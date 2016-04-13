@@ -38,6 +38,45 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="MousePressEvent"  event_variant="StartAdjustLevelWindow" target="adjustlevelwindow">
             <action name="init"/>
         </transition>
+        <transition event_class="InteractionPositionEvent"  event_variant="SetCrosshair" target="crosshair">
+            <action name="setCrosshair"/>
+            <action name="updateStatusbar"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent"  event_variant="Move" target="rotationPossible">
+            <condition name="check_can_rotate"/>
+            <action name="startRotation"/>
+        </transition>
+        <!-- Case when we do crosshair instead of rotation) -->
+        <transition event_class="InteractionPositionEvent"  event_variant="StartRotate" target="crosshair">
+            <condition name="check_can_rotate" inverted="true" />
+        </transition>
+
+        <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="swivel">
+            <condition name="check_can_swivel"/>
+        </transition>
+        <!-- Case when we do crosshair instead of swivel) -->
+        <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="crosshair">
+            <condition name="check_can_swivel" inverted="true"/>
+        </transition>
+    </state>
+    <state name="crosshair">
+      <transition event_class="InteractionPositionEvent"  event_variant="MoveCrosshair" target="crosshair">
+        <action name="setCrosshair"/>
+        <action name="updateStatusbar"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
+
+      <!-- Case when we jumped in from rotation (wanted to rotate, but not possible, so alternative action is to set crosshair) -->
+      <transition event_class="InteractionPositionEvent"  event_variant="Rotate" target="crosshair">
+        <action name="setCrosshair"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="EndRotate" target="start"/>
+      <!-- Case when we do crosshair instead of swivel) -->
+      <transition event_class="InteractionPositionEvent"  event_variant="Swivel" target="crosshair">
+        <action name="setCrosshair"/>
+        <action name="updateStatusbar"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
     </state>
     <state name="move">
       <transition event_class="InteractionPositionEvent" event_variant="Moving" target="move">
@@ -68,4 +107,42 @@ TODO Std move to abort interaction of scroll/pan/zoom
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>
     </state>
+    <state name="rotationPossible">
+      <transition event_class="InteractionPositionEvent" event_variant="StartRotate" target="rotation">
+        <action name="rotate"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="Move" target="start">
+        <condition name="check_can_rotate" inverted="true" />
+        <action name="endRotation"/>
+      </transition>
+      <transition event_class="InteractionEvent" event_variant="PlaneUP" target="rotationPossible">
+        <action name="ScrollOneUp"/>
+      </transition>
+      <transition event_class="InteractionEvent" event_variant="PlaneDown" target="rotationPossible">
+        <action name="ScrollOneDown"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="StartMove" target="move">
+        <condition name="check_position_event"/>
+        <action name="init"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="StartZoom" target="zoom">
+        <condition name="check_position_event"/>
+        <action name="init"/>
+      </transition>
+    </state>
+    <state name="rotation">
+      <transition event_class="InteractionPositionEvent" event_variant="Rotate" target="rotation">
+        <action name="rotate"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="EndRotate" target="start">
+        <action name="endRotation"/>
+      </transition>
+    </state>
+    <state name="swivel">
+      <transition event_class="InteractionPositionEvent" event_variant="Swivel" target="swivel">
+        <action name="swivel"/>
+      </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
+    </state>
+
 </statemachine>

@@ -80,9 +80,6 @@ void mitk::vtkSimulationPolyDataMapper2D::Render(vtkRenderer* renderer, vtkActor
   PlaneIntersectionVisitor planeIntersectionVisitor(planeGeometry->GetOrigin(), planeGeometry->GetNormal());
   m_Simulation->GetRootNode()->executeVisitor(&planeIntersectionVisitor);
 
-  mitk::DisplayGeometry::Pointer displayGeometry = mitkRenderer->GetDisplayGeometry();
-  Point2D point2D;
-
   glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
   glEnable(GL_COLOR_MATERIAL);
 

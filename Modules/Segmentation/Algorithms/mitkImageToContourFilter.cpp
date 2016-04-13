@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkProperty.h"
 #include "mitkImageAccessByItk.h"
 
+#include <itkConstantPadImageFilter.h>
+
 
 mitk::ImageToContourFilter::ImageToContourFilter()
 {
@@ -68,8 +70,28 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction (const itk::Image<TPixel
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ContourExtractor2DImageFilter<ImageType> ContourExtractor;
 
+  typedef itk::ConstantPadImageFilter<ImageType, ImageType> PadFilterType;
+  typename PadFilterType::Pointer padFilter = PadFilterType::New();
+  typename ImageType::SizeType lowerExtendRegion;
+  lowerExtendRegion[0] = 1;
+  lowerExtendRegion[1] = 1;
+
+  typename ImageType::SizeType upperExtendRegion;
+  upperExtendRegion[0] = 1;
+  upperExtendRegion[1] = 1;
+
+  /*
+   * We need to pad here, since the ITK contour extractor fails if the
+   * segmentation touches more than one image edge.
+   * By padding the image for one row at each edge we overcome this issue
+   */
+  padFilter->SetInput(sliceImage);
+  padFilter->SetConstant(0);
+  padFilter->SetPadLowerBound(lowerExtendRegion);
+  padFilter->SetPadUpperBound(upperExtendRegion);
+
   typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
-  contourExtractor->SetInput(sliceImage);
+  contourExtractor->SetInput(padFilter->GetOutput());
   contourExtractor->SetContourValue(0.5);
 
   contourExtractor->Update();

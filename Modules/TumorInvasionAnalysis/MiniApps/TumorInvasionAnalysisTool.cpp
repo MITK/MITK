@@ -28,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // ITK
 #include <itkImageRegionIterator.h>
 
+using namespace std;
+
 int main(int argc, char *argv[]) {
     // Setup CLI Module parsable interface
     mitkCommandLineParser parser;
@@ -64,6 +66,7 @@ int main(int argc, char *argv[]) {
                        "output folder for results");
     parser.addArgument("forest", "t", mitkCommandLineParser::OutputFile,
                        "store trained forest to file");
+
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     // Show a help message
@@ -192,6 +195,7 @@ int main(int argc, char *argv[]) {
 
     classifier.SetClassRatio(ratio);
     classifier.SetTrainMargin(7, 1);
+    classifier.SamplesWeightingActivated(true);
     classifier.SelectTrainingSamples(trainCollection, samplingMode);
     // Learning stage
     std::cout << "Start Training" << std::endl;
@@ -203,7 +207,16 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Start Predict" << std::endl;
     classifier.PredictInvasion(testCollection, features);
+
+    if (false && outputFolder != "") {
+        std::cout << "Saving files to " << outputFolder << std::endl;
+        mitk::CollectionWriter::ExportCollectionToFolder(trainCollection,
+                                                        "/tmp/dumple");
+    }
     classifier.SanitizeResults(testCollection);
+
+
+
 
     {
         mitk::DataCollectionImageIterator<unsigned char, 3> gtvIt(testCollection,

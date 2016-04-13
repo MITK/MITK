@@ -27,6 +27,9 @@ namespace mitk {
 
 /**
  * @brief The ScaleOperation is an operation to scale any mitk::BaseGeometry.
+ *
+ * The scale factor is expressed as a factor relative to the current size.
+ * For doubling the size, you would use a factor of 1.0 == 100% plus.
  */
 class MITKCORE_EXPORT ScaleOperation : public Operation
 {
@@ -35,8 +38,8 @@ class MITKCORE_EXPORT ScaleOperation : public Operation
   /**
    * @brief ScaleOperation constructor.
    * @param operationType this has to be set to OpSCALE.
-   * @param scaleFactor scaling factor in percentage of the input geometry.
-   * @param scaleAnchorPoint Point to scale the object arround.
+   * @param scaleFactor Relative scaling factor in percentage of the input geometry.
+   * @param scaleAnchorPoint Point to scale the object around.
    * Typically geometry->GetCenter() or geometry->GetOrigin() are nice.
    */
   ScaleOperation(OperationType operationType, Point3D scaleFactor, Point3D scaleAnchorPoint);

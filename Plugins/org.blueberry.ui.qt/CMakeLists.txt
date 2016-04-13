@@ -19,6 +19,6 @@ set(PLUGIN_exported_include_suffixes
 mitk_create_plugin(EXPORT_DIRECTIVE BERRY_UI_QT
                         EXPORTED_INCLUDE_SUFFIXES ${PLUGIN_exported_include_suffixes})
 
-if(MITK_USE_Qt5)
+if(MITK_USE_QT)
   target_link_libraries(${PLUGIN_TARGET} PUBLIC Qt5::Widgets)
 endif()

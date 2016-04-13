@@ -189,6 +189,18 @@ namespace mitk {
     virtual void SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep) override;
 
     /**
+    * \brief Replaces the geometry instances with clones of the passed geometry.
+    *
+    * Replaces the geometries of all time steps with clones of the passed
+    * geometry. Replacement strategy depends on the implementation of TimeGeometry
+    * sub class.
+    * @remark The time points itself stays untouched. Use this method if you want
+    * to change the spatial properties of a TimeGeometry and preserve the time
+    * "grid".
+    */
+    virtual void ReplaceTimeStepGeometries(const BaseGeometry* geometry);
+
+    /**
     * \brief Makes a deep copy of the current object
     */
     virtual itk::LightObject::Pointer InternalClone () const override;
@@ -208,7 +220,7 @@ namespace mitk {
     *
     * Saves a copy for each time step.
     */
-    void Initialize (BaseGeometry* geometry, TimeStepType timeSteps);
+    void Initialize (const BaseGeometry* geometry, TimeStepType timeSteps);
     /**
     * \brief Initialize the TimeGeometry with empty BaseGeometry
     */
@@ -223,5 +235,29 @@ namespace mitk {
     TimePointType m_FirstTimePoint;
     TimePointType m_StepDuration;
   }; // end class ProportialTimeGeometry
+
+
+  /**
+  * @brief Equal A function comparing two ProportionalTimeGeometries for being identical.
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * The function compares two instances of ProportionalTimeGeometries in all their aspects.
+  *
+  * The parameter eps is a tolerance value for all methods which are internally used for comparison.
+  * If you want to use different tolerance values for different parts of the geometry, feel free to use
+  * the other comparison methods and write your own implementation of Equal.
+  *
+  * @param rightHandSide Compare this against leftHandSide.
+  * @param leftHandSide Compare this against rightHandSide.
+  * @param eps Tolerance for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  *
+  * @return True, if all comparison are true. False in any other case.
+  */
+  MITKCORE_EXPORT bool Equal(const mitk::ProportionalTimeGeometry& leftHandSide, const mitk::ProportionalTimeGeometry& rightHandSide, ScalarType eps, bool verbose);
+
+
+
 } // end namespace MITK
 #endif // ProportionalTimeGeometry_h

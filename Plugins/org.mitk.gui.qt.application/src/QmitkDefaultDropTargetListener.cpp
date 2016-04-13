@@ -79,8 +79,6 @@ void QmitkDefaultDropTargetListener::DropEvent(QDropEvent *event)
     return;
 
   QStringList fileNames2;
-  //TODO Qt 4.7 API
-  //fileNames2.reserve(fileNames.size());
   foreach(QUrl url, fileNames)
   {
     fileNames2.push_back(url.toLocalFile());

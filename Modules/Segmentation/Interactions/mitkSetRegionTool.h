@@ -60,17 +60,11 @@ class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
     virtual void Activated() override;
     virtual void Deactivated() override;
 
-    virtual bool OnMousePressed ( StateMachineAction*, InteractionEvent* );
-    virtual bool OnMouseReleased( StateMachineAction*, InteractionEvent* );
-    virtual bool OnInvertLogic  ( StateMachineAction*, InteractionEvent* );
+    virtual void OnMousePressed ( StateMachineAction*, InteractionEvent* );
+    virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* );
+    virtual void OnMouseMoved ( StateMachineAction*, InteractionEvent* );
 
     int m_PaintingPixelValue;
-
-    bool m_FillContour;
-    bool m_StatusFillWholeSlice;
-
-    ContourModel::Pointer m_SegmentationContourInWorldCoordinates;
-    ContourModel::Pointer m_WholeImageContourInWorldCoordinates;
 };
 
 } // namespace

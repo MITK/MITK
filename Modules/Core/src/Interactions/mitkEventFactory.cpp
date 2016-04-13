@@ -58,7 +58,7 @@ static std::string GetButtonState(mitk::InteractionEvent *event)
 {
   mitk::InteractionEvent::MouseButtons buttonState = mitk::InteractionEvent::NoButton;
   std::string eventClass = event->GetNameOfClass();
-  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
+  std::transform(eventClass.cbegin(), eventClass.cend(), eventClass.begin(), ::toupper);
 
   std::string strButtonState = "";
   if (eventClass == "MOUSEPRESSEVENT")
@@ -117,7 +117,7 @@ static std::string GetModifierState(mitk::InteractionEvent *event)
 {
   mitk::InteractionEvent::ModifierKeys modifierKeys = mitk::InteractionEvent::NoKey;
   std::string eventClass = event->GetNameOfClass();
-  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
+  std::transform(eventClass.cbegin(), eventClass.cend(), eventClass.begin(), ::toupper);
   std::string strModKeys = "";
   // TODO Add InteractionKey
   if (eventClass == "MOUSEPRESSEVENT")
@@ -176,7 +176,7 @@ static std::string GetEventButton(mitk::InteractionEvent *event)
 {
   mitk::InteractionEvent::MouseButtons button = mitk::InteractionEvent::NoButton;
   std::string eventClass = event->GetNameOfClass();
-  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
+  std::transform(eventClass.cbegin(), eventClass.cend(), eventClass.begin(), ::toupper);
   std::string stdButton = "";
   // TODO Add InteractionKey
   if (eventClass == "MOUSEPRESSEVENT")
@@ -288,9 +288,9 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   //Position in world coordinates
   if(list->GetStringProperty(InteractionEventConst::xmlEventPropertyPositionInWorld().c_str(), strWorld))
   {
-    std::vector<std::string> coords = split(strWorld, ',');
+    const std::vector<std::string> coords = split(strWorld, ',');
     int i = 0;
-    for ( std::vector<std::string>::iterator it = coords.begin(); it != coords.end(); ++it, ++i)
+    for ( std::vector<std::string>::const_iterator it = coords.cbegin(); it != coords.cend(); ++it, ++i)
     {
       worldPos[i] = atof((*it).c_str());
     }
@@ -302,7 +302,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     std::vector<std::string> mods = split(strModifiers, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
     {
-      std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
+      std::transform((*it).cbegin(), (*it).cend(), (*it).begin(), ::toupper);
       if (*it == "CTRL")
       {
         modifiers = modifiers | InteractionEvent::ControlKey;
@@ -325,7 +325,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   // Set EventButton
   if (list->GetStringProperty(InteractionEventConst::xmlEventPropertyEventButton().c_str(), strEventButton))
   {
-    std::transform(strEventButton.begin(), strEventButton.end(), strEventButton.begin(), ::toupper);
+    std::transform(strEventButton.cbegin(), strEventButton.cend(), strEventButton.begin(), ::toupper);
     if (strEventButton == "MIDDLEMOUSEBUTTON")
     {
       eventButton = InteractionEvent::MiddleMouseButton;
@@ -350,7 +350,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
     std::vector<std::string> mods = split(strButtonState, ',');
     for (std::vector<std::string>::iterator it = mods.begin(); it != mods.end(); ++it)
     {
-      std::transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
+      std::transform((*it).cbegin(), (*it).cend(), (*it).begin(), ::toupper);
       if (*it == "MIDDLEMOUSEBUTTON")
       {
         buttonState = buttonState | InteractionEvent::MiddleMouseButton;
@@ -386,7 +386,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else
   {
-    std::transform(strWheelDelta.begin(), strWheelDelta.end(), strWheelDelta.begin(), ::toupper);
+    std::transform(strWheelDelta.cbegin(), strWheelDelta.cend(), strWheelDelta.begin(), ::toupper);
     if (strWheelDelta == "DOWN")
     {
       wheelDelta = -1;
@@ -415,7 +415,7 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
 
     //if not found always use first registered renderer
     if(renderer == NULL)
-      renderer = (*(mitk::BaseRenderer::baseRendererMap.begin())).second;
+      renderer = (*(mitk::BaseRenderer::baseRendererMap.cbegin())).second;
 }
 
   /*
@@ -423,26 +423,26 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
    */
 
   mitk::InteractionEvent::Pointer event;
-  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
+  std::transform(eventClass.cbegin(), eventClass.cend(), eventClass.begin(), ::toupper);
 
   if (eventClass == "MOUSEPRESSEVENT")
   {
     // buttonstates incorporate the event button (as in Qt)
     buttonState = buttonState | eventButton;
-    event = MousePressEvent::New(renderer, pos,worldPos, buttonState, modifiers, eventButton);
+    event = MousePressEvent::New(renderer, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEDOUBLECLICKEVENT")
   {
     buttonState = buttonState | eventButton;
-    event = MouseDoubleClickEvent::New(renderer, pos,worldPos, buttonState, modifiers, eventButton);
+    event = MouseDoubleClickEvent::New(renderer, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "MOUSEMOVEEVENT")
   {
-    event = MouseMoveEvent::New(renderer, pos,worldPos, buttonState, modifiers);
+    event = MouseMoveEvent::New(renderer, pos, buttonState, modifiers);
   }
   else if (eventClass == "MOUSERELEASEEVENT")
   {
-    event = MouseReleaseEvent::New(renderer, pos,worldPos, buttonState, modifiers, eventButton);
+    event = MouseReleaseEvent::New(renderer, pos, buttonState, modifiers, eventButton);
   }
   else if (eventClass == "INTERACTIONKEYEVENT")
   {
@@ -450,11 +450,11 @@ mitk::InteractionEvent::Pointer mitk::EventFactory::CreateEvent(PropertyList::Po
   }
   else if (eventClass == "MOUSEWHEELEVENT")
   {
-    event = MouseWheelEvent::New(renderer, pos,worldPos, buttonState, modifiers, wheelDelta);
+    event = MouseWheelEvent::New(renderer, pos, buttonState, modifiers, wheelDelta);
   }
   else if (eventClass == "INTERACTIONPOSITIONEVENT")
   {
-    event = InteractionPositionEvent::New(renderer, pos,worldPos);
+    event = InteractionPositionEvent::New(renderer, pos);
   }
   else if (eventClass == "INTERNALEVENT")
   {
@@ -482,7 +482,7 @@ std::string mitk::EventFactory::EventToXML(mitk::InteractionEvent *event)
   std::string eventClass = event->GetNameOfClass();
   std::string eventXML = "<" + InteractionEventConst::xmlTagEventVariant() +  " " + InteractionEventConst::xmlParameterEventClass() + "=\"";
 
-  std::transform(eventClass.begin(), eventClass.end(), eventClass.begin(), ::toupper);
+  std::transform(eventClass.cbegin(), eventClass.cend(), eventClass.begin(), ::toupper);
 
   eventXML += eventClass + "\" >\n";
   // here follow event specific attributes

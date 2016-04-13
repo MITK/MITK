@@ -404,21 +404,7 @@ function(mitk_create_module)
       endif()
     endif()
 
-    # Qt 4 case
-    if(MITK_USE_Qt4)
-      if(UI_FILES)
-        qt4_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
-      endif()
-      if(MOC_H_FILES)
-        qt4_wrap_cpp(Q${KITNAME}_GENERATED_MOC_CPP ${MOC_H_FILES} OPTIONS -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-      endif()
-      if(QRC_FILES)
-        qt4_add_resources(Q${KITNAME}_GENERATED_QRC_CPP ${QRC_FILES})
-      endif()
-    endif()
-
-    # all the same for Qt 5
-    if(MITK_USE_Qt5)
+    if(MITK_USE_QT)
       if(UI_FILES)
         qt5_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
       endif()

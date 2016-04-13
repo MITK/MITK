@@ -151,49 +151,47 @@ protected:
   * openGL attributes to reduce unnecessary setting of these attributes.
   * (e.g. no need to set color twice if it's the same)
   */
-  void RenderLines( PlanarFigureDisplayMode lineDisplayMode,
+  void RenderLines( const PlanarFigureDisplayMode lineDisplayMode,
                     mitk::PlanarFigure * planarFigure,
                     mitk::Point2D &anchorPoint,
-                    mitk::PlaneGeometry * planarFigurePlaneGeometry,
+                    const mitk::PlaneGeometry * planarFigurePlaneGeometry,
                     const mitk::PlaneGeometry * rendererPlaneGeometry,
-                    mitk::DisplayGeometry * displayGeometry );
+                    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Renders the quantities of the figure below the text annotations.
   */
-  void RenderQuantities( mitk::PlanarFigure * planarFigure,
+  void RenderQuantities( const mitk::PlanarFigure * planarFigure,
                          mitk::BaseRenderer * renderer,
-                         mitk::Point2D anchorPoint,
+                         const mitk::Point2D anchorPoint,
                          double &annotationOffset,
                          float globalOpacity,
-                         PlanarFigureDisplayMode lineDisplayMode );
+                         const PlanarFigureDisplayMode lineDisplayMode );
 
   /**
   * \brief Renders the text annotations.
   */
   void RenderAnnotations( mitk::BaseRenderer * renderer,
-                          std::string name,
-                          mitk::Point2D anchorPoint,
+                          const std::string name,
+                          const mitk::Point2D anchorPoint,
                           float globalOpacity,
-                          PlanarFigureDisplayMode lineDisplayMode,
+                          const PlanarFigureDisplayMode lineDisplayMode,
                           double &annotationOffset );
 
   /**
   * \brief Renders the control-points.
   */
-  void RenderControlPoints( mitk::PlanarFigure * planarFigure,
-                            PlanarFigureDisplayMode lineDisplayMode,
-                            mitk::PlaneGeometry * planarFigurePlaneGeometry,
+  void RenderControlPoints( const mitk::PlanarFigure * planarFigure,
+                            const PlanarFigureDisplayMode lineDisplayMode,
+                            const mitk::PlaneGeometry * planarFigurePlaneGeometry,
                             const mitk::PlaneGeometry * rendererPlaneGeometry,
-                            mitk::DisplayGeometry * displayGeometry );
+                            mitk::BaseRenderer * renderer);
 
 
-  void TransformObjectToDisplay(
-    const mitk::Point2D &point2D,
+  void TransformObjectToDisplay(const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
-    const mitk::PlaneGeometry *objectGeometry,
-    const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry );
+    const mitk::PlaneGeometry *objectGeometry, const mitk::PlaneGeometry *,
+    const mitk::BaseRenderer * renderer);
 
   void DrawMarker(
     const mitk::Point2D &point,
@@ -205,17 +203,17 @@ protected:
     PlanarFigureControlPointStyleProperty::Shape shape,
     const mitk::PlaneGeometry *objectGeometry,
     const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry );
+    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Actually paints the polyline defined by the figure.
   */
-  void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
+  void PaintPolyLine( const mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,
     const PlaneGeometry* rendererPlaneGeometry,
-    const DisplayGeometry* displayGeometry);
+    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Internally used by RenderLines() to draw the mainlines using
@@ -225,7 +223,7 @@ protected:
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,
     const PlaneGeometry* rendererPlaneGeometry,
-    const DisplayGeometry* displayGeometry) ;
+    const mitk::BaseRenderer * renderer);
 
   /**
   * \brief Internally used by RenderLines() to draw the helperlines using
@@ -235,7 +233,7 @@ protected:
     Point2D& anchorPoint,
     const PlaneGeometry* planarFigurePlaneGeometry,
     const PlaneGeometry* rendererPlaneGeometry,
-    const DisplayGeometry* displayGeometry) ;
+    const mitk::BaseRenderer * renderer);
 
   void InitializeDefaultPlanarFigureProperties();
 
@@ -272,6 +270,12 @@ private:
   bool m_DrawName;
   bool m_DrawDashed;
   bool m_DrawHelperDashed;
+  bool m_AnnotationsShadow;
+
+  std::string m_AnnotationFontFamily;
+  bool m_DrawAnnotationBold;
+  bool m_DrawAnnotationItalic;
+  int  m_AnnotationSize;
 
   // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;
@@ -279,6 +283,8 @@ private:
   float m_OutlineWidth;
   float m_HelperlineWidth;
   //float m_PointWidth;
+
+  float m_DevicePixelRatio;
 
   PlanarFigureControlPointStyleProperty::Shape m_ControlPointShape;
 
@@ -292,6 +298,7 @@ private:
   float m_MarkerlineOpacity[3];
   float m_MarkerColor[3][3];
   float m_MarkerOpacity[3];
+  float m_AnnotationColor[3][3];
 
   // Bool flag that represents whether or not the DataNode has been modified.
   bool m_NodeModified;

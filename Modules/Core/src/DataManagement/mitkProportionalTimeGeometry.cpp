@@ -151,7 +151,7 @@ mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimePo
 
 mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep) const
 {
-  if (timeStep > m_GeometryVector.size())
+  if (timeStep >= m_GeometryVector.size())
     return nullptr;
   return m_GeometryVector[timeStep]->Clone();
 }
@@ -221,14 +221,23 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
   return parent;
 }
 
-void mitk::ProportionalTimeGeometry::Initialize (BaseGeometry* geometry, TimeStepType timeSteps)
+void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry* geometry)
+{
+  for (TimeStepType currentStep = 0; currentStep < this->CountTimeSteps(); ++currentStep)
+  {
+    BaseGeometry::Pointer clonedGeometry = geometry->Clone();
+    this->SetTimeStepGeometry(clonedGeometry.GetPointer(), currentStep);
+  }
+}
+
+void mitk::ProportionalTimeGeometry::Initialize (const BaseGeometry* geometry, TimeStepType timeSteps)
 {
   timeSteps = (timeSteps > 0) ? timeSteps : 1;
   m_FirstTimePoint = 0.0;
   m_StepDuration = 1.0;
   if (timeSteps < 2)
   {
-    m_FirstTimePoint = -std::numeric_limits<double>::max();
+    m_FirstTimePoint = -std::numeric_limits<mitk::TimePointType>::max();
     m_StepDuration = std::numeric_limits<mitk::TimePointType>().infinity();
   }
 
@@ -269,4 +278,20 @@ void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream& os, itk::Indent ind
     os << "NULL" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
+}
+
+bool mitk::Equal(const ProportionalTimeGeometry& leftHandSide, const ProportionalTimeGeometry& rightHandSide, ScalarType eps, bool verbose)
+{
+  bool result = mitk::Equal( static_cast<const TimeGeometry&>(leftHandSide),
+                             static_cast<const TimeGeometry&>(rightHandSide),
+                             eps,
+                             verbose);
+
+  if (!result) // early out if base class already is unhappy
+    return false;
+
+  // base class test already covers all aspects that could differ
+  // no need to test anything more.
+
+  return result;
 }

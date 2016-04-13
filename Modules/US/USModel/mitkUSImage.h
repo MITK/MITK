@@ -48,7 +48,7 @@ namespace mitk {
       /**
       * \brief Reads out this image's Metadata set from the properties and returns a corresponding USImageMetadata object.
       */
-      mitk::USImageMetadata::Pointer GetMetadata();
+      mitk::USImageMetadata::Pointer GetMetadata() const;
 
       /**
       * \brief Writes the information of the metadata object into the image's properties.

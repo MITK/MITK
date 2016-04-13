@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 #include <mitkLookupTableProperty.h>
 #include <mitkVtkScalarModeProperty.h>
+#include <mitkTransferFunctionProperty.h>
 #include <mitkCoreServices.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
@@ -290,9 +291,56 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   //to be disabled.
   localStorage->m_Actor->GetProperty()->SetLighting(0);
 
-  bool scalarVisibility = false;
-  node->GetBoolProperty("scalar visibility", scalarVisibility);
-  localStorage->m_Mapper->SetScalarVisibility(scalarVisibility);
+  // same block for scalar data rendering as in 3D mapper
+  mitk::TransferFunctionProperty::Pointer transferFuncProp;
+  this->GetDataNode()->GetProperty(transferFuncProp, "Surface.TransferFunction", renderer);
+  if (transferFuncProp.IsNotNull() )
+  {
+    localStorage->m_Mapper->SetLookupTable(transferFuncProp->GetValue()->GetColorTransferFunction());
+  }
+
+  mitk::LookupTableProperty::Pointer lookupTableProp;
+  this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
+  if (lookupTableProp.IsNotNull() )
+  {
+    localStorage->m_Mapper->SetLookupTable(lookupTableProp->GetLookupTable()->GetVtkLookupTable());
+  }
+
+  mitk::LevelWindow levelWindow;
+  if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer, "levelWindow"))
+  {
+    localStorage->m_Mapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+  }
+  else
+    if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
+    {
+      localStorage->m_Mapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+    }
+
+    bool scalarVisibility = false;
+    this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+    localStorage->m_Mapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
+
+    if(scalarVisibility)
+    {
+      mitk::VtkScalarModeProperty* scalarMode;
+      if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
+        localStorage->m_Mapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+      else
+        localStorage->m_Mapper->SetScalarModeToDefault();
+
+      bool colorMode = false;
+      this->GetDataNode()->GetBoolProperty("color mode", colorMode);
+      localStorage->m_Mapper->SetColorMode( (colorMode ? 1 : 0) );
+
+      double scalarsMin = 0;
+      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
+
+      double scalarsMax = 1.0;
+      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
+
+      localStorage->m_Mapper->SetScalarRange(scalarsMin,scalarsMax);
+    }
 
   //color for inverse normals
   float inverseNormalsColor[3]= { 1.0f, 0.0f, 0.0f };

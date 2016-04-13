@@ -6,7 +6,7 @@
         </transition>
     </state>
     <state name="select" >
-        <transition event_class="InteractionPositionEvent" event_variant="MovePointer" target="start">
+        <transition event_class="InteractionPositionEvent" event_variant="MovePointer" target="select">
             <condition name="isOverObject" inverted="true" />
             <action name="deselectObject"/>
         </transition>
@@ -14,7 +14,7 @@
             <condition name="isOverObject"/>
             <action name="selectObject"/>
         </transition>
-        <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+        <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="select">
             <action name="deselectObject"/>
         </transition>
         <transition event_class="InteractionPositionEvent" event_variant="ScaleRadius" target="select">

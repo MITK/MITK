@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkPropRenderer.h"
 
 #include "mitkTestingMacros.h"
-#include "mitkGlobalInteraction.h"
 
 #include <iostream>
 
@@ -186,6 +185,12 @@ static void TestPropertyList(mitk::DataNode::Pointer dataNode)
   double yd = 0;
   dataNode->GetDoubleProperty("float", yd);
   MITK_TEST_CONDITION(mitk::Equal(yd, static_cast<double>(y)), "Testing GetDoubleProperty");
+
+  double d = sqrt(2.0);
+  dataNode->SetDoubleProperty("double", d);
+  double read_d;
+  MITK_TEST_CONDITION(dataNode->GetDoubleProperty("double", read_d), "Testing GetDoubleProperty");
+  MITK_TEST_CONDITION(d == read_d, "Testing Set/GetDoubleProperty"); // Equal does not the same thing
   dataNode->SetStringProperty("string", "MITK");
   std::string s = "GANZVIELPLATZ";
   dataNode->GetStringProperty("string", s);
@@ -283,8 +288,6 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("DataNode")
 
-  // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // let's create an object of our class
   mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();

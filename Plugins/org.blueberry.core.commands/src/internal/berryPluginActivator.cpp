@@ -14,10 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "berryPluginActivator.h"
-
-#include <QtPlugin>
 
 namespace berry {
 
@@ -36,7 +33,3 @@ void org_blueberry_core_commands_Activator::stop(ctkPluginContext* context)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_blueberry_core_commands, berry::org_blueberry_core_commands_Activator)
-#endif

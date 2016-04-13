@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone=no>
+<DICOMFileReader
+  class="ThreeDnTDICOMSeriesReader"
+  version="1"
+  label="3D+t by AcquisitionNumber"  description="Group as 3D+t by AcquisitionTime, then sort by Image Position (Patient)"
+  group3DnT="true"
+  fixTiltByShearing="true">
+  <DICOMDatasetSorter class="DICOMTagBasedSorter">
+    <Distinguishing>
+      <Tag name="SeriesInstanceUID" group="0020," element="000e"/>
+      <Tag name="AcquisitionTime" group="0x0008," element="0x0032"/>
+    </Distinguishing>
+    <Sorting>
+     <ImagePositionPatient/>
+     <Tag name="InstanceNumber" group="0x0020" element="0x0013"/>
+     <Tag name="SOPInstanceUID" group="0x0008," element="0x0018"/>
+    </Sorting>
+  </DICOMDatasetSorter>
+</DICOMFileReader>

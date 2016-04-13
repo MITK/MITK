@@ -20,11 +20,9 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
         )
   endif()
 
-  # Determine the Qt4/5 library installation prefix
+  # Determine the Qt5 library installation prefix
   set(_qmake_location )
-  if(MITK_USE_Qt4)
-    set(_qmake_location ${QT_QMAKE_EXECUTABLE})
-  elseif(MITK_USE_Qt5 AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
+  if(MITK_USE_QT AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
                  PROPERTY IMPORT_LOCATION)
   endif()
@@ -85,9 +83,6 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   if(WIN32)
     if(SOFA_DIR)
       list(APPEND _dir_candidates "${SOFA_DIR}/bin")
-    endif()
-    if(REDLAND_INSTALL_DIR)
-      list(APPEND _dir_candidates "${REDLAND_INSTALL_DIR}/bin")
     endif()
     list(APPEND _dir_candidates "${ITK_DIR}/bin")
   else()

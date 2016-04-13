@@ -17,27 +17,14 @@ if(TARGET ${TESTDRIVER})
                           ${MITK_DATA_DIR}/Pic2DplusT.nrrd
   )
 
-  mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest
-                          ${MITK_DATA_DIR}/TestStateMachine1.xml
-                          ${MITK_DATA_DIR}/TestStateMachine2.xml
-  )
 
   mitkAddCustomModuleTest(mitkEventConfigTest_CreateObjectInDifferentWays mitkEventConfigTest
                           ${MITK_SOURCE_DIR}/Modules/Core/test/resource/Interactions/StatemachineConfigTest.xml
   )
 
-  mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
-                          ${MITK_DATA_DIR}/Pic3D.nrrd
-                          ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd
-  )
 
   mitkAddCustomModuleTest(mitkDataStorageTest_US4DCyl mitkDataStorageTest
                           ${MITK_DATA_DIR}/US4DCyl.nrrd
-  )
-
-  mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStateMachineFactoryTest
-                          ${MITK_DATA_DIR}/TestStateMachine1.xml
-                          ${MITK_DATA_DIR}/TestStateMachine2.xml
   )
 
   mitkAddCustomModuleTest(mitkDicomSeriesReaderTest_CTImage mitkDicomSeriesReaderTest
@@ -147,21 +134,22 @@ if(TARGET ${TESTDRIVER})
     )
     endif()
 
+# BUG 18695 - tests deactivated, because win 32 bit continuous renders images slightly different. TODO!
     #Test reslice interpolation
     #note: nearest mode is already tested by swivel test
-    mitkAddCustomModuleTest(ResliceInterpolationIsLinear mitkImageVtkMapper2DResliceInterpolationPropertyTest
-                            1 #linear
-                            ${MITK_DATA_DIR}/Pic3D.nrrd
-                            -V
-                            ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefLinear.png #corresponding reference screenshot LINEAR
-    )
+    #mitkAddCustomModuleTest(ResliceInterpolationIsLinear mitkImageVtkMapper2DResliceInterpolationPropertyTest
+    #                        1 #linear
+    #                        ${MITK_DATA_DIR}/Pic3D.nrrd
+    #                        -V
+    #                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefLinear.png #corresponding reference screenshot LINEAR
+    #)
 
-    mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceInterpolationPropertyTest
-                            3 #cubic
-                            ${MITK_DATA_DIR}/Pic3D.nrrd
-                            -V
-                            ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefCubic.png #corresponding reference screenshot CUBIC
-    )
+    #mitkAddCustomModuleTest(ResliceInterpolationIsCubic mitkImageVtkMapper2DResliceInterpolationPropertyTest
+    #                        3 #cubic
+    #                        ${MITK_DATA_DIR}/Pic3D.nrrd
+    #                        -V
+    #                        ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/pic3dRefCubic.png #corresponding reference screenshot CUBIC
+    #)
     #End test reslice interpolation
 
     # Testing of the rendering of binary images
@@ -213,9 +201,17 @@ if(TARGET ${TESTDRIVER})
     #mitkAddCustomModuleTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
     #                        ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz
     #)
+
+    mitkAddCustomModuleTest(mitkPlaneGeometryDataMapper2DTest mitkPlaneGeometryDataMapper2DTest
+                            ${MITK_DATA_DIR}/Pic3D.nrrd #input image to load in data storage
+                            -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/PlaneGeometryMapper640x480REF.png #corresponding reference screenshot
+    )
+
+
     SET_PROPERTY(TEST mitkRotatedSlice4DTest mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw
       # mitkImageVtkMapper2D_pic3dOpacity640x480
       mitkSurfaceVtkMapper2DTest mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2D_openMeAloneTransformed640x480 #mitkSurfaceVtkMapper3DTexturedSphereTest_Football
+      mitkPlaneGeometryDataMapper2DTest
     PROPERTY RUN_SERIAL TRUE)
 
   endif()

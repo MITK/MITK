@@ -18,16 +18,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNodePredicateDataType.h"
 
+#include <mitkSliceNavigationController.h>
+#include <mitkBaseRenderer.h>
 #include "QmitkDataStorageComboBox.h"
+#include "mitkCameraController.h"
 
-#include "mitkFocusManager.h"
-#include "mitkGlobalInteraction.h"
 #include "itkCommand.h"
 
-
 #include <QMessageBox>
-
-
 
 const std::string QmitkViewInitializationView::VIEW_ID = "org.mitk.views.viewinitialization";
 
@@ -74,8 +72,6 @@ void QmitkViewInitializationView::Activated()
 
 void QmitkViewInitializationView::Deactivated()
 {
-  mitk::FocusManager* fm = mitk::GlobalInteraction::GetInstance()->GetFocusManager();
-  fm->RemoveObserver(m_CommandTag);
 }
 
 void QmitkViewInitializationView::Visible()
@@ -106,7 +102,7 @@ void QmitkViewInitializationView::OnApply()
       m_Controls->cbFrontSide->isChecked(),
       m_Controls->cbRotated->isChecked()
       );
-    mitk::BaseRenderer::GetInstance(renderwindow)->GetDisplayGeometry()->Fit();
+    mitk::BaseRenderer::GetInstance(renderwindow)->GetCameraController()->Fit();
   }
 }
 
@@ -144,24 +140,12 @@ void QmitkViewInitializationView::InitRenderWindowSelector()
     itk::SimpleMemberCommand<QmitkViewInitializationView>::New();
   updateRendererListCommand->SetCallbackFunction( this, &QmitkViewInitializationView::UpdateRendererList );
 
-  mitk::FocusManager* fm = mitk::GlobalInteraction::GetInstance()->GetFocusManager();
-  m_CommandTag = fm->AddObserver(mitk::FocusEvent(), updateRendererListCommand);
-
   this->UpdateRendererList();
 }
 
 void QmitkViewInitializationView::UpdateRendererList()
 {
-  vtkRenderWindow* focusedRenderWindow = NULL;
-
-  mitk::FocusManager* fm = mitk::GlobalInteraction::GetInstance()->GetFocusManager();
-
-  mitk::BaseRenderer::ConstPointer br = fm->GetFocused();
-
-  if (br.IsNotNull())
-  {
-    focusedRenderWindow = br->GetRenderWindow();
-  }
+  vtkRenderWindow* focusedRenderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
 
   int selectedItem = -1;
   int itemNumber = 0;

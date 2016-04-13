@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>455</width>
-    <height>975</height>
+    <height>332</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,9 +20,6 @@
    <string>QmitkTemplate</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
-    <number>0</number>
-   </property>
    <item>
     <widget class="QLabel" name="labelError">
      <property name="text">
@@ -40,15 +37,155 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnXnatUpload">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Upload to XNAT</string>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources/xnat.qrc">
+         <normaloff>:/xnat-plugin/xnat-upload.png</normaloff>:/xnat-plugin/xnat-upload.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnXnatDownload">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Download File</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources/xnat.qrc">
+         <normaloff>:/xnat-plugin/xnat-download.png</normaloff>:/xnat-plugin/xnat-download.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnCreateXnatFolder">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Create Folder</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../resources/xnat.qrc">
+         <normaloff>:/xnat-plugin/xnat-folder.png</normaloff>:/xnat-plugin/xnat-folder.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Dowloading file ...</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QTreeView" name="treeView"/>
      </item>
     </layout>
    </item>
+   <item>
+    <layout class="QVBoxLayout" name="infoVerticalLayout">
+     <item>
+      <widget class="QmitkXnatProjectWidget" name="wgtProjectInfo" native="true"/>
+     </item>
+     <item>
+      <widget class="QmitkXnatExperimentWidget" name="wgtExperimentInfo" native="true"/>
+     </item>
+     <item>
+      <widget class="QmitkXnatSubjectWidget" name="wgtSubjectInfo" native="true"/>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkXnatProjectWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkXnatProjectWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkXnatSubjectWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkXnatSubjectWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkXnatExperimentWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkXnatExperimentWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../resources/xnat.qrc"/>
+ </resources>
  <connections/>
 </ui>

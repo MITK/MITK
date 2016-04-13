@@ -271,7 +271,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   unsigned int iterations = 40;
   unsigned int convergence_win_size = 8;
   double convergence_tolerance = 1e-5;
-  while( min_value / max_schedule_val < min_required_image_size )
+  while( max_schedule_val > 1.0 && (min_value / max_schedule_val < min_required_image_size) )
   {
     max_schedule_val /= 2;
     max_pyramid_lvl--;

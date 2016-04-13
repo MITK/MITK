@@ -316,9 +316,7 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
   if (style & Constants::CLOSE)
   {
     qtFlags |= Qt::WindowSystemMenuHint;
-#if QT_VERSION >= 0x040500
     qtFlags |= Qt::WindowCloseButtonHint;
-#endif
   }
   if (!(style & Constants::BORDER))
     qtFlags |= Qt::FramelessWindowHint;

@@ -28,8 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"
 #include "mitkRenderingManager.h"
-#include "mitkGlobalInteraction.h"
-#include "mitkEventMapper.h"
 #include "mitkGenericProperty.h"
 #include "mitkImageSource.h"
 #include "mitkCoreObjectFactory.h"
@@ -55,10 +53,6 @@ mitk::BaseData* mitk::DataNode::GetData() const
   return m_Data;
 }
 
-mitk::Interactor* mitk::DataNode::GetInteractor() const
-{
-  return m_Interactor;
-}
 
 void mitk::DataNode::SetData(mitk::BaseData* baseData)
 {
@@ -89,23 +83,11 @@ void mitk::DataNode::SetData(mitk::BaseData* baseData)
 
     m_DataReferenceChangedTime.Modified();
     Modified();
-
-    // inform the interactor about the change
-    if (m_Interactor.IsNotNull())
-    {
-      m_Interactor->DataChanged();
-    }
   }
 }
 
-void mitk::DataNode::SetInteractor(mitk::Interactor* interactor)
-{
-  m_Interactor = interactor;
-  if(m_Interactor.IsNotNull())
-    m_Interactor->SetDataNode(this);
-}
 
-mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
+mitk::DataNode::DataNode() : m_PropertyListModifiedObserverTag(0)
 {
   m_Mappers.resize(10);
 
@@ -122,17 +104,10 @@ mitk::DataNode::DataNode() : m_Data(NULL), m_PropertyListModifiedObserverTag(0)
 mitk::DataNode::~DataNode()
 {
   if(m_PropertyList.IsNotNull())
-    // remove modified event listener
     m_PropertyList->RemoveObserver(m_PropertyListModifiedObserverTag);
 
-  Interactor* interactor = this->GetInteractor();
-
-  if ( interactor )
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( interactor );
-  }
   m_Mappers.clear();
-  m_Data = NULL;
+  m_Data = nullptr;
 }
 
 mitk::DataNode& mitk::DataNode::operator=(const DataNode& right)
@@ -208,6 +183,17 @@ bool mitk::DataNode::VerifyRequestedRegion()
 void mitk::DataNode::SetRequestedRegion( const itk::DataObject * /*data*/)
 {
 }
+
+mitk::DataNode::PropertyListKeyNames mitk::DataNode::GetPropertyListNames() const
+{
+  PropertyListKeyNames result;
+
+  for (auto entries : m_MapOfPropertyLists)
+    result.push_back( entries.first );
+
+  return result;
+}
+
 
 void mitk::DataNode::CopyInformation(const itk::DataObject * /*data*/)
 {
@@ -455,7 +441,7 @@ void mitk::DataNode::SetFloatProperty( const char* propertyKey, float floatValue
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::FloatProperty::New(floatValue));
 }
 
-void mitk::DataNode::SetDoubleProperty(const char *propertyKey, float doubleValue, const mitk::BaseRenderer *renderer)
+void mitk::DataNode::SetDoubleProperty(const char *propertyKey, double doubleValue, const mitk::BaseRenderer *renderer)
 {
   if (dynamic_cast<FloatProperty*>(this->GetProperty(propertyKey, renderer)) != NULL)
   {
@@ -578,42 +564,16 @@ bool mitk::DataNode::IsSelected(const mitk::BaseRenderer* renderer)
   return selected;
 }
 
-void mitk::DataNode::SetInteractorEnabled( const bool& enabled )
+void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer interactor)
 {
-  if ( m_Interactor.IsNull() )
-  {
-    itkWarningMacro("Interactor is NULL. Couldn't enable or disable interaction.");
+  if (m_DataInteractor == interactor)
     return;
-  }
-  if ( enabled )
-    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor.GetPointer() );
-  else
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor.GetPointer() );
-}
 
-void mitk::DataNode::EnableInteractor()
-{
-  SetInteractorEnabled( true );
-}
-
-void mitk::DataNode::DisableInteractor()
-{
-  SetInteractorEnabled( false );
-}
-
-bool mitk::DataNode::IsInteractorEnabled() const
-{
-  return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
-}
-
-void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer& interactor)
-{
   m_DataInteractor = interactor;
-  Modified();
+  this->Modified();
 
-  // the interactor has changed, so we have ti invoke an InteractorChangedEvent
-  const mitk::DataNode::InteractorChangedEvent changedEvent;
-  InvokeEvent( changedEvent );
+  mitk::DataNode::InteractorChangedEvent changedEvent;
+  this->InvokeEvent(changedEvent);
 }
 
 mitk::DataInteractor::Pointer mitk::DataNode::GetDataInteractor() const

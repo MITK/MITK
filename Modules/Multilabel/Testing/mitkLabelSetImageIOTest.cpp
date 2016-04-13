@@ -26,16 +26,13 @@ std::string pathToImage;
 class mitkLabelSetImageIOTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLabelSetImageIOTestSuite);
-  MITK_TEST(TestGetWriteConfidenceLevel);
   MITK_TEST(TestWriteLabelSetImage);
-  MITK_TEST(TestGetReadConfidenceLevel);
   MITK_TEST(TestReadLabelSetImage);
   CPPUNIT_TEST_SUITE_END();
 
 private:
   mitk::Image::Pointer regularImage;
   mitk::LabelSetImage::Pointer multilabelImage;
-  mitk::LabelSetImageIO* lsetIO;
 
 public:
 
@@ -63,24 +60,12 @@ public:
     // TODO assert that the layer od labelset and labels is correct - TEST
 
     multilabelImage->AddLayer(newlayer);
-
-    lsetIO = new mitk::LabelSetImageIO();
   }
 
   void tearDown() override
   {
     regularImage = 0;
     multilabelImage = 0;
-    delete lsetIO;
-  }
-
-  void TestGetWriteConfidenceLevel()
-  {
-    dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetInput(regularImage);
-    CPPUNIT_ASSERT_MESSAGE("LabelSetImageIO returned wrong writer confidence level", lsetIO->GetWriterConfidenceLevel() == mitk::IFileIO::Unsupported);
-
-    dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetInput(multilabelImage);
-    CPPUNIT_ASSERT_MESSAGE("LabelSetImageIO returned wrong writer confidence level", lsetIO->GetWriterConfidenceLevel() == mitk::IFileIO::Supported);
   }
 
   void TestWriteLabelSetImage()
@@ -88,19 +73,11 @@ public:
     pathToImage = mitk::IOUtil::CreateTemporaryDirectory();
     pathToImage.append("/LabelSetTestImage.nrrd");
 
-    dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetInput(multilabelImage);
-    dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetOutputLocation(pathToImage);
-    dynamic_cast<mitk::IFileWriter*>(lsetIO)->Write();
-  }
+    mitk::IOUtil::Save(multilabelImage, pathToImage);
 
-  void TestGetReadConfidenceLevel()
-  {
-    dynamic_cast<mitk::IFileReader*>(lsetIO)->SetInput(GetTestDataFilePath("Pic3D.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("LabelSetImageIO returned wrong reader confidence level", lsetIO->GetReaderConfidenceLevel() == mitk::IFileIO::Unsupported);
-
-    std::string path = GetTestDataFilePath("Multilabel/Pic3DAsMultilabelImage.nrrd");
-    dynamic_cast<mitk::IFileReader*>(lsetIO)->SetInput(path);
-    CPPUNIT_ASSERT_MESSAGE("LabelSetImageIO returned wrong reader confidence level", lsetIO->GetReaderConfidenceLevel() == mitk::IFileIO::Supported);
+    //dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetInput(multilabelImage);
+    //dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetOutputLocation(pathToImage);
+    //dynamic_cast<mitk::IFileWriter*>(lsetIO)->Write();
   }
 
   void TestReadLabelSetImage()

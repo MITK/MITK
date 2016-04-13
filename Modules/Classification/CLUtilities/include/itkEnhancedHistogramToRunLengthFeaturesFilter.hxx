@@ -155,30 +155,48 @@ namespace itk {
 
       // Normalize all measures by the total number of runs
 
-      shortRunEmphasis       /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      longRunEmphasis        /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      greyLevelNonuniformity /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      runLengthNonuniformity /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
+      if (this->m_TotalNumberOfRuns > 0)
+      {
+        shortRunEmphasis       /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        longRunEmphasis        /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        greyLevelNonuniformity /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        runLengthNonuniformity /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
 
-      lowGreyLevelRunEmphasis /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      highGreyLevelRunEmphasis /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
+        lowGreyLevelRunEmphasis /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        highGreyLevelRunEmphasis /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
 
-      shortRunLowGreyLevelEmphasis /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      shortRunHighGreyLevelEmphasis /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      longRunLowGreyLevelEmphasis /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      longRunHighGreyLevelEmphasis /=
-        static_cast<double>( this->m_TotalNumberOfRuns );
-      runPercentage = static_cast<double>( this->m_TotalNumberOfRuns ) / static_cast<double>( this->m_NumberOfVoxels );
-      numberOfRuns = static_cast<double>( this->m_TotalNumberOfRuns ) ;
+        shortRunLowGreyLevelEmphasis /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        shortRunHighGreyLevelEmphasis /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        longRunLowGreyLevelEmphasis /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        longRunHighGreyLevelEmphasis /=
+          static_cast<double>( this->m_TotalNumberOfRuns );
+        runPercentage = static_cast<double>( this->m_TotalNumberOfRuns ) / static_cast<double>( this->m_NumberOfVoxels );
+        numberOfRuns = static_cast<double>( this->m_TotalNumberOfRuns ) ;
+      } else {
+        shortRunEmphasis        = 0;
+        longRunEmphasis         = 0;
+        greyLevelNonuniformity  = 0;
+        runLengthNonuniformity= 0;
+
+        lowGreyLevelRunEmphasis  = 0;
+        highGreyLevelRunEmphasis = 0;
+
+        shortRunLowGreyLevelEmphasis = 0;
+        shortRunHighGreyLevelEmphasis= 0;
+        longRunLowGreyLevelEmphasis  = 0;
+        longRunHighGreyLevelEmphasis = 0;
+        runPercentage = 0;
+        numberOfRuns = static_cast<double>( this->m_TotalNumberOfRuns ) ;
+      }
 
       MeasurementObjectType* shortRunEmphasisOutputObject =
         static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 0 ) );

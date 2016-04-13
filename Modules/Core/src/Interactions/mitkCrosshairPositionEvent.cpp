@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::CrosshairPositionEvent::CrosshairPositionEvent( BaseRenderer* sender)
-: Event( sender, 0, 0, 0, 0)
+: InteractionEvent( sender)
 {
-
 }

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseController.h"
 #include "mitkBaseRenderer.h"
 
-mitk::BaseController::BaseController(const char * type) : StateMachine(type), m_LastUpdateTime(0)
+mitk::BaseController::BaseController() : m_LastUpdateTime(0)
 {
   m_Slice = Stepper::New();
   m_Time  = Stepper::New();
@@ -26,6 +26,11 @@ mitk::BaseController::BaseController(const char * type) : StateMachine(type), m_
 
 mitk::BaseController::~BaseController()
 {
+}
+
+void mitk::BaseController::ExecuteOperation(mitk::Operation* /* *operation */)
+{
+
 }
 
 mitk::Stepper* mitk::BaseController::GetSlice()

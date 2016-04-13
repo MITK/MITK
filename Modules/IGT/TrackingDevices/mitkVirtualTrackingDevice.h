@@ -105,7 +105,7 @@ namespace mitk
     * The tool will have a random path on which it will move around. The path is created with a
     * spline function and random control points inside the tracking volume.
     *
-    * \param tool  The tool which will be added.
+    * \param toolName  The tool which will be added.
     * \return Returns true if the tool has been added, false otherwise.
     */
     TrackingTool* AddTool(const char* toolName);
@@ -156,6 +156,32 @@ namespace mitk
     */
     void SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond);
 
+  /**
+  * \brief enable addition of Gaussian Noise to tracking coordinates
+  */
+  void EnableGaussianNoise();
+
+  /**
+  * \brief disable addition of Gaussian Noise to Trackin coordinates
+  */
+  void DisableGaussianNoise();
+
+  /**
+  * \brief sets the mean distribution and the standard deviation for the Gaussian Noise
+  *
+  */
+  void SetParamsForGaussianNoise(double meanDistribution, double deviationDistribution);
+
+  /**
+  * \brief returns the mean distribution for the Gaussian Noise
+  */
+  double GetMeanDistribution();
+
+  /**
+  * \brief returns the deviation distribution for the Gaussian Noise
+  */
+  double GetDeviationDistribution();
+
   protected:
     VirtualTrackingDevice();
     ~VirtualTrackingDevice();
@@ -186,6 +212,9 @@ namespace mitk
     unsigned int m_NumberOfControlPoints;           ///< number of control points for the random path generation
 
     mitk::ScalarType m_Bounds[6];                   ///< bounding box of the tracking volume stored as {xMin, xMax, yMin, yMax, zMin, zMax}
+  bool m_GaussianNoiseEnabled;    ///< adding Gaussian Noise to tracking coordinates or not, false by default
+  double m_MeanDistributionParam;    /// mean distribution for Gaussion Noise, 0.0 by default
+  double m_DeviationDistributionParam;  ///< deviation distribution for Gaussian Noise, 1.0 by default
   };
 }//mitk
 #endif /* MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_ */

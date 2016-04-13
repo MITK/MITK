@@ -62,6 +62,7 @@ m_LastEventSlice(0),
 m_Contourmarkername ("Position"),
 m_ShowMarkerNodes (false)
 {
+  Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
 }
 
 mitk::SegTool2D::~SegTool2D()
@@ -262,7 +263,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult (const InteractionPositionEven
 {
   if(!positionEvent) return;
 
-  const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
+  const PlaneGeometry* planeGeometry( (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
   const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
 
   if( planeGeometry && slice && !abstractTransformGeometry)
@@ -372,7 +373,9 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   OperationEvent* undoStackItem = new OperationEvent( DiffSliceOperationApplier::GetInstance(), doOperation, undoOperation, "Segmentation" );
 
   //add it to the undo controller
-  UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+  UndoStackItem::IncCurrObjectEventId();
+  UndoStackItem::IncCurrGroupEventId();
+  UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 
   //clear the pointers as the operation are stored in the undocontroller and also deleted from there
   undoOperation = NULL;

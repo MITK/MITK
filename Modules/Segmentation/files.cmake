@@ -38,25 +38,22 @@ set(CPP_FILES
   Interactions/mitkBinaryThresholdULTool.cpp
   Interactions/mitkCalculateGrayValueStatisticsTool.cpp
   Interactions/mitkCalculateVolumetryTool.cpp
-  Interactions/mitkContourInteractor.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
+  Interactions/mitkLiveWireTool2D.cpp
   Interactions/mitkContourTool.cpp
   Interactions/mitkCorrectorTool2D.cpp
   Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
-  Interactions/mitkExtrudedContourInteractor.cpp
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
-  Interactions/mitkLiveWireTool2D.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkPixelManipulationTool.cpp
-  Interactions/mitkRegionGrow3DTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
@@ -116,4 +113,7 @@ set(RESOURCE_FILES
   Interactions/PressMoveReleaseWithCTRLInversion.xml
   Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
   Interactions/SegmentationToolsConfig.xml
+
+  Interactions/ContourModelModificationConfig.xml
+  Interactions/ContourModelModificationInteractor.xml
 )

@@ -68,14 +68,15 @@ namespace mitk
     BinaryThresholdTool(); // purposely hidden
     virtual ~BinaryThresholdTool();
 
-    void SetupPreviewNodeFor( DataNode* nodeForThresholding );
+    void SetupPreviewNode();
 
     void CreateNewSegmentationFromThreshold(DataNode* node);
 
     void OnRoiDataChanged();
+    void UpdatePreview();
 
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
+    void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double thresholdValue, unsigned int timeStep );
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;

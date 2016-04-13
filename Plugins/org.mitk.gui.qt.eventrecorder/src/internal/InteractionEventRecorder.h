@@ -54,6 +54,8 @@ class InteractionEventRecorder : public QmitkAbstractView
     void StartRecording();
     void StopRecording();
     void OpenFile();
+    void RotatePlanes();
+    void RotateView();
     void Play();
 
   protected:

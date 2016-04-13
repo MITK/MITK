@@ -200,41 +200,19 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-if(APPLE)
-  set(DESIRED_QT_VERSION 4 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-else()
-  set(DESIRED_QT_VERSION 5 CACHE STRING "Pick a version of Qt to use: 4 or 5")
-endif()
-
-env_option(MITK_USE_QT "Use the Qt Company's Qt library" ON)
-set(MITK_DESIRED_QT_VERSION ${DESIRED_QT_VERSION})
+env_option(MITK_USE_QT "Use Qt library" ON)
 
 if(MITK_USE_QT)
-  # find the package at the very beginning, so that QT4_FOUND is available
-  if(DESIRED_QT_VERSION MATCHES 4)
-    set(MITK_QT4_MINIMUM_VERSION 4.7)
-    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
-    set(MITK_USE_Qt4 TRUE)
-    set(MITK_USE_Qt5 FALSE)
-  endif()
-  if(DESIRED_QT_VERSION MATCHES 5)
-    set(MITK_QT5_MINIMUM_VERSION 5.0.0)
-    set(MITK_USE_Qt4 FALSE)
-    set(MITK_USE_Qt5 TRUE)
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}" CACHE PATH "")
-    set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help)
-    find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
-    if(Qt5_DIR)
-      get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
-      list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
-      if(_result LESS 0)
-        set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
-      endif()
+  set(MITK_QT5_MINIMUM_VERSION 5.0.0)
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help)
+  find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
+  if(Qt5_DIR)
+    get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
+    list(FIND CMAKE_PREFIX_PATH "${_Qt5_DIR}" _result)
+    if(_result LESS 0)
+      set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
     endif()
   endif()
-else()
-  set(MITK_USE_Qt4 FALSE)
-  set(MITK_USE_Qt5 FALSE)
 endif()
 
 # ------------------------------------------------------------------------
@@ -251,8 +229,7 @@ endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
-mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Util XML Zip)
-mitkFunctionAddExternalProject(NAME Boost       OFF DOC "Use the Boost C++ library")
+mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Net Util XML Zip)
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
 mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
 
@@ -284,6 +261,7 @@ mitkFunctionAddExternalProject(NAME Vigra     OFF          DEPENDS HDF5)
 # These are "hard" dependencies and always set to ON
 mitkFunctionAddExternalProject(NAME ITK       ON           NO_CACHE)
 mitkFunctionAddExternalProject(NAME VTK       ON           NO_CACHE)
+mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
@@ -291,6 +269,7 @@ mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC 
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
+mitkFunctionAddExternalProject(NAME VMTK      OFF          DEPENDS ITK VTK)
 
 if(MITK_USE_QT)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
@@ -318,7 +297,6 @@ foreach(_buildConfigFile ${_buildConfigFiles})
 endforeach()
 
 set(MITK_BUILD_CONFIGURATION "Custom" CACHE STRING "Use pre-defined MITK configurations")
-mark_as_advanced(MITK_BUILD_CONFIGURATION)
 set_property(CACHE MITK_BUILD_CONFIGURATION PROPERTY STRINGS ${_buildConfigs})
 
 mitkFunctionEnableBuildConfiguration()
@@ -329,17 +307,10 @@ mitkFunctionFindWhitelists(MITK)
 # -----------------------------------------
 # Custom dependency logic
 
-if(MITK_USE_Boost)
-  option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
-  set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
-endif()
+option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
+set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
 if(MITK_USE_SOFA)
-  # SOFA requires boost library
-  if(MITK_USE_SOFA AND NOT MITK_USE_Boost)
-    message("> Forcing MITK_USE_Boost to ON because of MITK_USE_SOFA")
-    set(MITK_USE_Boost ON CACHE BOOL "" FORCE)
-  endif()
   # SOFA requires boost system library
   list(FIND MITK_USE_Boost_LIBRARIES system _result)
   if(_result LESS 0)
@@ -365,7 +336,7 @@ if(MITK_USE_SOFA)
 endif()
 
 # sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
-if(MITK_USE_Qt5 AND MITK_USE_Python)
+if(MITK_USE_QT AND MITK_USE_Python)
   set(minimum_required_python_qt5_version "5.3.0")
   find_package(Qt5 COMPONENTS Core REQUIRED)
 
@@ -552,6 +523,7 @@ include(mitkFunctionCheckModuleDependencies)
 include(mitkFunctionCompileSnippets)
 include(mitkFunctionConvertXPSchema)
 include(mitkFunctionCreateBlueBerryApplication)
+include(mitkFunctionCreateCommandLineApp)
 include(mitkFunctionCreateModule)
 include(mitkFunctionCreatePlugin)
 include(mitkFunctionCreateProvisioningFile)
@@ -666,12 +638,6 @@ if(NOT MITK_FAST_TESTING)
   endif()
 endif()
 
-# MITK_VERSION
-set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
-if(MITK_VERSION_PATCH STREQUAL "99")
-  set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
-endif()
-
 if(NOT UNIX AND NOT MINGW)
   set(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
 endif()
@@ -695,6 +661,12 @@ set(MITK_MODULE_NAME_DEFAULTS_TO_DIRECTORY_NAME 1)
 
 mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
 mitkFunctionGetVersionDescription(${MITK_SOURCE_DIR} MITK)
+
+# MITK_VERSION
+set(MITK_VERSION_STRING "${MITK_VERSION_MAJOR}.${MITK_VERSION_MINOR}.${MITK_VERSION_PATCH}")
+if(MITK_VERSION_PATCH STREQUAL "99")
+  set(MITK_VERSION_STRING "${MITK_VERSION_STRING}-${MITK_REVISION_SHORTID}")
+endif()
 
 #-----------------------------------------------------------------------------
 # Installation preparation
@@ -780,9 +752,6 @@ if(NOT MSVC_VERSION)
     #-Wold-style-cast
     #-Wsign-promo
 
-    # the following two lines should be removed after ITK-3097 has
-    # been resolved, see also MITK bug 15279
-    -Wno-unused-local-typedefs
     -Wno-array-bounds
 
     -fdiagnostics-show-option
@@ -804,7 +773,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(MITK_SHARED_LINKER_FLAGS "-Wl,--enable-auto-import ${MITK_SHARED_LINKER_FLAGS}")
   endif()
 
-  set(MITK_CXX_FLAGS_RELEASE "-D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
+  set(MITK_CXX_FLAGS_RELEASE "-U_FORTIFY_SOURCES -D_FORTIFY_SOURCE=2 ${MITK_CXX_FLAGS_RELEASE}")
 endif()
 
 set(MITK_MODULE_LINKER_FLAGS ${MITK_SHARED_LINKER_FLAGS})
@@ -824,6 +793,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
+set(Boost_ADDITIONAL_VERSIONS "1.59" "1.59.0")
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
@@ -888,10 +858,8 @@ if(MITK_USE_SOFA)
   link_directories(${SOFA_LIBRARY_DIRS})
 endif()
 
-if(MITK_USE_Boost)
-  # Same as SOFA above
-  link_directories(${Boost_LIBRARY_DIRS})
-endif()
+# Same as SOFA above
+link_directories(${Boost_LIBRARY_DIRS})
 
 if(MITK_USE_OpenIGTLink)
   # Same as SOFA above
@@ -908,36 +876,32 @@ endif()
 
 # Qt support
 if(MITK_USE_QT)
-  if(DESIRED_QT_VERSION MATCHES 4)
-    find_package(Qt4 ${MITK_QT4_MINIMUM_VERSION} REQUIRED)
-  elseif(DESIRED_QT_VERSION MATCHES 5)
-    find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
-    get_target_property(_qmake_exec Qt5::qmake LOCATION)
-    execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
-      RESULT_VARIABLE _result
-      OUTPUT_VARIABLE QT_BINARY_DIR
-      ERROR_VARIABLE _error
-    )
-    string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
-    if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
-      message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
-    endif()
+  find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
+  get_target_property(_qmake_exec Qt5::qmake LOCATION)
+  execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
+    RESULT_VARIABLE _result
+     OUTPUT_VARIABLE QT_BINARY_DIR
+    ERROR_VARIABLE _error
+  )
+  string(STRIP "${QT_BINARY_DIR}" QT_BINARY_DIR)
+  if(_result OR NOT EXISTS "${QT_BINARY_DIR}")
+    message(FATAL_ERROR "Could not determine Qt binary directory: ${_result} ${QT_BINARY_DIR} ${_error}")
   endif()
 
   find_program(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
 
   find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
-    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+    NAMES qcollectiongenerator qcollectiongenerator-qt5 qcollectiongenerator5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
 
   find_program(QT_ASSISTANT_EXECUTABLE
-    NAMES assistant-qt4 assistant4 assistant
+    NAMES assistant assistant-qt5 assistant5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
@@ -1156,10 +1120,13 @@ if(MITK_USE_BLUEBERRY)
   include("${CMAKE_CURRENT_SOURCE_DIR}/Applications/AppList.cmake")
   set(mitk_apps_fullpath )
   foreach(mitk_app ${MITK_APPS})
-    string(FIND ${mitk_app} "MITK_BUILD_APP_" _index)
-    string(SUBSTRING ${mitk_app} ${_index} -1 _var)
-    if(${_var})
-      list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${mitk_app}")
+    # extract option_name
+    string(REPLACE "^^" "\\;" target_info ${mitk_app})
+    set(target_info_list ${target_info})
+    list(GET target_info_list 0 directory_name)
+    list(GET target_info_list 1 option_name)
+    if(${option_name})
+      list(APPEND mitk_apps_fullpath "${CMAKE_CURRENT_SOURCE_DIR}/Applications/${directory_name}^^${option_name}")
     endif()
   endforeach()
 
@@ -1238,6 +1205,7 @@ if(MITK_APPS)
     set(target_info_list ${target_info})
     list(GET target_info_list 0 target_dir)
     list(GET target_info_list 1 option_name)
+    list(GET target_info_list 2 executable_name)
     # check if the application is enabled
     if(${option_name} OR MITK_BUILD_ALL_APPS)
       # check whether application specific configuration files will be used
@@ -1255,7 +1223,7 @@ if(MITK_APPS)
         endif()
       endif()
     # add link to the list
-    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${target_dir}")
+    list(APPEND CPACK_CREATE_DESKTOP_LINKS "${executable_name}")
     endif()
   endforeach()
 

@@ -40,6 +40,120 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper2D.h>
 
+///
+#include <set>
+#include <array>
+#include <algorithm>
+#include <cassert>
+
+namespace
+{
+  /// Some simple interval arithmetic
+  template<typename T>
+  class SimpleInterval {
+  public:
+    SimpleInterval(T start = T(), T end = T())
+      :  m_LowerBoundary(std::min(start, end))
+      ,  m_UpperBoundary(std::max(start, end))
+    {
+
+    }
+
+    T GetLowerBoundary() const { return  m_LowerBoundary; }
+    T GetUpperBoundary() const { return  m_UpperBoundary; }
+
+    bool empty() const { return  m_LowerBoundary ==  m_UpperBoundary; }
+
+    bool operator<(const SimpleInterval& otherInterval) const
+    {
+      return  this->m_UpperBoundary < otherInterval.GetLowerBoundary();
+    }
+
+  private:
+    T  m_LowerBoundary;
+    T  m_UpperBoundary;
+  };
+
+  template<typename T>
+  class IntervalSet {
+  public:
+    typedef SimpleInterval<T> IntervalType;
+
+    IntervalSet(IntervalType startingInterval)
+    {
+      m_IntervalsContainer.insert(std::move(startingInterval));
+    }
+
+    void operator-=(const IntervalType& interval)
+    {
+      // equal_range will find all the intervals in the interval set which intersect with the input interval
+      //   due to the nature of operator< of SimpleInterval
+      auto range = m_IntervalsContainer.equal_range(interval);
+
+      for (auto iter = range.first; iter != range.second;)
+      {
+        auto subtractionResult = SubtractIntervals(*iter, interval);
+
+        // Remove the old interval from the set
+        iter = m_IntervalsContainer.erase(iter);
+        for (auto&& interval : subtractionResult)
+        {
+          if (!interval.empty()) {
+            // Add the new interval to the set
+            // emplace_hint adds the element at the closest valid place before the hint iterator,
+            //   which is exactly where the new interval should be
+            iter = m_IntervalsContainer.insert(iter, std::move(interval));
+            ++iter;
+          }
+        }
+      }
+    }
+
+    IntervalSet operator-(const IntervalType& interval)
+    {
+      IntervalSet result = *this;
+      result -= interval;
+      return result;
+    }
+
+    typedef std::set<IntervalType> IntervalsContainer;
+
+    const IntervalsContainer& getIntervals() const
+    {
+      return m_IntervalsContainer;
+    }
+
+  private:
+    IntervalsContainer m_IntervalsContainer;
+
+    std::array<IntervalType, 2> SubtractIntervals(const IntervalType& firstInterval, const IntervalType& secondInterval)
+    {
+      assert(secondInterval.GetUpperBoundary() >= firstInterval.GetLowerBoundary() && firstInterval.GetUpperBoundary() >= secondInterval.GetLowerBoundary()); // Non-intersecting intervals should never reach here
+
+      if (secondInterval.GetLowerBoundary() < firstInterval.GetLowerBoundary())
+      {
+        if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
+        {
+          std::array<IntervalType, 2> result = { { IntervalType(), IntervalType() } };
+      return result; // firstInterval completely enclosed
+        }
+        std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetUpperBoundary(), secondInterval.GetUpperBoundary()), IntervalType() } };
+    return result; // secondInterval removes the beginning of firstInterval
+      }
+
+      if (firstInterval.GetUpperBoundary() < secondInterval.GetUpperBoundary())
+      {
+        std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary()), IntervalType() } };
+      return result; // secondInterval removes the end of firstInterval
+      }
+      std::array<IntervalType, 2> result = { { IntervalType(firstInterval.GetLowerBoundary(), secondInterval.GetLowerBoundary()),
+        IntervalType(secondInterval.GetUpperBoundary(), firstInterval.GetUpperBoundary()) } };
+      return result; // secondInterval is completely enclosed in firstInterval and removes the middle
+    }
+  };
+}
+
+
 mitk::PlaneGeometryDataMapper2D::AllInstancesContainer mitk::PlaneGeometryDataMapper2D::s_AllInstances;
 
 // input for this mapper ( = PlaneGeometryData)
@@ -149,8 +263,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
         rendererWorldPlaneGeometryData->GetPlaneGeometry() );
 
   if ( worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(worldPlaneGeometry)==NULL
-       && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL
-       && inputPlaneGeometry->GetReferenceGeometry() )
+       && inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry*>(input->GetPlaneGeometry() )==NULL)
   {
     const BaseGeometry *referenceGeometry = inputPlaneGeometry->GetReferenceGeometry();
 
@@ -163,30 +276,16 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
     // Calculate the intersection line of the input plane with the world plane
     if ( worldPlaneGeometry->IntersectionLine( inputPlaneGeometry, crossLine ) )
     {
-      Point3D boundingBoxMin, boundingBoxMax;
-      boundingBoxMin = referenceGeometry->GetCornerPoint(0);
-      boundingBoxMax = referenceGeometry->GetCornerPoint(7);
+      bool hasIntersection = referenceGeometry ? CutCrossLineWithReferenceGeometry(referenceGeometry, crossLine) :
+                                                 CutCrossLineWithPlaneGeometry(inputPlaneGeometry, crossLine);
 
-      Point3D indexLinePoint;
-      Vector3D indexLineDirection;
+      if (!hasIntersection)
+      {
+        return;
+      }
 
-      referenceGeometry->WorldToIndex(crossLine.GetPoint(),indexLinePoint);
-      referenceGeometry->WorldToIndex(crossLine.GetDirection(),indexLineDirection);
-
-      referenceGeometry->WorldToIndex(boundingBoxMin,boundingBoxMin);
-      referenceGeometry->WorldToIndex(boundingBoxMax,boundingBoxMax);
-
-      // Then, clip this line with the (transformed) bounding box of the
-      // reference geometry.
-      Line3D::BoxLineIntersection(
-            boundingBoxMin[0], boundingBoxMin[1], boundingBoxMin[2],
-          boundingBoxMax[0], boundingBoxMax[1], boundingBoxMax[2],
-          indexLinePoint, indexLineDirection,
-          point1, point2 );
-
-      referenceGeometry->IndexToWorld(point1,point1);
-      referenceGeometry->IndexToWorld(point2,point2);
-      crossLine.SetPoints(point1,point2);
+      point1 = crossLine.GetPoint1();
+      point2 = crossLine.GetPoint2();
 
       vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
       vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
@@ -200,53 +299,58 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
       NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
-      std::vector<Point3D> intersections;
-
-      intersections.push_back(point1);
-
       otherPlanesIt = m_OtherPlaneGeometries.begin();
-      int gapsize = 32;
-      this->GetDataNode()->GetPropertyValue( "Crosshair.Gap Size",gapsize, NULL );
+      int gapSize = 32;
+      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
 
+
+      auto intervals = IntervalSet<double>( SimpleInterval<double>(0, 1));
 
       ScalarType lineLength = point1.EuclideanDistanceTo(point2);
-      DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+      ScalarType gapInMM = gapSize * renderer->GetScaleFactorMMPerDisplayUnit();
+      float gapSizeParam = gapInMM / lineLength;
 
-      ScalarType gapinmm = gapsize * displayGeometry->GetScaleFactorMMPerDisplayUnit();
-
-      float gapSizeParam = gapinmm / lineLength;
-
-      while ( otherPlanesIt != otherPlanesEnd )
+      if( gapSize != 0 )
       {
-        PlaneGeometry *otherPlane = static_cast< PlaneGeometry * >(
-              static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
-
-        if (otherPlane != inputPlaneGeometry && otherPlane != worldPlaneGeometry)
+        while ( otherPlanesIt != otherPlanesEnd )
         {
-          Point3D planeIntersection;
-          otherPlane->IntersectionPoint(crossLine,planeIntersection);
-          ScalarType sectionLength = point1.EuclideanDistanceTo(planeIntersection);
-          ScalarType lineValue = sectionLength/lineLength;
-          if(lineValue-gapSizeParam > 0.0)
-            intersections.push_back(crossLine.GetPoint(lineValue-gapSizeParam));
-          else intersections.pop_back();
-          if(lineValue+gapSizeParam < 1.0)
-            intersections.push_back(crossLine.GetPoint(lineValue+gapSizeParam));
-        }
-        ++otherPlanesIt;
-      }
-      if(intersections.size()%2 == 1)
-        intersections.push_back(point2);
+          bool ignorePlane = false;
+          (*otherPlanesIt)->GetPropertyValue("Crosshair.Ignore", ignorePlane);
+          if (ignorePlane)
+          {
+              ++otherPlanesIt;
+              continue;
+          }
 
-      if(intersections.empty())
-      {
-        this->DrawLine(point1,point2,lines,points);
-      }
-      else
-        for(unsigned int i = 0 ; i< intersections.size()-1 ; i+=2)
-        {
-          this->DrawLine(intersections[i],intersections[i+1],lines,points);
+          PlaneGeometry *otherPlaneGeometry = static_cast< PlaneGeometry * >(
+                static_cast< PlaneGeometryData * >((*otherPlanesIt)->GetData() )->GetPlaneGeometry() );
+
+          if (otherPlaneGeometry != inputPlaneGeometry && otherPlaneGeometry != worldPlaneGeometry)
+          {
+              double intersectionParam;
+              if (otherPlaneGeometry->IntersectionPointParam(crossLine, intersectionParam) && intersectionParam > 0 &&
+                  intersectionParam < 1)
+              {
+                Point3D point = crossLine.GetPoint() + intersectionParam * crossLine.GetDirection();
+
+                bool intersectionPointInsideOtherPlane =
+                  otherPlaneGeometry->HasReferenceGeometry() ?
+                    TestPointInReferenceGeometry(otherPlaneGeometry->GetReferenceGeometry(), point) :
+                    TestPointInPlaneGeometry(otherPlaneGeometry, point);
+
+                if (intersectionPointInsideOtherPlane)
+                {
+                  intervals -= SimpleInterval<double>(intersectionParam - gapSizeParam, intersectionParam + gapSizeParam);
+                }
+              }
+          }
+          ++otherPlanesIt;
         }
+      }
+
+      for (const auto& interval : intervals.getIntervals()) {
+          this->DrawLine(crossLine.GetPoint(interval.GetLowerBoundary()), crossLine.GetPoint(interval.GetUpperBoundary()), lines, points);
+      }
 
       // Add the points to the dataset
       linesPolyData->SetPoints(points);
@@ -268,7 +372,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       GetDataNode()->GetBoolProperty( "reslice.thickslices.showarea", showAreaOfThickSlicing );
 
       // determine the pixelSpacing in that direction
-      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing( referenceGeometry->GetSpacing(), orthogonalVector );
+      double thickSliceDistance = SlicedGeometry3D::CalculateSpacing(
+        referenceGeometry ? referenceGeometry->GetSpacing() : inputPlaneGeometry->GetSpacing(), orthogonalVector);
 
       IntProperty *intProperty=0;
       if( GetDataNode()->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
@@ -286,7 +391,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       ls->m_Arrowmapper->SetInputData(arrowPolyData);
       if(this->m_RenderOrientationArrows)
       {
-        ScalarType triangleSizeMM = 7.0 * displayGeometry->GetScaleFactorMMPerDisplayUnit();
+        ScalarType triangleSizeMM = 7.0 * renderer->GetScaleFactorMMPerDisplayUnit();
 
         vtkSmartPointer<vtkCellArray> triangles = vtkSmartPointer<vtkCellArray>::New();
         vtkSmartPointer<vtkPoints> triPoints = vtkSmartPointer<vtkPoints>::New();
@@ -325,7 +430,107 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
   }
 }
 
-void mitk::PlaneGeometryDataMapper2D::DrawLine( mitk::Point3D p0,mitk::Point3D p1,
+bool mitk::PlaneGeometryDataMapper2D::TestPointInPlaneGeometry(const PlaneGeometry *planeGeometry, const Point3D &point)
+{
+  Point2D mappedPoint;
+  planeGeometry->Map(point, mappedPoint);
+  planeGeometry->WorldToIndex(mappedPoint, mappedPoint);
+
+  return (planeGeometry->GetBounds()[0] < mappedPoint[0] && mappedPoint[0] < planeGeometry->GetBounds()[1] &&
+          planeGeometry->GetBounds()[2] < mappedPoint[1] && mappedPoint[1] < planeGeometry->GetBounds()[3]);
+}
+
+bool mitk::PlaneGeometryDataMapper2D::TestPointInReferenceGeometry(const BaseGeometry* referenceGeometry, const Point3D& point)
+{
+  return referenceGeometry->IsInside(point);
+}
+
+bool mitk::PlaneGeometryDataMapper2D::CutCrossLineWithPlaneGeometry(const PlaneGeometry* planeGeometry,
+                                                                    Line3D& crossLine)
+{
+  Point2D indexLinePoint;
+  Vector2D indexLineDirection;
+
+  planeGeometry->Map(crossLine.GetPoint(), indexLinePoint);
+  planeGeometry->Map(crossLine.GetPoint(), crossLine.GetDirection(), indexLineDirection);
+
+  planeGeometry->WorldToIndex(indexLinePoint, indexLinePoint);
+  planeGeometry->WorldToIndex(indexLineDirection, indexLineDirection);
+
+  mitk::Point2D intersectionPoints[2];
+
+  // Then, clip this line with the (transformed) bounding box of the
+  // reference geometry.
+  int nIntersections = Line3D::RectangleLineIntersection(planeGeometry->GetBounds()[0],
+                                                         planeGeometry->GetBounds()[2],
+                                                         planeGeometry->GetBounds()[1],
+                                                         planeGeometry->GetBounds()[3],
+                                                         indexLinePoint,
+                                                         indexLineDirection,
+                                                         intersectionPoints[0],
+                                                         intersectionPoints[1]);
+
+  if (nIntersections < 2)
+  {
+    return false;
+  }
+
+  planeGeometry->IndexToWorld(intersectionPoints[0], intersectionPoints[0]);
+  planeGeometry->IndexToWorld(intersectionPoints[1], intersectionPoints[1]);
+
+  Point3D point1, point2;
+
+  planeGeometry->Map(intersectionPoints[0], point1);
+  planeGeometry->Map(intersectionPoints[1], point2);
+  crossLine.SetPoints(point1, point2);
+
+  return true;
+}
+
+bool mitk::PlaneGeometryDataMapper2D::CutCrossLineWithReferenceGeometry(const BaseGeometry* referenceGeometry,
+                                                                        Line3D& crossLine)
+{
+  Point3D boundingBoxMin, boundingBoxMax;
+  boundingBoxMin = referenceGeometry->GetCornerPoint(0);
+  boundingBoxMax = referenceGeometry->GetCornerPoint(7);
+
+  Point3D indexLinePoint;
+  Vector3D indexLineDirection;
+
+  referenceGeometry->WorldToIndex(crossLine.GetPoint(), indexLinePoint);
+  referenceGeometry->WorldToIndex(crossLine.GetDirection(), indexLineDirection);
+
+  referenceGeometry->WorldToIndex(boundingBoxMin, boundingBoxMin);
+  referenceGeometry->WorldToIndex(boundingBoxMax, boundingBoxMax);
+
+  Point3D point1, point2;
+
+  // Then, clip this line with the (transformed) bounding box of the
+  // reference geometry.
+  int nIntersections = Line3D::BoxLineIntersection(boundingBoxMin[0],
+                                                   boundingBoxMin[1],
+                                                   boundingBoxMin[2],
+                                                   boundingBoxMax[0],
+                                                   boundingBoxMax[1],
+                                                   boundingBoxMax[2],
+                                                   indexLinePoint,
+                                                   indexLineDirection,
+                                                   point1,
+                                                   point2);
+
+  if (nIntersections < 2)
+  {
+    return false;
+  }
+
+  referenceGeometry->IndexToWorld(point1, point1);
+  referenceGeometry->IndexToWorld(point2, point2);
+  crossLine.SetPoints(point1, point2);
+
+  return true;
+}
+
+void mitk::PlaneGeometryDataMapper2D::DrawLine(mitk::Point3D p0, mitk::Point3D p1,
                                                 vtkCellArray* lines,
                                                 vtkPoints* points
                                                 )

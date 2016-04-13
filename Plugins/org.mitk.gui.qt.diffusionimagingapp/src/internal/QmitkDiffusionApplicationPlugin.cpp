@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileInfo>
 #include <QDateTime>
-#include <QtPlugin>
 
 QmitkDiffusionApplicationPlugin* QmitkDiffusionApplicationPlugin::inst = nullptr;
 
@@ -84,7 +83,3 @@ ctkPluginContext* QmitkDiffusionApplicationPlugin::GetPluginContext() const
 {
   return context;
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_diffusionimagingapp, QmitkDiffusionApplicationPlugin)
-#endif

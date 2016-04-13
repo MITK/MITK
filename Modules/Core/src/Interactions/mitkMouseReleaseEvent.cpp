@@ -18,11 +18,11 @@
 #include "mitkMouseReleaseEvent.h"
 
 mitk::MouseReleaseEvent::MouseReleaseEvent(mitk::BaseRenderer* baseRenderer,
-    const mitk::Point2D& mousePosition, const Point3D &worldPosition,
+    const mitk::Point2D& mousePosition,
     MouseButtons buttonStates,
     ModifierKeys modifiers,
     MouseButtons eventButton)
-: InteractionPositionEvent(baseRenderer, mousePosition, worldPosition)
+: InteractionPositionEvent(baseRenderer, mousePosition)
 , m_EventButton(eventButton)
 , m_ButtonStates(buttonStates)
 , m_Modifiers(modifiers)

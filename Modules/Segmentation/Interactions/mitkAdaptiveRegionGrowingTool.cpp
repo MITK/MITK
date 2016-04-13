@@ -36,10 +36,6 @@ mitk::AdaptiveRegionGrowingTool::AdaptiveRegionGrowingTool()
   m_PointSetNode->GetPropertyList()->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PointSet = mitk::PointSet::New();
   m_PointSetNode->SetData(m_PointSet);
-  m_SeedPointInteractor = mitk::SinglePointDataInteractor::New();
-  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
-  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
-  m_SeedPointInteractor->SetDataNode(m_PointSetNode);
 }
 
 mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
@@ -81,14 +77,22 @@ us::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const
 
 void mitk::AdaptiveRegionGrowingTool::Activated()
 {
+  Superclass::Activated();
+
   if (!GetDataStorage()->Exists(m_PointSetNode))
     GetDataStorage()->Add(m_PointSetNode, GetWorkingData());
+  m_SeedPointInteractor = mitk::SinglePointDataInteractor::New();
+  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
+  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
+  m_SeedPointInteractor->SetDataNode(m_PointSetNode);
 }
 
 void mitk::AdaptiveRegionGrowingTool::Deactivated()
 {
   m_PointSet->Clear();
   GetDataStorage()->Remove(m_PointSetNode);
+
+  Superclass::Deactivated();
 }
 
 mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetReferenceData(){

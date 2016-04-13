@@ -83,6 +83,7 @@ public:
   // ------------------------------ MITK formats ----------------------------------
 
   static CustomMimeType POINTSET_MIMETYPE(); // mps
+  static CustomMimeType GEOMETRY_DATA_MIMETYPE(); // .mitkgeometry
 
   static std::string POINTSET_MIMETYPE_NAME(); // DEFAULT_BASE_NAME.pointset
 

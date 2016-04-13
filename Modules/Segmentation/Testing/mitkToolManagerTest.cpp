@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkToolManager.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkGlobalInteraction.h"
 
 class mitkToolManagerTestClass { public:
 
@@ -60,8 +59,6 @@ static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)
 int mitkToolManagerTest(int, char* [])
 {
   MITK_TEST_BEGIN("ToolManager")
-
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
   MITK_TEST_CONDITION_REQUIRED(dataStorage.IsNotNull(), "StandaloneDataManager instantiation")

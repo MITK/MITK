@@ -236,7 +236,7 @@ ALIASES                = "FIXME=\par Fix Me's:\n" \
                          "github{2}=<a href=\"https://github.com/MITK/MITK/blob/master/\1\">\2</a>" \
                          "deprecatedSince{1}=\xrefitem deprecatedSince\1 \" Deprecated as of \1\" \"Functions deprecated as of \1\" " \
                          "minimumCMakeVersion=@CMAKE_MINIMUM_REQUIRED_VERSION@" \
-                         "minimumQt4Version=@MITK_QT4_MINIMUM_VERSION@" \
+                         "minimumQt5Version=@MITK_QT5_MINIMUM_VERSION@" \
                          "imageMacro{3}=\image html \1 \2 \n \image latex \1 \2 width=\3cm" \
                          "developersguidemainpage{1}=\mainpage " \
                          "usersguidemainpage{1}=\page \1" \
@@ -2106,7 +2106,7 @@ DOT_NUM_THREADS        = @MITK_DOXYGEN_DOT_NUM_THREADS@
 # The default value is: Helvetica.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_FONTNAME           = FreeSans.ttf
+DOT_FONTNAME           = Helvetica
 
 # The DOT_FONTSIZE tag can be used to set the size (in points) of the font of
 # dot graphs.

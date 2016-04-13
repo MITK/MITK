@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 
 #include <itkContourExtractor2DImageFilter.h>
+#include <itkConstantPadImageFilter.h>
 
 
 
 mitk::ImageToContourModelFilter::ImageToContourModelFilter()
-  : m_SliceGeometry(nullptr)
+  : m_SliceGeometry(nullptr),
+    m_ContourValue(0.5)
 {
 }
 
@@ -74,6 +76,19 @@ const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilte
 }
 
 
+void mitk::ImageToContourModelFilter::SetContourValue(float contourValue)
+{
+    this->m_ContourValue = contourValue;
+    this->Modified();
+}
+
+
+float mitk::ImageToContourModelFilter::GetContourValue()
+{
+    return this->m_ContourValue;
+}
+
+
 void mitk::ImageToContourModelFilter::GenerateData()
 {
   mitk::Image::ConstPointer sliceImage = this->GetInput();
@@ -106,9 +121,29 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
   typedef itk::PolyLineParametricPath<2> PolyLineParametricPath2D;
   typedef PolyLineParametricPath2D::VertexListType ContourPath;
 
+  typedef itk::ConstantPadImageFilter<ImageType, ImageType> PadFilterType;
+  typename PadFilterType::Pointer padFilter = PadFilterType::New();
+  typename ImageType::SizeType lowerExtendRegion;
+  lowerExtendRegion[0] = 1;
+  lowerExtendRegion[1] = 1;
+
+  typename ImageType::SizeType upperExtendRegion;
+  upperExtendRegion[0] = 1;
+  upperExtendRegion[1] = 1;
+
+  /*
+   * We need to pad here, since the ITK contour extractor fails if the
+   * segmentation touches more than one image edge.
+   * By padding the image for one row at each edge we overcome this issue
+   */
+  padFilter->SetInput(sliceImage);
+  padFilter->SetConstant(0);
+  padFilter->SetPadLowerBound(lowerExtendRegion);
+  padFilter->SetPadUpperBound(upperExtendRegion);
+
   typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
-  contourExtractor->SetInput(sliceImage);
-  contourExtractor->SetContourValue(0.5);
+  contourExtractor->SetInput(padFilter->GetOutput());
+  contourExtractor->SetContourValue(m_ContourValue);
 
   contourExtractor->Update();
 
@@ -123,6 +158,13 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
     mitk::Point3D currentWorldPoint;
 
     mitk::ContourModel::Pointer contour = this->GetOutput(i);
+    if (contour.IsNull())
+    {
+        contour = mitk::ContourModel::New();
+    }
+
+    if (contour.IsNull())
+      contour = mitk::ContourModel::New();
 
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {

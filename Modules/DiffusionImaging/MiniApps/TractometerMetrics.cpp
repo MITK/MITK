@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+using namespace std;
+
 /*!
 \brief Calculates the Tractometer evaluation metrics for tractograms (http://www.tractometer.org/)
 */

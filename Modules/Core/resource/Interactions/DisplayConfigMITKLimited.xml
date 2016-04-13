@@ -1,0 +1,33 @@
+<!--
+* - MITK : The original interaction scheme
+*  BUT no crosshair and no scrolling is allowed
+*  Is used e.g. for PlanarFigure to prevent competing event triggers
+-->
+<config>
+  <!-- Zoom sensitivity -->
+  <param name="zoomFactor" value="5"/>
+  <!-- Zoom either by moving mouse leftright or updown -->
+  <param name="zoomDirection" value="updown"/>
+  <!-- react to an event, even tough is was already processed by a DataInteractor-->
+  <param name="alwaysReact" value="false"/>
+  <!-- Moving -->
+  <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="MiddleMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
+    <attribute name="ButtonState" value="MiddleMouseButton"/>
+  </event_variant>
+  <!-- Zooming -->
+  <event_variant class="MousePressEvent" name="StartZoom">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+   <event_variant class="MouseMoveEvent" name="Zooming">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndZooming">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+</config>

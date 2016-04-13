@@ -98,7 +98,7 @@ void mitk::FiberBundleMapper2D::Update(mitk::BaseRenderer * renderer)
             fiberBundle->RequestUpdate2D();
         }
 
-        if ( localStorage->m_LastUpdateTime<renderer->GetDisplayGeometry()->GetMTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
+        if ( localStorage->m_LastUpdateTime<renderer->GetCurrentWorldPlaneGeometryUpdateTime() || localStorage->m_LastUpdateTime<fiberBundle->GetUpdateTime2D() )
         {
             this->UpdateShaderParameter(renderer);
             this->GenerateDataForRenderer( renderer );

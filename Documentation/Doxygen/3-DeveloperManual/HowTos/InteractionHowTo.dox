@@ -1,0 +1,88 @@
+/**
+
+\page InteractionHowTo Interaction Related Examples in MITK
+
+\tableofcontents
+
+\section EnableDisableCrosshair How to disable/re-enable/modify Display Interaction using Microservices
+
+Display Interaction is implemented as EventObservers that are registered as Microservices. This allows them to be queried and modified from
+anywhere in the code. Application scenarios are e.g. wanting to disable certain interaction during a task, to avoid any conflicting actions,
+or to adapt the behavior to a special tool that is selected.
+One example in the MITK Workbench are the measurement tools. They are designed to operate on a single slice, such that we do not want the user
+to scroll or move the cross-hair once he started a measurement. Once he finished the measurement the usual interaction should be restored.
+The following code demonstrates how this is done.
+
+
+To change the mitk::DisplayInteractors behavior, we first need to set up MicroService capabilities in the module by adding:
+
+\code
+#include <usModuleInitialization.h>
+US_INITIALIZE_MODULE
+\endcode
+
+Furthermore, following includes are needed for the code snipped to work:
+
+\code
+// Header
+#include "usServiceRegistration.h"
+#include <mitkEventConfig.h>
+
+// Source
+#include "mitkInteractionEventObserver.h"
+#include "mitkDisplayInteractor.h"
+
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
+\endcode
+
+
+The first code snipped queries the us for the DisplayInteractor and then exchanges its configuration for a minimal version, that does not allow
+scrolling or cross-hair actions. The original configuration is stored in a member that allows restoration of the original behavior once
+we're done with our action.
+
+\code
+    m_DisplayInteractorConfigs.clear();
+    std::vector<us::ServiceReference<mitk::InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
+    for (std::vector<us::ServiceReference<mitk::InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+    {
+        mitk::DisplayInteractor* displayInteractor = dynamic_cast<mitk::DisplayInteractor*>(
+                    us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
+        if (displayInteractor != NULL)
+        {
+            // remember the original configuration
+            m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
+            // here the alternative configuration is loaded
+            displayInteractor->SetEventConfig("DisplayConfigMITKLimited.xml");
+        }
+    }
+\endcode
+
+To restore the old configuration, query the DisplayInteractor again and then restored the saved configuration:
+
+\code
+    for (std::map<us::ServiceReferenceU, mitk::EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+         it != m_DisplayInteractorConfigs.end(); ++it)
+    {
+      if (it->first)
+      {
+        mitk::DisplayInteractor* displayInteractor = static_cast<mitk::DisplayInteractor*>(
+                                                 us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(it->first));
+        if (displayInteractor != NULL)
+        {
+          // here the regular configuration is loaded again
+          displayInteractor->SetEventConfig(it->second);
+          MITK_INFO << "restore config";
+        }
+      }
+    }
+    m_DisplayInteractorConfigs.clear();
+\endcode
+
+Member declaration:
+\code
+    // holds configuration objects that have been deactivated
+    std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
+\endcode
+
+*/

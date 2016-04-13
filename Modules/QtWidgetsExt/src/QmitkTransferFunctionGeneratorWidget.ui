@@ -110,7 +110,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
           </size>
          </property>
          <property name="toolTip">
-          <string>Choose one of generic MITK internal presets to apply to standard CT data or MR data.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose from generic MITK transfer function presets to apply to standard CT data or MR data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="statusTip">
           <string>Load a MITK internal preset</string>
@@ -137,7 +137,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
          <item>
           <widget class="QLabel" name="m_InfoPreset">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>1</verstretch>
             </sizepolicy>
@@ -164,7 +164,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
            </property>
            <property name="wordWrap">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="indent">
             <number>0</number>
@@ -186,8 +186,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
             </size>
            </property>
            <property name="toolTip">
-            <string>Load a transfer function in xml-format from the filesystem.
-The load includes all transfer functions: grayvalue, color and gradient.</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load a transfer function in xml-format from the filesystem.&lt;/p&gt;&lt;p&gt;The file should include all transfer functions: grayvalue, color and gradient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Load</string>
@@ -209,8 +208,7 @@ The load includes all transfer functions: grayvalue, color and gradient.</string
             </size>
            </property>
            <property name="toolTip">
-            <string>Save a transfer function in xml-format in the filesystem.
-The save includes all transfer functions: grayvalue, color and gradient.</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save a transfer function in xml-format to the filesystem.&lt;/p&gt;&lt;p&gt;The file includes all transfer functions: grayvalue, color and gradient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Save</string>
@@ -269,7 +267,7 @@ Move the mouse to the right and the function moves to the right. </string>
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources/QtWidgetsExt.qrc">:/QtWidgetsExt/cross.png</pixmap>
+          <pixmap resource="../resource/QtWidgetsExt.qrc">:/QtWidgetsExt/cross.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -362,7 +360,7 @@ Move the mouse to the right and the center of the bell moves to the right.</stri
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="resources/QtWidgetsExt.qrc">:/QtWidgetsExt/cross.png</pixmap>
+          <pixmap resource="../resource/QtWidgetsExt.qrc">:/QtWidgetsExt/cross.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>true</bool>
@@ -419,7 +417,7 @@ Move the mouse to the right and the center of the bell moves to the right.</stri
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resources/QtWidgetsExt.qrc"/>
+  <include location="../resource/QtWidgetsExt.qrc"/>
  </resources>
  <connections/>
 </ui>

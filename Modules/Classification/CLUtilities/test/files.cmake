@@ -1,3 +1,4 @@
 set(MODULE_TESTS
-  mitkSmoothedClassProbabilitesTest.cpp
+  #mitkSmoothedClassProbabilitesTest.cpp
+  mitkGlobalFeaturesTest.cpp
 )

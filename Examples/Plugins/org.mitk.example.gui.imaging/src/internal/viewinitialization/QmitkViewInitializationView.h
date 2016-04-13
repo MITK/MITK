@@ -26,16 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkViewInitializationViewControls.h"
 
 
-
-/*!
- * \ingroup org_mitk_gui_qt_viewinitialization_internal
- *
- * \brief QmitkViewInitializationView
- *
- * Document your class here.
- *
- * \sa QmitkFunctionality
- */
 class QmitkViewInitializationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 

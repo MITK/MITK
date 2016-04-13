@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+using namespace std;
+
 const int numOdfSamples = 200;
 typedef itk::Image< itk::Vector< float, numOdfSamples > , 3 > SampledShImageType;
 

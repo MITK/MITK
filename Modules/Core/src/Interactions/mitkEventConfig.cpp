@@ -152,7 +152,7 @@ void mitk::EventConfigPrivate::InsertMapping(const EventMapping& mapping)
 void mitk::EventConfigPrivate::CopyMapping( const EventListType eventList )
 {
   EventListType::const_iterator iter;
-  for( iter=eventList.begin(); iter!=eventList.end(); iter++ )
+  for( iter=eventList.begin(); iter!=eventList.end(); ++iter )
   {
     InsertMapping( *(iter) );
   }
@@ -174,14 +174,14 @@ void mitk::EventConfigXMLParser::StartElement(const char* elementName, const cha
   }
   else if (name == InteractionEventConst::xmlTagParam())
   {
-    std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
-    std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue(), atts);
+    const std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
+    const std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue(), atts);
     d->m_PropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
   else if (name == InteractionEventConst::xmlTagEventVariant())
   {
-    std::string eventClass = ReadXMLStringAttribute(InteractionEventConst::xmlParameterEventClass(), atts);
-    std::string eventVariant = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
+    const std::string eventClass = ReadXMLStringAttribute(InteractionEventConst::xmlParameterEventClass(), atts);
+    const std::string eventVariant = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
     // New list in which all parameters are stored that are given within the <input/> tag
     d->m_EventPropertyList = PropertyList::New();
     d->m_EventPropertyList->SetStringProperty(InteractionEventConst::xmlParameterEventClass().c_str(), eventClass.c_str());
@@ -191,15 +191,15 @@ void mitk::EventConfigXMLParser::StartElement(const char* elementName, const cha
   else if (name == InteractionEventConst::xmlTagAttribute())
   {
     // Attributes that describe an Input Event, such as which MouseButton triggered the event,or which modifier keys are pressed
-    std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
-    std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue(), atts);
+    const std::string name = ReadXMLStringAttribute(InteractionEventConst::xmlParameterName(), atts);
+    const std::string value = ReadXMLStringAttribute(InteractionEventConst::xmlParameterValue(), atts);
     d->m_EventPropertyList->SetStringProperty(name.c_str(), value.c_str());
   }
 }
 
 void mitk::EventConfigXMLParser::EndElement(const char* elementName)
 {
-  std::string name(elementName);
+  const std::string name(elementName);
   // At end of input section, all necessary infos are collected to created an interaction event.
   if (name == InteractionEventConst::xmlTagEventVariant())
   {

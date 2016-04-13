@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyDelegate.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkFocusManager.h"
-#include "mitkGlobalInteraction.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -100,11 +98,7 @@ void QmitkPropertiesTableEditor::init()
   m_NodePropertiesTableView->setItemDelegate(new QmitkPropertyDelegate(this));
   m_NodePropertiesTableView->setAlternatingRowColors(true);
   m_NodePropertiesTableView->setSortingEnabled(true);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  m_NodePropertiesTableView->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#else
   m_NodePropertiesTableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#endif
 
   QObject::connect( m_TxtPropertyFilterKeyWord, SIGNAL( textChanged(const QString &) )
     , this, SLOT( PropertyFilterKeyWordTextChanged(const QString &) ) );

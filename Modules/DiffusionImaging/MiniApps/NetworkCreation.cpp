@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 #include <mitkIOUtil.h>
 
+using namespace std;
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;

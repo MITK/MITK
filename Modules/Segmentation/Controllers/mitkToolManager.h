@@ -28,9 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma GCC visibility pop
 
 #include <vector>
-#include <map>
-
-#include "usServiceRegistration.h"
 
 
 namespace mitk
@@ -61,18 +58,10 @@ class PlaneGeometry;
       to the implementation of itk::ObjectFactory).
       In MITK, the right place to register the factories to itk::ObjectFactory is the mitk::QMCoreObjectFactory or mitk::SBCoreObjectFactory.
 
-   \li One (and only one - or none at all) of the registered tools can be activated using ActivateTool. This tool is registered to mitk::GlobalInteraction
-      as a listener and will receive all mouse clicks and keyboard strokes that get into the MITK event mechanism. Tools are automatically
-      unregistered from GlobalInteraction when no clients are registered to ToolManager (see RegisterClient()).
-
    \li ToolManager knows a set of "reference" DataNodes and a set of "working" DataNodes. The first application are segmentation tools, where the
       reference is the original image and the working data the (kind of) binary segmentation. However, ToolManager is implemented more generally, so that
       there could be other tools that work, e.g., with surfaces.
 
-  \li Any "user/client" of ToolManager, i.e. every functionality that wants to use a tool, should call RegisterClient when the tools should be active.
-      ToolManager keeps track of how many clients want it to be used, and when this count reaches zero, it unregistes the active Tool from GlobalInteraction.
-      In "normal" settings, the functionality does not need to care about that if it uses a QmitkToolSelectionBox, which does exactly that when it is
-      enabled/disabled.
 
   \li There is a set of events that are sent by ToolManager. At the moment these are TODO update documentation:
       - mitk::ToolReferenceDataChangedEvent whenever somebody calls SetReferenceData. Most of the time this actually means that the data has changed, but
@@ -187,13 +176,6 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     */
     void SetRoiData(DataNode*);
 
-    /**
-      * If set to true the mitk::GlobalInteraction just informs
-      * the active tool about new mitk::StateEvent but no other
-      * Interactor or Statemachine
-      */
-    void ActivateExclusiveStateEventPolicy(bool);
-
     /*
       \brief Get the list of reference data.
     */
@@ -231,17 +213,13 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
 
     /*
       \brief Tell that someone is using tools.
-      GUI elements should call this when they become active. This method increases an internal "client count". Tools
-      are only registered to GlobalInteraction when this count is greater than 0. This is useful to automatically deactivate
-      tools when you hide their GUI elements.
+      GUI elements should call this when they become active. This method increases an internal "client count".
      */
     void RegisterClient();
 
     /*
       \brief Tell that someone is NOT using tools.
-      GUI elements should call this when they become active. This method increases an internal "client count". Tools
-      are only registered to GlobalInteraction when this count is greater than 0. This is useful to automatically deactivate
-      tools when you hide their GUI elements.
+      GUI elements should call this when they become active. This method increases an internal "client count".
      */
     void UnregisterClient();
 
@@ -285,7 +263,7 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     NodeTagMapType  m_ReferenceDataObserverTags;
 
     DataVectorType m_WorkingData;
-    NodeTagMapType  m_WorkingDataObserverTags;
+    NodeTagMapType m_WorkingDataObserverTags;
 
     DataVectorType m_RoiData;
     NodeTagMapType m_RoiDataObserverTags;
@@ -294,14 +272,9 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
 
     WeakPointer<DataStorage> m_DataStorage;
 
-    bool m_ExclusiveStateEventPolicy;
-
     /// \brief Callback for NodeRemove events
     void OnNodeRemoved(const mitk::DataNode* node);
 
-  private:
-
-    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
 };
 
 } // namespace

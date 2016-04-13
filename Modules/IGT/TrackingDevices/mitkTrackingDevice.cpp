@@ -17,13 +17,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingDevice.h"
 #include "mitkIGTTimeStamp.h"
 #include "mitkTrackingTool.h"
+
 #include <itkMutexLockHolder.h>
+
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+
+#include "mitkUnspecifiedTrackingTypeInformation.h"
+#include "mitkTrackingDeviceTypeCollection.h"
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::TrackingDevice::TrackingDevice() :
-  m_Data(mitk::DeviceDataUnspecified),
+m_Data(mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified()),
   m_State(mitk::TrackingDevice::Setup),
   m_StopTracking(false),
   m_RotationMode(mitk::TrackingDevice::RotationStandard)
@@ -79,7 +86,17 @@ mitk::TrackingDeviceType mitk::TrackingDevice::GetType() const{
 }
 
 void mitk::TrackingDevice::SetType(mitk::TrackingDeviceType deviceType){
-  m_Data = mitk::GetFirstCompatibleDeviceDataForLine(deviceType);
+
+  us::ModuleContext* context = us::GetModuleContext();
+
+   std::vector<us::ServiceReference<mitk::TrackingDeviceTypeCollection> > refs = context->GetServiceReferences<mitk::TrackingDeviceTypeCollection>();
+   if (refs.empty())
+   {
+     MITK_ERROR << "No tracking device service found!";
+   }
+   mitk::TrackingDeviceTypeCollection* deviceTypeCollection = context->GetService<mitk::TrackingDeviceTypeCollection>(refs.front());
+
+   m_Data = deviceTypeCollection->GetFirstCompatibleDeviceDataForLine(deviceType);
 }
 
 mitk::TrackingDeviceData mitk::TrackingDevice::GetData() const{

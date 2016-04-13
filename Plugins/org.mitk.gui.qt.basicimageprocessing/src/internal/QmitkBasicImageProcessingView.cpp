@@ -141,7 +141,7 @@ typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double >       
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
-: QmitkFunctionality(),
+: QmitkAbstractView(),
   m_Controls(NULL),
   m_SelectedImageNode(NULL),
   m_TimeStepperAdapter(NULL)
@@ -168,12 +168,62 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
 
     mitk::NodePredicateDimension::Pointer dimensionPredicate = mitk::NodePredicateDimension::New(3);
     mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
-    m_Controls->m_ImageSelector2->SetDataStorage(this->GetDefaultDataStorage());
+    m_Controls->m_ImageSelector2->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateAnd::New(dimensionPredicate, imagePredicate));
   }
   m_Controls->gbTwoImageOps->hide();
 
-  m_SelectedImageNode = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
+  m_SelectedImageNode = mitk::DataStorageSelection::New(this->GetDataStorage(), false);
+
+  // Setup Controls
+
+  this->m_Controls->cbWhat1->clear();
+  this->m_Controls->cbWhat1->insertItem(NOACTIONSELECTED, "Please select operation");
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_DENOISING, "--- Denoising ---");
+  this->m_Controls->cbWhat1->insertItem(GAUSSIAN, "Gaussian");
+  this->m_Controls->cbWhat1->insertItem(MEDIAN, "Median");
+  this->m_Controls->cbWhat1->insertItem(TOTALVARIATION, "Total Variation");
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_MORPHOLOGICAL, "--- Morphological ---");
+  this->m_Controls->cbWhat1->insertItem(DILATION, "Dilation");
+  this->m_Controls->cbWhat1->insertItem(EROSION, "Erosion");
+  this->m_Controls->cbWhat1->insertItem(OPENING, "Opening");
+  this->m_Controls->cbWhat1->insertItem(CLOSING, "Closing");
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_EDGE_DETECTION, "--- Edge Detection ---");
+  this->m_Controls->cbWhat1->insertItem(GRADIENT, "Gradient");
+  this->m_Controls->cbWhat1->insertItem(LAPLACIAN, "Laplacian (2nd Derivative)");
+  this->m_Controls->cbWhat1->insertItem(SOBEL, "Sobel Operator");
+  this->m_Controls->cbWhat1->insertItem(CATEGORY_MISC, "--- Misc ---");
+  this->m_Controls->cbWhat1->insertItem(THRESHOLD, "Threshold");
+  this->m_Controls->cbWhat1->insertItem(INVERSION, "Image Inversion");
+  this->m_Controls->cbWhat1->insertItem(DOWNSAMPLING, "Downsampling");
+  this->m_Controls->cbWhat1->insertItem(FLIPPING, "Flipping");
+  this->m_Controls->cbWhat1->insertItem(RESAMPLING, "Resample to");
+  this->m_Controls->cbWhat1->insertItem(RESCALE, "Rescale values to interval");
+  this->m_Controls->cbWhat1->insertItem(RESCALE2, "Rescale values by scalar");
+
+  this->m_Controls->cbWhat2->clear();
+  this->m_Controls->cbWhat2->insertItem(TWOIMAGESNOACTIONSELECTED, "Please select on operation");
+  this->m_Controls->cbWhat2->insertItem(CATEGORY_ARITHMETIC, "--- Arithmetric operations ---");
+  this->m_Controls->cbWhat2->insertItem(ADD, "Add to Image 1:");
+  this->m_Controls->cbWhat2->insertItem(SUBTRACT, "Subtract from Image 1:");
+  this->m_Controls->cbWhat2->insertItem(MULTIPLY, "Multiply with Image 1:");
+  this->m_Controls->cbWhat2->insertItem(RESAMPLE_TO, "Resample Image 1 to fit geometry:");
+  this->m_Controls->cbWhat2->insertItem(DIVIDE, "Divide Image 1 by:");
+  this->m_Controls->cbWhat2->insertItem(CATEGORY_BOOLEAN, "--- Boolean operations ---");
+  this->m_Controls->cbWhat2->insertItem(AND, "AND");
+  this->m_Controls->cbWhat2->insertItem(OR, "OR");
+  this->m_Controls->cbWhat2->insertItem(XOR, "XOR");
+
+  this->m_Controls->cbParam4->clear();
+  this->m_Controls->cbParam4->insertItem(LINEAR, "Linear");
+  this->m_Controls->cbParam4->insertItem(NEAREST, "Nearest neighbor");
+
+  m_Controls->dsbParam1->hide();
+  m_Controls->dsbParam2->hide();
+  m_Controls->dsbParam3->hide();
+  m_Controls->tlParam3->hide();
+  m_Controls->tlParam4->hide();
+  m_Controls->cbParam4->hide();
 }
 
 void QmitkBasicImageProcessing::CreateConnections()
@@ -190,64 +240,16 @@ void QmitkBasicImageProcessing::CreateConnections()
   }
 
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime,
-    GetActiveStdMultiWidget()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
+    GetRenderWindowPart()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
 }
 
-void QmitkBasicImageProcessing::Activated()
+void QmitkBasicImageProcessing::SetFocus()
 {
-  QmitkFunctionality::Activated();
-
-  this->m_Controls->cbWhat1->clear();
-  this->m_Controls->cbWhat1->insertItem( NOACTIONSELECTED, "Please select operation");
-  this->m_Controls->cbWhat1->insertItem( CATEGORY_DENOISING, "--- Denoising ---");
-  this->m_Controls->cbWhat1->insertItem( GAUSSIAN, "Gaussian");
-  this->m_Controls->cbWhat1->insertItem( MEDIAN, "Median");
-  this->m_Controls->cbWhat1->insertItem( TOTALVARIATION, "Total Variation");
-  this->m_Controls->cbWhat1->insertItem( CATEGORY_MORPHOLOGICAL, "--- Morphological ---");
-  this->m_Controls->cbWhat1->insertItem( DILATION, "Dilation");
-  this->m_Controls->cbWhat1->insertItem( EROSION, "Erosion");
-  this->m_Controls->cbWhat1->insertItem( OPENING, "Opening");
-  this->m_Controls->cbWhat1->insertItem( CLOSING, "Closing");
-  this->m_Controls->cbWhat1->insertItem( CATEGORY_EDGE_DETECTION, "--- Edge Detection ---");
-  this->m_Controls->cbWhat1->insertItem( GRADIENT, "Gradient");
-  this->m_Controls->cbWhat1->insertItem( LAPLACIAN, "Laplacian (2nd Derivative)");
-  this->m_Controls->cbWhat1->insertItem( SOBEL, "Sobel Operator");
-  this->m_Controls->cbWhat1->insertItem( CATEGORY_MISC, "--- Misc ---");
-  this->m_Controls->cbWhat1->insertItem( THRESHOLD, "Threshold");
-  this->m_Controls->cbWhat1->insertItem( INVERSION, "Image Inversion");
-  this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, "Downsampling");
-  this->m_Controls->cbWhat1->insertItem( FLIPPING, "Flipping");
-  this->m_Controls->cbWhat1->insertItem( RESAMPLING, "Resample to");
-  this->m_Controls->cbWhat1->insertItem( RESCALE, "Rescale values to interval");
-  this->m_Controls->cbWhat1->insertItem( RESCALE2, "Rescale values by scalar");
-
-  this->m_Controls->cbWhat2->clear();
-  this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, "Please select on operation" );
-  this->m_Controls->cbWhat2->insertItem( CATEGORY_ARITHMETIC, "--- Arithmetric operations ---" );
-  this->m_Controls->cbWhat2->insertItem( ADD, "Add to Image 1:" );
-  this->m_Controls->cbWhat2->insertItem( SUBTRACT, "Subtract from Image 1:" );
-  this->m_Controls->cbWhat2->insertItem( MULTIPLY, "Multiply with Image 1:" );
-  this->m_Controls->cbWhat2->insertItem( RESAMPLE_TO, "Resample Image 1 to fit geometry:" );
-  this->m_Controls->cbWhat2->insertItem( DIVIDE, "Divide Image 1 by:" );
-  this->m_Controls->cbWhat2->insertItem( CATEGORY_BOOLEAN, "--- Boolean operations ---" );
-  this->m_Controls->cbWhat2->insertItem( AND, "AND" );
-  this->m_Controls->cbWhat2->insertItem( OR, "OR" );
-  this->m_Controls->cbWhat2->insertItem( XOR, "XOR" );
-
-  this->m_Controls->cbParam4->clear();
-  this->m_Controls->cbParam4->insertItem( LINEAR, "Linear" );
-  this->m_Controls->cbParam4->insertItem( NEAREST, "Nearest neighbor" );
-
-  m_Controls->dsbParam1->hide();
-  m_Controls->dsbParam2->hide();
-  m_Controls->dsbParam3->hide();
-  m_Controls->tlParam3->hide();
-  m_Controls->tlParam4->hide();
-  m_Controls->cbParam4->hide();
+  m_Controls->rBOneImOp->setFocus();
 }
 
 //datamanager selection changed
-void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
   //any nodes there?
   if (!nodes.empty())
@@ -1119,7 +1121,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 //  this->ResetOneImageOpPanel();
 
   // add new image to data storage and set as active to ease further processing
-  GetDefaultDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
+  GetDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
   if ( m_Controls->cbHideOrig->isChecked() == true )
     m_SelectedImageNode->GetNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
   // TODO!! m_Controls->m_ImageSelector1->SetSelectedNode(result);
@@ -1369,7 +1371,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( (name + nameAddition ).c_str() ));
   result->SetData( newImage1 );
-  GetDefaultDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
+  GetDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
 
   // show only the newly created image
   m_SelectedImageNode->GetNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );

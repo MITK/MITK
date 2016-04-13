@@ -54,6 +54,7 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
 
 QtShell::~QtShell()
 {
+  widget->setProperty("shell", QVariant::fromValue(static_cast<Shell*>(nullptr)));
   widget->deleteLater();
 }
 

@@ -20,7 +20,7 @@
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="padding"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="panning"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="level window"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="PACS"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="mouse"/>

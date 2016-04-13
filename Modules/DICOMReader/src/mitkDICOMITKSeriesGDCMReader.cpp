@@ -15,90 +15,84 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 //#define MBILOG_ENABLE_DEBUG
-//#define ENABLE_TIMING
+#define ENABLE_TIMING
 
+#include <itkTimeProbesCollectorBase.h>
+#include <gdcmUIDs.h>
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkITKDICOMSeriesReaderHelper.h"
 #include "mitkGantryTiltInformation.h"
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMGDCMTagScanner.h"
 
-#include <itkTimeProbesCollectorBase.h>
+itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::MutexLock::New();
 
-#include <gdcmUIDs.h>
 
-mitk::DICOMITKSeriesGDCMReader
-::DICOMITKSeriesGDCMReader(unsigned int decimalPlacesForOrientation)
-:DICOMFileReader()
-,m_FixTiltByShearing(true)
-,m_DecimalPlacesForOrientation(decimalPlacesForOrientation)
+mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation )
+: DICOMFileReader()
+, m_FixTiltByShearing( true )
+, m_DecimalPlacesForOrientation( decimalPlacesForOrientation )
 {
-  this->EnsureMandatorySortersArePresent(decimalPlacesForOrientation);
-
-  m_LocaleMutex = itk::MutexLock::New();
+  this->EnsureMandatorySortersArePresent( decimalPlacesForOrientation );
 }
 
 
-mitk::DICOMITKSeriesGDCMReader
-::DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other )
-:DICOMFileReader(other)
-,m_FixTiltByShearing(false)
-,m_SortingResultInProgress( other.m_SortingResultInProgress )
-,m_Sorter( other.m_Sorter )
-,m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
-,m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
-,m_ReplacedCLocales( other.m_ReplacedCLocales )
-,m_ReplacedCinLocales( other.m_ReplacedCinLocales )
-,m_DecimalPlacesForOrientation(other.m_DecimalPlacesForOrientation)
-,m_TagCache( other.m_TagCache )
+mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( const DICOMITKSeriesGDCMReader& other )
+: DICOMFileReader( other )
+, m_FixTiltByShearing( false )
+, m_SortingResultInProgress( other.m_SortingResultInProgress )
+, m_Sorter( other.m_Sorter )
+, m_EquiDistantBlocksSorter( other.m_EquiDistantBlocksSorter->Clone() )
+, m_NormalDirectionConsistencySorter( other.m_NormalDirectionConsistencySorter->Clone() )
+, m_ReplacedCLocales( other.m_ReplacedCLocales )
+, m_ReplacedCinLocales( other.m_ReplacedCinLocales )
+, m_DecimalPlacesForOrientation( other.m_DecimalPlacesForOrientation )
+, m_TagCache( other.m_TagCache )
 {
 }
 
-mitk::DICOMITKSeriesGDCMReader
-::~DICOMITKSeriesGDCMReader()
+mitk::DICOMITKSeriesGDCMReader::~DICOMITKSeriesGDCMReader()
 {
 }
 
-mitk::DICOMITKSeriesGDCMReader&
-mitk::DICOMITKSeriesGDCMReader
-::operator=(const DICOMITKSeriesGDCMReader& other)
+mitk::DICOMITKSeriesGDCMReader& mitk::DICOMITKSeriesGDCMReader::
+  operator=( const DICOMITKSeriesGDCMReader& other )
 {
-  if (this != &other)
+  if ( this != &other )
   {
-    DICOMFileReader::operator=(other);
-    this->m_FixTiltByShearing = other.m_FixTiltByShearing;
-    this->m_SortingResultInProgress = other.m_SortingResultInProgress;
-    this->m_Sorter = other.m_Sorter; // TODO should clone the list items
-    this->m_EquiDistantBlocksSorter = other.m_EquiDistantBlocksSorter->Clone();
+    DICOMFileReader::operator                =( other );
+    this->m_FixTiltByShearing                = other.m_FixTiltByShearing;
+    this->m_SortingResultInProgress          = other.m_SortingResultInProgress;
+    this->m_Sorter                           = other.m_Sorter; // TODO should clone the list items
+    this->m_EquiDistantBlocksSorter          = other.m_EquiDistantBlocksSorter->Clone();
     this->m_NormalDirectionConsistencySorter = other.m_NormalDirectionConsistencySorter->Clone();
-    this->m_ReplacedCLocales = other.m_ReplacedCLocales;
-    this->m_ReplacedCinLocales = other.m_ReplacedCinLocales;
-    this->m_DecimalPlacesForOrientation = other.m_DecimalPlacesForOrientation;
-    this->m_TagCache = other.m_TagCache;
+    this->m_ReplacedCLocales                 = other.m_ReplacedCLocales;
+    this->m_ReplacedCinLocales               = other.m_ReplacedCinLocales;
+    this->m_DecimalPlacesForOrientation      = other.m_DecimalPlacesForOrientation;
+    this->m_TagCache                         = other.m_TagCache;
   }
   return *this;
 }
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::operator==(const DICOMFileReader& other) const
+bool mitk::DICOMITKSeriesGDCMReader::operator==( const DICOMFileReader& other ) const
 {
-  if (const Self* otherSelf = dynamic_cast<const Self*>(&other))
+  if ( const Self* otherSelf = dynamic_cast<const Self*>( &other ) )
   {
     if ( this->m_FixTiltByShearing == otherSelf->m_FixTiltByShearing
-      && *(this->m_EquiDistantBlocksSorter) == *(otherSelf->m_EquiDistantBlocksSorter)
-      && (fabs(this->m_DecimalPlacesForOrientation - otherSelf->m_DecimalPlacesForOrientation) < eps)
-       )
+         && *( this->m_EquiDistantBlocksSorter ) == *( otherSelf->m_EquiDistantBlocksSorter )
+         && ( fabs( this->m_DecimalPlacesForOrientation - otherSelf->m_DecimalPlacesForOrientation ) < eps ) )
     {
       // test sorters for equality
-      if (this->m_Sorter.size() != otherSelf->m_Sorter.size()) return false;
+      if ( this->m_Sorter.size() != otherSelf->m_Sorter.size() )
+        return false;
 
-      auto mySorterIter = this->m_Sorter.begin();
-      auto oSorterIter = otherSelf->m_Sorter.begin();
-      for(; mySorterIter != this->m_Sorter.end() && oSorterIter != otherSelf->m_Sorter.end();
-          ++mySorterIter, ++oSorterIter)
+      auto mySorterIter = this->m_Sorter.cbegin();
+      auto oSorterIter  = otherSelf->m_Sorter.cbegin();
+      for ( ; mySorterIter != this->m_Sorter.cend() && oSorterIter != otherSelf->m_Sorter.cend();
+            ++mySorterIter, ++oSorterIter )
       {
-        if ( ! (**mySorterIter == **oSorterIter ) ) return false; // this sorter differs
+        if ( !( **mySorterIter == **oSorterIter ) )
+          return false; // this sorter differs
       }
 
       // nothing differs ==> all is equal
@@ -115,144 +109,117 @@ mitk::DICOMITKSeriesGDCMReader
   }
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::SetFixTiltByShearing(bool on)
+void mitk::DICOMITKSeriesGDCMReader::SetFixTiltByShearing( bool on )
 {
   m_FixTiltByShearing = on;
 }
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::GetFixTiltByShearing() const
+bool mitk::DICOMITKSeriesGDCMReader::GetFixTiltByShearing() const
 {
   return m_FixTiltByShearing;
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::SetAcceptTwoSlicesGroups(bool accept)
+void mitk::DICOMITKSeriesGDCMReader::SetAcceptTwoSlicesGroups( bool accept ) const
 {
-  m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups(accept);
+  m_EquiDistantBlocksSorter->SetAcceptTwoSlicesGroups( accept );
 }
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::GetAcceptTwoSlicesGroups() const
+bool mitk::DICOMITKSeriesGDCMReader::GetAcceptTwoSlicesGroups() const
 {
   return m_EquiDistantBlocksSorter->GetAcceptTwoSlicesGroups();
 }
 
 
 mitk::DICOMGDCMImageFrameList
-mitk::DICOMITKSeriesGDCMReader
-::FromDICOMDatasetList(const DICOMDatasetList& input)
+  mitk::DICOMITKSeriesGDCMReader::FromDICOMDatasetList( const DICOMDatasetList& input )
 {
   DICOMGDCMImageFrameList output;
-  output.reserve(input.size());
+  output.reserve( input.size() );
 
-  for(auto inputIter = input.begin();
-      inputIter != input.end();
-      ++inputIter)
+  for ( auto inputIter = input.cbegin(); inputIter != input.cend(); ++inputIter )
   {
-    DICOMGDCMImageFrameInfo* gfi = dynamic_cast<DICOMGDCMImageFrameInfo*>(*inputIter);
-    assert(gfi);
-    output.push_back(gfi);
+    DICOMGDCMImageFrameInfo* gfi = dynamic_cast<DICOMGDCMImageFrameInfo*>( *inputIter );
+    assert( gfi );
+    output.push_back( gfi );
   }
 
   return output;
 }
 
 mitk::DICOMDatasetList
-mitk::DICOMITKSeriesGDCMReader
-::ToDICOMDatasetList(const DICOMGDCMImageFrameList& input)
+  mitk::DICOMITKSeriesGDCMReader::ToDICOMDatasetList( const DICOMGDCMImageFrameList& input )
 {
   DICOMDatasetList output;
-  output.reserve(input.size());
+  output.reserve( input.size() );
 
-  for(auto inputIter = input.begin();
-      inputIter != input.end();
-      ++inputIter)
+  for ( auto inputIter = input.cbegin(); inputIter != input.cend(); ++inputIter )
   {
     DICOMDatasetAccess* da = inputIter->GetPointer();
-    assert(da);
-    output.push_back(da);
+    assert( da );
+    output.push_back( da );
   }
 
   return output;
 }
 
 mitk::DICOMImageFrameList
-mitk::DICOMITKSeriesGDCMReader
-::ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input)
+  mitk::DICOMITKSeriesGDCMReader::ToDICOMImageFrameList( const DICOMGDCMImageFrameList& input )
 {
   DICOMImageFrameList output;
-  output.reserve(input.size());
+  output.reserve( input.size() );
 
-  for(auto inputIter = input.begin();
-      inputIter != input.end();
-      ++inputIter)
+  for ( auto inputIter = input.cbegin(); inputIter != input.cend(); ++inputIter )
   {
-    DICOMImageFrameInfo::Pointer fi = (*inputIter)->GetFrameInfo();
-    assert(fi.IsNotNull());
-    output.push_back(fi);
+    DICOMImageFrameInfo::Pointer fi = ( *inputIter )->GetFrameInfo();
+    assert( fi.IsNotNull() );
+    output.push_back( fi );
   }
 
   return output;
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::InternalPrintConfiguration(std::ostream& os) const
+void mitk::DICOMITKSeriesGDCMReader::InternalPrintConfiguration( std::ostream& os ) const
 {
-  unsigned int sortIndex(1);
-  for(auto sorterIter = m_Sorter.begin();
-      sorterIter != m_Sorter.end();
-      ++sortIndex, ++sorterIter)
+  unsigned int sortIndex( 1 );
+  for ( auto sorterIter = m_Sorter.cbegin(); sorterIter != m_Sorter.cend(); ++sortIndex, ++sorterIter )
   {
     os << "Sorting step " << sortIndex << ":" << std::endl;
-    (*sorterIter)->PrintConfiguration(os, "  ");
+    ( *sorterIter )->PrintConfiguration( os, "  " );
   }
 
   os << "Sorting step " << sortIndex << ":" << std::endl;
-  m_EquiDistantBlocksSorter->PrintConfiguration(os, "  ");
+  m_EquiDistantBlocksSorter->PrintConfiguration( os, "  " );
 }
 
 
-std::string
-mitk::DICOMITKSeriesGDCMReader
-::GetActiveLocale() const
+std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale()
 {
-  return setlocale(LC_NUMERIC, nullptr);
+  return setlocale( LC_NUMERIC, nullptr );
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::PushLocale() const
+void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
 {
-  m_LocaleMutex->Lock();
+  s_LocaleMutex->Lock();
 
-  std::string currentCLocale = setlocale(LC_NUMERIC, nullptr);
+  std::string currentCLocale = setlocale( LC_NUMERIC, nullptr );
   m_ReplacedCLocales.push( currentCLocale );
-  setlocale(LC_NUMERIC, "C");
+  setlocale( LC_NUMERIC, "C" );
 
   std::locale currentCinLocale( std::cin.getloc() );
   m_ReplacedCinLocales.push( currentCinLocale );
   std::locale l( "C" );
-  std::cin.imbue(l);
+  std::cin.imbue( l );
 
-  m_LocaleMutex->Unlock();
+  s_LocaleMutex->Unlock();
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::PopLocale() const
+void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
 {
-  m_LocaleMutex->Lock();
+  s_LocaleMutex->Lock();
 
-  if (!m_ReplacedCLocales.empty())
+  if ( !m_ReplacedCLocales.empty() )
   {
-    setlocale(LC_NUMERIC, m_ReplacedCLocales.top().c_str());
+    setlocale( LC_NUMERIC, m_ReplacedCLocales.top().c_str() );
     m_ReplacedCLocales.pop();
   }
   else
@@ -260,7 +227,7 @@ mitk::DICOMITKSeriesGDCMReader
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
-  if (!m_ReplacedCinLocales.empty())
+  if ( !m_ReplacedCinLocales.empty() )
   {
     std::cin.imbue( m_ReplacedCinLocales.top() );
     m_ReplacedCinLocales.pop();
@@ -270,68 +237,61 @@ mitk::DICOMITKSeriesGDCMReader
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
-  m_LocaleMutex->Unlock();
+  s_LocaleMutex->Unlock();
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList
-mitk::DICOMITKSeriesGDCMReader
-::Condense3DBlocks(SortingBlockList& input)
+  mitk::DICOMITKSeriesGDCMReader::Condense3DBlocks( SortingBlockList& input )
 {
   return input; // to be implemented differently by sub-classes
 }
 
-#if defined(MBILOG_ENABLE_DEBUG) || defined (ENABLE_TIMING)
-  #define timeStart(part) timer.Start(part);
-  #define timeStop(part) timer.Stop(part);
+#if defined( MBILOG_ENABLE_DEBUG ) || defined( ENABLE_TIMING )
+#define timeStart( part ) timer.Start( part );
+#define timeStop( part ) timer.Stop( part );
 #else
-  #define timeStart(part)
-  #define timeStop(part)
+#define timeStart( part )
+#define timeStop( part )
 #endif
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::AnalyzeInputFiles()
+void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
 {
   itk::TimeProbesCollectorBase timer;
 
-  timeStart("Reset");
+  timeStart( "Reset" );
   this->ClearOutputs();
-  timeStop("Reset");
+  timeStop( "Reset" );
 
   // prepare initial sorting (== list of input files)
-  StringList inputFilenames = this->GetInputFiles();
-  timeStart("Check input for DCM");
-  if ( inputFilenames.empty()
-       ||
-       !this->CanHandleFile( inputFilenames.front() ) // first
-       ||
-       !this->CanHandleFile( inputFilenames.back() ) // last
-       ||
-       !this->CanHandleFile( inputFilenames[ inputFilenames.size() / 2] ) // roughly central file
-     )
+  const StringList inputFilenames = this->GetInputFiles();
+  timeStart( "Check input for DCM" );
+  if ( inputFilenames.empty() || !this->CanHandleFile( inputFilenames.front() ) // first
+       || !this->CanHandleFile( inputFilenames.back() )                         // last
+       || !this->CanHandleFile( inputFilenames[inputFilenames.size() / 2] )     // roughly central file
+       )
   {
     // TODO a read-as-many-as-possible fallback could be implemented here
     MITK_DEBUG << "Reader unable to process files..";
     return;
   }
 
-  timeStop("Check input for DCM");
+  timeStop( "Check input for DCM" );
 
   // scan files for sorting-relevant tags
-  if (m_TagCache.IsNull())
+  if ( m_TagCache.IsNull() )
   {
-    timeStart("Tag scanning");
+    timeStart( "Tag scanning" );
     DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
     m_TagCache = filescanner.GetPointer(); // keep alive and make accessible to sub-classes
 
-    filescanner->SetInputFiles(inputFilenames);
+    filescanner->SetInputFiles( inputFilenames );
     filescanner->AddTags( this->GetTagsOfInterest() );
 
     PushLocale();
     filescanner->Scan();
     PopLocale();
 
-    timeStop("Tag scanning");
+    timeStop( "Tag scanning" );
   }
   else
   {
@@ -349,70 +309,78 @@ mitk::DICOMITKSeriesGDCMReader
   //     to describe the scanner output, even after the reader (and its scanner) is deleted.
   //   - if DICOMImageFrameInfo now inherits DICOMDatasetAccess, it would also need to implement
   //     GetTagValueAsString().
-  //     - so this could all work if we implement a default response in DICOMImageFrameInfo::GetTagValueAsString() (like in GetFilenameIfAvailable)
+  //     - so this could all work if we implement a default response in
+  //     DICOMImageFrameInfo::GetTagValueAsString() (like in GetFilenameIfAvailable)
   //       and overwrite it in DICOMGDCMImageFrameInfo, which also knows about a specific GDCM scanner result
   //       (which again COULD (no need to?) be hidden as a point to a DICOMGDCMTagScanner class)
   //
-  if ( DICOMGDCMTagScanner* tagCache = dynamic_cast<DICOMGDCMTagScanner*>(m_TagCache.GetPointer()) )
+  if ( DICOMGDCMTagScanner* tagCache = dynamic_cast<DICOMGDCMTagScanner*>( m_TagCache.GetPointer() ) )
   {
     m_SortingResultInProgress.push_back( tagCache->GetFrameInfoList() );
   }
   else
   {
-    throw std::logic_error("Bad implementation error: DICOMITKSeriesGDCMReader now unable to find dataset/tag information for its input.");
+    throw std::logic_error( "Bad implementation error: DICOMITKSeriesGDCMReader now unable to find "
+                            "dataset/tag information for its input." );
   }
 
   // sort and split blocks as configured
 
-  timeStart("Sorting frames");
+  timeStart( "Sorting frames" );
   unsigned int sorterIndex = 0;
-  for(auto sorterIter = m_Sorter.begin();
-      sorterIter != m_Sorter.end();
-      ++sorterIndex, ++sorterIter)
+  for ( auto sorterIter = m_Sorter.cbegin(); sorterIter != m_Sorter.cend(); ++sorterIndex, ++sorterIter )
   {
-    std::stringstream ss; ss << "Sorting step " << sorterIndex;
+    std::stringstream ss;
+    ss << "Sorting step " << sorterIndex;
     timeStart( ss.str().c_str() );
-    m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex, *sorterIter, m_SortingResultInProgress);
+    m_SortingResultInProgress =
+      this->InternalExecuteSortingStep( sorterIndex, *sorterIter, m_SortingResultInProgress );
     timeStop( ss.str().c_str() );
   }
 
   // a last extra-sorting step: ensure equidistant slices
   timeStart( "EquiDistantBlocksSorter" );
-  m_SortingResultInProgress = this->InternalExecuteSortingStep(sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress);
+  m_SortingResultInProgress = this->InternalExecuteSortingStep(
+    sorterIndex++, m_EquiDistantBlocksSorter.GetPointer(), m_SortingResultInProgress );
   timeStop( "EquiDistantBlocksSorter" );
 
-  timeStop("Sorting frames");
+  timeStop( "Sorting frames" );
 
-  timeStart("Condensing 3D blocks");
+  timeStart( "Condensing 3D blocks" );
   m_SortingResultInProgress = this->Condense3DBlocks( m_SortingResultInProgress );
-  timeStop("Condensing 3D blocks");
+  timeStop( "Condensing 3D blocks" );
 
   // provide final result as output
 
-  timeStart("Output");
+  timeStart( "Output" );
   unsigned int o = this->GetNumberOfOutputs();
-  this->SetNumberOfOutputs( o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
-  for (auto blockIter = m_SortingResultInProgress.begin();
-       blockIter != m_SortingResultInProgress.end();
-       ++o, ++blockIter)
+  this->SetNumberOfOutputs(
+    o + m_SortingResultInProgress.size() ); // Condense3DBlocks may already have added outputs!
+  for ( auto blockIter = m_SortingResultInProgress.cbegin(); blockIter != m_SortingResultInProgress.cend();
+        ++o, ++blockIter )
   {
-    DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
-    assert(!gdcmFrameInfoList.empty());
+    const DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
+    assert( !gdcmFrameInfoList.empty() );
 
     // reverse frames if necessary
     // update tilt information from absolute last sorting
-    DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmFrameInfoList );
+    const DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmFrameInfoList );
     m_NormalDirectionConsistencySorter->SetInput( datasetList );
     m_NormalDirectionConsistencySorter->Sort();
-    DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList( m_NormalDirectionConsistencySorter->GetOutput(0) );
+    const DICOMGDCMImageFrameList sortedGdcmInfoFrameList =
+      FromDICOMDatasetList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
     const GantryTiltInformation& tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
 
     // set frame list for current block
-    DICOMImageFrameList frameList = ToDICOMImageFrameList( sortedGdcmInfoFrameList );
-    assert(!frameList.empty());
+    const DICOMImageFrameList frameList = ToDICOMImageFrameList( sortedGdcmInfoFrameList );
+    assert( !frameList.empty() );
 
     DICOMImageBlockDescriptor block;
-    block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
+    block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because
+                                              // SetImageFrameList will trigger reading of lots of interesting
+                                              // tags!
+    block.SetAdditionalTagsOfInterest( GetAdditionalTagsOfInterest() );
+    block.SetTagLookupTableToPropertyFunctor( GetTagLookupTableToPropertyFunctor() );
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 
@@ -420,26 +388,23 @@ mitk::DICOMITKSeriesGDCMReader
 
     this->SetOutput( o, block );
   }
-  timeStop("Output");
+  timeStop( "Output" );
 
-#if defined(MBILOG_ENABLE_DEBUG) || defined (ENABLE_TIMING)
+#if defined( MBILOG_ENABLE_DEBUG ) || defined( ENABLE_TIMING )
   std::cout << "---------------------------------------------------------------" << std::endl;
   timer.Report( std::cout );
   std::cout << "---------------------------------------------------------------" << std::endl;
 #endif
 }
 
-mitk::DICOMITKSeriesGDCMReader::SortingBlockList
-mitk::DICOMITKSeriesGDCMReader
-::InternalExecuteSortingStep(
-    unsigned int sortingStepIndex,
-    DICOMDatasetSorter::Pointer sorter,
-    const SortingBlockList& input)
+mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader::InternalExecuteSortingStep(
+  unsigned int sortingStepIndex, const DICOMDatasetSorter::Pointer& sorter, const SortingBlockList& input )
 {
   SortingBlockList nextStepSorting; // we should not modify our input list while processing it
-  std::stringstream ss; ss << "Sorting step " << sortingStepIndex << " '";
-#if defined(MBILOG_ENABLE_DEBUG)
-  sorter->PrintConfiguration(ss);
+  std::stringstream ss;
+  ss << "Sorting step " << sortingStepIndex << " '";
+#if defined( MBILOG_ENABLE_DEBUG )
+  sorter->PrintConfiguration( ss );
 #endif
   ss << "'";
   nextStepSorting.clear();
@@ -448,38 +413,35 @@ mitk::DICOMITKSeriesGDCMReader
   MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ": " << input.size() << " groups input";
   unsigned int groupIndex = 0;
 
-  for(auto blockIter = input.begin();
-      blockIter != input.end();
-      ++groupIndex, ++blockIter)
+  for ( auto blockIter = input.cbegin(); blockIter != input.cend(); ++groupIndex, ++blockIter )
   {
     const DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
-    DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmInfoFrameList );
+    const DICOMDatasetList datasetList               = ToDICOMDatasetList( gdcmInfoFrameList );
 
+#if defined( MBILOG_ENABLE_DEBUG )
     MITK_DEBUG << "--------------------------------------------------------------------------------";
-    MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " (" << datasetList.size() << " datasets): ";
-    for (auto oi = datasetList.begin();
-        oi != datasetList.end();
-        ++oi)
+    MITK_DEBUG << "DICOMITKSeriesGDCMReader: " << ss.str() << ", dataset group " << groupIndex << " ("
+               << datasetList.size() << " datasets): ";
+    for ( auto oi = datasetList.cbegin(); oi != datasetList.cend(); ++oi )
     {
-      MITK_DEBUG << "  INPUT     : " << (*oi)->GetFilenameIfAvailable();
+      MITK_DEBUG << "  INPUT     : " << ( *oi )->GetFilenameIfAvailable();
     }
+#endif
 
-    sorter->SetInput(datasetList);
+    sorter->SetInput( datasetList );
     sorter->Sort();
     unsigned int numberOfResultingBlocks = sorter->GetNumberOfOutputs();
 
-    for (unsigned int b = 0; b < numberOfResultingBlocks; ++b)
+    for ( unsigned int b = 0; b < numberOfResultingBlocks; ++b )
     {
-      DICOMDatasetList blockResult = sorter->GetOutput(b);
+      const DICOMDatasetList blockResult = sorter->GetOutput( b );
 
-      for (auto oi = blockResult.begin();
-          oi != blockResult.end();
-          ++oi)
+      for ( auto oi = blockResult.cbegin(); oi != blockResult.cend(); ++oi )
       {
-        MITK_DEBUG << "  OUTPUT(" << b << ") :" << (*oi)->GetFilenameIfAvailable();
+        MITK_DEBUG << "  OUTPUT(" << b << ") :" << ( *oi )->GetFilenameIfAvailable();
       }
 
-      DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList(blockResult);
+      DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList( blockResult );
       nextStepSorting.push_back( sortedGdcmInfoFrameList );
     }
   }
@@ -488,10 +450,9 @@ mitk::DICOMITKSeriesGDCMReader
 }
 
 mitk::ReaderImplementationLevel
-mitk::DICOMITKSeriesGDCMReader
-::GetReaderImplementationLevel(const std::string sopClassUID) const
+  mitk::DICOMITKSeriesGDCMReader::GetReaderImplementationLevel( const std::string sopClassUID )
 {
-  if (sopClassUID.empty())
+  if ( sopClassUID.empty() )
   {
     return SOPClassUnknown;
   }
@@ -501,7 +462,7 @@ mitk::DICOMITKSeriesGDCMReader
 
   gdcm::UIDs::TSType gdcmType = uidKnowledge;
 
-  switch (gdcmType)
+  switch ( gdcmType )
   {
     case gdcm::UIDs::CTImageStorage:
     case gdcm::UIDs::MRImageStorage:
@@ -524,46 +485,42 @@ mitk::DICOMITKSeriesGDCMReader
 
 // void AllocateOutputImages();
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::LoadImages()
+bool mitk::DICOMITKSeriesGDCMReader::LoadImages()
 {
   bool success = true;
 
   unsigned int numberOfOutputs = this->GetNumberOfOutputs();
-  for (unsigned int o = 0; o < numberOfOutputs; ++o)
+  for ( unsigned int o = 0; o < numberOfOutputs; ++o )
   {
-    success &= this->LoadMitkImageForOutput(o);
+    success &= this->LoadMitkImageForOutput( o );
   }
 
   return success;
 }
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::LoadMitkImageForImageBlockDescriptor(DICOMImageBlockDescriptor& block) const
+bool mitk::DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(
+  DICOMImageBlockDescriptor& block ) const
 {
   PushLocale();
-  const DICOMImageFrameList& frames = block.GetImageFrameList();
+  const DICOMImageFrameList& frames    = block.GetImageFrameList();
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
-  bool hasTilt = tiltInfo.IsRegularGantryTilt();
+  bool hasTilt                         = tiltInfo.IsRegularGantryTilt();
 
   ITKDICOMSeriesReaderHelper::StringContainer filenames;
-  for (auto frameIter = frames.begin();
-      frameIter != frames.end();
-      ++frameIter)
+  filenames.reserve( frames.size() );
+  for ( auto frameIter = frames.cbegin(); frameIter != frames.cend(); ++frameIter )
   {
-    filenames.push_back( (*frameIter)->Filename );
+    filenames.push_back( ( *frameIter )->Filename );
   }
 
   mitk::ITKDICOMSeriesReaderHelper helper;
-  bool success(true);
+  bool success( true );
   try
   {
     mitk::Image::Pointer mitkImage = helper.Load( filenames, m_FixTiltByShearing && hasTilt, tiltInfo );
     block.SetMitkImage( mitkImage );
   }
-  catch (std::exception& e)
+  catch ( const std::exception& e )
   {
     success = false;
     MITK_ERROR << "Exception during image loading: " << e.what();
@@ -575,29 +532,23 @@ mitk::DICOMITKSeriesGDCMReader
 }
 
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::LoadMitkImageForOutput(unsigned int o)
+bool mitk::DICOMITKSeriesGDCMReader::LoadMitkImageForOutput( unsigned int o )
 {
-  DICOMImageBlockDescriptor& block = this->InternalGetOutput(o);
-  return this->LoadMitkImageForImageBlockDescriptor(block);
+  DICOMImageBlockDescriptor& block = this->InternalGetOutput( o );
+  return this->LoadMitkImageForImageBlockDescriptor( block );
 }
 
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::CanHandleFile(const std::string& filename)
+bool mitk::DICOMITKSeriesGDCMReader::CanHandleFile( const std::string& filename )
 {
-  return ITKDICOMSeriesReaderHelper::CanHandleFile(filename);
+  return ITKDICOMSeriesReaderHelper::CanHandleFile( filename );
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::AddSortingElement(DICOMDatasetSorter* sorter, bool atFront)
+void mitk::DICOMITKSeriesGDCMReader::AddSortingElement( DICOMDatasetSorter* sorter, bool atFront )
 {
-  assert(sorter);
+  assert( sorter );
 
-  if (atFront)
+  if ( atFront )
   {
     m_Sorter.push_front( sorter );
   }
@@ -608,28 +559,24 @@ mitk::DICOMITKSeriesGDCMReader
 }
 
 mitk::DICOMITKSeriesGDCMReader::ConstSorterList
-mitk::DICOMITKSeriesGDCMReader
-::GetFreelyConfiguredSortingElements() const
+  mitk::DICOMITKSeriesGDCMReader::GetFreelyConfiguredSortingElements() const
 {
   std::list<DICOMDatasetSorter::ConstPointer> result;
 
-  unsigned int sortIndex(0);
-  for(auto sorterIter = m_Sorter.begin();
-      sorterIter != m_Sorter.end();
-      ++sortIndex, ++sorterIter)
+  unsigned int sortIndex( 0 );
+  for ( auto sorterIter = m_Sorter.begin(); sorterIter != m_Sorter.end(); ++sortIndex, ++sorterIter )
   {
-    if (sortIndex > 0) // ignore first element (see EnsureMandatorySortersArePresent)
+    if ( sortIndex > 0 ) // ignore first element (see EnsureMandatorySortersArePresent)
     {
-      result.push_back( (*sorterIter).GetPointer() );
+      result.push_back( ( *sorterIter ).GetPointer() );
     }
   }
 
   return result;
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::EnsureMandatorySortersArePresent(unsigned int decimalPlacesForOrientation)
+void mitk::DICOMITKSeriesGDCMReader::EnsureMandatorySortersArePresent(
+  unsigned int decimalPlacesForOrientation )
 {
   DICOMTagBasedSorter::Pointer splitter = DICOMTagBasedSorter::New();
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0010) ); // Number of Rows
@@ -641,98 +588,90 @@ mitk::DICOMITKSeriesGDCMReader
   splitter->AddDistinguishingTag( DICOMTag(0x0028, 0x0008) ); // Number of Frames
   this->AddSortingElement( splitter, true ); // true = at front
 
-  if (m_EquiDistantBlocksSorter.IsNull())
+  if ( m_EquiDistantBlocksSorter.IsNull() )
   {
     m_EquiDistantBlocksSorter = mitk::EquiDistantBlocksSorter::New();
   }
   m_EquiDistantBlocksSorter->SetAcceptTilt( m_FixTiltByShearing );
 
-  if (m_NormalDirectionConsistencySorter.IsNull())
+  if ( m_NormalDirectionConsistencySorter.IsNull() )
   {
     m_NormalDirectionConsistencySorter = mitk::NormalDirectionConsistencySorter::New();
   }
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::SetToleratedOriginOffsetToAdaptive(double fractionOfInterSliceDistance)
+void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffsetToAdaptive( double fractionOfInterSliceDistance ) const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
-  m_EquiDistantBlocksSorter->SetToleratedOriginOffsetToAdaptive(fractionOfInterSliceDistance);
+  m_EquiDistantBlocksSorter->SetToleratedOriginOffsetToAdaptive( fractionOfInterSliceDistance );
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::SetToleratedOriginOffset(double millimeters)
+void mitk::DICOMITKSeriesGDCMReader::SetToleratedOriginOffset( double millimeters ) const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
-  m_EquiDistantBlocksSorter->SetToleratedOriginOffset(millimeters);
+  m_EquiDistantBlocksSorter->SetToleratedOriginOffset( millimeters );
 }
 
-double
-mitk::DICOMITKSeriesGDCMReader
-::GetToleratedOriginError() const
+double mitk::DICOMITKSeriesGDCMReader::GetToleratedOriginError() const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   return m_EquiDistantBlocksSorter->GetToleratedOriginOffset();
 }
 
-bool
-mitk::DICOMITKSeriesGDCMReader
-::IsToleratedOriginOffsetAbsolute() const
+bool mitk::DICOMITKSeriesGDCMReader::IsToleratedOriginOffsetAbsolute() const
 {
   assert( m_EquiDistantBlocksSorter.IsNotNull() );
   return m_EquiDistantBlocksSorter->IsToleratedOriginOffsetAbsolute();
 }
 
-double
-mitk::DICOMITKSeriesGDCMReader
-::GetDecimalPlacesForOrientation() const
+double mitk::DICOMITKSeriesGDCMReader::GetDecimalPlacesForOrientation() const
 {
   return m_DecimalPlacesForOrientation;
 }
 
-mitk::DICOMTagCache::Pointer
-mitk::DICOMITKSeriesGDCMReader
-::GetTagCache() const
+mitk::DICOMTagCache::Pointer mitk::DICOMITKSeriesGDCMReader::GetTagCache() const
 {
   return m_TagCache;
 }
 
-void
-mitk::DICOMITKSeriesGDCMReader
-::SetTagCache(DICOMTagCache::Pointer tagCache)
+void mitk::DICOMITKSeriesGDCMReader::SetTagCache( const DICOMTagCache::Pointer& tagCache )
 {
   m_TagCache = tagCache;
 }
 
-mitk::DICOMTagList
-mitk::DICOMITKSeriesGDCMReader
-::GetTagsOfInterest() const
+mitk::DICOMTagList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
 {
   DICOMTagList completeList;
 
   // check all configured sorters
-  for(auto sorterIter = m_Sorter.begin();
-      sorterIter != m_Sorter.end();
-      ++sorterIter)
+  for ( auto sorterIter = m_Sorter.cbegin(); sorterIter != m_Sorter.cend(); ++sorterIter )
   {
-    assert(sorterIter->IsNotNull());
+    assert( sorterIter->IsNotNull() );
 
-    DICOMTagList tags = (*sorterIter)->GetTagsOfInterest();
-    completeList.insert( completeList.end(), tags.begin(), tags.end() );
+    const DICOMTagList tags = ( *sorterIter )->GetTagsOfInterest();
+    completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
   }
 
   // check our own forced sorters
   DICOMTagList tags = m_EquiDistantBlocksSorter->GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
   tags = m_NormalDirectionConsistencySorter->GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
   // add the tags for DICOMImageBlockDescriptor
   tags = DICOMImageBlockDescriptor::GetTagsOfInterest();
-  completeList.insert( completeList.end(), tags.begin(), tags.end() );
+  completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
+
+
+  const std::unordered_map<const char*, mitk::DICOMTag> tagList = GetAdditionalTagsOfInterest();
+  for ( auto iter = tagList.cbegin();
+        iter != tagList.cend();
+        ++iter
+      )
+  {
+   completeList.push_back( iter->second ) ;
+  }
 
   return completeList;
 }

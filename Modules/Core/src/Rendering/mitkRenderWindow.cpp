@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRenderWindow.h"
 
-#include "mitkDisplayPositionEvent.h"
 #include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
@@ -47,8 +46,7 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name, mitk
     }
   }
 
-  if ( m_vtkRenderWindow->GetSize()[0] <= 10
-    || m_vtkRenderWindow->GetSize()[0] <= 10 )
+  if ( m_vtkRenderWindow->GetSize()[0] <= 10)
   {
     m_vtkRenderWindow->SetSize( 100, 100 );
   }
@@ -87,8 +85,6 @@ vtkRenderWindowInteractor* mitk::RenderWindow::GetVtkRenderWindowInteractor()
 void mitk::RenderWindow::SetSize( int width, int height )
 {
   this->GetVtkRenderWindow()->SetSize( width, height );
-
-  this->resizeMitkEvent( width, height );
 }
 
 void mitk::RenderWindow::ReinitEventProvider()

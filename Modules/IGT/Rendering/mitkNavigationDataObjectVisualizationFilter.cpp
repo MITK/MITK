@@ -22,6 +22,7 @@ mitk::NavigationDataObjectVisualizationFilter::NavigationDataObjectVisualization
 : NavigationDataToNavigationDataFilter(),
 m_RepresentationList(), m_TransformPosition(), m_TransformOrientation(), m_RotationMode(RotationStandard)
 {
+
 }
 
 

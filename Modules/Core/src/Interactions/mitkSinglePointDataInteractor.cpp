@@ -38,7 +38,7 @@ mitk::SinglePointDataInteractor::~SinglePointDataInteractor()
 
 }
 
-bool mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
+void mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -72,6 +72,8 @@ bool mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
     if ( m_UndoEnabled )
     {
       OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point");
+      OperationEvent::IncCurrObjectEventId();
+
       m_UndoController->SetOperationEvent(operationEvent);
     }
     //execute the Operation
@@ -82,10 +84,7 @@ bool mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
 
     // Request update
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-
-    return true;
   }
-  return false;
 }
 
 
@@ -94,7 +93,7 @@ bool mitk::SinglePointDataInteractor::AddPoint(StateMachineAction* /*stateMachin
  */
 void mitk::SinglePointDataInteractor::DataNodeChanged()
 {
-  if (GetDataNode().IsNotNull())
+  if (GetDataNode() != nullptr)
   {
     PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
     if (points == NULL)

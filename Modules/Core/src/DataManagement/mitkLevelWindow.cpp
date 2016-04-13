@@ -53,9 +53,13 @@ void mitk::LevelWindow::EnsureConsistency()
 }
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
-  : m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
-  m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
-  m_DefaultLowerBound( -2048.0 ), m_DefaultUpperBound( 4096.0 ),
+  : m_LowerWindowBound( level - window / 2.0 ),
+  m_UpperWindowBound( level + window / 2.0 ),
+  m_RangeMin( -2048.0 ),
+  m_RangeMax( 4096.0 ),
+  m_DefaultLowerBound( -2048.0 ),
+  m_DefaultUpperBound( 4096.0 ),
+  m_IsFloatingImage(false),
   m_Fixed( false )
 {
   SetDefaultLevelWindow(level, window);
@@ -69,6 +73,7 @@ mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
   , m_RangeMax( levWin.GetRangeMax() )
   , m_DefaultLowerBound( levWin.GetDefaultLowerBound() )
   , m_DefaultUpperBound( levWin.GetDefaultUpperBound() )
+  , m_IsFloatingImage(levWin.IsFloatingValues())
   , m_Fixed( levWin.GetFixed() )
 {
 }
@@ -243,12 +248,22 @@ In consequence the level window maximizes contrast with minimal amount of
 computation and does do useful things if the data contains std::min or
 std:max values or has only 1 or 2 or 3 data values.
 */
-void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, bool guessByCentralSlice)
+void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, bool guessByCentralSlice,
+    unsigned selectedComponent)
 {
   if ( IsFixed() )
     return;
 
   if ( image == nullptr || !image->IsInitialized() ) return;
+
+  if ((image->GetPixelType().GetComponentType() == 9) || (image->GetPixelType().GetComponentType() == 10))
+  {
+    // Floating image
+    m_IsFloatingImage = true;
+  } else
+  {
+    m_IsFloatingImage = false;
+  }
 
   const mitk::Image* wholeImage = image;
   ScalarType minValue = 0.0;
@@ -266,7 +281,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     image = sliceSelector->GetOutput();
     if ( image == nullptr || !image->IsInitialized() ) return;
 
-    minValue    = image->GetStatistics()->GetScalarValueMin();
+    minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
@@ -274,7 +289,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     {
       // guessByCentralSlice seems to have failed, lets look at all data
       image       = wholeImage;
-      minValue    = image->GetStatistics()->GetScalarValueMin();
+      minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
       maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
       min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
       max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
@@ -283,13 +298,13 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   else
   {
     const_cast<Image*>(image)->Update();
-    minValue    = image->GetStatistics()->GetScalarValueMin(0);
+    minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
     maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
-      ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i);
+      ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);
       if (minValue > minValueTemp)
         minValue    = minValueTemp;
       ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
@@ -422,17 +437,27 @@ bool mitk::LevelWindow::IsFixed() const
   return m_Fixed;
 }
 
+bool mitk::LevelWindow::IsFloatingValues() const
+{
+  return m_IsFloatingImage;
+}
+
+void mitk::LevelWindow::SetFloatingValues(bool value)
+{
+  m_IsFloatingImage = value;
+}
+
 bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
 {
-  if ( m_RangeMin == levWin.GetRangeMin() &&
-    m_RangeMax == levWin.GetRangeMax() &&
-    m_LowerWindowBound == levWin.GetLowerWindowBound() && m_UpperWindowBound == levWin.GetUpperWindowBound() &&
-    m_DefaultLowerBound == levWin.GetDefaultLowerBound() && m_DefaultUpperBound == levWin.GetDefaultUpperBound() && m_Fixed == levWin.IsFixed() ) {
-      return true;
-  }
-  else {
-    return false;
-  }
+  return
+    mitk::Equal(this->m_RangeMin, levWin.m_RangeMin, mitk::sqrteps)
+    && mitk::Equal(this->m_RangeMax, levWin.m_RangeMax, mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultLowerBound, levWin.m_DefaultLowerBound, mitk::sqrteps)
+    && mitk::Equal(this->m_DefaultUpperBound, levWin.m_DefaultUpperBound, mitk::sqrteps)
+    && mitk::Equal(this->m_LowerWindowBound, levWin.m_LowerWindowBound, mitk::sqrteps)
+    && mitk::Equal(this->m_UpperWindowBound, levWin.m_UpperWindowBound, mitk::sqrteps)
+    && m_Fixed == levWin.IsFixed()
+    && m_IsFloatingImage == levWin.IsFloatingValues();
 }
 
 bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const
@@ -453,6 +478,7 @@ mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
     m_DefaultLowerBound = levWin.GetDefaultLowerBound();
     m_DefaultUpperBound = levWin.GetDefaultUpperBound();
     m_Fixed = levWin.GetFixed();
+    m_IsFloatingImage = levWin.IsFloatingValues();
     return *this;
   }
 }

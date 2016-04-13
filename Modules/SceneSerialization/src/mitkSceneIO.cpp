@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
 #include <mitkStandardFileLocations.h>
+#include <mitkLocaleSwitch.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -88,6 +89,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
                                                     DataStorage* pStorage,
                                                     bool clearStorageFirst )
 {
+  mitk::LocaleSwitch localeSwitch("C");
+
   // prepare data storage
   DataStorage::Pointer storage = pStorage;
   if ( storage.IsNull() )
@@ -193,6 +196,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     MITK_ERROR << "No filename given. Not possible to save scene.";
     return false;
   }
+
+  mitk::LocaleSwitch localeSwitch("C");
 
   try
   {
@@ -334,25 +339,15 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           }
 
           // store all renderwindow specific propertylists
-          if (RenderingManager::IsInstantiated())
+          mitk::DataNode::PropertyListKeyNames propertyListKeys = node->GetPropertyListNames();
+          for (auto renderWindowName : propertyListKeys)
           {
-            const RenderingManager::RenderWindowVector& allRenderWindows( RenderingManager::GetInstance()->GetAllRegisteredRenderWindows() );
-            for ( RenderingManager::RenderWindowVector::const_iterator rw = allRenderWindows.begin();
-              rw != allRenderWindows.end();
-              ++rw)
+            PropertyList* propertyList = node->GetPropertyList(renderWindowName);
+            if ( propertyList && !propertyList->IsEmpty() )
             {
-              if (vtkRenderWindow* renderWindow = *rw)
-              {
-                std::string renderWindowName( mitk::BaseRenderer::GetInstance(renderWindow)->GetName() );
-                BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
-                PropertyList* propertyList = node->GetPropertyList(renderer);
-                if ( propertyList && !propertyList->IsEmpty() )
-                {
-                  TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
-                  renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
-                  nodeElement->LinkEndChild( renderWindowPropertiesElement );
-                }
-              }
+              TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
+              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
+              nodeElement->LinkEndChild( renderWindowPropertiesElement );
             }
           }
 

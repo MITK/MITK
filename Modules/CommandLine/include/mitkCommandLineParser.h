@@ -74,8 +74,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  * std::out is used for output to keep dependencies to a minimum.
  */
 
-using namespace std;
-
 class MITKCOMMANDLINE_EXPORT mitkCommandLineParser
 {
 public:
@@ -119,13 +117,13 @@ public:
  *         to a us::Any containing the value.
  */
 
-  map<string, us::Any> parseArguments( const StringContainerType& arguments, bool* ok = nullptr );
+  std::map<std::string, us::Any> parseArguments( const StringContainerType& arguments, bool* ok = nullptr );
 
   /**
   * Convenient method allowing to parse a given list of command line arguments.
   * @see parseArguments(const StringContainerType &, bool*)
   */
-  map<string, us::Any> parseArguments( int argc, char** argv, bool* ok = nullptr );
+ std:: map<std::string, us::Any> parseArguments( int argc, char** argv, bool* ok = nullptr );
 
   /**
  * Returns a detailed error description if a call to <code>parseArguments()</code>
@@ -134,7 +132,7 @@ public:
  * @return The error description, empty if no error occured.
  * @see parseArguments(const StringContainerType&, bool*)
  */
-  string errorString() const;
+  std::string errorString() const;
 
   /**
  * This method returns all unparsed arguments, i.e. all arguments
@@ -157,7 +155,7 @@ public:
  * @return <code>true</code> if the argument was added, <code>false</code>
  *         otherwise.
  */
-  bool argumentAdded( const string& argument ) const;
+  bool argumentAdded( const std::string& argument ) const;
 
   /**
  * Checks if the given argument has been parsed successfully by a previous
@@ -167,7 +165,7 @@ public:
  * @return <code>true</code> if the argument was parsed, <code>false</code>
  *         otherwise.
  */
-  bool argumentParsed( const string& argument ) const;
+  bool argumentParsed( const std::string& argument ) const;
 
   /**
  * Adds a command line argument. An argument can have a long name
@@ -214,11 +212,11 @@ public:
  * @throws std::logic_error If the us::Any type of <code>defaultValue</code>
  *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
  */
-  void addArgument( const string& longarg,
-                    const string& shortarg,
+  void addArgument( const std::string& longarg,
+                    const std::string& shortarg,
                     Type type,
-                    const string& argLabel,
-                    const string& argHelp = string(),
+                    const std::string& argLabel,
+                    const std::string& argHelp = std::string(),
                     const us::Any& defaultValue = us::Any(),
                     bool optional = true,
                     bool ignoreRest = false,
@@ -237,7 +235,7 @@ public:
  * @param argHelp A help string describing alternatives to the deprecated argument.
  */
   void
-  addDeprecatedArgument( const string& longarg, const string& shortarg, const string& argLabel, const string& argHelp );
+  addDeprecatedArgument( const std::string& longarg, const std::string& shortarg, const std::string& argLabel, const std::string& argHelp );
 
   /**
  * Sets a custom regular expression for validating argument parameters. The method
@@ -253,9 +251,9 @@ public:
  *
  * @see errorString()
  */
-  bool setExactMatchRegularExpression( const string& argument,
-                                       const string& expression,
-                                       const string& exactMatchFailedMessage );
+  bool setExactMatchRegularExpression( const std::string& argument,
+                                       const std::string& expression,
+                                       const std::string& exactMatchFailedMessage );
 
   /**
  * The field width for the argument names without the help text.
@@ -272,7 +270,7 @@ public:
  * @param charPad The padding character.
  * @return The formatted help text.
  */
-  string helpText() const;
+  std::string helpText() const;
 
   /**
  * Sets the argument prefix for long and short argument names. This can be used
@@ -298,7 +296,7 @@ public:
  * @param longPrefix The prefix for long argument names.
  * @param shortPrefix The prefix for short argument names.
  */
-  void setArgumentPrefix( const string& longPrefix, const string& shortPrefix );
+  void setArgumentPrefix( const std::string& longPrefix, const std::string& shortPrefix );
 
   /**
  * Begins a new group for documenting arguments. All newly added arguments via
@@ -310,12 +308,12 @@ public:
  *
  * @param description The description of the group
  */
-  void beginGroup( const string& description );
+  void beginGroup( const std::string& description );
 
   /**
  * Ends the current group.
  *
- * @see beginGroup(const string&)
+ * @see beginGroup(const std::string&)
  */
   void endGroup();
 
@@ -371,12 +369,12 @@ private:
   class ctkInternal;
   ctkInternal* Internal;
 
-  string Title;
-  string Contributor;
-  string Category;
-  string Description;
-  string ParameterGroupName;
-  string ParameterGroupDescription;
+  std::string Title;
+  std::string Contributor;
+  std::string Category;
+  std::string Description;
+  std::string ParameterGroupName;
+  std::string ParameterGroupDescription;
 };
 
 #endif

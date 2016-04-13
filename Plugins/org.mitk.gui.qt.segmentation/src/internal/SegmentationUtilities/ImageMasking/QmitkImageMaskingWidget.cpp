@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
 
-#include <qmessagebox.h>
+#include <QMessageBox>
 
 static const char* const HelpText = "Select a regular image and a binary image";
 

@@ -193,16 +193,16 @@ int main(int argc, char* argv[])
   parser.setContributor("MBI");
 
   // Params parsing
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inputdir = us::any_cast<string>(parsedArgs["inputdir"]);
-  std::string outputdir = us::any_cast<string>(parsedArgs["outputdir"]);
-  std::string mitkprojectdata = us::any_cast<string>(parsedArgs["mitkprojectdata"]);
-  std::string csf_mps_name = us::any_cast<string>(parsedArgs["csfmps"]);
-  std::string les_mps_name = us::any_cast<string>(parsedArgs["lesmps"]);
-  std::string bra_mps_name = us::any_cast<string>(parsedArgs["bramps"]);
+  std::string inputdir = us::any_cast<std::string>(parsedArgs["inputdir"]);
+  std::string outputdir = us::any_cast<std::string>(parsedArgs["outputdir"]);
+  std::string mitkprojectdata = us::any_cast<std::string>(parsedArgs["mitkprojectdata"]);
+  std::string csf_mps_name = us::any_cast<std::string>(parsedArgs["csfmps"]);
+  std::string les_mps_name = us::any_cast<std::string>(parsedArgs["lesmps"]);
+  std::string bra_mps_name = us::any_cast<std::string>(parsedArgs["bramps"]);
 
   mitk::Image::Pointer class_mask_sampled, raw_image, class_mask;
   mitk::PointSet::Pointer CSF_mps, LES_mps, BRA_mps;

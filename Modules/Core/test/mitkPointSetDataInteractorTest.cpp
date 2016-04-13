@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 #include <mitkIOUtil.h>
-#include <mitkInteractionTestHelper.h>
+#include "mitkInteractionTestHelper.h"
 #include <mitkPointSet.h>
 #include <mitkPointSetDataInteractor.h>
 
@@ -34,7 +34,8 @@ class mitkPointSetDataInteractorTestSuite : public mitk::TestFixture
   vtkDebugLeaks::SetExitError(0);
 
   MITK_TEST(AddPointInteraction);
-  MITK_TEST(DeletePointInteraction);
+  MITK_TEST(MoveDeletePointInteraction);
+  //MITK_TEST(RotatedPlanesInteraction);
   CPPUNIT_TEST_SUITE_END();
 
 
@@ -76,16 +77,23 @@ public:
   void AddPointInteraction()
   {
     //Path to the reference PointSet
-    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/PointSetDataInteractor_add_points_in_2D_ref.mps");
+    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/TestAddPoints.mps");
 
     //Path to the interaction xml file
-    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PointSetDataInteractor_add_points_in_2D.xml");
+    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestAddPoints.xml");
+
+    std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
+    mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+    mitk::DataNode::Pointer refDN = mitk::DataNode::New();
+    refDN->SetData(referenceImage);
+
 
     //Create test helper to initialize all necessary objects for interaction
     mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
 
     //Add our test node to the DataStorage of our test helper
     interactionTestHelper.AddNodeToStorage(m_TestPointSetNode);
+    interactionTestHelper.AddNodeToStorage(refDN);
 
     //Start Interaction
     interactionTestHelper.PlaybackInteraction();
@@ -93,8 +101,42 @@ public:
     //Load the reference PointSet
     mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
 
-    //Compare reference with the result of the interaction
-    MITK_ASSERT_EQUAL(m_TestPointSet, referencePointSet, "");
+    //Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries. They are not stored in a file and therefore not equal.
+    CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
+
+  }
+
+  void RotatedPlanesInteraction()
+  {
+
+      //Path to the reference PointSet
+      std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/PointSetDataInteractor_PointsAdd2d3d.mps");
+
+      //Path to the interaction xml file
+      std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PointSetDataInteractor_PointsAdd2d3d.xml");
+
+      std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
+      mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+      mitk::DataNode::Pointer refDN = mitk::DataNode::New();
+      refDN->SetData(referenceImage);
+
+
+      //Create test helper to initialize all necessary objects for interaction
+      mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
+
+      //Add our test node to the DataStorage of our test helper
+      interactionTestHelper.AddNodeToStorage(m_TestPointSetNode);
+      interactionTestHelper.AddNodeToStorage(refDN);
+
+      //Start Interaction
+      interactionTestHelper.PlaybackInteraction();
+
+      //Load the reference PointSet
+      mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
+
+      //Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries. They are not stored in a file and therefore not equal.
+      CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
+
   }
 
   void PlayInteraction( std::string &xmlFile, mitk::DataNode* node )
@@ -124,59 +166,35 @@ public:
     dataInteractor->SetDataNode( node );
   }
 
-  void DeletePointInteraction()
+  void MoveDeletePointInteraction()
   {
-    mitk::PointSetDataInteractor::Pointer dataInteractor = mitk::PointSetDataInteractor::New();
-    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+      //Path to the reference PointSet
+      std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/TestMoveRemovePoints.mps");
 
-    //Path to the reference PointSet
-    std::string referencePointSetPath = GetTestDataFilePath("InteractionTestData/InputData/InitPointSet.mps");
-    mitk::PointSet::Pointer ps = mitk::IOUtil::LoadPointSet( referencePointSetPath );
-    pointSetNode->SetData( ps );
+      //Path to the interaction xml file
+      std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/TestMoveRemovePoints.xml");
 
-    this->SetupInteractor( dataInteractor, pointSetNode );
+      std::string pic3D = GetTestDataFilePath("Pic3D.nrrd");
+      mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(pic3D);
+      mitk::DataNode::Pointer refDN = mitk::DataNode::New();
+      refDN->SetData(referenceImage);
 
-    std::string interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-0_1.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-0.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 1 );
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-1_3.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-1.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 1 );
+      //Create test helper to initialize all necessary objects for interaction
+      mitk::InteractionTestHelper interactionTestHelper(interactionXmlPath);
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-2_4.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-2.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 1 );
+      //Add our test node to the DataStorage of our test helper
+      interactionTestHelper.AddNodeToStorage(m_TestPointSetNode);
+      interactionTestHelper.AddNodeToStorage(refDN);
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-3_8.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-3.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 1 );
+      //Start Interaction
+      interactionTestHelper.PlaybackInteraction();
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-4_2.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-4.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 4 );
+      //Load the reference PointSet
+      mitk::PointSet::Pointer referencePointSet = mitk::IOUtil::LoadPointSet(referencePointSetPath);
 
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-5_6.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-5.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 4 );
-
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-6_7.xml");
-    referencePointSetPath = GetTestDataFilePath("InteractionTestData/ReferenceData/DataInteractionDel-refPS-6.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-    EvaluateState( referencePointSetPath, ps, 4 );
-
-    interactionXmlPath = GetTestDataFilePath("InteractionTestData/Interactions/PSDataInteractionDel-7_5.xml");
-    //referencePointSetPath = GetTestDataFilePath("InteractionTestData/PointSet1.mps");
-    PlayInteraction( interactionXmlPath, pointSetNode );
-
-    MITK_TEST_CONDITION_REQUIRED(ps->GetPointSet()->GetNumberOfPoints() == 0, "Empty point set check.");
-    MITK_TEST_CONDITION_REQUIRED(ps->GetNumberOfSelected() == 0, "No selected points." );
+      //Compare reference with the result of the interaction. Last parameter (false) is set to ignore the geometries. They are not stored in a file and therefore not equal.
+      CPPUNIT_ASSERT_MESSAGE("", mitk::Equal(referencePointSet, m_TestPointSet, .001, true, false));
   }
 
 };

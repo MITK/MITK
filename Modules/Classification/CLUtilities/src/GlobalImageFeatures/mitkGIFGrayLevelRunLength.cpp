@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGrayLevelRunLength::FeatureListType & featureList, double range)
+  CalculateGrayLevelRunLengthFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFGrayLevelRunLength::FeatureListType & featureList, mitk::GIFGrayLevelRunLength::ParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<TPixel, VImageDimension> MaskType;
@@ -42,6 +42,37 @@ void
   mitk::CastToItkImage(mask, maskImage);
 
   typename FilterType::Pointer filter = FilterType::New();
+
+  typename FilterType::OffsetVector::Pointer newOffset = FilterType::OffsetVector::New();
+  auto oldOffsets = filter->GetOffsets();
+  auto oldOffsetsIterator = oldOffsets->Begin();
+  while (oldOffsetsIterator != oldOffsets->End())
+  {
+    bool continueOuterLoop = false;
+    typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
+    for (unsigned int i = 0; i < VImageDimension; ++i)
+    {
+      if (params.m_Direction == i + 2 && offset[i] != 0)
+      {
+        continueOuterLoop = true;
+      }
+    }
+    if (params.m_Direction == 1)
+    {
+      offset[0] = 0;
+      offset[1] = 0;
+      offset[2] = 1;
+      newOffset->push_back(offset);
+      break;
+    }
+
+    oldOffsetsIterator++;
+    if (continueOuterLoop)
+      continue;
+    newOffset->push_back(offset);
+  }
+  filter->SetOffsets(newOffset);
+
 
   // All features are required
   typename FilterType::FeatureNameVectorPointer requestedFeatures = FilterType::FeatureNameVector::New();
@@ -65,12 +96,20 @@ void
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
-  int rangeOfPixels = range;
+  int rangeOfPixels = params.m_Range;
   if (rangeOfPixels < 2)
     rangeOfPixels = 256;
 
-  filter->SetNumberOfBinsPerAxis(rangeOfPixels);
+  if (params.m_UseCtRange)
+  {
+    filter->SetPixelValueMinMax((TPixel)(-1024.5),(TPixel)(3096.5));
+    filter->SetNumberOfBinsPerAxis(3096.5+1024.5);
+  } else
+  {
+    filter->SetPixelValueMinMax(minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+    filter->SetNumberOfBinsPerAxis(rangeOfPixels);
+  }
+
   filter->SetDistanceValueMinMax(0,rangeOfPixels);
 
   filter->Update();
@@ -140,7 +179,7 @@ void
 }
 
 mitk::GIFGrayLevelRunLength::GIFGrayLevelRunLength():
-  m_Range(1.0)
+m_Range(1.0), m_UseCtRange(false), m_Direction(0)
 {
 }
 
@@ -148,7 +187,12 @@ mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::Calcul
 {
   FeatureListType featureList;
 
-  AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,m_Range);
+  ParameterStruct params;
+  params.m_UseCtRange=m_UseCtRange;
+  params.m_Range = m_Range;
+  params.m_Direction = m_Direction;
+
+  AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,params);
 
   return featureList;
 }

@@ -6,3 +6,8 @@ if (BUG_15479_FIXED)
   )
 
 endif()
+
+
+set(MODULE_TESTS ${MODULE_TESTS}
+  QmitkDataStorageListModelTest.cpp
+)

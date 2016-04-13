@@ -39,6 +39,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
+#include <usModule.h>
+#include <mitkTrackingDeviceTypeCollection.h>
+#include <mitkUnspecifiedTrackingTypeInformation.h>
+#include "mitkNDIAuroraTypeInformation.h"
 
 // vtk
 #include <vtkSphereSource.h>
@@ -47,12 +51,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIGTException.h>
 #include <mitkIGTIOException.h>
 
+//for Microservice
+#include "mitkPluginActivator.h"
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include "usServiceReference.h"
+
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
 QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   : QmitkFunctionality()
-  , m_Controls( 0 )
-  , m_MultiWidget( NULL )
+  , m_Controls(nullptr)
+  , m_MultiWidget(nullptr)
+  , m_DeviceTypeCollection(nullptr)
 {
   m_TrackingLoggingTimer = new QTimer(this);
   m_TrackingRenderTimer = new QTimer(this);
@@ -61,6 +72,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_connected = false;
   m_logging = false;
   m_loggedFrames = 0;
+
 
   //create filename for autosaving of tool storage
   QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
@@ -80,6 +92,26 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   //initialize worker thread
   m_WorkerThread = new QThread();
   m_Worker = new QmitkMITKIGTTrackingToolboxViewWorker();
+
+  ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
+  if (pluginContext)
+  {
+    QString interfaceName = QString::fromStdString(us_service_interface_iid<mitk::TrackingDeviceTypeCollection>());
+    QList<ctkServiceReference> serviceReference = pluginContext->getServiceReferences(interfaceName);
+
+    if (serviceReference.size() > 0)
+    {
+      m_DeviceTypeServiceReference = serviceReference.at(0);
+      const ctkServiceReference& r = serviceReference.at(0);
+      m_DeviceTypeCollection = pluginContext->getService<mitk::TrackingDeviceTypeCollection>(r);
+    }
+    else
+    {
+      MITK_INFO << "No Tracking Device Collection!";
+    }
+
+  }
+
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
@@ -101,15 +133,20 @@ try
   if(m_Worker) {delete m_Worker;}
   //remove the tracking volume
   this->GetDataStorage()->Remove(m_TrackingVolumeNode);
-  //remove the tool storage
+  //unregister microservices
   if(m_toolStorage) {m_toolStorage->UnRegisterMicroservice();}
   if(m_TrackingDeviceSource) {m_TrackingDeviceSource->UnRegisterMicroservice();}
+  if(m_IGTLMessageProvider.IsNotNull()){m_IGTLMessageProvider->UnRegisterMicroservice();}
   }
   catch(std::exception& e) {MITK_WARN << "Unexpected exception during clean up of tracking toolbox view: " << e.what();}
   catch(...) {MITK_WARN << "Unexpected unknown error during clean up of tracking toolbox view!";}
 //store tool storage and UI settings for persistence
 this->AutoSaveToolStorage();
 this->StoreUISettings();
+
+m_DeviceTypeCollection = nullptr;
+mitk::PluginActivator::GetContext()->ungetService(m_DeviceTypeServiceReference);
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
@@ -147,12 +184,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
 
     //connections for the tracking device configuration widget
     connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableOptionsButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableTrackingConfigurationButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressStarted()), this, SLOT(DisableTrackingControls()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableOptionsButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingConfigurationButtons()));
-    connect( m_Controls->m_configurationWidget, SIGNAL(ProgressFinished()), this, SLOT(EnableTrackingControls()));
+
 
     //connect worker thread
     connect(m_Worker, SIGNAL(AutoDetectToolsFinished(bool,QString)), this, SLOT(OnAutoDetectToolsFinished(bool,QString)) );
@@ -166,7 +198,6 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Worker->moveToThread(m_WorkerThread);
 
     //initialize widgets
-    m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
     m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
 
@@ -198,7 +229,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     }
     else
     {
-      Compatibles = mitk::GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
+      Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine( m_Controls->m_configurationWidget->GetTrackingDevice()->GetType());
     }
     m_Controls->m_VolumeSelectionBox->clear();
     for(std::size_t i = 0; i < Compatibles.size(); i++)
@@ -341,11 +372,11 @@ void QmitkMITKIGTTrackingToolboxView::OnConnect()
   }
 
   //parse tracking device data
-  mitk::TrackingDeviceData data = mitk::DeviceDataUnspecified;
+  mitk::TrackingDeviceData data = mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified();
   QString qstr =  m_Controls->m_VolumeSelectionBox->currentText();
   if ( (! qstr.isNull()) || (! qstr.isEmpty()) ) {
     std::string str = qstr.toStdString();
-    data = mitk::GetDeviceDataByName(str); //Data will be set later, after device generation
+    data = m_DeviceTypeCollection->GetDeviceDataByName(str); //Data will be set later, after device generation
   }
 
   //initialize worker thread
@@ -391,7 +422,6 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
   //enable/disable Buttons
   DisableOptionsButtons();
   DisableTrackingConfigurationButtons();
-  m_Controls->m_configurationWidget->ConfigurationFinished();
 
   m_Controls->m_TrackingControlLabel->setText("Status: connected");
   m_Controls->m_ConnectDisconnectButton->setText("Disconnect");
@@ -423,7 +453,6 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
   m_Controls->m_StartStopTrackingButton->setEnabled(false);
   EnableOptionsButtons();
   EnableTrackingConfigurationButtons();
-  m_Controls->m_configurationWidget->Reset();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
   m_Controls->m_ConnectDisconnectButton->setText("Connect");
   m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
@@ -488,7 +517,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     m_IGTLConversionFilter->RegisterAsMicroservice();
 
     //create server and message provider
-    m_IGTLServer = mitk::IGTLServer::New();
+    m_IGTLServer = mitk::IGTLServer::New(false);
     m_IGTLServer->SetName("Tracking Toolbox IGTL Server");
     m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
     m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);
@@ -561,7 +590,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
   else
   {
-    Type = mitk::TrackingSystemNotSpecified;
+    Type = mitk::UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     MessageBox("Error: This tracking device is not included in this project. Please make sure that the device is installed and activated in your MITK build.");
     m_Controls->m_TrackingToolsGoupBox->setEnabled(false);
     m_Controls->m_TrackingControlsGroupBox->setEnabled(false);
@@ -569,7 +598,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
 
   // Code to enable/disable device specific buttons
-  if (Type == mitk::NDIAurora) //Aurora
+  if (Type == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) //Aurora
   {
     m_Controls->m_AutoDetectTools->setVisible(true);
     m_Controls->m_AddSingleTool->setEnabled(false);
@@ -581,7 +610,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
 
   // Code to select appropriate tracking volume for current type
-  std::vector<mitk::TrackingDeviceData> Compatibles = mitk::GetDeviceDataForLine(Type);
+  std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(Type);
   m_Controls->m_VolumeSelectionBox->clear();
   for(std::size_t i = 0; i < Compatibles.size(); i++)
   {
@@ -598,7 +627,7 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingVolumeChanged(QString qstr)
 
   std::string str = qstr.toStdString();
 
-  mitk::TrackingDeviceData data = mitk::GetDeviceDataByName(str);
+  mitk::TrackingDeviceData data = m_DeviceTypeCollection->GetDeviceDataByName(str);
   m_TrackingDeviceData = data;
 
   volumeGenerator->SetTrackingDeviceData(data);
@@ -629,7 +658,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName())
   {
     DisableTrackingConfigurationButtons();
     m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eAutoDetectTools);
@@ -1092,7 +1121,7 @@ void QmitkMITKIGTTrackingToolboxView::DisableTrackingControls()
 void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(true);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAurora) m_Controls->m_AddSingleTool->setEnabled(true);
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(true);
   m_Controls->m_LoadTools->setEnabled(true);
   m_Controls->m_ResetTools->setEnabled(true);
 }
@@ -1100,7 +1129,7 @@ void QmitkMITKIGTTrackingToolboxView::EnableTrackingConfigurationButtons()
 void QmitkMITKIGTTrackingToolboxView::DisableTrackingConfigurationButtons()
 {
   m_Controls->m_AutoDetectTools->setEnabled(false);
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAurora) m_Controls->m_AddSingleTool->setEnabled(false);
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) m_Controls->m_AddSingleTool->setEnabled(false);
   m_Controls->m_LoadTools->setEnabled(false);
   m_Controls->m_ResetTools->setEnabled(false);
 }
@@ -1112,7 +1141,7 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
   if ( m_toolStorage.IsNotNull() ){
     m_toolStorage->UnLockStorage(); //only to be sure...
     m_toolStorage->UnRegisterMicroservice();
-    m_toolStorage = NULL;
+    m_toolStorage = nullptr;
   }
 
   //now: replace by the new one
@@ -1293,7 +1322,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
     mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
     newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(currentDevice->GetTool(i))->GetSerialNumber());
     newTool->SetIdentifier(toolname.str());
-    newTool->SetTrackingDeviceType(mitk::NDIAurora);
+    newTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     mitk::Surface::Pointer mySphere = mitk::Surface::New();
     vtkSphereSource *vtkData = vtkSphereSource::New();

@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
   #include <mitkNavigationToolStorage.h>
   #include <mitkIOUtil.h>
   #include "mitkNavigationToolStorageTestHelper.h"
+  #include "mitkNDIAuroraTypeInformation.h"
+  #include "mitkMicronTrackerTypeInformation.h"
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::CreateTestData_SimpleStorage()
     {
@@ -77,7 +79,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("ClaronTool#1");
     myNavigationTool->SetSerialNumber("0815");
-    myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
+    myNavigationTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
     myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
 
     //create second tool
@@ -94,7 +96,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageTestHelper::Crea
     myNavigationTool2->SetDataNode(myNode2);
     myNavigationTool2->SetIdentifier("AuroraTool#1");
     myNavigationTool2->SetSerialNumber("0816");
-    myNavigationTool2->SetTrackingDeviceType(mitk::NDIAurora);
+    myNavigationTool2->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
     myNavigationTool2->SetType(mitk::NavigationTool::Instrument);
 
     //create navigation tool storage

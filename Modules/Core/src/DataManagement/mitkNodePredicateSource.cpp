@@ -33,7 +33,7 @@ bool mitk::NodePredicateSource::CheckNode(const mitk::DataNode* childNode) const
     const mitk::DataStorage::SetOfObjects::STLContainerType sources =
       m_DataStorage->GetSources(childNode, nullptr, !m_SearchAllSources)->CastToSTLConstContainer();
 
-    return std::find(sources.begin(), sources.end(), m_BaseNode) != sources.end();
+    return std::find(sources.cbegin(), sources.cend(), m_BaseNode) != sources.cend();
   }
 
   return false;

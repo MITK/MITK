@@ -77,12 +77,12 @@ int vtkMitkRenderProp::GetNumberOfPaths()
 int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
   typedef std::map<int,mitk::Mapper*> MappersMapType;
-  MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
-  for(MappersMapType::iterator it = mappersMap.begin(); it != mappersMap.end(); it++)
+  const MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
+  for(MappersMapType::const_iterator it = mappersMap.cbegin(); it != mappersMap.cend(); it++)
   {
     mitk::Mapper * mapper = (*it).second;
 
-    mitk::VtkMapper::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapper);
+    const mitk::VtkMapper::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper*>(mapper);
     if(vtkMapper)
     {
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly

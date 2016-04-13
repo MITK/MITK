@@ -180,4 +180,59 @@ const std::string mitk::InteractionEventConst::xmlRenderSizeZ()
   return xmlSize;
 }
 
+
+const std::string mitk::InteractionEventConst::xmlViewUpX()
+{
+  static const std::string xmlSize = "ViewUpX";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlViewUpY()
+{
+  static const std::string xmlSize = "ViewUpY";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlViewUpZ()
+{
+  static const std::string xmlSize = "ViewUpZ";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlCameraPositionX()
+{
+  static const std::string xmlSize = "CameraPositionX";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlCameraPositionY()
+{
+  static const std::string xmlSize = "CameraPositionY";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlCameraPositionZ()
+{
+  static const std::string xmlSize = "CameraPositionZ";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlCameraFocalPointX()
+{
+  static const std::string xmlSize = "CameraFocalPointX";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlCameraFocalPointY()
+{
+  static const std::string xmlSize = "CameraFocalPointY";
+  return xmlSize;
+}
+
+const std::string mitk::InteractionEventConst::xmlCameraFocalPointZ()
+{
+  static const std::string xmlSize = "CameraFocalPointZ";
+  return xmlSize;
+}
+
 }

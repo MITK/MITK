@@ -117,58 +117,58 @@ namespace mitk
      *  Every time a point is added it is also checked if the maximal number of points is reached,
      *  and if so an InternalEvent with the signal name "MaxNumberOfPoints" is triggered.
      */
-    virtual bool AddPoint(StateMachineAction*, InteractionEvent* event);
+    virtual void AddPoint(StateMachineAction*, InteractionEvent* event);
 
     /** Removes point that is selected */
-    virtual bool RemovePoint(StateMachineAction*, InteractionEvent*interactionEvent);
+    virtual void RemovePoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
     /**
      * Checks if new point is close enough to an old one,
      * if so, trigger the ClosedContour signal which can be caught by the state machine.
      */
-    virtual bool IsClosedContour(StateMachineAction*, InteractionEvent*);
+    virtual void IsClosedContour(StateMachineAction*, InteractionEvent*);
 
     /**
      * Moves the currently selected point to the new coodinates.
      */
-    virtual bool MovePoint(StateMachineAction*, InteractionEvent*);
+    virtual void MovePoint(StateMachineAction*, InteractionEvent*);
 
     /**
      * Initializes the movement, stores starting position.
      */
-    virtual bool InitMove(StateMachineAction*, InteractionEvent*interactionEvent);
+    virtual void InitMove(StateMachineAction*, InteractionEvent*interactionEvent);
 
     /**
      * Is called when a movement is finished, changes back to regular color.
      */
-    virtual bool FinishMove(StateMachineAction*, InteractionEvent*);
+    virtual void FinishMove(StateMachineAction*, InteractionEvent*);
 
     /**
      * Selects a point from the PointSet as currently active.
      */
-    virtual bool SelectPoint(StateMachineAction*, InteractionEvent*);
+    virtual void SelectPoint(StateMachineAction*, InteractionEvent*);
 
     /**
      * Unselects a point at the given coordinate.
      */
-    virtual bool UnSelectPointAtPosition(StateMachineAction*, InteractionEvent*);
+    virtual void UnSelectPointAtPosition(StateMachineAction*, InteractionEvent*);
 
     /**
      * Unselects all points out of reach.
      */
-    virtual bool UnSelectAll(StateMachineAction*, InteractionEvent*);
+    virtual void UnSelectAll(StateMachineAction*, InteractionEvent*);
 
 
     /**
      * @brief UpdatePointSet Updates the member variable that holds the point set, evaluating the time step of the sender.
      */
 
-    virtual bool UpdatePointSet(StateMachineAction* stateMachineAction, InteractionEvent*);
+    virtual void UpdatePointSet(StateMachineAction* stateMachineAction, InteractionEvent*);
 
     /**
      * Calls for inactivation of the DataInteractor
      */
-    virtual bool Abort(StateMachineAction*, InteractionEvent*);
+    virtual void Abort(StateMachineAction*, InteractionEvent*);
 
     /** \brief to calculate a direction vector from last point and actual
      * point

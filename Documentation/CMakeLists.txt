@@ -7,11 +7,7 @@ set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PA
     "Output directory for doxygen generated documentation." )
 
 # Compile source code snippets
-
-# do not add snippets if building with Qt4
-if(NOT DESIRED_QT_VERSION MATCHES 4)
-  add_subdirectory(Snippets)
-endif()
+add_subdirectory(Snippets)
 
 # Different doxygen versions produce significantly different behaviour in the MITK documentation
 # especially in regards to the MITK Qt assistant help files and markdown files.
@@ -51,7 +47,7 @@ set(MITK_DOXYGEN_GENERATE_QHP "NO")
 if(MITK_DOXYGEN_GENERATE_QCH_FILES)
 
   find_program(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
     PATHS ${QT_BINARY_DIR}
     DOC "The location of the the Qt help generator executable"
     NO_DEFAULT_PATH

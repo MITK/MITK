@@ -14,15 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "berryPluginActivator.h"
-
 #include "berryUiTestSuite.h"
-
 #include "api/berryMockViewPart.h"
 #include "api/berrySaveableMockViewPart.h"
-
-#include <QtPlugin>
 
 namespace berry {
 
@@ -39,5 +34,3 @@ void org_blueberry_ui_tests_Activator::stop(ctkPluginContext* context)
 }
 
 }
-
-Q_EXPORT_PLUGIN2(org_blueberry_ui_tests, berry::org_blueberry_ui_tests_Activator)

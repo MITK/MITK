@@ -1,0 +1,15 @@
+<config>
+  <event_variant class="InteractionKeyEvent" name="Abort">
+    <attribute name="Key" value="Delete"/>
+  </event_variant>
+  <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="MouseMove"/>
+  <event_variant class="MouseReleaseEvent" name="MoveEnd">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Move">
+    <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+</config>

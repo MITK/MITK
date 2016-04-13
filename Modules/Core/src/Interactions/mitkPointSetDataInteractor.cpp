@@ -43,7 +43,7 @@ void mitk::PointSetDataInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("removePoint", RemovePoint);
 }
 
-bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -51,16 +51,12 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
   // disallow adding of new points if maximum number of points is reached
   if (m_MaxNumberOfPoints > 1 &&  m_PointSet->GetSize(timeStep) >= m_MaxNumberOfPoints)
   {
-    return false;
+    return;
   }
   // To add a point the minimal information is the position, this method accepts all InteractionsPositionEvents
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    // 1) Undo/Redo Supports Grouping of Operations that are undone as a set,
-    // this statement indicates that a new Operation starts here
-    mitk::OperationEvent::IncCurrObjectEventId();
-
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
     this->UnselectAll( timeStep, timeInMs);
@@ -89,6 +85,7 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
       // 4) Do and Undo Operations are combined in an Operation event which also contains the target of the operations (here m_PointSet)
       OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Add point");
       // 5) Store the Operation in the UndoController
+      OperationEvent::IncCurrObjectEventId();
       m_UndoController->SetOperationEvent(operationEvent);
     }
 
@@ -113,16 +110,10 @@ bool mitk::PointSetDataInteractor::AddPoint(StateMachineAction* stateMachineActi
       InternalEvent::Pointer event = InternalEvent::New(NULL, this, "MaximalNumberOfPoints");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }
-
-    return true;
-  }
-  else
-  {
-    return false;
   }
 }
 
-bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -141,13 +132,13 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
 
       PointOperation* doOp = new mitk::PointOperation(OpSELECTPOINT,timeInMs, point, index);
 
-      //Undo
-      if (m_UndoEnabled)
+      /*if (m_UndoEnabled)
       {
         PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMs,point, index);
-        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp);
+        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Select Point");
+        OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
-      }
+      }*/
 
       //execute the Operation
       m_PointSet->ExecuteOperation(doOp);
@@ -156,10 +147,8 @@ bool mitk::PointSetDataInteractor::SelectPoint(StateMachineAction*, InteractionE
         delete doOp;
 
       interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-      return true;
     }
   }
-  return false;
 }
 
 mitk::PointSetDataInteractor::PointSetDataInteractor() :
@@ -171,7 +160,7 @@ mitk::PointSetDataInteractor::~PointSetDataInteractor()
 {
 }
 
-bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -179,8 +168,6 @@ bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if (positionEvent != NULL)
   {
-    mitk::OperationEvent::IncCurrObjectEventId();
-
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
     //search the point in the list
@@ -197,6 +184,7 @@ bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
       {
         PointOperation* undoOp = new mitk::PointOperation(OpINSERT,timeInMs, itkPoint, position);
         OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Remove point");
+        mitk::OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
       }
       //execute the Operation
@@ -216,14 +204,9 @@ bool mitk::PointSetDataInteractor::RemovePoint(StateMachineAction*, InteractionE
     }
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
   }
-  else
-  {
-    return false;
-  }
-  return true;
 }
 
-bool mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
@@ -236,13 +219,11 @@ bool mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction*, Interact
     {
       InternalEvent::Pointer event = InternalEvent::New(NULL, this, "ClosedContour");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
-      return true;
     }
   }
-  return false;
 }
 
-bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAction, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -292,16 +273,11 @@ bool mitk::PointSetDataInteractor::MovePoint(StateMachineAction* stateMachineAct
     // Update the display
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
     IsClosedContour(stateMachineAction,interactionEvent);
-    return true;
-  }
-  else
-  {
-    return false;
   }
 }
 
 
-bool mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -317,26 +293,24 @@ bool mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction*, 
     if (index != -1)
     {
       PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMs, point, index);
-      if (m_UndoEnabled)  //write to UndoMechanism
+
+      /*if (m_UndoEnabled)
       {
         PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT,timeInMs, point, index);
-        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp);
+        OperationEvent *operationEvent = new OperationEvent(m_PointSet, doOp, undoOp, "Unselect Point");
+        OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent(operationEvent);
-      }
-      //execute the Operation
+      }*/
+
       m_PointSet->ExecuteOperation(doOp);
 
       if ( !m_UndoEnabled )
         delete doOp;
-
-      return true;
-
     }
   }
-  return false;
 }
 
-bool mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
+void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk::InteractionEvent *interactionEvent)
 {
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
@@ -368,13 +342,13 @@ bool mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
           noPoint.Fill( 0 );
           mitk::PointOperation* doOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMs,  noPoint, position);
 
-          if ( m_UndoEnabled )
+          /*if ( m_UndoEnabled )
           {
             mitk::PointOperation* undoOp = new mitk::PointOperation(OpSELECTPOINT, timeInMs,  noPoint, position);
-            OperationEvent *operationEvent = new OperationEvent( m_PointSet, doOp, undoOp );
-
+            OperationEvent *operationEvent = new OperationEvent( m_PointSet, doOp, undoOp, "Unselect Point" );
+            OperationEvent::IncCurrObjectEventId();
             m_UndoController->SetOperationEvent( operationEvent );
-          }
+          }*/
 
           m_PointSet->ExecuteOperation( doOp );
 
@@ -389,28 +363,24 @@ bool mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
   {
     this->UnselectAll(timeStep,timeInMs);
   }
-
-  return true;
 }
 
-bool mitk::PointSetDataInteractor::UpdatePointSet(mitk::StateMachineAction*, mitk::InteractionEvent*)
+void mitk::PointSetDataInteractor::UpdatePointSet(mitk::StateMachineAction*, mitk::InteractionEvent*)
 {
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(this->GetDataNode()->GetData());
   if ( pointSet == NULL )
   {
-    return false;
     MITK_ERROR << "PointSetDataInteractor:: No valid point set .";
+    return;
   }
 
   m_PointSet = pointSet;
-  return true;
 }
 
-bool mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InternalEvent::Pointer event = InternalEvent::New(NULL, this, IntDeactivateMe);
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
-  return true;
 }
 
 
@@ -419,7 +389,7 @@ bool mitk::PointSetDataInteractor::Abort(StateMachineAction*, InteractionEvent* 
  */
 void mitk::PointSetDataInteractor::DataNodeChanged()
 {
-  if (GetDataNode().IsNotNull())
+  if (GetDataNode() != nullptr)
   {
     PointSet* points = dynamic_cast<PointSet*>(GetDataNode()->GetData());
     if (points == NULL)
@@ -441,15 +411,13 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
   }
 }
 
-bool mitk::PointSetDataInteractor::InitMove(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::InitMove(StateMachineAction*, InteractionEvent* interactionEvent)
 {
 
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
 
   if (positionEvent == NULL)
-    return false;
-
-  mitk::OperationEvent::IncCurrObjectEventId();
+    return;
 
   // start of the Movement is stored to calculate the undoKoordinate
   // in FinishMovement
@@ -460,10 +428,9 @@ bool mitk::PointSetDataInteractor::InitMove(StateMachineAction*, InteractionEven
   m_SumVec.Fill(0);
 
   GetDataNode()->SetProperty("contourcolor", ColorProperty::New(1.0, 1.0, 1.0));
-  return true;
 }
 
-bool mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEvent* interactionEvent)
 {
 
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
@@ -505,6 +472,7 @@ bool mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEv
           mitk::Point3D undoPoint = ( itkPoint - m_SumVec );
           PointOperation* undoOp = new mitk::PointOperation(OpMOVE,timeInMs, undoPoint, position);
           OperationEvent *operationEvent =  new OperationEvent(m_PointSet, doOp, undoOp, "Move point");
+          OperationEvent::IncCurrObjectEventId();
           m_UndoController->SetOperationEvent(operationEvent);
         }
         //execute the Operation
@@ -519,13 +487,12 @@ bool mitk::PointSetDataInteractor::FinishMove(StateMachineAction*, InteractionEv
 
     // Update the display
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-    OperationEvent::IncCurrGroupEventId();
   }
   else
-  {return false;
+  {
+    return;
   }
   this->NotifyResultReady();
-  return true;
 }
 
 
@@ -619,14 +586,14 @@ void mitk::PointSetDataInteractor::UnselectAll(unsigned int timeStep, ScalarType
       noPoint.Fill( 0 );
       mitk::PointOperation *doOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMs, noPoint, position);
 
-      if ( m_UndoEnabled )
+      /*if ( m_UndoEnabled )
       {
         mitk::PointOperation *undoOp =
             new mitk::PointOperation(OpSELECTPOINT, timeInMs, noPoint, position);
-        OperationEvent *operationEvent = new OperationEvent( pointSet, doOp, undoOp );
-
+        OperationEvent *operationEvent = new OperationEvent( pointSet, doOp, undoOp, "Unselect Point" );
+        OperationEvent::IncCurrObjectEventId();
         m_UndoController->SetOperationEvent( operationEvent );
-      }
+      }*/
 
       pointSet->ExecuteOperation( doOp );
 
@@ -655,13 +622,14 @@ void mitk::PointSetDataInteractor::SelectPoint(int position, unsigned int timeSt
 
   mitk::PointOperation *doOp = new mitk::PointOperation( OpSELECTPOINT,timeInMS, noPoint, position);
 
-  if ( m_UndoEnabled )
+  /*if ( m_UndoEnabled )
   {
     mitk::PointOperation* undoOp = new mitk::PointOperation(OpDESELECTPOINT,timeInMS, noPoint, position);
 
-    OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp);
+    OperationEvent *operationEvent = new OperationEvent(pointSet, doOp, undoOp, "Select Point");
+    OperationEvent::IncCurrObjectEventId();
     m_UndoController->SetOperationEvent(operationEvent);
-  }
+  }*/
 
   pointSet->ExecuteOperation( doOp );
 

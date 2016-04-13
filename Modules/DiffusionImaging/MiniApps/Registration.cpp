@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 #include <mitkImageTimeSelector.h>
+#include <itkImageFileWriter.h>
 // ITK
 #include <itksys/SystemTools.hxx>
 #include <itkDirectory.h>
@@ -31,7 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkWindowedSincInterpolateImageFunction.h"
 #include "itkIdentityTransform.h"
 #include "itkResampleImageFilter.h"
+#include "itkNrrdImageIO.h"
 
+using namespace std;
 
 typedef std::vector<std::string> FileListType;
 typedef itk::Image<double, 3> InputImageType;
@@ -82,6 +85,8 @@ static FileListType CreateFileList(std::string folder , std::string postfix)
         continue;
       filename = folder + filename;
       if (!itksys::SystemTools::FileExists( filename.c_str()))
+        continue;
+      if (filename.length() <= postfix.length() )
         continue;
       if (filename.substr(filename.length() -postfix.length() ) == postfix)
         fileList.push_back(filename);
@@ -241,10 +246,10 @@ int main( int argc, char* argv[] )
   parser.addArgument("fixed", "f", mitkCommandLineParser::String, "Fixed images:", "Suffix for fixed image (if none is supplied first file matching moving pattern is chosen)",us::Any(),true);
   parser.addArgument("moving", "m", mitkCommandLineParser::String, "Moving images:", "Suffix for moving images",us::Any(),false);
   parser.addArgument("derived", "d", mitkCommandLineParser::String, "Derived resources:", "Derived resources suffixes (replaces suffix for moving images); comma separated",us::Any(),true);
-  parser.addArgument("silent", "s", mitkCommandLineParser::Bool, "Silent:" "No xml progress output.");
+  parser.addArgument("silent", "s", mitkCommandLineParser::Bool, "Silent:", "No xml progress output.");
   parser.addArgument("resample", "r", mitkCommandLineParser::String, "Resample (x,y,z)mm:", "Resample provide x,y,z spacing in mm (e.g. -r 1,1,3), is not applied to tensor data",us::Any());
   parser.addArgument("binary", "b", mitkCommandLineParser::Bool, "Binary:", "Speficies that derived resource are binary (interpolation using nearest neighbor)",us::Any());
-  parser.addArgument("correct-origin", "c", mitkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Switch when you reveive:  Joint PDF summed to zero ",us::Any());
+  parser.addArgument("correct-origin", "c", mitkCommandLineParser::Bool, "Origin correction:", "Correct for large origin displacement. Use switch when you reveive:  Joint PDF summed to zero ",us::Any());
   parser.addArgument("sinc-int", "s", mitkCommandLineParser::Bool, "Windowed-sinc interpolation:", "Use windowed-sinc interpolation (3) instead of linear interpolation ",us::Any());
 
 
@@ -351,6 +356,7 @@ int main( int argc, char* argv[] )
 
   // Copy reference image to destination
   std::string savePathAndFileName = GetSavePath(outputPath, referenceFileName);
+
   mitk::IOUtil::SaveImage(refImage, savePathAndFileName);
 
   // Copy all derived resources also to output folder, adding _reg suffix
@@ -415,13 +421,21 @@ int main( int argc, char* argv[] )
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";
+
       mitk::RegistrationWrapper::GetTransformation(refImage, movingImage, transf, offset, alignOrigin, referenceMask);
       mitk::RegistrationWrapper::ApplyTransformationToImage(movingImage, transf,offset, resampleReference); // , resampleImage
 
       savePathAndFileName = GetSavePath(outputPath, fileMorphName);
       if (fileType == ".dwi")
         fileType = "dwi";
-      SaveImage(savePathAndFileName,movingImage,fileType );
+
+      if (movingImage->GetData() == nullptr)
+        MITK_INFO <<"POST DATA is null";
+
+
+
+
+      mitk::IOUtil::Save(movingImage, savePathAndFileName);
     }
 
     if (!silent)
@@ -447,7 +461,7 @@ int main( int argc, char* argv[] )
       mitk::RegistrationWrapper::ApplyTransformationToImage(derivedMovingResource, transf,offset, resampleReference,isBinary);
 
       savePathAndFileName = GetSavePath(outputPath, derivedResourceFilename);
-      SaveImage(savePathAndFileName,derivedMovingResource,fileType );
+      mitk::IOUtil::SaveImage(derivedMovingResource, savePathAndFileName);
     }
   }
 

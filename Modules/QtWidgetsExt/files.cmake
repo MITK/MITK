@@ -10,9 +10,6 @@ set(CPP_FILES
   QmitkColorPropertyEditor.cpp
   QmitkColorPropertyView.cpp
   QmitkColorTransferFunctionCanvas.cpp
-  QmitkCorrespondingPointSetsModel.cpp
-  QmitkCorrespondingPointSetsView.cpp
-  QmitkCorrespondingPointSetsWidget.cpp
   QmitkCrossWidget.cpp
   QmitkEditPointDialog.cpp
   QmitkEnumerationPropertyWidget.cpp
@@ -63,9 +60,6 @@ set(MOC_H_FILES
   include/QmitkColorPropertyEditor.h
   include/QmitkColorPropertyView.h
   include/QmitkColorTransferFunctionCanvas.h
-  include/QmitkCorrespondingPointSetsModel.h
-  include/QmitkCorrespondingPointSetsView.h
-  include/QmitkCorrespondingPointSetsWidget.h
   include/QmitkCrossWidget.h
   include/QmitkEditPointDialog.h
   include/QmitkEnumerationPropertyWidget.h

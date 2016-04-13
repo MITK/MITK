@@ -518,7 +518,7 @@
               <number>0</number>
              </property>
              <item row="0" column="1">
-              <widget class="QmitkDataStorageComboBox" name="m_NormalizationMaskBox">
+              <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_NormalizationMaskBox">
                <property name="toolTip">
                 <string>Select binary mask image.</string>
                </property>
@@ -1596,6 +1596,11 @@
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

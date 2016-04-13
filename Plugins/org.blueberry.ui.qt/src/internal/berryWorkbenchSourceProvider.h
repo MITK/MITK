@@ -157,7 +157,7 @@ private:
    * <code>null</code> if the last call to
    * <code>Display.getActiveShell()</code> returned <code>null</code>.
    */
-  const Shell* lastActiveShell;
+  WeakPointer<const Shell> lastActiveShell;
 
   /**
    * The last workbench window shell seen as active by this provider. This
@@ -165,7 +165,7 @@ private:
    * <code>workbench.getActiveWorkbenchWindow()</code> returned
    * <code>null</code>.
    */
-  const Shell* lastActiveWorkbenchWindowShell;
+  WeakPointer<const Shell> lastActiveWorkbenchWindowShell;
 
   /**
    * The last workbench window seen as active by this provider. This value may

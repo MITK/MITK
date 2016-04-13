@@ -34,12 +34,15 @@ const char* mitk::SegmentationsProcessingTool::GetGroup() const
 
 void mitk::SegmentationsProcessingTool::Activated()
 {
+  Superclass::Activated();
+
   ProcessAllObjects();
   m_ToolManager->ActivateTool(-1);
 }
 
 void mitk::SegmentationsProcessingTool::Deactivated()
 {
+  Superclass::Deactivated();
 }
 
 void mitk::SegmentationsProcessingTool::ProcessAllObjects()

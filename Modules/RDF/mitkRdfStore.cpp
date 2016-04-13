@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRdfStore.h"
 
 #include <iostream>
-#include <mitkCommon.h>
 
 #include <redland.h>
 
@@ -43,7 +42,8 @@ namespace mitk {
     bool Remove(RdfTriple triple);
     bool Contains(RdfTriple triple);
 
-    ResultMap Query(std::string query) const;
+    ResultMap ExecuteTupleQuery(const std::string& query) const;
+    bool ExecuteBooleanQuery(const std::string& query) const;
 
     void Save(std::string filename, std::string format = "");
     void Import(std::string url, std::string format = "");
@@ -65,6 +65,17 @@ namespace mitk {
     RdfUri LibRdfUriToRdfUri(librdf_uri* uri) const;
 
     bool CheckComplete(librdf_statement* statement);
+
+  private:
+
+    /**
+     * Prepends the prefixes to the specified query string.
+     *
+     * @param query The query string.
+     * @return The query string with leading prefixes.
+     */
+    std::string PrependPrefixes(const std::string& query) const;
+
   };
 
   /****************************************************************************
@@ -210,16 +221,11 @@ namespace mitk {
     return false;
   }
 
-  RdfStorePrivate::ResultMap RdfStorePrivate::Query(std::string sparqlQuery) const
+  RdfStorePrivate::ResultMap RdfStorePrivate::ExecuteTupleQuery(const std::string& query) const
   {
     RdfStorePrivate::ResultMap resultMap;
-    std::string completeQuery;
 
-    for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
-    {
-      completeQuery += "PREFIX " + i->first + ": " + "<" + i->second.ToString() + "> ";
-    }
-    completeQuery += sparqlQuery;
+    const std::string completeQuery = this->PrependPrefixes(query);
 
     librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
 
@@ -273,6 +279,56 @@ namespace mitk {
     librdf_free_query(rdfQuery);
 
     return resultMap;
+  }
+
+  bool RdfStorePrivate::ExecuteBooleanQuery(const std::string& query) const
+  {
+    const std::string completeQuery = this->PrependPrefixes(query);
+
+    librdf_query* rdfQuery = librdf_new_query(m_World, "sparql", 0, (const unsigned char*) completeQuery.c_str(), 0);
+
+    if (!rdfQuery)
+    {
+      mitkThrow() << "failed to create query object";
+    }
+
+    librdf_query_results* results = librdf_query_execute(rdfQuery, m_Model);
+
+    if (!results)
+    {
+      librdf_free_query(rdfQuery);
+      mitkThrow() << "SPARQL syntax error";
+    }
+
+    if (!librdf_query_results_is_boolean(results))
+    {
+      librdf_free_query_results(results);
+      librdf_free_query(rdfQuery);
+
+      mitkThrow() << "unexpected result type error: tried to request a boolean result with a non-boolean query";
+    }
+
+    int rawResult = librdf_query_results_get_boolean(results);
+
+    bool booleanResult;
+
+    if (rawResult > 0)
+    {
+      booleanResult = true;
+    }
+    else if (rawResult == 0)
+    {
+      booleanResult = false;
+    }
+    else
+    {
+      mitkThrow() << "error while retrieving result";
+    }
+
+    librdf_free_query_results(results);
+    librdf_free_query(rdfQuery);
+
+    return booleanResult;
   }
 
   void RdfStorePrivate::Save(std::string filename, std::string format)
@@ -462,6 +518,18 @@ namespace mitk {
     return RdfUri();
   }
 
+  std::string RdfStorePrivate::PrependPrefixes(const std::string& query) const
+  {
+    std::string completeQuery;
+
+    for (PrefixMap::const_iterator i = m_Prefixes.begin(); i != m_Prefixes.end(); i++)
+    {
+      completeQuery += "PREFIX " + i->first + ": " + "<" + i->second.ToString() + "> ";
+    }
+
+    return completeQuery += query;
+  }
+
   /****************************************************************************
   ******************************* mitkRdfStore ********************************
   ****************************************************************************/
@@ -519,9 +587,19 @@ namespace mitk {
     return d->Contains(triple);
   }
 
-  ResultMap RdfStore::Query(std::string query) const
+  ResultMap RdfStore::Query(const std::string& query) const
   {
-    return d->Query(query);
+    return d->ExecuteTupleQuery(query);
+  }
+
+  ResultMap RdfStore::ExecuteTupleQuery(const std::string& query) const
+  {
+    return d->ExecuteTupleQuery(query);
+  }
+
+  bool RdfStore::ExecuteBooleanQuery(const std::string& query) const
+  {
+    return d->ExecuteBooleanQuery(query);
   }
 
   void RdfStore::Save(std::string filename, std::string format)

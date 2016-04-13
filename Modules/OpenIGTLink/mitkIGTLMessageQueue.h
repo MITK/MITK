@@ -25,8 +25,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <deque>
 
+//OpenIGTLink
 #include "igtlMessageBase.h"
-
+#include "igtlImageMessage.h"
+#include "igtlStringMessage.h"
+#include "igtlTrackingDataMessage.h"
+#include "igtlTransformMessage.h"
 
 namespace mitk {
   /**
@@ -39,24 +43,38 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(mitk::IGTLMessageQueue, itk::Object)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
-    /**
-     * \brief Different buffering types
-     * Infinit buffering means that you can push as many messages as you want
-     * NoBuffering means that the queue just stores a single message
-    */
-    enum BufferingType {Infinit, NoBuffering};
+      /**
+       * \brief Different buffering types
+       * Infinit buffering means that you can push as many messages as you want
+       * NoBuffering means that the queue just stores a single message
+       */
+    enum BufferingType { Infinit, NoBuffering };
+
+    void PushSendMessage(igtl::MessageBase::Pointer message);
 
     /**
     * \brief Adds the message to the queue
     */
-    void PushMessage( igtl::MessageBase::Pointer message );
+    void PushMessage(igtl::MessageBase::Pointer message);
+
+    /**
+    * \brief Adds the message to the queue
+    */
+    void PushCommandMessage(igtl::MessageBase::Pointer message);
     /**
     * \brief Returns and removes the oldest message from the queue
     */
-    igtl::MessageBase::Pointer PullMessage();
+    igtl::MessageBase::Pointer PullMiscMessage();
+    igtl::ImageMessage::Pointer PullImage2dMessage();
+    igtl::ImageMessage::Pointer PullImage3dMessage();
+    igtl::TrackingDataMessage::Pointer PullTrackingMessage();
+    igtl::MessageBase::Pointer PullCommandMessage();
+    igtl::StringMessage::Pointer PullStringMessage();
+    igtl::TransformMessage::Pointer PullTransformMessage();
+    igtl::MessageBase::Pointer PullSendMessage();
 
     /**
     * \brief Get the number of messages in the queue
@@ -95,7 +113,6 @@ namespace mitk {
     IGTLMessageQueue();
     virtual ~IGTLMessageQueue();
 
-
   protected:
     /**
     * \brief Mutex to take car of the queue
@@ -105,7 +122,17 @@ namespace mitk {
     /**
     * \brief the queue that stores pointer to the inserted messages
     */
-    std::deque< igtl::MessageBase::Pointer > m_Queue;
+    std::deque< igtl::MessageBase::Pointer > m_CommandQueue;
+    std::deque< igtl::ImageMessage::Pointer > m_Image2dQueue;
+    std::deque< igtl::ImageMessage::Pointer > m_Image3dQueue;
+    std::deque< igtl::TransformMessage::Pointer > m_TransformQueue;
+    std::deque< igtl::TrackingDataMessage::Pointer > m_TrackingDataQueue;
+    std::deque< igtl::StringMessage::Pointer > m_StringQueue;
+    std::deque< igtl::MessageBase::Pointer > m_MiscQueue;
+
+    std::deque< igtl::MessageBase::Pointer> m_SendQueue;
+
+    igtl::MessageBase::Pointer m_Latest_Message;
 
     /**
     * \brief defines the kind of buffering
@@ -113,6 +140,5 @@ namespace mitk {
     BufferingType m_BufferingType;
   };
 }
-
 
 #endif

@@ -53,7 +53,6 @@ public:
     void InitView( mitk::BaseRenderer::MapperSlotId mapperID,
                    mitk::SliceNavigationController::ViewDirection viewDirection );
 
-    void SetCrossHairPositioningOnClick(bool enabled);
 
 signals:
 

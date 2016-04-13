@@ -1,0 +1,6 @@
+/**
+\page org_openigtlinkexample OpenIGTLink client example
+
+A simple OpenIGTLink client that can stream and visualize tracking data from an OpenIGTLink server. This server can be another MITK intances, e.g., running the OpenIGTLink provider example or any other OpenIGTLink server such as a PLUS server.
+
+*/

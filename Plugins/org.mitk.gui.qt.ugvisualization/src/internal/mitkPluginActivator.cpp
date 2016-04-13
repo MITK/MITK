@@ -13,10 +13,8 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkPluginActivator.h"
-
-#include <QtPlugin>
-
 #include "QmitkUGVisualizationView.h"
 
 namespace mitk {
@@ -32,7 +30,3 @@ void PluginActivator::stop(ctkPluginContext* context)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_gui_qt_ugvisualization, mitk::PluginActivator)
-#endif

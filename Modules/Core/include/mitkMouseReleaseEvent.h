@@ -35,7 +35,7 @@ namespace mitk
 
   public:
     mitkClassMacro(MouseReleaseEvent,InteractionPositionEvent)
-    mitkNewMacro6Param(Self, BaseRenderer*, const Point2D& ,const Point3D& , MouseButtons , ModifierKeys, MouseButtons)
+    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D& , MouseButtons , ModifierKeys, MouseButtons)
 
     ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
@@ -49,7 +49,6 @@ namespace mitk
   protected:
     MouseReleaseEvent(BaseRenderer*,
         const mitk::Point2D& mousePosition = Point2D(),
-        const mitk::Point3D& worldPosition = Point3D(),
         MouseButtons buttonStates = NoButton,
         ModifierKeys modifiers = NoKey,
         MouseButtons eventButton = NoButton);

@@ -26,6 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkNodePredicateDataType.h>
 
+//Microservices
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include <usModuleContext.h>
+
 // Qmitk headers
 #include "QmitkNavigationToolCreationAdvancedWidget.h"
 
@@ -120,6 +126,7 @@ class MITKIGTUI_EXPORT QmitkNavigationToolCreationWidget : public QWidget
 
     /** Initializes the tool landmark lists in the UI. */
     void InitializeUIToolLandmarkLists();
+    void RefreshTrackingDeviceCollection();
 
 };
 #endif

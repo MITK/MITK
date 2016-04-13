@@ -32,7 +32,7 @@ public:
   mitkClassMacro(CameraRotationController,BaseController);
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
-  mitkNewMacro1Param(Self, const char *);
+  //mitkNewMacro1Param(Self, const char *);
 
   void RotateCamera();
   void AcquireCamera();
@@ -42,10 +42,8 @@ public:
     m_RenderWindow = renWin;
   }
 
-  virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent ) override;
-
 protected:
-  CameraRotationController(const char * type = nullptr);
+  CameraRotationController();
   virtual ~CameraRotationController();
 
 private:

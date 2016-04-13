@@ -1,0 +1,24 @@
+diff --git a/CMakeOptions.cmake b/CMakeOptions.cmake
+index 17fc5b8..23b3f1f 100644
+--- a/CMakeOptions.cmake
++++ b/CMakeOptions.cmake
+@@ -16,6 +16,19 @@ IF ( NOT VTK_FOUND )
+ ENDIF ( NOT VTK_FOUND )
+ 
+ #
++# Try to find GDCM and include its settings (otherwise complain)
++#
++IF ( NOT GDCM_FOUND )
++  FIND_PACKAGE(GDCM REQUIRED)
++  INCLUDE(${GDCM_USE_FILE})
++ENDIF ( NOT GDCM_FOUND )
++
++#
++# Try to find OpenCV which possibly is a dependency of ITK
++#
++FIND_PACKAGE(OpenCV)
++
++#
+ # Try to find ITK and include its settings (otherwise complain)
+ #
+ IF ( NOT ITK_FOUND )

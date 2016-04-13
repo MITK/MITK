@@ -50,21 +50,6 @@ if(NOT PATCH_COMMAND)
 endif()
 
 #-----------------------------------------------------------------------------
-# Qt options for external projects and MITK
-#-----------------------------------------------------------------------------
-
-if(MITK_USE_QT)
-  set(qt_project_args -DDESIRED_QT_VERSION:STRING=${DESIRED_QT_VERSION})
-else()
-  set(qt_project_args )
-endif()
-
-if(MITK_USE_Qt4)
-  list(APPEND qt_project_args
-       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE} )
-endif()
-
-#-----------------------------------------------------------------------------
 # ExternalProjects
 #-----------------------------------------------------------------------------
 
@@ -95,12 +80,10 @@ foreach(proj ${nice_external_projects})
   endif()
 endforeach()
 
-if(MITK_USE_Boost)
-  set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
-  mark_as_advanced(EXTERNAL_BOOST_ROOT)
-  if(EXTERNAL_BOOST_ROOT)
-    set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
-  endif()
+set(EXTERNAL_BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Path to Boost directory")
+mark_as_advanced(EXTERNAL_BOOST_ROOT)
+if(EXTERNAL_BOOST_ROOT)
+  set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
 endif()
 
 # Setup file for setting custom ctest vars
@@ -389,7 +372,6 @@ ExternalProject_Add(${proj}
     -DMITK_WHITELIST:STRING=${MITK_WHITELIST}
     -DMITK_WHITELISTS_EXTERNAL_PATH:STRING=${MITK_WHITELISTS_EXTERNAL_PATH}
     -DMITK_WHITELISTS_INTERNAL_PATH:STRING=${MITK_WHITELISTS_INTERNAL_PATH}
-    ${qt_project_args}
     -DMITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_FLOATING_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}

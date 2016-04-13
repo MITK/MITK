@@ -65,6 +65,8 @@ namespace mitk
      *  @param removedNode != NULL a node was removed from DataStorage */
     void SetAutoTopMostImage(bool autoTopMost, const DataNode* removedNode = nullptr);
 
+    void RecaluclateLevelWindowForSelectedComponent(const itk::EventObject&);
+
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
     /** @brief Sets an specific LevelWindowProperty, all changes will affect the image belonging to this property.
@@ -128,6 +130,8 @@ namespace mitk
     ObserverToPropertyMap        m_PropObserverToNode;  ///< map to hold observer IDs to every visible property of DataNode�s BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer IDs to every layer property of DataNode�s BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode3; ///< map to hold observer IDs to every Image Rendering.Mode property of DataNode�s BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode4; ///< map to hold observer IDs to every Image.Displayed Component property of DataNode�s BaseProperty
+
     void UpdateObservers();                             ///< updates the internal observer list. Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete
     void ClearPropObserverLists();                      ///< internal help method to clear both lists/maps.
     void CreatePropObserverLists();                     ///< internal help method to create both lists/maps.

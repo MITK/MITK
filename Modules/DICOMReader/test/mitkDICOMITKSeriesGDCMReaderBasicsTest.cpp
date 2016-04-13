@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTestingMacros.h"
 
+#include <unordered_map>
+#include "mitkStringProperty.h"
+
 using mitk::DICOMTag;
 
 int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
@@ -32,6 +35,25 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED(gdcmReader.IsNotNull(), "DICOMITKSeriesGDCMReader can be instantiated.");
 
   mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
+
+  std::unordered_map<const char*, const char*> expectedPropertyTypes;
+  std::unordered_map<const char*, mitk::DICOMTag> additionalTags;
+  additionalTags.insert( std::make_pair( "Test1", DICOMTag( 0x0008, 0x005 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test1", "StringProperty" ) );
+
+  additionalTags.insert( std::make_pair( "Test2", DICOMTag( 0x0008, 0x008 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test2", "StringProperty" ) );
+
+  additionalTags.insert( std::make_pair( "Test3", DICOMTag( 0x0008, 0x0060 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test3", "StringProperty" ) );
+
+  additionalTags.insert( std::make_pair( "Test4", DICOMTag( 0x0008, 0x1070 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test4", "StringProperty" ) );
+
+  additionalTags.insert( std::make_pair( "Test5", DICOMTag( 0x0020, 0x1041 ) ) );
+  expectedPropertyTypes.insert( std::make_pair( "Test5", "StringLookupTableProperty" ) );
+
+  gdcmReader->SetAdditionalTagsOfInterest( additionalTags );
 
   // check the Set/GetInput function
   mitk::DICOMFileReaderTestHelper::TestInputFilenames( gdcmReader );
@@ -75,12 +97,38 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   tagSorter->SetSortCriterion( sorting );
 
   gdcmReader->AddSortingElement( tagSorter );
+
+  gdcmReader->SetAdditionalTagsOfInterest( additionalTags );
+
+
   mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
   gdcmReader->PrintOutputs(std::cout, true);
 
   // really load images
-  mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader );
+  mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader, additionalTags, expectedPropertyTypes );
+
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Load the images again with another TagLookupTableToPropertyFunctor
+  //
+  //////////////////////////////////////////////////////////////////////////
+
+  gdcmReader->SetTagLookupTableToPropertyFunctor( []( const mitk::StringLookupTable& table )
+  {
+    return static_cast<mitk::BaseProperty::Pointer>( mitk::StringProperty::New( table.GetTableValue(0) ) );
+  } );
+
+  expectedPropertyTypes["Test5"] = "StringLProperty";
+
+  mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
+
+  gdcmReader->PrintOutputs(std::cout, true);
+
+  // really load images
+  mitk::DICOMFileReaderTestHelper::TestMitkImagesAreLoaded( gdcmReader, additionalTags, expectedPropertyTypes );
+
 
   MITK_TEST_END();
 }

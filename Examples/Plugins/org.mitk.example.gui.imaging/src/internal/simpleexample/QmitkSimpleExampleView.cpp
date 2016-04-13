@@ -172,7 +172,7 @@ void QmitkSimpleExampleView::StereoSelectionChanged( int id )
   }
 
 
-  mitk::BaseRenderer::GetInstance(vtkrenderwindow)->SetMapperID(2);
+  mitk::BaseRenderer::GetInstance(vtkrenderwindow)->SetMapperID(mitk::BaseRenderer::Standard3D);
   renderWindowPart->RequestUpdate();
 }
 

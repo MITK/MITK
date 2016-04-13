@@ -165,8 +165,20 @@ struct SelListenerRigidRegistration : ISelectionListener
 };
 
 QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL),
-m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
+: QmitkFunctionality(),
+  m_MultiWidget(NULL),
+  m_MovingNode(NULL),
+  m_MovingMaskNode(NULL),
+  m_FixedNode(NULL),
+  m_FixedMaskNode(NULL),
+  m_ShowRedGreen(false),
+  m_Opacity(0.5),
+  m_OriginalOpacity(1.0),
+  m_Deactivated(false),
+  m_FixedDimension(0),
+  m_MovingDimension(0),
+  m_PresetSelected(false),
+  m_PresetNotLoaded(false)
 {
   m_TranslateSliderPos[0] = 0;
   m_TranslateSliderPos[1] = 0;
@@ -213,8 +225,6 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
-  //m_Controls.m_UseFixedImageMask->hide();
-  //m_Controls.m_UseMovingImageMask->hide();
   m_Controls.m_UseMaskingCB->hide();
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
@@ -270,7 +280,30 @@ void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::strin
 
 void QmitkRigidRegistrationView::PresetSelectionChanged()
 {
-  this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(true);
+  // first item is blank == no preset selected
+  bool validPresetSelected = (this->m_Controls.m_RigidRegistrationPresetBox->currentIndex() > 0);
+
+  if (validPresetSelected)
+  {
+    this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(true);
+
+    // selection chaged, disable unter the preset is loaded
+    this->m_PresetNotLoaded = true;
+    this->m_Controls.m_CalculateTransformation->setEnabled(false);
+  }
+  else
+  {
+    // reset preset view
+    this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
+    // THE QT5 solution : this->m_Controls.m_RigidRegistrationPresetBox->currentIndexChanged(0);
+    this->m_Controls.m_RigidRegistrationPresetBox->setCurrentIndex(0);
+    this->m_PresetNotLoaded = true;
+
+    // disable calculate button
+    this->m_Controls.m_CalculateTransformation->setEnabled(false);
+
+  }
+
 }
 
 void QmitkRigidRegistrationView::LoadSelectedPreset()
@@ -282,6 +315,7 @@ void QmitkRigidRegistrationView::LoadSelectedPreset()
 
   // first item is blank == no preset selected
   m_PresetSelected = ( this->m_Controls.m_RigidRegistrationPresetBox->currentIndex() > 0 );
+  m_PresetNotLoaded = false;
 
   this->CheckCalculateEnabled();
 }
@@ -577,8 +611,9 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataNode::Pointer movingIm
 
 bool QmitkRigidRegistrationView::CheckCalculate()
 {
-  if(m_MovingNode==m_FixedNode)
+  if(m_MovingNode==m_FixedNode || !this->m_PresetNotLoaded )
     return false;
+
   return true;
 }
 
@@ -1150,7 +1185,7 @@ void QmitkRigidRegistrationView::CheckCalculateEnabled()
   {
     m_Controls.m_ManualFrame->setEnabled(true);
 
-    if( m_PresetSelected )
+    if( m_PresetSelected  && !m_PresetNotLoaded )
     {
       m_Controls.m_CalculateTransformation->setEnabled(true);
       if ( (m_FixedDimension != m_MovingDimension && std::max<int>(m_FixedDimension, m_MovingDimension) != 4) || m_FixedDimension < 2 /*|| m_FixedDimension > 3*/)

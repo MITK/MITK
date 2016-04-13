@@ -19,16 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MITKUSTelemedScanConverterPlugin.h"
 #include "mitkImageReadAccessor.h"
 
-mitk::USTelemedImageSource::USTelemedImageSource(  )
+mitk::USTelemedImageSource::USTelemedImageSource()
   : m_Image(mitk::Image::New()),
-    m_ImageMutex(itk::FastMutexLock::New()),
-    m_Plugin(0),
-    m_PluginCallback(0),
-    m_UsgDataView(0),
-    m_ImageProperties(0),
-    m_DepthProperties(0),
-    m_upDateCounter(0)
+  m_ImageMutex(itk::FastMutexLock::New()),
+  m_Plugin(0),
+  m_PluginCallback(0),
+  m_UsgDataView(0),
+  m_ImageProperties(0),
+  m_DepthProperties(0),
+  m_OldnXPelsPerUnit(0),
+  m_OldnYPelsPerUnit(0)
+
 {
+
 }
 
 mitk::USTelemedImageSource::~USTelemedImageSource( )
@@ -43,19 +46,20 @@ void mitk::USTelemedImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   if ( image.IsNull() ) { image = mitk::Image::New(); }
 
-  //if depth changed: update geometry, but 20 frames after the change because it takes this time until geometry adapts
-  if (m_upDateCounter==20 && m_Image->IsInitialized())
+  //get the actual resolution to check if it changed. We have to do this every time because the geometry takes a few frames to adapt
+  Usgfw2Lib::tagImageResolution resolutionInMetersActual;
+  m_ImageProperties->GetResolution(&resolutionInMetersActual, 0);
+  if (m_OldnXPelsPerUnit != resolutionInMetersActual.nXPelsPerUnit || m_OldnYPelsPerUnit != resolutionInMetersActual.nYPelsPerUnit)
     {
-    UpdateImageGeometry();
-    m_upDateCounter++;
-    }
-  if (m_OldDepth != m_DepthProperties->Current)
-    {
-    m_upDateCounter=0;
-    m_OldDepth =  m_DepthProperties->GetCurrent();
-    }
-  if (m_upDateCounter<20) m_upDateCounter++;
+      //we can only update if the image exists and has a geometry
+      if (m_Image.IsNotNull() && m_Image->GetGeometry() != NULL)
+     {
+        m_OldnXPelsPerUnit = resolutionInMetersActual.nXPelsPerUnit;
+        m_OldnYPelsPerUnit = resolutionInMetersActual.nYPelsPerUnit;
+        UpdateImageGeometry();
+      }
 
+    }
   //now update image
   if ( m_Image->IsInitialized() )
   {

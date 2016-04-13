@@ -81,9 +81,6 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel* re
   if ( !renderingContour->IsEmptyTimeStep(timestep) )
   {
 
-    mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-    assert(displayGeometry.IsNotNull());
-
     //apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
 
@@ -112,7 +109,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel* re
     //    ContourModel::OutputType point;
     mitk::Point3D point;
 
-    mitk::Point3D p, projected_p;
+    mitk::Point3D p;
     float vtkp[3];
     float lineWidth = 3.0;
 
@@ -165,13 +162,9 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel* re
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
 
-      displayGeometry->Project(p, projected_p);
+      renderer->WorldToDisplay(p, pt2d);
 
-      displayGeometry->Map(projected_p, pt2d);
-      displayGeometry->WorldToDisplay(pt2d, pt2d);
-
-      Vector3D diff=p-projected_p;
-      ScalarType scalardiff = diff.GetNorm();
+      ScalarType scalardiff = fabs(renderer->GetCurrentWorldPlaneGeometry()->SignedDistance(p));
 
       //project to plane
       if(projectmode)
@@ -309,9 +302,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel* re
       itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
-      displayGeometry->Project(p, projected_p);
-      displayGeometry->Map(projected_p, pt2d);
-      displayGeometry->WorldToDisplay(pt2d, pt2d);
+      renderer->WorldToDisplay(p, pt2d);
 
       glLineWidth(lineWidth);
       glBegin (GL_LINES);
@@ -331,13 +322,9 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel* re
       transform->TransformPoint(vtkp, vtkp);
       vtk2itk(vtkp,p);
 
-      displayGeometry->Project(p, projected_p);
+      renderer->WorldToDisplay(p, pt2d);
 
-      displayGeometry->Map(projected_p, pt2d);
-      displayGeometry->WorldToDisplay(pt2d, pt2d);
-
-      Vector3D diff=p-projected_p;
-      ScalarType scalardiff = diff.GetNorm();
+      ScalarType scalardiff = fabs(renderer->GetCurrentWorldPlaneGeometry()->SignedDistance(p));
       //----------------------------------
 
       //draw point if close to plane

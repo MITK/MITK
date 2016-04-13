@@ -18,9 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLabelSetImageWriter__cpp
 
 #include "mitkBasePropertySerializer.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkIOMimeTypes.h"
 #include "mitkLabelSetImageIO.h"
 #include "mitkLabelSetImageConverter.h"
+#include <mitkLocaleSwitch.h>
 
 // itk
 #include "itkMetaDataDictionary.h"
@@ -28,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNrrdImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itkImageFileReader.h"
-#include "mitkImageAccessByItk.h"
 
 #include "tinyxml.h"
 
@@ -58,24 +59,11 @@ void LabelSetImageIO::Write()
 {
   ValidateOutputLocation();
 
-  const LabelSetImage* input = static_cast<const LabelSetImage*>(this->GetInput());
+  auto input = dynamic_cast<const LabelSetImage*>(this->GetInput());
 
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
+  mitk::LocaleSwitch localeSwitch("C");
 
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      mitkThrow() << "Could not set locale " << currLocale;
-    }
-  }
-
-  mitk::Image::Pointer inputVector = mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(input);
+  mitk::Image::Pointer inputVector = mitk::ConvertLabelSetImageToImage(input);
 
   // image write
   if ( inputVector.IsNull() )
@@ -236,15 +224,6 @@ void LabelSetImageIO::Write()
     mitkThrow() << e.what();
   }
   // end image write
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    mitkThrow() << "Could not reset locale " << currLocale;
-  }
 }
 
 IFileIO::ConfidenceLevel LabelSetImageIO::GetReaderConfidenceLevel() const
@@ -268,20 +247,7 @@ IFileIO::ConfidenceLevel LabelSetImageIO::GetReaderConfidenceLevel() const
 
 std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 {
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      mitkThrow() << "Could not set locale.";
-    }
-  }
+  mitk::LocaleSwitch localeSwitch("C");
 
   // begin regular image loading, adapted from mitkItkImageIO
   itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
@@ -403,7 +369,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 
   // end regular image loading
 
-  LabelSetImage::Pointer output = LabelSetImageConverter::ConvertImageToLabelSetImage(image);
+  LabelSetImage::Pointer output = ConvertImageToLabelSetImage(image);
 
   // get labels and add them as properties to the image
   char keybuffer[256];
@@ -441,15 +407,6 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
   }
 
   MITK_INFO << "...finished!" << std::endl;
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    mitkThrow() << "Could not reset locale!";
-  }
 
   std::vector<BaseData::Pointer> result;
   result.push_back(output.GetPointer());

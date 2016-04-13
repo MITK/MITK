@@ -33,7 +33,6 @@ namespace mitk
 
 class DataNode;
 class PlaneGeometry;
-class DisplayGeometry;
 class PlanarFigure;
 class PositionEvent;
 class BaseRenderer;
@@ -102,42 +101,45 @@ protected:
 
   bool CheckFigureIsExtendable( const InteractionEvent* interactionEvent );
 
+  bool CheckFigureIsDeletable( const InteractionEvent* interactionEvent );
+
 
   ////////  Actions ////////
 
-  bool FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+  void FinalizeFigure( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+  void MoveCurrentPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+  void DeselectPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool AddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+  void AddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool AddInitialPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+  void AddInitialPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool StartHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+  void StartHovering( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
+  void EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool DeleteFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+  void DeleteFigure( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
+  void SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent );
+  void HidePreviewPoint( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent );
+  void HideControlPoints( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool RemoveSelectedPoint(StateMachineAction*, InteractionEvent* interactionEvent);
+  void RemoveSelectedPoint(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool RequestContextMenu(StateMachineAction*, InteractionEvent* interactionEvent);
+  void RequestContextMenu(StateMachineAction*, InteractionEvent* interactionEvent);
 
-  bool SelectFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+  void SelectFigure( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool SelectPoint( StateMachineAction*, InteractionEvent* interactionEvent );
+  void SelectPoint( StateMachineAction*, InteractionEvent* interactionEvent );
 
-  bool EndInteraction( StateMachineAction*, InteractionEvent* interactionEvent );
+  void EndInteraction( StateMachineAction*, InteractionEvent* interactionEvent );
 
 
+  bool FilterEvents(InteractionEvent* interactionEvent, DataNode*) override;
 
   /**
     \brief Used when clicking to determine if a point is too close to the previous point.
@@ -152,7 +154,7 @@ protected:
     mitk::Point2D &displayPoint,
     const mitk::PlaneGeometry *objectGeometry,
     const mitk::PlaneGeometry *rendererGeometry,
-    const mitk::DisplayGeometry *displayGeometry ) const;
+    const mitk::BaseRenderer *renderer) const;
 
   /** \brief Returns true if the first specified point is in proximity of the line defined
    * the other two point; false otherwise.
@@ -169,7 +171,6 @@ protected:
     PlanarFigure *planarFigure,
     const PlaneGeometry *planarFigureGeometry,
     const PlaneGeometry *rendererGeometry,
-    const DisplayGeometry *displayGeometry,
     Point2D& pointProjectedOntoLine) const;
 
   /** \brief Returns the index of the marker (control point) over which the point contained
@@ -180,7 +181,7 @@ protected:
     const PlanarFigure *planarFigure,
     const PlaneGeometry *planarFigureGeometry,
     const PlaneGeometry *rendererGeometry,
-    const DisplayGeometry *displayGeometry ) const;
+    const BaseRenderer *renderer) const;
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
 

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkITKImageImport_txx
 #define __mitkITKImageImport_txx
 #include "mitkITKImageImport.h"
+#include "mitkImageReadAccessor.h"
 
 template <class TInputImage>
 mitk::ITKImageImport<TInputImage>::ITKImageImport()
@@ -151,6 +152,7 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(itk::SmartPointer<ItkOutputImageTy
 template <typename ItkOutputImageType>
 mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk::Image* mitkImage, const BaseGeometry* geometry, bool update)
 {
+
   if(update)
     itkimage->Update();
 
@@ -158,6 +160,16 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType* itkimage, mitk
   if(mitkImage != nullptr)
   {
     resultImage = mitkImage;
+
+    // test the pointer equality with read accessor only if mitk Image is intialized, otherwise an Exception is thrown by the ReadAccessor
+    if( mitkImage->IsInitialized() )
+    {
+      // check the data pointer, for that, we need to ignore the lock of the mitkImage
+      mitk::ImageReadAccessor read_probe( mitk::Image::Pointer(mitkImage), nullptr, mitk::ImageAccessorBase::IgnoreLock );
+      if( itkimage->GetBufferPointer() == read_probe.GetData() )
+        return resultImage;
+    }
+
   }
   else
   {

@@ -12,18 +12,18 @@ set(CPP_FILES
   Algorithms/mitkNavigationDataToNavigationDataFilter.cpp
   Algorithms/mitkNavigationDataToPointSetFilter.cpp
   Algorithms/mitkNavigationDataTransformFilter.cpp
-  Algorithms/mitkIGTLMessageToNavigationDataFilter.cpp
   Algorithms/mitkNavigationDataToIGTLMessageFilter.cpp
+  Algorithms/mitkIGTLMessageToNavigationDataFilter.cpp
 
   Common/mitkIGTTimeStamp.cpp
   Common/mitkSerialCommunication.cpp
-  Common/mitkTrackingTypes.cpp
 
   DataManagement/mitkNavigationDataSource.cpp
   DataManagement/mitkNavigationTool.cpp
   DataManagement/mitkNavigationToolStorage.cpp
   DataManagement/mitkTrackingDeviceSourceConfigurator.cpp
   DataManagement/mitkTrackingDeviceSource.cpp
+  DataManagement/mitkTrackingDeviceTypeCollection.cpp
 
   ExceptionHandling/mitkIGTException.cpp
   ExceptionHandling/mitkIGTHardwareException.cpp
@@ -59,6 +59,18 @@ set(CPP_FILES
   TrackingDevices/mitkOptitrackTrackingTool.cpp
   TrackingDevices/mitkOpenIGTLinkTrackingDevice.cpp
   TrackingDevices/mitkOpenIGTLinkTrackingTool.cpp
+  TrackingDevices/mitkNDIAuroraTypeInformation.cpp
+  TrackingDevices/mitkNDIPolarisTypeInformation.cpp
+  TrackingDevices/mitkNPOptitrackTrackingTypeInformation.cpp
+  TrackingDevices/mitkVirtualTrackerTypeInformation.cpp
+  TrackingDevices/mitkMicronTrackerTypeInformation.cpp
+  TrackingDevices/mitkOpenIGTLinkTypeInformation.cpp
+  TrackingDevices/mitkUnspecifiedTrackingTypeInformation.cpp
+)
+
+set(H_FILES
+  DataManagement/mitkTrackingDeviceTypeInformation.h
+  Common/mitkTrackingTypes.h
 )
 
 set(RESOURCE_FILES
@@ -75,7 +87,6 @@ set(RESOURCE_FILES
   NDIPolarisSpectraExtendedPyramid.stl
   NDIPolarisVicra.stl
 )
-
 
 if(MITK_USE_MICRON_TRACKER)
   set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkClaronInterface.cpp)

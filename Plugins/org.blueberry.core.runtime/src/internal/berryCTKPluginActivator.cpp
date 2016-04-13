@@ -36,8 +36,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryRegistryContributor.h"
 
 #include <QCoreApplication>
-#include <QtPlugin>
-
 #include <QDebug>
 
 namespace berry {
@@ -286,7 +284,3 @@ void org_blueberry_core_runtime_Activator::stopAppContainer()
 }
 
 }
-
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-  Q_EXPORT_PLUGIN2(org_blueberry_core_runtime, berry::org_blueberry_core_runtime_Activator)
-#endif

@@ -25,13 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkRenderWindow.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkNodePredicateDataType.h>
 
 // include gl to read out properties
 #include <vtkOpenGL.h>
 #include <vtkOpenGLExtensionManager.h>
+#include <vtksys/SystemTools.hxx>
 
 #if defined _MSC_VER
 #if _MSC_VER >= 1700
@@ -61,9 +61,6 @@ mitk::RenderingTestHelper::RenderingTestHelper(int width, int height, int argc, 
 
 void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
-  // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
-
   m_RenderWindow = mitk::RenderWindow::New(NULL ,"unnamed renderer" , NULL, renderingMode);
 
   m_DataStorage = mitk::StandaloneDataStorage::New();
@@ -176,6 +173,7 @@ void mitk::RenderingTestHelper::Render()
     m_RenderWindow->GetRenderer()->PrepareRender();
 
     this->GetVtkRenderWindow()->Render();
+    this->GetVtkRenderWindow()->WaitForCompletion();
     if(m_AutomaticallyCloseRenderWindow == false)
     {
       //Use interaction to stop the test
@@ -243,7 +241,6 @@ vtkRenderWindow* mitk::RenderingTestHelper::GetVtkRenderWindow()
 bool mitk::RenderingTestHelper::CompareRenderWindowAgainstReference(int argc, char* argv[], double threshold)
 {
   this->Render();
-  m_RenderWindow->GetRenderer()->ForceImmediateUpdate();
   //retVal meanings: (see VTK/Rendering/vtkTesting.h)
   //0 = test failed
   //1 = test passed

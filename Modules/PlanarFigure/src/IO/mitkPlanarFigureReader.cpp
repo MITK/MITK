@@ -214,16 +214,16 @@ void mitk::PlanarFigureReader::GenerateData()
          propertyElement = propertyElement->NextSiblingElement("property") )
     {
       const char* keya = propertyElement->Attribute("key");
-      std::string key( keya ? keya : "");
+      const std::string key( keya ? keya : "");
 
       const char* typea = propertyElement->Attribute("type");
-      std::string type( typea ? typea : "");
+      const std::string type( typea ? typea : "");
 
       // hand propertyElement to specific reader
       std::stringstream propertyDeserializerClassName;
       propertyDeserializerClassName << type << "Serializer";
 
-      std::list<itk::LightObject::Pointer> readers =
+      const std::list<itk::LightObject::Pointer> readers =
         itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
       if (readers.size() < 1)
       {
@@ -234,13 +234,13 @@ void mitk::PlanarFigureReader::GenerateData()
         MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
       }
 
-      for ( auto iter = readers.begin();
-        iter != readers.end();
+      for ( auto iter = readers.cbegin();
+        iter != readers.cend();
         ++iter )
       {
         if (BasePropertySerializer* reader = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
         {
-          BaseProperty::Pointer property = reader->Deserialize( propertyElement->FirstChildElement() );
+          const BaseProperty::Pointer property = reader->Deserialize( propertyElement->FirstChildElement() );
           if (property.IsNotNull())
           {
             planarFigure->GetPropertyList()->ReplaceProperty(key, property);
@@ -280,16 +280,16 @@ void mitk::PlanarFigureReader::GenerateData()
         mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
 
         // Extract and set plane transform parameters
-        DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
+        const DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
 
         typedef mitk::BaseGeometry::TransformType TransformType;
         TransformType::ParametersType parameters;
         parameters.SetSize( 12 );
 
         unsigned int i;
-        DoubleList::iterator it;
-        for ( it = transformList.begin(), i = 0;
-              it != transformList.end();
+        DoubleList::const_iterator it;
+        for ( it = transformList.cbegin(), i = 0;
+              it != transformList.cend();
               ++it, ++i )
         {
           parameters.SetElement( i, *it );
@@ -302,13 +302,13 @@ void mitk::PlanarFigureReader::GenerateData()
 
 
         // Extract and set plane bounds
-        DoubleList boundsList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "boundsParam" ), "bound", 6 );
+        const DoubleList boundsList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "boundsParam" ), "bound", 6 );
 
         typedef mitk::BaseGeometry::BoundsArrayType BoundsArrayType;
 
         BoundsArrayType bounds;
-        for ( it = boundsList.begin(), i = 0;
-              it != boundsList.end();
+        for ( it = boundsList.cbegin(), i = 0;
+              it != boundsList.cend();
               ++it, ++i )
         {
           bounds[i] = *it;
@@ -318,10 +318,10 @@ void mitk::PlanarFigureReader::GenerateData()
 
 
         // Extract and set spacing and origin
-        Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
+        const Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
         planeGeo->SetSpacing( spacing );
 
-        Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
+        const Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
         planarFigure->SetPlaneGeometry(planeGeo);
       }
@@ -332,7 +332,9 @@ void mitk::PlanarFigureReader::GenerateData()
     TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");
     bool first = true;
     if (cpElement != nullptr)
-      for( TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr; vertElement = vertElement->NextSiblingElement("Vertex"))
+      for( TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex");
+           vertElement != nullptr;
+           vertElement = vertElement->NextSiblingElement("Vertex") )
       {
         if (vertElement == nullptr)
           continue;

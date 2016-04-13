@@ -105,7 +105,7 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
     Superclass::Initialize(pixelType, other->GetDimension(), other->GetDimensions());
   }
 
-  mitk::TimeGeometry::Pointer originalGeometry = other->GetTimeGeometry()->Clone();
+  auto originalGeometry = other->GetTimeGeometry()->Clone();
   this->SetTimeGeometry(originalGeometry);
 
   // Add a inital LabelSet ans corresponding image data to the stack
@@ -163,7 +163,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize( this->GetPixelType(), this->GetDimension(), this->GetDimensions(), this->GetImageDescriptor()->GetNumberOfChannels() );
-  newImage->SetGeometry(this->GetGeometry()->Clone());
+  newImage->SetTimeGeometry(this->GetTimeGeometry()->Clone());
 
   if (newImage->GetDimension() < 4)
   {
@@ -254,7 +254,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
       m_ActiveLayer = layer; // only at this place m_ActiveLayer should be manipulated!!! Use Getter and Setter
       AccessByItk_1(this, LayerContainerToImageProcessing, GetActiveLayer());
 
-      AfterchangeLayerEvent.Send();
+      AfterChangeLayerEvent.Send();
     }
   }
   catch (itk::ExceptionObject& e)
@@ -491,8 +491,8 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
     memset(accessor->GetData(), 0, byteSize);
     delete accessor;
 
-    mitk::SlicedGeometry3D::Pointer geometry = this->GetSlicedGeometry()->Clone();
-    mask->SetGeometry(geometry);
+    auto geometry = this->GetTimeGeometry()->Clone();
+    mask->SetTimeGeometry(geometry);
 
     AccessByItk_2(this, CreateLabelMaskProcessing, mask, index);
   }
@@ -503,124 +503,6 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index)
 
   return mask;
 }
-
-//void mitk::LabelSetImage::SurfaceStamp(mitk::Surface* surface, bool forceOverwrite)
-//{
-//  if (!surface)
-//  {
-//    MITK_ERROR << "Input surface is NULL.";
-//    return;
-//  }
-
-//  try
-//  {
-//    LabelSetImageType::Pointer itkImage;
-//    mitk::CastToItkImage(this, itkImage);
-
-//    vtkPolyData *polydata = surface->GetVtkPolyData();
-
-//    vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-//    transform->SetMatrix(surface->GetGeometry()->GetVtkTransform()->GetMatrix());
-//    transform->Update();
-
-//    vtkSmartPointer<vtkTransformPolyDataFilter> transformer = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-//    transformer->SetInputData(polydata);
-//    transformer->SetTransform(transform);
-//    transformer->Update();
-
-//    typedef double Coord;
-//    typedef itk::QuadEdgeMesh< Coord, 3 > MeshType;
-
-//    MeshType::Pointer mesh = MeshType::New();
-//    mesh->SetCellsAllocationMethod(MeshType::CellsAllocatedDynamicallyCellByCell);
-//    int numberOfPoints = polydata->GetNumberOfPoints();
-//    mesh->GetPoints()->Reserve(numberOfPoints);
-
-//    vtkPoints* points = polydata->GetPoints();
-
-//    MeshType::PointType point;
-//    for (int i = 0; i < numberOfPoints; i++)
-//    {
-//      double* aux = points->GetPoint(i);
-//      point[0] = aux[0];
-//      point[1] = aux[1];
-//      point[2] = aux[2];
-//      mesh->SetPoint(i, point);
-//    }
-
-//    // Load the polygons into the itk::Mesh
-//    typedef MeshType::CellAutoPointer     CellAutoPointerType;
-//    typedef MeshType::CellType            CellType;
-//    typedef itk::TriangleCell< CellType > TriangleCellType;
-//    typedef MeshType::PointIdentifier     PointIdentifierType;
-//    typedef MeshType::CellIdentifier      CellIdentifierType;
-
-//    // Read the number of polygons
-//    CellIdentifierType numberOfPolygons = 0;
-//    numberOfPolygons = polydata->GetNumberOfPolys();
-
-//    PointIdentifierType numberOfCellPoints = 3;
-
-//    for (CellIdentifierType i = 0; i < numberOfPolygons; i++)
-//    {
-//      vtkIdList *cellIds;
-//      vtkCell *vcell = polydata->GetCell(i);
-//      cellIds = vcell->GetPointIds();
-
-//      CellAutoPointerType cell;
-//      auto   triangleCell = new TriangleCellType;
-//      PointIdentifierType k;
-//      for (k = 0; k < numberOfCellPoints; k++)
-//      {
-//        triangleCell->SetPointId(k, cellIds->GetId(k));
-//      }
-
-//      cell.TakeOwnership(triangleCell);
-//      mesh->SetCell(i, cell);
-//    }
-
-//    typedef itk::TriangleMeshToBinaryImageFilter<MeshType, LabelSetImageType> TriangleMeshToBinaryImageFilterType;
-
-//    TriangleMeshToBinaryImageFilterType::Pointer filter = TriangleMeshToBinaryImageFilterType::New();
-//    filter->SetInput(mesh);
-//    filter->SetInfoImage(itkImage);
-//    filter->SetInsideValue(1);
-//    filter->SetOutsideValue(0);
-//    filter->Update();
-
-//    LabelSetImageType::Pointer resultImage = filter->GetOutput();
-//    resultImage->DisconnectPipeline();
-
-//    typedef itk::ImageRegionConstIterator< LabelSetImageType > SourceIteratorType;
-//    typedef itk::ImageRegionIterator< LabelSetImageType > TargetIteratorType;
-
-//    SourceIteratorType sourceIter(resultImage, resultImage->GetLargestPossibleRegion());
-//    sourceIter.GoToBegin();
-
-//    TargetIteratorType targetIter(itkImage, itkImage->GetLargestPossibleRegion());
-//    targetIter.GoToBegin();
-
-//    int activeLabel = GetActiveLabel(GetActiveLayer())->GetValue();
-
-//    while (!sourceIter.IsAtEnd())
-//    {
-//      int sourceValue = static_cast<int>(sourceIter.Get());
-//      int targetValue = static_cast<int>(targetIter.Get());
-
-//      if ((sourceValue != 0) && (forceOverwrite || !this->GetLabel(targetValue)->GetLocked())) // skip exterior and locked labels
-//      {
-//        targetIter.Set(activeLabel);
-//      }
-//      ++sourceIter;
-//      ++targetIter;
-//    }
-//  }
-//  catch (itk::ExceptionObject& e)
-//  {
-//    mitkThrow() << e.GetDescription();
-//  }
-//  this->Modified();
-//}
 
 void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
 {
@@ -641,10 +523,21 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
     memset(accessor->GetData(), 0, byteSize);
     delete accessor;
 
-    mitk::SlicedGeometry3D::Pointer geometry = image->GetSlicedGeometry()->Clone();
-    this->SetGeometry(geometry);
+    auto geometry = image->GetTimeGeometry()->Clone();
+    this->SetTimeGeometry(geometry);
 
-    AccessTwoImagesFixedDimensionByItk(this, image, InitializeByLabeledImageProcessing, 3);
+    if (image->GetDimension() == 3)
+    {
+      AccessTwoImagesFixedDimensionByItk(this, image, InitializeByLabeledImageProcessing, 3);
+    }
+    else if (image->GetDimension() == 4)
+    {
+      AccessTwoImagesFixedDimensionByItk(this, image, InitializeByLabeledImageProcessing, 4);
+    }
+    else
+    {
+      mitkThrow() << image->GetDimension() << "-dimensional label set images not yet supported";
+    }
   }
   catch (...)
   {
@@ -653,18 +546,16 @@ void mitk::LabelSetImage::InitializeByLabeledImage(mitk::Image::Pointer image)
   this->Modified();
 }
 
-template < typename ImageType1, typename ImageType2 >
-void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output, ImageType2* input)
+template <typename LabelSetImageType, typename ImageType>
+void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType* labelSetImage, ImageType* image)
 {
-  typedef itk::ImageRegionConstIterator< ImageType2 > SourceIteratorType;
-  typedef itk::ImageRegionIterator< ImageType1 > TargetIteratorType;
-  //  typedef itk::RelabelComponentImageFilter<ImageType2, ImageType2> FilterType;
+  typedef itk::ImageRegionConstIteratorWithIndex<ImageType> SourceIteratorType;
+  typedef itk::ImageRegionIterator<LabelSetImageType> TargetIteratorType;
 
-  TargetIteratorType targetIter(output, output->GetLargestPossibleRegion());
+  TargetIteratorType targetIter(labelSetImage, labelSetImage->GetRequestedRegion());
   targetIter.GoToBegin();
 
-  //SourceIteratorType sourceIter( relabelFilter->GetOutput(), relabelFilter->GetOutput()->GetLargestPossibleRegion() );
-  SourceIteratorType sourceIter(input, input->GetLargestPossibleRegion());
+  SourceIteratorType sourceIter(image, image->GetRequestedRegion());
   sourceIter.GoToBegin();
 
   while (!sourceIter.IsAtEnd())
@@ -672,28 +563,29 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(ImageType1* output,
     PixelType sourceValue = static_cast<PixelType>(sourceIter.Get());
     targetIter.Set(sourceValue);
 
-    if (!ExistLabel(sourceValue))
+    if (!this->ExistLabel(sourceValue))
     {
       std::stringstream name;
       name << "object-" << sourceValue;
-      mitk::Label::Pointer label = mitk::Label::New();
-      label->SetName(name.str().c_str());
+
       double rgba[4];
-      m_LabelSetContainer[GetActiveLayer()]->GetLookupTable()->GetTableValue(sourceValue, rgba);
-      mitk::Color newColor;
-      newColor.SetRed(rgba[0]);
-      newColor.SetGreen(rgba[1]);
-      newColor.SetBlue(rgba[2]);
-      label->SetColor(newColor);
+      m_LabelSetContainer[this->GetActiveLayer()]->GetLookupTable()->GetTableValue(sourceValue, rgba);
+
+      mitk::Color color;
+      color.SetRed(rgba[0]);
+      color.SetGreen(rgba[1]);
+      color.SetBlue(rgba[2]);
+
+      auto label = mitk::Label::New();
+      label->SetName(name.str().c_str());
+      label->SetColor(color);
       label->SetOpacity(rgba[3]);
       label->SetValue(sourceValue);
 
-      GetLabelSet()->AddLabel(label);
+      this->GetLabelSet()->AddLabel(label);
 
       if (GetActiveLabelSet()->GetNumberOfLabels() >= mitk::Label::MAX_LABEL_VALUE || sourceValue >= mitk::Label::MAX_LABEL_VALUE)
-      {
-        AddLayer();
-      }
+        this->AddLayer();
     }
 
     ++sourceIter;
@@ -799,7 +691,7 @@ void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType* itkImage, P
   }
 
   GetLabelSet(layer)->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
-  this->GetSlicedGeometry()->IndexToWorld(pos, pos);
+  this->GetSlicedGeometry()->IndexToWorld(pos, pos); // TODO: TimeGeometry?
   GetLabelSet(layer)->GetLabel(pixelValue)->SetCenterOfMassCoordinates(pos);
 }
 

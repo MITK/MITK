@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITK_MEASUREMENT_H__INCLUDED
 
 #include <QmitkAbstractView.h>
+#include <mitkEventConfig.h>
 #include <mitkILifecycleAwarePart.h>
+#include "usServiceRegistration.h"
 
 /// forward declarations
 struct QmitkMeasurementViewData;
@@ -57,34 +59,35 @@ class QmitkMeasurementView : public QmitkAbstractView
 
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
   protected slots:
-    ///# draw actions
-    void ActionDrawLineTriggered( bool checked = false );
-    void ActionDrawPathTriggered( bool checked = false );
-    void ActionDrawAngleTriggered( bool checked = false );
-    void ActionDrawFourPointAngleTriggered( bool checked = false );
-    void ActionDrawCircleTriggered( bool checked = false );
-    void ActionDrawEllipseTriggered( bool checked = false );
-    void ActionDrawDoubleEllipseTriggered( bool checked = false );
-    void ActionDrawRectangleTriggered( bool checked = false );
-    void ActionDrawPolygonTriggered( bool checked = false );
-    void ActionDrawBezierCurveTriggered( bool checked = false );
-    void ActionDrawSubdivisionPolygonTriggered( bool checked = false );
-    void CopyToClipboard( bool checked = false );
+    void OnDrawLineTriggered( bool checked = false );
+    void OnDrawPathTriggered( bool checked = false );
+    void OnDrawAngleTriggered( bool checked = false );
+    void OnDrawFourPointAngleTriggered( bool checked = false );
+    void OnDrawCircleTriggered( bool checked = false );
+    void OnDrawEllipseTriggered( bool checked = false );
+    void OnDrawDoubleEllipseTriggered( bool checked = false );
+    void OnDrawRectangleTriggered( bool checked = false );
+    void OnDrawPolygonTriggered( bool checked = false );
+    void OnDrawBezierCurveTriggered( bool checked = false );
+    void OnDrawSubdivisionPolygonTriggered( bool checked = false );
+    void OnCopyToClipboard( bool checked = false );
 
   private:
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
     void UpdateMeasurementText();
     void AddAllInteractors();
-    void RemoveAllInteractors();
     mitk::DataNode::Pointer DetectTopMostVisibleImage();
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
     void PlanarFigureInitialized();
-    void CheckForTopMostVisibleImage(mitk::DataNode* _NodeToNeglect=nullptr);
+    void CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglect = nullptr);
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;
+
+    // holds configuration objects that have been deactivated
+    std::map<us::ServiceReferenceU, mitk::EventConfig> m_DisplayInteractorConfigs;
 };
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if !defined(QmitkBasicImageProcessingView_H__INCLUDED)
 #define QmitkBasicImageProcessingView_H__INCLUDED
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_basicimageprocessing_Export.h>
 #include "ui_QmitkBasicImageProcessingViewControls.h"
 
@@ -47,7 +47,7 @@ time slider. The result is also a 3D image.
 \ingroup Bundles
 */
 
-class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QmitkFunctionality
+class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QmitkAbstractView
 {
   Q_OBJECT
 
@@ -68,17 +68,17 @@ public:
   */
   virtual void CreateQtPartControl(QWidget *parent) override;
 
+  virtual void SetFocus() override;
+
   /*!
   \brief method for creating the connections of main and control widget
   */
   virtual void CreateConnections();
 
-  virtual void Activated() override;
-
   /*!
   \brief Invoked when the DataManager selection changed
   */
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 
   protected slots:

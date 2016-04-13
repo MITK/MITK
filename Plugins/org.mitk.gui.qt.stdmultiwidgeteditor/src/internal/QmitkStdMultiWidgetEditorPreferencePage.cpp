@@ -104,7 +104,7 @@ bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
   m_Preferences->Put("widget4 second background color", m_WidgetBackgroundColor2[3]);
   m_Preferences->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
 
-  m_Preferences->PutBool("Use constrained zooming and padding"
+  m_Preferences->PutBool("Use constrained zooming and panning"
                          , m_Ui->m_EnableFlexibleZooming->isChecked());
   m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
   m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
@@ -153,7 +153,7 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
 
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[index]);
 
-  m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and padding", true));
+  m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
   m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
   m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
   int mode= m_Preferences->GetInt("Rendering Mode",0);

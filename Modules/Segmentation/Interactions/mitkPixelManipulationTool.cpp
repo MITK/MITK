@@ -41,6 +41,8 @@ mitk::PixelManipulationTool::~PixelManipulationTool()
 
 void mitk::PixelManipulationTool::Activated()
 {
+  Superclass::Activated();
+
   m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::PixelManipulationTool> (this,&mitk::PixelManipulationTool::OnRoiDataChanged);
   m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
 
@@ -60,6 +62,7 @@ void mitk::PixelManipulationTool::Deactivated()
 {
   m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::PixelManipulationTool> (this,&mitk::PixelManipulationTool::OnRoiDataChanged);
 
+  Superclass::Deactivated();
 }
 
 const char* mitk::PixelManipulationTool::GetName() const

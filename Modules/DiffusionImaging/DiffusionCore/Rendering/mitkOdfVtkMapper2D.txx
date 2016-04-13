@@ -52,7 +52,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkFloatArray.h"
 #include "vtkDelaunay2D.h"
 #include "vtkMapper.h"
-
+#include <vtkInformationVector.h>
+#include <vtkInformation.h>
 #include "vtkRenderer.h"
 
 #include "itkOrientationDistributionFunction.h"
@@ -64,6 +65,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+
+#include <ciso646>
+
 
 template<class T, int N>
 vtkSmartPointer<vtkTransform> mitk::OdfVtkMapper2D<T,N>::m_OdfTransform = vtkSmartPointer<vtkTransform>::New();
@@ -85,6 +89,18 @@ float mitk::OdfVtkMapper2D<T,N>::m_IndexParam1;
 
 template<class T, int N>
 float mitk::OdfVtkMapper2D<T,N>::m_IndexParam2;
+
+template<class T, int N>
+bool mitk::OdfVtkMapper2D<T, N>::m_toggleTensorEllipsoidView = false;
+
+template<class T, int N>
+bool mitk::OdfVtkMapper2D<T, N>::m_toggleColourisationMode = false;
+
+template<class T, int N>
+bool mitk::OdfVtkMapper2D<T, N>::m_toggleGlyphPlacementMode = true;
+
+template<class T, int N>
+vtkSmartPointer<vtkDoubleArray> mitk::OdfVtkMapper2D<T, N>::m_colourScalars = nullptr;
 
 #define ODF_MAPPER_PI M_PI
 
@@ -248,7 +264,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     typedef itk::OrientationDistributionFunction<float,N> OdfType;
     OdfType odf;
 
-    if(odfvals->GetNumberOfComponents()==6)
+    if( odfvals->GetNumberOfComponents()==6 and not m_toggleTensorEllipsoidView )
     {
         float tensorelems[6] = {
             (float)odfvals->GetComponent(id,0),
@@ -260,7 +276,97 @@ void  mitk::OdfVtkMapper2D<T,N>
         };
         itk::DiffusionTensor3D<float> tensor(tensorelems);
         odf.InitFromTensor(tensor);
+
+        if( (pfilter-> GetColorMode()) == 0 ) // m_ColourisationMode; VTK_COLOR_BY_INPUT=0, VTK_COLOR_BY_SOURCE=1.
+        { /// \brief Colourisation of glyph like in MitkWorkbench's dti visualisation, r,g,b,a=x,y,z,fa of main direction of diffusion.
+//          unsigned char rgba[4] = {0,0,0,0};
+          double rgba[4] = {0,0,0,0};
+          rgba[3] = fabs(tensor.GetFractionalAnisotropy()); //* 255); // fa = FractionalAnisotropy => Helligkeit = Value, and alpha.
+          typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
+          typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
+          tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // normalized eigenvectors as rows in ascending order.
+          rgba[0] = (fabs( eigenVectors(2, 0) ) * rgba[3]);
+          rgba[1] = (fabs( eigenVectors(2, 1) ) * rgba[3]);
+          rgba[2] = (fabs( eigenVectors(2, 2) ) * rgba[3]);
+//#define __IMG_DAT_ITEM__CLIP_00_FF__(val) (val) = ( (val) < 0 ) ? ( 0 ) : ( ( (val) > 255 ) ? ( 255 ) : ( (val) ) );
+#define __IMG_DAT_ITEM__CLIP_0_1__(val) (val) = ( (val) < 0.0 ) ? ( 0.0 ) : ( ( (val) > 1.0 ) ? ( 1.0 ) : ( (val) ) );
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[0]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[1]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[2]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[3]);
+          m_colourScalars-> InsertNextTuple4( rgba[0], rgba[1], rgba[2], rgba[3] ); // Allocates space automaticaly.
+
+          data-> AddArray( m_colourScalars );
+          data-> SetActiveScalars( "GLYPH_COLORS" );
+        }
+        else
+        {
+          data-> SetActiveScalars( "vector" );
+          data-> RemoveArray( "GLYPH_COLORS" );
+        }
     }
+
+    else if( odfvals->GetNumberOfComponents()==6 and m_toggleTensorEllipsoidView )
+    {
+      float tensorElements[6] = {
+          (float)odfvals->GetComponent(id, 0), (float)odfvals->GetComponent(id, 1), (float)odfvals->GetComponent(id, 2),
+          (float)odfvals->GetComponent(id, 3), (float)odfvals->GetComponent(id, 4), (float)odfvals->GetComponent(id, 5),
+      };
+      itk::DiffusionTensor3D<float> tensor( tensorElements );
+      odf.InitFromEllipsoid( tensor );
+
+      if( (pfilter-> GetColorMode()) == 0 ) // m_ColourisationMode; VTK_COLOR_BY_INPUT=0, VTK_COLOR_BY_SOURCE=1.
+      { /// \brief Colourisation of glyph like in MitkWorkbench's dti visualisation, r,g,b,a=x,y,z,fa of main direction of diffusion.
+        double rgba[4] = {0,0,0,0};
+        rgba[3] = fabs( tensor.GetFractionalAnisotropy()); // * 255 ); // fa = FractionalAnisotropy => Helligkeit = Value
+        typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
+        typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
+        tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // normalized eigenvectors as rows in ascending order.
+        rgba[0] = (fabs( eigenVectors(2, 0) ) * rgba[3]);
+        rgba[1] = (fabs( eigenVectors(2, 1) ) * rgba[3]);
+        rgba[2] = (fabs( eigenVectors(2, 2) ) * rgba[3]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[0]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[1]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[2]);
+        __IMG_DAT_ITEM__CLIP_0_1__(rgba[3]);
+
+        m_colourScalars-> InsertNextTuple4( rgba[0], rgba[1], rgba[2], rgba[3] );
+        data-> CopyScalarsOn();
+        data-> SetCopyAttribute(id, 1);
+        data-> SetCopyScalars(id);
+        data-> CopyAllOn();
+        data-> SetDebug('1');
+
+        pfilter-> DebugOn();
+        pfilter-> GetOutput()-> DebugOn();
+        pfilter-> GetOutput()-> GetPointData()-> CopyScalarsOn();
+
+        data-> AddArray( m_colourScalars );
+        data-> SetActiveScalars( "GLYPH_COLORS" );
+
+#ifndef NDEBUG
+        {
+          vtkIndent indent;
+          std::cout << "<data>\n";
+          data-> PrintSelf(std::cout, indent.GetNextIndent());
+          std::cout << "</data>\n<pfilter>\n";
+          pfilter-> PrintSelf(std::cout, indent.GetNextIndent());
+          std::cout << pfilter->GetOutput()->GetClassName() << "\n";
+          pfilter-> GetOutput()-> PrintSelf(std::cout, indent.GetNextIndent());
+          pfilter-> GetOutput()->GetPointData()-> PrintSelf(std::cout, indent.GetNextIndent());
+          pfilter-> GetOutput()->GetPointData()->GetScalars()-> PrintSelf(std::cout, indent.GetNextIndent());
+          std::cout << "</pfilter>";
+        }
+#endif
+
+      }
+      else
+      {
+        data-> SetActiveScalars( "vector" );
+        data-> RemoveArray( "GLYPH_COLORS" );
+      }
+    }
+
     else
     {
         for(int i=0; i<N; i++)
@@ -299,9 +405,12 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
     vnl2vtk( point.GetVnlVector(), vp );
     vnl2vtk( normal.GetVnlVector(), vnormal );
 
-    mitk::DisplayGeometry::Pointer dispGeometry = renderer->GetDisplayGeometry();
-    mitk::Vector2D size = dispGeometry->GetSizeInMM();
-    mitk::Vector2D origin = dispGeometry->GetOriginInMM();
+  Point2D dispSizeInMM = renderer->GetViewportSizeInMM();
+
+  Point2D displayGeometryOriginInMM = renderer->GetOriginInMM();
+
+  mitk::Vector2D size = dispSizeInMM.GetVectorFromOrigin();
+  mitk::Vector2D origin = displayGeometryOriginInMM.GetVectorFromOrigin();
 
     //
     //  |------O------|
@@ -327,15 +436,15 @@ typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry mitk::OdfVtkMapper2D<T,N>
     mitk::Point2D point1;
     point1[0] = M[0]; point1[1] = M[1];
     mitk::Point3D M3D;
-    dispGeometry->Map(point1, M3D);
+    renderer->GetCurrentWorldPlaneGeometry()->Map(point1, M3D);
 
     point1[0] = L[0]; point1[1] = L[1];
     mitk::Point3D L3D;
-    dispGeometry->Map(point1, L3D);
+    renderer->GetCurrentWorldPlaneGeometry()->Map(point1, L3D);
 
     point1[0] = O[0]; point1[1] = O[1];
     mitk::Point3D O3D;
-    dispGeometry->Map(point1, O3D);
+    renderer->GetCurrentWorldPlaneGeometry()->Map(point1, O3D);
 
     double d1 = sqrt((M3D[0]-L3D[0])*(M3D[0]-L3D[0])
                      + (M3D[1]-L3D[1])*(M3D[1]-L3D[1])
@@ -490,7 +599,9 @@ void  mitk::OdfVtkMapper2D<T,N>
         int tuples = m_VtkImage->GetPointData()->GetScalars()->GetNumberOfTuples();
         pointdata->SetNumberOfTuples(tuples);
         for(int i=0; i<tuples; i++)
-            pointdata->SetTuple(i,m_VtkImage->GetPointData()->GetScalars()->GetTuple(i));
+        {
+          pointdata->SetTuple( i, m_VtkImage->GetPointData()->GetScalars()->GetTuple(i) );
+        }
         pointdata->SetName( "vector" );
         cuttedPlane->GetPointData()->AddArray(pointdata);
 
@@ -597,18 +708,34 @@ void  mitk::OdfVtkMapper2D<T,N>
 
             vtkSmartPointer<vtkMaskedProgrammableGlyphFilter> glyphGenerator = vtkSmartPointer<vtkMaskedProgrammableGlyphFilter>::New();
             glyphGenerator->SetMaximumNumberOfPoints(std::min(m_ShowMaxNumber,(int)cuttedPlane->GetNumberOfPoints()));
-            glyphGenerator->SetRandomMode(1);
+
+            glyphGenerator->SetRandomMode( m_toggleGlyphPlacementMode );
+
             glyphGenerator->SetUseMaskPoints(1);
             glyphGenerator->SetSourceConnection(trans->GetOutputPort() );
             glyphGenerator->SetInput(cuttedPlane);
-            glyphGenerator->SetColorModeToColorBySource();
-            glyphGenerator->SetInputArrayToProcess(0,0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
+
+            if( not m_toggleColourisationMode )
+            {
+              glyphGenerator-> SetColorModeToColorBySource();
+              glyphGenerator-> SetInputArrayToProcess(0,0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
+              if(m_colourScalars != nullptr) { m_colourScalars-> Initialize(); }
+            }
+            else if ( m_toggleColourisationMode )
+            {
+              m_colourScalars = vtkSmartPointer<vtkDoubleArray>::New();
+              m_colourScalars-> SetNumberOfComponents( 4 ); // red, green, blue and alpha are the 4 components per tuple.
+              m_colourScalars-> SetName( "GLYPH_COLORS" );
+              glyphGenerator-> SetColorModeToColorByInput();
+              glyphGenerator-> SetInputArrayToProcess(0,0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "GLYPH_COLORS");
+            }
+
             glyphGenerator->SetGeometry(this->GetDataNode()->GetData()->GetGeometry());
             glyphGenerator->SetGlyphMethod(&(GlyphMethod),(void *)glyphGenerator);
 
             try
             {
-                glyphGenerator->Update();
+              glyphGenerator->Update();
             }
             catch( itk::ExceptionObject& err )
             {
@@ -616,13 +743,14 @@ void  mitk::OdfVtkMapper2D<T,N>
             }
 
             localStorage->m_OdfsPlanes[index]->AddInputConnection(glyphGenerator->GetOutputPort());
-
             localStorage->m_OdfsPlanes[index]->Update();
         }
     }
     localStorage->m_PropAssemblies[index]->VisibilityOn();
     if(localStorage->m_PropAssemblies[index]->GetParts()->IsItemPresent(localStorage->m_OdfsActors[index]))
-        localStorage->m_PropAssemblies[index]->RemovePart(localStorage->m_OdfsActors[index]);
+    {
+      localStorage->m_PropAssemblies[index]->RemovePart(localStorage->m_OdfsActors[index]);
+    }
     localStorage->m_OdfsMappers[index]->SetInputData(localStorage->m_OdfsPlanes[index]->GetOutput());
     localStorage->m_PropAssemblies[index]->AddPart(localStorage->m_OdfsActors[index]);
 }
@@ -760,7 +888,9 @@ void  mitk::OdfVtkMapper2D<T,N>
       && (localStorage->m_LastUpdateTime >= m_DataNode->GetPropertyList()->GetMTime()) //was a property modified?
       && (localStorage->m_LastUpdateTime >= m_DataNode->GetPropertyList(renderer)->GetMTime())
       && dispGeo.Equals(m_LastDisplayGeometry))
-        return;
+    {
+      return;
+    }
 
     localStorage->m_LastUpdateTime.Modified();
 
@@ -772,14 +902,34 @@ void  mitk::OdfVtkMapper2D<T,N>
     }
     else
     {
-        localStorage->m_OdfsActors[0]->VisibilityOn();
-        localStorage->m_OdfsActors[1]->VisibilityOn();
-        localStorage->m_OdfsActors[2]->VisibilityOn();
+      localStorage->m_OdfsActors[0]->VisibilityOn();
+      localStorage->m_OdfsActors[1]->VisibilityOn();
+      localStorage->m_OdfsActors[2]->VisibilityOn();
 
-        m_OdfSource->SetAdditionalScale(GetMinImageSpacing(GetIndex(renderer)));
-        ApplyPropertySettings();
-        Slice(renderer, dispGeo);
-        m_LastDisplayGeometry = dispGeo;
+      m_OdfSource->SetAdditionalScale(GetMinImageSpacing(GetIndex(renderer)));
+      ApplyPropertySettings();
+
+      for(unsigned iter=0; iter<3; ++iter)
+      {
+        if( m_toggleColourisationMode == true )
+        {
+          localStorage-> m_OdfsMappers[iter]-> SetColorModeToDirectScalars();
+          localStorage-> m_OdfsMappers[iter]-> SelectColorArray("GLYPH_COLORS");
+          localStorage-> m_OdfsMappers[iter]-> ScalarVisibilityOn();
+          localStorage-> m_OdfsMappers[iter]-> SetScalarMode(3); // 0=Default, 1=UsePointData, 2=UseCellData, _3=UsePointFieldData_
+          // 4=UseCellFieldData, 5=UseFieldData, rot oder weiss, manchmal schwarz danach ?... double [0;1] statt char [0;255] ?
+        }
+        else if ( m_toggleColourisationMode == false )
+        {
+          localStorage-> m_OdfsMappers[iter]-> SetColorModeToDefault();
+          localStorage-> m_OdfsMappers[iter]-> SelectColorArray("vector");
+          localStorage-> m_OdfsMappers[iter]-> ScalarVisibilityOn();
+          localStorage-> m_OdfsMappers[iter]-> SetScalarMode(0); // 0=Default
+        }
+      }
+
+      Slice(renderer, dispGeo);
+      m_LastDisplayGeometry = dispGeo;
     }
 }
 
@@ -825,6 +975,10 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     this->GetDataNode()->GetFloatProperty( "IndexParam1", m_IndexParam1);
     this->GetDataNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
+
+    this-> GetDataNode()-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", m_toggleTensorEllipsoidView );
+    this-> GetDataNode()-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", m_toggleColourisationMode );
+    this-> GetDataNode()-> GetBoolProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", m_toggleGlyphPlacementMode);
 }
 
 template <class T, int N>
@@ -847,7 +1001,7 @@ bool mitk::OdfVtkMapper2D<T,N>
     imageNormal1.Normalize();
     imageNormal2.Normalize();
 
-    double eps = 0.000001;
+    double eps = 0.000001; // Did you mean: std::numeric_limits<T>::epsilon(); ?
     int test = 0;
     if( fabs(fabs(dot_product(normal.GetVnlVector(),imageNormal0.GetVnlVector()))-1) > eps )
         test++;
@@ -874,8 +1028,11 @@ void  mitk::OdfVtkMapper2D<T,N>
     node->SetProperty( "VisibleOdfs_T", mitk::BoolProperty::New( false ) );
     node->SetProperty( "VisibleOdfs_C", mitk::BoolProperty::New( false ) );
     node->SetProperty( "VisibleOdfs_S", mitk::BoolProperty::New( false ) );
-    node->SetProperty ("layer", mitk::IntProperty::New(100));
+    node->SetProperty( "layer", mitk::IntProperty::New(100));
     node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
+    node-> AddProperty( "DiffusionCore.Rendering.OdfVtkMapper.SwitchTensorView", mitk::BoolProperty::New( false) );
+    node-> AddProperty( "DiffusionCore.Rendering.OdfVtkMapper.ColourisationModeBit", mitk::BoolProperty::New( false ) );
+    node-> AddProperty( "DiffusionCore.Rendering.OdfVtkMapper.RandomModeBit", mitk::BoolProperty::New( true ) );
 }
 
 #endif // __mitkOdfVtkMapper2D_txx__

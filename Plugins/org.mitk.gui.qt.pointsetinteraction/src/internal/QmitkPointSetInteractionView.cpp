@@ -116,7 +116,10 @@ void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode
   else
   {
     m_Controls->m_CurrentPointSetLabel->setText("None");
-    m_Controls->m_PointListWidget->SetPointSetNode(0);
+    m_Controls->m_PointListWidget->SetPointSetNode(nullptr);
+    std::vector<mitk::DataNode*> emptyList;
+    emptyList.push_back(nullptr);
+    this->FireNodesSelected( emptyList );
   }
 
 }

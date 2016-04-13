@@ -1,6 +1,7 @@
 SET(CPP_FILES
   QmitkCustomWidgetOverlay.cpp
   QmitkOverlay.cpp
+  QmitkOverlayContainerWidget.cpp
   QmitkOverlayController.cpp
   QmitkScalarBar.cpp
   QmitkScalarBarOverlay.cpp

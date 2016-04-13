@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define BERRYIPERSISTABLE_H
 
 #include <org_blueberry_ui_qt_Export.h>
-
 #include <berrySmartPointer.h>
 
 namespace berry {
@@ -44,4 +43,3 @@ struct BERRY_UI_QT IPersistable
 }
 
 #endif // BERRYIPERSISTABLE_H
-

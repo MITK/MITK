@@ -223,4 +223,8 @@ Instances of mitk::Dispatcher receive all events and distribute them to their re
 the DataInteractors according to the layer of their
 mitk::DataNode in descending order. Then the event is offered to the first mitk::DataInteractor, which in turn checks if it can handle the event. This is done
 for each mitk::DataInteractor until the first processes the event, after this the other DataInteractors are skipped and all InteractionEventObservers are notified.
+
+\section DataInteractionPage_Examples Examples
+
+Examples can be found at \subpage InteractionHowTo
  */

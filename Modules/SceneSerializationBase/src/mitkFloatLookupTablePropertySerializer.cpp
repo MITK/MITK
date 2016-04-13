@@ -18,8 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkFloatLookupTablePropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
+#include <mitkLocaleSwitch.h>
 #include "mitkProperties.h"
+#include <boost/lexical_cast.hpp>
 
 namespace mitk
 {
@@ -37,6 +38,9 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
       const FloatLookupTableProperty* prop = dynamic_cast<const FloatLookupTableProperty*>(m_Property.GetPointer());
       if (prop == nullptr)
         return nullptr;
+
+      LocaleSwitch localeSwitch("C");
+
       FloatLookupTable lut = prop->GetValue();
       //if (lut.IsNull())
       //  return NULL; // really?
@@ -47,7 +51,7 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
         {
           auto  tableEntry = new TiXmlElement("LUTValue");
           tableEntry->SetAttribute("id", it->first);
-          tableEntry->SetDoubleAttribute("value", static_cast<double>(it->second));
+          tableEntry->SetAttribute("value", boost::lexical_cast<std::string>(it->second));
           element->LinkEndChild( tableEntry );
         }
         return element;
@@ -58,19 +62,28 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
       if (!element)
         return nullptr;
 
+      LocaleSwitch localeSwitch("C");
+
       FloatLookupTable lut;
       for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))
       {
 
         int tempID;
-        if (child->QueryIntAttribute("id", &tempID) == TIXML_WRONG_TYPE)
-          return nullptr; // TODO: can we do a better error handling?
+        if (child->QueryIntAttribute("id", &tempID) != TIXML_SUCCESS)
+          return nullptr;
         FloatLookupTable::IdentifierType id = static_cast<FloatLookupTable::IdentifierType>(tempID);
-        float tempVal = -1.0;
-        if (child->QueryFloatAttribute("value", &tempVal) == TIXML_WRONG_TYPE)
-          return nullptr; // TODO: can we do a better error handling?
-        FloatLookupTable::ValueType val = static_cast<FloatLookupTable::ValueType>(tempVal);
-        lut.SetTableValue(id, val);
+        std::string value_string;
+        if (child->QueryStringAttribute("value", &value_string) != TIXML_SUCCESS)
+          return nullptr;
+        try
+        {
+          lut.SetTableValue(id, boost::lexical_cast<float>(value_string));
+        }
+        catch (boost::bad_lexical_cast& e)
+        {
+          MITK_ERROR << "Could not parse string as number: " << e.what();
+          return nullptr;
+        }
       }
       return FloatLookupTableProperty::New(lut).GetPointer();
     }

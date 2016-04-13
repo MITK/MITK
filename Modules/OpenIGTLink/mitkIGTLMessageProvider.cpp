@@ -42,22 +42,52 @@ mitk::IGTLMessageProvider::IGTLMessageProvider()
   : mitk::IGTLDeviceSource()
 {
   this->SetName("IGTLMessageProvider");
-  m_MultiThreader = itk::MultiThreader::New();
+  //m_MultiThreader = itk::MultiThreader::New();
   m_StreamingTimeMutex = itk::FastMutexLock::New();
-  m_StopStreamingThreadMutex = itk::FastMutexLock::New();
-  m_ThreadId = 0;
+  //m_StopStreamingThreadMutex = itk::FastMutexLock::New();
+  //m_ThreadId = 0;
   m_IsStreaming = false;
+
+  // Create a command object. The function will be called later from the main thread
+  this->m_StopStreamingCommand = ProviderCommand::New();
+  m_StopStreamingCommand->SetCallbackFunction(this,
+    &mitk::IGTLMessageProvider::InvokeStopStreamingEvent);
+
+  this->m_StreamingCommand = ProviderCommand::New();
+  m_StreamingCommand->SetCallbackFunction(this,
+    &mitk::IGTLMessageProvider::InvokeStartStreamingEvent);
 }
 
 mitk::IGTLMessageProvider::~IGTLMessageProvider()
 {
-  // terminate worker thread on destruction
-  this->m_StopStreamingThreadMutex->Lock();
-  this->m_StopStreamingThread = true;
-  this->m_StopStreamingThreadMutex->Unlock();
-  if ( m_ThreadId >= 0)
+  //// terminate worker thread on destruction
+  //this->m_StopStreamingThreadMutex->Lock();
+  //this->m_StopStreamingThread = true;
+  //this->m_StopStreamingThreadMutex->Unlock();
+  //if ( m_ThreadId >= 0)
+  //{
+  //  this->m_MultiThreader->TerminateThread(m_ThreadId);
+  //}
+   this->InvokeEvent(StreamingStartRequiredEvent());
+}
+
+void mitk::IGTLMessageProvider::Update()
+{
+
+  Superclass::Update();
+
+  if (this->GetInput() != nullptr)
   {
-    this->m_MultiThreader->TerminateThread(m_ThreadId);
+    igtl::MessageBase::Pointer curMessage = this->GetInput()->GetMessage();
+    if (dynamic_cast<igtl::TrackingDataMessage*>(curMessage.GetPointer()) != nullptr)
+    {
+      igtl::TrackingDataMessage* tdMsg =
+        (igtl::TrackingDataMessage*)(curMessage.GetPointer());
+      igtl::TrackingDataElement::Pointer trackingData = igtl::TrackingDataElement::New();
+      tdMsg->GetTrackingDataElement(0, trackingData);
+      float x_pos, y_pos, z_pos;
+      trackingData->GetPosition(&x_pos, &y_pos, &z_pos);
+    }
   }
 }
 
@@ -122,6 +152,16 @@ void mitk::IGTLMessageProvider::CreateOutputs()
 void mitk::IGTLMessageProvider::OnIncomingMessage()
 {
 
+}
+
+void mitk::IGTLMessageProvider::OnLostConnection()
+{
+  //in case the provider is streaming at the moment we have to stop it
+  if (m_IsStreaming)
+  {
+    MITK_DEBUG("IGTLMessageProvider") << "lost connection, stop streaming";
+    this->StopStreamingOfAllSources();
+  }
 }
 
 std::string RemoveRequestPrefixes(std::string requestType)
@@ -234,18 +274,16 @@ void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
     this->m_StreamingTime = 1.0 / (double) fps * 1000.0;
     this->m_StreamingTimeMutex->Unlock();
 
-    // Create a command object. The function will be called later from the
-    // main thread
-    this->m_StreamingCommand = ProviderCommand::New();
-    m_StreamingCommand->SetCallbackFunction(this,
-        &mitk::IGTLMessageProvider::Update);
+    //// For streaming we need a continues time signal, since there is no timer
+    //// available we start a thread that generates a timing signal
+    //// This signal is invoked from the other thread the update of the pipeline
+    //// has to be executed from the main thread. Thus, we use the
+    //// callbackfromGUIThread class to pass the execution to the main thread
+    //this->m_ThreadId = m_MultiThreader->SpawnThread(this->TimerThread, this);
 
-    // For streaming we need a continues time signal, since there is no timer
-    // available we start a thread that generates a timing signal
-    // This signal is invoked from the other thread the update of the pipeline
-    // has to be executed from the main thread. Thus, we use the
-    // callbackfromGUIThread class to pass the execution to the main thread
-    this->m_ThreadId = m_MultiThreader->SpawnThread(this->TimerThread, this);
+    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+          this->m_StreamingCommand);
+
     this->m_IsStreaming = true;
   }
   else
@@ -255,15 +293,39 @@ void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
   }
 }
 
+void mitk::IGTLMessageProvider::InvokeStartStreamingEvent()
+{
+  this->InvokeEvent(StreamingStartRequiredEvent());
+}
+
+void mitk::IGTLMessageProvider::InvokeStopStreamingEvent()
+{
+  this->InvokeEvent(StreamingStopRequiredEvent());
+}
+
 void mitk::IGTLMessageProvider::StopStreamingOfSource(IGTLMessageSource* src)
 {
   //this is something bad!!! The streaming thread has to be stopped before the
   //source is disconnected otherwise it can cause a crash. This has to be added!!
   this->DisconnectFrom(src);
 
-  this->m_StopStreamingThreadMutex->Lock();
-  this->m_StopStreamingThread = true;
-  this->m_StopStreamingThreadMutex->Unlock();
+  //this->m_StopStreamingThreadMutex->Lock();
+  //this->m_StopStreamingThread = true;
+  //this->m_StopStreamingThreadMutex->Unlock();
+
+  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+    this->m_StopStreamingCommand);
+
+  //does this flag needs a mutex???
+  this->m_IsStreaming = false;
+}
+
+void mitk::IGTLMessageProvider::StopStreamingOfAllSources()
+{
+  // \todo remove all inputs
+
+  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+    this->m_StopStreamingCommand);
 
   //does this flag needs a mutex???
   this->m_IsStreaming = false;
@@ -322,53 +384,53 @@ mitk::IGTLMessageProvider::DisconnectFrom( mitk::IGTLMessageSource* UpstreamFilt
   }
 }
 
-ITK_THREAD_RETURN_TYPE mitk::IGTLMessageProvider::TimerThread(void* pInfoStruct)
-{
-  // extract this pointer from thread info structure
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
-      (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::IGTLMessageProvider* thisObject =
-      static_cast<mitk::IGTLMessageProvider*>(pInfo->UserData);
-
-  itk::SimpleMutexLock mutex;
-  mutex.Lock();
-
-  thisObject->m_StopStreamingThreadMutex->Lock();
-  thisObject->m_StopStreamingThread = false;
-  thisObject->m_StopStreamingThreadMutex->Unlock();
-
-  thisObject->m_StreamingTimeMutex->Lock();
-  unsigned int waitingTime = thisObject->m_StreamingTime;
-  thisObject->m_StreamingTimeMutex->Unlock();
-
-  while (true)
-  {
-    thisObject->m_StopStreamingThreadMutex->Lock();
-    bool stopThread = thisObject->m_StopStreamingThread;
-    thisObject->m_StopStreamingThreadMutex->Unlock();
-
-    if (stopThread)
-    {
-      break;
-    }
-
-    //wait for the time given
-    //I know it is not the nicest solution but we just need an approximate time
-    //sleeps for 20 ms
-    #if defined (WIN32) || defined (_WIN32)
-    Sleep(waitingTime);
-    #else
-    usleep(waitingTime * 1000);
-    #endif
-
-    // Ask to execute that command from the GUI thread
-    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
-          thisObject->m_StreamingCommand);
-  }
-
-  thisObject->m_ThreadId = 0;
-
-  mutex.Unlock();
-
-  return ITK_THREAD_RETURN_VALUE;
-}
+//ITK_THREAD_RETURN_TYPE mitk::IGTLMessageProvider::TimerThread(void* pInfoStruct)
+//{
+//  // extract this pointer from thread info structure
+//  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
+//      (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+//  mitk::IGTLMessageProvider* thisObject =
+//      static_cast<mitk::IGTLMessageProvider*>(pInfo->UserData);
+//
+//  itk::SimpleMutexLock mutex;
+//  mutex.Lock();
+//
+//  thisObject->m_StopStreamingThreadMutex->Lock();
+//  thisObject->m_StopStreamingThread = false;
+//  thisObject->m_StopStreamingThreadMutex->Unlock();
+//
+//  thisObject->m_StreamingTimeMutex->Lock();
+//  unsigned int waitingTime = thisObject->m_StreamingTime;
+//  thisObject->m_StreamingTimeMutex->Unlock();
+//
+//  while (true)
+//  {
+//    thisObject->m_StopStreamingThreadMutex->Lock();
+//    bool stopThread = thisObject->m_StopStreamingThread;
+//    thisObject->m_StopStreamingThreadMutex->Unlock();
+//
+//    if (stopThread)
+//    {
+//      break;
+//    }
+//
+//    //wait for the time given
+//    //I know it is not the nicest solution but we just need an approximate time
+//    //sleeps for 20 ms
+//    #if defined (WIN32) || defined (_WIN32)
+//    Sleep(waitingTime);
+//    #else
+//    usleep(waitingTime * 1000);
+//    #endif
+//
+//    // Ask to execute that command from the GUI thread
+//    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(
+//          thisObject->m_StreamingCommand);
+//  }
+//
+//  thisObject->m_ThreadId = 0;
+//
+//  mutex.Unlock();
+//
+//  return ITK_THREAD_RETURN_VALUE;
+//}

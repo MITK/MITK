@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMSortByTag.h"
 
+#include "ofstd.h"
+
 mitk::DICOMSortByTag
 ::DICOMSortByTag(const DICOMTag& tag, DICOMSortCriterion::Pointer secondaryCriterion)
 :DICOMSortCriterion(secondaryCriterion)
@@ -98,8 +100,8 @@ mitk::DICOMSortByTag
   assert(left);
   assert(right);
 
-  std::string leftString = left->GetTagValueAsString(tag);
-  std::string rightString = right->GetTagValueAsString(tag);
+  const std::string leftString = left->GetTagValueAsString(tag);
+  const std::string rightString = right->GetTagValueAsString(tag);
 
   if (leftString != rightString)
   {
@@ -118,30 +120,30 @@ mitk::DICOMSortByTag
   assert(left);
   assert(right);
 
-  std::string leftString = left->GetTagValueAsString(tag);
-  std::string rightString = right->GetTagValueAsString(tag);
+  const std::string leftString = left->GetTagValueAsString(tag);
+  const std::string rightString = right->GetTagValueAsString(tag);
 
-  std::istringstream lefti(leftString);
-  std::istringstream righti(rightString);
+  double leftDouble( 0 );
+  double rightDouble( 0 );
 
-  double leftDouble(0);
-  double rightDouble(0);
-
-  if (    (lefti >> leftDouble) && (righti >> rightDouble)
-       && lefti.eof() && righti.eof() )
+  try
   {
-    if (leftDouble != rightDouble) // can we decide?
-    {
-      return leftDouble < rightDouble;
-    }
-    else // ask secondary criterion
-    {
-      return this->NextLevelIsLeftBeforeRight(left, right);
-    }
+    leftDouble = OFStandard::atof( leftString.c_str() );
+    rightDouble = OFStandard::atof( rightString.c_str() );
   }
-  else // no numerical conversion..
+  catch ( const std::exception& /*e*/ )
   {
     return this->StringCompare(left,right, tag); // fallback to string compare
+  }
+
+
+  if ( leftDouble != rightDouble ) // can we decide?
+  {
+    return leftDouble < rightDouble;
+  }
+  else // ask secondary criterion
+  {
+    return this->NextLevelIsLeftBeforeRight( left, right );
   }
 }
 
@@ -152,25 +154,23 @@ mitk::DICOMSortByTag
   assert(from);
   assert(to);
 
-  std::string fromString = from->GetTagValueAsString(m_Tag);
-  std::string toString = to->GetTagValueAsString(m_Tag);
-
-  std::istringstream fromi(fromString);
-  std::istringstream toi(toString);
+  const std::string fromString = from->GetTagValueAsString(m_Tag);
+  const std::string toString = to->GetTagValueAsString(m_Tag);
 
   double fromDouble(0);
   double toDouble(0);
 
-  if (    (fromi >> fromDouble) && (toi >> toDouble)
-       && fromi.eof() && toi.eof() )
+  try
   {
-    return toDouble - fromDouble;
+    fromDouble = OFStandard::atof( fromString.c_str() );
+    toDouble = OFStandard::atof( toString.c_str() );
   }
-  else
+  catch ( const std::exception& /*e*/ )
   {
     MITK_WARN << "NO NUMERIC DISTANCE between '" << fromString << "' and '" << toString << "'";
     return 0;
   }
 
+  return toDouble - fromDouble;
   // TODO second-level compare?
 }

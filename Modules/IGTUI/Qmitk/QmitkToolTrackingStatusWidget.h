@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <QVector>
 #include <QLabel>
+#include <usModuleContext.h>
 
 
 
@@ -107,6 +108,7 @@ public:
   void PreShowTools(mitk::NavigationToolStorage::Pointer toolStorage);
 
 
+  void OnServiceEvent(const us::ServiceEvent event);
 
 protected:
   void CreateConnections();
@@ -131,11 +133,14 @@ private:
 
   QmitkToolTrackingStatusWidget::Style m_Style;
 
+  mitk::NavigationToolStorage::Pointer m_previewToolStorage; ///>Tool Storage which is used for preview when tracking is not active...
+
   void RemoveGuiLabels();
 
   /** @brief Adds an empty label which tells the user that currently no tool is availiable. */
   void AddEmptyLabel();
 
+  us::ModuleContext* m_Context;
 
 };
 #endif // _QmitkToolTrackingStatusWidget_H_INCLUDED

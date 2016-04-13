@@ -90,6 +90,11 @@ namespace mitk {
         */
         void SetUseProgressBar(bool);
 
+
+        using itk::ProcessObject::SetInput;
+        virtual void SetInput( const mitk::Surface* surface );
+        virtual void SetInput( unsigned int idx, const mitk::Surface* surface );
+
         /**
           \brief Set the stepsize which the progress bar should proceed
 

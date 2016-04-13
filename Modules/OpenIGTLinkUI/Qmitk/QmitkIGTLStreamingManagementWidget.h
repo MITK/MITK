@@ -59,31 +59,11 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
     QmitkIGTLStreamingManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkIGTLStreamingManagementWidget();
 
-    /**
-    * \brief Is called when the current device received a message
-    */
-    void OnMessageReceived();
-
-    /**
-     * \brief Is called when the current device received a command
-    */
-    void OnCommandReceived();
-
-    /**
-     * \brief Is called when the current device lost a connection to one of its
-     * sockets
-    */
-    void OnLostConnection();
-
-    /**
-     * \brief Is called when the current device connected to another device
-    */
-    void OnNewConnection();
-
 
   protected slots:
     void OnStartStreaming();
     void OnStopStreaming();
+    void OnStreamingTimerTimeout();
 
     /** \brief Is called when a new source is selected.
      *  @param source the newly selected source
@@ -116,6 +96,37 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
   protected:
 
     /**
+    * \brief Is called when the current device received a message
+    */
+    void OnMessageReceived();
+
+    /**
+     * \brief Is called when the current device received a command
+    */
+    void OnCommandReceived();
+
+    /**
+     * \brief Is called when the current device lost a connection to one of its
+     * sockets
+    */
+    void OnLostConnection();
+
+    /**
+    * \brief Is called when the current device connected to another device
+    */
+    void OnNewConnection();
+
+    /**
+    * \brief Is called when provider requests the start of the streaming timer
+    */
+    void OnStartStreamingTimer();
+
+    /**
+    * \brief Is called when provider requests the stop of the streaming timer
+    */
+    void OnStopStreamingTimer();
+
+    /**
      * \brief Calls AdaptGUIToState()
      */
     void OnDeviceStateChanged();
@@ -142,11 +153,16 @@ class MITKOPENIGTLINKUI_EXPORT QmitkIGTLStreamingManagementWidget : public QWidg
     /** @brief flag to indicate if the IGTL device is a client or a server */
     bool m_IsClient;
 
+    /** @brief the streaming timer that periodically calls the update method of the provider */
+    QTimer m_StreamingTimer;
+
     unsigned long m_MessageReceivedObserverTag;
     unsigned long m_CommandReceivedObserverTag;
     unsigned long m_LostConnectionObserverTag;
     unsigned long m_NewConnectionObserverTag;
     unsigned long m_StateModifiedObserverTag;
+    unsigned long m_StartStreamingTimerObserverTag;
+    unsigned long m_StopStreamingTimerObserverTag;
 
     //############## private help methods #######################
     void DisableSourceControls();

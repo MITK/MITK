@@ -29,8 +29,7 @@ const QString QmitkDicomBrowser::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
 
 
 QmitkDicomBrowser::QmitkDicomBrowser()
-: m_Thread(new QThread())
-, m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
+: m_DicomDirectoryListener(new QmitkDicomDirectoryListener())
 , m_StoreSCPLauncher(new QmitkStoreSCPLauncher(&m_Builder))
 , m_Publisher(new QmitkDicomDataEventPublisher())
 {
@@ -38,8 +37,6 @@ QmitkDicomBrowser::QmitkDicomBrowser()
 
 QmitkDicomBrowser::~QmitkDicomBrowser()
 {
-    m_Thread.quit();
-    m_Thread.wait(1000);
     delete m_DicomDirectoryListener;
     delete m_StoreSCPLauncher;
     delete m_Handler;
@@ -59,7 +56,7 @@ void QmitkDicomBrowser::CreateQtPartControl(QWidget *parent )
     CreateTemporaryDirectory();
     StartDicomDirectoryListener();
 
-    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(false);
+    m_Controls.m_ctkDICOMQueryRetrieveWidget->useProgressDialog(true);
 
     connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnTabChanged(int)));
 
@@ -112,15 +109,9 @@ void QmitkDicomBrowser::OnDicomImportFinished()
 
 void QmitkDicomBrowser::StartDicomDirectoryListener()
 {
-    if(!m_Thread.isRunning())
-    {
-        m_DicomDirectoryListener->SetDicomListenerDirectory(m_TempDirectory);
-        m_DicomDirectoryListener->SetDicomFolderSuffix(TEMP_DICOM_FOLDER_SUFFIX);
-        connect(m_DicomDirectoryListener,SIGNAL(SignalStartDicomImport(const QStringList&)),m_Controls.internalDataWidget,SLOT(OnStartDicomImport(const QStringList&)),Qt::DirectConnection);
-        //connect(m_Controls.internalDataWidget,SIGNAL(SignalFinishedImport()),m_DicomDirectoryListener,SLOT(OnImportFinished()),Qt::DirectConnection);
-        m_DicomDirectoryListener->moveToThread(&m_Thread);
-        m_Thread.start();
-    }
+  m_DicomDirectoryListener->SetDicomListenerDirectory(m_TempDirectory);
+  m_DicomDirectoryListener->SetDicomFolderSuffix(TEMP_DICOM_FOLDER_SUFFIX);
+  connect(m_DicomDirectoryListener, SIGNAL(SignalStartDicomImport(const QStringList&)), m_Controls.internalDataWidget, SLOT(OnStartDicomImport(const QStringList&)), Qt::DirectConnection);
 }
 
 

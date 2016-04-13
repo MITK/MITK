@@ -1,5 +1,6 @@
 add_subdirectory(CLCore)
 add_subdirectory(CLUtilities)
+add_subdirectory(CLMRUtilities)
 add_subdirectory(CLLibSVM)
 add_subdirectory(CLVigraRandomForest)
 add_subdirectory(DataCollection)

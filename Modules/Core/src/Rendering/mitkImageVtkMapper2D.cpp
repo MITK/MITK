@@ -119,6 +119,8 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
+  SetVtkMapperImmediateModeRendering(localStorage->m_Mapper);
+
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   mitk::DataNode* datanode = this->GetDataNode();
 

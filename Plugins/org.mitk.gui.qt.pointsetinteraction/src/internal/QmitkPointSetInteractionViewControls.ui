@@ -130,7 +130,6 @@
  <includes>
   <include location="global">mitkDataNode.h</include>
   <include location="global">mitkPointSet.h</include>
-  <include location="global">mitkPointSetInteractor.h</include>
  </includes>
  <resources/>
  <connections/>

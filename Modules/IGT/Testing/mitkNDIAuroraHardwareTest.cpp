@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTrackingTool.h"
 #include "mitkStandardFileLocations.h"
 
+#include "mitkNDIAuroraTypeInformation.h"
+
 
 int mitkNDIAuroraHardwareTest(int  argc , char* argv[])
 {
@@ -31,7 +33,7 @@ int mitkNDIAuroraHardwareTest(int  argc , char* argv[])
 
    //create an aurora tracking device
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
-  myNDITrackingDevice->SetType(mitk::NDIAurora);
+  myNDITrackingDevice->SetType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
 
 #ifdef WIN32
   //set port

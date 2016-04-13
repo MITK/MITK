@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 
 #include <mitkColorProperty.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
@@ -196,6 +195,11 @@ void QmitkStdMultiWidgetEditor::EnableDecorations(bool enable, const QStringList
     enable ? d->m_StdMultiWidget->EnableGradientBackground()
            : d->m_StdMultiWidget->DisableGradientBackground();
   }
+  if (decorations.isEmpty() || decorations.contains(DECORATION_CORNER_ANNOTATION))
+  {
+    enable ? d->m_StdMultiWidget->SetCornerAnnotationVisibility(true)
+           : d->m_StdMultiWidget->SetCornerAnnotationVisibility(false);
+  }
 }
 
 bool QmitkStdMultiWidgetEditor::IsDecorationEnabled(const QString &decoration) const
@@ -216,24 +220,19 @@ bool QmitkStdMultiWidgetEditor::IsDecorationEnabled(const QString &decoration) c
   {
     return d->m_StdMultiWidget->GetGradientBackgroundFlag();
   }
+  else if (decoration == DECORATION_CORNER_ANNOTATION)
+  {
+    return d->m_StdMultiWidget->IsCornerAnnotationVisible();
+  }
+
   return false;
 }
 
 QStringList QmitkStdMultiWidgetEditor::GetDecorations() const
 {
   QStringList decorations;
-  decorations << DECORATION_BORDER << DECORATION_LOGO << DECORATION_MENU << DECORATION_BACKGROUND;
+  decorations << DECORATION_BORDER << DECORATION_LOGO << DECORATION_MENU << DECORATION_BACKGROUND << DECORATION_CORNER_ANNOTATION;
   return decorations;
-}
-
-mitk::SlicesRotator* QmitkStdMultiWidgetEditor::GetSlicesRotator() const
-{
-  return d->m_StdMultiWidget->GetSlicesRotator();
-}
-
-mitk::SlicesSwiveller* QmitkStdMultiWidgetEditor::GetSlicesSwiveller() const
-{
-  return d->m_StdMultiWidget->GetSlicesSwiveller();
 }
 
 void QmitkStdMultiWidgetEditor::EnableSlicingPlanes(bool enable)
@@ -254,17 +253,6 @@ bool QmitkStdMultiWidgetEditor::IsSlicingPlanesEnabled() const
   {
     return false;
   }
-}
-
-void QmitkStdMultiWidgetEditor::EnableLinkedNavigation(bool enable)
-{
-  enable ? d->m_StdMultiWidget->EnableNavigationControllerEventListening()
-         : d->m_StdMultiWidget->DisableNavigationControllerEventListening();
-}
-
-bool QmitkStdMultiWidgetEditor::IsLinkedNavigationEnabled() const
-{
-  return d->m_StdMultiWidget->IsCrosshairNavigationEnabled();
 }
 
 void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
@@ -291,8 +279,6 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     d->m_RenderWindows.insert("3d", d->m_StdMultiWidget->GetRenderWindow4());
 
     d->m_MouseModeToolbar->setMouseModeSwitcher( d->m_StdMultiWidget->GetMouseModeSwitcher() );
-    connect( d->m_MouseModeToolbar, SIGNAL( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ),
-      d->m_StdMultiWidget, SLOT( MouseModeSelected(mitk::MouseModeSwitcher::MouseMode) ) );
 
     layout->addWidget(d->m_StdMultiWidget);
 
@@ -317,7 +303,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     // in 2D and 3D
     d->m_StdMultiWidget->AddDisplayPlaneSubTree();
 
-    d->m_StdMultiWidget->EnableNavigationControllerEventListening();
+    //d->m_StdMultiWidget->EnableNavigationControllerEventListening();
 
     // Store the initial visibility status of the menu widget.
     d->m_MenuWidgetsEnabled = d->m_StdMultiWidget->IsMenuWidgetEnabled();
@@ -414,10 +400,10 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   //refresh colors of rectangles
   d->m_StdMultiWidget->EnableColoredRectangles();
 
-  // Set preferences respecting zooming and padding
-  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", true);
+  // Set preferences respecting zooming and panning
+  bool constrainedZooming = prefs->GetBool("Use constrained zooming and panning", true);
 
-  mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+  mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrainedZooming);
 
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(this->GetDataStorage());
 

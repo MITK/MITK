@@ -21,21 +21,15 @@
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
-#include <mitkGlobalInteraction.h>
 #include "mitkProperties.h"
 #include "mitkPlaneGeometryDataMapper2D.h"
-#include "mitkGlobalInteraction.h"
 #include "mitkDisplayInteractor.h"
-#include "mitkPositionEvent.h"
-#include "mitkStateEvent.h"
+#include "mitkCameraController.h"
 #include "mitkLine.h"
 #include "mitkInteractionConst.h"
 #include "mitkVtkLayerController.h"
-#include "mitkPositionTracker.h"
 #include "mitkDisplayInteractor.h"
-#include "mitkSlicesRotator.h"
-#include "mitkSlicesSwiveller.h"
-#include "mitkCoordinateSupplier.h"
+
 #include "mitkDataStorage.h"
 #include "mitkIOUtil.h"
 
@@ -63,7 +57,6 @@ mitk::RenderWindow::Pointer mitkWidget3;
 mitk::RenderWindow::Pointer mitkWidget4;
 
 mitk::DisplayInteractor::Pointer m_DisplayInteractor;
-mitk::CoordinateSupplier::Pointer m_LastLeftClickPositionSupplier;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering1;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering2;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering3;
@@ -100,12 +93,6 @@ void InitializeWindows()
   mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
-  // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
-  gi->AddListener(m_TimeNavigationController);
-
-  m_LastLeftClickPositionSupplier = mitk::CoordinateSupplier::New("navigation", NULL);
-  mitk::GlobalInteraction::GetInstance()->AddListener(m_LastLeftClickPositionSupplier);
 
   mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.1,0.1,0.1);
   mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.5,0.5,0.5);
@@ -190,10 +177,10 @@ void AddDisplayPlaneSubTree()
 void Fit()
 {
   vtkRenderer * vtkrenderer;
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow())->GetDisplayGeometry()->Fit();
-  mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow())->GetDisplayGeometry()->Fit();
-  mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow())->GetDisplayGeometry()->Fit();
-  mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow())->GetDisplayGeometry()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow())->GetCameraController()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow())->GetCameraController()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow())->GetCameraController()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow())->GetCameraController()->Fit();
 
   int w = vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
@@ -268,17 +255,15 @@ int main(int argc, char* argv[])
   // Part V: Create window and pass the tree to it
   //*************************************************************************
 
-  // Global Interaction initialize
-  // legacy because window manager relies still on existence if global interaction
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
-
-  //mitk::GlobalInteraction::GetInstance()->AddListener(m_DisplayInteractor);
-
   // Create renderwindows
   mitkWidget1 = mitk::RenderWindow::New();
   mitkWidget2 = mitk::RenderWindow::New();
   mitkWidget3 = mitk::RenderWindow::New();
   mitkWidget4 = mitk::RenderWindow::New();
+
+  mitkWidget1->GetRenderer()->PrepareRender();
+  mitkWidget2->GetRenderer()->PrepareRender();
+  mitkWidget3->GetRenderer()->PrepareRender();
 
   // Tell the renderwindow which (part of) the datastorage to render
   mitkWidget1->GetRenderer()->SetDataStorage(m_DataStorage);
@@ -286,12 +271,6 @@ int main(int argc, char* argv[])
   mitkWidget3->GetRenderer()->SetDataStorage(m_DataStorage);
   mitkWidget4->GetRenderer()->SetDataStorage(m_DataStorage);
 
-  // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
-  gi->AddListener(mitkWidget1->GetSliceNavigationController());
-  gi->AddListener(mitkWidget2->GetSliceNavigationController());
-  gi->AddListener(mitkWidget3->GetSliceNavigationController());
-  gi->AddListener(mitkWidget4->GetSliceNavigationController());
 
   // instantiate display interactor
   if (m_DisplayInteractor.IsNull())

@@ -78,17 +78,17 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
     const DICOMImageBlockDescriptor block = reader->GetOutput(o);
 
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
-    for(auto iter = outputFiles.begin();
-        iter != outputFiles.end();
+    for(auto iter = outputFiles.cbegin();
+        iter != outputFiles.cend();
         ++iter)
     {
       // check that output is part of input
-      auto inputPositionOfCurrentOutput = std::find( inputFiles.begin(), inputFiles.end(), (*iter)->Filename );
-      if (inputPositionOfCurrentOutput !=  inputFiles.end())
+      auto inputPositionOfCurrentOutput = std::find( inputFiles.cbegin(), inputFiles.cend(), (*iter)->Filename );
+      if (inputPositionOfCurrentOutput !=  inputFiles.cend())
       {
         // check that output is only part of ONE output
-        auto outputPositionOfCurrentOutput = std::find( allSortedInputsFiles.begin(), allSortedInputsFiles.end(), (*iter)->Filename );
-        if (outputPositionOfCurrentOutput == allSortedInputsFiles.end())
+        auto outputPositionOfCurrentOutput = std::find( allSortedInputsFiles.cbegin(), allSortedInputsFiles.cend(), (*iter)->Filename );
+        if (outputPositionOfCurrentOutput == allSortedInputsFiles.cend())
         {
           // was not in list before
           allSortedInputsFiles.push_back( *inputPositionOfCurrentOutput );
@@ -120,7 +120,9 @@ static void TestOutputsContainInputs(DICOMFileReader* reader)
   }
 }
 
-static void TestMitkImagesAreLoaded(DICOMFileReader* reader)
+static void TestMitkImagesAreLoaded( DICOMFileReader* reader,
+                                     const std::unordered_map<const char*, mitk::DICOMTag>& requestedTags,
+                                     const std::unordered_map<const char*, const char*>& expectedProperties )
 {
   StringList inputFiles = GetInputFilenames();
   reader->SetInputFiles( inputFiles );
@@ -134,13 +136,29 @@ static void TestMitkImagesAreLoaded(DICOMFileReader* reader)
     const DICOMImageBlockDescriptor block = reader->GetOutput(o);
 
     const DICOMImageFrameList& outputFiles = block.GetImageFrameList();
-    mitk::Image::Pointer mitkImage = block.GetMitkImage();
+    const mitk::Image::Pointer mitkImage = block.GetMitkImage();
+    auto iter2 = expectedProperties.cbegin();
+
+    for ( auto iter = requestedTags.cbegin(); iter != requestedTags.cend(); ++iter, ++iter2 )
+    {
+      mitk::BaseProperty* property = mitkImage->GetProperty( iter->first ).GetPointer();
+      MITK_TEST_CONDITION( property != nullptr,
+                           "Requested Tag is available as Property in Image" );
+
+      MITK_INFO << iter->first << " / " << property->GetNameOfClass();
+    }
+
 
     MITK_DEBUG << "-------------------------------------------";
     MITK_DEBUG << "Output " << o << " at " << (void*) mitkImage.GetPointer();
     MITK_DEBUG << "  Number of files: " << outputFiles.size();
     MITK_DEBUG << "  Dimensions: " << mitkImage->GetDimension(0) << " " << mitkImage->GetDimension(1) << " " << mitkImage->GetDimension(2);
   }
+}
+
+static mitk::BaseProperty::Pointer DummyTagToPropertyFunctor( const mitk::StringLookupTable& )
+{
+  return mitk::BaseProperty::Pointer();
 }
 
 

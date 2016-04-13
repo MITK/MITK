@@ -8,7 +8,6 @@ set(CPP_FILES
   IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
   # Interactions
-  Interactions/mitkFiberBundleInteractor.cpp
 
   # Tractography
   Algorithms/GibbsTracking/mitkParticleGrid.cpp

@@ -14,18 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef __mitkLabelSetImage_H_
 #define __mitkLabelSetImage_H_
 
-#include "mitkImage.h"
-#include "MitkMultilabelExports.h"
+#include <mitkImage.h>
 #include <mitkLabelSet.h>
-#include <mitkSurface.h>
 
-#include <itkImage.h>
-#include <itkVectorImage.h>
-
+#include <MitkMultilabelExports.h>
 
 namespace mitk
 {
@@ -58,7 +53,7 @@ public:
   * As soon as active labelset was changed, the signal emits.
   * Emitted by SetActiveLayer(int layer);
   */
-  Message<> AfterchangeLayerEvent;
+  Message<> AfterChangeLayerEvent;
 
   /**
    * @brief Initialize an empty mitk::LabelSetImage using the information
@@ -315,8 +310,8 @@ protected:
   template < typename ImageType >
   void CreateLabelMaskProcessing( ImageType* input, mitk::Image* mask, PixelType index);
 
-  template < typename ImageType1, typename ImageType2 >
-  void InitializeByLabeledImageProcessing( ImageType1* input, ImageType2* other);
+  template < typename LabelSetImageType, typename ImageType >
+  void InitializeByLabeledImageProcessing(LabelSetImageType* input, ImageType* other);
 
   std::vector< LabelSet::Pointer > m_LabelSetContainer;
   std::vector< Image::Pointer > m_LayerContainer;

@@ -34,6 +34,8 @@
 #include <itkNrrdImageIO.h>
 #include <itkDiffusionTensor3D.h>
 
+using namespace std;
+
 typedef short DiffusionPixelType;
 typedef double TTensorPixelType;
 
@@ -59,21 +61,21 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
   measurementsCalculator->Update();
   map->InitializeByItk( measurementsCalculator->GetOutput() );
   map->SetVolume( measurementsCalculator->GetOutput()->GetBufferPointer() );
-  mitk::IOUtil::SaveImage(map, filename + "_dti_FA" + postfix + ".nrrd");
+  mitk::IOUtil::Save(map, filename + "_FA" + postfix + ".nrrd");
 
   // MD
   measurementsCalculator->SetMeasure(MeasurementsType::MD);
   measurementsCalculator->Update();
   map->InitializeByItk( measurementsCalculator->GetOutput() );
   map->SetVolume( measurementsCalculator->GetOutput()->GetBufferPointer() );
-  mitk::IOUtil::SaveImage(map, filename + "_dti_MD" + postfix + ".nrrd");
+  mitk::IOUtil::Save(map, filename + "_MD" + postfix + ".nrrd");
 
   // AD
   measurementsCalculator->SetMeasure(MeasurementsType::AD);
   measurementsCalculator->Update();
   map->InitializeByItk( measurementsCalculator->GetOutput() );
   map->SetVolume( measurementsCalculator->GetOutput()->GetBufferPointer() );
-  mitk::IOUtil::SaveImage(map, filename + "_dti_AD" + postfix + ".nrrd");
+  mitk::IOUtil::Save(map, filename + "_AD" + postfix + ".nrrd");
 
 
   // CA
@@ -81,21 +83,21 @@ static void ExtractMapsAndSave(mitk::TensorImage::Pointer tensorImage, std::stri
   measurementsCalculator->Update();
   map->InitializeByItk( measurementsCalculator->GetOutput() );
   map->SetVolume( measurementsCalculator->GetOutput()->GetBufferPointer() );
-  mitk::IOUtil::SaveImage(map, filename + "_dti_CA" + postfix + ".nrrd");
+  mitk::IOUtil::Save(map, filename + "_CA" + postfix + ".nrrd");
 
   // RA
   measurementsCalculator->SetMeasure(MeasurementsType::RA);
   measurementsCalculator->Update();
   map->InitializeByItk( measurementsCalculator->GetOutput() );
   map->SetVolume( measurementsCalculator->GetOutput()->GetBufferPointer() );
-  mitk::IOUtil::SaveImage(map, filename + "_dti_RA" + postfix + ".nrrd");
+  mitk::IOUtil::Save(map, filename + "_RA" + postfix + ".nrrd");
 
   // RD
   measurementsCalculator->SetMeasure(MeasurementsType::RD);
   measurementsCalculator->Update();
   map->InitializeByItk( measurementsCalculator->GetOutput() );
   map->SetVolume( measurementsCalculator->GetOutput()->GetBufferPointer() );
-  mitk::IOUtil::SaveImage(map, filename + "_dti_RD" + postfix + ".nrrd");
+  mitk::IOUtil::Save(map, filename + "_RD" + postfix + ".nrrd");
 
 }
 
@@ -115,7 +117,10 @@ int main(int argc, char* argv[])
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
-    return EXIT_FAILURE;
+  {
+    std::cout << parser.helpText();
+    return EXIT_SUCCESS;
+  }
 
 
   std::string inputFile = us::any_cast<string>(parsedArgs["input"]);

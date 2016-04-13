@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkInteractionConst.h"
-#include "mitkGlobalInteraction.h"
 
 #include "itkOrImageFilter.h"
 #include "mitkImageTimeSelector.h"
@@ -163,7 +162,16 @@ void mitk::FastMarchingTool3D::Activated()
   m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
-  m_SeedPointInteractor = mitk::PointSetInteractor::New("PressMoveReleaseAndPointSetting", m_SeedsAsPointSetNode);
+
+
+  // Create PointSetData Interactor
+  m_SeedPointInteractor = mitk::PointSetDataInteractor::New();
+  // Load the according state machine for regular point set interaction
+  m_SeedPointInteractor->LoadStateMachine("PointSet.xml");
+  // Set the configuration file that defines the triggers for the transitions
+  m_SeedPointInteractor->SetEventConfig("PointSetConfig.xml");
+  // set the DataNode (which already is added to the DataStorage
+  m_SeedPointInteractor->SetDataNode(m_SeedsAsPointSetNode);
 
   m_ReferenceImageAsITK = InternalImageType::New();
 
@@ -208,7 +216,6 @@ void mitk::FastMarchingTool3D::Activated()
   m_ThresholdFilter->SetInput( m_FastMarchingFilter->GetOutput() );
 
   m_ToolManager->GetDataStorage()->Add(m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0));
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
 
   itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::Pointer pointAddedCommand = itk::SimpleMemberCommand<mitk::FastMarchingTool3D>::New();
   pointAddedCommand->SetCallbackFunction(this, &mitk::FastMarchingTool3D::OnAddPoint);
@@ -223,7 +230,6 @@ void mitk::FastMarchingTool3D::Activated()
 
 void mitk::FastMarchingTool3D::Deactivated()
 {
-  Superclass::Deactivated();
   m_ToolManager->GetDataStorage()->Remove( this->m_ResultImageNode );
   m_ToolManager->GetDataStorage()->Remove( this->m_SeedsAsPointSetNode );
   this->ClearSeeds();
@@ -241,11 +247,14 @@ void mitk::FastMarchingTool3D::Deactivated()
     mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, 0);
     m_SeedsAsPointSet->ExecuteOperation(doOp);
   }
-  mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
+  // Deactivate Interaction
+  m_SeedPointInteractor->SetDataNode(NULL);
   m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
   m_SeedsAsPointSetNode = NULL;
   m_SeedsAsPointSet->RemoveObserver(m_PointSetAddObserverTag);
   m_SeedsAsPointSet->RemoveObserver(m_PointSetRemoveObserverTag);
+
+  Superclass::Deactivated();
 }
 
 void mitk::FastMarchingTool3D::Initialize()
@@ -362,7 +371,7 @@ void mitk::FastMarchingTool3D::Update()
     m_ProgressCommand->AddStepsToDo(progress_steps);
 
     //remove interaction with poinset while updating
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_SeedPointInteractor);
+    m_SeedPointInteractor->SetDataNode(NULL);
     CurrentlyBusy.Send(true);
     try
     {
@@ -393,7 +402,7 @@ void mitk::FastMarchingTool3D::Update()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     //add interaction with poinset again
-    mitk::GlobalInteraction::GetInstance()->AddInteractor(m_SeedPointInteractor);
+    m_SeedPointInteractor->SetDataNode(m_SeedsAsPointSetNode);
   }
 }
 

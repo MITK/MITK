@@ -21,30 +21,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkQuaternion.h"
 #include <vnl/vnl_det.h>
 
-
 mitk::IGTLMessageToNavigationDataFilter::IGTLMessageToNavigationDataFilter()
-: mitk::NavigationDataSource()
+  : mitk::NavigationDataSource()
 {
   mitk::NavigationData::Pointer output = mitk::NavigationData::New();
   this->SetNumberOfRequiredOutputs(1);
   this->SetNthOutput(0, output.GetPointer());
 }
 
-
 mitk::IGTLMessageToNavigationDataFilter::~IGTLMessageToNavigationDataFilter()
 {
 }
 
-
-void mitk::IGTLMessageToNavigationDataFilter::SetInput( const IGTLMessage* msg )
+void mitk::IGTLMessageToNavigationDataFilter::SetInput(const IGTLMessage* msg)
 {
   this->SetInput(0, msg);
 }
 
-
-void mitk::IGTLMessageToNavigationDataFilter::SetInput( unsigned int idx, const IGTLMessage* msg )
+void mitk::IGTLMessageToNavigationDataFilter::SetInput(unsigned int idx, const IGTLMessage* msg)
 {
-  if ( msg == NULL ) // if an input is set to NULL, remove it
+  if (msg == NULL) // if an input is set to NULL, remove it
   {
     this->RemoveInput(idx);
   }
@@ -56,9 +52,8 @@ void mitk::IGTLMessageToNavigationDataFilter::SetInput( unsigned int idx, const 
   this->CreateOutputsForAllInputs();
 }
 
-
 const mitk::IGTLMessage*
-mitk::IGTLMessageToNavigationDataFilter::GetInput( void ) const
+mitk::IGTLMessageToNavigationDataFilter::GetInput(void) const
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -66,9 +61,8 @@ mitk::IGTLMessageToNavigationDataFilter::GetInput( void ) const
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(0));
 }
 
-
 const mitk::IGTLMessage*
-mitk::IGTLMessageToNavigationDataFilter::GetInput( unsigned int idx ) const
+mitk::IGTLMessageToNavigationDataFilter::GetInput(unsigned int idx) const
 {
   if (this->GetNumberOfInputs() < 1)
     return NULL;
@@ -76,16 +70,15 @@ mitk::IGTLMessageToNavigationDataFilter::GetInput( unsigned int idx ) const
   return static_cast<const IGTLMessage*>(this->ProcessObject::GetInput(idx));
 }
 
-
 const mitk::IGTLMessage*
 mitk::IGTLMessageToNavigationDataFilter::GetInput(std::string messageName) const
 {
   const DataObjectPointerArray& inputs = const_cast<Self*>(this)->GetInputs();
   for (DataObjectPointerArray::const_iterator it = inputs.begin();
-       it != inputs.end(); ++it)
+    it != inputs.end(); ++it)
   {
     if (std::string(messageName) ==
-        (static_cast<IGTLMessage*>(it->GetPointer()))->GetName())
+      (static_cast<IGTLMessage*>(it->GetPointer()))->GetName())
     {
       return static_cast<IGTLMessage*>(it->GetPointer());
     }
@@ -93,15 +86,14 @@ mitk::IGTLMessageToNavigationDataFilter::GetInput(std::string messageName) const
   return NULL;
 }
 
-
 itk::ProcessObject::DataObjectPointerArraySizeType
-mitk::IGTLMessageToNavigationDataFilter::GetInputIndex( std::string messageName )
+mitk::IGTLMessageToNavigationDataFilter::GetInputIndex(std::string messageName)
 {
   DataObjectPointerArray outputs = this->GetInputs();
   for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
   {
     if (messageName ==
-        (static_cast<IGTLMessage*>(outputs.at(i).GetPointer()))->GetName())
+      (static_cast<IGTLMessage*>(outputs.at(i).GetPointer()))->GetName())
     {
       return i;
     }
@@ -110,27 +102,26 @@ mitk::IGTLMessageToNavigationDataFilter::GetInputIndex( std::string messageName 
 }
 
 void mitk::IGTLMessageToNavigationDataFilter::ConnectTo(
-    mitk::IGTLMessageSource* UpstreamFilter)
+  mitk::IGTLMessageSource* UpstreamFilter)
 {
   for (DataObjectPointerArraySizeType i = 0;
-       i < UpstreamFilter->GetNumberOfOutputs(); i++)
+    i < UpstreamFilter->GetNumberOfOutputs(); i++)
   {
     this->SetInput(i, UpstreamFilter->GetOutput(i));
   }
 }
 
 void mitk::IGTLMessageToNavigationDataFilter::SetNumberOfExpectedOutputs(
-    unsigned int numOutputs)
+  unsigned int numOutputs)
 {
   this->SetNumberOfIndexedOutputs(numOutputs);
   this->CreateOutputsForAllInputs();
 }
 
-
 void mitk::IGTLMessageToNavigationDataFilter::CreateOutputsForAllInputs()
 {
   // create outputs for all inputs
-//  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
+  //  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
   bool isModified = false;
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
@@ -142,7 +133,7 @@ void mitk::IGTLMessageToNavigationDataFilter::CreateOutputsForAllInputs()
     }
   }
 
-  if(isModified)
+  if (isModified)
     this->Modified();
 }
 
@@ -153,17 +144,17 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTransformData()
 
   //cast the input message into the proper type
   igtl::TransformMessage* tMsg =
-      (igtl::TransformMessage*)(input->GetMessage().GetPointer());
+    (igtl::TransformMessage*)(input->GetMessage().GetPointer());
 
   //check if cast was successful
-  if ( !tMsg )
+  if (!tMsg)
   {
     mitkThrow() << "Cast from igtl::MessageBase to igtl::TransformMessage "
-                << "failed! Please check the message.";
+      << "failed! Please check the message.";
   }
 
   /* update outputs with tracking data from tools */
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs(); ++i)
   {
     mitk::NavigationData* output = this->GetOutput(i);
     assert(output);
@@ -174,21 +165,18 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTransformData()
       continue;
     }
 
-    //debug output
-    tMsg->Print(std::cout);
-
     //get the transformation matrix and convert it into an affinetransformation
     igtl::Matrix4x4 transformation_;
     tMsg->GetMatrix(transformation_);
     mitk::AffineTransform3D::Pointer affineTransformation =
-        mitk::AffineTransform3D::New();
+      mitk::AffineTransform3D::New();
     mitk::Matrix3D transformation;
     mitk::Vector3D offset;
-    for ( unsigned int r = 0; r < 3; r++ )
+    for (unsigned int r = 0; r < 3; r++)
     {
-      for ( unsigned int c = 0; c < 3; c++ )
+      for (unsigned int c = 0; c < 3; c++)
       {
-        transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
+        transformation.GetVnlMatrix().set(r, c, transformation_[r][c]);
       }
       offset.SetElement(r, transformation_[r][3]);
     }
@@ -201,15 +189,13 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTransformData()
     //the affine transformation. The other values are initialized with standard
     //values
     mitk::NavigationData::Pointer nd =
-        mitk::NavigationData::New(affineTransformation, true);
+      mitk::NavigationData::New(affineTransformation, true);
     //set the time stamp
     nd->SetIGTTimeStamp(input->GetTimeStamp());
     //set the name
-//    nd->SetName(td->GetName());
+    nd->SetName(input->GetName());
 
     output->Graft(nd);
-
-    nd->Print(std::cout);
   }
 }
 
@@ -220,27 +206,27 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
 
   //cast the input message into the proper type
   igtl::TrackingDataMessage* tdMsg =
-      (igtl::TrackingDataMessage*)(input->GetMessage().GetPointer());
+    (igtl::TrackingDataMessage*)(input->GetMessage().GetPointer());
 
   //check if cast was successful
-  if ( !tdMsg )
+  if (!tdMsg)
   {
     mitkThrow() << "Cast from igtl::MessageBase to igtl::TrackingDataMessage "
-                << "failed! Please check the message.";
+      << "failed! Please check the message.";
   }
 
   //get the number of tracking data elements
   unsigned int numTrackingDataElements =
-      tdMsg->GetNumberOfTrackingDataElements();
+    tdMsg->GetNumberOfTrackingDataElements();
 
-  if ( !numTrackingDataElements )
+  if (!numTrackingDataElements)
   {
     MITK_ERROR("IGTLMsgToNavDataFilter") << "There are no tracking data "
-                                            "elements in this message";
+      "elements in this message";
   }
 
   /* update outputs with tracking data from tools */
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs(); ++i)
   {
     mitk::NavigationData* output = this->GetOutput(i);
     assert(output);
@@ -251,7 +237,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
     //check if the current index, all outputs that have no corresponding input
     //tracking element stay invalidated, the others are validated according to
     //the tracking element
-    if ( input->IsDataValid() == false || i >= numTrackingDataElements )
+    if (input->IsDataValid() == false || i >= numTrackingDataElements)
     {
       continue;
     }
@@ -265,14 +251,14 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
     igtl::Matrix4x4 transformation_;
     td->GetMatrix(transformation_);
     mitk::AffineTransform3D::Pointer affineTransformation =
-        mitk::AffineTransform3D::New();
+      mitk::AffineTransform3D::New();
     mitk::Matrix3D transformation;
     mitk::Vector3D offset;
-    for ( unsigned int r = 0; r < 3; r++ )
+    for (unsigned int r = 0; r < 3; r++)
     {
-      for ( unsigned int c = 0; c < 3; c++ )
+      for (unsigned int c = 0; c < 3; c++)
       {
-        transformation.GetVnlMatrix().set( r , c , transformation_[r][c] );
+        transformation.GetVnlMatrix().set(r, c, transformation_[r][c]);
       }
       offset.SetElement(r, transformation_[r][3]);
     }
@@ -284,18 +270,18 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
 
     //check the rotation matrix
     vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrix =
-        affineTransformation->GetMatrix().GetVnlMatrix();
+      affineTransformation->GetMatrix().GetVnlMatrix();
     vnl_matrix_fixed<ScalarType, 3, 3> rotationMatrixTransposed =
-        rotationMatrix.transpose();
+      rotationMatrix.transpose();
     // a quadratic matrix is a rotation matrix exactly when determinant is 1
     // and transposed is inverse
     if (!Equal(1.0, vnl_det(rotationMatrix), 0.1)
-        || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
+      || !((rotationMatrix*rotationMatrixTransposed).is_identity(0.1)))
     {
       MITK_ERROR("IGTLMsgToNavDataFilter") << "tried to initialize NavData "
-          << "with non-rotation matrix :" << rotationMatrix << " (Does your "
-             "AffineTransform3D object include spacing? This is not "
-             "supported by NavigationData objects!)";
+        << "with non-rotation matrix :" << rotationMatrix << " (Does your "
+        "AffineTransform3D object include spacing? This is not "
+        "supported by NavigationData objects!)";
       nd = mitk::NavigationData::New();
     }
     else
@@ -307,7 +293,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateTrackingDataData()
       nd = mitk::NavigationData::New(affineTransformation, true);
     }
     //set the time stamp
-    nd->SetIGTTimeStamp(input->GetTimeStamp());
+    nd->SetIGTTimeStamp(input->GetIGTTimeStamp());
     //set the name
     nd->SetName(td->GetName());
     output->Graft(nd);
@@ -322,27 +308,27 @@ mitk::IGTLMessageToNavigationDataFilter::GenerateQuaternionTrackingDataData()
 
   //cast the input message into the proper type
   igtl::QuaternionTrackingDataMessage* tdMsg =
-      (igtl::QuaternionTrackingDataMessage*)(input->GetMessage().GetPointer());
+    (igtl::QuaternionTrackingDataMessage*)(input->GetMessage().GetPointer());
 
   //check if cast was successful
-  if ( !tdMsg )
+  if (!tdMsg)
   {
     mitkThrow() << "Cast from igtl::MessageBase to igtl::TrackingDataMessage "
-                << "failed! Please check the message.";
+      << "failed! Please check the message.";
   }
 
   //get the number of tracking data elements
   unsigned int numTrackingDataElements =
-      tdMsg->GetNumberOfQuaternionTrackingDataElements();
+    tdMsg->GetNumberOfQuaternionTrackingDataElements();
 
-  if ( !numTrackingDataElements )
+  if (!numTrackingDataElements)
   {
     MITK_ERROR("IGTLMsgToNavDataFilter") << "There are no tracking data "
-                                            "elements in this message";
+      "elements in this message";
   }
 
   /* update outputs with tracking data from tools */
-  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs(); ++i)
   {
     mitk::NavigationData* output = this->GetOutput(i);
     assert(output);
@@ -353,12 +339,11 @@ mitk::IGTLMessageToNavigationDataFilter::GenerateQuaternionTrackingDataData()
     //check if the current index, all outputs that have no corresponding input
     //tracking element stay invalidated, the others are validated according to
     //the tracking element
-    if ( input->IsDataValid() == false || i >= numTrackingDataElements )
+    if (input->IsDataValid() == false || i >= numTrackingDataElements)
     {
       continue;
     }
     output->SetDataValid(true);
-
 
     //get the tracking data element which holds all the data
     igtl::QuaternionTrackingDataElement::Pointer td;
@@ -402,7 +387,7 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
 
   //check if the message is valid, if it is not valid we do not generate new
   //outputs
-  if ( !input->IsDataValid() )
+  if (!input->IsDataValid())
   {
     MITK_DEBUG("IGTLMessageToNavigationDataFilter") << "Input data is invalid.";
     return;
@@ -412,15 +397,15 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
   const char* msgType = input->GetIGTLMessageType();
 
   //check if the IGTL message has the proper type
-  if( strcmp(msgType, "TRANSFORM") == 0 )
+  if (strcmp(msgType, "TRANSFORM") == 0)
   {
     this->GenerateTransformData();
   }
-  else if( strcmp(msgType, "TDATA") == 0 )
+  else if (strcmp(msgType, "TDATA") == 0)
   {
     this->GenerateTrackingDataData();
   }
-  else if( strcmp(msgType, "QTDATA") == 0 )
+  else if (strcmp(msgType, "QTDATA") == 0)
   {
     this->GenerateQuaternionTrackingDataData();
   }
@@ -429,27 +414,26 @@ void mitk::IGTLMessageToNavigationDataFilter::GenerateData()
     //the message has another type
     //ignore
     MITK_INFO("IGTLMessageToNavigationDataFilter") << "The input has a unknown "
-                                                   << "message type: "
-                                                   << msgType;
+      << "message type: "
+      << msgType;
   }
 }
 
-
 void mitk::IGTLMessageToNavigationDataFilter::GenerateOutputInformation()
 {
-//  Superclass::GenerateOutputInformation();
+  //  Superclass::GenerateOutputInformation();
 
-//  mitk::NavigationData* output = this->GetOutput(0);
-//  assert(output);
-//  const mitk::IGTLMessage* input = this->GetInput(0);
-//  assert(input);
+  //  mitk::NavigationData* output = this->GetOutput(0);
+  //  assert(output);
+  //  const mitk::IGTLMessage* input = this->GetInput(0);
+  //  assert(input);
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
-//  output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
+  //  output->Initialize(input->GetPixelType(), input->GetDimension(), input->GetDimensions());
 
-//  // initialize geometry
-//  output->SetPropertyList(input->GetPropertyList()->Clone());
-//  mitk::TimeGeometry::Pointer clonGeometry = input->GetTimeGeometry()->Clone();
-//  output->SetTimeGeometry(clonGeometry.GetPointer());
+  //  // initialize geometry
+  //  output->SetPropertyList(input->GetPropertyList()->Clone());
+  //  mitk::TimeGeometry::Pointer clonGeometry = input->GetTimeGeometry()->Clone();
+  //  output->SetTimeGeometry(clonGeometry.GetPointer());
 }

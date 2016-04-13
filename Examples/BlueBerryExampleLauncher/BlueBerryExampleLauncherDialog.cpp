@@ -43,6 +43,29 @@ BlueBerryExampleLauncherDialog::BlueBerryExampleLauncherDialog(QWidget *parent) 
       appDir.entryList(QStringList(QApplication::applicationName() + "_*.provisioning"),
                                    QDir::Files | QDir::Readable, QDir::Name);
 
+#ifdef Q_OS_MAC
+    /*
+     * On Mac, if started from the build directory the .provisioning file is located at:
+     * <MITK-build/bin/BlueBerryExampleLauncher_*.provisioning>
+     * but the executable path is:
+     * <MITK-build/bin/BlueBerryExampleLauncher.app/Contents/MacOS/BlueBerryExampleLauncher>
+     * In this case we have to cdUp threetimes.
+     *
+     * During packaging however the MitkWorkbench.provisioning file is placed at the same
+     * level like the executable, hence nothing has to be done.
+     */
+
+    if (provisioningFiles.empty())
+    {
+      appDir.cdUp();
+      appDir.cdUp();
+      appDir.cdUp();
+      provisioningFiles =
+          appDir.entryList(QStringList(QApplication::applicationName() + "_*.provisioning"),
+                                       QDir::Files | QDir::Readable, QDir::Name);
+    }
+#endif
+
   foreach(QString provFile, provisioningFiles)
   {
     int startIndex = provFile.indexOf('_');
@@ -82,6 +105,27 @@ QString BlueBerryExampleLauncherDialog::getDemoConfiguration()
     #ifdef CMAKE_INTDIR
     appDir.cdUp();
     #endif
+
+#ifdef Q_OS_MAC
+    /*
+     * On Mac, if started from the build directory the .provisioning file is located at:
+     * <MITK-build/bin/BlueBerryExampleLauncher_*.provisioning>
+     * but the executable path is:
+     * <MITK-build/bin/BlueBerryExampleLauncher.app/Contents/MacOS/BlueBerryExampleLauncher>
+     * In this case we have to cdUp threetimes.
+     *
+     * During packaging however the MitkWorkbench.provisioning file is placed at the same
+     * level like the executable, hence nothing has to be done.
+     */
+    QFileInfo filePath (appDir.filePath(provisioningFiles[ui->appList->currentRow()]));
+
+    if (!filePath.exists())
+    {
+      appDir.cdUp();
+      appDir.cdUp();
+      appDir.cdUp();
+    }
+#endif
 
     return appDir.filePath(provisioningFiles[ui->appList->currentRow()]);
   }

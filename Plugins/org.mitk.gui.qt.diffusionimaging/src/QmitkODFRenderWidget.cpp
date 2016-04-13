@@ -101,8 +101,7 @@ void QmitkODFRenderWidget::GenerateODF( itk::OrientationDistributionFunction<dou
   m_RenderWindow->GetRenderer()->SetDataStorage( m_ds );
 
   // adjust camera to current plane rotation
-  mitk::Geometry2D::ConstPointer worldGeometry = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetCurrentWorldGeometry2D();
-  mitk::PlaneGeometry::ConstPointer worldPlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*>( worldGeometry.GetPointer() );
+  mitk::PlaneGeometry::ConstPointer worldPlaneGeometry = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())->GetCurrentWorldPlaneGeometry();
   mitk::Vector3D normal = worldPlaneGeometry->GetNormal();
   mitk::Vector3D up = worldPlaneGeometry->GetAxisVector(1);
   normal.Normalize();

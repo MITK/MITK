@@ -38,6 +38,8 @@ namespace mitk {
   * the StdMultiWidget to render a crosshair in all 2D render windows. The crosshair
   * is assembled as lines and rendered with a vtkPolyDataMapper. The mapper
   * requires multiple plane geometry to compute the correct crosshair position.
+  * The plane bounds are computed using either ReferenceGeometry if it is present or
+  * the plane geometry itself otherwise.
   * The mapper offers the following properties:
   * \b Crosshair.Line width: The thickness of the crosshair.
   * \b Crosshair.Gap Size: The gap between the lines in pixels.
@@ -104,6 +106,12 @@ protected:
   virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
 
   void CreateVtkCrosshair(BaseRenderer *renderer);
+
+  static bool TestPointInPlaneGeometry(const PlaneGeometry* planeGeometry, const Point3D& point);
+  static bool TestPointInReferenceGeometry(const BaseGeometry* referenceGeometry, const Point3D& point);
+
+  static bool CutCrossLineWithPlaneGeometry(const PlaneGeometry* planeGeometry, Line3D &crossLine);
+  static bool CutCrossLineWithReferenceGeometry(const BaseGeometry* referenceGeometry, Line3D &crossLine);
 
   /**
     * \brief Returns the thick slice mode for the given datanode.

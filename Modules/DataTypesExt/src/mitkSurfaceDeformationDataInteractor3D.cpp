@@ -55,7 +55,7 @@ void mitk::SurfaceDeformationDataInteractor3D::ConnectActionsAndFunctions()
 
 void mitk::SurfaceDeformationDataInteractor3D::DataNodeChanged()
 {
-  if(this->GetDataNode().IsNotNull())
+  if(this->GetDataNode() != nullptr)
   {
     m_Surface = dynamic_cast<Surface*>(this->GetDataNode()->GetData());
 
@@ -75,7 +75,7 @@ bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const Interaction
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   Point3D currentPickedPoint;
 
-  if(interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint) == this->GetDataNode().GetPointer())
+  if(interactionEvent->GetSender()->PickObject(currentPickedDisplayPoint, currentPickedPoint) == this->GetDataNode())
   {
     // Colorized surface at current picked position
     m_SurfaceColorizationCenter = currentPickedPoint;
@@ -84,11 +84,11 @@ bool mitk::SurfaceDeformationDataInteractor3D::CheckOverObject(const Interaction
   return false;
 }
 
-bool mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
-    return false;
+    return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
@@ -99,14 +99,13 @@ bool mitk::SurfaceDeformationDataInteractor3D::SelectObject(StateMachineAction*,
   this->ColorizeSurface(polyData, timeStep,  m_SurfaceColorizationCenter, COLORIZATION_GAUSS);
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-  return true;
 }
 
-bool mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
-    return false;
+    return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
@@ -117,14 +116,13 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeselectObject(StateMachineAction
   this->ColorizeSurface(polyData, timeStep, m_SurfaceColorizationCenter, COLORIZATION_CONSTANT, -1.0);
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-  return true;
 }
 
-bool mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
-    return false;
+    return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
@@ -142,15 +140,13 @@ bool mitk::SurfaceDeformationDataInteractor3D::InitDeformation(StateMachineActio
 
   // Make deep copy of vtkPolyData interacted on
   m_OriginalPolyData->DeepCopy(polyData);
-
-  return true;
 }
 
-bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
-    return false;
+    return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   vtkPolyData* polyData = m_Surface->GetVtkPolyData(timeStep);
@@ -225,14 +221,13 @@ bool mitk::SurfaceDeformationDataInteractor3D::DeformObject (StateMachineAction*
   m_Surface->Modified();
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-  return true;
 }
 
-bool mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   const MouseWheelEvent* wheelEvent = dynamic_cast<const MouseWheelEvent*>(interactionEvent);
   if(wheelEvent == NULL)
-    return false;
+    return;
 
   m_GaussSigma += (double) (wheelEvent->GetWheelDelta()) / 20;
   if ( m_GaussSigma < 10.0 )
@@ -251,23 +246,22 @@ bool mitk::SurfaceDeformationDataInteractor3D::ScaleRadius(StateMachineAction*, 
   this->ColorizeSurface( polyData, timeStep, m_SurfaceColorizationCenter, COLORIZATION_GAUSS );
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-  return true;
 }
 
 
-bool mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(vtkPolyData* polyData, int timeStep, const Point3D &pickedPoint, int mode, double scalar)
+void mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(vtkPolyData* polyData, int timeStep, const Point3D &pickedPoint, int mode, double scalar)
 {
   if (polyData == NULL)
-    return false;
+    return;
 
   vtkPoints* points = polyData->GetPoints();
   vtkPointData* pointData = polyData->GetPointData();
   if ( pointData == NULL )
-    return false;
+    return;
 
   vtkDataArray* scalars = pointData->GetScalars();
   if (scalars == NULL)
-    return false;
+    return;
 
   if (mode == COLORIZATION_GAUSS)
   {
@@ -310,9 +304,6 @@ bool mitk::SurfaceDeformationDataInteractor3D::ColorizeSurface(vtkPolyData* poly
       scalars->SetComponent(i, 0, scalar);
     }
   }
-
   polyData->Modified();
   pointData->Update();
-
-  return true;
 }

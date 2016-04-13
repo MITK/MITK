@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
-#include "mitkPointSetInteractor.h"
+#include "mitkPointSetDataInteractor.h"
 #include "mitkToolCommand.h"
 
 #include "mitkMessage.h"
@@ -155,7 +155,7 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool3D : public AutoSegmentationTool
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;
-    mitk::PointSetInteractor::Pointer m_SeedPointInteractor;
+    mitk::PointSetDataInteractor::Pointer m_SeedPointInteractor;
     unsigned int m_PointSetAddObserverTag;
     unsigned int m_PointSetRemoveObserverTag;
 

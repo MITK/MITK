@@ -50,7 +50,9 @@ namespace mitk {
       virtual void GenerateOutputInformation() override;
 
       /** Returns a const reference to the input image */
-      const mitk::Image* GetInput(void);
+      const mitk::Image* GetInput(void) const;
+
+      mitk::Image* GetInput(void);
 
       /** Set the source image. As input every mitk 3D image can be used. */
       using itk::ProcessObject::SetInput;

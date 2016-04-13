@@ -14,200 +14,185 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkLookupTablePropertySerializer_h_included
-#define mitkLookupTablePropertySerializer_h_included
+#include "mitkLookupTablePropertySerializer.h"
+#include <mitkLookupTableProperty.h>
+#include <mitkLocaleSwitch.h>
+#include "mitkStringsToNumbers.h"
 
-#include "mitkBasePropertySerializer.h"
-
-#include "mitkLookupTableProperty.h"
-
-namespace mitk
+TiXmlElement* mitk::LookupTablePropertySerializer::Serialize()
 {
+  if (const LookupTableProperty* prop = dynamic_cast<const LookupTableProperty*>(m_Property.GetPointer()))
+  {
+    LocaleSwitch localeSwitch("C");
 
-class LookupTablePropertySerializer : public BasePropertySerializer
-{
-  public:
+    LookupTable::Pointer mitkLut = const_cast<LookupTableProperty*>(prop)->GetLookupTable();
+    if (mitkLut.IsNull()) return nullptr; // really?
 
-    mitkClassMacro( LookupTablePropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    vtkLookupTable* lut = mitkLut->GetVtkLookupTable();
+    if (!lut) return nullptr;
 
-    virtual TiXmlElement* Serialize() override
+    auto  element = new TiXmlElement("LookupTable");
+
+    double*  range;
+    double*  rgba;
+
+    element->SetAttribute("NumberOfColors", lut->GetNumberOfTableValues());
+    element->SetAttribute("Scale", lut->GetScale());
+    element->SetAttribute("Ramp", lut->GetRamp());
+
+    range = lut->GetHueRange();
+    auto  child = new TiXmlElement("HueRange");
+    element->LinkEndChild( child );
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+
+    range = lut->GetValueRange();
+    child = new TiXmlElement("ValueRange");
+    element->LinkEndChild( child );
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+
+    range = lut->GetSaturationRange();
+    child = new TiXmlElement("SaturationRange");
+    element->LinkEndChild( child );
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+
+    range = lut->GetAlphaRange();
+    child = new TiXmlElement("AlphaRange");
+    element->LinkEndChild( child );
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+
+    range = lut->GetTableRange();
+    child = new TiXmlElement("TableRange");
+    element->LinkEndChild( child );
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+
+    child = new TiXmlElement("Table");
+    element->LinkEndChild( child );
+    for ( int index = 0; index < lut->GetNumberOfTableValues(); ++index)
     {
-      if (const LookupTableProperty* prop = dynamic_cast<const LookupTableProperty*>(m_Property.GetPointer()))
-      {
-        LookupTable::Pointer mitkLut = const_cast<LookupTableProperty*>(prop)->GetLookupTable();
-        if (mitkLut.IsNull()) return nullptr; // really?
+      auto  grandChild = new TiXmlElement("RgbaColor");
+      rgba = lut->GetTableValue(index);
+      grandChild->SetAttribute("R", boost::lexical_cast<std::string>(rgba[0]));
+      grandChild->SetAttribute("G", boost::lexical_cast<std::string>(rgba[1]));
+      grandChild->SetAttribute("B", boost::lexical_cast<std::string>(rgba[2]));
+      grandChild->SetAttribute("A", boost::lexical_cast<std::string>(rgba[3]));
+      child->LinkEndChild( grandChild );
+    }
+    return element;
+  }
+  else return nullptr;
+}
 
-        vtkLookupTable* lut = mitkLut->GetVtkLookupTable();
-        if (!lut) return nullptr;
+mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiXmlElement* element)
+{
+  if (!element) return nullptr;
 
-        auto  element = new TiXmlElement("LookupTable");
+  LocaleSwitch localeSwitch("C");
 
-        double*  range;
-        double*  rgba;
+  double range[2];
+  double  rgba[4];
 
-        element->SetAttribute("NumberOfColors", lut->GetNumberOfTableValues());
-        element->SetAttribute("Scale", lut->GetScale());
-        element->SetAttribute("Ramp", lut->GetRamp());
+  std::string double_strings[4];
 
-        range = lut->GetHueRange();
-        auto  child = new TiXmlElement("HueRange");
-        element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", range[0]);
-          child->SetDoubleAttribute("max", range[1]);
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
 
-        range = lut->GetValueRange();
-                      child = new TiXmlElement("ValueRange");
-        element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", range[0]);
-          child->SetDoubleAttribute("max", range[1]);
+  int numberOfColors;
+  int scale;
+  int ramp; // hope the int values don't change betw. vtk versions...
+  if ( element->QueryIntAttribute( "NumberOfColors", &numberOfColors ) == TIXML_SUCCESS )
+  {
+    lut->SetNumberOfTableValues( numberOfColors );
+  }
+  else
+    return nullptr;
+  if ( element->QueryIntAttribute( "Scale", &scale ) == TIXML_SUCCESS )
+  {
+    lut->SetScale( scale );
+  }
+  else
+    return nullptr;
+  if ( element->QueryIntAttribute( "Ramp", &ramp ) == TIXML_SUCCESS )
+  {
+    lut->SetRamp( ramp );
+  }
+  else
+    return nullptr;
 
-        range = lut->GetSaturationRange();
-                      child = new TiXmlElement("SaturationRange");
-        element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", range[0]);
-          child->SetDoubleAttribute("max", range[1]);
-
-        range = lut->GetAlphaRange();
-                      child = new TiXmlElement("AlphaRange");
-        element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", range[0]);
-          child->SetDoubleAttribute("max", range[1]);
-
-        range = lut->GetTableRange();
-                      child = new TiXmlElement("TableRange");
-        element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", range[0]);
-          child->SetDoubleAttribute("max", range[1]);
-
-        child = new TiXmlElement("Table");
-        element->LinkEndChild( child );
-        for ( int index = 0; index < lut->GetNumberOfTableValues(); ++index)
-        {
-          auto  grandChildNinife = new TiXmlElement("RgbaColor");
-          rgba = lut->GetTableValue(index);
-          grandChildNinife->SetDoubleAttribute("R", rgba[0]);
-          grandChildNinife->SetDoubleAttribute("G", rgba[1]);
-          grandChildNinife->SetDoubleAttribute("B", rgba[2]);
-          grandChildNinife->SetDoubleAttribute("A", rgba[3]);
-          child->LinkEndChild( grandChildNinife );
-        }
-        return element;
-      }
-      else return nullptr;
+  try
+  {
+    TiXmlElement* child = element->FirstChildElement("HueRange");
+    if (child)
+    {
+      if ( child->QueryStringAttribute( "min", &double_strings[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( child->QueryStringAttribute( "max", &double_strings[1] ) != TIXML_SUCCESS ) return nullptr;
+      StringsToNumbers<double>(2, double_strings, range);
+      lut->SetHueRange( range );
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    child = element->FirstChildElement("ValueRange");
+    if (child)
     {
-      if (!element) return nullptr;
-
-      typedef double OUR_VTK_FLOAT_TYPE;
-      double range[2];
-      double  rgba[4];
-
-      double d;  // bec. of tinyXML's interface that takes a pointer to float or double...
-
-      vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-
-      int numberOfColors;
-      int scale;
-      int ramp; // hope the int values don't change betw. vtk versions...
-      if ( element->QueryIntAttribute( "NumberOfColors", &numberOfColors ) == TIXML_SUCCESS )
-      {
-        lut->SetNumberOfTableValues( numberOfColors );
-      }
-      else
-        return nullptr;
-      if ( element->QueryIntAttribute( "Scale", &scale ) == TIXML_SUCCESS )
-      {
-        lut->SetScale( scale );
-      }
-      else
-        return nullptr;
-      if ( element->QueryIntAttribute( "Ramp", &ramp ) == TIXML_SUCCESS )
-      {
-        lut->SetRamp( ramp );
-      }
-      else
-        return nullptr;
-
-      TiXmlElement* child = element->FirstChildElement("HueRange");
-      if (child)
-      {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS )
-          return nullptr;
-        range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS )
-          return nullptr;
-        range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        lut->SetHueRange( range );
-      }
-
-                    child = element->FirstChildElement("ValueRange");
-      if (child)
-      {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        lut->SetValueRange( range );
-      }
-
-                    child = element->FirstChildElement("SaturationRange");
-      if (child)
-      {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        lut->SetSaturationRange( range );
-      }
-
-                    child = element->FirstChildElement("AlphaRange");
-      if (child)
-      {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        lut->SetAlphaRange( range );
-      }
-
-                    child = element->FirstChildElement("TableRange");
-      if (child)
-      {
-        if ( child->QueryDoubleAttribute( "min", &d ) != TIXML_SUCCESS ) return nullptr; range[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        if ( child->QueryDoubleAttribute( "max", &d ) != TIXML_SUCCESS ) return nullptr; range[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-        lut->SetTableRange( range );
-      }
-
-      child = element->FirstChildElement("Table");
-      if (child)
-      {
-        unsigned int index(0);
-        for( TiXmlElement* grandChild = child->FirstChildElement("RgbaColor"); grandChild; grandChild = grandChild->NextSiblingElement("RgbaColor"))
-        {
-          if ( grandChild->QueryDoubleAttribute("R", &d) != TIXML_SUCCESS ) return nullptr; rgba[0] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-          if ( grandChild->QueryDoubleAttribute("G", &d) != TIXML_SUCCESS ) return nullptr; rgba[1] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-          if ( grandChild->QueryDoubleAttribute("B", &d) != TIXML_SUCCESS ) return nullptr; rgba[2] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-          if ( grandChild->QueryDoubleAttribute("A", &d) != TIXML_SUCCESS ) return nullptr; rgba[3] = static_cast<OUR_VTK_FLOAT_TYPE>(d);
-
-          lut->SetTableValue( index, rgba );
-          ++index;
-        }
-      }
-
-      LookupTable::Pointer mitkLut = LookupTable::New();
-      mitkLut->SetVtkLookupTable( lut );
-
-      return LookupTableProperty::New(mitkLut).GetPointer();
+      if ( child->QueryStringAttribute( "min", &double_strings[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( child->QueryStringAttribute( "max", &double_strings[1] ) != TIXML_SUCCESS ) return nullptr;
+      StringsToNumbers<double>(2, double_strings, range);
+      lut->SetValueRange( range );
     }
 
-  protected:
+    child = element->FirstChildElement("SaturationRange");
+    if (child)
+    {
+      if ( child->QueryStringAttribute( "min", &double_strings[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( child->QueryStringAttribute( "max", &double_strings[1] ) != TIXML_SUCCESS ) return nullptr;
+      StringsToNumbers<double>(2, double_strings, range);
+      lut->SetSaturationRange( range );
+    }
 
-    LookupTablePropertySerializer() {}
-    virtual ~LookupTablePropertySerializer() {}
-};
+    child = element->FirstChildElement("AlphaRange");
+    if (child)
+    {
+      if ( child->QueryStringAttribute( "min", &double_strings[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( child->QueryStringAttribute( "max", &double_strings[1] ) != TIXML_SUCCESS ) return nullptr;
+      StringsToNumbers<double>(2, double_strings, range);
+      lut->SetAlphaRange( range );
+    }
 
-} // namespace
+    child = element->FirstChildElement("TableRange");
+    if (child)
+    {
+      if ( child->QueryStringAttribute( "min", &double_strings[0] ) != TIXML_SUCCESS ) return nullptr;
+      if ( child->QueryStringAttribute( "max", &double_strings[1] ) != TIXML_SUCCESS ) return nullptr;
+      StringsToNumbers<double>(2, double_strings, range);
+      lut->SetTableRange( range );
+    }
 
-// important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
-MITK_REGISTER_SERIALIZER(LookupTablePropertySerializer);
+    child = element->FirstChildElement("Table");
+    if (child)
+    {
+      unsigned int index(0);
+      for( TiXmlElement* grandChild = child->FirstChildElement("RgbaColor"); grandChild; grandChild = grandChild->NextSiblingElement("RgbaColor"))
+      {
+        if ( grandChild->QueryStringAttribute("R", &double_strings[0]) != TIXML_SUCCESS ) return nullptr;
+        if ( grandChild->QueryStringAttribute("G", &double_strings[1]) != TIXML_SUCCESS ) return nullptr;
+        if ( grandChild->QueryStringAttribute("B", &double_strings[2]) != TIXML_SUCCESS ) return nullptr;
+        if ( grandChild->QueryStringAttribute("A", &double_strings[3]) != TIXML_SUCCESS ) return nullptr;
+        StringsToNumbers<double>(4, double_strings, rgba);
+        lut->SetTableValue( index, rgba );
+        ++index;
+      }
+    }
+  }
+  catch (boost::bad_lexical_cast& e)
+  {
+    MITK_ERROR << "Could not parse string as number: " << e.what();
+    return nullptr;
+  }
 
-#endif
+  LookupTable::Pointer mitkLut = LookupTable::New();
+  mitkLut->SetVtkLookupTable( lut );
 
+  return LookupTableProperty::New(mitkLut).GetPointer();
+}

@@ -87,14 +87,7 @@ void mitk::BaseData::Expand( unsigned int timeSteps )
 {
   if (m_TimeGeometry.IsNotNull() )
   {
-    ProportionalTimeGeometry * propTimeGeometry = dynamic_cast<ProportionalTimeGeometry*> (m_TimeGeometry.GetPointer());
-    if (propTimeGeometry)
-    {
-      propTimeGeometry->Expand(timeSteps);
-      return;
-    }
-
-    mitkThrow() << "TimeGeometry is of an unkown Type. Could not expand it. ";
+    m_TimeGeometry->Expand(timeSteps);
   }
   else
   {
@@ -287,4 +280,17 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << "NULL" << std::endl;
   else
     GetTimeGeometry()->Print(os, indent);
+  // print out all properties
+  PropertyList::Pointer propertyList = this->GetPropertyList();
+  if (propertyList.IsNotNull() && !propertyList->IsEmpty())
+  {
+    //general headline
+    os << "Properties of BaseData:" << std::endl;
+
+    const PropertyList::PropertyMap* map = propertyList->GetMap();
+    for (PropertyList::PropertyMap::const_iterator iter = map->begin(); iter != map->end(); iter++)
+    {
+      os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
+    }
+  }
 }

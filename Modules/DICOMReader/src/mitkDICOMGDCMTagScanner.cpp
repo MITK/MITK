@@ -16,44 +16,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMGDCMTagScanner.h"
 
-mitk::DICOMGDCMTagScanner
-::DICOMGDCMTagScanner()
+mitk::DICOMGDCMTagScanner::DICOMGDCMTagScanner()
 {
 }
 
-mitk::DICOMGDCMTagScanner
-::DICOMGDCMTagScanner(const DICOMGDCMTagScanner& other)
-:DICOMTagCache(other)
+mitk::DICOMGDCMTagScanner::DICOMGDCMTagScanner( const DICOMGDCMTagScanner& other )
+: DICOMTagCache( other )
 {
 }
 
-mitk::DICOMGDCMTagScanner
-::~DICOMGDCMTagScanner()
+mitk::DICOMGDCMTagScanner::~DICOMGDCMTagScanner()
 {
 }
 
-std::string
-mitk::DICOMGDCMTagScanner
-::GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const
+std::string mitk::DICOMGDCMTagScanner::GetTagValue( DICOMImageFrameInfo* frame, const DICOMTag& tag ) const
 {
-  assert(frame);
+  assert( frame );
 
-  for(auto frameIter = m_ScanResult.begin();
-      frameIter != m_ScanResult.end();
-      ++frameIter)
+  for ( auto frameIter = m_ScanResult.cbegin(); frameIter != m_ScanResult.cend(); ++frameIter )
   {
-    if ( (*frameIter)->GetFrameInfo().IsNotNull() &&
-         (*((*frameIter)->GetFrameInfo()) == *frame )
-       )
+    if ( ( *frameIter )->GetFrameInfo().IsNotNull() && ( *( ( *frameIter )->GetFrameInfo() ) == *frame ) )
     {
-      return (*frameIter)->GetTagValueAsString(tag);
+      return ( *frameIter )->GetTagValueAsString( tag );
     }
-
   }
 
-  if ( m_ScannedTags.find(tag) != m_ScannedTags.end() )
+  if ( m_ScannedTags.find( tag ) != m_ScannedTags.cend() )
   {
-    if ( std::find( m_InputFilenames.begin(), m_InputFilenames.end(), frame->Filename ) != m_InputFilenames.end() )
+    if ( std::find( m_InputFilenames.cbegin(), m_InputFilenames.cend(), frame->Filename )
+         != m_InputFilenames.cend() )
     {
       // precondition of gdcm::Scanner::GetValue() fulfilled
       return m_GDCMScanner.GetValue( frame->Filename.c_str(), gdcm::Tag( tag.GetGroup(), tag.GetElement() ) );
@@ -64,10 +55,10 @@ mitk::DICOMGDCMTagScanner
       // this is a helpful reminder for them to inform us
       std::stringstream errorstring;
       errorstring << "Invalid call to DICOMGDCMTagScanner::GetTagValue( "
-        << "'" << frame->Filename << "', frame " << frame->FrameNo
-        << " ). Filename was never mentioned before!";
+                  << "'" << frame->Filename << "', frame " << frame->FrameNo
+                  << " ). Filename was never mentioned before!";
       MITK_ERROR << errorstring.str();
-      throw std::invalid_argument(errorstring.str());
+      throw std::invalid_argument( errorstring.str() );
     }
   }
   else
@@ -76,60 +67,50 @@ mitk::DICOMGDCMTagScanner
     // this is a helpful reminder for them to inform us
     std::stringstream errorstring;
     errorstring << "Invalid call to DICOMGDCMTagScanner::GetTagValue( ";
-    tag.Print(errorstring);
+    tag.Print( errorstring );
     errorstring << " ). Tag was never mentioned before!";
     MITK_ERROR << errorstring.str();
-    throw std::invalid_argument(errorstring.str());
+    throw std::invalid_argument( errorstring.str() );
   }
 }
 
-void
-mitk::DICOMGDCMTagScanner
-::AddTag(const DICOMTag& tag)
+void mitk::DICOMGDCMTagScanner::AddTag( const DICOMTag& tag )
 {
-  m_ScannedTags.insert(tag);
-  m_GDCMScanner.AddTag( gdcm::Tag(tag.GetGroup(), tag.GetElement()) ); // also a set, duplicate calls to AddTag don't hurt
+  m_ScannedTags.insert( tag );
+  m_GDCMScanner.AddTag(
+    gdcm::Tag( tag.GetGroup(), tag.GetElement() ) ); // also a set, duplicate calls to AddTag don't hurt
 }
 
-void
-mitk::DICOMGDCMTagScanner
-::AddTags(const DICOMTagList& tags)
+void mitk::DICOMGDCMTagScanner::AddTags( const DICOMTagList& tags )
 {
-  for(auto tagIter = tags.begin();
-      tagIter != tags.end();
-      ++tagIter)
+  for ( auto tagIter = tags.cbegin(); tagIter != tags.cend(); ++tagIter )
   {
-    this->AddTag(*tagIter);
+    this->AddTag( *tagIter );
   }
 }
 
-void
-mitk::DICOMGDCMTagScanner
-::SetInputFiles(const StringList& filenames)
+void mitk::DICOMGDCMTagScanner::SetInputFiles( const StringList& filenames )
 {
   m_InputFilenames = filenames;
 }
 
 
-void
-mitk::DICOMGDCMTagScanner
-::Scan()
+void mitk::DICOMGDCMTagScanner::Scan()
 {
   // TODO integrate push/pop locale??
   m_GDCMScanner.Scan( m_InputFilenames );
 
   m_ScanResult.clear();
-  for (StringList::const_iterator inputIter = m_InputFilenames.begin();
-       inputIter != m_InputFilenames.end();
-       ++inputIter)
+  m_ScanResult.reserve( m_InputFilenames.size() );
+
+  for ( auto inputIter = m_InputFilenames.cbegin(); inputIter != m_InputFilenames.cend(); ++inputIter )
   {
-    m_ScanResult.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New(*inputIter, 0), m_GDCMScanner.GetMapping(inputIter->c_str()) ) );
+    m_ScanResult.push_back( DICOMGDCMImageFrameInfo::New( DICOMImageFrameInfo::New( *inputIter, 0 ),
+                                                          m_GDCMScanner.GetMapping( inputIter->c_str() ) ) );
   }
 }
 
-mitk::DICOMGDCMImageFrameList
-mitk::DICOMGDCMTagScanner
-::GetFrameInfoList() const
+mitk::DICOMGDCMImageFrameList mitk::DICOMGDCMTagScanner::GetFrameInfoList() const
 {
   return m_ScanResult;
 }

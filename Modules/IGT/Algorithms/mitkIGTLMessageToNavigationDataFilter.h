@@ -25,7 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /**Documentation
   * \brief IGTLinkMessageToNavigationDataFilter is a filter that receives
   * OpenIGTLink messages as input and produce NavigationDatas as output

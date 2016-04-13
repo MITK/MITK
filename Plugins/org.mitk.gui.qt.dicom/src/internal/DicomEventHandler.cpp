@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <service/event/ctkEventConstants.h>
 #include <ctkDictionary.h>
 #include <mitkLogMacros.h>
-#include <mitkDicomSeriesReader.h>
 #include <mitkDataNode.h>
 #include <mitkIDataStorageService.h>
 #include <service/event/ctkEventAdmin.h>
@@ -28,6 +27,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QVector>
 #include "mitkImage.h"
 #include <mitkContourModelSet.h>
+
+#include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMEnums.h>
+#include <mitkStringProperty.h>
 
 #include <mitkRTDoseReader.h>
 #include <mitkRTStructureSetReader.h>
@@ -60,12 +63,10 @@ DicomEventHandler::~DicomEventHandler()
 void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 {
   QStringList listOfFilesForSeries;
-  mitk::DicomSeriesReader::StringContainer seriesToLoad;
-
   listOfFilesForSeries = ctkEvent.getProperty("FilesForSeries").toStringList();
 
-  if (!listOfFilesForSeries.isEmpty()){
-
+  if (!listOfFilesForSeries.isEmpty())
+  {
     //for rt data, if the modality tag isnt defined or is "CT" the image is handled like before
     if(ctkEvent.containsProperty("Modality") &&
        (ctkEvent.getProperty("Modality").toString().compare("RTDOSE",Qt::CaseInsensitive) == 0 ||
@@ -82,7 +83,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
         doseImageNode = doseReader->LoadRTDose(listOfFilesForSeries.at(0).toStdString().c_str());
         doseOutlineNode->SetData(doseImageNode->GetData());
-        if(doseImageNode.IsNotNull() && doseOutlineNode->GetData() != NULL)
+        if (doseImageNode.IsNotNull() && doseOutlineNode->GetData() != nullptr)
         {
           berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
           berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID.c_str());
@@ -98,35 +99,35 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
             if (aPresetNode.IsNull())
             {
-              mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: "<< (*pos).toStdString();
+              mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << (*pos).toStdString();
             }
 
             mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
 
-            NamesType levelNames =  aPresetNode->ChildrenNames();
+            NamesType levelNames = aPresetNode->ChildrenNames();
             for (NamesType::const_iterator levelName = levelNames.begin(); levelName != levelNames.end(); ++levelName)
             {
               berry::IPreferences::Pointer levelNode = aPresetNode->Node(*levelName);
               if (aPresetNode.IsNull())
               {
-                mitkThrow() << "Error in preference interface. Cannot find level node under given preset name. Name: "<< (*pos).toStdString() <<"; Level id: "<< (*levelName).toStdString();
+                mitkThrow() << "Error in preference interface. Cannot find level node under given preset name. Name: " << (*pos).toStdString() << "; Level id: " << (*levelName).toStdString();
               }
 
               mitk::IsoDoseLevel::Pointer isoLevel = mitk::IsoDoseLevel::New();
 
-              isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID.c_str(),0.0));
+              isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID.c_str(), 0.0));
               mitk::IsoDoseLevel::ColorType color;
-              color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID.c_str(),1.0));
-              color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID.c_str(),1.0));
-              color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID.c_str(),1.0));
+              color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID.c_str(), 1.0));
+              color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID.c_str(), 1.0));
+              color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID.c_str(), 1.0));
               isoLevel->SetColor(color);
-              isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID.c_str(),true));
-              isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID.c_str(),true));
+              isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID.c_str(), true));
+              isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID.c_str(), true));
 
               levelSet->SetIsoDoseLevel(isoLevel);
             }
 
-            presetMap.insert(std::make_pair((*pos).toStdString(),levelSet));
+            presetMap.insert(std::make_pair((*pos).toStdString(), levelSet));
           }
 
           if (presetMap.size() == 0)
@@ -134,60 +135,82 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
             presetMap.insert(std::make_pair(std::string("Virtuos"), mitk::GeneratIsoLevels_Virtuos()));
           }
 
-          double referenceDose = 40.0;
+
+          prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
+
+          if (prefNode.IsNull())
+          {
+            mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << prefNode->ToString().toStdString();
+          }
+
           //set some specific colorwash and isoline properties
-          doseImageNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), true);
-          doseOutlineNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), true);
+          bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(), true);
+          doseImageNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), showColorWashGlobal);
+
+          bool showIsolinesGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(), true);
+          doseOutlineNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsolinesGlobal);
+
           //Set reference dose property
+          double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
           doseImageNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
           doseOutlineNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
 
-          berry::IPreferences::Pointer nameNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
-          QString presetName = nameNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID.c_str(),"");
+
+          QString presetName = prefNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID.c_str(), "Virtuos");
 
           mitk::IsoDoseLevelSet::Pointer isoDoseLevelPreset = presetMap[presetName.toStdString()];
           mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(isoDoseLevelPreset);
 
-          doseImageNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),levelSetProp);
-          doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(),levelSetProp);
+          doseImageNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
+          doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
 
           mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
           mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
-          doseImageNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),levelVecProp);
-          doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),levelVecProp);
-
-          //Generating the Colorwash
-          vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-
-          for(mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelPreset->Begin(); itIsoDoseLevel != isoDoseLevelPreset->End(); ++itIsoDoseLevel)
-          {
-            float *hsv = new float[3];
-            //used for transfer rgb to hsv
-            vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
-            if(itIsoDoseLevel->GetVisibleColorWash()){
-              cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0],itIsoDoseLevel->GetColor()[1],itIsoDoseLevel->GetColor()[2],&hsv[0],&hsv[1],&hsv[2]);
-              transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose,hsv[0],hsv[1],hsv[2],1.0,1.0);
-            }
-          }
-
-          mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
-          mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-          mitkTransFunc->SetColorTransferFunction(transferFunction);
-          mitkTransFuncProp->SetValue(mitkTransFunc);
+          doseImageNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
+          doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
 
           mitk::RenderingModeProperty::Pointer renderingModeProp = mitk::RenderingModeProperty::New();
-          renderingModeProp->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
 
-          doseImageNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+          if (showColorWashGlobal)
+          {
+            //Generating the Colorwash
+            vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+
+            for (mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelPreset->Begin(); itIsoDoseLevel != isoDoseLevelPreset->End(); ++itIsoDoseLevel)
+            {
+              float *hsv = new float[3];
+              //used for transfer rgb to hsv
+              vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+              if (itIsoDoseLevel->GetVisibleColorWash()){
+                cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2], &hsv[0], &hsv[1], &hsv[2]);
+                transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, hsv[0], hsv[1], hsv[2], 1.0, 1.0);
+              }
+            }
+
+            mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+            mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+            mitkTransFunc->SetColorTransferFunction(transferFunction);
+            mitkTransFuncProp->SetValue(mitkTransFunc);
+            doseImageNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+
+
+            renderingModeProp->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
+          }
+          else
+          {
+            //Set rendering mode to levelwindow color mode
+            renderingModeProp->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+          }
+
           doseImageNode->SetProperty("Image Rendering.Mode", renderingModeProp);
           doseImageNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
           //set the outline properties
           doseOutlineNode->SetBoolProperty("outline binary", true);
-          doseOutlineNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-          doseOutlineNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false) );
+          doseOutlineNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+          doseOutlineNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
 
-          ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+          ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
           mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
           mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
@@ -196,7 +219,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
           //set the dose mapper for outline drawing; the colorwash is realized by the imagevtkmapper2D
           mitk::DoseImageVtkMapper2D::Pointer contourMapper = mitk::DoseImageVtkMapper2D::New();
-          doseOutlineNode->SetMapper(1,contourMapper);
+          doseOutlineNode->SetMapper(1, contourMapper);
 
           mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
         }//END DOSE
@@ -226,7 +249,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     }
     else
     {
-
+      mitk::StringList seriesToLoad;
       QStringListIterator it(listOfFilesForSeries);
 
       while (it.hasNext())
@@ -234,21 +257,90 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
         seriesToLoad.push_back(it.next().toStdString());
       }
 
+      //Get Reference for default data storage.
+      ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+      mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+      mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
-      mitk::DataNode::Pointer node = mitk::DicomSeriesReader::LoadDicomSeries(seriesToLoad);
-      if (node.IsNull())
+      //special handling of Philips 3D US DICOM.
+      //Copied from DICOMSeriesReaderService
+      if (!seriesToLoad.empty() && mitk::DicomSeriesReader::IsPhilips3DDicom(seriesToLoad.front()))
       {
-        MITK_ERROR << "Error loading series: " << ctkEvent.getProperty("SeriesName").toString().toStdString()
-                   << " id: " <<ctkEvent.getProperty("SeriesUID").toString().toStdString();
+          MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
+          const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+          setlocale(LC_NUMERIC, "C");
+          std::locale previousCppLocale(std::cin.getloc());
+          std::locale l("C");
+          std::cin.imbue(l);
+
+          mitk::DataNode::Pointer node = mitk::DataNode::New();
+          mitk::DicomSeriesReader::StringContainer stringvec;
+          stringvec.push_back(seriesToLoad.front());
+          if (mitk::DicomSeriesReader::LoadDicomSeries(stringvec, *node))
+          {
+              mitk::BaseData::Pointer data = node->GetData();
+              mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameName(seriesToLoad.front()));
+              data->GetPropertyList()->SetProperty("name", nameProp);
+              node->SetProperty("name", nameProp);
+              dataStorage->Add(node);
+          }
+          setlocale(LC_NUMERIC, previousCLocale);
+          std::cin.imbue(previousCppLocale);
+          return;
       }
-      else
-      {
-        //Get Reference for default data storage.
-        ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-        mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-        mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
-        dataStorage->Add(node);
+      //Normal DICOM handling (It wasn't a Philips 3D US)
+      mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
+
+      selector->LoadBuiltIn3DConfigs();
+      selector->LoadBuiltIn3DnTConfigs();
+      selector->SetInputFiles(seriesToLoad);
+
+      mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
+
+      reader->SetInputFiles(seriesToLoad);
+      reader->AnalyzeInputFiles();
+      reader->LoadImages();
+
+      for (unsigned int i = 0; i < reader->GetNumberOfOutputs(); ++i)
+      {
+          const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(i);
+          mitk::BaseData::Pointer data = desc.GetMitkImage().GetPointer();
+
+          std::string nodeName = "Unnamed_DICOM";
+
+          std::string studyDescription = desc.GetPropertyAsString("studyDescription");
+          std::string seriesDescription = desc.GetPropertyAsString("seriesDescription");
+
+          if (!studyDescription.empty())
+          {
+              nodeName = studyDescription;
+          }
+
+          if (!seriesDescription.empty())
+          {
+              if (!studyDescription.empty())
+              {
+                  nodeName += "/";
+              }
+              nodeName += seriesDescription;
+          }
+
+          mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New(nodeName);
+          data->SetProperty("name", nameProp);
+
+          mitk::DataNode::Pointer node = mitk::DataNode::New();
+          node->SetData(data);
+          nameProp = mitk::StringProperty::New(nodeName);
+          node->SetProperty("name", nameProp);
+
+          dataStorage->Add(node);
+      }
+
+      if (reader->GetNumberOfOutputs() < 1)
+      {
+          MITK_ERROR << "Error loading series: " << ctkEvent.getProperty("SeriesName").toString().toStdString()
+              << " id: " << ctkEvent.getProperty("SeriesUID").toString().toStdString();
       }
     }
   }

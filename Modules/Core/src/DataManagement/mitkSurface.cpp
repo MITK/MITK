@@ -53,7 +53,7 @@ mitk::Surface::Surface(const mitk::Surface& other)
   if(!other.m_PolyDatas.empty())
   {
     m_PolyDatas.resize(other.m_PolyDatas.size());
-    std::transform(other.m_PolyDatas.begin(), other.m_PolyDatas.end(), m_PolyDatas.begin(), DeepCopy);
+    std::transform(other.m_PolyDatas.cbegin(), other.m_PolyDatas.cend(), m_PolyDatas.begin(), DeepCopy);
   }
   else
   {

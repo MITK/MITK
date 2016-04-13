@@ -6,6 +6,6 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE DIFFUSIONIMAGING_APP_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgets MitkSceneSerialization
-  PACKAGE_DEPENDS Qt4|QtWebKit Qt5|WebKitWidgets
+  PACKAGE_DEPENDS Qt5|WebKitWidgets
 )
 

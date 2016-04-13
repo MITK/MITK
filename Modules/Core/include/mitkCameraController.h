@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include "mitkBaseController.h"
-#include "mitkDisplayPositionEvent.h"
 
 namespace mitk {
 
@@ -39,29 +38,16 @@ public:
     enum StandardView { ANTERIOR,POSTERIOR,SINISTER,DEXTER,CRANIAL,CAUDAL };
 
     mitkClassMacro(CameraController, BaseController);
-    mitkNewMacro1Param(Self, const char*);
+    //mitkNewMacro1Param(Self, const char*);
+    itkNewMacro(Self);
 
-    itkSetMacro(Renderer,BaseRenderer*);
-    itkSetMacro(ZoomFactor,double);
+
+    void SetRenderer(const BaseRenderer* renderer)
+    {
+      m_Renderer = renderer;
+    };
     itkGetConstMacro(Renderer,const BaseRenderer*);
-    itkGetConstMacro(ZoomFactor,double);
 
-    //##Documentation
-    //## @brief Implemented in sub-classes.
-    virtual void Resize(int w, int h);
-
-    //##Documentation
-    //## @brief Implemented in sub-classes.
-    virtual void MousePressEvent(mitk::MouseEvent*);
-    //##Documentation
-    //## @brief Implemented in sub-classes.
-    virtual void MouseReleaseEvent(mitk::MouseEvent*);
-    //##Documentation
-    //## @brief Implemented in sub-classes.
-    virtual void MouseMoveEvent(mitk::MouseEvent*);
-    //##Documentation
-    //## @brief Implemented in sub-classes.
-    virtual void KeyPressEvent(mitk::KeyEvent*);
 
    virtual void SetViewToAnterior();
    virtual void SetViewToPosterior();
@@ -71,11 +57,40 @@ public:
    virtual void SetViewToCaudal();
    virtual void SetStandardView(StandardView view);
 
+   /**
+    * @brief Fit Adjust the camera, so that the world bounding box is fully visible.
+    */
+   void Fit();
+
+   /**
+    * @brief Set the desired zoom-level to the absolute value given.
+    */
+   void SetScaleFactorInMMPerDisplayUnit( ScalarType scale );
+
+   /**
+    * @brief MoveCameraToPoint Move camera so that the point on the plane is in the view center.
+    * @param planePoint
+    */
+   void MoveCameraToPoint(const Point2D &planePoint);
+
+   void MoveBy(const Vector2D &moveVectorInMM);
+
+   void Zoom(ScalarType factor, const Point2D &zoomPointInMM);
+
+   Point2D GetCameraPositionOnPlane();
+
+   /**
+    * @brief AdjustCameraToPlane Moves the camera of a 2D Renderwindow without panning or
+    * zooming, eg. only rotate the camera.
+    */
+   void AdjustCameraToPlane();
+
 protected:
+
     /**
     * @brief Default Constructor
     **/
-    CameraController(const char * type = nullptr);
+    CameraController();
 
     /**
     * @brief Default Destructor
@@ -83,7 +98,20 @@ protected:
     virtual ~CameraController();
     const BaseRenderer* m_Renderer;
 
-    double m_ZoomFactor; ///< zoom factor used for the standard view camera
+    ScalarType ComputeMaxParallelScale();
+
+private:
+
+
+    /**
+     * @brief AdjustCameraToPlane Moves the camera of a 2D Renderwindow without panning or
+     * zooming, eg. only rotate the camera.
+     * @param PlanePoint point where the camera is moved to during the adjustment.
+     */
+    void AdjustCameraToPlane(const Point2D& PlanePoint);
+
+    void AdjustConstrainedCameraPosition(Point2D& planePoint);
+
 };
 
 } // namespace mitk

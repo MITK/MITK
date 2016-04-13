@@ -8,6 +8,30 @@ For a detailed list of parameters call the according tool without any arguments 
 
 \section Preprocessing Preprocessing Tools
 
+
+\subsection DiffDicomLoad Diffusion Dicom Loader
+
+Loads Diffusion DICOM Files and creates NRRD or Nifty file.
+
+
+\code
+  $./MitkDiffusionDICOMLoader -i /home/dcmFolder/ -o /home/outputfile.nrrd
+  $./MitkDiffusionDICOMLoader -i /home/dcmFolder/ -o /home/outputfile.nii
+\endcode
+
+
+\subsection RegDicomLoad Regular Dicom Loader
+
+Loads DICOM Files and creates NRRD or Nifty file.
+
+\code
+  $./MitkDicom2Nrrd  -i /home/dcmFolder/ -o /home/outputfile.nrrd
+  $./MitkDicom2Nrrd -i /home/dcmFolder/ -o /home/outputfile.nii
+\endcode
+
+
+
+
 \subsection SecFolderRegistration Folder Registration
 
 Allows to register a series of images (of different modalities, including diffusion weighted) to one reference image. It allows to register derived resources (e.g. a segmentation on
@@ -37,8 +61,8 @@ Patien01_2010-4_ROI.nrrd
 All T2 and DWI images are to be co-registered to the first T2 image, this can be achieved by the following two calls:
 
 \code
-  $./MitkFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m T2.nrrd
-  $./MitkFolderRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi
+  $./MitkRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m T2.nrrd
+  $./MitkRegistration -i /home/inputFolder/ -o /home/outputFolder/  -f Patien01_2010-1_T2.nrrd -m .dwi
 \endcode
 
 The segmentations where performed on the T1 image and are therefore related to the image space of the respective T1 image,
@@ -66,6 +90,12 @@ and therefore registration fails. In this case you can try the -c option which u
 \subsection CopyGeometry Copy Geometry
 
 Copies the geometry (origin) of the source image to the target image.
+This is useful in cases where rounding errors in geometries cause the following itk error:
+itk::ERROR: ImageToImageFilter(): Inputs do not occupy the same physical space!
+
+For images with differing extent the --alignCentroid option will adapt the origin of the input image such that the centroids of both images align,
+this can be as a preprocessing steo for registratering images that do not overlap at all
+(e.g. error : Joint PDF summed to zero )
 
 
 \subsection ImageResampler Resampling of Images

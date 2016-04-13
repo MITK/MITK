@@ -74,7 +74,7 @@ namespace mitk {
     mitkClassMacroItkParent(ImageDataItem, itk::LightObject);
 
     itkCloneMacro(ImageDataItem);
-    virtual itk::LightObject::Pointer InternalClone() const;
+    virtual itk::LightObject::Pointer InternalClone() const override;
 
 
     ImageDataItem(const ImageDataItem& aParent, const mitk::ImageDescriptor::Pointer desc,
@@ -147,14 +147,14 @@ namespace mitk {
       return m_Parent;
     }
 
-    //## Returns a vtkImageData; if non is present, a new one is constructed.
+    /**
+     * @brief GetVtkImageAccessor Returns a vtkImageDataItem, if none is present, a new one is constructed by the ConstructVtkImageData method.
+     *                            Due to historical development of MITK and VTK, the vtkImage origin is explicitly set to (0, 0, 0) for 3D images.
+     *                            See bug 5050 for detailed information.
+     * @return Pointer of type ImageVtkReadAccessor
+     */
     ImageVtkReadAccessor* GetVtkImageAccessor(ImageConstPointer) const;
     ImageVtkWriteAccessor* GetVtkImageAccessor(ImagePointer);
-    /*{
-      if(m_VtkImageData==NULL)
-        ConstructVtkImageData(iP);
-      return m_VtkImageData;
-    }*/
 
     // Returns if image data should be deleted on destruction of ImageDataItem.
     bool GetManageMemory() const

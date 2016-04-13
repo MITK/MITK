@@ -92,12 +92,6 @@ signals:
     void SignalCancelImport();
 
 public slots:
-
-    /// @brief Called when indexing into database is finished.
-    /// In this slot the models database with new imports is set.
-    /// This causes a model update.
-    void OnFinishedImport();
-
     /// @brief Called when view button was clicked.
    void OnViewButtonClicked();
 
@@ -117,15 +111,9 @@ protected:
 
     void SetDatabase(QString databaseFile);
 
-    /// \brief SetupProgressDialog Sets up progress dialog.
-    void SetupProgressDialog(QWidget* parent);
-
     bool DeletePatients();
     bool DeleteStudies();
     bool DeleteSeries();
-
-    QProgressDialog* m_ProgressDialog;
-    QLabel* m_ProgressDialogLabel;
 
     ctkDICOMDatabase* m_LocalDatabase;
     ctkDICOMIndexer* m_LocalIndexer;

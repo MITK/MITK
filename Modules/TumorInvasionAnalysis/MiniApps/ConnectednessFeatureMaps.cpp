@@ -25,6 +25,12 @@
 
 #include <itkConnectednessFilter.h>
 
+// ITK
+#include "itkBinaryErodeImageFilter.h"
+#include "itkFlatStructuringElement.h"
+
+using namespace std;
+
 typedef itk::Image<unsigned char,3> BinaryType;
 typedef itk::Image<mitk::ScalarType,3> ResultType;
 typedef itk::Image< itk::DiffusionTensor3D<float>, 3 > ItkTensorImage;
@@ -47,6 +53,8 @@ int main(int argc, char* argv[])
     parser.addArgument("confidence", "c", mitkCommandLineParser::InputImage, "confidence map (only when Tensor Images are used)");
     parser.addArgument("valueImage", "x", mitkCommandLineParser::InputImage, "image of values that are propagated");
 
+    parser.addArgument("erodeSeed", "a", mitkCommandLineParser::Bool, "apply erosion of seed region");
+
     parser.addArgument("rankFilter", "r", mitkCommandLineParser::Bool, "median filter for propagation");
 
     parser.addArgument("propMap", "p", mitkCommandLineParser::OutputFile, "[out] propagated map");
@@ -64,12 +72,17 @@ int main(int argc, char* argv[])
     }
 
     bool useRank = false;
+    bool applyErosion = false;
     bool useValueImage = false;
     if (parsedArgs.count("rankFilter") || parsedArgs.count("r"))
         useRank = true;
 
     if (parsedArgs.count("valueImage") || parsedArgs.count("x"))
         useValueImage = true;
+
+    if (parsedArgs.count("erodeSeed") || parsedArgs.count("a"))
+        applyErosion = true;
+
 
     std::string inputFile = us::any_cast<string>(parsedArgs["input"]);
     std::string propMap = us::any_cast<string>(parsedArgs["propMap"]);
@@ -118,6 +131,28 @@ int main(int argc, char* argv[])
     mitk::CastToItkImage(seedImage, itkSeed);
     if (useValueImage)
         mitk::CastToItkImage(valueImage, itkValueImage);
+
+
+
+    if (applyErosion)
+    {
+
+      typedef itk::FlatStructuringElement<3> StructuringElementType;
+      StructuringElementType::RadiusType elementRadius;
+      elementRadius.Fill(2);
+      elementRadius[2] = 0;
+      StructuringElementType structuringElement = StructuringElementType::Box(elementRadius);
+
+      typedef itk::BinaryErodeImageFilter <BinaryType, BinaryType, StructuringElementType> BinaryErodeImageFilterType;
+
+      BinaryErodeImageFilterType::Pointer erodeFilter = BinaryErodeImageFilterType::New();
+      erodeFilter->SetInput(itkSeed);
+      erodeFilter->SetKernel(structuringElement);
+      erodeFilter->SetForegroundValue(1);
+      erodeFilter->Update();
+      itkSeed = erodeFilter->GetOutput();
+    }
+
 
     if (mode == "Vector" || mode == "FeatureVector")
     {

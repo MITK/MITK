@@ -132,7 +132,7 @@ namespace mitk
     }
 
 #define PERSISTENCE_GET_SERVICE_METHOD_MACRO\
-    mitk::IPersistenceService* GetPeristenceService() const\
+    mitk::IPersistenceService* GetPersistenceService() const\
     {\
         PERSISTENCE_GET_SERVICE_MACRO\
         return persistenceService;\
@@ -142,7 +142,7 @@ namespace mitk
 public:\
     bool Save(const std::string& fileName="", bool appendChanges=false)\
     {\
-        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        mitk::IPersistenceService* persistenceService = this->GetPersistenceService();\
         bool noError = persistenceService != 0;\
         if( noError )\
             this->ToPropertyList();\
@@ -152,7 +152,7 @@ public:\
     }\
     bool Load(const std::string& fileName="", bool enforeReload=true)\
     {\
-        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        mitk::IPersistenceService* persistenceService = this->GetPersistenceService();\
         bool noError = persistenceService != 0 && persistenceService->Load(fileName, enforeReload);\
         if( noError )\
         {\
@@ -162,7 +162,7 @@ public:\
     }\
     void ToPropertyList()\
     {\
-        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        mitk::IPersistenceService* persistenceService = this->GetPersistenceService();\
         this->InitializePropertyListReplacedObserver(persistenceService);\
         if( !persistenceService )\
             return;\
@@ -172,7 +172,7 @@ public:\
     }\
     void FromPropertyList()\
     {\
-        mitk::IPersistenceService* persistenceService = this->GetPeristenceService();\
+        mitk::IPersistenceService* persistenceService = this->GetPersistenceService();\
         this->InitializePropertyListReplacedObserver(persistenceService);\
         if( !persistenceService )\
             return;\

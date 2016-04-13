@@ -221,6 +221,9 @@ void HelpContentView::setContentsWidgetBusy()
 void HelpContentView::unsetContentsWidgetBusy()
 {
   m_ContentWidget->unsetCursor();
+  QHelpEngineWrapper& helpEngine = HelpPluginActivator::getInstance()->getQHelpEngine();
+  m_ContentWidget->setModel(helpEngine.contentModel());
+  m_ContentWidget->sortByColumn(0, Qt::AscendingOrder);
 }
 
 }

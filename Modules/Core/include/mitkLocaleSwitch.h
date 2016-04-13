@@ -14,47 +14,81 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#ifndef __mitkLocaleSwitch_h
+#define __mitkLocaleSwitch_h
 
+#include "MitkCoreExports.h"
 
-#ifndef MITKLOCALESWITCH_H_
-#define MITKLOCALESWITCH_H_
-
-#include <MitkCoreExports.h>
 #include <clocale>
 
-namespace mitk {
+namespace mitk
+{
 
+/**
+  \brief Convenience class to temporarily change the current locale.
+
+  This helper class can be used to switch to a specific locale
+  for a couple of operations. Once the class is destroyed, the previous
+  locale will be restored. This avoids calling or forgetting to call
+  setlocale() in multiple return locations.
+
+  Typically this is used to switch to a "C" locale when parsing or
+  printing numbers, in order to consistently get "." and not "," as
+  a decimal separator.
+
+  \code
+
+  std::string toString(int number)
+  {
+    mitk::LocaleSwitch localeSwitch("C");// installs C locale until the end of the function
+
+    std::stringstream parser;
+    parser << number;
+
+    return parser.str();
+  }
+  \endcode
+*/
 struct MITKCORE_EXPORT LocaleSwitch
 {
   LocaleSwitch(const std::string& newLocale)
-    : m_OldLocale(std::setlocale(LC_ALL, nullptr))
-    , m_NewLocale(newLocale)
+  : m_NewLocale( newLocale )
   {
-    if (m_OldLocale == nullptr)
+    // query and keep the current locale
+    const char* currentLocale = std::setlocale(LC_ALL, nullptr);
+    if (currentLocale != nullptr)
+        m_OldLocale = currentLocale;
+    else
+        m_OldLocale = "";
+
+    // install the new locale if it different from the current one
+    if (m_NewLocale != m_OldLocale)
     {
-      m_OldLocale = "";
-    }
-    else if (m_NewLocale != m_OldLocale)
-    {
-      // set the locale
-      if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == nullptr)
+      if ( ! std::setlocale(LC_ALL, m_NewLocale.c_str()) )
       {
-        MITK_INFO << "Could not set locale " << m_NewLocale;
-        m_OldLocale = nullptr;
+        MITK_INFO << "Could not switch to locale " << m_NewLocale;
+        m_OldLocale = "";
       }
     }
   }
+
   ~LocaleSwitch()
   {
-    if (m_OldLocale != nullptr && std::setlocale(LC_ALL, m_OldLocale) == nullptr)
+    if ( !m_OldLocale.empty() && m_OldLocale != m_NewLocale && !std::setlocale(LC_ALL, m_OldLocale.c_str()) )
     {
-      MITK_INFO << "Could not reset locale " << m_OldLocale;
+      MITK_INFO << "Could not reset original locale " << m_OldLocale;
     }
   }
+
 private:
-  const char* m_OldLocale;
+
+  /// locale at instantiation of object
+  std::string m_OldLocale;
+
+  /// locale during life-time of object
   const std::string m_NewLocale;
 };
+
 }
 
-#endif // MITKLOCALESWITCH_H_
+#endif // __mitkLocaleSwitch_h

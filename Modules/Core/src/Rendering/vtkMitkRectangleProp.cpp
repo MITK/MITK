@@ -32,7 +32,9 @@ vtkStandardNewMacro(vtkMitkRectangleProp);
 
 vtkMitkRectangleProp::vtkMitkRectangleProp():
   m_Height(0),
-  m_Width(0)
+  m_Width(0),
+  m_OriginX(0),
+  m_OriginY(0)
 {
   vtkSmartPointer<vtkPolyDataMapper2D> mapper = vtkSmartPointer<vtkPolyDataMapper2D>::New();
   m_PolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -72,6 +74,8 @@ int vtkMitkRectangleProp::RenderOverlay(vtkViewport* viewport)
   {
     m_Width = viewport->GetSize()[0];
     m_Height = viewport->GetSize()[1];
+    m_OriginX = viewport->GetOrigin()[0];
+    m_OriginY = viewport->GetOrigin()[1];
     UpdateRectangle();
   }
   this->Mapper->RenderOverlay(viewport, this);
@@ -83,20 +87,22 @@ void vtkMitkRectangleProp::UpdateRectangle()
 {
   vtkSmartPointer<vtkPoints> points = m_PolyData->GetPoints();
   float offset = (GetProperty()->GetLineWidth()-0.5);
-  float wLine = m_Width-1;
-  float hLine = m_Height-1;
+  float wLine = m_OriginX+m_Width-1;
+  float hLine = m_OriginY+m_Height-1;
+  float offX = m_OriginX+offset;
+  float offY = m_OriginY+offset;
 
-  points->SetPoint(m_BottomLeftR  ,0.0, offset, 0.0);
-  points->SetPoint(m_BottomRightL ,m_Width, offset, 0.0);
+  points->SetPoint(m_BottomLeftR  ,m_OriginX, offY, 0.0);
+  points->SetPoint(m_BottomRightL ,m_Width+m_OriginX, offY, 0.0);
 
-  points->SetPoint(m_BottomLeftU  ,offset, 0.0, 0.0);
-  points->SetPoint(m_TopLeftD     ,offset, m_Height, 0.0);
+  points->SetPoint(m_BottomLeftU  ,offX, m_OriginY, 0.0);
+  points->SetPoint(m_TopLeftD     ,offX, m_OriginY+m_Height, 0.0);
 
-  points->SetPoint(m_TopLeftR     ,0.0, hLine, 0.0);
-  points->SetPoint(m_TopRightL    ,m_Width, hLine, 0.0);
+  points->SetPoint(m_TopLeftR     ,m_OriginX, hLine, 0.0);
+  points->SetPoint(m_TopRightL    ,m_Width+m_OriginX, hLine, 0.0);
 
-  points->SetPoint(m_TopRightD    ,wLine, m_Height, 0.0);
-  points->SetPoint(m_BottomRightU ,wLine, 0.0, 0.0);
+  points->SetPoint(m_TopRightD    ,wLine, m_OriginY+m_Height, 0.0);
+  points->SetPoint(m_BottomRightU ,wLine, m_OriginY, 0.0);
 }
 
 void vtkMitkRectangleProp::CreateRectangle()

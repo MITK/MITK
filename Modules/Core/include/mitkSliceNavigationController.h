@@ -89,11 +89,6 @@ class BaseRenderer;
  * ITK events to tell observers, like a BaseRenderer,  when the selected slice
  * or timestep changes.
  *
- * SliceNavigationControllers are registered as listeners to GlobalInteraction
- * by the QmitkStdMultiWidget. In ExecuteAction, the controllers react to
- * PositionEvents by setting the steppers to the slice which is nearest to the
- * point of the PositionEvent.
- *
  * Example:
  * \code
  * // Initialization
@@ -163,9 +158,10 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
 {
   public:
     mitkClassMacro(SliceNavigationController,BaseController);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    mitkNewMacro1Param(Self, const char *);
+    //itkFactorylessNewMacro(Self)
+    //mitkNewMacro1Param(Self, const char *);
+    itkNewMacro(Self);
+    //itkCloneMacro(Self)
 
     /**
      * \brief Possible view directions, \a Original will uses
@@ -238,7 +234,7 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     itkGetEnumMacro(DefaultViewDirection, ViewDirection);
 
 
-    const char* GetViewDirectionAsString();
+    const char* GetViewDirectionAsString() const;
 
     virtual void SetViewDirectionToDefault();
 
@@ -268,7 +264,6 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     /**
      * \brief Tell observers to re-read the currently selected 2D geometry
      *
-     * Called by mitk::SlicesRotator during rotation.
      */
     virtual void SendCreatedWorldGeometryUpdate();
 
@@ -488,10 +483,6 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
     void ReorientSlices(
        const mitk::Point3D &point, const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1 );
 
-
-    virtual bool ExecuteAction(
-      Action* action, mitk::StateEvent const* stateEvent) override;
-
     void ExecuteOperation(Operation* operation) override;
 
     /**
@@ -521,40 +512,9 @@ class MITKCORE_EXPORT SliceNavigationController : public BaseController
 
 
   protected:
-    SliceNavigationController(const char * type = nullptr);
+    SliceNavigationController();
     virtual ~SliceNavigationController();
 
-    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition);
-/*
-    template <class T>
-    static void buildstring( mitkIpPicDescriptor *pic, itk::Point<int, 3> p, std::string &s, T = 0)
-    {
-      std::string value;
-      std::stringstream stream;
-      stream.imbue(std::locale::classic());
-      stream<<s<<"; Pixelvalue: ";
-
-      if ( (p[0]>=0 && p[1] >=0 && p[2]>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] )
-      {
-        if(pic->bpe!=24)
-        {
-          stream<<(((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] ]);
-        }
-        else
-        {
-          stream<<(((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
-          stream<<(((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
-          stream<<(((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 ]);
-        }
-
-        s = stream.str();
-      }
-      else
-      {
-        s+= "point out of data";
-      }
-    };
-*/
     mitk::BaseGeometry::ConstPointer m_InputWorldGeometry3D;
     mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
 

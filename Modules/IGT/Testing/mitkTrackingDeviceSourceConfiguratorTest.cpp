@@ -21,6 +21,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkIGTConfig.h>
 
+#include <usModuleContext.h>
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
+#include "mitkTrackingDeviceTypeCollection.h"
+#include "mitkUnspecifiedTrackingTypeInformation.h"
+
+//All Tracking devices, which should be avaiable by default
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+#include "mitkVirtualTrackerTypeInformation.h"
+#include "mitkMicronTrackerTypeInformation.h"
+#include "mitkNPOptitrackTrackingTypeInformation.h"
+#include "mitkOpenIGTLinkTypeInformation.h"
+
 
 static void TestInstantiation()
 {
@@ -42,7 +59,7 @@ static void TestInvalidClaronTrackingDevice()
 
   //create invalid tool 1
   mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  firstTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
   firstNode->SetName("Tool1");
   firstTool->SetDataNode(firstNode);
@@ -50,7 +67,7 @@ static void TestInvalidClaronTrackingDevice()
 
   //create invalid tool 2
   mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
-  secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  secondTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
   secondNode->SetName("Tool2");
   secondTool->SetDataNode(secondNode);
@@ -67,7 +84,7 @@ static void TestInvalidClaronTrackingDevice()
 
   MITK_TEST_OUTPUT(<<"Testing simple claron tracking device with another 2 invalid tools");
 
-  secondTool->SetTrackingDeviceType(mitk::NDIAurora);
+  secondTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
   claronStorage = mitk::NavigationToolStorage::New();
   claronStorage->AddTool(secondTool);
 
@@ -100,7 +117,7 @@ static void TestValidClaronTrackingDevice()
 
   //create valid tool 1
   mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  firstTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
   firstNode->SetName("Tool1");
   firstTool->SetDataNode(firstNode);
@@ -110,7 +127,7 @@ static void TestValidClaronTrackingDevice()
 
   //create valid tool 2
   mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
-  secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  secondTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
   secondNode->SetName("Tool2");
   secondTool->SetDataNode(secondNode);
@@ -142,7 +159,7 @@ static void TestAdditionalMethods()
 
   //create valid tool 1
   mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
-  firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  firstTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
   firstNode->SetName("Tool1");
   firstTool->SetDataNode(firstNode);
@@ -152,7 +169,7 @@ static void TestAdditionalMethods()
 
   //create valid tool 2
   mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
-  secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+  secondTool->SetTrackingDeviceType(mitk::MicronTrackerTypeInformation::GetTrackingDeviceName());
   mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
   secondNode->SetName("Tool2");
   secondTool->SetDataNode(secondNode);
@@ -177,6 +194,14 @@ static void TestAdditionalMethods()
 
 int mitkTrackingDeviceSourceConfiguratorTest(int /* argc */, char* /*argv*/[])
 {
+  mitk::TrackingDeviceTypeCollection deviceTypeCollection;
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIAuroraTypeInformation());
+  deviceTypeCollection.RegisterAsMicroservice();
+
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::VirtualTrackerTypeInformation());
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::NDIPolarisTypeInformation());
+  deviceTypeCollection.RegisterTrackingDeviceType(new mitk::MicronTrackerTypeInformation());
+
   MITK_TEST_BEGIN("TrackingDeviceConfigurator");
 
   TestInstantiation();

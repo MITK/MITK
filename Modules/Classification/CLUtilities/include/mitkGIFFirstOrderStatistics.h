@@ -35,18 +35,29 @@ namespace mitk
     /**
     * \brief Calculates the Cooccurence-Matrix based features for this class.
     */
-    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
+    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
 
     /**
     * \brief Returns a list of the names of all features that are calculated from this class
     */
-    virtual FeatureNameListType GetFeatureNames();
+    virtual FeatureNameListType GetFeatureNames() override;
 
     itkGetConstMacro(Range,double);
     itkSetMacro(Range, double);
+    itkGetConstMacro(HistogramSize,int);
+    itkSetMacro(HistogramSize, int);
+    itkGetConstMacro(UseCtRange,bool);
+    itkSetMacro(UseCtRange, bool);
+
+    struct ParameterStruct {
+      int m_HistogramSize;
+      bool m_UseCtRange;
+    };
 
   private:
     double m_Range;
+    int m_HistogramSize;
+    bool m_UseCtRange;
   };
 }
 #endif //mitkGIFFirstOrderStatistics_h

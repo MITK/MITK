@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>OpenIGTLinkManagerControls</class>
+ <widget class="QWidget" name="OpenIGTLinkManagerControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>668</width>
+    <height>392</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Select OpenIGTLink device source:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkIGTLDeviceSourceSelectionWidget" name="m_SourceListWidget"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Manage device:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkIGTLDeviceSourceManagementWidget" name="m_SourceManagerWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_3">
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Manage streams of selected device source:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkIGTLStreamingManagementWidget" name="m_StreamManagerWidget" native="true"/>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkIGTLDeviceSourceSelectionWidget</class>
+   <extends>QTextEdit</extends>
+   <header>QmitkIGTLDeviceSourceSelectionWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkIGTLDeviceSourceManagementWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkIGTLDeviceSourceManagementWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkIGTLStreamingManagementWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkIGTLStreamingManagementWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

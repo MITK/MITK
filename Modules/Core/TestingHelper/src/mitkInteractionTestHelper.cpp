@@ -18,9 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //MITK
 #include <mitkInteractionTestHelper.h>
 #include <mitkStandaloneDataStorage.h>
-#include <mitkGlobalInteraction.h>
 #include <mitkIOUtil.h>
 #include <mitkInteractionEventConst.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
+
+// VTK
+#include <vtkRenderWindowInteractor.h>
+#include <vtkCamera.h>
 
 //us
 #include <usGetModuleContext.h>
@@ -42,9 +46,6 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
   bool loadOkay = document.LoadFile();
   if (loadOkay)
   {
-    // Global interaction must(!) be initialized
-    if(! mitk::GlobalInteraction::GetInstance()->IsInitialized())
-      mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
     //get RenderingManager instance
     mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
@@ -93,11 +94,15 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
         size[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlRenderSizeZ())->c_str());
       }
 
+
       //create renderWindow, renderer and dispatcher
       mitk::RenderWindow::Pointer rw = mitk::RenderWindow::New(NULL, rendererName, rm); //VtkRenderWindow is created within constructor if NULL
 
       if (size[0] != 0 && size[1] != 0)
+      {
         rw->SetSize(size[0],size[1]);
+        rw->GetRenderer()->Resize( size[0],size[1]);
+      }
 
       //set storage of renderer
       rw->GetRenderer()->SetDataStorage(m_DataStorage);
@@ -108,6 +113,52 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       //set renderer to render 2D
       rw->GetRenderer()->SetMapperID(mapperID);
 
+      rw->GetRenderer()->PrepareRender();
+
+
+
+      // Some more magic for the 3D render window case:
+      // Camera view direction, position and focal point
+
+      if (mapperID == mitk::BaseRenderer::Standard3D)
+      {
+        if(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX()) != NULL)
+        {
+
+          double cameraFocalPoint[3];
+
+          cameraFocalPoint[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX())->c_str());
+          cameraFocalPoint[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointY())->c_str());
+          cameraFocalPoint[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointZ())->c_str());
+          rw->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(cameraFocalPoint);
+        }
+
+        if(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX()) != NULL)
+        {
+
+          double cameraPosition[3];
+
+          cameraPosition[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX())->c_str());
+          cameraPosition[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionY())->c_str());
+          cameraPosition[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionZ())->c_str());
+          rw->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition);
+        }
+
+        if(element->Attribute(mitk::InteractionEventConst::xmlViewUpX()) != NULL)
+        {
+
+          double viewUp[3];
+
+          viewUp[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlViewUpX())->c_str());
+          viewUp[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlViewUpY())->c_str());
+          viewUp[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlViewUpZ())->c_str());
+          rw->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(viewUp);
+        }
+      }
+
+      rw->GetVtkRenderWindow()->Render();
+      rw->GetVtkRenderWindow()->WaitForCompletion();
+
       //connect SliceNavigationControllers to timestep changed event of TimeNavigationController
       rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
       rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController(), false);
@@ -117,8 +168,8 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
     }
 
     //TODO: check the following lines taken from QmitkStdMultiWidget and adapt them to be executed in our code here.
-//    mitkWidget1->GetSliceNavigationController()
-//      ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+    //    mitkWidget1->GetSliceNavigationController()
+    //      ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
     //########### register display interactor to handle scroll events ##################
     //use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
@@ -128,23 +179,27 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
   {
     mitkThrow() << "Can not load interaction xml file <" << m_InteractionFilePath << ">";
   }
+
+  // WARNING assumes a 3D window exists !!!!
+  this->AddDisplayPlaneSubTree();
+
 }
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
-    mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
+  mitk::RenderingManager* rm = mitk::RenderingManager::GetInstance();
 
-    //unregister renderers
-    InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
-    InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  //unregister renderers
+  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
 
-    for(; it != end; it++)
-    {
-        rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
-        (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
-        mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
-    }
-    rm->RemoveAllObservers();
+  for(; it != end; it++)
+  {
+    rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
+    (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
+    mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
+  }
+  rm->RemoveAllObservers();
 }
 
 
@@ -157,22 +212,50 @@ mitk::DataStorage::Pointer mitk::InteractionTestHelper::GetDataStorage()
 void mitk::InteractionTestHelper::AddNodeToStorage(mitk::DataNode::Pointer node)
 {
   this->m_DataStorage->Add(node);
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+
+  this->Set3dCameraSettings();
 }
 
 
 void mitk::InteractionTestHelper::PlaybackInteraction()
 {
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
   //load events if not loaded yet
   if(m_Events.empty())
     this->LoadInteraction();
 
+  InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
+  InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
+  for(; it != end; it++)
+  {
+
+    (*it)->GetRenderer()->PrepareRender();
+
+    (*it)->GetVtkRenderWindow()->Render();
+    (*it)->GetVtkRenderWindow()->WaitForCompletion();
+  }
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+
+  it = m_RenderWindowList.begin();
+  for(; it != end; it++)
+  {
+    (*it)->GetVtkRenderWindow()->Render();
+    (*it)->GetVtkRenderWindow()->WaitForCompletion();
+  }
+
+  //mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
   //playback all events in queue
   for (unsigned long i=0; i < m_Events.size(); ++i)
   {
     //let dispatcher of sending renderer process the event
     m_Events.at(i)->GetSender()->GetDispatcher()->ProcessEvent(m_Events.at(i));
   }
+  if (false)
+  {
+    it--;
+    (*it)->GetVtkRenderWindow()->GetInteractor()->Start();
+  }
+
 }
 
 
@@ -183,13 +266,15 @@ void mitk::InteractionTestHelper::LoadInteraction()
   mitk::XML2EventParser parser(xmlStream);
   m_Events = parser.GetInteractions();
   xmlStream.close();
-    // Avoid VTK warning: Trying to delete object with non-zero reference count.
+  // Avoid VTK warning: Trying to delete object with non-zero reference count.
   parser.SetReferenceCount(0);
 }
 
 
 void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
 {
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+
   bool timeStepIsvalid = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetCreatedWorldGeometry()->IsValidTimeStep(newTimeStep);
 
   if(timeStepIsvalid)
@@ -239,4 +324,131 @@ mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindow(unsigned int in
   {
     return NULL;
   }
+}
+
+
+void mitk::InteractionTestHelper::AddDisplayPlaneSubTree()
+{
+  // add the displayed planes of the multiwidget to a node to which the subtree
+  // @a planesSubTree points ...
+
+
+  mitk::PlaneGeometryDataMapper2D::Pointer mapper;
+  mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1000);
+
+
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetProperty("name", mitk::StringProperty::New("Widgets"));
+  node->SetProperty("helper object", mitk::BoolProperty::New(true));
+
+
+  m_DataStorage->Add(node);
+
+  for (auto it : m_RenderWindowList)
+  {
+    if (it->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D)
+      continue;
+
+    // ... of widget 1
+    mitk::DataNode::Pointer planeNode1 = (mitk::BaseRenderer::GetInstance(it->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+
+    planeNode1->SetProperty("visible", mitk::BoolProperty::New(true));
+    planeNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
+    planeNode1->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+    planeNode1->SetProperty("helper object", mitk::BoolProperty::New(true));
+    planeNode1->SetProperty("layer", layer);
+    planeNode1->SetColor(1.0, 0.0, 0.0);
+    mapper = mitk::PlaneGeometryDataMapper2D::New();
+    planeNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
+    m_DataStorage->Add(planeNode1, node);
+
+  }
+
+
+}
+
+void mitk::InteractionTestHelper::Set3dCameraSettings()
+{
+
+  TiXmlDocument document(m_InteractionFilePath);
+  bool loadOkay = document.LoadFile();
+  if (loadOkay)
+  {
+
+    //for each renderer found create a render window and configure
+    for( TiXmlElement* element = document.FirstChildElement(mitk::InteractionEventConst::xmlTagInteractions())->FirstChildElement(mitk::InteractionEventConst::xmlTagConfigRoot())->FirstChildElement(mitk::InteractionEventConst::xmlTagRenderer());
+         element != NULL;
+         element = element->NextSiblingElement(mitk::InteractionEventConst::xmlTagRenderer()) )
+    {
+      //get name of renderer
+      const char* rendererName = element->Attribute(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str());
+
+      //get mapper slot id
+      mitk::BaseRenderer::MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
+      if(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID()) != NULL)
+      {
+        int mapperIDNum = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID())->c_str());
+        mapperID = static_cast<mitk::BaseRenderer::MapperSlotId>(mapperIDNum);
+      }
+
+
+      if (mapperID == mitk::BaseRenderer::Standard3D)
+      {
+        RenderWindow* namedRenderer = nullptr;
+
+        for (auto it : m_RenderWindowList)
+        {
+          if (strcmp(it->GetRenderer()->GetName(), rendererName) == 0)
+          {
+            namedRenderer = it.GetPointer();
+            break;
+          }
+        }
+
+        if (namedRenderer == nullptr)
+        {
+          MITK_ERROR << "No match for render window was found.";
+          return;
+        }
+        namedRenderer->GetRenderer()->PrepareRender();
+
+        if(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX()) != NULL)
+        {
+
+          double cameraFocalPoint[3];
+
+          cameraFocalPoint[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointX())->c_str());
+          cameraFocalPoint[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointY())->c_str());
+          cameraFocalPoint[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraFocalPointZ())->c_str());
+          namedRenderer->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(cameraFocalPoint);
+        }
+
+        if(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX()) != NULL)
+        {
+
+          double cameraPosition[3];
+
+          cameraPosition[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionX())->c_str());
+          cameraPosition[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionY())->c_str());
+          cameraPosition[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlCameraPositionZ())->c_str());
+          namedRenderer->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition);
+        }
+
+        if(element->Attribute(mitk::InteractionEventConst::xmlViewUpX()) != NULL)
+        {
+
+          double viewUp[3];
+
+          viewUp[0] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlViewUpX())->c_str());
+          viewUp[1] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlViewUpY())->c_str());
+          viewUp[2] = std::atoi(element->Attribute(mitk::InteractionEventConst::xmlViewUpZ())->c_str());
+          namedRenderer->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(viewUp);
+        }
+
+        namedRenderer->GetVtkRenderWindow()->Render();
+      }
+    }
+  }
+
+
 }

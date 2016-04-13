@@ -28,11 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkProperties.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
-#include <mitkGlobalInteraction.h>
-#include <mitkDisplayInteractor.h>
 #include <mitkPointSet.h>
-#include <mitkPositionEvent.h>
-#include <mitkStateEvent.h>
 #include <mitkLine.h>
 #include <mitkInteractionConst.h>
 #include <mitkDataStorage.h>
@@ -44,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkImage.h>
 #include <mitkVtkLayerController.h>
+#include <mitkCameraController.h>
 #include <vtkTextProperty.h>
 #include <vtkCornerAnnotation.h>
 #include <vtkMitkRectangleProp.h>
@@ -159,8 +156,6 @@ m_CrosshairNavigationEnabled(false)
   m_SubSplit2->addWidget( mitkWidget3Container );
   m_SubSplit2->addWidget( mitkWidget4Container );
 
-  //  m_RenderingManager->SetGlobalInteraction( mitk::GlobalInteraction::GetInstance() );
-
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager,renderingMode);
   mitkWidget1->SetLayoutIndex( AXIAL );
@@ -231,8 +226,6 @@ m_CrosshairNavigationEnabled(false)
 
 void QmitkStdMultiWidget::InitializeWidget()
 {
-  m_PositionTracker = NULL;
-
   //Make all black and overwrite renderwindow 4
   this->FillGradientBackgroundWithBlack();
   //This is #191919 in hex
@@ -296,24 +289,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   SetDecorationProperties("Coronal", GetDecorationColor(2), 2);
   SetDecorationProperties("3D", GetDecorationColor(3), 3);
 
-  // create a slice rotator
-  m_SlicesRotator = mitk::SlicesRotator::New("slices-rotator");
-  m_SlicesRotator->AddSliceController(
-    mitkWidget1->GetSliceNavigationController() );
-  m_SlicesRotator->AddSliceController(
-    mitkWidget2->GetSliceNavigationController() );
-  m_SlicesRotator->AddSliceController(
-    mitkWidget3->GetSliceNavigationController() );
-
-  // create a slice swiveller (using the same state-machine as SlicesRotator)
-  m_SlicesSwiveller = mitk::SlicesSwiveller::New("slices-rotator");
-  m_SlicesSwiveller->AddSliceController(
-    mitkWidget1->GetSliceNavigationController() );
-  m_SlicesSwiveller->AddSliceController(
-    mitkWidget2->GetSliceNavigationController() );
-  m_SlicesSwiveller->AddSliceController(
-    mitkWidget3->GetSliceNavigationController() );
-
   //connect to the "time navigation controller": send time via sliceNavigationControllers
   m_TimeNavigationController->ConnectGeometryTimeEvent(
     mitkWidget1->GetSliceNavigationController() , false);
@@ -333,16 +308,11 @@ void QmitkStdMultiWidget::InitializeWidget()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()
     ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  mitkWidget4->GetSliceNavigationController()
-    ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
+  //mitkWidget4->GetSliceNavigationController()
+  //  ->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
 
-  m_LastLeftClickPositionSupplier =
-    mitk::CoordinateSupplier::New("navigation", NULL);
-  mitk::GlobalInteraction::GetInstance()->AddListener(
-    m_LastLeftClickPositionSupplier
-    );
 
   // setup the department logo rendering
   m_LogoRendering = mitk::LogoOverlay::New();
@@ -450,7 +420,7 @@ std::string QmitkStdMultiWidget::GetCornerAnnotationText(unsigned int widgetNumb
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
   DisablePositionTracking();
-  DisableNavigationControllerEventListening();
+  //DisableNavigationControllerEventListening();
 
   m_TimeNavigationController->Disconnect(mitkWidget1->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget2->GetSliceNavigationController());
@@ -660,6 +630,11 @@ void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
   {
     m_CornerAnnotations[i]->SetVisibility(visibility);
   }
+}
+
+bool QmitkStdMultiWidget::IsCornerAnnotationVisible(void) const
+{
+  return m_CornerAnnotations[0]->GetVisibility() > 0;
 }
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number)
@@ -1292,14 +1267,6 @@ void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
 void QmitkStdMultiWidget::Fit()
 {
   vtkSmartPointer<vtkRenderer> vtkrenderer;
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDisplayGeometry()->Fit();
-  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetDisplayGeometry()->Fit();
-  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetDisplayGeometry()->Fit();
-  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetDisplayGeometry()->Fit();
-
-  int w = vtkObject::GetGlobalWarningDisplay();
-  vtkObject::GlobalWarningDisplayOff();
-
   vtkrenderer = mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetVtkRenderer();
   if ( vtkrenderer!= NULL )
     vtkrenderer->ResetCamera();
@@ -1316,21 +1283,22 @@ void QmitkStdMultiWidget::Fit()
   if ( vtkrenderer!= NULL )
     vtkrenderer->ResetCamera();
 
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetCameraController()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetCameraController()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetCameraController()->Fit();
+  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->GetCameraController()->Fit();
+
+  int w = vtkObject::GetGlobalWarningDisplay();
+  vtkObject::GlobalWarningDisplayOff();
+
+
+
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
 void QmitkStdMultiWidget::InitPositionTracking()
 {
-  //PoinSetNode for MouseOrientation
-  m_PositionTrackerNode = mitk::DataNode::New();
-  m_PositionTrackerNode->SetProperty("name", mitk::StringProperty::New("Mouse Position"));
-  m_PositionTrackerNode->SetData( mitk::PointSet::New() );
-  m_PositionTrackerNode->SetColor(1.0,0.33,0.0);
-  m_PositionTrackerNode->SetProperty("layer", mitk::IntProperty::New(1001));
-  m_PositionTrackerNode->SetVisibility(true);
-  m_PositionTrackerNode->SetProperty("inputdevice", mitk::BoolProperty::New(true) );
-  m_PositionTrackerNode->SetProperty("BaseRendererMapperID", mitk::IntProperty::New(0) );//point position 2D mouse
-  m_PositionTrackerNode->SetProperty("baserenderer", mitk::StringProperty::New("N/A"));
+// TODO POSITIONTRACKER
 }
 
 void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
@@ -1423,10 +1391,6 @@ void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
 
 void QmitkStdMultiWidget::mousePressEvent(QMouseEvent * e)
 {
-   if (e->button() == Qt::LeftButton) {
-       mitk::Point3D pointValue = this->GetLastLeftClickPosition();
-       emit LeftMouseClicked(pointValue);
-   }
 }
 
 void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
@@ -1438,11 +1402,6 @@ void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
   emit Moved();
 }
 
-void QmitkStdMultiWidget::leaveEvent ( QEvent * /*e*/  )
-{
-  //set cursor back to initial state
-  m_SlicesRotator->ResetMouseCursor();
-}
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow1() const
 {
@@ -1462,11 +1421,6 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow3() const
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow4() const
 {
   return mitkWidget4;
-}
-
-const mitk::Point3D& QmitkStdMultiWidget::GetLastLeftClickPosition() const
-{
-  return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
 const mitk::Point3D QmitkStdMultiWidget::GetCrossPosition() const
@@ -1489,115 +1443,45 @@ const mitk::Point3D QmitkStdMultiWidget::GetCrossPosition() const
       return point;
     }
   }
-  return m_LastLeftClickPositionSupplier->GetCurrentPoint();
+  // TODO BUG POSITIONTRACKER;
+  mitk::Point3D p;
+  return p;
+  //return m_LastLeftClickPositionSupplier->GetCurrentPoint();
 }
 
 void QmitkStdMultiWidget::EnablePositionTracking()
 {
-  if (!m_PositionTracker)
-  {
-    m_PositionTracker = mitk::PositionTracker::New("PositionTracker", NULL);
-  }
-  mitk::GlobalInteraction* globalInteraction = mitk::GlobalInteraction::GetInstance();
-  if (globalInteraction)
-  {
-    if(m_DataStorage.IsNotNull())
-      m_DataStorage->Add(m_PositionTrackerNode);
-    globalInteraction->AddListener(m_PositionTracker);
-  }
+
 }
 
 void QmitkStdMultiWidget::DisablePositionTracking()
 {
-  mitk::GlobalInteraction* globalInteraction =
-    mitk::GlobalInteraction::GetInstance();
 
-  if(globalInteraction)
-  {
-    if (m_DataStorage.IsNotNull())
-      m_DataStorage->Remove(m_PositionTrackerNode);
-    globalInteraction->RemoveListener(m_PositionTracker);
-  }
 }
 
 void QmitkStdMultiWidget::EnsureDisplayContainsPoint(
-  mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p)
+  mitk::BaseRenderer* renderer, const mitk::Point3D& p)
 {
-  mitk::Point2D pointOnPlane;
-  displayGeometry->Map( p, pointOnPlane );
+  mitk::Point2D pointOnDisplay;
+  renderer->WorldToDisplay(p,pointOnDisplay);
 
-  // point minus origin < width or height ==> outside ?
-  mitk::Vector2D pointOnRenderWindow_MM;
-  pointOnRenderWindow_MM = pointOnPlane.GetVectorFromOrigin()
-    - displayGeometry->GetOriginInMM();
-
-  mitk::Vector2D sizeOfDisplay( displayGeometry->GetSizeInMM() );
-
-  if (   sizeOfDisplay[0] < pointOnRenderWindow_MM[0]
-  ||                0 > pointOnRenderWindow_MM[0]
-  || sizeOfDisplay[1] < pointOnRenderWindow_MM[1]
-  ||                0 > pointOnRenderWindow_MM[1] )
+  if(pointOnDisplay[0] < renderer->GetVtkRenderer()->GetOrigin()[0]
+     || pointOnDisplay[1] < renderer->GetVtkRenderer()->GetOrigin()[1]
+     || pointOnDisplay[0] > renderer->GetVtkRenderer()->GetOrigin()[0]+renderer->GetViewportSize()[0]
+     || pointOnDisplay[1] > renderer->GetVtkRenderer()->GetOrigin()[1]+renderer->GetViewportSize()[1])
   {
-    // point is not visible -> move geometry
-    mitk::Vector2D offset( (pointOnRenderWindow_MM - sizeOfDisplay / 2.0)
-      / displayGeometry->GetScaleFactorMMPerDisplayUnit() );
-
-    displayGeometry->MoveBy( offset );
+    mitk::Point2D pointOnPlane;
+    renderer->GetCurrentWorldPlaneGeometry()->Map(p,pointOnPlane);
+    renderer->GetCameraController()->MoveCameraToPoint(pointOnPlane);
   }
 }
 
 void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
 {
-  // create a PositionEvent with the given position and
-  // tell the slice navigation controllers to move there
-  mitk::Point2D p2d;
-  mitk::PositionEvent event( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow()), 0, 0, 0,
-    mitk::Key_unknown, p2d, newPosition );
-  mitk::StateEvent stateEvent(mitk::EIDLEFTMOUSEBTN, &event);
-  mitk::StateEvent stateEvent2(mitk::EIDLEFTMOUSERELEASE, &event);
+   mitkWidget1->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+   mitkWidget2->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
+   mitkWidget3->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
 
-  switch ( m_PlaneMode )
-  {
-  default:
-  case PLANE_MODE_SLICING:
-    mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent );
-    mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent );
-    mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent );
-
-    // just in case SNCs will develop something that depends on the mouse
-    // button being released again
-    mitkWidget1->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
-    mitkWidget2->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
-    mitkWidget3->GetSliceNavigationController()->HandleEvent( &stateEvent2 );
-    break;
-
-  case PLANE_MODE_ROTATION:
-    m_SlicesRotator->HandleEvent( &stateEvent );
-
-    // just in case SNCs will develop something that depends on the mouse
-    // button being released again
-    m_SlicesRotator->HandleEvent( &stateEvent2 );
-    break;
-
-  case PLANE_MODE_SWIVEL:
-    m_SlicesSwiveller->HandleEvent( &stateEvent );
-
-    // just in case SNCs will develop something that depends on the mouse
-    // button being released again
-    m_SlicesSwiveller->HandleEvent( &stateEvent2 );
-    break;
-  }
-
-  // determine if cross is now out of display
-  // if so, move the display window
-  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())
-    ->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())
-    ->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())
-    ->GetDisplayGeometry(), newPosition );
-
-  // update displays
   m_RenderingManager->RequestUpdateAll();
 }
 
@@ -1699,13 +1583,14 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
     mitk::ScalarType pixelValue;
 
-    mitkPixelTypeMultiplex4(
+    mitkPixelTypeMultiplex5(
       mitk::FastSinglePixelAccess,
       image->GetChannelDescriptor().GetPixelType(),
       image,
       image->GetVolumeData(baseRenderer->GetTimeStep()),
       p,
-      pixelValue);
+      pixelValue,
+      component);
 
     if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
     {
@@ -1723,70 +1608,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
   statusText = stream.str();
   mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-}
-
-void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
-{
-  // Let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
-
-  //// Listen for SliceNavigationController
-  //TODO 18735 can this be deleted ??
-  //mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  //mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-  //mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener( mitk::MessageDelegate<QmitkStdMultiWidget>( this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent ) );
-
-  switch ( m_PlaneMode )
-  {
-  default:
-  case PLANE_MODE_SLICING:
-    gi->AddListener( mitkWidget1->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget2->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget3->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget4->GetSliceNavigationController() );
-    break;
-
-  case PLANE_MODE_ROTATION:
-    gi->AddListener( m_SlicesRotator );
-    break;
-
-  case PLANE_MODE_SWIVEL:
-    gi->AddListener( m_SlicesSwiveller );
-    break;
-  }
-
-  gi->AddListener( m_TimeNavigationController );
-  m_CrosshairNavigationEnabled = true;
-}
-
-void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
-{
-  // Do not let NavigationControllers listen to GlobalInteraction
-  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
-
-  switch ( m_PlaneMode )
-  {
-  default:
-  case PLANE_MODE_SLICING:
-    gi->RemoveListener( mitkWidget1->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget2->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget3->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget4->GetSliceNavigationController() );
-    break;
-
-  case PLANE_MODE_ROTATION:
-    m_SlicesRotator->ResetMouseCursor();
-    gi->RemoveListener( m_SlicesRotator );
-    break;
-
-  case PLANE_MODE_SWIVEL:
-    m_SlicesSwiveller->ResetMouseCursor();
-    gi->RemoveListener( m_SlicesSwiveller );
-    break;
-  }
-
-  gi->RemoveListener( m_TimeNavigationController );
-  m_CrosshairNavigationEnabled = false;
 }
 
 int QmitkStdMultiWidget::GetLayout() const
@@ -1836,20 +1657,6 @@ bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
   return m_LogoRendering->IsVisible(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 }
 
-bool QmitkStdMultiWidget::IsCrosshairNavigationEnabled() const
-{
-  return m_CrosshairNavigationEnabled;
-}
-
-mitk::SlicesRotator * QmitkStdMultiWidget::GetSlicesRotator() const
-{
-  return m_SlicesRotator;
-}
-
-mitk::SlicesSwiveller * QmitkStdMultiWidget::GetSlicesSwiveller() const
-{
-  return m_SlicesSwiveller;
-}
 
 void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool visible, mitk::BaseRenderer *renderer)
 {
@@ -1896,8 +1703,6 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
 
 void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 {
-  m_SlicesRotator->SetLinkPlanes( link );
-  m_SlicesSwiveller->SetLinkPlanes( link );
   emit WidgetPlanesRotationLinked( link );
 }
 
@@ -1905,119 +1710,27 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
 {
   MITK_DEBUG << "Changing crosshair mode to " << userMode;
 
-  // first of all reset left mouse button interaction to default if PACS interaction style is active
-  m_MouseModeSwitcher->SelectMouseMode( mitk::MouseModeSwitcher::MousePointer );
-
   emit WidgetNotifyNewCrossHairMode( userMode );
-
-  int mode = m_PlaneMode;
-  bool link = false;
-
-  // Convert user interface mode to actual mode
+    // Convert user interface mode to actual mode
   {
     switch(userMode)
     {
       case 0:
-        mode = PLANE_MODE_SLICING;
-        link = false;
+        m_MouseModeSwitcher->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
         break;
-
       case 1:
-        mode = PLANE_MODE_ROTATION;
-        link = false;
+        m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::ROTATION);
         break;
 
       case 2:
-        mode = PLANE_MODE_ROTATION;
-        link = true;
+        m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::ROTATIONLINKED);
         break;
 
       case 3:
-        mode = PLANE_MODE_SWIVEL;
-        link = false;
+        m_MouseModeSwitcher->SetInteractionScheme( mitk::MouseModeSwitcher::InteractionScheme::SWIVEL);
         break;
     }
   }
-
-  // Slice rotation linked
-  m_SlicesRotator->SetLinkPlanes( link );
-  m_SlicesSwiveller->SetLinkPlanes( link );
-
-  // Do nothing if mode didn't change
-  if ( m_PlaneMode == mode )
-  {
-    return;
-  }
-
-  mitk::GlobalInteraction *gi = mitk::GlobalInteraction::GetInstance();
-
-  // Remove listeners of previous mode
-  switch ( m_PlaneMode )
-  {
-  default:
-  case PLANE_MODE_SLICING:
-    // Notify MainTemplate GUI that this mode has been deselected
-    emit WidgetPlaneModeSlicing( false );
-
-    gi->RemoveListener( mitkWidget1->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget2->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget3->GetSliceNavigationController() );
-    gi->RemoveListener( mitkWidget4->GetSliceNavigationController() );
-    break;
-
-  case PLANE_MODE_ROTATION:
-    // Notify MainTemplate GUI that this mode has been deselected
-    emit WidgetPlaneModeRotation( false );
-
-    m_SlicesRotator->ResetMouseCursor();
-    gi->RemoveListener( m_SlicesRotator );
-    break;
-
-  case PLANE_MODE_SWIVEL:
-    // Notify MainTemplate GUI that this mode has been deselected
-    emit WidgetPlaneModeSwivel( false );
-
-    m_SlicesSwiveller->ResetMouseCursor();
-    gi->RemoveListener( m_SlicesSwiveller );
-    break;
-  }
-
-  // Set new mode and add corresponding listener to GlobalInteraction
-  m_PlaneMode = mode;
-  switch ( m_PlaneMode )
-  {
-  default:
-  case PLANE_MODE_SLICING:
-    // Notify MainTemplate GUI that this mode has been selected
-    emit WidgetPlaneModeSlicing( true );
-
-    // Add listeners
-    gi->AddListener( mitkWidget1->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget2->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget3->GetSliceNavigationController() );
-    gi->AddListener( mitkWidget4->GetSliceNavigationController() );
-
-    m_RenderingManager->InitializeViews();
-    break;
-
-  case PLANE_MODE_ROTATION:
-    // Notify MainTemplate GUI that this mode has been selected
-    emit WidgetPlaneModeRotation( true );
-
-    // Add listener
-    gi->AddListener( m_SlicesRotator );
-    break;
-
-  case PLANE_MODE_SWIVEL:
-    // Notify MainTemplate GUI that this mode has been selected
-    emit WidgetPlaneModeSwivel( true );
-
-    // Add listener
-    gi->AddListener( m_SlicesSwiveller );
-    break;
-  }
-  // Notify MainTemplate GUI that mode has changed
-  emit WidgetPlaneModeChange(m_PlaneMode);
 }
 
 void QmitkStdMultiWidget::SetGradientBackgroundColorForRenderWindow( const mitk::Color & upper, const mitk::Color & lower, unsigned int widgetNumber )
@@ -2252,18 +1965,6 @@ bool QmitkStdMultiWidget::IsColoredRectanglesEnabled() const
 mitk::MouseModeSwitcher* QmitkStdMultiWidget::GetMouseModeSwitcher()
 {
   return m_MouseModeSwitcher;
-}
-
-void QmitkStdMultiWidget::MouseModeSelected( mitk::MouseModeSwitcher::MouseMode mouseMode )
-{
-  if ( mouseMode == 0 )
-  {
-    this->EnableNavigationControllerEventListening();
-  }
-  else
-  {
-    this->DisableNavigationControllerEventListening();
-  }
 }
 
 mitk::DataNode::Pointer QmitkStdMultiWidget::GetWidgetPlane1()

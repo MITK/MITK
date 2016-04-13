@@ -44,24 +44,31 @@ class SceneReaderV1 : public SceneReader
     bool DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory);
 
     /**
+      \brief Clear a default property list and handle some exceptions.
+
+      Called after assigning a BaseData object to a fresh DataNode via SetData().
+      This call to SetData() would create default properties that have not been
+      there when saving the scene. Since they can produce problems, we clear the
+      list and use only those properties that we read from the scene file.
+
+      This method also handles some exceptions for backwards compatibility.
+      Those exceptions are documented directly in the code of the method.
+    */
+    void ClearNodePropertyListWithExceptions(DataNode& node, PropertyList& propertyList);
+
+    /**
       \brief reads all properties assigned to a base data element and assigns the list to the base data object
 
       The baseDataNodeElem is supposed to be the <properties file="..."> element.
     */
     bool DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement* baseDataNodeElem, const std::string& workingDir);
 
-    typedef std::multimap<int, std::string> UnorderedLayers;
-    typedef std::map<std::string, int> OrderedLayers;
     typedef std::pair<DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
-    typedef std::map<int, NodesAndParentsPair >   LayerPropertyMapType;
+    typedef std::list< NodesAndParentsPair > OrderedNodesList;
     typedef std::map<std::string, DataNode*> IDToNodeMappingType;
     typedef std::map<DataNode*, std::string> NodeToIDMappingType;
 
-    void GetLayerOrder(TiXmlDocument& document, const std::string& workingDirectory, std::vector<mitk::DataNode::Pointer> DataNodes, OrderedLayers& order);
-
-    UnorderedLayers         m_UnorderedLayers;
-    OrderedLayers           m_OrderedLayers;
-    LayerPropertyMapType    m_OrderedNodePairs;
+    OrderedNodesList        m_OrderedNodePairs;
     IDToNodeMappingType     m_NodeForID;
     NodeToIDMappingType     m_IDForNode;
 

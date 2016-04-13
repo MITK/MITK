@@ -196,10 +196,10 @@ void mitk::GeneralizedLinearModel::EstimatePermutation(const vnl_matrix<double> 
     m_Permutation(i) = jpvt[i]-1;
   }
 
-  delete x;
-  delete qraux;
-  delete jpvt;
-  delete work;
+  delete[] x;
+  delete[] qraux;
+  delete[] jpvt;
+  delete[] work;
 }
 
 // Copy a vnl-matrix to an c-array with row-wise representation.

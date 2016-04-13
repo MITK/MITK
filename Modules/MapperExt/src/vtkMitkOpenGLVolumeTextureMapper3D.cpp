@@ -1098,7 +1098,6 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
     while(currentChunk < numChunks)
     {
-//      MITK_INFO << "processing chunk " << currentChunk;
 
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;
@@ -1112,16 +1111,11 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
       glBindTexture(vtkgl::TEXTURE_3D, volume1);
       vtkgl::TexSubImage3D(vtkgl::TEXTURE_3D,0,0,0,currentChunkStart,fullX,fullY,currentChunkSize,GL_RGBA,GL_UNSIGNED_BYTE,tmpPtr);
-                                                  /*
-      glBindTexture(vtkgl::TEXTURE_3D, volume2);
-      vtkgl::TexSubImage3D(vtkgl::TEXTURE_3D,0,0,0,currentChunkStart,fullX,fullY,currentChunkSize,GL_RGB,GL_UNSIGNED_BYTE,tmpPtr2);
-                                                    */
       currentChunk ++;
     }
   }
 
-  delete tmpPtr;
- // delete tmpPtr2;
+  delete[] tmpPtr;
 }
 
 class RGBACompute
@@ -1451,8 +1445,8 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
     }
   }
 
-  delete tmpPtr;
-  delete tmpPtr2;
+  delete[] tmpPtr;
+  delete[] tmpPtr2;
 }
 
 //-----------------------------------------------------------------------------

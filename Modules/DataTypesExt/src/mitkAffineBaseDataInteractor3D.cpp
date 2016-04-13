@@ -83,7 +83,7 @@ void mitk::AffineBaseDataInteractor3D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("rotateDownModifierKey",RotateDownModifierKey);
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateUpKey(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateUpKey(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(translationStepSizePropertyName, stepSize);
@@ -91,10 +91,9 @@ bool mitk::AffineBaseDataInteractor3D::TranslateUpKey(StateMachineAction*, Inter
   movementVector.Fill(0.0);
   movementVector.SetElement(2, stepSize);
   this->TranslateGeometry(movementVector, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateDownKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateDownKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(translationStepSizePropertyName, stepSize);
@@ -102,10 +101,9 @@ bool mitk::AffineBaseDataInteractor3D::TranslateDownKey(mitk::StateMachineAction
   movementVector.Fill(0.0);
   movementVector.SetElement(2, -stepSize);
   this->TranslateGeometry(movementVector, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateLeftKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateLeftKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(translationStepSizePropertyName, stepSize);
@@ -113,10 +111,9 @@ bool mitk::AffineBaseDataInteractor3D::TranslateLeftKey(mitk::StateMachineAction
   movementVector.Fill(0.0);
   movementVector.SetElement(0, -stepSize);
   this->TranslateGeometry(movementVector, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateRightKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateRightKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(translationStepSizePropertyName, stepSize);
@@ -124,10 +121,9 @@ bool mitk::AffineBaseDataInteractor3D::TranslateRightKey(mitk::StateMachineActio
   movementVector.Fill(0.0);
   movementVector.SetElement(0, stepSize);
   this->TranslateGeometry(movementVector, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateUpModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateUpModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(translationStepSizePropertyName, stepSize);
@@ -135,10 +131,9 @@ bool mitk::AffineBaseDataInteractor3D::TranslateUpModifierKey(mitk::StateMachine
   movementVector.Fill(0.0);
   movementVector.SetElement(1, stepSize);
   this->TranslateGeometry(movementVector, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateDownModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateDownModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(translationStepSizePropertyName, stepSize);
@@ -146,75 +141,67 @@ bool mitk::AffineBaseDataInteractor3D::TranslateDownModifierKey(mitk::StateMachi
   movementVector.Fill(0.0);
   movementVector.SetElement(1, -stepSize);
   this->TranslateGeometry(movementVector, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateUpKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateUpKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(rotationStepSizePropertyName, stepSize);
   this->RotateGeometry(-stepSize, 0, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateDownKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateDownKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(rotationStepSizePropertyName, stepSize);
   this->RotateGeometry(stepSize, 0, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
+  return;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateLeftKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateLeftKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(rotationStepSizePropertyName, stepSize);
   this->RotateGeometry(-stepSize, 2, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateRightKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateRightKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(rotationStepSizePropertyName, stepSize);
   this->RotateGeometry(stepSize, 2, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateUpModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateUpModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(rotationStepSizePropertyName, stepSize);
   this->RotateGeometry(stepSize, 1, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateDownModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateDownModifierKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 1.0f;
   this->GetDataNode()->GetFloatProperty(rotationStepSizePropertyName, stepSize);
   this->RotateGeometry(-stepSize, 1, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::ScaleUpKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::ScaleUpKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 0.1f;
   this->GetDataNode()->GetFloatProperty(scaleStepSizePropertyName, stepSize);
   mitk::Point3D newScale;
   newScale.Fill(stepSize);
   this->ScaleGeometry(newScale, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::ScaleDownKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::ScaleDownKey(mitk::StateMachineAction*, mitk::InteractionEvent* interactionEvent)
 {
   float stepSize = 0.1f;
   this->GetDataNode()->GetFloatProperty(scaleStepSizePropertyName, stepSize);
   mitk::Point3D newScale;
   newScale.Fill(-stepSize);
   this->ScaleGeometry(newScale, this->GetUpdatedTimeGeometry(interactionEvent));
-  return true;
 }
 
 void mitk::AffineBaseDataInteractor3D::ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry* geometry)
@@ -279,26 +266,29 @@ mitk::BaseGeometry* mitk::AffineBaseDataInteractor3D::GetUpdatedTimeGeometry(mit
 void mitk::AffineBaseDataInteractor3D::DataNodeChanged()
 {
   mitk::DataNode::Pointer newInputNode = this->GetDataNode();
-  //add default properties
-  newInputNode->AddProperty( selectedColorPropertyName, mitk::ColorProperty::New(0.0,1.0,0.0) );
-  newInputNode->AddProperty( deselectedColorPropertyName, mitk::ColorProperty::New(0.0,0.0,1.0) );
-  newInputNode->AddProperty( translationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
-  newInputNode->AddProperty( rotationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
-  newInputNode->AddProperty( scaleStepSizePropertyName, mitk::FloatProperty::New(0.1f) );
-
-  //save the previous color of the node, in order to restore it after the interactor is destroyed
-  mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty("color"));
-  if ( priorColor.IsNotNull() )
+  if (newInputNode.IsNotNull())
   {
+    //add default properties
+    newInputNode->AddProperty( selectedColorPropertyName, mitk::ColorProperty::New(0.0,1.0,0.0) );
+    newInputNode->AddProperty( deselectedColorPropertyName, mitk::ColorProperty::New(0.0,0.0,1.0) );
+    newInputNode->AddProperty( translationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
+    newInputNode->AddProperty( rotationStepSizePropertyName, mitk::FloatProperty::New(1.0f) );
+    newInputNode->AddProperty( scaleStepSizePropertyName, mitk::FloatProperty::New(0.1f) );
+
+    //save the previous color of the node, in order to restore it after the interactor is destroyed
+    mitk::ColorProperty::Pointer priorColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty("color"));
+    if ( priorColor.IsNotNull() )
+    {
       mitk::ColorProperty::Pointer tmpCopyOfPriorColor = mitk::ColorProperty::New();
       tmpCopyOfPriorColor->SetColor( priorColor->GetColor() );
       newInputNode->AddProperty( priorPropertyName, tmpCopyOfPriorColor );
+    }
+    newInputNode->SetColor(0.0,0.0,1.0);
   }
-  newInputNode->SetColor(0.0,0.0,1.0);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::AffineBaseDataInteractor3D::SetDataNode(mitk::DataInteractor::NodeType node)
+void mitk::AffineBaseDataInteractor3D::SetDataNode(DataNode* node)
 {
   this->RestoreNodeProperties(); //if there was another node set, restore it's color
   DataInteractor::SetDataNode(node);
@@ -311,18 +301,18 @@ bool mitk::AffineBaseDataInteractor3D::CheckOverObject(const InteractionEvent* i
     return false;
 
   Point3D currentWorldPoint;
-  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode().GetPointer())
+  if(interactionEvent->GetSender()->PickObject(positionEvent->GetPointerPositionOnScreen(), currentWorldPoint) == this->GetDataNode())
     return true;
 
   return false;
 }
 
-bool mitk::AffineBaseDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
-    return false;
+    return;
 
   mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(node->GetProperty(selectedColorPropertyName));
   if ( selectedColor.IsNotNull() )
@@ -331,15 +321,15 @@ bool mitk::AffineBaseDataInteractor3D::SelectObject(StateMachineAction*, Interac
   }
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
-  return true;
+  return;
 }
 
-bool mitk::AffineBaseDataInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
-    return false;
+    return;
 
   mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(node->GetProperty(deselectedColorPropertyName));
   if ( selectedColor.IsNotNull() )
@@ -349,17 +339,17 @@ bool mitk::AffineBaseDataInteractor3D::DeselectObject(StateMachineAction*, Inter
 
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 
-  return true;
+  return;
 }
 
-bool mitk::AffineBaseDataInteractor3D::InitTranslate(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::InitTranslate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  return InitMembers(interactionEvent);
+  InitMembers(interactionEvent);
 }
 
-bool mitk::AffineBaseDataInteractor3D::InitRotate(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::InitRotate(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  return InitMembers(interactionEvent);
+  InitMembers(interactionEvent);
 }
 
 bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent* interactionEvent)
@@ -372,9 +362,9 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent* interaction
   m_InitialPickedWorldPoint = positionEvent->GetPositionInWorld();
 
   // Get the timestep to also support 3D+t
-   int timeStep = 0;
-   if ((interactionEvent->GetSender()) != NULL)
-     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
+  int timeStep = 0;
+  if ((interactionEvent->GetSender()) != NULL)
+    timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
   this->GetDataNode()->GetData()->UpdateOutputInformation(); // make sure that the Geometry is up-to-date
@@ -382,11 +372,11 @@ bool mitk::AffineBaseDataInteractor3D::InitMembers(InteractionEvent* interaction
   return true;
 }
 
-bool mitk::AffineBaseDataInteractor3D::TranslateObject (StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::TranslateObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
-    return false;
+    return;
 
   Point3D currentPickedPoint = positionEvent->GetPositionInWorld();
 
@@ -402,14 +392,14 @@ bool mitk::AffineBaseDataInteractor3D::TranslateObject (StateMachineAction*, Int
 
   this->TranslateGeometry(interactionMove, this->GetUpdatedTimeGeometry(interactionEvent));
 
-  return true;
+  return;
 }
 
-bool mitk::AffineBaseDataInteractor3D::RotateObject (StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::AffineBaseDataInteractor3D::RotateObject (StateMachineAction*, InteractionEvent* interactionEvent)
 {
   InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
   if(positionEvent == NULL)
-    return false;
+    return;
 
   Point2D currentPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   Point3D currentWorldPoint = positionEvent->GetPositionInWorld();
@@ -438,17 +428,17 @@ bool mitk::AffineBaseDataInteractor3D::RotateObject (StateMachineAction*, Intera
     interactionMove[2] = currentWorldPoint[2] - m_InitialPickedWorldPoint[2];
 
     if (interactionMove[0] == 0 && interactionMove[1] == 0  && interactionMove[2] == 0)
-      return true;
+      return;
 
     Vector3D rotationAxis = itk::CrossProduct(viewPlaneNormal, interactionMove);
     rotationAxis.Normalize();
 
     int* size = currentVtkRenderer->GetSize();
     double l2 =
-      (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
-      (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
-      (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
-      (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
+        (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) *
+        (currentPickedDisplayPoint[0] - m_InitialPickedDisplayPoint[0]) +
+        (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]) *
+        (currentPickedDisplayPoint[1] - m_InitialPickedDisplayPoint[1]);
 
     double rotationAngle = 360.0 * sqrt(l2 / (size[0] * size[0] + size[1] * size[1]));
 
@@ -469,16 +459,12 @@ bool mitk::AffineBaseDataInteractor3D::RotateObject (StateMachineAction*, Intera
       timeGeometry->SetTimeStepGeometry(newGeometry, timeStep);
 
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-
-    return true;
   }
-  else
-    return false;
 }
 
-bool mitk::AffineBaseDataInteractor3D::ScaleObject(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
+void mitk::AffineBaseDataInteractor3D::ScaleObject(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
-  return true;
+  return;
 }
 
 void mitk::AffineBaseDataInteractor3D::RestoreNodeProperties()

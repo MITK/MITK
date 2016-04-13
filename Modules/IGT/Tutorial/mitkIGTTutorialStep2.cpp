@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCone.h>
 #include <mitkCylinder.h>
 #include <mitkRenderWindow.h>
-#include <mitkGlobalInteraction.h>
 #include <itksys/SystemTools.hxx>
 /**
   * \brief This tutorial shows how to compose navigation datas. Therefore we render two objects.
@@ -36,9 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
   */
 int main(int argc, char* argv[])
 {
-  // Before rendering, global interaction must be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize("global");
-
   //General code rendering the data in a renderwindow. See MITK Tutorial Step1 for more details.
   mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
   mitk::RenderWindow::Pointer renderWindow = mitk::RenderWindow::New();

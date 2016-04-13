@@ -45,6 +45,7 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 
   CPPUNIT_TEST_SUITE(mitkPlanarFigureInteractionTestSuite);
   MITK_TEST(AngleInteractionCreate);
+  MITK_TEST(Angle2InteractionCreate);
   MITK_TEST(BezierCurveInteractionCreate);
   MITK_TEST(CircleInteractionCreate);
   MITK_TEST(DoubleEllipseInteractionCreate);
@@ -53,7 +54,8 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(PlanarPolygonInteractionCreate);
   MITK_TEST(NonClosedPlanarPolygonInteractionCreate);
   MITK_TEST(RectangleInteractionCreate);
-  MITK_TEST(PlanarSubdivisionInteractionCreate);
+  // BUG 19304
+  //MITK_TEST(PlanarSubdivisionInteractionCreate);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -83,7 +85,8 @@ public:
 
 
     //Load a bounding image
-    mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("InteractionTestData/InputData/scaledSingleSlice.nrrd"));
+    mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
+    figure->SetGeometry(testImage->GetGeometry());
 
     mitk::DataNode::Pointer dn = mitk::DataNode::New();
     dn->SetData(testImage);
@@ -121,7 +124,14 @@ public:
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarAngle::New();
-    RunTest(figure, "InteractionTestData/Interactions/Angle.xml", "InteractionTestData/ReferenceData/Angle.pf");
+    RunTest(figure, "InteractionTestData/Interactions/Angle1.xml", "InteractionTestData/ReferenceData/Angle1.pf");
+  }
+
+  void Angle2InteractionCreate()
+  {
+    mitk::PlanarFigure::Pointer figure;
+    figure = mitk::PlanarAngle::New();
+    RunTest(figure, "InteractionTestData/Interactions/Angle2.xml", "InteractionTestData/ReferenceData/Angle2.pf");
   }
 
   void BezierCurveInteractionCreate()
@@ -149,7 +159,7 @@ public:
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarSubdivisionPolygon::New();
-    RunTest(figure, "InteractionTestData/Interactions/SubDivision.xml", "InteractionTestData/ReferenceData/SubDivision.pf");
+    RunTest(figure, "InteractionTestData/Interactions/SubdivisionPolygon.xml", "InteractionTestData/ReferenceData/SubDivision.pf");
   }
 
   void PlanarFourPointAngleInteractionCreate()

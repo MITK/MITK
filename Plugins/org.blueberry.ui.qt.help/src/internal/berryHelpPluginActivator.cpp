@@ -31,7 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <service/event/ctkEventConstants.h>
 
-#include <QtPlugin>
 #include <QDir>
 #include <QDateTime>
 
@@ -77,10 +76,6 @@ HelpPluginActivator::HelpPluginActivator()
 HelpPluginActivator::~HelpPluginActivator()
 {
   instance = nullptr;
-  // bug-19229 no support for QScopedPointerDeleteLater in Qt4
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  helpEngine.take()->deleteLater();
-#endif
 }
 
 void
@@ -481,7 +476,3 @@ void HelpContextHandler::handleEvent(const ctkEvent &event)
 }
 
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_blueberry_ui_qt_help, berry::HelpPluginActivator)
-#endif

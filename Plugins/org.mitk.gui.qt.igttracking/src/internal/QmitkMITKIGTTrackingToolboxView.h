@@ -228,6 +228,10 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    //members for worker thread
    QThread* m_WorkerThread;
    QmitkMITKIGTTrackingToolboxViewWorker* m_Worker;
+
+  private:
+   ctkServiceReference m_DeviceTypeServiceReference;
+   mitk::TrackingDeviceTypeCollection* m_DeviceTypeCollection;
 };
 
 

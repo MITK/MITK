@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStdMultiWidget.h"
 
 #include "mitkVtkPropRenderer.h"
-#include "mitkGlobalInteraction.h"
-
 #include <iostream>
 
 #include <vtkRenderer.h>
@@ -61,7 +59,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
 
     :
-      QmitkFunctionality(), m_Controls(NULL),
+      QmitkFunctionality(), m_Controls(nullptr),
       m_SelectedNode(0),
       m_BackgroundColor(QColor(0,0,0))
 {
@@ -106,21 +104,23 @@ void QmitkScreenshotMaker::GenerateScreenshot()
 {
     if (m_LastFile.size()==0)
         m_LastFile = QDir::currentPath()+"/screenshot.png";
-    QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
     if (fileName.size()>0)
         m_LastFile = fileName;
 
-    vtkRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetVtkRenderer();
-    if (renderer == NULL)
+    vtkRenderWindow* renderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
+    mitk::BaseRenderer* baserenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+
+    if (baserenderer == nullptr)
         return;
-    this->TakeScreenshot(renderer, 1, fileName);
+    this->TakeScreenshot(baserenderer->GetVtkRenderer(), 1, fileName);
 }
 
 void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
 {
     if (m_LastPath.size()==0)
         m_LastPath = QDir::currentPath();
-    QString filePath = QFileDialog::getExistingDirectory(NULL, "Save screenshots to...", m_LastPath);
+    QString filePath = QFileDialog::getExistingDirectory(nullptr, "Save screenshots to...", m_LastPath);
     if (filePath.size()>0)
         m_LastPath = filePath;
 
@@ -144,7 +144,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
         c++;
     }
     vtkRenderer* renderer = m_MultiWidget->mitkWidget1->GetRenderer()->GetVtkRenderer();
-    if (renderer != NULL)
+    if (renderer != nullptr)
         this->TakeScreenshot(renderer, 1, filePath+fileName);
 
     fileName = "/sagittal.png";
@@ -157,7 +157,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
         c++;
     }
     renderer = m_MultiWidget->mitkWidget2->GetRenderer()->GetVtkRenderer();
-    if (renderer != NULL)
+    if (renderer != nullptr)
         this->TakeScreenshot(renderer, 1, filePath+fileName);
 
     fileName = "/coronal.png";
@@ -170,7 +170,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
         c++;
     }
     renderer = m_MultiWidget->mitkWidget3->GetRenderer()->GetVtkRenderer();
-    if (renderer != NULL)
+    if (renderer != nullptr)
         this->TakeScreenshot(renderer, 1, filePath+fileName);
 
     n = this->m_MultiWidget->GetWidgetPlane1();
@@ -198,7 +198,7 @@ void QmitkScreenshotMaker::Generate3DHighresScreenshot()
 {
     if (m_LastFile.size()==0)
         m_LastFile = QDir::currentPath()+"/3D_screenshot.png";
-    QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", m_LastFile, "PNG file (*.png);;JPEG file (*.jpg)");
     if (fileName.size()>0)
         m_LastFile = fileName;
     GenerateHR3DAtlasScreenshots(fileName);
@@ -210,7 +210,7 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
 {
     if (m_LastPath.size()==0)
         m_LastPath = QDir::currentPath();
-    QString filePath = QFileDialog::getExistingDirectory( NULL, "Save screenshots to...", m_LastPath);
+    QString filePath = QFileDialog::getExistingDirectory( nullptr, "Save screenshots to...", m_LastPath);
     if (filePath.size()>0)
         m_LastPath = filePath;
 
@@ -267,7 +267,7 @@ void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName)
     // only works correctly for 3D RenderWindow
     m_MultiWidget->SetCornerAnnotationVisibility(false);
     vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
-    if (renderer == NULL)
+    if (renderer == nullptr)
         return;
     this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName);
     m_MultiWidget->SetCornerAnnotationVisibility(true);
@@ -290,7 +290,7 @@ vtkCamera* QmitkScreenshotMaker::GetCam()
             {
                 // vtk smart pointer handling
                 cam = vtkcam;
-                cam->Register( NULL );
+                cam->Register( nullptr );
             }
         }
     }
@@ -346,13 +346,13 @@ void QmitkScreenshotMaker::StdMultiWidgetAvailable(QmitkStdMultiWidget&  stdMult
 
 void QmitkScreenshotMaker::StdMultiWidgetNotAvailable()
 {
-    m_MultiWidget = NULL;
+    m_MultiWidget = nullptr;
     m_Parent->setEnabled(false);
 }
 
 void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
 {
-    if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
+    if ((renderer == nullptr) ||(magnificationFactor < 1) || fileName.isEmpty())
         return;
 
     bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );

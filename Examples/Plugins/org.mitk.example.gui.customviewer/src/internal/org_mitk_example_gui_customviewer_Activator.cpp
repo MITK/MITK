@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ViewerPerspective.h"
 #include "DicomPerspective.h"
 
-#include <QtPlugin>
-
 ctkPluginContext* org_mitk_example_gui_customviewer_Activator::PluginContext = nullptr;
 
 void org_mitk_example_gui_customviewer_Activator::start(ctkPluginContext* context)
@@ -44,8 +42,3 @@ ctkPluginContext* org_mitk_example_gui_customviewer_Activator::GetPluginContext(
 {
   return PluginContext;
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_example_gui_customviewer, org_mitk_example_gui_customviewer_Activator)
-#endif
-

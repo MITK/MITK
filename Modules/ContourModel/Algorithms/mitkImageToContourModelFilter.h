@@ -54,6 +54,10 @@ namespace mitk {
 
     const InputType* GetInput(unsigned int idx);
 
+    void SetContourValue(float contourValue);
+
+    float GetContourValue();
+
   protected:
     ImageToContourModelFilter();
 
@@ -66,6 +70,7 @@ namespace mitk {
 
   private:
     const BaseGeometry* m_SliceGeometry;
+    float m_ContourValue;
 
   };
 

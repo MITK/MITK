@@ -386,11 +386,18 @@ int mitkImageTest(int argc, char* argv[])
 
   MITK_TEST_OUTPUT(<< " Testing whether GetSlicedGeometry(0)->GetOrigin() has been correctly initialized from vtkImageData");
   mitk::Point3D origin2 = mitkByVtkImage->GetSlicedGeometry(0)->GetOrigin();
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2, vtkoriginAsMitkPoint), "");
 
   MITK_TEST_OUTPUT(<< " Testing whether GetGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
   origin2 = mitkByVtkImage->GetGeometry()->GetOrigin();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
+
+  MITK_TEST_OUTPUT(<< " Testing if vtkOrigin is (0, 0, 0). This behaviour is due to historical development of MITK. Aslo see bug 5050!");
+  vtkImageData* vtkImage = imgMem->GetVtkImageData();
+  auto vtkOrigin = vtkImage->GetOrigin();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(vtkOrigin[0], 0), "testing vtkOrigin[0] to be 0");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(vtkOrigin[1], 0), "testing vtkOrigin[1] to be 0");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(vtkOrigin[2], 0), "testing vtkOrigin[2] to be 0");
 
   // TODO test the following initializers on channel-incorporation
   //  void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)

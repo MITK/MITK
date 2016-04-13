@@ -25,7 +25,7 @@ mitk::DICOMGDCMImageFrameInfo
 }
 
 mitk::DICOMGDCMImageFrameInfo
-::DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo)
+::DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo)
 :itk::LightObject()
 ,m_FrameInfo(frameinfo)
 ,m_TagForValue()
@@ -33,7 +33,7 @@ mitk::DICOMGDCMImageFrameInfo
 }
 
 mitk::DICOMGDCMImageFrameInfo
-::DICOMGDCMImageFrameInfo(DICOMImageFrameInfo::Pointer frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping)
+::DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping)
 :itk::LightObject()
 ,m_FrameInfo(frameinfo)
 ,m_TagForValue(tagToValueMapping)
@@ -49,9 +49,9 @@ std::string
 mitk::DICOMGDCMImageFrameInfo
 ::GetTagValueAsString(const DICOMTag& tag) const
 {
-  auto mappedValue = m_TagForValue.find( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
+  const auto mappedValue = m_TagForValue.find( gdcm::Tag(tag.GetGroup(), tag.GetElement()) );
 
-  if (mappedValue != m_TagForValue.end())
+  if (mappedValue != m_TagForValue.cend())
   {
     if (mappedValue->second != nullptr)
     {

@@ -88,7 +88,9 @@ namespace mitk {
     {
       Axial,
       Sagittal,
-      Frontal
+      Frontal, // also known as "Coronal" in mitk.
+      None //This defines the PlaneGeometry for the 3D renderWindow which
+          //curiously also needs a PlaneGeometry. This should be reconsidered some time.
     };
 
     virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
@@ -159,11 +161,23 @@ namespace mitk {
     * (default: axial) with respect to \a transform (default: identity)
     * given width and height in units.
     *
+    * \a Rotated means rotated by 180 degrees (1/2 rotation) within the plane.
+    * Rotation by 90 degrees (1/4 rotation) is not implemented as of now.
+    *
+    * \a Frontside/Backside:
+    * Viewed from below = frontside in the axial case;
+    * (radiologist's view versus neuro-surgeon's view, see:
+    * http://www.itk.org/Wiki/images/e/ed/DICOM-OrientationDiagram-Radiologist-vs-NeuroSurgeon.png )
+    * Viewed from front = frontside in the coronal case;
+    * Viewed from left = frontside in the sagittal case.
+    *
+    * \a Cave/Caution: Currently only RPI, LAI, LPS and RAS in the three standard planes are covered,
+    * i.e. 12 cases of 144:  3 standard planes * 48 coordinate orientations = 144 cases.
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const AffineTransform3D* transform = nullptr,
-      PlaneOrientation planeorientation = Axial,
-      ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
+                                         const AffineTransform3D* transform = nullptr,
+                                         PlaneOrientation planeorientation = Axial,
+                                         ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
 
     /**
     * \brief Initialize plane with orientation \a planeorientation
@@ -181,6 +195,10 @@ namespace mitk {
     *
     * The vectors are normalized and multiplied by the respective spacing before
     * they are set in the matrix.
+    *
+    * This overloaded version of InitializeStandardPlane() creates only righthanded
+    * coordinate orientations, unless spacing contains 1 or 3 negative entries.
+    *
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const Vector3D& rightVector, const Vector3D& downVector,
@@ -193,6 +211,10 @@ namespace mitk {
     *
     * The vectors are normalized and multiplied by the respective spacing
     * before they are set in the matrix.
+    *
+    * This overloaded version of InitializeStandardPlane() creates only righthanded
+    * coordinate orientations, unless spacing contains 1 or 3 negative entries.
+    *
     */
     virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
       const VnlVector& rightVector, const VnlVector& downVector,
@@ -224,7 +246,7 @@ namespace mitk {
     * \brief Initialize plane by origin and normal (size is 1.0 mm in
     * all directions, direction of right-/down-vector valid but
     * undefined).
-    *
+    * \warning This function can only produce righthanded coordinate orientation, not lefthanded.
     */
     virtual void InitializePlane(const Point3D& origin, const Vector3D& normal);
 
@@ -233,6 +255,8 @@ namespace mitk {
     *
     * \warning The vectors are set into the matrix as they are,
     * \em without normalization!
+    * This function creates a righthanded IndexToWorldTransform,
+    * only a negative thickness could still make it lefthanded.
     */
     void SetMatrixByVectors(const VnlVector& rightVector,
       const VnlVector& downVector, ScalarType thickness = 1.0);

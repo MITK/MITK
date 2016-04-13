@@ -268,6 +268,9 @@ void
 
   switch ( planeorientation )
   {
+  case PlaneGeometry::None:
+    break;
+
   case PlaneGeometry::Axial:
     viewSpacing = geometry3D->GetSpacing()[2];
     slices = (unsigned int) geometry3D->GetExtent( 2 );
@@ -686,6 +689,10 @@ void
 void
   mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
 {
+  PlaneGeometry::Pointer geometry2D;
+  ApplyTransformMatrixOperation *applyMatrixOp;
+  Point3D center;
+
   switch ( operation->GetOperationType() )
   {
   case OpNOTHING:
@@ -847,6 +854,7 @@ void
         // Clear the slice stack and adjust it according to the center of
         // rotation and plane position (see documentation of ReinitializePlanes)
         this->ReinitializePlanes( center, planeOp->GetPoint() );
+        planeGeometry->SetSpacing(this->GetSpacing());
 
         if ( m_SliceNavigationController )
         {
@@ -890,6 +898,7 @@ void
 
         // Apply changes on first slice to whole slice stack
         this->ReinitializePlanes( center, planeOp->GetPoint() );
+        planeGeometry->SetSpacing(this->GetSpacing());
 
         if ( m_SliceNavigationController )
         {
@@ -1007,9 +1016,9 @@ void
     // The other slices will be re-generated on demand
 
     // Save first slice
-    PlaneGeometry::Pointer geometry2D = m_PlaneGeometries[0];
+    geometry2D = m_PlaneGeometries[0];
 
-    ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
+    applyMatrixOp = dynamic_cast< ApplyTransformMatrixOperation* >( operation );
 
     // Apply transformation to first plane
     geometry2D->ExecuteOperation( applyMatrixOp );
@@ -1017,7 +1026,7 @@ void
     // Generate a ApplyTransformMatrixOperation using the dataset center instead of
     // the supplied rotation center. The supplied center is instead used to adjust the
     // slice stack afterwards (see OpROTATE).
-    Point3D center = m_ReferenceGeometry->GetCenter();
+    center = m_ReferenceGeometry->GetCenter();
 
     // Clear the slice stack and adjust it according to the center of
     // the dataset and the supplied rotation center (see documentation of
@@ -1026,6 +1035,9 @@ void
 
     BaseGeometry::ExecuteOperation( applyMatrixOp );
     break;
+
+  default: // let handle by base class if we don't do anything
+    BaseGeometry::ExecuteOperation( operation );
   }
 
   this->Modified();

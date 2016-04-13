@@ -83,7 +83,7 @@ mitk::DICOMFileReader
 
 void
 mitk::DICOMFileReader
-::SetInputFiles(StringList filenames)
+::SetInputFiles( const StringList& filenames)
 {
   m_InputFilenames = filenames;
 }
@@ -195,4 +195,30 @@ mitk::DICOMFileReader
 {
   itk::GDCMImageIO::Pointer io = itk::GDCMImageIO::New();
   return io->CanReadFile( filename.c_str() );
+}
+
+
+std::unordered_map<const char*, mitk::DICOMTag> mitk::DICOMFileReader::GetAdditionalTagsOfInterest() const
+{
+  return m_AdditionalTagsOfInterest;
+}
+
+
+void mitk::DICOMFileReader::SetAdditionalTagsOfInterest(
+  const std::unordered_map<const char*, mitk::DICOMTag>& tagList )
+{
+  m_AdditionalTagsOfInterest = tagList;
+}
+
+
+void mitk::DICOMFileReader::SetTagLookupTableToPropertyFunctor(
+  mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor functor )
+{
+  m_TagLookupTableToPropertyFunctor = functor;
+}
+
+mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor
+  mitk::DICOMFileReader::GetTagLookupTableToPropertyFunctor() const
+{
+  return m_TagLookupTableToPropertyFunctor;
 }

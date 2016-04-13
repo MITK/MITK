@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCuboid.h>
 #include <mitkOperationActor.h>
 #include <mitkOperation.h>
-#include <mitkAffineInteractor.h>
+#include <mitkAffineImageCropperInteractor.h>
 #include "mitkWeakPointer.h"
 #include <itkImage.h>
 #include <QProgressDialog>
@@ -177,7 +177,7 @@ protected:
   /*!
   * \brief Interactor for moving and scaling the cuboid
   */
-  mitk::AffineInteractor::Pointer m_AffineInteractor;
+  mitk::AffineImageCropperInteractor::Pointer m_AffineInteractor;
 
   /*!
   * \brief Creates the cuboid and its data tree node.

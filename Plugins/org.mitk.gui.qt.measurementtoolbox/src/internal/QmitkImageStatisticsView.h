@@ -107,6 +107,9 @@ protected:
   void FillStatisticsTableView( const std::vector<mitk::ImageStatisticsCalculator::Statistics> &s,
     const mitk::Image *image );
 
+
+  std::vector<QString> CalculateStatisticsForPlanarFigure( const mitk::Image *image);
+
   void FillLinearProfileStatisticsTableView( const mitk::Image *image );
 
   /** \brief  Removes statistics from the GUI */
@@ -154,6 +157,8 @@ protected:
 
   // member variables
   Ui::QmitkImageStatisticsViewControls *m_Controls;
+  // if you have a planar figure selected, the statistics values will be saved in this one.
+  std::vector<QString> m_PlanarFigureStatistics;
   QmitkImageStatisticsCalculationThread* m_CalculationThread;
 
   QmitkStepperAdapter*      m_TimeStepperAdapter;

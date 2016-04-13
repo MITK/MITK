@@ -308,9 +308,10 @@ protected:
  * @param leftHandSide Compare this against rightHandSide.
  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
  * @param verbose Flag indicating if the user wants detailed console output or not.
+ * @param checkGeometry if comparing point sets loaded from a file, the geometries might be different and must not be compared. In all other cases, you should compare the geometries.
  * @return True, if all subsequent comparisons are true, false otherwise
  */
-DEPRECATED( MITKCORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose ));
+DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::PointSet* leftHandSide, const mitk::PointSet* rightHandSide, mitk::ScalarType eps, bool verbose, bool checkGeometry = true));
 
 /**
  * @brief Equal A function comparing two pointsets for beeing identical.
@@ -324,9 +325,10 @@ DEPRECATED( MITKCORE_EXPORT bool Equal( const mitk::PointSet* leftHandSide, cons
  * @param leftHandSide Compare this against rightHandSide.
  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
  * @param verbose Flag indicating if the user wants detailed console output or not.
+ * @param checkGeometry if comparing point sets loaded from a file, the geometries might be different and must not be compared. In all other cases, you should compare the geometries.
  * @return True, if all subsequent comparisons are true, false otherwise
  */
-MITKCORE_EXPORT bool Equal( const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose );
+MITKCORE_EXPORT bool Equal(const mitk::PointSet& leftHandSide, const mitk::PointSet& rightHandSide, mitk::ScalarType eps, bool verbose, bool checkGeometry = true);
 
 itkEventMacro( PointSetEvent, itk::AnyEvent );
 itkEventMacro( PointSetMoveEvent, PointSetEvent );

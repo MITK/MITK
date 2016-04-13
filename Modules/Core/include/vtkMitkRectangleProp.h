@@ -56,6 +56,8 @@ protected:
 
   int m_Height;
   int m_Width;
+  int m_OriginX;
+  int m_OriginY;
   vtkIdType m_BottomLeftR,
   m_BottomRightL,
   m_BottomLeftU,

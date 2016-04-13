@@ -256,7 +256,17 @@ bool mitk::BaseGeometry::Is2DConvertable()
 mitk::Point3D mitk::BaseGeometry::GetCenter() const
 {
   assert(m_BoundingBox.IsNotNull());
-  return this->GetIndexToWorldTransform()->TransformPoint(m_BoundingBox->GetCenter());
+  Point3D c = m_BoundingBox->GetCenter();
+  if (m_ImageGeometry)
+  {
+    //Get Center returns the middel of min and max pixel index. In corner based images, this is the right position.
+    //In center based images (imageGeometry == true), the index needs to be shifted back.
+    c[0] -= 0.5;
+    c[1] -= 0.5;
+    c[2] -= 0.5;
+  }
+  this->IndexToWorld(c, c);
+  return c;
 }
 
 double mitk::BaseGeometry::GetDiagonalLength2() const
@@ -884,6 +894,18 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
     result = false;
   }
 
+  //Compare FrameOfReference ID
+  if (rightHandSide.GetFrameOfReferenceID() != leftHandSide.GetFrameOfReferenceID())
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetFrameOfReferenceID is different.";
+      MITK_INFO << "rightHandSide is " << rightHandSide.GetFrameOfReferenceID() << " : leftHandSide is " << leftHandSide.GetFrameOfReferenceID();
+    }
+    result = false;
+  }
+
+
   //Compare BoundingBoxes
   if (!mitk::Equal(*leftHandSide.GetBoundingBox(), *rightHandSide.GetBoundingBox(), eps, verbose))
   {
@@ -911,8 +933,7 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mi
 bool mitk::Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose)
 {
   //Compare IndexToWorldTransform Matrix
-  if (!mitk::MatrixEqualElementWise(leftHandSide.GetMatrix(),
-    rightHandSide.GetMatrix()))
+  if (!mitk::MatrixEqualElementWise(leftHandSide.GetMatrix(), rightHandSide.GetMatrix(), eps))
   {
     if (verbose)
     {

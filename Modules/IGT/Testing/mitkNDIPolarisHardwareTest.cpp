@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 
 
+#include "mitkNDIPolarisTypeInformation.h"
+
+
 int mitkNDIPolarisHardwareTest(int argc , char* argv[])
 {
   // always start with this!
@@ -31,7 +34,7 @@ int mitkNDIPolarisHardwareTest(int argc , char* argv[])
 
   //create a polaris tracking device
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
-  myNDITrackingDevice->SetType(mitk::NDIPolaris);
+  myNDITrackingDevice->SetType(mitk::NDIPolarisTypeInformation::GetTrackingDeviceName());
 
 #ifdef WIN32
   //set port

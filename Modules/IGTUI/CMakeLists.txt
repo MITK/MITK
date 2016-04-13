@@ -4,6 +4,8 @@ MITK_CREATE_MODULE(
   DEPENDS MitkIGT MitkQtWidgetsExt MitkPersistence
 )
 
+add_subdirectory(autoload/ConfigurationWidgetRegistry)
+
 ## create IGTUI config
 configure_file(mitkIGTUIConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTUIConfig.h @ONLY)
 

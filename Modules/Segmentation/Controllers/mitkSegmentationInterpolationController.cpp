@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSegmentationInterpolationController.h"
 
+#include <mitkImageAccessByItk.h>
 #include "mitkImageCast.h"
-#include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
 #include <mitkExtractSliceFilter.h>
 #include "mitkImageReadAccessor.h"

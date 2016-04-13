@@ -61,12 +61,12 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   empty.cropRight = 0;
   this->m_CropArea = empty;
 
-  //set number of outputs
+  // set number of outputs
   this->SetNumberOfIndexedOutputs(1);
 
-  //create a new output
+  // create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();
-  this->SetNthOutput(0,newOutput);
+  this->SetNthOutput(0, newOutput);
 }
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
@@ -90,12 +90,12 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   empty.cropRight = 0;
   this->m_CropArea = empty;
 
-  //set number of outputs
+  // set number of outputs
   this->SetNumberOfIndexedOutputs(1);
 
-  //create a new output
+  // create a new output
   mitk::Image::Pointer newOutput = mitk::Image::New();
-  this->SetNthOutput(0,newOutput);
+  this->SetNthOutput(0, newOutput);
 }
 
 mitk::USDevice::~USDevice()
@@ -110,25 +110,29 @@ mitk::USDevice::~USDevice()
   this->UnregisterOnService();
 }
 
-mitk::USAbstractControlInterface::Pointer mitk::USDevice::GetControlInterfaceCustom()
+mitk::USAbstractControlInterface::Pointer
+mitk::USDevice::GetControlInterfaceCustom()
 {
   MITK_INFO << "Custom control interface does not exist for this object.";
   return 0;
 }
 
-mitk::USControlInterfaceBMode::Pointer mitk::USDevice::GetControlInterfaceBMode()
+mitk::USControlInterfaceBMode::Pointer
+mitk::USDevice::GetControlInterfaceBMode()
 {
   MITK_INFO << "Control interface BMode does not exist for this object.";
   return 0;
 }
 
-mitk::USControlInterfaceProbes::Pointer mitk::USDevice::GetControlInterfaceProbes()
+mitk::USControlInterfaceProbes::Pointer
+mitk::USDevice::GetControlInterfaceProbes()
 {
   MITK_INFO << "Control interface Probes does not exist for this object.";
   return 0;
 }
 
-mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDoppler()
+mitk::USControlInterfaceDoppler::Pointer
+mitk::USDevice::GetControlInterfaceDoppler()
 {
   MITK_INFO << "Control interface Doppler does not exist for this object.";
   return 0;
@@ -137,27 +141,31 @@ mitk::USControlInterfaceDoppler::Pointer mitk::USDevice::GetControlInterfaceDopp
 void mitk::USDevice::SetManufacturer(std::string manufacturer)
 {
   m_Manufacturer = manufacturer;
-  if ( m_DeviceState >= State_Initialized )
+  if (m_DeviceState >= State_Initialized)
   {
-    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_MANUFACTURER, manufacturer);
+    this->UpdateServiceProperty(
+      mitk::USDevice::GetPropertyKeys().US_PROPKEY_MANUFACTURER,
+      manufacturer);
   }
 }
 
 void mitk::USDevice::SetName(std::string name)
 {
   m_Name = name;
-  if ( m_DeviceState >= State_Initialized )
+  if (m_DeviceState >= State_Initialized)
   {
-    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_NAME, name);
+    this->UpdateServiceProperty(
+      mitk::USDevice::GetPropertyKeys().US_PROPKEY_NAME, name);
   }
 }
 
 void mitk::USDevice::SetComment(std::string comment)
 {
   m_Comment = comment;
-  if ( m_DeviceState >= State_Initialized )
+  if (m_DeviceState >= State_Initialized)
   {
-    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_COMMENT, comment);
+    this->UpdateServiceProperty(
+      mitk::USDevice::GetPropertyKeys().US_PROPKEY_COMMENT, comment);
   }
 }
 
@@ -167,13 +175,16 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 
   us::ServiceProperties props;
 
-  props[propertyKeys.US_PROPKEY_ISCONNECTED] = this->GetIsConnected() ? "true" : "false";
-  props[propertyKeys.US_PROPKEY_ISACTIVE] = this->GetIsActive() ? "true" : "false";
+  props[propertyKeys.US_PROPKEY_ISCONNECTED] =
+    this->GetIsConnected() ? "true" : "false";
+  props[propertyKeys.US_PROPKEY_ISACTIVE] =
+    this->GetIsActive() ? "true" : "false";
 
   props[propertyKeys.US_PROPKEY_LABEL] = this->GetServicePropertyLabel();
 
   // get identifier of selected probe if there is one selected
-  mitk::USControlInterfaceProbes::Pointer probesControls = this->GetControlInterfaceProbes();
+  mitk::USControlInterfaceProbes::Pointer probesControls =
+    this->GetControlInterfaceProbes();
   if (probesControls.IsNotNull() && probesControls->GetIsActive())
   {
     mitk::USProbe::Pointer probe = probesControls->GetSelectedProbe();
@@ -183,10 +194,10 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
     }
   }
 
-  props[ propertyKeys.US_PROPKEY_CLASS ] = GetDeviceClass();
-  props[ propertyKeys.US_PROPKEY_MANUFACTURER ] = m_Manufacturer;
-  props[ propertyKeys.US_PROPKEY_NAME ] = m_Name;
-  props[ propertyKeys.US_PROPKEY_COMMENT ] = m_Comment;
+  props[propertyKeys.US_PROPKEY_CLASS] = GetDeviceClass();
+  props[propertyKeys.US_PROPKEY_MANUFACTURER] = m_Manufacturer;
+  props[propertyKeys.US_PROPKEY_NAME] = m_Name;
+  props[propertyKeys.US_PROPKEY_COMMENT] = m_Comment;
 
   m_ServiceProperties = props;
 
@@ -196,7 +207,7 @@ us::ServiceProperties mitk::USDevice::ConstructServiceProperties()
 void mitk::USDevice::UnregisterOnService()
 {
   // unregister on micro service
-  if ( m_ServiceRegistration && ! m_UnregisteringStarted)
+  if (m_ServiceRegistration && !m_UnregisteringStarted)
   {
     // make sure that unregister is not started a second
     // time due to a callback during unregister for example
@@ -208,7 +219,10 @@ void mitk::USDevice::UnregisterOnService()
 
 bool mitk::USDevice::Initialize()
 {
-  if (! this->OnInitialization() ) { return false; }
+  if (!this->OnInitialization())
+  {
+    return false;
+  }
 
   m_DeviceState = State_Initialized;
 
@@ -223,25 +237,33 @@ bool mitk::USDevice::Initialize()
 
 bool mitk::USDevice::Connect()
 {
-  if ( this->GetIsConnected() )
+  MITK_DEBUG << "mitk::USDevice::Connect() called";
+
+  if (this->GetIsConnected())
   {
-    MITK_INFO("mitkUSDevice") << "Tried to connect an ultrasound device that was already connected. Ignoring call...";
+    MITK_INFO("mitkUSDevice") << "Tried to connect an ultrasound device that "
+      "was already connected. Ignoring call...";
     return true;
   }
 
-  if ( ! this->GetIsInitialized() )
+  if (!this->GetIsInitialized())
   {
-    MITK_ERROR("mitkUSDevice") << "Cannot connect device if it is not in initialized state.";
+    MITK_ERROR("mitkUSDevice")
+      << "Cannot connect device if it is not in initialized state.";
     return false;
   }
 
   // Prepare connection, fail if this fails.
-  if ( ! this->OnConnection() ) { return false; }
+  if (!this->OnConnection())
+  {
+    return false;
+  }
 
   // Update state
   m_DeviceState = State_Connected;
 
-  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED, true);
+  this->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED, true);
   return true;
 }
 
@@ -252,31 +274,35 @@ void mitk::USDevice::ConnectAsynchron()
 
 bool mitk::USDevice::Disconnect()
 {
-  if ( ! GetIsConnected())
+  if (!GetIsConnected())
   {
-    MITK_WARN << "Tried to disconnect an ultrasound device that was not connected. Ignoring call...";
+    MITK_WARN << "Tried to disconnect an ultrasound device that was not "
+      "connected. Ignoring call...";
     return false;
   }
   // Prepare connection, fail if this fails.
-  if (! this->OnDisconnection()) return false;
+  if (!this->OnDisconnection())
+    return false;
 
   // Update state
   m_DeviceState = State_Initialized;
 
-  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED, false);
+  this->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISCONNECTED, false);
 
   return true;
 }
 
 bool mitk::USDevice::Activate()
 {
-  if (! this->GetIsConnected())
+  if (!this->GetIsConnected())
   {
-    MITK_INFO("mitkUSDevice") << "Cannot activate device if it is not in connected state.";
+    MITK_INFO("mitkUSDevice")
+      << "Cannot activate device if it is not in connected state.";
     return true;
   }
 
-  if ( OnActivation() )
+  if (OnActivation())
   {
     m_DeviceState = State_Activated;
 
@@ -285,40 +311,98 @@ bool mitk::USDevice::Activate()
     // spawn thread for aquire images if us device is active
     if (m_SpawnAcquireThread)
     {
-      this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+      this->m_ThreadID =
+        this->m_MultiThreader->SpawnThread(this->Acquire, this);
     }
 
-    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, true);
-    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+    this->UpdateServiceProperty(
+      mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, true);
+    this->UpdateServiceProperty(
+      mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL,
+      this->GetServicePropertyLabel());
 
     // initialize the b mode control properties of the micro service
-    mitk::USControlInterfaceBMode::Pointer bmodeControls = this->GetControlInterfaceBMode();
-    if ( bmodeControls.IsNotNull() ) { bmodeControls->Initialize(); }
+    mitk::USControlInterfaceBMode::Pointer bmodeControls =
+      this->GetControlInterfaceBMode();
+    if (bmodeControls.IsNotNull())
+    {
+      bmodeControls->Initialize();
+    }
   }
+
+  this->ProvideViaOIGTL();
 
   return m_DeviceState == State_Activated;
 }
 
+void mitk::USDevice::ProvideViaOIGTL()
+{
+  // create a new OpenIGTLink Server
+  if (m_IGTLServer.IsNull())
+    m_IGTLServer = mitk::IGTLServer::New(true);
+
+  m_IGTLServer->SetName(this->GetName());
+
+  // create a new OpenIGTLink Device source
+  if (m_IGTLMessageProvider.IsNull())
+    m_IGTLMessageProvider = mitk::IGTLMessageProvider::New();
+
+  // set the OpenIGTLink server as the source for the device source
+  m_IGTLMessageProvider->SetIGTLDevice(m_IGTLServer);
+
+  // register the provider so that it can be configured with the IGTL manager
+  // plugin. This could be hardcoded but now I already have the fancy plugin.
+  m_IGTLMessageProvider->RegisterAsMicroservice();
+
+  m_ImageToIGTLMsgFilter = mitk::ImageToIGTLMessageFilter::New();
+  m_ImageToIGTLMsgFilter->ConnectTo(this);
+
+  // set the name of this filter to identify it easier
+  m_ImageToIGTLMsgFilter->SetName(this->GetName());
+
+  // register this filter as micro service. The message provider looks for
+  // provided IGTLMessageSources, once it found this microservice and someone
+  // requested this data type then the provider will connect with this filter
+  // automatically.
+  m_ImageToIGTLMsgFilter->RegisterAsMicroservice();
+}
+
 void mitk::USDevice::Deactivate()
 {
-  if ( ! this->GetIsActive() )
+  if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")
       << "Cannot deactivate a device which is not activae.";
     return;
   }
 
-  if ( ! OnDeactivation() ) { return; }
+  if (!OnDeactivation())
+  {
+    return;
+  }
 
+  DisableOIGTL();
   m_DeviceState = State_Connected;
 
-  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, false);
-  this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL, this->GetServicePropertyLabel());
+  this->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, false);
+  this->UpdateServiceProperty(
+    mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL,
+    this->GetServicePropertyLabel());
+}
+
+void mitk::USDevice::DisableOIGTL()
+{
+  // TODO: This seems not to be enough cleanup to catch all cases. For example, if the device is disconnected
+  // from the OIGTL GUI, this won't get cleaned up correctly.
+  m_IGTLServer->CloseConnection();
+  m_IGTLMessageProvider->UnRegisterMicroservice();
+  m_ImageToIGTLMsgFilter->UnRegisterMicroservice();
 }
 
 void mitk::USDevice::SetIsFreezed(bool freeze)
 {
-  if ( ! this->GetIsActive() )
+  if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")
       << "Cannot freeze or unfreeze if device is not active.";
@@ -327,7 +411,7 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
   this->OnFreeze(freeze);
 
-  if ( freeze )
+  if (freeze)
   {
     m_IsFreezed = true;
   }
@@ -342,10 +426,11 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
 bool mitk::USDevice::GetIsFreezed()
 {
-  if ( ! this->GetIsActive() )
+  if (!this->GetIsActive())
   {
     MITK_WARN("mitkUSDevice")("mitkUSTelemedDevice")
-      << "Cannot get freeze state if the hardware interface is not ready. Returning false...";
+      << "Cannot get freeze state if the hardware interface is not ready. "
+      "Returning false...";
     return false;
   }
 
@@ -355,7 +440,7 @@ bool mitk::USDevice::GetIsFreezed()
 void mitk::USDevice::PushFilter(AbstractOpenCVImageFilter::Pointer filter)
 {
   mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
-  if ( imageSource.IsNull() )
+  if (imageSource.IsNull())
   {
     MITK_ERROR << "ImageSource must not be null when pushing a filter.";
     mitkThrow() << "ImageSource must not be null when pushing a filter.";
@@ -364,16 +449,17 @@ void mitk::USDevice::PushFilter(AbstractOpenCVImageFilter::Pointer filter)
   imageSource->PushFilter(filter);
 }
 
-void mitk::USDevice::PushFilterIfNotPushedBefore(AbstractOpenCVImageFilter::Pointer filter)
+void mitk::USDevice::PushFilterIfNotPushedBefore(
+  AbstractOpenCVImageFilter::Pointer filter)
 {
   mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
-  if ( imageSource.IsNull() )
+  if (imageSource.IsNull())
   {
     MITK_ERROR << "ImageSource must not be null when pushing a filter.";
     mitkThrow() << "ImageSource must not be null when pushing a filter.";
   }
 
-  if ( ! imageSource->GetIsFilterInThePipeline(filter) )
+  if (!imageSource->GetIsFilterInThePipeline(filter))
   {
     imageSource->PushFilter(filter);
   }
@@ -382,7 +468,7 @@ void mitk::USDevice::PushFilterIfNotPushedBefore(AbstractOpenCVImageFilter::Poin
 bool mitk::USDevice::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter)
 {
   mitk::USImageSource::Pointer imageSource = this->GetUSImageSource();
-  if ( imageSource.IsNull() )
+  if (imageSource.IsNull())
   {
     MITK_ERROR << "ImageSource must not be null when pushing a filter.";
     mitkThrow() << "ImageSource must not be null when removing a filter.";
@@ -393,7 +479,7 @@ bool mitk::USDevice::RemoveFilter(AbstractOpenCVImageFilter::Pointer filter)
 
 void mitk::USDevice::UpdateServiceProperty(std::string key, std::string value)
 {
-  m_ServiceProperties[ key ] = value;
+  m_ServiceProperties[key] = value;
   m_ServiceRegistration.SetProperties(m_ServiceProperties);
 
   // send event to notify listeners about the changed property
@@ -409,7 +495,8 @@ void mitk::USDevice::UpdateServiceProperty(std::string key, double value)
 
 void mitk::USDevice::UpdateServiceProperty(std::string key, bool value)
 {
-  this->UpdateServiceProperty(key, value ? std::string("true") : std::string("false"));
+  this->UpdateServiceProperty(
+    key, value ? std::string("true") : std::string("false"));
 }
 
 /**
@@ -463,7 +550,7 @@ void mitk::USDevice::GrabImage()
   m_ImageMutex->Lock();
   this->SetImage(image);
   m_ImageMutex->Unlock();
-  //if (image.IsNotNull() && (image->GetGeometry()!=NULL)){
+  // if (image.IsNotNull() && (image->GetGeometry()!=NULL)){
   //  MITK_INFO << "Spacing: " << image->GetGeometry()->GetSpacing();}
 }
 
@@ -474,43 +561,41 @@ bool mitk::USDevice::GetIsInitialized()
   return m_DeviceState == State_Initialized;
 }
 
-bool mitk::USDevice::GetIsActive()
-{
-  return m_DeviceState == State_Activated;
-}
+bool mitk::USDevice::GetIsActive() { return m_DeviceState == State_Activated; }
 
 bool mitk::USDevice::GetIsConnected()
 {
   return m_DeviceState == State_Connected;
 }
 
-std::string mitk::USDevice::GetDeviceManufacturer(){
-  return m_Manufacturer;
-}
+std::string mitk::USDevice::GetDeviceManufacturer() { return m_Manufacturer; }
 
-std::string mitk::USDevice::GetDeviceModel(){
-  return m_Name;
-}
+std::string mitk::USDevice::GetDeviceModel() { return m_Name; }
 
-std::string mitk::USDevice::GetDeviceComment(){
-  return m_Comment;
-}
+std::string mitk::USDevice::GetDeviceComment() { return m_Comment; }
 
 void mitk::USDevice::GenerateData()
 {
   m_ImageMutex->Lock();
 
-  if ( m_Image.IsNull() || ! m_Image->IsInitialized() ) { m_ImageMutex->Unlock(); return; }
+  if (m_Image.IsNull() || !m_Image->IsInitialized())
+  {
+    m_ImageMutex->Unlock();
+    return;
+  }
 
   mitk::Image::Pointer output = this->GetOutput();
 
-  if ( ! output->IsInitialized()
-    || output->GetDimension(0) != m_Image->GetDimension(0) || output->GetDimension(1) != m_Image->GetDimension(1) )
+  if (!output->IsInitialized() ||
+    output->GetDimension(0) != m_Image->GetDimension(0) ||
+    output->GetDimension(1) != m_Image->GetDimension(1))
   {
-    output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+    output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(),
+      m_Image->GetDimensions());
   }
 
-  mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
+  mitk::ImageReadAccessor inputReadAccessor(m_Image,
+    m_Image->GetSliceData(0, 0, 0));
   output->SetSlice(inputReadAccessor.GetData());
   output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();
@@ -519,8 +604,14 @@ void mitk::USDevice::GenerateData()
 std::string mitk::USDevice::GetServicePropertyLabel()
 {
   std::string isActive;
-  if (this->GetIsActive()) { isActive = " (Active)"; }
-  else { isActive = " (Inactive)"; }
+  if (this->GetIsActive())
+  {
+    isActive = " (Active)";
+  }
+  else
+  {
+    isActive = " (Inactive)";
+  }
   // e.g.: Zonare MyLab5 (Active)
   return m_Manufacturer + " " + m_Name + isActive;
 }
@@ -528,12 +619,13 @@ std::string mitk::USDevice::GetServicePropertyLabel()
 ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USDevice* device = (mitk::USDevice*) pInfo->UserData;
+  struct itk::MultiThreader::ThreadInfoStruct* pInfo =
+    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::USDevice* device = (mitk::USDevice*)pInfo->UserData;
   while (device->GetIsActive())
   {
     // lock this thread when ultrasound device is freezed
-    if ( device->m_IsFreezed )
+    if (device->m_IsFreezed)
     {
       itk::SimpleMutexLock* mutex = &(device->m_FreezeMutex);
       mutex->Lock();
@@ -552,8 +644,9 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
 ITK_THREAD_RETURN_TYPE mitk::USDevice::ConnectThread(void* pInfoStruct)
 {
   /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USDevice* device = (mitk::USDevice*) pInfo->UserData;
+  struct itk::MultiThreader::ThreadInfoStruct* pInfo =
+    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  mitk::USDevice* device = (mitk::USDevice*)pInfo->UserData;
 
   device->Connect();
 

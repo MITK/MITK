@@ -20,6 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include <itkMersenneTwisterRandomVariateGenerator.h>
 #include "mitkRenderingModeProperty.h"
+#include <itkImageIterator.h>
+#include <mitkImageCast.h>
+#include <itkImageDuplicator.h>
+#include <itkComposeImageFilter.h>
+#include <itkEventObject.h>
 
 class mitkLevelWindowManagerTestClass
 {
@@ -27,66 +32,66 @@ public:
 
   static void TestInstantiation()
   {
-  mitk::LevelWindowManager::Pointer manager;
-  manager = mitk::LevelWindowManager::New();
-  MITK_TEST_CONDITION_REQUIRED(manager.IsNotNull(),"Testing mitk::LevelWindowManager::New()");
+    mitk::LevelWindowManager::Pointer manager;
+    manager = mitk::LevelWindowManager::New();
+    MITK_TEST_CONDITION_REQUIRED(manager.IsNotNull(),"Testing mitk::LevelWindowManager::New()");
   }
 
   static void TestSetGetDataStorage()
   {
-  mitk::LevelWindowManager::Pointer manager;
-  manager = mitk::LevelWindowManager::New();
-  MITK_TEST_OUTPUT(<< "Creating DataStorage: ");
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+    mitk::LevelWindowManager::Pointer manager;
+    manager = mitk::LevelWindowManager::New();
+    MITK_TEST_OUTPUT(<< "Creating DataStorage: ");
+    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-  bool success = true;
-  try
+    bool success = true;
+    try
     {
-    manager->SetDataStorage(ds);
+      manager->SetDataStorage(ds);
     }
-  catch(std::exception e)
+    catch(std::exception e)
     {
-    success = false;
-    MITK_ERROR << "Exception: " << e.what();
+      success = false;
+      MITK_ERROR << "Exception: " << e.what();
     }
-  MITK_TEST_CONDITION_REQUIRED(success,"Testing mitk::LevelWindowManager SetDataStorage() ");
-  MITK_TEST_CONDITION_REQUIRED(ds == manager->GetDataStorage(),"Testing mitk::LevelWindowManager GetDataStorage ");
+    MITK_TEST_CONDITION_REQUIRED(success,"Testing mitk::LevelWindowManager SetDataStorage() ");
+    MITK_TEST_CONDITION_REQUIRED(ds == manager->GetDataStorage(),"Testing mitk::LevelWindowManager GetDataStorage ");
 
   }
 
   static void TestMethodsWithInvalidParameters()
   {
-  mitk::LevelWindowManager::Pointer manager;
-  manager = mitk::LevelWindowManager::New();
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-  manager->SetDataStorage(ds);
+    mitk::LevelWindowManager::Pointer manager;
+    manager = mitk::LevelWindowManager::New();
+    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+    manager->SetDataStorage(ds);
 
-  bool success = false;
-  mitk::LevelWindowProperty::Pointer levelWindowProperty = mitk::LevelWindowProperty::New();
-  try
+    bool success = false;
+    mitk::LevelWindowProperty::Pointer levelWindowProperty = mitk::LevelWindowProperty::New();
+    try
     {
-    manager->SetLevelWindowProperty(levelWindowProperty);
+      manager->SetLevelWindowProperty(levelWindowProperty);
     }
-  catch(mitk::Exception e)
+    catch(mitk::Exception e)
     {
-    success = true;
+      success = true;
     }
-  MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager SetLevelWindowProperty with invalid parameter");
+    MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager SetLevelWindowProperty with invalid parameter");
   }
 
   static void TestOtherMethods()
   {
-  mitk::LevelWindowManager::Pointer manager;
-  manager = mitk::LevelWindowManager::New();
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-  manager->SetDataStorage(ds);
+    mitk::LevelWindowManager::Pointer manager;
+    manager = mitk::LevelWindowManager::New();
+    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+    manager->SetDataStorage(ds);
 
-  MITK_TEST_CONDITION(manager->isAutoTopMost(),"Testing mitk::LevelWindowManager isAutoTopMost");
+    MITK_TEST_CONDITION(manager->isAutoTopMost(),"Testing mitk::LevelWindowManager isAutoTopMost");
 
-  // It is not clear what the following code is supposed to test. The expression in
-  // the catch(...) block does have no effect, so success is always true.
-  // Related bugs are 13894 and 13889
-  /*
+    // It is not clear what the following code is supposed to test. The expression in
+    // the catch(...) block does have no effect, so success is always true.
+    // Related bugs are 13894 and 13889
+    /*
   bool success = true;
   try
   {
@@ -98,50 +103,50 @@ public:
     success == false;
   }
   MITK_TEST_CONDITION(success,"Testing mitk::LevelWindowManager GetLevelWindow() and SetLevelWindow()");
-  */
+     */
 
-  manager->SetAutoTopMostImage(true);
-  MITK_TEST_CONDITION(manager->isAutoTopMost(),"Testing mitk::LevelWindowManager isAutoTopMost()");
+    manager->SetAutoTopMostImage(true);
+    MITK_TEST_CONDITION(manager->isAutoTopMost(),"Testing mitk::LevelWindowManager isAutoTopMost()");
   }
 
   static void TestRemoveObserver(std::string testImageFile)
   {
-  mitk::LevelWindowManager::Pointer manager;
-  manager = mitk::LevelWindowManager::New();
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-  manager->SetDataStorage(ds);
+    mitk::LevelWindowManager::Pointer manager;
+    manager = mitk::LevelWindowManager::New();
+    mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+    manager->SetDataStorage(ds);
 
-  //add multiple objects to the data storage => multiple observers should be created
-  mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
-  mitk::DataNode::Pointer node1 = mitk::DataNode::New();
-  node1->SetData(image1);
-  mitk::Image::Pointer image2 = mitk::IOUtil::LoadImage(testImageFile);
-  mitk::DataNode::Pointer node2 = mitk::DataNode::New();
-  node2->SetData(image2);
-  ds->Add(node1);
-  ds->Add(node2);
+    //add multiple objects to the data storage => multiple observers should be created
+    mitk::Image::Pointer image1 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::DataNode::Pointer node1 = mitk::DataNode::New();
+    node1->SetData(image1);
+    mitk::Image::Pointer image2 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::DataNode::Pointer node2 = mitk::DataNode::New();
+    node2->SetData(image2);
+    ds->Add(node1);
+    ds->Add(node2);
 
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Test if nodes have been added");
-  MITK_TEST_CONDITION_REQUIRED(static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
+    MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Test if nodes have been added");
+    MITK_TEST_CONDITION_REQUIRED(static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
 
-  mitk::Image::Pointer image3 = mitk::IOUtil::LoadImage(testImageFile);
-  mitk::DataNode::Pointer node3 = mitk::DataNode::New();
-  node3->SetData(image3);
-  ds->Add(node3);
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 3, "Test if another node have been added");
-  MITK_TEST_CONDITION_REQUIRED(static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
+    mitk::Image::Pointer image3 = mitk::IOUtil::LoadImage(testImageFile);
+    mitk::DataNode::Pointer node3 = mitk::DataNode::New();
+    node3->SetData(image3);
+    ds->Add(node3);
+    MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 3, "Test if another node have been added");
+    MITK_TEST_CONDITION_REQUIRED(static_cast<int>(manager->GetRelevantNodes()->size()) == manager->GetNumberOfObservers(), "Test if number of nodes is similar to number of observers");
 
-  ds->Remove(node1);
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Deleted node 1 (test GetRelevantNodes())");
-  MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 2, "Deleted node 1 (test GetNumberOfObservers())");
+    ds->Remove(node1);
+    MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 2, "Deleted node 1 (test GetRelevantNodes())");
+    MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 2, "Deleted node 1 (test GetNumberOfObservers())");
 
-  ds->Remove(node2);
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 1, "Deleted node 2 (test GetRelevantNodes())");
-  MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 1, "Deleted node 2 (test GetNumberOfObservers())");
+    ds->Remove(node2);
+    MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 1, "Deleted node 2 (test GetRelevantNodes())");
+    MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 1, "Deleted node 2 (test GetNumberOfObservers())");
 
-  ds->Remove(node3);
-  MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 0, "Deleted node 3 (test GetRelevantNodes())");
-  MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 0, "Deleted node 3 (test GetNumberOfObservers())");
+    ds->Remove(node3);
+    MITK_TEST_CONDITION_REQUIRED(manager->GetRelevantNodes()->size() == 0, "Deleted node 3 (test GetRelevantNodes())");
+    MITK_TEST_CONDITION_REQUIRED(manager->GetNumberOfObservers() == 0, "Deleted node 3 (test GetNumberOfObservers())");
 
   }
 
@@ -150,9 +155,9 @@ public:
     bool ok = false;
 
     ok = ( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == 1 ) &&
-    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == 2 ) &&
-    (mitk::RenderingModeProperty::LOOKUPTABLE_COLOR == 3 ) &&
-    (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == 4 );
+        (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == 2 ) &&
+        (mitk::RenderingModeProperty::LOOKUPTABLE_COLOR == 3 ) &&
+        (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == 4 );
 
     return ok;
   }
@@ -211,6 +216,9 @@ public:
       MITK_TEST_CONDITION( renderingModesValid && ( (!manager->GetLevelWindowProperty() && !i) || (manager->GetLevelWindowProperty() && i) ), "Testing level window property member according to rendering mode");
     }
   }
+
+
+
 
 };
 

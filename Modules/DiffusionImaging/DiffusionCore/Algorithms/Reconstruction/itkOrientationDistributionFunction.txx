@@ -26,7 +26,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPointShell.h"
 
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
+#ifdef _MSC_VER
+  #if _MSC_VER <= 1700
+    #define fmin(a,b) ((a<=b)?(a):(b))
+    #define fmax(a,b) ((a>=b)?(a):(b))
+    #define isnan(c)  (c!=c)
+  #endif
+#endif
+
+#include <itkMatrix.h>
+#include <vnl/vnl_matrix.h>
+#include <vnl/vnl_matrix_fixed.h>
+#include <vnl/vnl_inverse.h>
+#include <typeinfo>
+#include <ciso646>
 
 namespace itk
 {
@@ -291,8 +305,7 @@ namespace itk
   }
 
   /**
-  * Set the Tensor to an Identity.
-  * Set ones in the diagonal and zeroes every where else.
+  * InitFromTensor()
   */
   template<class T, unsigned int NOdfDirections>
   void
@@ -325,6 +338,123 @@ namespace itk
 
       if ((*this)[i]<0 || (*this)[i]!=(*this)[i])
         (*this)[i] = 0;
+    }
+  }
+
+  /**
+  * InitFromEllipsoid()
+  */
+  template<class T, unsigned int NOdfDirections>
+  void OrientationDistributionFunction<T, NOdfDirections>::
+  InitFromEllipsoid( itk::DiffusionTensor3D<T> tensor )
+  {
+    FixedArray<T, 6> nulltensor;
+    nulltensor.Fill(0.0);
+    if( tensor == nulltensor )
+    {
+      for ( unsigned int it=0; it < NOdfDirections; ++it ){ (*this)[it] = (T)0; }
+      MITK_DEBUG << "OrientationDistributionFunction<" << typeid(T).name() << ", " << NOdfDirections
+                 << ">::InitFromEllipsoid(" << typeid(tensor).name()
+                 << ") encountered a nulltensor as dti input point and ignorend it.";
+      return;
+    }
+
+    typename itk::DiffusionTensor3D<T>::EigenValuesArrayType eigenValues;
+    typename itk::DiffusionTensor3D<T>::EigenVectorsMatrixType eigenVectors;
+    tensor.ComputeEigenAnalysis( eigenValues, eigenVectors ); // gives normalized eigenvectors as lines i.e. rows.
+    double a = eigenValues[0]; // those eigenvalues are the 3 |axes of the ellipsoid|,
+    double b = eigenValues[1]; // ComputeEigenAnalysis gives eigenValues in ascending < order per default,
+    double c = eigenValues[2]; // therefor the third eigenVector is the main direction of diffusion.
+
+    if( a <= 0.0 or b <= 0.0 or c <= 0.0 )
+    {
+      for ( unsigned int it=0; it < NOdfDirections; ++it ){ (*this)[it] = (T)0; }
+      MITK_DEBUG << "OrientationDistributionFunction<" << typeid(T).name() << ", " << NOdfDirections
+                 << ">::InitFromEllipsoid(" << typeid(tensor).name()
+                 << ") encountered an eigenvalue <= 0 and ignored this input point.";
+      return;
+    }
+
+    // check magnitude and scale towards 1 to minimize numerical condition kappa:
+#ifdef _MSC_VER
+  #if _MSC_VER <= 1700
+    int exponent_a = floor(std::log(a)/std::log(2));
+    int exponent_b = floor(std::log(b)/std::log(2));
+    int exponent_c = floor(std::log(c)/std::log(2));
+  #else
+    int exponent_a = std::ilogb(a);
+    int exponent_b = std::ilogb(b);
+    int exponent_c = std::ilogb(c);
+  #endif
+#else
+    int exponent_a = std::ilogb(a);
+    int exponent_b = std::ilogb(b);
+    int exponent_c = std::ilogb(c);
+#endif
+
+    T min_exponent= fmin(exponent_a, fmin(exponent_b, exponent_c) );
+    T max_exponent= fmax(exponent_c, fmax(exponent_b, exponent_a) );
+    int scale_exponent = floor(0.5 * (min_exponent + max_exponent));
+    double scaling = pow(2, scale_exponent);
+    a= a/scaling;
+    b= b/scaling;
+    c= c/scaling;
+
+    vnl_matrix_fixed<double, 3, 3> eigenBase; // for change of base system.
+    for (int row = 0 ; row < 3; ++row) // Transposing because ComputeEigenAnalysis(,) gave us _row_ vectors.
+    {
+      for (int col = 0; col < 3; ++col)
+      {
+        eigenBase(row, col) = eigenVectors(col, row);
+      }
+    }
+    eigenBase= vnl_inverse(eigenBase); // Assuming canonical orthonormal system x=[1;0;0];y=[0;1;0];z=[0;0;1] for original DT.
+    eigenBase.assert_finite();
+
+#ifndef NDEBUG
+    double kappa=1.0;
+    { // calculate numerical condition kappa= ||f(x)-f(x~)|| approximately:
+      double gxaa = pow( a, -2.0);  double gybb = pow( b, -2.0);  double gzcc = pow( c, -2.0);
+      kappa = sqrt( pow( a, 2.0)+ pow( b, 2.0)+ pow( c, 2.0) + 1 ) / (gxaa + gybb + gzcc)
+          * sqrt( pow( a, -6.0)+ pow( b, -6.0)+ pow( c, -6.0) + pow( a, -4.0)+ pow( b, -4.0)+ pow( c, -4.0) );
+      MITK_DEBUG <<"kappa= "<< kappa << ", eigenvalues= [" << a <<", "<< b <<", "<< c <<"], eigenbase= ["
+                 <<eigenBase(0,0)<<", "<<eigenBase(1,0)<<", "<<eigenBase(2,0)<<"; "
+                 <<eigenBase(0,1)<<", "<<eigenBase(1,1)<<", "<<eigenBase(2,1)<<"; "
+                 <<eigenBase(0,2)<<", "<<eigenBase(1,2)<<", "<<eigenBase(2,2)<<"] ";
+      if( std::isnan(kappa) )
+      {
+        MITK_DEBUG << "oh noes: kappa was NaN, setting kappa to 1e5"; // typical value kappa=1e5 for 1e-6<=a,b,c<=1e-4.
+        kappa=1e5;
+      };
+    }
+#endif
+
+    for( unsigned int i=0; i < NOdfDirections; ++i )
+    {
+      /// calculate probability p(g)=r as ellipsoids magnitude in direction of g' = B^-1 * g:
+      /// (g0*r/evx)² + (g1*r/evy)² + (g2*r/evz)² = 1, |g'|=1.
+
+      vnl_vector_fixed<double, 3> g( (*m_Directions)(0,i), (*m_Directions)(1,i), (*m_Directions)(2,i) );
+      g = eigenBase*g;   // passive change of base system of g.
+      g = g.normalize(); // unit vectors necessary.
+      (*this)[i] = scaling / sqrt( (g[0]/a)*(g[0]/a) + (g[1]/b)*(g[1]/b) + (g[2]/c)*(g[2]/c) );
+
+#ifndef NDEBUG
+      { // boundary check for numerical stability, assuming sigma=6, ||f(x~)-f~(x~)|| <= eps*kappa*sigma.
+        T min_ev= fmin(a, fmin(b, c) );   T max_ev= fmax(c, fmax(b, a) );
+        double eps= std::numeric_limits<T>::epsilon();
+        assert( scaling*min_ev <= ((*this)[i] + eps*kappa*6.0) ); // we should be between smallest and
+        assert( (*this)[i] <= (scaling*max_ev + eps*kappa*6.0) ); // biggest eigenvalue.
+      }
+#endif
+      if ( (*this)[i] < T(0) or (*this)[i] > T(1) or isnan((*this)[i]) ) // P∈[0;1] sanity check.
+      { // C: NaN != NaN, C++11: isnan((*this)[i]).
+        MITK_DEBUG << "OrientationDistributionFunction<" << typeid(T).name() << ", " << NOdfDirections
+                   << ">::InitFromEllipsoid(" << typeid(tensor).name()
+                   << ") encountered a probability value out of range [0;1] and set it to zero: (*this)["
+                   << i <<"]= " << (*this)[i];
+        (*this)[i] = T(0);
+      }
     }
   }
 
@@ -1212,8 +1342,6 @@ namespace itk
     }
     return is;
   }
-
-
 
 } // end namespace itk
 

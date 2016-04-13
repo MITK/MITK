@@ -24,9 +24,8 @@ if(MITK_USE_Poco)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.0-all.tar.gz
-      URL_MD5 4fed893d4ca57db98b0e10d82545232a
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Poco-1.6.0.patch
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.6.1-all.tar.gz
+      URL_MD5 05961d10195d0f760b707752e88938e9
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
@@ -36,7 +35,7 @@ if(MITK_USE_Poco)
         -DENABLE_MONGODB:BOOL=OFF
         -DENABLE_PDF:BOOL=OFF
         -DENABLE_UTIL:BOOL=ON
-        -DENABLE_NET:BOOL=OFF
+        -DENABLE_NET:BOOL=ON
         -DENABLE_NETSSL:BOOL=OFF
         -DENABLE_NETSSL_WIN:BOOL=OFF
         -DENABLE_CRYPTO:BOOL=OFF

@@ -16,12 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNDIProtocol.h"
 #include "mitkNDITrackingDevice.h"
+#include "mitkNDIAuroraTypeInformation.h"
+#include "mitkNDIPolarisTypeInformation.h"
+#include "mitkUnspecifiedTrackingTypeInformation.h"
 #include <string>
 #include <algorithm>
 #include <sstream>
 #include <itksys/SystemTools.hxx>
 #include <stdio.h>
-
 
 mitk::NDIProtocol::NDIProtocol()
 : itk::Object(), m_TrackingDevice(nullptr), m_UseCRC(true)
@@ -1222,11 +1224,11 @@ mitk::NDIErrorCode mitk::NDIProtocol::VER(mitk::TrackingDeviceType& t)
     upperCaseReply.resize(reply.size());
     std::transform (reply.begin(), reply.end(), upperCaseReply.begin(), toupper);  // convert reply to uppercase to ease finding
     if (upperCaseReply.find("POLARIS") != std::string::npos)
-      t = mitk::NDIPolaris;
+      t = NDIPolarisTypeInformation::GetTrackingDeviceName();
     else if (upperCaseReply.find("AURORA") != std::string::npos)
-      t = mitk::NDIAurora;
+      t = NDIAuroraTypeInformation::GetTrackingDeviceName();
     else
-      t = mitk::TrackingSystemNotSpecified;
+      t = UnspecifiedTrackingTypeInformation::GetTrackingDeviceName();
     // check for "VICRA", "SPECTRA", "ACCEDO"
     /* do not check for remaining reply, do not check for CRC, just delete remaining reply */
     itksys::SystemTools::Delay(500); // wait until reply should be finished
@@ -1757,17 +1759,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
         }
         //analyze volume here
 
-        if (currentVolume.compare(0,1,mitk::DeviceDataPolarisOldModel.HardwareCode)==0)
+        if (currentVolume.compare(0, 1, mitk::NDIPolarisTypeInformation::GetDeviceDataPolarisOldModel().HardwareCode) == 0)
           MITK_INFO<<"Standard volume supported \n";
-        else if (currentVolume.compare(0,3,mitk::DeviceDataPolarisSpectra.HardwareCode)==0)
+        else if (currentVolume.compare(0, 3, mitk::NDIPolarisTypeInformation::GetDeviceDataPolarisSpectra().HardwareCode) == 0)
           MITK_INFO<<"Spectra pyramid volume supported \n";
-        else if (currentVolume.compare(0,3,mitk::DeviceDataSpectraExtendedPyramid.HardwareCode)==0)
+        else if (currentVolume.compare(0, 3, mitk::NDIPolarisTypeInformation::GetDeviceDataSpectraExtendedPyramid().HardwareCode)==0)
           MITK_INFO<<"Spectra extended pyramid volume supported \n";
-        else if (currentVolume.compare(0,1,mitk::DeviceDataPolarisVicra.HardwareCode)==0)
+        else if (currentVolume.compare(0, 1, mitk::NDIPolarisTypeInformation::GetDeviceDataPolarisVicra().HardwareCode) == 0)
           MITK_INFO<<"Vicra volume supported \n";
-        else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarCube.HardwareCode)==0)
+        else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarCube().HardwareCode) == 0)
           MITK_INFO<<"Cube volume supported \n";
-        else if (currentVolume.compare(0,1,mitk::DeviceDataAuroraPlanarDome.HardwareCode)==0)
+        else if (currentVolume.compare(0, 1, mitk::NDIAuroraTypeInformation::GetDeviceDataAuroraPlanarDome().HardwareCode) == 0)
           MITK_INFO<<"Dome volume supported \n";
         else
           MITK_WARN<<"Message not understood!\n";

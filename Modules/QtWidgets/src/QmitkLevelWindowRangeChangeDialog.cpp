@@ -26,29 +26,29 @@ QmitkLevelWindowRangeChangeDialog::QmitkLevelWindowRangeChangeDialog(QWidget* pa
   QObject::connect(okButton, SIGNAL(clicked()), this, SLOT(inputValidator()));
 }
 
-int QmitkLevelWindowRangeChangeDialog::getLowerLimit()
+double QmitkLevelWindowRangeChangeDialog::getLowerLimit()
 {
-  return rangeMinSpinBox->value();
+  return rangeMinDoubleSpinBox->value();
 }
 
-int QmitkLevelWindowRangeChangeDialog::getUpperLimit()
+double QmitkLevelWindowRangeChangeDialog::getUpperLimit()
 {
-  return rangeMaxSpinBox->value();
+  return rangeMaxDoubleSpinBox->value();
 }
 
-void QmitkLevelWindowRangeChangeDialog::setLowerLimit( int rangeMin )
+void QmitkLevelWindowRangeChangeDialog::setLowerLimit( double rangeMin )
 {
-  rangeMinSpinBox->setValue(rangeMin);
+  rangeMinDoubleSpinBox->setValue(rangeMin);
 }
 
-void QmitkLevelWindowRangeChangeDialog::setUpperLimit( int rangeMax )
+void QmitkLevelWindowRangeChangeDialog::setUpperLimit( double rangeMax )
 {
-  rangeMaxSpinBox->setValue(rangeMax);
+  rangeMaxDoubleSpinBox->setValue(rangeMax);
 }
 
 void QmitkLevelWindowRangeChangeDialog::inputValidator()
 {
-  if (!(rangeMinSpinBox->value() < rangeMaxSpinBox->value()))
+  if (!(rangeMinDoubleSpinBox->value() < rangeMaxDoubleSpinBox->value()))
   {
     QMessageBox::critical( this, "Change Range",
     "Upper limit has to be greater than lower limit.\n"

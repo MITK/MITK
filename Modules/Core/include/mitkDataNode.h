@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseData.h"
 //#include "mitkMapper.h"
-#include "mitkInteractor.h"
 #include "mitkDataInteractor.h"
 
 #ifdef MBI_NO_STD_NAMESPACE
@@ -41,6 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <map>
 #include <set>
 #include "mitkLevelWindow.h"
+#include "mitkGeometry3D.h"
 
 class vtkLinearTransform;
 
@@ -70,6 +70,7 @@ public:
   typedef mitk::Geometry3D::Pointer Geometry3DPointer;
   typedef std::vector< itk::SmartPointer< Mapper > > MapperVector;
   typedef std::map<std::string, mitk::PropertyList::Pointer> MapOfPropertyLists;
+  typedef std::vector<MapOfPropertyLists::key_type> PropertyListKeyNames;
   typedef std::set<std::string> GroupTagList;
 
   /**
@@ -99,12 +100,6 @@ public:
   vtkLinearTransform* GetVtkTransform(int t=0) const;
 
   /**
-   * \brief Get the Interactor.
-   * \deprecatedSince{2013_03} Use DataInteractor and GetDataInteractor instead.
-   */
-  Interactor* GetInteractor() const;
-
-  /**
    * \brief Set the data object (instance of BaseData, e.g., an Image)
    * managed by this DataNode
    *
@@ -120,11 +115,8 @@ public:
 
   /**
    * \brief Set the Interactor.
-   * \deprecatedSince{2013_03} Use DataInteractor and SetDataInteractor instead.
    */
-  virtual void SetInteractor(Interactor* interactor);
-
-  virtual void SetDataInteractor(const DataInteractor::Pointer& interactor);
+  virtual void SetDataInteractor(const DataInteractor::Pointer interactor);
   virtual DataInteractor::Pointer GetDataInteractor() const;
 
   mitk::DataNode& operator=(const DataNode& right);
@@ -142,6 +134,14 @@ public:
   virtual void SetRequestedRegion( const itk::DataObject *data) override;
 
   virtual void CopyInformation(const itk::DataObject *data) override;
+
+  /**
+   * \brief The "names" used for (renderer-specific) PropertyLists in GetPropertyList(string).
+   *
+   * All possible values for the "renderer" parameters of
+   * the diverse GetProperty/List() methods.
+   */
+  PropertyListKeyNames GetPropertyListNames() const;
 
   /**
    * \brief Set the property (instance of BaseProperty) with key \a propertyKey in the PropertyList
@@ -505,7 +505,7 @@ public:
    * \brief Convenience method for setting double properties (instances of
    * DoubleProperty)
    */
-  void SetDoubleProperty(const char* propertyKey, float doubleValue, const mitk::BaseRenderer* renderer=nullptr);
+  void SetDoubleProperty(const char* propertyKey, double doubleValue, const mitk::BaseRenderer* renderer=nullptr);
 
   /**
    * \brief Convenience method for setting string properties (instances of
@@ -527,26 +527,6 @@ public:
   {
     return m_DataReferenceChangedTime.GetMTime();
   }
-
-  /**
-   * \brief Adds or removes the associated interactor to mitk::GLobalInteraction.
-   */
-  virtual void SetInteractorEnabled( const bool& enabled );
-
-  /**
-   * \brief Adds the interactor to mitk::GlobalInteraction
-   */
-  virtual void EnableInteractor();
-
-  /**
-   * \brief Removes the Interactor from mitk::GlobalInteraction
-   */
-  virtual void DisableInteractor();
-
-  /**
-   * \brief Tests, if the interactor is already added to mitk::GlobalInteraction
-   */
-  virtual bool IsInteractorEnabled() const;
 
 protected:
   DataNode();
@@ -575,9 +555,6 @@ protected:
 
   /// \brief Map associating each BaseRenderer with its own PropertyList
   mutable MapOfPropertyLists m_MapOfPropertyLists;
-
-  /// \brief Interactor, that handles the Interaction
-  Interactor::Pointer m_Interactor; // TODO: INTERACTION_LEGACY
 
   DataInteractor::Pointer m_DataInteractor;
 

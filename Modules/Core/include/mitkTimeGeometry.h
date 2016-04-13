@@ -27,10 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 namespace mitk {
-  /**
-  * \deprecatedSince{2013_09} GlobalInteraction is deprecated. It is replaced by mitk::Dispatcher.
-  *  Please use the new implementation described in \see DataInteractionPage .
-  */
 
   typedef mitk::ScalarType         TimePointType;
   typedef std::size_t   TimeStepType;
@@ -190,6 +186,7 @@ namespace mitk {
     * a null-pointer will be returned.
     */
     virtual BaseGeometry::Pointer GetGeometryCloneForTimeStep( TimeStepType timeStep) const = 0;
+
     /**
     * \brief Sets the geometry for a given time step
     *
@@ -206,6 +203,18 @@ namespace mitk {
     * Shrinking is not supported!
     */
     virtual void Expand(TimeStepType size) = 0;
+
+    /**
+    * \brief Replaces the geometry instances with clones ot the passed geometry.
+    *
+    * Replaces the geometries of all time steps with clones of the passed
+    * geometry. Replacment strategy depends on the implementation of TimeGeometry
+    * sub class.
+    * @remark The time points itself stays untouched. Use this method if you want
+    * to change the spatial properties of a TimeGeometry and preserve the time
+    * "grid".
+    */
+    virtual void ReplaceTimeStepGeometries(const BaseGeometry* geometry) = 0;
 
     /**
     * \brief Tests if all necessary informations are set and the object is valid
@@ -301,5 +310,26 @@ namespace mitk {
 
     virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
   }; // end class TimeGeometry
+
+  /**
+  * @brief Equal A function comparing two instances of TimeGeometry for being identical.
+  *
+  * @ingroup MITKTestingAPI
+  *
+  * The function compares two instances of TimeGeometries in all their aspects.
+  *
+  * The parameter eps is a tolerance value for all methods which are internally used for comparison.
+  * If you want to use different tolerance values for different parts of the geometry, feel free to use
+  * the other comparison methods and write your own implementation of Equal.
+  *
+  * @param rightHandSide Compare this against leftHandSide.
+  * @param leftHandSide Compare this against rightHandSide.
+  * @param eps Tolerance for comparison. You can use mitk::eps in most cases.
+  * @param verbose Flag indicating if the user wants detailed console output or not.
+  *
+  * @return True, if all comparison are true. False in any other case.
+  */
+  MITKCORE_EXPORT bool Equal(const mitk::TimeGeometry& leftHandSide, const mitk::TimeGeometry& rightHandSide, ScalarType eps, bool verbose);
+
 } // end namespace MITK
 #endif // TimeGeometry_h

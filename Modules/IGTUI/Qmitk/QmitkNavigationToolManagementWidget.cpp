@@ -81,6 +81,7 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
       m_DataStorage->Remove(readTool->GetDataNode());
       }
     UpdateToolTable();
+    m_NavigationToolStorage->UpdateMicroservice();
     }
 }
 
@@ -141,6 +142,7 @@ void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorag
     DisableStorageControls();
     }
   UpdateToolTable();
+  m_NavigationToolStorage->UpdateMicroservice();
   }
 
 //##################################################################################
@@ -149,20 +151,44 @@ void QmitkNavigationToolManagementWidget::LoadStorage(mitk::NavigationToolStorag
 
 void QmitkNavigationToolManagementWidget::OnMoveToolUp()
 {
-    std::string currentIdentifier = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetIdentifier();
-    int NewNumber = m_Controls->m_ToolList->currentIndex().row() - 1;
-    if (NewNumber<0) {MITK_WARN << "Cannot move tool up because it is on the top!";}
-    else {m_NavigationToolStorage->AssignToolNumber(currentIdentifier,NewNumber);}
-    UpdateToolTable();
+  if (m_NavigationToolStorage.IsNotNull())
+  {
+    int toolIndex = m_Controls->m_ToolList->currentIndex().row();
+    if (toolIndex >= 0)
+    {
+      mitk::NavigationTool::Pointer currentNavigationTool = m_NavigationToolStorage->GetTool(toolIndex);
+      if (currentNavigationTool.IsNotNull())
+      {
+        std::string currentIdentifier = currentNavigationTool->GetIdentifier();
+        int NewNumber = m_Controls->m_ToolList->currentIndex().row() - 1;
+        if (NewNumber < 0) { MITK_WARN << "Cannot move tool up because it is on the top!"; }
+        else { m_NavigationToolStorage->AssignToolNumber(currentIdentifier, NewNumber); }
+        UpdateToolTable();
+        m_NavigationToolStorage->UpdateMicroservice();
+      }
+    }
+  }
 }
 
 void QmitkNavigationToolManagementWidget::OnMoveToolDown()
 {
-    std::string currentIdentifier = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetIdentifier();
-    int NewNumber = m_Controls->m_ToolList->currentIndex().row() + 1;
-    if (NewNumber>=m_NavigationToolStorage->GetToolCount()) {MITK_WARN << "Cannot move tool down because it is the last tool in this storage!";}
-    else {m_NavigationToolStorage->AssignToolNumber(currentIdentifier,NewNumber);}
-    UpdateToolTable();
+  if (m_NavigationToolStorage.IsNotNull())
+  {
+    int toolIndex = m_Controls->m_ToolList->currentIndex().row();
+    if (toolIndex >= 0)
+    {
+      mitk::NavigationTool::Pointer currentNavigationTool = m_NavigationToolStorage->GetTool(toolIndex);
+      if (currentNavigationTool.IsNotNull())
+      {
+        std::string currentIdentifier = currentNavigationTool->GetIdentifier();
+        int NewNumber = m_Controls->m_ToolList->currentIndex().row() + 1;
+        if (NewNumber >= m_NavigationToolStorage->GetToolCount()) { MITK_WARN << "Cannot move tool down because it is the last tool in this storage!"; }
+        else { m_NavigationToolStorage->AssignToolNumber(currentIdentifier, NewNumber); }
+        UpdateToolTable();
+        m_NavigationToolStorage->UpdateMicroservice();
+      }
+    }
+  }
 }
 
 
@@ -178,6 +204,7 @@ void QmitkNavigationToolManagementWidget::OnAddTool()
     m_Controls->m_ToolCreationWidget->Initialize(m_DataStorage,defaultIdentifier.toStdString(),defaultName.toStdString());
     m_edit = false;
     m_Controls->m_MainWidgets->setCurrentIndex(1);
+    m_NavigationToolStorage->UpdateMicroservice();
   }
 
 void QmitkNavigationToolManagementWidget::OnDeleteTool()
@@ -197,7 +224,7 @@ void QmitkNavigationToolManagementWidget::OnDeleteTool()
     m_DataStorage->Remove(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetDataNode());
     m_NavigationToolStorage->DeleteTool(m_Controls->m_ToolList->currentIndex().row());
     UpdateToolTable();
-
+    m_NavigationToolStorage->UpdateMicroservice();
   }
 
 void QmitkNavigationToolManagementWidget::OnEditTool()
@@ -214,8 +241,10 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
     }
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
     m_Controls->m_ToolCreationWidget->SetDefaultData(selectedTool);
+    m_NavigationToolStorage->SetName("test");
     m_edit = true;
     m_Controls->m_MainWidgets->setCurrentIndex(1);
+    m_NavigationToolStorage->UpdateMicroservice();
   }
 
 void QmitkNavigationToolManagementWidget::OnCreateStorage()
@@ -252,6 +281,7 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
     {
       MessageBox(exception.GetDescription());
     }
+    m_NavigationToolStorage->UpdateMicroservice();
   }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
@@ -297,6 +327,7 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
     UpdateToolTable();
 
     m_Controls->m_MainWidgets->setCurrentIndex(0);
+    m_NavigationToolStorage->UpdateMicroservice();
   }
 
 void QmitkNavigationToolManagementWidget::OnAddToolCancel()
@@ -315,23 +346,9 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   for(int i=0; i<m_NavigationToolStorage->GetToolCount(); i++)
     {
       QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str())+ " ";
-      switch (m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType())
-        {
-        case mitk::ClaronMicron:
-              currentTool += "(MicronTracker/"; break;
-        case mitk::NDIAurora:
-              currentTool += "(NDI Aurora/"; break;
-        case mitk::NDIPolaris:
-              currentTool += "(NDI Polaris/"; break;
-        case mitk::NPOptitrack:
-              currentTool += "(NP Optitrack/"; break;
-        case mitk::VirtualTracker:
-              currentTool += "(Virtual Tracker/"; break;
-        case mitk::OpenIGTLinkTrackingDeviceConnection:
-              currentTool += "(Open IGT Link/"; break;
-        default:
-              currentTool += "(unknown tracking system/"; break;
-        }
+
+      currentTool += "(" + QString::fromStdString(m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType()) + "/";
+
       switch (m_NavigationToolStorage->GetTool(i)->GetType())
         {
         case mitk::NavigationTool::Instrument:
@@ -360,6 +377,8 @@ void QmitkNavigationToolManagementWidget::DisableStorageControls()
   m_Controls->m_StorageName->setText("<none>");
   m_Controls->m_AddTool->setEnabled(false);
   m_Controls->m_LoadTool->setEnabled(false);
+  m_Controls->m_MoveToolUp->setEnabled(false);
+  m_Controls->m_MoveToolDown->setEnabled(false);
   m_Controls->m_selectedLabel->setEnabled(false);
   m_Controls->m_DeleteTool->setEnabled(false);
   m_Controls->m_EditTool->setEnabled(false);
@@ -373,6 +392,8 @@ void QmitkNavigationToolManagementWidget::EnableStorageControls()
 {
   m_Controls->m_AddTool->setEnabled(true);
   m_Controls->m_LoadTool->setEnabled(true);
+  m_Controls->m_MoveToolUp->setEnabled(true);
+  m_Controls->m_MoveToolDown->setEnabled(true);
   m_Controls->m_selectedLabel->setEnabled(true);
   m_Controls->m_DeleteTool->setEnabled(true);
   m_Controls->m_EditTool->setEnabled(true);

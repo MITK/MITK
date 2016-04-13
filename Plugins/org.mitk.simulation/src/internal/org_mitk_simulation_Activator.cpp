@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyFilter.h>
 #include <mitkSimulationObjectFactory.h>
 #include <boost/core/ignore_unused.hpp>
-#include <QtPlugin>
 #include <sofa/core/ObjectFactory.h>
 #include <sofa/helper/system/PluginManager.h>
 
@@ -105,7 +104,3 @@ void mitk::org_mitk_simulation_Activator::stop(ctkPluginContext*)
 {
   Context = NULL;
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  Q_EXPORT_PLUGIN2(org_mitk_simulation, mitk::org_mitk_simulation_Activator)
-#endif

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <itkLinearInterpolateImageFunction.h>
 //#include <itkTimeProbesCollectorBase.h>
 
+#include <ofdatime.h>
 
 template <typename PixelType>
 mitk::Image::Pointer
@@ -60,6 +61,8 @@ mitk::ITKDICOMSeriesReaderHelper
   image->InitializeByItk(readVolume.GetPointer());
   image->SetImportVolume(readVolume->GetBufferPointer());
 
+#ifdef MBILOG_ENABLE_DEBUG
+
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
                                       << image->GetDimension(1) << ", "
                                       << image->GetDimension(2) << "]";
@@ -67,13 +70,14 @@ mitk::ITKDICOMSeriesReaderHelper
   MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
                                     << image->GetGeometry()->GetSpacing()[1] << ", "
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
+#endif //MBILOG_ENABLE_DEBUG
 
   return image;
 }
 
 #define MITK_DEBUG_OUTPUT_FILELIST(list)\
   MITK_DEBUG << "-------------------------------------------"; \
-  for (StringContainer::const_iterator _iter = (list).begin(); _iter!=(list).end(); ++_iter) \
+  for (StringContainer::const_iterator _iter = (list).cbegin(); _iter!=(list).cend(); ++_iter) \
     { \
       MITK_DEBUG <<" file '" << *_iter<< "'"; \
     } \
@@ -89,6 +93,13 @@ mitk::ITKDICOMSeriesReaderHelper
     itk::GDCMImageIO::Pointer& io)
 {
   unsigned int numberOfTimeSteps = filenamesForTimeSteps.size();
+
+  MITK_DEBUG << "Start extracting time bounds of time steps";
+  const TimeBoundsList timeBoundsList = ExtractTimeBoundsOfTimeSteps(filenamesForTimeSteps);
+  if (numberOfTimeSteps!=timeBoundsList.size())
+  {
+    mitkThrow() << "Error while loading 3D+t. Inconsistent size of generated time bounds list. List size: "<< timeBoundsList.size() << "; number of steps: "<<numberOfTimeSteps;
+  }
 
   mitk::Image::Pointer image = mitk::Image::New();
 
@@ -107,9 +118,13 @@ mitk::ITKDICOMSeriesReaderHelper
 
 
   unsigned int currentTimeStep = 0;
+
+#ifdef MBILOG_ENABLE_DEBUG
   MITK_DEBUG << "Start loading timestep " << currentTimeStep;
   MITK_DEBUG_OUTPUT_FILELIST( filenamesForTimeSteps.front() )
-    reader->SetFileNames(filenamesForTimeSteps.front());
+#endif // MBILOG_ENABLE_DEBUG
+
+  reader->SetFileNames(filenamesForTimeSteps.front());
   reader->Update();
   typename ImageType::Pointer readVolume = reader->GetOutput();
 
@@ -123,13 +138,16 @@ mitk::ITKDICOMSeriesReaderHelper
   image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep++); // timestep 0
 
   // for other time-steps
-  for (auto timestepsIter = ++(filenamesForTimeSteps.begin()); // start with SECOND entry
-      timestepsIter != filenamesForTimeSteps.end();
+  for (auto timestepsIter = ++(filenamesForTimeSteps.cbegin()); // start with SECOND entry
+      timestepsIter != filenamesForTimeSteps.cend();
       ++currentTimeStep, ++timestepsIter)
   {
+#ifdef MBILOG_ENABLE_DEBUG
     MITK_DEBUG << "Start loading timestep " << currentTimeStep;
     MITK_DEBUG_OUTPUT_FILELIST( *timestepsIter )
-      reader->SetFileNames(*timestepsIter);
+#endif // MBILOG_ENABLE_DEBUG
+
+    reader->SetFileNames( *timestepsIter );
     reader->Update();
     readVolume = reader->GetOutput();
 
@@ -141,6 +159,7 @@ mitk::ITKDICOMSeriesReaderHelper
     image->SetImportVolume(readVolume->GetBufferPointer(), currentTimeStep);
   }
 
+#ifdef MBILOG_ENABLE_DEBUG
   MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", "
                                       << image->GetDimension(1) << ", "
                                       << image->GetDimension(2) << "]";
@@ -148,7 +167,11 @@ mitk::ITKDICOMSeriesReaderHelper
   MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
                                     << image->GetGeometry()->GetSpacing()[1] << ", "
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
+#endif // MBILOG_ENABLE_DEBUG
 
+  //construct timegeometry
+  TimeGeometry::Pointer timeGeometry = GenerateTimeGeometry(image->GetGeometry(),timeBoundsList);
+  image->SetTimeGeometry(timeGeometry);
   return image;
 }
 
@@ -190,7 +213,7 @@ mitk::ITKDICOMSeriesReaderHelper
       - we lastly apply modify the image spacing in z direction by replacing this number with the correctly calulcated inter-slice distance
   */
 
-  ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
+  const ScalarType factor = tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() / input->GetSpacing()[1];
   // row 1, column 2 corrects shear in parallel to Y axis, proportional to distance in Z direction
   transformShear->Shear( 1, 2, factor );
 
@@ -240,11 +263,11 @@ mitk::ITKDICOMSeriesReaderHelper
 
   // in any case we need more size to accomodate shifted slices
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
-  double imageSizeZ = largerSize[2];
-  MITK_DEBUG <<"Calculate lager size = " << largerSize[1] << " + " << tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) << " / " << input->GetSpacing()[1] << "+ 2.0";
+  const double imageSizeZ = largerSize[2];
+  //MITK_DEBUG <<"Calculate lager size = " << largerSize[1] << " + " << tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) << " / " << input->GetSpacing()[1] << "+ 2.0";
   largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) / input->GetSpacing()[1]+ 2.0);
   resampler->SetSize( largerSize );
-  MITK_DEBUG << "Fix Y size of image w/ spacing " << input->GetSpacing()[1] << " from " << input->GetLargestPossibleRegion().GetSize()[1] << " to " << largerSize[1];
+  //MITK_DEBUG << "Fix Y size of image w/ spacing " << input->GetSpacing()[1] << " from " << input->GetLargestPossibleRegion().GetSize()[1] << " to " << largerSize[1];
 
   // in SOME cases this additional size is below/behind origin
   if ( tiltInfo.GetMatrixCoefficientForCorrectionInWorldCoordinates() > 0.0 )

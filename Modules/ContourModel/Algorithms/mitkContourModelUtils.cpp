@@ -72,7 +72,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
 
       if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) && constrainToInside )
       {
-        MITK_INFO << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
+        MITK_DEBUG << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
       }
 
       projectedContour->AddVertex( projectedPointIn2D, currentTimestep );
@@ -85,7 +85,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(Ima
 
 
 
-mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(const BaseGeometry* sliceGeometry, ContourModel* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ))
 {
   if ( !sliceGeometry || !contourIn2D ) return nullptr;
 
@@ -164,7 +164,9 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-      pol2stenc->SetTolerance(0);
+
+      //Set a minimal tolerance, so that clipped pixels will be added to contour as well.
+      pol2stenc->SetTolerance(mitk::eps);
       pol2stenc->SetInputData(surface2D);
       pol2stenc->Update();
 

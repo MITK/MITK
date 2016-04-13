@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE_TESTS(EXTRA_DEPENDS MitkDICOMReader)
+MITK_CREATE_MODULE_TESTS()
 
 # mitkAddCustomModuleTest(mitkRoiMeasurementsTests mitkRoiMeasurementsTest ${MITK_DATA_DIR}/ImageStatisticsTestData/)
 

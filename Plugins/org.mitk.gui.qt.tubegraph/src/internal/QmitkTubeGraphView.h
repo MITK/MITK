@@ -93,7 +93,7 @@ protected:
 
   mitk::TubeGraphDataInteractor::ActivationMode GetActivationMode();
   virtual void SetFocus() override;
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  virtual void NodeRemoved(const mitk::DataNode*) override;
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes ) override;
 

@@ -328,6 +328,8 @@ protected:
 
     bool m_PresetSelected;
 
+    bool m_PresetNotLoaded;
+
     QmitkStepperAdapter*      m_TimeStepperAdapter;
 };
 

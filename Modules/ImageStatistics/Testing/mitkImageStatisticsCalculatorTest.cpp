@@ -18,9 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <mitkPlanarPolygon.h>
-#include <mitkClassicDICOMSeriesReader.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
 #include <mitkStandaloneDataStorage.h>
+
+#include <mitkIOUtil.h>
+#include <mitkImageGenerator.h>
+#include <mitkImagePixelWriteAccessor.h>
 
 /**
  * \brief Test class for mitkImageStatisticsCalculator
@@ -45,6 +48,9 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
   MITK_TEST(TestCase10);
   MITK_TEST(TestCase11);
   MITK_TEST(TestCase12);
+  MITK_TEST(TestImageMaskingEmpty);
+  MITK_TEST(TestImageMaskingNonEmpty);
+  MITK_TEST(TestRecomputeOnModifiedMask);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -65,6 +71,9 @@ public:
   void TestCase10();
   void TestCase11();
   void TestCase12();
+  void TestImageMaskingEmpty();
+  void TestImageMaskingNonEmpty();
+  void TestRecomputeOnModifiedMask();
 
 private:
 
@@ -75,8 +84,12 @@ private:
   const mitk::ImageStatisticsCalculator::Statistics ComputeStatistics( mitk::Image::Pointer image,
                                                                        mitk::PlanarFigure::Pointer polygon );
 
+  // calculate statistics for the given image and planarpolygon
+  const mitk::ImageStatisticsCalculator::Statistics ComputeStatistics( mitk::Image::Pointer image,
+                                                                       mitk::Image::Pointer image_mask );
+
   void VerifyStatistics(const mitk::ImageStatisticsCalculator::Statistics& stats,
-                        double testMean, double testSD);
+                        double testMean, double testSD, double testMedian=0);
 };
 
 void mitkImageStatisticsCalculatorTestSuite::setUp()
@@ -88,16 +101,8 @@ void mitkImageStatisticsCalculatorTestSuite::setUp()
   }
 
   MITK_TEST_OUTPUT(<< "Loading test image '" << filename << "'")
-  mitk::StringList files;
-  files.push_back( filename );
 
-  mitk::ClassicDICOMSeriesReader::Pointer reader = mitk::ClassicDICOMSeriesReader::New();
-  reader->SetInputFiles( files );
-  reader->AnalyzeInputFiles();
-  reader->LoadImages();
-  MITK_TEST_CONDITION_REQUIRED( reader->GetNumberOfOutputs() == 1, "Loaded one result from file" );
-
-  m_Image = reader->GetOutput(0).GetMitkImage();
+  m_Image = mitk::IOUtil::LoadImage(filename);
   MITK_TEST_CONDITION_REQUIRED( m_Image.IsNotNull(), "Loaded an mitk::Image" );
 
   m_Geometry = m_Image->GetSlicedGeometry()->GetPlaneGeometry(0);
@@ -123,7 +128,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase1()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase2()
@@ -145,7 +150,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase2()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase3()
@@ -165,7 +170,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase3()
   figure1->SetControlPoint( 2, pnt3, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 255.0, 0.0, 255.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase4()
@@ -187,7 +192,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase4()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 191.25, 127.5);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 191.25, 127.5, 254.50);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase5()
@@ -209,7 +214,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase5()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 191.50, 89.80);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 191.50, 89.80, 254.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase6()
@@ -231,7 +236,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase6()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 191.5, 89.80);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 191.5, 89.80, 254.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase7()
@@ -253,7 +258,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase7()
   figure1->SetControlPoint( 3, pnt4, true );
   figure1->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 127.66, 127.5);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure1.GetPointer()), 127.66, 127.5, 128.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase8()
@@ -275,7 +280,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase8()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 128.0, 0.0);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 128.0, 0.0, 128.0);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase9()
@@ -297,7 +302,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase9()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 191.5, 89.80);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 191.5, 89.80, 254.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase10()
@@ -319,7 +324,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase10()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 127.66, 127.5);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 127.66, 127.5, 128.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase11()
@@ -342,7 +347,7 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase11()
   figure2->SetControlPoint( 3, pnt4, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 204.0, 105.58 );
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 204.0, 105.58, 254.5);
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestCase12()
@@ -362,7 +367,70 @@ void mitkImageStatisticsCalculatorTestSuite::TestCase12()
   figure2->SetControlPoint( 2, pnt3, true );
   figure2->GetPolyLine(0);
 
-  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 212.66, 73.32);
+  this->VerifyStatistics(ComputeStatistics(m_Image, figure2.GetPointer()), 212.66, 73.32, 254.5);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingEmpty()
+{
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_Image, 0 );
+
+  this->VerifyStatistics( ComputeStatistics( m_Image, mask_image ), 0.0, 0.0, 0.0);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestImageMaskingNonEmpty()
+{
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_Image, 0 );
+
+  std::vector< itk::Index<3U> > activated_indices;
+  itk::Index<3U> index = {{10, 8, 0}};
+  activated_indices.push_back( index );
+
+  index[0] = 9;  index[1] = 8; index[2] =  0;
+  activated_indices.push_back( index );
+
+  index[0] = 9;  index[1] = 7; index[2] =  0;
+  activated_indices.push_back( index );
+
+  index[0] = 10;  index[1] = 7; index[2] =  0;
+  activated_indices.push_back( index );
+
+  std::vector< itk::Index<3U> >::const_iterator indexIter = activated_indices.begin();
+
+  // activate voxel in the mask image
+  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
+  while( indexIter != activated_indices.end() )
+  {
+    writeAccess.SetPixelByIndex( (*indexIter++), 1);
+  }
+
+  this->VerifyStatistics( ComputeStatistics( m_Image, mask_image ), 127.5, 147.22, 254.5);
+}
+
+void mitkImageStatisticsCalculatorTestSuite::TestRecomputeOnModifiedMask()
+{
+  mitk::Image::Pointer mask_image = mitk::ImageGenerator::GenerateImageFromReference<unsigned char>( m_Image, 0 );
+
+  mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
+  statisticsCalculator->SetImage( m_Image );
+  statisticsCalculator->SetImageMask( mask_image );
+  statisticsCalculator->SetMaskingModeToImage();
+
+  statisticsCalculator->ComputeStatistics();
+  this->VerifyStatistics( statisticsCalculator->GetStatistics(), 0.0, 0.0, 0.0);
+
+  // activate voxel in the mask image
+  itk::Index<3U> test_index = {11, 8, 0};
+  mitk::ImagePixelWriteAccessor< unsigned char, 3> writeAccess( mask_image );
+  writeAccess.SetPixelByIndex( test_index, 1);
+
+  mask_image->Modified();
+
+  statisticsCalculator->ComputeStatistics();
+  const mitk::ImageStatisticsCalculator::Statistics stat = statisticsCalculator->GetStatistics();
+
+  this->VerifyStatistics( stat, 128.0, 0.0, 128.0);
+  MITK_TEST_CONDITION( stat.GetN() == 1, "Calculated mask voxel count '" << stat.GetN() << "'  is equal to the desired value '" << 1 << "'" );
+
 }
 
 const mitk::ImageStatisticsCalculator::Statistics
@@ -373,13 +441,34 @@ mitkImageStatisticsCalculatorTestSuite::ComputeStatistics( mitk::Image::Pointer 
   statisticsCalculator->SetMaskingModeToPlanarFigure();
   statisticsCalculator->SetPlanarFigure( polygon );
 
+  try
+  {
+    statisticsCalculator->ComputeStatistics();
+    return statisticsCalculator->GetStatistics();
+  }
+  catch( ... )
+  {
+  }
+
+  return mitk::ImageStatisticsCalculator::Statistics();
+}
+
+const mitk::ImageStatisticsCalculator::Statistics
+mitkImageStatisticsCalculatorTestSuite::ComputeStatistics(mitk::Image::Pointer image, mitk::Image::Pointer image_mask )
+{
+  mitk::ImageStatisticsCalculator::Pointer statisticsCalculator = mitk::ImageStatisticsCalculator::New();
+  statisticsCalculator->SetImage( image );
+  statisticsCalculator->SetImageMask( image_mask );
+  statisticsCalculator->SetMaskingModeToImage();
+
   statisticsCalculator->ComputeStatistics();
 
   return statisticsCalculator->GetStatistics();
 }
 
+
 void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(const mitk::ImageStatisticsCalculator::Statistics& stats,
-                                                              double testMean, double testSD)
+                                                              double testMean, double testSD, double testMedian)
 {
   int tmpMean = stats.GetMean() * 100;
   double calculatedMean = tmpMean / 100.0;
@@ -392,6 +481,12 @@ void mitkImageStatisticsCalculatorTestSuite::VerifyStatistics(const mitk::ImageS
   MITK_TEST_CONDITION( calculatedSD == testSD,
                        "Calculated grayvalue sd '" << calculatedSD <<
                        "'  is equal to the desired value '" << testSD <<"'" );
+
+  int tmpMedian = stats.GetMedian() * 100;
+  double calculatedMedian = tmpMedian / 100.0;
+  MITK_TEST_CONDITION( testMedian == calculatedMedian,
+                       "Calculated median grayvalue '" << calculatedMedian <<
+                       "' is equal to the desired value '" << testMedian << "'");
 }
 
 void mitkImageStatisticsCalculatorTestSuite::TestUninitializedImage()

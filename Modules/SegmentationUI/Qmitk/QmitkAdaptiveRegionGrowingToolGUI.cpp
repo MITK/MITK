@@ -31,7 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkConnectedAdaptiveThresholdImageFilter.h>
 #include <itkMinimumMaximumImageCalculator.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include "itkNumericTraits.h"
 #include <itkImageIterator.h>
+#include "itkMaskImageFilter.h"
 
 #include "itkOrImageFilter.h"
 #include "mitkImageCast.h"
@@ -39,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPixelTypeMultiplex.h"
 #include "mitkImagePixelReadAccessor.h"
+
+#include "mitkImageCast.h"
 
 
 MITK_TOOL_GUI_MACRO( , QmitkAdaptiveRegionGrowingToolGUI, "")
@@ -64,7 +68,7 @@ QmitkAdaptiveRegionGrowingToolGUI::QmitkAdaptiveRegionGrowingToolGUI(QWidget* pa
   //m_Controls.m_PreviewSlider->InvertedAppearance(true);
 
   this->CreateConnections();
-  this->SetDataNodeNames("labeledRGSegmentation","RGResult","RGFeedbackSurface");
+  this->SetDataNodeNames("labeledRGSegmentation","RGResult","RGFeedbackSurface", "maskedSegmentation" );
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -112,6 +116,12 @@ void QmitkAdaptiveRegionGrowingToolGUI::RemoveHelperNodes()
   {
     m_DataStorage->Remove(imageNode);
   }
+
+  mitk::DataNode::Pointer maskedSegmentationNode = m_DataStorage->GetNamedNode( m_NAMEFORMASKEDSEGMENTATION);
+  if( maskedSegmentationNode.IsNotNull() )
+  {
+    m_DataStorage->Remove(maskedSegmentationNode);
+  }
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
@@ -125,11 +135,12 @@ void QmitkAdaptiveRegionGrowingToolGUI::CreateConnections()
     connect( m_Controls.m_ThresholdSlider, SIGNAL(minimumValueChanged(double)), this, SLOT(SetLowerThresholdValue(double)));
 }
 
-void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface)
+void QmitkAdaptiveRegionGrowingToolGUI::SetDataNodeNames(std::string labledSegmentation, std::string binaryImage, std::string surface, std::string maskedSegmentation )
 {
   m_NAMEFORLABLEDSEGMENTATIONIMAGE = labledSegmentation;
   m_NAMEFORBINARYIMAGE = binaryImage;
   m_NAMEFORSURFACE = surface;
+  m_NAMEFORMASKEDSEGMENTATION = maskedSegmentation;
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -234,7 +245,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
             }
             else
             {
-              pixelValues[pos] = -10000000;
+              pixelValues[pos] = std::numeric_limits< long >::min();
               pos++;
             }
           }
@@ -242,17 +253,31 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
       }
 
       //Now calculation mean of the pixelValues
+      //Now calculation mean of the pixelValues
       unsigned int numberOfValues(0);
       for (auto & pixelValue : pixelValues)
       {
-        if(pixelValue > -10000000)
+        if(pixelValue > std::numeric_limits< long >::min())
         {
           m_SeedPointValueMean += pixelValue;
           numberOfValues++;
         }
       }
-
       m_SeedPointValueMean = m_SeedPointValueMean/numberOfValues;
+
+      mitk::ScalarType var = 0;
+      if ( numberOfValues > 1 )
+      {
+        for (auto & pixelValue : pixelValues)
+        {
+          if(pixelValue > std::numeric_limits< mitk::ScalarType >::min())
+          {
+            var += ( pixelValue - m_SeedPointValueMean )*( pixelValue - m_SeedPointValueMean );
+          }
+        }
+        var /= numberOfValues - 1;
+      }
+      mitk::ScalarType stdDev = sqrt( var );
 
       /*
        * Here the upper- and lower threshold is calculated:
@@ -268,9 +293,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::OnPointAdded()
 
       if (m_CurrentRGDirectionIsUpwards)
       {
-        m_LOWERTHRESHOLD = m_SeedPointValueMean;
-        if (m_SeedpointValue < m_SeedPointValueMean)
-          m_LOWERTHRESHOLD = m_SeedpointValue;
+        m_LOWERTHRESHOLD = m_SeedPointValueMean - stdDev;
         m_UPPERTHRESHOLD = m_SeedpointValue + windowSize;
         if (m_UPPERTHRESHOLD > max)
           m_UPPERTHRESHOLD = max;
@@ -371,6 +394,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   typedef itk::ConnectedAdaptiveThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
   typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
   typedef itk::MinimumMaximumImageCalculator<InputImageType> MinMaxValueFilterType;
+  typedef itk::BinaryThresholdImageFilter< InputImageType, InputImageType > ThresholdFilterType;
+  typedef itk::MaskImageFilter< InputImageType, InputImageType, InputImageType > MaskImageFilterType;
 
   if ( !imageGeometry->IsInside(seedPoint) )
   {
@@ -425,7 +450,8 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
   mitk::Image::Pointer resultImage = mitk::ImportItkImage(regionGrower->GetOutput())->Clone();
   //initialize slider
   m_Controls.m_PreviewSlider->setMinimum(m_LOWERTHRESHOLD);
-  mitk::ScalarType max = m_LOWERTHRESHOLD+resultImage->GetStatistics()->GetScalarValueMax();
+
+  mitk::ScalarType max = m_SeedpointValue + resultImage->GetStatistics()->GetScalarValueMax();
   if (max < m_UPPERTHRESHOLD)
     m_Controls.m_PreviewSlider->setMaximum(max);
   else
@@ -460,6 +486,54 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(itk::Image<TPixel, VI
 
   // now add result to data tree
   m_DataStorage->Add( newNode, m_InputImageNode );
+
+
+  typename InputImageType::Pointer inputImageItk;
+  mitk::CastToItkImage< InputImageType >( resultImage, inputImageItk );
+  //volume rendering preview masking
+  typename ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  thresholdFilter->SetInput( inputImageItk );
+  thresholdFilter->SetInsideValue( 1 );
+  thresholdFilter->SetOutsideValue( 0 );
+
+  double sliderVal = this->m_Controls.m_PreviewSlider->value();
+  if (m_CurrentRGDirectionIsUpwards)
+  {
+    thresholdFilter->SetLowerThreshold( sliderVal );
+    thresholdFilter->SetUpperThreshold( itk::NumericTraits< TPixel >::max() );
+  }
+  else
+  {
+    thresholdFilter->SetLowerThreshold( itk::NumericTraits< TPixel >::min() );
+    thresholdFilter->SetUpperThreshold( sliderVal );
+  }
+  thresholdFilter->SetInPlace( false );
+
+  typename MaskImageFilterType::Pointer maskFilter = MaskImageFilterType::New();
+  maskFilter->SetInput( inputImageItk );
+  maskFilter->SetInPlace( false );
+  maskFilter->SetMaskImage( thresholdFilter->GetOutput() );
+  maskFilter->SetOutsideValue( 0 );
+  maskFilter->UpdateLargestPossibleRegion();
+
+  mitk::Image::Pointer mitkMask;
+  mitk::CastToMitkImage< InputImageType >( maskFilter->GetOutput(), mitkMask );
+  mitk::DataNode::Pointer maskedNode = mitk::DataNode::New();
+  maskedNode->SetData( mitkMask );
+
+  // set some properties
+  maskedNode->SetProperty("name", mitk::StringProperty::New(m_NAMEFORMASKEDSEGMENTATION));
+  maskedNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  maskedNode->SetProperty("color", mitk::ColorProperty::New(0.0,1.0,0.0));
+  maskedNode->SetProperty("layer", mitk::IntProperty::New(1));
+  maskedNode->SetProperty("opacity", mitk::FloatProperty::New(0.0));
+
+  //delete the old image, if there was one:
+  mitk::DataNode::Pointer deprecatedMask = m_DataStorage->GetNamedNode(m_NAMEFORMASKEDSEGMENTATION);
+  m_DataStorage->Remove(deprecatedMask);
+
+  // now add result to data tree
+  m_DataStorage->Add( maskedNode, m_InputImageNode );
 
   this->InitializeLevelWindow();
 
@@ -565,6 +639,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ChangeLevelWindow(double newValue)
 
     if (m_UseVolumeRendering)
     this->UpdateVolumeRenderingThreshold((int) (level - 0.5));//lower threshold for labeled image
+
     newNode->SetVisibility(true);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -752,7 +827,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableControls(bool enable)
 
 void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
 {
-  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORMASKEDSEGMENTATION );
 
   if(node.IsNull())
     return;
@@ -771,58 +846,64 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
     node->SetBoolProperty("volumerendering", enable);
   }
 
+  double val = this->m_Controls.m_PreviewSlider->value();
+  this->ChangeLevelWindow( val );
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::UpdateVolumeRenderingThreshold(int thValue)
 {
-  mitk::DataNode::Pointer node = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  typedef short PixelType;
+  typedef itk::Image< PixelType, 3 > InputImageType;
+  typedef itk::BinaryThresholdImageFilter< InputImageType, InputImageType > ThresholdFilterType;
+  typedef itk::MaskImageFilter< InputImageType, InputImageType, InputImageType > MaskImageFilterType;
 
-  mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+  mitk::DataNode::Pointer grownImageNode = m_DataStorage->GetNamedNode( m_NAMEFORLABLEDSEGMENTATIONIMAGE);
+  mitk::Image::Pointer grownImage = dynamic_cast< mitk::Image* >( grownImageNode->GetData() );
 
-  if (m_UpdateSuggestedThreshold)
+  if ( !grownImage )
   {
-    m_SuggestedThValue = thValue;
-    m_UpdateSuggestedThreshold = false;
+    MITK_ERROR << "Missing data node for labeled segmentation image.";
+    return;
   }
 
-  // grayvalue->opacity
-  {
-    vtkPiecewiseFunction *f = tf->GetScalarOpacityFunction();
-    f->RemoveAllPoints();
-    f->AddPoint(0, 0);
-    f->AddPoint(thValue+0.5, 0);
-    f->AddPoint(thValue+1.5, 1);
-    f->AddPoint(1000, 1);
-    f->ClampingOn();
-    f->Modified();
-  }
+  InputImageType::Pointer itkGrownImage;
+  mitk::CastToItkImage( grownImage, itkGrownImage );
 
-  // grayvalue->color
-  {
-    float a = 255.0;
-    vtkColorTransferFunction *ctf = tf->GetColorTransferFunction();
-    ctf->RemoveAllPoints();
-    //ctf->AddRGBPoint(-1000, 0.0, 0.0, 0.0);
-    ctf->AddRGBPoint(m_SuggestedThValue+1, 203/a, 104/a, 102/a);
-    ctf->AddRGBPoint(m_SuggestedThValue, 255/a, 0/a, 0/a);
-    ctf->ClampingOn();
-    ctf->Modified();
-  }
+  ThresholdFilterType::Pointer thresholdFilter = ThresholdFilterType::New();
+  thresholdFilter->SetInput( itkGrownImage );
+  thresholdFilter->SetInPlace( false );
 
-  // GradientOpacityFunction
+  double sliderVal = this->m_Controls.m_PreviewSlider->value();
+  PixelType threshold = itk::NumericTraits< PixelType >::min();
+  if (m_CurrentRGDirectionIsUpwards)
   {
-    vtkPiecewiseFunction *gof = tf->GetGradientOpacityFunction();
-    gof->RemoveAllPoints();
-    gof->AddPoint(-10000, 1);
-    gof->AddPoint(10000, 1);
-    gof->ClampingOn();
-    gof->Modified();
-  }
+    threshold = static_cast< PixelType >( m_UPPERTHRESHOLD - sliderVal + 0.5 );
 
-  mitk::TransferFunctionProperty::Pointer tfp = mitk::TransferFunctionProperty::New();
-  tfp->SetValue(tf);
-  node->SetProperty("TransferFunction", tfp);
+    thresholdFilter->SetLowerThreshold( threshold );
+    thresholdFilter->SetUpperThreshold( itk::NumericTraits< PixelType >::max() );
+  }
+  else
+  {
+    threshold = sliderVal - m_LOWERTHRESHOLD + 0.5;
+
+    thresholdFilter->SetLowerThreshold( itk::NumericTraits< PixelType >::min() );
+    thresholdFilter->SetUpperThreshold( threshold );
+  }
+  thresholdFilter->UpdateLargestPossibleRegion();
+
+  MaskImageFilterType::Pointer maskFilter = MaskImageFilterType::New();
+  maskFilter->SetInput( itkGrownImage );
+  maskFilter->SetInPlace( false );
+  maskFilter->SetMaskImage( thresholdFilter->GetOutput() );
+  maskFilter->SetOutsideValue( 0 );
+  maskFilter->UpdateLargestPossibleRegion();
+
+  mitk::Image::Pointer mitkMaskedImage;
+  mitk::CastToMitkImage< InputImageType >( maskFilter->GetOutput(), mitkMaskedImage );
+  mitk::DataNode::Pointer maskNode = m_DataStorage->GetNamedNode(m_NAMEFORMASKEDSEGMENTATION);
+  maskNode->SetData( mitkMaskedImage );
 }
 
 void QmitkAdaptiveRegionGrowingToolGUI::UseVolumeRendering(bool on)

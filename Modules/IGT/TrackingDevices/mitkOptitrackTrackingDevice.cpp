@@ -304,8 +304,6 @@ bool mitk::OptitrackTrackingDevice::StartTracking()
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
 
-  m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
-
   /******************************************************************************
   ###############################################################################
   TODO: check the timestamp from the Optitrack API
@@ -352,6 +350,7 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
   }
   else
   {
+    m_TrackingFinishedMutex->Unlock();
     MITK_INFO << "System is not in State Tracking -> Cannot StopTracking";
     mitkThrowException(mitk::IGTException) << "System is not in State Tracking -> Cannot StopTracking";
     return false;
@@ -364,7 +363,7 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
   ******************************************************************************/
   mitk::IGTTimeStamp::GetInstance()->Stop(this);
 
-  m_TrackingFinishedMutex->Lock();
+  m_TrackingFinishedMutex->Unlock();
   return true;
 }
 

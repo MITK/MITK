@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 AutoSelectingDICOMReaderService::AutoSelectingDICOMReaderService()
-  : BaseDICOMReaderService("MITK DICOM Reader (auto)")
+  : BaseDICOMReaderService("MITK DICOM Reader v2 (autoselect)")
 {
   this->RegisterService();
 }

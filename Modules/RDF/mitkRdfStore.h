@@ -103,7 +103,7 @@ namespace mitk {
     * Queries over the triplestore with the given SPARQL query.
     * @param query A std:string which stands for a SPARQL query text.
     * @return The result of the query will be returned as a map of keys with their values as lists of nodes.
-    * @deprecatedSince{2015_11} Use mitk::RdfStore::ExecuteTupleQuery() instead.
+    * @deprecatedSince{2016_03} Use mitk::RdfStore::ExecuteTupleQuery() instead.
     */
     DEPRECATED(ResultMap Query(const std::string& query) const);
 

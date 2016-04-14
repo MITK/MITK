@@ -39,7 +39,6 @@ m_Data(mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified()),
   m_StopTrackingMutex = itk::FastMutexLock::New();
   m_StateMutex = itk::FastMutexLock::New();
   m_TrackingFinishedMutex = itk::FastMutexLock::New();
-  m_TrackingFinishedMutex->Lock();  // execution rights are owned by the application thread at the beginning
 }
 
 
@@ -122,6 +121,7 @@ bool mitk::TrackingDevice::StopTracking()
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
     this->SetState(Ready);
+    m_TrackingFinishedMutex->Unlock();
   }
   return true;
 }

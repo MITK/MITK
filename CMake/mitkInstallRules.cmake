@@ -34,6 +34,21 @@ if(MITK_USE_CTK)
   endif()
 endif()
 
+# related to bug-19679
+if(MACOSX_BUNDLE_NAMES)
+  foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
+    get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+                 PROPERTY IMPORT_LOCATION)
+    get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
+    install(FILES "${_qmake_path}/../plugins/platforms/libqcocoa.dylib"
+            DESTINATION "${bundle_name}.app/Contents/MacOS/platforms"
+            CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/sqldrivers/libqsqlite.dylib"
+            DESTINATION "${bundle_name}.app/Contents/MacOS/sqldrivers"
+            CONFIGURATIONS Release)
+  endforeach()
+endif()
+
 if(WIN32)
   if(MITK_USE_QT)
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}

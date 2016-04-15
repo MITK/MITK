@@ -77,11 +77,11 @@ Useful Links
 [mitk]: http://mitk.org
 [itk]: http://www.itk.org
 [vtk]: http://www.vtk.org
-[mitk-overview]: http://docs.mitk.org/2015.05/Overview.html
-[mitk-usermanual]: http://docs.mitk.org/2015.05/UserManualPortal.html
-[mitk-devmanual]: http://docs.mitk.org/2015.05/DeveloperManualPortal.html
-[mitk-apiref]: http://docs.mitk.org/2015.05/usergroup0.html
-[platforms]: http://docs.mitk.org/2015.05/SupportedPlatformsPage.html
+[mitk-overview]: http://docs.mitk.org/2016.03/Overview.html
+[mitk-usermanual]: http://docs.mitk.org/2016.03/UserManualPortal.html
+[mitk-devmanual]: http://docs.mitk.org/2016.03/DeveloperManualPortal.html
+[mitk-apiref]: http://docs.mitk.org/2016.03/usergroup0.html
+[platforms]: http://docs.mitk.org/2016.03/SupportedPlatformsPage.html
 [dkfz]: http://www.dkfz.de
 [license]: http://mitk.org/git/?p=MITK.git;a=blob_plain;f=LICENSE.txt
 [release-cycle]: http://mitk.org/MitkReleaseCycle
@@ -89,6 +89,6 @@ Useful Links
 [gitweb]: http://mitk.org/git/?p=MITK.git
 [contribute]: http://mitk.org/How_to_contribute
 [cmake]: http://www.cmake.org
-[build]: http://docs.mitk.org/2015.05/BuildInstructionsPage.html
+[build]: http://docs.mitk.org/2016.03/BuildInstructionsPage.html
 [mailinglist]: http://mitk.org/Mailinglist
 [bugs]: http://bugs.mitk.org/

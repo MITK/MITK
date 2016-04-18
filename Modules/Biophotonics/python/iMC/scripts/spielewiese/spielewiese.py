@@ -3,15 +3,15 @@ import numpy as np
 
 import theano
 import theano.tensor as T
-#from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
-from theano.tensor.shared_randomstreams import RandomStreams
-from theano import function
+from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
+#from theano.tensor.shared_randomstreams import RandomStreams
+import time
 
 #theano.config.compute_test_value = 'warn'
 #theano.config.exception_verbosity='high'
 # initializing
 rng = RandomStreams(seed=234)
-photons = 10
+photons = 10**6
 SHELL_MAX = 101
 
 mu_a = T.scalar('mu_a')
@@ -28,7 +28,7 @@ shells_per_mfp = 1e4/microns_per_shell/(mu_a+mu_s)
 
 
 
-nr_iterations = theano.shared(0)
+finished = theano.shared(np.array(0, dtype='int8'))
 
 xyz = theano.shared(np.zeros((photons,3), dtype=theano.config.floatX))
 
@@ -36,9 +36,11 @@ uvw_np = np.zeros((photons,3), dtype=theano.config.floatX)
 uvw_np[:,2] = 1. # w = 1
 uvw = theano.shared(uvw_np)
 
+#weights_np = np.ones((photons,1), dtype=theano.config.floatX)
 weight = theano.shared(np.ones((photons,1), dtype=theano.config.floatX))
 
-heat = theano.shared(np.zeros((SHELL_MAX,1), dtype=theano.config.floatX))
+heat_np = np.zeros((SHELL_MAX,1), dtype=theano.config.floatX)
+heat = theano.shared(heat_np)
 
 
 
@@ -66,7 +68,7 @@ xyz_moved = xyz + uvw*t
 shells = T.cast(l2_norm_along_columns(xyz_moved) * shells_per_mfp,
                'int32')
 shells = T.clip(shells, 0, SHELL_MAX-1)
-new_heats = (1.0 -albedo) * weight
+new_heats = (1.0 - albedo) * weight
 new_weight = weight * albedo
 theano.printing.Print('shells')(shells)
 
@@ -108,54 +110,21 @@ weight_after_roulette = T.switch(T.and_(partakes_roulette, T.invert(loses_roulet
 #theano.printing.Print('loses_roulette')(loses_roulette)
 #theano.printing.Print('weight_after_roulette')(weight_after_roulette)
 
-# update heat array
-# could also be done using foldl?
-def update_heat_array(heat_index, additional_heat):
-    heat_subtensor = heat[heat_index]
-    return {heat:T.inc_subtensor(heat_subtensor, additional_heat)}
 
-heat_results, heat_updates = theano.scan(fn=update_heat_array,
-                                         outputs_info=None,
-                                         sequences=[shells, new_heats])
-
-theano.printing.Print('new_heats')(new_heats)
-theano.printing.Print('heat')(heat_updates[heat])
-
-run_one_cycle = theano.function(inputs=[shells, new_heats],
-                                outputs=heat_updates[heat],
-                                updates=heat_updates)
+one_cycle = theano.function(inputs=[mu_a, mu_s, microns_per_shell],
+                            outputs=[shells, new_heats],
+                            updates=OrderedDict({xyz: xyz_moved, uvw: uvw_new_direction,
+                                                 weight: weight_after_roulette,
+                                                 finished: T.allclose(weight, 0.)}))
 
 
+start = time.time()
+print("start simulation")
+
+while not finished.get_value():
+    new_shells, new_heats = one_cycle(2, 20, 50)
+
+end = time.time()
+print("end simulation after: " + str(end - start) + " seconds")
 
 
-
-
-def one_cycle(mu_a, mu_s, microns_per_shell, xyz, uvw, weight, heat):
-    return  OrderedDict({xyz: xyz_moved, uvw: uvw_new_direction,
-            weight:weight_after_roulette,
-            heat: heat_updates[heat],
-            nr_iterations: nr_iterations+1}), \
-            theano.scan_module.until(T.allclose(weight_after_roulette, 0.))
-
-final_heat, final_updates = theano.scan(fn=one_cycle,
-                                        non_sequences=[mu_a, mu_s, microns_per_shell,
-                                                       xyz, uvw, weight, heat],
-                                        outputs_info=[],
-                                        n_steps=1000,
-                                        strict=True)
-
-final_nr_iterations = final_updates[nr_iterations]
-final_heat_array = final_updates[heat]
-
-
-
-
-run_till_end = theano.function(inputs=[mu_a, mu_s, microns_per_shell],
-                               outputs=[final_nr_iterations, final_heat_array],
-                               updates=final_updates)
-
-
-
-
-
-print(run_till_end(2.,20.,50))

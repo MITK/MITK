@@ -72,6 +72,7 @@ public:
 
   QmitkRenderWindow* GetRenderWindow4() const;
 
+
   const mitk::Point3D
   GetCrossPosition() const;
 

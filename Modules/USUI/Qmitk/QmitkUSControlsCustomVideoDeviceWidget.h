@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpinBox>
 
 namespace Ui {
-class QmitkUSControlsCustomVideoDeviceWidget;
+  class QmitkUSControlsCustomVideoDeviceWidget;
 }
 
 /** \brief Widget for custom controls of mitk::USVideoDevice.
@@ -34,13 +34,23 @@ class QmitkUSControlsCustomVideoDeviceWidget;
   */
 class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidget
 {
-    Q_OBJECT
+  Q_OBJECT
 
-private slots:
+    private slots:
   /**
     * \brief Called when user changes one of the crop area control elements.
     */
   void OnCropAreaChanged();
+
+  /**
+  * \brief Called when user changes the scanning depth of the ultrasound
+  */
+  void OnDepthChanged();
+
+  /**
+  * \brief Called when user chagnes the identifier for the probe of the ultrasoud machine
+  */
+  void OnProbeChanged();
 
 public:
   /**

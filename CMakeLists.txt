@@ -232,6 +232,8 @@ endif()
 
 set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
+
+
 mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Net Util XML Zip)
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
 mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
@@ -861,8 +863,6 @@ if(MITK_USE_SOFA)
   link_directories(${SOFA_LIBRARY_DIRS})
 endif()
 
-# Same as SOFA above
-link_directories(${Boost_LIBRARY_DIRS})
 
 if(MITK_USE_OpenIGTLink)
   # Same as SOFA above
@@ -879,6 +879,7 @@ endif()
 
 # Qt support
 if(MITK_USE_QT)
+)
   find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
   get_target_property(_qmake_exec Qt5::qmake LOCATION)
   execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS

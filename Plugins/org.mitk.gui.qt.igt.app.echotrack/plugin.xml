@@ -6,11 +6,11 @@
           class="USNavigation"
           icon="resources/icon.xpm" /> -->
     <view id="org.mitk.views.usmarkerplacement"
-          name="Ultrasound Navigation 2"
+          name="IGT EchoTrack"
           class="USNavigationMarkerPlacement"
           icon="resources/icon2.xpm" />
     <view id="org.mitk.views.ultrasoundcalibration"
-          name="Ultrasound Calibration"
+          name="IGT EchoTrack Calibration"
           class="UltrasoundCalibration"
           icon="resources/icon_calibration.xpm" />
   </extension>

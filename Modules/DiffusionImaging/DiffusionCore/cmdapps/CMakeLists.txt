@@ -1,3 +1,5 @@
+option(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
+
 if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
   # needed include directories
@@ -10,22 +12,16 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( diffusionminiapps
-    NetworkCreation^^MitkFiberTracking_MitkConnectomics
-    NetworkStatistics^^MitkConnectomics
-    Fiberfox^^MitkFiberTracking
-    MultishellMethods^^MitkFiberTracking
-    PeaksAngularError^^MitkFiberTracking
-    PeakExtraction^^MitkFiberTracking
-    FiberExtraction^^MitkFiberTracking
-    FiberProcessing^^MitkFiberTracking
-    FiberDirectionExtraction^^MitkFiberTracking
-    LocalDirectionalFiberPlausibility^^MitkFiberTracking
-    StreamlineTracking^^MitkFiberTracking
-    GibbsTracking^^MitkFiberTracking
-    TractometerMetrics^^MitkFiberTracking
-    FileFormatConverter^^MitkFiberTracking
-    DFTraining^^MitkFiberTracking
-    DFTracking^^MitkFiberTracking
+    DwiDenoising^^
+    ImageResampler^^
+    ExportShImage^^
+    CopyGeometry^^
+    DiffusionIndices^^
+    QballReconstruction^^
+    Registration^^
+    TensorReconstruction^^
+    TensorDerivedMapsExtraction^^
+    DiffusionDICOMLoader^^
     )
 
     foreach(diffusionminiapp ${diffusionminiapps})
@@ -43,15 +39,5 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
         PACKAGE_DEPENDS ITK
       )
     endforeach()
-
-  # This mini app does not depend on mitkDiffusionImaging at all
-  mitkFunctionCreateCommandLineApp(
-    NAME Dicom2Nrrd
-    DEPENDS MitkCore ${dependencies_list}
-  )
-
-  if(EXECUTABLE_IS_ENABLED)
-    MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})
-  endif()
 
   endif()

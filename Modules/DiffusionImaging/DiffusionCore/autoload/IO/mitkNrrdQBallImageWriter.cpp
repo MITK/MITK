@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 #include "mitkImageCast.h"
 #include "mitkIOMimeTypes.h"
-#include "mitkDiffusionIOMimeTypes.h"
+#include "mitkDiffusionCoreIOMimeTypes.h"
 
 
 mitk::NrrdQBallImageWriter::NrrdQBallImageWriter()
-  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::QBI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::QBI_MIMETYPE_DESCRIPTION())
+  : AbstractFileWriter(mitk::QBallImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionCoreIOMimeTypes::QBI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::QBI_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }

@@ -11,11 +11,11 @@ import time
 #theano.config.compute_test_value = 'warn'
 #theano.config.exception_verbosity='high'
 #theano.config.profile=True
-theano.config.mode = "FAST_RUN"
+#theano.config.mode = "FAST_RUN"
 #theano.config.mode = "FAST_COMPILE"
-theano.config.scan.allow_gc =True
-theano.config.scan.allow_output_prealloc =False
-theano.optimizer_excluding="more_mem"
+#theano.config.scan.allow_gc =True
+#theano.config.scan.allow_output_prealloc =False
+#theano.optimizer_excluding="more_mem"
 
 # initializing
 rng = RandomStreams(seed=234)
@@ -72,7 +72,6 @@ shell = T.cast(T.sqrt(T.sqr(x_moved) + T.sqr(y_moved) + T.sqr(z_moved))
                * microns_per_shell, 'int32')
 shell = T.clip(shell, 0, SHELL_MAX-1)
 
-new_heat = (1.0 - albedo) * weight_i
 new_weight = weight_i * albedo
 
 # new direction
@@ -106,30 +105,31 @@ weight_after_roulette = T.switch(T.and_(partakes_roulette, loses_roulette),
 weight_after_roulette = T.switch(T.and_(partakes_roulette, T.invert(loses_roulette)),
                                  weight_after_roulette / CHANCE,
                                  weight_after_roulette)
-heat_subtensor = heat[shell]
+
+new_heat = (1.0 - albedo) * weight_i
+heat_i = heat[shell]
 
 
 def one_run(i, mu_a, mu_s, microns_per_shell,
-            x, y, z, u, v, w, weight):
-    return OrderedDict({heat: T.inc_subtensor(heat_subtensor, new_heat),
+            heat, x, y, z, u, v, w, weight):
+    return OrderedDict({heat: T.set_subtensor(heat_i, new_heat),
                         x: T.set_subtensor(x_i, x_moved),
                         y: T.set_subtensor(y_i, y_moved),
                         z: T.set_subtensor(z_i, z_moved),
                         u: T.set_subtensor(u_i, u_new_direction),
                         v: T.set_subtensor(v_i, v_new_direction),
                         w: T.set_subtensor(w_i, w_new_direction),
-                        weight: T.set_subtensor(weight_i, weight_after_roulette)}), \
-           theano.scan_module.until(T.isclose(weight_i, 0.))
+                        weight: T.set_subtensor(weight_i, weight_after_roulette)})
 
 
 one_photon_results, one_photon_updates = theano.scan(fn=one_run,
                                                      outputs_info=None,
                                                      non_sequences=[i, mu_a, mu_s, microns_per_shell,
-                                                                    x, y, z, u, v, w, weight],
-                                                     n_steps=10000,
+                                                                    heat, x, y, z, u, v, w, weight],
+                                                     n_steps=100,
                                                      strict=True)
 
-final_heat_result = [one_photon_updates[weight], one_photon_updates[heat]]
+final_heat_result = one_photon_updates[heat]
 
 
 initial_heat = np.zeros(SHELL_MAX, dtype=theano.config.floatX)

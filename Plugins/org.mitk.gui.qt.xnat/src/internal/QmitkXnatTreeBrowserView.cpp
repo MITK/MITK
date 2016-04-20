@@ -778,15 +778,13 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 {
   if(m_TreeModel==nullptr)
   {
-    MITK_WARN << "m_TreeModel is null";
     return;
   }
 
   QModelIndex index = m_Controls.treeView->indexAt(pos);
 
-  if(index.row()<0 || index.column() < 0)
+  if(index.isValid() == false)
   {
-    MITK_WARN << "no items at this position in treelist";
     return;
   }
 

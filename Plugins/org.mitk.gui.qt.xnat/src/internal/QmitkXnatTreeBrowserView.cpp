@@ -776,19 +776,28 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
 void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
 {
+  if(m_TreeModel==nullptr)
+  {
+    return;
+  }
+
+  QModelIndex index = m_Controls.treeView->indexAt(pos);
+
+  if(index.isValid() == false)
+  {
+    return;
+  }
+
   m_ContextMenu->clear();
 
   QAction* actRefreshItem = new QAction("Refresh", m_ContextMenu);
   m_ContextMenu->addAction(actRefreshItem);
   connect(actRefreshItem, SIGNAL(triggered()), this, SLOT(OnContextMenuRefreshItem()));
-  m_ContextMenu->popup(QCursor::pos());
 
   QAction* actGetXNATURL = new QAction("Copy XNAT URL to clipboard", m_ContextMenu);
   m_ContextMenu->addAction(actGetXNATURL);
   connect(actGetXNATURL, SIGNAL(triggered()), this, SLOT(OnContextMenuCopyXNATUrlToClipboard()));
   m_ContextMenu->addSeparator();
-
-  QModelIndex index = m_Controls.treeView->indexAt(pos);
 
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
 
@@ -846,7 +855,6 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
     QAction* actCreateSubject = new QAction("Create new subject", m_ContextMenu);
     m_ContextMenu->addAction(actCreateSubject);
     connect(actCreateSubject, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewSubject()));
-    m_ContextMenu->popup(QCursor::pos());
   }
   ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(xnatObject);
   if (subject != nullptr)
@@ -854,10 +862,11 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
     QAction* actCreateExperiment = new QAction("Create new experiment", m_ContextMenu);
     m_ContextMenu->addAction(actCreateExperiment);
     connect(actCreateExperiment, SIGNAL(triggered()), this, SLOT(OnContextMenuCreateNewExperiment()));
-    m_ContextMenu->popup(QCursor::pos());
   }
 
+
   m_ContextMenu->popup(QCursor::pos());
+
 }
 
 void QmitkXnatTreeBrowserView::CleanUp()

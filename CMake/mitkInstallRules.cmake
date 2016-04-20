@@ -46,6 +46,9 @@ if(MACOSX_BUNDLE_NAMES)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/libqsqlite.dylib"
             DESTINATION "${bundle_name}.app/Contents/MacOS/sqldrivers"
             CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.dylib"
+            DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
+            CONFIGURATIONS Release)
   endforeach()
 endif()
 

@@ -681,7 +681,23 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
   if (resource == nullptr)
   {
-    resource = this->InternalAddResourceFolder(parentObject);
+    try
+    {
+      resource = this->InternalAddResourceFolder(parentObject);
+    }
+    catch(ctkRuntimeException exc)
+    {
+      MITK_WARN << exc.what();
+      QmitkHttpStatusCode* statusCode = new QmitkHttpStatusCode();
+      statusCode->ReadFromErrorMessage(exc.what());
+
+      if(statusCode->GetStatusCode() != 200)
+      {
+        QMessageBox::warning(m_Controls.treeView, "Warning", statusCode->GetServerResponse().c_str());
+      }
+
+      return;
+    }
   }
 
   if (resource == nullptr)
@@ -1009,7 +1025,27 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       ctkXnatProject* project = dynamic_cast<ctkXnatProject*>(variant.value<ctkXnatObject*>());
       ctkXnatSubject* subject = dynamic_cast<ctkXnatSubject*>(dialog->GetXnatObject());
       subject->setParent(project);
-      subject->save();
+      try
+      {
+        subject->save();
+      }
+      catch(ctkRuntimeException exc)
+      {
+        //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
+        QmitkHttpStatusCode* statusCode = new QmitkHttpStatusCode();
+        statusCode->ReadFromErrorMessage(exc.what());
+
+
+        if(statusCode->GetStatusCode() != 200)
+        {
+          QMessageBox::warning(m_Controls.treeView, "Warning", statusCode->GetServerResponse().c_str());
+        }
+
+        exc.rethrow();
+      }
+      catch(...)
+      {
+      }
 
       // Get xnat session from micro service
       ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
@@ -1019,7 +1055,6 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       m_TreeModel->removeDataModel(session->dataModel());
 
       UpdateSession(session);
-
     }
   }
 }
@@ -1097,4 +1132,45 @@ void QmitkXnatTreeBrowserView::sessionTimesOutSoonMsg()
     session->renew();
   }
   timer->stop();
+}
+
+
+
+QmitkHttpStatusCode::QmitkHttpStatusCode()
+{
+}
+
+QmitkHttpStatusCode::~QmitkHttpStatusCode()
+{
+}
+
+void QmitkHttpStatusCode::ReadFromErrorMessage(const char *_errorMsg)
+{
+  std::string errorMsg(_errorMsg, strnlen(_errorMsg, strlen(_errorMsg)));
+  /*
+   * sample error response:
+   * ERROR: An error occurred: ctkRuntimeException: Syncing with http request failed. {d55ec279-8a65-46d6-80d3-cec079066109}: 202: Error downloading
+   * https:... - server replied: Forbidden
+   */
+
+
+  //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
+  //TODO: implement re-catching
+  //TODO: status-code specific error messages
+
+  if(errorMsg.find("request failed.") != std::string::npos)
+  {
+    int indexOfErrorCode = errorMsg.find(": Error") - 3;
+    int indexOfServerResponse = errorMsg.rfind("server replied: ") + 16; //Length of "server replied : " is 16
+
+    std::string statusCodeString = errorMsg.substr(indexOfErrorCode,3);
+    std::istringstream istr(statusCodeString);
+    uint statusCode;
+    istr >> statusCode;
+
+    std::string serverResponse = errorMsg.substr(indexOfServerResponse);
+
+    m_statusCode = statusCode;
+    m_serverResponse = serverResponse;
+  }
 }

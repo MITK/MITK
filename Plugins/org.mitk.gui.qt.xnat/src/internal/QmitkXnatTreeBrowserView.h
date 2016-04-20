@@ -133,3 +133,18 @@ private:
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H
+
+class QmitkHttpStatusCode
+{
+private:
+  uint m_statusCode;
+  std::string m_serverResponse;
+
+public:
+  QmitkHttpStatusCode();
+  ~QmitkHttpStatusCode();
+
+  uint GetStatusCode(){ return m_statusCode; }
+  std::string GetServerResponse() { return m_serverResponse; }
+  void ReadFromErrorMessage(const char* errorMsg);
+};

@@ -63,7 +63,7 @@ public:
     ///
     /// Toggles the Connection in the Service Registry from opened to closed or the other way around.
     ///
-    virtual void ToggleConnection();
+    virtual void TestConnection();
 
   virtual void onUseNetworkProxy(bool);
 

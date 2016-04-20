@@ -112,7 +112,7 @@ heat_i = heat[shell]
 
 def one_run(i, mu_a, mu_s, microns_per_shell,
             heat, x, y, z, u, v, w, weight):
-    return OrderedDict({heat: T.set_subtensor(heat_i, new_heat),
+    return OrderedDict({heat: T.inc_subtensor(heat_i, new_heat),
                         x: T.set_subtensor(x_i, x_moved),
                         y: T.set_subtensor(y_i, y_moved),
                         z: T.set_subtensor(z_i, z_moved),

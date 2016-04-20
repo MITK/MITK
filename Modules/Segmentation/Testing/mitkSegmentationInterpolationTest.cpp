@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkSegmentationInterpolationController.h>
+#include <mitkSliceNavigationController.h>
 
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
@@ -34,9 +35,8 @@ private:
 
   // Load data into these
   mitk::Image::Pointer m_ReferenceImage;
-  mitk::Image::Pointer m_InputImageAxial;
-  mitk::Image::Pointer m_FeedbackImageAxial;
-  mitk::Image::Pointer m_ResultImageAxial;
+  mitk::Image::Pointer m_InputSegmentationAxial;
+  mitk::Image::Pointer m_ResultSegmentationAxial;
 
   // Plane index (the slice to be interpolated)
   int m_PlaneIndexAxial;
@@ -51,12 +51,10 @@ public:
 
     m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
-    m_InputImageAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestInputAxial.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestInputAxial.nrrd]", m_InputImageAxial.IsNotNull());
-//    m_FeedbackImageAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestFeedbackAxial.nrrd"));
-//    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestFeedbackAxial.nrrd]", m_FeedbackImageAxial.IsNotNull());
-    m_ResultImageAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestResultAxial.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestResultAxial.nrrd]", m_ResultImageAxial.IsNotNull());
+    m_InputSegmentationAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestInputAxial.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestInputAxial.nrrd]", m_InputSegmentationAxial.IsNotNull());
+    m_ResultSegmentationAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestResultAxial.nrrd"));
+    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestResultAxial.nrrd]", m_ResultSegmentationAxial.IsNotNull());
 
     m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
   }
@@ -64,20 +62,27 @@ public:
   void tearDown() override
   {
     m_ReferenceImage = nullptr;
-    m_InputImageAxial = nullptr;
-//    m_FeedbackImageAxial = nullptr;
-    m_ResultImageAxial = nullptr;
+    m_InputSegmentationAxial = nullptr;
+    m_ResultSegmentationAxial = nullptr;
   }
 
   void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
   {
-    m_InterpolationController->SetSegmentationVolume(m_InputImageAxial);
+    m_InterpolationController->SetSegmentationVolume(m_InputSegmentationAxial);
     m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
-
-    // read and write accessor to the input segmentation
-
+    mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_InputSegmentationAxial->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
+//    slicedGeometry->InitializePlanes(
+//                currentGeometry,
+//                mitk::PlaneGeometry::Sagittal, true, true, false );
+    mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(m_PlaneIndexAxial));
+    MITK_INFO << plane->GetOrigin();
+    mitk::Image::Pointer interpolationResult = m_InterpolationController->Interpolate(2, m_PlaneIndexAxial, plane, 0);
+    if (interpolationResult == nullptr)
+    {
+        MITK_INFO << "Result is null";
+    }
     mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolationtest.nrrd");
-    MITK_ASSERT_EQUAL(interpolationResult, m_ResultImageAxial, "The created interpolation should fit the reference interpolation.");
+    MITK_ASSERT_EQUAL(interpolationResult, m_ResultSegmentationAxial, "The created interpolation should fit the reference interpolation.");
   }
 
 };

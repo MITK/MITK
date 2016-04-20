@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // other
 #include <mitkImage.h>
-#include <mitkImageWriteAccessor.h>
+#include <mitkImagePixelWriteAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkSegmentationInterpolationController.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkTool.h>
 
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
@@ -33,56 +33,69 @@ class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 
 private:
 
-  // Load data into these
   mitk::Image::Pointer m_ReferenceImage;
-  mitk::Image::Pointer m_InputSegmentationAxial;
-  mitk::Image::Pointer m_ResultSegmentationAxial;
-
-  // Plane index (the slice to be interpolated)
-  int m_PlaneIndexAxial;
-
+  mitk::Image::Pointer m_SegmentationImage;
+  itk::Index<3> m_CenterPoint;
   mitk::SegmentationInterpolationController::Pointer m_InterpolationController;
 
 public:
 
   void setUp() override
   {
-    m_PlaneIndexAxial = 23;
+    m_CenterPoint = {{ 50, 50, 50 }}; // Arbitrary, just needs to be somewhere inside image
 
     m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
     CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
-    m_InputSegmentationAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestInputAxial.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestInputAxial.nrrd]", m_InputSegmentationAxial.IsNotNull());
-    m_ResultSegmentationAxial = mitk::IOUtil::LoadImage(GetTestDataFilePath("SegmentationInterpolation/InterpolationTestResultAxial.nrrd"));
-    CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [InterpolationTestResultAxial.nrrd]", m_ResultSegmentationAxial.IsNotNull());
 
     m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
+
+    // Create empty segmentation
+    // Surely there must be a better way to get an image with all zeros?
+    m_SegmentationImage = mitk::Image::New();
+    const mitk::PixelType pixelType(mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>());
+    m_SegmentationImage->Initialize(pixelType, m_ReferenceImage->GetDimension(), m_ReferenceImage->GetDimensions());
+    unsigned int size = sizeof(mitk::Tool::DefaultSegmentationDataType);
+    for (unsigned int dim = 0; dim < m_SegmentationImage->GetDimension(); ++dim)
+    {
+        size *= m_SegmentationImage->GetDimension(dim);
+    }
+    memset(m_SegmentationImage->GetData(), 0, size);
   }
 
   void tearDown() override
   {
     m_ReferenceImage = nullptr;
-    m_InputSegmentationAxial = nullptr;
-    m_ResultSegmentationAxial = nullptr;
+    m_SegmentationImage = nullptr;
+    m_InterpolationController->Delete();
   }
 
   void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
   {
-    m_InterpolationController->SetSegmentationVolume(m_InputSegmentationAxial);
-    m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
-    mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_InputSegmentationAxial->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
-//    slicedGeometry->InitializePlanes(
-//                currentGeometry,
-//                mitk::PlaneGeometry::Sagittal, true, true, false );
-    mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(m_PlaneIndexAxial));
-    MITK_INFO << plane->GetOrigin();
-    mitk::Image::Pointer interpolationResult = m_InterpolationController->Interpolate(2, m_PlaneIndexAxial, plane, 0);
-    if (interpolationResult == nullptr)
-    {
-        MITK_INFO << "Result is null";
-    }
-    mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolationtest.nrrd");
-    MITK_ASSERT_EQUAL(interpolationResult, m_ResultSegmentationAxial, "The created interpolation should fit the reference interpolation.");
+    // Fill segmentation
+    mitk::ImagePixelWriteAccessor<unsigned short, 3> pixelAccessor(m_SegmentationImage);
+    MITK_INFO << "Hallo";
+
+
+
+
+
+
+//      m_InterpolationController->SetSegmentationVolume(m_SegmentationImage);
+//      m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
+
+//    mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_InputSegmentationAxial->GetTimeGeometry()->GetGeometryForTimeStep(0).GetPointer());
+////    slicedGeometry->InitializePlanes(
+////                currentGeometry,
+////                mitk::PlaneGeometry::Sagittal, true, true, false );
+//    mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(m_PlaneIndexAxial));
+//    MITK_INFO << plane->GetOrigin();
+//    mitk::Image::Pointer interpolationResult = m_InterpolationController->Interpolate(2, m_PlaneIndexAxial, plane, 0);
+//    if (interpolationResult == nullptr)
+//    {
+//        MITK_INFO << "Result is null";
+//    }
+//    mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolationtest.nrrd");
+//    MITK_ASSERT_EQUAL(interpolationResult, m_ResultSegmentationAxial, "The created interpolation should fit the reference interpolation.");
   }
 
 };

@@ -2,7 +2,9 @@ from collections import OrderedDict
 import numpy as np
 
 import theano
+from theano.ifelse import ifelse
 import theano.tensor as T
+import theano.tensor.inplace as inplace
 #from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 from theano.tensor.shared_randomstreams import RandomStreams
 import time
@@ -102,11 +104,11 @@ def one_run(my_x, my_y, my_z,
     roulette = rng.uniform(low=0., high=1.)
     loses_roulette = T.gt(roulette, CHANCE)
     # if roulette decides to terminate the photon: set weight to 0
-    weight_after_roulette = T.switch(T.and_(partakes_roulette, loses_roulette),
+    weight_after_roulette = ifelse(T.and_(partakes_roulette, loses_roulette),
                                      0.,
                                      new_weight)
     # if partakes in roulette but does not get terminated
-    weight_after_roulette = T.switch(T.and_(partakes_roulette, T.invert(loses_roulette)),
+    weight_after_roulette = ifelse(T.and_(partakes_roulette, T.invert(loses_roulette)),
                                      weight_after_roulette / CHANCE,
                                      weight_after_roulette)
 
@@ -171,7 +173,7 @@ all_photon_results, all_photon_updates = theano.scan(fn=all_runs,
                                                                     weight,
                                                                     heat,
                                                                     albedo, microns_per_shell],
-                                                     n_steps=1000000,
+                                                     n_steps=10,
                                                      strict=True)
 
 

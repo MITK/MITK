@@ -1,11 +1,11 @@
+
 layer {
   name: "data"
   type: "HDF5Data"
   top: "data"
-  top: "label"
   hdf5_data_param {
-    source: "ipcai_test_hdf5.h5_list.txt"
-    batch_size: 50
+    source: "ipcai_image_hdf5.h5_list.txt"
+    batch_size: 1263612
   }
 }
 layer {
@@ -67,11 +67,4 @@ layer {
       value: 0.1
     }
   }
-}
-layer {
-  name: "loss"
-  type: "EuclideanLoss"
-  bottom: "score"
-  bottom: "label"
-  top: "loss"
 }

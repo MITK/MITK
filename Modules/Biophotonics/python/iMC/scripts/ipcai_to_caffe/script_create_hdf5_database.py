@@ -1,6 +1,4 @@
 import h5py, os
-import caffe
-import numpy as np
 import pandas as pd
 
 from regression.preprocessing import preprocess

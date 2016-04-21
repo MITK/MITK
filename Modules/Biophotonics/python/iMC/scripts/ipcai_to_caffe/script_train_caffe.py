@@ -10,10 +10,10 @@ def ipcai(database, batch_size):
 
     n.data, n.label = L.HDF5Data(batch_size=batch_size, source=database, ntop=2)
 
-    n.fc1 = L.InnerProduct(n.data, num_output=100, weight_filler=dict(type='xavier'),
+    n.fc1 = L.InnerProduct(n.data, num_output=25, weight_filler=dict(type='xavier'),
                            bias_filler=dict(type='constant', value=0.1))
     n.relu1 = L.ReLU(n.fc1, in_place=True)
-    n.fc2 = L.InnerProduct(n.relu1, num_output=100, weight_filler=dict(type='xavier'),
+    n.fc2 = L.InnerProduct(n.relu1, num_output=25, weight_filler=dict(type='xavier'),
                            bias_filler=dict(type='constant', value=0.1))
     n.relu2 = L.ReLU(n.fc2, in_place=True)
     n.score = L.InnerProduct(n.relu2, num_output=1, weight_filler=dict(type='xavier'),

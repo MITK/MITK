@@ -14,7 +14,7 @@ layer {
   bottom: "data"
   top: "fc1"
   inner_product_param {
-    num_output: 100
+    num_output: 25
     weight_filler {
       type: "xavier"
     }
@@ -36,7 +36,7 @@ layer {
   bottom: "fc1"
   top: "fc2"
   inner_product_param {
-    num_output: 100
+    num_output: 25
     weight_filler {
       type: "xavier"
     }

@@ -23,20 +23,26 @@ References:
 
 from __future__ import print_function
 
-__docformat__ = 'restructedtext en'
-
-
 import os
 import sys
 import timeit
+import time
 
 import numpy
+import numpy as np
 
 import theano
 import theano.tensor as T
 
 
-from logistic_sgd import LogisticRegression, load_data
+from logistic_sgd import LogisticRegression
+from input_icai_data import load_data
+
+#theano.config.compute_test_value = 'warn'
+#theano.config.mode = "FAST_COMPILE"
+#theano.config.exception_verbosity='high'
+
+__docformat__ = 'restructedtext en'
 
 
 # start-snippet-1
@@ -165,7 +171,7 @@ class MLP(object):
         self.logRegressionLayer = LogisticRegression(
             input=self.hiddenLayer.output,
             n_in=n_hidden,
-            n_out=n_out
+            n_out=1
         )
         # end-snippet-2 start-snippet-3
         # L1 norm ; one regularization option is to enforce L1 norm to
@@ -191,6 +197,8 @@ class MLP(object):
         # same holds for the function computing the number of errors
         self.errors = self.logRegressionLayer.errors
 
+        self.y_pred = self.logRegressionLayer.y_pred
+
         # the parameters of the model are the parameters of the two layer it is
         # made out of
         self.params = self.hiddenLayer.params + self.logRegressionLayer.params
@@ -200,8 +208,9 @@ class MLP(object):
         self.input = input
 
 
-def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
-             dataset='mnist.pkl.gz', batch_size=20, n_hidden=500):
+def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
+             dataset="/media/wirkert/data/Data/2016_02_02_IPCAI/results/intermediate",
+             batch_size=20, n_hidden=100):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron
@@ -235,10 +244,9 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     valid_set_x, valid_set_y = datasets[1]
     test_set_x, test_set_y = datasets[2]
 
-    # compute number of minibatches for training, validation and testing
+    # compute number of minibatches for training and validation
     n_train_batches = train_set_x.get_value(borrow=True).shape[0] // batch_size
     n_valid_batches = valid_set_x.get_value(borrow=True).shape[0] // batch_size
-    n_test_batches = test_set_x.get_value(borrow=True).shape[0] // batch_size
 
     ######################
     # BUILD ACTUAL MODEL #
@@ -248,8 +256,10 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     # allocate symbolic variables for the data
     index = T.lscalar()  # index to a [mini]batch
     x = T.matrix('x')  # the data is presented as rasterized images
-    y = T.ivector('y')  # the labels are presented as 1D vector of
+    x.tag.test_value = np.zeros((5000,8)).astype('float32')
+    y = T.vector('y')  # the labels are presented as 1D vector of
                         # [int] labels
+    y.tag.test_value = np.ones(5000).astype('float32')
 
     rng = numpy.random.RandomState(1234)
 
@@ -257,9 +267,9 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     classifier = MLP(
         rng=rng,
         input=x,
-        n_in=28 * 28,
-        n_hidden=n_hidden,
-        n_out=10
+        n_in=8,
+        n_hidden=100,
+        n_out=1
     )
 
     # start-snippet-4
@@ -276,11 +286,10 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     # compiling a Theano function that computes the mistakes that are made
     # by the model on a minibatch
     test_model = theano.function(
-        inputs=[index],
-        outputs=classifier.errors(y),
+        inputs=[],
+        outputs=classifier.y_pred,
         givens={
-            x: test_set_x[index * batch_size:(index + 1) * batch_size],
-            y: test_set_y[index * batch_size:(index + 1) * batch_size]
+            x: test_set_x
         }
     )
 
@@ -386,14 +395,13 @@ def test_mlp(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
                     best_iter = iter
 
                     # test it on the test set
-                    test_losses = [test_model(i) for i
-                                   in range(n_test_batches)]
-                    test_score = numpy.mean(test_losses)
-
-                    print(('     epoch %i, minibatch %i/%i, test error of '
-                           'best model %f %%') %
-                          (epoch, minibatch_index + 1, n_train_batches,
-                           test_score * 100.))
+                    start = time.time()
+                    test_predictions = test_model()
+                    end = time.time()
+                    estimation_time = end - start
+                    print("time necessary for estimating image parameters: " +
+                          str(estimation_time) + "s")
+                    print(test_predictions.shape)
 
             if patience <= iter:
                 done_looping = True

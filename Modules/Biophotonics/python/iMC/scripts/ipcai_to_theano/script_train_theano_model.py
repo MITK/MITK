@@ -222,7 +222,7 @@ class MLP(object):
 
 def test_mlp(learning_rate=0.001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
              dataset="/media/wirkert/data/Data/2016_02_02_IPCAI/results/intermediate",
-             batch_size=20, n_hidden=100):
+             batch_size=20, n_hidden=25):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron

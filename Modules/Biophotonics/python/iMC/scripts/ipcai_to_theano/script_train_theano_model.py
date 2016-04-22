@@ -104,7 +104,7 @@ class HiddenLayer(object):
             W = theano.shared(value=W_values, name='W', borrow=True)
 
         if b is None:
-            b_values = numpy.zeros((n_out,), dtype=theano.config.floatX)
+            b_values = 0.1+numpy.zeros((n_out,), dtype=theano.config.floatX)
             b = theano.shared(value=b_values, name='b', borrow=True)
 
         self.W = W
@@ -158,18 +158,26 @@ class MLP(object):
         # into a HiddenLayer with a tanh activation function connected to the
         # LogisticRegression layer; the activation function can be replaced by
         # sigmoid or any other nonlinear function
-        self.hiddenLayer = HiddenLayer(
+        self.hiddenLayer1 = HiddenLayer(
             rng=rng,
             input=input,
             n_in=n_in,
             n_out=n_hidden,
-            activation=T.tanh
+            activation=T.nnet.relu
+        )
+
+        self.hiddenLayer2 = HiddenLayer(
+            rng=rng,
+            input=self.hiddenLayer1.output,
+            n_in=n_hidden,
+            n_out=n_hidden,
+            activation=T.nnet.relu
         )
 
         # The logistic regression layer gets as input the hidden units
         # of the hidden layer
         self.logRegressionLayer = LogisticRegression(
-            input=self.hiddenLayer.output,
+            input=self.hiddenLayer2.output,
             n_in=n_hidden,
             n_out=n_out
         )
@@ -177,14 +185,16 @@ class MLP(object):
         # L1 norm ; one regularization option is to enforce L1 norm to
         # be small
         self.L1 = (
-            abs(self.hiddenLayer.W).sum()
+            abs(self.hiddenLayer1.W).sum()
+            + abs(self.hiddenLayer2.W).sum()
             + abs(self.logRegressionLayer.W).sum()
         )
 
         # square of L2 norm ; one regularization option is to enforce
         # square of L2 norm to be small
         self.L2_sqr = (
-            (self.hiddenLayer.W ** 2).sum()
+            (self.hiddenLayer1.W ** 2).sum()
+            + (self.hiddenLayer2.W ** 2).sum()
             + (self.logRegressionLayer.W ** 2).sum()
         )
 
@@ -201,7 +211,9 @@ class MLP(object):
 
         # the parameters of the model are the parameters of the two layer it is
         # made out of
-        self.params = self.hiddenLayer.params + self.logRegressionLayer.params
+        self.params = self.hiddenLayer1.params +\
+                      self.hiddenLayer2.params +\
+                      self.logRegressionLayer.params
         # end-snippet-3
 
         # keep track of model input

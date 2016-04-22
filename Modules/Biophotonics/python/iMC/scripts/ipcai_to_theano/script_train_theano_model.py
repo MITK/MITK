@@ -171,7 +171,7 @@ class MLP(object):
         self.logRegressionLayer = LogisticRegression(
             input=self.hiddenLayer.output,
             n_in=n_hidden,
-            n_out=1
+            n_out=n_out
         )
         # end-snippet-2 start-snippet-3
         # L1 norm ; one regularization option is to enforce L1 norm to
@@ -208,7 +208,7 @@ class MLP(object):
         self.input = input
 
 
-def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
+def test_mlp(learning_rate=0.001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
              dataset="/media/wirkert/data/Data/2016_02_02_IPCAI/results/intermediate",
              batch_size=20, n_hidden=100):
     """
@@ -256,7 +256,7 @@ def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     # allocate symbolic variables for the data
     index = T.lscalar()  # index to a [mini]batch
     x = T.matrix('x')  # the data is presented as rasterized images
-    x.tag.test_value = np.zeros((5000,8)).astype('float32')
+    x.tag.test_value = np.zeros((5000, 8)).astype('float32')
     y = T.vector('y')  # the labels are presented as 1D vector of
                         # [int] labels
     y.tag.test_value = np.ones(5000).astype('float32')
@@ -268,7 +268,7 @@ def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
         rng=rng,
         input=x,
         n_in=8,
-        n_hidden=100,
+        n_hidden=n_hidden,
         n_out=1
     )
 
@@ -358,7 +358,7 @@ def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
     epoch = 0
     done_looping = False
 
-    while (epoch < n_epochs) and (not done_looping):
+    while (epoch < n_epochs):# and (not done_looping):
         epoch = epoch + 1
         for minibatch_index in range(n_train_batches):
 
@@ -405,7 +405,7 @@ def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
 
             if patience <= iter:
                 done_looping = True
-                break
+                #break
 
     end_time = timeit.default_timer()
     print(('Optimization complete. Best validation score of %f %% '

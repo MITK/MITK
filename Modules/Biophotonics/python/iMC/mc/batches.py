@@ -329,3 +329,47 @@ class VisualizationBatch(AbstractBatch):
                               nr_samples)
 
         return self.df
+
+
+class IntralipidPhantomBatch(AbstractBatch):
+    """batch used for visualization of different spectra. Feel free to adapt
+    for your visualization purposes."""
+
+    def __init__(self):
+        super(IntralipidPhantomBatch, self).__init__()
+
+    def append_one_layer(self, nr_samples):
+        """helper function to create parameters for one layer"""
+
+        # scales data to lie between maxi and mini instead of 0 and 1
+        scale = lambda x, mini, maxi: x * (maxi - mini) + mini
+        # shortcut to random generator
+        gen = np.random.random_sample
+
+        # create layer elements
+        self.df["layer" + str(self._nr_layers), "vhb"] = \
+            scale(gen(nr_samples), 0.001, 0.1)
+        self.df["layer" + str(self._nr_layers), "sao2"] = \
+            scale(gen(nr_samples), 0., 1.)
+        self.df["layer" + str(self._nr_layers), "a_mie"] = \
+            scale(gen(nr_samples), 5., 40.) * 100  # to 1/m
+        self.df["layer" + str(self._nr_layers), "b_mie"] = \
+            scale(gen(nr_samples), 2.3, 2.4)
+        self.df["layer" + str(self._nr_layers), "d"] = \
+            2000.*10**-6
+        self.df["layer" + str(self._nr_layers), "n"] = \
+            scale(gen(nr_samples), 1.33, 1.54)
+        self.df["layer" + str(self._nr_layers), "g"] = \
+            scale(gen(nr_samples), 0.8, 0.95)
+        self._nr_layers += 1
+
+    def create_parameters(self, nr_samples):
+        """Create intralipid batch with a total diameter of 2mm.
+        all other parameters vary randomly
+        within each layer to simulate the interlipid scattering/absorption
+        properties."""
+
+        # create three layers with random samples
+        self.append_one_layer(nr_samples)
+
+        return self.df

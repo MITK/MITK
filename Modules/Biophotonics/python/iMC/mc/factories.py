@@ -4,11 +4,11 @@ Created on Oct 15, 2015
 @author: wirkert
 '''
 
-from mc.tissuemodels import AbstractTissue, GenericTissue
+from mc.tissuemodels import AbstractTissue, GenericTissue, PhantomTissue
 from mc.batches import AbstractBatch
 from mc.batches import GenericBatch, LessGenericBatch, GenericMeanScatteringBatch
 from mc.batches import ColonMuscleBatch, ColonMuscleMeanScatteringBatch
-from mc.batches import VisualizationBatch
+from mc.batches import VisualizationBatch, IntralipidPhantomBatch
 
 
 class AbstractMcFactory(object):
@@ -94,6 +94,20 @@ class VisualizationMcFactory(AbstractMcFactory):
 
     def create_batch_to_simulate(self):
         return VisualizationBatch()
+
+    def __init__(self):
+        '''
+        Constructor
+        '''
+
+
+class PhantomFactory(AbstractMcFactory):
+
+    def create_tissue_model(self):
+        return PhantomTissue()
+
+    def create_batch_to_simulate(self):
+        return IntralipidPhantomBatch()
 
     def __init__(self):
         '''

@@ -7,7 +7,7 @@ Created on Sep 9, 2015
 import numpy as np
 
 from mc.sim import MciWrapper
-from mc.usuag import Ua, UsgJacques
+from mc.usuag import Ua, UsgJacques, UsgIntralipid
 
 
 class AbstractTissue(object):
@@ -138,4 +138,12 @@ class GenericTissue(AbstractTissue):
         ds = np.ones(nr_layers, dtype=float) * 500.*10 ** -6
         ns = np.ones(nr_layers, dtype=float) * 1.38
         super(GenericTissue, self).__init__(ns, uas, usgs, ds)
+
+
+class PhantomTissue(GenericTissue):
+
+    def __init__(self, nr_layers=1):
+        super(PhantomTissue, self).__init__(nr_layers=1)
+        self.usgs = [UsgIntralipid()]
+
 

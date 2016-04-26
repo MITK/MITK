@@ -188,3 +188,30 @@ class UsGMuscle(object):
         g = 0.96
         return us, g
 
+
+class UsgIntralipid(object):
+    """helper object for setting us and g in intralipid
+    We use the formulas from
+    http://omlc.org/spectra/intralipid/ to calculate
+    """
+
+    def __init__(self):
+        self.a_ray = 0. * 100.
+        self.a_mie = 20. * 100.
+        self.b_mie = 2.33
+        self.g = 0.85
+
+    def __call__(self, wavelength):
+
+        norm_wavelength = (wavelength / (500 * 10 ** -9))
+
+        us_ray = self.a_ray * norm_wavelength ** (-4)
+        us_mie = self.a_mie * norm_wavelength ** (-self.b_mie)
+
+        us_prime = (us_ray + us_mie)  # * 100. to convert to m^-1
+
+        g = 2.25 * (wavelength * 10**9)**-0.155
+
+        us = us_prime / (1 - g)
+
+        return us, g

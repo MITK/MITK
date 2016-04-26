@@ -30,13 +30,14 @@ import time
 
 import numpy
 import numpy as np
-
+import matplotlib.pylab as plt
 import theano
 import theano.tensor as T
 
 
 from logistic_sgd import LogisticRegression
 from input_icai_data import load_data
+from ipcai2016.tasks_common import plot_image
 
 #theano.config.compute_test_value = 'warn'
 #theano.config.mode = "FAST_COMPILE"
@@ -220,9 +221,10 @@ class MLP(object):
         self.input = input
 
 
-def test_mlp(learning_rate=0.001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
+def test_mlp(learning_rate=0.001, L1_reg=0.0001, L2_reg=0.0001, n_epochs=1000,
              dataset="/media/wirkert/data/Data/2016_02_02_IPCAI/results/intermediate",
-             batch_size=20, n_hidden=25):
+             batch_size=20, n_hidden=25,
+             do_timing_test=False):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron
@@ -250,6 +252,7 @@ def test_mlp(learning_rate=0.001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
 
 
    """
+
     datasets = load_data(dataset)
 
     train_set_x, train_set_y = datasets[0]
@@ -406,14 +409,15 @@ def test_mlp(learning_rate=0.001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
                     best_validation_loss = this_validation_loss
                     best_iter = iter
 
-                    # test it on the test set
-                    start = time.time()
-                    test_predictions = test_model()
-                    end = time.time()
-                    estimation_time = end - start
-                    print("time necessary for estimating image parameters: " +
-                          str(estimation_time) + "s")
-                    print(test_predictions.shape)
+                    if do_timing_test:
+                        # test it on the test set
+                        start = time.time()
+                        test_predictions = test_model()
+                        end = time.time()
+                        estimation_time = end - start
+                        print("time necessary for estimating image parameters: " +
+                              str(estimation_time) + "s")
+                        print(test_predictions.shape)
 
             if patience <= iter:
                 done_looping = True
@@ -427,6 +431,14 @@ def test_mlp(learning_rate=0.001, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
            os.path.split(__file__)[1] +
            ' ran for %.2fm' % ((end_time - start_time) / 60.)), file=sys.stderr)
 
+    test_predictions = test_model()
+    image = test_predictions.reshape(1029,1228)
+    image[0, 0] = 0.0
+    image[0, 1] = 1.
+    image = np.clip(image, 0., 1.)
+    plot_image(image)
+    plt.savefig("sample_image.png",
+                    dpi=250, bbox_inches='tight')
 
 if __name__ == '__main__':
     test_mlp()

@@ -105,6 +105,9 @@ int main(int argc, char* argv[])
   // Use it as a 3D view
   renderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
 
+  // Reposition the camera to include all visible actors
+  renderWindow.GetRenderer()->GetVtkRenderer()->ResetCamera();
+
   // *******************************************************
   // ****************** START OF NEW PART ******************
   // *******************************************************

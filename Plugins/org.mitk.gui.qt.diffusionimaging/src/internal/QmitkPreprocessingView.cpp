@@ -197,9 +197,10 @@ void QmitkPreprocessingView::CreateConnections()
 void QmitkPreprocessingView::DoFlipAxis()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(node) );
 
@@ -286,6 +287,7 @@ void QmitkPreprocessingView::TemplatedFlipAxis(itk::Image<TPixel, VImageDimensio
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   itk::FixedArray<bool, 3> flipAxes;
   flipAxes[0] = m_Controls->m_FlipX->isChecked();
@@ -320,6 +322,7 @@ void QmitkPreprocessingView::DoRemoveGradient()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage )
@@ -380,6 +383,7 @@ void QmitkPreprocessingView::DoExtractGradient()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
@@ -415,6 +419,7 @@ void QmitkPreprocessingView::DoCropImage()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( isDiffusionImage )
@@ -540,6 +545,7 @@ void QmitkPreprocessingView::DoApplySpacing()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( isDiffusionImage )
@@ -611,9 +617,10 @@ void QmitkPreprocessingView::TemplatedSetImageSpacing( itk::Image<TPixel, VImage
 void QmitkPreprocessingView::DoApplyOrigin()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image));
   if ( isDiffusionImage )
@@ -686,9 +693,10 @@ void QmitkPreprocessingView::TemplatedSetImageOrigin( itk::Image<TPixel, VImageD
 void QmitkPreprocessingView::DoUpdateInterpolationGui(int i)
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   switch (i)
   {
@@ -735,9 +743,10 @@ void QmitkPreprocessingView::DoExtractBrainMask()
 void QmitkPreprocessingView::DoResampleImage()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( isDiffusionImage )
@@ -1017,6 +1026,7 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( isDiffusionImage )
@@ -1176,6 +1186,7 @@ void QmitkPreprocessingView::DoDwiNormalization()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( ! isDiffusionImage ) { return; }
@@ -1212,7 +1223,10 @@ void QmitkPreprocessingView::DoDwiNormalization()
   if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
   {
     itkImage = UcharImageType::New();
-    mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage);
+    if (  dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()) != nullptr )
+    {
+      mitk::CastToItkImage( dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage );
+    }
     filter->SetMaskImage(itkImage);
   }
 
@@ -1333,6 +1347,7 @@ void QmitkPreprocessingView::DoLengthCorrection()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( ! isDiffusionImage ) { return; }
@@ -1469,6 +1484,7 @@ void QmitkPreprocessingView::DoBiExpFit()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( ! isDiffusionImage ) { return; }
@@ -1500,6 +1516,7 @@ void QmitkPreprocessingView::DoAKCFit()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( ! isDiffusionImage ) { return; }
@@ -1533,9 +1550,9 @@ void QmitkPreprocessingView::DoADCFit()
 void QmitkPreprocessingView::DoADCAverage()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( ! isDiffusionImage )
@@ -1566,6 +1583,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( ! isDiffusionImage ) { return; }
@@ -1620,6 +1638,7 @@ void QmitkPreprocessingView::UpdateBValueTableWidget(int)
   }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage(false);
 
@@ -1693,6 +1712,16 @@ void QmitkPreprocessingView::TemplatedUpdateGui( itk::VectorImage<TPixel, VImage
   }
 }
 
+
+//todo/mdh
+void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+{
+  (void) nodes;
+  //maybe?
+  this->OnImageSelectionChanged();
+}//todo/mdh/why not?
+
+
 void QmitkPreprocessingView::OnImageSelectionChanged()
 {
   bool foundImageVolume = true;
@@ -1702,6 +1731,8 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
   bool foundDwiVolume( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( node ) );
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
+
   bool multiComponentVolume = (image->GetPixelType().GetNumberOfComponents() > 1);
 
   bool foundSingleImageVolume = foundDwiVolume || (foundImageVolume && (!multiComponentVolume));
@@ -1863,6 +1894,7 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
   }
 }
 
+
 void QmitkPreprocessingView::Visible()
 {
   QmitkFunctionality::Visible();
@@ -1885,6 +1917,7 @@ void QmitkPreprocessingView::DoHalfSphereGradientDirections()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   mitk::Image::Pointer newDwi = image->Clone();
   GradientDirectionContainerType::Pointer gradientContainer =
@@ -1914,9 +1947,10 @@ void QmitkPreprocessingView::DoHalfSphereGradientDirections()
 void QmitkPreprocessingView::DoApplyMesurementFrame()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage )
@@ -1955,6 +1989,7 @@ void QmitkPreprocessingView::DoShowGradientDirections()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
@@ -2070,6 +2105,7 @@ void QmitkPreprocessingView::DoReduceGradientDirections()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
@@ -2152,6 +2188,7 @@ void QmitkPreprocessingView::MergeDwis()
   if (node.IsNull()) { return; }
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
@@ -2160,6 +2197,7 @@ void QmitkPreprocessingView::MergeDwis()
   if (node2.IsNull()) { return; }
 
   mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*>(node2->GetData());
+  if ( image2 == nullptr ) { return; }
 
   typedef itk::VectorImage<DiffusionPixelType,3> DwiImageType;
   typedef DwiImageType::PixelType                DwiPixelType;
@@ -2237,9 +2275,10 @@ void QmitkPreprocessingView::MergeDwis()
 void QmitkPreprocessingView::ExtractB0()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
@@ -2279,9 +2318,10 @@ void QmitkPreprocessingView::ExtractB0()
 void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage ) { return; }
@@ -2323,9 +2363,10 @@ void QmitkPreprocessingView::DoExtractBOWithoutAveraging()
 void QmitkPreprocessingView::AverageGradients()
 {
   mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
-  if (node.IsNull())
-    return;
+  if (node.IsNull()) { return; }
+
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
 
   bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(image) );
   if ( !isDiffusionImage )

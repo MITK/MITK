@@ -42,8 +42,6 @@ struct PrpSelListener;
  *
  * \brief Viewing and modifying diffusion weighted images (gradient reduction, resampling, b-value projection, ...)
  *
- * Document your class here.
- *
  * \sa QmitkFunctionality
  */
 class QmitkPreprocessingView : public QmitkFunctionality
@@ -147,7 +145,7 @@ protected:
   void UpdateBValueTableWidget(int);
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-//  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override; // why not?
 
   Ui::QmitkPreprocessingViewControls* m_Controls;
 

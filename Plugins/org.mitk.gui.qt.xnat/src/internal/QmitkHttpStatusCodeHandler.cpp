@@ -30,28 +30,34 @@ QmitkHttpStatusCodeHandler::~QmitkHttpStatusCodeHandler()
 static void CreateMessageBox(int statusCode, std::string errorMessage)
 {
   std::stringstream ss;
+  //FIXME This seems to be a bug in the ctk framework. Rewise this as soon as possible!
+  //The feedback status code seems to be off by 201.
+  statusCode += 201;
   switch(statusCode)
   {
   case 202:
-    QMessageBox::warning(nullptr, "HTTP STATUS - 202", "Probably no permission to perform this action.");
+    QMessageBox::warning(nullptr, "202 - Accepted", "The request has been accepted, but not yet processed.");
     break;
   case 204:
-    QMessageBox::warning(nullptr, "204 - NO CONTENT", "Successful request but no content could be returned.");
+    QMessageBox::warning(nullptr, "204 - No Content", "Successful request but no content could be returned.");
     break;
   case 301:
     QMessageBox::warning(nullptr, "301 - Moved Permanently", "All requests to this url cannot be processed anymore.");
     break;
   case 400:
-    QMessageBox::warning(nullptr, "400 - Bad request", "Server will not respond due to a client error..");
+    QMessageBox::warning(nullptr, "400 - Bad Request", "Server will not respond due to a client error..");
     break;
   case 401:
     QMessageBox::warning(nullptr, "401 - Unauthorized", "Please provide your authentication credentials.");
     break;
   case 403:
-    QMessageBox::warning(nullptr, "403 - Forbidden", "You do not have the rights to access this page.");
+    QMessageBox::warning(nullptr, "403 - Forbidden", "You do not have the rights to perform this action.");
     break;
   case 404:
     QMessageBox::warning(nullptr, "404 - Not Found", "The requested resource could not be found.");
+    break;
+  case 500:
+    QMessageBox::warning(nullptr, "500 - Internal Server Error", "An internal server error occured.");
     break;
   default:
     ss << "An Http Error occured with error code " << statusCode << " and server message: " << errorMessage;

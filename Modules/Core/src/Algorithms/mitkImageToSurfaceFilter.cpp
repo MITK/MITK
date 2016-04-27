@@ -148,6 +148,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   // determine point_data normals for the poly data points.
   vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
   normalsGenerator->SetInputData( polydata );
+  normalsGenerator->FlipNormalsOn();
 
   vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
   cleanPolyDataFilter->SetInputConnection(normalsGenerator->GetOutputPort());

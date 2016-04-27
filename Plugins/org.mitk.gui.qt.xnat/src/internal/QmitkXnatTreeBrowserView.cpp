@@ -219,16 +219,7 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
 
   ctkXnatObject* parent = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
-  try
-  {
-    this->InternalAddResourceFolder(parent);
-  }
-  catch(ctkRuntimeException exc)
-  {
-    if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-      exc.rethrow();
-    return;
-  }
+  this->InternalAddResourceFolder(parent);
   m_TreeModel->refresh(index);
 }
 
@@ -244,16 +235,7 @@ void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
 
   if (enableDownload)
   {
-    try
-    {
-      this->InternalFileDownload(index, true);
-    }
-    catch(ctkRuntimeException exc)
-    {
-      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-        exc.rethrow();
-      return;
-    }
+    this->InternalFileDownload(index, true);
   }
 }
 
@@ -314,30 +296,12 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
       int result = msgBox.exec();
       if (result == QMessageBox::Ok)
       {
-        try
-        {
-          InternalFileDownload(index, true);
-        }
-        catch(ctkRuntimeException exc)
-        {
-          if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-            exc.rethrow();
-          return;
-        }
+        InternalFileDownload(index, true);
       }
     }
     else
     {
-      try
-      {
-        InternalFileDownload(index, true);
-      }
-      catch(ctkRuntimeException exc)
-      {
-        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-          exc.rethrow();
-        return;
-      }
+      InternalFileDownload(index, true);
     }
   }
 }
@@ -644,16 +608,8 @@ void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadAndOpenFile()
 {
   QModelIndex index = m_Controls.treeView->currentIndex();
-  try
-  {
-    InternalFileDownload(index, true);
-  }
-  catch(ctkRuntimeException exc)
-  {
-    if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-      exc.rethrow();
-    return;
-  }
+
+  InternalFileDownload(index, true);
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuCreateResourceFolder()
@@ -663,16 +619,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateResourceFolder()
 
   if (parentObject != nullptr)
   {
-    try
-    {
-      this->InternalAddResourceFolder(parentObject);
-    }
-    catch(ctkRuntimeException exc)
-    {
-      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-        exc.rethrow();
-      return;
-    }
+    this->InternalAddResourceFolder(parentObject);
   }
 }
 
@@ -686,7 +633,16 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
     if (folderName.isEmpty())
       folderName = "NO LABEL";
 
-    return parent->addResourceFolder(folderName);
+    try
+    {
+      return parent->addResourceFolder(folderName);
+    }
+    catch(ctkRuntimeException exc)
+    {
+      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+        exc.rethrow();
+      return nullptr;
+    }
   }
   else
   {
@@ -1137,9 +1093,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
           exc.rethrow();
         project->remove(subject);
         delete subject;
-      }
-      catch(...)
-      {
+        return;
       }
 
       // Get xnat session from micro service
@@ -1167,7 +1121,20 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       ctkXnatExperiment* experiment = dynamic_cast<ctkXnatExperiment*>(dialog->GetXnatObject());
       experiment->setParent(subject);
       experiment->setProperty("xsiType", experiment->imageModality());
-      experiment->save();
+
+      try
+      {
+        experiment->save();
+      }
+      catch(ctkRuntimeException exc)
+      {
+        //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
+        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+          exc.rethrow();
+        subject->remove(experiment);
+        delete experiment;
+        return;
+      }
 
       // Get xnat session from micro service
       ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(

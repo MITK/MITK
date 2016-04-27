@@ -1,3 +1,19 @@
+/*===================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
+
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
+
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
+
 #include "QmitkHttpStatusCodeHandler.h"
 #include "QMessageBox"
 #include <sstream>
@@ -52,11 +68,6 @@ bool QmitkHttpStatusCodeHandler::HandleErrorMessage(const char *_errorMsg)
    * ERROR: An error occurred: ctkRuntimeException: Syncing with http request failed. {d55ec279-8a65-46d6-80d3-cec079066109}: 202: Error downloading
    * https:... - server replied: Forbidden
    */
-
-
-  //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-  //TODO: implement re-catching
-  //TODO: status-code specific error messages
 
   if(errorMsg.find("request failed.") == std::string::npos)
     return false;

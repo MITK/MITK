@@ -195,8 +195,9 @@ void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
   if (m_DataInteractor.IsNotNull())
     m_DataInteractor->SetDataNode(newNode);
 
-  ObserveNewNode(newNode);
   dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
+  ObserveNewNode(newNode);
+
 }
 
 void QmitkPointListWidget::OnBtnSavePoints()
@@ -385,12 +386,6 @@ void QmitkPointListWidget::ObserveNewNode(mitk::DataNode* node)
   // remove old observer
   if ( m_PointSetNode )
   {
-    if (m_DataInteractor)
-    {
-      m_DataInteractor = NULL;
-      m_ToggleAddPoint->setChecked( false );
-    }
-
     m_PointSetNode->RemoveObserver(m_NodeObserverTag);
     m_NodeObserverTag = 0;
   }

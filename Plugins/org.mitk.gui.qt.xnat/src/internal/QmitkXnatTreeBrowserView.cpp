@@ -628,9 +628,6 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
     catch(ctkRuntimeException exc)
     {
       m_StatusCodeHandler.HandleErrorMessage(exc.what());
-      MITK_INFO << "This was called";
-
-      //TODO
       return nullptr;
     }
   }
@@ -725,24 +722,12 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
   if (resource == nullptr)
   {
-    try
-    {
-      resource = this->InternalAddResourceFolder(parentObject);
-    }
-    catch(ctkRuntimeException exc)
-    {
-      m_StatusCodeHandler.HandleErrorMessage(exc.what());
-      return;
-    }
+    resource = this->InternalAddResourceFolder(parentObject);
   }
 
   if (resource == nullptr)
   {
-    MITK_WARN << "Could not upload file! No resource available!";
-    QMessageBox msgbox;
-    msgbox.setText("Could not upload file! No resource available!");
-    msgbox.setIcon(QMessageBox::Critical);
-    msgbox.exec();
+    MITK_WARN << "Resource folder could not be created!";
     return;
   }
 

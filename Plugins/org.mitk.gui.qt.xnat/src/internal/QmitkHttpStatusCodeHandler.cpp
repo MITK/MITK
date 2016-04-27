@@ -32,6 +32,7 @@ static void CreateMessageBox(int statusCode, std::string errorMessage)
   std::stringstream ss;
   //FIXME This seems to be a bug in the ctk framework. Rewise this as soon as possible!
   //The feedback status code seems to be off by 201.
+  //This is a Qt bug - will be fixed after moving on 11.05.2016
   statusCode += 201;
   switch(statusCode)
   {

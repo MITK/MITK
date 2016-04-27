@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "ui_QmitkXnatTreeBrowserViewControls.h"
+#include "QmitkHttpStatusCodeHandler.h"
 
 // ctkXnatCore
 #include "ctkXnatSession.h"
@@ -129,22 +130,9 @@ private:
 
   QMenu* m_ContextMenu;
 
+  QmitkHttpStatusCodeHandler m_StatusCodeHandler;
+
   bool m_SilentMode;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H
-
-class QmitkHttpStatusCode
-{
-private:
-  uint m_statusCode;
-  std::string m_serverResponse;
-
-public:
-  QmitkHttpStatusCode();
-  ~QmitkHttpStatusCode();
-
-  uint GetStatusCode(){ return m_statusCode; }
-  std::string GetServerResponse() { return m_serverResponse; }
-  void ReadFromErrorMessage(const char* errorMsg);
-};

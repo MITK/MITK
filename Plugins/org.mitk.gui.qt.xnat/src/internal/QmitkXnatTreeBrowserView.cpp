@@ -219,7 +219,16 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
 
   ctkXnatObject* parent = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
-  this->InternalAddResourceFolder(parent);
+  try
+  {
+    this->InternalAddResourceFolder(parent);
+  }
+  catch(ctkRuntimeException exc)
+  {
+    if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+      exc.rethrow();
+    return;
+  }
   m_TreeModel->refresh(index);
 }
 
@@ -235,7 +244,16 @@ void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
 
   if (enableDownload)
   {
-    this->InternalFileDownload(index, true);
+    try
+    {
+      this->InternalFileDownload(index, true);
+    }
+    catch(ctkRuntimeException exc)
+    {
+      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+        exc.rethrow();
+      return;
+    }
   }
 }
 
@@ -296,12 +314,30 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
       int result = msgBox.exec();
       if (result == QMessageBox::Ok)
       {
-        InternalFileDownload(index, true);
+        try
+        {
+          InternalFileDownload(index, true);
+        }
+        catch(ctkRuntimeException exc)
+        {
+          if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+            exc.rethrow();
+          return;
+        }
       }
     }
     else
     {
-      InternalFileDownload(index, true);
+      try
+      {
+        InternalFileDownload(index, true);
+      }
+      catch(ctkRuntimeException exc)
+      {
+        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+          exc.rethrow();
+        return;
+      }
     }
   }
 }
@@ -388,7 +424,16 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           QString folderName = obj->resourceUri();
           folderName.replace("/","_");
           downloadPath = m_DownloadPath + folderName;
-          this->InternalDICOMDownload(obj, downloadPath);
+          try
+          {
+            this->InternalDICOMDownload(obj, downloadPath);
+          }
+          catch(ctkRuntimeException exc)
+          {
+            if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+              exc.rethrow();
+            return;
+          }
           serverURL = obj->resourceUri();
         }
       }
@@ -432,7 +477,16 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           QString folderName = parent->resourceUri();
           folderName.replace("/","_");
           downloadPath = m_DownloadPath + folderName;
-          this->InternalDICOMDownload(parent, downloadPath);
+          try
+          {
+            this->InternalDICOMDownload(parent, downloadPath);
+          }
+          catch(ctkRuntimeException exc)
+          {
+            if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+              exc.rethrow();
+            return;
+          }
           serverURL = parent->resourceUri();
         }
         else
@@ -482,7 +536,16 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       }
 
       mitk::StringProperty::Pointer xnatURL = mitk::StringProperty::New(serverURL.toStdString());
-      this->InternalOpenFiles(fileList, xnatURL);
+      try
+      {
+        this->InternalOpenFiles(fileList, xnatURL);
+      }
+      catch(ctkRuntimeException exc)
+      {
+        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+          exc.rethrow();
+        return;
+      }
     }
   }
 }
@@ -566,13 +629,31 @@ void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList,
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()
 {
   QModelIndex index = m_Controls.treeView->currentIndex();
-  InternalFileDownload(index, false);
+  try
+  {
+    InternalFileDownload(index, false);
+  }
+  catch(ctkRuntimeException exc)
+  {
+    if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+      exc.rethrow();
+    return;
+  }
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadAndOpenFile()
 {
   QModelIndex index = m_Controls.treeView->currentIndex();
-  InternalFileDownload(index, true);
+  try
+  {
+    InternalFileDownload(index, true);
+  }
+  catch(ctkRuntimeException exc)
+  {
+    if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+      exc.rethrow();
+    return;
+  }
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuCreateResourceFolder()
@@ -582,7 +663,16 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateResourceFolder()
 
   if (parentObject != nullptr)
   {
-    this->InternalAddResourceFolder(parentObject);
+    try
+    {
+      this->InternalAddResourceFolder(parentObject);
+    }
+    catch(ctkRuntimeException exc)
+    {
+      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+        exc.rethrow();
+      return;
+    }
   }
 }
 
@@ -644,7 +734,16 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
     file->setLocalFilePath(filename);
     QFileInfo fileInfo (filename);
     file->setName(fileInfo.fileName());
-    this->InternalFileUpload(file);
+    try
+    {
+      this->InternalFileUpload(file);
+    }
+    catch(ctkRuntimeException exc)
+    {
+      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+        exc.rethrow();
+      return;
+    }
     m_TreeModel->addChildNode(index, file);
   }
 }
@@ -687,15 +786,8 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     }
     catch(ctkRuntimeException exc)
     {
-      MITK_WARN << exc.what();
-      QmitkHttpStatusCode* statusCode = new QmitkHttpStatusCode();
-      statusCode->ReadFromErrorMessage(exc.what());
-
-      if(statusCode->GetStatusCode() != 200)
-      {
-        QMessageBox::warning(m_Controls.treeView, "Warning", statusCode->GetServerResponse().c_str());
-      }
-
+      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+        exc.rethrow();
       return;
     }
   }
@@ -764,7 +856,16 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
     xnatFile->setLocalFilePath(fileName);
 
-    this->InternalFileUpload(xnatFile);
+    try
+    {
+      this->InternalFileUpload(xnatFile);
+    }
+    catch(ctkRuntimeException exc)
+    {
+      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+        exc.rethrow();
+      return;
+    }
     QFile::remove(fileName);
 
     m_TreeModel->refresh(parentIndex);
@@ -1032,16 +1133,10 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       catch(ctkRuntimeException exc)
       {
         //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-        QmitkHttpStatusCode* statusCode = new QmitkHttpStatusCode();
-        statusCode->ReadFromErrorMessage(exc.what());
-
-
-        if(statusCode->GetStatusCode() != 200)
-        {
-          QMessageBox::warning(m_Controls.treeView, "Warning", statusCode->GetServerResponse().c_str());
-        }
-
-        exc.rethrow();
+        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
+          exc.rethrow();
+        project->remove(subject);
+        delete subject;
       }
       catch(...)
       {
@@ -1132,45 +1227,4 @@ void QmitkXnatTreeBrowserView::sessionTimesOutSoonMsg()
     session->renew();
   }
   timer->stop();
-}
-
-
-
-QmitkHttpStatusCode::QmitkHttpStatusCode()
-{
-}
-
-QmitkHttpStatusCode::~QmitkHttpStatusCode()
-{
-}
-
-void QmitkHttpStatusCode::ReadFromErrorMessage(const char *_errorMsg)
-{
-  std::string errorMsg(_errorMsg, strnlen(_errorMsg, strlen(_errorMsg)));
-  /*
-   * sample error response:
-   * ERROR: An error occurred: ctkRuntimeException: Syncing with http request failed. {d55ec279-8a65-46d6-80d3-cec079066109}: 202: Error downloading
-   * https:... - server replied: Forbidden
-   */
-
-
-  //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-  //TODO: implement re-catching
-  //TODO: status-code specific error messages
-
-  if(errorMsg.find("request failed.") != std::string::npos)
-  {
-    int indexOfErrorCode = errorMsg.find(": Error") - 3;
-    int indexOfServerResponse = errorMsg.rfind("server replied: ") + 16; //Length of "server replied : " is 16
-
-    std::string statusCodeString = errorMsg.substr(indexOfErrorCode,3);
-    std::istringstream istr(statusCodeString);
-    uint statusCode;
-    istr >> statusCode;
-
-    std::string serverResponse = errorMsg.substr(indexOfServerResponse);
-
-    m_statusCode = statusCode;
-    m_serverResponse = serverResponse;
-  }
 }

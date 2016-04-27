@@ -220,7 +220,8 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
   ctkXnatObject* parent = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
   this->InternalAddResourceFolder(parent);
-  m_TreeModel->refresh(index);
+
+  OnContextMenuRefreshItem();
 }
 
 void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
@@ -394,8 +395,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
           catch(ctkRuntimeException exc)
           {
-            if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-              exc.rethrow();
+            m_StatusCodeHandler.HandleErrorMessage(exc.what());
             return;
           }
           serverURL = obj->resourceUri();
@@ -447,8 +447,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
           catch(ctkRuntimeException exc)
           {
-            if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-              exc.rethrow();
+            m_StatusCodeHandler.HandleErrorMessage(exc.what());
             return;
           }
           serverURL = parent->resourceUri();
@@ -506,8 +505,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       }
       catch(ctkRuntimeException exc)
       {
-        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-          exc.rethrow();
+        m_StatusCodeHandler.HandleErrorMessage(exc.what());
         return;
       }
     }
@@ -593,16 +591,7 @@ void QmitkXnatTreeBrowserView::InternalOpenFiles(const QFileInfoList & fileList,
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadFile()
 {
   QModelIndex index = m_Controls.treeView->currentIndex();
-  try
-  {
-    InternalFileDownload(index, false);
-  }
-  catch(ctkRuntimeException exc)
-  {
-    if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-      exc.rethrow();
-    return;
-  }
+  InternalFileDownload(index, false);
 }
 
 void QmitkXnatTreeBrowserView::OnContextMenuDownloadAndOpenFile()
@@ -632,15 +621,16 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
   {
     if (folderName.isEmpty())
       folderName = "NO LABEL";
-
     try
     {
       return parent->addResourceFolder(folderName);
     }
     catch(ctkRuntimeException exc)
     {
-      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-        exc.rethrow();
+      m_StatusCodeHandler.HandleErrorMessage(exc.what());
+      MITK_INFO << "This was called";
+
+      //TODO
       return nullptr;
     }
   }
@@ -696,8 +686,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
     }
     catch(ctkRuntimeException exc)
     {
-      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-        exc.rethrow();
+      m_StatusCodeHandler.HandleErrorMessage(exc.what());
       return;
     }
     m_TreeModel->addChildNode(index, file);
@@ -742,8 +731,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     }
     catch(ctkRuntimeException exc)
     {
-      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-        exc.rethrow();
+      m_StatusCodeHandler.HandleErrorMessage(exc.what());
       return;
     }
   }
@@ -818,8 +806,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     }
     catch(ctkRuntimeException exc)
     {
-      if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-        exc.rethrow();
+      m_StatusCodeHandler.HandleErrorMessage(exc.what());
       return;
     }
     QFile::remove(fileName);
@@ -1089,8 +1076,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       catch(ctkRuntimeException exc)
       {
         //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-          exc.rethrow();
+        !m_StatusCodeHandler.HandleErrorMessage(exc.what());
         project->remove(subject);
         delete subject;
         return;
@@ -1128,9 +1114,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       }
       catch(ctkRuntimeException exc)
       {
-        //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-        if(!m_StatusCodeHandler.HandleErrorMessage(exc.what()))
-          exc.rethrow();
+        m_StatusCodeHandler.HandleErrorMessage(exc.what());
         subject->remove(experiment);
         delete experiment;
         return;

@@ -63,6 +63,7 @@ static void CreateMessageBox(int statusCode, std::string errorMessage)
 bool QmitkHttpStatusCodeHandler::HandleErrorMessage(const char *_errorMsg)
 {
   std::string errorMsg(_errorMsg, strnlen(_errorMsg, strlen(_errorMsg)));
+  bool success = true;
   /*
    * sample error response:
    * ERROR: An error occurred: ctkRuntimeException: Syncing with http request failed. {d55ec279-8a65-46d6-80d3-cec079066109}: 202: Error downloading
@@ -70,13 +71,13 @@ bool QmitkHttpStatusCodeHandler::HandleErrorMessage(const char *_errorMsg)
    */
 
   if(errorMsg.find("request failed.") == std::string::npos)
-    return false;
+    success = false;
 
   std::string::size_type indexOfErrorCode = errorMsg.find(": Error") - 3;
   std::string::size_type indexOfServerResponse = errorMsg.rfind("server replied: ") + 16; //Length of "server replied : " is 16
 
   if(indexOfErrorCode == std::string::npos || indexOfServerResponse == std::string::npos)
-    return false;
+    success =  false;
 
   std::string statusCodeString = errorMsg.substr(indexOfErrorCode,3);
   std::stringstream str;
@@ -88,5 +89,10 @@ bool QmitkHttpStatusCodeHandler::HandleErrorMessage(const char *_errorMsg)
 
   ::CreateMessageBox(statusCode, serverResponse);
 
-  return true;
+  if(!success)
+  {
+    QMessageBox::warning(nullptr, "General Error", errorMsg.c_str());
+  }
+
+  return success;
 }

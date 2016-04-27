@@ -35,39 +35,9 @@ public:
 
   void TestPython()
   {
-    MITK_INFO << "=================================== hallo";
-    //us::Module* module = us::ModuleRegistry::GetModule("MitkPythonService");
-    //us::ModuleContext* context = module->GetModuleContext();
-    //////get the service which is generated in the PythonModuleActivator
-    //us::ServiceReference<mitk::IPythonService> serviceRef = context->GetServiceReference<mitk::IPythonService>();
-    //mitk::IPythonService* service = dynamic_cast<mitk::IPythonService*>( context->GetService(serviceRef) );
-
     std::string result = m_PythonService->Execute( "5+5", mitk::IPythonService::EVAL_COMMAND );
-    MITK_TEST_CONDITION( result == "10", "Testing if running python code 5+5 results in 10" )
+    MITK_TEST_CONDITION( result == "10", "Testing if running python code 5+5 results in 10" );
   }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPython)
-
-//int mitkPythonTest(int /*argc*/, char* /*argv*/[])
-//{
-//  MITK_TEST_BEGIN("PythonTest")
-//
-////  itk::SmartPointer<mitk::PythonService> _PythonService(new mitk::PythonService());
-////
-////  std::string result = _PythonService->Execute( "5+5", mitk::IPythonService::EVAL_COMMAND );
-////  MITK_TEST_CONDITION( result == "10", "Testing if running python code 5+5 results in 10" )
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//    MITK_INFO << "===================================";
-//
-//  MITK_TEST_END()
-//}

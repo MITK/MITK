@@ -154,7 +154,9 @@ protected:
   QmitkStdMultiWidget* m_MultiWidget;
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
-  void CallMultishellToSingleShellFilter(itk::DWIVoxelFunctor * functor, mitk::Image::Pointer ImPtr, QString imageName, mitk::DataNode* parent);
+  void CallMultishellToSingleShellFilter( itk::DWIVoxelFunctor * functor,
+                                          mitk::Image::Pointer ImPtr, QString imageName,
+                                          mitk::DataNode* parent );
 
   void CleanBValueTableWidget();
 

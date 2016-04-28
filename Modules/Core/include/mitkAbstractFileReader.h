@@ -223,7 +223,7 @@ private:
   virtual mitk::IFileReader* Clone() const = 0;
 
   class Impl;
-  std::auto_ptr<Impl> d;
+  std::unique_ptr<Impl> d;
 };
 
 } // namespace mitk

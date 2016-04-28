@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkSherwoodTestClass
 {
 public:
-  std::auto_ptr< mitk::SWForest > m_Forest;
+  std::unique_ptr< mitk::SWForest > m_Forest;
   mitk::ImageDataCollections m_TrainingData;
   mitk::ImageDataCollections m_TestData;
 

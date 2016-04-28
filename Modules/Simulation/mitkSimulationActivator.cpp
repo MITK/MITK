@@ -51,8 +51,8 @@ namespace mitk
     SimulationActivator(const SimulationActivator&);
     SimulationActivator& operator=(const SimulationActivator&);
 
-    std::auto_ptr<SimulationService> m_SimulationService;
-    std::auto_ptr<AbstractFileIO> m_SimulationIO;
+    std::unique_ptr<SimulationService> m_SimulationService;
+    std::unique_ptr<AbstractFileIO> m_SimulationIO;
   };
 }
 

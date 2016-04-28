@@ -47,7 +47,7 @@ namespace mitk
     bool IsInteractionPerformerNotNull(const InteractionEvent* event);
 
     class Impl;
-    std::auto_ptr<Impl> m_Impl;
+    std::unique_ptr<Impl> m_Impl;
   };
 }
 

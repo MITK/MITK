@@ -72,7 +72,7 @@ private:
   mitk::IPropertyFilters* m_PropertyFilters;
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
   QString m_ClassName;
-  std::auto_ptr<QmitkPropertyItem> m_RootItem;
+  std::unique_ptr<QmitkPropertyItem> m_RootItem;
   std::map<std::string, unsigned long> m_PropertyDeletedTags;
   std::map<std::string, unsigned long> m_PropertyModifiedTags;
 };

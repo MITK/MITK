@@ -160,7 +160,7 @@ void TestServiceTracker()
   ServiceControlInterface* serviceController = mc->GetService(servCtrlRef);
   US_TEST_CONDITION_REQUIRED(serviceController != 0, "Test valid service controller");
 
-  std::auto_ptr<ServiceTracker<void> > st1(new ServiceTracker<void>(mc, servref));
+  std::unique_ptr<ServiceTracker<void>> st1(new ServiceTracker<void>(mc, servref));
 
   // 2. Check the size method with an unopened service tracker
 

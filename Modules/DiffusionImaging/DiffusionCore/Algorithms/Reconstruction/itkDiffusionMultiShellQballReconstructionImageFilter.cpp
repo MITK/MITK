@@ -997,9 +997,9 @@ void DiffusionMultiShellQballReconstructionImageFilter<T,TG,TO,L,NOdfDirections>
 ::ComputeReconstructionMatrix(IndiciesVector const & refVector)
 {
 
-  typedef std::auto_ptr< vnl_matrix< double> >  MatrixDoublePtr;
-  typedef std::auto_ptr< vnl_vector< int > >    VectorIntPtr;
-  typedef std::auto_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
+  typedef std::unique_ptr< vnl_matrix< double> >  MatrixDoublePtr;
+  typedef std::unique_ptr< vnl_vector< int > >    VectorIntPtr;
+  typedef std::unique_ptr< vnl_matrix_inverse< double > >  InverseMatrixDoublePtr;
 
   int numberOfGradientDirections = refVector.size();
 

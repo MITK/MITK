@@ -195,7 +195,7 @@ void LabelSetImageIO::Write()
       unsigned int count(0);
       while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
       {
-        std::auto_ptr<TiXmlDocument> document;
+        std::unique_ptr<TiXmlDocument> document;
         document.reset(new TiXmlDocument());
 
         TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....

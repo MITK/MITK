@@ -126,6 +126,7 @@ mitk::Point2D QmlMitkRenderWindowItem::GetMousePosition(QMouseEvent* me) const
   mitk::Point2D point;
   point[0] = me->x();
   point[1] = me->y();
+  m_Renderer->GetDisplayGeometry()->ULDisplayToDisplay(point, point);
   return point;
 }
 
@@ -134,6 +135,7 @@ mitk::Point2D QmlMitkRenderWindowItem::GetMousePosition(QWheelEvent* we) const
   mitk::Point2D point;
   point[0] = we->x();
   point[1] = we->y();
+  m_Renderer->GetDisplayGeometry()->ULDisplayToDisplay(point, point);
   return point;
 }
 

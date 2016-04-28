@@ -80,8 +80,6 @@ CMake will present you a couple of options, these are the most important ones:
  - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
    will download and build ACVD)
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
- - <tt><b>MITK_USE_Boost</b></tt> Build MITK code which depends on Boost (this
-   will download Boost 1.56)
  - <tt><b>MITK_USE_Boost_LIBRARIES</b></tt> If you need binary Boost libraries,
    specify them here.
  - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this

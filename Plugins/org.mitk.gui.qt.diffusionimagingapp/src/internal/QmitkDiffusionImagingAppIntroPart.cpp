@@ -37,8 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
 
-#include <QWebView>
-#include <QWebPage>
+#include <QWebEngineView>
+#include <QWebEnginePage>
 #include <QUrlQuery>
 #include <QString>
 #include <QStringList>
@@ -54,6 +54,81 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
+
+namespace
+{
+  class QmitkDiffusionWebEnginePage final : public QWebEnginePage
+  {
+  public:
+    explicit QmitkDiffusionWebEnginePage(QmitkDiffusionImagingAppIntroPart* introPart, QObject* parent = nullptr);
+    ~QmitkDiffusionWebEnginePage();
+
+  private:
+    bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;
+
+    QmitkDiffusionImagingAppIntroPart* m_IntroPart;
+  };
+
+  QmitkDiffusionWebEnginePage::QmitkDiffusionWebEnginePage(QmitkDiffusionImagingAppIntroPart* introPart, QObject* parent)
+    : QWebEnginePage(parent),
+    m_IntroPart(introPart)
+  {
+  }
+
+  QmitkDiffusionWebEnginePage::~QmitkDiffusionWebEnginePage()
+  {
+  }
+
+  bool QmitkDiffusionWebEnginePage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
+  {
+    QString scheme = url.scheme();
+
+    if (scheme.contains("mitk"))
+    {
+      if (url.path().isEmpty())
+        return false;
+
+      if (url.host().contains("perspectives"))
+      {
+        QString id = url.path().simplified().replace("/", "");
+
+        auto introSite = m_IntroPart->GetIntroSite();
+        auto workbenchWindow = introSite->GetWorkbenchWindow();
+        auto workbench = workbenchWindow->GetWorkbench();
+
+        workbench->ShowPerspective(id, workbenchWindow);
+
+        auto context = QmitkDiffusionApplicationPlugin::GetDefault()->GetPluginContext();
+        auto serviceReference = context->getServiceReference<mitk::IDataStorageService>();
+
+        mitk::IDataStorageService* service = serviceReference
+          ? context->getService<mitk::IDataStorageService>(serviceReference)
+          : nullptr;
+
+        if (service)
+        {
+          berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(service->GetActiveDataStorage()));
+
+          auto page = introSite->GetPage();
+          auto editors = page->FindEditors(editorInput, "org.mitk.editors.stdmultiwidget", 1);
+
+          if (!editors.isEmpty())
+            page->Activate(editors[0]->GetPart(true));
+        }
+      }
+    }
+    else if (scheme.contains("http"))
+    {
+      QDesktopServices::openUrl(url);
+    }
+    else
+    {
+      return true;
+    }
+
+    return false;
+  }
+}
 
 QmitkDiffusionImagingAppIntroPart::QmitkDiffusionImagingAppIntroPart()
   : m_Controls(NULL)
@@ -90,9 +165,7 @@ QmitkDiffusionImagingAppIntroPart::~QmitkDiffusionImagingAppIntroPart()
       this->GetIntroSite()->GetPage()->SetPerspective(perspective);
     }
   }
-
 }
-
 
 void QmitkDiffusionImagingAppIntroPart::CreateQtPartControl(QWidget* parent)
 {
@@ -102,9 +175,10 @@ void QmitkDiffusionImagingAppIntroPart::CreateQtPartControl(QWidget* parent)
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
 
-    // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
-    m_view = new QWebView(parent);
-    m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    m_view = new QWebEngineView(parent);
+
+    auto page = new QmitkDiffusionWebEnginePage(this, parent);
+    m_view->setPage(page);
 
     QUrl urlQtResource(QString("qrc:/org.mitk.gui.qt.welcomescreen/mitkdiffusionimagingappwelcomeview.html"),  QUrl::TolerantMode );
     m_view->load( urlQtResource );
@@ -117,90 +191,12 @@ void QmitkDiffusionImagingAppIntroPart::CreateQtPartControl(QWidget* parent)
 
 void QmitkDiffusionImagingAppIntroPart::CreateConnections()
 {
-  if ( m_Controls )
-  {
-    connect( (QObject*)(m_view->page()), SIGNAL(linkClicked(const QUrl& )), this, SLOT(DelegateMeTo(const QUrl& )) );
-  }
-}
-
-
-void QmitkDiffusionImagingAppIntroPart::DelegateMeTo(const QUrl& showMeNext)
-{
-  QString scheme          = showMeNext.scheme();
-  QByteArray urlHostname  = QUrl::toAce(showMeNext.host());
-  QByteArray urlPath      = showMeNext.path().toLatin1();
-  QUrlQuery query(showMeNext);
-  QByteArray dataset      = query.queryItemValue("dataset").toLatin1();
-  QByteArray clear        = query.queryItemValue("clear").toLatin1();//showMeNext.encodedQueryItemValue("clear");
-
-  if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;
-
-  // if the scheme is set to mitk, it is to be tested which action should be applied
-  if (scheme.contains(QString("mitk")) )
-  {
-    if(urlPath.isEmpty() ) MITK_INFO << " mitk path is empty " ;
-
-    // searching for the perspective keyword within the host name
-    if(urlHostname.contains(QByteArray("perspectives")) )
-    {
-      // the simplified method removes every whitespace
-      // ( whitespace means any character for which the standard C++ isspace() method returns true)
-      urlPath = urlPath.simplified();
-      QString perspectiveId(urlPath.data());
-      perspectiveId.replace(QString("/"), QString("") );
-
-      // is working fine as long as the perspective id is valid, if not the application crashes
-      GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
-
-      // search the Workbench for opened StdMultiWidgets to ensure the focus does not stay on the welcome screen and is switched to
-      // an StdMultiWidget if one available
-      ctkPluginContext* context = QmitkDiffusionApplicationPlugin::GetDefault()->GetPluginContext();
-      ctkServiceReference ref = context->getServiceReference<mitk::IDataStorageService>();
-      if (ref)
-      {
-        mitk::IDataStorageService* service = context->getService<mitk::IDataStorageService>(ref);
-        berry::IEditorInput::Pointer editorInput(
-              new mitk::DataStorageEditorInput( service->GetActiveDataStorage() ));
-
-        // the solution is not clean, but the dependency to the StdMultiWidget was removed in order to fix a crash problem
-        // as described in Bug #11715
-        // This is the correct way : use the static string ID variable
-        // berry::IEditorPart::Pointer editor = GetIntroSite()->GetPage()->FindEditors( editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID );
-        // QuickFix: we use the same string for an local variable
-        const QString stdEditorID = "org.mitk.editors.stdmultiwidget";
-
-        // search for opened StdMultiWidgetEditors
-        QList<berry::IEditorReference::Pointer> editorList = GetIntroSite()->GetPage()->FindEditors( editorInput, stdEditorID, 1 );
-
-        // if an StdMultiWidgetEditor open was found, give focus to it
-        if(!editorList.isEmpty())
-        {
-          GetIntroSite()->GetPage()->Activate( editorList[0]->GetPart(true) );
-        }
-      }
-    }
-  }
-  // if the scheme is set to http, by default no action is performed, if an external webpage needs to be
-  // shown it should be implemented below
-  else if (scheme.contains(QString("http")) )
-  {
-    QDesktopServices::openUrl(showMeNext);
-//    m_view->load( ) ;
-  }
-  else if(scheme.contains("qrc"))
-  {
-    m_view->load(showMeNext);
-  }
-
 }
 
 void QmitkDiffusionImagingAppIntroPart::StandbyStateChanged(bool)
 {
-
 }
-
 
 void QmitkDiffusionImagingAppIntroPart::SetFocus()
 {
-
 }

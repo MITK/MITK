@@ -219,7 +219,7 @@ public:
       {
         for ( int j = 0; j != 4; ++j )
         {
-          (*vtk_matrix)[i][j] = t + (i + j) / 8.0; // just insignificant values
+          vtk_matrix->SetElement(i, j, t + (i + j) / 8.0); // just insignificant values
         }
       }
 

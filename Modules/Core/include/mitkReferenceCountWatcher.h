@@ -69,9 +69,7 @@ public:
     m_DeleteCommand->SetCallbackFunction(this, &ReferenceCountWatcher::DeleteObserver);
     if(m_Object!=NULL)
       m_ObserverTag = m_Object->AddObserver(itk::DeleteEvent(), m_DeleteCommand);
-    m_ReferenceCountLock.Lock();
     m_ReferenceCount = 0;
-    m_ReferenceCountLock.Unlock();
   }
   //##Documentation
   //## @brief Destructor: remove observer

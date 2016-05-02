@@ -20,14 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidget>
 #include <QUrl>
-#include <QWebView>
+#include <QWebEngineView>
 #include "MitkQtWidgetsExtExports.h"
 #include <QVariant>
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 #include <itkPolyLineParametricPath.h>
 #include <mitkImageStatisticsCalculator.h>
-#include <QmitkWebPage.h>
 
 /**
 * \brief Widget which shows a histogram using JavaScript.
@@ -36,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * or segmentation. It also can display an intensity profile for
 * path elements, which lais over an image.
 */
-class MITKQTWIDGETSEXT_EXPORT QmitkHistogramJSWidget : public QWebView
+class MITKQTWIDGETSEXT_EXPORT QmitkHistogramJSWidget : public QWebEngineView
 {
   Q_OBJECT
 
@@ -234,7 +233,7 @@ private:
   * Clears the QLists m_Measurement and m_Frequency
   */
   void ClearData();
-  QmitkJSWebPage* m_Page;
+  QWebEnginePage* m_Page;
 
 private slots:
 

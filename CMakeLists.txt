@@ -203,8 +203,8 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 env_option(MITK_USE_QT "Use Qt library" ON)
 
 if(MITK_USE_QT)
-  set(MITK_QT5_MINIMUM_VERSION 5.0.0)
-  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help LinguistTools)
+  set(MITK_QT5_MINIMUM_VERSION 5.6.0)
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebEngineWidgets Xml XmlPatterns UiTools Help LinguistTools)
   if(APPLE)
     set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} DBus)
   endif()
@@ -736,6 +736,7 @@ if(WIN32)
   mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
+  mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
 endif()
 
 if(NOT MSVC_VERSION)

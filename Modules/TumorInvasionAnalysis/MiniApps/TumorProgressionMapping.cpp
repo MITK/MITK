@@ -151,7 +151,7 @@ public:
     prop->SetFontSize(40);
     prop->SetOpacity(opacity);
     textImage->AllocateScalars(VTK_UNSIGNED_SHORT,3);
-    freetype->RenderString(prop,vtkUnicodeString::from_utf8(text.c_str()),textImage);
+    freetype->RenderString(prop,vtkUnicodeString::from_utf8(text.c_str()),72,textImage);
     textImage->Modified();
 
     int* extent = textImage->GetExtent();

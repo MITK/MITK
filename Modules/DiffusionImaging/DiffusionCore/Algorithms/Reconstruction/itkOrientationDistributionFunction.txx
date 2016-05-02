@@ -366,7 +366,7 @@ namespace itk
     double b = eigenValues[1]; // ComputeEigenAnalysis gives eigenValues in ascending < order per default,
     double c = eigenValues[2]; // therefor the third eigenVector is the main direction of diffusion.
 
-    if( a <= 0.0 or b <= 0.0 or c <= 0.0 )
+    if( a <= 0.0 || b <= 0.0 || c <= 0.0 )
     {
       for ( unsigned int it=0; it < NOdfDirections; ++it ){ (*this)[it] = (T)0; }
       MITK_DEBUG << "OrientationDistributionFunction<" << typeid(T).name() << ", " << NOdfDirections
@@ -447,7 +447,7 @@ namespace itk
         assert( (*this)[i] <= (scaling*max_ev + eps*kappa*6.0) ); // biggest eigenvalue.
       }
 #endif
-      if ( (*this)[i] < T(0) or (*this)[i] > T(1) or isnan((*this)[i]) ) // P∈[0;1] sanity check.
+      if ( (*this)[i] < T(0) || (*this)[i] > T(1) || std::isnan((*this)[i]) ) // P∈[0;1] sanity check.
       { // C: NaN != NaN, C++11: isnan((*this)[i]).
         MITK_DEBUG << "OrientationDistributionFunction<" << typeid(T).name() << ", " << NOdfDirections
                    << ">::InitFromEllipsoid(" << typeid(tensor).name()

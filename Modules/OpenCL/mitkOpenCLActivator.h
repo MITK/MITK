@@ -38,7 +38,7 @@ class US_ABI_LOCAL OpenCLActivator : public us::ModuleActivator
 {
 private:
 
-  std::auto_ptr<OclResourceServiceImpl> m_ResourceService;
+  std::unique_ptr<OclResourceServiceImpl> m_ResourceService;
 
 public:
   /** @brief Load module context */

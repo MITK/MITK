@@ -51,7 +51,7 @@ namespace mitk
     VtkShadersActivator(const VtkShadersActivator&);
     VtkShadersActivator& operator=(const VtkShadersActivator&);
 
-    std::auto_ptr<VtkShaderRepository> m_VtkShaderRepository;
+    std::unique_ptr<VtkShaderRepository> m_VtkShaderRepository;
   };
 
 }

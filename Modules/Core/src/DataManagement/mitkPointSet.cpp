@@ -511,7 +511,7 @@ void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
     // point
     Point3D point = this->GetPoint( position, t );
 
-    std::auto_ptr<PointOperation> op;
+    std::unique_ptr<PointOperation> op;
     if (selected)
     {
       op.reset(new mitk::PointOperation(OpSELECTPOINT, timeInMS, point, position ));

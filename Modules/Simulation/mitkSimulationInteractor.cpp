@@ -91,7 +91,7 @@ namespace mitk
     RayModel::SPtr m_PickRayModel;
     std::vector<ComponentMouseInteraction*> m_InteractionComponents;
     ComponentMouseInteraction* m_Interaction;
-    std::auto_ptr<InteractionPerformer> m_InteractionPerformer;
+    std::unique_ptr<InteractionPerformer> m_InteractionPerformer;
     bool m_IsMouseNodeAttached;
     bool m_UseCollisionPipeline;
     BodyPicked m_LastBodyPicked;

@@ -1,5 +1,4 @@
 set(CPP_FILES
-  mitkMatchPointActivator.cpp
   mitkMAPRegistrationWrapper.cpp
   mitkMAPRegistrationWrapperObjectFactory.cpp
   mitkRegEvaluationObjectFactory.cpp
@@ -12,8 +11,6 @@ set(CPP_FILES
   Helper/mitkPointSetMappingHelper.cpp
   Helper/mitkResultNodeGenerationHelper.cpp
   Helper/mitkTimeFramesRegistrationHelper.cpp
-  IO/mitkMAPRegistrationWrapperIO.cpp
-  IO/mitkMAPRegistrationWrapperSerializer.cpp
   Rendering/mitkRegistrationWrapperMapper2D.cpp
   Rendering/mitkRegistrationWrapperMapper3D.cpp
   Rendering/mitkRegistrationWrapperMapperBase.cpp
@@ -41,8 +38,6 @@ set(H_FILES
   Helper/mitkPointSetMappingHelper.h
   Helper/mitkResultNodeGenerationHelper.h
   Helper/mitkTimeFramesRegistrationHelper.h
-  IO/mitkMAPRegistrationWrapperIO.h
-  IO/mitkMAPRegistrationWrapperSerializer.h
   Rendering/mitkRegistrationWrapperMapper2D.h
   Rendering/mitkRegistrationWrapperMapper3D.h
   Rendering/mitkRegistrationWrapperMapperBase.h

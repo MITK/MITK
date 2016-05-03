@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkMAPRegistrationWrapperSerializer_h
 #define __mitkMAPRegistrationWrapperSerializer_h
 
-#include "MitkMatchPointRegistrationExports.h"
 #include <mitkBaseDataSerializer.h>
 
 namespace mitk
@@ -26,7 +25,7 @@ namespace mitk
 /**
   \brief Serializes mitk::MAPRegistrationWrapper for mitk::SceneIO
 */
-class MITKMATCHPOINTREGISTRATION_EXPORT MAPRegistrationWrapperSerializer : public BaseDataSerializer
+class MAPRegistrationWrapperSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( MAPRegistrationWrapperSerializer, BaseDataSerializer );

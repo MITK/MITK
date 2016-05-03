@@ -73,4 +73,3 @@ std::string mitk::MAPRegistrationWrapperSerializer::Serialize()
   }
   return filename;
 }
-

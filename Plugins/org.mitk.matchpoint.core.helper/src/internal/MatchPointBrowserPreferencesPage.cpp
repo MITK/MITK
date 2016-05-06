@@ -145,7 +145,7 @@ void MatchPointBrowserPreferencesPage::PerformCancel()
 void MatchPointBrowserPreferencesPage::Update()
 {
   m_DebugOutput->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME.c_str(), false));
-  m_LoadFromApplicationDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR.c_str(), false));
+  m_LoadFromApplicationDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR.c_str(), true));
   m_LoadFromHomeDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR.c_str(), false));
   m_LoadFromCurrentDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR.c_str(), false));
   m_LoadFromAutoLoadPathDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR.c_str(), false));

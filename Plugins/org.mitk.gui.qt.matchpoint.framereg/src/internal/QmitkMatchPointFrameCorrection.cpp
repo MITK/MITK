@@ -26,9 +26,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkPointSet.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkMAPAlgorithmInfoSelection.h>
+#include <mitkRegistrationHelper.h>
+#include <mitkResultNodeGenerationHelper.h>
 
 // Qmitk
 #include "QmitkMatchPointFrameCorrection.h"
+#include <QmitkRegistrationJob.h>
+#include <QmitkMappingJob.h>
 
 // Qt
 #include <QMessageBox>
@@ -47,13 +56,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mapExceptionObjectMacros.h>
 #include <mapConvert.h>
 #include <mapDeploymentDLLAccess.h>
-
-// Map4CTK
-#include <mitkMAPAlgorithmInfoSelection.h>
-#include <QmitkRegistrationJob.h>
-#include <QmitkMappingJob.h>
-#include <mitkRegistrationHelper.h>
-#include <mitkResultNodeGenerationHelper.h>
 
 const std::string QmitkMatchPointFrameCorrection::VIEW_ID =
   "org.mitk.views.matchpoint.algorithm.framereg";
@@ -230,6 +232,13 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
 
   mitk::DataNode::Pointer oldTargetNode = m_spSelectedTargetNode;
 
+  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
+
+  mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+
   if (m_LoadedAlgorithm.IsNull())
   {
     m_Controls.m_lbLoadedAlgorithmName->setText(
@@ -302,8 +311,8 @@ bool QmitkMatchPointFrameCorrection::CheckInputs()
         m_spSelectedTargetMaskNode = nodes.front();
         m_spSelectedTargetMaskData = NULL;
         targetMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
-        bool isMask = false;
-        m_spSelectedTargetMaskNode->GetBoolProperty("binary", isMask);
+
+        bool isMask = maskPredicate->CheckNode(m_spSelectedTargetMaskNode);
 
         if (!isMask)
         {

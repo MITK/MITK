@@ -31,6 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
 #include <mitkAlgorithmHelper.h>
+#include <mitkResultNodeGenerationHelper.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateOr.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
 
 // Qmitk
 #include "QmitkMatchPointMapper.h"
@@ -113,16 +118,14 @@ bool  QmitkMatchPointMapper::IsAbleToRefineGeometry() const
 
 bool  QmitkMatchPointMapper::IsBinaryInput() const
 {
-    bool result = false;
-    bool binary = false;
+    mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
+    mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+    mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
 
-    if (this->m_spSelectedInputNode.IsNotNull())
-    {
-        if (this->m_spSelectedInputNode->GetBoolProperty("binary", binary))
-        {
-            result = binary;
-        }
-    }
+    mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+
+    bool result = maskPredicate->CheckNode(this->m_spSelectedInputNode);
 
     return result;
 }

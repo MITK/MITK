@@ -152,11 +152,7 @@ void QmitkMatchPointBrowser::CreateQtPartControl(QWidget* parent)
     m_Controls.m_algoTreeView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     m_Controls.m_algoTreeView->header()->setStretchLastSection(false);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    m_Controls.m_algoTreeView->header()->setResizeMode(0, QHeaderView::Stretch);
-#else
     m_Controls.m_algoTreeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-#endif
     m_Controls.m_algoTreeView->setColumnHidden(3, true);
 
     this->CreateConnections();
@@ -182,7 +178,7 @@ void QmitkMatchPointBrowser::RetrieveAndStorePreferenceValues()
     berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
 
     bool loadApplicationDir = prefs->GetBool(
-        MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR.c_str(), false);
+        MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR.c_str(), true);
     bool loadHomeDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR.c_str(), false);
     bool loadCurrentDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR.c_str(),
         false);

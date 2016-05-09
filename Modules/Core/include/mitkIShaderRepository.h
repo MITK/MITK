@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <list>
 
 class vtkActor;
-class vtkShaderProgram2;
+class vtkShaderProgram;
 
 namespace mitk
 {
@@ -43,10 +43,12 @@ namespace mitk
    * in mappers.
    */
   struct MITKCORE_EXPORT IShaderRepository
+
   {
     struct ShaderPrivate;
 
     class MITKCORE_EXPORT Shader : public itk::LightObject
+
     {
     public:
       mitkClassMacroItkParent(Shader, itk::LightObject) itkFactorylessNewMacro(Self)

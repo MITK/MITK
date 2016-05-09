@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkShaderProgram.h"
 
-#include "vtkShader2.h"
+#include "vtkShader.h"
 
 mitk::VtkShaderProgram::VtkShaderProgram() : m_VtkShaderProgram(NULL)
 {
@@ -30,7 +30,7 @@ void mitk::VtkShaderProgram::Activate()
 {
   if (m_VtkShaderProgram)
   {
-    m_VtkShaderProgram->Use();
+//    m_VtkShaderProgram->Use(); //TODO 18922
   }
 }
 
@@ -38,16 +38,16 @@ void mitk::VtkShaderProgram::Deactivate()
 {
   if (m_VtkShaderProgram)
   {
-    m_VtkShaderProgram->Restore();
+//    m_VtkShaderProgram->Restore(); //TODO 18922
   }
 }
 
-void mitk::VtkShaderProgram::SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram2> p)
+void mitk::VtkShaderProgram::SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram> p)
 {
   m_VtkShaderProgram = p;
 }
 
-vtkSmartPointer<vtkShaderProgram2> mitk::VtkShaderProgram::GetVtkShaderProgram() const
+vtkSmartPointer<vtkShaderProgram> mitk::VtkShaderProgram::GetVtkShaderProgram() const
 {
   return m_VtkShaderProgram;
 }

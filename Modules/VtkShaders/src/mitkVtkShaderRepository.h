@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _MITKVTKSHADERREPOSITORY_H_
 
 #include "mitkIShaderRepository.h"
-#include <vtkShaderProgram2.h>
+#include <vtkShaderProgram.h>
 #include <vtkXMLShader.h>
 
 class vtkXMLDataElement;

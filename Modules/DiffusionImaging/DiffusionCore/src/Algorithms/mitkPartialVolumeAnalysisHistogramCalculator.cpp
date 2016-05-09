@@ -60,7 +60,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <iostream>
 #include <sstream>
-#include <type_traits>
 
 namespace mitk
 {
@@ -700,8 +699,8 @@ namespace mitk
     }
     else
     {
-      //      typedef typename itk::BSplineInterpolateImageFunction<ImageType, double>
-      //          InterpolatorType;
+      //   typedef typename itk::BSplineInterpolateImageFunction<ImageType, double>
+      //   InterpolatorType;
       typedef typename itk::LinearInterpolateImageFunction<ImageType, double> InterpolatorType;
 
       typename InterpolatorType::Pointer interpolator

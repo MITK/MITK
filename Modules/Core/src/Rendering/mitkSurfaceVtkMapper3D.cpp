@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkScalarModeProperty.h>
 #include <mitkClippingProperty.h>
 #include <mitkSmartPointerProperty.h>
-#include <mitkIShaderRepository.h>
 #include <mitkExtractSliceFilter.h>
 #include <mitkImageSliceSelector.h>
 #include <mitkCoreServices.h>
@@ -499,12 +498,12 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     node->AddProperty("material.edgeColor", mitk::ColorProperty::New(0.5f, 0.5f, 0.5f), renderer, overwrite);
   }
 
-  // Shaders
-  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
-  if (shaderRepo)
-  {
-    shaderRepo->AddDefaultProperties(node, renderer, overwrite);
-  }
+//  // Shaders
+//  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+//  if (shaderRepo)
+//  {
+//    shaderRepo->AddDefaultProperties(node, renderer, overwrite);
+//  }
 }
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)

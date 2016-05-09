@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPLANECLIPPING_H_HEADER_INCLUDED
 #define MITKPLANECLIPPING_H_HEADER_INCLUDED
 
-#include <vtkPoints.h>
 #include <mitkGeometry3D.h>
 #include <mitkPlaneGeometry.h>
+#include <vtkPoints.h>
+#include <vtkSmartPointer.h>
 #include <vtkTransform.h>
 
 namespace mitk {

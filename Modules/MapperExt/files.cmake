@@ -13,8 +13,6 @@ set(CPP_FILES
   vtkMaskedGlyph2D.cpp
   vtkMaskedGlyph3D.cpp
   vtkMitkGPUVolumeRayCastMapper.cpp
-  vtkMitkOpenGLVolumeTextureMapper3D.cpp
-  vtkMitkVolumeTextureMapper3D.cpp
   vtkUnstructuredGridMapper.cpp
 
   vtkPointSetSlicer.cxx

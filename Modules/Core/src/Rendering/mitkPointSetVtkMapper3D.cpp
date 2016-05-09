@@ -42,9 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 #include <vtkMatrix4x4.h>
 
-#include <vtkgl.h>
-
 #include <mitkPropertyObserver.h>
+#include <vtk_glew.h>
 
 const mitk::PointSet* mitk::PointSetVtkMapper3D::GetInput()
 {

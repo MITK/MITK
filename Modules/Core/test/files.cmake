@@ -85,7 +85,6 @@ set(MODULE_TESTS
   mitkImageDimensionConverterTest.cpp
   mitkLoggingAdapterTest.cpp
   mitkUIDGeneratorTest.cpp
-  mitkShaderRepositoryTest.cpp
   mitkPlanePositionManagerTest.cpp
   mitkAffineTransformBaseTest.cpp
   mitkPropertyAliasesTest.cpp

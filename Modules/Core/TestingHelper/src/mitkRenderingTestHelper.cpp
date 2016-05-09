@@ -30,7 +30,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // include gl to read out properties
 #include <vtkOpenGL.h>
-#include <vtkOpenGLExtensionManager.h>
 #include <vtksys/SystemTools.hxx>
 
 #if defined _MSC_VER

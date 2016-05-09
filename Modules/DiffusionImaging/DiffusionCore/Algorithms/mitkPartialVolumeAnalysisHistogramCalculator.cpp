@@ -662,14 +662,14 @@ namespace mitk
     // Direction
     typename ResamplerType::DirectionType direction;
     typename mitk::AffineTransform3D::MatrixType matrix = planegeo->GetIndexToWorldTransform()->GetMatrix();
-    for(unsigned int c=0; c<matrix.ColumnDimensions; c++)
+    for(decltype(matrix.ColumnDimensions) c = 0; c < matrix.ColumnDimensions; ++c)
     {
       double sum = 0;
-      for(unsigned int r=0; r<matrix.RowDimensions; r++)
+      for(decltype(matrix.ColumnDimensions) r=0; r<matrix.RowDimensions; ++r)
       {
         sum += matrix(r,c)*matrix(r,c);
       }
-      for(unsigned int r=0; r<matrix.RowDimensions; r++)
+      for(decltype(matrix.ColumnDimensions) r=0; r<matrix.RowDimensions; ++r)
       {
         direction(r,c) = matrix(r,c)/sqrt(sum);
       }

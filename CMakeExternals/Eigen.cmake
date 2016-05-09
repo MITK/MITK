@@ -21,7 +21,7 @@ if(MITK_USE_Eigen)
       URL_MD5 9e3bfaaab3db18253cfd87ea697b3ab1
       CMAKE_ARGS
         ${ep_common_args}
-        -DBUILD_TESTING:BOOL=OFF
+        -DBUILD_TESTING:BOOL=ON
         -DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

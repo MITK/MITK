@@ -26,12 +26,6 @@ if(MITK_USE_DCMTK)
       )
     endif()
 
-    set(use_cxx11_stl ON)
-
-    if(MSVC)
-      set(use_cxx11_stl OFF)
-    endif()
-
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20160216.tar.gz
@@ -43,7 +37,7 @@ if(MITK_USE_DCMTK)
          ${additional_args}
          "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS} ${DCMTK_C_FLAGS}"
-         -DDCMTK_USE_CXX11_STL:BOOL=${use_cxx11_stl}
+         -DDCMTK_USE_CXX11_STL:BOOL=OFF
          -DDCMTK_WITH_DOXYGEN:BOOL=OFF
          -DDCMTK_WITH_ZLIB:BOOL=OFF # see bug #9894
          -DDCMTK_WITH_OPENSSL:BOOL=OFF # see bug #9894

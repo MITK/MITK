@@ -39,13 +39,13 @@ bool mitk::USVideoDeviceCustomControls::GetIsActive()
 void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::USImageCropping newArea)
 {
   MITK_INFO << "Set Crop Area L:" << newArea.left << " R:" << newArea.right
-            << " T:" << newArea.top << " B:" << newArea.bottom;
+    << " T:" << newArea.top << " B:" << newArea.bottom;
 
   if (m_ImageSource.IsNotNull())
   {
     // if area is empty, remove region
-    if((newArea.bottom==0) && (newArea.top==0)&&
-      (newArea.left==0) && (newArea.right==0))
+    if ((newArea.bottom == 0) && (newArea.top == 0) &&
+      (newArea.left == 0) && (newArea.right == 0))
     {
       m_ImageSource->RemoveRegionOfInterest();
     }
@@ -58,6 +58,16 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
   {
     MITK_WARN << "Cannot set crop are, source is not initialized!";
   }
+}
+
+void mitk::USVideoDeviceCustomControls::SetNewDepth(double depth)
+{
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH, depth);
+}
+
+void mitk::USVideoDeviceCustomControls::SetNewProbeIdentifier(std::string probename)
+{
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED, probename);
 }
 
 mitk::USImageVideoSource::USImageCropping mitk::USVideoDeviceCustomControls::GetCropArea()

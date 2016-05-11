@@ -1,0 +1,19 @@
+<statemachine>
+  <state name="start" startstate="true">
+    <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="radius">
+      <action name="addCenter" />
+    </transition>
+  </state>
+  <state name="radius">
+    <transition event_class="MouseMoveEvent" event_variant="StdMouseMove" target="radius">
+      <action name="changeRadius" />
+    </transition>
+    <transition event_class="MousePressEvent" event_variant="StdMousePressPrimaryButton" target="final">
+      <action name="endCreation" />
+      </transition>
+    <transition event_class="MousePressEvent" event_variant="StdMousePressSecondaryButton" target="start">
+      <action name="abortCreation" />
+    </transition>
+  </state>
+  <state name="final"><!-- final state in which nothing is done anymore --></state>
+</statemachine>

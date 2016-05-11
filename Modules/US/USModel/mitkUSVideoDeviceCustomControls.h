@@ -24,52 +24,62 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 
 namespace mitk {
-/**
-  * \brief Custom controls for mitk::USVideoDevice.
-  * Controls image cropping of the corresponding mitk::USImageVideoSource.
-  */
-class MITKUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
-{
-public:
-  mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
-  mitkNewMacro1Param(Self, itk::SmartPointer<USVideoDevice>);
-
   /**
-    * Activate or deactivate the custom controls. This is just for handling
-    * widget visibility in a GUI for example. Cropping will not be deactivated
-    * if this method is called with false. Use
-    * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
-    * instead.
+    * \brief Custom controls for mitk::USVideoDevice.
+    * Controls image cropping of the corresponding mitk::USImageVideoSource.
     */
-  virtual void SetIsActive( bool isActive ) override;
+  class MITKUS_EXPORT USVideoDeviceCustomControls : public USAbstractControlInterface
+  {
+  public:
+    mitkClassMacro(USVideoDeviceCustomControls, USAbstractControlInterface);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USVideoDevice>);
 
-  /**
-    * \return if this custom controls are currently activated
-    */
-  virtual bool GetIsActive( ) override;
+    /**
+      * Activate or deactivate the custom controls. This is just for handling
+      * widget visibility in a GUI for example. Cropping will not be deactivated
+      * if this method is called with false. Use
+      * mitk::USVideoDeviceCustomControls::SetCropArea() with an empty are
+      * instead.
+      */
+    virtual void SetIsActive(bool isActive) override;
 
-  /**
-    * \brief Sets the area that will be cropped from the US image.
-    * Set [0,0,0,0] to disable it, which is also default.
-    */
-  void SetCropArea( USImageVideoSource::USImageCropping newArea );
+    /**
+      * \return if this custom controls are currently activated
+      */
+    virtual bool GetIsActive() override;
 
-  /**
-    * \return area currently set for image cropping
-    */
-  mitk::USImageVideoSource::USImageCropping GetCropArea( );
+    /**
+      * \brief Sets the area that will be cropped from the US image.
+      * Set [0,0,0,0] to disable it, which is also default.
+      */
+    void SetCropArea(USImageVideoSource::USImageCropping newArea);
 
-protected:
-  /**
-    * Class needs an mitk::USImageVideoSource object for beeing constructed.
-    * This object will be manipulated by the custom controls methods.
-    */
-  USVideoDeviceCustomControls( itk::SmartPointer<USVideoDevice> device );
-  virtual ~USVideoDeviceCustomControls( );
+    /**
+      * \return area currently set for image cropping
+      */
+    mitk::USImageVideoSource::USImageCropping GetCropArea();
 
-  bool                          m_IsActive;
-  USImageVideoSource::Pointer   m_ImageSource;
-};
+    /**
+      * \brief Sets new depth value
+      */
+    void SetNewDepth(double depth);
+
+    /**
+      * \ brief Sets new probe identifier
+      */
+    void SetNewProbeIdentifier(std::string probename);
+
+  protected:
+    /**
+      * Class needs an mitk::USImageVideoSource object for beeing constructed.
+      * This object will be manipulated by the custom controls methods.
+      */
+    USVideoDeviceCustomControls(itk::SmartPointer<USVideoDevice> device);
+    virtual ~USVideoDeviceCustomControls();
+
+    bool                          m_IsActive;
+    USImageVideoSource::Pointer   m_ImageSource;
+  };
 } // namespace mitk
 
 #endif // MITKUSVideoDeviceCustomControls_H_HEADER_INCLUDED_

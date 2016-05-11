@@ -222,6 +222,13 @@ private: void VerifyImage() const;
    */
 public: QString GetImageFilename() const;
 
+    /**
+    * Return the case perspective for this editor.
+    *
+    * @return the label
+    */
+public: QString GetCase() const override;
+
   /**
    * Return the user printable label for this editor.
    *

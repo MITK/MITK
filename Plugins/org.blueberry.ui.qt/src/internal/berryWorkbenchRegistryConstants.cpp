@@ -132,6 +132,8 @@ namespace berry {
 
   const QString WorkbenchRegistryConstants::ATT_MOVEABLE = "moveable"; //$NON-NLS-1$
 
+  const QString WorkbenchRegistryConstants::ATT_CASE = "case"; //$NON-NLS-1$
+
   const QString WorkbenchRegistryConstants::ATT_NAME = "name"; //$NON-NLS-1$
 
   const QString WorkbenchRegistryConstants::ATT_NAME_FILTER = "nameFilter"; //$NON-NLS-1$

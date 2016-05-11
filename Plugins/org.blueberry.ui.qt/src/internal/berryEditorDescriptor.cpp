@@ -178,6 +178,15 @@ QString EditorDescriptor::GetImageFilename() const
   return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON);
 }
 
+QString EditorDescriptor::GetCase() const
+{
+  if (configurationElement.IsNull())
+  {
+    return 0;
+  }
+  return configurationElement->GetAttribute(WorkbenchRegistryConstants::ATT_CASE);
+}
+
 QString EditorDescriptor::GetLabel() const
 {
   //if (program == null)

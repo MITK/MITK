@@ -100,6 +100,11 @@ QIcon ViewDescriptor::GetImageDescriptor() const
   return imageDescriptor;
 }
 
+QString ViewDescriptor::GetCase() const
+{
+  return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_CASE);
+}
+
 QString ViewDescriptor::GetLabel() const
 {
   return configElement->GetAttribute(WorkbenchRegistryConstants::ATT_NAME);

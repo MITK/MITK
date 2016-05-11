@@ -53,6 +53,14 @@ struct BERRY_UI_QT IWorkbenchPartDescriptor : public virtual Object
    */
   virtual QIcon GetImageDescriptor() const = 0;
 
+
+  /**
+  * Returns the case perspecitve or 0.
+  *
+  * @return the part case
+  */
+  virtual QString GetCase() const = 0;
+
   /**
    * Returns the label to show for this part.
    *

@@ -324,6 +324,11 @@ struct WorkbenchRegistryConstants {
   static const QString ATT_MOVEABLE; // "moveable";
 
   /**
+  * Name attribute. Value <code>case</code>.
+  */
+  static const QString ATT_CASE; // "case";
+
+  /**
    * Name attribute. Value <code>name</code>.
    */
   static const QString ATT_NAME; // "name";

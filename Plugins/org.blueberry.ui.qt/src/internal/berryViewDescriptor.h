@@ -96,6 +96,11 @@ public:
   QIcon GetImageDescriptor() const override;
 
   /* (non-Javadoc)
+  * @see org.blueberry.ui.IWorkbenchPartDescriptor#getCase()
+  */
+  QString GetCase() const override;
+
+  /* (non-Javadoc)
    * @see org.blueberry.ui.IWorkbenchPartDescriptor#getLabel()
    */
   QString GetLabel() const override;

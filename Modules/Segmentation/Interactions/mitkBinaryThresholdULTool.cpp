@@ -148,6 +148,11 @@ void mitk::BinaryThresholdULTool::CancelThresholding()
 
 void mitk::BinaryThresholdULTool::SetupPreviewNode()
 {
+  itk::RGBPixel<float> pixel;
+  pixel[0] = 0.0f;
+  pixel[1] = 1.0f;
+  pixel[2] = 0.0f;
+
   if (m_NodeForThresholding.IsNotNull())
   {
     Image::Pointer image = dynamic_cast<Image*>( m_NodeForThresholding->GetData() );
@@ -155,24 +160,39 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
 
     if (image.IsNotNull())
     {
-      mitk::Image* workingimage = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+      mitk::LabelSetImage::Pointer workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
 
-      if (workingimage)
+      if (workingImage.IsNotNull())
       {
-        m_ThresholdFeedbackNode->SetData(workingimage->Clone());
+        m_ThresholdFeedbackNode->SetData(workingImage->Clone());
+        m_IsOldBinary = false;
 
         //Let's paint the feedback node green...
         mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
 
-        itk::RGBPixel<float> pixel;
-        pixel[0] = 0.0f;
-        pixel[1] = 1.0f;
-        pixel[2] = 0.0f;
+        if(previewImage.IsNull())
+        {
+            MITK_ERROR << "Cannot create helper objects.";
+            return;
+        }
+
         previewImage->GetActiveLabel()->SetColor(pixel);
         previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
       }
       else
-        m_ThresholdFeedbackNode->SetData( mitk::Image::New() );
+      {
+        mitk::Image::Pointer workingImageBin = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+        if(workingImageBin)
+        {
+          m_ThresholdFeedbackNode->SetData( workingImageBin->Clone() );
+          m_IsOldBinary = true;
+        }
+        else
+          m_ThresholdFeedbackNode->SetData( mitk::Image::New() );
+      }
+
+      m_ThresholdFeedbackNode->SetColor(pixel);
+      m_ThresholdFeedbackNode->SetOpacity(0.5);
 
       int layer(50);
       m_NodeForThresholding->GetIntProperty("layer", layer);
@@ -326,6 +346,24 @@ static void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage,
   segmentation->SetVolume( (void*) (filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
 }
 
+template <typename TPixel, unsigned int VImageDimension>
+static void ITKThresholdingOldBinary( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double lower, double upper, unsigned int timeStep )
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+  typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
+
+  typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
+  filter->SetInput(originalImage);
+  filter->SetLowerThreshold(lower);
+  filter->SetUpperThreshold(upper);
+  filter->SetInsideValue(1);
+  filter->SetOutsideValue(0);
+  filter->Update();
+
+  segmentation->SetVolume( (void*) (filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+}
+
 void mitk::BinaryThresholdULTool::UpdatePreview()
 {
   mitk::Image::Pointer thresholdImage = dynamic_cast<mitk::Image*> (m_NodeForThresholding->GetData());
@@ -340,7 +378,14 @@ void mitk::BinaryThresholdULTool::UpdatePreview()
       timeSelector->UpdateLargestPossibleRegion();
       Image::Pointer feedBackImage3D = timeSelector->GetOutput();
 
-      AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
+      if(m_IsOldBinary)
+      {
+        AccessByItk_n(feedBackImage3D, ITKThresholdingOldBinary, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
+      }
+      else
+      {
+        AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
+      }
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
   }

@@ -77,6 +77,8 @@ namespace mitk
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double thresholdValue, unsigned int timeStep );
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKThresholdingOldBinary( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double thresholdValue, unsigned int timeStep );
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;
@@ -87,6 +89,7 @@ namespace mitk
     double m_CurrentThresholdValue;
     bool m_IsFloatImage;
 
+    bool m_IsOldBinary = false;
   };
 
 } // namespace

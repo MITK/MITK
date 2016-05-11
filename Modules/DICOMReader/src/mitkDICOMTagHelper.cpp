@@ -190,7 +190,7 @@ std::string
 mitk::GeneratPropertyNameForDICOMTag(const mitk::DICOMTag& tag)
 {
     std::ostringstream nameStream;
-    nameStream << "DICOM." << tag.GetGroup() << "." << tag.GetElement();
+    nameStream << "DICOM." << std::setw(4) << std::setfill('0') << std::hex << tag.GetGroup() << "." << std::setw(4) << std::setfill('0') << std::hex << tag.GetElement();
 
     return nameStream.str();
 };

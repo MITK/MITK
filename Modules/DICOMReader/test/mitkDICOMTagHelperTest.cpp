@@ -15,6 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDICOMTagHelper.h"
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
+
 #include <limits>
 
 class mitkDICOMTagHelperTestSuite : public mitk::TestFixture
@@ -41,10 +44,10 @@ public:
     void GeneratPropertyNameForDICOMTag()
     {
         std::string result = mitk::GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0018, 0x0080));
-        MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0018.0080", "Testing GetTimeBounds lower part with m_emptyTimeGeometry");
+        MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0018.0080", "Testing GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0018, 0x0080)");
 
         result = mitk::GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0008, 0x001a));
-        MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0008.001a", "Testing GetTimeBounds lower part with m_emptyTimeGeometry");
+        MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0008.001a", "Testing GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0008, 0x001a)");
     }
 
     void GetDefaultDICOMTagsOfInterest()

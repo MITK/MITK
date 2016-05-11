@@ -75,7 +75,7 @@ void QmlMitkRenderWindowItem::createPlaneNode()
     if (this->GetRenderer()->GetSliceNavigationController()->GetDefaultViewDirection() == mitk::SliceNavigationController::Original)
         return;
 
-    mitk::DataNode::Pointer		planeNode;
+    mitk::DataNode::Pointer   planeNode;
     mitk::IntProperty::Pointer  layer;
     mitk::PlaneGeometryDataMapper2D::Pointer mapper = mitk::PlaneGeometryDataMapper2D::New();
 
@@ -284,7 +284,7 @@ int QmlMitkRenderWindowItem::getViewType()
 void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
-    mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
+    //mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
 
     mitk::MousePressEvent::Pointer mPressEvent =
     mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
@@ -296,7 +296,7 @@ void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
-    mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
+    //mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
 
     mitk::MouseReleaseEvent::Pointer mReleaseEvent =
     mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
@@ -308,7 +308,7 @@ void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
 {
     mitk::Point2D mousePosition = GetMousePosition(me);
-    mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
+    //mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
 
     mitk::MouseMoveEvent::Pointer mMoveEvent =
     mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me));

@@ -286,8 +286,8 @@ bool
 
   for (DICOMGDCMImageFrameList::const_iterator pos = frameList.begin(); pos != frameList.end(); ++pos)
   {
-    std::string dateStr = (*pos)->GetTagValueAsString(acquisitionDateTag);
-    std::string timeStr = (*pos)->GetTagValueAsString(acquisitionTimeTag);
+    std::string dateStr = (*pos)->GetTagValueAsString(acquisitionDateTag).value;
+    std::string timeStr = (*pos)->GetTagValueAsString(acquisitionTimeTag).value;
 
     OFDateTime time;
     bool convertResult = ConvertDICOMDateTimeString(dateStr, timeStr, time);

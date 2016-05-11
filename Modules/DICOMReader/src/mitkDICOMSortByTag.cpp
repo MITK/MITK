@@ -98,12 +98,13 @@ mitk::DICOMSortByTag
   assert(left);
   assert(right);
 
-  std::string leftString = left->GetTagValueAsString(tag);
-  std::string rightString = right->GetTagValueAsString(tag);
-
-  if (leftString != rightString)
+  DICOMDatasetFinding leftFinding = left->GetTagValueAsString(tag);
+  DICOMDatasetFinding rightFinding = right->GetTagValueAsString(tag);
+  //Doesn't care if findings are valid or not. If they are not valid,
+  //value is empty, thats enough.
+  if (leftFinding.value != rightFinding.value)
   {
-    return leftString.compare(rightString) < 0;
+    return leftFinding.value.compare(rightFinding.value) < 0;
   }
   else
   {
@@ -118,11 +119,13 @@ mitk::DICOMSortByTag
   assert(left);
   assert(right);
 
-  std::string leftString = left->GetTagValueAsString(tag);
-  std::string rightString = right->GetTagValueAsString(tag);
+  DICOMDatasetFinding leftFinding = left->GetTagValueAsString(tag);
+  DICOMDatasetFinding rightFinding = right->GetTagValueAsString(tag);
+  //Doesn't care if findings are valid or not. If they are not valid,
+  //value is empty, thats enough.
 
-  std::istringstream lefti(leftString);
-  std::istringstream righti(rightString);
+  std::istringstream lefti(leftFinding.value);
+  std::istringstream righti(rightFinding.value);
 
   double leftDouble(0);
   double rightDouble(0);
@@ -152,11 +155,13 @@ mitk::DICOMSortByTag
   assert(from);
   assert(to);
 
-  std::string fromString = from->GetTagValueAsString(m_Tag);
-  std::string toString = to->GetTagValueAsString(m_Tag);
+  DICOMDatasetFinding fromFinding = from->GetTagValueAsString(m_Tag);
+  DICOMDatasetFinding toFinding = to->GetTagValueAsString(m_Tag);
+  //Doesn't care if findings are valid or not. If they are not valid,
+  //value is empty, thats enough.
 
-  std::istringstream fromi(fromString);
-  std::istringstream toi(toString);
+  std::istringstream fromi(fromFinding.value);
+  std::istringstream toi(toFinding.value);
 
   double fromDouble(0);
   double toDouble(0);
@@ -168,7 +173,7 @@ mitk::DICOMSortByTag
   }
   else
   {
-    MITK_WARN << "NO NUMERIC DISTANCE between '" << fromString << "' and '" << toString << "'";
+    MITK_WARN << "NO NUMERIC DISTANCE between '" << fromFinding.value << "' and '" << toFinding.value << "'";
     return 0;
   }
 

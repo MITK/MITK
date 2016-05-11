@@ -106,8 +106,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
     // get block characteristics of first block
     unsigned int currentBlockNumberOfSlices = firstBlock.size();
-    std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
-    std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+    std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
+    std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
 
     remainingBlocks.pop_front();
 
@@ -120,8 +120,8 @@ mitk::ThreeDnTDICOMSeriesReader
       DICOMGDCMImageFrameList& otherBlock = *otherBlockIter;
 
       unsigned int otherBlockNumberOfSlices = otherBlock.size();
-      std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient );
-      std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+      std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
+      std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later

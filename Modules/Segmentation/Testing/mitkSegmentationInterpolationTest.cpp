@@ -19,12 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 // other
+#include <mitkExtractSliceFilter.h>
 #include <mitkImage.h>
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkIOUtil.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkTool.h>
+#include <mitkVtkImageOverwrite.h>
 
 class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
@@ -64,13 +66,13 @@ public:
 
         // Work in the center of the image
         m_CenterPoint = {{ 127, 127, 25 }};
+//        m_CenterPoint = {{ 15, 15, 15 }};
     }
 
     void tearDown() override
     {
         m_ReferenceImage = nullptr;
         m_SegmentationImage = nullptr;
-        m_InterpolationController->Delete();
         m_CenterPoint = {{ 0, 0, 0 }};
     }
 
@@ -87,9 +89,9 @@ public:
          *
          * put accessor in scope
          */
+        itk::Index<3> currentPoint;
         {
             mitk::ImagePixelWriteAccessor<mitk::Tool::DefaultSegmentationDataType, 3> writeAccessor(m_SegmentationImage);
-            itk::Index<3> currentPoint;
 
             // Fill 3x3 slice
             currentPoint[dim] = m_CenterPoint[dim] - 1;
@@ -107,6 +109,8 @@ public:
             writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
         }
 
+        mitk::IOUtil::Save(m_SegmentationImage, "/home/jenspetersen/Desktop/preseg.nrrd");
+
         m_InterpolationController->SetSegmentationVolume(m_SegmentationImage);
         m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
 
@@ -114,32 +118,54 @@ public:
         // Note: Index = (sag, cor, ax); PlaneOrientation enum = (ax, sag, cor) in this situation
         mitk::BaseGeometry::Pointer currentGeometry = m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
         mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(currentGeometry.GetPointer());
-        slicedGeometry->InitializePlanes(currentGeometry, mitk::PlaneGeometry::PlaneOrientation((dim+1)%3), true, true, false);
-        mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry(m_CenterPoint[dim]));
+        slicedGeometry->InitializePlanes(currentGeometry, mitk::PlaneGeometry::PlaneOrientation(1));
+        mitk::PlaneGeometry* plane = slicedGeometry->GetPlaneGeometry(m_CenterPoint[dim]);
         mitk::Image::Pointer interpolationResult = m_InterpolationController->Interpolate(dim, m_CenterPoint[dim], plane, 0);
 
+        // Write result into segmentation image
+        vtkSmartPointer<mitkVtkImageOverwrite> reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+        reslicer->SetInputSlice(interpolationResult->GetSliceData()->GetVtkImageAccessor(interpolationResult)->GetVtkImageData());
+        reslicer->SetOverwriteMode(true);
+        reslicer->Modified();
+        mitk::ExtractSliceFilter::Pointer extractor =  mitk::ExtractSliceFilter::New(reslicer);
+        extractor->SetInput(m_SegmentationImage);
+        extractor->SetTimeStep(0);
+        extractor->SetWorldGeometry(plane);
+        extractor->SetVtkOutputRequest(true);
+        extractor->SetResliceTransformByGeometry(currentGeometry);
+        extractor->Modified();
+        extractor->Update();
+
+        mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolation.nrrd");
+        mitk::IOUtil::Save(m_SegmentationImage, "/home/jenspetersen/Desktop/postseg.nrrd");
+
         // Check a 4x4 square, the center of which needs to be filled
-        mitk::ImagePixelReadAccessor<mitk::Tool::DefaultSegmentationDataType, 2> readAccess(interpolationResult);
-        itk::Index currentPoint2D;
+        mitk::ImagePixelReadAccessor<mitk::Tool::DefaultSegmentationDataType, 3> readAccess(m_SegmentationImage);
+        currentPoint = m_CenterPoint;
+
         for (int i=-1; i<=2; ++i)
         {
             for (int j=-1; j<=2; ++j)
             {
-                currentPoint[dim%2] = m_CenterPoint[(dim+1)%3] + i;
-                currentPoint[(dim+1)%2] = m_CenterPoint[(dim+2)%3] + j;
+                currentPoint[(dim+1)%3] = m_CenterPoint[(dim+1)%3] + i;
+                currentPoint[(dim+2)%3] = m_CenterPoint[(dim+2)%3] + j;
+
+                MITK_INFO << currentPoint << ": " << readAccess.GetPixelByIndexSafe(currentPoint);
+
                 if (i == -1 || i == 2 || j == -1 || j == 2)
                 {
-                    MITK_ASSERT_EQUAL(readAccess.GetPixelByIndexSafe(currentPoint2D), 0, "Have false positive segmentation.");
+//                    CPPUNIT_ASSERT_MESSAGE("Have false positive segmentation.", readAccess.GetPixelByIndexSafe(currentPoint) == 0);
                 }
                 else
                 {
-                    MITK_ASSERT_EQUAL(readAccess.GetPixelByIndexSafe(currentPoint2D), 1, "Have false negative segmentation.");
+//                    CPPUNIT_ASSERT_MESSAGE("Have false negative segmentation.", readAccess.GetPixelByIndexSafe(currentPoint) == 1);
                 }
             }
         }
-    };
+    }
+};
 
-    MITK_TEST_SUITE_REGISTRATION(mitkSegmentationInterpolation);
+MITK_TEST_SUITE_REGISTRATION(mitkSegmentationInterpolation);
 
 
 

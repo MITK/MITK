@@ -286,12 +286,16 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
   {
-    //read in filename
-    QString filename = QFileDialog::getSaveFileName(NULL, tr("Save Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)"));
+    QFileDialog *fileDialog = new QFileDialog;
+    fileDialog->setDefaultSuffix("IGTToolStorage");
+    QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
+    QString filename  = fileDialog->getSaveFileName(NULL, tr("Save Navigation Tool Storage"), "/", suffix, &suffix);
+
     if (filename.isEmpty()) return; //canceled by the user
 
-    // add file extension if it wasn't added by the file dialog
-    if ( filename.right(15) != ".IGTToolStorage" ) { filename += ".IGTToolStorage"; }
+    // check file suffix
+    QFileInfo file(filename);
+    if(file.suffix().isEmpty()) filename += ".IGTToolStorage";
 
     //serialize tool storage
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();

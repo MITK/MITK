@@ -163,8 +163,10 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
     image->SetImportVolume(readVolume->GetBufferPointer(), 0, 0, mitk::Image::ImportMemoryManagementType::AsyncCopyMemory);
 
     itk::ImageIOBase::IOComponentType comptype = io->GetComponentType();
-    std::thread thr(LoadSeries, filenames, image, comptype, command);
-    thr.detach();
+    LoadSeries(filenames, image, comptype, command);
+    // TODO now threading switch off, because we have trouble with unsafe changing local everywhere
+    //std::thread thr(LoadSeries, filenames, image, comptype, command);
+    //thr.detach();
   }
   else
   {

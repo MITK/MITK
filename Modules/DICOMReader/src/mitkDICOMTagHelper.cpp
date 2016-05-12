@@ -19,15 +19,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMTagHelper.h"
 
-mitk::DICOMTagMapType::value_type MakeEntry(mitk::DICOMTag& tag)
+#include <mitkIDICOMTagsOfInterest.h>
+
+#include "usModuleContext.h"
+#include "usGetModuleContext.h"
+
+mitk::DefaultDICOMTagMapType::value_type MakeEntry(mitk::DICOMTag& tag)
 {
     return std::make_pair(GeneratPropertyNameForDICOMTag(tag).c_str(), tag);
 }
 
 mitk::DICOMTagMapType
+mitk::GetCurrentDICOMTagsOfInterest()
+{
+  mitk::DICOMTagMapType result;
+
+  std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest> > toiRegisters = us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+  if (toiRegisters.empty())
+  {
+    // bad, no service found, cannot get tags of interest
+    MITK_ERROR << "DICOM tag error: no service for DICOM tags of interest";
+    return result;
+  }
+  else if (toiRegisters.size() > 1)
+  {
+    MITK_WARN << "DICOM tag error: multiple service for DICOM tags of interest found. Using just one.";
+  }
+
+  IDICOMTagsOfInterest* toiRegister = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
+  if (!toiRegister)
+  {
+    MITK_ERROR << "Service lookup error, cannot get DICOM tag of interest service ";
+  }
+
+  return toiRegister->GetTagsOfInterest();
+}
+
+mitk::DefaultDICOMTagMapType
 mitk::GetDefaultDICOMTagsOfInterest()
 {
-    DICOMTagMapType result;
+    DefaultDICOMTagMapType result;
     //These tags are copied from DICOMSeriesReader. The old naming style (deprecated)
     //is keept for backwards compatibility until it is removed.
     //Below we have also already added the properties with the new naming style

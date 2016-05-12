@@ -24,6 +24,7 @@ set(CPP_FILES
   mitkDICOMEnums.cpp
   mitkDICOMReaderConfigurator.cpp
   mitkDICOMFileReaderSelector.cpp
+  mitkIDICOMTagsOfInterest.cpp
 )
 
 set(RESOURCE_FILES

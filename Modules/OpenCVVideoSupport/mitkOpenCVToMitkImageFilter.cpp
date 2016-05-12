@@ -29,6 +29,9 @@ namespace mitk{
   OpenCVToMitkImageFilter::OpenCVToMitkImageFilter()
     : m_OpenCVImage(nullptr)
   {
+    m_ImageMutex = itk::FastMutexLock::New();
+    m_OpenCVImageMutex = itk::FastMutexLock::New();
+    m_OpenCVMatMutex = itk::FastMutexLock::New();
   }
 
   OpenCVToMitkImageFilter::~OpenCVToMitkImageFilter()
@@ -37,8 +40,12 @@ namespace mitk{
 
   void OpenCVToMitkImageFilter::SetOpenCVImage(const IplImage* image)
   {
+    m_OpenCVImageMutex->Lock();
     this->m_OpenCVImage = image;
+    m_OpenCVImageMutex->Unlock();
+    m_OpenCVMatMutex->Lock();
     this->m_OpenCVMat.release();
+    m_OpenCVMatMutex->Unlock();
     this->Modified();
   }
 
@@ -46,56 +53,63 @@ namespace mitk{
   {
     IplImage cvMatIplImage;
     const IplImage* targetImage = nullptr;
-    if(m_OpenCVImage == nullptr)
+    if (m_OpenCVImage == nullptr)
     {
-      if( m_OpenCVMat.cols == 0 || m_OpenCVMat.rows == 0 )
+      if (m_OpenCVMat.cols == 0 || m_OpenCVMat.rows == 0)
       {
         MITK_WARN << "Cannot not start filter. OpenCV Image not set.";
         return;
       }
       else
       {
+        m_OpenCVMatMutex->Lock();
         cvMatIplImage = m_OpenCVMat;
+        m_OpenCVMatMutex->Unlock();
         targetImage = &cvMatIplImage;
       }
     }
     else
+    {
+      m_OpenCVImageMutex->Lock();
       targetImage = m_OpenCVImage;
+      m_OpenCVImageMutex->Unlock();
+    }
 
+    m_ImageMutex->Lock();
     // now convert rgb image
-    if( (targetImage->depth>=0) && ((unsigned int)targetImage->depth == IPL_DEPTH_8S) && (targetImage->nChannels == 1) )
-      m_Image = ConvertIplToMitkImage< char, 2>( targetImage );
+    if ((targetImage->depth >= 0) && ((unsigned int)targetImage->depth == IPL_DEPTH_8S) && (targetImage->nChannels == 1))
+      m_Image = ConvertIplToMitkImage< char, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 1 )
-      m_Image = ConvertIplToMitkImage< unsigned char, 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 1)
+      m_Image = ConvertIplToMitkImage< unsigned char, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 3 )
-      m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_8U && targetImage->nChannels == 3)
+      m_Image = ConvertIplToMitkImage< UCRGBPixelType, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 1 )
-      m_Image = ConvertIplToMitkImage< unsigned short, 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 1)
+      m_Image = ConvertIplToMitkImage< unsigned short, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 3 )
-      m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_16U && targetImage->nChannels == 3)
+      m_Image = ConvertIplToMitkImage< USRGBPixelType, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 1 )
-      m_Image = ConvertIplToMitkImage< float, 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 1)
+      m_Image = ConvertIplToMitkImage< float, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 3 )
-      m_Image = ConvertIplToMitkImage< FloatRGBPixelType , 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_32F && targetImage->nChannels == 3)
+      m_Image = ConvertIplToMitkImage< FloatRGBPixelType, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 1 )
-      m_Image = ConvertIplToMitkImage< double, 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 1)
+      m_Image = ConvertIplToMitkImage< double, 2>(targetImage);
 
-    else if( targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 3 )
-      m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( targetImage );
+    else if (targetImage->depth == IPL_DEPTH_64F && targetImage->nChannels == 3)
+      m_Image = ConvertIplToMitkImage< DoubleRGBPixelType, 2>(targetImage);
 
     else
     {
       MITK_WARN << "Unknown image depth and/or pixel type. Cannot convert OpenCV to MITK image.";
       return;
     }
-
+    m_ImageMutex->Unlock();
     //cvReleaseImage(&rgbOpenCVImage);
   }
 
@@ -108,7 +122,7 @@ namespace mitk{
   * Converting from OpenCV image to ITK Image
   *********************************************/
   template <typename TPixel, unsigned int VImageDimension>
-  Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const IplImage * input )
+  Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage(const IplImage * input)
   {
     typedef itk::Image< TPixel, VImageDimension > ImageType;
 
@@ -117,7 +131,7 @@ namespace mitk{
     typename ImageType::RegionType::SizeType size;
     typename ImageType::RegionType::IndexType index;
     typename ImageType::SpacingType spacing;
-    size.Fill( 1 );
+    size.Fill(1);
     size[0] = input->width;
     size[1] = input->height;
     index.Fill(0);
@@ -132,13 +146,13 @@ namespace mitk{
     // itk::OpenCVImageBridge::IplImageToITKImage<ImageType>() is simply used to initialize the itk image
     // and in the next step the image data are copied by hand!
 
-    if(input->nChannels == 3) // these are RGB images and need to be set to BGR before conversion!
+    if (input->nChannels == 3) // these are RGB images and need to be set to BGR before conversion!
     {
       output = itk::OpenCVImageBridge::IplImageToITKImage<ImageType>(input);
     }
     else
     {
-      memcpy((void*) output->GetBufferPointer(), (void*) input->imageDataOrigin,
+      memcpy((void*)output->GetBufferPointer(), (void*)input->imageDataOrigin,
         input->width*input->height*sizeof(TPixel));
     }
 
@@ -151,8 +165,12 @@ namespace mitk{
 
   void OpenCVToMitkImageFilter::SetOpenCVMat(const cv::Mat &image)
   {
+    m_OpenCVMatMutex->Lock();
     m_OpenCVMat = image;
+    m_OpenCVMatMutex->Unlock();
+    m_OpenCVImageMutex->Lock();
     m_OpenCVImage = nullptr;
+    m_OpenCVImageMutex->Unlock();
     this->Modified();
   }
 
@@ -172,7 +190,9 @@ namespace mitk{
     mitkImage->Modified();
     mitkImage->Update();
 
+    m_ImageMutex->Lock();
     m_Image = mitkImage;
+    m_ImageMutex->Unlock();
   }
 
 } // end namespace mitk

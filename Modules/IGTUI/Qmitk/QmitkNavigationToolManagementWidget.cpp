@@ -280,13 +280,13 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
         tempStorage->SetName(myPath.getFileName()); //set the filename as name for the storage, so the user can identify it
         this->LoadStorage(tempStorage);
         emit NewStorageAdded(m_NavigationToolStorage,myPath.getFileName());
+        m_NavigationToolStorage->UpdateMicroservice();
       }
     }
     catch (const mitk::Exception& exception)
     {
       MessageBox(exception.GetDescription());
     }
-    m_NavigationToolStorage->UpdateMicroservice();
   }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSettings>
 #include <QFileInfo>
 
-const std::string QmitkIGTCommonHelper::VIEW_ID = "org.mitk.views.igtcommoonhelper";
+const std::string QmitkIGTCommonHelper::VIEW_ID = "org.mitk.views.igtcommonhelper";
 
 void QmitkIGTCommonHelper::SetLastFileSavePath(const QString &str)
 {

@@ -207,7 +207,9 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 {
-  m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
+  QString fileName = QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.*");
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(fileName);
+  m_Controls->m_CalibrationFileName->setText(fileName);
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)

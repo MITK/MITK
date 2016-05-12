@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageSerializer.h>
 #include <mitkIGTException.h>
 #include <mitkIOUtil.h>
+#include <QmitkIGTCommonHelper.h>
 
 //qt headers
 #include <qfiledialog.h>
@@ -445,9 +446,10 @@ m_SequentialPlayer = player;
 
 void QmitkIGTPlayerWidget::OnOpenFileButtonPressed()
 {
-  QString filename = QFileDialog::getOpenFileName(this, "Load tracking data", QDir::currentPath(),"XML files (*.xml)");
+  QString filename = QFileDialog::getOpenFileName(this, "Load tracking data", QmitkIGTCommonHelper::GetLastFileLoadPath(),"XML files (*.xml)");
   QFile file(filename);
 
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(filename);
   // if something went wrong or user pressed cancel in the save dialog
   if ( filename.isEmpty()  || ! file.exists() )
   {

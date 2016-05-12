@@ -24,11 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorage.h>
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkNavigationToolStorageSerializer.h>
+#include <QmitkIGTCommonHelper.h>
 
 //qt headers
 #include <qfiledialog.h>
 #include <qinputdialog.h>
 #include <qmessagebox.h>
+#include <qsettings.h>
 
 //poco headers
 #include <Poco/Path.h>
@@ -69,7 +71,8 @@ void QmitkNavigationToolManagementWidget::OnLoadTool()
    return;
   }
   mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Add Navigation Tool"), QmitkIGTCommonHelper::GetLastFileLoadPath(), "*.IGTTool").toLatin1().data();
+  QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
   if (filename == "") return;
   mitk::NavigationTool::Pointer readTool = myReader->DoRead(filename);
   if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
@@ -91,12 +94,12 @@ void QmitkNavigationToolManagementWidget::OnSaveTool()
     if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
 
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toLatin1().data();
+    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), QmitkIGTCommonHelper::GetLastFileSavePath(), "*.IGTTool").toLatin1().data();
+    QmitkIGTCommonHelper::SetLastFileSavePathByFileName(QString::fromStdString(filename));
     filename.append(".IGTTool");
     if (filename == "") return;
     if (!myWriter->DoWrite(filename,m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())))
       MessageBox("Error: "+ myWriter->GetErrorMessage());
-
 }
 
 void QmitkNavigationToolManagementWidget::CreateConnections()
@@ -261,8 +264,10 @@ void QmitkNavigationToolManagementWidget::OnCreateStorage()
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
-    std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), "/", tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
+    std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileLoadPath(), tr("IGT Tool Storage (*.IGTToolStorage)")).toStdString();
     if (filename == "") return;
+
+    QmitkIGTCommonHelper::SetLastFileLoadPathByFileName(QString::fromStdString(filename));
 
     try
     {
@@ -289,14 +294,13 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
     QFileDialog *fileDialog = new QFileDialog;
     fileDialog->setDefaultSuffix("IGTToolStorage");
     QString suffix = "IGT Tool Storage (*.IGTToolStorage)";
-    QString filename  = fileDialog->getSaveFileName(NULL, tr("Save Navigation Tool Storage"), "/", suffix, &suffix);
+    QString filename  = fileDialog->getSaveFileName(NULL, tr("Save Navigation Tool Storage"), QmitkIGTCommonHelper::GetLastFileSavePath(), suffix, &suffix);
 
     if (filename.isEmpty()) return; //canceled by the user
 
     // check file suffix
     QFileInfo file(filename);
     if(file.suffix().isEmpty()) filename += ".IGTToolStorage";
-
     //serialize tool storage
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
     if (!mySerializer->Serialize(filename.toStdString(),m_NavigationToolStorage))
@@ -307,6 +311,7 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
     Poco::Path myPath = Poco::Path(filename.toStdString());
     m_Controls->m_StorageName->setText(QString::fromStdString(myPath.getFileName()));
 
+    QmitkIGTCommonHelper::SetLastFileSavePath(file.absolutePath());
   }
 
 

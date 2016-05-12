@@ -34,6 +34,7 @@ set(CPP_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.cpp
   Qmitk/QmitkNDIAbstractDeviceWidget.cpp
   Qmitk/QmitkAbstractTrackingDeviceWidget.cpp
+  Qmitk/QmitkIGTCommonHelper.cpp
 )
 
 set(UI_FILES
@@ -101,6 +102,7 @@ set(MOC_H_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidgetConnectionWorker.h
   Qmitk/QmitkNDIAbstractDeviceWidget.h
   Qmitk/QmitkAbstractTrackingDeviceWidget.h
+  Qmitk/QmitkIGTCommonHelper.h
 )
 
 set(QRC_FILES

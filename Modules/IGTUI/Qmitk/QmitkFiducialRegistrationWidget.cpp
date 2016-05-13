@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAppendPolyData.h>
 #include <vtkPoints.h>
 #include <vtkLandmarkTransform.h>
+#include <mitkStaticIGTHelperFunctions.h>
 
 
 #define FRW_LOG MITK_INFO("Fiducial Registration Widget")
@@ -290,17 +291,19 @@ void QmitkFiducialRegistrationWidget::setDataStorage(mitk::DataStorage::Pointer 
 
 void QmitkFiducialRegistrationWidget::AddTrackerPoint()
 {
-  if (m_TrackerNavigationData.IsNull() || m_TrackerFiducialsNode.IsNull()) { return; }
+  if (m_DataStorage.IsNull()) { return ; } //here the widget should simply do nothing (for backward compatibility)
+  else if (m_TrackerNavigationData.IsNull() || m_TrackerFiducialsNode.IsNull()) { MITK_WARN << "Tracker node not correctly initialized"; return; }
   mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsNode->GetData());
   ps->InsertPoint(ps->GetSize(), m_TrackerNavigationData->GetPosition());
 }
 
 bool QmitkFiducialRegistrationWidget::CheckRegistrationInitialization()
 {
-  if (m_ImageNode.IsNull() ||
-    m_ImageFiducialsNode.IsNull() ||
-    m_TrackerFiducialsNode.IsNull()
-    ) { MITK_WARN << "Registration not correctly initialized";  return false; }
+  if (m_DataStorage.IsNull()) { return false; } //here the widget should simply do nothing (for backward compatibility)
+  else if (m_ImageNode.IsNull() ||
+      m_ImageFiducialsNode.IsNull() ||
+      m_TrackerFiducialsNode.IsNull()
+      ) {MITK_WARN << "Registration not correctly initialized"; return false;}
   else {return true;}
 }
 
@@ -312,7 +315,7 @@ void QmitkFiducialRegistrationWidget::Register()
   /* retrieve fiducials */
   mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsNode->GetData());
   mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsNode->GetData());
-  if (trackerFiducials->GetSize() != trackerFiducials->GetSize())
+  if (trackerFiducials->GetSize() != imageFiducials->GetSize())
   {
     MITK_WARN << "Not the same number of fiducials, cannot register";
     return;
@@ -344,10 +347,10 @@ void QmitkFiducialRegistrationWidget::Register()
   transform->Modified();
   transform->Update();
   //compute FRE of transform
-  /*
-  double FRE = ComputeFRE(imageFiducials, trackerFiducials, transform);
-  m_Controls.m_RegistrationWidget->SetQualityDisplayText("FRE: " + QString::number(FRE) + " mm");
-  */
+
+  double FRE = mitk::StaticIGTHelperFunctions::ComputeFRE(imageFiducials, trackerFiducials, transform);
+  this->SetQualityDisplayText("FRE: " + QString::number(FRE) + " mm");
+
   //#############################################################################################
 
   //############### conversion back to itk/mitk data types ##########################

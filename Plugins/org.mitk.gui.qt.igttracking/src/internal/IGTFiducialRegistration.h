@@ -60,7 +60,11 @@ class IGTFiducialRegistration : public QmitkAbstractView
 
   protected:
 
+    void InitializeRegistration();
+
     Ui::IGTFiducialRegistrationControls m_Controls;
+
+    mitk::NavigationData::Pointer m_TrackingPointer;
 
 
 };

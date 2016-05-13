@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiducialRegistrationWidget.h"
 #include "QmitkStdMultiWidget.h"
 #include "MitkIGTUIExports.h"
+#include "MitkNavigationData.h"
 /*!
  * \brief IGT Fiducial Registration Widget
  *
@@ -38,6 +39,9 @@ public:
 
   QmitkFiducialRegistrationWidget(QWidget* parent);
   virtual ~QmitkFiducialRegistrationWidget();
+  void setImageNode(mitk::DataNode::Pointer i);
+  void setTrackerNavigationData(mitk::NavigationData::Pointer t);
+  void setDataStorage(mitk::DataStorage::Pointer d);
 
   /*!
   \brief enumeration to specify the appearance of the widget.
@@ -63,6 +67,7 @@ public:
   void SetTrackerFiducialsNode(mitk::DataNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials
   mitk::DataNode::Pointer GetImageFiducialsNode(); ///< returns data tree node for the image fiducials
   mitk::DataNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
+
 
   void SetQualityDisplayText(QString text); ///< sets specific text on the UI (useful to display FRE/TRE...)
   /*!
@@ -95,6 +100,8 @@ public:
   protected slots:
     void DisableEditButtonRegistrationImagePoints(bool);///< Disables the edit button of the widget RegistrationImagePoints if the activated variable is true.
     void DisableEditButtonRegistrationTrackingPoints(bool);///< Disables the edit button of the widget RegistrationTrackingPoints if the activated variable is true.
+    void AddTrackerPoint();
+    void Register();
 
 protected:
 
@@ -102,10 +109,16 @@ protected:
 
   void CreateConnections();
 
+  bool CheckRegistrationInitialization();
+
   Ui::QmitkFiducialRegistrationWidget* m_Controls;  ///< gui widget
   QmitkStdMultiWidget* m_MultiWidget;
   mitk::DataNode::Pointer m_ImageFiducialsNode;
   mitk::DataNode::Pointer m_TrackerFiducialsNode;
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::NavigationData::Pointer m_TrackerNavigationData;
+  mitk::DataNode::Pointer m_ImageNode;
+  mitk::NavigationData::Pointer m_T_ObjectReg;
 
 };
 #endif // _QmitkFiducialRegistrationWidget_H_INCLUDED

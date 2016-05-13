@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNiftiImageIO.h"
 #include "itkImageFileWriter.h"
 #include "itksys/SystemTools.hxx"
-#include "mitkDiffusionIOMimeTypes.h"
+#include "mitkDiffusionCoreIOMimeTypes.h"
 #include "mitkImageCast.h"
 
 #include <iostream>
@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::DiffusionImageNiftiWriterService::DiffusionImageNiftiWriterService()
-  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION())
+  : AbstractFileWriter(mitk::Image::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION())
 {
   RegisterService();
 }

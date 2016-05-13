@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNrrdTensorImageReader.h"
 #include <mitkCustomMimeType.h>
-#include "mitkDiffusionIOMimeTypes.h"
+#include "mitkDiffusionCoreIOMimeTypes.h"
 
 #include "itkImageFileReader.h"
 #include "itkImageRegionIterator.h"
@@ -36,7 +36,7 @@ namespace mitk
   }
 
   NrrdTensorImageReader::NrrdTensorImageReader()
-    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionIOMimeTypes::DTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION() )
+    : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DTI_MIMETYPE_DESCRIPTION() )
   {
     m_ServiceReg = this->RegisterService();
   }

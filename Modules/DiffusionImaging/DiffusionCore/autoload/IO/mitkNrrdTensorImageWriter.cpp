@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileWriter.h"
 #include "itkDiffusionTensor3D.h"
 #include "mitkImageCast.h"
-#include "mitkDiffusionIOMimeTypes.h"
+#include "mitkDiffusionCoreIOMimeTypes.h"
 
 
 mitk::NrrdTensorImageWriter::NrrdTensorImageWriter()
-  : AbstractFileWriter(mitk::TensorImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionIOMimeTypes::DTI_MIMETYPE() ), mitk::DiffusionIOMimeTypes::DTI_MIMETYPE_DESCRIPTION() )
+  : AbstractFileWriter(mitk::TensorImage::GetStaticNameOfClass(), CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DTI_MIMETYPE_DESCRIPTION() )
 {
   RegisterService();
 }

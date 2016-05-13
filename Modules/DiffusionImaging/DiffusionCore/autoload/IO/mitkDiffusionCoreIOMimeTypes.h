@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKDIFFUSIONIOMIMETYPES_H
-#define MITKDIFFUSIONIOMIMETYPES_H
+#ifndef MITKDiffusionCoreIOMimeTypes_H
+#define MITKDiffusionCoreIOMimeTypes_H
 
 #include "mitkCustomMimeType.h"
 
@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-class DiffusionIOMimeTypes
+class DiffusionCoreIOMimeTypes
 {
 public:
 
@@ -45,19 +45,6 @@ public:
   // Get all Diffusion Mime Types
   static std::vector<CustomMimeType*> Get();
 
-  // ------------------------------ VTK formats ----------------------------------
-
-  static CustomMimeType FIBERBUNDLE_VTK_MIMETYPE();
-  static std::string FIBERBUNDLE_VTK_MIMETYPE_NAME();
-
-  static std::string FIBERBUNDLE_MIMETYPE_DESCRIPTION();
-
-  // ------------------------------ TrackVis formats ----------------------------------
-
-  static CustomMimeType FIBERBUNDLE_TRK_MIMETYPE();
-  static std::string FIBERBUNDLE_TRK_MIMETYPE_NAME();
-
-
   // ------------------------- Image formats (ITK based) --------------------------
 
   static DiffusionImageNrrdMimeType DWI_NRRD_MIMETYPE();
@@ -75,31 +62,13 @@ public:
   static std::string DTI_MIMETYPE_DESCRIPTION();
   static std::string QBI_MIMETYPE_DESCRIPTION();
 
-  // ------------------------------ MITK formats ----------------------------------
-
-  static CustomMimeType CONNECTOMICS_MIMETYPE(); // cnf
-  static CustomMimeType CONNECTOMICS_MATRIX_MIMETYPE(); // mat
-  static CustomMimeType CONNECTOMICS_LIST_MIMETYPE(); // txt
-
-  static std::string CONNECTOMICS_MIMETYPE_NAME();
-  static std::string CONNECTOMICS_MATRIX_MIMETYPE_NAME();
-  static std::string CONNECTOMICS_LIST_MIMETYPE_NAME();
-
-  static std::string CONNECTOMICS_MIMETYPE_DESCRIPTION();
-
-  static CustomMimeType PLANARFIGURECOMPOSITE_MIMETYPE();
-
-  static std::string PLANARFIGURECOMPOSITE_MIMETYPE_NAME();
-
-  static std::string PLANARFIGURECOMPOSITE_MIMETYPE_DESCRIPTION();
-
 private:
 
   // purposely not implemented
-  DiffusionIOMimeTypes();
-  DiffusionIOMimeTypes(const DiffusionIOMimeTypes&);
+  DiffusionCoreIOMimeTypes();
+  DiffusionCoreIOMimeTypes(const DiffusionCoreIOMimeTypes&);
 };
 
 }
 
-#endif // MITKDIFFUSIONIOMIMETYPES_H
+#endif // MITKDiffusionCoreIOMimeTypes_H

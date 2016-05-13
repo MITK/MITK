@@ -48,7 +48,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
     /// the static function for the conversion
     ///
     template <typename TPixel, unsigned int VImageDimension>
-    static Image::Pointer ConvertIplToMitkImage( const IplImage * input );
+    static Image::Pointer ConvertCVMatToMitkImage( const cv::Mat input );
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
     itkFactorylessNewMacro(Self)
@@ -58,7 +58,7 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
     /// sets an iplimage as input
     ///
     void SetOpenCVImage(const IplImage* image);
-    itkGetMacro(OpenCVImage, const IplImage*);
+    //itkGetMacro(OpenCVImage, const IplImage*);
 
     ///
     /// sets an opencv mat as input (will be used if OpenCVImage Ipl image is 0)
@@ -88,11 +88,9 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
 
 protected:
     Image::Pointer m_Image;
-    const IplImage* m_OpenCVImage;
     cv::Mat m_OpenCVMat;
 
     itk::FastMutexLock::Pointer m_ImageMutex;
-    itk::FastMutexLock::Pointer m_OpenCVImageMutex;
     itk::FastMutexLock::Pointer m_OpenCVMatMutex;
 };
 

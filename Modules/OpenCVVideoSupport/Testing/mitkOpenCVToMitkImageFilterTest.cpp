@@ -69,7 +69,7 @@ protected:
       m_testedFilter->Update();
       mitk::Image::Pointer result;
       result = m_testedFilter->GetOutput();
-      std::cout << "Thread " << ThreadID << " Update Call" << std::endl;
+      //std::cout << "Thread " << ThreadID << " Update Call" << std::endl;
     }
   }
 
@@ -184,7 +184,7 @@ public:
 
     for (int i = 0; i < 10000; i++)
     {
-
+      //std::cout << "Run  " << i << std::endl;
       //wait a bit
       itksys::SystemTools::Delay(delay);
 

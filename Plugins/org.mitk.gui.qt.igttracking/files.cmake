@@ -37,6 +37,7 @@ set(CACHED_RESOURCE_FILES
   resources/iconNavigationToolManager.xpm
   resources/iconTrackingToolBox.xpm
   resources/iconNavigationToolCalibration.xpm
+  resources/iconFiducialRegistration.png
   plugin.xml
 )
 

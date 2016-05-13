@@ -26,9 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * Widget used to set fiducial landmarks in the image and to confirm the corresponding landmarks on the world object (patient/phantom).
  *
- * SetImageFiducialsNode(), SetTrackerFiducialsNode() and SetMultiWidget() must be called, otherwise QmitkPointListWidget can not work.
+ * The widget can add tracker fiducials and perform the registration internally. To enable this functionaltity the
+ * methods SetDataStorage(), setTrackerNavigationData() and setImageNode() needs to be called before.
  *
- *
+ * If Registration should be handled from outside the class the methods SetImageFiducialsNode() and SetTrackerFiducialsNode()
+ * must be called, otherwise the QmitkPointListWidget can not work. If SetDataStorage() is not called the widget does nothing
+ * internally.
  *
  * \sa IGT
 */
@@ -39,6 +42,10 @@ public:
 
   QmitkFiducialRegistrationWidget(QWidget* parent);
   virtual ~QmitkFiducialRegistrationWidget();
+
+  /** Adds the image node which is
+   *
+   */
   void setImageNode(mitk::DataNode::Pointer i);
   void setTrackerNavigationData(mitk::NavigationData::Pointer t);
   void setDataStorage(mitk::DataStorage::Pointer d);

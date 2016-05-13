@@ -381,14 +381,14 @@ void QmitkFiducialRegistrationWidget::Register()
 
   //transform surface/image
 
-    //first we have to store the original ct image transform to compose it with the new transform later
-    mitk::AffineTransform3D::Pointer imageTransform = m_ImageNode->GetData()->GetGeometry()->GetIndexToWorldTransform();
-    imageTransform->Compose(mitkTransform);
-    mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
-    itk::Matrix<mitk::ScalarType, 3, 3> rotationFloatNew = imageTransform->GetMatrix();
-    itk::Vector<mitk::ScalarType, 3> translationFloatNew = imageTransform->GetOffset();
-    newImageTransform->SetMatrix(rotationFloatNew);
-    newImageTransform->SetOffset(translationFloatNew);
-    m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+  //first we have to store the original ct image transform to compose it with the new transform later
+  mitk::AffineTransform3D::Pointer imageTransform = m_ImageNode->GetData()->GetGeometry()->GetIndexToWorldTransform();
+  imageTransform->Compose(mitkTransform);
+  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
+  itk::Matrix<mitk::ScalarType, 3, 3> rotationFloatNew = imageTransform->GetMatrix();
+  itk::Vector<mitk::ScalarType, 3> translationFloatNew = imageTransform->GetOffset();
+  newImageTransform->SetMatrix(rotationFloatNew);
+  newImageTransform->SetOffset(translationFloatNew);
+  m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
 
 }

@@ -21,7 +21,7 @@
 	 <view id="org.mitk.views.IGTFiducialRegistration"
           name="IGT Fiducial Registration"
           class="IGTFiducialRegistration"
-          icon="resources/iconNavigationToolCalibration.xpm" />
+          icon="resources/iconFiducialRegistration.png" />
   </extension>
 
 </plugin>

@@ -22,7 +22,7 @@
 #include <QmlMitkSliderNavigatorItem.h>
 
 #include <mitkVector.h>
-#include <QQuickitem>
+#include <QQuickItem>
 #include <QQmlEngine>
 
 class QmitkStepperAdapter;

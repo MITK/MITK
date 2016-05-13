@@ -40,7 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QOpenGLContext;
 class QOpenGLFramebufferObject;
-class QVTKInteractorAdapter;
+class QVTKMitkInteractorAdapter;
 class QVTKInteractor;
 class QVTKFramebufferObjectRenderer;
 class vtkEventQtSlotConnect;
@@ -107,7 +107,7 @@ protected:
 private:
     vtkOpenGLRenderWindow *m_win;
     vtkSmartPointer<QVTKInteractor> m_interactor;
-    QVTKInteractorAdapter* m_interactorAdapter;
+    QVTKMitkInteractorAdapter* m_interactorAdapter;
     vtkSmartPointer<vtkEventQtSlotConnect> m_connect;
 
     friend class QVTKFramebufferObjectRenderer;

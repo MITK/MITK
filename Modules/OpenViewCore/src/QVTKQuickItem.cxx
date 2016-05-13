@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSGSimpleTextureNode>
 
 #include "QVTKInteractor.h"
-#include "QVTKInteractorAdapter.h"
+#include "QVTKMitkInteractorAdapter.h"
 #include "vtkGenericOpenGLRenderWindow.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkgl.h"
@@ -56,7 +56,7 @@ QVTKQuickItem::QVTKQuickItem(QQuickItem* parent)
     setAcceptedMouseButtons(Qt::LeftButton | Qt::MiddleButton | Qt::RightButton);
 
     m_interactor = vtkSmartPointer<QVTKInteractor>::New();
-    m_interactorAdapter = new QVTKInteractorAdapter(this);
+    m_interactorAdapter = new QVTKMitkInteractorAdapter(this);
     m_connect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
     m_win = vtkInternalOpenGLRenderWindow::New();

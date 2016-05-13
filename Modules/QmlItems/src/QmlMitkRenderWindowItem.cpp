@@ -17,7 +17,6 @@
 #include "QmlMitkRenderWindowItem.h"
 
 #include <QVTKInteractor.h>
-#include <QVTKInteractorAdapter.h>
 
 #include <vtkEventQtSlotConnect.h>
 #include <vtkGenericOpenGLRenderWindow.h>

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    QVTKInteractorAdapter.h
+  Module:    QVTKMitkInteractorAdapter.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -47,12 +47,12 @@ See LICENSE.txt or http://www.mitk.org for details.
  http://www.trolltech.com/products/3rdparty/vtksupport.html
 =========================================================================*/
 
-// .NAME QVTKInteractorAdapter - Handle Qt events.
+// .NAME QVTKMitkInteractorAdapter - Handle Qt events.
 // .SECTION Description
 // QVTKInteractor handles relaying Qt events to VTK.
 
-#ifndef Q_VTK_INTERACTOR_ADAPTER_H
-#define Q_VTK_INTERACTOR_ADAPTER_H
+#ifndef Q_VTK_MITK_INTERACTOR_ADAPTER_H
+#define Q_VTK_MITK_INTERACTOR_ADAPTER_H
 
 #include <QtCore/QObject>
 
@@ -61,21 +61,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 class vtkRenderWindowInteractor;
 class QEvent;
 
-// .NAME QVTKInteractorAdapter - A QEvent translator.
+// .NAME QVTKMitkInteractorAdapter - A QEvent translator.
 // .SECTION Description
-// QVTKInteractorAdapter translates QEvents and send them to a
+// QVTKMitkInteractorAdapter translates QEvents and send them to a
 // vtkRenderWindowInteractor.
-class MITKOPENVIEWCORE_EXPORT QVTKInteractorAdapter : public QObject
+class MITKOPENVIEWCORE_EXPORT QVTKMitkInteractorAdapter : public QObject
 {
   Q_OBJECT
 public:
   // Description:
   // Constructor: takes QObject parent
-  QVTKInteractorAdapter(QObject* parent);
+  QVTKMitkInteractorAdapter(QObject* parent);
 
   // Description:
   // Destructor
-  ~QVTKInteractorAdapter();
+  ~QVTKMitkInteractorAdapter();
 
   // Description:
   // Process a QEvent and send it to the interactor

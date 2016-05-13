@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    QVTKInteractorAdapter.cxx
+  Module:    QVTKMitkInteractorAdapter.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #pragma warning(disable:4512)
 #endif
 
-#include "QVTKInteractorAdapter.h"
+#include "QVTKMitkInteractorAdapter.h"
 #include "QVTKInteractor.h"
 
 #include <QEvent>
@@ -66,16 +66,16 @@ static const char* ascii_to_key_sym(int);
 // function to get VTK keysyms from Qt keys
 static const char* qt_key_to_key_sym(Qt::Key, Qt::KeyboardModifiers modifiers);
 
-QVTKInteractorAdapter::QVTKInteractorAdapter(QObject* parentObject)
+QVTKMitkInteractorAdapter::QVTKMitkInteractorAdapter(QObject* parentObject)
   : QObject(parentObject)
 {
 }
 
-QVTKInteractorAdapter::~QVTKInteractorAdapter()
+QVTKMitkInteractorAdapter::~QVTKMitkInteractorAdapter()
 {
 }
 
-bool QVTKInteractorAdapter::ProcessEvent(QEvent* e, vtkRenderWindowInteractor* iren)
+bool QVTKMitkInteractorAdapter::ProcessEvent(QEvent* e, vtkRenderWindowInteractor* iren)
 {
   if(iren == NULL || e == NULL)
     return false;

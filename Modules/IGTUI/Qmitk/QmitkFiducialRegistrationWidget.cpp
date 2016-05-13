@@ -39,6 +39,13 @@ QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent
 QmitkFiducialRegistrationWidget::~QmitkFiducialRegistrationWidget()
 {
   m_Controls = NULL;
+
+  //clean up data nodes
+  if (m_DataStorage.IsNotNull())
+  {
+    if (m_ImageFiducialsNode.IsNotNull()) m_DataStorage->Remove(m_ImageFiducialsNode);
+    if (m_TrackerFiducialsNode.IsNotNull()) m_DataStorage->Remove(m_TrackerFiducialsNode);
+  }
 }
 
 
@@ -137,7 +144,7 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Poi
   m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == NULL)
   {
-    FRW_WARN<< "stdMultiWidget is NULL";
+    MITK_DEBUG<< "stdMultiWidget is NULL";
     return;
   }
   m_Controls->m_RegistrationImagePoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
@@ -153,7 +160,7 @@ void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::P
   m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == NULL)
   {
-    FRW_WARN<< "stdMultiWidget is NULL";
+    MITK_DEBUG<< "stdMultiWidget is NULL";
     return;
   }
   m_Controls->m_RegistrationTrackingPoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget

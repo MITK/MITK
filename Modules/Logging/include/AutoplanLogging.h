@@ -2,6 +2,8 @@
 
 #define BOOST_LOG_DYN_LINK 1
 
+#define BOOST_USE_WINAPI_VERSION 0x0501
+
 // boost
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/move/utility.hpp>

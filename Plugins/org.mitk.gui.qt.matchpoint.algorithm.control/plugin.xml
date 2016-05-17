@@ -5,6 +5,7 @@
     <view id="org.mitk.views.matchpoint.algorithm.control"
           name="MatchPoint Algorithm Control"
           class="QmitkMatchPoint"
+		  category="Registration"
           icon="resources/icon.png" />
   </extension>
 

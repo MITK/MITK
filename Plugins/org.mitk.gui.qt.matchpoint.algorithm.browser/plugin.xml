@@ -5,6 +5,7 @@
     <view id="org.mitk.views.matchpoint.algorithm.browser"
           name="MatchPoint Algorithm Browser"
           class="QmitkMatchPointBrowser"
+		  category="Registration"
           icon="resources/icon.xpm" />
   </extension>
 

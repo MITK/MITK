@@ -5,6 +5,7 @@
     <view id="org.mitk.views.matchpoint.algorithm.batch"
           name="MatchPoint Registration Batch Processing"
           class="QmitkMatchPointBatchProcessor"
+		  category="Registration"
           icon="resources/icon.png" />
   </extension>
 

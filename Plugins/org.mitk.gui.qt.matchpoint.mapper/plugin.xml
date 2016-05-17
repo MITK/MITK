@@ -5,6 +5,7 @@
     <view id="org.mitk.views.matchpoint.mapper"
           name="MatchPoint Mapper"
           class="QmitkMatchPointMapper"
+		  category="Registration"
           icon="resources/icon.xpm" />
   </extension>
 

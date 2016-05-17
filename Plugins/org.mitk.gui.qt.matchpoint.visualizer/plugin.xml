@@ -5,6 +5,7 @@
     <view id="org.mitk.views.matchpoint.visualizer"
           name="MatchPoint Registration Vizualizer"
           class="QmitkMatchPointRegistrationVisualizer"
+		  category="Registration"
           icon="resources/icon.png" />
   </extension>
 

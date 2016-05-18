@@ -70,4 +70,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.igt.app.echotrack:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
+  org.mitk.gui.qt.overlaymanager:OFF
 )

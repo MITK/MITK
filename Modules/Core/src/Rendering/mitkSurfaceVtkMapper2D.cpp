@@ -311,11 +311,10 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
   {
     localStorage->m_Mapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
-  else
-    if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
-    {
-      localStorage->m_Mapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
-    }
+  else if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
+  {
+    localStorage->m_Mapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+  }
 
   bool scalarVisibility = false;
   this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);

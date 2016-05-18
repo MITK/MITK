@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkIOUtil.h>
+#include <mitkSliceNavigationController.h>
 #include <mitkSegmentationInterpolationController.h>
 #include <mitkTool.h>
 #include <mitkVtkImageOverwrite.h>
@@ -78,7 +79,7 @@ public:
 
     void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
     {
-        int dim(2); // axial slices are sorted along third axis
+        int dim(1); // axial slices are sorted along third axis
 
         /* Fill segmentation
          *
@@ -116,11 +117,22 @@ public:
 
         // This could be easier...
         // Note: Index = (sag, cor, ax); PlaneOrientation enum = (ax, sag, cor) in this situation
-        mitk::BaseGeometry::Pointer currentGeometry = m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
-        mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(currentGeometry.GetPointer());
-        slicedGeometry->InitializePlanes(currentGeometry, mitk::PlaneGeometry::PlaneOrientation(1));
-        mitk::PlaneGeometry* plane = slicedGeometry->GetPlaneGeometry(m_CenterPoint[dim]);
+        mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();
+        navigationController->SetInputWorldTimeGeometry(m_SegmentationImage->GetTimeGeometry());
+        navigationController->SetViewDirection(mitk::SliceNavigationController::ViewDirection(0));
+        navigationController->Update();
+        mitk::Point3D pointMM;
+        m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0)->IndexToWorld(m_CenterPoint, pointMM);
+        navigationController->SelectSliceByPoint(pointMM);
+        auto plane = navigationController->GetCurrentPlaneGeometry();
+
+
+//        mitk::BaseGeometry::Pointer currentGeometry = m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
+//        mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(currentGeometry.GetPointer());
+//        mitk::PlaneGeometry* plane = slicedGeometry->GetPlaneGeometry(m_CenterPoint[dim]);
         mitk::Image::Pointer interpolationResult = m_InterpolationController->Interpolate(dim, m_CenterPoint[dim], plane, 0);
+
+        mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolation.nrrd");
 
         // Write result into segmentation image
         vtkSmartPointer<mitkVtkImageOverwrite> reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -132,11 +144,10 @@ public:
         extractor->SetTimeStep(0);
         extractor->SetWorldGeometry(plane);
         extractor->SetVtkOutputRequest(true);
-        extractor->SetResliceTransformByGeometry(currentGeometry);
+        extractor->SetResliceTransformByGeometry(m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
         extractor->Modified();
         extractor->Update();
 
-        mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolation.nrrd");
         mitk::IOUtil::Save(m_SegmentationImage, "/home/jenspetersen/Desktop/postseg.nrrd");
 
         // Check a 4x4 square, the center of which needs to be filled

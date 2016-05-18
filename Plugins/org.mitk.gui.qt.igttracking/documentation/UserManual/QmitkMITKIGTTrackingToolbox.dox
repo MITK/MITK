@@ -53,4 +53,7 @@ If your device is tracking, you are able to log the tracking data by using the l
 
 In the options tab you can enable or disable the visualization of the tracking volume and of the tool quaternions. If enabled, the tool quaternions are shown in the tool information. You can also define the update rate of the tracking data. The update rate should not be set higher than the update rate of the tracking system.
 
+
+Return to the Tutorial overview: \ref IGTTutorialStepAdvanced
+
 */

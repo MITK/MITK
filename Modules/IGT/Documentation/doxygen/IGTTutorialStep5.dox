@@ -1,0 +1,17 @@
+/**
+\page IGTTutorialStepAdvanced A deeper look into the IGT Plugins
+
+Please have a look at each of these plugins:
+
+\li \ref org_mitk_views_igttrackingtoolbox  - Connect your tracking device and start tracking
+
+\li \ref org_mitk_views_igtnavigationtoolmanager -  Edit your tool storage
+
+\li \ref org_mitk_views_navigationdataplayer  - Play your navigation data, e.g. recorded with the tracking toolbox
+
+\li not available yet: tutorial to calibration tool manager. Will follow soon.
+
+
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+
+*/

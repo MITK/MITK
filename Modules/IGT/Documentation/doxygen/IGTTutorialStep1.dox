@@ -1,5 +1,5 @@
 /**
-\page IGTTutorialStep1 IGT filter pipeline
+\page IGTTutorialStepFilterPipeline IGT filter pipeline
 
 The IGT tutorial consists of four main parts for construction of a small navigation pipeline using a virtual tracking device.
 The virtual tracking device produces random tool data (position and orientation) so no additional hardware is required.
@@ -41,6 +41,6 @@ This tutorial is an extra target which can be build separately.
 
 \include mitkIGTTutorialStep1.cpp
 
-\ref IGTTutorialStep2 "[Next step]" \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 
 */

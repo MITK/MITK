@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceSource.h>
 #include "mitkNavigationDataDisplacementFilter.h"
 #include <mitkNavigationDataRecorder.h>
-#include <mitkNavigationDataPlayer.h>
+#include <mitkNavigationDataSequentialPlayer.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -154,14 +154,13 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   std::cout << "Start playing from file: " << filename.str() << " ..." << std::endl;
 
-  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
+  mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
 
   mitk::NavigationDataSet::Pointer naviDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(filename.str()).GetPointer());
   player->SetNavigationDataSet(naviDataSet);
 
-  player->StartPlaying(); //this starts the player
-  //From now on the player provides NavigationDatas in the order and
-  //correct time as they were recorded
+  //From now on the player provides NavigationDatas in a sequential order. The next position is given, as soon as "update" is called, so this player is not in real time.
+  //If you need the correct time of your tracking Data, use the NavigationDataPlayer instead and call "StartPlaying" and "StopPlaying".
 
   //this connects the outputs of the player to the NavigationData objects
   mitk::NavigationData::Pointer nd = player->GetOutput();
@@ -170,20 +169,16 @@ int main(int  /*argc*/, char*  /*argv*/[])
   {
     if (nd.IsNotNull()) //check if the output is not null
     {
-      //With this update the NavigationData object propagates through the pipeline to get a new value.
-      //In this case we only have a source (NavigationDataPlayer).
-      nd->Update();
+      //With this call, we go to the next recorded data set.
+      player->GoToNextSnapshot();
 
-      std::cout << x << ": 1:" << nd->GetPosition() << std::endl;
-      std::cout << x << ": 2:" << nd2->GetPosition() << std::endl;
-      std::cout << x << ": 1:" << nd->GetOrientation() << std::endl;
-      std::cout << x << ": 2:" << nd2->GetOrientation() << std::endl;
+      MITK_INFO << "Time Step " << x;
+      MITK_INFO<< "Tool 1:" << nd->GetPosition();
+      MITK_INFO << "Tool 2:" << nd2->GetPosition() ;
 
-      itksys::SystemTools::Delay(100); //sleep a little like in the recorder part
+      itksys::SystemTools::Delay(100); //sleep a little like in the recorder part, just for nice reading...
     }
   }
-  player->StopPlaying(); //This stops the player
-  //With another call of StartPlaying the player will start again at the beginning of the file
 
   itksys::SystemTools::Delay(2000);
   std::cout << "finished" << std::endl;

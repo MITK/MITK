@@ -125,7 +125,12 @@ bool  QmitkMatchPointMapper::IsBinaryInput() const
 
     mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
 
-    bool result = maskPredicate->CheckNode(this->m_spSelectedInputNode);
+    bool result = false;
+
+    if(this->m_spSelectedInputNode.IsNotNull())
+    {
+      result = maskPredicate->CheckNode(this->m_spSelectedInputNode);
+    }
 
     return result;
 }

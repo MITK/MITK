@@ -20,9 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 
 #include <vtkCallbackCommand.h>
+#include <vtkWeakPointer.h>
 
 #include <string>
 #include <itkObject.h>
+#include <itkEventObject.h>
 #include <itkObjectFactory.h>
 
 #include "mitkPropertyList.h"
@@ -393,6 +395,35 @@ protected:
    // ForceImmediateUpdateAll();
   };
 };
+
+class ITKEvent_EXPORT FocusChangedEvent : public itk::AnyEvent
+{
+public:
+  typedef FocusChangedEvent Self;
+  typedef itk::AnyEvent Superclass;
+
+  FocusChangedEvent( vtkRenderWindow* renderwindow = nullptr );
+
+  virtual ~FocusChangedEvent();
+
+  virtual const char * GetEventName() const override;
+
+  virtual bool CheckEvent(const ::itk::EventObject* e) const override;
+
+  virtual ::itk::EventObject* MakeObject() const override;
+
+  vtkRenderWindow* GetFocusedRenderWindow() const;
+
+  FocusChangedEvent(const Self& s);
+
+protected:
+  vtkWeakPointer<vtkRenderWindow> m_RenderWindow;
+
+private:
+  void operator=(const Self&);
+
+};
+
 } // namespace mitk
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

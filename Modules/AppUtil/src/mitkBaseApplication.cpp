@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QDesktopServices>
 #include <QStringList>
 #include <QCoreApplication>
+#include <QOpenGLContext>
 #include <QDebug>
 
 #include <iostream>
@@ -673,6 +674,14 @@ void BaseApplication::initializeLibraryPaths()
     ctkPluginFrameworkLauncher::addSearchPath(appDir.absoluteFilePath(suffix));
   }
 }
+
+static void initialize()
+{
+  QOpenGLContext context;
+  context.create();
+}
+
+Q_COREAPP_STARTUP_FUNCTION(initialize)
 
 int BaseApplication::main(const std::vector<std::string>& args)
 {

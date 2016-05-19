@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
+
   RenderingManager::Pointer RenderingManager::s_Instance = 0;
   RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 
@@ -823,7 +825,7 @@ namespace mitk
     if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
     {
       m_FocusedRenderWindow = focusWindow;
-      this->InvokeEvent(FocusChangedEvent(focusWindow));
+      this->InvokeEvent(FocusChangedEvent());
       return;
     }
 
@@ -832,42 +834,4 @@ namespace mitk
 
   // Create and register generic RenderingManagerFactory.
   TestingRenderingManagerFactory renderingManagerFactory;
-
-  FocusChangedEvent::FocusChangedEvent(vtkRenderWindow *renderwindow) : m_RenderWindow(renderwindow)
-  {
-    MITK_INFO << "FocusChangedEvent";
-    if(renderwindow) MITK_INFO << renderwindow->GetWindowName();
-  }
-
-  FocusChangedEvent::~FocusChangedEvent()
-  {
-
-  }
-
-  const char *FocusChangedEvent::GetEventName() const
-  {
-    return "FocusChangedEvent";
-  }
-
-  bool FocusChangedEvent::CheckEvent(const itk::EventObject *e) const
-  {
-    return dynamic_cast<const Self*>(e);
-  }
-
-  itk::EventObject *FocusChangedEvent::MakeObject() const
-  {
-    return new Self( m_RenderWindow );
-  }
-
-  vtkRenderWindow *FocusChangedEvent::GetFocusedRenderWindow() const
-  {
-    return m_RenderWindow.GetPointer();
-  }
-
-  FocusChangedEvent::FocusChangedEvent(const FocusChangedEvent::Self &s)
-    : itk::AnyEvent(s), m_RenderWindow(s.m_RenderWindow)
-  {
-
-  }
-
 } // namespace

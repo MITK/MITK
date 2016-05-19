@@ -375,6 +375,8 @@ itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
 
 #pragma GCC visibility pop
 
+itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent)
+
 /**
  * Generic RenderingManager implementation for "non-rendering-plattform",
  * e.g. for tests. Its factory (TestingRenderingManagerFactory) is
@@ -394,34 +396,6 @@ protected:
   {
    // ForceImmediateUpdateAll();
   };
-};
-
-class ITKEvent_EXPORT FocusChangedEvent : public itk::AnyEvent
-{
-public:
-  typedef FocusChangedEvent Self;
-  typedef itk::AnyEvent Superclass;
-
-  FocusChangedEvent( vtkRenderWindow* renderwindow = nullptr );
-
-  virtual ~FocusChangedEvent();
-
-  virtual const char * GetEventName() const override;
-
-  virtual bool CheckEvent(const ::itk::EventObject* e) const override;
-
-  virtual ::itk::EventObject* MakeObject() const override;
-
-  vtkRenderWindow* GetFocusedRenderWindow() const;
-
-  FocusChangedEvent(const Self& s);
-
-protected:
-  vtkWeakPointer<vtkRenderWindow> m_RenderWindow;
-
-private:
-  void operator=(const Self&);
-
 };
 
 } // namespace mitk

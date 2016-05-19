@@ -317,30 +317,30 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer* renderer)
       localStorage->m_Mapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
     }
 
-    bool scalarVisibility = false;
-    this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
-    localStorage->m_Mapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
+  bool scalarVisibility = false;
+  this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+  localStorage->m_Mapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
 
-    if(scalarVisibility)
-    {
-      mitk::VtkScalarModeProperty* scalarMode;
-      if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
-        localStorage->m_Mapper->SetScalarMode(scalarMode->GetVtkScalarMode());
-      else
-        localStorage->m_Mapper->SetScalarModeToDefault();
+  if(scalarVisibility)
+  {
+    mitk::VtkScalarModeProperty* scalarMode;
+    if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
+      localStorage->m_Mapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+    else
+      localStorage->m_Mapper->SetScalarModeToDefault();
 
-      bool colorMode = false;
-      this->GetDataNode()->GetBoolProperty("color mode", colorMode);
-      localStorage->m_Mapper->SetColorMode( (colorMode ? 1 : 0) );
+    bool colorMode = false;
+    this->GetDataNode()->GetBoolProperty("color mode", colorMode);
+    localStorage->m_Mapper->SetColorMode( (colorMode ? 1 : 0) );
 
-      double scalarsMin = 0;
-      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
+    double scalarsMin = 0;
+    this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
 
-      double scalarsMax = 1.0;
-      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
+    double scalarsMax = 1.0;
+    this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
 
-      localStorage->m_Mapper->SetScalarRange(scalarsMin,scalarsMax);
-    }
+    localStorage->m_Mapper->SetScalarRange(scalarsMin,scalarsMax);
+  }
 
   //color for inverse normals
   float inverseNormalsColor[3]= { 1.0f, 0.0f, 0.0f };

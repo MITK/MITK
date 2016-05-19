@@ -20,11 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 
 #include <vtkCallbackCommand.h>
-#include <vtkWeakPointer.h>
 
 #include <string>
 #include <itkObject.h>
-#include <itkEventObject.h>
 #include <itkObjectFactory.h>
 
 #include "mitkPropertyList.h"

@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
 
-mitk::DefaultDICOMTagMapType::value_type MakeEntry(mitk::DICOMTag& tag)
+mitk::DefaultDICOMTagMapType::value_type MakeEntry(const mitk::DICOMTag& tag)
 {
     return std::make_pair(GeneratPropertyNameForDICOMTag(tag).c_str(), tag);
 }
@@ -213,6 +213,11 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0081))); //dicom.TE
     result.insert(MakeEntry(DICOMTag(0x0018, 0x1310))); //dicom.Acquisition Matrix
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0087))); //dicom.Magnetic Field Strength
+
+    //SOP
+    result.insert(MakeEntry(DICOMTag(0x0008, 0x0018))); //SOP Instance UID
+    result.insert(MakeEntry(DICOMTag(0x0020, 0x0013))); //Instance number
+    result.insert(MakeEntry(DICOMTag(0x0020, 0x1041))); //Slice location
 
     return result;
 };

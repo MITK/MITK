@@ -300,7 +300,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetPixelSpacing() const
   }
 
   static const DICOMTag tagPixelSpacing( 0x0028, 0x0030 );
-  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing );
+  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing ).value;
 }
 
 std::string mitk::DICOMImageBlockDescriptor::GetImagerPixelSpacing() const
@@ -312,7 +312,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetImagerPixelSpacing() const
   }
 
   static const DICOMTag tagImagerPixelSpacing( 0x0018, 0x1164 );
-  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing );
+  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing ).value;
 }
 
 void mitk::DICOMImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX,
@@ -529,7 +529,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUID() const
   if ( !m_ImageFrameList.empty() && m_TagCache.IsNotNull() )
   {
     static const DICOMTag tagSOPClassUID( 0x0008, 0x0016 );
-    return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID );
+    return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID ).value;
   }
   else
   {
@@ -654,7 +654,7 @@ void mitk::DICOMImageBlockDescriptor::Print(std::ostream& os, bool filenameDetai
   \
 {                                                                     \
     const DICOMTag t( tag_g, tag_e );                                      \
-    const std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ); \
+    const std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ).value; \
     const_cast<DICOMImageBlockDescriptor*>( this )                         \
       ->SetProperty( #tag_name, StringProperty::New( tagValue ) );         \
   \
@@ -664,8 +664,8 @@ void mitk::DICOMImageBlockDescriptor::Print(std::ostream& os, bool filenameDetai
   \
 {                                                                          \
     const DICOMTag t( tag_g, tag_e );                                           \
-    const std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ); \
-    const std::string tagValueLast  = m_TagCache->GetTagValue( lastFrame, t );  \
+    const std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ).value; \
+    const std::string tagValueLast  = m_TagCache->GetTagValue( lastFrame, t ).value;  \
     const_cast<DICOMImageBlockDescriptor*>( this )                              \
       ->SetProperty( #tag_name "First", StringProperty::New( tagValueFirst ) ); \
     const_cast<DICOMImageBlockDescriptor*>( this )                              \
@@ -734,13 +734,13 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     for ( auto frameIter = m_ImageFrameList.begin(); frameIter != m_ImageFrameList.end();
           ++slice, ++frameIter )
     {
-      const std::string sliceLocation = m_TagCache->GetTagValue( *frameIter, tagSliceLocation );
+      const std::string sliceLocation = m_TagCache->GetTagValue( *frameIter, tagSliceLocation ).value;
       sliceLocationForSlices.SetTableValue( slice, sliceLocation );
 
-      const std::string instanceNumber = m_TagCache->GetTagValue( *frameIter, tagInstanceNumber );
+      const std::string instanceNumber = m_TagCache->GetTagValue( *frameIter, tagInstanceNumber ).value;
       instanceNumberForSlices.SetTableValue( slice, instanceNumber );
 
-      const std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber );
+      const std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber ).value;
       SOPInstanceUIDForSlices.SetTableValue( slice, sopInstanceUID );
 
       const std::string filename = ( *frameIter )->Filename;
@@ -751,8 +751,11 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
       for ( auto iter = m_AdditionalTagList.cbegin(); iter != m_AdditionalTagList.cend(); ++iter )
       {
-        const std::string value = m_TagCache->GetTagValue( *frameIter, iter->second );
-        additionalTagResultList[iter->first].SetTableValue( slice, value );
+        const DICOMDatasetFinding finding = m_TagCache->GetTagValue( *frameIter, iter->second );
+        if (finding.isValid)
+        {
+          additionalTagResultList[iter->first].SetTableValue(slice, finding.value);
+        }
       }
     }
     // add property or properties with proper names

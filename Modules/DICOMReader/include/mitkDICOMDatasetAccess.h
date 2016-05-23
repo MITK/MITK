@@ -23,6 +23,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+  Helper class that is used for the result of DICOMDatasetAccess::GetTagValueAsString
+   */
+  struct MITKDICOMREADER_EXPORT DICOMDatasetFinding
+  {
+    std::string value;
+    /**Indicates if value is valid or not.*/
+    bool isValid;
+
+    DICOMDatasetFinding() : isValid(false), value("")
+    {};
+  };
 
 /**
   \ingroup DICOMReaderModule
@@ -38,8 +50,11 @@ class MITKDICOMREADER_EXPORT DICOMDatasetAccess
     /// If DICOM is not read from file but from somewhere else (network, database), we might not have files.
     virtual std::string GetFilenameIfAvailable() const = 0;
 
-    /// \brief Return the raw value of the tag as a string
-    virtual std::string GetTagValueAsString(const mitk::DICOMTag& tag) const = 0;
+    /** \brief Return a DICOMDatasetFinding instance of the tag.
+    The return containes (if valid) the raw value of the tag as a string.
+    \param tag Tag which value should be retreived.
+    */
+    virtual DICOMDatasetFinding GetTagValueAsString(const DICOMTag& tag) const = 0;
 
     virtual ~DICOMDatasetAccess() {};
 };

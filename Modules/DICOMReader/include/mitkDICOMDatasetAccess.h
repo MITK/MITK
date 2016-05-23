@@ -28,9 +28,10 @@ namespace mitk
    */
   struct MITKDICOMREADER_EXPORT DICOMDatasetFinding
   {
-    std::string value;
     /**Indicates if value is valid or not.*/
     bool isValid;
+    /**The found value.*/
+    std::string value;
 
     DICOMDatasetFinding() : isValid(false), value("")
     {};

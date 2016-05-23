@@ -35,7 +35,7 @@ namespace mitk
         public:
           typedef MultiModalTranslationDefaultRegistrationAlgorithm Self;
 
-          typedef ITKTransMattesMIMultiResRegistrationAlgorithm<ImageType, ImageType, DIPP_MultiModal_translation_defaultUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<ImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
+          typedef ITKTransMattesMIMultiResRegistrationAlgorithm<ImageType, ImageType, ::map::algorithm::MITK_MultiModal_translation_defaultUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<ImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>
           Superclass;
 
           typedef ::itk::SmartPointer<Self>                                     Pointer;

@@ -1,5 +1,5 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS Rendering IO Helper
+  INCLUDE_DIRS PUBLIC Rendering Helper
   DEPENDS MitkCore MitkSceneSerializationBase
   PACKAGE_DEPENDS
    PRIVATE ITK VTK

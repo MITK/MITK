@@ -1,17 +1,21 @@
 /**
 \page IGTTutorialStepPluginIntroduction Introduction to the IGT Plugins
 
-\ref org_mitk_gui_qt_igttracking - Overview of all tracking views which could be used for your application
+The IGT module provides some nice views which might help you with your project. This first step leads you through the main functionality of the IGT plugin.
 
-\li igttrackingtoolbox  - Connect your tracking device and start tracking
+To get familiar with these, please click on each of the views and follow the instructions:
 
-\li igtnavigationtoolmanager -  Edit your tool storage
+\li \ref org_mitk_views_igttrackingtoolbox  - Connect your tracking device and start tracking
 
-\li navigationdataplayer  - Play your navigation data, e.g. recorded with the tracking toolbox
+\li \ref org_mitk_views_igtnavigationtoolmanager -  Edit your tool storage
 
-\li  calibration tool manager. Will follow soon.
+\li \ref org_mitk_views_navigationdataplayer  - Play your navigation data, e.g. recorded with the tracking toolbox
 
+\li \ref org_mitk_views_calibrationtoolmanager Calibration Tool Manager. Will follow soon.
 
-\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+An overview of all tracking views can also be found here:
+\li \ref org_mitk_gui_qt_igttracking
+
+\ref Return to the \ref TrackingPlugins "[IGT Tutorial Overview]"
 
 */

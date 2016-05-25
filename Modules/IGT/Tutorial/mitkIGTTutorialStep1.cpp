@@ -30,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## \brief A small console tutorial about MITK-IGT
 int main(int  /*argc*/, char*  /*argv*/[])
 {
+  //! [What we will do]
   //*************************************************************************
   // What we will do...
   //*************************************************************************
@@ -39,7 +40,10 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //filter which just displaces the positions with an offset. After that we use a recorder
   //to store this new positions and other information to disc in a XML file. After that we use
   //another source (NavigationDataPlayer) to replay the recorded data.
+  //! [What we will do]
 
+
+  //! [Part I Basic 1]
   //*************************************************************************
   // Part I: Basic initialization of the source and tracking device
   //*************************************************************************
@@ -54,7 +58,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
   tracker->AddTool("tool1");
   tracker->AddTool("tool2");
+  //! [Part I Basic 1]
 
+  //! [Part I Basic 2]
   //The tracking device object is used for the physical connection to the device. To use the
   //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
   //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores
@@ -75,7 +81,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //Note we do not call this on the TrackingDevice object
   source->StartTracking();  //start the tracking
   //Now the source generates outputs.
+  //! [Part I Basic 2]
 
+  //! [Part II: Create a NavigationDataToNavigationDataFilter]
   //*************************************************************************
   // Part II: Create a NavigationDataToNavigationDataFilter
   //*************************************************************************
@@ -103,6 +111,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //{
   //  displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter
   //}
+
+  //! [Part II: Create a NavigationDataToNavigationDataFilter]
+  //! [Part III: Record the data with the NavigationDataRecorder]
 
   //*************************************************************************
   // Part III: Record the data with the NavigationDataRecorder
@@ -143,6 +154,12 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //The IO-System needs a filename. Otherwise the output
   //is redirected to the console. See MITK-Concepts page for more details on IO in MITK
   mitk::IOUtil::SaveBaseData(recorder->GetNavigationDataSet(), filename.str());
+
+
+  //! [Part III: Record the data with the NavigationDataRecorder]
+
+  //! [Part IV: Play the data with the NavigationDataPlayer]
+
   //*************************************************************************
   // Part IV: Play the data with the NavigationDataPlayer
   //*************************************************************************
@@ -182,4 +199,6 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   itksys::SystemTools::Delay(2000);
   std::cout << "finished" << std::endl;
+
+  //! [Part IV: Play the data with the NavigationDataPlayer]
 }

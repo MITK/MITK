@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_navigationdataplayer The NavigationData Player
 
-\imageMacro{QmitkIGTTracking_IconNavigationDataPlayer.png,"Icon of the NavigationData Player",2.00}
+\imageMacro{../resources/iconNavigationDataPlayer.png,"Icon of the NavigationData Player",2.00}
 
 \tableofcontents
 
@@ -22,6 +22,7 @@ Use the Time-based player to play the data in the speed they were originally acq
 <li> Check "Display" to render the data in the render Window.
 </ul>
 
-Return to the Tutorial overview: \ref IGTTutorialStepAdvanced
+<b>Tutorial:</b> As part of the IGT tutorial, you might try to replay your recorded data from step \ref org_mitk_views_igttrackingtoolbox
+Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction
 
 */

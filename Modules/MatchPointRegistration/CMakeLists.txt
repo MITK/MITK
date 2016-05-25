@@ -6,8 +6,10 @@ MITK_CREATE_MODULE(
    PUBLIC MatchPoint
 )
 
-ADD_SUBDIRECTORY(autoload/IO)
-ADD_SUBDIRECTORY(algorithms)
-if(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Testing)
-endif(BUILD_TESTING)
+if( ${MITK_USE_MatchPoint} )
+  ADD_SUBDIRECTORY(autoload/IO)
+  ADD_SUBDIRECTORY(algorithms)
+  if(BUILD_TESTING)
+    ADD_SUBDIRECTORY(Testing)
+  endif(BUILD_TESTING)
+endif()

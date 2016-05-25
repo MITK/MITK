@@ -143,6 +143,11 @@ class MITKSEGMENTATION_EXPORT SegmentationInterpolationController : public itk::
     */
     void Activate2DInterpolation(bool);
 
+    /**
+      \brief Get existing instance or create a new one
+    */
+    static SegmentationInterpolationController* GetInstance();
+
   protected:
 
     /**

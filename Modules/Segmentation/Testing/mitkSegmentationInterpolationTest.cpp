@@ -49,6 +49,12 @@ public:
         m_ReferenceImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
         CPPUNIT_ASSERT_MESSAGE("Failed to load image for test: [Pic3D.nrrd]", m_ReferenceImage.IsNotNull());
 
+        // Test
+//        mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();
+//        navigationController->SetInputWorldTimeGeometry(m_SegmentationImage->GetTimeGeometry());
+//        navigationController->Update(mitk::SliceNavigationController::ViewDirection(dim));
+
+
         m_InterpolationController = mitk::SegmentationInterpolationController::GetInstance();
 
         // Create empty segmentation
@@ -79,7 +85,15 @@ public:
 
     void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
     {
-        int dim(1); // axial slices are sorted along third axis
+        int dim(2); // axial slices are sorted along third axis
+        mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Frontal;
+
+        switch(viewDirection)
+        {
+        case(mitk::SliceNavigationController::Axial): dim = 2; break;
+        case(mitk::SliceNavigationController::Frontal): dim = 1; break;
+        case(mitk::SliceNavigationController::Sagittal): dim = 0; break;
+        }
 
         /* Fill segmentation
          *
@@ -103,14 +117,16 @@ public:
                     currentPoint[(dim+1)%3] = m_CenterPoint[(dim+1)%3] + i;
                     currentPoint[(dim+2)%3] = m_CenterPoint[(dim+2)%3] + j;
                     writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
+                    MITK_INFO << currentPoint;
                 }
             }
             // Now i=j=1, set point two slices up
             currentPoint[dim] = m_CenterPoint[dim] + 1;
             writeAccessor.SetPixelByIndexSafe(currentPoint, 1);
+            MITK_INFO << "other slice: "<<currentPoint;
         }
 
-        mitk::IOUtil::Save(m_SegmentationImage, "/home/jenspetersen/Desktop/preseg.nrrd");
+        mitk::IOUtil::Save(m_SegmentationImage, "/home/jens/Desktop/preseg2.nrrd");
 
         m_InterpolationController->SetSegmentationVolume(m_SegmentationImage);
         m_InterpolationController->SetReferenceVolume(m_ReferenceImage);
@@ -119,20 +135,24 @@ public:
         // Note: Index = (sag, cor, ax); PlaneOrientation enum = (ax, sag, cor) in this situation
         mitk::SliceNavigationController::Pointer navigationController = mitk::SliceNavigationController::New();
         navigationController->SetInputWorldTimeGeometry(m_SegmentationImage->GetTimeGeometry());
-        navigationController->SetViewDirection(mitk::SliceNavigationController::ViewDirection(0));
-        navigationController->Update();
+//        navigationController->SetViewDirection(mitk::SliceNavigationController::ViewDirection(dim));
+        navigationController->Update(viewDirection);
         mitk::Point3D pointMM;
         m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0)->IndexToWorld(m_CenterPoint, pointMM);
         navigationController->SelectSliceByPoint(pointMM);
+        MITK_INFO << "point between: "<<m_CenterPoint;
         auto plane = navigationController->GetCurrentPlaneGeometry();
-
 
 //        mitk::BaseGeometry::Pointer currentGeometry = m_SegmentationImage->GetTimeGeometry()->GetGeometryForTimeStep(0);
 //        mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(currentGeometry.GetPointer());
 //        mitk::PlaneGeometry* plane = slicedGeometry->GetPlaneGeometry(m_CenterPoint[dim]);
         mitk::Image::Pointer interpolationResult = m_InterpolationController->Interpolate(dim, m_CenterPoint[dim], plane, 0);
+        MITK_INFO << "INTERPOLATION RESULTS";
+        interpolationResult->GetGeometry()->GetIndexToWorldTransform()->Print(std::cout);
+        MITK_INFO << "origin plane: "<<plane->GetOrigin();
+         MITK_INFO << "origin image: "<<interpolationResult->GetGeometry()->GetOrigin();
 
-        mitk::IOUtil::Save(interpolationResult, "/home/jenspetersen/Desktop/interpolation.nrrd");
+        mitk::IOUtil::Save(interpolationResult, "/home/jens/Desktop/interpolation2.nrrd");
 
         // Write result into segmentation image
         vtkSmartPointer<mitkVtkImageOverwrite> reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
@@ -148,7 +168,7 @@ public:
         extractor->Modified();
         extractor->Update();
 
-        mitk::IOUtil::Save(m_SegmentationImage, "/home/jenspetersen/Desktop/postseg.nrrd");
+        mitk::IOUtil::Save(m_SegmentationImage, "/home/jens/Desktop/postseg2.nrrd");
 
         // Check a 4x4 square, the center of which needs to be filled
         mitk::ImagePixelReadAccessor<mitk::Tool::DefaultSegmentationDataType, 3> readAccess(m_SegmentationImage);

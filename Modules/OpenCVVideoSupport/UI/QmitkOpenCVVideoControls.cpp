@@ -35,7 +35,7 @@ public:
   ///
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
 
-    QmitkOpenCVVideoControls* q;
+  QmitkOpenCVVideoControls* q;
 
   ///
   /// muellerm: a unique id for the prop list
@@ -139,13 +139,13 @@ void QmitkOpenCVVideoControls::on_VideoProgressSlider_sliderReleased()
   m_SliderCurrentlyMoved = false;
 }
 
-void QmitkOpenCVVideoControls::on_RepeatVideoButton_clicked(bool checked/*=false */)
+void QmitkOpenCVVideoControls::on_RepeatVideoButton_clicked(bool checked)
 {
   MITK_INFO << "repeat video clicked";
   m_VideoSource->SetRepeatVideo(checked);
 }
 
-void QmitkOpenCVVideoControls::on_PlayButton_clicked(bool checked/*=false*/)
+void QmitkOpenCVVideoControls::on_PlayButton_clicked(bool checked)
 {
   MITK_INFO << "play button clicked";
   if (checked)
@@ -380,7 +380,7 @@ void QmitkOpenCVVideoControlsPrivate::ToPropertyList()
   }
   else
   {
-    MITK_ERROR << "Persistence Service not available.";
+    MITK_WARN << "Persistence Service not available.";
   }
 }
 
@@ -417,7 +417,7 @@ void QmitkOpenCVVideoControlsPrivate::FromPropertyList()
   }
   else
   {
-    MITK_ERROR << "Persistence Service not available.";
+    MITK_WARN << "Persistence Service not available.";
   }
 }
 

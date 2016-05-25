@@ -35,7 +35,7 @@ public:
   ///
   PERSISTENCE_GET_SERVICE_METHOD_MACRO
 
-  QmitkOpenCVVideoControls* q;
+    QmitkOpenCVVideoControls* q;
 
   ///
   /// muellerm: a unique id for the prop list
@@ -45,16 +45,16 @@ public:
   void FromPropertyList();
 };
 
-QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _VideoBackground
-                                                   , QmitkRenderWindow* _RenderWindow
-                                                   , QWidget * parent, Qt::WindowFlags f)
-: QWidget(parent, f)
-, m_VideoBackground(0)
-, m_RenderWindow(0)
-, m_VideoSource(0)
-, m_Controls(new Ui::QmitkOpenCVVideoControls)
-, m_SliderCurrentlyMoved(false)
-, d(new QmitkOpenCVVideoControlsPrivate(this, "QmitkOpenCVVideoControls"))
+QmitkOpenCVVideoControls::QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground
+  , QmitkRenderWindow* _RenderWindow
+  , QWidget * parent, Qt::WindowFlags f)
+  : QWidget(parent, f)
+  , m_VideoBackground(nullptr)
+  , m_RenderWindow(nullptr)
+  , m_VideoSource(nullptr)
+  , m_Controls(new Ui::QmitkOpenCVVideoControls)
+  , m_SliderCurrentlyMoved(false)
+  , d(new QmitkOpenCVVideoControlsPrivate(this, "QmitkOpenCVVideoControls"))
 {
   m_Controls->setupUi(this);
   m_Controls->FileChooser->SetFileMustExist(true);
@@ -63,24 +63,46 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _Video
   this->SetRenderWindow(_RenderWindow);
   this->SetVideoBackground(_VideoBackground);
   d->FromPropertyList();
-  d->GetPersistenceService()->AddPropertyListReplacedObserver(this);
+
+  mitk::IPersistenceService* persistenceService = d->GetPersistenceService();
+
+  if (persistenceService != nullptr)
+  {
+    persistenceService->AddPropertyListReplacedObserver(this);
+  }
+  else
+  {
+    MITK_WARN << "No Persistence Service available in constructor";
+  }
 }
 
 QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
 {
   if(m_VideoSource != 0 && m_VideoSource->IsCapturingEnabled())
-      this->Stop(); // emulate stop
-  d->GetPersistenceService()->RemovePropertyListReplacedObserver(this);
+  {
+    this->Stop(); // emulate stop
+  }
+
+  mitk::IPersistenceService* persistenceService = d->GetPersistenceService();
+  if (persistenceService != nullptr)
+  {
+    persistenceService->RemovePropertyListReplacedObserver(this);
+  }
+  else
+  {
+    MITK_WARN << "No Persistence Service available in destructor";
+  }
+
   d->ToPropertyList();
 }
 
-void QmitkOpenCVVideoControls::on_UseGrabbingDeviceButton_clicked( bool /*checked=false*/ )
+void QmitkOpenCVVideoControls::on_UseGrabbingDeviceButton_clicked(bool /*checked=false*/)
 {
   m_Controls->GrabbingDevicePanel->setEnabled(true);
   m_Controls->VideoFilePanel->setEnabled(false);
 }
 
-void QmitkOpenCVVideoControls::on_UseVideoFileButton_clicked( bool /*checked=false*/ )
+void QmitkOpenCVVideoControls::on_UseVideoFileButton_clicked(bool /*checked=false*/)
 {
   m_Controls->GrabbingDevicePanel->setEnabled(false);
   m_Controls->VideoFilePanel->setEnabled(true);
@@ -99,45 +121,45 @@ void QmitkOpenCVVideoControls::on_VideoProgressSlider_sliderPressed()
 {
   m_SliderCurrentlyMoved = true;
   // temporary pause the video while sliding
-  if( !m_VideoSource->GetCapturePaused() )
+  if (!m_VideoSource->GetCapturePaused())
     m_VideoSource->PauseCapturing();
-  MITK_DEBUG << "freezing video with old pos ratio: "<< m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
+  MITK_DEBUG << "freezing video with old pos ratio: " << m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
 }
 
 void QmitkOpenCVVideoControls::on_VideoProgressSlider_sliderReleased()
 {
   double progressRatio = static_cast<double>(m_Controls->VideoProgressSlider->value())
-    /static_cast<double>(m_Controls->VideoProgressSlider->maximum());
+    / static_cast<double>(m_Controls->VideoProgressSlider->maximum());
   m_VideoSource->SetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO, progressRatio);
 
-  MITK_DEBUG << "resuming video with new pos ratio: "<< progressRatio;
+  MITK_DEBUG << "resuming video with new pos ratio: " << progressRatio;
   // resume the video ( if it was not paused by the user)
-  if( m_VideoSource->GetCapturePaused() && m_Controls->PlayButton->isChecked() )
+  if (m_VideoSource->GetCapturePaused() && m_Controls->PlayButton->isChecked())
     m_VideoSource->PauseCapturing();
   m_SliderCurrentlyMoved = false;
 }
 
-void QmitkOpenCVVideoControls::on_RepeatVideoButton_clicked( bool checked/*=false */ )
+void QmitkOpenCVVideoControls::on_RepeatVideoButton_clicked(bool checked/*=false */)
 {
   MITK_INFO << "repeat video clicked";
   m_VideoSource->SetRepeatVideo(checked);
 }
 
-void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
+void QmitkOpenCVVideoControls::on_PlayButton_clicked(bool checked/*=false*/)
 {
   MITK_INFO << "play button clicked";
-  if(checked)
+  if (checked)
   {
-    if( m_VideoSource->GetCapturePaused() )
+    if (m_VideoSource->GetCapturePaused())
     {
       this->SwitchPlayButton(false);
       m_VideoSource->PauseCapturing();
     }
     else
     {
-      if(m_Controls->UseGrabbingDeviceButton->isChecked())
+      if (m_Controls->UseGrabbingDeviceButton->isChecked())
       {
-        m_VideoSource->SetVideoCameraInput(m_Controls->GrabbingDeviceNumber->text().toInt(),false);
+        m_VideoSource->SetVideoCameraInput(m_Controls->GrabbingDeviceNumber->text().toInt(), false);
         m_Controls->VideoFileControls->setEnabled(false);
       }
       else
@@ -148,7 +170,7 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
       }
 
       m_VideoSource->StartCapturing();
-      if(!m_VideoSource->IsCapturingEnabled())
+      if (!m_VideoSource->IsCapturingEnabled())
       {
         MITK_ERROR << "Video could not be initialized!";
         m_Controls->PlayButton->setChecked(false);
@@ -157,18 +179,18 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
       else
       {
         int hertz = m_Controls->UpdateRate->text().toInt();
-        int updateTime = itk::Math::Round<int, double>( 1000.0/hertz );
+        int updateTime = itk::Math::Round<int, double>(1000.0 / hertz);
 
         // resets the whole background
-        m_VideoBackground->SetTimerDelay( updateTime );
-        m_VideoBackground->AddRenderWindow( m_RenderWindow->GetVtkRenderWindow() );
-        this->connect( m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
+        m_VideoBackground->SetTimerDelay(updateTime);
+        m_VideoBackground->AddRenderWindow(m_RenderWindow->GetVtkRenderWindow());
+        this->connect(m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
           , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
 
         m_VideoBackground->Enable();
         this->m_Controls->StopButton->setEnabled(true);
         // show video file controls
-        if(m_Controls->UseVideoFileButton->isChecked())
+        if (m_Controls->UseVideoFileButton->isChecked())
         {
           m_Controls->VideoFileControls->setEnabled(true);
           m_Controls->RepeatVideoButton->setEnabled(true);
@@ -190,11 +212,10 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
     // show pause button
     this->SwitchPlayButton(true);
     m_VideoSource->PauseCapturing();
-
   }
 }
 
-void QmitkOpenCVVideoControls::on_StopButton_clicked( bool /*checked=false*/ )
+void QmitkOpenCVVideoControls::on_StopButton_clicked(bool /*checked=false*/)
 {
   this->Stop();
 }
@@ -204,7 +225,7 @@ void QmitkOpenCVVideoControls::Stop()
   // disable video file controls, stop button and show play button again
   m_Controls->UseGrabbingDeviceButton->setEnabled(true);
   m_Controls->UseVideoFileButton->setEnabled(true);
-  if(m_Controls->UseGrabbingDeviceButton->isChecked())
+  if (m_Controls->UseGrabbingDeviceButton->isChecked())
     on_UseGrabbingDeviceButton_clicked(true);
   else
     on_UseVideoFileButton_clicked(true);
@@ -214,17 +235,17 @@ void QmitkOpenCVVideoControls::Stop()
   this->m_Controls->StopButton->setEnabled(false);
   this->SwitchPlayButton(true);
 
-  if(m_VideoBackground)
+  if (m_VideoBackground)
   {
     m_VideoBackground->Disable();
 
-    if(m_RenderWindow)
-      m_VideoBackground->RemoveRenderWindow( m_RenderWindow->GetVtkRenderWindow() );
+    if (m_RenderWindow)
+      m_VideoBackground->RemoveRenderWindow(m_RenderWindow->GetVtkRenderWindow());
 
-    this->disconnect( m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
+    this->disconnect(m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
       , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
   }
-  if(m_VideoSource != 0)
+  if (m_VideoSource != 0)
     m_VideoSource->StopCapturing();
 }
 
@@ -235,41 +256,41 @@ void QmitkOpenCVVideoControls::Reset()
 
 void QmitkOpenCVVideoControls::SwitchPlayButton(bool paused)
 {
-  if(paused)
+  if (paused)
   {
     m_Controls->PlayButton->setText("Play");
-    m_Controls->PlayButton->setIcon( QIcon(":/OpenCVVideoSupportUI/media-playback-start.png") );
+    m_Controls->PlayButton->setIcon(QIcon(":/OpenCVVideoSupportUI/media-playback-start.png"));
     m_Controls->PlayButton->setChecked(false);
   }
   else
   {
     m_Controls->PlayButton->setText("Pause");
-    m_Controls->PlayButton->setIcon( QIcon(":/OpenCVVideoSupportUI/media-playback-pause.png") );
+    m_Controls->PlayButton->setIcon(QIcon(":/OpenCVVideoSupportUI/media-playback-pause.png"));
     m_Controls->PlayButton->setChecked(true);
   }
 }
 
-void QmitkOpenCVVideoControls::NewFrameAvailable( mitk::VideoSource* /*videoSource*/ )
+void QmitkOpenCVVideoControls::NewFrameAvailable(mitk::VideoSource* /*videoSource*/)
 {
-  emit NewOpenCVFrameAvailable( m_VideoSource->GetCurrentFrame() );
-  if(!m_SliderCurrentlyMoved)
-    m_Controls->VideoProgressSlider->setValue( itk::Math::Round<int,double>( m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO)
-      *m_Controls->VideoProgressSlider->maximum() ) );
+  emit NewOpenCVFrameAvailable(m_VideoSource->GetCurrentFrame());
+  if (!m_SliderCurrentlyMoved)
+    m_Controls->VideoProgressSlider->setValue(itk::Math::Round<int, double>(m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO)
+    *m_Controls->VideoProgressSlider->maximum()));
 }
 
-void QmitkOpenCVVideoControls::SetRenderWindow( QmitkRenderWindow* _RenderWindow )
+void QmitkOpenCVVideoControls::SetRenderWindow(QmitkRenderWindow* _RenderWindow)
 {
-  if(m_RenderWindow == _RenderWindow)
+  if (m_RenderWindow == _RenderWindow)
     return;
 
   // In Reset() m_MultiWidget is used, set it to 0 now for avoiding errors
-  if(_RenderWindow == 0)
+  if (_RenderWindow == 0)
     m_RenderWindow = 0;
   this->Reset();
 
   m_RenderWindow = _RenderWindow;
 
-  if(m_RenderWindow == 0)
+  if (m_RenderWindow == 0)
   {
     this->setEnabled(false);
   }
@@ -284,20 +305,20 @@ QmitkRenderWindow* QmitkOpenCVVideoControls::GetRenderWindow() const
   return m_RenderWindow;
 }
 
-void QmitkOpenCVVideoControls::SetVideoBackground( QmitkVideoBackground* _VideoBackground )
+void QmitkOpenCVVideoControls::SetVideoBackground(QmitkVideoBackground* _VideoBackground)
 {
-  if(m_VideoBackground == _VideoBackground)
+  if (m_VideoBackground == _VideoBackground)
     return;
 
-  if(m_VideoBackground != 0)
-    this->disconnect( m_VideoBackground, SIGNAL(destroyed(QObject*))
+  if (m_VideoBackground != nullptr)
+    this->disconnect(m_VideoBackground, SIGNAL(destroyed(QObject*))
     , this, SLOT(QObjectDestroyed(QObject*)));
 
   this->Reset();
 
   m_VideoBackground = _VideoBackground;
 
-  if(m_VideoBackground == 0)
+  if (m_VideoBackground == nullptr)
   {
     m_VideoSource = 0;
     MITK_WARN << "m_MultiWidget is 0";
@@ -308,19 +329,19 @@ void QmitkOpenCVVideoControls::SetVideoBackground( QmitkVideoBackground* _VideoB
     this->setEnabled(true);
     m_VideoSource = dynamic_cast<mitk::OpenCVVideoSource*>(m_VideoBackground->GetVideoSource());
     // preset form entries
-    if(m_VideoSource != 0)
+    if (m_VideoSource != nullptr)
     {
-      if(!m_VideoSource->GetVideoFileName().empty())
+      if (!m_VideoSource->GetVideoFileName().empty())
       {
-        m_Controls->FileChooser->SetFile( m_VideoSource->GetVideoFileName() );
-        on_UseGrabbingDeviceButton_clicked( false );
+        m_Controls->FileChooser->SetFile(m_VideoSource->GetVideoFileName());
+        on_UseGrabbingDeviceButton_clicked(false);
       }
-      else if( m_VideoSource->GetGrabbingDeviceNumber() >= 0)
-        m_Controls->GrabbingDeviceNumber->setValue( m_VideoSource->GetGrabbingDeviceNumber() );
+      else if (m_VideoSource->GetGrabbingDeviceNumber() >= 0)
+        m_Controls->GrabbingDeviceNumber->setValue(m_VideoSource->GetGrabbingDeviceNumber());
 
-      m_Controls->UpdateRate->setValue( m_VideoBackground->GetTimerDelay() );
+      m_Controls->UpdateRate->setValue(m_VideoBackground->GetTimerDelay());
 
-      this->connect( m_VideoBackground, SIGNAL(destroyed(QObject*))
+      this->connect(m_VideoBackground, SIGNAL(destroyed(QObject*))
         , this, SLOT(QObjectDestroyed(QObject*)));
     }
     else
@@ -329,7 +350,6 @@ void QmitkOpenCVVideoControls::SetVideoBackground( QmitkVideoBackground* _VideoB
       this->setEnabled(false);
     }
   }
-
 }
 
 QmitkVideoBackground* QmitkOpenCVVideoControls::GetVideoBackground() const
@@ -337,27 +357,40 @@ QmitkVideoBackground* QmitkOpenCVVideoControls::GetVideoBackground() const
   return m_VideoBackground;
 }
 
-void QmitkOpenCVVideoControls::QObjectDestroyed( QObject * obj /*= 0 */ )
+void QmitkOpenCVVideoControls::QObjectDestroyed(QObject * obj /*= 0 */)
 {
-  if(m_VideoBackground == obj)
+  if (m_VideoBackground == obj)
   {
-    m_VideoSource = 0;
-    this->SetVideoBackground(0);
+    m_VideoSource = nullptr;
+    this->SetVideoBackground(nullptr);
   }
 }
 
 void QmitkOpenCVVideoControlsPrivate::ToPropertyList()
 {
-    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(m_Id);
-    propList->Set("deviceType", q->m_Controls->UseGrabbingDeviceButton->isChecked()? 0: 1);
-    propList->Set("grabbingDeviceNumber", q->m_Controls->GrabbingDeviceNumber->value());
-    propList->Set("updateRate", q->m_Controls->UpdateRate->value());
-    propList->Set("repeatVideo", q->m_Controls->RepeatVideoButton->isChecked());
+  mitk::IPersistenceService* persistenceService = this->GetPersistenceService();
+
+  if (persistenceService != nullptr)
+  {
+      mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(m_Id);
+      propList->Set("deviceType", q->m_Controls->UseGrabbingDeviceButton->isChecked() ? 0 : 1);
+      propList->Set("grabbingDeviceNumber", q->m_Controls->GrabbingDeviceNumber->value());
+      propList->Set("updateRate", q->m_Controls->UpdateRate->value());
+      propList->Set("repeatVideo", q->m_Controls->RepeatVideoButton->isChecked());
+  }
+  else
+  {
+    MITK_ERROR << "Persistence Service not available.";
+  }
 }
 
 void QmitkOpenCVVideoControlsPrivate::FromPropertyList()
 {
-    mitk::PropertyList::Pointer propList = this->GetPersistenceService()->GetPropertyList(m_Id);
+  mitk::IPersistenceService* persistenceService = this->GetPersistenceService();
+
+  if (persistenceService != nullptr)
+  {
+    mitk::PropertyList::Pointer propList = persistenceService->GetPropertyList(m_Id);
 
     bool repeatVideo = false;
     propList->Get("repeatVideo", repeatVideo);
@@ -373,14 +406,23 @@ void QmitkOpenCVVideoControlsPrivate::FromPropertyList()
 
     int deviceType = 0;
     propList->Get("deviceType", deviceType);
-    if( deviceType == 0 )
-        q->m_Controls->UseGrabbingDeviceButton->setChecked(true);
+    if (deviceType == 0)
+    {
+      q->m_Controls->UseGrabbingDeviceButton->setChecked(true);
+    }
     else
-        q->m_Controls->UseVideoFileButton->setChecked(true);
+    {
+      q->m_Controls->UseVideoFileButton->setChecked(true);
+    }
+  }
+  else
+  {
+    MITK_ERROR << "Persistence Service not available.";
+  }
 }
 
-void QmitkOpenCVVideoControls::AfterPropertyListReplaced( const std::string& id, mitk::PropertyList* /*propertyList*/ )
+void QmitkOpenCVVideoControls::AfterPropertyListReplaced(const std::string& id, mitk::PropertyList* /*propertyList*/)
 {
-    if( id == d->m_Id )
-        d->FromPropertyList();
+  if (id == d->m_Id)
+    d->FromPropertyList();
 }

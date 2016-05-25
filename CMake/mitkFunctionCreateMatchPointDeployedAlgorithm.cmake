@@ -63,7 +63,6 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
 
   MESSAGE(STATUS "... generate MDRA profile (from ${ALG_PROFILE})...")
 
-  set(MatchPoint_SOURCE_DIR "${CMAKE_BINARY_DIR}/../ep/src/MatchPoint")
   include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
   CREATE_ALGORITHM_PROFILE(${ALG_NAME} ${ALG_PROFILE})
 

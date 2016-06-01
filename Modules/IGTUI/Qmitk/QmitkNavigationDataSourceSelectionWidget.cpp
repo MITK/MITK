@@ -57,8 +57,14 @@ void QmitkNavigationDataSourceSelectionWidget::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_NavigationDataSourceWidget), SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(NavigationDataSourceSelected(us::ServiceReferenceU)) );
+    connect((QObject*)(m_Controls->m_ToolView), SIGNAL(currentRowChanged(int)), this, SLOT(NavigationToolSelected(int)));
 
   }
+}
+
+void QmitkNavigationDataSourceSelectionWidget::NavigationToolSelected(int selection)
+{
+  emit NavigationToolSelected(this->m_CurrentStorage->GetTool(selection));
 }
 
 void QmitkNavigationDataSourceSelectionWidget::NavigationDataSourceSelected(us::ServiceReferenceU s)

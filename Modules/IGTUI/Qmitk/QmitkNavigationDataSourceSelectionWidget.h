@@ -68,10 +68,18 @@ class MITKIGTUI_EXPORT QmitkNavigationDataSourceSelectionWidget : public QWidget
     void NavigationDataSourceSelected(mitk::NavigationDataSource::Pointer n);
 
 
+    /** @brief This signal is emitted when a new navigation data tool is selected.
+    * @param n Holds the new selected navigation tool. Is null if the old source is deselected and no new source is selected.
+    */
+    void NavigationToolSelected(mitk::NavigationTool::Pointer n);
+
+
 
   protected slots:
 
     void NavigationDataSourceSelected(us::ServiceReferenceU s);
+
+    void NavigationToolSelected(int selection);
 
 
   protected:

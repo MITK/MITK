@@ -20,14 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiducialRegistrationWidget.h"
 #include "QmitkStdMultiWidget.h"
 #include "MitkIGTUIExports.h"
+#include "MitkNavigationData.h"
 /*!
  * \brief IGT Fiducial Registration Widget
  *
  * Widget used to set fiducial landmarks in the image and to confirm the corresponding landmarks on the world object (patient/phantom).
  *
- * SetImageFiducialsNode(), SetTrackerFiducialsNode() and SetMultiWidget() must be called, otherwise QmitkPointListWidget can not work.
+ * The widget can add tracker fiducials and perform the registration internally. To enable this functionaltity the
+ * methods SetDataStorage(), setTrackerNavigationData() and setImageNode() needs to be called before.
  *
- *
+ * If Registration should be handled from outside the class the methods SetImageFiducialsNode() and SetTrackerFiducialsNode()
+ * must be called, otherwise the QmitkPointListWidget can not work. If SetDataStorage() is not called the widget does nothing
+ * internally.
  *
  * \sa IGT
 */
@@ -39,6 +43,17 @@ public:
   QmitkFiducialRegistrationWidget(QWidget* parent);
   virtual ~QmitkFiducialRegistrationWidget();
 
+  /** Adds the image node which is transformed after "register" is clicked. */
+  void setImageNode(mitk::DataNode::Pointer i);
+
+  /** Adds the tracker navigation data which is used when "add current instrument position" is clicked. */
+  void setTrackerNavigationData(mitk::NavigationData::Pointer t);
+
+  /** Sets the data storage. This is required is the widget shoul add tracker points and perform
+   *  registrations internally. When not setting the data storage the widget can still be used
+   *  by reacting on the signals and do custom actions outside.*/
+  void setDataStorage(mitk::DataStorage::Pointer d);
+
   /*!
   \brief enumeration to specify the appearance of the widget.
   'FIDUCIALMODE' is likely to be used for (tracking) fiducial based registration purposes
@@ -49,6 +64,7 @@ public:
     FIDUCIALMODE,
     LANDMARKMODE
   };
+
   /*!
   \brief set the appearance mode of this widget
   'FIDUCIALMODE' adapts the widget for (tracking) fiducial based registration purposes
@@ -56,27 +72,28 @@ public:
   */
   void SetWidgetAppearanceMode(WidgetAppearanceMode widgetMode);
 
-  void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< Set the default stdMultiWidget (needed for the PointListwidget)
+  void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< (Deprecated method. Multiwidget is not required any more.) Set the default stdMultiWidget (needed for the PointListwidget)
   void AddSliceNavigationController(mitk::SliceNavigationController* snc); ///< add the slice navigation controller to be used to move the crosshair to the actual point position
-
   void SetImageFiducialsNode(mitk::DataNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials
   void SetTrackerFiducialsNode(mitk::DataNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials
   mitk::DataNode::Pointer GetImageFiducialsNode(); ///< returns data tree node for the image fiducials
   mitk::DataNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
-
   void SetQualityDisplayText(QString text); ///< sets specific text on the UI (useful to display FRE/TRE...)
+
   /*!
   \brief Specify the name of the source landmarks. Will be used for label and button.
 
   Example: sourceLandmarkName="CT" will result in group box title "CT landmarks" and button text "Add CT landmark".
   */
   void SetSourceLandmarkName(QString sourceLandmarkName);
+
   /*!
   \brief Specify the name of the source landmarks. Will be used for label and button.
 
   Example: targetLandmarkName="CT" will result in group box title "CT landmarks" and button text "Add CT landmark".
   */
   void SetTargetLandmarkName(QString targetLandmarkName);
+
   bool UseICPIsChecked(); ///< returns true if automatic correspondences search is activated else false
   void HideStaticRegistrationRadioButton(bool on); ///< show or hide  "static Fiducial Registration" radio button in the UI
   void HideContinousRegistrationRadioButton(bool on); ///< show or hide  "hybrid continuous Fiducial Registration" radio button in the UI
@@ -95,6 +112,8 @@ public:
   protected slots:
     void DisableEditButtonRegistrationImagePoints(bool);///< Disables the edit button of the widget RegistrationImagePoints if the activated variable is true.
     void DisableEditButtonRegistrationTrackingPoints(bool);///< Disables the edit button of the widget RegistrationTrackingPoints if the activated variable is true.
+    void AddTrackerPoint();
+    void Register();
 
 protected:
 
@@ -102,10 +121,16 @@ protected:
 
   void CreateConnections();
 
+  bool CheckRegistrationInitialization();
+
   Ui::QmitkFiducialRegistrationWidget* m_Controls;  ///< gui widget
   QmitkStdMultiWidget* m_MultiWidget;
   mitk::DataNode::Pointer m_ImageFiducialsNode;
   mitk::DataNode::Pointer m_TrackerFiducialsNode;
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::NavigationData::Pointer m_TrackerNavigationData;
+  mitk::DataNode::Pointer m_ImageNode;
+  mitk::NavigationData::Pointer m_T_ObjectReg;
 
 };
 #endif // _QmitkFiducialRegistrationWidget_H_INCLUDED

@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkFiducialRegistrationWidget.h"
 #include "QmitkStdMultiWidget.h"
 #include "MitkIGTUIExports.h"
-#include "MitkNavigationData.h"
+#include "mitkNavigationData.h"
 /*!
  * \brief IGT Fiducial Registration Widget
  *

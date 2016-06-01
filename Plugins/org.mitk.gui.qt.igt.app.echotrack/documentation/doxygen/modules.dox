@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mbi_gui_qt_usnavigation org.mbi.gui.qt.usnavigation
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup org_mbi_gui_qt_usnavigation_internal Internal
+  \ingroup org_mbi_gui_qt_usnavigation
+
+  \brief This subcategory includes the internal classes of the org.mbi.gui.qt.usnavigation plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

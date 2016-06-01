@@ -5,10 +5,6 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_overlaymanager_Activator.cpp
   QmitkOverlayManagerView.cpp
-  QmitkPropertyItemDelegate.cpp
-  QmitkPropertyItem.cpp
-  QmitkPropertyItemModel.cpp
-  QmitkPropertyItemSortFilterProxyModel.cpp
   QmitkAddNewPropertyDialog.cpp
 )
 
@@ -20,9 +16,6 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_overlaymanager_Activator.h
   src/internal/QmitkOverlayManagerView.h
-  src/internal/QmitkPropertyItemDelegate.h
-  src/internal/QmitkPropertyItemModel.h
-  src/internal/QmitkPropertyItemSortFilterProxyModel.h
   src/internal/QmitkAddNewPropertyDialog.h
 )
 

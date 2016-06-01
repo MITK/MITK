@@ -24,6 +24,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkOverlayManagerViewControls.h"
 
+class QmitkPropertyItemDelegate;
+class QmitkPropertyItemModel;
+class QSortFilterProxyModel;
+
+namespace mitk
+{
+class IPropertyAliases;
+class IPropertyDescriptions;
+class IPropertyPersistence;
+}
 
 /**
   \brief QmitkOverlayManagerView
@@ -39,22 +49,41 @@ class QmitkOverlayManagerView : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
+  QmitkOverlayManagerView();
+  ~QmitkOverlayManagerView();
 
+protected:
 
-  protected:
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  virtual void SetFocus() override;
 
-    virtual void SetFocus() override;
+  Ui::QmitkOverlayManagerViewControls m_Controls;
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-                                     const QList<mitk::DataNode::Pointer>& nodes ) override;
+private slots:
+  void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
+  void OnPropertyListChanged(int index);
+  void OnAddNewProperty();
 
-    Ui::QmitkOverlayManagerViewControls m_Controls;
+private:
+  QString GetPropertyNameOrAlias(const QModelIndex& index);
+  void OnPropertyNameChanged(const itk::EventObject& event);
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  QWidget* m_Parent;
+  unsigned long m_PropertyNameChangedTag;
+  std::string m_SelectionClassName;
+  mitk::IPropertyAliases* m_PropertyAliases;
+  mitk::IPropertyDescriptions* m_PropertyDescriptions;
+  mitk::IPropertyPersistence* m_PropertyPersistence;
+  QSortFilterProxyModel* m_ProxyModel;
+  QmitkPropertyItemModel* m_Model;
+  QmitkPropertyItemDelegate* m_Delegate;
+  mitk::DataNode::Pointer m_SelectedNode;
+  mitk::BaseRenderer* m_Renderer;
 
 };
 

@@ -23,11 +23,11 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="m_OverlayListTab">
       <attribute name="title">
-       <string>Tab 1</string>
+       <string>Overlays</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -41,9 +41,62 @@
      </widget>
      <widget class="QWidget" name="m_PropertyListTab">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>Properties</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="propertyListLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Property List</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="propertyListComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="newButton">
+           <property name="toolTip">
+            <string>Add new property</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../org.mitk.gui.qt.properties/resources/Properties.qrc">
+             <normaloff>:/Properties/new.png</normaloff>:/Properties/new.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
@@ -58,6 +111,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../../../org.mitk.gui.qt.properties/resources/Properties.qrc"/>
+ </resources>
  <connections/>
 </ui>

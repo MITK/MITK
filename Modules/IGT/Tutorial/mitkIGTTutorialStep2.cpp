@@ -25,14 +25,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCylinder.h>
 #include <mitkRenderWindow.h>
 #include <itksys/SystemTools.hxx>
-/**
-  * \brief This tutorial shows how to compose navigation datas. Therefore we render two objects.
-  * The first object is a cone that is tracked. The second object is a cylinder at a fixed position
-  * relative to the cone. At the end of the tracking, the cylinder is moved to its new relative position
-  * according to the last output of the tracking device.
-  * In addition to IGT tutorial step 1, the objects are added to a datastorage. Furthermore, a renderwindow
-  * is used for visual output.
-  */
+
+//The next line starts a snippet to display this code in the documentation. If you don't revise the documentation, don't remove it!
+//! [What we will do]
+
+//*************************************************************************
+// What we will do...
+//*************************************************************************
+// This tutorial shows how to compose navigation datas. Therefore we render two objects.
+//The first object is a cone that is tracked. The second object is a cylinder at a fixed position
+//relative to the cone. At the end of the tracking, the cylinder is moved to its new relative position
+//according to the last output of the tracking device.
+//In addition to IGT tutorial step 1, the objects are added to a datastorage. Furthermore, a renderwindow
+//is used for visual output.
+
+//! [What we will do]
 int main(int argc, char* argv[])
 {
   //General code rendering the data in a renderwindow. See MITK Tutorial Step1 for more details.
@@ -42,8 +49,8 @@ int main(int argc, char* argv[])
 
   //Here, we want a 3D renderwindow
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
-  renderWindow->GetVtkRenderWindow()->SetSize( 500, 500 );
-  renderWindow->GetRenderer()->Resize( 500, 500);
+  renderWindow->GetVtkRenderWindow()->SetSize(500, 500);
+  renderWindow->GetRenderer()->Resize(500, 500);
   //Connect datastorage and renderwindow
   renderWindow->GetRenderer()->SetDataStorage(dataStorage);
 
@@ -53,7 +60,7 @@ int main(int argc, char* argv[])
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
   //Bounds (within the random numbers are generated) must be set before the tools are added
   double bound = 10.0;
-  mitk::ScalarType bounds[] = {-bound, bound, -bound, bound, -bound, bound};
+  mitk::ScalarType bounds[] = { -bound, bound, -bound, bound, -bound, bound };
   tracker->SetBounds(bounds);
   tracker->AddTool("tool1");
 
@@ -114,10 +121,10 @@ int main(int argc, char* argv[])
   mitk::BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(0);
   geometry->SetBounds(bounds);
 
-  mitk::RenderingManager::GetInstance()->InitializeViews( geometry );
+  mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
 
   //Generate and render 75 time steps to move the tracked object
-  for(int i=0; i < 75; ++i)
+  for (int i = 0; i < 75; ++i)
   {
     //Update the cone position
     visualizer->Update();

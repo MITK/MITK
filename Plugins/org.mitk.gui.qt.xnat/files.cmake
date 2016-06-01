@@ -8,7 +8,6 @@ set(INTERNAL_CPP_FILES
   QmitkXnatTreeBrowserView.cpp
   QmitkXnatConnectionPreferencePage.cpp
   QmitkXnatSessionManager.cpp
-  QmitkHttpStatusCodeHandler.cpp
 )
 
 set(UI_FILES

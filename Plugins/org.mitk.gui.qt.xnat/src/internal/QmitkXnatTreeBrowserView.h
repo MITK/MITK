@@ -64,6 +64,8 @@ public:
 
 protected slots:
 
+  void AnErrorOccurred(const QModelIndex &idx);
+
   /// \brief Opens or reuses the xnat editor with the activated node as root item.
   void OnActivatedNode(const QModelIndex& index);
 
@@ -129,8 +131,6 @@ private:
   QString m_DownloadPath;
 
   QMenu* m_ContextMenu;
-
-  QmitkHttpStatusCodeHandler m_StatusCodeHandler;
 
   bool m_SilentMode;
 };

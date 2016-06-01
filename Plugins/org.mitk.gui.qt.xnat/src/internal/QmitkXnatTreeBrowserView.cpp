@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatResource.h>
 #include <ctkXnatResourceFolder.h>
 #include <ctkXnatScan.h>
-#include <ctkXnatScanFolder.h>
+#include <ctkXnatScanFolder.h>http://blog.qt.io/blog/2015/05/11/integrating-custom-opengl-rendering-with-qt-quick-via-qquickframebufferobject/#comment-1195852
 #include <ctkXnatSubject.h>
 
 
@@ -111,12 +111,10 @@ void QmitkXnatTreeBrowserView::ToggleConnection()
   }
   catch (std::invalid_argument)
   {
-    if (true)
-    {
-      mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
-      session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
-            mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
-    }
+    mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
+
+    session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
+          mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
 
   if (session != 0 && session->isOpen())
@@ -159,6 +157,13 @@ void QmitkXnatTreeBrowserView::ToggleConnection()
   }
 }
 
+void QmitkXnatTreeBrowserView::AnErrorOccurred(const QModelIndex &idx)
+{
+  MITK_WARN << "An Error Occurred!";
+
+  m_Controls.treeView->collapseAll();
+}
+
 void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 {
   // Create GUI widgets from the Qt Designer's .ui file
@@ -186,6 +191,9 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
           this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
   connect(m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)));
+  connect(m_Controls.treeView, SIGNAL(clicked), SLOT(MouseClicked(QMouseEvent *)));
+  connect(m_TreeModel, SIGNAL(Error(const QModelIndex&)), SLOT(AnErrorOccurred(const QModelIndex&)));
+
 
   m_Tracker->Open();
 
@@ -284,6 +292,7 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
   ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
   bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
   enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
+
   if (enableDownload)
   {
     if(!m_SilentMode)
@@ -395,7 +404,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
           catch(ctkRuntimeException exc)
           {
-            m_StatusCodeHandler.HandleErrorMessage(exc.what());
+            QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
             return;
           }
           serverURL = obj->resourceUri();
@@ -447,7 +456,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
           catch(ctkRuntimeException exc)
           {
-            m_StatusCodeHandler.HandleErrorMessage(exc.what());
+            QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
             return;
           }
           serverURL = parent->resourceUri();
@@ -505,7 +514,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       }
       catch(ctkRuntimeException exc)
       {
-        m_StatusCodeHandler.HandleErrorMessage(exc.what());
+        QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         return;
       }
     }
@@ -627,7 +636,7 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
     }
     catch(ctkRuntimeException exc)
     {
-      m_StatusCodeHandler.HandleErrorMessage(exc.what());
+      QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return nullptr;
     }
   }
@@ -683,7 +692,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuUploadFile()
     }
     catch(ctkRuntimeException exc)
     {
-      m_StatusCodeHandler.HandleErrorMessage(exc.what());
+      QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return;
     }
     m_TreeModel->addChildNode(index, file);
@@ -791,7 +800,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     }
     catch(ctkRuntimeException exc)
     {
-      m_StatusCodeHandler.HandleErrorMessage(exc.what());
+      QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
       return;
     }
     QFile::remove(fileName);
@@ -926,7 +935,7 @@ void QmitkXnatTreeBrowserView::CleanUp()
 
 void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)
 {
-
+  //TODO: CTK seems to ignore spaces while creating the http request. This will lead to corrupted http request that will fail.
   QVariant variant = m_TreeModel->data(index, Qt::UserRole);
   if (variant.isValid())
   {
@@ -1061,7 +1070,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewSubject()
       catch(ctkRuntimeException exc)
       {
         //TODO: Implement isValid-flag to check if ctkRuntimeExceptio is valid http-exception.
-        !m_StatusCodeHandler.HandleErrorMessage(exc.what());
+        !QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         project->remove(subject);
         delete subject;
         return;
@@ -1099,7 +1108,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCreateNewExperiment()
       }
       catch(ctkRuntimeException exc)
       {
-        m_StatusCodeHandler.HandleErrorMessage(exc.what());
+        QmitkHttpStatusCodeHandler::HandleErrorMessage(exc.what());
         subject->remove(experiment);
         delete experiment;
         return;

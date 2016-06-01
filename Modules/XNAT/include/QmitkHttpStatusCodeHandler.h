@@ -17,16 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKHTTPSTATUSCODEHANDLER_H
 #define QMITKHTTPSTATUSCODEHANDLER_H
 
+#include <MitkXNATExports.h>
+
 #include <string>
 
-class QmitkHttpStatusCodeHandler final
+class MITKXNAT_EXPORT QmitkHttpStatusCodeHandler final
 {
 
 public:
+  static bool HandleErrorMessage(const char *_errorMsg);
+
+private:
   QmitkHttpStatusCodeHandler();
   ~QmitkHttpStatusCodeHandler();
-
-  bool HandleErrorMessage(const char *_errorMsg);
 };
 
 #endif // QMITKHTTPSTATUSCODEHANDLER_H

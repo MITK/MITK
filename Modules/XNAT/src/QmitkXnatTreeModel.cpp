@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkXnatTreeModel.h"
+#include <QmitkHttpStatusCodeHandler.h>
 
 #include <QmitkMimeTypes.h>
 
@@ -31,10 +32,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatScan.h>
 #include <ctkXnatScanFolder.h>
 
+#include <iostream>
+
 QmitkXnatTreeModel::QmitkXnatTreeModel ()
   : ctkXnatTreeModel()
 {
 
+}
+
+void QmitkXnatTreeModel::fetchMore(const QModelIndex& index)
+{
+  try
+  {
+    ctkXnatTreeModel::fetchMore(index);
+  }
+  catch(ctkRuntimeException e)
+  {
+    QmitkHttpStatusCodeHandler::HandleErrorMessage(e.what());
+
+    //This is bullshit:
+    ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
+    selectedXnatObject->add(selectedXnatObject);
+    std::cout << selectedXnatObject->children().size() << std::endl;
+    emit Error(index);
+  }
 }
 
 QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
@@ -116,7 +137,6 @@ Qt::DropActions QmitkXnatTreeModel::supportedDropActions()
 Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags defaultFlags = ctkXnatTreeModel::flags(index);
-
 
   if (index.isValid())
   {

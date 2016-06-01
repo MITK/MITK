@@ -45,7 +45,10 @@ public:
 
   ctkXnatObject* GetXnatObjectFromUrl(const QString&);
 
+  void fetchMore(const QModelIndex& index) override;
+
   signals:
+  void Error(const QModelIndex &idx);
   void ResourceDropped(const QList<mitk::DataNode*>&, ctkXnatObject*, const QModelIndex&);
 
 private:

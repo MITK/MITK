@@ -4,10 +4,12 @@ set(CPP_FILES
   mitkLabelSetImage.cpp
   mitkLabelSetImageConverter.cpp
   mitkLabelSetImageSource.cpp
+  mitkLabelSetImageSurfaceStampFilter.cpp
   mitkLabelSetImageToSurfaceFilter.cpp
   mitkLabelSetImageToSurfaceThreadedFilter.cpp
   mitkLabelSetImageVtkMapper2D.cpp
   mitkMultilabelObjectFactory.cpp
+  mitkLabelSetIOHelper.cpp
 )
 
 set(RESOURCE_FILES

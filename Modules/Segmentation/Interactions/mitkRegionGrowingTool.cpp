@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToContourModelFilter.h"
 #include "mitkRegionGrowingTool.xpm"
 
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
+#include "mitkExtractDirectedPlaneImageFilterNew.h"
+#include "mitkLabelSetImage.h"
+
 // us
 #include <usModule.h>
 #include <usModuleResource.h>
@@ -288,6 +292,23 @@ void mitk::RegionGrowingTool::OnMousePressed ( StateMachineAction*, InteractionE
         if (workingSliceGeometry->IsIndexInside(m_SeedPoint))
         {
             MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates " << m_SeedPoint << ") is inside working slice";
+/* Multilabel Merge
+          ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( m_WorkingSlice, feedbackContour, false, false ); // false: don't add any 0.5
+          // false: don't constrain the contour to the image's inside
+          if (projectedContour.IsNotNull())
+          {
+            //FeedbackContourTool::FillContourInSlice( projectedContour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+            DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+            Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+            LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image.GetPointer());
+            int activeColor = 1;
+            if (labelImage != 0)
+            {
+              activeColor = labelImage->GetActiveLabel()->GetValue();
+            }
+
+            mitk::ContourModelUtils::FillContourInSlice(projectedContour, timestep, m_WorkingSlice, image, m_PaintingPixelValue*activeColor);
+*/
 
             // 3. determine the pixel value under the last click to determine what to do
             bool inside(true);

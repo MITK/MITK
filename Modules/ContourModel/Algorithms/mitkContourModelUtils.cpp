@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkImageLogic.h"
 #include "vtkPointData.h"
 
-
+#include "mitkLabelSetImage.h"
 
 mitk::ContourModelUtils::ContourModelUtils()
 {
@@ -118,13 +118,13 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
 
 
 
-void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue )
+void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour, Image* sliceImage, mitk::Image::Pointer workingImage, int paintingPixelValue )
 {
-  mitk::ContourModelUtils::FillContourInSlice(projectedContour, 0, sliceImage, paintingPixelValue);
+  mitk::ContourModelUtils::FillContourInSlice(projectedContour, 0, sliceImage,workingImage, paintingPixelValue);
 }
 
 
-void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
+void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, mitk::Image::Pointer workingImage , int eraseMode)
 {
       //create a surface of the input ContourModel
       mitk::Surface::Pointer surface = mitk::Surface::New();
@@ -146,7 +146,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       //surface2D->Update();
 
 
-
       // prepare the binary image's voxel grid
       vtkSmartPointer<vtkImageData> whiteImage =
           vtkSmartPointer<vtkImageData>::New();
@@ -160,7 +159,6 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       {
         whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
       }
-
       // polygonal data --> image stencil:
       vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc =
         vtkSmartPointer<vtkPolyDataToImageStencil>::New();
@@ -179,34 +177,112 @@ void mitk::ContourModelUtils::FillContourInSlice( ContourModel* projectedContour
       imgstenc->ReverseStencilOff();
       imgstenc->SetBackgroundValue(outval);
       imgstenc->Update();
-
-
-      //Fill according to painting value
-      vtkSmartPointer<vtkImageLogic> booleanOperation = vtkSmartPointer<vtkImageLogic>::New();
-
-      booleanOperation->SetInput2Data(sliceImage->GetVtkImageData());
-      booleanOperation->SetOperationToOr();
-      booleanOperation->SetOutputTrueValue(1.0);
-
-      if(paintingPixelValue == 1)
+      mitk::LabelSetImage* labelImage; // Todo: Get the working Image
+      int activePixelValue = eraseMode;
+      labelImage = dynamic_cast<LabelSetImage*>(workingImage.GetPointer());
+      if (labelImage)
       {
-        //COMBINE
-        //slice or stencil
-        booleanOperation->SetInputConnection(imgstenc->GetOutputPort());
-        booleanOperation->SetOperationToOr();
-      } else
-      {
-        //CUT
-        //slice and not(stencil)
-        vtkSmartPointer<vtkImageLogic> booleanOperationNOT = vtkSmartPointer<vtkImageLogic>::New();
-        booleanOperationNOT->SetInputConnection(imgstenc->GetOutputPort());
-        booleanOperationNOT->SetOperationToNot();
-        booleanOperationNOT->Update();
-        booleanOperation->SetInputConnection(booleanOperationNOT->GetOutputPort());
-        booleanOperation->SetOperationToAnd();
+        activePixelValue = labelImage->GetActiveLabel()->GetValue();
       }
-      booleanOperation->Update();
 
-      //copy scalars to output image slice
-      sliceImage->SetVolume(booleanOperation->GetOutput()->GetScalarPointer());
+      // Fill according to the Color Team
+      vtkSmartPointer<vtkImageData> filledImage = imgstenc->GetOutput();
+      vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
+      FillSliceInSlice(filledImage, resultImage, workingImage, eraseMode);
+      /*
+      count = filledImage->GetNumberOfPoints();
+      if (activePixelValue == 0)
+      {
+        for (vtkIdType i = 0; i < count; ++i)
+        {
+          if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+          {
+            resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+          }
+        }
+      }
+      else if (eraseMode != 0) // We are not erasing...
+      {
+        for (vtkIdType i = 0; i < count; ++i)
+        {
+          if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+          {
+            int targetValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
+            if (labelImage)
+            {
+              if (!labelImage->GetLabel(targetValue)->GetLocked())
+              {
+                resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+              }
+            } else
+            {
+              resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+            }
+          }
+        }
+      }
+      else
+      {
+        for (vtkIdType i = 0; i < count; ++i)
+        {
+          if ((resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue) & (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1))
+          {
+            resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+          }
+        }
+      }*/
+      sliceImage->SetVolume(resultImage->GetScalarPointer());
+}
+
+void mitk::ContourModelUtils::FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, mitk::Image::Pointer image, int eraseMode)
+{
+  mitk::LabelSetImage* labelImage; // Todo: Get the working Image
+  int activePixelValue = eraseMode;
+  labelImage = dynamic_cast<LabelSetImage*>(image.GetPointer());
+  if (labelImage)
+  {
+    activePixelValue = labelImage->GetActiveLabel()->GetValue();
+  }
+
+  int count = filledImage->GetNumberOfPoints();
+  if (activePixelValue == 0)
+  {
+    for (vtkIdType i = 0; i < count; ++i)
+    {
+      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+      {
+        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+      }
+    }
+  }
+  else if (eraseMode != 0) // We are not erasing...
+  {
+    for (vtkIdType i = 0; i < count; ++i)
+    {
+      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+      {
+        int targetValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
+        if (labelImage)
+        {
+          if (!labelImage->GetLabel(targetValue)->GetLocked())
+          {
+            resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+          }
+        } else
+        {
+          resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+        }
+      }
+    }
+  }
+  else
+  {
+    for (vtkIdType i = 0; i < count; ++i)
+    {
+      if ((resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue) & (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1))
+      {
+        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+      }
+    }
+  }
 }

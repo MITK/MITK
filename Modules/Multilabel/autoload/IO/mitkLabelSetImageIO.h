@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkLabelSetImageWriter_h
-#define __mitkLabelSetImageWriter_h
+#ifndef __mitkLabelSetImageIO_h
+#define __mitkLabelSetImageIO_h
 
-#include "MitkMultilabelIOExports.h"
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
 
@@ -29,7 +28,7 @@ namespace mitk
   */
   // The export macro should be removed. Currently, the unit
   // tests directly instantiate this class.
-  class MITKMULTILABELIO_EXPORT LabelSetImageIO : public mitk::AbstractFileIO
+  class LabelSetImageIO : public mitk::AbstractFileIO
   {
   public:
 
@@ -55,21 +54,13 @@ namespace mitk
 
     // -------------- LabelSetImageIO specific functions -------------
 
-    static bool SaveLabelSetImagePreset(const std::string & presetFilename, mitk::LabelSetImage::Pointer & inputImage);
     int GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str);
     std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
-    static Label::Pointer LoadLabelFromTiXmlDocument(TiXmlElement *labelElem);
-    static void LoadLabelSetImagePreset(const std::string &presetFilename, mitk::LabelSetImage::Pointer &inputImage);
 
   private:
 
     LabelSetImageIO* IOClone() const override;
-
-    static TiXmlElement *GetLabelAsTiXmlElement(Label *label);
-
-    static TiXmlElement * PropertyToXmlElem( const std::string& key, const BaseProperty* property );
-    static bool PropertyFromXmlElem(std::string& key, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem);
   };
 } // end of namespace mitk
 
-#endif // __mitkLabelSetImageWriter_h
+#endif // __mitkLabelSetImageIO_h

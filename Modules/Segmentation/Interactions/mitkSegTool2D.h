@@ -152,6 +152,8 @@ class MITKSEGMENTATION_EXPORT SegTool2D : public Tool
 
     void WriteBackSegmentationResult (std::vector<SliceInformation> sliceList, bool writeSliceToVolume = true);
 
+    void WritePreviewOnWorkingImage( Image* targetSlice, Image* sourceSlice, Image* workingImage, int paintingPixelValue, int timestep );
+
     void WriteSliceToVolume (SliceInformation sliceInfo);
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.

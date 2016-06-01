@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGetPropertyService.h"
 #include "QmitkPropertyItemDelegate.h"
 #include "QmitkPropertyItemModel.h"
 #include <mitkBaseProperty.h>
@@ -31,6 +30,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSpinBox>
 #include <QToolButton>
 #include <algorithm>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceReference.h>
+
+mitk::IPropertyExtensions* GetPropertyService()
+{
+
+  us::ModuleContext* context = us::GetModuleContext();
+  us::ServiceReference<mitk::IPropertyExtensions> serviceRef = context->GetServiceReference<mitk::IPropertyExtensions>();
+
+  return serviceRef
+    ? context->GetService<mitk::IPropertyExtensions>(serviceRef)
+    : NULL;
+}
 
 QmitkColorWidget::QmitkColorWidget(QWidget* parent)
   : QWidget(parent),
@@ -182,7 +195,7 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
     {
       QSpinBox* spinBox = new QSpinBox(parent);
 
-      mitk::IPropertyExtensions* extensions = mitk::GetPropertyService<mitk::IPropertyExtensions>();
+      mitk::IPropertyExtensions* extensions = GetPropertyService();
       std::string name = this->GetPropertyName(index);
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
@@ -206,7 +219,7 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
     {
       QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
 
-      mitk::IPropertyExtensions* extensions = mitk::GetPropertyService<mitk::IPropertyExtensions>();
+      mitk::IPropertyExtensions* extensions = GetPropertyService();
       std::string name = this->GetPropertyName(index);
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))

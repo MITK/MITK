@@ -14,11 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGetPropertyService.h"
-#include "QmitkPropertiesPreferencePage.h"
 #include "QmitkPropertyItem.h"
 #include "QmitkPropertyItemModel.h"
-#include <berryIBerryPreferences.h>
 #include <mitkColorProperty.h>
 #include <mitkEnumerationProperty.h>
 #include <mitkProperties.h>
@@ -26,6 +23,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyFilters.h>
 #include <mitkRenderingManager.h>
 #include <mitkStringProperty.h>
+#include <QColor>
+
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usServiceReference.h>
+
+template <class T>
+T* GetPropertyService()
+{
+  us::ModuleContext* context = us::GetModuleContext();
+  us::ServiceReference<T> serviceRef = context->GetServiceReference<T>();
+
+  return serviceRef
+    ? context->GetService<T>(serviceRef)
+    : NULL;
+}
 
 static QColor MitkToQt(const mitk::Color &color)
 {
@@ -69,6 +82,8 @@ private:
 
 QmitkPropertyItemModel::QmitkPropertyItemModel(QObject* parent)
   : QAbstractItemModel(parent),
+    m_ShowAliases(false),
+    m_FilterProperties(false),
     m_PropertyAliases(NULL),
     m_PropertyFilters(NULL)
 {
@@ -271,18 +286,15 @@ QModelIndex QmitkPropertyItemModel::index(int row, int column, const QModelIndex
 
 void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
 {
-  bool showAliases = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES, true);
-  bool filterProperties = preferences->GetBool(QmitkPropertiesPreferencePage::FILTER_PROPERTIES, true);
-
-  bool updateAliases = showAliases != (m_PropertyAliases != NULL);
-  bool updateFilters = filterProperties != (m_PropertyFilters != NULL);
+  bool updateAliases = m_ShowAliases != (m_PropertyAliases != NULL);
+  bool updateFilters = m_FilterProperties != (m_PropertyFilters != NULL);
 
   bool resetPropertyList = false;
 
   if (updateAliases)
   {
-    m_PropertyAliases = showAliases
-      ? mitk::GetPropertyService<mitk::IPropertyAliases>()
+    m_PropertyAliases = m_ShowAliases
+      ? GetPropertyService<mitk::IPropertyAliases>()
       : NULL;
 
     resetPropertyList = m_PropertyList.IsNotNull();
@@ -290,8 +302,8 @@ void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences
 
   if (updateFilters)
   {
-    m_PropertyFilters = filterProperties
-      ? mitk::GetPropertyService<mitk::IPropertyFilters>()
+    m_PropertyFilters = m_FilterProperties
+      ? GetPropertyService<mitk::IPropertyFilters>()
       : NULL;
 
     if (!resetPropertyList)

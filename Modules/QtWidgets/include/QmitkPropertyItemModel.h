@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyItemModel_h
 #define QmitkPropertyItemModel_h
 
+#include <MitkQtWidgetsExports.h>
 #include <QAbstractItemModel>
 #include <mitkPropertyList.h>
 #include <mitkWeakPointer.h>
@@ -39,7 +40,7 @@ namespace mitk
   };
 }
 
-class QmitkPropertyItemModel : public QAbstractItemModel
+class MITKQTWIDGETS_EXPORT QmitkPropertyItemModel : public QAbstractItemModel
 {
   Q_OBJECT
 
@@ -60,6 +61,24 @@ public:
   void SetPropertyList(mitk::PropertyList* propertyList, const QString& className = "");
   void Update();
 
+  void SetShowAliases (const bool showAliases)
+  {
+    this->m_ShowAliases = showAliases;
+  }
+  bool GetShowAliases() const
+  {
+    return this->m_ShowAliases;
+  }
+
+  void SetFilterProperties (const bool filterProperties)
+  {
+    this->m_FilterProperties = filterProperties;
+  }
+  bool GetFilterProperties() const
+  {
+    return this->m_FilterProperties;
+  }
+
 private:
   void CreateRootItem();
   QModelIndex FindProperty(const mitk::BaseProperty* property);
@@ -68,6 +87,8 @@ private:
   void OnPropertyModified(const itk::Object* property, const itk::EventObject& event);
   void SetNewPropertyList(mitk::PropertyList* propertyList);
 
+  bool m_ShowAliases;
+  bool m_FilterProperties;
   mitk::IPropertyAliases* m_PropertyAliases;
   mitk::IPropertyFilters* m_PropertyFilters;
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;

@@ -18,6 +18,10 @@
           name="IGT Navigation Tool Calibration"
           class="IGTNavigationToolCalibration"
           icon="resources/iconNavigationToolCalibration.xpm" />
+	 <view id="org.mitk.views.IGTFiducialRegistration"
+          name="IGT Fiducial Registration"
+          class="IGTFiducialRegistration"
+          icon="resources/iconFiducialRegistration.png" />
   </extension>
 
 </plugin>

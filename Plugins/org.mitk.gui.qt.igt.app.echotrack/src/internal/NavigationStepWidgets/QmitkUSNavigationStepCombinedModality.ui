@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSNavigationStepCombinedModality</class>
+ <widget class="QWidget" name="QmitkUSNavigationStepCombinedModality">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>286</width>
+    <height>339</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="combinedModalityLabel">
+     <property name="text">
+      <string>Available Combined Modalities</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkServiceListWidget" name="combinedModalityListWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QToolButton" name="combinedModalityCreateButton">
+       <property name="toolTip">
+        <string>Create New Combined Modality</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/plus.png</normaloff>:/USNavigation/plus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QToolButton" name="combinedModalityDeleteButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Delete Selected Combined Modality</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/minus.png</normaloff>:/USNavigation/minus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QToolButton" name="combinedModalitEditButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Edit Selected Combined Modality</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/preferences.png</normaloff>:/USNavigation/preferences.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="6">
+      <widget class="QToolButton" name="combinedModalityDistconnectButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Disconnect Selected Combined Modality</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/process-stop.png</normaloff>:/USNavigation/process-stop.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="5">
+      <widget class="QToolButton" name="combinedModalityActivateButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Activate Selected Combined Modality</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/accept.png</normaloff>:/USNavigation/accept.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_9">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>13</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="helpLabel">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select a Combined Modality from the list above or create a new one first. A calibration file must be loaded if the Combined Modality isn't calibrated already. Calibrations can be managed by hitting the &lt;span style=&quot; text-decoration: underline;&quot;&gt;Edit&lt;/span&gt; button above.&lt;/p&gt;&lt;p&gt;You can proceed by hitting the &lt;span style=&quot; text-decoration: underline;&quot;&gt;Next&lt;/span&gt; button.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_10">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>13</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QmitkUSCombinedModalityCreationWidget" name="combinedModalityCreateWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="QmitkUSCombinedModalityEditWidget" name="combinedModalityEditWidget" native="true"/>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="calibrationGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Calibration</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="calibrationLoadStateLabel">
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>Selected device is not calibrated.</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="calibrationLoadButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&amp;Load Calibration</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/USNavigation.qrc">
+          <normaloff>:/USNavigation/document-open.png</normaloff>:/USNavigation/document-open.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkUSCombinedModalityCreationWidget</class>
+   <extends>QWidget</extends>
+   <header>src/internal/Widgets/QmitkUSCombinedModalityCreationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkServiceListWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkServiceListWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSCombinedModalityEditWidget</class>
+   <extends>QWidget</extends>
+   <header>src/internal/Widgets/QmitkUSCombinedModalityEditWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../resources/USNavigation.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>calibrationLoadButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepCombinedModality</receiver>
+   <slot>OnLoadCalibration()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>142</x>
+     <y>268</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>combinedModalityCreateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepCombinedModality</receiver>
+   <slot>OnCombinedModalityCreateNewButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>52</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>combinedModalityDeleteButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepCombinedModality</receiver>
+   <slot>OnDeleteButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>112</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>combinedModalityDistconnectButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepCombinedModality</receiver>
+   <slot>OnDisconnectButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>232</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>combinedModalitEditButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepCombinedModality</receiver>
+   <slot>OnCombinedModalityEditButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>172</x>
+     <y>73</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>combinedModalityActivateButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepCombinedModality</receiver>
+   <slot>OnActivateButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>235</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>142</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnCombinedModalityCreateNewButtonClicked()</slot>
+  <slot>OnDeleteButtonClicked()</slot>
+  <slot>OnLoadCalibration()</slot>
+  <slot>OnDisconnectButtonClicked()</slot>
+  <slot>OnCombinedModalityEditButtonClicked()</slot>
+  <slot>OnActivateButtonClicked()</slot>
+ </slots>
+</ui>

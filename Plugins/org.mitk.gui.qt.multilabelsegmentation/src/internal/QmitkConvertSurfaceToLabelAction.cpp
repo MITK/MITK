@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include "mitkLabelSetImage.h"
 #include "mitkToolManagerProvider.h"
+#include <mitkSurface.h>
 
 //needed for qApp
 #include <qcoreapplication.h>

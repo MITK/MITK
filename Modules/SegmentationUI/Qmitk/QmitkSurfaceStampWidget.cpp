@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImage.h>
+#include <mitkSurface.h>
 
 #include <QMessageBox>
 

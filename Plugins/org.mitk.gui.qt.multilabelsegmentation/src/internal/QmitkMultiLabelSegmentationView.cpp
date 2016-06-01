@@ -832,8 +832,8 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
     workingImage->BeforeChangeLayerEvent
         -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
-    workingImage->AfterchangeLayerEvent
-        -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
+//    workingImage->AfterchangeLayerEvent
+//        -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
   }
 
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
@@ -848,8 +848,8 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
     workingImage->BeforeChangeLayerEvent
         += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
-    workingImage->AfterchangeLayerEvent
-        += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
+//    workingImage->AfterchangeLayerEvent
+//        += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
   }
 
   m_ToolManager->SetWorkingData(m_WorkingNode);

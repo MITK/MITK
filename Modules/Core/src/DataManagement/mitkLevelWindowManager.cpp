@@ -190,8 +190,6 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
   mitk::DataNode::Pointer propNode = 0;
   while ( it != nodes->End() )
   {
-    bool foundPrev = false;
-
     mitk::DataNode::Pointer node = it.Value();
     mitk::LevelWindowProperty::Pointer prop = dynamic_cast< mitk::LevelWindowProperty* >( node->GetProperty( "levelwindow" ) );
     if ( prop == levelWindowProperty )

@@ -287,8 +287,8 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
 
   for ( DICOMGDCMImageFrameList::const_iterator pos = frameList.cbegin(); pos != frameList.cend(); ++pos )
   {
-    const std::string dateStr = ( *pos )->GetTagValueAsString( acquisitionDateTag );
-    const std::string timeStr = ( *pos )->GetTagValueAsString( acquisitionTimeTag );
+    const std::string dateStr = ( *pos )->GetTagValueAsString( acquisitionDateTag ).value;
+    const std::string timeStr = ( *pos )->GetTagValueAsString( acquisitionTimeTag ).value;
 
     OFDateTime time;
     const bool convertResult = ConvertDICOMDateTimeString( dateStr, timeStr, time );

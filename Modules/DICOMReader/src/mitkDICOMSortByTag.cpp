@@ -121,8 +121,8 @@ mitk::DICOMSortByTag
   assert(left);
   assert(right);
 
-  DICOMDatasetFinding leftFinding = left->GetTagValueAsString(tag);
-  DICOMDatasetFinding rightFinding = right->GetTagValueAsString(tag);
+  const DICOMDatasetFinding leftFinding = left->GetTagValueAsString(tag);
+  const DICOMDatasetFinding rightFinding = right->GetTagValueAsString(tag);
   //Doesn't care if findings are valid or not. If they are not valid,
   //value is empty, thats enough.
 
@@ -131,8 +131,8 @@ mitk::DICOMSortByTag
 
   try
   {
-    leftDouble = OFStandard::atof( leftString.c_str() );
-    rightDouble = OFStandard::atof( rightString.c_str() );
+    leftDouble = OFStandard::atof( leftFinding.value.c_str() );
+    rightDouble = OFStandard::atof(rightFinding.value.c_str());
   }
   catch ( const std::exception& /*e*/ )
   {
@@ -157,8 +157,8 @@ mitk::DICOMSortByTag
   assert(from);
   assert(to);
 
-  DICOMDatasetFinding fromFinding = from->GetTagValueAsString(m_Tag);
-  DICOMDatasetFinding toFinding = to->GetTagValueAsString(m_Tag);
+  const DICOMDatasetFinding fromFinding = from->GetTagValueAsString(m_Tag);
+  const DICOMDatasetFinding toFinding = to->GetTagValueAsString(m_Tag);
   //Doesn't care if findings are valid or not. If they are not valid,
   //value is empty, thats enough.
 
@@ -167,8 +167,8 @@ mitk::DICOMSortByTag
 
   try
   {
-    fromDouble = OFStandard::atof( fromString.c_str() );
-    toDouble = OFStandard::atof( toString.c_str() );
+    fromDouble = OFStandard::atof(fromFinding.value.c_str());
+    toDouble = OFStandard::atof(toFinding.value.c_str());
   }
   catch ( const std::exception& /*e*/ )
   {

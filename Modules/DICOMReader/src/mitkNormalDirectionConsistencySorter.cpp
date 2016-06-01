@@ -95,9 +95,9 @@ mitk::NormalDirectionConsistencySorter
 
     // make sure here that the direction from slice to slice is the direction of
     // image normals...
-    const std::string imageOrientationString = firstDS->GetTagValueAsString( tagImageOrientation );
-    const std::string imagePositionPatientFirst = firstDS->GetTagValueAsString( tagImagePositionPatient );
-    const std::string imagePositionPatientLast = lastDS->GetTagValueAsString( tagImagePositionPatient );
+    const std::string imageOrientationString = firstDS->GetTagValueAsString( tagImageOrientation ).value;
+    const std::string imagePositionPatientFirst = firstDS->GetTagValueAsString(tagImagePositionPatient).value;
+    const std::string imagePositionPatientLast = lastDS->GetTagValueAsString(tagImagePositionPatient).value;
 
     Vector3D right; right.Fill(0.0);
     Vector3D up; up.Fill(0.0);

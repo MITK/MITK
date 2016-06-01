@@ -18,13 +18,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAutoSelectingDICOMReaderService.h"
 #include "mitkClassicDICOMSeriesReaderService.h"
+#include "mitkDICOMTagsOfInterestService.h"
+
+#include "mitkDICOMTagHelper.h"
+
+#include <usModuleContext.h>
 
 namespace mitk {
 
-  void DICOMReaderServicesActivator::Load(us::ModuleContext*)
+  void DICOMReaderServicesActivator::Load(us::ModuleContext* context)
   {
     m_AutoSelectingDICOMReader.reset(new AutoSelectingDICOMReaderService());
     m_ClassicDICOMSeriesReader.reset(new ClassicDICOMSeriesReaderService());
+
+    m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());
+    context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());
+
+    DefaultDICOMTagMapType tagmap = GetDefaultDICOMTagsOfInterest();
+    for (auto tag : tagmap)
+    {
+      m_DICOMTagsOfInterestService->AddTagOfInterest(tag.second);
+    }
   }
 
   void DICOMReaderServicesActivator::Unload(us::ModuleContext*)

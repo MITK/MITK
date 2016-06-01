@@ -29,7 +29,7 @@ mitk::DICOMGDCMTagScanner::~DICOMGDCMTagScanner()
 {
 }
 
-std::string mitk::DICOMGDCMTagScanner::GetTagValue( DICOMImageFrameInfo* frame, const DICOMTag& tag ) const
+mitk::DICOMDatasetFinding mitk::DICOMGDCMTagScanner::GetTagValue( DICOMImageFrameInfo* frame, const DICOMTag& tag ) const
 {
   assert( frame );
 
@@ -37,7 +37,7 @@ std::string mitk::DICOMGDCMTagScanner::GetTagValue( DICOMImageFrameInfo* frame, 
   {
     if ( ( *frameIter )->GetFrameInfo().IsNotNull() && ( *( ( *frameIter )->GetFrameInfo() ) == *frame ) )
     {
-      return ( *frameIter )->GetTagValueAsString( tag );
+      return (*frameIter)->GetTagValueAsString(tag);
     }
   }
 
@@ -47,7 +47,14 @@ std::string mitk::DICOMGDCMTagScanner::GetTagValue( DICOMImageFrameInfo* frame, 
          != m_InputFilenames.cend() )
     {
       // precondition of gdcm::Scanner::GetValue() fulfilled
-      return m_GDCMScanner.GetValue( frame->Filename.c_str(), gdcm::Tag( tag.GetGroup(), tag.GetElement() ) );
+      const char* value = m_GDCMScanner.GetValue( frame->Filename.c_str(), gdcm::Tag( tag.GetGroup(), tag.GetElement() ) );
+      DICOMDatasetFinding result;
+      if (value)
+      {
+        result.isValid = true;
+        result.value = value;
+      }
+      return result;
     }
     else
     {

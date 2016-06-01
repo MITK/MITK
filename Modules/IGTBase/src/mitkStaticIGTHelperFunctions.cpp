@@ -98,7 +98,7 @@ double mitk::StaticIGTHelperFunctions::ComputeFRE(mitk::PointSet::Pointer imageF
 {
   if (imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
   double FRE = 0;
-  for (unsigned int i = 0; i < imageFiducials->GetSize(); i++)
+  for (int i = 0; i < imageFiducials->GetSize(); i++)
   {
     itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
     if (transform != NULL)

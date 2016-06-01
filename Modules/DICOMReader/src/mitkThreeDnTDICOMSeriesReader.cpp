@@ -106,8 +106,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
     // get block characteristics of first block
     const unsigned int currentBlockNumberOfSlices = firstBlock.size();
-    const std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient );
-    const std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+    const std::string currentBlockFirstOrigin = firstBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
+    const std::string currentBlockLastOrigin  =  firstBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
 
     remainingBlocks.erase( remainingBlocks.begin() );
 
@@ -120,8 +120,8 @@ mitk::ThreeDnTDICOMSeriesReader
       const DICOMGDCMImageFrameList otherBlock = *otherBlockIter;
 
       const unsigned int otherBlockNumberOfSlices = otherBlock.size();
-      const std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient );
-      const std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient );
+      const std::string otherBlockFirstOrigin = otherBlock.front()->GetTagValueAsString( tagImagePositionPatient ).value;
+      const std::string otherBlockLastOrigin  =  otherBlock.back()->GetTagValueAsString( tagImagePositionPatient ).value;
 
       // add matching blocks to current3DnTBlock
       // keep other blocks for later
@@ -180,6 +180,8 @@ mitk::ThreeDnTDICOMSeriesReader
 
     DICOMImageBlockDescriptor block;
     block.SetTagCache( this->GetTagCache() ); // important: this must be before SetImageFrameList(), because SetImageFrameList will trigger reading of lots of interesting tags!
+    block.SetAdditionalTagsOfInterest(GetAdditionalTagsOfInterest());
+    block.SetTagLookupTableToPropertyFunctor(GetTagLookupTableToPropertyFunctor());
     block.SetImageFrameList( frameList );
     block.SetTiltInformation( tiltInfo );
 

@@ -329,15 +329,15 @@ mitk::DICOMTagBasedSorter
        ++tagIter)
   {
     groupID << tagIter->GetGroup() << tagIter->GetElement(); // make group/element part of the id to cover empty tags
-    const std::string rawTagValue = dataset->GetTagValueAsString(*tagIter);
+    DICOMDatasetFinding rawTagValue = dataset->GetTagValueAsString(*tagIter);
     std::string processedTagValue;
-    if ( m_TagValueProcessor[*tagIter] != nullptr )
+    if ( m_TagValueProcessor[*tagIter] != nullptr && rawTagValue.isValid)
     {
-      processedTagValue = (*m_TagValueProcessor[*tagIter])(rawTagValue);
+      processedTagValue = (*m_TagValueProcessor[*tagIter])(rawTagValue.value);
     }
     else
     {
-      processedTagValue = rawTagValue;
+      processedTagValue = rawTagValue.value;
     }
     groupID << processedTagValue;
   }

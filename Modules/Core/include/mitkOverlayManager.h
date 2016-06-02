@@ -23,8 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOverlay.h"
 #include "mitkAbstractOverlayLayouter.h"
 #include "mitkLocalStorageHandler.h"
+#include "itkEventObject.h"
 
 namespace mitk {
+
+itkEventMacroDeclaration(OverlayAddEvent, itk::AnyEvent)
 
 class BaseRenderer;
 
@@ -33,7 +36,7 @@ class BaseRenderer;
  * call the update method of each Overlay during the rendering phase of the renderer.
  * See \ref OverlaysPage for more info.
 */
-class MITKCORE_EXPORT OverlayManager : public itk::LightObject {
+class MITKCORE_EXPORT OverlayManager : public itk::Object {
 public:
   typedef std::set<BaseRenderer*> BaseRendererSet;
   typedef std::set<Overlay::Pointer> OverlaySet;
@@ -41,7 +44,7 @@ public:
   typedef std::map<const BaseRenderer*,LayouterMap > LayouterRendererMap;
   typedef std::map<const BaseRenderer*,vtkSmartPointer<vtkRenderer> > ForegroundRendererMap;
 
-  mitkClassMacroItkParent(OverlayManager, itk::LightObject);
+  mitkClassMacroItkParent(OverlayManager, itk::Object)
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
@@ -100,7 +103,6 @@ private:
   /** \brief assignment operator */
   OverlayManager &operator=(const OverlayManager &);
 
-  itkEventMacroDeclaration(OverlayAddEvent, itk::AnyEvent)
 
 };
 

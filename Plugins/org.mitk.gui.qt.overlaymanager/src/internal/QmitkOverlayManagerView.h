@@ -77,8 +77,11 @@ private:
   void OnPropertyNameChanged(const itk::EventObject& event);
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
+  void OnOverlayAdded(itk::Object */*caller*/, const itk::EventObject &event);
+
   QWidget* m_Parent;
   unsigned long m_PropertyNameChangedTag;
+  unsigned long m_OverlayManagerObserverTag;
   std::string m_SelectionClassName;
   mitk::IPropertyAliases* m_PropertyAliases;
   mitk::IPropertyDescriptions* m_PropertyDescriptions;

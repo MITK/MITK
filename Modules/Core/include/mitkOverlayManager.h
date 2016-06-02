@@ -100,6 +100,8 @@ private:
   /** \brief assignment operator */
   OverlayManager &operator=(const OverlayManager &);
 
+  itkEventMacroDeclaration(OverlayAddEvent, itk::AnyEvent)
+
 };
 
 } // namespace mitk

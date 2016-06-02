@@ -59,6 +59,7 @@ void mitk::VtkOverlay::AddToRenderer(mitk::BaseRenderer *renderer, vtkRenderer *
   if(renderer && vtkrenderer && !vtkrenderer->HasViewProp(vtkProp))
   {
     vtkrenderer->AddViewProp(vtkProp);
+    mitk::RenderingManager::GetInstance()->RequestUpdate(vtkrenderer->GetRenderWindow());
   }
 }
 
@@ -77,6 +78,7 @@ void mitk::VtkOverlay::RemoveFromRenderer(mitk::BaseRenderer *renderer, vtkRende
   if(vtkrenderer->HasViewProp(vtkProp))
   {
     vtkrenderer->RemoveViewProp(vtkProp);
+    mitk::RenderingManager::GetInstance()->RequestUpdate(vtkrenderer->GetRenderWindow());
   }
 }
 

@@ -24,8 +24,11 @@ mitk::TextOverlay2D::TextOverlay2D()
 {
   mitk::Point2D position;
   position[0] = position[1] = 0;
-  SetPosition2D(position);
-  SetOffsetVector(position);
+  this->SetPosition2D(position);
+  this->SetOffsetVector(position);
+  this->SetText("");
+  this->SetFontSize(20);
+  this->SetColor(1.0,1.0,1.0);
 }
 
 mitk::TextOverlay2D::~TextOverlay2D()

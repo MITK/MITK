@@ -19,6 +19,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::Overlay::Overlay() : m_LayoutedBy(NULL)
 {
   m_PropertyList = mitk::PropertyList::New();
+  this->SetName(this->GetNameOfClass());
+  this->SetVisibility(true);
+  this->SetOpacity(1.0);
 }
 
 mitk::Overlay::~Overlay()
@@ -177,25 +180,25 @@ bool mitk::Overlay::GetName(std::string& nodeName, mitk::BaseRenderer* renderer,
 
 void mitk::Overlay::SetText(std::string text)
 {
-  SetStringProperty("Overlay.Text", text.c_str());
+  SetStringProperty("Text", text.c_str());
 }
 
 std::string mitk::Overlay::GetText() const
 {
   std::string text;
-  GetPropertyList()->GetStringProperty("Overlay.Text", text);
+  GetPropertyList()->GetStringProperty("Text", text);
   return text;
 }
 
 void mitk::Overlay::SetFontSize(int fontSize)
 {
-  SetIntProperty("Overlay.FontSize", fontSize);
+  SetIntProperty("FontSize", fontSize);
 }
 
 int mitk::Overlay::GetFontSize() const
 {
   int fontSize = 1;
-  GetPropertyList()->GetIntProperty("Overlay.FontSize", fontSize);
+  GetPropertyList()->GetIntProperty("FontSize", fontSize);
   return fontSize;
 }
 

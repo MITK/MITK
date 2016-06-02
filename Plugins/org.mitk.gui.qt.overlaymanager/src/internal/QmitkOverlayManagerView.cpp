@@ -39,6 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRenderingManager.h"
 #include <QPainter>
 #include <memory>
+#include <mitkTextOverlay2D.h>
 
 const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymanager";
 
@@ -103,15 +104,8 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
   connect(m_Controls.newButton, SIGNAL(clicked()), this, SLOT(OnAddNewProperty()));
   connect(m_Controls.m_PropertyTree->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
-  connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnActivateOverlayList(int)));
   connect(m_Controls.m_OverlayList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(OnOverlaySelectionChanged(QListWidgetItem*,QListWidgetItem*))  );
-  connect(m_Controls.m_OverlayList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivateOverlayList(const QModelIndex&)));
-
-  itk::MemberCommand<QmitkOverlayManagerView>::Pointer command
-        = itk::MemberCommand<QmitkOverlayManagerView>::New();
-
-  command->SetCallbackFunction(this, &QmitkOverlayManagerView::OnOverlayAdded );
-  m_OverlayManagerObserverTag = mitk::OverlayManager::GetInstance()->AddObserver(mitk::OverlayAddEvent, command);
+  connect(m_Controls.m_OverlayList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnDoubleClick(const QModelIndex&)));
 }
 
 QString QmitkOverlayManagerView::GetPropertyNameOrAlias(const QModelIndex& index)
@@ -242,22 +236,40 @@ void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
 
 }
 
-void QmitkOverlayManagerView::QmitkOverlayManagerView::OnOverlayAdded(itk::Object *,
-                                                                      const itk::EventObject &/*event*/)
+void QmitkOverlayManagerView::OnOverlayAdded(itk::Object *,const itk::EventObject &event)
 {
-//  const mitk::FocusChangedEvent* focusEvent = dynamic_cast<const mitk::FocusChangedEvent*>(&event);
-//  if(focusEvent)
-//  {
-//    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(
-//          mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow());
-//    if(renderer)
-//    {
-//      QString name("2D Screenshots - ");
-//      name.append(renderer->GetName());
-//      m_Controls->m_2DBox->setTitle(name);
-//    }
-//  }
+  MITK_INFO << "ONADDED";
+  const mitk::OverlayAddEvent* addEvent = dynamic_cast<const mitk::OverlayAddEvent*>(&event);
+  if(addEvent)
+  {
+    OnActivateOverlayList();
+  }
+}
 
+void QmitkOverlayManagerView::Activated()
+{
+
+}
+
+void QmitkOverlayManagerView::Deactivated()
+{
+}
+
+void QmitkOverlayManagerView::Visible()
+{
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  if(om && m_OverlayManagerObserverTag == 0)
+  {
+    itk::MemberCommand<QmitkOverlayManagerView>::Pointer command
+        = itk::MemberCommand<QmitkOverlayManagerView>::New();
+    command->SetCallbackFunction(this, &QmitkOverlayManagerView::OnOverlayAdded );
+    m_OverlayManagerObserverTag = om->AddObserver(mitk::OverlayAddEvent(), command);
+  }
+  this->OnActivateOverlayList();
+}
+
+void QmitkOverlayManagerView::Hidden()
+{
 }
 
 void QmitkOverlayManagerView::OnPropertyListChanged(int index)
@@ -287,9 +299,8 @@ void QmitkOverlayManagerView::OnAddNewProperty()
 //    this->m_Model->Update();
 }
 
-void QmitkOverlayManagerView::OnActivateOverlayList(int tabIdx)
+void QmitkOverlayManagerView::OnActivateOverlayList()
 {
-  if(tabIdx != 0) return;
   typedef mitk::OverlayManager::OverlaySet OverlaySet;
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
   if(om)
@@ -330,7 +341,6 @@ void QmitkOverlayManagerView::OnActivateOverlayList(int tabIdx)
 
 void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current, QListWidgetItem *)
 {
-
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
   if (propertyList != NULL)
@@ -393,4 +403,33 @@ void QmitkOverlayManagerView::OnDoubleClick(const QModelIndex &)
   {
     m_SelectedOverlay->Modified();
   }
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  to->SetText("test");
+  om->AddOverlay(to.GetPointer());
+  MITK_INFO << "AddOverlay";
+}
+
+void QmitkOverlayManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+  OnActivateOverlayList();
+  if (m_Controls.propertyListComboBox->count() == 2)
+  {
+    QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+
+    Q_FOREACH(QString renderWindow, renderWindows.keys())
+    {
+      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindow);
+    }
+  }
+}
+
+void QmitkOverlayManagerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
+{
+  if (m_Controls.propertyListComboBox->count() > 2)
+  {
+    m_Controls.propertyListComboBox->clear();
+    m_Controls.propertyListComboBox->addItem("Data node: common");
+  }
+  m_Controls.m_OverlayList->clear();
 }

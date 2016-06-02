@@ -21,9 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
-
+#include <mitkIRenderWindowPartListener.h>
 #include "ui_QmitkOverlayManagerViewControls.h"
 #include "mitkOverlay.h"
+#include "mitkILifecycleAwarePart.h"
 
 class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
@@ -44,7 +45,8 @@ class IPropertyPersistence;
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class QmitkOverlayManagerView : public QmitkAbstractView
+class QmitkOverlayManagerView : public QmitkAbstractView, public mitk::IRenderWindowPartListener,
+    public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -62,13 +64,16 @@ protected:
 
   virtual void SetFocus() override;
 
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override;
+
   Ui::QmitkOverlayManagerViewControls m_Controls;
 
 private slots:
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
   void OnPropertyListChanged(int index);
   void OnAddNewProperty();
-  void OnActivateOverlayList(int tabIdx);
+  void OnActivateOverlayList();
   void OnOverlaySelectionChanged(QListWidgetItem* current,QListWidgetItem*);
   void OnDoubleClick(const QModelIndex&);
 
@@ -78,6 +83,18 @@ private:
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   void OnOverlayAdded(itk::Object */*caller*/, const itk::EventObject &event);
+
+  /** \see berry::IPartListener::PartActivated */
+  virtual void Activated();
+
+  /** \see berry::IPartListener::PartDeactivated */
+  virtual void Deactivated();
+
+  /** \see berry::IPartListener::PartVisible */
+  virtual void Visible();
+
+  /** \see berry::IPartListener::PartHidden */
+  virtual void Hidden();
 
   QWidget* m_Parent;
   unsigned long m_PropertyNameChangedTag;

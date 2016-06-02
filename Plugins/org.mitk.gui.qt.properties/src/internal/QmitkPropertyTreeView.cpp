@@ -263,6 +263,9 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
   bool showAliasesInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_ALIASES_IN_DESCRIPTION, true);
   bool showPersistenceInDescription = preferences->GetBool(QmitkPropertiesPreferencePage::SHOW_PERSISTENCE_IN_DESCRIPTION, true);
   bool developerMode = preferences->GetBool(QmitkPropertiesPreferencePage::DEVELOPER_MODE, false);
+  bool filterProperties = preferences->GetBool(QmitkPropertiesPreferencePage::FILTER_PROPERTIES, true);
+  m_Model->SetFilterProperties(filterProperties);
+  m_Model->SetShowAliases(showAliases);
 
   bool updateAliases = showAliases != (m_PropertyAliases != NULL);
   bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != NULL);
@@ -309,7 +312,7 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
     m_Controls.newButton->setVisible(developerMode);
   }
 
-  m_Model->OnPreferencesChanged(preferences);
+  m_Model->OnPreferencesChanged();
 }
 
 void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)

@@ -286,6 +286,12 @@ bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer 
   if (m_LastGenerateDataTime < overlay->GetMTime())
     return true;
 
+  if (m_LastGenerateDataTime < overlay->GetPropertyList()->GetMTime())
+    return true;
+
+  if (m_LastGenerateDataTime < overlay->GetPropertyList(renderer)->GetMTime())
+    return true;
+
   if (renderer && m_LastGenerateDataTime < renderer->GetTimeStepUpdateTime())
     return true;
 

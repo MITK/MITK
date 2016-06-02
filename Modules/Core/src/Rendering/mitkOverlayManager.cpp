@@ -86,6 +86,24 @@ void mitk::OverlayManager::RemoveAllBaseRenderers()
   }
 }
 
+const mitk::OverlayManager::OverlaySet &mitk::OverlayManager::GetAllOverlays()
+{
+  return m_OverlaySet;
+}
+
+mitk::OverlayManager* mitk::OverlayManager::GetInstance()
+{
+  auto renderwindows = mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+  mitk::BaseRenderer* renderer = nullptr;
+  for(auto renderwindow : renderwindows)
+  {
+    renderer = mitk::BaseRenderer::GetInstance(renderwindow);
+    if(renderer && renderer->GetOverlayManager().IsNotNull())
+      return renderer->GetOverlayManager();
+  }
+  return nullptr;
+}
+
 void mitk::OverlayManager::AddOverlay(const Overlay::Pointer& overlay, bool ForceInForeground)
 {
   std::pair<OverlaySet::iterator,bool> inSet;

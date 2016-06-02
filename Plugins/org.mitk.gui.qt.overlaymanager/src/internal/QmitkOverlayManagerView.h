@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "ui_QmitkOverlayManagerViewControls.h"
+#include "mitkOverlay.h"
 
 class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
@@ -67,6 +68,9 @@ private slots:
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
   void OnPropertyListChanged(int index);
   void OnAddNewProperty();
+  void OnActivateOverlayList(int tabIdx);
+  void OnOverlaySelectionChanged(QListWidgetItem* current,QListWidgetItem*);
+  void OnDoubleClick(const QModelIndex&);
 
 private:
   QString GetPropertyNameOrAlias(const QModelIndex& index);
@@ -82,7 +86,7 @@ private:
   QSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;
   QmitkPropertyItemDelegate* m_Delegate;
-  mitk::DataNode::Pointer m_SelectedNode;
+  mitk::Overlay::Pointer m_SelectedOverlay;
   mitk::BaseRenderer* m_Renderer;
 
 };

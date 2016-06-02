@@ -395,7 +395,7 @@ public:
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */
-  explicit Overlay();
+  Overlay();
 
   /** \brief virtual destructor in order to derive from this class */
   virtual ~Overlay();

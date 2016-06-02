@@ -284,7 +284,7 @@ QModelIndex QmitkPropertyItemModel::index(int row, int column, const QModelIndex
     : QModelIndex();
 }
 
-void QmitkPropertyItemModel::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
+void QmitkPropertyItemModel::OnPreferencesChanged()
 {
   bool updateAliases = m_ShowAliases != (m_PropertyAliases != NULL);
   bool updateFilters = m_FilterProperties != (m_PropertyFilters != NULL);

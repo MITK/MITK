@@ -35,6 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
 #include <QmitkRenderWindow.h>
+#include "mitkOverlayManager.h"
+#include "mitkRenderingManager.h"
 #include <QPainter>
 #include <memory>
 
@@ -100,6 +102,9 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.propertyListComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnPropertyListChanged(int)));
   connect(m_Controls.newButton, SIGNAL(clicked()), this, SLOT(OnAddNewProperty()));
   connect(m_Controls.m_PropertyTree->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
+  connect(m_Controls.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(OnActivateOverlayList(int)));
+  connect(m_Controls.m_OverlayList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(OnOverlaySelectionChanged(QListWidgetItem*,QListWidgetItem*))  );
+  connect(m_Controls.m_OverlayList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnActivateOverlayList(const QModelIndex&)));
 }
 
 QString QmitkOverlayManagerView::GetPropertyNameOrAlias(const QModelIndex& index)
@@ -227,6 +232,80 @@ void QmitkOverlayManagerView::OnPropertyNameChanged(const itk::EventObject&)
 
 void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
+
+}
+
+void QmitkOverlayManagerView::OnPropertyListChanged(int index)
+{
+  if (index == -1)
+    return;
+
+  QString renderer = m_Controls.propertyListComboBox->itemText(index);
+
+  if (renderer.startsWith("Data node: "))
+    renderer = QString::fromStdString(renderer.toStdString().substr(11));
+
+  m_Renderer = renderer != "common"
+    ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
+    : NULL;
+
+  this->OnOverlaySelectionChanged(m_Controls.m_OverlayList->currentItem(), nullptr);
+}
+
+void QmitkOverlayManagerView::OnAddNewProperty()
+{
+//  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
+//      ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
+//      : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
+
+//  if (dialog->exec() == QDialog::Accepted)
+//    this->m_Model->Update();
+}
+
+void QmitkOverlayManagerView::OnActivateOverlayList(int tabIdx)
+{
+  if(tabIdx != 0) return;
+  typedef mitk::OverlayManager::OverlaySet OverlaySet;
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  if(om)
+  {
+    OverlaySet oset = om->GetAllOverlays();
+    OverlaySet redundantOverlays;
+    std::vector<QListWidgetItem*> deletedOverlays;
+    for(unsigned int i=0 ; i<m_Controls.m_OverlayList->count() ; ++i)
+    {
+      QListWidgetItem* item = m_Controls.m_OverlayList->item(i);
+      if(item)
+      {
+        mitk::Overlay* overlay = reinterpret_cast<mitk::Overlay*>(item->data(Qt::UserRole).value<void*>());
+        OverlaySet::const_iterator overlayIt = oset.find(overlay);
+        if( overlayIt == oset.cend() )
+          deletedOverlays.push_back(item);
+        else
+          redundantOverlays.insert(overlay);
+      }
+    }
+    for(auto deleted : deletedOverlays)
+    {
+      m_Controls.m_OverlayList->removeItemWidget(deleted);
+    }
+    for (auto overlay : oset)
+    {
+      OverlaySet::const_iterator overlayIt = redundantOverlays.find(overlay.GetPointer());
+      if( overlayIt == redundantOverlays.cend() )
+      {
+        QListWidgetItem* item = new QListWidgetItem();
+        item->setData(Qt::UserRole,QVariant::fromValue<void*>(overlay.GetPointer()));
+        item->setText(overlay->GetNameOfClass());
+        m_Controls.m_OverlayList->addItem(item);
+      }
+    }
+  }
+}
+
+void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current, QListWidgetItem *)
+{
+
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
   if (propertyList != NULL)
@@ -239,11 +318,14 @@ void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
     m_PropertyNameChangedTag = 0;
   }
 
-  if (nodes.empty() || nodes.front().IsNull())
+  mitk::Overlay* overlay = nullptr;
+  if(current)
+    overlay = reinterpret_cast<mitk::Overlay*>(current->data(Qt::UserRole).value<void*>());
+  if (!overlay)
   {
-    m_SelectedNode = NULL;
+    m_SelectedOverlay = NULL;
 
-    this->SetPartName("Properties");
+    this->SetPartName("Overlay Properties");
     m_Model->SetPropertyList(NULL);
     m_Delegate->SetPropertyList(NULL);
 
@@ -251,33 +333,20 @@ void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
   }
   else
   {
-    m_SelectedNode = nodes.front();
+    m_SelectedOverlay = overlay;
 
-    QString selectionClassName = m_SelectedNode->GetData() != NULL
-      ? m_SelectedNode->GetData()->GetNameOfClass()
-      : "";
+    QString selectionClassName = m_SelectedOverlay->GetNameOfClass();
 
     m_SelectionClassName = selectionClassName.toStdString();
 
-    mitk::PropertyList::Pointer propertyList;
-
-    if (m_Renderer == NULL && m_Controls.propertyListComboBox->currentText() == "Base data")
-    {
-      propertyList = m_SelectedNode->GetData() != NULL
-        ? m_SelectedNode->GetData()->GetPropertyList()
-        : NULL;
-    }
-    else
-    {
-      propertyList = m_SelectedNode->GetPropertyList(m_Renderer);
-    }
+    mitk::PropertyList::Pointer propertyList = overlay->GetPropertyList(m_Renderer);
 
     m_Model->SetPropertyList(propertyList, selectionClassName);
     m_Delegate->SetPropertyList(propertyList);
 
     OnPropertyNameChanged(itk::ModifiedEvent());
 
-    mitk::BaseProperty* nameProperty = m_SelectedNode->GetProperty("name");
+    mitk::BaseProperty* nameProperty = m_SelectedOverlay->GetProperty("name");
 
     if (nameProperty != NULL)
     {
@@ -293,36 +362,10 @@ void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
     m_Controls.m_PropertyTree->expandAll();
 }
 
-void QmitkOverlayManagerView::OnPropertyListChanged(int index)
+void QmitkOverlayManagerView::OnDoubleClick(const QModelIndex &)
 {
-  if (index == -1)
-    return;
-
-  QString renderer = m_Controls.propertyListComboBox->itemText(index);
-
-  if (renderer.startsWith("Data node: "))
-    renderer = QString::fromStdString(renderer.toStdString().substr(11));
-
-  m_Renderer = renderer != "common" && renderer != "Base data"
-    ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
-    : NULL;
-
-  QList<mitk::DataNode::Pointer> nodes;
-
-  if (m_SelectedNode.IsNotNull())
-    nodes << m_SelectedNode;
-
-  berry::IWorkbenchPart::Pointer workbenchPart;
-
-  this->OnSelectionChanged(workbenchPart, nodes);
-}
-
-void QmitkOverlayManagerView::OnAddNewProperty()
-{
-  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
-      ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
-      : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
-
-  if (dialog->exec() == QDialog::Accepted)
-    this->m_Model->Update();
+  if(m_SelectedOverlay.IsNotNull())
+  {
+    m_SelectedOverlay->Modified();
+  }
 }

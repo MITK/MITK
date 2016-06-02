@@ -73,6 +73,10 @@ public:
 
   void RemoveAllBaseRenderers();
 
+  const OverlaySet& GetAllOverlays();
+
+  static OverlayManager* GetInstance();
+
 protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

@@ -104,9 +104,9 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   //
   //////////////////////////////////////////////////////////////////////////
 
-  gdcmReader->SetTagLookupTableToPropertyFunctor( []( const mitk::StringLookupTable& table )
+  gdcmReader->SetTagLookupTableToPropertyFunctor( []( const mitk::DICOMCachedValueLookupTable& table )
   {
-    return static_cast<mitk::BaseProperty::Pointer>( mitk::StringProperty::New( table.GetTableValue(0) ) );
+    return static_cast<mitk::BaseProperty::Pointer>( mitk::StringProperty::New( table.GetTableValue(0).Value ) );
   } );
 
   expectedPropertyTypes.insert(std::make_pair("Test1", "StringProperty"));

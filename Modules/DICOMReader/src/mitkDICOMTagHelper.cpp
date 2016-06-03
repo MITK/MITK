@@ -202,9 +202,9 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0054, 0x1300))); //dicom.pet.FrameReferenceTime
 
     //Other interesting acquisition correlated information
-    result.insert(MakeEntry(DICOMTag(0x0008, 0x0022))); //dicom.acuisition date
-    result.insert(MakeEntry(DICOMTag(0x0008, 0x0032))); //dicom.acuisition time
-    result.insert(MakeEntry(DICOMTag(0x0008, 0x002a))); //dicom.acuisition datetime
+    result.insert(MakeEntry(DICOMTag(0x0008, 0x0022))); //dicom.acquisition date
+    result.insert(MakeEntry(DICOMTag(0x0008, 0x0032))); //dicom.acquisition time
+    result.insert(MakeEntry(DICOMTag(0x0008, 0x002a))); //dicom.acquisition datetime
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0080))); //dicom.Modality
     result.insert(MakeEntry(DICOMTag(0x0018, 0x002a))); //dicom.Sequence Name
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0020))); //dicom.Scanning Sequence

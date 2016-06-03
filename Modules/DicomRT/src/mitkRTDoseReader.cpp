@@ -17,16 +17,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRTDoseReader.h"
 
-#include <mitkIOUtil.h>
-#include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
-#include <itkImageIterator.h>
-#include <itkImageRegionIterator.h>
+#include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMFileReader.h>
+#include <mitkRTConstants.h>
+#include <mitkImageStatisticsHolder.h>
+#include "mitkDICOMTagHelper.h"
+#include "usModuleContext.h"
+#include "usGetModuleContext.h"
+
 #include <itkShiftScaleImageFilter.h>
 #include <itkCastImageFilter.h>
-
-#include <mitkRTConstants.h>
 
 namespace mitk
 {
@@ -38,30 +40,48 @@ namespace mitk
   mitk::DataNode::Pointer RTDoseReader::
       LoadRTDose(const char* filename)
   {
-    DcmFileFormat fileformat;
-    OFCondition outp = fileformat.loadFile(filename, EXS_Unknown);
-    if(outp.bad())
-    {
-      MITK_ERROR << "Cant read the file" << std::endl;
-    }
-    DcmDataset *dataset = fileformat.getDataset();
+      DICOMTag referencedRTPlan(0x300c, 0x0002);
+      mitk::IDICOMTagsOfInterest* toiSrv = GetDicomTagsOfInterestService();
+      if (toiSrv)
+      {
+          toiSrv->AddTagOfInterest(referencedRTPlan);
+      }
 
-    std::string name = filename;
-    itk::FilenamesContainer file;
-    file.push_back(name);
+      mitk::StringList oneFile = { filename };
+      mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
+      selector->LoadBuiltIn3DConfigs();
+      selector->SetInputFiles(oneFile);
 
-    mitk::DicomSeriesReader* reader = new mitk::DicomSeriesReader;
+      mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
+      reader->SetAdditionalTagsOfInterest(toiSrv->GetTagsOfInterest());
 
-    mitk::DataNode::Pointer originalNode = reader->LoadDicomSeries(file,false);
+      reader->SetInputFiles(oneFile);
+      reader->AnalyzeInputFiles();
+      reader->LoadImages();
 
-    if(originalNode.IsNull())
-    {
-      MITK_ERROR << "Error reading the dcm file" << std::endl;
-      return 0;
-    }
+      if (reader->GetNumberOfOutputs() == 0){
+          MITK_ERROR << "Error reading the dicom file" << std::endl;
+          return 0;
+      }
 
-    mitk::Image::Pointer originalImage
-        = dynamic_cast<mitk::Image*>(originalNode->GetData());
+      const mitk::DICOMImageBlockDescriptor& desc = reader->GetOutput(0);
+
+      mitk::Image::Pointer originalImage
+          = desc.GetMitkImage();
+
+      if (originalImage.IsNull())
+      {
+          MITK_ERROR << "Error reading the dcm file" << std::endl;
+          return 0;
+      }
+
+      DcmFileFormat fileformat;
+      OFCondition outp = fileformat.loadFile(filename, EXS_Unknown);
+      if (outp.bad())
+      {
+          MITK_ERROR << "Can't read the RTDOSE file" << std::endl;
+      }
+      DcmDataset *dataset = fileformat.getDataset();
 
     DRTDoseIOD doseObject;
     OFCondition result = doseObject.read(*dataset);
@@ -80,13 +100,18 @@ namespace mitk
 
     AccessByItk_1(originalImage, MultiplayGridScaling, gridscale);
 
-    double prescripeDose = this->GetMaxDoseValue(dataset);
+    auto statistics = this->scaledDoseImage->GetStatistics();
+    double maxDose = statistics->GetScalarValueMax();
+
+    this->scaledDoseImage->SetPropertyList(originalImage->GetPropertyList());
+    this->scaledDoseImage->SetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), mitk::GenericProperty<double>::New(0.8*maxDose));
+
+    mitk::DataNode::Pointer originalNode = mitk::DataNode::New();
 
     originalNode->SetName("RT Dose");
     originalNode->SetData(this->scaledDoseImage);
-    originalNode->SetFloatProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(),prescripeDose);
-    originalNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40);
-    originalNode->SetBoolProperty(mitk::RTConstants::DOSE_PROPERTY_NAME.c_str(),true);
+    originalNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), 40.0);
+
     return originalNode;
   }
 
@@ -113,45 +138,21 @@ namespace mitk
     mitk::CastToMitkImage(scaledOutput, this->scaledDoseImage);
   }
 
-  double RTDoseReader::GetMaxDoseValue(DcmDataset* dataSet)
+  mitk::IDICOMTagsOfInterest* RTDoseReader::GetDicomTagsOfInterestService()
   {
-    DRTDoseIOD doseObject;
-    OFCondition result = doseObject.read(*dataSet);
-    if(result.bad())
-    {
-      MITK_ERROR << "Error reading the RT Dose dataset" << std::endl;
-      return 0;
-    }
+      mitk::IDICOMTagsOfInterest* result = nullptr;
 
-    Uint16 rows, columns, frames;
-    OFString nrframes, gridScaling;
-    const Uint16 *pixelData = NULL;
-    Float32 gridscale;
-
-    Uint16 &rows_ref = rows;
-    Uint16 &columns_ref = columns;
-
-    doseObject.getRows(rows_ref);
-    doseObject.getColumns(columns_ref);
-    doseObject.getNumberOfFrames(nrframes);
-    doseObject.getDoseGridScaling(gridScaling);
-
-    frames = atoi(nrframes.c_str());
-    gridscale = OFStandard::atof(gridScaling.c_str());
-    dataSet->findAndGetUint16Array(DCM_PixelData, pixelData, 0);
-
-    int size = columns*rows*frames;
-    double highest = 0;
-
-    for(int i=0; i<size; ++i)
-    {
-      if((pixelData[i]*gridscale)>highest)
+      std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest> > toiRegisters = us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+      if (!toiRegisters.empty())
       {
-        highest = pixelData[i] * gridscale;
+          if (toiRegisters.size() > 1)
+          {
+              MITK_WARN << "Multiple DICOM tags of interest services found. Using just one.";
+          }
+          result = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
       }
-    }
 
-    return highest;
+      return result;
   }
 
 }

@@ -228,16 +228,14 @@ mitk::ThreeDnTDICOMSeriesReader
   const GantryTiltInformation tiltInfo = block.GetTiltInformation();
   const bool hasTilt = tiltInfo.IsRegularGantryTilt();
 
-  const int numberOfTimesteps = block.GetIntProperty("timesteps", 1);
+  const int numberOfTimesteps = block.GetNumberOfTimeSteps();
 
   if (numberOfTimesteps == 1)
   {
     return DICOMITKSeriesGDCMReader::LoadMitkImageForImageBlockDescriptor(block);
   }
 
-  const int numberOfFramesPerTimestep = frames.size() / numberOfTimesteps;
-  assert( int(double((double)frames.size() / (double)numberOfTimesteps ))
-       == numberOfFramesPerTimestep ); // this should hold
+  const int numberOfFramesPerTimestep = block.GetNumberOfFramesPerTimeStep();
 
   ITKDICOMSeriesReaderHelper::StringContainerList filenamesPerTimestep;
   for (int timeStep = 0; timeStep<numberOfTimesteps; ++timeStep)

@@ -564,6 +564,21 @@ std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUIDAsName() const
   }
 }
 
+const int mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
+{
+  return this->GetIntProperty("timesteps", 1);
+};
+
+const int mitk::DICOMImageBlockDescriptor::GetNumberOfFramesPerTimeStep() const
+{
+  const int numberOfTimesteps = this->GetNumberOfTimeSteps();
+  const int numberOfFramesPerTimestep = this->m_ImageFrameList.size() / numberOfTimesteps;
+  assert(int(double((double)this->m_ImageFrameList.size() / (double)numberOfTimesteps))
+    == numberOfFramesPerTimestep); // this should hold
+
+  return numberOfFramesPerTimestep;
+};
+
 
 void mitk::DICOMImageBlockDescriptor::SetTagCache( DICOMTagCache* privateCache )
 {

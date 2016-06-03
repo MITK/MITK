@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMFileReaderSelector.h>
 #include <mitkDICOMEnums.h>
 #include <mitkDICOMTagHelper.h>
+#include <mitkDICOMProperty.h>
 #include <mitkStringProperty.h>
 
 #include <mitkRTDoseReader.h>
@@ -300,6 +301,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
 
       reader->SetAdditionalTagsOfInterest(mitk::GetCurrentDICOMTagsOfInterest());
+      reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
       reader->SetInputFiles(seriesToLoad);
       reader->AnalyzeInputFiles();
       reader->LoadImages();

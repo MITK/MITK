@@ -86,15 +86,18 @@ namespace mitk
       */
     virtual void RemoveAllInfos() = 0;
 
-    /** \brief Remove all persistence info for a certain mime type.
-    */
-    virtual void RemoveInfosByMimeType(const MimeTypeNameType& mime) = 0;
-
-    /** \brief Remove persistence infos of a specific base data property.
+    /** \brief Remove persistence infos of a specific property name.
       *
       * \param[in] propertyName Name of the property.
       */
-    virtual void RemoveInfosByName(const std::string& propertyName) = 0;
+    virtual void RemoveInfos(const std::string& propertyName) = 0;
+
+    /** \brief Remove persistence infos of a specific property name and mime type.
+    *
+    * \param[in] propertyName Name of the property.
+    * \param[in] mime Name of the mime type.
+    */
+    virtual void RemoveInfos(const std::string& propertyName, const MimeTypeNameType& mime) = 0;
 
   };
 }

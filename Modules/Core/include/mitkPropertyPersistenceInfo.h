@@ -46,6 +46,7 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
     mitkNewMacro1Param(Self, const std::string&);
+    mitkNewMacro2Param(Self, const std::string&, const std::string&);
 
     std::string GetKey() const;
     void SetKey(const std::string& key);
@@ -59,8 +60,6 @@ namespace mitk
     const SerializationFunctionType GetSerializationFunction() const;
     void SetSerializationFunction(const SerializationFunctionType& fnc);
 
-    bool operator==(const Self& other) const;
-
     /** This mime type name indicates that a info can be used for any mime type as long as
      not another info with a more specific mime type is available.*/
     static MimeTypeNameType ANY_MIMETYPE_NAME();
@@ -72,6 +71,12 @@ namespace mitk
       */
     PropertyPersistenceInfo(const std::string& key = "");
 
+    /** \brief Constructor.
+    *
+    * \param[in] key Key used to save the property value as key value pair.
+    * \param[in] mimeTypeName mime type the info is defined for.
+    */
+    PropertyPersistenceInfo(const std::string& key, const std::string& mimeTypeName);
     virtual ~PropertyPersistenceInfo();
 
   private:
@@ -86,13 +91,13 @@ namespace mitk
   namespace PropertyPersistenceSerialization
   {
     /** Simple default serialization that uses prop->GetValueAsString for the serialization.*/
-    ::std::string serializeByGetValueAsString(const mitk::BaseProperty* prop);
+    MITKCORE_EXPORT ::std::string serializeByGetValueAsString(const mitk::BaseProperty* prop);
   }
 
   namespace PropertyPersistenceDeserialization
   {
     /** Simple default functions that puts the passed string into a string property.*/
-    mitk::BaseProperty::Pointer deserializeToStringProperty(const std::string& value);
+    MITKCORE_EXPORT mitk::BaseProperty::Pointer deserializeToStringProperty(const std::string& value);
   }
 }
 

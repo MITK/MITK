@@ -48,6 +48,12 @@ mitk::PropertyPersistenceInfo::PropertyPersistenceInfo(const std::string& key)
 {
 }
 
+mitk::PropertyPersistenceInfo::PropertyPersistenceInfo(const std::string& key, const std::string& mimeTypeName)
+  : m_Impl(new Impl(key))
+{
+  m_Impl->MimeTypeName = mimeTypeName;
+}
+
 mitk::PropertyPersistenceInfo::~PropertyPersistenceInfo()
 {
   delete m_Impl;

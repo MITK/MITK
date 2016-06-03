@@ -129,18 +129,18 @@ void mitk::PropertyPersistence::RemoveAllInfos()
   m_Infos.clear();
 }
 
-void mitk::PropertyPersistence::RemoveInfosByName(const std::string& propertyName)
+void mitk::PropertyPersistence::RemoveInfos(const std::string& propertyName)
 {
   if (!propertyName.empty())
     m_Infos.erase(propertyName);
 }
 
-void mitk::PropertyPersistence::RemoveInfosByMimeType(const MimeTypeNameType& mime)
+void mitk::PropertyPersistence::RemoveInfos(const std::string& propertyName, const MimeTypeNameType& mime)
 {
   auto itr = m_Infos.begin();
   while (itr != m_Infos.end())
   {
-    if (itr->second.IsNotNull() && itr->second->GetMimeTypeName() == mime)
+    if (itr->first == propertyName && itr->second.IsNotNull() && itr->second->GetMimeTypeName() == mime)
     {
       itr = m_Infos.erase(itr);
     }
@@ -149,3 +149,9 @@ void mitk::PropertyPersistence::RemoveInfosByMimeType(const MimeTypeNameType& mi
     }
   }
 }
+
+
+mitk::IPropertyPersistence* mitk::CreateTestInstancePropertyPersistence()
+{
+  return new PropertyPersistence();
+};

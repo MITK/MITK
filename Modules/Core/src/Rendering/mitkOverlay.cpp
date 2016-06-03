@@ -33,7 +33,7 @@ void mitk::Overlay::SetProperty(const std::string& propertyKey,
   const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, propertyValue);
-  this->Modified();
+  GetPropertyList(renderer)->Modified();
 }
 
 void mitk::Overlay::ReplaceProperty(const std::string& propertyKey,
@@ -41,6 +41,7 @@ void mitk::Overlay::ReplaceProperty(const std::string& propertyKey,
   const mitk::BaseRenderer* renderer)
 {
   GetPropertyList(renderer)->ReplaceProperty(propertyKey, propertyValue);
+  GetPropertyList(renderer)->Modified();
 }
 
 void mitk::Overlay::AddProperty(const std::string& propertyKey,
@@ -178,27 +179,27 @@ bool mitk::Overlay::GetName(std::string& nodeName, mitk::BaseRenderer* renderer,
   return GetStringProperty(propertyKey, nodeName, renderer);
 }
 
-void mitk::Overlay::SetText(std::string text)
+void mitk::Overlay::SetText(std::string text, mitk::BaseRenderer* renderer)
 {
-  SetStringProperty("Text", text.c_str());
+  SetStringProperty("Text", text.c_str(), renderer);
 }
 
-std::string mitk::Overlay::GetText() const
+std::string mitk::Overlay::GetText(mitk::BaseRenderer* renderer) const
 {
   std::string text;
-  GetPropertyList()->GetStringProperty("Text", text);
+  GetStringProperty("Text", text, renderer);
   return text;
 }
 
-void mitk::Overlay::SetFontSize(int fontSize)
+void mitk::Overlay::SetFontSize(int fontSize, mitk::BaseRenderer* renderer)
 {
-  SetIntProperty("FontSize", fontSize);
+  SetIntProperty("FontSize", fontSize, renderer);
 }
 
-int mitk::Overlay::GetFontSize() const
+int mitk::Overlay::GetFontSize(mitk::BaseRenderer* renderer) const
 {
   int fontSize = 1;
-  GetPropertyList()->GetIntProperty("FontSize", fontSize);
+  GetIntProperty("FontSize", fontSize, renderer);
   return fontSize;
 }
 

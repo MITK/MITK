@@ -27,8 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-
-
+#include <boost/type_traits/make_unsigned.hpp>
 
 mitk::TemporoSpatialStringProperty::TemporoSpatialStringProperty( const char* s )
 {
@@ -224,10 +223,57 @@ void mitk::TemporoSpatialStringProperty::SetValue(const ValueType& value)
   this->SetValue(0, 0, value);
 };
 
+// Create necessary escape sequences from illegal characters
+template<class Ch>
+std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
+{
+  std::basic_string<Ch> result;
+  typename std::basic_string<Ch>::const_iterator b = s.begin();
+  typename std::basic_string<Ch>::const_iterator e = s.end();
+  while (b != e)
+  {
+    typedef typename boost::make_unsigned<Ch>::type UCh;
+    UCh c(*b);
+    // This assumes an ASCII superset. But so does everything in PTree.
+    // We escape everything outside ASCII, because this code can't
+    // handle high unicode characters.
+    if (c == 0x20 || c == 0x21 || (c >= 0x23 && c <= 0x2E) ||
+      (c >= 0x30 && c <= 0x5B) || (c >= 0x5D && c <= 0xFF))
+      result += *b;
+    else if (*b == Ch('\b')) result += Ch('\\'), result += Ch('b');
+    else if (*b == Ch('\f')) result += Ch('\\'), result += Ch('f');
+    else if (*b == Ch('\n')) result += Ch('\\'), result += Ch('n');
+    else if (*b == Ch('\r')) result += Ch('\\'), result += Ch('r');
+    else if (*b == Ch('\t')) result += Ch('\\'), result += Ch('t');
+    else if (*b == Ch('/')) result += Ch('\\'), result += Ch('/');
+    else if (*b == Ch('"'))  result += Ch('\\'), result += Ch('"');
+    else if (*b == Ch('\\')) result += Ch('\\'), result += Ch('\\');
+    else
+    {
+      const char *hexdigits = "0123456789ABCDEF";
+      unsigned long u = (std::min)(static_cast<unsigned long>(
+        static_cast<UCh>(*b)),
+        0xFFFFul);
+      int d1 = u / 4096; u -= d1 * 4096;
+      int d2 = u / 256; u -= d2 * 256;
+      int d3 = u / 16; u -= d3 * 16;
+      int d4 = u;
+      result += Ch('\\'); result += Ch('u');
+      result += Ch(hexdigits[d1]); result += Ch(hexdigits[d2]);
+      result += Ch(hexdigits[d3]); result += Ch(hexdigits[d4]);
+    }
+    ++b;
+  }
+  return result;
+}
+
 
 ::std::string
 mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(const mitk::BaseProperty* prop)
 {
+  //REMARK: Implemented own serialization instead of using boost::ptree::json_write because
+  //currently everything (even numbers) are converted into string representations by the writer
+  //so e.g. it becomes "t":"2" instaed of "t":2
   const mitk::TemporoSpatialStringProperty* tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty*>(prop);
 
   if (!tsProp)
@@ -245,7 +291,7 @@ mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJ
     std::vector<mitk::TemporoSpatialStringProperty::IndexValueType> zs = tsProp->GetAvailableSlices(t);
     for (auto z : zs)
     {
-      std::string value = tsProp->GetValue(t, z);
+      std::string value = CreateJSONEscapes(tsProp->GetValue(t, z));
 
       if (first)
       {

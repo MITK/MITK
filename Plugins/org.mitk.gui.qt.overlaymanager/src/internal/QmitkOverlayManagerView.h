@@ -76,7 +76,7 @@ private slots:
   void OnActivateOverlayList();
   void OnOverlaySelectionChanged(QListWidgetItem* current,QListWidgetItem*);
 
-  void OnDelete(const QModelIndex& current);
+  void OnDelete();
   void OnAddTextOverlay2D();
   void OnAddTextOverlay3D();
   void OnAddLabelOverlay();

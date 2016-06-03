@@ -40,6 +40,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPainter>
 #include <memory>
 #include <mitkTextOverlay2D.h>
+#include <mitkTextOverlay3D.h>
+#include <mitkLabelOverlay3D.h>
+#include <mitkScaleLegendOverlay.h>
+#include <mitkColorBarOverlay.h>
+#include <mitkLogoOverlay.h>
 
 const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymanager";
 
@@ -106,7 +111,16 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.newButton, SIGNAL(clicked()), this, SLOT(OnAddNewProperty()));
   connect(m_Controls.m_PropertyTree->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
   connect(m_Controls.m_OverlayList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(OnOverlaySelectionChanged(QListWidgetItem*,QListWidgetItem*))  );
-  connect(m_Controls.m_OverlayList, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(OnDoubleClick(const QModelIndex&)));
+  connect(m_Controls.m_DeleteOverlay, SIGNAL(clicked()), this, SLOT(OnDelete()));
+
+  connect(m_Controls.m_ButtonAddColorBar, SIGNAL(clicked()), this, SLOT(OnAddColorBarOverlay()));
+  connect(m_Controls.m_ButtonAddLabels, SIGNAL(clicked()), this, SLOT(OnAddLabelOverlay()));
+  connect(m_Controls.m_ButtonAddScaleLegend, SIGNAL(clicked()), this, SLOT(OnAddScaleLegendOverlay()));
+  connect(m_Controls.m_ButtonAddText2D, SIGNAL(clicked()), this, SLOT(OnAddTextOverlay2D()));
+  connect(m_Controls.m_ButtonAddText3D, SIGNAL(clicked()), this, SLOT(OnAddTextOverlay3D()));
+  connect(m_Controls.m_ButtonAddLogo, SIGNAL(clicked()), this, SLOT(OnAddLogoOverlay()));
+
+  m_Controls.m_ButtonAddLabels->setVisible(false);
 }
 
 QString QmitkOverlayManagerView::GetPropertyNameOrAlias(const QModelIndex& index)
@@ -392,10 +406,12 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
     m_Controls.m_PropertyTree->expandAll();
 }
 
-void QmitkOverlayManagerView::OnDelete(const QModelIndex &current)
+void QmitkOverlayManagerView::OnDelete()
 {
+  auto items = m_Controls.m_OverlayList->selectedItems();
+  if(items.count() < 1) return;
   mitk::Overlay* overlay = nullptr;
-  QListWidgetItem* item = m_Controls.m_OverlayList->item(current.row());
+  QListWidgetItem* item = items[0];
   if(item)
     overlay = reinterpret_cast<mitk::Overlay*>(item->data(Qt::UserRole).value<void*>());
   mitk::OverlayManager::GetInstance()->RemoveOverlay(overlay);
@@ -411,35 +427,35 @@ void QmitkOverlayManagerView::OnAddTextOverlay2D()
 void QmitkOverlayManagerView::OnAddTextOverlay3D()
 {
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
-  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  mitk::TextOverlay3D::Pointer to = mitk::TextOverlay3D::New();
   om->AddOverlay(to.GetPointer());
 }
 
 void QmitkOverlayManagerView::OnAddLabelOverlay()
 {
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
-  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  mitk::LabelOverlay3D::Pointer to = mitk::LabelOverlay3D::New();
   om->AddOverlay(to.GetPointer());
 }
 
 void QmitkOverlayManagerView::OnAddColorBarOverlay()
 {
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
-  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  mitk::ColorBarOverlay::Pointer to = mitk::ColorBarOverlay::New();
   om->AddOverlay(to.GetPointer());
 }
 
 void QmitkOverlayManagerView::OnAddScaleLegendOverlay()
 {
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
-  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  mitk::ScaleLegendOverlay::Pointer to = mitk::ScaleLegendOverlay::New();
   om->AddOverlay(to.GetPointer());
 }
 
 void QmitkOverlayManagerView::OnAddLogoOverlay()
 {
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
-  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  mitk::LogoOverlay::Pointer to = mitk::LogoOverlay::New();
   om->AddOverlay(to.GetPointer());
 }
 

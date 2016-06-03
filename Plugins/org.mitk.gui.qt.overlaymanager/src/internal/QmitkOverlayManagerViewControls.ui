@@ -23,27 +23,39 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
-     <widget class="QWidget" name="m_OverlayListTab">
-      <attribute name="title">
-       <string>Overlays</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QListWidget" name="m_OverlayList"/>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="m_PropertyListTab">
       <attribute name="title">
-       <string>Properties</string>
+       <string>Overlay List</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QListWidget" name="m_OverlayList">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_DeleteOverlay">
+         <property name="text">
+          <string>Delete</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="topMargin">
@@ -81,7 +93,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../../../org.mitk.gui.qt.properties/resources/Properties.qrc">
+            <iconset resource="../../resources/Properties.qrc">
              <normaloff>:/Properties/new.png</normaloff>:/Properties/new.png</iconset>
            </property>
            <property name="iconSize">
@@ -100,7 +112,80 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
-          <widget class="QTreeView" name="m_PropertyTree"/>
+          <widget class="QTreeView" name="m_PropertyTree">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Add Overlay</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <item>
+          <widget class="QPushButton" name="m_ButtonAddText2D">
+           <property name="text">
+            <string>Text 2D</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ButtonAddText3D">
+           <property name="text">
+            <string>Text 3D</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ButtonAddLabels">
+           <property name="text">
+            <string>PointSet Labels</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ButtonAddColorBar">
+           <property name="text">
+            <string>Color Bar</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_ButtonAddScaleLegend">
+           <property name="text">
+            <string>Scale Legend</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_6">
+           <property name="text">
+            <string>Logo</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>
@@ -112,7 +197,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../../org.mitk.gui.qt.properties/resources/Properties.qrc"/>
+  <include location="../../resources/Properties.qrc"/>
  </resources>
  <connections/>
 </ui>

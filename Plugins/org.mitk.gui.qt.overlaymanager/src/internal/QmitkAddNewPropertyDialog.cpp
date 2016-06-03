@@ -21,16 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <cassert>
 
-QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::BaseData::Pointer baseData, QWidget* parent)
+QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::Overlay::Pointer overlay, mitk::BaseRenderer::Pointer renderer, QWidget* parent)
   : QDialog(parent),
-    m_BaseData(baseData)
-{
-  this->Initialize();
-}
-
-QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::DataNode::Pointer dataNode, mitk::BaseRenderer::Pointer renderer, QWidget* parent)
-  : QDialog(parent),
-    m_DataNode(dataNode),
+    m_Overlay(overlay),
     m_Renderer(renderer)
 {
   this->Initialize();
@@ -48,9 +41,6 @@ void QmitkAddNewPropertyDialog::Initialize()
   types << "bool" << "double" << "float" << "int" << "string";
 
   m_Controls.typeComboBox->addItems(types);
-
-  m_Controls.persistentLabel->setVisible(m_BaseData.IsNotNull());
-  m_Controls.persistentCheckBox->setVisible(m_BaseData.IsNotNull());
 
   connect(m_Controls.typeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(ShowAdequateValueWidget(const QString&)));
   connect(m_Controls.addButton, SIGNAL(clicked()), this, SLOT(AddNewProperty()));
@@ -73,24 +63,8 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
     return;
   }
 
-  if (m_BaseData.IsNotNull())
-  {
-    mitk::BaseProperty::Pointer property = this->CreateProperty();
-    m_BaseData->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), property);
-
-    if (m_Controls.persistentCheckBox->isChecked())
-    {
-      mitk::IPropertyPersistence* propertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
-
-      if (propertyPersistence != nullptr)
-        propertyPersistence->AddInfo(m_Controls.nameLineEdit->text().toStdString(), mitk::PropertyPersistenceInfo::New());
-    }
-  }
-  else
-  {
-    m_DataNode->SetProperty(m_Controls.nameLineEdit->text().toLatin1(), this->CreateProperty(), m_Renderer);
-  }
-
+  m_Overlay->SetProperty(m_Controls.nameLineEdit->text().toStdString(), this->CreateProperty(), m_Renderer);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->accept();
 }
 

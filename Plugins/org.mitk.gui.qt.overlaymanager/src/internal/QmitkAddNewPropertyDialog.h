@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkBaseRenderer.h>
 #include <mitkBaseProperty.h>
-#include <mitkDataNode.h>
+#include <mitkOverlay.h>
 #include <QDialog>
 #include <ui_QmitkAddNewPropertyDialog.h>
 
@@ -28,8 +28,7 @@ class QmitkAddNewPropertyDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit QmitkAddNewPropertyDialog(mitk::BaseData::Pointer baseData, QWidget* parent = NULL);
-  explicit QmitkAddNewPropertyDialog(mitk::DataNode::Pointer dataNode, mitk::BaseRenderer::Pointer renderer = NULL, QWidget* parent = NULL);
+  explicit QmitkAddNewPropertyDialog(mitk::Overlay::Pointer overlay, mitk::BaseRenderer::Pointer renderer = NULL, QWidget* parent = NULL);
   ~QmitkAddNewPropertyDialog();
 
 private slots:
@@ -42,8 +41,7 @@ private:
   void Initialize();
 
   Ui::QmitkAddNewPropertyDialog m_Controls;
-  mitk::DataNode::Pointer m_DataNode;
-  mitk::BaseData::Pointer m_BaseData;
+  mitk::Overlay::Pointer m_Overlay;
   mitk::BaseRenderer::Pointer m_Renderer;
 };
 

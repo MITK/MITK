@@ -75,7 +75,14 @@ private slots:
   void OnAddNewProperty();
   void OnActivateOverlayList();
   void OnOverlaySelectionChanged(QListWidgetItem* current,QListWidgetItem*);
-  void OnDoubleClick(const QModelIndex&);
+
+  void OnDelete(const QModelIndex& current);
+  void OnAddTextOverlay2D();
+  void OnAddTextOverlay3D();
+  void OnAddLabelOverlay();
+  void OnAddColorBarOverlay();
+  void OnAddScaleLegendOverlay();
+  void OnAddLogoOverlay();
 
 private:
   QString GetPropertyNameOrAlias(const QModelIndex& index);

@@ -69,7 +69,8 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  m_Controls.propertyListComboBox->addItem("Data node: common");
+  m_Controls.propertyListComboBox->addItem("common");
+  m_Controls.m_OverlayList->clear();
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
@@ -79,7 +80,7 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
 
     Q_FOREACH(QString renderWindow, renderWindows.keys())
     {
-      m_Controls.propertyListComboBox->addItem(QString("Data node: ") + renderWindow);
+      m_Controls.propertyListComboBox->addItem(renderWindow);
     }
   }
 
@@ -238,7 +239,6 @@ void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
 
 void QmitkOverlayManagerView::OnOverlayAdded(itk::Object *,const itk::EventObject &event)
 {
-  MITK_INFO << "ONADDED";
   const mitk::OverlayAddEvent* addEvent = dynamic_cast<const mitk::OverlayAddEvent*>(&event);
   if(addEvent)
   {
@@ -279,24 +279,19 @@ void QmitkOverlayManagerView::OnPropertyListChanged(int index)
 
   QString renderer = m_Controls.propertyListComboBox->itemText(index);
 
-  if (renderer.startsWith("Data node: "))
-    renderer = QString::fromStdString(renderer.toStdString().substr(11));
-
-  m_Renderer = renderer != "common"
-      ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
-      : NULL;
+  QmitkRenderWindow* renwin = this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer);
+  m_Renderer= renwin ? renwin->GetRenderer() : nullptr;
 
   this->OnOverlaySelectionChanged(m_Controls.m_OverlayList->currentItem(), nullptr);
 }
 
 void QmitkOverlayManagerView::OnAddNewProperty()
 {
-  //  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(m_Controls.propertyListComboBox->currentText() != "Base data"
-//      ? new QmitkAddNewPropertyDialog(m_SelectedNode, m_Renderer, m_Parent)
-//      : new QmitkAddNewPropertyDialog(m_SelectedNode->GetData()));
+  std::unique_ptr<QmitkAddNewPropertyDialog> dialog(
+        new QmitkAddNewPropertyDialog(m_SelectedOverlay, m_Renderer, m_Parent));
 
-//  if (dialog->exec() == QDialog::Accepted)
-//    this->m_Model->Update();
+  if (dialog->exec() == QDialog::Accepted)
+    this->m_Model->Update();
 }
 
 void QmitkOverlayManagerView::OnActivateOverlayList()
@@ -406,30 +401,32 @@ void QmitkOverlayManagerView::OnDoubleClick(const QModelIndex &)
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
   mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
   to->SetText("test");
+
+  to->SetStringProperty("Text", "ACTIVE", m_Renderer);
+
   om->AddOverlay(to.GetPointer());
-  MITK_INFO << "AddOverlay";
 }
 
 void QmitkOverlayManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-  OnActivateOverlayList();
-  if (m_Controls.propertyListComboBox->count() == 2)
+  if (m_Controls.propertyListComboBox->count() == 1)
   {
     QHash<QString, QmitkRenderWindow*> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
 
     Q_FOREACH(QString renderWindow, renderWindows.keys())
     {
-      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindow);
+      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, renderWindow);
     }
   }
+  OnActivateOverlayList();
 }
 
 void QmitkOverlayManagerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  if (m_Controls.propertyListComboBox->count() > 2)
+  if (m_Controls.propertyListComboBox->count() > 1)
   {
     m_Controls.propertyListComboBox->clear();
-    m_Controls.propertyListComboBox->addItem("Data node: common");
+    m_Controls.propertyListComboBox->addItem("common");
   }
   m_Controls.m_OverlayList->clear();
 }

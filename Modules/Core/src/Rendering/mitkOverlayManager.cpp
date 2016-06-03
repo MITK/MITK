@@ -164,6 +164,7 @@ void OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
   }
 
   m_OverlaySet.erase(overlayIt);
+  this->InvokeEvent(OverlayAddEvent());
 }
 
 void OverlayManager::RemoveAllOverlays()

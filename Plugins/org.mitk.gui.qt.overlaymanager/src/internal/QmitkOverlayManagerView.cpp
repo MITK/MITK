@@ -392,18 +392,54 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
     m_Controls.m_PropertyTree->expandAll();
 }
 
-void QmitkOverlayManagerView::OnDoubleClick(const QModelIndex &)
+void QmitkOverlayManagerView::OnDelete(const QModelIndex &current)
 {
-  if(m_SelectedOverlay.IsNotNull())
-  {
-    m_SelectedOverlay->Modified();
-  }
+  mitk::Overlay* overlay = nullptr;
+  QListWidgetItem* item = m_Controls.m_OverlayList->item(current.row());
+  if(item)
+    overlay = reinterpret_cast<mitk::Overlay*>(item->data(Qt::UserRole).value<void*>());
+  mitk::OverlayManager::GetInstance()->RemoveOverlay(overlay);
+}
+
+void QmitkOverlayManagerView::OnAddTextOverlay2D()
+{
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
   mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
-  to->SetText("test");
+  om->AddOverlay(to.GetPointer());
+}
 
-  to->SetStringProperty("Text", "ACTIVE", m_Renderer);
+void QmitkOverlayManagerView::OnAddTextOverlay3D()
+{
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  om->AddOverlay(to.GetPointer());
+}
 
+void QmitkOverlayManagerView::OnAddLabelOverlay()
+{
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  om->AddOverlay(to.GetPointer());
+}
+
+void QmitkOverlayManagerView::OnAddColorBarOverlay()
+{
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  om->AddOverlay(to.GetPointer());
+}
+
+void QmitkOverlayManagerView::OnAddScaleLegendOverlay()
+{
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  om->AddOverlay(to.GetPointer());
+}
+
+void QmitkOverlayManagerView::OnAddLogoOverlay()
+{
+  mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
   om->AddOverlay(to.GetPointer());
 }
 

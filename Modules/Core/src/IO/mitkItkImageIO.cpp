@@ -36,8 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-const char * const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
-const char * const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+const char * const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
+const char * const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+const char * const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
+const char * const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+
 
 ItkImageIO::ItkImageIO(const ItkImageIO& other)
   : AbstractFileIO(other)
@@ -327,11 +330,19 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   // re-initialize TimeGeometry
   TimeGeometry::Pointer timeGeometry;
 
-  if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
-  {
-      itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData =
-          dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
-          PROPERTY_KEY_TIMEGEOMETRY_TYPE));
+  if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE) || dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
+  {  //also check for the name because of backwards compatibility. Past code version stored with the name and not with the key
+    itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData = nullptr;
+    if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE))
+    {
+      timeGeometryTypeData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
+        PROPERTY_NAME_TIMEGEOMETRY_TYPE));
+    }
+    else
+    {
+      timeGeometryTypeData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
+        PROPERTY_KEY_TIMEGEOMETRY_TYPE));
+    }
 
       if (timeGeometryTypeData->GetMetaDataObjectValue() == ArbitraryTimeGeometry::GetStaticNameOfClass())
       {
@@ -339,11 +350,17 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
           typedef std::vector<TimePointType> TimePointVector;
           TimePointVector timePoints;
 
-          if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS))
+          if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS))
           {
               timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(
-                  PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
+                  PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS));
           }
+          else if(dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS))
+          {
+            timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(
+              PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
+          }
+
 
           if (timePoints.size() - 1 != image->GetDimension(3))
           {
@@ -666,8 +683,8 @@ void ItkImageIO::InitializeDefaultMetaDataKeys()
 {
   this->m_DefaultMetaDataKeys.push_back("NRRD.space");
   this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-  this->m_DefaultMetaDataKeys.push_back(PROPERTY_KEY_TIMEGEOMETRY_TYPE);
-  this->m_DefaultMetaDataKeys.push_back(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS);
+  this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
+  this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
   this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
 }
 

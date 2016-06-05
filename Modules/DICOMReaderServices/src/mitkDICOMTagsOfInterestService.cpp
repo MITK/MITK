@@ -77,7 +77,7 @@ AddTagOfInterest(const DICOMTag& tag, bool makePersistant)
   MutexHolder lock(m_Lock);
   std::string propName = mitk::GeneratPropertyNameForDICOMTag(tag);
   this->m_TagMap.insert(std::make_pair(propName, tag));
-  this->m_PersMap.insert(std::make_pair(propName, makePersistant));
+  this->m_PersMap[propName] = makePersistant; //this must be changed even if the propname already exists.
   this->m_KnownTags.insert(propName);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();

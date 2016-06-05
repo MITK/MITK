@@ -213,12 +213,14 @@ void mitk::TemporoSpatialStringProperty::SetValue(const TimeStepType& timeStep, 
   }
   else
   {
-    timeIter->second.insert(std::make_pair(zSlice, value));
+    timeIter->second[zSlice] = value;
   }
+  this->Modified();
 };
 
 void mitk::TemporoSpatialStringProperty::SetValue(const ValueType& value)
 {
+  this->Modified();
   m_Values.clear();
   this->SetValue(0, 0, value);
 };

@@ -1,0 +1,12 @@
+/**
+\page org_mitk_gui_qt_dicominspector DICOM Inspector
+
+\imageMacro{ "inspector.png", "Icon of DICOM Inspector", 2}
+
+This is a simple view that displays all DICOM properties of the data of the currently selected node.
+DICOM properties are all properties that have a property name starting with "DICOM".
+The plugin will show the dicom values corresponding to the currently selected time point and z slice.
+E.G. the value of "acquesition time" will change with changing the time step of 3d+t image or the value
+of "slice position" will change with changing the current z slice of the image.
+
+*/

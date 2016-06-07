@@ -312,38 +312,22 @@ void QmitkOverlayManagerView::OnActivateOverlayList()
 {
   typedef mitk::OverlayManager::OverlaySet OverlaySet;
   mitk::OverlayManager* om = mitk::OverlayManager::GetInstance();
+  m_Controls.m_OverlayList->clear();
   if(om)
   {
     OverlaySet oset = om->GetAllOverlays();
-    OverlaySet redundantOverlays;
-    std::vector<QListWidgetItem*> deletedOverlays;
-    for(unsigned int i=0 ; i<m_Controls.m_OverlayList->count() ; ++i)
-    {
-      QListWidgetItem* item = m_Controls.m_OverlayList->item(i);
-      if(item)
-      {
-        mitk::Overlay* overlay = reinterpret_cast<mitk::Overlay*>(item->data(Qt::UserRole).value<void*>());
-        OverlaySet::const_iterator overlayIt = oset.find(overlay);
-        if( overlayIt == oset.cend() )
-          deletedOverlays.push_back(item);
-        else
-          redundantOverlays.insert(overlay);
-      }
-    }
-    for(auto deleted : deletedOverlays)
-    {
-      m_Controls.m_OverlayList->removeItemWidget(deleted);
-    }
     for (auto overlay : oset)
     {
-      OverlaySet::const_iterator overlayIt = redundantOverlays.find(overlay.GetPointer());
-      if( overlayIt == redundantOverlays.cend() )
+      QListWidgetItem* item = new QListWidgetItem();
+      item->setData(Qt::UserRole,QVariant::fromValue<void*>(overlay.GetPointer()));
+      QString text(overlay->GetName().c_str());
+      if(text.length()>0)
       {
-        QListWidgetItem* item = new QListWidgetItem();
-        item->setData(Qt::UserRole,QVariant::fromValue<void*>(overlay.GetPointer()));
-        item->setText(overlay->GetNameOfClass());
-        m_Controls.m_OverlayList->addItem(item);
+        text.append(" : ");
       }
+      text.append(overlay->GetNameOfClass());
+      item->setText(text);
+      m_Controls.m_OverlayList->addItem(item);
     }
   }
 }

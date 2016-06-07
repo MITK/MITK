@@ -38,9 +38,8 @@ class IPropertyPersistence;
 }
 
 /**
-  \brief QmitkOverlayManagerView
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  \brief QmitkOverlayManagerView allows to view all overlays added to the mitk::OverlayManager. Properties of these overlays
+  can be modified.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal

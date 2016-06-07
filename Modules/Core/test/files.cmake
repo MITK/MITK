@@ -59,6 +59,8 @@ set(MODULE_TESTS
   mitkProgressBarTest.cpp
   mitkPropertyTest.cpp
   mitkPropertyListTest.cpp
+  mitkPropertyPersistenceTest.cpp
+  mitkPropertyPersistenceInfoTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkSurfaceTest.cpp
@@ -109,6 +111,7 @@ set(MODULE_TESTS
   mitkRotatedSlice4DTest.cpp
   mitkLevelWindowManagerCppUnitTest.cpp
   mitkVectorPropertyTest.cpp
+  mitkTemporoSpatialStringPropertyTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

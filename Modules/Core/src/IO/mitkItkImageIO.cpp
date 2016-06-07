@@ -36,8 +36,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-const char * const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
-const char * const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+const char * const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
+const char * const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+const char * const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
+const char * const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+
 
 ItkImageIO::ItkImageIO(const ItkImageIO& other)
   : AbstractFileIO(other)
@@ -327,11 +330,19 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   // re-initialize TimeGeometry
   TimeGeometry::Pointer timeGeometry;
 
-  if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
-  {
-      itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData =
-          dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
-          PROPERTY_KEY_TIMEGEOMETRY_TYPE));
+  if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE) || dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
+  {  //also check for the name because of backwards compatibility. Past code version stored with the name and not with the key
+    itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData = nullptr;
+    if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE))
+    {
+      timeGeometryTypeData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
+        PROPERTY_NAME_TIMEGEOMETRY_TYPE));
+    }
+    else
+    {
+      timeGeometryTypeData = dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(
+        PROPERTY_KEY_TIMEGEOMETRY_TYPE));
+    }
 
       if (timeGeometryTypeData->GetMetaDataObjectValue() == ArbitraryTimeGeometry::GetStaticNameOfClass())
       {
@@ -339,11 +350,17 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
           typedef std::vector<TimePointType> TimePointVector;
           TimePointVector timePoints;
 
-          if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS))
+          if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS))
           {
               timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(
-                  PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
+                  PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS));
           }
+          else if(dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS))
+          {
+            timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(
+              PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
+          }
+
 
           if (timePoints.size() - 1 != image->GetDimension(3))
           {
@@ -385,12 +402,42 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   {
     if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
     {
-      std::string key = iter->first;
+      const std::string& key = iter->first;
+      std::string assumedPropertyName = key;
+      std::replace(assumedPropertyName.begin(), assumedPropertyName.end(), '_', '.');
+
+      std::string mimeTypeName = GetMimeType()->GetName();
+
+      //Check of there is already a info for the key and our mime type.
+      IPropertyPersistence::InfoMapType infos = mitk::CoreServices::GetPropertyPersistence()->GetInfosByKey(key);
+
+      auto predicate = [mimeTypeName](const std::pair<const std::string, PropertyPersistenceInfo::Pointer>& x){return x.second.IsNotNull() && x.second->GetMimeTypeName() == mimeTypeName; };
+      auto finding = std::find_if(infos.begin(), infos.end(), predicate);
+
+      if (finding == infos.end())
+      {
+        auto predicateWild = [](const std::pair<const std::string, PropertyPersistenceInfo::Pointer>& x){return x.second.IsNotNull() && x.second->GetMimeTypeName() == PropertyPersistenceInfo::ANY_MIMETYPE_NAME(); };
+        finding = std::find_if(infos.begin(), infos.end(), predicateWild);
+      }
+
+      PropertyPersistenceInfo::Pointer info;
+
+      if (finding != infos.end())
+      {
+        assumedPropertyName = finding->first;
+        info = finding->second;
+      }
+      else
+      { //we have not found anything suitable so we generate our own info
+        info = PropertyPersistenceInfo::New(key);
+        info->SetMimeTypeName(PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
+      }
+
       std::string value = dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
 
-      std::replace(key.begin(), key.end(), '_', '.');
+      mitk::BaseProperty::Pointer loadedProp = info->GetDeserializationFunction()(value);
 
-      image->SetProperty(key.c_str(), mitk::StringProperty::New(value));
+      image->SetProperty(assumedPropertyName.c_str(), loadedProp);
 
       // Read properties should be persisted unless they are default properties
       // which are written anyway
@@ -398,22 +445,21 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
 
       for( const auto &defaultKey : m_DefaultMetaDataKeys )
       {
-        if( defaultKey.length() <= key.length() )
+        if (defaultKey.length() <= assumedPropertyName.length())
         {
           // does the start match the default key
-          if( key.substr(0,defaultKey.length()).find( defaultKey ) != std::string::npos )
+          if (assumedPropertyName.substr(0, defaultKey.length()).find(defaultKey) != std::string::npos)
           {
             isDefaultKey = true;
+            break;
           }
         }
       }
 
-      if( isDefaultKey == true )
+      if( !isDefaultKey )
       {
-        continue;
+        mitk::CoreServices::GetPropertyPersistence()->AddInfo(assumedPropertyName, info);
       }
-
-      mitk::CoreServices::GetPropertyPersistence()->AddInfo(key, mitk::PropertyPersistenceInfo::New(iter->first));
     }
   }
 
@@ -572,24 +618,25 @@ void ItkImageIO::Write()
 
     for(const auto &property : *imagePropertyList->GetMap())
     {
-      if( !mitk::CoreServices::GetPropertyPersistence()->HasInfo(property.first) )
+      PropertyPersistenceInfo::Pointer info = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first, GetMimeType()->GetName(), true);
+
+      if( info.IsNull())
       {
         continue;
       }
 
-      std::string value = property.second->GetValueAsString();
+      std::string value = info->GetSerializationFunction()(property.second);
 
       if( value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING )
       {
         continue;
       }
 
-      std::string key = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first)->GetKey();
+      std::string key = info->GetKey();
 
       itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
     }
-    // ***** Remove const_cast after bug 17952 is fixed ****
-    ImageReadAccessor imageAccess(const_cast<mitk::Image*>(image));
+    ImageReadAccessor imageAccess(image);
     m_ImageIO->Write(imageAccess.GetData());
   }
   catch (const std::exception& e)
@@ -636,8 +683,9 @@ void ItkImageIO::InitializeDefaultMetaDataKeys()
 {
   this->m_DefaultMetaDataKeys.push_back("NRRD.space");
   this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
-  this->m_DefaultMetaDataKeys.push_back(PROPERTY_KEY_TIMEGEOMETRY_TYPE);
-  this->m_DefaultMetaDataKeys.push_back(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS);
+  this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
+  this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
+  this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
 }
 
 }

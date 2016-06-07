@@ -152,9 +152,9 @@ namespace mitk
     std::string GetSOPClassUIDAsName() const;
 
     /**Convinience method that returns the property timesteps*/
-    const int GetNumberOfTimeSteps() const;
+    int GetNumberOfTimeSteps() const;
     /**return the number of frames that constitute one timestep.*/
-    const int GetNumberOfFramesPerTimeStep() const;
+    int GetNumberOfFramesPerTimeStep() const;
 
     void SetTagCache(DICOMTagCache* privateCache);
 

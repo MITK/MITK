@@ -14,31 +14,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <memory>
 
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryIBerryPreferences.h>
 
 // Qmitk
 #include "QmitkOverlayManagerView.h"
+#include "QmitkAddNewPropertyDialog.h"
+#include "QmitkPropertyItemDelegate.h"
+#include "QmitkPropertyItemModel.h"
+#include <QmitkRenderWindow.h>
 
 // Qt
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
+#include <QPainter>
 
-#include "mitkGetPropertyService.h"
-#include "QmitkAddNewPropertyDialog.h"
-#include "QmitkPropertyItemDelegate.h"
-#include "QmitkPropertyItemModel.h"
-#include <berryIBerryPreferences.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
+#include "mitkGetPropertyService.h"
 #include <mitkIPropertyPersistence.h>
-#include <QmitkRenderWindow.h>
 #include "mitkOverlayManager.h"
 #include "mitkRenderingManager.h"
-#include <QPainter>
-#include <memory>
 #include <mitkTextOverlay2D.h>
 #include <mitkTextOverlay3D.h>
 #include <mitkLabelOverlay3D.h>

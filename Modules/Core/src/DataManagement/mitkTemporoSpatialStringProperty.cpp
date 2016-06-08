@@ -238,11 +238,11 @@ std::string CreateJSONEscapes(const std::string &s)
     typedef std::string::value_type Ch;
 
     UCh c(*b);
-    // This assumes an ASCII superset. But so does everything in PTree.
+    // This assumes an ASCII superset.
     // We escape everything outside ASCII, because this code can't
     // handle high unicode characters.
     if (c == 0x20 || c == 0x21 || (c >= 0x23 && c <= 0x2E) ||
-      (c >= 0x30 && c <= 0x5B) || (c >= 0x5D && c <= 0xFF))
+      (c >= 0x30 && c <= 0x5B) || (c >= 0x5D && c <= 0x7F))
       result += *b;
     else if (*b == Ch('\b')) result += Ch('\\'), result += Ch('b');
     else if (*b == Ch('\f')) result += Ch('\\'), result += Ch('f');

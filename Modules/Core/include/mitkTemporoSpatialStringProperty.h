@@ -58,8 +58,8 @@ namespace mitk
       /**Returns the value of the passed time step and slice. If it does not exist and allowedClosed is true
        * it will look for the closest value. If nothing could be found an empty string will be returned.*/
       ValueType GetValue(const TimeStepType& timeStep, const IndexValueType& zSlice, bool allowCloseTime = false, bool allowCloseSlice = false) const;
-      ValueType GetValueBySlice(const IndexValueType& zSlice, bool allowclosed = false) const;
-      ValueType GetValueByTimeStep(const TimeStepType& timeStep, bool allowclosed = false) const;
+      ValueType GetValueBySlice(const IndexValueType& zSlice, bool allowClose = false) const;
+      ValueType GetValueByTimeStep(const TimeStepType& timeStep, bool allowClose = false) const;
 
       bool HasValue() const;
       bool HasValue(const TimeStepType& timeStep, const IndexValueType& zSlice, bool allowCloseTime = false, bool allowCloseSlice = false) const;

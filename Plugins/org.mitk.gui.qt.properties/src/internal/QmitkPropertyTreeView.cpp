@@ -174,7 +174,7 @@ void QmitkPropertyTreeView::OnCurrentRowChanged(const QModelIndex& current, cons
 
       if (m_PropertyPersistence != nullptr)
       {
-        isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
+        isPersistent = m_PropertyPersistence->HasInfos(name.toStdString());
 
         /*if (isPersistent)
         {

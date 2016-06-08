@@ -25,6 +25,10 @@ class mitkTemporoSpatialStringPropertyTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkTemporoSpatialStringPropertyTestSuite);
 
+  MITK_TEST(GetValue);
+  MITK_TEST(HasValue);
+  MITK_TEST(SetValue);
+
   MITK_TEST(serializeTemporoSpatialStringPropertyToJSON);
   MITK_TEST(deserializeJSONToTemporoSpatialStringProperty);
 
@@ -51,11 +55,77 @@ public:
   {
   }
 
+  void GetValue()
+  {
+    CPPUNIT_ASSERT(refProp->GetValue() == "v_0_0");
+
+    CPPUNIT_ASSERT(refProp->GetValue(3,0) == "v_3_0");
+    CPPUNIT_ASSERT(refProp->GetValue(3,2) == "v_3_2");
+    CPPUNIT_ASSERT(refProp->GetValue(3,1,false,true) == "v_3_0");
+    CPPUNIT_ASSERT(refProp->GetValue(3,5, false, true) == "v_3_2");
+
+    CPPUNIT_ASSERT(refProp->GetValueBySlice(0) == "v_0_0");
+    CPPUNIT_ASSERT(refProp->GetValueBySlice(4, true) == "v_0_0");
+
+    CPPUNIT_ASSERT(refProp->GetValueByTimeStep(3) == "v_3_0");
+    CPPUNIT_ASSERT(refProp->GetValueByTimeStep(6) == "v_6_1");
+    CPPUNIT_ASSERT(refProp->GetValueByTimeStep(5, true) == "v_3_0");
+
+    CPPUNIT_ASSERT(refProp->GetValueAsString() == "v_0_0");
+
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps().size() == 3);
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps()[0] == 0);
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps()[1] == 3);
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps()[2] == 6);
+
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(0).size() == 1);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(0)[0] == 0);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(3).size() == 2);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(3)[0] == 0);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(3)[1] == 2);
+
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(2).size() == 0);
+  }
+
+  void HasValue()
+  {
+    CPPUNIT_ASSERT(refProp->HasValue());
+
+    CPPUNIT_ASSERT(refProp->HasValue(3, 0));
+    CPPUNIT_ASSERT(refProp->HasValue(3, 2));
+    CPPUNIT_ASSERT(refProp->HasValue(3, 1, false, true));
+    CPPUNIT_ASSERT(refProp->HasValue(3, 5, false, true));
+    CPPUNIT_ASSERT(!refProp->HasValue(3, 1));
+    CPPUNIT_ASSERT(!refProp->HasValue(3, 5));
+    CPPUNIT_ASSERT(refProp->HasValue(4, 2, true, true));
+    CPPUNIT_ASSERT(refProp->HasValue(4, 2, true, false));
+    CPPUNIT_ASSERT(!refProp->HasValue(4, 2, false, true));
+
+    CPPUNIT_ASSERT(refProp->HasValueBySlice(0));
+    CPPUNIT_ASSERT(refProp->HasValueBySlice(4, true));
+    CPPUNIT_ASSERT(!refProp->HasValueBySlice(4));
+
+    CPPUNIT_ASSERT(refProp->HasValueByTimeStep(3));
+    CPPUNIT_ASSERT(refProp->HasValueByTimeStep(6));
+    CPPUNIT_ASSERT(refProp->HasValueByTimeStep(5, true));
+    CPPUNIT_ASSERT(!refProp->HasValueByTimeStep(5));
+  }
+
+  void SetValue()
+  {
+    CPPUNIT_ASSERT_NO_THROW(refProp->SetValue(8, 9, "v_8_9"));
+    CPPUNIT_ASSERT(refProp->GetValue(8,9) == "v_8_9");
+
+    CPPUNIT_ASSERT_NO_THROW(refProp->SetValue("newValue"));
+    CPPUNIT_ASSERT(refProp->GetValue(0, 0) == "newValue");
+    CPPUNIT_ASSERT(refProp->GetAvailableTimeSteps().size()==1);
+    CPPUNIT_ASSERT(refProp->GetAvailableSlices(0).size() == 1);
+  }
 
   void serializeTemporoSpatialStringPropertyToJSON()
   {
     std::string data = mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(refProp);
-    MITK_TEST_CONDITION_REQUIRED(refJSON == data, "Testing serializeTemporoSpatialStringPropertyToJSON() producing correct string.");
+    CPPUNIT_ASSERT(refJSON == data); //"Testing serializeTemporoSpatialStringPropertyToJSON() producing correct string.");
   }
 
   void deserializeJSONToTemporoSpatialStringProperty()
@@ -64,11 +134,11 @@ public:
 
     mitk::TemporoSpatialStringProperty* tsProp = dynamic_cast<mitk::TemporoSpatialStringProperty*>(prop.GetPointer());
 
-    MITK_TEST_CONDITION_REQUIRED(tsProp->GetValue(0,0) == "v_0_0", "Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 1");
-    MITK_TEST_CONDITION_REQUIRED(tsProp->GetValue(3, 0) == "v_3_0", "Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 2");
-    MITK_TEST_CONDITION_REQUIRED(tsProp->GetValue(3, 2) == "v_3_2", "Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 3");
-    MITK_TEST_CONDITION_REQUIRED(tsProp->GetValue(6, 1) == "v_6_1", "Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 4");
-    MITK_TEST_CONDITION_REQUIRED(*tsProp == *refProp, "Testing deserializeJSONToTemporoSpatialStringProperty()");
+    CPPUNIT_ASSERT(tsProp->GetValue(0, 0) == "v_0_0"); //"Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 1");
+    CPPUNIT_ASSERT(tsProp->GetValue(3, 0) == "v_3_0"); //"Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 2");
+    CPPUNIT_ASSERT(tsProp->GetValue(3, 2) == "v_3_2"); //"Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 3");
+    CPPUNIT_ASSERT(tsProp->GetValue(6, 1) == "v_6_1"); //"Testing deserializeJSONToTemporoSpatialStringProperty() producing property with correct value 4");
+    CPPUNIT_ASSERT(*tsProp == *refProp); //"Testing deserializeJSONToTemporoSpatialStringProperty()");
   }
 
 };

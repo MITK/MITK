@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyItemDelegate_h
 #define QmitkPropertyItemDelegate_h
 
+#include <MitkQtWidgetsExports.h>
 #include <QListView>
 #include <QStyledItemDelegate>
 #include <mitkPropertyList.h>
@@ -68,7 +69,7 @@ private:
   QComboBox* m_ComboBox;
 };
 
-class QmitkPropertyItemDelegate : public QStyledItemDelegate
+class MITKQTWIDGETS_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

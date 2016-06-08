@@ -27,6 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::TextOverlay3D::TextOverlay3D()
 {
+  mitk::Point3D position;
+  position.Fill(0);
+  this->SetPosition3D(position);
+  this->SetOffsetVector(position);
+  this->SetText("");
+  this->SetFontSize(20);
+  this->SetColor(1.0,1.0,1.0);
 }
 
 

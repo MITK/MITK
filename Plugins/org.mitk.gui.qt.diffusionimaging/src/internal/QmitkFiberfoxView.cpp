@@ -150,8 +150,10 @@ void QmitkFiberfoxView::AfterThread()
   parameters = m_TractsToDwiFilter->GetParameters();
 
   mitkImage = mitk::GrabItkImageMemory( m_TractsToDwiFilter->GetOutput() );
-  mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New(  parameters.m_SignalGen.GetGradientDirections()  ));
-  mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ));
+  mitkImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
+                          mitk::GradientDirectionsProperty::New(  parameters.m_SignalGen.GetGradientDirections()  ));
+  mitkImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(),
+                          mitk::FloatProperty::New( parameters.m_SignalGen.m_Bvalue ));
   mitk::DiffusionPropertyHelper propertyHelper( mitkImage );
   propertyHelper.InitializeImage();
   parameters.m_Misc.m_ResultNode->SetData( mitkImage );

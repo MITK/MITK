@@ -60,6 +60,7 @@ int mitkTextOverlay3DRendering3DTest(int argc, char* argv[])
       point[2] = -i*5;
       pointset->InsertPoint(i, point);
       textOverlay3D->SetText("A Point");
+      textOverlay3D->SetFontSize(1);
 
       // The Position is set to the point coordinate to create an annotation to the point in the PointSet.
       textOverlay3D->SetPosition3D(point);

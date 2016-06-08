@@ -76,6 +76,10 @@ private slots:
   void OnOverlaySelectionChanged(QListWidgetItem* current,QListWidgetItem*);
 
   void OnDelete();
+  void OnAddOverlay();
+
+private:
+
   void OnAddTextOverlay2D();
   void OnAddTextOverlay3D();
   void OnAddLabelOverlay();
@@ -83,10 +87,11 @@ private slots:
   void OnAddScaleLegendOverlay();
   void OnAddLogoOverlay();
 
-private:
   QString GetPropertyNameOrAlias(const QModelIndex& index);
   void OnPropertyNameChanged(const itk::EventObject& event);
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  void InitializeAddAnimationMenu();
 
   void OnOverlayAdded(itk::Object */*caller*/, const itk::EventObject &event);
 
@@ -114,6 +119,7 @@ private:
   QmitkPropertyItemDelegate* m_Delegate;
   mitk::Overlay::Pointer m_SelectedOverlay;
   mitk::BaseRenderer* m_Renderer;
+  QMenu* m_AddOverlayMenu;
 
 };
 

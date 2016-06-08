@@ -67,6 +67,7 @@ protected:
   /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
   mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
+  vtkProp* GetVtkProp(BaseRenderer *renderer) const override;
   virtual vtkActor2D* GetVtkActor2D(BaseRenderer *renderer) const override;
   void UpdateVtkOverlay2D(mitk::BaseRenderer *renderer) override;
 

@@ -58,7 +58,8 @@ QmitkOverlayManagerView::QmitkOverlayManagerView()
     m_ProxyModel(nullptr),
     m_Model(nullptr),
     m_Delegate(nullptr),
-    m_Renderer(nullptr)
+    m_Renderer(nullptr),
+    m_AddOverlayMenu(nullptr)
 {
 }
 
@@ -89,6 +90,8 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
     }
   }
 
+  InitializeAddAnimationMenu();
+
   m_ProxyModel = new QSortFilterProxyModel(m_Controls.m_PropertyTree);
   m_Model = new QmitkPropertyItemModel(m_ProxyModel);
 
@@ -112,15 +115,7 @@ void QmitkOverlayManagerView::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.m_PropertyTree->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(OnCurrentRowChanged(const QModelIndex&, const QModelIndex&)));
   connect(m_Controls.m_OverlayList, SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)), this, SLOT(OnOverlaySelectionChanged(QListWidgetItem*,QListWidgetItem*))  );
   connect(m_Controls.m_DeleteOverlay, SIGNAL(clicked()), this, SLOT(OnDelete()));
-
-  connect(m_Controls.m_ButtonAddColorBar, SIGNAL(clicked()), this, SLOT(OnAddColorBarOverlay()));
-  connect(m_Controls.m_ButtonAddLabels, SIGNAL(clicked()), this, SLOT(OnAddLabelOverlay()));
-  connect(m_Controls.m_ButtonAddScaleLegend, SIGNAL(clicked()), this, SLOT(OnAddScaleLegendOverlay()));
-  connect(m_Controls.m_ButtonAddText2D, SIGNAL(clicked()), this, SLOT(OnAddTextOverlay2D()));
-  connect(m_Controls.m_ButtonAddText3D, SIGNAL(clicked()), this, SLOT(OnAddTextOverlay3D()));
-  connect(m_Controls.m_ButtonAddLogo, SIGNAL(clicked()), this, SLOT(OnAddLogoOverlay()));
-
-  m_Controls.m_ButtonAddLabels->setVisible(false);
+  connect(m_Controls.m_AddOverlay, SIGNAL(clicked()), this, SLOT(OnAddOverlay()));
 }
 
 QString QmitkOverlayManagerView::GetPropertyNameOrAlias(const QModelIndex& index)
@@ -249,6 +244,18 @@ void QmitkOverlayManagerView::OnPropertyNameChanged(const itk::EventObject&)
 void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
 
+}
+
+void QmitkOverlayManagerView::InitializeAddAnimationMenu()
+{
+  m_AddOverlayMenu = new QMenu(m_Controls.m_AddOverlay);
+
+  m_AddOverlayMenu->addAction("TextOverlay2D");
+  m_AddOverlayMenu->addAction("TextOverlay3D");
+  m_AddOverlayMenu->addAction("LabelOverlay");
+  m_AddOverlayMenu->addAction("ColorBarOverlay");
+  m_AddOverlayMenu->addAction("ScaleLegendOverlay");
+  m_AddOverlayMenu->addAction("LogoOverlay");
 }
 
 void QmitkOverlayManagerView::OnOverlayAdded(itk::Object *,const itk::EventObject &event)
@@ -399,6 +406,34 @@ void QmitkOverlayManagerView::OnDelete()
   if(item)
     overlay = reinterpret_cast<mitk::Overlay*>(item->data(Qt::UserRole).value<void*>());
   mitk::OverlayManager::GetInstance()->RemoveOverlay(overlay);
+}
+
+void QmitkOverlayManagerView::OnAddOverlay()
+{
+  QAction* action = m_AddOverlayMenu->exec(QCursor::pos());
+
+  if (action != NULL)
+  {
+    const QString widgetKey = action->text();
+
+    if (widgetKey == "TextOverlay2D")
+      OnAddTextOverlay2D();
+
+    else if (widgetKey == "TextOverlay3D")
+      OnAddTextOverlay3D();
+
+    else if (widgetKey == "LabelOverlay")
+      OnAddLabelOverlay();
+
+    else if (widgetKey == "ColorBarOverlay")
+      OnAddColorBarOverlay();
+
+    else if (widgetKey == "ScaleLegendOverlay")
+      OnAddScaleLegendOverlay();
+
+    else if (widgetKey == "LogoOverlay")
+      OnAddLogoOverlay();
+  }
 }
 
 void QmitkOverlayManagerView::OnAddTextOverlay2D()

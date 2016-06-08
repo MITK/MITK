@@ -689,7 +689,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     }
     else
     {
-      //mdh/todo: bug-19481
       MITK_WARN << "QmitkFiberfoxView.cpp: Unrecognised parameters.m_Misc.m_MotionVolumesBox: " << parameters.m_Misc.m_MotionVolumesBox;
       parameters.m_Misc.m_MotionVolumesBox = "random"; // set default.
       for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
@@ -1287,9 +1286,13 @@ void QmitkFiberfoxView::LoadParameters()
   {
     m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
     if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel.get()))
+    {
       m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
+    }
     else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel.get()))
+    {
       m_Controls->m_NoiseDistributionBox->setCurrentIndex(1);
+    }
     m_Controls->m_NoiseLevel->setValue(parameters.m_NoiseModel->GetNoiseVariance());
   }
   else
@@ -2580,7 +2583,9 @@ void QmitkFiberfoxView::UpdateGui()
     m_Controls->m_GeometryFrame->setEnabled(false);
   }
 
-  if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))
+  if ( m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull()
+       && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(
+         dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()) ) )
   {
     m_Controls->m_DiffusionPropsMessage->setVisible(true);
     m_Controls->m_BvalueBox->setEnabled(false);

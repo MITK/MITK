@@ -40,10 +40,10 @@ using namespace std;
 
 namespace mitk {
 
-/** Signal generation */
-class SignalGenerationParameters
-{
-public:
+  /** Signal generation */
+  class SignalGenerationParameters
+  {
+  public:
     typedef itk::Image<double, 3>                   ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
     typedef itk::Vector<double,3>                   GradientType;
@@ -155,17 +155,17 @@ public:
     inline void SetGradienDirections(GradientListType gradientList);
     inline void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
 
-protected:
+  protected:
 
     unsigned int                        m_NumGradients;             ///< Number of diffusion-weighted image volumes.
     unsigned int                        m_NumBaseline;              ///< Number of non-diffusion-weighted image volumes.
     GradientListType                    m_GradientDirections;       ///< Total number of image volumes.
-};
+  };
 
-/** Fiber generation */
-class FiberGenerationParameters
-{
-public:
+  /** Fiber generation */
+  class FiberGenerationParameters
+  {
+  public:
 
     enum FiberDistribution{
         DISTRIBUTE_UNIFORM, // distribute fibers uniformly in the ROIs
@@ -201,12 +201,12 @@ public:
     mitk::Vector3D      m_Scale;
     FlipListType        m_FlipList;        ///< contains flags indicating a flip of the 2D fiber x-coordinates (needed to resolve some unwanted fiber twisting)
     FiducialListType    m_Fiducials;       ///< container of the planar ellipses used as fiducials for the fiber generation process
-};
+  };
 
-/** GUI persistence, input, output, ... */
-class MiscFiberfoxParameters
-{
-public:
+  /** GUI persistence, input, output, ... */
+  class MiscFiberfoxParameters
+  {
+  public:
     MiscFiberfoxParameters()
         : m_ResultNode(DataNode::New())
         , m_ParentNode(NULL)
@@ -253,16 +253,16 @@ public:
     bool                m_CheckAdvancedFiberOptionsBox;
     bool                m_CheckConstantRadiusBox;
     bool                m_CheckIncludeFiducialsBox;
-};
+  };
 
-/**
+  /**
   * \brief Datastructure to manage the Fiberfox signal generation parameters.
   *
   */
-template< class ScalarType = double >
-class FiberfoxParameters
-{
-public:
+  template< class ScalarType = double >
+  class FiberfoxParameters
+  {
+  public:
 
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
@@ -339,7 +339,7 @@ public:
     template< class ParameterType >
     ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
     std::string                         m_MissingTags;
-};
+  };
 }
 
 #include "mitkFiberfoxParameters.cpp"

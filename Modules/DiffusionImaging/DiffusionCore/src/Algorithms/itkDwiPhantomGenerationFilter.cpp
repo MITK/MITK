@@ -36,21 +36,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-//#define QBALL_RECON_PI       3.14159265358979323846
 
-template< class TOutputScalarType >
-DwiPhantomGenerationFilter< TOutputScalarType >
-::DwiPhantomGenerationFilter()
+  template< class TOutputScalarType >
+  DwiPhantomGenerationFilter< TOutputScalarType >
+  ::DwiPhantomGenerationFilter()
     : m_BValue(1000)
     , m_SignalScale(1000)
     , m_BaselineImages(0)
     , m_MaxBaseline(0)
     , m_MeanBaseline(0)
     , m_NoiseVariance(0.004)
+    , m_AddNoiseFlag(true) // parameters.m_Misc.m_CheckAddNoiseBox
     , m_GreyMatterAdc(0.01)
     , m_SimulateBaseline(true)
     , m_DefaultBaseline(1000)
-{
+  {
     this->SetNumberOfRequiredOutputs (1);
     m_Spacing.Fill(2.5); m_Origin.Fill(0.0);
     m_DirectionMatrix.SetIdentity();
@@ -75,12 +75,13 @@ DwiPhantomGenerationFilter< TOutputScalarType >
 
     this->SetNthOutput (0, outImage);
 
-}
 
-template< class TOutputScalarType >
-void DwiPhantomGenerationFilter< TOutputScalarType >
-::GenerateTensors()
-{
+  }
+
+  template< class TOutputScalarType >
+  void DwiPhantomGenerationFilter< TOutputScalarType >
+  ::GenerateTensors()
+  {
     MITK_INFO << "Generating tensors";
 
     for (int i=0; i<m_SignalRegions.size(); i++)
@@ -128,23 +129,23 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
 
         m_TensorList.push_back(tensor);
     }
-}
+  }
 
-template< class TOutputScalarType >
-void DwiPhantomGenerationFilter< TOutputScalarType >::AddNoise(typename OutputImageType::PixelType& pix)
-{
+  template< class TOutputScalarType >
+  void DwiPhantomGenerationFilter< TOutputScalarType >::AddNoise(typename OutputImageType::PixelType& pix)
+  {
     for( unsigned int i=0; i<m_GradientList.size(); i++)
     {
         float signal = pix[i];
         float val = sqrt(pow(signal + m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance), 2) +  pow(m_SignalScale*m_RandGen->GetNormalVariate(0.0, m_NoiseVariance),2));
         pix[i] += val;
     }
-}
+  }
 
-template< class TOutputScalarType >
-typename DwiPhantomGenerationFilter< TOutputScalarType >::OutputImageType::PixelType
-DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::DiffusionTensor3D<float>& T, float weight)
-{
+  template< class TOutputScalarType >
+  typename DwiPhantomGenerationFilter< TOutputScalarType >::OutputImageType::PixelType
+  DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::DiffusionTensor3D<float>& T, float weight)
+  {
     typename OutputImageType::PixelType out;
     out.SetSize(m_GradientList.size());
     out.Fill(0);
@@ -183,22 +184,28 @@ DwiPhantomGenerationFilter< TOutputScalarType >::SimulateMeasurement(itk::Diffus
     }
 
     return out;
-}
+  }
 
-template< class TOutputScalarType >
-void DwiPhantomGenerationFilter< TOutputScalarType >
-::GenerateData()
-{
-    if (m_NoiseVariance < 0)
+  template< class TOutputScalarType >
+  void DwiPhantomGenerationFilter< TOutputScalarType >
+  ::GenerateData()
+  {
+    if (m_NoiseVariance < 0 && m_AddNoiseFlag)
+    {
         m_NoiseVariance = 0.001;
+    }
 
     if (!m_SimulateBaseline)
     {
         MITK_INFO << "Baseline image values are set to default. Noise variance value is treated as SNR!";
-        if (m_NoiseVariance <= 0)
+      if (m_NoiseVariance <= 0 && m_AddNoiseFlag)
+      {
             m_NoiseVariance = 0.0001;
-        if (m_NoiseVariance>99)
+      }
+      if (m_NoiseVariance>99 && m_AddNoiseFlag)
+      {
             m_NoiseVariance = 0;
+      }
         else
         {
             m_NoiseVariance = m_DefaultBaseline/(m_NoiseVariance*m_SignalScale);
@@ -351,15 +358,21 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
         m_MeanBaseline += pix[0];
         it.Set(pix);
         m_NumDirectionsImage->SetPixel(index, numDirs);
-        if (m_NoiseVariance>0)
+      if (m_NoiseVariance>0 && m_AddNoiseFlag)
+      {
             m_SNRImage->SetPixel(index, pix[0]/(noiseStdev*m_SignalScale));
+      }
         ++it;
     }
     m_MeanBaseline /= m_ImageRegion.GetNumberOfPixels();
-    if (m_NoiseVariance>0)
+    if (m_NoiseVariance>0 && m_AddNoiseFlag)
+    {
         MITK_INFO << "Mean SNR: " << m_MeanBaseline/(noiseStdev*m_SignalScale);
+    }
     else
+    {
         MITK_INFO << "No noise added";
+    }
 
     // add rician noise
     it.GoToBegin();
@@ -376,12 +389,12 @@ void DwiPhantomGenerationFilter< TOutputScalarType >
     directionsPolyData->SetPoints(m_VtkPoints);
     directionsPolyData->SetLines(m_VtkCellArray);
     m_OutputFiberBundle = mitk::FiberBundle::New(directionsPolyData);
-}
-template< class TOutputScalarType >
-double DwiPhantomGenerationFilter< TOutputScalarType >::GetTensorL2Norm(itk::DiffusionTensor3D<float>& T)
-{
+  }
+  template< class TOutputScalarType >
+  double DwiPhantomGenerationFilter< TOutputScalarType >::GetTensorL2Norm(itk::DiffusionTensor3D<float>& T)
+  {
     return sqrt(T[0]*T[0] + T[3]*T[3] + T[5]*T[5] + T[1]*T[2]*2.0 + T[2]*T[4]*2.0 + T[1]*T[4]*2.0);
-}
+  }
 
 }
 

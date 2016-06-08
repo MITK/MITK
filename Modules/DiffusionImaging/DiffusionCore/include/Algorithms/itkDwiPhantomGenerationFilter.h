@@ -97,7 +97,7 @@ public:
     itkGetMacro( SNRImage, ItkFloatImgType::Pointer)                            ///< contains local SNR values
     itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< output vector field
 
-    protected:
+protected:
     DwiPhantomGenerationFilter();
     ~DwiPhantomGenerationFilter(){}
 
@@ -132,6 +132,7 @@ private:
     double                                          m_MaxBaseline;      ///< maximum value of the baseline image
     double                                          m_MeanBaseline;     ///< mean value of the baseline image
     double                                          m_NoiseVariance;    ///< variance of rician noise
+    bool m_AddNoiseFlag;  //* Checkbox flag to switch noise on and off. */
     float                                           m_GreyMatterAdc;    ///< ADC of isotropic diffusion tensor
     bool                                            m_SimulateBaseline; ///< generate baseline image values as the l2 norm of the corresponding tensor used for the diffusion signal generation
     TOutputScalarType                               m_DefaultBaseline;  ///< default value for baseline image

@@ -34,28 +34,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk {
 
-template< class TPixelType >
-KspaceImageFilter< TPixelType >
-::KspaceImageFilter()
+  template< class TPixelType >
+  KspaceImageFilter< TPixelType >
+  ::KspaceImageFilter()
     : m_Z(0)
     , m_UseConstantRandSeed(false)
     , m_SpikesPerSlice(0)
     , m_IsBaseline(true)
-{
+  {
     m_DiffusionGradientDirection.Fill(0.0);
 
     m_CoilPosition.Fill(0.0);
-}
+  }
 
-template< class TPixelType >
-void KspaceImageFilter< TPixelType >
-::BeforeThreadedGenerateData()
-{
+  template< class TPixelType >
+  void KspaceImageFilter< TPixelType >
+  ::BeforeThreadedGenerateData()
+  {
     m_Spike = vcl_complex<double>(0,0);
     m_SpikeLog = "";
 
     typename OutputImageType::Pointer outputImage = OutputImageType::New();
-    itk::ImageRegion<2> region; region.SetSize(0, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0));  region.SetSize(1, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1));
+    itk::ImageRegion<2> region;
+    region.SetSize(0, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(0));
+    region.SetSize(1, m_Parameters->m_SignalGen.m_CroppedRegion.GetSize(1));
     outputImage->SetLargestPossibleRegion( region );
     outputImage->SetBufferedRegion( region );
     outputImage->SetRequestedRegion( region );
@@ -81,9 +83,12 @@ void KspaceImageFilter< TPixelType >
 
     m_Transform =  m_Parameters->m_SignalGen.m_ImageDirection;
     for (int i=0; i<3; i++)
+    {
         for (int j=0; j<3; j++)
+      {
             m_Transform[i][j] *=  m_Parameters->m_SignalGen.m_ImageSpacing[j];
-
+      }
+    }
     double a = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(0)*m_Parameters->m_SignalGen.m_ImageSpacing[0];
     double b = m_Parameters->m_SignalGen.m_ImageRegion.GetSize(1)*m_Parameters->m_SignalGen.m_ImageSpacing[1];
     double diagonal = sqrt(a*a+b*b)/1000;   // image diagonal in m
@@ -120,11 +125,11 @@ void KspaceImageFilter< TPixelType >
     }
 
     m_ReadoutScheme->AdjustEchoTime();
-}
+  }
 
-template< class TPixelType >
-double KspaceImageFilter< TPixelType >::CoilSensitivity(DoubleVectorType& pos)
-{
+  template< class TPixelType >
+  double KspaceImageFilter< TPixelType >::CoilSensitivity(DoubleVectorType& pos)
+  {
     // *************************************************************************
     // Coil ring is moving with excited slice (FIX THIS SOMETIME)
     m_CoilPosition[2] = pos[2];
@@ -151,18 +156,22 @@ double KspaceImageFilter< TPixelType >::CoilSensitivity(DoubleVectorType& pos)
     default:
         return 1;
     }
-}
+  }
 
-template< class TPixelType >
-void KspaceImageFilter< TPixelType >
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadID)
-{
+  template< class TPixelType >
+  void KspaceImageFilter< TPixelType >
+  ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, ThreadIdType threadID)
+  {
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
     randGen->SetSeed();
     if (m_UseConstantRandSeed)  // always generate the same random numbers?
+    {
         randGen->SetSeed(0);
+    }
     else
+    {
         randGen->SetSeed();
+    }
 
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
@@ -177,7 +186,8 @@ void KspaceImageFilter< TPixelType >
     double yMaxFov = yMax*m_Parameters->m_SignalGen.m_CroppingFactor;               // actual FOV in y-direction (in x-direction FOV=xMax)
 
     double numPix = kxMax*kyMax;
-    double noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax); // adjust noise variance since it is the intended variance in physical space and not in k-space
+    // Adjust noise variance since it is the intended variance in physical space and not in k-space:
+    double noiseVar = m_Parameters->m_SignalGen.m_PartialFourier*m_Parameters->m_SignalGen.m_NoiseVariance/(kyMax*kxMax);
 
     while( !oit.IsAtEnd() )
     {
@@ -190,44 +200,54 @@ void KspaceImageFilter< TPixelType >
         // time passes since application of the RF pulse
         double tRf = m_Parameters->m_SignalGen.m_tEcho+t;
 
-        // calculate eddy current decay factor (TODO: vielleicht umbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
+      // calculate eddy current decay factor
+      // (TODO: vielleicht umbauen dass hier die zeit vom letzten diffusionsgradienten an genommen wird. doku dann auch entsprechend anpassen.)
         double eddyDecay = 0;
         if ( m_Parameters->m_Misc.m_CheckAddEddyCurrentsBox && m_Parameters->m_SignalGen.m_EddyStrength>0)
+      {
             eddyDecay = exp(-tRead/m_Parameters->m_SignalGen.m_Tau );
+      }
 
         // calcualte signal relaxation factors
         std::vector< double > relaxFactor;
         if ( m_Parameters->m_SignalGen.m_DoSimulateRelaxation)
+      {
             for (unsigned int i=0; i<m_CompartmentImages.size(); i++)
-                relaxFactor.push_back( exp(-tRf/m_T2.at(i) -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom)*(1.0-exp(-(m_Parameters->m_SignalGen.m_tRep + tRf)/m_T1.at(i))) );
-
+        {
+          relaxFactor.push_back( exp(-tRf/m_T2.at(i) -fabs(t)/ m_Parameters->m_SignalGen.m_tInhom)
+                                 * (1.0-exp(-(m_Parameters->m_SignalGen.m_tRep + tRf)/m_T1.at(i))) );
+        }
+      }
         // get current k-space index (depends on the schosen k-space readout scheme)
         itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());
 
         // partial fourier
         bool pf = false;
         if (kIdx[1]>kyMax*m_Parameters->m_SignalGen.m_PartialFourier)
+      {
             pf = true;
+      }
 
         if (!pf)
         {
             // shift k for DFT: (0 -- N) --> (-N/2 -- N/2)
             double kx = kIdx[0];
             double ky = kIdx[1];
-            if ((int)kxMax%2==1)
-                kx -= (kxMax-1)/2;
-            else
-                kx -= kxMax/2;
-            if ((int)kyMax%2==1)
-                ky -= (kyMax-1)/2;
-            else
-                ky -= kyMax/2;
+        if ((int)kxMax%2==1){ kx -= (kxMax-1)/2; }
+        else{ kx -= kxMax/2; }
+
+        if ((int)kyMax%2==1){ ky -= (kyMax-1)/2; }
+        else{ ky -= kyMax/2; }
 
             // add ghosting
             if (oit.GetIndex()[1]%2 == 1)
+        {
                 kx -= m_Parameters->m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+        }
             else
+        {
                 kx += m_Parameters->m_SignalGen.m_KspaceLineOffset;    // add gradient delay induced offset
+        }
 
             vcl_complex<double> s(0,0);
             InputIteratorType it(m_CompartmentImages.at(0), m_CompartmentImages.at(0)->GetLargestPossibleRegion() );
@@ -235,14 +255,10 @@ void KspaceImageFilter< TPixelType >
             {
                 double x = it.GetIndex()[0];
                 double y = it.GetIndex()[1];
-                if ((int)xMax%2==1)
-                    x -= (xMax-1)/2;
-                else
-                    x -= xMax/2;
-                if ((int)yMax%2==1)
-                    y -= (yMax-1)/2;
-                else
-                    y -= yMax/2;
+          if ((int)xMax%2==1){ x -= (xMax-1)/2; }
+          else{ x -= xMax/2; }
+          if ((int)yMax%2==1){ y -= (yMax-1)/2; }
+          else{ y -= yMax/2; }
 
                 DoubleVectorType pos; pos[0] = x; pos[1] = y; pos[2] = m_Z;
                 pos = m_Transform*pos/1000;   // vector from image center to current position (in meter)
@@ -265,6 +281,7 @@ void KspaceImageFilter< TPixelType >
                 {
                     omega += (m_DiffusionGradientDirection[0]*pos[0]+m_DiffusionGradientDirection[1]*pos[1]+m_DiffusionGradientDirection[2]*pos[2]) * eddyDecay;
                 }
+
                 if (m_Parameters->m_SignalGen.m_FrequencyMap.IsNotNull()) // simulate distortions
                 {
                     itk::Point<double, 3> point3D;
@@ -272,7 +289,9 @@ void KspaceImageFilter< TPixelType >
                     if (m_Parameters->m_SignalGen.m_DoAddMotion)    // we have to account for the head motion since this also moves our frequency map
                     {
                         m_Parameters->m_SignalGen.m_FrequencyMap->TransformIndexToPhysicalPoint(index, point3D);
-                        point3D = m_FiberBundle->TransformPoint(point3D.GetVnlVector(), -m_Rotation[0],-m_Rotation[1],-m_Rotation[2],-m_Translation[0],-m_Translation[1],-m_Translation[2]);
+              point3D = m_FiberBundle->TransformPoint( point3D.GetVnlVector(),
+                                                       -m_Rotation[0], -m_Rotation[1], -m_Rotation[2],
+                                                       -m_Translation[0], -m_Translation[1], -m_Translation[2] );
                         omega += InterpolateFmapValue(point3D);
                     }
                     else
@@ -282,10 +301,8 @@ void KspaceImageFilter< TPixelType >
                 }
 
                 // if signal comes from outside FOV, mirror it back (wrap-around artifact - aliasing)
-                if (y<-yMaxFov/2)
-                    y += yMaxFov;
-                else if (y>=yMaxFov/2)
-                    y -= yMaxFov;
+          if (y<-yMaxFov/2){ y += yMaxFov; }
+          else if (y>=yMaxFov/2) { y -= yMaxFov; }
 
                 // actual DFT term
                 s += f * exp( std::complex<double>(0, 2 * M_PI * (kx*x/xMax + ky*y/yMaxFov + omega*t/1000 )) );
@@ -295,10 +312,14 @@ void KspaceImageFilter< TPixelType >
             s /= numPix;
 
             if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
+        {
                 m_Spike = s;
+        }
 
-            if (m_Parameters->m_SignalGen.m_NoiseVariance>0)
+        if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_CheckAddNoiseBox)
+        {
                 s = vcl_complex<double>(s.real()+randGen->GetNormalVariate(0,noiseVar), s.imag()+randGen->GetNormalVariate(0,noiseVar));
+        }
 
             outputImage->SetPixel(kIdx, s);
             m_KSpaceImage->SetPixel(kIdx, sqrt(s.imag()*s.imag()+s.real()*s.real()) );
@@ -306,12 +327,12 @@ void KspaceImageFilter< TPixelType >
 
         ++oit;
     }
-}
+  }
 
-template< class TPixelType >
-void KspaceImageFilter< TPixelType >
-::AfterThreadedGenerateData()
-{
+  template< class TPixelType >
+  void KspaceImageFilter< TPixelType >
+  ::AfterThreadedGenerateData()
+  {
     delete m_ReadoutScheme;
 
     typename OutputImageType::Pointer outputImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
@@ -366,13 +387,13 @@ void KspaceImageFilter< TPixelType >
         outputImage->SetPixel(spikeIdx, m_Spike);
         m_SpikeLog += "[" + boost::lexical_cast<std::string>(spikeIdx[0]) + "," + boost::lexical_cast<std::string>(spikeIdx[1]) + "," + boost::lexical_cast<std::string>(m_Zidx) + "] Magnitude: " + boost::lexical_cast<std::string>(m_Spike.real()) + "+" + boost::lexical_cast<std::string>(m_Spike.imag()) + "i\n";
     }
-}
+  }
 
 
 
-template< class TPixelType >
-double KspaceImageFilter< TPixelType >::InterpolateFmapValue(itk::Point<float, 3> itkP)
-{
+  template< class TPixelType >
+  double KspaceImageFilter< TPixelType >::InterpolateFmapValue(itk::Point<float, 3> itkP)
+  {
     itk::Index<3> idx;
     itk::ContinuousIndex< double, 3> cIdx;
     m_Parameters->m_SignalGen.m_FrequencyMap->TransformPhysicalPointToIndex(itkP, idx);
@@ -439,7 +460,7 @@ double KspaceImageFilter< TPixelType >::InterpolateFmapValue(itk::Point<float, 3
     }
 
     return pix;
-}
+  }
 
 }
 #endif

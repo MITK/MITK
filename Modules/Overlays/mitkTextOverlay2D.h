@@ -23,6 +23,7 @@
 #include "MitkOverlaysExports.h"
 
 class vtkTextActor;
+class vtkPropAssembly;
 
 namespace mitk {
 
@@ -37,6 +38,12 @@ public:
     vtkSmartPointer<vtkTextActor> m_TextActor;
 
     vtkSmartPointer<vtkTextProperty> m_TextProp;
+
+    vtkSmartPointer<vtkTextActor> m_STextActor;
+
+    vtkSmartPointer<vtkTextProperty> m_STextProp;
+
+    vtkSmartPointer<vtkPropAssembly> m_Assembly;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;

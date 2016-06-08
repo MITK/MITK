@@ -131,6 +131,8 @@ void QmitkXnatTreeBrowserView::ToggleConnection()
       mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->OpenXnatSession();
       m_Controls.btnXnatConnect->setToolTip("Disconnect");
       m_Controls.btnXnatConnect->setIcon(QIcon(":/xnat-plugin/xnat-disconnect.png"));
+      m_Controls.searchField->setEnabled(true);
+      m_Controls.searchModeBox->setEnabled(true);
     }
     catch (const ctkXnatAuthenticationException& auth)
     {
@@ -194,7 +196,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.treeView, SIGNAL(clicked), SLOT(MouseClicked(QMouseEvent *)));
   connect(m_TreeModel, SIGNAL(Error(const QModelIndex&)), SLOT(AnErrorOccurred(const QModelIndex&)));
 
-
   m_Tracker->Open();
 
   ctkXnatSession* session;
@@ -217,6 +218,7 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.btnXnatUpload, SIGNAL(clicked()), this, SLOT(OnUploadFromDataStorage()));
   connect(m_Controls.btnXnatDownload, SIGNAL(clicked()), this, SLOT(OnDownloadSelectedXnatFile()));
   connect(m_Controls.btnCreateXnatFolder, SIGNAL(clicked()), this, SLOT(OnCreateResourceFolder()));
+  connect(m_Controls.searchField, SIGNAL(textChanged(const QString&)), this, SLOT(search(const QString&)));
 }
 
 void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
@@ -230,6 +232,77 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
   this->InternalAddResourceFolder(parent);
 
   OnContextMenuRefreshItem();
+}
+
+
+void QmitkXnatTreeBrowserView::search(const QString &toSearch)
+{
+  m_Controls.treeView->expandToDepth(1);
+  m_Controls.treeView->clearSelection();
+  if(toSearch == "")
+    return;
+
+  foreach (const QModelIndex &hidden, m_hiddenItems)
+  {
+    m_Controls.treeView->setRowHidden(hidden.row(),hidden.parent(),false);
+  }
+  m_hiddenItems.clear();
+
+  QModelIndexList items = m_Controls.treeView->model()->match(
+        m_Controls.treeView->model()->index(0,0),
+        Qt::DisplayRole,
+        QVariant::fromValue(toSearch),
+        -1,
+        Qt::MatchContains|Qt::MatchRecursive);
+
+  if(!items.isEmpty())
+  {
+    foreach (const QModelIndex &match, items)
+    {
+      int depth = 0;
+      QModelIndex tparent = match;
+      while ( tparent.parent().isValid() )
+      {
+        tparent = tparent.parent();
+        depth++;
+      }
+
+      switch (depth)    //when getting the currentIndex of the comboBox we need to add 1 because the 0th depth won't be used
+      {
+      case 1: //Project Level
+        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::ProjectLevel)
+        {
+          m_hiddenItems.append(match);
+          m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
+        }
+        break;
+      case 2: //Patient level
+        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::SubjectLevel)
+        {
+          m_hiddenItems.append(match);
+          m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
+        }
+        break;
+      case 3: //Experiment level
+        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::ExperimentLevel)
+        {
+          m_hiddenItems.append(match);
+          m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
+        }
+        break;
+      case 4: //File level
+        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::FileLevel)
+        {
+          m_hiddenItems.append(match);
+          m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
+        }
+        break;
+      default:
+        break;
+      }
+    }
+
+  }
 }
 
 void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
@@ -267,6 +340,7 @@ void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
 
 void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 {
+  MITK_WARN << index.row() << "  " << index.column() << "  ";
   // Enable download button
   if (!index.isValid()) return;
 
@@ -931,6 +1005,9 @@ void QmitkXnatTreeBrowserView::CleanUp()
   m_Controls.btnCreateXnatFolder->setEnabled(false);
   m_Controls.btnXnatDownload->setEnabled(false);
   m_Controls.btnXnatUpload->setEnabled(false);
+  m_Controls.searchField->setEnabled(false);
+  m_Controls.searchField->setText("");
+  m_Controls.searchModeBox->setEnabled(false);
 }
 
 void QmitkXnatTreeBrowserView::itemSelected(const QModelIndex& index)

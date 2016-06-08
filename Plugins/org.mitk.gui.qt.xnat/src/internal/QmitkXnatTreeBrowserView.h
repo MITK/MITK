@@ -62,6 +62,14 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
+  enum SearchMethod {
+    ServerLevel = 0,
+    ProjectLevel = 1,
+    SubjectLevel = 2,
+    ExperimentLevel = 3,
+    FileLevel = 4
+  };
+
 protected slots:
 
   void AnErrorOccurred(const QModelIndex &idx);
@@ -74,6 +82,9 @@ protected slots:
 
   /// \brief Cleans the tree model
   void CleanTreeModel(ctkXnatSession* session);
+
+  /// \brief Searches the tree model
+  void search(const QString &toSearch);
 
   void OnContextMenuRequested(const QPoint & pos);
   void OnContextMenuDownloadAndOpenFile();
@@ -133,6 +144,8 @@ private:
   QMenu* m_ContextMenu;
 
   bool m_SilentMode;
+  QModelIndexList m_hiddenItems;
+
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

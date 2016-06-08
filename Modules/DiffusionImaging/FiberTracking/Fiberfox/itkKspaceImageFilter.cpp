@@ -218,7 +218,7 @@ namespace itk {
                                  * (1.0-exp(-(m_Parameters->m_SignalGen.m_tRep + tRf)/m_T1.at(i))) );
         }
       }
-      // get current k-space index (depends on the schosen k-space readout scheme)
+      // get current k-space index (depends on the chosen k-space readout scheme)
       itk::Index< 2 > kIdx = m_ReadoutScheme->GetActualKspaceIndex(oit.GetIndex());
 
       // partial fourier
@@ -297,6 +297,7 @@ namespace itk {
             else
             {
               omega += m_Parameters->m_SignalGen.m_FrequencyMap->GetPixel(index);
+
             }
           }
 
@@ -314,6 +315,7 @@ namespace itk {
         if (m_SpikesPerSlice>0 && sqrt(s.imag()*s.imag()+s.real()*s.real()) > sqrt(m_Spike.imag()*m_Spike.imag()+m_Spike.real()*m_Spike.real()) )
         {
           m_Spike = s;
+
         }
 
         if (m_Parameters->m_SignalGen.m_NoiseVariance>0 && m_Parameters->m_Misc.m_CheckAddNoiseBox)

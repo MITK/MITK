@@ -202,7 +202,7 @@ namespace itk {
       {
         m_NoiseVariance = 0.0001;
       }
-      if (m_NoiseVariance>99 && m_AddNoiseFlag)
+      else if (m_NoiseVariance>99 && m_AddNoiseFlag)
       {
         m_NoiseVariance = 0;
       }
@@ -344,15 +344,15 @@ namespace itk {
 
       if (numDirs>1)
       {
-        for (int i=0; i<m_GradientList.size(); i++)
-          pix[i] /= numDirs;
+        for (int i=0; i<m_GradientList.size(); i++) { pix[i] /= numDirs; }
+
       }
       else if (numDirs==0)
       {
-        if (m_SimulateBaseline)
-          pix = SimulateMeasurement(isoTensor, 1.0);
-        else
-          pix.Fill(0.0);
+        if (m_SimulateBaseline) { pix = SimulateMeasurement(isoTensor, 1.0); }
+
+        else { pix.Fill(0.0); }
+
       }
 
       m_MeanBaseline += pix[0];

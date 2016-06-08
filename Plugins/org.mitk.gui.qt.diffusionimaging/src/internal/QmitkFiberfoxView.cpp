@@ -2611,7 +2611,9 @@ void QmitkFiberfoxView::UpdateGui()
     m_Controls->m_GeometryFrame->setEnabled(false);
   }
 
-  if (m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull() && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData())))
+  if ( m_Controls->m_TemplateComboBox->GetSelectedNode().IsNotNull()
+       && mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(
+         dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData()) ) )
   {
     m_Controls->m_DiffusionPropsMessage->setVisible(true);
     m_Controls->m_BvalueBox->setEnabled(false);

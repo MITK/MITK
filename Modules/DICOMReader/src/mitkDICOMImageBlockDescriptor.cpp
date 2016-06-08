@@ -781,7 +781,7 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
         const DICOMDatasetFinding finding = m_TagCache->GetTagValue( *frameIter, iter->second );
         if (finding.isValid)
         {
-          DICOMCachedValueInfo info{ timePoint, zSlice, finding.value };
+          DICOMCachedValueInfo info{ static_cast<unsigned int>(timePoint), zSlice, finding.value };
           additionalTagResultList[iter->first].SetTableValue(slice, info);
         }
       }

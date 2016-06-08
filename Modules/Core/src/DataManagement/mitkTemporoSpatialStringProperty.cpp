@@ -226,15 +226,17 @@ void mitk::TemporoSpatialStringProperty::SetValue(const ValueType& value)
 };
 
 // Create necessary escape sequences from illegal characters
-template<class Ch>
-std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
+// the following function was copied from the json writer of boost::property_tree
+std::string CreateJSONEscapes(const std::string &s)
 {
-  std::basic_string<Ch> result;
-  typename std::basic_string<Ch>::const_iterator b = s.begin();
-  typename std::basic_string<Ch>::const_iterator e = s.end();
+  std::string result;
+  std::string::const_iterator b = s.begin();
+  std::string::const_iterator e = s.end();
   while (b != e)
   {
-    typedef typename boost::make_unsigned<Ch>::type UCh;
+    typedef boost::make_unsigned<std::string::value_type>::type UCh;
+    typedef std::string::value_type Ch;
+
     UCh c(*b);
     // This assumes an ASCII superset. But so does everything in PTree.
     // We escape everything outside ASCII, because this code can't

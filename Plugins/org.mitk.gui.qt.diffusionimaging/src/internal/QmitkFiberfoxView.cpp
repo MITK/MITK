@@ -689,7 +689,6 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     }
     else
     {
-      //mdh/todo: bug-19481
       MITK_WARN << "QmitkFiberfoxView.cpp: Unrecognised parameters.m_Misc.m_MotionVolumesBox: " << parameters.m_Misc.m_MotionVolumesBox;
       parameters.m_Misc.m_MotionVolumesBox = "random"; // set default.
       for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
@@ -1164,6 +1163,7 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
         else if (dosampling)
         {
           diffImg = dynamic_cast<mitk::Image*>(m_Controls->m_TemplateComboBox->GetSelectedNode()->GetData());
+<<<<<<< HEAD
 
           typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
           TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
@@ -1192,6 +1192,36 @@ void QmitkFiberfoxView::SaveParameters(QString filename)
         }
       }
 
+=======
+
+          typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
+          TensorReconstructionImageFilterType::Pointer filter = TensorReconstructionImageFilterType::New();
+          ItkDwiType::Pointer itkVectorImagePointer = ItkDwiType::New();
+          mitk::CastToItkImage(diffImg, itkVectorImagePointer);
+          filter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+          filter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+
+          filter->Update();
+          tensorImage = filter->GetOutput();
+
+          QballFilterType::Pointer qballfilter = QballFilterType::New();
+          qballfilter->SetGradientImage( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), itkVectorImagePointer );
+          qballfilter->SetBValue( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+          qballfilter->SetLambda(0.006);
+          qballfilter->SetNormalizationMethod(QballFilterType::QBAR_RAW_SIGNAL);
+          qballfilter->Update();
+          itkFeatureImage = qballfilter->GetCoefficientImage();
+
+          itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
+          adcFilter->SetInput( itkVectorImagePointer );
+          adcFilter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( diffImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+          adcFilter->SetB_value( static_cast<mitk::FloatProperty*>(diffImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+          adcFilter->Update();
+          adcImage = adcFilter->GetOutput();
+        }
+      }
+
+>>>>>>> bug-19484-FiberFox-FixArtefactsFlag
       if (dosampling && diffImg.IsNotNull())
       {
         ok = model->SampleKernels(diffImg, ffParamaters.m_SignalGen.m_MaskImage, tensorImage, itkFeatureImage, adcImage);
@@ -1287,9 +1317,19 @@ void QmitkFiberfoxView::LoadParameters()
   {
     m_Controls->m_AddNoise->setChecked(parameters.m_Misc.m_CheckAddNoiseBox);
     if (dynamic_cast<mitk::RicianNoiseModel<double>*>(parameters.m_NoiseModel.get()))
+<<<<<<< HEAD
       m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
     else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel.get()))
       m_Controls->m_NoiseDistributionBox->setCurrentIndex(1);
+=======
+    {
+      m_Controls->m_NoiseDistributionBox->setCurrentIndex(0);
+    }
+    else if (dynamic_cast<mitk::ChiSquareNoiseModel<double>*>(parameters.m_NoiseModel.get()))
+    {
+      m_Controls->m_NoiseDistributionBox->setCurrentIndex(1);
+    }
+>>>>>>> bug-19484-FiberFox-FixArtefactsFlag
     m_Controls->m_NoiseLevel->setValue(parameters.m_NoiseModel->GetNoiseVariance());
   }
   else
@@ -2604,6 +2644,22 @@ void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, cons
   {
     mitk::DataNode::Pointer node = nodes.at(i);
 
+<<<<<<< HEAD
+=======
+    //        bool isDiffusionImage(false);
+    //        if ( node.IsNotNull() )
+    //        {
+    //          isDiffusionImage = mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData()));
+    //        }
+
+    //        if ( node.IsNotNull() && isDiffusionImage )
+    //        {
+    //            m_SelectedDWI = node;
+    //            m_SelectedImage = node;
+    //            m_SelectedImages.push_back(node);
+    //        }
+
+>>>>>>> bug-19484-FiberFox-FixArtefactsFlag
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       m_SelectedImages.push_back(node);

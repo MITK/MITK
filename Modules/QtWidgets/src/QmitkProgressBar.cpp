@@ -55,8 +55,6 @@ void QmitkProgressBar::SetPercentageVisible(bool visible)
  */
 void QmitkProgressBar::AddStepsToDo(unsigned int steps)
 {
-  Reset();
-
   emit SignalAddStepsToDo(steps);
 }
 

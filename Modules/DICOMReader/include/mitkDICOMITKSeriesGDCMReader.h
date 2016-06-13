@@ -342,6 +342,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     double m_DecimalPlacesForOrientation;
 
     DICOMTagCache::Pointer m_TagCache;
+    bool m_ExternalCache;
 };
 
 }

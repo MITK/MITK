@@ -299,7 +299,9 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       selector->SetInputFiles(seriesToLoad);
 
       mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
-
+      //reset tag cache to ensure that additional tags of interest
+      //will be regarded by the reader if set later on.
+      reader->SetTagCache(nullptr);
       reader->SetAdditionalTagsOfInterest(mitk::GetCurrentDICOMTagsOfInterest());
       reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
       reader->SetInputFiles(seriesToLoad);

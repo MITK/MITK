@@ -24,9 +24,9 @@ set(MOC_H_FILES
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
-  resources/iconGenerationView.xpm
-  resources/iconToFUtilView.xpm
-  resources/iconToFScrenshotMaker.xpm
+  resources/icon_tof_settings.svg
+  resources/icon_tof_util.svg
+  resources/icon_tof_screenshot.svg
 )
 
 set(QRC_FILES

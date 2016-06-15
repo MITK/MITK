@@ -5,34 +5,34 @@
     <view id="org.mitk.views.igttutorial"
           name="IGT Example: Tutorial Step 2"
           class="QmitkIGTTutorialView"
-          icon="resources/IGTTutorial.png"/>
+          icon="resources/icon_igt_simple_example.svg"/>
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.igttrackinglab"
           name="IGT Example: Tracking Lab"
           class="QmitkIGTTrackingLabView"
-          icon="resources/IgtTrackingLab.png" />
+          icon="resources/icon_igt_tracking_lab.svg" />
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.OpenIGTLinkExample"
           name="OpenIGTLink Example: Client"
           class="OpenIGTLinkExample"
-          icon="resources/example.png" />
+          icon="resources/icon_openigtlink_client_example.svg" />
   </extension>
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.OpenIGTLinkProviderExample"
           name="OpenIGTLink Example: Provider"
           class="OpenIGTLinkProviderExample"
-          icon="resources/provider.png" />
+          icon="resources/icon_openigtlink_provider_example.svg" />
   </extension>
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.openigtlinkplugin"
           name="OpenIGTLink Example: Simultaneous Streaming"
           class="OpenIGTLinkPlugin"
-          icon="resources/icon.xpm" />
+          icon="resources/icon_openigtlink_extended_example.svg" />
   </extension>
 
 </plugin>

@@ -25,7 +25,8 @@ if(NOT MatchPoint_DIR)
     set(download_step SOURCE_DIR ${MatchPoint_SOURCE_DIR})
   else()
     set(download_step
-        SVN_REPOSITORY https://svn.inet.dkfz-heidelberg.de/sbr/Sources/SBR-Projects/MatchPoint/trunk
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev1372.tar.gz
+        URL_MD5 bfaabc06873a532c06bf9dfea173d3aa
         #SOURCE_DIR ${ep_prefix}/${proj}
        )
   endif()
@@ -55,6 +56,7 @@ if(NOT MatchPoint_DIR)
   #  mitkFunctionInstallExternalCMakeProject(${proj})
   ExternalProject_Get_Property(${proj} binary_dir)
   set(MatchPoint_DIR ${binary_dir})
+  mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()
 

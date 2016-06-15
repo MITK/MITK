@@ -119,11 +119,6 @@ void QmitkXnatTreeModel::fetchMore(const QModelIndex& index)
   catch(ctkRuntimeException e)
   {
     QmitkHttpStatusCodeHandler::HandleErrorMessage(e.what());
-
-    //This is bullshit:
-    ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
-    selectedXnatObject->add(selectedXnatObject);
-    std::cout << selectedXnatObject->children().size() << std::endl;
     emit Error(index);
   }
 }

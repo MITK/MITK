@@ -63,16 +63,11 @@ public:
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   enum SearchMethod {
-    ServerLevel = 0,
-    ProjectLevel = 1,
-    SubjectLevel = 2,
-    ExperimentLevel = 3,
-    FileLevel = 4
+    ProjectLevel = 0,
+    SubjectLevel = 1
   };
 
 protected slots:
-
-  void AnErrorOccurred(const QModelIndex &idx);
 
   /// \brief Opens or reuses the xnat editor with the activated node as root item.
   void OnActivatedNode(const QModelIndex& index);
@@ -145,6 +140,8 @@ private:
 
   bool m_SilentMode;
   QModelIndexList m_hiddenItems;
+
+  bool m_AlreadyInSearch = false;
 
 };
 

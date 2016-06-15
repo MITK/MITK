@@ -46,6 +46,7 @@ public:
   ctkXnatObject* GetXnatObjectFromUrl(const QString&);
 
   void fetchMore(const QModelIndex& index) override;
+
   QModelIndexList match(const QModelIndex &start, int role,
                                             const QVariant &value, int hits,
                                             Qt::MatchFlags flags) const override;

@@ -315,6 +315,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>inXnatHostAddress</tabstop>
+  <tabstop>inXnatPort</tabstop>
+  <tabstop>inXnatUsername</tabstop>
+  <tabstop>inXnatPassword</tabstop>
+  <tabstop>inXnatDownloadPath</tabstop>
+  <tabstop>btnDownloadPath</tabstop>
+  <tabstop>cbUseNetworkProxy</tabstop>
+  <tabstop>inProxyAddress</tabstop>
+  <tabstop>inProxyPort</tabstop>
+  <tabstop>inProxyUsername</tabstop>
+  <tabstop>inProxyPassword</tabstop>
+  <tabstop>xnatTestConnectionButton</tabstop>
+  <tabstop>cbUseSilentMode</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

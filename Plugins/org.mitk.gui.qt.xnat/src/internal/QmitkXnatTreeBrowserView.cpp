@@ -159,13 +159,6 @@ void QmitkXnatTreeBrowserView::ToggleConnection()
   }
 }
 
-void QmitkXnatTreeBrowserView::AnErrorOccurred(const QModelIndex &idx)
-{
-  MITK_WARN << "An Error Occurred!";
-
-  m_Controls.treeView->collapseAll();
-}
-
 void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
 {
   // Create GUI widgets from the Qt Designer's .ui file
@@ -193,8 +186,6 @@ void QmitkXnatTreeBrowserView::CreateQtPartControl(QWidget *parent)
           this, SLOT(OnContextMenuRequested(const QPoint&)));
   connect(m_Tracker, SIGNAL(AboutToBeClosed(ctkXnatSession*)), this, SLOT(CleanTreeModel(ctkXnatSession*)));
   connect(m_Tracker, SIGNAL(Opened(ctkXnatSession*)), this, SLOT(UpdateSession(ctkXnatSession*)));
-  connect(m_Controls.treeView, SIGNAL(clicked), SLOT(MouseClicked(QMouseEvent *)));
-  connect(m_TreeModel, SIGNAL(Error(const QModelIndex&)), SLOT(AnErrorOccurred(const QModelIndex&)));
 
   m_Tracker->Open();
 
@@ -237,16 +228,29 @@ void QmitkXnatTreeBrowserView::OnCreateResourceFolder()
 
 void QmitkXnatTreeBrowserView::search(const QString &toSearch)
 {
-  m_Controls.treeView->expandToDepth(1);
-  m_Controls.treeView->clearSelection();
-  if(toSearch == "")
+  if(m_AlreadyInSearch)
     return;
+
+  m_AlreadyInSearch = true;
+
+  m_Controls.treeView->collapseAll();
+  m_Controls.treeView->expandToDepth(m_Controls.searchModeBox->currentIndex());
+
+  m_Controls.treeView->clearSelection();
 
   foreach (const QModelIndex &hidden, m_hiddenItems)
   {
     m_Controls.treeView->setRowHidden(hidden.row(),hidden.parent(),false);
   }
   m_hiddenItems.clear();
+
+  if(toSearch.isEmpty())
+  {
+    m_Controls.treeView->collapseAll();
+    m_Controls.treeView->expandToDepth(0);
+    m_AlreadyInSearch = false;
+    return;
+  }
 
   QModelIndexList items = m_Controls.treeView->model()->match(
         m_Controls.treeView->model()->index(0,0),
@@ -267,31 +271,17 @@ void QmitkXnatTreeBrowserView::search(const QString &toSearch)
         depth++;
       }
 
-      switch (depth)    //when getting the currentIndex of the comboBox we need to add 1 because the 0th depth won't be used
+      switch (depth)
       {
       case 1: //Project Level
-        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::ProjectLevel)
+        if(m_Controls.searchModeBox->currentIndex() == ProjectLevel)
         {
           m_hiddenItems.append(match);
           m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
         }
         break;
       case 2: //Patient level
-        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::SubjectLevel)
-        {
-          m_hiddenItems.append(match);
-          m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
-        }
-        break;
-      case 3: //Experiment level
-        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::ExperimentLevel)
-        {
-          m_hiddenItems.append(match);
-          m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
-        }
-        break;
-      case 4: //File level
-        if(m_Controls.searchModeBox->currentIndex()+1 == SearchMethod::FileLevel)
+        if(m_Controls.searchModeBox->currentIndex() == SubjectLevel)
         {
           m_hiddenItems.append(match);
           m_Controls.treeView->setRowHidden(match.row(),match.parent(),true);
@@ -303,6 +293,7 @@ void QmitkXnatTreeBrowserView::search(const QString &toSearch)
     }
 
   }
+  m_AlreadyInSearch = false;
 }
 
 void QmitkXnatTreeBrowserView::OnDownloadSelectedXnatFile()
@@ -340,7 +331,6 @@ void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
 
 void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 {
-  MITK_WARN << index.row() << "  " << index.column() << "  ";
   // Enable download button
   if (!index.isValid()) return;
 
@@ -539,7 +529,16 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
         {
           this->SetStatusInformation("Downloading file " + file->name());
 
-          file->download(filePath);
+          try
+          {
+            file->download(filePath);
+          }
+          catch(...)
+          {
+            QmitkHttpStatusCodeHandler::HandleErrorMessage("");
+            return;
+          }
+
           serverURL = file->parent()->resourceUri();
 
           // Checking if the file exists now

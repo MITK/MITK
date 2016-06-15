@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkHttpStatusCodeHandler.h"
 #include "QMessageBox"
 #include <sstream>
-#include <mitkLog.h>
+#include <mitkCommon.h>
 
 QmitkHttpStatusCodeHandler::QmitkHttpStatusCodeHandler()
 {
@@ -142,6 +142,7 @@ static void CreateMessageBox(int statusCode, std::string errorMessage)
 
 bool QmitkHttpStatusCodeHandler::HandleErrorMessage(const char *_errorMsg)
 {
+  static int lastCode = 0;
   std::string errorMsg(_errorMsg, strnlen(_errorMsg, strlen(_errorMsg)));
   bool success = true;
   /*
@@ -167,12 +168,18 @@ bool QmitkHttpStatusCodeHandler::HandleErrorMessage(const char *_errorMsg)
 
   std::string serverResponse = errorMsg.substr(indexOfServerResponse);
 
-  ::CreateMessageBox(statusCode, serverResponse);
+  if(lastCode!=statusCode)
+    ::CreateMessageBox(statusCode, serverResponse);
 
-  if(!success)
+  if(!success && lastCode!=statusCode)
   {
     QMessageBox::warning(nullptr, "General Error", errorMsg.c_str());
   }
+
+  if(lastCode != statusCode)
+    lastCode = statusCode;
+  else
+    lastCode = 0;
 
   return success;
 }

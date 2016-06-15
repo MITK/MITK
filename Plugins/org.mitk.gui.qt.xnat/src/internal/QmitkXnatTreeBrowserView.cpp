@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatResource.h>
 #include <ctkXnatResourceFolder.h>
 #include <ctkXnatScan.h>
-#include <ctkXnatScanFolder.h>http://blog.qt.io/blog/2015/05/11/integrating-custom-opengl-rendering-with-qt-quick-via-qquickframebufferobject/#comment-1195852
+#include <ctkXnatScanFolder.h>
 #include <ctkXnatSubject.h>
 
 

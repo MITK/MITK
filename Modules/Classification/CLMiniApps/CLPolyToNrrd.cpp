@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
   parser.setDescription("Creates a Nrrd segmentation based on a 2d-vtk polydata.");
   parser.setContributor("MBI");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size()==0)
   {

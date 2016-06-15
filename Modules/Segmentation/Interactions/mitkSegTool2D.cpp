@@ -62,6 +62,7 @@ m_LastEventSlice(0),
 m_Contourmarkername ("Position"),
 m_ShowMarkerNodes (false)
 {
+  Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
 }
 
 mitk::SegTool2D::~SegTool2D()

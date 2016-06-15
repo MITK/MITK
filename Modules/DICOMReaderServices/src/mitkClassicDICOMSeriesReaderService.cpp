@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
   ClassicDICOMSeriesReaderService::ClassicDICOMSeriesReaderService()
-  : BaseDICOMReaderService("MITK DICOM Reader(2013 classic style)")
+  : BaseDICOMReaderService("MITK DICOM Reader v2 (classic config)")
 {
   this->RegisterService();
 }

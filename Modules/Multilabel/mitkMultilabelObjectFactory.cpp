@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
 #include "mitkCoreObjectFactory.h"
-
+#include <mitkCoreServices.h>
+#include <mitkIPropertyFilters.h>
+#include <mitkPropertyFilter.h>
 #include <mitkLabelSetImageVtkMapper2D.h>
 
 
@@ -61,20 +63,30 @@ mitk::Mapper::Pointer mitk::MultilabelObjectFactory::CreateMapper(mitk::DataNode
 
 void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-
-  if(node==NULL)
+  if(node == nullptr)
     return;
 
-  mitk::DataNode::Pointer nodePointer = node;
+  if(node->GetData() == nullptr)
+    return;
 
-  if(node->GetData() ==NULL)
-       return;
+  if(dynamic_cast<LabelSetImage*>(node->GetData()) != nullptr)
+  {
+    mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
 
- if( dynamic_cast<LabelSetImage*>(node->GetData())!=NULL )
- {
-   mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(node);
-//     mitk::LabelSetImageVtkMapper3D::SetDefaultProperties(node);
- }
+    auto propertyFilters = CoreServices::GetPropertyFilters();
+
+    if (propertyFilters != nullptr)
+    {
+      PropertyFilter labelSetImageFilter;
+      labelSetImageFilter.AddEntry("binaryimage.hoveringannotationcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("binaryimage.hoveringcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("binaryimage.selectedannotationcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("binaryimage.selectedcolor", PropertyFilter::Blacklist);
+      labelSetImageFilter.AddEntry("outline binary shadow color", PropertyFilter::Blacklist);
+
+      propertyFilters->AddFilter(labelSetImageFilter, "LabelSetImage");
+    }
+  }
 }
 
 const char* mitk::MultilabelObjectFactory::GetFileExtensions()

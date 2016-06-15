@@ -1,7 +1,7 @@
 project(org_blueberry_ui_qt_help)
 
 set(QT_USE_QTHELP 1)
-set(QT_USE_QTWEBKIT 1)
+set(QT_USE_QTWEBENGINE 1)
 set(QT_USE_QTNETWORK 1)
 
 mitk_create_plugin(
@@ -10,4 +10,4 @@ mitk_create_plugin(
 )
 
 target_link_libraries(${PLUGIN_TARGET} PRIVATE
-  Qt5::Help Qt5::OpenGL Qt5::PrintSupport Qt5::WebKitWidgets Qt5::Xml)
+  Qt5::Help Qt5::OpenGL Qt5::PrintSupport Qt5::WebEngineWidgets Qt5::Xml)

@@ -36,7 +36,7 @@ struct MimeType::Impl : us::SharedData
     , m_Id(id)
   {}
 
-  std::auto_ptr<CustomMimeType> m_CustomMimeType;
+  std::unique_ptr<CustomMimeType> m_CustomMimeType;
 
   int m_Rank;
   long m_Id;

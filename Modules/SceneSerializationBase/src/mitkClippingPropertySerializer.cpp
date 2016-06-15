@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkClippingPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
+#include <mitkLocaleSwitch.h>
 #include "mitkClippingProperty.h"
 #include "mitkNumericTypes.h"
 
@@ -37,6 +37,8 @@ class ClippingPropertySerializer : public BasePropertySerializer
     {
       if (const ClippingProperty* prop = dynamic_cast<const ClippingProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("clipping");
         if (prop->GetClippingEnabled())
           element->SetAttribute("enabled", "true");
@@ -64,6 +66,9 @@ class ClippingPropertySerializer : public BasePropertySerializer
     {
       if (!element)
         return nullptr;
+
+      LocaleSwitch localeSwitch("C");
+
       bool enabled = std::string(element->Attribute("enabled")) == "true";
 
       TiXmlElement* originElement = element->FirstChildElement("origin");

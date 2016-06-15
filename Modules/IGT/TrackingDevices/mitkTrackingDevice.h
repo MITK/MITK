@@ -163,6 +163,8 @@ namespace mitk {
      */
     virtual bool IsDeviceInstalled();
 
+    private:
+      TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
     protected:
 
       /**
@@ -175,7 +177,7 @@ namespace mitk {
       virtual ~TrackingDevice();
 
     TrackingDeviceData m_Data; ///< current device Data
-      TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
+
       bool m_StopTracking;       ///< signal stop to tracking thread
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
       itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()

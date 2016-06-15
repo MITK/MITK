@@ -52,7 +52,7 @@ void mitk::TubeGraphDataInteractor::ConnectActionsAndFunctions()
 
 void mitk::TubeGraphDataInteractor::DataNodeChanged()
 {
-  if (GetDataNode().IsNotNull())
+  if (GetDataNode() != nullptr)
   {
     if(GetDataNode()->GetData() != NULL)
     {

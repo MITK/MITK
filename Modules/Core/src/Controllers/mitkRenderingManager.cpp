@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
+
   RenderingManager::Pointer RenderingManager::s_Instance = 0;
   RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 
@@ -823,6 +825,7 @@ namespace mitk
     if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
     {
       m_FocusedRenderWindow = focusWindow;
+      this->InvokeEvent(FocusChangedEvent());
       return;
     }
 

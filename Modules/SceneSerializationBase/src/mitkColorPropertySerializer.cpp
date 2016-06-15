@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkColorPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
+#include <mitkLocaleSwitch.h>
 #include "mitkColorProperty.h"
 #include "mitkStringsToNumbers.h"
 
@@ -37,6 +37,8 @@ class ColorPropertySerializer : public BasePropertySerializer
     {
       if (const ColorProperty* prop = dynamic_cast<const ColorProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("color");
         Color color = prop->GetValue();
         element->SetAttribute("r", boost::lexical_cast<std::string>(color[0]));
@@ -50,6 +52,8 @@ class ColorPropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       std::string c_string[3];
       if ( element->QueryStringAttribute( "r", &c_string[0] ) != TIXML_SUCCESS ) return nullptr;

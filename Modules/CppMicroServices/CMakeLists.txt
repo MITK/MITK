@@ -227,7 +227,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 if(MSVC)
-  set(US_CXX_FLAGS "/MP /WX /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
+  set(US_CXX_FLAGS "/MP /WX /wd4180 /wd4996 /wd4251 /wd4503 ${US_CXX_FLAGS}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${US_CXX_FLAGS}")
@@ -414,9 +414,6 @@ if(NOT US_NO_INSTALL)
   set(_install_cmake_scripts
     ${US_MODULE_INIT_TEMPLATE}
     ${US_CMAKE_RESOURCE_DEPENDENCIES_CPP}
-    ${US_CMAKE_DIR}/CMakeParseArguments.cmake
-    ${US_CMAKE_DIR}/FindPackageHandleStandardArgs.cmake
-    ${US_CMAKE_DIR}/FindPackageMessage.cmake
     ${US_CMAKE_DIR}/usFunctionGenerateModuleInit.cmake
     ${US_CMAKE_DIR}/usFunctionAddResources.cmake
     ${US_CMAKE_DIR}/usFunctionEmbedResources.cmake

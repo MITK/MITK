@@ -54,6 +54,7 @@
     <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="EditFigure" >
       <action name="deselect_point" ID="76" /> <!-- AcDESELECTPOINT -->
     </transition>
+
   </state>
 
   <state name="PlaceFigure">
@@ -195,7 +196,7 @@
       <condition name="reset_on_point_select_needed" inverted="true" />
     </transition>
 
-    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="HoveringOverPoint" >
+    <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="ControlPointSelected" >
       <!-- select the control-point under the cursor -->
       <condition name="figure_is_on_current_slice" />
       <condition name="figure_is_selected" inverted="true" />

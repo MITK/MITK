@@ -23,24 +23,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkExtractSliceFilter.h"
-#include <QWebFrame>
-
 
 QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
-  QWebView(parent)
+  QWebEngineView(parent)
 {
   // set histogram type to barchart in first instance
   m_UseLineGraph = false;
-  m_Page = new QmitkJSWebPage(this);
+  m_Page = new QWebEnginePage(this);
   setPage(m_Page);
   // set html from source
-  connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
+  // connect(page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(AddJSObject()));
   QUrl myUrl = QUrl("qrc:///QtWidgetsExt/Histogram.html");
   setUrl(myUrl);
 
   // set Scrollbars to be always disabled
-  page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
-  page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
+  // page()->mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+  // page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
 
   m_ParametricPath = ParametricPathType::New();
 
@@ -53,16 +51,16 @@ QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
 // adds an Object of Type QmitkHistogramJSWidget to the JavaScript, using QtWebkitBridge
 void QmitkHistogramJSWidget::AddJSObject()
 {
-  page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
+  // page()->mainFrame()->addToJavaScriptWindowObject(QString("histogramData"), this);
 }
 
 // reloads WebView, everytime its size has been changed, so the size of the Histogram fits to the size of the widget
 void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
-  QWebView::resizeEvent(resizeEvent);
+  QWebEngineView::resizeEvent(resizeEvent);
 
   // workaround for Qt Bug: https://bugs.webkit.org/show_bug.cgi?id=75984
-  page()->mainFrame()->evaluateJavaScript("disconnectSignals()");
+  // page()->mainFrame()->evaluateJavaScript("disconnectSignals()");
   this->reload();
 }
 

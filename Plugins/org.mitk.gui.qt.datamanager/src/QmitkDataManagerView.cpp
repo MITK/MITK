@@ -191,6 +191,9 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QmitkNodeDescriptor* imageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
+  auto multiComponentImageDataNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("MultiComponentImage");
+
   QmitkNodeDescriptor* diffusionImageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("DiffusionImage");
 
@@ -335,8 +338,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   componentAction->setDefaultWidget(_ComponentWidget);
   QObject::connect( componentAction , SIGNAL( changed() )
     , this, SLOT( ComponentActionChanged() ) );
-  imageDataNodeDescriptor->AddAction(componentAction, false);
-  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(imageDataNodeDescriptor,componentAction));
+  multiComponentImageDataNodeDescriptor->AddAction(componentAction, false);
+  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(multiComponentImageDataNodeDescriptor,componentAction));
   if (diffusionImageDataNodeDescriptor!=NULL)
   {
       diffusionImageDataNodeDescriptor->AddAction(componentAction, false);

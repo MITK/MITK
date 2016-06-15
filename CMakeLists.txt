@@ -23,7 +23,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2015.05.99)
+  project(MITK VERSION 2016.03.99)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -203,8 +203,11 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 env_option(MITK_USE_QT "Use Qt library" ON)
 
 if(MITK_USE_QT)
-  set(MITK_QT5_MINIMUM_VERSION 5.0.0)
-  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebKitWidgets Xml XmlPatterns UiTools Help)
+  set(MITK_QT5_MINIMUM_VERSION 5.6.0)
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebEngineWidgets Xml XmlPatterns UiTools Help LinguistTools)
+  if(APPLE)
+    set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} DBus)
+  endif()
   find_package(Qt5 ${MITK_QT5_MINIMUM_VERSION} COMPONENTS ${MITK_QT5_COMPONENTS} REQUIRED)
   if(Qt5_DIR)
     get_filename_component(_Qt5_DIR "${Qt5_DIR}/../../../" ABSOLUTE)
@@ -521,8 +524,10 @@ include(GenerateExportHeader)
 include(mitkFunctionAddCustomModuleTest)
 include(mitkFunctionCheckModuleDependencies)
 include(mitkFunctionCompileSnippets)
+include(mitkFunctionConfigureVisualStudioUserProjectFile)
 include(mitkFunctionConvertXPSchema)
 include(mitkFunctionCreateBlueBerryApplication)
+include(mitkFunctionCreateCommandLineApp)
 include(mitkFunctionCreateModule)
 include(mitkFunctionCreatePlugin)
 include(mitkFunctionCreateProvisioningFile)
@@ -732,6 +737,7 @@ if(WIN32)
   mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637
   mitkFunctionCheckCompilerFlags("/wd4316" MITK_CXX_FLAGS) # warning C4316: object alignment on heap
+  mitkFunctionCheckCompilerFlags("/wd4180" MITK_CXX_FLAGS) # warning C4180: qualifier applied to function type has no meaning
 endif()
 
 if(NOT MSVC_VERSION)
@@ -792,7 +798,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
-set(Boost_ADDITIONAL_VERSIONS "1.59" "1.59.0")
+set(Boost_ADDITIONAL_VERSIONS "1.60" "1.60.0")
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
@@ -888,19 +894,19 @@ if(MITK_USE_QT)
   endif()
 
   find_program(QT_HELPGENERATOR_EXECUTABLE
-    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    NAMES qhelpgenerator qhelpgenerator-qt5 qhelpgenerator5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
 
   find_program(QT_COLLECTIONGENERATOR_EXECUTABLE
-    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+    NAMES qcollectiongenerator qcollectiongenerator-qt5 qcollectiongenerator5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
 
   find_program(QT_ASSISTANT_EXECUTABLE
-    NAMES assistant-qt4 assistant4 assistant
+    NAMES assistant assistant-qt5 assistant5
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )

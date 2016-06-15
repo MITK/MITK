@@ -37,7 +37,7 @@ itkEventMacro(TranslateEvent, AffineInteractionEvent)
   *
   * \ingroup Interaction
   */
-// Inherit from DataInteratcor, this provides functionality of a state machine and configurable inputs.
+// Inherit from DataInteractor, this provides functionality of a state machine and configurable inputs.
 class MITKDATATYPESEXT_EXPORT AffineBaseDataInteractor3D: public DataInteractor
 {
 
@@ -46,7 +46,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void SetDataNode(NodeType node);
+  virtual void SetDataNode(DataNode* node);
   void TranslateGeometry(mitk::Vector3D translate, mitk::BaseGeometry* geometry);
   void RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry* geometry);
   void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry* geometry);

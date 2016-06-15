@@ -115,9 +115,8 @@ public:
 
   /**
    * \brief Set the Interactor.
-   * \deprecatedSince{2013_03} Use DataInteractor and SetDataInteractor instead.
    */
-  virtual void SetDataInteractor(const DataInteractor::Pointer& interactor);
+  virtual void SetDataInteractor(const DataInteractor::Pointer interactor);
   virtual DataInteractor::Pointer GetDataInteractor() const;
 
   mitk::DataNode& operator=(const DataNode& right);

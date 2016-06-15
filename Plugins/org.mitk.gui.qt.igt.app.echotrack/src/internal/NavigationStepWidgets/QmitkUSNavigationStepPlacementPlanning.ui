@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSNavigationStepPlacementPlanning</class>
+ <widget class="QWidget" name="QmitkUSNavigationStepPlacementPlanning">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>396</width>
+    <height>448</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="bodyMarkerTrackingStatusLabel">
+     <property name="styleSheet">
+      <string notr="true">
+              background-color: #ff7878; margin-right: 1em; margin-left: 1em;
+              border: 1px solid grey
+            </string>
+     </property>
+     <property name="text">
+      <string>Body marker is not inside the tracking volume.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="currentTargetLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Planning Target %1 of %2</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Placement planning can be done either by using the tracked needle or by clicking with the mouse. Correcting the position is always possible by selecting the target with the &quot;Previous&quot; and &quot;Next&quot; buttons and placing it just again the.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Placement by Needle Path</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>A target can be placed (or replaced) by pointing the needle to the desired position on the target surface and hitting the button below.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="placeTargetButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Place Target on Current Needle Path</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/USNavigation.qrc">
+          <normaloff>:/USNavigation/accept.png</normaloff>:/USNavigation/accept.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Placment by Mouse Click</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>A target can be placed (or replaced) by freezing the imaging and then left clicking into the render window at the desired positon.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QmitkUSNavigationFreezeButton" name="freezeImageButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="allTargetsPlannedLabel">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>All Targets are planned. You can proceed with the next step if the planning result is satisfactory. Otherwise you can replace a target by switching to it witch the &quot;Previous&quot; and &quot;Next&quot; buttons and replace it as it was placed before.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="centersOfMassLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Centers of Mass Distances:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="angleDifferenceLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Mean Angle Difference:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="centersOfMassValue">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="angleDifferenceValue">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="removeButton">
+       <property name="text">
+        <string>Remove Current</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/minus.png</normaloff>:/USNavigation/minus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="previousButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Previous</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/go-previous.png</normaloff>:/USNavigation/go-previous.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="nextButton">
+       <property name="text">
+        <string>Next</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../resources/USNavigation.qrc">
+         <normaloff>:/USNavigation/go-next.png</normaloff>:/USNavigation/go-next.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkUSNavigationFreezeButton</class>
+   <extends>QPushButton</extends>
+   <header>src/internal/Widgets/QmitkUSNavigationFreezeButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../resources/USNavigation.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>previousButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepPlacementPlanning</receiver>
+   <slot>OnGoToPreviousTarget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nextButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepPlacementPlanning</receiver>
+   <slot>OnGoToNextTarget()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>328</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>65</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>placeTargetButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepPlacementPlanning</receiver>
+   <slot>OnPlaceTargetButtonClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>119</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>72</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>removeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QmitkUSNavigationStepPlacementPlanning</receiver>
+   <slot>OnRemoveCurrentTargetClicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>83</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnGoToPreviousTarget()</slot>
+  <slot>OnGoToNextTarget()</slot>
+  <slot>OnPlaceTargetButtonClicked()</slot>
+  <slot>OnRemoveCurrentTargetClicked()</slot>
+  <slot>OnFreeze(bool)</slot>
+ </slots>
+</ui>

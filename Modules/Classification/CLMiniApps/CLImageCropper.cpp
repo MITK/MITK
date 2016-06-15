@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input file:", "Input file",us::Any(),false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file",us::Any(),false);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
@@ -47,9 +47,9 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  std::string referenceName = us::any_cast<string>(parsedArgs["reference"]);
-  std::string inputName = us::any_cast<string>(parsedArgs["input"]);
-  std::string outputName = us::any_cast<string>(parsedArgs["output"]);
+  std::string referenceName = us::any_cast<std::string>(parsedArgs["reference"]);
+  std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
 
   mitk::Image::Pointer imageToCrop = mitk::IOUtil::LoadImage(inputName);
   mitk::Image::Pointer referenceImage = mitk::IOUtil::LoadImage(referenceName);

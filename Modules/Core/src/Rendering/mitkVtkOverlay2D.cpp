@@ -23,7 +23,6 @@ mitk::VtkOverlay2D::VtkOverlay2D()
 {
 }
 
-
 mitk::VtkOverlay2D::~VtkOverlay2D()
 {
 }

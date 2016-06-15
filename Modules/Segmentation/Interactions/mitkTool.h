@@ -33,8 +33,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateNot.h"
 
 #include <iostream>
+#include <map>
 #include <string>
+
 #include <itkObject.h>
+
+#include "usServiceRegistration.h"
 
 #include "mitkInteractionEventObserver.h"
 #include "mitkEventStateMachine.h"
@@ -62,7 +66,7 @@ namespace mitk
   There is a separate page describing the \ref QmitkInteractiveSegmentationTechnicalPage.
 
   Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know is, that
-  every derived tool should always call SuperClass::Deactivated() in its own implementation of Deactivated, because mitk::Tool
+  every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated, because mitk::Tool
   resets the StateMachine in this method. Only if you are very sure that you covered all possible things that might happen to your
   own tool, you should consider not to reset the StateMachine from time to time.
 
@@ -196,16 +200,21 @@ namespace mitk
     /**
     \brief Called when the tool gets activated.
 
-    Derived tools should call their parents implementation.
+    Derived tools should call their parents implementation at the beginning of the overriding function.
     */
     virtual void Activated();
 
     /**
     \brief Called when the tool gets deactivated.
 
-    Derived tools should call their parents implementation.
+    Derived tools should call their parents implementation at the end of the overriding function.
     */
     virtual void Deactivated();
+
+    /**
+    \brief Let subclasses change their event configuration.
+    */
+    std::string m_EventConfig;
 
     Tool(); // purposely hidden
     Tool( const char*); // purposely hidden
@@ -245,6 +254,8 @@ namespace mitk
     NodePredicateAnd::Pointer m_IsSegmentationPredicate;
 
     std::string m_InteractorType;
+
+    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
 
   };
 

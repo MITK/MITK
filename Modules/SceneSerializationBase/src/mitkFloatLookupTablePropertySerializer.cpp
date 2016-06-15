@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkFloatLookupTablePropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
+#include <mitkLocaleSwitch.h>
 #include "mitkProperties.h"
 #include <boost/lexical_cast.hpp>
 
@@ -38,6 +38,9 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
       const FloatLookupTableProperty* prop = dynamic_cast<const FloatLookupTableProperty*>(m_Property.GetPointer());
       if (prop == nullptr)
         return nullptr;
+
+      LocaleSwitch localeSwitch("C");
+
       FloatLookupTable lut = prop->GetValue();
       //if (lut.IsNull())
       //  return NULL; // really?
@@ -58,6 +61,8 @@ class FloatLookupTablePropertySerializer : public BasePropertySerializer
     {
       if (!element)
         return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       FloatLookupTable lut;
       for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))

@@ -19,7 +19,7 @@ else(NOT EXISTS ${DCMTK_STORESCP})
 
   configure_file( org_mitk_gui_qt_dicom_config.h.in org_mitk_gui_qt_dicom_config.h @ONLY)
 
-  MITK_INSTALL_HELPER_APP(${DCMTK_STORESCP})
+  MITK_INSTALL_HELPER_APP( EXECUTABLES ${DCMTK_STORESCP})
 
   mitk_create_plugin(
     EXPORT_DIRECTIVE DICOM_EXPORT

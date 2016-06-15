@@ -32,9 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkAbstractTransformGeometry.h"
 
-
-//how precise must the user pick the point
-//default value
 mitk::PlanarFigureInteractor::PlanarFigureInteractor()
 : DataInteractor()
 , m_Precision( 6.5 )
@@ -80,7 +77,6 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "end_hovering", EndHovering );
   CONNECT_FUNCTION( "delete_figure", DeleteFigure );
 }
-
 
 bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* /*interactionEvent*/ )
 {

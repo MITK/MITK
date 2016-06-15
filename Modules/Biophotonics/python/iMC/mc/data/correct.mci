@@ -1,0 +1,15 @@
+1.0 # file version
+1 # number of runs
+
+temp.mco A # output filename, ASCII/Binary
+1000000 # No. of photons
+0.002 2 # dz, dr
+500 1 1 # No. of dz, dr & da.
+
+3 # No. of layers
+# n mua mus g d # One line for each layer
+1.0 # n for medium above.
+1.000 0.02100 0.03200 4.300 540.000
+1.000 0.01000 0.01000 1.000 100.000
+100.100 1.01100 1.02100 103.100 10410.000
+1.0 # n for medium below.

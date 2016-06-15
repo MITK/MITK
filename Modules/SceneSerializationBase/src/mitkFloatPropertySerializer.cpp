@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkProperties.h"
 #include "mitkStringsToNumbers.h"
+#include <mitkLocaleSwitch.h>
 
 namespace mitk
 {
@@ -37,6 +38,8 @@ class FloatPropertySerializer : public BasePropertySerializer
     {
       if (const FloatProperty* prop = dynamic_cast<const FloatProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("float");
         element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
         return element;
@@ -47,6 +50,8 @@ class FloatPropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       std::string f_string;
       if ( element->QueryStringAttribute( "value", &f_string) == TIXML_SUCCESS )

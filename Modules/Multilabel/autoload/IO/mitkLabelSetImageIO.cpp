@@ -59,11 +59,11 @@ void LabelSetImageIO::Write()
 {
   ValidateOutputLocation();
 
-  const LabelSetImage* input = static_cast<const LabelSetImage*>(this->GetInput());
+  auto input = dynamic_cast<const LabelSetImage*>(this->GetInput());
 
-  mitk::LocaleSwitch("C");
+  mitk::LocaleSwitch localeSwitch("C");
 
-  mitk::Image::Pointer inputVector = mitk::LabelSetImageConverter::ConvertLabelSetImageToImage(input);
+  mitk::Image::Pointer inputVector = mitk::ConvertLabelSetImageToImage(input);
 
   // image write
   if ( inputVector.IsNull() )
@@ -195,7 +195,7 @@ void LabelSetImageIO::Write()
       unsigned int count(0);
       while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
       {
-        std::auto_ptr<TiXmlDocument> document;
+        std::unique_ptr<TiXmlDocument> document;
         document.reset(new TiXmlDocument());
 
         TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
@@ -247,7 +247,7 @@ IFileIO::ConfidenceLevel LabelSetImageIO::GetReaderConfidenceLevel() const
 
 std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 {
-  mitk::LocaleSwitch("C");
+  mitk::LocaleSwitch localeSwitch("C");
 
   // begin regular image loading, adapted from mitkItkImageIO
   itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
@@ -369,7 +369,7 @@ std::vector<BaseData::Pointer> LabelSetImageIO::Read()
 
   // end regular image loading
 
-  LabelSetImage::Pointer output = LabelSetImageConverter::ConvertImageToLabelSetImage(image);
+  LabelSetImage::Pointer output = ConvertImageToLabelSetImage(image);
 
   // get labels and add them as properties to the image
   char keybuffer[256];

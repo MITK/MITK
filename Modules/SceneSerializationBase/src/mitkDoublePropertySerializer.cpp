@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSceneSerializationBaseExports.h>
 
+#include <mitkLocaleSwitch.h>
+
 namespace mitk
 {
 
@@ -39,6 +41,8 @@ class DoublePropertySerializer : public BasePropertySerializer
     {
       if (const DoubleProperty* prop = dynamic_cast<const DoubleProperty*>(m_Property.GetPointer()))
       {
+        LocaleSwitch localeSwitch("C");
+
         auto  element = new TiXmlElement("double");
         element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
         return element;
@@ -49,6 +53,8 @@ class DoublePropertySerializer : public BasePropertySerializer
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
     {
       if (!element) return nullptr;
+
+      LocaleSwitch localeSwitch("C");
 
       std::string d;
       if ( element->QueryStringAttribute( "value", &d ) == TIXML_SUCCESS )

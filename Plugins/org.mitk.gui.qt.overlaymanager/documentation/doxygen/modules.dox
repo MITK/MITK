@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_overlaymanager org.mitk.gui.qt.overlaymanager
+  \ingroup MITKPlugins
+
+  \brief This is the overlaymanager plugin. Overlays that have been addded to the OverlayManager can be viewed and modified. The plugin also allows to add new overlays.
+
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_overlaymanager_internal Internal
+  \ingroup org_mitk_gui_qt_overlaymanager
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.overlaymanager plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

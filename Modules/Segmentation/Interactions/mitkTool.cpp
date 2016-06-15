@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTool.h"
+
+#include "mitkDisplayInteractor.h"
 #include "mitkProperties.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
@@ -48,6 +50,8 @@ mitk::Tool::Tool(const char* type)
 , m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) )
 , m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
 , m_InteractorType( type )
+, m_DisplayInteractorConfigs()
+, m_EventConfig("DisplayConfigMITK.xml")
 {
 
 }
@@ -85,7 +89,7 @@ void mitk::Tool::Notify( InteractionEvent* interactionEvent, bool isHandled )
   // the event is passed to the state machine interface to be handled
   if ( !isHandled )
   {
-    this->HandleEvent(interactionEvent, NULL);
+    this->HandleEvent(interactionEvent, nullptr);
   }
 }
 
@@ -113,12 +117,43 @@ void mitk::Tool::SetToolManager(ToolManager* manager)
 
 void mitk::Tool::Activated()
 {
+  // As a legacy solution the display interaction of the new interaction framework is disabled here to avoid conflicts with tools
+  // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+  m_DisplayInteractorConfigs.clear();
+  std::vector<us::ServiceReference<InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+  for (std::vector<us::ServiceReference<InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+  {
+    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(
+                                                    us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    if (displayInteractor != nullptr)
+    {
+      // remember the original configuration
+      m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
+      // here the alternative configuration is loaded
+      displayInteractor->SetEventConfig( m_EventConfig.c_str() );
+    }
+  }
 }
 
 void mitk::Tool::Deactivated()
 {
-  // ToDo: reactivate this feature!
-  //StateMachine::ResetStatemachineToStartState(); // forget about the past
+  // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
+  // in new interaction framework
+  for (std::map<us::ServiceReferenceU, EventConfig>::iterator it = m_DisplayInteractorConfigs.begin();
+       it != m_DisplayInteractorConfigs.end(); ++it)
+  {
+    if (it->first)
+    {
+      DisplayInteractor* displayInteractor = static_cast<DisplayInteractor*>(
+                                               us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+      if (displayInteractor != nullptr)
+      {
+        // here the regular configuration is loaded again
+        displayInteractor->SetEventConfig(it->second);
+      }
+    }
+  }
+  m_DisplayInteractorConfigs.clear();
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix)
@@ -140,7 +175,7 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const 
     else
     {
       MITK_ERROR << "There is more than one GUI for " << classname << " (several factories claim ability to produce a " << guiClassname << " ) " << std::endl;
-      return NULL; // people should see and fix this error
+      return nullptr; // people should see and fix this error
     }
   }
 
@@ -162,7 +197,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() con
 mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color )
 {
   // we NEED a reference image for size etc.
-  if (!original) return NULL;
+  if (!original) return nullptr;
 
   // actually create a new empty segmentation
   PixelType pixelType(mitk::MakeScalarPixelType<DefaultSegmentationDataType>() );
@@ -223,7 +258,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
   else
   {
     Tool::ErrorMessage("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.");
-    return NULL;
+    return nullptr;
   }
 
   return CreateSegmentationNode( segmentation, organName, color );
@@ -231,7 +266,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original
 
 mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const std::string& organName, const mitk::Color& color )
 {
-  if (!image) return NULL;
+  if (!image) return nullptr;
 
   // decorate the datatreenode with some properties
   DataNode::Pointer segmentationNode = DataNode::New();
@@ -242,7 +277,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
 
   // visualization properties
   segmentationNode->SetProperty( "binary", BoolProperty::New(true) );
-//  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
+  segmentationNode->SetProperty( "color", ColorProperty::New(color) );
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
   lut->SetType(mitk::LookupTable::MULTILABEL);
   mitk::LookupTableProperty::Pointer lutProp = mitk::LookupTableProperty::New();

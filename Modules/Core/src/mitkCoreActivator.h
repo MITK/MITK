@@ -62,16 +62,16 @@ private:
 
   void RegisterLegacyWriter();
 
-  std::auto_ptr<us::ServiceTracker<mitk::IShaderRepository> > m_ShaderRepositoryTracker;
+  std::unique_ptr<us::ServiceTracker<mitk::IShaderRepository> > m_ShaderRepositoryTracker;
 
   //mitk::RenderingManager::Pointer m_RenderingManager;
-  std::auto_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
-  std::auto_ptr<mitk::PropertyAliases> m_PropertyAliases;
-  std::auto_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
-  std::auto_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
-  std::auto_ptr<mitk::PropertyFilters> m_PropertyFilters;
-  std::auto_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
-  std::auto_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
+  std::unique_ptr<mitk::PlanePositionManagerService> m_PlanePositionManager;
+  std::unique_ptr<mitk::PropertyAliases> m_PropertyAliases;
+  std::unique_ptr<mitk::PropertyDescriptions> m_PropertyDescriptions;
+  std::unique_ptr<mitk::PropertyExtensions> m_PropertyExtensions;
+  std::unique_ptr<mitk::PropertyFilters> m_PropertyFilters;
+  std::unique_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
+  std::unique_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
 
   // File IO
   std::vector<mitk::IFileReader*> m_FileReaders;

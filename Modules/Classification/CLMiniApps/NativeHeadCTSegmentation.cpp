@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace mitk;
 
 typedef unsigned int uint;
-void ReadMitkProjectImageAndMask(string input_file, mitk::Image::Pointer & raw_image, mitk::Image::Pointer & class_mask, Image::Pointer &brain_mask);
+void ReadMitkProjectImageAndMask(std::string input_file, mitk::Image::Pointer & raw_image, mitk::Image::Pointer & class_mask, Image::Pointer &brain_mask);
 std::map<unsigned int, double> VolumeUnderMaskByLabel(mitk::Image::Pointer mask);
 
 /**
@@ -75,12 +75,12 @@ int main(int argc, char* argv[])
   parser.setContributor("Jonas Cordes");
 
   // Params parsing
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
 
-  std::string inputdir = us::any_cast<string>(parsedArgs["inputdir"]);
-  std::string outputdir = us::any_cast<string>(parsedArgs["outputdir"]);
+  std::string inputdir = us::any_cast<std::string>(parsedArgs["inputdir"]);
+  std::string outputdir = us::any_cast<std::string>(parsedArgs["outputdir"]);
 
   //  int treecount = parsedArgs.count("treecount") ? us::any_cast<int>(parsedArgs["treecount"]) : 50;
   //  int treedepth = parsedArgs.count("treedepth") ? us::any_cast<int>(parsedArgs["treedepth"]) : 50;
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
   //  float precision = parsedArgs.count("precision") ? us::any_cast<float>(parsedArgs["precision"]) : mitk::eps;
   //  float fraction = parsedArgs.count("fraction") ? us::any_cast<float>(parsedArgs["fraction"]) : 0.6;
   //  bool withreplacement = parsedArgs.count("replacment") ? us::any_cast<float>(parsedArgs["replacment"]) : true;
-  std::string filt_select = parsedArgs.count("select") ? us::any_cast<string>(parsedArgs["select"]) : "*.mitk";
+  std::string filt_select = parsedArgs.count("select") ? us::any_cast<std::string>(parsedArgs["select"]) : "*.mitk";
 
   QString filter(filt_select.c_str());
   QDir dir(inputdir.c_str());

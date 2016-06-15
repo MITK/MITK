@@ -1,41 +1,40 @@
 /**
 \page IGTHowToImplementATrackingDevice How To Implement A Tracking Device
 
-If you want to implement your own Tracking device, you need to do the following (see e.g. VitrualTrackerTypeInformation):
+If you want to implement your own Tracking device, you need to do the following (see e.g. mitk::VirtualTrackerTypeInformation):
 
-  -# Derive a class MyAwesomeTrackingDeviceInformation from the abstract class TrackingDeviceTypeInformation
+  -# Derive a class MyAwesomeTrackingDeviceInformation from the abstract class mitk::TrackingDeviceTypeInformation
   -# In the constructor of your class
        -# give your device a unique name ("my awesome device")
-       -# push back at least one TrackingDeviceData corresponding to your device to m_TrackingDeviceData (TrackingDeviceType Line needs to be identical to your chosen device name "my awesome device")
-  -# Implement the function CreateTrackingDeviceSource
+       -# push back at least one mitk::TrackingDeviceData corresponding to your device to m_TrackingDeviceData (mitk::TrackingDeviceType member 'Line' needs to be identical to your chosen device name "my awesome device")
+  -# Implement the method mitk::TrackingDeviceTypeInformation::CreateTrackingDeviceSource.
 
-Recommended Steps (but not necessary):
-  -# Provide a static function to get your tracking device name
-     (recommended:
+Recommended steps (but not necessary):
+  -# Provide a static method to get your tracking device name.\n
+     Recommended:
      \code{.cpp}
      static std::string MyAwesomeTrackingDeviceInformation::GetTrackingDeviceName()
      {
         return "my awesome device";
      }
      \endcode
-     and use this function in your constructor for step 2a) and 2b))
+     Use this method in your constructor for step 2a) and 2b).
 
-     This function will make it easier to implement options for your device in any other Module/Plugin.
+     This method will make it easier to implement options for your device in any other Module/Plugin.
      If you want to check if the device in use is your device, you need to compare the names - and this can now be done in any
-     Plugin just by calling this static function. An if you later on decide to change the name of your device into
-     "my One And Only Device" - there is only one line of code you'll have to adapt.
-     Attention: If you change the name, you must edit all tool storages which were saved, e.g. using the IGT Navigation Tool Manager Plugin
-     Attention: You should use a static function instead of static variables due to the initialization order of static variables and the autoload module.
+     Plugin just by calling this static method. And if you later on decide to change the name of your device into
+     "my One And Only Device" - there is only one line of code you'll have to adapt.\n
+     Attention: If you change the name, you must edit all tool storages which were saved, e.g. using \ref org_mitk_views_igtnavigationtoolmanager .\n
+     Attention: You should use a static method instead of static variables due to the initialization order of static variables and the autoload module.
 
-  -# Provide static functions for all your TrackingDeviceData
-       (recommended:
+  -# Provide static methods for all your mitk::TrackingDeviceData.\n
+       Recommended:
        \code{.cpp}
        TrackingDeviceData MyAwesomeTrackingDeviceInformation::GetDeviceDataForMyFirstDevice()
        {
                      return{ MyAwesomeTrackingDeviceInformation::GetTrackingDeviceName(), "my Model", "my model volume location", "my hardware code" };
        }
        \endcode
-       )
 
   -# Register your Tracking Device to the collection:
     \code{.cpp}
@@ -56,17 +55,19 @@ Recommended Steps (but not necessary):
       \endcode
 
     You can do the registration anywhere in your code, also from external projects.
-    We recommend to do the registration of your tracking device in the autoload function of your module.
-    Devices, which should be always available (e.g. Polaris, Aurora, Virtual, ...) are registered in IGTExtActivator.
+    We recommend doing the registration of your tracking device in the autoload function of your module.
+    Devices, which should be always available (e.g. Polaris, Aurora, Virtual, ...) are registered in mitk::IGTActivator.
 
   -# Implement a widget to configure your device and register it to the collection
-        -# Derive a Widget class QmitkMyAwesomeTrackingDeviceWidget from QmitkAbstractTrackingDeviceWidget
+        -# Derive a Widget class QmitkMyAwesomeTrackingDeviceWidget from QmitkAbstractTrackingDeviceWidget.
            Please follow the steps as explained in QmitkAbstractTrackingDeviceWidget.h
         -# Create a .ui file
-        -# Register it to TrackingDeviceWidgetCollection
+        -# Register it to mitk::TrackingDeviceWidgetCollection
         \code{.cpp}
             m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::MyAwesomeTrackingDeviceInformation::GetTrackingDeviceName(), new QmitkMyAwesomeTrackingDeviceWidget);
         \endcode
-        (you can get the Widget collection analogous to step 6, replacing TrackingDeviceTypeCollection with TrackingDeviceWidgetCollection)
+        You can get the Widget collection analogous to step 3, replacing mitk::TrackingDeviceTypeCollection with mitk::TrackingDeviceWidgetCollection.
+
+Your tracking device should now be available in other Plugins, e.g. \ref org_mitk_views_igttrackingtoolbox .
 
 */

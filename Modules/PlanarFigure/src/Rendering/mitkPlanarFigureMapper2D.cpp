@@ -297,10 +297,13 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
   const mitk::PlaneGeometry *rendererGeometry,
   const mitk::BaseRenderer * renderer)
 {
-  mitk::Point2D displayPoint;
+  if (this->GetDataNode() != nullptr && this->GetDataNode()->GetDataInteractor().IsNull())
+    return;
 
   if ( markerOpacity == 0 && lineOpacity == 0 )
     return;
+
+  mitk::Point2D displayPoint;
 
   this->TransformObjectToDisplay(
     point, displayPoint,

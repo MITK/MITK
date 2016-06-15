@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTransferFunctionPropertySerializer.h"
 #include <boost/lexical_cast.hpp>
+#include <mitkLocaleSwitch.h>
 
 namespace mitk {
 
@@ -31,6 +32,8 @@ TiXmlElement* mitk::TransferFunctionPropertySerializer::Serialize()
 {
   if (const TransferFunctionProperty* prop = dynamic_cast<const TransferFunctionProperty*>(mitk::BasePropertySerializer::m_Property.GetPointer()))
   {
+    LocaleSwitch localeSwitch("C");
+
     TransferFunction* transferfunction = prop->GetValue();
     if (!transferfunction)
       return nullptr;
@@ -98,6 +101,7 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
   if(!s)
   {
     MITK_ERROR << "cant serialize transfer function";
+
     return false;
   }
 
@@ -124,12 +128,16 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
   if (!element)
     return nullptr;
 
+  mitk::LocaleSwitch localeSwitch("C");
+
   TransferFunction::Pointer tf = TransferFunction::New();
 
   // deserialize scalar opacity function
   TiXmlElement* scalarOpacityPointlist = element->FirstChildElement("ScalarOpacity");
   if (scalarOpacityPointlist == nullptr)
+  {
     return nullptr;
+  }
 
   tf->ClearScalarOpacityPoints();
 
@@ -148,7 +156,9 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
 
     TiXmlElement* gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
     if (gradientOpacityPointlist == nullptr)
+    {
       return nullptr;
+    }
 
     tf->ClearGradientOpacityPoints();
 
@@ -165,10 +175,14 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
 
     TiXmlElement* rgbPointlist = element->FirstChildElement("Color");
     if (rgbPointlist == nullptr)
+    {
       return nullptr;
+    }
     vtkColorTransferFunction* ctf = tf->GetColorTransferFunction();
     if (ctf == nullptr)
+    {
       return nullptr;
+    }
 
     ctf->RemoveAllPoints();
 
@@ -193,6 +207,7 @@ BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXm
   catch ( boost::bad_lexical_cast& e )
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
+
     return nullptr;
   }
 

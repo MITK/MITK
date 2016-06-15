@@ -1,16 +1,17 @@
+file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
+
 set(CPP_FILES
-  vtkEventQtSlotConnect.cxx
-  QVTKInteractor.cxx
-  QVTKInteractorAdapter.cxx
-  QVTKQuickItem.cxx
   vtkQtConnection.cxx
+  QVTKMitkInteractorAdapter.cxx
+  QVTKQuickItem.cxx
+  QVTKFramebufferObjectRenderer.cxx
+  QVTKInternalOpenglRenderWindow.cxx
 )
 
 set(MOC_H_FILES
-  QVTKInteractorAdapter.h
-  QVTKInteractorInternal.h
-  QVTKQuickItem.h
-  vtkQtConnection.h
+  include/QVTKMitkInteractorAdapter.h
+  include/QVTKQuickItem.h
+  include/vtkQtConnection.h
 )
 
 set(UI_FILES

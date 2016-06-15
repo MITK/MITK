@@ -16,13 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkLookupTablePropertySerializer.h"
 #include <mitkLookupTableProperty.h>
-
+#include <mitkLocaleSwitch.h>
 #include "mitkStringsToNumbers.h"
 
 TiXmlElement* mitk::LookupTablePropertySerializer::Serialize()
 {
   if (const LookupTableProperty* prop = dynamic_cast<const LookupTableProperty*>(m_Property.GetPointer()))
   {
+    LocaleSwitch localeSwitch("C");
+
     LookupTable::Pointer mitkLut = const_cast<LookupTableProperty*>(prop)->GetLookupTable();
     if (mitkLut.IsNull()) return nullptr; // really?
 
@@ -88,6 +90,8 @@ TiXmlElement* mitk::LookupTablePropertySerializer::Serialize()
 mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiXmlElement* element)
 {
   if (!element) return nullptr;
+
+  LocaleSwitch localeSwitch("C");
 
   double range[2];
   double  rgba[4];

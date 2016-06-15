@@ -40,64 +40,64 @@ using namespace std;
 
 namespace mitk {
 
-/** Signal generation */
-class SignalGenerationParameters
-{
-public:
+  /** Signal generation */
+  class SignalGenerationParameters
+  {
+  public:
     typedef itk::Image<double, 3>                   ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>            ItkUcharImgType;
     typedef itk::Vector<double,3>                   GradientType;
     typedef std::vector<GradientType>               GradientListType;
 
     enum CoilSensitivityProfile : int {
-        COIL_CONSTANT,
-        COIL_LINEAR,
-        COIL_EXPONENTIAL
+      COIL_CONSTANT,
+      COIL_LINEAR,
+      COIL_EXPONENTIAL
     };
 
     enum AcquisitionType : int {
-        SingleShotEpi,
-        SpinEcho
+      SingleShotEpi,
+      SpinEcho
     };
 
     SignalGenerationParameters()
-        : m_AcquisitionType(SignalGenerationParameters::SingleShotEpi)
-        , m_SignalScale(100)
-        , m_tEcho(100)
-        , m_tRep(4000)
-        , m_tLine(1)
-        , m_tInhom(50)
-        , m_ReversePhase(false)
-        , m_PartialFourier(1.0)
-        , m_NoiseVariance(0.001)
-        , m_NumberOfCoils(1)
-        , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
-        , m_Bvalue(1000)
-        , m_SimulateKspaceAcquisition(false)
-        , m_AxonRadius(0)
-        , m_DoDisablePartialVolume(false)
-        , m_Spikes(0)
-        , m_SpikeAmplitude(1)
-        , m_KspaceLineOffset(0)
-        , m_EddyStrength(300)
-        , m_Tau(70)
-        , m_CroppingFactor(1)
-        , m_DoAddGibbsRinging(false)
-        , m_DoSimulateRelaxation(true)
-        , m_DoAddMotion(false)
-        , m_DoRandomizeMotion(true)
-        , m_FrequencyMap(NULL)
-        , m_MaskImage(NULL)
+      : m_AcquisitionType(SignalGenerationParameters::SingleShotEpi)
+      , m_SignalScale(100)
+      , m_tEcho(100)
+      , m_tRep(4000)
+      , m_tLine(1)
+      , m_tInhom(50)
+      , m_ReversePhase(false)
+      , m_PartialFourier(1.0)
+      , m_NoiseVariance(0.001)
+      , m_NumberOfCoils(1)
+      , m_CoilSensitivityProfile(SignalGenerationParameters::COIL_CONSTANT)
+      , m_Bvalue(1000)
+      , m_SimulateKspaceAcquisition(false)
+      , m_AxonRadius(0)
+      , m_DoDisablePartialVolume(false)
+      , m_Spikes(0)
+      , m_SpikeAmplitude(1)
+      , m_KspaceLineOffset(0)
+      , m_EddyStrength(300)
+      , m_Tau(70)
+      , m_CroppingFactor(1)
+      , m_DoAddGibbsRinging(false)
+      , m_DoSimulateRelaxation(true)
+      , m_DoAddMotion(false)
+      , m_DoRandomizeMotion(true)
+      , m_FrequencyMap(NULL)
+      , m_MaskImage(NULL)
     {
-        m_ImageRegion.SetSize(0, 12);
-        m_ImageRegion.SetSize(1, 12);
-        m_ImageRegion.SetSize(2, 3);
-        m_ImageSpacing.Fill(2.0);
-        m_ImageOrigin.Fill(0.0);
-        m_ImageDirection.SetIdentity();
-        m_Translation.Fill(0.0);
-        m_Rotation.Fill(0.0);
-        SetNumWeightedVolumes(6);
+      m_ImageRegion.SetSize(0, 12);
+      m_ImageRegion.SetSize(1, 12);
+      m_ImageRegion.SetSize(2, 3);
+      m_ImageSpacing.Fill(2.0);
+      m_ImageOrigin.Fill(0.0);
+      m_ImageDirection.SetIdentity();
+      m_Translation.Fill(0.0);
+      m_Rotation.Fill(0.0);
+      SetNumWeightedVolumes(6);
     }
 
     /** input/output image specifications */
@@ -155,38 +155,38 @@ public:
     inline void SetGradienDirections(GradientListType gradientList);
     inline void SetGradienDirections(mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer gradientList);
 
-protected:
+  protected:
 
     unsigned int                        m_NumGradients;             ///< Number of diffusion-weighted image volumes.
     unsigned int                        m_NumBaseline;              ///< Number of non-diffusion-weighted image volumes.
     GradientListType                    m_GradientDirections;       ///< Total number of image volumes.
-};
+  };
 
-/** Fiber generation */
-class FiberGenerationParameters
-{
-public:
+  /** Fiber generation */
+  class FiberGenerationParameters
+  {
+  public:
 
     enum FiberDistribution{
-        DISTRIBUTE_UNIFORM, // distribute fibers uniformly in the ROIs
-        DISTRIBUTE_GAUSSIAN // distribute fibers using a 2D gaussian
+      DISTRIBUTE_UNIFORM, // distribute fibers uniformly in the ROIs
+      DISTRIBUTE_GAUSSIAN // distribute fibers using a 2D gaussian
     };
 
     typedef vector< vector< mitk::PlanarEllipse::Pointer > >    FiducialListType;
     typedef vector< vector< unsigned int > >                    FlipListType;
 
     FiberGenerationParameters()
-        : m_Distribution(DISTRIBUTE_UNIFORM)
-        , m_Density(100)
-        , m_Variance(100)
-        , m_Sampling(1)
-        , m_Tension(0)
-        , m_Continuity(0)
-        , m_Bias(0)
+      : m_Distribution(DISTRIBUTE_UNIFORM)
+      , m_Density(100)
+      , m_Variance(100)
+      , m_Sampling(1)
+      , m_Tension(0)
+      , m_Continuity(0)
+      , m_Bias(0)
     {
-        m_Rotation.Fill(0.0);
-        m_Translation.Fill(0.0);
-        m_Scale.Fill(1.0);
+      m_Rotation.Fill(0.0);
+      m_Translation.Fill(0.0);
+      m_Scale.Fill(1.0);
     }
 
     FiberDistribution   m_Distribution;
@@ -201,32 +201,32 @@ public:
     mitk::Vector3D      m_Scale;
     FlipListType        m_FlipList;        ///< contains flags indicating a flip of the 2D fiber x-coordinates (needed to resolve some unwanted fiber twisting)
     FiducialListType    m_Fiducials;       ///< container of the planar ellipses used as fiducials for the fiber generation process
-};
+  };
 
-/** GUI persistence, input, output, ... */
-class MiscFiberfoxParameters
-{
-public:
+  /** GUI persistence, input, output, ... */
+  class MiscFiberfoxParameters
+  {
+  public:
     MiscFiberfoxParameters()
-        : m_ResultNode(DataNode::New())
-        , m_ParentNode(NULL)
-        , m_SignalModelString("")
-        , m_ArtifactModelString("")
-        , m_OutputPath("/tmp/")
-        , m_OutputPrefix("fiberfox")
-        , m_CheckOutputVolumeFractionsBox(false)
-        , m_CheckAdvancedSignalOptionsBox(false)
-        , m_CheckAddNoiseBox(false)
-        , m_CheckAddGhostsBox(false)
-        , m_CheckAddAliasingBox(false)
-        , m_CheckAddSpikesBox(false)
-        , m_CheckAddEddyCurrentsBox(false)
-        , m_CheckAddDistortionsBox(false)
-        , m_MotionVolumesBox("random")
-        , m_CheckRealTimeFibersBox(true)
-        , m_CheckAdvancedFiberOptionsBox(false)
-        , m_CheckConstantRadiusBox(false)
-        , m_CheckIncludeFiducialsBox(true)
+      : m_ResultNode(DataNode::New())
+      , m_ParentNode(NULL)
+      , m_SignalModelString("")
+      , m_ArtifactModelString("")
+      , m_OutputPath("/tmp/")
+      , m_OutputPrefix("fiberfox")
+      , m_CheckOutputVolumeFractionsBox(false)
+      , m_CheckAdvancedSignalOptionsBox(false)
+      , m_CheckAddNoiseBox(false)
+      , m_CheckAddGhostsBox(false)
+      , m_CheckAddAliasingBox(false)
+      , m_CheckAddSpikesBox(false)
+      , m_CheckAddEddyCurrentsBox(false)
+      , m_CheckAddDistortionsBox(false)
+      , m_MotionVolumesBox("random")
+      , m_CheckRealTimeFibersBox(true)
+      , m_CheckAdvancedFiberOptionsBox(false)
+      , m_CheckConstantRadiusBox(false)
+      , m_CheckIncludeFiducialsBox(true)
     {}
 
     DataNode::Pointer   m_ResultNode;                       ///< Stores resulting image.
@@ -253,16 +253,16 @@ public:
     bool                m_CheckAdvancedFiberOptionsBox;
     bool                m_CheckConstantRadiusBox;
     bool                m_CheckIncludeFiducialsBox;
-};
+  };
 
-/**
+  /**
   * \brief Datastructure to manage the Fiberfox signal generation parameters.
   *
   */
-template< class ScalarType = double >
-class FiberfoxParameters
-{
-public:
+  template< class ScalarType = double >
+  class FiberfoxParameters
+  {
+  public:
 
     typedef itk::Image<double, 3>                           ItkDoubleImgType;
     typedef itk::Image<unsigned char, 3>                    ItkUcharImgType;
@@ -277,50 +277,50 @@ public:
     template< class OutType >
     FiberfoxParameters< OutType > CopyParameters()
     {
-        FiberfoxParameters< OutType > out;
+      FiberfoxParameters< OutType > out;
 
-        out.m_FiberGen = m_FiberGen;
-        out.m_SignalGen = m_SignalGen;
-        out.m_Misc = m_Misc;
+      out.m_FiberGen = m_FiberGen;
+      out.m_SignalGen = m_SignalGen;
+      out.m_Misc = m_Misc;
 
-        if (m_NoiseModel!=NULL)
-        {
-            if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
-                out.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<OutType> >();
-            else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
-                out.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<OutType> >();
-            out.m_NoiseModel->SetNoiseVariance(m_NoiseModel->GetNoiseVariance());
-        }
+      if (m_NoiseModel!=NULL)
+      {
+        if (dynamic_cast<mitk::RicianNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+          out.m_NoiseModel = std::make_shared< mitk::RicianNoiseModel<OutType> >();
+        else if (dynamic_cast<mitk::ChiSquareNoiseModel<ScalarType>*>(m_NoiseModel.get()))
+          out.m_NoiseModel = std::make_shared< mitk::ChiSquareNoiseModel<OutType> >();
+        out.m_NoiseModel->SetNoiseVariance(m_NoiseModel->GetNoiseVariance());
+      }
 
-        for (unsigned int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
-        {
-            mitk::DiffusionSignalModel<OutType>* outModel = NULL;
-            mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
-            if (i<m_FiberModelList.size())
-                signalModel = m_FiberModelList.at(i);
-            else
-                signalModel = m_NonFiberModelList.at(i-m_FiberModelList.size());
+      for (unsigned int i=0; i<m_FiberModelList.size()+m_NonFiberModelList.size(); i++)
+      {
+        mitk::DiffusionSignalModel<OutType>* outModel = NULL;
+        mitk::DiffusionSignalModel<ScalarType>* signalModel = NULL;
+        if (i<m_FiberModelList.size())
+          signalModel = m_FiberModelList.at(i);
+        else
+          signalModel = m_NonFiberModelList.at(i-m_FiberModelList.size());
 
-            if (dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel))
-                outModel = new mitk::StickModel<OutType>(dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel));
-            else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
-                outModel = new mitk::TensorModel<OutType>(dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel));
-            else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
-                outModel = new mitk::RawShModel<OutType>(dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel));
-            else  if (dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel))
-                outModel = new mitk::BallModel<OutType>(dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel));
-            else if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
-                outModel = new mitk::AstroStickModel<OutType>(dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel));
-            else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
-                outModel = new mitk::DotModel<OutType>(dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel));
+        if (dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel))
+          outModel = new mitk::StickModel<OutType>(dynamic_cast<mitk::StickModel<ScalarType>*>(signalModel));
+        else  if (dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel))
+          outModel = new mitk::TensorModel<OutType>(dynamic_cast<mitk::TensorModel<ScalarType>*>(signalModel));
+        else  if (dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel))
+          outModel = new mitk::RawShModel<OutType>(dynamic_cast<mitk::RawShModel<ScalarType>*>(signalModel));
+        else  if (dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel))
+          outModel = new mitk::BallModel<OutType>(dynamic_cast<mitk::BallModel<ScalarType>*>(signalModel));
+        else if (dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel))
+          outModel = new mitk::AstroStickModel<OutType>(dynamic_cast<mitk::AstroStickModel<ScalarType>*>(signalModel));
+        else  if (dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel))
+          outModel = new mitk::DotModel<OutType>(dynamic_cast<mitk::DotModel<ScalarType>*>(signalModel));
 
-            if (i<m_FiberModelList.size())
-                out.m_FiberModelList.push_back(outModel);
-            else
-                out.m_NonFiberModelList.push_back(outModel);
-        }
+        if (i<m_FiberModelList.size())
+          out.m_FiberModelList.push_back(outModel);
+        else
+          out.m_NonFiberModelList.push_back(outModel);
+      }
 
-        return out;
+      return out;
     }
 
     /** Not templated parameters */
@@ -339,7 +339,7 @@ public:
     template< class ParameterType >
     ParameterType ReadVal(boost::property_tree::ptree::value_type const& v, std::string tag, ParameterType defaultValue, bool essential=false);
     std::string                         m_MissingTags;
-};
+  };
 }
 
 #include "mitkFiberfoxParameters.cpp"

@@ -17,7 +17,7 @@ set(Boost_DEPENDS ${proj})
 
 if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
-  set(_boost_version 1_59)
+  set(_boost_version 1_60)
   set(_boost_install_include_dir include/boost)
   if(WIN32)
     set(_boost_install_include_dir include/boost-${_boost_version}/boost)
@@ -68,8 +68,11 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     else()
       message(FATAL_ERROR "Compiler '${CMAKE_CXX_COMPILER_ID}' not supported. Use GNU or Clang instead.")
     endif()
-    string(REGEX MATCH "^[0-9]+\\.[0-9]+" _compiler_version "${CMAKE_CXX_COMPILER_VERSION}")
-    set(_boost_toolset "${_boost_with_toolset}-${_compiler_version}")
+      get_filename_component(_cxx_compiler_name "${CMAKE_CXX_COMPILER}" NAME)
+      string(REGEX MATCH "^[0-9]+\\.[0-9]+" _compiler_version "${CMAKE_CXX_COMPILER_VERSION}")
+      if(_cxx_compiler_name MATCHES "${_compiler_version}")
+        set(_boost_toolset "${_boost_with_toolset}-${_compiler_version}")
+      endif()
   endif()
 
   if(_boost_toolset)
@@ -133,19 +136,26 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
            COMMAND ${CMAKE_COMMAND} -E copy_directory "<SOURCE_DIR>/boost" "<INSTALL_DIR>/${_boost_install_include_dir}")
   endif()
 
+  ExternalProject_Add(${proj}-download
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.7z
+      URL_MD5 7ce7f5a4e396484da8da6b60d4ed7661
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ""
+      INSTALL_COMMAND ""
+    )
+
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_${_boost_version}_0.tar.bz2
-    URL_MD5 6aa9a5c6a4ca1016edd0ed1178e3cb87
-    # We use in-source builds for Boost
-    BINARY_DIR ${ep_prefix}/src/${proj}
+    SOURCE_DIR "${ep_prefix}/src/${proj}-download"
+    BINARY_DIR "${ep_prefix}/src/${proj}-download"
+    DOWNLOAD_COMMAND ""
     CONFIGURE_COMMAND "<SOURCE_DIR>/bootstrap${_shell_extension}"
       --with-toolset=${_boost_with_toolset}
       --with-libraries=${_boost_libs}
       "--prefix=<INSTALL_DIR>"
     ${_boost_build_cmd}
     INSTALL_COMMAND ${_install_cmd}
-    DEPENDS ${proj_DEPENDENCIES}
+    DEPENDS ${proj}-download ${proj_DEPENDENCIES}
     )
 
   ExternalProject_Get_Property(${proj} install_dir)

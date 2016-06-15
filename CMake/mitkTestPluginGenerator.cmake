@@ -45,6 +45,7 @@ if(BUILD_TESTING)
     )
 
   if(CMAKE_PREFIX_PATH)
+    string (REPLACE ";" "$<SEMICOLON>" CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH}")
     list(APPEND configure_options -DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH})
   endif()
 

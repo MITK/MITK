@@ -22,6 +22,7 @@
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkDataInteractor.h"
+#include <mitkWeakPointer.h>
 #include <MitkCoreExports.h>
 #include <list>
 #include "usServiceTracker.h"
@@ -51,7 +52,7 @@ namespace mitk
     mitkClassMacroItkParent(Dispatcher, itk::LightObject);
     mitkNewMacro1Param(Self, const std::string&);
 
-    typedef std::list<DataInteractor::Pointer> ListInteractorType;
+    typedef std::list<mitk::WeakPointer<DataInteractor>> ListInteractorType;
     typedef std::list<itk::SmartPointer<InteractionEvent> > ListEventsType;
 
     /**
@@ -92,12 +93,7 @@ namespace mitk
 
   private:
 
-    struct cmp{
-      bool operator()(DataInteractor::Pointer d1, DataInteractor::Pointer d2){
-        return (d1->GetLayer() > d2->GetLayer());
-      }
-    };
-    std::list<DataInteractor::Pointer> m_Interactors;
+    ListInteractorType m_Interactors;
     ListEventsType m_QueuedEvents;
 
     /**
@@ -109,9 +105,9 @@ namespace mitk
      * See \ref DataInteractionTechnicalPage_DispatcherEventDistSection for a description of ProcessEventModes
      */
     ProcessEventMode m_ProcessingMode;
-    DataInteractor::Pointer m_SelectedInteractor;
+    mitk::WeakPointer<DataInteractor> m_SelectedInteractor;
 
-    void SetEventProcessingMode(DataInteractor::Pointer);
+    void SetEventProcessingMode(DataInteractor* );
 
     /**
      * Function to handle special internal events,

@@ -110,7 +110,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
           </size>
          </property>
          <property name="toolTip">
-          <string>Choose one of generic MITK internal presets to apply to standard CT data or MR data.</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Choose from generic MITK transfer function presets to apply to standard CT data or MR data.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="statusTip">
           <string>Load a MITK internal preset</string>
@@ -186,8 +186,7 @@ Or save and load your own created transfer functions in a folder in XML format.<
             </size>
            </property>
            <property name="toolTip">
-            <string>Load a transfer function in xml-format from the filesystem.
-The load includes all transfer functions: grayvalue, color and gradient.</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load a transfer function in xml-format from the filesystem.&lt;/p&gt;&lt;p&gt;The file should include all transfer functions: grayvalue, color and gradient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Load</string>
@@ -209,8 +208,7 @@ The load includes all transfer functions: grayvalue, color and gradient.</string
             </size>
            </property>
            <property name="toolTip">
-            <string>Save a transfer function in xml-format in the filesystem.
-The save includes all transfer functions: grayvalue, color and gradient.</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save a transfer function in xml-format to the filesystem.&lt;/p&gt;&lt;p&gt;The file includes all transfer functions: grayvalue, color and gradient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Save</string>

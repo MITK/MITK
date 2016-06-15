@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryQtEditorPart.h>
 
 class QToolBar;
-class QWebPage;
+class QWebEnginePage;
 
 namespace berry {
 
@@ -51,7 +51,7 @@ public:
   bool IsDirty() const override { return false; }
   bool IsSaveAsAllowed() const override { return false; }
 
-  QWebPage* GetQWebPage() const;
+  QWebEnginePage* GetQWebPage() const;
 
   IPartListener::Events::Types GetPartEventTypes() const override;
   void PartDeactivated(const IWorkbenchPartReference::Pointer& /*partRef*/) override;
@@ -85,7 +85,7 @@ private Q_SLOTS:
 
 private:
 
-  bool findInWebPage(const QString& ttf, bool forward);
+  void findInWebPage(const QString& ttf, bool forward);
 
   void enableShortcuts();
   void disableShortcuts();
@@ -95,7 +95,7 @@ private:
   Q_DISABLE_COPY(HelpEditor)
 
   QToolBar* m_ToolBar;
-  HelpWebView* m_WebView;
+  HelpWebView* m_WebEngineView;
   HelpEditorFindWidget* m_FindWidget;
 
   QAction* m_BackAction;
@@ -106,7 +106,6 @@ private:
   QAction* m_OpenHelpMode;
   QAction* m_CloseHelpMode;
   QAction* m_HomeAction;
-  QAction* m_PrintAction;
 };
 
 } // end namespace berry

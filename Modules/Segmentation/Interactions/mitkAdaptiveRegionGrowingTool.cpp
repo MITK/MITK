@@ -95,6 +95,11 @@ void mitk::AdaptiveRegionGrowingTool::Deactivated()
   Superclass::Deactivated();
 }
 
+void mitk::AdaptiveRegionGrowingTool::ConfirmSegmentation()
+{
+  m_ToolManager->ActivateTool(-1);
+}
+
 mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetReferenceData(){
   return this->m_ToolManager->GetReferenceData(0);
 }

@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 
 #include "ui_QmitkXnatTreeBrowserViewControls.h"
+#include "QmitkHttpStatusCodeHandler.h"
 
 // ctkXnatCore
 #include "ctkXnatSession.h"
@@ -61,6 +62,11 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
+  enum SearchMethod {
+    ProjectLevel = 0,
+    SubjectLevel = 1
+  };
+
 protected slots:
 
   /// \brief Opens or reuses the xnat editor with the activated node as root item.
@@ -71,6 +77,9 @@ protected slots:
 
   /// \brief Cleans the tree model
   void CleanTreeModel(ctkXnatSession* session);
+
+  /// \brief Searches the tree model
+  void search(const QString &toSearch);
 
   void OnContextMenuRequested(const QPoint & pos);
   void OnContextMenuDownloadAndOpenFile();
@@ -130,6 +139,10 @@ private:
   QMenu* m_ContextMenu;
 
   bool m_SilentMode;
+  QModelIndexList m_hiddenItems;
+
+  bool m_AlreadyInSearch = false;
+
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

@@ -9,6 +9,7 @@ set(CPP_FILES
   QmitkXnatCreateObjectDialog.cpp
   QmitkSelectXnatUploadDestinationDialog.cpp
   QmitkXnatUploadFromDataStorageDialog.cpp
+  QmitkHttpStatusCodeHandler.cpp
 )
 
 set(MOC_H_FILES
@@ -20,6 +21,7 @@ set(MOC_H_FILES
  include/QmitkXnatCreateObjectDialog.h
  include/QmitkSelectXnatUploadDestinationDialog.h
  include/QmitkXnatUploadFromDataStorageDialog.h
+ include/QmitkHttpStatusCodeHandler.h
 )
 
 set(QRC_FILES

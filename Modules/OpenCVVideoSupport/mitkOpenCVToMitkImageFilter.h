@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // itk includes
 #include <itkMacro.h>
+#include <itkFastMutexLock.h>
 #include <itkImage.h>
 
 // OpenCV includes
@@ -32,11 +33,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-///
-/// \brief Filter for creating MITK RGB Images from an OpenCV image
-///
-class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
-{
+  ///
+  /// \brief Filter for creating MITK RGB Images from an OpenCV image
+  ///
+  class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
+  {
   public:
     typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
     typedef itk::RGBPixel< unsigned short > USRGBPixelType;
@@ -47,17 +48,17 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
     /// the static function for the conversion
     ///
     template <typename TPixel, unsigned int VImageDimension>
-    static Image::Pointer ConvertIplToMitkImage( const IplImage * input );
+    static Image::Pointer ConvertCVMatToMitkImage(const cv::Mat input);
 
     mitkClassMacro(OpenCVToMitkImageFilter, ImageSource);
     itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
 
-    ///
-    /// sets an iplimage as input
-    ///
-    void SetOpenCVImage(const IplImage* image);
-    itkGetMacro(OpenCVImage, const IplImage*);
+      ///
+      /// sets an iplimage as input
+      ///
+      void SetOpenCVImage(const IplImage* image);
+    //itkGetMacro(OpenCVImage, const IplImage*);
 
     ///
     /// sets an opencv mat as input (will be used if OpenCVImage Ipl image is 0)
@@ -85,11 +86,13 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT OpenCVToMitkImageFilter : public ImageSource
 
     virtual void GenerateData() override;
 
-protected:
+  protected:
     Image::Pointer m_Image;
-    const IplImage* m_OpenCVImage;
     cv::Mat m_OpenCVMat;
-};
+
+    itk::FastMutexLock::Pointer m_ImageMutex;
+    itk::FastMutexLock::Pointer m_OpenCVMatMutex;
+  };
 
 } // namespace mitk
 

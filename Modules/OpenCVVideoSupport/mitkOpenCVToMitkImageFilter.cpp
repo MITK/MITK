@@ -125,7 +125,7 @@ namespace mitk{
   {
     typedef itk::Image< TPixel, VImageDimension > ImageType;
 
-    ImageType::Pointer output = itk::OpenCVImageBridge::CVMatToITKImage<ImageType>(input);
+    typename ImageType::Pointer output = itk::OpenCVImageBridge::CVMatToITKImage<ImageType>(input);
     Image::Pointer mitkImage = Image::New();
     mitkImage = GrabItkImageMemory(output);
 

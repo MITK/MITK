@@ -611,28 +611,36 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
         {
           numbers.push_back( nummer );
         }
-        // a list of negative numbers is given:
+        // If a list of negative numbers is given:
         if( numbers.min() < 0 && numbers.max() < 0 )
         {
           for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
           {
             m_SignalGen.m_MotionVolumes.push_back( true );
           }
-          if ( -n < m_SignalGen.GetNumVolumes() && n < 0 )
+          // set all true except those given.
+          for( auto iter = std::begin(numbers); iter != std::end(numbers); ++iter )
           {
-            m_SignalGen.m_MotionVolumes[-n]=false;
+            if ( -(*iter) < m_SignalGen.GetNumVolumes() && *iter < 0 )
+            {
+              m_SignalGen.m_MotionVolumes[ *iter ] = false;
+            }
           }
         }
-        // a list of positive numbers is given:
+        // If a list of positive numbers is given:
         else if( numbers.min() >= 0 && numbers.max() >= 0 )
         {
           for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
           {
             m_SignalGen.m_MotionVolumes.push_back( false );
           }
-          if ( n < m_SignalGen.GetNumVolumes() && n >= 0 )
+          // set all false except those given.
+          for( auto iter = std::begin(numbers); iter != std::end(numbers); ++iter )
           {
-            m_SignalGen.m_MotionVolumes[n]=true;
+            if ( *iter < m_SignalGen.GetNumVolumes() && *iter >= 0 )
+            {
+              m_SignalGen.m_MotionVolumes[ *iter ] = true;
+            }
           }
         }
         else

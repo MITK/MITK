@@ -28,21 +28,23 @@ namespace mitk
     PropertyPersistence();
     ~PropertyPersistence();
 
-    typedef IPropertyPersistence::InfoMapType InfoMapType;
+    typedef IPropertyPersistence::InfoResultType InfoResultType;
 
-    bool AddInfo(const std::string& propertyName, PropertyPersistenceInfo::Pointer info, bool overwrite) override;
-    InfoMapType GetInfos(const std::string& propertyName) override;
-    InfoMapType GetInfosByKey(const std::string& persistenceKey) override;
-    PropertyPersistenceInfo::Pointer GetInfo(const std::string& propertyName, const MimeTypeNameType& mime, bool allowWildCard) override;
-    bool HasInfos(const std::string& propertyName) override;
+    bool AddInfo(const PropertyPersistenceInfo* info, bool overwrite) override;
+    InfoResultType GetInfos(const std::string& propertyName, bool allowNameRegEx) const override;
+    InfoResultType GetInfos(const std::string& propertyName, const MimeTypeNameType& mime, bool allowMimeWildCard, bool allowNameRegEx) const override;
+    InfoResultType GetInfosByKey(const std::string& persistenceKey, bool allowKeyRegEx) const override;
+    bool HasInfos(const std::string& propertyName, bool allowNameRegEx) const override;
     void RemoveAllInfos() override;
     void RemoveInfos(const std::string& propertyName) override;
     void RemoveInfos(const std::string& propertyName, const MimeTypeNameType& mime) override;
 
   private:
-    typedef std::multimap<const std::string, PropertyPersistenceInfo::Pointer> InfoMap;
-    typedef InfoMap::const_iterator InfoMapConstIterator;
-    typedef InfoMap::iterator InfoMapIterator;
+    typedef std::multimap<const std::string, PropertyPersistenceInfo::ConstPointer> InfoMap;
+
+    /**Helper function that selects */
+    using SelectFunctionType = std::function < bool(const InfoMap::value_type&) >;
+    static InfoMap SelectInfos(const InfoMap& infos, const SelectFunctionType& selectFunction);
 
     PropertyPersistence(const PropertyPersistence&);
     PropertyPersistence& operator=(const PropertyPersistence&);

@@ -83,7 +83,10 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
       mitk::IPropertyPersistence* propertyPersistence = mitk::GetPropertyService<mitk::IPropertyPersistence>();
 
       if (propertyPersistence != nullptr)
-        propertyPersistence->AddInfo(m_Controls.nameLineEdit->text().toStdString(), mitk::PropertyPersistenceInfo::New());
+      {
+        mitk::PropertyPersistenceInfo::Pointer info = mitk::PropertyPersistenceInfo::New(m_Controls.nameLineEdit->text().toStdString());
+        propertyPersistence->AddInfo(info);
+      }
     }
   }
   else

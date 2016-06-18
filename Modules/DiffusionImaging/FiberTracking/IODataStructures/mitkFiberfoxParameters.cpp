@@ -449,8 +449,7 @@ template< class ScalarType >
 void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 {
   m_MissingTags = "";
-  if(filename.empty())
-    return;
+  if(filename.empty()) { return; }
 
   const std::string& locale = "C";
   const std::string& currLocale = setlocale( LC_ALL, NULL );
@@ -469,13 +468,12 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
 
   boost::property_tree::ptree parameterTree;
-  boost::property_tree::xml_parser::read_xml(filename, parameterTree);
+  boost::property_tree::xml_parser::read_xml( filename, parameterTree );
 
 
   m_FiberModelList.clear();
   m_NonFiberModelList.clear();
-  if (m_NoiseModel)
-    m_NoiseModel = nullptr;
+  if (m_NoiseModel) { m_NoiseModel = nullptr; }
 
   BOOST_FOREACH( boost::property_tree::ptree::value_type const& v1, parameterTree.get_child("fiberfox") )
   {
@@ -547,9 +545,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
       m_SignalGen.m_ImageDirection[2][2] = ReadVal<double>(v1,"basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
       m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)
-          ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
+                                      ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
       m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)
-          ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
+                                             ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
       m_SignalGen.m_NumberOfCoils = ReadVal<int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
       m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);
       m_SignalGen.m_PartialFourier = ReadVal<double>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
@@ -597,25 +595,57 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
       m_Misc.m_MotionVolumesBox = ReadVal<string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
       m_SignalGen.m_MotionVolumes.clear();
-      if (m_Misc.m_MotionVolumesBox=="random")
+      if ( m_Misc.m_MotionVolumesBox == "random" )
       {
-        for (int i=0; i<m_SignalGen.GetNumVolumes(); i++)
-          m_SignalGen.m_MotionVolumes.push_back(rand()%2);
-      }
-      else if (!m_Misc.m_MotionVolumesBox.empty())
-      {
-        for (int i=0; i<m_SignalGen.GetNumVolumes(); i++)
-          m_SignalGen.m_MotionVolumes.push_back(false);
-
-        stringstream stream(m_Misc.m_MotionVolumesBox);
-        int n;
-        while(stream >> n)
+        for ( size_t i=0; i < m_SignalGen.GetNumVolumes(); ++i )
         {
-          if (n<m_SignalGen.GetNumVolumes() && n>=0)
-            m_SignalGen.m_MotionVolumes[n]=true;
+          m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
         }
       }
-      // else ?
+      else if ( ! m_Misc.m_MotionVolumesBox.empty() )
+      {
+        stringstream stream( m_Misc.m_MotionVolumesBox );
+        std::vector<int> numbers;
+        int nummer = std::numeric_limits<int>::max();
+        while( stream >> nummer )
+        {
+          numbers.push_back( nummer );
+        }
+        // a list of negative numbers is given:
+        if( numbers.min() < 0 && numbers.max() < 0 )
+        {
+          for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
+          {
+            m_SignalGen.m_MotionVolumes.push_back( true );
+          }
+          if ( -n < m_SignalGen.GetNumVolumes() && n < 0 )
+          {
+            m_SignalGen.m_MotionVolumes[-n]=false;
+          }
+        }
+        // a list of positive numbers is given:
+        else if( numbers.min() >= 0 && numbers.max() >= 0 )
+        {
+          for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
+          {
+            m_SignalGen.m_MotionVolumes.push_back( false );
+          }
+          if ( n < m_SignalGen.GetNumVolumes() && n >= 0 )
+          {
+            m_SignalGen.m_MotionVolumes[n]=true;
+          }
+        }
+        else
+        {
+          MITK_INFO << "mitkFiberfoxParameters.cpp: Inconsistent list of numbers in m_MotionVolumesBox.";
+          break;
+        }
+      }
+      else
+      {
+        MITK_INFO << "mitkFiberfoxParameters.cpp: Cannot make sense of string in m_MotionVolumesBox.";
+        break;
+      }
 
 
       try
@@ -764,6 +794,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           }
         }
       }
+    }
+    else
+    {
+
     }
   }
 

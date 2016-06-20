@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
 #include <mbilog.h>
+#include <algorithm>
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
@@ -612,34 +613,36 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           numbers.push_back( nummer );
         }
         // If a list of negative numbers is given:
-        if( numbers.min() < 0 && numbers.max() < 0 )
+        if( *(std::min_element( numbers.begin(), numbers.end() )) < 0
+            && *(std::max_element( numbers.begin(), numbers.end() )) < 0 )
         {
           for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
           {
             m_SignalGen.m_MotionVolumes.push_back( true );
           }
           // set all true except those given.
-          for( auto iter = std::begin(numbers); iter != std::end(numbers); ++iter )
+          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
           {
             if ( -(*iter) < m_SignalGen.GetNumVolumes() && *iter < 0 )
             {
-              m_SignalGen.m_MotionVolumes[ *iter ] = false;
+              m_SignalGen.m_MotionVolumes.at( *iter ) = false;
             }
           }
         }
         // If a list of positive numbers is given:
-        else if( numbers.min() >= 0 && numbers.max() >= 0 )
+        else if( *(std::min_element( numbers.begin(), numbers.end() )) >= 0
+                 && *(std::max_element( numbers.begin(), numbers.end() )) >= 0 )
         {
           for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
           {
             m_SignalGen.m_MotionVolumes.push_back( false );
           }
           // set all false except those given.
-          for( auto iter = std::begin(numbers); iter != std::end(numbers); ++iter )
+          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter )
           {
             if ( *iter < m_SignalGen.GetNumVolumes() && *iter >= 0 )
             {
-              m_SignalGen.m_MotionVolumes[ *iter ] = true;
+              m_SignalGen.m_MotionVolumes.at( *iter ) = true;
             }
           }
         }

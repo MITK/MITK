@@ -2,5 +2,5 @@ MITK_CREATE_MODULE(
   INCLUDE_DIRS
     PUBLIC include/
     PRIVATE src/
-  PACKAGE_DEPENDS Qt5|Core+Quick VTK|vtkGUISupportQt OpenGL
+  PACKAGE_DEPENDS Qt5|Core+Quick VTK OpenGL
   )

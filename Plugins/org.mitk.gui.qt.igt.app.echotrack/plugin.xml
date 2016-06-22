@@ -12,7 +12,7 @@
     <view id="org.mitk.views.ultrasoundcalibration"
           name="IGT EchoTrack Calibration"
           class="UltrasoundCalibration"
-          icon="resources/icon_calibration.xpm" />
+          icon="resources/icon_US_calibration.svg" />
   </extension>
 
   <extension point="org.blueberry.ui.perspectives">

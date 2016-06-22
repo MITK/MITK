@@ -33,11 +33,11 @@ set(MOC_H_FILES
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
-  resources/iconNavigationDataPlayer.png
-  resources/iconNavigationToolManager.xpm
-  resources/iconTrackingToolBox.xpm
-  resources/iconNavigationToolCalibration.xpm
-  resources/iconFiducialRegistration.png
+  resources/iconTrackingDataPlayer.svg
+  resources/iconTrackingRegistration.svg
+  resources/iconTrackingToolbox.svg
+  resources/iconTrackingToolCalibration.svg
+  resources/iconTrackingToolManager.svg
   plugin.xml
 )
 

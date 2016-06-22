@@ -110,7 +110,7 @@ set(MOC_H_FILES
 set(CACHED_RESOURCE_FILES
   # resources/icon.xpm //not functional anymore. Delete code?
   resources/icon2.xpm
-  resources/icon_calibration.xpm
+  resources/icon_US_calibration.svg
   plugin.xml
 )
 

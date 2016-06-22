@@ -267,16 +267,16 @@ public:
   void RemoveInfos()
   {
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos(prop1));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop1)", !service->HasInfos(prop1));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop4)", service->HasInfos(prop4));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", service->HasInfos(prop5));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop1)", !service->HasInfos(prop1,false));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop4)", service->HasInfos(prop4, false));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", service->HasInfos(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos(prop4));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop4)", !service->HasInfos(prop4));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", service->HasInfos(prop5));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop4)", !service->HasInfos(prop4, false));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", service->HasInfos(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos(prop5));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", !service->HasInfos(prop5));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop5)", !service->HasInfos(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos("unknown_prop"));
   }
@@ -289,13 +289,13 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if other info of other property name but same mime still exists", !service->GetInfos(prop4, "mime2", false).empty());
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos(prop5, "wrongMime"));
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5 with wrong mime", service->HasInfos(prop5));
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5 with wrong mime", service->HasInfos(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos(prop5, "mime5"));
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5", !service->HasInfos(prop5));
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5", !service->HasInfos(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfos("unkown_prop", "mime2"));
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if unkown property name but exting mime was used", service->HasInfos(prop4));
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if unkown property name but exting mime was used", service->HasInfos(prop4, false));
   }
 
 };

@@ -172,8 +172,7 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent* event)
       if ((*it).IsNotNull() && (*it)->HandleEvent(event, (*it)->GetDataNode()))
       {
         // Interactor can be deleted during HandleEvent(), so check it again
-        if ((*it).IsNotNull())
-        {
+        if ((*it).IsNotNull()) {
           // if an event is handled several properties are checked, in order to determine the processing mode of the dispatcher
           SetEventProcessingMode(*it);
         }

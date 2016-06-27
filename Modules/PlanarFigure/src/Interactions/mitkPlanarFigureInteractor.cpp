@@ -205,7 +205,7 @@ void mitk::PlanarFigureInteractor::DeleteFigure( StateMachineAction*, Interactio
 
 
 void mitk::PlanarFigureInteractor::PerformPointResetOnSelect( StateMachineAction*,
-                                                              InteractionEvent* interactionEvent )
+                                                              InteractionEvent* )
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
   planarFigure->ResetOnPointSelect();

@@ -625,6 +625,11 @@ bool mitk::PlanarFigure::ResetOnPointSelect()
   return false;
 }
 
+bool mitk::PlanarFigure::ResetOnPointSelectNeeded() const
+{
+  return false;
+}
+
 void mitk::PlanarFigure::RemoveControlPoint( unsigned int index )
 {
   if ( index > m_ControlPoints.size() )

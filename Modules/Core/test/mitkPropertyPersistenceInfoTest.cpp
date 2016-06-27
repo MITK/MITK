@@ -22,12 +22,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 
-::std::string testSerializeFunction(const mitk::BaseProperty* prop)
+::std::string testSerializeFunction(const mitk::BaseProperty* /*prop*/)
 {
   return "testSerialize";
 }
 
-mitk::BaseProperty::Pointer testDeserializeFunction(const std::string& value)
+mitk::BaseProperty::Pointer testDeserializeFunction(const std::string& /*value*/)
 {
   mitk::StringProperty::Pointer result = mitk::StringProperty::New("testSerialize");
   return result.GetPointer();

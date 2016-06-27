@@ -564,7 +564,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUIDAsName() const
   }
 }
 
-const int mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
+int mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
 {
   int result = 1;
   this->m_PropertyList->GetIntProperty("timesteps", result);
@@ -572,7 +572,7 @@ const int mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
   return result;
 };
 
-const int mitk::DICOMImageBlockDescriptor::GetNumberOfFramesPerTimeStep() const
+int mitk::DICOMImageBlockDescriptor::GetNumberOfFramesPerTimeStep() const
 {
   const int numberOfTimesteps = this->GetNumberOfTimeSteps();
   const int numberOfFramesPerTimestep = this->m_ImageFrameList.size() / numberOfTimesteps;

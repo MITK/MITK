@@ -62,12 +62,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMenu>
 #include <QMessageBox>
 #include <QTimer>
+#include <QFileInfo>
+#include <QFileInfoList>
+
 #include <QmitkPreferencesDialog.h>
 
 // Poco
 #include <Poco/Zip/Decompress.h>
 
 const QString QmitkXnatTreeBrowserView::VIEW_ID = "org.mitk.views.xnat.treebrowser";
+
+static bool isDirWriteable(QDir myDir)
+{
+  const QFileInfoList tmpInfo = myDir.entryInfoList();
+  foreach (QFileInfo f, tmpInfo)
+  {
+    if(f.fileName() == ".")
+      return f.isWritable();
+  }
+  return true;
+}
 
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
   m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
@@ -432,6 +446,18 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
   if (!index.isValid())
     return;
 
+  QDir rootDownloadDir(m_DownloadPath);
+  if(isDirWriteable(rootDownloadDir) == false)
+  {
+    MITK_INFO << "Download directory access permission unsufficient! " << m_DownloadPath;
+    QMessageBox::critical(nullptr,"Download directory access permission unsufficient!",
+                         "You have no permission to write to selected download directory " + m_DownloadPath);
+    QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+    _PreferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.XnatConnectionPreferencePage");
+    _PreferencesDialog.exec();
+    return;
+  }
+
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
   if (xnatObject != nullptr)
   {
@@ -488,13 +514,18 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
       QString uriId = file->parent()->resourceUri();
       uriId.replace("/data/archive/projects/", "");
 
+      bool filePathExists = true;
       QString folderName = m_DownloadPath + uriId + "/";
       downloadPath = folderName;
 
       QDir dir(downloadPath);
       if (!dir.exists())
       {
-        dir.mkpath(".");
+        if(!dir.mkpath("."))
+        {
+          filePathExists = false;
+          MITK_INFO << "Path Creation Failed.";
+        }
       }
 
       filePath = folderName + file->name();
@@ -527,18 +558,15 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
         }
         else
         {
-          this->SetStatusInformation("Downloading file " + file->name());
-
-          try
+          if(filePathExists)
           {
+            this->SetStatusInformation("Downloading file " + file->name());
             file->download(filePath);
           }
-          catch(...)
+          else
           {
-            QmitkHttpStatusCodeHandler::HandleErrorMessage("");
-            return;
+            MITK_INFO << "File Download Failed.";
           }
-
           serverURL = file->parent()->resourceUri();
 
           // Checking if the file exists now
@@ -556,13 +584,24 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
           }
           else
           {
-            MITK_INFO << "Download of " << file->name().toStdString() << " failed!";
-            QMessageBox msgBox;
-            msgBox.setText("Download of " + file->name() + " failed!");
-            msgBox.setIcon(QMessageBox::Critical);
-            msgBox.exec();
-            m_Controls.groupBox->hide();
-            return;
+            if(filePathExists)
+            {
+              MITK_INFO << "Download of " << file->name().toStdString() << " failed!";
+              QMessageBox::critical(m_Controls.treeView, "Download failed!", "Download of " + file->name() + " failed!");
+              m_Controls.groupBox->hide();
+              return;
+            }
+            else
+            {
+              MITK_INFO << "Download of " << file->name().toStdString() << " failed! Download Path not available!";
+              QMessageBox::critical(m_Controls.treeView, "Download failed!", "Download of " + file->name() + " failed!\nDownload Path "
+                                    + m_DownloadPath + " not available. Change Download Path in Settings!");
+              QmitkPreferencesDialog _PreferencesDialog(QApplication::activeWindow());
+              _PreferencesDialog.SetSelectedPage("org.mitk.gui.qt.application.XnatConnectionPreferencePage");
+              _PreferencesDialog.exec();
+              m_Controls.groupBox->hide();
+              return;
+            }
           }
         }
       }

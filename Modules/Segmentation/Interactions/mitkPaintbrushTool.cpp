@@ -378,29 +378,60 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 
   if (leftMouseButtonPressed)
   {
-    mitk::Point3D direction;
-    direction[0] = indexCoordinates[0] - m_LastPosition[0];
-    direction[1] = indexCoordinates[1] - m_LastPosition[1];
-    direction[2] = indexCoordinates[2] - m_LastPosition[2];
+    const double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
+    const double radius = static_cast<double>(m_Size) / 2.0;
 
-    direction[0] = direction.GetVnlVector().normalize()[0];
-    direction[1] = direction.GetVnlVector().normalize()[1];
-    direction[2] = direction.GetVnlVector().normalize()[2];
+    // draw it the old way
+    FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+    m_WorkingNode->SetData(m_WorkingSlice);
+    m_WorkingNode->Modified();
 
-    double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
-
-    double radius = static_cast<double>(m_Size) / 2.0;
-    size_t steps = (size_t)(dist / radius);
-
-    for ( size_t i = 0; i <= steps ; ++i )
+    // if points are >= radius away draw rectangle to fill empty holes
+    // in between the 2 points
+    if ( dist > radius )
     {
-      for (ContourModel::VertexIterator it = contour->Begin(); it != contour->End(); ++it)
-      {
-        Point3D& point = (*it)->Coordinates;
+      const mitk::Point3D& currentPos = indexCoordinates;
+      mitk::Point3D direction;
+      mitk::Point3D vertex;
+      mitk::Point3D normal;
 
-        point[0] -= direction[0] * radius ;
-        point[1] -= direction[1] * radius ;
-      }
+      direction[0] = indexCoordinates[0] - m_LastPosition[0];
+      direction[1] = indexCoordinates[1] - m_LastPosition[1];
+      direction[2] = indexCoordinates[2] - m_LastPosition[2];
+
+      direction[0] = direction.GetVnlVector().normalize()[0];
+      direction[1] = direction.GetVnlVector().normalize()[1];
+      direction[2] = direction.GetVnlVector().normalize()[2];
+
+      // 90 degrees rotation of direction
+      normal[0] = -1.0 * direction[1];
+      normal[1] = direction[0];
+
+      contour->Clear();
+
+      // upper left corner
+      vertex[0] = m_LastPosition[0] + (normal[0] * radius);
+      vertex[1] = m_LastPosition[1] + (normal[1] * radius);
+
+      contour->AddVertex(vertex);
+
+      // upper right corner
+      vertex[0] = currentPos[0] + (normal[0] * radius);
+      vertex[1] = currentPos[1] + (normal[1] * radius);
+
+      contour->AddVertex(vertex);
+
+      // lower right corner
+      vertex[0] = currentPos[0] - (normal[0] * radius);
+      vertex[1] = currentPos[1] - (normal[1] * radius);
+
+      contour->AddVertex(vertex);
+
+      // lower left corner
+      vertex[0] = m_LastPosition[0] - (normal[0] * radius);
+      vertex[1] = m_LastPosition[1] - (normal[1] * radius);
+
+      contour->AddVertex(vertex);
 
       FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
       m_WorkingNode->SetData(m_WorkingSlice);

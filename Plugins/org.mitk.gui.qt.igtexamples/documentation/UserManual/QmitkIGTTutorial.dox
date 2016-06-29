@@ -4,14 +4,13 @@
 This view is not meant as an end-user module. It contains tutorial program code that explains how to use the MITK-IGT component.
 
 It contains only two buttons. The "Start image guided therapy" button will create a virtual tracking device and a virtual tool.
-It will move the tool around on random paths in a tracking volume of 200x200x200 mm. The tool is visualized with a cone. 
+It will move the tool around on random paths in a tracking volume of 200x200x200 mm. The tool is visualized with a cone.
 If you do not see a cone moving around, you will need to initialize the rendering views correctly. Use the DataManager view to perform
 a global reinit.
 
 The symbol of this view is the following:
 
 \imageMacro{../../resources/IGTTutorial.png,"",2}
-
 
 In this tutorial we connect to the NDI Polaris tracking system (or alternatively use a virtual tracking device) and we will show the movement of a tool as cone in the StdMultiWidget editor.
 
@@ -30,8 +29,6 @@ First of all, you will have to add an IGT dependency to your cmake list. FOr thi
 
 More information on how to create your own plugin can be found here: \ref NewPluginPage
 
-The view looks like this:
-\imageMacro{IGTExampleIGT_QT_Tutorial_PluginView.png,"",15.90}
 When clicking the start button, a cone should move in the 3D view and stop after clicking the stop button.
 
 The view has several fuctions. Most of them deal with the basic functionality with the plugin (e.g. CreateQTPartControl or CreateConnections). For a deeper understanding, you might have a look at the files QmitkIGTTutorialView.cpp and QmitkIGTTutorialView.h

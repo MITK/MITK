@@ -46,7 +46,7 @@ public:
   /// Construct the widget with the given render window and the given preset values
   ///
   QmitkOpenCVVideoControls(QmitkVideoBackground* _VideoBackground, QmitkRenderWindow* _RenderWindow
-    , QWidget * parent = 0, Qt::WindowFlags f = 0);
+    , QWidget* parent = 0, Qt::WindowFlags f = 0);
 
   ///
   /// call reset if video playback is enabled here

@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMTagHelper.h>
 #include <mitkDICOMProperty.h>
 #include <mitkStringProperty.h>
+#include <mitkDicomSeriesReader.h>
 
 #include <mitkRTDoseReader.h>
 #include <mitkRTStructureSetReader.h>

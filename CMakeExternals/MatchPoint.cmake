@@ -33,7 +33,7 @@ if(NOT MatchPoint_DIR)
 
   ExternalProject_Add(${proj}
      ${download_step}
-     INSTALL_COMMAND ""
+     # INSTALL_COMMAND "${CMAKE_COMMAND} -P cmake_install.cmake"
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -51,11 +51,8 @@ if(NOT MatchPoint_DIR)
      DEPENDS ${proj_DEPENDENCIES}
     )
 
-  # MatchPoint does not support "make install" yet
-  # set(${proj}_DIR ${ep_prefix})
-  #  mitkFunctionInstallExternalCMakeProject(${proj})
   ExternalProject_Get_Property(${proj} binary_dir)
-  set(MatchPoint_DIR ${binary_dir})
+  set(${proj}_DIR ${binary_dir})
   mitkFunctionInstallExternalCMakeProject(${proj})
 
 else()

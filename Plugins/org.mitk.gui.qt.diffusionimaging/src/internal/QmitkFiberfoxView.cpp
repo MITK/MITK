@@ -663,30 +663,72 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-y", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[1]));
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Motion.Rotation-z", DoubleProperty::New(parameters.m_SignalGen.m_Rotation[2]));
 
-    if ( parameters.m_Misc.m_MotionVolumesBox=="random" )
+    if ( parameters.m_Misc.m_MotionVolumesBox == "random" )
     {
-      for (int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++)
+      for ( size_t i=0; i < parameters.m_SignalGen.GetNumVolumes(); ++i )
       {
-        parameters.m_SignalGen.m_MotionVolumes.push_back(rand()%2);
+        parameters.m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
       }
+      MITK_DEBUG << "QmitkFiberfoxView.cpp: Case m_Misc.m_MotionVolumesBox == \"random\".";
     }
-    else if ( !parameters.m_Misc.m_MotionVolumesBox.empty() )
-    {
-      for ( int i=0; i<parameters.m_SignalGen.GetNumVolumes(); i++ )
-      {
-        parameters.m_SignalGen.m_MotionVolumes.push_back(false);
-      }
 
+    else if ( ! parameters.m_Misc.m_MotionVolumesBox.empty() )
+    {
       stringstream stream( parameters.m_Misc.m_MotionVolumesBox );
-      int n;
-      while( stream >> n )
+      std::vector<int> numbers;
+      int nummer = std::numeric_limits<int>::max();
+      while( stream >> nummer )
       {
-        if ( n < parameters.m_SignalGen.GetNumVolumes() && n >= 0 )
+        if( nummer < std::numeric_limits<int>::max() )
         {
-          parameters.m_SignalGen.m_MotionVolumes[n] = true;
+          numbers.push_back( nummer );
         }
       }
+
+      // If a list of negative numbers is given:
+      if(    *(std::min_element( numbers.begin(), numbers.end() )) < 0
+          && *(std::max_element( numbers.begin(), numbers.end() )) <= 0 ) // cave: -0 == +0
+      {
+        for ( size_t i=0; i < parameters.m_SignalGen.GetNumVolumes(); ++i )
+        {
+          parameters.m_SignalGen.m_MotionVolumes.push_back( true );
+        }
+        // set all true except those given.
+        for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
+        {
+          if ( -(*iter) < parameters.m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
+          {
+            parameters.m_SignalGen.m_MotionVolumes.at( -(*iter) ) = false;
+          }
+        }
+        MITK_DEBUG << "QmitkFiberfoxView.cpp: Case list of negative numbers.";
+      }
+
+      // If a list of positive numbers is given:
+      else if(    *(std::min_element( numbers.begin(), numbers.end() )) >= 0
+               && *(std::max_element( numbers.begin(), numbers.end() )) >= 0 )
+      {
+        for ( size_t i=0; i < parameters.m_SignalGen.GetNumVolumes(); ++i )
+        {
+          parameters.m_SignalGen.m_MotionVolumes.push_back( false );
+        }
+        // set all false except those given.
+        for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter )
+        {
+          if ( *iter < parameters.m_SignalGen.GetNumVolumes() && *iter >= 0 )
+          {
+            parameters.m_SignalGen.m_MotionVolumes.at( *iter ) = true;
+          }
+        }
+        MITK_DEBUG << "QmitkFiberfoxView.cpp: Case list of positive numbers.";
+      }
+
+      else
+      {
+        MITK_ERROR << "QmitkFiberfoxView.cpp: Inconsistent list of numbers in m_MotionVolumesBox.";
+      }
     }
+
     else
     {
       MITK_WARN << "QmitkFiberfoxView.cpp: Unrecognised parameters.m_Misc.m_MotionVolumesBox: " << parameters.m_Misc.m_MotionVolumesBox;

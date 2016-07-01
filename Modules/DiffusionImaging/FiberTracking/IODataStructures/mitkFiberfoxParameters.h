@@ -39,7 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace std;
 
-namespace mitk {
+namespace mitk
+{
 
   /** Signal generation */
   class SignalGenerationParameters
@@ -56,7 +57,8 @@ namespace mitk {
       COIL_EXPONENTIAL
     };
 
-    enum AcquisitionType : int {
+    enum AcquisitionType : int
+    {
       SingleShotEpi,
       SpinEcho
     };
@@ -169,7 +171,8 @@ namespace mitk {
   {
   public:
 
-    enum FiberDistribution{
+    enum FiberDistribution
+    {
       DISTRIBUTE_UNIFORM, // distribute fibers uniformly in the ROIs
       DISTRIBUTE_GAUSSIAN // distribute fibers using a 2D gaussian
     };

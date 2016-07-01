@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
-#include <mbilog.h>
+#include <mitkLog.h>
 #include <algorithm>
 
 template< class ScalarType >
@@ -596,12 +596,14 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
       m_Misc.m_MotionVolumesBox = ReadVal<string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
       m_SignalGen.m_MotionVolumes.clear();
+
       if ( m_Misc.m_MotionVolumesBox == "random" )
       {
         for ( size_t i=0; i < m_SignalGen.GetNumVolumes(); ++i )
         {
           m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
         }
+        MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case m_Misc.m_MotionVolumesBox == \"random\".";
       }
       else if ( ! m_Misc.m_MotionVolumesBox.empty() )
       {
@@ -610,11 +612,14 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
         int nummer = std::numeric_limits<int>::max();
         while( stream >> nummer )
         {
-          numbers.push_back( nummer );
+          if( nummer < std::numeric_limits<int>::max() )
+            {
+              numbers.push_back( nummer );
+            }
         }
         // If a list of negative numbers is given:
         if( *(std::min_element( numbers.begin(), numbers.end() )) < 0
-            && *(std::max_element( numbers.begin(), numbers.end() )) < 0 )
+            && *(std::max_element( numbers.begin(), numbers.end() )) <= 0 ) // cave: -0 == +0
         {
           for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
           {
@@ -623,11 +628,12 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
           // set all true except those given.
           for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
           {
-            if ( -(*iter) < m_SignalGen.GetNumVolumes() && *iter < 0 )
+            if ( -(*iter) < m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
             {
-              m_SignalGen.m_MotionVolumes.at( *iter ) = false;
+              m_SignalGen.m_MotionVolumes.at( -(*iter) ) = false;
             }
           }
+          MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of negative numbers.";
         }
         // If a list of positive numbers is given:
         else if( *(std::min_element( numbers.begin(), numbers.end() )) >= 0
@@ -645,16 +651,17 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
               m_SignalGen.m_MotionVolumes.at( *iter ) = true;
             }
           }
+          MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of positive numbers.";
         }
         else
         {
-          MITK_INFO << "mitkFiberfoxParameters.cpp: Inconsistent list of numbers in m_MotionVolumesBox.";
+          MITK_WARN << "mitkFiberfoxParameters.cpp: Inconsistent list of numbers in m_MotionVolumesBox.";
           break;
         }
       }
       else
       {
-        MITK_INFO << "mitkFiberfoxParameters.cpp: Cannot make sense of string in m_MotionVolumesBox.";
+        MITK_WARN << "mitkFiberfoxParameters.cpp: Cannot make sense of string in m_MotionVolumesBox.";
         break;
       }
 
@@ -812,7 +819,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
     }
   }
 
-  try{
+  try
+  {
     itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
     reader->SetFileName(filename+"_FMAP.nrrd");
     reader->Update();
@@ -824,7 +832,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
     MITK_INFO << "No frequency map found.";
   }
 
-  try{
+  try
+  {
     itk::ImageFileReader<ItkUcharImgType>::Pointer reader = itk::ImageFileReader<ItkUcharImgType>::New();
     reader->SetFileName(filename+"_MASK.nrrd");
     reader->Update();

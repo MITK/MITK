@@ -25,16 +25,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCylinder.h>
 #include <mitkRenderWindow.h>
 #include <itksys/SystemTools.hxx>
-/**
-  * \brief This tutorial shows how to compose navigation datas. Therefore we render two objects.
-  * The first object is a cone that is tracked. The second object is a cylinder at a fixed position
-  * relative to the cone. At the end of the tracking, the cylinder is moved to its new relative position
-  * according to the last output of the tracking device.
-  * In addition to IGT tutorial step 1, the objects are added to a datastorage. Furthermore, a renderwindow
-  * is used for visual output.
-  */
+
+//The next line starts a snippet to display this code in the documentation. If you don't revise the documentation, don't remove it!
+//! [What we will do]
+
+//*************************************************************************
+// What we will do...
+//*************************************************************************
+// This tutorial shows how to compose navigation datas. Therefore we render two objects.
+//The first object is a cone that is tracked. The second object is a cylinder at a fixed position
+//relative to the cone. At the end of the tracking, the cylinder is moved to its new relative position
+//according to the last output of the tracking device.
+//In addition to IGT tutorial step 1, the objects are added to a datastorage. Furthermore, a renderwindow
+//is used for visual output.
+
+//! [What we will do]
 int main(int argc, char* argv[])
 {
+  //*************************************************************************
+  // Set up Render Window and Tracking Device
+  //*************************************************************************
+  //! [Render Window]
   //General code rendering the data in a renderwindow. See MITK Tutorial Step1 for more details.
   mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
   mitk::RenderWindow::Pointer renderWindow = mitk::RenderWindow::New();
@@ -42,18 +53,19 @@ int main(int argc, char* argv[])
 
   //Here, we want a 3D renderwindow
   renderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
-  renderWindow->GetVtkRenderWindow()->SetSize( 500, 500 );
-  renderWindow->GetRenderer()->Resize( 500, 500);
+  renderWindow->GetVtkRenderWindow()->SetSize(500, 500);
+  renderWindow->GetRenderer()->Resize(500, 500);
   //Connect datastorage and renderwindow
   renderWindow->GetRenderer()->SetDataStorage(dataStorage);
 
-  // --------------begin of moving object code -------------------------- //
+  //! [Render Window]
 
+  //! [Setup Tracking Device]
   //Virtual tracking device to generate random positions
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
   //Bounds (within the random numbers are generated) must be set before the tools are added
   double bound = 10.0;
-  mitk::ScalarType bounds[] = {-bound, bound, -bound, bound, -bound, bound};
+  mitk::ScalarType bounds[] = { -bound, bound, -bound, bound, -bound, bound };
   tracker->SetBounds(bounds);
   tracker->AddTool("tool1");
 
@@ -62,6 +74,13 @@ int main(int argc, char* argv[])
   source->SetTrackingDevice(tracker);
   source->Connect();
 
+  //! [Setup Tracking Device]
+
+  //*************************************************************************
+  // Create Objects
+  //*************************************************************************
+
+  //! [Moving Object]
   //Cone representation for rendering of the moving object
   mitk::Cone::Pointer cone = mitk::Cone::New();
   dataNode->SetData(cone);
@@ -73,12 +92,9 @@ int main(int argc, char* argv[])
   mitk::NavigationDataObjectVisualizationFilter::Pointer visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
   visualizer->SetInput(0, source->GetOutput());
   visualizer->SetRepresentationObject(0, cone);
-  source->StartTracking();
+  //! [Moving Object]
 
-  // --------------end of moving object code -------------------------- //
-
-  // --------------begin of fixed object code ------------------------- //
-
+  //! [Fixed Object]
   //Cylinder representation for rendering of the fixed object
   mitk::DataNode::Pointer cylinderNode = mitk::DataNode::New();
   mitk::Cylinder::Pointer cylinder = mitk::Cylinder::New();
@@ -106,18 +122,26 @@ int main(int argc, char* argv[])
   //apply rotation and translation
   mitk::NavigationData::Pointer fixedNavigationData = mitk::NavigationData::New(affineTransform3D);
   cylinder->GetGeometry()->SetIndexToWorldTransform(fixedNavigationData->GetAffineTransform3D());
+  //! [Fixed Object]
 
-  // --------------end of fixed object code ------------------------- //
+  //*************************************************************************
+  // The Tracking loop
+  //*************************************************************************
 
+  //! [Initialize views]
   // Global reinit with the bounds of the virtual tracking device
   mitk::TimeGeometry::Pointer timeGeometry = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
   mitk::BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(0);
   geometry->SetBounds(bounds);
 
-  mitk::RenderingManager::GetInstance()->InitializeViews( geometry );
+  mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
 
+  source->StartTracking();
+  //! [Initialize views]
+
+  //! [Tracking]
   //Generate and render 75 time steps to move the tracked object
-  for(int i=0; i < 75; ++i)
+  for (int i = 0; i < 75; ++i)
   {
     //Update the cone position
     visualizer->Update();
@@ -134,7 +158,13 @@ int main(int argc, char* argv[])
   //The tracking is done, now we want to move the fixed object to its correct relative position regarding the tracked object.
   source->StopTracking();
   source->Disconnect();
+  //! [Tracking]
 
+  //*************************************************************************
+  // Final Transform
+  //*************************************************************************
+
+  //! [Calculate Transform]
   //Now the tracking is finished and we can use the transformation to move
   //the fixed object to its correct position relative to the new position
   //of the moving/tracked object. Therefore, we compose the navigation datas.
@@ -149,4 +179,5 @@ int main(int argc, char* argv[])
 
   //Wait a little before closing the renderwindow
   itksys::SystemTools::Delay(2000);
+  //! [Calculate Transform]
 }

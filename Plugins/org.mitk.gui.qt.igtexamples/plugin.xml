@@ -3,7 +3,7 @@
 
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.igttutorial"
-          name="IGT Example: Tutorial Step 2"
+          name="IGT Example: IGT QT Tutorial"
           class="QmitkIGTTutorialView"
           icon="resources/icon_igt_simple_example.svg"/>
   </extension>

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 #include "ui_QmitkIGTTutorialViewControls.h"
-//#include "../IgttutorialDll.h"
 
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataObjectVisualizationFilter.h"

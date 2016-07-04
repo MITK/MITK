@@ -28,85 +28,85 @@ See LICENSE.txt or http://www.mitk.org for details.
 //ui header
 #include "ui_QmitkNavigationToolManagementWidgetControls.h"
 
- /** Documentation:
-  *   \brief An object of this class offers an UI to manage NavigationTools and
-  *       NavigationToolStorages. This means a user may create, save and load
-  *       single NavigationTools and/or NavigationToolStorages with this widget.
-  *
-  *      Be sure to call the Initialize-methode before you start the widget
-  *      otherwise some errors might occure.
-  *
-  *   \ingroup IGTUI
-  */
+/** Documentation:
+ *   \brief An object of this class offers an UI to manage NavigationTools and
+ *       NavigationToolStorages. This means a user may create, save and load
+ *       single NavigationTools and/or NavigationToolStorages with this widget.
+ *
+ *      Be sure to call the Initialize-methode before you start the widget
+ *      otherwise some errors might occure.
+ *
+ *   \ingroup IGTUI
+ */
 class MITKIGTUI_EXPORT QmitkNavigationToolManagementWidget : public QWidget
 {
   Q_OBJECT
 
-  public:
-    static const std::string VIEW_ID;
+public:
+  static const std::string VIEW_ID;
 
-    /** Initializes the widget. Has to be called before any action, otherwise errors might occur. */
-    void Initialize(mitk::DataStorage* dataStorage);
+  /** Initializes the widget. Has to be called before any action, otherwise errors might occur. */
+  void Initialize(mitk::DataStorage* dataStorage);
 
-    /** Loads a storage to the widget. The old storage storage is dropped, so be careful, if the
-     *  storage is not saved somewhere else it might be lost. You might want to ask the user if he
-     *  wants to save the storage to the harddisk before calling this method.
-     *  @param storageToLoad This storage will be loaded and might be modified by the user.
-     */
-    void LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad);
+  /** Loads a storage to the widget. The old storage storage is dropped, so be careful, if the
+   *  storage is not saved somewhere else it might be lost. You might want to ask the user if he
+   *  wants to save the storage to the harddisk before calling this method.
+   *  @param storageToLoad This storage will be loaded and might be modified by the user.
+   */
+  void LoadStorage(mitk::NavigationToolStorage::Pointer storageToLoad);
 
-    QmitkNavigationToolManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    ~QmitkNavigationToolManagementWidget();
+  QmitkNavigationToolManagementWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  ~QmitkNavigationToolManagementWidget();
 
-  signals:
+signals:
 
-    /** This signal is emmited if a new storage was added by the widget itself, e.g. because
-     *  a storage was loaded from the harddisk.
-     *  @param newStorage Holds the new storage which was added.
-     *  @param storageName Name of the new storage (e.g. filename)
-     */
-    void NewStorageAdded(mitk::NavigationToolStorage::Pointer newStorage, std::string storageName);
+  /** This signal is emmited if a new storage was added by the widget itself, e.g. because
+   *  a storage was loaded from the harddisk.
+   *  @param newStorage Holds the new storage which was added.
+   *  @param storageName Name of the new storage (e.g. filename)
+   */
+  void NewStorageAdded(mitk::NavigationToolStorage::Pointer newStorage, std::string storageName);
 
   protected slots:
 
-    //main widget page:
-    void OnAddTool();
-    void OnDeleteTool();
-    void OnEditTool();
-    void OnLoadTool();
-    void OnSaveTool();
-    void OnMoveToolUp();
-    void OnMoveToolDown();
-    void OnLoadStorage();
-    void OnSaveStorage();
-    void OnCreateStorage();
+  //main widget page:
+  void OnAddTool();
+  void OnDeleteTool();
+  void OnEditTool();
+  void OnLoadTool();
+  void OnSaveTool();
+  void OnMoveToolUp();
+  void OnMoveToolDown();
+  void OnLoadStorage();
+  void OnSaveStorage();
+  void OnCreateStorage();
 
-    //widget page "add tool":
-    void OnAddToolCancel();
-    void OnAddToolSave();
+  //widget page "add tool":
+  void OnAddToolCancel();
+  void OnAddToolSave();
 
-  protected:
+protected:
 
-    /// \brief Creation of the connections
-    virtual void CreateConnections();
+  /// \brief Creation of the connections
+  virtual void CreateConnections();
 
-    virtual void CreateQtPartControl(QWidget *parent);
+  virtual void CreateQtPartControl(QWidget *parent);
 
-    Ui::QmitkNavigationToolManagementWidgetControls* m_Controls;
+  Ui::QmitkNavigationToolManagementWidgetControls* m_Controls;
 
-    /** @brief holds the DataStorage */
-    mitk::DataStorage* m_DataStorage;
+  /** @brief holds the DataStorage */
+  mitk::DataStorage* m_DataStorage;
 
-    /** @brief holds the NavigationToolStorage we are working with. */
-    mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
+  /** @brief holds the NavigationToolStorage we are working with. */
+  mitk::NavigationToolStorage::Pointer m_NavigationToolStorage;
 
-    /** @brief shows if we are in edit mode, if not we create new navigation tool objects. */
-    bool m_edit;
+  /** @brief shows if we are in edit mode, if not we create new navigation tool objects. */
+  bool m_edit;
 
-    //############## private help methods #######################
-    void MessageBox(std::string s);
-    void UpdateToolTable();
-    void DisableStorageControls();
-    void EnableStorageControls();
+  //############## private help methods #######################
+  void MessageBox(std::string s);
+  void UpdateToolTable();
+  void DisableStorageControls();
+  void EnableStorageControls();
 };
 #endif

@@ -1,0 +1,50 @@
+/**
+\page IGTTutorialStepAdvanced A deeper look into the IGT Plugins
+
+We already know the three views of the IGT tracking plugin from the first tutorial step (\ref IGTTutorialStepPluginIntroduction): \ref org_mitk_views_igttrackingtoolbox , \ref org_mitk_views_igtnavigationtoolmanager and  \ref org_mitk_views_navigationdataplayer . While the first tutorial step only dealt with the usage of these views, we now want to have a deeper look at some parts of the code.
+
+\section AutoLoad Autoload all parameters from last session
+
+To increase the usability of the tracking toolbox, all parameters from the last session will be restored. Therefore, we will use the following code to save all parameters. It is also used in the specific tracking device widgets, but we will just have a look at one example, restoring some parameters like the Show-Tracking-Volume-Checkbox, the filename of the autosave path of the tool storage or the index of the tracking volume.
+
+To store the settings, the following code is used:
+
+\snippet QmitkMITKIGTTrackingToolboxView.cpp StoreUISettings
+
+We will reload it with
+\snippet QmitkMITKIGTTrackingToolboxView.cpp LoadUISettings
+
+\sectionLoadToolStorage Load Tool Storage
+
+This code will load a previously stored or autosaved tool storage:
+
+\snippet QmitkMITKIGTTrackingToolboxView.cpp LoadToolStorage
+
+TODO
+
+\section ThreadedTracking Threaded Tracking
+
+Usually, the tracking is done in a separate thread in order to still allow parallel usage of the workbench. If we track the devices in the same thread, the workbench might freeze.
+That's why we use thread workers
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 1
+...which are connected to functions
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 3
+
+The thread will be startet, if we connect a tracking device by pushing the connect button or start tracking etc:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 4
+
+...and finished afterwards:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 5
+
+You can access the data from the worker thread if needed:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 6
+
+Which of the functions is finally executed will be chosen in the ThreadFunc:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 7
+
+To deconstruct the workers, we first terminate the threads and then delete them
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 2
+
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+
+*/

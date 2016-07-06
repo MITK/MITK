@@ -39,9 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
 QmitkSimpleExampleView::QmitkSimpleExampleView()
-: m_Controls(NULL),
+: m_Controls(nullptr),
   m_NavigatorsInitialized(false),
-  m_Parent(NULL)
+  m_Parent(nullptr)
 {
 }
 
@@ -70,7 +70,7 @@ void QmitkSimpleExampleView::SetFocus()
 
 void QmitkSimpleExampleView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (renderWindowPart == NULL)
+  if (renderWindowPart == nullptr)
   {
     m_Parent->setEnabled(false);
     return;
@@ -181,7 +181,7 @@ QmitkRenderWindow* QmitkSimpleExampleView::GetSelectedRenderWindow() const
   QString id = m_Controls->renderWindowComboBox->currentText();
   if (id.isEmpty())
   {
-    return NULL;
+    return nullptr;
   }
   else
   {
@@ -191,24 +191,24 @@ QmitkRenderWindow* QmitkSimpleExampleView::GetSelectedRenderWindow() const
 
 void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
 
   vtkRenderer* renderer = this->GetSelectedRenderWindow()->GetRenderer()->GetVtkRenderer();
-  if (renderer == NULL)
+  if (renderer == nullptr)
     return;
   this->TakeScreenshot(renderer, 4, fileName);
 }
 
 void QmitkSimpleExampleView::OnTakeScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
 
   QmitkRenderWindow* renWin = this->GetSelectedRenderWindow();
-  if (renWin == NULL)
+  if (renWin == nullptr)
     return;
 
   vtkRenderer* renderer = renWin->GetRenderer()->GetVtkRenderer();
-  if (renderer == NULL)
+  if (renderer == nullptr)
     return;
   this->TakeScreenshot(renderer, 1, fileName);
 }
@@ -216,7 +216,7 @@ void QmitkSimpleExampleView::OnTakeScreenshot()
 
 void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
 {
-  if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
+  if ((renderer == nullptr) ||(magnificationFactor < 1) || fileName.isEmpty())
     return;
 
   bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );

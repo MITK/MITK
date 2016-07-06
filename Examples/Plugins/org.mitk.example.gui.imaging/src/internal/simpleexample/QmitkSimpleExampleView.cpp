@@ -39,9 +39,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
 QmitkSimpleExampleView::QmitkSimpleExampleView()
-: m_Controls(NULL),
+: m_Controls(nullptr),
   m_NavigatorsInitialized(false),
-  m_Parent(NULL)
+  m_Parent(nullptr)
 {
 }
 
@@ -70,7 +70,7 @@ void QmitkSimpleExampleView::SetFocus()
 
 void QmitkSimpleExampleView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (renderWindowPart == NULL)
+  if (renderWindowPart == nullptr)
   {
     m_Parent->setEnabled(false);
     return;
@@ -122,7 +122,6 @@ void QmitkSimpleExampleView::InitNavigators()
   mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);
   /* initialize the views to the bounding geometry */
   m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-  //m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(GetDefaultDataStorage());
 }
 
 void QmitkSimpleExampleView::GenerateMovie()
@@ -143,14 +142,14 @@ void QmitkSimpleExampleView::GenerateMovie()
   }
 }
 
-void QmitkSimpleExampleView::StereoSelectionChanged( int id )
+void QmitkSimpleExampleView::StereoSelectionChanged(int id)
 {
   /* From vtkRenderWindow.h tells us about stereo rendering:
   Set/Get what type of stereo rendering to use. CrystalEyes mode uses frame-sequential capabilities available in OpenGL to drive LCD shutter glasses and stereo projectors. RedBlue mode is a simple type of stereo for use with red-blue glasses. Anaglyph mode is a superset of RedBlue mode, but the color output channels can be configured using the AnaglyphColorMask and the color of the original image can be (somewhat maintained using AnaglyphColorSaturation; the default colors for Anaglyph mode is red-cyan. Interlaced stereo  mode produces a composite image where horizontal lines alternate between left and right views. StereoLeft and StereoRight modes choose one or the other stereo view. Dresden mode is yet another stereoscopic interleaving.
   */
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
-  vtkRenderWindow * vtkrenderwindow = this->GetSelectedRenderWindow()->GetVtkRenderWindow();
+  vtkRenderWindow * vtkrenderwindow = renderWindowPart->GetQmitkRenderWindow("3d")->GetVtkRenderWindow();
 
   // note: foreground vtkRenderers (at least the department logo renderer) produce errors in stereoscopic visualization.
   // Therefore, we disable the logo visualization during stereo rendering.
@@ -171,7 +170,6 @@ void QmitkSimpleExampleView::StereoSelectionChanged( int id )
     break;
   }
 
-
   mitk::BaseRenderer::GetInstance(vtkrenderwindow)->SetMapperID(mitk::BaseRenderer::Standard3D);
   renderWindowPart->RequestUpdate();
 }
@@ -181,7 +179,7 @@ QmitkRenderWindow* QmitkSimpleExampleView::GetSelectedRenderWindow() const
   QString id = m_Controls->renderWindowComboBox->currentText();
   if (id.isEmpty())
   {
-    return NULL;
+    return nullptr;
   }
   else
   {
@@ -191,32 +189,31 @@ QmitkRenderWindow* QmitkSimpleExampleView::GetSelectedRenderWindow() const
 
 void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
 
   vtkRenderer* renderer = this->GetSelectedRenderWindow()->GetRenderer()->GetVtkRenderer();
-  if (renderer == NULL)
+  if (renderer == nullptr)
     return;
   this->TakeScreenshot(renderer, 4, fileName);
 }
 
 void QmitkSimpleExampleView::OnTakeScreenshot()
 {
-  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  QString fileName = QFileDialog::getSaveFileName(nullptr, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
 
   QmitkRenderWindow* renWin = this->GetSelectedRenderWindow();
-  if (renWin == NULL)
+  if (renWin == nullptr)
     return;
 
   vtkRenderer* renderer = renWin->GetRenderer()->GetVtkRenderer();
-  if (renderer == NULL)
+  if (renderer == nullptr)
     return;
   this->TakeScreenshot(renderer, 1, fileName);
 }
 
-
 void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
 {
-  if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
+  if ((renderer == nullptr) ||(magnificationFactor < 1) || fileName.isEmpty())
     return;
 
   bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );

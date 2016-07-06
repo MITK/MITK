@@ -62,7 +62,7 @@ private:
   QmitkRenderWindow* GetSelectedRenderWindow() const;
 
   /// writes a screenshot in JPEG or PNG format to the file fileName
-  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName);
+  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
 
 private slots:
 
@@ -103,5 +103,8 @@ private:
   QScopedPointer<QmitkStepperAdapter> m_MovieStepper;
 
   QWidget* m_Parent;
+
+  QString m_PNGExtension = "PNG File (*.png)";
+  QString m_JPGExtension = "JPEG File (*.jpg)";
 };
 #endif // _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED

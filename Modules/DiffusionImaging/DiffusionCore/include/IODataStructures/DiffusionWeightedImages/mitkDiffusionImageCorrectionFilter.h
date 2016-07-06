@@ -71,6 +71,8 @@ public:
    */
   void CorrectDirections( const TransformMatrixType& );
 
+  virtual void GenerateOutputInformation() override {}
+
 
 protected:
   DiffusionImageCorrectionFilter();

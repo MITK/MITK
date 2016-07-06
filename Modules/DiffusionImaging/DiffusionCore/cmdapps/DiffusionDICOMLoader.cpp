@@ -27,6 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/Directory.hxx>
 
 #include "mitkDiffusionDICOMFileReader.h"
+#include "mitkSortByImagePositionPatient.h"
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMSortByTag.h"
 
@@ -41,6 +42,7 @@ static mitk::StringList& GetInputFilenames()
   return inputs;
 }
 
+// FIXME slash at the end
 void SetInputFileNames( std::string input_directory )
 {
   // I. Get all files in directory
@@ -54,7 +56,8 @@ void SetInputFileNames( std::string input_directory )
     if( ! itksys::SystemTools::FileIsDirectory( input.GetFile(idx)) )
     {
       std::string fullpath = input_directory + "/" + std::string( input.GetFile(idx) );
-      inputlist.push_back(  itksys::SystemTools::ConvertToOutputPath( fullpath.c_str() ) );
+      //inputlist.push_back(  itksys::SystemTools::ConvertToOutputPath( fullpath.c_str() ) );
+      inputlist.push_back(  fullpath.c_str() );
 
       MITK_INFO("dicom.loader.inputdir.addfile") << input.GetFile(idx);
     }
@@ -73,9 +76,9 @@ void SetInputFileNames( std::string input_directory )
 
 mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::string output_file )
 {
-  // repeat test with some more realistic sorting
-  mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New(); // this also tests destruction
-  mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
+  mitk::DiffusionDICOMFileReader::Pointer gdcmReader = mitk::DiffusionDICOMFileReader::New();
+  //mitk::ClassicDICOMSeriesReader::Pointer gdcmReader = mitk::ClassicDICOMSeriesReader::New();
+ /* mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
 
   // Use tags as in Qmitk
   // all the things that split by tag in DicomSeriesReader
@@ -84,23 +87,49 @@ mitk::Image::Pointer ReadInDICOMFiles( mitk::StringList& input_files, std::strin
   tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0030) ); // Pixel Spacing
   tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x1164) ); // Imager Pixel Spacing
   tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0037) ); // Image Orientation (Patient) // TODO add tolerance parameter (l. 1572 of original code)
+  // TODO handle as real vectors! cluster with configurable errors!
+  tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x000e) ); // Series Instance UID
   tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0018, 0x0050) ); // Slice Thickness
   tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0028, 0x0008) ); // Number of Frames
-  tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
+  //tagSorter->AddDistinguishingTag( mitk::DICOMTag(0x0020, 0x0052) ); // Frame of Reference UID
+
+  // gdcmReader->AddSortingElement( tagSorter );
+  //mitk::DICOMFileReaderTestHelper::TestOutputsContainInputs( gdcmReader );
 
   mitk::DICOMSortCriterion::ConstPointer sorting =
-      mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
-                                 mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012) //acquisition number
-                                                            ).GetPointer()
-                                 ).GetPointer();
+    mitk::SortByImagePositionPatient::New(  // Image Position (Patient)
+      //mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0013), // instance number
+         mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0020, 0x0012), // aqcuisition number
+            mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0032), // aqcuisition time
+               mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0018, 0x1060), // trigger time
+                  mitk::DICOMSortByTag::New( mitk::DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
+                ).GetPointer()
+              ).GetPointer()
+            ).GetPointer()
+         ).GetPointer()
+    // ).GetPointer()
+    ).GetPointer();
   tagSorter->SetSortCriterion( sorting );
 
-  MITK_INFO("dicom.loader.read.init") << "[]" ;
-  MITK_INFO("dicom.loader.read.inputs") << " " << input_files.size();
-
+  // mosaic
+  //gdcmReader->SetResolveMosaic( this->m_Controls->m_SplitMosaicCheckBox->isChecked() );
+  gdcmReader->AddSortingElement( tagSorter );*/
   gdcmReader->SetInputFiles( input_files );
-  gdcmReader->AddSortingElement( tagSorter );
-  gdcmReader->AnalyzeInputFiles();
+
+  try
+  {
+    gdcmReader->AnalyzeInputFiles();
+  }
+  catch( const itk::ExceptionObject &e)
+  {
+    MITK_ERROR << "Failed to analyze data. " << e.what();
+  }
+  catch( const std::exception &se)
+  {
+    MITK_ERROR << "Std Exception " << se.what();
+  }
+
+
   gdcmReader->LoadImages();
 
   mitk::Image::Pointer loaded_image = gdcmReader->GetOutput(0).GetMitkImage();
@@ -130,20 +159,22 @@ void SearchForInputInSubdirs( std::string root_directory, std::string subdir_pre
   {
     std::string current_path = rootdir.GetFile(idx);
 
-    std::string directory_path = std::string(rootdir.GetPath()) + std::string("/") + current_path;
+    std::string directory_path = std::string(rootdir.GetPath()) + current_path;
 
-    MITK_INFO("dicom.loader.inputrootdir.test") << "ProbePath:   " << current_path;
-    MITK_INFO("dicom.loader.inputrootdir.test") << "IsDirectory: " << itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
+    MITK_INFO("dicom.loader.inputrootdir.test") << "ProbePath:   " << current_path << "\n"
+                                                << "escaped to " <<  itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() );
+
+    MITK_INFO("dicom.loader.inputrootdir.test") << " IsDirectory: " << itksys::SystemTools::FileIsDirectory( directory_path.c_str() )
                                                 << " StartsWith: " << itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() );
 
     // test for prefix
-    if(    itksys::SystemTools::FileIsDirectory( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ).c_str() )
+    if(    itksys::SystemTools::FileIsDirectory( directory_path.c_str() )
            && itksys::SystemTools::StringStartsWith( current_path.c_str(), subdir_prefix.c_str() )
            )
     {
 
       MITK_INFO("dicom.loader.inputrootdir.searchin") << directory_path;
-      SetInputFileNames( itksys::SystemTools::ConvertToOutputPath( directory_path.c_str() ) );
+      SetInputFileNames( directory_path.c_str() );
 
       MITK_INFO("dicom.loader.inputrootdir.preload") << "[]" ;
       DiffusionImageType::Pointer dwi = ReadInDICOMFiles( GetInputFilenames(), "" );

@@ -181,7 +181,8 @@ void mitk::DiffusionDICOMFileReader
     MITK_ERROR << "Failed to parse input, retrieved 0 outputs from SeriesGDCMReader ";
   }
 
-  MITK_INFO("diffusion.dicomreader") << "Retrieved " << number_of_outputs << "outputs.";
+  MITK_INFO("diffusion.dicomreader") << "Retrieved " << number_of_outputs << " outputs.";
+  std::vector< bool > valid_input_list;
 
   for( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); outputidx++ )
   {
@@ -209,8 +210,20 @@ void mitk::DiffusionDICOMFileReader
     {
 
       // retrieve both vendor and image type
-      std::string vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
-      std::string image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
+      const char* ch_vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
+      const char* ch_image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
+
+      if( ch_vendor == NULL || ch_image_type == NULL )
+      {
+        MITK_WARN << "Unable to retrieve vendor/image information from " << frame_0->Filename.c_str() << "\n" <<
+                     "Output " << outputidx+1 << " is not valid, skipping analysis.";
+        valid_input_list.push_back(false);
+        continue;
+
+      }
+
+      std::string vendor = std::string( ch_vendor );
+      std::string image_type = std::string( ch_image_type );
       MITK_INFO("diffusion.dicomreader") << "Output " << outputidx+1 << "  Got vendor: " << vendor << " image type " << image_type;
 
       // parse vendor tag
@@ -244,12 +257,14 @@ void mitk::DiffusionDICOMFileReader
       if( headerReader.IsNull() )
       {
         MITK_ERROR << "No header reader for given vendor. ";
+        valid_input_list.push_back(false);
         continue;
       }
 
     }
     else
     {
+      valid_input_list.push_back(false);
       continue;
     }
 
@@ -275,10 +290,31 @@ void mitk::DiffusionDICOMFileReader
       m_IsMosaicData.push_back(isMosaic);
       m_OutputHeaderContainer.push_back( retrievedHeader );
       m_OutputReaderContainer.push_back( headerReader );
+      valid_input_list.push_back(true);
     }
   }
 
-  this->SetNumberOfOutputs( this->m_OutputHeaderContainer.size() );
+  // check status of the outputs and remove the non-valid
+  std::vector< DICOMImageBlockDescriptor > valid_outputs;
+  for ( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); ++outputidx )
+  {
+    if( valid_input_list.at(outputidx) )
+    {
+      valid_outputs.push_back( this->InternalGetOutput( outputidx ) );
+    }
+  }
+
+  // clear complete list
+  this->ClearOutputs();
+  this->SetNumberOfOutputs( valid_outputs.size() );
+
+  // insert only the valid ones
+  for ( unsigned int outputidx = 0; valid_outputs.size(); ++outputidx )
+  {
+      this->SetOutput( outputidx, valid_outputs.at( outputidx ) );
+  }
+
+
 
   for( unsigned int outputidx = 0; outputidx < this->GetNumberOfOutputs(); outputidx++ )
   {

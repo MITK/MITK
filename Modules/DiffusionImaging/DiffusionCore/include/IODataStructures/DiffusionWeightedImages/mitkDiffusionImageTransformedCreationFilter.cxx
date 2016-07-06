@@ -20,9 +20,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDiffusionImageTransformedCreationFilter.h"
 #include "mitkDiffusionImageCorrectionFilter.h"
 
+#include "mitkImageCast.h"
+#include "mitkImageWriteAccessor.h"
+#include "mitkImageTimeSelector.h"
+#include "mitkProperties.h"
+#include "mitkIOUtil.h"
+
+
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
 #include <itkWindowedSincInterpolateImageFunction.h>
+#include <itkBSplineInterpolateImageFunction.h>
 #include <itkLinearInterpolateImageFunction.h>
 
 
@@ -43,14 +51,25 @@ static void ResampleImage( typename ItkImageType::Pointer itk_reference,
 
   typedef itk::WindowedSincInterpolateImageFunction< ItkImageType, 7> WindowedSincInterpolatorType;
   typename WindowedSincInterpolatorType::Pointer sinc_interpolator = WindowedSincInterpolatorType::New();
+
+  typedef itk::BSplineInterpolateImageFunction< ItkImageType, double, double> BSplineInterpolatorType;
+  typename BSplineInterpolatorType::Pointer bicubic_interpolator = BSplineInterpolatorType::New();
+  bicubic_interpolator->SetSplineOrder(3);
+
   typedef typename itk::ResampleImageFilter<  ItkImageType, ItkImageType, double> ResampleImageFilterType;
   typename ResampleImageFilterType::Pointer resampler = ResampleImageFilterType::New();
 
-  resampler->SetInterpolator( linear_interpolator );
-  if( interpolator == mitk::DiffusionImageTransformedCreationFilter<TTransformType>::WindowedSinc )
-    resampler->SetInterpolator( sinc_interpolator );
-  if ( interpolator == mitk::DiffusionImageTransformedCreationFilter<TTransformType>::NearestNeighbor )
-    resampler->SetInterpolator ( nn_interpolator );
+  // Create interpolator pool
+  typedef itk::InterpolateImageFunction< ItkImageType, double> InterpolateFunctionBaseType;
+  std::vector< InterpolateFunctionBaseType* > InterpolateFunctionsPool;
+
+  InterpolateFunctionsPool.push_back( nn_interpolator.GetPointer() );
+  InterpolateFunctionsPool.push_back( linear_interpolator.GetPointer() );
+  InterpolateFunctionsPool.push_back( bicubic_interpolator.GetPointer() );
+  InterpolateFunctionsPool.push_back( sinc_interpolator.GetPointer() );
+
+  // select interpolator by the selection flag
+  resampler->SetInterpolator( InterpolateFunctionsPool.at( interpolator ) );
 
   typename ItkImageType::Pointer itk_input;
   mitk::CastToItkImage< ItkImageType >( mitk_input, itk_input );
@@ -89,7 +108,7 @@ template< typename TTransformType>
 mitk::DiffusionImageTransformedCreationFilter<TTransformType>
 ::DiffusionImageTransformedCreationFilter()
 {
-
+  this->m_OutputPrefix = "/tmp/";
 }
 
 template< typename TTransformType>
@@ -117,6 +136,14 @@ mitk::DiffusionImageTransformedCreationFilter<TTransformType>
 }
 
 template< typename TTransformType>
+void mitk::DiffusionImageTransformedCreationFilter< TTransformType >
+::GenerateOutputInformation()
+{
+  MITK_INFO << "Debug info";
+}
+
+
+template< typename TTransformType>
 void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
 ::GenerateData()
 {
@@ -138,10 +165,8 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   ImageType::Pointer current_itk_reference = ImageType::New();
   CastToItkImage( this->m_ResamplingReferenceImage, current_itk_reference );
 
-  mitk::IOUtil::Save( input, "/tmp/resampled_3dnt_pre.nrrd");
-
-  auto time_dim = input->GetDimension(3);
-  for( auto time_idx = 0; time_idx < time_dim; time_idx++ )
+  unsigned int time_dim = input->GetDimension(3);
+  for( unsigned int time_idx = 0; time_idx < time_dim; time_idx++ )
   {
 
     mitk::ImageTimeSelector::Pointer t_sel = mitk::ImageTimeSelector::New();
@@ -159,14 +184,11 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   mitk::DiffusionImageCreationFilter::Pointer creator =
       mitk::DiffusionImageCreationFilter::New();
 
-  mitk::IOUtil::Save( resampled_output, "/tmp/resampled_3dnt_post.nrrd");
-
   creator->SetInput( resampled_output );
   creator->SetHeaderDescriptor( this->GetTransformedHeaderInformation() );
   creator->Update();
 
-  mitk::Image::Pointer output = this->GetOutput();
-  output->Initialize( creator->GetOutput() );
+  mitk::Image::Pointer output = creator->GetOutput();
 
   typedef mitk::DiffusionPropertyHelper DPH;
   float BValue = mitk::DiffusionPropertyHelper::GetReferenceBValue( creator->GetOutput() );
@@ -182,11 +204,12 @@ void mitk::DiffusionImageTransformedCreationFilter<TTransformType>
   corrector->SetImage( output) ;
   corrector->CorrectDirections( this->m_RotationMatrices );
 
+  DPH pHelper( output );
+  pHelper.InitializeImage();
 
-  output->Modified();
-
-
-  mitk::IOUtil::Save( output, "/tmp/resampled_dw.dwi");
+  m_OutputCache = output;
+  this->SetPrimaryOutput( m_OutputCache );
+  m_OutputCache->Modified();
 }
 
 template< typename TTransformType>

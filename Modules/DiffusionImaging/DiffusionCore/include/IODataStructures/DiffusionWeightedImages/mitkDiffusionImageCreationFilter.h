@@ -86,6 +86,8 @@ public:
 
   virtual void GenerateData() override;
 
+  virtual void GenerateOutputInformation() override;
+
 protected:
   DiffusionImageCreationFilter();
   ~DiffusionImageCreationFilter();
@@ -94,9 +96,11 @@ protected:
   MeasurementFrameType InternalGetMeasurementFrame();
   float InternalGetBValue();
 
-  VectorImageType::Pointer RemapIntoVectorImage( mitk::Image::Pointer input);
+  mitk::Image::Pointer RemapIntoVectorImage( mitk::Image::Pointer input);
 
   mitk::Image::Pointer m_ReferenceImage;
+
+  mitk::Image::Pointer m_OutputCache;
 
   DiffusionImageHeaderDescriptor m_HeaderDescriptor;
   bool m_HeaderDescriptorSet;

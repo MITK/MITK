@@ -46,7 +46,8 @@ public:
   enum InterpolatorLevel
   {
     NearestNeighbor = 0,
-    Linear,
+    Trilinear,
+    BSpline_Bicubic,
     WindowedSinc
   };
 
@@ -77,6 +78,13 @@ public:
     this->m_DiffusionReferenceImage = dwimage;
   }
 
+  void SetOutputPrefix( std::string prefix )
+{
+  this->m_OutputPrefix = prefix;
+}
+
+  virtual void GenerateOutputInformation() override;
+
 protected:
   DiffusionImageTransformedCreationFilter();
   ~DiffusionImageTransformedCreationFilter();
@@ -93,10 +101,16 @@ protected:
 
   typedef DiffusionImageCorrectionFilter::TransformMatrixType MatrixType;
   std::vector< MatrixType > m_RotationMatrices;
+
+  std::string m_OutputPrefix;
+
+  mitk::Image::Pointer m_OutputCache;
 };
 
-#include "mitkDiffusionImageTransformedCreationFilter.cxx"
-
 } // end namespace mitk
+
+#ifndef ITK_MANUAL_INSTANTIATION
+  #include "mitkDiffusionImageTransformedCreationFilter.cxx"
+#endif
 
 #endif // DIFFUSIONIMAGETRANSFORMEDCREATIONFILTER_H

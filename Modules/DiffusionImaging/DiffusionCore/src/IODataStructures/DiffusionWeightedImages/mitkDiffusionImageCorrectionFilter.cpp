@@ -96,7 +96,6 @@ void mitk::DiffusionImageCorrectionFilter
 
   // replace the old directions with the corrected ones
   m_SourceImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( corrected_directions ) );
-
 }
 
 

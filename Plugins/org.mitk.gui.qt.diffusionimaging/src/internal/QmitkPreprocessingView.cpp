@@ -1224,7 +1224,11 @@ void QmitkPreprocessingView::DoLengthCorrection()
     filter->SetReferenceGradientDirectionContainer( static_cast<mitk::GradientDirectionsProperty*>( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
     filter->Update();
 
-    mitk::Image::Pointer newImage = mitk::ImportItkImage( itkVectorImagePointer );
+    mitk::Image::Pointer newImage = mitk::Image::New();//mitk::ImportItkImage( itkVectorImagePointer );
+    newImage->InitializeByItk( itkVectorImagePointer.GetPointer() );
+    newImage->SetImportVolume( itkVectorImagePointer->GetBufferPointer(), 0, 0, mitk::Image::CopyMemory);
+    itkVectorImagePointer->GetPixelContainer()->ContainerManageMemoryOff();
+
     newImage->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( filter->GetOutputGradientDirectionContainer() ) );
     newImage->SetProperty( mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( filter->GetNewBValue() ) );
     newImage->SetProperty( mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( static_cast<mitk::MeasurementFrameProperty*>(image->GetProperty(mitk::DiffusionPropertyHelper::MEASUREMENTFRAMEPROPERTYNAME.c_str()).GetPointer() )->GetMeasurementFrame() ) );

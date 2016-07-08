@@ -97,6 +97,14 @@ public:
   */
   QwtPlot* GetPlot();
 
+  /**
+    * Set the title using (formatted) QwtText object
+    */
+  void SetPlotTitle(const QwtText& qwt_title);
+
+  /**
+    * Set plain text title, using default formatting
+    */
   void SetPlotTitle(const char* title);
 
   /**

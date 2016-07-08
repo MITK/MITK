@@ -77,9 +77,15 @@ unsigned int QmitkPlotWidget::InsertCurve(const char* title, QColor color )
   return static_cast<unsigned int> (m_PlotCurveVector.size() - 1);
 }
 
+void QmitkPlotWidget::SetPlotTitle(const QwtText &qwt_title)
+{
+  this->m_Plot->setTitle( qwt_title );
+}
+
 void QmitkPlotWidget::SetPlotTitle(const char* title)
 {
-  m_Plot->setTitle(title);
+  QwtText qwt_title_text(title);
+  this->SetPlotTitle(qwt_title_text);
 }
 
 void QmitkPlotWidget::SetAxisTitle(int axis, const char* title)

@@ -121,7 +121,6 @@ int mitkPointSetLocaleTest(int, char*[])
   refPointSet->SetPoint(0, refPoint);
 
   //create locale list
-  std::ofstream stream;
 
   typedef std::list<std::string> StringList;
   StringList alllocales;

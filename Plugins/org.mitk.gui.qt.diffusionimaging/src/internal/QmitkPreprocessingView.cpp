@@ -1536,8 +1536,10 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
 
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
     bool multiComponentVolume = (image->GetPixelType().GetNumberOfComponents() > 1);
+    bool threeDplusTVolume = (image->GetTimeSteps() > 1);
 
-    bool foundSingleImageVolume = foundDwiVolume || (foundImageVolume && (!multiComponentVolume));
+    // we do not support multi-component and 3D+t images in the widget, check early to avoid access exception
+    bool foundSingleImageVolume = foundDwiVolume || (foundImageVolume && (!multiComponentVolume) && (!threeDplusTVolume) );
 
     m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
     m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);

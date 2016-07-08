@@ -55,8 +55,6 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   static long int sum_orig_Pic3D_pic_gz = 14685408;
 
-  std::string argv_str(argv[1]);
-
   mitkIpPicGetTags(argv[1], picheader);
 
   //Read pic-Image from file

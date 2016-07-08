@@ -194,12 +194,11 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
   TimeGeometry* timeGeom = GetTimeGeometry();
 
   assert (timeGeom != nullptr);
-  BaseGeometry* geometry;
 
   TimeStepType steps = timeGeom->CountTimeSteps();
   for (TimeStepType timestep = 0; timestep < steps; ++timestep)
   {
-    geometry = GetGeometry(timestep);
+    auto geometry = GetGeometry(timestep);
     if (geometry != nullptr)
     {
       geometry->SetOrigin(origin);
@@ -288,7 +287,7 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
     os << "Properties of BaseData:" << std::endl;
 
     const PropertyList::PropertyMap* map = propertyList->GetMap();
-    for (PropertyList::PropertyMap::const_iterator iter = map->begin(); iter != map->end(); iter++)
+    for (PropertyList::PropertyMap::const_iterator iter = map->begin(); iter != map->end(); ++iter)
     {
       os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;
     }

@@ -159,7 +159,7 @@ const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
   for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = all->Begin(); nodeIt != all->End(); nodeIt++)  // for each node
   {
     mitk::PropertyList* pl = nodeIt.Value()->GetPropertyList();
-    for (mitk::PropertyList::PropertyMap::const_iterator propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end(); propIt++)
+    for (mitk::PropertyList::PropertyMap::const_iterator propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end(); ++propIt)
       if (dynamic_cast<mitk::GroupTagProperty*>(propIt->second.GetPointer()) != NULL)
         result.insert(propIt->first);
   }
@@ -341,7 +341,7 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
             }
           }
         }
-        catch(itk::ExceptionObject e)
+        catch(itk::ExceptionObject& e)
         {
           MITK_ERROR << e << std::endl;
         }

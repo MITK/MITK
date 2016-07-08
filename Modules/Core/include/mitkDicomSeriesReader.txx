@@ -53,8 +53,6 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
     reader->AddObserver(itk::ProgressEvent(), command);
   }
 
-  unsigned int act_volume = 1u;
-
   if (preLoadedImageBlock.IsNull())
   {
     reader->SetFileNames(imageBlocks.front());
@@ -98,6 +96,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
 
   if ( preLoadedImageBlock.IsNull() )
   {
+    unsigned int act_volume = 1u;
     for (auto df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
     {
       reader->SetFileNames(*df_it);

@@ -717,12 +717,12 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   mitk::DataNode::Pointer node;
   mitk::DataNode::Pointer topSourceNode;
 
-  bool isBinary (false);
   int component = 0;
 
   node = this->GetTopLayerNode(nodes,worldposition,posEvent->GetSender());
   if(node.IsNotNull())
   {
+    bool isBinary (false);
     node->GetBoolProperty("binary", isBinary);
     if(isBinary)
     {
@@ -918,12 +918,13 @@ bool mitk::DisplayInteractor::GetBoolProperty( mitk::PropertyList::Pointer prope
 mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes, mitk::Point3D worldposition, BaseRenderer *ren)
 {
   mitk::DataNode::Pointer node;
-  int  maxlayer = -32768;
-  bool isHelper (false);
+
   if(nodes.IsNotNull())
   {
+    int  maxlayer = -32768;
     for (unsigned int x = 0; x < nodes->size(); x++)
     {
+      bool isHelper (false);
       nodes->at(x)->GetBoolProperty("helper object", isHelper);
       if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
       {

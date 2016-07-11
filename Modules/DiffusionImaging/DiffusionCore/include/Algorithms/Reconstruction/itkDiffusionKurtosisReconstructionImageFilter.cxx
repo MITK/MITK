@@ -21,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkDiffusionKurtosisReconstructionImageFilter.h"
 
 #include <itkImageRegionConstIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 
 template< class TInputPixelType>
@@ -78,17 +80,20 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   {
    itk::kurtosis_fit_lsq_function kurtosis_cost_fn( fit_measurements.size() );
    kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
+   kurtosis_cost_fn.use_bounds();
 
    vnl_levenberg_marquardt nonlinear_fit( kurtosis_cost_fn );
    nonlinear_fit.minimize(result);
   }
 }
 
+
+
 template< class TInputPixelType, class TOutputPixelType>
 itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::DiffusionKurtosisReconstructionImageFilter()
   : m_ReferenceBValue(-1),
-    m_OmitBZero(true)
+    m_OmitBZero(false)
 {
   this->m_InitialPosition = vnl_vector<double>(3, 0);
   this->m_InitialPosition[2] = 1000.0; // S_0
@@ -110,9 +115,74 @@ itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelTyp
 
 template< class TInputPixelType, class TOutputPixelType>
 void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
+::GenerateOutputInformation()
+{
+  // first call superclass
+  Superclass::GenerateOutputInformation();
+}
+
+template< class TInputPixelType, class TOutputPixelType>
+void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::BeforeThreadedGenerateData()
 {
 
+}
+
+template< class TInputPixelType, class TOutputPixelType>
+void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
+::AfterThreadedGenerateData()
+{
+ /* // initialize buffer to zero overall, but don't forget the requested region pointer
+  for( unsigned int i=0; i<this->GetNumberOfOutputs(); ++i)
+  {
+    typename OutputImageType::Pointer output = this->GetOutput(i);
+
+    // after generating, set the buffered region to max, we have taken care about filling it with valid data in
+    // UpdateOutputInformation, if not set, a writer (or any filter using the LargestPossibleRegion() during update may
+    // complain about not getting the requested region
+    output->SetBufferedRegion( output->GetLargestPossibleRegion() );
+
+    std::cout << "[DiffusionKurtosisReconstructionImageFilter.After]" << output->GetLargestPossibleRegion() << std::endl;
+  }*/
+
+}
+
+template< class TInputPixelType, class TOutputPixelType>
+typename itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>::KurtosisSnapshot
+itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
+::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, vnl_vector<double> bvalues, bool omit_bzero)
+{
+  // initialize
+  vnl_vector<double> initial_position;
+  if( !this->m_OmitBZero )
+  {
+    initial_position.set_size(2);
+    initial_position[0] = this->m_InitialPosition[0];
+    initial_position[1] = this->m_InitialPosition[1];
+
+  }
+  else
+  {
+    initial_position.set_size(3);
+    initial_position = this->m_InitialPosition;
+  }
+
+  // fit
+  FitSingleVoxel( input, bvalues, initial_position, omit_bzero );
+
+  // assembly result snapshot
+  KurtosisSnapshot result;
+  result.m_D = initial_position[0];
+  result.m_K = initial_position[1];
+
+  if( omit_bzero )
+  {
+    result.m_f = 1 - initial_position[2] / std::max(0.01, input.GetElement(0));
+  }
+  else
+    result.m_f = 1;
+
+  return result;
 }
 
 template< class TInputPixelType, class TOutputPixelType>
@@ -161,15 +231,17 @@ template< class TInputPixelType, class TOutputPixelType>
 void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType /*threadId*/)
 {
-  typename OutputImageType::Pointer dImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
-  itk::ImageRegionIterator< OutputImageType > dImageIt(dImage, outputRegionForThread);
+  std::cout << "[ThreadedGenerateData]" << outputRegionForThread;
+
+  typename OutputImageType::Pointer dImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+  itk::ImageRegionIteratorWithIndex< OutputImageType > dImageIt(dImage, outputRegionForThread);
   dImageIt.GoToBegin();
 
-  typename OutputImageType::Pointer kImage = static_cast< OutputImageType * >(this->ProcessObject::GetPrimaryOutput());
-  itk::ImageRegionIterator< OutputImageType > kImageIt(kImage, outputRegionForThread);
+  typename OutputImageType::Pointer kImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(1));
+  itk::ImageRegionIteratorWithIndex< OutputImageType > kImageIt(kImage, outputRegionForThread);
   kImageIt.GoToBegin();
 
-  typedef itk::ImageRegionConstIterator< InputImageType > InputIteratorType;
+  typedef itk::ImageRegionConstIteratorWithIndex< InputImageType > InputIteratorType;
   InputIteratorType inputIter( this->GetInput(), outputRegionForThread );
   inputIter.GoToBegin();
 
@@ -193,12 +265,22 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
     vnl_vector<double> result = initial_position;
 
     // fit single voxel
-    FitSingleVoxel( inputIter.Get(), this->m_BValues, result, this->m_OmitBZero );
+
+    if( m_MapOutputRegion.IsInside( inputIter.GetIndex() ) )
+    {
+      FitSingleVoxel( inputIter.Get(), this->m_BValues, result, this->m_OmitBZero );
+    }
+    else
+    {
+      result.fill(0);
+    }
 
     // regardless the fit type, the parameters are always in the first two position
     // of the results vector
     dImageIt.Set( result[0] );
     kImageIt.Set( result[1] );
+
+    //std::cout << "[Kurtosis.Fit]" << inputIter.GetIndex() << " --> " << dImageIt.GetIndex() << " result: " << result << std::endl;
 
     ++inputIter;
     ++dImageIt;

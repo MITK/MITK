@@ -223,10 +223,7 @@ public:
   void SetOmitUnweightedValue( bool flag)
   { this->m_OmitBZero = flag; }
 
-  /** Set the smoothing parameter (gaussian) for estimating the maps */
-  void SetSmoothingSigma( const double sigma );
-
-  KurtosisSnapshot GetSnapshot();
+  KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, vnl_vector<double> bvalues, bool omit_bzero);
 
   /** Set the reference bvalue of the input DW image */
   void SetReferenceBValue( double bvalue )
@@ -235,15 +232,21 @@ public:
   /** Set the gradient directions */
   void SetGradientDirections( GradientDirectionContainerType::Pointer gradients );
 
+  /** Restrict map generation to an image region */
+  void SetMapOutputRegion( OutputImageRegionType region )
+  { m_MapOutputRegion = region; }
+
 protected:
   DiffusionKurtosisReconstructionImageFilter();
   virtual ~DiffusionKurtosisReconstructionImageFilter() {}
 
+  void GenerateOutputInformation() override;
+
+  void AfterThreadedGenerateData() override;
+
   void BeforeThreadedGenerateData() override;
 
   void ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
-
-  void AfterThreadedGenerateData() {}
 
   double m_ReferenceBValue;
 
@@ -252,6 +255,8 @@ protected:
   vnl_vector<double> m_InitialPosition;
 
   bool m_OmitBZero;
+
+  OutputImageRegionType m_MapOutputRegion;
 
 private:
 

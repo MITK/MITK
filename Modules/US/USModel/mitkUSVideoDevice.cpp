@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSVideoDevice.h"
 #include "mitkUSVideoDeviceCustomControls.h"
 
-
 mitk::USVideoDevice::USVideoDevice(int videoDeviceNumber, std::string manufacturer, std::string model) : mitk::USDevice(manufacturer, model)
 {
   Init();
@@ -91,7 +90,8 @@ bool mitk::USVideoDevice::OnConnection()
 {
   if (m_SourceIsFile){
     m_Source->SetVideoFileInput(m_FilePath);
-  } else {
+  }
+  else {
     m_Source->SetCameraInput(m_DeviceID);
   }
   //SetSourceCropArea();
@@ -110,7 +110,7 @@ bool mitk::USVideoDevice::OnDisconnection()
 bool mitk::USVideoDevice::OnActivation()
 {
   // make sure that video device is ready before aquiring images
-  if ( ! m_Source->GetIsReady() )
+  if (!m_Source->GetIsReady())
   {
     MITK_WARN("mitkUSDevice")("mitkUSVideoDevice") << "Could not activate us video device. Check if video grabber is configured correctly.";
     return false;
@@ -137,4 +137,25 @@ void mitk::USVideoDevice::UnregisterOnService()
 mitk::USImageSource::Pointer mitk::USVideoDevice::GetUSImageSource()
 {
   return m_Source.GetPointer();
+}
+
+std::vector<mitk::USProbe::Pointer> mitk::USVideoDevice::GetAllProbes()
+{
+  if (m_Probes.empty())
+  {
+    MITK_INFO << "No probes exist for this USVideDevice. Empty vector is returned";
+  }
+  return m_Probes;
+}
+
+mitk::USProbe::Pointer mitk::USVideoDevice::GetCurrentProbe()
+{
+  if (m_CurrentProbe.IsNotNull())
+  {
+    return m_CurrentProbe;
+  }
+  else
+  {
+    return 0;
+  }
 }

@@ -159,3 +159,7 @@ mitk::USProbe::Pointer mitk::USVideoDevice::GetCurrentProbe()
     return 0;
   }
 }
+
+void mitk::USVideoDevice::AddNewProbe()
+{
+}

@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US","Device Settings")
+mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US", "Device Settings")
 {
 }
 
@@ -33,7 +33,7 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
   std::vector<us::ServiceReference<USDevice> > services = thisContext->GetServiceReferences<USDevice>();
   MITK_INFO << "Trying to save " << services.size() << " US devices.";
   int numberOfSavedDevices = 0;
-  for(std::vector<us::ServiceReference<USDevice> >::iterator it = services.begin(); it != services.end(); ++it)
+  for (std::vector<us::ServiceReference<USDevice> >::iterator it = services.begin(); it != services.end(); ++it)
   {
     mitk::USDevice::Pointer currentDevice = thisContext->GetService(*it);
     //check if it is a USVideoDevice
@@ -41,7 +41,7 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
     {
       mitk::USVideoDevice::Pointer currentVideoDevice = dynamic_cast<mitk::USVideoDevice*>(currentDevice.GetPointer());
       QString identifier = "device" + QString::number(numberOfSavedDevices);
-      m_devices.setValue(identifier,USVideoDeviceToString(currentVideoDevice));
+      m_devices.setValue(identifier, USVideoDeviceToString(currentVideoDevice));
       numberOfSavedDevices++;
     }
 
@@ -50,7 +50,7 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
       MITK_WARN << "Saving of US devices of the type " << currentDevice->GetDeviceClass() << " is not supported at the moment. Skipping device.";
     }
   }
-  m_devices.setValue("numberOfSavedDevices",numberOfSavedDevices);
+  m_devices.setValue("numberOfSavedDevices", numberOfSavedDevices);
   MITK_INFO << "Successfully saved " << numberOfSavedDevices << " US devices.";
 }
 
@@ -60,12 +60,12 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
 
   int numberOfSavedDevices = m_devices.value("numberOfSavedDevices").toInt();
 
-  for(int i=0; i<numberOfSavedDevices; i++)
+  for (int i = 0; i < numberOfSavedDevices; i++)
   {
     // Try each device. If an exception occurs: Ignore device and notify user
     try
     {
-      QString currentString = m_devices.value("device"+QString::number(i)).toString();
+      QString currentString = m_devices.value("device" + QString::number(i)).toString();
       mitk::USDevice::Pointer currentDevice = dynamic_cast<mitk::USDevice*>(StringToUSVideoDevice(currentString).GetPointer());
       //currentDevice->Initialize();
       devices.push_back(currentDevice.GetPointer());
@@ -92,7 +92,7 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
   if (file == "") file = "none";
 
   mitk::USImageVideoSource::Pointer imageSource = dynamic_cast<mitk::USImageVideoSource*>(d->GetUSImageSource().GetPointer());
-  if ( ! imageSource )
+  if (!imageSource)
   {
     MITK_ERROR << "There is no USImageVideoSource at the current device.";
     mitkThrow() << "There is no USImageVideoSource at the current device.";
@@ -105,22 +105,26 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
 
   mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
 
+  //TODO store the probes of the device. For now its jus a dummy thing for testing purpose
+  QString probes = "probes";
+
   char seperator = '|';
 
   QString returnValue = manufacturer + seperator
-                       + model + seperator
-                       + comment + seperator
-                       + QString::number(source) + seperator
-                       + file.c_str() + seperator
-                       + QString::number(greyscale) + seperator
-                       + QString::number(resOverride) + seperator
-                       + QString::number(resWidth) + seperator
-                       + QString::number(resHight) + seperator
-                       + QString::number(roi.topLeftX) + seperator
-                       + QString::number(roi.topLeftY) + seperator
-                       + QString::number(roi.bottomRightX) + seperator
-                       + QString::number(roi.bottomRightY)
-                       ;
+    + model + seperator
+    + comment + seperator
+    + QString::number(source) + seperator
+    + file.c_str() + seperator
+    + QString::number(greyscale) + seperator
+    + QString::number(resOverride) + seperator
+    + QString::number(resWidth) + seperator
+    + QString::number(resHight) + seperator
+    + QString::number(roi.topLeftX) + seperator
+    + QString::number(roi.topLeftY) + seperator
+    + QString::number(roi.bottomRightX) + seperator
+    + QString::number(roi.bottomRightY) + seperator
+    + probes
+    ;
 
   MITK_INFO << "Output String: " << returnValue.toStdString();
   return returnValue;
@@ -132,11 +136,11 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   std::vector<std::string> data;
   std::string seperators = "|";
   std::string text = s.toStdString();
-  split(text,seperators,data);
-  if(data.size() != 13)
+  split(text, seperators, data);
+  if (data.size() != 14)
   {
     MITK_ERROR << "Cannot parse US device! (Size: " << data.size() << ")";
-    return mitk::USVideoDevice::New("INVALID","INVALID","INVALID");
+    return mitk::USVideoDevice::New("INVALID", "INVALID", "INVALID");
   }
 
   std::string manufacturer = data.at(0);
@@ -154,6 +158,11 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   cropArea.bottomRightX = (QString(data.at(11).c_str())).toInt();
   cropArea.bottomRightY = (QString(data.at(12).c_str())).toInt();
 
+  /*std::string probes = data.at(13);
+  std::string probesSeperator = "!";
+  std::vector<std::string> probesVector;
+  split(probes, probesSeperator, probesVector);*/
+
   // Create Device
   mitk::USVideoDevice::Pointer returnValue;
   if (file == "none")
@@ -169,7 +178,7 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
 
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(returnValue->GetUSImageSource().GetPointer());
-  if ( ! imageSource )
+  if (!imageSource)
   {
     MITK_ERROR << "There is no USImageVideoSource at the current device.";
     mitkThrow() << "There is no USImageVideoSource at the current device.";
@@ -180,10 +189,10 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
 
   // If Resolution override is activated, apply it
   if (resOverride)
-    {
+  {
     imageSource->OverrideResolution(resWidth, resHight);
     imageSource->SetResolutionOverride(true);
-    }
+  }
 
   // Set Crop Area
   imageSource->SetRegionOfInterest(cropArea);

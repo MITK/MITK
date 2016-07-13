@@ -103,6 +103,11 @@ namespace mitk {
     */
     mitk::USProbe::Pointer GetCurrentProbe();
 
+    /**
+    \brief adds a new probe to the device
+    */
+    void AddNewProbe();
+
     itkGetMacro(Image, mitk::Image::Pointer);
     itkGetMacro(DeviceID, int);
     itkGetMacro(FilePath, std::string);

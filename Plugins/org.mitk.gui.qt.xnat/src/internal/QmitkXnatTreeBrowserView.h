@@ -127,6 +127,7 @@ private:
   void InternalOpenFiles(const QFileInfoList&, mitk::StringProperty::Pointer xnatURL);
 
   void SetStatusInformation(const QString&);
+  void FilePathNotAvailableWarning(QString file);
 
   void CleanUp();
 

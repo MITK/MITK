@@ -145,9 +145,9 @@ RemoveTag(const DICOMTag& tag)
   }
 
   mitk::IPropertyPersistence* persSrv = GetPersistenceService();
-  if (persSrv && persSrv->HasInfos(propName))
+  if (persSrv && persSrv->HasInfo(propName))
   {
-    persSrv->RemoveInfos(propName);
+    persSrv->RemoveInfo(propName);
   }
 };
 

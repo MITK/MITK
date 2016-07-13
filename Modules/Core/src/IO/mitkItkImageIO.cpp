@@ -409,7 +409,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
       std::string mimeTypeName = GetMimeType()->GetName();
 
       //Check if there is already a info for the key and our mime type.
-      IPropertyPersistence::InfoResultType infos = mitk::CoreServices::GetPropertyPersistence()->GetInfosByKey(key);
+      IPropertyPersistence::InfoResultType infos = mitk::CoreServices::GetPropertyPersistence()->GetInfoByKey(key);
 
       auto predicate = [mimeTypeName](const PropertyPersistenceInfo::ConstPointer& x){return x.IsNotNull() && x->GetMimeTypeName() == mimeTypeName; };
       auto finding = std::find_if(infos.begin(), infos.end(), predicate);
@@ -620,7 +620,7 @@ void ItkImageIO::Write()
 
     for(const auto &property : *imagePropertyList->GetMap())
     {
-      IPropertyPersistence::InfoResultType infos = mitk::CoreServices::GetPropertyPersistence()->GetInfos(property.first, GetMimeType()->GetName(), true);
+      IPropertyPersistence::InfoResultType infos = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first, GetMimeType()->GetName(), true);
 
       if( infos.empty())
       {

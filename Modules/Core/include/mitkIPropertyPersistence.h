@@ -60,7 +60,7 @@ namespace mitk
       * \param[in] allowNameRegEx Indicates if also added infos with regexs are be checked.
       * \return Property persistence info or null pointer if no persistence info is available.
       */
-    virtual InfoResultType GetInfos(const std::string& propertyName, bool allowNameRegEx = true) const = 0;
+    virtual InfoResultType GetInfo(const std::string& propertyName, bool allowNameRegEx = true) const = 0;
 
     /** \brief Get the persistence info for a specific base data property and mime type.
     *
@@ -72,7 +72,7 @@ namespace mitk
     * \param[in] allowNameRegEx Indicates if also added infos with regexs are be checked.
     * \return Property persistence info or null pointer if no persistence info is available.
     */
-    virtual InfoResultType GetInfos(const std::string& propertyName, const MimeTypeNameType& mime, bool allowMimeWildCard = false, bool allowNameRegEx = true) const = 0;
+    virtual InfoResultType GetInfo(const std::string& propertyName, const MimeTypeNameType& mime, bool allowMimeWildCard = false, bool allowNameRegEx = true) const = 0;
 
     /** \brief Get the persistence info that will use the specified key.
     *
@@ -80,7 +80,7 @@ namespace mitk
     * \param[in] allowKeyRegEx Indicates if also added infos with regexs for the key are be checked.
     * \return Property persistence info or null pointer if no persistence info is available.
     */
-    virtual InfoResultType GetInfosByKey(const std::string& persistenceKey, bool allowKeyRegEx = true) const = 0;
+    virtual InfoResultType GetInfoByKey(const std::string& persistenceKey, bool allowKeyRegEx = true) const = 0;
 
     /** \brief Check if a specific base data property has persistence info.
       *
@@ -88,24 +88,24 @@ namespace mitk
       * \param[in] allowNameRegEx Indicates if also added infos with regexs are be checked.
       * \return True if the property has persistence info, false otherwise.
       */
-    virtual bool HasInfos(const std::string& propertyName, bool allowNameRegEx = true) const = 0;
+    virtual bool HasInfo(const std::string& propertyName, bool allowNameRegEx = true) const = 0;
 
     /** \brief Remove all persistence info.
       */
-    virtual void RemoveAllInfos() = 0;
+    virtual void RemoveAllInfo() = 0;
 
     /** \brief Remove persistence infos of a specific property name/regex.
       *
       * \param[in] propertyName Registered name or regex that should be removed.
       */
-    virtual void RemoveInfos(const std::string& propertyName) = 0;
+    virtual void RemoveInfo(const std::string& propertyName) = 0;
 
     /** \brief Remove persistence infos of a specific property name/regex and mime type.
     *
     * \param[in] propertyName Registered name or regex that should be removed.
     * \param[in] mime Name of the mime type.
     */
-    virtual void RemoveInfos(const std::string& propertyName, const MimeTypeNameType& mime) = 0;
+    virtual void RemoveInfo(const std::string& propertyName, const MimeTypeNameType& mime) = 0;
 
   };
 }

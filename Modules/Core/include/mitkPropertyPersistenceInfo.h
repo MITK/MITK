@@ -79,7 +79,7 @@ namespace mitk
     PropertyPersistenceInfo::Pointer UnRegExByKey(const std::string& key) const;
 
     /** This mime type name indicates that a info can be used for any mime type as long as
-     not another info with a more specific mime type is available.*/
+     another info with a more specific mime type is not available.*/
     static MimeTypeNameType ANY_MIMETYPE_NAME();
 
   protected:
@@ -98,6 +98,8 @@ namespace mitk
 
     virtual ~PropertyPersistenceInfo();
 
+    virtual void PrintSelf(std::ostream & os, itk::Indent indent) const override;
+
   private:
     PropertyPersistenceInfo(const Self& other);
     Self& operator=(const Self& other);
@@ -106,6 +108,7 @@ namespace mitk
     Impl* m_Impl;
   };
 
+  MITKCORE_EXPORT std::ostream& operator << (std::ostream& os, const PropertyPersistenceInfo& info);
 
   namespace PropertyPersistenceSerialization
   {

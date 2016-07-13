@@ -42,11 +42,11 @@ namespace mitk
     using MimeTypeNameType = PropertyPersistenceInfo::MimeTypeNameType;
 
     /** \brief Add persistence info for a specific base data property.
-      * If there is already a property info instances for the passed
+      * If there is already a property info instance for the passed
       * property name and the same info, it won't be added. Infos are
       * regarded equal, if the mime types are equal.
-      * You may enforce to overrite the old equal info for a property name
-      * by the overweite parameter.
+      * You may enforce to overwrite the old equal info for a property name
+      * by the overwrite parameter.
       *
       * \param[in] propertyName Name of the property.
       * \param[in] info Persistence info of the property.

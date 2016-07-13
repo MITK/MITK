@@ -226,6 +226,12 @@ void mitk::TemporoSpatialStringProperty::SetValue(const ValueType& value)
 };
 
 // Create necessary escape sequences from illegal characters
+// REMARK: This code is based upon code from boost::ptree::json_writer.
+// The corresponding boost function was not used directly, because it is not part of
+// the public interface of ptree::json_writer. :(
+// A own serialization strategy was implemented instead of using boost::ptree::json_write because
+// currently (<= boost 1.60) everything (even numbers) are converted into string representations
+// by the writer, so e.g. it becomes "t":"2" instaed of "t":2
 template<class Ch>
 std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
 {
@@ -274,8 +280,10 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
 mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(const mitk::BaseProperty* prop)
 {
   //REMARK: Implemented own serialization instead of using boost::ptree::json_write because
-  //currently everything (even numbers) are converted into string representations by the writer
-  //so e.g. it becomes "t":"2" instaed of "t":2
+  //currently (<= boost 1.60) everything (even numbers) are converted into string representations
+  //by the writer, so e.g. it becomes "t":"2" instaed of "t":2
+  //If this problem is fixed with boost, we shoud switch back to json_writer (and remove the custom
+  //implementation of CreateJSONEscapes (see above)).
   const mitk::TemporoSpatialStringProperty* tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty*>(prop);
 
   if (!tsProp)

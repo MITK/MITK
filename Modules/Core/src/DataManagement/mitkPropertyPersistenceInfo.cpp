@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <regex>
+#include <cassert>
 
 #include <mitkPropertyPersistenceInfo.h>
 #include <mitkStringProperty.h>
@@ -162,17 +163,12 @@ void mitk::PropertyPersistenceInfo::SetSerializationFunction(const mitk::Propert
     m_Impl->SerFnc = fnc;
 };
 
-mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializeToStringProperty(const std::string& value)
-{
-  StringProperty::Pointer result = StringProperty::New(value);
-  return result.GetPointer();
-}
-
 std::string GenerateFromTemplate(const std::string& sourceStr, const std::string& templateStr, const std::string& regexStr)
 {
   std::smatch sm;
   std::regex ex(regexStr);
-  assert(std::regex_match(sourceStr, sm, ex));
+  bool matched = std::regex_match(sourceStr, sm, ex);
+  assert(matched == true);
 
   std::string result = templateStr;
 
@@ -226,6 +222,25 @@ mitk::PropertyPersistenceInfo::MimeTypeNameType mitk::PropertyPersistenceInfo::A
     return name;
 };
 
+void mitk::PropertyPersistenceInfo::PrintSelf(std::ostream & os, itk::Indent indent) const
+{
+  this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Name:         " << this->m_Impl->Name << std::endl;
+  os << indent << "Key:          " << this->m_Impl->Key << std::endl;
+  os << indent << "IsRegEx:      " << this->m_Impl->IsRegEx << std::endl;
+  os << indent << "NameTemplate: " << this->m_Impl->NameTemplate << std::endl;
+  os << indent << "KeyTemplate:  " << this->m_Impl->KeyTemplate << std::endl;
+  os << indent << "MimeTypeName: " << this->m_Impl->MimeTypeName << std::endl;
+};
+
+std::ostream& mitk::operator << (std::ostream& os, const PropertyPersistenceInfo& info)
+{
+  info.Print(os);
+  return os;
+}
+
+
 ::std::string mitk::PropertyPersistenceSerialization::serializeByGetValueAsString(const mitk::BaseProperty* prop)
 {
     std::string result = "";
@@ -234,4 +249,10 @@ mitk::PropertyPersistenceInfo::MimeTypeNameType mitk::PropertyPersistenceInfo::A
         result = prop->GetValueAsString();
     }
     return result;
+}
+
+mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializeToStringProperty(const std::string& value)
+{
+  StringProperty::Pointer result = StringProperty::New(value);
+  return result.GetPointer();
 }

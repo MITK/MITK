@@ -107,7 +107,7 @@ else()
 
 endif()
 
-#install Matchpoint algorithms if matchpoint is present
+#install Matchpoint libs that are currently not auto detected
 if(MITK_USE_MatchPoint)
   install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
             DESTINATION "bin"
@@ -115,6 +115,6 @@ if(MITK_USE_MatchPoint)
   install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/"
             DESTINATION "bin"
             FILES_MATCHING PATTERN "MAPAlgorithms*")
-  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/deployed/"
-            DESTINATION "bin")
+#  install(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/deployed/"
+#            DESTINATION "bin")
 endif()

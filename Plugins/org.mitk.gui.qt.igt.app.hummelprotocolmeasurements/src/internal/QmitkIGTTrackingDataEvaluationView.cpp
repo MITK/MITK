@@ -546,7 +546,6 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()
         meanPos[1] *= m_scalingfactor;
         meanPos[2] *= m_scalingfactor;
       }
-      MITK_INFO << m_scalingfactor;
       mitk::Point3D secondPoint;
       mitk::Point3D thirdPoint;
       mitk::Point3D fourthPoint;
@@ -935,25 +934,23 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
 {
   double returnValue;
 
-  /*
   //another variant
   mitk::Quaternion combinedRotation = b * a;
 
-  itk::Vector<double,3> pt1; //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
+  itk::Vector<double, 3> pt1; //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
   pt1[0] = 0.0;
   pt1[1] = 0.0;
   pt1[2] = 100000.0;
 
-  itk::Matrix<double,3,3> rotMatrixA;
-  for(int i=0; i<3; i++) for(int j=0; j<3; j++) rotMatrixA[i][j] = combinedRotation.rotation_matrix_transpose().transpose()[i][j];
-  itk::Vector<double,3> pt2 = rotMatrixA*pt1;
+  itk::Matrix<double, 3, 3> rotMatrixA;
+  for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) rotMatrixA[i][j] = combinedRotation.rotation_matrix_transpose().transpose()[i][j];
+  itk::Vector<double, 3> pt2 = rotMatrixA*pt1;
 
   //compute angle between the two vectors
-  returnValue = (pt1[0]*pt2[0]+pt1[1]*pt2[1]+pt1[2]*pt2[2]) / ( sqrt(pow(pt1[0],2)+pow(pt1[1],2)+pow(pt1[2],2)) * sqrt(pow(pt2[0],2)+pow(pt2[1],2)+pow(pt2[2],2)));
+  returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2) + pow(pt1[1], 2) + pow(pt1[2], 2)) * sqrt(pow(pt2[0], 2) + pow(pt2[1], 2) + pow(pt2[2], 2)));
   returnValue = acos(returnValue);
 
-  */
-
+  /*
   //variant with double precision
 
   itk::Vector<double, 3> point; //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
@@ -978,6 +975,7 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
   returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2.0) + pow(pt1[1], 2.0) + pow(pt1[2], 2.0)) * sqrt(pow(pt2[0], 2.0) + pow(pt2[1], 2.0) + pow(pt2[2], 2.0)));
   returnValue = acos(returnValue);
 
+  */
   /* same code with float precision:
   mitk::Point3D point;
   mitk::FillVector3D(point,0,0,100); //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.

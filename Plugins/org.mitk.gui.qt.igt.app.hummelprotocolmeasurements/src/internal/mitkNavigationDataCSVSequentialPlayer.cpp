@@ -1,19 +1,18 @@
-/*=========================================================================
+/*===================================================================
 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2009-02-10 18:08:54 +0100 (Di, 10 Feb 2009) $
-Version:   $Revision: 16228 $
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center,
+Division of Medical and Biological Informatics.
+All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE.
 
-=========================================================================*/
+See LICENSE.txt or http://www.mitk.org for details.
+
+===================================================================*/
 
 #include "mitkNavigationDataCSVSequentialPlayer.h"
 #include <QString>
@@ -21,29 +20,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <fstream>
 
-
 mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSVSequentialPlayer()
   : mitk::NavigationDataPlayerBase()
 {
-m_NavigationDatas =  std::vector<mitk::NavigationData::Pointer>();
-m_CurrentPos = 0;
-m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV;
+  m_NavigationDatas = std::vector<mitk::NavigationData::Pointer>();
+  m_CurrentPos = 0;
+  m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV;
 }
-
 
 mitk::NavigationDataCSVSequentialPlayer::~NavigationDataCSVSequentialPlayer()
 {
-
 }
 
 bool mitk::NavigationDataCSVSequentialPlayer::IsAtEnd()
 {
- if (m_CurrentPos >= m_NavigationDatas.size()) return true;
- else return false;
+  if (m_CurrentPos >= m_NavigationDatas.size()) return true;
+  else return false;
 }
 
 void mitk::NavigationDataCSVSequentialPlayer::
-    SetFileName(const std::string& fileName)
+SetFileName(const std::string& fileName)
 {
   this->SetNumberOfOutputs(1);
   FillOutputEmpty(0);
@@ -55,40 +51,37 @@ void mitk::NavigationDataCSVSequentialPlayer::
 }
 
 void mitk::NavigationDataCSVSequentialPlayer::FillOutputEmpty(int number)
-  {
-  this->SetNthOutput(number,GetEmptyNavigationData());
-  }
+{
+  this->SetNthOutput(number, GetEmptyNavigationData());
+}
 
 mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetEmptyNavigationData()
-  {
+{
   mitk::NavigationData::Pointer emptyNd = mitk::NavigationData::New();
   mitk::NavigationData::PositionType position;
-  mitk::NavigationData::OrientationType orientation(0.0,0.0,0.0,0.0);
+  mitk::NavigationData::OrientationType orientation(0.0, 0.0, 0.0, 0.0);
   position.Fill(0.0);
 
   emptyNd->SetPosition(position);
   emptyNd->SetOrientation(orientation);
   emptyNd->SetDataValid(false);
   return emptyNd;
-  }
+}
 
 void mitk::NavigationDataCSVSequentialPlayer::GenerateData()
 {
-
- for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
+  for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
   {
-
     mitk::NavigationData* output = this->GetOutput(index);
 
     if (m_CurrentPos > m_NavigationDatas.size())
-        {
-           FillOutputEmpty(index);
-           return;
-        }
+    {
+      FillOutputEmpty(index);
+      return;
+    }
 
     output->Graft(this->m_NavigationDatas.at(m_CurrentPos));
     m_CurrentPos++;
-
   }
 }
 
@@ -100,48 +93,49 @@ void mitk::NavigationDataCSVSequentialPlayer::UpdateOutputInformation()
 
 std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataCSVSequentialPlayer::GetNavigationDatasFromFile(std::string filename)
 {
-std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
-std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
-for(int i=1; (i<fileContentLineByLine.size()); i++) //skip header so start at 1
-  {returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));}
+  std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
+  std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
+  for (int i = 1; (i < fileContentLineByLine.size()); i++) //skip header so start at 1
+  {
+    returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
+  }
 
-return returnValue;
+  return returnValue;
 }
 
 std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContentLineByLine(std::string filename)
 {
-std::vector<std::string> readData = std::vector<std::string>();
+  std::vector<std::string> readData = std::vector<std::string>();
 
-//save old locale
-char * oldLocale;
-oldLocale = setlocale( LC_ALL, 0 );
+  //save old locale
+  char * oldLocale;
+  oldLocale = setlocale(LC_ALL, 0);
 
-//define own locale
-std::locale C("C");
-setlocale( LC_ALL, "C" );
+  //define own locale
+  std::locale C("C");
+  setlocale(LC_ALL, "C");
 
-//read file
-std::ifstream file;
-file.open(filename.c_str(), std::ios::in);
-if (file.good())
-    {
+  //read file
+  std::ifstream file;
+  file.open(filename.c_str(), std::ios::in);
+  if (file.good())
+  {
     //read out file
     file.seekg(0L, std::ios::beg);  // move to begin of file
-    while (! file.eof())
-      {
+    while (!file.eof())
+    {
       std::string buffer;
-      std::getline(file,buffer);    // read out file line by line
+      std::getline(file, buffer);    // read out file line by line
       if (buffer.size() > 0) readData.push_back(buffer);
-
-      }
     }
+  }
 
-file.close();
+  file.close();
 
-//switch back to old locale
-setlocale( LC_ALL, oldLocale );
+  //switch back to old locale
+  setlocale(LC_ALL, oldLocale);
 
-return readData;
+  return readData;
 }
 
 mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNavigationDataOutOfOneLine(std::string line)
@@ -157,15 +151,14 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   bool valid = false;
   double time;
 
-  if (m_Filetype =  mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
-    {
-
+  if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
+  {
     if (myLineList.size() < 10)
-      {
-        MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size()-1).toStdString()  ;
-        returnValue = GetEmptyNavigationData();
-        return returnValue;
-      }
+    {
+      MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size() - 1).toStdString();
+      returnValue = GetEmptyNavigationData();
+      return returnValue;
+    }
 
     time = myLineList.at(1).toDouble();
 
@@ -179,15 +172,15 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     orientation[1] = myLineList.at(7).toDouble();
     orientation[2] = myLineList.at(8).toDouble();
     orientation[3] = myLineList.at(9).toDouble();
-    }
+  }
   else
-    {
+  {
     if (myLineList.size() < 10)
-      {
-        MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size()-1).toStdString()  ;
-        returnValue = GetEmptyNavigationData();
-        return returnValue;
-      }
+    {
+      MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size() - 1).toStdString();
+      returnValue = GetEmptyNavigationData();
+      return returnValue;
+    }
 
     time = myLineList.at(1).toDouble();
 
@@ -203,7 +196,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     orientation[1] = myLineList.at(7).toDouble();
     orientation[2] = myLineList.at(8).toDouble();
     orientation[3] = myLineList.at(9).toDouble();
-    }
+  }
 
   //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS
   returnValue->SetDataValid(valid);

@@ -536,8 +536,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()
             }
             */
       }
-
-      if (!myPlayer->IsAtEnd()) continue;
+      //if (!myPlayer->IsAtEnd()) continue;
 
       //create line from mean pos to a second point which lies along the sensor (1,0,0 in tool coordinates for aurora)
       mitk::Point3D meanPos = myEvaluationFilter->GetPositionMean(0);
@@ -547,6 +546,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()
         meanPos[1] *= m_scalingfactor;
         meanPos[2] *= m_scalingfactor;
       }
+      MITK_INFO << m_scalingfactor;
       mitk::Point3D secondPoint;
       mitk::Point3D thirdPoint;
       mitk::Point3D fourthPoint;

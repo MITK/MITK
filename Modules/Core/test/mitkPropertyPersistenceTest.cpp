@@ -14,6 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <cmath>
+#include <algorithm>
+#include <limits>
+
 #include "mitkPropertyPersistence.h"
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
@@ -21,9 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOMimeTypes.h"
 #include <mitkNumericConstants.h>
 #include <mitkEqual.h>
-
-#include <algorithm>
-#include <limits>
 
 class mitkPropertyPersistenceTestSuite : public mitk::TestFixture
 {

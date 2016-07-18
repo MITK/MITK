@@ -182,20 +182,20 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
       return returnValue;
     }
 
-    time = myLineList.at(1).toDouble();
+    //time = myLineList.at(2).toDouble();
 
     //if (myLineList.at(2).toStdString() == "true")
     //valid-flag wurde hier nicht gespeichert
     valid = true;
 
-    position[0] = myLineList.at(3).toDouble();
+    position[0] = myLineList.at(5).toDouble();
     position[1] = myLineList.at(4).toDouble();
-    position[2] = myLineList.at(5).toDouble();
+    position[2] = (myLineList.at(6).toDouble()*(-1));
 
-    orientation[0] = myLineList.at(6).toDouble();
-    orientation[1] = myLineList.at(7).toDouble();
-    orientation[2] = myLineList.at(8).toDouble();
-    orientation[3] = myLineList.at(9).toDouble();
+    orientation[0] = myLineList.at(9).toDouble();
+    orientation[1] = myLineList.at(8).toDouble();
+    orientation[2] = (myLineList.at(10).toDouble()*(-1));
+    orientation[3] = myLineList.at(7).toDouble();
   }
 
   //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS

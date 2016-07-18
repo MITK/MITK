@@ -926,7 +926,7 @@ void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesHeader()
 void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesDataSet(std::string pos1, std::string pos2, int idx1, int idx2, double angle)
 {
   double PI = 3.1415926535897932384626433832795;
-  double angle_degree = (angle / PI) * 180;
+  double angle_degree = angle * 180 / PI;
   m_CurrentAngleDifferencesWriteFile << "Angle between " << pos1 << " and " << pos2 << ";" << idx1 << ";" << idx2 << ";" << angle << ";" << angle_degree << "\n";
 }
 
@@ -934,6 +934,11 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
 {
   double returnValue;
 
+  //variant to work with the data received from the polhemus tracker
+  returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]));
+  returnValue = 2 * acos(returnValue);
+
+  /*
   //another variant
   mitk::Quaternion combinedRotation = b * a;
 
@@ -950,6 +955,7 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
   returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2) + pow(pt1[1], 2) + pow(pt1[2], 2)) * sqrt(pow(pt2[0], 2) + pow(pt2[1], 2) + pow(pt2[2], 2)));
   returnValue = acos(returnValue);
 
+  */
   /*
   //variant with double precision
 
@@ -976,18 +982,18 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
   returnValue = acos(returnValue);
 
   */
-  /* same code with float precision:
+  /*
+  // same code with float precision:
   mitk::Point3D point;
-  mitk::FillVector3D(point,0,0,100); //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
+  mitk::FillVector3D(point, 0, 0, 100); //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
   vnl_vector<float> pt1 = a.rotate(point.Get_vnl_vector());
   vnl_vector<float> pt2 = b.rotate(point.Get_vnl_vector());
 
   //compute angle between the two vectors
-  returnValue = (pt1[0]*pt2[0]+pt1[1]*pt2[1]+pt1[2]*pt2[2]) / ( sqrt(pow(pt1[0],2)+pow(pt1[1],2)+pow(pt1[2],2)) * sqrt(pow(pt2[0],2)+pow(pt2[1],2)+pow(pt2[2],2)));
+  returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2) + pow(pt1[1], 2) + pow(pt1[2], 2)) * sqrt(pow(pt2[0], 2) + pow(pt2[1], 2) + pow(pt2[2], 2)));
   returnValue = acos(returnValue);
   //angle(pt1,pt2);
   */
-
   return returnValue;
 }
 

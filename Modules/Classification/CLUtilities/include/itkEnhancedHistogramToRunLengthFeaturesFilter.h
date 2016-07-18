@@ -162,6 +162,18 @@ namespace itk {
       MeasurementType GetNumberOfRuns() const;
       const MeasurementObjectType* GetNumberOfRunsOutput() const;
 
+      /** Methods to return the grey level variance. */
+      MeasurementType GetGreyLevelVariance() const;
+      const MeasurementObjectType* GetGreyLevelVarianceOutput() const;
+
+      /** Methods to return the run length variance. */
+      MeasurementType GetRunLengthVariance() const;
+      const MeasurementObjectType* GetRunLengthVarianceOutput() const;
+
+      /** Methods to return the run entropy. */
+      MeasurementType GetRunEntropy() const;
+      const MeasurementObjectType* GetRunEntropyOutput() const;
+
       itkGetMacro( TotalNumberOfRuns, unsigned long );
 
       itkGetConstMacro(NumberOfVoxels, unsigned long);
@@ -181,7 +193,10 @@ namespace itk {
         LongRunLowGreyLevelEmphasis,
         LongRunHighGreyLevelEmphasis,
         RunPercentage,
-        NumberOfRuns
+        NumberOfRuns,
+        GreyLevelVariance,
+        RunLengthVariance,
+        RunEntropy
       }  RunLengthFeatureName;
 
       /** convenience method to access the run length values */

@@ -87,6 +87,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceMomentNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifference);
+  requestedFeatures->push_back(TextureFilterType::JointAverage);
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -209,6 +210,10 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
     case TextureFilterType::InverseDifference :
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::JointAverage :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Std.",featureStd->ElementAt(i)));
       break;
     default:
       break;

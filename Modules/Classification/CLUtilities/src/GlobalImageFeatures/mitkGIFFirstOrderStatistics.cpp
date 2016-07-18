@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-  CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList, mitk::GIFFirstOrderStatistics::ParameterStruct params)
+CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask, mitk::GIFFirstOrderStatistics::FeatureListType & featureList, mitk::GIFFirstOrderStatistics::ParameterStruct params)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<int, VImageDimension> MaskType;
@@ -78,6 +78,11 @@ void
   double mean_absolut_deviation = 0;
   double skewness = 0;
   double sum_prob = 0;
+
+  double p10th = histogram->Quantile(0,0.10);
+  double p25th = histogram->Quantile(0,0.25);
+  double p75th = histogram->Quantile(0,0.75);
+  double p90th = histogram->Quantile(0,0.90);
 
   double Log2=log(2);
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
@@ -130,6 +135,47 @@ void
   featureList.push_back(std::make_pair("FirstOrder Median",labelStatisticsImageFilter->GetMedian(1)));
   featureList.push_back(std::make_pair("FirstOrder Standard deviation",labelStatisticsImageFilter->GetSigma(1)));
   featureList.push_back(std::make_pair("FirstOrder No. of Voxel",labelStatisticsImageFilter->GetCount(1)));
+
+  featureList.push_back(std::make_pair("FirstOrder 10th Percentile",p10th));
+  featureList.push_back(std::make_pair("FirstOrder 90th Percentile",p90th));
+  featureList.push_back(std::make_pair("FirstOrder Interquartile Range",(p75th - p25th)));
+
+  //Calculate the robus mean absolute deviation
+  //First, set all frequencies to 0 that are <10th or >90th percentile
+  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+  {
+    index[0] = i;
+    MITK_WARN << "Old frequency of " << histogram->GetBinMin(0,i) << ": " << histogram->GetFrequency(index);
+    if(histogram->GetBinMin(0,i) < p10th)
+      histogram->SetFrequencyOfIndex(index, 0);
+    else if(histogram->GetBinMin(0,i) > p90th)
+      histogram->SetFrequencyOfIndex(index, 0);
+    MITK_WARN << "New frequency of " << histogram->GetBinMin(0,i) << ": " << histogram->GetFrequency(index);
+
+  }
+
+  //Calculate the mean
+  double meanRobust = 0.0;
+  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+  {
+    index[0] = i;
+    meanRobust += histogram->GetFrequency(index) * 0.5 * (histogram->GetBinMin(0,i) + histogram->GetBinMax(0,i));
+  }
+  meanRobust = meanRobust / histogram->GetTotalFrequency();
+
+  double robustMeanAbsoluteDeviation = 0.0;
+  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+  {
+    index[0] = i;
+    robustMeanAbsoluteDeviation += std::abs(histogram->GetFrequency(index) *
+                                            ( (0.5 * (histogram->GetBinMin(0,i) + histogram->GetBinMax(0,i)))
+                                              - meanRobust
+                                              ));
+  }
+  robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
+
+  featureList.push_back(std::make_pair("FirstOrder Robust Mean Absolute Deviation",robustMeanAbsoluteDeviation));
+
 }
 
 mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics() :

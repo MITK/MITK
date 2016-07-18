@@ -54,7 +54,7 @@ namespace itk
 
       // allocate the data objects for the outputs which are
       // just decorators real types
-      for ( int i = 0; i < 25; ++i )
+      for ( int i = 0; i < 26; ++i )
       {
         this->ProcessObject::SetNthOutput( i, this->MakeOutput(i) );
       }
@@ -167,6 +167,8 @@ namespace itk
       MeasurementType inverseDifferenceMomentNormalized = NumericTraits< MeasurementType >::ZeroValue();
       MeasurementType inverseDifferenceNormalized      = NumericTraits< MeasurementType >::ZeroValue();
       MeasurementType inverseDifference      = NumericTraits< MeasurementType >::ZeroValue();
+      MeasurementType averageProbability = NumericTraits< MeasurementType >::ZeroValue();
+
 
       double pixelVarianceSquared = pixelVariance * pixelVariance;
       // Variance is only used in correlation. If variance is 0, then
@@ -212,6 +214,7 @@ namespace itk
         contrast += (index[0] - index[1]) * (index[0] - index[1]) * frequency;
         dissimilarity += std::abs(index[0] - index[1]) * frequency;
         maximumProbability = std::max(maximumProbability, frequency);
+        averageProbability += frequency * index[0];
         if (index[0] != index[1])
           inverseVariance += frequency / ((index[0] - index[1])*(index[0] - index[1]));
         homogeneity1 +=frequency / ( 1.0 + std::abs( index[0] - index[1] ));
@@ -363,6 +366,10 @@ namespace itk
       MeasurementObjectType *inverseDifferenceOutputObject =
         static_cast< MeasurementObjectType * >( this->ProcessObject::GetOutput(24) );
       inverseDifferenceOutputObject->Set(inverseDifference);
+
+      MeasurementObjectType *jointAverageOutputObject =
+        static_cast< MeasurementObjectType * >( this->ProcessObject::GetOutput(25) );
+      jointAverageOutputObject->Set(averageProbability);
     }
 
     template< typename THistogram >
@@ -536,6 +543,7 @@ namespace itk
       itkMacroGLCMFeature(InverseDifferenceMomentNormalized,22)
       itkMacroGLCMFeature(InverseDifferenceNormalized,23)
       itkMacroGLCMFeature(InverseDifference,24)
+    itkMacroGLCMFeature(JointAverage,25)
 
       template< typename THistogram >
     typename EnhancedHistogramToTextureFeaturesFilter< THistogram >::MeasurementType
@@ -636,6 +644,7 @@ namespace itk
         itkMacroGLCMFeatureSwitch(InverseDifferenceMomentNormalized);
         itkMacroGLCMFeatureSwitch(InverseDifferenceNormalized);
         itkMacroGLCMFeatureSwitch(InverseDifference);
+        itkMacroGLCMFeatureSwitch(JointAverage);
       default:
         return 0;
       }

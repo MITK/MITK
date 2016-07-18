@@ -48,13 +48,23 @@ namespace mitk
     itkSetMacro(AcceptanceRate, double);
     itkGetConstMacro(AcceptanceRate, double);
 
-    itkSetMacro(AcceptanceRateVector, std::vector<double>);
+    //itkSetMacro(AcceptanceRateVector, std::vector<double>);
+    void SetAcceptanceRateVector(std::vector<double> arg)
+    {
+      m_AcceptanceRateVector = arg;
+    }
+
     itkGetConstMacro(AcceptanceRateVector, std::vector<double>);
 
     itkSetMacro(NumberOfSamples, unsigned int);
     itkGetConstMacro(NumberOfSamples, unsigned int);
 
-    itkSetMacro(NumberOfSamplesVector, std::vector<unsigned int>);
+    //itkSetMacro(NumberOfSamplesVector, std::vector<unsigned int>);
+    void SetNumberOfSamplesVector(std::vector<unsigned int> arg)
+    {
+      m_NumberOfSamplesVector = arg;
+    }
+
     itkGetConstMacro(NumberOfSamplesVector, std::vector<unsigned int>);
 
   private:

@@ -88,6 +88,9 @@ void
   requestedFeatures->push_back(TextureFilterType::LongRunHighGreyLevelEmphasis);
   requestedFeatures->push_back(TextureFilterType::RunPercentage);
   requestedFeatures->push_back(TextureFilterType::NumberOfRuns);
+  requestedFeatures->push_back(TextureFilterType::GreyLevelVariance);
+  requestedFeatures->push_back(TextureFilterType::RunLengthVariance);
+  requestedFeatures->push_back(TextureFilterType::RunEntropy);
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -171,6 +174,18 @@ void
     case TextureFilterType::NumberOfRuns :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") NumberOfRuns Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") NumberOfRuns Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::GreyLevelVariance :
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelVariance Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::RunLengthVariance :
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthVariance Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::RunEntropy :
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunEntropy Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunEntropy Std.",featureStd->ElementAt(i)));
       break;
     default:
       break;

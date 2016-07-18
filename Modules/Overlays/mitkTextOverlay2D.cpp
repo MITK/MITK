@@ -62,6 +62,11 @@ mitk::TextOverlay2D::LocalStorage::~LocalStorage()
 {
 }
 
+namespace
+{
+  const int FONT_SIZE = 16;
+}
+
 mitk::TextOverlay2D::LocalStorage::LocalStorage()
 {
   m_TextActor = vtkSmartPointer<vtkTextActor>::New();
@@ -98,6 +103,9 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
 
   m_TextProp->SetFontFamily(VTK_FONT_FILE);
   m_TextProp->SetFontFile(fontPath.c_str());
+  
+  m_TextProp->SetFontSize(FONT_SIZE);
+  m_STextProp->SetFontSize(FONT_SIZE);
 
   m_TextActor->SetTextProperty(m_TextProp);
   m_STextActor->SetTextProperty(m_STextProp);
@@ -118,9 +126,7 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     GetOpacity(opacity, renderer);
     ls->m_TextProp->SetColor(color[0], color[1], color[2]);
     ls->m_STextProp->SetColor(0, 0, 0);
-    ls->m_TextProp->SetFontSize(GetFontSize());
     ls->m_TextProp->SetOpacity(opacity);
-    ls->m_STextProp->SetFontSize(GetFontSize());
     ls->m_STextProp->SetOpacity(opacity);
 
     std::string fontFamilyAsString;

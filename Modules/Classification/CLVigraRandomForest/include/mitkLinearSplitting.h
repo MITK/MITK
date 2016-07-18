@@ -3,6 +3,7 @@
 
 #include <vigra/multi_array.hxx>
 #include <vigra/random_forest.hxx>
+#include <mitkAdditionalRFData.h>
 
 namespace mitk
 {
@@ -26,6 +27,9 @@ namespace mitk
 
       void SetPointWeights(WeightContainerType weight);
       WeightContainerType GetPointWeights();
+
+      void SetAdditionalData(AdditionalRFDataAbstract* data);
+      AdditionalRFDataAbstract* GetAdditionalData() const;
 
       template <class T>
       void set_external_parameters(vigra::ProblemSpec<T> const &ext);
@@ -79,6 +83,7 @@ namespace mitk
       double m_MinimumThreshold;
       std::ptrdiff_t m_MinimumIndex;
       vigra::ProblemSpec<> m_ExtParameter;
+      AdditionalRFDataAbstract* m_AdditionalData;
   };
 }
 

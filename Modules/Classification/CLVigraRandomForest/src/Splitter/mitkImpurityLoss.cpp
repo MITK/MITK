@@ -6,7 +6,8 @@
 template <class TLossFunction, class TLabelContainer, class TWeightContainer>
 template <class T>
 mitk::ImpurityLoss<TLossFunction, TLabelContainer, TWeightContainer>::ImpurityLoss(TLabelContainer const &labels,
-             vigra::ProblemSpec<T> const &ext) :
+  vigra::ProblemSpec<T> const &ext,
+  AdditionalRFDataAbstract * /*data*/) :
     m_UsePointWeights(false),
     m_Labels(labels),
     m_Counts(ext.class_count_, 0.0),

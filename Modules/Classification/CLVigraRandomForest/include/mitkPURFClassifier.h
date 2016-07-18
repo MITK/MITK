@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkVigraRandomForestClassifier_h
-#define mitkVigraRandomForestClassifier_h
+#ifndef mitkPURFClassifier_h
+#define mitkPURFClassifier_h
 
 #include <MitkCLVigraRandomForestExports.h>
 #include <mitkAbstractClassifier.h>
@@ -27,20 +27,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKCLVIGRARANDOMFOREST_EXPORT VigraRandomForestClassifier : public AbstractClassifier
+  class MITKCLVIGRARANDOMFOREST_EXPORT PURFClassifier : public AbstractClassifier
   {
   public:
 
-    mitkClassMacro(VigraRandomForestClassifier, AbstractClassifier)
+    mitkClassMacro(PURFClassifier, AbstractClassifier)
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
-      VigraRandomForestClassifier();
+      PURFClassifier();
 
-    ~VigraRandomForestClassifier();
+    ~PURFClassifier();
 
     void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
-    void OnlineTrain(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+
     Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
     Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
 
@@ -48,6 +48,7 @@ namespace mitk
     bool SupportsPointWiseWeight();
     bool SupportsPointWiseProbability();
     void ConvertParameter();
+    vigra::ArrayVector<double> CalculateKappa(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in);
 
     void SetRandomForest(const vigra::RandomForest<int> & rf);
     const vigra::RandomForest<int> & GetRandomForest() const;
@@ -61,11 +62,10 @@ namespace mitk
     void SetTreeCount(int);
     void SetWeightLambda(double);
 
-    void SetTreeWeights(Eigen::MatrixXd weights);
-    void SetTreeWeight(int treeId, double weight);
-    Eigen::MatrixXd GetTreeWeights() const;
-
     void PrintParameter(std::ostream &str = std::cout);
+
+    void SetClassProbabilities(Eigen::VectorXd probabilities);
+    Eigen::VectorXd GetClassProbabilites();
 
   private:
     // *-------------------
@@ -80,6 +80,7 @@ namespace mitk
 
     vigra::MultiArrayView<2, double> m_Probabilities;
     Eigen::MatrixXd m_TreeWeights;
+    Eigen::VectorXd m_ClassProbabilities;
 
     Parameter * m_Parameter;
     vigra::RandomForest<int> m_RandomForest;
@@ -91,4 +92,4 @@ namespace mitk
   };
 }
 
-#endif //mitkVigraRandomForestClassifier_h
+#endif //mitkPURFClassifier_h

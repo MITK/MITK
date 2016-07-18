@@ -51,12 +51,15 @@ void
   labelStatisticsImageFilter->Update();
 
   double volume = labelStatisticsImageFilter->GetCount(1);
+  double voxelVolume = 1;
   for (int i = 0; i < (int)(VImageDimension); ++i)
   {
     volume *= itkImage->GetSpacing()[i];
+    voxelVolume *= itkImage->GetSpacing()[i];
   }
 
-  featureList.push_back(std::make_pair("Volumetric Features Volume (pixel based)",volume));
+  featureList.push_back(std::make_pair("Volumetric Features Volume (pixel based)", volume));
+  featureList.push_back(std::make_pair("Volumetric Features Voxel Volume", voxelVolume));
 }
 
 template<typename TPixel, unsigned int VImageDimension>

@@ -182,8 +182,6 @@ namespace itk
       typename RelativeFrequencyContainerType::const_iterator rFreqIterator =
         m_RelativeFrequencyContainer.begin();
 
-      MITK_INFO << pixelMean << "  -  " << pixelVariance;
-
       for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )
       {

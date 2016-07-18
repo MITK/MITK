@@ -99,15 +99,14 @@ int main(int argc, char* argv[])
     int doTraining = allConfig.IntValue("General","Do Training",1);
     std::string forestPath = allConfig.Value("General","Forest Path");
     std::string trainingCollectionPath = allConfig.Value("General","Patient Collection");
-    std::string testCollectionPath = allConfig.Value("General", "Patient Test Collection", trainingCollectionPath);
+    std::string testCollectionPath = trainingCollectionPath;
 
     //////////////////////////////////////////////////////////////////////////////
     // Read Default Classification
     //////////////////////////////////////////////////////////////////////////////
     std::vector<std::string> trainPatients = allConfig.Vector("Training Group",currentRun);
     std::vector<std::string> testPatients = allConfig.Vector("Test Group",currentRun);
-    std::vector<std::string> modalities = allConfig.Vector("Modalities", 0);
-    std::vector<std::string> outputFilter = allConfig.Vector("Output Filter", 0);
+    std::vector<std::string> modalities = allConfig.Vector("Modalities",0);
     std::string trainMask = allConfig.Value("Data","Training Mask");
     std::string completeTrainMask = allConfig.Value("Data","Complete Training Mask");
     std::string testMask = allConfig.Value("Data","Test Mask");
@@ -116,14 +115,6 @@ int main(int argc, char* argv[])
     std::string outputFolder = allConfig.Value("General","Output Folder");
 
     std::string writeDataFilePath = allConfig.Value("Forest","File to write data to");
-
-    //////////////////////////////////////////////////////////////////////////////
-    // Read Data Forest Parameter
-    //////////////////////////////////////////////////////////////////////////////
-    int testSingleDataset = allConfig.IntValue("Data", "Test Single Dataset",0);
-    std::string singleDatasetName = allConfig.Value("Data", "Single Dataset Name", "none");
-    int trainSingleDataset = allConfig.IntValue("Data", "Train Single Dataset", 0);
-    std::string singleTrainDatasetName = allConfig.Value("Data", "Train Single Dataset Name", "none");
 
     //////////////////////////////////////////////////////////////////////////////
     // Read Forest Parameter
@@ -187,12 +178,7 @@ int main(int argc, char* argv[])
     usedModalities.push_back(statisticGoldStandard);
     usedModalities.push_back(importanceWeightName);
 
-    if (trainSingleDataset > 0)
-    {
-      trainPatients.clear();
-      trainPatients.push_back(singleTrainDatasetName);
-    }
-
+    //  vtkSmartPointer<mitk::CollectionReader> colReader = vtkSmartPointer<mitk::CollectionReader>::New();
     mitk::CollectionReader* colReader = new mitk::CollectionReader();
     colReader->AddDataElementIds(trainPatients);
     colReader->SetDataItemNames(usedModalities);
@@ -201,12 +187,6 @@ int main(int argc, char* argv[])
     if (doTraining)
     {
       trainCollection = colReader->LoadCollection(trainingCollectionPath);
-    }
-
-    if (testSingleDataset > 0)
-    {
-      testPatients.clear();
-      testPatients.push_back(singleDatasetName);
     }
     colReader->ClearDataElementIds();
     colReader->AddDataElementIds(testPatients);
@@ -332,19 +312,15 @@ int main(int argc, char* argv[])
         forest->SetPointWiseWeight(trainDataW);
         forest->UsePointWiseWeight(true);
       }
-      MITK_INFO << "Start training the forest";
       forest->Train(trainDataX, trainDataY);
-
-      MITK_INFO << "Save Forest";
-      mitk::IOUtil::Save(forest, forestPath);
+      // TODO forest.Save(forestPath);
     } else
     {
-      forest = dynamic_cast<mitk::VigraRandomForestClassifier*>(mitk::IOUtil::Load(forestPath)[0].GetPointer());// TODO forest.Load(forestPath);
+      // TODO forest.Load(forestPath);
     }
 
     time(&now);
     seconds =  std::difftime(now, lastTimePoint);
-    MITK_INFO << "Duration for Training: " << seconds;
     timingFile << seconds << ";";
     time(&lastTimePoint);
     //////////////////////////////////////////////////////////////////////////////
@@ -356,32 +332,22 @@ int main(int argc, char* argv[])
     auto w = forest->GetTreeWeights();
     w(0,0) = 10;
     forest->SetTreeWeights(w);*/
+    //mitk::IOUtil::Save(forest,"d:/tmp/forest.forest");
 
     //////////////////////////////////////////////////////////////////////////////
     // If required do test
     //////////////////////////////////////////////////////////////////////////////
-    MITK_INFO << "Convert Test data";
     auto testDataX = mitk::DCUtilities::DC3dDToMatrixXd(testCollection,modalities, testMask);
-
-    MITK_INFO << "Predict Test Data";
     auto testDataNewY = forest->Predict(testDataX);
     auto testDataNewProb = forest->GetPointWiseProbabilities();
     //MITK_INFO << testDataNewY;
 
-    auto maxClassValue = testDataNewProb.cols();
     std::vector<std::string> names;
-    for (int i = 0; i < maxClassValue; ++i)
-    {
-      std::string name = resultProb + std::to_string(i);
-      MITK_INFO << name;
-      names.push_back(name);
-    }
-    //names.push_back("prob-1");
-    //names.push_back("prob-2");
+    names.push_back("prob-1");
+    names.push_back("prob-2");
 
     mitk::DCUtilities::MatrixToDC3d(testDataNewY, testCollection, resultMask, testMask);
     mitk::DCUtilities::MatrixToDC3d(testDataNewProb, testCollection, names, testMask);
-    MITK_INFO << "Converted predicted data";
     //forest.SetMaskName(testMask);
     //forest.SetCollection(testCollection);
     //forest.Test();
@@ -427,11 +393,10 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // Save results to folder
     //////////////////////////////////////////////////////////////////////////////
-    ////std::vector<std::string> outputFilter;
+    std::vector<std::string> outputFilter;
     //outputFilter.push_back(resultMask);
     //std::vector<std::string> propNames = forest.GetListOfProbabilityNames();
     //outputFilter.insert(outputFilter.begin(), propNames.begin(), propNames.end());
-    MITK_INFO << "Write Result to HDD";
     mitk::CollectionWriter::ExportCollectionToFolder(testCollection,
       outputFolder + "/result_collection.xml",
       outputFilter);
@@ -447,7 +412,7 @@ int main(int argc, char* argv[])
 
     mitk::CollectionStatistic stat;
     stat.SetCollection(testCollection);
-    stat.SetClassCount(5);
+    stat.SetClassCount(2);
     stat.SetGoldName(statisticGoldStandard);
     stat.SetTestName(resultMask);
     stat.SetMaskName(testMask);

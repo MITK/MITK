@@ -33,6 +33,15 @@ public:
   virtual unsigned char operator() (unsigned char value) const = 0;
 };
 
+class BinaryValueminusOneToIndexMapper : public virtual ValueToIndexMapper
+{
+public:
+  unsigned char operator() (unsigned char value) const
+  {
+    return value-1;
+  }
+};
+
 class BinaryValueToIndexMapper : public virtual ValueToIndexMapper
 {
 public:

@@ -68,7 +68,8 @@ int main(int argc, char* argv[])
   }
 
   MITK_INFO << "Mode access";
-  int mode = 5;//us::any_cast<int>(parsedArgs["mode"]);
+  int mode =stoi(us::any_cast<string>(parsedArgs["mode"]));
+  MITK_INFO << "Mode: " << mode;
 
   MITK_INFO << "Read images";
   mitk::Image::Pointer mask1;
@@ -82,9 +83,9 @@ int main(int argc, char* argv[])
   mitk::MRNormTwoRegionsBasedFilter::Pointer twoRegion = mitk::MRNormTwoRegionsBasedFilter::New();
   mitk::Image::Pointer output;
 
-  //oneRegion->SetInput(image);
+  oneRegion->SetInput(image);
+  oneRegion->SetMask(mask0);
   twoRegion->SetInput(image);
-  //oneRegion->SetMask(mask0);
   twoRegion->SetMask1(mask0);
   twoRegion->SetMask2(mask1);
 

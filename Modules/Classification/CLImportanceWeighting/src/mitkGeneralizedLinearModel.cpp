@@ -129,7 +129,7 @@ mitk::GeneralizedLinearModel::GeneralizedLinearModel(const vnl_matrix<double> &x
     ++iter;
 
     oldB = m_B;
-    // Do Row-wise operation. No Vector oepration at this point.
+    // Do Row-wise operation. No Vector operation at this point.
     for (int r = 0; r<rows; ++r)
     {
       double deta = link.DLink(mu(r));

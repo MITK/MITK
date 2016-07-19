@@ -162,4 +162,5 @@ mitk::USProbe::Pointer mitk::USVideoDevice::GetCurrentProbe()
 
 void mitk::USVideoDevice::AddNewProbe()
 {
+  //Test
 }

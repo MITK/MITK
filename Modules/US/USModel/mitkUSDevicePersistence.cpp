@@ -89,7 +89,7 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
   QString comment = d->GetComment().c_str();
   int source = d->GetDeviceID();
   std::string file = d->GetFilePath();
-  if (file == "") file = "none";
+  if (!d->GetIsSourceFile()) file = "none"; //if GetIsSourceFile is true, the device plays back a file
 
   mitk::USImageVideoSource::Pointer imageSource = dynamic_cast<mitk::USImageVideoSource*>(d->GetUSImageSource().GetPointer());
   if (!imageSource)
@@ -105,8 +105,16 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
 
   mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
 
-  //TODO store the probes of the device. For now its jus a dummy thing for testing purpose
-  QString probes = "probes";
+  QString probes = "";
+
+  std::vector<mitk::USProbe::Pointer> allProbesOfDevice = d->GetAllProbes();
+  if (allProbesOfDevice.size() > 0)
+  {
+    for (std::vector<mitk::USProbe::Pointer>::iterator it = allProbesOfDevice.begin(); it != allProbesOfDevice.end(); it++)
+    {
+      probes = probes + USProbeToString(*it);
+    }
+  }
 
   char seperator = '|';
 
@@ -128,6 +136,16 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
 
   MITK_INFO << "Output String: " << returnValue.toStdString();
   return returnValue;
+}
+
+QString mitk::USDevicePersistence::USProbeToString(mitk::USProbe::Pointer p)
+{
+  QString probes = "";
+  std::map<int, mitk::Vector3D> depthsAndSpacing = p->GetDepthsAndSpacing();
+  if (depthsAndSpacing.size() > 0)
+  {
+    //TODO: implement a way to store all probe information in  a string
+  }
 }
 
 mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QString s)

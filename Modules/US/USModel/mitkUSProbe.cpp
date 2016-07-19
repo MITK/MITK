@@ -74,7 +74,7 @@ mitk::Vector3D mitk::USProbe::GetSpacingForGivenDepth(int givenDepth)
     spacing[2] = it->second[2];
   }
   else
-  {
+  { //spacing does not exist, so set default spacing (1,1,0)
     spacing[0] = 1;
     spacing[1] = 1;
     spacing[2] = 0;

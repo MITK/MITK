@@ -108,6 +108,11 @@ namespace mitk {
     */
     void AddNewProbe();
 
+    /**
+    \brief True, if this Device plays back a file, false if it recieves data from a device
+    */
+    bool GetIsSourceFile();
+
     itkGetMacro(Image, mitk::Image::Pointer);
     itkGetMacro(DeviceID, int);
     itkGetMacro(FilePath, std::string);

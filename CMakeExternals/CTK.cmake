@@ -66,7 +66,7 @@ if(MITK_USE_CTK)
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
       URL_MD5 2c04925496e6818706ccffa8a71afaae
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK-CXX.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

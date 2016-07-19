@@ -208,6 +208,8 @@ namespace itk
       itkMacroGLCMFeatureGetter(InverseDifferenceNormalized);
       itkMacroGLCMFeatureGetter(InverseDifference);
       itkMacroGLCMFeatureGetter(JointAverage);
+      itkMacroGLCMFeatureGetter(FirstMeasureOfInformationCorrelation);
+      itkMacroGLCMFeatureGetter(SecondMeasureOfInformationCorrelation);
 
       /** Texture feature types */
       typedef enum {
@@ -237,6 +239,8 @@ namespace itk
         InverseDifferenceNormalized,
         InverseDifference,
         JointAverage,
+        FirstMeasureOfInformationCorrelation,
+        SecondMeasureOfInformationCorrelation,
         InvalidFeatureName
       }  TextureFeatureName;
 

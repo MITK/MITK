@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkCommon.h>
 #include <mitkUSVideoDevice.h>
+#include <mitkUSProbe.h>
 
 // ITK
 #include <itkObjectFactory.h>
@@ -51,10 +52,13 @@ namespace mitk {
     QString USVideoDeviceToString(mitk::USVideoDevice::Pointer d);
     mitk::USVideoDevice::Pointer StringToUSVideoDevice(QString s);
     QString USProbeToString(mitk::USProbe::Pointer p);
+    mitk::USProbe::Pointer StringToUSProbe(std::string s);
 
     QSettings m_devices;
 
     void split(std::string& text, std::string& separators, std::vector<std::string>& words);
+    double spacingToDouble(std::string s);
+    int depthToInt(std::string s);
   };
 } // namespace mitk
 

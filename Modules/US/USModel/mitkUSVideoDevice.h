@@ -106,7 +106,7 @@ namespace mitk {
     /**
     \brief adds a new probe to the device
     */
-    void AddNewProbe();
+    void AddNewProbe(mitk::USProbe::Pointer probe);
 
     /**
     \brief True, if this Device plays back a file, false if it recieves data from a device

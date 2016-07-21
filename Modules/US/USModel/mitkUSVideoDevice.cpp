@@ -160,8 +160,9 @@ mitk::USProbe::Pointer mitk::USVideoDevice::GetCurrentProbe()
   }
 }
 
-void mitk::USVideoDevice::AddNewProbe()
+void mitk::USVideoDevice::AddNewProbe(mitk::USProbe::Pointer probe)
 {
+  m_Probes.push_back(probe);
 }
 
 bool mitk::USVideoDevice::GetIsSourceFile()

@@ -22,7 +22,6 @@
 
     <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
       <condition name="minimal_figure_is_finished" />
-      <condition name="points_can_be_added_or_removed" />
       <action name="finalize_figure" />"
     </transition>
 

@@ -109,6 +109,12 @@ namespace mitk {
     void AddNewProbe(mitk::USProbe::Pointer probe);
 
     /**
+    * \brief get the probe by its name
+    * Returns a  pointer to the probe identified by the given name. If no probe of given name exists for this Device 0 is returned.
+    */
+    mitk::USProbe::Pointer GetProbeByName(std::string name);
+
+    /**
     \brief True, if this Device plays back a file, false if it recieves data from a device
     */
     bool GetIsSourceFile();

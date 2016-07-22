@@ -922,9 +922,9 @@ mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(mitk::DataStora
   if(nodes.IsNotNull())
   {
     int  maxlayer = -32768;
+    bool isHelper(false);
     for (unsigned int x = 0; x < nodes->size(); x++)
     {
-      bool isHelper (false);
       nodes->at(x)->GetBoolProperty("helper object", isHelper);
       if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
       {

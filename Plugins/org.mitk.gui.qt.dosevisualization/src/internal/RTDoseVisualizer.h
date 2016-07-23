@@ -103,6 +103,8 @@ public:
 
     void ActualizeFreeIsoLine();
 
+    void OnDoseClicked();
+
 protected:
 
   virtual void CreateQtPartControl(QWidget *parent);

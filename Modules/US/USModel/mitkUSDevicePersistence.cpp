@@ -107,7 +107,7 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
 
   mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
 
-  QString probes = "ACV$100%1%1%0$120%2%2%0$150%3%3%0!BDW$90%1%1%0$120%2%2%0"; //for testing purpose needs to be an empty string later
+  QString probes = ""; //ACV$100%1%1%0$120%2%2%0$140%2%2%5!BDW$90%1%1%2$100%1%1%8!CSV$50%1%2%3$60%2%2%5
 
   char probesSeperator = '!';
   std::vector<mitk::USProbe::Pointer> allProbesOfDevice = d->GetAllProbes();
@@ -157,7 +157,8 @@ QString mitk::USDevicePersistence::USProbeToString(mitk::USProbe::Pointer p)
   if (depthsAndSpacing.size() > 0)
   {
     for (std::map<int, mitk::Vector3D>::iterator it = depthsAndSpacing.begin(); it != depthsAndSpacing.end(); it++){
-      probe = probe + depthSeperator + it->first + spacingSeperator + it->second[0] + spacingSeperator + it->second[1] + spacingSeperator + it->second[2];
+      probe = probe + depthSeperator + QString::number(it->first) + spacingSeperator + QString::number(it->second[0])
+        + spacingSeperator + QString::number(it->second[1]) + spacingSeperator + QString::number(it->second[2]);
     }
   }
   return probe;

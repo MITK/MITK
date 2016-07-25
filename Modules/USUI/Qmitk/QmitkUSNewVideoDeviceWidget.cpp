@@ -147,7 +147,28 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     imageSource->OverrideResolution(width, height);
     imageSource->SetResolutionOverride(true);
   }
-
+  if (!m_Controls->m_ProbesInformation->text().isEmpty()) //there are informations for the probes of the device, so create the probes
+  {
+    QString probesInformation = m_Controls->m_ProbesInformation->text();
+    QStringList probes = probesInformation.split(';'); //split the different probes
+    for (int i = 0; i < probes.size(); i++)
+    {
+      QStringList depths = probes.at(i).split(','); //now for every probe split the probe name and the different depths
+      mitk::USProbe::Pointer probe = mitk::USProbe::New();
+      probe->SetName(depths.at(0).toStdString()); //first element is the probe name
+      for (int i = 1; i < depths.size(); ++i) //all the other elements are the depths for the specific probe so add them to the probe
+      {
+        probe->SetDepth(depths.at(i).toInt());
+      }
+      newDevice->AddNewProbe(probe);
+    }
+  }
+  else //nor informations for the probes of the device, so set default value
+  {
+    mitk::USProbe::Pointer probe = mitk::USProbe::New("default");
+    probe->SetDepth(0);
+    newDevice->AddNewProbe(probe);
+  }
   newDevice->Initialize();
 
   emit Finished();
@@ -222,4 +243,19 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
     device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
   result->setText(text.c_str());
   return result;
+}
+
+void QmitkUSNewVideoDeviceWidget::split(std::string& text, std::string& separators, std::vector<std::string>& words)
+{
+  int n = text.length();
+  int start, stop;
+
+  start = text.find_first_not_of(separators);
+  while ((start >= 0) && (start < n))
+  {
+    stop = text.find_first_of(separators, start);
+    if ((stop < 0) || (stop > n)) stop = n;
+    words.push_back(text.substr(start, stop - start));
+    start = text.find_first_not_of(separators, stop + 1);
+  }
 }

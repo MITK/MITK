@@ -147,7 +147,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     imageSource->OverrideResolution(width, height);
     imageSource->SetResolutionOverride(true);
   }
-  if (!m_Controls->m_ProbesInformation->text().isEmpty()) //there are informations for the probes of the device, so create the probes
+  if (!m_Controls->m_ProbesInformation->text().isEmpty()) //there are informations about the probes of the device, so create the probes
   {
     QString probesInformation = m_Controls->m_ProbesInformation->text();
     QStringList probes = probesInformation.split(';'); //split the different probes
@@ -163,7 +163,7 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
       newDevice->AddNewProbe(probe);
     }
   }
-  else //nor informations for the probes of the device, so set default value
+  else //no information about the probes of the device, so set default value
   {
     mitk::USProbe::Pointer probe = mitk::USProbe::New("default");
     probe->SetDepth(0);
@@ -243,19 +243,4 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
     device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
   result->setText(text.c_str());
   return result;
-}
-
-void QmitkUSNewVideoDeviceWidget::split(std::string& text, std::string& separators, std::vector<std::string>& words)
-{
-  int n = text.length();
-  int start, stop;
-
-  start = text.find_first_not_of(separators);
-  while ((start >= 0) && (start < n))
-  {
-    stop = text.find_first_of(separators, start);
-    if ((stop < 0) || (stop > n)) stop = n;
-    words.push_back(text.substr(start, stop - start));
-    start = text.find_first_not_of(separators, stop + 1);
-  }
 }

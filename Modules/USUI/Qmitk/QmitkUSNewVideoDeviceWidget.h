@@ -107,8 +107,6 @@ protected:
   *  if the "CreateNewDevice slot was called.
   */
   mitk::USVideoDevice::Pointer m_TargetDevice;
-
-  void split(std::string& text, std::string& separators, std::vector<std::string>& words);
 };
 
 #endif // _QmitkUSNewVideoDeviceWidget_H_INCLUDED

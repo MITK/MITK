@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>405</width>
-    <height>231</height>
+    <height>234</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,14 +25,13 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="0" column="0">
-      <widget class="QPushButton" name="m_BtnNewDevice">
-       <property name="text">
-        <string>New Video Device</string>
+     <item row="1" column="0" colspan="2">
+      <widget class="QPushButton" name="m_BtnActivate">
+       <property name="enabled">
+        <bool>false</bool>
        </property>
-       <property name="icon">
-        <iconset resource="../resources/USUI.qrc">
-         <normaloff>:/USUI/plus.png</normaloff>:/USUI/plus.png</iconset>
+       <property name="text">
+        <string>Activate</string>
        </property>
       </widget>
      </item>
@@ -50,13 +49,24 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0" colspan="2">
-      <widget class="QPushButton" name="m_BtnActivate">
+     <item row="0" column="0">
+      <widget class="QPushButton" name="m_BtnNewDevice">
+       <property name="text">
+        <string>New Video Device</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/USUI.qrc">
+         <normaloff>:/USUI/plus.png</normaloff>:/USUI/plus.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="m_BtnEdit">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Activate</string>
+        <string>Edit Video Device</string>
        </property>
       </widget>
      </item>

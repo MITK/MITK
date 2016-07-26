@@ -401,6 +401,9 @@ public:
       /// Multi-frame image(s) or not
       bool IsMultiFrameImage() const;
 
+      // Image orientation
+      std::string GetOrientation() const;
+
       ImageBlockDescriptor();
       ~ImageBlockDescriptor();
 
@@ -432,6 +435,8 @@ public:
 
       void GetDesiredMITKImagePixelSpacing(ScalarType& spacingX, ScalarType& spacingY) const;
 
+      void SetOrientation(std::string orientation);
+
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
       std::string m_SeriesInstanceUID;
@@ -442,6 +447,7 @@ public:
       std::string m_ImagerPixelSpacing;
       bool m_HasMultipleTimePoints;
       bool m_IsMultiFrameImage;
+      std::string m_Orientation;
   };
 
   typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;

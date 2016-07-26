@@ -939,6 +939,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
       thisBlock.SetPixelSpacingInformation( DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagPixelSpacing ) ),
                                             DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagImagerPixelSpacing ) ) );
       thisBlock.SetHasMultipleTimePoints( false );
+      thisBlock.SetOrientation(DicomSeriesReader::ConstCharStarToString(scanner.GetValue(firstFileInBlock.c_str(), tagImageOrientation)));
 
       groupsOf3DBlocks[ newGroupUID.str() ] = thisBlock;
 

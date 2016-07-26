@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 *  limitations under the License.
 *
 *=========================================================================*/
-#ifndef __itkEnhancedScalarImageToSizeZoneMatrixFilter_h
-#define __itkEnhancedScalarImageToSizeZoneMatrixFilter_h
+#ifndef __itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter_h
+#define __itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter_h
 
 #include "itkImage.h"
 #include "itkHistogram.h"
@@ -43,7 +43,7 @@ namespace itk
 {
   namespace Statistics
   {
-    /** \class EnhancedScalarImageToSizeZoneMatrixFilter
+    /** \class EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter
     *  \brief This class computes a run length matrix (histogram) from
     *  a given image and a mask image if provided. Run length matrces are
     *  used for image texture description.
@@ -108,9 +108,9 @@ namespace itk
     *
     * IJ article: http://hdl.handle.net/1926/1374
     *
-    * \sa ScalarImageToSizeZoneFeaturesFilter
-    * \sa EnhancedScalarImageToSizeZoneMatrixFilter
-    * \sa HistogramToSizeZoneFeaturesFilter
+    * \sa ScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter
+    * \sa EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter
+    * \sa HistogramToNeighbourhoodGreyLevelDifferenceFeaturesFilter
     *
     * \author: Nick Tustison
     * \ingroup ITKStatistics
@@ -118,17 +118,17 @@ namespace itk
 
     template<typename TImageType, typename THistogramFrequencyContainer =
       DenseFrequencyContainer2>
-    class EnhancedScalarImageToSizeZoneMatrixFilter : public ProcessObject
+    class EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter : public ProcessObject
     {
     public:
       /** Standard typedefs */
-      typedef EnhancedScalarImageToSizeZoneMatrixFilter  Self;
+      typedef EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter  Self;
       typedef ProcessObject                       Superclass;
       typedef SmartPointer<Self>                  Pointer;
       typedef SmartPointer<const Self>            ConstPointer;
 
       /** Run-time type information (and related methods). */
-      itkTypeMacro( EnhancedScalarImageToSizeZoneMatrixFilter, ProcessObject );
+      itkTypeMacro( EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter, ProcessObject );
 
       /** standard New() method support */
       itkNewMacro( Self );
@@ -182,6 +182,8 @@ namespace itk
       *
       */
       void SetOffset( const OffsetType offset );
+
+      void AddOffsets( const std::vector<OffsetType> offset );
 
       /**
       * Get the current offset(s).
@@ -238,6 +240,9 @@ namespace itk
       /** method to get the Histogram */
       const HistogramType * GetOutput() const;
 
+      /** method to get the Histogram */
+      double* GetSiMatrix() const;
+
       /**
       * Set the pixel value of the mask that should be considered "inside" the
       * object. Defaults to 1.
@@ -246,8 +251,8 @@ namespace itk
       itkGetConstMacro( InsidePixelValue, PixelType );
 
     protected:
-      EnhancedScalarImageToSizeZoneMatrixFilter();
-      virtual ~EnhancedScalarImageToSizeZoneMatrixFilter() {};
+      EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter();
+      virtual ~EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter() {};
       virtual void PrintSelf( std::ostream& os, Indent indent ) const ITK_OVERRIDE;
 
       /** Standard itk::ProcessObject subclass method. */
@@ -259,6 +264,15 @@ namespace itk
 
       /** This method causes the filter to generate its output. */
       virtual void GenerateData() ITK_OVERRIDE;
+
+      /**
+      * Normalize the direction of the offset before it is applied.
+      * The last non-zero dimension of the offest has to be positive in order
+      * to match to scanning order of the iterator. Only the sign is changed.
+      * For example, the input offset (-1, 0) will be normalized as
+      * (1, 0).
+      * */
+      void NormalizeOffsetDirection(OffsetType &offset);
 
     private:
 
@@ -272,12 +286,14 @@ namespace itk
       MeasurementVectorType    m_LowerBound;
       MeasurementVectorType    m_UpperBound;
       OffsetVectorPointer      m_Offsets;
+
+      double * m_siMatrix;
     };
   } // end of namespace Statistics
 } // end of namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkEnhancedScalarImageToSizeZoneMatrixFilter.hxx"
+#include "itkEnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter.hxx"
 #endif
 
 #endif

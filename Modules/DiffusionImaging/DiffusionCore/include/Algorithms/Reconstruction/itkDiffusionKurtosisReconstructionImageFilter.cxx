@@ -25,6 +25,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
 
+#include <itkVectorIndexSelectionCastImageFilter.h>
+#include <itkComposeImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+
 template< class TInputPixelType>
 static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &input, const vnl_vector<double>& bvalues, vnl_vector<double>& result, bool omit_bzero = true)
 {
@@ -58,14 +62,17 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
     }
     else
     {
-      fit_measurements[ running_index ]  = input.GetElement(running_index + skip_count);
-      fit_bvalues[ running_index ] = *bvalueIter;
+      fit_measurements[ running_index - skip_count ]  = input.GetElement(running_index);
+      fit_bvalues[ running_index - skip_count] = *bvalueIter;
     }
 
     ++running_index;
     ++bvalueIter;
   }
 
+
+  MITK_INFO("KurtosisFilter.FitSingleVoxel.Meas") << fit_measurements;
+  MITK_INFO("KurtosisFilter.FitSingleVoxel.Bval") << fit_bvalues;
 
   // perform fit on data vectors
   if( omit_bzero )
@@ -85,6 +92,8 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
    vnl_levenberg_marquardt nonlinear_fit( kurtosis_cost_fn );
    nonlinear_fit.minimize(result);
   }
+
+  MITK_INFO("KurtosisFilter.FitSingleVoxel.Rslt") << result;
 }
 
 
@@ -93,7 +102,10 @@ template< class TInputPixelType, class TOutputPixelType>
 itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::DiffusionKurtosisReconstructionImageFilter()
   : m_ReferenceBValue(-1),
-    m_OmitBZero(false)
+    m_OmitBZero(false),
+    m_MaskImage(nullptr),
+    m_ApplyPriorSmoothing(false),
+    m_SmoothingSigma(1.5)
 {
   this->m_InitialPosition = vnl_vector<double>(3, 0);
   this->m_InitialPosition[2] = 1000.0; // S_0
@@ -125,7 +137,84 @@ template< class TInputPixelType, class TOutputPixelType>
 void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::BeforeThreadedGenerateData()
 {
+  // if we have a region set, convert it to a mask image, which is to be used as default for telling
+  // we need to set the image anyway, so by default the mask is overall 1
+  if( m_MaskImage.IsNull() )
+  {
+    m_MaskImage = MaskImageType::New();
+    m_MaskImage->SetRegions( this->GetInput()->GetLargestPossibleRegion() );
+    m_MaskImage->CopyInformation( this->GetInput() );
+    m_MaskImage->Allocate();
 
+    if( this->m_MapOutputRegion.GetNumberOfPixels() > 0 )
+    {
+
+      m_MaskImage->FillBuffer(0);
+
+      typedef itk::ImageRegionIteratorWithIndex< MaskImageType > MaskIteratorType;
+      MaskIteratorType maskIter( this->m_MaskImage, this->m_MapOutputRegion );
+      maskIter.GoToBegin();
+
+      while( !maskIter.IsAtEnd() )
+      {
+        maskIter.Set( 1 );
+        ++maskIter;
+      }
+
+    }
+    else
+    {
+      m_MaskImage->FillBuffer(1);
+    }
+
+
+  }
+
+
+  // apply smoothing to the input image
+  if( this->m_ApplyPriorSmoothing )
+  {
+    // filter typedefs
+    typedef itk::DiscreteGaussianImageFilter< itk::Image<TInputPixelType, 3 >, itk::Image<TInputPixelType, 3 > > GaussianFilterType;
+    typedef itk::VectorIndexSelectionCastImageFilter< InputImageType, itk::Image<TInputPixelType, 3 > > IndexSelectionType;
+    typedef itk::ComposeImageFilter< itk::Image<TInputPixelType, 3>, InputImageType > ComposeFilterType;
+
+
+    auto vectorImage = this->GetInput();
+    typename IndexSelectionType::Pointer indexSelectionFilter = IndexSelectionType::New();
+    indexSelectionFilter->SetInput( vectorImage );
+
+    typename ComposeFilterType::Pointer vec_composer = ComposeFilterType::New();
+
+    for( unsigned int i=0; i<vectorImage->GetVectorLength(); ++i)
+    {
+      typename GaussianFilterType::Pointer gaussian_filter = GaussianFilterType::New();
+
+      indexSelectionFilter->SetIndex( i );
+
+      gaussian_filter->SetInput( indexSelectionFilter->GetOutput() );
+      gaussian_filter->SetVariance( m_SmoothingSigma );
+
+      vec_composer->SetInput(i, gaussian_filter->GetOutput() );
+
+      gaussian_filter->Update();
+    }
+
+    try
+    {
+      vec_composer->Update();
+    }
+    catch(const itk::ExceptionObject &e)
+    {
+      mitkThrow() << "[VectorImage.GaussianSmoothing] !! Failed with ITK Exception: " << e.what();
+    }
+
+    this->m_ProcessedInputImage = vec_composer->GetOutput();
+  }
+  else
+  {
+    this->m_ProcessedInputImage = const_cast<InputImageType*>( this->GetInput() );
+  }
 }
 
 template< class TInputPixelType, class TOutputPixelType>
@@ -150,16 +239,29 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
 template< class TInputPixelType, class TOutputPixelType>
 typename itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>::KurtosisSnapshot
 itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
+::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, GradientDirectionContainerType::Pointer gradients, float bvalue, bool omit_bzero)
+{
+  // initialize bvalues from reference value and the gradients provided on input
+  this->SetReferenceBValue(bvalue);
+  this->SetGradientDirections( gradients );
+
+  // call the other method
+  return this->GetSnapshot( input, this->m_BValues, omit_bzero );
+}
+
+
+template< class TInputPixelType, class TOutputPixelType>
+typename itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>::KurtosisSnapshot
+itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, vnl_vector<double> bvalues, bool omit_bzero)
 {
   // initialize
   vnl_vector<double> initial_position;
-  if( !this->m_OmitBZero )
+  if( !omit_bzero )
   {
     initial_position.set_size(2);
     initial_position[0] = this->m_InitialPosition[0];
     initial_position[1] = this->m_InitialPosition[1];
-
   }
   else
   {
@@ -177,10 +279,59 @@ itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelTyp
 
   if( omit_bzero )
   {
-    result.m_f = 1 - initial_position[2] / std::max(0.01, input.GetElement(0));
+    result.m_f = 1 - initial_position[2] / std::fmax(0.01, input.GetElement(0));
+    result.m_BzeroFit = initial_position[2];
   }
   else
     result.m_f = 1;
+
+  // assembly data vectors for fitting
+  auto bvalueIter = bvalues.begin();
+  unsigned int unused_values = 0;
+  while( bvalueIter != bvalues.end() )
+  {
+    if( *bvalueIter < vnl_math::eps && omit_bzero )
+    {
+      ++unused_values;
+    }
+    ++bvalueIter;
+  }
+
+  // initialize data vectors with the estimated size (after filtering)
+  vnl_vector<double> fit_measurements( input.Size() - unused_values, 0 );
+  vnl_vector<double> fit_bvalues( input.Size() - unused_values, 0 );
+
+  // original data
+  vnl_vector<double> orig_measurements( input.Size(), 0 );
+
+  bvalueIter = bvalues.begin();
+  unsigned int running_index = 0;
+  unsigned int skip_count = 0;
+  while( bvalueIter != bvalues.end() )
+  {
+    if( *bvalueIter < vnl_math::eps && omit_bzero )
+    {
+      ++skip_count;
+    }
+    else
+    {
+      fit_measurements[ running_index - skip_count ]  = input.GetElement(running_index);
+      fit_bvalues[ running_index - skip_count ] = *bvalueIter;
+    }
+
+    orig_measurements[ running_index ] = input.GetElement(running_index);
+
+    ++running_index;
+    ++bvalueIter;
+  }
+
+  result.fit_bvalues = fit_bvalues;
+  result.fit_measurements = fit_measurements;
+
+  result.bvalues = bvalues;
+  result.measurements = orig_measurements;
+
+  result.m_fittedBZero = omit_bzero;
 
   return result;
 }
@@ -242,8 +393,12 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
   kImageIt.GoToBegin();
 
   typedef itk::ImageRegionConstIteratorWithIndex< InputImageType > InputIteratorType;
-  InputIteratorType inputIter( this->GetInput(), outputRegionForThread );
+  InputIteratorType inputIter( m_ProcessedInputImage, outputRegionForThread );
   inputIter.GoToBegin();
+
+  typedef itk::ImageRegionConstIteratorWithIndex< MaskImageType > MaskIteratorType;
+  MaskIteratorType maskIter( this->m_MaskImage, outputRegionForThread );
+  maskIter.GoToBegin();
 
   vnl_vector<double> initial_position;
   if( !this->m_OmitBZero )
@@ -264,9 +419,8 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
     // set (reset) each iteration
     vnl_vector<double> result = initial_position;
 
-    // fit single voxel
-
-    if( m_MapOutputRegion.IsInside( inputIter.GetIndex() ) )
+    // fit single voxel (if inside mask )
+    if( maskIter.Get() > 0 )
     {
       FitSingleVoxel( inputIter.Get(), this->m_BValues, result, this->m_OmitBZero );
     }
@@ -282,6 +436,7 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
 
     //std::cout << "[Kurtosis.Fit]" << inputIter.GetIndex() << " --> " << dImageIt.GetIndex() << " result: " << result << std::endl;
 
+    ++maskIter;
     ++inputIter;
     ++dImageIt;
     ++kImageIt;

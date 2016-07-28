@@ -161,22 +161,40 @@ namespace itk
   };
 
 
+/**
+  @class DiffusionKurtosisReconstructionImageFilter
+  @brief This filter provides the fit of the kurtosis (non-IVIM) signal to the data
+
+  It has two main modes of operation, either as an image filter to compute the D and K maps, i.e. fitting the values to each voxel or a computation on a single voxel
+  or a voxel group (with mask) can be triggered by @sa GetSnapshot, GetCurrentSnapshot methods.
+  */
 template< class TInputPixelType, class TOutputPixelType >
 class DiffusionKurtosisReconstructionImageFilter :
     public ImageToImageFilter< VectorImage< TInputPixelType, 3>, Image<TOutputPixelType, 3> >
 {
 public:
 
+  /**
+    @struct KurtosisSnapsho
+
+    @brief Struct describing a result (and the data) of a Kurtosis model fit
+    */
   struct KurtosisSnapshot
   {
     // input data structures
     //vnl_vector<double> filtered_measurements;
     vnl_vector<double> bvalues;
     vnl_vector<double> measurements;
+
+    vnl_vector<double> fit_bvalues;
+    vnl_vector<double> fit_measurements;
     vnl_vector<unsigned int> weighted_image_indices;
+
+    bool m_fittedBZero;
 
     // variables holding the fitted values
     double m_f;
+    double m_BzeroFit;
     double m_D;
     double m_K;
   };
@@ -201,6 +219,8 @@ public:
   typedef typename Superclass::InputImageType      InputImageType;
   typedef Image< OutputPixelType, 3 >              OutputImageType;
 
+  typedef itk::Image< unsigned char, 3>            MaskImageType;
+
   typedef typename Superclass::OutputImageRegionType   OutputImageRegionType;
 
 
@@ -223,7 +243,20 @@ public:
   void SetOmitUnweightedValue( bool flag)
   { this->m_OmitBZero = flag; }
 
+  /**
+    Trigger a single computation of the Kurtosis values from the given input vector and the bvalues and returns the result as a KurtosisSnapshot object */
   KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, vnl_vector<double> bvalues, bool omit_bzero);
+
+  /**
+    Trigger a single computation of the kurtosis values, first the bvalues vector is computed internally but then also stored into the returend snapshot */
+  KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, GradientDirectionContainerType::Pointer, float bvalue, bool omit_bzero);
+
+  /**
+    * Returns the value of the current data presented to the filter.
+
+      If a mask is set, the voxels are first averaged before passed to the fitting procedure
+    */
+  KurtosisSnapshot GetCurrentSnapshot(bool omit_bzero);
 
   /** Set the reference bvalue of the input DW image */
   void SetReferenceBValue( double bvalue )
@@ -234,7 +267,25 @@ public:
 
   /** Restrict map generation to an image region */
   void SetMapOutputRegion( OutputImageRegionType region )
-  { m_MapOutputRegion = region; }
+  {
+    m_MapOutputRegion = region;
+    this->m_ApplyPriorSmoothing = true;
+  }
+
+  void SetImageMask( MaskImageType::Pointer mask );
+
+  /** Set smoothing sigma (default = 1.5 ), automatically enables smoothing prior to fitting */
+  void SetSmoothingSigma( double sigma )
+  {
+    this->m_SmoothingSigma = sigma;
+    this->m_ApplyPriorSmoothing = true;
+  }
+
+  /** Activate/Deactivate the gaussian smoothing applied to the input prior to fitting ( default = off ) */
+  void SetUseSmoothingPriorToFitting( bool flag)
+  {
+    this->m_ApplyPriorSmoothing = flag;
+  }
 
 protected:
   DiffusionKurtosisReconstructionImageFilter();
@@ -257,6 +308,13 @@ protected:
   bool m_OmitBZero;
 
   OutputImageRegionType m_MapOutputRegion;
+
+  MaskImageType::Pointer m_MaskImage;
+
+  typename InputImageType::Pointer m_ProcessedInputImage;
+
+  bool m_ApplyPriorSmoothing;
+  double m_SmoothingSigma;
 
 private:
 

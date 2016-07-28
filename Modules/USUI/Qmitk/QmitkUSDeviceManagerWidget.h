@@ -54,6 +54,7 @@ public:
 
 signals:
   void NewDeviceButtonClicked();
+  void EditDeviceButtonClicked(mitk::USDevice::Pointer);
 
   /* This signal is emitted if a device is activated. */
   void DeviceActivated();
@@ -74,6 +75,8 @@ signals:
 
   void OnClickedRemoveDevice();
   void OnClickedNewDevice();
+
+  void OnClickedEditDevice();
 
   /*
   \brief Called, when the selection in the devicelist changes.

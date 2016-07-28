@@ -73,6 +73,8 @@ signals:
   */
   void OnClickedDone();
 
+  void OnClickedFinishedEditing();
+
   /*
   \brief Called, when the button "Cancel" was clicked
   */
@@ -85,6 +87,14 @@ signals:
 
   void OnOpenFileButtonClicked();
 
+  void OnClickedRemoveProbe();
+
+  void OnClickedRemoveDepth();
+
+  void OnClickedAddDepths();
+
+  void OnProbeChanged(const QString & probename);
+
 protected:
 
   Ui::QmitkUSNewVideoDeviceWidgetControls* m_Controls; ///< member holding the UI elements of this widget
@@ -93,6 +103,14 @@ protected:
   \brief Constructs a ListItem from the given device for display in the list of active devices
   */
   QListWidgetItem* ConstructItemFromDevice(mitk::USDevice::Pointer device);
+
+  void ChangeUIEditingUSVideoDevice();
+
+  void CleanUpAfterEditingOfDevice();
+
+  void CleanUpAfterCreatingNewDevice();
+
+  void AddProbesToDevice(mitk::USVideoDevice::Pointer device);
 
   /*
   \brief Displays whether this widget is active or not. It gets activated by either sending a Signal to

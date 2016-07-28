@@ -62,6 +62,11 @@ namespace mitk {
     void SetDepth(int depth);
 
     /**
+    * \brief Removes the given depth of the probe, if it exists
+    */
+    void RemoveDepth(int depthToRemove);
+
+    /**
     * \ brief Sets the spacing associated to the given depth of the probe. Spacing needs to be calibrated.
     */
     void SetSpacingForGivenDepth(int givenDepth, Vector3D spacing);

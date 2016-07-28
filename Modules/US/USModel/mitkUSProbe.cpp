@@ -56,6 +56,11 @@ void mitk::USProbe::SetDepth(int depth)
   m_DepthsAndSpacings.insert(std::pair<int, mitk::Vector3D>(depth, defaultSpacing));
 }
 
+void mitk::USProbe::RemoveDepth(int depthToRemove)
+{
+  m_DepthsAndSpacings.erase(depthToRemove);
+}
+
 void mitk::USProbe::SetSpacingForGivenDepth(int givenDepth, Vector3D spacing)
 {
   m_DepthsAndSpacings[givenDepth][0] = spacing[0];

@@ -25,16 +25,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="0" colspan="2">
-      <widget class="QPushButton" name="m_BtnActivate">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Activate</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QPushButton" name="m_BtnRemove">
        <property name="enabled">
@@ -60,13 +50,23 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="1" column="0">
       <widget class="QPushButton" name="m_BtnEdit">
        <property name="enabled">
         <bool>false</bool>
        </property>
        <property name="text">
         <string>Edit Video Device</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="m_BtnActivate">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Activate</string>
        </property>
       </widget>
      </item>

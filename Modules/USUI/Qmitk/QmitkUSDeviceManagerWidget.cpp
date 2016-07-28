@@ -69,6 +69,8 @@ void QmitkUSDeviceManagerWidget::CreateConnections()
     connect(m_Controls->m_ConnectedDevices,
       SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this,
       SLOT(OnDeviceSelectionChanged(us::ServiceReferenceU)));
+    connect(m_Controls->m_BtnEdit, SIGNAL(clicked()), this,
+      SLOT(OnClickedEditDevice()));
   }
 }
 
@@ -170,6 +172,13 @@ void QmitkUSDeviceManagerWidget::OnClickedRemoveDevice()
 void QmitkUSDeviceManagerWidget::OnClickedNewDevice()
 {
   emit NewDeviceButtonClicked();
+}
+
+void QmitkUSDeviceManagerWidget::OnClickedEditDevice()
+{
+  mitk::USDevice::Pointer device =
+    m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
+  emit EditDeviceButtonClicked(device);
 }
 
 void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(

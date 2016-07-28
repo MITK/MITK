@@ -63,7 +63,7 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
 
   //connect signals and slots...
   connect(m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this, SLOT(OnClickedAddNewDevice())); // Change Widget Visibilities
-  //connect( m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice()) ); // Init NewDeviceWidget
+  connect(m_Controls.m_DeviceManagerWidget, SIGNAL(NewDeviceButtonClicked()), this->m_Controls.m_NewVideoDeviceWidget, SLOT(CreateNewDevice())); // Init NewDeviceWidget
   connect(m_Controls.m_ActiveVideoDevices, SIGNAL(ServiceSelectionChanged(us::ServiceReferenceU)), this, SLOT(OnChangedActiveDevice()));
   connect(m_Controls.m_RunImageTimer, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
   connect(m_Controls.m_ShowImageStream, SIGNAL(clicked()), this, SLOT(OnChangedActiveDevice()));
@@ -77,6 +77,8 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   connect(m_RenderingTimer3d, SIGNAL(timeout()), this, SLOT(RenderImage3d()));
   connect(m_Controls.m_Update2DView, SIGNAL(clicked()), this, SLOT(StartTimers()));
   connect(m_Controls.m_Update3DView, SIGNAL(clicked()), this, SLOT(StartTimers()));
+  connect(m_Controls.m_DeviceManagerWidget, SIGNAL(EditDeviceButtonClicked(mitk::USDevice::Pointer)), this, SLOT(OnClickedEditDevice())); //Change Widget Visibilities
+  connect(m_Controls.m_DeviceManagerWidget, SIGNAL(EditDeviceButtonClicked(mitk::USDevice::Pointer)), this->m_Controls.m_NewVideoDeviceWidget, SLOT(EditDevice(mitk::USDevice::Pointer)));
 
   // Initializations
   m_Controls.m_NewVideoDeviceWidget->setVisible(false);
@@ -110,6 +112,14 @@ void UltrasoundSupport::OnClickedAddNewDevice()
   m_Controls.m_DeviceManagerWidget->setVisible(false);
   m_Controls.m_Headline->setText("Add New Video Device:");
   m_Controls.m_WidgetActiveDevices->setVisible(false);
+}
+
+void UltrasoundSupport::OnClickedEditDevice()
+{
+  m_Controls.m_NewVideoDeviceWidget->setVisible(true);
+  m_Controls.m_DeviceManagerWidget->setVisible(false);
+  m_Controls.m_WidgetActiveDevices->setVisible(false);
+  m_Controls.m_Headline->setText("Edit Video Device:");
 }
 
 void UltrasoundSupport::UpdateImage()

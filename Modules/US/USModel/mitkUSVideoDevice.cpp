@@ -171,6 +171,19 @@ mitk::USProbe::Pointer mitk::USVideoDevice::GetProbeByName(std::string name)
   return 0; //no matching probe was found so 0 is returned
 }
 
+void mitk::USVideoDevice::RemoveProbeByName(std::string name)
+{
+  for (std::vector<mitk::USProbe::Pointer>::iterator it = m_Probes.begin(); it != m_Probes.end(); it++)
+  {
+    if (name.compare((*it)->GetName()) == 0)
+    {
+      m_Probes.erase(it);
+      return;
+    }
+  }
+  MITK_INFO << "No Probe with given name " << name << " was found";
+}
+
 void mitk::USVideoDevice::AddNewProbe(mitk::USProbe::Pointer probe)
 {
   m_Probes.push_back(probe);

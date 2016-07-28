@@ -115,6 +115,11 @@ namespace mitk {
     mitk::USProbe::Pointer GetProbeByName(std::string name);
 
     /**
+    * \brief Removes the Probe with the given name
+    */
+    void RemoveProbeByName(std::string name);
+
+    /**
     \brief True, if this Device plays back a file, false if it recieves data from a device
     */
     bool GetIsSourceFile();

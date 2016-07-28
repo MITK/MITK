@@ -74,7 +74,10 @@ EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter<TImageType, TH
   output->SetMeasurementVectorSize( measurementVectorSize );
 
   m_siMatrix = new double[m_NumberOfBinsPerAxis];
-  m_siMatrix[0] = 0;
+  for(int i = 0; i < m_NumberOfBinsPerAxis; i++)
+  {
+    m_siMatrix[i] = 0;
+  }
 
   this->m_LowerBound.SetSize( measurementVectorSize );
   this->m_UpperBound.SetSize( measurementVectorSize );

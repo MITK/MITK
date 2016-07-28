@@ -113,8 +113,16 @@ void mitk::DiffusionImageCreationFilter::GenerateData()
   // data packed into vector image
   OutputType::Pointer outputForCache = this->GetOutput();
 
-  mitk::Image::Pointer mitkvectorimage = mitk::GrabItkImageMemory<DPH::ImageType>( RemapIntoVectorImage( input_image ));
-  outputForCache->Initialize( mitkvectorimage );
+  if( input_image->GetTimeSteps() > 1 )
+  {
+    mitk::Image::Pointer mitkvectorimage = mitk::GrabItkImageMemory<DPH::ImageType>( RemapIntoVectorImage( input_image ));
+    outputForCache->Initialize( mitkvectorimage );
+  }
+  // no need to remap, we expect to have a vector image directly
+  else
+  {
+    outputForCache->Initialize( input_image );
+  }
 
   // header information
   GradientDirectionContainerType::Pointer DiffusionVectors =  this->InternalGetGradientDirections( );

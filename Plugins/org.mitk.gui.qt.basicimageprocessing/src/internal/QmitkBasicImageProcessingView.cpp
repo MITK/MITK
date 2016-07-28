@@ -238,9 +238,19 @@ void QmitkBasicImageProcessing::CreateConnections()
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
     connect( (QObject*)(m_Controls->cbParam4), SIGNAL( activated(int) ), this, SLOT( SelectInterpolator(int) ) );
   }
+}
 
-  m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime,
-    GetRenderWindowPart()->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromBIP");
+void QmitkBasicImageProcessing::InternalGetTimeNavigationController()
+{
+  auto renwin_part = GetRenderWindowPart();
+  if( renwin_part != nullptr )
+  {
+    auto tnc = renwin_part->GetTimeNavigationController();
+    if( tnc != nullptr )
+    {
+      m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, tnc->GetTime(), "sliceNavigatorTimeFromBIP");
+    }
+  }
 }
 
 void QmitkBasicImageProcessing::SetFocus()
@@ -290,6 +300,9 @@ void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointe
     // button coding
     if ( tempImage->GetDimension() > 3 )
     {
+      // try to retrieve the TNC (for 4-D Processing )
+      this->InternalGetTimeNavigationController();
+
       m_Controls->sliceNavigatorTime->setEnabled(true);
       m_Controls->tlTime->setEnabled(true);
     }

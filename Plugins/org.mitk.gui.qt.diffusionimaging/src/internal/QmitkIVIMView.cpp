@@ -317,11 +317,13 @@ void QmitkIVIMView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
     if (m_DiffusionImageNode.IsNotNull())
     {
         m_Controls->m_VisualizeResultsWidget->setVisible(true);
+        m_Controls->m_KurtosisVisualizationWidget->setVisible(true);
         m_Controls->m_InputData->setTitle("Input Data");
     }
     else
     {
         m_Controls->m_VisualizeResultsWidget->setVisible(false);
+        m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
         m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     }
 
@@ -467,6 +469,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         return;
 
     m_Controls->m_VisualizeResultsWidget->setVisible(false);
+    m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
 
     mitk::Image::Pointer diffusionImg = dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData());
     mitk::Image::Pointer maskImg = NULL;
@@ -533,7 +536,25 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(newstart, vecimg->GetPixel(index));
 
-        success = FittIVIM(roiImage, static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), false, crosspos);
+        if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+        {
+            success = FitKurtosis(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             newstart);
+        }
+        else
+        {
+            success = FittIVIM(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             false,
+                             crosspos);
+        }
+
+
+
+
     }
     else
     {
@@ -600,17 +621,50 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(index, avg);
 
-        success = FittIVIM(roiImage, static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), false, index);
+        if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+        {
+            success = FitKurtosis(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             index);
+        }
+        else
+        {
+            success = FittIVIM(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             false,
+                             index);
+        }
     }
 
     vecimg->SetRegions( vecimg->GetLargestPossibleRegion() );
 
     if (success)
     {
-        m_Controls->m_VisualizeResultsWidget->setVisible(true);
-        m_Controls->m_VisualizeResultsWidget->SetParameters(m_Snap);
+        // 0 - IVIM, 1 - Kurtosis
+        if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+        {
+           m_Controls->m_KurtosisVisualizationWidget->setVisible(true);
+           m_Controls->m_KurtosisVisualizationWidget->SetData(m_KurtosisSnap);
+        }
+        else
+        {
+           m_Controls->m_VisualizeResultsWidget->setVisible(true);
+           m_Controls->m_VisualizeResultsWidget->SetParameters(m_Snap);
+        }
     }
 }
+
+bool QmitkIVIMView::FitKurtosis( itk::VectorImage<short, 3> *vecimg, DirContainerType *dirs, float bval, OutImgType::IndexType &crosspos )
+{
+  KurtosisFilterType::Pointer filter = KurtosisFilterType::New();
+
+  m_KurtosisSnap = filter->GetSnapshot( vecimg->GetPixel( crosspos ), dirs, bval, this->m_Controls->m_OmitBZeroCB->isChecked() );
+
+  return true;
+}
+
 
 bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos)
 {

@@ -193,7 +193,7 @@ mitk::InteractionTestHelper::~InteractionTestHelper()
   InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
   InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
 
-  for(; it != end; it++)
+  for(; it != end; ++it)
   {
     rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
     (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
@@ -226,7 +226,7 @@ void mitk::InteractionTestHelper::PlaybackInteraction()
 
   InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
   InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
-  for(; it != end; it++)
+  for(; it != end; ++it)
   {
 
     (*it)->GetRenderer()->PrepareRender();
@@ -237,7 +237,7 @@ void mitk::InteractionTestHelper::PlaybackInteraction()
   mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 
   it = m_RenderWindowList.begin();
-  for(; it != end; it++)
+  for(; it != end; ++it)
   {
     (*it)->GetVtkRenderWindow()->Render();
     (*it)->GetVtkRenderWindow()->WaitForCompletion();
@@ -289,7 +289,7 @@ mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindowByName(const std
   InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
   InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
 
-  for(; it != end; it++)
+  for(; it != end; ++it)
   {
     if( name.compare( (*it)->GetRenderer()->GetName() ) == 0)
       return (*it).GetPointer();
@@ -304,7 +304,7 @@ mitk::RenderWindow* mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDir
   InteractionTestHelper::RenderWindowListType::iterator it = m_RenderWindowList.begin();
   InteractionTestHelper::RenderWindowListType::iterator end = m_RenderWindowList.end();
 
-  for(; it != end; it++)
+  for(; it != end; ++it)
   {
     if( viewDirection == (*it)->GetSliceNavigationController()->GetDefaultViewDirection() )
       return (*it).GetPointer();

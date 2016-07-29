@@ -190,12 +190,11 @@ void mitk::PlaneGeometryDataMapper2D::GenerateDataForRenderer( mitk::BaseRendere
   // (for the gap at the point where they intersect). A change in any of the
   // other PlaneGeometryData nodes could mean that we render ourself
   // differently, so we check for that here.
-  bool generateDataRequired = false;
   for (AllInstancesContainer::iterator it = s_AllInstances.begin();
        it != s_AllInstances.end();
        ++it)
   {
-    generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
+    bool generateDataRequired = ls->IsGenerateDataRequired(renderer, this, (*it)->GetDataNode());
     if (generateDataRequired) break;
   }
 
@@ -299,7 +298,6 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       NodesVectorType::iterator otherPlanesIt = m_OtherPlaneGeometries.begin();
       NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
-      otherPlanesIt = m_OtherPlaneGeometries.begin();
       int gapSize = 32;
       this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
 

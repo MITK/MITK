@@ -808,7 +808,7 @@ namespace mitk
       m_DataStorage = storage;
 
       RenderingManager::RenderWindowVector::const_iterator iter;
-      for (iter = m_AllRenderWindows.cbegin(); iter < m_AllRenderWindows.cend(); iter++)
+      for (iter = m_AllRenderWindows.cbegin(); iter < m_AllRenderWindows.cend(); ++iter)
       {
         mitk::BaseRenderer::GetInstance((*iter))->SetDataStorage(m_DataStorage.GetPointer());
       }

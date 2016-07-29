@@ -50,7 +50,7 @@ void OverlayManager::AddBaseRenderer(BaseRenderer* renderer)
   if(inSet.second)
   {
     OverlaySet::const_iterator it;
-    for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); it++ )
+    for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); ++it )
     {
       if((*it)->IsForceInForeground())
         (*it)->AddToRenderer(renderer,m_ForegroundRenderer[renderer]);
@@ -100,10 +100,9 @@ const OverlayManager::OverlaySet &OverlayManager::GetAllOverlays()
 OverlayManager* OverlayManager::GetInstance()
 {
   auto renderwindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  BaseRenderer* renderer = nullptr;
   for(auto renderwindow : renderwindows)
   {
-    renderer = BaseRenderer::GetInstance(renderwindow);
+    BaseRenderer* renderer = BaseRenderer::GetInstance(renderwindow);
     if(renderer && renderer->GetOverlayManager().IsNotNull())
       return renderer->GetOverlayManager();
   }
@@ -117,7 +116,7 @@ void OverlayManager::AddOverlay(const Overlay::Pointer& overlay, bool ForceInFor
   if(inSet.second)
   {
     BaseRendererSet::const_iterator it;
-    for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); it++ )
+    for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); ++it )
     {
       if(ForceInForeground)
       {
@@ -155,7 +154,7 @@ void OverlayManager::RemoveOverlay(const Overlay::Pointer &overlay)
     return;
 
   BaseRendererSet::const_iterator it;
-  for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); it++)
+  for ( it=m_BaseRendererSet.cbegin() ; it != m_BaseRendererSet.cend(); ++it)
   {
     overlay->RemoveFromBaseRenderer(*it);
     vtkRenderer* forgroundRenderer = m_ForegroundRenderer[*it];
@@ -176,7 +175,7 @@ void OverlayManager::RemoveAllOverlays()
 void OverlayManager::UpdateOverlays(BaseRenderer* baseRenderer)
 {
   OverlaySet::const_iterator it;
-  for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); it++ )
+  for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); ++it )
   {
     (*it)->Update(baseRenderer);
   }
@@ -204,7 +203,7 @@ void OverlayManager::UpdateLayouts(BaseRenderer *renderer)
 {
   const LayouterMap layouters = m_LayouterMap[renderer];
   LayouterMap::const_iterator it;
-  for ( it=layouters.cbegin() ; it != layouters.cend(); it++ )
+  for ( it=layouters.cbegin() ; it != layouters.cend(); ++it )
   {
     (it->second)->PrepareLayout();
   }

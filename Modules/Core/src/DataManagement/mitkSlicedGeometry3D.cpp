@@ -441,7 +441,7 @@ double
   return SlicedGeometry3D::CalculateSpacing( spacing, d );
 }
 
-double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D spacing, const mitk::Vector3D &d )
+double mitk::SlicedGeometry3D::CalculateSpacing( const mitk::Vector3D& spacing, const mitk::Vector3D &d )
 {
   // The following can be derived from the ellipsoid equation
   //
@@ -476,12 +476,10 @@ void
 {
   Superclass::SetImageGeometry( isAnImageGeometry );
 
-  mitk::BaseGeometry* geometry;
-
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
   {
-    geometry = m_PlaneGeometries[s];
+    mitk::BaseGeometry* geometry = m_PlaneGeometries[s];
     if ( geometry!=nullptr )
     {
       geometry->SetImageGeometry( isAnImageGeometry );
@@ -492,12 +490,10 @@ void
 void
   mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
 {
-  mitk::BaseGeometry* geometry;
-
   unsigned int s;
   for ( s = 0; s < m_Slices; ++s )
   {
-    geometry = m_PlaneGeometries[s];
+    mitk::BaseGeometry* geometry = m_PlaneGeometries[s];
     if ( geometry!=nullptr )
     {
       geometry->ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
@@ -945,11 +941,7 @@ void
         double centerOfRotationDistance =
           planeGeometry->SignedDistanceFromPlane( m_ReferenceGeometry->GetCenter() );
 
-        if ( centerOfRotationDistance > 0 )
-        {
-          m_DirectionVector = m_DirectionVector;
-        }
-        else
+        if ( centerOfRotationDistance <= 0 )
         {
           m_DirectionVector = -m_DirectionVector;
         }

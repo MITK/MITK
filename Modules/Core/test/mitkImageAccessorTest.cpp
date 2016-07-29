@@ -150,12 +150,12 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void* data)
          }
       }
    }
-   catch(mitk::MemoryIsLockedException e)
+   catch(mitk::MemoryIsLockedException &e)
    {
       threadData->m_Successful = false;
       e.Print(std::cout);
    }
-   catch(mitk::Exception e)
+   catch(mitk::Exception &e)
    {
       threadData->m_Successful = false;
       e.Print(std::cout);

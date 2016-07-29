@@ -140,7 +140,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     mitk::PointSetVtkMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; ++it ) {
     (*it)->SetDefaultProperties(node);
   }
 }
@@ -165,7 +165,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
   mitk::Mapper::Pointer tmpMapper = NULL;
 
   // check whether extra factories provide mapper
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; ++it ) {
     tmpMapper = (*it)->CreateMapper(node,id);
     if(tmpMapper.IsNotNull())
       newMapper = tmpMapper;
@@ -227,7 +227,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
   MultimapType aMap;
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ )
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; ++it )
   {
     aMap = (*it)->GetFileExtensionsMap();
     this->MergeFileExtensions(m_FileExtensionsMap, aMap);
@@ -238,11 +238,10 @@ const char* mitk::CoreObjectFactory::GetFileExtensions()
 
 void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap)
 {
-  bool duplicateFound = false;
   std::pair<MultimapType::iterator, MultimapType::iterator> pairOfIter;
   for (MultimapType::iterator it = inputMap.begin(); it != inputMap.end(); ++it)
   {
-    duplicateFound = false;
+    bool duplicateFound = false;
     pairOfIter = fileExtensionsMap.equal_range((*it).first);
     for (MultimapType::iterator it2 = pairOfIter.first; it2 != pairOfIter.second; ++it2)
     {
@@ -284,7 +283,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
 
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
   MultimapType aMap;
-  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ )
+  for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; ++it )
   {
     aMap = (*it)->GetSaveFileExtensionsMap();
     this->MergeFileExtensions(m_SaveFileExtensionsMap, aMap);
@@ -310,7 +309,7 @@ mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters(
 
   //collect all extra factories
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin();
-       it != m_ExtraFactories.end(); it++ )
+       it != m_ExtraFactories.end(); ++it )
   {
     FileWriterList list2 = (*it)->GetFileWriters();
 
@@ -332,7 +331,7 @@ void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int)
 std::string mitk::CoreObjectFactory::GetDescriptionForExtension(const std::string& extension)
 {
   std::multimap<std::string, std::string> fileExtensionMap = GetSaveFileExtensionsMap();
-  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); ++it)
     if (it->first == extension) return it->second;
   return ""; // If no matching extension was found, return emtpy string
 }
@@ -345,7 +344,7 @@ void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase*
 
   std::map<std::string, std::vector<std::string> > extensionsByCategories;
   std::multimap<std::string, std::string> fileExtensionMap = factory->GetFileExtensionsMap();
-  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); it++)
+  for(std::multimap<std::string, std::string>::iterator it = fileExtensionMap.begin(); it != fileExtensionMap.end(); ++it)
   {
     std::string extension = it->first;
     // remove "*."
@@ -385,13 +384,13 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase*
 
   MultimapType fileExtensionMap = factory->GetSaveFileExtensionsMap();
 
-  for(mitk::CoreObjectFactory::FileWriterList::iterator it = writers.begin(); it != writers.end(); it++)
+  for(mitk::CoreObjectFactory::FileWriterList::iterator it = writers.begin(); it != writers.end(); ++it)
   {
     std::vector<std::string> extensions = (*it)->GetPossibleFileExtensions();
     if (extensions.empty()) continue;
 
     std::string description;
-    for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ext++)
+    for(std::vector<std::string>::iterator ext = extensions.begin(); ext != extensions.end(); ++ext)
     {
       if (ext->empty()) continue;
 
@@ -408,7 +407,7 @@ void mitk::CoreObjectFactory::RegisterLegacyWriters(mitk::CoreObjectFactoryBase*
       }
 
       for(MultimapType::iterator fileExtensionIter = fileExtensionMap.begin();
-          fileExtensionIter != fileExtensionMap.end(); fileExtensionIter++)
+          fileExtensionIter != fileExtensionMap.end(); ++fileExtensionIter)
       {
         if (fileExtensionIter->first == extensionWithStar)
         {

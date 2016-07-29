@@ -141,10 +141,9 @@ public:
 
   void Itk2Mitk(void)
   {
-    Vector3D vector3D = originalValues;
     itk::Vector<ScalarType, 3> itkVector = valuesToCopy;
 
-    vector3D = itkVector;
+    Vector3D vector3D = itkVector;
 
     TestForEquality(vector3D, itkVector, "mitk::Vector3D", "itk::Vector");
   }
@@ -153,9 +152,8 @@ public:
   void Mitk2Itk(void)
   {
     Vector3D vector3D = valuesToCopy;
-    itk::Vector<ScalarType, 3> itkVector = originalValues;
 
-    itkVector = vector3D;
+    itk::Vector<ScalarType, 3> itkVector = vector3D;
 
     TestForEquality(itkVector, vector3D, "itk::Vector", "mitk::Vector3D");
   }
@@ -163,10 +161,9 @@ public:
 
   void Vnlfixed2Mitk(void)
   {
-    mitk::Vector3D vector3D = originalValues;
     vnl_vector_fixed<ScalarType, 3> vnlVectorFixed(valuesToCopy);
 
-    vector3D = vnlVectorFixed;
+    mitk::Vector3D vector3D = vnlVectorFixed;
 
     TestForEquality(vector3D, vnlVectorFixed, "mitk::Vector3D", "vnl_vector_fixed<ScalarType>");
   }
@@ -185,11 +182,10 @@ public:
 
   void Vnl2Mitk(void)
   {
-    mitk::Vector3D vector3D = originalValues;
     vnl_vector<ScalarType> vnlVector(3);
     vnlVector.set(valuesToCopy);
 
-    vector3D = vnlVector;
+    mitk::Vector3D vector3D = vnlVector;
 
     TestForEquality(vector3D, vnlVector, "mitk::Vector3D", "vnl_vector<ScalarType>");
   }
@@ -251,9 +247,8 @@ public:
   void Point2Vector()
   {
     mitk::Point3D point3D   = originalValues;
-    mitk::Vector3D vector3D = valuesToCopy;
 
-    vector3D = point3D.GetVectorFromOrigin();
+    mitk::Vector3D vector3D = point3D.GetVectorFromOrigin();
 
     TestForEquality(point3D, vector3D, "mitk::Point3D", "mitk::Vector3D");
   }

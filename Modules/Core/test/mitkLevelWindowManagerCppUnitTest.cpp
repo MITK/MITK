@@ -122,7 +122,7 @@ public:
     {
       manager->SetDataStorage(ds);
     }
-    catch(std::exception e)
+    catch(std::exception &e)
     {
       MITK_ERROR << "Exception: " << e.what();
     }

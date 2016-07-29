@@ -232,7 +232,7 @@ namespace mitk {
 
     virtual void ExecuteOperation(Operation* operation) override;
 
-    static double CalculateSpacing(const mitk::Vector3D spacing, const mitk::Vector3D &d);
+    static double CalculateSpacing(const mitk::Vector3D &spacing, const mitk::Vector3D &d);
 
   protected:
     SlicedGeometry3D();

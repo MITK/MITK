@@ -882,14 +882,7 @@
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
            <layout class="QGridLayout" name="gridLayout_5">
-            <item row="6" column="0">
-             <widget class="QCheckBox" name="m_OmitBZeroCB">
-              <property name="text">
-               <string>Omit b=0 Measurement</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
+            <item row="7" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <property name="spacing">
                <number>2</number>
@@ -898,20 +891,7 @@
                <enum>QLayout::SetMaximumSize</enum>
               </property>
               <item>
-               <widget class="QLabel" name="label_9">
-                <property name="minimumSize">
-                 <size>
-                  <width>80</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Output Images</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="m_CheckD_2">
+               <widget class="QCheckBox" name="m_CheckKurtD">
                 <property name="text">
                  <string>D</string>
                 </property>
@@ -921,7 +901,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="m_Checkf_2">
+               <widget class="QCheckBox" name="m_CheckKurtK">
                 <property name="text">
                  <string>K</string>
                 </property>
@@ -931,6 +911,49 @@
                </widget>
               </item>
              </layout>
+            </item>
+            <item row="6" column="1">
+             <widget class="QCheckBox" name="m_OmitBZeroCB">
+              <property name="text">
+               <string>Omit b=0 Measurement</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QDoubleSpinBox" name="m_SigmaSpinBox">
+              <property name="toolTip">
+               <string extracomment="Signa for gaussian smoothing applied prior to map computation"/>
+              </property>
+              <property name="minimum">
+               <double>1.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>5.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.100000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QLabel" name="label_10">
+              <property name="text">
+               <string>Smooting sigma</string>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="0">
+             <widget class="QLabel" name="label_9">
+              <property name="minimumSize">
+               <size>
+                <width>80</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Output Images</string>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

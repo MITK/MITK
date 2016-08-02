@@ -114,6 +114,8 @@ protected:
   mitk::DataNode::Pointer m_MaskImageNode;
 
   bool m_Active;
+
+  bool m_HoldUpdate;
 };
 
 

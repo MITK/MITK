@@ -219,7 +219,7 @@ public:
   typedef typename Superclass::InputImageType      InputImageType;
   typedef Image< OutputPixelType, 3 >              OutputImageType;
 
-  typedef itk::Image< unsigned char, 3>            MaskImageType;
+  typedef itk::Image< short , 3>            MaskImageType;
 
   typedef typename Superclass::OutputImageRegionType   OutputImageRegionType;
 

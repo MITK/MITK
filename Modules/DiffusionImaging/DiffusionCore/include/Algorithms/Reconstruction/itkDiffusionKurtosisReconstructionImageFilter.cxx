@@ -71,8 +71,8 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   }
 
 
-  MITK_INFO("KurtosisFilter.FitSingleVoxel.Meas") << fit_measurements;
-  MITK_INFO("KurtosisFilter.FitSingleVoxel.Bval") << fit_bvalues;
+  MITK_DEBUG("KurtosisFilter.FitSingleVoxel.Meas") << fit_measurements;
+  MITK_DEBUG("KurtosisFilter.FitSingleVoxel.Bval") << fit_bvalues;
 
   // perform fit on data vectors
   if( omit_bzero )
@@ -93,7 +93,7 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
    nonlinear_fit.minimize(result);
   }
 
-  MITK_INFO("KurtosisFilter.FitSingleVoxel.Rslt") << result;
+  MITK_DEBUG("KurtosisFilter.FitSingleVoxel.Rslt") << result;
 }
 
 
@@ -131,6 +131,13 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
 {
   // first call superclass
   Superclass::GenerateOutputInformation();
+}
+
+template< class TInputPixelType, class TOutputPixelType>
+void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
+::SetImageMask(MaskImageType::Pointer mask)
+{
+  this->m_MaskImage = mask;
 }
 
 template< class TInputPixelType, class TOutputPixelType>

@@ -1,5 +1,8 @@
 #include "AutoplanLogging.h"
 
+#include <iostream>
+#include <cstdlib>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/date_time.hpp>
@@ -14,7 +17,22 @@ namespace Logger {
     tcplog = false;
     datastoragelog = false;
 
-  };
+#ifdef _WIN32
+    if(const char* ifAppData = std::getenv("PATH")) {
+      logsPath = std::string(ifAppData) + "\\DKFZ\\logs\\";
+    }
+    else {
+      logsPath = "./logs/";
+    }
+#else
+    if(const char* ifHome = std::getenv("PATH")) {
+      logsPath = std::string(ifHome) + "/.local/share/DKFZ/logs/";
+    }
+    else {
+      logsPath = "./logs/";
+    }
+#endif
+  }
 
   Options& Options::get()
   {

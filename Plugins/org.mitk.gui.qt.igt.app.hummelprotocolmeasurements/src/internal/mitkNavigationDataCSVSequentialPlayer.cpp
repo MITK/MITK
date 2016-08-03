@@ -13,12 +13,13 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
+#define _USE_MATH_DEFINES
 #include "mitkNavigationDataCSVSequentialPlayer.h"
 #include <QString>
 #include <QStringList>
 #include <iostream>
 #include <fstream>
+#include <math.h>
 
 mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSVSequentialPlayer()
   : mitk::NavigationDataPlayerBase()
@@ -167,11 +168,6 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     position[0] = myLineList.at(3).toDouble();
     position[1] = myLineList.at(4).toDouble();
     position[2] = myLineList.at(5).toDouble();
-
-    orientation[0] = myLineList.at(6).toDouble();
-    orientation[1] = myLineList.at(7).toDouble();
-    orientation[2] = myLineList.at(8).toDouble();
-    orientation[3] = myLineList.at(9).toDouble();
   }
   else
   {
@@ -188,14 +184,15 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     //valid-flag wurde hier nicht gespeichert
     valid = true;
 
-    position[0] = myLineList.at(5).toDouble();
-    position[1] = myLineList.at(4).toDouble();
-    position[2] = (myLineList.at(6).toDouble()*(-1));
+    position[0] = myLineList.at(4).toDouble();
+    position[1] = myLineList.at(5).toDouble();
+    position[2] = myLineList.at(6).toDouble();
 
-    orientation[0] = myLineList.at(9).toDouble();
-    orientation[1] = myLineList.at(8).toDouble();
-    orientation[2] = (myLineList.at(10).toDouble()*(-1));
-    orientation[3] = myLineList.at(7).toDouble();
+    double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
+    double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
+    double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
+    mitk::Quaternion eulerQuat(euler3, euler2, euler1);
+    orientation = eulerQuat;
   }
 
   //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS

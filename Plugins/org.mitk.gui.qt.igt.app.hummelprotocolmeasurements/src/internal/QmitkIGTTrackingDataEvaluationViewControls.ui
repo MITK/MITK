@@ -175,7 +175,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QLineEdit" name="m_OutputFilename">
            <property name="text">
-            <string>D:/Experimente/output.csv</string>
+            <string>D:/tmp/output.csv</string>
            </property>
           </widget>
          </item>

@@ -63,6 +63,8 @@ QmitkIVIMView::~QmitkIVIMView()
 
 void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
 {
+  // hold update untill all elements are set
+  this->m_HoldUpdate = true;
 
     // build up qt view, unless already done
     if ( !m_Controls )
@@ -95,7 +97,6 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
         //connect( m_Controls->m_MaximalBValueWidget, SIGNAL( valueChanged(double)), this, SLOT( OnKurtosisParamsChanged() ) );
         connect( m_Controls->m_OmitBZeroCB, SIGNAL( stateChanged(int) ), this, SLOT( OnKurtosisParamsChanged() ) );
         connect( m_Controls->m_KurtosisFitScale, SIGNAL( currentIndexChanged(int)), this, SLOT( OnKurtosisParamsChanged() ) );
-
     }
 
     QString dstar = QString::number(m_Controls->m_DStarSlider->value()/1000.0);
@@ -122,7 +123,11 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_KurtosisRangeWidget->setRange( 0.0, 10.0 );
     m_Controls->m_KurtosisRangeWidget->setMaximumValue( 5.0 );
 
+
     //m_Controls->m_MaximalBValueWidget->setVisible( false );
+
+    // release update block after the UI-elements were all set
+    this->m_HoldUpdate = false;
 
 }
 
@@ -424,7 +429,6 @@ void QmitkIVIMView::AutoThreshold()
 
 void QmitkIVIMView::FittIVIMStart()
 {
-
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
     mitk::Image* img = 0;
@@ -458,8 +462,11 @@ void QmitkIVIMView::FittIVIMStart()
       filter->SetReferenceBValue( static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
       filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
       filter->SetSmoothingSigma( this->m_Controls->m_SigmaSpinBox->value() );
-      filter->SetBoundariesForKurtosis( this->m_Controls->m_KurtosisRangeWidget->minimumValue(), this->m_Controls->m_KurtosisRangeWidget->maximumValue() );
-      filter->SetFittingScale( static_cast<KurtosisFilterType::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() ) );
+
+      if( this->m_Controls->m_UseKurtosisBoundsCB->isChecked() )
+        filter->SetBoundariesForKurtosis( this->m_Controls->m_KurtosisRangeWidget->minimumValue(), this->m_Controls->m_KurtosisRangeWidget->maximumValue() );
+
+      filter->SetFittingScale( static_cast<itk::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() ) );
 
       if( m_MaskImageNode.IsNotNull() )
       {
@@ -526,7 +533,8 @@ void QmitkIVIMView::FittIVIMStart()
 
 void QmitkIVIMView::OnKurtosisParamsChanged()
 {
-  this->FittIVIMStart();
+  itk::StartEvent dummy;
+  OnSliceChanged(dummy);
 }
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
@@ -733,7 +741,21 @@ bool QmitkIVIMView::FitKurtosis( itk::VectorImage<short, 3> *vecimg, DirContaine
 {
   KurtosisFilterType::Pointer filter = KurtosisFilterType::New();
 
-  m_KurtosisSnap = filter->GetSnapshot( vecimg->GetPixel( crosspos ), dirs, bval, this->m_Controls->m_OmitBZeroCB->isChecked() );
+  itk::KurtosisFitConfiguration fit_config;
+  fit_config.omit_bzero =  this->m_Controls->m_OmitBZeroCB->isChecked();
+  if( this->m_Controls->m_UseKurtosisBoundsCB->isChecked() )
+  {
+    fit_config.use_K_limits = true;
+    vnl_vector_fixed<double, 2> k_limits;
+    k_limits[0] = this->m_Controls->m_KurtosisRangeWidget->minimumValue();
+    k_limits[1] = this->m_Controls->m_KurtosisRangeWidget->maximumValue();
+
+    fit_config.K_limits = k_limits;
+
+  }
+  fit_config.fit_scale = static_cast<itk::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() );
+
+  m_KurtosisSnap = filter->GetSnapshot( vecimg->GetPixel( crosspos ), dirs, bval, fit_config );
 
   return true;
 }

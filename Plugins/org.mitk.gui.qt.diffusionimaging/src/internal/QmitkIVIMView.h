@@ -118,6 +118,7 @@ protected:
   bool m_Active;
 
   bool m_HoldUpdate;
+
 };
 
 

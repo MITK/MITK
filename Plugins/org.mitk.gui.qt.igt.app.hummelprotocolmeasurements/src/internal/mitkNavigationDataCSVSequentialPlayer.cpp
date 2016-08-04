@@ -96,7 +96,7 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataCSVSequentialPlay
 {
   std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
   std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
-  for (int i = 1; (i < fileContentLineByLine.size()); i = i + 24) //skip header so start at 1
+  for (int i = 1; (i < fileContentLineByLine.size()); i++) //skip header so start at 1
   {
     returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
   }
@@ -165,6 +165,23 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
     if (myLineList.at(3).toStdString() == "1") valid = true;
 
+    /*
+    //Variant for the Aurora measurements
+    //(.csv files from MITK)
+    position[0] = myLineList.at(3).toDouble();
+    position[1] = myLineList.at(4).toDouble();
+    position[2] = myLineList.at(5).toDouble();
+
+    orientation[0] = myLineList.at(6).toDouble(); //qx
+    orientation[1] = myLineList.at(7).toDouble(); //qy
+    orientation[2] = myLineList.at(8).toDouble(); //qz
+    orientation[3] = myLineList.at(9).toDouble(); //qr
+    */
+
+
+    //Variant for the polhemus measurements in August 2016
+    //(.csv files from the polhemus software)
+
     position[0] = myLineList.at(4).toDouble();
     position[1] = myLineList.at(5).toDouble();
     position[2] = myLineList.at(6).toDouble();
@@ -190,6 +207,22 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     //valid-flag wurde hier nicht gespeichert
     valid = true;
 
+    /*
+    //Variant for the Aurora measurements
+    //(.csv files from MITK)
+    position[0] = myLineList.at(3).toDouble();
+    position[1] = myLineList.at(4).toDouble();
+    position[2] = myLineList.at(5).toDouble();
+
+    orientation[0] = myLineList.at(6).toDouble(); //qx
+    orientation[1] = myLineList.at(7).toDouble(); //qy
+    orientation[2] = myLineList.at(8).toDouble(); //qz
+    orientation[3] = myLineList.at(9).toDouble(); //qr
+    */
+
+    //Variant for the polhemus measurements in August 2016
+    //(.csv files from the polhemus software)
+
     position[0] = myLineList.at(4).toDouble();
     position[1] = myLineList.at(5).toDouble();
     position[2] = myLineList.at(6).toDouble();
@@ -199,6 +232,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
     mitk::Quaternion eulerQuat(euler3, euler2, euler1);
     orientation = eulerQuat;
+
   }
 
   //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS

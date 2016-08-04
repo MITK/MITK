@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationDataRecorderDeprecated.h>
 #include <mitkQuaternionAveraging.h>
 #include <mitkTransform.h>
+#include <mitkStaticIGTHelperFunctions.h>
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -920,24 +921,30 @@ void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
 
 void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesHeader()
 {
-  m_CurrentAngleDifferencesWriteFile << "Name;Idx1;Idx2;Angle [-PI..+PI]; Angle [Degree]\n";
+  m_CurrentAngleDifferencesWriteFile << "Name;Idx1;Idx2;Angle [Degree]\n";
 }
 
 void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesDataSet(std::string pos1, std::string pos2, int idx1, int idx2, double angle)
 {
-  double PI = 3.1415926535897932384626433832795;
-  double angle_degree = angle * 180 / PI;
-  m_CurrentAngleDifferencesWriteFile << "Angle between " << pos1 << " and " << pos2 << ";" << idx1 << ";" << idx2 << ";" << angle << ";" << angle_degree << "\n";
-  MITK_INFO << "Angle: " << angle_degree;
+  //double PI = 3.1415926535897932384626433832795;
+  //double angle_degree = angle * 180 / PI;
+  m_CurrentAngleDifferencesWriteFile << "Angle between " << pos1 << " and " << pos2 << ";" << idx1 << ";" << idx2 << ";" << angle << "\n";//<< ";" << angle_degree << "\n";
+  MITK_INFO << "Angle: " << angle;
 }
 
 double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b)
 {
-  double returnValue;
+  itk::Vector<double> vec;
+  vec[0] = 10000;
+  vec[1] = 0;
+  vec[2] = 0;
+  double returnValue = mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(a, b, vec);
 
+  /*
   //variant to work with the data received from the polhemus tracker
   returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])*sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3])));
   returnValue = 2 * acos(returnValue);
+  */
 
   /*
   //another variant
@@ -956,6 +963,8 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
   returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2) + pow(pt1[1], 2) + pow(pt1[2], 2)) * sqrt(pow(pt2[0], 2) + pow(pt2[1], 2) + pow(pt2[2], 2)));
   returnValue = acos(returnValue);
   */
+
+
   /*
   //variant with double precision
 

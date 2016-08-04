@@ -21,7 +21,7 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
   {
   double returnValue;
 
-  itk::Vector<double,3> point; //caution 5D-Tools: correct verctor along the tool axis is needed
+  itk::Vector<double,3> point; //caution 5D-Tools: correct vector along the tool axis is needed
   point[0] = rotationVector[0];
   point[1] = rotationVector[1];
   point[2] = rotationVector[2];

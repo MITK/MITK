@@ -89,6 +89,8 @@ protected slots:
   void ClipboardStatisticsButtonClicked();
   void ClipboardCurveButtonClicked();
 
+  void OnKurtosisParamsChanged();
+
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed

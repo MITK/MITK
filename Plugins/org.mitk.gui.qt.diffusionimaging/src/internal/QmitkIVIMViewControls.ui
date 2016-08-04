@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
+    <width>379</width>
     <height>1563</height>
    </rect>
   </property>
@@ -881,81 +881,145 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
-           <layout class="QGridLayout" name="gridLayout_5">
-            <item row="7" column="1">
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <property name="spacing">
-               <number>2</number>
-              </property>
-              <property name="sizeConstraint">
-               <enum>QLayout::SetMaximumSize</enum>
-              </property>
-              <item>
-               <widget class="QCheckBox" name="m_CheckKurtD">
-                <property name="text">
-                 <string>D</string>
-                </property>
-                <property name="checked">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="m_CheckKurtK">
-                <property name="text">
-                 <string>K</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="6" column="1">
-             <widget class="QCheckBox" name="m_OmitBZeroCB">
-              <property name="text">
-               <string>Omit b=0 Measurement</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="1">
-             <widget class="QDoubleSpinBox" name="m_SigmaSpinBox">
-              <property name="toolTip">
-               <string extracomment="Signa for gaussian smoothing applied prior to map computation"/>
-              </property>
-              <property name="minimum">
-               <double>1.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>5.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0">
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Smooting sigma</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QLabel" name="label_9">
-              <property name="minimumSize">
-               <size>
-                <width>80</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Output Images</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QFrame" name="frame_6">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <property name="lineWidth">
+             <number>2</number>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <item>
+              <layout class="QGridLayout" name="gridLayout_5">
+               <item row="9" column="1">
+                <widget class="ctkRangeWidget" name="m_KurtosisRangeWidget" native="true"/>
+               </item>
+               <item row="6" column="1">
+                <widget class="QCheckBox" name="m_OmitBZeroCB">
+                 <property name="text">
+                  <string>Omit b=0 Measurement</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SetMaximumSize</enum>
+                 </property>
+                 <item>
+                  <widget class="QCheckBox" name="m_CheckKurtD">
+                   <property name="text">
+                    <string>D</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="m_CheckKurtK">
+                   <property name="text">
+                    <string>K</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item row="10" column="1">
+                <widget class="QComboBox" name="m_KurtosisFitScale">
+                 <property name="toolTip">
+                  <string>Select if the data is fitted directly (straight) or the logarithmic equation is used</string>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>Straight Fit</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Logarithmic Fit</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="8" column="0">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string>Smoothing sigma</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="0">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Select Fit Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="0">
+                <widget class="QLabel" name="label_11">
+                 <property name="toolTip">
+                  <string>Force the fitting of K to remain within the given boundaries</string>
+                 </property>
+                 <property name="text">
+                  <string>Boundaries for K</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="1">
+                <widget class="QDoubleSpinBox" name="m_SigmaSpinBox">
+                 <property name="toolTip">
+                  <string>Signa for gaussian smoothing applied prior to map computation</string>
+                 </property>
+                 <property name="minimum">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>5.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QLabel" name="label_9">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Output Images</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
           </item>
           <item>
            <widget class="QmitkKurtosisWidget" name="m_KurtosisVisualizationWidget" native="true">
@@ -1087,6 +1151,12 @@
    <class>QmitkKurtosisWidget</class>
    <extends>QWidget</extends>
    <header>QmitkKurtosisWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkRangeWidget</class>
+   <extends>QWidget</extends>
+   <header>ctkRangeWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

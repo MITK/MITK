@@ -90,6 +90,12 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_CurveClipboard, SIGNAL(clicked()), this, SLOT(ClipboardCurveButtonClicked()) );
         connect( m_Controls->m_ValuesClipboard, SIGNAL(clicked()), this, SLOT(ClipboardStatisticsButtonClicked()) );
 
+        // connect all kurtosis actions to a recompute
+        connect( m_Controls->m_KurtosisRangeWidget, SIGNAL( rangeChanged(double, double)), this, SLOT(OnKurtosisParamsChanged() ) );
+        //connect( m_Controls->m_MaximalBValueWidget, SIGNAL( valueChanged(double)), this, SLOT( OnKurtosisParamsChanged() ) );
+        connect( m_Controls->m_OmitBZeroCB, SIGNAL( stateChanged(int) ), this, SLOT( OnKurtosisParamsChanged() ) );
+        connect( m_Controls->m_KurtosisFitScale, SIGNAL( currentIndexChanged(int)), this, SLOT( OnKurtosisParamsChanged() ) );
+
     }
 
     QString dstar = QString::number(m_Controls->m_DStarSlider->value()/1000.0);
@@ -111,6 +117,12 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_Warning->setVisible(false);
 
     MethodCombo(m_Controls->m_MethodCombo->currentIndex());
+
+    m_Controls->m_KurtosisRangeWidget->setSingleStep(0.1);
+    m_Controls->m_KurtosisRangeWidget->setRange( 0.0, 10.0 );
+    m_Controls->m_KurtosisRangeWidget->setMaximumValue( 5.0 );
+
+    //m_Controls->m_MaximalBValueWidget->setVisible( false );
 
 }
 
@@ -446,7 +458,8 @@ void QmitkIVIMView::FittIVIMStart()
       filter->SetReferenceBValue( static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
       filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
       filter->SetSmoothingSigma( this->m_Controls->m_SigmaSpinBox->value() );
-
+      filter->SetBoundariesForKurtosis( this->m_Controls->m_KurtosisRangeWidget->minimumValue(), this->m_Controls->m_KurtosisRangeWidget->maximumValue() );
+      filter->SetFittingScale( static_cast<KurtosisFilterType::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() ) );
 
       if( m_MaskImageNode.IsNotNull() )
       {
@@ -480,7 +493,7 @@ void QmitkIVIMView::FittIVIMStart()
 
       QString new_kname = basename; new_kname = new_kname.append("KurtFit_KMap");
 
-      if( this->m_Controls->m_CheckKurtD )
+      if( this->m_Controls->m_CheckKurtD->isChecked() )
       {
         mitk::DataNode::Pointer dnode = mitk::DataNode::New();
         dnode->SetData( dimage );
@@ -489,7 +502,7 @@ void QmitkIVIMView::FittIVIMStart()
         GetDefaultDataStorage()->Add(dnode);
       }
 
-      if( this->m_Controls->m_CheckKurtK )
+      if( this->m_Controls->m_CheckKurtK->isChecked() )
       {
         mitk::DataNode::Pointer knode = mitk::DataNode::New();
         knode->SetData( kimage );
@@ -509,6 +522,11 @@ void QmitkIVIMView::FittIVIMStart()
 
       OutputToDatastorage(nodes);
     }
+}
+
+void QmitkIVIMView::OnKurtosisParamsChanged()
+{
+  this->FittIVIMStart();
 }
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)

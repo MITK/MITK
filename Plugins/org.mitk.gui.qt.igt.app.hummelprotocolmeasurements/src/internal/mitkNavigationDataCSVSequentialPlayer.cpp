@@ -96,7 +96,7 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataCSVSequentialPlay
 {
   std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
   std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
-  for (int i = 1; (i < fileContentLineByLine.size()); i++) //skip header so start at 1
+  for (int i = 1; (i < fileContentLineByLine.size()); i = i + 24) //skip header so start at 1
   {
     returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
   }
@@ -161,13 +161,19 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
       return returnValue;
     }
 
-    time = myLineList.at(1).toDouble();
+    time = myLineList.at(2).toDouble();
 
-    if (myLineList.at(2).toStdString() == "1") valid = true;
+    if (myLineList.at(3).toStdString() == "1") valid = true;
 
-    position[0] = myLineList.at(3).toDouble();
-    position[1] = myLineList.at(4).toDouble();
-    position[2] = myLineList.at(5).toDouble();
+    position[0] = myLineList.at(4).toDouble();
+    position[1] = myLineList.at(5).toDouble();
+    position[2] = myLineList.at(6).toDouble();
+
+    double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
+    double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
+    double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
+    mitk::Quaternion eulerQuat(euler3, euler2, euler1);
+    orientation = eulerQuat;
   }
   else
   {

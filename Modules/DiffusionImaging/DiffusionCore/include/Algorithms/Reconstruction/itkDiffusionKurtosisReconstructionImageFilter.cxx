@@ -105,12 +105,15 @@ itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelTyp
     m_OmitBZero(false),
     m_MaskImage(nullptr),
     m_ApplyPriorSmoothing(false),
-    m_SmoothingSigma(1.5)
+    m_SmoothingSigma(1.5),
+    m_MaxFitBValue( 3000 )
 {
   this->m_InitialPosition = vnl_vector<double>(3, 0);
   this->m_InitialPosition[2] = 1000.0; // S_0
   this->m_InitialPosition[0] = 0.001; // D
   this->m_InitialPosition[1] = 1; // K
+
+  this->m_KurtosisBounds.fill(0);
 
   // single input image
   this->SetNumberOfRequiredInputs(1);

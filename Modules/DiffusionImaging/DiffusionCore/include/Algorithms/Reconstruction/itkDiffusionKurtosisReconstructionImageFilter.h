@@ -199,6 +199,12 @@ public:
     double m_K;
   };
 
+  enum FitScale
+  {
+    STRAIGHT = 0,
+    LOGARITHMIC
+  };
+
   //-- class typedefs
   typedef DiffusionKurtosisReconstructionImageFilter Self;
   typedef SmartPointer<Self>                      Pointer;
@@ -287,6 +293,28 @@ public:
     this->m_ApplyPriorSmoothing = flag;
   }
 
+  /** Set boundaries enforced by penalty terms in the fitting procedure */
+  void SetBoundariesForKurtosis( double lower, double upper )
+  {
+    m_KurtosisBounds[0] = lower; m_KurtosisBounds[1] = upper;
+  }
+
+  /** Exclude measurements associated with b-values higher than max_bvalue from fitting */
+  void SetMaximalBValueUsedForFitting( double max_bvalue )
+  {
+    m_MaxFitBValue = max_bvalue;
+  }
+
+  /** Select the method used in fitting of the data
+
+    STRAIHT - fit the exponential signal equation S / S_0 = exp [ ... ]
+    LOGARITHMIC - fit the logarithmic signal equation ln( S / S_0 ) = []
+    */
+  void SetFittingScale( FitScale scale )
+  {
+    m_ScaleForFitting = scale;
+  }
+
 protected:
   DiffusionKurtosisReconstructionImageFilter();
   virtual ~DiffusionKurtosisReconstructionImageFilter() {}
@@ -315,6 +343,11 @@ protected:
 
   bool m_ApplyPriorSmoothing;
   double m_SmoothingSigma;
+
+  vnl_vector_fixed<double, 2> m_KurtosisBounds;
+  double m_MaxFitBValue;
+
+  FitScale m_ScaleForFitting;
 
 private:
 

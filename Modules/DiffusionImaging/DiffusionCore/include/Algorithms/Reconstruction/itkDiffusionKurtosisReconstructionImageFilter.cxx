@@ -30,7 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkDiscreteGaussianImageFilter.h>
 
 template< class TInputPixelType>
-static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &input, const vnl_vector<double>& bvalues, vnl_vector<double>& result, bool omit_bzero = true)
+static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &input,
+                            const vnl_vector<double>& bvalues,
+                            vnl_vector<double>& result,
+                            itk::KurtosisFitConfiguration kf_config)
 {
   // check for length
   assert( input.Size() == bvalues.size() );
@@ -40,7 +43,7 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   unsigned int unused_values = 0;
   while( bvalueIter != bvalues.end() )
   {
-    if( *bvalueIter < vnl_math::eps && omit_bzero )
+    if( *bvalueIter < vnl_math::eps && kf_config.omit_bzero )
     {
       ++unused_values;
     }
@@ -56,7 +59,10 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   unsigned int skip_count = 0;
   while( bvalueIter != bvalues.end() )
   {
-    if( *bvalueIter < vnl_math::eps && omit_bzero )
+        // skip b=0 if the corresponding flag is set
+    if( ( kf_config.omit_bzero && *bvalueIter < vnl_math::eps )
+        // skip bvalues higher than the limit provided, if the flag is activated
+        || ( kf_config.exclude_high_b && *bvalueIter > kf_config.b_upper_threshold ) )
     {
       ++skip_count;
     }
@@ -75,10 +81,17 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   MITK_DEBUG("KurtosisFilter.FitSingleVoxel.Bval") << fit_bvalues;
 
   // perform fit on data vectors
-  if( omit_bzero )
+  if( kf_config.omit_bzero )
   {
    itk::kurtosis_fit_omit_unweighted kurtosis_cost_fn( fit_measurements.size() );
    kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
+
+   // configuration
+   kurtosis_cost_fn.set_fit_logscale( static_cast<bool>(kf_config.fit_scale) );
+   if( kf_config.use_K_limits)
+   {
+    kurtosis_cost_fn.set_K_bounds( kf_config.K_limits );
+   }
 
    vnl_levenberg_marquardt nonlinear_fit( kurtosis_cost_fn );
    nonlinear_fit.minimize( result );
@@ -87,7 +100,14 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   {
    itk::kurtosis_fit_lsq_function kurtosis_cost_fn( fit_measurements.size() );
    kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
-   kurtosis_cost_fn.use_bounds();
+
+   // configuration
+   kurtosis_cost_fn.set_fit_logscale( static_cast<bool>(kf_config.fit_scale) );
+   if( kf_config.use_K_limits)
+   {
+    kurtosis_cost_fn.set_K_bounds( kf_config.K_limits );
+   }
+
 
    vnl_levenberg_marquardt nonlinear_fit( kurtosis_cost_fn );
    nonlinear_fit.minimize(result);
@@ -106,7 +126,9 @@ itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelTyp
     m_MaskImage(nullptr),
     m_ApplyPriorSmoothing(false),
     m_SmoothingSigma(1.5),
-    m_MaxFitBValue( 3000 )
+    m_MaxFitBValue( 3000 ),
+    m_UseKBounds( false ),
+    m_ScaleForFitting( STRAIGHT )
 {
   this->m_InitialPosition = vnl_vector<double>(3, 0);
   this->m_InitialPosition[2] = 1000.0; // S_0
@@ -249,24 +271,26 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
 template< class TInputPixelType, class TOutputPixelType>
 typename itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>::KurtosisSnapshot
 itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
-::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, GradientDirectionContainerType::Pointer gradients, float bvalue, bool omit_bzero)
+::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, GradientDirectionContainerType::Pointer gradients, float bvalue, KurtosisFitConfiguration kf_conf)
 {
   // initialize bvalues from reference value and the gradients provided on input
   this->SetReferenceBValue(bvalue);
   this->SetGradientDirections( gradients );
 
   // call the other method
-  return this->GetSnapshot( input, this->m_BValues, omit_bzero );
+  return this->GetSnapshot( input, this->m_BValues, kf_conf );
 }
 
 
 template< class TInputPixelType, class TOutputPixelType>
 typename itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>::KurtosisSnapshot
 itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
-::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, vnl_vector<double> bvalues, bool omit_bzero)
+::GetSnapshot(const itk::VariableLengthVector<TInputPixelType> &input, vnl_vector<double> bvalues, KurtosisFitConfiguration kf_conf)
 {
   // initialize
   vnl_vector<double> initial_position;
+  bool omit_bzero = kf_conf.omit_bzero;
+
   if( !omit_bzero )
   {
     initial_position.set_size(2);
@@ -280,7 +304,7 @@ itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelTyp
   }
 
   // fit
-  FitSingleVoxel( input, bvalues, initial_position, omit_bzero );
+  FitSingleVoxel( input, bvalues, initial_position, kf_conf );
 
   // assembly result snapshot
   KurtosisSnapshot result;
@@ -410,6 +434,13 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
   MaskIteratorType maskIter( this->m_MaskImage, outputRegionForThread );
   maskIter.GoToBegin();
 
+  KurtosisFitConfiguration fit_config;
+  fit_config.omit_bzero = this->m_OmitBZero;
+  fit_config.fit_scale = this->m_ScaleForFitting;
+
+  fit_config.use_K_limits = this->m_UseKBounds;
+  fit_config.K_limits = this->m_KurtosisBounds;
+
   vnl_vector<double> initial_position;
   if( !this->m_OmitBZero )
   {
@@ -432,7 +463,7 @@ void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPix
     // fit single voxel (if inside mask )
     if( maskIter.Get() > 0 )
     {
-      FitSingleVoxel( inputIter.Get(), this->m_BValues, result, this->m_OmitBZero );
+      FitSingleVoxel( inputIter.Get(), this->m_BValues, result, fit_config );
     }
     else
     {

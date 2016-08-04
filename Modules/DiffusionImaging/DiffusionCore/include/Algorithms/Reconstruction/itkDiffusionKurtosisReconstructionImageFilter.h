@@ -43,7 +43,8 @@ namespace itk
     /** full lsq_function constructor */
     kurtosis_fit_lsq_function( unsigned int num_params, unsigned int num_measurements, UseGradient g=no_gradient)
       : vnl_least_squares_function( num_params, num_measurements, g),
-        m_use_bounds(false)
+        m_use_bounds(false),
+        m_use_logscale(false)
     {}
 
     /** simplified constructor for the 2-parameters fit */
@@ -56,6 +57,13 @@ namespace itk
     void initialize( vnl_vector< double > const& _meas, vnl_vector< double> const& _bvals )
     {
       meas = _meas;
+
+      if( m_use_logscale )
+      {
+        for( unsigned int i=0; i< meas.size(); ++i)
+          meas[i] = log( meas[i] );
+      }
+
       bvalues = _bvals;
     }
 
@@ -71,6 +79,21 @@ namespace itk
       kurtosis_lower_bounds = vnl_vector<double>(2, 0);
     }
 
+    void set_fit_logscale( bool flag )
+    {
+      this->m_use_logscale = flag;
+    }
+
+    void set_K_bounds( const vnl_vector_fixed<double, 2> k_bounds )
+    {
+      // init
+      this->use_bounds();
+
+      // override K bounds
+      kurtosis_lower_bounds[1] = k_bounds[0];
+      kurtosis_upper_bounds[1] = k_bounds[1];
+    }
+
     virtual void f(const vnl_vector<double> &x, vnl_vector<double> &fx)
     {
       for ( unsigned int s=0; s < fx.size(); s++ )
@@ -78,6 +101,8 @@ namespace itk
         const double factor = ( meas[s] - M(x, s) );
         fx[s] = factor * factor + penalty_term(x);
       }
+
+      MITK_INFO("Fit.x_and_f") << x << " | " << fx;
     }
 
   protected:
@@ -86,18 +111,28 @@ namespace itk
     double Diff( double x1, double x2, double b)
     {
       const double quotient = -1. * b * x1 + b*b * x1 * x1 * x2 / 6;
-      return exp(quotient);
+
+      if( m_use_logscale )
+        return quotient;
+      else
+        return exp(quotient);
     }
 
     /** The fitting measurement function, has to be reimplemented in the classes */
     virtual double M( vnl_vector<double> const& x, unsigned int idx )
     {
       const double bvalue = bvalues[idx];
-      return meas[0] *  Diff( x[0], x[1], bvalue);
+
+      double result = Diff( x[0], x[1], bvalue);
+
+      if( m_use_logscale )
+        return meas[0] + result;
+      else
+        return meas[0] * result ;
     }
 
     /** Penalty term on D and K during fitting, make sure the vector that is passed in contains (D, K) in this ordering */
-    double penalty_term( vnl_vector<double> const& x)
+    virtual double penalty_term( vnl_vector<double> const& x)
     {
       double penalty = 0;
 
@@ -109,7 +144,7 @@ namespace itk
       {
         // 5% penalty boundary
         // use exponential function to scale the penalty (max when x[i] == bounds )
-        double penalty_boundary = 0.05 * (kurtosis_upper_bounds[i] - kurtosis_lower_bounds[i]);
+        double penalty_boundary = 0.02 * (kurtosis_upper_bounds[i] - kurtosis_lower_bounds[i]);
 
         if( x[i] < kurtosis_lower_bounds[i] + penalty_boundary )
         {
@@ -121,10 +156,14 @@ namespace itk
         }
       }
 
+      MITK_INFO("Fit.Orig.Penalty") << x << " || penalty: " << penalty;
+
       return penalty;
     }
 
     bool m_use_bounds;
+
+    bool m_use_logscale;
 
     vnl_vector<double> kurtosis_upper_bounds;
     vnl_vector<double> kurtosis_lower_bounds;
@@ -149,17 +188,46 @@ namespace itk
     virtual double M(const vnl_vector<double> &x, unsigned int idx) override
     {
       const double bvalue = bvalues[idx];
-      return x[2] *  Diff( x[0], x[1], bvalue);
+
+      double result = Diff( x[0], x[1], bvalue);
+
+      if( m_use_logscale )
+        return log( x[2] ) + result;
+      else
+        return x[2] * result ;
     }
 
     virtual double penalty_term(const vnl_vector<double> &x)
     {
       // grab last two elements (D, K) from the 3-param fit and get penalty from superclass
       vnl_vector<double> xx(x.data_block()[0], 2) ;
+
+      MITK_INFO("Fit.Omit.Penalty") << xx;
+
       return kurtosis_fit_lsq_function::penalty_term(xx);
     }
   };
 
+  enum FitScale
+  {
+    STRAIGHT = 0,
+    LOGARITHMIC
+  };
+
+  struct KurtosisFitConfiguration
+  {
+    KurtosisFitConfiguration()
+      : omit_bzero(false),use_K_limits(false),exclude_high_b(false) {}
+
+    bool omit_bzero;
+    FitScale fit_scale;
+
+    bool use_K_limits;
+    vnl_vector_fixed<double, 2> K_limits;
+
+    bool exclude_high_b;
+    double b_upper_threshold;
+  };
 
 /**
   @class DiffusionKurtosisReconstructionImageFilter
@@ -175,7 +243,7 @@ class DiffusionKurtosisReconstructionImageFilter :
 public:
 
   /**
-    @struct KurtosisSnapsho
+    @struct KurtosisSnapshot
 
     @brief Struct describing a result (and the data) of a Kurtosis model fit
     */
@@ -197,12 +265,6 @@ public:
     double m_BzeroFit;
     double m_D;
     double m_K;
-  };
-
-  enum FitScale
-  {
-    STRAIGHT = 0,
-    LOGARITHMIC
   };
 
   //-- class typedefs
@@ -251,11 +313,11 @@ public:
 
   /**
     Trigger a single computation of the Kurtosis values from the given input vector and the bvalues and returns the result as a KurtosisSnapshot object */
-  KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, vnl_vector<double> bvalues, bool omit_bzero);
+  KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, vnl_vector<double> bvalues, KurtosisFitConfiguration kf_conf);
 
   /**
     Trigger a single computation of the kurtosis values, first the bvalues vector is computed internally but then also stored into the returend snapshot */
-  KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, GradientDirectionContainerType::Pointer, float bvalue, bool omit_bzero);
+  KurtosisSnapshot GetSnapshot( const itk::VariableLengthVector< TInputPixelType > &input, GradientDirectionContainerType::Pointer, float bvalue, KurtosisFitConfiguration kf_conf);
 
   /**
     * Returns the value of the current data presented to the filter.
@@ -296,6 +358,8 @@ public:
   /** Set boundaries enforced by penalty terms in the fitting procedure */
   void SetBoundariesForKurtosis( double lower, double upper )
   {
+    m_UseKBounds = true;
+
     m_KurtosisBounds[0] = lower; m_KurtosisBounds[1] = upper;
   }
 
@@ -344,6 +408,7 @@ protected:
   bool m_ApplyPriorSmoothing;
   double m_SmoothingSigma;
 
+  bool m_UseKBounds;
   vnl_vector_fixed<double, 2> m_KurtosisBounds;
   double m_MaxFitBValue;
 

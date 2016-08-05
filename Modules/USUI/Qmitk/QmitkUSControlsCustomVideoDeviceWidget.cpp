@@ -58,6 +58,14 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
     ui->crop_right->setValue(cropping.right);
     ui->crop_bot->setValue(cropping.bottom);
     ui->crop_top->setValue(cropping.top);
+
+    //get all probes and put their names into a combobox
+    std::vector<mitk::USProbe::Pointer> probes = m_ControlInterface->GetProbes();
+    for (std::vector<mitk::USProbe::Pointer>::iterator it = probes.begin(); it != probes.end(); it++)
+    {
+      std::string probeName = (*it)->GetName();
+      ui->m_ProbeIdentifier->addItem(QString::fromUtf8(probeName.data(), probeName.size()));
+    }
   }
   else
   {
@@ -79,8 +87,8 @@ void QmitkUSControlsCustomVideoDeviceWidget::Initialize()
   connect(ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
   connect(ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
   connect(ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
-  connect(ui->m_UsDepth, SIGNAL(valueChanged(int)), this, SLOT(OnDepthChanged()));
-  connect(ui->m_ProbeIdentifier, SIGNAL(textChanged(const QString &)), this, SLOT(OnProbeChanged()));
+  connect(ui->m_UsDepth, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnDepthChanged()));
+  connect(ui->m_ProbeIdentifier, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnProbeChanged()));
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
@@ -119,15 +127,15 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()
 
 void QmitkUSControlsCustomVideoDeviceWidget::OnDepthChanged()
 {
-  double depth = ui->m_UsDepth->value();
+  double depth = ui->m_UsDepth->currentText().toDouble();
   m_ControlInterface->SetNewDepth(depth);
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::OnProbeChanged()
 {
-  QString qtProbename = ui->m_ProbeIdentifier->text();
-  std::string probename = qtProbename.toStdString();
+  std::string probename = ui->m_ProbeIdentifier->currentText().toStdString();
   m_ControlInterface->SetNewProbeIdentifier(probename);
+  SetDepthsForProbe(probename);
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* target, int value)
@@ -135,4 +143,14 @@ void QmitkUSControlsCustomVideoDeviceWidget::BlockSignalAndSetValue(QSpinBox* ta
   bool oldState = target->blockSignals(true);
   target->setValue(value);
   target->blockSignals(oldState);
+}
+
+void QmitkUSControlsCustomVideoDeviceWidget::SetDepthsForProbe(std::string probename)
+{
+  ui->m_UsDepth->clear();
+  std::vector<int> depths = m_ControlInterface->GetDepthsForProbe(probename);
+  for (std::vector<int>::iterator it = depths.begin(); it != depths.end(); it++)
+  {
+    ui->m_UsDepth->addItem(QString::number(*it));
+  }
 }

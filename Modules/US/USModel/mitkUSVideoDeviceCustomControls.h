@@ -69,6 +69,16 @@ namespace mitk {
       */
     void SetNewProbeIdentifier(std::string probename);
 
+    /**
+    *\brief Get all the probes for the current device
+    */
+    std::vector<mitk::USProbe::Pointer> GetProbes();
+
+    /**
+    * \brief Get the scanning dephts of the given probe
+    */
+    std::vector<int> GetDepthsForProbe(std::string name);
+
   protected:
     /**
       * Class needs an mitk::USImageVideoSource object for beeing constructed.

@@ -52,6 +52,10 @@ class QmitkUSControlsCustomVideoDeviceWidget : public QmitkUSAbstractCustomWidge
   */
   void OnProbeChanged();
 
+  /**
+  * \brief Get all depths for the given probe and fill them into a combobox
+  */
+  void SetDepthsForProbe(std::string probename);
 public:
   /**
     * Constructs widget object. All gui control elements will be disabled until

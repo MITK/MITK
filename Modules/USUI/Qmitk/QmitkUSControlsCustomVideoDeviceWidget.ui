@@ -233,13 +233,6 @@
        </property>
       </spacer>
      </item>
-     <item row="3" column="0">
-      <widget class="QLineEdit" name="m_ProbeIdentifier">
-       <property name="placeholderText">
-        <string>default</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
@@ -275,14 +268,10 @@
       </layout>
      </item>
      <item row="1" column="0">
-      <widget class="QSpinBox" name="m_UsDepth">
-       <property name="minimum">
-        <number>10</number>
-       </property>
-       <property name="maximum">
-        <number>999</number>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="m_UsDepth"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QComboBox" name="m_ProbeIdentifier"/>
      </item>
     </layout>
    </item>

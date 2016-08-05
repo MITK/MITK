@@ -72,7 +72,9 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f, mit
   mitkWidget4Container(NULL),
   m_PendingCrosshairPositionEvent(false),
   m_CrosshairNavigationEnabled(false),
-  m_drawTextInStatusBar(true)
+  m_drawTextInStatusBar(true),
+  imageMTime(0),
+  m_displayMetaInfo(false)
 {
   /******************************************************
   * Use the global RenderingManager if none was specified

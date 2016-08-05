@@ -67,6 +67,13 @@ mitk::ToolManager::~ToolManager()
 
 void mitk::ToolManager::InitializeTools()
 {
+  if (m_ActiveTool) {
+    m_ActiveTool->Deactivated();
+    m_ActiveToolRegistration.Unregister();
+
+    m_ActiveTool = nullptr;
+    m_ActiveToolID = -1;
+  }
 
   m_Tools.resize(0);
   // get a list of all known mitk::Tools

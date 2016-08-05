@@ -29,10 +29,6 @@ QmitkKurtosisWidget::QmitkKurtosisWidget(QWidget *parent)
     canvas->setContentsMargins(0, 0, 0, 0);
   }
 
-  auto logScale = new QwtLogScaleEngine();
-  m_Plot->setAxisScaleEngine(0, logScale );
-  m_Plot->setAxisScale(0, 0.15, 1.2 );
-
 }
 
 QmitkKurtosisWidget::~QmitkKurtosisWidget()
@@ -47,6 +43,12 @@ void QmitkKurtosisWidget::SetData(KurtosisFilterType::KurtosisSnapshot snap)
 
   if( snap.bvalues.empty() )
     return;
+
+  double max_y_val = 1.4 * fmax( snap.measurements[0], snap.m_BzeroFit );
+
+  auto logScale = new QwtLogScaleEngine();
+  m_Plot->setAxisScaleEngine(0, logScale );
+  m_Plot->setAxisScale(0, 0.1, max_y_val );
 
   QString s("D=%1, K=%2");
   s = s.arg( snap.m_D, 4); s = s.arg( snap.m_K, 4);
@@ -66,21 +68,22 @@ void QmitkKurtosisWidget::SetData(KurtosisFilterType::KurtosisSnapshot snap)
   //
   // Data-points
   //
-  auto measured_values = toStdVec( snap.measurements / snap.measurements[0] );
+  auto measured_values = toStdVec( snap.measurements );
+  double y_bzero = measured_values[0];
 
   if( snap.m_fittedBZero )
   {
-    auto c_measurements_curve = this->InsertCurve( "Corrected measured values with fitted b=0" );
+    /*auto c_measurements_curve = this->InsertCurve( "Corrected measured values with fitted b=0" );
     this->SetCurveData( c_measurements_curve, toStdVec( snap.fit_bvalues ), toStdVec( snap.fit_measurements / snap.m_BzeroFit ) );
     this->SetCurvePen( c_measurements_curve, QPen(Qt::NoPen) );
     QwtSymbol* whiteDiamond = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::white), QColor(Qt::black), QSize(8,8));
-    this->SetCurveSymbol( c_measurements_curve, whiteDiamond );
+    this->SetCurveSymbol( c_measurements_curve, whiteDiamond );*/
 
     std::vector<double> single_bzero;
     single_bzero.push_back(0);
 
     std::vector<double> fitted_bzero;
-    fitted_bzero.push_back( 1 );
+    fitted_bzero.push_back( snap.m_BzeroFit );
 
     auto c_measurements_bzero = this->InsertCurve( "Fitted b=0" );
     this->SetCurveData( c_measurements_bzero, single_bzero, fitted_bzero );
@@ -88,9 +91,9 @@ void QmitkKurtosisWidget::SetData(KurtosisFilterType::KurtosisSnapshot snap)
     QwtSymbol* blackDiamond = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::black), QColor(Qt::black), QSize(8,8));
     this->SetCurveSymbol( c_measurements_bzero, blackDiamond );
 
-    measured_values.at(0) = snap.measurements[0] / snap.m_BzeroFit;
+    y_bzero = snap.m_BzeroFit;
 
-    MITK_INFO("Kurtosis.Widget.Bzero") << "[Fitted] " << snap.m_BzeroFit << ": [Measured]  " << snap.measurements[0];
+    MITK_DEBUG("Kurtosis.Widget.Bzero") << "[Fitted] " << snap.m_BzeroFit << ": [Measured]  " << snap.measurements[0];
   }
 
 
@@ -113,13 +116,14 @@ void QmitkKurtosisWidget::SetData(KurtosisFilterType::KurtosisSnapshot snap)
   vnl_vector<double> y_D_model(num_samples);
 
   const double x_tics_offset = max_bvalue / static_cast<double>( num_samples );
+
   for( unsigned int i=0; i<num_samples; ++i)
   {
      x_K_model[i] = i * x_tics_offset;
 
      double bval = x_K_model[i];
-     y_K_model[i] = exp( -bval * snap.m_D + bval*bval * snap.m_D * snap.m_D * snap.m_K / 6.0 );
-     y_D_model[i] = exp( -bval * snap.m_D );
+     y_K_model[i] = y_bzero * exp( -bval * snap.m_D + bval*bval * snap.m_D * snap.m_D * snap.m_K / 6.0 );
+     y_D_model[i] = y_bzero * exp( -bval * snap.m_D );
   }
 
   auto kurtosis_curve = this->InsertCurve( "Resulting fit of the model" );

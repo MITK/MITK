@@ -240,6 +240,9 @@ public:
     */
   struct KurtosisSnapshot
   {
+    KurtosisSnapshot()
+      : m_f(1), m_BzeroFit(1), m_D(0.001), m_K(0) {}
+
     // input data structures
     //vnl_vector<double> filtered_measurements;
     vnl_vector<double> bvalues;

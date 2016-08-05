@@ -199,7 +199,6 @@ void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
     imageSource->OverrideResolution(width, height);
     imageSource->SetResolutionOverride(true);
   }
-
   CleanUpAfterEditingOfDevice();
   MITK_INFO << "Finished Editing";
   emit Finished();

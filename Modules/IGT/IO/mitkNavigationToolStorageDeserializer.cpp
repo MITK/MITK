@@ -36,7 +36,7 @@ mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk:
   {
   m_DataStorage = dataStorage;
   //create temp directory for this reader
-  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory("NavigationToolStorageDeserializerTmp_XXXXXX",mitk::IOUtil::GetProgramPath());
+  m_tempDirectory = mitk::IOUtil::CreateTemporaryDirectory("NavigationToolStorageDeserializerTmp_XXXXXX",mitk::IOUtil::GetTempPath());
   }
 
 mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()

@@ -97,6 +97,7 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
         //connect( m_Controls->m_MaximalBValueWidget, SIGNAL( valueChanged(double)), this, SLOT( OnKurtosisParamsChanged() ) );
         connect( m_Controls->m_OmitBZeroCB, SIGNAL( stateChanged(int) ), this, SLOT( OnKurtosisParamsChanged() ) );
         connect( m_Controls->m_KurtosisFitScale, SIGNAL( currentIndexChanged(int)), this, SLOT( OnKurtosisParamsChanged() ) );
+        connect( m_Controls->m_UseKurtosisBoundsCB, SIGNAL(clicked() ), this, SLOT( OnKurtosisParamsChanged() ) );
     }
 
     QString dstar = QString::number(m_Controls->m_DStarSlider->value()/1000.0);
@@ -122,6 +123,9 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_KurtosisRangeWidget->setSingleStep(0.1);
     m_Controls->m_KurtosisRangeWidget->setRange( 0.0, 10.0 );
     m_Controls->m_KurtosisRangeWidget->setMaximumValue( 5.0 );
+
+    // LogScale not working yet, have to fix that first
+    m_Controls->m_KurtosisFitScale->setEnabled(false);
 
 
     //m_Controls->m_MaximalBValueWidget->setVisible( false );

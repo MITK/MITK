@@ -102,7 +102,7 @@ namespace itk
         fx[s] = factor * factor + penalty_term(x);
       }
 
-      MITK_INFO("Fit.x_and_f") << x << " | " << fx;
+      MITK_DEBUG("Fit.x_and_f") << x << " | " << fx;
     }
 
   protected:
@@ -140,7 +140,8 @@ namespace itk
       if( !m_use_bounds )
         return penalty;
 
-      for( unsigned int i=0; i< x.size(); i++)
+      // we have bounds for D and K only (the first two params )
+      for( unsigned int i=0; i< 2; i++)
       {
         // 5% penalty boundary
         // use exponential function to scale the penalty (max when x[i] == bounds )
@@ -156,7 +157,7 @@ namespace itk
         }
       }
 
-      MITK_INFO("Fit.Orig.Penalty") << x << " || penalty: " << penalty;
+      MITK_DEBUG("Fit.Orig.Penalty") << x << " || penalty: " << penalty;
 
       return penalty;
     }
@@ -195,16 +196,6 @@ namespace itk
         return log( x[2] ) + result;
       else
         return x[2] * result ;
-    }
-
-    virtual double penalty_term(const vnl_vector<double> &x)
-    {
-      // grab last two elements (D, K) from the 3-param fit and get penalty from superclass
-      vnl_vector<double> xx(x.data_block()[0], 2) ;
-
-      MITK_INFO("Fit.Omit.Penalty") << xx;
-
-      return kurtosis_fit_lsq_function::penalty_term(xx);
     }
   };
 

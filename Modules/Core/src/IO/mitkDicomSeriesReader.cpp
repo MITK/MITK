@@ -1026,7 +1026,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
             identicalOrigins = false;
           }
 
-          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
+          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock) && numberOfFilesInThisBlock == 1)
           {
             // group with previous block
             groupsOf3DPlusTBlocks[previousBlockKey].AddFiles( block3DIter->second.GetFilenames() );

@@ -22,8 +22,8 @@ SET(MOC_H_FILES
 )
 
 SET(CACHED_RESOURCE_FILES
-  resources/icon.xpm
-  resources/icon-eval.xpm
+  resources/iconMeasurementTracking.svg
+  resources/iconMeasurementEvaluation.svg
   plugin.xml
 )
 

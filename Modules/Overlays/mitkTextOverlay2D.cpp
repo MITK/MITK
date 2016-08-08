@@ -175,8 +175,8 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     calculateTextPosWithOffset(xt, yt);
     calculateTextPosWithOffset(xs, ys);
 
-    ls->m_TextActor->SetDisplayPosition(posT[0], posT[1]);
-    ls->m_STextActor->SetDisplayPosition(posS[0], posS[1]);
+    ls->m_TextActor->SetDisplayPosition(xt, yt);
+    ls->m_STextActor->SetDisplayPosition(xs, ys);
 
     ls->UpdateGenerateDataTime();
   }
@@ -208,8 +208,8 @@ void mitk::TextOverlay2D::applyTextOrientation(vtkSmartPointer<vtkTextProperty>&
 
 void mitk::TextOverlay2D::calculateTextPosWithOffset(float& x, float& y)
 {
-  x += 5.0;
-  y += 5.0;
+  x += 10.0;
+  y += 10.0;
 
   if (m_Orientation == mitk::TextOrientation::TextLeft)
   {
@@ -221,7 +221,7 @@ void mitk::TextOverlay2D::calculateTextPosWithOffset(float& x, float& y)
   }
   else if (m_Orientation == mitk::TextOrientation::TextCenterBottom)
   {
-    y -=10.0;
+    y -= 30.0;
   }
 }
 

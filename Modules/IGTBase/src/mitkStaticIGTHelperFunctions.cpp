@@ -47,11 +47,9 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
 
 double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b)
 {
-  itk::Vector<double,3> rotationVector = itk::Vector<double,3>();
-  rotationVector[0] = 0;
-  rotationVector[1] = 0;
-  rotationVector[2] = 1000;
-  return GetAngleBetweenTwoQuaterions(a,b,rotationVector);
+  double returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])*sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3])));
+  returnValue = 2 * acos(returnValue);
+  return returnValue;
 }
 
 itk::Matrix<double,3,3> mitk::StaticIGTHelperFunctions::ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma)

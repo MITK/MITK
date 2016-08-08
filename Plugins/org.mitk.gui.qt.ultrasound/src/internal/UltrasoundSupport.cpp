@@ -417,7 +417,7 @@ UltrasoundSupport::UltrasoundSupport()
     pluginContext->connectServiceListener(this, "OnDeciveServiceEvent",
     QString::fromStdString("(" + us::ServiceConstants::OBJECTCLASS() + "=" + us_service_interface_iid<mitk::USDevice>() + ")"));
   }
-  // HAAAA!
+
 }
 
 UltrasoundSupport::~UltrasoundSupport()

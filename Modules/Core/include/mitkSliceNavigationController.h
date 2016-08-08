@@ -157,6 +157,9 @@ class BaseRenderer;
 class MITKCORE_EXPORT SliceNavigationController : public BaseController
 {
   public:
+    
+    void setPositionTop(bool top);
+    
     mitkClassMacro(SliceNavigationController,BaseController);
     //itkFactorylessNewMacro(Self)
     //mitkNewMacro1Param(Self, const char *);

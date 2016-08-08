@@ -93,6 +93,11 @@ SliceNavigationController::~SliceNavigationController()
 }
 
 
+void SliceNavigationController::setPositionTop(bool top)
+{
+  m_Top = top;
+}
+
 void
 SliceNavigationController::SetInputWorldGeometry3D( const BaseGeometry *geometry )
 {
@@ -192,7 +197,7 @@ void SliceNavigationController::Update()
   {
     if ( m_ViewDirection == Axial )
     {
-      this->Update( Axial, false, false, true );
+      this->Update( Axial, m_Top, false, true );
     }
     else
     {

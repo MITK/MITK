@@ -908,7 +908,12 @@ void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
         q2 = EvaluationDataCollection.at(j)->GetQuaternionMean(0);
       }
 
-      double AngleBetweenTwoQuaternions = GetAngleBetweenTwoQuaterions(q1, q2);
+      itk::Vector<double> rotationVec;
+      //adapt for Aurora 5D tools: [0,0,1000]
+      rotationVec[0] = 10000; //X
+      rotationVec[1] = 0; //Y
+      rotationVec[2] = 0; //Z
+      double AngleBetweenTwoQuaternions = mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(q1, q2, rotationVec);
 
       //write data set
       WriteDifferenceAnglesDataSet(pos1.toStdString(), pos2.toStdString(), i, j, AngleBetweenTwoQuaternions);
@@ -930,80 +935,6 @@ void QmitkIGTTrackingDataEvaluationView::WriteDifferenceAnglesDataSet(std::strin
   //double angle_degree = angle * 180 / PI;
   m_CurrentAngleDifferencesWriteFile << "Angle between " << pos1 << " and " << pos2 << ";" << idx1 << ";" << idx2 << ";" << angle << "\n";//<< ";" << angle_degree << "\n";
   MITK_INFO << "Angle: " << angle;
-}
-
-double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b)
-{
-  itk::Vector<double> vec;
-  vec[0] = 10000;
-  vec[1] = 0;
-  vec[2] = 0;
-  double returnValue = mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(a, b, vec);
-
-  /*
-  //variant to work with the data received from the polhemus tracker
-  //source: https://fgiesen.wordpress.com/2013/01/07/small-note-on-quaternion-distance-metrics/
-  returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])*sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3])));
-  returnValue = 2 * acos(returnValue);
-  */
-
-  /*
-  //another variant
-  mitk::Quaternion combinedRotation = b * a;
-
-  itk::Vector<double, 3> pt1; //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
-  pt1[0] = 0.0;
-  pt1[1] = 0.0;
-  pt1[2] = 100000.0;
-
-  itk::Matrix<double, 3, 3> rotMatrixA;
-  for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) rotMatrixA[i][j] = combinedRotation.rotation_matrix_transpose().transpose()[i][j];
-  itk::Vector<double, 3> pt2 = rotMatrixA*pt1;
-
-  //compute angle between the two vectors
-  returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2) + pow(pt1[1], 2) + pow(pt1[2], 2)) * sqrt(pow(pt2[0], 2) + pow(pt2[1], 2) + pow(pt2[2], 2)));
-  returnValue = acos(returnValue);
-  */
-
-
-  /*
-  //variant with double precision
-
-  itk::Vector<double, 3> point; //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
-  //TODO: welchen Vektor hier nehmen?
-  point[0] = 0;
-  point[1] = 100000.0;
-  point[2] = 100000.0;
-
-  //OB DAS HILFT?
-  a.normalize();
-  b.normalize();
-
-  itk::Matrix<double, 3, 3> rotMatrixA;
-  for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) rotMatrixA[i][j] = a.rotation_matrix_transpose().transpose()[i][j];
-
-  itk::Matrix<double, 3, 3> rotMatrixB;
-  for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) rotMatrixB[i][j] = b.rotation_matrix_transpose().transpose()[i][j];
-
-  itk::Vector<double, 3> pt1 = rotMatrixA * point;
-  itk::Vector<double, 3> pt2 = rotMatrixB * point;
-
-  returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2.0) + pow(pt1[1], 2.0) + pow(pt1[2], 2.0)) * sqrt(pow(pt2[0], 2.0) + pow(pt2[1], 2.0) + pow(pt2[2], 2.0)));
-  returnValue = acos(returnValue);
-  */
-  /*
-  // same code with float precision:
-  mitk::Point3D point;
-  mitk::FillVector3D(point, 0, 0, 100); //caution 5D-Tools: Vector must lie in the YZ-plane for a correct result.
-  vnl_vector<float> pt1 = a.rotate(point.Get_vnl_vector());
-  vnl_vector<float> pt2 = b.rotate(point.Get_vnl_vector());
-
-  //compute angle between the two vectors
-  returnValue = (pt1[0] * pt2[0] + pt1[1] * pt2[1] + pt1[2] * pt2[2]) / (sqrt(pow(pt1[0], 2) + pow(pt1[1], 2) + pow(pt1[2], 2)) * sqrt(pow(pt2[0], 2) + pow(pt2[1], 2) + pow(pt2[2], 2)));
-  returnValue = acos(returnValue);
-  //angle(pt1,pt2);
-  */
-  return returnValue;
 }
 
 std::vector<mitk::NavigationData::Pointer> QmitkIGTTrackingDataEvaluationView::GetNavigationDatasFromFile(std::string filename)

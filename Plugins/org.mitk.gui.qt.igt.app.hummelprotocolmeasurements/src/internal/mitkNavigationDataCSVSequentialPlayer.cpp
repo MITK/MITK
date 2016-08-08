@@ -26,7 +26,7 @@ mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSVSequentialPlayer()
 {
   m_NavigationDatas = std::vector<mitk::NavigationData::Pointer>();
   m_CurrentPos = 0;
-  m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV;
+  m_Filetype = mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV;
 }
 
 mitk::NavigationDataCSVSequentialPlayer::~NavigationDataCSVSequentialPlayer()
@@ -152,9 +152,72 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   bool valid = false;
   double time;
 
-  if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
+  //this is for custom csv files. You have adapt the column numbers to correctly
+  //interpret your csv file.
+  if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV)
   {
     if (myLineList.size() < 10)
+    {
+      MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size() - 1).toStdString();
+      returnValue = GetEmptyNavigationData();
+      return returnValue;
+    }
+
+    valid = true; //if no valid flag is given: simply set to true
+
+    /*
+    //############# Variant for the Aurora measurements ###############
+    //#############   (CUSTOM .csv files from MITK)     ###############
+
+    position[0] = myLineList.at(3).toDouble();
+    position[1] = myLineList.at(4).toDouble();
+    position[2] = myLineList.at(5).toDouble();
+
+    orientation[0] = myLineList.at(6).toDouble(); //qx
+    orientation[1] = myLineList.at(7).toDouble(); //qy
+    orientation[2] = myLineList.at(8).toDouble(); //qz
+    orientation[3] = myLineList.at(9).toDouble(); //qr
+    */
+
+    //Variant for the polhemus measurements in August 2016
+    //(.csv files from the polhemus software)
+
+    //Important: due to the documentation, Polhemus uses
+    //a left handed coordinate system while MITK uses a
+    //right handed. A conversion is not included in this
+    //read in method yet, because this is not required
+    //for this special rotation evaliation (no matter
+    //if it turns 11.25 degree to left or right). For
+    //other usage this might be important to adapt!
+
+    position[0] = myLineList.at(4).toDouble();
+    position[1] = myLineList.at(5).toDouble();
+    position[2] = myLineList.at(6).toDouble();
+
+    /*
+    //Doesn't work... don't know how to interpret the
+    //Polhemus quaternions. They are seem to different
+    //different to other quaternions (NDI, Claron, etc.)
+    orientation[3] = myLineList.at(7).toDouble();  //qr
+    orientation[0] = myLineList.at(8).toDouble();  //qx
+    orientation[1] = myLineList.at(9).toDouble();  //qy
+    orientation[2] = myLineList.at(10).toDouble(); //qz
+    */
+
+    //Using Euler angles instead does work
+    double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
+    double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
+    double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
+    mitk::Quaternion eulerQuat(euler3, euler2, euler1);
+    orientation = eulerQuat;
+
+  }
+  //this is for MITK csv files that have been recorded with the MITK
+  //navigation data recorder. You can also use the navigation data player
+  //class from the MITK-IGT module instead.
+  else if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSV)
+  {
+    if (myLineList.size() < 8)
     {
       MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size() - 1).toStdString();
       returnValue = GetEmptyNavigationData();
@@ -165,74 +228,14 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
     if (myLineList.at(3).toStdString() == "1") valid = true;
 
-    /*
-    //Variant for the Aurora measurements
-    //(.csv files from MITK)
-    position[0] = myLineList.at(3).toDouble();
-    position[1] = myLineList.at(4).toDouble();
-    position[2] = myLineList.at(5).toDouble();
+    position[0] = myLineList.at(2).toDouble();
+    position[1] = myLineList.at(3).toDouble();
+    position[2] = myLineList.at(4).toDouble();
 
-    orientation[0] = myLineList.at(6).toDouble(); //qx
-    orientation[1] = myLineList.at(7).toDouble(); //qy
-    orientation[2] = myLineList.at(8).toDouble(); //qz
-    orientation[3] = myLineList.at(9).toDouble(); //qr
-    */
-
-
-    //Variant for the polhemus measurements in August 2016
-    //(.csv files from the polhemus software)
-
-    position[0] = myLineList.at(4).toDouble();
-    position[1] = myLineList.at(5).toDouble();
-    position[2] = myLineList.at(6).toDouble();
-
-    double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
-    double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
-    double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
-    mitk::Quaternion eulerQuat(euler3, euler2, euler1);
-    orientation = eulerQuat;
-  }
-  else
-  {
-    if (myLineList.size() < 10)
-    {
-      MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size() - 1).toStdString();
-      returnValue = GetEmptyNavigationData();
-      return returnValue;
-    }
-
-    //time = myLineList.at(2).toDouble();
-
-    //if (myLineList.at(2).toStdString() == "true")
-    //valid-flag wurde hier nicht gespeichert
-    valid = true;
-
-    /*
-    //Variant for the Aurora measurements
-    //(.csv files from MITK)
-    position[0] = myLineList.at(3).toDouble();
-    position[1] = myLineList.at(4).toDouble();
-    position[2] = myLineList.at(5).toDouble();
-
-    orientation[0] = myLineList.at(6).toDouble(); //qx
-    orientation[1] = myLineList.at(7).toDouble(); //qy
-    orientation[2] = myLineList.at(8).toDouble(); //qz
-    orientation[3] = myLineList.at(9).toDouble(); //qr
-    */
-
-    //Variant for the polhemus measurements in August 2016
-    //(.csv files from the polhemus software)
-
-    position[0] = myLineList.at(4).toDouble();
-    position[1] = myLineList.at(5).toDouble();
-    position[2] = myLineList.at(6).toDouble();
-
-    double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
-    double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
-    double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
-    mitk::Quaternion eulerQuat(euler3, euler2, euler1);
-    orientation = eulerQuat;
-
+    orientation[0] = myLineList.at(5).toDouble(); //qx
+    orientation[1] = myLineList.at(6).toDouble(); //qy
+    orientation[2] = myLineList.at(7).toDouble(); //qz
+    orientation[3] = myLineList.at(8).toDouble(); //qr
   }
 
   //returnValue->SetTimeStamp(time); //DOES NOT WORK ANY MORE... CANNOT SET TIME TO itk::timestamp CLASS

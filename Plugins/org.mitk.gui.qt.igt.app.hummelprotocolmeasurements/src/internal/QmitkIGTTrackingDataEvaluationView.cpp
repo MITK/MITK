@@ -942,6 +942,7 @@ double QmitkIGTTrackingDataEvaluationView::GetAngleBetweenTwoQuaterions(mitk::Qu
 
   /*
   //variant to work with the data received from the polhemus tracker
+  //source: https://fgiesen.wordpress.com/2013/01/07/small-note-on-quaternion-distance-metrics/
   returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])*sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3])));
   returnValue = 2 * acos(returnValue);
   */

@@ -27,9 +27,17 @@ namespace mitk
 
   /**Documentation
   * \brief This class is a NavigationDataPlayer which can play CSV formatted
-  * files in sequential order, which means it doesn't
-  * care about timestamps and just
-  * outputs the navigationdatas in their sequential order
+  * files in sequential order, which means it doesn't care about timestamps and just
+  * outputs the navigationdatas in their sequential order.
+  *
+  * It is thought to interpret custom csv files. To do so please adapt the column
+  * numbers of position and orientation in the internal method GetNavigationDataOutOfOneLine().
+  *
+  * So far only one (the first) tool is read in as required for the hummel protocol measurements.
+  *
+  * This class can also interpret MITK style csv files (set filetype to NavigationDataCSV), but
+  * you can also use the MITK navigation data player class inside the MITK-IGT module which
+  * is newer and better maintained.
   *
   * \ingroup IGT
   */
@@ -37,12 +45,6 @@ namespace mitk
     : public NavigationDataPlayerBase
   {
   public:
-
-    enum Filetype
-      {
-      NavigationDataCSV,
-      ManualLoggingCSV
-      };
 
     mitkClassMacro(NavigationDataCSVSequentialPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
@@ -57,8 +59,21 @@ namespace mitk
     */
     itkGetStringMacro(FileName);
 
-    itkSetMacro(Filetype,Filetype);
+    enum Filetype
+    {
+      NavigationDataCSV, //for csv files from the MITK navigation data player
+      ManualLoggingCSV //for custum csv files
+    };
+    /**
+    * \brief Sets the file type. ManualLoggingCSV is default and is thought for your
+    *        custom csv files. You can also set it to NavigationDataCSV, then this
+    *        player interprets MITK style csv files.
+    */
+    itkSetMacro(Filetype, Filetype);
 
+    /**
+    * \return Returns true if the player reached the end of the file.
+    */
     bool IsAtEnd();
 
     /**

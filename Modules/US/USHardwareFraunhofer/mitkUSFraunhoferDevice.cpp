@@ -19,7 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include "mitkUSFraunhoferSDKHeader.h"
 
 mitk::USFraunhoferDevice::USFraunhoferDevice(std::string manufacturer, std::string model)
-: mitk::USDevice(manufacturer, model){}
+	: mitk::USDevice(manufacturer, model), m_ControlsProbes(mitk::USFraunhoferProbesControls::New(this)),
+	m_ControlsBMode(mitk::USFraunhoferBModeControls::New(this)),
+	m_ControlsDoppler(mitk::USFraunhoferDopplerControls::New(this)),
+	m_ImageSource(mitk::USFraunhoferImageSource::New())
+{
+  SetNumberOfOutputs(1);
+  SetNthOutput(0, this->MakeOutput(0));
+}
 
 mitk::USFraunhoferDevice::~USFraunhoferDevice()
 {
@@ -32,29 +39,27 @@ std::string mitk::USFraunhoferDevice::GetDeviceClass()
 
 mitk::USControlInterfaceBMode::Pointer mitk::USFraunhoferDevice::GetControlInterfaceBMode()
 {
-  return nullptr;
+  return m_ControlsBMode.GetPointer();
 }
 
 mitk::USControlInterfaceProbes::Pointer mitk::USFraunhoferDevice::GetControlInterfaceProbes()
 {
-  return nullptr;
+  return m_ControlsProbes.GetPointer();
 };
 
 mitk::USControlInterfaceDoppler::Pointer mitk::USFraunhoferDevice::GetControlInterfaceDoppler()
 {
-  return nullptr;
+  return m_ControlsDoppler.GetPointer();
 };
 
 bool mitk::USFraunhoferDevice::OnInitialization()
 {
-
   return true;
 }
 
 bool mitk::USFraunhoferDevice::OnConnection()
 {
-  // create main Fraunhofer API COM library object
-
+  // Setup the scanmode
   return true;
 }
 
@@ -62,7 +67,6 @@ bool mitk::USFraunhoferDevice::OnDisconnection()
 {
   // control objects cannot be active anymore
 
-  ReleaseUsgControls();
 
   return true;
 }
@@ -76,7 +80,6 @@ bool mitk::USFraunhoferDevice::OnActivation()
 
 bool mitk::USFraunhoferDevice::OnDeactivation()
 {
-  this->StopScanning();
   return true;
 }
 
@@ -87,15 +90,10 @@ void mitk::USFraunhoferDevice::OnFreeze(bool freeze)
 
 mitk::USImageSource::Pointer mitk::USFraunhoferDevice::GetUSImageSource()
 {
-  return nullptr;
+  return m_ImageSource;
 }
 
-void mitk::USFraunhoferDevice::ReleaseUsgControls()
+ScanModeNative& mitk::USFraunhoferDevice::GetScanMode()
 {
-
-}
-
-void mitk::USFraunhoferDevice::StopScanning()
-{
-
+  return m_ScanMode;
 }

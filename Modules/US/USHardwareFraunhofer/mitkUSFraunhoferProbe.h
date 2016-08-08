@@ -37,7 +37,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(USFraunhoferProbe, USProbe);
-	itkNewMacro(Self);
+	mitkNewMacro1Param(Self, std::string);
 
   protected:
     /**
@@ -46,7 +46,7 @@ namespace mitk
       * \param probe API probe object which should be represented by the constructed object
       * \param dataView API data view object conected to this probe object
       */
-    USFraunhoferProbe();
+    USFraunhoferProbe(std::string ProbeName);
     virtual ~USFraunhoferProbe();
 
   };

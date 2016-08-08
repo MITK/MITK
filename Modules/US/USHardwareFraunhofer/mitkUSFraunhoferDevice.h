@@ -106,6 +106,9 @@ namespace mitk {
     /** @return Returns the current image source of this device. */
     USImageSource::Pointer GetUSImageSource( );
 
+	/** @return Returns the currently used scanmode of this device*/
+	ScanModeNative& GetScanMode();
+
   protected:
     /**
       * Constructs a mitk::USFraunhoferDevice object by given manufacturer
@@ -119,20 +122,11 @@ namespace mitk {
     USFraunhoferDevice(std::string manufacturer, std::string model);
     virtual ~USFraunhoferDevice();
 
-    void ReleaseUsgControls( );
-
-    /**
-      * \brief Stop ultrasound scanning by Fraunhofer API call.
-      *
-      * \throw mitk::Exception if API call returned with an error
-      */
-    void StopScanning( );
-
-    /*USFraunhoferProbesControls::Pointer    m_ControlsProbes;
+    USFraunhoferProbesControls::Pointer    m_ControlsProbes;
     USFraunhoferBModeControls::Pointer     m_ControlsBMode;
     USFraunhoferDopplerControls::Pointer   m_ControlsDoppler;
 
-    USFraunhoferImageSource::Pointer       m_ImageSource;*/
+    USFraunhoferImageSource::Pointer       m_ImageSource;
 
     /**
     * The Fraunhofer API expects callback functions to pass 
@@ -140,6 +134,8 @@ namespace mitk {
     * The message callback is here, the data itself is given directly to the image source.
     */
     void stringMessageCallback(char* message);
+
+	ScanModeNative m_ScanMode;
   };
 } // namespace mitk
 

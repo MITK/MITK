@@ -34,7 +34,6 @@ void mitk::USFraunhoferImageSource::GetNextRawImage( mitk::Image::Pointer& image
    if(image.IsNull()) { 
       image = mitk::Image::New(); 
    }
-   
 }
 
 void newDataCallback(

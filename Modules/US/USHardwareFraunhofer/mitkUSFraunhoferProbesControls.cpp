@@ -43,14 +43,25 @@ std::vector<mitk::USProbe::Pointer> mitk::USFraunhoferProbesControls::GetProbeSe
 {
 	// create a new vector of base class (USProbe) objects, because
 	// interface wants a vector of this type
-	std::vector<mitk::USProbe::Pointer> usProbes(1, 0);
-
+	std::vector<mitk::USProbe::Pointer> usProbes(m_ProbesSet.size(), 0);
+	for (unsigned int n = 0; n < m_ProbesSet.size(); ++n)
+	{
+		usProbes.at(n) = m_ProbesSet.at(n).GetPointer();
+	}
 	return usProbes;
 }
 
 void mitk::USFraunhoferProbesControls::OnSelectProbe(unsigned int index)
 {
+	if (index >= m_ProbesSet.size())
+	{
+		MITK_ERROR("USFraunhoferProbesControls")("USControlInterfaceProbes")
+			<< "Cannot select probe with index " << index << ". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
+		mitkThrow() << "Cannot select probe with index " << index <<
+			". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
+	}
 
+	m_SelectedProbeIndex = index;
 }
 
 void mitk::USFraunhoferProbesControls::OnSelectProbe(mitk::USProbe::Pointer probe)
@@ -59,32 +70,42 @@ void mitk::USFraunhoferProbesControls::OnSelectProbe(mitk::USProbe::Pointer prob
 
 mitk::USProbe::Pointer mitk::USFraunhoferProbesControls::GetSelectedProbe()
 {
+	if (m_SelectedProbeIndex >= m_ProbesSet.size())
+	{
+		MITK_ERROR("USFraunhoferProbesControls")("USControlInterfaceProbes")
+			<< "Cannot get active probe as the current index is" << m_SelectedProbeIndex <<
+			". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
+		mitkThrow() << "Cannot get active probe as the current index is" << m_SelectedProbeIndex <<
+			". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
+	}
 
-	return nullptr;
+	return m_ProbesSet.at(m_SelectedProbeIndex).GetPointer();
 }
 
 unsigned int mitk::USFraunhoferProbesControls::GetProbesCount() const
 {
-	return 0;
+	return m_ProbesSet.size();
 }
 
 
 void mitk::USFraunhoferProbesControls::ProbeRemoved(unsigned int index)
 {
 	MITK_INFO << "Probe removed...";
+
+	if (m_ProbesSet.size() > index)
+	{
+		m_ProbesSet.erase(m_ProbesSet.begin() + index);
+	}
 }
 
 void mitk::USFraunhoferProbesControls::ProbeAdded(unsigned int index)
 {
 	MITK_INFO << "Probe arrived...";
-}
 
-bool mitk::USFraunhoferProbesControls::CreateProbesCollection()
-{
-	return true;
+	this->CreateProbesSet();
 }
 
 void mitk::USFraunhoferProbesControls::CreateProbesSet()
 {
-	
+	m_ProbesSet.push_back(mitk::USFraunhoferProbe::New( m_FraunhoferDevice->GetScanMode().transducerName ));
 }

@@ -17,8 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSFraunhoferProbe.h"
 #include "mitkUSFraunhoferSDKHeader.h"
 
-mitk::USFraunhoferProbe::USFraunhoferProbe()
+mitk::USFraunhoferProbe::USFraunhoferProbe(std::string ProbeName)
 {
+	SetName(ProbeName);
 }
 
 mitk::USFraunhoferProbe::~USFraunhoferProbe()

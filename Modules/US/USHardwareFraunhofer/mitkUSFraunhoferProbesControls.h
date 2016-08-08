@@ -29,6 +29,8 @@ namespace mitk {
   /**
     * \brief Implementation of mitk::USControlInterfaceProbes for Fraunhofer ultrasound devices.
     * See documentation of mitk::USControlInterfaceProbes for a description of the interface methods.
+	* This class has to be implemented for the USDevice but the Fraunhofer API does not support multiple devices.
+	* Therefore there will be just one probe at all times.
     */
   class USFraunhoferProbesControls : public USControlInterfaceProbes
   {

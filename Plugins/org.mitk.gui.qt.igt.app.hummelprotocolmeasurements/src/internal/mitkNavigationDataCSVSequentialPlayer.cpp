@@ -194,22 +194,44 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     position[1] = myLineList.at(5).toDouble();
     position[2] = myLineList.at(6).toDouble();
 
-    /*
+
     //Doesn't work... don't know how to interpret the
     //Polhemus quaternions. They are seem to different
     //different to other quaternions (NDI, Claron, etc.)
-    orientation[3] = myLineList.at(7).toDouble();  //qr
-    orientation[0] = myLineList.at(8).toDouble();  //qx
-    orientation[1] = myLineList.at(9).toDouble();  //qy
-    orientation[2] = myLineList.at(10).toDouble(); //qz
+    //http://www.mathepedia.de/Quaternionen.aspx
+    double rotationAngle =  myLineList.at(7).toDouble();
+    double rotationAxis[3];
+    rotationAxis[0] = myLineList.at(8).toDouble();
+    rotationAxis[1] = myLineList.at(9).toDouble();
+    rotationAxis[2] = myLineList.at(10).toDouble();
+
+    /*
+    double betragRotationAxis = sqrt(pow(rotationAxis[0], 2) + pow(rotationAxis[1], 2) + pow(rotationAxis[2], 2));
+    rotationAngle /= betragRotationAxis;
+    rotationAxis[0] /= betragRotationAxis;
+    rotationAxis[1] /= betragRotationAxis;
+    rotationAxis[2] /= betragRotationAxis;
     */
 
+    double qr = cos(rotationAngle/2);
+    double qx = rotationAxis[0] * sin(rotationAngle/2);
+    double qy = rotationAxis[1] * sin(rotationAngle/2);
+    double qz = rotationAxis[1] * sin(rotationAngle/2);
+
+    orientation[3] = qr;  //qr
+    orientation[0] = qx;  //qx
+    orientation[1] = qy;  //qy
+    orientation[2] = qz;  //qz
+
+
+    /*
     //Using Euler angles instead does work
     double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
     double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
     double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
     mitk::Quaternion eulerQuat(euler3, euler2, euler1);
     orientation = eulerQuat;
+    */
 
   }
   //this is for MITK csv files that have been recorded with the MITK

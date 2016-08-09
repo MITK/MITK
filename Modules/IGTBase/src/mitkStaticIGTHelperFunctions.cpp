@@ -47,6 +47,8 @@ double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quater
 
 double mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(mitk::Quaternion a, mitk::Quaternion b)
 {
+  //formula returnValue = 2 * acos ( a <dotproduct> b )
+  //derivation from here: https://fgiesen.wordpress.com/2013/01/07/small-note-on-quaternion-distance-metrics/
   double returnValue = ((a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]) / (sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2] + a[3] * a[3])*sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2] + b[3] * b[3])));
   returnValue = 2 * acos(returnValue);
   return returnValue;

@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QPushButton>
 
+#include <deque>
 #include <algorithm>
 
 #include <mitkLogMacros.h>
@@ -58,7 +59,10 @@ public:
     { return id == other.id; }
 
     bool operator<(const PrefPage& other)
-    { return name < other.name; }
+    {
+      bool res = (name < other.name);
+      return res;
+    }
 
     QString id;
     QString name;
@@ -116,16 +120,26 @@ public:
         }
 
         // add information as PrefPage
-        m_PrefPages.push_back(PrefPage(id, name, category, className, keywordLabels, berry::IConfigurationElement::Pointer(*prefPagesIt)));
+        //m_PrefPages.push_back(PrefPage(id, name, category, className, keywordLabels, berry::IConfigurationElement::Pointer(*prefPagesIt)));
+        
+        PrefPage page(id, name, category, className, keywordLabels, berry::IConfigurationElement::Pointer(*prefPagesIt));
+        if (category.isEmpty())
+        {
+          m_PrefPages.push_front(page);
+        }
+        else
+        {
+          m_PrefPages.push_back(page);
+        }
       }
-
     }
   }
 
   ///
   /// Saves all treewidgetitems in a map, the key is the id of the preferencepage.
   ///
-  QList<PrefPage> m_PrefPages;
+  //QList<PrefPage> m_PrefPages;
+  std::deque<PrefPage> m_PrefPages;
   int m_CurrentPage;
 
 };
@@ -160,7 +174,7 @@ QmitkPreferencesDialog::~QmitkPreferencesDialog()
 
 void QmitkPreferencesDialog::SetSelectedPage(const QString& id)
 {
-  for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
+  for(std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
   {
     if(it->id == id)
     {
@@ -252,7 +266,7 @@ void QmitkPreferencesDialog::SavePreferences()
 {
   berry::IQtPreferencePage* prefPage = nullptr;
 
-  for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
+  for(std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it)
   {
     prefPage = it->prefPage;
     if(prefPage) {
@@ -321,7 +335,7 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
 
     d->m_CurrentPage = 0;
     berry::IWorkbench* workbench = berry::PlatformUI::GetWorkbench();
-    for(QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it, ++d->m_CurrentPage)
+    for(std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin(); it != d->m_PrefPages.end(); ++it, ++d->m_CurrentPage)
     {
       if(it->treeWidgetItem == selectedItems.at(0))
       {
@@ -342,9 +356,11 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
   }
 }
 
+#include <iostream>
+
 void QmitkPreferencesDialog::UpdateTree()
 {
-  if(d->m_PreferencesTree == nullptr)
+  /*if(d->m_PreferencesTree == nullptr)
     return;
 
   //m_PreferencesTree->clear();
@@ -449,6 +465,71 @@ void QmitkPreferencesDialog::UpdateTree()
   {
     if(d->m_PrefPages.front().treeWidgetItem != nullptr)
       d->m_PrefPages.front().treeWidgetItem->setSelected(true);
-  }
+  }*/
 
+  if(d->m_PreferencesTree == nullptr)
+  {
+    return;
+  }
+  
+  // TODO: Sort queue to lock position
+  //---------------------------------------------------------------------------
+  std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator endRoot = d->m_PrefPages.end();
+  
+  std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator sortIter = d->m_PrefPages.begin();
+  for (; sortIter != d->m_PrefPages.end(); ++sortIter)
+  {
+    if (sortIter->category.isEmpty())
+    {
+      endRoot = sortIter;
+    }
+  }
+  
+  if (endRoot != d->m_PrefPages.end())
+  {
+    std::sort(d->m_PrefPages.begin(), endRoot + 1);
+  }
+  
+  std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator iter = d->m_PrefPages.begin();
+  for (; iter != d->m_PrefPages.end(); ++iter)
+  {
+    if (iter->id == "org.mitk.gui.qt.application.EnvironmentPreferencePage")
+    {
+      std::deque<QmitkPreferencesDialogPrivate::PrefPage>::iterator iter2 = d->m_PrefPages.begin();
+      std::iter_swap(iter, iter2);
+    }
+  }
+  
+  //---------------------------------------------------------------------------
+  
+  for (unsigned int i = 0; i < d->m_PrefPages.size(); ++i)
+  {
+    std::cout << "//--------------------------------------//" << std::endl;
+    std::cout << "(i)PrefPage.id=" << d->m_PrefPages[i].id << std::endl;
+    std::cout << "(i)PrefPage.category=" << d->m_PrefPages[i].category << std::endl;
+    std::cout << "//--------------------------------------//" << std::endl;
+  }
+  
+  for (unsigned int i = 0; i < d->m_PrefPages.size(); ++i)
+  {
+    d->m_PrefPages[i].treeWidgetItem = new QTreeWidgetItem();
+    d->m_PrefPages[i].treeWidgetItem->setText(0, d->m_PrefPages[i].name);
+    
+    if (d->m_PrefPages[i].category.isEmpty())
+    {
+      d->m_PreferencesTree->addTopLevelItem(d->m_PrefPages[i].treeWidgetItem);
+    }
+    else
+    {
+      for (unsigned int j = 0; j < d->m_PrefPages.size(); ++j)
+      {
+        if (d->m_PrefPages[i].category == d->m_PrefPages[j].id)
+        { 
+          d->m_PrefPages[j].treeWidgetItem->addChild(d->m_PrefPages[i].treeWidgetItem);
+          
+          break;
+        }
+      }
+    }
+  }
 }

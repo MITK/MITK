@@ -61,7 +61,7 @@ void QmlMitkStdMultiItem::init()
     if(QmlMitkStdMultiItem::storage.IsNull())
         QmlMitkStdMultiItem::storage = mitk::StandaloneDataStorage::New();
 
-    this->m_mouseMode = mitk::MouseModeSwitcher::New();
+    this->m_mouseMode = mitk::MouseModeSwitcher::New("QmlMitkStdMultiItem");
     this->m_mouseMode->SetInteractionScheme(mitk::MouseModeSwitcher::InteractionScheme::MITK);
 
     this->m_viewerAxial->SetDataStorage(QmlMitkStdMultiItem::storage);

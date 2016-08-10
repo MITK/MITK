@@ -173,7 +173,7 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
 
     //########### register display interactor to handle scroll events ##################
     //use MouseModeSwitcher to ensure that the statemachine of DisplayInteractor is loaded correctly
-    m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
+    m_MouseModeSwitcher = mitk::MouseModeSwitcher::New("InteractionTestHelper");
   }
   else
   {

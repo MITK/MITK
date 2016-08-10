@@ -21,10 +21,10 @@
 
 #include "mitkInteractionEventObserver.h"
 
-mitk::MouseModeSwitcher::MouseModeSwitcher() :
+mitk::MouseModeSwitcher::MouseModeSwitcher(const std::string& rendererName) :
     m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(NULL)
 {
-  this->InitializeListeners();
+  this->InitializeListeners(rendererName);
   this->SetInteractionScheme(m_ActiveInteractionScheme);
 }
 
@@ -33,7 +33,7 @@ mitk::MouseModeSwitcher::~MouseModeSwitcher()
   m_ServiceRegistration.Unregister();
 }
 
-void mitk::MouseModeSwitcher::InitializeListeners()
+void mitk::MouseModeSwitcher::InitializeListeners(const std::string& rendererName)
 {
   if (m_CurrentObserver.IsNull())
   {
@@ -43,6 +43,9 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     // Register as listener via micro services
     us::ServiceProperties props;
     props["name"] = std::string("DisplayInteractor");
+    if (!rendererName.empty()) {
+      props["rendererName"] = rendererName;
+    }
     m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
         m_CurrentObserver.GetPointer(),props);
   }

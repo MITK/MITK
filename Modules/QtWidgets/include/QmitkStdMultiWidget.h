@@ -418,6 +418,9 @@ protected:
 
   bool m_PendingCrosshairPositionEvent;
   bool m_CrosshairNavigationEnabled;
+
+  QString m_Name;
+
   /**
    * @brief CreateCornerAnnotation helper method to create a corner annotation.
    * @param text of the annotation.

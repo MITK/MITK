@@ -71,7 +71,7 @@ protected:
   USDiPhASImageSource( );
   virtual ~USDiPhASImageSource( );
   
-  void UpdateImageGeometry(int imageWidth, int imageHeight);
+  void UpdateImageGeometry();
   
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;

@@ -55,9 +55,10 @@ namespace mitk {
     */
     virtual std::string GetDeviceClass();
 
-    virtual USControlInterfaceBMode::Pointer GetControlInterfaceBMode();
+   // virtual USControlInterfaceBMode::Pointer GetControlInterfaceBMode();
     virtual USControlInterfaceProbes::Pointer GetControlInterfaceProbes();
-    virtual USControlInterfaceDoppler::Pointer GetControlInterfaceDoppler();
+    //virtual USControlInterfaceDoppler::Pointer GetControlInterfaceDoppler();
+	virtual mitk::USAbstractControlInterface::Pointer GetControlInterfaceCustom();
 
     /**
       * \brief Is called during the initialization process.
@@ -145,9 +146,10 @@ namespace mitk {
     */
     void InitializeScanMode();
 
-    USDiPhASProbesControls::Pointer    m_ControlsProbes;
-    USDiPhASBModeControls::Pointer     m_ControlsBMode;
-    USDiPhASDopplerControls::Pointer   m_ControlsDoppler;
+    USDiPhASProbesControls::Pointer     m_ControlsProbes;
+    USDiPhASBModeControls::Pointer      m_ControlsBMode;
+    USDiPhASDopplerControls::Pointer    m_ControlsDoppler;
+	USAbstractControlInterface::Pointer m_ControlsCustom;
 
     USDiPhASImageSource::Pointer       m_ImageSource;
 

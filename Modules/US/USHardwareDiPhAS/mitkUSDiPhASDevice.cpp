@@ -39,20 +39,25 @@ std::string mitk::USDiPhASDevice::GetDeviceClass()
   return "org.mitk.modules.us.USDiPhASDevice";
 }
 
-mitk::USControlInterfaceBMode::Pointer mitk::USDiPhASDevice::GetControlInterfaceBMode()
+/*mitk::USControlInterfaceBMode::Pointer mitk::USDiPhASDevice::GetControlInterfaceBMode()
 {
   return m_ControlsBMode.GetPointer();
-}
+}*/
 
 mitk::USControlInterfaceProbes::Pointer mitk::USDiPhASDevice::GetControlInterfaceProbes()
 {
   return m_ControlsProbes.GetPointer();
 };
 
-mitk::USControlInterfaceDoppler::Pointer mitk::USDiPhASDevice::GetControlInterfaceDoppler()
+/*mitk::USControlInterfaceDoppler::Pointer mitk::USDiPhASDevice::GetControlInterfaceDoppler()
 {
   return m_ControlsDoppler.GetPointer();
-};
+};*/
+
+mitk::USAbstractControlInterface::Pointer mitk::USDiPhASDevice::GetControlInterfaceCustom()
+{
+	return m_ControlsCustom.GetPointer();
+}
 
 mitk::USImageSource::Pointer mitk::USDiPhASDevice::GetUSImageSource()
 {
@@ -100,20 +105,17 @@ void WrapperImageDataCallback(
 
 bool mitk::USDiPhASDevice::OnConnection()
 {
-	w_device = this;
-	w_ISource = m_ImageSource;
-  // Need those forwarders to call member functions; createBeamformer expects non-member function pointers. 
+  w_device = this;
+  w_ISource = m_ImageSource;
+  // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 
 
-	createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
-  //createBeamformer(nullptr,nullptr);
+  createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
   initBeamformer();
   this->InitializeScanMode();
   
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
-  m_IsRunning = toggleFreeze(); //start scanning
-  
-  
+
   return true;
 }
 
@@ -128,7 +130,6 @@ bool mitk::USDiPhASDevice::OnActivation()
 {
   if(!m_IsRunning)
     m_IsRunning=toggleFreeze();
-  MITK_INFO<< "I was activated";
   return true;
 }
 
@@ -136,7 +137,6 @@ bool mitk::USDiPhASDevice::OnDeactivation()
 {
   if(m_IsRunning)
     m_IsRunning=toggleFreeze();
-  MITK_INFO<< "I was deactivated";
   return true;
 }
 
@@ -210,7 +210,6 @@ void mitk::USDiPhASDevice::InitializeScanMode()
 
 void mitk::USDiPhASDevice::MessageCallback(const char* message)
 {
-	MITK_INFO << "Info 4 u";
 	MITK_INFO << "DiPhAS API: " << message << '\n';
 }
 

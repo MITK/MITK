@@ -68,7 +68,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
-  /*if (imageData != nullptr && !m_Image.IsNull())
+  if (imageData != nullptr && !m_Image.IsNull())
   {
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
 
@@ -77,19 +77,18 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     {
       unsigned int dim[]={imageWidth, imageHeight}; // image dimensions
 
-      m_Image->Initialize(mitk::MakeScalarPixelType<char>(), 2, dim);
+      m_Image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 2, dim);
     }
 
     // lock the image for writing an copy the given buffer into the image then
     m_Image->SetSlice(imageData);
 
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Unlock(); }
-  }*/
-	MITK_INFO << "another info 4 u";
+  }
 }
 
 
-void UpdateImageGeometry(int imageWidth, int imageHeight)
+void UpdateImageGeometry()
 {
   mitk::Vector3D spacing;
   spacing[0] = 1; //conversion: meters to millimeters

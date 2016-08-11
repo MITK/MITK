@@ -83,7 +83,7 @@ set(ENV{PATH} "${CTEST_PATH}")
 
 # If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
 if(NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
-  set(GIT_REPOSITORY "http://git.mitk.org/MITK.git")
+  set(GIT_REPOSITORY "https://phabricator.mitk.org/diffusion/MITK/mitk.git")
 endif()
 
 #

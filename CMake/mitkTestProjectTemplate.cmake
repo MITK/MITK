@@ -26,7 +26,7 @@ if(BUILD_TESTING)
                        LABELS "MITK;BlueBerry")
 
   add_test(NAME mitkProjectTemplateCloneTest
-           COMMAND ${GIT_EXECUTABLE} clone http://git.mitk.org/MITK-ProjectTemplate.git ${MITK-ProjectTemplate_SOURCE_DIR}
+           COMMAND ${GIT_EXECUTABLE} clone https://phabricator.mitk.org/diffusion/MPT/mitk-projecttemplate.git ${MITK-ProjectTemplate_SOURCE_DIR}
           )
   set_tests_properties(mitkProjectTemplateCloneTest PROPERTIES
                        DEPENDS mitkProjectTemplateRmSrcTest

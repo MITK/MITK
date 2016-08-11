@@ -55,7 +55,7 @@ If you don't want to use Git, you may also download a snapshot of the current so
 To clone MITK's current Git repository do:
 
 \code
-git clone http://git.mitk.org/MITK.git
+git clone https://phabricator.mitk.org/diffusion/MITK/mitk.git MITK
 \endcode
 
 \section BuildInstructions_Build_With_CMake Build MITK with CMake

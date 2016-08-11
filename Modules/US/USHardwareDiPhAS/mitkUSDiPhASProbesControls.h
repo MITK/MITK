@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSDiPhASProbesControls_H_HEADER_INCLUDED_
 #define MITKUSDiPhASProbesControls_H_HEADER_INCLUDED_
 
-#include "mitkUSDiPhASSDKHeader.h"
+#include "Framework.IBMT.US.CWrapper.h"
 #include "mitkUSDiPhASProbe.h"
 #include "mitkUSControlInterfaceProbes.h"
 

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSDiPhASBModeControls_H_HEADER_INCLUDED_
 #define MITKUSDiPhASBModeControls_H_HEADER_INCLUDED_
 
-#include "mitkUSDiPhASSDKHeader.h"
+#include "Framework.IBMT.US.CWrapper.h"
 #include "mitkUSControlInterfaceBMode.h"
 
 #include <itkObjectFactory.h>

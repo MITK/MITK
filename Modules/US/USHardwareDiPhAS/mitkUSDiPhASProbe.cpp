@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDiPhASProbe.h"
-#include "mitkUSDiPhASSDKHeader.h"
+#include "Framework.IBMT.US.CWrapper.h"
 
 mitk::USDiPhASProbe::USDiPhASProbe(std::string ProbeName)
 {

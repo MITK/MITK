@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSDiPhASImageSource_H_HEADER_INCLUDED_
 
 #include "mitkUSImageSource.h"
-#include "mitkUSDiPhASSDKHeader.h"
+#include "Framework.IBMT.US.CWrapper.h"
 
 #include "itkFastMutexLock.h"
 
@@ -62,7 +62,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     unsigned char* imageData,
     int& imageWidth,
     int& imageHeight,
-    int& imageBytesPerPixel,
+	int& imagePixelFormat,
     int& imageSetsTotal,
 
     double& timeStamp);
@@ -71,7 +71,7 @@ protected:
   USDiPhASImageSource( );
   virtual ~USDiPhASImageSource( );
   
-  void UpdateImageGeometry();
+  void UpdateImageGeometry(int imageWidth, int imageHeight);
   
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;

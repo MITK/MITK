@@ -16,17 +16,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSDiPhASDevice.h"
 
-//#include "mitkUSDiPhASSDKHeader.h"
+//#include "Framework.IBMT.US.CWrapper.h"
 
 mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model)
 	: mitk::USDevice(manufacturer, model), m_ControlsProbes(mitk::USDiPhASProbesControls::New(this)),
 	m_ControlsBMode(mitk::USDiPhASBModeControls::New(this)),
 	m_ControlsDoppler(mitk::USDiPhASDopplerControls::New(this)),
 	m_ImageSource(mitk::USDiPhASImageSource::New()),
-	m_IsRunning(false);
+	m_IsRunning(false)
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
+  
 }
 
 mitk::USDiPhASDevice::~USDiPhASDevice()
@@ -71,29 +72,47 @@ bool mitk::USDiPhASDevice::OnInitialization()
   return true;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------
+// ugly wrapper stuff - find better solution so it isn't necessary to create a global pointer to USDiPhASDevice...
+
+mitk::USDiPhASDevice* w_device;
+mitk::USDiPhASImageSource* w_ISource;
+
+void WrapperMessageCallback(const char* message) 
+{
+	w_device->MessageCallback(message);
+}
+
+void WrapperImageDataCallback(
+	short* rfDataChannelData, int channelDatalinesPerDataset, int channelDataSamplesPerChannel, int channelDataTotalDatasets,
+	short* rfDataArrayBeamformed, int beamformedLines, int beamformedSamples, int beamformedTotalDatasets,
+	unsigned char* imageData, int imageWidth, int imageHeight, int imagePixelFormat, int imageSetsTotal,
+
+	double timeStamp)
+{
+	 w_ISource->ImageDataCallback(
+		rfDataChannelData, channelDatalinesPerDataset, channelDatalinesPerDataset, channelDataTotalDatasets,
+		rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
+		imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
+}
+
+//----------------------------------------------------------------------------------------------------------------------------
+
 bool mitk::USDiPhASDevice::OnConnection()
 {
-  static auto WrapMessageCallback = [this](const char* message)->void{ this->StringMessageCallback(message); };
-  static auto WrapImageDataCallback = [this](
-      short* rfDataChannelData, int channelDatalinesPerDataset, int channelDataSamplesPerLine, int channelDataTotalDatasets,
-      short* rfDataArrayBeamformed, int beamformedLines, int beamformedSamples, int beamformedTotalDatasets,
-      unsigned char* imageData, int imageWidth, int imageHeight, int imagePixelFormat, int imageSetsTotal, double timeStamp)->void
-    { 
-      this->m_ImageSource->ImageDataCallback(
-        rfDataChannelData, channelDatalinesPerDataset, channelDataSamplesPerLine, channelDataTotalDatasets,
-        rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
-        imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
-	};
+	w_device = this;
+	w_ISource = m_ImageSource;
   // Need those forwarders to call member functions; createBeamformer expects non-member function pointers. 
-  // "static" is needed to ensure those methods remain in memory
 
-  createBeamformer((StringMessageCallback)&WrapMessageCallback, (NewDataCallback)&WrapImageDataCallback);
+	createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
+  //createBeamformer(nullptr,nullptr);
   initBeamformer();
   this->InitializeScanMode();
   
   // pass the new scanmode to the device:
-  setupScan(m_ScanMode);
+  setupScan(this->m_ScanMode);
   m_IsRunning = toggleFreeze(); //start scanning
+  
   
   return true;
 }
@@ -129,8 +148,7 @@ void mitk::USDiPhASDevice::OnFreeze(bool freeze)
 
 void mitk::USDiPhASDevice::InitializeScanMode()
 {
-	// initialize the ScanMode to be used for measurements:
-	m_ScanMode.scanModeName = "TestMode";
+	m_ScanMode.scanModeName = "UltrasoundMode";
 
 	// configure a linear transducer
 	m_ScanMode.transducerName = "L2-7 ";
@@ -141,37 +159,14 @@ void mitk::USDiPhASDevice::InitializeScanMode()
 	m_ScanMode.transducerType = 1;
 
 	// configure the transmit sequence(s):
-	int selectedChannelOn = 63;
 	int numChannels = 128;
 	m_ScanMode.transmitEventsCount = 1;
-	int totalNumberOfDelays = numChannels * m_ScanMode.transmitEventsCount;
-	m_ScanMode.transmitEventsDelays = new float[totalNumberOfDelays];
-	m_ScanMode.BurstHalfwaveClockCountPerChannel = new int[numChannels];
-	m_ScanMode.BurstCountPerChannel = new int[numChannels];
-	m_ScanMode.BurstUseNegativePolarityPerChannel = new bool[numChannels];
-	for (int i = 0; i < numChannels; ++i)
-	{
-		if (i == selectedChannelOn)
-		{
-			m_ScanMode.BurstHalfwaveClockCountPerChannel[i] = 12; // 5MHz
-			m_ScanMode.BurstCountPerChannel[i] = 1;
-			m_ScanMode.BurstUseNegativePolarityPerChannel[i] = true;
-			m_ScanMode.transmitEventsDelays[i] = 0;
-		}
-		else
-		{
-			m_ScanMode.BurstHalfwaveClockCountPerChannel[i] = 0; // 5MHz
-			m_ScanMode.BurstCountPerChannel[i] = 1;
-			m_ScanMode.BurstUseNegativePolarityPerChannel[i] = true;
-			m_ScanMode.transmitEventsDelays[i] = 0;
-		}
-	}
-
+	m_ScanMode.BurstHalfwaveClockCountAllChannels = 11; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 5 MHz 
 	m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
 	m_ScanMode.voltageV = 70;
 
 	// configure the receive paramters:
-	m_ScanMode.receivePhaseLengthSeconds = 65e-6f;
+	m_ScanMode.receivePhaseLengthSeconds = 65e-6f; // 5 cm imaging depth
 	m_ScanMode.tgcdB = new unsigned char[8];
 	for (int tgc = 0; tgc < 8; ++tgc)
 		m_ScanMode.tgcdB[tgc] = tgc * 2 + 10;
@@ -180,20 +175,28 @@ void mitk::USDiPhASDevice::InitializeScanMode()
 	m_ScanMode.averagingCount = 1;
 
 	// configure general processing:
-	m_ScanMode.transferChannelData = true;
+	m_ScanMode.transferChannelData = false;
 
 	// configure reconstruction processing:
 	m_ScanMode.averageSpeedOfSound = 1540;
-	m_ScanMode.computeBeamforming = false;
-	m_ScanMode.beamformingAlgorithm = 0; //  (int)Beamforming::PlaneWaveCompound;
-	/*BeamformingParametersPlaneWaveCompound parameters;
-	parameters.usePhaseCoherence = 0;
-	parameters.SpeedOfSoundMeterPerSecond = 1540;
-	m_ScanMode.beamformingAlgorithmParameters = (void*)&parameters;*/
+	m_ScanMode.computeBeamforming = true;
+	m_ScanMode.beamformingAlgorithm = (int)Beamforming::PlaneWaveCompound;
+
+	// setup beamforming parameters:
+	BeamformingParametersPlaneWaveCompound parametersPW;
+	parametersPW.SpeedOfSoundMeterPerSecond = 1540;
+	parametersPW.angleSkipFactor = 1;
+	m_ScanMode.beamformingAlgorithmParameters = (void*)&parametersPW;
+
 	m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
 	m_ScanMode.reconstructionLines = 128;
 	m_ScanMode.reconstructionSamplesPerLine = 2048;
 	m_ScanMode.transferBeamformedData = false;
+
+	// configure bandpass:
+	m_ScanMode.bandpassApply = false;
+	m_ScanMode.bandpassFrequencyLowHz = 1e6f;
+	m_ScanMode.bandpassFrequencyHighHz = 20e6f;
 
 	// configure image generation:
 	m_ScanMode.imageWidth = 512;
@@ -205,8 +208,9 @@ void mitk::USDiPhASDevice::InitializeScanMode()
 
 // callback for the DiPhAS API 
 
-void mitk::USDiPhASDevice::StringMessageCallback(const char* message)
+void mitk::USDiPhASDevice::MessageCallback(const char* message)
 {
+	MITK_INFO << "Info 4 u";
 	MITK_INFO << "DiPhAS API: " << message << '\n';
 }
 

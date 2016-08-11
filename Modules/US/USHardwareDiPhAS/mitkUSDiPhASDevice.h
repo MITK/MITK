@@ -25,7 +25,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDiPhASBModeControls.h"
 #include "mitkUSDiPhASDopplerControls.h"
 
-#include "mitkUSDiPhASSDKHeader.h"
+#include "Framework.IBMT.US.CWrapper.h"
+
+#include <Windows.h>
+#include <iostream>
+#include <SDKDDKVer.h>
+#include <stdio.h>
+#include <tchar.h>
 
 namespace mitk {
   /**
@@ -37,6 +43,7 @@ namespace mitk {
     * Images given by the device are put into an object of
     * mitk::USDiPhASImageSource.
     */
+
   class USDiPhASDevice : public USDevice
   {
   public:
@@ -111,6 +118,9 @@ namespace mitk {
     /** @return Returns the currently used scanmode of this device*/
     ScanModeNative& GetScanMode();
 
+	void MessageCallback(const char* message);
+	ScanModeNative                     m_ScanMode;
+
   protected:
     /**
       * Constructs a mitk::USDiPhASDevice object by given manufacturer
@@ -129,7 +139,6 @@ namespace mitk {
     * both status messages and the processed images to the user.
     * The message callback is here, the data itself is given directly to the image source.
     */
-    void StringMessageCallback(const char* message);
 
     /**
     * This method sets up the scanmode at the begining
@@ -141,7 +150,6 @@ namespace mitk {
     USDiPhASDopplerControls::Pointer   m_ControlsDoppler;
 
     USDiPhASImageSource::Pointer       m_ImageSource;
-    ScanModeNative m_ScanMode;
 
     bool m_IsRunning;
   };

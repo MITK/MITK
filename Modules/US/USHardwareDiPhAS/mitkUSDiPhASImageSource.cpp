@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDiPhASImageSource.h"
-#include "mitkUSDiPhASSDKHeader.h"
+#include "Framework.IBMT.US.CWrapper.h"
 #include "mitkImageReadAccessor.h"
 
 mitk::USDiPhASImageSource::USDiPhASImageSource()
   : m_Image(mitk::Image::New()),
-  m_ImageMutex(itk::FastMutexLock::New()
+  m_ImageMutex(itk::FastMutexLock::New())
 {
 
 }
@@ -68,7 +68,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
-  if (imageData != nullptr && !m_Image.IsNull())
+  /*if (imageData != nullptr && !m_Image.IsNull())
   {
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
 
@@ -84,14 +84,15 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     m_Image->SetSlice(imageData);
 
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Unlock(); }
-  }
+  }*/
+	MITK_INFO << "another info 4 u";
 }
 
 
-void UpdateImageGeometry(int imageWidth, int imageHeight, )
+void UpdateImageGeometry(int imageWidth, int imageHeight)
 {
   mitk::Vector3D spacing;
-  spacing[0] = ((double)1 / resolutionInMeters.nXPelsPerUnit) * 1000; //conversion: meters to millimeters
-  spacing[1] = ((double)1 / resolutionInMeters.nXPelsPerUnit) * 1000; //conversion: meters to millimeters
+  spacing[0] = 1; //conversion: meters to millimeters
+  spacing[1] = 1; //conversion: meters to millimeters
   spacing[2] = 1;
 }

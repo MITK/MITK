@@ -14,30 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUSFraunhoferBModeControls_H_HEADER_INCLUDED_
-#define MITKUSFraunhoferBModeControls_H_HEADER_INCLUDED_
+#ifndef MITKUSDiPhASBModeControls_H_HEADER_INCLUDED_
+#define MITKUSDiPhASBModeControls_H_HEADER_INCLUDED_
 
-#include "mitkUSFraunhoferSDKHeader.h"
+#include "mitkUSDiPhASSDKHeader.h"
 #include "mitkUSControlInterfaceBMode.h"
 
 #include <itkObjectFactory.h>
 
 namespace mitk {
-  class USFraunhoferDevice;
+  class USDiPhASDevice;
 
   /**
-    * \brief Implementation of mitk::USControlInterfaceBMode for Fraunhofer ultrasound devices.
+    * \brief Implementation of mitk::USControlInterfaceBMode for DiPhAS ultrasound devices.
     * See documentation of mitk::USControlInterfaceBMode for a description of the interface methods.
     */
-  class USFraunhoferBModeControls : public USControlInterfaceBMode
+  class USDiPhASBModeControls : public USControlInterfaceBMode
   {
   public:
-    mitkClassMacro(USFraunhoferBModeControls, USControlInterfaceBMode);
-    mitkNewMacro1Param(Self, itk::SmartPointer<USFraunhoferDevice>);
+    mitkClassMacro(USDiPhASBModeControls, USControlInterfaceBMode);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USDiPhASDevice>);
 
     /**
       * Scan mode is set to b mode when this controls are activated.
-      * All necessary controls are created at the Fraunhofer API.
+      * All necessary controls are created at the DiPhAS API.
       */
     virtual void SetIsActive( bool );
 
@@ -79,8 +79,8 @@ namespace mitk {
     virtual double GetScanningDynamicRangeTick( );
 
   protected:
-    USFraunhoferBModeControls(itk::SmartPointer<USFraunhoferDevice> device);
-    virtual ~USFraunhoferBModeControls();
+    USDiPhASBModeControls(itk::SmartPointer<USDiPhASDevice> device);
+    virtual ~USDiPhASBModeControls();
 
     bool                      m_Active;
 
@@ -91,4 +91,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSFraunhoferBModeControls_H_HEADER_INCLUDED_
+#endif // MITKUSDiPhASBModeControls_H_HEADER_INCLUDED_

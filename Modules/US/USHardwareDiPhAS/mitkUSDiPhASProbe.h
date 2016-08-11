@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUSFraunhoferProbe_H_HEADER_INCLUDED_
-#define MITKUSFraunhoferProbe_H_HEADER_INCLUDED_
+#ifndef MITKUSDiPhASProbe_H_HEADER_INCLUDED_
+#define MITKUSDiPhASProbe_H_HEADER_INCLUDED_
 
 #include "mitkUSProbe.h"
 
@@ -27,29 +27,29 @@ namespace Usgfw2Lib {
 namespace mitk
 {
   /**
-    * \brief Specialized mitk::USProbe for handling Fraunhofer API probe objects.
-    * It encapsulates a probe object from the Fraunhofer API.
+    * \brief Specialized mitk::USProbe for handling DiPhAS API probe objects.
+    * It encapsulates a probe object from the DiPhAS API.
     *
-    * This class should only be instantiated by mitk::USFraunhoferProbesControls.
-    * Every other object can get instances of mitk::USFraunhoferProbe from there.
+    * This class should only be instantiated by mitk::USDiPhASProbesControls.
+    * Every other object can get instances of mitk::USDiPhASProbe from there.
     */
-  class USFraunhoferProbe : public USProbe
+  class USDiPhASProbe : public USProbe
   {
   public:
-    mitkClassMacro(USFraunhoferProbe, USProbe);
+    mitkClassMacro(USDiPhASProbe, USProbe);
 	mitkNewMacro1Param(Self, std::string);
 
   protected:
     /**
-      * Constructs mitk::USFraunhoferProbe object with given API objects.
+      * Constructs mitk::USDiPhASProbe object with given API objects.
       *
       * \param probe API probe object which should be represented by the constructed object
       * \param dataView API data view object conected to this probe object
       */
-    USFraunhoferProbe(std::string ProbeName);
-    virtual ~USFraunhoferProbe();
+    USDiPhASProbe(std::string ProbeName);
+    virtual ~USDiPhASProbe();
 
   };
 } // namespace mitk
 
-#endif // MITKUSFraunhoferProbe_H_HEADER_INCLUDED_
+#endif // MITKUSDiPhASProbe_H_HEADER_INCLUDED_

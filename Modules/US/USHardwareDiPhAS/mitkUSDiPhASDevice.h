@@ -14,31 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUSFraunhoferDevice_H_HEADER_INCLUDED_
-#define MITKUSFraunhoferDevice_H_HEADER_INCLUDED_
+#ifndef MITKUSDiPhASDevice_H_HEADER_INCLUDED_
+#define MITKUSDiPhASDevice_H_HEADER_INCLUDED_
+
+#include <functional>
 
 #include "mitkUSDevice.h"
-#include "mitkUSFraunhoferImageSource.h"
-#include "mitkUSFraunhoferProbesControls.h"
-#include "mitkUSFraunhoferBModeControls.h"
-#include "mitkUSFraunhoferDopplerControls.h"
+#include "mitkUSDiPhASImageSource.h"
+#include "mitkUSDiPhASProbesControls.h"
+#include "mitkUSDiPhASBModeControls.h"
+#include "mitkUSDiPhASDopplerControls.h"
 
-#include "mitkUSFraunhoferSDKHeader.h"
+#include "mitkUSDiPhASSDKHeader.h"
 
 namespace mitk {
   /**
-    * \brief Implementation of mitk::USDevice for Fraunhofer API devices.
-    * Connects to a Fraunhofer API device through its COM library interface.
+    * \brief Implementation of mitk::USDevice for DiPhAS API devices.
+    * Connects to a DiPhAS API device through its COM library interface.
     *
     * This class handles all API communications and creates interfaces for
     * b mode, doppler and probes controls.
     * Images given by the device are put into an object of
-    * mitk::USFraunhoferImageSource.
+    * mitk::USDiPhASImageSource.
     */
-  class USFraunhoferDevice : public USDevice
+  class USDiPhASDevice : public USDevice
   {
   public:
-    mitkClassMacro(USFraunhoferDevice, mitk::USDevice);
+    mitkClassMacro(USDiPhASDevice, mitk::USDevice);
     mitkNewMacro2Param(Self, std::string, std::string);
 
     /**
@@ -52,7 +54,7 @@ namespace mitk {
 
     /**
       * \brief Is called during the initialization process.
-      * There is nothing done on the initialization of a mik::USFraunhoferDevive object.
+      * There is nothing done on the initialization of a mik::USDiPhASDevive object.
       *
       * \return always true
       */
@@ -60,7 +62,7 @@ namespace mitk {
 
     /**
       * \brief Is called during the connection process.
-      * Connect to the Fraunhofer API.
+      * Connect to the DiPhAS API.
       *
       * \return true if successfull, false if no device is connected to the pc
       * \throws mitk::Exception if something goes wrong at the API calls
@@ -69,8 +71,8 @@ namespace mitk {
 
     /**
       * \brief Is called during the disconnection process.
-      * Deactivate and remove all Fraunhofer API controls. A disconnect from the
-      * Fraunhofer API is not possible for which reason the hardware stays in connected
+      * Deactivate and remove all DiPhAS API controls. A disconnect from the
+      * DiPhAS API is not possible for which reason the hardware stays in connected
       * state even after calling this method.
       *
       * \return always true
@@ -106,12 +108,12 @@ namespace mitk {
     /** @return Returns the current image source of this device. */
     USImageSource::Pointer GetUSImageSource( );
 
-	/** @return Returns the currently used scanmode of this device*/
-	ScanModeNative& GetScanMode();
+    /** @return Returns the currently used scanmode of this device*/
+    ScanModeNative& GetScanMode();
 
   protected:
     /**
-      * Constructs a mitk::USFraunhoferDevice object by given manufacturer
+      * Constructs a mitk::USDiPhASDevice object by given manufacturer
       * and model string. These strings are just for labeling the device
       * in the micro service.
       *
@@ -119,24 +121,30 @@ namespace mitk {
       * construction. Registration at the micro service happens not before
       * initialization method was called.
       */
-    USFraunhoferDevice(std::string manufacturer, std::string model);
-    virtual ~USFraunhoferDevice();
-
-    USFraunhoferProbesControls::Pointer    m_ControlsProbes;
-    USFraunhoferBModeControls::Pointer     m_ControlsBMode;
-    USFraunhoferDopplerControls::Pointer   m_ControlsDoppler;
-
-    USFraunhoferImageSource::Pointer       m_ImageSource;
+    USDiPhASDevice(std::string manufacturer, std::string model);
+    virtual ~USDiPhASDevice();
 
     /**
-    * The Fraunhofer API expects callback functions to pass 
+    * The DiPhAS API expects callback functions to pass 
     * both status messages and the processed images to the user.
     * The message callback is here, the data itself is given directly to the image source.
     */
-    void stringMessageCallback(char* message);
+    void StringMessageCallback(const char* message);
 
-	ScanModeNative m_ScanMode;
+    /**
+    * This method sets up the scanmode at the begining
+    */
+    void InitializeScanMode();
+
+    USDiPhASProbesControls::Pointer    m_ControlsProbes;
+    USDiPhASBModeControls::Pointer     m_ControlsBMode;
+    USDiPhASDopplerControls::Pointer   m_ControlsDoppler;
+
+    USDiPhASImageSource::Pointer       m_ImageSource;
+    ScanModeNative m_ScanMode;
+
+    bool m_IsRunning;
   };
 } // namespace mitk
 
-#endif // MITKUSFraunhoferDevice_H_HEADER_INCLUDED_
+#endif // MITKUSDiPhASDevice_H_HEADER_INCLUDED_

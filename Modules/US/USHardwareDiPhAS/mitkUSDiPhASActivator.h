@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkUSFraunhoferActivator_h
-#define __mitkUSFraunhoferActivator_h
+#ifndef __mitkUSDiPhASActivator_h
+#define __mitkUSDiPhASActivator_h
 
-#include "mitkUSFraunhoferDevice.h"
+#include "mitkUSDiPhASDevice.h"
 
 // Microservices
 #include <usModuleContext.h>
@@ -25,14 +25,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class USFraunhoferActivator : public us::ModuleActivator {
+  class USDiPhASActivator : public us::ModuleActivator {
   public:
 
-    USFraunhoferActivator();
-    virtual ~USFraunhoferActivator();
+    USDiPhASActivator();
+    virtual ~USDiPhASActivator();
 
     /**
-      * \brief Fraunhofer device is created and initialized on module load.
+      * \brief DiPhAS device is created and initialized on module load.
       * Service registration is done during the initialization process.
       */
     void Load(us::ModuleContext* context);
@@ -44,10 +44,10 @@ namespace mitk
     void Unload(us::ModuleContext* context);
 
   protected:
-    USFraunhoferDevice::Pointer m_Device;
+    USDiPhASDevice::Pointer m_Device;
   };
 } // namespace mitk
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::USFraunhoferActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::USDiPhASActivator)
 
-#endif // __mitkUSFraunhoferActivator_h
+#endif // __mitkUSDiPhASActivator_h

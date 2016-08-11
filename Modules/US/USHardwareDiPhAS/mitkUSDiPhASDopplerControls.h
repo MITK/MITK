@@ -14,37 +14,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUSFraunhoferDopplerControls_H_HEADER_INCLUDED_
-#define MITKUSFraunhoferDopplerControls_H_HEADER_INCLUDED_
+#ifndef MITKUSDiPhASDopplerControls_H_HEADER_INCLUDED_
+#define MITKUSDiPhASDopplerControls_H_HEADER_INCLUDED_
 
-#include "mitkUSFraunhoferSDKHeader.h"
+#include "mitkUSDiPhASSDKHeader.h"
 #include "mitkUSControlInterfaceDoppler.h"
 
 #include <itkObjectFactory.h>
 
 namespace mitk {
-  class USFraunhoferDevice;
+  class USDiPhASDevice;
   /**
-    * \brief Implementation of mitk::USControlInterfaceDoppler for Fraunhofer ultrasound devices.
+    * \brief Implementation of mitk::USControlInterfaceDoppler for DiPhAS ultrasound devices.
     * See documentation of mitk::USControlInterfaceBMode for a description of the interface methods.
     *
     * This implementation does nothing, yet!
     */
-  class USFraunhoferDopplerControls : public USControlInterfaceDoppler
+  class USDiPhASDopplerControls : public USControlInterfaceDoppler
   {
   public:
-    mitkClassMacro(USFraunhoferDopplerControls, USControlInterfaceDoppler);
-    mitkNewMacro1Param(Self, itk::SmartPointer<USFraunhoferDevice>);
+    mitkClassMacro(USDiPhASDopplerControls, USControlInterfaceDoppler);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USDiPhASDevice>);
 
     virtual void SetIsActive(bool);
     virtual bool GetIsActive();
 
   protected:
-    USFraunhoferDopplerControls(itk::SmartPointer<USFraunhoferDevice> device);
-    virtual ~USFraunhoferDopplerControls();
+    USDiPhASDopplerControls(itk::SmartPointer<USDiPhASDevice> device);
+    virtual ~USDiPhASDopplerControls();
 
     bool  m_IsActive;
   };
 }
 
-#endif // MITKUSFraunhoferDopplerControls_H_HEADER_INCLUDED_
+#endif // MITKUSDiPhASDopplerControls_H_HEADER_INCLUDED_

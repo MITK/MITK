@@ -14,25 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSFraunhoferDopplerControls.h"
-#include "mitkUSFraunhoferDevice.h"
+#include "mitkUSDiPhASDopplerControls.h"
+#include "mitkUSDiPhASDevice.h"
 #include <mitkException.h>
 
-mitk::USFraunhoferDopplerControls::USFraunhoferDopplerControls(itk::SmartPointer<USFraunhoferDevice> device)
+mitk::USDiPhASDopplerControls::USDiPhASDopplerControls(itk::SmartPointer<USDiPhASDevice> device)
   : mitk::USControlInterfaceDoppler(device.GetPointer())
 {
 }
 
-mitk::USFraunhoferDopplerControls::~USFraunhoferDopplerControls()
+mitk::USDiPhASDopplerControls::~USDiPhASDopplerControls()
 {
 }
 
-void mitk::USFraunhoferDopplerControls::SetIsActive(bool isActive)
+void mitk::USDiPhASDopplerControls::SetIsActive(bool isActive)
 {
   m_IsActive = isActive;
 }
 
-bool mitk::USFraunhoferDopplerControls::GetIsActive()
+bool mitk::USDiPhASDopplerControls::GetIsActive()
 {
   return m_IsActive;
 }

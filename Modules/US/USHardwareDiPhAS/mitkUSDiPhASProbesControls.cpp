@@ -14,32 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSFraunhoferProbesControls.h"
-#include "mitkUSFraunhoferDevice.h"
+#include "mitkUSDiPhASProbesControls.h"
+#include "mitkUSDiPhASDevice.h"
 #include <mitkException.h>
 
-mitk::USFraunhoferProbesControls::USFraunhoferProbesControls(itk::SmartPointer<USFraunhoferDevice> device)
+mitk::USDiPhASProbesControls::USDiPhASProbesControls(itk::SmartPointer<USDiPhASDevice> device)
   : mitk::USControlInterfaceProbes(device.GetPointer()),
-    m_IsActive(false), m_FraunhoferDevice(device)
+    m_IsActive(false), m_DiPhASDevice(device)
 {
 }
 
-mitk::USFraunhoferProbesControls::~USFraunhoferProbesControls()
+mitk::USDiPhASProbesControls::~USDiPhASProbesControls()
 {
 }
 
 
-void mitk::USFraunhoferProbesControls::SetIsActive(bool isActive)
+void mitk::USDiPhASProbesControls::SetIsActive(bool isActive)
 {
 	m_IsActive = isActive;
 }
 
-bool mitk::USFraunhoferProbesControls::GetIsActive()
+bool mitk::USDiPhASProbesControls::GetIsActive()
 {
 	return m_IsActive;
 }
 
-std::vector<mitk::USProbe::Pointer> mitk::USFraunhoferProbesControls::GetProbeSet()
+std::vector<mitk::USProbe::Pointer> mitk::USDiPhASProbesControls::GetProbeSet()
 {
 	// create a new vector of base class (USProbe) objects, because
 	// interface wants a vector of this type
@@ -51,11 +51,11 @@ std::vector<mitk::USProbe::Pointer> mitk::USFraunhoferProbesControls::GetProbeSe
 	return usProbes;
 }
 
-void mitk::USFraunhoferProbesControls::OnSelectProbe(unsigned int index)
+void mitk::USDiPhASProbesControls::OnSelectProbe(unsigned int index)
 {
 	if (index >= m_ProbesSet.size())
 	{
-		MITK_ERROR("USFraunhoferProbesControls")("USControlInterfaceProbes")
+		MITK_ERROR("USDiPhASProbesControls")("USControlInterfaceProbes")
 			<< "Cannot select probe with index " << index << ". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
 		mitkThrow() << "Cannot select probe with index " << index <<
 			". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
@@ -64,15 +64,15 @@ void mitk::USFraunhoferProbesControls::OnSelectProbe(unsigned int index)
 	m_SelectedProbeIndex = index;
 }
 
-void mitk::USFraunhoferProbesControls::OnSelectProbe(mitk::USProbe::Pointer probe)
+void mitk::USDiPhASProbesControls::OnSelectProbe(mitk::USProbe::Pointer probe)
 {
 }
 
-mitk::USProbe::Pointer mitk::USFraunhoferProbesControls::GetSelectedProbe()
+mitk::USProbe::Pointer mitk::USDiPhASProbesControls::GetSelectedProbe()
 {
 	if (m_SelectedProbeIndex >= m_ProbesSet.size())
 	{
-		MITK_ERROR("USFraunhoferProbesControls")("USControlInterfaceProbes")
+		MITK_ERROR("USDiPhASProbesControls")("USControlInterfaceProbes")
 			<< "Cannot get active probe as the current index is" << m_SelectedProbeIndex <<
 			". Maximum possible index is " << m_ProbesSet.size() - 1 << ".";
 		mitkThrow() << "Cannot get active probe as the current index is" << m_SelectedProbeIndex <<
@@ -82,13 +82,13 @@ mitk::USProbe::Pointer mitk::USFraunhoferProbesControls::GetSelectedProbe()
 	return m_ProbesSet.at(m_SelectedProbeIndex).GetPointer();
 }
 
-unsigned int mitk::USFraunhoferProbesControls::GetProbesCount() const
+unsigned int mitk::USDiPhASProbesControls::GetProbesCount() const
 {
 	return m_ProbesSet.size();
 }
 
 
-void mitk::USFraunhoferProbesControls::ProbeRemoved(unsigned int index)
+void mitk::USDiPhASProbesControls::ProbeRemoved(unsigned int index)
 {
 	MITK_INFO << "Probe removed...";
 
@@ -98,14 +98,14 @@ void mitk::USFraunhoferProbesControls::ProbeRemoved(unsigned int index)
 	}
 }
 
-void mitk::USFraunhoferProbesControls::ProbeAdded(unsigned int index)
+void mitk::USDiPhASProbesControls::ProbeAdded(unsigned int index)
 {
 	MITK_INFO << "Probe arrived...";
 
 	this->CreateProbesSet();
 }
 
-void mitk::USFraunhoferProbesControls::CreateProbesSet()
+void mitk::USDiPhASProbesControls::CreateProbesSet()
 {
-	m_ProbesSet.push_back(mitk::USFraunhoferProbe::New( m_FraunhoferDevice->GetScanMode().transducerName ));
+	m_ProbesSet.push_back(mitk::USDiPhASProbe::New( m_DiPhASDevice->GetScanMode().transducerName ));
 }

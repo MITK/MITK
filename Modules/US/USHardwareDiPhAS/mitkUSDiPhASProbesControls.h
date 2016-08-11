@@ -14,29 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKUSFraunhoferProbesControls_H_HEADER_INCLUDED_
-#define MITKUSFraunhoferProbesControls_H_HEADER_INCLUDED_
+#ifndef MITKUSDiPhASProbesControls_H_HEADER_INCLUDED_
+#define MITKUSDiPhASProbesControls_H_HEADER_INCLUDED_
 
-#include "mitkUSFraunhoferSDKHeader.h"
-#include "mitkUSFraunhoferProbe.h"
+#include "mitkUSDiPhASSDKHeader.h"
+#include "mitkUSDiPhASProbe.h"
 #include "mitkUSControlInterfaceProbes.h"
 
 #include <itkObjectFactory.h>
 
 namespace mitk {
-  class USFraunhoferDevice;
+  class USDiPhASDevice;
 
   /**
-    * \brief Implementation of mitk::USControlInterfaceProbes for Fraunhofer ultrasound devices.
+    * \brief Implementation of mitk::USControlInterfaceProbes for DiPhAS ultrasound devices.
     * See documentation of mitk::USControlInterfaceProbes for a description of the interface methods.
-	* This class has to be implemented for the USDevice but the Fraunhofer API does not support multiple devices.
+	* This class has to be implemented for the USDevice but the DiPhAS API does not support multiple devices.
 	* Therefore there will be just one probe at all times.
     */
-  class USFraunhoferProbesControls : public USControlInterfaceProbes
+  class USDiPhASProbesControls : public USControlInterfaceProbes
   {
   public:
-    mitkClassMacro(USFraunhoferProbesControls, USControlInterfaceProbes);
-    mitkNewMacro1Param(Self, itk::SmartPointer<USFraunhoferDevice>);
+    mitkClassMacro(USDiPhASProbesControls, USControlInterfaceProbes);
+    mitkNewMacro1Param(Self, itk::SmartPointer<USDiPhASDevice>);
 
     /**
       * Probe informations are fetched on activation. On deactivation there is nothing done.
@@ -57,31 +57,31 @@ namespace mitk {
   protected:
     /**
       * Constructs an empty object.
-      * Fraunhofer device has to be set after constructing by calling
-      * mitk::USFraunhoferProbesControls::SetFraunhoferDevice before the
+      * DiPhAS device has to be set after constructing by calling
+      * mitk::USDiPhASProbesControls::SetDiPhASDevice before the
       * object can be used.
       */
-    USFraunhoferProbesControls(itk::SmartPointer<USFraunhoferDevice> device);
-    virtual ~USFraunhoferProbesControls();
+    USDiPhASProbesControls(itk::SmartPointer<USDiPhASDevice> device);
+    virtual ~USDiPhASProbesControls();
 
     /**
-      * Create collection object (Fraunhofer API) for the API device.
+      * Create collection object (DiPhAS API) for the API device.
       */
     bool CreateProbesCollection();
 
     /**
-      * Create vector of mitk::USFraunhoferProbe objects from the
-      * Fraunhofer API probe collection. Hence
-      * mitk::USFraunhoferProbesControls::CreateProbesCollection has to
+      * Create vector of mitk::USDiPhASProbe objects from the
+      * DiPhAS API probe collection. Hence
+      * mitk::USDiPhASProbesControls::CreateProbesCollection has to
       * be called before.
       */
     void CreateProbesSet();
 
     bool                                  m_IsActive;
     unsigned int                          m_SelectedProbeIndex;
-    std::vector<USFraunhoferProbe::Pointer>  m_ProbesSet;
-    itk::SmartPointer<USFraunhoferDevice>    m_FraunhoferDevice;
+    std::vector<USDiPhASProbe::Pointer>  m_ProbesSet;
+    itk::SmartPointer<USDiPhASDevice>    m_DiPhASDevice;
   };
 }
 
-#endif // MITKUSFraunhoferProbesControls_H_HEADER_INCLUDED_
+#endif // MITKUSDiPhASProbesControls_H_HEADER_INCLUDED_

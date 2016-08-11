@@ -14,25 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSFraunhoferActivator.h"
+#include "mitkUSDiPhASActivator.h"
 
-mitk::USFraunhoferActivator::USFraunhoferActivator()
+mitk::USDiPhASActivator::USDiPhASActivator()
 {
-  MITK_INFO << "USFraunhoferActivator created";
+  MITK_INFO << "USDiPhASActivator created";
 }
 
-mitk::USFraunhoferActivator::~USFraunhoferActivator()
+mitk::USDiPhASActivator::~USDiPhASActivator()
 {
 }
 
-void mitk::USFraunhoferActivator::Load(us::ModuleContext* context)
+void mitk::USDiPhASActivator::Load(us::ModuleContext* context)
 {
   // create a new device
-  m_Device = mitk::USFraunhoferDevice::New("Fraunhofer", "Ultrasound System");
+  m_Device = mitk::USDiPhASDevice::New("DiPhAS", "Ultrasound System");
   m_Device->Initialize();
 }
 
-void mitk::USFraunhoferActivator::Unload(us::ModuleContext* context)
+void mitk::USDiPhASActivator::Unload(us::ModuleContext* context)
 {
   // set smart pointer to null (device will be unregistered from
   // micro service in it's destrcutor)

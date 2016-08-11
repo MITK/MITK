@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSFraunhoferProbe.h"
-#include "mitkUSFraunhoferSDKHeader.h"
+#include "mitkUSDiPhASProbe.h"
+#include "mitkUSDiPhASSDKHeader.h"
 
-mitk::USFraunhoferProbe::USFraunhoferProbe(std::string ProbeName)
+mitk::USDiPhASProbe::USDiPhASProbe(std::string ProbeName)
 {
 	SetName(ProbeName);
 }
 
-mitk::USFraunhoferProbe::~USFraunhoferProbe()
+mitk::USDiPhASProbe::~USDiPhASProbe()
 {
 }

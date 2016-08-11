@@ -9,7 +9,11 @@ set(MY_OPERATING_SYSTEM )
 
 if(UNIX)
   # Download a utility script
-  set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/mitkDetectOS.sh;hb=${hb}")
+  if(IS_PHABRICATOR_URL)
+    set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/mitkDetectOS.sh?view=raw")
+  else()
+    set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/mitkDetectOS.sh")
+  endif()
   set(dest "${CTEST_SCRIPT_DIRECTORY}/mitkDetectOS.sh")
   downloadFile("${url}" "${dest}")
   execute_process(COMMAND sh "${dest}"
@@ -145,7 +149,11 @@ endif()
 #
 # Download and include dashboard driver script
 #
-set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/MITKDashboardDriverScript.cmake;hb=${hb}")
+if(IS_PHABRICATOR_URL)
+  set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/MITKDashboardDriverScript.cmake?view=raw")
+else()
+  set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardDriverScript.cmake")
+endif()
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.driver)
 downloadFile("${url}" "${dest}")
 include(${dest})

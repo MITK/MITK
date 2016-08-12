@@ -19,11 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSProbe.h"
 
-namespace Usgfw2Lib {
-  struct IProbe;
-  struct IUsgDataView;
-}
-
 namespace mitk
 {
   /**

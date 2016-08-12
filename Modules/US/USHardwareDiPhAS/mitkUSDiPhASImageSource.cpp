@@ -15,19 +15,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDiPhASImageSource.h"
-#include "Framework.IBMT.US.CWrapper.h"
-#include "mitkImageReadAccessor.h"
+#include "mitkUSDiPhASDevice.h"
 
-mitk::USDiPhASImageSource::USDiPhASImageSource()
-  : m_Image(mitk::Image::New()),
-  m_ImageMutex(itk::FastMutexLock::New())
+mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
+	: m_Image(mitk::Image::New()),
+	m_ImageMutex(itk::FastMutexLock::New()),
+	m_device(device)
 {
-
 }
 
 mitk::USDiPhASImageSource::~USDiPhASImageSource( )
 {
-
 }
 
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
@@ -78,20 +76,43 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       unsigned int dim[]={imageWidth, imageHeight}; // image dimensions
 
       m_Image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 2, dim);
+
+	  UpdateImageGeometry(); // update the image geometry
     }
 
     // lock the image for writing an copy the given buffer into the image then
     m_Image->SetSlice(imageData);
-
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Unlock(); }
   }
 }
 
-
-void UpdateImageGeometry()
+void mitk::USDiPhASImageSource::UpdateImageGeometry()
 {
   mitk::Vector3D spacing;
-  spacing[0] = 1; //conversion: meters to millimeters
-  spacing[1] = 1; //conversion: meters to millimeters
+  float& recordTime        = m_device->GetScanMode().receivePhaseLengthSeconds;
+  int& speedOfSound        = m_device->GetScanMode().averageSpeedOfSound;
+  int& imageWidth          = m_device->GetScanMode().imageWidth;
+  int& imageHeight         = m_device->GetScanMode().imageHeight;
+  float& pitch             = m_device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
+  int& reconstructionLines = m_device->GetScanMode().reconstructionLines;
+
+  spacing[0] = (pitch*reconstructionLines)/imageWidth;
+  spacing[1] = ((recordTime*speedOfSound/2)*1000)/imageHeight;
   spacing[2] = 1;
+
+  m_ImageMutex->Lock();
+  if (m_Image.IsNotNull() && (m_Image->GetGeometry() != NULL))
+  {
+	  m_Image->GetGeometry()->SetSpacing(spacing);
+	  m_Image->GetGeometry()->Modified();
+  }
+  else
+  {
+	  MITK_WARN << "image or geometry was NULL, can't adapt geometry";
+  }
+  m_ImageMutex->Unlock();
+
+  MITK_DEBUG << "UpdateImageGeometry called!";
+  MITK_DEBUG << "depth in mm: " << (recordTime*speedOfSound / 2);
+  MITK_DEBUG << "new spacing: " << spacing;
 }

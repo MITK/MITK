@@ -16,18 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSDiPhASDevice.h"
 
-//#include "Framework.IBMT.US.CWrapper.h"
-
 mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model)
 	: mitk::USDevice(manufacturer, model), m_ControlsProbes(mitk::USDiPhASProbesControls::New(this)),
 	m_ControlsBMode(mitk::USDiPhASBModeControls::New(this)),
 	m_ControlsDoppler(mitk::USDiPhASDopplerControls::New(this)),
-	m_ImageSource(mitk::USDiPhASImageSource::New()),
+	m_ImageSource(mitk::USDiPhASImageSource::New(this)),
 	m_IsRunning(false)
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
-  
+  //m_MessageCallbackWrapper = [](const char* message)->void{/*this->MessageCallback(message); */};
 }
 
 mitk::USDiPhASDevice::~USDiPhASDevice()
@@ -78,7 +76,10 @@ bool mitk::USDiPhASDevice::OnInitialization()
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
-// ugly wrapper stuff - find better solution so it isn't necessary to create a global pointer to USDiPhASDevice...
+/* ugly wrapper stuff - find better solution so it isn't necessary to create a global pointer to USDiPhASDevice...
+ * passing a lambda function would be nicer - sadly something goes wrong when passing the adress of a lambda function:
+ * the API produces access violations. Passing the Lambda function itself would be preferable, but that's not possible
+*/
 
 mitk::USDiPhASDevice* w_device;
 mitk::USDiPhASImageSource* w_ISource;
@@ -106,10 +107,12 @@ void WrapperImageDataCallback(
 bool mitk::USDiPhASDevice::OnConnection()
 {
   w_device = this;
-  w_ISource = m_ImageSource;
+  w_ISource = m_ImageSource; 
   // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 
-
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
+
+  
+
   initBeamformer();
   this->InitializeScanMode();
   
@@ -128,6 +131,18 @@ bool mitk::USDiPhASDevice::OnDisconnection()
 
 bool mitk::USDiPhASDevice::OnActivation()
 {
+  // probe controls are available now
+  m_ControlsProbes->SetIsActive(true);
+
+  if (m_ControlsProbes->GetProbesCount() < 1)
+  {
+	  MITK_WARN("USDevice")("USDiPhASDevice") << "No probe found.";
+	  return false;
+  }
+
+  m_ControlsProbes->SelectProbe(0);
+
+  // toggle the beamformer of the API
   if(!m_IsRunning)
     m_IsRunning=toggleFreeze();
   return true;

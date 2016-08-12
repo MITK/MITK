@@ -17,12 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSDiPhASImageSource_H_HEADER_INCLUDED_
 #define MITKUSDiPhASImageSource_H_HEADER_INCLUDED_
 
+
 #include "mitkUSImageSource.h"
+
 #include "Framework.IBMT.US.CWrapper.h"
 
+#include "mitkImageReadAccessor.h"
 #include "itkFastMutexLock.h"
 
 namespace mitk {
+
+class USDiPhASDevice;
 /**
   * \brief Implementation of mitk::USImageSource for DiPhAS API devices.
   * The method mitk::USImageSource::GetNextRawImage() is implemented for
@@ -35,8 +40,8 @@ class USDiPhASImageSource : public USImageSource
 {
 public:
   mitkClassMacro(USDiPhASImageSource, USImageSource);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);
+  itkCloneMacro(Self);
 
   /**
     * Implementation of the superclass method. Returns the pointer
@@ -68,13 +73,17 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     double& timeStamp);
 
 protected:
-  USDiPhASImageSource( );
+	USDiPhASImageSource(mitk::USDiPhASDevice* device);
   virtual ~USDiPhASImageSource( );
-  
+
+  /**
+    * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
+    */
   void UpdateImageGeometry();
   
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;
+  mitk::USDiPhASDevice*            m_device;
 };
 } // namespace mitk
 

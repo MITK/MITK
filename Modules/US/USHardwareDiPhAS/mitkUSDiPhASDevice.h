@@ -43,7 +43,7 @@ namespace mitk {
     * Images given by the device are put into an object of
     * mitk::USDiPhASImageSource.
     */
-
+	
   class USDiPhASDevice : public USDevice
   {
   public:
@@ -120,7 +120,6 @@ namespace mitk {
     ScanModeNative& GetScanMode();
 
 	void MessageCallback(const char* message);
-	ScanModeNative                     m_ScanMode;
 
   protected:
     /**
@@ -151,9 +150,10 @@ namespace mitk {
     USDiPhASDopplerControls::Pointer    m_ControlsDoppler;
 	USAbstractControlInterface::Pointer m_ControlsCustom;
 
-    USDiPhASImageSource::Pointer       m_ImageSource;
+    USDiPhASImageSource::Pointer        m_ImageSource;
 
-    bool m_IsRunning;
+    bool                                m_IsRunning;
+	ScanModeNative                      m_ScanMode;
   };
 } // namespace mitk
 

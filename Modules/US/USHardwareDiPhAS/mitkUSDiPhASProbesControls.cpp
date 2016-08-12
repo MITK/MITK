@@ -31,6 +31,7 @@ mitk::USDiPhASProbesControls::~USDiPhASProbesControls()
 
 void mitk::USDiPhASProbesControls::SetIsActive(bool isActive)
 {
+	this->CreateProbesSet();
 	m_IsActive = isActive;
 }
 

@@ -699,8 +699,14 @@ mitk::DataNode::Pointer RTDoseVisualizer::GetIsoDoseNode(mitk::DataNode::Pointer
 bool RTDoseVisualizer::ModalityIsRTDose(const mitk::DataNode* dataNode) const
 {
     auto data = dataNode->GetData();
+    if (!data) {
+      return false;
+    }
     auto modalityProperty = data->GetProperty("modality");
     auto modalityGenericProperty = dynamic_cast<mitk::GenericProperty<std::string>*>(modalityProperty.GetPointer());
+    if (!modalityGenericProperty) {
+      return false;
+    }
     std::string modality = modalityGenericProperty->GetValue();
     return modality == "RTDOSE";
 }

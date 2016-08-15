@@ -2,10 +2,10 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.opolasercontrol"
+    <view id="org.mitk.views.lasercontrol"
           name="OPO Laser Control"
           class="OPOLaserControl"
-          icon="resources/icon.xpm" />
+          icon="resources/iconLaser.xpm" />
   </extension>
 
 </plugin>

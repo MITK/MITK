@@ -28,76 +28,83 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 
+
 const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.opolasercontrol";
 
 void OPOLaserControl::SetFocus()
 {
-  m_Controls.buttonPerformImageProcessing->setFocus();
+  m_Controls.buttonConnect->setFocus();
 }
 
 void OPOLaserControl::CreateQtPartControl( QWidget *parent )
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
-  connect( m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
-}
+  connect( m_Controls.buttonConnect, SIGNAL(clicked()), this, SLOT(ConnectToLaser()) );
+  connect( m_Controls.buttonStatus, SIGNAL(clicked()), this, SLOT(GetStatus()) );
+  }
 
 void OPOLaserControl::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
-  // iterate all selected objects, adjust warning visibility
-  foreach( mitk::DataNode::Pointer node, nodes )
-  {
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      m_Controls.labelWarning->setVisible( false );
-      m_Controls.buttonPerformImageProcessing->setEnabled( true );
-      return;
-    }
-  }
 
-  m_Controls.labelWarning->setVisible( true );
-  m_Controls.buttonPerformImageProcessing->setEnabled( false );
 }
 
 
-void OPOLaserControl::DoImageProcessing()
+void OPOLaserControl::ConnectToLaser()
 {
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
+  m_serial = mitk::SerialCommunication::New();
+  m_serial->SetBaudRate(mitk::SerialCommunication::BaudRate115200);
 
-  mitk::DataNode* node = nodes.front();
+  //get port
+  int port = 0;
+  port = m_Controls.spinBoxPort->value();
 
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
+  //build prefix (depends on linux/win)
+  QString prefix = "";
+  #ifdef WIN32
+    prefix = "COM";
+    m_serial->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
+  #else
+    prefix = m_Controls.comboBoxPortType->currentText();
+  #endif
 
-  // here we have a valid mitk::DataNode
+  QString portName = prefix + QString::number(port);
+  m_serial->SetDeviceName(portName.toStdString());
 
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
+  m_serial->SetDataBits(mitk::SerialCommunication::DataBits8);
+  m_serial->SetParity(mitk::SerialCommunication::Odd);  // No parity
+  m_serial->SetStopBits(mitk::SerialCommunication::StopBits1);
 
-      // actually do something here...
+  // FIXME Unclear specs
+  //  • Half duplex
+  //  • Does not use Xon/Xoff
+  //  • Does not use RTS/CTS
+  m_serial->SetHardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff);
+  m_serial->SetSendTimeout(2000);
+  m_serial->SetReceiveTimeout(2000);
+  std::string message = "STATE";
 
-    }
-  }
+  MITK_INFO << "sent STATE Command";
+  m_serial->OpenConnection();
+  m_serial->Send(message);
+
+  if (m_serial->Receive(message,4) == false) // receive 4 bytes
+    std::cout << "Error receiving STATE. Only " << message.size() << " characters received: '" << message << "'.\n";
+  else
+    std::cout << "Received STATE: '" << message << "'.\n";
+
+
+//  COMMAND SYNTAX
+//  • Commands are in ASCII, UPPER CASE only, and must be terminated by the “CR” or “LF” or “CRLF” (Carriage Return Line Feed) character.
+//  • Responses are messages followed by a LF.
+//  • Commands can be sent at a maximum rate of 10 Hz. Sending a new command only after receiving the response from the previous one is the best way to ensure you meet this requirement.
+//  • Answer message ‘ERROR: UNKNOWN’ is returned when the computer doesn’t recognize the characters sent,
+//  • Answer message ‘ERROR : OUT OF RANGE’ is returned when, while programming a data, the number of figure exceeds the authorized one,
+//  • Answer message ‘ERROR : BAD PARAM’ is returned when the entered character is not an expected numeric character.
+}
+
+void OPOLaserControl::GetStatus()
+{
+
 }

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkLaserControlControls.h"
 
+#include "mitkSerialCommunication.h"
 
 /**
   \brief OPOLaserControl
@@ -46,8 +47,9 @@ class OPOLaserControl : public QmitkAbstractView
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
+    void ConnectToLaser();
 
+    void GetStatus();
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -59,6 +61,9 @@ class OPOLaserControl : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::OPOLaserControlControls m_Controls;
+
+    mitk::SerialCommunication::Pointer m_serial;
+
 
 };
 

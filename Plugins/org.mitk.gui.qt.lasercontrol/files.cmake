@@ -18,7 +18,7 @@ set(MOC_H_FILES
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/icon.xpm
+  resources/iconLaser.xpm
   plugin.xml
 )
 

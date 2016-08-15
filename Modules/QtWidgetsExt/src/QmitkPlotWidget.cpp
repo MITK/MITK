@@ -53,9 +53,13 @@ void QmitkPlotWidget::SetLegendAttribute(unsigned int curveId, const QwtPlotCurv
   std::get<0>(m_PlotCurveVector[curveId])->setLegendAttribute(attribute);
 }
 
-unsigned int QmitkPlotWidget::InsertCurve(const char* title)
+unsigned int QmitkPlotWidget::InsertCurve(const char* title, QColor color )
 {
-  QwtPlotCurve* curve = new QwtPlotCurve(QwtText(title));
+  QwtText qwt_title = QwtText(title);
+  qwt_title.setColor( color );
+  qwt_title.setPaintAttribute( QwtText::PaintUsingTextColor );
+
+  QwtPlotCurve* curve = new QwtPlotCurve( qwt_title );
   QwtPlotIntervalCurve* xErrors = new QwtPlotIntervalCurve();
   QwtPlotIntervalCurve* yErrors = new QwtPlotIntervalCurve();
 
@@ -135,12 +139,14 @@ bool QmitkPlotWidget::SetCurveData(unsigned int curveId, const XYDataVector& dat
 void QmitkPlotWidget::SetCurvePen( unsigned int curveId, const QPen& pen )
 {
   std::get<0>(m_PlotCurveVector[curveId])->setPen( pen );
+  std::get<0>(m_PlotCurveVector[curveId])->setLegendAttribute( QwtPlotCurve::LegendShowLine );
 }
 
 
 void QmitkPlotWidget::SetCurveBrush( unsigned int curveId, const QBrush& brush )
 {
   std::get<0>(m_PlotCurveVector[curveId])->setBrush( brush );
+  std::get<0>(m_PlotCurveVector[curveId])->setLegendAttribute( QwtPlotCurve::LegendShowBrush );
 }
 
 
@@ -157,6 +163,18 @@ void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::C
 void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol )
 {
   std::get<0>(m_PlotCurveVector[curveId])->setSymbol(symbol);
+  std::get<0>(m_PlotCurveVector[curveId])->setLegendAttribute( QwtPlotCurve::LegendShowSymbol );
+}
+
+
+void QmitkPlotWidget::SetCurveAntialiasingOn(unsigned int curveId)
+{
+  std::get<0>(m_PlotCurveVector[curveId])->setRenderHint( QwtPlotItem::RenderAntialiased );
+}
+
+void QmitkPlotWidget::SetCurveAntialiasingOff(unsigned int curveId)
+{
+  std::get<0>(m_PlotCurveVector[curveId])->setRenderHint( QwtPlotItem::RenderAntialiased, false );
 }
 
 void QmitkPlotWidget::SetErrorPen(unsigned int curveId, const QPen& pen)

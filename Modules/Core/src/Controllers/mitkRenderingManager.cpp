@@ -822,14 +822,17 @@ namespace mitk
 
   void RenderingManager::SetRenderWindowFocus(vtkRenderWindow *focusWindow)
   {
-    if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
+    if (focusWindow != m_FocusedRenderWindow)
     {
-      m_FocusedRenderWindow = focusWindow;
-      this->InvokeEvent(FocusChangedEvent());
-      return;
-    }
+      if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
+      {
+        m_FocusedRenderWindow = focusWindow;
+        this->InvokeEvent(FocusChangedEvent());
+        return;
+      }
 
-    MITK_ERROR << "Tried to set a RenderWindow that does not exist.";
+      MITK_ERROR << "Tried to set a RenderWindow that does not exist.";
+    }
   }
 
   // Create and register generic RenderingManagerFactory.

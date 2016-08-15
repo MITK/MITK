@@ -18,14 +18,14 @@ namespace Logger {
     datastoragelog = false;
 
 #ifdef _WIN32
-    if(const char* ifAppData = std::getenv("PATH")) {
+    if(const char* ifAppData = std::getenv("LOCALAPPDATA")) {
       logsPath = std::string(ifAppData) + "\\DKFZ\\logs\\";
     }
     else {
       logsPath = "./logs/";
     }
 #else
-    if(const char* ifHome = std::getenv("PATH")) {
+    if(const char* ifHome = std::getenv("HOME")) {
       logsPath = std::string(ifHome) + "/.local/share/DKFZ/logs/";
     }
     else {

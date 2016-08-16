@@ -48,8 +48,9 @@ class OPOLaserControl : public QmitkAbstractView
 
     /// \brief Called when the user clicks the GUI button
     void ConnectToLaser();
-
     void GetStatus();
+    void SendCustomMessage();
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;

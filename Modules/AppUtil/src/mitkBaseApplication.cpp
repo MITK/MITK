@@ -36,8 +36,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QOpenGLContext>
 
 #include <iostream>
+
+static void initialize()
+{
+  QOpenGLContext context; // T19851
+  context.create();
+}
+
+Q_COREAPP_STARTUP_FUNCTION(initialize)
 
 namespace mitk {
 

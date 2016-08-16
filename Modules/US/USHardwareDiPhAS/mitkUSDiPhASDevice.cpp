@@ -60,7 +60,6 @@ ScanModeNative& mitk::USDiPhASDevice::GetScanMode()
 
 bool mitk::USDiPhASDevice::OnInitialization()
 {
-  MITK_INFO<<"I was initialized";
   return true;
 }
 
@@ -93,23 +92,8 @@ void WrapperImageDataCallback(
 
 //----------------------------------------------------------------------------------------------------------------------------
 
-#include <functional>
-
-
-void mitk::USDiPhASDevice::MessageCallbackWrapper(const char* message, mitk::USDiPhASDevice::Pointer device)
-{
-	device->MessageCallback(message);
-}
-
 bool mitk::USDiPhASDevice::OnConnection()
 {
-  //testcode----------------------------------------------------------------------------------------------------------------------
-  std::function<void(const char*)> hi = std::bind(USDiPhASDevice::MessageCallbackWrapper, std::placeholders::_1, this);
-  auto k = [](std::function<void(const char*)> h)->void {h("lol"); };
-  k(hi);
-  //testcode----------------------------------------------------------------------------------------------------------------------
-  //just the way I'd like the Callbacks to be
-
   w_device = this;
   w_ISource = m_ImageSource; 
   // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 

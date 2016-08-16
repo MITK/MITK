@@ -120,7 +120,6 @@ namespace mitk {
     ScanModeNative& GetScanMode();
 
     void MessageCallback(const char* message);
-    static void MessageCallbackWrapper(const char* message, mitk::USDiPhASDevice::Pointer device);
 
   protected:
     /**

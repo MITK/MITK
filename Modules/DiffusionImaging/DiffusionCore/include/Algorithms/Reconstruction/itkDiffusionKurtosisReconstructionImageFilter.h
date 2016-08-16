@@ -44,7 +44,8 @@ namespace itk
     kurtosis_fit_lsq_function( unsigned int num_params, unsigned int num_measurements, UseGradient g=no_gradient)
       : vnl_least_squares_function( num_params, num_measurements, g),
         m_use_bounds(false),
-        m_use_logscale(false)
+        m_use_logscale(false),
+        m_skip_fit(false)
     {}
 
     /** simplified constructor for the 2-parameters fit */
@@ -57,11 +58,23 @@ namespace itk
     void initialize( vnl_vector< double > const& _meas, vnl_vector< double> const& _bvals )
     {
       meas = _meas;
-
       if( m_use_logscale )
       {
         for( unsigned int i=0; i< meas.size(); ++i)
+        {
+          // would produce NaN values, skip the fit
+          // using the virtual function from the superclass (sets a boolean flag)
+          if( meas[i] < vnl_math::eps )
+          {
+            m_skip_fit = true;
+            throw_failure();
+
+            continue;
+          }
+
           meas[i] = log( meas[i] );
+
+        }
       }
 
       bvalues = _bvals;
@@ -165,6 +178,8 @@ namespace itk
     bool m_use_bounds;
 
     bool m_use_logscale;
+
+    bool m_skip_fit;
 
     vnl_vector<double> kurtosis_upper_bounds;
     vnl_vector<double> kurtosis_lower_bounds;

@@ -84,10 +84,10 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   if( kf_config.omit_bzero )
   {
    itk::kurtosis_fit_omit_unweighted kurtosis_cost_fn( fit_measurements.size() );
-   kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
-
    // configuration
    kurtosis_cost_fn.set_fit_logscale( static_cast<bool>(kf_config.fit_scale) );
+   kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
+
    if( kf_config.use_K_limits)
    {
     kurtosis_cost_fn.set_K_bounds( kf_config.K_limits );
@@ -99,10 +99,10 @@ static void FitSingleVoxel( const itk::VariableLengthVector< TInputPixelType > &
   else
   {
    itk::kurtosis_fit_lsq_function kurtosis_cost_fn( fit_measurements.size() );
-   kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
-
    // configuration
    kurtosis_cost_fn.set_fit_logscale( static_cast<bool>(kf_config.fit_scale) );
+   kurtosis_cost_fn.initialize( fit_measurements, fit_bvalues );
+
    if( kf_config.use_K_limits)
    {
     kurtosis_cost_fn.set_K_bounds( kf_config.K_limits );
@@ -416,8 +416,6 @@ template< class TInputPixelType, class TOutputPixelType>
 void itk::DiffusionKurtosisReconstructionImageFilter<TInputPixelType, TOutputPixelType>
 ::ThreadedGenerateData(const OutputImageRegionType &outputRegionForThread, ThreadIdType /*threadId*/)
 {
-  std::cout << "[ThreadedGenerateData]" << outputRegionForThread;
-
   typename OutputImageType::Pointer dImage = static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
   itk::ImageRegionIteratorWithIndex< OutputImageType > dImageIt(dImage, outputRegionForThread);
   dImageIt.GoToBegin();

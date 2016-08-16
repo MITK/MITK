@@ -125,7 +125,7 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_KurtosisRangeWidget->setMaximumValue( 5.0 );
 
     // LogScale not working yet, have to fix that first
-    m_Controls->m_KurtosisFitScale->setEnabled(false);
+    // m_Controls->m_KurtosisFitScale->setEnabled(false);
 
 
     //m_Controls->m_MaximalBValueWidget->setVisible( false );

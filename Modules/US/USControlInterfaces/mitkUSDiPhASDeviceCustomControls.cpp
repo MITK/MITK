@@ -14,25 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkUSDiPhASDopplerControls.h"
-#include "mitkUSDiPhASDevice.h"
-#include <mitkException.h>
+#include "mitkUSDiPhASDeviceCustomControls.h"
 
-mitk::USDiPhASDopplerControls::USDiPhASDopplerControls(itk::SmartPointer<USDiPhASDevice> device)
-  : mitk::USControlInterfaceDoppler(device.GetPointer())
+mitk::USDiPhASDeviceCustomControls::USDiPhASDeviceCustomControls(itk::SmartPointer<USDevice> device)
+  : mitk::USAbstractControlInterface(device.GetPointer()), m_IsActive(false)
 {
 }
 
-mitk::USDiPhASDopplerControls::~USDiPhASDopplerControls()
+mitk::USDiPhASDeviceCustomControls::~USDiPhASDeviceCustomControls()
 {
 }
 
-void mitk::USDiPhASDopplerControls::SetIsActive(bool isActive)
+void mitk::USDiPhASDeviceCustomControls::SetIsActive(bool isActive)
 {
   m_IsActive = isActive;
 }
 
-bool mitk::USDiPhASDopplerControls::GetIsActive()
+bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
 {
   return m_IsActive;
 }

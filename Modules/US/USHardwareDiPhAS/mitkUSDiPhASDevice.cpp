@@ -15,17 +15,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkUSDiPhASDevice.h"
+#include "mitkUSDiPhASCustomControls.h"
 
 mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model)
 	: mitk::USDevice(manufacturer, model), m_ControlsProbes(mitk::USDiPhASProbesControls::New(this)),
-	m_ControlsBMode(mitk::USDiPhASBModeControls::New(this)),
-	m_ControlsDoppler(mitk::USDiPhASDopplerControls::New(this)),
 	m_ImageSource(mitk::USDiPhASImageSource::New(this)),
+  m_ControlInterfaceCustom(mitk::USDiPhASCustomControls::New(this)),
 	m_IsRunning(false)
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
-  //m_MessageCallbackWrapper = [](const char* message)->void{/*this->MessageCallback(message); */};
 }
 
 mitk::USDiPhASDevice::~USDiPhASDevice()
@@ -37,24 +36,14 @@ std::string mitk::USDiPhASDevice::GetDeviceClass()
   return "org.mitk.modules.us.USDiPhASDevice";
 }
 
-/*mitk::USControlInterfaceBMode::Pointer mitk::USDiPhASDevice::GetControlInterfaceBMode()
-{
-  return m_ControlsBMode.GetPointer();
-}*/
-
 mitk::USControlInterfaceProbes::Pointer mitk::USDiPhASDevice::GetControlInterfaceProbes()
 {
   return m_ControlsProbes.GetPointer();
 };
 
-/*mitk::USControlInterfaceDoppler::Pointer mitk::USDiPhASDevice::GetControlInterfaceDoppler()
-{
-  return m_ControlsDoppler.GetPointer();
-};*/
-
 mitk::USAbstractControlInterface::Pointer mitk::USDiPhASDevice::GetControlInterfaceCustom()
 {
-	return m_ControlsCustom.GetPointer();
+  return m_ControlInterfaceCustom.GetPointer();
 }
 
 mitk::USImageSource::Pointer mitk::USDiPhASDevice::GetUSImageSource()
@@ -86,7 +75,7 @@ mitk::USDiPhASImageSource* w_ISource;
 
 void WrapperMessageCallback(const char* message) 
 {
-	w_device->MessageCallback(message);
+  w_device->MessageCallback(message);
 }
 
 void WrapperImageDataCallback(
@@ -104,14 +93,27 @@ void WrapperImageDataCallback(
 
 //----------------------------------------------------------------------------------------------------------------------------
 
+#include <functional>
+
+
+void mitk::USDiPhASDevice::MessageCallbackWrapper(const char* message, mitk::USDiPhASDevice::Pointer device)
+{
+	device->MessageCallback(message);
+}
+
 bool mitk::USDiPhASDevice::OnConnection()
 {
+  //testcode----------------------------------------------------------------------------------------------------------------------
+  std::function<void(const char*)> hi = std::bind(USDiPhASDevice::MessageCallbackWrapper, std::placeholders::_1, this);
+  auto k = [](std::function<void(const char*)> h)->void {h("lol"); };
+  k(hi);
+  //testcode----------------------------------------------------------------------------------------------------------------------
+  //just the way I'd like the Callbacks to be
+
   w_device = this;
   w_ISource = m_ImageSource; 
   // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
-
-  
 
   initBeamformer();
   this->InitializeScanMode();

@@ -24,4 +24,5 @@ USControlInterfaces/mitkUSAbstractControlInterface.cpp
 USControlInterfaces/mitkUSControlInterfaceBMode.cpp
 USControlInterfaces/mitkUSControlInterfaceProbes.cpp
 USControlInterfaces/mitkUSControlInterfaceDoppler.cpp
+USControlInterfaces/mitkUSDiPhASDeviceCustomControls.cpp
 )

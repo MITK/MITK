@@ -3,7 +3,6 @@ mitkUSDiPhASActivator.cpp
 mitkUSDiPhASDevice.cpp
 mitkUSDiPhASImageSource.cpp
 mitkUSDiPhASProbe.cpp
-mitkUSDiPhASBModeControls.cpp
-mitkUSDiPhASDopplerControls.cpp
 mitkUSDiPhASProbesControls.cpp
+mitkUSDiPhASCustomControls.cpp
 )

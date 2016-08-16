@@ -424,6 +424,11 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
         ls->m_CrosshairActor->GetProperty()->SetLineStippleRepeatFactor(1);
         ls->m_CrosshairHelperLineActor->SetVisibility(1);
       }
+      else
+      {
+        ls->m_CrosshairActor->GetProperty()->SetLineStipplePattern(0xffff);
+        ls->m_CrosshairHelperLineActor->SetVisibility(0);
+      }
     }
   }
 }

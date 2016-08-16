@@ -489,15 +489,33 @@ void QmitkDataStorageTreeModel::AddNodeInternal(const mitk::DataNode *node)
     }
     else
     {
-      beginInsertRows(index, parentTreeItem->GetChildCount()
-                      , parentTreeItem->GetChildCount());
-      new TreeItem(const_cast<mitk::DataNode*>(node), parentTreeItem);
+      int firstRowWithASiblingBelow = 0;
+      int nodeLayer = -1;
+      node->GetIntProperty("layer", nodeLayer);
+      for (TreeItem* siblingTreeItem: parentTreeItem->GetChildren())
+      {
+        int siblingLayer = -1;
+        if (mitk::DataNode* siblingNode = siblingTreeItem->GetDataNode())
+        {
+          siblingNode->GetIntProperty("layer", siblingLayer);
+        }
+        if (nodeLayer > siblingLayer)
+        {
+          break;
+        }
+        ++firstRowWithASiblingBelow;
+      }
+      beginInsertRows(index, firstRowWithASiblingBelow, firstRowWithASiblingBelow);
+      parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataNode*>(node)), firstRowWithASiblingBelow);
     }
 
     // emit endInsertRows event
     endInsertRows();
 
-    this->AdjustLayerProperty();
+    if(m_PlaceNewNodesOnTop)
+    {
+      this->AdjustLayerProperty();
+    }
 }
 
 void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
@@ -843,17 +861,23 @@ void QmitkDataStorageTreeModel::TreeItem::SetParent( TreeItem* _Parent )
 
 void QmitkDataStorageTreeModel::Update()
 {
-    if (m_DataStorage.IsNotNull())
+  if (m_DataStorage.IsNotNull())
+  {
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetAll();
+
+    /// Regardless the value of this preference, the new nodes must not be inserted
+    /// at the top now, but at the position according to their layer.
+    bool newNodesWereToBePlacedOnTop = m_PlaceNewNodesOnTop;
+    m_PlaceNewNodesOnTop = false;
+
+    for (const auto& node: *_NodeSet)
     {
-        this->beginResetModel();
-        this->endResetModel();
-
-        mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetAll();
-
-        for (mitk::DataStorage::SetOfObjects::const_iterator it = _NodeSet->begin(); it != _NodeSet->end(); it++)
-        {
-            // save node
-            this->AddNodeInternal(*it);
-        }
+      this->AddNodeInternal(node);
     }
+
+    m_PlaceNewNodesOnTop = newNodesWereToBePlacedOnTop;
+
+    /// Adjust the layers to ensure that derived nodes are above their sources.
+    this->AdjustLayerProperty();
+  }
 }

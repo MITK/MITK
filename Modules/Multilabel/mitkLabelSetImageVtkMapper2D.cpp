@@ -518,12 +518,19 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   else if ( (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
             || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
-    mitk::Color color = image->GetActiveLabel()->GetColor();
+    // Change color of first label
+    auto firstLabel = image->GetLabel(1);
+    if (firstLabel == nullptr)
+    {
+      firstLabel = image->GetActiveLabel();
+    }
+
+    mitk::Color color = firstLabel->GetColor();
 
     if (this->GetDataNode()->GetColor(color.GetDataPointer(), renderer))
     {
-      image->GetActiveLabel()->SetColor(color);
-      image->GetActiveLabelSet()->UpdateLookupTable(image->GetActiveLabel()->GetValue());
+      firstLabel->SetColor(color);
+      image->GetActiveLabelSet()->UpdateLookupTable(firstLabel->GetValue());
     }
 
 

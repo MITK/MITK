@@ -404,6 +404,9 @@ public:
       // Image orientation
       std::string GetOrientation() const;
 
+      // Contains bad slicing distance or not
+      bool IsBadSlicingDistance() const;
+
       ImageBlockDescriptor();
       ~ImageBlockDescriptor();
 
@@ -437,6 +440,8 @@ public:
 
       void SetOrientation(std::string orientation);
 
+      void SetBadSlicingDistance(bool badSlicingDistance);
+      
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
       std::string m_SeriesInstanceUID;
@@ -448,6 +453,7 @@ public:
       bool m_HasMultipleTimePoints;
       bool m_IsMultiFrameImage;
       std::string m_Orientation;
+      bool m_BadSlicingDistance;
   };
 
   typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;
@@ -596,6 +602,11 @@ protected:
       bool ContainsGantryTilt();
 
       /**
+      \brief Wheter or not the grouped result contain unexpected distance between slices.
+      */
+      bool ContainsBadSlicingDistance();
+
+      /**
         \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
       */
       void AddFileToSortedBlock(const std::string& filename);
@@ -617,12 +628,18 @@ protected:
       */
       void UndoPrematureGrouping();
 
+      /**
+        \brief Meant for internal use by AnalyzeFileForITKImageSeriesReaderSpacingAssumption only.
+      */
+      void FlagBadSlicingDistance();
+
     protected:
 
       StringContainer m_GroupedFiles;
       StringContainer m_UnsortedFiles;
 
       bool m_GantryTilt;
+      bool m_BadSlicingDistance;
   };
 
   /**

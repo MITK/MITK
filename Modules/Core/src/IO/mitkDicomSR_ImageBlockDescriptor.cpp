@@ -24,7 +24,8 @@ namespace mitk
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor()
 :m_HasGantryTiltCorrected(false)
 ,m_HasMultipleTimePoints(false)
-,m_IsMultiFrameImage(false)
+,m_IsMultiFrameImage(false),
+m_BadSlicingDistance(false)
 {
 }
 
@@ -36,7 +37,8 @@ DicomSeriesReader::ImageBlockDescriptor::~ImageBlockDescriptor()
 DicomSeriesReader::ImageBlockDescriptor::ImageBlockDescriptor(const StringContainer& files)
 :m_HasGantryTiltCorrected(false)
 ,m_HasMultipleTimePoints(false)
-,m_IsMultiFrameImage(false)
+,m_IsMultiFrameImage(false),
+m_BadSlicingDistance(false)
 {
   m_Filenames = files;
 }
@@ -247,6 +249,16 @@ std::string DicomSeriesReader::ImageBlockDescriptor::GetOrientation() const
 void DicomSeriesReader::ImageBlockDescriptor::SetOrientation(std::string orientation)
 {
   m_Orientation = orientation;
+}
+
+bool DicomSeriesReader::ImageBlockDescriptor::IsBadSlicingDistance() const
+{
+  return m_BadSlicingDistance;
+}
+
+void DicomSeriesReader::ImageBlockDescriptor::SetBadSlicingDistance(bool badSlicingDistance)
+{
+  m_BadSlicingDistance = badSlicingDistance;
 }
 
 } // end namespace mitk

@@ -718,14 +718,21 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         Point3D assumedOrigin = lastDifferentOrigin + fromFirstToSecondOrigin;
 
         Vector3D originError = assumedOrigin - thisOrigin;
+        double expectedDistance = fromFirstToSecondOrigin.GetNorm();
         double norm = originError.GetNorm();
-        double toleratedError(0.005); // max. 1/10mm error when measurement crosses 20 slices in z direction
 
-        if (norm > toleratedError)
+        double toleratedError(0.005);  // Error below this value is ignored
+        double toleratedErrorWithWarning(expectedDistance * 10.0);  // Error below this value is reported but slices are still combined
+
+        if (toleratedError < norm && norm < toleratedErrorWithWarning) {
+          result.FlagBadSlicingDistance();
+        }
+
+        if (norm > toleratedErrorWithWarning)
         {
           MITK_DEBUG << "  File does not fit into the inter-slice distance pattern (diff = "
                                << norm << ", allowed "
-                               << toleratedError << ").";
+                               << toleratedErrorWithWarning << ").";
           MITK_DEBUG << "  Expected position (" << assumedOrigin[0] << ","
                                             << assumedOrigin[1] << ","
                                             << assumedOrigin[2] << "), got position ("
@@ -949,6 +956,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
                                             DicomSeriesReader::ConstCharStarToString( scanner.GetValue( firstFileInBlock.c_str(), tagImagerPixelSpacing ) ) );
       thisBlock.SetHasMultipleTimePoints( false );
       thisBlock.SetOrientation(DicomSeriesReader::ConstCharStarToString(scanner.GetValue(firstFileInBlock.c_str(), tagImageOrientation)));
+      thisBlock.SetBadSlicingDistance(analysisResult.ContainsBadSlicingDistance());
 
       groupsOf3DBlocks[ newGroupUID.str() ] = thisBlock;
 

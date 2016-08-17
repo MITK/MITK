@@ -20,7 +20,8 @@ namespace mitk
 {
 
 DicomSeriesReader::SliceGroupingAnalysisResult::SliceGroupingAnalysisResult()
-:m_GantryTilt(false)
+  : m_GantryTilt(false),
+    m_BadSlicingDistance(false)
 {
 }
 
@@ -37,6 +38,11 @@ DicomSeriesReader::StringContainer DicomSeriesReader::SliceGroupingAnalysisResul
 bool DicomSeriesReader::SliceGroupingAnalysisResult::ContainsGantryTilt()
 {
   return m_GantryTilt;
+}
+
+bool DicomSeriesReader::SliceGroupingAnalysisResult::ContainsBadSlicingDistance()
+{
+  return m_BadSlicingDistance;
 }
 
 void DicomSeriesReader::SliceGroupingAnalysisResult::AddFileToSortedBlock(const std::string& filename)
@@ -57,6 +63,11 @@ void DicomSeriesReader::SliceGroupingAnalysisResult::AddFilesToUnsortedBlock(con
 void DicomSeriesReader::SliceGroupingAnalysisResult::FlagGantryTilt()
 {
   m_GantryTilt = true;
+}
+
+void DicomSeriesReader::SliceGroupingAnalysisResult::FlagBadSlicingDistance()
+{
+  m_BadSlicingDistance = true;
 }
 
 void DicomSeriesReader::SliceGroupingAnalysisResult::UndoPrematureGrouping()

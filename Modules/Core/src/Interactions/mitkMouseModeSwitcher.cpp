@@ -22,67 +22,76 @@
 #include "mitkInteractionEventObserver.h"
 
 mitk::MouseModeSwitcher::MouseModeSwitcher(const std::string& rendererName) :
-    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(NULL)
+    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer)
 {
-  this->InitializeListeners(rendererName);
+  this->AddRenderer(rendererName);
   this->SetInteractionScheme(m_ActiveInteractionScheme);
 }
 
 mitk::MouseModeSwitcher::~MouseModeSwitcher()
 {
-  m_ServiceRegistration.Unregister();
+  for (auto serviceRegistration : m_ServiceRegistrations) {
+    serviceRegistration.Unregister();
+  }
 }
 
-void mitk::MouseModeSwitcher::InitializeListeners(const std::string& rendererName)
+void mitk::MouseModeSwitcher::AddRenderer(const std::string& rendererName)
 {
-  if (m_CurrentObserver.IsNull())
-  {
-    m_CurrentObserver = mitk::DisplayInteractor::New();
-    m_CurrentObserver->LoadStateMachine("DisplayInteraction.xml");
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
-    // Register as listener via micro services
-    us::ServiceProperties props;
-    props["name"] = std::string("DisplayInteractor");
-    if (!rendererName.empty()) {
-      props["rendererName"] = rendererName;
-    }
-    m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
-        m_CurrentObserver.GetPointer(),props);
+  DisplayInteractor::Pointer currentObserver = mitk::DisplayInteractor::New();
+  currentObserver->LoadStateMachine("DisplayInteraction.xml");
+  currentObserver->SetEventConfig("DisplayConfigMITK.xml");
+  // Register as listener via micro services
+  us::ServiceProperties props;
+  props["name"] = std::string("DisplayInteractor");
+  if (!rendererName.empty()) {
+    props["rendererName"] = rendererName;
   }
+  us::ServiceRegistration<InteractionEventObserver> serviceRegistration = 
+    us::GetModuleContext()->RegisterService<InteractionEventObserver>(currentObserver.GetPointer(),props);
+
+  m_Observers.push_back(currentObserver);
+  m_ServiceRegistrations.push_back(serviceRegistration);
 }
 
 void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
 {
+  std::string eventConfig;
   switch (scheme)
   {
   case MITK:
   {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
+    eventConfig = "DisplayConfigMITK.xml";
   }
     break;
   case PACS:
   {
-    m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
+    eventConfig = "DisplayConfigPACS.xml";
   }
     break;
 
   case ROTATION:
   {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
+    eventConfig = "DisplayConfigMITKRotationUnCoupled.xml";
   }
     break;
 
   case ROTATIONLINKED:
   {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotation.xml");
+    eventConfig = "DisplayConfigMITKRotation.xml";
   }
     break;
 
   case SWIVEL:
   {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITKSwivel.xml");
+    eventConfig = "DisplayConfigMITKSwivel.xml";
   }
     break;
+  }
+
+  if (!eventConfig.empty()) {
+    for (auto observer : m_Observers) {
+      observer->SetEventConfig(eventConfig);
+    }
   }
   m_ActiveInteractionScheme = scheme;
   this->InvokeEvent(MouseModeChangedEvent());
@@ -90,7 +99,9 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
 
 void mitk::MouseModeSwitcher::SetSelectionMode(bool selection)
 {
-  m_CurrentObserver->SetSelectionMode(selection);
+  for (auto observer : m_Observers) {
+    observer->SetSelectionMode(selection);
+  }
 }
 
 void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
@@ -98,35 +109,42 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
   if (m_ActiveInteractionScheme != PACS)
     return;
 
+  std::string eventConfig;
   switch (mode)
   {
   case MousePointer:
   {
-    m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
+    eventConfig = "DisplayConfigPACS.xml";
     break;
   } // case 0
   case Scroll:
   {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSScroll.xml");
-
+    eventConfig = "DisplayConfigPACSScroll.xml";
     break;
   }
   case LevelWindow:
   {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSLevelWindow.xml");
+    eventConfig = "DisplayConfigPACSLevelWindow.xml";
     break;
   }
   case Zoom:
   {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSZoom.xml");
+    eventConfig = "DisplayConfigPACSZoom.xml";
     break;
   }
   case Pan:
   {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSPan.xml");
+    eventConfig = "DisplayConfigPACSPan.xml";
     break;
   }
   } // end switch (mode)
+
+  if (!eventConfig.empty()) {
+    for (auto observer : m_Observers) {
+      observer->AddEventConfig(eventConfig);
+    }
+  }
+
   m_ActiveMouseMode = mode;
   this->InvokeEvent(MouseModeChangedEvent());
 }

@@ -114,24 +114,26 @@ namespace mitk {
     */
     void SetSelectionMode(bool selection);
 
+    /**
+    * \brief Initializes the listener with the MITK default behavior.
+    */
+    void AddRenderer(const std::string& rendererName);
+
   protected:
     MouseModeSwitcher(const std::string& rendererName = "");
     virtual ~MouseModeSwitcher();
   private:
-    /**
-    * \brief Initializes the listener with the MITK default behavior.
-    */
-    void InitializeListeners(const std::string& rendererName);
 
     InteractionScheme m_ActiveInteractionScheme;
     MouseMode         m_ActiveMouseMode;
-    DisplayInteractor::Pointer m_CurrentObserver;
+
+    std::vector<DisplayInteractor::Pointer> m_Observers;
 
     /**
      * Reference to the service registration of the observer,
      * it is needed to unregister the observer on unload.
      */
-    us::ServiceRegistration<InteractionEventObserver> m_ServiceRegistration;
+    std::vector<us::ServiceRegistration<InteractionEventObserver>> m_ServiceRegistrations;
   };
 } // namespace mitk
 

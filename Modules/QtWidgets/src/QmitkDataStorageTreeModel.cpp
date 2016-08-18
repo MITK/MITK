@@ -143,7 +143,7 @@ Qt::DropActions QmitkDataStorageTreeModel::supportedDragActions() const
 }
 
 bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
-                                     Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
+                                     Qt::DropAction action, int row, int /*column*/, const QModelIndex &parent)
 {
   // Early exit, returning true, but not actually doing anything (ignoring data).
   if (action == Qt::IgnoreAction)
@@ -181,23 +181,40 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
       QModelIndex dropItemModelIndex = this->IndexFromTreeItem(dropItem);
       QModelIndex parentModelIndex = this->IndexFromTreeItem(parentItem);
 
+      int dragIndex = 0;
+
       // Iterate through the list of TreeItem (which may be at non-consecutive indexes).
       QList<TreeItem*>::iterator diIter;
       for (diIter  = listOfItemsToDrop.begin();
            diIter != listOfItemsToDrop.end();
            diIter++)
       {
+        TreeItem* itemToDrop = *diIter;
+        if (itemToDrop->GetIndex() < row)
+        {
+          dragIndex = 1;
+        }
         // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
         this->beginRemoveRows(parentModelIndex, (*diIter)->GetIndex(), (*diIter)->GetIndex());
         parentItem->RemoveChild(*diIter);
         this->endRemoveRows();
       }
 
+      // row = -1 dropped on an item, row != -1 dropped  in between two items
       // Select the target index position, or put it at the end of the list.
-      int dropIndex = dropItemModelIndex.row();
+      int dropIndex = 0;
+      if (row != -1)
+      {
+        if (dragIndex == 0)
+          dropIndex = std::min(row, parentItem->GetChildCount() - 1);
+        else
+          dropIndex = std::min(row - 1, parentItem->GetChildCount() - 1);
+      }
+      else
+        dropIndex = dropItem->GetIndex();
 
-      if (dropIndex == -1 || dropIndex > parentItem->GetChildCount())
-        dropIndex = parentItem->GetChildCount();
+      if ((row == -1 && dropItemModelIndex.row() == -1) || dropItemModelIndex.row() > parentItem->GetChildCount())
+        dropIndex = parentItem->GetChildCount() - 1;
 
       // Now insert items again at the drop item position
       this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);

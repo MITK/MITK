@@ -18,6 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkLocaleSwitch_h
 
 #include "MitkCoreExports.h"
+#include "mitkLogMacros.h"
+
+#include <clocale>
+#include <string>
+
+#pragma warning(disable:4251)
 
 namespace mitk
 {

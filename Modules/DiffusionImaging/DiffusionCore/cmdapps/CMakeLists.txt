@@ -22,6 +22,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     TensorReconstruction^^
     TensorDerivedMapsExtraction^^
     DiffusionDICOMLoader^^
+    DiffusionIVIMFit^^
     )
 
     foreach(diffusionminiapp ${diffusionminiapps})

@@ -50,8 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \sa QmitkWelcomePage Editor
  */
 
-class QWebEngineView;
-
 class QmitkMitkWorkbenchIntroPart : public berry::QtIntroPart
 {
 
@@ -75,7 +73,9 @@ public:
 protected:
 
   Ui::QmitkWelcomeScreenViewControls* m_Controls;
-  QWebEngineView* m_view;
+
+  class Impl;
+  Impl* m_Impl;
 };
 
 #endif /* QMITKWORKBENCHINTROPART_H_ */

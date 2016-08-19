@@ -16,7 +16,6 @@ set(CPP_FILES
   QmitkFileChooser.cpp
   QmitkGnuplotWidget.cpp
   QmitkHistogram.cpp
-  QmitkHistogramJSWidget.cpp
   QmitkHistogramWidget.cpp
   QmitkHotkeyLineEdit.cpp
   QmitkModulesDialog.cpp
@@ -64,7 +63,6 @@ set(MOC_H_FILES
   include/QmitkEnumerationPropertyWidget.h
   include/QmitkFileChooser.h
   include/QmitkGnuplotWidget.h
-  include/QmitkHistogramJSWidget.h
   include/QmitkHistogramWidget.h
   include/QmitkHotkeyLineEdit.h
   include/QmitkNumberPropertyEditor.h

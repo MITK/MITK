@@ -66,7 +66,9 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Release)
-    MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
+    if(MITK_USE_QT_WEBENGINE)
+      MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
+    endif()
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
             CONFIGURATIONS Release)

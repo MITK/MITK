@@ -33,6 +33,7 @@ set(mitk_modules
   OpenViewCore
   QtWidgets
   QtWidgetsExt
+  QtWidgetsWeb
   QmlItems
   SegmentationUI
   DiffusionImaging

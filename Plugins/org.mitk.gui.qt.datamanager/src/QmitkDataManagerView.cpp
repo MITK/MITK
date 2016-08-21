@@ -126,6 +126,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeModel->setParent( parent );
   m_NodeTreeModel->SetPlaceNewNodesOnTop(
       prefs->GetBool("Place new nodes on top", true) );
+  m_NodeTreeModel->SetAllowHierarchyChange(
+    prefs->GetBool("Allow changing of parent node", false));
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
   // Prepare filters
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
@@ -498,6 +500,9 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   m_NodeTreeView->expandAll();
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
+
+  m_NodeTreeModel->SetAllowHierarchyChange(
+    prefs->GetBool("Allow changing of parent node", false));
 
   this->GlobalReinit();
 

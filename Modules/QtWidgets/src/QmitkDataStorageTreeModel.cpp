@@ -204,8 +204,16 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
     }
 
     // dragging from one parent to another
+    if((!m_AllowHierarchyChange) && isValidDragAndDropOperation)
     {
-      isValidDragAndDropOperation = (listOfItemsToDrop[0]->GetParent() == parentItem) || (m_AllowHierarchyChange);
+      if (row == -1)// drag onto a node
+      {
+        isValidDragAndDropOperation = listOfItemsToDrop[0]->GetParent() == parentItem;
+      }
+      else  // drag between nodes
+      {
+        isValidDragAndDropOperation = listOfItemsToDrop[0]->GetParent() == dropItem;
+      }
     }
 
     // dragging on a child node of one the dragged nodes
@@ -245,14 +253,17 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
            diIter++)
       {
         TreeItem* itemToDrop = *diIter;
-        if (itemToDrop->GetIndex() < row)
+
+        // if the item is dragged down we have to compensate its final position for the
+        // fact it is deleted lateron, this only applies if it is dragged within the same level
+        if ( (itemToDrop->GetIndex() < row) && (itemToDrop->GetParent() == dropItem))
         {
           dragIndex = 1;
         }
 
         // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
-        this->beginRemoveRows(this->IndexFromTreeItem((*diIter)->GetParent()), (*diIter)->GetIndex(), (*diIter)->GetIndex());
-        (*diIter)->GetParent()->RemoveChild(*diIter);
+        this->beginRemoveRows(this->IndexFromTreeItem(itemToDrop->GetParent()), itemToDrop->GetIndex(), itemToDrop->GetIndex());
+        itemToDrop->GetParent()->RemoveChild(itemToDrop);
         this->endRemoveRows();
       }
 
@@ -304,7 +315,14 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
         }
         else
         {
-          parentItem->InsertChild((*diIter), dropIndex);
+          if (row == -1)// drag onto a node
+          {
+            parentItem->InsertChild((*diIter), dropIndex);
+          }
+          else  // drag between nodes
+          {
+            dropItem->InsertChild((*diIter), dropIndex);
+          }
         }
 
         dropIndex++;

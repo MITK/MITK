@@ -55,10 +55,10 @@ public:
         prefPage(nullptr), confElem(_confElem), treeWidgetItem(nullptr)
     {}
 
-    bool operator==(const PrefPage& other)
+    bool operator==(const PrefPage& other) const
     { return id == other.id; }
 
-    bool operator<(const PrefPage& other)
+    bool operator<(const PrefPage& other) const
     {
       bool res = (name < other.name);
       return res;

@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 #include <mitkVtkLayerController.h>
+#include "mitkOverlay2DLayouter.h"
 
 namespace mitk
 {
@@ -35,23 +36,31 @@ namespace mitk
 
   void OverlayManager::AddBaseRenderer(BaseRenderer *renderer)
   {
-    if (!m_ForegroundRenderer[renderer])
+  if(!renderer)
+    return;
+
+  std::string rendererName = renderer->GetName();
+  if(!m_ForegroundRenderer[rendererName])
     {
-      m_ForegroundRenderer[renderer] = vtkSmartPointer<vtkRenderer>::New();
-      vtkRenderer *rendererVtk = m_ForegroundRenderer[renderer];
+    m_ForegroundRenderer[rendererName] = vtkSmartPointer<vtkRenderer>::New();
+    vtkRenderer* rendererVtk = m_ForegroundRenderer[rendererName];
       rendererVtk->SetActiveCamera(renderer->GetVtkRenderer()->GetActiveCamera());
       VtkLayerController::GetInstance(renderer->GetRenderWindow())->InsertForegroundRenderer(rendererVtk, false);
       rendererVtk->SetInteractive(false);
     }
+  for(auto layouter : mitk::Overlay2DLayouter::CreateLayouter(renderer))
+  {
+    this->AddLayouter(layouter.GetPointer());
+  }
     std::pair<BaseRendererSet::iterator, bool> inSet;
-    inSet = m_BaseRendererSet.insert(renderer);
+  inSet = m_BaseRendererSet.insert(rendererName);
     if (inSet.second)
     {
       OverlaySet::const_iterator it;
-      for (it = m_OverlaySet.cbegin(); it != m_OverlaySet.cend(); ++it)
+    for ( it=m_OverlaySet.cbegin() ; it != m_OverlaySet.cend(); it++ )
       {
         if ((*it)->IsForceInForeground())
-          (*it)->AddToRenderer(renderer, m_ForegroundRenderer[renderer]);
+        (*it)->AddToRenderer(renderer,m_ForegroundRenderer[rendererName]);
         else
           (*it)->AddToBaseRenderer(renderer);
       }
@@ -63,7 +72,8 @@ namespace mitk
     if (!renderer)
       return;
 
-    vtkRenderer *forgroundRenderer = m_ForegroundRenderer[renderer];
+  std::string rendererName = renderer->GetName();
+  vtkRenderer* forgroundRenderer = m_ForegroundRenderer[rendererName];
     OverlaySet::const_iterator it;
     for (it = m_OverlaySet.cbegin(); it != m_OverlaySet.cend(); ++it)
     {
@@ -72,13 +82,19 @@ namespace mitk
         (*it)->RemoveFromRenderer(renderer, forgroundRenderer);
     }
 
-    BaseRendererSet::const_iterator i = m_BaseRendererSet.find(renderer);
+  m_ForegroundRenderer.erase(rendererName);
+  m_LayouterMap.erase(rendererName);
+
+  BaseRendererSet::const_iterator i = m_BaseRendererSet.find(rendererName);
     if (i == m_BaseRendererSet.cend())
       return;
 
     m_BaseRendererSet.erase(i);
+}
 
-    m_ForegroundRenderer[renderer] = NULL;
+void OverlayManager::RemoveBaseRenderer(const std::string& rendererName)
+{
+  RemoveBaseRenderer(mitk::BaseRenderer::GetByName(rendererName));
   }
 
   void OverlayManager::RemoveAllBaseRenderers()

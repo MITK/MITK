@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOVERLAY2DLAYOUTER_H
 #define MITKOVERLAY2DLAYOUTER_H
 
-#include <MitkOverlaysExports.h>
+#include <MitkCoreExports.h>
 #include <mitkAbstractOverlayLayouter.h>
 
 namespace mitk
 {
   /** @brief A simple implementation of a layouter for 2D Overlays
    */
-  class MITKOVERLAYS_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter
+  class MITKCORE_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter
   {
   public:
     enum Alignment
@@ -34,17 +34,22 @@ namespace mitk
       TopRight,
       BottomLeft,
       Bottom,
-      BottomRight
+      BottomRight,
+      Left,
+      Right
     };
     mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);
     itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      static std::string STANDARD_2D_TOPLEFT();
+      static std::string STANDARD_2D();
+    static std::string STANDARD_2D_TOPLEFT();
     static std::string STANDARD_2D_TOP();
     static std::string STANDARD_2D_TOPRIGHT();
     static std::string STANDARD_2D_BOTTOMLEFT();
     static std::string STANDARD_2D_BOTTOM();
     static std::string STANDARD_2D_BOTTOMRIGHT();
+    static std::string STANDARD_2D_LEFT();
+    static std::string STANDARD_2D_RIGHT();
 
     /** \brief Factory method for the different kinds of Layouters */
     /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
@@ -53,6 +58,11 @@ namespace mitk
     /** \brief Factory method for the different kinds of Layouters */
     /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
     static Overlay2DLayouter::Pointer CreateLayouter(const std::string &identifier, BaseRenderer *renderer);
+
+    /** \brief Factory method for all available Layouters in the Standard2D group */
+    /** Create a list of Layouter which, depending on the identifier sort the Overlays in one corner of the
+     * Renderwindow*/
+    static std::vector<Overlay2DLayouter::Pointer> CreateLayouter(BaseRenderer *renderer);
 
     void PrepareLayout() override;
 

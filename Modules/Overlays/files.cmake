@@ -6,7 +6,6 @@ set(CPP_FILES
   mitkTextOverlay3D.cpp
   mitkLabelOverlay3D.cpp
   mitkColorBarOverlay.cpp
-  mitkOverlay2DLayouter.cpp
   mitkScaleLegendOverlay.cpp
   mitkLogoOverlay.cpp
   mitkVtkLogoRepresentation.cxx

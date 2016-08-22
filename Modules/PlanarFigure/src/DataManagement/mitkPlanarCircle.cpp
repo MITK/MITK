@@ -171,6 +171,8 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
         ImageType3D::Pointer itkImage;
         mitk::CastToItkImage(image, itkImage);
 
+        BoundingBox::BoundsArrayType bounds = this->GetPlaneGeometry()->GetBounds();
+
         ImageType3D::IndexType currentIndex;
         currentIndex[Z] = centerIndex[Z];
 
@@ -196,6 +198,16 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
           currentIndex[Y] = centerIndex[Y];
           for (int rowX = lIndex; rowX <= rIndex; rowX++) {
             currentIndex[X] = rowX;
+
+            if  (currentIndex[X] <= bounds[0]
+              || currentIndex[X] >= bounds[1]
+              || currentIndex[Y] <= bounds[0]
+              || currentIndex[Y] >= bounds[1]
+              || currentIndex[Z] <= bounds[2]
+              || currentIndex[Z] >= bounds[3]) {
+              return nullptr;
+            }
+
             short val = itkImage->GetPixel(currentIndex);
             values.push_back(val);
             if (val < minValue) {
@@ -230,7 +242,7 @@ mitk::PlanarCircle::MeasurementStatistics* mitk::PlanarCircle::EvaluateStatistic
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 std::string mitk::PlanarCircle::EvaluateAnnotation()

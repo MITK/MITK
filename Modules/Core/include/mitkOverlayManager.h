@@ -39,11 +39,11 @@ namespace mitk
   class MITKCORE_EXPORT OverlayManager : public itk::Object
   {
   public:
-    typedef std::set<BaseRenderer *> BaseRendererSet;
+  typedef std::set<std::string> BaseRendererSet;
     typedef std::set<Overlay::Pointer> OverlaySet;
     typedef std::map<const std::string, AbstractOverlayLayouter::Pointer> LayouterMap;
-    typedef std::map<const BaseRenderer *, LayouterMap> LayouterRendererMap;
-    typedef std::map<const BaseRenderer *, vtkSmartPointer<vtkRenderer>> ForegroundRendererMap;
+  typedef std::map<std::string,LayouterMap > LayouterRendererMap;
+  typedef std::map<std::string,vtkSmartPointer<vtkRenderer> > ForegroundRendererMap;
 
     mitkClassMacroItkParent(OverlayManager, itk::Object) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
@@ -72,6 +72,8 @@ namespace mitk
     void UpdateOverlays(BaseRenderer *baseRenderer);
 
     void RemoveBaseRenderer(mitk::BaseRenderer *renderer);
+
+  void RemoveBaseRenderer(const std::string& rendererName);
 
     void RemoveAllBaseRenderers();
 

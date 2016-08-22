@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOverlay.h"
 
-mitk::Overlay::Overlay() : m_LayoutedBy(NULL)
+mitk::Overlay::Overlay() : m_LayoutedBy(nullptr)
 {
   m_PropertyList = mitk::PropertyList::New();
   this->SetName(this->GetNameOfClass());
@@ -65,9 +65,12 @@ mitk::BaseProperty *mitk::Overlay::GetProperty(const std::string &propertyKey, c
   // renderer specified?
   if (renderer)
   {
-    std::map<const mitk::BaseRenderer *, mitk::PropertyList::Pointer>::const_iterator it;
+    MapOfPropertyLists::const_iterator it;
+
+    std::string rendererName = renderer->GetName();
+
     // check for the renderer specific property
-    it = m_MapOfPropertyLists.find(renderer);
+    it = m_MapOfPropertyLists.find(rendererName);
     if (it != m_MapOfPropertyLists.cend()) // found
     {
       mitk::BaseProperty::Pointer property = it->second->GetProperty(propertyKey);
@@ -286,12 +289,14 @@ mitk::PropertyList *mitk::Overlay::GetPropertyList(const mitk::BaseRenderer *ren
   if (renderer == NULL)
     return m_PropertyList;
 
-  mitk::PropertyList::Pointer &propertyList = m_MapOfPropertyLists[renderer];
+  std::string rendererName = renderer->GetName();
+
+  mitk::PropertyList::Pointer & propertyList = m_MapOfPropertyLists[rendererName];
 
   if (propertyList.IsNull())
     propertyList = mitk::PropertyList::New();
 
-  assert(m_MapOfPropertyLists[renderer].IsNotNull());
+  assert(m_MapOfPropertyLists[rendererName].IsNotNull());
 
   return propertyList;
 }

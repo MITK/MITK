@@ -43,7 +43,7 @@ namespace mitk
       itk::Point<double, 2> Size;
     };
 
-    typedef std::map<const BaseRenderer *, PropertyList::Pointer> MapOfPropertyLists;
+  typedef std::map<std::string,PropertyList::Pointer> MapOfPropertyLists;
 
     /** \brief Base class for mapper specific rendering ressources.
      */

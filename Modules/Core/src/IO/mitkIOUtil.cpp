@@ -332,11 +332,16 @@ struct IOUtil::Impl
 #ifdef US_PLATFORM_WINDOWS
 std::string IOUtil::GetProgramPath()
 {
-  char path[512];
-  char oem[512];
-  std::size_t index = std::string(path, GetModuleFileName(NULL, path, 512)).find_last_of('\\');
-  CharToOemA(path, oem);
-  return std::string(oem, strlen(oem));
+  std::string programPath;
+  programPath.resize(1024);
+  size_t pathSize = GetModuleFileNameA(nullptr, &programPath[0], programPath.size());
+  programPath.resize(pathSize);
+
+  std::string::size_type pos = programPath.rfind("\\");
+  if (pos != std::string::npos) {
+    programPath.erase(pos, programPath.size());
+  }
+  return programPath;
 }
 #elif defined(US_PLATFORM_APPLE)
 #include <mach-o/dyld.h>

@@ -6,7 +6,7 @@ if( NOT OPENSSL_FOUND AND NOT SSL_EAY_RELEASE AND NOT LIB_EAY_RELEASE )
   message( "Could not find OpenSSL, XNAT will not work for HTTPS connections. Please set the SSL_EAY_RELEASE and LIB_EAY_RELEASE CMake variables to the respective libraries." )
 endif()
 
-if( WIN32 AND EXISTS ${SSL_EAY_RELEASE} AND EXISTS ${LIB_EAY_RELEASE} )
+if( WIN32 AND EXISTS "${SSL_EAY_RELEASE}" AND EXISTS "${LIB_EAY_RELEASE}" )
   configure_file( ${SSL_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
   configure_file( ${LIB_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
   configure_file( ${SSL_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )

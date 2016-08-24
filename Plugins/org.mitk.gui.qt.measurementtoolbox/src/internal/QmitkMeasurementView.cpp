@@ -864,6 +864,7 @@ mitk::DataNode::Pointer QmitkMeasurementView::AddFigureToDataStorage(mitk::Plana
   newNode->SetName(name.toStdString());
   newNode->SetData(figure);
   newNode->SetSelected(true);
+  newNode->SetBoolProperty("includeInBoundingBox", false);
 
   if (d->m_SelectedImageNode.IsNotNull())
   {

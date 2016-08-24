@@ -543,6 +543,7 @@ void QmitkPartialVolumeAnalysisView::AddFigureToDataStorage(mitk::PlanarFigure* 
     mitk::DataNode::Pointer newNode = mitk::DataNode::New();
     newNode->SetName(name.toStdString());
     newNode->SetData(figure);
+    newNode->SetBoolProperty("includeInBoundingBox", false);
 
     // Add custom property, if available
     if ( (propertyKey != NULL) && (property != NULL) )

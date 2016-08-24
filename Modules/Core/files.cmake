@@ -263,7 +263,6 @@ set(CPP_FILES
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkIShaderRepository.cpp
-  Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkOverlay.cpp
   Rendering/mitkOverlayManager.cpp

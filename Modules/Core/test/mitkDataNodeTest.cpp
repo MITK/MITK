@@ -74,10 +74,6 @@ public:
     dataNode->SetData(baseData);
     MITK_TEST_CONDITION(baseData == dataNode->GetData(), "Testing if a PlaneGeometryData object was set correctly")
 
-    baseData = mitk::ManufacturerLogo::New();
-    dataNode->SetData(baseData);
-    MITK_TEST_CONDITION(baseData == dataNode->GetData(), "Testing if a ManufacturerLogo object was set correctly")
-
     baseData = mitk::PointSet::New();
     dataNode->SetData(baseData);
     MITK_TEST_CONDITION(baseData == dataNode->GetData(), "Testing if a PointSet object was set correctly")

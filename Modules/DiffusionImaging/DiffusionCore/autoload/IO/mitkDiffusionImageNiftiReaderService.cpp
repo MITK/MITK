@@ -43,6 +43,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkImageWriteAccessor.h>
 #include <mitkImageDataItem.h>
+#include <mitkLocaleSwitch.h>
 #include "mitkIOUtil.h"
 
 
@@ -104,21 +105,7 @@ void DiffusionImageNiftiReaderService::InternalRead()
   {
     try
     {
-      const std::string& locale = "C";
-      const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-      if ( locale.compare(currLocale)!=0 )
-      {
-        try
-        {
-          setlocale(LC_ALL, locale.c_str());
-        }
-        catch(...)
-        {
-          MITK_INFO << "Could not set locale " << locale;
-        }
-      }
-
+      mitk::LocaleSwitch localeSwitch("C");
 
       MITK_INFO << "DiffusionImageNiftiReaderService: reading image information";
       VectorImageType::Pointer itkVectorImage;
@@ -443,15 +430,6 @@ void DiffusionImageNiftiReaderService::InternalRead()
       // so that it can be assigned to the DataObject in GenerateData();
       m_OutputCache = outputForCache;
       m_CacheTime.Modified();
-
-      try
-      {
-        setlocale(LC_ALL, currLocale.c_str());
-      }
-      catch(...)
-      {
-        MITK_INFO << "Could not reset locale " << currLocale;
-      }
     }
     catch(std::exception& e)
     {

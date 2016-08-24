@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarBezierCurve.h"
 
 #include "mitkBasePropertySerializer.h"
+#include <mitkLocaleSwitch.h>
 
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
@@ -59,21 +60,7 @@ mitk::PlanarFigureReader::~PlanarFigureReader()
 
 void mitk::PlanarFigureReader::GenerateData()
 {
-    const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, nullptr );
-
-    if ( locale.compare(currLocale)!=0 )
-    {
-      try
-      {
-        setlocale(LC_ALL, locale.c_str());
-      }
-      catch(...)
-      {
-        MITK_INFO << "Could not set locale " << locale;
-      }
-    }
-
+  mitk::LocaleSwitch localeSwitch("C");
   m_Success = false;
   this->SetNumberOfIndexedOutputs(0); // reset all outputs, we add new ones depending on the file content
 
@@ -366,15 +353,6 @@ void mitk::PlanarFigureReader::GenerateData()
 
     // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
     this->SetNthOutput( this->GetNumberOfOutputs(), planarFigure );  // add planarFigure as new output of this filter
-  }
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    MITK_INFO << "Could not reset locale " << currLocale;
   }
 
   m_Success = true;

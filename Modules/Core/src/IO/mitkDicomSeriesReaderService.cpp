@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkDicomSeriesReader.h>
+#include <mitkLocaleSwitch.h>
 #include <mitkProgressBar.h>
 #include <mitkImage.h>
 
@@ -36,9 +37,8 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;
 
-  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
-  setlocale(LC_NUMERIC, "C");
-  std::locale previousCppLocale( std::cin.getloc() );
+  mitk::LocaleSwitch localeSwitch("C");
+  std::locale previousCppLocale(std::cin.getloc());
   std::locale l( "C" );
   std::cin.imbue(l);
 
@@ -56,7 +56,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
       data->GetPropertyList()->SetProperty("name", nameProp);
       result.push_back(data);
     }
-    setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
     return result;
 
@@ -120,7 +119,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
     ProgressBar::GetInstance()->Progress();
   }
 
-  setlocale(LC_NUMERIC, previousCLocale);
   std::cin.imbue(previousCppLocale);
 
   return result;

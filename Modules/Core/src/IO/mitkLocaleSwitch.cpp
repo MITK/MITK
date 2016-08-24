@@ -68,8 +68,9 @@ LocaleSwitch::Impl::~Impl()
 }
 
 LocaleSwitch::LocaleSwitch(const char* newLocale)
+  : m_LocaleSwitchImpl(new Impl(newLocale))
 {
-  m_LocaleSwitchImpl = new Impl(newLocale);
+  
 }
 
 LocaleSwitch::~LocaleSwitch()

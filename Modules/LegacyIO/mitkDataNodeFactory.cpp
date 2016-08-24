@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkITKImageImport.h>
+#include <mitkLocaleSwitch.h>
 
 // C-Standard library includes
 #include <stdlib.h>
@@ -229,8 +230,7 @@ std::string mitk::DataNodeFactory::GetDirectory()
 
 void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 {
-  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
-  setlocale(LC_NUMERIC, "C");
+  mitk::LocaleSwitch localeSwitch("C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
   std::cin.imbue(l);
@@ -246,7 +246,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     {
       node->SetName(this->GetBaseFileName());
     }
-    setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
     return;
 
@@ -305,7 +304,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     ProgressBar::GetInstance()->Progress();
   }
 
-  setlocale(LC_NUMERIC, previousCLocale);
   std::cin.imbue(previousCppLocale);
 }
 

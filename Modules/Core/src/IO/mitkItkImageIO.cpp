@@ -213,21 +213,7 @@ std::vector<TimePointType> ConvertMetaDataObjectToTimePointList(const itk::MetaD
 std::vector<BaseData::Pointer> ItkImageIO::Read()
 {
   std::vector<BaseData::Pointer> result;
-
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not set locale " << locale;
-    }
-  }
+  mitk::LocaleSwitch localeSwitch("C");
 
   Image::Pointer image = Image::New();
 
@@ -464,15 +450,6 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
   }
 
   MITK_INFO << "...finished!" << std::endl;
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    MITK_INFO << "Could not reset locale " << currLocale;
-  }
 
   result.push_back(image.GetPointer());
   return result;

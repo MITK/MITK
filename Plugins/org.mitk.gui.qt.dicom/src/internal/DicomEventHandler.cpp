@@ -50,6 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkLocaleSwitch.h>
 
 #include <berryIPreferencesService.h>
 #include <berryIPreferences.h>
@@ -270,8 +271,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       if (!seriesToLoad.empty() && mitk::DicomSeriesReader::IsPhilips3DDicom(seriesToLoad.front()))
       {
           MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
-          const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
-          setlocale(LC_NUMERIC, "C");
+          mitk::LocaleSwitch localeSwitch("C");
           std::locale previousCppLocale(std::cin.getloc());
           std::locale l("C");
           std::cin.imbue(l);
@@ -287,7 +287,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
               node->SetProperty("name", nameProp);
               dataStorage->Add(node);
           }
-          setlocale(LC_NUMERIC, previousCLocale);
           std::cin.imbue(previousCppLocale);
           return;
       }

@@ -127,7 +127,6 @@ void SurfaceStlIO::Write()
   LocaleSwitch localeSwitch("C");
 
   ValidateOutputLocation();
-
   const Surface* input = dynamic_cast<const Surface*>(this->GetInput());
 
   const unsigned int timesteps = input->GetTimeGeometry()->CountTimeSteps();

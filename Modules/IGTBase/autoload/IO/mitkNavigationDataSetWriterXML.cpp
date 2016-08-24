@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "mitkNavigationDataSetWriterXML.h"
 #include <mitkIGTMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
 // Third Party
 #include <tinyxml.h>
@@ -53,9 +54,7 @@ void mitk::NavigationDataSetWriterXML::Write()
   }
   mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
 
-  //save old locale
-  char * oldLocale;
-  oldLocale = setlocale( LC_ALL, nullptr );
+  mitk::LocaleSwitch localeSwitch("C");
 
   StreamHeader(out, data);
   StreamData(out, data);
@@ -64,9 +63,6 @@ void mitk::NavigationDataSetWriterXML::Write()
   // Cleanup
   out->flush();
   delete out;
-
-  //switch back to old locale
-  setlocale( LC_ALL, oldLocale );
 }
 
 void mitk::NavigationDataSetWriterXML::StreamHeader (std::ostream* stream, mitk::NavigationDataSet::ConstPointer data)

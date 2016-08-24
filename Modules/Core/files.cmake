@@ -257,6 +257,7 @@ set(CPP_FILES
   IO/mitkVtkLoggingAdapter.cpp
 
   Rendering/mitkAbstractOverlayLayouter.cpp
+  Rendering/mitkAbstractAnnotationRenderer.cpp
   Rendering/mitkOverlay2DLayouter.cpp
   Rendering/mitkBaseRenderer.cpp
   #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module

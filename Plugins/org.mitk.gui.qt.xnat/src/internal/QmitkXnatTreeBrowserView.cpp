@@ -880,6 +880,15 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
   //1. If not dropped on a resource, create a new folder
   //temporarily remove the annoying message box that upload was successfull..
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
+
+  // if dragged on the resource folder we need to provide the corresponding parent
+  // instead of the folder
+  ctkXnatResourceFolder* resourceFolder = dynamic_cast<ctkXnatResourceFolder*>(parentObject);
+  if (resource == nullptr && resourceFolder != nullptr)
+  {
+    parentObject = parentObject->parent();
+  }
+
   if (resource == nullptr)
   {
     resource = this->InternalAddResourceFolder(parentObject);
@@ -956,7 +965,14 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     }
     QFile::remove(fileName);
 
-    m_TreeModel->refresh(parentIndex);
+    if (resourceFolder == nullptr)
+    {
+      m_TreeModel->refresh(parentIndex);
+    }
+    else
+    {
+      m_TreeModel->refresh(parentIndex.parent());
+    }
 
     // The filename for uploading
     //    QFileInfo fileInfo;

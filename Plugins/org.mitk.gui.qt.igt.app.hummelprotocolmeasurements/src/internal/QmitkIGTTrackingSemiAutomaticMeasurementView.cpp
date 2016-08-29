@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
 #include <mitkLog.h>
+#include "mitkHummelProtocolEvaluation.h"
 
 // POCO
 #include <Poco/File.h>
@@ -78,48 +79,8 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateResults()
   newNode->SetData(this->m_MeanPoints);
   this->GetDataStorage()->Add(newNode);
 
-  if (m_MeanPoints->GetSize() == 12)
-  {
-    MITK_INFO << "Computing distance error for Compact FG...";
-    std::vector<double> distances;
-    mitk::Point3D test;
-    //row 1
-    distances.push_back(m_MeanPoints->GetPoint(0).EuclideanDistanceTo(m_MeanPoints->GetPoint(1))); //0
-    distances.push_back(m_MeanPoints->GetPoint(1).EuclideanDistanceTo(m_MeanPoints->GetPoint(2))); //1
-    distances.push_back(m_MeanPoints->GetPoint(2).EuclideanDistanceTo(m_MeanPoints->GetPoint(3))); //2
-    //row 2
-    distances.push_back(m_MeanPoints->GetPoint(4).EuclideanDistanceTo(m_MeanPoints->GetPoint(5))); //3
-    distances.push_back(m_MeanPoints->GetPoint(5).EuclideanDistanceTo(m_MeanPoints->GetPoint(6))); //4
-    distances.push_back(m_MeanPoints->GetPoint(6).EuclideanDistanceTo(m_MeanPoints->GetPoint(7))); //5
-    //row 3
-    distances.push_back(m_MeanPoints->GetPoint(8).EuclideanDistanceTo(m_MeanPoints->GetPoint(9))); //6
-    distances.push_back(m_MeanPoints->GetPoint(9).EuclideanDistanceTo(m_MeanPoints->GetPoint(10))); //7
-    distances.push_back(m_MeanPoints->GetPoint(10).EuclideanDistanceTo(m_MeanPoints->GetPoint(11))); //8
-    //column 1
-    distances.push_back(m_MeanPoints->GetPoint(0).EuclideanDistanceTo(m_MeanPoints->GetPoint(4))); //9
-    distances.push_back(m_MeanPoints->GetPoint(4).EuclideanDistanceTo(m_MeanPoints->GetPoint(8))); //10
-    //column 2
-    distances.push_back(m_MeanPoints->GetPoint(1).EuclideanDistanceTo(m_MeanPoints->GetPoint(5))); //11
-    distances.push_back(m_MeanPoints->GetPoint(5).EuclideanDistanceTo(m_MeanPoints->GetPoint(9))); //12
-    //column 3
-    distances.push_back(m_MeanPoints->GetPoint(2).EuclideanDistanceTo(m_MeanPoints->GetPoint(6))); //13
-    distances.push_back(m_MeanPoints->GetPoint(6).EuclideanDistanceTo(m_MeanPoints->GetPoint(10))); //14
-    //column 4
-    distances.push_back(m_MeanPoints->GetPoint(3).EuclideanDistanceTo(m_MeanPoints->GetPoint(7))); //15
-    distances.push_back(m_MeanPoints->GetPoint(7).EuclideanDistanceTo(m_MeanPoints->GetPoint(11))); //16
-
-    std::vector<double> errors;
-    double meanError = 0;
-    for (int i = 0; i < distances.size(); i++)
-    {
-      double currentError = distances.at(i) - (double)50.0;
-      errors.push_back(currentError);
-      meanError += currentError;
-      MITK_INFO << "Error" << i << " : " << currentError;
-    }
-    meanError /= distances.size();
-    MITK_INFO << "Mean error : " << meanError;
-  }
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> results5cmDistances;
+  mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_MeanPoints, mitk::HummelProtocolEvaluation::small, results5cmDistances);
 }
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateQtPartControl(QWidget *parent)

@@ -25,7 +25,10 @@ namespace mitk
 {
 
   /**Documentation
-  * \brief TODO
+  * \brief Static methods for evaluations according to the assessment protocol
+  * for EM trackers published by Hummel et al. 2005 [1].
+  *
+  * [1] Hummel, J. et al. - Design and application of an assessment protocol for electromagnetic tracking systems. Med Phys 32(7), July 2005
   *
   * \ingroup IGT
   */
@@ -33,9 +36,19 @@ namespace mitk
 
   {
   public:
+    /** Distance error with description. */
     struct HummelProtocolDistanceError {double distanceError; std::string description;};
-  enum HummelProtocolMeasurementVolume { small, standard };
-    static bool EvaluateDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results);
+    /** Tracking volumes for evaluation.
+     *  standard: The standard volume of 9 x 10 measurment points as described in [1]
+     *  small: A small volume in the center 3 x 4 measurement points, for smaller field generators [2]
+     *  [2] Maier-Hein, L. et al. - Standardized assessment of new electromagnetic field generators in an interventional radiology setting. Med Phys 39(6), June 2012
+     */
+    enum HummelProtocolMeasurementVolume { small, standard };
+    /** Evaluates the 5 cm distances as defined by the Hummel prtocol [1,2].
+     * @return Returns true if evaluation was successfull, false if not.
+     * @param[out] Results Please give an empty vector. The results will be added to this vector.
+     */
+    static bool Evaluate5cmDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results);
   };
 } // namespace mitk
 

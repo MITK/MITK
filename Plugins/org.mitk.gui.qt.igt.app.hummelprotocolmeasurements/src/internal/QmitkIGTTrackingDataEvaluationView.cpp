@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQuaternionAveraging.h>
 #include <mitkTransform.h>
 #include <mitkStaticIGTHelperFunctions.h>
+#include "mitkHummelProtocolEvaluation.h"
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -82,6 +83,7 @@ void QmitkIGTTrackingDataEvaluationView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_OrientationCalculationGenerateReference, SIGNAL(clicked()), this, SLOT(OnOrientationCalculation_CalcRef()));
     connect(m_Controls->m_OrientationCalculationWriteOrientationsToFile, SIGNAL(clicked()), this, SLOT(OnOrientationCalculation_CalcOrientandWriteToFile()));
     connect(m_Controls->m_GeneratePointSetsOfSinglePositions, SIGNAL(clicked()), this, SLOT(OnGeneratePointSetsOfSinglePositions()));
+    connect(m_Controls->m_StartEvaluationAll, SIGNAL(clicked()), this, SLOT(OnEvaluateDataAll()));
   }
 }
 
@@ -342,6 +344,13 @@ void QmitkIGTTrackingDataEvaluationView::OnLoadFileList()
   OnAddToCurrentList();
 }
 
+void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
+{
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> results5cm;
+  mitk::HummelProtocolEvaluation::HummelProtocolMeasurementVolume volume = mitk::HummelProtocolEvaluation::small;
+  mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume , results5cm);
+}
+
 void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
 {
   //open output file
@@ -496,6 +505,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSet()
   newNode->SetName(name.toStdString());
   newNode->SetData(generatedPointSet);
   this->GetDataStorage()->Add(newNode);
+  m_PointSetMeanPositions = generatedPointSet;
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()

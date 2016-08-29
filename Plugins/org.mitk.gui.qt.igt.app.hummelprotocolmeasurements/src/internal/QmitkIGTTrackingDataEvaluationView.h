@@ -58,6 +58,7 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     void OnLoadFileList();
     void OnAddToCurrentList();
     void OnEvaluateData();
+    void OnEvaluateDataAll();
     void OnGeneratePointSet();
     void OnGeneratePointSetsOfSinglePositions();
     void OnGenerateRotationLines();
@@ -116,6 +117,9 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
 
     /** @brief calculates the slerp average of a set of quaternions which is stored in the navigation data evaluation filter */
     mitk::Quaternion GetSLERPAverage(mitk::NavigationDataEvaluationFilter::Pointer);
+
+    /** @brief Stores the mean positions of all evaluated data */
+    mitk::PointSet::Pointer m_PointSetMeanPositions;
 };
 
 

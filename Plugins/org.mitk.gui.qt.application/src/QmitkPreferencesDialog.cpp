@@ -146,6 +146,18 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
 {
   d->setupUi(this);
 
+  QPalette currentPalette = palette();
+  d->m_Headline->setStyleSheet(QString(
+    "background-color: [background-color]; "
+    "border-style: solid; "
+    "border-width: 1px; "
+    "border-color: [border-color]; "
+    "color: [text-color]; "
+  ).replace("[background-color]", currentPalette.color(QPalette::Mid).name())
+   .replace("[border-color]", currentPalette.color(QPalette::Light).name())
+   .replace("[text-color]", currentPalette.color(QPalette::BrightText).name())
+  );
+
   QObject::connect(d->m_Keyword, SIGNAL(editingFinished()), this, SLOT(OnKeywordEditingFinished()));
   QObject::connect(d->m_Keyword, SIGNAL(textChanged(QString)), this, SLOT(OnKeywordTextChanged(QString)));
 

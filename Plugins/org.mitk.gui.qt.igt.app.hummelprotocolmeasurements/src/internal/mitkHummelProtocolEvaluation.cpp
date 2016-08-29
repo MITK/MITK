@@ -80,18 +80,44 @@ return false;
 }
 MITK_INFO << "Computing Hummel protocol distance errors for standard measurement volumes (90 points)...";
 
-for (int row = 0; row < 10; row++) //rows
-for (int distance = 0; distance < 9; distance++)
-{
-mitk::Point3D point1 = p->GetPoint(row*10 + distance);
-mitk::Point3D point2 = p->GetPoint(row*10 + distance+1);
-distances.push_back(point1.EuclideanDistanceTo(point2));
-std::stringstream description;
-description << "Error: Distance " << (row + 1) << "/" << (distance + 1) << " to " << (row + 1) << "/" << (distance + 2);
-descriptions.push_back("Error: Distance 5/7 to 6/7");
-}
+int distanceCounter = 0;
+
+//convert measurements to matrix
+mitk::Point3D matrix[9][10];
+for (int row = 0; row < 9; row++)
+  for (int column = 0; column < 10; column++)
+    matrix[row][column] = p->GetPoint(row * 10 + column);
+
+//evaluation of rows
+for (int row = 0; row < 9; row++) //rows
+  for (int distance = 0; distance < 9; distance++)
+  {
+  distanceCounter++;
+  mitk::Point3D point1 = p->GetPoint(row*10 + distance);
+  mitk::Point3D point2 = p->GetPoint(row*10 + distance+1);
+  distances.push_back(point1.EuclideanDistanceTo(point2));
+  std::stringstream description;
+  description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (distance + 1) << " to " << (row + 1) << "/" << (distance + 2);
+  descriptions.push_back(description.str());
+  }
+
+//evaluation of columns
+for (int column = 0; column < 10; column++)
+  for (int row = 0; row < 8; row++)
+  {
+  distanceCounter++;
+  mitk::Point3D point1 = matrix[row][column];
+  mitk::Point3D point2 = matrix[row+1][column];
+  distances.push_back(point1.EuclideanDistanceTo(point2));
+  std::stringstream description;
+  description << "Distance(" << distanceCounter << ") " << (row+1 )<< "/" << (column+1) << " to " << (row + 2) << "/" << (column + 1);
+  descriptions.push_back(description.str());
+  }
+
 break;
 }
+
+
 HummelProtocolDistanceError meanError;
 meanError.distanceError = 0;
 meanError.description = "Mean Error";

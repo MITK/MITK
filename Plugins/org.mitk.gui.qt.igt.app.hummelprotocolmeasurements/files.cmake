@@ -7,7 +7,7 @@ SET(INTERNAL_CPP_FILES
   QmitkIGTTrackingDataEvaluationView.cpp
   mitkPluginActivator.cpp
   mitkNavigationDataCSVSequentialPlayer.cpp
-
+  mitkHummelProtocolEvaluation.cpp
 )
 
 SET(UI_FILES

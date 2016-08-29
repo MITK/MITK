@@ -106,6 +106,18 @@ void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference:
   //MITK_INFO << "*** PartDeactivated (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
 
+  // Check for a render window part and inform IRenderWindowPartListener views
+  // that it was deactivated
+  if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part))
+  {
+    if (m_ActiveRenderWindowPart == renderPart)
+    {
+      RenderWindowPartDeactivated(renderPart);
+      m_ActiveRenderWindowPart = nullptr;
+      m_VisibleRenderWindowPart = nullptr;
+    }
+  }
+
   if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
   {
     lifecycleAwarePart->Deactivated();

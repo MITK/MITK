@@ -135,6 +135,9 @@ public:
   ///
   QModelIndex GetIndex(const mitk::DataNode*) const;
 
+  /// Set whether to allow hierarchy changes by dragging and dropping
+  void SetAllowHierarchyChange(bool allowHierarchyChange);
+
 //# MISC
 protected:
   ///
@@ -248,6 +251,16 @@ protected:
   mitk::NodePredicateBase::Pointer m_Predicate;
   bool m_PlaceNewNodesOnTop;
   TreeItem* m_Root;
+
+  /// Flag to block the data storage events if nodes are added/removed by this class.
+  bool m_BlockDataStorageEvents;
+
+  /// This decides whether or not it is allowed to assign a different parent to a node
+  /// If it is false, it is not possible to change the hierarchy of nodes by dragging
+  /// and dropping.
+  /// If it is true, dragging nodes on another node will replace all of their parents
+  /// with that one.
+  bool m_AllowHierarchyChange;
 
 private:
   void AddNodeInternal(const mitk::DataNode*);

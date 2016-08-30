@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkDiffusionPropertyHelper.h>
 #include "itkDiffusionIntravoxelIncoherentMotionReconstructionImageFilter.h"
+#include "itkDiffusionKurtosisReconstructionImageFilter.h"
 
 /*!
   \brief QmitkIVIMView
@@ -54,6 +55,7 @@ public:
   typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
   typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType DirContainerType;
   typedef itk::DiffusionIntravoxelIncoherentMotionReconstructionImageFilter<short, float> IVIMFilterType;
+  typedef itk::DiffusionKurtosisReconstructionImageFilter<short, float> KurtosisFilterType;
   typedef itk::VectorImage<short,3> VecImgType;
   typedef itk::Image<float,3> OutImgType;
 
@@ -87,10 +89,14 @@ protected slots:
   void ClipboardStatisticsButtonClicked();
   void ClipboardCurveButtonClicked();
 
+  void OnKurtosisParamsChanged();
+
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+
+  bool FitKurtosis( itk::VectorImage<short, 3> *vecimg, DirContainerType *dirs, float bval, OutImgType::IndexType &crosspos);
 
   Ui::QmitkIVIMViewControls* m_Controls;
 
@@ -104,11 +110,15 @@ protected:
   OutImgType::Pointer m_fMap;
 
   IVIMFilterType::IVIMSnapshot m_Snap;
+  KurtosisFilterType::KurtosisSnapshot m_KurtosisSnap;
 
   mitk::DataNode::Pointer m_DiffusionImageNode;
   mitk::DataNode::Pointer m_MaskImageNode;
 
   bool m_Active;
+
+  bool m_HoldUpdate;
+
 };
 
 

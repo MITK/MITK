@@ -33,7 +33,6 @@ mitk::TemporoSpatialStringProperty::TemporoSpatialStringProperty( const char* s 
 {
   if (s)
   {
-    std::string value = s;
     SliceMapType slices{ { 0, s } };
 
     m_Values.insert(std::make_pair(0, slices));

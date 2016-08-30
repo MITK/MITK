@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QUrl>
 #include <QWebEngineView>
-#include "MitkQtWidgetsExtExports.h"
+#include "MitkQtWidgetsWebExports.h"
 #include <QVariant>
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
@@ -35,7 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 * or segmentation. It also can display an intensity profile for
 * path elements, which lais over an image.
 */
-class MITKQTWIDGETSEXT_EXPORT QmitkHistogramJSWidget : public QWebEngineView
+class MITKQTWIDGETSWEB_EXPORT QmitkHistogramJSWidget : public QWebEngineView
 {
   Q_OBJECT
 

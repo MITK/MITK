@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/lexical_cast.hpp>
 #include <itkImageFileWriter.h>
 #include <itkImageFileReader.h>
-#include <mbilog.h>
+#include <mitkLog.h>
+#include <algorithm>
 
 template< class ScalarType >
 mitk::FiberfoxParameters< ScalarType >::FiberfoxParameters()
@@ -449,8 +450,7 @@ template< class ScalarType >
 void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 {
   m_MissingTags = "";
-  if(filename.empty())
-    return;
+  if(filename.empty()) { return; }
 
   const std::string& locale = "C";
   const std::string& currLocale = setlocale( LC_ALL, NULL );
@@ -469,13 +469,12 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
 
   boost::property_tree::ptree parameterTree;
-  boost::property_tree::xml_parser::read_xml(filename, parameterTree);
+  boost::property_tree::xml_parser::read_xml( filename, parameterTree );
 
 
   m_FiberModelList.clear();
   m_NonFiberModelList.clear();
-  if (m_NoiseModel)
-    m_NoiseModel = nullptr;
+  if (m_NoiseModel) { m_NoiseModel = nullptr; }
 
   BOOST_FOREACH( boost::property_tree::ptree::value_type const& v1, parameterTree.get_child("fiberfox") )
   {
@@ -547,9 +546,9 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
       m_SignalGen.m_ImageDirection[2][2] = ReadVal<double>(v1,"basic.direction.9",m_SignalGen.m_ImageDirection[2][2]);
 
       m_SignalGen.m_AcquisitionType = (SignalGenerationParameters::AcquisitionType)
-          ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
+                                      ReadVal<int>(v1,"acquisitiontype", m_SignalGen.m_AcquisitionType);
       m_SignalGen.m_CoilSensitivityProfile = (SignalGenerationParameters::CoilSensitivityProfile)
-          ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
+                                             ReadVal<int>(v1,"coilsensitivityprofile", m_SignalGen.m_CoilSensitivityProfile);
       m_SignalGen.m_NumberOfCoils = ReadVal<int>(v1,"numberofcoils", m_SignalGen.m_NumberOfCoils);
       m_SignalGen.m_ReversePhase = ReadVal<bool>(v1,"reversephase", m_SignalGen.m_ReversePhase);
       m_SignalGen.m_PartialFourier = ReadVal<double>(v1,"partialfourier", m_SignalGen.m_PartialFourier);
@@ -597,25 +596,74 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
 
       m_Misc.m_MotionVolumesBox = ReadVal<string>(v1,"artifacts.motionvolumes", m_Misc.m_MotionVolumesBox);
       m_SignalGen.m_MotionVolumes.clear();
-      if (m_Misc.m_MotionVolumesBox=="random")
-      {
-        for (int i=0; i<m_SignalGen.GetNumVolumes(); i++)
-          m_SignalGen.m_MotionVolumes.push_back(rand()%2);
-      }
-      else if (!m_Misc.m_MotionVolumesBox.empty())
-      {
-        for (int i=0; i<m_SignalGen.GetNumVolumes(); i++)
-          m_SignalGen.m_MotionVolumes.push_back(false);
 
-        stringstream stream(m_Misc.m_MotionVolumesBox);
-        int n;
-        while(stream >> n)
+      if ( m_Misc.m_MotionVolumesBox == "random" )
+      {
+        for ( size_t i=0; i < m_SignalGen.GetNumVolumes(); ++i )
         {
-          if (n<m_SignalGen.GetNumVolumes() && n>=0)
-            m_SignalGen.m_MotionVolumes[n]=true;
+          m_SignalGen.m_MotionVolumes.push_back( bool( rand()%2 ) );
+        }
+        MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case m_Misc.m_MotionVolumesBox == \"random\".";
+      }
+      else if ( ! m_Misc.m_MotionVolumesBox.empty() )
+      {
+        stringstream stream( m_Misc.m_MotionVolumesBox );
+        std::vector<int> numbers;
+        int nummer = std::numeric_limits<int>::max();
+        while( stream >> nummer )
+        {
+          if( nummer < std::numeric_limits<int>::max() )
+            {
+              numbers.push_back( nummer );
+            }
+        }
+        // If a list of negative numbers is given:
+        if( *(std::min_element( numbers.begin(), numbers.end() )) < 0
+            && *(std::max_element( numbers.begin(), numbers.end() )) <= 0 ) // cave: -0 == +0
+        {
+          for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
+          {
+            m_SignalGen.m_MotionVolumes.push_back( true );
+          }
+          // set all true except those given.
+          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
+          {
+            if ( -(*iter) < m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
+            {
+              m_SignalGen.m_MotionVolumes.at( -(*iter) ) = false;
+            }
+          }
+          MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of negative numbers.";
+        }
+        // If a list of positive numbers is given:
+        else if( *(std::min_element( numbers.begin(), numbers.end() )) >= 0
+                 && *(std::max_element( numbers.begin(), numbers.end() )) >= 0 )
+        {
+          for ( size_t i=0; i<m_SignalGen.GetNumVolumes(); ++i )
+          {
+            m_SignalGen.m_MotionVolumes.push_back( false );
+          }
+          // set all false except those given.
+          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter )
+          {
+            if ( *iter < m_SignalGen.GetNumVolumes() && *iter >= 0 )
+            {
+              m_SignalGen.m_MotionVolumes.at( *iter ) = true;
+            }
+          }
+          MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of positive numbers.";
+        }
+        else
+        {
+          MITK_WARN << "mitkFiberfoxParameters.cpp: Inconsistent list of numbers in m_MotionVolumesBox.";
+          break;
         }
       }
-      // else ?
+      else
+      {
+        MITK_WARN << "mitkFiberfoxParameters.cpp: Cannot make sense of string in m_MotionVolumesBox.";
+        break;
+      }
 
 
       try
@@ -765,9 +813,14 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
         }
       }
     }
+    else
+    {
+
+    }
   }
 
-  try{
+  try
+  {
     itk::ImageFileReader<ItkDoubleImgType>::Pointer reader = itk::ImageFileReader<ItkDoubleImgType>::New();
     reader->SetFileName(filename+"_FMAP.nrrd");
     reader->Update();
@@ -779,7 +832,8 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
     MITK_INFO << "No frequency map found.";
   }
 
-  try{
+  try
+  {
     itk::ImageFileReader<ItkUcharImgType>::Pointer reader = itk::ImageFileReader<ItkUcharImgType>::New();
     reader->SetFileName(filename+"_MASK.nrrd");
     reader->Update();

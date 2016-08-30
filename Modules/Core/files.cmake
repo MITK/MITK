@@ -236,6 +236,7 @@ set(CPP_FILES
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkLegacyFileReaderService.cpp
   IO/mitkLegacyFileWriterService.cpp
+  IO/mitkLocaleSwitch.cpp
   IO/mitkLog.cpp
   IO/mitkMimeType.cpp
   IO/mitkMimeTypeProvider.cpp

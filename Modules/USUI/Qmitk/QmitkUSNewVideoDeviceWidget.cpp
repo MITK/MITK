@@ -54,8 +54,8 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
 {
   if (m_Controls)
   {
-    connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this,
-      SLOT(OnClickedDone()));
+    // connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this,
+    //  SLOT(OnClickedDone()));
     connect(m_Controls->m_BtnCancel, SIGNAL(clicked()), this,
       SLOT(OnClickedCancel()));
     connect(m_Controls->m_RadioDeviceSource, SIGNAL(clicked()), this,
@@ -68,6 +68,12 @@ void QmitkUSNewVideoDeviceWidget::CreateConnections()
       SLOT(OnDeviceTypeSelection()));
     connect(m_Controls->m_OpenFileButton, SIGNAL(clicked()), this,
       SLOT(OnOpenFileButtonClicked()));
+
+    //Connect buttons and functions for editing of probes
+    connect(m_Controls->m_BtnRemoveProbe, SIGNAL(clicked()), this, SLOT(OnClickedRemoveProbe()));
+    connect(m_Controls->m_BtnRemoveDepth, SIGNAL(clicked()), this, SLOT(OnClickedRemoveDepth()));
+    connect(m_Controls->m_BtnAddDepths, SIGNAL(clicked()), this, SLOT(OnClickedAddDepths()));
+    connect(m_Controls->m_Probes, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnProbeChanged(const QString &)));
   }
 }
 
@@ -147,9 +153,54 @@ void QmitkUSNewVideoDeviceWidget::OnClickedDone()
     imageSource->OverrideResolution(width, height);
     imageSource->SetResolutionOverride(true);
   }
-
+  if (!m_Controls->m_ProbesInformation->text().isEmpty()) //there are informations about the probes of the device, so create the probes
+  {
+    AddProbesToDevice(newDevice);
+  }
+  else //no information about the probes of the device, so set default value
+  {
+    mitk::USProbe::Pointer probe = mitk::USProbe::New("default");
+    probe->SetDepth(0);
+    newDevice->AddNewProbe(probe);
+  }
   newDevice->Initialize();
+  CleanUpAfterCreatingNewDevice();
 
+  emit Finished();
+}
+
+void QmitkUSNewVideoDeviceWidget::OnClickedFinishedEditing()
+{
+  m_Active = false;
+  m_TargetDevice->SetManufacturer(m_Controls->m_Manufacturer->text().toStdString());
+  m_TargetDevice->SetName(m_Controls->m_Model->text().toStdString());
+  m_TargetDevice->SetComment(m_Controls->m_Comment->text().toStdString());
+
+  if (!m_Controls->m_ProbesInformation->text().isEmpty()){ //there is information about probes to add, so add them
+    AddProbesToDevice(m_TargetDevice);
+  }
+  mitk::USImageVideoSource::Pointer imageSource =
+    dynamic_cast<mitk::USImageVideoSource*>(
+    m_TargetDevice->GetUSImageSource().GetPointer());
+  if (!imageSource)
+  {
+    MITK_ERROR << "There is no USImageVideoSource at the current device.";
+    mitkThrow() << "There is no USImageVideoSource at the current device.";
+  }
+
+  // Set Video Options
+  imageSource->SetColorOutput(!m_Controls->m_CheckGreyscale->isChecked());
+
+  // If Resolution override is activated, apply it
+  if (m_Controls->m_CheckResolutionOverride->isChecked())
+  {
+    int width = m_Controls->m_ResolutionWidth->value();
+    int height = m_Controls->m_ResolutionHeight->value();
+    imageSource->OverrideResolution(width, height);
+    imageSource->SetResolutionOverride(true);
+  }
+  CleanUpAfterEditingOfDevice();
+  MITK_INFO << "Finished Editing";
   emit Finished();
 }
 
@@ -157,6 +208,8 @@ void QmitkUSNewVideoDeviceWidget::OnClickedCancel()
 {
   m_TargetDevice = 0;
   m_Active = false;
+  CleanUpAfterCreatingNewDevice();
+  CleanUpAfterEditingOfDevice();
   emit Finished();
 }
 
@@ -204,10 +257,24 @@ void QmitkUSNewVideoDeviceWidget::EditDevice(mitk::USDevice::Pointer device)
   }
   m_TargetDevice = static_cast<mitk::USVideoDevice*>(device.GetPointer());
   m_Active = true;
+
+  ChangeUIEditingUSVideoDevice();
 }
 
 void QmitkUSNewVideoDeviceWidget::CreateNewDevice()
 {
+  //When new device is created there are no probes to edit, therefore disable the Groupbox
+  m_Controls->m_GroupBoxEditProbes->setEnabled(false);
+
+  //Toggle functionality of Btn_Done
+  connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedDone()));
+  m_Controls->m_BtnDone->setText("Add Video Device");
+
+  //Fill Metadata with default information
+  m_Controls->m_Manufacturer->setText("Unknown Manufacturer");
+  m_Controls->m_Model->setText("Unknown Model");
+  m_Controls->m_Comment->setText("None");
+
   m_TargetDevice = 0;
   m_Active = true;
 }
@@ -222,4 +289,116 @@ QListWidgetItem* QmitkUSNewVideoDeviceWidget::ConstructItemFromDevice(
     device->GetDeviceManufacturer() + "|" + device->GetDeviceModel();
   result->setText(text.c_str());
   return result;
+}
+
+void QmitkUSNewVideoDeviceWidget::ChangeUIEditingUSVideoDevice()
+{
+  //deactivate the group box containing Videosource options because they should not be changed
+  m_Controls->m_GroupBoxVideoSource->setEnabled(false);
+
+  //activate the groupbox contaning the options to edit the probes of the device and fill it with information
+  m_Controls->m_GroupBoxEditProbes->setEnabled(true);
+  std::vector<mitk::USProbe::Pointer> probes = m_TargetDevice->GetAllProbes();
+  for (std::vector<mitk::USProbe::Pointer>::iterator it = probes.begin(); it != probes.end(); it++)
+  {
+    std::string probeName = (*it)->GetName();
+    m_Controls->m_Probes->addItem(QString::fromUtf8(probeName.data(), probeName.size()));
+  }
+  OnProbeChanged(m_Controls->m_Probes->currentText());
+
+  //Toggle functionality of Btn_Done
+  m_Controls->m_BtnDone->setText("Save Changes");
+  connect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedFinishedEditing()));
+
+  //Fill Metadata with Information provided by the Device selected to edit
+  m_Controls->m_Manufacturer->setText(m_TargetDevice->GetManufacturer().c_str());
+  m_Controls->m_Model->setText(m_TargetDevice->GetName().c_str());
+  m_Controls->m_Comment->setText(m_TargetDevice->GetComment().c_str());
+}
+
+void QmitkUSNewVideoDeviceWidget::OnClickedAddDepths()
+{
+  if (!m_Controls->m_Probes->currentText().isEmpty())
+  {
+    std::string probename = m_Controls->m_Probes->currentText().toStdString();
+    mitk::USProbe::Pointer currentProbe = m_TargetDevice->GetProbeByName(probename);
+    QString depths = m_Controls->m_AddDepths->text();
+    QStringList singleDepths = depths.split(',');
+    for (int i = 0; i < singleDepths.size(); i++)
+    {
+      currentProbe->SetDepth(singleDepths.at(i).toInt());
+    }
+    m_Controls->m_AddDepths->clear();
+    OnProbeChanged(m_Controls->m_Probes->currentText());
+  }
+}
+
+void QmitkUSNewVideoDeviceWidget::OnClickedRemoveDepth()
+{
+  if (!m_Controls->m_Probes->currentText().isEmpty() && !m_Controls->m_Depths->currentText().isEmpty())
+  {
+    std::string probename = m_Controls->m_Probes->currentText().toStdString();
+    int indexOfDepthToRemove = m_Controls->m_Depths->currentIndex();
+    mitk::USProbe::Pointer currentProbe = m_TargetDevice->GetProbeByName(probename);
+    currentProbe->RemoveDepth(m_Controls->m_Depths->currentText().toInt());
+    m_Controls->m_Depths->removeItem(indexOfDepthToRemove);
+  }
+}
+
+void QmitkUSNewVideoDeviceWidget::OnClickedRemoveProbe()
+{
+  if (!m_Controls->m_Probes->currentText().isEmpty())
+  {
+    std::string probename = m_Controls->m_Probes->currentText().toStdString();
+    int indexOfProbeToRemove = m_Controls->m_Probes->currentIndex();
+    m_TargetDevice->RemoveProbeByName(probename);
+    m_Controls->m_Probes->removeItem(indexOfProbeToRemove);
+  }
+}
+
+void QmitkUSNewVideoDeviceWidget::OnProbeChanged(const QString & probename)
+{
+  if (!probename.isEmpty())
+  {
+    std::string name = probename.toStdString();
+    mitk::USProbe::Pointer probe = m_TargetDevice->GetProbeByName(name);
+    std::map<int, mitk::Vector3D> depths = probe->GetDepthsAndSpacing();
+    m_Controls->m_Depths->clear();
+    for (std::map<int, mitk::Vector3D>::iterator it = depths.begin(); it != depths.end(); it++)
+    {
+      m_Controls->m_Depths->addItem(QString::number(it->first));
+    }
+  }
+}
+
+void QmitkUSNewVideoDeviceWidget::CleanUpAfterCreatingNewDevice()
+{
+  disconnect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedDone()));
+  m_Controls->m_ProbesInformation->clear();
+}
+
+void QmitkUSNewVideoDeviceWidget::CleanUpAfterEditingOfDevice()
+{
+  disconnect(m_Controls->m_BtnDone, SIGNAL(clicked()), this, SLOT(OnClickedFinishedEditing()));
+  m_Controls->m_Probes->clear();
+  m_Controls->m_Depths->clear();
+  m_Controls->m_AddDepths->clear();
+  m_Controls->m_ProbesInformation->clear();
+}
+
+void QmitkUSNewVideoDeviceWidget::AddProbesToDevice(mitk::USVideoDevice::Pointer device)
+{
+  QString probesInformation = m_Controls->m_ProbesInformation->text();
+  QStringList probes = probesInformation.split(';'); //split the different probes
+  for (int i = 0; i < probes.size(); i++)
+  {
+    QStringList depths = probes.at(i).split(','); //now for every probe split the probe name and the different depths
+    mitk::USProbe::Pointer probe = mitk::USProbe::New();
+    probe->SetName(depths.at(0).toStdString()); //first element is the probe name
+    for (int i = 1; i < depths.size(); i++) //all the other elements are the depths for the specific probe so add them to the probe
+    {
+      probe->SetDepth(depths.at(i).toInt());
+    }
+    device->AddNewProbe(probe);
+  }
 }

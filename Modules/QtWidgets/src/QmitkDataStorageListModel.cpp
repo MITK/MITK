@@ -194,7 +194,7 @@ void QmitkDataStorageListModel::AddNodeToInternalList(mitk::DataNode* node)
     if (node->GetData() != nullptr) {
       dataModifiedCommand = itk::MemberCommand<QmitkDataStorageListModel>::New();
       dataModifiedCommand->SetCallbackFunction(this, &QmitkDataStorageListModel::OnDataModified);
-      unsigned long dataObserverTag =  node->GetData()->AddObserver(itk::ModifiedEvent(), dataModifiedCommand);
+      dataObserverTag =  node->GetData()->AddObserver(itk::ModifiedEvent(), dataModifiedCommand);
     }
 
     m_NodesAndObserverTags.push_back( std::make_tuple(node, nodeObserverTag, dataObserverTag) );
@@ -205,7 +205,15 @@ void QmitkDataStorageListModel::ClearInternalNodeList()
 {
   for(auto& iter : m_NodesAndObserverTags)
   {
-    std::get<NODE>(iter)->RemoveObserver(std::get<NODE_OBSERVER>(iter));
+    auto node = std::get<NODE>(iter);
+    if (node != nullptr)
+    {
+      node->RemoveObserver(std::get<NODE_OBSERVER>(iter));
+      if (node->GetData() != nullptr)
+      {
+        node->GetData()->RemoveObserver(std::get<DATA_OBSERVER>(iter));
+      }
+    }
   }
   m_NodesAndObserverTags.clear();
 }

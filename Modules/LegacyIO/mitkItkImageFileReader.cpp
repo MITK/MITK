@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkConfig.h"
 #include "mitkException.h"
 #include <mitkProportionalTimeGeometry.h>
+#include <mitkLocaleSwitch.h>
 
 #include <itkImageFileReader.h>
 #include <itksys/SystemTools.hxx>
@@ -39,21 +40,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::ItkImageFileReader::GenerateData()
 {
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, nullptr );
-
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO("mitkItkImageFileReader") << "Could not set locale " << locale;
-    }
-  }
-
+  mitk::LocaleSwitch localeSwitch("C");
   mitk::Image::Pointer image = this->GetOutput();
 
   const unsigned int MINDIM = 2;
@@ -173,15 +160,6 @@ void mitk::ItkImageFileReader::GenerateData()
   //  SetDefaultImageProperties( node );
   //}
   MITK_INFO("mitkItkImageFileReader") << "...finished!" << std::endl;
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    MITK_INFO("mitkItkImageFileReader") << "Could not reset locale " << currLocale;
-  }
 }
 
 

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDICOMTagHelper.h>
 #include <mitkDICOMProperty.h>
 #include <mitkDicomSeriesReader.h>
+#include <mitkLocaleSwitch.h>
 #include <iostream>
 
 namespace mitk {
@@ -44,8 +45,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
   if (DicomSeriesReader::IsPhilips3DDicom(fileName))
   {
       MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
-      const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
-      setlocale(LC_NUMERIC, "C");
+      mitk::LocaleSwitch localeSwitch("C");
       std::locale previousCppLocale(std::cin.getloc());
       std::locale l("C");
       std::cin.imbue(l);
@@ -60,7 +60,6 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
           data->GetPropertyList()->SetProperty("name", nameProp);
           result.push_back(data);
       }
-      setlocale(LC_NUMERIC, previousCLocale);
       std::cin.imbue(previousCppLocale);
       return result;
   }

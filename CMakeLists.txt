@@ -201,10 +201,14 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # Qt version related variables
 
 env_option(MITK_USE_QT "Use Qt library" ON)
+env_option(MITK_USE_QT_WEBENGINE "Use Qt WebEngine library" ON)
 
 if(MITK_USE_QT)
   set(MITK_QT5_MINIMUM_VERSION 5.6.0)
-  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets WebEngineWidgets Xml XmlPatterns UiTools Help LinguistTools)
+  set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns UiTools Help LinguistTools)
+  if(MITK_USE_QT_WEBENGINE)
+    set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} WebEngineWidgets)
+  endif()
   if(APPLE)
     set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} DBus)
   endif()
@@ -216,6 +220,8 @@ if(MITK_USE_QT)
       set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
     endif()
   endif()
+elseif(MITK_USE_QT_WEBENGINE)
+  set(MITK_USE_QT_WEBENGINE OFF)
 endif()
 
 # ------------------------------------------------------------------------
@@ -941,6 +947,11 @@ if(MITK_USE_QT)
 
       if(NOT QT_HELPGENERATOR_EXECUTABLE)
         message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because QT_HELPGENERATOR_EXECUTABLE is empty.")
+        set(_force_blueberry_use_qt_help_to_off 1)
+      endif()
+
+      if(NOT MITK_USE_QT_WEBENGINE)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_QT_WEBENGINE is OFF.")
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 

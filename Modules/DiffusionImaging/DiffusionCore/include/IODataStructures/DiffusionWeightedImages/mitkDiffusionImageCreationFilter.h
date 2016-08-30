@@ -85,7 +85,6 @@ public:
   void SetHeaderDescriptor( DiffusionImageHeaderDescriptor header_descriptor );
 
   virtual void GenerateData() override;
-
 protected:
   DiffusionImageCreationFilter();
   ~DiffusionImageCreationFilter();

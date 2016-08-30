@@ -1209,9 +1209,9 @@ void mitk::Image::SetGeometry(BaseGeometry* aGeometry3D)
 
 void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
-  unsigned char i;
   if(m_Initialized)
   {
+    unsigned char i;
     os << indent << " Dimension: " << m_Dimension << std::endl;
     os << indent << " Dimensions: ";
     for(i=0; i < m_Dimension; ++i)

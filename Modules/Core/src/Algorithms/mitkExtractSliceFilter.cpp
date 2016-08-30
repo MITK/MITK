@@ -308,9 +308,9 @@ void mitk::ExtractSliceFilter::GenerateData(){
   xMax = static_cast< int >( extent[0]);
   yMax = static_cast< int >( extent[1]);
 
-  double sliceBounds[6];
   if (m_WorldGeometry->GetReferenceGeometry())
   {
+    double sliceBounds[6];
     for (auto & sliceBound : sliceBounds)
     {
       sliceBound = 0.0;

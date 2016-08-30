@@ -25,6 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIOUtil.h"
 
+#include <itkImageFileWriter.h>
+
 #include <itkComposeImageFilter.h>
 
 
@@ -59,11 +61,11 @@ mitk::DiffusionImageCreationFilter::RemapIntoVectorImage( mitk::Image::Pointer i
   }
   catch( const itk::ExceptionObject& e)
   {
-    MITK_ERROR << "Caugt exception while updating compose filter: " << e.what();
+    MITK_ERROR << "Caught exception while updating compose filter: " << e.what();
   }
 
   mitk::DiffusionImageCreationFilter::VectorImageType::Pointer vector_image = vec_composer->GetOutput();
-  vector_image->GetPixelContainer()->SetContainerManageMemory(false);
+  vector_image->GetPixelContainer()->ContainerManageMemoryOff();
 
   return vector_image;
 }
@@ -110,11 +112,18 @@ void mitk::DiffusionImageCreationFilter::GenerateData()
     mitkThrow() << "Either a header descriptor or a reference diffusion-weighted image have to be provided. Terminating.";
   }
 
-  // data packed into vector image
-  OutputType::Pointer outputForCache = this->GetOutput();
+  mitk::Image::Pointer outputForCache = this->GetOutput();
 
-  mitk::Image::Pointer mitkvectorimage = mitk::GrabItkImageMemory<DPH::ImageType>( RemapIntoVectorImage( input_image ));
-  outputForCache->Initialize( mitkvectorimage );
+  if( input_image->GetTimeSteps() > 1 )
+  {
+    mitk::Image::Pointer mitkvectorimage = mitk::GrabItkImageMemory<DPH::ImageType>( RemapIntoVectorImage( input_image ));
+    outputForCache->Initialize( mitkvectorimage );
+  }
+  // no need to remap, we expect to have a vector image directly
+  else
+  {
+    outputForCache->Initialize( input_image );
+  }
 
   // header information
   GradientDirectionContainerType::Pointer DiffusionVectors =  this->InternalGetGradientDirections( );

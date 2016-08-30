@@ -50,7 +50,7 @@ public:
     {
       manager->SetDataStorage(ds);
     }
-    catch(std::exception e)
+    catch(std::exception &e)
     {
       success = false;
       MITK_ERROR << "Exception: " << e.what();
@@ -73,7 +73,7 @@ public:
     {
       manager->SetLevelWindowProperty(levelWindowProperty);
     }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
     {
       success = true;
     }
@@ -153,9 +153,7 @@ public:
 
   static bool VerifyRenderingModes()
   {
-    bool ok = false;
-
-    ok = ( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == 1 ) &&
+    bool ok = ( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR == 1 ) &&
         (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR == 2 ) &&
         (mitk::RenderingModeProperty::LOOKUPTABLE_COLOR == 3 ) &&
         (mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR == 4 );
@@ -391,11 +389,9 @@ public:
       {
         break;
       }
-      int ind = found - nodesForLevelWindow.begin();
 
       //all invisible?
       found = std::find( nodesVisible.begin(), nodesVisible.end(), true );
-      bool allInvisible = ( found == nodesVisible.end() );
 
       if ( !nodesForLevelWindow[ ran ] )
       {

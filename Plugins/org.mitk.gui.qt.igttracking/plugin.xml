@@ -5,23 +5,23 @@
      <view id="org.mitk.views.mitkigtnavigationtoolmanager"
           name="IGT Navigation Tool Manager"
           class="QmitkMITKIGTNavigationToolManagerView"
-          icon="resources/iconNavigationToolManager.xpm" />
+          icon="resources/iconTrackingToolManager.svg" />
      <view id="org.mitk.views.navigationdataplayer"
           name="IGT Navigation Data Player"
           class="QmitkNavigationDataPlayerView"
-          icon="resources/iconNavigationDataPlayer.png" />
+          icon="resources/iconTrackingDataPlayer.svg" />
      <view id="org.mitk.views.mitkigttrackingtoolbox"
           name="IGT Tracking Toolbox"
           class="QmitkMITKIGTTrackingToolboxView"
-          icon="resources/iconTrackingToolBox.xpm" />
+          icon="resources/iconTrackingToolbox.svg" />
      <view id="org.mitk.views.igtnavigationtoolcalibration"
           name="IGT Navigation Tool Calibration"
           class="IGTNavigationToolCalibration"
-          icon="resources/iconNavigationToolCalibration.xpm" />
+          icon="resources/iconTrackingToolCalibration.svg" />
 	 <view id="org.mitk.views.IGTFiducialRegistration"
           name="IGT Fiducial Registration"
           class="IGTFiducialRegistration"
-          icon="resources/iconFiducialRegistration.png" />
+          icon="resources/iconTrackingRegistration.svg" />
   </extension>
 
 </plugin>

@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkDiffusionTensor3D.h"
 #include "mitkImageCast.h"
 #include "mitkDiffusionCoreIOMimeTypes.h"
+#include <mitkLocaleSwitch.h>
 
 
 mitk::NrrdTensorImageWriter::NrrdTensorImageWriter()
@@ -53,19 +54,7 @@ void mitk::NrrdTensorImageWriter::Write()
     MITK_ERROR << "Sorry, filename has not been set!" ;
     return ;
   }
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not set locale " << locale;
-    }
-  }
+  mitk::LocaleSwitch localeSwitch("C");
 
   itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
   io->SetFileType( itk::ImageIOBase::Binary );
@@ -91,16 +80,6 @@ void mitk::NrrdTensorImageWriter::Write()
   {
     std::cout << e << std::endl;
   }
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    MITK_INFO << "Could not reset locale " << currLocale;
-  }
-
 }
 
 mitk::NrrdTensorImageWriter* mitk::NrrdTensorImageWriter::Clone() const

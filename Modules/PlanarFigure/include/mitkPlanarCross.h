@@ -90,6 +90,8 @@ public:
   /** \brief The cross shall be reset to a single line when a control point is selected. */
   virtual bool ResetOnPointSelect() override;
 
+  virtual bool ResetOnPointSelectNeeded() const override;
+
 
   /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
   virtual unsigned int GetNumberOfFeatures() const override;
@@ -123,6 +125,7 @@ private:
 
   /** Internal method for applying spatial constraints. */
   virtual Point2D InternalApplyControlPointConstraints( unsigned int index, const Point2D& point );
+
 
 };
 

@@ -44,106 +44,107 @@ class UltrasoundSupport : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    virtual void SetFocus() override;
+  virtual void SetFocus() override;
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-    UltrasoundSupport();
-    virtual ~UltrasoundSupport();
+  UltrasoundSupport();
+  virtual ~UltrasoundSupport();
 
   public slots:
-    /*
-    * \brief This is called when the newDeviceWidget is closed
-    */
-    void OnNewDeviceWidgetDone();
+  /*
+  * \brief This is called when the newDeviceWidget is closed
+  */
+  void OnNewDeviceWidgetDone();
 
   protected slots:
 
-    void OnClickedAddNewDevice();
+  void OnClickedAddNewDevice();
 
-    void OnChangedFramerateLimit();
+  void OnChangedFramerateLimit();
 
-    /*
-     *\brief Called, when the selection in the list of the active devices changes.
-     */
-    void OnChangedActiveDevice();
+  void OnClickedEditDevice();
 
-    void OnClickedFreezeButton();
+  /*
+   *\brief Called, when the selection in the list of the active devices changes.
+   */
+  void OnChangedActiveDevice();
 
-    void OnDeciveServiceEvent(const ctkServiceEvent event);
+  void OnClickedFreezeButton();
 
-    /*
-    * \brief This is the main imaging loop that updates the image and is called regularily during the imaging process
-    */
-    void UpdateImage();
+  void OnDeciveServiceEvent(const ctkServiceEvent event);
 
-    void RenderImage2d();
+  /*
+  * \brief This is the main imaging loop that updates the image and is called regularily during the imaging process
+  */
+  void UpdateImage();
 
-    void RenderImage3d();
+  void RenderImage2d();
 
-    void StartTimers();
+  void RenderImage3d();
 
-    void StopTimers();
+  void StartTimers();
 
-  protected:
+  void StopTimers();
 
-    void CreateControlWidgets();
-    void RemoveControlWidgets();
+protected:
 
-    /** The device that is currently used to aquire images */
-    mitk::USDevice::Pointer m_Device;
+  void CreateControlWidgets();
+  void RemoveControlWidgets();
 
+  /** The device that is currently used to aquire images */
+  mitk::USDevice::Pointer m_Device;
 
-    void SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D);
-    /** This timer triggers periodic updates to the pipeline */
-    QTimer* m_UpdateTimer;
-    QTimer* m_RenderingTimer2d;
-    QTimer* m_RenderingTimer3d;
+  void SetTimerIntervals(int intervalPipeline, int interval2D, int interval3D);
+  /** This timer triggers periodic updates to the pipeline */
+  QTimer* m_UpdateTimer;
+  QTimer* m_RenderingTimer2d;
+  QTimer* m_RenderingTimer3d;
 
-    /** These clocks are used to compute the framerate in the methods DisplayImage(),RenderImage2d() and RenderImage3d(). */
-    QTime  m_Clock;
-    QTime  m_Clock2d;
-    QTime  m_Clock3d;
+  /** These clocks are used to compute the framerate in the methods DisplayImage(),RenderImage2d() and RenderImage3d(). */
+  QTime  m_Clock;
+  QTime  m_Clock2d;
+  QTime  m_Clock3d;
 
-    /** A counter to comute the framerate. */
-    int m_FrameCounterPipeline;
-    int m_FrameCounter2d;
-    int m_FrameCounter3d;
-    int m_FPSPipeline, m_FPS2d, m_FPS3d;
+  /** A counter to comute the framerate. */
+  int m_FrameCounterPipeline;
+  int m_FrameCounter2d;
+  int m_FrameCounter3d;
+  int m_FPSPipeline, m_FPS2d, m_FPS3d;
 
-    /** Stores the properties of some QWidgets (and the tool storage file name) to QSettings.*/
-    void StoreUISettings();
+  /** Stores the properties of some QWidgets (and the tool storage file name) to QSettings.*/
+  void StoreUISettings();
 
-    /** Loads the properties of some QWidgets (and the tool storage file name) from QSettings.*/
-    void LoadUISettings();
+  /** Loads the properties of some QWidgets (and the tool storage file name) from QSettings.*/
+  void LoadUISettings();
 
-    /** The node that we feed images into.*/
-    mitk::DataNode::Pointer m_Node;
+  /** The node that we feed images into.*/
+  mitk::DataNode::Pointer m_Node;
 
-    /** The image that is hold by the node above.*/
-    mitk::Image::Pointer m_Image;
+  /** The image that is hold by the node above.*/
+  mitk::Image::Pointer m_Image;
 
-    /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because
-     *  the zoom factor was modified) and the image needs to be reinitialized. */
-    mitk::SlicedGeometry3D::Pointer m_OldGeometry;
+  /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because
+   *  the zoom factor was modified) and the image needs to be reinitialized. */
+  mitk::SlicedGeometry3D::Pointer m_OldGeometry;
 
-    Ui::UltrasoundSupportControls m_Controls;
+  Ui::UltrasoundSupportControls m_Controls;
 
-    QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
-    QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
-    QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
-    QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
+  QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
+  QmitkUSControlsBModeWidget*   m_ControlBModeWidget;
+  QmitkUSControlsDopplerWidget* m_ControlDopplerWidget;
+  QmitkUSControlsProbesWidget*  m_ControlProbesWidget;
 
-    QList<ctkServiceReference>    m_CustomWidgetServiceReference;
+  QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
-    bool m_ImageAlreadySetToNode;
-    unsigned int m_CurrentImageWidth;
-    unsigned int m_CurrentImageHeight;
-    double m_CurrentDynamicRange;
+  bool m_ImageAlreadySetToNode;
+  unsigned int m_CurrentImageWidth;
+  unsigned int m_CurrentImageHeight;
+  double m_CurrentDynamicRange;
 };
 
 #endif // UltrasoundSupport_h

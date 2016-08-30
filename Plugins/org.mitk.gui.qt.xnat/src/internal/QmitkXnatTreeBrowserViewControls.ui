@@ -136,9 +136,53 @@
     </layout>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="searchLayout">
+     <item>
+      <widget class="QLineEdit" name="searchField">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="searchModeBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>Projects</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Patients</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QTreeView" name="treeView"/>
+      <widget class="QTreeView" name="treeView">
+       <property name="uniformRowHeights">
+        <bool>false</bool>
+       </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="animated">
+        <bool>false</bool>
+       </property>
+       <property name="expandsOnDoubleClick">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

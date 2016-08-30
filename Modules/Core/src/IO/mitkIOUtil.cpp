@@ -925,7 +925,7 @@ std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeName, 
   // Add an extension if not already specified
   if (ext.empty() && addExtension)
   {
-    ext = saveInfo.m_MimeType.GetExtensions().empty() ? std::string() : "." + saveInfo.m_MimeType.GetExtensions().front();
+    saveInfo.m_MimeType.GetExtensions().empty() ? std::string() : "." + saveInfo.m_MimeType.GetExtensions().front();
   }
 
   std::vector<SaveInfo> infos;

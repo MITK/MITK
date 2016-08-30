@@ -81,7 +81,7 @@ public:
     {
     throwExceptionWithThrowMacro(messageThrow);
     }
-  catch(mitk::Exception e)
+  catch(mitk::Exception& e)
     {
     mitkReThrow(e) << messageReThrow;
     }
@@ -146,7 +146,7 @@ public:
      {
      myExceptionTestObject->throwExceptionManually("message1"," and message2");
      }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
      {
      thrownMessage = e.GetDescription();
      exceptionThrown = true;
@@ -181,7 +181,7 @@ public:
      {
      myExceptionTestObject->throwExceptionWithThrowMacro("test123");
      }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
      {
      exceptionThrown = true;
      messageText = e.GetDescription();
@@ -198,7 +198,7 @@ public:
      {
      myExceptionTestObject->throwSpecializedExceptionWithThrowMacro("test123");
      }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
      {
      exceptionThrown = true;
      messageText = e.GetDescription();
@@ -214,7 +214,7 @@ public:
      {
      myExceptionTestObject->throwSpecializedExceptionWithThrowMacro2("test123");
      }
-    catch(SpecializedTestException e)
+    catch(SpecializedTestException &e)
      {
      exceptionThrown = true;
      messageText = e.GetDescription();
@@ -299,7 +299,7 @@ static void TestRethrowMacro()
      {
      myExceptionTestObject->reThrowExceptionWithReThrowMacro("Test original message.","Test rethrow message.");
      }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
      {
      message = e.GetDescription();
      exceptionThrown = true;

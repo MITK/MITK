@@ -75,3 +75,22 @@ mitk::USImageVideoSource::USImageCropping mitk::USVideoDeviceCustomControls::Get
   // just return the crop area set at the image source
   return m_ImageSource->GetCropping();
 }
+
+std::vector<mitk::USProbe::Pointer> mitk::USVideoDeviceCustomControls::GetProbes()
+{
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  return device->GetAllProbes();
+}
+
+std::vector<int> mitk::USVideoDeviceCustomControls::GetDepthsForProbe(std::string name)
+{
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  mitk::USProbe::Pointer probe = device->GetProbeByName(name);
+  std::map<int, mitk::Vector3D> depthsAndSpacings = probe->GetDepthsAndSpacing();
+  std::vector<int> depths;
+  for (std::map<int, mitk::Vector3D>::iterator it = depthsAndSpacings.begin(); it != depthsAndSpacings.end(); it++)
+  {
+    depths.push_back((it->first));
+  }
+  return depths;
+}

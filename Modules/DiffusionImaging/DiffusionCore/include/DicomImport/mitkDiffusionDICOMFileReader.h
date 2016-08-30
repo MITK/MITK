@@ -21,17 +21,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDICOMITKSeriesGDCMReader.h"
 #include "mitkDiffusionHeaderDICOMFileReader.h"
-#include "mitkThreeDnTDICOMSeriesReader.h"
+#include "mitkClassicDICOMSeriesReader.h"
 
 namespace mitk
 {
 
 class MITKDIFFUSIONCORE_EXPORT DiffusionDICOMFileReader
-        : public ThreeDnTDICOMSeriesReader
+        : public ClassicDICOMSeriesReader
 {
 public:
 
-  mitkClassMacro( DiffusionDICOMFileReader, DICOMITKSeriesGDCMReader )
+  mitkClassMacro( DiffusionDICOMFileReader, ClassicDICOMSeriesReader )
   mitkCloneMacro( DiffusionDICOMFileReader )
 
   itkNewMacro( DiffusionDICOMFileReader )

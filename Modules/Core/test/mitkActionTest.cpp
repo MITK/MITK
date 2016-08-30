@@ -40,8 +40,7 @@ int mitkActionTest(int /*argc*/, char* /*argv*/[])
   action->AddProperty("floatproperty", mitk::FloatProperty::New(10.05));
 
   std::cout << "try adding property BOOL and read them: ";
-  bool boolproperty = false;
-  boolproperty = dynamic_cast<mitk::BoolProperty *>(action->GetProperty("boolproperty"))->GetValue();
+  bool boolproperty = dynamic_cast<mitk::BoolProperty *>(action->GetProperty("boolproperty"))->GetValue();
   if (boolproperty != true)
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -60,8 +59,7 @@ int mitkActionTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "try adding property FLOAT and read them: ";
-  float floatproperty = 0.0;
-  floatproperty = dynamic_cast<mitk::FloatProperty *>(action->GetProperty("floatproperty"))->GetValue();
+  float floatproperty = dynamic_cast<mitk::FloatProperty *>(action->GetProperty("floatproperty"))->GetValue();
   if (floatproperty != 10.05f)
   {
     std::cout<<"[FAILED]"<<std::endl;

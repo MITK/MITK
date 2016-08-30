@@ -419,9 +419,9 @@ void mitk::LevelWindowManager::Update(const itk::EventObject&)  // visible prope
 
     bool visible = node->IsVisible(NULL);
 
-    int layer = -1;
     if ( node->IsVisible(NULL) )
     {
+      int layer = -1;
       node->GetIntProperty( "layer", layer );
       if ( layer > maxVisibleLayer )
       {

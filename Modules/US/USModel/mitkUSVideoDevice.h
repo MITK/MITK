@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include "mitkUSDevice.h"
 #include "mitkUSImageVideoSource.h"
+#include "mitkUSProbe.h"
 #include <itkObjectFactory.h>
 
 namespace itk {
@@ -88,9 +89,44 @@ namespace mitk {
     */
     virtual USImageSource::Pointer GetUSImageSource() override;
 
+    /**
+    * \brief Return all probes for this USVideoDevice or an empty vector it no probes were set
+    * Returns a std::vector of all probes that exist for this USVideoDevice if there were probes set while creating or modifying this USVideoDevice.
+    * Otherwise it returns an empty vector. Therefore always check if vector is filled, before using it!
+    */
+    std::vector<mitk::USProbe::Pointer> GetAllProbes();
+
+    /**
+    * \brief Return current active probe for this USVideoDevice
+    * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USVideoDevice.
+    * Returns null otherwise
+    */
+    mitk::USProbe::Pointer GetCurrentProbe();
+
+    /**
+    \brief adds a new probe to the device
+    */
+    void AddNewProbe(mitk::USProbe::Pointer probe);
+
+    /**
+    * \brief get the probe by its name
+    * Returns a  pointer to the probe identified by the given name. If no probe of given name exists for this Device 0 is returned.
+    */
+    mitk::USProbe::Pointer GetProbeByName(std::string name);
+
+    /**
+    * \brief Removes the Probe with the given name
+    */
+    void RemoveProbeByName(std::string name);
+
+    /**
+    \brief True, if this Device plays back a file, false if it recieves data from a device
+    */
+    bool GetIsSourceFile();
+
     itkGetMacro(Image, mitk::Image::Pointer);
-    itkGetMacro(DeviceID,int);
-    itkGetMacro(FilePath,std::string);
+    itkGetMacro(DeviceID, int);
+    itkGetMacro(FilePath, std::string);
   protected:
 
     /**
@@ -173,6 +209,16 @@ namespace mitk {
     * \brief custom control interface for us video device
     */
     itk::SmartPointer<USVideoDeviceCustomControls> m_ControlInterfaceCustom;
+
+    /**
+    * \brief probes for this USVideoDevice
+    */
+    std::vector < mitk::USProbe::Pointer > m_Probes;
+
+    /**
+    \brief probe that is currently in use
+    */
+    mitk::USProbe::Pointer m_CurrentProbe;
   };
 } // namespace mitk
 

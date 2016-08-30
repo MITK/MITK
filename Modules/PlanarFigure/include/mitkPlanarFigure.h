@@ -91,6 +91,8 @@ public:
    * displayed/interacted with). */
   virtual bool IsPlaced() const { return m_FigurePlaced; };
 
+  /** \brief Handle not placed planar figures as empty */
+  virtual bool IsEmpty() const { return !IsPlaced(); };
 
   /** \brief Place figure at the given point (in 2D index coordinates) onto
    * the given 2D geometry.

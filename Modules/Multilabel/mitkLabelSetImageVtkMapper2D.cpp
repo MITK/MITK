@@ -147,6 +147,11 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     return;
   }
 
+  bool contourActive = false;
+  bool contourAll = false;
+  node->GetBoolProperty("labelset.contour.active", contourActive, renderer);
+  node->GetBoolProperty("labelset.contour.all", contourAll, renderer);
+
   for (int lidx=0; lidx<numberOfLayers; ++lidx)
   {
     mitk::Image* layerImage = NULL;
@@ -249,9 +254,16 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     this->TransformActor( renderer );
 
     //set the plane as input for the mapper
-    localStorage->m_LayerMapperVector[lidx]->SetInputConnection(localStorage->m_Plane->GetOutputPort());
-    //set the texture for the actor
+    if (contourAll || (contourActive && lidx == activeLayer)) 
+    {
+      localStorage->m_LayerMapperVector[lidx]->SetInputConnection(nullptr);
+    } 
+    else 
+    {
+      localStorage->m_LayerMapperVector[lidx]->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+    }
 
+    //set the texture for the actor
     localStorage->m_LayerActorVector[lidx]->SetTexture(localStorage->m_LayerTextureVector[lidx]);
 
     localStorage->m_LayerActorVector[lidx]->GetProperty()->SetOpacity(opacity);
@@ -474,6 +486,31 @@ void mitk::LabelSetImageVtkMapper2D::ApplyLookuptable( mitk::BaseRenderer* rende
   localStorage->m_LevelWindowFilterVector[layer]->SetLookupTable( input->GetLabelSet(layer)->GetLookupTable()->GetVtkLookupTable() );
 }
 
+void mitk::LabelSetImageVtkMapper2D::ApplyContour(mitk::BaseRenderer* renderer, int layer)
+{
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+
+  bool contourActive = false;
+  bool contourAll = false;
+  float contourWidth(2.0);
+
+  this->GetDataNode()->GetBoolProperty("labelset.contour.active", contourActive, renderer);
+  this->GetDataNode()->GetBoolProperty("labelset.contour.all", contourAll, renderer);
+  this->GetDataNode()->GetFloatProperty("labelset.contour.width", contourWidth, renderer);
+
+  localStorage->m_OutlineActor->GetProperty()->SetLineWidth(contourWidth);
+  localStorage->m_OutlineShadowActor->GetProperty()->SetLineWidth(contourWidth * 1.5);
+
+  if (contourAll || contourActive) 
+  {
+    localStorage->m_LayerMapperVector[layer]->SetInputConnection(nullptr);
+  } 
+  else 
+  {
+    localStorage->m_LayerMapperVector[layer]->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+  }
+}
+
 void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
   bool visible = true;
@@ -537,6 +574,7 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     this->ApplyColor(renderer, color);
     this->ApplyOpacity(renderer, image->GetActiveLayer());
     this->ApplyLookuptable(renderer, image->GetActiveLayer());
+    this->ApplyContour(renderer, image->GetActiveLayer());
 
     localStorage->m_LastPropertyUpdateTime.Modified();
   }

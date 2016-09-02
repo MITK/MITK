@@ -226,6 +226,9 @@ protected:
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer, int layer );
 
+  /** \brief Set the contour of the actor and its width. */
+  void ApplyContour(mitk::BaseRenderer* renderer, int layer);
+
   /**
     * \brief Calculates whether the given rendering geometry intersects the
     * given SlicedGeometry3D.

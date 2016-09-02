@@ -256,7 +256,9 @@ void mitk::LabelSetImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer
     //set the plane as input for the mapper
     if (contourAll || (contourActive && lidx == activeLayer)) 
     {
-      localStorage->m_LayerMapperVector[lidx]->SetInputConnection(nullptr);
+      localStorage->m_LayerMapperVector[lidx]->SetInputData(
+        this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[lidx], image->GetActiveLabel()->GetValue())
+      );
     } 
     else 
     {
@@ -503,8 +505,11 @@ void mitk::LabelSetImageVtkMapper2D::ApplyContour(mitk::BaseRenderer* renderer, 
 
   if (contourAll || contourActive) 
   {
-    localStorage->m_LayerMapperVector[layer]->SetInputConnection(nullptr);
-  } 
+    mitk::LabelSetImage* image = dynamic_cast< mitk::LabelSetImage* >(this->GetDataNode()->GetData());
+    localStorage->m_LayerMapperVector[layer]->SetInputData(
+      this->CreateOutlinePolyData(renderer, localStorage->m_ReslicedImageVector[layer], image->GetActiveLabel()->GetValue())
+    );
+  }
   else 
   {
     localStorage->m_LayerMapperVector[layer]->SetInputConnection(localStorage->m_Plane->GetOutputPort());

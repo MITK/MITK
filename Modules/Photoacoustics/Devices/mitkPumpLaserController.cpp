@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkLaserDevice.h"
+#include "mitkPumpLaserController.h"
 
 #include <chrono>
 #include <thread>
@@ -26,11 +26,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 const unsigned char CR = 0xD; // == '\r' - carriage return
 const unsigned char LF = 0xA; // == '\n' - line feed
 
-mitk::LaserDevice::LaserDevice() :
-  m_State(mitk::LaserDevice::UNCONNECTED),
+mitk::PumpLaserController::PumpLaserController() :
+  m_State(mitk::PumpLaserController::UNCONNECTED),
   m_FlashlampRunning(false),
   m_ShutterOpen(false),
   m_LaserEmission(false),
+  m_DeviceName(),
   m_PortNumber(mitk::SerialCommunication::COM6), 
   m_BaudRate(mitk::SerialCommunication::BaudRate115200),
   m_DataBits(mitk::SerialCommunication::DataBits8), 
@@ -44,7 +45,7 @@ mitk::LaserDevice::LaserDevice() :
 {
 }
 
-mitk::LaserDevice::~LaserDevice()
+mitk::PumpLaserController::~PumpLaserController()
 {
   /* stop tracking and disconnect from tracking device */
   if ((GetState() == STATE3) || (GetState() == STATE4) || (GetState() == STATE5))
@@ -70,7 +71,7 @@ mitk::LaserDevice::~LaserDevice()
   }
 }
 
-std::string mitk::LaserDevice::Send(const std::string* input)
+std::string mitk::PumpLaserController::Send(const std::string* input)
 {
   if (input == nullptr)
     return "SERIALSENDERROR";
@@ -94,7 +95,7 @@ std::string mitk::LaserDevice::Send(const std::string* input)
     return "OK";
 }
 
-std::string mitk::LaserDevice::ReceiveLine(std::string* answer)
+std::string mitk::PumpLaserController::ReceiveLine(std::string* answer)
 {
   if (answer == nullptr)
     return "SERIALRECEIVEERROR";
@@ -112,24 +113,27 @@ std::string mitk::LaserDevice::ReceiveLine(std::string* answer)
 }
 
 
-void mitk::LaserDevice::ClearSendBuffer()
+void mitk::PumpLaserController::ClearSendBuffer()
 {
   std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex); // lock the mutex until the end of the scope
   m_SerialCommunication->ClearSendBuffer();
 }
 
 
-void mitk::LaserDevice::ClearReceiveBuffer()
+void mitk::PumpLaserController::ClearReceiveBuffer()
 {
   std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex); // lock the mutex until the end of the scope
   m_SerialCommunication->ClearReceiveBuffer();
 }
 
 
-bool mitk::LaserDevice::OpenConnection()
+bool mitk::PumpLaserController::OpenConnection()
 {
+
+  MITK_INFO << "!!!!!!!!!!-&&-------!!!!!!!!!!!!!";
   m_SerialCommunication = mitk::SerialCommunication::New();
 
+  MITK_INFO << "!!!!!!!!!!-++-------!!!!!!!!!!!!!";
   if (m_DeviceName.empty())
     m_SerialCommunication->SetPortNumber(m_PortNumber);
   else
@@ -139,8 +143,8 @@ bool mitk::LaserDevice::OpenConnection()
   m_SerialCommunication->SetDataBits(m_DataBits);
   m_SerialCommunication->SetParity(m_Parity);
   m_SerialCommunication->SetStopBits(m_StopBits);
-  m_SerialCommunication->SetSendTimeout(300);
-  m_SerialCommunication->SetReceiveTimeout(300);
+  m_SerialCommunication->SetSendTimeout(150);
+  m_SerialCommunication->SetReceiveTimeout(150);
   if (m_SerialCommunication->OpenConnection() == 0) // 0 == ERROR_VALUE
   {
     m_SerialCommunication->CloseConnection();
@@ -155,7 +159,7 @@ bool mitk::LaserDevice::OpenConnection()
     return false;
 }
 
-bool mitk::LaserDevice::CloseConnection()
+bool mitk::PumpLaserController::CloseConnection()
 {
   if (this->GetState() != UNCONNECTED)
   {
@@ -170,7 +174,7 @@ bool mitk::LaserDevice::CloseConnection()
   return true;
 }
 
-mitk::LaserDevice::LaserDeviceState mitk::LaserDevice::GetState()
+mitk::PumpLaserController::PumpLaserState mitk::PumpLaserController::GetState()
 {
   
   std::string *command = new std::string;
@@ -230,7 +234,7 @@ mitk::LaserDevice::LaserDeviceState mitk::LaserDevice::GetState()
 }
 
 
-void mitk::LaserDevice::StayAlive()
+void mitk::PumpLaserController::StayAlive()
 {
   do{
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -244,7 +248,7 @@ void mitk::LaserDevice::StayAlive()
   } while (m_KeepAlive);
 }
 
-bool mitk::LaserDevice::StartFlashlamps()
+bool mitk::PumpLaserController::StartFlashlamps()
 {
   this->GetState();
   if (!m_FlashlampRunning)
@@ -265,7 +269,7 @@ bool mitk::LaserDevice::StartFlashlamps()
       m_FlashlampRunning = true;
       m_ShutterOpen = false;
       m_KeepAlive = true;
-      m_StayAliveMessageThread = std::thread(&mitk::LaserDevice::StayAlive, this);
+      m_StayAliveMessageThread = std::thread(&mitk::PumpLaserController::StayAlive, this);
     }
     else
     {
@@ -278,7 +282,7 @@ bool mitk::LaserDevice::StartFlashlamps()
   return true;
 }
 
-bool mitk::LaserDevice::StopFlashlamps ()
+bool mitk::PumpLaserController::StopFlashlamps()
 {
   this->GetState();
   if (m_FlashlampRunning)
@@ -311,7 +315,7 @@ bool mitk::LaserDevice::StopFlashlamps ()
   return true;
 }
 
-bool mitk::LaserDevice::StopQswitch()
+bool mitk::PumpLaserController::StopQswitch()
 {
   this->GetState();
   if (m_FlashlampRunning && m_LaserEmission)

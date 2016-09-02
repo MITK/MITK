@@ -25,9 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QMessageBox>
 
-//mitk image
-#include <mitkImage.h>
-
+//mitk
+#include <mitkPumpLaserController.h>
 
 const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.opolasercontrol";
 
@@ -43,7 +42,6 @@ void OPOLaserControl::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonConnect, SIGNAL(clicked()), this, SLOT(ConnectToLaser()) );
   connect( m_Controls.buttonStatus, SIGNAL(clicked()), this, SLOT(GetStatus()) );
   connect( m_Controls.buttonSendCustomMessage, SIGNAL(clicked()), this, SLOT(SendCustomMessage()) );
-  m_serial = mitk::SerialCommunication::New();
 }
 
 void OPOLaserControl::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -55,89 +53,86 @@ void OPOLaserControl::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 
 void OPOLaserControl::ConnectToLaser()
 {
-  MITK_INFO << m_serial->IsConnected();
-  if(m_serial->IsConnected())
+  mitk::PumpLaserController * test = mitk::PumpLaserController::New;
+  MITK_INFO << "!!!!!!!!!!-??-------!!!!!!!!!!!!!";
+  if (m_PumpLaserController->OpenConnection())
   {
-    m_serial->CloseConnection();
-    m_Controls.buttonSendCustomMessage->setEnabled(false);
-    m_Controls.buttonStatus->setEnabled(false);
-    m_Controls.buttonConnect->setText("Connect");
-  }
+    m_Controls.buttonSendCustomMessage->setEnabled(true);
+    m_Controls.buttonStatus->setEnabled(true);
+    m_Controls.buttonConnect->setText("Disconnect");
+    MITK_INFO << "!!!!!!!!!!----------!!!!!!!!!!!!!";
+    std::string message("TRIG EE"); // both external Triggers
+    std::string response("");
 
-  else
-  {
-    m_serial->SetBaudRate(mitk::SerialCommunication::BaudRate115200);
+    m_PumpLaserController->Send(&message);
+    m_PumpLaserController->ReceiveLine(&response);
+  
 
-    //get port
-    int port = 0;
-    port = m_Controls.spinBoxPort->value();
+    ////get port
+    //int port = 0;
+    //port = m_Controls.spinBoxPort->value();
 
-    //build prefix (depends on linux/win)
-    QString prefix = "";
-    #ifdef WIN32
-      prefix = "COM";
-      m_serial->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
-    #else
-      prefix = m_Controls.comboBoxPortType->currentText();
-    #endif
+    ////build prefix (depends on linux/win)
+    //QString prefix = "";
+    //#ifdef WIN32
+    //  prefix = "COM";
+    //  m_serial->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
+    //#else
+    //  prefix = m_Controls.comboBoxPortType->currentText();
+    //#endif
 
-    QString portName = prefix + QString::number(port);
-    m_serial->SetDeviceName(portName.toStdString());
-
-    m_serial->SetDataBits(mitk::SerialCommunication::DataBits8);
-    m_serial->SetParity(mitk::SerialCommunication::None);  // No parity
-    m_serial->SetStopBits(mitk::SerialCommunication::StopBits1);
+    //QString portName = prefix + QString::number(port);
+    //m_serial->SetDeviceName(portName.toStdString());
 
     // FIXME Unclear specs
     //  • Half duplex
     //  • Does not use Xon/Xoff
     //  • Does not use RTS/CTS
-    // FIXME
-
-    m_serial->SetHardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff);
-    m_serial->SetSendTimeout(200);
-    m_serial->SetReceiveTimeout(200);
-
-    MITK_INFO << "sent STATE Command";
-    m_serial->OpenConnection();
-    m_Controls.buttonSendCustomMessage->setEnabled(true);
-    m_Controls.buttonStatus->setEnabled(true);
-    m_Controls.buttonConnect->setText("Disconnect");
+    // FIXME  
+  }
+  else
+  {
+    m_PumpLaserController->CloseConnection();
+    m_Controls.buttonSendCustomMessage->setEnabled(false);
+    m_Controls.buttonStatus->setEnabled(false);
+    m_Controls.buttonConnect->setText("Connect");
   }
 }
 
 void OPOLaserControl::GetStatus()
 {
-  std::string message = "STATE";
-  std::string tmpMessage = "";
+  mitk::PumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
 
-  m_serial->Send(message);
-
-  if (m_serial->Receive(tmpMessage,4) == false) // receive 4 bytes
-    std::cout << "Error receiving STATE. Only " << tmpMessage.size() << " characters received: '" << tmpMessage << "'.\n";
-  else
-    std::cout << "Received STATE: '" << tmpMessage << "'.\n";
-
-  //  COMMAND SYNTAX
-  //  • Commands are in ASCII, UPPER CASE only, and must be terminated by the “CR” or “LF” or “CRLF” (Carriage Return Line Feed) character.
-  //  • Responses are messages followed by a LF.
-  //  • Commands can be sent at a maximum rate of 10 Hz. Sending a new command only after receiving the response from the previous one is the best way to ensure you meet this requirement.
-  //  • Answer message ‘ERROR: UNKNOWN’ is returned when the computer doesn’t recognize the characters sent,
-  //  • Answer message ‘ERROR : OUT OF RANGE’ is returned when, while programming a data, the number of figure exceeds the authorized one,
-  //  • Answer message ‘ERROR : BAD PARAM’ is returned when the entered character is not an expected numeric character.
-
+  if (pumpLaserState == mitk::PumpLaserController::STATE0)
+    MITK_INFO << "Received STATE0: Boot Fault.";
+  else if (pumpLaserState == mitk::PumpLaserController::STATE1)
+    MITK_INFO << "Received STATE1: Warm Up.";
+  else if (pumpLaserState == mitk::PumpLaserController::STATE2)
+    MITK_INFO << "Received STATE2: Laser Ready.";
+  else if (pumpLaserState == mitk::PumpLaserController::STATE3)
+    MITK_INFO << "Received STATE3: Flashing. Pulse Disabled.";
+  else if (pumpLaserState == mitk::PumpLaserController::STATE4)
+    MITK_INFO << "Received STATE4: Flashing. Shutter Closed.";
+  else if (pumpLaserState == mitk::PumpLaserController::STATE5)
+    MITK_INFO << "Received STATE5: Flashing. Pulse Enabled.";
+  else if (pumpLaserState == mitk::PumpLaserController::UNCONNECTED)
+    MITK_INFO << "Received ERROR.";
 }
 
 void OPOLaserControl::SendCustomMessage()
 {
   std::string message = m_Controls.lineMessage->text().toStdString();
-  std::string response = "";
+  std::string response("");
 
-  m_serial->Send(message);
+  m_PumpLaserController->Send(&message);
+  m_PumpLaserController->ReceiveLine(&response);
+ 
+  MITK_INFO << "Received response: " << response;
+}
 
-  if (m_serial->Receive(response,4) == false) // receive 4 bytes
-    MITK_INFO << "Error receiving response. Only " << response.size() << " characters received: '" << response;
-  else
-    MITK_INFO << "Received response: '" << response;
+void OPOLaserControl::ToogleFlashlamp()
+{
+  m_PumpLaserController->StartFlashlamps();
+  MITK_INFO << "Received response: ";
 
 }

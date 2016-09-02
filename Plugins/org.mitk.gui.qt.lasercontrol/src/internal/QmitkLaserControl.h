@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkLaserControlControls.h"
 
-#include "mitkSerialCommunication.h"
+#include <mitkPumpLaserController.h>
 
 /**
   \brief OPOLaserControl
@@ -50,6 +50,7 @@ class OPOLaserControl : public QmitkAbstractView
     void ConnectToLaser();
     void GetStatus();
     void SendCustomMessage();
+    void ToogleFlashlamp();
 
   protected:
 
@@ -63,8 +64,7 @@ class OPOLaserControl : public QmitkAbstractView
 
     Ui::OPOLaserControlControls m_Controls;
 
-    mitk::SerialCommunication::Pointer m_serial;
-
+    mitk::PumpLaserController* m_PumpLaserController;
 
 };
 

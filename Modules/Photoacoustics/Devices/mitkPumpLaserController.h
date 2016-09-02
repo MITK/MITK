@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKLASERDEVICE_H_HEADER_INCLUDED
-#define MITKLASERDEVICE_H_HEADER_INCLUDED
+#ifndef MITKPumpLaserController_H_HEADER_INCLUDED
+#define MITKPumpLaserController_H_HEADER_INCLUDED
 
 #include "itkObject.h"
 #include "mitkCommon.h"
@@ -29,13 +29,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
     
-    class LaserDevice : public itk::Object
+    class PumpLaserController : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(LaserDevice, itk::Object);
+      mitkClassMacroItkParent(PumpLaserController, itk::Object);
       itkCloneMacro(Self)
 
-      enum LaserDeviceState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
+      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
       /**
        * \brief Opens a connection to the device
        *
@@ -65,7 +65,7 @@ namespace mitk {
       virtual bool StartQswitch() = 0;
       virtual bool StopQswitch();
 
-      virtual LaserDeviceState GetState();
+      virtual PumpLaserState GetState();
 
       typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection
       typedef mitk::SerialCommunication::BaudRate BaudRate;     ///< Baud rate of the serial connection
@@ -75,11 +75,11 @@ namespace mitk {
       typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
 
     private:
-      LaserDeviceState m_State; ///< current Laser state
+      PumpLaserState m_State; ///< current Laser state
     protected:
 
-      LaserDevice();
-      virtual ~LaserDevice();
+      PumpLaserController();
+      virtual ~PumpLaserController();
 
       bool m_KeepAlive = false;
       bool m_FlashlampRunning = false;
@@ -100,4 +100,4 @@ namespace mitk {
     };
 } // namespace mitk
 
-#endif /* MITKLASERDEVICE_H_HEADER_INCLUDED */
+#endif /* MITKPumpLaserController_H_HEADER_INCLUDED */

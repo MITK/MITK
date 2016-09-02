@@ -492,6 +492,8 @@ void BaseApplication::initializeQt()
   this->setApplicationName(appName);
   this->setOrganizationName(orgName);
   this->setOrganizationDomain(orgDomain);
+
+
 }
 
 void BaseApplication::initialize(Poco::Util::Application& self)
@@ -621,6 +623,8 @@ QCoreApplication* BaseApplication::getQApplication() const
 #ifdef Q_OS_OSX
   qCoreApp->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
+
+  qCoreApp->setAttribute(Qt::AA_ShareOpenGLContexts);
 
   if (!qCoreApp)
   {

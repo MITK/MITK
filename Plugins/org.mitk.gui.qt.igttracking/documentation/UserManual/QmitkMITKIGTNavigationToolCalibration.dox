@@ -1,0 +1,33 @@
+/**
+
+\page org_mitk_views_calibrationtoolmanager The MITK-IGT Navigation Tool Calibration
+
+\imageMacro{../resources/iconTrackingToolCalibration.svg,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+
+
+\section QmitkMITKIGTNavigationToolCalibrationIntroduction Introduction
+This view allows the calibration of navigation tools. The calibrated tools can be saved permanently and later be used for any other IGT application.
+
+
+\section QmitkMITKIGTNavigationToolCalibrationPrerequisities Prerequisites
+
+In the IGT Tracking Toolbox configure your tracking device with at least two tools. The tool you wish to calibrate and one tool used as a pointer during the calibration process. For details on how to configure your tracking device and your tools have a look at \ref org_mitk_views_igttrackingtoolbox
+After you configured your device and your tools connect your device and start tracking. Now switch to the IGT Navigation Tool Calibration for the calibration process.
+
+
+\section QmitkMITKIGTNavigationToolCalibrationInitialization Initialization
+
+On the tab Initialization choose the tracking device you configured in the prevois step by clicking on it in the box "Available Navigation Data Sources". Then in the box "Tools" the tools you configured for this device should appear. Click on the tool that needs to be calibrated and then on the button "Use as Tool to Calibrate". On top of the view under the headline "Tool To calibrate" you now see the tool information for the chosen tool.
+For the tool used as a pointer do the same. Click on it, then click on the button "Use as Calibration Pointer" and on top of the view under the headline "Calibration pointer you should see the tool information for the pointer tool.
+
+\imageMacro{QmitkIGTTracking_ToolCalibration_Initialization.png,"MITK Screenshot with the initialized tools for calibration",16.00}
+
+
+\section QmitkMITKIGTNavigationToolCalibrationToolTipCalibration Tool Tip Calibration
+
+Onto the next step
+
+
+Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction
+
+*/

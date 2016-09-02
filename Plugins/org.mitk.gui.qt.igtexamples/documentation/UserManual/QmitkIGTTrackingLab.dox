@@ -16,7 +16,7 @@ The IGT-TrackingLab is the last step of the IGT tutorial. It is a plugin which s
 
 The symbol of the Tracking Lab View is the following:
 
-\imageMacro{../../resources/IgtTrackingLab.png,"",2}
+\imageMacro{../../resources/icon_igt_tracking_lab.png,"",2}
 
 The view looks like this:
 \imageMacro{IGT_TrackingLab_PluginView.png,"",15.90}

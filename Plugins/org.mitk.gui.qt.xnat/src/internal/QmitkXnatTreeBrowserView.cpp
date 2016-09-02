@@ -369,20 +369,23 @@ void QmitkXnatTreeBrowserView::OnUploadFromDataStorage()
 
 void QmitkXnatTreeBrowserView::OnXnatNodeSelected(const QModelIndex& index)
 {
-  // Enable download button
   if (!index.isValid()) return;
 
   ctkXnatObject* selectedXnatObject = index.data(Qt::UserRole).value<ctkXnatObject*>();
 
+  // enable download button
   bool enableDownload = dynamic_cast<ctkXnatFile*>(selectedXnatObject) != nullptr;
   enableDownload |= dynamic_cast<ctkXnatScan*>(selectedXnatObject) != nullptr;
   m_Controls.btnXnatDownload->setEnabled(enableDownload);
 
+  // enable folder creation
   bool enableCreateFolder = dynamic_cast<ctkXnatProject*>(selectedXnatObject) != nullptr;
   enableCreateFolder |= dynamic_cast<ctkXnatSubject*>(selectedXnatObject) != nullptr;
   enableCreateFolder |= dynamic_cast<ctkXnatExperiment*>(selectedXnatObject) != nullptr;
+  enableCreateFolder |= dynamic_cast<ctkXnatResourceFolder*>(selectedXnatObject) != nullptr;
   m_Controls.btnCreateXnatFolder->setEnabled(enableCreateFolder);
 
+  // enable upload
   bool enableUpload = dynamic_cast<ctkXnatResource*>(selectedXnatObject) != nullptr;
   m_Controls.btnXnatUpload->setEnabled(enableUpload);
 }
@@ -781,6 +784,15 @@ ctkXnatResource* QmitkXnatTreeBrowserView::InternalAddResourceFolder(ctkXnatObje
   {
     if (folderName.isEmpty())
       folderName = "NO LABEL";
+
+    // if called on the resource-folder level we need to provide he corresponding
+    // parent instead of the folder
+    ctkXnatResourceFolder* resourceFolder = dynamic_cast<ctkXnatResourceFolder*>(parent);
+    if (resourceFolder != nullptr)
+    {
+      parent = parent->parent();
+    }
+
     try
     {
       return parent->addResourceFolder(folderName);
@@ -878,17 +890,10 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     return;
 
   //1. If not dropped on a resource, create a new folder
-  //temporarily remove the annoying message box that upload was successfull..
+  //temporarily remove the annoying message box that upload was successful..
   ctkXnatResource* resource = dynamic_cast<ctkXnatResource*>(parentObject);
-
-  // if dragged on the resource folder we need to provide the corresponding parent
-  // instead of the folder
-  ctkXnatResourceFolder* resourceFolder = dynamic_cast<ctkXnatResourceFolder*>(parentObject);
-  if (resource == nullptr && resourceFolder != nullptr)
-  {
-    parentObject = parentObject->parent();
-  }
-
+  // store original resource folder object for later use
+  ctkXnatResourceFolder* originalResourceFolder = dynamic_cast<ctkXnatResourceFolder*>(parentObject);
   if (resource == nullptr)
   {
     resource = this->InternalAddResourceFolder(parentObject);
@@ -965,7 +970,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
     }
     QFile::remove(fileName);
 
-    if (resourceFolder == nullptr)
+    if (originalResourceFolder == nullptr)
     {
       m_TreeModel->refresh(parentIndex);
     }
@@ -1036,6 +1041,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
   canHaveResourceFolder |= dynamic_cast<ctkXnatProject*>(xnatObject) != NULL;
   canHaveResourceFolder |=  dynamic_cast<ctkXnatSubject*>(xnatObject) != NULL;
   canHaveResourceFolder |=  dynamic_cast<ctkXnatExperiment*>(xnatObject) != NULL;
+  canHaveResourceFolder |= dynamic_cast<ctkXnatResourceFolder*>(xnatObject) != NULL;
 
   bool uploadFilePossible = false;
   uploadFilePossible |= dynamic_cast<ctkXnatResource*>(xnatObject) != NULL;

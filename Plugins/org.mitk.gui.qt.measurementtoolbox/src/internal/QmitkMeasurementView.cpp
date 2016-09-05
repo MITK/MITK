@@ -463,10 +463,12 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
       this->PlanarFigureInitialized(); // normally called when a figure is finished, to reset all buttons
 
     d->m_DataNodeToPlanarFigureData.erase( it );
+
+    if (nonConstNode != nullptr) {
+      nonConstNode->SetDataInteractor(nullptr);
+    }
   }
 
-  if (nonConstNode != nullptr)
-    nonConstNode->SetDataInteractor(nullptr);
 
   auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
   auto nodes = this->GetDataStorage()->GetDerivations(node, isPlanarFigure);

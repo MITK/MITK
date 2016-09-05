@@ -63,7 +63,6 @@ mitk::PickingTool::PickingTool()
   // set some properties
   m_ResultNode->SetProperty("name", mitk::StringProperty::New("result"));
   m_ResultNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_ResultNode->SetProperty("color", mitk::ColorProperty::New(0, 1, 0));
   m_ResultNode->SetProperty("layer", mitk::IntProperty::New(1));
   m_ResultNode->SetProperty("opacity", mitk::FloatProperty::New(0.33f));
 }
@@ -179,6 +178,7 @@ void mitk::PickingTool::OnPointAdded()
     {
       AccessByItk_2(orgImage, StartRegionGrowing, orgImage->GetGeometry(), seedPoint);
     }
+    m_ResultNode->SetProperty("color", mitk::ColorProperty::New(1, 1, 0));
     this->m_PointSet->Clear();
   }
 }

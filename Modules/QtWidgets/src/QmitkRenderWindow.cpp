@@ -24,6 +24,8 @@
 #include <QTimer>
 #include <QDragEnterEvent>
 #include <QDropEvent>
+#include <QSurfaceFormat>
+#include <QWindow>
 #include "mitkMousePressEvent.h"
 #include "mitkMouseMoveEvent.h"
 #include "mitkMouseDoubleClickEvent.h"
@@ -46,6 +48,10 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   /*QGLFormat newform = this->format();
   newform.setSamples(8);
   this->setFormat(newform);*/
+
+  QSurfaceFormat surfaceFormat = windowHandle()->format();
+  surfaceFormat.setStencilBufferSize(8);
+  windowHandle()->setFormat(surfaceFormat);
 
   if (renderingMode == mitk::BaseRenderer::RenderingMode::DepthPeeling)
   {

@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
   \brief OPOLaserControl
 
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
+  \warning  This class is not yet documented. Use "git blame" and ask the author why he is a lazy fuck.
 
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
@@ -52,6 +52,14 @@ class OPOLaserControl : public QmitkAbstractView
     void SendCustomMessage();
     void ToogleFlashlamp();
 
+
+    void InitLaser();
+    void TuneWavelength();
+    void ToggleFlashlamp();
+    void ToggleQSwitch();
+    void SyncWavelengthSetBySlider();
+    void SyncWavelengthSetBySpinBox();
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -63,6 +71,8 @@ class OPOLaserControl : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::OPOLaserControlControls m_Controls;
+    bool m_SyncFromSpinBox;
+    bool m_SyncFromSlider;
 
     mitk::PumpLaserController::Pointer m_PumpLaserController;
 

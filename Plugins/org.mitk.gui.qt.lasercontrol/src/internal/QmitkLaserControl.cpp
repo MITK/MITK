@@ -42,7 +42,75 @@ void OPOLaserControl::CreateQtPartControl( QWidget *parent )
   connect( m_Controls.buttonConnect, SIGNAL(clicked()), this, SLOT(ConnectToLaser()) );
   connect( m_Controls.buttonStatus, SIGNAL(clicked()), this, SLOT(GetStatus()) );
   connect( m_Controls.buttonSendCustomMessage, SIGNAL(clicked()), this, SLOT(SendCustomMessage()) );
+
+  connect(m_Controls.buttonInitLaser, SIGNAL(clicked()), this, SLOT(InitLaser()));
+  connect(m_Controls.buttonTune, SIGNAL(clicked()), this, SLOT(TuneWavelength()));
+  connect(m_Controls.buttonFlashlamp, SIGNAL(clicked()), this, SLOT(ToggleFlashlamp()));
+  connect(m_Controls.buttonQSwitch, SIGNAL(clicked()), this, SLOT(ToggleQSwitch()));
+
+  connect(m_Controls.sliderWavelength, SIGNAL(valueChanged(int)), this, SLOT(SyncWavelengthSetBySlider()));
+  connect(m_Controls.spinBoxWavelength, SIGNAL(valueChanged(double)), this, SLOT(SyncWavelengthSetBySpinBox()));
+
+  m_SyncFromSpinBox = true;
+  m_SyncFromSlider = true;
+
 }
+void OPOLaserControl::SyncWavelengthSetBySlider()
+{
+  if (m_SyncFromSlider)
+  {
+    m_SyncFromSpinBox = false;
+    m_Controls.spinBoxWavelength->setValue(m_Controls.sliderWavelength->value() / 10);
+  }
+  else
+    m_SyncFromSlider = true;
+
+}
+
+void OPOLaserControl::SyncWavelengthSetBySpinBox()
+{
+  if (m_SyncFromSpinBox)
+  {
+    m_SyncFromSlider = false;
+    m_Controls.sliderWavelength->setValue(m_Controls.spinBoxWavelength->value() * 10);
+  }
+  else
+    m_SyncFromSpinBox = true;
+}
+
+void OPOLaserControl::InitLaser()
+{
+  
+}
+
+void OPOLaserControl::TuneWavelength(){}
+void OPOLaserControl::ToggleFlashlamp(){}
+void OPOLaserControl::ToggleQSwitch(){}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void OPOLaserControl::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )

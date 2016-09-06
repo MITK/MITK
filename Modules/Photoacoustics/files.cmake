@@ -3,5 +3,5 @@ set(CPP_FILES
   #IO/mitkGrbReader.cpp
   ###IO/mitkGrbWriter.cpp not existent
 
-  Devices/mitkPumpLaserController.cpp
+  HardwareSeriell/mitkPumpLaserController.cpp
 )

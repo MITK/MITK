@@ -344,6 +344,7 @@ bool mitk::PumpLaserController::StartQswitch()
       m_FlashlampRunning = true;
       m_ShutterOpen = true;
       m_KeepAlive = true;
+      return true;
     }
     else
     {

@@ -22,8 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDevice.h"
 #include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASProbesControls.h"
-#include "mitkUSDiPhASBModeControls.h"
-#include "mitkUSDiPhASDopplerControls.h"
+#include "mitkUSDiPhASCustomControls.h"
 
 #include "Framework.IBMT.US.CWrapper.h"
 
@@ -32,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <SDKDDKVer.h>
 #include <stdio.h>
 #include <tchar.h>
+
+#include <itkObjectFactory.h>
+
 
 namespace mitk {
   /**
@@ -55,10 +57,8 @@ namespace mitk {
     */
     virtual std::string GetDeviceClass();
 
-   // virtual USControlInterfaceBMode::Pointer GetControlInterfaceBMode();
     virtual USControlInterfaceProbes::Pointer GetControlInterfaceProbes();
-    //virtual USControlInterfaceDoppler::Pointer GetControlInterfaceDoppler();
-	virtual mitk::USAbstractControlInterface::Pointer GetControlInterfaceCustom();
+    virtual itk::SmartPointer<USAbstractControlInterface> GetControlInterfaceCustom();
 
     /**
       * \brief Is called during the initialization process.
@@ -119,7 +119,7 @@ namespace mitk {
     /** @return Returns the currently used scanmode of this device*/
     ScanModeNative& GetScanMode();
 
-	void MessageCallback(const char* message);
+    void MessageCallback(const char* message);
 
   protected:
     /**
@@ -145,15 +145,13 @@ namespace mitk {
     */
     void InitializeScanMode();
 
-    USDiPhASProbesControls::Pointer     m_ControlsProbes;
-    USDiPhASBModeControls::Pointer      m_ControlsBMode;
-    USDiPhASDopplerControls::Pointer    m_ControlsDoppler;
-	USAbstractControlInterface::Pointer m_ControlsCustom;
+    USDiPhASProbesControls::Pointer                m_ControlsProbes;
+    itk::SmartPointer<USAbstractControlInterface>  m_ControlInterfaceCustom;
 
-    USDiPhASImageSource::Pointer        m_ImageSource;
+    USDiPhASImageSource::Pointer                   m_ImageSource;
 
-    bool                                m_IsRunning;
-	ScanModeNative                      m_ScanMode;
+    bool                                           m_IsRunning;
+    ScanModeNative                                 m_ScanMode;
   };
 } // namespace mitk
 

@@ -53,14 +53,13 @@ void OPOLaserControl::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sourc
 
 void OPOLaserControl::ConnectToLaser()
 {
-  mitk::PumpLaserController * test = mitk::PumpLaserController::New;
-  MITK_INFO << "!!!!!!!!!!-??-------!!!!!!!!!!!!!";
+  
+  m_PumpLaserController = mitk::PumpLaserController::New();
   if (m_PumpLaserController->OpenConnection())
   {
     m_Controls.buttonSendCustomMessage->setEnabled(true);
     m_Controls.buttonStatus->setEnabled(true);
     m_Controls.buttonConnect->setText("Disconnect");
-    MITK_INFO << "!!!!!!!!!!----------!!!!!!!!!!!!!";
     std::string message("TRIG EE"); // both external Triggers
     std::string response("");
 

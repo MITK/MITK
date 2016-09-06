@@ -129,11 +129,8 @@ void mitk::PumpLaserController::ClearReceiveBuffer()
 
 bool mitk::PumpLaserController::OpenConnection()
 {
-
-  MITK_INFO << "!!!!!!!!!!-&&-------!!!!!!!!!!!!!";
   m_SerialCommunication = mitk::SerialCommunication::New();
 
-  MITK_INFO << "!!!!!!!!!!-++-------!!!!!!!!!!!!!";
   if (m_DeviceName.empty())
     m_SerialCommunication->SetPortNumber(m_PortNumber);
   else
@@ -150,7 +147,7 @@ bool mitk::PumpLaserController::OpenConnection()
     m_SerialCommunication->CloseConnection();
     m_SerialCommunication = nullptr;
     MITK_ERROR << "[Pump Laser] " << "Can not open serial port";
-    return 0;
+    return false;
   }
 
   if (this->GetState() != UNCONNECTED)
@@ -176,7 +173,18 @@ bool mitk::PumpLaserController::CloseConnection()
 
 mitk::PumpLaserController::PumpLaserState mitk::PumpLaserController::GetState()
 {
+  if (m_SerialCommunication == nullptr)
+  {
+    m_State = UNCONNECTED;
+    return m_State;
+  }
   
+  if (!m_SerialCommunication->IsConnected())
+  {
+    m_State = UNCONNECTED;
+    return m_State;
+  }
+
   std::string *command = new std::string;
   std::string answer("");
   command->assign("STATE");
@@ -313,6 +321,41 @@ bool mitk::PumpLaserController::StopFlashlamps()
   }
   MITK_INFO << "[Pump Laser] " << "Flashlamps are not running";
   return true;
+}
+
+bool mitk::PumpLaserController::StartQswitch()
+{
+  this->GetState();
+  if (!m_LaserEmission)
+  {
+    if (m_LaserEmission && m_LaserEmission)
+      this->StopQswitch();
+
+    std::string *command = new std::string;
+    std::string answer("");
+    command->assign("QSW 1");
+
+    this->Send(command);
+    this->ReceiveLine(&answer);
+    this->ClearReceiveBuffer();
+
+    if (answer == "OK")
+    {
+      m_FlashlampRunning = true;
+      m_ShutterOpen = true;
+      m_KeepAlive = true;
+    }
+    else
+    {
+      MITK_ERROR << "[Pump Laser] " << "Cannot start Qswitch." << " Laser is telling me: " << answer;
+      return false;
+    }
+  }
+  else
+  {
+    MITK_INFO << "[Pump Laser] " << "Laser is already emitting";
+    return true;
+  }
 }
 
 bool mitk::PumpLaserController::StopQswitch()

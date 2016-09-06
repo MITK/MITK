@@ -26,14 +26,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mutex>
 
 #include "mitkSerialCommunication.h"
+#include "MitkPhotoacousticsExports.h"
 
 namespace mitk {
     
-    class PumpLaserController : public itk::Object
+    class MITKPHOTOACOUSTICS_EXPORT PumpLaserController : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(PumpLaserController, itk::Object);
-      itkCloneMacro(Self)
+      mitkClassMacroItkParent(PumpLaserController, itk::LightObject);
+      itkFactorylessNewMacro(Self);
 
       enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
       /**
@@ -42,14 +43,14 @@ namespace mitk {
        * This may only be called if there is currently no connection to the device.
        * If OpenConnection() is successful, the object will change from UNCONNECTED state to a STATE state
        */
-      virtual bool OpenConnection() = 0;
+      virtual bool OpenConnection();
 
       /**
        * \brief Closes the connection to the device
        *
        * This may only be called if there is currently a connection to the device. (e.g. object is in a STATE state)
        */
-      virtual bool CloseConnection() = 0; ///< Closes the connection with the device
+      virtual bool CloseConnection(); ///< Closes the connection with the device
 
       virtual std::string Send(const std::string* input);
 
@@ -59,10 +60,10 @@ namespace mitk {
 
       virtual void ClearReceiveBuffer();
       virtual void StayAlive();
-      virtual bool StartFlashlamps() = 0;
+      virtual bool StartFlashlamps();
       virtual bool StopFlashlamps();
 
-      virtual bool StartQswitch() = 0;
+      virtual bool StartQswitch();
       virtual bool StopQswitch();
 
       virtual PumpLaserState GetState();

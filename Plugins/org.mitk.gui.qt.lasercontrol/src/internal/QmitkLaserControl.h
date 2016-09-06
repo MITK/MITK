@@ -64,7 +64,7 @@ class OPOLaserControl : public QmitkAbstractView
 
     Ui::OPOLaserControlControls m_Controls;
 
-    mitk::PumpLaserController* m_PumpLaserController;
+    mitk::PumpLaserController::Pointer m_PumpLaserController;
 
 };
 

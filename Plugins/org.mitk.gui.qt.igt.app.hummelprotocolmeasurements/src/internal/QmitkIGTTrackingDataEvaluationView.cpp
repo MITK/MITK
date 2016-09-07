@@ -354,6 +354,7 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
     mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
     mitk::HummelProtocolEvaluation::Evaluate15cmDistances(m_PointSetMeanPositions, volume, results15cm);
     mitk::HummelProtocolEvaluation::Evaluate30cmDistances(m_PointSetMeanPositions, volume, results15cm);
+    mitk::HummelProtocolEvaluation::EvaluateAccumulatedDistances(m_PointSetMeanPositions, volume, resultsAccum);
   }
   else
   {
@@ -376,6 +377,11 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
   filename30cm << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".results30cm.csv";
   MITK_INFO << "Writing output to file " << filename30cm.str();
   writeToFile(filename30cm.str(), results30cm);
+
+  std::stringstream filenameAccum;
+  filenameAccum << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".resultsAccumDist.csv";
+  MITK_INFO << "Writing output to file " << filenameAccum.str();
+  writeToFile(filenameAccum.str(), resultsAccum);
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()

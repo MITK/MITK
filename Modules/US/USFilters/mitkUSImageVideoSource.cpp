@@ -184,10 +184,12 @@ void mitk::USImageVideoSource::RemoveRegionOfInterest()
 void mitk::USImageVideoSource::GetNextRawImage( cv::Mat& image )
 {
   // loop video if necessary
-  if (m_VideoCapture->get(CV_CAP_PROP_POS_FRAMES) == m_VideoCapture->get(CV_CAP_PROP_FRAME_COUNT))
+  //Commented out because setting and getting of these properties is not supported. Therefore on Linux
+    //you'll always get some Highgui errors from OpenCV
+  /*if (m_VideoCapture->get(CV_CAP_PROP_POS_FRAMES) == m_VideoCapture->get(CV_CAP_PROP_FRAME_COUNT))
   {
     m_VideoCapture->set(CV_CAP_PROP_POS_FRAMES, 0);
-  }
+  }*/
 
   // retrieve image
   *m_VideoCapture >> image; // get a new frame from camera

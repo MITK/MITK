@@ -89,9 +89,61 @@ bool mitk::HummelProtocolEvaluation::Evaluate15cmDistances(mitk::PointSet::Point
 bool mitk::HummelProtocolEvaluation::Evaluate30cmDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
 {
   if (m != mitk::HummelProtocolEvaluation::standard) { MITK_WARN << "30 cm distances are only evaluated for standard volumes, aborting!"; return false; }
+  MITK_INFO << "########### 30 cm distance errors #############";
+
   //convert measurements to matrix
   itk::Matrix<itk::Point<double, 3>, 9, 10>  matrix = ParseMatrixStandardVolume(p);
-  return false;
+
+  //these are the variables for the results:
+  std::vector<double> distances;
+  std::vector<std::string> descriptions;
+
+  //evaluation of rows
+  int distanceCounter = 0;
+  for (int row = 0; row < 9; row++) //rows
+    for (int distance = 0; distance < 4; distance++)
+    {
+      distanceCounter++;
+      mitk::Point3D point1 = p->GetPoint(row * 10 + distance);
+      mitk::Point3D point2 = p->GetPoint(row * 10 + distance + 6);
+      distances.push_back(point1.EuclideanDistanceTo(point2));
+      std::stringstream description;
+      description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (distance + 1) << " to " << (row + 1) << "/" << (distance + 7);
+      descriptions.push_back(description.str());
+    }
+
+  //evaluation of columns
+  for (int column = 0; column < 10; column++)
+    for (int row = 0; row < 3; row++)
+    {
+      distanceCounter++;
+      mitk::Point3D point1 = matrix[row][column];
+      mitk::Point3D point2 = matrix[row + 6][column];
+      distances.push_back(point1.EuclideanDistanceTo(point2));
+      std::stringstream description;
+      description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (column + 1) << " to " << (row + 7) << "/" << (column + 1);
+      descriptions.push_back(description.str());
+    }
+
+  //compute all errors
+  for (int i = 0; i < distances.size(); i++)
+  {
+    HummelProtocolDistanceError currentError;
+    currentError.distanceError = abs(distances.at(i) - (double)300.0);
+    currentError.description = descriptions.at(i);
+    Results.push_back(currentError);
+    MITK_INFO << "Error " << currentError.description << " : " << currentError.distanceError;
+  }
+
+  //compute statistics
+  std::vector<HummelProtocolDistanceError> statistics = mitk::HummelProtocolEvaluation::ComputeStatistics(Results);
+  for (auto currentError : statistics)
+  {
+    Results.push_back(currentError);
+    MITK_INFO << currentError.description << " : " << currentError.distanceError;
+  }
+
+  return true;
 }
 
 bool mitk::HummelProtocolEvaluation::EvaluateAccumulatedDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)

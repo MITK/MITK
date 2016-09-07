@@ -382,7 +382,20 @@ void AbstractFileReader::SetDefaultDataNodeProperties(DataNode* node, const std:
   // path
   if (!filePath.empty())
   {
-    mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenamePath(filePath) );
+    std::string workString = filePath;
+
+#ifdef _WIN32
+    int size = MultiByteToWideChar(CP_ACP, MB_COMPOSITE, filePath.c_str(), filePath.length(), nullptr, 0);
+    std::wstring utf16_str(size, '\0');
+    MultiByteToWideChar(CP_ACP, MB_COMPOSITE, filePath.c_str(), filePath.length(), &utf16_str[0], size);
+
+    int utf8_size = WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(), utf16_str.length(), nullptr, 0, nullptr, nullptr);
+    std::string utf8_str(utf8_size, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, utf16_str.c_str(), utf16_str.length(), &utf8_str[0], utf8_size, nullptr, nullptr);
+    workString = utf8_str;
+#endif
+
+    mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenamePath(workString));
     node->SetProperty(StringProperty::PATH, pathProp);
   }
 

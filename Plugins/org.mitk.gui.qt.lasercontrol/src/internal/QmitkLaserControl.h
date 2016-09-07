@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkLaserControlControls.h"
 
 #include <mitkPumpLaserController.h>
+#include <mitkOpotekLaser.h>
 
 /**
   \brief OPOLaserControl
@@ -71,10 +72,12 @@ class OPOLaserControl : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::OPOLaserControlControls m_Controls;
+    bool m_LaserSystemConnected;
     bool m_SyncFromSpinBox;
     bool m_SyncFromSlider;
 
     mitk::PumpLaserController::Pointer m_PumpLaserController;
+    mitk::OpotekLaser::Pointer m_OpotekLaserSystem;
 
 };
 

@@ -54,6 +54,8 @@ void OPOLaserControl::CreateQtPartControl( QWidget *parent )
   m_SyncFromSpinBox = true;
   m_SyncFromSlider = true;
 
+  m_LaserSystemConnected = false;
+
 }
 void OPOLaserControl::SyncWavelengthSetBySlider()
 {
@@ -80,12 +82,48 @@ void OPOLaserControl::SyncWavelengthSetBySpinBox()
 
 void OPOLaserControl::InitLaser()
 {
-  
+  if (!m_LaserSystemConnected)
+  {
+    m_OpotekLaserSystem = mitk::OpotekLaser::New();
+    m_OpotekLaserSystem->SetConfigurationPath("C:\\opotekPhocusMobileDkfz160907.ini");
+
+    if (m_OpotekLaserSystem->Initialize())
+    {
+      m_Controls.buttonFlashlamp->setEnabled(true);
+      m_Controls.buttonQSwitch->setEnabled(true);
+      m_Controls.buttonTune->setEnabled(true);
+      m_Controls.buttonInitLaser->setText("Reset and Release Laser");
+
+      m_Controls.sliderWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength());
+      m_Controls.sliderWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength());
+      m_Controls.spinBoxWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength()/10.0);
+      m_Controls.spinBoxWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength()/10.0);
+      m_Controls.spinBoxWavelength->setValue(m_OpotekLaserSystem->GetWavelength()/10.0);
+    }
+    else
+    {
+      MITK_ERROR << "OpotekLaser Initialization failed.";
+    }
+  }
+  else
+  {
+    // destroy and free
+    m_Controls.buttonFlashlamp->setEnabled(false);
+    m_Controls.buttonQSwitch->setEnabled(false);
+    m_Controls.buttonTune->setEnabled(false);
+    m_Controls.buttonInitLaser->setText("Init Laser");
+  }
 }
 
-void OPOLaserControl::TuneWavelength(){}
-void OPOLaserControl::ToggleFlashlamp(){}
-void OPOLaserControl::ToggleQSwitch(){}
+void OPOLaserControl::TuneWavelength()
+{}
+
+void OPOLaserControl::ToggleFlashlamp()
+{}
+
+void OPOLaserControl::ToggleQSwitch()
+{}
+
 
 
 

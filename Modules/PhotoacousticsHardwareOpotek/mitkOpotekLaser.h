@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObject.h"
 #include "mitkCommon.h"
 
-#include "MitkHardwareOPOTEKExports.h"
+#include "MitkPhotoacousticsHardwareOpotekExports.h"
 
 namespace mitk {
-    
-    class MITKHARDWAREOPOTEK_EXPORT OpotekLaser : public itk::LightObject
+
+    class MITKPHOTOACOUSTICSHARDWAREOPOTEK_EXPORT OpotekLaser : public itk::LightObject
     {
     public:
       mitkClassMacroItkParent(mitk::OpotekLaser, itk::LightObject);
@@ -42,6 +42,10 @@ namespace mitk {
       virtual bool StartQswitching();
       virtual bool StopQswitching();
 
+      virtual int GetMinWavelength();
+      virtual int GetMaxWavelength();
+      virtual int GetWavelength();
+
     protected:
 
       std::map<int, std::string> m_ErrorMessages;
@@ -57,7 +61,6 @@ namespace mitk {
       double m_WavelengthMax;
       double m_WavelengthMin;
       int m_CurrentWavelengthInNmTenths;
-
 
     };
 } // namespace mitk

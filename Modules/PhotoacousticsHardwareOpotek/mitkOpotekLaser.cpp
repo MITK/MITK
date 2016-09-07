@@ -56,7 +56,10 @@ mitk::OpotekLaser::~OpotekLaser()
 
 void mitk::OpotekLaser::SetConfigurationPath(std::string configurationPath)
 {
+  MITK_INFO << configurationPath;
+  m_ConfigurationFilePath = new char[configurationPath.length() + 1];
   std::strcpy(m_ConfigurationFilePath, configurationPath.c_str());
+  MITK_INFO << m_ConfigurationFilePath;
 }
 
 bool mitk::OpotekLaser::Initialize()
@@ -173,4 +176,17 @@ bool mitk::OpotekLaser::StopQswitching()
   }
   else
     return true;
+}
+
+int mitk::OpotekLaser::GetMinWavelength()
+{
+  return (int) (m_WavelengthMin * 10);
+}
+int mitk::OpotekLaser::GetMaxWavelength()
+{
+  return (int)(m_WavelengthMax * 10);
+}
+int mitk::OpotekLaser::GetWavelength()
+{
+  return m_CurrentWavelengthInNmTenths;
 }

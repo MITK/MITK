@@ -235,7 +235,7 @@
             <enum>QSlider::TicksBelow</enum>
            </property>
            <property name="tickInterval">
-            <number>500</number>
+            <number>10000</number>
            </property>
           </widget>
          </item>

@@ -984,9 +984,7 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
   m_NodeTreeView->setExpanded(viewIndex, true);
 
   // a new row was inserted
-  if( m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1 )
-  {
-    this->OpenRenderWindowPart();
+  if (m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1) {
     m_CurrentRowCount = m_NodeTreeModel->rowCount();
   }
 }

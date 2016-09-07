@@ -167,8 +167,7 @@ std::string GenerateFromTemplate(const std::string& sourceStr, const std::string
 {
   std::smatch sm;
   std::regex ex(regexStr);
-  bool matched = std::regex_match(sourceStr, sm, ex);
-  assert(matched == true);
+  std::regex_match(sourceStr, sm, ex);
 
   std::string result = templateStr;
 

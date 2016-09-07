@@ -62,12 +62,12 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
 
 void mitk::USVideoDeviceCustomControls::SetNewDepth(double depth)
 {
-  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH, depth);
+  m_Device->DepthChanged(depth);
 }
 
 void mitk::USVideoDeviceCustomControls::SetNewProbeIdentifier(std::string probename)
 {
-  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED, probename);
+  m_Device->ProbeChanged(probename);
 }
 
 mitk::USImageVideoSource::USImageCropping mitk::USVideoDeviceCustomControls::GetCropArea()

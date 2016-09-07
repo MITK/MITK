@@ -317,10 +317,11 @@ bool mitk::USDevice::Activate()
 
     this->UpdateServiceProperty(
       mitk::USDevice::GetPropertyKeys().US_PROPKEY_ISACTIVE, true);
+    MITK_INFO << "a";
     this->UpdateServiceProperty(
       mitk::USDevice::GetPropertyKeys().US_PROPKEY_LABEL,
       this->GetServicePropertyLabel());
-
+    MITK_INFO << "b";
     // initialize the b mode control properties of the micro service
     mitk::USControlInterfaceBMode::Pointer bmodeControls =
       this->GetControlInterfaceBMode();
@@ -651,4 +652,15 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::ConnectThread(void* pInfoStruct)
   device->Connect();
 
   return ITK_THREAD_RETURN_VALUE;
+}
+
+
+void mitk::USDevice::ProbeChanged(std::string probename)
+{
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED, probename);
+}
+
+void mitk::USDevice::DepthChanged(double depth)
+{
+    this->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH, depth);
 }

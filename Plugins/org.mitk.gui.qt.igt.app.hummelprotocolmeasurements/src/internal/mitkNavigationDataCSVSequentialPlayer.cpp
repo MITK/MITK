@@ -145,7 +145,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
   QString myLine = QString(line.c_str());
 
-  QStringList myLineList = myLine.split(';');
+  QStringList myLineList = myLine.split(',');
 
   mitk::Point3D position;
   mitk::Quaternion orientation;
@@ -199,38 +199,78 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     //Polhemus quaternions. They are seem to different
     //different to other quaternions (NDI, Claron, etc.)
     //http://www.mathepedia.de/Quaternionen.aspx
+
+    /*
+    double qr = myLineList.at(7).toDouble();
+    double qx = myLineList.at(8).toDouble();
+    double qy = myLineList.at(9).toDouble();
+    double qz = myLineList.at(10).toDouble();
+
+    vnl_quaternion<double> newQuat(qx, qy, qz, qr);
+
+    orientation = newQuat;
+    orientation.normalize();*/
+
+    /*
+    orientation[3] = qr;  //qr
+    orientation[0] = qx;  //qx
+    orientation[1] = qy;  //qy
+    orientation[2] = qz;  //qz
+
+    orientation.normalize();
+    */
+
+
+
+    //Using Euler angles instead does work
+    //azimuth: rotation about Z axis of reference frame
+    double azimuthAngle = (myLineList.at(11).toDouble() / 180 * M_PI);
+    //elevation: rotation about Y' axis (transformed Y axis of sonsor frame)
+    double elevationAngle = (myLineList.at(12).toDouble() / 180 * M_PI);
+    //roll: rotation about X axis of sensor frame
+    double rollAngle = (myLineList.at(13).toDouble() / 180 * M_PI);
+    vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
+    orientation = eulerQuat;
+
+
+    /*
+    //code block for conversion from axis-angular representation
     double rotationAngle =  myLineList.at(7).toDouble();
     double rotationAxis[3];
     rotationAxis[0] = myLineList.at(8).toDouble();
     rotationAxis[1] = myLineList.at(9).toDouble();
     rotationAxis[2] = myLineList.at(10).toDouble();
 
-    /*
     double betragRotationAxis = sqrt(pow(rotationAxis[0], 2) + pow(rotationAxis[1], 2) + pow(rotationAxis[2], 2));
     rotationAngle /= betragRotationAxis;
     rotationAxis[0] /= betragRotationAxis;
     rotationAxis[1] /= betragRotationAxis;
     rotationAxis[2] /= betragRotationAxis;
-    */
+
 
     double qr = cos(rotationAngle/2);
     double qx = rotationAxis[0] * sin(rotationAngle/2);
     double qy = rotationAxis[1] * sin(rotationAngle/2);
     double qz = rotationAxis[1] * sin(rotationAngle/2);
+    */
 
-    orientation[3] = qr;  //qr
-    orientation[0] = qx;  //qx
-    orientation[1] = qy;  //qy
-    orientation[2] = qz;  //qz
 
 
     /*
-    //Using Euler angles instead does work
-    double euler1 = (myLineList.at(11).toDouble() / 180 * M_PI);
-    double euler2 = (myLineList.at(12).toDouble() / 180 * M_PI);
-    double euler3 = (myLineList.at(13).toDouble() / 180 * M_PI);
-    mitk::Quaternion eulerQuat(euler3, euler2, euler1);
-    orientation = eulerQuat;
+    //code block for conversion from left-handed to right-handed
+    mitk::Quaternion linksZuRechtsdrehend;
+    double rotationAngle = -M_PI;
+    double rotationAxis[3];
+    rotationAxis[0] = 0;
+    rotationAxis[1] = 0;
+    rotationAxis[2] = 1;
+
+    linksZuRechtsdrehend[3] = cos(rotationAngle / 2);
+    linksZuRechtsdrehend[0] = rotationAxis[0] * sin(rotationAngle / 2);
+    linksZuRechtsdrehend[1] = rotationAxis[1] * sin(rotationAngle / 2);
+    linksZuRechtsdrehend[2] = rotationAxis[2] * sin(rotationAngle / 2);
+
+    orientation = orientation * linksZuRechtsdrehend;
     */
 
   }

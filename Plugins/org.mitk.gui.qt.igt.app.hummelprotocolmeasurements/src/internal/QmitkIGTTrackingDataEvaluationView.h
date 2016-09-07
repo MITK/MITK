@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkFunctionality.h>
 
 #include "ui_QmitkIGTTrackingDataEvaluationViewControls.h"
+#include "mitkHummelProtocolEvaluation.h"
 
 #include <mitkNavigationDataEvaluationFilter.h>
 
@@ -99,6 +100,8 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     void CalculateDifferenceAngles();
     void WriteDifferenceAnglesHeader();
     void WriteDifferenceAnglesDataSet(std::string pos1, std::string pos2, int idx1, int idx2, double angle);
+
+    void writeToFile(std::string filename, std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> values);
 
     //different help methods to read a csv logging file
     std::vector<mitk::NavigationData::Pointer> GetNavigationDatasFromFile(std::string filename);

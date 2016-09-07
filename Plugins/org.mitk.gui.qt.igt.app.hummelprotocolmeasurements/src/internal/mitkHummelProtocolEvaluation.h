@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMatrix.h>
 
 
+
 namespace mitk
 {
 
@@ -74,6 +75,11 @@ namespace mitk
      *  to an array representing the hummel board.
      */
     static itk::Matrix<itk::Point<double, 3>, 9, 10> ParseMatrixStandardVolume(mitk::PointSet::Pointer p);
+
+    /** Computes statistics (as mean, standard deviation, quantiles, min, max, etc.) on the given values.
+     *  The results are stored inside the return value.
+     */
+    static std::vector<HummelProtocolDistanceError> ComputeStatistics(std::vector<HummelProtocolDistanceError> values);
 
   };
 } // namespace mitk

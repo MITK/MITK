@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQuaternionAveraging.h>
 #include <mitkTransform.h>
 #include <mitkStaticIGTHelperFunctions.h>
-#include "mitkHummelProtocolEvaluation.h"
+
 
 //ITK
 #include <itksys/SystemTools.hxx>
@@ -360,7 +360,11 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
     mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
   }
 
-
+  //write results to file
+  std::stringstream filename5cm;
+  filename5cm << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".results5cm.csv";
+  MITK_INFO << "Writing output to file " << filename5cm.str();
+  writeToFile(filename5cm.str(), results5cm);
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
@@ -1057,4 +1061,17 @@ mitk::Quaternion QmitkIGTTrackingDataEvaluationView::GetSLERPAverage(mitk::Navig
   average = myAverager->CalcAverage(quaternions);
 
   return average;
+}
+
+void QmitkIGTTrackingDataEvaluationView::writeToFile(std::string filename, std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> values)
+{
+  std::fstream currentFile;
+  currentFile.open(filename.c_str(), std::ios::out);
+  if (currentFile.bad()) { MITK_WARN << "Cannot open file, aborting!"; return; }
+  currentFile << "Description" << ";" << "Error[mm]" << "\n";
+  for (auto currentError : values)
+  {
+    currentFile << currentError.description << ";" << currentError.distanceError << "\n";
+  }
+  currentFile.close();
 }

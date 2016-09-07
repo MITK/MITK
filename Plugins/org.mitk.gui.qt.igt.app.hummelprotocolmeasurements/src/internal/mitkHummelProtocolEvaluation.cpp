@@ -16,6 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include "mitkHummelProtocolEvaluation.h"
 
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/moment.hpp>
+#include <boost/accumulators/statistics/tail_quantile.hpp>
+#include <boost/math/distributions/normal.hpp>
+#include <algorithm>
+
 bool mitk::HummelProtocolEvaluation::Evaluate15cmDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
 {
   if (m != mitk::HummelProtocolEvaluation::standard) { MITK_WARN << "15 cm distances are only evaluated for standard volumes, aborting!"; return false; }
@@ -56,7 +65,7 @@ bool mitk::HummelProtocolEvaluation::Evaluate15cmDistances(mitk::PointSet::Point
       descriptions.push_back(description.str());
     }
 
-  //compute all errors as return value and print them to the console
+  //compute all errors
   for (int i = 0; i < distances.size(); i++)
   {
     HummelProtocolDistanceError currentError;
@@ -64,6 +73,14 @@ bool mitk::HummelProtocolEvaluation::Evaluate15cmDistances(mitk::PointSet::Point
     currentError.description = descriptions.at(i);
     Results.push_back(currentError);
     MITK_INFO << "Error " << currentError.description << " : " << currentError.distanceError;
+  }
+
+  //compute statistics
+  std::vector<HummelProtocolDistanceError> statistics = mitk::HummelProtocolEvaluation::ComputeStatistics(Results);
+  for (auto currentError : statistics)
+  {
+    Results.push_back(currentError);
+    MITK_INFO << currentError.description << " : " << currentError.distanceError;
   }
 
   return true;
@@ -186,24 +203,25 @@ for (int column = 0; column < 10; column++)
 break;
 }
 
-
-HummelProtocolDistanceError meanError;
-meanError.distanceError = 0;
-meanError.description = "Mean Error";
+//compute all errors
 for (int i = 0; i < distances.size(); i++)
 {
 HummelProtocolDistanceError currentError;
 currentError.distanceError = abs(distances.at(i) - (double)50.0);
 currentError.description = descriptions.at(i);
 Results.push_back(currentError);
-meanError.distanceError += currentError.distanceError;
 MITK_INFO << "Error " << currentError.description << " : " << currentError.distanceError;
 }
-meanError.distanceError /= distances.size();
-Results.push_back(meanError);
-MITK_INFO << "Mean error : " << meanError.distanceError;
 
-return false;
+//compute statistics
+std::vector<HummelProtocolDistanceError> statistics = mitk::HummelProtocolEvaluation::ComputeStatistics(Results);
+for (auto currentError : statistics)
+{
+  Results.push_back(currentError);
+  MITK_INFO << currentError.description << " : " << currentError.distanceError;
+}
+
+return true;
 }
 
 itk::Matrix<itk::Point<double, 3>, 9, 10> mitk::HummelProtocolEvaluation::ParseMatrixStandardVolume(mitk::PointSet::Pointer p)
@@ -217,4 +235,47 @@ itk::Matrix<itk::Point<double, 3>, 9, 10> mitk::HummelProtocolEvaluation::ParseM
   for (int row = 0; row < 9; row++)
     for (int column = 0; column < 10; column++)
       returnValue[row][column] = p->GetPoint(row * 10 + column);
+}
+
+std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> mitk::HummelProtocolEvaluation::ComputeStatistics(std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> values)
+{
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> returnValue;
+
+  //convert input values to boost / using boost accumulators for statistics
+  boost::accumulators::accumulator_set<double, boost::accumulators::features<boost::accumulators::tag::mean,
+                                                                             //boost::accumulators::tag::median,
+                                                                             boost::accumulators::tag::variance,
+                                                                             boost::accumulators::tag::max,
+                                                                             boost::accumulators::tag::min
+                                                                             //boost::accumulators::tag::tail<boost::accumulators::left>
+                                                                          > > acc;
+  for (mitk::HummelProtocolEvaluation::HummelProtocolDistanceError each : values)
+  {
+    acc(each.distanceError);
+  }
+
+  returnValue.push_back({ boost::accumulators::mean(acc), "Mean" });
+  //double quantile25th = boost::accumulators::quantile(acc, boost::accumulators::quantile_probability = 0.25);
+  //returnValue.push_back({ boost::accumulators::median(acc), "Median" });
+  returnValue.push_back({ boost::accumulators::variance(acc), "Variance" });
+  returnValue.push_back({ boost::accumulators::min(acc), "Min" });
+  returnValue.push_back({ boost::accumulators::max(acc), "Max" });
+
+  //don't get the boost stuff working correctly, so computing the quantiles and median by myself:
+  std::vector<double> quantile;
+  for (mitk::HummelProtocolEvaluation::HummelProtocolDistanceError each : values)
+    {quantile.push_back(each.distanceError);}
+
+  auto const Q1 = quantile.size() / 4;
+  auto const Q2 = quantile.size() / 2;
+  auto const Q3 = Q1 + Q2;
+
+  std::sort(quantile.begin(),quantile.end());
+
+  returnValue.push_back({ quantile[Q1], "Quartile 1" });
+  returnValue.push_back({ quantile[Q2], "Median" });
+  returnValue.push_back({ quantile[Q3], "Quartile 3" });
+
+  return returnValue;
+
 }

@@ -16,8 +16,80 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _USE_MATH_DEFINES
 #include "mitkHummelProtocolEvaluation.h"
 
+bool mitk::HummelProtocolEvaluation::Evaluate15cmDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
+{
+  if (m != mitk::HummelProtocolEvaluation::standard) { MITK_WARN << "15 cm distances are only evaluated for standard volumes, aborting!"; return false; }
+
+  MITK_INFO << "########### 15 cm distance errors #############";
+
+  //convert measurements to matrix
+  itk::Matrix<itk::Point<double, 3>, 9, 10>  matrix = ParseMatrixStandardVolume(p);
+
+  //these are the variables for the results:
+  std::vector<double> distances;
+  std::vector<std::string> descriptions;
+
+  //evaluation of rows
+  int distanceCounter = 0;
+  for (int row = 0; row < 9; row++) //rows
+    for (int distance = 0; distance < 7; distance++)
+    {
+      distanceCounter++;
+      mitk::Point3D point1 = p->GetPoint(row * 10 + distance);
+      mitk::Point3D point2 = p->GetPoint(row * 10 + distance + 3);
+      distances.push_back(point1.EuclideanDistanceTo(point2));
+      std::stringstream description;
+      description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (distance + 1) << " to " << (row + 1) << "/" << (distance + 4);
+      descriptions.push_back(description.str());
+    }
+
+  //evaluation of columns
+  for (int column = 0; column < 10; column++)
+    for (int row = 0; row < 6; row++)
+    {
+      distanceCounter++;
+      mitk::Point3D point1 = matrix[row][column];
+      mitk::Point3D point2 = matrix[row + 3][column];
+      distances.push_back(point1.EuclideanDistanceTo(point2));
+      std::stringstream description;
+      description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (column + 1) << " to " << (row + 4) << "/" << (column + 1);
+      descriptions.push_back(description.str());
+    }
+
+  //compute all errors as return value and print them to the console
+  for (int i = 0; i < distances.size(); i++)
+  {
+    HummelProtocolDistanceError currentError;
+    currentError.distanceError = abs(distances.at(i) - (double)150.0);
+    currentError.description = descriptions.at(i);
+    Results.push_back(currentError);
+    MITK_INFO << "Error " << currentError.description << " : " << currentError.distanceError;
+  }
+
+  return true;
+}
+
+bool mitk::HummelProtocolEvaluation::Evaluate30cmDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
+{
+  if (m != mitk::HummelProtocolEvaluation::standard) { MITK_WARN << "30 cm distances are only evaluated for standard volumes, aborting!"; return false; }
+  //convert measurements to matrix
+  itk::Matrix<itk::Point<double, 3>, 9, 10>  matrix = ParseMatrixStandardVolume(p);
+  return false;
+}
+
+bool mitk::HummelProtocolEvaluation::EvaluateAccumulatedDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
+{
+  if (m != mitk::HummelProtocolEvaluation::standard) { MITK_WARN << "Accumulated distances are only evaluated for standard volumes, aborting!"; return false; }
+  //convert measurements to matrix
+  itk::Matrix<itk::Point<double, 3>, 9, 10>  matrix = ParseMatrixStandardVolume(p);
+  return false;
+}
+
+
+
 bool mitk::HummelProtocolEvaluation::Evaluate5cmDistances(mitk::PointSet::Pointer p, HummelProtocolMeasurementVolume m, std::vector<HummelProtocolDistanceError> &Results)
 {
+MITK_INFO << "########### 5 cm distance errors #############";
 std::vector<double> distances;
 std::vector<std::string> descriptions;
 switch (m)
@@ -83,10 +155,7 @@ MITK_INFO << "Computing Hummel protocol distance errors for standard measurement
 int distanceCounter = 0;
 
 //convert measurements to matrix
-mitk::Point3D matrix[9][10];
-for (int row = 0; row < 9; row++)
-  for (int column = 0; column < 10; column++)
-    matrix[row][column] = p->GetPoint(row * 10 + column);
+itk::Matrix<itk::Point<double, 3>, 9, 10>  matrix = ParseMatrixStandardVolume(p);
 
 //evaluation of rows
 for (int row = 0; row < 9; row++) //rows
@@ -135,4 +204,17 @@ Results.push_back(meanError);
 MITK_INFO << "Mean error : " << meanError.distanceError;
 
 return false;
+}
+
+itk::Matrix<itk::Point<double, 3>, 9, 10> mitk::HummelProtocolEvaluation::ParseMatrixStandardVolume(mitk::PointSet::Pointer p)
+{
+  itk::Matrix<itk::Point<double, 3>, 9, 10> returnValue = itk::Matrix<itk::Point<double, 3>, 9, 10>();
+  if (p->GetSize() != 90)
+  {
+    MITK_WARN << "PointSet does not have the right size. Expected 90 got " << p->GetSize() << " ... aborting!";
+    return returnValue;
+  }
+  for (int row = 0; row < 9; row++)
+    for (int column = 0; column < 10; column++)
+      returnValue[row][column] = p->GetPoint(row * 10 + column);
 }

@@ -346,11 +346,21 @@ void QmitkIGTTrackingDataEvaluationView::OnLoadFileList()
 
 void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
 {
-  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> results5cm;
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> results5cm, results15cm, results30cm, resultsAccum;
   mitk::HummelProtocolEvaluation::HummelProtocolMeasurementVolume volume;
-  if (m_Controls->m_standardVolume->isChecked()) volume = mitk::HummelProtocolEvaluation::standard;
-  else volume = mitk::HummelProtocolEvaluation::small;
-  mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume , results5cm);
+  if (m_Controls->m_standardVolume->isChecked())
+  {
+    volume = mitk::HummelProtocolEvaluation::standard;
+    mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
+    mitk::HummelProtocolEvaluation::Evaluate15cmDistances(m_PointSetMeanPositions, volume, results15cm);
+  }
+  else
+  {
+    volume = mitk::HummelProtocolEvaluation::small;
+    mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
+  }
+
+
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()

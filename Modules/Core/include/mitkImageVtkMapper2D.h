@@ -237,6 +237,7 @@ protected:
       \param renderer: Pointer to the renderer containing the needed information
       \note This code is based on code from the iil library.
       */
+  template<typename PixelType>
   vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer* renderer);
 
   /** Default constructor */
@@ -302,6 +303,9 @@ protected:
   bool RenderingGeometryIntersectsImage( const PlaneGeometry* renderingGeometry, SlicedGeometry3D* imageGeometry );
 };
 
+
 } // namespace mitk
+
+#include "mitkImageVtkMapper2D.txx"
 
 #endif /* MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E */

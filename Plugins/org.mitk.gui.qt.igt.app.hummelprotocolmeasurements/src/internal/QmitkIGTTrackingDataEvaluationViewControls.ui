@@ -101,6 +101,55 @@
         </layout>
        </item>
        <item>
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string>(1) - VISUALIZATION - of all data sets:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
+         <item>
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>Prefix for Data Nodes:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="m_prefix"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_GeneratePointSetOfMeanPositions">
+         <property name="text">
+          <string>Generate PointSet of Mean Positions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_GeneratePointSetsOfSinglePositions">
+         <property name="text">
+          <string>Generate PointSets of Single Positions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_GenerateRotationLines">
+         <property name="text">
+          <string>Generate Lines for Rotation</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="Line" name="line_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -110,7 +159,7 @@
        <item>
         <widget class="QLabel" name="label_19">
          <property name="text">
-          <string>(1) Evaluation per file / data set:</string>
+          <string>(3) - JITTER - Evaluation per file / data set:</string>
          </property>
         </widget>
        </item>
@@ -152,7 +201,7 @@
            <property name="minimumSize">
             <size>
              <width>220</width>
-             <height>50</height>
+             <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -182,55 +231,6 @@
         </layout>
        </item>
        <item>
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_17">
-         <property name="text">
-          <string>(2) Visualization of all data sets:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_17">
-         <item>
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>Prefix for Data Nodes:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="m_prefix"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QPushButton" name="m_GeneratePointSetOfMeanPositions">
-         <property name="text">
-          <string>Generate PointSet of Mean Positions</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="m_GeneratePointSetsOfSinglePositions">
-         <property name="text">
-          <string>Generate PointSets of Single Positions</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="m_GenerateRotationLines">
-         <property name="text">
-          <string>Generate Lines for Rotation</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="Line" name="line_5">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -240,7 +240,7 @@
        <item>
         <widget class="QLabel" name="label_20">
          <property name="text">
-          <string>(3) Evaluation of all data sets:</string>
+          <string>(3) - ACCURACY - Evaluation of all data sets:</string>
          </property>
         </widget>
        </item>
@@ -264,7 +264,7 @@
            <property name="minimumSize">
             <size>
              <width>220</width>
-             <height>50</height>
+             <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
@@ -280,6 +280,137 @@
          </item>
          <item>
           <spacer name="horizontalSpacer_17">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_6">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_21">
+         <property name="text">
+          <string>(4) - GRID MATCHING - Evaluation of all data sets:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_19">
+         <item>
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Reference PointSet:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_20">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QmitkDataStorageComboBox" name="m_ReferencePointSetComboBox">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>Measurement PointSet:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_21">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QmitkDataStorageComboBox" name="m_MeasurementPointSetComboBox">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_18">
+         <item>
+          <spacer name="horizontalSpacer_18">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_GridMatching">
+           <property name="minimumSize">
+            <size>
+             <width>220</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>PERFOM GRID MATCHING</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_19">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -1030,6 +1161,13 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

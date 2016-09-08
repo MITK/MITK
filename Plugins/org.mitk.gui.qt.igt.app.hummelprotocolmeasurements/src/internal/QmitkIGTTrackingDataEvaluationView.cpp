@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkQuaternionAveraging.h>
 #include <mitkTransform.h>
 #include <mitkStaticIGTHelperFunctions.h>
+#include <mitkNodePredicateDataType.h>
 
 
 //ITK
@@ -84,7 +85,68 @@ void QmitkIGTTrackingDataEvaluationView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_OrientationCalculationWriteOrientationsToFile, SIGNAL(clicked()), this, SLOT(OnOrientationCalculation_CalcOrientandWriteToFile()));
     connect(m_Controls->m_GeneratePointSetsOfSinglePositions, SIGNAL(clicked()), this, SLOT(OnGeneratePointSetsOfSinglePositions()));
     connect(m_Controls->m_StartEvaluationAll, SIGNAL(clicked()), this, SLOT(OnEvaluateDataAll()));
+    connect(m_Controls->m_GridMatching, SIGNAL(clicked()), this, SLOT(OnPerfomGridMatching()));
+
+    //initialize data storage combo boxes
+    m_Controls->m_ReferencePointSetComboBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_ReferencePointSetComboBox->SetAutoSelectNewItems(true);
+    m_Controls->m_ReferencePointSetComboBox->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
+    m_Controls->m_MeasurementPointSetComboBox->SetDataStorage(this->GetDataStorage());
+    m_Controls->m_MeasurementPointSetComboBox->SetAutoSelectNewItems(true);
+    m_Controls->m_MeasurementPointSetComboBox->SetPredicate(mitk::NodePredicateDataType::New("PointSet"));
   }
+}
+
+void QmitkIGTTrackingDataEvaluationView::OnPerfomGridMatching()
+{
+  mitk::PointSet::Pointer reference = dynamic_cast<mitk::PointSet*>(m_Controls->m_ReferencePointSetComboBox->GetSelectedNode()->GetData());
+  mitk::PointSet::Pointer measurement = dynamic_cast<mitk::PointSet*>(m_Controls->m_MeasurementPointSetComboBox->GetSelectedNode()->GetData());
+  //convert point sets to vtk poly data
+  vtkSmartPointer<vtkPoints> sourcePoints = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> targetPoints = vtkSmartPointer<vtkPoints>::New();
+  for (int i = 0; i<reference->GetSize(); i++)
+  {
+    MITK_INFO << "Point added " << i;
+    double point[3] = { reference->GetPoint(i)[0], reference->GetPoint(i)[1], reference->GetPoint(i)[2] };
+    sourcePoints->InsertNextPoint(point);
+    double point_targets[3] = { measurement->GetPoint(i)[0], measurement->GetPoint(i)[1], measurement->GetPoint(i)[2] };
+    targetPoints->InsertNextPoint(point_targets);
+  }
+  //compute transform
+  vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
+  transform->SetSourceLandmarks(sourcePoints);
+  transform->SetTargetLandmarks(targetPoints);
+  transform->SetModeToRigidBody();
+  transform->Modified();
+  transform->Update();
+  //compute FRE of transform
+  double FRE = mitk::StaticIGTHelperFunctions::ComputeFRE(reference, measurement, transform);
+  MITK_INFO << "FRE after grid matching: " + QString::number(FRE) + " mm";
+  //convert from vtk to itk data types
+  itk::Matrix<float, 3, 3> rotationFloat = itk::Matrix<float, 3, 3>();
+  itk::Vector<float, 3> translationFloat = itk::Vector<float, 3>();
+  itk::Matrix<double, 3, 3> rotationDouble = itk::Matrix<double, 3, 3>();
+  itk::Vector<double, 3> translationDouble = itk::Vector<double, 3>();
+
+  vtkSmartPointer<vtkMatrix4x4> m = transform->GetMatrix();
+  for (int k = 0; k<3; k++) for (int l = 0; l<3; l++)
+  {
+    rotationFloat[k][l] = m->GetElement(k, l);
+    rotationDouble[k][l] = m->GetElement(k, l);
+
+  }
+  for (int k = 0; k<3; k++)
+  {
+    translationFloat[k] = m->GetElement(k, 3);
+    translationDouble[k] = m->GetElement(k, 3);
+  }
+  //create affine transform 3D
+  mitk::AffineTransform3D::Pointer mitkTransform = mitk::AffineTransform3D::New();
+  mitkTransform->SetMatrix(rotationDouble);
+  mitkTransform->SetOffset(translationDouble);
+  mitk::NavigationData::Pointer transformNavigationData = mitk::NavigationData::New(mitkTransform);
+  m_Controls->m_ReferencePointSetComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(mitkTransform);
+  m_Controls->m_ReferencePointSetComboBox->GetSelectedNode()->GetData()->GetGeometry()->Modified();
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcRef()
@@ -537,6 +599,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSet()
   QString name = this->m_Controls->m_prefix->text() + "PointSet_of_Mean_Positions";
   newNode->SetName(name.toStdString());
   newNode->SetData(generatedPointSet);
+  newNode->SetFloatProperty("pointsize", 5);
   this->GetDataStorage()->Add(newNode);
   m_PointSetMeanPositions = generatedPointSet;
 }
@@ -633,9 +696,9 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateGroundTruthPointSet()
   int currentPointID = 0;
   mitk::Point3D currentPoint;
   mitk::FillVector3D(currentPoint, 0, 0, 0);
-  for (int i = 0; i < m_Controls->m_PointNumber1->value(); i++)
+  for (int i = 0; i < m_Controls->m_PointNumber2->value(); i++)
   {
-    for (int j = 0; j < m_Controls->m_PointNumber2->value(); j++)
+    for (int j = 0; j < m_Controls->m_PointNumber1->value(); j++)
     {
       generatedPointSet->InsertPoint(currentPointID, currentPoint);
       currentPointID++;
@@ -648,6 +711,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateGroundTruthPointSet()
   QString nodeName = "GroundTruthPointSet_" + QString::number(m_Controls->m_PointNumber1->value()) + "x" + QString::number(m_Controls->m_PointNumber2->value()) + "_(" + QString::number(m_Controls->m_PointDistance->value()) + "mm)";
   newNode->SetName(nodeName.toStdString());
   newNode->SetData(generatedPointSet);
+  newNode->SetFloatProperty("pointsize", 5);
   this->GetDataStorage()->Add(newNode);
 }
 

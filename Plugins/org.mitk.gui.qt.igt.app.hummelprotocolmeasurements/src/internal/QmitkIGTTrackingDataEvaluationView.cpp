@@ -525,7 +525,13 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
     //connect pipeline
     for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
 
-    //update pipline until number of samlples is reached
+    if (myPlayer->GetNumberOfSnapshots() < m_Controls->m_NumberOfSamples->value())
+    {
+      MITK_WARN << "Number of snapshots (" << myPlayer->GetNumberOfSnapshots() << ") smaller than number of samples to evaluate (" << m_Controls->m_NumberOfSamples->value() << ") ! Cannot proceed!";
+      return;
+    }
+
+    //update pipline until number of samples is reached
     for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++)
     {
       myEvaluationFilter->Update();

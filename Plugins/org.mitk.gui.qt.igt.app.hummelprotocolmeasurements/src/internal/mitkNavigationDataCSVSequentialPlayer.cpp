@@ -68,7 +68,10 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetEmptyN
   emptyNd->SetDataValid(false);
   return emptyNd;
 }
-
+int mitk::NavigationDataCSVSequentialPlayer::GetNumberOfSnapshots()
+{
+  return m_NavigationDatas.size();
+}
 void mitk::NavigationDataCSVSequentialPlayer::GenerateData()
 {
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
@@ -123,11 +126,23 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
   {
     //read out file
     file.seekg(0L, std::ios::beg);  // move to begin of file
+
+    int count = 0;
+    int count2 = 0;
     while (!file.eof())
     {
       std::string buffer;
       std::getline(file, buffer);    // read out file line by line
-      if (buffer.size() > 0) readData.push_back(buffer);
+
+      //for Polhemus tracker: just take every 24th sample
+      if (count == 0) if (buffer.size() > 0)
+      {
+        MITK_INFO << "read(" << count2 << "): " << buffer.substr(0,30);
+        count2++;
+        readData.push_back(buffer);
+      }
+
+      count++; if (count == 24) count = 0;
     }
   }
 
@@ -165,10 +180,10 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
     valid = true; //if no valid flag is given: simply set to true
 
-    /*
+
     //############# Variant for the Aurora measurements ###############
     //#############   (CUSTOM .csv files from MITK)     ###############
-
+    /*
     position[0] = myLineList.at(3).toDouble();
     position[1] = myLineList.at(4).toDouble();
     position[2] = myLineList.at(5).toDouble();
@@ -189,6 +204,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     //for this special rotation evaliation (no matter
     //if it turns 11.25 degree to left or right). For
     //other usage this might be important to adapt!
+
 
     position[0] = myLineList.at(4).toDouble();
     position[1] = myLineList.at(5).toDouble();

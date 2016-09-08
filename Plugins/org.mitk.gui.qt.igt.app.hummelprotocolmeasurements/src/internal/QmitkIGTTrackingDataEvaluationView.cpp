@@ -187,6 +187,15 @@ void QmitkIGTTrackingDataEvaluationView::OnPerfomGridMatching()
   mitk::NavigationData::Pointer transformNavigationData = mitk::NavigationData::New(mitkTransform);
   m_Controls->m_ReferencePointSetComboBox->GetSelectedNode()->GetData()->GetGeometry()->SetIndexToWorldTransform(mitkTransform);
   m_Controls->m_ReferencePointSetComboBox->GetSelectedNode()->GetData()->GetGeometry()->Modified();
+
+  //write to file
+
+  std::stringstream filename;
+  filename << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".GridMatchingResult.csv";
+  MITK_INFO << "Writing output to file " << filename.str();
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> FRE_Error;
+  FRE_Error.push_back({ FRE, "FRE after grid matching [mm]" });
+  writeToFile(filename.str(), FRE_Error);
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcRef()

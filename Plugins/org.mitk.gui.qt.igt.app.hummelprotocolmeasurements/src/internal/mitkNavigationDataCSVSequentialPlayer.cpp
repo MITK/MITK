@@ -128,7 +128,7 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
     file.seekg(0L, std::ios::beg);  // move to begin of file
 
     int count = 0;
-    int count2 = 0;
+    //int count2 = 0;
     while (!file.eof())
     {
       std::string buffer;
@@ -137,8 +137,8 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
       //for Polhemus tracker: just take every 24th sample
       if (count == 0) if (buffer.size() > 0)
       {
-        MITK_INFO << "read(" << count2 << "): " << buffer.substr(0,30);
-        count2++;
+        //MITK_INFO << "read(" << count2 << "): " << buffer.substr(0,30);
+        //count2++;
         readData.push_back(buffer);
       }
 

@@ -338,6 +338,7 @@ std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> mitk::H
     acc(each.distanceError);
   }
 
+  returnValue.push_back({ values.size(), "N" });
   returnValue.push_back({ boost::accumulators::mean(acc), "Mean" });
   //double quantile25th = boost::accumulators::quantile(acc, boost::accumulators::quantile_probability = 0.25);
   //returnValue.push_back({ boost::accumulators::median(acc), "Median" });

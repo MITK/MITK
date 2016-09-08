@@ -341,11 +341,11 @@ std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> mitk::H
   returnValue.push_back({ boost::accumulators::mean(acc), "Mean" });
   //double quantile25th = boost::accumulators::quantile(acc, boost::accumulators::quantile_probability = 0.25);
   //returnValue.push_back({ boost::accumulators::median(acc), "Median" });
-  returnValue.push_back({ boost::accumulators::variance(acc), "Variance" });
+  //returnValue.push_back({ boost::accumulators::variance(acc), "Variance" });
   returnValue.push_back({ boost::accumulators::min(acc), "Min" });
   returnValue.push_back({ boost::accumulators::max(acc), "Max" });
 
-  //don't get the boost stuff working correctly, so computing the quantiles and median by myself:
+  //don't get the boost stuff working correctly, so computing the quantiles, median and standard deviation by myself:
   std::vector<double> quantile;
   for (mitk::HummelProtocolEvaluation::HummelProtocolDistanceError each : values)
     {quantile.push_back(each.distanceError);}
@@ -359,6 +359,24 @@ std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> mitk::H
   returnValue.push_back({ quantile[Q1], "Quartile 1" });
   returnValue.push_back({ quantile[Q2], "Median" });
   returnValue.push_back({ quantile[Q3], "Quartile 3" });
+
+  double mean = boost::accumulators::mean(acc);
+  double errorSum = 0;
+  for (mitk::HummelProtocolEvaluation::HummelProtocolDistanceError each : values)
+  {
+    double error = pow((each.distanceError - mean),2);
+    errorSum += error;
+  }
+  double variance = errorSum / values.size();
+  double sampleVariance = errorSum / (values.size()-1);
+  double standardDev = sqrt(variance);
+  double sampleStandardDev = sqrt(sampleVariance);
+
+  returnValue.push_back({ variance, "Variance" });
+  returnValue.push_back({ sampleVariance, "Sample Variance" });
+  returnValue.push_back({ standardDev, "Standard Deviation" });
+  returnValue.push_back({ sampleStandardDev, "Sample Standard Deviation" });
+
 
   return returnValue;
 

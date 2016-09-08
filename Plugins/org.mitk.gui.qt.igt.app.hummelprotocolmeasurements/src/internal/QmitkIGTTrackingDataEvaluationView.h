@@ -68,6 +68,7 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     void OnCSVtoXMLLoadInputList();
     void OnCSVtoXMLLoadOutputList();
     void OnPerfomGridMatching();
+    void OnComputeRotation();
 
     /** Reads in exactly three position files als reference. */
     void OnOrientationCalculation_CalcRef();

@@ -97,7 +97,11 @@ itk::Matrix<double,3,3> mitk::StaticIGTHelperFunctions::ConvertEulerAnglesToRota
 
 double mitk::StaticIGTHelperFunctions::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)
 {
-  if (imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
+  if (imageFiducials->GetSize() != realWorldFiducials->GetSize())
+  {
+    MITK_WARN << "Cannot compute FRE, got different numbers of points (1: " << imageFiducials->GetSize() << " /2: " << realWorldFiducials->GetSize() << ")";
+    return -1;
+  }
   double FRE = 0;
   for (int i = 0; i < imageFiducials->GetSize(); i++)
   {

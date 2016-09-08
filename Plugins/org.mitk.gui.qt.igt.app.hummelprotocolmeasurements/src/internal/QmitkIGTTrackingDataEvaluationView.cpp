@@ -86,6 +86,7 @@ void QmitkIGTTrackingDataEvaluationView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_GeneratePointSetsOfSinglePositions, SIGNAL(clicked()), this, SLOT(OnGeneratePointSetsOfSinglePositions()));
     connect(m_Controls->m_StartEvaluationAll, SIGNAL(clicked()), this, SLOT(OnEvaluateDataAll()));
     connect(m_Controls->m_GridMatching, SIGNAL(clicked()), this, SLOT(OnPerfomGridMatching()));
+    connect(m_Controls->m_ComputeRotation, SIGNAL(clicked()), this, SLOT(OnComputeRotation()));
 
     //initialize data storage combo boxes
     m_Controls->m_ReferencePointSetComboBox->SetDataStorage(this->GetDataStorage());
@@ -97,6 +98,11 @@ void QmitkIGTTrackingDataEvaluationView::CreateQtPartControl(QWidget *parent)
   }
 }
 
+void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
+{
+
+}
+
 void QmitkIGTTrackingDataEvaluationView::OnPerfomGridMatching()
 {
   mitk::PointSet::Pointer reference = dynamic_cast<mitk::PointSet*>(m_Controls->m_ReferencePointSetComboBox->GetSelectedNode()->GetData());
@@ -106,7 +112,6 @@ void QmitkIGTTrackingDataEvaluationView::OnPerfomGridMatching()
   vtkSmartPointer<vtkPoints> targetPoints = vtkSmartPointer<vtkPoints>::New();
   for (int i = 0; i<reference->GetSize(); i++)
   {
-    MITK_INFO << "Point added " << i;
     double point[3] = { reference->GetPoint(i)[0], reference->GetPoint(i)[1], reference->GetPoint(i)[2] };
     sourcePoints->InsertNextPoint(point);
     double point_targets[3] = { measurement->GetPoint(i)[0], measurement->GetPoint(i)[1], measurement->GetPoint(i)[2] };
@@ -415,7 +420,7 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
     volume = mitk::HummelProtocolEvaluation::standard;
     mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
     mitk::HummelProtocolEvaluation::Evaluate15cmDistances(m_PointSetMeanPositions, volume, results15cm);
-    mitk::HummelProtocolEvaluation::Evaluate30cmDistances(m_PointSetMeanPositions, volume, results15cm);
+    mitk::HummelProtocolEvaluation::Evaluate30cmDistances(m_PointSetMeanPositions, volume, results30cm);
     mitk::HummelProtocolEvaluation::EvaluateAccumulatedDistances(m_PointSetMeanPositions, volume, resultsAccum);
   }
   else
@@ -456,6 +461,8 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
     return;
   }
 
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> jitterValues;
+
   //write output file header
   WriteHeader();
 
@@ -492,12 +499,26 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
       //std::cout << "Euler " << j << ";" << myPlayer->GetOutput()->GetOrientation().rotation_euler_angles()[0] << ";" << myPlayer->GetOutput()->GetOrientation().rotation_euler_angles()[1] << ";" << myPlayer->GetOutput()->GetOrientation().rotation_euler_angles()[2] << "\n";
     }
 
+    //store all jitter values in separate vector for statistics
+    jitterValues.push_back({ myEvaluationFilter->GetPositionErrorRMS(0), "RMS" });
+
     //write result to output file
     WriteDataSet(myEvaluationFilter, m_FilenameVector.at(i));
   }
 
-  //close output file
+  //close output file for single data
   m_CurrentWriteFile.close();
+
+  //compute statistics
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> jitterStatistics = mitk::HummelProtocolEvaluation::ComputeStatistics(jitterValues);
+  MITK_INFO << "## Jitter (RMS) statistics: ##";
+  for (auto jitterStat : jitterStatistics) {MITK_INFO << jitterStat.description << ": " << jitterStat.distanceError;}
+
+  //write statistic results to separate file
+  std::stringstream filenameJitterStat;
+  filenameJitterStat << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".resultsJitterStatistics.csv";
+  MITK_INFO << "Writing output to file " << filenameJitterStat.str();
+  writeToFile(filenameJitterStat.str(), jitterStatistics);
 
   //calculate angles if option is on
   if (m_Controls->m_settingDifferenceAngles->isChecked() || m_Controls->m_DifferencesSLERP->isChecked()) CalculateDifferenceAngles();

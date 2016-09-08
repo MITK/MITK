@@ -85,7 +85,7 @@ void OPOLaserControl::InitLaser()
   if (!m_LaserSystemConnected)
   {
     m_OpotekLaserSystem = mitk::OpotekLaser::New();
-    m_OpotekLaserSystem->SetConfigurationPath("C:\\opotekPhocusMobileDkfz160907.ini");
+    m_OpotekLaserSystem->SetConfigurationPath("opotek_15033_SN3401_1905_1906_20160330.ini");
 
     if (m_OpotekLaserSystem->Initialize())
     {
@@ -96,9 +96,10 @@ void OPOLaserControl::InitLaser()
 
       m_Controls.sliderWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength());
       m_Controls.sliderWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength());
-      m_Controls.spinBoxWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength()/10.0);
-      m_Controls.spinBoxWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength()/10.0);
-      m_Controls.spinBoxWavelength->setValue(m_OpotekLaserSystem->GetWavelength()/10.0);
+      m_Controls.spinBoxWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength() / 10.0);
+      m_Controls.spinBoxWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength() / 10.0);
+      m_Controls.sliderWavelength->setValue(m_OpotekLaserSystem->GetWavelength());
+      m_Controls.spinBoxWavelength->setValue(m_OpotekLaserSystem->GetWavelength() / 10.0);
     }
     else
     {
@@ -116,13 +117,28 @@ void OPOLaserControl::InitLaser()
 }
 
 void OPOLaserControl::TuneWavelength()
-{}
+{
+  m_OpotekLaserSystem->TuneToWavelength(m_Controls.sliderWavelength->value());
+  QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
+  wavelengthText.append("nm");
+  m_Controls.labelWavelength->setText(wavelengthText);
+}
 
 void OPOLaserControl::ToggleFlashlamp()
-{}
+{
+  if(!m_OpotekLaserSystem->IsFlashing())
+    m_OpotekLaserSystem->StartFlashing();
+  else
+    m_OpotekLaserSystem->StopFlashing();
+}
 
 void OPOLaserControl::ToggleQSwitch()
-{}
+{
+  if (!m_OpotekLaserSystem->IsEmitting())
+    m_OpotekLaserSystem->StartQswitching();
+  else
+    m_OpotekLaserSystem->StopQswitching();
+}
 
 
 

@@ -24,7 +24,9 @@ mitk::OpotekLaser::OpotekLaser() :
   m_ErrorCode(0),
   m_WavelengthMin(0),
   m_WavelengthMax(0),
-  m_CurrentWavelengthInNmTenths(0)
+  m_CurrentWavelengthInNmTenths(0),
+  m_IsFlashing(false),
+  m_IsEmitting(false)
 {
   m_ErrorMessages[0] = "No Error";
   m_ErrorMessages[10000] = "No Error";
@@ -86,6 +88,8 @@ bool mitk::OpotekLaser::Initialize()
   else
     MITK_INFO << "[Laser Debug] Signal wavelength range is " << m_WavelengthMin << "nm to " << m_WavelengthMax << "nm";
 
+  m_CurrentWavelengthInNmTenths = 7500;
+
   OPOTEK_Laser(0, 0, "", &m_ErrorCode);
   if (m_ErrorCode)
   {
@@ -136,10 +140,11 @@ bool mitk::OpotekLaser::StartFlashing()
   if (m_ErrorCode)
   {
     MITK_ERROR << "[Laser Debug] OPOTEK_Laser(1,1,[...]) StartFlashing returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
-    return false;
+    m_IsFlashing = false;
   }
   else
-    return true;
+    m_IsFlashing = true;
+  return m_IsFlashing;
 }
 
 bool mitk::OpotekLaser::StopFlashing()
@@ -148,10 +153,11 @@ bool mitk::OpotekLaser::StopFlashing()
   if (m_ErrorCode)
   {
     MITK_ERROR << "[Laser Debug] OPOTEK_Laser(1,0,[...]) StopFlashing returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
-    return false;
+    m_IsFlashing = true;
   }
   else
-    return true;
+    m_IsFlashing = false;
+  return !m_IsFlashing;
 }
 
 bool mitk::OpotekLaser::StartQswitching()
@@ -160,10 +166,11 @@ bool mitk::OpotekLaser::StartQswitching()
   if (m_ErrorCode)
   {
     MITK_ERROR << "[Laser Debug] OPOTEK_Laser(2,1,[...]) StartQswitching returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
-    return false;
+    m_IsEmitting = false;
   }
   else
-    return true;
+    m_IsEmitting = true;
+  return m_IsEmitting;
 }
 
 bool mitk::OpotekLaser::StopQswitching()
@@ -172,10 +179,11 @@ bool mitk::OpotekLaser::StopQswitching()
   if (m_ErrorCode)
   {
     MITK_ERROR << "[Laser Debug] OPOTEK_Laser(2,0,[...]) StopQswitching returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
-    return false;
+    m_IsEmitting = true;
   }
   else
-    return true;
+    m_IsEmitting = false;
+  return !m_IsEmitting;
 }
 
 int mitk::OpotekLaser::GetMinWavelength()
@@ -189,4 +197,12 @@ int mitk::OpotekLaser::GetMaxWavelength()
 int mitk::OpotekLaser::GetWavelength()
 {
   return m_CurrentWavelengthInNmTenths;
+}
+bool mitk::OpotekLaser::IsFlashing()
+{
+  return m_IsFlashing;
+}
+bool mitk::OpotekLaser::IsEmitting()
+{
+  return m_IsEmitting;
 }

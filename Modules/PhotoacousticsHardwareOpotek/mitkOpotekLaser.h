@@ -41,7 +41,8 @@ namespace mitk {
 
       virtual bool StartQswitching();
       virtual bool StopQswitching();
-
+      virtual bool IsFlashing();
+      virtual bool IsEmitting();
       virtual int GetMinWavelength();
       virtual int GetMaxWavelength();
       virtual int GetWavelength();
@@ -62,6 +63,8 @@ namespace mitk {
       double m_WavelengthMin;
       int m_CurrentWavelengthInNmTenths;
 
+      bool m_IsFlashing;
+      bool m_IsEmitting;
     };
 } // namespace mitk
 

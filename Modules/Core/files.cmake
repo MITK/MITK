@@ -258,6 +258,8 @@ set(CPP_FILES
 
   Rendering/mitkAbstractOverlayLayouter.cpp
   Rendering/mitkAbstractAnnotationRenderer.cpp
+  Rendering/mitkIAnnotationService.cpp
+  Rendering/mitkAnnotationService.cpp
   Rendering/mitkOverlay2DLayouter.cpp
   Rendering/mitkBaseRenderer.cpp
   #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module

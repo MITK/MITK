@@ -125,6 +125,12 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
 
     /** @brief Stores the mean positions of all evaluated data */
     mitk::PointSet::Pointer m_PointSetMeanPositions;
+
+    /** @return returns the mean orientation of all given data */
+    std::vector<mitk::Quaternion> GetMeanOrientationsOfAllData(std::vector<mitk::NavigationDataEvaluationFilter::Pointer> allData, bool useSLERP = false);
+
+    /** @return returns all data read from the data list as NavigationDataEvaluationFilters */
+    std::vector<mitk::NavigationDataEvaluationFilter::Pointer> GetAllDataFromUIList();
 };
 
 

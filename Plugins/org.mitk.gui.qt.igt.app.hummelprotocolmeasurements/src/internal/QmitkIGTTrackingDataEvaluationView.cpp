@@ -100,7 +100,42 @@ void QmitkIGTTrackingDataEvaluationView::CreateQtPartControl(QWidget *parent)
 
 void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
 {
+  //Get all data from UI
+  auto EvaluationDataCollection = GetAllDataFromUIList();
+  //Compute mean Quaternions
+  auto OrientationVector = GetMeanOrientationsOfAllData(EvaluationDataCollection);
 
+  //Compute Rotations
+
+  itk::Vector<double> rotationVec;
+  //adapt for Aurora 5D tools: [0,0,1000]
+  rotationVec[0] = 0; //X
+  rotationVec[1] = 0; //Y
+  rotationVec[2] = 10000; //Z
+
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> allOrientationErrors;
+  for (int i = 0; i < (OrientationVector.size() - 1); i++)
+  {
+    double AngleBetweenTwoQuaternions = mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(OrientationVector.at(i), OrientationVector.at(i+1), rotationVec);
+    double AngularError = abs(AngleBetweenTwoQuaternions - 11.25);
+    std::stringstream description;
+    description << "Rotation Error ROT" << (i + 1) << " / ROT" << (i + 2);
+    allOrientationErrors.push_back({ AngularError, description.str() });
+    MITK_INFO << description.str() << ": " << AngularError;
+  }
+
+  //compute statistics
+  std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> orientationErrorStatistics;
+  orientationErrorStatistics = mitk::HummelProtocolEvaluation::ComputeStatistics(allOrientationErrors);
+  MITK_INFO << "## Rotation error statistics: ##";
+  for (auto stat : orientationErrorStatistics) { MITK_INFO << stat.description << ": " << stat.distanceError; }
+
+  //write results to file
+  allOrientationErrors.insert(allOrientationErrors.end(), orientationErrorStatistics.begin(), orientationErrorStatistics.end());
+  std::stringstream filenameOrientationStat;
+  filenameOrientationStat << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".orientationStatistics.csv";
+  MITK_INFO << "Writing output to file " << filenameOrientationStat.str();
+  writeToFile(filenameOrientationStat.str(), allOrientationErrors);
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnPerfomGridMatching()
@@ -964,7 +999,22 @@ void QmitkIGTTrackingDataEvaluationView::WriteDataSet(mitk::NavigationDataEvalua
   }
 }
 
-void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
+
+std::vector<mitk::Quaternion> QmitkIGTTrackingDataEvaluationView::GetMeanOrientationsOfAllData(std::vector<mitk::NavigationDataEvaluationFilter::Pointer> allData, bool useSLERP)
+{
+  std::vector<mitk::Quaternion> returnValue;
+
+  for (auto dataSet : allData)
+  {
+    if (useSLERP) returnValue.push_back(GetSLERPAverage(dataSet));
+    else returnValue.push_back(dataSet->GetQuaternionMean(0));
+  }
+
+  return returnValue;
+}
+
+
+std::vector<mitk::NavigationDataEvaluationFilter::Pointer> QmitkIGTTrackingDataEvaluationView::GetAllDataFromUIList()
 {
   std::vector<mitk::NavigationDataEvaluationFilter::Pointer> EvaluationDataCollection;
 
@@ -981,12 +1031,12 @@ void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
 
     //check if the stream is valid and skip file if not
     /*
-      if (!myPlayer->GetStreamValid())
-      {
-      MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
-      }
-      else
-      */
+    if (!myPlayer->GetStreamValid())
+    {
+    MITK_ERROR << "Error in file " << m_FilenameVector.at(i) << ": " << myPlayer->GetErrorMessage() << " ; Skipping file!";
+    }
+    else
+    */
     {
       //connect pipeline
       for (int j = 0; j < myPlayer->GetNumberOfOutputs(); j++) { myEvaluationFilter->SetInput(j, myPlayer->GetOutput(j)); }
@@ -998,6 +1048,14 @@ void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
     myPlayer = NULL;
     EvaluationDataCollection.push_back(myEvaluationFilter);
   }
+
+  return EvaluationDataCollection;
+}
+
+void QmitkIGTTrackingDataEvaluationView::CalculateDifferenceAngles()
+{
+  //Get all data from UI
+  std::vector<mitk::NavigationDataEvaluationFilter::Pointer> EvaluationDataCollection = GetAllDataFromUIList();
 
   //calculation and writing of output data
   //open output file

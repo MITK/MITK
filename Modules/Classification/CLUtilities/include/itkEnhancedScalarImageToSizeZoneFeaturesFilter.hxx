@@ -68,7 +68,9 @@ namespace itk
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::SmallZoneEmphasis );
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::LargeZoneEmphasis );
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::GreyLevelNonuniformity );
+      requestedFeatures->push_back( SizeZoneFeaturesFilterType::GreyLevelNonuniformityNormalized );
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::SizeZoneNonuniformity );
+      requestedFeatures->push_back( SizeZoneFeaturesFilterType::SizeZoneNonuniformityNormalized );
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::LowGreyLevelZoneEmphasis );
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::HighGreyLevelZoneEmphasis );
       requestedFeatures->push_back( SizeZoneFeaturesFilterType::SmallZoneLowGreyLevelEmphasis );

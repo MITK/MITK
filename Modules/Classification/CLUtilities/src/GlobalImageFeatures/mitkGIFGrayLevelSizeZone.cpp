@@ -79,7 +79,9 @@ void
   requestedFeatures->push_back(TextureFilterType::SmallZoneEmphasis);
   requestedFeatures->push_back(TextureFilterType::LargeZoneEmphasis);
   requestedFeatures->push_back(TextureFilterType::GreyLevelNonuniformity);
+  requestedFeatures->push_back(TextureFilterType::GreyLevelNonuniformityNormalized);
   requestedFeatures->push_back(TextureFilterType::SizeZoneNonuniformity);
+  requestedFeatures->push_back(TextureFilterType::SizeZoneNonuniformityNormalized);
   requestedFeatures->push_back(TextureFilterType::LowGreyLevelZoneEmphasis);
   requestedFeatures->push_back(TextureFilterType::HighGreyLevelZoneEmphasis);
   requestedFeatures->push_back(TextureFilterType::SmallZoneLowGreyLevelEmphasis);
@@ -135,8 +137,14 @@ void
     case TextureFilterType::GreyLevelNonuniformity :
       featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") GreyLevelNonuniformity Means",featureMeans->ElementAt(i)));
       break;
+    case TextureFilterType::GreyLevelNonuniformityNormalized :
+      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") GreyLevelNonuniformityNormalized Means",featureMeans->ElementAt(i)));
+      break;
     case TextureFilterType::SizeZoneNonuniformity :
       featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SizeZoneNonuniformity Means",featureMeans->ElementAt(i)));
+      break;
+    case TextureFilterType::SizeZoneNonuniformityNormalized :
+      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SizeZoneNonuniformityNormalized Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::LowGreyLevelZoneEmphasis :
       featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") LowGreyLevelZoneEmphasis Means",featureMeans->ElementAt(i)));

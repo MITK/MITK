@@ -68,7 +68,9 @@ namespace itk
       requestedFeatures->push_back( RunLengthFeaturesFilterType::ShortRunEmphasis );
       requestedFeatures->push_back( RunLengthFeaturesFilterType::LongRunEmphasis );
       requestedFeatures->push_back( RunLengthFeaturesFilterType::GreyLevelNonuniformity );
+      requestedFeatures->push_back( RunLengthFeaturesFilterType::GreyLevelNonuniformityNormalized );
       requestedFeatures->push_back( RunLengthFeaturesFilterType::RunLengthNonuniformity );
+      requestedFeatures->push_back( RunLengthFeaturesFilterType::RunLengthNonuniformityNormalized );
       requestedFeatures->push_back( RunLengthFeaturesFilterType::LowGreyLevelRunEmphasis );
       requestedFeatures->push_back( RunLengthFeaturesFilterType::HighGreyLevelRunEmphasis );
       requestedFeatures->push_back( RunLengthFeaturesFilterType::ShortRunLowGreyLevelEmphasis );

@@ -126,9 +126,17 @@ namespace itk {
       MeasurementType GetGreyLevelNonuniformity() const;
       const MeasurementObjectType* GetGreyLevelNonuniformityOutput() const;
 
+      /** Methods to return the grey level nonuniformity normalized. */
+      MeasurementType GetGreyLevelNonuniformityNormalized() const;
+      const MeasurementObjectType* GetGreyLevelNonuniformityNormalizedOutput() const;
+
       /** Methods to return the Zone length nonuniformity. */
       MeasurementType GetSizeZoneNonuniformity() const;
       const MeasurementObjectType* GetSizeZoneNonuniformityOutput() const;
+
+      /** Methods to return the Zone length nonuniformity normalized. */
+      MeasurementType GetSizeZoneNonuniformityNormalized() const;
+      const MeasurementObjectType* GetSizeZoneNonuniformityNormalizedOutput() const;
 
       /** Methods to return the low grey level Zone emphasis. */
       MeasurementType GetLowGreyLevelZoneEmphasis() const;
@@ -185,7 +193,9 @@ namespace itk {
         SmallZoneEmphasis,
         LargeZoneEmphasis,
         GreyLevelNonuniformity,
+        GreyLevelNonuniformityNormalized,
         SizeZoneNonuniformity,
+        SizeZoneNonuniformityNormalized,
         LowGreyLevelZoneEmphasis,
         HighGreyLevelZoneEmphasis,
         SmallZoneLowGreyLevelEmphasis,

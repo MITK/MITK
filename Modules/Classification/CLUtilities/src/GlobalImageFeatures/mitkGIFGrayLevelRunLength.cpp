@@ -79,7 +79,9 @@ void
   requestedFeatures->push_back(TextureFilterType::ShortRunEmphasis);
   requestedFeatures->push_back(TextureFilterType::LongRunEmphasis);
   requestedFeatures->push_back(TextureFilterType::GreyLevelNonuniformity);
+  requestedFeatures->push_back(TextureFilterType::GreyLevelNonuniformityNormalized);
   requestedFeatures->push_back(TextureFilterType::RunLengthNonuniformity);
+  requestedFeatures->push_back(TextureFilterType::RunLengthNonuniformityNormalized);
   requestedFeatures->push_back(TextureFilterType::LowGreyLevelRunEmphasis);
   requestedFeatures->push_back(TextureFilterType::HighGreyLevelRunEmphasis);
   requestedFeatures->push_back(TextureFilterType::ShortRunLowGreyLevelEmphasis);
@@ -139,9 +141,17 @@ void
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformity Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformity Std.",featureStd->ElementAt(i)));
       break;
+    case TextureFilterType::GreyLevelNonuniformityNormalized :
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformityNormalized Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformityNormalized Std.",featureStd->ElementAt(i)));
+      break;
     case TextureFilterType::RunLengthNonuniformity :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformity Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformity Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::RunLengthNonuniformityNormalized :
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformityNormalized Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformityNormalized Std.",featureStd->ElementAt(i)));
       break;
     case TextureFilterType::LowGreyLevelRunEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LowGreyLevelRunEmphasis Means",featureMeans->ElementAt(i)));

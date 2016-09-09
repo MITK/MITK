@@ -126,9 +126,17 @@ namespace itk {
       MeasurementType GetGreyLevelNonuniformity() const;
       const MeasurementObjectType* GetGreyLevelNonuniformityOutput() const;
 
+      /** Methods to return the grey level nonuniformity. */
+      MeasurementType GetGreyLevelNonuniformityNormalized() const;
+      const MeasurementObjectType* GetGreyLevelNonuniformityNormalizedOutput() const;
+
       /** Methods to return the run length nonuniformity. */
       MeasurementType GetRunLengthNonuniformity() const;
       const MeasurementObjectType* GetRunLengthNonuniformityOutput() const;
+
+      /** Methods to return the run length nonuniformity. */
+      MeasurementType GetRunLengthNonuniformityNormalized() const;
+      const MeasurementObjectType* GetRunLengthNonuniformityNormalizedOutput() const;
 
       /** Methods to return the low grey level run emphasis. */
       MeasurementType GetLowGreyLevelRunEmphasis() const;
@@ -185,7 +193,9 @@ namespace itk {
         ShortRunEmphasis,
         LongRunEmphasis,
         GreyLevelNonuniformity,
+        GreyLevelNonuniformityNormalized,
         RunLengthNonuniformity,
+        RunLengthNonuniformityNormalized,
         LowGreyLevelRunEmphasis,
         HighGreyLevelRunEmphasis,
         ShortRunLowGreyLevelEmphasis,

@@ -114,6 +114,11 @@ namespace itk {
       MeasurementType SizeZoneVariance = NumericTraits<MeasurementType>::ZeroValue();
       MeasurementType ZoneEntropy = NumericTraits<MeasurementType>::ZeroValue();
 
+      //Added 09.09.2016
+      MeasurementType greyLevelNonuniformityNormalized = NumericTraits<MeasurementType>::ZeroValue();
+      MeasurementType SizeZoneNonuniformityNormalized = NumericTraits<MeasurementType>::ZeroValue();
+
+
       vnl_vector<double> greyLevelNonuniformityVector(
         inputHistogram->GetSize()[0], 0.0 );
       vnl_vector<double> SizeZoneNonuniformityVector(
@@ -187,13 +192,13 @@ namespace itk {
         SizeZoneNonuniformityVector[index[1]] += frequency;
 
         // measures from Chu et al.
-        lowGreyLevelZoneEmphasis += ( frequency / i2 );
+        lowGreyLevelZoneEmphasis += (i2 > 0.0001) ? ( frequency / i2 ) : 0;
         highGreyLevelZoneEmphasis += ( frequency * i2 );
 
         // measures from Dasarathy and Holder
-        SmallZoneLowGreyLevelEmphasis += ( frequency / ( i2 * j2 ) );
-        SmallZoneHighGreyLevelEmphasis += ( frequency * i2 / j2 );
-        LargeZoneLowGreyLevelEmphasis += ( frequency * j2 / i2 );
+        SmallZoneLowGreyLevelEmphasis += ((i2 * j2) > 0.0001) ? ( frequency / ( i2 * j2 ) ) : 0;
+        SmallZoneHighGreyLevelEmphasis += (j2 > 0.0001) ? ( frequency * i2 / j2 ) : 0;
+        LargeZoneLowGreyLevelEmphasis += (i2 = 0.0001) ? ( frequency * j2 / i2 ) : 0;
         LargeZoneHighGreyLevelEmphasis += ( frequency * i2 * j2 );
 
         totNumOfVoxelsUsed += (count * frequency);
@@ -233,19 +238,25 @@ namespace itk {
           static_cast<double>( this->m_TotalNumberOfZones );
         ZonePercentage = static_cast<double>( this->m_TotalNumberOfZones ) / static_cast<double>( this->m_NumberOfVoxels );
         numberOfZones = static_cast<double>( this->m_TotalNumberOfZones ) ;
+
+        greyLevelNonuniformityNormalized = greyLevelNonuniformity / static_cast<double>(this->m_TotalNumberOfZones);
+        SizeZoneNonuniformityNormalized = SizeZoneNonuniformity / static_cast<double>(this->m_TotalNumberOfZones);
+
       } else {
-        SmallZoneEmphasis        = 0;
-        LargeZoneEmphasis         = 0;
-        greyLevelNonuniformity  = 0;
-        SizeZoneNonuniformity= 0;
+        SmallZoneEmphasis      = 0;
+        LargeZoneEmphasis      = 0;
+        greyLevelNonuniformity = 0;
+        SizeZoneNonuniformity  = 0;
+        greyLevelNonuniformityNormalized = 0;
+        SizeZoneNonuniformityNormalized  = 0;
 
         lowGreyLevelZoneEmphasis  = 0;
         highGreyLevelZoneEmphasis = 0;
 
         SmallZoneLowGreyLevelEmphasis = 0;
         SmallZoneHighGreyLevelEmphasis= 0;
-        LargeZoneLowGreyLevelEmphasis  = 0;
-        LargeZoneHighGreyLevelEmphasis = 0;
+        LargeZoneLowGreyLevelEmphasis = 0;
+        LargeZoneHighGreyLevelEmphasis= 0;
         ZonePercentage = 0;
         numberOfZones = static_cast<double>( this->m_TotalNumberOfZones ) ;
       }
@@ -310,6 +321,15 @@ namespace itk {
       MeasurementObjectType* ZoneEntropyOutputObject =
         static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 14 ) );
       ZoneEntropyOutputObject->Set( ZoneEntropy );
+
+      MeasurementObjectType* greyLevelNonuniformityNormalizedOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 15 ) );
+      greyLevelNonuniformityNormalizedOutputObject->Set( greyLevelNonuniformityNormalized );
+
+      MeasurementObjectType* SizeZoneNonuniformityNormalizedOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 16 ) );
+      SizeZoneNonuniformityNormalizedOutputObject->Set( SizeZoneNonuniformityNormalized );
+
     }
 
     template<typename THistogram>
@@ -346,6 +366,24 @@ namespace itk {
       ::GetSizeZoneNonuniformityOutput() const
     {
       return itkDynamicCastInDebugMode<const MeasurementObjectType*>(this->ProcessObject::GetOutput( 3 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>
+      ::GetGreyLevelNonuniformityNormalizedOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>(this->ProcessObject::GetOutput( 15 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>
+      ::GetSizeZoneNonuniformityNormalizedOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>(this->ProcessObject::GetOutput( 16 ) );
     }
 
     template<typename THistogram>
@@ -474,9 +512,25 @@ namespace itk {
     template<typename THistogram>
     typename EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>::MeasurementType
       EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>
+      ::GetGreyLevelNonuniformityNormalized() const
+    {
+      return this->GetGreyLevelNonuniformityNormalizedOutput()->Get();
+    }
+
+    template<typename THistogram>
+    typename EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>
       ::GetSizeZoneNonuniformity() const
     {
       return this->GetSizeZoneNonuniformityOutput()->Get();
+    }
+
+    template<typename THistogram>
+    typename EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToSizeZoneFeaturesFilter<THistogram>
+      ::GetSizeZoneNonuniformityNormalized() const
+    {
+      return this->GetSizeZoneNonuniformityNormalizedOutput()->Get();
     }
 
     template<typename THistogram>
@@ -571,8 +625,12 @@ namespace itk {
         return this->GetLargeZoneEmphasis();
       case GreyLevelNonuniformity:
         return this->GetGreyLevelNonuniformity();
+      case GreyLevelNonuniformityNormalized:
+        return this->GetGreyLevelNonuniformityNormalized();
       case SizeZoneNonuniformity:
         return this->GetSizeZoneNonuniformity();
+      case SizeZoneNonuniformityNormalized:
+        return this->GetSizeZoneNonuniformityNormalized();
       case LowGreyLevelZoneEmphasis:
         return this->GetLowGreyLevelZoneEmphasis();
       case HighGreyLevelZoneEmphasis:

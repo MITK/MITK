@@ -337,9 +337,13 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *render
 
       if (componentType == itk::ImageIOBase::CHAR) {
         localStorage->m_OutlinePolyData = CreateOutlinePolyData<char>(renderer);
+      } else if (componentType == itk::ImageIOBase::UCHAR) {
+        localStorage->m_OutlinePolyData = CreateOutlinePolyData<unsigned char>(renderer);
+      } else if (componentType == itk::ImageIOBase::SHORT) {
+        localStorage->m_OutlinePolyData = CreateOutlinePolyData<short>(renderer);
       } else if (componentType == itk::ImageIOBase::USHORT) {
         localStorage->m_OutlinePolyData = CreateOutlinePolyData<unsigned short>(renderer);
-      } else {
+      } else{
         supportedPixelType = false;
       }
 

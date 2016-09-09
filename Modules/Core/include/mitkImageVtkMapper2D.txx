@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vtkPoints.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkCellArray.h>
+
 namespace mitk
 {
 

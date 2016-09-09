@@ -178,10 +178,10 @@ void
   filter->SetOffset(offset);
   filter->SetDelta(delta);
   filter->Update();
-  for (int i = 0; i < VImageDimension; ++i)
+  for (int i = 0; i < 11; ++i)
   {
     mitk::Image::Pointer img = mitk::Image::New();
-    mitk::CastToMitkImage(filter->GetOutput(), img);
+    mitk::CastToMitkImage(filter->GetOutput(i), img);
     out.push_back(img);
   }
 }
@@ -193,6 +193,7 @@ int main(int argc, char* argv[])
   // required params
   parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input VTK polydata", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("extension", "e", mitkCommandLineParser::OutputFile, "Extension", "File extension. Default is .nii.gz", us::Any(), true);
 
   parser.addArgument("gaussian","g",mitkCommandLineParser::String, "Gaussian Filtering of the input images", "Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
   parser.addArgument("difference-of-gaussian","dog",mitkCommandLineParser::String, "Difference of Gaussian Filtering of the input images", "Difference of Gaussian Filter. Followed by the used variances seperated by ';' ",us::Any());
@@ -220,6 +221,12 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   std::string filename=parsedArgs["output"].ToString();
 
+  std::string extension = ".nii.gz";
+  if (parsedArgs.count("extension"))
+  {
+    extension = parsedArgs["extension"].ToString();
+  }
+
   ////////////////////////////////////////////////////////////////
   // CAlculate Gaussian Features
   ////////////////////////////////////////////////////////////////
@@ -237,7 +244,7 @@ int main(int argc, char* argv[])
       AccessByItk_3(image, LocalHistograms, outs, ranges[0], ranges[1]);
       for (int i = 0; i < outs.size(); ++i)
       {
-        std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+".nii.gz";
+        std::string name = filename + "-lh" + us::any_value_to_string<int>(i)+extension;
         mitk::IOUtil::SaveImage(outs[i], name);
       }
     }
@@ -254,9 +261,11 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < ranges.size(); ++i)
     {
+      MITK_INFO << "Gaussian with sigma: " << ranges[i];
       mitk::Image::Pointer output;
       AccessByItk_2(image, GaussianFilter, ranges[i], output);
-      std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i])+".nii.gz";
+      MITK_INFO << "Write output:";
+      std::string name = filename + "-gaussian-" + us::any_value_to_string(ranges[i]) + extension;
       mitk::IOUtil::SaveImage(output, name);
     }
   }
@@ -274,7 +283,7 @@ int main(int argc, char* argv[])
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, DifferenceOfGaussFilter, ranges[i], output);
-      std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i])+".nii.gz";
+      std::string name = filename + "-dog-" + us::any_value_to_string(ranges[i]) + extension;
       mitk::IOUtil::SaveImage(output, name);
     }
   }
@@ -292,7 +301,7 @@ int main(int argc, char* argv[])
     {
       mitk::Image::Pointer output;
       AccessByItk_2(image, LaplacianOfGaussianFilter, ranges[i], output);
-      std::string name = filename + "-log-" + us::any_value_to_string(ranges[i])+".nii.gz";
+      std::string name = filename + "-log-" + us::any_value_to_string(ranges[i]) + extension;
       mitk::IOUtil::SaveImage(output, name);
     }
   }
@@ -313,11 +322,11 @@ int main(int argc, char* argv[])
       outs.push_back(mitk::Image::New());
       outs.push_back(mitk::Image::New());
       AccessByItk_2(image, HessianOfGaussianFilter, ranges[i], outs);
-      std::string name = filename + "-hog0-" + us::any_value_to_string(ranges[i])+".nii.gz";
+      std::string name = filename + "-hog0-" + us::any_value_to_string(ranges[i]) + extension;
       mitk::IOUtil::SaveImage(outs[0], name);
-      name = filename + "-hog1-" + us::any_value_to_string(ranges[i])+".nii.gz";
+      name = filename + "-hog1-" + us::any_value_to_string(ranges[i]) + extension;
       mitk::IOUtil::SaveImage(outs[1], name);
-      name = filename + "-hog2-" + us::any_value_to_string(ranges[i])+".nii.gz";
+      name = filename + "-hog2-" + us::any_value_to_string(ranges[i]) + extension;
       mitk::IOUtil::SaveImage(outs[2], name);
     }
   }

@@ -87,6 +87,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceMomentNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifferenceNormalized);
   requestedFeatures->push_back(TextureFilterType::InverseDifference);
+  requestedFeatures->push_back(TextureFilterType::JointAverage);
+  requestedFeatures->push_back(TextureFilterType::FirstMeasureOfInformationCorrelation);
+  requestedFeatures->push_back(TextureFilterType::SecondMeasureOfInformationCorrelation);
 
   typename MinMaxComputerType::Pointer minMaxComputer = MinMaxComputerType::New();
   minMaxComputer->SetImage(itkImage);
@@ -210,6 +213,18 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Means",featureMeans->ElementAt(i)));
       featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Std.",featureStd->ElementAt(i)));
       break;
+    case TextureFilterType::JointAverage :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::FirstMeasureOfInformationCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
+      break;
+    case TextureFilterType::SecondMeasureOfInformationCorrelation :
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
+      break;
     default:
       break;
     }
@@ -287,5 +302,11 @@ mitk::GIFCooccurenceMatrix::FeatureNameListType mitk::GIFCooccurenceMatrix::GetF
   featureList.push_back("co-occ. InverseDifferenceNormalized Std.");
   featureList.push_back("co-occ. InverseDifference Means");
   featureList.push_back("co-occ. InverseDifference Std.");
+  featureList.push_back("co-occ. JointAverage Means");
+  featureList.push_back("co-occ. JointAverage Std.");
+  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Means");
+  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Std.");
+  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Means");
+  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Std.");
   return featureList;
 }

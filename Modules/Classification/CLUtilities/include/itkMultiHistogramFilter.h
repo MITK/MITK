@@ -14,6 +14,7 @@ namespace itk
       typedef SmartPointer< Self >                                    Pointer;
       typedef typename TInputImageType::ConstPointer                       InputImagePointer;
       typedef typename TOuputImageType::Pointer                       OutputImagePointer;
+      typedef typename TOuputImageType::RegionType                    OutputImageRegionType;
 
       itkNewMacro (Self);
       itkTypeMacro(MultiHistogramFilter, ImageToImageFilter);
@@ -28,7 +29,9 @@ namespace itk
       MultiHistogramFilter();
       ~MultiHistogramFilter(){};
 
-      virtual void GenerateData();
+      virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId);
+      virtual void BeforeThreadedGenerateData(void);
+
 
       DataObject::Pointer MakeOutput(unsigned int /*idx*/);
 

@@ -27,6 +27,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFVolumetricStatistics.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkITKImageImport.h>
+
+
+#include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkResampleImageFilter.h"
+
+
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
@@ -45,6 +54,59 @@ static std::vector<double> splitDouble(std::string str, char delimiter) {
   return internal;
 }
 
+template<typename TPixel, unsigned int VImageDimension>
+void
+ResampleImage(itk::Image<TPixel, VImageDimension>* itkImage, float resolution, mitk::Image::Pointer& newImage)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::ResampleImageFilter<ImageType, ImageType> ResampleFilterType;
+
+  typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  auto spacing = itkImage->GetSpacing();
+  auto size = itkImage->GetLargestPossibleRegion().GetSize();
+
+  for (int i = 0; i < VImageDimension; ++i)
+  {
+    size[i] = size[i] / (1.0*resolution)*(1.0*spacing[i])+1.0;
+  }
+  spacing.Fill(resolution);
+
+  resampler->SetInput(itkImage);
+  resampler->SetSize(size);
+  resampler->SetOutputSpacing(spacing);
+  resampler->SetOutputOrigin(itkImage->GetOrigin());
+  resampler->SetOutputDirection(itkImage->GetDirection());
+  resampler->Update();
+
+  newImage->InitializeByItk(resampler->GetOutput());
+  mitk::GrabItkImageMemory(resampler->GetOutput(), newImage);
+}
+
+
+static void
+ResampleMask(mitk::Image::Pointer mask, mitk::Image::Pointer ref, mitk::Image::Pointer& newMask)
+{
+  typedef itk::NearestNeighborInterpolateImageFunction< MaskImageType> NearestNeighborInterpolateImageFunctionType;
+  typedef itk::ResampleImageFilter<MaskImageType,MaskImageType> ResampleFilterType;
+
+  NearestNeighborInterpolateImageFunctionType::Pointer nn_interpolator = NearestNeighborInterpolateImageFunctionType::New();
+  MaskImageType::Pointer itkMoving = MaskImageType::New();
+  MaskImageType::Pointer itkRef = MaskImageType::New();
+  mitk::CastToItkImage(mask, itkMoving);
+  mitk::CastToItkImage(ref, itkRef);
+
+
+  ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  resampler->SetInput(itkMoving);
+  resampler->SetReferenceImage(itkRef);
+  resampler->UseReferenceImageOn();
+  resampler->SetInterpolator(nn_interpolator);
+  resampler->Update();
+
+  newMask->InitializeByItk(resampler->GetOutput());
+  mitk::GrabItkImageMemory(resampler->GetOutput(), newMask);
+}
+
 int main(int argc, char* argv[])
 {
   mitkCommandLineParser parser;
@@ -61,6 +123,9 @@ int main(int argc, char* argv[])
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
   parser.addArgument("same-space", "sp", mitkCommandLineParser::String, "Bool", "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
+  parser.addArgument("resample-mask", "rm", mitkCommandLineParser::Bool, "Bool", "Resamples the mask to the resolution of the input image ", us::Any());
+  parser.addArgument("save-resample-mask", "srm", mitkCommandLineParser::String, "String", "If specified the resampled mask is saved to this path (if -rm is 1)", us::Any());
+  parser.addArgument("fixed-isotropic", "fi", mitkCommandLineParser::Float, "Float", "Input image resampled to fixed isotropic resolution given in mm. Should be used with resample-mask ", us::Any());
   parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
 
   // Miniapp Infos
@@ -80,12 +145,38 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version: "<< 1.3;
+  MITK_INFO << "Version: "<< 1.7;
 
-  bool useCooc = parsedArgs.count("cooccurence");
+  //bool useCooc = parsedArgs.count("cooccurence");
+
+  bool resampleMask = false;
+  if (parsedArgs.count("resample-mask"))
+  {
+    resampleMask = us::any_cast<bool>(parsedArgs["resample-mask"]);
+  }
 
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+
+  if (parsedArgs.count("fixed-isotropic"))
+  {
+    mitk::Image::Pointer newImage = mitk::Image::New();
+    float resolution = us::any_cast<float>(parsedArgs["fixed-isotropic"]);
+    AccessByItk_2(image, ResampleImage, resolution, newImage);
+    image = newImage;
+  }
+
+  if (resampleMask)
+  {
+    mitk::Image::Pointer newMaskImage = mitk::Image::New();
+    ResampleMask(mask, image, newMaskImage);
+    mask = newMaskImage;
+    if (parsedArgs.count("save-resample-mask"))
+    {
+      mitk::IOUtil::SaveImage(mask, parsedArgs["save-resample-mask"].ToString());
+    }
+  }
+
 
   bool fixDifferentSpaces = parsedArgs.count("same-space");
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))
@@ -119,7 +210,7 @@ int main(int argc, char* argv[])
 
   mitk::AbstractGlobalImageFeature::FeatureListType stats;
   ////////////////////////////////////////////////////////////////
-  // CAlculate First Order Features
+  // Calculate First Order Features
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("first-order"))
   {
@@ -131,7 +222,7 @@ int main(int argc, char* argv[])
   }
 
   ////////////////////////////////////////////////////////////////
-  // CAlculate Volume based Features
+  // Calculate Volume based Features
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("volume"))
   {
@@ -143,13 +234,13 @@ int main(int argc, char* argv[])
   }
 
   ////////////////////////////////////////////////////////////////
-  // CAlculate Co-occurence Features
+  // Calculate Co-occurence Features
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("cooccurence"))
   {
     auto ranges = splitDouble(parsedArgs["cooccurence"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
       mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
@@ -162,13 +253,13 @@ int main(int argc, char* argv[])
   }
 
   ////////////////////////////////////////////////////////////////
-  // CAlculate Run-Length Features
+  // Calculate Run-Length Features
   ////////////////////////////////////////////////////////////////
   if (parsedArgs.count("run-length"))
   {
     auto ranges = splitDouble(parsedArgs["run-length"].ToString(),';');
 
-    for (int i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       MITK_INFO << "Start calculating run-length with number of bins " << ranges[i] << "....";
       mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
@@ -179,7 +270,7 @@ int main(int argc, char* argv[])
       MITK_INFO << "Finished calculating run-length with number of bins " << ranges[i] << "....";
     }
   }
-  for (int i = 0; i < stats.size(); ++i)
+  for (std::size_t i = 0; i < stats.size(); ++i)
   {
     std::cout << stats[i].first << " - " << stats[i].second <<std::endl;
   }
@@ -191,20 +282,22 @@ int main(int argc, char* argv[])
     {
       output << "Description" << ";";
     }
-    for (int i = 0; i < stats.size(); ++i)
+    for (std::size_t i = 0; i < stats.size(); ++i)
     {
       output << stats[i].first << ";";
     }
+    output << "EndOfMeasurement;";
     output << std::endl;
   }
   if ( parsedArgs.count("description") )
   {
     output << parsedArgs["description"].ToString() << ";";
   }
-  for (int i = 0; i < stats.size(); ++i)
+  for (std::size_t i = 0; i < stats.size(); ++i)
   {
     output << stats[i].second << ";";
   }
+  output << "EndOfMeasurement;";
   output << std::endl;
   output.close();
 

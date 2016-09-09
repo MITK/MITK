@@ -31,8 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::MRNormLinearStatisticBasedFilter::MRNormLinearStatisticBasedFilter() :
   m_CenterMode(MRNormLinearStatisticBasedFilter::MEDIAN)
 {
-  this->SetNumberOfIndexedInputs(3);
-  this->SetNumberOfRequiredInputs(3);
+  this->SetNumberOfIndexedInputs(2);
+  this->SetNumberOfRequiredInputs(1);
 }
 
 mitk::MRNormLinearStatisticBasedFilter::~MRNormLinearStatisticBasedFilter()
@@ -65,7 +65,7 @@ void mitk::MRNormLinearStatisticBasedFilter::GenerateOutputInformation()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), *input->GetTimeGeometry());
   output->SetPropertyList(input->GetPropertyList()->Clone());

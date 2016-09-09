@@ -51,7 +51,7 @@ namespace itk {
 
       // allocate the data objects for the outputs which are
       // just decorators real types
-      for( unsigned int i = 0; i < 12; i++ )
+      for( unsigned int i = 0; i < 15; i++ )
       {
         this->ProcessObject::SetNthOutput( i, this->MakeOutput( i ) );
       }
@@ -109,6 +109,10 @@ namespace itk {
       MeasurementType longRunHighGreyLevelEmphasis = NumericTraits<MeasurementType>::ZeroValue();
       MeasurementType runPercentage = NumericTraits<MeasurementType>::ZeroValue();
       MeasurementType numberOfRuns = NumericTraits<MeasurementType>::ZeroValue();
+      //Added 15.07.2016
+      MeasurementType greyLevelVariance = NumericTraits<MeasurementType>::ZeroValue();
+      MeasurementType runLengthVariance = NumericTraits<MeasurementType>::ZeroValue();
+      MeasurementType runEntropy = NumericTraits<MeasurementType>::ZeroValue();
 
       vnl_vector<double> greyLevelNonuniformityVector(
         inputHistogram->GetSize()[0], 0.0 );
@@ -116,6 +120,34 @@ namespace itk {
         inputHistogram->GetSize()[1], 0.0 );
 
       typedef typename HistogramType::ConstIterator HistogramIterator;
+
+      double mu_i = 0.0;
+      double mu_j = 0.0;
+
+      //Calculate the means.
+      for ( HistogramIterator hit = inputHistogram->Begin();
+        hit != inputHistogram->End(); ++hit )
+      {
+        MeasurementType frequency = hit.GetFrequency();
+        if ( frequency == 0 )
+        {
+          continue;
+        }
+        MeasurementVectorType measurement = hit.GetMeasurementVector();
+        IndexType index = hit.GetIndex();
+
+        double i = index[0] + 1;
+        double j = index[1] + 1;
+
+        double p_ij = frequency / m_TotalNumberOfRuns;
+
+        mu_i += i * p_ij;
+        mu_j += j * p_ij;
+      }
+
+      //Calculate the other features.
+      const double log2 = std::log(2.0);
+
       for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )
       {
@@ -130,6 +162,15 @@ namespace itk {
 
         double i2 = static_cast<double>( ( index[0] + 1 ) * ( index[0] + 1 ) );
         double j2 = static_cast<double>( ( index[1] + 1 ) * ( index[1] + 1 ) );
+
+        double i = index[0] + 1;
+        double j = index[1] + 1;
+
+        double p_ij = frequency / m_TotalNumberOfRuns;
+
+        greyLevelVariance += ((i - mu_i) * (i - mu_i) * p_ij);
+        runLengthVariance += ((j - mu_j) * (j - mu_j) * p_ij);
+        runEntropy -= ( p_ij > 0.0001 ) ? p_ij *std::log(p_ij) / log2 : 0;
 
         // Traditional measures
         shortRunEmphasis += ( frequency / j2 );
@@ -246,6 +287,18 @@ namespace itk {
       MeasurementObjectType* numberOfRunsOutputObject =
         static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 11 ) );
       numberOfRunsOutputObject->Set( numberOfRuns );
+
+      MeasurementObjectType* greyLevelVarianceOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 12 ) );
+      greyLevelVarianceOutputObject->Set( greyLevelVariance );
+
+      MeasurementObjectType* runLengthVarianceOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 13 ) );
+      runLengthVarianceOutputObject->Set( runLengthVariance );
+
+      MeasurementObjectType* runEntropyOutputObject =
+        static_cast<MeasurementObjectType*>( this->ProcessObject::GetOutput( 14 ) );
+      runEntropyOutputObject->Set( runEntropy );
     }
 
     template<typename THistogram>
@@ -357,6 +410,33 @@ namespace itk {
     }
 
     template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetGreyLevelVarianceOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 12 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunLengthVarianceOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 13 ) );
+    }
+
+    template<typename THistogram>
+    const
+      typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementObjectType*
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunEntropyOutput() const
+    {
+      return itkDynamicCastInDebugMode<const MeasurementObjectType*>( this->ProcessObject::GetOutput( 14 ) );
+    }
+
+    template<typename THistogram>
     typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
       EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
       ::GetShortRunEmphasis() const
@@ -444,6 +524,28 @@ namespace itk {
     {
       return this->GetNumberOfRunsOutput()->Get();
     }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetGreyLevelVariance() const
+    {
+      return this->GetGreyLevelVarianceOutput()->Get();
+    }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunLengthVariance() const
+    {
+      return this->GetRunLengthVarianceOutput()->Get();
+    }
+    template<typename THistogram>
+    typename EnhancedHistogramToRunLengthFeaturesFilter<THistogram>::MeasurementType
+      EnhancedHistogramToRunLengthFeaturesFilter<THistogram>
+      ::GetRunEntropy() const
+    {
+      return this->GetRunEntropyOutput()->Get();
+    }
+
 
     template<typename THistogram>
     typename EnhancedHistogramToRunLengthFeaturesFilter< THistogram>::MeasurementType
@@ -476,6 +578,12 @@ namespace itk {
         return this->GetRunPercentage();
       case NumberOfRuns:
         return this->GetNumberOfRuns();
+      case GreyLevelVariance:
+        return this->GetGreyLevelVariance();
+      case RunLengthVariance:
+        return this->GetRunLengthVariance();
+      case RunEntropy:
+        return this->GetRunEntropy();
       default:
         return 0;
       }

@@ -51,7 +51,7 @@ namespace itk {
 
       // allocate the data objects for the outputs which are
       // just decorators real types
-      for( unsigned int i = 0; i < 15; i++ )
+      for( unsigned int i = 0; i < 17; i++ )
       {
         this->ProcessObject::SetNthOutput( i, this->MakeOutput( i ) );
       }

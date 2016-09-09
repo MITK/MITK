@@ -3,6 +3,7 @@
 #include <vtkPoints.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkCellArray.h>
+#include <vtkPolyData.h>
 
 namespace mitk
 {

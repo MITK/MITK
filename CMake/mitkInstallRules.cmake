@@ -34,7 +34,7 @@ if(MITK_USE_CTK)
   endif()
 endif()
 
-# related to bug-19679
+# related to MITK:T19679
 if(MACOSX_BUNDLE_NAMES)
   foreach(bundle_name ${MACOSX_BUNDLE_NAMES})
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
@@ -49,6 +49,13 @@ if(MACOSX_BUNDLE_NAMES)
     install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.dylib"
             DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
             CONFIGURATIONS Release)
+    # related to MITK:T19679-InstallQtWebEnginProcess
+    if(MITK_USE_QT_WEBENGINE)
+        get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
+        install(DIRECTORY ${ABS_DIR_HELPERS}
+                DESTINATION "${bundle_name}.app/Contents/Frameworks/QtWebEngineCore.framework/"
+                CONFIGURATIONS Release)
+    endif()
   endforeach()
 endif()
 

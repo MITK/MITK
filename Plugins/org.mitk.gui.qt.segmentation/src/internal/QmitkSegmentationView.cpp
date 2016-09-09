@@ -217,15 +217,19 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
    }
 
    // tell the interpolation about toolmanager and multiwidget (and data storage)
-   if (m_Controls && m_MultiWidget)
+   if (m_Controls)
    {
-      mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-      m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDefaultDataStorage());
-      QList<mitk::SliceNavigationController*> controllers;
-      controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
-      controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
-      controllers.push_back(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
-      m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
+     if (m_MultiWidget) {
+       mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+       m_Controls->m_SlicesInterpolator->SetDataStorage(this->GetDefaultDataStorage());
+       QList<mitk::SliceNavigationController*> controllers;
+       controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
+       controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
+       controllers.push_back(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
+       m_Controls->m_SlicesInterpolator->Initialize(toolManager, controllers);
+     } else {
+       m_Controls->m_SlicesInterpolator->Uninitialize();
+     }
    }
 }
 

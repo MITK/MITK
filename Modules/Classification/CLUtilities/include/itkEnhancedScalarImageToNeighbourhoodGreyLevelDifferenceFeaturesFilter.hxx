@@ -147,7 +147,7 @@ namespace itk
       for( offsetIt = this->m_Offsets->Begin(), offsetNum = 0;
         offsetIt != this->m_Offsets->End(); offsetIt++, offsetNum++ )
       {
-        MITK_WARN << "Adding offset " << offsetIt.Value();
+        //MITK_WARN << "Adding offset " << offsetIt.Value();
         tVector.push_back(offsetIt.Value());
       }
       this->m_NeighbourhoodGreyLevelDifferenceMatrixGenerator->AddOffsets( tVector);
@@ -160,10 +160,6 @@ namespace itk
           this->m_NeighbourhoodGreyLevelDifferenceMatrixGenerator->GetSiMatrix() );
         NeighbourhoodGreyLevelDifferenceMatrixCalculator->SetNumberOfVoxels(numberOfVoxels);
         NeighbourhoodGreyLevelDifferenceMatrixCalculator->Update();
-
-       double y =  NeighbourhoodGreyLevelDifferenceMatrixCalculator->
-                      GetFeature(NeighbourhoodGreyLevelDifferenceFeaturesFilterType::Coarseness);
-       MITK_WARN << y;
 
         typename FeatureNameVector::ConstIterator fnameIt;
         for( fnameIt = this->m_RequestedFeatures->Begin(), featureNum = 0;

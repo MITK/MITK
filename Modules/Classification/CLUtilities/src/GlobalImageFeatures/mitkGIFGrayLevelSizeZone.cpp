@@ -129,52 +129,52 @@ void
     switch (i)
     {
     case TextureFilterType::SmallZoneEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SmallZoneEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") SmallZoneEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::LargeZoneEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") LargeZoneEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") LargeZoneEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelNonuniformity :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") GreyLevelNonuniformity Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") GreyLevelNonuniformity Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelNonuniformityNormalized :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") GreyLevelNonuniformityNormalized Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") GreyLevelNonuniformityNormalized Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::SizeZoneNonuniformity :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SizeZoneNonuniformity Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") SizeZoneNonuniformity Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::SizeZoneNonuniformityNormalized :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SizeZoneNonuniformityNormalized Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") SizeZoneNonuniformityNormalized Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::LowGreyLevelZoneEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") LowGreyLevelZoneEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") LowGreyLevelZoneEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::HighGreyLevelZoneEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") HighGreyLevelZoneEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") HighGreyLevelZoneEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::SmallZoneLowGreyLevelEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SmallZoneLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") SmallZoneLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::SmallZoneHighGreyLevelEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SmallZoneHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") SmallZoneHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::LargeZoneLowGreyLevelEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") LargeZoneLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") LargeZoneLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::LargeZoneHighGreyLevelEmphasis :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") LargeZoneHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") LargeZoneHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::ZonePercentage :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") ZonePercentage Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") ZonePercentage Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelVariance :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") GreyLevelVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") GreyLevelVariance Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::SizeZoneVariance :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") SizeZoneVariance Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") SizeZoneVariance Means",featureMeans->ElementAt(i)));
       break;
     case TextureFilterType::ZoneEntropy :
-      featureList.push_back(std::make_pair("SizeZone. ("+ strRange+") ZoneEntropy Means",featureMeans->ElementAt(i)));
+      featureList.push_back(std::make_pair("SizeZone ("+ strRange+") ZoneEntropy Means",featureMeans->ElementAt(i)));
       break;
     default:
       break;
@@ -204,23 +204,23 @@ mitk::GIFGrayLevelSizeZone::FeatureListType mitk::GIFGrayLevelSizeZone::Calculat
 mitk::GIFGrayLevelSizeZone::FeatureNameListType mitk::GIFGrayLevelSizeZone::GetFeatureNames()
 {
   FeatureNameListType featureList;
-  featureList.push_back("SizeZone. SmallZoneEmphasis Means");
-  featureList.push_back("SizeZone. SmallZoneEmphasis Std.");
-  featureList.push_back("SizeZone. LargeZoneEmphasis Means");
-  featureList.push_back("SizeZone. LargeZoneEmphasis Std.");
-  featureList.push_back("SizeZone. GreyLevelNonuniformity Means");
-  featureList.push_back("SizeZone. GreyLevelNonuniformity Std.");
-  featureList.push_back("SizeZone. SizeZoneNonuniformity Means");
-  featureList.push_back("SizeZone. SizeZoneNonuniformity Std.");
-  featureList.push_back("SizeZone. LowGreyLevelZoneEmphasis Means");
-  featureList.push_back("SizeZone. LowGreyLevelZoneEmphasis Std.");
-  featureList.push_back("SizeZone. HighGreyLevelZoneEmphasis Means");
-  featureList.push_back("SizeZone. HighGreyLevelZoneEmphasis Std.");
-  featureList.push_back("SizeZone. SmallZoneLowGreyLevelEmphasis Means");
-  featureList.push_back("SizeZone. SmallZoneLowGreyLevelEmphasis Std.");
-  featureList.push_back("SizeZone. SmallZoneHighGreyLevelEmphasis Means");
-  featureList.push_back("SizeZone. SmallZoneHighGreyLevelEmphasis Std.");
-  featureList.push_back("SizeZone. LargeZoneHighGreyLevelEmphasis Means");
-  featureList.push_back("SizeZone. LargeZoneHighGreyLevelEmphasis Std.");
+  featureList.push_back("SizeZone SmallZoneEmphasis Means");
+  featureList.push_back("SizeZone SmallZoneEmphasis Std.");
+  featureList.push_back("SizeZone LargeZoneEmphasis Means");
+  featureList.push_back("SizeZone LargeZoneEmphasis Std.");
+  featureList.push_back("SizeZone GreyLevelNonuniformity Means");
+  featureList.push_back("SizeZone GreyLevelNonuniformity Std.");
+  featureList.push_back("SizeZone SizeZoneNonuniformity Means");
+  featureList.push_back("SizeZone SizeZoneNonuniformity Std.");
+  featureList.push_back("SizeZone LowGreyLevelZoneEmphasis Means");
+  featureList.push_back("SizeZone LowGreyLevelZoneEmphasis Std.");
+  featureList.push_back("SizeZone HighGreyLevelZoneEmphasis Means");
+  featureList.push_back("SizeZone HighGreyLevelZoneEmphasis Std.");
+  featureList.push_back("SizeZone SmallZoneLowGreyLevelEmphasis Means");
+  featureList.push_back("SizeZone SmallZoneLowGreyLevelEmphasis Std.");
+  featureList.push_back("SizeZone SmallZoneHighGreyLevelEmphasis Means");
+  featureList.push_back("SizeZone SmallZoneHighGreyLevelEmphasis Std.");
+  featureList.push_back("SizeZone LargeZoneHighGreyLevelEmphasis Means");
+  featureList.push_back("SizeZone LargeZoneHighGreyLevelEmphasis Std.");
   return featureList;
 }

@@ -186,7 +186,7 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
   typename RelativeFrequencyContainerType::const_iterator rFreqIterator =
       m_RelativeFrequencyContainer.begin();
 
-  IndexType globalIndex;
+  IndexType globalIndex(2);
 
   for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )

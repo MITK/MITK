@@ -115,7 +115,6 @@ void
   std::string strRange = ss.str();
   for (std::size_t i = 0; i < featureMeans->size(); ++i)
   {
-    MITK_WARN << "Writing output " << i;
     switch (i)
     {
     case TextureFilterType::Coarseness :

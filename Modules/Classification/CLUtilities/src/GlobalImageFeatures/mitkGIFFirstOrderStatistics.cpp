@@ -145,12 +145,10 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {
     index[0] = i;
-    MITK_WARN << "Old frequency of " << histogram->GetBinMin(0,i) << ": " << histogram->GetFrequency(index);
     if(histogram->GetBinMin(0,i) < p10th)
       histogram->SetFrequencyOfIndex(index, 0);
     else if(histogram->GetBinMin(0,i) > p90th)
       histogram->SetFrequencyOfIndex(index, 0);
-    MITK_WARN << "New frequency of " << histogram->GetBinMin(0,i) << ": " << histogram->GetFrequency(index);
 
   }
 

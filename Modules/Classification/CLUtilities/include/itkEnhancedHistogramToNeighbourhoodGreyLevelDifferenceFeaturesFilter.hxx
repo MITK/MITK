@@ -132,7 +132,7 @@ GenerateData( void )
     Nv += ni;
   }
 
-  sumPiSi /= Nv;
+  sumPiSi /= (Nv > 0) ? Nv : 1;
 
 
   //Calculate the other features

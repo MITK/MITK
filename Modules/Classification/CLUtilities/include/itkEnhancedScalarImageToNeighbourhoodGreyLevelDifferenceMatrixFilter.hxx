@@ -316,9 +316,9 @@ EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter<TImageType, TH
 
       m_siMatrix[hIndex[0]] += si;
     }
-    MITK_WARN << " -> In this round we added: " << centerIndex << " with value " << centerPixelIntensity << " and si = " << si;
-    MITK_WARN << " -> Values are now siMatrix["<<hIndex[0]<<"]: " << m_siMatrix[hIndex[0]];
-    MITK_WARN << " -> Values are now niMatrix: " << output->GetFrequency(hIndex) << "/" << run;
+    //MITK_WARN << " -> In this round we added: " << centerIndex << " with value " << centerPixelIntensity << " and si = " << si;
+    //MITK_WARN << " -> Values are now siMatrix["<<hIndex[0]<<"]: " << m_siMatrix[hIndex[0]];
+    //MITK_WARN << " -> Values are now niMatrix: " << output->GetFrequency(hIndex) << "/" << run;
   }
 }
 

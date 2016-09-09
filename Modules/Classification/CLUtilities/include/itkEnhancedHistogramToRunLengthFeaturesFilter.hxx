@@ -180,14 +180,14 @@ namespace itk {
         runLengthNonuniformityVector[index[1]] += frequency;
 
         // measures from Chu et al.
-        lowGreyLevelRunEmphasis += ( frequency / i2 );
-        highGreyLevelRunEmphasis += ( frequency * i2 );
+        lowGreyLevelZoneEmphasis += (i2 > 0.0001) ? ( frequency / i2 ) : 0;
+        highGreyLevelZoneEmphasis += ( frequency * i2 );
 
         // measures from Dasarathy and Holder
-        shortRunLowGreyLevelEmphasis += ( frequency / ( i2 * j2 ) );
-        shortRunHighGreyLevelEmphasis += ( frequency * i2 / j2 );
-        longRunLowGreyLevelEmphasis += ( frequency * j2 / i2 );
-        longRunHighGreyLevelEmphasis += ( frequency * i2 * j2 );
+        SmallZoneLowGreyLevelEmphasis += ((i2 * j2) > 0.0001) ? ( frequency / ( i2 * j2 ) ) : 0;
+        SmallZoneHighGreyLevelEmphasis += (j2 > 0.0001) ? ( frequency * i2 / j2 ) : 0;
+        LargeZoneLowGreyLevelEmphasis += (i2 = 0.0001) ? ( frequency * j2 / i2 ) : 0;
+        LargeZoneHighGreyLevelEmphasis += ( frequency * i2 * j2 );
       }
       greyLevelNonuniformity =
         greyLevelNonuniformityVector.squared_magnitude();

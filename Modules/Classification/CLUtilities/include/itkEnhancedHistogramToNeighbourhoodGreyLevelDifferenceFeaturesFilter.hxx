@@ -166,15 +166,6 @@ GenerateData( void )
 
       double j = measurement2[0];
 
-      if(ni*nj != 0)
-      {
-      MITK_WARN << "===INFO===";
-      MITK_WARN << "At index " << index << "/" << index2;
-      MITK_WARN << " -> We have a greyvalue i = " << i << ", j = " << j;
-      MITK_WARN << " -> si = " << si << ", sj = " << sj;
-      MITK_WARN << " -> ni = " << ni << ", nj = " << nj;
-      }
-
       pipj += ni*nj*(i-j)*(i-j);
       ipijpj += std::abs(i*ni - j*nj);
 

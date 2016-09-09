@@ -283,7 +283,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   featureList.push_back(std::make_pair("Volumetric Features PCA Minor Axis",minor));
   featureList.push_back(std::make_pair("Volumetric Features PCA Least Axis",least));
   featureList.push_back(std::make_pair("Volumetric Features PCA Elongation",elongation));
-  featureList.push_back(std::make_pair("Volumetric Features PCA Flatnes",flatness));
+  featureList.push_back(std::make_pair("Volumetric Features PCA Flatness",flatness));
 
 
   return featureList;

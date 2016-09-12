@@ -562,7 +562,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
 
         mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
-        if (interpolation) {
+        if (interpolation.IsNotNull()) {
           m_FeedbackNode->SetData(interpolation);
         }
 

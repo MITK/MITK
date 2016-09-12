@@ -34,3 +34,12 @@ bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
 {
   return m_IsActive;
 }
+
+void mitk::USDiPhASDeviceCustomControls::SetSoundOfSpeed(int speed)
+{
+  this->OnSetSoundOfSpeed(speed);
+}
+
+void mitk::USDiPhASDeviceCustomControls::OnSetSoundOfSpeed(int speed)
+{
+}

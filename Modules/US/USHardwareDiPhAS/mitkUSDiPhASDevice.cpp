@@ -147,6 +147,14 @@ void mitk::USDiPhASDevice::OnFreeze(bool freeze)
     m_IsRunning=toggleFreeze(); // toggleFreeze() returns true if it starts running the beamformer, otherwise false
 }
 
+void mitk::USDiPhASDevice::UpdateScanmode()
+{
+  toggleFreeze();
+  setupScan(this->m_ScanMode);
+  m_ImageSource->UpdateImageGeometry();
+  toggleFreeze();
+}
+
 void mitk::USDiPhASDevice::InitializeScanMode()
 {
 	m_ScanMode.scanModeName = "UltrasoundMode";

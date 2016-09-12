@@ -49,6 +49,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
 
   if ( m_ControlInterface.IsNotNull() )
   {
+    //ui->SpeedOfSound->setValue(cropping.left);
   }
   else
   {
@@ -56,9 +57,20 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
         << "Did not get a custom video device control interface.";
   }
 
+  ui->SpeedOfSound->setEnabled(m_ControlInterface.IsNotNull());
 }
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 {
   ui->setupUi(this);
+
+  connect(ui->SpeedOfSound, SIGNAL(valueChanged(int)), this, SLOT(OnSpeedOfSoundChanged()));
+}
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnSpeedOfSoundChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetSoundOfSpeed(ui->SpeedOfSound->value());
+
+  MITK_INFO << "wrks";
 }

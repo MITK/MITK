@@ -55,6 +55,9 @@ protected:
 
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;
+  USDiPhASDevice*               m_device;
+
+  virtual void OnSetSoundOfSpeed(int speed) override;
 };
 } // namespace mitk
 

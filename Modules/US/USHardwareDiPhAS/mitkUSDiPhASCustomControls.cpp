@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDiPhASCustomControls.h"
 
 mitk::USDiPhASCustomControls::USDiPhASCustomControls(USDiPhASDevice* device)
-  : mitk::USDiPhASDeviceCustomControls(device), m_IsActive(false)
+  : mitk::USDiPhASDeviceCustomControls(device), m_IsActive(false), m_device(device)
 {
 }
 
@@ -33,4 +33,10 @@ void mitk::USDiPhASCustomControls::SetIsActive(bool isActive)
 bool mitk::USDiPhASCustomControls::GetIsActive()
 {
   return m_IsActive;
+}
+
+void mitk::USDiPhASCustomControls::OnSetSoundOfSpeed(int speed)
+{
+  m_device->GetScanMode().averageSpeedOfSound = speed;
+  m_device->UpdateScanmode();
 }

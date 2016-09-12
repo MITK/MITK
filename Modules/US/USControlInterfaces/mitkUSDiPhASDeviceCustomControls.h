@@ -44,6 +44,8 @@ public:
     */
   virtual bool GetIsActive( ) override;
 
+  virtual void SetSoundOfSpeed(int speed);
+
 protected:
   /**
     * Class needs an mitk::USDevice object for beeing constructed.
@@ -53,6 +55,10 @@ protected:
 
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;
+
+  
+  virtual void OnSetSoundOfSpeed(int speed);
+
 };
 } // namespace mitk
 

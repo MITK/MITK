@@ -53,7 +53,7 @@ public:
     * The API calls this function to pass the image data to the
 	* user; here the m_Image is updated
     */
-void mitk::USDiPhASImageSource::ImageDataCallback(
+  void mitk::USDiPhASImageSource::ImageDataCallback(
     short* rfDataChannelData,
     int& channelDataChannelsPerDataset,
     int& channelDataSamplesPerChannel,
@@ -67,10 +67,12 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     unsigned char* imageData,
     int& imageWidth,
     int& imageHeight,
-	int& imagePixelFormat,
+    int& imagePixelFormat,
     int& imageSetsTotal,
 
     double& timeStamp);
+
+  void UpdateImageGeometry();
 
 protected:
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
@@ -79,8 +81,7 @@ protected:
   /**
     * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
     */
-  void UpdateImageGeometry();
-  
+
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;
   mitk::USDiPhASDevice*            m_device;

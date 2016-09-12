@@ -37,6 +37,7 @@ class QmitkUSControlsCustomDiPhASDeviceWidget : public QmitkUSAbstractCustomWidg
     Q_OBJECT
 
 private slots:
+   virtual void OnSpeedOfSoundChanged();
 
 public:
   /**
@@ -76,7 +77,6 @@ protected:
 
 private:
   Ui::QmitkUSControlsCustomDiPhASDeviceWidget*         ui;
-
   mitk::USDiPhASDeviceCustomControls::Pointer  m_ControlInterface;
 };
 

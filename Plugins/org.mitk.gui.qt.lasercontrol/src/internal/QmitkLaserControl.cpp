@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
@@ -35,13 +34,13 @@ void OPOLaserControl::SetFocus()
   m_Controls.buttonConnect->setFocus();
 }
 
-void OPOLaserControl::CreateQtPartControl( QWidget *parent )
+void OPOLaserControl::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
-  connect( m_Controls.buttonConnect, SIGNAL(clicked()), this, SLOT(ConnectToLaser()) );
-  connect( m_Controls.buttonStatus, SIGNAL(clicked()), this, SLOT(GetStatus()) );
-  connect( m_Controls.buttonSendCustomMessage, SIGNAL(clicked()), this, SLOT(SendCustomMessage()) );
+  m_Controls.setupUi(parent);
+  connect(m_Controls.buttonConnect, SIGNAL(clicked()), this, SLOT(ConnectToLaser()));
+  connect(m_Controls.buttonStatus, SIGNAL(clicked()), this, SLOT(GetStatus()));
+  connect(m_Controls.buttonSendCustomMessage, SIGNAL(clicked()), this, SLOT(SendCustomMessage()));
 
   connect(m_Controls.buttonInitLaser, SIGNAL(clicked()), this, SLOT(InitLaser()));
   connect(m_Controls.buttonTune, SIGNAL(clicked()), this, SLOT(TuneWavelength()));
@@ -55,7 +54,6 @@ void OPOLaserControl::CreateQtPartControl( QWidget *parent )
   m_SyncFromSlider = true;
 
   m_LaserSystemConnected = false;
-
 }
 void OPOLaserControl::SyncWavelengthSetBySlider()
 {
@@ -66,7 +64,6 @@ void OPOLaserControl::SyncWavelengthSetBySlider()
   }
   else
     m_SyncFromSlider = true;
-
 }
 
 void OPOLaserControl::SyncWavelengthSetBySpinBox()
@@ -82,6 +79,7 @@ void OPOLaserControl::SyncWavelengthSetBySpinBox()
 
 void OPOLaserControl::InitLaser()
 {
+  m_Controls.buttonInitLaser->setText("working ...");
   if (!m_LaserSystemConnected)
   {
     m_OpotekLaserSystem = mitk::OpotekLaser::New();
@@ -100,6 +98,7 @@ void OPOLaserControl::InitLaser()
       m_Controls.spinBoxWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength() / 10.0);
       m_Controls.sliderWavelength->setValue(m_OpotekLaserSystem->GetWavelength());
       m_Controls.spinBoxWavelength->setValue(m_OpotekLaserSystem->GetWavelength() / 10.0);
+      m_LaserSystemConnected = true;
     }
     else
     {
@@ -109,16 +108,24 @@ void OPOLaserControl::InitLaser()
   else
   {
     // destroy and free
-    m_Controls.buttonFlashlamp->setEnabled(false);
-    m_Controls.buttonQSwitch->setEnabled(false);
-    m_Controls.buttonTune->setEnabled(false);
-    m_Controls.buttonInitLaser->setText("Init Laser");
+    if (m_OpotekLaserSystem->ResetAndRelease())
+    {
+      m_Controls.buttonFlashlamp->setEnabled(false);
+      m_Controls.buttonQSwitch->setEnabled(false);
+      m_Controls.buttonTune->setEnabled(false);
+      m_Controls.buttonInitLaser->setText("Init Laser");
+      m_LaserSystemConnected = false;
+    }
+    else
+    {
+      MITK_ERROR << "OpotekLaser release failed.";
+    }
   }
 }
 
 void OPOLaserControl::TuneWavelength()
 {
-  m_OpotekLaserSystem->TuneToWavelength(m_Controls.sliderWavelength->value());
+  m_OpotekLaserSystem->TuneToWavelength(m_Controls.spinBoxFIXME->value());
   QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
   wavelengthText.append("nm");
   m_Controls.labelWavelength->setText(wavelengthText);
@@ -126,56 +133,41 @@ void OPOLaserControl::TuneWavelength()
 
 void OPOLaserControl::ToggleFlashlamp()
 {
-  if(!m_OpotekLaserSystem->IsFlashing())
+  m_Controls.buttonFlashlamp->setText("...");
+  if (!m_OpotekLaserSystem->IsFlashing())
+  {
     m_OpotekLaserSystem->StartFlashing();
+    m_Controls.buttonFlashlamp->setText("Stop Lamp");
+  }
   else
+  {
     m_OpotekLaserSystem->StopFlashing();
+    m_Controls.buttonFlashlamp->setText("Start Lamp");
+  }
 }
 
 void OPOLaserControl::ToggleQSwitch()
 {
+  m_Controls.buttonQSwitch->setText("...");
   if (!m_OpotekLaserSystem->IsEmitting())
+  {
     m_OpotekLaserSystem->StartQswitching();
+    m_Controls.buttonQSwitch->setText("Stop Laser");
+  }
   else
+  {
     m_OpotekLaserSystem->StopQswitching();
+    m_Controls.buttonQSwitch->setText("Start Laser");
+  }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void OPOLaserControl::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
-                                             const QList<mitk::DataNode::Pointer>& nodes )
+void OPOLaserControl::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
+  const QList<mitk::DataNode::Pointer>& nodes)
 {
-
 }
-
 
 void OPOLaserControl::ConnectToLaser()
 {
-  
   m_PumpLaserController = mitk::PumpLaserController::New();
   if (m_PumpLaserController->OpenConnection())
   {
@@ -187,7 +179,6 @@ void OPOLaserControl::ConnectToLaser()
 
     m_PumpLaserController->Send(&message);
     m_PumpLaserController->ReceiveLine(&response);
-  
 
     ////get port
     //int port = 0;
@@ -209,7 +200,7 @@ void OPOLaserControl::ConnectToLaser()
     //  • Half duplex
     //  • Does not use Xon/Xoff
     //  • Does not use RTS/CTS
-    // FIXME  
+    // FIXME
   }
   else
   {
@@ -247,7 +238,7 @@ void OPOLaserControl::SendCustomMessage()
 
   m_PumpLaserController->Send(&message);
   m_PumpLaserController->ReceiveLine(&response);
- 
+
   MITK_INFO << "Received response: " << response;
 }
 
@@ -255,5 +246,4 @@ void OPOLaserControl::ToogleFlashlamp()
 {
   m_PumpLaserController->StartFlashlamps();
   MITK_INFO << "Received response: ";
-
 }

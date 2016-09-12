@@ -17,16 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOpotekLaser.h"
 #include "OPOTEK.h"
 
+#include <chrono>
+#include <thread>
+
 mitk::OpotekLaser::OpotekLaser() :
-  m_ConfigurationFilePath(""),
-  m_MotorComPort(0),
-  m_PumpLaserComPort(0),
-  m_ErrorCode(0),
-  m_WavelengthMin(0),
-  m_WavelengthMax(0),
-  m_CurrentWavelengthInNmTenths(0),
-  m_IsFlashing(false),
-  m_IsEmitting(false)
+m_ConfigurationFilePath(""),
+m_MotorComPort(0),
+m_PumpLaserComPort(0),
+m_ErrorCode(0),
+m_WavelengthMin(0),
+m_WavelengthMax(0),
+m_CurrentWavelengthInNmTenths(7500),
+m_IsFlashing(false),
+m_IsEmitting(false)
 {
   m_ErrorMessages[0] = "No Error";
   m_ErrorMessages[10000] = "No Error";
@@ -53,7 +56,7 @@ mitk::OpotekLaser::OpotekLaser() :
 mitk::OpotekLaser::~OpotekLaser()
 {
   this->ResetAndRelease();
-  MITK_INFO << "[Laser Debug] destroy that laser";
+  MITK_INFO << "[Laser Debug] destroyed that laser";
 }
 
 void mitk::OpotekLaser::SetConfigurationPath(std::string configurationPath)
@@ -67,7 +70,7 @@ void mitk::OpotekLaser::SetConfigurationPath(std::string configurationPath)
 bool mitk::OpotekLaser::Initialize()
 {
   OPOTEK_Init(m_ConfigurationFilePath, &m_MotorComPort, &m_PumpLaserComPort, &m_ErrorCode);
-  
+
   if (m_ErrorCode)
   {
     MITK_ERROR << "[Laser Debug] OPOTEK_Init returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
@@ -79,6 +82,15 @@ bool mitk::OpotekLaser::Initialize()
     return false;
   }
 
+  if (m_MotorComPort == -1)
+  {
+    MITK_ERROR << "[Laser Debug] OPOTEK_Init could not find Motor COM Port";
+    return false;
+  }
+
+  MITK_INFO << "[Laser Debug] OPOTEK_Init motor found here: COM" << m_MotorComPort;
+  MITK_INFO << "[Laser Debug] OPOTEK_Init laser found here: COM" << m_PumpLaserComPort;
+
   OPOTEK_SelectConfiguration(0, &m_WavelengthMin, &m_WavelengthMax, &m_ErrorCode);
   if (m_ErrorCode)
   {
@@ -88,7 +100,7 @@ bool mitk::OpotekLaser::Initialize()
   else
     MITK_INFO << "[Laser Debug] Signal wavelength range is " << m_WavelengthMin << "nm to " << m_WavelengthMax << "nm";
 
-  m_CurrentWavelengthInNmTenths = 7500;
+  this->TuneToWavelength(m_CurrentWavelengthInNmTenths);
 
   OPOTEK_Laser(0, 0, "", &m_ErrorCode);
   if (m_ErrorCode)
@@ -97,7 +109,8 @@ bool mitk::OpotekLaser::Initialize()
     return false;
   }
 
-  OPOTEK_Laser(5, 0, "TRIG EE\r\n", &m_ErrorCode);
+  OPOTEK_Laser(5, 0, "TRIG EE\n", &m_ErrorCode);
+
   if (m_ErrorCode)
   {
     MITK_ERROR << "[Laser Debug] OPOTEK_Laser(5,[...]) Trying to set both triggers to external returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
@@ -109,6 +122,9 @@ bool mitk::OpotekLaser::Initialize()
 
 bool mitk::OpotekLaser::ResetAndRelease()
 {
+  this->StopQswitching();
+  this->StopFlashing();
+
   OPOTEK_Close(&m_ErrorCode);
   if (m_ErrorCode)
   {
@@ -121,17 +137,20 @@ bool mitk::OpotekLaser::ResetAndRelease()
 
 bool mitk::OpotekLaser::TuneToWavelength(int wavelengthInNanoMeterTenths)
 {
-  OPOTEK_Motor(0, wavelengthInNanoMeterTenths, 0, &m_ErrorCode);
-  if (m_ErrorCode)
-  {
-    MITK_ERROR << "[Laser Debug] OPOTEK_Motor(0,wavelength,[...]) Tuning returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
-    return false;
-  }
-  else
-  {
-    m_CurrentWavelengthInNmTenths = wavelengthInNanoMeterTenths;
-    return true;
-  }
+  MITK_ERROR << "[Laser Debug] OPOTEK_Motor(0,wavelength,[...]) simply does not work #fixme #externaldependency #thirdhashtag";
+  return false;
+  //MITK_INFO << wavelengthInNanoMeterTenths;
+  //OPOTEK_Motor(0, wavelengthInNanoMeterTenths, 0, &m_ErrorCode);
+  //if (m_ErrorCode)
+  //{
+  //  MITK_ERROR << "[Laser Debug] OPOTEK_Motor(0,wavelength,[...]) Tuning returned error " << m_ErrorCode << ": \n" << m_ErrorMessages[m_ErrorCode];
+  //  return false;
+  //}
+  //else
+  //{
+  //  m_CurrentWavelengthInNmTenths = wavelengthInNanoMeterTenths;
+  //  return true;
+  //}
 }
 
 bool mitk::OpotekLaser::StartFlashing()
@@ -188,7 +207,7 @@ bool mitk::OpotekLaser::StopQswitching()
 
 int mitk::OpotekLaser::GetMinWavelength()
 {
-  return (int) (m_WavelengthMin * 10);
+  return (int)(m_WavelengthMin * 10);
 }
 int mitk::OpotekLaser::GetMaxWavelength()
 {

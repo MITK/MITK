@@ -55,13 +55,13 @@ namespace mitk {
       virtual ~OpotekLaser();
 
       char* m_ConfigurationFilePath;
-      int m_MotorComPort;
-      int m_PumpLaserComPort;
-      int m_ErrorCode;
+      int32_t m_MotorComPort;
+      int32_t m_PumpLaserComPort;
+      int32_t m_ErrorCode;
 
       double m_WavelengthMax;
       double m_WavelengthMin;
-      int m_CurrentWavelengthInNmTenths;
+      int32_t m_CurrentWavelengthInNmTenths;
 
       bool m_IsFlashing;
       bool m_IsEmitting;

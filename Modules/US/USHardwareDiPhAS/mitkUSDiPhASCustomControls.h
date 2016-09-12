@@ -57,7 +57,32 @@ protected:
   USImageVideoSource::Pointer   m_ImageSource;
   USDiPhASDevice*               m_device;
 
-  virtual void OnSetSoundOfSpeed(int speed) override;
+  /** handlers for value changes
+  */
+  //Transmit
+  virtual void OnSetTransmitPhaseLength(double ms) override;
+  virtual void OnSetExcitationFrequency(double MHz) override;
+  virtual void OnSetTransmitEvents(int events) override;
+  virtual void OnSetVoltage(int voltage) override;
+  virtual void OnSetMode(bool interleaved) override;
+
+  //Receive
+  virtual void OnSetScanDepth(double mm) override;
+  virtual void OnSetAveragingCount(int count) override;
+  virtual void OnSetTGCMin(int min) override;
+  virtual void OnSetTGCMax(int max) override;
+  virtual void OnSetDataType(int type) override; // 0= raw; 1= beamformed; 2= imageData;
+
+  //Beamforming
+  virtual void OnSetPitch(double mm) override;
+  virtual void OnSetReconstructedSamples(int samples) override;
+  virtual void OnSetReconstructedLines(int lines) override;
+  virtual void OnSetSpeedOfSound(int mps) override;
+
+  //Bandpass
+  virtual void OnSetBandpassEnabled(bool bandpass) override;
+  virtual void OnSetLowCut(double MHz) override;
+  virtual void OnSetHighCut(double MHz) override;
 };
 } // namespace mitk
 

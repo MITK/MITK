@@ -37,7 +37,31 @@ class QmitkUSControlsCustomDiPhASDeviceWidget : public QmitkUSAbstractCustomWidg
     Q_OBJECT
 
 private slots:
-   virtual void OnSpeedOfSoundChanged();
+
+  //Transmit
+  virtual void OnTransmitPhaseLengthChanged();
+  virtual void OnExcitationFrequencyChanged();
+  virtual void OnTransmitEventsChanged();
+  virtual void OnVoltageChanged();
+  virtual void OnModeChanged();
+
+  //Receive
+  virtual void OnScanDepthChanged();
+  virtual void OnAveragingCountChanged();
+  virtual void OnTGCMinChanged();
+  virtual void OnTGCMaxChanged();
+  virtual void OnDataTypeChanged(); // 0= raw; 1= beamformed; 2= imageData;
+
+  //Beamforming
+  virtual void OnPitchChanged();
+  virtual void OnReconstructedSamplesChanged();
+  virtual void OnReconstructedLinesChanged();
+  virtual void OnSpeedOfSoundChanged();
+
+  //Bandpass
+  virtual void OnBandpassEnabledChanged();
+  virtual void OnLowCutChanged();
+  virtual void OnHighCutChanged();
 
 public:
   /**

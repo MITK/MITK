@@ -35,11 +35,120 @@ bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
   return m_IsActive;
 }
 
-void mitk::USDiPhASDeviceCustomControls::SetSoundOfSpeed(int speed)
+
+//Set Functions
+
+//Transmit
+void mitk::USDiPhASDeviceCustomControls::SetTransmitPhaseLength(double ms)
 {
-  this->OnSetSoundOfSpeed(speed);
+  this->OnSetTransmitPhaseLength(ms);
 }
 
-void mitk::USDiPhASDeviceCustomControls::OnSetSoundOfSpeed(int speed)
+void mitk::USDiPhASDeviceCustomControls::SetExcitationFrequency(double MHz)
 {
+  this->OnSetExcitationFrequency(MHz);
 }
+
+void mitk::USDiPhASDeviceCustomControls::SetTransmitEvents(int events)
+{
+  this->OnSetTransmitEvents(events);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetVoltage(int voltage)
+{
+  this->OnSetVoltage(voltage);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetMode(bool interleaved)
+{
+  this->OnSetMode(interleaved);
+}
+
+//Receive
+void mitk::USDiPhASDeviceCustomControls::SetScanDepth(double mm)
+{
+  this->OnSetScanDepth(mm);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetAveragingCount(int count)
+{
+  this->OnSetAveragingCount(count);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetTGCMin(int min)
+{
+  this->OnSetTGCMin(min);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetTGCMax(int max)
+{
+  this->OnSetTGCMax(max);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetDataType(int type)
+{
+  this->OnSetDataType(type);
+}
+// 0= raw; 1= beamformed; 2= imageData;
+
+//Beamforming
+void mitk::USDiPhASDeviceCustomControls::SetPitch(double mm)
+{
+  this->OnSetPitch(mm);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetReconstructedSamples(int samples)
+{
+  this->OnSetReconstructedSamples(samples);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetReconstructedLines(int lines)
+{
+  this->OnSetReconstructedLines(lines);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetSpeedOfSound(int mps)
+{
+  this->OnSetSpeedOfSound(mps);
+}
+
+//Bandpass
+void mitk::USDiPhASDeviceCustomControls::SetBandpassEnabled(bool bandpass)
+{
+  this->OnSetBandpassEnabled(bandpass);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetLowCut(double MHz)
+{
+  this->OnSetLowCut(MHz);
+}
+
+void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
+{
+  this->OnSetHighCut(MHz);
+}
+
+
+//OnSetDummies
+
+//Transmit
+void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double ms) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double MHz) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTransmitEvents(int events) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetVoltage(int voltage) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetMode(bool interleaved) {}
+//Receive
+void mitk::USDiPhASDeviceCustomControls::OnSetScanDepth(double mm) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetAveragingCount(int count) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTGCMin(int min) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetTGCMax(int max) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetDataType(int type) {}
+//Beamforming
+void mitk::USDiPhASDeviceCustomControls::OnSetPitch(double mm) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedSamples(int samples) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedLines(int lines) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetSpeedOfSound(int mps) {}
+//Bandpass
+void mitk::USDiPhASDeviceCustomControls::OnSetBandpassEnabled(bool bandpass) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetLowCut(double MHz) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetHighCut(double MHz) {}

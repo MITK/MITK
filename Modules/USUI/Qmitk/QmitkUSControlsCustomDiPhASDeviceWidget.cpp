@@ -54,7 +54,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   else
   {
     MITK_WARN("QmitkUSAbstractCustomWidget")("QmitkUSControlsCustomDiPhASDeviceWidget")
-        << "Did not get a custom video device control interface.";
+        << "Did not get a custom device control interface.";
   }
 
   ui->SpeedOfSound->setEnabled(m_ControlInterface.IsNotNull());
@@ -64,13 +64,145 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 {
   ui->setupUi(this);
 
+  //transmit
+  connect(ui->TransmitPhaseLength, SIGNAL(valueChanged(double)), this, SLOT(OnTransmitPhaseLengthChanged()));
+  connect(ui->ExcitationFrequency, SIGNAL(valueChanged(double)), this, SLOT(OnExcitationFrequencyChanged()));
+  connect(ui->TransmitEvents, SIGNAL(valueChanged(int)), this, SLOT(OnTransmitEventsChanged()));
+  connect(ui->Voltage, SIGNAL(valueChanged(int)), this, SLOT(OnVoltageChanged()));
+  connect(ui->Mode, SIGNAL(currentTextChanged(QString)), this, SLOT(OnModeChanged()));
+
+  //Receive
+  connect(ui->ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(OnScanDepthChanged()));
+  connect(ui->AveragingCount, SIGNAL(valueChanged(int)), this, SLOT(OnAveragingCountChanged()));
+  connect(ui->TimeGainCompensationMin, SIGNAL(valueChanged(int)), this, SLOT(OnTGCMinChanged()));
+  connect(ui->TimeGainCompensationMax, SIGNAL(valueChanged(int)), this, SLOT(OnTGCMaxChanged()));
+  connect(ui->DataType, SIGNAL(currentTextChanged(QString)), this, SLOT(OnDataTypeChanged()));
+
+  //Beamforming
+  connect(ui->PitchOfTransducer, SIGNAL(valueChanged(double)), this, SLOT(OnPitchChanged()));
+  connect(ui->ReconstructedSamplesPerLine, SIGNAL(valueChanged(int)), this, SLOT(OnReconstructedSamplesChanged()));
+  connect(ui->ReconstructedLines, SIGNAL(valueChanged(int)), this, SLOT(OnReconstructedLinesChanged()));
   connect(ui->SpeedOfSound, SIGNAL(valueChanged(int)), this, SLOT(OnSpeedOfSoundChanged()));
+
+  //Bandpass
+  connect(ui->BandpassEnabled, SIGNAL(currentTextChanged(QString)), this, SLOT(OnBandpassEnabledChanged()));
+  connect(ui->LowCut, SIGNAL(valueChanged(double)), this, SLOT(OnLowCutChanged()));
+  connect(ui->HighCut, SIGNAL(valueChanged(double)), this, SLOT(OnHighCutChanged()));
+
 }
 
+//slots
+
+//Transmit
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitPhaseLengthChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetTransmitPhaseLength(ui->TransmitPhaseLength->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnExcitationFrequencyChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetExcitationFrequency(ui->ExcitationFrequency->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitEventsChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetTransmitEvents(ui->TransmitEvents->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnVoltageChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetVoltage(ui->Voltage->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnModeChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  QString Mode = ui->Mode->currentText();
+  if (Mode == "Ultrasound only") {
+    m_ControlInterface->SetMode(false);
+  }
+  else if (Mode == "Interleaved") {
+    m_ControlInterface->SetMode(true);
+  }
+}
+
+//Receive
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnScanDepthChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetScanDepth(ui->ScanDepth->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnAveragingCountChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetAveragingCount(ui->AveragingCount->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMinChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetTGCMin(ui->TimeGainCompensationMin->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMax->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  QString DataType = ui->DataType->currentText();
+  if (DataType == "Raw Data") {
+    m_ControlInterface->SetDataType(0);
+  }
+  else if (DataType == "Beamformed Data") {
+    m_ControlInterface->SetDataType(1);
+  }
+  else if (DataType == "Image Data") {
+    m_ControlInterface->SetDataType(2);
+  }
+} // 0= raw; 1= beamformed; 2= imageData;
+
+//Beamforming
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnPitchChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetPitch(ui->PitchOfTransducer->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedSamplesChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetReconstructedSamples(ui->ReconstructedSamplesPerLine->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedLinesChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetReconstructedLines(ui->ReconstructedLines->value());
+}
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnSpeedOfSoundChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
-  m_ControlInterface->SetSoundOfSpeed(ui->SpeedOfSound->value());
+  m_ControlInterface->SetSpeedOfSound(ui->SpeedOfSound->value());
+}
 
-  MITK_INFO << "wrks";
+//Bandpass
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnBandpassEnabledChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+
+  if (ui->BandpassEnabled->currentText() == "On") {
+    m_ControlInterface->SetBandpassEnabled(true);
+  }
+  else {
+    m_ControlInterface->SetBandpassEnabled(false);
+  }
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnLowCutChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetLowCut(ui->LowCut->value());
+}
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnHighCutChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetHighCut(ui->HighCut->value());
 }

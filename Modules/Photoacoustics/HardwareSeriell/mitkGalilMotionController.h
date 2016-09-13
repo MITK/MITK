@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKPumpLaserController_H_HEADER_INCLUDED
-#define MITKPumpLaserController_H_HEADER_INCLUDED
+#ifndef mitkGalilMotionController_H_HEADER_INCLUDED
+#define mitkGalilMotionController_H_HEADER_INCLUDED
 
 #include "itkObject.h"
 #include "mitkCommon.h"
@@ -30,13 +30,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
     
-    class MITKPHOTOACOUSTICS_EXPORT PumpLaserController : public itk::LightObject
+    class MITKPHOTOACOUSTICS_EXPORT GalilMotionController : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(PumpLaserController, itk::LightObject);
+      mitkClassMacroItkParent(GalilMotionController, itk::LightObject);
       itkFactorylessNewMacro(Self);
 
-      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
       /**
        * \brief Opens a connection to the device
        *
@@ -50,6 +49,7 @@ namespace mitk {
        *
        * This may only be called if there is currently a connection to the device. (e.g. object is in a STATE state)
        */
+	   
       virtual bool CloseConnection(); ///< Closes the connection with the device
 
       virtual std::string Send(const std::string* input);
@@ -57,16 +57,11 @@ namespace mitk {
       virtual std::string ReceiveLine(std::string* answer);
 
       virtual void ClearSendBuffer();
-
       virtual void ClearReceiveBuffer();
-      virtual void StayAlive();
-      virtual bool StartFlashlamps();
-      virtual bool StopFlashlamps();
-
-      virtual bool StartQswitch();
-      virtual bool StopQswitch();
-
-      virtual PumpLaserState GetState();
+	  
+      virtual bool Test();
+      virtual bool Home();
+      virtual bool Tune();
 
       typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection
       typedef mitk::SerialCommunication::BaudRate BaudRate;     ///< Baud rate of the serial connection
@@ -76,16 +71,11 @@ namespace mitk {
       typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
 
     private:
-      PumpLaserState m_State; ///< current Laser state
+      int m_CurrentPosition; ///< current Laser state
     protected:
 
-      PumpLaserController();
-      virtual ~PumpLaserController();
-
-      bool m_KeepAlive = false;
-      bool m_FlashlampRunning = false;
-      bool m_ShutterOpen = false;
-      bool m_LaserEmission = false;
+      GalilMotionController();
+      virtual ~GalilMotionController();
       
       std::string m_DeviceName;///< Device Name
       PortNumber m_PortNumber; ///< COM Port Number
@@ -94,11 +84,10 @@ namespace mitk {
       Parity m_Parity;         ///< Parity mode for communication
       StopBits m_StopBits;     ///< number of stop bits per token
       HardwareHandshake m_HardwareHandshake; ///< use hardware handshake for serial port connection
-
+	  
       mitk::SerialCommunication::Pointer m_SerialCommunication;    ///< serial communication interface
-      std::thread m_StayAliveMessageThread;
       std::mutex m_SerialCommunicationMutex; ///< mutex for coordinated access of serial communication interface
     };
 } // namespace mitk
 
-#endif /* MITKPumpLaserController_H_HEADER_INCLUDED */
+#endif /* mitkGalilMotionController_H_HEADER_INCLUDED */

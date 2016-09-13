@@ -25,9 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 //mitk
-#include <mitkPumpLaserController.h>
+#include <mitkOpotekPumpLaserController.h>
 
-const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.opolasercontrol";
+const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.lasercontrol";
 
 void OPOLaserControl::SetFocus()
 {
@@ -168,7 +168,7 @@ void OPOLaserControl::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
 
 void OPOLaserControl::ConnectToLaser()
 {
-  m_PumpLaserController = mitk::PumpLaserController::New();
+  m_PumpLaserController = mitk::OpotekPumpLaserController::New();
   if (m_PumpLaserController->OpenConnection())
   {
     m_Controls.buttonSendCustomMessage->setEnabled(true);
@@ -213,21 +213,21 @@ void OPOLaserControl::ConnectToLaser()
 
 void OPOLaserControl::GetStatus()
 {
-  mitk::PumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
+  mitk::OpotekPumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
 
-  if (pumpLaserState == mitk::PumpLaserController::STATE0)
+  if (pumpLaserState == mitk::OpotekPumpLaserController::STATE0)
     MITK_INFO << "Received STATE0: Boot Fault.";
-  else if (pumpLaserState == mitk::PumpLaserController::STATE1)
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE1)
     MITK_INFO << "Received STATE1: Warm Up.";
-  else if (pumpLaserState == mitk::PumpLaserController::STATE2)
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE2)
     MITK_INFO << "Received STATE2: Laser Ready.";
-  else if (pumpLaserState == mitk::PumpLaserController::STATE3)
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE3)
     MITK_INFO << "Received STATE3: Flashing. Pulse Disabled.";
-  else if (pumpLaserState == mitk::PumpLaserController::STATE4)
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
     MITK_INFO << "Received STATE4: Flashing. Shutter Closed.";
-  else if (pumpLaserState == mitk::PumpLaserController::STATE5)
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
     MITK_INFO << "Received STATE5: Flashing. Pulse Enabled.";
-  else if (pumpLaserState == mitk::PumpLaserController::UNCONNECTED)
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
     MITK_INFO << "Received ERROR.";
 }
 

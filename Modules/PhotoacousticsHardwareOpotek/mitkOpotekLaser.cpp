@@ -17,6 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOpotekLaser.h"
 #include "OPOTEK.h"
 
+#include "gclib.h"
+#include "gclibo.h"
+
 #include <chrono>
 #include <thread>
 

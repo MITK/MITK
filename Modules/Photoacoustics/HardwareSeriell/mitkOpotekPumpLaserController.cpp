@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkPumpLaserController.h"
+#include "mitkOpotekPumpLaserController.h"
 
 #include <chrono>
 #include <thread>
@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const unsigned char CR = 0xD; // == '\r' - carriage return
 const unsigned char LF = 0xA; // == '\n' - line feed
 
-mitk::PumpLaserController::PumpLaserController() :
-  m_State(mitk::PumpLaserController::UNCONNECTED),
+mitk::OpotekPumpLaserController::OpotekPumpLaserController() :
+m_State(mitk::OpotekPumpLaserController::UNCONNECTED),
   m_FlashlampRunning(false),
   m_ShutterOpen(false),
   m_LaserEmission(false),
@@ -41,11 +41,10 @@ mitk::PumpLaserController::PumpLaserController() :
   m_SerialCommunication(nullptr),
   m_StayAliveMessageThread(),
   m_SerialCommunicationMutex()
-
 {
 }
 
-mitk::PumpLaserController::~PumpLaserController()
+mitk::OpotekPumpLaserController::~OpotekPumpLaserController()
 {
   /* stop tracking and disconnect from tracking device */
   if ((GetState() == STATE3) || (GetState() == STATE4) || (GetState() == STATE5))
@@ -71,7 +70,7 @@ mitk::PumpLaserController::~PumpLaserController()
   }
 }
 
-std::string mitk::PumpLaserController::Send(const std::string* input)
+std::string mitk::OpotekPumpLaserController::Send(const std::string* input)
 {
   if (input == nullptr)
     return "SERIALSENDERROR";
@@ -95,7 +94,7 @@ std::string mitk::PumpLaserController::Send(const std::string* input)
     return "OK";
 }
 
-std::string mitk::PumpLaserController::ReceiveLine(std::string* answer)
+std::string mitk::OpotekPumpLaserController::ReceiveLine(std::string* answer)
 {
   if (answer == nullptr)
     return "SERIALRECEIVEERROR";
@@ -113,21 +112,21 @@ std::string mitk::PumpLaserController::ReceiveLine(std::string* answer)
 }
 
 
-void mitk::PumpLaserController::ClearSendBuffer()
+void mitk::OpotekPumpLaserController::ClearSendBuffer()
 {
   std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex); // lock the mutex until the end of the scope
   m_SerialCommunication->ClearSendBuffer();
 }
 
 
-void mitk::PumpLaserController::ClearReceiveBuffer()
+void mitk::OpotekPumpLaserController::ClearReceiveBuffer()
 {
   std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex); // lock the mutex until the end of the scope
   m_SerialCommunication->ClearReceiveBuffer();
 }
 
 
-bool mitk::PumpLaserController::OpenConnection()
+bool mitk::OpotekPumpLaserController::OpenConnection()
 {
   m_SerialCommunication = mitk::SerialCommunication::New();
 
@@ -156,7 +155,7 @@ bool mitk::PumpLaserController::OpenConnection()
     return false;
 }
 
-bool mitk::PumpLaserController::CloseConnection()
+bool mitk::OpotekPumpLaserController::CloseConnection()
 {
   if (this->GetState() != UNCONNECTED)
   {
@@ -171,7 +170,7 @@ bool mitk::PumpLaserController::CloseConnection()
   return true;
 }
 
-mitk::PumpLaserController::PumpLaserState mitk::PumpLaserController::GetState()
+mitk::OpotekPumpLaserController::PumpLaserState mitk::OpotekPumpLaserController::GetState()
 {
   if (m_SerialCommunication == nullptr)
   {
@@ -242,7 +241,7 @@ mitk::PumpLaserController::PumpLaserState mitk::PumpLaserController::GetState()
 }
 
 
-void mitk::PumpLaserController::StayAlive()
+void mitk::OpotekPumpLaserController::StayAlive()
 {
   do{
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -256,7 +255,7 @@ void mitk::PumpLaserController::StayAlive()
   } while (m_KeepAlive);
 }
 
-bool mitk::PumpLaserController::StartFlashlamps()
+bool mitk::OpotekPumpLaserController::StartFlashlamps()
 {
   this->GetState();
   if (!m_FlashlampRunning)
@@ -277,7 +276,7 @@ bool mitk::PumpLaserController::StartFlashlamps()
       m_FlashlampRunning = true;
       m_ShutterOpen = false;
       m_KeepAlive = true;
-      m_StayAliveMessageThread = std::thread(&mitk::PumpLaserController::StayAlive, this);
+      m_StayAliveMessageThread = std::thread(&mitk::OpotekPumpLaserController::StayAlive, this);
     }
     else
     {
@@ -290,7 +289,7 @@ bool mitk::PumpLaserController::StartFlashlamps()
   return true;
 }
 
-bool mitk::PumpLaserController::StopFlashlamps()
+bool mitk::OpotekPumpLaserController::StopFlashlamps()
 {
   this->GetState();
   if (m_FlashlampRunning)
@@ -323,7 +322,7 @@ bool mitk::PumpLaserController::StopFlashlamps()
   return true;
 }
 
-bool mitk::PumpLaserController::StartQswitch()
+bool mitk::OpotekPumpLaserController::StartQswitch()
 {
   this->GetState();
   if (!m_LaserEmission)
@@ -359,7 +358,7 @@ bool mitk::PumpLaserController::StartQswitch()
   }
 }
 
-bool mitk::PumpLaserController::StopQswitch()
+bool mitk::OpotekPumpLaserController::StopQswitch()
 {
   this->GetState();
   if (m_FlashlampRunning && m_LaserEmission)

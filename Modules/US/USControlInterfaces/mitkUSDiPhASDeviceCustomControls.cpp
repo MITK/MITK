@@ -35,13 +35,12 @@ bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
   return m_IsActive;
 }
 
-
 //Set Functions
 
 //Transmit
-void mitk::USDiPhASDeviceCustomControls::SetTransmitPhaseLength(double ms)
+void mitk::USDiPhASDeviceCustomControls::SetTransmitPhaseLength(double us)
 {
-  this->OnSetTransmitPhaseLength(ms);
+  this->OnSetTransmitPhaseLength(us);
 }
 
 void mitk::USDiPhASDeviceCustomControls::SetExcitationFrequency(double MHz)
@@ -89,7 +88,7 @@ void mitk::USDiPhASDeviceCustomControls::SetDataType(int type)
 {
   this->OnSetDataType(type);
 }
-// 0= raw; 1= beamformed; 2= imageData;
+// 0= raw; 1= beamformed;
 
 //Beamforming
 void mitk::USDiPhASDeviceCustomControls::SetPitch(double mm)

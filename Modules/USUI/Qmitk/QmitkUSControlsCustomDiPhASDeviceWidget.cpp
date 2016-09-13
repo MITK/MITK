@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkUSControlsCustomDiPhASDeviceWidget.h"
 #include <QMessageBox>
 
+
 #include <mitkException.h>
 
 QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget(QWidget *parent)
@@ -140,11 +141,27 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnAveragingCountChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMinChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+
+  int tgcMin = ui->TimeGainCompensationMin->value();
+  int tgcMax = ui->TimeGainCompensationMax->value();
+  if (tgcMin > tgcMax) {
+    ui->TimeGainCompensationMin->setValue(tgcMax);
+    MITK_INFO << "User tried to set tgcMin>tgcMax.";
+  }
+  
   m_ControlInterface->SetTGCMin(ui->TimeGainCompensationMin->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+
+  int tgcMin = ui->TimeGainCompensationMin->value();
+  int tgcMax = ui->TimeGainCompensationMax->value();
+  if (tgcMin > tgcMax) {
+    ui->TimeGainCompensationMax->setValue(tgcMin);
+    MITK_INFO << "User tried to set tgcMin>tgcMax.";
+  }
+  
   m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMax->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
@@ -157,10 +174,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
   else if (DataType == "Beamformed Data") {
     m_ControlInterface->SetDataType(1);
   }
-  else if (DataType == "Image Data") {
-    m_ControlInterface->SetDataType(2);
-  }
-} // 0= raw; 1= beamformed; 2= imageData;
+} // 0= raw; 1= beamformed;
 
 //Beamforming
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnPitchChanged()
@@ -199,10 +213,26 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnBandpassEnabledChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnLowCutChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+
+  unsigned int Low = ui->LowCut->value();
+  unsigned int High = ui->HighCut->value();
+  if (Low > High) {
+    ui->LowCut->setValue(High);
+    MITK_INFO << "User tried to set LowCut>HighCut.";
+  }
+
   m_ControlInterface->SetLowCut(ui->LowCut->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnHighCutChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+
+  unsigned int Low = ui->LowCut->value();
+  unsigned int High = ui->HighCut->value();
+  if (Low > High) {
+    ui->HighCut->setValue(Low);
+    MITK_INFO << "User tried to set LowCut>HighCut.";
+  }
+
   m_ControlInterface->SetHighCut(ui->HighCut->value());
 }

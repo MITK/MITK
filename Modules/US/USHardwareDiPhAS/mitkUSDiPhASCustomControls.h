@@ -56,11 +56,12 @@ protected:
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;
   USDiPhASDevice*               m_device;
+  int                           currentBeamformingAlgorithm;
 
   /** handlers for value changes
   */
   //Transmit
-  virtual void OnSetTransmitPhaseLength(double ms) override;
+  virtual void OnSetTransmitPhaseLength(double us) override;
   virtual void OnSetExcitationFrequency(double MHz) override;
   virtual void OnSetTransmitEvents(int events) override;
   virtual void OnSetVoltage(int voltage) override;
@@ -71,7 +72,7 @@ protected:
   virtual void OnSetAveragingCount(int count) override;
   virtual void OnSetTGCMin(int min) override;
   virtual void OnSetTGCMax(int max) override;
-  virtual void OnSetDataType(int type) override; // 0= raw; 1= beamformed; 2= imageData;
+  virtual void OnSetDataType(int type) override; // 0= raw; 1= beamformed;
 
   //Beamforming
   virtual void OnSetPitch(double mm) override;

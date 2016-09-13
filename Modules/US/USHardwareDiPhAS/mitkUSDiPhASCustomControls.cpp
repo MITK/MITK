@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <cmath>
 
 mitk::USDiPhASCustomControls::USDiPhASCustomControls(USDiPhASDevice* device)
-  : mitk::USDiPhASDeviceCustomControls(device), m_IsActive(false), m_device(device)
+  : mitk::USDiPhASDeviceCustomControls(device), m_IsActive(false), m_device(device), currentBeamformingAlgorithm((int)Beamforming::PlaneWaveCompound)
 {
 }
 
@@ -37,9 +37,9 @@ bool mitk::USDiPhASCustomControls::GetIsActive()
 }
 
 //Transmit
-void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double ms)
+void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {
-  m_device->GetScanMode().transmitPhaseLengthSeconds = ms*1000;
+  m_device->GetScanMode().transmitPhaseLengthSeconds = us*1000*1000;
   m_device->UpdateScanmode();
 }
 
@@ -61,14 +61,32 @@ void mitk::USDiPhASCustomControls::OnSetVoltage(int voltage)
 
 void mitk::USDiPhASCustomControls::OnSetMode(bool interleaved)
 {
+  auto& scanMode = m_device->GetScanMode();
+  if (interleaved) {
+    currentBeamformingAlgorithm = (int)Beamforming::Interleaved_OA_US;
 
+    BeamformingParametersPlaneWaveCompound parametersPW;
+    parametersPW.SpeedOfSoundMeterPerSecond = scanMode.averageSpeedOfSound;
+    parametersPW.angleSkipFactor = 1;
+    scanMode.beamformingAlgorithmParameters = (void*)&parametersPW;
+
+  } else {
+    currentBeamformingAlgorithm = (int)Beamforming::PlaneWaveCompound;
+
+    BeamformingParametersInterleaved_OA_US parametersOSUS;
+    parametersOSUS.SpeedOfSoundMeterPerSecond = scanMode.averageSpeedOfSound;
+    parametersOSUS.angleSkipFactor = 1;
+    scanMode.beamformingAlgorithmParameters = (void*)&parametersOSUS;
+  }
+  scanMode.beamformingAlgorithm = currentBeamformingAlgorithm;
+  m_device->UpdateScanmode();
 }
 
 //Receive
 void mitk::USDiPhASCustomControls::OnSetScanDepth(double mm)
 {
-  auto scanMode = m_device->GetScanMode();
-  int time = 2 * (1000 * mm) / scanMode.averageSpeedOfSound;
+  auto& scanMode = m_device->GetScanMode();
+  float time = 2 * (0.001 * mm) / scanMode.averageSpeedOfSound;
   m_device->GetScanMode().receivePhaseLengthSeconds = time;
   m_device->UpdateScanmode();
 }
@@ -81,30 +99,48 @@ void mitk::USDiPhASCustomControls::OnSetAveragingCount(int count)
 
 void mitk::USDiPhASCustomControls::OnSetTGCMin(int min)
 {
-  auto scanMode = m_device->GetScanMode();
+  auto& scanMode = m_device->GetScanMode();
   char range = scanMode.tgcdB[7] - min;
-  for (char tgc = 0; tgc < 8; ++tgc){
-  scanMode.tgcdB[tgc] = (range*(tgc + 1) / 8);
-}
+  for (int tgc = 0; tgc < 7; ++tgc)
+    scanMode.tgcdB[tgc] = round(tgc*range / 7 + min);
+
   m_device->UpdateScanmode();
 }
 
 void mitk::USDiPhASCustomControls::OnSetTGCMax(int max)
 {
-  auto scanMode = m_device->GetScanMode();
+  auto& scanMode = m_device->GetScanMode();
   char range = max - scanMode.tgcdB[0];
-  for (char tgc = 0; tgc < 8; ++tgc)
-    scanMode.tgcdB[tgc] = (range*(tgc + 1) / 8);
-  m_device->UpdateScanmode();
+  for (int tgc = 1; tgc < 8; ++tgc)
+    scanMode.tgcdB[tgc] = round(tgc*range / 7 + scanMode.tgcdB[0]);
 
-  for (int i = 0; i < 8; i++)
-    MITK_INFO << (int)scanMode.tgcdB[i];
+  m_device->UpdateScanmode();
 }
 
 void mitk::USDiPhASCustomControls::OnSetDataType(int type)
 {
+  auto& scanMode = m_device->GetScanMode();
+  switch (type) {
+    case 0: {
+      scanMode.computeBeamforming = false;
+      scanMode.beamformingAlgorithm = 0;
+      MITK_INFO << "try";
+      m_device->UpdateScanmode();
+      break; 
+    }
+    case 1: {
+      scanMode.computeBeamforming = true;
+      scanMode.beamformingAlgorithm = currentBeamformingAlgorithm;
+      m_device->UpdateScanmode();
+      break;
+    }
+
+    default: 
+      MITK_INFO << "Unknown Data Type requested";  
+      break;
+  }
 }
-// 0= raw; 1= beamformed; 2= imageData;
+// 0= raw; 1= beamformed
 
 //Beamforming
 void mitk::USDiPhASCustomControls::OnSetPitch(double mm)
@@ -140,12 +176,12 @@ void mitk::USDiPhASCustomControls::OnSetBandpassEnabled(bool bandpass)
 
 void mitk::USDiPhASCustomControls::OnSetLowCut(double MHz)
 {
-  m_device->GetScanMode().bandpassFrequencyLowHz = MHz;
+  m_device->GetScanMode().bandpassFrequencyLowHz = MHz*1000*1000;
   m_device->UpdateScanmode();
 }
 
 void mitk::USDiPhASCustomControls::OnSetHighCut(double MHz)
 {
-  m_device->GetScanMode().bandpassFrequencyHighHz = MHz;
+  m_device->GetScanMode().bandpassFrequencyHighHz = MHz*1000*1000;
   m_device->UpdateScanmode();
 }

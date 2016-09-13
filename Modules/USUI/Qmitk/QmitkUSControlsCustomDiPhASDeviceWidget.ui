@@ -7,13 +7,33 @@
     <x>0</x>
     <y>0</y>
     <width>579</width>
-    <height>747</height>
+    <height>709</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="CurrentState">
+       <property name="frameShape">
+        <enum>QFrame::WinPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>Started</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QLabel" name="TransmitLabel">
      <property name="text">
@@ -200,11 +220,6 @@
        </property>
        <item>
         <property name="text">
-         <string>Image Data</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
          <string>Beamformed Data</string>
         </property>
        </item>
@@ -228,7 +243,7 @@
         <double>1000.000000000000000</double>
        </property>
        <property name="value">
-        <double>5.000000000000000</double>
+        <double>50.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -363,12 +378,12 @@
       <widget class="QComboBox" name="BandpassEnabled">
        <item>
         <property name="text">
-         <string>On</string>
+         <string>Off</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Off</string>
+         <string>On</string>
         </property>
        </item>
       </widget>

@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
 	: m_Image(mitk::Image::New()),
 	m_ImageMutex(itk::FastMutexLock::New()),
-	m_device(device)
+  m_device(device),
+  m_GUIOutput(nullptr)
 {
 }
 
@@ -84,6 +85,9 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     m_Image->SetSlice(imageData);
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Unlock(); }
   }
+  if (m_GUIOutput) {
+    m_GUIOutput->setText("hi");
+  }
 }
 
 void mitk::USDiPhASImageSource::UpdateImageGeometry()
@@ -115,4 +119,9 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   MITK_DEBUG << "UpdateImageGeometry called!";
   MITK_DEBUG << "depth in mm: " << (recordTime*speedOfSound / 2);
   MITK_DEBUG << "new spacing: " << spacing;
+}
+
+void mitk::USDiPhASImageSource::setGUIOutput(QLabel* out)
+{
+  m_GUIOutput = out;
 }

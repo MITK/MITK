@@ -188,7 +188,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
 
 	// configure reconstruction processing:
 	m_ScanMode.averageSpeedOfSound = 1540;
-	m_ScanMode.computeBeamforming = true;
+  m_ScanMode.computeBeamforming = true;
 	m_ScanMode.beamformingAlgorithm = (int)Beamforming::PlaneWaveCompound;
 
 	// setup beamforming parameters:
@@ -204,8 +204,8 @@ void mitk::USDiPhASDevice::InitializeScanMode()
 
 	// configure bandpass:
 	m_ScanMode.bandpassApply = false;
-	m_ScanMode.bandpassFrequencyLowHz = 1e6f;
-	m_ScanMode.bandpassFrequencyHighHz = 20e6f;
+  m_ScanMode.bandpassFrequencyLowHz = 0;
+  m_ScanMode.bandpassFrequencyHighHz = 5e6f;
 
 	// configure image generation:
 	m_ScanMode.imageWidth = 512;

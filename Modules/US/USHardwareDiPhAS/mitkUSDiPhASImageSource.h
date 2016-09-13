@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageReadAccessor.h"
 #include "itkFastMutexLock.h"
+#include <QLabel>
 
 namespace mitk {
 
@@ -73,6 +74,7 @@ public:
     double& timeStamp);
 
   void UpdateImageGeometry();
+  void setGUIOutput(QLabel* out);
 
 protected:
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
@@ -85,6 +87,7 @@ protected:
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;
   mitk::USDiPhASDevice*            m_device;
+  QLabel *                         m_GUIOutput;
 };
 } // namespace mitk
 

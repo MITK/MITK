@@ -23,6 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObjectFactory.h>
 
+#include <QLabel>
+
 namespace mitk {
 /**
   * \brief Custom controls for mitk::USDiPhASDevice.
@@ -45,7 +47,7 @@ public:
   virtual bool GetIsActive( ) override;
 
   //Transmit
-  virtual void SetTransmitPhaseLength(double ms);
+  virtual void SetTransmitPhaseLength(double us);
   virtual void SetExcitationFrequency(double MHz);
   virtual void SetTransmitEvents(int events);
   virtual void SetVoltage(int voltage);
@@ -56,7 +58,7 @@ public:
   virtual void SetAveragingCount(int count);
   virtual void SetTGCMin(int min);
   virtual void SetTGCMax(int max);
-  virtual void SetDataType(int type); // 0= raw; 1= beamformed; 2= imageData;
+  virtual void SetDataType(int type); // 0= raw; 1= beamformed;
 
   //Beamforming
   virtual void SetPitch(double mm);
@@ -82,7 +84,7 @@ protected:
   /** virtual handlers implemented in Device Controls
     */
   //Transmit
-  virtual void OnSetTransmitPhaseLength(double ms);
+  virtual void OnSetTransmitPhaseLength(double us);
   virtual void OnSetExcitationFrequency(double MHz);
   virtual void OnSetTransmitEvents(int events);
   virtual void OnSetVoltage(int voltage);
@@ -93,7 +95,7 @@ protected:
   virtual void OnSetAveragingCount(int count);
   virtual void OnSetTGCMin(int min);
   virtual void OnSetTGCMax(int max);
-  virtual void OnSetDataType(int type); // 0= raw; 1= beamformed; 2= imageData;
+  virtual void OnSetDataType(int type); // 0= raw; 1= beamformed;
 
   //Beamforming
   virtual void OnSetPitch(double mm);

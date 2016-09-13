@@ -212,6 +212,9 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
     dictionary["0028|0030"] = "dicom.PixelSpacing";
     dictionary["0018|1164"] = "dicom.ImagerPixelSpacing";
 
+    // Misc 
+    dictionary["0008|0005"] = "dicom.SpecificCharacterSet";
+
     initialized = true;
   }
 

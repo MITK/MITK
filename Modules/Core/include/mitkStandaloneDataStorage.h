@@ -127,6 +127,10 @@ namespace mitk {
     //##Documentation
     //## @brief Nodes are stored in reverse relation for easier traversal in the opposite direction of the relation
     AdjacencyList m_DerivedNodes;
+
+    //##Documentation
+    //## @brief Count for added nodes, used to save their initial loading order
+    int m_AddedNodesCount;
   };
 } // namespace mitk
 #endif /* MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_ */

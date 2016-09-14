@@ -26,7 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::StandaloneDataStorage::StandaloneDataStorage()
-: mitk::DataStorage()
+: mitk::DataStorage(),
+  m_AddedNodesCount(0)
 {
 }
 
@@ -69,6 +70,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
     else
       sp = mitk::DataStorage::SetOfObjects::New();
     /* Store node and parent list in sources adjacency list */
+    node->SetIntProperty("loadIndex", m_AddedNodesCount++);
     m_SourceNodes.insert(std::make_pair(node, sp));
 
     /* Store node and an empty children list in derivations adjacency list */
@@ -155,14 +157,30 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
 
-  mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
-  /* Fill resultset with all objects that are managed by the StandaloneDataStorage object */
-  unsigned int index = 0;
+  std::map<int, mitk::DataNode::Pointer> tempResult;
+
+  /* Fill tempResult with all objects that are managed by the StandaloneDataStorage object */
   for (AdjacencyList::const_iterator it = m_SourceNodes.cbegin(); it != m_SourceNodes.cend(); ++it)
+  {
     if (it->first.IsNull())
+    {
       continue;
+    }
     else
-      resultset->InsertElement(index++, const_cast<mitk::DataNode*>(it->first.GetPointer()));
+    {
+      int loadIndex = 0;
+      it->first->GetIntProperty("loadIndex", loadIndex);
+      tempResult[loadIndex] = const_cast<mitk::DataNode*>(it->first.GetPointer());
+    }
+  }
+
+  // Transform map with possible empty cells to flat vector
+  mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
+  int index = 0;
+  for (auto node : tempResult) 
+  {
+    resultset->InsertElement(index++, node.second);
+  }
 
   return SetOfObjects::ConstPointer(resultset);
 }

@@ -61,7 +61,24 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
         << "Did not get a custom device control interface.";
   }
 
-  ui->SpeedOfSound->setEnabled(m_ControlInterface.IsNotNull());
+  //now pass the default values
+  OnTransmitPhaseLengthChanged();
+  OnExcitationFrequencyChanged();
+  OnTransmitEventsChanged();
+  OnVoltageChanged();
+  OnModeChanged();
+  OnScanDepthChanged();
+  OnAveragingCountChanged();
+  OnTGCMinChanged();
+  OnTGCMaxChanged();
+  OnDataTypeChanged();
+  OnPitchChanged();
+  OnReconstructedSamplesChanged();
+  OnReconstructedLinesChanged();
+  OnSpeedOfSoundChanged();
+  OnBandpassEnabledChanged();
+  OnLowCutChanged();
+  OnHighCutChanged();
 }
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
@@ -92,7 +109,6 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
   connect(ui->BandpassEnabled, SIGNAL(currentTextChanged(QString)), this, SLOT(OnBandpassEnabledChanged()));
   connect(ui->LowCut, SIGNAL(valueChanged(double)), this, SLOT(OnLowCutChanged()));
   connect(ui->HighCut, SIGNAL(valueChanged(double)), this, SLOT(OnHighCutChanged()));
-
 }
 
 //slots

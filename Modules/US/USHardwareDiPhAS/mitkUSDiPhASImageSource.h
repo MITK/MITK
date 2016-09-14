@@ -101,7 +101,6 @@ protected:
   BeamformerStateInfoNative       BeamformerInfos;
 
   int                             DataType;       // 0: Use image data; 1: Use beamformed data
-
 };
 } // namespace mitk
 

@@ -25,6 +25,7 @@ mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
+  this->InitializeScanMode();
 }
 
 mitk::USDiPhASDevice::~USDiPhASDevice()
@@ -102,7 +103,6 @@ bool mitk::USDiPhASDevice::OnConnection()
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
 
   initBeamformer();
-  this->InitializeScanMode();
   
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
@@ -160,6 +160,7 @@ void mitk::USDiPhASDevice::UpdateScanmode()
 
   setupScan(this->m_ScanMode);
   m_ImageSource->UpdateImageGeometry();
+
   if (!m_IsRunning)
     m_IsRunning = toggleFreeze();
 }

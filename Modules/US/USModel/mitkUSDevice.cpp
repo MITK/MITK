@@ -588,7 +588,8 @@ void mitk::USDevice::GenerateData()
 
   if (!output->IsInitialized() ||
     output->GetDimension(0) != m_Image->GetDimension(0) ||
-    output->GetDimension(1) != m_Image->GetDimension(1))
+    output->GetDimension(1) != m_Image->GetDimension(1) ||
+    output->GetPixelType()  != m_Image->GetPixelType())
   {
     output->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(),
       m_Image->GetDimensions());

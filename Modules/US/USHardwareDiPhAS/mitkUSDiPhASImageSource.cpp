@@ -34,23 +34,32 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource( )
 
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
-  if ( image.IsNull() ) { image = mitk::Image::New(); }
+  m_ImageMutex->Lock();
 
-  // write the data of m_Image to image
-  if ( m_Image->IsInitialized() )
+  if (m_Image->IsInitialized())
   {
-    m_ImageMutex->Lock();
+    //initialize the image the first time
+    if (image.IsNull()) {
+      image = mitk::Image::New();
+      image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+    }
+
+    // write the data of m_Image to image if it changed
+    if (image->GetPixelType() != m_Image->GetPixelType() ||
+      image->GetDimensions() != m_Image->GetDimensions()) {
+      image = mitk::Image::New();
+      image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
+    }
 
     // copy contents of the given image into the member variable
-    image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
-    mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
+    mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0, 0, 0));
     image->SetSlice(inputReadAccessor.GetData());
     image->SetGeometry(m_Image->GetGeometry());
-
-    m_ImageMutex->Unlock();
   }
 
-  /*if (!useGUIOutPut && m_GUIOutput) {
+  m_ImageMutex->Unlock();
+
+  if (!useGUIOutPut && m_GUIOutput) {
     // Need to do this because the program initializes the GUI twice
     // this is probably an MITK bug, if it's fixed the timing becomes unneccesary
     float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
@@ -66,7 +75,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     s << "state info: PRF:" << BeamformerInfos.systemPRF << "Hz, datarate: " << BeamformerInfos.dataTransferRateMBit << "MBit/s";
 
     m_GUIOutput(QString::fromStdString(s.str()));
-  }*/ //too performance-heavy
+  }
 }
 
 void mitk::USDiPhASImageSource::ImageDataCallback(
@@ -118,6 +127,10 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWidth)
 {
   unsigned int dim[] = { imageWidth, imageHeight }; // image dimensions
+  m_ImageMutex->Lock();
+
+  m_Image = mitk::Image::New();
+
   switch (DataType)
   {
     case 0: {
@@ -129,6 +142,8 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
       break;
     }
   } // 0:imageData 1:beamformed
+  m_ImageMutex->Unlock();
+
   UpdateImageGeometry(); // update the image geometry
   startTime = ((float)std::clock()) / CLOCKS_PER_SEC; //wait till the callback is available again
   useGUIOutPut = false;
@@ -160,9 +175,9 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   }
   m_ImageMutex->Unlock();
 
-  MITK_DEBUG << "UpdateImageGeometry called!";
-  MITK_DEBUG << "depth in mm: " << (recordTime*speedOfSound / 2);
-  MITK_DEBUG << "new spacing: " << spacing;
+  MITK_INFO << "UpdateImageGeometry called!";
+  MITK_INFO << "depth in mm: " << (recordTime*speedOfSound / 2);
+  MITK_INFO << "new spacing: " << spacing;
 }
 
 void mitk::USDiPhASImageSource::setDataType(int DataT)

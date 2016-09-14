@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkOpotekPumpLaserController.h>
 #include <mitkOpotekLaser.h>
-
+#include <mitkGalilMotor.h>
 /**
   \brief OPOLaserControl
 
@@ -78,6 +78,7 @@ class OPOLaserControl : public QmitkAbstractView
 
     mitk::OpotekPumpLaserController::Pointer m_PumpLaserController;
     mitk::OpotekLaser::Pointer m_OpotekLaserSystem;
+    mitk::GalilMotor::Pointer m_OPOMotor;
 
 };
 

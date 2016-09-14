@@ -84,6 +84,8 @@ void OPOLaserControl::InitLaser()
   {
     m_OpotekLaserSystem = mitk::OpotekLaser::New();
     m_OpotekLaserSystem->SetConfigurationPath("opotek_15033_SN3401_1905_1906_20160330.ini");
+    m_OPOMotor = mitk::GalilMotor::New();
+    m_OPOMotor->OpenConnection();
 
     if (m_OpotekLaserSystem->Initialize())
     {
@@ -110,6 +112,7 @@ void OPOLaserControl::InitLaser()
     // destroy and free
     if (m_OpotekLaserSystem->ResetAndRelease())
     {
+      m_OPOMotor->CloseConnection();
       m_Controls.buttonFlashlamp->setEnabled(false);
       m_Controls.buttonQSwitch->setEnabled(false);
       m_Controls.buttonTune->setEnabled(false);
@@ -125,10 +128,11 @@ void OPOLaserControl::InitLaser()
 
 void OPOLaserControl::TuneWavelength()
 {
-  m_OpotekLaserSystem->TuneToWavelength(m_Controls.spinBoxFIXME->value());
-  QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
-  wavelengthText.append("nm");
-  m_Controls.labelWavelength->setText(wavelengthText);
+  m_OPOMotor->TuneToWavelength(30000/*m_Controls.spinBoxFIXME->value()*/);
+
+  //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
+  //wavelengthText.append("nm");
+  //m_Controls.labelWavelength->setText(wavelengthText);
 }
 
 void OPOLaserControl::ToggleFlashlamp()

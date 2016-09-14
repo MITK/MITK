@@ -87,11 +87,11 @@ bool mitk::OpotekLaser::Initialize()
 
   if (m_MotorComPort == -1)
   {
-    MITK_ERROR << "[Laser Debug] OPOTEK_Init could not find Motor COM Port";
-    return false;
+    MITK_INFO << "[Laser Debug] As expected, OPOTEK_Init could not find Motor COM Port";
   }
+  else
+    MITK_INFO << "[Laser Debug] OPOTEK_Init motor found here: COM" << m_MotorComPort;
 
-  MITK_INFO << "[Laser Debug] OPOTEK_Init motor found here: COM" << m_MotorComPort;
   MITK_INFO << "[Laser Debug] OPOTEK_Init laser found here: COM" << m_PumpLaserComPort;
 
   OPOTEK_SelectConfiguration(0, &m_WavelengthMin, &m_WavelengthMax, &m_ErrorCode);
@@ -103,8 +103,6 @@ bool mitk::OpotekLaser::Initialize()
   else
     MITK_INFO << "[Laser Debug] Signal wavelength range is " << m_WavelengthMin << "nm to " << m_WavelengthMax << "nm";
 
-  this->TuneToWavelength(m_CurrentWavelengthInNmTenths);
-
   OPOTEK_Laser(0, 0, "", &m_ErrorCode);
   if (m_ErrorCode)
   {
@@ -113,6 +111,7 @@ bool mitk::OpotekLaser::Initialize()
   }
 
   OPOTEK_Laser(5, 0, "TRIG EE\n", &m_ErrorCode);
+  OPOTEK_Laser(3, 80, "", &m_ErrorCode);
 
   if (m_ErrorCode)
   {

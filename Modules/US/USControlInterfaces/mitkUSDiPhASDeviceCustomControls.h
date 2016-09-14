@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObjectFactory.h>
 
-#include <QLabel>
+#include <functional>
+#include <qstring.h>
 
 namespace mitk {
 /**
@@ -58,7 +59,7 @@ public:
   virtual void SetAveragingCount(int count);
   virtual void SetTGCMin(int min);
   virtual void SetTGCMax(int max);
-  virtual void SetDataType(int type); // 0= raw; 1= beamformed;
+  virtual void SetDataType(int type); // 0= image; 1= beamformed;
 
   //Beamforming
   virtual void SetPitch(double mm);
@@ -70,6 +71,8 @@ public:
   virtual void SetBandpassEnabled(bool bandpass);
   virtual void SetLowCut(double MHz);
   virtual void SetHighCut(double MHz);
+
+  virtual void passGUIOut(std::function<void(QString)> callback);
 
 protected:
   /**
@@ -95,7 +98,7 @@ protected:
   virtual void OnSetAveragingCount(int count);
   virtual void OnSetTGCMin(int min);
   virtual void OnSetTGCMax(int max);
-  virtual void OnSetDataType(int type); // 0= raw; 1= beamformed;
+  virtual void OnSetDataType(int type); // 0= image; 1= beamformed;
 
   //Beamforming
   virtual void OnSetPitch(double mm);

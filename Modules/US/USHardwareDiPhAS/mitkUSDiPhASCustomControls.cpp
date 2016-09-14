@@ -36,6 +36,13 @@ bool mitk::USDiPhASCustomControls::GetIsActive()
   return m_IsActive;
 }
 
+void mitk::USDiPhASCustomControls::passGUIOut(std::function<void(QString)> callback)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  callback("initializing");
+  imageSource->setGUIOutput(callback);
+}
+
 //Transmit
 void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {
@@ -45,6 +52,9 @@ void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 
 void mitk::USDiPhASCustomControls::OnSetExcitationFrequency(double MHz)
 {
+  m_device->GetScanMode().BurstHalfwaveClockCountAllChannels = round(((120 / MHz) - 2) / 2);
+  m_device->UpdateScanmode();
+  // b = (c/f - 2) * 1/2, where c is the internal clock, f the wanted frequency, b the burst count
 }
 
 void mitk::USDiPhASCustomControls::OnSetTransmitEvents(int events)
@@ -120,18 +130,20 @@ void mitk::USDiPhASCustomControls::OnSetTGCMax(int max)
 void mitk::USDiPhASCustomControls::OnSetDataType(int type)
 {
   auto& scanMode = m_device->GetScanMode();
+  auto imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
   switch (type) {
     case 0: {
-      scanMode.computeBeamforming = false;
-      scanMode.beamformingAlgorithm = 0;
-      MITK_INFO << "try";
+      scanMode.transferBeamformedData = false;
+      scanMode.transferImageData = true;
       m_device->UpdateScanmode();
+      imageSource->setDataType(0);
       break; 
     }
     case 1: {
-      scanMode.computeBeamforming = true;
-      scanMode.beamformingAlgorithm = currentBeamformingAlgorithm;
+      scanMode.transferBeamformedData = true;
+      scanMode.transferImageData = false;
       m_device->UpdateScanmode();
+      imageSource->setDataType(1);
       break;
     }
 
@@ -140,7 +152,7 @@ void mitk::USDiPhASCustomControls::OnSetDataType(int type)
       break;
   }
 }
-// 0= raw; 1= beamformed
+// 0= image; 1= beamformed
 
 //Beamforming
 void mitk::USDiPhASCustomControls::OnSetPitch(double mm)

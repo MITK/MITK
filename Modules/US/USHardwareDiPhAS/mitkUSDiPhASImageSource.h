@@ -24,7 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageReadAccessor.h"
 #include "itkFastMutexLock.h"
-#include <QLabel>
+#include <functional>
+#include <qstring.h>
+#include <ctime>
+#include <string>
 
 namespace mitk {
 
@@ -73,21 +76,32 @@ public:
 
     double& timeStamp);
 
+  /**
+  * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
+  */
   void UpdateImageGeometry();
-  void setGUIOutput(QLabel* out);
+
+  static void setGUIOutput(std::function<void(QString)> out);
+
+  void setDataType(int DataT);
 
 protected:
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
   virtual ~USDiPhASImageSource( );
 
-  /**
-    * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
-    */
+  void UpdateImageDataType(int imageHeight, int imageWidth);
 
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;
   mitk::USDiPhASDevice*            m_device;
-  QLabel *                         m_GUIOutput;
+  static std::function<void(QString)>     m_GUIOutput;
+
+  float                           startTime;
+  bool                            useGUIOutPut;
+  BeamformerStateInfoNative       BeamformerInfos;
+
+  int                             DataType;       // 0: Use image data; 1: Use beamformed data
+
 };
 } // namespace mitk
 

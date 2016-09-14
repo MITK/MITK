@@ -35,6 +35,8 @@ bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
   return m_IsActive;
 }
 
+void mitk::USDiPhASDeviceCustomControls::passGUIOut(std::function<void(QString)> callback) {}
+
 //Set Functions
 
 //Transmit
@@ -88,7 +90,7 @@ void mitk::USDiPhASDeviceCustomControls::SetDataType(int type)
 {
   this->OnSetDataType(type);
 }
-// 0= raw; 1= beamformed;
+// 0= image; 1= beamformed;
 
 //Beamforming
 void mitk::USDiPhASDeviceCustomControls::SetPitch(double mm)

@@ -50,7 +50,10 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
 
   if ( m_ControlInterface.IsNotNull() )
   {
-    //ui->SpeedOfSound->setValue(cropping.left);
+    m_ControlInterface->passGUIOut([this](QString str)->void{
+      if (this) {
+        this->ui->CurrentState->setText(str);
+      } });
   }
   else
   {
@@ -168,13 +171,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
   QString DataType = ui->DataType->currentText();
-  if (DataType == "Raw Data") {
+  if (DataType == "Image Data") {
     m_ControlInterface->SetDataType(0);
   }
   else if (DataType == "Beamformed Data") {
     m_ControlInterface->SetDataType(1);
   }
-} // 0= raw; 1= beamformed;
+} // 0= image; 1= beamformed;
 
 //Beamforming
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnPitchChanged()

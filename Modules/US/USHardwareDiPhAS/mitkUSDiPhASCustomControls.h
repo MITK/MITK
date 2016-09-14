@@ -45,6 +45,8 @@ public:
     */
   virtual bool GetIsActive( ) override;
 
+  virtual void passGUIOut(std::function<void(QString)> callback) override;
+
 protected:
   /**
     * Class needs an mitk::USDiPhASDevice object for beeing constructed.
@@ -72,7 +74,7 @@ protected:
   virtual void OnSetAveragingCount(int count) override;
   virtual void OnSetTGCMin(int min) override;
   virtual void OnSetTGCMax(int max) override;
-  virtual void OnSetDataType(int type) override; // 0= raw; 1= beamformed;
+  virtual void OnSetDataType(int type) override; // 0= image; 1= beamformed;
 
   //Beamforming
   virtual void OnSetPitch(double mm) override;

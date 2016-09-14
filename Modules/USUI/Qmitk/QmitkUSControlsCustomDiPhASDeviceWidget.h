@@ -50,7 +50,7 @@ private slots:
   virtual void OnAveragingCountChanged();
   virtual void OnTGCMinChanged();
   virtual void OnTGCMaxChanged();
-  virtual void OnDataTypeChanged(); // 0= raw; 1= beamformed;
+  virtual void OnDataTypeChanged(); // 0= image; 1= beamformed;
 
   //Beamforming
   virtual void OnPitchChanged();

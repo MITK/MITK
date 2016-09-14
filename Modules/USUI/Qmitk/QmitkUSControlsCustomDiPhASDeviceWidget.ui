@@ -220,12 +220,12 @@
        </property>
        <item>
         <property name="text">
-         <string>Beamformed Data</string>
+         <string>Image Data</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Raw Data</string>
+         <string>Beamformed Data</string>
         </property>
        </item>
       </widget>
@@ -260,6 +260,9 @@
     <layout class="QGridLayout" name="Beamforming">
      <item row="1" column="0">
       <widget class="QSpinBox" name="ReconstructedSamplesPerLine">
+       <property name="minimum">
+        <number>256</number>
+       </property>
        <property name="maximum">
         <number>4096</number>
        </property>
@@ -280,6 +283,9 @@
      </item>
      <item row="3" column="0">
       <widget class="QSpinBox" name="ReconstructedLines">
+       <property name="minimum">
+        <number>128</number>
+       </property>
        <property name="maximum">
         <number>1024</number>
        </property>

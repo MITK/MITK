@@ -31,6 +31,8 @@ mitk::USDiPhASDevice::~USDiPhASDevice()
 {
 }
 
+//Gets
+
 std::string mitk::USDiPhASDevice::GetDeviceClass()
 {
   return "org.mitk.modules.us.USDiPhASDevice";
@@ -149,10 +151,17 @@ void mitk::USDiPhASDevice::OnFreeze(bool freeze)
 
 void mitk::USDiPhASDevice::UpdateScanmode()
 {
-  toggleFreeze();
+  if (m_IsRunning)
+    m_IsRunning = toggleFreeze();
+
+  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
+  m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
+  // a higher resolution is useless, this also ensures correct spacing using any data types
+
   setupScan(this->m_ScanMode);
   m_ImageSource->UpdateImageGeometry();
-  toggleFreeze();
+  if (!m_IsRunning)
+    m_IsRunning = toggleFreeze();
 }
 
 void mitk::USDiPhASDevice::InitializeScanMode()
@@ -208,8 +217,8 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.bandpassFrequencyHighHz = 5e6f;
 
 	// configure image generation:
-	m_ScanMode.imageWidth = 512;
-	m_ScanMode.imageHeight = 512;
+  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
+  m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
 	m_ScanMode.imageMultiplier = 1;
 	m_ScanMode.imageLeveling = 0;
 	m_ScanMode.transferImageData = true;

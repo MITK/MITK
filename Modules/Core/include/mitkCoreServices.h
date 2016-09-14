@@ -38,6 +38,7 @@ namespace mitk
   class IPropertyExtensions;
   class IPropertyFilters;
   class IPropertyPersistence;
+class IAnnotationService;
 
   /**
    * @brief Access MITK core services.
@@ -110,6 +111,13 @@ namespace mitk
     static IMimeTypeProvider *GetMimeTypeProvider(us::ModuleContext *context = us::GetModuleContext());
 
     /**
+   * @brief TODO19786 Get an IMimeTypeProvider instance.
+   * @param context The module context of the module getting the service.
+   * @return A non-NULL IMimeTypeProvider instance.
+   */
+  static IAnnotationService* GetAnnotationService(us::ModuleContext* context = us::GetModuleContext());
+
+  /**
      * @brief Unget a previously acquired service instance.
      * @param service The service instance to be released.
      * @return \c true if ungetting the service was successful, \c false otherwise.

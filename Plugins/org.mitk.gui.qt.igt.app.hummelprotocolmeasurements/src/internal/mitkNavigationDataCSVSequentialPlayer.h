@@ -82,7 +82,7 @@ namespace mitk
     */
     virtual void UpdateOutputInformation();
 
-    int mitk::NavigationDataCSVSequentialPlayer::GetNumberOfSnapshots();
+    int GetNumberOfSnapshots();
 
   protected:
     NavigationDataCSVSequentialPlayer();

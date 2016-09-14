@@ -19,7 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKHummelProtocolEvaluation_H_HEADER_INCLUDED_
 
 #include <mitkPointSet.h>
-#include <itkMatrix.h>
+#include <mitkMatrix.h>
+#include <vnl/vnl_numeric_traits.h>
+#include <vnl/vnl_c_vector.h>
+#include <mitkNavigationData.h>
 
 
 
@@ -38,6 +41,7 @@ namespace mitk
 
   {
   public:
+
     /** Distance error with description. */
     struct HummelProtocolDistanceError {double distanceError; std::string description;};
     /** Tracking volumes for evaluation.
@@ -79,7 +83,13 @@ namespace mitk
     /** Converts a pointset holding all measurement points of the hummel protocol in line-by-line order
      *  to an array representing the hummel board.
      */
-    static itk::Matrix<itk::Point<double, 3>, 9, 10> ParseMatrixStandardVolume(mitk::PointSet::Pointer p);
+    static std::array<std::array<mitk::Point3D, 10> ,9> ParseMatrixStandardVolume(mitk::PointSet::Pointer p);
+    //It would be really wonderfull if we could replace std::array<std::array<mitk::Point3D, 10> ,9> by  mitk::Matrix< mitk::Point3D, 9, 10 > but
+    //unfortunatly this version does not compile under Linux. To be precise under Linux only matrices like this: mitk::Matriy<double, 9, 10> compile
+    //even the usage of a double pointer (eg mitk::Matrix<double* , 9, 10>) does not compile. We always got an error message saying:
+    //vnl_c_vector.h:42:49: error: invalid use of incomplete type ‘class vnl_numeric_traits<itk::Point<double, 3u> >’
+    //Under Windows this error does not appear there everything compiles fine.
+
   };
 } // namespace mitk
 

@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk
 #include <mitkOpotekPumpLaserController.h>
 
+#include <vector>
+
 const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.lasercontrol";
 
 void OPOLaserControl::SetFocus()
@@ -44,6 +46,7 @@ void OPOLaserControl::CreateQtPartControl(QWidget *parent)
 
   connect(m_Controls.buttonInitLaser, SIGNAL(clicked()), this, SLOT(InitLaser()));
   connect(m_Controls.buttonTune, SIGNAL(clicked()), this, SLOT(TuneWavelength()));
+  connect(m_Controls.buttonFastTuning, SIGNAL(clicked()), this, SLOT(StartFastTuning()));
   connect(m_Controls.buttonFlashlamp, SIGNAL(clicked()), this, SLOT(ToggleFlashlamp()));
   connect(m_Controls.buttonQSwitch, SIGNAL(clicked()), this, SLOT(ToggleQSwitch()));
 
@@ -128,7 +131,16 @@ void OPOLaserControl::InitLaser()
 
 void OPOLaserControl::TuneWavelength()
 {
-  m_OPOMotor->TuneToWavelength(30000/*m_Controls.spinBoxFIXME->value()*/);
+  m_OPOMotor->TuneToWavelength(750);
+  //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
+  //wavelengthText.append("nm");
+  //m_Controls.labelWavelength->setText(wavelengthText);
+}
+
+void OPOLaserControl::StartFastTuning()
+{
+  std::vector<double> listOfWavelengths;
+  m_OPOMotor->FastTuneWavelengths(listOfWavelengths/*m_Controls.spinBoxFIXME->value()*/);
 
   //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
   //wavelengthText.append("nm");
@@ -244,10 +256,4 @@ void OPOLaserControl::SendCustomMessage()
   m_PumpLaserController->ReceiveLine(&response);
 
   MITK_INFO << "Received response: " << response;
-}
-
-void OPOLaserControl::ToogleFlashlamp()
-{
-  m_PumpLaserController->StartFlashlamps();
-  MITK_INFO << "Received response: ";
 }

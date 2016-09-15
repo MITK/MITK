@@ -51,11 +51,11 @@ class OPOLaserControl : public QmitkAbstractView
     void ConnectToLaser();
     void GetStatus();
     void SendCustomMessage();
-    void ToogleFlashlamp();
 
 
     void InitLaser();
     void TuneWavelength();
+    void StartFastTuning();
     void ToggleFlashlamp();
     void ToggleQSwitch();
     void SyncWavelengthSetBySlider();

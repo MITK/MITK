@@ -27,6 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "gclib.h"
 #include "gclibo.h"
 
+#include <usModule.h>
+#include <usModuleResource.h>
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResourceStream.h>
+
+#include <tinyxml.h>
+
 namespace mitk {
 
     class MITKPHOTOACOUSTICSHARDWAREOPOTEK_EXPORT GalilMotor : public itk::LightObject
@@ -44,17 +52,20 @@ namespace mitk {
 
     protected:
       virtual bool Home();
-      
+      void LoadResorceFile(std::string filename, std::string* lines);
+      int GetPositionFromWavelength(double wavelength);
       GalilMotor();
       virtual ~GalilMotor();
 
-      char* m_SomeFilePath;
       int m_ComPort;
       std::string m_ErrorMessage;
       GCon m_GalilSystem;
       GReturn m_ReturnCode;
 
+      std::string m_XmlOpoConfiguration;
       double m_CurrentWavelength;
+      double m_WavelengthToStepCalibration[8];
+
     };
 } // namespace mitk
 

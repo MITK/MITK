@@ -19,10 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKHummelProtocolEvaluation_H_HEADER_INCLUDED_
 
 #include <mitkPointSet.h>
-#include <mitkMatrix.h>
-#include <vnl/vnl_numeric_traits.h>
-#include <vnl/vnl_c_vector.h>
-#include <mitkNavigationData.h>
+
 
 
 

@@ -110,8 +110,9 @@ void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
   itk::Vector<double> rotationVec;
   //adapt for Aurora 5D tools: [0,0,1000]
   rotationVec[0] = 0; //X
-  rotationVec[1] = 0; //Y
+  rotationVec[1] = 10000; //Y
   rotationVec[2] = 10000; //Z
+
 
   std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> allOrientationErrors;
   for (int i = 0; i < (OrientationVector.size() - 1); i++)
@@ -132,6 +133,9 @@ void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
 
   //write results to file
   allOrientationErrors.insert(allOrientationErrors.end(), orientationErrorStatistics.begin(), orientationErrorStatistics.end());
+  allOrientationErrors.push_back({rotationVec[0],"Rot Vector [x]"});
+  allOrientationErrors.push_back({rotationVec[1], "Rot Vector [y]"});
+  allOrientationErrors.push_back({rotationVec[2], "Rot Vector [z]"});
   std::stringstream filenameOrientationStat;
   filenameOrientationStat << std::string(m_Controls->m_OutputFilename->text().toUtf8()).c_str() << ".orientationStatistics.csv";
   MITK_INFO << "Writing output to file " << filenameOrientationStat.str();

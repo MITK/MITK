@@ -84,12 +84,13 @@ public:
   static void setGUIOutput(std::function<void(QString)> out);
 
   void setDataType(int DataT);
+  void UpdateImageDataType(int imageHeight, int imageWidth);
+  void SetDisplayedEvent(int event);
 
 protected:
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
   virtual ~USDiPhASImageSource( );
 
-  void UpdateImageDataType(int imageHeight, int imageWidth);
 
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;
@@ -99,6 +100,7 @@ protected:
   float                           startTime;
   bool                            useGUIOutPut;
   BeamformerStateInfoNative       BeamformerInfos;
+  int                             displayedEvent;
 
   int                             DataType;       // 0: Use image data; 1: Use beamformed data
 };

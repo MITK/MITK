@@ -43,6 +43,12 @@ void mitk::USDiPhASCustomControls::passGUIOut(std::function<void(QString)> callb
   imageSource->setGUIOutput(callback);
 }
 
+void mitk::USDiPhASCustomControls::OnSetEventDisplay(int event)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->SetDisplayedEvent(event);
+}
+
 //Transmit
 void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {
@@ -75,15 +81,12 @@ void mitk::USDiPhASCustomControls::OnSetMode(bool interleaved)
   if (interleaved) {
     currentBeamformingAlgorithm = (int)Beamforming::Interleaved_OA_US;
 
-    BeamformingParametersPlaneWaveCompound parametersPW;
     parametersPW.SpeedOfSoundMeterPerSecond = scanMode.averageSpeedOfSound;
     parametersPW.angleSkipFactor = 1;
     scanMode.beamformingAlgorithmParameters = (void*)&parametersPW;
-
   } else {
     currentBeamformingAlgorithm = (int)Beamforming::PlaneWaveCompound;
 
-    BeamformingParametersInterleaved_OA_US parametersOSUS;
     parametersOSUS.SpeedOfSoundMeterPerSecond = scanMode.averageSpeedOfSound;
     parametersOSUS.angleSkipFactor = 1;
     scanMode.beamformingAlgorithmParameters = (void*)&parametersOSUS;

@@ -38,6 +38,8 @@ class QmitkUSControlsCustomDiPhASDeviceWidget : public QmitkUSAbstractCustomWidg
 
 private slots:
 
+  virtual void OnEventDisplayChanged();
+
   //Transmit
   virtual void OnTransmitPhaseLengthChanged();
   virtual void OnExcitationFrequencyChanged();

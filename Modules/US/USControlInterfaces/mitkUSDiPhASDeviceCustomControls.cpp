@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDiPhASDeviceCustomControls.h"
 
 mitk::USDiPhASDeviceCustomControls::USDiPhASDeviceCustomControls(itk::SmartPointer<USDevice> device)
-  : mitk::USAbstractControlInterface(device.GetPointer()), m_IsActive(false)
+  : mitk::USAbstractControlInterface(device.GetPointer()), m_IsActive(false), silentUpdate(false)
 {
 }
 
@@ -37,7 +37,22 @@ bool mitk::USDiPhASDeviceCustomControls::GetIsActive()
 
 void mitk::USDiPhASDeviceCustomControls::passGUIOut(std::function<void(QString)> callback) {}
 
+void mitk::USDiPhASDeviceCustomControls::SetSilentUpdate(bool silent)
+{
+  silentUpdate = silent;
+}
+
+bool mitk::USDiPhASDeviceCustomControls::GetSilentUpdate()
+{
+  return silentUpdate;
+}
+
 //Set Functions
+
+void mitk::USDiPhASDeviceCustomControls::SetEventDisplay(int event)
+{
+  this->OnSetEventDisplay(event);
+}
 
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::SetTransmitPhaseLength(double us)
@@ -131,7 +146,7 @@ void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
 
 
 //OnSetDummies
-
+void mitk::USDiPhASDeviceCustomControls::OnSetEventDisplay(int event) {}
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double ms) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double MHz) {}

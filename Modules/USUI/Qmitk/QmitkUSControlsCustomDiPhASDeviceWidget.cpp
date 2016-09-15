@@ -62,11 +62,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   }
 
   //now pass the default values
+
+  m_ControlInterface->SetSilentUpdate(true); // don't update the scanmode everytime
+
   OnTransmitPhaseLengthChanged();
   OnExcitationFrequencyChanged();
   OnTransmitEventsChanged();
   OnVoltageChanged();
-  OnModeChanged();
   OnScanDepthChanged();
   OnAveragingCountChanged();
   OnTGCMinChanged();
@@ -79,11 +81,18 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnBandpassEnabledChanged();
   OnLowCutChanged();
   OnHighCutChanged();
+  OnEventDisplayChanged();
+
+  m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
+
+  OnModeChanged();
 }
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 {
   ui->setupUi(this);
+
+  connect(ui->EventDisplay, SIGNAL(valueChanged(int)), this, SLOT(OnEventDisplayChanged()));
 
   //transmit
   connect(ui->TransmitPhaseLength, SIGNAL(valueChanged(double)), this, SLOT(OnTransmitPhaseLengthChanged()));
@@ -113,6 +122,20 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 
 //slots
 
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnEventDisplayChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+
+  int max = ui->TransmitEvents->value();
+  int current = ui->EventDisplay->value();
+  if (current > max-1) {
+    ui->EventDisplay->setValue(max - 1);
+    MITK_INFO << "User tried to set displayed event higher than amount of created events.";
+  }
+
+  m_ControlInterface->SetEventDisplay(ui->EventDisplay->value());
+}
+
 //Transmit
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitPhaseLengthChanged()
 {
@@ -127,7 +150,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnExcitationFrequencyChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitEventsChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
-  m_ControlInterface->SetTransmitEvents(ui->TransmitEvents->value());
+
+  int transmitEvents = ui->TransmitEvents->value();
+  int displayedEvents = ui->EventDisplay->value();
+  if (displayedEvents >= transmitEvents)
+    ui->EventDisplay->setValue(transmitEvents);
+  //correct the displayed event
+  m_ControlInterface->SetTransmitEvents(transmitEvents);
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnVoltageChanged()
 {
@@ -138,12 +167,19 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnModeChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
   QString Mode = ui->Mode->currentText();
+  bool silent = m_ControlInterface->GetSilentUpdate();
+  m_ControlInterface->SetSilentUpdate(true);
+
   if (Mode == "Ultrasound only") {
     m_ControlInterface->SetMode(false);
+    ui->TransmitEvents->setValue(1);
   }
   else if (Mode == "Interleaved") {
     m_ControlInterface->SetMode(true);
+    ui->TransmitEvents->setValue(2);
   }
+  if (!silent) { m_ControlInterface->SetSilentUpdate(false); }
+  OnTransmitEventsChanged();
 }
 
 //Receive

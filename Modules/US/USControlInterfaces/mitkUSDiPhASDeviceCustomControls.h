@@ -47,6 +47,8 @@ public:
     */
   virtual bool GetIsActive( ) override;
 
+  virtual void SetEventDisplay(int event);
+
   //Transmit
   virtual void SetTransmitPhaseLength(double us);
   virtual void SetExcitationFrequency(double MHz);
@@ -73,6 +75,8 @@ public:
   virtual void SetHighCut(double MHz);
 
   virtual void passGUIOut(std::function<void(QString)> callback);
+  virtual void SetSilentUpdate(bool silent);
+  virtual bool GetSilentUpdate();
 
 protected:
   /**
@@ -83,9 +87,13 @@ protected:
 
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;
+  bool                          silentUpdate;
 
   /** virtual handlers implemented in Device Controls
     */
+
+  virtual void OnSetEventDisplay(int event);
+
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us);
   virtual void OnSetExcitationFrequency(double MHz);

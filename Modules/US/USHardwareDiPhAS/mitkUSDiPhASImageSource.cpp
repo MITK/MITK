@@ -24,7 +24,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_device(device),
   startTime(((float)std::clock()) / CLOCKS_PER_SEC),
   useGUIOutPut(false),
-  DataType(0)
+  DataType(0),
+  displayedEvent(0)
 {
 }
 
@@ -105,18 +106,34 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     // initialize mitk::Image with given image size on the first time
     if ( ! m_Image->IsInitialized() )
     {
-      UpdateImageDataType(imageHeight, imageWidth);
+      UpdateImageDataType(imageHeight, imageWidth);     // update data type and image pixel dimensions
     }
 
     // lock the image for writing an copy the given buffer into the image then
     switch (DataType)
     {
     case 0: {
-      m_Image->SetSlice(imageData);
+      m_Image->SetSlice(&imageData[displayedEvent*imageHeight*imageWidth]);
       break;
     }
     case 1: {
-      m_Image->SetSlice(rfDataArrayBeamformed);
+      short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
+      int pixelsPerImage = beamformedLines*beamformedSamples;
+
+      for (char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
+      {
+        for (unsigned int sample = 0; sample < beamformedSamples; sample++)
+        {
+          for (short line = 0; line < beamformedLines; line++)
+          {
+            flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
+              = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
+          }
+        } // the beamformed image is flipped by 90 degrees; we need to flip it manually
+      }
+
+      m_Image->SetSlice(&flipme[displayedEvent*beamformedLines*beamformedSamples]);
+      delete flipme;
       break;
     }
     }
@@ -143,8 +160,8 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
     }
   } // 0:imageData 1:beamformed
   m_ImageMutex->Unlock();
+  UpdateImageGeometry();                            // update the image geometry
 
-  UpdateImageGeometry(); // update the image geometry
   startTime = ((float)std::clock()) / CLOCKS_PER_SEC; //wait till the callback is available again
   useGUIOutPut = false;
 }
@@ -187,6 +204,11 @@ void mitk::USDiPhASImageSource::setDataType(int DataT)
     DataType = DataT;
     UpdateImageDataType(m_device->GetScanMode().imageHeight, m_device->GetScanMode().imageWidth);
   }
+}
+
+void mitk::USDiPhASImageSource::SetDisplayedEvent(int event)
+{
+  displayedEvent = event;
 }
 
 std::function<void(QString)>  mitk::USDiPhASImageSource::m_GUIOutput = nullptr;

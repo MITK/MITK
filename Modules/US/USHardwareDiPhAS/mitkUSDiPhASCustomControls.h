@@ -47,6 +47,9 @@ public:
 
   virtual void passGUIOut(std::function<void(QString)> callback) override;
 
+  BeamformingParametersPlaneWaveCompound   parametersPW;
+  BeamformingParametersInterleaved_OA_US parametersOSUS;
+
 protected:
   /**
     * Class needs an mitk::USDiPhASDevice object for beeing constructed.
@@ -62,6 +65,9 @@ protected:
 
   /** handlers for value changes
   */
+
+  virtual void OnSetEventDisplay(int event) override;
+
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us) override;
   virtual void OnSetExcitationFrequency(double MHz) override;

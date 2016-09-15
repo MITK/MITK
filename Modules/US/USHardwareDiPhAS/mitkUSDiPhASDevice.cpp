@@ -102,7 +102,8 @@ bool mitk::USDiPhASDevice::OnConnection()
   // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
 
-  initBeamformer();
+  initBeamformer();                     //start the hardware connection
+  m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
   
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
@@ -154,12 +155,15 @@ void mitk::USDiPhASDevice::UpdateScanmode()
   if (m_IsRunning)
     m_IsRunning = toggleFreeze();
 
-  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
   m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
+  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
   // a higher resolution is useless, this also ensures correct spacing using any data types
 
-  setupScan(this->m_ScanMode);
-  m_ImageSource->UpdateImageGeometry();
+  if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))
+  {
+    setupScan(this->m_ScanMode);
+    m_ImageSource->UpdateImageDataType(m_ScanMode.imageHeight, m_ScanMode.imageWidth);
+  }
 
   if (!m_IsRunning)
     m_IsRunning = toggleFreeze();
@@ -167,62 +171,63 @@ void mitk::USDiPhASDevice::UpdateScanmode()
 
 void mitk::USDiPhASDevice::InitializeScanMode()
 {
-	m_ScanMode.scanModeName = "UltrasoundMode";
+  // create a scanmode to be used for measurements:
+  m_ScanMode.scanModeName = "InterleavedMode";
 
-	// configure a linear transducer
-	m_ScanMode.transducerName = "L2-7 ";
-	m_ScanMode.transducerCurvedRadiusMeter = 0;
-	m_ScanMode.transducerElementCount = 128;
-	m_ScanMode.transducerFrequencyHz = 5000000;
-	m_ScanMode.transducerPitchMeter = 0.0003f;
-	m_ScanMode.transducerType = 1;
+  // configure a linear transducer
+  m_ScanMode.transducerName = "L2-7 ";
+  m_ScanMode.transducerCurvedRadiusMeter = 0;
+  m_ScanMode.transducerElementCount = 128;
+  m_ScanMode.transducerFrequencyHz = 5000000;
+  m_ScanMode.transducerPitchMeter = 0.0003f;
+  m_ScanMode.transducerType = 1;
 
-	// configure the transmit sequence(s):
-	int numChannels = 128;
-	m_ScanMode.transmitEventsCount = 1;
-	m_ScanMode.BurstHalfwaveClockCountAllChannels = 11; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 5 MHz 
-	m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
-	m_ScanMode.voltageV = 70;
+  // configure the transmit sequence(s):
+  int numChannels = 128;
+  m_ScanMode.transmitEventsCount = 2;
+  m_ScanMode.BurstHalfwaveClockCountAllChannels = 11; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 5 MHz
+  m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
+  m_ScanMode.voltageV = 70;
 
-	// configure the receive paramters:
-	m_ScanMode.receivePhaseLengthSeconds = 65e-6f; // 5 cm imaging depth
-	m_ScanMode.tgcdB = new unsigned char[8];
-	for (int tgc = 0; tgc < 8; ++tgc)
-		m_ScanMode.tgcdB[tgc] = tgc * 2 + 10;
-	m_ScanMode.accumulation = 1;
-	m_ScanMode.bandpassApply = false;
-	m_ScanMode.averagingCount = 1;
+  // configure the receive paramters:
+  m_ScanMode.receivePhaseLengthSeconds = 65e-6f; // 5 cm imaging depth
+  m_ScanMode.tgcdB = new unsigned char[8];
+  for (int tgc = 0; tgc < 8; ++tgc)
+    m_ScanMode.tgcdB[tgc] = tgc * 2 + 10;
+  m_ScanMode.accumulation = 1;
+  m_ScanMode.bandpassApply = false;
+  m_ScanMode.averagingCount = 1;
 
-	// configure general processing:
-	m_ScanMode.transferChannelData = false;
+  // configure general processing:
+  m_ScanMode.transferChannelData = false;
 
-	// configure reconstruction processing:
-	m_ScanMode.averageSpeedOfSound = 1540;
+  // configure reconstruction processing:
+  m_ScanMode.averageSpeedOfSound = 1540;
   m_ScanMode.computeBeamforming = true;
-	m_ScanMode.beamformingAlgorithm = (int)Beamforming::PlaneWaveCompound;
+  m_ScanMode.beamformingAlgorithm = (int)Beamforming::Interleaved_OA_US;
 
-	// setup beamforming parameters:
-	BeamformingParametersPlaneWaveCompound parametersPW;
-	parametersPW.SpeedOfSoundMeterPerSecond = 1540;
-	parametersPW.angleSkipFactor = 1;
-	m_ScanMode.beamformingAlgorithmParameters = (void*)&parametersPW;
+  // setup beamforming parameters:
+  BeamformingParametersInterleaved_OA_US parametersOSUS;
+  parametersOSUS.SpeedOfSoundMeterPerSecond = 1540;
+  parametersOSUS.angleSkipFactor = 1;
+  m_ScanMode.beamformingAlgorithmParameters = (void*)&parametersOSUS;
 
-	m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
-	m_ScanMode.reconstructionLines = 128;
-	m_ScanMode.reconstructionSamplesPerLine = 2048;
-	m_ScanMode.transferBeamformedData = false;
+  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
+  m_ScanMode.reconstructionLines = 128;
+  m_ScanMode.reconstructionSamplesPerLine = 2048;
+  m_ScanMode.transferBeamformedData = false;
 
-	// configure bandpass:
-	m_ScanMode.bandpassApply = false;
-  m_ScanMode.bandpassFrequencyLowHz = 0;
-  m_ScanMode.bandpassFrequencyHighHz = 5e6f;
+  // configure bandpass:
+  m_ScanMode.bandpassApply = false;
+  m_ScanMode.bandpassFrequencyLowHz = 1e6f;
+  m_ScanMode.bandpassFrequencyHighHz = 20e6f;
 
-	// configure image generation:
-  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
-  m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
-	m_ScanMode.imageMultiplier = 1;
-	m_ScanMode.imageLeveling = 0;
-	m_ScanMode.transferImageData = true;
+  // configure image generation:
+  m_ScanMode.imageWidth = 512;
+  m_ScanMode.imageHeight = 512;
+  m_ScanMode.imageMultiplier = 1;
+  m_ScanMode.imageLeveling = 0;
+  m_ScanMode.transferImageData = true;
 }
 
 // callback for the DiPhAS API 

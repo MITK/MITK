@@ -76,6 +76,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Resampling
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkBSplineInterpolateImageFunction.h>
 #include <itkCastImageFilter.h>
 #include <itkLinearInterpolateImageFunction.h>
 
@@ -1321,8 +1322,13 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   case RESAMPLE_TO:
     {
 
-      itk::LinearInterpolateImageFunction<DoubleImageType>::Pointer nn_interpolator
-        = itk::LinearInterpolateImageFunction<DoubleImageType>::New();
+
+      itk::BSplineInterpolateImageFunction<DoubleImageType, double>::Pointer bspl_interpolator
+        = itk::BSplineInterpolateImageFunction<DoubleImageType, double>::New();
+      bspl_interpolator->SetSplineOrder( 3 );
+
+      itk::NearestNeighborInterpolateImageFunction< DoubleImageType >::Pointer nn_interpolator
+          = itk::NearestNeighborInterpolateImageFunction< DoubleImageType>::New();
 
       DoubleImageType::Pointer itkImage1 = DoubleImageType::New();
       DoubleImageType::Pointer itkImage2 = DoubleImageType::New();
@@ -1334,7 +1340,13 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       resampleFilter->SetInput( itkImage1 );
       resampleFilter->SetReferenceImage( itkImage2 );
       resampleFilter->SetUseReferenceImage( true );
-      resampleFilter->SetInterpolator( nn_interpolator );
+
+      // use NN interp with binary images
+      if( m_SelectedImageNode->GetNode()->GetProperty("binary") )
+        resampleFilter->SetInterpolator( nn_interpolator );
+      else
+        resampleFilter->SetInterpolator( bspl_interpolator );
+
       resampleFilter->SetDefaultPixelValue( 0 );
 
       try

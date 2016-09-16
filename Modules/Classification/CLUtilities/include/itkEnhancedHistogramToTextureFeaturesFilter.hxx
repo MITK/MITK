@@ -218,7 +218,7 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
     autocorrelation +=index[0] * index[1] * frequency;
     contrast += (index[0] - index[1]) * (index[0] - index[1]) * frequency;
     dissimilarity += std::abs(index[0] - index[1]) * frequency;
-    maximumProbability = std::max(maximumProbability, frequency);
+    maximumProbability +=std::max(maximumProbability, frequency);
     averageProbability += frequency * index[0];
     if (index[0] != index[1])
       inverseVariance += frequency / ((index[0] - index[1])*(index[0] - index[1]));

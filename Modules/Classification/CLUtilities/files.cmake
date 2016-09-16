@@ -9,6 +9,7 @@ set(CPP_FILES
   Features/itkLineHistogramBasedMassImageFilter.cpp
 
   GlobalImageFeatures/mitkGIFCooccurenceMatrix.cpp
+  GlobalImageFeatures/mitkGIFCooccurenceMatrix2.cpp
   GlobalImageFeatures/mitkGIFGrayLevelRunLength.cpp
   GlobalImageFeatures/mitkGIFGrayLevelSizeZone.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp

@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
 
-#include <mitkGIFCooccurenceMatrix.h>
+#include <mitkGIFCooccurenceMatrix2.h>
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFVolumetricStatistics.h>
@@ -289,10 +289,10 @@ int main(int argc, char* argv[])
     for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
-      mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
+      mitk::GIFCooccurenceMatrix2::Pointer coocCalculator = mitk::GIFCooccurenceMatrix2::New();
       coocCalculator->SetRange(ranges[i]);
       coocCalculator->SetDirection(direction);
-      auto localResults = coocCalculator->CalculateFeatures(image, mask);
+      auto localResults = coocCalculator->CalculateFeatures(image, maskNoNaN);
       stats.insert(stats.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
     }

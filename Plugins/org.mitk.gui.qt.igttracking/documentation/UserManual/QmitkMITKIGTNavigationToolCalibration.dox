@@ -20,12 +20,32 @@ After you configured your device and your tools connect your device and start tr
 On the tab Initialization choose the tracking device you configured in the prevois step by clicking on it in the box "Available Navigation Data Sources". Then in the box "Tools" the tools you configured for this device should appear. Click on the tool that needs to be calibrated and then on the button "Use as Tool to Calibrate". On top of the view under the headline "Tool To calibrate" you now see the tool information for the chosen tool.
 For the tool used as a pointer do the same. Click on it, then click on the button "Use as Calibration Pointer" and on top of the view under the headline "Calibration pointer you should see the tool information for the pointer tool.
 
-\imageMacro{QmitkIGTTracking_ToolCalibration_Initialization.png,"MITK Screenshot with the initialized tools for calibration",16.00}
+\imageMacro{QmitkIGTTracking_ToolCalibration_Initialization.png,"MITK Screenshot with the initialized tools for calibration",5.00}
 
 
 \section QmitkMITKIGTNavigationToolCalibrationToolTipCalibration Tool Tip Calibration
 
-Onto the next step
+After you finished the initialization of your tracking device you can proceed on to the tab Tool Tip Calibration to calibrate your tool. 
+For the Tool Tip Calibration you have four different options:
+
+<ul>
+<li> Manual: Enter the known Translation and Rotation for the Tool Tip manually
+<li> Single Reference Tool: Use a calibrated tool as a reference to calibrate the non-calibrated tool
+<li> Multiple Tools Reference: Not implemented yet
+<li> Pivoting: Calibrate the tool by pivoting it around its tip. (Not fully implemented yet)
+</ul>
+
+\subsection QmitkMITKIGTNavigationToolCalibrationManual Manual Tool Tip Calibration
+
+Use this method to calibrate a navigation tool, of which you already know the translation and rotation that determine the tool tip calibration. 
+Click on Start Edit Tooltip and in the new window you can enter the values for the translation and the rotation. Either by using the sliders or by entering the values into the boxes. 
+\imageMacro{QmitkIGTTracking_ToolCalibration_Manual_EditingWindow.png,"MITK Screenshot of the window for manual tool calibration",5.00}
+After you entered the values you can click "Use Manipulated ToolTip" to perform the Calibration on the Tool to calibrate. The box "Current Tool Tip Orientation" will show you the results. It will list the resulting values of the Quaternion, the Euler Angles and the Matrix. To save the result permanently just click "Save Calibrated Navigation Tool" and you can save the calibrated tool as an IGTTool for later use with your tracking device in a navigation application.
+If you are not satisfied with the results you can click "Start Edit Tooltip" again and either change the values for the rotation and translation again or just reset everything by clicking on "Reset to Identity". To write the new values or reseted values into the tool just click "Use Manipulated Tool Tip" again. Now you can save your relust just as described above.
+
+
+
+
 
 
 Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction

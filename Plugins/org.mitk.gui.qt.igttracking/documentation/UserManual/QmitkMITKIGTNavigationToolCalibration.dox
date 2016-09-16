@@ -4,6 +4,7 @@
 
 \imageMacro{../resources/iconTrackingToolCalibration.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
+\tableofcontents
 
 \section QmitkMITKIGTNavigationToolCalibrationIntroduction Introduction
 This view allows the calibration of navigation tools. The calibrated tools can be saved permanently and later be used for any other IGT application.
@@ -64,8 +65,11 @@ This is not implemented yet.
 Not fully implemented yet.
 
 To calibrate your tool via pivoting place it on its tip an pivot it around its tip. Be careful not to move the tip otherwise the calibration result will be inaccurate. After you pivoted the tool into a new position click on the "Add Current Pose" button to collect the navigation data for this position. After you collected as many points as you need click on "Comute Pivot Point" to compute the pivot point.
-Unfortunately nothing will happen now, because the functinality is not fully implemented yet. Feel free to do it. :)
+Unfortunately nothing will happen now, because the functinality is not fully implemented yet.
 
+\subsection QmitkMITKIGTNavigationToolCalibration Tool Landmark Calibration
+
+Not fully implemented yet.
 
 Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction
 

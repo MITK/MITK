@@ -31,6 +31,7 @@ NDI tracking device and use real hardware to track. The code is written in the Q
 \li \subpage IGTTutorialStepSimplePlugin
 
 <b>  Step 5 - Example for a tracking application: The IGT Tracking Lab Plugin  </b> \n
+This step includes a small example of a tracking application. You will record points to track and register a book and update its position. It will show you a demo workflow for possible applications.
 \li \subpage IGTTutorialStepTrackingLab
 
 <b>  Step 6 - Advanced usage of IGT Modules  </b> \n

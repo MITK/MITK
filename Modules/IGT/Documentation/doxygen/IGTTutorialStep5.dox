@@ -3,7 +3,11 @@
 
 We already know the three views of the IGT tracking plugin from the first tutorial step (\ref org_mitk_gui_qt_igttracking): \ref org_mitk_views_igttrackingtoolbox , \ref org_mitk_views_igtnavigationtoolmanager and  \ref org_mitk_views_navigationdataplayer . While the first tutorial step only dealt with the usage of these views, we now want to have a deeper look at some parts of the code.
 
-Please note, that a lot of the IGT functionality is available as a widget. So if you need some part of it for your own plugin, you might just want to include the widget. This is for example done for the QmitkNavigationToolCreationWidget, which is used in the \ref org_mitk_views_igttrackingtoolbox view as well as in the \ref org_mitk_views_igtnavigationtoolmanager view.
+\section Widgets IGT Widgets
+
+A lot of the IGT functionality is available as a widget. So if you need some part of it for your own plugin, you might just want to include the widget. This is for example done for the QmitkNavigationToolCreationWidget, which is used in the \ref org_mitk_views_igttrackingtoolbox view as well as in the \ref org_mitk_views_igtnavigationtoolmanager view.
+
+\imageMacro{IGTTutorialStep5_Widgets.png,"",15.90}
 
 \section DataAccess Data access
 The fist important question is, how to get the tools you want to use for your application. The most simple way is using the \ref org_mitk_views_igtnavigationtoolmanager to load, create or edit the tools and access it via the NavigationToolStorage. It's provided by a microservice and you can access it e.g. via the module context (make sure, your module depends on IGT):
@@ -14,7 +18,7 @@ The fist important question is, how to get the tools you want to use for your ap
 
 Then, simply access the tools by
 
-      m_ToolStorage->->GetTool();
+      m_ToolStorage->GetTool();
 
 There are also many different functions available, e.g. providing the number of available tools or the name of the current tracking device. Just have a look at the documentation of the mitk::NavigationToolStorage if you are interested in it.
 

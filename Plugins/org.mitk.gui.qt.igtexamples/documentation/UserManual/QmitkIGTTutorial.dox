@@ -10,7 +10,11 @@ a global reinit.
 
 The symbol of this view is the following:
 
-\imageMacro{../../resources/IGTTutorial.png,"",2}
+\imageMacro{../../resources/icon_igt_simple_example.png,"",2}
+
+and the whole view looks like this:
+
+\imageMacro{IGTExampleIGT_QT_Tutorial_PluginView.png,"",2}
 
 In this tutorial we connect to the NDI Polaris tracking system (or alternatively use a virtual tracking device) and we will show the movement of a tool as cone in the StdMultiWidget editor.
 

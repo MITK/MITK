@@ -82,6 +82,8 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     void UpdateContour( const InteractionPositionEvent* );
 
 
+    void CreateWorkingNode();
+
     /**
     *   Little helper function. Returns the upper left corner of the given pixel.
     */

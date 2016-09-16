@@ -110,6 +110,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
       entropy += prob * std::log(prob) / Log2;
     }
   }
+  entropy = -entropy;
 
   double rms = std::sqrt(squared_sum / count);
   kurtosis = kurtosis / (uncorrected_std_dev*uncorrected_std_dev * uncorrected_std_dev*uncorrected_std_dev);
@@ -122,7 +123,8 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair("FirstOrder Entropy",entropy));
   featureList.push_back(std::make_pair("FirstOrder Energy",squared_sum));
   featureList.push_back(std::make_pair("FirstOrder RMS",rms));
-  featureList.push_back(std::make_pair("FirstOrder Kurtosis",kurtosis));
+  featureList.push_back(std::make_pair("FirstOrder Kurtosis", kurtosis));
+  featureList.push_back(std::make_pair("FirstOrder Excess Kurtosis", kurtosis-3));
   featureList.push_back(std::make_pair("FirstOrder Skewness",skewness));
   featureList.push_back(std::make_pair("FirstOrder Mean absolute deviation",mean_absolut_deviation));
   featureList.push_back(std::make_pair("FirstOrder Covered Image Intensity Range",coveredGrayValueRange));
@@ -145,10 +147,14 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {
     index[0] = i;
-    if(histogram->GetBinMin(0,i) < p10th)
+    if (histogram->GetBinMax(0, i) < p10th)
+    {
       histogram->SetFrequencyOfIndex(index, 0);
-    else if(histogram->GetBinMin(0,i) > p90th)
+    }
+    else if (histogram->GetBinMin(0, i) > p90th)
+    {
       histogram->SetFrequencyOfIndex(index, 0);
+    }
   }
 
   //Calculate the mean
@@ -159,7 +165,6 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
     meanRobust += histogram->GetFrequency(index) * 0.5 * (histogram->GetBinMin(0,i) + histogram->GetBinMax(0,i));
   }
   meanRobust = meanRobust / histogram->GetTotalFrequency();
-
   double robustMeanAbsoluteDeviation = 0.0;
   for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
   {

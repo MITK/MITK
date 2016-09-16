@@ -1,13 +1,17 @@
 /**
-\page IGTTutorialStep4 Tracking Lab
+\page IGTTutorialStepTrackingLab Tracking Lab
 
 The tracking lab is an IGT plugin containing various functions. You can enable this example in CMake with the
-option: MITK_BUILD_org.mitk.gui.qt.igtexamples. The code of the plugin/view is located in:
-MITK-Source/Plugins/org.mitk.gui.qt.igtexamples/src/internal/QmitkIGTTrackingLabView
+option: MITK_BUILD_org.mitk.gui.qt.igtexamples.
+
+\imageMacro{IGTTutorialStep3_cmake.png,"",15.90}
+
+The code of the plugin/view is located in:
+MITK-Source/Plugins/org.mitk.gui.qt.igtexamples/src/internal/QmitkIGTTrackingLabView .
 The plugin will automatically be lodaed in the mitkWorkbench.
 
-More information can be found in the user manual: \ref org_igttrackinglab "Tracking Lab User Manual"
+Please read the manual page on how to use this example: \ref org_igttrackinglab
 
-\ref IGTTutorialStep3 "[Previous step]" \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 
 */

@@ -1,5 +1,5 @@
 /**
-\page org_igttrackinglab IGT Tutorial Step 4: The IGT-TrackingLab
+\page org_igttrackinglab IGT Tutorial Step 5: The IGT-TrackingLab
 
 Available sections:
   - \ref QmitkIGTTrackingLabUsersManualOverview
@@ -10,16 +10,27 @@ Available sections:
   - \ref QmitkIGTTrackingLabUsersManualPtSetRec
   - \ref QmitkIGTTrackingLabUsersManualCamView
 
+
 \section QmitkIGTTrackingLabUsersManualOverview Introduction
 
-The IGT-TrackingLab is the last step of the IGT tutorial. It is a plugin which shows examples usage for many IGT classes and is also an example navigation implemented with IGT. In the following you can learn how to use the plugin by reading this manual together with the source code.
+The IGT-TrackingLab is the last step of the IGT tutorial. In the following you can learn how to use the plugin by reading this manual. IGT-TrackingLab shows example usage for many IGT classes and is also an example navigation implemented with IGT.
+
+The symbol of the Tracking Lab View is the following:
+
+\imageMacro{../../resources/icon_igt_tracking_lab.png,"",2}
+
+The view looks like this:
+\imageMacro{IGT_TrackingLab_PluginView.png,"",15.90}
+
+With this tutorial you will register a book using a tracking device of your choice and the MITK's book surface file. The registration will enable you to move the book in the real world and observe its movement in the MITK display. It also allows you to record PointSets or use the CameraView which simulates a Camera at the tip of your pointer.
 
 \section QmitkIGTTrackingLabUsersManualPrel Preliminaries
 First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the \ref org_mitk_views_igttrackingtoolbox "Tracking Toolbox View".
 
+
 \section QmitkIGTTrackingLabUsersManualConf Configuration
-Select the desired <i>Navigation Data Source</i>. Now it's time to define which tool shall be used as object marker and which tool shall be used as pointer. Next load the Book surface 
-provided with the example data (e.g. book.stl from the MITK-Data repository which comes with every superbuild or may also be checked out separately) into MITK. Fixate the object marker on a real book of your choice. Now we need to tell MITK that the object marker has been fixated on a physical object. To do this, select the <i>Book</i> as surface in the <i>Object Selection</i> submenu.
+Select the desired <i>Navigation Data Source</i>. Now it's time to define which tool shall be used as object marker and which tool shall be used as pointer. Next load the Book surface
+provided with the example data (e.g. book.stl from the MITK-Data repository which comes with every superbuild or may also be checked out separately) into MITK. Fixate the object marker on a real book of your choice. Now we need to tell MITK that the object marker has been fixated on a physical object. To do this, select the <i>Book</i> as surface in the <i>Object Selection</i> submenu as you can see in the screenshot above.
 
 \section QmitkIGTTrackingLabUsersManualIntialReg Initial Registration
 Now we need to register the object marker to the surface it's fixed upon, in our case the book. To do this, first press the initial registration button. For MITK to be able to do this registration, we need to
@@ -27,6 +38,7 @@ Now we need to register the object marker to the surface it's fixed upon, in our
 Press the <i>plus</i> button in the <i>Image fiducials</i> column. Shift + click on the corners on the book in the <i>MITK Display</i>.
 2. Point to the corresponding landmarks in the real world using the pointer.
 Now press the <i>plus</i> button in the <i>Real world fiducials</i> column and point to the corners on the real book. Press <i>Add current instrument position</i> whenever you targeted a corner to tell MITK this is the desired landmark. Make sure you select the "real" edges in the same order as the edges in the image.
+\imageMacro{IGT_TrackingLab_InitialRegistration.png,"Here the landmarks of the virtual object are already set",15.90}
 
 Press <i>Register</i> to finalize the initial registration.
 Now the object marker is registered onto the book. You can see this in the MITK image. If needed the FRE is shown in the widget.
@@ -52,5 +64,5 @@ You may need to adjust the Needle View Direction and the View Up Vector. This is
 
 In the above case, the camera should look in inverse z-direction, and the view up vector should probably be set to positive x. Note this is just an example and may be different depending on your pointer.
 
-
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 */

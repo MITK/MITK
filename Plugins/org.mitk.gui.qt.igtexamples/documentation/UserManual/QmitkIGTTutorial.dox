@@ -1,14 +1,94 @@
 /**
-\page org_imageguidedtherapytutorial The MITK-IGT Tutorial Module
+\page org_imageguidedtherapytutorial The MITK-IGT Tutorial View
 
-\imageMacro{QmitkIGTExamples_ImageGuidedTherapy.png,"Icon of the MITK-IGT Tutorial Module",2.00}
-
-\section QmitkIGTTutorialUserManualSummary Summary
-
-This module is not meant as a end-user module. It contains tutorial program code that explains how to use the MITK-IGT component.
+This view is not meant as an end-user module. It contains tutorial program code that explains how to use the MITK-IGT component.
 
 It contains only two buttons. The "Start image guided therapy" button will create a virtual tracking device and a virtual tool.
-It will move the tool around on random paths in a tracking volume of 200x200x200 mm. The tool is visualized with a cone. 
+It will move the tool around on random paths in a tracking volume of 200x200x200 mm. The tool is visualized with a cone.
 If you do not see a cone moving around, you will need to initialize the rendering views correctly. Use the DataManager view to perform
 a global reinit.
+
+The symbol of this view is the following:
+
+\imageMacro{../../resources/icon_igt_simple_example.png,"",2}
+
+and the whole view looks like this:
+
+\imageMacro{IGTExampleIGT_QT_Tutorial_PluginView.png,"",2}
+
+In this tutorial we connect to the NDI Polaris tracking system (or alternatively use a virtual tracking device) and we will show the movement of a tool as cone in the StdMultiWidget editor.
+
+First of all, you will have to add an IGT dependency to your cmake list. For this example, MitkIGTUI would be sufficient, but as the plugin contains several views, we have additional OpenIGTLink and US dependencies:
+
+\code{.cpp}
+
+    project(org_mitk_gui_qt_igtexamples)
+
+    mitk_create_plugin(
+        EXPORT_DIRECTIVE IGTEXAMPLES_EXPORT
+        EXPORTED_INCLUDE_SUFFIXES src
+        MODULE_DEPENDS MitkQtWidgetsExt MitkIGT MitkIGTUI MitkOpenIGTLink MitkOpenIGTLinkUI MitkUS
+    )
+\endcode
+
+More information on how to create your own plugin can be found here: \ref NewPluginPage
+
+When clicking the start button, a cone should move in the 3D view and stop after clicking the stop button.
+
+The view has several fuctions. Most of them deal with the basic functionality with the plugin (e.g. CreateQTPartControl or CreateConnections). For a deeper understanding, you might have a look at the files QmitkIGTTutorialView.cpp and QmitkIGTTutorialView.h
+For our IGT functionality, the following functions are important:
+\li OnStartIGT: Starts the navigation pipeline
+\li OnStopIGT: Disconnect the pipeline
+\li OnTimer: Updates the view
+
+Let's now have a deeper look at these functions.
+
+\section OnStartIGT OnStartIGT
+
+\snippet ../../src/internal/QmitkIGTTutorialView.cpp OnStart 1
+
+We first check in a try environment, if we should use an NDI tracking device or a virtual device. Let's start with NDI, we hardcode the parameters here and give out a warning. In your propper application, the parameters should be set via the gui aswell (see \ref org_mitk_views_igttrackingtoolbox ), but for simplicity, we just set hardcoded parameters here. If you want to try it with your own NDI device, you need to adapt these parameters here in the code:
+
+\snippet ../../src/internal/QmitkIGTTutorialView.cpp OnStart 2
+
+The tracking device has to be set to a source. For more information on the tracking pipeline, please have a look at the \ref IGTTutorialStepFilterPipeline.
+
+\snippet QmitkIGTTutorialView.cpp OnStart 3
+
+Alternatively, we can setup a virtual tracking device. We create this device, set the bounds, add a tool and connect it to the source:
+
+\snippet QmitkIGTTutorialView.cpp OnStart 4
+
+Now we need to connect the tracking system
+
+\snippet QmitkIGTTutorialView.cpp OnStart 5
+
+For the visualisation, we need an object. Here, we create a red cone
+
+\snippet QmitkIGTTutorialView.cpp OnStart 6
+
+The visualization filter will actually render the cone
+\snippet QmitkIGTTutorialView.cpp OnStart 7
+
+For a continuous display, we need to call update, here we decide to do it every 100 ms using a timer.
+\snippet QmitkIGTTutorialView.cpp OnStart 8
+
+Disable the selection of tracking devices during tracking:
+\snippet QmitkIGTTutorialView.cpp OnStart 8a
+
+For propper coding, you should always catch the exceptions:
+\snippet QmitkIGTTutorialView.cpp OnStart 9
+
+\section OnTimer OnTimer
+
+Each time, the timer is updated, the following code is executed:
+\snippet QmitkIGTTutorialView.cpp OnTimer
+
+\section OnStopIGT OnStopIGT
+This function will stop the pipeline and clean up everything:
+\snippet QmitkIGTTutorialView.cpp OnStop
+
+You now have a very simple plugin, which creates an own tracking device and starts or stops tracking. Of course, for your more advanced project, you could implement a new tracking device to be available in every plugin (see \ref IGTHowToImplementATrackingDevice) or use already implemented tracking devices via the tracking toolbox and/or microservices. This small example should just show you the most simple way to start tracking.
+
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 */

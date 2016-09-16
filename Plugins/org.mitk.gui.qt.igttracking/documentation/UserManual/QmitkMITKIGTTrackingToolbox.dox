@@ -2,55 +2,92 @@
 
 \page org_mitk_views_igttrackingtoolbox The MITK-IGT Tracking Toolbox
 
-\imageMacro{QmitkIGTTracking_IconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+\imageMacro{../resources/iconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
 \tableofcontents
 
 \section QmitkMITKIGTTrackingToolboxIntroduction Introduction
 
-The MITK-IGT Tracking Toolbox is a view which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file. Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada) and MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) are supported. The MicroBird family (Ascension Technology Corporation, Inc.; Burlington, USA) will hopefully follow soon since it is already supported by the tracking layer of IGT. The logging feature of the Tracking Toolbox supports logging in XML or CSV format.
+The MITK-IGT Tracking Toolbox is a view which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file.
+This page gives an overview of the view and is at the same time part of the IGT tutorial step \ref org_mitk_gui_qt_igttracking. All parts containing instructions
+for the tutorial begin with the bold printed label <b>Tutorial</b>.
 
 \imageMacro{QmitkIGTTracking_ScreenshotMitk.png,"MITK Screenshot with the TrackingToolbox activated",16.00}
 
 \section QmitkMITKIGTTrackingToolboxWorkflow General workflow Introduction
 
+Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada), MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) and Optitrack (NaturalPoint) are supported (see <a href="http://mitk.org/wiki/Mitk-Tracking-Device_Support_Levels"> Hardware Tracking Device Support</a>). Different tracking hardware can be used via OpenIGTLink connections (see \ref IGTTutorialStepOpenIGTLink "Open IGT Link tutorial"
+). For this Tracking Toolbox tutorial, we will use a virtual tracking device, which allows you to use simulated tracking data. This is very helpful if you want to test or implement some tracking application and don't have the hardware always available.
+
 A general Workflow with the Tracking Toolbox may be:
 
 <ul>
 <li> Configuration of a tracking device
-<li> Loading a toolfile which holds tool definitions
+<li> Adding or loading a toolfile which holds tool definitions
 <li> Start tracking
 <li> Logging tracked data
 </ul>
 
+<b>Tutorial:</b> In the following sections, we will get familiar with each of these points using the Virtual Tracking Device.
+
 \section QmitkMITKIGTTrackingToolboxConnecting Tracking Device Configuration
 
-The tracking device can be specified in the tracking device configuration section located in the upper area of the tracking tab. As shown in the screenshot below, you choose your tracking device in the drop down menu. If you use a tracking system connected to a serial port, like Aurora or Polaris, you then need to specifiy the serial port. In case of the MicronTracker you only need to ensure that all drivers are installed correctly and integrated into MITK. If you want to check the connection, press "test connection". The results are displayed in the small black box on the right.
+The tracking device can be specified in the tracking device configuration section located in the upper area of the tracking tab. As shown in the screenshot below, you choose your tracking device in the drop down menu.
+
+If you use a real tracking system, you might need to set some parameters like the serial port for Aurora or Polaris or the host name for your OpenIGTLink connection. Most implemented tracking device include an option to test your conection. Therefore you just need to press the button "test connection". The results are displayed in the small black box on the right.
+
+<b>Tutorial:</b> For a first introduction, please select the virtual tracking device in the drop-down-menu. You should see an option to add some jittering to the simulated data.
 
 \imageMacro{QmitkIGTTracking_ConfigurationWidget.png,"Tracking Device Configuration",8.55}
 
-\section QmitkMITKIGTTrackingToolboxLoadingTools Loading tools
+\section Tracking Tools
 
-To load tools which can be tracked you need a predefined tracking tool storage. If you use the Aurora system you also have the possibility to automatically detect the connected tools. In this case a tracking tool storage is created by the software (see section below). Otherwise you can use the MITK view NavigationToolManager to define a navigation tool storage. There you can create navigation tools with the corresponding toolfiles, visualization surfaces and so on. Please see NavigationToolManager manual for more details.
+For tracking, you need information about your tools. You can either add single tools, load previously created tool storages or for some devices auto-detect all available tools. The best way to edit tools after creation/loading is \ref org_mitk_views_igtnavigationtoolmanager view. Creation of new tools or loading of existing tool storages can be done within the Tracking Tool Widget.
 
-Navigation tool storages can be loaded by pressing the button "Load Tools". Please ensure that the tracking device type of the tools matches the chosen tracking device, otherwise you will get an error message if you try to start tracking. All loaded tools will then be displayed in grey as shown in the screenshot below. If you start tracking they will become green if the tools were found and red if they were not found inside the tracking volume.
+\imageMacro{QmitkIGTTracking_NavigationToolManagement_TrackingTools.png, "The tracking tool widget for adding or loading tools.",9.00}
 
-\imageMacro{QmitkIGTTracking_TrackingToolsWidget.png,"Tracking Tools",9.08}
+All added or loaded tools will then be displayed in grey as shown in the screenshot below. If you start tracking they will become green if the tools were found and red if they were not found inside the tracking volume.
+\imageMacro{QmitkIGTTracking_TrackingToolsWidget.png,"Added Tracking Tools",9.08}
 
-\section QmitkMITKIGTTrackingToolboxAutoDetection Auto detection of tools (only Aurora)
+\subsection QmitkMITKIGTTrackingToolboxAddingTools Adding tools
+The most simple step to begin with is to add new tools with this widget. The same widget is also available within \ref org_mitk_views_igtnavigationtoolmanager view and the single parameters are explained there in more detail.
+\imageMacro{QmitkIGTTracking_NavigationToolManagementAddTool.png,"Adding a new tool", 9.00}
 
-If the Aurora tracking system is used, a button "Auto Detection" appears. If you press this button the software connects to the system and automatically detects all connected tools. You will then be asked whether you want to save the detected tools as a tool storage to the hard drive. You might want to do this if you want to use or modify this tool storage later. In the automatically detected tool storage the tools are named AutoDetectedTools1, AutoDetectedTools2, and so on. Small spheres are used as tool surfaces. After autodetection the detected tools are loaded automatically even if you did not save them.
+<b>Tutorial:</b> Please click the "Add single tool" button and make sure, that the Virtual Tracker is selected in the drop-down-menu (the tracking device configured in the first step must always match your tools!). You might want to give your tool a new name in the "Basic Information" section and load a surface for visualization in the "Tool Visualization" section (a surface file can be found in your binary folder if you did compile MITK by yourself: MITK-superbuild\MITK-Data\IGT-Data\ClaronTool.stl). If you don't have any surface data, you can just select "use simple cone". Click on "Finished" and repeat this step to add a second tool.
+
+\subsection QmitkMITKIGTTrackingToolboxLoadingTools Loading tools
+To load tools which can be tracked you need a predefined tracking tool storage. You can use the MITK \ref org_mitk_views_igtnavigationtoolmanager view to define a navigation tool storage or to save the tools created within the last step in a toolstorage.
+
+Navigation tool storages can be loaded by pressing the button "Load Tools". Please ensure that the tracking device type of the tools matches the chosen tracking device, otherwise you will get an error message if you try to start tracking.
+
+\subsection QmitkMITKIGTTrackingToolboxAutoDetection Auto detection of tools (only Aurora)
+If you use the Aurora system you also have the possibility to automatically detect the connected tools. In this case a tracking tool storage is created by the software.
+In the Tracking Device Configuration widget, a button "Auto Detection" appears. If you press this button the software connects to the system and automatically detects all connected tools. You will then be asked whether you want to save the detected tools as a tool storage to the hard drive. You might want to do this if you want to use or modify this tool storage later. In the automatically detected tool storage the tools are named AutoDetectedTools1, AutoDetectedTools2, and so on. Small spheres are used as tool surfaces. After autodetection the detected tools are loaded automatically even if you did not save them.
 
 \section QmitkMITKIGTTrackingToolboxStartTracking Start/stop tracking
+To start tracking, you first need to connect to your tracking device ("connect" button). If your tools or tool storage don't match the tracking device or if no connection can be established, this might give an error message here.
+\imageMacro{QmitkIGTTracking_TrackingControl.png,"Tracking Control to start tracking.", 9.00}
+If connected succesfully, the start tracking button is enabled. As soon as you clicked this button, the tool information and tools will be highlighted red or green (un-/successful tracking) and in case of successful tracking, it's position will be updated and the tools are visualized in the 3D view of MITK.
+Note that options may not be changed after connecting the tracking device.
 
-Tracking can simply be started by pressing "Start Tracking". Note that options may not be changed during tracking. Once tracking has started the tracking volume (only if the option is on) and the tools are visualized in the 3D view of MITK.
+You can start, freeze, unfreeze and stop the tracking as long as you are connected. If you want to finish your tracking, please stop an disconnect your tracking device.
 
-\section QmitkMITKIGTTrackingToolboxLogging Logging features
-
-If your device is tracking, you are able to log the tracking data by using the logging tab. You first must define a file name. You can then choose whether you want comma seperated (csv) or xml format. Press "Start Logging" to start logging. You can also limit the number of logged frames, which will cause the logging to stop automatically after the given number.
+<b>Tutorial:</b> Please click "connect" and "start tracking". Both tools should move within the tracking volume, the position data should be updated in the tool widget and be highlighted green. You can freeze, unfreeze and stop/restart the tracking as often as you like. When finished, please stop and disconnect.
 
 \section QmitkMITKIGTTrackingOptions Options
 
-In the options tab you can enable or disable the visualization of the tracking volume and of the tool quaternions. If enabled, the tool quaternions are shown in the tool information. You can also define the update rate of the tracking data. The update rate should not be set higher than the update rate of the tracking system.
+In the options tab you can enable or disable the visualization of the tracking volume and of the tool quaternions. If enabled, the tool quaternions are shown in the tool information. You can also define the update rate of the tracking data. The update rate should not be set higher than the update rate of the tracking system. Other options might be available here depending on the newest developement within MITK-IGT.
+\imageMacro{QmitkIGTTracking_Options.png,"Recorded logging data.", 9.00}
+
+\section QmitkMITKIGTTrackingToolboxLogging Logging features
+The logging feature of the Tracking Toolbox supports logging in XML or CSV format.
+If your device is tracking, you are able to log the tracking data by using the logging tab. You first must define a file name. You can then choose whether you want comma seperated (csv) or xml format. Press "Start Logging" to start logging. You can also limit the number of logged frames, which will cause the logging to stop automatically after the given number.
+
+\imageMacro{QmitkIGTTracking_LoggingWidget.png,"Tracking options.", 9.00}
+
+<b>Tutorial:</b> Please connect and start tracking as you already did in the last step, switch to the logging tab, specify a csv file and start logging for a view seconds. Stop the tracking after a short period of time. You should now find the specified file which should look similar to the following screenshot and contain position data for both tools:
+\imageMacro{QmitkIGTTracking_LogFile.png,"Recorded logging data.", 9.00}
+
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 
 */

@@ -1,0 +1,1 @@
+If you change icons, please change both - svg and png - as one is needed for the documentation and the other as plugin icon.

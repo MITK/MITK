@@ -1,35 +1,50 @@
 /**
 \page IGTTutorialOverview IGT Tutorial Overview
 
-The IGT tutorial consists of four steps which will introduce the reader to the basic concepts and functions of IGT.
+The IGT tutorial consists of several steps which will introduce the you to the basic concepts and functions of IGT. The overview of all pages can be found here: \ref NavigationGeneralModulePage.
 
-\section Step1 Step 1 - IGT filter pipeline
+\section TrackingPlugins Tracking Plugins
 
-The first step will introduce the concept of the navigation pipeline. Via a virtual tracking device, tracking data
+<b> Step 1 - Introduction to the Tracking Plugins </b> \n
+During the introduction, you will get familiar with the usage of the tracking plugins. We will guide you step by step through the most important functions of our plugins.
+\li \ref org_mitk_gui_qt_igttracking
+
+\section IGTCode The IGT code
+
+<b>  Step 2 - IGT filter pipeline  </b> \n
+We will now start with a look at simple code examples to construct a simple navigation pipeline. Via a virtual tracking device, tracking data
 is written to the console. Everything is organized in a classic c++ main method.
-\li \subpage IGTTutorialStep1
+\li \subpage IGTTutorialStepFilterPipeline
 
-\section Step2 Step 2 - Visualization Filter and MITK Concepts
-
-Step 2 adds a broader view of basic MITK concepts. The objects are now added to an mitkDataStorage and rendered
+<b>  Step 3 - Visualization Filter and MITK Concepts  </b> \n
+This step adds a broader view of basic MITK concepts. The objects are now added to an mitkDataStorage and rendered
 in an mitkRenderWindow. For visualization the NavigationDataObjectVisualizationFilter is used.
 Everything is organized in a classic c++ main method.
-\li \subpage IGTTutorialStep2
+\li \subpage IGTTutorialStepVisualization
 
-\section Step3 Step 3 - Qt Gui Tutorial
+\section IGTWorkbench IGT within the MITK workbench
+
+<b>  Step 4 - Write your own simple Tracking Plugin  </b> \n
 This step shows how to seamlessly integrate an IGT plugin (the QmitkIGTTutorialView) into the mitkWorkbench. The plugin uses the virtual
 tracking device to generate data and renders the result in the mitkWorkbench. It is also possible to connect an
 NDI tracking device and use real hardware to track. The code is written in the QmitkView manner.
-\li \subpage IGTTutorialStep3
+\li \subpage IGTTutorialStepSimplePlugin
 
-\section Step4 Step 4 - Tracking Lab
-Step 4 shows a variety of navigation applications. To this point, for documentation a user manual is available.
-\li \subpage IGTTutorialStep4
+<b>  Step 5 - Example for a tracking application: The IGT Tracking Lab Plugin  </b> \n
+This step includes a small example of a tracking application. You will record points to track and register a book and update its position. It will show you a demo workflow for possible applications.
+\li \subpage IGTTutorialStepTrackingLab
 
-\section Step5 Step 5 - OpenIGTLink Tutorial
-Step 5 gives examples how to use OpenIGTLink in MITK. The first two simple examples include code to open a OpenIGTLink client and server for tracking data. The third, more advanced example shows you how to stream tracking and ultrasound data simultaneously from an external server.
-\li \subpage org_openigtlinkexample
-\li \subpage org_openigtlinkproviderexample
-\li \subpage org_openigtlinkplugin
+<b>  Step 6 - Advanced usage of IGT Modules  </b> \n
+In this step, we will have a deeper look into the plugins which we already saw within the first introduction step. Here, we point out some details in the code, which might be useful for you to reuse them within your own projects.
+\li \subpage IGTTutorialStepAdvanced
+
+<b>  Step 7 - OpenIGTLink Tutorial  </b> \n
+This step gives examples how to use OpenIGTLink in MITK. The first two simple examples include code to open a OpenIGTLink client and server for tracking data. The third, more advanced example shows you how to stream tracking and ultrasound data simultaneously from an external server.
+\li \subpage IGTTutorialStepOpenIGTLink
+
+\section FurtherFunctionality Further IGT functionality
+
+If you want to implement your own tracking device, this page might be helpful:
+\li \subpage IGTHowToImplementATrackingDevice
 
 */

@@ -7,7 +7,7 @@ The modules are shared libraries that provide functionality that can be used by 
 
 \section MITKModuleManualsListPageModuleManualList List of Module Manuals
 
-  \li \subpage IGTGeneralModulePage
+  \li \subpage NavigationGeneralModulePage
   \li \subpage MitkOpenCL_Overview
   \li \subpage LegacyGLModule
   \li \subpage GeneratingDeviceModulesPage

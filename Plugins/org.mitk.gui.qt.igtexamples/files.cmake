@@ -28,19 +28,9 @@ set(MOC_H_FILES
   src/internal/OpenIGTLinkPlugin.h
 )
 
-set(QRC_FILES
-  resources/QmitkIGTTrackingLabView.qrc
-  #resources/QmitkIGTTutorialView.qrc
-)
-
 set(CACHED_RESOURCE_FILES
-  resources/IgtTrackingLab.png
   resources/start_rec.png
   resources/stop_rec.png
-  resources/IGTTutorial.png
-  resources/icon.xpm
-  resources/example.png
-  resources/provider.png
   resources/icon_igt_simple_example.svg
   resources/icon_igt_tracking_lab.svg
   resources/icon_openigtlink_client_example.svg

@@ -3,12 +3,18 @@
 
 This plugin offers basic tracking functionalities. This includes connecting to a tracking system, logging and recording of tracking data, managing tracking tools and playing recorded tracking data.
 
-The plugin includes different views, which are described in different pages in detail:
+The plugin includes different views, which are described on different pages in detail.
+
+As part of the tutorial, it is recommended to get familiar with each of the following views as they lead you through the main functionality of the IGT plugin. Please read the following pages to get familiar with them:
 
 <ul>
-<li> \subpage org_mitk_views_igttrackingtoolbox : Allows for connecting to a tracking system and logging/recording of the tracked data.
-<li> \subpage org_mitk_views_igtnavigationtoolmanager : Navigation Tool Manager: This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
-<li> \subpage org_mitk_views_navigationdataplayer : Navigation Data Player: Plays navigation data which was recorded with the Tracking Toolbox for example.
+<li> \subpage org_mitk_views_igttrackingtoolbox : Allows for connecting a tracking system and logging/recording the tracked data.
+<li> \subpage org_mitk_views_igtnavigationtoolmanager : This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
+<li> \subpage org_mitk_views_navigationdataplayer : Plays navigation data which was recorded with the Tracking Toolbox for example.
+<li> \subpage org_mitk_views_calibrationtoolmanager Calibration Tool Manager. This view offers functionality to calibrate navigation tools.
+<li> \subpage org_mitk_views_igtregistrationview : The IGTFiducialRegistration view allows the recording of real world landmarks and corresponding landmarks on a virtual object.
 </ul>
+
+\ref Return to the \ref TrackingPlugins "[IGT Tutorial Overview]"
 
 */

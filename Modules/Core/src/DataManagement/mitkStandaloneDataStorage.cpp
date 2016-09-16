@@ -70,7 +70,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
     else
       sp = mitk::DataStorage::SetOfObjects::New();
     /* Store node and parent list in sources adjacency list */
-    node->SetIntProperty("loadIndex", m_AddedNodesCount++);
+    m_NodesIndices[node] = m_AddedNodesCount++;
     m_SourceNodes.insert(std::make_pair(node, sp));
 
     /* Store node and an empty children list in derivations adjacency list */
@@ -168,8 +168,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
     }
     else
     {
-      int loadIndex = 0;
-      it->first->GetIntProperty("loadIndex", loadIndex);
+      int loadIndex = m_NodesIndices.at(it->first);
       tempResult[loadIndex] = const_cast<mitk::DataNode*>(it->first.GetPointer());
     }
   }

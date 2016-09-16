@@ -131,6 +131,10 @@ namespace mitk {
     //##Documentation
     //## @brief Count for added nodes, used to save their initial loading order
     int m_AddedNodesCount;
+
+    //##Documentation
+    //## @brief Map with info about nodes' indices
+    std::map<mitk::DataNode::ConstPointer, int> m_NodesIndices;
   };
 } // namespace mitk
 #endif /* MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_ */

@@ -18,7 +18,7 @@ and the whole view looks like this:
 
 In this tutorial we connect to the NDI Polaris tracking system (or alternatively use a virtual tracking device) and we will show the movement of a tool as cone in the StdMultiWidget editor.
 
-First of all, you will have to add an IGT dependency to your cmake list. FOr this example, MitkIGTUI would be sufficient, but as the plugin contains several views, we have additional OpenIGTLink and US dependencies:
+First of all, you will have to add an IGT dependency to your cmake list. For this example, MitkIGTUI would be sufficient, but as the plugin contains several views, we have additional OpenIGTLink and US dependencies:
 
 \code{.cpp}
 

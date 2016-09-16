@@ -42,7 +42,7 @@ If you use a real tracking system, you might need to set some parameters like th
 
 \section Tracking Tools
 
-For tracking, you need information about your tools. You can either add single tools, load previously created tool storages or for some devices auto-detect all available tools. The best way to edit tools after creation/loading is \ref org_mitk_views_igtnavigationtoolmanager view. Creation of new tools or loading of existing tool storages can be done within the Tracking Tool Widget
+For tracking, you need information about your tools. You can either add single tools, load previously created tool storages or for some devices auto-detect all available tools. The best way to edit tools after creation/loading is \ref org_mitk_views_igtnavigationtoolmanager view. Creation of new tools or loading of existing tool storages can be done within the Tracking Tool Widget.
 
 \imageMacro{QmitkIGTTracking_NavigationToolManagement_TrackingTools.png, "The tracking tool widget for adding or loading tools.",9.00}
 

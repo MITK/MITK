@@ -2,7 +2,7 @@
 
 \page org_mitk_views_calibrationtoolmanager The MITK-IGT Navigation Tool Calibration
 
-\imageMacro{../resources/iconTrackingToolCalibration.svg,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+\imageMacro{../resources/iconTrackingToolCalibration.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
 
 \section QmitkMITKIGTNavigationToolCalibrationIntroduction Introduction
@@ -11,7 +11,7 @@ This view allows the calibration of navigation tools. The calibrated tools can b
 
 \section QmitkMITKIGTNavigationToolCalibrationPrerequisities Prerequisites
 
-In the IGT Tracking Toolbox configure your tracking device with at least two tools. The tool you wish to calibrate and one tool used as a pointer during the calibration process. For details on how to configure your tracking device and your tools have a look at \ref org_mitk_views_igttrackingtoolbox
+In the IGT Tracking Toolbox configure your tracking device with at least two tools. The tool you wish to calibrate and one tool used as a pointer during the calibration process. For details on how to configure your tracking device and your tools have a look at \ref org_mitk_views_igttrackingtoolbox .
 After you configured your device and your tools connect your device and start tracking. Now switch to the IGT Navigation Tool Calibration for the calibration process.
 
 

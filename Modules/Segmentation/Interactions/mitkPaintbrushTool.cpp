@@ -290,6 +290,8 @@ void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
   if (!positionEvent) return;
 
   // create new working node
+  // a fresh node is needed to only display the actual drawing process for
+  // the undo function
   if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
       m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
   m_WorkingSlice = nullptr;
@@ -452,7 +454,8 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
       m_WorkingNode->Modified();
     }
   } else {
-      // switched from renderwindow
+      // switched from different renderwindow
+      // no activate hover highlighting. Otherwise undo / redo wont work
       this->m_WorkingNode->SetVisibility(false);
   }
 

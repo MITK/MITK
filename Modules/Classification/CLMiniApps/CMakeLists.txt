@@ -41,10 +41,11 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       set(dependencies_list ${dependencies})
 
       mitk_create_executable(${appname}
-      DEPENDS MitkCore MitkCLCore ${dependencies_list}
-      PACKAGE_DEPENDS ITK Qt4|QtCore Qt5|Core Vigra
-      CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
+      DEPENDS MitkCore MitkCLCore MitkCommandLine ${dependencies_list}
+      PACKAGE_DEPENDS ITK Qt5|Core Vigra
+      CPP_FILES ${appname}.cpp
       )
+      # CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
 
       if(EXECUTABLE_IS_ENABLED)
 
@@ -106,22 +107,22 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
     DEPENDS MitkCore MitkCLCore MitkDataCollection MitkCLImportanceWeighting MitkCLVigraRandomForest
     CPP_FILES CLVoxelClassification.cpp
   )
-  mitk_create_executable(CLBrainMask
-    DEPENDS MitkCore MitkCLUtilities
-    CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLImageConverter
-    DEPENDS MitkCore
-    CPP_FILES CLImageConverter.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLSurWeighting
-    DEPENDS MitkCore MitkCLUtilities MitkDataCollection MitkCLImportanceWeighting
-    CPP_FILES CLSurWeighting.cpp mitkCommandLineParser.cpp
-  )
-  mitk_create_executable(CLImageCropper
-    DEPENDS MitkCore MitkCLUtilities MitkAlgorithmsExt
-    CPP_FILES CLImageCropper.cpp mitkCommandLineParser.cpp
-  )
+  #mitk_create_executable(CLBrainMask
+  #  DEPENDS MitkCore MitkCLUtilities
+  #  CPP_FILES CLBrainMask.cpp mitkCommandLineParser.cpp
+  #)
+  #mitk_create_executable(CLImageConverter
+  #  DEPENDS MitkCore
+  #  CPP_FILES CLImageConverter.cpp mitkCommandLineParser.cpp
+  #)
+  #mitk_create_executable(CLSurWeighting
+  #  DEPENDS MitkCore MitkCLUtilities MitkDataCollection #MitkCLImportanceWeighting
+  #  CPP_FILES CLSurWeighting.cpp mitkCommandLineParser.cpp
+  #)
+  #mitk_create_executable(CLImageCropper
+  #  DEPENDS MitkCore MitkCLUtilities MitkAlgorithmsExt
+  #  CPP_FILES CLImageCropper.cpp mitkCommandLineParser.cpp
+  #)
 
         # On Linux, create a shell script to start a relocatable application
         if(UNIX AND NOT APPLE)

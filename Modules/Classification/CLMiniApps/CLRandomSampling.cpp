@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include <mitkRandomImageSampler.h>
 
-static vector<double> splitDouble(string str, char delimiter) {
-  vector<double> internal;
-  stringstream ss(str); // Turn the string into a stream.
-  string tok;
+static std::vector<double> splitDouble(std::string str, char delimiter) {
+  std::vector<double> internal;
+  std::stringstream ss(str); // Turn the string into a stream.
+  std::string tok;
   double val;
   while (getline(ss, tok, delimiter)) {
-    stringstream s2(tok);
+    std::stringstream s2(tok);
     s2 >> val;
     internal.push_back(val);
   }
@@ -32,13 +32,13 @@ static vector<double> splitDouble(string str, char delimiter) {
   return internal;
 }
 
-static vector<unsigned int> splitUInt(string str, char delimiter) {
-  vector<unsigned int> internal;
-  stringstream ss(str); // Turn the string into a stream.
-  string tok;
+static std::vector<unsigned int> splitUInt(std::string str, char delimiter) {
+  std::vector<unsigned int> internal;
+  std::stringstream ss(str); // Turn the string into a stream.
+  std::string tok;
   unsigned int val;
   while (getline(ss, tok, delimiter)) {
-    stringstream s2(tok);
+    std::stringstream s2(tok);
     s2 >> val;
     internal.push_back(val);
   }
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   parser.addArgument("single-number", "sn", mitkCommandLineParser::OutputFile, "Single Number of Voxel for each class", "Output file", us::Any(), true);
   parser.addArgument("class-number", "cn", mitkCommandLineParser::OutputFile, "Class-dependedn number of voxels ", "Output file", us::Any(), true);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size() == 0)
     return EXIT_FAILURE;
@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
   }
 
 
-  std::string inputName = us::any_cast<string>(parsedArgs["input"]);
-  std::string outputName = us::any_cast<string>(parsedArgs["output"]);
+  std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
 
   mitk::RandomImageSampler::Pointer filter = mitk::RandomImageSampler::New();

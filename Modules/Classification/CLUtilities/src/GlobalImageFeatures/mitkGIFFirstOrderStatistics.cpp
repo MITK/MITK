@@ -149,7 +149,6 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
       histogram->SetFrequencyOfIndex(index, 0);
     else if(histogram->GetBinMin(0,i) > p90th)
       histogram->SetFrequencyOfIndex(index, 0);
-
   }
 
   //Calculate the mean

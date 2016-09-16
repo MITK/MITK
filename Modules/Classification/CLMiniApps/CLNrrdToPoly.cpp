@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
   parser.setDescription("Estimates a Mesh from a segmentation");
   parser.setContributor("MBI");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size()==0)
   {

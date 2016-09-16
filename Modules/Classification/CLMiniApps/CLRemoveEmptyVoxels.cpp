@@ -48,12 +48,12 @@ int main(int argc, char* argv[])
 
   for (int i = 0; i < 100; ++i)
   {
-    stringstream s1; s1 << i; std::string number = s1.str();
+    std::stringstream s1; s1 << i; std::string number = s1.str();
     parser.addArgument("input"+number, "i"+number, mitkCommandLineParser::OutputFile, "Input file", "input file", us::Any(), true);
     parser.addArgument("output" + number, "o" + number, mitkCommandLineParser::OutputFile, "Output File", "Output file", us::Any(), true);
   }
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size() == 0)
     return EXIT_FAILURE;
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
   std::vector<IteratorType> outputIteratorVector;
   for (int i = 0; i < 100; ++i)
   {
-    stringstream s1; s1 << i; std::string number = s1.str();
+    std::stringstream s1; s1 << i; std::string number = s1.str();
     if (parsedArgs.count("input" + number) < 1)
       break;
     if (parsedArgs.count("output" + number) < 1)
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   // Save the new images
   for (int i = 0; i < outputIteratorVector.size(); ++i)
   {
-    stringstream s1; s1 << i; std::string number = s1.str();
+    std::stringstream s1; s1 << i; std::string number = s1.str();
     mitk::Image::Pointer mitkImage = mitk::Image::New();
     mitk::CastToMitkImage(itkOutputImageVector[i], mitkImage);
     mitk::IOUtil::SaveImage(mitkImage, parsedArgs["output" + number].ToString());

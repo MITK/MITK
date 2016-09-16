@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
   parser.setDescription("Resamples an image (moving) to an given image (fix) without additional registration.");
   parser.setContributor("MBI");
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size() == 0)
   {

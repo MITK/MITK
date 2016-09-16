@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   }
 
   MITK_INFO << "Mode access";
-  int mode =stoi(us::any_cast<string>(parsedArgs["mode"]));
+  int mode =std::stoi(us::any_cast<std::string>(parsedArgs["mode"]));
   MITK_INFO << "Mode: " << mode;
 
   MITK_INFO << "Read images";

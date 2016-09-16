@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
   parser.addArgument("type", "t", mitkCommandLineParser::OutputFile, "Type definition:", "Define Scalar data type: int, uint, short, ushort, char, uchar, float, double", us::Any(), false);
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   if (parsedArgs.size()==0)
     return EXIT_FAILURE;
@@ -52,9 +52,9 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  std::string inputName = us::any_cast<string>(parsedArgs["input"]);
-  std::string outputName = us::any_cast<string>(parsedArgs["output"]);
-  std::string type = us::any_cast<string>(parsedArgs["type"]);
+  std::string inputName = us::any_cast<std::string>(parsedArgs["input"]);
+  std::string outputName = us::any_cast<std::string>(parsedArgs["output"]);
+  std::string type = us::any_cast<std::string>(parsedArgs["type"]);
 
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(inputName);
   mitk::Image::Pointer outputImage = mitk::Image::New();

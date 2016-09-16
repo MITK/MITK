@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
   parser.addArgument("winer-filter-noise", "wfn", mitkCommandLineParser::Float, "Parameter", "Noise estimate defining the Wiener filter (default 0.01)", us::Any(), true);
 
 
-  map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Show a help message
   if (parsedArgs.count("help") || parsedArgs.count("h"))

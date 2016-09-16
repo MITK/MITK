@@ -9,7 +9,7 @@ The plugin includes different views, which are described on different pages in d
 <li> \subpage org_mitk_views_igttrackingtoolbox : Allows for connecting a tracking system and logging/recording the tracked data.
 <li> \subpage org_mitk_views_igtnavigationtoolmanager : This view offers functionality to manage tool storages. Each tool storage holds a preconfigured tool collection. Once saved you can load a tool storage in the Tracking Toolbox and don't need to add every tool seperately.
 <li> \subpage org_mitk_views_navigationdataplayer : Plays navigation data which was recorded with the Tracking Toolbox for example.
-<li> \subpage org_mitk_views_calibrationtoolmanager Calibration Tool Manager. Will follow soon.
+<li> \subpage org_mitk_views_calibrationtoolmanager Calibration Tool Manager. This view offers functionality to calibrate navigation tools.
 </ul>
 
 \ref Return to the \ref TrackingPlugins "[IGT Tutorial Overview]"

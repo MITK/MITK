@@ -176,6 +176,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   }
   robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
 
+  featureList.push_back(std::make_pair("FirstOrder Robust Mean", meanRobust));
   featureList.push_back(std::make_pair("FirstOrder Robust Mean Absolute Deviation",robustMeanAbsoluteDeviation));
 
 }

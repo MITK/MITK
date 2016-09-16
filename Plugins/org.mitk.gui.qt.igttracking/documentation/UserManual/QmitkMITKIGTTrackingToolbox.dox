@@ -9,7 +9,7 @@
 \section QmitkMITKIGTTrackingToolboxIntroduction Introduction
 
 The MITK-IGT Tracking Toolbox is a view which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file.
-This page gives an overview of the view and is at the same time part of the IGT tutorial step \ref IGTTutorialStepPluginIntroduction. All parts containing instructions
+This page gives an overview of the view and is at the same time part of the IGT tutorial step \ref org_mitk_gui_qt_igttracking. All parts containing instructions
 for the tutorial begin with the bold printed label <b>Tutorial</b>.
 
 \imageMacro{QmitkIGTTracking_ScreenshotMitk.png,"MITK Screenshot with the TrackingToolbox activated",16.00}
@@ -88,6 +88,6 @@ If your device is tracking, you are able to log the tracking data by using the l
 <b>Tutorial:</b> Please connect and start tracking as you already did in the last step, switch to the logging tab, specify a csv file and start logging for a view seconds. Stop the tracking after a short period of time. You should now find the specified file which should look similar to the following screenshot and contain position data for both tools:
 \imageMacro{QmitkIGTTracking_LogFile.png,"Recorded logging data.", 9.00}
 
-Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 
 */

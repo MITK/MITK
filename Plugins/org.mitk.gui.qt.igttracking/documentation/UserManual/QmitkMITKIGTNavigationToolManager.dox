@@ -48,6 +48,6 @@ The tool type is additional information which is not needed by the tracking devi
 
 \imageMacro{QmitkIGTTracking_NavigationToolManagementAddTool.png,"Screenshot of add/edit navigation tool screen",9.19}
 
-Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 
 */

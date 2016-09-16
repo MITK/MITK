@@ -24,6 +24,6 @@ Use the Time-based player to play the data in the speed they were originally acq
 
 <b>Tutorial:</b> As part of the IGT tutorial, you might try to replay your recorded data from step \ref org_mitk_views_igttrackingtoolbox. You should see two spheric tools moving within the tracking volume. Note that the tool storage is not included in the navigation data player at the moment, and hence all tools are represented as spheres.
 
-Return to the Tutorial Step: \ref IGTTutorialStepPluginIntroduction
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 
 */

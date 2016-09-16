@@ -1,7 +1,7 @@
 /**
 \page IGTTutorialStepAdvanced A deeper look into the IGT Plugins
 
-We already know the three views of the IGT tracking plugin from the first tutorial step (\ref IGTTutorialStepPluginIntroduction): \ref org_mitk_views_igttrackingtoolbox , \ref org_mitk_views_igtnavigationtoolmanager and  \ref org_mitk_views_navigationdataplayer . While the first tutorial step only dealt with the usage of these views, we now want to have a deeper look at some parts of the code.
+We already know the three views of the IGT tracking plugin from the first tutorial step (\ref org_mitk_gui_qt_igttracking): \ref org_mitk_views_igttrackingtoolbox , \ref org_mitk_views_igtnavigationtoolmanager and  \ref org_mitk_views_navigationdataplayer . While the first tutorial step only dealt with the usage of these views, we now want to have a deeper look at some parts of the code.
 
 Please note, that a lot of the IGT functionality is available as a widget. So if you need some part of it for your own plugin, you might just want to include the widget. This is for example done for the QmitkNavigationToolCreationWidget, which is used in the \ref org_mitk_views_igttrackingtoolbox view as well as in the \ref org_mitk_views_igtnavigationtoolmanager view.
 

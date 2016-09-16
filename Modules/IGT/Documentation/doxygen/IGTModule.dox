@@ -22,7 +22,7 @@ The IGT documentation contains the following pages:
 <ul>
 <li> \subpage IGTTutorialOverview  IGT Tutorial Overview - This tutorial will guide you step by step through all plugins, modules and documentation pages. It contains the following steps:
 <ul>
-<li> \ref IGTTutorialStepPluginIntroduction - Step 1: This tutorial step explains the usage of the most important IGT plugins
+<li> \ref org_mitk_gui_qt_igttracking - Step 1: This tutorial step explains the usage of the most important IGT plugins
 
 <li> \ref IGTTutorialStepFilterPipeline - Step 2: This tutorial step on how to implement an IGT filter pipeline
 

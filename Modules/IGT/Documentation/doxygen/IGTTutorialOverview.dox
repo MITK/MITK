@@ -7,7 +7,7 @@ The IGT tutorial consists of several steps which will introduce the you to the b
 
 <b> Step 1 - Introduction to the Tracking Plugins </b> \n
 During the introduction, you will get familiar with the usage of the tracking plugins. We will guide you step by step through the most important functions of our plugins.
-\li \subpage IGTTutorialStepPluginIntroduction
+\li \ref org_mitk_gui_qt_igttracking
 
 \section IGTCode The IGT code
 

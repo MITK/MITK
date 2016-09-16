@@ -31,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
 
+#include <itkImageDuplicator.h>
+#include <itkImageRegionIterator.h>
+
 
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
@@ -82,6 +85,45 @@ ResampleImage(itk::Image<TPixel, VImageDimension>* itkImage, float resolution, m
   mitk::GrabItkImageMemory(resampler->GetOutput(), newImage);
 }
 
+
+
+static void
+CreateNoNaNMask(mitk::Image::Pointer mask, mitk::Image::Pointer ref, mitk::Image::Pointer& newMask)
+{
+  MaskImageType::Pointer itkMask = MaskImageType::New();
+  FloatImageType::Pointer itkValue = FloatImageType::New();
+  mitk::CastToItkImage(mask, itkMask);
+  mitk::CastToItkImage(ref, itkValue);
+
+  typedef itk::ImageDuplicator< MaskImageType > DuplicatorType;
+  DuplicatorType::Pointer duplicator = DuplicatorType::New();
+  duplicator->SetInputImage(itkMask);
+  duplicator->Update();
+
+  auto tmpMask = duplicator->GetOutput();
+
+  itk::ImageRegionIterator<MaskImageType> mask1Iter(itkMask, itkMask->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<MaskImageType> mask2Iter(tmpMask, tmpMask->GetLargestPossibleRegion());
+  itk::ImageRegionIterator<FloatImageType> imageIter(itkValue, itkValue->GetLargestPossibleRegion());
+  while (!mask1Iter.IsAtEnd())
+  {
+    mask2Iter.Set(0);
+    if (mask1Iter.Value() > 0)
+    {
+      // Is not NaN
+      if (imageIter.Value() == imageIter.Value())
+      {
+        mask2Iter.Set(1);
+      }
+    }
+    ++mask1Iter;
+    ++mask2Iter;
+    ++imageIter;
+  }
+
+  newMask->InitializeByItk(tmpMask);
+  mitk::GrabItkImageMemory(tmpMask, newMask);
+}
 
 static void
 ResampleMask(mitk::Image::Pointer mask, mitk::Image::Pointer ref, mitk::Image::Pointer& newMask)
@@ -158,6 +200,7 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
   mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
 
+
   if (parsedArgs.count("fixed-isotropic"))
   {
     mitk::Image::Pointer newImage = mitk::Image::New();
@@ -208,6 +251,9 @@ int main(int argc, char* argv[])
     direction = splitDouble(parsedArgs["direction"].ToString(), ';')[0];
   }
 
+  mitk::Image::Pointer maskNoNaN = mitk::Image::New();
+  CreateNoNaNMask(mask, image, maskNoNaN);
+
   mitk::AbstractGlobalImageFeature::FeatureListType stats;
   ////////////////////////////////////////////////////////////////
   // Calculate First Order Features
@@ -216,7 +262,7 @@ int main(int argc, char* argv[])
   {
     MITK_INFO << "Start calculating first order statistics....";
     mitk::GIFFirstOrderStatistics::Pointer firstOrderCalculator = mitk::GIFFirstOrderStatistics::New();
-    auto localResults = firstOrderCalculator->CalculateFeatures(image, mask);
+    auto localResults = firstOrderCalculator->CalculateFeatures(image, maskNoNaN);
     stats.insert(stats.end(), localResults.begin(), localResults.end());
     MITK_INFO << "Finished calculating first order statistics....";
   }

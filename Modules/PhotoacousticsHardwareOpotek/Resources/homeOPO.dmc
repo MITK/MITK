@@ -32,6 +32,9 @@ ST;AM
 MG "HIT END"
 OE 1
 WT 100
+pos=0
+PA pos;BG;AM;
+BG;AM;
 DP*=0
 rh=1
 EN

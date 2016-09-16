@@ -6,12 +6,9 @@ rt=1
 JP #MOVE
 EN
 #ININT
-'MG "INSIDE INTERUPPT ROUTINE"
 idx = count % points
-MG "idx = ", idx {F2.2}
 PA pos[idx];BG;AM;
 BG;AM;
 count = count + 1
 WT 1
-RI 1; 'Return to the main program
-'and restore trip point
+RI 1;

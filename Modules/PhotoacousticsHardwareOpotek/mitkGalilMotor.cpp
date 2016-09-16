@@ -115,13 +115,13 @@ bool mitk::GalilMotor::CloseConnection()
 
 int mitk::GalilMotor::GetPositionFromWavelength(double wavelength)
 {
-  int pos = m_WavelengthToStepCalibration[0]; //+ m_WavelengthToStepCalibration[7];
-  pos += m_WavelengthToStepCalibration[1] * wavelength;
-  pos += m_WavelengthToStepCalibration[2] * std::pow(wavelength, 2);
-  pos += m_WavelengthToStepCalibration[3] * std::pow(wavelength, 3);
-  pos += m_WavelengthToStepCalibration[4] * std::pow(wavelength, 4);
-  pos += m_WavelengthToStepCalibration[5] * std::pow(wavelength, 5);
-  pos += m_WavelengthToStepCalibration[6] * std::pow(wavelength, 6);
+  int pos = m_WavelengthToStepCalibration[0] + m_WavelengthToStepCalibration[7];
+  pos += (m_WavelengthToStepCalibration[1] * wavelength);
+  pos += (m_WavelengthToStepCalibration[2] * std::pow(wavelength, 2));
+  pos += (m_WavelengthToStepCalibration[3] * std::pow(wavelength, 3));
+  pos += (m_WavelengthToStepCalibration[4] * std::pow(wavelength, 4));
+  pos += (m_WavelengthToStepCalibration[5] * std::pow(wavelength, 5));
+  pos += (m_WavelengthToStepCalibration[6] * std::pow(wavelength, 6));
   return pos;
 }
 
@@ -160,20 +160,20 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
   m_ReturnCode = GProgramDownload(m_GalilSystem, "", 0);
 
   std::string positionCommand;
-  positionCommand = "count = 0; idx = 0; DM pos[2]; pos[0] = " + std::to_string(36459/*this->GetPositionFromWavelength(wavelength)*/) + "; "
-    + "pos[1] = " + std::to_string(24577/*this->GetPositionFromWavelength(wavelength)*/) + ";";
-
+  positionCommand = "\n count = 0; idx = 0; DM pos[2] \n pos[0] = " + std::to_string(36459/*this->GetPositionFromWavelength(wavelength)*/) + "\n"
+    + "pos[1] = " + std::to_string(24577/*this->GetPositionFromWavelength(wavelength)*/) + "\n";
+  MITK_INFO << "[Galil Debug] fasttuning lke this" << positionCommand;
   std::string galilFastTuneConf;
-  this->LoadResorceFile("configSlowTuneOPO.dmc", &galilFastTuneConf);
+  this->LoadResorceFile("configFastTuneOPO.dmc", &galilFastTuneConf);
   std::string galilFastTuneExec;
-  this->LoadResorceFile("executeSlowTuneOPO.dmc", &galilFastTuneExec);
+  this->LoadResorceFile("executeFastTuneOPO.dmc", &galilFastTuneExec);
 
   std::string galilFastTune = galilFastTuneConf + positionCommand + galilFastTuneExec;
 
   m_ReturnCode = GProgramDownload(m_GalilSystem, galilFastTune.c_str(), 0);
 
   //m_ReturnCode = GProgramDownloadFile(m_GalilSystem, "c:/opotek/fastTuneOPO.dmc", 0);/*should be tuneOPOto700*/
-  MITK_INFO << "[Galil Debug] after tune GProgramDownloadFile = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
+  MITK_INFO << "[Galil Debug] after fast tune GProgramDownloadFile = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
   m_ReturnCode = GCmd(m_GalilSystem, "XQ");
   GSleep(3000);
   int val = -1;

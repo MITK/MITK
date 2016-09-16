@@ -127,6 +127,9 @@ private:
   */
   void ResetTwoImageOpPanel();
 
+  /** retrieve the tnc from renderwindow part */
+  void InternalGetTimeNavigationController();
+
   /*!
   * controls containing sliders for scrolling through the slices
   */

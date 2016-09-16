@@ -93,6 +93,8 @@ protected slots:
   void sessionTimedOutMsg();
   void sessionTimesOutSoonMsg();
 
+  void ToggleConnection();
+
 protected:
 
   virtual void SetFocus() override;
@@ -117,6 +119,8 @@ private:
 
   void SetStatusInformation(const QString&);
 
+  void CleanUp();
+
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
   QmitkXnatTreeModel* m_TreeModel;
 
@@ -124,6 +128,8 @@ private:
   QString m_DownloadPath;
 
   QMenu* m_ContextMenu;
+
+  bool m_SilentMode;
 };
 
 #endif // QMITKXNATTREEBROWSERVIEW_H

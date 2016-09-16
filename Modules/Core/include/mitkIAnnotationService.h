@@ -21,9 +21,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 #include <vector>
 #include <MitkCoreExports.h>
+#include <usServiceRegistration.h>
 
 namespace mitk
 {
+  class AbstractAnnotationRenderer;
+
+  typedef us::ServiceRegistration<AbstractAnnotationRenderer> AnnotationServiceRef;
+
   /**
    * \ingroup MicroServices_Interfaces
    * \brief Interface of property aliases service.
@@ -35,6 +40,9 @@ namespace mitk
   class MITKCORE_EXPORT IAnnotationService
   {
   public:
+
+    virtual void AddAnnotationRenderer(AnnotationServiceRef, const std::string& id) = 0;
+
     virtual ~IAnnotationService();
 
   };

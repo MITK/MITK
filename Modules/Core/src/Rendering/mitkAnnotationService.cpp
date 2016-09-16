@@ -15,6 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAnnotationService.h"
+#include <mitkAbstractAnnotationRenderer.h>
+
+void mitk::AnnotationService::AddAnnotationRenderer(mitk::AnnotationServiceRef ref, const std::string &id)
+{
+  m_InstanceMap[id] = ref;
+}
 
 mitk::AnnotationService::AnnotationService()
 {

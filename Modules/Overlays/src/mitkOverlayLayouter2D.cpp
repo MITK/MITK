@@ -23,6 +23,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
+OverlayLayouter2D *OverlayLayouter2D::GetOverlayLayouter2D(us::ModuleContext *context)
+{
+  return Superclass::GetService<OverlayLayouter2D>(context);
+}
+
 OverlayLayouter2D::OverlayLayouter2D()
 {
 }

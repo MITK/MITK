@@ -22,13 +22,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  typedef std::map<std::string,AnnotationServiceRef> InstanceMapType;
+
   class AnnotationService : public IAnnotationService
   {
   public:
+
+    void AddAnnotationRenderer(AnnotationServiceRef ref, const std::string &id) override;
+
     AnnotationService();
     ~AnnotationService();
 
   private:
+
+    InstanceMapType m_InstanceMap;
 
     AnnotationService(const AnnotationService&);
     AnnotationService& operator=(const AnnotationService&);

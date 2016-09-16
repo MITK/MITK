@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include "mitkOverlay.h"
 #include "mitkServiceInterface.h"
+#include "usGetModuleContext.h"
 
 namespace mitk {
 
@@ -36,11 +37,31 @@ class BaseRenderer;
  *@ingroup Overlays
 */
 class MITKCORE_EXPORT AbstractAnnotationRenderer : public itk::LightObject {
-public:
+
+  public:
 
   mitkClassMacroItkParent(AbstractAnnotationRenderer, itk::LightObject);
 
   protected:
+
+  template<class S>
+  static S* GetService(us::ModuleContext* context)
+  {
+    if (context == nullptr) return nullptr;
+
+    S* coreService = nullptr;
+
+//    m_PropertyAliases.reset(new mitk::PropertyAliases);
+//    context->RegisterService<mitk::IPropertyAliases>(m_PropertyAliases.get());
+
+    us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
+    if (serviceRef)
+    {
+      coreService = context->GetService(serviceRef);
+    }
+
+    return coreService;
+  }
 
   /** \brief explicit constructor which disallows implicit conversions */
   explicit AbstractAnnotationRenderer();

@@ -27,7 +27,6 @@ With this tutorial you will register a book using a tracking device of your choi
 \section QmitkIGTTrackingLabUsersManualPrel Preliminaries
 First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the \ref org_mitk_views_igttrackingtoolbox "Tracking Toolbox View".
 
-TODO - here should be an option to use previously recorded data.
 
 \section QmitkIGTTrackingLabUsersManualConf Configuration
 Select the desired <i>Navigation Data Source</i>. Now it's time to define which tool shall be used as object marker and which tool shall be used as pointer. Next load the Book surface

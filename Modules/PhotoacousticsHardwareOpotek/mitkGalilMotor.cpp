@@ -34,7 +34,6 @@ m_CurrentWavelength(750)
   m_GalilSystem = 0;
   m_ReturnCode = G_NO_ERROR;
   LoadResorceFile("opoCalibration.xml", &m_XmlOpoConfiguration);
-  MITK_INFO << m_XmlOpoConfiguration;
   TiXmlDocument xmlDoc;
 
   if (xmlDoc.Parse(m_XmlOpoConfiguration.c_str(), 0, TIXML_ENCODING_UTF8))
@@ -116,7 +115,7 @@ bool mitk::GalilMotor::CloseConnection()
 
 int mitk::GalilMotor::GetPositionFromWavelength(double wavelength)
 {
-  int pos = m_WavelengthToStepCalibration[0] + m_WavelengthToStepCalibration[7];
+  int pos = m_WavelengthToStepCalibration[0]; //+ m_WavelengthToStepCalibration[7];
   pos += m_WavelengthToStepCalibration[1] * wavelength;
   pos += m_WavelengthToStepCalibration[2] * std::pow(wavelength, 2);
   pos += m_WavelengthToStepCalibration[3] * std::pow(wavelength, 3);

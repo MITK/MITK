@@ -33,17 +33,13 @@ const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.lasercontrol";
 
 void OPOLaserControl::SetFocus()
 {
-  m_Controls.buttonConnect->setFocus();
+
 }
 
 void OPOLaserControl::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.buttonConnect, SIGNAL(clicked()), this, SLOT(ConnectToLaser()));
-  connect(m_Controls.buttonStatus, SIGNAL(clicked()), this, SLOT(GetStatus()));
-  connect(m_Controls.buttonSendCustomMessage, SIGNAL(clicked()), this, SLOT(SendCustomMessage()));
-
   connect(m_Controls.buttonInitLaser, SIGNAL(clicked()), this, SLOT(InitLaser()));
   connect(m_Controls.buttonTune, SIGNAL(clicked()), this, SLOT(TuneWavelength()));
   connect(m_Controls.buttonFastTuning, SIGNAL(clicked()), this, SLOT(StartFastTuning()));
@@ -131,7 +127,7 @@ void OPOLaserControl::InitLaser()
 
 void OPOLaserControl::TuneWavelength()
 {
-  m_OPOMotor->TuneToWavelength(750);
+  m_OPOMotor->TuneToWavelength(m_Controls.spinBoxWavelength->value());
   //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
   //wavelengthText.append("nm");
   //m_Controls.labelWavelength->setText(wavelengthText);
@@ -184,17 +180,17 @@ void OPOLaserControl::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
 
 void OPOLaserControl::ConnectToLaser()
 {
-  m_PumpLaserController = mitk::OpotekPumpLaserController::New();
-  if (m_PumpLaserController->OpenConnection())
-  {
-    m_Controls.buttonSendCustomMessage->setEnabled(true);
-    m_Controls.buttonStatus->setEnabled(true);
-    m_Controls.buttonConnect->setText("Disconnect");
-    std::string message("TRIG EE"); // both external Triggers
-    std::string response("");
+  //m_PumpLaserController = mitk::OpotekPumpLaserController::New();
+  //if (m_PumpLaserController->OpenConnection())
+  //{
+  //  m_Controls.buttonSendCustomMessage->setEnabled(true);
+  //  m_Controls.buttonStatus->setEnabled(true);
+  //  m_Controls.buttonConnect->setText("Disconnect");
+  //  std::string message("TRIG EE"); // both external Triggers
+  //  std::string response("");
 
-    m_PumpLaserController->Send(&message);
-    m_PumpLaserController->ReceiveLine(&response);
+  //  m_PumpLaserController->Send(&message);
+  //  m_PumpLaserController->ReceiveLine(&response);
 
     ////get port
     //int port = 0;
@@ -217,43 +213,43 @@ void OPOLaserControl::ConnectToLaser()
     //  • Does not use Xon/Xoff
     //  • Does not use RTS/CTS
     // FIXME
-  }
-  else
-  {
-    m_PumpLaserController->CloseConnection();
-    m_Controls.buttonSendCustomMessage->setEnabled(false);
-    m_Controls.buttonStatus->setEnabled(false);
-    m_Controls.buttonConnect->setText("Connect");
-  }
+  //}
+  //else
+  //{
+  //  m_PumpLaserController->CloseConnection();
+  //  m_Controls.buttonSendCustomMessage->setEnabled(false);
+  //  m_Controls.buttonStatus->setEnabled(false);
+  //  m_Controls.buttonConnect->setText("Connect");
+  //}
 }
 
 void OPOLaserControl::GetStatus()
 {
-  mitk::OpotekPumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
+  //mitk::OpotekPumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
 
-  if (pumpLaserState == mitk::OpotekPumpLaserController::STATE0)
-    MITK_INFO << "Received STATE0: Boot Fault.";
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE1)
-    MITK_INFO << "Received STATE1: Warm Up.";
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE2)
-    MITK_INFO << "Received STATE2: Laser Ready.";
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE3)
-    MITK_INFO << "Received STATE3: Flashing. Pulse Disabled.";
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
-    MITK_INFO << "Received STATE4: Flashing. Shutter Closed.";
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
-    MITK_INFO << "Received STATE5: Flashing. Pulse Enabled.";
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
-    MITK_INFO << "Received ERROR.";
+  //if (pumpLaserState == mitk::OpotekPumpLaserController::STATE0)
+  //  MITK_INFO << "Received STATE0: Boot Fault.";
+  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE1)
+  //  MITK_INFO << "Received STATE1: Warm Up.";
+  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE2)
+  //  MITK_INFO << "Received STATE2: Laser Ready.";
+  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE3)
+  //  MITK_INFO << "Received STATE3: Flashing. Pulse Disabled.";
+  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
+  //  MITK_INFO << "Received STATE4: Flashing. Shutter Closed.";
+  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
+  //  MITK_INFO << "Received STATE5: Flashing. Pulse Enabled.";
+  //else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
+  //  MITK_INFO << "Received ERROR.";
 }
 
 void OPOLaserControl::SendCustomMessage()
 {
-  std::string message = m_Controls.lineMessage->text().toStdString();
-  std::string response("");
+  //std::string message = m_Controls.lineMessage->text().toStdString();
+  //std::string response("");
 
-  m_PumpLaserController->Send(&message);
-  m_PumpLaserController->ReceiveLine(&response);
+  //m_PumpLaserController->Send(&message);
+  //m_PumpLaserController->ReceiveLine(&response);
 
-  MITK_INFO << "Received response: " << response;
+  //MITK_INFO << "Received response: " << response;
 }

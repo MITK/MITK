@@ -85,6 +85,8 @@ namespace mitk
     mitk::ScalarType m_CurrentLowerThresholdValue;
     mitk::ScalarType m_CurrentUpperThresholdValue;
 
+    bool m_IsOldBinary = false;
+
     typedef itk::Image<int, 3> ImageType;
     typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
     typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;

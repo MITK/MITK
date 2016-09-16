@@ -279,18 +279,6 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
 
 }
 
-void mitk::PaintbrushTool::CreateWorkingNode()
-{
-  if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
-      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
-  m_WorkingSlice = nullptr;
-  m_CurrentPlane = nullptr;
-
-  m_WorkingNode = DataNode::New();
-  m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
-  m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
-}
-
 /**
   Just show the contour, get one point as the central point and add surrounding points to the contour.
   */
@@ -301,7 +289,17 @@ void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
 
   if (!positionEvent) return;
 
-  this->CreateWorkingNode();
+  // create new working node
+  if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
+      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+  m_WorkingSlice = nullptr;
+  m_CurrentPlane = nullptr;
+
+  m_WorkingNode = DataNode::New();
+  m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+  m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+
+  this->m_WorkingNode->SetVisibility(true);
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -454,6 +452,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
       m_WorkingNode->Modified();
     }
   } else {
+      // switched from renderwindow
       this->m_WorkingNode->SetVisibility(false);
   }
 
@@ -491,10 +490,9 @@ void mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEven
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return;
 
-  //CheckIfCurrentSliceHasChanged(positionEvent);
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 
-  // deactivate current node
+  // deactivate visibility of helper node
   m_WorkingNode->SetVisibility(false);
 
   RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );

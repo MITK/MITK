@@ -1200,10 +1200,15 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 //  this->ResetTwoImageOpPanel();
 
   // check if 4D image and use filter on correct time step
-  int time = ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos();
   if(newImage1->GetDimension() > 3)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+
+    auto sn_widget = static_cast<QmitkSliderNavigatorWidget*>( m_Controls->sliceNavigatorTime );
+    int time = 0;
+
+    if( sn_widget != nullptr )
+        time = sn_widget->GetPos();
 
     timeSelector->SetInput(newImage1);
     timeSelector->SetTimeNr( time );

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateProperty.h>
 #include <mitkIRenderingManager.h>
 #include <mitkImageGenerator.h>
+#include <mitkImageReadAccessor.h>
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -90,19 +91,28 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_FrameCounter2d = 0;
   m_FrameCounter3d = 0;
 
-  // Create Node for US Stream
-  if (m_Node.IsNull())
-  {
-    m_Node = mitk::DataNode::New();
-    m_Node->SetName("US Support Viewing Stream");
-    //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
-    mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255,0);
-    m_Node->SetData(dummyImage);
-    m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
-  }
-
   m_Controls.tabWidget->setTabEnabled(1, false);
+}
 
+void UltrasoundSupport::InitNewNode(const char* name)
+{
+  m_Node.push_back(nullptr);
+  auto& Node = m_Node.back();
+  Node = mitk::DataNode::New();
+  Node->SetName(name);
+  //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
+  mitk::Image::Pointer dummyImage = mitk::ImageGenerator::GenerateRandomImage<float>(100, 100, 1, 1, 1, 1, 1, 255, 0);
+  Node->SetData(dummyImage);
+  m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
+  this->GetDataStorage()->Add(Node);
+}
+
+void UltrasoundSupport::DestroyLastNode()
+{
+  auto& Node = m_Node.back();
+  this->GetDataStorage()->Remove(Node);
+  Node->ReleaseData();
+  m_Node.pop_back();
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -119,42 +129,89 @@ void UltrasoundSupport::UpdateImage()
   m_Device->Modified();
   m_Device->Update();
 
+  AllImagesOutput = m_Device->GetOutput();
+
+  //Update the amount of Nodes; there should be one Node for every slide
+  bool isSet = true;
+  int amountOfNodes = 0;
+  while (isSet) {
+    isSet = AllImagesOutput->IsSliceSet(amountOfNodes);
+    if(isSet)
+      ++amountOfNodes;
+  } 
+
+  while (m_Node.size() < amountOfNodes) {
+    InitNewNode("No Data received yet ...");
+  }
+  while (m_Node.size() > amountOfNodes) {
+    DestroyLastNode();
+  }
+
+  while (curOutput.size() < amountOfNodes) {
+    curOutput.push_back(mitk::Image::New());
+    unsigned int* dimOld = AllImagesOutput->GetDimensions();
+    unsigned int dim[3] = { dimOld[0], dimOld[1], 1};
+    curOutput.back()->Initialize(AllImagesOutput->GetPixelType(), 3, dim);
+  }
+  while (curOutput.size() > amountOfNodes) {
+    curOutput.pop_back();
+  }
+
   //Only update the view if the image is shown
   if(m_Controls.m_ShowImageStream->isChecked())
   {
-    //Update data node
-    mitk::Image::Pointer curOutput = m_Device->GetOutput();
-    if(curOutput->IsEmpty())
+    for (int index = 0; index < curOutput.size(); ++index)
     {
-      m_Node->SetName("No Data received yet ...");
-      //create a noise image for correct initialization of level window, etc.
-      mitk::Image::Pointer randomImage = mitk::ImageGenerator::GenerateRandomImage<float>(32, 32, 1, 1, 1, 1, 1, 255,0);
-      m_Node->SetData(randomImage);
-      curOutput->SetGeometry(randomImage->GetGeometry());
+      unsigned int* dimOld = AllImagesOutput->GetDimensions();
+      unsigned int dim[3] = { dimOld[0], dimOld[1], 1 };
+      curOutput.at(index)->Initialize(AllImagesOutput->GetPixelType(), 3, dim); ////pls make that beautiful
+
+      //Update data node
+      mitk::Image::Pointer AllImagesOutput = m_Device->GetOutput();
+      
+      if (!AllImagesOutput->IsEmpty())
+      {
+        mitk::ImageReadAccessor inputReadAccessor(AllImagesOutput, AllImagesOutput->GetSliceData(index));
+        curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
+      }
+      else
+      {
+        MITK_INFO << curOutput.at(index);
+      }
+
+      if (curOutput.at(index)->IsEmpty())
+      {
+        m_Node.at(index)->SetName("No Data received yet ...");
+        //create a noise image for correct initialization of level window, etc.
+        mitk::Image::Pointer randomImage = mitk::ImageGenerator::GenerateRandomImage<float>(32, 32, 1, 1, 1, 1, 1, 255, 0);
+        m_Node.at(index)->SetData(randomImage);
+        curOutput.at(index)->SetGeometry(randomImage->GetGeometry());
+      }
+      else
+      {
+        char name[30];
+        sprintf(name, "US Viewing Stream - Image %d", index);
+        m_Node.at(index)->SetName(name);
+        m_Node.at(index)->SetData(curOutput.at(index));
+      }
     }
-    else
-    {
-      m_Node->SetName("US Support Viewing Stream");
-      m_Node->SetData(curOutput);
-    }
-    // if the geometry changed: reinitialize the ultrasound image
-    if((m_OldGeometry.IsNotNull()) &&
-       (curOutput->GetGeometry() != NULL) &&
-       (!mitk::Equal(m_OldGeometry.GetPointer(),curOutput->GetGeometry(),0.0001,false))
+    // if the geometry changed: reinitialize the ultrasound image. we use the first image in the vector to readjust the geometry
+    if ((m_OldGeometry.IsNotNull()) &&
+      (curOutput.at(0)->GetGeometry() != NULL) &&
+      (!mitk::Equal(m_OldGeometry.GetPointer(), curOutput.at(0)->GetGeometry(), 0.0001, false))
       )
     {
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-      if ( (renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()) )
+      if ((renderWindow != NULL) && (curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {
         renderWindow->GetRenderingManager()->InitializeViews(
-        curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          curOutput.at(0)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
         renderWindow->GetRenderingManager()->RequestUpdateAll();
       }
-      m_CurrentImageWidth = curOutput->GetDimension(0);
-      m_CurrentImageHeight = curOutput->GetDimension(1);
-      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput->GetGeometry());
+      m_CurrentImageWidth = curOutput.at(0)->GetDimension(0);
+      m_CurrentImageHeight = curOutput.at(0)->GetDimension(1);
+      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(curOutput.at(0)->GetGeometry());
     }
-
   }
 
   //Update frame counter
@@ -237,8 +294,11 @@ void UltrasoundSupport::OnChangedActiveDevice()
   //clean up and stop timer
   StopTimers();
   this->RemoveControlWidgets();
-  this->GetDataStorage()->Remove(m_Node);
-  m_Node->ReleaseData();
+  for (auto& Node : m_Node)
+  {
+    this->GetDataStorage()->Remove(Node);
+    Node->ReleaseData();
+  }
 
   //get current device, abort if it is invalid
   m_Device = m_Controls.m_ActiveVideoDevices->GetSelectedService<mitk::USDevice>();
@@ -253,9 +313,12 @@ void UltrasoundSupport::OnChangedActiveDevice()
   m_Controls.tabWidget->setTabEnabled(1, true);
 
   //show node if the option is enabled
-  if(m_Controls.m_ShowImageStream->isChecked())
+  if (m_Controls.m_ShowImageStream->isChecked())
   {
-    this->GetDataStorage()->Add(m_Node);
+    for (auto& Node : m_Node)
+    {
+      this->GetDataStorage()->Add(Node);
+    }
   }
 
   //start timer
@@ -398,9 +461,12 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 
     // update level window for the current dynamic range
     mitk::LevelWindow levelWindow;
-    m_Node->GetLevelWindow(levelWindow);
-    levelWindow.SetAuto(m_Image, true, true);
-    m_Node->SetLevelWindow(levelWindow);
+    for (auto& Node : m_Node)
+    {
+      Node->GetLevelWindow(levelWindow);
+      levelWindow.SetAuto(m_Image, true, true);
+      Node->SetLevelWindow(levelWindow);
+    }
   }
 }
 

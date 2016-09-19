@@ -52,9 +52,19 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     }
 
-    // copy contents of the given image into the member variable
-    mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0, 0, 0));
-    image->SetSlice(inputReadAccessor.GetData());
+    // copy contents of the given image into the member variable, slice after slice
+    bool isSet = true;
+    int sliceNumber = 0;
+    while(isSet) {
+      if (isSet = m_Image->IsSliceSet(sliceNumber)) {
+        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
+        image->SetSlice(inputReadAccessor.GetData(), sliceNumber);
+      }
+      else {
+        break;
+      }
+      ++sliceNumber;
+    }
     image->SetGeometry(m_Image->GetGeometry());
   }
 
@@ -113,7 +123,9 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     switch (DataType)
     {
     case 0: {
-      m_Image->SetSlice(&imageData[displayedEvent*imageHeight*imageWidth]);
+      for (int i = 0; i < imageSetsTotal; i++) {
+        m_Image->SetSlice(&imageData[i*imageHeight*imageWidth], i);
+      }
       break;
     }
     case 1: {
@@ -132,7 +144,9 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         } // the beamformed image is flipped by 90 degrees; we need to flip it manually
       }
 
-      m_Image->SetSlice(&flipme[displayedEvent*beamformedLines*beamformedSamples]);
+      for (int i = 0; i < beamformedTotalDatasets; i++) {
+        m_Image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
+      }
       delete flipme;
       break;
     }
@@ -143,7 +157,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
 void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWidth)
 {
-  unsigned int dim[] = { imageWidth, imageHeight }; // image dimensions
+  unsigned int dim[] = { imageWidth, imageHeight, displayedEvent+1 }; // image dimensions
   m_ImageMutex->Lock();
 
   m_Image = mitk::Image::New();
@@ -151,11 +165,11 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
   switch (DataType)
   {
     case 0: {
-      m_Image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 2, dim);
+      m_Image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, dim);
       break;
     }
     case 1: {
-      m_Image->Initialize(mitk::MakeScalarPixelType<short>(), 2, dim);
+      m_Image->Initialize(mitk::MakeScalarPixelType<short>(), 3, dim);
       break;
     }
   } // 0:imageData 1:beamformed
@@ -209,6 +223,8 @@ void mitk::USDiPhASImageSource::setDataType(int DataT)
 void mitk::USDiPhASImageSource::SetDisplayedEvent(int event)
 {
   displayedEvent = event;
+  auto& ScanMode = m_device->GetScanMode();
+  UpdateImageDataType(ScanMode.imageHeight, ScanMode.imageWidth);
 }
 
 std::function<void(QString)>  mitk::USDiPhASImageSource::m_GUIOutput = nullptr;

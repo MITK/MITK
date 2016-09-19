@@ -121,11 +121,15 @@ class UltrasoundSupport : public QmitkAbstractView
     /** Loads the properties of some QWidgets (and the tool storage file name) from QSettings.*/
     void LoadUISettings();
 
-    /** The node that we feed images into.*/
-    mitk::DataNode::Pointer m_Node;
+    /** The nodes that we feed images into.*/
+    std::vector<mitk::DataNode::Pointer> m_Node;
+    void InitNewNode(const char* name);
+    void DestroyLastNode();
 
     /** The image that is hold by the node above.*/
     mitk::Image::Pointer m_Image;
+    mitk::Image::Pointer AllImagesOutput;
+    std::vector<mitk::Image::Pointer> curOutput;
 
     /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because
      *  the zoom factor was modified) and the image needs to be reinitialized. */

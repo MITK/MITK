@@ -20,11 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIsoDoseLevelCollections.h"
 
-#include "MitkRTUIExports.h"
+#include "MitkDicomRTExports.h"
 
 namespace mitk
 {
-  IsoDoseLevelSet::Pointer MITKRTUI_EXPORT GeneratIsoLevels_Virtuos();
+  IsoDoseLevelSet::Pointer MITKDICOMRT_EXPORT GeneratIsoLevels_Virtuos();
 }
 
 #endif

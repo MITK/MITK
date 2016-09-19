@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include <mitkNodePredicateProperty.h>
+#include <mitkDoseNodeHelper.h>
 
 #include <service/event/ctkEventAdmin.h>
 #include <service/event/ctkEventConstants.h>
@@ -100,6 +101,8 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
 
   this->m_Controls.btnRemoveFreeValue->setDisabled(true);
 
+  this->m_Controls.doseBtn->setVisible(false);
+
   connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), this, SLOT(OnReferenceDoseChanged(double)));
   connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), m_LevelSetModel, SLOT(setReferenceDose(double)));
   connect(m_Controls.radioAbsDose, SIGNAL(toggled(bool)), m_LevelSetModel, SLOT(setShowAbsoluteDose(bool)));
@@ -112,6 +115,7 @@ void RTDoseVisualizer::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.comboPresets, SIGNAL(currentIndexChanged ( const QString&)), this, SLOT(OnCurrentPresetChanged(const QString&)));
   connect(m_Controls.btnUsePrescribedDose, SIGNAL(clicked()), this, SLOT(OnUsePrescribedDoseClicked()));
   connect(m_Controls.isoLevelSetView->model(), SIGNAL( modelReset()), this, SLOT(OnDataChangedInIsoLevelSetView()));
+  connect(m_Controls.doseBtn, SIGNAL(clicked()), this, SLOT(OnDoseClicked()));
 
   ctkServiceReference ref = mitk::org_mitk_gui_qt_dosevisualization_Activator::GetContext()->getServiceReference<ctkEventAdmin>();
 
@@ -151,7 +155,7 @@ void RTDoseVisualizer::OnReferenceDoseChanged(double value)
       {
         this->m_selectedNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
         mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-        isoDoseNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
+        if (isoDoseNode.IsNotNull()) isoDoseNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), value);
       }
     }
     if (this->m_selectedNode.IsNotNull())
@@ -177,24 +181,28 @@ void RTDoseVisualizer::OnAddFreeValueClicked()
   mitk::IsoDoseLevelVectorProperty::Pointer propIsoVector;
 
   mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-  propIsoVector = dynamic_cast<mitk::IsoDoseLevelVectorProperty*>(isoDoseNode->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
 
-  freeIsoDoseVector = propIsoVector->GetValue();
-  if (freeIsoDoseVector.IsNull())
-    mitk::IsoDoseLevelVector::Pointer freeIsoDoseVector = mitk::IsoDoseLevelVector::New();
+  if (isoDoseNode.IsNotNull())
+  {
+    propIsoVector = dynamic_cast<mitk::IsoDoseLevelVectorProperty*>(isoDoseNode->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
 
-  mitk::IsoDoseLevel::Pointer newLevel = mitk::IsoDoseLevel::New(0.5,mColor,true,false);
-  freeIsoDoseVector->InsertElement(m_freeIsoValuesCount,newLevel);
-  propIsoVector = mitk::IsoDoseLevelVectorProperty::New(freeIsoDoseVector);
+    freeIsoDoseVector = propIsoVector->GetValue();
+    if (freeIsoDoseVector.IsNull())
+      mitk::IsoDoseLevelVector::Pointer freeIsoDoseVector = mitk::IsoDoseLevelVector::New();
 
-  isoDoseNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),propIsoVector);
+    mitk::IsoDoseLevel::Pointer newLevel = mitk::IsoDoseLevel::New(0.5, mColor, true, false);
+    freeIsoDoseVector->InsertElement(m_freeIsoValuesCount, newLevel);
+    propIsoVector = mitk::IsoDoseLevelVectorProperty::New(freeIsoDoseVector);
 
-  m_freeIsoValuesCount++;
-  this->m_Controls.btnRemoveFreeValue->setEnabled(true);
-  //Update Widget
-  this->UpdateFreeIsoValues();
-  //Update Rendering
-  this->ActualizeFreeIsoLine();
+    isoDoseNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), propIsoVector);
+
+    m_freeIsoValuesCount++;
+    this->m_Controls.btnRemoveFreeValue->setEnabled(true);
+    //Update Widget
+    this->UpdateFreeIsoValues();
+    //Update Rendering
+    this->ActualizeFreeIsoLine();
+  }
 }
 
 void RTDoseVisualizer::OnRemoveFreeValueClicked()
@@ -227,6 +235,19 @@ void RTDoseVisualizer::OnUsePrescribedDoseClicked()
   m_Controls.spinReferenceDose->setValue(this->m_PrescribedDose_Data);
 }
 
+void RTDoseVisualizer::OnDoseClicked()
+{
+  auto nodes = this->GetDataManagerSelection();
+
+  for (auto node : nodes)
+  {
+    mitk::ConfigureNodeAsDoseNode(node, 50);
+    node->Modified();
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
 {
   //colorwash visibility changed, update the colorwash
@@ -237,7 +258,7 @@ void RTDoseVisualizer::OnDataChangedInIsoLevelSetView()
     //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
     //Only way to render the isoline by changes without a global reinit
     mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-    isoDoseNode->Modified();
+    if (isoDoseNode.IsNotNull()) isoDoseNode->Modified();
 
     // Reinit if visibility of colorwash or isodoselevel changed
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -296,31 +317,35 @@ void RTDoseVisualizer::UpdateFreeIsoValues()
   this->m_Controls.listFreeValues->clear();
 
   mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-  mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec;
-
-  propfreeIsoVec = dynamic_cast<mitk::IsoDoseLevelVectorProperty*>(isoDoseNode->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
-
-
-  mitk::IsoDoseLevelVector::Pointer freeIsoDoseLevelVec = propfreeIsoVec->GetValue();
-
-  for (mitk::IsoDoseLevelVector::Iterator pos = freeIsoDoseLevelVec->Begin(); pos != freeIsoDoseLevelVec->End(); ++pos)
+  if (isoDoseNode.IsNotNull())
   {
-    QListWidgetItem* item = new QListWidgetItem;
-    item->setSizeHint(QSize(0,25));
-    QmitkFreeIsoDoseLevelWidget* widget = new QmitkFreeIsoDoseLevelWidget;
 
-    float pref;
-    m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(),pref);
+    mitk::IsoDoseLevelVectorProperty::Pointer propfreeIsoVec;
 
-    widget->setIsoDoseLevel(pos.Value());
-    widget->setReferenceDose(pref);
-    connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
-    connect(widget,SIGNAL(ColorChanged(mitk::IsoDoseLevel*)), this, SLOT(ActualizeFreeIsoLine()));
-    connect(widget,SIGNAL(ValueChanged(mitk::IsoDoseLevel*,mitk::DoseValueRel)), this, SLOT(ActualizeFreeIsoLine()));
-    connect(widget,SIGNAL(VisualizationStyleChanged(mitk::IsoDoseLevel*)), this, SLOT(ActualizeFreeIsoLine()));
+    propfreeIsoVec = dynamic_cast<mitk::IsoDoseLevelVectorProperty*>(isoDoseNode->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
 
-    this->m_Controls.listFreeValues->addItem(item);
-    this->m_Controls.listFreeValues->setItemWidget(item,widget);
+
+    mitk::IsoDoseLevelVector::Pointer freeIsoDoseLevelVec = propfreeIsoVec->GetValue();
+
+    for (mitk::IsoDoseLevelVector::Iterator pos = freeIsoDoseLevelVec->Begin(); pos != freeIsoDoseLevelVec->End(); ++pos)
+    {
+      QListWidgetItem* item = new QListWidgetItem;
+      item->setSizeHint(QSize(0, 25));
+      QmitkFreeIsoDoseLevelWidget* widget = new QmitkFreeIsoDoseLevelWidget;
+
+      float pref;
+      m_selectedNode->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), pref);
+
+      widget->setIsoDoseLevel(pos.Value());
+      widget->setReferenceDose(pref);
+      connect(m_Controls.spinReferenceDose, SIGNAL(valueChanged(double)), widget, SLOT(setReferenceDose(double)));
+      connect(widget, SIGNAL(ColorChanged(mitk::IsoDoseLevel*)), this, SLOT(ActualizeFreeIsoLine()));
+      connect(widget, SIGNAL(ValueChanged(mitk::IsoDoseLevel*, mitk::DoseValueRel)), this, SLOT(ActualizeFreeIsoLine()));
+      connect(widget, SIGNAL(VisualizationStyleChanged(mitk::IsoDoseLevel*)), this, SLOT(ActualizeFreeIsoLine()));
+
+      this->m_Controls.listFreeValues->addItem(item);
+      this->m_Controls.listFreeValues->setItemWidget(item, widget);
+    }
   }
 }
 
@@ -331,7 +356,7 @@ void RTDoseVisualizer::ActualizeFreeIsoLine()
     //Hack: This is a dirty hack to reinit the isodose contour node. Only if the node (or property) has changed the rendering process register the RequestUpdateAll
     //Only way to render the isoline by changes without a global reinit
     mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-    isoDoseNode->Modified();
+    if (isoDoseNode.IsNotNull()) isoDoseNode->Modified();
 
     // Reinit if visibility of colorwash or isodoselevel changed
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -368,12 +393,15 @@ void RTDoseVisualizer::OnGlobalVisIsoLineToggled(bool showIsoLines)
   if (m_selectedNode.IsNotNull())
   {
     mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-    isoDoseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLines);
+    if (isoDoseNode.IsNotNull())
+    {
+      isoDoseNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLines);
 
-    //toggle the visibility of the free isolevel sliders
-    this->m_Controls.listFreeValues->setEnabled(showIsoLines);
+      //toggle the visibility of the free isolevel sliders
+      this->m_Controls.listFreeValues->setEnabled(showIsoLines);
 
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
   }
 }
 
@@ -476,24 +504,27 @@ void RTDoseVisualizer::UpdateBySelectedNode()
 
     //free iso lines
     mitk::DataNode::Pointer isoDoseNode = this->GetIsoDoseNode(m_selectedNode);
-    mitk::IsoDoseLevelVectorProperty::Pointer propIsoVector;
-
-    propIsoVector =  dynamic_cast<mitk::IsoDoseLevelVectorProperty*>(isoDoseNode->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
-
-    if (propIsoVector.IsNull())
+    if (isoDoseNode)
     {
-      mitk::IsoDoseLevelVector::Pointer freeIsoValues = mitk::IsoDoseLevelVector::New();
-      propIsoVector = mitk::IsoDoseLevelVectorProperty::New(freeIsoValues);
-      isoDoseNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(),propIsoVector);
+      mitk::IsoDoseLevelVectorProperty::Pointer propIsoVector;
+
+      propIsoVector = dynamic_cast<mitk::IsoDoseLevelVectorProperty*>(isoDoseNode->GetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str()));
+
+      if (propIsoVector.IsNull())
+      {
+        mitk::IsoDoseLevelVector::Pointer freeIsoValues = mitk::IsoDoseLevelVector::New();
+        propIsoVector = mitk::IsoDoseLevelVectorProperty::New(freeIsoValues);
+        isoDoseNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), propIsoVector);
+      }
+
+      UpdateFreeIsoValues();
+
+      //global dose issues
+      //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
+      bool showIsoLine = mitk::GetGlobalIsolineVis();
+      isoDoseNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsoLine);
+      m_Controls.checkGlobalVisIsoLine->setChecked(showIsoLine);
     }
-
-    UpdateFreeIsoValues();
-
-    //global dose issues
-    //ATM the IsoDoseContours have an own (helper) node which is a child of dose node; Will be fixed with the doseMapper refactoring
-    bool showIsoLine = mitk::GetGlobalIsolineVis();
-    isoDoseNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(),showIsoLine);
-    m_Controls.checkGlobalVisIsoLine->setChecked(showIsoLine);
 
     bool showColorWash = mitk::GetGlobalColorwashVis();
     m_selectedNode->GetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(),showColorWash);
@@ -693,7 +724,14 @@ void RTDoseVisualizer::OnHandleCTKEventPresetsChanged(const ctkEvent& event)
 mitk::DataNode::Pointer RTDoseVisualizer::GetIsoDoseNode(mitk::DataNode::Pointer doseNode)
 {
   mitk::DataStorage::SetOfObjects::ConstPointer childNodes = this->GetDataStorage()->GetDerivations(doseNode);
-  return doseNode = (*childNodes->begin());
+  if (childNodes->empty())
+  {
+    return nullptr;
+  }
+  else
+  {
+    return doseNode = (*childNodes->begin());
+  }
 }
 
 bool RTDoseVisualizer::ModalityIsRTDose(const mitk::DataNode* dataNode) const

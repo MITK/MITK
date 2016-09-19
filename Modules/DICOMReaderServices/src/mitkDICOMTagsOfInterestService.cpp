@@ -92,10 +92,11 @@ AddTagOfInterest(const DICOMTag& tag, bool makePersistant)
     std::string key = propName;
     std::replace(key.begin(), key.end(), '.', '_');
 
-    PropertyPersistenceInfo::Pointer info = PropertyPersistenceInfo::New(key);
+    PropertyPersistenceInfo::Pointer info = PropertyPersistenceInfo::New();
+    info->SetNameAndKey(propName, key);
     info->SetDeserializationFunction(mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty);
     info->SetSerializationFunction(mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON);
-    persSrv->AddInfo(propName, info);
+    persSrv->AddInfo(info);
   }
 };
 
@@ -144,9 +145,9 @@ RemoveTag(const DICOMTag& tag)
   }
 
   mitk::IPropertyPersistence* persSrv = GetPersistenceService();
-  if (persSrv && persSrv->HasInfos(propName))
+  if (persSrv && persSrv->HasInfo(propName))
   {
-    persSrv->RemoveInfos(propName);
+    persSrv->RemoveInfo(propName);
   }
 };
 

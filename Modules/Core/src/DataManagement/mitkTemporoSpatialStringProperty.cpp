@@ -225,17 +225,21 @@ void mitk::TemporoSpatialStringProperty::SetValue(const ValueType& value)
 };
 
 // Create necessary escape sequences from illegal characters
-// the following function was copied from the json writer of boost::property_tree
-std::string CreateJSONEscapes(const std::string &s)
+// REMARK: This code is based upon code from boost::ptree::json_writer.
+// The corresponding boost function was not used directly, because it is not part of
+// the public interface of ptree::json_writer. :(
+// A own serialization strategy was implemented instead of using boost::ptree::json_write because
+// currently (<= boost 1.60) everything (even numbers) are converted into string representations
+// by the writer, so e.g. it becomes "t":"2" instaed of "t":2
+template<class Ch>
+std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
 {
-  std::string result;
-  std::string::const_iterator b = s.begin();
-  std::string::const_iterator e = s.end();
+  std::basic_string<Ch> result;
+  typename std::basic_string<Ch>::const_iterator b = s.begin();
+  typename std::basic_string<Ch>::const_iterator e = s.end();
   while (b != e)
   {
-    typedef boost::make_unsigned<std::string::value_type>::type UCh;
-    typedef std::string::value_type Ch;
-
+    typedef typename boost::make_unsigned<Ch>::type UCh;
     UCh c(*b);
     // This assumes an ASCII superset.
     // We escape everything outside ASCII, because this code can't
@@ -275,8 +279,10 @@ std::string CreateJSONEscapes(const std::string &s)
 mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(const mitk::BaseProperty* prop)
 {
   //REMARK: Implemented own serialization instead of using boost::ptree::json_write because
-  //currently everything (even numbers) are converted into string representations by the writer
-  //so e.g. it becomes "t":"2" instaed of "t":2
+  //currently (<= boost 1.60) everything (even numbers) are converted into string representations
+  //by the writer, so e.g. it becomes "t":"2" instaed of "t":2
+  //If this problem is fixed with boost, we shoud switch back to json_writer (and remove the custom
+  //implementation of CreateJSONEscapes (see above)).
   const mitk::TemporoSpatialStringProperty* tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty*>(prop);
 
   if (!tsProp)

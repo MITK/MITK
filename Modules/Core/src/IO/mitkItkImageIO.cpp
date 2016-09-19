@@ -394,29 +394,31 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
 
       std::string mimeTypeName = GetMimeType()->GetName();
 
-      //Check of there is already a info for the key and our mime type.
-      IPropertyPersistence::InfoMapType infos = mitk::CoreServices::GetPropertyPersistence()->GetInfosByKey(key);
+      //Check if there is already a info for the key and our mime type.
+      IPropertyPersistence::InfoResultType infoList = mitk::CoreServices::GetPropertyPersistence()->GetInfoByKey(key);
 
-      auto predicate = [mimeTypeName](const std::pair<const std::string, PropertyPersistenceInfo::Pointer>& x){return x.second.IsNotNull() && x.second->GetMimeTypeName() == mimeTypeName; };
-      auto finding = std::find_if(infos.begin(), infos.end(), predicate);
+      auto predicate = [mimeTypeName](const PropertyPersistenceInfo::ConstPointer& x){return x.IsNotNull() && x->GetMimeTypeName() == mimeTypeName; };
+      auto finding = std::find_if(infoList.begin(), infoList.end(), predicate);
 
-      if (finding == infos.end())
+      if (finding == infoList.end())
       {
-        auto predicateWild = [](const std::pair<const std::string, PropertyPersistenceInfo::Pointer>& x){return x.second.IsNotNull() && x.second->GetMimeTypeName() == PropertyPersistenceInfo::ANY_MIMETYPE_NAME(); };
-        finding = std::find_if(infos.begin(), infos.end(), predicateWild);
+        auto predicateWild = [](const PropertyPersistenceInfo::ConstPointer& x){return x.IsNotNull() && x->GetMimeTypeName() == PropertyPersistenceInfo::ANY_MIMETYPE_NAME(); };
+        finding = std::find_if(infoList.begin(), infoList.end(), predicateWild);
       }
 
-      PropertyPersistenceInfo::Pointer info;
+      PropertyPersistenceInfo::ConstPointer info;
 
-      if (finding != infos.end())
+      if (finding != infoList.end())
       {
-        assumedPropertyName = finding->first;
-        info = finding->second;
+        assumedPropertyName = (*finding)->GetName();
+        info = *finding;
       }
       else
       { //we have not found anything suitable so we generate our own info
-        info = PropertyPersistenceInfo::New(key);
-        info->SetMimeTypeName(PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
+        PropertyPersistenceInfo::Pointer newInfo = PropertyPersistenceInfo::New();
+        newInfo->SetNameAndKey(assumedPropertyName, key);
+        newInfo->SetMimeTypeName(PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
+        info = newInfo;
       }
 
       std::string value = dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
@@ -444,7 +446,7 @@ std::vector<BaseData::Pointer> ItkImageIO::Read()
 
       if( !isDefaultKey )
       {
-        mitk::CoreServices::GetPropertyPersistence()->AddInfo(assumedPropertyName, info);
+        mitk::CoreServices::GetPropertyPersistence()->AddInfo(info);
       }
     }
   }
@@ -595,24 +597,25 @@ void ItkImageIO::Write()
 
     for(const auto &property : *imagePropertyList->GetMap())
     {
-      PropertyPersistenceInfo::Pointer info = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first, GetMimeType()->GetName(), true);
+      IPropertyPersistence::InfoResultType infoList = mitk::CoreServices::GetPropertyPersistence()->GetInfo(property.first, GetMimeType()->GetName(), true);
 
-      if( info.IsNull())
+      if (infoList.empty())
       {
         continue;
       }
 
-      std::string value = info->GetSerializationFunction()(property.second);
+      std::string value = infoList.front()->GetSerializationFunction()(property.second);
 
       if( value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING )
       {
         continue;
       }
 
-      std::string key = info->GetKey();
+      std::string key = infoList.front()->GetKey();
 
       itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
     }
+
     ImageReadAccessor imageAccess(image);
     m_ImageIO->Write(imageAccess.GetData());
   }

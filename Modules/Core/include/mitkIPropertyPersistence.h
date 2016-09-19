@@ -29,7 +29,7 @@ namespace mitk
     * Persistent properties will be saved if the file format supports custom key value pairs like the .nrrd file format.\n
     * \remark The service supports the use of regular expressions (regex; ECMAscript syntax)
     * for property names and persistance keys to specifiy persistence rules in a generic way. The getter of the interface
-    * (GetInfos and GetInfosByKey) will always ensure that the return containes no regex, thus name and key in the results
+    * (GetInfo and GetInfoByKey) will always ensure that the return containes no regex, thus name and key in the results
     * can directly be used. For details on how the result names and keys are determined, please @TODO
     *
     */
@@ -43,8 +43,8 @@ namespace mitk
 
     /** \brief Add persistence info for a specific base data property.
       * If there is already a property info instance for the passed
-      * property name and the same info, it won't be added. Infos are
-      * regarded equal, if the mime types are equal.
+      * property name and the same info, it won't be added. Info instances
+      * are regarded equal, if the mime types are equal.
       * You may enforce to overwrite the old equal info for a property name
       * by the overwrite parameter.
       *
@@ -57,7 +57,7 @@ namespace mitk
 
     /** \brief Get the persistence info for a specific base data property.
       * \param[in] propertyName Name of the property.
-      * \param[in] allowNameRegEx Indicates if also added infos with regexs are be checked.
+      * \param[in] allowNameRegEx Indicates if also added info instances with regexs are being checked.
       * \return Property persistence info or null pointer if no persistence info is available.
       */
     virtual InfoResultType GetInfo(const std::string& propertyName, bool allowNameRegEx = true) const = 0;
@@ -69,7 +69,7 @@ namespace mitk
     * \param[in] allowMimeWildCard Indicates if wildcard is allowed. If it is allowed, the method will first try to find the specified info.
     * If no info was found but an info exists with the mime type name PropertyPersistenceInfo::ANY_MIMETYPE_NAME(), the later info will be
     * returned as fall back option.
-    * \param[in] allowNameRegEx Indicates if also added infos with regexs are be checked.
+    * \param[in] allowNameRegEx Indicates if also added info instances with regexs are being checked.
     * \return Property persistence info or null pointer if no persistence info is available.
     */
     virtual InfoResultType GetInfo(const std::string& propertyName, const MimeTypeNameType& mime, bool allowMimeWildCard = false, bool allowNameRegEx = true) const = 0;
@@ -77,7 +77,7 @@ namespace mitk
     /** \brief Get the persistence info that will use the specified key.
     *
     * \param[in] propertyName Name of the property.
-    * \param[in] allowKeyRegEx Indicates if also added infos with regexs for the key are be checked.
+    * \param[in] allowKeyRegEx Indicates if also added info instances with regexs for the key are being checked.
     * \return Property persistence info or null pointer if no persistence info is available.
     */
     virtual InfoResultType GetInfoByKey(const std::string& persistenceKey, bool allowKeyRegEx = true) const = 0;
@@ -85,7 +85,7 @@ namespace mitk
     /** \brief Check if a specific base data property has persistence info.
       *
       * \param[in] propertyName Name of the property.
-      * \param[in] allowNameRegEx Indicates if also added infos with regexs are be checked.
+      * \param[in] allowNameRegEx Indicates if also added info instances with regexs are being checked.
       * \return True if the property has persistence info, false otherwise.
       */
     virtual bool HasInfo(const std::string& propertyName, bool allowNameRegEx = true) const = 0;
@@ -94,13 +94,13 @@ namespace mitk
       */
     virtual void RemoveAllInfo() = 0;
 
-    /** \brief Remove persistence infos of a specific property name/regex.
+    /** \brief Remove persistence info instances of a specific property name/regex.
       *
       * \param[in] propertyName Registered name or regex that should be removed.
       */
     virtual void RemoveInfo(const std::string& propertyName) = 0;
 
-    /** \brief Remove persistence infos of a specific property name/regex and mime type.
+    /** \brief Remove persistence info instances of a specific property name/regex and mime type.
     *
     * \param[in] propertyName Registered name or regex that should be removed.
     * \param[in] mime Name of the mime type.

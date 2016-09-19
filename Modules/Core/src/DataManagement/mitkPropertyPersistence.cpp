@@ -42,7 +42,7 @@ bool mitk::PropertyPersistence::AddInfo(const PropertyPersistenceInfo* info, boo
 
   mitk::PropertyPersistenceInfo::MimeTypeNameType mime = info->GetMimeTypeName();
 
-  auto infoRange = m_Infos.equal_range(info->GetName());
+  auto infoRange = m_InfoMap.equal_range(info->GetName());
 
   auto predicate = [mime](const std::pair<const std::string, mitk::PropertyPersistenceInfo::ConstPointer>& x)
   {
@@ -58,20 +58,20 @@ bool mitk::PropertyPersistence::AddInfo(const PropertyPersistenceInfo* info, boo
   {
     if (exists && overwrite)
     {
-      m_Infos.erase(finding);
+      m_InfoMap.erase(finding);
     }
     result = true;
-    m_Infos.insert(std::make_pair(info->GetName(), info));
+    m_InfoMap.insert(std::make_pair(info->GetName(), info));
   }
 
   return result;
 }
 
-mitk::PropertyPersistence::InfoMap mitk::PropertyPersistence::SelectInfo(const InfoMap& infos, const SelectFunctionType& selectFunction)
+mitk::PropertyPersistence::InfoMap mitk::PropertyPersistence::SelectInfo(const InfoMap& infoMap, const SelectFunctionType& selectFunction)
 {
   InfoMap result;
 
-  for (auto pos : infos)
+  for (auto pos : infoMap)
   {
     if (selectFunction(pos))
     {
@@ -89,7 +89,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfo(con
     return x.second.IsNotNull() && !x.second->IsRegEx() && x.second->GetName() == propertyName;
   };
 
-  InfoMap selection = SelectInfo(m_Infos, select);
+  InfoMap selection = SelectInfo(m_InfoMap, select);
 
   InfoResultType result;
   for (const auto & pos : selection)
@@ -109,7 +109,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfo(con
       return false;
     };
 
-    selection = SelectInfo(m_Infos, select);
+    selection = SelectInfo(m_InfoMap, select);
 
     for (const auto & pos : selection)
     {
@@ -142,7 +142,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfo(con
     return infoPredicate(x, propertyName, mime);
   };
 
-  InfoMap selection = SelectInfo(m_Infos, select);
+  InfoMap selection = SelectInfo(m_InfoMap, select);
 
   if (allowNameRegEx)
   {
@@ -151,7 +151,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfo(con
       return infoPredicateRegEx(x, propertyName, mime);
     };
 
-    InfoMap regExSelection = SelectInfo(m_Infos, select);
+    InfoMap regExSelection = SelectInfo(m_InfoMap, select);
 
     selection.insert(regExSelection.begin(), regExSelection.end());
   }
@@ -163,7 +163,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfo(con
       return infoPredicate(x, propertyName, PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
     };
 
-    selection = SelectInfo(m_Infos, select);
+    selection = SelectInfo(m_InfoMap, select);
 
     if (allowNameRegEx)
     {
@@ -172,7 +172,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfo(con
         return infoPredicateRegEx(x, propertyName, PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
       };
 
-      InfoMap regExSelection = SelectInfo(m_Infos, select);
+      InfoMap regExSelection = SelectInfo(m_InfoMap, select);
 
       selection.insert(regExSelection.begin(), regExSelection.end());
     }
@@ -191,7 +191,7 @@ mitk::PropertyPersistence::InfoResultType mitk::PropertyPersistence::GetInfoByKe
 {
   InfoResultType result;
 
-  for (const auto& pos : m_Infos)
+  for (const auto& pos : m_InfoMap)
   {
     if (pos.second.IsNotNull())
     {
@@ -219,26 +219,26 @@ bool mitk::PropertyPersistence::HasInfo(const std::string& propertyName, bool al
 
 void mitk::PropertyPersistence::RemoveAllInfo()
 {
-  m_Infos.clear();
-  m_Infos.clear();
+  m_InfoMap.clear();
+  m_InfoMap.clear();
 }
 
 void mitk::PropertyPersistence::RemoveInfo(const std::string& propertyName)
 {
   if (!propertyName.empty())
   {
-    m_Infos.erase(propertyName);
+    m_InfoMap.erase(propertyName);
   }
 }
 
 void mitk::PropertyPersistence::RemoveInfo(const std::string& propertyName, const MimeTypeNameType& mime)
 {
-  auto itr = m_Infos.begin();
-  while (itr != m_Infos.end())
+  auto itr = m_InfoMap.begin();
+  while (itr != m_InfoMap.end())
   {
     if (itr->first == propertyName && itr->second.IsNotNull() && itr->second->GetMimeTypeName() == mime)
     {
-      itr = m_Infos.erase(itr);
+      itr = m_InfoMap.erase(itr);
     }
     else {
       ++itr;

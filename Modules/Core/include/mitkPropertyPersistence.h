@@ -44,12 +44,12 @@ namespace mitk
 
     /**Helper function that selects */
     using SelectFunctionType = std::function < bool(const InfoMap::value_type&) >;
-    static InfoMap SelectInfo(const InfoMap& infos, const SelectFunctionType& selectFunction);
+    static InfoMap SelectInfo(const InfoMap& infoMap, const SelectFunctionType& selectFunction);
 
     PropertyPersistence(const PropertyPersistence&);
     PropertyPersistence& operator=(const PropertyPersistence&);
 
-    InfoMap m_Infos;
+    InfoMap m_InfoMap;
   };
 
   /**Creates an unmanaged (!) instance of PropertyPersistence for testing purposes.*/

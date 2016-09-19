@@ -198,35 +198,31 @@ void
   directionVector.Normalize();
   directionVector *= zSpacing;
 
-  if ( flipped == false )
-  {
-    // Normally we should use the following four lines to create a copy of
-    // the transform contrained in geometry2D, because it may not be changed
-    // by us. But we know that SetSpacing creates a new transform without
-    // changing the old (coming from geometry2D), so we can use the fifth
-    // line instead. We check this at (**).
-    //
-    // AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    // transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
-    // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
-    // SetIndexToWorldTransform(transform);
+  mitk::AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
 
-    this->SetIndexToWorldTransform( const_cast< AffineTransform3D * >(
-      geometry2D->GetIndexToWorldTransform() ));
-  }
-  else
+  if (flipped)
   {
     directionVector *= -1.0;
-    this->SetIndexToWorldTransform( AffineTransform3D::New());
-    this->GetIndexToWorldTransform()->SetMatrix(
-      geometry2D->GetIndexToWorldTransform()->GetMatrix() );
 
     AffineTransform3D::OutputVectorType scaleVector;
     FillVector3D(scaleVector, 1.0, 1.0, -1.0);
-    this->GetIndexToWorldTransform()->Scale(scaleVector, true);
-    this->GetIndexToWorldTransform()->SetOffset(
-      geometry2D->GetIndexToWorldTransform()->GetOffset() );
+    transform->Scale(scaleVector, true);
   }
+
+  // The origin of a non-image 2D geometry is at its bottom-left corner,
+  // but that of a non-image 3D geometry is at its bottom-left-back corner.
+  // That means, the 3D origin is half a voxel back from the 2D origin.
+  // The origin of image geometries at pixel/voxel centre, so there no
+  // correction is needed.
+  AffineTransform3D::OutputVectorType offset = geometry2D->GetIndexToWorldTransform()->GetOffset();
+  if (!geometry2D->GetImageGeometry())
+  {
+    offset -= 0.5 * directionVector;
+  }
+  transform->SetOffset(offset);
+
+  this->SetIndexToWorldTransform(transform);
 
   mitk::Vector3D spacing;
   FillVector3D( spacing,

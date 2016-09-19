@@ -64,7 +64,6 @@ m_CurrentWavelength(750)
   {
     MITK_ERROR << "[GalilMotor Debug] Could not load configuration xml ";
   }
-
 }
 
 mitk::GalilMotor::~GalilMotor()
@@ -160,24 +159,26 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
   m_ReturnCode = GProgramDownload(m_GalilSystem, "", 0);
 
   std::string positionCommand;
-  positionCommand = "\n count = 0; idx = 0; DM pos[2] \n pos[0] = " + std::to_string(36459/*this->GetPositionFromWavelength(wavelength)*/) + "\n"
-    + "pos[1] = " + std::to_string(24577/*this->GetPositionFromWavelength(wavelength)*/) + "\n";
-  MITK_INFO << "[Galil Debug] fasttuning lke this" << positionCommand;
+  positionCommand = "count=0;idx=0;DM pos[2]\npos[0]=" + std::to_string(36459/*this->GetPositionFromWavelength(wavelength)*/) + "\n"
+    + "pos[1]=" + std::to_string(24577/*this->GetPositionFromWavelength(wavelength)*/) + "\n";
   std::string galilFastTuneConf;
   this->LoadResorceFile("configFastTuneOPO.dmc", &galilFastTuneConf);
   std::string galilFastTuneExec;
   this->LoadResorceFile("executeFastTuneOPO.dmc", &galilFastTuneExec);
 
-  std::string galilFastTune = galilFastTuneConf + positionCommand + galilFastTuneExec;
+  std::string galilFastTune; //= galilFastTuneConf + positionCommand + galilFastTuneExec;
+  this->LoadResorceFile("test.dmc", &galilFastTune);
+
+  MITK_INFO << "[Galil Debug] fasttuning lke this \n" << galilFastTune;
 
   m_ReturnCode = GProgramDownload(m_GalilSystem, galilFastTune.c_str(), 0);
-
+  GSleep(1000);
   //m_ReturnCode = GProgramDownloadFile(m_GalilSystem, "c:/opotek/fastTuneOPO.dmc", 0);/*should be tuneOPOto700*/
   MITK_INFO << "[Galil Debug] after fast tune GProgramDownloadFile = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
   m_ReturnCode = GCmd(m_GalilSystem, "XQ");
-  GSleep(3000);
-  int val = -1;
-  GCmdI(m_GalilSystem, "rt=?", &val);
+  GSleep(8000);
+  int val = 200;
+  GCmdI(m_GalilSystem, "rtf=?", &val);
   MITK_INFO << "[Galil Debug] after tuning execution = " << m_ReturnCode << "; successfulTune = " << val;
   return true;
 }

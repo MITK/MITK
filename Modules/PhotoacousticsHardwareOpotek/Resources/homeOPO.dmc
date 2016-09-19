@@ -1,4 +1,3 @@
-'**************************************
 #AUTO
 #MAIN
 rh=-1
@@ -29,12 +28,8 @@ OE 0
 JG -10000;BG
 #JOG;JP#JOG,@ABS[_TEX]<1000
 ST;AM
-MG "HIT END"
 OE 1
 WT 100
-pos=0
-PA pos;BG;AM;
-BG;AM;
 DP*=0
 rh=1
 EN

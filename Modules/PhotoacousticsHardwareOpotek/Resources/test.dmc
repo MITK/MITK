@@ -1,75 +1,46 @@
-'**************************************
-#AUTO
-#MAIN
-WT 1000
-'*****************
+#FASTTUNE
+rtf=-1
+II1
 'AMP SETTINGS
-i=56
 AU 0
-i=54
 BR 1
-i=53
+'AG 0
 TM 1000
-i=51
 TL 3
-i=50
 TK 9.998
-i=49
 '
 'GENERAL SETTINGS
 ER 10000
 OE 1
-i=48
 'MT -1
-i=47
 'CE 0
-i=46
 CN-1
-i=45
 'PID PARAMETERS
 KD 17.5
-i=44
 KP 15
-i=43
 KI 0
-i=42
 '
 SHX
-i=41
-WT 250
-'
-i=40
-JS#HOME
-i=39
-WT 100
-i=38
-PR 25000;BG;AM
-DP*=0
-i=37
 WT 1000
-i=36
-'
-SP 150000
-i=35
-AC 12000000
-i=34
-DC 12000000
-i=33
-pos=2200
-i=32
-PA pos;BG;AM;
-i=31
-BG;AM;
-i=30
-WT 100
+SP 1500000
+AC 120000000
+DC 120000000
+count=0;idx=0;DM pos[2]
+pos[0]=27200
+pos[1]=30900
+points=pos[-1]
+#MOVE;
+II 1
+WT 10
+JP #MOVE;
 EN
+'SUBROUTINE
 '**************************************
-#HOME
-OE 0
-JG -10000;BG
-#JOG;JP#JOG,@ABS[_TEX]<1000
-ST;AM
-MG "HIT END"
-OE 1
-WT100
-EN
+#ININT
+rtf=count+10000000;
+idx = count % points
+'PA pos[idx];BG;AM;
+'BG;AM;
+count = count + 1
+WT 1
+RI 1;

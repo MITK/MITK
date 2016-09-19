@@ -26,11 +26,16 @@ WT 250
 SP 3000000
 AC 120000000
 DC 120000000
+rt=-2
 count=0;idx=0;DM pos[2]
+rt=-3
 pos[0]=36459
 pos[1]=24577
+rt=-4
 points=pos[-1]
+rt=-5
 #MOVE
+rt=-6
 II 1
 WT 5
 rt=1
@@ -38,10 +43,12 @@ JP #MOVE
 EN
 #ININT
 'MG "INSIDE INTERUPPT ROUTINE"
+rt=-7
 idx = count % points
 MG "idx = ", idx {F2.2}
 PA pos[idx];BG;AM;
 BG;AM;
+rt=-8
 count = count + 1
 WT 1
 RI 1; 'Return to the main program

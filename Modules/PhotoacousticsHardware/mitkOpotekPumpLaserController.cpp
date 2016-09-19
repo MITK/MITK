@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <thread>
 #include <mutex>
 
+#include <tinyxml.h>
+
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 
@@ -49,8 +51,8 @@ mitk::OpotekPumpLaserController::~OpotekPumpLaserController()
   /* stop tracking and disconnect from tracking device */
   if ((GetState() == STATE3) || (GetState() == STATE4) || (GetState() == STATE5))
   {
-    this->StopQswitch();
-    this->StopFlashlamps();
+    this->StopQswitching();
+    this->StopFlashing();
   }
   if (GetState() == STATE2)
   {
@@ -125,9 +127,47 @@ void mitk::OpotekPumpLaserController::ClearReceiveBuffer()
   m_SerialCommunication->ClearReceiveBuffer();
 }
 
-
-bool mitk::OpotekPumpLaserController::OpenConnection()
+void mitk::OpotekPumpLaserController::LoadResorceFile(std::string filename, std::string* lines)
 {
+  us::ModuleResource resorceFile = us::GetModuleContext()->GetModule()->GetResource(filename);
+  std::string line;
+  if (resorceFile.IsValid() && resorceFile.IsFile())
+  {
+    us::ModuleResourceStream stream(resorceFile);
+    while (std::getline(stream, line))
+    {
+      *lines = *lines + line + "\n";
+    }
+  }
+  else
+  {
+    MITK_ERROR << "Resource file was not valid";
+  }
+}
+
+bool mitk::OpotekPumpLaserController::OpenConnection(std::string configurationFile)
+{
+  LoadResorceFile(configurationFile + ".xml", &m_XmlPumpLaserConfiguration);
+  TiXmlDocument xmlDoc;
+
+  if (xmlDoc.Parse(m_XmlPumpLaserConfiguration.c_str(), 0, TIXML_ENCODING_UTF8))
+  {
+    TiXmlElement* root = xmlDoc.FirstChildElement("PumpLaser");
+    if (root)
+    {
+      TiXmlElement* elementNode = root->FirstChildElement("Seriell");
+      TiXmlElement* element = elementNode->FirstChildElement("PortNumber");
+      m_PortNumber = mitk::SerialCommunication::PortNumber(std::stoi(element->GetText()));
+      element = elementNode->FirstChildElement("Baud");
+      m_BaudRate = mitk::SerialCommunication::BaudRate(std::stoi(element->GetText()));
+    }
+  }
+  else
+  {
+    MITK_ERROR << "[Pump Laser Debug] Could not load configuration xml ";
+    return false;
+  }
+
   m_SerialCommunication = mitk::SerialCommunication::New();
 
   if (m_DeviceName.empty())
@@ -159,8 +199,8 @@ bool mitk::OpotekPumpLaserController::CloseConnection()
 {
   if (this->GetState() != UNCONNECTED)
   {
-    this->StopQswitch();
-    this->StopFlashlamps();
+    this->StopQswitching();
+    this->StopFlashing();
 
     // close the serial connection
     m_SerialCommunication->CloseConnection();
@@ -255,13 +295,13 @@ void mitk::OpotekPumpLaserController::StayAlive()
   } while (m_KeepAlive);
 }
 
-bool mitk::OpotekPumpLaserController::StartFlashlamps()
+bool mitk::OpotekPumpLaserController::StartFlashing()
 {
   this->GetState();
   if (!m_FlashlampRunning)
   {
     if (m_LaserEmission)
-      this->StopQswitch();
+      this->StopQswitching();
 
     std::string *command = new std::string;
     std::string answer("");
@@ -289,13 +329,13 @@ bool mitk::OpotekPumpLaserController::StartFlashlamps()
   return true;
 }
 
-bool mitk::OpotekPumpLaserController::StopFlashlamps()
+bool mitk::OpotekPumpLaserController::StopFlashing()
 {
   this->GetState();
   if (m_FlashlampRunning)
   {
     if (m_LaserEmission)
-      this->StopQswitch();
+      this->StopQswitching();
 
     std::string *command = new std::string;
     std::string answer("");
@@ -322,13 +362,13 @@ bool mitk::OpotekPumpLaserController::StopFlashlamps()
   return true;
 }
 
-bool mitk::OpotekPumpLaserController::StartQswitch()
+bool mitk::OpotekPumpLaserController::StartQswitching()
 {
   this->GetState();
   if (!m_LaserEmission)
   {
     if (m_LaserEmission && m_LaserEmission)
-      this->StopQswitch();
+      this->StopQswitching();
 
     std::string *command = new std::string;
     std::string answer("");
@@ -358,7 +398,7 @@ bool mitk::OpotekPumpLaserController::StartQswitch()
   }
 }
 
-bool mitk::OpotekPumpLaserController::StopQswitch()
+bool mitk::OpotekPumpLaserController::StopQswitching()
 {
   this->GetState();
   if (m_FlashlampRunning && m_LaserEmission)
@@ -380,4 +420,13 @@ bool mitk::OpotekPumpLaserController::StopQswitch()
 
   }
   return true;
+}
+
+bool mitk::OpotekPumpLaserController::IsEmitting()
+{
+  return m_LaserEmission;
+}
+bool mitk::OpotekPumpLaserController::IsFlashing()
+{
+  return m_FlashlampRunning;
 }

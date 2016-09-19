@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 
 #include "vector"
-#include "MitkPhotoacousticsHardwareOpotekExports.h"
+#include "MitkPhotoacousticsHardwareExports.h"
 
 #include "gclib.h"
 #include "gclibo.h"
@@ -37,14 +37,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-    class MITKPHOTOACOUSTICSHARDWAREOPOTEK_EXPORT GalilMotor : public itk::LightObject
+    class MITKPHOTOACOUSTICSHARDWARE_EXPORT GalilMotor : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(mitk::GalilMotor, itk::LightObject);
+      mitkClassMacroItkParent(mitk::GalilMotor, itk::Object);
       itkFactorylessNewMacro(Self);
 
-      virtual bool OpenConnection();
+      virtual bool OpenConnection(std::string configuration);
       virtual bool CloseConnection();
+
+      double GetMinWavelength();
+      double GetMaxWavelength();
+      double GetCurrentWavelength();
 
       bool TuneToWavelength(double wavelength);
 
@@ -58,11 +62,14 @@ namespace mitk {
       virtual ~GalilMotor();
 
       int m_ComPort;
+      int m_BaudRate;
       std::string m_ErrorMessage;
       GCon m_GalilSystem;
       GReturn m_ReturnCode;
 
       std::string m_XmlOpoConfiguration;
+      double m_MinWavelength;
+      double m_MaxWavelength;
       double m_CurrentWavelength;
       double m_WavelengthToStepCalibration[8];
 

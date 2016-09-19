@@ -21,11 +21,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObject.h"
 #include "mitkCommon.h"
 
-#include "MitkPhotoacousticsHardwareOpotekExports.h"
+#include "MitkPhotoacousticsHardwareExports.h"
 
 namespace mitk {
 
-    class MITKPHOTOACOUSTICSHARDWAREOPOTEK_EXPORT OpotekLaser : public itk::LightObject
+  class MITKPHOTOACOUSTICSHARDWARE_EXPORT OpotekLaser : public itk::LightObject
     {
     public:
       mitkClassMacroItkParent(mitk::OpotekLaser, itk::LightObject);

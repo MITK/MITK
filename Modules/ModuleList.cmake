@@ -70,8 +70,7 @@ set(mitk_modules
   BiophotonicsHardware
   Classification
   TumorInvasionAnalysis
-  Photoacoustics
-  PhotoacousticsHardwareOpotek
+  PhotoacousticsHardware
 )
 
 if(MITK_ENABLE_PIC_READER)

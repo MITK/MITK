@@ -25,8 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkLaserControlControls.h"
 
 #include <mitkOpotekPumpLaserController.h>
-#include <mitkOpotekLaser.h>
 #include <mitkGalilMotor.h>
+
 /**
   \brief OPOLaserControl
 
@@ -48,10 +48,7 @@ class OPOLaserControl : public QmitkAbstractView
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
-    void ConnectToLaser();
-    void GetStatus();
-    void SendCustomMessage();
-
+    void GetState();
 
     void InitLaser();
     void TuneWavelength();
@@ -72,12 +69,12 @@ class OPOLaserControl : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::OPOLaserControlControls m_Controls;
-    bool m_LaserSystemConnected;
+    bool m_PumpLaserConnected;
+    bool m_OPOConnected;
     bool m_SyncFromSpinBox;
     bool m_SyncFromSlider;
 
     mitk::OpotekPumpLaserController::Pointer m_PumpLaserController;
-    mitk::OpotekLaser::Pointer m_OpotekLaserSystem;
     mitk::GalilMotor::Pointer m_OPOMotor;
 
 };

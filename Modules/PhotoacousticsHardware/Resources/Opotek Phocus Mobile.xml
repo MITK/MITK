@@ -15,13 +15,13 @@
     <Signal-default>750.000</Signal-default>
     <Signal-high>950.000</Signal-high>
   </Signal>
-  <Port>
+  <Seriell>
     <PortNumber>7</PortNumber>
     <Baud>115200</Baud>
     <DataBits>8</DataBits>
     <Parity>0</Parity>
     <StopBits>10</StopBits>
-  </Port>
+  </Seriell>
   <SpectralResponse>
     <Wavelength>690.0|695.2|700.4|705.6|710.8|716.0|721.2|726.4|731.6|736.8|742.0|747.2|752.4|757.6|762.8|768.0|773.2|778.4|783.6|788.8|794.0|799.2|804.4|809.6|814.8|820.0|825.2|830.4|835.6|840.8|846.0|851.2|856.4|861.6|866.8|872.0|877.2|882.4|887.6|892.8|898.0|903.2|908.4|913.6|918.8|924.0|929.2|934.4|939.6|944.8
     </Wavelength>
@@ -31,3 +31,12 @@
 	</Energy>
   </SpectralResponse>
 </Motor>
+<PumpLaser>
+  <Seriell>
+    <PortNumber>6</PortNumber>
+    <Baud>115200</Baud>
+    <DataBits>8</DataBits>
+    <Parity>N</Parity>
+    <StopBits>1</StopBits>
+  </Seriell>
+</PumpLaser>

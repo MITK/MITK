@@ -1,10 +1,15 @@
 set(CPP_FILES
   mitkOpotekLaser.cpp
+  mitkOpotekPumpLaserController.cpp
   mitkGalilMotor.cpp
 )
 
 set(RESOURCE_FILES
   homeOPO.dmc
+  
+  GHOME.dmc
+  STUNE.dmc
+  FTUNE.dmc
 
   configSlowTuneOPO.dmc
   executeSlowTuneOPO.dmc
@@ -14,5 +19,5 @@ set(RESOURCE_FILES
 
   test.dmc
   tuneOPOto700.dmc
-  opoCalibration.xml
+  OpotekPhocusMobile.xml
 )

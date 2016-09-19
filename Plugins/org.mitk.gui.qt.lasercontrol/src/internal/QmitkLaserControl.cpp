@@ -33,7 +33,6 @@ const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.lasercontrol";
 
 void OPOLaserControl::SetFocus()
 {
-
 }
 
 void OPOLaserControl::CreateQtPartControl(QWidget *parent)
@@ -52,7 +51,8 @@ void OPOLaserControl::CreateQtPartControl(QWidget *parent)
   m_SyncFromSpinBox = true;
   m_SyncFromSlider = true;
 
-  m_LaserSystemConnected = false;
+  m_PumpLaserConnected = false;
+  m_OPOConnected = false;
 }
 void OPOLaserControl::SyncWavelengthSetBySlider()
 {
@@ -78,59 +78,95 @@ void OPOLaserControl::SyncWavelengthSetBySpinBox()
 
 void OPOLaserControl::InitLaser()
 {
+  m_Controls.buttonInitLaser->setEnabled(false);
   m_Controls.buttonInitLaser->setText("working ...");
-  if (!m_LaserSystemConnected)
+  if (!m_PumpLaserConnected)
   {
-    m_OpotekLaserSystem = mitk::OpotekLaser::New();
-    m_OpotekLaserSystem->SetConfigurationPath("opotek_15033_SN3401_1905_1906_20160330.ini");
-    m_OPOMotor = mitk::GalilMotor::New();
-    m_OPOMotor->OpenConnection();
+    m_PumpLaserController = mitk::OpotekPumpLaserController::New();
 
-    if (m_OpotekLaserSystem->Initialize())
+    if (m_PumpLaserController->OpenConnection("OpotekPhocusMobile"))
     {
       m_Controls.buttonFlashlamp->setEnabled(true);
       m_Controls.buttonQSwitch->setEnabled(true);
-      m_Controls.buttonTune->setEnabled(true);
       m_Controls.buttonInitLaser->setText("Reset and Release Laser");
 
-      m_Controls.sliderWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength());
-      m_Controls.sliderWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength());
-      m_Controls.spinBoxWavelength->setMinimum(m_OpotekLaserSystem->GetMinWavelength() / 10.0);
-      m_Controls.spinBoxWavelength->setMaximum(m_OpotekLaserSystem->GetMaxWavelength() / 10.0);
-      m_Controls.sliderWavelength->setValue(m_OpotekLaserSystem->GetWavelength());
-      m_Controls.spinBoxWavelength->setValue(m_OpotekLaserSystem->GetWavelength() / 10.0);
-      m_LaserSystemConnected = true;
+      std::string message("TRIG EE"); // set both Triggers external
+      std::string response("");
+
+      m_PumpLaserController->Send(&message);
+      m_PumpLaserController->ReceiveLine(&response);
+      m_PumpLaserConnected = true;
+      this->GetState();
     }
     else
     {
-      MITK_ERROR << "OpotekLaser Initialization failed.";
+      MITK_ERROR << "Opotek Pump Laser Initialization Failed.";
+      m_Controls.buttonInitLaser->setText("Init Laser");
     }
   }
   else
   {
     // destroy and free
-    if (m_OpotekLaserSystem->ResetAndRelease())
+    if (m_PumpLaserController->CloseConnection())
     {
-      m_OPOMotor->CloseConnection();
       m_Controls.buttonFlashlamp->setEnabled(false);
       m_Controls.buttonQSwitch->setEnabled(false);
-      m_Controls.buttonTune->setEnabled(false);
       m_Controls.buttonInitLaser->setText("Init Laser");
-      m_LaserSystemConnected = false;
+      m_PumpLaserConnected = false;
     }
     else
     {
-      MITK_ERROR << "OpotekLaser release failed.";
+      MITK_ERROR << "Opotek Pump Laser Release failed.";
+      m_Controls.buttonInitLaser->setText("Reset and Release Laser");
     }
   }
+
+  if (!m_OPOConnected)
+  {
+    m_OPOMotor = mitk::GalilMotor::New();
+    if (m_OPOMotor->OpenConnection("OpotekPhocusMobile"))
+    {
+      m_Controls.buttonTune->setEnabled(true);
+      m_Controls.buttonFastTuning->setEnabled(true);
+      m_Controls.sliderWavelength->setMinimum(m_OPOMotor->GetMinWavelength() * 10);
+      m_Controls.sliderWavelength->setMaximum(m_OPOMotor->GetMaxWavelength() * 10);
+      m_Controls.spinBoxWavelength->setMinimum(m_OPOMotor->GetMinWavelength());
+      m_Controls.spinBoxWavelength->setMaximum(m_OPOMotor->GetMaxWavelength());
+      m_Controls.sliderWavelength->setValue(m_OPOMotor->GetCurrentWavelength() * 10);
+      m_Controls.spinBoxWavelength->setValue(m_OPOMotor->GetCurrentWavelength());
+      m_OPOConnected = true; // not always right FIXME
+    }
+    else
+    {
+      MITK_ERROR << "OPO Initialization Failed.";
+      m_Controls.buttonInitLaser->setText("Init Laser");
+    }
+  }
+  else
+  {
+    // destroy and free
+    if (m_OPOMotor->CloseConnection())
+    {
+      m_Controls.buttonTune->setEnabled(false);
+      m_Controls.buttonFastTuning->setEnabled(false);
+      m_Controls.buttonInitLaser->setText("Init Laser");
+      m_OPOConnected = false;
+    }
+    else
+    {
+      MITK_ERROR << "OPO release failed.";
+      m_Controls.buttonInitLaser->setText("Reset and Release Laser");
+    }
+  }
+  m_Controls.buttonInitLaser->setEnabled(true);
 }
 
 void OPOLaserControl::TuneWavelength()
 {
   m_OPOMotor->TuneToWavelength(m_Controls.spinBoxWavelength->value());
-  //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
-  //wavelengthText.append("nm");
-  //m_Controls.labelWavelength->setText(wavelengthText);
+  QString wavelengthText = QString::number(m_OPOMotor->GetCurrentWavelength());
+  wavelengthText.append("nm");
+  m_Controls.labelWavelength->setText(wavelengthText);
 }
 
 void OPOLaserControl::StartFastTuning()
@@ -146,31 +182,33 @@ void OPOLaserControl::StartFastTuning()
 void OPOLaserControl::ToggleFlashlamp()
 {
   m_Controls.buttonFlashlamp->setText("...");
-  if (!m_OpotekLaserSystem->IsFlashing())
+  if (!m_PumpLaserController->IsFlashing())
   {
-    m_OpotekLaserSystem->StartFlashing();
+    m_PumpLaserController->StartFlashing();
     m_Controls.buttonFlashlamp->setText("Stop Lamp");
   }
   else
   {
-    m_OpotekLaserSystem->StopFlashing();
+    m_PumpLaserController->StopFlashing();
     m_Controls.buttonFlashlamp->setText("Start Lamp");
   }
+  this->GetState();
 }
 
 void OPOLaserControl::ToggleQSwitch()
 {
   m_Controls.buttonQSwitch->setText("...");
-  if (!m_OpotekLaserSystem->IsEmitting())
+  if (!m_PumpLaserController->IsEmitting())
   {
-    m_OpotekLaserSystem->StartQswitching();
+    m_PumpLaserController->StartQswitching();
     m_Controls.buttonQSwitch->setText("Stop Laser");
   }
   else
   {
-    m_OpotekLaserSystem->StopQswitching();
+    m_PumpLaserController->StopQswitching();
     m_Controls.buttonQSwitch->setText("Start Laser");
   }
+  this->GetState();
 }
 
 void OPOLaserControl::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
@@ -178,78 +216,22 @@ void OPOLaserControl::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
 {
 }
 
-void OPOLaserControl::ConnectToLaser()
+void OPOLaserControl::GetState()
 {
-  //m_PumpLaserController = mitk::OpotekPumpLaserController::New();
-  //if (m_PumpLaserController->OpenConnection())
-  //{
-  //  m_Controls.buttonSendCustomMessage->setEnabled(true);
-  //  m_Controls.buttonStatus->setEnabled(true);
-  //  m_Controls.buttonConnect->setText("Disconnect");
-  //  std::string message("TRIG EE"); // both external Triggers
-  //  std::string response("");
+  mitk::OpotekPumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
 
-  //  m_PumpLaserController->Send(&message);
-  //  m_PumpLaserController->ReceiveLine(&response);
-
-    ////get port
-    //int port = 0;
-    //port = m_Controls.spinBoxPort->value();
-
-    ////build prefix (depends on linux/win)
-    //QString prefix = "";
-    //#ifdef WIN32
-    //  prefix = "COM";
-    //  m_serial->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
-    //#else
-    //  prefix = m_Controls.comboBoxPortType->currentText();
-    //#endif
-
-    //QString portName = prefix + QString::number(port);
-    //m_serial->SetDeviceName(portName.toStdString());
-
-    // FIXME Unclear specs
-    //  • Half duplex
-    //  • Does not use Xon/Xoff
-    //  • Does not use RTS/CTS
-    // FIXME
-  //}
-  //else
-  //{
-  //  m_PumpLaserController->CloseConnection();
-  //  m_Controls.buttonSendCustomMessage->setEnabled(false);
-  //  m_Controls.buttonStatus->setEnabled(false);
-  //  m_Controls.buttonConnect->setText("Connect");
-  //}
-}
-
-void OPOLaserControl::GetStatus()
-{
-  //mitk::OpotekPumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
-
-  //if (pumpLaserState == mitk::OpotekPumpLaserController::STATE0)
-  //  MITK_INFO << "Received STATE0: Boot Fault.";
-  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE1)
-  //  MITK_INFO << "Received STATE1: Warm Up.";
-  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE2)
-  //  MITK_INFO << "Received STATE2: Laser Ready.";
-  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE3)
-  //  MITK_INFO << "Received STATE3: Flashing. Pulse Disabled.";
-  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
-  //  MITK_INFO << "Received STATE4: Flashing. Shutter Closed.";
-  //else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
-  //  MITK_INFO << "Received STATE5: Flashing. Pulse Enabled.";
-  //else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
-  //  MITK_INFO << "Received ERROR.";
-}
-
-void OPOLaserControl::SendCustomMessage()
-{
-  //std::string message = m_Controls.lineMessage->text().toStdString();
-  //std::string response("");
-
-  //m_PumpLaserController->Send(&message);
-  //m_PumpLaserController->ReceiveLine(&response);
-
-  //MITK_INFO << "Received response: " << response;
+  if (pumpLaserState == mitk::OpotekPumpLaserController::STATE0)
+    m_Controls.labelStatus->setText("PL0: Boot Fault.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE1)
+    m_Controls.labelStatus->setText("PL1: Warm Up.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE2)
+    m_Controls.labelStatus->setText("PL2: Laser Ready.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE3)
+    m_Controls.labelStatus->setText("PL3: Flashing. Pulse Disabled.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
+    m_Controls.labelStatus->setText("PL4: Flashing. Shutter Closed.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
+    m_Controls.labelStatus->setText("PL5: Flashing. Pulse Enabled.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
+    m_Controls.labelStatus->setText("PL ERROR.");
 }

@@ -279,13 +279,14 @@ int mitkImageTest(int argc, char* argv[])
   mitk::FillVector3D(spacing, 0.78, 0.91, 2.23);
 
   //InitializeStandardPlane(rightVector, downVector, spacing)
-  mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
-  planegeometry->InitializeStandardPlane(100, 100, right, bottom, &spacing);
-  planegeometry->SetOrigin(origin);
+  mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
+  planeGeometry->SetImageGeometry(true);
+  planeGeometry->InitializeStandardPlane(100, 100, right, bottom, &spacing);
+  planeGeometry->SetOrigin(origin);
 
   // Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with PlaneGeometry and GetData(): ";
-  imgMem->Initialize( mitk::MakePixelType<int, int, 1>(), *planegeometry);
-  MITK_TEST_CONDITION_REQUIRED( imgMem->GetGeometry()->GetOrigin() == static_cast<mitk::BaseGeometry*>(planegeometry)->GetOrigin(), "Testing correct setting of geometry via initialize!");
+  imgMem->Initialize( mitk::MakePixelType<int, int, 1>(), *planeGeometry);
+  MITK_TEST_CONDITION_REQUIRED( imgMem->GetGeometry()->GetOrigin() == static_cast<mitk::BaseGeometry*>(planeGeometry)->GetOrigin(), "Testing correct setting of geometry via initialize!");
 
   try
   {
@@ -299,7 +300,7 @@ int mitkImageTest(int argc, char* argv[])
   MITK_TEST_CONDITION_REQUIRED( p!=NULL, "GetData() returned valid pointer.");
 
   // Testing Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry) and GetData(): ";
-  imgMem->Initialize( mitk::MakePixelType<int, int, 1>() , 40, *planegeometry);
+  imgMem->Initialize( mitk::MakePixelType<int, int, 1>() , 40, *planeGeometry);
 
   try
   {

@@ -178,7 +178,7 @@ int testGeometry(const mitk::Geometry3D *geometry,
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
   mitk::Point3D axialcornerpoint0;
-  axialcornerpoint0 = cornerpoint0 + bottom + normal * (numSlices - 1 + 0.5); // really -1?
+  axialcornerpoint0 = cornerpoint0 + bottom + normal * numSlices;
   result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(),
                            width,
                            height,
@@ -207,7 +207,7 @@ int testGeometry(const mitk::Geometry3D *geometry,
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
   mitk::Point3D frontalcornerpoint0;
-  frontalcornerpoint0 = cornerpoint0 + geometry->GetAxisVector(1) * (+0.5 / geometry->GetExtent(1));
+  frontalcornerpoint0 = cornerpoint0;
   result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(),
                            width,
                            numSlices,
@@ -236,7 +236,7 @@ int testGeometry(const mitk::Geometry3D *geometry,
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
   mitk::Point3D sagittalcornerpoint0;
-  sagittalcornerpoint0 = cornerpoint0 + geometry->GetAxisVector(0) * (+0.5 / geometry->GetExtent(0));
+  sagittalcornerpoint0 = cornerpoint0;
   result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(),
                            height,
                            numSlices,

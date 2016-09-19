@@ -46,7 +46,7 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  virtual void SetDataNode(DataNode* node);
+  virtual void SetDataNode(DataNode* node) override;
   void TranslateGeometry(mitk::Vector3D translate, mitk::BaseGeometry* geometry);
   void RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry* geometry);
   void ScaleGeometry(mitk::Point3D newScale, mitk::BaseGeometry* geometry);

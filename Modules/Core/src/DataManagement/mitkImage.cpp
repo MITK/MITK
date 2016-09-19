@@ -820,11 +820,12 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
     this->m_ImageDescriptor->AddNewChannel( type );
   }
 
-  PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
-  planegeometry->InitializeStandardPlane(m_Dimensions[0], m_Dimensions[1]);
+  PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
+  planeGeometry->InitializeStandardPlane(m_Dimensions[0], m_Dimensions[1]);
+  planeGeometry->ImageGeometryOn();
 
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->InitializeEvenlySpaced(planegeometry, m_Dimensions[2]);
+  slicedGeometry->InitializeEvenlySpaced(planeGeometry, m_Dimensions[2]);
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);

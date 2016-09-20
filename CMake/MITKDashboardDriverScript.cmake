@@ -40,10 +40,10 @@ string(REPLACE " " "%20" _build_name_escaped "${CTEST_BUILD_NAME}")
 # Check if "mbits" is reachable
 file(DOWNLOAD "http://mbits" "${CTEST_SCRIPT_DIRECTORY}/mbits.html" TIMEOUT 2 STATUS _status)
 list(GET _status 0 _status_code)
-if(_status_code EQUAL 6) # couldn't resovle host name
-  set(MBITS_AVAILABLE 0)
-else()
+if(_status_code EQUAL 0) # successful completion
   set(MBITS_AVAILABLE 1)
+else()
+  set(MBITS_AVAILABLE 0)
 endif()
 
 #

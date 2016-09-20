@@ -129,7 +129,7 @@ bool mitk::GalilMotor::CloseConnection()
 
 int mitk::GalilMotor::GetPositionFromWavelength(double wavelength)
 {
-  int pos = m_WavelengthToStepCalibration[0] + m_WavelengthToStepCalibration[7];
+  int pos = m_WavelengthToStepCalibration[0] + m_WavelengthToStepCalibration[7] - 32561;
   pos += (m_WavelengthToStepCalibration[1] * wavelength);
   pos += (m_WavelengthToStepCalibration[2] * std::pow(wavelength, 2));
   pos += (m_WavelengthToStepCalibration[3] * std::pow(wavelength, 3));
@@ -145,8 +145,8 @@ bool mitk::GalilMotor::TuneToWavelength(double wavelength)
     MITK_INFO << "[Galil Debug] after AB: " << m_ReturnCode << "";
   m_ReturnCode = GCmd(m_GalilSystem, "BV"); // Burn all variables
     MITK_INFO << "[Galil Debug] after BV: " << m_ReturnCode << "";
-  m_ReturnCode = GProgramDownload(m_GalilSystem, "", 0); // Erase the program on the system
-    MITK_INFO << "[Galil Debug] after empty GProgramDownload: " << m_ReturnCode << "";
+  //m_ReturnCode = GProgramDownload(m_GalilSystem, "", 0); // Erase the program on the system
+  //  MITK_INFO << "[Galil Debug] after empty GProgramDownload: " << m_ReturnCode << "";
 
   std::string positionCommand;
   positionCommand = "pos=" + std::to_string(this->GetPositionFromWavelength(wavelength));
@@ -167,9 +167,9 @@ bool mitk::GalilMotor::TuneToWavelength(double wavelength)
   //m_ReturnCode = GProgramDownloadFile(m_GalilSystem, "c:/opotek/fastTuneOPO.dmc", 0);/*should be tuneOPOto700*/
   //MITK_INFO << "[Galil Debug] after tune GProgramDownloadFile = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
   GSleep(10);
-  m_ReturnCode = GCmd(m_GalilSystem, "XQ");
+  m_ReturnCode = GCmd(m_GalilSystem, "XQ#STUNE");
   MITK_INFO << "[Galil Debug] after sending XQ#STUNE = " << m_ReturnCode;
-  GSleep(3000);
+  GSleep(10000);
   int success, pos = -1;
   m_ReturnCode = GCmdI(m_GalilSystem, "suc=?", &success);
   MITK_INFO << "[Galil Debug] after asking suc=? = " << m_ReturnCode << "; successfulTune = " << success;

@@ -1,11 +1,36 @@
 #AUTO
 #STUNE
-suc=0
+suc=-1
+'*****************
+'AMP SETTINGS
+AU 0
+BR 1
+'AG 0
+TM 1000
+TL 3
+TK 9.998
+'
+'GENERAL SETTINGS
+ER 10000
+OE 1
+'MT -1
+'CE 0
+CN-1
+'PID PARAMETERS
+KD 17.5
+KP 15
+KI 0
+'
+suc=-101
+SHX
+WT 250
+'
 SP 150000
 AC 12000000
 DC 12000000
-PA pos;BG;AM;
-BG;AM;
+'
+suc=-102
 WT 100
+PA pos;BG;AM
 suc=1
 EN

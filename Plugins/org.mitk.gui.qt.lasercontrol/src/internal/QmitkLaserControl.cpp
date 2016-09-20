@@ -159,11 +159,19 @@ void OPOLaserControl::InitLaser()
     }
   }
   m_Controls.buttonInitLaser->setEnabled(true);
+  this->GetState();
 }
 
 void OPOLaserControl::TuneWavelength()
 {
-  m_OPOMotor->TuneToWavelength(m_Controls.spinBoxWavelength->value());
+  if (m_Controls.checkBoxCalibration->isChecked())
+  {
+    m_OPOMotor->TuneToWavelength(m_Controls.spinBoxPosition->value(), true);
+  }
+  else
+  {
+    m_OPOMotor->TuneToWavelength(m_Controls.spinBoxWavelength->value(), false);
+  }
   QString wavelengthText = QString::number(m_OPOMotor->GetCurrentWavelength());
   wavelengthText.append("nm");
   m_Controls.labelWavelength->setText(wavelengthText);
@@ -172,8 +180,8 @@ void OPOLaserControl::TuneWavelength()
 void OPOLaserControl::StartFastTuning()
 {
   std::vector<double> listOfWavelengths;
+  listOfWavelengths.push_back(700);
   listOfWavelengths.push_back(800);
-  listOfWavelengths.push_back(900);
   m_OPOMotor->FastTuneWavelengths(listOfWavelengths);
 
   //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
@@ -206,13 +214,17 @@ void OPOLaserControl::ToggleQSwitch()
   m_Controls.buttonQSwitch->setText("...");
   if (!m_PumpLaserController->IsEmitting())
   {
-    m_PumpLaserController->StartQswitching();
-    m_Controls.buttonQSwitch->setText("Stop Laser");
+    if(m_PumpLaserController->StartQswitching())
+      m_Controls.buttonQSwitch->setText("Stop Laser");
+    else
+      m_Controls.buttonQSwitch->setText("Start Laser");
   }
   else
   {
-    m_PumpLaserController->StopQswitching();
-    m_Controls.buttonQSwitch->setText("Start Laser");
+    if(m_PumpLaserController->StopQswitching())
+      m_Controls.buttonQSwitch->setText("Start Laser");
+    else
+      m_Controls.buttonQSwitch->setText("Stop Laser");
   }
   this->GetState();
 }
@@ -237,7 +249,9 @@ void OPOLaserControl::GetState()
   else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
     m_Controls.labelStatus->setText("PL4: Flashing. Shutter Closed.");
   else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
-    m_Controls.labelStatus->setText("PL5: Flashing. Pulse Enabled.");
+    m_Controls.labelStatus->setText("PL5: Flashing. Shutter Open.");
+  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE6)
+    m_Controls.labelStatus->setText("PL6: Flashing. Pulse Enabled.");
   else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
-    m_Controls.labelStatus->setText("PL ERROR.");
+    m_Controls.labelStatus->setText("PL Not Connected.");
 }

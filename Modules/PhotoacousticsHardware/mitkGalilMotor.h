@@ -50,7 +50,7 @@ namespace mitk {
       double GetMaxWavelength();
       double GetCurrentWavelength();
 
-      bool TuneToWavelength(double wavelength);
+      bool TuneToWavelength(double wavelength, bool isRecalibrating);
 
       bool FastTuneWavelengths(std::vector<double> wavelengthList);
 

@@ -1,3 +1,4 @@
+#AUTO
 #FTUNE
 suc=-1
 II1
@@ -36,8 +37,7 @@ JP #MOVE
 EN
 #ININT
 idx = count % points
-PA pos[idx];BG;AM;
-BG;AM;
+PR pos[idx];BG;AM;
 count = count + 1
 WT 1
 RI 1

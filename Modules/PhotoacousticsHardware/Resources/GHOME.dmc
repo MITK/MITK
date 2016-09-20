@@ -23,7 +23,7 @@ KI 0
 '
 suc=-101
 SHX
-WT 250
+WT 50
 '
 SP 150000
 AC 12000000
@@ -36,7 +36,7 @@ JG -10000;BG
 ST;AM
 suc=-103
 OE 1
-WT 100
+WT 50
 PR 32561;BG;AM 
 DP*=0
 suc=1

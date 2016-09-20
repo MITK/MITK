@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>243</width>
-    <height>332</height>
+    <height>445</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -33,7 +33,7 @@
           <x>10</x>
           <y>20</y>
           <width>206</width>
-          <height>281</height>
+          <height>291</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -290,6 +290,35 @@
            </property>
            <property name="text">
             <string>Start Fast Tuning</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="horizontalLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>340</y>
+          <width>201</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="checkBoxCalibration">
+           <property name="text">
+            <string>calibrate OPO</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBoxPosition">
+           <property name="maximum">
+            <number>50000</number>
+           </property>
+           <property name="value">
+            <number>25000</number>
            </property>
           </widget>
          </item>

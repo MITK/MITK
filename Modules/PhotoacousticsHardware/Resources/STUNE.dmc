@@ -23,14 +23,14 @@ KI 0
 '
 suc=-101
 SHX
-WT 250
+WT 50
 '
 SP 150000
 AC 12000000
 DC 12000000
 '
 suc=-102
-WT 100
+WT 50
 PA pos;BG;AM
 suc=1
 EN

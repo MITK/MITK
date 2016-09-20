@@ -183,7 +183,7 @@ void QmitkOverlayManagerView::OnCurrentRowChanged(const QModelIndex& current, co
 
       if (m_PropertyPersistence != nullptr)
       {
-        isPersistent = m_PropertyPersistence->HasInfos(name.toStdString());
+        isPersistent = m_PropertyPersistence->HasInfo(name.toStdString());
 
         /*if (isPersistent)
         {

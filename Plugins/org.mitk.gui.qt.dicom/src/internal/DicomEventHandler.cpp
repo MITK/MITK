@@ -71,7 +71,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
   if (!listOfFilesForSeries.isEmpty())
   {
-    //for rt data, if the modality tag isnt defined or is "CT" the image is handled like before
+    //for rt data, if the modality tag isn't defined or is "CT" the image is handled like before
     if(ctkEvent.containsProperty("Modality") &&
        (ctkEvent.getProperty("Modality").toString().compare("RTDOSE",Qt::CaseInsensitive) == 0 ||
         ctkEvent.getProperty("Modality").toString().compare("RTSTRUCT",Qt::CaseInsensitive) == 0))
@@ -80,152 +80,167 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
 
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
-        mitk::RTDoseReader::Pointer doseReader = mitk::RTDoseReader::New();
+          auto doseReader = mitk::RTDoseReader();
+          doseReader.SetInput(listOfFilesForSeries.at(0).toStdString());
+          std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
+          if (!readerOutput.empty()){
+            mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
 
-        mitk::DataNode::Pointer doseImageNode = mitk::DataNode::New();
-        mitk::DataNode::Pointer doseOutlineNode = mitk::DataNode::New();
+            mitk::DataNode::Pointer doseImageNode = mitk::DataNode::New();
+            doseImageNode->SetData(doseImage);
+            doseImageNode->SetName("RTDose");
 
-        doseImageNode = doseReader->LoadRTDose(listOfFilesForSeries.at(0).toStdString().c_str());
-        doseOutlineNode->SetData(doseImageNode->GetData());
-        if (doseImageNode.IsNotNull() && doseOutlineNode->GetData() != nullptr)
-        {
-          berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-          berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID.c_str());
+            mitk::DataNode::Pointer doseOutlineNode = mitk::DataNode::New();
 
-          typedef QStringList NamesType;
-          NamesType names = prefNode->ChildrenNames();
-
-          std::map<std::string, mitk::IsoDoseLevelSet::Pointer> presetMap;
-
-          for (NamesType::const_iterator pos = names.begin(); pos != names.end(); ++pos)
-          {
-            berry::IPreferences::Pointer aPresetNode = prefNode->Node(*pos);
-
-            if (aPresetNode.IsNull())
+            doseOutlineNode->SetData(doseImage);
+            if (doseImage != nullptr)
             {
-              mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << (*pos).toStdString();
+                auto sopUIDProperty = doseImage->GetProperty("dicomseriesreader.SOPClassUID");
+                if (sopUIDProperty.IsNotNull()){
+                    auto sopUIDStringProperty = dynamic_cast<mitk::StringProperty*>(sopUIDProperty.GetPointer());
+                    if (sopUIDStringProperty != nullptr){
+                        std::string sopUID = sopUIDStringProperty->GetValue();
+                        doseImageNode->SetName(sopUID);
+                    }
+                }
+
+                berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+                berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_ISO_PRESETS_PREFERENCE_NODE_ID.c_str());
+
+                typedef QStringList NamesType;
+                NamesType names = prefNode->ChildrenNames();
+
+                std::map<std::string, mitk::IsoDoseLevelSet::Pointer> presetMap;
+
+                for (NamesType::const_iterator pos = names.begin(); pos != names.end(); ++pos)
+                {
+                    berry::IPreferences::Pointer aPresetNode = prefNode->Node(*pos);
+
+                    if (aPresetNode.IsNull())
+                    {
+                        mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << (*pos).toStdString();
+                    }
+
+                    mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
+
+                    NamesType levelNames = aPresetNode->ChildrenNames();
+                    for (NamesType::const_iterator levelName = levelNames.begin(); levelName != levelNames.end(); ++levelName)
+                    {
+                        berry::IPreferences::Pointer levelNode = aPresetNode->Node(*levelName);
+                        if (aPresetNode.IsNull())
+                        {
+                            mitkThrow() << "Error in preference interface. Cannot find level node under given preset name. Name: " << (*pos).toStdString() << "; Level id: " << (*levelName).toStdString();
+                        }
+
+                        mitk::IsoDoseLevel::Pointer isoLevel = mitk::IsoDoseLevel::New();
+
+                        isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID.c_str(), 0.0));
+                        mitk::IsoDoseLevel::ColorType color;
+                        color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID.c_str(), 1.0));
+                        color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID.c_str(), 1.0));
+                        color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID.c_str(), 1.0));
+                        isoLevel->SetColor(color);
+                        isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID.c_str(), true));
+                        isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID.c_str(), true));
+
+                        levelSet->SetIsoDoseLevel(isoLevel);
+                    }
+
+                    presetMap.insert(std::make_pair((*pos).toStdString(), levelSet));
+                }
+
+                if (presetMap.size() == 0)
+                {
+                    presetMap.insert(std::make_pair(std::string("Virtuos"), mitk::GeneratIsoLevels_Virtuos()));
+                }
+
+
+                prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
+
+                if (prefNode.IsNull())
+                {
+                    mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << prefNode->ToString().toStdString();
+                }
+
+                //set some specific colorwash and isoline properties
+                bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(), true);
+                doseImageNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), showColorWashGlobal);
+
+                bool showIsolinesGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(), true);
+                doseOutlineNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsolinesGlobal);
+
+                //Set reference dose property
+                double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
+                doseImageNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
+                doseOutlineNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
+
+                QString presetName = prefNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID.c_str(), "Virtuos");
+
+                mitk::IsoDoseLevelSet::Pointer isoDoseLevelPreset = presetMap[presetName.toStdString()];
+                mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(isoDoseLevelPreset);
+
+                doseImageNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
+                doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
+
+                mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
+                mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
+                doseImageNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
+                doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
+
+                mitk::RenderingModeProperty::Pointer renderingModeProp = mitk::RenderingModeProperty::New();
+
+                if (showColorWashGlobal)
+                {
+                    //Generating the Colorwash
+                    vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+
+                    for (mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelPreset->Begin(); itIsoDoseLevel != isoDoseLevelPreset->End(); ++itIsoDoseLevel)
+                    {
+                        float *hsv = new float[3];
+                        //used for transfer rgb to hsv
+                        vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
+                        if (itIsoDoseLevel->GetVisibleColorWash()){
+                            cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2], &hsv[0], &hsv[1], &hsv[2]);
+                            transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, hsv[0], hsv[1], hsv[2], 1.0, 1.0);
+                        }
+                    }
+
+                    mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
+                    mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
+                    mitkTransFunc->SetColorTransferFunction(transferFunction);
+                    mitkTransFuncProp->SetValue(mitkTransFunc);
+                    doseImageNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
+
+
+                    renderingModeProp->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
+                }
+                else
+                {
+                    //Set rendering mode to levelwindow color mode
+                    renderingModeProp->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+                }
+
+                doseImageNode->SetProperty("Image Rendering.Mode", renderingModeProp);
+                doseImageNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+
+                //set the outline properties
+                doseOutlineNode->SetBoolProperty("outline binary", true);
+                doseOutlineNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+                doseOutlineNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+
+                ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+                mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+                mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+                dataStorage->Add(doseImageNode);
+                dataStorage->Add(doseOutlineNode, doseImageNode);
+
+                //set the dose mapper for outline drawing; the colorwash is realized by the imagevtkmapper2D
+                mitk::DoseImageVtkMapper2D::Pointer contourMapper = mitk::DoseImageVtkMapper2D::New();
+                doseOutlineNode->SetMapper(1, contourMapper);
+
+                mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
             }
-
-            mitk::IsoDoseLevelSet::Pointer levelSet = mitk::IsoDoseLevelSet::New();
-
-            NamesType levelNames = aPresetNode->ChildrenNames();
-            for (NamesType::const_iterator levelName = levelNames.begin(); levelName != levelNames.end(); ++levelName)
-            {
-              berry::IPreferences::Pointer levelNode = aPresetNode->Node(*levelName);
-              if (aPresetNode.IsNull())
-              {
-                mitkThrow() << "Error in preference interface. Cannot find level node under given preset name. Name: " << (*pos).toStdString() << "; Level id: " << (*levelName).toStdString();
-              }
-
-              mitk::IsoDoseLevel::Pointer isoLevel = mitk::IsoDoseLevel::New();
-
-              isoLevel->SetDoseValue(levelNode->GetDouble(mitk::RTUIConstants::ISO_LEVEL_DOSE_VALUE_ID.c_str(), 0.0));
-              mitk::IsoDoseLevel::ColorType color;
-              color.SetRed(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_RED_ID.c_str(), 1.0));
-              color.SetGreen(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_GREEN_ID.c_str(), 1.0));
-              color.SetBlue(levelNode->GetFloat(mitk::RTUIConstants::ISO_LEVEL_COLOR_BLUE_ID.c_str(), 1.0));
-              isoLevel->SetColor(color);
-              isoLevel->SetVisibleIsoLine(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_ISOLINES_ID.c_str(), true));
-              isoLevel->SetVisibleColorWash(levelNode->GetBool(mitk::RTUIConstants::ISO_LEVEL_VISIBILITY_COLORWASH_ID.c_str(), true));
-
-              levelSet->SetIsoDoseLevel(isoLevel);
-            }
-
-            presetMap.insert(std::make_pair((*pos).toStdString(), levelSet));
-          }
-
-          if (presetMap.size() == 0)
-          {
-            presetMap.insert(std::make_pair(std::string("Virtuos"), mitk::GeneratIsoLevels_Virtuos()));
-          }
-
-
-          prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
-
-          if (prefNode.IsNull())
-          {
-            mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << prefNode->ToString().toStdString();
-          }
-
-          //set some specific colorwash and isoline properties
-          bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(), true);
-          doseImageNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_COLORWASH_PROPERTY_NAME.c_str(), showColorWashGlobal);
-
-          bool showIsolinesGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_ISOLINES_ID.c_str(), true);
-          doseOutlineNode->SetBoolProperty(mitk::RTConstants::DOSE_SHOW_ISOLINES_PROPERTY_NAME.c_str(), showIsolinesGlobal);
-
-          //Set reference dose property
-          double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
-          doseImageNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
-          doseOutlineNode->SetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), referenceDose);
-
-
-          QString presetName = prefNode->Get(mitk::RTUIConstants::SELECTED_ISO_PRESET_ID.c_str(), "Virtuos");
-
-          mitk::IsoDoseLevelSet::Pointer isoDoseLevelPreset = presetMap[presetName.toStdString()];
-          mitk::IsoDoseLevelSetProperty::Pointer levelSetProp = mitk::IsoDoseLevelSetProperty::New(isoDoseLevelPreset);
-
-          doseImageNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
-          doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_ISO_LEVELS_PROPERTY_NAME.c_str(), levelSetProp);
-
-          mitk::IsoDoseLevelVector::Pointer levelVector = mitk::IsoDoseLevelVector::New();
-          mitk::IsoDoseLevelVectorProperty::Pointer levelVecProp = mitk::IsoDoseLevelVectorProperty::New(levelVector);
-          doseImageNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
-          doseOutlineNode->SetProperty(mitk::RTConstants::DOSE_FREE_ISO_VALUES_PROPERTY_NAME.c_str(), levelVecProp);
-
-          mitk::RenderingModeProperty::Pointer renderingModeProp = mitk::RenderingModeProperty::New();
-
-          if (showColorWashGlobal)
-          {
-            //Generating the Colorwash
-            vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-
-            for (mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelPreset->Begin(); itIsoDoseLevel != isoDoseLevelPreset->End(); ++itIsoDoseLevel)
-            {
-              float *hsv = new float[3];
-              //used for transfer rgb to hsv
-              vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
-              if (itIsoDoseLevel->GetVisibleColorWash()){
-                cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2], &hsv[0], &hsv[1], &hsv[2]);
-                transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, hsv[0], hsv[1], hsv[2], 1.0, 1.0);
-              }
-            }
-
-            mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();
-            mitk::TransferFunctionProperty::Pointer mitkTransFuncProp = mitk::TransferFunctionProperty::New();
-            mitkTransFunc->SetColorTransferFunction(transferFunction);
-            mitkTransFuncProp->SetValue(mitkTransFunc);
-            doseImageNode->SetProperty("Image Rendering.Transfer Function", mitkTransFuncProp);
-
-
-            renderingModeProp->SetValue(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR);
-          }
-          else
-          {
-            //Set rendering mode to levelwindow color mode
-            renderingModeProp->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-          }
-
-          doseImageNode->SetProperty("Image Rendering.Mode", renderingModeProp);
-          doseImageNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
-
-          //set the outline properties
-          doseOutlineNode->SetBoolProperty("outline binary", true);
-          doseOutlineNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-          doseOutlineNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-
-          ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-          mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-          mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
-
-          dataStorage->Add(doseImageNode);
-          dataStorage->Add(doseOutlineNode, doseImageNode);
-
-          //set the dose mapper for outline drawing; the colorwash is realized by the imagevtkmapper2D
-          mitk::DoseImageVtkMapper2D::Pointer contourMapper = mitk::DoseImageVtkMapper2D::New();
-          doseOutlineNode->SetMapper(1, contourMapper);
-
-          mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
         }//END DOSE
       }
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)

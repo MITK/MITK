@@ -30,6 +30,13 @@ if(NOT DEFINED GDCM_DIR)
     )
   endif()
 
+  # On Mac some assertions fail that prevent reading certain DICOM files. Bug #19995
+  if(APPLE)
+    list(APPEND additional_args
+      "-DCMAKE_CXX_FLAGS_DEBUG:STRING=${CMAKE_CXX_FLAGS_DEBUG} -DNDEBUG"
+    )
+  endif()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-2.6.3.tar.bz2

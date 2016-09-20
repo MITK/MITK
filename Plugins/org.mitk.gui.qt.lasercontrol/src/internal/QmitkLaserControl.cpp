@@ -90,11 +90,11 @@ void OPOLaserControl::InitLaser()
       m_Controls.buttonQSwitch->setEnabled(true);
       m_Controls.buttonInitLaser->setText("Reset and Release Laser");
 
-      std::string message("TRIG EE"); // set both Triggers external
-      std::string response("");
+      std::string command("TRIG EE"); // set both Triggers external
+      std::string answer("");
 
-      m_PumpLaserController->Send(&message);
-      m_PumpLaserController->ReceiveLine(&response);
+      m_PumpLaserController->SendAndReceiveLine(&command, &answer);
+      MITK_INFO << answer;
       m_PumpLaserConnected = true;
       this->GetState();
     }
@@ -172,7 +172,9 @@ void OPOLaserControl::TuneWavelength()
 void OPOLaserControl::StartFastTuning()
 {
   std::vector<double> listOfWavelengths;
-  m_OPOMotor->FastTuneWavelengths(listOfWavelengths/*m_Controls.spinBoxFIXME->value()*/);
+  listOfWavelengths.push_back(800);
+  listOfWavelengths.push_back(900);
+  m_OPOMotor->FastTuneWavelengths(listOfWavelengths);
 
   //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
   //wavelengthText.append("nm");
@@ -184,13 +186,17 @@ void OPOLaserControl::ToggleFlashlamp()
   m_Controls.buttonFlashlamp->setText("...");
   if (!m_PumpLaserController->IsFlashing())
   {
-    m_PumpLaserController->StartFlashing();
-    m_Controls.buttonFlashlamp->setText("Stop Lamp");
+    if(m_PumpLaserController->StartFlashing())
+      m_Controls.buttonFlashlamp->setText("Stop Lamp");
+    else
+      m_Controls.buttonFlashlamp->setText("Start Lamp");
   }
   else
   {
-    m_PumpLaserController->StopFlashing();
-    m_Controls.buttonFlashlamp->setText("Start Lamp");
+    if (m_PumpLaserController->StopFlashing())
+      m_Controls.buttonFlashlamp->setText("Start Lamp");
+    else
+      m_Controls.buttonFlashlamp->setText("Stop Lamp");
   }
   this->GetState();
 }

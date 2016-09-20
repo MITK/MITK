@@ -106,9 +106,7 @@ bool mitk::GalilMotor::OpenConnection(std::string configuration)
   {
     MITK_ERROR << "[GalilMotor Debug] Could not load configuration xml ";
   }
-  std::string openCommand("COM");
-  openCommand.append(m_ComPort + " --baud " + m_BaudRate);
-
+  std::string openCommand("COM" + std::to_string(m_ComPort) + " --baud " + std::to_string(m_BaudRate));
   MITK_INFO << "[Galil Debug] before GOpen(" << openCommand << ") = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
   m_ReturnCode = GOpen(openCommand.c_str() , &m_GalilSystem);
   MITK_INFO << "[Galil Debug] after GOpen = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
@@ -153,12 +151,12 @@ bool mitk::GalilMotor::TuneToWavelength(double wavelength)
   std::string positionCommand;
   positionCommand = "pos=" + std::to_string(this->GetPositionFromWavelength(wavelength));
   m_ReturnCode = GCmd(m_GalilSystem, positionCommand.c_str());
-    MITK_INFO << "[Galil Debug] after sending tune position: " << m_ReturnCode << "";
+    MITK_INFO << "[Galil Debug] after sending tune position("<<positionCommand<<"): " << m_ReturnCode << "";
 
   std::string galilProgramSTUNE;
   this->LoadResorceFile("STUNE.dmc", &galilProgramSTUNE);
   m_ReturnCode = GProgramDownload(m_GalilSystem, galilProgramSTUNE.c_str(), 0);
-    MITK_INFO << "[Galil Debug] after STUNE progam: " << m_ReturnCode << "";
+    MITK_INFO << "[Galil Debug] after STUNE progam: " << m_ReturnCode << galilProgramSTUNE;
 
   //std::string galilSlowTuneConf;
   //this->LoadResorceFile("configSlowTuneOPO.dmc", &galilSlowTuneConf);
@@ -169,13 +167,14 @@ bool mitk::GalilMotor::TuneToWavelength(double wavelength)
   //m_ReturnCode = GProgramDownloadFile(m_GalilSystem, "c:/opotek/fastTuneOPO.dmc", 0);/*should be tuneOPOto700*/
   //MITK_INFO << "[Galil Debug] after tune GProgramDownloadFile = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
   GSleep(10);
-  m_ReturnCode = GCmd(m_GalilSystem, "XQ#STUNE");
+  m_ReturnCode = GCmd(m_GalilSystem, "XQ");
   MITK_INFO << "[Galil Debug] after sending XQ#STUNE = " << m_ReturnCode;
   GSleep(3000);
-  int success = -1;
+  int success, pos = -1;
   m_ReturnCode = GCmdI(m_GalilSystem, "suc=?", &success);
   MITK_INFO << "[Galil Debug] after asking suc=? = " << m_ReturnCode << "; successfulTune = " << success;
-  
+  m_ReturnCode = GCmdI(m_GalilSystem, "pos=?", &pos);
+  MITK_INFO << "[Galil Debug] after asking pos=? = " << m_ReturnCode << "; pos = " << pos;
   if (success == 1)
     return true;
   else
@@ -197,7 +196,8 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
 
   for (int wavelengthIterator = 0; wavelengthIterator < wavelengthList.size(); wavelengthIterator++)
   {
-    positionsCommand = "pos[" + std::to_string(wavelengthIterator) + "]=" + std::to_string(this->GetPositionFromWavelength(wavelengthList[0]));
+    positionsCommand = "pos[" + std::to_string(wavelengthIterator) + "]=" + std::to_string(this->GetPositionFromWavelength(wavelengthList[wavelengthIterator]));
+    MITK_INFO << "[Galil Debug] after command(" << positionsCommand << "): " << m_ReturnCode << "";
     m_ReturnCode = GCmd(m_GalilSystem, positionsCommand.c_str());
     MITK_INFO << "[Galil Debug] after command(" << positionsCommand << "): " << m_ReturnCode << "";
   }
@@ -237,7 +237,7 @@ bool mitk::GalilMotor::Home()
   m_ReturnCode = GProgramDownload(m_GalilSystem, galilProgram.c_str(), 0);
     MITK_INFO << "[Galil Debug] after home GProgramDownloadFile = " << m_ReturnCode << "; m_GalilSystem = " << m_GalilSystem;
 
-  m_ReturnCode = GCmd(m_GalilSystem, "XQ#HOME"); // HOME
+  m_ReturnCode = GCmd(m_GalilSystem, "XQ#GHOME"); // HOME
   GSleep(10000);
   int val = -1;
   m_ReturnCode = GCmdI(m_GalilSystem, "suc=?", &val);

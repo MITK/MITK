@@ -37,6 +37,6 @@
     <Baud>115200</Baud>
     <DataBits>8</DataBits>
     <Parity>N</Parity>
-    <StopBits>StopBits1</StopBits>
+    <StopBits>1</StopBits>
   </Seriell>
 </PumpLaser>

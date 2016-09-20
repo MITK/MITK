@@ -42,7 +42,7 @@ namespace mitk {
       mitkClassMacroItkParent(OpotekPumpLaserController, itk::LightObject);
       itkFactorylessNewMacro(Self);
 
-      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
+      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
       /**
        * \brief Opens a connection to the device
        *
@@ -58,13 +58,8 @@ namespace mitk {
        */
       virtual bool CloseConnection(); ///< Closes the connection with the device
 
-      virtual std::string Send(const std::string* input);
+      virtual std::string SendAndReceiveLine(const std::string* input, std::string* answer);
 
-      virtual std::string ReceiveLine(std::string* answer);
-
-      virtual void ClearSendBuffer();
-
-      virtual void ClearReceiveBuffer();
       virtual void StayAlive();
       virtual bool StartFlashing();
       virtual bool StopFlashing();

@@ -1,0 +1,51 @@
+/**
+\page org_mitk_gui_qt_matchpoint_algorithm_control The MatchPoint Algorithm Control Plugin
+
+\imageMacro{map-icon-run.png, "Icon of the MatchPoint Algorithm Control", 3}
+
+\li \ref MAP_RUN_Introduction
+\li \ref MAP_RUN_Contact
+\li \ref MAP_RUN_Usage
+
+\section MAP_RUN_Introduction Introduction
+This plugin offers the user a way to use a selected registration algorithm in order to determine a registration for two selected images.
+For the selection of an algorithm please see MatchPoint Algorithm Browser (\ref org_mitk_gui_qt_algorithm_browser).
+
+\section MAP_RUN_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+
+\section MAP_RUN_Usage Usage
+\imageMacro{control_example.png, "Example screenshot showing the control plugin in use.", 14}
+To use the plugin a registration algorithm must be loaded and the moving as well as the target image must be selected.\n
+The moving image will be the image whicht will be registered onto the target image. Thus the result would show a mapped input image
+in the geometry (field of view, orientation, spacing) defined by the target image.\n
+The images will be selected in the data manager using multi select (press the CTRL-key while selecting the nodes in the data manager).
+The first selection is the moving image, the second is the target image.\n
+If an algorithm is loaded and input images are selected, the plugin will automatically switch to the "Execution" tab.
+
+\subsection MAP_RUN_Usage_selection Selection tab
+\imageMacro{step1_selection.png, "Details of the selection tab.", 8}
+In this tab you can load/"book" the algorithm selected in the MatchPoint Algorithm Browser. In the tab you see the ID of the algorithm
+selected by the browser and its profile information.\n
+If you press "Load selected algorithm", the algorithm will be used by the controller plugin in and the name of the algorithm occurs
+in the text field "Loaded algorithm" (at the top of the plugin view).\n
+At this point, it has no effect if you change the the selection in the browser. The controller plugin will keep the loaded algorithm until
+you choose to load another one.
+
+\subsection MAP_RUN_Usage_exec Execution tab
+\imageMacro{step2_execution.png, "Details of the execution tab.",8}
+In this tab you can specify a name for the registration job (this will determine the names of the result nodes in the data manager).\n
+You can also choose to "store registration" (which is normally the goal of the whole process, because this is the very result of the algorithm ;).\n
+Additionally you can "Generate + store mapped result". This is a convenience feature which often saves you the time to use the mapper plugin afterwards.
+It will do the same like using the mapper plugin with the moving and target image, setting padding value "0" and using "linear interpolation".
+If you need other settings, skip the convenience generation and use the mapper plugin directly.\n
+"Start" will trigger the registration process. Some algorithms allow to be stopped while registering. In those cases, there is an "Stop" button enabled,
+as soon as the registration process starts.
+
+\subsection MAP_RUN_Usage_settings Settings tab
+\imageMacro{step3_settings.png, "Details of the settings tab.",8}
+In this tab, you can parametrize the loaded algorithm (befor it starts), if it offers any possibility to do so.
+*/
+

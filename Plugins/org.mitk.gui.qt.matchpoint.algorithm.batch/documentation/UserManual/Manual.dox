@@ -1,0 +1,21 @@
+/**
+\page org_mitk_gui_qt_matchpoint_algorithm_batch The MatchPoint Registration Batch Processor Plugin
+
+\imageMacro{map-icon-batch.png, "Icon of the MatchPoint Algorithm Batch Processor",3}
+
+\li \ref MAP_BATCH_Introduction
+\li \ref MAP_BATCH_Contact
+\li \ref MAP_BATCH_Usage
+
+\section MAP_BATCH_Introduction Introduction
+This plugin is very similar to the MatchPoint algorithm controller plugin, but allows to register a set of selected input images in one batch run onto one selected target image.
+
+\section MAP_BATCH_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+
+\section MAP_BATCH_Usage Usage
+Oops. Documentation is missing and to be done.
+*/
+

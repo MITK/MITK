@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.matchpoint.core.helper.PreferencesPage" name="MatchPoint" class="MatchPointBrowserPreferencesPage"></page>
+  </extension>
+
+</plugin>

@@ -560,21 +560,40 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   else if ( (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
             || (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
   {
-    mitk::Color color = image->GetActiveLabel()->GetColor();
 
-    if (this->GetDataNode()->GetColor(color.GetDataPointer(), renderer))
+    // The previous update was interrupted because of no intersection between image and world geometry
+    // Have to make a full update again
+    if (localStorage->m_ReslicedImageVector[image->GetActiveLayer()] == nullptr) 
     {
-      image->GetActiveLabel()->SetColor(color);
-      image->GetActiveLabelSet()->UpdateLookupTable(image->GetActiveLabel()->GetValue());
+      this->GenerateDataForRenderer(renderer);
+      localStorage->m_LastDataUpdateTime.Modified();
+      localStorage->m_LastPropertyUpdateTime.Modified();
+    } 
+    else 
+    {
+      // Change color of first label
+      auto firstLabel = image->GetLabel(1);
+      if (firstLabel == nullptr)
+      {
+        firstLabel = image->GetActiveLabel();
+      }
+
+      mitk::Color color = firstLabel->GetColor();
+
+      if (this->GetDataNode()->GetColor(color.GetDataPointer(), renderer))
+      {
+        firstLabel->SetColor(color);
+        image->GetActiveLabelSet()->UpdateLookupTable(firstLabel->GetValue());
+      }
+
+
+      this->ApplyColor(renderer, color);
+      this->ApplyOpacity(renderer, image->GetActiveLayer());
+      this->ApplyLookuptable(renderer, image->GetActiveLayer());
+      this->ApplyContour(renderer, image->GetActiveLayer());
+
+      localStorage->m_LastPropertyUpdateTime.Modified();
     }
-
-
-    this->ApplyColor(renderer, color);
-    this->ApplyOpacity(renderer, image->GetActiveLayer());
-    this->ApplyLookuptable(renderer, image->GetActiveLayer());
-    this->ApplyContour(renderer, image->GetActiveLayer());
-
-    localStorage->m_LastPropertyUpdateTime.Modified();
   }
 }
 

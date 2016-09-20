@@ -209,7 +209,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
           mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
 
           mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
-          mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, 1.0);
+          mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, workingImage, 1.0);
 
           //write back to image volume
           SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);

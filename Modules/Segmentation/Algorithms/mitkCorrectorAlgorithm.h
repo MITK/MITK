@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkImage.h>
 
+#define multilabelSegmentationType unsigned short
 namespace mitk
 {
   /**
@@ -54,16 +55,15 @@ namespace mitk
     */
     void SetContour(ContourModel* contour){ this->m_Contour = contour; }
 
+    itkSetMacro(FillColor, int);
+    itkGetConstMacro(FillColor, int);
+
+    itkSetMacro(EraseColor, int);
+    itkGetConstMacro(EraseColor, int);
     /**
     * \brief Calculated difference image.
     */
     //itkGetObjectMacro(DifferenceImage, Image);
-
-    itkSetMacro(FillColor, int);
-    itkSetMacro(EraseColor, int);
-
-    itkGetMacro(FillColor, int);
-    itkGetMacro(EraseColor, int);
 
     // used by TobiasHeimannCorrectionAlgorithm
     typedef struct

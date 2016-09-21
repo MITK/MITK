@@ -239,6 +239,9 @@ void mitk::Overlay::SetVisibility(bool visible, const std::string &propertyKey)
 {
   mitk::BoolProperty::Pointer prop;
   prop = mitk::BoolProperty::New(visible);
+  this->m_PropertyList->SetProperty(propertyKey, prop);
+}
+
   bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer * renderer, mitk::Overlay * overlay)
   {
     if (m_LastGenerateDataTime < overlay->GetMTime())

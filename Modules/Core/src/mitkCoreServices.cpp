@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkIShaderRepository.h>
-#include <mitkIAnnotationService.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -105,11 +104,6 @@ namespace mitk
   {
     return GetCoreService<IMimeTypeProvider>(context);
   }
-
-IAnnotationService* CoreServices::GetAnnotationService(us::ModuleContext* context)
-{
-  return GetCoreService<IAnnotationService>(context);
-}
 
   bool CoreServices::Unget(us::ModuleContext *context, const std::string & /*interfaceId*/, void *service)
   {

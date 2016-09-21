@@ -17,25 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkAnnotationService_h
 #define mitkAnnotationService_h
 
-#include <mitkIAnnotationService.h>
 #include <map>
 
 namespace mitk
 {
-  typedef std::map<std::string,AnnotationServiceRef> InstanceMapType;
 
-  class AnnotationService : public IAnnotationService
+  class AnnotationService
   {
   public:
-
-    void AddAnnotationRenderer(AnnotationServiceRef ref, const std::string &id) override;
 
     AnnotationService();
     ~AnnotationService();
 
   private:
-
-    InstanceMapType m_InstanceMap;
 
     AnnotationService(const AnnotationService&);
     AnnotationService& operator=(const AnnotationService&);

@@ -298,9 +298,6 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_MimeTypeProvider->Start();
   m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());
 
-  m_AnnotationService.reset(new mitk::AnnotationService);
-  context->RegisterService<mitk::AnnotationService>(m_AnnotationService.get());
-
   this->RegisterDefaultMimeTypes();
   this->RegisterItkReaderWriter();
   this->RegisterVtkReaderWriter();

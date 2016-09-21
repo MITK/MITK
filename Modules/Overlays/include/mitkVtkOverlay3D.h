@@ -30,13 +30,13 @@ namespace mitk
   class MITKCORE_EXPORT VtkOverlay3D : public VtkOverlay
   {
   public:
-    void SetPosition3D(const Point3D &position3D, mitk::BaseRenderer *renderer = NULL);
+    void SetPosition3D(const Point3D &position3D);
 
-    Point3D GetPosition3D(mitk::BaseRenderer *renderer = NULL) const;
+    Point3D GetPosition3D() const;
 
-    void SetOffsetVector(const Point3D &OffsetVector, mitk::BaseRenderer *renderer = NULL);
+    void SetOffsetVector(const Point3D &OffsetVector);
 
-    Point3D GetOffsetVector(mitk::BaseRenderer *renderer = NULL) const;
+    Point3D GetOffsetVector() const;
 
     mitkClassMacro(VtkOverlay3D, VtkOverlay);
 

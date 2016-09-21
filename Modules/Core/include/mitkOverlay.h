@@ -43,8 +43,6 @@ namespace mitk
       itk::Point<double, 2> Size;
     };
 
-  typedef std::map<std::string,PropertyList::Pointer> MapOfPropertyLists;
-
     /** \brief Base class for mapper specific rendering ressources.
      */
     class MITKCORE_EXPORT BaseLocalStorage
@@ -70,9 +68,7 @@ namespace mitk
     * @sa m_PropertyList
     * @sa m_MapOfPropertyLists
     */
-    void SetProperty(const std::string &propertyKey,
-                     const BaseProperty::Pointer &property,
-                     const mitk::BaseRenderer *renderer = nullptr);
+    void SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &property);
 
     /**
     * @brief Replace the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
@@ -84,9 +80,7 @@ namespace mitk
     * @sa m_PropertyList
     * @sa m_MapOfPropertyLists
     */
-    void ReplaceProperty(const std::string &propertyKey,
-                         const BaseProperty::Pointer &property,
-                         const mitk::BaseRenderer *renderer = nullptr);
+    void ReplaceProperty(const std::string &propertyKey, const BaseProperty::Pointer &property);
 
     /**
     * @brief Add the property (instance of BaseProperty) if it does
@@ -104,20 +98,7 @@ namespace mitk
     * @sa m_PropertyList
     * @sa m_MapOfPropertyLists
     */
-    void AddProperty(const std::string &propertyKey,
-                     const BaseProperty::Pointer &property,
-                     const mitk::BaseRenderer *renderer = nullptr,
-                     bool overwrite = false);
-
-    /**
-    * @brief Get the PropertyList of the @a renderer. If @a renderer is @a
-    * NULL, the BaseRenderer-independent PropertyList of this Overlay
-    * is returned.
-    * @sa GetProperty
-    * @sa m_PropertyList
-    * @sa m_MapOfPropertyLists
-    */
-    mitk::PropertyList *GetPropertyList(const mitk::BaseRenderer *renderer = nullptr) const;
+    void AddProperty(const std::string &propertyKey, const BaseProperty::Pointer &property, bool overwrite = false);
 
     /**
     * @brief Add values from another PropertyList.
@@ -127,9 +108,8 @@ namespace mitk
     * set the @param replace.
     *
     * @param replace true: if @param pList contains a property "visible" of type ColorProperty and our m_PropertyList
-    * also
-    * has a "visible" property of a different type (e.g. BoolProperty), change the type, i.e. replace the objects behind
-    * the pointer.
+    * also has a "visible" property of a different type (e.g. BoolProperty), change the type, i.e. replace the objects
+    * behind the pointer.
     *
     * @sa SetProperty
     * @sa ReplaceProperty
@@ -148,7 +128,7 @@ namespace mitk
     * @sa m_PropertyList
     * @sa m_MapOfPropertyLists
     */
-    mitk::BaseProperty *GetProperty(const std::string &propertyKey, const mitk::BaseRenderer *renderer = nullptr) const;
+    mitk::BaseProperty *GetProperty(const std::string &propertyKey) const;
 
     /**
     * @brief Get the property of type T with key @a propertyKey from the PropertyList
@@ -162,11 +142,9 @@ namespace mitk
     * @sa m_MapOfPropertyLists
     */
     template <typename T>
-    bool GetProperty(itk::SmartPointer<T> &property,
-                     const std::string &propertyKey,
-                     const mitk::BaseRenderer *renderer = nullptr) const
+    bool GetProperty(itk::SmartPointer<T> &property, const std::string &propertyKey) const
     {
-      property = dynamic_cast<T *>(GetProperty(propertyKey, renderer));
+      property = dynamic_cast<T *>(GetProperty(propertyKey));
       return property.IsNotNull();
     }
 
@@ -182,9 +160,9 @@ namespace mitk
     * @sa m_MapOfPropertyLists
     */
     template <typename T>
-    bool GetProperty(T *&property, const std::string &propertyKey, const mitk::BaseRenderer *renderer = nullptr) const
+    bool GetProperty(T *&property, const std::string &propertyKey) const
     {
-      property = dynamic_cast<T *>(GetProperty(propertyKey, renderer));
+      property = dynamic_cast<T *>(GetProperty(propertyKey));
       return property != nullptr;
     }
 
@@ -194,9 +172,9 @@ namespace mitk
     * @return @a true property was found
     */
     template <typename T>
-    bool GetPropertyValue(const std::string &propertyKey, T &value, mitk::BaseRenderer *renderer = nullptr) const
+    bool GetPropertyValue(const std::string &propertyKey, T &value) const
     {
-      GenericProperty<T> *gp = dynamic_cast<GenericProperty<T> *>(GetProperty(propertyKey, renderer));
+      GenericProperty<T> *gp = dynamic_cast<GenericProperty<T> *>(GetProperty(propertyKey));
       if (gp != nullptr)
       {
         value = gp->GetValue();
@@ -210,58 +188,52 @@ namespace mitk
     * BoolProperty)
     * @return @a true property was found
     */
-    bool GetBoolProperty(const std::string &propertyKey, bool &boolValue, mitk::BaseRenderer *renderer = nullptr) const;
+    bool GetBoolProperty(const std::string &propertyKey, bool &boolValue) const;
 
     /**
     * @brief Convenience access method for int properties (instances of
     * IntProperty)
     * @return @a true property was found
     */
-    bool GetIntProperty(const std::string &propertyKey, int &intValue, mitk::BaseRenderer *renderer = nullptr) const;
+    bool GetIntProperty(const std::string &propertyKey, int &intValue) const;
 
     /**
     * @brief Convenience access method for float properties (instances of
     * FloatProperty)
     * @return @a true property was found
     */
-    bool GetFloatProperty(const std::string &propertyKey,
-                          float &floatValue,
-                          mitk::BaseRenderer *renderer = nullptr) const;
+    bool GetFloatProperty(const std::string &propertyKey, float &floatValue) const;
 
     /**
     * @brief Convenience access method for string properties (instances of
     * StringProperty)
     * @return @a true property was found
     */
-    bool GetStringProperty(const std::string &propertyKey,
-                           std::string &string,
-                           mitk::BaseRenderer *renderer = nullptr) const;
+    bool GetStringProperty(const std::string &propertyKey, std::string &string) const;
 
     /**
     * @brief Convenience method for setting int properties (instances of
     * IntProperty)
     */
-    void SetIntProperty(const std::string &propertyKey, int intValue, mitk::BaseRenderer *renderer = nullptr);
+    void SetIntProperty(const std::string &propertyKey, int intValue);
 
     /**
     * @brief Convenience method for setting int properties (instances of
     * IntProperty)
     */
-    void SetBoolProperty(const std::string &propertyKey, bool boolValue, mitk::BaseRenderer *renderer = nullptr);
+    void SetBoolProperty(const std::string &propertyKey, bool boolValue);
 
     /**
     * @brief Convenience method for setting int properties (instances of
     * IntProperty)
     */
-    void SetFloatProperty(const std::string &propertyKey, float floatValue, mitk::BaseRenderer *renderer = nullptr);
+    void SetFloatProperty(const std::string &propertyKey, float floatValue);
 
     /**
     * @brief Convenience method for setting int properties (instances of
     * IntProperty)
     */
-    void SetStringProperty(const std::string &propertyKey,
-                           const std::string &string,
-                           mitk::BaseRenderer *renderer = nullptr);
+    void SetStringProperty(const std::string &propertyKey, const std::string &string);
 
     /**
     * @brief Convenience access method for boolean properties (instances
@@ -272,9 +244,9 @@ namespace mitk
     * GetBoolProperty method!
     * @sa GetBoolProperty
     */
-    bool IsOn(const std::string &propertyKey, mitk::BaseRenderer *renderer, bool defaultIsOn = true) const
+    bool IsOn(const std::string &propertyKey, bool defaultIsOn = true) const
     {
-      GetBoolProperty(propertyKey, defaultIsOn, renderer);
+      GetBoolProperty(propertyKey, defaultIsOn);
       return defaultIsOn;
     }
 
@@ -283,9 +255,7 @@ namespace mitk
     * StringProperty with property-key "name")
     * @return @a true property was found
     */
-    bool GetName(std::string &nodeName,
-                 mitk::BaseRenderer *renderer = nullptr,
-                 const std::string &propertyKey = "name") const;
+    bool GetName(std::string &nodeName, const std::string &propertyKey = "name") const;
 
     /**
     * @brief Extra convenience access method for accessing the name of an object (instance of
@@ -310,47 +280,41 @@ namespace mitk
     * ColorProperty)
     * @return @a true property was found
     */
-    bool GetColor(float rgb[], mitk::BaseRenderer *renderer = nullptr, const std::string &propertyKey = "color") const;
+    bool GetColor(float rgb[], const std::string &propertyKey = "color") const;
     /**
     * @brief Convenience method for setting color properties (instances of
     * ColorProperty)
     */
-    void SetColor(const mitk::Color &color,
-                  mitk::BaseRenderer *renderer = nullptr,
-                  const std::string &propertyKey = "color");
+    void SetColor(const mitk::Color &color, const std::string &propertyKey = "color");
     /**
     * @brief Convenience method for setting color properties (instances of
     * ColorProperty)
     */
-    void SetColor(float red,
-                  float green,
-                  float blue,
-                  mitk::BaseRenderer *renderer = nullptr,
-                  const std::string &propertyKey = "color");
+    void SetColor(float red, float green, float blue, const std::string &propertyKey = "color");
     /**
     * @brief Convenience method for setting color properties (instances of
     * ColorProperty)
     */
-    void SetColor(const float rgb[], mitk::BaseRenderer *renderer = nullptr, const std::string &propertyKey = "color");
+    void SetColor(const float rgb[], const std::string &propertyKey = "color");
     /**
     * @brief Convenience access method for opacity properties (instances of
     * FloatProperty)
     * @return @a true property was found
     */
-    bool GetOpacity(float &opacity, mitk::BaseRenderer *renderer, const std::string &propertyKey = "opacity") const;
+    bool GetOpacity(float &opacity, const std::string &propertyKey = "opacity") const;
     /**
     * @brief Convenience method for setting opacity properties (instances of
     * FloatProperty)
     */
-    void SetOpacity(float opacity, mitk::BaseRenderer *renderer = nullptr, const std::string &propertyKey = "opacity");
+    void SetOpacity(float opacity, const std::string &propertyKey = "opacity");
 
-    void SetText(std::string text, mitk::BaseRenderer *renderer = nullptr);
+    void SetText(std::string text);
 
-    std::string GetText(mitk::BaseRenderer *renderer = nullptr) const;
+    std::string GetText() const;
 
-    void SetFontSize(int fontSize, mitk::BaseRenderer *renderer = nullptr);
+    void SetFontSize(int fontSize);
 
-    int GetFontSize(mitk::BaseRenderer *renderer = nullptr) const;
+    int GetFontSize() const;
 
     /**
     * @brief Convenience access method for visibility properties (instances
@@ -358,7 +322,7 @@ namespace mitk
     * @return @a true property was found
     * @sa IsVisible
     */
-    bool GetVisibility(bool &visible, mitk::BaseRenderer *renderer, const std::string &propertyKey = "visible") const;
+    bool GetVisibility(bool &visible, const std::string &propertyKey = "visible") const;
 
     /**
     * @brief Convenience access method for visibility properties (instances
@@ -371,9 +335,7 @@ namespace mitk
     * @sa GetVisibility
     * @sa IsOn
     */
-    bool IsVisible(mitk::BaseRenderer *renderer,
-                   const std::string &propertyKey = "visible",
-                   bool defaultIsOn = true) const;
+    bool IsVisible(const std::string &propertyKey = "visible", bool defaultIsOn = true) const;
 
     /**
     * @brief Convenience method for setting visibility properties (instances
@@ -382,9 +344,7 @@ namespace mitk
     * @param renderer Specify a renderer if the visibility shall be specific to a renderer
     * @param propertykey Can be used to specify a user defined name of the visibility propery.
     */
-    void SetVisibility(bool visible,
-                       mitk::BaseRenderer *renderer = nullptr,
-                       const std::string &propertyKey = "visible");
+    void SetVisibility(bool visible, const std::string &propertyKey = "visible");
 
     /** \brief Adds the overlay to the specified renderer. Update Overlay should be called soon in order to apply all
      * properties*/
@@ -429,11 +389,6 @@ namespace mitk
     * by the BaseRenderer-specific properties defined in m_MapOfPropertyLists.
     */
     PropertyList::Pointer m_PropertyList;
-
-    /**
-    * @brief Map associating each BaseRenderer with its own PropertyList
-    */
-    mutable MapOfPropertyLists m_MapOfPropertyLists;
 
     /**
     * @brief Timestamp of the last change of m_Data

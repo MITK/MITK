@@ -35,6 +35,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkCommand.h>
 
+template<typename TPixel, unsigned int VDimensions>
+void SetToZero(itk::Image< TPixel, VDimensions> * source)
+{
+  source->FillBuffer(0);
+}
+
+
 mitk::LabelSetImage::LabelSetImage() :
 mitk::Image(),
 m_ActiveLayer(0),
@@ -108,6 +115,9 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
   auto originalGeometry = other->GetTimeGeometry()->Clone();
   this->SetTimeGeometry(originalGeometry);
 
+  // initialize image memory to zero
+  AccessByItk(this, SetToZero);
+
   // Add a inital LabelSet ans corresponding image data to the stack
   AddLayer();
 }
@@ -151,12 +161,6 @@ void mitk::LabelSetImage::RemoveLayer()
   m_LayerContainer.erase(m_LayerContainer.begin() + layerToDelete);
 
   this->Modified();
-}
-
-template<typename TPixel, unsigned int VDimensions>
-void SetToZero(itk::Image< TPixel, VDimensions> * source)
-{
-  source->FillBuffer(0);
 }
 
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)

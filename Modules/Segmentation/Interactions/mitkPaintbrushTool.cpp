@@ -30,9 +30,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 int mitk::PaintbrushTool::m_Size = 1;
 
 mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
-:FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
- m_PaintingPixelValue(paintingPixelValue),
- m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
+  : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
+    m_PaintingPixelValue(paintingPixelValue),
+    m_LastContourSize(0), // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
+    m_WorkingImage(nullptr),
+    m_ImageObserverTag(0)
 {
   m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
@@ -72,6 +74,13 @@ void mitk::PaintbrushTool::Deactivated()
       m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
   m_WorkingSlice = nullptr;
   m_CurrentPlane = nullptr;
+
+  if (m_WorkingImage && m_ImageObserverTag)
+  {
+    m_WorkingImage->RemoveObserver(m_ImageObserverTag);
+  }
+  m_WorkingImage = nullptr;
+
   m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
 
   Superclass::Deactivated();
@@ -505,19 +514,39 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
 
     if (!workingNode)
-        return;
+    {
+      return;
+    }
 
     Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
 
-    if ( !image || !planeGeometry || abstractTransformGeometry )
-        return;
+    if (!image || !planeGeometry || abstractTransformGeometry)
+    {
+      return;
+    }
 
-    if(m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
+    if (m_WorkingImage != image) 
+    {
+      // observe Modified() event of image
+      if (m_WorkingImage && m_ImageObserverTag) 
+      {
+        m_WorkingImage->RemoveObserver(m_ImageObserverTag);
+      }
+
+      m_WorkingImage = image;
+
+      itk::ReceptorMemberCommand<PaintbrushTool>::Pointer command = itk::ReceptorMemberCommand<PaintbrushTool>::New();
+      command->SetCallbackFunction(this, &PaintbrushTool::OnToolManagerImageModified);
+      m_ImageObserverTag = m_WorkingImage->AddObserver(itk::ModifiedEvent(), command);
+    }
+
+    if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
     {
         m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
         m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
         m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
         m_WorkingNode->SetData(m_WorkingSlice);
+
     }
     else
     {
@@ -565,4 +594,9 @@ void mitk::PaintbrushTool::OnToolManagerWorkingDataModified()
   //Here we simply set the current working slice to null. The next time the mouse is moved
   //within a renderwindow a new slice will be extracted from the new working data
   m_WorkingSlice = nullptr;
+}
+
+void mitk::PaintbrushTool::OnToolManagerImageModified(const itk::EventObject&)
+{
+  OnToolManagerWorkingDataModified();
 }

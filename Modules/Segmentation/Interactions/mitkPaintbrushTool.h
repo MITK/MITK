@@ -93,6 +93,7 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     void CheckIfCurrentSliceHasChanged(const InteractionPositionEvent* event);
 
     void OnToolManagerWorkingDataModified();
+    void OnToolManagerImageModified(const itk::EventObject&);
 
     int m_PaintingPixelValue;
     static int m_Size;
@@ -105,6 +106,8 @@ class MITKSEGMENTATION_EXPORT PaintbrushTool : public FeedbackContourTool
     PlaneGeometry::Pointer m_CurrentPlane;
     DataNode::Pointer m_WorkingNode;
     mitk::Point3D m_LastPosition;
+    Image::Pointer m_WorkingImage;
+    int m_ImageObserverTag;
 };
 
 } // namespace

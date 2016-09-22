@@ -168,8 +168,9 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
     }
     else
     {
-      int loadIndex = m_NodesIndices.at(it->first);
-      tempResult[loadIndex] = const_cast<mitk::DataNode*>(it->first.GetPointer());
+      auto node = const_cast<mitk::DataNode*>(it->first.GetPointer());
+      int loadIndex = m_NodesIndices.at(node);
+      tempResult[loadIndex] = node;
     }
   }
 

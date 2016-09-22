@@ -134,7 +134,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Map with info about nodes' indices
-    std::map<mitk::DataNode::ConstPointer, int> m_NodesIndices;
+    std::map<mitk::DataNode*, int> m_NodesIndices;
   };
 } // namespace mitk
 #endif /* MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_ */

@@ -280,11 +280,11 @@ protected:
   template < typename ImageType1, typename ImageType2 >
   void ChangeLayerProcessing( ImageType1* source, ImageType2* target );
 
-  template < typename ImageType >
-  void LayerContainerToImageProcessing( ImageType* source, unsigned int layer);
+  template <typename TPixel, unsigned int VImageDimension>
+  void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension>* source, unsigned int layer);
 
-  template < typename ImageType >
-  void ImageToLayerContainerProcessing( ImageType* source, unsigned int layer) const;
+  template <typename TPixel, unsigned int VImageDimension>
+  void ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension>* source, unsigned int layer) const;
 
   template < typename ImageType >
   void CalculateCenterOfMassProcessing( ImageType* input, PixelType index, unsigned int layer);

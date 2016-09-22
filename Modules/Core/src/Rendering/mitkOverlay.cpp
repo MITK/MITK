@@ -242,30 +242,42 @@ void mitk::Overlay::SetVisibility(bool visible, const std::string &propertyKey)
   this->m_PropertyList->SetProperty(propertyKey, prop);
 }
 
-  bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer * renderer, mitk::Overlay * overlay)
-  {
-    if (m_LastGenerateDataTime < overlay->GetMTime())
-      return true;
+bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Overlay *overlay)
+{
+  if (m_LastGenerateDataTime < overlay->GetMTime())
+    return true;
 
-    if (m_LastGenerateDataTime < overlay->GetPropertyList()->GetMTime())
-      return true;
+  if (m_LastGenerateDataTime < overlay->GetPropertyList()->GetMTime())
+    return true;
 
-    if (m_LastGenerateDataTime < overlay->GetPropertyList(renderer)->GetMTime())
-      return true;
+  if (renderer && m_LastGenerateDataTime < renderer->GetTimeStepUpdateTime())
+    return true;
 
-    if (renderer && m_LastGenerateDataTime < renderer->GetTimeStepUpdateTime())
-      return true;
+  return false;
+}
 
-    return false;
-  }
+mitk::Overlay::Bounds mitk::Overlay::GetBoundsOnDisplay(mitk::BaseRenderer *) const
+{
+  mitk::Overlay::Bounds bounds;
+  bounds.Position[0] = bounds.Position[1] = bounds.Size[0] = bounds.Size[1] = 0;
+  return bounds;
+}
 
-  mitk::Overlay::Bounds mitk::Overlay::GetBoundsOnDisplay(mitk::BaseRenderer *) const
-  {
-    mitk::Overlay::Bounds bounds;
-    bounds.Position[0] = bounds.Position[1] = bounds.Size[0] = bounds.Size[1] = 0;
-    return bounds;
-  }
+void mitk::Overlay::SetBoundsOnDisplay(mitk::BaseRenderer *, const mitk::Overlay::Bounds &)
+{
+}
 
-  void mitk::Overlay::SetBoundsOnDisplay(mitk::BaseRenderer *, const mitk::Overlay::Bounds &) {}
-  void mitk::Overlay::SetForceInForeground(bool forceForeground) { m_ForceInForeground = forceForeground; }
-  bool mitk::Overlay::IsForceInForeground() const { return m_ForceInForeground; }
+void mitk::Overlay::SetForceInForeground(bool forceForeground)
+{
+  m_ForceInForeground = forceForeground;
+}
+
+bool mitk::Overlay::IsForceInForeground() const
+{
+  return m_ForceInForeground;
+}
+
+mitk::PropertyList *mitk::Overlay::GetPropertyList() const
+{
+  return m_PropertyList;
+}

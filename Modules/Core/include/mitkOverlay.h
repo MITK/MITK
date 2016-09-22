@@ -373,6 +373,8 @@ namespace mitk
 
     bool IsForceInForeground() const;
 
+  PropertyList* GetPropertyList() const;
+
     mitkClassMacroItkParent(Overlay, itk::Object);
 
   protected:

@@ -91,9 +91,9 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     for (size_t i = 0; i < pointsetsize; i++)
     {
       mitk::Point3D coordinate = m_LabelCoordinates->GetPoint(i);
-      points->InsertNextPoint(coordinate[0] + GetOffsetVector(renderer)[0],
-                              coordinate[1] + GetOffsetVector(renderer)[1],
-                              coordinate[2] + GetOffsetVector(renderer)[2]);
+      points->InsertNextPoint(coordinate[0] + GetOffsetVector()[0],
+                              coordinate[1] + GetOffsetVector()[1],
+                              coordinate[2] + GetOffsetVector()[2]);
       if (m_LabelVector.size() > i)
         ls->m_Labels->SetValue(i, m_LabelVector[i]);
       else
@@ -111,8 +111,8 @@ void mitk::LabelOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 
     float color[3] = {1, 1, 1};
     float opacity = 1.0;
-    GetColor(color, renderer);
-    GetOpacity(opacity, renderer);
+    GetColor(color);
+    GetOpacity(opacity);
     ls->m_LabelsActor->GetProperty()->SetColor(color[0], color[1], color[2]);
     ls->m_LabelsActor->GetProperty()->SetOpacity(opacity);
     ls->UpdateGenerateDataTime();

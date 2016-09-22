@@ -85,14 +85,14 @@ void mitk::LogoOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_LogoRep->SetPickable(false);
     ls->m_LogoRep->SetShowBorder(true);
     ls->m_LogoRep->SetRenderer(renderer->GetVtkRenderer());
-    float size = GetRelativeSize(renderer);
+    float size = GetRelativeSize();
     ls->m_LogoRep->SetPosition2(size, size);
-    int corner = GetCornerPosition(renderer);
+    int corner = GetCornerPosition();
     ls->m_LogoRep->SetCornerPosition(corner);
-    mitk::Point2D offset = GetOffsetVector(renderer);
+    mitk::Point2D offset = GetOffsetVector();
     ls->m_LogoRep->SetPosition(offset[0], offset[1]);
     float opacity = 1.0;
-    GetOpacity(opacity, renderer);
+    GetOpacity(opacity);
     ls->m_LogoRep->GetImageProperty()->SetOpacity(opacity);
     ls->m_LogoRep->BuildRepresentation();
     ls->UpdateGenerateDataTime();
@@ -148,44 +148,44 @@ std::string mitk::LogoOverlay::GetLogoImagePath() const
   return path;
 }
 
-void mitk::LogoOverlay::SetOffsetVector(const Point2D &OffsetVector, mitk::BaseRenderer *renderer)
+void mitk::LogoOverlay::SetOffsetVector(const Point2D &OffsetVector)
 {
   mitk::Point2dProperty::Pointer OffsetVectorProperty = mitk::Point2dProperty::New(OffsetVector);
-  SetProperty("Overlay.OffsetVector", OffsetVectorProperty.GetPointer(), renderer);
+  SetProperty("Overlay.OffsetVector", OffsetVectorProperty.GetPointer());
   Modified();
 }
 
-mitk::Point2D mitk::LogoOverlay::GetOffsetVector(mitk::BaseRenderer *renderer) const
+mitk::Point2D mitk::LogoOverlay::GetOffsetVector() const
 {
   mitk::Point2D OffsetVector;
   OffsetVector.Fill(0);
-  GetPropertyValue<mitk::Point2D>("Overlay.OffsetVector", OffsetVector, renderer);
+  GetPropertyValue<mitk::Point2D>("Overlay.OffsetVector", OffsetVector);
   return OffsetVector;
 }
 
-void mitk::LogoOverlay::SetCornerPosition(const int &corner, mitk::BaseRenderer *renderer)
+void mitk::LogoOverlay::SetCornerPosition(const int &corner)
 {
-  SetIntProperty("Overlay.CornerPosition", corner, renderer);
+  SetIntProperty("Overlay.CornerPosition", corner);
   Modified();
 }
 
-int mitk::LogoOverlay::GetCornerPosition(mitk::BaseRenderer *renderer) const
+int mitk::LogoOverlay::GetCornerPosition() const
 {
   int corner = 0;
-  GetIntProperty("Overlay.CornerPosition", corner, renderer);
+  GetIntProperty("Overlay.CornerPosition", corner);
   return corner;
 }
 
-void mitk::LogoOverlay::SetRelativeSize(const float &size, mitk::BaseRenderer *renderer)
+void mitk::LogoOverlay::SetRelativeSize(const float &size)
 {
-  SetFloatProperty("Overlay.RelativeSize", size, renderer);
+  SetFloatProperty("Overlay.RelativeSize", size);
   Modified();
 }
 
-float mitk::LogoOverlay::GetRelativeSize(mitk::BaseRenderer *renderer) const
+float mitk::LogoOverlay::GetRelativeSize() const
 {
   float size = 0;
-  GetFloatProperty("Overlay.RelativeSize", size, renderer);
+  GetFloatProperty("Overlay.RelativeSize", size);
   return size;
 }
 

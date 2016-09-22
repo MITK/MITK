@@ -37,13 +37,13 @@ namespace mitk
     virtual Overlay::Bounds GetBoundsOnDisplay(BaseRenderer *renderer) const override;
     virtual void SetBoundsOnDisplay(BaseRenderer *renderer, const Bounds &bounds) override;
 
-    void SetPosition2D(const Point2D &position2D, mitk::BaseRenderer *renderer = NULL);
+  void SetPosition2D(const Point2D& position2D);
 
-    Point2D GetPosition2D(mitk::BaseRenderer *renderer = NULL) const;
+  Point2D GetPosition2D() const;
 
-    void SetOffsetVector(const Point2D &OffsetVector, BaseRenderer *renderer = NULL);
+  void SetOffsetVector(const Point2D& OffsetVector);
 
-    Point2D GetOffsetVector(mitk::BaseRenderer *renderer = NULL) const;
+  Point2D GetOffsetVector() const;
 
   protected:
     virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const override;

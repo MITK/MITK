@@ -47,10 +47,10 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel *rendering
   }
 
   renderer->GetOverlayManager()->AddOverlay(m_PointNumbersOverlay.GetPointer(), renderer);
-  m_PointNumbersOverlay->SetVisibility(false, renderer);
+  m_PointNumbersOverlay->SetVisibility(false);
 
   renderer->GetOverlayManager()->AddOverlay(m_ControlPointNumbersOverlay.GetPointer(), renderer);
-  m_ControlPointNumbersOverlay->SetVisibility(false, renderer);
+  m_ControlPointNumbersOverlay->SetVisibility(false);
 
   InternalDrawContour(renderingContour, renderer);
 }
@@ -355,13 +355,16 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
   }
 }
 
-void mitk::ContourModelGLMapper2DBase::WriteTextWithOverlay(
-  TextOverlayPointerType textOverlay, const char *text, float rgb[3], Point2D /*pt2d*/, mitk::BaseRenderer *renderer)
+void mitk::ContourModelGLMapper2DBase::WriteTextWithOverlay(TextOverlayPointerType textOverlay,
+                                                            const char *text,
+                                                            float rgb[3],
+                                                            Point2D /*pt2d*/,
+                                                            mitk::BaseRenderer * /*renderer*/)
 {
   textOverlay->SetText(text);
   textOverlay->SetColor(rgb);
   textOverlay->SetOpacity(1);
   textOverlay->SetFontSize(16);
   textOverlay->SetBoolProperty("drawShadow", false);
-  textOverlay->SetVisibility(true, renderer);
+  textOverlay->SetVisibility(true);
 }

@@ -91,8 +91,8 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
   {
     float color[3] = {0.0, 1.0, 0.0};
     float opacity = 1.0;
-    GetColor(color, renderer);
-    GetOpacity(opacity, renderer);
+    GetColor(color);
+    GetOpacity(opacity);
     ls->m_TextProp->SetColor(color[0], color[1], color[2]);
     ls->m_STextProp->SetColor(0, 0, 0);
     ls->m_TextProp->SetFontSize(GetFontSize());
@@ -128,8 +128,8 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_STextActor->SetInput(GetText().c_str());
 
     mitk::Point2D posT, posS;
-    posT[0] = GetPosition2D(renderer)[0] + GetOffsetVector(renderer)[0];
-    posT[1] = GetPosition2D(renderer)[1] + GetOffsetVector(renderer)[1];
+    posT[0] = GetPosition2D()[0] + GetOffsetVector()[0];
+    posT[1] = GetPosition2D()[1] + GetOffsetVector()[1];
     posS[0] = posT[0] + 1;
     posS[1] = posT[1] - 1;
 

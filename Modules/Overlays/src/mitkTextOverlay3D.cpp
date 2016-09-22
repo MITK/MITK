@@ -64,7 +64,7 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   if (ls->IsGenerateDataRequired(renderer, this))
   {
-    Point3D pos3d = GetPosition3D(renderer);
+    Point3D pos3d = GetPosition3D();
     vtkRenderer *vtkRender = renderer->GetVtkRenderer();
     if (vtkRender)
     {
@@ -73,7 +73,7 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
       if (camera != nullptr)
       {
         // calculate the offset relative to the camera's view direction
-        Point3D offset = GetOffsetVector(renderer);
+        Point3D offset = GetOffsetVector();
 
         Vector3D viewUp;
         camera->GetViewUp(viewUp.GetDataPointer());
@@ -89,8 +89,8 @@ void mitk::TextOverlay3D::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_textSource->SetText(GetText().c_str());
     float color[3] = {1, 1, 1};
     float opacity = 1.0;
-    GetColor(color, renderer);
-    GetOpacity(opacity, renderer);
+    GetColor(color);
+    GetOpacity(opacity);
     ls->m_follower->GetProperty()->SetColor(color[0], color[1], color[2]);
     ls->m_follower->GetProperty()->SetOpacity(opacity);
     ls->m_follower->SetScale(this->GetFontSize());

@@ -52,9 +52,9 @@ void mitk::PlanarFigureMapper2D::Paint(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
 
-  m_AnnotationOverlay->SetVisibility(false, renderer);
+  m_AnnotationOverlay->SetVisibility(false);
 
-  m_QuantityOverlay->SetVisibility(false, renderer);
+  m_QuantityOverlay->SetVisibility(false);
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
@@ -714,7 +714,7 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
   m_AnnotationOverlay->SetOpacity(globalOpacity);
   m_AnnotationOverlay->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
   m_AnnotationOverlay->SetBoolProperty("drawShadow", m_AnnotationsShadow);
-  m_AnnotationOverlay->SetVisibility(true, renderer);
+  m_AnnotationOverlay->SetVisibility(true);
   m_AnnotationOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
   m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
   m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
@@ -776,7 +776,7 @@ void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *plan
   m_QuantityOverlay->SetOpacity(globalOpacity);
   m_QuantityOverlay->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
   m_QuantityOverlay->SetBoolProperty("drawShadow", m_DrawShadow);
-  m_QuantityOverlay->SetVisibility(true, renderer);
+  m_QuantityOverlay->SetVisibility(true);
 
   m_AnnotationOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
   m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);

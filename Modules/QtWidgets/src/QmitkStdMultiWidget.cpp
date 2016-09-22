@@ -1679,7 +1679,7 @@ void QmitkStdMultiWidget::DisableDepartmentLogo()
 
 bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
 {
-  return m_LogoRendering->IsVisible(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  return m_LogoRendering->IsVisible();
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char *widgetName, bool visible, mitk::BaseRenderer *renderer)

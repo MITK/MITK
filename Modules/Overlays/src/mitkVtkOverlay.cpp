@@ -29,7 +29,7 @@ mitk::VtkOverlay::~VtkOverlay()
 void mitk::VtkOverlay::Update(mitk::BaseRenderer *renderer)
 {
   vtkSmartPointer<vtkProp> prop = GetVtkProp(renderer);
-  if (!IsVisible(renderer))
+  if(!IsVisible())
   {
     prop->SetVisibility(false);
     return;

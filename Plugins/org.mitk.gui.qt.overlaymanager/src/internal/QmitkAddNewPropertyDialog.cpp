@@ -63,7 +63,7 @@ void QmitkAddNewPropertyDialog::AddNewProperty()
     return;
   }
 
-  m_Overlay->SetProperty(m_Controls.nameLineEdit->text().toStdString(), this->CreateProperty(), m_Renderer);
+  m_Overlay->SetProperty(m_Controls.nameLineEdit->text().toStdString(), this->CreateProperty());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->accept();
 }

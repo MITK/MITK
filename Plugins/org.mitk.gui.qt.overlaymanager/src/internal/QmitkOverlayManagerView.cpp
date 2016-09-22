@@ -374,7 +374,7 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
 
     m_SelectionClassName = selectionClassName.toStdString();
 
-    mitk::PropertyList::Pointer propertyList = overlay->GetPropertyList(m_Renderer);
+    mitk::PropertyList::Pointer propertyList = overlay->GetPropertyList();
 
     m_Model->SetPropertyList(propertyList, selectionClassName);
     m_Delegate->SetPropertyList(propertyList);

@@ -58,8 +58,8 @@ namespace mitk
     std::string GetLogoImagePath() const;
 
     /** \brief The relative offset to the corner position */
-    void SetOffsetVector(const Point2D &OffsetVector, BaseRenderer *renderer = NULL);
-    Point2D GetOffsetVector(mitk::BaseRenderer *renderer = NULL) const;
+    void SetOffsetVector(const Point2D &OffsetVector);
+    Point2D GetOffsetVector() const;
 
     /** \brief The corner where the logo is displayed.
    0 = Bottom left
@@ -67,11 +67,11 @@ namespace mitk
    2 = Top right
    3 = Top left
    4 = Center*/
-    void SetCornerPosition(const int &corner, BaseRenderer *renderer = NULL);
-    int GetCornerPosition(mitk::BaseRenderer *renderer = NULL) const;
+    void SetCornerPosition(const int &corner);
+    int GetCornerPosition() const;
 
-    void SetRelativeSize(const float &size, BaseRenderer *renderer = NULL);
-    float GetRelativeSize(mitk::BaseRenderer *renderer = NULL) const;
+    void SetRelativeSize(const float &size);
+    float GetRelativeSize() const;
 
   protected:
     /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */

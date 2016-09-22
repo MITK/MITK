@@ -48,7 +48,7 @@ namespace mitk
     void DrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer);
 
     void WriteTextWithOverlay(
-      TextOverlayPointerType textOverlay, const char *text, float rgb[3], Point2D pt2d, mitk::BaseRenderer *renderer);
+      TextOverlayPointerType textOverlay, const char *text, float rgb[3], Point2D pt2d, mitk::BaseRenderer *);
 
     virtual void InternalDrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer);
 

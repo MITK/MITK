@@ -485,7 +485,7 @@ void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& mess
     << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl
     << "  " << std::endl
     << " Please file a BUG REPORT: " << std::endl
-    << " http://bugs.mitk.org" << std::endl
+    << " https://phabricator.mitk.org/" << std::endl
     << " Contain the following information:" << std::endl
     << "  - What image were you working on?" << std::endl
     << "  - Which region of the image?" << std::endl

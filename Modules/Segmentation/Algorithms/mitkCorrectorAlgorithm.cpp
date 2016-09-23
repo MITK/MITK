@@ -231,20 +231,6 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(itk::Image< De
     previousIndex = currentIndex;
   }
 
-  // Check if only on Segment
-  if (firstSegment && currentSegment.points.size() > 0)
-  {
-    ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(m_WorkingImage, m_Contour, true, false);
-    projectedContour->Close();
-    if (firstPointIsFillingColor)
-    {
-      ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_EraseColor);
-    }
-    else
-    {
-      ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_FillColor);
-    }
-  }
   return true;
 }
 

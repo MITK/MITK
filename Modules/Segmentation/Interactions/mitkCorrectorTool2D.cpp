@@ -188,8 +188,16 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
 
-  mitk::Image::Pointer erg1 = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
-  SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), image, workingColorId,0);
-  SegTool2D::WriteBackSegmentationResult(positionEvent,erg1);
-  //this->WriteBackSegmentationResult(positionEvent, resultSlice);
+  if (labelSetImage.IsNotNull())
+  {
+    mitk::Image::Pointer erg1 = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, image);
+    SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), image, workingColorId, 0);
+    SegTool2D::WriteBackSegmentationResult(positionEvent, erg1);
+  }
+  else
+  {
+    mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
+    resultSlice->SetVolume(imAccess.GetData());
+    this->WriteBackSegmentationResult(positionEvent, resultSlice);
+  }
 }

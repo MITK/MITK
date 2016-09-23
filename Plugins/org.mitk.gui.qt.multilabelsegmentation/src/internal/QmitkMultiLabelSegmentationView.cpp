@@ -115,7 +115,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
 
   // *------------------------
-  // * DATA SLECTION WIDGETS
+  // * DATA SELECTION WIDGETS
   // *------------------------
 
   m_Controls.m_cbReferenceNodeSelector->SetAutoSelectNewItems(true);

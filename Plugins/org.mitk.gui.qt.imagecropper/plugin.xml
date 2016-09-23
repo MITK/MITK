@@ -11,7 +11,7 @@
       id="org.mitk.views.imagecropper"
       name="Image Cropper"
       category="General"
-      icon="resources/icon.xpm"
+      icon="resources/icon.png"
       class="QmitkImageCropper" >
       <description>Crop images to a given size</description>
       <keywordReference id="org.mitk.views.xnat.imagecropper.ViewKeyword"/>

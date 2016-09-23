@@ -1,212 +1,179 @@
-/*===================================================================
+/*=========================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
-See LICENSE.txt or http://www.mitk.org for details.
+=========================================================================*/
 
-===================================================================*/
+#ifndef QmitkImageCropper_h
+#define QmitkImageCropper_h
 
-#if !defined(QMITK_IMAGECROPPER_H__INCLUDED)
-#define QMITK_IMAGECROPPER_H__INCLUDED
+#include <QmitkAbstractView.h>
 
 #ifdef WIN32
 #pragma warning( disable : 4250 )
 #endif
 
-#include "QmitkFunctionality.h"
-#include <mitkCuboid.h>
-#include <mitkOperationActor.h>
-#include <mitkOperation.h>
-#include <mitkAffineImageCropperInteractor.h>
-#include "mitkWeakPointer.h"
-#include <itkImage.h>
 #include <QProgressDialog>
+#include "QVTKWidget.h"
+#include "QmitkRegisterClasses.h"
 
-#include "mitkImageCropperEventInterface.h"
+#include "itkCommand.h"
+#include <itkImage.h>
+#include <itksys/SystemTools.hxx>
 
-#include "ui_QmitkImageCropperControls.h"
+#include <vtkEventQtSlotConnect.h>
+#include <vtkObjectFactory.h>
+#include <vtkRenderWindow.h>
+#include <vtkSmartPointer.h>
+
+#include <mitkBoundingShapeInteractor.h>
+#include <mitkDataStorage.h>
+#include <mitkEventConfig.h>
+#include <mitkGeometryData.h>
+#include <mitkPointSet.h>
+#include <mitkWeakPointer.h>
+
+#include "ui_ImageCropperControls.h"
+
+#include "usServiceRegistration.h"
+
 
 
 /*!
-\ingroup org_mitk_gui_qt_imagecropper_internal
-\brief Functionality for cropping images with a cuboid
+@brief QmitkImageCropperView
+\warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
-This functionality lets the user select an image from the data tree, select an area of interest by placing
-a cuboid object, and then crop the image, so that pixels from outside the cuboid will remove.
-
-The image size is automatically reduced, if the cuboid is not rotated but parallel to the image axes.
-
-\b Implementation
-
-The functionality owns a cuboid (m_CroppingObject) and the associated interactor (m_AffineInteractor),
-which implements moving and scaling the cuboid.
-
+\sa QmitkFunctionality
+\ingroup ${plugin_target}_internal
 */
-
-class QmitkImageCropper : public QmitkFunctionality, public mitk::OperationActor
+class QmitkImageCropper : public QmitkAbstractView
 {
-
-  /// Operation base class, which holds pointers to a node of the data tree (mitk::DataNode)
-  /// and to two data sets (mitk::BaseData) instances
-  class opExchangeNodes: public mitk::Operation
-  {
-  public: opExchangeNodes( mitk::OperationType type,  mitk::DataNode* node,
-            mitk::BaseData* oldData,
-            mitk::BaseData* newData );
-          ~opExchangeNodes();
-          mitk::DataNode* GetNode() { return m_Node; }
-          mitk::BaseData* GetOldData() { return m_OldData; }
-          mitk::BaseData* GetNewData() { return m_NewData; }
-  protected:
-    void NodeDeleted(const itk::Object * /*caller*/, const itk::EventObject & /*event*/);
-  private:
-    mitk::DataNode* m_Node;
-    mitk::BaseData::Pointer m_OldData;
-    mitk::BaseData::Pointer m_NewData;
-    long m_NodeDeletedObserverTag;
-    long m_OldDataDeletedObserverTag;
-    long m_NewDataDeletedObserverTag;
-  };
-
+  // this is needed for all Qt objects that should have a Qt meta-object
+  // (everything that derives from QObject and wants to have signal/slots)
 private:
 
   Q_OBJECT
 
 public:
   /*!
-  \brief Constructor. Called by SampleApp (or other apps that use functionalities)
+  @brief Constructor. Called by SampleApp (or other apps that use functionalities)
   */
-  QmitkImageCropper(QObject *parent=0);
+  QmitkImageCropper(QObject *parent = 0);
 
-  /*!
-  \brief Destructor
-  */
   virtual ~QmitkImageCropper();
 
-  /*!
-  \brief Creates the Qt widget containing the functionality controls, like sliders, buttons etc.
-  */
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  static const std::string VIEW_ID;
+
+  virtual void CreateQtPartControl(QWidget *parent);
 
   /*!
-  \brief Creates the Qt connections needed
+  @brief Creates the Qt connections needed
   */
-  virtual void CreateConnections();
-
-  /*!
-  \brief Invoked when this functionality is selected by the application
-  */
-  virtual void Activated() override;
-
-  /*!
-  \brief Invoked when the user leaves this functionality
-  */
-  virtual void Deactivated() override;
-
-  ///
-  /// Called when a StdMultiWidget is available.
-  ///
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
-  ///
-  /// Called when no StdMultiWidget is available.
-  ///
-  virtual void StdMultiWidgetNotAvailable() override;
-
-
-  /*
-  \brief Interface of a mitk::StateMachine (for undo/redo)
-  */
-  virtual void  ExecuteOperation (mitk::Operation*) override;
 
   QWidget* GetControls();
 
-
-  public slots:
-
-    virtual void CropImage();
-    virtual void SurroundingCheck(bool value);
-    virtual void CreateNewBoundingObject();
-    virtual void ChkInformationToggled( bool on );
+  /// @brief Called when the user clicks the GUI button
+  protected slots:
+  /*!
+  * @brief Creates a new bounding object
+  */
+  virtual void DoCreateNewBoundingObject();
+  /*!
+  * @brief Whenever Crop button is pressed, issue a cropping action
+  */
+  void DoCropping();
+  /*!
+  * @brief Whenever Mask button is pressed, issue a masking action
+  */
+  void DoMasking();
+  /*!
+  * @brief Dis- or enable the advanced setting section
+  */
+  void OnAdvancedSettingsButtonToggled();
+  /*!
+  * @brief Updates current selection of the bounding object
+  */
+  void OnDataSelectionChanged(const mitk::DataNode* node);
+  /*!
+  * @brief Changes the colors of the bounding object
+  */
+  void OnSelectedColorChanged();
+  /*!
+  * @brief Changes the colors of the bounding object
+  */
+  void OnDeselectedColorChanged();
+  /*!
+  * @brief Sets the scalar value for outside pixels in case of masking
+  */
+  void OnSliderValueChanged(int slidervalue);
 
 protected:
 
+  virtual void SetFocus();
   /*!
-  * Default main widget containing 4 windows showing 3
-  * orthogonal slices of the volume and a 3d render window
+ @brief called by QmitkFunctionality when DataManager's selection has changed
   */
-  QmitkStdMultiWidget* m_MultiWidget;
-
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   /*!
-  * Controls containing an image selection drop down, some usage information and a "crop" button
+  @brief Sets the selected bounding object as current bounding object and set up interactor
   */
-  Ui::QmitkImageCropperControls * m_Controls;
+  void OnComboBoxSelectionChanged(const mitk::DataNode* node);
+  /*!
+  @brief Change color of the selected or deselected bounding shape
+  */
+  void ChangeColor(mitk::ColorProperty::Pointer colorProperty, bool selected);
+  /*!
+  * @brief Initializes a new bounding shape using the selected image geometry.
+  */
+  mitk::Geometry3D::Pointer InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry);
 
+  void CreateBoundingShapeInteractor(bool rotationEnabled);
+
+private:
   /*!
   * The parent QWidget
   */
   QWidget* m_ParentWidget;
-
   /*!
-  * \brief A pointer to the node of the image to be croped.
+  * @brief A pointer to the node of the image to be cropped.
   */
   mitk::WeakPointer<mitk::DataNode> m_ImageNode;
-
   /*!
-  * \brief A pointer to the image to be cropped.
+  * @brief The cuboid used for cropping.
   */
-  mitk::WeakPointer<mitk::Image> m_ImageToCrop;
+  mitk::GeometryData::Pointer m_CroppingObject;
 
   /*!
-  * \brief The cuboid used for cropping.
-  */
-  mitk::BoundingObject::Pointer m_CroppingObject;
-
-  /*!
-  * \brief Tree node of the cuboid used for cropping.
+  * @brief Tree node of the cuboid used for cropping.
   */
   mitk::DataNode::Pointer m_CroppingObjectNode;
 
   /*!
-  * \brief Interactor for moving and scaling the cuboid
+  * @brief Interactor for moving and scaling the cuboid
   */
-  mitk::AffineImageCropperInteractor::Pointer m_AffineInteractor;
+  mitk::BoundingShapeInteractor::Pointer m_BoundingShapeInteractor;
 
-  /*!
-  * \brief Creates the cuboid and its data tree node.
-  */
-  virtual void CreateBoundingObject();
+  void ProcessImage(bool crop);
 
-  /*!
-  * \brief Called from superclass, handles selection changes.
-  */
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  // cropping parameter
+  mitk::ScalarType m_CropOutsideValue;
+  bool m_Advanced;
+  bool m_Active;
+  bool m_ScrollEnabled;
 
-  /*!
-  * \brief Finds the given node in the data tree and optionally fits the cuboid to it
-  */
-  virtual void AddBoundingObjectToNode(mitk::DataNode* node, bool fit);
-
-  /*!
-  * \brief Removes the cuboid from any node and hides it from the user.
-  */
-  virtual void RemoveBoundingObjectFromNode();
-
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
-
-private:
-
-  // operation constant
-  static const mitk::OperationType OP_EXCHANGE;
-
-  //Interface class for undo redo
-  mitk::ImageCropperEventInterface* m_Interface;
+  Ui::ImageCropperControls m_Controls;
 };
-#endif // !defined(QMITK_IMAGECROPPER_H__INCLUDED)
+
+
+#endif // QmitkImageCropper_h

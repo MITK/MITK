@@ -1,0 +1,123 @@
+<statemachine NAME="Affine">
+    <state name="start" startstate="true" >
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="select">
+            <condition name="isHoveringOverObject"/>
+			<condition name="isHoveringOverHandles"  inverted="true"/>
+            <action name="selectObject"/>
+        </transition>
+      <transition event_class="InteractionPositionEvent" event_variant="Selection" target="handle">
+	    <condition name="isHoveringOverHandles"/>
+            <action name="selectHandle"/>
+        </transition>
+	   <transition event_class="InteractionPositionEvent" event_variant="Selection" target="start">
+            <condition name="isHoveringOverHandles" inverted="true" />
+            <condition name="isHoveringOverObject" inverted="true" />
+		        </transition> 	
+    </state>
+    <state name="handle" >
+<!-- Init Scale Mouse events -->
+        <transition event_class="InteractionPositionEvent" event_variant="InitInteraction" target="scale">
+            <action name="initInteraction"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="start">
+            <condition name="isHoveringOverHandles" inverted="true" />
+            <condition name="isHoveringOverObject" inverted="true" />
+            <action name="deselectObject"/>
+        </transition>
+		<transition event_class="InteractionPositionEvent" event_variant="Selection" target="select">
+	       <condition name="isHoveringOverHandles" inverted="true"/>
+    	   <condition name="isHoveringOverObject"/>
+           <action name="selectObject"/>
+		</transition> 
+		<transition event_class="InteractionPositionEvent" event_variant="Selection" target="handle">
+	       <condition name="isHoveringOverHandles" />
+		</transition> 
+		<transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectHandles"/>
+        </transition>
+    </state>
+
+    <state name="select" >
+<!-- Init Translation Mouse events -->
+        <transition event_class="InteractionPositionEvent" event_variant="InitInteraction" target="translate">
+            <action name="initInteraction"/>
+        </transition>
+<!-- Init Rotation Mouse events -->
+<!--
+        <transition event_class="InteractionPositionEvent" event_variant="InitRotation" target="rotate">
+            <action name="initRotate"/>
+        </transition>
+-->
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="start">
+            <condition name="isHoveringOverHandles" inverted="true" />
+            <condition name="isHoveringOverObject" inverted="true" />
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="handle">
+	    <condition name="isHoveringOverHandles"/>
+            <action name="selectHandle"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="Selection" target="select">
+	    <condition name="isHoveringOverHandles" inverted="true"/>
+    	   <condition name="isHoveringOverObject"/>
+           <!-- <action name="selectObject"/> -->
+        </transition>
+<!-- Only Mouse Mode: Deselect if mouse outside render window -->
+		<transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectObject"/>
+        </transition>
+    </state>
+    <state name="translate" >
+        <transition event_class="InteractionPositionEvent" event_variant="ObjectInteraction" target="translate">
+            <action name="translateObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndInteraction" target="start">
+           <condition name="isHoveringOverObject" inverted="true"/>
+           <condition name="isHoveringOverHandles" inverted="true"/> 
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndInteraction" target="select">
+            <condition name="isHoveringOverObject"/>
+            <action name="selectObject"/>
+        </transition>
+		<transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectObject"/>
+        </transition>
+    </state>
+	<state name="scale" >
+        <transition event_class="InteractionPositionEvent" event_variant="ObjectInteraction" target="scale">
+            <action name="scaleObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndInteraction" target="start">
+            <condition name="isHoveringOverHandles" inverted="true"/>   
+            <condition name="isHoveringOverObject" inverted="true"/>  
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndInteraction" target="select">
+            <condition name="isHoveringOverObject"/>
+            <condition name="isHoveringOverHandles" inverted="true"/>    
+	    <action name="selectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndInteraction" target="handle">
+            <condition name="isHoveringOverHandles"/>    
+	    <action name="selectHandle"/>
+        </transition>
+		<transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+            <action name="deselectObject"/>
+        </transition>
+    </state>
+<!-- Rotation Mouse events -->
+   <state name="rotate" >
+        <transition event_class="InteractionPositionEvent" event_variant="ObjectRotation" target="rotate">
+            <action name="rotateObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndRotation" target="start">
+            <condition name="isHoveringOverObject" inverted="true"/>
+            <action name="deselectObject"/>
+        </transition>
+        <transition event_class="InteractionPositionEvent" event_variant="EndRotation" target="select">
+            <condition name="isHoveringOverObject" />
+            <action name="selectObject"/>
+        </transition>
+     </state>
+</statemachine>

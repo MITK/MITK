@@ -1,0 +1,29 @@
+<config>
+  <event_variant name="Selection" class="MouseMoveEvent" >
+  </event_variant>
+<!-- Scaling -->
+  <event_variant name="InitInteraction" class="MousePressEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="ObjectInteraction" class="MouseMoveEvent">
+      <attribute name="ButtonState" value="LeftMouseButton"/>
+  </event_variant>
+  <event_variant name="EndInteraction" class="MouseReleaseEvent">
+      <attribute name="EventButton" value="LeftMouseButton"/>
+  </event_variant>
+<!-- Rotation -->
+<!--
+  <event_variant name="InitRotation" class="MousePressEvent">
+      <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant name="ObjectRotation" class="MouseMoveEvent" >
+      <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant name="EndRotation" class="MouseReleaseEvent">
+      <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+-->
+<!-- Scaling -->
+  <event_variant name="ScaleObject" class="MouseWheelEvent">
+  </event_variant>
+</config>

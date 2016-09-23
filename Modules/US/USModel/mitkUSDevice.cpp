@@ -648,7 +648,6 @@ ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
         device->m_FreezeBarrier->Wait(mutex);
       }
     }
-
     device->GrabImage();
   }
   return ITK_THREAD_RETURN_VALUE;

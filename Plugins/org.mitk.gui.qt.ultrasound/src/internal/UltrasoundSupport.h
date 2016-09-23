@@ -125,11 +125,13 @@ class UltrasoundSupport : public QmitkAbstractView
     std::vector<mitk::DataNode::Pointer> m_Node;
     void InitNewNode(const char* name);
     void DestroyLastNode();
+    void UpdateAmountOfOutputs();
 
     /** The image that is hold by the node above.*/
     mitk::Image::Pointer m_Image;
     mitk::Image::Pointer AllImagesOutput;
     std::vector<mitk::Image::Pointer> curOutput;
+    int                                 m_AmountOfOutputs;
 
     /** The old geometry of m_Image. It is needed to check if the geometry changed (e.g. because
      *  the zoom factor was modified) and the image needs to be reinitialized. */

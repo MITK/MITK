@@ -25,7 +25,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   startTime(((float)std::clock()) / CLOCKS_PER_SEC),
   useGUIOutPut(false),
   DataType(0),
-  displayedEvent(0)
+  displayedEvent(0),
+  m_GUIOutput(nullptr)
 {
 }
 
@@ -72,7 +73,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 
   if (!useGUIOutPut && m_GUIOutput) {
     // Need to do this because the program initializes the GUI twice
-    // this is probably an MITK bug, if it's fixed the timing becomes unneccesary
+    // this is probably a bug in UltrasoundSupport, if it's fixed the timing becomes unneccesary
     float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
     if (timePassed > 10)
     {
@@ -80,6 +81,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
   }
   if (useGUIOutPut) {
+    // pass some beamformer state infos to the GUI
     getSystemInfo(&BeamformerInfos);
 
     std::ostringstream s;
@@ -122,34 +124,35 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     // lock the image for writing an copy the given buffer into the image then
     switch (DataType)
     {
-    case 0: {
-      for (int i = 0; i < imageSetsTotal; i++) {
-        m_Image->SetSlice(&imageData[i*imageHeight*imageWidth], i);
+      case 0: {
+        for (int i = 0; i < imageSetsTotal; i++) {
+          m_Image->SetSlice(&imageData[i*imageHeight*imageWidth], i);
+        }
+        break;
       }
-      break;
-    }
-    case 1: {
-      short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
-      int pixelsPerImage = beamformedLines*beamformedSamples;
+      case 1: {
+        short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
+        int pixelsPerImage = beamformedLines*beamformedSamples;
 
-      for (char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
-      {
-        for (unsigned int sample = 0; sample < beamformedSamples; sample++)
+        for (char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
         {
-          for (short line = 0; line < beamformedLines; line++)
+          for (unsigned int sample = 0; sample < beamformedSamples; sample++)
           {
-            flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
-              = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
-          }
-        } // the beamformed image is flipped by 90 degrees; we need to flip it manually
-      }
+            for (short line = 0; line < beamformedLines; line++)
+            {
+              flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
+                = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
+            }
+          } // the beamformed image is flipped by 90 degrees; we need to flip it manually
+        }
 
-      for (int i = 0; i < beamformedTotalDatasets; i++) {
-        m_Image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
+        for (int i = 0; i < beamformedTotalDatasets; i++) {
+          m_Image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
+          // set every image to a different slice
+        }
+        delete flipme;
+        break;
       }
-      delete flipme;
-      break;
-    }
     }
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Unlock(); }
   }
@@ -157,7 +160,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
 void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWidth)
 {
-  unsigned int dim[] = { imageWidth, imageHeight, displayedEvent+1 }; // image dimensions
+  unsigned int dim[] = { imageWidth, imageHeight, displayedEvent+1 }; // image dimensions; every image needs a seperate slice!
   m_ImageMutex->Lock();
 
   m_Image = mitk::Image::New();
@@ -173,6 +176,7 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
       break;
     }
   } // 0:imageData 1:beamformed
+
   m_ImageMutex->Unlock();
   UpdateImageGeometry();                            // update the image geometry
 
@@ -192,7 +196,8 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
 
   spacing[0] = (pitch*reconstructionLines)/imageWidth;
   spacing[1] = ((recordTime*speedOfSound/2)*1000)/imageHeight;
-  spacing[2] = 1;
+  spacing[2] = 1; 
+  //recalculate correct spacing
 
   m_ImageMutex->Lock();
   if (m_Image.IsNotNull() && (m_Image->GetGeometry() != NULL))
@@ -226,8 +231,6 @@ void mitk::USDiPhASImageSource::SetDisplayedEvent(int event)
   auto& ScanMode = m_device->GetScanMode();
   UpdateImageDataType(ScanMode.imageHeight, ScanMode.imageWidth);
 }
-
-std::function<void(QString)>  mitk::USDiPhASImageSource::m_GUIOutput = nullptr;
 
 void mitk::USDiPhASImageSource::setGUIOutput(std::function<void(QString)> out)
 {

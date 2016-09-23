@@ -94,6 +94,8 @@ void UltrasoundSupport::CreateQtPartControl( QWidget *parent )
   m_Controls.tabWidget->setTabEnabled(1, false);
 }
 
+#include <mitkRenderingModeProperty.h>
+
 void UltrasoundSupport::InitNewNode(const char* name)
 {
   m_Node.push_back(nullptr);
@@ -123,60 +125,73 @@ void UltrasoundSupport::OnClickedAddNewDevice()
   m_Controls.m_WidgetActiveDevices->setVisible(false);
 }
 
-void UltrasoundSupport::UpdateImage()
+void UltrasoundSupport::UpdateAmountOfOutputs()
 {
-  //Update device
-  m_Device->Modified();
-  m_Device->Update();
-
-  AllImagesOutput = m_Device->GetOutput();
-
   //Update the amount of Nodes; there should be one Node for every slide
   bool isSet = true;
-  int amountOfNodes = 0;
+  m_AmountOfOutputs = 0;
   while (isSet) {
-    isSet = AllImagesOutput->IsSliceSet(amountOfNodes);
-    if(isSet)
-      ++amountOfNodes;
-  } 
+    isSet = AllImagesOutput->IsSliceSet(m_AmountOfOutputs);
+    if (isSet)
+      ++m_AmountOfOutputs;
+  }
 
-  while (m_Node.size() < amountOfNodes) {
+  // correct the amount of Nodes to display data
+  while (m_Node.size() < m_AmountOfOutputs) {
     InitNewNode("No Data received yet ...");
   }
-  while (m_Node.size() > amountOfNodes) {
+  while (m_Node.size() > m_AmountOfOutputs) {
     DestroyLastNode();
   }
 
-  while (curOutput.size() < amountOfNodes) {
+  // correct the amount of image outputs that we feed the nodes with
+  while (curOutput.size() < m_AmountOfOutputs) {
     curOutput.push_back(mitk::Image::New());
     unsigned int* dimOld = AllImagesOutput->GetDimensions();
-    unsigned int dim[3] = { dimOld[0], dimOld[1], 1};
-    curOutput.back()->Initialize(AllImagesOutput->GetPixelType(), 3, dim);
+    unsigned int dim[2] = { dimOld[0], dimOld[1]};
+    curOutput.back()->Initialize(AllImagesOutput->GetPixelType(), 2, dim);
   }
-  while (curOutput.size() > amountOfNodes) {
+  while (curOutput.size() > m_AmountOfOutputs) {
     curOutput.pop_back();
   }
+}
 
+void UltrasoundSupport::UpdateImage()
+{
+  m_Device->Modified();
+  m_Device->Update();  
+  //Update device
+
+  AllImagesOutput = m_Device->GetOutput();
+  UpdateAmountOfOutputs(); 
+  // create as many Nodes and Outputs as there are slices in AllImagesOutput
+
+  if (m_AmountOfOutputs == 0)
+    return; 
+  //if there is no image to be displayed, skip the rest of this method
+  
   //Only update the view if the image is shown
-  if(m_Controls.m_ShowImageStream->isChecked())
+  if(m_Controls.m_ShowImageStream->isChecked()) 
   {
-    for (int index = 0; index < curOutput.size(); ++index)
+    for (int index = 0; index < m_AmountOfOutputs; ++index)
     {
-      unsigned int* dimOld = AllImagesOutput->GetDimensions();
-      unsigned int dim[3] = { dimOld[0], dimOld[1], 1 };
-      curOutput.at(index)->Initialize(AllImagesOutput->GetPixelType(), 3, dim); ////pls make that beautiful
+      if (curOutput.at(index)->GetDimension(0) != AllImagesOutput->GetDimension(0) ||
+        curOutput.at(index)->GetDimension(1) != AllImagesOutput->GetDimension(1) ||
+        curOutput.at(index)->GetDimension(2) != AllImagesOutput->GetDimension(2) ||
+        curOutput.at(index)->GetPixelType() != AllImagesOutput->GetPixelType())
+      {
+        unsigned int* dimOld = AllImagesOutput->GetDimensions();
+        unsigned int dim[2] = { dimOld[0], dimOld[1]};
+        curOutput.at(index)->Initialize(AllImagesOutput->GetPixelType(), 2, dim);
+        // if we switched image resolution or type the outputs must be reinitialized!
+      } 
 
-      //Update data node
-      mitk::Image::Pointer AllImagesOutput = m_Device->GetOutput();
-      
       if (!AllImagesOutput->IsEmpty())
       {
         mitk::ImageReadAccessor inputReadAccessor(AllImagesOutput, AllImagesOutput->GetSliceData(index));
         curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
-      }
-      else
-      {
-        MITK_INFO << curOutput.at(index);
+        curOutput.at(index)->SetGeometry(AllImagesOutput->GetGeometry()); 
+        //Update the image Output with seperate slices
       }
 
       if (curOutput.at(index)->IsEmpty())
@@ -192,9 +207,11 @@ void UltrasoundSupport::UpdateImage()
         char name[30];
         sprintf(name, "US Viewing Stream - Image %d", index);
         m_Node.at(index)->SetName(name);
-        m_Node.at(index)->SetData(curOutput.at(index));
+        m_Node.at(index)->SetData(curOutput.at(index)); 
+        // set the name of the Output
       }
     }
+
     // if the geometry changed: reinitialize the ultrasound image. we use the first image in the vector to readjust the geometry
     if ((m_OldGeometry.IsNotNull()) &&
       (curOutput.at(0)->GetGeometry() != NULL) &&
@@ -473,7 +490,7 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
-  m_CurrentImageWidth(0), m_CurrentImageHeight(0)
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

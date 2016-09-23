@@ -51,7 +51,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   if ( m_ControlInterface.IsNotNull() )
   {
     m_ControlInterface->passGUIOut([this](QString str)->void{
-      if (this) {
+      if (this && this->ui) {
         this->ui->CurrentState->setText(str);
       } });
   }
@@ -151,12 +151,10 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitEventsChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
 
-  int transmitEvents = ui->TransmitEvents->value();
-  int displayedEvents = ui->EventDisplay->value();
-  if (displayedEvents >= transmitEvents)
-    ui->EventDisplay->setValue(transmitEvents);
+  OnEventDisplayChanged();
   //correct the displayed event
-  m_ControlInterface->SetTransmitEvents(transmitEvents);
+
+  m_ControlInterface->SetTransmitEvents(ui->TransmitEvents->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnVoltageChanged()
 {

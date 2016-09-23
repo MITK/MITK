@@ -55,7 +55,7 @@ public:
 
   /**
     * The API calls this function to pass the image data to the
-	* user; here the m_Image is updated
+	  * user; here the m_Image is updated
     */
   void mitk::USDiPhASImageSource::ImageDataCallback(
     short* rfDataChannelData,
@@ -81,7 +81,7 @@ public:
   */
   void UpdateImageGeometry();
 
-  static void setGUIOutput(std::function<void(QString)> out);
+  void setGUIOutput(std::function<void(QString)> out);
 
   void setDataType(int DataT);
   void UpdateImageDataType(int imageHeight, int imageWidth);
@@ -95,13 +95,15 @@ protected:
   mitk::Image::Pointer             m_Image;
   itk::FastMutexLock::Pointer      m_ImageMutex;
   mitk::USDiPhASDevice*            m_device;
-  static std::function<void(QString)>     m_GUIOutput;
+  std::function<void(QString)>     m_GUIOutput;
 
+  /**
+   * variables for management of current state
+   */
   float                           startTime;
   bool                            useGUIOutPut;
-  BeamformerStateInfoNative       BeamformerInfos;
   int                             displayedEvent;
-
+  BeamformerStateInfoNative       BeamformerInfos;
   int                             DataType;       // 0: Use image data; 1: Use beamformed data
 };
 } // namespace mitk

@@ -34,6 +34,16 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource( )
 {
 }
 
+#include "mitkUSDiPhASBModeImageFilter.h"
+#include "itkImage.h"
+#include "itkResampleImageFilter.h"
+#include "itkCastImageFilter.h"
+#include "itkCropImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
+#include "itkIntensityWindowingImageFilter.h"
+#include "mitkImageCast.h"
+#include "mitkITKImageImport.h"
+
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   m_ImageMutex->Lock();
@@ -60,6 +70,20 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       if (isSet = m_Image->IsSliceSet(sliceNumber)) {
         mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
         image->SetSlice(inputReadAccessor.GetData(), sliceNumber);
+
+        typedef itk::Image< float, 3 > itkFloatImageType;
+        typedef itk::Image< unsigned char, 3 > itkUcharImageType;
+        typedef itk::PhotoacousticBModeImageFilter < itkFloatImageType, itkUcharImageType > PhotoacousticBModeImageFilter;
+
+        PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
+        itkFloatImageType::Pointer itkImage;
+        mitk::CastToItkImage(m_Image, itkImage);
+        photoacousticBModeFilter->SetInput(itkImage);
+        photoacousticBModeFilter->SetDirection(0);
+        image = mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
+        /**
+         *this is just a Test to set up everything for the BModeFilterImplementation
+         */
       }
       else {
         break;

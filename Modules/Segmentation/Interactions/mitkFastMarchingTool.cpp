@@ -273,24 +273,47 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
   if (dynamic_cast<mitk::Image*>(m_ResultImageNode->GetData()))
   {
     //logical or combination of preview and segmentation slice
-    OutputImageType::Pointer workingImageSliceInITK = OutputImageType::New();
 
     mitk::Image::Pointer workingImageSlice;
     mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image*>(this->m_ToolManager->GetWorkingData(0)->GetData());
-
     workingImageSlice = GetAffectedImageSliceAs2DImage(m_WorkingPlane, workingImage, m_CurrentTimeStep);
-    CastToItkImage( workingImageSlice, workingImageSliceInITK );
-
-    typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
-    OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
-
-    orFilter->SetInput(0, m_ThresholdFilter->GetOutput());
-    orFilter->SetInput(1, workingImageSliceInITK);
-    orFilter->Update();
 
     mitk::Image::Pointer segmentationResult = mitk::Image::New();
 
-    mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+    bool isDeprecatedUnsignedCharSegmentation = (workingImage->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+
+    if (isDeprecatedUnsignedCharSegmentation)
+    {
+      typedef itk::Image< unsigned char, 2 >          OutputUCharImageType;
+      OutputUCharImageType::Pointer workingImageSliceInITK = OutputUCharImageType::New();
+
+      CastToItkImage(workingImageSlice, workingImageSliceInITK);
+
+      typedef itk::OrImageFilter<OutputImageType, OutputUCharImageType, OutputUCharImageType> OrImageFilterType;
+      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+
+      orFilter->SetInput1(m_ThresholdFilter->GetOutput());
+      orFilter->SetInput2(workingImageSliceInITK);
+      orFilter->Update();
+
+      mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+    }
+    else
+    {
+      OutputImageType::Pointer workingImageSliceInITK = OutputImageType::New();
+
+      CastToItkImage(workingImageSlice, workingImageSliceInITK);
+
+      typedef itk::OrImageFilter<OutputImageType, OutputImageType> OrImageFilterType;
+      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+
+      orFilter->SetInput(0, m_ThresholdFilter->GetOutput());
+      orFilter->SetInput(1, workingImageSliceInITK);
+      orFilter->Update();
+
+      mitk::CastToMitkImage(orFilter->GetOutput(), segmentationResult);
+    }
+
     segmentationResult->GetGeometry()->SetOrigin(workingImageSlice->GetGeometry()->GetOrigin());
     segmentationResult->GetGeometry()->SetIndexToWorldTransform(workingImageSlice->GetGeometry()->GetIndexToWorldTransform());
 

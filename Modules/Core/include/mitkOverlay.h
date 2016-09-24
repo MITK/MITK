@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef OVERLAY_H
 #define OVERLAY_H
 
+#include "mitkServiceInterface.h"
 #include <MitkCoreExports.h>
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>
@@ -373,7 +374,7 @@ namespace mitk
 
     bool IsForceInForeground() const;
 
-  PropertyList* GetPropertyList() const;
+    PropertyList *GetPropertyList() const;
 
     mitkClassMacroItkParent(Overlay, itk::Object);
 
@@ -412,4 +413,7 @@ namespace mitk
   };
 
 } // namespace mitk
+
+MITK_DECLARE_SERVICE_INTERFACE(mitk::Overlay, "org.mitk.services.Overlay")
+
 #endif // OVERLAY_H

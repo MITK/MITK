@@ -41,14 +41,6 @@ public:
   itkFactorylessNewMacro(Self)
   itkCloneMacro(Self)
 
-  /**
-   * @brief TODO19786 Get an IMimeTypeProvider instance.
-   * @param context The module context of the module getting the service.
-   * @return A non-NULL IMimeTypeProvider instance.
-   */
-  static OverlayLayouter2D* GetOverlayLayouter2D(us::ModuleContext* context = us::GetModuleContext());
-
-
   protected:
 
   /** \brief explicit constructor which disallows implicit conversions */

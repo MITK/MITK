@@ -15,6 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkOverlay.h"
+#include "usGetModuleContext.h"
+
+const std::string mitk::Overlay::US_INTERFACE_NAME = "org.mitk.services.Overlay";
+const std::string mitk::Overlay::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
+const std::string mitk::Overlay::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
+const std::string mitk::Overlay::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::Overlay::Overlay() : m_LayoutedBy(nullptr)
 {
@@ -26,6 +32,7 @@ mitk::Overlay::Overlay() : m_LayoutedBy(nullptr)
 
 mitk::Overlay::~Overlay()
 {
+  this->UnRegisterMicroservice();
 }
 
 void mitk::Overlay::SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
@@ -280,4 +287,22 @@ bool mitk::Overlay::IsForceInForeground() const
 mitk::PropertyList *mitk::Overlay::GetPropertyList() const
 {
   return m_PropertyList;
+}
+
+void mitk::Overlay::RegisterAsMicroservice()
+{
+  // Get Context
+  us::ModuleContext* context = us::GetModuleContext();
+
+  // Define ServiceProps
+  us::ServiceProperties props;
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.Overlay.id_", 16);
+  props[ US_PROPKEY_ID ] = uidGen.GetUID();
+  m_ServiceRegistration = context->RegisterService(this, props);
+}
+
+void mitk::Overlay::UnRegisterMicroservice()
+{
+  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
 }

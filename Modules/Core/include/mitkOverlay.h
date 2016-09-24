@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define OVERLAY_H
 
 #include "mitkServiceInterface.h"
+#include "usServiceRegistration.h"
 #include <MitkCoreExports.h>
 #include <mitkBaseRenderer.h>
 #include <mitkCommon.h>
@@ -376,6 +377,31 @@ namespace mitk
 
     PropertyList *GetPropertyList() const;
 
+    /**
+    *\brief Returns the id that this device is registered with. The id will only be valid, if the
+    * Overlay has been registered using RegisterAsMicroservice().
+    */
+    std::string GetMicroserviceID();
+
+    /**
+    *\brief These Constants are used in conjunction with Microservices
+    */
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_ID;
+    static const std::string US_PROPKEY_ISACTIVE; // NOT IMPLEMENTED YET!
+
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    * To unregister, call UnregisterMicroservice().
+    */
+    virtual void RegisterAsMicroservice();
+
+    /**
+    *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
+    */
+    virtual void UnRegisterMicroservice();
+
     mitkClassMacroItkParent(Overlay, itk::Object);
 
   protected:
@@ -410,6 +436,9 @@ namespace mitk
 
     /** \brief Reference to the layouter in which this overlay is managed. */
     AbstractOverlayLayouter *m_LayoutedBy;
+
+  private:
+    us::ServiceRegistration<Self> m_ServiceRegistration;
   };
 
 } // namespace mitk

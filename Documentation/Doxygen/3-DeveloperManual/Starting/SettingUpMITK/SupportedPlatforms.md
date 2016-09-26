@@ -26,8 +26,8 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
-| Ubuntu Linux 14.04 (x64)            | GNU 4.8
-| Ubuntu Linux 12.04 (x64)            | GNU 4.7 as provided by ppa:ubuntu-toolchain-r/test
+| Ubuntu Linux 14.04 (x64)            | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
+| Ubuntu Linux 12.04 (x64)            | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
 | Microsoft Windows 7 (x64)           | MSVC 2012 Express Update 4
 | Apple OS X 10.10 "Yosemite"         | Clang 6.0
 
@@ -42,7 +42,7 @@ as well as in the current master branch.
 
 | Platform                           | Compilers
 | ---------------------------------- | --------------------------------------------------
-| Ubuntu Linux 12.04 (x86)           | GNU 4.7 as provided by ppa:ubuntu-toolchain-r/test
+| Ubuntu Linux 12.04 (x86)           | GNU 4.9 as provided by ppa:ubuntu-toolchain-r/test
 | Microsoft Windows 7 (x64)          | MSVC 2012 Express Update 4 (x86)
 | Microsoft Windows 8 (x64)          | MSVC 2013 Community Update 4
 | Apple OS X 10.9 "Mavericks"        | Clang 5.0

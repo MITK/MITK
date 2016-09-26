@@ -23,14 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-AnnotationPlacer::AnnotationPlacer()
-{
-}
-
 
 AnnotationPlacer::~AnnotationPlacer()
 {
-
 }
 
 

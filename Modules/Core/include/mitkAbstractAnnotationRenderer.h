@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ABSTRACTANNOTATIONRENDERER_H
 
 #include <MitkCoreExports.h>
-#include <itkObject.h>
 #include <mitkCommon.h>
 #include "mitkOverlay.h"
 #include "mitkServiceInterface.h"
 #include "usGetModuleContext.h"
+#include "mitkOverlayServiceTracker.h"
 
 namespace mitk {
 
@@ -36,19 +36,21 @@ class BaseRenderer;
  *One type of layouter should always have a unique identifier.
  *@ingroup Overlays
 */
-class MITKCORE_EXPORT AbstractAnnotationRenderer : public itk::LightObject {
+class MITKCORE_EXPORT AbstractAnnotationRenderer {
 
-  public:
+public:
 
-  mitkClassMacroItkParent(AbstractAnnotationRenderer, itk::LightObject);
-
-  protected:
-
-  /** \brief explicit constructor which disallows implicit conversions */
-  explicit AbstractAnnotationRenderer();
+  AbstractAnnotationRenderer(const std::string& rendererID);
 
   /** \brief virtual destructor in order to derive from this class */
   virtual ~AbstractAnnotationRenderer();
+
+  virtual std::string GetID() = 0;
+  std::string GetRendererID();
+
+  static const std::string US_INTERFACE_NAME;
+  static const std::string US_PROPKEY_ID;
+  static const std::string US_PROPKEY_RENDERER_ID;
 
 private:
 
@@ -57,6 +59,10 @@ private:
 
   /** \brief assignment operator */
   AbstractAnnotationRenderer &operator=(const AbstractAnnotationRenderer &);
+
+  OverlayServiceTracker* m_OverlayServiceTracker;
+
+  const std::string m_RendererID;
 };
 
 } // namespace mitk

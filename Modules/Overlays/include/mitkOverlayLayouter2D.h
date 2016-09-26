@@ -18,12 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define OVERLAYLAYOUTER2D_H
 
 #include "MitkOverlaysExports.h"
-#include <itkLightObject.h>
-#include <vtkSmartPointer.h>
-#include "mitkOverlay.h"
 #include "mitkAbstractAnnotationRenderer.h"
-#include "mitkLocalStorageHandler.h"
-#include "itkEventObject.h"
 
 namespace mitk {
 
@@ -34,17 +29,9 @@ class BaseRenderer;
  * call the update method of each Overlay during the rendering phase of the renderer.
  * See \ref OverlaysPage for more info.
 */
-class MITKOVERLAYS_EXPORT OverlayLayouter2D : public mitk::AbstractAnnotationRenderer {
+class MITKOVERLAYS_EXPORT OverlayLayouter2D : public AbstractAnnotationRenderer {
 
 public:
-  mitkClassMacro(OverlayLayouter2D, mitk::AbstractAnnotationRenderer);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  protected:
-
-  /** \brief explicit constructor which disallows implicit conversions */
-  explicit OverlayLayouter2D();
 
   /** \brief virtual destructor in order to derive from this class */
   virtual ~OverlayLayouter2D();

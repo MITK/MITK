@@ -18,12 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define ANNOTATIONPLACER_H
 
 #include "MitkOverlaysExports.h"
-#include <itkLightObject.h>
-#include <vtkSmartPointer.h>
 #include "mitkOverlay.h"
 #include "mitkAbstractAnnotationRenderer.h"
-#include "mitkLocalStorageHandler.h"
-#include "itkEventObject.h"
 
 namespace mitk {
 
@@ -34,17 +30,9 @@ class BaseRenderer;
  * call the update method of each Overlay during the rendering phase of the renderer.
  * See \ref OverlaysPage for more info.
 */
-class MITKOVERLAYS_EXPORT AnnotationPlacer : public mitk::AbstractAnnotationRenderer {
+class MITKOVERLAYS_EXPORT AnnotationPlacer : public AbstractAnnotationRenderer {
 
-public:
-  mitkClassMacro(AnnotationPlacer, mitk::AbstractAnnotationRenderer);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-protected:
-
-    /** \brief explicit constructor which disallows implicit conversions */
-    explicit AnnotationPlacer();
+  public:
 
     /** \brief virtual destructor in order to derive from this class */
     virtual ~AnnotationPlacer();

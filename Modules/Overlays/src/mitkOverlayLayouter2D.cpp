@@ -23,11 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
 
-OverlayLayouter2D::OverlayLayouter2D()
-{
-}
-
-
 OverlayLayouter2D::~OverlayLayouter2D()
 {
 

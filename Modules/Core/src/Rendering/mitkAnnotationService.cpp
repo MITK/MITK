@@ -16,12 +16,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAnnotationService.h"
 #include <mitkAbstractAnnotationRenderer.h>
+#include <memory>
 
-mitk::AnnotationService::AnnotationService()
+namespace mitk
+{
+
+AnnotationService::AnnotationService()
 {
 }
 
-mitk::AnnotationService::~AnnotationService()
+AnnotationService::~AnnotationService()
 {
 }
 
+AbstractAnnotationRenderer *AnnotationService::GetAnnotationRenderer(const std::string &arTypeID,
+                                                                     const std::string &rendererID)
+{
+  //get the context
+  us::ModuleContext* context = us::GetModuleContext();
+
+  //specify a filter that defines the requested type
+  std::string filter = "(&(" + AbstractAnnotationRenderer::US_PROPKEY_ID +
+      "=" + arTypeID + ")("+ AbstractAnnotationRenderer::US_PROPKEY_RENDERER_ID +
+      "=" + rendererID + "))";
+  //find the fitting service
+  std::vector<us::ServiceReferenceU> serviceReferences =
+      context->GetServiceReferences(AbstractAnnotationRenderer::US_INTERFACE_NAME, filter);
+
+  //check if a service reference was found. It is also possible that several
+  //services were found. This is not checked here, just the first one is taken.
+  AbstractAnnotationRenderer* ar = nullptr;
+  if ( serviceReferences.size() )
+  {
+    ar = context->GetService<AbstractAnnotationRenderer>(serviceReferences.front());
+  }
+  //no service reference was found or found service reference has no valid source
+  return ar;
+}
+
+template<typename T>
+void AnnotationService::RegisterAnnotationRenderer(const std::string &rendererID)
+{
+  std::unique_ptr<T> ar(new T(rendererID));
+  // Define ServiceProps
+  us::ServiceProperties props;
+  props[ AbstractAnnotationRenderer::US_PROPKEY_RENDERER_ID ] = rendererID;
+  props[ AbstractAnnotationRenderer::US_PROPKEY_ID ] = ar->GetID();
+
+  us::GetModuleContext()->RegisterService(ar.get(),props);
+  m_AnnotationRendererServices.push_back(std::move(ar));
+}
+
+}

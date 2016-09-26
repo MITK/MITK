@@ -293,7 +293,6 @@ void mitk::Overlay::RegisterAsMicroservice()
 {
   // Get Context
   us::ModuleContext* context = us::GetModuleContext();
-
   // Define ServiceProps
   us::ServiceProperties props;
   mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.Overlay.id_", 16);

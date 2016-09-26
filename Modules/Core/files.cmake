@@ -132,6 +132,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyFilters.cpp
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkPropertyListReplacedObserver.cpp
+  DataManagement/mitkPropertyNameHelper.cpp
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkPropertyPersistence.cpp
   DataManagement/mitkPropertyPersistenceInfo.cpp

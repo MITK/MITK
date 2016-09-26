@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkDICOMTagsOfInterestService.h"
-#include "mitkDICOMTagHelper.h"
 
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"
@@ -72,50 +71,59 @@ mitk::DICOMTagsOfInterestService::
 
 void
 mitk::DICOMTagsOfInterestService::
-AddTagOfInterest(const DICOMTag& tag, bool makePersistant)
+AddTagOfInterest(const DICOMTagPath& tagPath, bool makePersistant)
 {
+  if (tagPath.Size() == 0)
+  {
+    MITK_DEBUG << "Indication for wrong DICOMTagsOfInterestService::AddTagOfInterest() usage. Empty DICOM tag path was passed.";
+    return;
+  }
+
   MutexHolder lock(m_Lock);
-  std::string propName = mitk::GeneratPropertyNameForDICOMTag(tag);
-  this->m_TagMap.insert(std::make_pair(propName, tag));
-  this->m_PersMap[propName] = makePersistant; //this must be changed even if the propname already exists.
-  this->m_KnownTags.insert(propName);
+  std::string propRegEx = mitk::DICOMTagPathToPropertRegEx(tagPath);
+  this->m_Tags.insert(tagPath);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
   if (descriptionSrv)
   {
-    descriptionSrv->AddDescription(propName, "DICOM tag: " + tag.GetName());
+    descriptionSrv->AddDescriptionRegEx(propRegEx, "DICOM tag: " + tagPath.GetLastNode().tag.GetName());
   }
 
   mitk::IPropertyPersistence* persSrv = GetPersistenceService();
-  if (persSrv)
+  if (persSrv && makePersistant)
   {
-    std::string key = propName;
-    std::replace(key.begin(), key.end(), '.', '_');
-
     PropertyPersistenceInfo::Pointer info = PropertyPersistenceInfo::New();
-    info->SetNameAndKey(propName, key);
+    if (tagPath.IsExplicit())
+    {
+      std::string name = mitk::DICOMTagPathToPropertyName(tagPath);
+      std::string key = name;
+      std::replace(key.begin(), key.end(), '.', '_');
+      info->SetNameAndKey(name, key);
+    }
+    else
+    {
+      std::string key = mitk::DICOMTagPathToPersistenceKeyRegEx(tagPath);
+      std::string keyTemplate = mitk::DICOMTagPathToPersistenceKeyTemplate(tagPath);
+      std::string propTemplate = mitk::DICOMTagPathToPersistenceNameTemplate(tagPath);
+      info->UseRegEx(propRegEx, propTemplate, key, keyTemplate);
+    }
+
     info->SetDeserializationFunction(mitk::PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty);
     info->SetSerializationFunction(mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON);
     persSrv->AddInfo(info);
   }
 };
 
-mitk::DICOMTagsOfInterestService::DICOMTagMapType
+mitk::DICOMTagPathMapType
 mitk::DICOMTagsOfInterestService::
 GetTagsOfInterest() const
 {
   MutexHolder lock(m_Lock);
-  DICOMTagMapType result;
+  DICOMTagPathMapType result;
 
-  for (auto tag : this->m_TagMap)
+  for (auto tag : this->m_Tags)
   {
-    InternalTagSetType::const_iterator finding = this->m_KnownTags.find(tag.first);
-    if (finding == this->m_KnownTags.cend())
-    {
-      mitkThrow() << "Invalid status. Tag is missing in the known tag set. Problematic tag:" << tag.first;
-    }
-
-    result.insert(std::make_pair(finding->c_str(), tag.second));
+    result.insert(std::make_pair(tag, ""));
   }
 
   return result;
@@ -123,31 +131,29 @@ GetTagsOfInterest() const
 
 bool
 mitk::DICOMTagsOfInterestService::
-HasTag(const DICOMTag& tag) const
+HasTag(const DICOMTagPath& tag) const
 {
-  std::string propName = mitk::GeneratPropertyNameForDICOMTag(tag);
-  return this->m_TagMap.find(propName) != this->m_TagMap.cend();
+  return this->m_Tags.find(tag) != this->m_Tags.cend();
 };
 
 void
 mitk::DICOMTagsOfInterestService::
-RemoveTag(const DICOMTag& tag)
+RemoveTag(const DICOMTagPath& tag)
 {
   MutexHolder lock(m_Lock);
-  std::string propName = mitk::GeneratPropertyNameForDICOMTag(tag);
-  this->m_PersMap.erase(propName);
-  this->m_TagMap.erase(propName);
+  this->m_Tags.erase(tag);
+  std::string propRegEx = mitk::DICOMTagPathToPropertRegEx(tag);
 
   mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
-  if (descriptionSrv && descriptionSrv->HasDescription(propName))
+  if (descriptionSrv)
   {
-    descriptionSrv->RemoveDescription(propName);
+    descriptionSrv->RemoveDescription(propRegEx);
   }
 
   mitk::IPropertyPersistence* persSrv = GetPersistenceService();
-  if (persSrv && persSrv->HasInfo(propName))
+  if (persSrv)
   {
-    persSrv->RemoveInfo(propName);
+    persSrv->RemoveInfo(propRegEx);
   }
 };
 
@@ -156,6 +162,23 @@ mitk::DICOMTagsOfInterestService::
 RemoveAllTags()
 {
   MutexHolder lock(m_Lock);
-  this->m_PersMap.clear();
-  this->m_TagMap.clear();
+  mitk::IPropertyDescriptions* descriptionSrv = GetDescriptionsService();
+  mitk::IPropertyPersistence* persSrv = GetPersistenceService();
+
+  for (const auto& tag : m_Tags)
+  {
+    std::string propRegEx = mitk::DICOMTagPathToPropertRegEx(tag);
+
+    if (descriptionSrv)
+    {
+      descriptionSrv->RemoveDescription(propRegEx);
+    }
+
+    if (persSrv)
+    {
+      persSrv->RemoveInfo(propRegEx);
+    }
+  }
+
+  this->m_Tags.clear();
 };

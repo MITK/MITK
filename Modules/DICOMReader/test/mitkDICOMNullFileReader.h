@@ -39,7 +39,7 @@ class DICOMNullFileReader : public DICOMFileReader
 
     bool operator==(const DICOMFileReader& other) const override;
 
-    virtual DICOMTagList GetTagsOfInterest() const override { return DICOMTagList(); }
+    virtual DICOMTagPathList GetTagsOfInterest() const override { return DICOMTagPathList(); }
     virtual void SetTagCache( const DICOMTagCache::Pointer& ) override {}
 
   protected:

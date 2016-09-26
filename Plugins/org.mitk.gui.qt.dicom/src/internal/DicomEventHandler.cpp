@@ -29,8 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkContourModelSet.h>
 
 #include <mitkDICOMFileReaderSelector.h>
+#include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMEnums.h>
-#include <mitkDICOMTagHelper.h>
+#include <mitkDICOMTagsOfInterestHelper.h>
 #include <mitkDICOMProperty.h>
 #include <mitkStringProperty.h>
 #include <mitkDicomSeriesReader.h>
@@ -314,12 +315,16 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       selector->SetInputFiles(seriesToLoad);
 
       mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
-      //reset tag cache to ensure that additional tags of interest
-      //will be regarded by the reader if set later on.
-      reader->SetTagCache(nullptr);
       reader->SetAdditionalTagsOfInterest(mitk::GetCurrentDICOMTagsOfInterest());
       reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
       reader->SetInputFiles(seriesToLoad);
+
+      mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
+      scanner->AddTagPaths(reader->GetTagsOfInterest());
+      scanner->SetInputFiles(seriesToLoad);
+      scanner->Scan();
+
+      reader->SetTagCache(scanner->GetScanCache());
       reader->AnalyzeInputFiles();
       reader->LoadImages();
 

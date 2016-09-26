@@ -158,14 +158,22 @@ namespace mitk
 
     void SetTagCache(DICOMTagCache* privateCache);
 
+    /** Type specifies additional tags of interest. Key is the tag path of interest.
+    * The value is an optional user defined name for the property that should be used to store the tag value(s).
+    * Empty value is default and will imply to use the found DICOMTagPath as property name.*/
+    typedef std::map<DICOMTagPath, std::string> AdditionalTagsMapType;
     /**
-    * \brief Set a list of DICOM-Tags that will be copied into the property of the mitk::Image.
+    * \brief Set a list of DICOMTagPaths that specifiy all DICOM-Tags that will be copied into the property of the mitk::Image.
     *
     * This method can be used to specify a list of DICOM-tags that shall be available after the loading.
-    * The content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image,
-    * where the property-key equals the key in the unordered_map.
+    * The value in the tagMap is an optional user defined name for the property key that should be used
+    * when storing the property). Empty value is default and will imply to use the found DICOMTagPath
+    * as property key.
+    * By default the content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image.
+    * This behaviour can be changed by setting a different TagLookupTableToPropertyFunctor via
+    * SetTagLookupTableToPropertyFunctor().
     */
-    void SetAdditionalTagsOfInterest(const std::unordered_map<const char*, DICOMTag>& tagList);
+    void SetAdditionalTagsOfInterest(const AdditionalTagsMapType& tagMap);
 
     typedef std::function<mitk::BaseProperty::Pointer(const DICOMCachedValueLookupTable&) > TagLookupTableToPropertyFunctor;
 
@@ -212,7 +220,8 @@ namespace mitk
 
     mutable bool m_PropertiesOutOfDate;
 
-    std::unordered_map<const char*, DICOMTag> m_AdditionalTagList;
+    AdditionalTagsMapType m_AdditionalTagMap;
+    std::set<std::string> m_FoundAdditionalTags;
 
     TagLookupTableToPropertyFunctor m_PropertyFunctor;
   };

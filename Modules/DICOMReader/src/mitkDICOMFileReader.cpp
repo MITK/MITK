@@ -201,14 +201,14 @@ mitk::DICOMFileReader
 }
 
 
-std::unordered_map<const char*, mitk::DICOMTag> mitk::DICOMFileReader::GetAdditionalTagsOfInterest() const
+mitk::DICOMFileReader::AdditionalTagsMapType mitk::DICOMFileReader::GetAdditionalTagsOfInterest() const
 {
   return m_AdditionalTagsOfInterest;
 }
 
 
 void mitk::DICOMFileReader::SetAdditionalTagsOfInterest(
-  const std::unordered_map<const char*, mitk::DICOMTag>& tagList )
+  const AdditionalTagsMapType& tagList)
 {
   m_AdditionalTagsOfInterest = tagList;
   this->Modified();

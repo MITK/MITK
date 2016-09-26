@@ -41,8 +41,9 @@ mitk::DICOMImageBlockDescriptor::DICOMImageBlockDescriptor( const DICOMImageBloc
 , m_PropertyList( other.m_PropertyList->Clone() )
 , m_TagCache( other.m_TagCache )
 , m_PropertiesOutOfDate( other.m_PropertiesOutOfDate )
-, m_AdditionalTagList( other.m_AdditionalTagList )
-, m_PropertyFunctor( other.m_PropertyFunctor )
+, m_AdditionalTagMap(other.m_AdditionalTagMap)
+, m_FoundAdditionalTags(other.m_FoundAdditionalTags)
+, m_PropertyFunctor(other.m_PropertyFunctor)
 {
   if ( m_MitkImage )
   {
@@ -63,7 +64,8 @@ mitk::DICOMImageBlockDescriptor& mitk::DICOMImageBlockDescriptor::
     m_ReaderImplementationLevel = other.m_ReaderImplementationLevel;
     m_TiltInformation           = other.m_TiltInformation;
 
-    m_AdditionalTagList = other.m_AdditionalTagList;
+    m_AdditionalTagMap = other.m_AdditionalTagMap;
+    m_FoundAdditionalTags = other.m_FoundAdditionalTags;
     m_PropertyFunctor = other.m_PropertyFunctor;
 
     if ( other.m_PropertyList )
@@ -114,9 +116,9 @@ mitk::DICOMTagList mitk::DICOMImageBlockDescriptor::GetTagsOfInterest()
 
 
 void mitk::DICOMImageBlockDescriptor::SetAdditionalTagsOfInterest(
-  const std::unordered_map<const char*, mitk::DICOMTag>& tagList )
+  const AdditionalTagsMapType& tagMap)
 {
-  m_AdditionalTagList = tagList;
+  m_AdditionalTagMap = tagMap;
 }
 
 
@@ -451,12 +453,6 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty( propertyKeySOPInstanceUID, this->GetProperty( "SOPInstanceUIDForSlices" ) );
   mitkImage->SetProperty( "files", this->GetProperty( "filenamesForSlices" ) );
 
-  for ( auto iter = m_AdditionalTagList.cbegin(); iter != m_AdditionalTagList.cend(); ++iter )
-  {
-    mitkImage->SetProperty( iter->first, this->GetProperty( iter->first ) );
-  }
-
-
   // second part: add properties that describe the whole image block
   mitkImage->SetProperty( "dicomseriesreader.SOPClassUID", StringProperty::New( this->GetSOPClassUID() ) );
 
@@ -508,8 +504,18 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   mitkImage->SetProperty( "dicom.pixel.Rows", this->GetProperty( "rows" ) );
   mitkImage->SetProperty( "dicom.pixel.Columns", this->GetProperty( "columns" ) );
 
+  // third part: get all found additional tags of interest
 
-  // third part: get something from ImageIO. BUT this needs to be created elsewhere. or not at all!
+  for (auto tag : m_FoundAdditionalTags)
+  {
+    BaseProperty* prop = this->GetProperty(tag);
+    if (prop)
+    {
+      mitkImage->SetProperty(tag.c_str(), prop);
+    }
+  }
+
+  // fourth part: get something from ImageIO. BUT this needs to be created elsewhere. or not at all!
 
   return mitkImage;
 }
@@ -745,8 +751,7 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     const DICOMTag tagInstanceNumber( 0x0020, 0x0013 );
     const DICOMTag tagSOPInstanceNumber( 0x0008, 0x0018 );
 
-    std::unordered_map<const char*, DICOMCachedValueLookupTable> additionalTagResultList;
-
+    std::unordered_map<std::string, DICOMCachedValueLookupTable> additionalTagResultList;
 
     unsigned int slice(0);
     int timePoint(-1);
@@ -776,16 +781,21 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
       MITK_DEBUG << "Tag info for slice " << slice << ": SL '" << sliceLocation << "' IN '" << instanceNumber
                  << "' SOP instance UID '" << sopInstanceUID << "'";
 
-      for ( auto iter = m_AdditionalTagList.cbegin(); iter != m_AdditionalTagList.cend(); ++iter )
+      for (const auto& tag : m_AdditionalTagMap)
       {
-        const DICOMDatasetFinding finding = m_TagCache->GetTagValue( *frameIter, iter->second );
-        if (finding.isValid)
+        const DICOMTagCache::FindingsListType findings = m_TagCache->GetTagValue( *frameIter, tag.first );
+        for (const auto& finding : findings)
         {
+          if (finding.isValid)
+          {
+            std::string propKey = (tag.second.empty()) ? DICOMTagPathToPropertyName(finding.path) : tag.second;
           DICOMCachedValueInfo info{ static_cast<unsigned int>(timePoint), zSlice, finding.value };
-          additionalTagResultList[iter->first].SetTableValue(slice, info);
+            additionalTagResultList[propKey].SetTableValue(slice, info);
+          }
         }
       }
     }
+
     // add property or properties with proper names
     DICOMImageBlockDescriptor* thisInstance = const_cast<DICOMImageBlockDescriptor*>( this );
     thisInstance->SetProperty( "sliceLocationForSlices",
@@ -799,9 +809,13 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
     thisInstance->SetProperty( "filenamesForSlices", StringLookupTableProperty::New( filenamesForSlices ) );
 
+
+    //add properties for additional tags of interest
+
     for ( auto iter = additionalTagResultList.cbegin(); iter != additionalTagResultList.cend(); ++iter )
     {
       thisInstance->SetProperty( iter->first, m_PropertyFunctor( iter->second ) );
+      thisInstance->m_FoundAdditionalTags.insert(m_FoundAdditionalTags.cend(),iter->first);
     }
 
     m_PropertiesOutOfDate = false;

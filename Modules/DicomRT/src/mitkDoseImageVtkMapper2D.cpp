@@ -33,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkVtkResliceInterpolationProperty.h>
 #include "mitkImageStatisticsHolder.h"
 #include "mitkPlaneClipping.h"
+#include "mitkPropertyNameHelper.h"
 
 //MITK Rendering
 #include "mitkDoseImageVtkMapper2D.h"
@@ -766,8 +767,9 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
       /* initialize level/window from DICOM tags */
       std::string sLevel;
       std::string sWindow;
-      if ( image->GetPropertyList()->GetStringProperty( "dicom.voilut.WindowCenter", sLevel )
-        && image->GetPropertyList()->GetStringProperty( "dicom.voilut.WindowWidth", sWindow ) )
+
+      if (GetBackwardsCompatibleDICOMProperty(0x0028, 0x1050, "dicom.voilut.WindowCenter", image->GetPropertyList(), sLevel)
+        && GetBackwardsCompatibleDICOMProperty(0x0028, 0x1051, "dicom.voilut.WindowWidth", image->GetPropertyList(), sWindow))
       {
         float level = atof( sLevel.c_str() );
         float window = atof( sWindow.c_str() );
@@ -776,8 +778,8 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
         std::string sSmallestPixelValueInSeries;
         std::string sLargestPixelValueInSeries;
 
-        if ( image->GetPropertyList()->GetStringProperty( "dicom.series.SmallestPixelValueInSeries", sSmallestPixelValueInSeries )
-          && image->GetPropertyList()->GetStringProperty( "dicom.series.LargestPixelValueInSeries", sLargestPixelValueInSeries ) )
+        if (GetBackwardsCompatibleDICOMProperty(0x0028, 0x0108, "dicom.series.SmallestPixelValueInSeries", image->GetPropertyList(), sSmallestPixelValueInSeries)
+          && GetBackwardsCompatibleDICOMProperty(0x0028, 0x0109, "dicom.series.LargestPixelValueInSeries", image->GetPropertyList(), sLargestPixelValueInSeries))
         {
           float smallestPixelValueInSeries = atof( sSmallestPixelValueInSeries.c_str() );
           float largestPixelValueInSeries = atof( sLargestPixelValueInSeries.c_str() );

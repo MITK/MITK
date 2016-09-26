@@ -42,28 +42,22 @@ namespace mitk
     DICOMTagsOfInterestService();
     virtual ~DICOMTagsOfInterestService();
 
-    virtual void AddTagOfInterest(const DICOMTag& tag, bool makePersistant = true) override;
+    virtual void AddTagOfInterest(const DICOMTagPath& tag, bool makePersistant = true) override;
 
-    virtual DICOMTagMapType GetTagsOfInterest() const override;
+    virtual DICOMTagPathMapType GetTagsOfInterest() const override;
 
-    virtual bool HasTag(const DICOMTag& tag) const override;
+    virtual bool HasTag(const DICOMTagPath& tag) const override;
 
-    virtual void RemoveTag(const DICOMTag& tag) override;
+    virtual void RemoveTag(const DICOMTagPath& tag) override;
 
     virtual void RemoveAllTags() override;
 
   private:
 
-    typedef std::unordered_map<std::string, DICOMTag> InternalTagMapType;
-    typedef std::unordered_map<std::string, bool> InternalPersistanceMapType;
-    typedef std::set<std::string>  InternalTagSetType;
+    typedef std::set<DICOMTagPath> InternalTagSetType;
     typedef itk::MutexLockHolder<itk::SimpleFastMutexLock> MutexHolder;
 
-    /**The set is used to ensure that strings that are passed outside as char*
-     always stay a valid pointer, even if the tag is removed from the service.*/
-    InternalTagSetType m_KnownTags;
-    InternalTagMapType m_TagMap;
-    InternalPersistanceMapType m_PersMap;
+    InternalTagSetType m_Tags;
     mutable itk::SimpleFastMutexLock m_Lock;
 
     DICOMTagsOfInterestService(const DICOMTagsOfInterestService&);

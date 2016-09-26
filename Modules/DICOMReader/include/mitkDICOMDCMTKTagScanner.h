@@ -14,12 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef mitkDICOMGDCMTagScanner_h
-#define mitkDICOMGDCMTagScanner_h
+#ifndef mitkDICOMDCMTKTagScanner_h
+#define mitkDICOMDCMTKTagScanner_h
+
+#include <set>
 
 #include "mitkDICOMTagScanner.h"
 #include "mitkDICOMEnums.h"
-#include "mitkDICOMGDCMTagCache.h"
+#include "mitkDICOMGenericTagCache.h"
 
 namespace mitk
 {
@@ -28,33 +30,14 @@ namespace mitk
     \ingroup DICOMReaderModule
     \brief Encapsulates the tag scanning process for a set of DICOM files.
 
-    Formerly integrated as a part of DICOMITKSeriesGDCMReader, the tag
-    scanning part has been factored out into this DICOMGDCMTagScanner class
-    in order to allow a single scan for multiple reader alternatives. This
-    helps much in the selection process of e.g. DICOMFileReaderSelector.
-
-    The class works similar to gdcm::Scanner, just with the MITK set of classes:
-     - add a number of DICOM tags that should be read
-     - set a list of files that should be scanned for named tags
-     - call Scan()
-     - retrieve the scan results
-       - via GetFrameInfoList() or
-       - via GetTagValue()
-
-    When used in a process where multiple classes will access the scan
-    results, care should be taken that all the tags and files of interest
-    are communicated to DICOMGDCMTagScanner before requesting the results!
-
-    @remark This scanner does only support the scanning for simple value tag.
-    If you need to scann for sequence items or non-top-level elements, this scanner
-    will not be sufficient. See i.a. DICOMDCMTKTagScanner for these cases.
+    For the scanning process it uses DCMTK functionality.
   */
-  class MITKDICOMREADER_EXPORT DICOMGDCMTagScanner : public DICOMTagScanner
+  class MITKDICOMREADER_EXPORT DICOMDCMTKTagScanner : public DICOMTagScanner
   {
     public:
 
-      mitkClassMacro(DICOMGDCMTagScanner, DICOMTagScanner);
-      itkFactorylessNewMacro( DICOMGDCMTagScanner );
+      mitkClassMacro(DICOMDCMTKTagScanner, DICOMTagScanner);
+      itkFactorylessNewMacro( DICOMDCMTKTagScanner );
       itkCloneMacro(Self);
 
       /**
@@ -99,24 +82,17 @@ namespace mitk
       */
       virtual DICOMTagCache::Pointer GetScanCache() const override;
 
-      /**
-        \brief Directly retrieve the tag value for a given frame and tag.
-        @pre Scan() must have been called before calling this function.
-      */
-      virtual DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const;
-
     protected:
 
-      DICOMGDCMTagScanner();
-      virtual ~DICOMGDCMTagScanner();
+      DICOMDCMTKTagScanner();
+      virtual ~DICOMDCMTKTagScanner();
 
-      std::set<DICOMTag> m_ScannedTags;
+      std::set<DICOMTagPath> m_ScannedTags;
       StringList m_InputFilenames;
-      DICOMGDCMTagCache::Pointer m_Cache;
-      std::shared_ptr<gdcm::Scanner> m_GDCMScanner;
+      DICOMGenericTagCache::Pointer m_Cache;
 
     private:
-      DICOMGDCMTagScanner(const DICOMGDCMTagScanner&);
+      DICOMDCMTKTagScanner(const DICOMDCMTKTagScanner&);
   };
 }
 

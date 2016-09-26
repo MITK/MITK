@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 
+#include <mitkPropertyNameHelper.h>
+
 #include "QmitkDataStorageTreeModel.h"
 #include "QmitkNodeDescriptorManager.h"
 #include <QmitkEnums.h>
@@ -433,13 +435,26 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   QString nodeName;
   if(DicomPropertiesExists(*dataNode))
   {
-    mitk::BaseProperty* seriesDescription = (dataNode->GetProperty("dicom.series.SeriesDescription"));
-    mitk::BaseProperty* studyDescription = (dataNode->GetProperty("dicom.study.StudyDescription"));
-    mitk::BaseProperty* patientsName = (dataNode->GetProperty("dicom.patient.PatientsName"));
+    mitk::BaseProperty* seriesDescription = (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103e).c_str()));
+    mitk::BaseProperty* studyDescription = (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
+    mitk::BaseProperty* patientsName = (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
 
-    nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
-    nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) +  "\n";
-    nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+    mitk::BaseProperty* seriesDescription_deprecated = (dataNode->GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription_deprecated = (dataNode->GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName_deprecated = (dataNode->GetProperty("dicom.patient.PatientsName"));
+
+    if (patientsName)
+    {
+      nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+    }
+    else
+    { /** Code coveres the deprecated property naming for backwards compatibility */
+      nodeName += QFile::encodeName(patientsName_deprecated->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(studyDescription_deprecated->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(seriesDescription_deprecated->GetValueAsString().c_str());
+    }
   }
   else
   {
@@ -479,9 +494,13 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
 bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode& node) const
 {
     bool propertiesExists = false;
-    mitk::BaseProperty* seriesDescription = (node.GetProperty("dicom.series.SeriesDescription"));
-    mitk::BaseProperty* studyDescription = (node.GetProperty("dicom.study.StudyDescription"));
-    mitk::BaseProperty* patientsName = (node.GetProperty("dicom.patient.PatientsName"));
+
+    mitk::BaseProperty* seriesDescription_deprecated = (node.GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription_deprecated = (node.GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName_deprecated = (node.GetProperty("dicom.patient.PatientsName"));
+    mitk::BaseProperty* seriesDescription = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103e).c_str()));
+    mitk::BaseProperty* studyDescription = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
+    mitk::BaseProperty* patientsName = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
 
     if(patientsName!=NULL && studyDescription!=NULL && seriesDescription!=NULL)
     {
@@ -492,6 +511,18 @@ bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode& node
             propertiesExists = true;
         }
     }
+
+    /** Code coveres the deprecated property naming for backwards compatibility */
+    if (patientsName_deprecated != NULL && studyDescription_deprecated != NULL && seriesDescription_deprecated != NULL)
+    {
+      if ((!patientsName_deprecated->GetValueAsString().empty()) &&
+        (!studyDescription_deprecated->GetValueAsString().empty()) &&
+        (!seriesDescription_deprecated->GetValueAsString().empty()))
+      {
+        propertiesExists = true;
+      }
+    }
+
     return propertiesExists;
 }
 

@@ -112,6 +112,7 @@ set(MODULE_TESTS
   mitkLevelWindowManagerCppUnitTest.cpp
   mitkVectorPropertyTest.cpp
   mitkTemporoSpatialStringPropertyTest.cpp
+  mitkPropertyNameHelperTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

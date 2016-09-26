@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRTConstants.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkDICOMTagPath.h>
 
 #include "usModuleContext.h"
 #include "usGetModuleContext.h"

@@ -96,6 +96,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkProgressBar.h"
+#include "mitkPropertyNameHelper.h"
 #include <mitkDicomSeriesReader.h>
 
 bool mitk::DataNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
@@ -282,11 +283,13 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     {
       std::string nodeName(uid);
       std::string studyDescription;
-      if ( node->GetStringProperty( "dicom.study.StudyDescription", studyDescription ) )
+
+      if (GetBackwardsCompatibleDICOMProperty(0x0008, 0x1030, "dicom.study.StudyDescription", node->GetPropertyList(), studyDescription))
       {
         nodeName = studyDescription;
         std::string seriesDescription;
-        if ( node->GetStringProperty( "dicom.series.SeriesDescription", seriesDescription ) )
+
+        if (GetBackwardsCompatibleDICOMProperty(0x0008, 0x103e, "dicom.study.SeriesDescription", node->GetPropertyList(), seriesDescription))
         {
           nodeName += "/" + seriesDescription;
         }

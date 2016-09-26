@@ -195,7 +195,7 @@ mitk::DICOMFileReaderSelector
   // let all readers analyze the file set
   for ( auto rIter = m_Readers.cbegin(); rIter != m_Readers.cend(); ++rIter )
   {
-    gdcmScanner->AddTags( (*rIter)->GetTagsOfInterest() );
+    gdcmScanner->AddTagPaths((*rIter)->GetTagsOfInterest());
   }
 
   gdcmScanner->Scan();
@@ -205,7 +205,7 @@ mitk::DICOMFileReaderSelector
   for ( auto rIter = m_Readers.cbegin(); rIter != m_Readers.cend(); ++readerIndex, ++rIter )
   {
     (*rIter)->SetInputFiles( m_InputFilenames );
-    (*rIter)->SetTagCache( gdcmScanner.GetPointer() );
+    (*rIter)->SetTagCache( gdcmScanner->GetScanCache() );
     try
     {
       (*rIter)->AnalyzeInputFiles();

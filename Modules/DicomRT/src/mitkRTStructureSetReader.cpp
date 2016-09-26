@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 #include <mitkBaseRenderer.h>
-#include "mitkDICOMTagHelper.h"
+#include "mitkDICOMTagPath.h"
 
 namespace mitk
 {
@@ -243,12 +243,12 @@ namespace mitk
             //add uid and patient uid to property
             OFString uid;
             structureSetObject.getSeriesInstanceUID(uid);
-            std::string uidPropertyName = mitk::GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0020, 0x000e));
+            std::string uidPropertyName = mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0020, 0x000e));
             contourSet->SetProperty(uidPropertyName.c_str(), mitk::StringProperty::New(uid.c_str()));
 
             OFString patientUid;
             structureSetObject.getPatientID(patientUid);
-            std::string patientUidPropertyName = mitk::GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0010,
+            std::string patientUidPropertyName = mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010,
                 0x0020));
             contourSet->SetProperty(patientUidPropertyName.c_str(),
                 mitk::StringProperty::New(patientUid.c_str()));

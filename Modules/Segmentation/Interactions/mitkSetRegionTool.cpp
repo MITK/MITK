@@ -106,11 +106,9 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   fillHolesFilter->SetInput(regionGrower->GetOutput());
   fillHolesFilter->SetForegroundValue(1);
 
-//<<<<<<< HEAD
   //Store result and preview
   mitk::Image::Pointer resultImage = mitk::GrabItkImageMemory(fillHolesFilter->GetOutput());
   resultImage->SetGeometry(workingSlice->GetGeometry());
-//=======
   // Get the current working color
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return;
@@ -122,61 +120,6 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   {
     activeColor = labelImage->GetActiveLabel()->GetValue();
   }
-
-
-//  // 2. Determine the contour that surronds the selected "piece of the image"
-//
-//  // find a contour seed point
-//  unsigned int oneContourOffset = static_cast<unsigned int>( m_SeedPointMemoryOffset ); // safe because of earlier check if m_SeedPointMemoryOffset < 0
-//
-//  /**
-//    * The logic of finding a starting point for the contour is the following:
-//    *
-//    *  - If the initial seed point is 0, we are either inside a hole or outside of every segmentation.
-//    *    We move to the right until we hit a 1, which must be part of a contour.
-//    *
-//    *  - If the initial seed point is 1, then ...
-//    *    we now do the same (running to the right) until we hit a 1
-//    *
-//    *  In both cases the found contour point is used to extract a contour and
-//    *  then a test is applied to find out if the initial seed point is contained
-//    *  in the contour. If this is the case, filling should be applied, otherwise
-//    *  nothing is done.
-//    */
-//  unsigned int size = originalPicSlice->n[0] * originalPicSlice->n[1];
-///*
-//  unsigned int rowSize = originalPicSlice->n[0];
-//*/
-//  ipMITKSegmentationTYPE* data = static_cast<ipMITKSegmentationTYPE*>(originalPicSlice->data);
-//
-//  if ( data[oneContourOffset] == 0 ) // initial seed 0
-//  {
-//    for ( ; oneContourOffset < size; ++oneContourOffset )
-//    {
-//      if ( data[oneContourOffset] > 0 ) break;
-//    }
-//  }
-//  else if ( data[oneContourOffset] == activeColor ) // initial seed 1
-//  {
-//    unsigned int lastValidPixel = size-1; // initialization, will be changed lateron
-//    bool inSeg = true;    // inside segmentation?
-//    for ( ; oneContourOffset < size; ++oneContourOffset )
-//    {
-//      if ( ( data[oneContourOffset] != activeColor ) && inSeg ) // pixel 0 and inside-flag set: this happens at the first pixel outside a filled region
-//      {
-//        inSeg = false;
-//        lastValidPixel = oneContourOffset - 1; // store the last pixel position inside a filled region
-//        break;
-//      }
-//      else // pixel 1, inside-flag doesn't matter: this happens while we are inside a filled region
-//      {
-//        inSeg = true; // first iteration lands here
-//      }
-//
-//    }
-//    oneContourOffset = lastValidPixel;
-//  }
-//>>>>>>> origin/bug-18647-multilabelsegmentationplugin-integration-2015-11-25
 
   mitk::ImageToContourModelFilter::Pointer contourextractor = mitk::ImageToContourModelFilter::New();
   contourextractor->SetInput(resultImage);
@@ -228,8 +171,6 @@ void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   }
 
   mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, slice, image, m_PaintingPixelValue*activeColor);
-
-  //FeedbackContourTool::FillContourInSlice( projectedContour, timeStep, slice, m_PaintingPixelValue );
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 }

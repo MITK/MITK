@@ -171,6 +171,7 @@ public:
      * @see GuiTk::IControlListener
      */
     public: void ControlActivated(GuiTk::ControlEvent::Pointer e) override;
+    public: void ControlDestroyed(GuiTk::ControlEvent::Pointer) override;
 
     /**
      * @see GuiTk::IControlListener

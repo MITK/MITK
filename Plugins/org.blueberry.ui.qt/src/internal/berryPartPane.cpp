@@ -148,9 +148,14 @@ void PartPane::ControlActivated(GuiTk::ControlEvent::Pointer /*e*/)
   }
 }
 
+void PartPane::ControlDestroyed(GuiTk::ControlEvent::Pointer)
+{
+  control = nullptr;
+}
+
 GuiTk::IControlListener::Events::Types PartPane::GetEventTypes() const
 {
-  return GuiTk::IControlListener::Events::ACTIVATED;
+  return GuiTk::IControlListener::Events::ACTIVATED | GuiTk::IControlListener::Events::DESTROYED;
 }
 
 void PartPane::MoveAbove(QWidget* refControl)

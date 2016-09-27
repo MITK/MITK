@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkLabelSetImage.h"
 
 #include "mitkCorrectorTool2D.xpm"
+#include "mitkLabelSetImage.h"
 
 // us
 #include <usModule.h>
@@ -169,9 +170,11 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   algorithm->SetContour( singleTimestepContour );
 
   mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
+  int workingColorId (1);
   if (labelSetImage.IsNotNull())
   {
-    algorithm->SetFillColor(labelSetImage->GetActiveLabel()->GetValue());
+    workingColorId = labelSetImage->GetActiveLabel()->GetValue();
+    algorithm->SetFillColor(workingColorId);
   }
   try
   {
@@ -184,8 +187,17 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
-  mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
-  resultSlice->SetVolume(imAccess.GetData());
 
-  this->WriteBackSegmentationResult(positionEvent, resultSlice);
+  if (labelSetImage.IsNotNull())
+  {
+    mitk::Image::Pointer erg1 = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, image);
+    SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), image, workingColorId, 0);
+    SegTool2D::WriteBackSegmentationResult(positionEvent, erg1);
+  }
+  else
+  {
+    mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
+    resultSlice->SetVolume(imAccess.GetData());
+    this->WriteBackSegmentationResult(positionEvent, resultSlice);
+  }
 }

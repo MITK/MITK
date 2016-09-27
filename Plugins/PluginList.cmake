@@ -72,4 +72,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF
+  org.mitk.gui.qt.multilabelsegmentation:ON
 )

@@ -50,6 +50,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUndoController.h"
 
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkImageToItk.h"
+#include "mitkImageCast.h"
+#include "mitkLabelSetImage.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -481,11 +485,92 @@ void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& mess
     << " If your image is rotated or the 2D views don't really contain the patient image, try to press the button next to the image selection. " << std::endl
     << "  " << std::endl
     << " Please file a BUG REPORT: " << std::endl
-    << " http://bugs.mitk.org" << std::endl
+    << " https://phabricator.mitk.org/" << std::endl
     << " Contain the following information:" << std::endl
     << "  - What image were you working on?" << std::endl
     << "  - Which region of the image?" << std::endl
     << "  - Which tool did you use?" << std::endl
     << "  - What did you do?" << std::endl
     << "  - What happened (not)? What did you expect?" << std::endl;
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void InternalWritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* targetSlice, const mitk::Image* sourceSlice, mitk::Image* originalImage, int overwritevalue )
+{
+  typedef itk::Image<TPixel,VImageDimension> SliceType;
+
+  typename SliceType::Pointer sourceSliceITK;
+  CastToItkImage( sourceSlice, sourceSliceITK );
+
+  // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels that are non-zero
+  typedef itk::ImageRegionIterator< SliceType >        OutputIteratorType;
+  typedef itk::ImageRegionConstIterator< SliceType >   InputIteratorType;
+
+  InputIteratorType inputIterator( sourceSliceITK, sourceSliceITK->GetLargestPossibleRegion() );
+  OutputIteratorType outputIterator( targetSlice, targetSlice->GetLargestPossibleRegion() );
+
+  outputIterator.GoToBegin();
+  inputIterator.GoToBegin();
+
+  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(originalImage);
+  assert (workingImage);
+
+  int activePixelValue = workingImage->GetActiveLabel()->GetValue();
+
+  if (activePixelValue == 0) // if exterior is the active label
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      if (inputIterator.Get() != 0)
+      {
+        outputIterator.Set( overwritevalue );
+      }
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+  else if (overwritevalue != 0) // if we are not erasing
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      int targetValue = static_cast<int>(outputIterator.Get());
+      if ( inputIterator.Get() != 0 )
+      {
+        if (!workingImage->GetLabel(targetValue)->GetLocked())
+        {
+          outputIterator.Set( overwritevalue );
+        }
+      }
+      if (targetValue == overwritevalue)
+      {
+          outputIterator.Set( inputIterator.Get() );
+      }
+
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+  else // if we are erasing
+  {
+    while ( !outputIterator.IsAtEnd() )
+    {
+      const int targetValue = outputIterator.Get();
+      if (inputIterator.Get() != 0)
+      {
+        if (targetValue == activePixelValue)
+          outputIterator.Set( overwritevalue );
+      }
+
+      ++outputIterator;
+      ++inputIterator;
+    }
+  }
+}
+
+
+
+void mitk::SegTool2D::WritePreviewOnWorkingImage( Image* targetSlice, Image* sourceSlice, mitk::Image* workingImage, int paintingPixelValue, int timestep )
+{
+  if ((!targetSlice) || (!sourceSlice)) return;
+  AccessFixedDimensionByItk_3( targetSlice, InternalWritePreviewOnWorkingImage, 2, sourceSlice, workingImage, paintingPixelValue );
 }

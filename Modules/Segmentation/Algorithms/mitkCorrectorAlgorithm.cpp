@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageRegionIterator.h"
 #include "itkCastImageFilter.h"
 
+
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()
   :ImageToImageFilter()
   , m_FillColor(1)
@@ -84,6 +85,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   }
 
   Image::Pointer temporarySlice;
+
   // Convert to DefaultSegmentationDataType (because TobiasHeimannCorrectionAlgorithm relys on that data type)
   {
     itk::Image< DefaultSegmentationDataType, 2 >::Pointer correctPixelTypeImage;
@@ -96,11 +98,15 @@ void mitk::CorrectorAlgorithm::GenerateData()
     // virtual void mitk::SlicedGeometry3D::SetSpacing(const mitk::Vector3D&): Assertion `aSpacing[0]>0 && aSpacing[1]>0 && aSpacing[2]>0' failed
     // solution here: we overwrite it with an unity matrix
     itk::Image< DefaultSegmentationDataType, 2 >::DirectionType imageDirection;
+
     imageDirection.SetIdentity();
     //correctPixelTypeImage->SetDirection(imageDirection);
 
     temporarySlice = this->GetOutput();
     //  temporarySlice = ImportItkImage( correctPixelTypeImage );
+    //m_FillColor = 1;
+    m_EraseColor = 0;
+
     ImprovedHeimannCorrectionAlgorithm(correctPixelTypeImage);
 
     //this is suboptimal, needs to be kept synchronous to DefaultSegmentationDataType
@@ -225,20 +231,6 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(itk::Image< De
     previousIndex = currentIndex;
   }
 
-  // Check if only on Segment
-  if (firstSegment && currentSegment.points.size() > 0)
-  {
-    ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(m_WorkingImage, m_Contour, true, false);
-    projectedContour->Close();
-    if (firstPointIsFillingColor)
-    {
-      ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_EraseColor);
-    }
-    else
-    {
-      ContourModelUtils::FillContourInSlice(projectedContour, 0, m_WorkingImage, m_FillColor);
-    }
-  }
   return true;
 }
 
@@ -266,7 +258,6 @@ void mitk::CorrectorAlgorithm::ColorSegment(const mitk::CorrectorAlgorithm::TSeg
 itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 >::Pointer mitk::CorrectorAlgorithm::CloneImage(itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 >::Pointer pic)
 {
   typedef itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 > ItkImageType;
-
   typedef itk::ImageDuplicator< ItkImageType > DuplicatorType;
   DuplicatorType::Pointer duplicator = DuplicatorType::New();
   duplicator->SetInputImage(pic);
@@ -450,8 +441,6 @@ int mitk::CorrectorAlgorithm::FillRegion(const std::vector<itk::Index<2> > &seed
 
   return numberOfPixel;
 }
-
-
 
 void mitk::CorrectorAlgorithm::OverwriteImage(itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 >::Pointer source, itk::Image< mitk::CorrectorAlgorithm::DefaultSegmentationDataType, 2 >::Pointer target)
 {

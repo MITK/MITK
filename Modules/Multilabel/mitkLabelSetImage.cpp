@@ -35,6 +35,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkCommand.h>
 
+template<typename TPixel, unsigned int VDimensions>
+void SetToZero(itk::Image< TPixel, VDimensions> * source)
+{
+  source->FillBuffer(0);
+}
+
+
 mitk::LabelSetImage::LabelSetImage() :
 mitk::Image(),
 m_ActiveLayer(0),
@@ -108,6 +115,16 @@ void mitk::LabelSetImage::Initialize(const mitk::Image* other)
   auto originalGeometry = other->GetTimeGeometry()->Clone();
   this->SetTimeGeometry(originalGeometry);
 
+  // initialize image memory to zero
+  if (4 == this->GetDimension())
+  {
+    AccessFixedDimensionByItk(this, SetToZero, 4);
+  }
+  else
+  {
+    AccessByItk(this, SetToZero);
+  }
+
   // Add a inital LabelSet ans corresponding image data to the stack
   AddLayer();
 }
@@ -151,12 +168,6 @@ void mitk::LabelSetImage::RemoveLayer()
   m_LayerContainer.erase(m_LayerContainer.begin() + layerToDelete);
 
   this->Modified();
-}
-
-template<typename TPixel, unsigned int VDimensions>
-void SetToZero(itk::Image< TPixel, VDimensions> * source)
-{
-  source->FillBuffer(0);
 }
 
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
@@ -246,15 +257,31 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
 {
   try
   {
-    if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()))
+    if (4 == this->GetDimension())
     {
-      BeforeChangeLayerEvent.Send();
+      if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()))
+      {
+        BeforeChangeLayerEvent.Send();
 
-      AccessByItk_1(this, ImageToLayerContainerProcessing, GetActiveLayer());
-      m_ActiveLayer = layer; // only at this place m_ActiveLayer should be manipulated!!! Use Getter and Setter
-      AccessByItk_1(this, LayerContainerToImageProcessing, GetActiveLayer());
+        AccessFixedDimensionByItk_n(this, ImageToLayerContainerProcessing, 4, (GetActiveLayer()));
+        m_ActiveLayer = layer; // only at this place m_ActiveLayer should be manipulated!!! Use Getter and Setter
+        AccessFixedDimensionByItk_n(this, LayerContainerToImageProcessing, 4, (GetActiveLayer()));
 
-      AfterChangeLayerEvent.Send();
+        AfterChangeLayerEvent.Send();
+      }
+    }
+    else
+    {
+      if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()))
+      {
+        BeforeChangeLayerEvent.Send();
+
+        AccessByItk_1(this, ImageToLayerContainerProcessing, GetActiveLayer());
+        m_ActiveLayer = layer; // only at this place m_ActiveLayer should be manipulated!!! Use Getter and Setter
+        AccessByItk_1(this, LayerContainerToImageProcessing, GetActiveLayer());
+
+        AfterChangeLayerEvent.Send();
+      }
     }
   }
   catch (itk::ExceptionObject& e)
@@ -731,11 +758,13 @@ void mitk::LabelSetImage::ConcatenateProcessing(ImageType* itkTarget, mitk::Labe
   }
 }
 
-template < typename ImageType >
-void mitk::LabelSetImage::LayerContainerToImageProcessing(ImageType* target, unsigned int layer)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::LabelSetImage::LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension>* target, unsigned int layer)
 {
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typename ImageType::Pointer itkSource;
-  mitk::CastToItkImage(m_LayerContainer[layer], itkSource);
+  //mitk::CastToItkImage(m_LayerContainer[layer], itkSource);
+  itkSource = ImageToItkImage<TPixel, VImageDimension >(m_LayerContainer[layer]);
   typedef itk::ImageRegionConstIterator< ImageType >  SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >       TargetIteratorType;
 
@@ -753,11 +782,13 @@ void mitk::LabelSetImage::LayerContainerToImageProcessing(ImageType* target, uns
   }
 }
 
-template < typename ImageType >
-void mitk::LabelSetImage::ImageToLayerContainerProcessing(ImageType* source, unsigned int layer) const
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::LabelSetImage::ImageToLayerContainerProcessing(itk::Image<TPixel, VImageDimension>* source, unsigned int layer) const
 {
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
   typename ImageType::Pointer itkTarget;
-  mitk::CastToItkImage(m_LayerContainer[layer], itkTarget);
+  //mitk::CastToItkImage(m_LayerContainer[layer], itkTarget);
+  itkTarget = ImageToItkImage<TPixel, VImageDimension >(m_LayerContainer[layer]);
 
   typedef itk::ImageRegionConstIterator< ImageType >   SourceIteratorType;
   typedef itk::ImageRegionIterator< ImageType >        TargetIteratorType;

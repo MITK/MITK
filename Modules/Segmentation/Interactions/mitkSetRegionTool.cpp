@@ -20,6 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBaseRenderer.h"
 #include "mitkImageDataItem.h"
+#include "mitkLegacyAdaptors.h"
+#include "mitkLabelSetImage.h"
 
 #include <mitkITKImageImport.h>
 #include <mitkImageToContourModelFilter.h>
@@ -107,6 +109,17 @@ void mitk::SetRegionTool::OnMousePressed ( StateMachineAction*, InteractionEvent
   //Store result and preview
   mitk::Image::Pointer resultImage = mitk::GrabItkImageMemory(fillHolesFilter->GetOutput());
   resultImage->SetGeometry(workingSlice->GetGeometry());
+  // Get the current working color
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  if (!workingNode) return;
+
+  Image* image = dynamic_cast<Image*>(workingNode->GetData());
+  LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);
+  int activeColor = 1;
+  if (labelImage != 0)
+  {
+    activeColor = labelImage->GetActiveLabel()->GetValue();
+  }
 
   mitk::ImageToContourModelFilter::Pointer contourextractor = mitk::ImageToContourModelFilter::New();
   contourextractor->SetInput(resultImage);
@@ -150,7 +163,14 @@ void mitk::SetRegionTool::OnMouseReleased( StateMachineAction*, InteractionEvent
   // false: don't constrain the contour to the image's inside
   if (projectedContour.IsNull()) return;
 
-  FeedbackContourTool::FillContourInSlice( projectedContour, timeStep, slice, m_PaintingPixelValue );
+  LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image);
+  int activeColor = 1;
+  if (labelImage != 0)
+  {
+    activeColor = labelImage->GetActiveLabel()->GetValue();
+  }
+
+  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, slice, image, m_PaintingPixelValue*activeColor);
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 }

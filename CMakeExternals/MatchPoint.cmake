@@ -25,9 +25,8 @@ if(NOT MatchPoint_DIR)
     set(download_step SOURCE_DIR ${MatchPoint_SOURCE_DIR})
   else()
     set(download_step
-        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev1372.tar.gz
-        URL_MD5 bfaabc06873a532c06bf9dfea173d3aa
-        #SOURCE_DIR ${ep_prefix}/${proj}
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev1481.tar.gz
+        URL_MD5 82b9b1bb3f909f2e00397e285ce8c981
        )
   endif()
 

@@ -597,18 +597,13 @@ void mitk::USDevice::GenerateData()
   }
 
   // copy contents of the given image into the member variable, slice after slice
-  bool isSet = true;
-  int sliceNumber = 0;
-  while(isSet) {
-    if (isSet = m_Image->IsSliceSet(sliceNumber)) {
+  for (int sliceNumber = 0; sliceNumber < m_Image->GetDimension(2); ++sliceNumber)
+  {
+    if (m_Image->IsSliceSet(sliceNumber)) {
       mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
       output->SetSlice(inputReadAccessor.GetData(), sliceNumber);
     }
-    else {
-      break;
-    }
-    ++sliceNumber;
-  }
+ }
 
   output->SetGeometry(m_Image->GetGeometry());
   m_ImageMutex->Unlock();

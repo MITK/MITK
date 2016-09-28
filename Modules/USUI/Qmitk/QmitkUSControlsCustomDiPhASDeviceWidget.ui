@@ -35,7 +35,34 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <widget class="QLabel" name="GeneralLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;General Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="General">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="UseBModeFilter">
+       <property name="text">
+        <string>Use BMode Envelope Filter</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
@@ -50,9 +77,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="EventDisplaylabel">
+      <widget class="QLabel" name="EventDisplayLabel">
        <property name="text">
-        <string>Display Event Number</string>
+        <string>Display Events</string>
        </property>
       </widget>
      </item>

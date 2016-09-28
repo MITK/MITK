@@ -81,11 +81,14 @@ public:
   */
   void UpdateImageGeometry();
 
-  void setGUIOutput(std::function<void(QString)> out);
+  void SetGUIOutput(std::function<void(QString)> out);
 
-  void setDataType(int DataT);
-  void UpdateImageDataType(int imageHeight, int imageWidth);
+  void SetDataType(int DataT);
   void SetDisplayedEvent(int event);
+  void SetUseBModeFilter(bool isSet);
+
+  void UpdateImageDataType(int imageHeight, int imageWidth);
+  
 
 protected:
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
@@ -105,6 +108,7 @@ protected:
   int                             displayedEvent;
   BeamformerStateInfoNative       BeamformerInfos;
   int                             DataType;       // 0: Use image data; 1: Use beamformed data
+  bool                            useBModeFilter;
 };
 } // namespace mitk
 

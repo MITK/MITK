@@ -26,7 +26,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   useGUIOutPut(false),
   DataType(0),
   displayedEvent(0),
-  m_GUIOutput(nullptr)
+  m_GUIOutput(nullptr),
+  useBModeFilter(false)
 {
 }
 
@@ -63,33 +64,51 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     }
 
-    // copy contents of the given image into the member variable, slice after slice
-    bool isSet = true;
-    int sliceNumber = 0;
-    while(isSet) {
-      if (isSet = m_Image->IsSliceSet(sliceNumber)) {
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
-        image->SetSlice(inputReadAccessor.GetData(), sliceNumber);
-
-        typedef itk::Image< float, 3 > itkFloatImageType;
-        typedef itk::Image< unsigned char, 3 > itkUcharImageType;
-        typedef itk::PhotoacousticBModeImageFilter < itkFloatImageType, itkUcharImageType > PhotoacousticBModeImageFilter;
+    if (!useBModeFilter)
+    {
+      // copy contents of the given image into the member variable, slice after slice
+      for (int sliceNumber = 0; sliceNumber < m_Image->GetDimension(2); ++sliceNumber)
+      {
+        if (m_Image->IsSliceSet(sliceNumber)) {
+          mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
+          image->SetSlice(inputReadAccessor.GetData(), sliceNumber);
+        }
+      }
+    }
+    else {
+      // feed the m_image to the BMode filter and grab it back; 
+      // input type has to be a floating point number, thus we have a little bit more performance loss,
+      // as the image needs to be casted and copied into a float image, in addition to being fitted with the envelope filter
+      if (DataType == 0)
+      {
+        typedef itk::Image< float, 3 > itkInputImageType;
+        typedef itk::Image< unsigned char, 3 > itkOutputImageType;
+        typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
 
         PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
-        itkFloatImageType::Pointer itkImage;
+        itkInputImageType::Pointer itkImage;
+
         mitk::CastToItkImage(m_Image, itkImage);
         photoacousticBModeFilter->SetInput(itkImage);
         photoacousticBModeFilter->SetDirection(0);
         image = mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
-        /**
-         *this is just a Test to set up everything for the BModeFilterImplementation
-         */
-      }
-      else {
-        break;
-      }
-      ++sliceNumber;
+      } // DataType == 0 : imageData -> uchar output type
+      else if (DataType == 1)
+      {
+        typedef itk::Image< float, 3 > itkInputImageType;
+        typedef itk::Image< short, 3 > itkOutputImageType;
+        typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
+
+        PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
+        itkInputImageType::Pointer itkImage;
+
+        mitk::CastToItkImage(m_Image, itkImage);
+        photoacousticBModeFilter->SetInput(itkImage);
+        photoacousticBModeFilter->SetDirection(0);
+        image = mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
+      } // DataType == 1 : beamformed -> short output type
     }
+    // always copy the geometry from the m_Image
     image->SetGeometry(m_Image->GetGeometry());
   }
 
@@ -240,7 +259,7 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   MITK_INFO << "new spacing: " << spacing;
 }
 
-void mitk::USDiPhASImageSource::setDataType(int DataT)
+void mitk::USDiPhASImageSource::SetDataType(int DataT)
 {
   if (DataT != DataType)
   {
@@ -256,7 +275,12 @@ void mitk::USDiPhASImageSource::SetDisplayedEvent(int event)
   UpdateImageDataType(ScanMode.imageHeight, ScanMode.imageWidth);
 }
 
-void mitk::USDiPhASImageSource::setGUIOutput(std::function<void(QString)> out)
+void mitk::USDiPhASImageSource::SetGUIOutput(std::function<void(QString)> out)
 {
   USDiPhASImageSource::m_GUIOutput = out;
+}
+
+void mitk::USDiPhASImageSource::SetUseBModeFilter(bool isSet)
+{
+  useBModeFilter = isSet;
 }

@@ -67,6 +67,7 @@ protected:
   */
 
   virtual void OnSetEventDisplay(int event) override;
+  virtual void OnSetUseBModeFilter(bool isSet) override;
 
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us) override;

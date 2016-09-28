@@ -48,6 +48,7 @@ public:
   virtual bool GetIsActive( ) override;
 
   virtual void SetEventDisplay(int event);
+  virtual void SetUseBModeFilter(bool isSet);
 
   //Transmit
   virtual void SetTransmitPhaseLength(double us);
@@ -93,6 +94,7 @@ protected:
     */
 
   virtual void OnSetEventDisplay(int event);
+  virtual void OnSetUseBModeFilter(bool isSet);
 
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us);

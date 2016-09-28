@@ -49,6 +49,11 @@ bool mitk::USDiPhASDeviceCustomControls::GetSilentUpdate()
 
 //Set Functions
 
+void mitk::USDiPhASDeviceCustomControls::SetUseBModeFilter(bool isSet)
+{
+  this->OnSetUseBModeFilter(isSet);
+}
+
 void mitk::USDiPhASDeviceCustomControls::SetEventDisplay(int event)
 {
   this->OnSetEventDisplay(event);
@@ -147,6 +152,7 @@ void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
 
 //OnSetDummies
 void mitk::USDiPhASDeviceCustomControls::OnSetEventDisplay(int event) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetUseBModeFilter(bool isSet) {}
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double ms) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double MHz) {}

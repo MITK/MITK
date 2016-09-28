@@ -128,13 +128,7 @@ void UltrasoundSupport::OnClickedAddNewDevice()
 void UltrasoundSupport::UpdateAmountOfOutputs()
 {
   //Update the amount of Nodes; there should be one Node for every slide
-  bool isSet = true;
-  m_AmountOfOutputs = 0;
-  while (isSet) {
-    isSet = AllImagesOutput->IsSliceSet(m_AmountOfOutputs);
-    if (isSet)
-      ++m_AmountOfOutputs;
-  }
+  m_AmountOfOutputs = AllImagesOutput->GetDimension(2);
 
   // correct the amount of Nodes to display data
   while (m_Node.size() < m_AmountOfOutputs) {

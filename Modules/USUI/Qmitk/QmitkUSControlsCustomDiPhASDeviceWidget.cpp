@@ -82,6 +82,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnLowCutChanged();
   OnHighCutChanged();
   OnEventDisplayChanged();
+  OnUseBModeFilterChanged();
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
 
@@ -92,6 +93,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 {
   ui->setupUi(this);
 
+  connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
   connect(ui->EventDisplay, SIGNAL(valueChanged(int)), this, SLOT(OnEventDisplayChanged()));
 
   //transmit
@@ -121,6 +123,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 }
 
 //slots
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnUseBModeFilterChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  bool UseBModeFilter = ui->UseBModeFilter->isChecked();
+  m_ControlInterface->SetUseBModeFilter(UseBModeFilter);
+}
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnEventDisplayChanged()
 {

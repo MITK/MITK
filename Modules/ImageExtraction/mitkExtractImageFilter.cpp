@@ -30,7 +30,7 @@ mitk::ExtractImageFilter::ExtractImageFilter()
  m_TimeStep(0),
  m_DirectionCollapseToStrategy( DIRECTIONCOLLAPSETOGUESS )
 {
-  MITK_WARN << "Class ExtractImageFilter is deprecated! Use ExtractSliceFilter instead.";
+  //MITK_WARN << "Class ExtractImageFilter is deprecated! Use ExtractSliceFilter instead.";
 }
 
 mitk::ExtractImageFilter::~ExtractImageFilter()

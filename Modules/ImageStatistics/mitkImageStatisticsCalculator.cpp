@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
-#include "mitkExtractSliceFilter.h"
+#include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkITKImageImport.h"
 
@@ -1016,28 +1016,16 @@ namespace mitk
         unsigned int slice = index[axis];
         m_PlanarFigureSlice = slice;
 
-        int sliceindex = slice;
-        bool isFrontside = true;
-        bool isRotated = false;
-
-        mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-        plane->InitializeStandardPlane(timeSliceImage->GetGeometry(), mitk::PlaneGeometry::Axial, sliceindex, isFrontside, isRotated);
-        mitk::Point3D origin = plane->GetOrigin();
-        mitk::Vector3D normal;
-        normal = plane->GetNormal();
-        normal.Normalize();
-        origin += normal * 0.5;//pixelspacing is 1, so half the spacing is 0.5
-        plane->SetOrigin(origin);
 
         // Extract slice with given position and direction from image
         unsigned int dimension = timeSliceImage->GetDimension();
 
         if (dimension != 2)
         {
-          ExtractSliceFilter::Pointer imageExtractor = ExtractSliceFilter::New();
+          ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
           imageExtractor->SetInput( timeSliceImage );
-          imageExtractor->SetOutputDimensionality(axis);
-          imageExtractor->SetWorldGeometry(plane);
+          imageExtractor->SetSliceDimension( axis );
+          imageExtractor->SetSliceIndex( slice );
           imageExtractor->Update();
           m_InternalImage = imageExtractor->GetOutput();
         }

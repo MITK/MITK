@@ -27,6 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkOpotekPumpLaserController.h>
 #include <mitkGalilMotor.h>
 
+#include <vector>
+
 /**
   \brief OPOLaserControl
 
@@ -53,6 +55,9 @@ class OPOLaserControl : public QmitkAbstractView
     void InitLaser();
     void TuneWavelength();
     void StartFastTuning();
+
+    void ShutterCountDown();
+
     void ToggleFlashlamp();
     void ToggleQSwitch();
     void SyncWavelengthSetBySlider();

@@ -79,7 +79,6 @@ std::string mitk::OpotekPumpLaserController::SendAndReceiveLine(const std::strin
   
   std::string message;
 
-  //message = *input + std::string(1, CR);
   message = *input + '\n';
 
   // Clear send buffer
@@ -303,7 +302,8 @@ bool mitk::OpotekPumpLaserController::StartFlashing()
       return false;
     }
   }
-  MITK_INFO << "[Pump Laser] " << "Flashlamps are already running";
+  else
+    MITK_INFO << "[Pump Laser] " << "Flashlamps are already running";
   
   return true;
 }
@@ -334,7 +334,9 @@ bool mitk::OpotekPumpLaserController::StopFlashing()
     }
 
   }
-  MITK_INFO << "[Pump Laser] " << "Flashlamps are not running";
+  else
+    MITK_INFO << "[Pump Laser] " << "Flashlamps are not running";
+
   return true;
 }
 

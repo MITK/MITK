@@ -1,6 +1,5 @@
 #AUTO
 #MAIN
-count=-1;
 WT 1
 'AMP SETTINGS
 AU 0
@@ -31,10 +30,8 @@ WT 10
 SP 3000000
 AC 60000000
 DC 60000000
-count=0;idx=0;'DM pos[2]
-'pos[0]=-7000
-'pos[1]=4000
-points=pos[-1]
+count=0
+idx=0
 #MOVE
 II 1
 WT 5

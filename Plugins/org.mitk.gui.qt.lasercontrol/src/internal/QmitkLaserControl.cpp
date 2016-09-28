@@ -180,14 +180,17 @@ void OPOLaserControl::TuneWavelength()
 void OPOLaserControl::StartFastTuning()
 {
   std::vector<double> listOfWavelengths;
-  listOfWavelengths.push_back(725 - 1);
-  listOfWavelengths.push_back(750 - 1);
-  listOfWavelengths.push_back(775 - 1);
-  listOfWavelengths.push_back(800 - 1);
-  listOfWavelengths.push_back(825 - 1);
-  listOfWavelengths.push_back(850 - 1);
-  listOfWavelengths.push_back(875 - 1);
-  listOfWavelengths.push_back(900 - 1);
+  listOfWavelengths.push_back(700);
+  listOfWavelengths.push_back(720);
+  listOfWavelengths.push_back(740);
+  listOfWavelengths.push_back(760);
+  listOfWavelengths.push_back(780);
+  listOfWavelengths.push_back(800);
+  listOfWavelengths.push_back(820);
+  listOfWavelengths.push_back(840);
+  listOfWavelengths.push_back(860);
+  listOfWavelengths.push_back(880);
+  listOfWavelengths.push_back(900);
   m_OPOMotor->FastTuneWavelengths(listOfWavelengths);
 
   //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);

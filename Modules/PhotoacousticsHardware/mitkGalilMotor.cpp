@@ -195,18 +195,19 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
   m_ReturnCode = GProgramDownload(m_GalilSystem, "", 0); // Erase the program on the system
   MITK_INFO << "[Galil Debug] after empty GProgramDownload: " << m_ReturnCode << "";
   GSleep(1000);
-  std::string positionsCommand("#AUTO\nDM pos[" + std::to_string(wavelengthList.size()) + "]\n");
+  std::string positionsCommand("#AUTO\n#PARA\nDA pos[0]\npoints = "+std::to_string(wavelengthList.size())+"\nDM pos[" + std::to_string(wavelengthList.size()) + "];\n");
 
   for (int wavelengthIterator = 0; wavelengthIterator < wavelengthList.size(); wavelengthIterator++)
   {
     positionsCommand += "pos[" + std::to_string(wavelengthIterator) + "]=" + std::to_string(this->GetPositionFromWavelength(wavelengthList[wavelengthIterator])) + "\n";
   }
-  positionsCommand += "points="+std::to_string(wavelengthList.size());
+  positionsCommand += "EN\n";
 
   m_ReturnCode = GProgramDownload(m_GalilSystem, positionsCommand.c_str(), 0);
   MITK_INFO << "[Galil Debug] after sending positions command(" << positionsCommand << "): " << m_ReturnCode << "";
-  m_ReturnCode = GCmd(m_GalilSystem, "XQ"); // FTUNE
   GSleep(1000);
+  m_ReturnCode = GCmd(m_GalilSystem, "XQ"); // FTUNE
+  MITK_INFO << "[Galil Debug] after asking XQ#PARA = " << m_ReturnCode;
   m_ReturnCode = GProgramDownload(m_GalilSystem, "", 0); // Erase the program on the system
   MITK_INFO << "[Galil Debug] after empty GProgramDownload: " << m_ReturnCode << "";
   GSleep(1000);
@@ -222,9 +223,18 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
   int count = -1;
   m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
   MITK_INFO << "[Galil Debug] cycles = " << count;
+  m_ReturnCode = GCmdI(m_GalilSystem, "pos=?", &count);
+  MITK_INFO << "[Galil Debug] pos = " << count;
+  m_ReturnCode = GCmdI(m_GalilSystem, "points=?", &count);
+  MITK_INFO << "[Galil Debug] points = " << count;
   std::this_thread::sleep_for(std::chrono::seconds(10));
   m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
   MITK_INFO << "[Galil Debug] cycles = " << count;
+
+  m_ReturnCode = GCmdI(m_GalilSystem, "pos=?", &count);
+  MITK_INFO << "[Galil Debug] pos = " << count;
+  m_ReturnCode = GCmdI(m_GalilSystem, "points=?", &count);
+  MITK_INFO << "[Galil Debug] points = " << count;
   std::this_thread::sleep_for(std::chrono::seconds(10));
   m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
   MITK_INFO << "[Galil Debug] cycles = " << count;
@@ -245,7 +255,7 @@ bool mitk::GalilMotor::Home()
 {
   m_ReturnCode = GCmd(m_GalilSystem, "AB"); // Abort any running programs
   MITK_INFO << "[Galil Debug] after AB: " << m_ReturnCode << "";
-  GSleep(100);
+  GSleep(1000);
   m_ReturnCode = GCmd(m_GalilSystem, "BV"); // Burn all variables
   MITK_INFO << "[Galil Debug] after BV: " << m_ReturnCode << "";
   GSleep(1000);

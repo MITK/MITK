@@ -180,22 +180,27 @@ void OPOLaserControl::TuneWavelength()
 void OPOLaserControl::StartFastTuning()
 {
   std::vector<double> listOfWavelengths;
-  listOfWavelengths.push_back(700);
-  listOfWavelengths.push_back(720);
-  listOfWavelengths.push_back(740);
-  listOfWavelengths.push_back(760);
-  listOfWavelengths.push_back(780);
-  listOfWavelengths.push_back(800);
-  listOfWavelengths.push_back(820);
-  listOfWavelengths.push_back(840);
-  listOfWavelengths.push_back(860);
-  listOfWavelengths.push_back(880);
-  listOfWavelengths.push_back(900);
-  m_OPOMotor->FastTuneWavelengths(listOfWavelengths);
+  double tmpWavelength = 0;
+  int currentRow = 0;
+  bool success = false;
 
-  //QString wavelengthText = QString::number(m_OpotekLaserSystem->GetWavelength() / 10);
-  //wavelengthText.append("nm");
-  //m_Controls.labelWavelength->setText(wavelengthText);
+  do
+  {
+    if (currentRow != 0) listOfWavelengths.push_back(tmpWavelength);
+    if (m_Controls.tableFastTuningWavelengths->item(0, currentRow))
+    {
+      QString test = m_Controls.tableFastTuningWavelengths->item(0, currentRow)->text();
+      tmpWavelength = test.toDouble(&success);
+      currentRow++;
+    }
+    else
+      tmpWavelength = 0;
+
+    if (success == 0)
+      tmpWavelength = 0;
+  } while (tmpWavelength<950.1 && tmpWavelength>689.9);
+
+  m_OPOMotor->FastTuneWavelengths(listOfWavelengths);
 }
 
 void OPOLaserControl::ToggleFlashlamp()
@@ -203,7 +208,7 @@ void OPOLaserControl::ToggleFlashlamp()
   m_Controls.buttonFlashlamp->setText("...");
   if (!m_PumpLaserController->IsFlashing())
   {
-    if(m_PumpLaserController->StartFlashing())
+    if (m_PumpLaserController->StartFlashing())
       m_Controls.buttonFlashlamp->setText("Stop Lamp");
     else
       m_Controls.buttonFlashlamp->setText("Start Lamp");
@@ -211,7 +216,10 @@ void OPOLaserControl::ToggleFlashlamp()
   else
   {
     if (m_PumpLaserController->StopFlashing())
+    {
       m_Controls.buttonFlashlamp->setText("Start Lamp");
+      m_Controls.buttonFlashlamp->setText("Start Laser");
+    }
     else
       m_Controls.buttonFlashlamp->setText("Stop Lamp");
   }
@@ -223,14 +231,14 @@ void OPOLaserControl::ToggleQSwitch()
   m_Controls.buttonQSwitch->setText("...");
   if (!m_PumpLaserController->IsEmitting())
   {
-    if(m_PumpLaserController->StartQswitching())
+    if (m_PumpLaserController->StartQswitching())
       m_Controls.buttonQSwitch->setText("Stop Laser");
     else
       m_Controls.buttonQSwitch->setText("Start Laser");
   }
   else
   {
-    if(m_PumpLaserController->StopQswitching())
+    if (m_PumpLaserController->StopQswitching())
       m_Controls.buttonQSwitch->setText("Start Laser");
     else
       m_Controls.buttonQSwitch->setText("Stop Laser");

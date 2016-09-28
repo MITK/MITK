@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.matchpoint.algorithm.framereg"
+          name="MatchPoint Frame Correction"
+          class="QmitkMatchPointFrameCorrection"
+		  category="Registration"
+          icon="resources/icon.png" />
+  </extension>
+
+</plugin>

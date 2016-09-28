@@ -71,6 +71,8 @@ set(mitk_modules
   BiophotonicsHardware
   Classification
   TumorInvasionAnalysis
+  MatchPointRegistration
+  MatchPointRegistrationUI
 )
 
 if(MITK_ENABLE_PIC_READER)

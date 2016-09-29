@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //MITK
 #include <mitkImage.h>
+#include <mitkDataNode.h>
 
 //MatchPoint
 #include <mapRegistrationBase.h>
@@ -79,6 +80,14 @@ namespace mitk
     itkGetConstObjectMacro(TargetImage, mitk::Image);
     itkGetConstObjectMacro(MovingImage, mitk::Image);
 
+    /**takes the input image, rescales it and converts it to pixel type int to be used for visualization as target image*/
+    void SetTargetNode(const mitk::DataNode* tNode);
+    /**takes the input image, rescales it and converts it to pixel type int to be used for visualization as mapped moving*/
+    void SetMovingNode(const mitk::DataNode* mNode);
+
+    itkGetConstObjectMacro(TargetNode, mitk::DataNode);
+    itkGetConstObjectMacro(MovingNode, mitk::DataNode);
+
   protected:
     typedef ::itk::Image<unsigned char, 3> InternalImageType;
 
@@ -93,6 +102,8 @@ namespace mitk
     mitk::MAPRegistrationWrapper::Pointer m_Registration;
     mitk::Image::Pointer m_TargetImage;
     mitk::Image::Pointer m_MovingImage;
+    mitk::DataNode::ConstPointer m_TargetNode;
+    mitk::DataNode::ConstPointer m_MovingNode;
 
   private:
     RegEvaluationObject& operator = (const RegEvaluationObject&);

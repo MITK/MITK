@@ -120,7 +120,6 @@ namespace mitk
     // calculates translation based on offset+extent not on the transformation matrix
     // NOTE: center of the box is
     vtkSmartPointer<vtkMatrix4x4> imageTransform = this->m_Geometry->GetGeometry()->GetVtkTransform()->GetMatrix();
-    Point3D spacing = this->m_Geometry->GetGeometry()->GetSpacing();
     Point3D center = this->m_Geometry->GetGeometry()->GetCenter();
     auto translation = vtkSmartPointer<vtkTransform>::New();
     translation->Translate(center[0] - imageTransform->GetElement(0, 3), center[1] - imageTransform->GetElement(1, 3), center[2] - imageTransform->GetElement(2, 3));
@@ -221,7 +220,6 @@ namespace mitk
     // calculates translation based on offset+extent not on the transformation matrix
     vtkSmartPointer<vtkMatrix4x4> imageTransform = this->m_Geometry->GetGeometry()->GetVtkTransform()->GetMatrix();
     Point3D center = this->m_Geometry->GetGeometry()->GetCenter();
-    Point3D spacing = this->m_Geometry->GetGeometry()->GetSpacing();
     auto translation = vtkSmartPointer<vtkTransform>::New();
     translation->Translate(center[0] - imageTransform->GetElement(0, 3), center[1] - imageTransform->GetElement(1, 3), center[2] - imageTransform->GetElement(2, 3));
 
@@ -365,7 +363,6 @@ namespace mitk
 
     // Apply transform of the input image to the new generated output image
     mitk::BoundingShapeCropper::RegionType outputRegion = output->GetRequestedRegion();
-    const mitk::TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
 
     m_TimeOfHeaderInitialization.Modified();
   }

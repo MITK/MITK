@@ -45,7 +45,7 @@ namespace mitk
 
     double DistanceFromCam;
     std::vector<Handle> HandlePropertyList;
-    LocalStorageHandler<LocalStorage> LocalStorageHandler;
+    mitk::LocalStorageHandler<LocalStorage> LocalStorageHandler;
   };
 }
 
@@ -237,7 +237,6 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     else
       initialHandleSize = 1.0/40.0;
 
-    mitk::Point2D displaysize = renderer->GetDisplaySizeInMM();
     double handlesize = ((cam->GetDistance()*std::tan(vtkMath::RadiansFromDegrees(cam->GetViewAngle()))) / 2.0)*initialHandleSize;
 
     if (localStorage->m_PropAssembly->GetParts()->IsItemPresent(localStorage->m_HandleActor))
@@ -318,9 +317,9 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     this->ApplyBoundingShapeProperties(renderer, localStorage->m_SelectedHandleActor);
 
     // apply properties read from the PropertyList
-    this->ApplyProperties(localStorage->m_Actor, renderer);
-    this->ApplyProperties(localStorage->m_HandleActor, renderer);
-    this->ApplyProperties(localStorage->m_SelectedHandleActor, renderer);
+    // this->ApplyProperties(localStorage->m_Actor, renderer);
+    // this->ApplyProperties(localStorage->m_HandleActor, renderer);
+    // this->ApplyProperties(localStorage->m_SelectedHandleActor, renderer);
 
     localStorage->m_Actor->VisibilityOn();
     localStorage->m_HandleActor->VisibilityOn();

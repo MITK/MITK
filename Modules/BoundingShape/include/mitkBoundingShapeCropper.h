@@ -18,11 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BOUNDINGSHAPECROPPER_H
 #define BOUNDINGSHAPECROPPER_H
 
-#include "mitkAlgorithmsExtExports.h"
 #include "mitkBoundingShapeCropper.h"
 #include "MitkBoundingShapeExports.h"
 #include "mitkCommon.h"
-#include "mitkDataTypesExtExports.h"
 #include "mitkGeometryData.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
@@ -134,7 +132,7 @@ namespace mitk {
     /**
     * @brief Current time step displayed
     */
-    unsigned int m_CurrentTimeStep;
+    int m_CurrentTimeStep;
     /**
     * @brief Use m_UseWholeInputRegion for deciding whether a cropping or masking will be performed
     */

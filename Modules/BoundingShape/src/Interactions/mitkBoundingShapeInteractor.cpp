@@ -213,7 +213,6 @@ bool mitk::BoundingShapeInteractor::CheckOverObject(const InteractionEvent* inte
 
   // calculates translation based on offset+extent not on the transformation matrix (because the cube is located in the center not in the origin)
   vtkSmartPointer<vtkMatrix4x4> imageTransform = geometry->GetVtkTransform()->GetMatrix();
-  Point3D spacing = geometry->GetSpacing();
   Point3D center = geometry->GetCenter();
   auto translation = vtkSmartPointer<vtkTransform>::New();
   auto transform = vtkSmartPointer<vtkTransform>::New();
@@ -261,7 +260,6 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
   GeometryData::Pointer geometryData = dynamic_cast<GeometryData*>(this->GetDataNode()->GetData());
   BaseGeometry::Pointer geometry = geometryData->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
   std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
-  Point3D center = CalcAvgPoint(cornerPoints[7], cornerPoints[0]);
   interactionEvent->GetSender()->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
   double scale = interactionEvent->GetSender()->GetScaleFactorMMPerDisplayUnit(); //GetDisplaySizeInMM
   mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("handle size factor"));
@@ -274,7 +272,6 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
 
   mitk::Point2D displaysize = interactionEvent->GetSender()->GetDisplaySizeInMM();
   ScalarType handlesize = ((displaysize[0] + displaysize[1]) / 2.0)*initialHandleSize;
-  Vector3D spacing = geometry->GetSpacing();
   unsigned int handleNum = 0;
 
   for (auto &handle : m_Impl->Handles)
@@ -341,7 +338,7 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction*, Interac
 
 
 
-void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction*, InteractionEvent*)
 {
   this->DisableCrosshairNavigation(); //disable crosshair interaction and scolling if user is hovering over the object
   DataNode::Pointer node = this->GetDataNode();
@@ -482,7 +479,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
   }
 
   bool positionChangeThreshold = true;
-  for (unsigned int numFaces = 0; numFaces < 8; numFaces++) // estimate the corresponding face and shift its assigned points
+  for (int numFaces = 0; numFaces < 8; numFaces++) // estimate the corresponding face and shift its assigned points
   {
     if ((numFaces != faces[0]) && (numFaces != faces[1]) && (numFaces != faces[2]) && (numFaces != faces[3]))
     {
@@ -498,7 +495,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
         point[0] += std::round(faceShift[0] / spacing[0])*spacing[0];
         point[1] += std::round(faceShift[1] / spacing[1])*spacing[1];
         point[2] += std::round(faceShift[2] / spacing[2])*spacing[2];
-    
+
       }
 
       if (point == pointscontainer->GetElement(numFaces))

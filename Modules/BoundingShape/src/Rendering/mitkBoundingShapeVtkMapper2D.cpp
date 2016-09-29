@@ -57,7 +57,7 @@ namespace mitk
     }
 
     std::vector<Handle> HandlePropertyList;
-    LocalStorageHandler<LocalStorage> LocalStorageHandler;
+    mitk::LocalStorageHandler<LocalStorage> LocalStorageHandler;
   };
 }
 
@@ -365,9 +365,9 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer* rende
         double angle2 = vtkMath::DegreesFromRadians(acos(vtkMath::Dot(normal, result2)));
 
         // show handles only if the corresponding face is aligned to the render window
-        if (((abs(angle - 0)<0.001) || (abs(angle - 180)<0.001) && i != 0 && i != 1)
-          || ((abs(angle1 - 0)<0.001) || (abs(angle1 - 180)<0.001) && i != 2 && i != 3)
-          || ((abs(angle2 - 0)<0.001) || (abs(angle2 - 180)<0.001) && i != 4 && i != 5))
+        if ((((abs(angle  - 0) < 0.001) || (abs(angle  - 180) < 0.001)) && i != 0 && i != 1)
+         || (((abs(angle1 - 0) < 0.001) || (abs(angle1 - 180) < 0.001)) && i != 2 && i != 3)
+         || (((abs(angle2 - 0) < 0.001) || (abs(angle2 - 180) < 0.001)) && i != 4 && i != 5))
               {
 
                   if (activeHandleId == nullptr)

@@ -1,11 +1,11 @@
 /**
 \page org_mitk_gui_qt_imagecropper Image Cropper Plugin
 
-\imageMacro{QmitkImageCropper_Icon.png,"Icon of the Image Cropper Plugin.",2.00}
+\imageMacro{QmitkImageCropper_Icon.png,"Icon of the Image Cropper Plugin.",20}
 
 \tableofcontents
 
-\section Usage
+\section org_mitk_gui_qt_imagecropperUsage Usage
 
 The Image Cropper Plugin allows you to crop subvolumes out of your orginial image volume by defining a cubic bounding box.
 
@@ -20,21 +20,21 @@ In case of 3D+t images the whole timeseries is cropped by default.
 \imageMacro{BoundingBox_ImageCropperView.png,"Bounding Box.",12.00}
 \imageMacro{Basic_ImageCropperView.png,"Basic Settings.",7.09}
 
-\section Advanced settings
+\section org_mitk_gui_qt_imagecropperAdvanced Advanced settings
 In the advanced settings view you find additional features to manipulate the bounding box.
 \imageMacro{Advanced_ImageCropperView.png,"Advanced Settings.",7.09}
 
-\subsection Bounding Shape Color
+\subsection org_mitk_gui_qt_imagecropperAdvancedColor Bounding Shape Color
 By pressing the two color buttons you may change the color for the selected and unselected state of the box.
-\subsection Overwrite original image
+\subsection org_mitk_gui_qt_imagecropperAdvancedOverwrite Overwrite original image
 By enabling this checkbox the image is replaced by the cropped subvolume. Be careful to use this option since there is now Redo action available.
-\subsection Crop current timestep only
+\subsection org_mitk_gui_qt_imagecropperAdvancedTimestep Crop current timestep only
 If this checkbox is enabled the xD + t image is reduced to a xD image (3D+t --> 3D) with the timestep visible in the widget. This is useful if you want to extract a single image or its corresponding 
-subvolume of the timeseries. The whole timeseries is cropped by default.
+subvolume of the timeseries. The whole timeseries is cropped by default using the timeGeometry of the timestep visible in the widget.
 
-\section Current issues
+\section org_mitk_gui_qt_imagecropperIssues Current issues
 Due to the latest changes in MITK slicegeometry is it currently not supported to crop 2D images unless the are 3D
 images containing only a single slice. The user will be notified by a warning and and the input is handled as a single lable image. 
 
-Right now changing the shape or rotating of the bounding box is not possible but will be integrated in the future.
+Right now changing the shape or rotation of the bounding box is not supported but might be integrated in the future.
 */

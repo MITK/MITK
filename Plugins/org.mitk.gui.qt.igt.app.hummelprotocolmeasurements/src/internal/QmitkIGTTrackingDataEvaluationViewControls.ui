@@ -696,6 +696,9 @@
                   <property name="text">
                    <string>;</string>
                   </property>
+                  <property name="maxLength">
+                   <number>1</number>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -723,12 +726,16 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="m_SampleCount"/>
+                 <widget class="QSpinBox" name="m_SampleCount">
+                  <property name="value">
+                   <number>1</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox">
+               <widget class="QCheckBox" name="m_HeaderRow">
                 <property name="text">
                  <string>The csv file has a header row</string>
                 </property>
@@ -753,7 +760,11 @@
                  </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSpinBox" name="m_YPos"/>
+                 <widget class="QSpinBox" name="m_YPos">
+                  <property name="value">
+                   <number>4</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="label_29">
@@ -763,7 +774,11 @@
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QSpinBox" name="m_ZPos"/>
+                 <widget class="QSpinBox" name="m_ZPos">
+                  <property name="value">
+                   <number>5</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_27">
@@ -773,7 +788,11 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QSpinBox" name="m_XPos"/>
+                 <widget class="QSpinBox" name="m_XPos">
+                  <property name="value">
+                   <number>3</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="label_4">
@@ -811,7 +830,11 @@
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QSpinBox" name="m_Qz"/>
+                 <widget class="QSpinBox" name="m_Qz">
+                  <property name="value">
+                   <number>8</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_33">
@@ -821,13 +844,25 @@
                  </widget>
                 </item>
                 <item row="4" column="1">
-                 <widget class="QSpinBox" name="m_Qr"/>
+                 <widget class="QSpinBox" name="m_Qr">
+                  <property name="value">
+                   <number>9</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSpinBox" name="m_Qy"/>
+                 <widget class="QSpinBox" name="m_Qy">
+                  <property name="value">
+                   <number>7</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QSpinBox" name="m_Qx"/>
+                 <widget class="QSpinBox" name="m_Qx">
+                  <property name="value">
+                   <number>6</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_32">
@@ -876,7 +911,11 @@
                  </widget>
                 </item>
                 <item row="1" column="1">
-                 <widget class="QSpinBox" name="m_Azimuth"/>
+                 <widget class="QSpinBox" name="m_Azimuth">
+                  <property name="minimum">
+                   <number>-1</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="3" column="0">
                  <widget class="QLabel" name="label_39">
@@ -886,10 +925,18 @@
                  </widget>
                 </item>
                 <item row="3" column="1">
-                 <widget class="QSpinBox" name="m_Roll"/>
+                 <widget class="QSpinBox" name="m_Roll">
+                  <property name="minimum">
+                   <number>-1</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="2" column="1">
-                 <widget class="QSpinBox" name="m_Elevation"/>
+                 <widget class="QSpinBox" name="m_Elevation">
+                  <property name="minimum">
+                   <number>-1</number>
+                  </property>
+                 </widget>
                 </item>
                 <item row="1" column="0">
                  <widget class="QLabel" name="label_37">
@@ -924,9 +971,9 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_22">
                 <item>
-                 <widget class="QRadioButton" name="m_Degrees">
+                 <widget class="QRadioButton" name="m_Radiants">
                   <property name="text">
-                   <string>Degrees</string>
+                   <string>Radiants</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
@@ -934,9 +981,12 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="m_Radiants">
+                 <widget class="QRadioButton" name="m_Degrees">
                   <property name="text">
-                   <string>Radiants</string>
+                   <string>Degrees</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>

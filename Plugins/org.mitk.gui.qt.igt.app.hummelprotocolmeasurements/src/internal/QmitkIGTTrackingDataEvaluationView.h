@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkHummelProtocolEvaluation.h"
 
 #include <mitkNavigationDataEvaluationFilter.h>
+#include "mitkNavigationDataCSVSequentialPlayer.h"
 
 
 
@@ -109,6 +110,9 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     std::vector<mitk::NavigationData::Pointer> GetNavigationDatasFromFile(std::string filename);
     std::vector<std::string> GetFileContentLineByLine(std::string filename);
     mitk::NavigationData::Pointer GetNavigationDataOutOfOneLine(std::string line);
+
+    //help method to sonstruct the NavigationDataCSVSequentialPlayer filled with all the options from the UI
+    mitk::NavigationDataCSVSequentialPlayer::Pointer ConstructNewNavigationDataPlayer();
 
     //CSV to XML members
     std::vector<std::string> m_CSVtoXMLInputFilenameVector;

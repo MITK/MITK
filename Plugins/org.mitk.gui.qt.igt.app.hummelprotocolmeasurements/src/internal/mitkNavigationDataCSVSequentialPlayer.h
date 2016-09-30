@@ -48,11 +48,34 @@ namespace mitk
 
     mitkClassMacro(NavigationDataCSVSequentialPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
+    NavigationDataCSVSequentialPlayer();
 
     /**
     * \brief sets the file name and path (if XMLString is set, this is neglected)
     */
     void SetFileName(const std::string& _FileName);
+
+    /**
+     * @brief SetOptions    sets the options for reading out the data out of the correct postions of the file
+     * @param rightHanded   true if the used coordinate System is right handed, false if it is left handed
+     * @param seperatorSign symbol that is used to separate the values in the .csv file
+     * @param sampleCount   every n-th sample in the file that should be used
+     * @param headerRow     true if the .csv file has a header row otherwise false
+     * @param xPos          number of the colum in the .csv file for the x-coordinates of the position
+     * @param yPos          number of the colum in the .csv file for the y-coordinates of the position
+     * @param zPos          number of the colum in the .csv file for the z-coordinates of the position
+     * @param useQuats      true if Quaternions are used to construct the orientation, false if Euler Angles are used
+     * @param qx            number of the column in the .csv file for the x component of the quaternion
+     * @param qy            number of the column in the .csv file for the y component of the quaternion
+     * @param qz            number of the column in the .csv file for the z component of the quaternion
+     * @param qr            number of the column in the .csv file for the r component of the quaternion
+     * @param azimuth       number of the colum in the .csv file for Azimuth (Euler Angles)
+     * @param elevatino     number of the colum in the .csv file for Elevation (Euler Angles)
+     * @param roll          number of the colum in the .csv file for Roll (Euler Angles)
+     * @param eulerInRadiants   true if the Euler Angles in the .csv file are in radiants, false if they are in degrees
+     */
+    void SetOptions(bool rightHanded, std::string seperatorSign, int sampleCount, bool headerRow, int xPos, int yPos, int zPos, bool useQuats,
+                    int qx, int qy, int qz, int qr, int azimuth, int elevatino, int roll, bool eulerInRadiants);
 
     /**
     * \brief returns the file name and path
@@ -108,6 +131,22 @@ namespace mitk
     void FillOutputEmpty(int number);
     mitk::NavigationData::Pointer GetEmptyNavigationData();
 
+    bool m_RightHanded; //true if the used coordinate System is right handed, false if it is left handed
+    std::string m_SeparatorSign; //symbol that is used to separate the values in the .csv file
+    int m_SampleCount; //every n-th sample in the file that should be used
+    bool m_HeaderRow; //true if the .csv file has a header row otherwise false
+    int m_XPos; //number of the colum in the .csv file for the x-coordinates of the position
+    int m_YPos; //number of the colum in the .csv file for the y-coordinates of the position
+    int m_ZPos; //number of the colum in the .csv file for the z-coordinates of the position
+    bool m_UseQuats; //true if Quaternions are used to construct the orientation, false if Euler Angles are used
+    int m_Qx; //number of the column in the .csv file for the x component of the quaternion
+    int m_Qy; //number of the column in the .csv file for the y component of the quaternion
+    int m_Qz; //number of the column in the .csv file for the z component of the quaternion
+    int m_Qr; //number of the column in the .csv file for the r component of the quaternion
+    int m_Azimuth; //number of the colum in the .csv file for Azimuth (Euler Angles)
+    int m_Elevation; //number of the colum in the .csv file for Elevation (Euler Angles)
+    int m_Roll; //number of the colum in the .csv file for Roll (Euler Angles)
+    bool m_EulersInRadiants; // true if the Euler Angles in the .csv file are in radiants, false if they are in degrees
   };
 } // namespace mitk
 

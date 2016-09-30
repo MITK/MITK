@@ -27,6 +27,7 @@ mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSVSequentialPlayer()
   m_NavigationDatas = std::vector<mitk::NavigationData::Pointer>();
   m_CurrentPos = 0;
   m_Filetype = mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV;
+
 }
 
 mitk::NavigationDataCSVSequentialPlayer::~NavigationDataCSVSequentialPlayer()
@@ -322,4 +323,24 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   returnValue->SetOrientation(orientation);
 
   return returnValue;
+}
+void mitk::NavigationDataCSVSequentialPlayer::SetOptions(bool rightHanded, std::string separatorSign, int sampleCount, bool headerRow, int xPos, int yPos,
+                                                         int zPos, bool useQuats, int qx, int qy, int qz, int qr, int azimuth, int elevatino, int roll, bool eulerInRadiants)
+{
+    m_RightHanded = rightHanded;
+    m_SeparatorSign = separatorSign;
+    m_SampleCount = sampleCount;
+    m_HeaderRow = headerRow;
+    m_XPos = xPos;
+    m_YPos = yPos;
+    m_ZPos = zPos;
+    m_UseQuats = useQuats;
+    m_Qx = qx;
+    m_Qy = qy;
+    m_Qz = qz;
+    m_Qr = qr;
+    m_Azimuth = azimuth;
+    m_Elevation = elevation;
+    m_Roll = roll;
+    m_EulersInRadiants = eulerInRadiants;
 }

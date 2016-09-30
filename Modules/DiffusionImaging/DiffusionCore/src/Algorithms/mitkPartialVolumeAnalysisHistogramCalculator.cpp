@@ -581,6 +581,7 @@ namespace mitk
     }
     MITK_DEBUG << "Bounding Box Region: " << m_InternalMask3D;
 
+    // crop the mask image to the BoundingBoxRegion extracted via the spatial masking object
     typedef itk::RegionOfInterestImageFilter< ImageType, MaskImage3DType > ROIFilterType;
     ROIFilterType::Pointer roi = ROIFilterType::New();
     roi->SetRegionOfInterest(m_InternalMask3D);

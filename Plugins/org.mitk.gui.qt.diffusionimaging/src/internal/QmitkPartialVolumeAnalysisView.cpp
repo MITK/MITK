@@ -68,6 +68,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkResampleImageFilter.h>
 #include <itkGaussianInterpolateImageFunction.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkImageDuplicator.h>
 
 #include <vnl/vnl_vector.h>
 
@@ -1337,23 +1338,57 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
 
             if(pixelType.GetBitsPerComponent() == 16)
             {
-                //convert from short to uchar
+              //convert from ushort to uchar
+              typedef itk::Image<unsigned char, 3> UCharImageType;
+              UCharImageType::Pointer charImage;
+
+
+              if(pixelType.GetComponentTypeAsString() == "short" )
+              {
                 typedef itk::Image<short, 3> ShortImageType;
-                typedef itk::Image<unsigned char, 3> CharImageType;
 
-                CharImageType::Pointer charImage;
                 ShortImageType::Pointer shortImage;
-                mitk::CastToItkImage(m_SelectedImageMask, shortImage);
+                mitk::CastToItkImage( m_SelectedImageMask, shortImage );
 
-                typedef itk::CastImageFilter<ShortImageType, CharImageType> ImageCasterType;
+                typedef itk::ImageDuplicator< ShortImageType > DuplicatorType;
+                DuplicatorType::Pointer duplicator = DuplicatorType::New();
+                duplicator->SetInputImage( shortImage );
+                duplicator->Update();
+
+                typedef itk::CastImageFilter<ShortImageType, UCharImageType> ImageCasterType;
 
                 ImageCasterType::Pointer caster = ImageCasterType::New();
-                caster->SetInput( shortImage );
+                caster->SetInput( duplicator->GetOutput() );
                 caster->Update();
                 charImage = caster->GetOutput();
 
+              }
+              else
+              {
+                typedef itk::Image<unsigned short, 3> UShortImageType;
 
-                mitk::CastToMitkImage(charImage, m_SelectedImageMask);
+                UShortImageType::Pointer shortImage;
+                mitk::CastToItkImage( m_SelectedImageMask, shortImage );
+
+                typedef itk::ImageDuplicator< UShortImageType > DuplicatorType;
+                DuplicatorType::Pointer duplicator = DuplicatorType::New();
+                duplicator->SetInputImage( shortImage );
+                duplicator->Update();
+
+                typedef itk::CastImageFilter<UShortImageType, UCharImageType> ImageCasterType;
+
+                ImageCasterType::Pointer caster = ImageCasterType::New();
+                caster->SetInput( duplicator->GetOutput() );
+                caster->Update();
+                charImage = caster->GetOutput();
+              }
+
+              m_SelectedImageMask = nullptr;
+              m_SelectedImageMask = mitk::Image::New();
+              m_SelectedImageMask->InitializeByItk( charImage.GetPointer() );
+              m_SelectedImageMask->SetVolume( charImage->GetBufferPointer() );
+
+              mitk::CastToMitkImage(charImage, m_SelectedImageMask);
             }
 
 

@@ -325,7 +325,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   return returnValue;
 }
 void mitk::NavigationDataCSVSequentialPlayer::SetOptions(bool rightHanded, std::string separatorSign, int sampleCount, bool headerRow, int xPos, int yPos,
-                                                         int zPos, bool useQuats, int qx, int qy, int qz, int qr, int azimuth, int elevatino, int roll, bool eulerInRadiants)
+                                                         int zPos, bool useQuats, int qx, int qy, int qz, int qr, int azimuth, int elevation, int roll, bool eulerInRadiants)
 {
     m_RightHanded = rightHanded;
     m_SeparatorSign = separatorSign;

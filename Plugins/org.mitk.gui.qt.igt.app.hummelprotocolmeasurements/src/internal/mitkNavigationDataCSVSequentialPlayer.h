@@ -48,7 +48,6 @@ namespace mitk
 
     mitkClassMacro(NavigationDataCSVSequentialPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
-    NavigationDataCSVSequentialPlayer();
 
     /**
     * \brief sets the file name and path (if XMLString is set, this is neglected)
@@ -56,7 +55,7 @@ namespace mitk
     void SetFileName(const std::string& _FileName);
 
     /**
-     * @brief SetOptions    sets the options for reading out the data out of the correct postions of the file
+     * @brief SetOptions    sets the options for reading out the data out of the correct postions of the file. They need to be set before using the player
      * @param rightHanded   true if the used coordinate System is right handed, false if it is left handed
      * @param seperatorSign symbol that is used to separate the values in the .csv file
      * @param sampleCount   every n-th sample in the file that should be used

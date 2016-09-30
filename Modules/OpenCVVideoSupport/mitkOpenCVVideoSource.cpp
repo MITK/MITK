@@ -131,14 +131,6 @@ void mitk::OpenCVVideoSource::FetchFrame()
         ++m_FrameCount;
       }
 
-      if (this->GetVideoCaptureProperty(CV_CAP_PROP_POS_FRAMES) == this->GetVideoCaptureProperty(CV_CAP_PROP_FRAME_COUNT))
-      {
-          this->SetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO, 0);
-          m_FrameCount = 0;
-          m_CurrentImage = cvQueryFrame(m_VideoCapture);
-          if (!m_RepeatVideo) this->StopCapturing();
-      }
-
       if(m_CurrentImage == nullptr) // do we need to repeat the video if it is from video file?
       {
         double framePos = this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
@@ -152,12 +144,10 @@ void mitk::OpenCVVideoSource::FetchFrame()
         }
         else
         {
-            this->StopCapturing();
-            return;
-//          std::ostringstream s;
-//          s << "End of video file " << m_VideoFileName;
-//          std::logic_error err( s.str() );
-//          throw err;
+          std::ostringstream s;
+          s << "End of video file " << m_VideoFileName;
+          std::logic_error err( s.str() );
+          throw err;
         }
       }
       else

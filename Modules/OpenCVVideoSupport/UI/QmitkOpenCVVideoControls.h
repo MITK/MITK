@@ -99,6 +99,8 @@ protected slots:
   void QObjectDestroyed( QObject * obj = 0 );
 
   void NewFrameAvailable(mitk::VideoSource* videoSource);
+  void EndOfVideoSourceReached(mitk::VideoSource* videoSource);
+
 protected:
   QmitkVideoBackground* m_VideoBackground;
   QmitkRenderWindow* m_RenderWindow;

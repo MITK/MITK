@@ -285,6 +285,19 @@ void QmitkOpenCVVideoControls::NewFrameAvailable(mitk::VideoSource* /*videoSourc
     *m_Controls->VideoProgressSlider->maximum()));
 }
 
+void QmitkOpenCVVideoControls::EndOfVideoSourceReached(mitk::VideoSource* /*videoSource*/)
+{
+  if (m_Controls->RepeatVideoButton->isChecked())
+  {
+    this->Reset();
+    this->Play();
+  }
+  else
+  {
+    this->Stop();
+  }
+}
+
 void QmitkOpenCVVideoControls::SetRenderWindow(QmitkRenderWindow* _RenderWindow)
 {
   if (m_RenderWindow == _RenderWindow)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>418</width>
+    <width>423</width>
     <height>955</height>
    </rect>
   </property>
@@ -516,19 +516,19 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-110</y>
-            <width>365</width>
-            <height>934</height>
+            <y>0</y>
+            <width>387</width>
+            <height>760</height>
            </rect>
           </property>
           <attribute name="label">
            <string>General</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_13">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
             <widget class="QGroupBox" name="GeneralOptions">
              <property name="title">
-              <string>General Options:</string>
+              <string/>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
@@ -621,36 +621,28 @@
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_40">
-                <property name="text">
-                 <string>Type of coordinate System:</string>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
                 </property>
-               </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_24">
-                <item>
-                 <widget class="QRadioButton" name="m_LeftHanded">
-                  <property name="text">
-                   <string>Left handed </string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="m_RigthHanded">
-                  <property name="text">
-                   <string>Right handed</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
            </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="page">
+          <attribute name="label">
+           <string>.csv file input options</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_13">
            <item>
             <widget class="QGroupBox" name="m_FileOptionsBox">
              <property name="title">
@@ -739,7 +731,40 @@
                 <property name="text">
                  <string>The csv file has a header row</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="CoordinateType">
+             <property name="title">
+              <string>Type of Coordinate System:</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_19">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_24">
+                <item>
+                 <widget class="QRadioButton" name="m_LeftHanded">
+                  <property name="text">
+                   <string>Left handed </string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="m_RigthHanded">
+                  <property name="text">
+                   <string>Right handed</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -903,6 +928,48 @@
               </item>
               <item>
                <layout class="QGridLayout" name="gridLayout_3">
+                <item row="0" column="1">
+                 <widget class="QLabel" name="label_30">
+                  <property name="text">
+                   <string>Column number:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_37">
+                  <property name="text">
+                   <string>Azimuth</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QSpinBox" name="m_Elevation">
+                  <property name="minimum">
+                   <number>-1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="label_39">
+                  <property name="text">
+                   <string>Roll</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_7">
+                  <property name="text">
+                   <string>Angle:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QSpinBox" name="m_Roll">
+                  <property name="minimum">
+                   <number>-1</number>
+                  </property>
+                 </widget>
+                </item>
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_38">
                   <property name="text">
@@ -917,97 +984,57 @@
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="label_39">
-                  <property name="text">
-                   <string>Roll</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="3" column="1">
-                 <widget class="QSpinBox" name="m_Roll">
-                  <property name="minimum">
-                   <number>-1</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QSpinBox" name="m_Elevation">
-                  <property name="minimum">
-                   <number>-1</number>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_37">
-                  <property name="text">
-                   <string>Azimuth</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_7">
-                  <property name="text">
-                   <string>Angle:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLabel" name="label_30">
-                  <property name="text">
-                   <string>Column number:</string>
-                  </property>
-                 </widget>
-                </item>
                </layout>
               </item>
               <item>
-               <widget class="QLabel" name="label_31">
-                <property name="text">
-                 <string>Unity for Euler Angles:</string>
-                </property>
+               <widget class="QWidget" name="EulerUnity" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_18">
+                 <item>
+                  <widget class="QLabel" name="label_31">
+                   <property name="text">
+                    <string>Unity for Euler Angles:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_22">
+                   <item>
+                    <widget class="QRadioButton" name="m_Radiants">
+                     <property name="text">
+                      <string>Radiants</string>
+                     </property>
+                     <property name="checked">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QRadioButton" name="m_Degrees">
+                     <property name="text">
+                      <string>Degrees</string>
+                     </property>
+                     <property name="checked">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
                </widget>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_22">
-                <item>
-                 <widget class="QRadioButton" name="m_Radiants">
-                  <property name="text">
-                   <string>Radiants</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="m_Degrees">
-                  <property name="text">
-                   <string>Degrees</string>
-                  </property>
-                  <property name="checked">
-                   <bool>false</bool>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
               </item>
              </layout>
             </widget>
            </item>
           </layout>
-          <zorder>GeneralOptions</zorder>
-          <zorder>GeneralOptions</zorder>
-          <zorder>PositionAndOrientationOptions</zorder>
-          <zorder>m_FileOptionsBox</zorder>
          </widget>
          <widget class="QWidget" name="toolBoxPage1">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>396</width>
-            <height>811</height>
+            <width>424</width>
+            <height>760</height>
            </rect>
           </property>
           <attribute name="label">

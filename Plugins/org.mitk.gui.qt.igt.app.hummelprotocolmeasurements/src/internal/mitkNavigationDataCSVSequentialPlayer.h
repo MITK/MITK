@@ -68,13 +68,14 @@ namespace mitk
      * @param qy            number of the column in the .csv file for the y component of the quaternion
      * @param qz            number of the column in the .csv file for the z component of the quaternion
      * @param qr            number of the column in the .csv file for the r component of the quaternion
-     * @param azimuth       number of the colum in the .csv file for Azimuth (Euler Angles)
-     * @param elevatino     number of the colum in the .csv file for Elevation (Euler Angles)
-     * @param roll          number of the colum in the .csv file for Roll (Euler Angles)
+     * @param azimuth       number of the colum in the .csv file for Azimuth (Euler Angles). Set < 0 if angle is not defined
+     * @param elevatino     number of the colum in the .csv file for Elevation (Euler Angles) Set < 0 if angle is not defined
+     * @param roll          number of the colum in the .csv file for Roll (Euler Angles) Set < 0 if angle is not defined
      * @param eulerInRadiants   true if the Euler Angles in the .csv file are in radiants, false if they are in degrees
+     * @param minNumberOfColumns
      */
-    void SetOptions(bool rightHanded, std::string seperatorSign, int sampleCount, bool headerRow, int xPos, int yPos, int zPos, bool useQuats,
-                    int qx, int qy, int qz, int qr, int azimuth, int elevatino, int roll, bool eulerInRadiants);
+    void SetOptions(bool rightHanded, char seperatorSign, int sampleCount, bool headerRow, int xPos, int yPos, int zPos, bool useQuats,
+                    int qx, int qy, int qz, int qr, int azimuth, int elevatino, int roll, bool eulerInRadiants, int minNumberOfColums);
 
     /**
     * \brief returns the file name and path
@@ -131,7 +132,7 @@ namespace mitk
     mitk::NavigationData::Pointer GetEmptyNavigationData();
 
     bool m_RightHanded; //true if the used coordinate System is right handed, false if it is left handed
-    std::string m_SeparatorSign; //symbol that is used to separate the values in the .csv file
+    char m_SeparatorSign; //symbol that is used to separate the values in the .csv file
     int m_SampleCount; //every n-th sample in the file that should be used
     bool m_HeaderRow; //true if the .csv file has a header row otherwise false
     int m_XPos; //number of the colum in the .csv file for the x-coordinates of the position
@@ -146,6 +147,7 @@ namespace mitk
     int m_Elevation; //number of the colum in the .csv file for Elevation (Euler Angles)
     int m_Roll; //number of the colum in the .csv file for Roll (Euler Angles)
     bool m_EulersInRadiants; // true if the Euler Angles in the .csv file are in radiants, false if they are in degrees
+    int m_MinNumberOfColumns; //minimal number of columns the file has to have (e.g. if you read data from column 8 the file has to have at least 8 columns)
   };
 } // namespace mitk
 

@@ -24,6 +24,7 @@ set(CPP_FILES
   mitkPropertyListSerializer.cpp
   mitkStringLookupTablePropertySerializer.cpp
   mitkStringPropertySerializer.cpp
+  mitkTemporoSpatialStringPropertySerializer.cpp
   mitkTransferFunctionPropertySerializer.cpp
   mitkUIntPropertySerializer.cpp
   mitkUShortPropertySerializer.cpp

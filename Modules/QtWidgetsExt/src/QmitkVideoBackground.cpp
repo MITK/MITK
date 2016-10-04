@@ -209,7 +209,18 @@ void QmitkVideoBackground::UpdateVideo()
   if( m_renderWindowVectorInfo.size() > 0 )
   {
     unsigned char *src = nullptr;
-    src = m_VideoSource->GetVideoTexture();
+
+    try
+    {
+      src = m_VideoSource->GetVideoTexture();
+    }
+    catch (const std::logic_error& error)
+    {
+        MITK_DEBUG << error.what();
+        emit EndOfVideoSourceReached(m_VideoSource);
+        return;
+    }
+
     if(src)
     {
       for(auto it = m_renderWindowVectorInfo.begin();

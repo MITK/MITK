@@ -149,6 +149,8 @@ public:
     ///
     void NewFrameAvailable(mitk::VideoSource*);
 
+    void EndOfVideoSourceReached(mitk::VideoSource*);
+
 protected:
   ///
   /// class for holding all vtk dependencies

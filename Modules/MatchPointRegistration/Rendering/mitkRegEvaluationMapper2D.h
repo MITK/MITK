@@ -138,6 +138,9 @@ public:
     /** \brief This filter is used to apply the level window to moving image. */
     vtkSmartPointer<vtkMitkLevelWindowFilter> m_MappedLevelWindowFilter;
 
+    vtkSmartPointer<vtkImageExtractComponents> m_TargetExtractFilter;
+    vtkSmartPointer<vtkImageExtractComponents> m_MappedExtractFilter;
+
     /** \brief Default constructor of the local storage. */
     LocalStorage();
     /** \brief Default deconstructor of the local storage. */
@@ -199,7 +202,7 @@ protected:
 
   void PrepareDifference( LocalStorage * localStorage );
 
-  void PrepareWipe( mitk::DataNode* datanode, LocalStorage * localStorage );
+  void PrepareWipe(mitk::DataNode* datanode, LocalStorage * localStorage, const Point2D& currentIndex2D);
 
   void PrepareCheckerBoard( mitk::DataNode* datanode, LocalStorage * localStorage );
 

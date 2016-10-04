@@ -336,25 +336,30 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     //connect the input with the levelwindow filter
     localStorage->m_TargetLevelWindowFilter->SetInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
     localStorage->m_MappedLevelWindowFilter->SetInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
-    localStorage->m_TargetLevelWindowFilter->Update();
-    localStorage->m_MappedLevelWindowFilter->Update();
+
+    localStorage->m_TargetExtractFilter->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+    localStorage->m_MappedExtractFilter->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+    localStorage->m_TargetExtractFilter->SetComponents(0);
+    localStorage->m_MappedExtractFilter->SetComponents(0);
 
     updated = true;
   }
 
-  //Generate evaulation image
+  //Generate evaluation image
   bool isStyleOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalStyle,localStorage->m_LastUpdateTime);
   bool isBlendOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalBlendFactor,localStorage->m_LastUpdateTime);
   bool isCheckerOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalCheckerCount,localStorage->m_LastUpdateTime);
   bool isWipeStyleOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalWipeStyle,localStorage->m_LastUpdateTime);
   bool isContourOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalTargetContour,localStorage->m_LastUpdateTime);
+  bool isPositionOutdated = mitk::PropertyIsOutdated(datanode, mitk::nodeProp_RegEvalCurrentPosition, localStorage->m_LastUpdateTime);
 
   if (updated ||
     isStyleOutdated ||
     isBlendOutdated ||
     isCheckerOutdated ||
     isWipeStyleOutdated ||
-    isContourOutdated)
+    isContourOutdated ||
+    isPositionOutdated)
   {
     mitk::RegEvalStyleProperty::Pointer evalStyleProp = mitk::RegEvalStyleProperty::New();
     datanode->GetProperty(evalStyleProp, mitk::nodeProp_RegEvalStyle);
@@ -378,7 +383,17 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
       }
     case 3 :
       {
-        PrepareWipe(datanode, localStorage);
+        const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+
+        Point3D currentPos3D;
+        datanode->GetPropertyValue<Point3D>(mitk::nodeProp_RegEvalCurrentPosition, currentPos3D);
+
+        Point2D currentPos2D;
+        worldGeometry->Map(currentPos3D, currentPos2D);
+        Point2D currentIndex2D;
+        worldGeometry->WorldToIndex(currentPos2D, currentIndex2D);
+
+        PrepareWipe(datanode, localStorage, currentIndex2D);
         break;
       }
     case 4 :
@@ -403,9 +418,6 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
 
     // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
-
-    ////connect the input with the levelwindow filter
-    //localStorage->m_LevelWindowFilter->SetInputData(localStorage->m_EvaluationImage);
 
     // check for texture interpolation property
     bool textureInterpolation = false;
@@ -442,24 +454,16 @@ void mitk::RegEvaluationMapper2D::PrepareContour( mitk::DataNode* datanode, Loca
   bool targetContour = true;
   datanode->GetBoolProperty(mitk::nodeProp_RegEvalTargetContour,targetContour);
 
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter1 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter2 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-  extractFilter1->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-  extractFilter1->SetComponents(0);
-  extractFilter2->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-  extractFilter2->SetComponents(0);
-
   vtkSmartPointer<vtkImageGradientMagnitude> magFilter =
     vtkSmartPointer<vtkImageGradientMagnitude>::New();
+
   if(targetContour)
   {
-    magFilter->SetInputConnection(extractFilter1->GetOutputPort());
+    magFilter->SetInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
   }
   else
   {
-    magFilter->SetInputConnection(extractFilter2->GetOutputPort());
+    magFilter->SetInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   }
 
   vtkSmartPointer<vtkImageAppendComponents> appendFilter =
@@ -469,11 +473,11 @@ void mitk::RegEvaluationMapper2D::PrepareContour( mitk::DataNode* datanode, Loca
   appendFilter->AddInputConnection(magFilter->GetOutputPort());
   if(targetContour)
   {
-    appendFilter->AddInputConnection(extractFilter2->GetOutputPort());
+    appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   }
   else
   {
-    appendFilter->AddInputConnection(extractFilter1->GetOutputPort());
+    appendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
   }
   appendFilter->Update();
 
@@ -486,26 +490,17 @@ void mitk::RegEvaluationMapper2D::PrepareDifference( LocalStorage * localStorage
     vtkSmartPointer<vtkImageMathematics>::New();
   vtkSmartPointer<vtkImageMathematics> absFilter =
     vtkSmartPointer<vtkImageMathematics>::New();
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter1 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter2 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
 
-  extractFilter1->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-  extractFilter1->SetComponents(0);
-  extractFilter2->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-  extractFilter2->SetComponents(0);
-
-  diffFilter->SetInputConnection(0, extractFilter1->GetOutputPort());
-  diffFilter->SetInputConnection(1, extractFilter1->GetOutputPort());
+  diffFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
+  diffFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
   diffFilter->SetOperationToSubtract();
   absFilter->SetInputConnection(diffFilter->GetOutputPort());
   absFilter->SetOperationToAbsoluteValue();
-  diffFilter->Update();
-  localStorage->m_EvaluationImage = diffFilter->GetOutput();
+  absFilter->Update();
+  localStorage->m_EvaluationImage = absFilter->GetOutput();
 }
 
-void mitk::RegEvaluationMapper2D::PrepareWipe( mitk::DataNode* datanode, LocalStorage * localStorage )
+void mitk::RegEvaluationMapper2D::PrepareWipe(mitk::DataNode* datanode, LocalStorage * localStorage, const Point2D& currentIndex2D)
 {
   mitk::RegEvalWipeStyleProperty::Pointer evalWipeStyleProp = mitk::RegEvalWipeStyleProperty::New();
   datanode->GetProperty(evalWipeStyleProp, mitk::nodeProp_RegEvalWipeStyle);
@@ -514,7 +509,7 @@ void mitk::RegEvaluationMapper2D::PrepareWipe( mitk::DataNode* datanode, LocalSt
     vtkSmartPointer<vtkImageRectilinearWipe>::New();
   wipedFilter->SetInputConnection(0, localStorage->m_TargetLevelWindowFilter->GetOutputPort());
   wipedFilter->SetInputConnection(1, localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-  wipedFilter->SetPosition(30, 30);
+  wipedFilter->SetPosition(currentIndex2D[0], currentIndex2D[1]);
 
   if (evalWipeStyleProp->GetValueAsId() == 0)
   {
@@ -553,31 +548,15 @@ void mitk::RegEvaluationMapper2D::PrepareColorBlend( LocalStorage * localStorage
 {
   vtkSmartPointer<vtkImageAppendComponents> appendFilter =
     vtkSmartPointer<vtkImageAppendComponents>::New();
-  vtkSmartPointer<vtkImageAppendComponents> appendFilter2 =
-    vtkSmartPointer<vtkImageAppendComponents>::New();
-
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter1 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter2 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter3 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
 
   //red channel
-  extractFilter1->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-  extractFilter1->SetComponents(0);
-  appendFilter->AddInputConnection(extractFilter1->GetOutputPort());
+  appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   //green channel
-  extractFilter2->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-  extractFilter2->SetComponents(0);
-  appendFilter->AddInputConnection(extractFilter2->GetOutputPort());
+  appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
 
   //blue channel
-  extractFilter3->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-  extractFilter3->SetComponents(0);
-  appendFilter2->AddInputConnection(appendFilter->GetOutputPort());
-  appendFilter->AddInputConnection(extractFilter3->GetOutputPort());
-  appendFilter2->Update();
+  appendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+  appendFilter->Update();
 
   localStorage->m_EvaluationImage = appendFilter->GetOutput();
 }
@@ -590,18 +569,8 @@ void mitk::RegEvaluationMapper2D::PrepareBlend( mitk::DataNode* datanode, LocalS
   vtkSmartPointer<vtkImageWeightedSum> blendFilter =
     vtkSmartPointer<vtkImageWeightedSum>::New();
 
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter1 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-  vtkSmartPointer<vtkImageExtractComponents> extractFilter2 =
-    vtkSmartPointer<vtkImageExtractComponents>::New();
-
-  extractFilter1->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
-  extractFilter1->SetComponents(0);
-  extractFilter2->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
-  extractFilter2->SetComponents(0);
-
-  blendFilter->AddInputConnection(extractFilter1->GetOutputPort());
-  blendFilter->AddInputConnection(extractFilter2->GetOutputPort());
+  blendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+  blendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   blendFilter->SetWeight(0, (100 - blendfactor) / 100.);
   blendFilter->SetWeight(1,blendfactor/100.);
   blendFilter->Update();
@@ -759,7 +728,8 @@ void mitk::RegEvaluationMapper2D::SetDefaultProperties(mitk::DataNode* node, mit
   node->AddProperty(mitk::nodeProp_RegEvalCheckerCount, mitk::IntProperty::New(3), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalTargetContour, mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(0), renderer, overwrite);
-
+  node->AddProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(mitk::Point3D()), renderer, overwrite);
+  
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
@@ -824,6 +794,11 @@ mitk::RegEvaluationMapper2D::LocalStorage::LocalStorage()
 {
   m_TargetLevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
   m_MappedLevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
+
+  m_TargetExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
+  m_MappedExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
+
+
 
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();

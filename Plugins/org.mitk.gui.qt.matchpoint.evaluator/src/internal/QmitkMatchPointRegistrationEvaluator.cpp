@@ -29,19 +29,186 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRegEvalWipeStyleProperty.h"
 
 // Qmitk
+#include "QmitkRenderWindow.h"
 #include "QmitkMatchPointRegistrationEvaluator.h"
 
 // Qt
 #include <QMessageBox>
 #include <QErrorMessage>
+#include <QTimer>
+
+
+
+///**********************************************
+QmitkSliceChangedListener::QmitkSliceChangedListener(): m_renderWindowPart(NULL),
+m_PendingSliceChangedEvent(false),
+m_internalUpdateFlag(false)
+{
+}
+
+QmitkSliceChangedListener::~QmitkSliceChangedListener()
+{
+  this->RemoveAllObservers();
+};
+
+void QmitkSliceChangedListener::OnSliceChangedDelayed()
+{
+  m_PendingSliceChangedEvent = false;
+  emit SliceChanged();
+};
+
+void
+QmitkSliceChangedListener::OnSliceChangedInternal(const itk::EventObject& e)
+{
+  // Taken from QmitkStdMultiWidget::HandleCrosshairPositionEvent().
+  // Since there are always 3 events arriving (one for each render window) every time the slice
+  // or time changes, the slot OnSliceChangedDelayed is triggered - and only if it hasn't been
+  // triggered yet - so it is only executed once for every slice/time change.
+  if (!m_PendingSliceChangedEvent)
+  {
+    m_PendingSliceChangedEvent = true;
+
+    QTimer::singleShot(0, this, SLOT(OnSliceChangedDelayed()));
+  }
+};
+
+void QmitkSliceChangedListener::OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/)
+{
+  const mitk::SliceNavigationController* sendingSlicer =
+    dynamic_cast<const mitk::SliceNavigationController*>(sender);
+
+  this->RemoveObservers(sendingSlicer);
+};
+
+void QmitkSliceChangedListener::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_renderWindowPart != renderWindowPart)
+  {
+    m_renderWindowPart = renderWindowPart;
+
+    if (!InitObservers())
+    {
+      QMessageBox::information(NULL, "Error", "Unable to set up the event observers. The " \
+        "plot will not be triggered on changing the crosshair, " \
+        "position or time step.");
+    }
+  }
+};
+
+void QmitkSliceChangedListener::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  m_renderWindowPart = NULL;
+  this->RemoveAllObservers(renderWindowPart);
+};
+
+bool QmitkSliceChangedListener::InitObservers()
+{
+  bool result = true;
+
+  typedef QHash<QString, QmitkRenderWindow*> WindowMapType;
+  WindowMapType windowMap = m_renderWindowPart->GetQmitkRenderWindows();
+
+  auto i = windowMap.begin();
+
+  while (i != windowMap.end())
+  {
+    mitk::SliceNavigationController* sliceNavController =
+      i.value()->GetSliceNavigationController();
+
+    if (sliceNavController)
+    {
+      itk::ReceptorMemberCommand<QmitkSliceChangedListener>::Pointer cmdSliceEvent =
+        itk::ReceptorMemberCommand<QmitkSliceChangedListener>::New();
+      cmdSliceEvent->SetCallbackFunction(this, &QmitkSliceChangedListener::OnSliceChangedInternal);
+      int tag = sliceNavController->AddObserver(
+        mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0),
+        cmdSliceEvent);
+
+      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+        i.key().toStdString(), m_renderWindowPart)));
+
+      itk::ReceptorMemberCommand<QmitkSliceChangedListener>::Pointer cmdTimeEvent =
+        itk::ReceptorMemberCommand<QmitkSliceChangedListener>::New();
+      cmdTimeEvent->SetCallbackFunction(this, &QmitkSliceChangedListener::OnSliceChangedInternal);
+      tag = sliceNavController->AddObserver(
+        mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0),
+        cmdTimeEvent);
+
+      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+        i.key().toStdString(), m_renderWindowPart)));
+
+      itk::MemberCommand<QmitkSliceChangedListener>::Pointer cmdDelEvent =
+        itk::MemberCommand<QmitkSliceChangedListener>::New();
+      cmdDelEvent->SetCallbackFunction(this,
+        &QmitkSliceChangedListener::OnSliceNavigationControllerDeleted);
+      tag = sliceNavController->AddObserver(
+        itk::DeleteEvent(), cmdDelEvent);
+
+      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+        i.key().toStdString(), m_renderWindowPart)));
+    }
+
+    ++i;
+
+    result = result && sliceNavController;
+  }
+
+  return result;
+};
+
+void QmitkSliceChangedListener::RemoveObservers(const mitk::SliceNavigationController* deletedSlicer)
+{
+  std::pair < ObserverMapType::const_iterator, ObserverMapType::const_iterator> obsRange =
+    m_ObserverMap.equal_range(deletedSlicer);
+
+  for (ObserverMapType::const_iterator pos = obsRange.first; pos != obsRange.second; ++pos)
+  {
+    pos->second.controller->RemoveObserver(pos->second.observerTag);
+  }
+
+  m_ObserverMap.erase(deletedSlicer);
+};
+
+void QmitkSliceChangedListener::RemoveAllObservers(mitk::IRenderWindowPart* deletedPart)
+{
+  for (ObserverMapType::const_iterator pos = m_ObserverMap.begin(); pos != m_ObserverMap.end();)
+  {
+    ObserverMapType::const_iterator delPos = pos++;
+
+    if (deletedPart == NULL || deletedPart == delPos->second.renderWindowPart)
+    {
+      delPos->second.controller->RemoveObserver(delPos->second.observerTag);
+      m_ObserverMap.erase(delPos);
+    }
+  }
+};
+
+QmitkSliceChangedListener::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller, int observerTag,
+  const std::string& renderWindowName, mitk::IRenderWindowPart* part) : controller(controller), observerTag(observerTag),
+  renderWindowName(renderWindowName), renderWindowPart(part)
+{
+};
+
+///**********************************************
+
+
+
+
+
+
+
+
+
+
 
 
 const std::string QmitkMatchPointRegistrationEvaluator::VIEW_ID =
     "org.mitk.views.matchpoint.registration.evaluator";
 
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-	: m_Parent(NULL), m_internalBlendUpdate(false)
+	: m_Parent(NULL), m_internalBlendUpdate(false), m_currentSelectedTimeStep(0)
 {
+  m_currentSelectedPosition.Fill(0.0);
 }
 
 void QmitkMatchPointRegistrationEvaluator::SetFocus()
@@ -88,8 +255,23 @@ void QmitkMatchPointRegistrationEvaluator::CreateQtPartControl(QWidget* parent)
 
 	connect(m_Controls.radioTargetContour, SIGNAL(toggled(bool)), this, SLOT(OnContourStyleChanged()));
 
+  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
+
 	this->ConfigureControls();
 }
+
+void QmitkMatchPointRegistrationEvaluator::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_SliceChangeListener.RenderWindowPartActivated(renderWindowPart);
+}
+
+void QmitkMatchPointRegistrationEvaluator::RenderWindowPartDeactivated(
+  mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
+}
+
 
 void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
         const QList<mitk::DataNode::Pointer>& nodes)
@@ -103,6 +285,8 @@ void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchP
 		if (evalObj)
 		{
 			this->m_selectedEvalNode = nodes[0];
+      m_selectedNodeTime.Modified();
+      OnSliceChanged();
 		}
 	}
 
@@ -148,6 +332,28 @@ void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 		this->m_Controls.groupWipe->setVisible(false);
 		this->m_Controls.groupContour->setVisible(false);
 	}
+}
+
+
+void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
+{
+  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(NULL);
+  unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+
+  if (m_currentSelectedPosition != currentSelectedPosition
+    || m_currentSelectedTimeStep != currentSelectedTimeStep
+    || m_selectedNodeTime > m_currentPositionTime)
+  {
+    //the current position has been changed or the selected node has been changed since the last position validation -> check position
+    m_currentSelectedPosition = currentSelectedPosition;
+    m_currentSelectedTimeStep = currentSelectedTimeStep;
+    m_currentPositionTime.Modified();
+
+    if (this->m_selectedEvalNode.IsNotNull())
+    {
+      this->m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(currentSelectedPosition));
+    }
+  }
 }
 
 void QmitkMatchPointRegistrationEvaluator::OnComboStyleChanged(int index)

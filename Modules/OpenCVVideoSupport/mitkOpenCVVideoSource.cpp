@@ -135,7 +135,7 @@ void mitk::OpenCVVideoSource::FetchFrame()
       {
         double framePos = this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
         MITK_DEBUG << "End of video file found. framePos: " << framePos;
-        if(m_RepeatVideo &&  framePos >= 0.99)
+        if(m_RepeatVideo && framePos >= 0.99)
         {
           MITK_DEBUG << "Restarting video file playback.";
           this->SetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO, 0);

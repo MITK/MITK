@@ -150,62 +150,7 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked(bool checked)
   MITK_INFO << "play button clicked";
   if (checked)
   {
-    if (m_VideoSource->GetCapturePaused())
-    {
-      this->SwitchPlayButton(false);
-      m_VideoSource->PauseCapturing();
-    }
-    else
-    {
-      if (m_Controls->UseGrabbingDeviceButton->isChecked())
-      {
-        m_VideoSource->SetVideoCameraInput(m_Controls->GrabbingDeviceNumber->text().toInt(), false);
-        m_Controls->VideoFileControls->setEnabled(false);
-      }
-      else
-      {
-        m_VideoSource->SetVideoFileInput(m_Controls->FileChooser->GetFile().c_str(), m_Controls->RepeatVideoButton->isChecked(), false);
-        m_VideoSource->SetRepeatVideo(m_Controls->RepeatVideoButton->isChecked());
-        m_Controls->VideoProgressSlider->setValue(0);
-      }
-
-      m_VideoSource->StartCapturing();
-      if (!m_VideoSource->IsCapturingEnabled())
-      {
-        MITK_ERROR << "Video could not be initialized!";
-        m_Controls->PlayButton->setChecked(false);
-      }
-
-      else
-      {
-        int hertz = m_Controls->UpdateRate->text().toInt();
-        int updateTime = itk::Math::Round<int, double>(1000.0 / hertz);
-
-        // resets the whole background
-        m_VideoBackground->SetTimerDelay(updateTime);
-        m_VideoBackground->AddRenderWindow(m_RenderWindow->GetVtkRenderWindow());
-        this->connect(m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
-          , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
-
-        m_VideoBackground->Enable();
-        this->m_Controls->StopButton->setEnabled(true);
-        // show video file controls
-        if (m_Controls->UseVideoFileButton->isChecked())
-        {
-          m_Controls->VideoFileControls->setEnabled(true);
-          m_Controls->RepeatVideoButton->setEnabled(true);
-          m_Controls->VideoProgressSlider->setEnabled(true);
-        }
-        // show pause button
-        this->SwitchPlayButton(false);
-        // disable other controls
-        m_Controls->GrabbingDevicePanel->setEnabled(false);
-        m_Controls->VideoFilePanel->setEnabled(false);
-        m_Controls->UseGrabbingDeviceButton->setEnabled(false);
-        m_Controls->UseVideoFileButton->setEnabled(false);
-        m_Controls->UpdateRatePanel->setEnabled(false);
-      }
-    }
+    this->Play();
   }
   else
   {
@@ -218,6 +163,68 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked(bool checked)
 void QmitkOpenCVVideoControls::on_StopButton_clicked(bool /*checked=false*/)
 {
   this->Stop();
+}
+
+void QmitkOpenCVVideoControls::Play()
+{
+  if (m_VideoSource->GetCapturePaused())
+  {
+    this->SwitchPlayButton(false);
+    m_VideoSource->PauseCapturing();
+  }
+  else
+  {
+    if (m_Controls->UseGrabbingDeviceButton->isChecked())
+    {
+      m_VideoSource->SetVideoCameraInput(m_Controls->GrabbingDeviceNumber->text().toInt(), false);
+      m_Controls->VideoFileControls->setEnabled(false);
+    }
+    else
+    {
+      m_VideoSource->SetVideoFileInput(m_Controls->FileChooser->GetFile().c_str(), m_Controls->RepeatVideoButton->isChecked(), false);
+      m_VideoSource->SetRepeatVideo(m_Controls->RepeatVideoButton->isChecked());
+      m_Controls->VideoProgressSlider->setValue(0);
+    }
+
+    m_VideoSource->StartCapturing();
+
+    if (!m_VideoSource->IsCapturingEnabled())
+    {
+      MITK_ERROR << "Video could not be initialized!";
+      m_Controls->PlayButton->setChecked(false);
+    }
+    else
+    {
+      int hertz = m_Controls->UpdateRate->text().toInt();
+      int updateTime = itk::Math::Round<int, double>(1000.0 / hertz);
+
+      // resets the whole background
+      m_VideoBackground->SetTimerDelay(updateTime);
+      m_VideoBackground->AddRenderWindow(m_RenderWindow->GetVtkRenderWindow());
+      this->connect(m_VideoBackground, SIGNAL(NewFrameAvailable(mitk::VideoSource*))
+        , this, SLOT(NewFrameAvailable(mitk::VideoSource*)));
+      this->connect(m_VideoBackground, SIGNAL(EndOfVideoSourceReached(mitk::VideoSource*))
+        , this, SLOT(EndOfVideoSourceReached(mitk::VideoSource*)));
+
+      m_VideoBackground->Enable();
+      this->m_Controls->StopButton->setEnabled(true);
+      // show video file controls
+      if (m_Controls->UseVideoFileButton->isChecked())
+      {
+        m_Controls->VideoFileControls->setEnabled(true);
+        m_Controls->RepeatVideoButton->setEnabled(true);
+        m_Controls->VideoProgressSlider->setEnabled(true);
+      }
+      // show pause button
+      this->SwitchPlayButton(false);
+      // disable other controls
+      m_Controls->GrabbingDevicePanel->setEnabled(false);
+      m_Controls->VideoFilePanel->setEnabled(false);
+      m_Controls->UseGrabbingDeviceButton->setEnabled(false);
+      m_Controls->UseVideoFileButton->setEnabled(false);
+      m_Controls->UpdateRatePanel->setEnabled(false);
+    }
+  }
 }
 
 void QmitkOpenCVVideoControls::Stop()
@@ -276,6 +283,19 @@ void QmitkOpenCVVideoControls::NewFrameAvailable(mitk::VideoSource* /*videoSourc
   if (!m_SliderCurrentlyMoved)
     m_Controls->VideoProgressSlider->setValue(itk::Math::Round<int, double>(m_VideoSource->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO)
     *m_Controls->VideoProgressSlider->maximum()));
+}
+
+void QmitkOpenCVVideoControls::EndOfVideoSourceReached(mitk::VideoSource* /*videoSource*/)
+{
+  if (m_Controls->RepeatVideoButton->isChecked())
+  {
+    this->Reset();
+    this->Play();
+  }
+  else
+  {
+    this->Stop();
+  }
 }
 
 void QmitkOpenCVVideoControls::SetRenderWindow(QmitkRenderWindow* _RenderWindow)

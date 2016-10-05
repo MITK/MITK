@@ -257,11 +257,11 @@ void mitk::BaseRenderer::UnregisterLocalStorageHandler(mitk::BaseLocalStorageHan
   m_RegisteredLocalStorageHandlers.remove(lsh);
 }
 
-void mitk::BaseRenderer::SetDataStorage(DataStorage* storage)
+void mitk::BaseRenderer::SetDataStorage(DataStorage* dataStorage)
 {
-  if (storage != m_DataStorage && storage != nullptr )
+  if (dataStorage != m_DataStorage && dataStorage != nullptr)
   {
-    m_DataStorage = storage;
+    m_DataStorage = dataStorage;
     m_BindDispatcherInteractor->SetDataStorage(m_DataStorage);
     this->Modified();
   }

@@ -117,7 +117,7 @@ public:
 
   void AddPlanesToDataStorage();
 
-  void SetDataStorage( mitk::DataStorage* ds );
+  void SetDataStorage( mitk::DataStorage* dataStorage );
 
   /** \brief Listener to the CrosshairPositionEvent
 

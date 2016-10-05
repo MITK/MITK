@@ -95,17 +95,7 @@ namespace mitk {
     */
     template < typename TPixel, unsigned int VImageDimension >
      void  CutImage(itk::Image< TPixel, VImageDimension >* inputItkImage, int timeStep);
-    /**
-    * @brief Template Function for cropping and masking images with rgb pixel type
-    */
-    template < typename TPixel, unsigned int VImageDimension >
-     void  CutImage(itk::Image<itk::RGBPixel<TPixel>, VImageDimension >* inputItkImage, int timeStep);
-    /**
-    * @brief Template Function for cropping and masking images with vector pixel type
-    **/
- /*    template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
-     void CutImage(itk::VectorImage<itk::Pixel<TPixel>, VImageDimension >* itkImage, int boTimeStep);
-*/
+
     /**
     *@brief Process the image and create the output
      **/

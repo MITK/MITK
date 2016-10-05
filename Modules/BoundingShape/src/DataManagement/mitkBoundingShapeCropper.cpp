@@ -54,12 +54,6 @@ namespace mitk
   {
   }
 
-  //template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
-  //void BoundingShapeCropper::CutImage
-  // (itk::VectorImage<TPixel, VImageDimension>* inputItkImage, int timeStep/* boTimeStep */, TOutputPixel* /* dummy */)
-  //{
-  // // TO DO make possible to crop vector images
-  //}
   template < typename TPixel, unsigned int VImageDimension >
   void BoundingShapeCropper::CutImage(itk::Image< TPixel, VImageDimension >* inputItkImage, int timeStep)
   {
@@ -154,107 +148,6 @@ namespace mitk
         || (this->m_UseCropTimeStepOnly && timeStep == this->m_CurrentTimeStep && isInside))
       {
         outputIt.Set((TOutputPixel)inputIt.Value());
-      }
-      else
-      {
-        outputIt.Set(outsideValue);
-      }
-    }
-  }
-
-  template < typename TPixel, unsigned int VImageDimension >
-  void BoundingShapeCropper::CutImage(itk::Image<itk::RGBPixel<TPixel>, VImageDimension >* inputItkImage, int timeStep)
-  {
-    MITK_INFO << "RGB Pixeltype" << std::endl;
-
-    typedef TPixel TOutputPixel;
-    typedef itk::RGBPixel<TPixel> PixelType;
-    typedef itk::RGBPixel<TOutputPixel> OutputPixelType;
-    typedef itk::Image<PixelType, VImageDimension> ItkInputImageType;
-    typedef itk::Image<OutputPixelType, VImageDimension> ItkOutputImageType;
-    typedef typename itk::ImageBase<VImageDimension>::RegionType ItkRegionType;
-    typedef itk::ImageRegionIteratorWithIndex< ItkInputImageType > ItkInputImageIteratorType;
-    typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
-
-    TOutputPixel outsideValue = itk::NumericTraits<TOutputPixel>::min();
-    if (this->m_Geometry.IsNull())
-      return;
-
-    if (inputItkImage == nullptr)
-    {
-      mitk::StatusBar::GetInstance()->DisplayErrorText("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
-      std::cout << " image is NULL...returning" << std::endl;
-      return;
-    }
-
-    // first convert the index
-    typename ItkRegionType::IndexType::IndexValueType tmpIndex[3];
-    itk2vtk(this->m_InputRequestedRegion.GetIndex(), tmpIndex);
-    typename ItkRegionType::IndexType index;
-    index.SetIndex(tmpIndex);
-
-    // then convert the size
-    typename ItkRegionType::SizeType::SizeValueType tmpSize[3];
-    itk2vtk(this->m_InputRequestedRegion.GetSize(), tmpSize);
-    typename ItkRegionType::SizeType size;
-    size.SetSize(tmpSize);
-
-    //create the ITK-image-region out of index and size
-    ItkRegionType inputRegionOfInterest(index, size);
-
-    // TODO maybe use mitkImageAccessor instead
-    typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
-    outputimagetoitk->SetInput(this->m_OutputTimeSelector->GetOutput());
-    outputimagetoitk->Update();
-    typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
-
-    // create the iterators
-    ItkInputImageIteratorType inputIt(inputItkImage, inputRegionOfInterest);
-    ItkOutputImageIteratorType outputIt(outputItkImage, outputItkImage->GetLargestPossibleRegion());
-
-    // Cut the boundingbox out of the image by iterating through
-    mitk::Point3D p;
-
-    mitk::BaseGeometry* inputGeometry = this->GetInput()->GetGeometry(timeStep);
-
-    // calculates translation based on offset+extent not on the transformation matrix
-    vtkSmartPointer<vtkMatrix4x4> imageTransform = this->m_Geometry->GetGeometry()->GetVtkTransform()->GetMatrix();
-    Point3D center = this->m_Geometry->GetGeometry()->GetCenter();
-    auto translation = vtkSmartPointer<vtkTransform>::New();
-    translation->Translate(center[0] - imageTransform->GetElement(0, 3), center[1] - imageTransform->GetElement(1, 3), center[2] - imageTransform->GetElement(2, 3));
-
-    auto transform = vtkSmartPointer<vtkTransform>::New();
-    transform->SetMatrix(imageTransform);
-    transform->PostMultiply();
-    transform->Concatenate(translation);
-    transform->Update();
-
-    mitk::Vector3D extent;
-    for (unsigned int i = 0; i < 3; ++i)
-      extent[i] = (this->m_Geometry->GetGeometry()->GetExtent(i));
-
-    // no, use the pixel value of the original image (normal cutting)
-    for (inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
-    {
-      vtk2itk(inputIt.GetIndex(), p);
-      inputGeometry->IndexToWorld(p, p);
-      ScalarType p2[4];
-      p2[0] = p[0];
-      p2[1] = p[1];
-      p2[2] = p[2];
-      p2[3] = 1;
-      // transform point from world to object coordinates
-      transform->GetInverse()->TransformPoint(p2, p2);
-      // check if the world point is within bounds
-      bool isInside = (p2[0] >= (-extent[0] / 2.0)) && (p2[0] <= (extent[0] / 2.0))
-        && (p2[1] >= (-extent[1] / 2.0)) && (p2[1] <= (extent[1] / 2.0))
-        && (p2[2] >= (-extent[2] / 2.0)) && (p2[2] <= (extent[2] / 2.0));
-
-      if ((!this->m_UseCropTimeStepOnly && isInside)
-        || (this->m_UseCropTimeStepOnly && timeStep != this->m_CurrentTimeStep)
-        || (this->m_UseCropTimeStepOnly && timeStep == this->m_CurrentTimeStep && isInside))
-      {
-        outputIt.Set((OutputPixelType)inputIt.Value());
       }
       else
       {
@@ -377,61 +270,7 @@ namespace mitk
       return;
     }
 
-    // Check if pixeltype is rgb
-    const mitk::PixelType &pixelType = image->GetPixelType();
-
-    if ((pixelType.GetPixelType() == itk::ImageIOBase::RGB) || (pixelType.GetPixelType() == itk::ImageIOBase::RGBA))
-    {
-      MITK_INFO << "is rgb";
-      switch (pixelType.GetComponentType())
-      {
-      case itk::ImageIOBase::UCHAR:
-      {
-        AccessFixedPixelTypeByItk_1(image, CutImage, (itk::RGBPixel<unsigned char>), boTimeStep);
-      }
-      case itk::ImageIOBase::USHORT:
-      {
-        AccessFixedPixelTypeByItk_1(image, CutImage, (itk::RGBPixel<unsigned short>), boTimeStep);
-        break;
-      }
-      case itk::ImageIOBase::FLOAT:
-      {
-        AccessFixedPixelTypeByItk_1(image, CutImage, (itk::RGBPixel<float>), boTimeStep);
-        break;
-      }
-      case itk::ImageIOBase::DOUBLE:
-      {
-        AccessFixedPixelTypeByItk_1(image, CutImage, (itk::RGBPixel<double>), boTimeStep);
-        break;
-      }
-      default:
-        MITK_ERROR << "Can not handle pixel component type " << pixelType.GetComponentType();
-        return;
-      }
-    }
-    else if (pixelType.GetPixelType() == itk::ImageIOBase::SCALAR)
-    {
-      switch (image->GetDimension())
-      {
-      case 2:
-      {
-        AccessFixedDimensionByItk_1(image, CutImage, 2, boTimeStep); break;
-      }
-      case 3:
-      {
-        AccessFixedDimensionByItk_1(image, CutImage, 3, boTimeStep); break;
-      }
-      case 4:
-      {
-        AccessFixedDimensionByItk_1(image, CutImage, 4, boTimeStep); break;
-      }
-      default: break;
-      }
-    }
-    else
-    {
-      MITK_ERROR << "Unsupported pixel type" << std::endl;
-    }
+    AccessByItk_1(image, CutImage, boTimeStep);
   }
 
   void BoundingShapeCropper::GenerateData()

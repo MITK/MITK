@@ -121,7 +121,7 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
 
 void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage* storage)
 {
-  if (storage == NULL)
+  if (storage == NULL || storage == m_DataStorage)
     return;
 
   BaseRenderer::SetDataStorage(storage);

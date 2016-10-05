@@ -1,0 +1,56 @@
+#-----------------------------------------------------------------------------
+# DCMQI
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_DCMQI)
+  set(proj DCMQI)
+  set(proj_DEPENDENCIES DCMTK ITK)
+  set(${proj}_DEPENDS ${proj})
+
+  # Sanity checks
+  if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
+    message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")
+  endif()
+
+  if(NOT DEFINED ${proj}_DIR)
+    set(additional_cmake_args)
+
+    if(CTEST_USE_LAUNCHERS)
+      list(APPEND additional_cmake_args
+      "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
+      )
+    endif()
+
+    ExternalProject_Add(${proj}
+      LIST_SEPARATOR ${sep}
+      #TODO MITK-Data
+      URL https://dl.dropbox.com/s/1rye5oewqxx4zn5/dcmqi-src-org.tar.gz
+      URL_MD5 d56a6a11a84a753c7498be5dce8f7a34
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMQI.patch
+      UPDATE_COMMAND ""
+      INSTALL_COMMAND ""
+      CMAKE_GENERATOR ${gen}
+      CMAKE_ARGS
+        ${ep_common_args}
+        ${additional_cmake_args}
+        #-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DDCMQI_SUPERBUILD:BOOL=OFF
+        -DDCMTK_DIR:PATH=${DCMTK_DIR}
+        -DITK_DIR:PATH=${ITK_DIR}
+      CMAKE_CACHE_ARGS
+        ${ep_common_cache_args}
+      CMAKE_CACHE_DEFAULT_ARGS
+        ${ep_common_cache_default_args}
+      DEPENDS ${proj_DEPENDENCIES}
+    )
+
+
+    ExternalProject_Get_Property(${proj} binary_dir)
+    set(${proj}_DIR ${binary_dir})
+    #set(${proj}_DIR ${ep_prefix})
+    #message(${proj}_DIR: ${${proj}_DIR})
+    #mitkFunctionInstallExternalCMakeProject(${proj})
+  else()
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+  endif()
+endif()

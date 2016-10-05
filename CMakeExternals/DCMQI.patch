@@ -1,0 +1,63 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 845863f..857d83a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -206,17 +206,6 @@ foreach(file
+   install(FILES ${file} DESTINATION ${DCMQI_INSTALL_CMAKE_DIR} COMPONENT Development)
+ endforeach()
+
+-#-----------------------------------------------------------------------------
+-# DCMQI dependencies - Projects should be TOPOLOGICALLY ordered
+-#-----------------------------------------------------------------------------
+-set(DCMQI_DEPENDENCIES
+-  zlib
+-  DCMTK
+-  ITK
+-  SlicerExecutionModel
+-  )
+-
+-include(CMake/ctkBlockCheckDependencies.cmake)
+
+
+ #-----------------------------------------------------------------------------
+@@ -229,11 +218,26 @@ if(DCMQI_SUPERBUILD)
+ endif()
+
+ find_package(DCMTK NO_MODULE REQUIRED)
+-find_package(SlicerExecutionModel NO_MODULE REQUIRED GenerateCLP)
++find_package(SlicerExecutionModel QUIET NO_MODULE)
+ find_package(ITK NO_MODULE REQUIRED)
+ include(${ITK_USE_FILE})
+
+-include(${SlicerExecutionModel_USE_FILE})
++#-----------------------------------------------------------------------------
++# DCMQI dependencies - Projects should be TOPOLOGICALLY ordered
++#-----------------------------------------------------------------------------
++set(DCMQI_DEPENDENCIES
++  zlib
++  DCMTK
++  ITK
++  )
++
++if(SlicerExecutionModel_FOUND)
++  list(APPEND DCMQI_DEPENDENCIES SlicerExecutionModel)
++  include(${SlicerExecutionModel_USE_FILE})
++  find_package(SlicerExecutionModel NO_MODULE REQUIRED GenerateCLP)
++endif()
++
++include(CMake/ctkBlockCheckDependencies.cmake)
+
+ include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/FindGit.cmake)
+ include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/dcmqiMacroExtractRepositoryInfo.cmake)
+@@ -255,7 +259,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp)
+ set(JSONCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp/jsoncpp.cpp)
+
+ add_subdirectory("libsrc")
+-
+-add_subdirectory("apps")
+-
+ add_subdirectory("doc")
++
++if(SlicerExecutionModel_FOUND)
++  add_subdirectory("apps")
++endif()

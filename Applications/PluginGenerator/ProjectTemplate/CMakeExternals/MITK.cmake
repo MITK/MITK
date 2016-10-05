@@ -20,6 +20,7 @@ if(NOT MITK_DIR)
   option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
   option(MITK_USE_DCMTK "Use DCMTK in MITK" ON)
+  option(MITK_USE_DCMQI "Use dcmqi in MITK" OFF)
   option(MITK_USE_QT "Use Qt library in MITK" ON)
   option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
@@ -54,6 +55,7 @@ if(NOT MITK_DIR)
     MITK_USE_ACVD
     MITK_USE_CTK
     MITK_USE_DCMTK
+    MITK_USE_DCMQI
     MITK_USE_QT
     MITK_USE_OpenCV
     MITK_USE_SOFA
@@ -95,7 +97,7 @@ if(NOT MITK_DIR)
   # Create options to inject pre-build dependencies
   #-----------------------------------------------------------------------------
 
-  foreach(proj CTK DCMTK GDCM VTK ACVD ITK OpenCV SOFA VMTK CableSwig)
+  foreach(proj CTK DCMTK DCMQI GDCM VTK ACVD ITK OpenCV SOFA VMTK CableSwig)
     if(MITK_USE_${proj})
       set(MITK_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
       mark_as_advanced(MITK_${proj}_DIR)

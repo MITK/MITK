@@ -139,11 +139,7 @@ void mitk::BoundingShapeVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
 void mitk::BoundingShapeVtkMapper2D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool overwrite)
 {
-  if (node != nullptr)
-  {
-    node->AddProperty("BoundingShape.Visual.2D Rendering", BoolProperty::New(false), renderer, overwrite);
-    Superclass::SetDefaultProperties(node, renderer, overwrite);
-  }
+  Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
 mitk::BoundingShapeVtkMapper2D::BoundingShapeVtkMapper2D()
@@ -331,7 +327,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer* rende
 
       if (localStorage->m_Cutter->GetOutput()->GetNumberOfPoints() > 0) // if plane is visible in the renderwindow
       {
-      mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("handle size factor"));
+      mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
 
       ScalarType initialHandleSize;
       if (handleSizeProperty != nullptr)
@@ -348,7 +344,7 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer* rende
           unsigned int i = 0;
 
       // add handles and their assigned properties to the local storage
-          mitk::IntProperty::Pointer activeHandleId = dynamic_cast<mitk::IntProperty*>(node->GetProperty("BoundingShapeInteractor.active handle id"));
+          mitk::IntProperty::Pointer activeHandleId = dynamic_cast<mitk::IntProperty*>(node->GetProperty("Bounding Shape.Active Handle ID"));
 
       bool visible = false;
       bool selected = false;

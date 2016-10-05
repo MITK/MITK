@@ -28,26 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeVtkMapper3D : public VtkMapper
   {
-    class LocalStorage : public Mapper::BaseLocalStorage
-    {
-    public:
-      LocalStorage();
-      ~LocalStorage();
-      std::vector<vtkSmartPointer<vtkSphereSource>> m_Handles;
-      vtkSmartPointer<vtkActor> m_Actor;
-      vtkSmartPointer<vtkActor> m_HandleActor;
-      vtkSmartPointer<vtkActor> m_SelectedHandleActor;
-      vtkSmartPointer<vtkPropAssembly> m_PropAssembly;
-    private:
-      LocalStorage(const LocalStorage&);
-      LocalStorage& operator=(const LocalStorage&);
-    };
-
   public:
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
 
     mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper)
     itkFactorylessNewMacro(Self)

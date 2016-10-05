@@ -34,10 +34,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usGetModuleContext.h"
 
 // Properties to allow the user to interact with the base data
-const char* selectedColorPropertyName = "BoundingShapeInteractor.selected color";
-const char* deselectedColorPropertyName = "BoundingShapeInteractor.deselected color";
-const char* activeHandleIdPropertyName = "BoundingShapeInteractor.active handle id";
-const char* boundingShapePropertyName = "BoundingShapeInteractor";
+const char* selectedColorPropertyName = "Bounding Shape.Selected Color";
+const char* deselectedColorPropertyName = "Bounding Shape.Deselected Color";
+const char* activeHandleIdPropertyName = "Bounding Shape.Active Handle ID";
+const char* boundingShapePropertyName = "Bounding Shape";
 
 namespace mitk
 {
@@ -262,7 +262,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
   std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
   interactionEvent->GetSender()->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
   double scale = interactionEvent->GetSender()->GetScaleFactorMMPerDisplayUnit(); //GetDisplaySizeInMM
-  mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("handle size factor"));
+  mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
 
   ScalarType initialHandleSize;
   if (handleSizeProperty != nullptr)

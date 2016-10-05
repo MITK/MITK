@@ -142,9 +142,9 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode* node)
     m_Advanced = true;
 
     mitk::ColorProperty::Pointer selcolorProperty = dynamic_cast<mitk::ColorProperty*>
-      (m_CroppingObjectNode->GetProperty("BoundingShapeInteractor.selected color"));
+      (m_CroppingObjectNode->GetProperty("Bounding Shape.Selected Color"));
     mitk::ColorProperty::Pointer deselcolorProperty = dynamic_cast<mitk::ColorProperty*>
-      (m_CroppingObjectNode->GetProperty("BoundingShapeInteractor.deselected color"));
+      (m_CroppingObjectNode->GetProperty("Bounding Shape.Deselected Color"));
     if (selcolorProperty && deselcolorProperty)
     {
       mitk::Color deselColor = deselcolorProperty->GetColor();
@@ -257,7 +257,6 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     m_CroppingObjectNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
     m_CroppingObjectNode->SetProperty("opacity", mitk::FloatProperty::New(0.6));
     m_CroppingObjectNode->SetProperty("layer", mitk::IntProperty::New(99));
-    m_CroppingObjectNode->AddProperty("isBoundingShape", mitk::BoolProperty::New(true));
     m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
     m_CroppingObjectNode->SetBoolProperty("pickable", true);
 
@@ -397,13 +396,13 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
 
 void QmitkImageCropper::OnSelectedColorChanged()
 {
-  mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("BoundingShapeInteractor.selected color"));
+  mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("Bounding Shape.Selected Color"));
   this->ChangeColor(colorProperty, true);
 }
 
 void QmitkImageCropper::OnDeselectedColorChanged()
 {
-  mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("BoundingShapeInteractor.deselected color"));
+  mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("Bounding Shape.Deselected Color"));
   this->ChangeColor(colorProperty, false);
 
 }
@@ -628,5 +627,3 @@ void QmitkImageCropper::ProcessImage(bool mask)
     QMessageBox::information(nullptr, "Warning", "Please load and select an image before starting image processing.");
   }
 }
-
-

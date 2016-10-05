@@ -31,7 +31,7 @@ mitk::Mapper::Pointer mitk::BoundingShapeObjectFactory::CreateMapper(mitk::DataN
 {
   Mapper::Pointer mapper;
 
-  if (dynamic_cast<GeometryData*>(node->GetData()) != NULL)
+  if (dynamic_cast<GeometryData*>(node->GetData()) != nullptr)
   {
     if (slotId == BaseRenderer::Standard2D)
     {

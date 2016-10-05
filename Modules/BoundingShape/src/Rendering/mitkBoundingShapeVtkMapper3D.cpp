@@ -32,6 +32,22 @@ namespace mitk
 {
   class BoundingShapeVtkMapper3D::Impl
   {
+    class LocalStorage : public Mapper::BaseLocalStorage
+    {
+    public:
+      LocalStorage();
+      ~LocalStorage();
+
+      LocalStorage(const LocalStorage&) = delete;
+      LocalStorage& operator=(const LocalStorage&) = delete;
+
+      std::vector<vtkSmartPointer<vtkSphereSource>> Handles;
+      vtkSmartPointer<vtkActor> Actor;
+      vtkSmartPointer<vtkActor> HandleActor;
+      vtkSmartPointer<vtkActor> SelectedHandleActor;
+      vtkSmartPointer<vtkPropAssembly> PropAssembly;
+    };
+
   public:
     Impl()
       : DistanceFromCam(1.0)
@@ -49,26 +65,22 @@ namespace mitk
   };
 }
 
-mitk::BoundingShapeVtkMapper3D::LocalStorage::LocalStorage()
-  : m_Actor(vtkSmartPointer<vtkActor>::New()), m_HandleActor(vtkSmartPointer<vtkActor>::New()), m_SelectedHandleActor(vtkSmartPointer<vtkActor>::New()), m_PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
+mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::LocalStorage()
+  : Actor(vtkSmartPointer<vtkActor>::New()),
+    HandleActor(vtkSmartPointer<vtkActor>::New()),
+    SelectedHandleActor(vtkSmartPointer<vtkActor>::New()),
+    PropAssembly(vtkSmartPointer<vtkPropAssembly>::New())
 {
-  // initialize handles
   for (int i = 0; i < 6; i++)
-  {
-    m_Handles.push_back(vtkSmartPointer<vtkSphereSource>::New());
-  }
-
+    Handles.push_back(vtkSmartPointer<vtkSphereSource>::New());
 }
 
-mitk::BoundingShapeVtkMapper3D::LocalStorage::~LocalStorage()
+mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
 {
 }
 
 void mitk::BoundingShapeVtkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool overwrite)
 {
-  if (node == nullptr)
-    return;
-
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
@@ -82,8 +94,9 @@ mitk::BoundingShapeVtkMapper3D::~BoundingShapeVtkMapper3D()
   delete m_Impl;
 }
 
-void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*)
+void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor)
 {
+  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 }
 
 void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer* renderer, vtkActor* actor)
@@ -91,56 +104,37 @@ void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer* 
   if (actor == nullptr)
     return;
 
-  mitk::DataNode* dataNode = this->GetDataNode();
+  auto dataNode = this->GetDataNode();
 
   if (dataNode == nullptr)
     return;
 
-  bool render = false;
-  dataNode->GetBoolProperty("boundingshape.3drendering", render);
+  bool isVisible = false;
+  dataNode->GetBoolProperty("Bounding Shape.3D Rendering", isVisible, renderer);
 
-  actor->SetVisibility(render);
+  actor->SetVisibility(isVisible);
 
   float lineWidth = 1.0f;
-  dataNode->GetFloatProperty("boundingshape.line.width", lineWidth, renderer);
+  dataNode->GetFloatProperty("Bounding Shape.Line.Width", lineWidth, renderer);
 
-  vtkProperty* property = actor->GetProperty();
+  auto property = actor->GetProperty();
   property->SetLineWidth(lineWidth);
-
 }
 
 void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
 {
-  DataNode* node = this->GetDataNode();
+  auto dataNode = this->GetDataNode();
 
-  if (node == nullptr)
+  if (dataNode == nullptr)
     return;
 
+  vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
 
-  LocalStorage* localStorage = m_Impl->LocalStorageHandler.GetLocalStorage(renderer);
+  auto localStorage = m_Impl->LocalStorageHandler.GetLocalStorage(renderer);
+  bool needGenerateData = localStorage->GetLastGenerateDataTime() < dataNode->GetMTime();
+  double distance = camera->GetDistance();
 
-  vtkCamera* cam = 0;
-  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >(renderer);
-  if (propRenderer)
-  {
-    // get vtk renderer
-    vtkRenderer* vtkrenderer = propRenderer->GetVtkRenderer();
-    if (vtkrenderer)
-    {
-      // get vtk camera
-      vtkCamera* vtkcam = vtkrenderer->GetActiveCamera();
-      if (vtkcam)
-      {
-        // vtk smart pointer handling
-        cam = vtkcam;
-        cam->Register(nullptr);
-      }
-    }
-  }
-
-  bool needGenerateData = localStorage->GetLastGenerateDataTime() < node->GetMTime();
-  double distance = cam->GetDistance();
-  if (abs(cam->GetDistance() - m_Impl->DistanceFromCam) > 0.001)
+  if (abs(distance - m_Impl->DistanceFromCam) > mitk::eps)
   {
     m_Impl->DistanceFromCam = distance;
     needGenerateData = true;
@@ -148,17 +142,17 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
 
   if (needGenerateData)
   {
-    bool visible = true;
-    GetDataNode()->GetVisibility(visible, renderer, "visible");
+    bool isVisible = true;
+    dataNode->GetVisibility(isVisible, renderer);
 
-    if (!visible)
+    if (!isVisible)
     {
-      localStorage->m_Actor->VisibilityOff();
+      localStorage->Actor->VisibilityOff();
       return;
     }
 
     // set the input-object at time t for the mapper
-    GeometryData* geometryData = dynamic_cast<GeometryData*>(node->GetData());
+    GeometryData* geometryData = dynamic_cast<GeometryData*>(dataNode->GetData());
     if (geometryData == nullptr)
       return;
 
@@ -225,11 +219,11 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     vtkSmartPointer<vtkPolyData> polydata = transformFilter->GetPolyDataOutput();
     if (polydata == nullptr)
     {
-      localStorage->m_Actor->VisibilityOff();
+      localStorage->Actor->VisibilityOff();
       return;
     }
 
-    mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("handle size factor"));
+    mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
 
     ScalarType initialHandleSize;
     if (handleSizeProperty != nullptr)
@@ -237,20 +231,20 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     else
       initialHandleSize = 1.0/40.0;
 
-    double handlesize = ((cam->GetDistance()*std::tan(vtkMath::RadiansFromDegrees(cam->GetViewAngle()))) / 2.0)*initialHandleSize;
+    double handlesize = ((camera->GetDistance()*std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0)*initialHandleSize;
 
-    if (localStorage->m_PropAssembly->GetParts()->IsItemPresent(localStorage->m_HandleActor))
-      localStorage->m_PropAssembly->RemovePart(localStorage->m_HandleActor);
-    if (localStorage->m_PropAssembly->GetParts()->IsItemPresent(localStorage->m_Actor))
-      localStorage->m_PropAssembly->RemovePart(localStorage->m_Actor);
+    if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->HandleActor))
+      localStorage->PropAssembly->RemovePart(localStorage->HandleActor);
+    if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->Actor))
+      localStorage->PropAssembly->RemovePart(localStorage->Actor);
 
     auto selectedhandlemapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
 
-    mitk::IntProperty::Pointer activeHandleId = dynamic_cast<mitk::IntProperty*>(node->GetProperty("BoundingShapeInteractor.active handle id"));
+    mitk::IntProperty::Pointer activeHandleId = dynamic_cast<mitk::IntProperty*>(dataNode->GetProperty("Bounding Shape.Active Handle ID"));
 
     int i = 0;
-    for (auto &handle : localStorage->m_Handles)
+    for (auto &handle : localStorage->Handles)
     {
       Point3D handlecenter = m_Impl->HandlePropertyList[i].GetPosition();
       handle->SetCenter(handlecenter[0], handlecenter[1], handlecenter[2]);
@@ -269,10 +263,10 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
         else
         {
           selectedhandlemapper->SetInputData(handle->GetOutput());
-          localStorage->m_SelectedHandleActor->SetMapper(selectedhandlemapper);
-          localStorage->m_SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
-          localStorage->m_SelectedHandleActor->GetMapper()->SetInputDataObject(handle->GetOutput());
-          localStorage->m_PropAssembly->AddPart(localStorage->m_SelectedHandleActor);
+          localStorage->SelectedHandleActor->SetMapper(selectedhandlemapper);
+          localStorage->SelectedHandleActor->GetProperty()->SetColor(0, 1, 0);
+          localStorage->SelectedHandleActor->GetMapper()->SetInputDataObject(handle->GetOutput());
+          localStorage->PropAssembly->AddPart(localStorage->SelectedHandleActor);
         }
       }
       i++;
@@ -285,55 +279,54 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     auto handlemapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     handlemapper->SetInputData(appendPoly->GetOutput());
 
-    localStorage->m_Actor->SetMapper(mapper);
-    localStorage->m_Actor->GetMapper()->SetInputDataObject(polydata);
-    localStorage->m_Actor->GetProperty()->SetOpacity(0.3);
+    localStorage->Actor->SetMapper(mapper);
+    localStorage->Actor->GetMapper()->SetInputDataObject(polydata);
+    localStorage->Actor->GetProperty()->SetOpacity(0.3);
 
-    mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color"));
+    mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("color"));
     if (selectedColor != nullptr){
       mitk::Color color = selectedColor->GetColor();
-      localStorage->m_Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
+      localStorage->Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
     }
 
-    localStorage->m_HandleActor->SetMapper(handlemapper);
+    localStorage->HandleActor->SetMapper(handlemapper);
     if (activeHandleId == nullptr)
     {
-      localStorage->m_HandleActor->GetProperty()->SetColor(1, 1, 1);
+      localStorage->HandleActor->GetProperty()->SetColor(1, 1, 1);
     }
     else
     {
-      localStorage->m_HandleActor->GetProperty()->SetColor(1, 0, 0);
+      localStorage->HandleActor->GetProperty()->SetColor(1, 0, 0);
     }
 
-    localStorage->m_HandleActor->GetMapper()->SetInputDataObject(appendPoly->GetOutput());
+    localStorage->HandleActor->GetMapper()->SetInputDataObject(appendPoly->GetOutput());
 
-    this->ApplyColorAndOpacityProperties(renderer, localStorage->m_Actor);
-    this->ApplyBoundingShapeProperties(renderer, localStorage->m_Actor);
+    this->ApplyColorAndOpacityProperties(renderer, localStorage->Actor);
+    this->ApplyBoundingShapeProperties(renderer, localStorage->Actor);
 
-    this->ApplyColorAndOpacityProperties(renderer, localStorage->m_HandleActor);
-    this->ApplyBoundingShapeProperties(renderer, localStorage->m_HandleActor);
+    this->ApplyColorAndOpacityProperties(renderer, localStorage->HandleActor);
+    this->ApplyBoundingShapeProperties(renderer, localStorage->HandleActor);
 
-    this->ApplyColorAndOpacityProperties(renderer, localStorage->m_SelectedHandleActor);
-    this->ApplyBoundingShapeProperties(renderer, localStorage->m_SelectedHandleActor);
+    this->ApplyColorAndOpacityProperties(renderer, localStorage->SelectedHandleActor);
+    this->ApplyBoundingShapeProperties(renderer, localStorage->SelectedHandleActor);
 
     // apply properties read from the PropertyList
     // this->ApplyProperties(localStorage->m_Actor, renderer);
     // this->ApplyProperties(localStorage->m_HandleActor, renderer);
     // this->ApplyProperties(localStorage->m_SelectedHandleActor, renderer);
 
-    localStorage->m_Actor->VisibilityOn();
-    localStorage->m_HandleActor->VisibilityOn();
-    localStorage->m_SelectedHandleActor->VisibilityOn();
+    localStorage->Actor->VisibilityOn();
+    localStorage->HandleActor->VisibilityOn();
+    localStorage->SelectedHandleActor->VisibilityOn();
 
-    localStorage->m_PropAssembly->AddPart(localStorage->m_Actor);
-    localStorage->m_PropAssembly->AddPart(localStorage->m_HandleActor);
-    localStorage->m_PropAssembly->VisibilityOn();
+    localStorage->PropAssembly->AddPart(localStorage->Actor);
+    localStorage->PropAssembly->AddPart(localStorage->HandleActor);
+    localStorage->PropAssembly->VisibilityOn();
 
     localStorage->UpdateGenerateDataTime();
   }
 }
 vtkProp* mitk::BoundingShapeVtkMapper3D::GetVtkProp(BaseRenderer* renderer)
 {
-  return m_Impl->LocalStorageHandler.GetLocalStorage(renderer)->m_PropAssembly;
+  return m_Impl->LocalStorageHandler.GetLocalStorage(renderer)->PropAssembly;
 }
-

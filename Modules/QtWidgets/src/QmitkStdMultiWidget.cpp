@@ -1683,10 +1683,10 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->UpdateLayers();
       mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->UpdateLayers();
       mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->UpdateLayers();
-      this->GetRenderWindow1()->GetRenderer()->ForceImmediateUpdate();
-      this->GetRenderWindow2()->GetRenderer()->ForceImmediateUpdate();
-      this->GetRenderWindow3()->GetRenderer()->ForceImmediateUpdate();
-      this->GetRenderWindow4()->GetRenderer()->ForceImmediateUpdate();
+      this->GetRenderWindow1()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow2()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow3()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow4()->GetRenderer()->RequestUpdate();
     }
   }
 }

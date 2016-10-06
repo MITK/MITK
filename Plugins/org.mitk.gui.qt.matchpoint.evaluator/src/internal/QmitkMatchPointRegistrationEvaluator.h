@@ -106,7 +106,8 @@ public:
   */
   berryObjectMacro(QmitkMatchPointRegistrationEvaluator)
 
-    QmitkMatchPointRegistrationEvaluator();
+  QmitkMatchPointRegistrationEvaluator();
+  ~QmitkMatchPointRegistrationEvaluator();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -114,16 +115,9 @@ public:
 
     /// \brief Called when the user clicks the GUI button
 
-    void OnComboStyleChanged(int);
-    void OnBlend50Pushed();
-    void OnBlendTargetPushed();
-    void OnBlendMovingPushed();
-    void OnBlendTogglePushed();
-    void OnSlideBlendChanged(int);
-    void OnSpinBlendChanged(int);
-    void OnSpinCheckerChanged(int);
-    void OnWipeStyleChanged();
-    void OnContourStyleChanged();
+  void OnEvalBtnPushed();
+  void OnStopBtnPushed();
+  void OnSettingsChanged(mitk::DataNode*);
 
     void OnSliceChanged();
 
@@ -148,6 +142,13 @@ private:
   QList<mitk::DataNode::Pointer> GetEvalNodes();
 
   /**
+  * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
+  * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
+  * They are also checked for vadility and stored in m_ValidInput,... .
+  * It also sets the info lables accordingly.*/
+  void CheckInputs();
+
+  /**
   * Updates the state of controls regarding to selected eval object.*/
   void ConfigureControls();
 
@@ -155,8 +156,6 @@ private:
   mitk::DataStorage::SetOfObjects::ConstPointer m_evalNodes;
 
   QmitkSliceChangedListener m_SliceChangeListener;
-
-  bool m_internalBlendUpdate;
 
   itk::TimeStamp m_selectedNodeTime;
   itk::TimeStamp m_currentPositionTime;
@@ -166,6 +165,16 @@ private:
   /** @brief indicates if the currently selected position is valid for the currently selected fit.
   * This it is within the input image */
   unsigned int m_currentSelectedTimeStep;
+
+  mitk::DataNode::Pointer m_spSelectedRegNode;
+  mitk::DataNode::Pointer m_spSelectedMovingNode;
+  mitk::DataNode::Pointer m_spSelectedTargetNode;
+
+  bool m_autoTarget;
+  bool m_autoMoving;
+  bool m_activeEvaluation;
+
+  const std::string HelperNodeName;
 };
 
 #endif // MatchPoint_h

@@ -14,259 +14,70 @@
    <property name="spacing">
     <number>5</number>
    </property>
-   <property name="margin">
+   <property name="leftMargin">
+    <number>5</number>
+   </property>
+   <property name="topMargin">
+    <number>5</number>
+   </property>
+   <property name="rightMargin">
+    <number>5</number>
+   </property>
+   <property name="bottomMargin">
     <number>5</number>
    </property>
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Evaluation visualization style:</string>
+      <string>Selected registration:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="comboStyle"/>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBlend">
-     <property name="title">
-      <string>Blend settings:</string>
+    <widget class="QLabel" name="lbRegistrationName">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="horizontalSpacing">
-       <number>5</number>
-      </property>
-      <property name="verticalSpacing">
-       <number>1</number>
-      </property>
-      <property name="margin">
-       <number>5</number>
-      </property>
-      <item row="2" column="2">
-       <widget class="QPushButton" name="pbBlendTarget">
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Sets the blend factor to 0% (only target is visible)</string>
-        </property>
-        <property name="text">
-         <string>target</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QPushButton" name="pbBlendMoving">
-        <property name="maximumSize">
-         <size>
-          <width>60</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Sets the blend factor to 100% (only mapped moving image is visible)</string>
-        </property>
-        <property name="text">
-         <string>mapped</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QPushButton" name="pbBlendToggle">
-        <property name="toolTip">
-         <string>&quot;Inverts&quot; the current blend factor.</string>
-        </property>
-        <property name="text">
-         <string>Toggle</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QSlider" name="slideBlend">
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>50</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="sbBlend">
-          <property name="suffix">
-           <string>%</string>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>50</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="3">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="pbBlend50">
-          <property name="maximumSize">
-           <size>
-            <width>60</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Sets blend factor to 50%:50%</string>
-          </property>
-          <property name="text">
-           <string>50:50</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupCheck">
-     <property name="title">
-      <string>Checkerboard settings:</string>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>5</number>
-      </property>
-      <property name="margin">
-       <number>5</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Field counts:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="sbChecker">
-        <property name="minimum">
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupWipe">
-     <property name="title">
-      <string>Wipe settings:</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="spacing">
-       <number>5</number>
-      </property>
-      <property name="margin">
-       <number>5</number>
-      </property>
-      <item>
-       <widget class="QRadioButton" name="radioWipeCross">
-        <property name="text">
-         <string>Cross</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioWipeH">
-        <property name="text">
-         <string>Horizontal Wipe</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioWipeV">
-        <property name="text">
-         <string>Vertical wipe</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupContour">
-     <property name="title">
-      <string>Contour settings</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>5</number>
-      </property>
-      <property name="margin">
-       <number>5</number>
-      </property>
-      <item>
-       <widget class="QRadioButton" name="radioTargetContour">
-        <property name="text">
-         <string>Target image as contour</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="radioMappedContour">
-        <property name="text">
-         <string>Mapped image as contour</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="labelNoSelect">
      <property name="palette">
       <palette>
        <active>
-        <colorrole role="WindowText">
+        <colorrole role="Text">
          <brush brushstyle="SolidPattern">
           <color alpha="255">
-           <red>170</red>
-           <green>0</green>
+           <red>0</red>
+           <green>170</green>
            <blue>0</blue>
           </color>
          </brush>
         </colorrole>
        </active>
        <inactive>
-        <colorrole role="WindowText">
+        <colorrole role="Text">
          <brush brushstyle="SolidPattern">
           <color alpha="255">
-           <red>170</red>
-           <green>0</green>
+           <red>0</red>
+           <green>170</green>
            <blue>0</blue>
           </color>
          </brush>
         </colorrole>
        </inactive>
        <disabled>
-        <colorrole role="WindowText">
+        <colorrole role="Text">
          <brush brushstyle="SolidPattern">
           <color alpha="255">
-           <red>120</red>
-           <green>120</green>
-           <blue>120</blue>
+           <red>159</red>
+           <green>158</green>
+           <blue>158</blue>
           </color>
          </brush>
         </colorrole>
@@ -279,11 +90,209 @@
        <bold>true</bold>
       </font>
      </property>
-     <property name="text">
-      <string>No registration evaluation object selected!</string>
+     <property name="toolTip">
+      <string>Registration that should be used to map the moving image...</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <property name="midLineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Selected moving image:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lbMovingName">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>159</red>
+           <green>158</green>
+           <blue>158</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Moving image that should be mapped...</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <property name="midLineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Selected target image:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lbTargetName">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="palette">
+      <palette>
+       <active>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </active>
+       <inactive>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>0</red>
+           <green>170</green>
+           <blue>0</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </inactive>
+       <disabled>
+        <colorrole role="Text">
+         <brush brushstyle="SolidPattern">
+          <color alpha="255">
+           <red>159</red>
+           <green>158</green>
+           <blue>158</blue>
+          </color>
+         </brush>
+        </colorrole>
+       </disabled>
+      </palette>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Reference image that is used to determine the field of view mapped into...</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <property name="midLineWidth">
+      <number>1</number>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pbEval">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starts the mapping of the input image with the current settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="text">
+      <string>Start evaluation</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pbStop">
+     <property name="text">
+      <string>Stop evaluation</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkRegEvalSettingsWidget" name="evalSettings" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>250</width>
+       <height>10</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -302,6 +311,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkRegEvalSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkRegEvalSettingsWidget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <designerdata>

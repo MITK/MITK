@@ -19,14 +19,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 
 // Mitk
-#include <mitkImageAccessByItk.h>
 #include <mitkStatusBar.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
+#include "mitkMatchPointPropertyTags.h"
 #include "mitkRegEvaluationObject.h"
-#include "mitkRegEvalStyleProperty.h"
-#include "mitkRegEvalWipeStyleProperty.h"
+#include "mitkRegistrationHelper.h"
+#include "mitkRegEvaluationMapper2D.h"
+#include <mitkAlgorithmHelper.h>
 
 // Qmitk
 #include "QmitkRenderWindow.h"
@@ -206,9 +208,17 @@ const std::string QmitkMatchPointRegistrationEvaluator::VIEW_ID =
     "org.mitk.views.matchpoint.registration.evaluator";
 
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-	: m_Parent(NULL), m_internalBlendUpdate(false), m_currentSelectedTimeStep(0)
+  : m_Parent(NULL), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationEvaluationHelper")
 {
   m_currentSelectedPosition.Fill(0.0);
+}
+
+QmitkMatchPointRegistrationEvaluator::~QmitkMatchPointRegistrationEvaluator()
+{
+  if (this->m_selectedEvalNode.IsNotNull() && this->GetDataStorage().IsNotNull())
+  {
+    this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  }
 }
 
 void QmitkMatchPointRegistrationEvaluator::SetFocus()
@@ -229,35 +239,16 @@ void QmitkMatchPointRegistrationEvaluator::CreateQtPartControl(QWidget* parent)
 
 	m_Parent = parent;
 
-	mitk::RegEvalStyleProperty::Pointer sampleProp = mitk::RegEvalStyleProperty::New();
-
-	for (unsigned int pos = 0; pos < sampleProp->Size(); ++pos)
-	{
-		this->m_Controls.comboStyle->insertItem(pos,
-		                                        QString::fromStdString(sampleProp->GetEnumString(pos)));
-	}
-
-	connect(m_Controls.comboStyle, SIGNAL(currentIndexChanged(int)), this,
-	        SLOT(OnComboStyleChanged(int)));
-
-	connect(m_Controls.pbBlend50, SIGNAL(clicked()), this, SLOT(OnBlend50Pushed()));
-	connect(m_Controls.pbBlendTarget, SIGNAL(clicked()), this, SLOT(OnBlendTargetPushed()));
-	connect(m_Controls.pbBlendMoving, SIGNAL(clicked()), this, SLOT(OnBlendMovingPushed()));
-	connect(m_Controls.pbBlendToggle, SIGNAL(clicked()), this, SLOT(OnBlendTogglePushed()));
-	connect(m_Controls.slideBlend, SIGNAL(valueChanged(int)), this, SLOT(OnSlideBlendChanged(int)));
-	connect(m_Controls.sbBlend, SIGNAL(valueChanged(int)), this, SLOT(OnSpinBlendChanged(int)));
-
-	connect(m_Controls.sbChecker, SIGNAL(valueChanged(int)), this, SLOT(OnSpinCheckerChanged(int)));
-
-	connect(m_Controls.radioWipeCross, SIGNAL(toggled(bool)), this, SLOT(OnWipeStyleChanged()));
-	connect(m_Controls.radioWipeH, SIGNAL(toggled(bool)), this, SLOT(OnWipeStyleChanged()));
-	connect(m_Controls.radioWipeV, SIGNAL(toggled(bool)), this, SLOT(OnWipeStyleChanged()));
-
-	connect(m_Controls.radioTargetContour, SIGNAL(toggled(bool)), this, SLOT(OnContourStyleChanged()));
+  connect(m_Controls.pbEval, SIGNAL(clicked()), this, SLOT(OnEvalBtnPushed()));
+  connect(m_Controls.pbStop, SIGNAL(clicked()), this, SLOT(OnStopBtnPushed()));
+  connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
 
+  m_selectedEvalNode = this->GetDataStorage()->GetNamedNode(HelperNodeName);
+
+  this->CheckInputs();
 	this->ConfigureControls();
 }
 
@@ -272,66 +263,149 @@ void QmitkMatchPointRegistrationEvaluator::RenderWindowPartDeactivated(
   this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
+void QmitkMatchPointRegistrationEvaluator::CheckInputs()
+{
+  if (!m_activeEvaluation)
+  {
+  QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
+  this->m_autoMoving = false;
+  this->m_autoTarget = false;
+  this->m_spSelectedMovingNode = NULL;
+  this->m_spSelectedTargetNode = NULL;
+  this->m_spSelectedRegNode = NULL;
+
+  if (dataNodes.size() > 0)
+  {
+    //test if auto select works
+    if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]))
+    {
+      this->m_spSelectedRegNode = dataNodes[0];
+      dataNodes.pop_front();
+
+      mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgMovingData);
+
+      if (uidProp)
+      {
+        //search for the moving node
+        mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+          uidProp);
+        this->m_spSelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
+        this->m_autoMoving = this->m_spSelectedMovingNode.IsNotNull();
+      }
+
+      uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+
+      if (uidProp)
+      {
+        //search for the target node
+        mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+          uidProp);
+        this->m_spSelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
+        this->m_autoTarget = this->m_spSelectedTargetNode.IsNotNull();
+      }
+    }
+
+    //if still nodes are selected -> ignore possible auto select
+    if (!dataNodes.empty())
+    {
+      mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
+
+      if (inputImage)
+      {
+        this->m_spSelectedMovingNode = dataNodes[0];
+        this->m_autoMoving = false;
+        dataNodes.pop_front();
+      }
+    }
+
+    if (!dataNodes.empty())
+    {
+      mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
+
+      if (inputImage)
+      {
+        this->m_spSelectedTargetNode = dataNodes[0];
+        this->m_autoTarget = false;
+        dataNodes.pop_front();
+      }
+    }
+  }
+  }
+}
+
 
 void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
         const QList<mitk::DataNode::Pointer>& nodes)
 {
-	m_selectedEvalNode = NULL;
-
-	if (nodes.size() > 0)
-	{
-		mitk::RegEvaluationObject* evalObj = dynamic_cast<mitk::RegEvaluationObject*>(nodes[0]->GetData());
-
-		if (evalObj)
-		{
-			this->m_selectedEvalNode = nodes[0];
-      m_selectedNodeTime.Modified();
-      OnSliceChanged();
-		}
-	}
-
-	ConfigureControls();
+  this->CheckInputs();
+	this->ConfigureControls();
 };
 
 void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 {
-	this->m_Controls.comboStyle->setEnabled(this->m_selectedEvalNode.IsNotNull());
-	this->m_Controls.labelNoSelect->setVisible(this->m_selectedEvalNode.IsNull());
+  //configure input data widgets
+  if (this->m_spSelectedRegNode.IsNull())
+  {
+    if (this->m_spSelectedMovingNode.IsNotNull() && this->m_spSelectedTargetNode.IsNotNull())
+    {
+      m_Controls.lbRegistrationName->setText(
+        QString("<font color='gray'>No registration selected! Direct comparison</font>"));
+    }
+    else
+    {
+      m_Controls.lbRegistrationName->setText(
+        QString("<font color='red'>No registration selected!</font>"));
+    }
+  }
+  else
+  {
+    m_Controls.lbRegistrationName->setText(QString::fromStdString(
+      this->m_spSelectedRegNode->GetName()));
+  }
 
-	if (this->m_selectedEvalNode.IsNotNull())
-	{
-		mitk::RegEvalStyleProperty* evalProp = NULL;
+  if (this->m_spSelectedMovingNode.IsNull())
+  {
+    m_Controls.lbMovingName->setText(QString("<font color='red'>no moving image selected!</font>"));
+  }
+  else
+  {
+    if (this->m_autoMoving)
+    {
+      m_Controls.lbMovingName->setText(QString("<font color='gray'>") + QString::fromStdString(
+        this->m_spSelectedMovingNode->GetName()) + QString(" (auto selected)</font>"));
+    }
+    else
+    {
+      m_Controls.lbMovingName->setText(QString::fromStdString(this->m_spSelectedMovingNode->GetName()));
+    }
+  }
 
-		if (this->m_selectedEvalNode->GetProperty(evalProp, mitk::nodeProp_RegEvalStyle))
-		{
-			OnComboStyleChanged(evalProp->GetValueAsId());
-			this->m_Controls.comboStyle->setCurrentIndex(evalProp->GetValueAsId());
-		}
-		else
-		{
-			this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-			                mitk::nodeProp_RegEvalStyle) + QString(" has not the assumed type."));
-		}
+  if (this->m_spSelectedTargetNode.IsNull())
+  {
+    m_Controls.lbTargetName->setText(QString("<font color='red'>no target image selected!</font>"));
+  }
+  else
+  {
+    if (this->m_autoTarget)
+    {
+      m_Controls.lbTargetName->setText(QString("<font color='gray'>") + QString::fromStdString(
+        this->m_spSelectedTargetNode->GetName()) + QString(" (auto selected)</font>"));
+    }
+    else
+    {
+      m_Controls.lbTargetName->setText(QString::fromStdString(this->m_spSelectedTargetNode->GetName()));
+    }
+  }
 
-		int factor = 50;
-		this->m_selectedEvalNode->GetIntProperty(mitk::nodeProp_RegEvalBlendFactor, factor);
-		this->m_Controls.sbBlend->setValue(factor);
-
-		int count = 3;
-		this->m_selectedEvalNode->GetIntProperty(mitk::nodeProp_RegEvalCheckerCount, count);
-		this->m_Controls.sbChecker->setValue(count);
-
-		bool targetContour = true;
-		this->m_selectedEvalNode->GetBoolProperty(mitk::nodeProp_RegEvalTargetContour, targetContour);
-		this->m_Controls.radioTargetContour->setChecked(targetContour);
-	}
-	else
-	{
-		this->m_Controls.groupBlend->setVisible(false);
-		this->m_Controls.groupCheck->setVisible(false);
-		this->m_Controls.groupWipe->setVisible(false);
-		this->m_Controls.groupContour->setVisible(false);
-	}
+  //config settings widget
+  this->m_Controls.evalSettings->setVisible(m_activeEvaluation);
+  this->m_Controls.pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
+    && this->m_spSelectedTargetNode.IsNotNull());
+  this->m_Controls.pbEval->setVisible(!m_activeEvaluation);
+  this->m_Controls.pbStop->setVisible(m_activeEvaluation);
+  this->m_Controls.lbMovingName->setEnabled(!m_activeEvaluation);
+  this->m_Controls.lbRegistrationName->setEnabled(!m_activeEvaluation);
+  this->m_Controls.lbTargetName->setEnabled(!m_activeEvaluation);
 }
 
 
@@ -356,101 +430,63 @@ void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
   }
 }
 
-void QmitkMatchPointRegistrationEvaluator::OnComboStyleChanged(int index)
+void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 {
-	m_Controls.groupBlend->setVisible(index == 0);
-	m_Controls.groupCheck->setVisible(index == 2);
-	m_Controls.groupWipe->setVisible(index == 3);
-	m_Controls.groupContour->setVisible(index == 5);
-
-	if (m_selectedEvalNode.IsNotNull())
-	{
-		m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalStyle, mitk::RegEvalStyleProperty::New(index));
-		this->GetRenderWindowPart()->RequestUpdate();
-	}
+	this->GetRenderWindowPart()->RequestUpdate();
 };
 
-void QmitkMatchPointRegistrationEvaluator::OnBlend50Pushed()
+void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 {
-	m_Controls.sbBlend->setValue(50);
-};
+  mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
 
-void QmitkMatchPointRegistrationEvaluator::OnBlendTargetPushed()
+  mitk::MAPRegistrationWrapper::Pointer reg;
+
+  if (m_spSelectedRegNode.IsNotNull())
+  {
+    reg = dynamic_cast<mitk::MAPRegistrationWrapper*>(this->m_spSelectedRegNode->GetData());
+  }
+  else
+  {
+    //generate a dymme reg to use
+    reg = mitk::GenerateIdentityRegistration3D();
+  }
+
+  regEval->SetRegistration(reg);
+  regEval->SetTargetNode(this->m_spSelectedTargetNode);
+  regEval->SetMovingNode(this->m_spSelectedMovingNode);
+
+  if (this->m_selectedEvalNode.IsNotNull())
+  {
+    this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  }
+
+  this->m_selectedEvalNode = mitk::DataNode::New();
+  this->m_selectedEvalNode->SetData(regEval);
+  
+  mitk::RegEvaluationMapper2D::SetDefaultProperties(this->m_selectedEvalNode);
+  this->m_selectedEvalNode->SetName(HelperNodeName);
+  this->m_selectedEvalNode->SetBoolProperty("helper object", true);
+  this->GetDataStorage()->Add(this->m_selectedEvalNode);
+
+  this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
+  this->OnSliceChanged();
+
+  this->GetRenderWindowPart()->RequestUpdate();
+
+  this->m_activeEvaluation = true;
+  this->CheckInputs();
+  this->ConfigureControls();
+}
+
+void QmitkMatchPointRegistrationEvaluator::OnStopBtnPushed()
 {
-	m_Controls.sbBlend->setValue(0);
-};
+  this->m_activeEvaluation = false;
 
-void QmitkMatchPointRegistrationEvaluator::OnBlendMovingPushed()
-{
-	m_Controls.sbBlend->setValue(100);
-};
+  this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  this->m_selectedEvalNode = nullptr;
+  this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
 
-void QmitkMatchPointRegistrationEvaluator::OnBlendTogglePushed()
-{
-	m_Controls.sbBlend->setValue(100 - m_Controls.sbBlend->value());
-};
-
-void QmitkMatchPointRegistrationEvaluator::OnSlideBlendChanged(int factor)
-{
-	m_internalBlendUpdate = true;
-	m_Controls.sbBlend->setValue(factor);
-	m_internalBlendUpdate = false;
-};
-
-void QmitkMatchPointRegistrationEvaluator::OnSpinBlendChanged(int factor)
-{
-	if (m_selectedEvalNode.IsNotNull())
-	{
-		m_selectedEvalNode->SetIntProperty(mitk::nodeProp_RegEvalBlendFactor, factor);
-		this->GetRenderWindowPart()->RequestUpdate();
-
-		if (!m_internalBlendUpdate)
-		{
-			this->m_Controls.slideBlend->setValue(factor);
-		}
-	}
-};
-
-void QmitkMatchPointRegistrationEvaluator::OnSpinCheckerChanged(int count)
-{
-	if (m_selectedEvalNode.IsNotNull())
-	{
-		m_selectedEvalNode->SetIntProperty(mitk::nodeProp_RegEvalCheckerCount, count);
-		this->GetRenderWindowPart()->RequestUpdate();
-	}
-};
-
-void QmitkMatchPointRegistrationEvaluator::OnWipeStyleChanged()
-{
-	if (m_selectedEvalNode.IsNotNull())
-	{
-		if (this->m_Controls.radioWipeCross->isChecked())
-		{
-			m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle,
-			                                mitk::RegEvalWipeStyleProperty::New(0));
-		}
-		else if (this->m_Controls.radioWipeH->isChecked())
-		{
-			m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle,
-			                                mitk::RegEvalWipeStyleProperty::New(1));
-		}
-		else
-		{
-			m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle,
-			                                mitk::RegEvalWipeStyleProperty::New(2));
-		}
-
-		this->GetRenderWindowPart()->RequestUpdate();
-	}
-};
-
-
-void QmitkMatchPointRegistrationEvaluator::OnContourStyleChanged()
-{
-	if (m_selectedEvalNode.IsNotNull())
-	{
-		m_selectedEvalNode->SetBoolProperty(mitk::nodeProp_RegEvalTargetContour,
-		                                    m_Controls.radioTargetContour->isChecked());
-		this->GetRenderWindowPart()->RequestUpdate();
-	}
-};
+  this->CheckInputs();
+  this->ConfigureControls();
+  this->GetRenderWindowPart()->RequestUpdate();
+}

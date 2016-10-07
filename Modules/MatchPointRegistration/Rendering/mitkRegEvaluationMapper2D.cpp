@@ -62,6 +62,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageRectilinearWipe.h>
 #include <vtkImageGradientMagnitude.h>
 #include <vtkImageAppendComponents.h>
+#include <vtkImageExtractComponents.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -130,6 +131,28 @@ const mitk::Image* mitk::RegEvaluationMapper2D::GetMovingImage( void )
   if (evalObj)
   {
     return evalObj->GetMovingImage();
+  }
+
+  return NULL;
+}
+
+const mitk::DataNode* mitk::RegEvaluationMapper2D::GetTargetNode(void)
+{
+  const mitk::RegEvaluationObject* evalObj = dynamic_cast< const mitk::RegEvaluationObject* >(GetDataNode()->GetData());
+  if (evalObj)
+  {
+    return evalObj->GetTargetNode();
+  }
+
+  return NULL;
+}
+
+const mitk::DataNode* mitk::RegEvaluationMapper2D::GetMovingNode(void)
+{
+  const mitk::RegEvaluationObject* evalObj = dynamic_cast< const mitk::RegEvaluationObject* >(GetDataNode()->GetData());
+  if (evalObj)
+  {
+    return evalObj->GetMovingNode();
   }
 
   return NULL;
@@ -268,19 +291,75 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     updated = true;
   }
 
-  //Generate evaulation image
+  // Bounds information for reslicing (only required if reference geometry
+  // is present)
+  //this used for generating a vtkPLaneSource with the right size
+  double sliceBounds[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+
+  if (updated
+    || (localStorage->m_LastUpdateTime < datanode->GetPropertyList()->GetMTime()) //was a property modified?
+    || (localStorage->m_LastUpdateTime < datanode->GetPropertyList(renderer)->GetMTime())
+    || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetMTime())
+    || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetMTime()))
+  {
+    localStorage->m_Reslicer->GetClippedPlaneBounds(sliceBounds);
+
+    //get the spacing of the slice
+    localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutputSpacing();
+
+    // calculate minimum bounding rect of IMAGE in texture
+    {
+      double textureClippingBounds[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+
+      // Calculate the actual bounds of the transformed plane clipped by the
+      // dataset bounding box; this is required for drawing the texture at the
+      // correct position during 3D mapping.
+
+      const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(worldGeometry);
+      mitk::PlaneClipping::CalculateClippedPlaneBounds(targetInput->GetGeometry(), planeGeometry, textureClippingBounds);
+
+      textureClippingBounds[0] = static_cast<int>(textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5);
+      textureClippingBounds[1] = static_cast<int>(textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5);
+      textureClippingBounds[2] = static_cast<int>(textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5);
+      textureClippingBounds[3] = static_cast<int>(textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5);
+
+      //clipping bounds for cutting the image
+      localStorage->m_TargetLevelWindowFilter->SetClippingBounds(textureClippingBounds);
+      localStorage->m_MappedLevelWindowFilter->SetClippingBounds(textureClippingBounds);
+    }
+
+    this->ApplyLookuptable(renderer, this->GetTargetNode(), localStorage->m_TargetLevelWindowFilter);
+    this->ApplyLookuptable(renderer, this->GetMovingNode(), localStorage->m_MappedLevelWindowFilter);
+    this->ApplyLevelWindow(renderer, this->GetTargetNode(), localStorage->m_TargetLevelWindowFilter);
+    this->ApplyLevelWindow(renderer, this->GetMovingNode(), localStorage->m_MappedLevelWindowFilter);
+
+    //connect the input with the levelwindow filter
+    localStorage->m_TargetLevelWindowFilter->SetInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
+    localStorage->m_MappedLevelWindowFilter->SetInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
+
+    localStorage->m_TargetExtractFilter->SetInputConnection(localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+    localStorage->m_MappedExtractFilter->SetInputConnection(localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+    localStorage->m_TargetExtractFilter->SetComponents(0);
+    localStorage->m_MappedExtractFilter->SetComponents(0);
+
+    updated = true;
+  }
+
+  //Generate evaluation image
   bool isStyleOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalStyle,localStorage->m_LastUpdateTime);
   bool isBlendOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalBlendFactor,localStorage->m_LastUpdateTime);
   bool isCheckerOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalCheckerCount,localStorage->m_LastUpdateTime);
   bool isWipeStyleOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalWipeStyle,localStorage->m_LastUpdateTime);
   bool isContourOutdated = mitk::PropertyIsOutdated(datanode,mitk::nodeProp_RegEvalTargetContour,localStorage->m_LastUpdateTime);
+  bool isPositionOutdated = mitk::PropertyIsOutdated(datanode, mitk::nodeProp_RegEvalCurrentPosition, localStorage->m_LastUpdateTime);
 
   if (updated ||
     isStyleOutdated ||
     isBlendOutdated ||
     isCheckerOutdated ||
     isWipeStyleOutdated ||
-    isContourOutdated)
+    isContourOutdated ||
+    isPositionOutdated)
   {
     mitk::RegEvalStyleProperty::Pointer evalStyleProp = mitk::RegEvalStyleProperty::New();
     datanode->GetProperty(evalStyleProp, mitk::nodeProp_RegEvalStyle);
@@ -304,7 +383,17 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
       }
     case 3 :
       {
-        PrepareWipe(datanode, localStorage);
+        const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldGeometry2D();
+
+        Point3D currentPos3D;
+        datanode->GetPropertyValue<Point3D>(mitk::nodeProp_RegEvalCurrentPosition, currentPos3D);
+
+        Point2D currentPos2D;
+        worldGeometry->Map(currentPos3D, currentPos2D);
+        Point2D currentIndex2D;
+        worldGeometry->WorldToIndex(currentPos2D, currentIndex2D);
+
+        PrepareWipe(datanode, localStorage, currentIndex2D);
         break;
       }
     case 4 :
@@ -325,46 +414,10 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     || (localStorage->m_LastUpdateTime < datanode->GetPropertyList()->GetMTime()) //was a property modified?
     || (localStorage->m_LastUpdateTime < datanode->GetPropertyList(renderer)->GetMTime()) )
   {
-    // Bounds information for reslicing (only required if reference geometry
-    // is present)
-    //this used for generating a vtkPLaneSource with the right size
-    double sliceBounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    localStorage->m_Reslicer->GetClippedPlaneBounds(sliceBounds);
-
-    //get the spacing of the slice
-    localStorage->m_mmPerPixel = localStorage->m_Reslicer->GetOutputSpacing();
-
-    // calculate minimum bounding rect of IMAGE in texture
-    {
-      double textureClippingBounds[6]  = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-
-      // Calculate the actual bounds of the transformed plane clipped by the
-      // dataset bounding box; this is required for drawing the texture at the
-      // correct position during 3D mapping.
-
-      const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
-      mitk::PlaneClipping::CalculateClippedPlaneBounds( targetInput->GetGeometry(), planeGeometry, textureClippingBounds );
-
-      textureClippingBounds[0] = static_cast< int >( textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5 );
-      textureClippingBounds[1] = static_cast< int >( textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5 );
-      textureClippingBounds[2] = static_cast< int >( textureClippingBounds[2] / localStorage->m_mmPerPixel[1] + 0.5 );
-      textureClippingBounds[3] = static_cast< int >( textureClippingBounds[3] / localStorage->m_mmPerPixel[1] + 0.5 );
-
-      //clipping bounds for cutting the image
-      localStorage->m_LevelWindowFilter->SetClippingBounds(textureClippingBounds);
-    }
-
     this->ApplyOpacity( renderer );
-
-    this->ApplyLookuptable( renderer );
-    this->ApplyLevelWindow( renderer );
-    this->ApplyColor( renderer );
 
     // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
-
-    //connect the input with the levelwindow filter
-    localStorage->m_LevelWindowFilter->SetInputData(localStorage->m_EvaluationImage);
 
     // check for texture interpolation property
     bool textureInterpolation = false;
@@ -374,7 +427,7 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     localStorage->m_Texture->SetInterpolate(textureInterpolation);
 
     // connect the texture with the output of the levelwindow filter
-    localStorage->m_Texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
+    localStorage->m_Texture->SetInputData(localStorage->m_EvaluationImage);
 
     this->TransformActor( renderer );
 
@@ -403,13 +456,14 @@ void mitk::RegEvaluationMapper2D::PrepareContour( mitk::DataNode* datanode, Loca
 
   vtkSmartPointer<vtkImageGradientMagnitude> magFilter =
     vtkSmartPointer<vtkImageGradientMagnitude>::New();
+
   if(targetContour)
   {
-    magFilter->AddInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
+    magFilter->SetInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
   }
   else
   {
-    magFilter->AddInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
+    magFilter->SetInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   }
 
   vtkSmartPointer<vtkImageAppendComponents> appendFilter =
@@ -419,11 +473,11 @@ void mitk::RegEvaluationMapper2D::PrepareContour( mitk::DataNode* datanode, Loca
   appendFilter->AddInputConnection(magFilter->GetOutputPort());
   if(targetContour)
   {
-    appendFilter->AddInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
+    appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   }
   else
   {
-    appendFilter->AddInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
+    appendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
   }
   appendFilter->Update();
 
@@ -434,27 +488,35 @@ void mitk::RegEvaluationMapper2D::PrepareDifference( LocalStorage * localStorage
 {
   vtkSmartPointer<vtkImageMathematics> diffFilter =
     vtkSmartPointer<vtkImageMathematics>::New();
-  vtkSmartPointer<vtkImageMathematics> absFilter =
+  vtkSmartPointer<vtkImageMathematics> minFilter =
     vtkSmartPointer<vtkImageMathematics>::New();
-  diffFilter->SetInput1Data(localStorage->m_slicedTargetImage->GetVtkImageData());
-  diffFilter->SetInput2Data(localStorage->m_slicedMappedImage->GetVtkImageData());
+  vtkSmartPointer<vtkImageMathematics> maxFilter =
+    vtkSmartPointer<vtkImageMathematics>::New();
+
+  minFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
+  minFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  minFilter->SetOperationToMin();
+  maxFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
+  maxFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  maxFilter->SetOperationToMax();
+
+  diffFilter->SetInputConnection(0, maxFilter->GetOutputPort());
+  diffFilter->SetInputConnection(1, minFilter->GetOutputPort());
   diffFilter->SetOperationToSubtract();
-  absFilter->SetInputConnection(diffFilter->GetOutputPort());
-  absFilter->SetOperationToAbsoluteValue();
   diffFilter->Update();
   localStorage->m_EvaluationImage = diffFilter->GetOutput();
 }
 
-void mitk::RegEvaluationMapper2D::PrepareWipe( mitk::DataNode* datanode, LocalStorage * localStorage )
+void mitk::RegEvaluationMapper2D::PrepareWipe(mitk::DataNode* datanode, LocalStorage * localStorage, const Point2D& currentIndex2D)
 {
   mitk::RegEvalWipeStyleProperty::Pointer evalWipeStyleProp = mitk::RegEvalWipeStyleProperty::New();
   datanode->GetProperty(evalWipeStyleProp, mitk::nodeProp_RegEvalWipeStyle);
 
   vtkSmartPointer<vtkImageRectilinearWipe> wipedFilter =
     vtkSmartPointer<vtkImageRectilinearWipe>::New();
-  wipedFilter->SetInput1Data(localStorage->m_slicedTargetImage->GetVtkImageData());
-  wipedFilter->SetInput2Data(localStorage->m_slicedMappedImage->GetVtkImageData());
-  wipedFilter->SetPosition(30,30);
+  wipedFilter->SetInputConnection(0, localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+  wipedFilter->SetInputConnection(1, localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+  wipedFilter->SetPosition(currentIndex2D[0], currentIndex2D[1]);
 
   if (evalWipeStyleProp->GetValueAsId() == 0)
   {
@@ -481,9 +543,9 @@ void mitk::RegEvaluationMapper2D::PrepareCheckerBoard( mitk::DataNode* datanode,
 
   vtkSmartPointer<vtkImageCheckerboard> checkerboardFilter =
     vtkSmartPointer<vtkImageCheckerboard>::New();
-  checkerboardFilter->SetInput1Data(localStorage->m_slicedTargetImage->GetVtkImageData());
-  checkerboardFilter->SetInput2Data(localStorage->m_slicedMappedImage->GetVtkImageData());
-  checkerboardFilter->SetNumberOfDivisions(checkerCount,checkerCount,1);
+  checkerboardFilter->SetInputConnection(0, localStorage->m_TargetLevelWindowFilter->GetOutputPort());
+  checkerboardFilter->SetInputConnection(1, localStorage->m_MappedLevelWindowFilter->GetOutputPort());
+  checkerboardFilter->SetNumberOfDivisions(checkerCount, checkerCount, 1);
   checkerboardFilter->Update();
 
   localStorage->m_EvaluationImage = checkerboardFilter->GetOutput();
@@ -493,12 +555,14 @@ void mitk::RegEvaluationMapper2D::PrepareColorBlend( LocalStorage * localStorage
 {
   vtkSmartPointer<vtkImageAppendComponents> appendFilter =
     vtkSmartPointer<vtkImageAppendComponents>::New();
+
   //red channel
-  appendFilter->AddInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
+  appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
   //green channel
-  appendFilter->AddInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
+  appendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+
   //blue channel
-  appendFilter->AddInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
+  appendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
   appendFilter->Update();
 
   localStorage->m_EvaluationImage = appendFilter->GetOutput();
@@ -511,96 +575,59 @@ void mitk::RegEvaluationMapper2D::PrepareBlend( mitk::DataNode* datanode, LocalS
 
   vtkSmartPointer<vtkImageWeightedSum> blendFilter =
     vtkSmartPointer<vtkImageWeightedSum>::New();
-  blendFilter->AddInputData(localStorage->m_slicedTargetImage->GetVtkImageData());
-  blendFilter->AddInputData(localStorage->m_slicedMappedImage->GetVtkImageData());
-  blendFilter->SetWeight(0,(100-blendfactor)/100.);
+
+  blendFilter->AddInputConnection(localStorage->m_TargetExtractFilter->GetOutputPort());
+  blendFilter->AddInputConnection(localStorage->m_MappedExtractFilter->GetOutputPort());
+  blendFilter->SetWeight(0, (100 - blendfactor) / 100.);
   blendFilter->SetWeight(1,blendfactor/100.);
   blendFilter->Update();
 
   localStorage->m_EvaluationImage = blendFilter->GetOutput();
 }
 
-void mitk::RegEvaluationMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer)
+void mitk::RegEvaluationMapper2D::ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter)
 {
   LocalStorage *localStorage = this->GetLocalStorage( renderer );
 
   LevelWindow levelWindow;
-  this->GetDataNode()->GetLevelWindow( levelWindow, renderer, "levelwindow" );
-  localStorage->m_LevelWindowFilter->GetLookupTable()->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+  dataNode->GetLevelWindow(levelWindow, renderer, "levelwindow");
+  levelFilter->GetLookupTable()->SetRange(levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound());
 
   mitk::LevelWindow opacLevelWindow;
-  if( this->GetDataNode()->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+  if (dataNode->GetLevelWindow(opacLevelWindow, renderer, "opaclevelwindow"))
   {
     //pass the opaque level window to the filter
-    localStorage->m_LevelWindowFilter->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
-    localStorage->m_LevelWindowFilter->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
+    levelFilter->SetMinOpacity(opacLevelWindow.GetLowerWindowBound());
+    levelFilter->SetMaxOpacity(opacLevelWindow.GetUpperWindowBound());
   }
   else
   {
     //no opaque level window
-    localStorage->m_LevelWindowFilter->SetMinOpacity(0.0);
-    localStorage->m_LevelWindowFilter->SetMaxOpacity(255.0);
+    levelFilter->SetMinOpacity(0.0);
+    levelFilter->SetMaxOpacity(255.0);
   }
 }
 
-void mitk::RegEvaluationMapper2D::ApplyColor( mitk::BaseRenderer* renderer )
+void mitk::RegEvaluationMapper2D::ApplyLookuptable(mitk::BaseRenderer* renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter)
 {
-  LocalStorage *localStorage = this->GetLocalStorage( renderer );
+  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
+  vtkLookupTable* usedLookupTable = localStorage->m_ColorLookupTable;
 
-  float rgb[3]= { 1.0f, 1.0f, 1.0f };
+  // If lookup table or transferfunction use is requested...
+  mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(dataNode->GetProperty("LookupTable"));
 
-  // check for color prop and use it for rendering if it exists
-  // binary image hovering & binary image selection
-  bool hover    = false;
-  bool selected = false;
-  GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
-  GetDataNode()->GetBoolProperty("selected", selected, renderer);
-  if(hover && !selected)
+  if (lookupTableProp.IsNotNull()) // is a lookuptable set?
   {
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-      ("binaryimage.hoveringcolor", renderer));
-    if(colorprop.IsNotNull())
-    {
-      memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-    }
-    else
-    {
-      GetDataNode()->GetColor( rgb, renderer, "color" );
-    }
+    usedLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
   }
-  if(selected)
+  else
   {
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-      ("binaryimage.selectedcolor", renderer));
-    if(colorprop.IsNotNull()) {
-      memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-    }
-    else
-    {
-      GetDataNode()->GetColor(rgb, renderer, "color");
-    }
+    //"Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'.
+    //A default (rainbow) lookup table will be used.
+    //Here have to do nothing. Warning for the user has been removed, due to unwanted console output
+    //in every interation of the rendering.
   }
-  if(!hover && !selected)
-  {
-    GetDataNode()->GetColor( rgb, renderer, "color" );
-  }
-
-  double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
-  dynamic_cast<vtkActor*> (localStorage->m_Actors->GetParts()->GetItemAsObject(0))->GetProperty()->SetColor(rgbConv);
-  localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
-
-  if ( localStorage->m_Actors->GetParts()->GetNumberOfItems() > 1 )
-  {
-    float rgb[3]= { 1.0f, 1.0f, 1.0f };
-    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-      ("outline binary shadow color", renderer));
-    if(colorprop.IsNotNull())
-    {
-      memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-    }
-    double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
-    dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) )->GetProperty()->SetColor(rgbConv);
-  }
+  levelFilter->SetLookupTable(usedLookupTable);
 }
 
 void mitk::RegEvaluationMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
@@ -615,28 +642,6 @@ void mitk::RegEvaluationMapper2D::ApplyOpacity( mitk::BaseRenderer* renderer )
   {
     dynamic_cast<vtkActor*>( localStorage->m_Actors->GetParts()->GetItemAsObject(0) )->GetProperty()->SetOpacity(opacity);
   }
-}
-
-void mitk::RegEvaluationMapper2D::ApplyLookuptable( mitk::BaseRenderer* renderer )
-{
-  LocalStorage* localStorage = m_LSH.GetLocalStorage(renderer);
-  vtkLookupTable* usedLookupTable = localStorage->m_ColorLookupTable;
-
-  // If lookup table or transferfunction use is requested...
-  mitk::LookupTableProperty::Pointer lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
-
-  if( lookupTableProp.IsNotNull() ) // is a lookuptable set?
-  {
-    usedLookupTable = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
-  }
-  else
-  {
-    //"Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'.
-    //A default (rainbow) lookup table will be used.
-    //Here have to do nothing. Warning for the user has been removed, due to unwanted console output
-    //in every interation of the rendering.
-  }
-  localStorage->m_LevelWindowFilter->SetLookupTable(usedLookupTable);
 }
 
 void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
@@ -678,7 +683,13 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
     || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
     || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-    || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+    || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime())
+    || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetMTime()) //was the target node modified?
+    || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetMTime()) //was the moving node modified?
+    || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetPropertyList()->GetMTime()) //was a target node property modified?
+    || (localStorage->m_LastUpdateTime < this->GetTargetNode()->GetPropertyList(renderer)->GetMTime())
+    || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetPropertyList()->GetMTime()) //was a moving node property modified?
+    || (localStorage->m_LastUpdateTime < this->GetMovingNode()->GetPropertyList(renderer)->GetMTime()))
   {
     this->GenerateDataForRenderer( renderer );
   }
@@ -724,7 +735,8 @@ void mitk::RegEvaluationMapper2D::SetDefaultProperties(mitk::DataNode* node, mit
   node->AddProperty(mitk::nodeProp_RegEvalCheckerCount, mitk::IntProperty::New(3), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalTargetContour, mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(0), renderer, overwrite);
-
+  node->AddProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(mitk::Point3D()), renderer, overwrite);
+  
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
@@ -787,8 +799,13 @@ mitk::RegEvaluationMapper2D::LocalStorage::~LocalStorage()
 
 mitk::RegEvaluationMapper2D::LocalStorage::LocalStorage()
 {
+  m_TargetLevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
+  m_MappedLevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
 
-  m_LevelWindowFilter = vtkSmartPointer<vtkMitkLevelWindowFilter>::New();
+  m_TargetExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
+  m_MappedExtractFilter = vtkSmartPointer<vtkImageExtractComponents>::New();
+
+
 
   //Do as much actions as possible in here to avoid double executions.
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();

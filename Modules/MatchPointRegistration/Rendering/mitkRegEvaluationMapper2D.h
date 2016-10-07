@@ -64,8 +64,10 @@ public:
 
   /** Method for creation through the object factory. */
   itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    itkCloneMacro(Self)
 
+  const mitk::DataNode* GetTargetNode(void);
+  const mitk::DataNode* GetMovingNode(void);
   /** \brief Get the target image to map */
   const mitk::Image *GetTargetImage(void);
   /** \brief Get the moving image to map */
@@ -99,6 +101,7 @@ public:
     vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
     /** \brief Current slice of a 2D render window.*/
     vtkSmartPointer<vtkImageData> m_EvaluationImage;
+
     /** \brief Empty vtkPolyData that is set when rendering geometry does not
       *   intersect the image geometry.
       *   \warning This member variable is set to NULL,
@@ -129,8 +132,14 @@ public:
     /** \brief mmPerPixel relation between pixel and mm. (World spacing).*/
     mitk::ScalarType* m_mmPerPixel;
 
-    /** \brief This filter is used to apply the level window to Grayvalue and RBG(A) images. */
-    vtkSmartPointer<vtkMitkLevelWindowFilter> m_LevelWindowFilter;
+    /** \brief This filter is used to apply the level window to target image. */
+    vtkSmartPointer<vtkMitkLevelWindowFilter> m_TargetLevelWindowFilter;
+
+    /** \brief This filter is used to apply the level window to moving image. */
+    vtkSmartPointer<vtkMitkLevelWindowFilter> m_MappedLevelWindowFilter;
+
+    vtkSmartPointer<vtkImageExtractComponents> m_TargetExtractFilter;
+    vtkSmartPointer<vtkImageExtractComponents> m_MappedExtractFilter;
 
     /** \brief Default constructor of the local storage. */
     LocalStorage();
@@ -193,7 +202,7 @@ protected:
 
   void PrepareDifference( LocalStorage * localStorage );
 
-  void PrepareWipe( mitk::DataNode* datanode, LocalStorage * localStorage );
+  void PrepareWipe(mitk::DataNode* datanode, LocalStorage * localStorage, const Point2D& currentIndex2D);
 
   void PrepareCheckerBoard( mitk::DataNode* datanode, LocalStorage * localStorage );
 
@@ -210,17 +219,14 @@ protected:
    * \warning To use the lookup table, the property 'Lookup Table' must be set and a 'Image Rendering.Mode'
    * which uses the lookup table must be set.
 */
-  void ApplyLookuptable(mitk::BaseRenderer* renderer);
+  void ApplyLookuptable(mitk::BaseRenderer* renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 
   /**
    * @brief ApplyLevelWindow Apply the level window for the given renderer.
    * \warning To use the level window, the property 'LevelWindow' must be set and a 'Image Rendering.Mode' which uses the level window must be set.
    * @param renderer Level window for which renderer?
    */
-  void ApplyLevelWindow(mitk::BaseRenderer* renderer);
-
-  /** \brief Set the color of the image/polydata */
-  void ApplyColor( mitk::BaseRenderer* renderer );
+  void ApplyLevelWindow(mitk::BaseRenderer *renderer, const mitk::DataNode* dataNode, vtkMitkLevelWindowFilter* levelFilter);
 
   /** \brief Set the opacity of the actor. */
   void ApplyOpacity( mitk::BaseRenderer* renderer );

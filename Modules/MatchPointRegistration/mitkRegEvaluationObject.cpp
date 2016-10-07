@@ -55,6 +55,34 @@ namespace mitk
     //nothing to do
   }
 
+  void RegEvaluationObject::SetTargetNode(const DataNode* tNode)
+  {
+    itkDebugMacro("setting TargetNode to " << tNode);
+
+    m_TargetNode = tNode;
+
+    if (tNode)
+    {
+      this->m_TargetImage = dynamic_cast<mitk::Image*>(tNode->GetData());
+    }
+
+    this->Modified();
+  };
+
+  void RegEvaluationObject::SetMovingNode(const DataNode* mNode)
+  {
+    itkDebugMacro("setting MovingNode to " << mNode);
+
+    m_MovingNode = mNode;
+
+    if (mNode)
+    {
+      this->m_MovingImage = dynamic_cast<mitk::Image*>(mNode->GetData());
+    }
+
+    this->Modified();
+  };
+
   void RegEvaluationObject::SetTargetImage(const mitk::Image* tImg)
   {
     itkDebugMacro("setting TargetImage to " << tImg);

@@ -52,6 +52,7 @@ const char* const nodeProp_RegEvalBlendFactor = "matchpoint.RegEval.BlendFactor"
 const char* const nodeProp_RegEvalCheckerCount = "matchpoint.RegEval.CheckerCount";
 const char* const nodeProp_RegEvalWipeStyle = "matchpoint.RegEval.WipeStyle";
 const char* const nodeProp_RegEvalTargetContour = "matchpoint.RegEval.TargetContour";
+const char* const nodeProp_RegEvalCurrentPosition = "matchpoint.RegEval.CurrentPosition";
 }
 
 

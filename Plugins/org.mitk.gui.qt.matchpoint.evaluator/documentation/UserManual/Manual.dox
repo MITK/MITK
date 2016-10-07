@@ -1,5 +1,5 @@
 /**
-\page org_mitk_gui_qt_registration_evaluator The MatchPoint Registration Evaluation View
+\page org_mitk_gui_qt_matchpoint_evaluator The MatchPoint Registration Evaluation View
 
 \image html map-icon-regeval.png "Icon of the MatchPoint Registration Evaluator"
 
@@ -8,71 +8,45 @@
 \li \ref MAP_REGEVAL_Usage
 
 \section MAP_REGEVAL_Introduction Introduction
-This view offers the possibility to map any image in the data manager using a user selected registration object.
-Using the Mapper the user can control the field of view (image geometry) the image should be mapped into, as well as
-interpolation strategy that should be used.\n
-It is one of several MatchPoint registration plugins.\n
-<b>Typical usage scenarios</b>\n
-\li You have registered image I1 onto image I2. Now you want to transfer the segmentation of I1 to I2 in order to evaluate I2 within this mapped segmentation using \ref org_mitk_views_imagestatistics .
-\li You have registered image I1 onto image I2. Now you want to map I3 (e.g. an other MRI sequence of the same session) also onto I2 with the same registration.
+This view offers the possibility to evaluate the quality of the registration/mapping of two given images by visual inspection.
+One may select no registration. Then the images will be displayed in evaluation mode assuming an identity transform (so no mapping).
+It is one of several MatchPoint registration plug-ins.\n
 
 \section MAP_REGEVAL_Contact Contact information
 This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
 and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+find a bug or have a feature request, feel free to contact us at www.mitk.org.
 
 \section MAP_REGEVAL_Usage Usage
-\image html mapper-examplescreen.png "Example screenshot showing the Mapper plugin in use."
-To use the mapper at least a Registration object and an input image must be selected. Registration objects are marked with a small blue icon
-(e.g. the data "Registration" in the data manager of the screen shot above). The view will try to automatically determine the reference image
-(by default it is the target image of the selected registration). The Reference image defines the geometry (field of view, orientation, spacing)
-that should be used for the result image. The reference image can be also defined by the user (or must be defined, if the Mapper cannot determin it automatically).\n
-You can multiselect registration and image(s) (press the CTRL-key while selecting the nodes in the data manager).
-The Mapper will automatically sort the selections in the correct "slots" of the view.
+\imageMacro{view_example.png, "Example screenshot showing the plug-in in use.", 14}
+To use the evaluation view you must have selected at least the moving and the target image you want to use to evaluate.
+If you select a registration with referenced target and moving image (the normal state if you generate registrations with the matchpoint plugins)
+these images will be auto selected by just clicking on the registration.
+If you select no registration the view will assume that an identity transform should be used.\n
+As long as no valid set of data is selected the "Start evaluation" button will be disabled. If its enabled you may start the evaluation mode with it.
 
-\image html mapper.png "Details of the mapper view."
-(1) The currently selected registration, that will be used for mapping.\n
-(2) The currently selected input image, that will be mapped.\n
-(3) The currently (automatically or by user) selected reference image, that defines the geometry of the result.\n
-(4) The name of the result image in the data manger.\n
-(5) The start button(s) to commence the mapping process. For details regarding the two options see \ref MAP_REGEVAL_Refine.\n
-(6) Log windows with messages regarding the mapping process.\n\n
+\imageMacro{no_data_selected.png, "Example screenshot showing the state if no data is selected", 5}
 
-Every "slot" has the ability to be locked. If locked the last selection will be kept, regardless the current selection in the data manager.
-You can use this for example to lock the registration, if you want to map multiple images. Doing so it is enough to just select the next image
-in the data manager. To lock a slot, click at the "lock" button at the right side (see example images below).
-\image html node-unlocked.png "Unlocked slot/node (default state). Changes with the selections in the data manager."
-\image html node-locked.png "Locked slot/node. Stays, regardless the selections in the data manager."
+If the evaluation view is active you can choose between differnt modes of visualization. For more details see \ref MAP_REGEVAL_Styles.\n
+To stop the evaluation mode, you may use the "Stop evaluation" button or just close the evaluation view.
 
-\section MAP_REGEVAL_Refine Mapping or geometry refinement
-The mapper view offers two options to map images:\n
-\li "Map" (default)
-\li "Refine geometry"
-"Map" fills the pixels of the output image by interpolating input image pixels using the registration object. This option always works.
-But may take longer and introduces interpolation errors, because a new image is resampled.\n
-The second option "Refine geometry" is only offered, if the registration (more precise its inverse kernel) is matrix based. In this case it just clones the image
-and refines the image geometry (origin, orientation, ...); thus no interpolation artefacts are introduced.
-\remark If you want to use a mapped image in conjunction with the statistic plugin and an mask of the reference image, you must use "Map" to ensure the same geometry.
-Otherwise the statistic plugin will fail.
+\remark The evaluation view will use the level window settings of the used images. So to changes the level windowing of the evaluation view, you must change the
+level windowing of the respective images.
 
-\section MAP_REGEVAL_Settings Settings
-If you map the image (and not just refine the geometry), you have several settings available:\n
-\li "Allow undefined pixels": Activate to handle pixels of the result image that are not in the field of view of the input image. This pixel will get the "padding value".
-\li "Allow error pixels": Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. This pixel will get the "error value".
-\li "Interpolator": Set to choose the interpolation strategy that should be used for mapping.
-\li "Activate super/sub sampling": Activate if you want to use origin and orientation of the reference image but want to alter the spacing.
-
-\section MAP_REGEVAL_Interpolation Interpolation
-You can choose from the following interpolation strategies:\n
-\li "nearest neighbour": Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
-\li "Linear": Fast linear interpolation with often sufficient quality. Tends to blur edges.
-\li "BSpline (3rd order)": Good trade off between time and quality.
-\li "Windowed Sinc (Hamming)": Good interpolation quality but very time consuming.
-\li "Windowed Sinc (Welch)": Good interpolation quality but very time consuming.
-
-\section MAP_REGEVAL_Masks Handling of masks/segmentations
-If you select an mask as input image, the plugin will be automatically reconfigured to settings that are suitable for the task of mapping masks.
-Most importantly the interpolator will be set to "nearest neighbour".
+\section MAP_REGEVAL_Styles Visualization styles
+You can choose from the following visualization styles to evaluate the registration/mapping quality:\n
+\li "Blend": Blends the images with a user defined weight. Default is 50:50.
+\imageMacro{style_blend.png, "Example for mode: Blend", 5}
+\li "Checkerboard": Checkerboard style that composes both images. You may define the resolution of the checkerboard.
+\imageMacro{style_checkerboard.png, "Example for mode: Checkerboard", 5}
+\li "Color blend": Color blend of the images (blue: target image; yellow: moving). Areas where you see no color implies good intensity matchings.
+\imageMacro{style_color_blend.png, "Example for mode: Color blend", 5}
+\li "Contour": Blend mode that display one image as blue "background" and the other image in yellow contours. You may choose the role of the images.
+\imageMacro{style_contour.png, "Example for mode: Contour", 5}
+\li "Difference": Displays the absolute difference of both images.
+\li "Wipe": Blend mode that makes a rectilinear combination of the images. You can choose the mode how the images are splitted. The split is synchronized with the current selection. So you may interact with the split border to position it on interesting areas.
+\imageMacro{style_wipe_cross.png, "Example for mode: Wipe cross", 5}
+\imageMacro{style_wipe_horizontal.png, "Example for mode: Wipe horizontal", 5}
 
 */
 

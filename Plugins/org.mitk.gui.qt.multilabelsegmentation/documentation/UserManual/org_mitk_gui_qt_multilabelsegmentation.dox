@@ -1,5 +1,5 @@
 /**
-\page org_mitk_views_multilabelsegmentation User Manual
+\page org_mitk_views_multilabelsegmentation The Multilabel Segmentation View
 
 \imageMacro{"multilabelsegmentation.png", "html", 12}
 
@@ -390,6 +390,7 @@ Select the image and the surface in the corresponding drop-down boxes (both are 
 
 \section org_mitk_gui_qt_segmentationUserManualTechnicalDetail Technical Information for Developers
 
+A list of properties can be found at \subpage MultiLabelSegmentationPropertiesPage.
 For technical specifications see : \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system : \subpage toolextensions.
 
 */

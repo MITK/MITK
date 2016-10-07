@@ -167,12 +167,14 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
         //Let's paint the feedback node green...
         mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
 
-        itk::RGBPixel<float> pixel;
-        pixel[0] = 0.0f;
-        pixel[1] = 1.0f;
-        pixel[2] = 0.0f;
-        previewImage->GetActiveLabel()->SetColor(pixel);
-        previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
+        if (previewImage) {
+          itk::RGBPixel<float> pixel;
+          pixel[0] = 0.0f;
+          pixel[1] = 1.0f;
+          pixel[2] = 0.0f;
+          previewImage->GetActiveLabel()->SetColor(pixel);
+          previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
+        }
       }
       else
         m_ThresholdFeedbackNode->SetData(mitk::Image::New());

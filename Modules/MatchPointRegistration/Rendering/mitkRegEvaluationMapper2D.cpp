@@ -488,16 +488,23 @@ void mitk::RegEvaluationMapper2D::PrepareDifference( LocalStorage * localStorage
 {
   vtkSmartPointer<vtkImageMathematics> diffFilter =
     vtkSmartPointer<vtkImageMathematics>::New();
-  vtkSmartPointer<vtkImageMathematics> absFilter =
+  vtkSmartPointer<vtkImageMathematics> minFilter =
+    vtkSmartPointer<vtkImageMathematics>::New();
+  vtkSmartPointer<vtkImageMathematics> maxFilter =
     vtkSmartPointer<vtkImageMathematics>::New();
 
-  diffFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
-  diffFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  minFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
+  minFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  minFilter->SetOperationToMin();
+  maxFilter->SetInputConnection(0, localStorage->m_TargetExtractFilter->GetOutputPort());
+  maxFilter->SetInputConnection(1, localStorage->m_MappedExtractFilter->GetOutputPort());
+  maxFilter->SetOperationToMax();
+
+  diffFilter->SetInputConnection(0, maxFilter->GetOutputPort());
+  diffFilter->SetInputConnection(1, minFilter->GetOutputPort());
   diffFilter->SetOperationToSubtract();
-  absFilter->SetInputConnection(diffFilter->GetOutputPort());
-  absFilter->SetOperationToAbsoluteValue();
-  absFilter->Update();
-  localStorage->m_EvaluationImage = absFilter->GetOutput();
+  diffFilter->Update();
+  localStorage->m_EvaluationImage = diffFilter->GetOutput();
 }
 
 void mitk::RegEvaluationMapper2D::PrepareWipe(mitk::DataNode* datanode, LocalStorage * localStorage, const Point2D& currentIndex2D)

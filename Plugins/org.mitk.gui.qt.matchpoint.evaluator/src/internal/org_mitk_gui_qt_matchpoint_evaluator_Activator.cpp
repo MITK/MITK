@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "org_mitk_gui_qt_matchpoint_evaluator_Activator.h"
 
 #include "QmitkMatchPointRegistrationEvaluator.h"
-#include "QmitkMatchPointRegistrationEvalGenerator.h"
 
 ctkPluginContext* org_mitk_gui_qt_matchpoint_evaluator_Activator::m_Context = 0;
 
@@ -26,7 +25,6 @@ void org_mitk_gui_qt_matchpoint_evaluator_Activator::start(
     ctkPluginContext* context)
 {
 	BERRY_REGISTER_EXTENSION_CLASS(QmitkMatchPointRegistrationEvaluator, context)
-	BERRY_REGISTER_EXTENSION_CLASS(QmitkMatchPointRegistrationEvalGenerator, context)
 
 	m_Context = context;
 }

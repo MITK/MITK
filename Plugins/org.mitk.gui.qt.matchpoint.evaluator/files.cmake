@@ -5,18 +5,15 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_matchpoint_evaluator_Activator.cpp
   QmitkMatchPointRegistrationEvaluator.cpp
-  QmitkMatchPointRegistrationEvalGenerator.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkMatchPointRegistrationEvaluator.ui
-  src/internal/QmitkMatchPointRegistrationEvalGenerator.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_matchpoint_evaluator_Activator.h
   src/internal/QmitkMatchPointRegistrationEvaluator.h
-  src/internal/QmitkMatchPointRegistrationEvalGenerator.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -25,7 +22,6 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/evaluator.png
-  resources/evalgen.png
   plugin.xml
 )
 

@@ -2,10 +2,6 @@
 <plugin>
   
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.matchpoint.evaluation.generator"
-          name="MatchPoint Registration Evaluation Generator"
-          class="QmitkMatchPointRegistrationEvalGenerator"
-          icon="resources/evalgen.png" />
     <view id="org.mitk.views.matchpoint.evaluation.editor"
           name="MatchPoint Registration Evaluator"
           class="QmitkMatchPointRegistrationEvaluator"

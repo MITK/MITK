@@ -1,5 +1,5 @@
 /**
-\page de_dkfz_matchpoint_mitk_gui_qt_algorithm_framereg The MatchPoint Motion/Frame Correction Plugin
+\page org_mitk_gui_qt_matchpoint_framereg The MatchPoint Motion/Frame Correction Plugin
 
 \imageMacro{"map-icon-run.png", "Icon of the MatchPoint Algorithm Control", 3}
 

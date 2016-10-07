@@ -14,6 +14,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_views_cmdlinemodules
   \li \subpage org_mitk_views_datamanager
   \li \subpage org_mitk_gui_qt_dicom
+  \li \subpage org_mitk_gui_qt_dicominspector
   \li \subpage org_mitk_gui_qt_diffusionimaging
   \li \subpage org_mitk_views_imagecropper
   \li \subpage org_mitk_views_imagenavigator
@@ -26,6 +27,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_gui_qt_registration
   \li \subpage org_mitk_gui_qt_remeshing
   \li \subpage org_mitk_views_segmentation
+  \li \subpage org_mitk_views_multilabelsegmentation
   \li \subpage org_mitk_gui_qt_spectrocamrecorder
   \li \subpage org_mitk_gui_qt_ultrasound
   \li \subpage org_mitk_gui_qt_viewnavigator
@@ -50,6 +52,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitkexamplesopencv
   \li \subpage org_mitk_gui_qt_igtexample
   \li \subpage org_mitk_gui_qt_igttracking
+  \li \subpage org_mitk_gui_qt_igt_app_echotrack
   \li \subpage org_blueberry_ui_qt_objectinspector
   \li \subpage org_mitk_gui_qt_eventrecorder
   \li \subpage org_mitk_gui_qt_overlaymanager

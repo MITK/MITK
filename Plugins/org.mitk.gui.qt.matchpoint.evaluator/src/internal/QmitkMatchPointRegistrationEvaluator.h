@@ -20,68 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
+#include <QmitkSliceNavigationListener.h>
 
 #include "ui_QmitkMatchPointRegistrationEvaluator.h"
-
-
-class QmitkSliceChangedListener : public QObject
-  {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
-    Q_OBJECT
-
-  public:
-    QmitkSliceChangedListener();
-    virtual ~QmitkSliceChangedListener();
-
-  signals:
-    void SliceChanged();
-
-  public slots:
-    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
-
-  protected slots:
-      /** Overwrite function to implement the behavior on slice/time changes. */
-      void OnSliceChangedDelayed();
-
-  protected:
-
-    /**	@brief Calls OnSliceChangedDelayed so the event isn't triggered multiple times. */
-    void OnSliceChangedInternal(const itk::EventObject& e);
-
-    void OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/);
-
-    /** Initializes and sets the observers that are used to monitor changes in the selected position
-    or time point in order to actualize the view.h*/
-    bool InitObservers();
-    void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
-    /** Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
-    void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = NULL);
-
-    mitk::IRenderWindowPart* m_renderWindowPart;
-
-    // Needed for observing the events for when a slice or time step is changed.
-    bool m_PendingSliceChangedEvent;
-
-    /**Helper structure to manage the registered observer events.*/
-    struct ObserverInfo
-    {
-      mitk::SliceNavigationController* controller;
-      int observerTag;
-      std::string renderWindowName;
-      mitk::IRenderWindowPart* renderWindowPart;
-
-      ObserverInfo(mitk::SliceNavigationController* controller, int observerTag,
-        const std::string& renderWindowName, mitk::IRenderWindowPart* part);
-    };
-
-    typedef std::multimap<const mitk::SliceNavigationController*, ObserverInfo> ObserverMapType;
-    ObserverMapType m_ObserverMap;
-
-    /**	@brief	Is a visualization currently running? */
-    bool m_internalUpdateFlag;
-  };
 
 /*!
 \brief QmitkMatchPointRegistrationEvaluator
@@ -155,7 +96,7 @@ private:
   mitk::DataNode::Pointer m_selectedEvalNode;
   mitk::DataStorage::SetOfObjects::ConstPointer m_evalNodes;
 
-  QmitkSliceChangedListener m_SliceChangeListener;
+  QmitkSliceNavigationListener m_SliceChangeListener;
 
   itk::TimeStamp m_selectedNodeTime;
   itk::TimeStamp m_currentPositionTime;

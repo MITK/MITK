@@ -1255,13 +1255,16 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
   this->UpdateAllWidgets();
 }
 
-void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* ds )
+void QmitkStdMultiWidget::SetDataStorage( mitk::DataStorage* dataStorage )
 {
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
-  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetDataStorage(ds);
-  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetDataStorage(ds);
-  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetDataStorage(ds);
-  m_DataStorage = ds;
+  if (m_DataStorage != dataStorage)
+  {
+    mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(dataStorage);
+    mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetDataStorage(dataStorage);
+    mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetDataStorage(dataStorage);
+    mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetDataStorage(dataStorage);
+    m_DataStorage = dataStorage;
+  }
 }
 
 void QmitkStdMultiWidget::Fit()

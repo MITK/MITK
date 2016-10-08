@@ -113,7 +113,7 @@ namespace mitk
       Standard2D = 1, Standard3D = 2
     };
 
-    virtual void SetDataStorage(DataStorage* storage);  ///< set the datastorage that will be used for rendering
+    virtual void SetDataStorage(DataStorage* dataStorage);  ///< set the data storage that will be used for rendering
 
     //##Documentation
     //## return the DataStorage that is used for rendering

@@ -81,7 +81,7 @@ public:
   // Active current renderwindow
   virtual void MakeCurrent();
 
-  virtual void SetDataStorage( mitk::DataStorage* storage ) override;  ///< set the datastorage that will be used for rendering
+  virtual void SetDataStorage(mitk::DataStorage* dataStorage) override;  ///< set the data storage that will be used for rendering
 
   virtual void InitRenderer(vtkRenderWindow* renderwindow) override;
   virtual void Update(mitk::DataNode* datatreenode);

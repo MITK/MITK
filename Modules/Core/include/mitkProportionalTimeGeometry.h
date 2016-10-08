@@ -198,7 +198,7 @@ namespace mitk {
     * to change the spatial properties of a TimeGeometry and preserve the time
     * "grid".
     */
-    virtual void ReplaceTimeStepGeometries(const BaseGeometry* geometry);
+    virtual void ReplaceTimeStepGeometries(const BaseGeometry* geometry) override;
 
     /**
     * \brief Makes a deep copy of the current object

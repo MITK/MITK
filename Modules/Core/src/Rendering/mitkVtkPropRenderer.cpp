@@ -119,17 +119,17 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     m_TextRenderer->Delete();
 }
 
-void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage* storage)
+void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage* dataStorage)
 {
-  if (storage == NULL)
-    return;
+  if (dataStorage != m_DataStorage && dataStorage != nullptr)
+  {
+    BaseRenderer::SetDataStorage(dataStorage);
 
-  BaseRenderer::SetDataStorage(storage);
+    static_cast<mitk::PlaneGeometryDataVtkMapper3D*>(m_CurrentWorldPlaneGeometryMapper.GetPointer())->SetDataStorageForTexture( m_DataStorage.GetPointer() );
 
-  static_cast<mitk::PlaneGeometryDataVtkMapper3D*>(m_CurrentWorldPlaneGeometryMapper.GetPointer())->SetDataStorageForTexture(m_DataStorage.GetPointer());
-
-  // Compute the geometry from the current data tree bounds and set it as world geometry
-  this->SetWorldGeometryToDataStorageBounds();
+    // Compute the geometry from the current data tree bounds and set it as world geometry
+    this->SetWorldGeometryToDataStorageBounds();
+  }
 }
 
 bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()

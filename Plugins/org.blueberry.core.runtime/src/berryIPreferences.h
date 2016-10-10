@@ -698,6 +698,14 @@ namespace berry
      * @see #flush()
      */
     virtual void Sync() = 0;
+
+    /**
+    * Sets a flag to the parameter <code>block</code> which can be used to
+    * block berry messages in order to prevent callback functions to be called.
+    *
+    * @param block boolean to set the flag
+    */
+    virtual void BlockSignals(bool block) = 0;
   };
 
 }  // namespace berry

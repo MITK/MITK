@@ -13,6 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 =========================================================================*/
+#include <algorithm>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -118,7 +119,7 @@ void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
   for (int i = 0; i < (OrientationVector.size() - 1); i++)
   {
     double AngleBetweenTwoQuaternions = mitk::StaticIGTHelperFunctions::GetAngleBetweenTwoQuaterions(OrientationVector.at(i), OrientationVector.at(i+1), rotationVec);
-    double AngularError = abs(AngleBetweenTwoQuaternions - 11.25);
+    double AngularError = fabs(AngleBetweenTwoQuaternions - 11.25);
     std::stringstream description;
     description << "Rotation Error ROT" << (i + 1) << " / ROT" << (i + 2);
     allOrientationErrors.push_back({ AngularError, description.str() });
@@ -214,7 +215,7 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcRef()
   for (int i = 0; i < m_FilenameVector.size(); i++)
   {
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -262,7 +263,7 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcOrientandW
   for (int i = 0; i < m_FilenameVector.size(); i++)
   {
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -518,7 +519,7 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateData()
   for (int i = 0; i < m_FilenameVector.size(); i++)
   {
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -591,7 +592,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSetsOfSinglePositions()
     mitk::PointSet::Pointer thisPointSet = mitk::PointSet::New();
 
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -635,7 +636,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGeneratePointSet()
   for (int i = 0; i < m_FilenameVector.size(); i++)
   {
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -687,7 +688,7 @@ void QmitkIGTTrackingDataEvaluationView::OnGenerateRotationLines()
   for (int i = 0; i < m_FilenameVector.size(); i++)
   {
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -1041,7 +1042,7 @@ std::vector<mitk::NavigationDataEvaluationFilter::Pointer> QmitkIGTTrackingDataE
   for (int i = 0; i < m_FilenameVector.size(); i++)
   {
     //create navigation data player
-    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    mitk::NavigationDataCSVSequentialPlayer::Pointer myPlayer = ConstructNewNavigationDataPlayer();
     myPlayer->SetFiletype(mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV);
     myPlayer->SetFileName(m_FilenameVector.at(i));
 
@@ -1253,4 +1254,36 @@ void QmitkIGTTrackingDataEvaluationView::writeToFile(std::string filename, std::
     currentFile << currentError.description << ";" << currentError.distanceError << "\n";
   }
   currentFile.close();
+}
+
+mitk::NavigationDataCSVSequentialPlayer::Pointer QmitkIGTTrackingDataEvaluationView::ConstructNewNavigationDataPlayer()
+{
+    bool rightHanded = m_Controls->m_RigthHanded->isChecked();
+    QString separator =  m_Controls->m_SeparatorSign->text();
+    QChar sepaSign = separator.at(0);
+    //char separatorSign;
+    char separatorSign = sepaSign.toLatin1();
+    //std::string separatorSign = m_Controls->m_SeparatorSign->text().toStdString();
+    int sampleCount = m_Controls->m_SampleCount->value();
+    bool headerRow = m_Controls->m_HeaderRow->isChecked();
+    int xPos = m_Controls->m_XPos->value();
+    int yPos = m_Controls->m_YPos->value();
+    int zPos = m_Controls->m_ZPos->value();
+    bool useQuats = m_Controls->m_UseQuats->isChecked();
+    int qx = m_Controls->m_Qx->value();
+    int qy = m_Controls->m_Qy->value();
+    int qz = m_Controls->m_Qz->value();
+    int qr = m_Controls->m_Qr->value();
+    int azimuth = m_Controls->m_Azimuth->value();
+    int elevation = m_Controls->m_Elevation->value();
+    int roll = m_Controls->m_Roll->value();
+    bool eulersInRad = m_Controls->m_Radiants->isChecked();
+    //need to find the biggest column number to determine the  minimal number of columns the .csv file has to have
+    int allInts[] = {xPos, yPos, zPos, qx, qy, qr, azimuth, elevation, roll};
+    int minNumberOfColumns = (*std::max_element(allInts, allInts+9)+1); //size needs to be +1 because columns start at 0 but size at 1
+
+    mitk::NavigationDataCSVSequentialPlayer::Pointer navDataPlayer = mitk::NavigationDataCSVSequentialPlayer::New();
+    navDataPlayer->SetOptions(rightHanded, separatorSign, sampleCount, headerRow, xPos, yPos, zPos, useQuats,
+                              qx, qy, qz, qr, azimuth, elevation, roll, eulersInRad, minNumberOfColumns);
+    return navDataPlayer;
 }

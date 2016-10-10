@@ -27,6 +27,7 @@ mitk::NavigationDataCSVSequentialPlayer::NavigationDataCSVSequentialPlayer()
   m_NavigationDatas = std::vector<mitk::NavigationData::Pointer>();
   m_CurrentPos = 0;
   m_Filetype = mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV;
+
 }
 
 mitk::NavigationDataCSVSequentialPlayer::~NavigationDataCSVSequentialPlayer()
@@ -99,7 +100,16 @@ std::vector<mitk::NavigationData::Pointer> mitk::NavigationDataCSVSequentialPlay
 {
   std::vector<mitk::NavigationData::Pointer> returnValue = std::vector<mitk::NavigationData::Pointer>();
   std::vector<std::string> fileContentLineByLine = GetFileContentLineByLine(filename);
-  for (int i = 1; (i < fileContentLineByLine.size()); i++) //skip header so start at 1
+  int i;
+  if (m_HeaderRow) //file has a header row, so it has to be skipped when reading the NavigationDatas
+  {
+      i = 1;
+  }
+  else
+  {
+      i = 0; //file has no header row, so no need to skip the first row
+  }
+  for (i; (i < fileContentLineByLine.size()); i++)
   {
     returnValue.push_back(GetNavigationDataOutOfOneLine(fileContentLineByLine.at(i)));
   }
@@ -142,7 +152,7 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
         readData.push_back(buffer);
       }
 
-      count++; if (count == 24) count = 0;
+      count++; if (count == m_SampleCount) count = 0;
     }
   }
 
@@ -160,7 +170,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
   QString myLine = QString(line.c_str());
 
-  QStringList myLineList = myLine.split(',');
+  QStringList myLineList = myLine.split(m_SeparatorSign);
 
   mitk::Point3D position;
   mitk::Quaternion orientation;
@@ -171,7 +181,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   //interpret your csv file.
   if (m_Filetype = mitk::NavigationDataCSVSequentialPlayer::ManualLoggingCSV)
   {
-    if (myLineList.size() < 10)
+    if (myLineList.size() < m_MinNumberOfColumns)
     {
       MITK_ERROR << "Error: cannot read line: only found " << myLineList.size() << " fields. Last field: " << myLineList.at(myLineList.size() - 1).toStdString();
       returnValue = GetEmptyNavigationData();
@@ -206,9 +216,62 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     //other usage this might be important to adapt!
 
 
-    position[0] = myLineList.at(4).toDouble();
-    position[1] = myLineList.at(5).toDouble();
-    position[2] = myLineList.at(6).toDouble();
+    position[0] = myLineList.at(m_XPos).toDouble();
+    position[1] = myLineList.at(m_YPos).toDouble();
+    position[2] = myLineList.at(m_ZPos).toDouble();
+
+    if(!m_RightHanded) //MITK uses a right handed coordinate system, so the position needs to be converted
+    {
+        position[0] = position[0]*(-1);
+    }
+
+    if (m_UseQuats) //Use Quaternions to construct the orientation of the NavigationData
+    {
+        orientation[0] = myLineList.at(m_Qx).toDouble(); //qx
+        orientation[1] = myLineList.at(m_Qy).toDouble(); //qy
+        orientation[2] = myLineList.at(m_Qz).toDouble(); //qz
+        orientation[3] = myLineList.at(m_Qr).toDouble(); //qr
+    }
+    else //Use the Euler Angles to construct the orientation of the NavigationData
+    {
+        double azimuthAngle;
+        double elevationAngle;
+        double rollAngle;
+        if(m_Azimuth < 0) //azimuth is not defined so set him to zero
+        {
+            azimuthAngle = 0;
+        }
+        else
+        {
+            azimuthAngle = myLineList.at(m_Azimuth).toDouble();
+        }
+        if(m_Elevation < 0)// elevation is not defined so set him to zero
+        {
+            elevationAngle = 0;
+        }
+        else
+        {
+            elevationAngle = myLineList.at(m_Elevation).toDouble();
+        }
+        if(m_Roll < 0) //roll is not defined so set him to zero
+        {
+            rollAngle = 0;
+        }
+        else
+        {
+            rollAngle = myLineList.at(m_Roll).toDouble();
+        }
+
+
+        if (!m_EulersInRadiants) //the Euler Angles are in Degrees but MITK uses radiants so they need to be converted
+        {
+            azimuthAngle = azimuthAngle / 180 * M_PI;
+            elevationAngle = elevationAngle / 180 * M_PI;
+            rollAngle = rollAngle / 180 * M_PI;
+        }
+        vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
+        orientation = eulerQuat;
+    }
 
 
     //Doesn't work... don't know how to interpret the
@@ -238,15 +301,15 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
 
 
-    //Using Euler angles instead does work
-    //azimuth: rotation about Z axis of reference frame
-    double azimuthAngle = (myLineList.at(11).toDouble() / 180 * M_PI);
-    //elevation: rotation about Y' axis (transformed Y axis of sonsor frame)
-    double elevationAngle = (myLineList.at(12).toDouble() / 180 * M_PI);
-    //roll: rotation about X axis of sensor frame
-    double rollAngle = (myLineList.at(13).toDouble() / 180 * M_PI);
-    vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
-    orientation = eulerQuat;
+//    //Using Euler angles instead does work
+//    //azimuth: rotation about Z axis of reference frame
+//    double azimuthAngle = (myLineList.at(11).toDouble() / 180 * M_PI);
+//    //elevation: rotation about Y' axis (transformed Y axis of sonsor frame)
+//    double elevationAngle = (myLineList.at(12).toDouble() / 180 * M_PI);
+//    //roll: rotation about X axis of sensor frame
+//    double rollAngle = (myLineList.at(13).toDouble() / 180 * M_PI);
+//    vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
+//    orientation = eulerQuat;
 
 
     /*
@@ -270,24 +333,23 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     double qz = rotationAxis[1] * sin(rotationAngle/2);
     */
 
+    if(!m_RightHanded) //MITK uses a right handed coordinate system, so the orientation needs to be converted
+    {
+      //code block for conversion from left-handed to right-handed
+      mitk::Quaternion linksZuRechtsdrehend;
+      double rotationAngle = -M_PI;
+      double rotationAxis[3];
+      rotationAxis[0] = 0;
+      rotationAxis[1] = 0;
+      rotationAxis[2] = 1;
 
+      linksZuRechtsdrehend[3] = cos(rotationAngle / 2);
+      linksZuRechtsdrehend[0] = rotationAxis[0] * sin(rotationAngle / 2);
+      linksZuRechtsdrehend[1] = rotationAxis[1] * sin(rotationAngle / 2);
+      linksZuRechtsdrehend[2] = rotationAxis[2] * sin(rotationAngle / 2);
 
-    /*
-    //code block for conversion from left-handed to right-handed
-    mitk::Quaternion linksZuRechtsdrehend;
-    double rotationAngle = -M_PI;
-    double rotationAxis[3];
-    rotationAxis[0] = 0;
-    rotationAxis[1] = 0;
-    rotationAxis[2] = 1;
-
-    linksZuRechtsdrehend[3] = cos(rotationAngle / 2);
-    linksZuRechtsdrehend[0] = rotationAxis[0] * sin(rotationAngle / 2);
-    linksZuRechtsdrehend[1] = rotationAxis[1] * sin(rotationAngle / 2);
-    linksZuRechtsdrehend[2] = rotationAxis[2] * sin(rotationAngle / 2);
-
-    orientation = orientation * linksZuRechtsdrehend;
-    */
+      orientation = orientation * linksZuRechtsdrehend;
+    }
 
   }
   //this is for MITK csv files that have been recorded with the MITK
@@ -322,4 +384,26 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
   returnValue->SetOrientation(orientation);
 
   return returnValue;
+}
+void mitk::NavigationDataCSVSequentialPlayer::SetOptions(bool rightHanded, char separatorSign, int sampleCount, bool headerRow, int xPos, int yPos,
+                                                         int zPos, bool useQuats, int qx, int qy, int qz, int qr, int azimuth, int elevation, int roll,
+                                                         bool eulerInRadiants, int minNumberOfColumns)
+{
+    m_RightHanded = rightHanded;
+    m_SeparatorSign = separatorSign;
+    m_SampleCount = sampleCount;
+    m_HeaderRow = headerRow;
+    m_XPos = xPos;
+    m_YPos = yPos;
+    m_ZPos = zPos;
+    m_UseQuats = useQuats;
+    m_Qx = qx;
+    m_Qy = qy;
+    m_Qz = qz;
+    m_Qr = qr;
+    m_Azimuth = azimuth;
+    m_Elevation = elevation;
+    m_Roll = roll;
+    m_EulersInRadiants = eulerInRadiants;
+    m_MinNumberOfColumns = minNumberOfColumns;
 }

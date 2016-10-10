@@ -1,10 +1,3 @@
-macro(_find_package package_name)
-  find_package(${package_name} REQUIRED PATHS ${${package_name}_DIR} PATH_SUFFIXES ${package_name} NO_DEFAULT_PATH NO_MODULE QUIET)
-  if(NOT ${package_name}_FOUND)
-    find_package(${package_name} REQUIRED)
-  endif()
-endmacro()
-
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   set(_dir_candidates
@@ -50,8 +43,8 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
 
   if(MITK_USE_HDF5)
-    _find_package(HDF5)
-    get_target_property(_location hdf5 LOCATION)
+    FIND_PACKAGE(HDF5 COMPONENTS C HL NO_MODULE REQUIRED shared)
+    get_target_property(_location hdf5-shared LOCATION)
     get_filename_component(_location ${_location} PATH)
     list(APPEND _additional_paths ${_location})
 

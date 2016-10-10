@@ -1,18 +1,19 @@
 diff -urNb vigra-Version-1-10-0/CMakeLists.txt Vigra/CMakeLists.txt
 --- vigra-Version-1-10-0/CMakeLists.txt	2013-11-18 17:48:16.000000000 +0100
 +++ Vigra/CMakeLists.txt	2015-03-03 10:13:57.693725000 +0100
-@@ -70,8 +70,11 @@
+@@ -70,7 +70,12 @@ IF(WITH_OPENEXR)
  ENDIF()
- 
+
  IF(WITH_HDF5)
 +    FIND_PACKAGE(HDF5 PATHS ${HDF5_DIR} PATH_SUFFIXES hdf5 NO_DEFAULT_PATH NO_MODULE)
-+IF(NOT HDF5_FOUND)
++  IF(NOT HDF5_FOUND)
      VIGRA_FIND_PACKAGE(HDF5)
++  ENDIF()
++  # HDF5 changed their config, this ports the new style to the old style
++  set(HDF5_LIBRARIES ${HDF5_EXPORT_LIBRARIES})
  ENDIF()
-+ENDIF()
- 
+
  IF(WITH_BOOST_GRAPH)
-     IF(WITH_VIGRANUMPY)
 @@ -395,3 +398,4 @@
  ENDIF()
  

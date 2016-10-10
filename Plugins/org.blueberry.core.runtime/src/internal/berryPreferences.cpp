@@ -34,6 +34,7 @@ namespace berry
       , m_Root(_Parent ? _Parent->m_Root : this)
       , m_Removed(false)
       , m_Storage(_Storage)
+      , m_BlockSignal(false)
   {
     // root node if parent is 0
     if (_Parent != nullptr)
@@ -352,7 +353,10 @@ namespace berry
     if (oldValue != value)
     {
       this->SetDirty(true);
-      this->OnPropertyChanged(ChangeEvent(this, key, oldValue, value));
+      if (!m_BlockSignal)
+      {
+        this->OnPropertyChanged(ChangeEvent(this, key, oldValue, value));
+      }
     }
   }
 
@@ -411,6 +415,11 @@ namespace berry
     this->Flush();
   }
 
+  void Preferences::BlockSignals(bool block)
+  {
+    m_BlockSignal = block;
+  }
+
   void Preferences::AssertValid_unlocked() const
   {
     if(m_Removed)
@@ -447,7 +456,10 @@ namespace berry
     }
     if(_Dirty)
     {
-      this->OnChanged.Send(this);
+      if (!m_BlockSignal)
+      {
+        this->OnChanged.Send(this);
+      }
     }
   }
 
@@ -455,7 +467,10 @@ namespace berry
   {
     m_Dirty = _Dirty;
     if(_Dirty)
-      this->OnChanged.Send(this);
+      if (!m_BlockSignal)
+      {
+        this->OnChanged.Send(this);
+      }
 /*
     for (ChildrenList::iterator it = m_Children.begin()
     ; it != m_Children.end(); ++it)

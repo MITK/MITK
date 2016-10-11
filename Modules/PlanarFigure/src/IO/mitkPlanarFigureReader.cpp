@@ -139,61 +139,10 @@ void mitk::PlanarFigureReader::GenerateData()
     std::string type = pfElement->Attribute("type");
 
     mitk::PlanarFigure::Pointer planarFigure = nullptr;
-    if (type == "PlanarAngle")
-    {
-      planarFigure = mitk::PlanarAngle::New();
-    }
-    else if (type == "PlanarCircle")
-    {
-      planarFigure = mitk::PlanarCircle::New();
-    }
-    else if (type == "PlanarEllipse")
-    {
-      planarFigure = mitk::PlanarEllipse::New();
-    }
-    else if (type == "PlanarCross")
-    {
-      planarFigure = mitk::PlanarCross::New();
-    }
-    else if (type == "PlanarFourPointAngle")
-    {
-      planarFigure = mitk::PlanarFourPointAngle::New();
-    }
-    else if (type == "PlanarLine")
-    {
-      planarFigure = mitk::PlanarLine::New();
-    }
-    else if (type == "PlanarPolygon")
-    {
-      planarFigure = mitk::PlanarPolygon::New();
-    }
-    else if (type == "PlanarSubdivisionPolygon")
-    {
-      planarFigure = mitk::PlanarSubdivisionPolygon::New();
-    }
-    else if (type == "PlanarRectangle")
-    {
-      planarFigure = mitk::PlanarRectangle::New();
-    }
-    else if (type == "PlanarArrow")
-    {
-      planarFigure = mitk::PlanarArrow::New();
-    }
-    else if (type == "PlanarDoubleEllipse")
-    {
-      planarFigure = mitk::PlanarDoubleEllipse::New();
-    }
-    else if (type == "PlanarBezierCurve")
-    {
-      planarFigure = mitk::PlanarBezierCurve::New();
-    }
-    else
-    {
-      // unknown type
-      MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
+    planarFigure = createPlanarFigure(type);
+    if (!planarFigure) {
       continue;
     }
-
 
     // Read properties of the planar figure
     for( TiXmlElement* propertyElement = pfElement->FirstChildElement("property");
@@ -357,6 +306,53 @@ void mitk::PlanarFigureReader::GenerateData()
 
   m_Success = true;
 }
+
+mitk::PlanarFigure::Pointer mitk::PlanarFigureReader::createPlanarFigure(const std::string& type)
+{
+  mitk::PlanarFigure::Pointer planarFigure = nullptr;
+  if (type == "PlanarAngle")
+  {
+    planarFigure = mitk::PlanarAngle::New();
+  } else if (type == "PlanarCircle")
+  {
+    planarFigure = mitk::PlanarCircle::New();
+  } else if (type == "PlanarEllipse")
+  {
+    planarFigure = mitk::PlanarEllipse::New();
+  } else if (type == "PlanarCross")
+  {
+    planarFigure = mitk::PlanarCross::New();
+  } else if (type == "PlanarFourPointAngle")
+  {
+    planarFigure = mitk::PlanarFourPointAngle::New();
+  } else if (type == "PlanarLine")
+  {
+    planarFigure = mitk::PlanarLine::New();
+  } else if (type == "PlanarPolygon")
+  {
+    planarFigure = mitk::PlanarPolygon::New();
+  } else if (type == "PlanarSubdivisionPolygon")
+  {
+    planarFigure = mitk::PlanarSubdivisionPolygon::New();
+  } else if (type == "PlanarRectangle")
+  {
+    planarFigure = mitk::PlanarRectangle::New();
+  } else if (type == "PlanarArrow")
+  {
+    planarFigure = mitk::PlanarArrow::New();
+  } else if (type == "PlanarDoubleEllipse")
+  {
+    planarFigure = mitk::PlanarDoubleEllipse::New();
+  } else if (type == "PlanarBezierCurve")
+  {
+    planarFigure = mitk::PlanarBezierCurve::New();
+  } else {
+    // unknown type
+    MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
+  }
+  return planarFigure;
+}
+
 
 mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
 {

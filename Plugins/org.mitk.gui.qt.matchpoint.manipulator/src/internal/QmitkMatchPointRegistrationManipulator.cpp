@@ -44,7 +44,7 @@ const std::string QmitkMatchPointRegistrationManipulator::VIEW_ID =
     "org.mitk.views.matchpoint.registration.manipulator";
 
 QmitkMatchPointRegistrationManipulator::QmitkMatchPointRegistrationManipulator()
-  : m_Parent(NULL), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationEvaluationHelper")
+  : m_Parent(NULL), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationManipulationEvaluationHelper")
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -234,13 +234,13 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   }
 
   //config settings widget
-  this->m_Controls.evalSettings->setVisible(m_activeEvaluation);
+  this->m_Controls.groupBox->setEnabled(m_activeEvaluation);
   this->m_Controls.pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
-    && this->m_spSelectedTargetNode.IsNotNull());
-  this->m_Controls.pbEval->setVisible(!m_activeEvaluation);
-  this->m_Controls.pbStop->setVisible(m_activeEvaluation);
+    && this->m_spSelectedTargetNode.IsNotNull() && !m_activeEvaluation);
+  this->m_Controls.pbCancel->setEnabled(m_activeEvaluation);
+  this->m_Controls.pbStore->setEnabled(m_activeEvaluation);
   this->m_Controls.lbMovingName->setEnabled(!m_activeEvaluation);
-  this->m_Controls.lbRegistrationName->setEnabled(!m_activeEvaluation);
+  this->m_Controls.lbRegistrationName->setEnabled(!m_activeEvaluation && this->m_Controls.radioSelectedReg->isChecked());
   this->m_Controls.lbTargetName->setEnabled(!m_activeEvaluation);
 }
 

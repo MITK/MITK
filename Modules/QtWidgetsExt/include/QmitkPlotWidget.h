@@ -113,7 +113,7 @@ public:
   * @returns the id of the curve. Use this id to
   * refer to the curve, if you want to modify or add data.
   */
-  unsigned int InsertCurve(const char* title , QColor color = Qt::black);
+  unsigned int InsertCurve(const char* title , QColor color = QColor(Qt::black));
 
   /**
   * Sets the title of the given axis. For the set of available axes

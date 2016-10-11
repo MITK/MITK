@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.matchpoint.manipulator"
+          name="MatchPoint Registration Manipulator"
+          class="QmitkMatchPointRegistrationManipulator"
+          icon="resources/manipulator.png" />		  
+  </extension>
+
+</plugin>

@@ -49,6 +49,7 @@ public:
 
   virtual void SetEventDisplay(int event);
   virtual void SetUseBModeFilter(bool isSet);
+  virtual void SetRecord(bool record);
 
   //Transmit
   virtual void SetTransmitPhaseLength(double us);
@@ -95,6 +96,7 @@ protected:
 
   virtual void OnSetEventDisplay(int event);
   virtual void OnSetUseBModeFilter(bool isSet);
+  virtual void OnSetRecord(bool record);
 
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us);

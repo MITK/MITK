@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASDevice.h"
-
+#include <mitkIOUtil.h>
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
 	: m_Image(mitk::Image::New()),
@@ -27,7 +27,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   DataType(0),
   displayedEvent(0),
   m_GUIOutput(nullptr),
-  useBModeFilter(false)
+  useBModeFilter(false),
+  currentlyRecording(false)
 {
 }
 
@@ -64,7 +65,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     }
 
-    if (!useBModeFilter)
+    // if DataType == 0 : just bypass the filter here, if imageData is given, as imageData is already enveloped..
+    if (!useBModeFilter || DataType == 0)  
     {
       // copy contents of the given image into the member variable, slice after slice
       for (int sliceNumber = 0; sliceNumber < m_Image->GetDimension(2); ++sliceNumber)
@@ -77,36 +79,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
     else {
       // feed the m_image to the BMode filter and grab it back; 
-      // input type has to be a floating point number, thus we have a little bit more performance loss,
-      // as the image needs to be casted and copied into a float image, in addition to being fitted with the envelope filter
-      if (DataType == 0)
-      {
-        typedef itk::Image< float, 3 > itkInputImageType;
-        typedef itk::Image< unsigned char, 3 > itkOutputImageType;
-        typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
-
-        PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
-        itkInputImageType::Pointer itkImage;
-
-        mitk::CastToItkImage(m_Image, itkImage);
-        photoacousticBModeFilter->SetInput(itkImage);
-        photoacousticBModeFilter->SetDirection(0);
-        image = mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
-      } // DataType == 0 : imageData -> uchar output type
-      else if (DataType == 1)
-      {
-        typedef itk::Image< float, 3 > itkInputImageType;
-        typedef itk::Image< short, 3 > itkOutputImageType;
-        typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
-
-        PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
-        itkInputImageType::Pointer itkImage;
-
-        mitk::CastToItkImage(m_Image, itkImage);
-        photoacousticBModeFilter->SetInput(itkImage);
-        photoacousticBModeFilter->SetDirection(0);
-        image = mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
-      } // DataType == 1 : beamformed -> short output type
+      if (DataType==1)
+        image = ApplyBmodeFilter(m_Image);
     }
     // always copy the geometry from the m_Image
     image->SetGeometry(m_Image->GetGeometry());
@@ -134,6 +108,38 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   }
 }
 
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
+{
+  // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
+  typedef itk::Image< float, 2 > itkInputImageType;
+  typedef itk::Image< short, 2 > itkOutputImageType;
+  typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
+
+  PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
+  itkInputImageType::Pointer itkImage;
+
+  mitk::CastToItkImage(inputImage, itkImage);
+  photoacousticBModeFilter->SetInput(itkImage);
+  photoacousticBModeFilter->SetDirection(0);
+  return mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
+}
+
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage)
+{
+  // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
+  typedef itk::Image< float, 3 > itkInputImageType;
+  typedef itk::Image< short, 3 > itkOutputImageType;
+  typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
+
+  PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
+  itkInputImageType::Pointer itkImage;
+
+  mitk::CastToItkImage(inputImage, itkImage);
+  photoacousticBModeFilter->SetInput(itkImage);
+  photoacousticBModeFilter->SetDirection(0);
+  return mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
+}
+
 void mitk::USDiPhASImageSource::ImageDataCallback(
     short* rfDataChannelData,
     int& channelDataChannelsPerDataset,
@@ -153,9 +159,10 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
-  bool writeImage = ((DataType == 0) && (imageData != nullptr)) || ((DataType == 1) && (rfDataArrayBeamformed != nullptr));
-  if (!m_Image.IsNull() && writeImage)
+  bool writeImage = ((DataType == 0) && (imageData != nullptr)) || ((DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
+  if (writeImage)
   {
+
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
 
     // initialize mitk::Image with given image size on the first time
@@ -197,7 +204,26 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         break;
       }
     }
-    if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Unlock(); }
+    if (m_ImageMutex.IsNotNull()) { m_ImageMutex->Unlock(); }
+  }
+  // if the user decides to start recording, we feed the vector the generated images
+  if (currentlyRecording) {
+    Image::Pointer savedImage = Image::New();
+    bool sliceSet = true;
+    int index = 0;
+    for (int index = 0; index < m_Image->GetDimension(2); ++index)
+    {
+      if (m_Image->IsSliceSet(index))
+      {
+        savedImage->Initialize(m_Image->GetPixelType(), 2, m_Image->GetDimensions());
+        savedImage->SetGeometry(m_Image->GetGeometry());
+
+        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index));
+        savedImage->SetSlice(inputReadAccessor.GetData());
+
+        m_recordedImages.push_back(savedImage);
+      }
+    }
   }
 }
 
@@ -283,4 +309,29 @@ void mitk::USDiPhASImageSource::SetGUIOutput(std::function<void(QString)> out)
 void mitk::USDiPhASImageSource::SetUseBModeFilter(bool isSet)
 {
   useBModeFilter = isSet;
+}
+
+void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
+{
+  // start the recording process
+  if (record)
+  {
+    currentlyRecording = true;
+    m_recordedImages.clear();  // we make sure there are no leftovers
+  }
+  // save images, end recording, and clean up
+  else
+  {
+    currentlyRecording = false;
+    for (int index = 0; index < m_recordedImages.size(); ++index)
+    {
+      // add the Bmode filter here
+      if (DataType == 1 && useBModeFilter)
+        m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
+
+      std::string path = "d:\\temporaryyy\\" + std::to_string(index) + ".nrrd";
+      mitk::IOUtil::Save(m_recordedImages.at(index), path);
+    }
+    m_recordedImages.clear(); // clean up the images
+  }
 }

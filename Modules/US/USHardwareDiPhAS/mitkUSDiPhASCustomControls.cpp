@@ -57,6 +57,12 @@ void mitk::USDiPhASCustomControls::OnSetEventDisplay(int event)
   imageSource->SetDisplayedEvent(event);
 }
 
+void mitk::USDiPhASCustomControls::OnSetRecord(bool record)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->SetRecordingStatus(record);
+}
+
 //Transmit
 void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {

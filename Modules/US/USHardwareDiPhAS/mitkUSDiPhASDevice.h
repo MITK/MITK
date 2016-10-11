@@ -119,10 +119,10 @@ namespace mitk {
     /** @return Returns the currently used scanmode of this device*/
     ScanModeNative& GetScanMode();
 
-    /** Updates the Scanmode
+    /** Updates the Scanmode and feeds it to the hardware
       */
     void UpdateScanmode();
-
+    /** This method forwards messages from the API to the user*/
     void MessageCallback(const char* message);
 
   protected:

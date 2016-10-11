@@ -18,6 +18,12 @@
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QLabel" name="CurrentState">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>25</height>
+        </size>
+       </property>
        <property name="frameShape">
         <enum>QFrame::WinPanel</enum>
        </property>
@@ -43,19 +49,6 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="General">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item>
       <widget class="QCheckBox" name="UseBModeFilter">
        <property name="text">
@@ -105,6 +98,19 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="StartStopRecord">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Start Recording</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

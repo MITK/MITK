@@ -82,26 +82,38 @@ public:
   void UpdateImageGeometry();
 
   void SetGUIOutput(std::function<void(QString)> out);
-
   void SetDataType(int DataT);
   void SetDisplayedEvent(int event);
   void SetUseBModeFilter(bool isSet);
 
+  /** REinitializes the image according to the DataType set. */
   void UpdateImageDataType(int imageHeight, int imageWidth);
-  
+
+  /** This starts or ends the recording session*/
+  void SetRecordingStatus(bool record);
 
 protected:
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
   virtual ~USDiPhASImageSource( );
 
+  /** This vector holds all the images we record, if recording is set to active. */
+  std::vector<mitk::Image::Pointer>     m_recordedImages;
 
-  mitk::Image::Pointer             m_Image;
-  itk::FastMutexLock::Pointer      m_ImageMutex;
-  mitk::USDiPhASDevice*            m_device;
-  std::function<void(QString)>     m_GUIOutput;
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage);
+  mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage);
+
+  /** This image holds the image to be displayed right now*/
+  mitk::Image::Pointer                  m_Image;
+
+  itk::FastMutexLock::Pointer           m_ImageMutex;
+  mitk::USDiPhASDevice*                 m_device;
+
+  /** This is a callback to pass text data to the GUI. */
+  std::function<void(QString)>          m_GUIOutput;
+
 
   /**
-   * variables for management of current state
+   * Variables for management of current state.
    */
   float                           startTime;
   bool                            useGUIOutPut;
@@ -109,6 +121,7 @@ protected:
   BeamformerStateInfoNative       BeamformerInfos;
   int                             DataType;       // 0: Use image data; 1: Use beamformed data
   bool                            useBModeFilter;
+  bool                            currentlyRecording;
 };
 } // namespace mitk
 

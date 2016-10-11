@@ -95,6 +95,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 
   connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
   connect(ui->EventDisplay, SIGNAL(valueChanged(int)), this, SLOT(OnEventDisplayChanged()));
+  connect(ui->StartStopRecord, SIGNAL(clicked()), this, SLOT(OnRecordChanged()));
 
   //transmit
   connect(ui->TransmitPhaseLength, SIGNAL(valueChanged(double)), this, SLOT(OnTransmitPhaseLengthChanged()));
@@ -143,6 +144,20 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnEventDisplayChanged()
   }
 
   m_ControlInterface->SetEventDisplay(ui->EventDisplay->value());
+}
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
+{
+  if (ui->StartStopRecord->text() == "Start Recording")
+  {
+    ui->StartStopRecord->setText("Stop Recording");
+    m_ControlInterface->SetRecord(true);
+  }
+  else
+  {
+    ui->StartStopRecord->setText("Start Recording");
+    m_ControlInterface->SetRecord(false);
+  }
 }
 
 //Transmit

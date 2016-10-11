@@ -40,6 +40,7 @@ private slots:
 
   virtual void OnEventDisplayChanged();
   virtual void OnUseBModeFilterChanged();
+  virtual void OnRecordChanged();
 
   //Transmit
   virtual void OnTransmitPhaseLengthChanged();

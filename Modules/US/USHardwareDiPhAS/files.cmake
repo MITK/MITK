@@ -1,0 +1,10 @@
+SET(CPP_FILES
+mitkUSDiPhASActivator.cpp
+mitkUSDiPhASDevice.cpp
+mitkUSDiPhASImageSource.cpp
+mitkUSDiPhASProbe.cpp
+mitkUSDiPhASProbesControls.cpp
+mitkUSDiPhASCustomControls.cpp
+mitkUSDiPhASBModeImageFilter.hxx
+mitkUSDiPhASBModeImageFilter.h
+)

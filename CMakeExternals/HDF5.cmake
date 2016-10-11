@@ -47,7 +47,7 @@ if(MITK_USE_HDF5)
     if(WIN32)
       set(HDF5_DIR ${install_dir}/cmake/)
     else()
-      set(HDF5_DIR ${install_dir}/share/cmake/hdf5)
+      set(HDF5_DIR ${install_dir}/share/cmake)
     endif()
 
   else()

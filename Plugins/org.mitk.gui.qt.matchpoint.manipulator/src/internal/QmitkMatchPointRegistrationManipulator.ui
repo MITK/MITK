@@ -280,7 +280,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pbEval">
+    <widget class="QPushButton" name="pbStart">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starts the mapping of the input image with the current settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -297,7 +297,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="lbRegName">
+    <widget class="QLineEdit" name="lbNewRegName">
      <property name="toolTip">
       <string>Name of the resulting mapped image</string>
      </property>

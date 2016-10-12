@@ -57,10 +57,25 @@ public:
     /// \brief Called when the user clicks the GUI button
 
   void OnEvalBtnPushed();
-  void OnStopBtnPushed();
+  void OnCancleBtnPushed();
+  void OnStoreBtnPushed();
   void OnSettingsChanged(mitk::DataNode*);
 
-    void OnSliceChanged();
+  void OnRotXChanged(double);
+  void OnRotYChanged(double);
+  void OnRotZChanged(double);
+
+  void OnTransXChanged(double);
+  void OnTransYChanged(double);
+  void OnTransZChanged(double);
+
+  void OnScaleXChanged(double);
+  void OnScaleYChanged(double);
+  void OnScaleZChanged(double);
+
+  void OnCenterTypeChanged(int);
+
+  void OnSliceChanged();
 
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed

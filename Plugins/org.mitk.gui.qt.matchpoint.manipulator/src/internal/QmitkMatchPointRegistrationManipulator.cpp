@@ -76,8 +76,34 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
 	m_Parent = parent;
 
   connect(m_Controls.pbEval, SIGNAL(clicked()), this, SLOT(OnEvalBtnPushed()));
-  connect(m_Controls.pbStop, SIGNAL(clicked()), this, SLOT(OnStopBtnPushed()));
+  connect(m_Controls.pbCancel, SIGNAL(clicked()), this, SLOT(OnCancleBtnPushed()));
+  connect(m_Controls.pbStore, SIGNAL(clicked()), this, SLOT(OnStoreBtnPushed()));
   connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
+  connect(m_Controls.radioSelectedReg, SIGNAL(toggled()), m_Controls.lbRegistrationName, SLOT(setEnabled()));
+
+  connect(m_Controls.slideRotX, SIGNAL(valueChanged(int)), m_Controls.sbRotX, SLOT(setValue(double)));
+  connect(m_Controls.sbRotX, SIGNAL(valueChanged(double)), this, SLOT(OnRotXChanged(double)));
+  connect(m_Controls.slideRotY, SIGNAL(valueChanged(int)), m_Controls.sbRotY, SLOT(setValue(double)));
+  connect(m_Controls.sbRotY, SIGNAL(valueChanged(double)), this, SLOT(OnRotYChanged(double)));
+  connect(m_Controls.slideRotZ, SIGNAL(valueChanged(int)), m_Controls.sbRotZ, SLOT(setValue(double)));
+  connect(m_Controls.sbRotZ, SIGNAL(valueChanged(double)), this, SLOT(OnRotZChanged(double)));
+
+  connect(m_Controls.slideTransX, SIGNAL(valueChanged(int)), m_Controls.sbTransX, SLOT(setValue(double)));
+  connect(m_Controls.sbTransX, SIGNAL(valueChanged(double)), this, SLOT(OnTransXChanged(double)));
+  connect(m_Controls.slideTransY, SIGNAL(valueChanged(int)), m_Controls.sbTransY, SLOT(setValue(double)));
+  connect(m_Controls.sbTransY, SIGNAL(valueChanged(double)), this, SLOT(OnTransYChanged(double)));
+  connect(m_Controls.slideTransZ, SIGNAL(valueChanged(int)), m_Controls.sbTransZ, SLOT(setValue(double)));
+  connect(m_Controls.sbTransZ, SIGNAL(valueChanged(double)), this, SLOT(OnTransZChanged(double)));
+
+  connect(m_Controls.slideScaleX, SIGNAL(valueChanged(int)), m_Controls.sbScaleX, SLOT(setValue(double)));
+  connect(m_Controls.sbScaleX, SIGNAL(valueChanged(double)), this, SLOT(OnScaleXChanged(double)));
+  connect(m_Controls.slideScaleY, SIGNAL(valueChanged(int)), m_Controls.sbScaleY, SLOT(setValue(double)));
+  connect(m_Controls.sbScaleY, SIGNAL(valueChanged(double)), this, SLOT(OnScaleYChanged(double)));
+  connect(m_Controls.slideScaleZ, SIGNAL(valueChanged(int)), m_Controls.sbScaleZ, SLOT(setValue(double)));
+  connect(m_Controls.sbScaleZ, SIGNAL(valueChanged(double)), this, SLOT(OnScaleZChanged(double)));
+
+  connect(m_Controls.comboCenter, SIGNAL(currentIndexChanged(int)), this, SLOT(OnCenterTypeChanged(double)));
+
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
@@ -234,14 +260,20 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
   }
 
   //config settings widget
-  this->m_Controls.groupBox->setEnabled(m_activeEvaluation);
-  this->m_Controls.pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
+  this->m_Controls.pbStart->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
     && this->m_spSelectedTargetNode.IsNotNull() && !m_activeEvaluation);
-  this->m_Controls.pbCancel->setEnabled(m_activeEvaluation);
-  this->m_Controls.pbStore->setEnabled(m_activeEvaluation);
+
   this->m_Controls.lbMovingName->setEnabled(!m_activeEvaluation);
   this->m_Controls.lbRegistrationName->setEnabled(!m_activeEvaluation && this->m_Controls.radioSelectedReg->isChecked());
   this->m_Controls.lbTargetName->setEnabled(!m_activeEvaluation);
+
+  this->m_Controls.lbNewRegName->setEnabled(m_activeEvaluation);
+  this->m_Controls.checkMapEntity->setEnabled(m_activeEvaluation);
+  this->m_Controls.tabWidget->setEnabled(m_activeEvaluation);
+  this->m_Controls.pbCancel->setEnabled(m_activeEvaluation);
+  this->m_Controls.pbStore->setEnabled(m_activeEvaluation);
+
+  this->ConfigureTransformWidgets();
 }
 
 
@@ -314,7 +346,20 @@ void QmitkMatchPointRegistrationManipulator::OnEvalBtnPushed()
   this->ConfigureControls();
 }
 
-void QmitkMatchPointRegistrationManipulator::OnStopBtnPushed()
+void QmitkMatchPointRegistrationManipulator::OnCancelBtnPushed()
+{
+  this->m_activeEvaluation = false;
+
+  this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  this->m_selectedEvalNode = nullptr;
+  this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
+
+  this->CheckInputs();
+  this->ConfigureControls();
+  this->GetRenderWindowPart()->RequestUpdate();
+}
+
+void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 {
   this->m_activeEvaluation = false;
 

@@ -122,6 +122,8 @@ protected:
      */
     virtual int CanReadFile (const char *name);
 
+    virtual mitk::PlanarFigure::Pointer createPlanarFigure(const std::string& type);
+
     /**
     * \brief parses the element for the attributes x,y,z and returns a mitk::Vector3D filled with these values
     * \param[in] e the TiXmlElement that will be parsed

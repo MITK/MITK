@@ -47,6 +47,13 @@ void mitk::BindDispatcherInteractor::SetDataStorage(mitk::DataStorage::Pointer d
     UnRegisterDataStorageEvents();
     m_DataStorage = dataStorage;
     RegisterDataStorageEvents();
+
+    // Register existing interactors
+    auto nodes = m_DataStorage->GetAll();
+    for (auto node : *nodes) 
+    {
+      RegisterInteractor(node);
+    }
   }
 }
 

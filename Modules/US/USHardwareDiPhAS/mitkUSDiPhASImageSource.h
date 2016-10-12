@@ -102,6 +102,9 @@ protected:
   mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage);
   mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage);
 
+  void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
+  void OrderImagesUltrasound(Image::Pointer SoundImage);
+
   /** This image holds the image to be displayed right now*/
   mitk::Image::Pointer                  m_Image;
 

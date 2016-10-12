@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASDevice.h"
 #include <mitkIOUtil.h>
+#include <ctime>
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
 	: m_Image(mitk::Image::New()),
@@ -229,7 +230,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
 void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWidth)
 {
-  unsigned int dim[] = { imageWidth, imageHeight, displayedEvent+1 }; // image dimensions; every image needs a seperate slice!
+  unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount }; // image dimensions; every image needs a seperate slice!
   m_ImageMutex->Lock();
 
   m_Image = mitk::Image::New();
@@ -311,6 +312,16 @@ void mitk::USDiPhASImageSource::SetUseBModeFilter(bool isSet)
   useBModeFilter = isSet;
 }
 
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+  if (from.empty())
+    return;
+  size_t start_pos = 0;
+  while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+  }
+}
+
 void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 {
   // start the recording process
@@ -323,15 +334,88 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   else
   {
     currentlyRecording = false;
+
+    time_t time = std::time(nullptr);
+    time_t* timeptr = &time;
+    std::string currentDate = std::ctime(timeptr);
+    replaceAll(currentDate, ":", "-");
+    currentDate.pop_back();
+    std::string MakeFolder = "mkdir \"d:/DiPhASImageData/" + currentDate + "\"";
+    system(MakeFolder.c_str());
+
     for (int index = 0; index < m_recordedImages.size(); ++index)
     {
       // add the Bmode filter here
       if (DataType == 1 && useBModeFilter)
         m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
-
-      std::string path = "d:\\temporaryyy\\" + std::to_string(index) + ".nrrd";
-      mitk::IOUtil::Save(m_recordedImages.at(index), path);
     }
+
+    Image::Pointer LaserImage = Image::New();
+    Image::Pointer SoundImage = Image::New();
+    std::string pathLaser = "d:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
+    std::string pathSound = "d:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    
+    if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a LaserImage if we used interleaved mode
+    {
+      OrderImagesInterleaved(LaserImage, SoundImage);
+      mitk::IOUtil::Save(SoundImage, pathSound);
+      mitk::IOUtil::Save(LaserImage, pathLaser);
+    }
+    else if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no LaserImage if we used US only mode
+    {
+      OrderImagesUltrasound(SoundImage);
+      mitk::IOUtil::Save(SoundImage, pathSound);
+    }
+
     m_recordedImages.clear(); // clean up the images
+  }
+}
+
+
+void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage)
+{
+  unsigned int width  = m_device->GetScanMode().imageWidth;
+  unsigned int height = m_device->GetScanMode().imageHeight;
+  unsigned int events = m_device->GetScanMode().transmitEventsCount;
+
+  unsigned int dimLaser[] = { width, height, m_recordedImages.size()/events};
+  unsigned int dimSound[] = { width, height, m_recordedImages.size()/events*(events-1)};
+  
+  LaserImage->Initialize(m_Image->GetPixelType(), 3, dimLaser);
+  LaserImage->SetGeometry(m_Image->GetGeometry());
+
+  SoundImage->Initialize(m_Image->GetPixelType(), 3, dimSound);
+  SoundImage->SetGeometry(m_Image->GetGeometry());
+
+  for (int index = 0; index < m_recordedImages.size(); ++index)
+  {
+    if (index % events == 0)
+    {
+      mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
+      LaserImage->SetSlice(inputReadAccessor.GetData(), index / events);
+    }
+    else
+    {
+      mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
+      SoundImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events));
+    }
+  }
+}
+
+void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer SoundImage)
+{
+  unsigned int width  = m_device->GetScanMode().imageWidth;
+  unsigned int height = m_device->GetScanMode().imageHeight;
+  unsigned int events = m_device->GetScanMode().transmitEventsCount;
+
+  unsigned int dimSound[] = { width, height, m_recordedImages.size()};
+
+  SoundImage->Initialize(m_Image->GetPixelType(), 3, dimSound);
+  SoundImage->SetGeometry(m_Image->GetGeometry());
+
+  for (int index = 0; index < m_recordedImages.size(); ++index)
+  {
+    mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
+    SoundImage->SetSlice(inputReadAccessor.GetData(), index);
   }
 }

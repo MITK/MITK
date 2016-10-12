@@ -114,18 +114,46 @@ void UltrasoundSupport::InitNewNode()
   this->GetDataStorage()->Add(Node);
 }
 
+void UltrasoundSupport::DestroyLastNode()
+{
+  auto& Node = m_Node.back();
+  this->GetDataStorage()->Remove(Node);
+  Node->ReleaseData();
+  m_Node.pop_back();
+  UpdateColormaps();
+}
+
+
 void UltrasoundSupport::UpdateColormaps()
 {
+  // we update here both the colormaps of the nodes, as well as the
+  // level window for the current dynamic range
+  mitk::LevelWindow levelWindow;
+
   if (m_Node.size() > 1)
   {
     for (int index = 0; index < m_AmountOfOutputs - 1; ++index)
     {
       SetColormap(m_Node.at(index), mitk::LookupTable::LookupTableType::GRAYSCALE);
+      m_Node.at(index)->GetLevelWindow(levelWindow);
+      if (!m_Image->IsEmpty())
+        levelWindow.SetAuto(m_Image, true, true);
+      m_Node.at(index)->SetLevelWindow(levelWindow);
     }
     SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::JET_TRANSPARENT);
+    m_Node.back()->GetLevelWindow(levelWindow);
+    levelWindow.SetWindowBounds(55, 125, true);
+    m_Node.back()->SetLevelWindow(levelWindow);
   }
-  else
+  else if (m_Node.size() == 1)
+  {
     SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::GRAYSCALE);
+    m_Node.back()->GetLevelWindow(levelWindow);
+    if (!m_Image->IsEmpty())
+      levelWindow.SetAuto(m_Image, true, true);
+    m_Node.back()->SetLevelWindow(levelWindow);
+  }
+  
 }
 void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
 {
@@ -138,14 +166,6 @@ void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTa
   mitk::RenderingModeProperty::Pointer renderingMode =
     dynamic_cast<mitk::RenderingModeProperty*>(node->GetProperty("Image Rendering.Mode"));
   renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-}
-
-void UltrasoundSupport::DestroyLastNode()
-{
-  auto& Node = m_Node.back();
-  this->GetDataStorage()->Remove(Node);
-  Node->ReleaseData();
-  m_Node.pop_back();
 }
 
 void UltrasoundSupport::OnClickedAddNewDevice()
@@ -514,6 +534,7 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
     {
       Node->GetLevelWindow(levelWindow);
       levelWindow.SetAuto(m_Image, true, true);
+	  levelWindow.SetWindowBounds(55, 125,true);
       Node->SetLevelWindow(levelWindow);
     }
   }

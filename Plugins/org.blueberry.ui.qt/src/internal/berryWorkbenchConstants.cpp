@@ -331,6 +331,8 @@ const QString WorkbenchConstants::TAG_THEME = "theme";//$NON-NLS-1$
 
 const QString WorkbenchConstants::TAG_VIEW_LAYOUT_REC = "viewLayoutRec";
 
+const QString WorkbenchConstants::TAG_EDITOR_LAYOUT_REC = "editorLayoutRec";
+
 const QString WorkbenchConstants::TAG_PERSPECTIVE_BAR = "perspectiveBar";
 
 const QString WorkbenchConstants::TAG_TRIM = "trimLayout";

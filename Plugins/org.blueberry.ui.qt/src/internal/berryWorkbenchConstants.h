@@ -320,6 +320,8 @@ struct BERRY_UI_QT WorkbenchConstants
 
   static const QString TAG_VIEW_LAYOUT_REC; // = "viewLayoutRec";
 
+  static const QString TAG_EDITOR_LAYOUT_REC; // = "editorLayoutRec";
+
   static const QString TAG_PERSPECTIVE_BAR; // = "perspectiveBar";
 
   static const QString TAG_TRIM; // = "trimLayout";

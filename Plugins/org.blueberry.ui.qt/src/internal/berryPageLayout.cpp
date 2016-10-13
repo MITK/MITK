@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryWorkbenchPlugin.h"
 #include "berryLayoutHelper.h"
+#include "berryEditorLayout.h"
 #include "berryViewLayout.h"
 #include "berryPresentationFactoryUtil.h"
 #include "berryFolderLayout.h"
@@ -623,9 +624,23 @@ IViewLayout::Pointer PageLayout::GetViewLayout(const QString& viewId)
   return IViewLayout::Pointer(new ViewLayout(PageLayout::Pointer(this), rec));
 }
 
+IEditorLayout::Pointer PageLayout::GetEditorLayout()
+{
+  if (editorLayoutRec == 0)
+  {
+    editorLayoutRec = new EditorLayoutRec();
+  }
+  return IEditorLayout::Pointer(new EditorLayout(editorLayoutRec));
+}
+
 QHash<QString, ViewLayoutRec::Pointer> PageLayout::GetIDtoViewLayoutRecMap()
 {
   return mapIDtoViewLayoutRec;
+}
+
+EditorLayoutRec::Pointer PageLayout::GetEditorLayoutRec()
+{
+  return editorLayoutRec;
 }
 
 void PageLayout::RemovePlaceholder(const QString& id)

@@ -55,6 +55,7 @@ private:
 
   ViewFactory* viewFactory;
   QHash<QString, ViewLayoutRec::Pointer> mapIDtoViewLayoutRec;
+  EditorLayoutRec::Pointer editorLayoutRec;
 
   static const QString VERSION_STRING; // = "0.016";
 
@@ -582,6 +583,7 @@ private: bool SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Pointe
      * @since 3.0
      */
     public: bool IsCloseable(IViewReference::Pointer reference);
+    public: bool IsCloseable(IEditorReference::Pointer reference);
 
     /**
      * Returns whether the given view is moveable in this perspective.

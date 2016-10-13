@@ -14,6 +14,7 @@ set(SRC_CPP_FILES
   berryIDropTargetListener.cpp
   berryIEditorDescriptor.cpp
   berryIEditorInput.cpp
+  berryIEditorLayout.h
   berryIEditorMatchingStrategy.cpp
   berryIEditorPart.cpp
   berryIEditorReference.cpp
@@ -276,6 +277,7 @@ set(INTERNAL_CPP_FILES
   berryEditorDescriptor.cpp
   berryEditorHistory.cpp
   berryEditorHistoryItem.cpp
+  berryEditorLayout.cpp
   berryEditorManager.cpp
   berryEditorReference.cpp
   berryEditorRegistry.cpp

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
 
+
 namespace mitk
 {
 
@@ -32,15 +33,6 @@ class PlaneGeometry;
  */
 class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
 {
-
-struct MeasurementStatistics
-{
-  double Mean;
-  double SD;
-  int Max;
-  int Min;
-};
-
 public:
   mitkClassMacro( PlanarCircle, PlanarFigure );
 
@@ -121,9 +113,6 @@ protected:
   /** \brief Spatially constrain control points of second (orthogonal) line */
   virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point ) override;
 
-  /** \evaluate annotation based on evaluating features. */
-  virtual std::string EvaluateAnnotation();
-
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal() override;
 
@@ -141,7 +130,7 @@ protected:
   bool m_MinMaxRadiusContraintsActive;
 
 private:
-  MeasurementStatistics* EvaluateStatistics(); 
+
 };
 
 } // namespace mitk

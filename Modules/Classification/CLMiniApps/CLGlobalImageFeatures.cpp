@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
 
+#include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFCooccurenceMatrix2.h>
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
@@ -158,7 +159,8 @@ int main(int argc, char* argv[])
   parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "Mask Image that specifies the area over for the statistic, (Values = 1)", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
 
-  parser.addArgument("cooccurence","cooc",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
+  parser.addArgument("cooccurence", "cooc", mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
+  parser.addArgument("cooccurence2", "cooc2", mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
   parser.addArgument("volume","vol",mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features",us::Any());
   parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
   parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
@@ -289,6 +291,25 @@ int main(int argc, char* argv[])
     for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
+      coocCalculator->SetRange(ranges[i]);
+      coocCalculator->SetDirection(direction);
+      auto localResults = coocCalculator->CalculateFeatures(image, maskNoNaN);
+      stats.insert(stats.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Calculate Co-occurence Features
+  ////////////////////////////////////////////////////////////////
+  if (parsedArgs.count("cooccurence2"))
+  {
+    auto ranges = splitDouble(parsedArgs["cooccurence2"].ToString(), ';');
+
+    for (std::size_t i = 0; i < ranges.size(); ++i)
+    {
+      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
       mitk::GIFCooccurenceMatrix2::Pointer coocCalculator = mitk::GIFCooccurenceMatrix2::New();
       coocCalculator->SetRange(ranges[i]);
       coocCalculator->SetDirection(direction);
@@ -310,6 +331,7 @@ int main(int argc, char* argv[])
       MITK_INFO << "Start calculating run-length with number of bins " << ranges[i] << "....";
       mitk::GIFGrayLevelRunLength::Pointer calculator = mitk::GIFGrayLevelRunLength::New();
       calculator->SetRange(ranges[i]);
+      calculator->SetDirection(direction);
 
       auto localResults = calculator->CalculateFeatures(image, mask);
       stats.insert(stats.end(), localResults.begin(), localResults.end());

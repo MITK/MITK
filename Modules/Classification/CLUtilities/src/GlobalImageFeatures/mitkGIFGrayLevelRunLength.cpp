@@ -111,6 +111,7 @@ void
     filter->SetNumberOfBinsPerAxis(3096.5+1024.5);
   } else
   {
+    MITK_INFO << "Min: " << minMaxComputer->GetMinimum() << " Max: " << minMaxComputer->GetMaximum() << " Range: " << rangeOfPixels;
     filter->SetPixelValueMinMax(minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
     filter->SetNumberOfBinsPerAxis(rangeOfPixels);
   }

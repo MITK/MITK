@@ -147,7 +147,7 @@ namespace itk
       for( offsetIt = this->m_Offsets->Begin(), offsetNum = 0;
         offsetIt != this->m_Offsets->End(); offsetIt++, offsetNum++ )
       {
-        //MITK_WARN << "Adding offset " << offsetIt.Value();
+        MITK_INFO << "Adding offset " << offsetIt.Value();
         tVector.push_back(offsetIt.Value());
       }
       this->m_NeighbourhoodGreyLevelDifferenceMatrixGenerator->AddOffsets( tVector);

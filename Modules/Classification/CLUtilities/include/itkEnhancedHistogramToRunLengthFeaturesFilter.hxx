@@ -128,27 +128,33 @@ namespace itk {
       double mu_i = 0.0;
       double mu_j = 0.0;
 
+      MITK_INFO << "Histogram outputs";
       //Calculate the means.
       for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )
       {
+        IndexType index = hit.GetIndex();
         MeasurementType frequency = hit.GetFrequency();
+
         if ( frequency == 0 )
         {
           continue;
         }
+
+        MITK_INFO << index[0] + 1 << "|" << index[1] + 1 << " " << frequency;
+
         MeasurementVectorType measurement = hit.GetMeasurementVector();
-        IndexType index = hit.GetIndex();
+
 
         double i = index[0] + 1;
         double j = index[1] + 1;
 
-        double p_ij = frequency / m_TotalNumberOfRuns;
+        double p_ij = frequency / (1.0*m_TotalNumberOfRuns);
 
         mu_i += i * p_ij;
         mu_j += j * p_ij;
       }
-
+      MITK_INFO << "Mu_i " << mu_i << " Mu_j " << mu_j;
       //Calculate the other features.
       const double log2 = std::log(2.0);
 
@@ -190,7 +196,7 @@ namespace itk {
         // measures from Dasarathy and Holder
         shortRunLowGreyLevelEmphasis += ((i2 * j2) > 0.0001) ? ( frequency / ( i2 * j2 ) ) : 0;
         shortRunHighGreyLevelEmphasis += (j2 > 0.0001) ? ( frequency * i2 / j2 ) : 0;
-        longRunLowGreyLevelEmphasis += (i2 = 0.0001) ? ( frequency * j2 / i2 ) : 0;
+        longRunLowGreyLevelEmphasis += (i2 > 0.0001) ? ( frequency * j2 / i2 ) : 0;
         longRunHighGreyLevelEmphasis += ( frequency * i2 * j2 );
       }
       greyLevelNonuniformity =

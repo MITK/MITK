@@ -14,6 +14,21 @@
 // STL
 #include <sstream>
 
+static
+void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
+                      std::string prefix,
+                      mitk::GIFCooccurenceMatrix2::FeatureListType &featureList);
+static
+void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> featureList,
+                                    mitk::CoocurenceMatrixFeatures &meanFeature,
+                                    mitk::CoocurenceMatrixFeatures  &stdFeature);
+static
+void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
+                            std::size_t number);
+
+
+
+
 mitk::CoocurenceMatrixHolder::CoocurenceMatrixHolder(double min, double max, int number) :
 m_MinimumRange(min),
 m_MaximumRange(max),
@@ -100,6 +115,8 @@ void CalculateFeatures(
   auto pijMatrix = holder.m_Matrix;
   auto piMatrix = holder.m_Matrix;
   auto pjMatrix = holder.m_Matrix;
+  double Ng = holder.m_NumberOfBins;
+  int NgSize = holder.m_NumberOfBins;
   pijMatrix /= pijMatrix.sum();
   piMatrix.rowwise().normalize();
   pjMatrix.colwise().normalize();
@@ -115,8 +132,123 @@ void CalculateFeatures(
         pjMatrix(i, j) = 0;
     }
 
+  Eigen::VectorXd piVector = pijMatrix.colwise().sum();
+  Eigen::VectorXd pjVector = pijMatrix.rowwise().sum();
+  double sigmai = 0;;
+  for (int i = 0; i < holder.m_NumberOfBins; ++i)
+  {
+    double iInt = holder.IndexToMeanIntensity(i);
+    results.RowAverage += iInt * piVector(i);
+    if (piVector(i) > 0)
+    {
+      results.RowEntropy -= piVector(i) * std::log(piVector(i)) / std::log(2);
+    }
+  }
+  for (int i = 0; i < holder.m_NumberOfBins; ++i)
+  {
+    double iInt = holder.IndexToMeanIntensity(i);
+    results.RowVariance += (iInt - results.RowAverage)*(iInt - results.RowAverage) * piVector(i);
+  }
+  results.RowMaximum = piVector.maxCoeff();
+  sigmai = std::sqrt(results.RowVariance);
+
+  Eigen::VectorXd pimj(NgSize);
+  pimj.fill(0);
+  Eigen::VectorXd pipj(2*NgSize);
+  pipj.fill(0);
+
+
   results.JointMaximum += pijMatrix.maxCoeff();
 
+  for (int i = 0; i < holder.m_NumberOfBins; ++i)
+  {
+    for (int j = 0; j < holder.m_NumberOfBins; ++j)
+    {
+      double iInt = holder.IndexToMeanIntensity(i);
+      double jInt = holder.IndexToMeanIntensity(j);
+      double pij = pijMatrix(i, j);
+
+      int deltaK = (i - j)>0?(i-j) : (j-i);
+      pimj(deltaK) += pij;
+      pipj(i + j) += pij;
+
+      results.JointAverage += iInt * pij;
+      if (pij > 0)
+      {
+        results.JointEntropy -= pij * std::log(pij) / std::log(2);
+        results.FirstRowColumnEntropy -= pij * std::log(piVector(i)*pjVector(j)) / std::log(2);
+      }
+      if (piVector(i) > 0 && pjVector(j) > 0 )
+      {
+        results.SecondRowColumnEntropy -= piVector(i)*pjVector(j) * std::log(piVector(i)*pjVector(j)) / std::log(2);
+      }
+      results.AngularSecondMoment += pij*pij;
+      results.Contrast += (iInt - jInt)* (iInt - jInt) * pij;
+      results.Dissimilarity += std::abs<double>(iInt - jInt) * pij;
+      results.InverseDifference += pij / (1 + (std::abs<double>(iInt - jInt)));
+      results.InverseDifferenceNormalised += pij / (1 + (std::abs<double>(iInt - jInt) / Ng));
+      results.InverseDifferenceMoment += pij / (1 + (iInt - jInt)*(iInt - jInt));
+      results.InverseDifferenceMomentNormalised += pij / (1 + (iInt - jInt)*(iInt - jInt)/Ng/Ng);
+      results.Autocorrelation += iInt*jInt * pij;
+      double cluster = (iInt + jInt - 2 * results.RowAverage);
+      results.ClusterTendency += cluster*cluster * pij;
+      results.ClusterShade += cluster*cluster*cluster * pij;
+      results.ClusterProminence += cluster*cluster*cluster*cluster * pij;
+      if (iInt != jInt)
+      {
+        results.InverseVariance += pij / (iInt - jInt) / (iInt - jInt);
+      }
+    }
+  }
+  results.Correlation = 1 / sigmai / sigmai * (-results.RowAverage*results.RowAverage+ results.Autocorrelation);
+  results.FirstMeasureOfInformationCorrelation = (results.JointEntropy - results.FirstRowColumnEntropy) / results.RowEntropy;
+  if (results.JointEntropy < results.SecondRowColumnEntropy)
+  {
+    results.SecondMeasureOfInformationCorrelation = sqrt(1 - exp(-2 * (results.SecondRowColumnEntropy - results.JointEntropy)));
+  }
+  else
+  {
+    results.SecondMeasureOfInformationCorrelation = 0;
+  }
+
+  for (int i = 0; i < holder.m_NumberOfBins; ++i)
+  {
+    for (int j = 0; j < holder.m_NumberOfBins; ++j)
+    {
+      double iInt = holder.IndexToMeanIntensity(i);
+      double jInt = holder.IndexToMeanIntensity(j);
+      double pij = pijMatrix(i, j);
+
+      results.JointVariance += (iInt - results.JointAverage)* (iInt - results.JointAverage)*pij;
+    }
+  }
+
+  for (int k = 0; k < NgSize; ++k)
+  {
+    results.DifferenceAverage += k* pimj(k);
+    if (pimj(k) > 0)
+    {
+      results.DifferenceEntropy -= pimj(k) * log(pimj(k)) / std::log(2);
+    }
+  }
+  for (int k = 0; k < NgSize; ++k)
+  {
+    results.DifferenceVariance += (results.DifferenceAverage-k)* (results.DifferenceAverage-k)*pimj(k);
+  }
+
+
+  for (int k = 0; k <2* NgSize ; ++k)
+  {
+    results.SumAverage += (2+k)* pipj(k);
+    if (pipj(k) > 0)
+    {
+      results.SumEntropy -= pipj(k) * log(pipj(k)) / std::log(2);
+    }
+  }
+  for (int k = 0; k < 2*NgSize; ++k)
+  {
+    results.SumVariance += (2+k - results.SumAverage)* (2+k - results.SumAverage)*pipj(k);
+  }
 
   //MITK_INFO << std::endl << holder.m_Matrix;
   //MITK_INFO << std::endl << pijMatrix;
@@ -127,7 +259,8 @@ void CalculateFeatures(
   //{
   //  MITK_INFO << "Bin " << i << " Min: " << holder.IndexToMinIntensity(i) << " Max: " << holder.IndexToMaxIntensity(i);
   //}
-
+  //MITK_INFO << pimj;
+  //MITK_INFO << pipj;
 
 }
 
@@ -187,188 +320,194 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
     }
   }
 
-  mitk::CoocurenceMatrixFeatures coocResults;
-  coocResults.JointAverage = 0;
-  coocResults.JointMaximum = 0;
-
-  mitk::CoocurenceMatrixHolder holder(rangeMin, rangeMax, numberOfBins);
+  std::vector<mitk::CoocurenceMatrixFeatures> resultVector;
+  mitk::CoocurenceMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins);
+  mitk::CoocurenceMatrixFeatures overallFeature;
   for (int i = 0; i < offsetVector.size(); ++i)
   {
     offset = offsetVector[i];
     MITK_INFO << offset;
+    mitk::CoocurenceMatrixHolder holder(rangeMin, rangeMax, numberOfBins);
+    mitk::CoocurenceMatrixFeatures coocResults;
     CalculateCoOcMatrix<TPixel, VImageDimension>(itkImage, maskImage, offset, config.range, holder);
+    holderOverall.m_Matrix += holder.m_Matrix;
+    CalculateFeatures(holder, coocResults);
+    resultVector.push_back(coocResults);
   }
-  CalculateFeatures(holder, coocResults);
-  //coocResults.JointMaximum /= offsetVector.size();
-  MITK_INFO << coocResults.JointMaximum;
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////
-  /*
-
-  typename FilterType::Pointer filter = FilterType::New();
-
-  typename FilterType::OffsetVector::Pointer newOffset = FilterType::OffsetVector::New();
-  auto oldOffsets = filter->GetOffsets();
-  auto oldOffsetsIterator = oldOffsets->Begin();
-  while(oldOffsetsIterator != oldOffsets->End())
-  {
-    bool continueOuterLoop = false;
-    typename FilterType::OffsetType offset = oldOffsetsIterator->Value();
-    for (unsigned int i = 0; i < VImageDimension; ++i)
-    {
-      offset[i] *= config.range;
-      if (config.direction == i + 2 && offset[i] != 0)
-      {
-        continueOuterLoop = true;
-      }
-    }
-    if (config.direction == 1)
-    {
-      offset[0] = 0;
-      offset[1] = 0;
-      offset[2] = 1;
-      newOffset->push_back(offset);
-      break;
-    }
+  CalculateFeatures(holderOverall, overallFeature);
+  //NormalizeMatrixFeature(overallFeature, offsetVector.size());
 
 
-    oldOffsetsIterator++;
-    if (continueOuterLoop)
-      continue;
-    newOffset->push_back(offset);
-
-  }
-  filter->SetOffsets(newOffset);
-
-
-  filter->Update();
-
-  auto featureMeans = filter->GetFeatureMeans ();
-  auto featureStd = filter->GetFeatureStandardDeviations();
+  mitk::CoocurenceMatrixFeatures featureMean;
+  mitk::CoocurenceMatrixFeatures featureStd;
+  CalculateMeanAndStdDevFeatures(resultVector, featureMean, featureStd);
 
   std::ostringstream  ss;
   ss << config.range;
   std::string strRange = ss.str();
-  for (std::size_t i = 0; i < featureMeans->size(); ++i)
+
+  MatrixFeaturesTo(overallFeature, "co-occ. 2 (" + strRange + ") overall", featureList);
+  MatrixFeaturesTo(featureMean, "co-occ. 2 (" + strRange + ") mean", featureList);
+  MatrixFeaturesTo(featureStd, "co-occ. 2 (" + strRange + ") std.dev.", featureList);
+
+
+}
+
+
+static
+void MatrixFeaturesTo(mitk::CoocurenceMatrixFeatures features,
+                      std::string prefix,
+                      mitk::GIFCooccurenceMatrix2::FeatureListType &featureList)
+{
+  featureList.push_back(std::make_pair(prefix + " Joint Maximum", features.JointMaximum));
+  featureList.push_back(std::make_pair(prefix + " Joint Average", features.JointAverage));
+  featureList.push_back(std::make_pair(prefix + " Joint Variance", features.JointVariance));
+  featureList.push_back(std::make_pair(prefix + " Joint Entropy", features.JointEntropy));
+  featureList.push_back(std::make_pair(prefix + " Row Maximum", features.RowMaximum));
+  featureList.push_back(std::make_pair(prefix + " Row Average", features.RowAverage));
+  featureList.push_back(std::make_pair(prefix + " Row Variance", features.RowVariance));
+  featureList.push_back(std::make_pair(prefix + " Row Entropy", features.RowEntropy));
+  featureList.push_back(std::make_pair(prefix + " First Row-Column Entropy", features.FirstRowColumnEntropy));
+  featureList.push_back(std::make_pair(prefix + " Second Row-Column Entropy", features.SecondRowColumnEntropy));
+  featureList.push_back(std::make_pair(prefix + " Difference Average", features.DifferenceAverage));
+  featureList.push_back(std::make_pair(prefix + " Difference Variance", features.DifferenceVariance));
+  featureList.push_back(std::make_pair(prefix + " Difference Entropy", features.DifferenceEntropy));
+  featureList.push_back(std::make_pair(prefix + " Sum Average", features.SumAverage));
+  featureList.push_back(std::make_pair(prefix + " Sum Variance", features.SumVariance));
+  featureList.push_back(std::make_pair(prefix + " Sum Entropy", features.SumEntropy));
+  featureList.push_back(std::make_pair(prefix + " Angular Second Moment", features.AngularSecondMoment));
+  featureList.push_back(std::make_pair(prefix + " Contrast", features.Contrast));
+  featureList.push_back(std::make_pair(prefix + " Dissimilarity", features.Dissimilarity));
+  featureList.push_back(std::make_pair(prefix + " Inverse Difference", features.InverseDifference));
+  featureList.push_back(std::make_pair(prefix + " Inverse Difference Normalized", features.InverseDifferenceNormalised));
+  featureList.push_back(std::make_pair(prefix + " Inverse Difference Moment", features.InverseDifferenceMoment));
+  featureList.push_back(std::make_pair(prefix + " Inverse Difference Moment Normalized", features.InverseDifferenceMomentNormalised));
+  featureList.push_back(std::make_pair(prefix + " Inverse Variance", features.InverseVariance));
+  featureList.push_back(std::make_pair(prefix + " Correlation", features.Correlation));
+  featureList.push_back(std::make_pair(prefix + " Autocorrleation", features.Autocorrelation));
+  featureList.push_back(std::make_pair(prefix + " Cluster Tendency", features.ClusterTendency));
+  featureList.push_back(std::make_pair(prefix + " Cluster Shade", features.ClusterShade));
+  featureList.push_back(std::make_pair(prefix + " Cluster Prominence", features.ClusterProminence));
+  featureList.push_back(std::make_pair(prefix + " First Measure of Information Correlation", features.FirstMeasureOfInformationCorrelation));
+  featureList.push_back(std::make_pair(prefix + " Second Measure of Information Correlation", features.SecondMeasureOfInformationCorrelation));
+}
+
+static
+void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> featureList,
+                                    mitk::CoocurenceMatrixFeatures &meanFeature,
+                                    mitk::CoocurenceMatrixFeatures  &stdFeature)
+{
+#define ADDFEATURE(a) meanFeature.a += featureList[i].a;stdFeature.a += featureList[i].a*featureList[i].a
+#define CALCVARIANCE(a) stdFeature.a =sqrt(stdFeature.a - meanFeature.a*meanFeature.a)
+
+  for (int i = 0; i < featureList.size(); ++i)
   {
-    switch (i)
-    {
-    case TextureFilterType::Energy :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Energy Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Energy Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Entropy :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Entropy Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Entropy Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Correlation :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Correlation Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Correlation Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::InverseDifferenceMoment :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMoment Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMoment Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Inertia :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Inertia Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Inertia Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::ClusterShade :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterShade Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterShade Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::ClusterProminence :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterProminence Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterProminence Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::HaralickCorrelation :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") HaralickCorrelation Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") HaralickCorrelation Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Autocorrelation :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Autocorrelation Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Autocorrelation Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Contrast :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Contrast Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Contrast Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Dissimilarity :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Dissimilarity Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Dissimilarity Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::MaximumProbability :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") MaximumProbability Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") MaximumProbability Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::InverseVariance :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseVariance Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseVariance Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Homogeneity1 :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Homogeneity1 Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Homogeneity1 Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::ClusterTendency :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterTendency Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") ClusterTendency Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::Variance :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Variance Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") Variance Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::SumAverage :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumAverage Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumAverage Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::SumEntropy :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumEntropy Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumEntropy Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::SumVariance :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumVariance Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SumVariance Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::DifferenceAverage :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceAverage Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceAverage Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::DifferenceEntropy :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceEntropy Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceEntropy Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::DifferenceVariance :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceVariance Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") DifferenceVariance Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::InverseDifferenceMomentNormalized :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMomentNormalized Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceMomentNormalized Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::InverseDifferenceNormalized :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceNormalized Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifferenceNormalized Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::InverseDifference :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") InverseDifference Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::JointAverage :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") JointAverage Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::FirstMeasureOfInformationCorrelation :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") FirstMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
-      break;
-    case TextureFilterType::SecondMeasureOfInformationCorrelation :
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("co-occ. ("+ strRange+") SecondMeasureOfInformationCorrelation Std.",featureStd->ElementAt(i)));
-      break;
-    default:
-      break;
-    }
-  }*/
+    ADDFEATURE(JointMaximum);
+    ADDFEATURE(JointAverage);
+    ADDFEATURE(JointVariance);
+    ADDFEATURE(JointEntropy);
+    ADDFEATURE(RowMaximum);
+    ADDFEATURE(RowAverage);
+    ADDFEATURE(RowVariance);
+    ADDFEATURE(RowEntropy);
+    ADDFEATURE(FirstRowColumnEntropy);
+    ADDFEATURE(SecondRowColumnEntropy);
+    ADDFEATURE(DifferenceAverage);
+    ADDFEATURE(DifferenceVariance);
+    ADDFEATURE(DifferenceEntropy);
+    ADDFEATURE(SumAverage);
+    ADDFEATURE(SumVariance);
+    ADDFEATURE(SumEntropy);
+    ADDFEATURE(AngularSecondMoment);
+    ADDFEATURE(Contrast);
+    ADDFEATURE(Dissimilarity);
+    ADDFEATURE(InverseDifference);
+    ADDFEATURE(InverseDifferenceNormalised);
+    ADDFEATURE(InverseDifferenceMoment);
+    ADDFEATURE(InverseDifferenceMomentNormalised);
+    ADDFEATURE(InverseVariance);
+    ADDFEATURE(Correlation);
+    ADDFEATURE(Autocorrelation);
+    ADDFEATURE(ClusterShade);
+    ADDFEATURE(ClusterTendency);
+    ADDFEATURE(ClusterProminence);
+    ADDFEATURE(FirstMeasureOfInformationCorrelation);
+    ADDFEATURE(SecondMeasureOfInformationCorrelation);
+  }
+  NormalizeMatrixFeature(meanFeature, featureList.size());
+  NormalizeMatrixFeature(stdFeature, featureList.size());
+
+  CALCVARIANCE(JointMaximum);
+  CALCVARIANCE(JointAverage);
+  CALCVARIANCE(JointVariance);
+  CALCVARIANCE(JointEntropy);
+  CALCVARIANCE(RowMaximum);
+  CALCVARIANCE(RowAverage);
+  CALCVARIANCE(RowVariance);
+  CALCVARIANCE(RowEntropy);
+  CALCVARIANCE(FirstRowColumnEntropy);
+  CALCVARIANCE(SecondRowColumnEntropy);
+  CALCVARIANCE(DifferenceAverage);
+  CALCVARIANCE(DifferenceVariance);
+  CALCVARIANCE(DifferenceEntropy);
+  CALCVARIANCE(SumAverage);
+  CALCVARIANCE(SumVariance);
+  CALCVARIANCE(SumEntropy);
+  CALCVARIANCE(AngularSecondMoment);
+  CALCVARIANCE(Contrast);
+  CALCVARIANCE(Dissimilarity);
+  CALCVARIANCE(InverseDifference);
+  CALCVARIANCE(InverseDifferenceNormalised);
+  CALCVARIANCE(InverseDifferenceMoment);
+  CALCVARIANCE(InverseDifferenceMomentNormalised);
+  CALCVARIANCE(InverseVariance);
+  CALCVARIANCE(Correlation);
+  CALCVARIANCE(Autocorrelation);
+  CALCVARIANCE(ClusterShade);
+  CALCVARIANCE(ClusterTendency);
+  CALCVARIANCE(ClusterProminence);
+  CALCVARIANCE(FirstMeasureOfInformationCorrelation);
+  CALCVARIANCE(SecondMeasureOfInformationCorrelation);
+
+#undef ADDFEATURE
+#undef CALCVARIANCE
+}
+
+static
+void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
+                            std::size_t number)
+{
+  features.JointMaximum = features.JointMaximum / number;
+  features.JointAverage = features.JointAverage / number;
+  features.JointVariance = features.JointVariance / number;
+  features.JointEntropy = features.JointEntropy / number;
+  features.RowMaximum = features.RowMaximum / number;
+  features.RowAverage = features.RowAverage / number;
+  features.RowVariance = features.RowVariance / number;
+  features.RowEntropy = features.RowEntropy / number;
+  features.FirstRowColumnEntropy = features.FirstRowColumnEntropy / number;
+  features.SecondRowColumnEntropy = features.SecondRowColumnEntropy / number;
+  features.DifferenceAverage = features.DifferenceAverage / number;
+  features.DifferenceVariance = features.DifferenceVariance / number;
+  features.DifferenceEntropy = features.DifferenceEntropy / number;
+  features.SumAverage = features.SumAverage / number;
+  features.SumVariance = features.SumVariance / number;
+  features.SumEntropy = features.SumEntropy / number;
+  features.AngularSecondMoment = features.AngularSecondMoment / number;
+  features.Contrast = features.Contrast / number;
+  features.Dissimilarity = features.Dissimilarity / number;
+  features.InverseDifference = features.InverseDifference / number;
+  features.InverseDifferenceNormalised = features.InverseDifferenceNormalised / number;
+  features.InverseDifferenceMoment = features.InverseDifferenceMoment / number;
+  features.InverseDifferenceMomentNormalised = features.InverseDifferenceMomentNormalised / number;
+  features.InverseVariance = features.InverseVariance / number;
+  features.Correlation = features.Correlation / number;
+  features.Autocorrelation = features.Autocorrelation / number;
+  features.ClusterShade = features.ClusterShade / number;
+  features.ClusterTendency = features.ClusterTendency / number;
+  features.ClusterProminence = features.ClusterProminence / number;
+  features.FirstMeasureOfInformationCorrelation = features.FirstMeasureOfInformationCorrelation / number;
+  features.SecondMeasureOfInformationCorrelation = features.SecondMeasureOfInformationCorrelation / number;
 }
 
 mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2():

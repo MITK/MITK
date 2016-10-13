@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -314,30 +314,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QRadioButton" name="m_smallVolume">
-         <property name="text">
-          <string>Small Volume (3 X 4 Positions)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_mediumVolume">
-         <property name="text">
-          <string>Medium Volume (5 X 5 Positions)</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_standardVolume">
-         <property name="text">
-          <string>Standard Volume (10 X 9 Positions)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -430,7 +406,7 @@ p, li { white-space: pre-wrap; }
       <attribute name="title">
        <string>Settings</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
@@ -538,6 +514,39 @@ p, li { white-space: pre-wrap; }
          <property name="checked">
           <bool>true</bool>
          </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Tracking Volume</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QRadioButton" name="m_smallVolume">
+            <property name="text">
+             <string>Small Volume (3 X 4 Positions)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="m_mediumVolume">
+            <property name="text">
+             <string>Medium Volume (5 X 5 Positions)</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="m_standardVolume">
+            <property name="text">
+             <string>Standard Volume (10 X 9 Positions)</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>

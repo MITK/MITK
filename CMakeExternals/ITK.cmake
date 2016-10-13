@@ -45,7 +45,11 @@ if(NOT DEFINED ITK_DIR)
   endif()
 
   if(MITK_USE_OpenCL)
-    list(APPEND additional_cmake_args -DITK_USE_GPU:BOOL=ON)
+    list(APPEND additional_cmake_args
+         -DITK_USE_GPU:BOOL=ON
+         -DOpenCL_INCLUDE_DIR:PATH=${OpenCL_INCLUDE_DIR}
+         -DOpenCL_LIBRARY:FILEPATH=${OpenCL_LIBRARY}
+        )
   endif()
 
   # Keep the behaviour of ITK 4.3 which by default turned on ITK Review

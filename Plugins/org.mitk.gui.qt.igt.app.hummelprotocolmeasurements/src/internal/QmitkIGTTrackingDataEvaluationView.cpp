@@ -110,9 +110,9 @@ void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
 
   itk::Vector<double> rotationVec;
   //adapt for Aurora 5D tools: [0,0,1000]
-  rotationVec[0] = 0; //X
-  rotationVec[1] = 10000; //Y
-  rotationVec[2] = 10000; //Z
+  rotationVec[0] = m_Controls->m_rotVecX->value(); //X
+  rotationVec[1] = m_Controls->m_rotVecY->value(); //Y
+  rotationVec[2] = m_Controls->m_rotVecZ->value(); //Z
 
 
   std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> allOrientationErrors;
@@ -472,11 +472,17 @@ void QmitkIGTTrackingDataEvaluationView::OnEvaluateDataAll()
     mitk::HummelProtocolEvaluation::Evaluate30cmDistances(m_PointSetMeanPositions, volume, results30cm);
     mitk::HummelProtocolEvaluation::EvaluateAccumulatedDistances(m_PointSetMeanPositions, volume, resultsAccum);
   }
-  else
+  else if (m_Controls->m_smallVolume->isChecked())
   {
     volume = mitk::HummelProtocolEvaluation::small;
     mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
   }
+  else if (m_Controls->m_mediumVolume->isChecked())
+  {
+    volume = mitk::HummelProtocolEvaluation::medium;
+    mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_PointSetMeanPositions, volume, results5cm);
+  }
+
 
   //write results to file
   std::stringstream filename5cm;

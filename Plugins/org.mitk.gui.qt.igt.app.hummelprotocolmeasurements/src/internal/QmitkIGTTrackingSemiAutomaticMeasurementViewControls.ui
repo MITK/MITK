@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -312,6 +312,30 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_smallVolume">
+         <property name="text">
+          <string>Small Volume (3 X 4 Positions)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_mediumVolume">
+         <property name="text">
+          <string>Medium Volume (5 X 5 Positions)</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_standardVolume">
+         <property name="text">
+          <string>Standard Volume (10 X 9 Positions)</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer_3">

@@ -80,7 +80,12 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateResults()
   this->GetDataStorage()->Add(newNode);
 
   std::vector<mitk::HummelProtocolEvaluation::HummelProtocolDistanceError> results5cmDistances;
-  mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_MeanPoints, mitk::HummelProtocolEvaluation::small, results5cmDistances);
+  if (m_Controls->m_mediumVolume->isChecked())
+    mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_MeanPoints, mitk::HummelProtocolEvaluation::medium, results5cmDistances);
+  else if (m_Controls->m_smallVolume->isChecked())
+    mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_MeanPoints, mitk::HummelProtocolEvaluation::small, results5cmDistances);
+  else if (m_Controls->m_standardVolume->isChecked())
+    mitk::HummelProtocolEvaluation::Evaluate5cmDistances(m_MeanPoints, mitk::HummelProtocolEvaluation::standard, results5cmDistances);
 }
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateQtPartControl(QWidget *parent)

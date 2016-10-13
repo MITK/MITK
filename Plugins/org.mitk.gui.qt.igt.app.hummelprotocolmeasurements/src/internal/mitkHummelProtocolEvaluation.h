@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKHummelProtocolEvaluation_H_HEADER_INCLUDED_
 
 #include <mitkPointSet.h>
+#include <array>
 
 
 
@@ -46,7 +47,7 @@ namespace mitk
      *  small: A small volume in the center 3 x 4 measurement points, for smaller field generators [2]
      *  [2] Maier-Hein, L. et al. - Standardized assessment of new electromagnetic field generators in an interventional radiology setting. Med Phys 39(6), June 2012
      */
-    enum HummelProtocolMeasurementVolume { small, standard };
+    enum HummelProtocolMeasurementVolume { small, medium, standard };
     /** Evaluates the 5 cm distances as defined by the Hummel protocol [1,2].
      * @return Returns true if evaluation was successfull, false if not.
      * @param[out] Results Please give an empty vector. The results will be added to this vector.
@@ -86,6 +87,8 @@ namespace mitk
     //even the usage of a double pointer (eg mitk::Matrix<double* , 9, 10>) does not compile. We always got an error message saying:
     //vnl_c_vector.h:42:49: error: invalid use of incomplete type ‘class vnl_numeric_traits<itk::Point<double, 3u> >’
     //Under Windows this error does not appear there everything compiles fine.
+
+    static std::array<std::array<mitk::Point3D, 5>, 5> ParseMatrixMediumVolume(mitk::PointSet::Pointer p);
 
   };
 } // namespace mitk

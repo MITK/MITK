@@ -20,7 +20,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QProcess>
 #include <QSize>
 
-class QmitkFFmpegWriter : public QObject
+#include "MitkQtWidgetsExtExports.h"
+
+class MITKQTWIDGETSEXT_EXPORT QmitkFFmpegWriter : public QObject
 {
   Q_OBJECT
 

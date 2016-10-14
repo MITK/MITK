@@ -645,6 +645,8 @@ void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
 
 void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int centerType)
 {
+  auto offset = m_CurrentTransform->GetOffset();
+
   if (centerType == 0)
   { //image center
     auto center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
@@ -676,4 +678,6 @@ void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int center
 
     m_CurrentTransform->SetCenter(itkCenter);
   }
+
+  m_CurrentTransform->SetOffset(offset);
 };

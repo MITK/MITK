@@ -21,7 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 #include <QmitkSliceNavigationListener.h>
-
+#include <mitkMAPRegistrationWrapper.h>
+#include <itkEuler3DTransform.h>
 #include "ui_QmitkMatchPointRegistrationManipulator.h"
 
 /*!
@@ -56,8 +57,8 @@ public:
 
     /// \brief Called when the user clicks the GUI button
 
-  void OnEvalBtnPushed();
-  void OnCancleBtnPushed();
+  void OnStartBtnPushed();
+  void OnCancelBtnPushed();
   void OnStoreBtnPushed();
   void OnSettingsChanged(mitk::DataNode*);
 
@@ -69,9 +70,13 @@ public:
   void OnTransYChanged(double);
   void OnTransZChanged(double);
 
-  void OnScaleXChanged(double);
-  void OnScaleYChanged(double);
-  void OnScaleZChanged(double);
+  void OnRotXSlideChanged(int);
+  void OnRotYSlideChanged(int);
+  void OnRotZSlideChanged(int);
+
+  void OnTransXSlideChanged(int);
+  void OnTransYSlideChanged(int);
+  void OnTransZSlideChanged(int);
 
   void OnCenterTypeChanged(int);
 
@@ -100,16 +105,30 @@ private:
   /**
   * Checks if appropriated nodes are selected in the data manager. If nodes are selected,
   * they are stored m_spSelectedRegNode, m_spSelectedInputNode and m_spSelectedRefNode.
-  * They are also checked for vadility and stored in m_ValidInput,... .
-  * It also sets the info lables accordingly.*/
+  * They are also checked for vadility.*/
   void CheckInputs();
 
   /**
-  * Updates the state of controls regarding to selected eval object.*/
+  * Updates the state of controls regarding to the state of the view and it objects.*/
   void ConfigureControls();
 
-  mitk::DataNode::Pointer m_selectedEvalNode;
-  mitk::DataStorage::SetOfObjects::ConstPointer m_evalNodes;
+  /** Initialize the state of the view, so the manipulation can start.*/
+  void InitSession();
+
+  /** Stops session, removes all obsolite members (e.g. RegEvalObject). After that the view is in a valid but inactive state.*/
+  void StopSession();
+
+  /**
+  * Updates the widgets that manipulate the transform according to the transform.*/
+  void UpdateTransformWidgets();
+
+  /**
+  * Updates the transform according to the widgets that manipulate the transform.*/
+  void UpdateTransform();
+
+  void ConfigureTransformCenter(int centerType);
+
+  mitk::DataNode::Pointer m_EvalNode;
 
   QmitkSliceNavigationListener m_SliceChangeListener;
 
@@ -122,14 +141,25 @@ private:
   * This it is within the input image */
   unsigned int m_currentSelectedTimeStep;
 
-  mitk::DataNode::Pointer m_spSelectedRegNode;
-  mitk::DataNode::Pointer m_spSelectedMovingNode;
-  mitk::DataNode::Pointer m_spSelectedTargetNode;
+  mitk::DataNode::Pointer m_SelectedPreRegNode;
+
+  mitk::DataNode::Pointer m_SelectedMovingNode;
+  mitk::DataNode::Pointer m_SelectedTargetNode;
+
+
+  mitk::MAPRegistrationWrapper::Pointer m_CurrentRegistrationWrapper;
+  typedef itk::Euler3DTransform<::map::core::continuous::ScalarType> TransformType;
+  TransformType::Pointer m_CurrentTransform;
+  typedef map::core::Registration<3, 3> MAPRegistrationType;
+  MAPRegistrationType::Pointer m_CurrentRegistration;
+  MAPRegistrationType::ConstPointer m_SelectedPreReg;
 
   bool m_autoTarget;
   bool m_autoMoving;
-  bool m_activeEvaluation;
+  bool m_activeManipulation;
 
+  bool m_UserDefinedName;
+  bool m_internalUpdate;
   const std::string HelperNodeName;
 };
 

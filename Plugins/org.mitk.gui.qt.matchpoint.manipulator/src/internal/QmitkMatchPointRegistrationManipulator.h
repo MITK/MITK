@@ -25,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkEuler3DTransform.h>
 #include "ui_QmitkMatchPointRegistrationManipulator.h"
 
+
+class QmitkMappingJob;
+
 /*!
 \brief QmitkMatchPointRegistrationManipulator
 
@@ -81,6 +84,9 @@ public:
   void OnCenterTypeChanged(int);
 
   void OnSliceChanged();
+
+  void OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData, const QmitkMappingJob* job);
+
 
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed

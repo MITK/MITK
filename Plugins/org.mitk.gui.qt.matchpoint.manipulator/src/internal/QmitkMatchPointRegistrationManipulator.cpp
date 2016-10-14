@@ -517,6 +517,16 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
   this->GetRenderWindowPart()->RequestUpdate();
 }
 
+void QmitkMatchPointRegistrationManipulator::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
+  const QmitkMappingJob* job)
+{
+  mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
+    spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputNodeUID,
+    job->m_doGeometryRefinement, job->m_InterpolatorLabel);
+  this->GetDataStorage()->Add(spMappedNode);
+  this->GetRenderWindowPart()->RequestUpdate();
+};
+
 
 void QmitkMatchPointRegistrationManipulator::OnRotXChanged(double x)
 {

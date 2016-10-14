@@ -125,6 +125,13 @@ void QmitkSimpleExampleView::InitNavigators()
   m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
+/**
+ * Returns path to the ffmpeg lib if configured in preferences.
+ *
+ * This implementation has been reused from MovieMaker view.
+ *
+ * @return The path to ffmpeg lib or empty string if not configured.
+ */
 QString QmitkSimpleExampleView::GetFFmpegPath() const
 {
   berry::IPreferences::Pointer preferences = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
@@ -134,10 +141,22 @@ QString QmitkSimpleExampleView::GetFFmpegPath() const
     : "";
 }
 
+/**
+ * Reads pixels from specified render window.
+ *
+ * This implementation has been reused from MovieMaker view.
+ *
+ * @param renderWindow
+ * @param x
+ * @param y
+ * @param width
+ * @param height
+ * @return
+ */
 static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)
 {
-  if (renderWindow == NULL)
-    return NULL;
+  if (renderWindow == nullptr)
+    return nullptr;
 
   unsigned char* frame = new unsigned char[width * height * 3];
 
@@ -147,6 +166,11 @@ static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, in
   return frame;
 }
 
+/**
+ * Records a movie from the selected render window with a default frame rate of 30 Hz.
+ *
+ * Parts of this implementation have been reused from MovieMaker view.
+ */
 void QmitkSimpleExampleView::GenerateMovie()
 {
   QmitkRenderWindow* movieRenderWindow = GetSelectedRenderWindow();
@@ -159,7 +183,7 @@ void QmitkSimpleExampleView::GenerateMovie()
 
   if (ffmpegPath.isEmpty())
   {
-    QMessageBox::information(NULL, "Movie Maker",
+    QMessageBox::information(nullptr, "Movie Maker",
       "<p>Set path to FFmpeg<sup>1</sup> or Libav<sup>2</sup> (avconv) in preferences (Window -> Preferences... (Ctrl+P) -> External Programs) to be able to record your movies to video files.</p>"
       "<p>If you are using Linux, chances are good that either FFmpeg or Libav is included in the official package repositories.</p>"
       "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a><br/>"
@@ -171,7 +195,7 @@ void QmitkSimpleExampleView::GenerateMovie()
 
   vtkRenderWindow* renderWindow = movieRenderWindow->GetRenderWindow();
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     return;
 
   const int border = 3;
@@ -203,7 +227,6 @@ void QmitkSimpleExampleView::GenerateMovie()
   movieWriter->SetOutputPath(saveFileName);
 
   const unsigned int numberOfFrames = stepper->GetSteps() - stepper->GetPos();
-  MITK_INFO << "#steps: " << numberOfFrames;
 
   try
   {

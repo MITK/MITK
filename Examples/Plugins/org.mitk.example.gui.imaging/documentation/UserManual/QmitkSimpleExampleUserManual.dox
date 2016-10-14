@@ -13,8 +13,7 @@ It offers:
 <li>A button "Re-Initialize Navigators" to reinitialize those sliders to their initial position (Slice and time position 0)
 <li>A button "Take Screenshot" to take a screenshot of the chosen window (Axial, Sagittal, Coronal, 3D)
 <li>A button "Take HighDef 3D Screenshot" to take an high resolution screenshot of the 3D scene
-<li>A button "Generate Movie" whichs takes a movie of the chosen window by scrolling either through all slices (Axial, Sagittal, Coronal)
-or rotating the 3D scene
+<li>A button "Generate Movie" whichs takes a movie of the chosen window by scrolling either through all slices (Axial, Sagittal, Coronal). Please use the MovieMaker view for recording a movie of a rotating 3D scene.
 <li>A selection box where the 3D view can be transformed into either a red-blue stereo or a D4D stereo view
 </ul>
 */

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "berryIPageLayout.h"
 
+#include "berryEditorLayoutRec.h"
 #include "berryViewLayoutRec.h"
 #include "berryContainerPlaceholder.h"
 #include "berryViewSashContainer.h"
@@ -84,6 +85,8 @@ private:
 
   typedef QHash<ILayoutContainer::Pointer, IPlaceholderFolderLayout::Pointer> FolderToFolderLayoutMap;
   FolderToFolderLayoutMap mapFolderToFolderLayout;
+
+  EditorLayoutRec::Pointer editorLayoutRec;
 
   QList<QString> perspectiveShortcuts;
 
@@ -559,12 +562,15 @@ public:
 public:
   IViewLayout::Pointer GetViewLayout(const QString& viewId) override;
 
+  virtual IEditorLayout::Pointer GetEditorLayout() override;
+
   /**
    * @since 3.0
    */
 public:
   QHash<QString, ViewLayoutRec::Pointer> GetIDtoViewLayoutRecMap();
 
+  EditorLayoutRec::Pointer GetEditorLayoutRec();
   /**
    * Removes any existing placeholder with the given id.
    *

@@ -513,6 +513,7 @@ void Perspective::LoadPredefinedPersp(PerspectiveDescriptor::Pointer persp)
   // Retrieve view layout info stored in the page layout.
   QHash<QString, ViewLayoutRec::Pointer> layoutInfo = layout->GetIDtoViewLayoutRecMap();
   mapIDtoViewLayoutRec.unite(layoutInfo);
+  editorLayoutRec = layout->GetEditorLayoutRec();
 
   //TODO Perspective action sets
   // Create action sets.
@@ -1006,6 +1007,18 @@ bool Perspective::RestoreState()
     }
   }
 
+  // Load the editor layout recs
+  IMemento::Pointer editorRecMemento = memento->GetChild(WorkbenchConstants::TAG_EDITOR_LAYOUT_REC);
+  QString closeablestr; 
+  editorRecMemento->GetString(WorkbenchConstants::TAG_CLOSEABLE, closeablestr);
+  if (WorkbenchConstants::FALSE_VAL == closeablestr)
+  {
+    if (!editorLayoutRec) {
+      editorLayoutRec = new EditorLayoutRec();
+    }
+    editorLayoutRec->isCloseable = false;
+  }
+
   //final IContextService service = (IContextService)page.getWorkbenchWindow().getService(IContextService.class);
   try
   { // one big try block, don't kill me here
@@ -1418,6 +1431,12 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
     }
   }
 
+  IMemento::Pointer editorLayoutMemento(memento->CreateChild(WorkbenchConstants::TAG_EDITOR_LAYOUT_REC));
+  if (editorLayoutRec && !editorLayoutRec->isCloseable)
+  {
+    editorLayoutMemento->PutString(WorkbenchConstants::TAG_CLOSEABLE, WorkbenchConstants::FALSE_VAL);
+  }
+
   // Save the layout.
   IMemento::Pointer childMem(memento->CreateChild(WorkbenchConstants::TAG_LAYOUT));
   //result->Add(presentation->SaveState(childMem));
@@ -1737,6 +1756,15 @@ bool Perspective::IsCloseable(IViewReference::Pointer reference)
   if (rec != 0)
   {
     return rec->isCloseable;
+  }
+  return true;
+}
+
+bool Perspective::IsCloseable(IEditorReference::Pointer reference)
+{
+  if (editorLayoutRec != 0)
+  {
+    return editorLayoutRec->isCloseable;
   }
   return true;
 }

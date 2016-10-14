@@ -383,18 +383,25 @@ void PartPane::DescribeLayout(QString& buf) const
 
 bool PartPane::IsCloseable()
 {
-  if (partReference.Lock().Cast<IViewReference>() != 0)
-  {
-    Perspective::Pointer perspective = page->GetActivePerspective();
-    if (perspective == 0) {
-        // Shouldn't happen -- can't have a ViewStack without a
-        // perspective
-        return true;
-    }
-    return perspective->IsCloseable(partReference.Lock().Cast<IViewReference>());
+  Perspective::Pointer perspective = page->GetActivePerspective();
+  if (perspective == 0) {
+    // Shouldn't happen -- can't have a ViewStack without a
+    // perspective
+    return true;
   }
 
-  return true;
+  if (partReference.Lock().Cast<IViewReference>() != 0)
+  {
+    return perspective->IsCloseable(partReference.Lock().Cast<IViewReference>());
+  } 
+  else if (partReference.Lock().Cast<IEditorReference>() != 0)
+  {
+    return perspective->IsCloseable(partReference.Lock().Cast<IEditorReference>());
+  } 
+  else 
+  {
+    return true;
+  }
 }
 
 void PartPane::SetInLayout(bool inLayout)

@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYIPAGELAYOUT_H_
 #define BERRYIPAGELAYOUT_H_
 
+#include "berryIEditorLayout.h"
 #include "berryIFolderLayout.h"
 #include "berryIPlaceholderFolderLayout.h"
 #include "berryIViewLayout.h"
@@ -398,6 +399,8 @@ struct BERRY_UI_QT IPageLayout : public Object
      * @since 3.0
      */
     virtual IViewLayout::Pointer GetViewLayout(const QString& id) = 0;
+
+    virtual IEditorLayout::Pointer GetEditorLayout() = 0;
 
     /**
      * Adds a standalone view with the given compound id to this page layout.

@@ -221,16 +221,17 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls.m_btPreviousLayer, SIGNAL(clicked()), this, SLOT( OnPreviousLayer()) );
   connect( m_Controls.m_btNextLayer, SIGNAL(clicked()), this, SLOT( OnNextLayer()) );
   connect( m_Controls.m_btLockExterior, SIGNAL(toggled(bool)), this, SLOT( OnLockExteriorToggled(bool)) );
-  connect( m_Controls.m_btDeactivateTool, SIGNAL(clicked()), this, SLOT( OnDeactivateActiveTool()) );
   connect( m_Controls.m_cbActiveLayer, SIGNAL(currentIndexChanged(int)), this, SLOT( OnChangeLayer(int)) );
 
-  m_Controls.m_btAddLayer->hide();
-  m_Controls.m_btDeactivateTool->hide();
-  m_Controls.m_btDeleteLayer->hide();
-  m_Controls.m_btLockExterior->hide();
-  m_Controls.m_btNextLayer->hide();
-  m_Controls.m_btPreviousLayer->hide();
-  m_Controls.m_cbActiveLayer->hide();
+  m_Controls.m_btAddLayer->setEnabled(false);
+  m_Controls.m_btDeleteLayer->setEnabled(false);
+  m_Controls.m_btNextLayer->setEnabled(false);
+  m_Controls.m_btPreviousLayer->setEnabled(false);
+  m_Controls.m_cbActiveLayer->setEnabled(false);
+
+  m_Controls.m_pbNewLabel->setEnabled(false);
+  m_Controls.m_btLockExterior->setEnabled(false);
+  m_Controls.m_pbShowLabelTable->setEnabled(false);
 }
 
 void QmitkMultiLabelSegmentationView::Activated()
@@ -368,7 +369,6 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   m_Controls.m_gbInterpolation->setEnabled(false);
   m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
   m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
-  m_Controls.m_btDeactivateTool->setEnabled(false);
   m_Controls.m_LabelSetWidget->setEnabled(false);
   m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
@@ -376,7 +376,9 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
   m_Controls.m_btLockExterior->setChecked(false);
+  m_Controls.m_btLockExterior->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setChecked(false);
+  m_Controls.m_pbShowLabelTable->setEnabled(false);
 
   m_Controls.m_ManualToolSelectionBox3D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
   m_Controls.m_ManualToolSelectionBox2D->SetEnabledMode(QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
@@ -389,10 +391,11 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
     if (hasValidWorkingNode)
     {
       m_Controls.m_pbNewLabel->setEnabled(true);
+      m_Controls.m_btLockExterior->setEnabled(true);
+      m_Controls.m_pbShowLabelTable->setEnabled(true);
       m_Controls.m_gbInterpolation->setEnabled(true);
       m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(true);
       m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(true);
-      m_Controls.m_btDeactivateTool->setEnabled(true);
       m_Controls.m_LabelSetWidget->setEnabled(true);
       m_Controls.m_btAddLayer->setEnabled(true);
 
@@ -523,27 +526,9 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)
 {
   if (value)
-  {
     m_Controls.m_LabelSetWidget->show();
-    m_Controls.m_btAddLayer->show();
-    m_Controls.m_btDeactivateTool->show();
-    m_Controls.m_btDeleteLayer->show();
-    m_Controls.m_btLockExterior->show();
-    m_Controls.m_btNextLayer->show();
-    m_Controls.m_btPreviousLayer->show();
-    m_Controls.m_cbActiveLayer->show();
-  }
   else
-  {
     m_Controls.m_LabelSetWidget->hide();
-    m_Controls.m_btAddLayer->hide();
-    m_Controls.m_btDeactivateTool->hide();
-    m_Controls.m_btDeleteLayer->hide();
-    m_Controls.m_btLockExterior->hide();
-    m_Controls.m_btNextLayer->hide();
-    m_Controls.m_btPreviousLayer->hide();
-    m_Controls.m_cbActiveLayer->hide();
-  }
 }
 
 void QmitkMultiLabelSegmentationView::OnNextLayer()

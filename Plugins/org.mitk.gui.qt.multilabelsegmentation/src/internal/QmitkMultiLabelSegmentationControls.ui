@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>191</width>
-    <height>454</height>
+    <width>459</width>
+    <height>844</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,7 +38,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBox_DataSelection">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -46,68 +46,63 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Patient Image</string>
+      <string>Data Selection</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <property name="leftMargin">
-       <number>4</number>
-      </property>
-      <property name="topMargin">
-       <number>2</number>
-      </property>
-      <property name="rightMargin">
-       <number>4</number>
-      </property>
-      <property name="bottomMargin">
-       <number>2</number>
-      </property>
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_PatientImage">
+        <property name="text">
+         <string>Patient Image</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_cbReferenceNodeSelector">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Segmentation</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <property name="leftMargin">
-       <number>4</number>
-      </property>
-      <property name="topMargin">
-       <number>2</number>
-      </property>
-      <property name="rightMargin">
-       <number>4</number>
-      </property>
-      <property name="bottomMargin">
-       <number>2</number>
-      </property>
-      <item>
+      <item row="0" column="2" rowspan="2">
+       <widget class="QToolButton" name="m_pbNewSegmentationSession">
+        <property name="toolTip">
+         <string>Create a new segmentation session</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/multilabelsegmentation.qrc">
+          <normaloff>:/multilabelsegmentation/NewSegmentationSession_48x48.png</normaloff>:/multilabelsegmentation/NewSegmentationSession_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>N</string>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_Segmentation">
+        <property name="text">
+         <string>Segmentation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
        <widget class="QmitkDataStorageComboBox" name="m_cbWorkingNodeSelector">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -118,115 +113,273 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <property name="spacing">
-      <number>3</number>
+    <widget class="QGroupBox" name="groupBox_Layer">
+     <property name="title">
+      <string>Layers</string>
      </property>
-     <property name="bottomMargin">
-      <number>4</number>
+     <property name="flat">
+      <bool>true</bool>
      </property>
-     <item>
-      <widget class="QToolButton" name="m_pbNewSegmentationSession">
-       <property name="toolTip">
-        <string>Create a new segmentation session</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../resources/multilabelsegmentation.qrc">
-         <normaloff>:/multilabelsegmentation/NewSegmentationSession_48x48.png</normaloff>:/multilabelsegmentation/NewSegmentationSession_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="shortcut">
-        <string>N</string>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_pbNewLabel">
-       <property name="toolTip">
-        <string>Add a new label to the current segmentation session</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../resources/multilabelsegmentation.qrc">
-         <normaloff>:/multilabelsegmentation/NewLabel_48x48.png</normaloff>:/multilabelsegmentation/NewLabel_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="shortcut">
-        <string>N</string>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>5</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_pbShowLabelTable">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>34</height>
-        </size>
-       </property>
-       <property name="toolTip">
-        <string>Show a table with all labels in the current segmentation session</string>
-       </property>
-       <property name="text">
-        <string>&gt;&gt;</string>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoRaise">
-        <bool>false</bool>
-       </property>
-       <property name="arrowType">
-        <enum>Qt::NoArrow</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QToolButton" name="m_btAddLayer">
+        <property name="toolTip">
+         <string>Add a layer to the current segmentation session</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/Qmitk/AddLayer_48x48.png</normaloff>:/Qmitk/AddLayer_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_btDeleteLayer">
+        <property name="toolTip">
+         <string>Delete the active layer</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/Qmitk/DeleteLayer_48x48.png</normaloff>:/Qmitk/DeleteLayer_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer1">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_btPreviousLayer">
+        <property name="toolTip">
+         <string>Change to the previous available layer</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/Qmitk/PreviousLayer_48x48.png</normaloff>:/Qmitk/PreviousLayer_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_btNextLayer">
+        <property name="toolTip">
+         <string>Change to the next available layer</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/Qmitk/NextLayer_48x48.png</normaloff>:/Qmitk/NextLayer_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="m_cbActiveLayer">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>40</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Switch to a layer</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_Labels">
+     <property name="title">
+      <string>Labels</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QToolButton" name="m_pbNewLabel">
+        <property name="toolTip">
+         <string>Add a new label to the current segmentation session</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/multilabelsegmentation.qrc">
+          <normaloff>:/multilabelsegmentation/NewLabel_48x48.png</normaloff>:/multilabelsegmentation/NewLabel_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="shortcut">
+         <string>N</string>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_btLockExterior">
+        <property name="toolTip">
+         <string>Lock/Unlock exterior</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/Qmitk/UnlockExterior_48x48.png</normaloff>
+          <normalon>:/Qmitk/LockExterior_48x48.png</normalon>:/Qmitk/UnlockExterior_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_pbShowLabelTable">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>34</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Show a table with all labels in the current segmentation session</string>
+        </property>
+        <property name="text">
+         <string>&gt;&gt;</string>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>false</bool>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QmitkLabelSetWidget" name="m_LabelSetWidget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -238,209 +391,6 @@
       </size>
      </property>
     </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>2</number>
-     </property>
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
-     </property>
-     <item>
-      <widget class="QToolButton" name="m_btDeactivateTool">
-       <property name="toolTip">
-        <string>Disable the active tool</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/SegmentationInteractor_48x48.png</normaloff>:/Qmitk/SegmentationInteractor_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_btLockExterior">
-       <property name="toolTip">
-        <string>Lock/Unlock exterior</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/UnlockExterior_48x48.png</normaloff>
-         <normalon>:/Qmitk/LockExterior_48x48.png</normalon>:/Qmitk/UnlockExterior_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_btAddLayer">
-       <property name="toolTip">
-        <string>Add a layer to the current segmentation session</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/AddLayer_48x48.png</normaloff>:/Qmitk/AddLayer_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_btDeleteLayer">
-       <property name="toolTip">
-        <string>Delete the active layer</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/DeleteLayer_48x48.png</normaloff>:/Qmitk/DeleteLayer_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_btPreviousLayer">
-       <property name="toolTip">
-        <string>Change to the previous available layer</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/PreviousLayer_48x48.png</normaloff>:/Qmitk/PreviousLayer_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="m_cbActiveLayer">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>40</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Switch to a layer</string>
-       </property>
-       <item>
-        <property name="text">
-         <string>0</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="m_btNextLayer">
-       <property name="toolTip">
-        <string>Change to the next available layer</string>
-       </property>
-       <property name="text">
-        <string>...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/SegmentationUI.qrc">
-         <normaloff>:/Qmitk/NextLayer_48x48.png</normaloff>:/Qmitk/NextLayer_48x48.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>28</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="autoRaise">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QTabWidget" name="m_tw2DTools">
@@ -755,12 +705,13 @@
     </spacer>
    </item>
   </layout>
-  <zorder>groupBox_4</zorder>
   <zorder>m_LabelSetWidget</zorder>
-  <zorder>groupBox</zorder>
+  <zorder>groupBox_DataSelection</zorder>
   <zorder>m_tw2DTools</zorder>
   <zorder>m_gbInterpolation</zorder>
   <zorder>verticalSpacer</zorder>
+  <zorder>groupBox_Layer</zorder>
+  <zorder>groupBox_Labels</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

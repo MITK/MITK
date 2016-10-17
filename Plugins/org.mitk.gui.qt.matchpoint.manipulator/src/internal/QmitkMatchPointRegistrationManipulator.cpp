@@ -400,20 +400,20 @@ void QmitkMatchPointRegistrationManipulator::UpdateTransformWidgets()
   this->m_Controls.slideTransY->setValue(this->m_CurrentTransform->GetTranslation()[1]);
   this->m_Controls.slideTransZ->setValue(this->m_CurrentTransform->GetTranslation()[2]);
 
-  this->m_Controls.sbRotX->setValue(this->m_CurrentTransform->GetAngleX()*(360/boost::math::double_constants::pi));
-  this->m_Controls.sbRotY->setValue(this->m_CurrentTransform->GetAngleY()*(360 / boost::math::double_constants::pi));
-  this->m_Controls.sbRotZ->setValue(this->m_CurrentTransform->GetAngleZ()*(360 / boost::math::double_constants::pi));
-  this->m_Controls.slideRotX->setValue(this->m_CurrentTransform->GetAngleX()*(360 / boost::math::double_constants::pi));
-  this->m_Controls.slideRotY->setValue(this->m_CurrentTransform->GetAngleY()*(360 / boost::math::double_constants::pi));
-  this->m_Controls.slideRotZ->setValue(this->m_CurrentTransform->GetAngleZ()*(360 / boost::math::double_constants::pi));
+  this->m_Controls.sbRotX->setValue(this->m_CurrentTransform->GetAngleX()*(180/boost::math::double_constants::pi));
+  this->m_Controls.sbRotY->setValue(this->m_CurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.sbRotZ->setValue(this->m_CurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.slideRotX->setValue(this->m_CurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.slideRotY->setValue(this->m_CurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.slideRotZ->setValue(this->m_CurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
   this->m_internalUpdate = false;
 };
 
 void QmitkMatchPointRegistrationManipulator::UpdateTransform()
 {
-  this->m_CurrentTransform->SetRotation(this->m_Controls.sbRotX->value()*(boost::math::double_constants::pi / 360),
-    this->m_Controls.sbRotY->value()*(boost::math::double_constants::pi / 360),
-    this->m_Controls.sbRotZ->value()*(boost::math::double_constants::pi / 360));
+  this->m_CurrentTransform->SetRotation(this->m_Controls.sbRotX->value()*(boost::math::double_constants::pi / 180),
+    this->m_Controls.sbRotY->value()*(boost::math::double_constants::pi / 180),
+    this->m_Controls.sbRotZ->value()*(boost::math::double_constants::pi / 180));
 
   TransformType::OutputVectorType trans;
   trans[0] = this->m_Controls.sbTransX->value();

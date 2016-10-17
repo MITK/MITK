@@ -1009,14 +1009,16 @@ bool Perspective::RestoreState()
 
   // Load the editor layout recs
   IMemento::Pointer editorRecMemento = memento->GetChild(WorkbenchConstants::TAG_EDITOR_LAYOUT_REC);
-  QString closeablestr; 
-  editorRecMemento->GetString(WorkbenchConstants::TAG_CLOSEABLE, closeablestr);
-  if (WorkbenchConstants::FALSE_VAL == closeablestr)
-  {
-    if (!editorLayoutRec) {
-      editorLayoutRec = new EditorLayoutRec();
+  if (editorRecMemento) {
+    QString closeablestr; 
+    editorRecMemento->GetString(WorkbenchConstants::TAG_CLOSEABLE, closeablestr);
+    if (WorkbenchConstants::FALSE_VAL == closeablestr)
+    {
+      if (!editorLayoutRec) {
+        editorLayoutRec = new EditorLayoutRec();
+      }
+      editorLayoutRec->isCloseable = false;
     }
-    editorLayoutRec->isCloseable = false;
   }
 
   //final IContextService service = (IContextService)page.getWorkbenchWindow().getService(IContextService.class);

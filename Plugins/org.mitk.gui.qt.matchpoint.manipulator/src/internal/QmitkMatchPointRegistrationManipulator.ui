@@ -34,13 +34,19 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QRadioButton" name="radioNewReg">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select this option to start with a new registration.&lt;/p&gt;&lt;p&gt;The registration will be pre initialized to map the center of the selected images.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
         <property name="text">
-         <string>New registration (Identity)</string>
+         <string>New registration (Center pre initialization)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QRadioButton" name="radioSelectedReg">
+        <property name="toolTip">
+         <string>Use the selected registration as bsaeline. The manipulation will be &quot;on top&quot; of the given registration.</string>
+        </property>
         <property name="text">
          <string>Selected registration</string>
         </property>
@@ -188,7 +194,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>Moving image that should be mapped...</string>
+      <string>Moving image that should be mapped.</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -263,7 +269,7 @@
       </font>
      </property>
      <property name="toolTip">
-      <string>Reference image that is used to determine the field of view mapped into...</string>
+      <string>Target image one wants to map onto.</string>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -282,7 +288,7 @@
    <item>
     <widget class="QPushButton" name="pbStart">
      <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Starts the mapping of the input image with the current settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>Starts the manipulation /manual registration.</string>
      </property>
      <property name="text">
       <string>Start manual registration</string>
@@ -299,7 +305,7 @@
    <item>
     <widget class="QLineEdit" name="lbNewRegName">
      <property name="toolTip">
-      <string>Name of the resulting mapped image</string>
+      <string>Name of the resulting manual registration</string>
      </property>
      <property name="text">
       <string>ManualRegistration</string>
@@ -311,6 +317,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="checkMapEntity">
+     <property name="toolTip">
+      <string>Check if a mapped moving image should be generated if the manual registration is confirmed.</string>
+     </property>
      <property name="text">
       <string>Generate + store mapped result</string>
      </property>
@@ -439,6 +448,15 @@
               <height>0</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(155, 255, 155)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string> mm</string>
+            </property>
             <property name="minimum">
              <double>-9999.000000000000000</double>
             </property>
@@ -467,6 +485,15 @@
               <height>0</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(155, 222, 255)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string> mm</string>
+            </property>
             <property name="minimum">
              <double>-9999.000000000000000</double>
             </property>
@@ -494,6 +521,15 @@
               <width>0</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(255, 155, 155)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string> mm</string>
             </property>
             <property name="minimum">
              <double>-9999.000000000000000</double>
@@ -597,7 +633,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>70</width>
+              <width>86</width>
               <height>0</height>
              </size>
             </property>
@@ -606,6 +642,18 @@
               <width>0</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(155, 255, 155)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="suffix">
+             <string> °</string>
             </property>
             <property name="minimum">
              <double>-360.000000000000000</double>
@@ -625,7 +673,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>70</width>
+              <width>86</width>
               <height>0</height>
              </size>
             </property>
@@ -634,6 +682,15 @@
               <width>0</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(155, 222, 255)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string> °</string>
             </property>
             <property name="minimum">
              <double>-360.000000000000000</double>
@@ -653,7 +710,7 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>70</width>
+              <width>86</width>
               <height>0</height>
              </size>
             </property>
@@ -662,6 +719,15 @@
               <width>0</width>
               <height>0</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color:rgb(255, 155, 155)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string> °</string>
             </property>
             <property name="minimum">
              <double>-360.000000000000000</double>
@@ -691,6 +757,9 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="toolTip">
+            <string>Allows to set the center of rotation.</string>
+           </property>
            <item>
             <property name="text">
              <string>Image center</string>
@@ -698,7 +767,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Image origin</string>
+             <string>World origin</string>
             </property>
            </item>
            <item>
@@ -906,6 +975,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pbCancel">
+       <property name="toolTip">
+        <string>Cancel the manual registration and resets the state of the view.</string>
+       </property>
        <property name="text">
         <string>Cancel</string>
        </property>
@@ -913,6 +985,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pbStore">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Confirm the defined registration.&lt;/p&gt;&lt;p&gt;The registration will be stored (and, if activated, a mapped image will be generated).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Confirm + Store</string>
        </property>

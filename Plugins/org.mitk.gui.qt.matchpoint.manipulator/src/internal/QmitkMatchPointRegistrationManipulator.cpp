@@ -59,7 +59,7 @@ const std::string QmitkMatchPointRegistrationManipulator::VIEW_ID =
 
 QmitkMatchPointRegistrationManipulator::QmitkMatchPointRegistrationManipulator()
   : m_Parent(NULL), m_activeManipulation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0), HelperNodeName("RegistrationManipulationEvaluationHelper"),
-  m_UserDefinedName(false), m_internalUpdate(false)
+   m_internalUpdate(false)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -276,6 +276,17 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
     }
   }
 
+  if (!m_activeManipulation)
+  {
+    QString name = "ManuelRegistration";
+
+    if (m_SelectedPreRegNode.IsNotNull())
+    {
+      name = QString::fromStdString(m_SelectedPreRegNode->GetName()) + " manual refined";
+    }
+    this->m_Controls.lbNewRegName->setText(name);
+  }
+
   //config settings widget
   this->m_Controls.groupReg->setEnabled(!m_activeManipulation);
 
@@ -312,6 +323,14 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   { //new registration
     kernel->setTransformModel(m_CurrentTransform);
     manipulator.setInverseMapping(kernel);
+
+    //init to map the image centers
+    auto movingCenter = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
+    auto targetCenter = m_SelectedTargetNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
+
+    auto offset = movingCenter - targetCenter;
+
+    m_CurrentTransform->SetOffset(offset);
   }
   else
   { //use selected pre registration as baseline
@@ -325,7 +344,16 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   }
 
   m_Controls.comboCenter->setCurrentIndex(0);
-  ConfigureTransformCenter(0);
+  this->ConfigureTransformCenter(0);
+
+  //set bounds of the translation slider widget to have sensible ranges
+  auto currenttrans = m_CurrentTransform->GetTranslation();
+  this->m_Controls.slideTransX->setMinimum(currenttrans[0] - 250);
+  this->m_Controls.slideTransY->setMinimum(currenttrans[1] - 250);
+  this->m_Controls.slideTransZ->setMinimum(currenttrans[2] - 250);
+  this->m_Controls.slideTransX->setMaximum(currenttrans[0] + 250);
+  this->m_Controls.slideTransY->setMaximum(currenttrans[1] + 250);
+  this->m_Controls.slideTransZ->setMaximum(currenttrans[2] + 250);
 
   //reinit view
   mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -660,33 +688,17 @@ void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int center
   if (centerType == 0)
   { //image center
     auto center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
-
-    TransformType::OutputPointType itkCenter;
-    itkCenter[0] = center[0];
-    itkCenter[1] = center[1];
-    itkCenter[2] = center[2];
-
-    m_CurrentTransform->SetCenter(itkCenter);
+    m_CurrentTransform->SetCenter(center);
   }
   else if (centerType == 1)
-  { //image origin
-    auto origin = m_SelectedMovingNode->GetData()->GetGeometry(m_currentSelectedTimeStep)->GetOrigin();
-
+  { //world origin
     TransformType::OutputPointType itkCenter;
-    itkCenter[0] = origin[0];
-    itkCenter[1] = origin[1];
-    itkCenter[2] = origin[2];
-
+    itkCenter.Fill(0.0);
     m_CurrentTransform->SetCenter(itkCenter);
   }
   else
   { //current selected point
-    TransformType::OutputPointType itkCenter;
-    itkCenter[0] = m_currentSelectedPosition[0];
-    itkCenter[1] = m_currentSelectedPosition[1];
-    itkCenter[2] = m_currentSelectedPosition[2];
-
-    m_CurrentTransform->SetCenter(itkCenter);
+    m_CurrentTransform->SetCenter(m_currentSelectedPosition);
   }
 
   m_CurrentTransform->SetOffset(offset);

@@ -164,7 +164,6 @@ private:
   bool m_autoMoving;
   bool m_activeManipulation;
 
-  bool m_UserDefinedName;
   bool m_internalUpdate;
   const std::string HelperNodeName;
 };

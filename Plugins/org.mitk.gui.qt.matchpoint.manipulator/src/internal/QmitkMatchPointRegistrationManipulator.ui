@@ -463,6 +463,9 @@
             <property name="maximum">
              <double>9999.000000000000000</double>
             </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="2" column="2">
@@ -500,6 +503,9 @@
             <property name="maximum">
              <double>9999.000000000000000</double>
             </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="3" column="2">
@@ -536,6 +542,9 @@
             </property>
             <property name="maximum">
              <double>9999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -661,6 +670,9 @@
             <property name="maximum">
              <double>360.000000000000000</double>
             </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
            </widget>
           </item>
           <item row="2" column="2">
@@ -697,6 +709,9 @@
             </property>
             <property name="maximum">
              <double>360.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -735,6 +750,9 @@
             <property name="maximum">
              <double>360.000000000000000</double>
             </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
            </widget>
           </item>
          </layout>
@@ -762,7 +780,7 @@
            </property>
            <item>
             <property name="text">
-             <string>Image center</string>
+             <string>Moving image center</string>
             </property>
            </item>
            <item>

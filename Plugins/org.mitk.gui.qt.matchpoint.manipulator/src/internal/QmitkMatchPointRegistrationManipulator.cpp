@@ -307,8 +307,10 @@ void QmitkMatchPointRegistrationManipulator::ConfigureControls()
 
 void QmitkMatchPointRegistrationManipulator::InitSession()
 {
-  this->m_CurrentTransform = TransformType::New();
-  this->m_CurrentTransform->SetIdentity();
+  this->m_InverseCurrentTransform = TransformType::New();
+  this->m_InverseCurrentTransform->SetIdentity();
+  this->m_DirectCurrentTransform = TransformType::New();
+  this->m_DirectCurrentTransform->SetIdentity();
 
   this->m_CurrentRegistrationWrapper = mitk::MAPRegistrationWrapper::New();
   m_CurrentRegistration = MAPRegistrationType::New();
@@ -321,23 +323,23 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
 
   if (this->m_Controls.radioNewReg->isChecked())
   { //new registration
-    kernel->setTransformModel(m_CurrentTransform);
+    kernel->setTransformModel(m_InverseCurrentTransform);
     manipulator.setInverseMapping(kernel);
 
     //init to map the image centers
     auto movingCenter = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
     auto targetCenter = m_SelectedTargetNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
 
-    auto offset = movingCenter - targetCenter;
-
-    m_CurrentTransform->SetOffset(offset);
+    auto offset = targetCenter - movingCenter;
+    m_DirectCurrentTransform->SetOffset(offset);
+    m_DirectCurrentTransform->GetInverse(m_InverseCurrentTransform);
   }
   else
   { //use selected pre registration as baseline
     itk::CompositeTransform < ::map::core::continuous::ScalarType, 3>::Pointer compTransform = itk::CompositeTransform < ::map::core::continuous::ScalarType, 3>::New();
     const map::core::RegistrationKernel<3, 3>* preKernel = dynamic_cast<const map::core::RegistrationKernel<3, 3>*>(&this->m_SelectedPreReg->getInverseMapping());
     compTransform->AddTransform(preKernel->getTransformModel()->Clone());
-    compTransform->AddTransform(this->m_CurrentTransform);
+    compTransform->AddTransform(this->m_InverseCurrentTransform);
 
     kernel->setTransformModel(compTransform);
     manipulator.setInverseMapping(kernel);
@@ -347,7 +349,7 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   this->ConfigureTransformCenter(0);
 
   //set bounds of the translation slider widget to have sensible ranges
-  auto currenttrans = m_CurrentTransform->GetTranslation();
+  auto currenttrans = m_DirectCurrentTransform->GetTranslation();
   this->m_Controls.slideTransX->setMinimum(currenttrans[0] - 250);
   this->m_Controls.slideTransY->setMinimum(currenttrans[1] - 250);
   this->m_Controls.slideTransZ->setMinimum(currenttrans[2] - 250);
@@ -379,8 +381,10 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
 
 void QmitkMatchPointRegistrationManipulator::StopSession()
 {
-  this->m_CurrentTransform = TransformType::New();
-  this->m_CurrentTransform->SetIdentity();
+  this->m_InverseCurrentTransform = TransformType::New();
+  this->m_InverseCurrentTransform->SetIdentity();
+  this->m_DirectCurrentTransform = TransformType::New();
+  this->m_DirectCurrentTransform->SetIdentity();
   this->m_CurrentRegistration = nullptr;
   this->m_CurrentRegistrationWrapper = nullptr;
 
@@ -393,34 +397,47 @@ void QmitkMatchPointRegistrationManipulator::StopSession()
 void QmitkMatchPointRegistrationManipulator::UpdateTransformWidgets()
 {
   this->m_internalUpdate = true;
-  this->m_Controls.sbTransX->setValue(this->m_CurrentTransform->GetTranslation()[0]);
-  this->m_Controls.sbTransY->setValue(this->m_CurrentTransform->GetTranslation()[1]);
-  this->m_Controls.sbTransZ->setValue(this->m_CurrentTransform->GetTranslation()[2]);
-  this->m_Controls.slideTransX->setValue(this->m_CurrentTransform->GetTranslation()[0]);
-  this->m_Controls.slideTransY->setValue(this->m_CurrentTransform->GetTranslation()[1]);
-  this->m_Controls.slideTransZ->setValue(this->m_CurrentTransform->GetTranslation()[2]);
+  this->m_Controls.sbTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
+  this->m_Controls.sbTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
+  this->m_Controls.sbTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
+  this->m_Controls.slideTransX->setValue(this->m_DirectCurrentTransform->GetTranslation()[0]);
+  this->m_Controls.slideTransY->setValue(this->m_DirectCurrentTransform->GetTranslation()[1]);
+  this->m_Controls.slideTransZ->setValue(this->m_DirectCurrentTransform->GetTranslation()[2]);
 
-  this->m_Controls.sbRotX->setValue(this->m_CurrentTransform->GetAngleX()*(180/boost::math::double_constants::pi));
-  this->m_Controls.sbRotY->setValue(this->m_CurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-  this->m_Controls.sbRotZ->setValue(this->m_CurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
-  this->m_Controls.slideRotX->setValue(this->m_CurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
-  this->m_Controls.slideRotY->setValue(this->m_CurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
-  this->m_Controls.slideRotZ->setValue(this->m_CurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.sbRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.sbRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.sbRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.slideRotX->setValue(this->m_DirectCurrentTransform->GetAngleX()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.slideRotY->setValue(this->m_DirectCurrentTransform->GetAngleY()*(180 / boost::math::double_constants::pi));
+  this->m_Controls.slideRotZ->setValue(this->m_DirectCurrentTransform->GetAngleZ()*(180 / boost::math::double_constants::pi));
   this->m_internalUpdate = false;
 };
 
-void QmitkMatchPointRegistrationManipulator::UpdateTransform()
+void QmitkMatchPointRegistrationManipulator::UpdateTransform(bool updateRotation)
 {
-  this->m_CurrentTransform->SetRotation(this->m_Controls.sbRotX->value()*(boost::math::double_constants::pi / 180),
-    this->m_Controls.sbRotY->value()*(boost::math::double_constants::pi / 180),
-    this->m_Controls.sbRotZ->value()*(boost::math::double_constants::pi / 180));
+  if (updateRotation)
+  {
+    if (m_Controls.comboCenter->currentIndex() == 2)
+    {
+     ConfigureTransformCenter(2);
+    }
+    this->m_DirectCurrentTransform->SetRotation(this->m_Controls.sbRotX->value()*(boost::math::double_constants::pi / 180),
+      this->m_Controls.sbRotY->value()*(boost::math::double_constants::pi / 180),
+      this->m_Controls.sbRotZ->value()*(boost::math::double_constants::pi / 180));
+  }
+  else
+  {
+    TransformType::OutputVectorType trans;
+    trans[0] = this->m_Controls.sbTransX->value();
+    trans[1] = this->m_Controls.sbTransY->value();
+    trans[2] = this->m_Controls.sbTransZ->value();
 
-  TransformType::OutputVectorType trans;
-  trans[0] = this->m_Controls.sbTransX->value();
-  trans[1] = this->m_Controls.sbTransY->value();
-  trans[2] = this->m_Controls.sbTransZ->value();
+    this->m_DirectCurrentTransform->SetTranslation(trans);
+  }
 
-  this->m_CurrentTransform->SetTranslation(trans);
+  this->m_DirectCurrentTransform->GetInverse(this->m_InverseCurrentTransform);
+
+  this->UpdateTransformWidgets();
 
   this->m_EvalNode->Modified();
   this->m_CurrentRegistrationWrapper->Modified();
@@ -488,10 +505,10 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
   ::map::core::RegistrationManipulator<MAPRegistrationType> manipulator(newReg);
 
   ::map::core::PreCachedRegistrationKernel<3, 3>::Pointer kernel = ::map::core::PreCachedRegistrationKernel<3, 3>::New();
-  kernel->setTransformModel(m_CurrentTransform);
+  kernel->setTransformModel(m_InverseCurrentTransform);
 
   ::map::core::PreCachedRegistrationKernel<3, 3>::Pointer kernel2 = ::map::core::PreCachedRegistrationKernel<3, 3>::New();
-  kernel2->setTransformModel(m_CurrentTransform->GetInverseTransform());
+  kernel2->setTransformModel(m_InverseCurrentTransform->GetInverseTransform());
 
   manipulator.setInverseMapping(kernel);
   manipulator.setDirectMapping(kernel2);
@@ -563,7 +580,7 @@ void QmitkMatchPointRegistrationManipulator::OnRotXChanged(double x)
     m_internalUpdate = true;
     this->m_Controls.slideRotX->setValue(x);
     m_internalUpdate = false;
-    this->UpdateTransform();
+    this->UpdateTransform(true);
   }
 };
 
@@ -582,7 +599,7 @@ void QmitkMatchPointRegistrationManipulator::OnRotYChanged(double y)
     m_internalUpdate = true;
     this->m_Controls.slideRotY->setValue(y);
     m_internalUpdate = false;
-    this->UpdateTransform();
+    this->UpdateTransform(true);
   }
 };
 
@@ -601,7 +618,7 @@ void QmitkMatchPointRegistrationManipulator::OnRotZChanged(double z)
     m_internalUpdate = true;
     this->m_Controls.slideRotZ->setValue(z);
     m_internalUpdate = false;
-    this->UpdateTransform();
+    this->UpdateTransform(true);
   }
 };
 
@@ -676,30 +693,35 @@ void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
 
   this->UpdateTransformWidgets();
 
-  this->m_EvalNode->Modified();
+  if (this->m_EvalNode.IsNotNull())
+  {
+    this->m_EvalNode->Modified();
+  }
   this->m_CurrentRegistrationWrapper->Modified();
   this->GetRenderWindowPart()->RequestUpdate();
 };
 
 void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int centerType)
 {
-  auto offset = m_CurrentTransform->GetOffset();
+  auto offset = m_DirectCurrentTransform->GetOffset();
 
   if (centerType == 0)
   { //image center
     auto center = m_SelectedMovingNode->GetData()->GetTimeGeometry()->GetCenterInWorld();
-    m_CurrentTransform->SetCenter(center);
+    m_DirectCurrentTransform->SetCenter(center);
   }
   else if (centerType == 1)
   { //world origin
     TransformType::OutputPointType itkCenter;
     itkCenter.Fill(0.0);
-    m_CurrentTransform->SetCenter(itkCenter);
+    m_DirectCurrentTransform->SetCenter(itkCenter);
   }
   else
   { //current selected point
-    m_CurrentTransform->SetCenter(m_currentSelectedPosition);
+    auto newCenter = m_InverseCurrentTransform->TransformPoint(m_currentSelectedPosition);
+    m_DirectCurrentTransform->SetCenter(newCenter);
   }
 
-  m_CurrentTransform->SetOffset(offset);
+  m_DirectCurrentTransform->SetOffset(offset);
+  m_DirectCurrentTransform->GetInverse(m_InverseCurrentTransform);
 };

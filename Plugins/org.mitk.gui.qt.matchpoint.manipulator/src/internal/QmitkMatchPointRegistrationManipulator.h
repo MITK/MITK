@@ -130,7 +130,7 @@ private:
 
   /**
   * Updates the transform according to the widgets that manipulate the transform.*/
-  void UpdateTransform();
+  void UpdateTransform(bool updateRotation = false);
 
   void ConfigureTransformCenter(int centerType);
 
@@ -155,7 +155,8 @@ private:
 
   mitk::MAPRegistrationWrapper::Pointer m_CurrentRegistrationWrapper;
   typedef itk::Euler3DTransform<::map::core::continuous::ScalarType> TransformType;
-  TransformType::Pointer m_CurrentTransform;
+  TransformType::Pointer m_InverseCurrentTransform;
+  TransformType::Pointer m_DirectCurrentTransform;
   typedef map::core::Registration<3, 3> MAPRegistrationType;
   MAPRegistrationType::Pointer m_CurrentRegistration;
   MAPRegistrationType::ConstPointer m_SelectedPreReg;

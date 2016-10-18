@@ -1,7 +1,7 @@
 /**
 \page org_mitk_gui_qt_matchpoint_evaluator The MatchPoint Registration Evaluation View
 
-\image html map-icon-regeval.png "Icon of the MatchPoint Registration Evaluator"
+\imageMacro{map-icon-regeval.png, "Icon of the MatchPoint Registration Evaluator", 3}
 
 \li \ref MAP_REGEVAL_Introduction
 \li \ref MAP_REGEVAL_Contact

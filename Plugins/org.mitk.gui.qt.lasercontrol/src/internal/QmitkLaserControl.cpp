@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
-#include <QFuture>
 #include <QtConcurrentRun>
 
 //mitk
@@ -44,9 +43,9 @@ void OPOLaserControl::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonFastTuning, SIGNAL(clicked()), this, SLOT(StartFastTuning()));
   connect(m_Controls.buttonFlashlamp, SIGNAL(clicked()), this, SLOT(ToggleFlashlamp()));
   connect(m_Controls.buttonQSwitch, SIGNAL(clicked()), this, SLOT(ToggleQSwitch()));
-
   connect(m_Controls.sliderWavelength, SIGNAL(valueChanged(int)), this, SLOT(SyncWavelengthSetBySlider()));
   connect(m_Controls.spinBoxWavelength, SIGNAL(valueChanged(double)), this, SLOT(SyncWavelengthSetBySpinBox()));
+  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(EnableLaser()));
 
   m_SyncFromSpinBox = true;
   m_SyncFromSlider = true;
@@ -54,6 +53,14 @@ void OPOLaserControl::CreateQtPartControl(QWidget *parent)
   m_PumpLaserConnected = false;
   m_OPOConnected = false;
 }
+
+void OPOLaserControl::EnableLaser()
+{
+  m_Controls.buttonQSwitch->setEnabled(true);
+  m_Controls.buttonQSwitch->setText("Start Laser");
+  this->GetState();
+}
+
 void OPOLaserControl::SyncWavelengthSetBySlider()
 {
   if (m_SyncFromSlider)
@@ -208,6 +215,14 @@ void OPOLaserControl::ShutterCountDown()
 {
   m_Controls.buttonFlashlamp->setText("Stop Lamp");
   m_Controls.buttonQSwitch->setEnabled(false);
+  m_Controls.buttonQSwitch->setText("10s ...");
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  m_Controls.buttonQSwitch->setText("9s ...");
+  std::this_thread::sleep_for(std::chrono::seconds(1));  
+  m_Controls.buttonQSwitch->setText("8s ...");
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  m_Controls.buttonQSwitch->setText("7s ...");
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   m_Controls.buttonQSwitch->setText("6s ...");
   std::this_thread::sleep_for(std::chrono::seconds(1));
   m_Controls.buttonQSwitch->setText("5s ...");
@@ -220,8 +235,8 @@ void OPOLaserControl::ShutterCountDown()
   std::this_thread::sleep_for(std::chrono::seconds(1));
   m_Controls.buttonQSwitch->setText("1s ...");
   std::this_thread::sleep_for(std::chrono::seconds(1));
-  m_Controls.buttonQSwitch->setEnabled(true);
-  m_Controls.buttonQSwitch->setText("Start Laser");
+  //m_Controls.buttonQSwitch->setEnabled(true);
+  //m_Controls.buttonQSwitch->setText("Start Laser");
 }
 
 void OPOLaserControl::ToggleFlashlamp()
@@ -232,6 +247,7 @@ void OPOLaserControl::ToggleFlashlamp()
     if (m_PumpLaserController->StartFlashing())
     {
       QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShutterCountDown);
+      m_Watcher.setFuture(future);
     }
     else
       m_Controls.buttonFlashlamp->setText("Start Lamp");

@@ -74,6 +74,7 @@ mitk::OpotekPumpLaserController::~OpotekPumpLaserController()
 
 std::string mitk::OpotekPumpLaserController::SendAndReceiveLine(const std::string* input, std::string* answer)
 {
+  MITK_INFO << "[]" << input->c_str();
   if (input == nullptr)
     return "SERIALSENDERROR";
   
@@ -96,6 +97,7 @@ std::string mitk::OpotekPumpLaserController::SendAndReceiveLine(const std::strin
   m_SerialCommunication->ClearReceiveBuffer();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   m_SerialCommunication->ClearReceiveBuffer();
+  MITK_INFO << "[]" << answer->c_str();
   return "OK";
 }
 
@@ -354,7 +356,6 @@ bool mitk::OpotekPumpLaserController::StartQswitching()
     {
       m_FlashlampRunning = true;
       m_ShutterOpen = true;
-      m_KeepAlive = true;
       return true;
     }
     else

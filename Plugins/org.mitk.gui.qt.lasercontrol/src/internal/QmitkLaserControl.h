@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkLaserControlControls.h"
 
+#include <QFuture>
+#include <QFutureWatcher>
 #include <mitkOpotekPumpLaserController.h>
 #include <mitkGalilMotor.h>
 
@@ -43,13 +45,13 @@ class OPOLaserControl : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
   protected slots:
 
-    /// \brief Called when the user clicks the GUI button
+  /// \brief Called when the user clicks the GUI button
     void GetState();
 
     void InitLaser();
@@ -57,6 +59,7 @@ class OPOLaserControl : public QmitkAbstractView
     void StartFastTuning();
 
     void ShutterCountDown();
+    void EnableLaser();
 
     void ToggleFlashlamp();
     void ToggleQSwitch();
@@ -78,6 +81,8 @@ class OPOLaserControl : public QmitkAbstractView
     bool m_OPOConnected;
     bool m_SyncFromSpinBox;
     bool m_SyncFromSlider;
+
+    QFutureWatcher<void> m_Watcher;
 
     mitk::OpotekPumpLaserController::Pointer m_PumpLaserController;
     mitk::GalilMotor::Pointer m_OPOMotor;

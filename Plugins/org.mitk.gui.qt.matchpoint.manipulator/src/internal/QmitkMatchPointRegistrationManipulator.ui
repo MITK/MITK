@@ -790,7 +790,7 @@
            </item>
            <item>
             <property name="text">
-             <string>Current navigator postion</string>
+             <string>Current navigator position</string>
             </property>
            </item>
           </widget>

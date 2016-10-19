@@ -186,6 +186,8 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
 
 void QmitkImageNavigatorView::UpdateStatusBar()
 {
+  if (m_IRenderWindowPart != nullptr)
+  {
     mitk::Point3D position = m_IRenderWindowPart->GetSelectedPosition();
     std::string statusText;
     mitk::BaseRenderer::Pointer renderer = mitk::BaseRenderer::GetInstance(m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetVtkRenderWindow());
@@ -195,35 +197,29 @@ void QmitkImageNavigatorView::UpdateStatusBar()
 
     if (nodes.IsNotNull())
     {
-        mitk::Image::Pointer image3D;
-        mitk::DataNode::Pointer node;
-        mitk::DataNode::Pointer topSourceNode;
+      mitk::Image::Pointer image3D;
+      mitk::DataNode::Pointer node;
+      mitk::DataNode::Pointer topSourceNode;
 
-        int component = 0;
+      int component = 0;
 
-        node = GetTopLayerNode(nodes, position, renderer);
+      node = GetTopLayerNode(nodes, position, renderer);
 
-        if(node.IsNotNull())
+      if (node.IsNotNull())
+      {
+        bool isBinary(false);
+        node->GetBoolProperty("binary", isBinary);
+        if (isBinary)
         {
-          bool isBinary (false);
-          node->GetBoolProperty("binary", isBinary);
-          if(isBinary)
+          mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = this->GetDataStorage()->GetSources(node, NULL, true);
+          if (!sourcenodes->empty())
           {
-            mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = this->GetDataStorage()->GetSources(node, NULL, true);
-            if(!sourcenodes->empty())
-            {
-              topSourceNode = GetTopLayerNode(sourcenodes, position, renderer);
-            }
-            if(topSourceNode.IsNotNull())
-            {
-              image3D = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
-              topSourceNode->GetIntProperty("Image.Displayed Component", component);
-            }
-            else
-            {
-              image3D = dynamic_cast<mitk::Image*>(node->GetData());
-              node->GetIntProperty("Image.Displayed Component", component);
-            }
+            topSourceNode = GetTopLayerNode(sourcenodes, position, renderer);
+          }
+          if (topSourceNode.IsNotNull())
+          {
+            image3D = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
+            topSourceNode->GetIntProperty("Image.Displayed Component", component);
           }
           else
           {
@@ -231,48 +227,55 @@ void QmitkImageNavigatorView::UpdateStatusBar()
             node->GetIntProperty("Image.Displayed Component", component);
           }
         }
-        std::stringstream stream;
-        stream.imbue(std::locale::classic());
-
-        // get the position and gray value from the image and build up status bar text
-        if(image3D.IsNotNull())
+        else
         {
-          itk::Index<3> p;
-          image3D->GetGeometry()->WorldToIndex(position, p);
-          stream.precision(2);
-          stream << "Position: <" << std::fixed << position[0] << ", " << std::fixed << position[1] << ", " << std::fixed << position[2] << "> mm";
-          stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
+          image3D = dynamic_cast<mitk::Image*>(node->GetData());
+          node->GetIntProperty("Image.Displayed Component", component);
+        }
+      }
+      std::stringstream stream;
+      stream.imbue(std::locale::classic());
 
-          mitk::ScalarType pixelValue;
+      // get the position and gray value from the image and build up status bar text
+      if (image3D.IsNotNull())
+      {
+        itk::Index<3> p;
+        image3D->GetGeometry()->WorldToIndex(position, p);
+        stream.precision(2);
+        stream << "Position: <" << std::fixed << position[0] << ", " << std::fixed << position[1] << ", " << std::fixed << position[2] << "> mm";
+        stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
 
-          mitkPixelTypeMultiplex5(
-                mitk::FastSinglePixelAccess,
-                image3D->GetChannelDescriptor().GetPixelType(),
-                image3D,
-                image3D->GetVolumeData(renderer->GetTimeStep()),
-                p,
-                pixelValue,
-                component);
+        mitk::ScalarType pixelValue;
+
+        mitkPixelTypeMultiplex5(
+          mitk::FastSinglePixelAccess,
+          image3D->GetChannelDescriptor().GetPixelType(),
+          image3D,
+          image3D->GetVolumeData(renderer->GetTimeStep()),
+          p,
+          pixelValue,
+          component);
 
 
 
-          if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
-          {
-            stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
-          }
-          else
-          {
-            stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
-          }
+        if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+        {
+          stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
         }
         else
         {
-          stream << "No image information at this position!";
+          stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
         }
+      }
+      else
+      {
+        stream << "No image information at this position!";
+      }
 
-        statusText = stream.str();
-        mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
-     }
+      statusText = stream.str();
+      mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
+    }
+  }
 }
 
 void QmitkImageNavigatorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)

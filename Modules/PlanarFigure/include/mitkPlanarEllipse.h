@@ -106,6 +106,7 @@ public:
 
   const unsigned int FEATURE_ID_MAJOR_AXIS;
   const unsigned int FEATURE_ID_MINOR_AXIS;
+  const unsigned int FEATURE_ID_AREA;
 
 protected:
   PlanarEllipse();

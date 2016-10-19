@@ -43,8 +43,6 @@ mitk::StandardFileLocations* mitk::StandardFileLocations::GetInstance()
 
 void mitk::StandardFileLocations::AddDirectoryForSearch(const char * dir, bool insertInFrontOfSearchList)
 {
-  std::string directory = dir;
-
   // Do nothing if directory is already included into search list (TODO more clever: search only once!)
   FileSearchVectorType::iterator iter;
   if(m_SearchDirectories.size() > 0)
@@ -82,7 +80,7 @@ std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char * f
 {
   FileSearchVectorType::iterator it;
 
-  for(it = m_SearchDirectories.begin(); it != m_SearchDirectories.end(); it++)
+  for(it = m_SearchDirectories.begin(); it != m_SearchDirectories.end(); ++it)
   {
     std::string currDir = (*it);
 

@@ -91,10 +91,9 @@ public:
 
   void Mitk2Itk_PointCompatibility()
   {
-    itk::Point<ScalarType, 3> itkPoint3D = originalValues;
     mitk::Point3D             point3D    = valuesToCopy;
 
-    itkPoint3D = point3D;
+    itk::Point<ScalarType, 3> itkPoint3D = point3D;
 
     TestForEquality(itkPoint3D, point3D, "itk::Point", "mitk:Point");
   }
@@ -102,10 +101,9 @@ public:
 
   void Itk2Mitk_PointCompatibility()
   {
-    mitk::Point3D point3D                = originalValues;
     itk::Point<ScalarType, 3> itkPoint3D = valuesToCopy;
 
-    point3D = itkPoint3D;
+    mitk::Point3D point3D = itkPoint3D;
 
     TestForEquality(point3D, itkPoint3D, "mitk:Point", "itk::Point");
   }
@@ -113,12 +111,11 @@ public:
 
   void Vtk2Mitk_PointCompatibility()
   {
-    mitk::Point3D point3D = originalValues;
     a_vtkPoints->InsertNextPoint(valuesToCopy);
     double vtkPoint[3];
     a_vtkPoints->GetPoint(0, vtkPoint);
 
-    point3D = vtkPoint;
+    mitk::Point3D point3D = vtkPoint;
 
     TestForEquality(point3D, vtkPoint, "mitk:Point", "vtkPoint");
 
@@ -138,10 +135,9 @@ public:
 
   void Pod2Mitk_PointCompatibility()
   {
-    itk::Point<double, 3> point3D = originalValues;
     ScalarType podPoint[] = {4.0, 5.0, 6.0};
 
-    point3D = podPoint;
+    itk::Point<double, 3> point3D = podPoint;
 
     TestForEquality(point3D, podPoint, "mitk::Point3D", "POD point");
   }
@@ -149,10 +145,9 @@ public:
 
   void Vector2Point()
   {
-    itk::Point<double, 3> point3D   = valuesToCopy;
     itk::Vector<double, 3> vector3D = originalValues;
 
-    point3D = vector3D;
+    itk::Point<double, 3> point3D = vector3D;
 
     TestForEquality(point3D, vector3D, "mitk::Point", "mitk::Vector");
   }

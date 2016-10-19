@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMITKIGTTrackingToolboxView.h"
 #include "QmitkNavigationDataPlayerView.h"
 #include "IGTNavigationToolCalibration.h"
+#include "IGTFiducialRegistration.h"
 
 //#include <mitkPersistenceService.h> //Workaround for bug in persistence module (see bug 16643 for details)
                                     //CAN BE REMOVED WHEN THE BUG IS FIXED
@@ -37,6 +38,7 @@ void PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMITKIGTTrackingToolboxView , context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkNavigationDataPlayerView , context)
   BERRY_REGISTER_EXTENSION_CLASS(IGTNavigationToolCalibration , context)
+  BERRY_REGISTER_EXTENSION_CLASS(IGTFiducialRegistration, context)
 
 
 }

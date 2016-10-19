@@ -75,7 +75,7 @@ int mitkLabelOverlay3DRendering2DTest(int argc, char* argv[])
   renderingHelper.Render();
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv,200.0) == true, "CompareRenderWindowAgainstReference test result positive?" );
 
   //use this to generate a reference screenshot or save the file:
   bool generateReferenceScreenshot = false;

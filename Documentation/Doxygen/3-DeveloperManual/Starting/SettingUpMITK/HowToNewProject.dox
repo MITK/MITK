@@ -177,7 +177,6 @@ control the MITK configuration:
 
 <ul>
  <li> \b MITK_USE_BLUEBERRY Enable the use of the BlueBerry application framework
- <li> \b MITK_USE_Boost Download and use Boost in MITK
  <li> \b MITK_USE_CTK Download, compile, and use CTK in MITK
  <li> \b MITK_USE_DCMTK Download, compile, and use DCMTK in MITK
  <li> \b MITK_USE_OpenCV Download, compile, and use OpenCV in MITK

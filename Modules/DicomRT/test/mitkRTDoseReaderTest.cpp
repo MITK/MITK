@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestFixture.h>
 
 #include <mitkRTDoseReader.h>
+#include <mitkRTConstants.h>
+#include <mitkGenericProperty.h>
 #include <mitkIOUtil.h>
 
 class mitkRTDoseReaderTestSuite : public mitk::TestFixture
@@ -40,12 +42,24 @@ public:
 
   void TestDoseImage()
   {
-    mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
+      mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("RT/Dose/RT_Dose.nrrd"));
 
-    mitk::DataNode::Pointer node = m_rtDoseReader->LoadRTDose(GetTestDataFilePath("RT/Dose/RD.dcm").c_str());
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+      mitk::DataNode::Pointer node = m_rtDoseReader->LoadRTDose(GetTestDataFilePath("RT/Dose/RD.dcm").c_str());
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
-    MITK_ASSERT_EQUAL(refImage, image, "referece-Image and image should be equal");
+      MITK_ASSERT_EQUAL(refImage, image, "reference-Image and image should be equal");
+
+      auto prescibedDoseProperty = image->GetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str());
+      auto prescribedDoseGenericProperty = dynamic_cast<mitk::GenericProperty<double>*>(prescibedDoseProperty.GetPointer());
+      double actualPrescribedDose = prescribedDoseGenericProperty->GetValue();
+      double expectedPrescribedDose = 65535 * 0.0010494648*0.8;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("prescribed dose property is not as expected", actualPrescribedDose, expectedPrescribedDose, 1e-5);
+
+      float actualReferenceDose;
+      auto referenceDoseProperty = node->GetFloatProperty(mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME.c_str(), actualReferenceDose);
+      float expectedReferenceDose = 40;
+
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("reference dose property is not as expected", static_cast<float>(actualReferenceDose), expectedReferenceDose);
 
   }
 

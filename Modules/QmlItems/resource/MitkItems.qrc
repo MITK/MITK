@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>components/DataToolbar.qml</file>
+        <file>components/MultiToolbar.qml</file>
+        <file>components/VectorIcon.qml</file>
+        <file>fonts/font-awesome/fontawesome-webfont.ttf</file>
+        <file>components/Checkbox.qml</file>
+        <file>components/Combobox.qml</file>
+        <file>components/TransferFunction.qml</file>
+        <file>components/TextField.qml</file>
+        <file>components/SliderNavigator.qml</file>
+        <file>components/Slider.qml</file>
+        <file>components/TransferOverlay.qml</file>
+        <file>components/Spinbox.qml</file>
+        <file>MitkDataManager.qml</file>
+        <file>MitkProperties.qml</file>
+        <file>MitkImageNavigator.qml</file>
+        <file>MitkStdMultiItem.qml</file>
+    </qresource>
+</RCC>

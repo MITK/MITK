@@ -5,7 +5,7 @@
     <view id="org.mitk.views.openigtlinkmanager"
           name="OpenIGTLink Manager"
           class="OpenIGTLinkManager"
-          icon="resources/manager.png" />
+          icon="resources/icon_openigtlink_manager.svg" />
   </extension>
 
 </plugin>

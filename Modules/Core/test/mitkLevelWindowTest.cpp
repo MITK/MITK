@@ -846,6 +846,7 @@ int mitkLevelWindowTest(int, char* [])
   if (!(lw->GetRange() == levelwindow.GetRange()))
   {
     std::cout<<"[FAILED]"<<std::endl;
+    delete lw;
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;

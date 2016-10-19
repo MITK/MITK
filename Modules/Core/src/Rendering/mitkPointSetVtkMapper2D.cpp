@@ -622,10 +622,6 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   //check for color props and use it for rendering of selected/unselected points and contour
   //due to different params in VTK (double/float) we have to convert
 
-  float unselectedColor[4];
-  double selectedColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };    //red
-  double contourColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };     //red
-
   float opacity = 1.0;
 
   GetDataNode()->GetOpacity(opacity, renderer);
@@ -633,6 +629,9 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   // apply color and opacity
   if (m_ShowPoints)
   {
+    float unselectedColor[4];
+    double selectedColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };    //red
+
     ls->m_UnselectedActor->VisibilityOn();
     ls->m_SelectedActor->VisibilityOn();
 
@@ -671,6 +670,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
 
   if (m_ShowContour)
   {
+    double contourColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };     //red
     ls->m_ContourActor->VisibilityOn();
 
     //get contour color property

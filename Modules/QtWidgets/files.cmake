@@ -34,6 +34,9 @@ QmitkStdMultiWidget.cpp
 QmitkMouseModeSwitcher.cpp
 QmitkDataStorageFilterProxyModel.cpp
 QmitkDataStorageComboBoxWithSelectNone.cpp
+QmitkPropertyItem.cpp
+QmitkPropertyItemDelegate.cpp
+QmitkPropertyItemModel.cpp
 )
 
 set(MOC_H_FILES
@@ -61,6 +64,9 @@ set(MOC_H_FILES
   include/QmitkStdMultiWidget.h
   include/QmitkMouseModeSwitcher.h
   include/QmitkDataStorageComboBoxWithSelectNone.h
+  include/QmitkPropertyItem.h
+  include/QmitkPropertyItemDelegate.h
+  include/QmitkPropertyItemModel.h
 )
 
 set(UI_FILES

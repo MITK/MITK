@@ -46,7 +46,6 @@ set(CPP_FILES
   QmitkTransferFunctionWidget.cpp
   QmitkUGCombinedRepresentationPropertyWidget.cpp
   QmitkVideoBackground.cpp
-  QmitkWebPage.cpp
   QtWidgetsExtRegisterClasses.cpp
 )
 
@@ -91,7 +90,6 @@ set(MOC_H_FILES
   include/QmitkTransferFunctionWidget.h
   include/QmitkUGCombinedRepresentationPropertyWidget.h
   include/QmitkVideoBackground.h
-  include/QmitkWebPage.h
 )
 
 set(UI_FILES

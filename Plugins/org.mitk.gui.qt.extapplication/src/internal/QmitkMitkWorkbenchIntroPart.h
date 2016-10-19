@@ -50,7 +50,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \sa QmitkWelcomePage Editor
  */
 
-class QWebView ;
+class QWebEngineView;
 
 class QmitkMitkWorkbenchIntroPart : public berry::QtIntroPart
 {
@@ -72,16 +72,10 @@ public:
 
   virtual void CreateConnections();
 
-
-protected slots:
-
-
-  void DelegateMeTo(const QUrl& ShowMeNext);
-
 protected:
 
   Ui::QmitkWelcomeScreenViewControls* m_Controls;
-  QWebView* m_view;
+  QWebEngineView* m_view;
 };
 
 #endif /* QMITKWORKBENCHINTROPART_H_ */

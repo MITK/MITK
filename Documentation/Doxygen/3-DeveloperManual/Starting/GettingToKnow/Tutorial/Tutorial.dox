@@ -21,6 +21,7 @@ We will start with configuring MITK to compile the tutorial, continue to show ho
 display and do basic interaction with images, and finally show how to build a plug-in and add new interactions.
 
 The source code of the examples can be found in Examples/Tutorial/ \n
+Visit \ref TroubleshootingPage for a guide to miscellaneous issues and their resolution. \n
 Two data files are used to execute the example code.
 
 \li Pic3D.nrrd \n

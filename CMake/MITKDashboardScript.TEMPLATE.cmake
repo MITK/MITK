@@ -135,14 +135,12 @@ endmacro()
 # Download and include setup script
 #
 if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
-  set(hb "HEAD")
+  set(IS_PHABRICATOR_URL FALSE)
+  set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardSetup.cmake")
 else()
-  string(REGEX REPLACE "^origin/(.*)$" "\\1" _branch_name ${GIT_BRANCH})
-  set(hb "refs/heads/${_branch_name}")
+  set(IS_PHABRICATOR_URL TRUE)
+  set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake?view=raw")
 endif()
-set(url "http://mitk.org/git/?p=MITK.git;a=blob_plain;f=CMake/MITKDashboardSetup.cmake;hb=${hb}")
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.setup)
 downloadFile("${url}" "${dest}")
 include(${dest})
-
-

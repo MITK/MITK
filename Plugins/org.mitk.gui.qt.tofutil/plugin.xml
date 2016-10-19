@@ -6,15 +6,15 @@
     <view id="org.mitk.views.tofutil"
           name="ToF Util"
           class="QmitkToFUtilView" 
-          icon="resources/iconToFUtilView.xpm" />
+          icon="resources/icon_tof_util.svg" />
     <view id="org.mitk.views.tofgeneration"
           name="ToF Device Generation"
           class="QmitkToFDeviceGeneration"
-          icon="resources/iconGenerationView.xpm" />
+          icon="resources/icon_tof_settings.svg" />
     <view id="org.mitk.views.tofscreenshotmaker"
           name="ToF Screenshot Maker"
           class="QmitkToFScreenshotMaker"
-          icon="resources/iconToFScrenshotMaker.xpm" />
+          icon="resources/icon_tof_screenshot.svg" />
   </extension>
 
 </plugin>

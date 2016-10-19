@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 
 #include "mitkDICOMTag.h"
+#include "mitkDICOMDatasetAccess.h"
 
 #include "MitkDICOMReaderExports.h"
 
@@ -39,7 +40,7 @@ namespace mitk
 
       mitkClassMacroItkParent( DICOMTagCache, itk::Object );
 
-      virtual std::string GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const = 0;
+      virtual DICOMDatasetFinding GetTagValue(DICOMImageFrameInfo* frame, const DICOMTag& tag) const = 0;
 
       protected:
 

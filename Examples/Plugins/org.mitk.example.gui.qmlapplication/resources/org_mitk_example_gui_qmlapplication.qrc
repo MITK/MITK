@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/document-open.svg</file>
+        <file>icons/document-print.svg</file>
+        <file>icons/document-save.svg</file>
+        <file>icons/edit-delete.svg</file>
+        <file>icons/edit-redo.svg</file>
+        <file>icons/edit-undo.svg</file>
+        <file>icons/go-bottom.svg</file>
+        <file>icons/go-down.svg</file>
+        <file>icons/go-first.svg</file>
+        <file>icons/go-home.svg</file>
+        <file>icons/go-last.svg</file>
+        <file>icons/go-next.svg</file>
+        <file>icons/go-previous.svg</file>
+        <file>icons/go-top.svg</file>
+        <file>icons/go-up.svg</file>
+        <file>icons/list-add.svg</file>
+        <file>icons/list-remove.svg</file>
+        <file>icons/media-playback-pause.svg</file>
+        <file>icons/media-playback-start.svg</file>
+        <file>icons/media-playback-stop.svg</file>
+        <file>icons/media-record.svg</file>
+        <file>icons/media-seek-backward.svg</file>
+        <file>icons/media-seek-forward.svg</file>
+        <file>icons/media-skip-backward.svg</file>
+        <file>icons/media-skip-forward.svg</file>
+        <file>icons/system-log-out.svg</file>
+        <file>icons/view-list-details.svg</file>
+        <file>icons/view-list-icons.svg</file>
+        <file>icons/view-refresh.svg</file>
+        <file>icons/datamanager.png</file>
+        <file>icons/properties.png</file>
+        <file>MitkQuickRender.qml</file>
+        <file>components/Button.qml</file>
+        <file>components/Tooltip.qml</file>
+        <file>views/Footer.qml</file>
+        <file>views/Toolbar.qml</file>
+        <file>fonts/font-awesome/fontawesome-webfont.ttf</file>
+    </qresource>
+</RCC>

@@ -55,29 +55,6 @@ QmitkIVIMView::QmitkIVIMView()
 
 QmitkIVIMView::~QmitkIVIMView()
 {
-//    QmitkStdMultiWidget* MultiWidget = this->GetActiveStdMultiWidget(false);
-
-//    if(MultiWidget)
-//    {
-//        //unregister observers when view is destroyed
-//        if( MultiWidget->mitkWidget1 != NULL && m_SliceObserverTag1 != 0)
-//        {
-//            mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget1->GetSliceNavigationController();
-//            slicer->RemoveObserver( m_SliceObserverTag1 );
-//        }
-
-//        if( MultiWidget->mitkWidget2 != NULL && m_SliceObserverTag2 != 0)
-//        {
-//            mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget2->GetSliceNavigationController();
-//            slicer->RemoveObserver( m_SliceObserverTag2 );
-//        }
-
-//        if( MultiWidget->mitkWidget3!= NULL && m_SliceObserverTag3 != 0)
-//        {
-//            mitk::SliceNavigationController* slicer = MultiWidget->mitkWidget3->GetSliceNavigationController();
-//            slicer->RemoveObserver( m_SliceObserverTag3 );
-//        }
-//    }
 }
 
 void QmitkIVIMView::CreateQtPartControl( QWidget *parent )

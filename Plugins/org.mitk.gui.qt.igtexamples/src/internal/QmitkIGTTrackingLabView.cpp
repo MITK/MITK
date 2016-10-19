@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkUpdateTimerWidget.h>
 #include <QmitkToolSelectionWidget.h>
 #include <QmitkToolTrackingStatusWidget.h>
+#include <mitkStaticIGTHelperFunctions.h>
 
 
 #include <mitkCone.h>
@@ -226,7 +227,7 @@ void QmitkIGTTrackingLabView::OnInitialRegistration()
   transform->Modified();
   transform->Update();
   //compute FRE of transform
-  double FRE = ComputeFRE(imageFiducials,trackerFiducials,transform);
+  double FRE = mitk::StaticIGTHelperFunctions::ComputeFRE(imageFiducials, trackerFiducials, transform);
   m_Controls.m_RegistrationWidget->SetQualityDisplayText("FRE: " + QString::number(FRE) + " mm");
   //#############################################################################################
 
@@ -733,24 +734,4 @@ bool QmitkIGTTrackingLabView::IsTransformDifferenceHigh(mitk::NavigationData::Po
   if(returnValue*57.3 > angularDifferenceThreshold){return true;}
 
   return false;
-}
-
-double QmitkIGTTrackingLabView::ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform)
-{
-  if(imageFiducials->GetSize() != realWorldFiducials->GetSize()) return -1;
-  double FRE = 0;
-  for(unsigned int i = 0; i < imageFiducials->GetSize(); i++)
-    {
-    itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
-    if (transform != NULL)
-      {
-      current_image_fiducial_point = transform->TransformPoint(imageFiducials->GetPoint(i)[0],imageFiducials->GetPoint(i)[1],imageFiducials->GetPoint(i)[2]);
-      }
-    double cur_error_squared = current_image_fiducial_point.SquaredEuclideanDistanceTo(realWorldFiducials->GetPoint(i));
-    FRE += cur_error_squared;
-    }
-
-  FRE = sqrt(FRE/ (double) imageFiducials->GetSize());
-
-  return FRE;
 }

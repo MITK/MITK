@@ -288,144 +288,143 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties( mitk::BaseRenderer* renderer,
   {
     ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
   }
-  else
-    if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
-    {
-      ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
-    }
+  else if(this->GetDataNode()->GetLevelWindow(levelWindow, renderer))
+  {
+    ls->m_VtkPolyDataMapper->SetScalarRange(levelWindow.GetLowerWindowBound(),levelWindow.GetUpperWindowBound());
+  }
 
-    bool scalarVisibility = false;
-    this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
-    ls->m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
+  bool scalarVisibility = false;
+  this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+  ls->m_VtkPolyDataMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
 
-    if(scalarVisibility)
-    {
-      mitk::VtkScalarModeProperty* scalarMode;
-      if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
-        ls->m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
-      else
-        ls->m_VtkPolyDataMapper->SetScalarModeToDefault();
+  if(scalarVisibility)
+  {
+    mitk::VtkScalarModeProperty* scalarMode;
+    if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
+      ls->m_VtkPolyDataMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+    else
+      ls->m_VtkPolyDataMapper->SetScalarModeToDefault();
 
-      bool colorMode = false;
-      this->GetDataNode()->GetBoolProperty("color mode", colorMode);
-      ls->m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
+    bool colorMode = false;
+    this->GetDataNode()->GetBoolProperty("color mode", colorMode);
+    ls->m_VtkPolyDataMapper->SetColorMode( (colorMode ? 1 : 0) );
 
-      double scalarsMin = 0;
-      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
+    double scalarsMin = 0;
+    this->GetDataNode()->GetDoubleProperty("ScalarsRangeMinimum", scalarsMin, renderer);
 
-      double scalarsMax = 1.0;
-      this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
+    double scalarsMax = 1.0;
+    this->GetDataNode()->GetDoubleProperty("ScalarsRangeMaximum", scalarsMax, renderer);
 
-      ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
-    }
+    ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+  }
 
-    mitk::SmartPointerProperty::Pointer imagetextureProp =
+  mitk::SmartPointerProperty::Pointer imagetextureProp =
       dynamic_cast< mitk::SmartPointerProperty * >(GetDataNode()->GetProperty("Surface.Texture", renderer));
 
-    if(imagetextureProp.IsNotNull())
+  if(imagetextureProp.IsNotNull())
+  {
+    mitk::Image* miktTexture = dynamic_cast< mitk::Image* >( imagetextureProp->GetSmartPointer().GetPointer() );
+    vtkSmartPointer<vtkTexture> vtkTxture = vtkSmartPointer<vtkTexture>::New();
+    //Either select the first slice of a volume
+    if(miktTexture->GetDimension(2) > 1)
     {
-      mitk::Image* miktTexture = dynamic_cast< mitk::Image* >( imagetextureProp->GetSmartPointer().GetPointer() );
-      vtkSmartPointer<vtkTexture> vtkTxture = vtkSmartPointer<vtkTexture>::New();
-      //Either select the first slice of a volume
-      if(miktTexture->GetDimension(2) > 1)
-      {
-        MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
-        mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
-        sliceselector->SetSliceNr(0);
-        sliceselector->SetChannelNr(0);
-        sliceselector->SetTimeNr(0);
-        sliceselector->SetInput(miktTexture);
-        sliceselector->Update();
-        vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
-      }
-      else //or just use the 2D image
-      {
-        vtkTxture->SetInputData(miktTexture->GetVtkImageData());
-      }
-      //pass the texture to the actor
-      ls->m_Actor->SetTexture(vtkTxture);
-      if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
-      {
-        MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
-      }
-      // if no texture is set, this will also remove a previously used texture
-      // and reset the actor to it's default behaviour
-    } else {
-      ls->m_Actor->SetTexture(0);
+      MITK_WARN << "3D Textures are not supported by VTK and MITK. The first slice of the volume will be used instead!";
+      mitk::ImageSliceSelector::Pointer sliceselector = mitk::ImageSliceSelector::New();
+      sliceselector->SetSliceNr(0);
+      sliceselector->SetChannelNr(0);
+      sliceselector->SetTimeNr(0);
+      sliceselector->SetInput(miktTexture);
+      sliceselector->Update();
+      vtkTxture->SetInputData(sliceselector->GetOutput()->GetVtkImageData());
     }
-
-    // deprecated settings
-    bool deprecatedUseCellData = false;
-    this->GetDataNode()->GetBoolProperty("deprecated useCellDataForColouring", deprecatedUseCellData);
-
-    bool deprecatedUsePointData = false;
-    this->GetDataNode()->GetBoolProperty("deprecated usePointDataForColouring", deprecatedUsePointData);
-
-    if (deprecatedUseCellData)
+    else //or just use the 2D image
     {
-      ls->m_VtkPolyDataMapper->SetColorModeToDefault();
-      ls->m_VtkPolyDataMapper->SetScalarRange(0,255);
-      ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
-      ls->m_VtkPolyDataMapper->SetScalarModeToUseCellData();
-      ls->m_Actor->GetProperty()->SetSpecular (1);
-      ls->m_Actor->GetProperty()->SetSpecularPower (50);
-      ls->m_Actor->GetProperty()->SetInterpolationToPhong();
+      vtkTxture->SetInputData(miktTexture->GetVtkImageData());
     }
-    else if (deprecatedUsePointData)
+    //pass the texture to the actor
+    ls->m_Actor->SetTexture(vtkTxture);
+    if(ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
     {
-      float scalarsMin = 0;
-      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
-        scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
-
-      float scalarsMax = 0.1;
-      if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
-        scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
-
-      ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
-      ls->m_VtkPolyDataMapper->SetColorModeToMapScalars();
-      ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
-      ls->m_Actor->GetProperty()->SetSpecular (1);
-      ls->m_Actor->GetProperty()->SetSpecularPower (50);
-      ls->m_Actor->GetProperty()->SetInterpolationToPhong();
+      MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
     }
+    // if no texture is set, this will also remove a previously used texture
+    // and reset the actor to it's default behaviour
+  } else {
+    ls->m_Actor->SetTexture(0);
+  }
 
-    int deprecatedScalarMode = VTK_COLOR_MODE_DEFAULT;
-    if(this->GetDataNode()->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
-    {
-      ls->m_VtkPolyDataMapper->SetScalarMode(deprecatedScalarMode);
-      ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
-      ls->m_Actor->GetProperty()->SetSpecular (1);
-      ls->m_Actor->GetProperty()->SetSpecularPower (50);
-    }
+  // deprecated settings
+  bool deprecatedUseCellData = false;
+  this->GetDataNode()->GetBoolProperty("deprecated useCellDataForColouring", deprecatedUseCellData);
 
-    // Check whether one or more ClippingProperty objects have been defined for
-    // this node. Check both renderer specific and global property lists, since
-    // properties in both should be considered.
-    const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList( renderer )->GetMap();
-    const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList( NULL )->GetMap();
+  bool deprecatedUsePointData = false;
+  this->GetDataNode()->GetBoolProperty("deprecated usePointDataForColouring", deprecatedUsePointData);
 
-    // Add clipping planes (if any)
-    ls->m_ClippingPlaneCollection->RemoveAllItems();
+  if (deprecatedUseCellData)
+  {
+    ls->m_VtkPolyDataMapper->SetColorModeToDefault();
+    ls->m_VtkPolyDataMapper->SetScalarRange(0,255);
+    ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
+    ls->m_VtkPolyDataMapper->SetScalarModeToUseCellData();
+    ls->m_Actor->GetProperty()->SetSpecular (1);
+    ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetInterpolationToPhong();
+  }
+  else if (deprecatedUsePointData)
+  {
+    float scalarsMin = 0;
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
+      scalarsMin = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
 
-    PropertyList::PropertyMap::const_iterator it;
-    for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
-    {
-      this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
-    }
+    float scalarsMax = 0.1;
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
+      scalarsMax = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
-    for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
-    {
-      this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
-    }
+    ls->m_VtkPolyDataMapper->SetScalarRange(scalarsMin,scalarsMax);
+    ls->m_VtkPolyDataMapper->SetColorModeToMapScalars();
+    ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
+    ls->m_Actor->GetProperty()->SetSpecular (1);
+    ls->m_Actor->GetProperty()->SetSpecularPower (50);
+    ls->m_Actor->GetProperty()->SetInterpolationToPhong();
+  }
 
-    if ( ls->m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
-    {
-      ls->m_VtkPolyDataMapper->SetClippingPlanes( ls->m_ClippingPlaneCollection );
-    }
-    else
-    {
-      ls->m_VtkPolyDataMapper->RemoveAllClippingPlanes();
-    }
+  int deprecatedScalarMode = VTK_COLOR_MODE_DEFAULT;
+  if(this->GetDataNode()->GetIntProperty("deprecated scalar mode", deprecatedScalarMode, renderer))
+  {
+    ls->m_VtkPolyDataMapper->SetScalarMode(deprecatedScalarMode);
+    ls->m_VtkPolyDataMapper->ScalarVisibilityOn();
+    ls->m_Actor->GetProperty()->SetSpecular (1);
+    ls->m_Actor->GetProperty()->SetSpecularPower (50);
+  }
+
+  // Check whether one or more ClippingProperty objects have been defined for
+  // this node. Check both renderer specific and global property lists, since
+  // properties in both should be considered.
+  const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList( renderer )->GetMap();
+  const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList( NULL )->GetMap();
+
+  // Add clipping planes (if any)
+  ls->m_ClippingPlaneCollection->RemoveAllItems();
+
+  PropertyList::PropertyMap::const_iterator it;
+  for ( it = rendererProperties->begin(); it != rendererProperties->end(); ++it )
+  {
+    this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
+  }
+
+  for ( it = globalProperties->begin(); it != globalProperties->end(); ++it )
+  {
+    this->CheckForClippingProperty( renderer,(*it).second.GetPointer() );
+  }
+
+  if ( ls->m_ClippingPlaneCollection->GetNumberOfItems() > 0 )
+  {
+    ls->m_VtkPolyDataMapper->SetClippingPlanes( ls->m_ClippingPlaneCollection );
+  }
+  else
+  {
+    ls->m_VtkPolyDataMapper->RemoveAllClippingPlanes();
+  }
 }
 
 vtkProp *mitk::SurfaceVtkMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
@@ -441,7 +440,7 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty( mitk::BaseRenderer* ren
   ClippingProperty *clippingProperty = dynamic_cast< ClippingProperty * >( property );
 
   if ( (clippingProperty != NULL)
-    && (clippingProperty->GetClippingEnabled()) )
+       && (clippingProperty->GetClippingEnabled()) )
   {
     const Point3D &origin = clippingProperty->GetOrigin();
     const Vector3D &normal = clippingProperty->GetNormal();

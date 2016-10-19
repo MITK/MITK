@@ -20,9 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkToolGUI::~QmitkToolGUI()
 {
-  m_ReferenceCountLock.Lock();
   m_ReferenceCount = 0; // otherwise ITK will complain in LightObject's destructor
-  m_ReferenceCountLock.Unlock();
 }
 
 void QmitkToolGUI::Register() const

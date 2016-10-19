@@ -34,7 +34,7 @@ mitk::StandaloneDataStorage::StandaloneDataStorage()
 mitk::StandaloneDataStorage::~StandaloneDataStorage()
 {
   for(AdjacencyList::iterator it = m_SourceNodes.begin();
-    it != m_SourceNodes.end(); it++)
+    it != m_SourceNodes.end(); ++it)
   {
     this->RemoveListeners(it->first);
   }
@@ -215,13 +215,13 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
   if (condition != NULL)
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); resultIt++)
+    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); ++resultIt)
       if ((*resultIt != node) && (condition->CheckNode(*resultIt) == true))
         realResultset->InsertElement(realResultset->Size(), mitk::DataNode::Pointer(const_cast<mitk::DataNode*>((*resultIt).GetPointer())));
   }
   else
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); resultIt++)
+    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); ++resultIt)
       if (*resultIt != node)
         realResultset->InsertElement(realResultset->Size(), mitk::DataNode::Pointer(const_cast<mitk::DataNode*>((*resultIt).GetPointer())));
   }

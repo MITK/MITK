@@ -27,6 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkUSControlInterfaceBMode.h"
 #include "mitkUSControlInterfaceDoppler.h"
 
+//Microservices
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usServiceProperties.h>
+#include <usModuleContext.h>
+
 #include <algorithm>
 
 //TempIncludes
@@ -35,6 +41,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string mitk::USCombinedModality::DeviceClassIdentifier = "org.mitk.modules.us.USCombinedModality";
 const char* mitk::USCombinedModality::DefaultProbeIdentifier = "default";
 const char* mitk::USCombinedModality::ProbeAndDepthSeperator = "_";
+
+const std::string mitk::USCombinedModality::US_INTERFACE_NAME = "org.mitk.services.USCombinedModality";
+const std::string mitk::USCombinedModality::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
+const std::string mitk::USCombinedModality::US_PROPKEY_CLASS = US_INTERFACE_NAME + ".class";
+const std::string mitk::USCombinedModality::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
 
 mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, NavigationDataSource::Pointer trackingDevice, std::string manufacturer, std::string model)
   : mitk::USDevice(manufacturer, model), m_UltrasoundDevice(usDevice), m_TrackingDevice(trackingDevice),
@@ -45,7 +56,7 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
 
   //create a new output (for the image data)
   mitk::Image::Pointer newOutput = mitk::Image::New();
-  this->SetNthOutput(0,newOutput);
+  this->SetNthOutput(0, newOutput);
 
   // Combined Modality should not spawn an own acquire thread, because
   // image acquiring is done by the included us device
@@ -54,6 +65,9 @@ mitk::USCombinedModality::USCombinedModality(USDevice::Pointer usDevice, Navigat
 
 mitk::USCombinedModality::~USCombinedModality()
 {
+  if (m_ServiceRegistration != nullptr)
+    m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
 }
 
 std::string mitk::USCombinedModality::GetDeviceClass()
@@ -74,7 +88,7 @@ mitk::USImageSource::Pointer mitk::USCombinedModality::GetUSImageSource()
 
 mitk::USAbstractControlInterface::Pointer mitk::USCombinedModality::GetControlInterfaceCustom()
 {
-    if (m_UltrasoundDevice.IsNull())
+  if (m_UltrasoundDevice.IsNull())
   {
     MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
     mitkThrow() << "UltrasoundDevice must not be null.";
@@ -121,7 +135,9 @@ void mitk::USCombinedModality::UnregisterOnService()
   if (m_DeviceState == State_Activated) { this->Deactivate(); }
   if (m_DeviceState == State_Connected) { this->Disconnect(); }
 
-  mitk::USDevice::UnregisterOnService();
+  if (m_ServiceRegistration != nullptr)
+    m_ServiceRegistration.Unregister();
+  m_ServiceRegistration = 0;
 }
 
 mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration()
@@ -151,7 +167,7 @@ mitk::AffineTransform3D::Pointer mitk::USCombinedModality::GetCalibration(std::s
   return calibrationIterator->second;
 }
 
-void mitk::USCombinedModality::SetCalibration (mitk::AffineTransform3D::Pointer calibration)
+void mitk::USCombinedModality::SetCalibration(mitk::AffineTransform3D::Pointer calibration)
 {
   if (calibration.IsNull())
   {
@@ -196,8 +212,8 @@ void mitk::USCombinedModality::SetNumberOfSmoothingValues(unsigned int numberOfS
   m_NumberOfSmoothingValues = numberOfSmoothingValues;
 
   // if filter should be activated or deactivated
-  if ( ( oldNumber == 0 && numberOfSmoothingValues != 0 ) ||
-    ( oldNumber != 0 && numberOfSmoothingValues == 0 ) )
+  if ((oldNumber == 0 && numberOfSmoothingValues != 0) ||
+    (oldNumber != 0 && numberOfSmoothingValues == 0))
   {
     this->RebuildFilterPipeline();
   }
@@ -210,8 +226,8 @@ void mitk::USCombinedModality::SetDelayCount(unsigned int delayCount)
   m_DelayCount = delayCount;
 
   // if filter should be activated or deactivated
-  if ( ( oldCount == 0 && delayCount != 0 ) ||
-    ( oldCount != 0 && delayCount == 0 ) )
+  if ((oldCount == 0 && delayCount != 0) ||
+    (oldCount != 0 && delayCount == 0))
   {
     this->RebuildFilterPipeline();
   }
@@ -226,7 +242,7 @@ bool mitk::USCombinedModality::OnInitialization()
     mitkThrow() << "UltrasoundDevice must not be null.";
   }
 
-  if ( m_UltrasoundDevice->GetDeviceState() < mitk::USDevice::State_Initialized )
+  if (m_UltrasoundDevice->GetDeviceState() < mitk::USDevice::State_Initialized)
   {
     return m_UltrasoundDevice->Initialize();
   }
@@ -245,7 +261,7 @@ bool mitk::USCombinedModality::OnConnection()
   }
 
   // connect ultrasound device only if it is not already connected
-  if ( m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Connected )
+  if (m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Connected)
   {
     return true;
   }
@@ -268,21 +284,21 @@ bool mitk::USCombinedModality::OnDisconnection()
 
 bool mitk::USCombinedModality::OnActivation()
 {
-  if ( m_UltrasoundDevice.IsNull() )
+  if (m_UltrasoundDevice.IsNull())
   {
     MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
     mitkThrow() << "UltrasoundDevice must not be null.";
   }
 
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-  if ( trackingDeviceSource.IsNull() )
+  if (trackingDeviceSource.IsNull())
   {
     MITK_WARN("USCombinedModality")("USDevice") << "Cannot start tracking as TrackingDeviceSource is null.";
   }
   trackingDeviceSource->StartTracking();
 
   // activate ultrasound device only if it is not already activated
-  if ( m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Activated )
+  if (m_UltrasoundDevice->GetDeviceState() >= mitk::USDevice::State_Activated)
   {
     return true;
   }
@@ -294,14 +310,14 @@ bool mitk::USCombinedModality::OnActivation()
 
 bool mitk::USCombinedModality::OnDeactivation()
 {
-  if ( m_UltrasoundDevice.IsNull() )
+  if (m_UltrasoundDevice.IsNull())
   {
     MITK_ERROR("USCombinedModality")("USDevice") << "UltrasoundDevice must not be null.";
     mitkThrow() << "UltrasoundDevice must not be null.";
   }
 
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-  if ( trackingDeviceSource.IsNull() )
+  if (trackingDeviceSource.IsNull())
   {
     MITK_WARN("USCombinedModality")("USDevice") << "Cannot stop tracking as TrackingDeviceSource is null.";
   }
@@ -315,11 +331,13 @@ bool mitk::USCombinedModality::OnDeactivation()
 void mitk::USCombinedModality::OnFreeze(bool freeze)
 {
   mitk::TrackingDeviceSource::Pointer trackingDeviceSource = dynamic_cast<mitk::TrackingDeviceSource*>(m_TrackingDevice.GetPointer());
-  if ( trackingDeviceSource.IsNull() )
-    {MITK_WARN("USCombinedModality")("USDevice") << "Cannot freeze tracking.";}
+  if (trackingDeviceSource.IsNull())
+  {
+    MITK_WARN("USCombinedModality")("USDevice") << "Cannot freeze tracking.";
+  }
   else
   {
-    if ( freeze ) { trackingDeviceSource->Freeze(); }
+    if (freeze) { trackingDeviceSource->Freeze(); }
     else { trackingDeviceSource->UnFreeze(); }
   }
 
@@ -343,38 +361,38 @@ bool mitk::USCombinedModality::GetIsCalibratedForCurrentStatus()
 
 bool mitk::USCombinedModality::GetContainsAtLeastOneCalibration()
 {
-  return ! m_Calibrations.empty();
+  return !m_Calibrations.empty();
 }
 
 void mitk::USCombinedModality::GenerateData()
 {
-  if (m_UltrasoundDevice->GetIsFreezed()) {return;} //if the image is freezed: do nothing
+  if (m_UltrasoundDevice->GetIsFreezed()) { return; } //if the image is freezed: do nothing
 
   //get next image from ultrasound image source
   mitk::Image::Pointer image = m_UltrasoundDevice->GetUSImageSource()->GetNextImage();
 
-  if ( image.IsNull() || ! image->IsInitialized() ) //check the image
-    {
+  if (image.IsNull() || !image->IsInitialized()) //check the image
+  {
     MITK_WARN << "Invalid image in USCombinedModality, aborting!";
     return;
-    }
+  }
 
   //get output and initialize it if it wasn't initialized before
   mitk::Image::Pointer output = this->GetOutput();
-  if ( ! output->IsInitialized() ) { output->Initialize(image); }
+  if (!output->IsInitialized()) { output->Initialize(image); }
 
   //now update image data
-  mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0,0,0));
+  mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(0, 0, 0));
   output->SetSlice(inputReadAccessor.GetData()); //copy image data
   output->GetGeometry()->SetSpacing(image->GetGeometry()->GetSpacing()); //copy spacing because this might also change
 
   //and update calibration (= transformation of the image)
   std::string calibrationKey = this->GetIdentifierForCurrentCalibration();
-  if ( ! calibrationKey.empty() )
+  if (!calibrationKey.empty())
   {
     std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator calibrationIterator
       = m_Calibrations.find(calibrationKey);
-    if ( calibrationIterator != m_Calibrations.end())
+    if (calibrationIterator != m_Calibrations.end())
     {
       // transform image according to callibration if one is set
       // for current configuration of probe and depth
@@ -429,21 +447,21 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
 
   // Parse Input
   TiXmlDocument doc;
-  if(!doc.Parse(xmlString.c_str()))
+  if (!doc.Parse(xmlString.c_str()))
   {
     MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     mitkThrow() << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
     return;
   }
   TiXmlElement* root = doc.FirstChildElement();
-  if(root == NULL)
+  if (root == NULL)
   {
     MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
     mitkThrow() << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
     return;
   }
   // Read Calibrations
-  for(TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+  for (TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
   {
     mitk::AffineTransform3D::MatrixType matrix;
     mitk::AffineTransform3D::OffsetType translation;
@@ -485,7 +503,7 @@ std::string mitk::USCombinedModality::GetIdentifierForCurrentProbe()
   us::ServiceProperties usdeviceProperties = m_UltrasoundDevice->GetServiceProperties();
 
   us::ServiceProperties::const_iterator probeIt = usdeviceProperties.find(
-        mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
+    mitk::USCombinedModality::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED);
 
   // get probe identifier from control interface for probes
   std::string probeName = mitk::USCombinedModality::DefaultProbeIdentifier;
@@ -525,7 +543,7 @@ void mitk::USCombinedModality::RebuildFilterPipeline()
 {
   m_LastFilter = m_TrackingDevice;
 
-  if ( m_NumberOfSmoothingValues > 0 )
+  if (m_NumberOfSmoothingValues > 0)
   {
     for (unsigned int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
     {
@@ -534,7 +552,7 @@ void mitk::USCombinedModality::RebuildFilterPipeline()
     m_LastFilter = m_SmoothingFilter;
   }
 
-  if ( m_DelayCount > 0 )
+  if (m_DelayCount > 0)
   {
     for (unsigned int i = 0; i < m_TrackingDevice->GetNumberOfOutputs(); i++)
     {
@@ -542,4 +560,22 @@ void mitk::USCombinedModality::RebuildFilterPipeline()
     }
     m_LastFilter = m_DelayFilter;
   }
+}
+
+void mitk::USCombinedModality::RegisterAsMicroservice()
+{
+  //Get Context
+  us::ModuleContext* context = us::GetModuleContext();
+
+  //Define ServiceProps
+  us::ServiceProperties props;
+  mitk::UIDGenerator uidGen =
+    mitk::UIDGenerator("org.mitk.services.USCombinedModality", 16);
+  props[US_PROPKEY_ID] = uidGen.GetUID();
+  props[US_PROPKEY_DEVICENAME] = this->GetName();
+  props[US_PROPKEY_CLASS] = this->GetDeviceClass();
+
+  m_ServiceProperties = props;
+
+  m_ServiceRegistration = context->RegisterService(this, props);
 }

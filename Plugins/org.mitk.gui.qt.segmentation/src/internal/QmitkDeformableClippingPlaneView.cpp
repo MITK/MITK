@@ -258,7 +258,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 
 void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 {
-  this->DeactivateInteractionButtons();
+ this->DeactivateInteractionButtons();
   //the new clipping plane
   mitk::Surface::Pointer plane = mitk::Surface::New();
   mitk::Image::Pointer referenceImage = mitk::Image::New();
@@ -294,8 +294,11 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
         for (mitk::DataStorage::SetOfObjects::ConstIterator itChildNodes = childNodes->Begin();
           itChildNodes != childNodes->End(); itChildNodes++)
         {
-          if (itChildNodes.Value().IsNotNull())
-            createSurfaceFromImage=false;
+          if (itChildNodes.Value().IsNotNull() && itChildNodes->Value()->GetName().compare(m_ReferenceNode->GetName()) == 0)
+          {
+            createSurfaceFromImage = false;
+            itChildNodes.Value()->SetVisibility(true);
+          }
         }
 
         if(createSurfaceFromImage)

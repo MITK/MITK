@@ -16,6 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFiducialRegistrationWidget.h"
 
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkAppendPolyData.h>
+#include <vtkPoints.h>
+#include <vtkLandmarkTransform.h>
+#include <mitkStaticIGTHelperFunctions.h>
+
 
 #define FRW_LOG MITK_INFO("Fiducial Registration Widget")
 #define FRW_WARN MITK_WARN("Fiducial Registration Widget")
@@ -32,6 +39,13 @@ QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent
 QmitkFiducialRegistrationWidget::~QmitkFiducialRegistrationWidget()
 {
   m_Controls = NULL;
+
+  //clean up data nodes
+  if (m_DataStorage.IsNotNull())
+  {
+    if (m_ImageFiducialsNode.IsNotNull()) m_DataStorage->Remove(m_ImageFiducialsNode);
+    if (m_TrackerFiducialsNode.IsNotNull()) m_DataStorage->Remove(m_TrackerFiducialsNode);
+  }
 }
 
 
@@ -57,8 +71,10 @@ void QmitkFiducialRegistrationWidget::CreateQtPartControl(QWidget *parent)
 void QmitkFiducialRegistrationWidget::CreateConnections()
 {
   connect( (QObject*)(m_Controls->m_AddTrackingFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedTrackingFiducial()) );
+  connect((QObject*)(m_Controls->m_AddTrackingFiducialBtn), SIGNAL(clicked()), this, SLOT(AddTrackerPoint()));
   connect( (QObject*)(m_Controls->m_AddImageFiducialBtn), SIGNAL(clicked()), this, SIGNAL(AddedImageFiducial()) );
   connect( (QObject*)(m_Controls->m_RegisterFiducialsBtn), SIGNAL(clicked()), this, SIGNAL(PerformFiducialRegistration()) );
+  connect((QObject*)(m_Controls->m_RegisterFiducialsBtn), SIGNAL(clicked()), this, SLOT(Register()));
   connect( (QObject*)(m_Controls->m_UseICPRegistration), SIGNAL(toggled(bool)), this, SIGNAL(FindFiducialCorrespondences(bool)) );
 
   //unselects the edit button of the other widget if one is selected
@@ -128,7 +144,7 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Poi
   m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == NULL)
   {
-    FRW_WARN<< "stdMultiWidget is NULL";
+    MITK_DEBUG<< "stdMultiWidget is NULL";
     return;
   }
   m_Controls->m_RegistrationImagePoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
@@ -144,7 +160,7 @@ void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::P
   m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == NULL)
   {
-    FRW_WARN<< "stdMultiWidget is NULL";
+    MITK_DEBUG<< "stdMultiWidget is NULL";
     return;
   }
   m_Controls->m_RegistrationTrackingPoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
@@ -247,4 +263,142 @@ void QmitkFiducialRegistrationWidget::SetTargetLandmarkName(QString targetLandma
   buttonText.append(targetLandmarkName);
   buttonText.append(" Landmark");
   m_Controls->m_AddTrackingFiducialBtn->setText(buttonText);
+}
+
+void QmitkFiducialRegistrationWidget::setImageNode(mitk::DataNode::Pointer i)
+{
+  m_ImageNode = i;
+}
+
+void QmitkFiducialRegistrationWidget::setTrackerNavigationData(mitk::NavigationData::Pointer t)
+{
+  m_TrackerNavigationData = t;
+}
+
+void QmitkFiducialRegistrationWidget::setDataStorage(mitk::DataStorage::Pointer d)
+{
+  m_DataStorage = d;
+
+  mitk::DataNode::Pointer ImageFiducialsNode = mitk::DataNode::New();
+  mitk::PointSet::Pointer imagePointSet = mitk::PointSet::New();
+  ImageFiducialsNode->SetData(imagePointSet);
+  ImageFiducialsNode->SetName("Image Point Set");
+  m_DataStorage->Add(ImageFiducialsNode);
+  this->SetImageFiducialsNode(ImageFiducialsNode);
+  m_ImageFiducialsNode = ImageFiducialsNode;
+
+  mitk::DataNode::Pointer TrackerFiducialsNode = mitk::DataNode::New();
+  mitk::PointSet::Pointer trackerPointSet = mitk::PointSet::New();
+  TrackerFiducialsNode->SetData(trackerPointSet);
+  TrackerFiducialsNode->SetName("Tracker Point Set");
+  m_DataStorage->Add(TrackerFiducialsNode);
+  this->SetTrackerFiducialsNode(TrackerFiducialsNode);
+  m_TrackerFiducialsNode = TrackerFiducialsNode;
+}
+
+void QmitkFiducialRegistrationWidget::AddTrackerPoint()
+{
+  if (m_DataStorage.IsNull()) { return ; } //here the widget should simply do nothing (for backward compatibility)
+  else if (m_TrackerNavigationData.IsNull() || m_TrackerFiducialsNode.IsNull()) { MITK_WARN << "Tracker node not correctly initialized"; return; }
+  mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsNode->GetData());
+  ps->InsertPoint(ps->GetSize(), m_TrackerNavigationData->GetPosition());
+}
+
+bool QmitkFiducialRegistrationWidget::CheckRegistrationInitialization()
+{
+  if (m_DataStorage.IsNull()) { return false; } //here the widget should simply do nothing (for backward compatibility)
+  else if (m_ImageNode.IsNull() ||
+      m_ImageFiducialsNode.IsNull() ||
+      m_TrackerFiducialsNode.IsNull()
+      ) {MITK_WARN << "Registration not correctly initialized"; return false;}
+  else {return true;}
+}
+
+void QmitkFiducialRegistrationWidget::Register()
+{
+  //Check for initialization
+  if (!CheckRegistrationInitialization()) return;
+
+  /* retrieve fiducials */
+  mitk::PointSet::Pointer imageFiducials = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsNode->GetData());
+  mitk::PointSet::Pointer trackerFiducials = dynamic_cast<mitk::PointSet*>(m_TrackerFiducialsNode->GetData());
+  if (trackerFiducials->GetSize() != imageFiducials->GetSize())
+  {
+    MITK_WARN << "Not the same number of fiducials, cannot register";
+    return;
+  }
+  else if (trackerFiducials->GetSize() < 3)
+  {
+    MITK_WARN << "Need at least 3 fiducials, cannot register";
+    return;
+  }
+
+  //############### conversion to vtk data types (we will use the vtk landmark based transform) ##########################
+  //convert point sets to vtk poly data
+  vtkSmartPointer<vtkPoints> sourcePoints = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkPoints> targetPoints = vtkSmartPointer<vtkPoints>::New();
+  for (int i = 0; i<imageFiducials->GetSize(); i++)
+  {
+    double point[3] = { imageFiducials->GetPoint(i)[0], imageFiducials->GetPoint(i)[1], imageFiducials->GetPoint(i)[2] };
+    sourcePoints->InsertNextPoint(point);
+    double point_targets[3] = { trackerFiducials->GetPoint(i)[0], trackerFiducials->GetPoint(i)[1], trackerFiducials->GetPoint(i)[2] };
+    targetPoints->InsertNextPoint(point_targets);
+  }
+
+  //########################### here, the actual transform is computed ##########################
+  //compute transform
+  vtkSmartPointer<vtkLandmarkTransform> transform = vtkSmartPointer<vtkLandmarkTransform>::New();
+  transform->SetSourceLandmarks(sourcePoints);
+  transform->SetTargetLandmarks(targetPoints);
+  transform->SetModeToRigidBody();
+  transform->Modified();
+  transform->Update();
+  //compute FRE of transform
+
+  double FRE = mitk::StaticIGTHelperFunctions::ComputeFRE(imageFiducials, trackerFiducials, transform);
+  this->SetQualityDisplayText("FRE: " + QString::number(FRE) + " mm");
+
+  //#############################################################################################
+
+  //############### conversion back to itk/mitk data types ##########################
+  //convert from vtk to itk data types
+  itk::Matrix<float, 3, 3> rotationFloat = itk::Matrix<float, 3, 3>();
+  itk::Vector<float, 3> translationFloat = itk::Vector<float, 3>();
+  itk::Matrix<double, 3, 3> rotationDouble = itk::Matrix<double, 3, 3>();
+  itk::Vector<double, 3> translationDouble = itk::Vector<double, 3>();
+
+  vtkSmartPointer<vtkMatrix4x4> m = transform->GetMatrix();
+  for (int k = 0; k<3; k++) for (int l = 0; l<3; l++)
+  {
+    rotationFloat[k][l] = m->GetElement(k, l);
+    rotationDouble[k][l] = m->GetElement(k, l);
+
+  }
+  for (int k = 0; k<3; k++)
+  {
+    translationFloat[k] = m->GetElement(k, 3);
+    translationDouble[k] = m->GetElement(k, 3);
+  }
+  //create affine transform 3D surface
+  mitk::AffineTransform3D::Pointer mitkTransform = mitk::AffineTransform3D::New();
+  mitkTransform->SetMatrix(rotationDouble);
+  mitkTransform->SetOffset(translationDouble);
+  //#############################################################################################
+
+  //############### object is transformed ##########################
+  //save transform
+  m_T_ObjectReg = mitk::NavigationData::New(mitkTransform); // this is stored in a member because it is needed for permanent registration later on
+
+  //transform surface/image
+
+  //first we have to store the original ct image transform to compose it with the new transform later
+  mitk::AffineTransform3D::Pointer imageTransform = m_ImageNode->GetData()->GetGeometry()->GetIndexToWorldTransform();
+  imageTransform->Compose(mitkTransform);
+  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
+  itk::Matrix<mitk::ScalarType, 3, 3> rotationFloatNew = imageTransform->GetMatrix();
+  itk::Vector<mitk::ScalarType, 3> translationFloatNew = imageTransform->GetOffset();
+  newImageTransform->SetMatrix(rotationFloatNew);
+  newImageTransform->SetOffset(translationFloatNew);
+  m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+
 }

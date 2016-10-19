@@ -80,18 +80,13 @@ mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Di
 
 mitk::Image::~Image()
 {
-  Clear();
-  m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 3;
-  m_ReferenceCountLock.Unlock();
-  m_ReferenceCountLock.Lock();
-  m_ReferenceCount = 0;
-  m_ReferenceCountLock.Unlock();
-  if(m_OffsetTable != nullptr)
-    delete [] m_OffsetTable;
+  this->Clear();
 
-  if(m_ImageStatistics != nullptr)
-    delete m_ImageStatistics;
+  m_ReferenceCount = 3;
+  m_ReferenceCount = 0;
+
+  delete [] m_OffsetTable;
+  delete m_ImageStatistics;
 }
 
 const mitk::PixelType mitk::Image::GetPixelType(int n) const
@@ -1214,9 +1209,9 @@ void mitk::Image::SetGeometry(BaseGeometry* aGeometry3D)
 
 void mitk::Image::PrintSelf(std::ostream& os, itk::Indent indent) const
 {
-  unsigned char i;
   if(m_Initialized)
   {
+    unsigned char i;
     os << indent << " Dimension: " << m_Dimension << std::endl;
     os << indent << " Dimensions: ";
     for(i=0; i < m_Dimension; ++i)

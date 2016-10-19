@@ -368,7 +368,7 @@ mitk::EquiDistantBlocksSorter
     bool fileFitsIntoPattern(false);
     std::string thisOriginString;
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
-    thisOriginString = (*dsIter)->GetTagValueAsString( tagImagePositionPatient );
+    thisOriginString = (*dsIter)->GetTagValueAsString(tagImagePositionPatient).value;
 
     if (thisOriginString.empty())
     {
@@ -442,7 +442,7 @@ mitk::EquiDistantBlocksSorter
 
         Vector3D right; right.Fill(0.0);
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
-        std::string orientationValue = (*dsIter)->GetTagValueAsString( tagImageOrientation );
+        std::string orientationValue = (*dsIter)->GetTagValueAsString( tagImageOrientation ).value;
         DICOMStringToOrientationVectors( orientationValue, right, up, ignoredConversionError );
 
         GantryTiltInformation tiltInfo( lastDifferentOrigin, thisOrigin, right, up, 1 );
@@ -557,9 +557,9 @@ mitk::EquiDistantBlocksSorter
       DICOMDatasetAccess* lastDataset = datasets.back();
       unsigned int numberOfSlicesApart = datasets.size() - 1;
 
-      std::string orientationString = firstDataset->GetTagValueAsString( tagImageOrientation );
-      std::string firstOriginString = firstDataset->GetTagValueAsString( tagImagePositionPatient );
-      std::string lastOriginString = lastDataset->GetTagValueAsString( tagImagePositionPatient );
+      std::string orientationString = firstDataset->GetTagValueAsString( tagImageOrientation ).value;
+      std::string firstOriginString = firstDataset->GetTagValueAsString( tagImagePositionPatient ).value;
+      std::string lastOriginString = lastDataset->GetTagValueAsString( tagImagePositionPatient ).value;
 
       result.FlagGantryTilt( GantryTiltInformation::MakeFromTagValues( firstOriginString, lastOriginString, orientationString, numberOfSlicesApart ));
     }

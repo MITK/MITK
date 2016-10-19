@@ -199,12 +199,6 @@ mitk::AffineTransform3D::Pointer m_T_ImageGeo;
 mitk::NavigationData::Pointer m_ObjectmarkerNavigationDataLastUpdate; ///< this is the position of the object marker from the last call of update(); it is used to check the difference and decide if the visualization must be updated
 
 //######################## some internal help methods ############################
-/** @brief Computes the fiducial registration error out of two sets of fiducials.
- *  The two sets must have the same size and the points must correspond to each other.
- *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
- *  @return                 Returns the FRE. Returns -1 if there was an error.
- */
-double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
 /**
 * Checks if the difference between two given transformations is high which means the method returns
 * true if the difference exeeds the given position and angular threshold.

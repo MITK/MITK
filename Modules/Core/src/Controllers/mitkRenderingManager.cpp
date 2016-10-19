@@ -34,6 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent)
+
   RenderingManager::Pointer RenderingManager::s_Instance = 0;
   RenderingManagerFactory *RenderingManager::s_RenderingManagerFactory = 0;
 
@@ -806,7 +808,7 @@ namespace mitk
       m_DataStorage = storage;
 
       RenderingManager::RenderWindowVector::const_iterator iter;
-      for (iter = m_AllRenderWindows.cbegin(); iter < m_AllRenderWindows.cend(); iter++)
+      for (iter = m_AllRenderWindows.cbegin(); iter < m_AllRenderWindows.cend(); ++iter)
       {
         mitk::BaseRenderer::GetInstance((*iter))->SetDataStorage(m_DataStorage.GetPointer());
       }
@@ -820,13 +822,17 @@ namespace mitk
 
   void RenderingManager::SetRenderWindowFocus(vtkRenderWindow *focusWindow)
   {
-    if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
+    if (focusWindow != m_FocusedRenderWindow)
     {
-      m_FocusedRenderWindow = focusWindow;
-      return;
-    }
+      if (!focusWindow || (m_RenderWindowList.find(focusWindow) != m_RenderWindowList.cend()))
+      {
+        m_FocusedRenderWindow = focusWindow;
+        this->InvokeEvent(FocusChangedEvent());
+        return;
+      }
 
-    MITK_ERROR << "Tried to set a RenderWindow that does not exist.";
+      MITK_ERROR << "Tried to set a RenderWindow that does not exist.";
+    }
   }
 
   // Create and register generic RenderingManagerFactory.

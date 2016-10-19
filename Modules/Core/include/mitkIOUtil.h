@@ -423,13 +423,6 @@ public:
    */
   DEPRECATED(static bool SavePointSet(mitk::PointSet::Pointer pointset, const std::string& path));
 
-  /** @deprecatedSince{2014_10} */
-  DEPRECATED(static const std::string DEFAULTIMAGEEXTENSION);
-  /** @deprecatedSince{2014_10} */
-  DEPRECATED(static const std::string DEFAULTSURFACEEXTENSION);
-  /** @deprecatedSince{2014_10} */
-  DEPRECATED(static const std::string DEFAULTPOINTSETEXTENSION);
-
 protected:
 
   struct ReaderOptionsFunctorBase

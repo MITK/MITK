@@ -721,6 +721,11 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
   newNode->SetVisibility(false);
   m_Controls.m_cbVolumeRendering->setChecked(false);
   //TODO disable slider etc...
+
+  if (m_RegionGrow3DTool.IsNotNull())
+  {
+    m_RegionGrow3DTool->ConfirmSegmentation();
+  }
 }
 
 template<typename TPixel, unsigned int VImageDimension>

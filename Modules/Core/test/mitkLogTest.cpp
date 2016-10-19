@@ -76,6 +76,7 @@ mitkTestLoggingThread(itk::MultiThreader::Pointer MultiThreader)
   ThreadID = -1;
   NumberOfMessages = 0;
   m_MultiThreader = MultiThreader;
+  LoggingRunning = true;
   }
 
 bool LoggingRunning;
@@ -158,7 +159,7 @@ static void TestSimpleLog()
       MITK_ERROR << "Test error stream.";
       MITK_FATAL << "Test fatal stream.";
       }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
       {
       testSucceded = false;
       }
@@ -186,7 +187,7 @@ static void TestObjectInfoLogging()
       MITK_INFO << testStringStream.str();
       MITK_INFO << testMitkPoint;
       }
-    catch(mitk::Exception e)
+    catch(mitk::Exception &e)
       {
       testSucceded = false;
       }
@@ -252,7 +253,7 @@ static void TestThreadSaveLog(bool toFile)
         }
 
       }
-    catch(std::exception e)
+    catch(std::exception &e)
       {
         MITK_ERROR << "exception during 'TestThreadSaveLog': "<<e.what();
         testSucceded = false;

@@ -103,6 +103,8 @@ protected:
 
   bool CheckFigureIsDeletable( const InteractionEvent* interactionEvent );
 
+  bool CheckFigureIsEditable( const InteractionEvent* interactionEvent );
+
 
   ////////  Actions ////////
 
@@ -121,6 +123,8 @@ protected:
   void EndHovering( StateMachineAction*, InteractionEvent* interactionEvent );
 
   void DeleteFigure( StateMachineAction*, InteractionEvent* interactionEvent );
+
+  void PerformPointResetOnSelect( StateMachineAction*, InteractionEvent* interactionEvent );
 
   void SetPreviewPointPosition( StateMachineAction*, InteractionEvent* interactionEvent );
 

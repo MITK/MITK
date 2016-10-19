@@ -39,13 +39,13 @@ bool mitk::USVideoDeviceCustomControls::GetIsActive()
 void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::USImageCropping newArea)
 {
   MITK_INFO << "Set Crop Area L:" << newArea.left << " R:" << newArea.right
-            << " T:" << newArea.top << " B:" << newArea.bottom;
+    << " T:" << newArea.top << " B:" << newArea.bottom;
 
   if (m_ImageSource.IsNotNull())
   {
     // if area is empty, remove region
-    if((newArea.bottom==0) && (newArea.top==0)&&
-      (newArea.left==0) && (newArea.right==0))
+    if ((newArea.bottom == 0) && (newArea.top == 0) &&
+      (newArea.left == 0) && (newArea.right == 0))
     {
       m_ImageSource->RemoveRegionOfInterest();
     }
@@ -60,8 +60,37 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
   }
 }
 
+void mitk::USVideoDeviceCustomControls::SetNewDepth(double depth)
+{
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH, depth);
+}
+
+void mitk::USVideoDeviceCustomControls::SetNewProbeIdentifier(std::string probename)
+{
+  m_Device->UpdateServiceProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_PROBES_SELECTED, probename);
+}
+
 mitk::USImageVideoSource::USImageCropping mitk::USVideoDeviceCustomControls::GetCropArea()
 {
   // just return the crop area set at the image source
   return m_ImageSource->GetCropping();
+}
+
+std::vector<mitk::USProbe::Pointer> mitk::USVideoDeviceCustomControls::GetProbes()
+{
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  return device->GetAllProbes();
+}
+
+std::vector<int> mitk::USVideoDeviceCustomControls::GetDepthsForProbe(std::string name)
+{
+  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
+  mitk::USProbe::Pointer probe = device->GetProbeByName(name);
+  std::map<int, mitk::Vector3D> depthsAndSpacings = probe->GetDepthsAndSpacing();
+  std::vector<int> depths;
+  for (std::map<int, mitk::Vector3D>::iterator it = depthsAndSpacings.begin(); it != depthsAndSpacings.end(); it++)
+  {
+    depths.push_back((it->first));
+  }
+  return depths;
 }

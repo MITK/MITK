@@ -158,8 +158,6 @@ int testAddPlanePosition()
 
 int testGetPlanePosition()
 {
-    mitk::PlaneGeometry* plane;
-    mitk::RestorePlanePositionOperation* op;
     bool error(true);
 
     MITK_TEST_OUTPUT(<<"Starting Test: ######### G e t P l a n e P o s i t i o n #########");
@@ -167,8 +165,8 @@ int testGetPlanePosition()
     //Testing for existing planepositions
     for (unsigned int i = 0; i < m_Geometries.size(); ++i)
     {
-        plane = m_Geometries.at(i);
-        op = m_Service->GetPlanePosition(i);
+        auto plane = m_Geometries.at(i);
+        auto op = m_Service->GetPlanePosition(i);
         error = ( !mitk::Equal(op->GetHeight(),plane->GetExtent(1)) ||
                   !mitk::Equal(op->GetWidth(),plane->GetExtent(0)) ||
                   !mitk::Equal(op->GetSpacing(),plane->GetSpacing()) ||
@@ -208,9 +206,8 @@ int testRemovePlanePosition()
     MITK_TEST_OUTPUT(<<"Starting Test: ######### R e m o v e P l a n e P o s i t i o n #########");
     unsigned int size = m_Service->GetNumberOfPlanePositions();
 
-    bool removed (true);
     //Testing for invalid IDs
-    removed = m_Service->RemovePlanePosition( -1 );
+    bool removed = m_Service->RemovePlanePosition( -1 );
     removed = m_Service->RemovePlanePosition( 1000000 );
     unsigned int size2 = m_Service->GetNumberOfPlanePositions();
 

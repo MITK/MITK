@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkUSNavigationStepMarkerIntervention</class>
+ <widget class="QWidget" name="QmitkUSNavigationStepMarkerIntervention">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>369</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="bodyMarkerTrackingStatusLabel">
+     <property name="styleSheet">
+      <string notr="true">
+              background-color: #ff7878; margin-right: 1em; margin-left: 1em;
+              border: 1px solid grey
+            </string>
+     </property>
+     <property name="text">
+      <string>Body marker is not inside the tracking volume.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="planningLiveViewSwitchButton">
+     <property name="text">
+      <string>Show Planning Zones</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="targetStructuresRangeGroupBox">
+     <property name="title">
+      <string>Distance to Current Target</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <item>
+       <layout class="QVBoxLayout" name="targetStructuresRangeLayout"/>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="targetReachedButtonsLayout">
+          <item>
+           <widget class="QPushButton" name="backToLastTargetButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Back to Last Target</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../resources/USNavigation.qrc">
+              <normaloff>:/USNavigation/go-previous.png</normaloff>:/USNavigation/go-previous.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="targetReachedButton">
+            <property name="text">
+             <string>Target Reached</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../resources/USNavigation.qrc">
+              <normaloff>:/USNavigation/accept.png</normaloff>:/USNavigation/accept.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After the target was reached you can now mark the actual position of the implant. Freeze the image and then click on the center of the implant.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QmitkUSNavigationFreezeButton" name="freezeImageButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="riskStructuresRangeGroupBox">
+     <property name="title">
+      <string>Distances to Risk Structures</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QmitkUSNavigationZoneDistancesWidget" name="riskStructuresRangeWidget" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="placementQualityGroupBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Placement Quality</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="centersOfMassLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Centers of Mass Distances:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="angleDifferenceLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Mean Angle Difference:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="centersOfMassValue">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="angleDifferenceValue">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkUSNavigationZoneDistancesWidget</class>
+   <extends>QWidget</extends>
+   <header>src/internal/Widgets/QmitkUSNavigationZoneDistancesWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkUSNavigationFreezeButton</class>
+   <extends>QPushButton</extends>
+   <header>src/internal/Widgets/QmitkUSNavigationFreezeButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../../../resources/USNavigation.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>planningLiveViewSwitchButton</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>QmitkUSNavigationStepMarkerIntervention</receiver>
+   <slot>OnShowPlanningView(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>199</x>
+     <y>41</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>135</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OnShowPlanningView(bool)</slot>
+  <slot>OnFreeze(bool)</slot>
+ </slots>
+</ui>

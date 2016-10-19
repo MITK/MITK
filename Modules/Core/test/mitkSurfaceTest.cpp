@@ -49,7 +49,6 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->Delete();
   MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData()!= nullptr, "Testing set vtkPolyData");
 
-  cloneSurface= nullptr;
   cloneSurface = surface->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneSurface->GetVtkPolyData()!= nullptr, "Testing set vtkPolyData of cloned surface!");
   cloneSurface = nullptr;
@@ -132,7 +131,6 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
 
   inputTimeGeometry = surface->GetUpdatedTimeGeometry();
   time = 3;
-  timestep=0;
 
   timestep = inputTimeGeometry->TimePointToTimeStep( time );
   MITK_TEST_CONDITION_REQUIRED(time == timestep, "Explicitly changing the data of timestep 3 and checking for timebounds correctness of surface's geometry again!");

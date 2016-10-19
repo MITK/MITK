@@ -109,6 +109,8 @@ namespace mitk
      */
     mitk::DataStorage* GetDataStorage();
 
+    void ConfirmSegmentation();
+
 
   protected:
 

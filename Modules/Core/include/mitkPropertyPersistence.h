@@ -28,14 +28,19 @@ namespace mitk
     PropertyPersistence();
     ~PropertyPersistence();
 
+    typedef IPropertyPersistence::InfoMapType InfoMapType;
+
     bool AddInfo(const std::string& propertyName, PropertyPersistenceInfo::Pointer info, bool overwrite) override;
-    PropertyPersistenceInfo::Pointer GetInfo(const std::string& propertyName) override;
-    bool HasInfo(const std::string& propertyName) override;
+    InfoMapType GetInfos(const std::string& propertyName) override;
+    InfoMapType GetInfosByKey(const std::string& persistenceKey) override;
+    PropertyPersistenceInfo::Pointer GetInfo(const std::string& propertyName, const MimeTypeNameType& mime, bool allowWildCard) override;
+    bool HasInfos(const std::string& propertyName) override;
     void RemoveAllInfos() override;
-    void RemoveInfo(const std::string& propertyName) override;
+    void RemoveInfos(const std::string& propertyName) override;
+    void RemoveInfos(const std::string& propertyName, const MimeTypeNameType& mime) override;
 
   private:
-    typedef std::map<std::string, PropertyPersistenceInfo::Pointer> InfoMap;
+    typedef std::multimap<const std::string, PropertyPersistenceInfo::Pointer> InfoMap;
     typedef InfoMap::const_iterator InfoMapConstIterator;
     typedef InfoMap::iterator InfoMapIterator;
 
@@ -44,6 +49,9 @@ namespace mitk
 
     InfoMap m_Infos;
   };
+
+  /**Creates an unmanaged (!) instance of PropertyPersistence for testing purposes.*/
+  MITKCORE_EXPORT IPropertyPersistence* CreateTestInstancePropertyPersistence();
 }
 
 #endif

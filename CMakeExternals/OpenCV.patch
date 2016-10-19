@@ -1,0 +1,31 @@
+--- OpenCV-2.4.11/cmake/OpenCVModule.cmake	2015-02-25 13:10:31.000000000 +0100
++++ opencv/cmake/OpenCVModule.cmake	2015-03-06 13:05:45.000000000 +0100
+@@ -521,7 +521,7 @@
+     ocv_include_directories(${OPENCL_INCLUDE_DIRS})
+     add_custom_command(
+       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.hpp"
+-      COMMAND ${CMAKE_COMMAND} -DCL_DIR="${CMAKE_CURRENT_SOURCE_DIR}/src/opencl" -DOUTPUT="${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" -P "${OpenCV_SOURCE_DIR}/cmake/cl2cpp.cmake"
++      COMMAND ${CMAKE_COMMAND} -DCL_DIR=${CMAKE_CURRENT_SOURCE_DIR}/src/opencl -DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp -P ${OpenCV_SOURCE_DIR}/cmake/cl2cpp.cmake
+       DEPENDS ${cl_kernels} "${OpenCV_SOURCE_DIR}/cmake/cl2cpp.cmake")
+     source_group("OpenCL" FILES ${cl_kernels} "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.hpp")
+     list(APPEND lib_srcs ${cl_kernels} "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.cpp" "${CMAKE_CURRENT_BINARY_DIR}/opencl_kernels.hpp")
+--- OpenCV-2.4.11/cmake/templates/OpenCVConfig.cmake.in	2015-02-25 13:10:31.000000000 +0100
++++ opencv/cmake/templates/OpenCVConfig.cmake.in	2015-03-06 13:08:56.000000000 +0100
+@@ -120,7 +120,7 @@
+
+ # Provide the include directories to the caller
+ set(OpenCV_INCLUDE_DIRS @OpenCV_INCLUDE_DIRS_CONFIGCMAKE@)
+-include_directories(${OpenCV_INCLUDE_DIRS})
++# include_directories(${OpenCV_INCLUDE_DIRS})
+
+ # ======================================================
+ # Link directories to add to the user project:
+@@ -153,7 +153,7 @@
+ # ==============================================================
+ SET(OpenCV2_INCLUDE_DIRS @OpenCV2_INCLUDE_DIRS_CONFIGCMAKE@)
+ if(OpenCV2_INCLUDE_DIRS)
+-  include_directories(${OpenCV2_INCLUDE_DIRS})
++  # include_directories(${OpenCV2_INCLUDE_DIRS})
+   list(APPEND OpenCV_INCLUDE_DIRS ${OpenCV2_INCLUDE_DIRS})
+
+   set(OpenCV_ADD_DEBUG_RELEASE @OpenCV_ADD_DEBUG_RELEASE_CONFIGCMAKE@)

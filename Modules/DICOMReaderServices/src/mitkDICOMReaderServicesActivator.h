@@ -18,24 +18,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDICOMREADERSERVICESACTIVATOR_H
 
 #include <usModuleActivator.h>
+#include <usServiceEvent.h>
 
 #include <memory>
 
 namespace mitk {
 
 struct IFileReader;
+class IDICOMTagsOfInterest;
 
 class DICOMReaderServicesActivator : public us::ModuleActivator
 {
 public:
 
-  void Load(us::ModuleContext*context) override;
+  void Load(us::ModuleContext* context) override;
   void Unload(us::ModuleContext* context) override;
+
+  void AliasServiceChanged(const us::ServiceEvent event);
 
 private:
 
   std::unique_ptr<IFileReader> m_AutoSelectingDICOMReader;
   std::unique_ptr<IFileReader> m_ClassicDICOMSeriesReader;
+  std::unique_ptr<IDICOMTagsOfInterest> m_DICOMTagsOfInterestService;
+
+  us::ModuleContext* mitkContext;
+
 };
 
 }

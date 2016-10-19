@@ -6,6 +6,7 @@ else()
 endif(USE_ITKZLIB)
 
 MITK_CREATE_MODULE(DEPENDS MitkCore
+                   PACKAGE_DEPENDS PRIVATE ITK|ITKIOImageBase
                    ADDITIONAL_LIBS ${_additional_libs}
                    WARNINGS_AS_ERRORS
                   )

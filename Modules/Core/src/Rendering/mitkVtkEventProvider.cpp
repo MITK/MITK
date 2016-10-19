@@ -104,7 +104,7 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
     vtkRenderWindowInteractor *i = this->Interactor;
 
     InteractionEventsVectorType::iterator it;
-    for(it = m_InteractionEventsVector.begin(); it != m_InteractionEventsVector.end(); it++)
+    for(it = m_InteractionEventsVector.begin(); it != m_InteractionEventsVector.end(); ++it)
     {
       // add observer to interactorStyle
       i->GetInteractorStyle()->AddObserver((vtkCommand::EventIds) (*it), this->EventCallbackCommand,

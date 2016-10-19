@@ -66,7 +66,7 @@ protected slots:
 private:
 
   class Impl;
-  std::auto_ptr<Impl> d;
+  std::unique_ptr<Impl> d;
 };
 
 #endif

@@ -256,6 +256,7 @@ public:
    * Default return value is false. Subclasses can overwrite this method and
    * execute any reset / initialization statements required. */
   virtual bool ResetOnPointSelect();
+  virtual bool ResetOnPointSelectNeeded() const;
 
   /** \brief removes the point with the given index from the list of controlpoints. */
   virtual void RemoveControlPoint( unsigned int index );

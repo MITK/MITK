@@ -216,7 +216,7 @@ class Law
 
    public:
 
-     Law(const std::string law) : m_Description(law)
+     Law(const std::string& law) : m_Description(law)
      { }
 
      std::string GetDescription() const

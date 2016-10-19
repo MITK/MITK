@@ -61,6 +61,7 @@ int mitkTextOverlay3DColorRenderingTest(int argc, char* argv[])
       pointset->InsertPoint(i, point);
       textOverlay3D->SetText("A Point");
       textOverlay3D->SetColor(1,0,0);
+      textOverlay3D->SetFontSize(1);
 
       // The Position is set to the point coordinate to create an annotation to the point in the PointSet.
       textOverlay3D->SetPosition3D(point);

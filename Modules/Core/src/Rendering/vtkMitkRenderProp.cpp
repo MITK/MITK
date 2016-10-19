@@ -78,7 +78,7 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
 {
   typedef std::map<int,mitk::Mapper*> MappersMapType;
   const MappersMapType mappersMap = m_VtkPropRenderer->GetMappersMap();
-  for(MappersMapType::const_iterator it = mappersMap.cbegin(); it != mappersMap.cend(); it++)
+  for(MappersMapType::const_iterator it = mappersMap.cbegin(); it != mappersMap.cend(); ++it)
   {
     mitk::Mapper * mapper = (*it).second;
 

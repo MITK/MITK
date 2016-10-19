@@ -4,16 +4,15 @@ MITK Rendering with QML prototype
 Summary
 ------------------
 
-This mini-application "QuickRender" demonstrates how to possibly build a Qt5 QML based
+This mini-application "QuickRender" demonstrates how to build a Qt5 QML based
 application that integrates MITK render windows.
 
-The `QuickRender` application is located in `Examples/QuickRender`
- - it provides no "File/Open" dialog
- - should be called with a file loadable by MITK, e.g. a 3D ![NRRD file](http://mitk.org/git/?p=MITK-Data.git;a=blob_plain;f=Pic3D.nrrd;hb=HEAD)
-
-`./QuickRender ~/NRRD-testimages/nrrd3dblock.nrrd`
-
-![Screenshot](http://maleike.github.io/MITK/quickrender.png)
+The `QuickRender` application is located in `Examples/QuickRender.
+The following plugins are showcased in a QtQuick environment:
+ - DataManager
+ - Level/Window
+ - Transfer Function
+ - Image Navigator
 
 Interaction:
  - mouse clicks place the cross-hair
@@ -21,28 +20,33 @@ Interaction:
  - holding the right mouse button and moving up/down changes the zoom level
  - holding the middle mouse button and mosing pans the scene (only when zoomed in)
 
+ ![Screenshot](Screenshot.png=640x)
+
 Code Changes
 ------------------
 
-A new module QmlMitk provides
- - class `QmlMitkRenderWindowItem`: provides functionality like `QmitkRenderWindowm` based on `QVTKQuickItem` (from ![OpenView](https://github.com/Kitware/openview))
- - class `QmlMitkFourRenderWindowWidget`: simplified replacement for `QmitkStdMultiWidget`, a minimal combination of four `QmlMitkFourRenderWindowWidget`s
- - a Qt 5, QtQuick dependency
+- added class `QmlMitkStdMultiItem`, which replaces the `QmlMitkFourRenderWindowWidget`
+  - different approach to register QmlMitkRenderWindowItems
+  - resembles more the QmitkStdMultiWidget (e.g. storing planes...)
+  - added the respective qml file: MitkStdMultiItem.qml
+- update class `QmlMitkRenderWindowItem`:
+  - removed interaction legacy
+  - updated interactions
+- `QVTKQuickItem` now uses framebuffer objects to render external OpenGL context
 
 Build Instructions
 ------------------
 
- - build Qt 5.1
- - place the Qt 5.1 qmake application in your environment `PATH`
+ - - install Qt 5.5
  - build MITK superbuild with
    - `MITK_BUILD_EXAMPLES` variable switched to `ON`
-   - advanced option `MITK_USE_CTK` switched to `OFF`
-   - `MITK_USE_BLUEBERRY` and `MITK_USE_QT` switched to `OFF` (MITK_USE_QT finds Qt 5)
+   - `MITK_USE_QT` switched to `ON`
+   - `DESIRED_QT_VERSION` to `5`
+   - `MITK_USE_CTK` switched to `ON`
+   - `MITK_USE_BLUEBERRY` switched to `ON`
 
 Open Issues
 ------------------
 
- - Build system integration of Qt 5 dependency
- - Build system integration of OpenView package
+ - threading issue, since QtQuick's scene graph rendering will happen on a dedicated render thread
  - cleaner, fuller interfaces for the two new widgets
- - real solution for QmlMitkBigRenderLock

@@ -127,7 +127,7 @@ protected:
     LocalFile& operator=(const LocalFile& other);
 
     struct Impl;
-    std::auto_ptr<Impl> d;
+    std::unique_ptr<Impl> d;
   };
 
   /**
@@ -224,7 +224,7 @@ private:
   virtual mitk::IFileWriter* Clone() const = 0;
 
   class Impl;
-  std::auto_ptr<Impl> d;
+  std::unique_ptr<Impl> d;
 };
 
 } // namespace mitk

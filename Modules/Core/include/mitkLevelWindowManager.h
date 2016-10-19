@@ -131,6 +131,7 @@ namespace mitk
     ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer IDs to every layer property of DataNode�s BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode3; ///< map to hold observer IDs to every Image Rendering.Mode property of DataNode�s BaseProperty
     ObserverToPropertyMap        m_PropObserverToNode4; ///< map to hold observer IDs to every Image.Displayed Component property of DataNode�s BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode5; ///< map to hold observer IDs to every image for level window property of DataNode�s BaseProperty
 
     void UpdateObservers();                             ///< updates the internal observer list. Ignores nodes which are marked to be deleted in the variable m_NodeMarkedToDelete
     void ClearPropObserverLists();                      ///< internal help method to clear both lists/maps.
@@ -143,6 +144,7 @@ namespace mitk
     unsigned long                m_PropertyModifiedTag;
     Image*                 m_CurrentImage;
     bool                         m_IsPropertyModifiedTagSet;
+    bool                         m_SettingImgForLvlWinProp;
   };
 }
 #endif

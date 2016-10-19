@@ -48,7 +48,7 @@ mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetInstance(vtkRenderWindow * renWin)
 {
-  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); mapit++)
+  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
   {
     if ((*mapit).first == renWin)
       return (*mapit).second;
@@ -76,7 +76,7 @@ void mitk::BaseRenderer::RemoveInstance(vtkRenderWindow* renWin)
 
 mitk::BaseRenderer* mitk::BaseRenderer::GetByName(const std::string& name)
 {
-  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); mapit++)
+  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
   {
     if ((*mapit).second->m_Name == name)
       return (*mapit).second;
@@ -86,7 +86,7 @@ mitk::BaseRenderer* mitk::BaseRenderer::GetByName(const std::string& name)
 
 vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName(const std::string& name)
 {
-  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); mapit++)
+  for (BaseRendererMapType::iterator mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
   {
     if ((*mapit).second->m_Name == name)
       return (*mapit).first;
@@ -237,7 +237,7 @@ void mitk::BaseRenderer::RemoveAllLocalStorages()
   this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
 
   std::list<mitk::BaseLocalStorageHandler*>::iterator it;
-  for (it = m_RegisteredLocalStorageHandlers.begin(); it != m_RegisteredLocalStorageHandlers.end(); it++)
+  for (it = m_RegisteredLocalStorageHandlers.begin(); it != m_RegisteredLocalStorageHandlers.end(); ++it)
     (*it)->ClearLocalStorage(this, false);
   m_RegisteredLocalStorageHandlers.clear();
 }

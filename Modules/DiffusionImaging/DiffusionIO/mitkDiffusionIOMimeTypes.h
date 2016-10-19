@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKDIFFUSIONIOMIMETYPES_H
 
 #include "mitkCustomMimeType.h"
-#include <MitkDiffusionIOExports.h>
 
 #include <string>
 
@@ -28,7 +27,7 @@ class DiffusionIOMimeTypes
 {
 public:
 
-  class MITKDIFFUSIONIO_EXPORT DiffusionImageNrrdMimeType : public CustomMimeType
+  class  DiffusionImageNrrdMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNrrdMimeType();
@@ -36,7 +35,7 @@ public:
     virtual DiffusionImageNrrdMimeType* Clone() const override;
   };
 
-  class MITKDIFFUSIONIO_EXPORT DiffusionImageNiftiMimeType : public CustomMimeType
+  class  DiffusionImageNiftiMimeType : public CustomMimeType
   {
   public:
     DiffusionImageNiftiMimeType();

@@ -97,17 +97,14 @@ public:
     mitk::BaseGeometry::Pointer base = dynamic_cast < mitk::BaseGeometry* > ( plane.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("Planegeometry should be castable to BaseGeometry", base.IsNotNull());
 
-    base = nullptr;
     g3d = mitk::Geometry3D::New();
     base = dynamic_cast < mitk::BaseGeometry* > ( g3d.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("Geometry3D should be castable to BaseGeometry", base.IsNotNull());
 
-    g3d=nullptr;
     mitk::SlicedGeometry3D::Pointer sliced = mitk::SlicedGeometry3D::New();
     g3d = dynamic_cast < mitk::Geometry3D* > ( sliced.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("SlicedGeometry3D should not be castable to Geometry3D", g3d.IsNull());
 
-    plane=nullptr;
     mitk::ThinPlateSplineCurvedGeometry::Pointer thin = mitk::ThinPlateSplineCurvedGeometry::New();
     plane = dynamic_cast < mitk::PlaneGeometry* > ( thin.GetPointer() );
     CPPUNIT_ASSERT_MESSAGE("AbstractTransformGeometry should be castable to PlaneGeometry", plane.IsNotNull());

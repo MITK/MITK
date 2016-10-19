@@ -1,0 +1,20 @@
+/**
+
+\page TroubleshootingPage Troubleshooting
+
+<ul>
+
+<li> NOTE: In case of errors such as:
+
+\code{.cpp}
+!1.132! WARNING: QmitkSliceWidget data is not an image!
+!1.150! WARNING: QmitkSliceWidget data is not an image!
+\endcode
+
+make sure your working directory is set correctly. This is especially an issue when directly running the application from the IDE. It should be set to:
+
+$MITK_ROOT_DIRECTORY/build/MITK-build/bin </li>
+
+</ul>
+
+*/

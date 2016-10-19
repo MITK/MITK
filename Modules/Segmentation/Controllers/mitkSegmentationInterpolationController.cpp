@@ -54,6 +54,17 @@ void mitk::SegmentationInterpolationController::Activate2DInterpolation(bool sta
   m_2DInterpolationActivated = status;
 }
 
+mitk::SegmentationInterpolationController* mitk::SegmentationInterpolationController::GetInstance()
+{
+  static mitk::SegmentationInterpolationController::Pointer m_Instance;
+
+  if ( m_Instance.IsNull() )
+  {
+    m_Instance = SegmentationInterpolationController::New();
+  }
+  return m_Instance;
+}
+
 mitk::SegmentationInterpolationController::~SegmentationInterpolationController()
 {
   // remove this from the list of interpolators

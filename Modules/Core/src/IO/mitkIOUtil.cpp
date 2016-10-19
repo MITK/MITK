@@ -282,10 +282,6 @@ static char* mkdtemps_compat(char* tmpl, int suffixlen)
 
 namespace mitk {
 
-const std::string IOUtil::DEFAULTIMAGEEXTENSION = ".nrrd";
-const std::string IOUtil::DEFAULTSURFACEEXTENSION = ".stl";
-const std::string IOUtil::DEFAULTPOINTSETEXTENSION = ".mps";
-
 struct IOUtil::Impl
 {
   struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
@@ -929,7 +925,7 @@ std::string IOUtil::Save(const BaseData* data, const std::string& mimeTypeName, 
   // Add an extension if not already specified
   if (ext.empty() && addExtension)
   {
-    ext = saveInfo.m_MimeType.GetExtensions().empty() ? std::string() : "." + saveInfo.m_MimeType.GetExtensions().front();
+    saveInfo.m_MimeType.GetExtensions().empty() ? std::string() : "." + saveInfo.m_MimeType.GetExtensions().front();
   }
 
   std::vector<SaveInfo> infos;

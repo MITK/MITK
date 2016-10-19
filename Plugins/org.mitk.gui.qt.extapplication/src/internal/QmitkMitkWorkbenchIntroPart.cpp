@@ -39,8 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
 
-#include <QWebView>
-#include <QWebPage>
+#include <QWebEngineView>
+#include <QWebEnginePage>
 #include <QUrlQuery>
 
 #include <QString>
@@ -53,6 +53,81 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkExtApplicationPlugin.h"
 #include "mitkDataStorageEditorInput.h"
 #include <string>
+
+namespace
+{
+  class QmitkWebEnginePage final : public QWebEnginePage
+  {
+  public:
+    explicit QmitkWebEnginePage(QmitkMitkWorkbenchIntroPart* introPart, QObject* parent = nullptr);
+    ~QmitkWebEnginePage();
+
+  private:
+    bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override;
+
+    QmitkMitkWorkbenchIntroPart* m_IntroPart;
+  };
+
+  QmitkWebEnginePage::QmitkWebEnginePage(QmitkMitkWorkbenchIntroPart* introPart, QObject* parent)
+    : QWebEnginePage(parent),
+      m_IntroPart(introPart)
+  {
+  }
+
+  QmitkWebEnginePage::~QmitkWebEnginePage()
+  {
+  }
+
+  bool QmitkWebEnginePage::acceptNavigationRequest(const QUrl& url, NavigationType, bool)
+  {
+    QString scheme = url.scheme();
+
+    if (scheme.contains("mitk"))
+    {
+      if (url.path().isEmpty())
+        return false;
+
+      if (url.host().contains("perspectives"))
+      {
+        QString id = url.path().simplified().replace("/", "");
+
+        auto introSite = m_IntroPart->GetIntroSite();
+        auto workbenchWindow = introSite->GetWorkbenchWindow();
+        auto workbench = workbenchWindow->GetWorkbench();
+
+        workbench->ShowPerspective(id, workbenchWindow);
+
+        auto context = QmitkExtApplicationPlugin::GetDefault()->GetPluginContext();
+        auto serviceReference = context->getServiceReference<mitk::IDataStorageService>();
+
+        mitk::IDataStorageService* service = serviceReference
+          ? context->getService<mitk::IDataStorageService>(serviceReference)
+          : nullptr;
+
+        if (service)
+        {
+          berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(service->GetActiveDataStorage()));
+
+          auto page = introSite->GetPage();
+          auto editorPart = page->FindEditor(editorInput);
+
+          if (editorPart.IsNotNull())
+            page->Activate(editorPart);
+        }
+      }
+    }
+    else if (scheme.contains("http"))
+    {
+      QDesktopServices::openUrl(url);
+    }
+    else
+    {
+      return true;
+    }
+
+    return false;
+  }
+}
 
 QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
   : m_Controls(nullptr)
@@ -91,7 +166,6 @@ QmitkMitkWorkbenchIntroPart::~QmitkMitkWorkbenchIntroPart()
 
 }
 
-
 void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
 {
   if (!m_Controls)
@@ -100,8 +174,10 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
-    m_view = new QWebView(parent);
-    m_view->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    m_view = new QWebEngineView(parent);
+
+    auto page = new QmitkWebEnginePage(this, parent);
+    m_view->setPage(page);
 
     QUrl urlQtResource(QString("qrc:/org.mitk.gui.qt.welcomescreen/mitkworkbenchwelcomeview.html"),  QUrl::TolerantMode );
     m_view->load( urlQtResource );
@@ -114,83 +190,12 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
 
 void QmitkMitkWorkbenchIntroPart::CreateConnections()
 {
-  if ( m_Controls )
-  {
-    connect( m_view, SIGNAL(linkClicked(const QUrl& )), this, SLOT(DelegateMeTo(const QUrl& )) );
-  }
 }
-
-
-void QmitkMitkWorkbenchIntroPart::DelegateMeTo(const QUrl& showMeNext)
-{
-  QString scheme          = showMeNext.scheme();
-  QByteArray urlHostname  = QUrl::toAce(showMeNext.host());
-  QByteArray urlPath      = showMeNext.path().toLatin1();
-  QUrlQuery query(showMeNext);
-  QByteArray dataset      = query.queryItemValue("dataset").toLatin1();
-  QByteArray clear        = query.queryItemValue("clear").toLatin1();//showMeNext.encodedQueryItemValue("clear");
-
-  if (scheme.isEmpty()) MITK_INFO << " empty scheme of the to be delegated link" ;
-
-  // if the scheme is set to mitk, it is to be tested which action should be applied
-  if (scheme.contains(QString("mitk")) )
-  {
-    if(urlPath.isEmpty() ) MITK_INFO << " mitk path is empty " ;
-
-    // searching for the perspective keyword within the host name
-    if(urlHostname.contains(QByteArray("perspectives")) )
-    {
-      // the simplified method removes every whitespace
-      // ( whitespace means any character for which the standard C++ isspace() method returns true)
-      urlPath = urlPath.simplified();
-      QString tmpPerspectiveId(urlPath.data());
-      tmpPerspectiveId.replace(QString("/"), QString("") );
-      QString perspectiveId  = tmpPerspectiveId;
-
-      // is working fine as long as the perspective id is valid, if not the application crashes
-      GetIntroSite()->GetWorkbenchWindow()->GetWorkbench()->ShowPerspective(perspectiveId, GetIntroSite()->GetWorkbenchWindow() );
-
-      // search the Workbench for opened StdMultiWidgets to ensure the focus does not stay on the welcome screen and is switched to
-      // a render window editor if one available
-      ctkPluginContext* context = QmitkExtApplicationPlugin::GetDefault()->GetPluginContext();
-      mitk::IDataStorageService* service = nullptr;
-      ctkServiceReference serviceRef = context->getServiceReference<mitk::IDataStorageService>();
-      if (serviceRef) service = context->getService<mitk::IDataStorageService>(serviceRef);
-      if (service)
-      {
-        berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput( service->GetActiveDataStorage() ));
-
-        // search for opened StdMultiWidgetEditors
-        berry::IEditorPart::Pointer editorPart = GetIntroSite()->GetPage()->FindEditor( editorInput );
-
-        // if an StdMultiWidgetEditor open was found, give focus to it
-        if(editorPart)
-        {
-          GetIntroSite()->GetPage()->Activate( editorPart );
-        }
-      }
-    }
-  }
-  // if the scheme is set to http, by default no action is performed, if an external webpage needs to be
-  // shown it should be implemented below
-  else if (scheme.contains(QString("http")) )
-  {
-    QDesktopServices::openUrl(showMeNext);
-//    m_view->load( ) ;
-  }
-  else if(scheme.contains("qrc"))
-  {
-    m_view->load(showMeNext);
-  }
-
-}
-
 
 void QmitkMitkWorkbenchIntroPart::StandbyStateChanged(bool /*standby*/)
 {
 
 }
-
 
 void QmitkMitkWorkbenchIntroPart::SetFocus()
 {

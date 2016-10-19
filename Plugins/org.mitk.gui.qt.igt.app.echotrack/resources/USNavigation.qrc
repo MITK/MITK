@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/USNavigation">
+        <file>go-next.png</file>
+        <file>go-previous.png</file>
+        <file>zoom-in.png</file>
+        <file>zoom-out.png</file>
+        <file>plus.png</file>
+        <file>minus.png</file>
+        <file>restart.png</file>
+        <file>star.png</file>
+        <file>preferences.png</file>
+        <file>document-open.png</file>
+        <file>document-save.png</file>
+        <file>system-lock-screen.png</file>
+        <file>accept.png</file>
+        <file>process-stop.png</file>
+        <file>record.png</file>
+        <file>record-gray.png</file>
+    </qresource>
+</RCC>

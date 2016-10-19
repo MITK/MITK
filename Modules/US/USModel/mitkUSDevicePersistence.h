@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKUSDevicePersistence_H_HEADER_INCLUDED_
 #define MITKUSDevicePersistence_H_HEADER_INCLUDED_
 
 // MITK
 #include <mitkCommon.h>
 #include <mitkUSVideoDevice.h>
+#include <mitkUSProbe.h>
 
 // ITK
 #include <itkObjectFactory.h>
@@ -28,39 +28,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 // QT
 #include <QSettings>
 
-
 namespace mitk {
+  /**Documentation
+  * TODO
+  */
 
-    /**Documentation
-    * TODO
-    */
-
-   class USDevicePersistence : public itk::Object
-    {
-    public:
-      mitkClassMacroItkParent(USDevicePersistence, itk::Object);
-      itkFactorylessNewMacro(Self)
+  class USDevicePersistence : public itk::Object
+  {
+  public:
+    mitkClassMacroItkParent(USDevicePersistence, itk::Object);
+    itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
       void StoreCurrentDevices();
 
-      std::vector<mitk::USDevice::Pointer> RestoreLastDevices();
+    std::vector<mitk::USDevice::Pointer> RestoreLastDevices();
 
-    protected:
+  protected:
 
-      USDevicePersistence();
-      virtual ~USDevicePersistence(){}
+    USDevicePersistence();
+    virtual ~USDevicePersistence(){}
 
-      QString USVideoDeviceToString(mitk::USVideoDevice::Pointer d);
-      mitk::USVideoDevice::Pointer StringToUSVideoDevice(QString s);
+    QString USVideoDeviceToString(mitk::USVideoDevice::Pointer d);
+    mitk::USVideoDevice::Pointer StringToUSVideoDevice(QString s);
+    QString USProbeToString(mitk::USProbe::Pointer p);
+    mitk::USProbe::Pointer StringToUSProbe(std::string s);
 
-      QSettings m_devices;
+    QSettings m_devices;
 
-      void split(std::string& text, std::string& separators, std::vector<std::string>& words);
-
-
-    };
+    void split(std::string& text, std::string& separators, std::vector<std::string>& words);
+    double spacingToDouble(std::string s);
+    int depthToInt(std::string s);
+  };
 } // namespace mitk
-
 
 #endif

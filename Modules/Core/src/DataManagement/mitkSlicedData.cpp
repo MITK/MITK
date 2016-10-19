@@ -346,13 +346,11 @@ void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 
   assert(timeGeometry!=nullptr);
 
-  mitk::SlicedGeometry3D* slicedGeometry;
-
   unsigned int steps = timeGeometry->CountTimeSteps();
 
   for(unsigned int timestep = 0; timestep < steps; ++timestep)
   {
-    slicedGeometry = GetSlicedGeometry(timestep);
+    mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(timestep);
     if(slicedGeometry != nullptr)
     {
       slicedGeometry->SetSpacing(aSpacing);

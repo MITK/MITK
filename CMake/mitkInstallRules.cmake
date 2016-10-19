@@ -46,6 +46,9 @@ if(MACOSX_BUNDLE_NAMES)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/libqsqlite.dylib"
             DESTINATION "${bundle_name}.app/Contents/MacOS/sqldrivers"
             CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/iconengines/libqsvgicon.dylib"
+            DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
+            CONFIGURATIONS Release)
   endforeach()
 endif()
 
@@ -63,6 +66,10 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Release)
+    MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
+    install(DIRECTORY "${_qmake_path}/../resources/"
+            DESTINATION "bin/resources/"
+            CONFIGURATIONS Release)
     install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
             DESTINATION "bin/plugins/platforms"
             CONFIGURATIONS Debug)
@@ -71,6 +78,9 @@ if(WIN32)
             CONFIGURATIONS Debug)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
             DESTINATION "bin/plugins/imageformats"
+            CONFIGURATIONS Debug)
+    install(DIRECTORY "${_qmake_path}/../resources/"
+            DESTINATION "bin/resources/"
             CONFIGURATIONS Debug)
   endif()
 

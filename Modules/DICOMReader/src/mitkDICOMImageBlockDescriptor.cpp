@@ -300,7 +300,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetPixelSpacing() const
   }
 
   static const DICOMTag tagPixelSpacing( 0x0028, 0x0030 );
-  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing );
+  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing ).value;
 }
 
 std::string mitk::DICOMImageBlockDescriptor::GetImagerPixelSpacing() const
@@ -312,7 +312,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetImagerPixelSpacing() const
   }
 
   static const DICOMTag tagImagerPixelSpacing( 0x0018, 0x1164 );
-  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing );
+  return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing ).value;
 }
 
 void mitk::DICOMImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX,
@@ -529,7 +529,7 @@ std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUID() const
   if ( !m_ImageFrameList.empty() && m_TagCache.IsNotNull() )
   {
     static const DICOMTag tagSOPClassUID( 0x0008, 0x0016 );
-    return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID );
+    return m_TagCache->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID ).value;
   }
   else
   {
@@ -563,6 +563,24 @@ std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUIDAsName() const
     return std::string( "" );
   }
 }
+
+int mitk::DICOMImageBlockDescriptor::GetNumberOfTimeSteps() const
+{
+  int result = 1;
+  this->m_PropertyList->GetIntProperty("timesteps", result);
+
+  return result;
+};
+
+int mitk::DICOMImageBlockDescriptor::GetNumberOfFramesPerTimeStep() const
+{
+  const int numberOfTimesteps = this->GetNumberOfTimeSteps();
+  int numberOfFramesPerTimestep = this->m_ImageFrameList.size() / numberOfTimesteps;
+  assert(int(double((double)this->m_ImageFrameList.size() / (double)numberOfTimesteps))
+    == numberOfFramesPerTimestep); // this should hold
+
+  return numberOfFramesPerTimestep;
+};
 
 
 void mitk::DICOMImageBlockDescriptor::SetTagCache( DICOMTagCache* privateCache )
@@ -654,7 +672,7 @@ void mitk::DICOMImageBlockDescriptor::Print(std::ostream& os, bool filenameDetai
   \
 {                                                                     \
     const DICOMTag t( tag_g, tag_e );                                      \
-    const std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ); \
+    const std::string tagValue = m_TagCache->GetTagValue( firstFrame, t ).value; \
     const_cast<DICOMImageBlockDescriptor*>( this )                         \
       ->SetProperty( #tag_name, StringProperty::New( tagValue ) );         \
   \
@@ -664,8 +682,8 @@ void mitk::DICOMImageBlockDescriptor::Print(std::ostream& os, bool filenameDetai
   \
 {                                                                          \
     const DICOMTag t( tag_g, tag_e );                                           \
-    const std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ); \
-    const std::string tagValueLast  = m_TagCache->GetTagValue( lastFrame, t );  \
+    const std::string tagValueFirst = m_TagCache->GetTagValue( firstFrame, t ).value; \
+    const std::string tagValueLast  = m_TagCache->GetTagValue( lastFrame, t ).value;  \
     const_cast<DICOMImageBlockDescriptor*>( this )                              \
       ->SetProperty( #tag_name "First", StringProperty::New( tagValueFirst ) ); \
     const_cast<DICOMImageBlockDescriptor*>( this )                              \
@@ -727,20 +745,29 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
     const DICOMTag tagInstanceNumber( 0x0020, 0x0013 );
     const DICOMTag tagSOPInstanceNumber( 0x0008, 0x0018 );
 
-    std::unordered_map<const char*, StringLookupTable> additionalTagResultList;
+    std::unordered_map<const char*, DICOMCachedValueLookupTable> additionalTagResultList;
 
 
-    unsigned int slice( 0 );
+    unsigned int slice(0);
+    int timePoint(-1);
+    unsigned int zSlice(0);
+    const int framesPerTimeStep = this->GetNumberOfFramesPerTimeStep();
     for ( auto frameIter = m_ImageFrameList.begin(); frameIter != m_ImageFrameList.end();
           ++slice, ++frameIter )
     {
-      const std::string sliceLocation = m_TagCache->GetTagValue( *frameIter, tagSliceLocation );
+      zSlice = slice%framesPerTimeStep;
+      if ( zSlice == 0)
+      {
+        timePoint++;
+      }
+
+      const std::string sliceLocation = m_TagCache->GetTagValue( *frameIter, tagSliceLocation ).value;
       sliceLocationForSlices.SetTableValue( slice, sliceLocation );
 
-      const std::string instanceNumber = m_TagCache->GetTagValue( *frameIter, tagInstanceNumber );
+      const std::string instanceNumber = m_TagCache->GetTagValue( *frameIter, tagInstanceNumber ).value;
       instanceNumberForSlices.SetTableValue( slice, instanceNumber );
 
-      const std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber );
+      const std::string sopInstanceUID = m_TagCache->GetTagValue( *frameIter, tagSOPInstanceNumber ).value;
       SOPInstanceUIDForSlices.SetTableValue( slice, sopInstanceUID );
 
       const std::string filename = ( *frameIter )->Filename;
@@ -751,8 +778,12 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
       for ( auto iter = m_AdditionalTagList.cbegin(); iter != m_AdditionalTagList.cend(); ++iter )
       {
-        const std::string value = m_TagCache->GetTagValue( *frameIter, iter->second );
-        additionalTagResultList[iter->first].SetTableValue( slice, value );
+        const DICOMDatasetFinding finding = m_TagCache->GetTagValue( *frameIter, iter->second );
+        if (finding.isValid)
+        {
+          DICOMCachedValueInfo info{ static_cast<unsigned int>(timePoint), zSlice, finding.value };
+          additionalTagResultList[iter->first].SetTableValue(slice, info);
+        }
       }
     }
     // add property or properties with proper names
@@ -779,22 +810,28 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
 
 mitk::BaseProperty::Pointer
-  mitk::DICOMImageBlockDescriptor::GetPropertyForDICOMValues( const StringLookupTable& stringLookupTable )
+mitk::DICOMImageBlockDescriptor::GetPropertyForDICOMValues(const DICOMCachedValueLookupTable& cacheLookupTable)
 {
-  const auto& lookupTable = stringLookupTable.GetLookupTable();
-  typedef std::pair<int, std::string> PairType;
+  const auto& lookupTable = cacheLookupTable.GetLookupTable();
+  typedef std::pair<int, DICOMCachedValueInfo> PairType;
   if ( std::adjacent_find(
          lookupTable.cbegin(),
          lookupTable.cend(),
-         []( const PairType& lhs, const PairType& rhs ) { return lhs.second != rhs.second; } )
+         []( const PairType& lhs, const PairType& rhs ) { return lhs.second.Value != rhs.second.Value; } )
        == lookupTable.cend() )
   {
     return static_cast<mitk::BaseProperty::Pointer>(
-      mitk::StringProperty::New( stringLookupTable.GetTableValue( 0 ) ).GetPointer() );
+      mitk::StringProperty::New(cacheLookupTable.GetTableValue(0).Value).GetPointer());
+  }
+
+  StringLookupTable stringTable;
+  for (auto element : lookupTable)
+  {
+    stringTable.SetTableValue(element.first, element.second.Value);
   }
 
   return static_cast<mitk::BaseProperty::Pointer>(
-    mitk::StringLookupTableProperty::New( stringLookupTable ).GetPointer() );
+    mitk::StringLookupTableProperty::New(stringTable).GetPointer());
 }
 
 

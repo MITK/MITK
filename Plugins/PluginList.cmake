@@ -39,6 +39,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.properties:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicom:OFF
+  org.mitk.gui.qt.dicominspector:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.geometrytools:OFF
@@ -68,6 +69,8 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.volumevisualization:OFF
   org.mitk.gui.qt.eventrecorder:OFF
   org.mitk.gui.qt.xnat:OFF
+  org.mitk.gui.qt.igt.app.echotrack:OFF
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
+  org.mitk.gui.qt.overlaymanager:OFF
 )

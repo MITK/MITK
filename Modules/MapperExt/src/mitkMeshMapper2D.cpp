@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
-const float selectedColor[]={1.0,0.0,0.6}; //for selected!
+const float selectedColor[] = {1.0f, 0.0f, 0.6f}; //for selected!
 
 mitk::MeshMapper2D::MeshMapper2D()
 {

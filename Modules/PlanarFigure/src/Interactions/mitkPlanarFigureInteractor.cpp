@@ -58,6 +58,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("reset_on_point_select_needed", CheckResetOnPointSelect);
   CONNECT_CONDITION("points_can_be_added_or_removed", CheckFigureIsExtendable);
   CONNECT_CONDITION("figure_can_be_deleted", CheckFigureIsDeletable);
+  CONNECT_CONDITION("figure_is_editable", CheckFigureIsEditable);
 
 
   CONNECT_FUNCTION( "finalize_figure", FinalizeFigure);
@@ -76,6 +77,7 @@ void mitk::PlanarFigureInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION( "start_hovering", StartHovering )
   CONNECT_FUNCTION( "end_hovering", EndHovering );
   CONNECT_FUNCTION( "delete_figure", DeleteFigure );
+  CONNECT_FUNCTION( "reset_on_point_select", PerformPointResetOnSelect );
 }
 
 bool mitk::PlanarFigureInteractor::CheckFigurePlaced( const InteractionEvent* /*interactionEvent*/ )
@@ -200,6 +202,15 @@ void mitk::PlanarFigureInteractor::DeleteFigure( StateMachineAction*, Interactio
   interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
 }
 
+
+void mitk::PlanarFigureInteractor::PerformPointResetOnSelect( StateMachineAction*,
+                                                              InteractionEvent* )
+{
+  mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
+  planarFigure->ResetOnPointSelect();
+}
+
+
 bool mitk::PlanarFigureInteractor::CheckMinimalFigureFinished( const InteractionEvent* /*interactionEvent*/ )
 {
   const mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
@@ -227,6 +238,14 @@ bool mitk::PlanarFigureInteractor::CheckFigureIsDeletable(const InteractionEvent
   GetDataNode()->GetBoolProperty("planarfigure.isdeletable", isDeletable);
 
   return isDeletable;
+}
+
+bool mitk::PlanarFigureInteractor::CheckFigureIsEditable(const InteractionEvent* /*interactionEvent*/)
+{
+  bool isEditable( true );
+  GetDataNode()->GetBoolProperty("planarfigure.iseditable", isEditable);
+
+  return isEditable;
 }
 
 
@@ -662,8 +681,11 @@ bool mitk::PlanarFigureInteractor::CheckResetOnPointSelect( const InteractionEve
 {
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>( GetDataNode()->GetData() );
 
+  bool isEditable = true;
+  GetDataNode()->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
   // Reset the PlanarFigure if required
-  return planarFigure->ResetOnPointSelect();
+  return isEditable && planarFigure->ResetOnPointSelectNeeded();
 }
 
 

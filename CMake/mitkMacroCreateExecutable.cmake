@@ -79,7 +79,7 @@ macro(mitk_create_executable)
       add_dependencies(${MODULE_TARGET} ${CMAKE_PROJECT_NAME}-autoload)
     endif()
 
-    # Create batch files for Windows platforms
+    # Create batch and VS user files for Windows platforms
     if(WIN32)
       set(_batch_file_in "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_TARGET}.bat.in")
       if(NOT EXISTS "${_batch_file_in}")
@@ -98,6 +98,9 @@ macro(mitk_create_executable)
              )
         endforeach()
       endif()
+      mitkFunctionConfigureVisualStudioUserProjectFile(
+          NAME ${MODULE_TARGET}
+        )
     endif()
   endif()
 

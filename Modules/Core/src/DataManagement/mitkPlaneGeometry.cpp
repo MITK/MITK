@@ -374,7 +374,7 @@ namespace mitk
                                 bottomDV,
                                 transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).two_norm() * lhOrRhSign );
     }
-    else if ( transform == nullptr )
+    else
     {
       this->SetMatrixByVectors( rightDV, bottomDV );
     }

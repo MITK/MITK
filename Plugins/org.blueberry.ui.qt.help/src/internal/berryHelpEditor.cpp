@@ -40,7 +40,7 @@ const QString HelpEditor::EDITOR_ID = "org.blueberry.editors.help";
 
 HelpEditor::HelpEditor()
   : m_ToolBar(nullptr)
-  , m_WebView(nullptr)
+  , m_WebEngineView(nullptr)
 {
 
 }
@@ -60,9 +60,9 @@ void HelpEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Poi
   site->GetPage()->AddPartListener(this);
   site->GetPage()->GetWorkbenchWindow()->AddPerspectiveListener(this);
 
-  m_WebView = new HelpWebView(site, nullptr);
+  m_WebEngineView = new HelpWebView(site, nullptr);
 
-  connect(m_WebView, SIGNAL(loadFinished(bool)), this, SLOT(InitializeTitle()));
+  connect(m_WebEngineView, SIGNAL(loadFinished(bool)), this, SLOT(InitializeTitle()));
 
   this->DoSetInput(input);
 }
@@ -77,9 +77,9 @@ void HelpEditor::CreateQtPartControl(QWidget* parent)
   m_ToolBar->setMaximumHeight(32);
   verticalLayout->addWidget(m_ToolBar);
 
-  m_WebView->setParent(parent);
-  m_WebView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  verticalLayout->addWidget(m_WebView);
+  m_WebEngineView->setParent(parent);
+  m_WebEngineView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  verticalLayout->addWidget(m_WebEngineView);
 
   m_FindWidget = new HelpEditorFindWidget(parent);
   m_FindWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Maximum);
@@ -90,17 +90,15 @@ void HelpEditor::CreateQtPartControl(QWidget* parent)
   connect(m_FindWidget, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
   connect(m_FindWidget, SIGNAL(find(QString, bool)), this,
           SLOT(find(QString, bool)));
-  connect(m_FindWidget, SIGNAL(escapePressed()), m_WebView, SLOT(setFocus()));
+  connect(m_FindWidget, SIGNAL(escapePressed()), m_WebEngineView, SLOT(setFocus()));
 
   // Fill the editor toolbar
   m_BackAction = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/go-previous.png"), "Go back",
-                                             m_WebView, SLOT(backward()));
+                                             m_WebEngineView, SLOT(backward()));
   m_ForwardAction = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/go-next.png"), "Go forward",
-                                                m_WebView, SLOT(forward()));
+                                                m_WebEngineView, SLOT(forward()));
   m_HomeAction = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/go-home.png"), "Go home",
-                                      m_WebView, SLOT(home()));
-  m_PrintAction = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/print.png"), "Print",
-    m_WebView, SLOT(print()));
+                                      m_WebEngineView, SLOT(home()));
 
   m_ToolBar->addSeparator();
 
@@ -109,8 +107,8 @@ void HelpEditor::CreateQtPartControl(QWidget* parent)
 
   m_ToolBar->addSeparator();
 
-  m_ZoomIn = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/zoom-in.png"), "Zoom in", m_WebView, SLOT(scaleUp()));
-  m_ZoomOut = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/zoom-out.png"), "Zoom out", m_WebView, SLOT(scaleDown()));
+  m_ZoomIn = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/zoom-in.png"), "Zoom in", m_WebEngineView, SLOT(scaleUp()));
+  m_ZoomOut = m_ToolBar->addAction(QIcon(":/org.blueberry.ui.qt.help/zoom-out.png"), "Zoom out", m_WebEngineView, SLOT(scaleDown()));
 
   m_ToolBar->addSeparator();
 
@@ -120,8 +118,8 @@ void HelpEditor::CreateQtPartControl(QWidget* parent)
   m_OpenHelpMode->setVisible(!(currPersp.IsNotNull() && currPersp->GetId() == HelpPerspective::ID));
   m_CloseHelpMode->setVisible((currPersp.IsNotNull() && currPersp->GetId() == HelpPerspective::ID));
 
-  connect(m_WebView, SIGNAL(backwardAvailable(bool)), m_BackAction, SLOT(setEnabled(bool)));
-  connect(m_WebView, SIGNAL(forwardAvailable(bool)), m_ForwardAction, SLOT(setEnabled(bool)));
+  connect(m_WebEngineView, SIGNAL(backwardAvailable(bool)), m_BackAction, SLOT(setEnabled(bool)));
+  connect(m_WebEngineView, SIGNAL(forwardAvailable(bool)), m_ForwardAction, SLOT(setEnabled(bool)));
 
   m_BackAction->setEnabled(false);
   m_ForwardAction->setEnabled(false);
@@ -165,7 +163,7 @@ void HelpEditor::DoSetInput(IEditorInput::Pointer input)
       helpInput = HelpEditorInput::Pointer(new HelpEditorInput(currHomePage));
     }
     QtEditorPart::SetInput(helpInput);
-    m_WebView->setSource(helpInput->GetUrl());
+    m_WebEngineView->setSource(helpInput->GetUrl());
   }
 }
 
@@ -210,7 +208,7 @@ void HelpEditor::CloseHelpPerspective()
 
 void HelpEditor::InitializeTitle()
 {
-  QString title = m_WebView->title();
+  QString title = m_WebEngineView->title();
   this->SetPartName(title);
 }
 
@@ -221,14 +219,14 @@ void HelpEditor::ShowTextSearch()
 
 void HelpEditor::SetFocus()
 {
-  m_WebView->setFocus();
+  m_WebEngineView->setFocus();
 
   enableShortcuts();
 }
 
-QWebPage *HelpEditor::GetQWebPage() const
+QWebEnginePage *HelpEditor::GetQWebPage() const
 {
-  return m_WebView->page();
+  return m_WebEngineView->page();
 }
 
 IPartListener::Events::Types HelpEditor::GetPartEventTypes() const
@@ -279,43 +277,30 @@ void HelpEditor::findPrevious()
 
 void HelpEditor::find(const QString &ttf, bool forward)
 {
-  bool found = findInWebPage(ttf, forward);
-
-  if (!found && ttf.isEmpty())
-    found = true;   // the line edit is empty, no need to mark it red...
+  this->findInWebPage(ttf, forward);
 
   if (!m_FindWidget->isVisible())
     m_FindWidget->show();
-  m_FindWidget->setPalette(found);
 }
 
-bool HelpEditor::findInWebPage(const QString &ttf, bool forward)
+void HelpEditor::findInWebPage(const QString &ttf, bool forward)
 {
-  bool found = false;
-  QWebPage::FindFlags options;
-  if (!ttf.isEmpty())
+  if (ttf.isEmpty())
   {
-    if (!forward)
-      options |= QWebPage::FindBackward;
-
-    if (m_FindWidget->caseSensitive())
-      options |= QWebPage::FindCaseSensitively;
-
-    found = m_WebView->findText(ttf, options);
-
-    if (!found)
-    {
-      options |= QWebPage::FindWrapsAroundDocument;
-      found = m_WebView->findText(ttf, options);
-    }
+    m_WebEngineView->findText(ttf);
+    m_FindWidget->setPalette(true);
+    return;
   }
-  // force highlighting of all other matches, also when empty (clear)
-  options = QWebPage::HighlightAllOccurrences;
+
+  QWebEnginePage::FindFlags options;
+
+  if (!forward)
+    options |= QWebEnginePage::FindBackward;
+
   if (m_FindWidget->caseSensitive())
-    options |= QWebPage::FindCaseSensitively;
-  m_WebView->findText(QLatin1String(""), options);
-  m_WebView->findText(ttf, options);
-  return found;
+    options |= QWebEnginePage::FindCaseSensitively;
+
+  m_WebEngineView->findText(ttf, options, [this](bool found) { m_FindWidget->setPalette(found); });
 }
 
 void HelpEditor::enableShortcuts()

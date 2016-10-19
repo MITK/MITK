@@ -463,7 +463,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 }
 
 
-mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrComponents)
+mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrComponents, int dimensions)
 {
   typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
   typedef itk::RGBPixel< unsigned short > USRGBPixelType;
@@ -511,7 +511,7 @@ mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrCom
     {
       mitkThrow()<< "unknown scalar PixelType";
     }
-  } else if(nrComponents == 3) {
+  } else if(nrComponents == 3 && dimensions == 2) {
     if( pythonPixeltype.compare("float64") == 0   ) {
       pixelType = mitk::MakePixelType<DoubleRGBImageType>();
     } else if( pythonPixeltype.compare("float32") == 0 ) {
@@ -521,7 +521,7 @@ mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrCom
     } else if( pythonPixeltype.compare("uint16") == 0 ) {
       pixelType = mitk::MakePixelType<USRGBImageType>();
     }
-  } else if( (nrComponents == 4)) {
+  } else if( (nrComponents == 4) && dimensions == 2 ) {
     if( pythonPixeltype.compare("float64") == 0   ) {
       pixelType = mitk::MakePixelType<DoubleRGBAImageType>();
     } else if( pythonPixeltype.compare("float32") == 0 ) {
@@ -603,7 +603,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
     --nr_dimensions;
   }
 
-  mitk::PixelType pixelType = DeterminePixelType(dtype, nr_Components);
+  mitk::PixelType pixelType = DeterminePixelType(dtype, nr_Components, nr_dimensions);
 
   unsigned int* dimensions = new unsigned int[nr_dimensions];
   // fill backwards , nd data saves dimensions in opposite direction
@@ -817,7 +817,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   // get number of components
   unsigned int nr_Components = (unsigned int) d[2];
 
-  mitk::PixelType pixelType = DeterminePixelType(dtype, nr_Components);
+  mitk::PixelType pixelType = DeterminePixelType(dtype, nr_Components, nr_dimensions);
 
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
   //mitkImage->SetChannel(py_data->data);

@@ -591,10 +591,8 @@ public:
     MITK_TEST_CONDITION(valueAt3DVolume == valueAtSlice, "comparing pixelvalues for orthogonal plane");
 
 
-    vtkSmartPointer<vtkImageData> imageInVtk = vtkSmartPointer<vtkImageData>::New();
-    imageInVtk = imageInMitk->GetVtkImageData();
-    vtkSmartPointer<vtkImageData> sliceInVtk = vtkSmartPointer<vtkImageData>::New();
-    sliceInVtk = slice->GetVtkImageData();
+    vtkSmartPointer<vtkImageData> imageInVtk = imageInMitk->GetVtkImageData();
+    vtkSmartPointer<vtkImageData> sliceInVtk = slice->GetVtkImageData();
 
     double PixelvalueByMitkOutput = sliceInVtk->GetScalarComponentAsDouble(n1, n2, 0, 0);
     //double valueVTKinImage = imageInVtk->GetScalarComponentAsDouble(testPoint3DInIndex[0], testPoint3DInIndex[1], testPoint3DInIndex[2], 0);
@@ -609,8 +607,7 @@ public:
     slicerWithVtkOutput->SetVtkOutputRequest(true);
 
     slicerWithVtkOutput->Update();
-    vtkSmartPointer<vtkImageData> vtkImageByVtkOutput = vtkSmartPointer<vtkImageData>::New();
-    vtkImageByVtkOutput = slicerWithVtkOutput->GetVtkOutput();
+    vtkSmartPointer<vtkImageData> vtkImageByVtkOutput = slicerWithVtkOutput->GetVtkOutput();
     double PixelvalueByVtkOutput = vtkImageByVtkOutput->GetScalarComponentAsDouble(n1, n2, 0, 0);
 
     MITK_TEST_CONDITION(PixelvalueByMitkOutput == PixelvalueByVtkOutput, "testing convertion of image output vtk->mitk by reslicer");
@@ -781,8 +778,6 @@ private:
 
     double pixelValue = pixelValueSet;
 
-    double distanceToCenter = 0.0;
-
 
     ImageIterator imageIterator( sphereImage, sphereImage->GetLargestPossibleRegion() );
     imageIterator.GoToBegin();
@@ -796,7 +791,7 @@ private:
       currentVoxelInIndex[1] = imageIterator.GetIndex()[1];
       currentVoxelInIndex[2] = imageIterator.GetIndex()[2];
 
-      distanceToCenter = (center + ( currentVoxelInIndex * -1.0 )).GetNorm();
+      double distanceToCenter = (center + ( currentVoxelInIndex * -1.0 )).GetNorm();
 
       //if distance to center is smaller then the radius of the sphere
       if( distanceToCenter < radius)
@@ -1049,8 +1044,6 @@ int mitkExtractSliceFilterTest(int /*argc*/, char* /*argv*/[])
     rotation[1] = 0.000439605;
     rotation[2] = 0.423017;
     MITK_INFO << rotation;
-
-    float rotateDegree = 70;
 
     mitk::RotationOperation* operation = new mitk::RotationOperation(mitk::OpROTATE, obliquePl->GetCenter(), rotationVector, degree);
     obliquePl->ExecuteOperation(operation);

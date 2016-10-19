@@ -163,6 +163,7 @@ protected:
 
 private:
   mitk::DataNode::Pointer GetIsoDoseNode(mitk::DataNode::Pointer doseNode);
+  bool ModalityIsRTDose(const mitk::DataNode* dataNode) const;
 };
 
 #endif // RTDoseVisualizer_h

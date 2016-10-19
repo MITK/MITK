@@ -373,6 +373,8 @@ itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
 
 #pragma GCC visibility pop
 
+itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent)
+
 /**
  * Generic RenderingManager implementation for "non-rendering-plattform",
  * e.g. for tests. Its factory (TestingRenderingManagerFactory) is
@@ -393,6 +395,7 @@ protected:
    // ForceImmediateUpdateAll();
   };
 };
+
 } // namespace mitk
 
 #endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */

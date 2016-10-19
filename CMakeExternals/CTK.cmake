@@ -10,12 +10,12 @@ if(MITK_USE_CTK)
   endif()
 
   set(proj CTK)
-  set(proj_DEPENDENCIES )
+  set(proj_DEPENDENCIES DCMTK)
   set(CTK_DEPENDS ${proj})
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag b721b7ca)
+    set(revision_tag 9440d3c9)
     #IF(${proj}_REVISION_TAG)
     #  SET(revision_tag ${${proj}_REVISION_TAG})
     #ENDIF()
@@ -42,20 +42,10 @@ if(MITK_USE_CTK)
       )
     endif()
 
-    if(MITK_USE_DCMTK)
+    if(NOT MITK_USE_Python)
       list(APPEND ctk_optional_cache_args
-           -DDCMTK_DIR:PATH=${DCMTK_DIR}
-          )
-      if(NOT MITK_USE_Python)
-        list(APPEND ctk_optional_cache_args
-            -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
-            )
-      endif()
-      list(APPEND proj_DEPENDENCIES DCMTK)
-    else()
-      list(APPEND ctk_optional_cache_args
-           -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
-          )
+        -DDCMTK_CMAKE_DEBUG_POSTFIX:STRING=d
+      )
     endif()
 
     if(CTEST_USE_LAUNCHERS)
@@ -75,7 +65,8 @@ if(MITK_USE_CTK)
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_${revision_tag}.tar.gz
       #GIT_REPOSITORY https://github.com/commontk/CTK.git
       #GIT_TAG origin/master
-      URL_MD5 9ebeb78c78ff9f458045e0a5ecffc73f
+      URL_MD5 2c04925496e6818706ccffa8a71afaae
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/CTK.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
@@ -97,10 +88,9 @@ if(MITK_USE_CTK)
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
         -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
-        -DDCMTK_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/CTK_DCMTK_085525e6.tar.gz
-        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_c5e4c2a7.tar.gz
-        # See bug 19073
-        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_36ab9c7c.tar.gz
+        -DDCMTK_DIR:PATH=${DCMTK_DIR}
+        -DqRestAPI_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qRestAPI_c5e4c2a7_patched.tar.gz
+        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_a081f9d6.tar.gz
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
       CMAKE_CACHE_DEFAULT_ARGS

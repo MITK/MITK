@@ -14,17 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <algorithm>
-
 #include "mitkPlanarEllipse.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
 #include <algorithm>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 mitk::PlanarEllipse::PlanarEllipse()
     : FEATURE_ID_MAJOR_AXIS(Superclass::AddFeature("Major Axis", "mm")),
       FEATURE_ID_MINOR_AXIS(Superclass::AddFeature("Minor Axis", "mm")),
+      FEATURE_ID_AREA(Superclass::AddFeature("Area", "mm2")),
       m_MinRadius(0),
       m_MaxRadius(100),
       m_MinMaxRadiusContraintsActive(false),
@@ -266,8 +268,14 @@ void mitk::PlanarEllipse::EvaluateFeaturesInternal()
 {
   const Point2D centerPoint = this->GetControlPoint(0);
 
-  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(1)));
-  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * centerPoint.EuclideanDistanceTo(this->GetControlPoint(2)));
+  const auto longAxisLength = centerPoint.EuclideanDistanceTo(this->GetControlPoint(1));
+  const auto shortAxisLength = centerPoint.EuclideanDistanceTo(this->GetControlPoint(2));
+
+  this->SetQuantity(FEATURE_ID_MAJOR_AXIS, 2 * longAxisLength);
+  this->SetQuantity(FEATURE_ID_MINOR_AXIS, 2 * shortAxisLength);
+  this->SetQuantity(FEATURE_ID_AREA, longAxisLength * shortAxisLength * M_PI );
+
+
 }
 
 

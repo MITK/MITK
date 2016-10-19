@@ -22,7 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US","Device Settings")
+#include <iostream>
+
+mitk::USDevicePersistence::USDevicePersistence() : m_devices("MITK US", "Device Settings")
 {
 }
 
@@ -33,7 +35,7 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
   std::vector<us::ServiceReference<USDevice> > services = thisContext->GetServiceReferences<USDevice>();
   MITK_INFO << "Trying to save " << services.size() << " US devices.";
   int numberOfSavedDevices = 0;
-  for(std::vector<us::ServiceReference<USDevice> >::iterator it = services.begin(); it != services.end(); ++it)
+  for (std::vector<us::ServiceReference<USDevice> >::iterator it = services.begin(); it != services.end(); ++it)
   {
     mitk::USDevice::Pointer currentDevice = thisContext->GetService(*it);
     //check if it is a USVideoDevice
@@ -41,7 +43,7 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
     {
       mitk::USVideoDevice::Pointer currentVideoDevice = dynamic_cast<mitk::USVideoDevice*>(currentDevice.GetPointer());
       QString identifier = "device" + QString::number(numberOfSavedDevices);
-      m_devices.setValue(identifier,USVideoDeviceToString(currentVideoDevice));
+      m_devices.setValue(identifier, USVideoDeviceToString(currentVideoDevice));
       numberOfSavedDevices++;
     }
 
@@ -50,7 +52,7 @@ void mitk::USDevicePersistence::StoreCurrentDevices()
       MITK_WARN << "Saving of US devices of the type " << currentDevice->GetDeviceClass() << " is not supported at the moment. Skipping device.";
     }
   }
-  m_devices.setValue("numberOfSavedDevices",numberOfSavedDevices);
+  m_devices.setValue("numberOfSavedDevices", numberOfSavedDevices);
   MITK_INFO << "Successfully saved " << numberOfSavedDevices << " US devices.";
 }
 
@@ -60,12 +62,12 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
 
   int numberOfSavedDevices = m_devices.value("numberOfSavedDevices").toInt();
 
-  for(int i=0; i<numberOfSavedDevices; i++)
+  for (int i = 0; i < numberOfSavedDevices; i++)
   {
     // Try each device. If an exception occurs: Ignore device and notify user
     try
     {
-      QString currentString = m_devices.value("device"+QString::number(i)).toString();
+      QString currentString = m_devices.value("device" + QString::number(i)).toString();
       mitk::USDevice::Pointer currentDevice = dynamic_cast<mitk::USDevice*>(StringToUSVideoDevice(currentString).GetPointer());
       //currentDevice->Initialize();
       devices.push_back(currentDevice.GetPointer());
@@ -89,10 +91,10 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
   QString comment = d->GetComment().c_str();
   int source = d->GetDeviceID();
   std::string file = d->GetFilePath();
-  if (file == "") file = "none";
+  if (!d->GetIsSourceFile()) file = "none"; //if GetIsSourceFile is true, the device plays back a file
 
   mitk::USImageVideoSource::Pointer imageSource = dynamic_cast<mitk::USImageVideoSource*>(d->GetUSImageSource().GetPointer());
-  if ( ! imageSource )
+  if (!imageSource)
   {
     MITK_ERROR << "There is no USImageVideoSource at the current device.";
     mitkThrow() << "There is no USImageVideoSource at the current device.";
@@ -105,25 +107,61 @@ QString mitk::USDevicePersistence::USVideoDeviceToString(mitk::USVideoDevice::Po
 
   mitk::USImageVideoSource::USImageRoi roi = imageSource->GetRegionOfInterest();
 
+  QString probes = ""; //ACV$100%1%1%0$120%2%2%0$140%2%2%5!BDW$90%1%1%2$100%1%1%8!CSV$50%1%2%3$60%2%2%5
+
+  char probesSeperator = '!';
+  std::vector<mitk::USProbe::Pointer> allProbesOfDevice = d->GetAllProbes();
+  if (allProbesOfDevice.size() > 0)
+  {
+    for (std::vector<mitk::USProbe::Pointer>::iterator it = allProbesOfDevice.begin(); it != allProbesOfDevice.end(); it++)
+    {
+      if (it == allProbesOfDevice.begin())
+      { // if it is the first element there is no need for the probes seperator
+        probes = probes + USProbeToString(*it);
+      }
+      else
+      {
+        probes = probes + probesSeperator + USProbeToString(*it);
+      }
+    }
+  }
+
   char seperator = '|';
 
   QString returnValue = manufacturer + seperator
-                       + model + seperator
-                       + comment + seperator
-                       + QString::number(source) + seperator
-                       + file.c_str() + seperator
-                       + QString::number(greyscale) + seperator
-                       + QString::number(resOverride) + seperator
-                       + QString::number(resWidth) + seperator
-                       + QString::number(resHight) + seperator
-                       + QString::number(roi.topLeftX) + seperator
-                       + QString::number(roi.topLeftY) + seperator
-                       + QString::number(roi.bottomRightX) + seperator
-                       + QString::number(roi.bottomRightY)
-                       ;
+    + model + seperator
+    + comment + seperator
+    + QString::number(source) + seperator
+    + file.c_str() + seperator
+    + QString::number(greyscale) + seperator
+    + QString::number(resOverride) + seperator
+    + QString::number(resWidth) + seperator
+    + QString::number(resHight) + seperator
+    + QString::number(roi.topLeftX) + seperator
+    + QString::number(roi.topLeftY) + seperator
+    + QString::number(roi.bottomRightX) + seperator
+    + QString::number(roi.bottomRightY) + seperator
+    + probes
+    ;
 
   MITK_INFO << "Output String: " << returnValue.toStdString();
   return returnValue;
+}
+
+QString mitk::USDevicePersistence::USProbeToString(mitk::USProbe::Pointer p)
+{
+  QString probe = p->GetName().c_str();
+  char depthSeperator = '$';
+  char spacingSeperator = '%';
+  std::map<int, mitk::Vector3D> depthsAndSpacing = p->GetDepthsAndSpacing();
+  if (depthsAndSpacing.size() > 0)
+  {
+    for (std::map<int, mitk::Vector3D>::iterator it = depthsAndSpacing.begin(); it != depthsAndSpacing.end(); it++){
+      probe = probe + depthSeperator + QString::number(it->first) + spacingSeperator + QString::number(it->second[0])
+        + spacingSeperator + QString::number(it->second[1]) + spacingSeperator + QString::number(it->second[2]);
+    }
+  }
+  return probe;
 }
 
 mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QString s)
@@ -132,11 +170,11 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
   std::vector<std::string> data;
   std::string seperators = "|";
   std::string text = s.toStdString();
-  split(text,seperators,data);
-  if(data.size() != 13)
+  split(text, seperators, data);
+  if (data.size() != 14)
   {
     MITK_ERROR << "Cannot parse US device! (Size: " << data.size() << ")";
-    return mitk::USVideoDevice::New("INVALID","INVALID","INVALID");
+    return mitk::USVideoDevice::New("INVALID", "INVALID", "INVALID");
   }
 
   std::string manufacturer = data.at(0);
@@ -169,7 +207,7 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
 
   mitk::USImageVideoSource::Pointer imageSource =
     dynamic_cast<mitk::USImageVideoSource*>(returnValue->GetUSImageSource().GetPointer());
-  if ( ! imageSource )
+  if (!imageSource)
   {
     MITK_ERROR << "There is no USImageVideoSource at the current device.";
     mitkThrow() << "There is no USImageVideoSource at the current device.";
@@ -180,15 +218,79 @@ mitk::USVideoDevice::Pointer mitk::USDevicePersistence::StringToUSVideoDevice(QS
 
   // If Resolution override is activated, apply it
   if (resOverride)
-    {
+  {
     imageSource->OverrideResolution(resWidth, resHight);
     imageSource->SetResolutionOverride(true);
-    }
+  }
 
   // Set Crop Area
   imageSource->SetRegionOfInterest(cropArea);
+  std::string probes = data.at(13);
+  std::string probesSeperator = "!";
+  std::vector<std::string> probesVector;
+  split(probes, probesSeperator, probesVector);
+  for (std::vector<std::string>::iterator it = probesVector.begin(); it != probesVector.end(); it++)
+  {
+    mitk::USProbe::Pointer probe = StringToUSProbe(*it);
+    returnValue->AddNewProbe(probe);
+  }
 
   return returnValue;
+}
+
+mitk::USProbe::Pointer mitk::USDevicePersistence::StringToUSProbe(std::string s)
+{
+  mitk::USProbe::Pointer probe = mitk::USProbe::New();
+  std::string spacingSeperator = "%";
+  std::string depthSeperator = "$";
+  std::vector<std::string> depthsWithSpacings;
+  split(s, depthSeperator, depthsWithSpacings);
+
+  for (std::vector<std::string>::iterator it = depthsWithSpacings.begin(); it != depthsWithSpacings.end(); it++)
+  {
+    if (it == depthsWithSpacings.begin()) //first element is the name of the probe
+    {
+      probe->SetName(*it);
+    }
+    else //other elements are the scanning depths of the probe and the spacing
+    {
+      std::vector<std::string> spacings;
+      split(*it, spacingSeperator, spacings);
+      mitk::Vector3D spacing;
+      double x;
+      double y;
+      double z;
+      int depth;
+      try
+      {
+        x = spacingToDouble(spacings.at(1));
+        y = spacingToDouble(spacings.at(2));
+        z = spacingToDouble(spacings.at(3));
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_ERROR << e.GetDescription() << "Spacing of " << probe->GetName() << " at depth " << spacings.at(0) << " will be set to default value 1,1,0.";
+        x = 1;
+        y = 1;
+        z = 1;
+      }
+      spacing[0] = x;
+      spacing[1] = y;
+      spacing[2] = z;
+
+      try
+      {
+        depth = depthToInt(spacings.at(0));
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_ERROR << probe->GetName() << ": " << e.GetDescription();
+        continue;
+      }
+      probe->SetDepthAndSpacing(depth, spacing);
+    }
+  }
+  return probe;
 }
 
 void mitk::USDevicePersistence::split(std::string& text, std::string& separators, std::vector<std::string>& words)
@@ -204,4 +306,28 @@ void mitk::USDevicePersistence::split(std::string& text, std::string& separators
     words.push_back(text.substr(start, stop - start));
     start = text.find_first_not_of(separators, stop + 1);
   }
+}
+
+double mitk::USDevicePersistence::spacingToDouble(std::string s)
+{
+  std::istringstream i(s);
+  double x;
+  if (!(i >> x))
+  {
+    //something went wrong because the string contains characters which can not be convertet into double
+    mitkThrow() << "An error occured while trying to recover the spacing.";
+  }
+  return x;
+}
+
+int mitk::USDevicePersistence::depthToInt(std::string s)
+{
+  std::istringstream i(s);
+  int x;
+  if (!(i >> x))
+  {
+    //something went wrong because the string contains characters which can not be convertet into int
+    mitkThrow() << "An error occured while trying to recover the scanning depth. " << s << " is not a valid scanning depth. ";
+  }
+  return x;
 }

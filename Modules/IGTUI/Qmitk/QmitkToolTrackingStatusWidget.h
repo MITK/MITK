@@ -26,9 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QLabel>
 #include <usModuleContext.h>
 
-
-
-
 /*!
 \brief QmitkToolTrackingStatusWidget
 
@@ -39,7 +36,6 @@ class MITKIGTUI_EXPORT QmitkToolTrackingStatusWidget : public QWidget
 {
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public:
-
 
   typedef std::vector< mitk::NavigationData::Pointer > NavigationDataPointerArray;
 
@@ -53,7 +49,6 @@ public:
   \brief default constructor
   */
   QmitkToolTrackingStatusWidget( QWidget* parent );
-
 
   /*!
   \brief default destructor
@@ -115,7 +110,6 @@ protected:
   void CreateQtPartControl( QWidget *parent );
   Ui::QmitkToolTrackingStatusWidgetControls* m_Controls;  ///< gui widgets
 
-
 private:
 
   /*!
@@ -124,6 +118,7 @@ private:
   QVector< QLabel* >* m_StatusLabels;
 
   std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas;
+  bool m_NavDatasNewFlag;
 
   bool m_ShowPositions;
 
@@ -144,4 +139,3 @@ private:
 
 };
 #endif // _QmitkToolTrackingStatusWidget_H_INCLUDED
-

@@ -27,7 +27,7 @@ mitk::VtkLayerController::vtkLayerControllerMapType mitk::VtkLayerController::s_
 mitk::VtkLayerController* mitk::VtkLayerController::GetInstance(vtkSmartPointer<vtkRenderWindow> renWin)
 {
   for(auto mapit = s_LayerControllerMap.begin();
-      mapit != s_LayerControllerMap.end(); mapit++)
+      mapit != s_LayerControllerMap.end(); ++mapit)
   {
     if( (*mapit).first == renWin)
       return (*mapit).second;
@@ -206,15 +206,15 @@ void mitk::VtkLayerController::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> 
   {
     RendererVectorType::iterator it;
     // Tell all renderers that there is a new renderwindow
-    for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
+    for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
     {
       (*it)->SetRenderWindow(renwin);
     }
-    for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
+    for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
     {
       (*it)->SetRenderWindow(renwin);
     }
-    for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
+    for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
     {
       (*it)->SetRenderWindow(renwin);
     }
@@ -283,7 +283,7 @@ void mitk::VtkLayerController::UpdateLayers()
   m_RenderWindow->SetNumberOfLayers(numberOfLayers);
   RendererVectorType::iterator it;
   // assign a layer number for the backround renderers
-  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
+  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
@@ -295,7 +295,7 @@ void mitk::VtkLayerController::UpdateLayers()
       currentLayerNumber--;
   }
   // assign a layer number for the scene renderers
-  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
+  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
@@ -307,7 +307,7 @@ void mitk::VtkLayerController::UpdateLayers()
       currentLayerNumber--;
   }
   // assign a layer number for the foreground renderers
-  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
+  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
@@ -332,12 +332,12 @@ void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
   this->m_RenderWindow->SetErase(i);
 
   RendererVectorType::iterator it;
-  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); it++)
+  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
     (*it)->SetErase(i);
 
-  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); it++)
+  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
     (*it)->SetErase(i);
 
-  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); it++)
+  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
     (*it)->SetErase(i);
 }

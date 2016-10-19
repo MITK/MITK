@@ -39,9 +39,9 @@ Download
 
 The MITK source code and binaries for the *MitkWorkbench* application are released regularly according to the [MITK release cycle][release-cycle]. See the [Download][download] page for a list of releases.
 
-The official MITK source code is available in the [MITK Git repository][gitweb]. The Git clone command is
+The official MITK source code is available in the [MITK Git repository][diffusion]. The Git clone command is
 
-    git clone http://git.mitk.org/MITK.git
+    git clone https://phabricator.mitk.org/diffusion/MITK/mitk.git
 
 Active development takes place in the MITK master branch and its usage is advised for advanced users only.
 
@@ -56,7 +56,7 @@ Build Instructions
 
 MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
 
-    git clone http://git.mitk.org/MITK.git
+    git clone https://phabricator.mitk.org/diffusion/MITK/mitk.git MITK
     mkdir MITK-build
     cd MITK-build
     cmake ../MITK
@@ -77,18 +77,18 @@ Useful Links
 [mitk]: http://mitk.org
 [itk]: http://www.itk.org
 [vtk]: http://www.vtk.org
-[mitk-overview]: http://docs.mitk.org/2015.05/Overview.html
-[mitk-usermanual]: http://docs.mitk.org/2015.05/UserManualPortal.html
-[mitk-devmanual]: http://docs.mitk.org/2015.05/DeveloperManualPortal.html
-[mitk-apiref]: http://docs.mitk.org/2015.05/usergroup0.html
-[platforms]: http://docs.mitk.org/2015.05/SupportedPlatformsPage.html
+[mitk-overview]: http://docs.mitk.org/2016.03/Overview.html
+[mitk-usermanual]: http://docs.mitk.org/2016.03/UserManualPortal.html
+[mitk-devmanual]: http://docs.mitk.org/2016.03/DeveloperManualPortal.html
+[mitk-apiref]: http://docs.mitk.org/2016.03/usergroup0.html
+[platforms]: http://docs.mitk.org/2016.03/SupportedPlatformsPage.html
 [dkfz]: http://www.dkfz.de
 [license]: http://mitk.org/git/?p=MITK.git;a=blob_plain;f=LICENSE.txt
 [release-cycle]: http://mitk.org/MitkReleaseCycle
 [download]: http://mitk.org/Download
-[gitweb]: http://mitk.org/git/?p=MITK.git
+[diffusion]: https://phabricator.mitk.org/diffusion/MITK/
 [contribute]: http://mitk.org/How_to_contribute
 [cmake]: http://www.cmake.org
-[build]: http://docs.mitk.org/2015.05/BuildInstructionsPage.html
+[build]: http://docs.mitk.org/2016.03/BuildInstructionsPage.html
 [mailinglist]: http://mitk.org/Mailinglist
-[bugs]: http://bugs.mitk.org/
+[bugs]: https://phabricator.mitk.org/maniphest/

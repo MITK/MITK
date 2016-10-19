@@ -5,7 +5,7 @@
     <view id="org.mitk.views.ultrasoundsupport"
           name="Ultrasound Support"
           class="UltrasoundSupport"
-          icon="resources/icon.xpm" />
+          icon="resources/icon_ultrasound.svg" />
   </extension>
 
 </plugin>

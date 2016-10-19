@@ -203,7 +203,6 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
   if(region != itkImage->GetRequestedRegion()) return;
 
   itk::ImageRegionConstIterator<ItkImageType> it(itkImage, region);
-  double value = 0;
 
   if ( statisticsHolder == nullptr || !statisticsHolder->IsValidTimeStep( t ) ) return;
   statisticsHolder->Expand(t+1); // make sure we have initialized all arrays
@@ -217,7 +216,7 @@ void mitk::_ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::
 
   while( !it.IsAtEnd() )
   {
-    value = it.Get()[component];
+    double value = it.Get()[component];
     //  if ( (value > mitkImage->m_ScalarMin) && (value < mitkImage->m_Scalar2ndMin) )        mitkImage->m_Scalar2ndMin = value;
     //  else if ( (value < mitkImage->m_ScalarMax) && (value > mitkImage->m_Scalar2ndMax) )   mitkImage->m_Scalar2ndMax = value;
     //  else if (value > mitkImage->m_ScalarMax)                                              mitkImage->m_ScalarMax = value;

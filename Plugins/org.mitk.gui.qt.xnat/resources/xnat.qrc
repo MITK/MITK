@@ -4,5 +4,7 @@
         <file>xnat-upload.png</file>
         <file>xnat-folder.png</file>
         <file>xnat-icon.png</file>
+        <file>xnat-connect.png</file>
+        <file>xnat-disconnect.png</file>
     </qresource>
 </RCC>

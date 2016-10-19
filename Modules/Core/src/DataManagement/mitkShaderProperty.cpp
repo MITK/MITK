@@ -88,7 +88,7 @@ void mitk::ShaderProperty::AddShaderTypes()
   while( i != l.end() )
   {
     AddEnum( (*i)->GetName() );
-    i++;
+    ++i;
   }
 }
 

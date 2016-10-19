@@ -100,7 +100,7 @@ protected:
 
   Message1<float> m_ProgressMessage;
 
-  std::auto_ptr<CustomMimeType> m_CustomMimeType;
+  std::unique_ptr<CustomMimeType> m_CustomMimeType;
   us::ServiceRegistration<CustomMimeType> m_MimeTypeReg;
 
 private:

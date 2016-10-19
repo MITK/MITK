@@ -41,6 +41,11 @@ set(CACHED_RESOURCE_FILES
   resources/icon.xpm
   resources/example.png
   resources/provider.png
+  resources/icon_igt_simple_example.svg
+  resources/icon_igt_tracking_lab.svg
+  resources/icon_openigtlink_client_example.svg
+  resources/icon_openigtlink_extended_example.svg
+  resources/icon_openigtlink_provider_example.svg
   plugin.xml
 )
 

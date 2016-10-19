@@ -90,7 +90,7 @@ private:
 
 public:
 
-  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL) {}
+  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL), m_SkipImageTest(false) {}
 
 
 

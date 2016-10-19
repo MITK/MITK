@@ -20,10 +20,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 const char* mitk::USImageSource::IMAGE_PROPERTY_IDENTIFIER = "id_nummer";
 
 mitk::USImageSource::USImageSource()
-: m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
+  : m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
   m_MitkToOpenCVFilter(nullptr),
   m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New()),
-  m_CurrentImageId(0)
+  m_CurrentImageId(0),
+  m_ImageFilterMutex(itk::FastMutexLock::New())
 {
 }
 
@@ -50,15 +51,17 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
 {
   mitk::Image::Pointer result;
 
-  if ( m_ImageFilter.IsNotNull() && ! m_ImageFilter->GetIsEmpty() )
+  // Get next image and apply OpenCV based filters beforehand
+  if (m_ImageFilter.IsNotNull() && !m_ImageFilter->GetIsEmpty())
   {
     cv::Mat image;
     this->GetNextRawImage(image);
 
-    if ( ! image.empty() )
+    if (!image.empty())
     {
-      // execute filter if a filter is specified
-      if ( m_ImageFilter.IsNotNull() ) { m_ImageFilter->FilterImage(image, m_CurrentImageId); }
+      m_ImageFilterMutex->Lock();
+      m_ImageFilter->FilterImage(image, m_CurrentImageId);
+      m_ImageFilterMutex->Unlock();
 
       // convert to MITK image
       this->m_OpenCVToMitkFilter->SetOpenCVMat(image);
@@ -68,13 +71,14 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
       result = this->m_OpenCVToMitkFilter->GetOutput();
     }
   }
+  // Get next image without filtering
   else
   {
     // mitk image can be received direclty if no filtering is necessary
     this->GetNextRawImage(result);
   }
 
-  if ( result.IsNotNull() )
+  if (result.IsNotNull())
   {
     result->SetProperty(IMAGE_PROPERTY_IDENTIFIER, mitk::IntProperty::New(m_CurrentImageId));
     m_CurrentImageId++;
@@ -89,10 +93,10 @@ mitk::Image::Pointer mitk::USImageSource::GetNextImage()
   }
 }
 
-void mitk::USImageSource::GetNextRawImage( cv::Mat& image )
+void mitk::USImageSource::GetNextRawImage(cv::Mat& image)
 {
   // create filter object if it does not exist yet
-  if ( ! m_MitkToOpenCVFilter )
+  if (!m_MitkToOpenCVFilter)
   {
     m_MitkToOpenCVFilter = mitk::ImageToOpenCVImageFilter::New();
   }
@@ -101,7 +105,7 @@ void mitk::USImageSource::GetNextRawImage( cv::Mat& image )
   mitk::Image::Pointer mitkImg;
   this->GetNextRawImage(mitkImg);
 
-  if ( mitkImg.IsNull() || ! mitkImg->IsInitialized() )
+  if (mitkImg.IsNull() || !mitkImg->IsInitialized())
   {
     image = cv::Mat();
     return;

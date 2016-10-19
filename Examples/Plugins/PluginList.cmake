@@ -12,6 +12,7 @@ set(MITK_EXAMPLE_PLUGINS
   org.mitk.example.gui.extensionpointdefinition:ON
   org.mitk.example.gui.extensionpointcontribution:ON
   org.mitk.example.gui.regiongrowing:ON
+  org.mitk.example.gui.qmlapplication:ON
 
   org.mitk.example.gui.imaging:ON
 )

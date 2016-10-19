@@ -27,8 +27,8 @@ if(MITK_USE_HDF5)
     # bad :( This would be fixed by using an external HDF-Installation with ITK/VTK
 
     ExternalProject_Add(${proj}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/hdf5-1.8.12.tar.gz
-       URL_MD5 d804802feb99b87fc668a90e6fa34411
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/hdf5_1.8.14.tar.gz
+       URL_MD5 a482686e733514a51cde12d6fe5c5d95
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}

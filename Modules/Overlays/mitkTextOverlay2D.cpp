@@ -24,8 +24,15 @@ mitk::TextOverlay2D::TextOverlay2D()
 {
   mitk::Point2D position;
   position[0] = position[1] = 0;
-  SetPosition2D(position);
-  SetOffsetVector(position);
+  this->SetPosition2D(position);
+  this->SetOffsetVector(position);
+  this->SetText("");
+  this->SetFontSize(20);
+  this->SetColor(1.0,1.0,1.0);
+  this->SetStringProperty("font.family","Arial");
+  this->SetBoolProperty( "font.bold", false );
+  this->SetBoolProperty( "font.italic", false );
+  this->SetBoolProperty("drawShadow", false);
 }
 
 mitk::TextOverlay2D::~TextOverlay2D()
@@ -47,8 +54,16 @@ mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer
 
 void mitk::TextOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, const mitk::Overlay::Bounds& bounds)
 {
-  vtkSmartPointer<vtkActor2D> actor = GetVtkActor2D(renderer);
-  actor->SetDisplayPosition(bounds.Position[0], bounds.Position[1]);
+  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+
+  mitk::Point2D posT, posS;
+  posT[0] = bounds.Position[0];
+  posT[1] = bounds.Position[1];
+  posS[0] = posT[0] + 1;
+  posS[1] = posT[1] - 1;
+
+  ls->m_TextActor->SetDisplayPosition(posT[0], posT[1]);
+  ls->m_STextActor->SetDisplayPosition(posS[0], posS[1]);
 }
 
 mitk::TextOverlay2D::LocalStorage::~LocalStorage()

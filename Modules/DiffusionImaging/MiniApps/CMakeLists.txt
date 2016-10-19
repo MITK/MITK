@@ -1,5 +1,3 @@
-option(BUILD_DiffusionMiniApps "Build commandline tools for diffusion" OFF)
-
 if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
 
   # needed include directories
@@ -12,11 +10,8 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     # if an app requires additional dependencies
     # they are added after a "^^" and separated by "_"
     set( diffusionminiapps
-    DwiDenoising^^
-    ImageResampler^^
     NetworkCreation^^MitkFiberTracking_MitkConnectomics
     NetworkStatistics^^MitkConnectomics
-    ExportShImage^^
     Fiberfox^^MitkFiberTracking
     MultishellMethods^^MitkFiberTracking
     PeaksAngularError^^MitkFiberTracking
@@ -27,15 +22,8 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     LocalDirectionalFiberPlausibility^^MitkFiberTracking
     StreamlineTracking^^MitkFiberTracking
     GibbsTracking^^MitkFiberTracking
-    CopyGeometry^^
-    DiffusionIndices^^
     TractometerMetrics^^MitkFiberTracking
-    QballReconstruction^^
-    Registration^^
     FileFormatConverter^^MitkFiberTracking
-    TensorReconstruction^^
-    TensorDerivedMapsExtraction^^
-    DiffusionDICOMLoader^^
     DFTraining^^MitkFiberTracking
     DFTracking^^MitkFiberTracking
     )

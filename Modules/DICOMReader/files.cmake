@@ -19,10 +19,13 @@ set(CPP_FILES
   mitkClassicDICOMSeriesReader.cpp
   mitkThreeDnTDICOMSeriesReader.cpp
   mitkDICOMTag.cpp
+  mitkDICOMTagHelper.cpp
   mitkDICOMTagCache.cpp
   mitkDICOMEnums.cpp
   mitkDICOMReaderConfigurator.cpp
   mitkDICOMFileReaderSelector.cpp
+  mitkIDICOMTagsOfInterest.cpp
+  mitkDICOMProperty.cpp
 )
 
 set(RESOURCE_FILES

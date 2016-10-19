@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.gui.qt.dicominspector"
+          name="Dicom Inspector"
+          class="QmitkDicomInspectorView"
+          icon="resources/inspector.png" />
+  </extension>
+
+</plugin>

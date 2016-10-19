@@ -826,7 +826,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
         ++groupIter )
   {
     FileNamesGrouping groupsOf3DBlocks; // intermediate result for only this group(!)
-    std::map<std::string, SliceGroupingAnalysisResult> mapOf3DBlockAnalysisResults;
     StringContainer filesStillToAnalyze = groupIter->second.GetFilenames();
     std::string groupUID = groupIter->first;
     unsigned int subgroup(0);

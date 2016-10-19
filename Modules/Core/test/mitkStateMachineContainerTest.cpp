@@ -53,9 +53,9 @@ mitk  ::StateMachineContainer* smc = mitk::StateMachineContainer::New();
 
   ActionCollectionType::iterator it = actions.begin();
   std::string action1 = (*it)->GetActionName();
-  it++;
+  ++it;
   std::string action2 = (*it)->GetActionName();
-  it++;// this should now point to the end of the vector, since only two actions are given
+  ++it;// this should now point to the end of the vector, since only two actions are given
 
   MITK_INFO << s2.IsNull();
 

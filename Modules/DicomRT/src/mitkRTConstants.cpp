@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRTConstants.h"
 
-const std::string mitk::RTConstants::DOSE_PROPERTY_NAME = "dose";
 const std::string mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME = "dose.PrescribedDose";
 const std::string mitk::RTConstants::REFERENCE_DOSE_PROPERTY_NAME = "dose.ReferenceDose";
 const std::string mitk::RTConstants::DOSE_TYPE_PROPERTY_NAME = "dose.type";

@@ -105,7 +105,7 @@ public:
   * @returns the id of the curve. Use this id to
   * refer to the curve, if you want to modify or add data.
   */
-  unsigned int InsertCurve( const char* title );
+  unsigned int InsertCurve(const char* title , QColor color = Qt::black);
 
   /**
   * Sets the title of the given axis. For the set of available axes
@@ -195,6 +195,9 @@ public:
   * @param: symbol A QwtSymbol
   */
   void SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol );
+
+  void SetCurveAntialiasingOn( unsigned int curveId);
+  void SetCurveAntialiasingOff( unsigned int curveId);
 
   /**
   * Sets the title of the given curve. The title will be shown in the legend of

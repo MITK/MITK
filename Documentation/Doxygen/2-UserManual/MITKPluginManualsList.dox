@@ -46,6 +46,7 @@ The distinction between developer and end user use is for convenience only and m
   \li \subpage org_mitk_gui_qt_igttracking
   \li \subpage org_blueberry_ui_qt_objectinspector
   \li \subpage org_mitk_gui_qt_eventrecorder
+  \li \subpage org_mitk_gui_qt_overlaymanager
 
 
 */

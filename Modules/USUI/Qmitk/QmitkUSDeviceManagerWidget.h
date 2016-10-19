@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QListWidgetItem>
 
-
 /**
 * @brief This Widget is used to manage available Ultrasound Devices.
 *
@@ -36,60 +35,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKUSUI_EXPORT QmitkUSDeviceManagerWidget :public QWidget
 {
-
   //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
-  public:
+public:
 
-    static const std::string VIEW_ID;
+  static const std::string VIEW_ID;
 
-    QmitkUSDeviceManagerWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
-    virtual ~QmitkUSDeviceManagerWidget();
+  QmitkUSDeviceManagerWidget(QWidget* p = 0, Qt::WindowFlags f1 = 0);
+  virtual ~QmitkUSDeviceManagerWidget();
 
-    /* @brief This method is part of the widget an needs not to be called seperately. */
-    virtual void CreateQtPartControl(QWidget *parent);
-    /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
-    virtual void CreateConnections();
-    /* @brief Disconnects all devices immediately. */
-    virtual void DisconnectAllDevices();
+  /* @brief This method is part of the widget an needs not to be called seperately. */
+  virtual void CreateQtPartControl(QWidget *parent);
+  /* @brief This method is part of the widget an needs not to be called seperately. (Creation of the connections of main and control widget.)*/
+  virtual void CreateConnections();
+  /* @brief Disconnects all devices immediately. */
+  virtual void DisconnectAllDevices();
 
-  signals:
-    void NewDeviceButtonClicked();
+signals:
+  void NewDeviceButtonClicked();
+  void EditDeviceButtonClicked(mitk::USDevice::Pointer);
 
-    /* This signal is emitted if a device is activated. */
-    void DeviceActivated();
+  /* This signal is emitted if a device is activated. */
+  void DeviceActivated();
 
   public slots:
 
-  protected slots:
+  protected slots :
 
     /*
     \brief Called, when the button "Activate Device" was clicked.
     */
     void OnClickedActivateDevice();
 
-    /*
-    \brief Called, when the button "Disconnect Device" was clicked.
-    */
-    void OnClickedDisconnectDevice();
+  /*
+  \brief Called, when the button "Disconnect Device" was clicked.
+  */
+  void OnClickedDisconnectDevice();
 
-    void OnClickedRemoveDevice();
-    void OnClickedNewDevice();
+  void OnClickedRemoveDevice();
+  void OnClickedNewDevice();
 
-    /*
-    \brief Called, when the selection in the devicelist changes.
-    */
-    void OnDeviceSelectionChanged(us::ServiceReferenceU reference);
+  void OnClickedEditDevice();
 
+  /*
+  \brief Called, when the selection in the devicelist changes.
+  */
+  void OnDeviceSelectionChanged(us::ServiceReferenceU reference);
 
-  protected:
+protected:
 
-    Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
+  Ui::QmitkUSDeviceManagerWidgetControls* m_Controls; ///< member holding the UI elements of this widget
 
-  private:
-
-
+private:
 };
 
 #endif // _QmitkUSDeviceManagerWidget_H_INCLUDED

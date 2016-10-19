@@ -26,9 +26,6 @@ struct MyObscurePixelType
 {
   typedef float ValueType;
   static const size_t Length = 2;
-
-  float val1;
-  int val2;
 };
 
 //## Documentation

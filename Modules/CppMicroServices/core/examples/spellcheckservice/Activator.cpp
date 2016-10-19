@@ -178,11 +178,11 @@ private:
     }
   }
 
-  std::auto_ptr<SpellCheckImpl> m_spellCheckService;
+  std::unique_ptr<SpellCheckImpl> m_spellCheckService;
   ServiceRegistration<ISpellCheckService> m_spellCheckReg;
 
   ModuleContext* m_context;
-  std::auto_ptr<ServiceTracker<IDictionaryService> > m_tracker;
+  std::unique_ptr<ServiceTracker<IDictionaryService> > m_tracker;
 
 public:
 

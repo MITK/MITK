@@ -66,15 +66,15 @@ if(MITK_USE_OpenCV)
       )
     endif()
 
-    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenCV-2.4.11.tar.gz)
-    set(opencv_url_md5 54fe3dba49ea276ec0228f8819e653bc)
+    set(opencv_url ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/opencv-2.4.13.tar.bz2)
+    set(opencv_url_md5 58cc63017a2b5cdc93ce3fca9e476f2e)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${opencv_url}
       URL_MD5 ${opencv_url_md5}
       # Related bug: http://bugs.mitk.org/show_bug.cgi?id=5912
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV-2.4.11.patch
+      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

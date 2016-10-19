@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkXnatTreeModel.h"
+#include <QmitkHttpStatusCodeHandler.h>
 
 #include <QmitkMimeTypes.h>
 
@@ -31,10 +32,95 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatScan.h>
 #include <ctkXnatScanFolder.h>
 
+#include <iostream>
+
 QmitkXnatTreeModel::QmitkXnatTreeModel ()
   : ctkXnatTreeModel()
 {
 
+}
+
+QModelIndexList QmitkXnatTreeModel::match(const QModelIndex &start, int role,
+                                          const QVariant &value, int hits,
+                                          Qt::MatchFlags flags) const
+{
+    QModelIndexList result;
+    uint matchType = flags & 0x0F;
+    Qt::CaseSensitivity cs = flags & Qt::MatchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+    bool recurse = flags & Qt::MatchRecursive;
+    bool wrap = flags & Qt::MatchWrap;
+    bool allHits = (hits == -1);
+    QString text; // only convert to a string if it is needed
+    QModelIndex p = parent(start);
+    int from = start.row();
+    int to = rowCount(p);
+
+    // iterates twice if wrapping
+    for (int i = 0; (wrap && i < 2) || (!wrap && i < 1); ++i) {
+        for (int r = from; (r < to) && (allHits || result.count() < hits); ++r) {
+            QModelIndex idx = index(r, start.column(), p);
+            if (!idx.isValid())
+                 continue;
+            QVariant v = data(idx, role);
+            // QVariant based matching
+            if (matchType == Qt::MatchExactly) {
+                if (value != v)
+                    result.append(idx);
+            } else { // QString based matching
+                if (text.isEmpty()) // lazy conversion
+                    text = value.toString();
+                QString t = v.toString();
+                switch (matchType) {
+                case Qt::MatchRegExp:
+                    if (!QRegExp(text, cs).exactMatch(t))
+                        result.append(idx);
+                    break;
+                case Qt::MatchWildcard:
+                    if (!QRegExp(text, cs, QRegExp::Wildcard).exactMatch(t))
+                        result.append(idx);
+                    break;
+                case Qt::MatchStartsWith:
+                    if (!t.startsWith(text, cs))
+                        result.append(idx);
+                    break;
+                case Qt::MatchEndsWith:
+                    if (!t.endsWith(text, cs))
+                        result.append(idx);
+                    break;
+                case Qt::MatchFixedString:
+                    if (!t.compare(text, cs) == 0)
+                        result.append(idx);
+                    break;
+                case Qt::MatchContains:
+                default:
+                    if (!t.contains(text, cs))
+                        result.append(idx);
+                }
+            }
+            if (recurse && hasChildren(idx)) { // search the hierarchy
+                result += match(index(0, idx.column(), idx), role,
+                                (text.isEmpty() ? value : text),
+                                (allHits ? -1 : hits - result.count()), flags);
+            }
+        }
+        // prepare for the next iteration
+        from = 0;
+        to = start.row();
+    }
+    return result;
+}
+
+void QmitkXnatTreeModel::fetchMore(const QModelIndex& index)
+{
+  try
+  {
+    ctkXnatTreeModel::fetchMore(index);
+  }
+  catch(ctkRuntimeException e)
+  {
+    QmitkHttpStatusCodeHandler::HandleErrorMessage(e.what());
+    emit Error(index);
+  }
 }
 
 QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
@@ -116,7 +202,6 @@ Qt::DropActions QmitkXnatTreeModel::supportedDropActions()
 Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags defaultFlags = ctkXnatTreeModel::flags(index);
-
 
   if (index.isValid())
   {

@@ -51,7 +51,7 @@ public:
   /// default ctor, TimerDelay is 40 by default
   /// you must SetVideoSource() and AddRenderWindow() afterwards
   ///
-  explicit QmitkVideoBackground(QObject *parent=nullptr);
+  explicit QmitkVideoBackground(QObject* parent = nullptr);
   ///
   /// constructs a video background with the given video source
   /// no parent is set here, dont forget to delete the object or
@@ -124,12 +124,12 @@ public:
   /// sets a *new* video source (if previously enabled, this will stop
   /// the video background if it was previously enabled
   ///
-  void SetVideoSource( mitk::VideoSource* videoSource );
+  void SetVideoSource(mitk::VideoSource* videoSource);
 
   ///
   /// receive renderwindow delete events
   ///
-  static void OnRenderWindowDelete(vtkObject *, unsigned long eid , void* clientdata, void * /*calldata*/);
+  static void OnRenderWindowDelete(vtkObject*, unsigned long eid , void* clientdata, void* /*calldata*/);
 
   ///
   /// receive VideoSource delete event
@@ -166,7 +166,7 @@ protected:
   ///
   /// removes the renderwindow and also removes the observer if the flag is set
   ///
-  void RemoveRenderWindow( vtkRenderWindow* renderWindow, bool removeObserver );
+  void RemoveRenderWindow(vtkRenderWindow* renderWindow, bool removeObserver);
   ///
   /// reset all video backgrounds
   ///

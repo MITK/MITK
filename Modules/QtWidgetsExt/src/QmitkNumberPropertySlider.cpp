@@ -65,7 +65,7 @@ public:
     Impl* m_Impl;
   };
 
-  std::auto_ptr<Editor> m_PropEditor;
+  std::unique_ptr<Editor> m_PropEditor;
 
   short m_DecimalPlaces;            // how many decimal places are shown
   double m_FactorPropertyToSlider; // internal conversion factor. neccessary because slider ranges work only with ints

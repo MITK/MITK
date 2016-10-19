@@ -82,19 +82,18 @@ int testSurfaceBoundingBoxConsistency(mitk::Surface* surface, bool expectIdentit
   polys->ComputeBounds();
   polys->GetBounds( bounds );
 
-  int i;
   if(expectIdentityTransform == false)
   {
     mitk::PlaneGeometry::Pointer geometry = mitk::PlaneGeometry::New();
     geometry->SetFloatBounds(bounds);
     geometry->SetIndexToWorldTransform(surface->GetGeometry()->GetIndexToWorldTransform());
     mitk::BoundingBox::BoundsArrayType bb = const_cast<mitk::BoundingBox*>(geometry->GetBoundingBox())->GetBounds();
-    for(i=0;i<6;++i)
+    for(int i=0;i<6;++i)
       bounds[i]=bb[i];
   }
 
   std::cout << "  Testing GetBoundingBox() ";
-  if((result=testExpectedIndexBoundingBox(surface->GetGeometry(), bounds)) != EXIT_SUCCESS)
+  if((testExpectedIndexBoundingBox(surface->GetGeometry(), bounds)) != EXIT_SUCCESS)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

@@ -97,22 +97,22 @@ mitk::SortByImagePositionPatient
   Vector3D leftRight; leftRight.Fill(0.0);
   Vector3D leftUp; leftUp.Fill(0.0);
   bool leftHasOrientation(false);
-  DICOMStringToOrientationVectors( left->GetTagValueAsString( tagImageOrientation ),
+  DICOMStringToOrientationVectors( left->GetTagValueAsString( tagImageOrientation ).value,
                                    leftRight, leftUp, leftHasOrientation );
 
   Vector3D rightRight; rightRight.Fill(0.0);
   Vector3D rightUp; rightUp.Fill(0.0);
   bool rightHasOrientation(false);
-  DICOMStringToOrientationVectors( right->GetTagValueAsString( tagImageOrientation ),
+  DICOMStringToOrientationVectors(right->GetTagValueAsString(tagImageOrientation).value,
                                    rightRight, rightUp, rightHasOrientation );
 
   Point3D leftOrigin; leftOrigin.Fill(0.0f);
   bool leftHasOrigin(false);
-  leftOrigin = DICOMStringToPoint3D( left->GetTagValueAsString( tagImagePositionPatient ), leftHasOrigin );
+  leftOrigin = DICOMStringToPoint3D(left->GetTagValueAsString(tagImagePositionPatient).value, leftHasOrigin);
 
   Point3D rightOrigin; rightOrigin.Fill(0.0f);
   bool rightHasOrigin(false);
-  rightOrigin = DICOMStringToPoint3D( right->GetTagValueAsString( tagImagePositionPatient ), rightHasOrigin );
+  rightOrigin = DICOMStringToPoint3D(right->GetTagValueAsString(tagImagePositionPatient).value, rightHasOrigin);
 
   //   we tolerate very small differences in image orientation, since we got to know about
   //   acquisitions where these values change across a single series (7th decimal digit)

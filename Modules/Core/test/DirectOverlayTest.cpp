@@ -235,8 +235,8 @@ int DirectOverlayTest(int argc, char* argv[])
 
     try
   {
-    sscanf( argv[3], "%d", &lower);
-    sscanf( argv[4], "%d", &upper);
+    sscanf( argv[3], "%u", &lower);
+    sscanf( argv[4], "%u", &upper);
     //lower = boost::lexical_cast<double>(argv[3]);
     //upper = boost::lexical_cast<double>(argv[4]);
 

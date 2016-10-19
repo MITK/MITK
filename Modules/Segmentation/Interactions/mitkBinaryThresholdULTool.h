@@ -91,7 +91,7 @@ namespace mitk
     void ITKThresholding(
       itk::Image<TPixel,
       VImageDimension>* originalImage,
-      mitk::Image* segmentation,
+      mitk::Image::Pointer segmentation,
       double lower,
       double upper,
       unsigned int timeStep

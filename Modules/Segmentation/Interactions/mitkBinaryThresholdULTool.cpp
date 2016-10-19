@@ -85,7 +85,7 @@ void mitk::BinaryThresholdULTool::Activated()
 {
   Superclass::Activated();
 
-  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<std::remove_reference<decltype(*this)>::type>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<BinaryThresholdULTool>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
 
   m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
   m_NodeForThresholding = m_OriginalImageNode;
@@ -102,7 +102,7 @@ void mitk::BinaryThresholdULTool::Activated()
 
 void mitk::BinaryThresholdULTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<std::remove_reference<decltype(*this)>::type>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<BinaryThresholdULTool>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
   m_NodeForThresholding = NULL;
   m_OriginalImageNode = NULL;
   try
@@ -214,12 +214,6 @@ void mitk::BinaryThresholdULTool::updateThresholdValue()
   ThresholdingValuesChanged.Send(m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue);
 }
 
-template <typename TPixel, unsigned int VImageDimension>
-static void ITKSetVolume( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep )
-{
-  segmentation->SetVolume( (void*) originalImage->GetPixelContainer()->GetBufferPointer(), timeStep);
-}
-
 void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* node)
 {
   if (node)
@@ -232,32 +226,7 @@ void mitk::BinaryThresholdULTool::CreateNewSegmentationFromThreshold(DataNode* n
 
       if (emptySegmentation)
       {
-        // actually perform a thresholding and ask for an organ type
-        for (unsigned int timeStep = 0; timeStep < feedBackImage->GetTimeSteps(); ++timeStep)
-        {
-          try
-          {
-            ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-            timeSelector->SetInput( feedBackImage );
-            timeSelector->SetTimeNr( timeStep );
-            timeSelector->UpdateLargestPossibleRegion();
-            Image::Pointer feedBackImage3D = timeSelector->GetOutput();
-
-            if (feedBackImage3D->GetDimension() == 2)
-            {
-              AccessFixedDimensionByItk_2( feedBackImage3D, ITKSetVolume, 2, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
-            }
-            else
-            {
-              AccessFixedDimensionByItk_2( feedBackImage3D, ITKSetVolume, 3, dynamic_cast<Image*>(emptySegmentation->GetData()), timeStep );
-            }
-
-          }
-          catch(...)
-          {
-            Tool::ErrorMessage("Error accessing single time steps of the original image. Cannot create segmentation.");
-          }
-        }
+        emptySegmentation->SetData(feedBackImage);
 
         //since we are maybe working on a smaller image, pad it to the size of the original image
         if (m_OriginalImageNode.GetPointer() != m_NodeForThresholding.GetPointer())
@@ -315,7 +284,7 @@ void mitk::BinaryThresholdULTool::OnRoiDataChanged()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-static void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double lower, double upper, unsigned int timeStep)
+static void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer segmentation, double lower, double upper, unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
@@ -329,7 +298,7 @@ static void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VIma
   filter->SetOutsideValue(0);
   filter->Update();
 
-  segmentation->SetVolume( (void*) (filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+  mitk::CastToMitkImage(filter->GetOutput(), segmentation);
 }
 
 void mitk::BinaryThresholdULTool::UpdatePreview()

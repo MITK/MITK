@@ -33,6 +33,7 @@ set(mitk_modules
   OpenViewCore
   QtWidgets
   QtWidgetsExt
+  QtWidgetsWeb
   QmlItems
   SegmentationUI
   DiffusionImaging
@@ -71,6 +72,8 @@ set(mitk_modules
   Classification
   TumorInvasionAnalysis
   PhotoacousticsHardware
+  MatchPointRegistration
+  MatchPointRegistrationUI
 )
 
 if(MITK_ENABLE_PIC_READER)

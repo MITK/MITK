@@ -34,7 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * @brief RemapIntoVectorImage Take a 3d+t image and reinterpret it as vector image
  * @return vectoriamge
  */
-mitk::Image::Pointer
+mitk::DiffusionImageCreationFilter::VectorImageType::Pointer
 mitk::DiffusionImageCreationFilter::RemapIntoVectorImage( mitk::Image::Pointer input)
 {
   typedef itk::Image<mitk::DiffusionPropertyHelper::DiffusionPixelType, 3> ImageVolumeType;
@@ -65,14 +65,9 @@ mitk::DiffusionImageCreationFilter::RemapIntoVectorImage( mitk::Image::Pointer i
   }
 
   mitk::DiffusionImageCreationFilter::VectorImageType::Pointer vector_image = vec_composer->GetOutput();
-  m_OutputCache = mitk::Image::New();
-
-  //mitk::GrabItkImageMemory<DPH::ImageType>( vector_image );
-  m_OutputCache->InitializeByItk( vector_image.GetPointer() );
-  m_OutputCache->SetImportVolume( vector_image->GetBufferPointer(), 0, 0, Image::CopyMemory );
   vector_image->GetPixelContainer()->ContainerManageMemoryOff();
 
-  return m_OutputCache;
+  return vector_image;
 }
 
 mitk::DiffusionImageCreationFilter::DiffusionImageCreationFilter()
@@ -87,17 +82,6 @@ mitk::DiffusionImageCreationFilter::DiffusionImageCreationFilter()
 mitk::DiffusionImageCreationFilter::~DiffusionImageCreationFilter()
 {
 
-}
-
-void mitk::DiffusionImageCreationFilter
-::GenerateOutputInformation()
-{
-  mitk::Image::Pointer input = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
-
-  // the filter merges all 3d+t to the components -> we need to adapt the pixel type accordingly
-  output->Initialize( MakePixelType< mitk::DiffusionPropertyHelper::DiffusionPixelType, 3>( input->GetTimeSteps() ),
-                      *input->GetGeometry(0) );
 }
 
 void mitk::DiffusionImageCreationFilter::SetReferenceImage( mitk::Image::Pointer reference_image )
@@ -128,9 +112,18 @@ void mitk::DiffusionImageCreationFilter::GenerateData()
     mitkThrow() << "Either a header descriptor or a reference diffusion-weighted image have to be provided. Terminating.";
   }
 
-  mitk::Image::Pointer outputForCache = RemapIntoVectorImage( input_image );
+  mitk::Image::Pointer outputForCache = this->GetOutput();
 
-
+  if( input_image->GetTimeSteps() > 1 )
+  {
+    mitk::Image::Pointer mitkvectorimage = mitk::GrabItkImageMemory<DPH::ImageType>( RemapIntoVectorImage( input_image ));
+    outputForCache->Initialize( mitkvectorimage );
+  }
+  // no need to remap, we expect to have a vector image directly
+  else
+  {
+    outputForCache->Initialize( input_image );
+  }
 
   // header information
   GradientDirectionContainerType::Pointer DiffusionVectors =  this->InternalGetGradientDirections( );
@@ -139,15 +132,12 @@ void mitk::DiffusionImageCreationFilter::GenerateData()
 
   // create BValueMap
   mitk::BValueMapProperty::BValueMap BValueMap = mitk::BValueMapProperty::CreateBValueMap( DiffusionVectors, BValue );
-  m_OutputCache->SetProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
-  m_OutputCache->SetProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
-  m_OutputCache->SetProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
-  m_OutputCache->SetProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
+  outputForCache->SetProperty( DPH::GRADIENTCONTAINERPROPERTYNAME.c_str(), mitk::GradientDirectionsProperty::New( DiffusionVectors ) );
+  outputForCache->SetProperty( DPH::MEASUREMENTFRAMEPROPERTYNAME.c_str(), mitk::MeasurementFrameProperty::New( MeasurementFrame ) );
+  outputForCache->SetProperty( DPH::BVALUEMAPPROPERTYNAME.c_str(), mitk::BValueMapProperty::New( BValueMap ) );
+  outputForCache->SetProperty( DPH::REFERENCEBVALUEPROPERTYNAME.c_str(), mitk::FloatProperty::New( BValue ) );
 
-  DPH pHelper( m_OutputCache );
-  pHelper.InitializeImage();
-
-  this->SetPrimaryOutput( m_OutputCache );
+  outputForCache->Modified();
 }
 
 void mitk::DiffusionImageCreationFilter::SetHeaderDescriptor(DiffusionImageHeaderDescriptor header_descriptor)

@@ -63,6 +63,7 @@ protected:
   QCheckBox* m_GlobalReinitOnNodeDelete;
   QCheckBox* m_GlobalReinitOnNodeAdded;
   QCheckBox* m_UseSurfaceDecimation;
+  QCheckBox* m_AllowParentChange;
   berry::IPreferences::Pointer m_DataManagerPreferencesNode;
 };
 

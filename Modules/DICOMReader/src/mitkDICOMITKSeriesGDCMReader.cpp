@@ -133,55 +133,6 @@ bool mitk::DICOMITKSeriesGDCMReader::GetAcceptTwoSlicesGroups() const
   return m_EquiDistantBlocksSorter->GetAcceptTwoSlicesGroups();
 }
 
-
-mitk::DICOMGDCMImageFrameList
-  mitk::DICOMITKSeriesGDCMReader::FromDICOMDatasetList( const DICOMDatasetList& input )
-{
-  DICOMGDCMImageFrameList output;
-  output.reserve( input.size() );
-
-  for ( auto inputIter = input.cbegin(); inputIter != input.cend(); ++inputIter )
-  {
-    DICOMGDCMImageFrameInfo* gfi = dynamic_cast<DICOMGDCMImageFrameInfo*>( *inputIter );
-    assert( gfi );
-    output.push_back( gfi );
-  }
-
-  return output;
-}
-
-mitk::DICOMDatasetList
-  mitk::DICOMITKSeriesGDCMReader::ToDICOMDatasetList( const DICOMGDCMImageFrameList& input )
-{
-  DICOMDatasetList output;
-  output.reserve( input.size() );
-
-  for ( auto inputIter = input.cbegin(); inputIter != input.cend(); ++inputIter )
-  {
-    DICOMDatasetAccess* da = inputIter->GetPointer();
-    assert( da );
-    output.push_back( da );
-  }
-
-  return output;
-}
-
-mitk::DICOMImageFrameList
-  mitk::DICOMITKSeriesGDCMReader::ToDICOMImageFrameList( const DICOMGDCMImageFrameList& input )
-{
-  DICOMImageFrameList output;
-  output.reserve( input.size() );
-
-  for ( auto inputIter = input.cbegin(); inputIter != input.cend(); ++inputIter )
-  {
-    DICOMImageFrameInfo::Pointer fi = ( *inputIter )->GetFrameInfo();
-    assert( fi.IsNotNull() );
-    output.push_back( fi );
-  }
-
-  return output;
-}
-
 void mitk::DICOMITKSeriesGDCMReader::InternalPrintConfiguration( std::ostream& os ) const
 {
   unsigned int sortIndex( 1 );
@@ -286,16 +237,17 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   {
     timeStart( "Tag scanning" );
     DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
-    m_TagCache = filescanner.GetPointer(); // keep alive and make accessible to sub-classes
 
     filescanner->SetInputFiles( inputFilenames );
-    filescanner->AddTags( this->GetTagsOfInterest() );
+    filescanner->AddTagPaths( this->GetTagsOfInterest() );
 
     PushLocale();
     filescanner->Scan();
     PopLocale();
 
-    timeStop( "Tag scanning" );
+    m_TagCache = filescanner->GetScanCache(); // keep alive and make accessible to sub-classes
+
+    timeStop("Tag scanning");
   }
   else
   {
@@ -303,30 +255,7 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   }
 
   m_SortingResultInProgress.clear();
-  // TODO We should remove the following cast
-  // DICOMImageFrameInfo would need to inherit DICOMDatasetAccess!
-  // - then the DICOMGDCMTagScanner class could create a DICOMGDCMImageFrameList internally
-  //   - and return it as a DICOMImageFrameList
-  // - like this, DICOMITKSeriesGDCMReader could use the DICOMImageFrameInfoList to feed its sorters
-  // - problem:
-  //   - DICOMImageFrameInfo is also part of DICOMImageBlockDescriptor, which is meant
-  //     to describe the scanner output, even after the reader (and its scanner) is deleted.
-  //   - if DICOMImageFrameInfo now inherits DICOMDatasetAccess, it would also need to implement
-  //     GetTagValueAsString().
-  //     - so this could all work if we implement a default response in
-  //     DICOMImageFrameInfo::GetTagValueAsString() (like in GetFilenameIfAvailable)
-  //       and overwrite it in DICOMGDCMImageFrameInfo, which also knows about a specific GDCM scanner result
-  //       (which again COULD (no need to?) be hidden as a point to a DICOMGDCMTagScanner class)
-  //
-  if ( DICOMGDCMTagScanner* tagCache = dynamic_cast<DICOMGDCMTagScanner*>( m_TagCache.GetPointer() ) )
-  {
-    m_SortingResultInProgress.push_back( tagCache->GetFrameInfoList() );
-  }
-  else
-  {
-    throw std::logic_error( "Bad implementation error: DICOMITKSeriesGDCMReader now unable to find "
-                            "dataset/tag information for its input." );
-  }
+  m_SortingResultInProgress.push_back(m_TagCache->GetFrameInfoList());
 
   // sort and split blocks as configured
 
@@ -363,20 +292,20 @@ void mitk::DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   for ( auto blockIter = m_SortingResultInProgress.cbegin(); blockIter != m_SortingResultInProgress.cend();
         ++o, ++blockIter )
   {
-    const DICOMGDCMImageFrameList& gdcmFrameInfoList = *blockIter;
+    const DICOMDatasetAccessingImageFrameList& gdcmFrameInfoList = *blockIter;
     assert( !gdcmFrameInfoList.empty() );
 
     // reverse frames if necessary
     // update tilt information from absolute last sorting
-    const DICOMDatasetList datasetList = ToDICOMDatasetList( gdcmFrameInfoList );
+    const DICOMDatasetList datasetList = ConvertToDICOMDatasetList( gdcmFrameInfoList );
     m_NormalDirectionConsistencySorter->SetInput( datasetList );
     m_NormalDirectionConsistencySorter->Sort();
-    const DICOMGDCMImageFrameList sortedGdcmInfoFrameList =
-      FromDICOMDatasetList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
+    const DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList =
+      ConvertToDICOMDatasetAccessingImageFrameList( m_NormalDirectionConsistencySorter->GetOutput( 0 ) );
     const GantryTiltInformation& tiltInfo = m_NormalDirectionConsistencySorter->GetTiltInformation();
 
     // set frame list for current block
-    const DICOMImageFrameList frameList = ToDICOMImageFrameList( sortedGdcmInfoFrameList );
+    const DICOMImageFrameList frameList = ConvertToDICOMImageFrameList( sortedGdcmInfoFrameList );
     assert( !frameList.empty() );
 
     DICOMImageBlockDescriptor block;
@@ -419,8 +348,8 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
 
   for ( auto blockIter = input.cbegin(); blockIter != input.cend(); ++groupIndex, ++blockIter )
   {
-    const DICOMGDCMImageFrameList& gdcmInfoFrameList = *blockIter;
-    const DICOMDatasetList datasetList               = ToDICOMDatasetList( gdcmInfoFrameList );
+    const DICOMDatasetAccessingImageFrameList& gdcmInfoFrameList = *blockIter;
+    const DICOMDatasetList datasetList               = ConvertToDICOMDatasetList( gdcmInfoFrameList );
 
 #if defined( MBILOG_ENABLE_DEBUG )
     MITK_DEBUG << "--------------------------------------------------------------------------------";
@@ -445,7 +374,7 @@ mitk::DICOMITKSeriesGDCMReader::SortingBlockList mitk::DICOMITKSeriesGDCMReader:
         MITK_DEBUG << "  OUTPUT(" << b << ") :" << ( *oi )->GetFilenameIfAvailable();
       }
 
-      DICOMGDCMImageFrameList sortedGdcmInfoFrameList = FromDICOMDatasetList( blockResult );
+      DICOMDatasetAccessingImageFrameList sortedGdcmInfoFrameList = ConvertToDICOMDatasetAccessingImageFrameList( blockResult );
       nextStepSorting.push_back( sortedGdcmInfoFrameList );
     }
   }
@@ -647,9 +576,9 @@ void mitk::DICOMITKSeriesGDCMReader::SetTagCache( const DICOMTagCache::Pointer& 
   m_ExternalCache = tagCache.IsNotNull();
 }
 
-mitk::DICOMTagList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
+mitk::DICOMTagPathList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
 {
-  DICOMTagList completeList;
+  DICOMTagPathList completeList;
 
   // check all configured sorters
   for ( auto sorterIter = m_Sorter.cbegin(); sorterIter != m_Sorter.cend(); ++sorterIter )
@@ -672,13 +601,13 @@ mitk::DICOMTagList mitk::DICOMITKSeriesGDCMReader::GetTagsOfInterest() const
   completeList.insert( completeList.end(), tags.cbegin(), tags.cend() );
 
 
-  const std::unordered_map<const char*, mitk::DICOMTag> tagList = GetAdditionalTagsOfInterest();
+  const AdditionalTagsMapType tagList = GetAdditionalTagsOfInterest();
   for ( auto iter = tagList.cbegin();
         iter != tagList.cend();
         ++iter
       )
   {
-   completeList.push_back( iter->second ) ;
+   completeList.push_back( iter->first ) ;
   }
 
   return completeList;

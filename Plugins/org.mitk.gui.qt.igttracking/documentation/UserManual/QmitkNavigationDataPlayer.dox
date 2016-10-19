@@ -1,7 +1,7 @@
 /**
 \page org_mitk_views_navigationdataplayer The NavigationData Player
 
-\imageMacro{QmitkIGTTracking_IconNavigationDataPlayer.png,"Icon of the NavigationData Player",2.00}
+\imageMacro{../resources/iconTrackingDataPlayer.png,"Icon of the NavigationData Player",2.00}
 
 \tableofcontents
 
@@ -21,5 +21,9 @@ Use the Time-based player to play the data in the speed they were originally acq
 <li>Check "Register as Microservice" to make the data available as a microservice TrackingDataSource. Other Filters can then be connected to it from other plugins. This is useful for development purposes or to replay previously recorded Situations.
 <li> Check "Display" to render the data in the render Window.
 </ul>
+
+<b>Tutorial:</b> As part of the IGT tutorial, you might try to replay your recorded data from step \ref org_mitk_views_igttrackingtoolbox. You should see two spheric tools moving within the tracking volume. Note that the tool storage is not included in the navigation data player at the moment, and hence all tools are represented as spheres.
+
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 
 */

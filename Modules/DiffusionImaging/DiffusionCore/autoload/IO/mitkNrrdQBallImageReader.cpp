@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNrrdImageIO.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageDataItem.h"
+#include <mitkLocaleSwitch.h>
 
 namespace mitk
 {
@@ -55,20 +56,7 @@ namespace mitk
     {
       try
       {
-        const std::string& locale = "C";
-        const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-        if ( locale.compare(currLocale)!=0 )
-        {
-          try
-          {
-            setlocale(LC_ALL, locale.c_str());
-          }
-          catch(...)
-          {
-            MITK_INFO << "Could not set locale " << locale;
-          }
-        }
+        mitk::LocaleSwitch localeSwitch("C");
 
         typedef itk::VectorImage<float,3> ImageType;
         itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
@@ -109,14 +97,6 @@ namespace mitk
         resultImage->SetVolume( vecImg->GetBufferPointer() );
         result.push_back( resultImage.GetPointer() );
 
-        try
-        {
-          setlocale(LC_ALL, currLocale.c_str());
-        }
-        catch(...)
-        {
-          MITK_INFO << "Could not reset locale " << currLocale;
-        }
       }
       catch(std::exception& e)
       {

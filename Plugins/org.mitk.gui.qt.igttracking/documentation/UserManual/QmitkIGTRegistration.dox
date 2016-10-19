@@ -1,0 +1,44 @@
+/**
+
+\page org_mitk_views_igtregistrationview The IGT Registration view
+
+\imageMacro{iconTrackingRegistration.png,"Icon of the MITK-IGT Fiducial Registration",2.00}
+
+\tableofcontents
+
+\section QmitkMITKIGTTracking_RegistrationIntroduction Introduction
+
+The MITK-IGT Fiducial Registration is a view which allows you to record real world landmarks as well as the corresponding landmarks on a virtual object with a tracking pointer of your choice.
+
+\imageMacro{QmitkIGTTracking_RegistrationView.png,"Screenshot of the MITK-IGT Fiducial Registration View",2.00}
+
+\section QmitkMITKIGTTracking_RegistrationPreliminaries Preliminaries
+
+First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the \ref org_mitk_views_igttrackingtoolbox.
+
+\section QmitkMITKIGTTracking_RegistrationConfiguration Configuration
+
+First of all you have to choose which tracking pointer should be used by clicking on one of the listed <i>Available Navigation Data Sources</i> and one of its related <i>Tools</i>. Confirm the tool to be used by clicking on <i>Choose Selected</i>. Above, the Polaris was chosen as navigation data source. In this case it has only one tool, the NDIPointer, which was selected as tracking pointer.
+
+In case you want to select landmarks on a virtual object, you have to load the image or surface and confirm by clicking <i>Choose Selected</i>.
+
+\section QmitkMITKIGTTracking_RegistrationPointRegistration Point Based Registration
+
+Now select the landmarks in the real world using the pointer: Press the <i>plus</i> button in the <i>Tracker fiducials</i> column and point to the landmarks in the real world. Press <i>Add current instrument position</i> to tell the MITK this is the desired landmark.
+
+To select landmarks on the virtual object or image, press the <i>plus</i> button in the <i>Image/object fiducials column</i>. Add landmarks by pressing <i>Shift</i> and clicking on the desired position of the virtual object or image. Make sure to select the landmarks on the virtual object or image in the same order as the real world landmarks.
+Press <i>Register</i> to finalize the initial registration.
+
+Points can be added manually by clicking on the button with a <i>plus</i> and <i>XYZ</i>.
+
+A single point can be deleted by using the <i>eraser</i> button on a selected point. You can delete a pointset by right-click on the list of points and choosing <i>Clear List</i>.
+
+You can change the order of the points manually by using the corresponding <i>arrow up</i> and <i>arrow down</i> button.
+
+To save a pointset you have to click on the <i>floppy disk</i> button at the bottom of the relevant column.
+
+It's possible to load a pointset by clicking on the <i>file</i> button and choosing the desired pointset. This replaces the current list of points.
+
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
+
+*/

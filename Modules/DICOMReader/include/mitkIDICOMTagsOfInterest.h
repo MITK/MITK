@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkServiceInterface.h>
 #include <string>
 #include <vector>
-#include <mitkDICOMTag.h>
+#include <mitkDICOMTagsOfInterestHelper.h>
 #include <MitkDICOMReaderExports.h>
 
 namespace mitk
@@ -39,25 +39,23 @@ namespace mitk
   public:
     virtual ~IDICOMTagsOfInterest();
 
-    typedef std::unordered_map<const char*, DICOMTag> DICOMTagMapType;
-
     /** \brief Add an tag to the TOI.
       * If the tag was already added it will be overwritten with the passed values.
       * \param[in] tag Tag that should be added.
       * \param[in] makePersistant Indicates if the tag should be made persistant if possible via the IPropertyPersistence service.
       */
-    virtual void AddTagOfInterest(const DICOMTag& tag, bool makePersistant = true) = 0;
+    virtual void AddTagOfInterest(const DICOMTagPath& tag, bool makePersistant = true) = 0;
 
     /** Returns the map of all tags of interest. Key is the property name. Value is the DICOM tag.*/
-    virtual DICOMTagMapType GetTagsOfInterest() const = 0;
+    virtual DICOMTagPathMapType GetTagsOfInterest() const = 0;
 
     /** Indicates if the given tag is already a tag of interest.*/
-    virtual bool HasTag(const DICOMTag& tag) const = 0;
+    virtual bool HasTag(const DICOMTagPath& tag) const = 0;
 
     /** \brief Remove specific tag. If it not exists the function will do nothing.
       * \param[in] tag Tag that should be removed.
       */
-    virtual void RemoveTag(const DICOMTag& tag) = 0;
+    virtual void RemoveTag(const DICOMTagPath& tag) = 0;
 
     /** \brief Remove all tags.
       */

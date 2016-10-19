@@ -280,12 +280,12 @@ bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
   filescanner->AddTag( acquisitionTimeTag );
   filescanner->Scan();
 
-  const DICOMGDCMImageFrameList frameList = filescanner->GetFrameInfoList();
+  const DICOMDatasetAccessingImageFrameList frameList = filescanner->GetFrameInfoList();
 
   bool result = false;
   bool first  = true;
 
-  for ( DICOMGDCMImageFrameList::const_iterator pos = frameList.cbegin(); pos != frameList.cend(); ++pos )
+  for (DICOMDatasetAccessingImageFrameList::const_iterator pos = frameList.cbegin(); pos != frameList.cend(); ++pos)
   {
     const std::string dateStr = ( *pos )->GetTagValueAsString( acquisitionDateTag ).value;
     const std::string timeStr = ( *pos )->GetTagValueAsString( acquisitionTimeTag ).value;

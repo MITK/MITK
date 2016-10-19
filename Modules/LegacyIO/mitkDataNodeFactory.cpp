@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseDataIOFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkITKImageImport.h>
+#include <mitkLocaleSwitch.h>
 
 // C-Standard library includes
 #include <stdlib.h>
@@ -95,6 +96,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkProgressBar.h"
+#include "mitkPropertyNameHelper.h"
 #include <mitkDicomSeriesReader.h>
 
 bool mitk::DataNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
@@ -229,8 +231,7 @@ std::string mitk::DataNodeFactory::GetDirectory()
 
 void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 {
-  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
-  setlocale(LC_NUMERIC, "C");
+  mitk::LocaleSwitch localeSwitch("C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );
   std::cin.imbue(l);
@@ -246,7 +247,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     {
       node->SetName(this->GetBaseFileName());
     }
-    setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
     return;
 
@@ -283,11 +283,13 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     {
       std::string nodeName(uid);
       std::string studyDescription;
-      if ( node->GetStringProperty( "dicom.study.StudyDescription", studyDescription ) )
+
+      if (GetBackwardsCompatibleDICOMProperty(0x0008, 0x1030, "dicom.study.StudyDescription", node->GetPropertyList(), studyDescription))
       {
         nodeName = studyDescription;
         std::string seriesDescription;
-        if ( node->GetStringProperty( "dicom.series.SeriesDescription", seriesDescription ) )
+
+        if (GetBackwardsCompatibleDICOMProperty(0x0008, 0x103e, "dicom.study.SeriesDescription", node->GetPropertyList(), seriesDescription))
         {
           nodeName += "/" + seriesDescription;
         }
@@ -305,7 +307,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     ProgressBar::GetInstance()->Progress();
   }
 
-  setlocale(LC_NUMERIC, previousCLocale);
   std::cin.imbue(previousCppLocale);
 }
 

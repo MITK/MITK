@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 
+#include <mitkPropertyNameHelper.h>
+
 #include "QmitkDataStorageTreeModel.h"
 #include "QmitkNodeDescriptorManager.h"
 #include <QmitkEnums.h>
@@ -37,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <map>
 
+#include <mitkCoreServices.h>
+
 QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataStorage
                                                       , bool _PlaceNewNodesOnTop
                                                       , QObject* parent )
@@ -44,6 +48,8 @@ QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataSt
 , m_DataStorage(0)
 , m_PlaceNewNodesOnTop(_PlaceNewNodesOnTop)
 , m_Root(0)
+, m_BlockDataStorageEvents(false)
+, m_AllowHierarchyChange(false)
 {
   this->SetDataStorage(_DataStorage);
 }
@@ -143,7 +149,7 @@ Qt::DropActions QmitkDataStorageTreeModel::supportedDragActions() const
 }
 
 bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
-                                     Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
+                                     Qt::DropAction action, int row, int /*column*/, const QModelIndex &parent)
 {
   // Early exit, returning true, but not actually doing anything (ignoring data).
   if (action == Qt::IgnoreAction)
@@ -175,11 +181,72 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
     // (otherwise, you could have a derived image such as a segmentation, and assign it to another image).
     // NOTE: We are assuming the input list is valid... i.e. when it was dragged, all the items had the same parent.
 
-    if(listOfItemsToDrop[0] != dropItem && listOfItemsToDrop[0]->GetParent() == parentItem)
+    // Determine whether or not the drag and drop operation is a valid one.
+    // Examples of invalid operations include:
+    //  - dragging nodes with different parents
+    //  - dragging nodes from one parent to another parent, if m_AllowHierarchyChange is false
+    //  - dragging a node on one of its child nodes (only relevant if m_AllowHierarchyChange is true)
+
+    bool isValidDragAndDropOperation(true);
+
+    // different parents
+    {
+      TreeItem* firstParent = listOfItemsToDrop[0]->GetParent();
+      QList<TreeItem*>::iterator diIter;
+      for (diIter = listOfItemsToDrop.begin() +1;
+        diIter != listOfItemsToDrop.end();
+        diIter++)
+      {
+        if (firstParent != (*diIter)->GetParent())
+        {
+          isValidDragAndDropOperation = false;
+          break;
+        }
+      }
+    }
+
+    // dragging from one parent to another
+    if((!m_AllowHierarchyChange) && isValidDragAndDropOperation)
+    {
+      if (row == -1)// drag onto a node
+      {
+        isValidDragAndDropOperation = listOfItemsToDrop[0]->GetParent() == parentItem;
+      }
+      else  // drag between nodes
+      {
+        isValidDragAndDropOperation = listOfItemsToDrop[0]->GetParent() == dropItem;
+      }
+    }
+
+    // dragging on a child node of one the dragged nodes
+    {
+      QList<TreeItem*>::iterator diIter;
+      for (diIter = listOfItemsToDrop.begin();
+        diIter != listOfItemsToDrop.end();
+        diIter++)
+      {
+        TreeItem* tempItem = dropItem;
+
+        while (tempItem != m_Root)
+        {
+          tempItem = tempItem->GetParent();
+          if (tempItem == *diIter)
+          {
+            isValidDragAndDropOperation = false;
+          }
+        }
+      }
+    }
+
+    if (!isValidDragAndDropOperation)
+      return isValidDragAndDropOperation;
+
+    if (listOfItemsToDrop[0] != dropItem && isValidDragAndDropOperation)
     {
       // Retrieve the index of where we are dropping stuff.
-      QModelIndex dropItemModelIndex = this->IndexFromTreeItem(dropItem);
       QModelIndex parentModelIndex = this->IndexFromTreeItem(parentItem);
+
+      int dragIndex = 0;
 
       // Iterate through the list of TreeItem (which may be at non-consecutive indexes).
       QList<TreeItem*>::iterator diIter;
@@ -187,26 +254,79 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
            diIter != listOfItemsToDrop.end();
            diIter++)
       {
+        TreeItem* itemToDrop = *diIter;
+
+        // if the item is dragged down we have to compensate its final position for the
+        // fact it is deleted lateron, this only applies if it is dragged within the same level
+        if ( (itemToDrop->GetIndex() < row) && (itemToDrop->GetParent() == dropItem))
+        {
+          dragIndex = 1;
+        }
+
         // Here we assume that as you remove items, one at a time, that GetIndex() will be valid.
-        this->beginRemoveRows(parentModelIndex, (*diIter)->GetIndex(), (*diIter)->GetIndex());
-        parentItem->RemoveChild(*diIter);
+        this->beginRemoveRows(this->IndexFromTreeItem(itemToDrop->GetParent()), itemToDrop->GetIndex(), itemToDrop->GetIndex());
+        itemToDrop->GetParent()->RemoveChild(itemToDrop);
         this->endRemoveRows();
       }
 
+      // row = -1 dropped on an item, row != -1 dropped  in between two items
       // Select the target index position, or put it at the end of the list.
-      int dropIndex = dropItemModelIndex.row();
+      int dropIndex = 0;
+      if (row != -1)
+      {
+        if (dragIndex == 0)
+          dropIndex = std::min(row, parentItem->GetChildCount() - 1);
+        else
+          dropIndex = std::min(row - 1, parentItem->GetChildCount() - 1);
+      }
+      else
+      {
+        dropIndex = dropItem->GetIndex();
+      }
 
-      if (dropIndex == -1 || dropIndex > parentItem->GetChildCount())
-        dropIndex = parentItem->GetChildCount();
+      QModelIndex dropItemModelIndex = this->IndexFromTreeItem(dropItem);
+      if ((row == -1 && dropItemModelIndex.row() == -1) || dropItemModelIndex.row() > parentItem->GetChildCount())
+        dropIndex = parentItem->GetChildCount() - 1;
 
       // Now insert items again at the drop item position
-      this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
+
+      if (m_AllowHierarchyChange)
+      {
+        this->beginInsertRows(dropItemModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
+      }
+      else
+      {
+        this->beginInsertRows(parentModelIndex, dropIndex, dropIndex + listOfItemsToDrop.size() - 1);
+      }
 
       for (diIter  = listOfItemsToDrop.begin();
            diIter != listOfItemsToDrop.end();
            diIter++)
       {
-        parentItem->InsertChild( (*diIter), dropIndex );
+        // dropped on node, behaviour depends on preference setting
+        if (m_AllowHierarchyChange)
+        {
+          m_BlockDataStorageEvents = true;
+          mitk::DataNode* droppedNode = (*diIter)->GetDataNode();
+          mitk::DataNode* dropOntoNode = dropItem->GetDataNode();
+          m_DataStorage->Remove(droppedNode);
+          m_DataStorage->Add(droppedNode, dropOntoNode);
+          m_BlockDataStorageEvents = false;
+
+          dropItem->InsertChild((*diIter), dropIndex);
+        }
+        else
+        {
+          if (row == -1)// drag onto a node
+          {
+            parentItem->InsertChild((*diIter), dropIndex);
+          }
+          else  // drag between nodes
+          {
+            dropItem->InsertChild((*diIter), dropIndex);
+          }
+        }
+
         dropIndex++;
       }
       this->endInsertRows();
@@ -315,13 +435,26 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   QString nodeName;
   if(DicomPropertiesExists(*dataNode))
   {
-    mitk::BaseProperty* seriesDescription = (dataNode->GetProperty("dicom.series.SeriesDescription"));
-    mitk::BaseProperty* studyDescription = (dataNode->GetProperty("dicom.study.StudyDescription"));
-    mitk::BaseProperty* patientsName = (dataNode->GetProperty("dicom.patient.PatientsName"));
+    mitk::BaseProperty* seriesDescription = (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103e).c_str()));
+    mitk::BaseProperty* studyDescription = (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
+    mitk::BaseProperty* patientsName = (dataNode->GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
 
-    nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
-    nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) +  "\n";
-    nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+    mitk::BaseProperty* seriesDescription_deprecated = (dataNode->GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription_deprecated = (dataNode->GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName_deprecated = (dataNode->GetProperty("dicom.patient.PatientsName"));
+
+    if (patientsName)
+    {
+      nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+    }
+    else
+    { /** Code coveres the deprecated property naming for backwards compatibility */
+      nodeName += QFile::encodeName(patientsName_deprecated->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(studyDescription_deprecated->GetValueAsString().c_str()) + "\n";
+      nodeName += QFile::encodeName(seriesDescription_deprecated->GetValueAsString().c_str());
+    }
   }
   else
   {
@@ -361,9 +494,13 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
 bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode& node) const
 {
     bool propertiesExists = false;
-    mitk::BaseProperty* seriesDescription = (node.GetProperty("dicom.series.SeriesDescription"));
-    mitk::BaseProperty* studyDescription = (node.GetProperty("dicom.study.StudyDescription"));
-    mitk::BaseProperty* patientsName = (node.GetProperty("dicom.patient.PatientsName"));
+
+    mitk::BaseProperty* seriesDescription_deprecated = (node.GetProperty("dicom.series.SeriesDescription"));
+    mitk::BaseProperty* studyDescription_deprecated = (node.GetProperty("dicom.study.StudyDescription"));
+    mitk::BaseProperty* patientsName_deprecated = (node.GetProperty("dicom.patient.PatientsName"));
+    mitk::BaseProperty* seriesDescription = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103e).c_str()));
+    mitk::BaseProperty* studyDescription = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
+    mitk::BaseProperty* patientsName = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
 
     if(patientsName!=NULL && studyDescription!=NULL && seriesDescription!=NULL)
     {
@@ -374,6 +511,18 @@ bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode& node
             propertiesExists = true;
         }
     }
+
+    /** Code coveres the deprecated property naming for backwards compatibility */
+    if (patientsName_deprecated != NULL && studyDescription_deprecated != NULL && seriesDescription_deprecated != NULL)
+    {
+      if ((!patientsName_deprecated->GetValueAsString().empty()) &&
+        (!studyDescription_deprecated->GetValueAsString().empty()) &&
+        (!seriesDescription_deprecated->GetValueAsString().empty()))
+      {
+        propertiesExists = true;
+      }
+    }
+
     return propertiesExists;
 }
 
@@ -503,6 +652,7 @@ void QmitkDataStorageTreeModel::AddNodeInternal(const mitk::DataNode *node)
 void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
 {
     if(node == 0
+      || m_BlockDataStorageEvents
       || m_DataStorage.IsNull()
       || !m_DataStorage->Exists(node)
       || m_Root->Find(node) != 0)
@@ -555,9 +705,9 @@ void QmitkDataStorageTreeModel::RemoveNodeInternal( const mitk::DataNode* node )
     this->AdjustLayerProperty();
 }
 
-void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
+void QmitkDataStorageTreeModel::RemoveNode(const mitk::DataNode* node )
 {
-    if (node == 0)
+  if (node == 0 || m_BlockDataStorageEvents)
         return;
 
     this->RemoveNodeInternal(node);
@@ -856,4 +1006,9 @@ void QmitkDataStorageTreeModel::Update()
             this->AddNodeInternal(*it);
         }
     }
+}
+
+void QmitkDataStorageTreeModel::SetAllowHierarchyChange(bool allowHierarchyChange)
+{
+  m_AllowHierarchyChange = allowHierarchyChange;
 }

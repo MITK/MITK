@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNavigationDataSetWriterCSV.h"
 #include <fstream>
 #include <mitkIGTMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
 mitk::NavigationDataSetWriterCSV::NavigationDataSetWriterCSV() : AbstractFileWriter(NavigationDataSet::GetStaticNameOfClass(),
   mitk::IGTMimeTypes::NAVIGATIONDATASETCSV_MIMETYPE(),
@@ -46,13 +47,8 @@ void mitk::NavigationDataSetWriterCSV::Write()
   }
   mitk::NavigationDataSet::ConstPointer data = dynamic_cast<const NavigationDataSet*> (this->GetInput());
 
-    //save old locale
-  char * oldLocale;
-  oldLocale = setlocale( LC_ALL, nullptr );
-
   //define own locale
-  std::locale C("C");
-  setlocale( LC_ALL, "C" );
+  mitk::LocaleSwitch localeSwitch("C");
 
   //write header
   unsigned int numberOfTools = data->GetNumberOfTools();
@@ -92,6 +88,4 @@ void mitk::NavigationDataSetWriterCSV::Write()
 
   out->flush();
   delete out;
-  //switch back to old locale
-  setlocale( LC_ALL, oldLocale );
 }

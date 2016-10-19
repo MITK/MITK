@@ -39,10 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QtCore/qconfig.h>
 
-#include <QWebEngineView>
-#include <QWebEnginePage>
-#include <QUrlQuery>
-
 #include <QString>
 #include <QStringList>
 #include <QRegExp>
@@ -54,6 +50,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorageEditorInput.h"
 #include <string>
 
+#ifdef MITK_USE_QT_WEBENGINE
+  #include <QWebEngineView>
+  #include <QWebEnginePage>
+  #include <QUrlQuery>
+#endif
+
+class QmitkMitkWorkbenchIntroPart::Impl
+{
+public:
+  Impl()
+#ifdef MITK_USE_QT_WEBENGINE
+    : View(nullptr)
+#endif
+  {
+  }
+
+  ~Impl()
+  {
+  }
+
+#ifdef MITK_USE_QT_WEBENGINE
+  QWebEngineView* View;
+#endif
+
+private:
+  Impl(const Impl&);
+  Impl& operator=(const Impl&);
+};
+
+#ifdef MITK_USE_QT_WEBENGINE
 namespace
 {
   class QmitkWebEnginePage final : public QWebEnginePage
@@ -128,12 +154,18 @@ namespace
     return false;
   }
 }
+#endif
 
 QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
-  : m_Controls(nullptr)
+  : m_Controls(nullptr),
+    m_Impl(new Impl)
 {
   berry::IPreferences::Pointer workbenchPrefs = QmitkExtApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+#ifdef MITK_USE_QT_WEBENGINE
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
+#else
+  workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
+#endif
   workbenchPrefs->Flush();
 }
 
@@ -149,7 +181,11 @@ QmitkMitkWorkbenchIntroPart::~QmitkMitkWorkbenchIntroPart()
   else
   {
     berry::IPreferences::Pointer workbenchPrefs = QmitkExtApplicationPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+#ifdef MITK_USE_QT_WEBENGINE
     workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
+#else
+    workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
+#endif
     workbenchPrefs->Flush();
   }
 
@@ -164,6 +200,7 @@ QmitkMitkWorkbenchIntroPart::~QmitkMitkWorkbenchIntroPart()
     }
   }
 
+  delete m_Impl;
 }
 
 void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
@@ -173,17 +210,21 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
     // create GUI widgets
     m_Controls = new Ui::QmitkWelcomeScreenViewControls;
     m_Controls->setupUi(parent);
+
+#ifdef MITK_USE_QT_WEBENGINE
     // create a QWebView as well as a QWebPage and QWebFrame within the QWebview
-    m_view = new QWebEngineView(parent);
+    m_Impl->View = new QWebEngineView(parent);
 
     auto page = new QmitkWebEnginePage(this, parent);
-    m_view->setPage(page);
+    m_Impl->View->setPage(page);
 
     QUrl urlQtResource(QString("qrc:/org.mitk.gui.qt.welcomescreen/mitkworkbenchwelcomeview.html"),  QUrl::TolerantMode );
-    m_view->load( urlQtResource );
+    m_Impl->View->load( urlQtResource );
 
     // adds the webview as a widget
-    parent->layout()->addWidget(m_view);
+    parent->layout()->addWidget(m_Impl->View);
+#endif
+
     this->CreateConnections();
   }
 }
@@ -194,10 +235,8 @@ void QmitkMitkWorkbenchIntroPart::CreateConnections()
 
 void QmitkMitkWorkbenchIntroPart::StandbyStateChanged(bool /*standby*/)
 {
-
 }
 
 void QmitkMitkWorkbenchIntroPart::SetFocus()
 {
-
 }

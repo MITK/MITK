@@ -57,11 +57,6 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
 
   if(params != nullptr && results != nullptr)
   {
-//    hist->Print();
-//    params->Print();
-//    results->Print();
-
-
     for(unsigned int i=0; i<m_Vals.size(); i++)
     {
       delete m_Vals[i];
@@ -91,42 +86,53 @@ void QmitkPartialVolumeAnalysisWidget::SetParameters( ParamsType *params, Result
 
     fiberFA = fiberFA / weights;
 
-
     QPen pen( Qt::SolidLine );
-    pen.setWidth(2);
+    pen.setWidth(1);
+
+    QwtText plot_title("Compartment Histograms " );
+    plot_title.setFont( QFont("Helvetica", 10, QFont::Bold) );
+    this->SetPlotTitle( plot_title );
 
     pen.setColor(Qt::black);
-    int curveId = this->InsertCurve( "histogram" );
+    int curveId = this->InsertCurve( "Histogram" );
     this->SetCurveData( curveId, (*m_Vals[0]), (*m_Vals[1]) );
     this->SetCurvePen( curveId, pen );
+    this->SetCurveAntialiasingOn( curveId );
     //  this->SetCurveTitle( curveId, "Image Histogram" );
 
+    pen.setColor(Qt::blue);
+    pen.setWidth(2);
+    curveId = this->InsertCurve( "Combined" );
+    this->SetCurveData( curveId, (*hist->GetXVals()), (*combiVals) );
+    this->SetCurvePen( curveId, pen );
+    m_Vals.push_back(combiVals);
+    this->SetCurveAntialiasingOn( curveId );
 
-    curveId = this->InsertCurve( "fiber" );
+
+    curveId = this->InsertCurve( "Tissue class" );
     this->SetCurveData(curveId, (*hist->GetXVals()), (*fiberVals));
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
     this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(1,0,0,.5), Qt::SolidPattern));
     m_Vals.push_back(fiberVals);
 
 
-    curveId = this->InsertCurve( "nonfiber" );
+    curveId = this->InsertCurve( "Non-tissue class" );
     this->SetCurveData( curveId, (*hist->GetXVals()), (*nonFiberVals) );
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
     this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(0,1,0,.5), Qt::SolidPattern));
     m_Vals.push_back(nonFiberVals);
 
 
-    curveId = this->InsertCurve( "mixed" );
+    curveId = this->InsertCurve( "Mixed (PV) class" );
     this->SetCurveData( curveId, (*hist->GetXVals()), (*mixedVals) );
     this->SetCurvePen( curveId, QPen( Qt::NoPen ) );
     this->SetCurveBrush(curveId, QBrush(QColor::fromRgbF(.7,.7,.7,.5), Qt::SolidPattern));
     m_Vals.push_back(mixedVals);
 
-    pen.setColor(Qt::blue);
-    curveId = this->InsertCurve( "combi" );
-    this->SetCurveData( curveId, (*hist->GetXVals()), (*combiVals) );
-    this->SetCurvePen( curveId, pen );
-    m_Vals.push_back(combiVals);
+    auto legend = new QwtLegend();
+    m_Plot->insertLegend( legend, QwtPlot::TopLegend );
+
+    this->Replot();
 
 
 

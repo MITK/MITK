@@ -1,0 +1,58 @@
+set(CPP_FILES
+  mitkMAPRegistrationWrapper.cpp
+  mitkMAPRegistrationWrapperObjectFactory.cpp
+  mitkRegEvaluationObjectFactory.cpp
+  mitkRegEvaluationObject.cpp
+  Helper/mitkUIDHelper.cpp
+  Helper/mitkAlgorithmHelper.cpp
+  Helper/mitkMaskedAlgorithmHelper.cpp
+  Helper/mitkRegistrationHelper.cpp
+  Helper/mitkImageMappingHelper.cpp
+  Helper/mitkPointSetMappingHelper.cpp
+  Helper/mitkResultNodeGenerationHelper.cpp
+  Helper/mitkTimeFramesRegistrationHelper.cpp
+  Rendering/mitkRegistrationWrapperMapper2D.cpp
+  Rendering/mitkRegistrationWrapperMapper3D.cpp
+  Rendering/mitkRegistrationWrapperMapperBase.cpp
+  Rendering/mitkRegEvaluationMapper2D.cpp
+  Rendering/mitkRegVisStyleProperty.cpp
+  Rendering/mitkRegVisDirectionProperty.cpp
+  Rendering/mitkRegVisColorStyleProperty.cpp
+  Rendering/mitkRegVisPropertyTags.cpp
+  Rendering/mitkRegVisHelper.cpp
+  Rendering/mitkRegEvalStyleProperty.cpp
+  Rendering/mitkRegEvalWipeStyleProperty.cpp
+)
+
+set(H_FILES
+  mitkMatchPointPropertyTags.h
+  mitkMAPRegistrationWrapper.h
+  mitkMAPRegistrationWrapperObjectFactory.h
+  mitkRegEvaluationObjectFactory.h
+  mitkRegEvaluationObject.h
+  Helper/mitkUIDHelper.h
+  Helper/mitkAlgorithmHelper.h
+  Helper/mitkMaskedAlgorithmHelper.h
+  Helper/mitkRegistrationHelper.h
+  Helper/mitkImageMappingHelper.h
+  Helper/mitkPointSetMappingHelper.h
+  Helper/mitkResultNodeGenerationHelper.h
+  Helper/mitkTimeFramesRegistrationHelper.h
+  Rendering/mitkRegistrationWrapperMapper2D.h
+  Rendering/mitkRegistrationWrapperMapper3D.h
+  Rendering/mitkRegistrationWrapperMapperBase.h
+  Rendering/mitkRegVisStyleProperty.h
+  Rendering/mitkRegVisDirectionProperty.h
+  Rendering/mitkRegVisColorStyleProperty.h
+  Rendering/mitkRegVisPropertyTags.h
+  Rendering/mitkRegVisHelper.h
+  Rendering/mitkRegEvaluationMapper2D.h
+  Rendering/mitkRegEvalStyleProperty.h
+  Rendering/mitkRegEvalWipeStyleProperty.h
+)
+
+set(TPP_FILES
+)
+
+set(MOC_H_FILES
+)

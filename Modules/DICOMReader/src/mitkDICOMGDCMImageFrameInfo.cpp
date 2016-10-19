@@ -18,24 +18,21 @@
 
 mitk::DICOMGDCMImageFrameInfo
 ::DICOMGDCMImageFrameInfo(const std::string& filename, unsigned int frameNo)
-:itk::LightObject()
-,m_FrameInfo( DICOMImageFrameInfo::New(filename, frameNo) )
+:DICOMDatasetAccessingImageFrameInfo(filename, frameNo)
 ,m_TagForValue()
 {
 }
 
 mitk::DICOMGDCMImageFrameInfo
 ::DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo)
-:itk::LightObject()
-,m_FrameInfo(frameinfo)
+:DICOMDatasetAccessingImageFrameInfo(frameinfo->Filename, frameinfo->FrameNo)
 ,m_TagForValue()
 {
 }
 
 mitk::DICOMGDCMImageFrameInfo
 ::DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping)
-:itk::LightObject()
-,m_FrameInfo(frameinfo)
+:DICOMDatasetAccessingImageFrameInfo(frameinfo->Filename, frameinfo->FrameNo)
 ,m_TagForValue(tagToValueMapping)
 {
 }
@@ -97,30 +94,20 @@ mitk::DICOMGDCMImageFrameInfo
   return result;
 }
 
+mitk::DICOMDatasetAccess::FindingsListType
+mitk::DICOMGDCMImageFrameInfo::GetTagValueAsString(const DICOMTagPath& path) const
+{
+  FindingsListType result;
+  if (path.Size() == 1 && path.IsExplicit())
+  {
+    result.push_back(this->GetTagValueAsString(path.GetFirstNode().tag));
+  }
+  return result;
+}
+
 std::string
 mitk::DICOMGDCMImageFrameInfo
 ::GetFilenameIfAvailable() const
 {
-  if (m_FrameInfo.IsNotNull())
-  {
-    return m_FrameInfo->Filename;
-  }
-  else
-  {
-    return std::string("");
-  }
-}
-
-mitk::DICOMImageFrameInfo::Pointer
-mitk::DICOMGDCMImageFrameInfo
-::GetFrameInfo() const
-{
-  return m_FrameInfo;
-}
-
-void
-  mitk::DICOMGDCMImageFrameInfo
-::SetFrameInfo(DICOMImageFrameInfo::Pointer frameinfo)
-{
-  m_FrameInfo = frameinfo;
+  return this->Filename;
 }

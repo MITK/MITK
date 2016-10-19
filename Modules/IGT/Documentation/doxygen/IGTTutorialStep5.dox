@@ -1,0 +1,72 @@
+/**
+\page IGTTutorialStepAdvanced A deeper look into the IGT Plugins
+
+We already know the three views of the IGT tracking plugin from the first tutorial step (\ref org_mitk_gui_qt_igttracking): \ref org_mitk_views_igttrackingtoolbox , \ref org_mitk_views_igtnavigationtoolmanager and  \ref org_mitk_views_navigationdataplayer . While the first tutorial step only dealt with the usage of these views, we now want to have a deeper look at some parts of the code.
+
+\section Widgets IGT Widgets
+
+A lot of the IGT functionality is available as a widget. So if you need some part of it for your own plugin, you might just want to include the widget. This is for example done for the QmitkNavigationToolCreationWidget, which is used in the \ref org_mitk_views_igttrackingtoolbox view as well as in the \ref org_mitk_views_igtnavigationtoolmanager view.
+
+\imageMacro{IGTTutorialStep5_Widgets.png,"",15.90}
+
+\section DataAccess Data access
+The fist important question is, how to get the tools you want to use for your application. The most simple way is using the \ref org_mitk_views_igtnavigationtoolmanager to load, create or edit the tools and access it via the NavigationToolStorage. It's provided by a microservice and you can access it e.g. via the module context (make sure, your module depends on IGT):
+
+      us::ModuleContext* context = us::GetModuleContext();
+      std::vector<us::ServiceReference <mitk::NavigationToolStorage> > refs = context->GetServiceReferences<mitk::NavigationToolStorage>();
+      m_ToolStorage = context->GetService<mitk::NavigationToolStorage>(refs.front());
+
+Then, simply access the tools by
+
+      m_ToolStorage->GetTool();
+
+There are also many different functions available, e.g. providing the number of available tools or the name of the current tracking device. Just have a look at the documentation of the mitk::NavigationToolStorage if you are interested in it.
+
+\section AutoLoad Autoload all parameters from last session
+
+To increase the usability of the application, the tracking toolbox restores all parameters from the last session. Therefore, we will use the following code to save all parameters. It is also used in the specific tracking device widgets, but we will just have a look at one example, restoring some parameters like the Show-Tracking-Volume-Checkbox, the filename of the autosave path of the tool storage or the index of the tracking volume.
+
+To store the settings, the following code is used:
+
+\snippet QmitkMITKIGTTrackingToolboxView.cpp StoreUISettings
+
+We will reload it with
+\snippet QmitkMITKIGTTrackingToolboxView.cpp LoadUISettings
+
+\section LoadToolStorage Load Tool Storage
+
+This code will load a previously stored or autosaved tool storage:
+
+\snippet QmitkMITKIGTTrackingToolboxView.cpp LoadToolStorage
+
+\section ThreadedTracking Threaded Tracking
+
+Usually, the tracking is done in a separate thread in order to still allow parallel usage of the workbench. If we track the devices in the same thread, the workbench might freeze.
+That's why we use thread workers
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 1
+...which are connected to functions
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 3
+
+The thread will be startet, if we connect a tracking device by pushing the connect button or start tracking etc:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 4
+
+...and finished afterwards:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 5
+
+You can access the data from the worker thread if needed:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 6
+
+Which of the functions is finally executed will be chosen in the ThreadFunc:
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 7
+
+To deconstruct the workers, we first terminate the threads and then delete them
+\snippet QmitkMITKIGTTrackingToolboxView.cpp Thread 2
+
+
+
+
+
+
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+
+*/

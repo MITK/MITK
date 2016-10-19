@@ -1,0 +1,52 @@
+/**
+\page org_mitk_gui_qt_matchpoint_evaluator The MatchPoint Registration Evaluation View
+
+\imageMacro{map-icon-regeval.png, "Icon of the MatchPoint Registration Evaluator", 3}
+
+\li \ref MAP_REGEVAL_Introduction
+\li \ref MAP_REGEVAL_Contact
+\li \ref MAP_REGEVAL_Usage
+
+\section MAP_REGEVAL_Introduction Introduction
+This view offers the possibility to evaluate the quality of the registration/mapping of two given images by visual inspection.
+One may select no registration. Then the images will be displayed in evaluation mode assuming an identity transform (so no mapping).
+It is one of several MatchPoint registration plug-ins.\n
+
+\section MAP_REGEVAL_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
+\section MAP_REGEVAL_Usage Usage
+\imageMacro{view_example.png, "Example screenshot showing the plug-in in use.", 14}
+To use the evaluation view you must have selected at least the moving and the target image you want to use to evaluate.
+If you select a registration with referenced target and moving image (the normal state if you generate registrations with the matchpoint plugins)
+these images will be auto selected by just clicking on the registration.
+If you select no registration the view will assume that an identity transform should be used.\n
+As long as no valid set of data is selected the "Start evaluation" button will be disabled. If its enabled you may start the evaluation mode with it.
+
+\imageMacro{no_data_selected.png, "Example screenshot showing the state if no data is selected", 5}
+
+If the evaluation view is active you can choose between differnt modes of visualization. For more details see \ref MAP_REGEVAL_Styles.\n
+To stop the evaluation mode, you may use the "Stop evaluation" button or just close the evaluation view.
+
+\remark The evaluation view will use the level window settings of the used images. So to changes the level windowing of the evaluation view, you must change the
+level windowing of the respective images.
+
+\section MAP_REGEVAL_Styles Visualization styles
+You can choose from the following visualization styles to evaluate the registration/mapping quality:\n
+\li "Blend": Blends the images with a user defined weight. Default is 50:50.
+\imageMacro{style_blend.png, "Example for mode: Blend", 5}
+\li "Checkerboard": Checkerboard style that composes both images. You may define the resolution of the checkerboard.
+\imageMacro{style_checkerboard.png, "Example for mode: Checkerboard", 5}
+\li "Color blend": Color blend of the images (blue: target image; yellow: moving). Areas where you see no color implies good intensity matchings.
+\imageMacro{style_color_blend.png, "Example for mode: Color blend", 5}
+\li "Contour": Blend mode that display one image as blue "background" and the other image in yellow contours. You may choose the role of the images.
+\imageMacro{style_contour.png, "Example for mode: Contour", 5}
+\li "Difference": Displays the absolute difference of both images.
+\li "Wipe": Blend mode that makes a rectilinear combination of the images. You can choose the mode how the images are splitted. The split is synchronized with the current selection. So you may interact with the split border to position it on interesting areas.
+\imageMacro{style_wipe_cross.png, "Example for mode: Wipe cross", 5}
+\imageMacro{style_wipe_horizontal.png, "Example for mode: Wipe horizontal", 5}
+
+*/
+

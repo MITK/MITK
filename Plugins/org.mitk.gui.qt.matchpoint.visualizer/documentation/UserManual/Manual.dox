@@ -1,0 +1,23 @@
+/**
+\page org_mitk_gui_qt_matchpoint_visualizer The MatchPoint Registration Visualizer Plugin
+
+\imageMacro{map-icon-regvis.png, "Icon of the Registration Visualizer",3}
+
+\li \ref MAP_VIS_Introduction
+\li \ref MAP_VIS_Contact
+\li \ref MAP_VIS_Usage
+
+\section MAP_VIS_Introduction Introduction
+This plugins is in development to offer the user a way to visualize MatchPoint registrations in an MITK scene.
+Currently only a simple grid visualization is implemented.\n
+\remark <b>This is an experimental version and work in progress.</b> So please excuse errors or usage issues and report them. This plugin will be improved and polished with the next releases.
+
+\section MAP_VIS_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+
+\section MAP_VIS_Usage Usage
+Oops. Documentation is missing and to be done.
+*/
+

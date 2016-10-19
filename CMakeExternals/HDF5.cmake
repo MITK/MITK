@@ -27,8 +27,8 @@ if(MITK_USE_HDF5)
     # bad :( This would be fixed by using an external HDF-Installation with ITK/VTK
 
     ExternalProject_Add(${proj}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/hdf5_1.8.14.tar.gz
-       URL_MD5 a482686e733514a51cde12d6fe5c5d95
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/hdf5-1.8.17.tar.gz
+       URL_MD5 7d572f8f3b798a628b8245af0391a0ca
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
@@ -45,9 +45,9 @@ if(MITK_USE_HDF5)
 
     ExternalProject_Get_Property(${proj} install_dir)
     if(WIN32)
-      set(HDF5_DIR ${install_dir}/cmake/hdf5)
+      set(HDF5_DIR ${install_dir}/cmake/)
     else()
-      set(HDF5_DIR ${install_dir}/share/cmake/hdf5)
+      set(HDF5_DIR ${install_dir}/share/cmake)
     endif()
 
   else()

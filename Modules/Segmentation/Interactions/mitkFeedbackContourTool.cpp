@@ -40,6 +40,9 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("layer", IntProperty::New(1000));
   m_FeedbackContourNode->SetProperty("contour.project-onto-plane", BoolProperty::New(false));
   m_FeedbackContourNode->SetProperty("contour.width", FloatProperty::New(1.0));
+  // set to max short, max int doesn't work, max value somewhere hardcoded?
+  m_FeedbackContourNode->SetProperty("layer",IntProperty::New(std::numeric_limits<short>::max()));
+  m_FeedbackContourNode->SetProperty("fixedLayer",BoolProperty::New(true));
 
   SetFeedbackContourColorDefault();
 }
@@ -125,5 +128,5 @@ void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedConto
 
 void mitk::FeedbackContourTool::FillContourInSlice( ContourModel* projectedContour, unsigned int timeStep, Image* sliceImage, int paintingPixelValue )
 {
-  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, sliceImage, paintingPixelValue);
+  mitk::ContourModelUtils::FillContourInSlice(projectedContour, timeStep, sliceImage, sliceImage, paintingPixelValue);
 }

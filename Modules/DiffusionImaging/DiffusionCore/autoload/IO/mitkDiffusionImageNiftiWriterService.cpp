@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itksys/SystemTools.hxx"
 #include "mitkDiffusionCoreIOMimeTypes.h"
 #include "mitkImageCast.h"
+#include <mitkLocaleSwitch.h>
 
 #include <iostream>
 #include <fstream>
@@ -61,20 +62,7 @@ void mitk::DiffusionImageNiftiWriterService::Write()
     MITK_ERROR << "Sorry, filename has not been set!";
     return ;
   }
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not set locale " << locale;
-    }
-  }
+  mitk::LocaleSwitch localeSwitch("C");
 
   char keybuffer[512];
   char valbuffer[512];
@@ -409,14 +397,6 @@ void mitk::DiffusionImageNiftiWriterService::Write()
         myfile3 << std::endl;
       }
     }
-  }
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    MITK_INFO << "Could not reset locale " << currLocale;
   }
 }
 

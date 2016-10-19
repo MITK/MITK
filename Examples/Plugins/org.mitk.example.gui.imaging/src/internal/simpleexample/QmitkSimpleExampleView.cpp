@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStepperAdapter.h"
 #include "QmitkRenderWindow.h"
 
-#include "mitkMovieGenerator.h"
+#include "QmitkFFmpegWriter.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkProperties.h"
@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDir>
+#include <berryPlatform.h>
 
 
 #include <vtkRenderWindow.h>
@@ -124,21 +125,134 @@ void QmitkSimpleExampleView::InitNavigators()
   m_NavigatorsInitialized = mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
+/**
+ * Returns path to the ffmpeg lib if configured in preferences.
+ *
+ * This implementation has been reused from MovieMaker view.
+ *
+ * @return The path to ffmpeg lib or empty string if not configured.
+ */
+QString QmitkSimpleExampleView::GetFFmpegPath() const
+{
+  berry::IPreferences::Pointer preferences = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+
+  return preferences.IsNotNull()
+    ? preferences->Get("ffmpeg", "")
+    : "";
+}
+
+/**
+ * Reads pixels from specified render window.
+ *
+ * This implementation has been reused from MovieMaker view.
+ *
+ * @param renderWindow
+ * @param x
+ * @param y
+ * @param width
+ * @param height
+ * @return
+ */
+static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)
+{
+  if (renderWindow == nullptr)
+    return nullptr;
+
+  unsigned char* frame = new unsigned char[width * height * 3];
+
+  renderWindow->MakeCurrent();
+  glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame);
+
+  return frame;
+}
+
+/**
+ * Records a movie from the selected render window with a default frame rate of 30 Hz.
+ *
+ * Parts of this implementation have been reused from MovieMaker view.
+ */
 void QmitkSimpleExampleView::GenerateMovie()
 {
   QmitkRenderWindow* movieRenderWindow = GetSelectedRenderWindow();
-  //mitk::Stepper::Pointer stepper = multiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice();
-  mitk::Stepper::Pointer stepper = movieRenderWindow->GetSliceNavigationController()->GetSlice();
-  mitk::MovieGenerator::Pointer movieGenerator = mitk::MovieGenerator::New();
-  if (movieGenerator.IsNotNull()) {
-    movieGenerator->SetStepper( stepper );
-    movieGenerator->SetRenderer( mitk::BaseRenderer::GetInstance(movieRenderWindow->GetRenderWindow()) );
 
-    QString movieFileName = QFileDialog::getSaveFileName(0, "Choose a file name", QString(), "Movie (*.avi)");
-    if (!movieFileName.isEmpty()) {
-      movieGenerator->SetFileName( movieFileName.toStdString().c_str() );
-      movieGenerator->WriteMovie();
+  mitk::Stepper::Pointer stepper = movieRenderWindow->GetSliceNavigationController()->GetSlice();
+
+  QmitkFFmpegWriter* movieWriter = new QmitkFFmpegWriter(m_Parent);
+
+  const QString ffmpegPath = GetFFmpegPath();
+
+  if (ffmpegPath.isEmpty())
+  {
+    QMessageBox::information(nullptr, "Movie Maker",
+      "<p>Set path to FFmpeg<sup>1</sup> or Libav<sup>2</sup> (avconv) in preferences (Window -> Preferences... (Ctrl+P) -> External Programs) to be able to record your movies to video files.</p>"
+      "<p>If you are using Linux, chances are good that either FFmpeg or Libav is included in the official package repositories.</p>"
+      "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a><br/>"
+      "[2] <a href=\"https://libav.org/download.html\">Download Libav from libav.org</a></p>");
+    return;
+  }
+
+  movieWriter->SetFFmpegPath(GetFFmpegPath());
+
+  vtkRenderWindow* renderWindow = movieRenderWindow->GetRenderWindow();
+
+  if (renderWindow == nullptr)
+    return;
+
+  const int border = 3;
+  const int x = border;
+  const int y = border;
+  int width = renderWindow->GetSize()[0] - border * 2;
+  int height = renderWindow->GetSize()[1] - border * 2;
+
+  if (width & 1)
+    --width;
+
+  if (height & 1)
+    --height;
+
+  if (width < 16 || height < 16)
+    return;
+
+  movieWriter->SetSize(width, height);
+  movieWriter->SetFramerate(30);
+
+  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.mp4)");
+
+  if (saveFileName.isEmpty())
+    return;
+
+  if(!saveFileName.endsWith(".mp4"))
+    saveFileName += ".mp4";
+
+  movieWriter->SetOutputPath(saveFileName);
+
+  const unsigned int numberOfFrames = stepper->GetSteps() - stepper->GetPos();
+
+  try
+  {
+    movieWriter->Start();
+
+    for (unsigned int currentFrame = 0; currentFrame < numberOfFrames; ++currentFrame)
+    {
+      mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
+      renderWindow->MakeCurrent();
+      unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
+      movieWriter->WriteFrame(frame);
+      delete[] frame;
+
+      stepper->Next();
     }
+
+    movieWriter->Stop();
+
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+  }
+  catch (const mitk::Exception& exception)
+  {
+    mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();
+
+    QMessageBox::critical(nullptr, "Generate Movie", exception.GetDescription());
   }
 }
 

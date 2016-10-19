@@ -20,8 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkClassicDICOMSeriesReaderService.h"
 #include "mitkDICOMTagsOfInterestService.h"
 
-#include "mitkDICOMTagHelper.h"
-
 #include <usModuleContext.h>
 
 namespace mitk {
@@ -34,10 +32,10 @@ namespace mitk {
     m_DICOMTagsOfInterestService.reset(new DICOMTagsOfInterestService());
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());
 
-    DefaultDICOMTagMapType tagmap = GetDefaultDICOMTagsOfInterest();
+    DICOMTagPathMapType tagmap = GetDefaultDICOMTagsOfInterest();
     for (auto tag : tagmap)
     {
-      m_DICOMTagsOfInterestService->AddTagOfInterest(tag.second);
+      m_DICOMTagsOfInterestService->AddTagOfInterest(tag.first);
     }
   }
 

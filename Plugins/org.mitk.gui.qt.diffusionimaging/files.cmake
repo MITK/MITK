@@ -3,6 +3,7 @@ set(SRC_CPP_FILES
   QmitkODFRenderWidget.cpp
   QmitkPartialVolumeAnalysisWidget.cpp
   QmitkIVIMWidget.cpp
+  QmitkKurtosisWidget.cpp
   QmitkTbssRoiAnalysisWidget.cpp
   QmitkResidualAnalysisWidget.cpp
   QmitkResidualViewWidget.cpp

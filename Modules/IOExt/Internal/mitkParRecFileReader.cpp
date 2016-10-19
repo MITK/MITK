@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkParRecFileReader.h"
 #include <itkImageFileReader.h>
+#include <mitkLocaleSwitch.h>
 
 #ifdef __GNUC__
 #define stricmp strcasecmp
@@ -114,25 +115,22 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"FOV (ap,fh,rl) [mm]"))
         {
           p=s+strcspn(s,"0123456789");
-          char *oldLocale = setlocale(LC_ALL, nullptr);
+          mitk::LocaleSwitch localeSwitch("C");
           sscanf(p,"%lf %lf %lf", &thickness[0], &thickness[1], &thickness[2]);
-          setlocale(LC_ALL, oldLocale);
         }
         else
         if(strstr(s,"Slice thickness [mm]"))
         {
           p=s+strcspn(s,"0123456789");
-          char *oldLocale = setlocale(LC_ALL, nullptr);
+          mitk::LocaleSwitch localeSwitch("C");
           sscanf(p,"%f", &sliceThickness);
-          setlocale(LC_ALL, oldLocale);
         }
         else
         if(strstr(s,"Slice gap [mm]"))
         {
           p=s+strcspn(s,"-0123456789");
-          char *oldLocale = setlocale(LC_ALL, nullptr);
+          mitk::LocaleSwitch localeSwitch("C");
           sscanf(p,"%f", &sliceGap);
-          setlocale(LC_ALL, oldLocale);
         }
       }
       fclose(f);

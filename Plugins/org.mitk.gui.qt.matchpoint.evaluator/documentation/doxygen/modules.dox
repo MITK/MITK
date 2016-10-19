@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_registration_evaluator org.mitk.gui.qt.registration.evaluator
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+  
+*/
+
+/**
+  \defgroup org_mitk_internal Internal
+  \ingroup org_mitk
+
+  \brief This subcategory includes the internal classes of the org.mitk plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

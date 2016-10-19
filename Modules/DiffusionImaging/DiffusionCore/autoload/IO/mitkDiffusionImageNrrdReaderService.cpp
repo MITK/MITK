@@ -44,7 +44,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageWriteAccessor.h>
 #include <mitkImageDataItem.h>
 #include "mitkIOUtil.h"
-
+#include <mitkLocaleSwitch.h>
 
 namespace mitk
 {
@@ -104,21 +104,7 @@ namespace mitk
     {
       try
       {
-        const std::string& locale = "C";
-        const std::string& currLocale = setlocale( LC_ALL, NULL );
-
-        if ( locale.compare(currLocale)!=0 )
-        {
-          try
-          {
-            setlocale(LC_ALL, locale.c_str());
-          }
-          catch(...)
-          {
-            MITK_INFO << "Could not set locale " << locale;
-          }
-        }
-
+        mitk::LocaleSwitch localeSwitch("C");
 
         MITK_INFO << "DiffusionImageNrrdReaderService: reading image information";
         VectorImageType::Pointer itkVectorImage;
@@ -240,14 +226,6 @@ namespace mitk
         m_OutputCache = outputForCache;
         m_CacheTime.Modified();
 
-        try
-        {
-          setlocale(LC_ALL, currLocale.c_str());
-        }
-        catch(...)
-        {
-          MITK_INFO << "Could not reset locale " << currLocale;
-        }
       }
       catch(std::exception& e)
       {

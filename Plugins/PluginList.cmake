@@ -73,4 +73,14 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.spectrocamrecorder:OFF
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF
+  org.mitk.gui.qt.multilabelsegmentation:ON
+  org.mitk.matchpoint.core.helper:OFF
+  org.mitk.gui.qt.matchpoint.algorithm.browser:OFF
+  org.mitk.gui.qt.matchpoint.algorithm.control:OFF
+  org.mitk.gui.qt.matchpoint.algorithm.batch:OFF
+  org.mitk.gui.qt.matchpoint.mapper:OFF
+  org.mitk.gui.qt.matchpoint.framereg:OFF
+  org.mitk.gui.qt.matchpoint.visualizer:OFF
+  org.mitk.gui.qt.matchpoint.evaluator:OFF
+  org.mitk.gui.qt.matchpoint.manipulator:OFF
 )

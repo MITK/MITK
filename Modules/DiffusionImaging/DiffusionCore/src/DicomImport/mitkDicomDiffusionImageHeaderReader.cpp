@@ -14,8 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkDicomDiffusionImageHeaderReader.h"
+
+#include <mitkLocaleSwitch.h>
 
 #include "mitkGEDicomDiffusionImageHeaderReader.h"
 #include "mitkPhilipsDicomDiffusionImageHeaderReader.h"
@@ -203,20 +204,7 @@ mitk::DicomDiffusionImageHeaderReader::GetOutput()
 
 void mitk::DicomDiffusionImageHeaderReader::ReadPublicTags()
 {
-  const std::string& locale = "C";
-  const std::string& currLocale = setlocale( LC_ALL, nullptr );
-
-  if ( locale.compare(currLocale)!=0 )
-  {
-    try
-    {
-      setlocale(LC_ALL, locale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not set locale " << locale;
-    }
-  }
+  mitk::LocaleSwitch localeSwitch("C");
 
   VolumeReaderType::DictionaryArrayRawPointer inputDict
     = m_VolumeReader->GetMetaDataDictionaryArray();
@@ -314,15 +302,6 @@ void mitk::DicomDiffusionImageHeaderReader::ReadPublicTags()
   this->m_Output->xSlice = xSlice;
   this->m_Output->ySlice = ySlice;
   this->m_Output->zSlice = zSlice;
-
-  try
-  {
-    setlocale(LC_ALL, currLocale.c_str());
-  }
-  catch(...)
-  {
-    MITK_INFO << "Could not reset locale " << currLocale;
-  }
 }
 
 

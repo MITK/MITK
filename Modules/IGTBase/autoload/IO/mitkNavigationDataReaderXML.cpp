@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include "mitkNavigationDataReaderXML.h"
 #include <mitkIGTMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
 // Third Party
 #include <itksys/SystemTools.hxx>
@@ -65,13 +66,8 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::NavigationDataReaderXML::Re
 
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string fileName)
 {
-  //save old locale
-  char * oldLocale;
-  oldLocale = setlocale(LC_ALL, 0);
-
   //define own locale
-  std::locale C("C");
-  setlocale(LC_ALL, "C");
+  mitk::LocaleSwitch localeSwitch("C");
 
   m_FileName = fileName;
 
@@ -116,21 +112,13 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::string
 
   mitk::NavigationDataSet::Pointer navigationDataSet = this->ReadNavigationDataSet();
 
-  //switch back to old locale
-  setlocale(LC_ALL, oldLocale);
-
   return navigationDataSet;
 }
 
 mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istream* stream)
 {
-  //save old locale
-  char * oldLocale;
-  oldLocale = setlocale( LC_ALL, nullptr );
-
   //define own locale
-  std::locale C("C");
-  setlocale( LC_ALL, "C" );
+  mitk::LocaleSwitch localeSwitch("C");
 
   // first get the file version
   m_FileVersion = this->GetFileVersion(stream);
@@ -146,9 +134,6 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istrea
   if (m_NumberOfOutputs == 0) { return nullptr; }
 
   mitk::NavigationDataSet::Pointer dataSet = this->ReadNavigationDataSet();
-
-  //switch back to old locale
-  setlocale( LC_ALL, oldLocale );
 
   return dataSet;
 }

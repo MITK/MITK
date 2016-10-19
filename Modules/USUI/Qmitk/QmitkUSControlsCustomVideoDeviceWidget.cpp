@@ -66,6 +66,9 @@ void QmitkUSControlsCustomVideoDeviceWidget::OnDeviceSet()
       std::string probeName = (*it)->GetName();
       ui->m_ProbeIdentifier->addItem(QString::fromUtf8(probeName.data(), probeName.size()));
     }
+    connect(ui->m_UsDepth, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnDepthChanged()));
+    connect(ui->m_ProbeIdentifier, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnProbeChanged()));
+
   }
   else
   {
@@ -87,8 +90,7 @@ void QmitkUSControlsCustomVideoDeviceWidget::Initialize()
   connect(ui->crop_right, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
   connect(ui->crop_top, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
   connect(ui->crop_bot, SIGNAL(valueChanged(int)), this, SLOT(OnCropAreaChanged()));
-  connect(ui->m_UsDepth, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnDepthChanged()));
-  connect(ui->m_ProbeIdentifier, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnProbeChanged()));
+
 }
 
 void QmitkUSControlsCustomVideoDeviceWidget::OnCropAreaChanged()

@@ -253,7 +253,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
     virtual bool operator==(const DICOMFileReader& other) const override;
 
-    virtual DICOMTagList GetTagsOfInterest() const override;
+    virtual DICOMTagPathList GetTagsOfInterest() const override;
 
   protected:
 
@@ -278,14 +278,7 @@ class MITKDICOMREADER_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
     DICOMITKSeriesGDCMReader(const DICOMITKSeriesGDCMReader& other);
     DICOMITKSeriesGDCMReader& operator=(const DICOMITKSeriesGDCMReader& other);
 
-    /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
-  static DICOMDatasetList ToDICOMDatasetList(const DICOMGDCMImageFrameList& input);
-    /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
-  static DICOMGDCMImageFrameList FromDICOMDatasetList(const DICOMDatasetList& input);
-    /// \brief See \ref DICOMITKSeriesGDCMReader_Internals
-  static DICOMImageFrameList ToDICOMImageFrameList(const DICOMGDCMImageFrameList& input);
-
-    typedef std::vector<DICOMGDCMImageFrameList> SortingBlockList;
+    typedef std::vector<DICOMDatasetAccessingImageFrameList> SortingBlockList;
     /**
       \brief "Hook" for sub-classes, see \ref DICOMITKSeriesGDCMReader_Condensing
       \return REMAINING blocks

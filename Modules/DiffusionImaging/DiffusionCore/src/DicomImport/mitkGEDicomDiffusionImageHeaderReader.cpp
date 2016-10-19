@@ -14,8 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkGEDicomDiffusionImageHeaderReader.h"
+
+#include <mitkLocaleSwitch.h>
+
 
 #include "gdcmGlobal.h"
 #include "gdcmDict.h"
@@ -42,20 +44,7 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
-    const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, nullptr );
-
-    if ( locale.compare(currLocale)!=0 )
-    {
-      try
-      {
-        setlocale(LC_ALL, locale.c_str());
-      }
-      catch(...)
-      {
-        MITK_INFO << "Could not set locale " << locale;
-      }
-    }
+    mitk::LocaleSwitch localeSwitch("C");
 
     // adapted from namic-sandbox
     // DicomToNrrdConverter.cxx
@@ -132,15 +121,6 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     }
 
     TransformGradients();
-
-    try
-    {
-      setlocale(LC_ALL, currLocale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not reset locale " << currLocale;
-    }
   }
 }
 

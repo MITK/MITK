@@ -5,7 +5,6 @@ set(CPP_FILES
   Qmitk/QmitkDoseValueDelegate.cpp
   Qmitk/QmitkDoseVisualStyleDelegate.cpp
   Helper/mitkRTUIConstants.cpp
-  Helper/mitkIsoLevelsGenerator.cpp
 )
 
 set(UI_FILES

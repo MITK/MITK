@@ -1,0 +1,76 @@
+/**
+
+\page org_mitk_views_calibrationtoolmanager The MITK-IGT Navigation Tool Calibration
+
+\imageMacro{../resources/iconTrackingToolCalibration.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+
+\tableofcontents
+
+\section QmitkMITKIGTNavigationToolCalibrationIntroduction Introduction
+This view allows the calibration of navigation tools. The calibrated tools can be saved permanently and later be used for any other IGT application.
+
+
+\section QmitkMITKIGTNavigationToolCalibrationPrerequisities Prerequisites
+
+In the IGT Tracking Toolbox configure your tracking device with at least two tools. The tool you wish to calibrate and one tool used as a pointer during the calibration process. For details on how to configure your tracking device and your tools have a look at \ref org_mitk_views_igttrackingtoolbox .
+After you configured your device and your tools connect your device and start tracking. Now switch to the IGT Navigation Tool Calibration for the calibration process.
+
+
+\section QmitkMITKIGTNavigationToolCalibrationInitialization Initialization
+
+On the tab Initialization choose the tracking device you configured in the prevois step by clicking on it in the box "Available Navigation Data Sources". Then in the box "Tools" the tools you configured for this device should appear. Click on the tool that needs to be calibrated and then on the button "Use as Tool to Calibrate". On top of the view under the headline "Tool To calibrate" you now see the tool information for the chosen tool.
+For the tool used as a pointer do the same. Click on it, then click on the button "Use as Calibration Pointer" and on top of the view under the headline "Calibration pointer you should see the tool information for the pointer tool.
+
+\imageMacro{QmitkIGTTracking_ToolCalibration_Initialization.png,"MITK Screenshot with the initialized tools for calibration",5.00}
+
+
+\section QmitkMITKIGTNavigationToolCalibrationToolTipCalibration Tool Tip Calibration
+
+After you finished the initialization of your tracking device you can proceed on to the tab Tool Tip Calibration to calibrate your tool.
+For the Tool Tip Calibration you have four different options:
+
+<ul>
+<li> Manual: Enter the known Translation and Rotation for the Tool Tip manually
+<li> Single Reference Tool: Use a calibrated tool as a reference to calibrate the non-calibrated tool
+<li> Multiple Tools Reference: Not implemented yet
+<li> Pivoting: Calibrate the tool by pivoting it around its tip. (Not fully implemented yet)
+</ul>
+
+\subsection QmitkMITKIGTNavigationToolCalibrationManual Manual Tool Tip Calibration
+
+Use this method to calibrate a navigation tool, of which you already know the translation and rotation that determine the tool tip calibration.
+Click on Start Edit Tooltip and in the new window you can enter the values for the translation and the rotation. Either by using the sliders or by entering the values into the boxes.
+\imageMacro{QmitkIGTTracking_ToolCalibration_Manual_EditingWindow.png,"MITK Screenshot of the window for manual tool calibration",5.00}
+After you entered the values you can click "Use Manipulated ToolTip" to perform the Calibration on the Tool to calibrate. The box "Current Tool Tip Orientation" will show you the results. It will list the resulting values of the Quaternion, the Euler Angles and the Matrix. 
+\imageMacro{QmitkIGTTracking_ToolCalibration_Manual_After.png,"MITK Screenshot of the Current Tool Tip Orientation Box after the tool was manually calibrated",5.00}
+To save the result permanently just click "Save Calibrated Navigation Tool" and you can save the calibrated tool as an IGTTool for later use with your tracking device in a navigation application.
+If you are not satisfied with the results you can click "Start Edit Tooltip" again and either change the values for the rotation and translation again or just reset everything by clicking on "Reset to Identity". To write the new values or reseted values into the tool just click "Use Manipulated Tool Tip" again. Now you can save your relust just as described above.
+
+\subsection QmitkMITKIGTNavigationToolCalibrationReference Tool Tip Calibration with a single Reference Tool
+
+Use this method to calibrate a navigation tool using a tool as pointer that is already calibrated.
+First choose the number of tracking data you wish to collect. It is 100 by default but you may choose as many as you wish. Now place your tool to calibrate in a fixed position where it is tracked. Next place your pointing tool in a manner that its tip touches the tip and is tracked too. Fix it in this position. For a good calibration it is important that the tools move the least possible.
+After you placed the tools click on the "Collect Navigation Data" Button and wait until all the data is gathered. Now you have several options to adjust the calibration to your needs. You can calibrate the position and/or the orientation or even invert the calibration transform. Choose the options needed for your tool and tracker and then click on "Run Calibration".
+The new Tool Tip Position and Orientation will be displayed und you can now apply them onto your tool by clicking on "Set New Tool Tip Position and/or Tool Orientation". To finally save the calibrated tool for later use just click on "Save Calibrated Navigation Tool".
+If you are not satisfied with the result of the calibration just repeat the steps described above.
+
+\imageMacro{QmitkIGTTracking_ToolCalibration_Reference.png,"MITK Screenshot of the Tool Tip Calibration Widget after a fully performed Tool Calibration using a single reference tool ",5.00}
+
+\subsection QmitkMITKIGTNavigationToolCalibrationMultipleReference Tool Tip Calibration using Multiple Reference Tools
+
+This is not implemented yet.
+
+\subsection QmitkMITKIGTNavigationToolCalibrationPivot Tool Tip Calibration via Pivoting
+
+Not fully implemented yet.
+
+To calibrate your tool via pivoting place it on its tip an pivot it around its tip. Be careful not to move the tip otherwise the calibration result will be inaccurate. After you pivoted the tool into a new position click on the "Add Current Pose" button to collect the navigation data for this position. After you collected as many points as you need click on "Comute Pivot Point" to compute the pivot point.
+Unfortunately nothing will happen now, because the functinality is not fully implemented yet.
+
+\subsection QmitkMITKIGTNavigationToolCalibration Tool Landmark Calibration
+
+Not fully implemented yet.
+
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
+
+*/

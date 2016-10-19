@@ -18,25 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDicomRTReader_h
 #define mitkDicomRTReader_h
 
-#include <itkObject.h>
+#include <mitkAbstractFileReader.h>
 
 #include <mitkImage.h>
-#include <mitkDataNode.h>
 #include <mitkIDICOMTagsOfInterest.h>
 #include <MitkDicomRTExports.h>
 
 namespace mitk
 {
     /**
-    * \brief RTDoseReader reads dicom files of modality RTDOSE.
+    * \brief RTDoseReader reads DICOM files of modality RTDOSE.
     */
-    class MITKDICOMRT_EXPORT RTDoseReader : public itk::Object
+    class MITKDICOMRT_EXPORT RTDoseReader : public mitk::AbstractFileReader
     {
 
         public:
 
-            mitkClassMacroItkParent( RTDoseReader, itk::Object );
-            itkNewMacro( Self );
+            RTDoseReader(const RTDoseReader& other);
+            RTDoseReader();
 
             /**
                 * @brief Reads a dicom dataset from a RTDOSE file
@@ -50,14 +49,15 @@ namespace mitk
                 * relative to a PrescriptionDose defined in the RT-Plan. If there is no
                 * RT-Plan file PrescriptionDose is set to 80% of the maximum dose.
                 */
-            mitk::DataNode::Pointer LoadRTDose(const char* filename);
-
-            RTDoseReader();
+            //mitk::DataNode::Pointer LoadRTDose(const char* filename);
 
             virtual ~RTDoseReader();
 
-    protected:
+            using AbstractFileReader::Read;
+            virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
 
+    private:
+        RTDoseReader* Clone() const override;
         /**
         * \brief Scales an image with a factor
         *
@@ -69,6 +69,7 @@ namespace mitk
         mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService();
 
         mitk::Image::Pointer scaledDoseImage;
+        us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
   };
 
 }

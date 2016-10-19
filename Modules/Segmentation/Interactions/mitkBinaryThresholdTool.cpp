@@ -54,9 +54,11 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
   m_IsFloatImage(false)
 {
   m_ThresholdFeedbackNode = DataNode::New();
-  m_ThresholdFeedbackNode->SetProperty("name", StringProperty::New("Thresholding feedback"));
-  m_ThresholdFeedbackNode->SetProperty("helper object", BoolProperty::New(true));
-  m_ThresholdFeedbackNode->SetFloatProperty("labelset.contour.width", 0.0);
+  m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(0.0, 1.0, 0.0) );
+  m_ThresholdFeedbackNode->SetProperty( "name", StringProperty::New("Thresholding feedback") );
+  m_ThresholdFeedbackNode->SetProperty( "opacity", FloatProperty::New(0.3) );
+  m_ThresholdFeedbackNode->SetProperty("binary", BoolProperty::New(true));
+  m_ThresholdFeedbackNode->SetProperty( "helper object", BoolProperty::New(true) );
 }
 
 mitk::BinaryThresholdTool::~BinaryThresholdTool()
@@ -131,7 +133,7 @@ void mitk::BinaryThresholdTool::SetThresholdValue(double value)
     // enough to work with our images. Might not work on images with really huge ranges, though. Anyways, still seems to be low enough
     // to work for floating point images with a range between 0 and 1. A better solution might be to dynamically calculate the value
     // based on the value range of the current image (as big as possible, as small as necessary).
-    m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.01) ) );
+    //m_ThresholdFeedbackNode->SetProperty( "levelwindow", LevelWindowProperty::New( LevelWindow(m_CurrentThresholdValue, 0.01) ) );
     UpdatePreview();
   }
 }
@@ -151,6 +153,11 @@ void mitk::BinaryThresholdTool::CancelThresholding()
 
 void mitk::BinaryThresholdTool::SetupPreviewNode()
 {
+  itk::RGBPixel<float> pixel;
+  pixel[0] = 0.0f;
+  pixel[1] = 1.0f;
+  pixel[2] = 0.0f;
+
   if (m_NodeForThresholding.IsNotNull())
   {
     Image::Pointer image = dynamic_cast<Image*>(m_NodeForThresholding->GetData());
@@ -158,24 +165,39 @@ void mitk::BinaryThresholdTool::SetupPreviewNode()
 
     if (image.IsNotNull())
     {
-      mitk::Image* workingimage = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+      mitk::LabelSetImage::Pointer workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
 
-      if (workingimage)
+      if (workingImage.IsNotNull())
       {
-        m_ThresholdFeedbackNode->SetData(workingimage->Clone());
+        m_ThresholdFeedbackNode->SetData(workingImage->Clone());
+        m_IsOldBinary = false;
 
         //Let's paint the feedback node green...
         mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
 
-        itk::RGBPixel<float> pixel;
-        pixel[0] = 0.0f;
-        pixel[1] = 1.0f;
-        pixel[2] = 0.0f;
+        if(previewImage.IsNull())
+        {
+            MITK_ERROR << "Cannot create helper objects.";
+            return;
+        }
+
         previewImage->GetActiveLabel()->SetColor(pixel);
         previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
       }
       else
-        m_ThresholdFeedbackNode->SetData(mitk::Image::New());
+      {
+        mitk::Image::Pointer workingImageBin = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+        if(workingImageBin)
+        {
+          m_ThresholdFeedbackNode->SetData( workingImageBin->Clone() );
+          m_IsOldBinary = true;
+        }
+        else
+          m_ThresholdFeedbackNode->SetData( mitk::Image::New() );
+      }
+
+      m_ThresholdFeedbackNode->SetColor(pixel);
+      m_ThresholdFeedbackNode->SetOpacity(0.5);
 
       int layer(50);
       m_NodeForThresholding->GetIntProperty("layer", layer);
@@ -324,12 +346,28 @@ void mitk::BinaryThresholdTool::ITKThresholding(itk::Image<TPixel, VImageDimensi
   segmentation->SetVolume((void*)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
 }
 
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::BinaryThresholdTool::ITKThresholdingOldBinary( itk::Image<TPixel, VImageDimension>* originalImage, Image* segmentation, double thresholdValue, unsigned int timeStep)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<unsigned char, VImageDimension> SegmentationType;
+  typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
+  typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
+  filter->SetInput(originalImage);
+  filter->SetLowerThreshold(thresholdValue);
+  filter->SetUpperThreshold(m_SensibleMaximumThresholdValue);
+  filter->SetInsideValue(1);
+  filter->SetOutsideValue(0);
+  filter->Update();
+
+  segmentation->SetVolume( (void*) (filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+}
 
 void mitk::BinaryThresholdTool::UpdatePreview()
 {
   mitk::Image::Pointer thresholdImage = dynamic_cast<mitk::Image*> (m_NodeForThresholding->GetData());
-  mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
+  mitk::Image::Pointer previewImage = dynamic_cast<mitk::Image*> (m_ThresholdFeedbackNode->GetData());
   if (thresholdImage && previewImage)
   {
     for (unsigned int timeStep = 0; timeStep < thresholdImage->GetTimeSteps(); ++timeStep)
@@ -339,7 +377,15 @@ void mitk::BinaryThresholdTool::UpdatePreview()
       timeSelector->SetTimeNr(timeStep);
       timeSelector->UpdateLargestPossibleRegion();
       Image::Pointer feedBackImage3D = timeSelector->GetOutput();
-      AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentThresholdValue, timeStep));
+
+      if(m_IsOldBinary)
+      {
+        AccessByItk_n(feedBackImage3D, ITKThresholdingOldBinary, (previewImage, m_CurrentThresholdValue, timeStep));
+      }
+      else
+      {
+        AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentThresholdValue, timeStep));
+      }
     }
 
     RenderingManager::GetInstance()->RequestUpdateAll();

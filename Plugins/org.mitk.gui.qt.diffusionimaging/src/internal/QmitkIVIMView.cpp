@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include "mitkImageCast.h"
 
+#include "mitkLookupTable.h"
+#include "mitkLookupTableProperty.h"
+
 // itk
 #include "itkScalarImageToHistogramGenerator.h"
 #include "itkRegionOfInterestImageFilter.h"
@@ -50,6 +53,7 @@ QmitkIVIMView::QmitkIVIMView()
     , m_DiffusionImageNode(NULL)
     , m_MaskImageNode(NULL)
     , m_Active(false)
+    , m_HoldUpdate(false)
 {
 }
 
@@ -59,6 +63,8 @@ QmitkIVIMView::~QmitkIVIMView()
 
 void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
 {
+  // hold update untill all elements are set
+  this->m_HoldUpdate = true;
 
     // build up qt view, unless already done
     if ( !m_Controls )
@@ -86,6 +92,12 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_CurveClipboard, SIGNAL(clicked()), this, SLOT(ClipboardCurveButtonClicked()) );
         connect( m_Controls->m_ValuesClipboard, SIGNAL(clicked()), this, SLOT(ClipboardStatisticsButtonClicked()) );
 
+        // connect all kurtosis actions to a recompute
+        connect( m_Controls->m_KurtosisRangeWidget, SIGNAL( rangeChanged(double, double)), this, SLOT(OnKurtosisParamsChanged() ) );
+        //connect( m_Controls->m_MaximalBValueWidget, SIGNAL( valueChanged(double)), this, SLOT( OnKurtosisParamsChanged() ) );
+        connect( m_Controls->m_OmitBZeroCB, SIGNAL( stateChanged(int) ), this, SLOT( OnKurtosisParamsChanged() ) );
+        connect( m_Controls->m_KurtosisFitScale, SIGNAL( currentIndexChanged(int)), this, SLOT( OnKurtosisParamsChanged() ) );
+        connect( m_Controls->m_UseKurtosisBoundsCB, SIGNAL(clicked() ), this, SLOT( OnKurtosisParamsChanged() ) );
     }
 
     QString dstar = QString::number(m_Controls->m_DStarSlider->value()/1000.0);
@@ -107,6 +119,19 @@ void QmitkIVIMView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_Warning->setVisible(false);
 
     MethodCombo(m_Controls->m_MethodCombo->currentIndex());
+
+    m_Controls->m_KurtosisRangeWidget->setSingleStep(0.1);
+    m_Controls->m_KurtosisRangeWidget->setRange( 0.0, 10.0 );
+    m_Controls->m_KurtosisRangeWidget->setMaximumValue( 5.0 );
+
+    // LogScale not working yet, have to fix that first
+    // m_Controls->m_KurtosisFitScale->setEnabled(false);
+
+
+    //m_Controls->m_MaximalBValueWidget->setVisible( false );
+
+    // release update block after the UI-elements were all set
+    this->m_HoldUpdate = false;
 
 }
 
@@ -294,11 +319,15 @@ void QmitkIVIMView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
     if (m_DiffusionImageNode.IsNotNull())
     {
         m_Controls->m_VisualizeResultsWidget->setVisible(true);
+        m_Controls->m_KurtosisVisualizationWidget->setVisible(true);
         m_Controls->m_InputData->setTitle("Input Data");
+
+        m_HoldUpdate = false;
     }
     else
     {
         m_Controls->m_VisualizeResultsWidget->setVisible(false);
+        m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
         m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     }
 
@@ -404,7 +433,6 @@ void QmitkIVIMView::AutoThreshold()
 
 void QmitkIVIMView::FittIVIMStart()
 {
-
     std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
 
     mitk::Image* img = 0;
@@ -430,8 +458,87 @@ void QmitkIVIMView::FittIVIMStart()
 
     OutImgType::IndexType dummy;
 
-    FittIVIM(vecimg, static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), true, dummy);
-    OutputToDatastorage(nodes);
+    if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+    {
+      // KURTOSIS
+      KurtosisFilterType::Pointer filter = KurtosisFilterType::New();
+      filter->SetInput(vecimg);
+      filter->SetReferenceBValue( static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue() );
+      filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer() );
+      filter->SetSmoothingSigma( this->m_Controls->m_SigmaSpinBox->value() );
+
+      if( this->m_Controls->m_UseKurtosisBoundsCB->isChecked() )
+        filter->SetBoundariesForKurtosis( this->m_Controls->m_KurtosisRangeWidget->minimumValue(), this->m_Controls->m_KurtosisRangeWidget->maximumValue() );
+
+      filter->SetFittingScale( static_cast<itk::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() ) );
+
+      if( m_MaskImageNode.IsNotNull() )
+      {
+        mitk::Image::Pointer maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
+        typedef itk::Image<short, 3> MaskImgType;
+
+        MaskImgType::Pointer maskItk;
+        CastToItkImage( maskImg, maskItk );
+
+        filter->SetImageMask( maskItk );
+      }
+
+      filter->Update();
+
+      mitk::LookupTable::Pointer kurt_map_lut = mitk::LookupTable::New();
+      kurt_map_lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
+      mitk::LookupTableProperty::Pointer kurt_lut_prop =
+          mitk::LookupTableProperty::New();
+      kurt_lut_prop->SetLookupTable( kurt_map_lut );
+
+      mitk::Image::Pointer dimage = mitk::Image::New();
+      dimage->InitializeByItk( filter->GetOutput(0) );
+      dimage->SetVolume( filter->GetOutput(0)->GetBufferPointer());
+
+      mitk::Image::Pointer kimage = mitk::Image::New();
+      kimage->InitializeByItk( filter->GetOutput(1) );
+      kimage->SetVolume( filter->GetOutput(1)->GetBufferPointer());
+
+      QString basename(nodes.front()->GetName().c_str());
+      QString new_dname = basename; new_dname = new_dname.append("KurtFit_DMap");
+
+      QString new_kname = basename; new_kname = new_kname.append("KurtFit_KMap");
+
+      if( this->m_Controls->m_CheckKurtD->isChecked() )
+      {
+        mitk::DataNode::Pointer dnode = mitk::DataNode::New();
+        dnode->SetData( dimage );
+        dnode->SetName(new_dname.toLatin1());
+        dnode->SetProperty("LookupTable", kurt_lut_prop );
+        GetDefaultDataStorage()->Add(dnode);
+      }
+
+      if( this->m_Controls->m_CheckKurtK->isChecked() )
+      {
+        mitk::DataNode::Pointer knode = mitk::DataNode::New();
+        knode->SetData( kimage );
+        knode->SetName(new_kname.toLatin1());
+        knode->SetProperty("LookupTable", kurt_lut_prop );
+        GetDefaultDataStorage()->Add(knode);
+      }
+
+    }
+    else
+    {
+      FittIVIM(vecimg,
+             static_cast<mitk::GradientDirectionsProperty*>( img->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+             static_cast<mitk::FloatProperty*>(img->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+             true,
+             dummy);
+
+      OutputToDatastorage(nodes);
+    }
+}
+
+void QmitkIVIMView::OnKurtosisParamsChanged()
+{
+  itk::StartEvent dummy;
+  OnSliceChanged(dummy);
 }
 
 void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
@@ -439,11 +546,15 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
     if(!m_Visible)
         return;
 
+    if(m_HoldUpdate)
+      return;
+
     m_Controls->m_Warning->setVisible(false);
     if(!m_Controls || m_DiffusionImageNode.IsNull())
         return;
 
     m_Controls->m_VisualizeResultsWidget->setVisible(false);
+    m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
 
     mitk::Image::Pointer diffusionImg = dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData());
     mitk::Image::Pointer maskImg = NULL;
@@ -510,7 +621,21 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(newstart, vecimg->GetPixel(index));
 
-        success = FittIVIM(roiImage, static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), false, crosspos);
+        if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+        {
+            success = FitKurtosis(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             newstart);
+        }
+        else
+        {
+            success = FittIVIM(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             false,
+                             crosspos);
+        }
     }
     else
     {
@@ -577,17 +702,68 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
         roiImage->Allocate();
         roiImage->SetPixel(index, avg);
 
-        success = FittIVIM(roiImage, static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(), static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(), false, index);
+        if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+        {
+            success = FitKurtosis(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             index);
+        }
+        else
+        {
+            success = FittIVIM(roiImage,
+                             static_cast<mitk::GradientDirectionsProperty*>( diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )->GetGradientDirectionsContainer(),
+                             static_cast<mitk::FloatProperty*>(diffusionImg->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )->GetValue(),
+                             false,
+                             index);
+        }
+
+        // do not update until selection changed, the values will remain the same as long as the mask is selected!
+        m_HoldUpdate = true;
+
     }
 
     vecimg->SetRegions( vecimg->GetLargestPossibleRegion() );
 
     if (success)
     {
-        m_Controls->m_VisualizeResultsWidget->setVisible(true);
-        m_Controls->m_VisualizeResultsWidget->SetParameters(m_Snap);
+        // 0 - IVIM, 1 - Kurtosis
+        if( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+        {
+           m_Controls->m_KurtosisVisualizationWidget->setVisible(true);
+           m_Controls->m_KurtosisVisualizationWidget->SetData(m_KurtosisSnap);
+        }
+        else
+        {
+           m_Controls->m_VisualizeResultsWidget->setVisible(true);
+           m_Controls->m_VisualizeResultsWidget->SetParameters(m_Snap);
+        }
     }
 }
+
+bool QmitkIVIMView::FitKurtosis( itk::VectorImage<short, 3> *vecimg, DirContainerType *dirs, float bval, OutImgType::IndexType &crosspos )
+{
+  KurtosisFilterType::Pointer filter = KurtosisFilterType::New();
+
+  itk::KurtosisFitConfiguration fit_config;
+  fit_config.omit_bzero =  this->m_Controls->m_OmitBZeroCB->isChecked();
+  if( this->m_Controls->m_UseKurtosisBoundsCB->isChecked() )
+  {
+    fit_config.use_K_limits = true;
+    vnl_vector_fixed<double, 2> k_limits;
+    k_limits[0] = this->m_Controls->m_KurtosisRangeWidget->minimumValue();
+    k_limits[1] = this->m_Controls->m_KurtosisRangeWidget->maximumValue();
+
+    fit_config.K_limits = k_limits;
+
+  }
+  fit_config.fit_scale = static_cast<itk::FitScale>(this->m_Controls->m_KurtosisFitScale->currentIndex() );
+
+  m_KurtosisSnap = filter->GetSnapshot( vecimg->GetPixel( crosspos ), dirs, bval, fit_config );
+
+  return true;
+}
+
 
 bool QmitkIVIMView::FittIVIM(itk::VectorImage<short,3>* vecimg, DirContainerType* dirs, float bval, bool multivoxel, OutImgType::IndexType &crosspos)
 {
@@ -720,7 +896,27 @@ void QmitkIVIMView::ChooseMethod()
 
 void QmitkIVIMView::ClipboardCurveButtonClicked()
 {
-    if(true)
+  // Kurtosis
+    if ( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
+    {
+      std::stringstream ss;
+      QString clipboard("Measurement Points\n");
+
+      ss << m_KurtosisSnap.bvalues << "\n" << m_KurtosisSnap.measurements << "\n\n";
+      ss << "Fitted Values ( D  K  [b_0] ) \n" << m_KurtosisSnap.m_D << " " << m_KurtosisSnap.m_K;
+      if( m_KurtosisSnap.m_fittedBZero )
+        ss << " " << m_KurtosisSnap.m_BzeroFit;
+
+      ss << "\n\n";
+      clipboard.append( QString( ss.str().c_str() ));
+
+      ss.str( std::string() );
+      ss.clear();
+
+      QApplication::clipboard()->setText(
+                  clipboard, QClipboard::Clipboard );
+    }
+    else
     {
 
         QString clipboard("Measurement Points\n");
@@ -771,30 +967,33 @@ void QmitkIVIMView::ClipboardCurveButtonClicked()
         QApplication::clipboard()->setText(
                     clipboard, QClipboard::Clipboard );
     }
-    else
-    {
-        QApplication::clipboard()->clear();
-    }
 }
 
 
 void QmitkIVIMView::ClipboardStatisticsButtonClicked()
 {
-    if ( true )
+    // Kurtosis
+    if ( m_Controls->m_ModelTabSelectionWidget->currentIndex() )
     {
 
-        QString clipboard( "f \t D \t D* \n" );
-        clipboard = clipboard.append( "%L1 \t %L2 \t %L3" )
-                .arg( m_Snap.currentF, 0, 'f', 10 )
-                .arg( m_Snap.currentD, 0, 'f', 10 )
-                .arg( m_Snap.currentDStar, 0, 'f', 10 ) ;
+        QString clipboard( "D \t K \n" );
+        clipboard = clipboard.append( "%L1 \t %L2" )
+                .arg( m_KurtosisSnap.m_D, 0, 'f', 10 )
+                .arg( m_KurtosisSnap.m_K, 0, 'f', 10 ) ;
 
         QApplication::clipboard()->setText(
                     clipboard, QClipboard::Clipboard );
     }
     else
     {
-        QApplication::clipboard()->clear();
+      QString clipboard( "f \t D \t D* \n" );
+      clipboard = clipboard.append( "%L1 \t %L2 \t %L3" )
+              .arg( m_Snap.currentF, 0, 'f', 10 )
+              .arg( m_Snap.currentD, 0, 'f', 10 )
+              .arg( m_Snap.currentDStar, 0, 'f', 10 ) ;
+
+      QApplication::clipboard()->setText(
+                  clipboard, QClipboard::Clipboard );
     }
 }
 

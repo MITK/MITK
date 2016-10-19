@@ -50,6 +50,7 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
   m_GlobalReinitOnNodeDelete = new QCheckBox;
   m_GlobalReinitOnNodeAdded = new QCheckBox;
   m_UseSurfaceDecimation = new QCheckBox;
+  m_AllowParentChange = new QCheckBox;
 
   auto  formLayout = new QFormLayout;
   formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
@@ -59,6 +60,7 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
   formLayout->addRow("&Call global reinit if node is deleted", m_GlobalReinitOnNodeDelete);
   formLayout->addRow("&Call global reinit if node is added", m_GlobalReinitOnNodeAdded);
   formLayout->addRow("&Use surface decimation:", m_UseSurfaceDecimation);
+  formLayout->addRow("&Allow changing of parent node:", m_AllowParentChange);
 
   m_MainControl->setLayout(formLayout);
   this->Update();
@@ -85,6 +87,8 @@ bool QmitkDataManagerPreferencePage::PerformOk()
                                         , m_GlobalReinitOnNodeAdded->isChecked());
   m_DataManagerPreferencesNode->PutBool("Use surface decimation"
                                         , m_UseSurfaceDecimation->isChecked());
+  m_DataManagerPreferencesNode->PutBool("Allow changing of parent node"
+    , m_AllowParentChange->isChecked());
   return true;
 }
 
@@ -102,4 +106,5 @@ void QmitkDataManagerPreferencePage::Update()
   m_UseSurfaceDecimation->setChecked(m_DataManagerPreferencesNode->GetBool("Use surface decimation", true));
   m_GlobalReinitOnNodeDelete->setChecked(m_DataManagerPreferencesNode->GetBool("Call global reinit if node is deleted", true));
   m_GlobalReinitOnNodeAdded->setChecked(m_DataManagerPreferencesNode->GetBool("Call global reinit if node is added", true));
+  m_AllowParentChange->setChecked(m_DataManagerPreferencesNode->GetBool("Allow changing of parent node", false));
 }

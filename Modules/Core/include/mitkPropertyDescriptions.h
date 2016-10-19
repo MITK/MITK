@@ -29,8 +29,9 @@ namespace mitk
     ~PropertyDescriptions();
 
     bool AddDescription(const std::string& propertyName, const std::string& description, const std::string& className, bool overwrite) override;
-    std::string GetDescription(const std::string& propertyName, const std::string& className) override;
-    bool HasDescription(const std::string& propertyName, const std::string& className) override;
+    bool AddDescriptionRegEx(const std::string& propertyRegEx, const std::string& description, const std::string& className, bool overwrite) override;
+    std::string GetDescription(const std::string& propertyName, const std::string& className, bool overwrite) const override;
+    bool HasDescription(const std::string& propertyName, const std::string& className, bool overwrite) const override;
     void RemoveAllDescriptions(const std::string& className) override;
     void RemoveDescription(const std::string& propertyName, const std::string& className) override;
 
@@ -43,6 +44,7 @@ namespace mitk
     PropertyDescriptions& operator=(const PropertyDescriptions&);
 
     std::map<std::string, DescriptionMap> m_Descriptions;
+    std::map<std::string, DescriptionMap> m_DescriptionsRegEx;
   };
 }
 

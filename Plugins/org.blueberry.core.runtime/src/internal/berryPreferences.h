@@ -239,6 +239,11 @@ namespace berry
      */
     virtual void Sync() override;
 
+    /**
+    * \see IPreferences::BlockSignals()
+    */
+    virtual void BlockSignals(bool block) override;
+
     //# End of IPreferences methods
 
   protected:
@@ -335,6 +340,11 @@ namespace berry
      * A mutex to avoid concurrency crashes. Mutable because we need to use Mutex::lock() in const functions
      */
     mutable QMutex m_Mutex;
+
+    /**
+    * A flag to block berry messages in order to prevent callback functions to be called.
+    */
+    bool m_BlockSignal;
   };
 
 }

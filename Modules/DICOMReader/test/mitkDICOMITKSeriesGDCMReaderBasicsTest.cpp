@@ -37,10 +37,10 @@ int mitkDICOMITKSeriesGDCMReaderBasicsTest(int argc, char* argv[])
   mitk::DICOMFileReaderTestHelper::SetTestInputFilenames( argc,argv );
 
   std::unordered_map<std::string, std::string> expectedPropertyTypes;
-  std::unordered_map<const char*, mitk::DICOMTag> additionalTags;
-  additionalTags.insert( std::make_pair( "Test1", DICOMTag( 0x0008, 0x0005 ) ) );
-  additionalTags.insert( std::make_pair( "Test2", DICOMTag( 0x0008, 0x0060 ) ) );
-  additionalTags.insert( std::make_pair( "Test3", DICOMTag( 0x0020, 0x1041 ) ) );
+  mitk::DICOMITKSeriesGDCMReader::AdditionalTagsMapType additionalTags;
+  additionalTags.insert( std::make_pair(DICOMTag( 0x0008, 0x0005 ), "Test1") );
+  additionalTags.insert( std::make_pair(DICOMTag( 0x0008, 0x0060 ), "Test2") );
+  additionalTags.insert( std::make_pair(DICOMTag( 0x0020, 0x1041 ), "Test3") );
 
   gdcmReader->SetAdditionalTagsOfInterest( additionalTags );
 

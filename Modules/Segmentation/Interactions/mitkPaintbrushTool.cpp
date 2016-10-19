@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAbstractTransformGeometry.h"
 
 #include "mitkLevelWindowProperty.h"
+#include "mitkLabelSetImage.h"
+#include "mitkContourModelUtils.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
@@ -279,7 +281,6 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
 
 }
 
-
 /**
   Just show the contour, get one point as the central point and add surrounding points to the contour.
   */
@@ -290,11 +291,26 @@ void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
 
   if (!positionEvent) return;
 
+  // create new working node
+  // a fresh node is needed to only display the actual drawing process for
+  // the undo function
+  if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
+      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+  m_WorkingSlice = nullptr;
+  m_CurrentPlane = nullptr;
+
+  m_WorkingNode = DataNode::New();
+  m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
+  m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+
+  this->m_WorkingNode->SetVisibility(true);
+
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   m_MasterContour->SetClosed(true);
   this->MouseMoved(interactionEvent, true);
+
 }
 
 void mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
@@ -383,8 +399,17 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     const double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
     const double radius = static_cast<double>(m_Size) / 2.0;
 
-    // draw it the old way
-    FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+    Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+    LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image.GetPointer());
+    int activeColor = 1;
+    if (labelImage != 0)
+    {
+      activeColor = labelImage->GetActiveLabel()->GetValue();
+    }
+
+    mitk::ContourModelUtils::FillContourInSlice(contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue*activeColor);
+
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
 
@@ -439,12 +464,16 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
       m_WorkingNode->SetData(m_WorkingSlice);
       m_WorkingNode->Modified();
     }
+  } else {
+      // switched from different renderwindow
+      // no activate hover highlighting. Otherwise undo / redo wont work
+      this->m_WorkingNode->SetVisibility(false);
   }
 
   m_LastPosition = indexCoordinates;
 
   // visualize contour
-  ContourModel::Pointer displayContour = this->GetFeedbackContour();
+  ContourModel::Pointer displayContour = FeedbackContourTool::GetFeedbackContour();
   displayContour->Clear();
 
   ContourModel::Pointer tmp = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
@@ -475,8 +504,12 @@ void mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEven
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
   if (!positionEvent) return;
 
-  CheckIfCurrentSliceHasChanged(positionEvent);
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
+
+  // deactivate visibility of helper node
+  m_WorkingNode->SetVisibility(false);
+
+  RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
 }
 
 /**

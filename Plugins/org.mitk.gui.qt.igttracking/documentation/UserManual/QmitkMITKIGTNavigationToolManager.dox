@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igtnavigationtoolmanager The MITK-IGT Navigation Tool Manager
 
-\imageMacro{QmitkIGTTracking_IconNavigationToolManager.png,"Icon of the Navigation Tool Manager",2.00}
+\imageMacro{../resources/iconTrackingToolManager.png,"Icon of the Navigation Tool Manager",2.00}
 
 \section QmitkMITKIGTNavigationToolManager Introduction
 
@@ -37,7 +37,7 @@ In the lower part of the UI you always see the list of tools of the tool storage
 
 \section QmitkMITKIGTNavigationToolManagerAddingEditingNavigationTools Adding / Editing Navigation Tools
 
-If you add or edit a navigation tool, an input mask, as shown in the screenshot below, appears. The tool identifier is filled automatically, if you change it, remember that it is unique in the current storage. Also, choose a valid surface for every tool, this is nessesary for correct tool visualization. The other information depends on the tracking system type. So choose a tool file for the Polaris or the MicronTracker system and type in a serial number for the Aurora system. Two identical tools with the same serial number are also possible, they are assigned by the order in which they are attached to the device. As long as they also have the same surface as representation, this should not be a problem for most of the use cases.
+If you add or edit a navigation tool, an input mask, as shown in the screenshot below, appears. The tool identifier is filled automatically, if you change it, remember that it is unique in the current storage. Also, choose a valid surface for every tool, this is nessesary for correct tool visualization. By default, a cone is displayed. The other information depends on the tracking system type, e.g. choose a tool file for the Polaris or the MicronTracker system and type in a serial number for the Aurora system. Two identical tools with the same serial number are also possible, they are assigned by the order in which they are attached to the device. As long as they also have the same surface as representation, this should not be a problem for most of the use cases.
 
 The tool type is additional information which is not needed by the tracking device but might be needed by further IGT applications. The same applies to the tool landmarks which might be defined for a tool. There are two different types of landmarks which are designed as described here:
 
@@ -47,5 +47,7 @@ The tool type is additional information which is not needed by the tracking devi
 </ul>
 
 \imageMacro{QmitkIGTTracking_NavigationToolManagementAddTool.png,"Screenshot of add/edit navigation tool screen",9.19}
+
+Return to the overview of the IGT Tracking Plugin views: \ref org_mitk_gui_qt_igttracking
 
 */

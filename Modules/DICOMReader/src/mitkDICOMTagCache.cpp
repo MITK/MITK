@@ -29,3 +29,9 @@ mitk::DICOMTagCache::DICOMTagCache( const DICOMTagCache&)
 mitk::DICOMTagCache::~DICOMTagCache()
 {
 }
+
+void mitk::DICOMTagCache::SetInputFiles(const StringList& filenames)
+{
+  m_InputFilenames = filenames;
+  this->Modified();
+}

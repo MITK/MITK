@@ -14,8 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkSiemensDicomDiffusionImageHeaderReader.h"
+
+#include <mitkLocaleSwitch.h>
+
+
 #include "gdcmGlobal.h"
 //#include <gdcmVersion.h>
 
@@ -83,20 +86,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
-    const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, nullptr );
-
-    if ( locale.compare(currLocale)!=0 )
-    {
-      try
-      {
-        setlocale(LC_ALL, locale.c_str());
-      }
-      catch(...)
-      {
-        MITK_INFO << "Could not set locale " << locale;
-      }
-    }
+    mitk::LocaleSwitch localeSwitch("C");
 
     // adapted from slicer
     // DicomToNrrdConverter.cxx
@@ -251,14 +241,6 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       vect3d.fill( 0.0 );
       this->m_Output->DiffusionVector = vect3d;
 
-    }
-    try
-    {
-      setlocale(LC_ALL, currLocale.c_str());
-    }
-    catch(...)
-    {
-      MITK_INFO << "Could not reset locale " << currLocale;
     }
   }
 }

@@ -132,6 +132,7 @@ set(CPP_FILES
   DataManagement/mitkPropertyFilters.cpp
   DataManagement/mitkPropertyList.cpp
   DataManagement/mitkPropertyListReplacedObserver.cpp
+  DataManagement/mitkPropertyNameHelper.cpp
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkPropertyPersistence.cpp
   DataManagement/mitkPropertyPersistenceInfo.cpp
@@ -236,6 +237,7 @@ set(CPP_FILES
   IO/mitkItkLoggingAdapter.cpp
   IO/mitkLegacyFileReaderService.cpp
   IO/mitkLegacyFileWriterService.cpp
+  IO/mitkLocaleSwitch.cpp
   IO/mitkLog.cpp
   IO/mitkMimeType.cpp
   IO/mitkMimeTypeProvider.cpp

@@ -1,0 +1,64 @@
+/**
+\page org_mitk_gui_qt_matchpoint_framereg The MatchPoint Motion/Frame Correction Plugin
+
+\imageMacro{"map-icon-run.png", "Icon of the MatchPoint Algorithm Control", 3}
+
+\li \ref MAP_FRAME_Introduction
+\li \ref MAP_FRAME_Contact
+\li \ref MAP_FRAME_Usage
+
+\section MAP_FRAME_Introduction Introduction
+This plugin offers the user a way to use a selected registration algorithm in order to make a frame/motion correction
+for a selected 3D+t images. The plugin is for example helpfull if you have a dynamic image with motion artifacts in same
+time points and you want to reduce/remove this motion artifacts.
+For the selection of an algorithm please see MatchPoint Algorithm Browser (\ref de_dkfz_matchpoint_mitk_gui_qt_algorithm_browser).
+
+\section MAP_FRAME_Contact Contact information
+This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
+and Therapy) at the DKFZ (German Cancer Research Center). If you have any questions, need support,
+find a bug or have a feature request, feel free to contact us at dipp@dkfz.de.
+
+\section MAP_FRAME_Usage Usage
+\imageMacro{"control_example.png" , "Example screenshot showing the plugin in use.", 15}
+To use the plugin a registration algorithm must be loaded and the image must be selected, that should be corrected.\n
+The correction is performed that every frame/timpoint of the image is registered to the first frame. And the corrected frames
+is mapped in the same geometry then the first frame.\n
+If an algorithm is loaded and input images are selected, the plugin will automatically switch to the "Execution" tab.
+
+\subsection MAP_FRAME_Usage_selection Algorithm selection tab
+\imageMacro{step1_selection.png, "Details of the algorithm selection tab.", 6}
+In this tab you can load/"book" the algorithm selected in the MatchPoint Algorithm Browser. In the tab you see the ID of the algorithm
+selected by the browser and its profile information.\n
+If you press "Load selected algorithm", the algorithm will be used by the plugin for the frame correction and the name of the algorithm occurs
+in the text field "Loaded algorithm" (at the top of the plugin view).\n
+At this point, it has no effect if you change the the selection in the browser. The plugin will keep the loaded algorithm until
+you choose to load another one.
+
+\subsection MAP_FRAME_Usage_exec Execution tab
+\imageMacro{step2_execution.png, "Details of the execution tab.", 8}
+In this tab you can specify a name for the correction job (this will determine the names of the result nodes in the data manager).\n
+"Start" will trigger the correction process.
+
+\subsection MAP_FRAME_Usage_settings Settings tab
+\imageMacro{step3_settings.png, "Details of the settings tab.", 8}
+In this tab, you can (1) define the mapping settings \ref MAP_FRAME_Mapper_Settings "(See details)", used for the corrected frames, or (2) parametrize the loaded algorithm (before it starts), if it offers any possibility to do so.
+*/
+
+\section MAP_FRAME_Mapper_Settings Mapper settings
+For the mapping of corrected images, you have several settings available:\n
+\li "Allow undefined pixels": Activate to handle pixels of the result image that are not in the field of view of the input image. This pixel will get the "padding value".
+\li "Allow error pixels": Activate to handle pixels of the result image that can not be mapped because the registration does not support this part of the output image. This pixel will get the "error value".
+\li "Interpolator": Set to choose the interpolation strategy that should be used for mapping. \ref MAP_FRAME_Interpolation "(see details)"
+
+\section MAP_FRAME_Interpolation Interpolation
+You can choose from the following interpolation strategies:\n
+\li "nearest neighbour": Use the value of the nearest pixel. Fastest, but high interpolation errors for gray value images. Right choice for label images or masks.
+\li "Linear": Fast linear interpolation with often sufficient quality. Tends to blur edges.
+\li "BSpline (3rd order)": Good trade off between time and quality.
+\li "Windowed Sinc (Hamming)": Good interpolation quality but very time consuming.
+\li "Windowed Sinc (Welch)": Good interpolation quality but very time consuming.
+
+\subsection MAP_FRAME_Usage_frame_selection Frame selection tab
+\imageMacro{step4_frameselection.png, "Details of the frame selection tab.", 6}
+In this tab you can specify the frames of the currently selected image that should be corrected. As default all frames of an image will be corrected.
+If you only select specific frames, these frames will be corrected all other frames will be just copied unchanged.

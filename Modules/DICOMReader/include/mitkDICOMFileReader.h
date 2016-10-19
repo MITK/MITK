@@ -85,7 +85,7 @@ public:
   /// AnalyzeInputFiles(). Take care of potential exceptions!
   virtual bool LoadImages() = 0;
 
-  virtual DICOMTagList GetTagsOfInterest() const = 0;
+  virtual DICOMTagPathList GetTagsOfInterest() const = 0;
 
   /// A way to provide external knowledge about files and tag values is appreciated.
   virtual void SetTagCache( const DICOMTagCache::Pointer& ) = 0;
@@ -106,14 +106,22 @@ public:
 
   virtual bool operator==( const DICOMFileReader& other ) const = 0;
 
+  /** Type specifies additional tags of interest. Key is the tag path of interest.
+   * The value is an optional user defined name for the property that should be used to store the tag value(s).
+   * Empty value is default and will imply to use the found DICOMTagPath as property name.*/
+  typedef DICOMImageBlockDescriptor::AdditionalTagsMapType AdditionalTagsMapType;
   /**
-  * \brief Set a list of DICOM-Tags that will be copied into the property of the mitk::Image.
+  * \brief Set a list of DICOMTagPaths that specifiy all DICOM-Tags that will be copied into the property of the mitk::Image.
   *
   * This method can be used to specify a list of DICOM-tags that shall be available after the loading.
-  * The content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image,
-  * where the property-key equals the key in the unordered_map.
+  * The value in the tagMap is an optional user defined name for the property key that should be used
+  * when storing the property). Empty value is default and will imply to use the found DICOMTagPath
+  * as property key.
+  * By default the content of the DICOM tags will be stored in a StringLookupTable on the mitk::Image.
+  * This behaviour can be changed by setting a different TagLookupTableToPropertyFunctor via
+  * SetTagLookupTableToPropertyFunctor().
   */
-  virtual void SetAdditionalTagsOfInterest( const std::unordered_map<const char*, DICOMTag>& tagList );
+  virtual void SetAdditionalTagsOfInterest(const AdditionalTagsMapType& tagList);
 
   /**
   * \brief Set a functor that defines how the slice-specific tag-values are stored in a Property.
@@ -145,7 +153,7 @@ protected:
   /// Configuration description for human reader, to be implemented by sub-classes
   virtual void InternalPrintConfiguration( std::ostream& os ) const = 0;
 
-  virtual std::unordered_map<const char*, DICOMTag> GetAdditionalTagsOfInterest() const;
+  virtual AdditionalTagsMapType GetAdditionalTagsOfInterest() const;
 
   mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor GetTagLookupTableToPropertyFunctor() const;
 
@@ -157,7 +165,7 @@ private:
   std::string m_ConfigLabel;
   std::string m_ConfigDescription;
 
-  std::unordered_map<const char*, DICOMTag> m_AdditionalTagsOfInterest;
+  AdditionalTagsMapType m_AdditionalTagsOfInterest;
   mitk::DICOMImageBlockDescriptor::TagLookupTableToPropertyFunctor m_TagLookupTableToPropertyFunctor;
 };
 }

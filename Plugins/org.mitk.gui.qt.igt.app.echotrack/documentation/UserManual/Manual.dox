@@ -1,10 +1,10 @@
 /**
-\page org_mbi_gui_qt_usnavigation Usnavigation Plugin
+\page org_mitk_gui_qt_igt_app_echotrack The Usnavigation Plugin
 
 Available sections:
-  - \ref org_mbi_gui_qt_usnavigationOverview
+  - \ref org_mitk_gui_qt_igt_app_echotrackOverview
 
-\section org_mbi_gui_qt_usnavigationOverview Overview
+\section org_mitk_gui_qt_igt_app_echotrackOverview Overview
 Describe the features of your awesome plugin here
 <ul>
 <li>Increases productivity

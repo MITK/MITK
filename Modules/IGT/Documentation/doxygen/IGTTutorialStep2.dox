@@ -1,11 +1,55 @@
 /**
-\page IGTTutorialStep2 IGT Visualization Filter and MITK Concepts
+\page IGTTutorialStepVisualization IGT Visualization Filter and MITK Concepts
 
 The following code shows how to insert IGT tracking data into an mitk::DataStorage and render the data with the mitk::NavigationDataObjectVisualizationFilter in an mitk::RenderWindow. The full code is shown below and can be found in MITK-Source/Modules/IGT/Tutorial/mitkIGTTutorialStep2.cpp.
-This tutorial is an extra target which can be build separately.
+This tutorial is an extra target which can be build separately (see \ref IGTTutStep1Build).
 
-\include mitkIGTTutorialStep2.cpp
+The example we are using here regards a moving tracker and a fixed object, and after tracking a transform to move the fixed object to the tracked one is calculated and applied.
 
-\ref IGTTutorialStep1 "[Previous step]" \ref IGTTutorialStep3 "[Next step]" \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+\snippet mitkIGTTutorialStep2.cpp What we will do
+
+The next image describes, what happens in this example. The blue and red object are labeled with "1" at their initial position. Next, the blue object will move (approximately along the yellow arrow) to the second position, while the red one stayes fixed. Now we calculate the transform of the blue cones initial and moved position (1 -> 2) and apply this transform to shift the red object to its final position (3). Now, the relative distance and orientation of the blue and red object is as it was in the beginning.
+
+\imageMacro{IGTTutorialStep2_overview.png,"Overlay of the three steps in this example: 1. Initial position\, 2. Blue object moved along the yellow arc\, 3. Final position\, the red object is moved to get the initial relative position compared to the blue object.",9.53}
+
+\section igtTut2sec1 Set up Render Window and Tracking Device
+
+First of all, we create a new render window. For simplicity, we are not using the MITK workbench yet but run this example as a stand alone application. Hence, we need to create a render window and a data storage.
+
+\snippet mitkIGTTutorialStep2.cpp Render Window
+
+Next, we need to set up the tracking device like we did in the last tutorial step \ref IGTTutorialStepFilterPipeline . We set additionally some boundaries for the tracking.
+
+\snippet mitkIGTTutorialStep2.cpp Setup Tracking Device
+
+\section igtTut2sec2 Create Objects
+
+Now we create a fixed and a moving object. For the moving (tracked) object, we decided for a blue cone. First, we set the name and color and add it to the data storage. Next, we need to create a visualitation filter to display it. Here, we connect in the visualization filter the output of our tracking device source to the cone representation.
+
+\snippet mitkIGTTutorialStep2.cpp Moving Object
+
+The fixed object is created accordingly, with a cylindrical shape and red color. As it is not tracked, we define an initial position and orientation, set it to the cylinder object and also store it as fixedNavigationData for later usage. As the object is not continuously updated, we don't need a visualization filter.
+
+\snippet mitkIGTTutorialStep2.cpp Fixed Object
+
+\section igtTut2sec3 The Tracking loop
+
+Before we start tracking, we need to initialize the rendering manager.
+
+\snippet mitkIGTTutorialStep2.cpp Initialize views
+
+We now move the tracked blue cone object for 75 steps, update the rendering and print the position to the output console.
+
+\snippet mitkIGTTutorialStep2.cpp Tracking
+
+\section igtTut2sec2 Final Transform
+
+Finally, we apply the new position of the tracked object (source->GetOutput) to the stored fixedNavigationData transform and update the rendering one last time.
+
+\snippet mitkIGTTutorialStep2.cpp Calculate Transform
+
+The red cylinder is now moved accodring to the tracked transform.
+
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 
 */

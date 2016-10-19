@@ -64,6 +64,9 @@ private:
   /// writes a screenshot in JPEG or PNG format to the file fileName
   void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
 
+  /// returns path to the ffmpeg lib if configured in preferences
+  QString GetFFmpegPath() const;
+
 private slots:
 
   /**

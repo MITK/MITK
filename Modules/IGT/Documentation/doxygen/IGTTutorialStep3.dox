@@ -1,13 +1,17 @@
 /**
-\page IGTTutorialStep3 Qt Gui Tutorial
+\page IGTTutorialStepSimplePlugin IGT QT Tutorial
 
-This tutorial shows how to integrate IGT in your plugin. You can enable this example in CMake with the
-option: MITK_BUILD_org.mitk.gui.qt.igtexamples. The code of the plugin/view is located in:
-MITK-Source/Plugins/org.mitk.gui.qt.igtexamples/src/internal/QmitkIGTTutorialView
+This tutorial shows how to integrate IGT in your plugin. You can enable this example in cmake with the
+option: MITK_BUILD_org.mitk.gui.qt.igtexamples.
+
+\imageMacro{IGTTutorialStep3_cmake.png,"",15.90}
+
+The code of the plugin/view is located in:
+MITK-Source/Plugins/org.mitk.gui.qt.igtexamples/src/internal/QmitkIGTTutorialView .
 The plugin will automatically be lodaed in the mitkWorkbench.
 
-More information can be found in the user manual: \ref org_imageguidedtherapytutorial "User manual"
+Please read the manual page on how to use this example: \ref org_imageguidedtherapytutorial
 
-\ref IGTTutorialStep2 "[Previous step]" \ref IGTTutorialStep4 "[Next step]" \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 
 */

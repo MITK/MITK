@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDeviceSource.h>
 #include "mitkNavigationDataDisplacementFilter.h"
 #include <mitkNavigationDataRecorder.h>
-#include <mitkNavigationDataPlayer.h>
+#include <mitkNavigationDataSequentialPlayer.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -30,16 +30,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## \brief A small console tutorial about MITK-IGT
 int main(int  /*argc*/, char*  /*argv*/[])
 {
+  //The next line starts a snippet to display this code in the documentation. If you don't revise the documentation, don't remove it!
+  //! [What we will do]
   //*************************************************************************
   // What we will do...
   //*************************************************************************
   //In this tutorial we build up a small navigation pipeline with a virtual tracking device
   //which produce random positions and orientation so no additional hardware is required.
+  //
   //The source of the pipeline is a TrackingDeviceSource object. This we connect to a simple
   //filter which just displaces the positions with an offset. After that we use a recorder
-  //to store this new positions and other information to disc in a XML file. After that we use
+  //to store this new positions and other information to disc in a XML file. After that, we use
   //another source (NavigationDataPlayer) to replay the recorded data.
+  //! [What we will do]
 
+  //! [Part I Basic 1]
   //*************************************************************************
   // Part I: Basic initialization of the source and tracking device
   //*************************************************************************
@@ -54,7 +59,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   mitk::VirtualTrackingDevice::Pointer tracker = mitk::VirtualTrackingDevice::New();
   tracker->AddTool("tool1");
   tracker->AddTool("tool2");
+  //! [Part I Basic 1]
 
+  //! [Part I Basic 2]
   //The tracking device object is used for the physical connection to the device. To use the
   //data inside of our tracking pipeline we need a source. This source encapsulate the tracking device
   //and provides objects of the type mitk::NavigationData as output. The NavigationData objects stores
@@ -75,7 +82,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //Note we do not call this on the TrackingDevice object
   source->StartTracking();  //start the tracking
   //Now the source generates outputs.
+  //! [Part I Basic 2]
 
+  //! [Part II]
   //*************************************************************************
   // Part II: Create a NavigationDataToNavigationDataFilter
   //*************************************************************************
@@ -104,6 +113,9 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //  displacer->SetInput(i, source->GetOutput(i));  //here we connect to the displacement filter
   //}
 
+  //! [Part II]
+  //! [Part III: Record the data with the NavigationDataRecorder]
+
   //*************************************************************************
   // Part III: Record the data with the NavigationDataRecorder
   //*************************************************************************
@@ -116,7 +128,7 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //we need the stringstream for building up our filename
   std::stringstream filename;
 
- //the .xml extension and an counter is NOT added automatically anymore -- that was the case in an earlier version
+  //the .xml extension and an counter is NOT added automatically anymore -- that was the case in an earlier version
   filename << itksys::SystemTools::GetCurrentWorkingDirectory() << "/Test Output-0.xml";
 
   std::cout << "Record to file: " << filename.str() << " ..." << std::endl;
@@ -143,8 +155,13 @@ int main(int  /*argc*/, char*  /*argv*/[])
   //The IO-System needs a filename. Otherwise the output
   //is redirected to the console. See MITK-Concepts page for more details on IO in MITK
   mitk::IOUtil::SaveBaseData(recorder->GetNavigationDataSet(), filename.str());
+
+  //! [Part III: Record the data with the NavigationDataRecorder]
+
+  //! [Part IV: Play the data with the NavigationDataPlayer]
+
   //*************************************************************************
-  // Part IV: Play the data with the NavigationDataPlayer
+  // Part IV: Play the data with the NavigationDataSequentialPlayer
   //*************************************************************************
 
   //The recording is finished now so now we can play the data. The NavigationDataPlayer is similar
@@ -154,37 +171,34 @@ int main(int  /*argc*/, char*  /*argv*/[])
 
   std::cout << "Start playing from file: " << filename.str() << " ..." << std::endl;
 
-  mitk::NavigationDataPlayer::Pointer player = mitk::NavigationDataPlayer::New();
+  mitk::NavigationDataSequentialPlayer::Pointer player = mitk::NavigationDataSequentialPlayer::New();
 
   mitk::NavigationDataSet::Pointer naviDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::LoadBaseData(filename.str()).GetPointer());
   player->SetNavigationDataSet(naviDataSet);
 
-  player->StartPlaying(); //this starts the player
-  //From now on the player provides NavigationDatas in the order and
-  //correct time as they were recorded
+  //From now on, the player provides NavigationDatas in a sequential order. The next position is given, as soon as "update" is called, so this player is not in real time.
+  //If you need the correct time of your tracking Data, use the NavigationDataPlayer instead and call "StartPlaying" and "StopPlaying".
 
   //this connects the outputs of the player to the NavigationData objects
   mitk::NavigationData::Pointer nd = player->GetOutput();
   mitk::NavigationData::Pointer nd2 = player->GetOutput(1);
-  for (unsigned int x=0; x<100; x++)
+  for (unsigned int x = 0; x < 100; x++)
   {
     if (nd.IsNotNull()) //check if the output is not null
     {
-      //With this update the NavigationData object propagates through the pipeline to get a new value.
-      //In this case we only have a source (NavigationDataPlayer).
-      nd->Update();
+      //With this call, we go to the next recorded data set.
+      player->GoToNextSnapshot();
 
-      std::cout << x << ": 1:" << nd->GetPosition() << std::endl;
-      std::cout << x << ": 2:" << nd2->GetPosition() << std::endl;
-      std::cout << x << ": 1:" << nd->GetOrientation() << std::endl;
-      std::cout << x << ": 2:" << nd2->GetOrientation() << std::endl;
+      MITK_INFO << "Time Step " << x;
+      MITK_INFO << "Tool 1:" << nd->GetPosition();
+      MITK_INFO << "Tool 2:" << nd2->GetPosition();
 
-      itksys::SystemTools::Delay(100); //sleep a little like in the recorder part
+      itksys::SystemTools::Delay(100); //sleep a little like in the recorder part, just for nice reading...
     }
   }
-  player->StopPlaying(); //This stops the player
-  //With another call of StartPlaying the player will start again at the beginning of the file
 
   itksys::SystemTools::Delay(2000);
   std::cout << "finished" << std::endl;
+
+  //! [Part IV: Play the data with the NavigationDataPlayer]
 }

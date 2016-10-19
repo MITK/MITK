@@ -242,6 +242,18 @@ namespace mitk {
     bool RemoveFilter(AbstractOpenCVImageFilter::Pointer filter);
 
     /**
+     * @brief To be called when the used probe changed. Will update the service properties
+     * @param probename of the now used probe
+     */
+    void ProbeChanged(std::string probename);
+
+    /**
+     * @brief To be called when the scanning depth of the probe changed. Will update the service properties
+     * @param depth that is now used
+     */
+    void DepthChanged(double depth);
+
+    /**
     * \brief Given property is updated in the device micro service.
     * This method is mainly for being used by the control interface
     * superclasses. You do not need to call it by yoursefs in your

@@ -30,3 +30,30 @@ mitk::GetDICOMPropertyForDICOMValuesFunctor(const mitk::DICOMCachedValueLookupTa
 
   return prop.GetPointer();
 }
+
+std::map< std::string, mitk::BaseProperty::Pointer> mitk::GetPropertyByDICOMTagPath(const mitk::PropertyList* list, const mitk::DICOMTagPath& path)
+{
+  std::map< std::string, mitk::BaseProperty::Pointer> result;
+
+  for (const auto& iter : *(list->GetMap()))
+  {
+    DICOMTagPath propPath = PropertyNameToDICOMTagPath(iter.first);
+    if (!propPath.IsEmpty() && path.Equals(propPath))
+    {
+      result.insert(iter);
+    }
+  }
+  return result;
+};
+
+std::map< std::string, mitk::BaseProperty::Pointer> mitk::GetPropertyByDICOMTagPath(const mitk::BaseData* data, const mitk::DICOMTagPath& path)
+{
+  std::map< std::string, mitk::BaseProperty::Pointer> result;
+
+  if (data)
+  {
+    result = GetPropertyByDICOMTagPath(data->GetPropertyList(), path);
+  }
+
+  return result;
+};

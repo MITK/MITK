@@ -20,7 +20,7 @@ The main features are:
     <li> The submodule USHardwareTelemed provides classes for handling a Telemed API device (mitk::USTelemedDevice).
     <li> Control of API-enabled Devices via MITK (Widgets for basic B mode controls and probe selection are available).
   </ul>
-  <li> Designed to interact with the \link IGTGeneralModulePage IGT Module \endlink for tracking functionality.
+  <li> Designed to interact with the \link NavigationGeneralModulePage IGT Module \endlink for tracking functionality.
 </ul>
 
 This module requires OpenCV to be enabled in the superbuild options via CMake.

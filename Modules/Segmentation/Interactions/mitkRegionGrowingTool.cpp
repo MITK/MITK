@@ -24,6 +24,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToContourModelFilter.h"
 #include "mitkRegionGrowingTool.xpm"
 
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
+#include "mitkExtractDirectedPlaneImageFilterNew.h"
+#include "mitkLabelSetImage.h"
+
 // us
 #include <usModule.h>
 #include <usModuleResource.h>

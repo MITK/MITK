@@ -30,64 +30,64 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class MITKDICOMRT_EXPORT RTStructureSetReader: public itk::Object
-  {
-    typedef std::deque<mitk::DataNode::Pointer> ContourModelSetNodes;
-
-    /**
-     * Represent a region of interest (ROI)
-     */
-    class RoiEntry
+    class MITKDICOMRT_EXPORT RTStructureSetReader : public itk::Object
     {
-      public:
-        RoiEntry();
-        RoiEntry( const RoiEntry& src);
-        virtual ~RoiEntry();
-        RoiEntry &operator=(const RoiEntry &src);
+        typedef std::deque<mitk::DataNode::Pointer> ContourModelSetNodes;
 
-        void SetPolyData(ContourModelSet::Pointer roiPolyData);
+        /**
+         * Represent a region of interest (ROI)
+         */
+        class RoiEntry
+        {
+        public:
+            RoiEntry();
+            RoiEntry(const RoiEntry& src);
+            virtual ~RoiEntry();
+            RoiEntry& operator=(const RoiEntry& src);
 
-        unsigned int Number;
-        std::string  Name;
-        std::string  Description;
-        double       DisplayColor[3];
-        mitk::ContourModelSet::Pointer ContourModelSet;
+            void SetPolyData(ContourModelSet::Pointer roiPolyData);
+
+            unsigned int Number;
+            std::string  Name;
+            std::string  Description;
+            double       DisplayColor[3];
+            mitk::ContourModelSet::Pointer ContourModelSet;
+        };
+
+    public:
+        mitkClassMacroItkParent(RTStructureSetReader, itk::Object)
+            itkNewMacro(Self)
+
+            /**
+             * @brief Reading a RT StructureSet from the DICOM file and returns the ROIs
+             * (region of interest) as a ContourModelSet. One ContourModelSet represent
+             * one ROI. A ContourModelSet contains ContourModels which represent the
+             * single structures.
+             * @param filepath to the RT StructureSet (.dmc) file
+             * @return Returns a std::deque filled with ContourModelSet::Pointer the
+             * deque contains all ROIs from the DICOM file
+             */
+             ContourModelSetNodes ReadStructureSet(const char* filepath);
+
+    protected:
+        /**
+         * containing the ROIs meta information like name number and description
+         */
+        std::vector<RoiEntry> ROISequenceVector;
+
+        RTStructureSetReader();
+        virtual ~RTStructureSetReader();
+
+        /**
+         * Returns the number of ROIs from the ROISequenceVector
+         */
+        size_t GetNumberOfROIs();
+
+        /**
+         * Returns the relevant ROI from the ROISequenceVector by its number
+         */
+        RoiEntry* FindRoiByNumber(unsigned int roiNum);
     };
-
-  public:
-    mitkClassMacroItkParent( RTStructureSetReader, itk::Object )
-    itkNewMacro( Self )
-
-    /**
-     * @brief Reading a RT StructureSet from the DICOM file and returns the ROIs
-     * (region of interest) as a ContourModelSet. One ContourModelSet represent
-     * one ROI. A ContourModelSet contains ContourModels which represent the
-     * single structures.
-     * @param filepath to the RT StructureSet (.dmc) file
-     * @return Returns a std::deque filled with ContourModelSet::Pointer the
-     * deque contains all ROIs from the DICOM file
-     */
-    ContourModelSetNodes ReadStructureSet(const char* filepath);
-
-  protected:
-    /**
-     * containing the ROIs meta information like name number and description
-     */
-    std::vector<RoiEntry> ROISequenceVector;
-
-    RTStructureSetReader();
-    virtual ~RTStructureSetReader();
-
-    /**
-     * Returns the number of ROIs from the ROISequenceVector
-     */
-    size_t GetNumberOfROIs();
-
-    /**
-     * Returns the relevant ROI from the ROISequenceVector by its number
-     */
-    RoiEntry* FindRoiByNumber(unsigned int roiNum);
-  };
 }
 
 #endif // MITKRTSTRUCTURESETREADER_H

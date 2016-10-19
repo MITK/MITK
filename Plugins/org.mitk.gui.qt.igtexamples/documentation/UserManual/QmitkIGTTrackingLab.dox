@@ -1,0 +1,68 @@
+/**
+\page org_igttrackinglab IGT Tutorial Step 5: The IGT-TrackingLab
+
+Available sections:
+  - \ref QmitkIGTTrackingLabUsersManualOverview
+  - \ref QmitkIGTTrackingLabUsersManualPrel
+  - \ref QmitkIGTTrackingLabUsersManualConf
+  - \ref QmitkIGTTrackingLabUsersManualIntialReg
+  - \ref QmitkIGTTrackingLabUsersManualPermReg
+  - \ref QmitkIGTTrackingLabUsersManualPtSetRec
+  - \ref QmitkIGTTrackingLabUsersManualCamView
+
+
+\section QmitkIGTTrackingLabUsersManualOverview Introduction
+
+The IGT-TrackingLab is the last step of the IGT tutorial. In the following you can learn how to use the plugin by reading this manual. IGT-TrackingLab shows example usage for many IGT classes and is also an example navigation implemented with IGT.
+
+The symbol of the Tracking Lab View is the following:
+
+\imageMacro{../../resources/icon_igt_tracking_lab.png,"",2}
+
+The view looks like this:
+\imageMacro{IGT_TrackingLab_PluginView.png,"",15.90}
+
+With this tutorial you will register a book using a tracking device of your choice and the MITK's book surface file. The registration will enable you to move the book in the real world and observe its movement in the MITK display. It also allows you to record PointSets or use the CameraView which simulates a Camera at the tip of your pointer.
+
+\section QmitkIGTTrackingLabUsersManualPrel Preliminaries
+First connect your tracking device to your PC. Then start the MITK Workbench and configure your tracking device using the \ref org_mitk_views_igttrackingtoolbox "Tracking Toolbox View".
+
+
+\section QmitkIGTTrackingLabUsersManualConf Configuration
+Select the desired <i>Navigation Data Source</i>. Now it's time to define which tool shall be used as object marker and which tool shall be used as pointer. Next load the Book surface
+provided with the example data (e.g. book.stl from the MITK-Data repository which comes with every superbuild or may also be checked out separately) into MITK. Fixate the object marker on a real book of your choice. Now we need to tell MITK that the object marker has been fixated on a physical object. To do this, select the <i>Book</i> as surface in the <i>Object Selection</i> submenu as you can see in the screenshot above.
+
+\section QmitkIGTTrackingLabUsersManualIntialReg Initial Registration
+Now we need to register the object marker to the surface it's fixed upon, in our case the book. To do this, first press the initial registration button. For MITK to be able to do this registration, we need to
+1. Select landmarks on the virtual object (e.g. the corners of the book)
+Press the <i>plus</i> button in the <i>Image fiducials</i> column. Shift + click on the corners on the book in the <i>MITK Display</i>.
+2. Point to the corresponding landmarks in the real world using the pointer.
+Now press the <i>plus</i> button in the <i>Real world fiducials</i> column and point to the corners on the real book. Press <i>Add current instrument position</i> whenever you targeted a corner to tell MITK this is the desired landmark. Make sure you select the "real" edges in the same order as the edges in the image.
+\imageMacro{IGT_TrackingLab_InitialRegistration.png,"Here the landmarks of the virtual object are already set",15.90}
+
+Press <i>Register</i> to finalize the initial registration.
+Now the object marker is registered onto the book. You can see this in the MITK image. If needed the FRE is shown in the widget.
+
+\section QmitkIGTTrackingLabUsersManualPermReg Permanent Registration
+Now everything is set up and registered. We can thus activate permanent registration to continuously track the object, the object marker and the pointer.
+
+For this, simply press the <i>Permanent Registration</i> button and select <i>Activate permanent registration</i>. You can now move the book in the real world and see the same movement in the <i>MITK Display</i>. A nice test to see if everything was correctly registered is to target the corners of the book with the pointer and check if the correct corners are pointed to in the <i>MITK Display</i>.
+
+\section QmitkIGTTrackingLabUsersManualPtSetRec PointSet Recording
+A user might now want to track a tool's trajectory. For this, the <i>PointSet Recording</i> was created.
+
+First click on <i>PointSet Recording</i>. Now select your tracking source and the tool whose trajectory shall be recorded. Activate the <i>Point Set Recording</i> checkbox. In the <i>MITK Display</i> little green points will now be drawn for every measured position. Deactivate the checkbox to stop recording. The trajectory is saved in the PointSet <i>Recorded Points</i> visible in the Data Manager.
+
+\section QmitkIGTTrackingLabUsersManualCamView Camera View
+Another possible tracking application is the Camera View. Here, a virtual camera is placed at the pointers tip and its images are shown in the MITK Display.
+
+Select Camera View and as usual the Tracking Source and the tool you want to place the virtual camera on. Activate the "Activate Needle View" checkbox and move the pointer around the book. You can now see the book from the pointers perspective.
+
+You may need to adjust the Needle View Direction and the View Up Vector. This is always relative to your tools coordinate center origin. An example of the NDI pointer tool coordinate system is shown below:
+
+\imageMacro{QmitkIGTExamples_Tool.png,"The coordinate system of the NDI pointing tool",16.00}
+
+In the above case, the camera should look in inverse z-direction, and the view up vector should probably be set to positive x. Note this is just an example and may be different depending on your pointer.
+
+\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+*/

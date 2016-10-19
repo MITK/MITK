@@ -1,32 +1,77 @@
 /**
-\page IGTGeneralModulePage The IGT Modules
+\page NavigationGeneralModulePage The Navigation Modules
 
 \section IGTGeneralModulePageOverview Overview
 
-The module IGT integrates image guided therapy (IGT) functionality to MITK. The main features of MITK-IGT are: 
+Navigation modules consist of IGT (Tracking devices), US (Ultrasound) and TOF (3D range imaging) modules. Each module is separated into UI dependent and independent modules (e.g. IGT and IGTUI module). The navigation modules are based on the OpenCVVideoSupport modules and OpenIGTLink modules. In addition, there is the basic module IGTBase, which holds general functionality for all navigation modules.
+
+Most navigation modules support hardware devices. A current list of all supported devices can be found here: <a href="http://mitk.org/wiki/Hardware_Support"> Hardware Support</a>.
+
+\section IGTModules IGT modules
+The module IGT integrates image guided therapy (IGT) functionality to MITK. The main features of MITK-IGT are:
 <ul>
-  <li> handling and processing of medical imaging data which is available through MITK itself 
-  <li> support of tracking devices 
+  <li> handling and processing of medical imaging data which is available through MITK itself
+  <li> support of tracking devices
   <li> a concept for processing tracking data
 </ul>
 
-MITK-IGT consists of two layers for hardware control (Tracking Layer) and processing of tracking data (Navigation Layer). Additionally it offers components for rapid development of graphical user interfaces (GUIs) of navigation applications. To separate UI functionality from the rest of the code UI classes are encapsulated in the separate module IGT-UI.
+MITK-IGT consists of two layers for hardware control (Tracking Layer) and processing of tracking data (Navigation Layer). Additionally it offers components for rapid development of graphicalt user interfaces (GUIs) of navigation applications. To separate UI functionality from the rest of the code UI classes are encapsulated in the separate module IGT-UI.
 
-\section IGTTutorial IGT Tutorial
+The IGT documentation contains the following pages:
 
-If you want to learn more about IGT you can have a look
-on the IGT tutorial, which can be found here:
+<ul>
+<li> \subpage IGTTutorialOverview  IGT Tutorial Overview - This tutorial will guide you step by step through all plugins, modules and documentation pages. It contains the following steps:
+<ul>
+<li> \ref org_mitk_gui_qt_igttracking - Step 1: This tutorial step explains the usage of the most important IGT plugins
 
- \li \subpage IGTTutorialOverview
+<li> \ref IGTTutorialStepFilterPipeline - Step 2: This tutorial step on how to implement an IGT filter pipeline
 
-If you want to implement your own tracking device, have a look here:
- \li \subpage IGTHowToImplementATrackingDevice
+<li> \ref IGTTutorialStepVisualization - Step 3: This tutorial step creates a simple render window to visualize tracking tools.
 
-\section IGTGeneralModulePageModuleList List of IGT Plugins
+<li> \ref IGTTutorialStepSimplePlugin - Step 4: This tutorial step shows you how to create a simple plugin for tracking
 
-There are also a few ready-to-use sample applications available as MITK-Plugins:
+<li> \ref IGTTutorialStepTrackingLab - Step 5: This tutorial step gives step-by-step explanations on how to use the example tracking lab by registering a book of your choice.
 
-  \li \ref org_mitk_gui_qt_igtexample
-  \li \ref org_mitk_gui_qt_igttracking
-  
+<li> \ref IGTTutorialStepAdvanced - Step 6: This step revises the code of the IGT plugins from the first step in more depth
+
+<li> \ref IGTTutorialStepOpenIGTLink - Step 7: This tutorial step gives an overview about OpenIGTLink in MITK
+
+<li> \ref IGTHowToImplementATrackingDevice - Step 8: This guideline is for an implementation of your own tracking device
+</ul>
+
+<li> \ref org_mitk_gui_qt_igttracking - Overview of all tracking views which could be used for your application
+<ul>
+<li> \ref org_mitk_views_igttrackingtoolbox  - Connect your tracking device and start tracking
+
+<li> \ref org_mitk_views_igtnavigationtoolmanager -  Edit your tool storage
+
+<li> \ref org_mitk_views_navigationdataplayer  - Play your navigation data, e.g. recorded with the tracking toolbox
+</ul>
+
+<li> \ref org_mitk_gui_qt_igtexample  - Overview of the example plugin
+
+<ul>
+<li> \ref org_imageguidedtherapytutorial  - The plugin which is created in Step \ref IGTTutorialStepSimplePlugin
+
+<li> \ref org_igttrackinglab - The IGT-TrackingLab view which is described in step \ref IGTTutorialStepTrackingLab
+
+<li> \ref org_openigtlinkexample  OpenIGTLink client example
+
+<li> \ref org_openigtlinkproviderexample OpenIGTLink server example
+
+<li> \ref org_openigtlinkplugin An extended OpenIGTLink example
+</ul>
+</ul>
+
+\section USModules US modules
+
+\li The ultrasound user manual: \ref USModulePage
+
+\section TOFModules TOF modules
+
+\ref org_toftutorial
+
+An explanation on how to create a TOF Module can be found here:
+\li \subpage GeneratingDeviceModulesPage
+
 */

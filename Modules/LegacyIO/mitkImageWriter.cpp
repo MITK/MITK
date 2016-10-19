@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageReadAccessor.h"
+#include <mitkLocaleSwitch.h>
 
 #include <itkImageIOBase.h>
 #include <itkImageIOFactory.h>
@@ -232,20 +233,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
 void mitk::ImageWriter::GenerateData()
 {
-   const std::string& locale = "C";
-   const std::string& currLocale = setlocale( LC_ALL, nullptr );
-
-   if ( locale.compare(currLocale)!=0 )
-   {
-      try
-      {
-         setlocale(LC_ALL, locale.c_str());
-      }
-      catch(...)
-      {
-         MITK_INFO << "Could not set locale " << locale;
-      }
-   }
+   mitk::LocaleSwitch localeSwitch("C");
 
    if ( m_FileName == "" )
    {
@@ -367,15 +355,6 @@ void mitk::ImageWriter::GenerateData()
       }
    }
    m_MimeType = "application/MITK.Pic";
-
-   try
-   {
-      setlocale(LC_ALL, currLocale.c_str());
-   }
-   catch(...)
-   {
-      MITK_INFO << "Could not reset locale " << currLocale;
-   }
 }
 
 bool mitk::ImageWriter::CanWriteDataType( DataNode* input )

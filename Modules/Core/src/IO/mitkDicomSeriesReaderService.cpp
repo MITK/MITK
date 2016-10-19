@@ -19,8 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
 #include <mitkDicomSeriesReader.h>
+#include <mitkLocaleSwitch.h>
 #include <mitkProgressBar.h>
 #include <mitkImage.h>
+#include <mitkPropertyNameHelper.h>
 
 #include <iostream>
 
@@ -36,9 +38,8 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;
 
-  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
-  setlocale(LC_NUMERIC, "C");
-  std::locale previousCppLocale( std::cin.getloc() );
+  mitk::LocaleSwitch localeSwitch("C");
+  std::locale previousCppLocale(std::cin.getloc());
   std::locale l( "C" );
   std::cin.imbue(l);
 
@@ -56,7 +57,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
       data->GetPropertyList()->SetProperty("name", nameProp);
       result.push_back(data);
     }
-    setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
     return result;
 
@@ -92,16 +92,18 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
     if (DicomSeriesReader::LoadDicomSeries(n_it->second.GetFilenames(), *node, true, true, true))
     {
       BaseData::Pointer data = node->GetData();
-      PropertyList::Pointer dataProps = data->GetPropertyList();
+      PropertyList::ConstPointer dataProps = data->GetPropertyList().GetPointer();
 
       std::string nodeName(uid);
       std::string studyDescription;
-      if ( dataProps->GetStringProperty( "dicom.study.StudyDescription", studyDescription ) )
+      
+      if (GetBackwardsCompatibleDICOMProperty(0x0008, 0x1030, "dicom.study.StudyDescription", dataProps, studyDescription))
       {
         nodeName = studyDescription;
         std::string seriesDescription;
-        if ( dataProps->GetStringProperty( "dicom.series.SeriesDescription", seriesDescription ) )
-        {
+
+        if (GetBackwardsCompatibleDICOMProperty(0x0008, 0x103e, "dicom.study.SeriesDescription", dataProps, seriesDescription))
+        { //may not be a string property so use the generic access.
           nodeName += "/" + seriesDescription;
         }
       }
@@ -120,7 +122,6 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
     ProgressBar::GetInstance()->Progress();
   }
 
-  setlocale(LC_NUMERIC, previousCLocale);
   std::cin.imbue(previousCppLocale);
 
   return result;

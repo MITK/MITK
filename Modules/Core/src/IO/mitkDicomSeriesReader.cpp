@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDicomSeriesReader.h>
 #include <mitkImage.h>
 #include <mitkImageCast.h>
+#include <mitkLocaleSwitch.h>
 
 #include <itkGDCMSeriesFileNames.h>
 
@@ -1447,9 +1448,8 @@ void DicomSeriesReader::FixSpacingInformation( mitk::Image* image, const ImageBl
 
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
 {
-  const char* previousCLocale = setlocale(LC_NUMERIC, nullptr);
-  setlocale(LC_NUMERIC, "C");
-  std::locale previousCppLocale( std::cin.getloc() );
+  mitk::LocaleSwitch localeSwitch("C");
+  std::locale previousCppLocale(std::cin.getloc());
   std::locale l( "C" );
   std::cin.imbue(l);
 
@@ -1568,7 +1568,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
       node.SetData( image );
       node.SetName(patientName);
-      setlocale(LC_NUMERIC, previousCLocale);
       std::cin.imbue(previousCppLocale);
     }
 
@@ -1585,7 +1584,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   catch (std::exception& e)
   {
     // reset locale then throw up
-    setlocale(LC_NUMERIC, previousCLocale);
     std::cin.imbue(previousCppLocale);
 
     MITK_DEBUG << "Caught exception in DicomSeriesReader::LoadDicom";

@@ -1,0 +1,39 @@
+<RCC>
+  <qresource prefix="/Qmitk" >
+    <file>AcceptCurrentInterpolation.png</file>
+    <file>AcceptAllInterpolations.png</file>
+    <file>AcceptSurfaceInterpolation.png</file>
+    <file>BooleanDifference_48x48.png</file>
+    <file>BooleanIntersection_48x48.png</file>
+    <file>BooleanUnion_48x48.png</file>
+    <file>Accept_48x48.png</file>
+    <file>Cancel_48x48.png</file>
+    <file>Run_48x48.png</file>
+    <file>ImportLabelSet_48x48.png</file>
+    <file>ImportLabeledImage_48x48.png</file>
+    <file>DeleteLayer_48x48.png</file>
+    <file>PreviousLayer_48x48.png</file>
+    <file>NextLayer_48x48.png</file>
+    <file>AddLayer_48x48.png</file>
+    <file>SegmentationInteractor_48x48.png</file>
+    <file>LockExterior_48x48.png</file>
+    <file>UnlockExterior_48x48.png</file>
+    <file>NewLabel_48x48.png</file>
+    <file>ClearSeeds_48x48.png</file>
+    <file>Start.png</file>
+    <file>Stop.png</file>
+    <file>Help_48x48.png</file>
+    <file>AdvancedTools.png</file>
+    <file>visible.png</file>
+    <file>invisible.png</file>
+    <file>lock.png</file>
+    <file>unlock.png</file>
+    <file>MergeLabels.png</file>
+    <file>RemoveLabel.png</file>
+    <file>EraseLabel.png</file>
+    <file>CreateSurface.png</file>
+    <file>CreateMask.png</file>
+    <file>RandomColor.png</file>
+    <file>RenameLabel.png</file>
+  </qresource>
+</RCC>

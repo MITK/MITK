@@ -88,16 +88,19 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
         newSpacing = geometry->GetSpacing()/m_UpsamplingFactor;
         newOrigin = geometry->GetOrigin();
         mitk::Geometry3D::BoundsArrayType bounds = geometry->GetBounds();
-        newOrigin[0] += bounds.GetElement(0);
-        newOrigin[1] += bounds.GetElement(2);
-        newOrigin[2] += bounds.GetElement(4);
+
+        // we retrieve the origin from a vtk-polydata (corner-based) and hance have to translate it to an image geometry
+        // i.e. center-based
+        newOrigin[0] += bounds.GetElement(0) + 0.5 * newSpacing[0];
+        newOrigin[1] += bounds.GetElement(2) + 0.5 * newSpacing[1];
+        newOrigin[2] += bounds.GetElement(4) + 0.5 * newSpacing[2];
 
         for (int i=0; i<3; i++)
             for (int j=0; j<3; j++)
                 newDirection[j][i] = geometry->GetMatrixColumn(i)[j];
-        upsampledRegion.SetSize(0, geometry->GetExtent(0)*m_UpsamplingFactor);
-        upsampledRegion.SetSize(1, geometry->GetExtent(1)*m_UpsamplingFactor);
-        upsampledRegion.SetSize(2, geometry->GetExtent(2)*m_UpsamplingFactor);
+        upsampledRegion.SetSize(0, ceil( geometry->GetExtent(0)*m_UpsamplingFactor ) );
+        upsampledRegion.SetSize(1, ceil( geometry->GetExtent(1)*m_UpsamplingFactor ) );
+        upsampledRegion.SetSize(2, ceil( geometry->GetExtent(2)*m_UpsamplingFactor ) );
     }
     typename OutputImageType::RegionType::SizeType upsampledSize = upsampledRegion.GetSize();
 

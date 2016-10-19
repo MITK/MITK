@@ -76,6 +76,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Resampling
 #include <itkResampleImageFilter.h>
 #include <itkNearestNeighborInterpolateImageFunction.h>
+#include <itkBSplineInterpolateImageFunction.h>
 #include <itkCastImageFilter.h>
 #include <itkLinearInterpolateImageFunction.h>
 
@@ -1200,10 +1201,15 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 //  this->ResetTwoImageOpPanel();
 
   // check if 4D image and use filter on correct time step
-  int time = ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos();
   if(newImage1->GetDimension() > 3)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+
+    auto sn_widget = static_cast<QmitkSliderNavigatorWidget*>( m_Controls->sliceNavigatorTime );
+    int time = 0;
+
+    if( sn_widget != nullptr )
+        time = sn_widget->GetPos();
 
     timeSelector->SetInput(newImage1);
     timeSelector->SetTimeNr( time );
@@ -1316,8 +1322,13 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   case RESAMPLE_TO:
     {
 
-      itk::LinearInterpolateImageFunction<DoubleImageType>::Pointer nn_interpolator
-        = itk::LinearInterpolateImageFunction<DoubleImageType>::New();
+
+      itk::BSplineInterpolateImageFunction<DoubleImageType, double>::Pointer bspl_interpolator
+        = itk::BSplineInterpolateImageFunction<DoubleImageType, double>::New();
+      bspl_interpolator->SetSplineOrder( 3 );
+
+      itk::NearestNeighborInterpolateImageFunction< DoubleImageType >::Pointer nn_interpolator
+          = itk::NearestNeighborInterpolateImageFunction< DoubleImageType>::New();
 
       DoubleImageType::Pointer itkImage1 = DoubleImageType::New();
       DoubleImageType::Pointer itkImage2 = DoubleImageType::New();
@@ -1329,7 +1340,13 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       resampleFilter->SetInput( itkImage1 );
       resampleFilter->SetReferenceImage( itkImage2 );
       resampleFilter->SetUseReferenceImage( true );
-      resampleFilter->SetInterpolator( nn_interpolator );
+
+      // use NN interp with binary images
+      if( m_SelectedImageNode->GetNode()->GetProperty("binary") )
+        resampleFilter->SetInterpolator( nn_interpolator );
+      else
+        resampleFilter->SetInterpolator( bspl_interpolator );
+
       resampleFilter->SetDefaultPixelValue( 0 );
 
       try

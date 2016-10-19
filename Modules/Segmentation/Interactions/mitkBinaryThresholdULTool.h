@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataNode.h"
+#include <mitkImage.h>
 
 #include <itkImage.h>
 #include <itkBinaryThresholdImageFilter.h>
@@ -69,12 +70,13 @@ namespace mitk
     BinaryThresholdULTool(); // purposely hidden
     virtual ~BinaryThresholdULTool();
 
-    void SetupPreviewNode();
+    virtual void SetupPreviewNode();
+    virtual void runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep);
+    virtual void updateThresholdValue();
 
-    void CreateNewSegmentationFromThreshold(DataNode* node);
-
-    void OnRoiDataChanged();
     void UpdatePreview();
+    void CreateNewSegmentationFromThreshold(DataNode* node);
+    void OnRoiDataChanged();
 
     DataNode::Pointer m_ThresholdFeedbackNode;
     DataNode::Pointer m_OriginalImageNode;
@@ -85,11 +87,15 @@ namespace mitk
     mitk::ScalarType m_CurrentLowerThresholdValue;
     mitk::ScalarType m_CurrentUpperThresholdValue;
 
-    typedef itk::Image<int, 3> ImageType;
-    typedef itk::Image< Tool::DefaultSegmentationDataType, 3> SegmentationType; // this is sure for new segmentations
-    typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
-    ThresholdFilterType::Pointer m_ThresholdFilter;
-
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKThresholding(
+      itk::Image<TPixel,
+      VImageDimension>* originalImage,
+      mitk::Image* segmentation,
+      double lower,
+      double upper,
+      unsigned int timeStep
+    );
   };
 
 } // namespace

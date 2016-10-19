@@ -85,7 +85,7 @@ void mitk::BinaryThresholdULTool::Activated()
 {
   Superclass::Activated();
 
-  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::BinaryThresholdULTool>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<std::remove_reference<decltype(*this)>::type>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
 
   m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
   m_NodeForThresholding = m_OriginalImageNode;
@@ -102,7 +102,7 @@ void mitk::BinaryThresholdULTool::Activated()
 
 void mitk::BinaryThresholdULTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::BinaryThresholdULTool>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<std::remove_reference<decltype(*this)>::type>(this, &mitk::BinaryThresholdULTool::OnRoiDataChanged);
   m_NodeForThresholding = NULL;
   m_OriginalImageNode = NULL;
   try
@@ -163,13 +163,15 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
 
         //Let's paint the feedback node green...
         mitk::LabelSetImage::Pointer previewImage = dynamic_cast<mitk::LabelSetImage*> (m_ThresholdFeedbackNode->GetData());
-
-        itk::RGBPixel<float> pixel;
-        pixel[0] = 0.0f;
-        pixel[1] = 1.0f;
-        pixel[2] = 0.0f;
-        previewImage->GetActiveLabel()->SetColor(pixel);
-        previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
+        if (previewImage) 
+        {
+          itk::RGBPixel<float> pixel;
+          pixel[0] = 0.0f;
+          pixel[1] = 1.0f;
+          pixel[2] = 0.0f;
+          previewImage->GetActiveLabel()->SetColor(pixel);
+          previewImage->GetActiveLabelSet()->UpdateLookupTable(previewImage->GetActiveLabel()->GetValue());
+        }
       }
       else
         m_ThresholdFeedbackNode->SetData( mitk::Image::New() );
@@ -191,21 +193,25 @@ void mitk::BinaryThresholdULTool::SetupPreviewNode()
         m_SensibleMaximumThresholdValue = static_cast<double>( statistics->GetScalarValueMax() );
       }
 
-      double range = m_SensibleMaximumThresholdValue - m_SensibleMinimumThresholdValue;
-      m_CurrentLowerThresholdValue = m_SensibleMinimumThresholdValue + range/3.0;
-      m_CurrentUpperThresholdValue = m_SensibleMinimumThresholdValue + 2*range/3.0;
-
       bool isFloatImage = false;
       if ((originalImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
           &&(originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT || originalImage->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE))
       {
         isFloatImage = true;
       }
-
       IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue, isFloatImage);
-      ThresholdingValuesChanged.Send(m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue);
+
+      updateThresholdValue();
     }
   }
+}
+
+void mitk::BinaryThresholdULTool::updateThresholdValue()
+{
+  double range = m_SensibleMaximumThresholdValue - m_SensibleMinimumThresholdValue;
+  m_CurrentLowerThresholdValue = m_SensibleMinimumThresholdValue + range / 3.0;
+  m_CurrentUpperThresholdValue = m_SensibleMinimumThresholdValue + 2 * range / 3.0;
+  ThresholdingValuesChanged.Send(m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue);
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -309,7 +315,7 @@ void mitk::BinaryThresholdULTool::OnRoiDataChanged()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-static void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double lower, double upper, unsigned int timeStep )
+static void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double lower, double upper, unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
@@ -340,8 +346,13 @@ void mitk::BinaryThresholdULTool::UpdatePreview()
       timeSelector->UpdateLargestPossibleRegion();
       Image::Pointer feedBackImage3D = timeSelector->GetOutput();
 
-      AccessByItk_n(feedBackImage3D, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
+      runItkThreshold(feedBackImage3D, previewImage, timeStep);
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
   }
+}
+
+void mitk::BinaryThresholdULTool::runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep)
+{
+  AccessByItk_n(feedbackImage3D, ITKThresholding, (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
 }

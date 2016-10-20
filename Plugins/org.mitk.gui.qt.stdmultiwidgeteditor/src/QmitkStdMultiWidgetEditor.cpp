@@ -67,7 +67,7 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 
   Events::Types GetPartEventTypes() const override
   {
-    return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
+    return Events::CLOSED | Events::HIDDEN | Events::VISIBLE | Events::OPENED;
   }
 
   void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override
@@ -92,13 +92,25 @@ struct QmitkStdMultiWidgetPartListener : public berry::IPartListener
 
       if (d->m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
       {
-        d->m_StdMultiWidget->RemovePlanesFromDataStorage();
         stdMultiWidgetEditor->RequestActivateMenuWidget(false);
       }
     }
   }
 
   void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override
+  {
+    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+    {
+      QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
+
+      if (d->m_StdMultiWidget == stdMultiWidgetEditor->GetStdMultiWidget())
+      {
+        stdMultiWidgetEditor->RequestActivateMenuWidget(true);
+      }
+    }
+  }
+
+  void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override
   {
     if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {

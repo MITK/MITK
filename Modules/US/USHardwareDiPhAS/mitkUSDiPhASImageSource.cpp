@@ -163,7 +163,6 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   bool writeImage = ((DataType == 0) && (imageData != nullptr)) || ((DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
-
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
 
     // initialize mitk::Image with given image size on the first time
@@ -230,7 +229,10 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
 void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWidth)
 {
-  unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount }; // image dimensions; every image needs a seperate slice!
+  int addEvents = 0;
+  if (m_device->IsInterleaved())
+    addEvents = 1;
+  unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount +addEvents}; // image dimensions; every image needs a seperate slice!
   m_ImageMutex->Lock();
 
   m_Image = mitk::Image::New();
@@ -340,7 +342,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string currentDate = std::ctime(timeptr);
     replaceAll(currentDate, ":", "-");
     currentDate.pop_back();
-    std::string MakeFolder = "mkdir \"d:/DiPhASImageData/" + currentDate + "\"";
+    std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
     system(MakeFolder.c_str());
 
     for (int index = 0; index < m_recordedImages.size(); ++index)
@@ -352,8 +354,8 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
     Image::Pointer LaserImage = Image::New();
     Image::Pointer SoundImage = Image::New();
-    std::string pathLaser = "d:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
-    std::string pathSound = "d:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    std::string pathLaser = "c:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
+    std::string pathSound = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a LaserImage if we used interleaved mode
     {
@@ -378,8 +380,8 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage
   unsigned int height = m_device->GetScanMode().imageHeight;
   unsigned int events = m_device->GetScanMode().transmitEventsCount;
 
-  unsigned int dimLaser[] = { width, height, m_recordedImages.size()/events};
-  unsigned int dimSound[] = { width, height, m_recordedImages.size()/events*(events-1)};
+  unsigned int dimLaser[] = { width, height, m_recordedImages.size()/(events+1)};
+  unsigned int dimSound[] = { width, height, m_recordedImages.size()/(events+1)*events};
   
   LaserImage->Initialize(m_Image->GetPixelType(), 3, dimLaser);
   LaserImage->SetGeometry(m_Image->GetGeometry());

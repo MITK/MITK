@@ -21,7 +21,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>25</height>
+         <height>50</height>
         </size>
        </property>
        <property name="frameShape">
@@ -50,14 +50,7 @@
    <item>
     <layout class="QHBoxLayout" name="General">
      <item>
-      <widget class="QCheckBox" name="UseBModeFilter">
-       <property name="text">
-        <string>Use BMode Envelope Filter</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -70,19 +63,9 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="EventDisplayLabel">
+      <widget class="QCheckBox" name="UseBModeFilter">
        <property name="text">
-        <string>Display Events</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="EventDisplay">
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="value">
-        <number>1</number>
+        <string>Use BMode Envelope Filter</string>
        </property>
       </widget>
      </item>
@@ -111,6 +94,19 @@
         <string>Start Recording</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -142,7 +138,7 @@
         <number>1</number>
        </property>
        <property name="value">
-        <number>2</number>
+        <number>1</number>
        </property>
       </widget>
      </item>
@@ -303,12 +299,12 @@
        </property>
        <item>
         <property name="text">
-         <string>Image Data</string>
+         <string>Beamformed Data</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Beamformed Data</string>
+         <string>Image Data</string>
         </property>
        </item>
       </widget>
@@ -326,7 +322,7 @@
         <double>1000.000000000000000</double>
        </property>
        <property name="value">
-        <double>50.000000000000000</double>
+        <double>100.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -478,6 +474,19 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

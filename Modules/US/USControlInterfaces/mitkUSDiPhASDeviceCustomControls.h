@@ -47,7 +47,6 @@ public:
     */
   virtual bool GetIsActive( ) override;
 
-  virtual void SetEventDisplay(int event);
   virtual void SetUseBModeFilter(bool isSet);
   virtual void SetRecord(bool record);
 

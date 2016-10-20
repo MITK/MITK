@@ -124,6 +124,12 @@ namespace mitk {
     void UpdateScanmode();
     /** This method forwards messages from the API to the user*/
     void MessageCallback(const char* message);
+    void SetBursts(int bursts);
+    void SetInterleaved(bool interleaved);
+    bool IsInterleaved();
+
+    BeamformingParametersInterleaved_OA_US paramsInterleaved;
+    BeamformingParametersPlaneWaveCompound paramsPlaneWave;
 
   protected:
     /**
@@ -148,6 +154,7 @@ namespace mitk {
     * This method sets up the scanmode at the begining
     */
     void InitializeScanMode();
+    void UpdateTransmitEvents();
 
     USDiPhASProbesControls::Pointer                m_ControlsProbes;
     itk::SmartPointer<USAbstractControlInterface>  m_ControlInterfaceCustom;
@@ -156,6 +163,9 @@ namespace mitk {
 
     bool                                           m_IsRunning;
     ScanModeNative                                 m_ScanMode;
+    int                                            m_BurstHalfwaveClockCount;
+    Beamforming                                    m_CurrentBeamformingAlgorithm;
+    bool                                           m_Interleaved;
   };
 } // namespace mitk
 

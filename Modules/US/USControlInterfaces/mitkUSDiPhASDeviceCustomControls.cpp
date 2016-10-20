@@ -54,11 +54,6 @@ void mitk::USDiPhASDeviceCustomControls::SetUseBModeFilter(bool isSet)
   this->OnSetUseBModeFilter(isSet);
 }
 
-void mitk::USDiPhASDeviceCustomControls::SetEventDisplay(int event)
-{
-  this->OnSetEventDisplay(event);
-}
-
 void mitk::USDiPhASDeviceCustomControls::SetRecord(bool record)
 {
   this->OnSetRecord(record);

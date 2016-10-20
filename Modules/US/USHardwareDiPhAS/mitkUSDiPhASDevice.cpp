@@ -21,11 +21,12 @@ mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model
 	: mitk::USDevice(manufacturer, model), m_ControlsProbes(mitk::USDiPhASProbesControls::New(this)),
 	m_ImageSource(mitk::USDiPhASImageSource::New(this)),
   m_ControlInterfaceCustom(mitk::USDiPhASCustomControls::New(this)),
-	m_IsRunning(false)
+  m_IsRunning(false),
+  m_BurstHalfwaveClockCount(7),
+  m_Interleaved(true)
 {
   SetNumberOfOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
-  this->InitializeScanMode();
 }
 
 mitk::USDiPhASDevice::~USDiPhASDevice()
@@ -102,9 +103,11 @@ bool mitk::USDiPhASDevice::OnConnection()
   // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
 
+  InitializeScanMode();
+
   initBeamformer();                     //start the hardware connection
   m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
-  
+
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
 
@@ -159,6 +162,8 @@ void mitk::USDiPhASDevice::UpdateScanmode()
   m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
   // a higher resolution is useless, this also ensures correct spacing using any data types
 
+  UpdateTransmitEvents();
+
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))
   {
     setupScan(this->m_ScanMode);
@@ -169,25 +174,48 @@ void mitk::USDiPhASDevice::UpdateScanmode()
     m_IsRunning = toggleFreeze();
 }
 
+void mitk::USDiPhASDevice::UpdateTransmitEvents()
+{
+  int numChannels = m_ScanMode.reconstructionLines;
+
+  // transmitEventsCount defines only the number of acoustic measurements (angles); there will be one event added to the start for OA measurement
+  m_ScanMode.TransmitEvents = new TransmitEventNative[m_ScanMode.transmitEventsCount];
+
+  for (int ev = 0; ev < m_ScanMode.transmitEventsCount; ++ev)
+  {
+    m_ScanMode.TransmitEvents[ev].transmitEventDelays = new float[numChannels];
+    m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel = new int[numChannels];
+    m_ScanMode.TransmitEvents[ev].BurstCountPerChannel = new int[numChannels];
+    m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel = new bool[numChannels];
+    m_ScanMode.TransmitEvents[ev].ChannelMultiplexerSetups = nullptr;
+
+    for (int i = 0; i < numChannels; ++i)
+    {
+      m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel[i] = m_BurstHalfwaveClockCount; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 7.5 MHz 
+      m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 1; // Burst with 1 cycle
+      m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel[i] = true;
+      m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 0;
+    }
+  }
+
+  m_ScanMode.transmitSequenceCount = 1;
+  m_ScanMode.transmitSequences = new SequenceNative[m_ScanMode.transmitSequenceCount];
+  m_ScanMode.transmitSequences[0].startEvent = 1;
+  m_ScanMode.transmitSequences[0].endEvent = m_ScanMode.transmitEventsCount;
+}
+
 void mitk::USDiPhASDevice::InitializeScanMode()
 {
   // create a scanmode to be used for measurements:
   m_ScanMode.scanModeName = "InterleavedMode";
 
   // configure a linear transducer
-  m_ScanMode.transducerName = "L2-7 ";
+  m_ScanMode.transducerName = "L5-10";
   m_ScanMode.transducerCurvedRadiusMeter = 0;
   m_ScanMode.transducerElementCount = 128;
-  m_ScanMode.transducerFrequencyHz = 5000000;
+  m_ScanMode.transducerFrequencyHz = 7500000;
   m_ScanMode.transducerPitchMeter = 0.0003f;
   m_ScanMode.transducerType = 1;
-
-  // configure the transmit sequence(s):
-  int numChannels = 128;
-  m_ScanMode.transmitEventsCount = 2;
-  m_ScanMode.BurstHalfwaveClockCountAllChannels = 11; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 5 MHz
-  m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
-  m_ScanMode.voltageV = 70;
 
   // configure the receive paramters:
   m_ScanMode.receivePhaseLengthSeconds = 65e-6f; // 5 cm imaging depth
@@ -204,18 +232,20 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   // configure reconstruction processing:
   m_ScanMode.averageSpeedOfSound = 1540;
   m_ScanMode.computeBeamforming = true;
-  m_ScanMode.beamformingAlgorithm = (int)Beamforming::Interleaved_OA_US;
 
   // setup beamforming parameters:
-  BeamformingParametersInterleaved_OA_US parametersOSUS;
-  parametersOSUS.SpeedOfSoundMeterPerSecond = 1540;
-  parametersOSUS.angleSkipFactor = 1;
-  m_ScanMode.beamformingAlgorithmParameters = (void*)&parametersOSUS;
+  SetInterleaved(true);
 
   m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
   m_ScanMode.reconstructionLines = 128;
   m_ScanMode.reconstructionSamplesPerLine = 2048;
   m_ScanMode.transferBeamformedData = false;
+
+  // configure the transmit sequence(s):
+  m_ScanMode.transmitEventsCount = 2;
+  m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
+  m_ScanMode.voltageV = 70;
+  UpdateTransmitEvents();
 
   // configure bandpass:
   m_ScanMode.bandpassApply = false;
@@ -228,6 +258,12 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.imageMultiplier = 1;
   m_ScanMode.imageLeveling = 0;
   m_ScanMode.transferImageData = true;
+
+  // Trigger setup:
+  m_ScanMode.triggerSetup.enabled = true;
+  m_ScanMode.triggerSetup.constantPulseRepetitionRateHz = 20;
+  m_ScanMode.triggerSetup.triggerWidthMicroseconds = 300;
+  m_ScanMode.triggerSetup.delayTrigger2Microseconds = -1;
 }
 
 // callback for the DiPhAS API 
@@ -237,3 +273,37 @@ void mitk::USDiPhASDevice::MessageCallback(const char* message)
 	MITK_INFO << "DiPhAS API: " << message << '\n';
 }
 
+void mitk::USDiPhASDevice::SetBursts(int bursts)
+{
+  m_BurstHalfwaveClockCount = bursts;
+}
+
+bool mitk::USDiPhASDevice::IsInterleaved()
+{
+  return m_Interleaved;
+}
+
+void mitk::USDiPhASDevice::SetInterleaved(bool interleaved)
+{
+  m_Interleaved = interleaved;
+  if (interleaved) {
+    m_CurrentBeamformingAlgorithm = Beamforming::Interleaved_OA_US;
+
+    paramsInterleaved.SpeedOfSoundMeterPerSecond = m_ScanMode.averageSpeedOfSound;
+    paramsInterleaved.angleSkipFactor = 1;
+    paramsInterleaved.OptoacousticDelay = 0.0000003; // 300ns
+    paramsInterleaved.filter = Filter::None;
+
+    m_ScanMode.beamformingAlgorithmParameters = (void*)&paramsInterleaved;
+  }
+  else {
+    m_CurrentBeamformingAlgorithm = Beamforming::PlaneWaveCompound;
+
+    paramsPlaneWave.SpeedOfSoundMeterPerSecond = m_ScanMode.averageSpeedOfSound;
+    paramsPlaneWave.angleSkipFactor = 1;
+    paramsPlaneWave.usePhaseCoherence = 0;
+
+    m_ScanMode.beamformingAlgorithmParameters = (void*)&paramsPlaneWave;
+  }
+  m_ScanMode.beamformingAlgorithm = m_CurrentBeamformingAlgorithm;
+}

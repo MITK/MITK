@@ -81,7 +81,6 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnBandpassEnabledChanged();
   OnLowCutChanged();
   OnHighCutChanged();
-  OnEventDisplayChanged();
   OnUseBModeFilterChanged();
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
@@ -94,7 +93,6 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
   ui->setupUi(this);
 
   connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
-  connect(ui->EventDisplay, SIGNAL(valueChanged(int)), this, SLOT(OnEventDisplayChanged()));
   connect(ui->StartStopRecord, SIGNAL(clicked()), this, SLOT(OnRecordChanged()));
 
   //transmit
@@ -132,20 +130,6 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnUseBModeFilterChanged()
   m_ControlInterface->SetUseBModeFilter(UseBModeFilter);
 }
 
-void QmitkUSControlsCustomDiPhASDeviceWidget::OnEventDisplayChanged()
-{
-  if (m_ControlInterface.IsNull()) { return; }
-
-  int max = ui->TransmitEvents->value();
-  int current = ui->EventDisplay->value();
-  if (current > max-1) {
-    ui->EventDisplay->setValue(max - 1);
-    MITK_INFO << "User tried to set displayed event higher than amount of created events.";
-  }
-
-  m_ControlInterface->SetEventDisplay(ui->EventDisplay->value());
-}
-
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
 {
   if (ui->StartStopRecord->text() == "Start Recording")
@@ -175,11 +159,9 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitEventsChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
 
-  OnEventDisplayChanged();
-  //correct the displayed event
-
   m_ControlInterface->SetTransmitEvents(ui->TransmitEvents->value());
 }
+
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnVoltageChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
@@ -194,11 +176,10 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnModeChanged()
 
   if (Mode == "Ultrasound only") {
     m_ControlInterface->SetMode(false);
-    ui->TransmitEvents->setValue(1);
   }
   else if (Mode == "Interleaved") {
     m_ControlInterface->SetMode(true);
-    ui->TransmitEvents->setValue(2);
+    ui->TransmitEvents->setValue(1);
   }
   if (!silent) { m_ControlInterface->SetSilentUpdate(false); }
   OnTransmitEventsChanged();

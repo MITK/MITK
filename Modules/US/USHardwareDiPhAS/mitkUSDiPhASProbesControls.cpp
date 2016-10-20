@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <string>
 #include "mitkUSDiPhASProbesControls.h"
 #include "mitkUSDiPhASDevice.h"
 #include <mitkException.h>

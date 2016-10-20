@@ -65,8 +65,6 @@ protected:
 
   /** handlers for value changes
   */
-
-  virtual void OnSetEventDisplay(int event) override;
   virtual void OnSetUseBModeFilter(bool isSet) override;
   virtual void OnSetRecord(bool record) override;
 

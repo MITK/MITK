@@ -51,12 +51,6 @@ void mitk::USDiPhASCustomControls::OnSetUseBModeFilter(bool isSet)
   imageSource->SetUseBModeFilter(isSet);
 }
 
-void mitk::USDiPhASCustomControls::OnSetEventDisplay(int event)
-{
-  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
-  imageSource->SetDisplayedEvent(event);
-}
-
 void mitk::USDiPhASCustomControls::OnSetRecord(bool record)
 {
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
@@ -72,7 +66,7 @@ void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 
 void mitk::USDiPhASCustomControls::OnSetExcitationFrequency(double MHz)
 {
-  m_device->GetScanMode().BurstHalfwaveClockCountAllChannels = round(((120 / MHz) - 2) / 2);
+  m_device->SetBursts(round(((120 / MHz) - 2) / 2));
   m_device->UpdateScanmode();
   // b = (c/f - 2) * 1/2, where c is the internal clock, f the wanted frequency, b the burst count
 }
@@ -91,21 +85,7 @@ void mitk::USDiPhASCustomControls::OnSetVoltage(int voltage)
 
 void mitk::USDiPhASCustomControls::OnSetMode(bool interleaved)
 {
-  auto& scanMode = m_device->GetScanMode();
-  if (interleaved) {
-    currentBeamformingAlgorithm = (int)Beamforming::Interleaved_OA_US;
-
-    parametersPW.SpeedOfSoundMeterPerSecond = scanMode.averageSpeedOfSound;
-    parametersPW.angleSkipFactor = 1;
-    scanMode.beamformingAlgorithmParameters = (void*)&parametersPW;
-  } else {
-    currentBeamformingAlgorithm = (int)Beamforming::PlaneWaveCompound;
-
-    parametersOSUS.SpeedOfSoundMeterPerSecond = scanMode.averageSpeedOfSound;
-    parametersOSUS.angleSkipFactor = 1;
-    scanMode.beamformingAlgorithmParameters = (void*)&parametersOSUS;
-  }
-  scanMode.beamformingAlgorithm = currentBeamformingAlgorithm;
+  m_device->SetInterleaved(interleaved);
   m_device->UpdateScanmode();
 }
 

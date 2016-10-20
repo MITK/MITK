@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include "mitkBinaryThresholdULTool.h"
 #include "mitkDataNode.h"
 
 #include <itkImage.h>
@@ -40,53 +41,28 @@ namespace mitk
 
   Last contributor: $Author$
   */
-  class MITKSEGMENTATION_EXPORT BinaryThresholdTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT BinaryThresholdTool : public BinaryThresholdULTool
   {
   public:
 
-    Message3<double,double, bool> IntervalBordersChanged;
     Message1<double>     ThresholdingValueChanged;
 
-    mitkClassMacro(BinaryThresholdTool, AutoSegmentationTool);
+    mitkClassMacro(BinaryThresholdTool, BinaryThresholdULTool);
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
     virtual const char* GetName() const override;
 
-    virtual void Activated() override;
-    virtual void Deactivated() override;
-
     virtual void SetThresholdValue(double value);
-    virtual void AcceptCurrentThresholdValue();
-    virtual void CancelThresholding();
-
 
   protected:
 
     BinaryThresholdTool(); // purposely hidden
     virtual ~BinaryThresholdTool();
 
-    void SetupPreviewNode();
-
-    void CreateNewSegmentationFromThreshold(DataNode* node);
-
-    void OnRoiDataChanged();
-    void UpdatePreview();
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, double thresholdValue, unsigned int timeStep );
-
-    DataNode::Pointer m_ThresholdFeedbackNode;
-    DataNode::Pointer m_OriginalImageNode;
-    DataNode::Pointer m_NodeForThresholding;
-
-    double m_SensibleMinimumThresholdValue;
-    double m_SensibleMaximumThresholdValue;
-    double m_CurrentThresholdValue;
-    bool m_IsFloatImage;
-
+    virtual void runItkThreshold(Image::Pointer feedbackImage3D, Image::Pointer previewImage, unsigned int timeStep) override;
+    virtual void updateThresholdValue() override;
   };
 
 } // namespace

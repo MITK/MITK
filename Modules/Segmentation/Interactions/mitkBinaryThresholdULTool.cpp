@@ -284,7 +284,7 @@ void mitk::BinaryThresholdULTool::OnRoiDataChanged()
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-static void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer segmentation, double lower, double upper, unsigned int timeStep)
+void mitk::BinaryThresholdULTool::ITKThresholding(itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer segmentation, double lower, double upper, unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;

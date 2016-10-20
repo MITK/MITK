@@ -36,6 +36,8 @@ public:
   /** \brief virtual destructor in order to derive from this class */
   virtual ~OverlayLayouter2D();
 
+  virtual void RegisterAnnotationRenderer(const std::string &rendererID) override;
+
 private:
 
   /** \brief copy constructor */

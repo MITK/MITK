@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVtkLayerController.h>
 #include "mitkOverlay2DLayouter.h"
+#include "mitkAnnotationService.h"
 
 namespace mitk
 {
@@ -26,6 +27,11 @@ namespace mitk
 OverlayLayouter2D::~OverlayLayouter2D()
 {
 
+}
+
+void OverlayLayouter2D::RegisterAnnotationRenderer(const std::string &rendererID)
+{
+  AnnotationService::RegisterAnnotationRenderer<OverlayLayouter2D>(rendererID);
 }
 
 

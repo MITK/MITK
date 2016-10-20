@@ -37,6 +37,8 @@ class MITKOVERLAYS_EXPORT AnnotationPlacer : public AbstractAnnotationRenderer {
     /** \brief virtual destructor in order to derive from this class */
     virtual ~AnnotationPlacer();
 
+  virtual void RegisterAnnotationRenderer(const std::string &rendererID) override;
+
 private:
 
   /** \brief copy constructor */

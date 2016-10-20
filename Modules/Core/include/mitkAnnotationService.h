@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <memory>
 #include <vector>
+#include <mitkAbstractAnnotationRenderer.h>
 
 namespace mitk
 {
@@ -36,7 +37,17 @@ namespace mitk
                                                              const std::string& rendererID);
 
     template<typename T>
-    static void RegisterAnnotationRenderer(const std::string& rendererID);
+    static void RegisterAnnotationRenderer(const std::string &rendererID)
+    {
+      std::unique_ptr<T> ar(new T(rendererID));
+      // Define ServiceProps
+      us::ServiceProperties props;
+      props[ AbstractAnnotationRenderer::US_PROPKEY_RENDERER_ID ] = rendererID;
+      props[ AbstractAnnotationRenderer::US_PROPKEY_ID ] = ar->GetID();
+
+      us::GetModuleContext()->RegisterService(ar.get(),props);
+      m_AnnotationRendererServices.push_back(std::move(ar));
+    }
 
   private:
 

@@ -48,6 +48,8 @@ public:
   virtual std::string GetID() = 0;
   std::string GetRendererID();
 
+  virtual void RegisterAnnotationRenderer(const std::string& rendererID) = 0;
+
   static const std::string US_INTERFACE_NAME;
   static const std::string US_PROPKEY_ID;
   static const std::string US_PROPKEY_RENDERER_ID;

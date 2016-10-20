@@ -184,6 +184,8 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics() :
   m_HistogramSize(256), m_UseCtRange(false)
 {
+  SetShortName("fo");
+  SetLongName("first-order");
 }
 
 mitk::GIFFirstOrderStatistics::FeatureListType mitk::GIFFirstOrderStatistics::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -212,3 +214,25 @@ mitk::GIFFirstOrderStatistics::FeatureNameListType mitk::GIFFirstOrderStatistics
   featureList.push_back("FirstOrder No. of Voxel");
   return featureList;
 }
+
+
+void mitk::GIFFirstOrderStatistics::AddArguments(mitkCommandLineParser &parser)
+{
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features", us::Any());
+}
+
+void
+mitk::GIFFirstOrderStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+{
+  auto parsedArgs = GetParameter();
+  if (parsedArgs.count(GetLongName()))
+  {
+    MITK_INFO << "Start calculating first order features ....";
+    auto localResults = this->CalculateFeatures(feature, mask);
+    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+    MITK_INFO << "Finished calculating first order features....";
+  }
+}
+

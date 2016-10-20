@@ -234,6 +234,8 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
 m_Range(1.0), m_Direction(0)
 {
+  SetShortName("cooc");
+  SetLongName("cooccurence");
 }
 
 mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -310,3 +312,51 @@ mitk::GIFCooccurenceMatrix::FeatureNameListType mitk::GIFCooccurenceMatrix::GetF
   featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Std.");
   return featureList;
 }
+
+
+
+void mitk::GIFCooccurenceMatrix::AddArguments(mitkCommandLineParser &parser)
+{
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
+  parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+}
+
+void
+mitk::GIFCooccurenceMatrix::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+{
+  auto parsedArgs = GetParameter();
+  std::string name = GetOptionPrefix();
+
+  if (parsedArgs.count(GetLongName()))
+  {
+    int direction = 0;
+    if (parsedArgs.count(name + "::direction"))
+    {
+      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
+    }
+    std::vector<double> ranges;
+    if (parsedArgs.count(name + "::range"))
+    {
+      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
+    }
+    else
+    {
+      ranges.push_back(1);
+    }
+
+    for (std::size_t i = 0; i < ranges.size(); ++i)
+    {
+      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
+      coocCalculator->SetRange(ranges[i]);
+      coocCalculator->SetDirection(direction);
+      auto localResults = coocCalculator->CalculateFeatures(feature, maskNoNAN);
+      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+    }
+  }
+}
+

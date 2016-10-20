@@ -102,7 +102,7 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFCooccurenceMatrix2 : public AbstractGlobalImageFeature
   {
     public:
-      mitkClassMacro(GIFCooccurenceMatrix2,AbstractGlobalImageFeature)
+      mitkClassMacro(GIFCooccurenceMatrix2, AbstractGlobalImageFeature);
       itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
 
@@ -117,6 +117,9 @@ namespace mitk
       * \brief Returns a list of the names of all features that are calculated from this class
       */
       virtual FeatureNameListType GetFeatureNames() override;
+
+      virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
+      virtual void AddArguments(mitkCommandLineParser &parser);
 
       itkGetConstMacro(Range,double);
       itkSetMacro(Range, double);

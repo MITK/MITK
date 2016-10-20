@@ -42,11 +42,10 @@ namespace mitk
     */
     virtual FeatureNameListType GetFeatureNames();
 
-    itkGetConstMacro(Range,double);
-    itkSetMacro(Range, double);
+    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
+    virtual void AddArguments(mitkCommandLineParser &parser);
 
   private:
-    double m_Range;
   };
 }
 #endif //mitkGIFVolumetricStatistics_h

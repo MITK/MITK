@@ -32,6 +32,10 @@ namespace mitk
     itkGetConstMacro(Direction, unsigned int);
     itkSetMacro(Direction, unsigned int);
 
+    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
+    virtual void AddArguments(mitkCommandLineParser &parser);
+
+
     struct GIFCooccurenceMatrixConfiguration
     {
       double range;

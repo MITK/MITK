@@ -199,6 +199,8 @@ void
 
 mitk::GIFVolumetricStatistics::GIFVolumetricStatistics()
 {
+  SetLongName("volume");
+  SetShortName("vol");
 }
 
 mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -400,3 +402,25 @@ mitk::GIFVolumetricStatistics::FeatureNameListType mitk::GIFVolumetricStatistics
   featureList.push_back("Volumetric Features Maximum 3D diameter");
   return featureList;
 }
+
+
+void mitk::GIFVolumetricStatistics::AddArguments(mitkCommandLineParser &parser)
+{
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features", us::Any());
+}
+
+void
+mitk::GIFVolumetricStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+{
+  auto parsedArgs = GetParameter();
+  if (parsedArgs.count(GetLongName()))
+  {
+    MITK_INFO << "Start calculating volumetric features ....";
+    auto localResults = this->CalculateFeatures(feature, mask);
+    featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+    MITK_INFO << "Finished calculating volumetric features....";
+  }
+}
+

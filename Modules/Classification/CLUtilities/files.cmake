@@ -14,6 +14,7 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFGrayLevelSizeZone.cpp
   GlobalImageFeatures/mitkGIFFirstOrderStatistics.cpp
   GlobalImageFeatures/mitkGIFVolumetricStatistics.cpp
+  GlobalImageFeatures/mitkGIFNeighbouringGreyLevelDependenceFeatures.cpp
   GlobalImageFeatures/mitkGIFNeighbourhoodGreyLevelDifference.cpp
   #GlobalImageFeatures/itkEnhancedScalarImageToRunLengthFeaturesFilter.hxx
   #GlobalImageFeatures/itkEnhancedScalarImageToRunLengthMatrixFilter.hxx

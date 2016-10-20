@@ -513,6 +513,8 @@ void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
 mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2():
 m_Range(1.0), m_Direction(0)
 {
+  SetShortName("cooc2");
+  SetLongName("cooccurence2");
 }
 
 mitk::GIFCooccurenceMatrix2::FeatureListType mitk::GIFCooccurenceMatrix2::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
@@ -589,3 +591,52 @@ mitk::GIFCooccurenceMatrix2::FeatureNameListType mitk::GIFCooccurenceMatrix2::Ge
   featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Std.");
   return featureList;
 }
+
+
+
+
+void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser)
+{
+  std::string name = GetOptionPrefix();
+
+  parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
+  parser.addArgument(name+"::direction", name+"::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+}
+
+void
+mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+{
+  auto parsedArgs = GetParameter();
+  std::string name = GetOptionPrefix();
+
+  if (parsedArgs.count(GetLongName()))
+  {
+    int direction = 0;
+    if (parsedArgs.count(name + "::direction"))
+    {
+      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
+    }
+    std::vector<double> ranges;
+    if (parsedArgs.count(name + "::range"))
+    {
+      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
+    }
+    else
+    {
+      ranges.push_back(1);
+    }
+
+    for (std::size_t i = 0; i < ranges.size(); ++i)
+    {
+      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      this->SetRange(ranges[i]);
+      this->SetDirection(direction);
+      auto localResults = this->CalculateFeatures(feature, maskNoNAN);
+      featureList.insert(featureList.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+    }
+  }
+
+}
+

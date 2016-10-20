@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFVolumetricStatistics.h>
+#include <mitkGIFNeighbouringGreyLevelDependenceFeatures.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
@@ -161,6 +162,7 @@ int main(int argc, char* argv[])
 
   parser.addArgument("cooccurence", "cooc", mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
   parser.addArgument("cooccurence2", "cooc2", mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
+  parser.addArgument("ngldm", "ngldm", mitkCommandLineParser::String, "Calculate Neighbouring grey level dependence based features", "Calculate Neighbouring grey level dependence based features", us::Any());
   parser.addArgument("volume","vol",mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features",us::Any());
   parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
   parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
@@ -297,6 +299,25 @@ int main(int argc, char* argv[])
       auto localResults = coocCalculator->CalculateFeatures(image, maskNoNaN);
       stats.insert(stats.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////
+  // Calculate ngldm Features
+  ////////////////////////////////////////////////////////////////
+  if (parsedArgs.count("ngldm"))
+  {
+    auto ranges = splitDouble(parsedArgs["ngldm"].ToString(), ';');
+
+    for (std::size_t i = 0; i < ranges.size(); ++i)
+    {
+      MITK_INFO << "Start calculating NGLDM with range " << ranges[i] << "....";
+      mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer coocCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
+      coocCalculator->SetRange(ranges[i]);
+      coocCalculator->SetDirection(direction);
+      auto localResults = coocCalculator->CalculateFeatures(image, maskNoNaN);
+      stats.insert(stats.end(), localResults.begin(), localResults.end());
+      MITK_INFO << "Finished calculating NGLDM with range " << ranges[i] << "....";
     }
   }
 

@@ -171,6 +171,7 @@ int main( int argc, char* argv[] )
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   if (parsedArgs.size()==0)
+    MITK_INFO("DiffusionIVIMFit.Main") << "size0!!";
     return EXIT_FAILURE;
 
   // mandatory arguments

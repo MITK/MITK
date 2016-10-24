@@ -19,42 +19,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <memory>
 #include <vector>
-#include <mitkAbstractAnnotationRenderer.h>
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
   class AbstractAnnotationRenderer;
 
-  class AnnotationService
+  class MITKCORE_EXPORT AnnotationService
   {
   public:
     typedef std::vector<std::unique_ptr<AbstractAnnotationRenderer> > AnnotationRendererServices;
-
     AnnotationService();
     ~AnnotationService();
 
     static AbstractAnnotationRenderer* GetAnnotationRenderer(const std::string& arTypeID,
                                                              const std::string& rendererID);
 
-    template<typename T>
-    static void RegisterAnnotationRenderer(const std::string &rendererID)
-    {
-      std::unique_ptr<T> ar(new T(rendererID));
-      // Define ServiceProps
-      us::ServiceProperties props;
-      props[ AbstractAnnotationRenderer::US_PROPKEY_RENDERER_ID ] = rendererID;
-      props[ AbstractAnnotationRenderer::US_PROPKEY_ID ] = ar->GetID();
-
-      us::GetModuleContext()->RegisterService(ar.get(),props);
-      m_AnnotationRendererServices.push_back(std::move(ar));
-    }
+    static void RegisterAnnotationRenderer(AbstractAnnotationRenderer* annotationRenderer);
 
   private:
 
     AnnotationService(const AnnotationService&);
     AnnotationService& operator=(const AnnotationService&);
 
-    static AnnotationRendererServices m_AnnotationRendererServices;
   };
 }
 

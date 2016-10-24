@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAnnotationService.h"
+#include <mitkAbstractAnnotationRenderer.h>
 
 namespace mitk
 {
@@ -50,6 +51,18 @@ AbstractAnnotationRenderer *AnnotationService::GetAnnotationRenderer(const std::
   }
   //no service reference was found or found service reference has no valid source
   return ar;
+}
+
+void AnnotationService::RegisterAnnotationRenderer(AbstractAnnotationRenderer *annotationRenderer)
+{
+  static AnnotationRendererServices AnnotationRendererServices;
+  // Define ServiceProps
+  us::ServiceProperties props;
+  props[ AbstractAnnotationRenderer::US_PROPKEY_RENDERER_ID ] = annotationRenderer->GetRendererID();
+  props[ AbstractAnnotationRenderer::US_PROPKEY_ID ] = annotationRenderer->GetID();
+
+  us::GetModuleContext()->RegisterService(annotationRenderer,props);
+  AnnotationRendererServices.push_back(std::unique_ptr<AbstractAnnotationRenderer>(annotationRenderer));
 }
 
 }

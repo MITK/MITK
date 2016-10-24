@@ -45,10 +45,8 @@ public:
   /** \brief virtual destructor in order to derive from this class */
   virtual ~AbstractAnnotationRenderer();
 
-  virtual std::string GetID() = 0;
-  std::string GetRendererID();
-
-  virtual void RegisterAnnotationRenderer(const std::string& rendererID) = 0;
+  virtual const std::string GetID() const = 0;
+  const std::string GetRendererID() const;
 
   static const std::string US_INTERFACE_NAME;
   static const std::string US_PROPKEY_ID;

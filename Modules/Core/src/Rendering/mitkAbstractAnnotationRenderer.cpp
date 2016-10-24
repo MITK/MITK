@@ -30,7 +30,7 @@ mitk::AbstractAnnotationRenderer::~AbstractAnnotationRenderer()
 {
 }
 
-std::string mitk::AbstractAnnotationRenderer::GetRendererID()
+const std::string mitk::AbstractAnnotationRenderer::GetRendererID() const
 {
   return m_RendererID;
 }

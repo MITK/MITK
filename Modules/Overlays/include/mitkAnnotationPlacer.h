@@ -32,14 +32,17 @@ class BaseRenderer;
 */
 class MITKOVERLAYS_EXPORT AnnotationPlacer : public AbstractAnnotationRenderer {
 
-  public:
+public:
+  /** \brief virtual destructor in order to derive from this class */
+  virtual ~AnnotationPlacer();
 
-    /** \brief virtual destructor in order to derive from this class */
-    virtual ~AnnotationPlacer();
+  const std::string GetID() const;
 
-  virtual void RegisterAnnotationRenderer(const std::string &rendererID) override;
+  static AnnotationPlacer* GetAnnotationRenderer(const std::string& rendererID);
 
 private:
+
+  AnnotationPlacer(const std::string& rendererID);
 
   /** \brief copy constructor */
   AnnotationPlacer( const AnnotationPlacer &);
@@ -47,6 +50,7 @@ private:
   /** \brief assignment operator */
   AnnotationPlacer &operator=(const AnnotationPlacer &);
 
+  static const std::string ANNOTATIONRENDERER_ID;
 };
 
 } // namespace mitk

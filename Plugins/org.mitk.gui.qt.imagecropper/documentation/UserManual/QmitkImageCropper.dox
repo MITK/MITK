@@ -1,36 +1,40 @@
 /**
-\page org_mitk_views_imagecropper The Image Cropper Plugin
+\page org_mitk_gui_qt_imagecropper Image Cropper Plugin
 
-\imageMacro{QmitkImageCropper_Icon.png,"Icon of the Image Cropper Plugin",2.00}
+\imageMacro{QmitkImageCropper_Icon.png,"Icon of the Image Cropper Plugin.",20}
 
 \tableofcontents
 
-\section QmitkImageCropperUserManualOverview Overview
+\section org_mitk_gui_qt_imagecropperUsage Usage
 
-ImageCropper is a functionality which allows the user to manually crop an image by means of a bounding box. The functionality does not create a new image, it only hides parts of the original image.
+The Image Cropper Plugin allows you to crop subvolumes out of your orginial image volume by defining a cubic bounding box.
 
-\section QmitkImageCropperUserManualFeatures Features
+This box can be placed at an arbitrary position in the volume and can be easily adjusted by using the handles on each of the faces. 
+Touching the handles changes the size of the box whereas touching the box itself changes its position.
 
-- Crop a selected image using a bounding box.
-- Set the border voxels to a specific user defined value after cropping.
+As soon as the bounding box is placed at the desired position, pressing the button 'Crop' creates a new image assigned to the orginal image
+as child node containing only the selected subvolume. The size of the subvolume equals the size of the bounding box.  
+Pressing the "Mask" button keeps the original image size but masks out the area not contained within the bounding box bounds.
+In case of 3D+t images the whole timeseries is cropped by default. 
 
+\imageMacro{BoundingBox_ImageCropperView.png,"Bounding Box.",12.00}
+\imageMacro{Basic_ImageCropperView.png,"Basic Settings.",7.09}
 
+\section org_mitk_gui_qt_imagecropperAdvanced Advanced settings
+In the advanced settings view you find additional features to manipulate the bounding box.
+\imageMacro{Advanced_ImageCropperView.png,"Advanced Settings.",7.09}
 
-\section QmitkImageCropperUserManualUsage Usage
-First select from the drop down menu the image to crop. The three 2D widgets show yellow rectangles representing the bounding box in each plane (axial, sagital, coronal), the lower right 3D widget shows the entire volume of the bounding box.\n
+\subsection org_mitk_gui_qt_imagecropperAdvancedColor Bounding Shape Color
+By pressing the two color buttons you may change the color for the selected and unselected state of the box.
+\subsection org_mitk_gui_qt_imagecropperAdvancedOverwrite Overwrite original image
+By enabling this checkbox the image is replaced by the cropped subvolume. Be careful to use this option since there is now Redo action available.
+\subsection org_mitk_gui_qt_imagecropperAdvancedTimestep Crop current timestep only
+If this checkbox is enabled the xD + t image is reduced to a xD image (3D+t --> 3D) with the timestep visible in the widget. This is useful if you want to extract a single image or its corresponding 
+subvolume of the timeseries. The whole timeseries is cropped by default using the timeGeometry of the timestep visible in the widget.
 
-- To change the <b>size</b> of bounding box press <i> control + right click </i> and move the cursor up/down or left/right in one of the three 2D views.\n
-- To change the <b>orientation</b> of the bounding box press <i> control + middle click </i> and move the cursor up/down or left/right in one of the three 2D views.\n
-- To <b>move</b> the bounding box press <i> control + left click </i> and move the cursor to the wanted position in one of the three 2D views.\n
+\section org_mitk_gui_qt_imagecropperIssues Current issues
+Due to the latest changes in MITK slicegeometry is it currently not supported to crop 2D images unless the are 3D
+images containing only a single slice. The user will be notified by a warning and and the input is handled as a single lable image. 
 
-
-To show the result press the [crop] button.\n
-To crop the image again press the [New bounding box!] button.\n\n
-
-All actions can be undone by using the global undo function (Ctrl+Z).\n
-
-To set the border voxels to a specific value after cropping the image, activate the corresponding checkbox and choose a gray value.
-
-\section QmitkImageCropperUserManualTroubleshooting Troubleshooting
-
+Right now changing the shape or rotation of the bounding box is not supported but might be integrated in the future.
 */

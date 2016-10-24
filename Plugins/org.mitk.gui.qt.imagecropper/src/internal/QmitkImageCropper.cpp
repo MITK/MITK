@@ -1,464 +1,629 @@
-/*===================================================================
+/*=========================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-#include <iostream>
+=========================================================================*/
 
 #include "QmitkImageCropper.h"
-#include <QAction>
 
+#include <QAction>
+#include <QCheckBox>
+#include <QColorDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QCheckBox>
 #include <QSpinBox>
 #include <QSlider>
+
+#include <vtkCommand.h>
+#include <vtkCubeSource.h>
+#include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
+#include <vtkPlaneWidget.h>
+#include <vtkProperty.h>
+#include <vtkSmartPointer.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 
-
-#include <mitkEllipsoid.h>
-#include <mitkCylinder.h>
-#include <mitkCone.h>
+#include <mitkBoundingShapeInteractor.h>
+#include <mitkBoundingShapeCropper.h>
+#include <mitkDisplayInteractor.h>
+#include <mitkIDataStorageService.h>
+#include <mitkImageCast.h> // Includes for image casting between ITK and MITK: added after using Plugin Generator
+#include <mitkImageAccessByItk.h>
+#include <mitkImageStatisticsHolder.h>
+#include <mitkInteractionConst.h>
+#include <mitkITKImageImport.h>
+#include <mitkLabelSetImage.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkProperties.h>
-#include "mitkUndoController.h"
-#include "mitkBoundingObjectCutter.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkITKImageImport.h"
-#include "mitkIDataStorageService.h"
-#include "mitkNodePredicateDataType.h"
 
+#include <itkBoundingBox.h>
 #include <itkCommand.h>
 
-//micro services
 #include <usModuleRegistry.h>
 #include <usGetModuleContext.h>
 
-//to be moved to mitkInteractionConst.h by StateMachineEditor
-const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
-
-// constructors for operation classes
-QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, mitk::DataNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
-:mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData), m_NodeDeletedObserverTag(0), m_OldDataDeletedObserverTag(0),
-m_NewDataDeletedObserverTag(0)
-{
-  // listen to the node the image is hold
-  itk::MemberCommand<opExchangeNodes>::Pointer nodeDeletedCommand = itk::MemberCommand<opExchangeNodes>::New();
-  nodeDeletedCommand->SetCallbackFunction(this, &opExchangeNodes::NodeDeleted);
-
-  m_NodeDeletedObserverTag = m_Node->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
-  m_OldDataDeletedObserverTag = m_OldData->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
-  m_NewDataDeletedObserverTag = m_NewData->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
-}
-
-// destructor for operation class
-QmitkImageCropper::opExchangeNodes::~opExchangeNodes()
-{
-  if (m_Node != NULL)
-  {
-    m_Node->RemoveObserver(m_NodeDeletedObserverTag);
-    m_Node=NULL;
-  }
-
-  if (m_OldData.IsNotNull())
-  {
-    m_OldData->RemoveObserver(m_OldDataDeletedObserverTag);
-    m_OldData=NULL;
-  }
-
-  if (m_NewData.IsNotNull())
-  {
-    m_NewData->RemoveObserver(m_NewDataDeletedObserverTag);
-    m_NewData=NULL;
-  }
-}
-
-void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object * /*caller*/, const itk::EventObject &/*event*/)
-{
-  m_Node = NULL;
-  m_OldData = NULL;
-  m_NewData = NULL;
-}
+const std::string QmitkImageCropper::VIEW_ID = "org.mitk.views.qmitkimagecropper";
 
 QmitkImageCropper::QmitkImageCropper(QObject *parent)
-: m_Controls(NULL), m_ParentWidget(0)
+  : m_ParentWidget(0),
+  m_ImageNode(nullptr),
+  m_CroppingObject(nullptr),
+  m_CroppingObjectNode(nullptr),
+  m_BoundingShapeInteractor(nullptr),
+  m_CropOutsideValue(0),
+  m_Advanced(0),
+  m_Active(0),
+  m_ScrollEnabled(true)
 {
-   m_Interface = new mitk::ImageCropperEventInterface;
-   m_Interface->SetImageCropper( this );
+  CreateBoundingShapeInteractor(false);
 }
-
 
 QmitkImageCropper::~QmitkImageCropper()
 {
-  //delete smart pointer objects
-  m_CroppingObjectNode = NULL;
-  m_CroppingObject = NULL;
+  //delete pointer objects
+  m_CroppingObjectNode = nullptr;
+  m_CroppingObject = nullptr;
 
-  m_Interface->Delete();
+  //disable interactor
+  if (m_BoundingShapeInteractor != nullptr)
+  {
+    m_BoundingShapeInteractor->SetDataNode(nullptr);
+    m_BoundingShapeInteractor->EnableInteraction(false);
+  }
+}
+
+void QmitkImageCropper::SetFocus()
+{
+  m_Controls.buttonCreateNewBoundingBox->setFocus();
+  m_Controls.comboBoxBoundingObject->setFocus();
+}
+
+void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
+{
+  // create GUI widgets from the Qt Designer's .ui file
+  m_Controls.setupUi(parent);
+
+  m_Controls.boundingShapeSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.boundingShapeSelector->SetPredicate(mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::GeometryData>::New(),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+  m_CroppingObjectNode = m_Controls.boundingShapeSelector->GetSelectedNode();
+
+  connect(m_Controls.buttonCropping, SIGNAL(clicked()), this, SLOT(DoCropping()));
+  connect(m_Controls.buttonMasking, SIGNAL(clicked()), this, SLOT(DoMasking()));
+  connect(m_Controls.boundingShapeSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
+    this, SLOT(OnDataSelectionChanged(const mitk::DataNode*)));
+  connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(DoCreateNewBoundingObject()));
+  connect(m_Controls.buttonAdvancedSettings, SIGNAL(clicked()), this, SLOT(OnAdvancedSettingsButtonToggled()));
+  connect(m_Controls.buttonDeselectedColor, SIGNAL(clicked()), this, SLOT(OnDeselectedColorChanged()));
+  connect(m_Controls.buttonSelectedColor, SIGNAL(clicked()), this, SLOT(OnSelectedColorChanged()));
+  connect(m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
+
+  m_Controls.spinBox->setValue(-1000);
+  m_Controls.spinBox->setEnabled(false);
+  m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
+  m_Controls.buttonCropping->setEnabled(false);
+  m_Controls.boundingShapeSelector->setEnabled(false);
+  m_Controls.labelWarningRotation->setVisible(false);
+  m_Controls.buttonAdvancedSettings->setEnabled(false);
+
+  m_Advanced = false;
+  this->OnAdvancedSettingsButtonToggled();
+  m_ParentWidget = parent;
 
 }
 
-void QmitkImageCropper::CreateQtPartControl(QWidget* parent)
+void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode* node)
 {
-  if (!m_Controls)
+  m_Controls.boundingShapeSelector->setEnabled(true);
+  m_CroppingObjectNode = m_Controls.boundingShapeSelector->GetSelectedNode();
+
+  if (m_CroppingObjectNode.IsNotNull() && dynamic_cast<mitk::GeometryData*>(this->m_CroppingObjectNode->GetData()))
   {
-    m_ParentWidget = parent;
+    m_Controls.buttonAdvancedSettings->setEnabled(true);
+    m_Controls.labelWarningBB->setText(QString::fromStdString(""));
+    m_CroppingObject = dynamic_cast<mitk::GeometryData*>(m_CroppingObjectNode->GetData());
+    m_Advanced = true;
 
-    // build ui elements
-    m_Controls = new Ui::QmitkImageCropperControls;
-    m_Controls->setupUi(parent);
+    mitk::ColorProperty::Pointer selcolorProperty = dynamic_cast<mitk::ColorProperty*>
+      (m_CroppingObjectNode->GetProperty("Bounding Shape.Selected Color"));
+    mitk::ColorProperty::Pointer deselcolorProperty = dynamic_cast<mitk::ColorProperty*>
+      (m_CroppingObjectNode->GetProperty("Bounding Shape.Deselected Color"));
+    if (selcolorProperty && deselcolorProperty)
+    {
+      mitk::Color deselColor = deselcolorProperty->GetColor();
+      mitk::Color selColor = selcolorProperty->GetColor();
 
-    // setup ui elements
-    m_Controls->groupInfo->hide();
-    m_Controls->m_SurroundingSlider->hide();
-    m_Controls->m_SurroundingSpin->hide();
-    m_Controls->m_BoxButton->setEnabled(true);
-    m_Controls->warningLabel->setVisible(false);
-    // create ui element connections
-    this->CreateConnections();
+      QColor selCurrentColor((int)(selColor.GetRed() * 255), (int)(selColor.GetGreen() * 255), (int)(selColor.GetBlue() * 255));
+      m_Controls.buttonSelectedColor->setAutoFillBackground(true);
+
+      auto styleSheet = QString("background-color:rgb(%1,%2,%3)")
+        .arg(selCurrentColor.red())
+        .arg(selCurrentColor.green())
+        .arg(selCurrentColor.blue());
+
+      m_Controls.buttonSelectedColor->setStyleSheet(styleSheet);
+
+      QColor deselCurrentColor((int)(deselColor.GetRed() * 255), (int)(deselColor.GetGreen() * 255), (int)(deselColor.GetBlue() * 255));
+      m_Controls.buttonDeselectedColor->setAutoFillBackground(true);
+      auto styleSheet2 = QString("background-color:rgb(%1,%2,%3)")
+        .arg(deselCurrentColor.red())
+        .arg(deselCurrentColor.green())
+        .arg(deselCurrentColor.blue());
+
+      m_Controls.buttonDeselectedColor->setStyleSheet(styleSheet2);
+    }
+    mitk::RenderingManager::GetInstance()->InitializeViews();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    m_Controls.buttonAdvancedSettings->setEnabled(false);
+    m_CroppingObject = nullptr;
+    m_BoundingShapeInteractor->EnableInteraction(false);
+    m_BoundingShapeInteractor->SetDataNode(nullptr);
+    m_Advanced = false;
+    this->OnAdvancedSettingsButtonToggled();
+    QColor defaultColor((int)(255), (int)(255), (int)(255));
+    auto styleSheet = QString("background-color:rgb(%1,%2,%3)")
+      .arg(defaultColor.red())
+      .arg(defaultColor.green())
+      .arg(defaultColor.blue());
+
+    m_Controls.buttonSelectedColor->setAutoFillBackground(true);
+    m_Controls.buttonSelectedColor->setStyleSheet(styleSheet);
+    m_Controls.buttonDeselectedColor->setAutoFillBackground(true);
+    m_Controls.buttonDeselectedColor->setStyleSheet(styleSheet);
   }
 
 }
 
-void QmitkImageCropper::CreateConnections()
+void QmitkImageCropper::OnAdvancedSettingsButtonToggled()
 {
-  if ( m_Controls )
+  m_Controls.groupBoxShape->setVisible(m_Advanced);
+  m_Controls.groupBoxColors->setVisible(m_Advanced);
+  m_Controls.groupImageSettings->setVisible(m_Advanced);
+  m_Advanced = !m_Advanced;
+}
+
+void QmitkImageCropper::CreateBoundingShapeInteractor(bool rotationEnabled)
+{
+  if (m_BoundingShapeInteractor.IsNull())
   {
-    connect( m_Controls->m_CropButton, SIGNAL(clicked()), this, SLOT(CropImage()));   // click on the crop button
-    connect( m_Controls->m_BoxButton, SIGNAL(clicked()), this, SLOT(CreateNewBoundingObject()) );
-    connect( m_Controls->m_EnableSurroundingCheckBox, SIGNAL(toggled(bool)), this, SLOT(SurroundingCheck(bool)) );
-    connect( m_Controls->chkInformation, SIGNAL(toggled(bool)), this, SLOT(ChkInformationToggled(bool)) );
+    m_BoundingShapeInteractor = mitk::BoundingShapeInteractor::New();
+    m_BoundingShapeInteractor->LoadStateMachine("BoundingShapeInteraction.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
+    m_BoundingShapeInteractor->SetEventConfig("BoundingShapeMouseConfig.xml", us::ModuleRegistry::GetModule("MitkBoundingShape"));
   }
-}
-
-void QmitkImageCropper::Activated()
-{
-  QmitkFunctionality::Activated();  // just call the inherited function
+  m_BoundingShapeInteractor->SetRotationEnabled(rotationEnabled);
 }
 
 
-void QmitkImageCropper::Deactivated()
+mitk::Geometry3D::Pointer QmitkImageCropper::InitializeWithImageGeometry(mitk::BaseGeometry::Pointer geometry)
 {
-  RemoveBoundingObjectFromNode();
+  // convert a basegeometry into a Geometry3D (otherwise IO is not working properly)
+  if (geometry == nullptr)
+    mitkThrow() << "Geometry is not valid.";
 
-  QmitkFunctionality::Deactivated(); // just call the inherited function
+  auto boundingGeometry = mitk::Geometry3D::New();
+  boundingGeometry->SetBounds(geometry->GetBounds());
+  boundingGeometry->SetImageGeometry(geometry->GetImageGeometry());
+  boundingGeometry->SetOrigin(geometry->GetOrigin());
+  boundingGeometry->SetSpacing(geometry->GetSpacing());
+  boundingGeometry->SetIndexToWorldTransform(geometry->GetIndexToWorldTransform());
+  boundingGeometry->Modified();
+  return boundingGeometry;
+}
 
+void QmitkImageCropper::DoCreateNewBoundingObject()
+{
+  if (m_ImageNode.IsNotNull())
+  {
+    m_Controls.buttonCropping->setEnabled(true);
+    m_Controls.buttonMasking->setEnabled(true);
+    m_Controls.boundingShapeSelector->setEnabled(true);
+
+    bool ok = false;
+    QString name = QInputDialog::getText(QApplication::activeWindow()
+      , "Add cropping shape...", "Enter name for the new cropping shape", QLineEdit::Normal, "BoundingShape", &ok);
+    if (!ok || name.isEmpty())
+      return;
+
+    // to do: check whether stdmulti.widget is valid
+    // get current timestep to support 3d+t images //to do: check if stdmultiwidget is valid
+    int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    mitk::BaseGeometry::Pointer imageGeometry = static_cast<mitk::BaseGeometry*>(m_ImageNode->GetData()->GetGeometry(timeStep));
+
+    m_CroppingObject = mitk::GeometryData::New();
+    m_CroppingObject->SetGeometry(static_cast<mitk::Geometry3D*>(this->InitializeWithImageGeometry(imageGeometry)));
+    m_CroppingObjectNode = mitk::DataNode::New();
+    m_CroppingObjectNode->SetData(m_CroppingObject);
+    m_CroppingObjectNode->SetProperty("name", mitk::StringProperty::New(name.toStdString()));
+    m_CroppingObjectNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
+    m_CroppingObjectNode->SetProperty("opacity", mitk::FloatProperty::New(0.6));
+    m_CroppingObjectNode->SetProperty("layer", mitk::IntProperty::New(99));
+    m_CroppingObjectNode->AddProperty("handle size factor", mitk::DoubleProperty::New(1.0 / 40.0));
+    m_CroppingObjectNode->SetBoolProperty("pickable", true);
+
+    if (!this->GetDataStorage()->Exists(m_CroppingObjectNode))
+    {
+      GetDataStorage()->Add(m_CroppingObjectNode, m_ImageNode);
+      m_Controls.boundingShapeSelector->SetSelectedNode(m_CroppingObjectNode);
+      m_CroppingObjectNode->SetVisibility(true);
+      m_BoundingShapeInteractor->EnableInteraction(true);
+      m_BoundingShapeInteractor->SetDataNode(this->m_CroppingObjectNode);
+      this->OnDataSelectionChanged(m_CroppingObjectNode);
+    }
+  }
+  // Adjust coordinate system by doing a reinit on
+  auto tempDataStorage = mitk::DataStorage::SetOfObjects::New();
+  tempDataStorage->InsertElement(0, m_CroppingObjectNode);
+
+  // initialize the views to the bounding geometry
+  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-/*! When called with an opExchangeNodes, it changes the content of a node from one data set to another
-*/
-void QmitkImageCropper::ExecuteOperation (mitk::Operation *operation)
+void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
+  const QList<mitk::DataNode::Pointer>& nodes)
 {
-  if (!operation) return;
-
-  switch (operation->GetOperationType())
+  bool rotationEnabled = false;
+  if (nodes.empty())
   {
-  case OP_EXCHANGE:
-    {
-      //RemoveBoundingObjectFromNode();
-      opExchangeNodes* op = static_cast<opExchangeNodes*>(operation);
-      op->GetNode()->SetData(op->GetNewData());
-      mitk::RenderingManager::GetInstance()->InitializeViews();
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      break;
-    }
-  default:;
+    m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+    m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
+    m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+    m_Controls.labelWarningBB->setText(QString::fromStdString("No bounding object available."));
+    m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
+    m_Controls.buttonCropping->setEnabled(false);
+    m_Controls.buttonMasking->setEnabled(false);
+    m_Controls.comboBoxBoundingObject->setEnabled(false);
+    m_Controls.labelWarningRotation->setVisible(false);
+    return;
   }
+  m_ParentWidget->setEnabled(true);
+
+  foreach(mitk::DataNode::Pointer node, nodes)
+  {
+    if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
+    {
+      m_ImageNode = nodes[0];
+      m_Controls.groupBoundingObject->setEnabled(true);
+      m_Controls.comboBoxBoundingObject->setEnabled(true);
+      m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(0, 0, 0) }");
+      m_Controls.labelWarningImage->setText(QString::fromStdString("File name: " + m_ImageNode->GetName()));
+      m_Controls.buttonCreateNewBoundingBox->setEnabled(true);
+
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
+      if (image != nullptr)
+      {
+        vtkSmartPointer<vtkMatrix4x4> imageMat = image->GetGeometry()->GetVtkMatrix();
+        // check whether the image geometry is rotated, if so, no pixel aligned cropping or masking can be performed
+        if ((imageMat->GetElement(1, 0) == 0.0) && (imageMat->GetElement(0, 1) == 0.0) &&
+          (imageMat->GetElement(1, 2) == 0.0) && (imageMat->GetElement(2, 1) == 0.0) &&
+          (imageMat->GetElement(2, 0) == 0.0) && (imageMat->GetElement(0, 2) == 0.0))
+        {
+          rotationEnabled = false;
+          m_Controls.labelWarningRotation->setVisible(false);
+        }
+        else
+        {
+          rotationEnabled = true;
+          m_Controls.labelWarningRotation->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+          m_Controls.labelWarningRotation->setVisible(true);
+        }
+
+        this->CreateBoundingShapeInteractor(rotationEnabled);
+        m_CroppingObjectNode = m_Controls.boundingShapeSelector->GetSelectedNode();
+        if (m_CroppingObjectNode != nullptr)
+        {
+          this->OnDataSelectionChanged(m_CroppingObjectNode);
+          m_BoundingShapeInteractor->EnableInteraction(true);
+          m_BoundingShapeInteractor->SetDataNode(this->m_CroppingObjectNode);
+          m_Controls.boundingShapeSelector->setEnabled(true);
+        }
+
+        if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
+        {
+          // TODO: ImageStatistics Plugin? Min/Max Value?
+          int minPixelValue = static_cast<int>(image->GetScalarValueMin());
+          //static_cast<int>image->GetStatistics()->GetScalarValueMinNoRecompute();
+          int maxPixelValue = static_cast<int>(image->GetScalarValueMax());
+          //static_cast<int>image->GetStatistics()->GetScalarValueMaxNoRecompute();
+          m_Controls.spinBox->setEnabled(true);
+          m_Controls.spinBox->setMaximum(maxPixelValue);
+          m_Controls.spinBox->setMinimum(minPixelValue);
+          m_Controls.spinBox->setValue(minPixelValue);
+        }
+        else
+          m_Controls.spinBox->setEnabled(false);
+
+        unsigned int dim = image->GetDimension();
+        if (dim < 2 || dim > 4)
+        {
+          m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+          m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
+          m_ParentWidget->setEnabled(false);
+        }
+        if (m_CroppingObjectNode != nullptr)
+        {
+          m_Controls.buttonCropping->setEnabled(true);
+          m_Controls.buttonMasking->setEnabled(true);
+          m_Controls.boundingShapeSelector->setEnabled(true);
+          m_Controls.labelWarningBB->setVisible(false);
+        }
+        else
+        {
+          m_Controls.buttonCropping->setEnabled(false);
+          m_Controls.buttonMasking->setEnabled(false);
+          m_Controls.boundingShapeSelector->setEnabled(false);
+          m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+          m_Controls.labelWarningBB->setText(QString::fromStdString("No bounding object available."));
+        }
+        return;
+      }
+      //  iterate all selected objects, adjust warning visibility
+      m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
+      m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
+      m_Controls.buttonCropping->setEnabled(false);
+      m_Controls.buttonMasking->setEnabled(false);
+      m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
+      m_Controls.comboBoxBoundingObject->setEnabled(false);
+      m_Controls.buttonDeselectedColor->setAutoFillBackground(false);
+      m_Controls.buttonDeselectedColor->setAutoFillBackground(false);
+      m_Controls.boundingShapeSelector->setEnabled(false);
+      m_ParentWidget->setEnabled(true);
+      m_Controls.labelWarningRotation->setVisible(false);
+    }
+  }
+}
+
+void QmitkImageCropper::OnSelectedColorChanged()
+{
+  mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("Bounding Shape.Selected Color"));
+  this->ChangeColor(colorProperty, true);
+}
+
+void QmitkImageCropper::OnDeselectedColorChanged()
+{
+  mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("Bounding Shape.Deselected Color"));
+  this->ChangeColor(colorProperty, false);
 
 }
 
-void QmitkImageCropper::CreateNewBoundingObject()
+void QmitkImageCropper::ChangeColor(mitk::ColorProperty::Pointer colorProperty, bool selected)
 {
-  // attach the cuboid to the image and update the views
-  if (this->IsVisible())
+  if (m_CroppingObjectNode != nullptr)
   {
-    if (m_ImageNode.IsNotNull())
+    if (colorProperty)
     {
-      m_ImageToCrop = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
-
-      if(m_ImageToCrop.IsNotNull())
+      mitk::Color color = colorProperty->GetColor();
+      QColor currentColor((int)(color.GetRed() * 255), (int)(color.GetGreen() * 255), (int)(color.GetBlue() * 255));
+      QColor result = QColorDialog::getColor(currentColor);
+      if (result.isValid())
       {
-        if (this->GetDefaultDataStorage()->GetNamedDerivedNode("CroppingObject", m_ImageNode))
+        color.SetRed(result.red() / 255.0);
+        color.SetGreen(result.green() / 255.0);
+        color.SetBlue(result.blue() / 255.0);
+        colorProperty->SetColor(color);
+
+        auto styleSheet = QString("background-color:rgb(%1,%2,%3)")
+          .arg(result.red())
+          .arg(result.green())
+          .arg(result.blue());
+
+        if (!selected)
         {
-          //Remove m_Cropping
-          this->RemoveBoundingObjectFromNode();
+          m_Controls.buttonDeselectedColor->setAutoFillBackground(true);
+          m_Controls.buttonDeselectedColor->setStyleSheet(styleSheet);
         }
-
-        bool fitCroppingObject = false;
-        if(m_CroppingObject.IsNull())
+        else
         {
-          CreateBoundingObject();
-          fitCroppingObject = true;
+          m_Controls.buttonSelectedColor->setAutoFillBackground(true);
+          m_Controls.buttonSelectedColor->setStyleSheet(styleSheet);
         }
-
-        if (m_CroppingObject.IsNull())
-          return;
-
-        AddBoundingObjectToNode( m_ImageNode, fitCroppingObject );
-
-        m_ImageNode->SetVisibility(true);
+        m_BoundingShapeInteractor->SetDataNode(m_CroppingObjectNode);
         mitk::RenderingManager::GetInstance()->InitializeViews();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        m_Controls->m_BoxButton->setText("Reset bounding box!");
-        m_Controls->m_CropButton->setEnabled(true);
       }
     }
-    else
-      QMessageBox::information(NULL, "Image cropping functionality", "Load an image first!");
   }
 }
 
-
-void QmitkImageCropper::SurroundingCheck(bool value)
+void QmitkImageCropper::OnComboBoxSelectionChanged(const mitk::DataNode* node)
 {
-  if(value)
+  mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
+  if (selectedNode != nullptr)
   {
-   if(m_ImageNode.IsNotNull())
+    if (m_ImageNode.IsNotNull())
+      selectedNode->SetDataInteractor(m_ImageNode->GetDataInteractor());
+    // m_ImageNode->GetDataInteractor()->SetDataNode(selectedNode);
+    m_ImageNode = selectedNode;
+  }
+}
+
+void QmitkImageCropper::OnSliderValueChanged(int slidervalue)
+{
+  m_CropOutsideValue = slidervalue;
+}
+
+
+void QmitkImageCropper::DoMasking()
+{
+  this->ProcessImage(true);
+}
+
+void QmitkImageCropper::DoCropping()
+{
+  this->ProcessImage(false);
+}
+
+
+void QmitkImageCropper::ProcessImage(bool mask)
+{
+  // cropping only possible if valid bounding shape as well as a valid image are loaded
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+
+  // to do: check whether stdmultiwidget is valid
+  int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+
+  if (nodes.empty()) return;
+
+  mitk::DataNode* node = nodes[0];
+
+  if (node == nullptr)
+  {
+    QMessageBox::information(nullptr, "Warning", "Please load and select an image before starting image processing.");
+    return;
+  }
+  if (m_CroppingObject == nullptr)
+  {
+    QMessageBox::information(nullptr, "Warning", "Please load and select a cropping object before starting image processing.");
+    return;
+  }
+
+  mitk::BaseData* data = node->GetData(); //get data from node
+  if (data != nullptr)
+  {
+    QString imageName;
+    if (mask)
+      imageName = QString::fromStdString(node->GetName() + "_masked");
+    else
+      imageName = QString::fromStdString(node->GetName() + "_cropped");
+
+    // image and bounding shape ok, set as input
+    auto croppedImageNode = mitk::DataNode::New();
+    auto cutter = mitk::BoundingShapeCropper::New();
+    cutter->SetGeometry(m_CroppingObject);
+
+    // adjustable in advanced settings
+    cutter->SetUseWholeInputRegion(mask); //either mask (mask=true) or crop (mask=false)
+    cutter->SetOutsideValue(m_CropOutsideValue);
+    cutter->SetUseCropTimeStepOnly(m_Controls.checkBoxCropTimeStepOnly->isChecked());
+    cutter->SetCurrentTimeStep(timeStep);
+
+    // TODO: Add support for MultiLayer (right now only Mulitlabel support)
+    mitk::LabelSetImage* labelsetImageInput = dynamic_cast<mitk::LabelSetImage*>(data);
+    if (labelsetImageInput != nullptr)
     {
-      mitk::DataNode *imageNode = m_ImageNode.GetPointer();
-      if (imageNode)
-      {
-        mitk::BaseData* data = imageNode->GetData();
-        if (data)
+        cutter->SetInput(labelsetImageInput);   
+        // do the actual cutting
+        try
         {
-          // test if this data item is an image or not (could also be a surface or something totally different)
-          mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-          if (image)
+          cutter->Update();
+        }
+        catch (const itk::ExceptionObject& e)
+        {
+          std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
+          QMessageBox::warning(nullptr,
+            tr("Cropping not possible!"),
+            tr(message.c_str()),
+            QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+          return;
+        }
+
+        auto labelSetImage = mitk::LabelSetImage::New();
+        labelSetImage->InitializeByLabeledImage(cutter->GetOutput());
+
+        for (int i = 0; i < labelsetImageInput->GetNumberOfLayers(); i++)
+        {
+          labelSetImage->AddLabelSetToLayer(i, labelsetImageInput->GetLabelSet(i));
+        }
+
+        croppedImageNode->SetData(labelSetImage);
+        croppedImageNode->SetProperty("name", mitk::StringProperty::New(imageName.toStdString()));
+
+        //add cropping result to the current data storage as child node to the image node
+        if (!m_Controls.checkOverwriteImage->isChecked())
+        {
+          if (!this->GetDataStorage()->Exists(croppedImageNode))
           {
-            float min = 10000.0;
-            float max = -10000.0;
-
-            min = image->GetScalarValueMin();
-            max = image->GetScalarValueMax();
-
-            m_Controls->m_SurroundingSlider->setRange((int)min,(int)max);
-            m_Controls->m_SurroundingSpin->setRange((int)min,(int)max);
+            this->GetDataStorage()->Add(croppedImageNode, m_ImageNode);
           }
         }
-      }
-      m_Controls->m_SurroundingSlider->show();
-      m_Controls->m_SurroundingSpin->show();
+        else // original image will be overwritten by the result image and the bounding box of the result is adjusted
+        {
+          node->SetData(labelSetImage);
+          node->Modified();
+          // Adjust coordinate system by doing a reinit on
+          auto tempDataStorage = mitk::DataStorage::SetOfObjects::New();
+          tempDataStorage->InsertElement(0, node);
+
+          // initialize the views to the bounding geometry
+          mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+          mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
     }
     else
-      m_Controls->m_EnableSurroundingCheckBox->setChecked(false);
-  }
-  else
-  {
-    m_Controls->m_SurroundingSlider->hide();
-    m_Controls->m_SurroundingSpin->hide();
-  }
-}
-
-void QmitkImageCropper::CropImage()
-{
-  // test, if image is selected
-  if (m_ImageToCrop.IsNull()) return;
-
-  // test, if bounding box is visible
-  if (m_CroppingObjectNode.IsNull())
-  {
-    QMessageBox::information(NULL, "Image cropping functionality", "Generate a new bounding object first!");
-    return;
-  }
-
-  // image and bounding object ok
-  mitk::BoundingObjectCutter::Pointer cutter = mitk::BoundingObjectCutter::New();
-  cutter->SetBoundingObject( m_CroppingObject );
-  cutter->SetInput( m_ImageToCrop );
-  cutter->AutoOutsideValueOff();
-
-  if (m_Controls->m_EnableSurroundingCheckBox->isChecked())
-  {
-    cutter->SetOutsideValue(m_Controls->m_SurroundingSpin->value());
-  }
-
-  // do the actual cutting
-  try
-  {
-    cutter->Update();
-    //cutter->UpdateLargestPossibleRegion();
-  }
-  catch(const itk::ExceptionObject& e)
-  {
-    std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
-
-    QMessageBox::warning ( NULL,
-      tr("Cropping not possible!"),
-      tr(message.c_str()),
-      QMessageBox::Ok,  QMessageBox::NoButton,  QMessageBox::NoButton );
-    return;
-  }
-
-  // cutting successful
-  mitk::Image::Pointer resultImage = cutter->GetOutput();
-  resultImage->DisconnectPipeline();
-  resultImage->SetPropertyList(m_ImageToCrop->GetPropertyList()->Clone());
-
-  RemoveBoundingObjectFromNode();
-
-  {
-    opExchangeNodes*  doOp   = new opExchangeNodes(OP_EXCHANGE, m_ImageNode.GetPointer(),
-      m_ImageNode->GetData(),
-      resultImage);
-    opExchangeNodes* undoOp  = new opExchangeNodes(OP_EXCHANGE, m_ImageNode.GetPointer(),
-      resultImage,
-      m_ImageNode->GetData());
-
-    // TODO: MITK doesn't recognize that a new event happens in the next line,
-    //       because nothing happens in the render window.
-    //       As a result the undo action will happen together with the last action
-    //       recognized by MITK.
-    mitk::OperationEvent* operationEvent = new mitk::OperationEvent( m_Interface, doOp, undoOp, "Crop image");
-    mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( operationEvent ); // tell the undo controller about the action
-
-    ExecuteOperation(doOp); // execute action
-  }
-
-  m_Controls->m_BoxButton->setEnabled(true);
-  m_Controls->m_CropButton->setEnabled(false);
-}
-
-void QmitkImageCropper::CreateBoundingObject()
-{
-  QStringList items;
-  items << tr("Cuboid") << tr("Ellipsoid") << tr("Cylinder") << tr("Cone");
-
-  bool ok;
-  QString item = QInputDialog::getItem(m_Parent, tr("Select Bounding Object"), tr("Type of Bounding Object:"), items, 0, false, &ok);
-
-  if (!ok)
-    return;
-
-  if (item == "Ellipsoid")
-    m_CroppingObject = mitk::Ellipsoid::New();
-  else if(item == "Cylinder")
-    m_CroppingObject = mitk::Cylinder::New();
-  else if (item == "Cone")
-    m_CroppingObject = mitk::Cone::New();
-  else if (item == "Cuboid")
-    m_CroppingObject = mitk::Cuboid::New();
-  else
-    return;
-
-  m_CroppingObjectNode = mitk::DataNode::New();
-  m_CroppingObjectNode->SetData( m_CroppingObject );
-  m_CroppingObjectNode->SetProperty( "name", mitk::StringProperty::New( "CroppingObject" ) );
-  m_CroppingObjectNode->SetProperty( "color", mitk::ColorProperty::New(1.0, 1.0, 0.0) );
-  m_CroppingObjectNode->SetProperty( "opacity", mitk::FloatProperty::New(0.4) );
-  m_CroppingObjectNode->SetProperty( "layer", mitk::IntProperty::New(99) ); // arbitrary, copied from segmentation functionality
-  m_CroppingObjectNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-
-  mitk::AffineImageCropperInteractor::Pointer affineDataInteractor = mitk::AffineImageCropperInteractor::New();
-  affineDataInteractor->LoadStateMachine("ClippingPlaneInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-  affineDataInteractor->SetEventConfig("CropperDeformationConfig.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
-  affineDataInteractor->SetDataNode(m_CroppingObjectNode);
-  m_CroppingObjectNode->SetBoolProperty("pickable", true);
-
-}
-
-void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
-{
-  this->RemoveBoundingObjectFromNode();
-
-  if (nodes.size() != 1 || dynamic_cast<mitk::Image*>(nodes[0]->GetData()) == 0)
-  {
-    m_ParentWidget->setEnabled(false);
-    m_Controls->warningLabel->setVisible(false);
-    return;
-  }
-
-  m_ImageNode = nodes[0];
-  m_ParentWidget->setEnabled(true);
-  // do not accept datanodes with dimension of less than three
-  mitk::Image* m_ImageToCrop = dynamic_cast<mitk::Image*>(nodes[0]->GetData());
-  if (m_ImageToCrop == NULL)
-  {
-    return;
-  }
-  unsigned int dim = m_ImageToCrop->GetDimension();
-  if (dim < 3)
-  {
-    m_Controls->warningLabel->setVisible(true);
-    m_ParentWidget->setEnabled(false);
-  }
-  else
-  {
-    m_Controls->warningLabel->setVisible(false);
-  }
-}
-
-void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)
-{
-  m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
-  unsigned int dim = m_ImageToCrop->GetDimension();
-  if (dim < 3)
-  {
-    MITK_WARN << "Image Cropper does not support 1D/2D Objects. Aborting operation";
-    return;
-  }
-  if(!this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
-  {
-    this->GetDefaultDataStorage()->Add(m_CroppingObjectNode, node);
-    if (fit)
     {
-      m_CroppingObject->FitGeometry(m_ImageToCrop->GetGeometry());
+      mitk::Image::Pointer imageInput = dynamic_cast<mitk::Image*>(data);
+      if (imageInput != nullptr)
+      {
+        cutter->SetInput(imageInput);
+        // do the actual cutting
+        try
+        {
+          cutter->Update();
+        }
+        catch (const itk::ExceptionObject& e)
+        {
+          std::string message = std::string("The Cropping filter could not process because of: \n ") + e.GetDescription();
+
+          QMessageBox::warning(nullptr,
+            tr("Cropping not possible!"),
+            tr(message.c_str()),
+            QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+          return;
+        }
+
+        //add cropping result to the current data storage as child node to the image node
+        if (!m_Controls.checkOverwriteImage->isChecked())
+        {
+          croppedImageNode->SetData(cutter->GetOutput());
+          croppedImageNode->SetProperty("name", mitk::StringProperty::New(imageName.toStdString()));
+          croppedImageNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
+          croppedImageNode->SetProperty("opacity", mitk::FloatProperty::New(0.4));
+          croppedImageNode->SetProperty("layer", mitk::IntProperty::New(99)); // arbitrary, copied from segmentation functionality
+          if (!this->GetDataStorage()->Exists(croppedImageNode))
+          {
+            this->GetDataStorage()->Add(croppedImageNode, m_ImageNode);
+          }
+        }
+        else // original image will be overwritten by the result image and the bounding box of the result is adjusted
+        {
+          node->SetData(cutter->GetOutput());
+          node->Modified();
+          // Adjust coordinate system by doing a reinit on
+          auto tempDataStorage = mitk::DataStorage::SetOfObjects::New();
+          tempDataStorage->InsertElement(0, node);
+
+          // initialize the views to the bounding geometry
+          mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+          mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        }
+      }
     }
-
-    //mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
   }
-  m_CroppingObjectNode->SetVisibility(true);
-}
-
-void QmitkImageCropper::RemoveBoundingObjectFromNode()
-{
-  if (m_CroppingObjectNode.IsNotNull())
-  {
-    if(this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
-    {
-      this->GetDefaultDataStorage()->Remove(m_CroppingObjectNode);
-      //mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
-      m_CroppingObject = NULL;
-    }
-    m_Controls->m_BoxButton->setText("New bounding box!");
-  }
-}
-
-void QmitkImageCropper::ChkInformationToggled( bool on )
-{
-  if (on)
-    m_Controls->groupInfo->show();
   else
-    m_Controls->groupInfo->hide();
-}
-
-void QmitkImageCropper::StdMultiWidgetAvailable( QmitkStdMultiWidget&  stdMultiWidget )
-{
-  m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkImageCropper::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
-
-void QmitkImageCropper::NodeRemoved(const mitk::DataNode *node)
-{
-  std::string name = node->GetName();
-
-  if (strcmp(name.c_str(), "CroppingObject")==0)
   {
-    m_Controls->m_CropButton->setEnabled(false);
-    m_Controls->m_BoxButton->setEnabled(true);
+    QMessageBox::information(nullptr, "Warning", "Please load and select an image before starting image processing.");
   }
 }

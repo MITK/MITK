@@ -13,19 +13,22 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef MITKPLUGINACTIVATOR_H
-#define MITKPLUGINACTIVATOR_H
+#ifndef org_mitk_gui_qt_imagecropper_Activator_h
+#define org_mitk_gui_qt_imagecropper_Activator_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk {
 
-class ImageCropperPluginActivator :
+  class org_mitk_gui_qt_imagecropper_Activator :
   public QObject, public ctkPluginActivator
 {
   Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_imagecropper")
-  Q_INTERFACES(ctkPluginActivator)
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_imagecropper")
+#endif
+    Q_INTERFACES(ctkPluginActivator)
 
 public:
 
@@ -36,4 +39,4 @@ public:
 
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif // org_mitk_gui_qt_imagecropper_Activator_h

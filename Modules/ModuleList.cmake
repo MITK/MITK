@@ -73,6 +73,7 @@ set(mitk_modules
   TumorInvasionAnalysis
   MatchPointRegistration
   MatchPointRegistrationUI
+  BoundingShape
 )
 
 if(MITK_ENABLE_PIC_READER)

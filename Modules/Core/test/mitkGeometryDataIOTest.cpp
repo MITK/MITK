@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestingMacros.h"
 
 #include "mitkGeometry3D.h"
-#include "mitkProportionalTimeGeometry.h"
 #include "mitkGeometryData.h"
+#include "mitkProportionalTimeGeometry.h"
 
-#include "mitkIOUtil.h"
 #include "mitkIOMimeTypes.h"
+#include "mitkIOUtil.h"
 /**
  \brief Reader/Writer test for GeometryData (via IOUtil).
 
@@ -34,14 +34,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkGeometryDataIOTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkGeometryDataIOTestSuite);
-    MITK_TEST(StoreDefaultGeometry3D);
-    MITK_TEST(StoreImageGeometry);
-    MITK_TEST(StoreFrameOfReference);
-    MITK_TEST(StoreOrigin);
-    MITK_TEST(StoreSpacing);
-    MITK_TEST(StoreBounds);
-    MITK_TEST(StoreTransform);
-    MITK_TEST(StoreProportionalTimeGeometry);
+  MITK_TEST(StoreDefaultGeometry3D);
+  MITK_TEST(StoreImageGeometry);
+  MITK_TEST(StoreFrameOfReference);
+  MITK_TEST(StoreOrigin);
+  MITK_TEST(StoreSpacing);
+  MITK_TEST(StoreBounds);
+  MITK_TEST(StoreTransform);
+  MITK_TEST(StoreProportionalTimeGeometry);
   CPPUNIT_TEST_SUITE_END();
 
   mitk::GeometryData::Pointer m_GeometryData;
@@ -53,17 +53,16 @@ class mitkGeometryDataIOTestSuite : public mitk::TestFixture
   mitk::ProportionalTimeGeometry::Pointer m_ReadProportionalTimeGeom;
 
 public:
-
   void setUp() override
   {
     m_GeometryData = mitk::GeometryData::New();
     m_Geom3D = mitk::Geometry3D::New();
 
-    m_GeometryData->SetGeometry( m_Geom3D ); // does copy!? doc says otherwise
+    m_GeometryData->SetGeometry(m_Geom3D); // does copy!? doc says otherwise
     // --> we reference and use the clone, not the original!
-    m_Geom3D = static_cast<mitk::Geometry3D*>( m_GeometryData->GetGeometry() );
+    m_Geom3D = static_cast<mitk::Geometry3D *>(m_GeometryData->GetGeometry());
 
-    m_TimeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry*> (m_GeometryData->GetTimeGeometry());
+    m_TimeGeometry = dynamic_cast<mitk::ProportionalTimeGeometry *>(m_GeometryData->GetTimeGeometry());
     CPPUNIT_ASSERT(m_TimeGeometry.IsNotNull());
   }
 
@@ -96,18 +95,18 @@ public:
     m_Geom3D->SetFrameOfReferenceID(513);
     ASSERT_Geometry3D_WriteReadLoop_Works();
 
-    m_Geom3D->SetFrameOfReferenceID( std::numeric_limits<unsigned int>::max() );
+    m_Geom3D->SetFrameOfReferenceID(std::numeric_limits<unsigned int>::max());
     ASSERT_Geometry3D_WriteReadLoop_Works();
   }
 
   void StoreOrigin()
   {
     mitk::Point3D origin;
-    mitk::FillVector3D(origin, std::numeric_limits<mitk::ScalarType>::min(), -52.723, +0.002 );
+    mitk::FillVector3D(origin, std::numeric_limits<mitk::ScalarType>::min(), -52.723, +0.002);
     m_Geom3D->SetOrigin(origin);
     ASSERT_Geometry3D_WriteReadLoop_Works();
 
-    mitk::FillVector3D(origin, -0.0015, 78.81, std::numeric_limits<mitk::ScalarType>::max() );
+    mitk::FillVector3D(origin, -0.0015, 78.81, std::numeric_limits<mitk::ScalarType>::max());
     m_Geom3D->SetOrigin(origin);
     ASSERT_Geometry3D_WriteReadLoop_Works();
   }
@@ -142,18 +141,14 @@ public:
 
   void StoreTransform()
   {
-    mitk::ScalarType matrixCoeffs[9] = {
-      0.0, 1.1, 2.2,
-      3.3, 4.4, 5.5,
-      6.6, 7.7, 8.8
-    };
+    mitk::ScalarType matrixCoeffs[9] = {0.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8};
 
     mitk::AffineTransform3D::MatrixType matrix;
-    matrix.GetVnlMatrix().set( matrixCoeffs );
+    matrix.GetVnlMatrix().set(matrixCoeffs);
 
     mitk::AffineTransform3D::OffsetType offset;
     offset[0] = -918273645.1829374; // don't want limits::min(), there is a minimal difference for this value.
-    //offset[1] = -0.0; // this causes problems with mitk::Equal
+    // offset[1] = -0.0; // this causes problems with mitk::Equal
     offset[1] = 0.0;
     offset[2] = +918273645.1829374;
 
@@ -172,24 +167,24 @@ public:
 
     // let IOUtil find a good file extension
     std::string filename("geometrydata_geometry3d");
-    std::string extension( mitk::IOMimeTypes::GEOMETRY_DATA_MIMETYPE().GetExtensions().front() );
+    std::string extension(mitk::IOMimeTypes::GEOMETRY_DATA_MIMETYPE().GetExtensions().front());
 
     // don't specify the extension, expect that there is no other writer
     // TODO Other than documented, Save does not add the extension. Anything missing in my MIMETYPE??
-    CPPUNIT_ASSERT_NO_THROW( mitk::IOUtil::Save( m_GeometryData, tmpPath + "/" + filename + "." + extension ) );
+    CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Save(m_GeometryData, tmpPath + "/" + filename + "." + extension));
 
     // read into member
-    std::vector<mitk::BaseData::Pointer> loadedData = mitk::IOUtil::Load( tmpPath + "/" + filename + "." + extension );
-    CPPUNIT_ASSERT_MESSAGE("IOUtil could read something (and just one)", loadedData.size() == 1 );
+    std::vector<mitk::BaseData::Pointer> loadedData = mitk::IOUtil::Load(tmpPath + "/" + filename + "." + extension);
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read something (and just one)", loadedData.size() == 1);
 
-    m_ReadGeometryData = dynamic_cast< mitk::GeometryData* >( loadedData.front().GetPointer() );
-    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ GeometryData", m_ReadGeometryData.IsNotNull() );
+    m_ReadGeometryData = dynamic_cast<mitk::GeometryData *>(loadedData.front().GetPointer());
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ GeometryData", m_ReadGeometryData.IsNotNull());
 
-    m_ReadGeom3D = dynamic_cast< mitk::Geometry3D* >( m_ReadGeometryData->GetGeometry() );
-    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ Geometry3D", m_ReadGeom3D.IsNotNull() );
+    m_ReadGeom3D = dynamic_cast<mitk::Geometry3D *>(m_ReadGeometryData->GetGeometry());
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ Geometry3D", m_ReadGeom3D.IsNotNull());
 
-    m_ReadProportionalTimeGeom = dynamic_cast< mitk::ProportionalTimeGeometry* >( m_ReadGeometryData->GetTimeGeometry() );
-    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ ProportionalTimeGeometry", m_ReadProportionalTimeGeom.IsNotNull() );
+    m_ReadProportionalTimeGeom = dynamic_cast<mitk::ProportionalTimeGeometry *>(m_ReadGeometryData->GetTimeGeometry());
+    CPPUNIT_ASSERT_MESSAGE("IOUtil could read _some_ ProportionalTimeGeometry", m_ReadProportionalTimeGeom.IsNotNull());
   }
 
   void ASSERT_Geometry3D_WriteReadLoop_Works()
@@ -199,7 +194,8 @@ public:
     // "The function compares the spacing, origin, axis vectors, extents, the matrix of the
     //  IndexToWorldTransform(element wise), the bounding(element wise) and the ImageGeometry flag."
     // This seems pretty much everything that we can have in a Geometry3D..
-    CPPUNIT_ASSERT_MESSAGE("Geometry3D > file > Geometry3D keeps geometry", mitk::Equal(*m_Geom3D, *m_ReadGeom3D, 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("Geometry3D > file > Geometry3D keeps geometry",
+                           mitk::Equal(*m_Geom3D, *m_ReadGeom3D, 0.000001, true));
     // Tolerance: Storing huge values 9.18274e+008 does not work at the precision of mitk::eps
     //            So the author of this test judged above tolerance sufficient. If more is
     //            required we need to inspect in more detail.
@@ -215,9 +211,9 @@ public:
       // add new time steps
       mitk::Geometry3D::Pointer timestepGeometry = mitk::Geometry3D::New();
       vtkSmartPointer<vtkMatrix4x4> vtk_matrix = vtkSmartPointer<vtkMatrix4x4>::New();
-      for ( int i = 0; i != 4; ++i )
+      for (int i = 0; i != 4; ++i)
       {
-        for ( int j = 0; j != 4; ++j )
+        for (int j = 0; j != 4; ++j)
         {
           vtk_matrix->SetElement(i, j, t + (i + j) / 8.0); // just insignificant values
         }
@@ -242,7 +238,8 @@ public:
   {
     WriteAndRead_m_GeometryData();
 
-    CPPUNIT_ASSERT_MESSAGE("ProportionalTimeGeometry > file > ProportionalTimeGeometry keeps geometry", mitk::Equal(*m_TimeGeometry, *m_ReadProportionalTimeGeom, 0.000001, true));
+    CPPUNIT_ASSERT_MESSAGE("ProportionalTimeGeometry > file > ProportionalTimeGeometry keeps geometry",
+                           mitk::Equal(*m_TimeGeometry, *m_ReadProportionalTimeGeom, 0.000001, true));
     // Tolerance: Storing huge values 9.18274e+008 does not work at the precision of mitk::eps
     //            So the author of this test judged above tolerance sufficient. If more is
     //            required we need to inspect in more detail.

@@ -14,56 +14,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKCHANNELDESCRIPTOR_H
 #define MITKCHANNELDESCRIPTOR_H
 
 #include "mitkPixelType.h"
 #include <string>
 
-
 namespace mitk
 {
+  /** \brief An object which holds all essential information about a single channel of an Image.
 
-/** \brief An object which holds all essential information about a single channel of an Image.
-
-  The channel descriptor is designed to be used only as a part of the ImageDescriptor. A consequence
-to this is that the ChannelDescriptor does not hold the geometry information, only the PixelType.
-The pixel type is the single information that can differ among an image with multiple channels.
-*/
-class MITKCORE_EXPORT ChannelDescriptor
-{
-public:
+    The channel descriptor is designed to be used only as a part of the ImageDescriptor. A consequence
+  to this is that the ChannelDescriptor does not hold the geometry information, only the PixelType.
+  The pixel type is the single information that can differ among an image with multiple channels.
+  */
+  class MITKCORE_EXPORT ChannelDescriptor
+  {
+  public:
     ChannelDescriptor(mitk::PixelType type, size_t numOfElements, bool allocate = false);
 
     ~ChannelDescriptor();
 
     /** \brief Get the type of channel's elements */
-    PixelType GetPixelType() const
-    { return m_PixelType; }
-
+    PixelType GetPixelType() const { return m_PixelType; }
     /** \brief Get the size in bytes of the channel */
-    size_t GetSize() const
-    { return m_Size; }
-
+    size_t GetSize() const { return m_Size; }
     /** \brief Get the pointer to the actual data of the channel
 
       \warning Such access to the image's data is not safe and will be replaced
       \todo new memory management design
     */
-    unsigned char* GetData() const
-    { return m_Data; }
-
-protected:
-
+    unsigned char *GetData() const { return m_Data; }
+  protected:
     friend class Image;
     friend class ImageAccessorBase;
 
-    void SetData( void* dataPtr )
+    void SetData(void *dataPtr)
     {
-      if(dataPtr == nullptr)
+      if (dataPtr == nullptr)
       {
-        m_Data = (unsigned char*) dataPtr;
+        m_Data = (unsigned char *)dataPtr;
       }
     }
 
@@ -85,9 +75,8 @@ protected:
       \warning Not safe
       \todo Replace in new memory management design
       */
-    unsigned char* m_Data;
-
-};
+    unsigned char *m_Data;
+  };
 
 } // end namespace mitk
 #endif // MITKCHANNELDESCRIPTOR_H

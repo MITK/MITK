@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _vtk_Logo_Rendering_h_
 #define _vtk_Logo_Rendering_h_
 
-
 #include <mitkBaseData.h>
 
 class vtkRenderer;
@@ -31,153 +30,154 @@ class vtkPolyData;
 class vtkPNGReader;
 class vtkImageImport;
 
-namespace mitk {
-
-class RenderWindow;
-/**
- * Renders a company logo in the foreground
- * of a vtkRenderWindow.
- * @deprecatedSince{2015_05} Use mitk::LogoOverlay instead
- */
-class MITKCORE_EXPORT ManufacturerLogo : public BaseData
+namespace mitk
 {
-public:
-
-  mitkClassMacro( ManufacturerLogo, BaseData );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  enum LogoPosition{ UpperLeft, UpperRight, LowerLeft, LowerRight, Middle };
-
-
-
+  class RenderWindow;
   /**
-   * Sets the renderwindow, in which the logo
-   * will be shown. Make sure, you have called this function
-   * before calling Enable()
+   * Renders a company logo in the foreground
+   * of a vtkRenderWindow.
+   * @deprecatedSince{2015_05} Use mitk::LogoOverlay instead
    */
-  virtual void SetRenderWindow( vtkRenderWindow* renderWindow );
+  class MITKCORE_EXPORT ManufacturerLogo : public BaseData
+  {
+  public:
+    mitkClassMacro(ManufacturerLogo, BaseData);
 
-  /**
-   * Sets the source file for the logo.
-   */
-  virtual void SetLogoSource(const char* filename);
-  /**
-   * Sets the opacity level of the logo.
-   */
-  virtual void SetOpacity(double opacity);
-  /**
-   * Specifies the logo size, values from 0...10,
-   * where 1 is a nice little logo
-   */
-  virtual void SetZoomFactor( double factor );
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  /**
-   * Enables drawing of the logo.
-   * If you want to disable it, call the Disable() function.
-   */
-  virtual void Enable();
+      enum LogoPosition {
+        UpperLeft,
+        UpperRight,
+        LowerLeft,
+        LowerRight,
+        Middle
+      };
 
-  /**
-   * Disables drawing of the logo.
-   * If you want to enable it, call the Enable() function.
-   */
-  virtual void Disable();
+    /**
+     * Sets the renderwindow, in which the logo
+     * will be shown. Make sure, you have called this function
+     * before calling Enable()
+     */
+    virtual void SetRenderWindow(vtkRenderWindow *renderWindow);
 
-  /**
-   * Checks, if the logo is currently
-   * enabled (visible)
-   */
-  virtual bool IsEnabled();
+    /**
+     * Sets the source file for the logo.
+     */
+    virtual void SetLogoSource(const char *filename);
+    /**
+     * Sets the opacity level of the logo.
+     */
+    virtual void SetOpacity(double opacity);
+    /**
+     * Specifies the logo size, values from 0...10,
+     * where 1 is a nice little logo
+     */
+    virtual void SetZoomFactor(double factor);
 
-  /**
-   * Empty implementation, since the ManufacturerLogo doesn't
-   * support the requested region concept
-   */
-  virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    /**
+     * Enables drawing of the logo.
+     * If you want to disable it, call the Disable() function.
+     */
+    virtual void Enable();
 
-  /**
-   * Empty implementation, since the ManufacturerLogo doesn't
-   * support the requested region concept
-   */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    /**
+     * Disables drawing of the logo.
+     * If you want to enable it, call the Enable() function.
+     */
+    virtual void Disable();
 
-  /**
-   * Empty implementation, since the ManufacturerLogo doesn't
-   * support the requested region concept
-   */
-  virtual bool VerifyRequestedRegion() override;
+    /**
+     * Checks, if the logo is currently
+     * enabled (visible)
+     */
+    virtual bool IsEnabled();
 
-  /**
-   * Empty implementation, since the ManufacturerLogo doesn't
-   * support the requested region concept
-   */
-  virtual void SetRequestedRegion( const itk::DataObject*) override;
+    /**
+     * Empty implementation, since the ManufacturerLogo doesn't
+     * support the requested region concept
+     */
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
-  /**
-   * Returns the vtkRenderWindow, which is used
-   * for displaying the logo
-   */
-  virtual vtkRenderWindow* GetRenderWindow();
+    /**
+     * Empty implementation, since the ManufacturerLogo doesn't
+     * support the requested region concept
+     */
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-  /**
-   * Returns the renderer responsible for
-   * rendering the logo into the
-   * vtkRenderWindow
-   */
-  virtual vtkRenderer* GetVtkRenderer();
+    /**
+     * Empty implementation, since the ManufacturerLogo doesn't
+     * support the requested region concept
+     */
+    virtual bool VerifyRequestedRegion() override;
 
-  /**
-   * Returns the actor associated with the logo
-   */
-  virtual vtkImageActor* GetActor();
+    /**
+     * Empty implementation, since the ManufacturerLogo doesn't
+     * support the requested region concept
+     */
+    virtual void SetRequestedRegion(const itk::DataObject *) override;
 
-  /**
-   * Returns the mapper associated with the logo
-   */
-  virtual vtkImageMapper* GetMapper();
+    /**
+     * Returns the vtkRenderWindow, which is used
+     * for displaying the logo
+     */
+    virtual vtkRenderWindow *GetRenderWindow();
 
-  /**
-   * If set true, this method forces the logo rendering mechanism that it always
-   * renders the MBI department logo, independent from mainapp option settings.
-   */
-  virtual void ForceMBILogoVisible(bool visible);
+    /**
+     * Returns the renderer responsible for
+     * rendering the logo into the
+     * vtkRenderWindow
+     */
+    virtual vtkRenderer *GetVtkRenderer();
 
-protected:
-  void SetupCamera();
-  void SetupPosition();
+    /**
+     * Returns the actor associated with the logo
+     */
+    virtual vtkImageActor *GetActor();
 
-  /**
-   * Constructor
-   */
-  ManufacturerLogo();
+    /**
+     * Returns the mapper associated with the logo
+     */
+    virtual vtkImageMapper *GetMapper();
 
-  /**
-   * Destructor
-   */
-  ~ManufacturerLogo();
+    /**
+     * If set true, this method forces the logo rendering mechanism that it always
+     * renders the MBI department logo, independent from mainapp option settings.
+     */
+    virtual void ForceMBILogoVisible(bool visible);
 
-  vtkRenderWindow*    m_RenderWindow;
-  vtkRenderer*        m_Renderer;
-  vtkImageActor*      m_Actor;
-  vtkImageMapper*     m_Mapper;
-  vtkPNGReader*       m_PngReader;
-  vtkCamera*          m_Camera;
-  vtkImageImport*     m_VtkImageImport;
+  protected:
+    void SetupCamera();
+    void SetupPosition();
 
-  std::string         m_FileName;
+    /**
+     * Constructor
+     */
+    ManufacturerLogo();
 
-  bool                m_IsEnabled;
-  bool                m_ForceShowMBIDepartmentLogo;
+    /**
+     * Destructor
+     */
+    ~ManufacturerLogo();
 
-  LogoPosition        m_LogoPosition;
-  double              m_ZoomFactor;
-  double              m_Opacity;
+    vtkRenderWindow *m_RenderWindow;
+    vtkRenderer *m_Renderer;
+    vtkImageActor *m_Actor;
+    vtkImageMapper *m_Mapper;
+    vtkPNGReader *m_PngReader;
+    vtkCamera *m_Camera;
+    vtkImageImport *m_VtkImageImport;
 
-  char *              m_ImageData;
+    std::string m_FileName;
 
-};
+    bool m_IsEnabled;
+    bool m_ForceShowMBIDepartmentLogo;
 
-} //end of namespace mitk
+    LogoPosition m_LogoPosition;
+    double m_ZoomFactor;
+    double m_Opacity;
+
+    char *m_ImageData;
+  };
+
+} // end of namespace mitk
 #endif

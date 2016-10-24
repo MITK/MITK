@@ -14,31 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkBaseController.h"
 #include "mitkBaseRenderer.h"
 
 mitk::BaseController::BaseController() : m_LastUpdateTime(0)
 {
   m_Slice = Stepper::New();
-  m_Time  = Stepper::New();
+  m_Time = Stepper::New();
 }
 
 mitk::BaseController::~BaseController()
 {
 }
 
-void mitk::BaseController::ExecuteOperation(mitk::Operation* /* *operation */)
+void mitk::BaseController::ExecuteOperation(mitk::Operation * /* *operation */)
 {
-
 }
 
-mitk::Stepper* mitk::BaseController::GetSlice()
+mitk::Stepper *mitk::BaseController::GetSlice()
 {
   return m_Slice.GetPointer();
 }
 
-mitk::Stepper* mitk::BaseController::GetTime()
+mitk::Stepper *mitk::BaseController::GetTime()
 {
   return m_Time.GetPointer();
 }

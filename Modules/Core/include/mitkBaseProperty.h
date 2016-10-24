@@ -14,41 +14,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 #define BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
 
-#include <string>
-#include <itkObjectFactory.h>
 #include <MitkCoreExports.h>
+#include <itkObjectFactory.h>
 #include <mitkCommon.h>
+#include <string>
 
-namespace mitk {
-
-/*! \brief Abstract base class for properties
-
-  \ingroup DataManagement
-
-    Base class for properties. Properties are arbitrary additional information
-    (to define a new type of information you have to define a subclass of
-    BaseProperty) that can be added to a PropertyList.
-    Concrete subclasses of BaseProperty should define Set-/Get-methods to assess
-    the property value, which should be stored by value (not by reference).
-    Subclasses must implement an operator==(const BaseProperty& property), which
-    is used by PropertyList to check whether a property has been changed.
-*/
-class MITKCORE_EXPORT BaseProperty : public itk::Object
+namespace mitk
 {
+  /*! \brief Abstract base class for properties
+
+    \ingroup DataManagement
+
+      Base class for properties. Properties are arbitrary additional information
+      (to define a new type of information you have to define a subclass of
+      BaseProperty) that can be added to a PropertyList.
+      Concrete subclasses of BaseProperty should define Set-/Get-methods to assess
+      the property value, which should be stored by value (not by reference).
+      Subclasses must implement an operator==(const BaseProperty& property), which
+      is used by PropertyList to check whether a property has been changed.
+  */
+  class MITKCORE_EXPORT BaseProperty : public itk::Object
+  {
   public:
+    mitkClassMacroItkParent(BaseProperty, itk::Object) itkCloneMacro(Self)
 
-    mitkClassMacroItkParent(BaseProperty,itk::Object)
-    itkCloneMacro(Self)
+      /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
 
-    /*! @brief Subclasses must implement IsEqual(const BaseProperty&) to support comparison.
-
-        operator== which is used by PropertyList to check whether a property has been changed.
-    */
-    bool operator==(const BaseProperty& property) const;
+          operator== which is used by PropertyList to check whether a property has been changed.
+      */
+      bool
+      operator==(const BaseProperty &property) const;
 
     /*! @brief Assigns property to this BaseProperty instance.
 
@@ -57,14 +55,14 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
         operator of the subclass should be disabled and the baseclass operator should
         be made visible using "using" statements.
     */
-    BaseProperty& operator=(const BaseProperty& property);
+    BaseProperty &operator=(const BaseProperty &property);
 
     /*! @brief Assigns property to this BaseProperty instance.
 
         This method is identical to the assignment operator, except for the return type.
         It allows to directly check if the assignemnt was successfull.
     */
-    bool AssignProperty(const BaseProperty & property);
+    bool AssignProperty(const BaseProperty &property);
 
     virtual std::string GetValueAsString() const;
 
@@ -75,17 +73,16 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
 
   protected:
     BaseProperty();
-    BaseProperty(const BaseProperty& other);
+    BaseProperty(const BaseProperty &other);
 
     virtual ~BaseProperty();
 
   private:
-
     /*!
       Override this method in subclasses to implement a meaningful comparison. The property
       argument is guaranteed to be castable to the type of the implementing subclass.
     */
-    virtual bool IsEqual(const BaseProperty& property) const = 0;
+    virtual bool IsEqual(const BaseProperty &property) const = 0;
 
     /*!
       Override this method in subclasses to implement a meaningful assignment. The property
@@ -96,13 +93,9 @@ class MITKCORE_EXPORT BaseProperty : public itk::Object
 
       @return True if the argument could be assigned to this property.
      */
-    virtual bool Assign(const BaseProperty& ) = 0;
-};
+    virtual bool Assign(const BaseProperty &) = 0;
+  };
 
 } // namespace mitk
 
-
-
 #endif /* BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54 */
-
-

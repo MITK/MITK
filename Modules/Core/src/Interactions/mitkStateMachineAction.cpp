@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStateMachineAction.h"
 
-mitk::StateMachineAction::StateMachineAction(const std::string& actionName) : m_ActionName(actionName)
+mitk::StateMachineAction::StateMachineAction(const std::string &actionName) : m_ActionName(actionName)
 {
 }
 

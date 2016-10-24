@@ -56,14 +56,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
-#include <MitkCoreExports.h>
 #include "mitkBaseGeometry.h"
 #include "mitkRestorePlanePositionOperation.h"
+#include <MitkCoreExports.h>
 
 #include <vnl/vnl_cross.h>
 
-namespace mitk {
-  template < class TCoordRep, unsigned int NPointDimension > class Line;
+namespace mitk
+{
+  template <class TCoordRep, unsigned int NPointDimension>
+  class Line;
   typedef Line<ScalarType, 3> Line3D;
 
   class PlaneGeometry;
@@ -81,17 +83,15 @@ namespace mitk {
     mitkClassMacro(PlaneGeometry, BaseGeometry);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    enum PlaneOrientation
-    {
-      Axial,
-      Sagittal,
-      Frontal, // also known as "Coronal" in mitk.
-      None //This defines the PlaneGeometry for the 3D renderWindow which
-          //curiously also needs a PlaneGeometry. This should be reconsidered some time.
-    };
+      enum PlaneOrientation {
+        Axial,
+        Sagittal,
+        Frontal, // also known as "Coronal" in mitk.
+        None     // This defines the PlaneGeometry for the 3D renderWindow which
+        // curiously also needs a PlaneGeometry. This should be reconsidered some time.
+      };
 
     virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
 
@@ -100,9 +100,12 @@ namespace mitk {
     //##Documentation
     //## @brief Convert (continuous or discrete) index coordinates of a \em vector
     //## \a vec_units to world coordinates (in mm)
-    //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
+    //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const
+    // mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
     //## For further information about coordinates types, please see the Geometry documentation
-    virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+    virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis,
+                              const mitk::Vector2D &vec_units,
+                              mitk::Vector2D &vec_mm) const;
 
     //##Documentation
     //## @brief Convert (continuous or discrete) index coordinates of a \em vector
@@ -113,9 +116,12 @@ namespace mitk {
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em vector
     //## \a vec_mm to (continuous!) index coordinates.
-    //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
+    //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const
+    // mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
     //## For further information about coordinates types, please see the Geometry documentation
-    virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+    virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm,
+                              const mitk::Vector2D &vec_mm,
+                              mitk::Vector2D &vec_units) const;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em vector
@@ -140,9 +146,11 @@ namespace mitk {
     *   thisgeometry->SetExtentInMM(2, 1.0);
     * \endcode
     */
-    virtual void InitializeStandardPlane(const BaseGeometry* geometry3D,
-      PlaneOrientation planeorientation = Axial, ScalarType zPosition = 0,
-      bool frontside = true, bool rotated = false);
+    virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
+                                         PlaneOrientation planeorientation = Axial,
+                                         ScalarType zPosition = 0,
+                                         bool frontside = true,
+                                         bool rotated = false);
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
@@ -152,9 +160,11 @@ namespace mitk {
     * \param top if \a true, create plane at top, otherwise at bottom
     * (for PlaneOrientation Axial, for other plane locations respectively)
     */
-    virtual void InitializeStandardPlane(const BaseGeometry* geometry3D, bool top,
-      PlaneOrientation planeorientation = Axial,
-      bool frontside = true, bool rotated = false);
+    virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
+                                         bool top,
+                                         PlaneOrientation planeorientation = Axial,
+                                         bool frontside = true,
+                                         bool rotated = false);
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
@@ -174,19 +184,26 @@ namespace mitk {
     * \a Cave/Caution: Currently only RPI, LAI, LPS and RAS in the three standard planes are covered,
     * i.e. 12 cases of 144:  3 standard planes * 48 coordinate orientations = 144 cases.
     */
-    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-                                         const AffineTransform3D* transform = nullptr,
+    virtual void InitializeStandardPlane(ScalarType width,
+                                         ScalarType height,
+                                         const AffineTransform3D *transform = nullptr,
                                          PlaneOrientation planeorientation = Axial,
-                                         ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
+                                         ScalarType zPosition = 0,
+                                         bool frontside = true,
+                                         bool rotated = false);
 
     /**
     * \brief Initialize plane with orientation \a planeorientation
     * (default: axial) given width, height and spacing.
     *
     */
-    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const Vector3D & spacing, PlaneOrientation planeorientation = Axial,
-      ScalarType zPosition = 0, bool frontside = true, bool rotated = false);
+    virtual void InitializeStandardPlane(ScalarType width,
+                                         ScalarType height,
+                                         const Vector3D &spacing,
+                                         PlaneOrientation planeorientation = Axial,
+                                         ScalarType zPosition = 0,
+                                         bool frontside = true,
+                                         bool rotated = false);
 
     /**
     * \brief Initialize plane by width and height in pixels, right-/down-vector
@@ -200,9 +217,11 @@ namespace mitk {
     * coordinate orientations, unless spacing contains 1 or 3 negative entries.
     *
     */
-    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const Vector3D& rightVector, const Vector3D& downVector,
-      const Vector3D *spacing = nullptr);
+    virtual void InitializeStandardPlane(ScalarType width,
+                                         ScalarType height,
+                                         const Vector3D &rightVector,
+                                         const Vector3D &downVector,
+                                         const Vector3D *spacing = nullptr);
 
     /**
     * \brief Initialize plane by width and height in pixels,
@@ -216,9 +235,11 @@ namespace mitk {
     * coordinate orientations, unless spacing contains 1 or 3 negative entries.
     *
     */
-    virtual void InitializeStandardPlane(ScalarType width, ScalarType height,
-      const VnlVector& rightVector, const VnlVector& downVector,
-      const Vector3D * spacing = nullptr);
+    virtual void InitializeStandardPlane(ScalarType width,
+                                         ScalarType height,
+                                         const VnlVector &rightVector,
+                                         const VnlVector &downVector,
+                                         const Vector3D *spacing = nullptr);
 
     /**
     * \brief Initialize plane by right-/down-vector (itk) and spacing
@@ -228,8 +249,9 @@ namespace mitk {
     * respectively. Then, the vectors are normalized and multiplied by the
     * respective spacing before they are set in the matrix.
     */
-    virtual void InitializeStandardPlane(const Vector3D& rightVector,
-      const Vector3D& downVector, const Vector3D * spacing = nullptr);
+    virtual void InitializeStandardPlane(const Vector3D &rightVector,
+                                         const Vector3D &downVector,
+                                         const Vector3D *spacing = nullptr);
 
     /**
     * \brief Initialize plane by right-/down-vector (vnl) and spacing
@@ -239,8 +261,9 @@ namespace mitk {
     * respectively. Then, the vectors are normalized and multiplied by the
     * respective spacing before they are set in the matrix.
     */
-    virtual void InitializeStandardPlane(const VnlVector& rightVector,
-      const VnlVector& downVector, const Vector3D * spacing = nullptr);
+    virtual void InitializeStandardPlane(const VnlVector &rightVector,
+                                         const VnlVector &downVector,
+                                         const Vector3D *spacing = nullptr);
 
     /**
     * \brief Initialize plane by origin and normal (size is 1.0 mm in
@@ -248,7 +271,7 @@ namespace mitk {
     * undefined).
     * \warning This function can only produce righthanded coordinate orientation, not lefthanded.
     */
-    virtual void InitializePlane(const Point3D& origin, const Vector3D& normal);
+    virtual void InitializePlane(const Point3D &origin, const Vector3D &normal);
 
     /**
     * \brief Initialize plane by right-/down-vector.
@@ -258,15 +281,14 @@ namespace mitk {
     * This function creates a righthanded IndexToWorldTransform,
     * only a negative thickness could still make it lefthanded.
     */
-    void SetMatrixByVectors(const VnlVector& rightVector,
-      const VnlVector& downVector, ScalarType thickness = 1.0);
+    void SetMatrixByVectors(const VnlVector &rightVector, const VnlVector &downVector, ScalarType thickness = 1.0);
 
     /**
     * \brief Change \a transform so that the third column of the
     * transform-martix is perpendicular to the first two columns
     *
     */
-    static void EnsurePerpendicularNormal(AffineTransform3D* transform);
+    static void EnsurePerpendicularNormal(AffineTransform3D *transform);
 
     /**
     * \brief Normal of the plane
@@ -280,20 +302,20 @@ namespace mitk {
     */
     VnlVector GetNormalVnl() const;
 
-    virtual ScalarType SignedDistance(const Point3D& pt3d_mm) const;
+    virtual ScalarType SignedDistance(const Point3D &pt3d_mm) const;
 
     /**
     * \brief Calculates, whether a point is below or above the plane. There are two different
     *calculation methods, with or without consideration of the bounding box.
     */
-    virtual bool IsAbove(const Point3D& pt3d_mm, bool considerBoundingBox = false) const;
+    virtual bool IsAbove(const Point3D &pt3d_mm, bool considerBoundingBox = false) const;
 
     /**
     * \brief Distance of the point from the plane
     * (bounding-box \em not considered)
     *
     */
-    ScalarType DistanceFromPlane(const Point3D& pt3d_mm) const;
+    ScalarType DistanceFromPlane(const Point3D &pt3d_mm) const;
 
     /**
     * \brief Signed distance of the point from the plane
@@ -301,14 +323,14 @@ namespace mitk {
     *
     * > 0 : point is in the direction of the direction vector.
     */
-    inline ScalarType SignedDistanceFromPlane(const Point3D& pt3d_mm) const
+    inline ScalarType SignedDistanceFromPlane(const Point3D &pt3d_mm) const
     {
       ScalarType len = GetNormalVnl().two_norm();
 
       if (len == 0)
         return 0;
 
-      return (pt3d_mm - GetOrigin())*GetNormal() / len;
+      return (pt3d_mm - GetOrigin()) * GetNormal() / len;
     }
 
     /**
@@ -317,11 +339,7 @@ namespace mitk {
     *
     * Result is 0 if planes are not parallel.
     */
-    ScalarType DistanceFromPlane(const PlaneGeometry* plane) const
-    {
-      return fabs(SignedDistanceFromPlane(plane));
-    }
-
+    ScalarType DistanceFromPlane(const PlaneGeometry *plane) const { return fabs(SignedDistanceFromPlane(plane)); }
     /**
     * \brief Signed distance of the plane from another plane
     * (bounding-box \em not considered)
@@ -351,8 +369,7 @@ namespace mitk {
     * \return number of intersection points (0..2). First interection point (if existing)
     * is returned in \a lineFrom, second in \a lineTo.
     */
-    unsigned int IntersectWithPlane2D(const PlaneGeometry *plane,
-      Point2D &lineFrom, Point2D &lineTo) const;
+    unsigned int IntersectWithPlane2D(const PlaneGeometry *plane, Point2D &lineFrom, Point2D &lineTo) const;
 
     /**
     * \brief Calculate the angle between two planes
@@ -375,8 +392,7 @@ namespace mitk {
     * \return \a true if \em unique intersection exists, i.e., if line
     * is \em not on or parallel to the plane
     */
-    bool IntersectionPoint(const Line3D &line,
-      Point3D &intersectionPoint) const;
+    bool IntersectionPoint(const Line3D &line, Point3D &intersectionPoint) const;
 
     /**
     * \brief Calculate line parameter of intersection point between the
@@ -468,8 +484,7 @@ namespace mitk {
     *
     * \return true projection was possible
     */
-    virtual bool Project(const mitk::Point3D &pt3d_mm,
-      mitk::Point3D &projectedPt3d_mm) const;
+    virtual bool Project(const mitk::Point3D &pt3d_mm, mitk::Point3D &projectedPt3d_mm) const;
 
     /**
     * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
@@ -483,8 +498,7 @@ namespace mitk {
     * \sa Project(const mitk::Vector3D &vec3d_mm, mitk::Vector3D
     * &projectedVec3d_mm)
     */
-    virtual bool Map(const mitk::Point3D & atPt3d_mm,
-      const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
+    virtual bool Map(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const;
 
     /**
     * \brief Converts a 2D vector given in mm (\a vec2d_mm) relative to the
@@ -495,8 +509,7 @@ namespace mitk {
     * image) into a 2D vector given in mm (as required by this method), use
     * IndexToWorld.
     */
-    virtual void Map(const mitk::Point2D & atPt2d_mm,
-      const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
+    virtual void Map(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const;
 
     /**
     * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
@@ -506,8 +519,9 @@ namespace mitk {
     *
     * \return true projection was possible
     */
-    virtual bool Project(const mitk::Point3D & atPt3d_mm,
-      const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const;
+    virtual bool Project(const mitk::Point3D &atPt3d_mm,
+                         const mitk::Vector3D &vec3d_mm,
+                         mitk::Vector3D &projectedVec3d_mm) const;
 
     /**
     * \brief Project a 3D vector given in mm (\a vec3d_mm) onto the 2D
@@ -522,11 +536,7 @@ namespace mitk {
     * (bounding-box \em not considered)
     *
     */
-    inline ScalarType Distance(const Point3D& pt3d_mm) const
-    {
-      return fabs(SignedDistance(pt3d_mm));
-    }
-
+    inline ScalarType Distance(const Point3D &pt3d_mm) const { return fabs(SignedDistance(pt3d_mm)); }
     /**
     * \brief Set the geometrical frame of reference in which this PlaneGeometry
     * is placed.
@@ -545,7 +555,7 @@ namespace mitk {
   protected:
     PlaneGeometry();
 
-    PlaneGeometry(const PlaneGeometry& other);
+    PlaneGeometry(const PlaneGeometry &other);
 
     virtual ~PlaneGeometry();
 
@@ -559,23 +569,24 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
-
+    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
     //##Documentation
     //## @brief CheckBounds
     //##
     //## This function is called in SetBounds. Assertions can be implemented in this function (see PlaneGeometry.cpp).
     //## If you implement this function in a subclass, make sure, that all classes were your class inherits from
     //## have an implementation of CheckBounds
-    //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as well!)
-    virtual void CheckBounds(const BoundsArrayType& bounds) override;
+    //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as
+    // well!)
+    virtual void CheckBounds(const BoundsArrayType &bounds) override;
 
     //##Documentation
     //## @brief CheckIndexToWorldTransform
     //##
-    //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see PlaneGeometry.cpp).
+    //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see
+    // PlaneGeometry.cpp).
     //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
-    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* transform) override;
+    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D *transform) override;
 
   private:
     /**
@@ -583,7 +594,6 @@ namespace mitk {
     * (bounding-box \em not considered)
     */
     virtual bool operator==(const PlaneGeometry *) const { return false; };
-
     /**
     * \brief Compares plane with another plane: \a false if IsOnPlane
     * (bounding-box \em not considered)

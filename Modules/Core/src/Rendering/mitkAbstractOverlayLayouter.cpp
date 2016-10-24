@@ -25,7 +25,7 @@ mitk::AbstractOverlayLayouter::~AbstractOverlayLayouter()
 {
 }
 
-std::list<mitk::Overlay*> mitk::AbstractOverlayLayouter::GetManagedOverlays() const
+std::list<mitk::Overlay *> mitk::AbstractOverlayLayouter::GetManagedOverlays() const
 {
   return m_ManagedOverlays;
 }
@@ -35,21 +35,21 @@ void mitk::AbstractOverlayLayouter::SetBaseRenderer(BaseRenderer *renderer)
   m_BaseRenderer = renderer;
 }
 
-mitk::BaseRenderer* mitk::AbstractOverlayLayouter::GetBaseRenderer()
+mitk::BaseRenderer *mitk::AbstractOverlayLayouter::GetBaseRenderer()
 {
   return m_BaseRenderer;
 }
 
-void mitk::AbstractOverlayLayouter::AddOverlay(mitk::Overlay* Overlay)
+void mitk::AbstractOverlayLayouter::AddOverlay(mitk::Overlay *Overlay)
 {
-  if(Overlay->m_LayoutedBy && Overlay->m_LayoutedBy != this)
+  if (Overlay->m_LayoutedBy && Overlay->m_LayoutedBy != this)
     Overlay->m_LayoutedBy->RemoveOverlay(Overlay);
   Overlay->m_LayoutedBy = this;
   m_ManagedOverlays.push_back(Overlay);
   PrepareLayout();
 }
 
-void mitk::AbstractOverlayLayouter::RemoveOverlay(mitk::Overlay* Overlay)
+void mitk::AbstractOverlayLayouter::RemoveOverlay(mitk::Overlay *Overlay)
 {
   m_ManagedOverlays.remove(Overlay);
 }

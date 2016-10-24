@@ -21,20 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
 
-#include <vnl/vnl_vector_fixed_ref.h>
 #include "vnl/vnl_math.h"
+#include <vnl/vnl_vector_fixed_ref.h>
 
 #include "mitkNumericConstants.h"
-#include "mitkVector.h"
 #include "mitkPoint.h"
+#include "mitkVector.h"
 
 using namespace mitk;
-
 
 class mitkVectorTypeConversionTestSuite : public mitk::TestFixture
 
 {
-
   CPPUNIT_TEST_SUITE(mitkVectorTypeConversionTestSuite);
 
   MITK_TEST(Point2Vector);
@@ -60,7 +58,6 @@ class mitkVectorTypeConversionTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /**
    * these variables are used in the test functions
    *
@@ -88,36 +85,32 @@ private:
   *  @param eps   defines the allowed tolerance when testing for equality.
    */
   template <typename T1, typename T2>
-  void TestForEquality(const T1& v1, const T2& v2, const std::string& v1Name, const std::string& v2Name, const ScalarType& eps = mitk::eps) const
+  void TestForEquality(const T1 &v1,
+                       const T2 &v2,
+                       const std::string &v1Name,
+                       const std::string &v2Name,
+                       const ScalarType &eps = mitk::eps) const
   {
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("\nAssigning " + v2Name + " to " + v1Name + ":\n both are equal", true,
-        EqualArray(v1, v2, 3, eps));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "\nAssigning " + v2Name + " to " + v1Name + ":\n both are equal", true, EqualArray(v1, v2, 3, eps));
   }
 
 public:
-
-
   void setUp(void) override
   {
     FillVector3D(originalValues, 1.123456789987, 2.789456321456, 3.123654789987456);
-    FillVector3D(valuesToCopy,   4.654789123321, 5.987456789321, 6.321654987789546);
+    FillVector3D(valuesToCopy, 4.654789123321, 5.987456789321, 6.321654987789546);
 
     epsDouble2Float = vnl_math::float_eps * 10.0;
   }
 
-  void tearDown(void) override
-  {
-
-  }
-
-
+  void tearDown(void) override {}
   void Pod2Mitk(void)
   {
     mitk::Vector3D vector3D = valuesToCopy;
 
     TestForEquality(vector3D, valuesToCopy, "mitk::Vector3D", "double POD");
   }
-
 
   void Mitk2Pod(void)
   {
@@ -129,15 +122,14 @@ public:
     TestForEquality(podArray, vector3D, "double POD", "mitk::Vector3D");
   }
 
-
   void OneElement2Mitk(void)
   {
     double twos[] = {2.0, 2.0, 2.0};
     mitk::Vector<double, 3> vector3D(2.0);
 
-    CPPUNIT_ASSERT_ASSERTION_PASS_MESSAGE( "\n one values initializes all elements to this value", EqualArray(vector3D, twos, 3));
+    CPPUNIT_ASSERT_ASSERTION_PASS_MESSAGE("\n one values initializes all elements to this value",
+                                          EqualArray(vector3D, twos, 3));
   }
-
 
   void Itk2Mitk(void)
   {
@@ -148,7 +140,6 @@ public:
     TestForEquality(vector3D, itkVector, "mitk::Vector3D", "itk::Vector");
   }
 
-
   void Mitk2Itk(void)
   {
     Vector3D vector3D = valuesToCopy;
@@ -158,7 +149,6 @@ public:
     TestForEquality(itkVector, vector3D, "itk::Vector", "mitk::Vector3D");
   }
 
-
   void Vnlfixed2Mitk(void)
   {
     vnl_vector_fixed<ScalarType, 3> vnlVectorFixed(valuesToCopy);
@@ -167,7 +157,6 @@ public:
 
     TestForEquality(vector3D, vnlVectorFixed, "mitk::Vector3D", "vnl_vector_fixed<ScalarType>");
   }
-
 
   void Mitk2Vnlfixed(void)
   {
@@ -179,7 +168,6 @@ public:
     TestForEquality(vnlVectorFixed, vector3D, "vnl_vector_fixed<ScalarType>", "mitk::Vector3D");
   }
 
-
   void Vnl2Mitk(void)
   {
     vnl_vector<ScalarType> vnlVector(3);
@@ -189,7 +177,6 @@ public:
 
     TestForEquality(vector3D, vnlVector, "mitk::Vector3D", "vnl_vector<ScalarType>");
   }
-
 
   void Mitk2Vnl(void)
   {
@@ -201,7 +188,6 @@ public:
 
     TestForEquality(vnlVector, vector3D, "vnl_vector<ScalarType>", "mitk::Vector3D");
   }
-
 
   /**
    * @brief Tests if an exception is thrown when constructing an mitk::Vector form a vnl_vector of not suited size.
@@ -216,11 +202,11 @@ public:
     CPPUNIT_ASSERT_THROW(vector3D = vnlVector, mitk::Exception);
   }
 
-
   void ToArray_DifferentType(void)
   {
     float podArray[3];
-    for (int var = 0; var < 3; ++var) {
+    for (int var = 0; var < 3; ++var)
+    {
       podArray[var] = originalValues[var];
     }
     mitk::Vector3D vector3D = valuesToCopy;
@@ -230,12 +216,12 @@ public:
     TestForEquality(podArray, vector3D, "float POD", "mitk::Vector3D", epsDouble2Float);
   }
 
-
   void Fill_DifferentType(void)
   {
     mitk::Vector3D vector3D = originalValues;
     float podArray[3];
-    for (int var = 0; var < 3; ++var) {
+    for (int var = 0; var < 3; ++var)
+    {
       podArray[var] = valuesToCopy[var];
     }
 
@@ -246,14 +232,12 @@ public:
 
   void Point2Vector()
   {
-    mitk::Point3D point3D   = originalValues;
+    mitk::Point3D point3D = originalValues;
 
     mitk::Vector3D vector3D = point3D.GetVectorFromOrigin();
 
     TestForEquality(point3D, vector3D, "mitk::Point3D", "mitk::Vector3D");
   }
-
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkVectorTypeConversion)

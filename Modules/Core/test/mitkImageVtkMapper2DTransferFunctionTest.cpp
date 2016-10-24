@@ -14,18 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
+#include "mitkTestingMacros.h"
 
-//VTK
-#include <vtkRegressionTestImage.h>
-#include <mitkTransferFunctionProperty.h>
-#include <mitkTransferFunction.h>
+// VTK
 #include <mitkRenderingModeProperty.h>
+#include <mitkTransferFunction.h>
+#include <mitkTransferFunctionProperty.h>
+#include <vtkRegressionTestImage.h>
 
-
-int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
+int mitkImageVtkMapper2DTransferFunctionTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -35,25 +34,28 @@ int mitkImageVtkMapper2DTransferFunctionTest(int argc, char* argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
-  //define an arbitrary colortransferfunction
+  // define an arbitrary colortransferfunction
   vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
   colorTransferFunction->SetColorSpaceToRGB();
-  colorTransferFunction->AddRGBPoint(0.0, 1, 0, 0); //black = red
-  colorTransferFunction->AddRGBPoint(127.5, 0, 1, 0); //grey = green
-  colorTransferFunction->AddRGBPoint(255.0, 0, 0, 1); //white = blue
+  colorTransferFunction->AddRGBPoint(0.0, 1, 0, 0);   // black = red
+  colorTransferFunction->AddRGBPoint(127.5, 0, 1, 0); // grey = green
+  colorTransferFunction->AddRGBPoint(255.0, 0, 0, 1); // white = blue
   mitk::TransferFunction::Pointer transferFucntion = mitk::TransferFunction::New();
-  transferFucntion->SetColorTransferFunction( colorTransferFunction );
+  transferFucntion->SetColorTransferFunction(colorTransferFunction);
 
-  //set the rendering mode to use the transfer function
-  renderingHelper.SetImageProperty("Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR));
-  //set the property for the image
-  renderingHelper.SetImageProperty("Image Rendering.Transfer Function", mitk::TransferFunctionProperty::New(transferFucntion));
+  // set the rendering mode to use the transfer function
+  renderingHelper.SetImageProperty(
+    "Image Rendering.Mode", mitk::RenderingModeProperty::New(mitk::RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR));
+  // set the property for the image
+  renderingHelper.SetImageProperty("Image Rendering.Transfer Function",
+                                   mitk::TransferFunctionProperty::New(transferFucntion));
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv, 20.0) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
-  //use this to generate a reference screenshot or save the file:
-  if(false)
+  // use this to generate a reference screenshot or save the file:
+  if (false)
   {
     renderingHelper.SaveReferenceScreenShot("/media/hdd/thomasHdd/Pictures/tmp/output2.png");
   }

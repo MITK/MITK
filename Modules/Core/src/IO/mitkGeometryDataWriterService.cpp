@@ -24,14 +24,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 
 mitk::GeometryDataWriterService::GeometryDataWriterService()
-  : AbstractFileWriter(GeometryData::GetStaticNameOfClass(),
-                       IOMimeTypes::GEOMETRY_DATA_MIMETYPE(),
-                       "MITK Geometry Data Writer")
+  : AbstractFileWriter(
+      GeometryData::GetStaticNameOfClass(), IOMimeTypes::GEOMETRY_DATA_MIMETYPE(), "MITK Geometry Data Writer")
 {
   RegisterService();
 }
 
-mitk::GeometryDataWriterService::GeometryDataWriterService(const mitk::GeometryDataWriterService& other)
+mitk::GeometryDataWriterService::GeometryDataWriterService(const mitk::GeometryDataWriterService &other)
   : AbstractFileWriter(other)
 {
 }
@@ -46,7 +45,7 @@ void mitk::GeometryDataWriterService::Write()
      But before changing to file interface, need to understand the new I/O classes */
   OutputStream out(this);
 
-  if ( !out.good() )
+  if (!out.good())
   {
     mitkThrow() << "Stream not good.";
   }
@@ -60,25 +59,26 @@ void mitk::GeometryDataWriterService::Write()
 
   TiXmlDocument doc;
 
-  TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
+  TiXmlDeclaration *decl = new TiXmlDeclaration(
+    "1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
   doc.LinkEndChild(decl);
 
-  TiXmlElement* rootNode = new TiXmlElement("GeometryData");
+  TiXmlElement *rootNode = new TiXmlElement("GeometryData");
   doc.LinkEndChild(rootNode);
 
   // note version info
-  TiXmlElement* version = new TiXmlElement("Version");
+  TiXmlElement *version = new TiXmlElement("Version");
   version->SetAttribute("Writer", __FILE__);
   version->SetAttribute("FileVersion", 1);
   rootNode->LinkEndChild(version);
 
-  const GeometryData* data = static_cast<const GeometryData*>( this->GetInput() );
+  const GeometryData *data = static_cast<const GeometryData *>(this->GetInput());
 
-  const ProportionalTimeGeometry* timeGeometry(NULL);
-  if ( (timeGeometry = dynamic_cast<const ProportionalTimeGeometry*>( data->GetTimeGeometry() )) )
+  const ProportionalTimeGeometry *timeGeometry(NULL);
+  if ((timeGeometry = dynamic_cast<const ProportionalTimeGeometry *>(data->GetTimeGeometry())))
   {
-    TiXmlElement* timeGeometryElement = ProportionalTimeGeometryToXML::ToXML( timeGeometry );
-    rootNode->LinkEndChild( timeGeometryElement );
+    TiXmlElement *timeGeometryElement = ProportionalTimeGeometryToXML::ToXML(timeGeometry);
+    rootNode->LinkEndChild(timeGeometryElement);
   }
   else
   {
@@ -89,7 +89,7 @@ void mitk::GeometryDataWriterService::Write()
   out << doc;
 }
 
-mitk::GeometryDataWriterService*mitk::GeometryDataWriterService::Clone() const
+mitk::GeometryDataWriterService *mitk::GeometryDataWriterService::Clone() const
 {
   return new GeometryDataWriterService(*this);
 }

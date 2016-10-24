@@ -29,105 +29,106 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usServiceReference.h>
 #include <usServiceTracker.h>
 
-#include <itkSimpleFastMutexLock.h>
 #include <itkMutexLockHolder.h>
+#include <itkSimpleFastMutexLock.h>
 
-namespace mitk {
-
-itk::SimpleFastMutexLock& s_ContextToServicesMapMutex()
+namespace mitk
 {
-  static itk::SimpleFastMutexLock mutex;
-  return mutex;
-}
-
-std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >& s_ContextToServicesMap()
-{
-  static std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> > serviceMap;
-  return serviceMap;
-}
-
-template<class S>
-static S* GetCoreService(us::ModuleContext* context)
-{
-  if (context == NULL) context = us::GetModuleContext();
-
-  S* coreService = NULL;
-  us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
-  if (serviceRef)
+  itk::SimpleFastMutexLock &s_ContextToServicesMapMutex()
   {
-    coreService = context->GetService(serviceRef);
+    static itk::SimpleFastMutexLock mutex;
+    return mutex;
   }
 
-  assert(coreService && "Asserting non-NULL MITK core service");
+  std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>> &s_ContextToServicesMap()
   {
-    itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
-    s_ContextToServicesMap()[context].insert(std::make_pair(coreService,serviceRef));
+    static std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>> serviceMap;
+    return serviceMap;
   }
 
-  return coreService;
-}
-
-IShaderRepository* CoreServices::GetShaderRepository()
-{
-  static us::ServiceTracker<IShaderRepository> tracker(us::GetModuleContext());
-  tracker.Open();
-  return tracker.GetService();
-}
-
-IPropertyAliases* CoreServices::GetPropertyAliases(us::ModuleContext* context)
-{
-  return GetCoreService<IPropertyAliases>(context);
-}
-
-IPropertyDescriptions* CoreServices::GetPropertyDescriptions(us::ModuleContext* context)
-{
-  return GetCoreService<IPropertyDescriptions>(context);
-}
-
-IPropertyExtensions* CoreServices::GetPropertyExtensions(us::ModuleContext* context)
-{
-  return GetCoreService<IPropertyExtensions>(context);
-}
-
-IPropertyFilters* CoreServices::GetPropertyFilters(us::ModuleContext* context)
-{
-  return GetCoreService<IPropertyFilters>(context);
-}
-
-IPropertyPersistence* CoreServices::GetPropertyPersistence(us::ModuleContext* context)
-{
-  return GetCoreService<IPropertyPersistence>(context);
-}
-
-IMimeTypeProvider* CoreServices::GetMimeTypeProvider(us::ModuleContext* context)
-{
-  return GetCoreService<IMimeTypeProvider>(context);
-}
-
-bool CoreServices::Unget(us::ModuleContext* context, const std::string& /*interfaceId*/, void* service)
-{
-  bool success = false;
-
-  itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
-  std::map<us::ModuleContext*, std::map<void*,us::ServiceReferenceU> >::iterator iter = s_ContextToServicesMap().find(context);
-  if (iter != s_ContextToServicesMap().end())
+  template <class S>
+  static S *GetCoreService(us::ModuleContext *context)
   {
-    std::map<void*,us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
-    if (iter2 != iter->second.end())
+    if (context == NULL)
+      context = us::GetModuleContext();
+
+    S *coreService = NULL;
+    us::ServiceReference<S> serviceRef = context->GetServiceReference<S>();
+    if (serviceRef)
     {
-      us::ServiceReferenceU serviceRef = iter2->second;
-      if (serviceRef)
+      coreService = context->GetService(serviceRef);
+    }
+
+    assert(coreService && "Asserting non-NULL MITK core service");
+    {
+      itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
+      s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
+    }
+
+    return coreService;
+  }
+
+  IShaderRepository *CoreServices::GetShaderRepository()
+  {
+    static us::ServiceTracker<IShaderRepository> tracker(us::GetModuleContext());
+    tracker.Open();
+    return tracker.GetService();
+  }
+
+  IPropertyAliases *CoreServices::GetPropertyAliases(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyAliases>(context);
+  }
+
+  IPropertyDescriptions *CoreServices::GetPropertyDescriptions(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyDescriptions>(context);
+  }
+
+  IPropertyExtensions *CoreServices::GetPropertyExtensions(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyExtensions>(context);
+  }
+
+  IPropertyFilters *CoreServices::GetPropertyFilters(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyFilters>(context);
+  }
+
+  IPropertyPersistence *CoreServices::GetPropertyPersistence(us::ModuleContext *context)
+  {
+    return GetCoreService<IPropertyPersistence>(context);
+  }
+
+  IMimeTypeProvider *CoreServices::GetMimeTypeProvider(us::ModuleContext *context)
+  {
+    return GetCoreService<IMimeTypeProvider>(context);
+  }
+
+  bool CoreServices::Unget(us::ModuleContext *context, const std::string & /*interfaceId*/, void *service)
+  {
+    bool success = false;
+
+    itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
+    std::map<us::ModuleContext *, std::map<void *, us::ServiceReferenceU>>::iterator iter =
+      s_ContextToServicesMap().find(context);
+    if (iter != s_ContextToServicesMap().end())
+    {
+      std::map<void *, us::ServiceReferenceU>::iterator iter2 = iter->second.find(service);
+      if (iter2 != iter->second.end())
       {
-        success = context->UngetService(serviceRef);
-        if (success)
+        us::ServiceReferenceU serviceRef = iter2->second;
+        if (serviceRef)
         {
-          iter->second.erase(iter2);
+          success = context->UngetService(serviceRef);
+          if (success)
+          {
+            iter->second.erase(iter2);
+          }
         }
       }
     }
+
+    return success;
   }
-
-  return success;
-}
-
 }

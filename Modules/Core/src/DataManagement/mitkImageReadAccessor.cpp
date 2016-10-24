@@ -18,14 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 
-mitk::ImageReadAccessor::ImageReadAccessor(
-    ImageConstPointer image,
-    const mitk::ImageDataItem* iDI,
-    int OptionFlags)
-  : ImageAccessorBase(image,iDI,OptionFlags)
-  , m_Image(image)
+mitk::ImageReadAccessor::ImageReadAccessor(ImageConstPointer image, const mitk::ImageDataItem *iDI, int OptionFlags)
+  : ImageAccessorBase(image, iDI, OptionFlags), m_Image(image)
 {
-  if(!(OptionFlags & ImageAccessorBase::IgnoreLock))
+  if (!(OptionFlags & ImageAccessorBase::IgnoreLock))
   {
     try
     {
@@ -39,14 +35,10 @@ mitk::ImageReadAccessor::ImageReadAccessor(
   }
 }
 
-mitk::ImageReadAccessor::ImageReadAccessor(
-    ImagePointer image,
-    const mitk::ImageDataItem* iDI,
-    int OptionFlags)
-  : ImageAccessorBase(image.GetPointer(), iDI, OptionFlags)
-  , m_Image(image.GetPointer())
+mitk::ImageReadAccessor::ImageReadAccessor(ImagePointer image, const mitk::ImageDataItem *iDI, int OptionFlags)
+  : ImageAccessorBase(image.GetPointer(), iDI, OptionFlags), m_Image(image.GetPointer())
 {
-  if(!(OptionFlags & ImageAccessorBase::IgnoreLock))
+  if (!(OptionFlags & ImageAccessorBase::IgnoreLock))
   {
     try
     {
@@ -60,27 +52,26 @@ mitk::ImageReadAccessor::ImageReadAccessor(
   }
 }
 
-mitk::ImageReadAccessor::ImageReadAccessor(const mitk::Image* image, const ImageDataItem* iDI)
-  : ImageAccessorBase(image, iDI, ImageAccessorBase::DefaultBehavior)
-  , m_Image(image)
+mitk::ImageReadAccessor::ImageReadAccessor(const mitk::Image *image, const ImageDataItem *iDI)
+  : ImageAccessorBase(image, iDI, ImageAccessorBase::DefaultBehavior), m_Image(image)
 {
   OrganizeReadAccess();
 }
 
 mitk::ImageReadAccessor::~ImageReadAccessor()
 {
-  if(!(m_Options & ImageAccessorBase::IgnoreLock))
+  if (!(m_Options & ImageAccessorBase::IgnoreLock))
   {
     // Future work: In case of non-coherent memory, copied area needs to be deleted
 
     m_Image->m_ReadWriteLock.Lock();
 
     // delete self from list of ImageReadAccessors in Image
-    auto it = std::find(m_Image->m_Readers.begin(),m_Image->m_Readers.end(),this);
+    auto it = std::find(m_Image->m_Readers.begin(), m_Image->m_Readers.end(), this);
     m_Image->m_Readers.erase(it);
 
     // delete lock, if there are no waiting ImageAccessors
-    if(m_WaitLock->m_WaiterCount <= 0)
+    if (m_WaitLock->m_WaiterCount <= 0)
     {
       m_WaitLock->m_Mutex.Unlock();
       delete m_WaitLock;
@@ -98,7 +89,7 @@ mitk::ImageReadAccessor::~ImageReadAccessor()
   }
 }
 
-const mitk::Image* mitk::ImageReadAccessor::GetImage() const
+const mitk::Image *mitk::ImageReadAccessor::GetImage() const
 {
   return m_Image.GetPointer();
 }
@@ -108,20 +99,21 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
   m_Image->m_ReadWriteLock.Lock();
 
   // Check, if there is any Write-Access going on
-  if(m_Image->m_Writers.size() > 0)
+  if (m_Image->m_Writers.size() > 0)
   {
     // Check for every WriteAccessors, if the Region of this ImageAccessors overlaps
     // make sure this iterator is not used, when m_ReadWriteLock is Unlocked!
     auto it = m_Image->m_Writers.begin();
 
-    for(; it!=m_Image->m_Writers.end(); ++it)
+    for (; it != m_Image->m_Writers.end(); ++it)
     {
-      ImageAccessorBase* w = *it;
-      if( Overlap(w) )
+      ImageAccessorBase *w = *it;
+      if (Overlap(w))
       {
         // An Overlap was detected. There are two possibilities to deal with this situation:
-        // Throw an exception or wait for the WriteAccessor w until it is released and start again with the request afterwards.
-        if(!(m_Options & ExceptionIfLocked))
+        // Throw an exception or wait for the WriteAccessor w until it is released and start again with the request
+        // afterwards.
+        if (!(m_Options & ExceptionIfLocked))
         {
           PreventRecursiveMutexLock(w);
 
@@ -130,7 +122,7 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
           m_Image->m_ReadWriteLock.Unlock();
           ImageAccessorBase::WaitForReleaseOf(w->m_WaitLock);
 
-          //after waiting for the WriteAccessor w, start this method again
+          // after waiting for the WriteAccessor w, start this method again
           OrganizeReadAccess();
           return;
         }
@@ -138,12 +130,13 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
         {
           // THROW EXCEPTION
           m_Image->m_ReadWriteLock.Unlock();
-          mitkThrowException(mitk::MemoryIsLockedException) << "The image part being ordered by the ImageAccessor is already in use and locked";
+          mitkThrowException(mitk::MemoryIsLockedException)
+            << "The image part being ordered by the ImageAccessor is already in use and locked";
           return;
         }
       } // if
-    } // for
-  } // if
+    }   // for
+  }     // if
 
   // Now, we know, that there is no conflict with a Write-Access
   // Lock the Mutex in ImageAccessorBase, to make sure that every other ImageAccessor has to wait if it locks the mutex
@@ -152,7 +145,7 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
   // insert self into readers list in Image
   m_Image->m_Readers.push_back(this);
 
-  //printf("ReadAccess %d %d\n",(int) m_Image->m_Readers.size(),(int) m_Image->m_Writers.size());
-  //fflush(0);
+  // printf("ReadAccess %d %d\n",(int) m_Image->m_Readers.size(),(int) m_Image->m_Writers.size());
+  // fflush(0);
   m_Image->m_ReadWriteLock.Unlock();
 }

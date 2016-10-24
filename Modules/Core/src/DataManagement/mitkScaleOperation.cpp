@@ -14,14 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkScaleOperation.h"
 
 mitk::ScaleOperation::ScaleOperation(mitk::OperationType operationType,
-                                     mitk::Point3D scaleFactor, mitk::Point3D scaleAnchorPoint)
-  : mitk::Operation(operationType),
-    m_ScaleFactor(scaleFactor),
-    m_ScaleAnchorPoint(scaleAnchorPoint)
+                                     mitk::Point3D scaleFactor,
+                                     mitk::Point3D scaleAnchorPoint)
+  : mitk::Operation(operationType), m_ScaleFactor(scaleFactor), m_ScaleAnchorPoint(scaleAnchorPoint)
 {
 }
 

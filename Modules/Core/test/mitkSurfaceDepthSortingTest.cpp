@@ -14,17 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
-#include <mitkNodePredicateDataType.h>
+#include "mitkTestingMacros.h"
 #include <mitkBaseProperty.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkSurface.h>
 
-//VTK
+// VTK
 #include <vtkRegressionTestImage.h>
 
-int mitkSurfaceDepthSortingTest(int argc, char* argv[])
+int mitkSurfaceDepthSortingTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -36,17 +36,18 @@ int mitkSurfaceDepthSortingTest(int argc, char* argv[])
 
   renderingHelper.SetMapperIDToRender3D();
 
-  mitk::DataNode* dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"));
+  mitk::DataNode *dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("Surface"));
 
-  if(dataNode)
-   {
-      dataNode->SetOpacity(0.8);
-      dataNode->SetBoolProperty("Depth Sorting", true);
-      dataNode->Update();
-   }
+  if (dataNode)
+  {
+    dataNode->SetOpacity(0.8);
+    dataNode->SetBoolProperty("Depth Sorting", true);
+    dataNode->Update();
+  }
 
-    //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-    MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
   MITK_TEST_END();
 }

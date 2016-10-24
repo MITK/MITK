@@ -23,16 +23,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderWindowFrame::RenderWindowFrame()
 {
-  m_RenderWindow           = nullptr;
-  m_RectangleRenderer      = vtkSmartPointer<vtkRenderer>::New();
+  m_RenderWindow = nullptr;
+  m_RectangleRenderer = vtkSmartPointer<vtkRenderer>::New();
 
-  m_IsEnabled         = false;
+  m_IsEnabled = false;
 }
 
 mitk::RenderWindowFrame::~RenderWindowFrame()
 {
-  if ( m_RenderWindow != nullptr )
-    if ( this->IsEnabled() )
+  if (m_RenderWindow != nullptr)
+    if (this->IsEnabled())
       this->Disable();
 }
 
@@ -41,7 +41,7 @@ mitk::RenderWindowFrame::~RenderWindowFrame()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::RenderWindowFrame::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renderWindow )
+void mitk::RenderWindowFrame::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renderWindow)
 {
   m_RenderWindow = renderWindow;
 }
@@ -71,7 +71,7 @@ vtkSmartPointer<vtkRenderer> mitk::RenderWindowFrame::GetVtkRenderer()
  */
 void mitk::RenderWindowFrame::Disable()
 {
-  if ( this->IsEnabled())
+  if (this->IsEnabled())
   {
     m_RectangleRenderer->EraseOn();
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_RectangleRenderer);
@@ -89,12 +89,12 @@ void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
   rect->SetColor(col1, col2, col3);
 
   m_RectangleRenderer->AddActor(rect);
-  if(!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted( m_RectangleRenderer ))
+  if (!mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_RectangleRenderer))
   {
     m_RectangleRenderer->EraseOff();
     m_RectangleRenderer->SetInteractive(0);
 
-    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer,true);
+    mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertForegroundRenderer(m_RectangleRenderer, true);
 
     m_IsEnabled = true;
   }
@@ -105,5 +105,5 @@ void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
  */
 bool mitk::RenderWindowFrame::IsEnabled()
 {
-  return  m_IsEnabled;
+  return m_IsEnabled;
 }

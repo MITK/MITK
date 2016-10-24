@@ -18,21 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjector::LandmarkProjector()
-  : m_InterpolatingAbstractTransform(nullptr), m_CompleteAbstractTransform(nullptr), m_FrameGeometry(nullptr), m_ParameterPlane(nullptr)
+  : m_InterpolatingAbstractTransform(nullptr),
+    m_CompleteAbstractTransform(nullptr),
+    m_FrameGeometry(nullptr),
+    m_ParameterPlane(nullptr)
 {
   m_FinalTargetLandmarks = m_WritableFinalTargetLandmarks = mitk::PointSet::DataType::PointsContainer::New();
-  m_ProjectedLandmarks   = mitk::PointSet::DataType::PointsContainer::New();
+  m_ProjectedLandmarks = mitk::PointSet::DataType::PointsContainer::New();
 }
 
 mitk::LandmarkProjector::~LandmarkProjector()
 {
-  if(m_InterpolatingAbstractTransform != nullptr)
+  if (m_InterpolatingAbstractTransform != nullptr)
     m_InterpolatingAbstractTransform->Delete();
 }
 
-void mitk::LandmarkProjector::SetInterpolatingAbstractTransform(vtkAbstractTransform* anInterpolatingAbstractTransform)
+void mitk::LandmarkProjector::SetInterpolatingAbstractTransform(vtkAbstractTransform *anInterpolatingAbstractTransform)
 {
-  if(m_InterpolatingAbstractTransform != anInterpolatingAbstractTransform)
+  if (m_InterpolatingAbstractTransform != anInterpolatingAbstractTransform)
   {
     m_InterpolatingAbstractTransform = anInterpolatingAbstractTransform;
     m_InterpolatingAbstractTransform->Register(nullptr);
@@ -41,7 +44,7 @@ void mitk::LandmarkProjector::SetInterpolatingAbstractTransform(vtkAbstractTrans
   }
 }
 
-vtkAbstractTransform* mitk::LandmarkProjector::GetCompleteAbstractTransform() const
+vtkAbstractTransform *mitk::LandmarkProjector::GetCompleteAbstractTransform() const
 {
   return m_CompleteAbstractTransform;
 }

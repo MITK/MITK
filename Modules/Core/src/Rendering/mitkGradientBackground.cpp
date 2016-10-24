@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkGradientBackground.h"
 #include "mitkVtkLayerController.h"
 
-#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 
 mitk::GradientBackground::GradientBackground()
 {
@@ -29,8 +29,8 @@ mitk::GradientBackground::GradientBackground()
 
 mitk::GradientBackground::~GradientBackground()
 {
-  if ( m_RenderWindow != nullptr )
-    if ( this->IsEnabled() )
+  if (m_RenderWindow != nullptr)
+    if (this->IsEnabled())
       this->Disable();
 }
 
@@ -39,7 +39,7 @@ mitk::GradientBackground::~GradientBackground()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::GradientBackground::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renderWindow )
+void mitk::GradientBackground::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renderWindow)
 {
   m_RenderWindow = renderWindow;
 }
@@ -67,7 +67,7 @@ vtkSmartPointer<vtkRenderer> mitk::GradientBackground::GetVtkRenderer()
  * Sets the gradient colors. The gradient
  * will smoothly fade from color1 to color2
  */
-void mitk::GradientBackground::SetGradientColors( double r1, double g1, double b1, double r2, double g2, double b2 )
+void mitk::GradientBackground::SetGradientColors(double r1, double g1, double b1, double r2, double g2, double b2)
 {
   this->SetLowerColor(r1, g1, b1);
   this->SetUpperColor(r2, g2, b2);
@@ -75,27 +75,27 @@ void mitk::GradientBackground::SetGradientColors( double r1, double g1, double b
 
 void mitk::GradientBackground::SetGradientColors(mitk::Color upper, mitk::Color lower)
 {
-  this->SetGradientColors(upper[0],upper[1],upper[2],lower[0],lower[1],lower[2]);
+  this->SetGradientColors(upper[0], upper[1], upper[2], lower[0], lower[1], lower[2]);
 }
 
-void mitk::GradientBackground::SetUpperColor(double r, double g, double b )
+void mitk::GradientBackground::SetUpperColor(double r, double g, double b)
 {
-  m_Renderer->SetBackground(r,g,b);
+  m_Renderer->SetBackground(r, g, b);
 }
 
-void mitk::GradientBackground::SetLowerColor(double r, double g, double b )
+void mitk::GradientBackground::SetLowerColor(double r, double g, double b)
 {
-  m_Renderer->SetBackground2(r,g,b);
+  m_Renderer->SetBackground2(r, g, b);
 }
 
 void mitk::GradientBackground::SetUpperColor(mitk::Color upper)
 {
-  this->SetUpperColor(upper[0],upper[1],upper[2]);
+  this->SetUpperColor(upper[0], upper[1], upper[2]);
 }
 
 void mitk::GradientBackground::SetLowerColor(mitk::Color lower)
 {
-  this->SetLowerColor(lower[0],lower[1],lower[2]);
+  this->SetLowerColor(lower[0], lower[1], lower[2]);
 }
 
 /**
@@ -105,7 +105,7 @@ void mitk::GradientBackground::SetLowerColor(mitk::Color lower)
 void mitk::GradientBackground::Enable()
 {
   m_Renderer->GradientBackgroundOn();
-  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertBackgroundRenderer(m_Renderer,true);
+  mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertBackgroundRenderer(m_Renderer, true);
 }
 
 /**
@@ -114,7 +114,7 @@ void mitk::GradientBackground::Enable()
  */
 void mitk::GradientBackground::Disable()
 {
-  if ( this->IsEnabled() )
+  if (this->IsEnabled())
   {
     m_Renderer->GradientBackgroundOff();
     mitk::VtkLayerController::GetInstance(m_RenderWindow)->RemoveRenderer(m_Renderer);
@@ -127,8 +127,8 @@ void mitk::GradientBackground::Disable()
  */
 bool mitk::GradientBackground::IsEnabled()
 {
-  if ( m_RenderWindow == nullptr )
+  if (m_RenderWindow == nullptr)
     return false;
   else
-    return ( mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_Renderer));
+    return (mitk::VtkLayerController::GetInstance(m_RenderWindow)->IsRendererInserted(m_Renderer));
 }

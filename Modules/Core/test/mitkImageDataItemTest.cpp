@@ -14,20 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"
 
 #include <fstream>
-int mitkImageDataItemTest(int /*argc*/, char* /*argv*/[])
+int mitkImageDataItemTest(int /*argc*/, char * /*argv*/ [])
 {
-  auto pixels = new unsigned long [100];
-  void * data = pixels;
+  auto pixels = new unsigned long[100];
+  void *data = pixels;
 
   std::cout << "Testing pseudo-type independent deleting: ";
-  delete [] (unsigned char*) data;
-  std::cout<<"[PASSED]"<<std::endl;
+  delete[](unsigned char *) data;
+  std::cout << "[PASSED]" << std::endl;
 
-  std::cout<<"[TEST DONE]"<<std::endl;
+  std::cout << "[TEST DONE]" << std::endl;
   return EXIT_SUCCESS;
 }

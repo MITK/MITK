@@ -14,51 +14,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef ItkLoggingAdapter_H_HEADER_INCLUDED
 #define ItkLoggingAdapter_H_HEADER_INCLUDED
 
 #include <MitkCoreExports.h>
-#include <itkOutputWindow.h>
 #include <itkObjectFactory.h>
+#include <itkOutputWindow.h>
 
-namespace mitk {
-//##Documentation
-//## @brief Adapter that overwrites the standard itk logging output window and sends the logging messages to the MITK logging instead.
-//## @ingroup IO
-
-// this class is used to send output to stdout and not the itk window
-class MITKCORE_EXPORT ItkLoggingAdapter : public itk::OutputWindow
+namespace mitk
 {
-public:
-  typedef ItkLoggingAdapter                Self;
-  typedef itk::SmartPointer<Self>                Pointer;
-  typedef itk::SmartPointer<const Self>          ConstPointer;
+  //##Documentation
+  //## @brief Adapter that overwrites the standard itk logging output window and sends the logging messages to the MITK
+  // logging instead.
+  //## @ingroup IO
 
-  /** Run-time type information (and related methods).   */
-  itkTypeMacro( ItkLoggingAdapter, itk::OutputWindow );
+  // this class is used to send output to stdout and not the itk window
+  class MITKCORE_EXPORT ItkLoggingAdapter : public itk::OutputWindow
+  {
+  public:
+    typedef ItkLoggingAdapter Self;
+    typedef itk::SmartPointer<Self> Pointer;
+    typedef itk::SmartPointer<const Self> ConstPointer;
 
-  /** New macro for creation of through a Smart Pointer   */
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    /** Run-time type information (and related methods).   */
+    itkTypeMacro(ItkLoggingAdapter, itk::OutputWindow);
 
-  /** @brief Initializes the logging adapter. Itk logging
-    *        messages are redirected to MITK logging afterwards.
-    */
-  static void Initialize();
+    /** New macro for creation of through a Smart Pointer   */
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  virtual void DisplayText(const char* s) override;
+      /** @brief Initializes the logging adapter. Itk logging
+        *        messages are redirected to MITK logging afterwards.
+        */
+      static void Initialize();
 
-protected:
-  ItkLoggingAdapter();
-  virtual ~ItkLoggingAdapter();
+    virtual void DisplayText(const char *s) override;
 
-private:
-  ItkLoggingAdapter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
+  protected:
+    ItkLoggingAdapter();
+    virtual ~ItkLoggingAdapter();
 
-
+  private:
+    ItkLoggingAdapter(const Self &); // purposely not implemented
+    void operator=(const Self &);    // purposely not implemented
+  };
 }
 
 #endif /* mitkItkLoggingAdapter_H_HEADER_INCLUDED */

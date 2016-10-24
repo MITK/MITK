@@ -16,64 +16,61 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkLayerController.h"
 
+#include <algorithm>
+#include <vtkObjectFactory.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkObjectFactory.h>
 #include <vtkRendererCollection.h>
-#include <algorithm>
 
 mitk::VtkLayerController::vtkLayerControllerMapType mitk::VtkLayerController::s_LayerControllerMap;
 
-mitk::VtkLayerController* mitk::VtkLayerController::GetInstance(vtkSmartPointer<vtkRenderWindow> renWin)
+mitk::VtkLayerController *mitk::VtkLayerController::GetInstance(vtkSmartPointer<vtkRenderWindow> renWin)
 {
-  for(auto mapit = s_LayerControllerMap.begin();
-      mapit != s_LayerControllerMap.end(); ++mapit)
+  for (auto mapit = s_LayerControllerMap.begin(); mapit != s_LayerControllerMap.end(); ++mapit)
   {
-    if( (*mapit).first == renWin)
+    if ((*mapit).first == renWin)
       return (*mapit).second;
-
   }
   return nullptr;
 }
 
-void  mitk::VtkLayerController::AddInstance(vtkSmartPointer<vtkRenderWindow> renWin,
-                                            vtkSmartPointer<vtkRenderer> mitkSceneRenderer)
+void mitk::VtkLayerController::AddInstance(vtkSmartPointer<vtkRenderWindow> renWin,
+                                           vtkSmartPointer<vtkRenderer> mitkSceneRenderer)
 {
   // ensure that no vtkRenderWindow is managed twice
   mitk::VtkLayerController::RemoveInstance(renWin);
 
   // instanciate controller, add it to the map
-  mitk::VtkLayerController* ControllerInstance = new mitk::VtkLayerController(renWin);
+  mitk::VtkLayerController *ControllerInstance = new mitk::VtkLayerController(renWin);
   ControllerInstance->InsertSceneRenderer(mitkSceneRenderer);
 
-  s_LayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin,ControllerInstance));
+  s_LayerControllerMap.insert(vtkLayerControllerMapType::value_type(renWin, ControllerInstance));
 }
 
-void  mitk::VtkLayerController::RemoveInstance(vtkSmartPointer<vtkRenderWindow> renWin)
+void mitk::VtkLayerController::RemoveInstance(vtkSmartPointer<vtkRenderWindow> renWin)
 {
   auto mapit = s_LayerControllerMap.find(renWin);
-  if(mapit != s_LayerControllerMap.end())
+  if (mapit != s_LayerControllerMap.end())
   {
     delete mapit->second;
-    s_LayerControllerMap.erase( mapit );
+    s_LayerControllerMap.erase(mapit);
   }
 }
 
 mitk::VtkLayerController::VtkLayerController(vtkSmartPointer<vtkRenderWindow> renderWindow)
 {
   m_RenderWindow = renderWindow;
-  m_RenderWindow->Register( nullptr );
+  m_RenderWindow->Register(nullptr);
   m_BackgroundRenderers.clear();
   m_ForegroundRenderers.clear();
   m_SceneRenderers.clear();
-
 }
 
 mitk::VtkLayerController::~VtkLayerController()
 {
-  if ( m_RenderWindow != nullptr )
+  if (m_RenderWindow != nullptr)
   {
-    m_RenderWindow->UnRegister( nullptr );
+    m_RenderWindow->UnRegister(nullptr);
   }
 }
 
@@ -82,20 +79,19 @@ mitk::VtkLayerController::~VtkLayerController()
  * With forceAbsoluteBackground set true a renderer can be placed at the absolute background of the scene.
  * Multiple calls with forceAbsoluteBackground set true will set the latest registered renderer as background.
  */
-void mitk::VtkLayerController::InsertBackgroundRenderer(vtkSmartPointer<vtkRenderer>
-                                                        renderer, bool forceAbsoluteBackground)
+void mitk::VtkLayerController::InsertBackgroundRenderer(vtkSmartPointer<vtkRenderer> renderer,
+                                                        bool forceAbsoluteBackground)
 {
-
-  if(renderer == nullptr)
+  if (renderer == nullptr)
     return;
 
   // Remove renderer if it already exists
   RemoveRenderer(renderer);
 
-  if(forceAbsoluteBackground)
+  if (forceAbsoluteBackground)
   {
     auto it = m_BackgroundRenderers.begin();
-    m_BackgroundRenderers.insert(it,renderer);
+    m_BackgroundRenderers.insert(it, renderer);
   }
   else
     m_BackgroundRenderers.push_back(renderer);
@@ -109,17 +105,16 @@ void mitk::VtkLayerController::InsertBackgroundRenderer(vtkSmartPointer<vtkRende
 void mitk::VtkLayerController::InsertForegroundRenderer(vtkSmartPointer<vtkRenderer> renderer,
                                                         bool forceAbsoluteForeground)
 {
-
-  if(renderer == nullptr)
+  if (renderer == nullptr)
     return;
 
   // Remove renderer if it already exists
   RemoveRenderer(renderer);
 
-  if(forceAbsoluteForeground)
+  if (forceAbsoluteForeground)
   {
     auto it = m_ForegroundRenderers.begin();
-    m_ForegroundRenderers.insert(it,renderer);
+    m_ForegroundRenderers.insert(it, renderer);
   }
   else
     m_ForegroundRenderers.push_back(renderer);
@@ -132,7 +127,7 @@ void mitk::VtkLayerController::InsertForegroundRenderer(vtkSmartPointer<vtkRende
  */
 vtkSmartPointer<vtkRenderer> mitk::VtkLayerController::GetSceneRenderer()
 {
-  if(m_SceneRenderers.size() > 0)
+  if (m_SceneRenderers.size() > 0)
   {
     auto it = m_SceneRenderers.begin();
     return (*it);
@@ -146,8 +141,7 @@ vtkSmartPointer<vtkRenderer> mitk::VtkLayerController::GetSceneRenderer()
  */
 void mitk::VtkLayerController::InsertSceneRenderer(vtkSmartPointer<vtkRenderer> renderer)
 {
-
-  if(renderer == nullptr)
+  if (renderer == nullptr)
     return;
 
   // Remove renderer if it already exists
@@ -164,10 +158,10 @@ void mitk::VtkLayerController::RemoveRenderer(vtkSmartPointer<vtkRenderer> rende
 {
   RendererVectorType::iterator it;
   // background layers
-  if(m_BackgroundRenderers.size() > 0)
+  if (m_BackgroundRenderers.size() > 0)
   {
-    it = std::find(m_BackgroundRenderers.begin(),m_BackgroundRenderers.end(),renderer);
-    if(it != m_BackgroundRenderers.end())
+    it = std::find(m_BackgroundRenderers.begin(), m_BackgroundRenderers.end(), renderer);
+    if (it != m_BackgroundRenderers.end())
     {
       m_BackgroundRenderers.erase(it);
       UpdateLayers();
@@ -175,10 +169,10 @@ void mitk::VtkLayerController::RemoveRenderer(vtkSmartPointer<vtkRenderer> rende
     }
   }
   // scene layers
-  if(m_SceneRenderers.size() > 0)
+  if (m_SceneRenderers.size() > 0)
   {
-    it = std::find(m_SceneRenderers.begin(),m_SceneRenderers.end(),renderer);
-    if(it != m_SceneRenderers.end())
+    it = std::find(m_SceneRenderers.begin(), m_SceneRenderers.end(), renderer);
+    if (it != m_SceneRenderers.end())
     {
       m_SceneRenderers.erase(it);
       UpdateLayers();
@@ -186,10 +180,10 @@ void mitk::VtkLayerController::RemoveRenderer(vtkSmartPointer<vtkRenderer> rende
     }
   }
   // foreground layers
-  if(m_ForegroundRenderers.size() > 0 )
+  if (m_ForegroundRenderers.size() > 0)
   {
-    it = std::find(m_ForegroundRenderers.begin(),m_ForegroundRenderers.end(),renderer);
-    if(it != m_ForegroundRenderers.end())
+    it = std::find(m_ForegroundRenderers.begin(), m_ForegroundRenderers.end(), renderer);
+    if (it != m_ForegroundRenderers.end())
     {
       m_ForegroundRenderers.erase(it);
       UpdateLayers();
@@ -202,19 +196,19 @@ void mitk::VtkLayerController::RemoveRenderer(vtkSmartPointer<vtkRenderer> rende
  */
 void mitk::VtkLayerController::SetRenderWindow(vtkSmartPointer<vtkRenderWindow> renwin)
 {
-  if(renwin != nullptr)
+  if (renwin != nullptr)
   {
     RendererVectorType::iterator it;
     // Tell all renderers that there is a new renderwindow
-    for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
+    for (it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
     {
       (*it)->SetRenderWindow(renwin);
     }
-    for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
+    for (it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
     {
       (*it)->SetRenderWindow(renwin);
     }
-    for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
+    for (it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
     {
       (*it)->SetRenderWindow(renwin);
     }
@@ -232,34 +226,33 @@ bool mitk::VtkLayerController::IsRendererInserted(vtkSmartPointer<vtkRenderer> r
 {
   RendererVectorType::iterator it;
   // background layers
-  if(m_BackgroundRenderers.size() > 0)
+  if (m_BackgroundRenderers.size() > 0)
   {
-    it = std::find(m_BackgroundRenderers.begin(),m_BackgroundRenderers.end(),renderer);
-    if ( it != m_BackgroundRenderers.end() )
+    it = std::find(m_BackgroundRenderers.begin(), m_BackgroundRenderers.end(), renderer);
+    if (it != m_BackgroundRenderers.end())
     {
       return true;
     }
   }
   // scene layers
-  if(m_SceneRenderers.size() > 0)
+  if (m_SceneRenderers.size() > 0)
   {
-    it = std::find(m_SceneRenderers.begin(),m_SceneRenderers.end(),renderer);
-    if ( it != m_SceneRenderers.end() )
+    it = std::find(m_SceneRenderers.begin(), m_SceneRenderers.end(), renderer);
+    if (it != m_SceneRenderers.end())
     {
       return true;
     }
   }
   // foreground layers
-  if(m_ForegroundRenderers.size() > 0 )
+  if (m_ForegroundRenderers.size() > 0)
   {
-    it = std::find(m_ForegroundRenderers.begin(),m_ForegroundRenderers.end(),renderer);
-    if ( it != m_ForegroundRenderers.end() )
+    it = std::find(m_ForegroundRenderers.begin(), m_ForegroundRenderers.end(), renderer);
+    if (it != m_ForegroundRenderers.end())
     {
       return true;
     }
   }
   return false;
-
 }
 /**
  * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
@@ -272,48 +265,48 @@ void mitk::VtkLayerController::UpdateLayers()
   vtkSmartPointer<vtkRendererCollection> v = m_RenderWindow->GetRenderers();
   v->RemoveAllItems();
 
-
-  unsigned int numberOfLayers = static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size());
+  unsigned int numberOfLayers =
+    static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size());
   int currentLayerNumber;
   bool traverseUpwards;
 
-  currentLayerNumber  = 0;
-  traverseUpwards     = true;
+  currentLayerNumber = 0;
+  traverseUpwards = true;
 
   m_RenderWindow->SetNumberOfLayers(numberOfLayers);
   RendererVectorType::iterator it;
   // assign a layer number for the backround renderers
-  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
+  for (it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
     m_RenderWindow->AddRenderer((*it));
 
-    if(traverseUpwards)
+    if (traverseUpwards)
       currentLayerNumber++;
     else
       currentLayerNumber--;
   }
   // assign a layer number for the scene renderers
-  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
+  for (it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
     m_RenderWindow->AddRenderer((*it));
 
-    if(traverseUpwards)
+    if (traverseUpwards)
       currentLayerNumber++;
     else
       currentLayerNumber--;
   }
   // assign a layer number for the foreground renderers
-  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
+  for (it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);
     (*it)->SetLayer(currentLayerNumber);
     m_RenderWindow->AddRenderer((*it));
 
-    if(traverseUpwards)
+    if (traverseUpwards)
       currentLayerNumber++;
     else
       currentLayerNumber--;
@@ -324,7 +317,8 @@ void mitk::VtkLayerController::UpdateLayers()
  */
 unsigned int mitk::VtkLayerController::GetNumberOfRenderers()
 {
-  return static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() + m_ForegroundRenderers.size());
+  return static_cast<unsigned int>(m_BackgroundRenderers.size() + m_SceneRenderers.size() +
+                                   m_ForegroundRenderers.size());
 }
 
 void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
@@ -332,12 +326,12 @@ void mitk::VtkLayerController::SetEraseForAllRenderers(int i)
   this->m_RenderWindow->SetErase(i);
 
   RendererVectorType::iterator it;
-  for(it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
+  for (it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
     (*it)->SetErase(i);
 
-  for(it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
+  for (it = m_SceneRenderers.begin(); it != m_SceneRenderers.end(); ++it)
     (*it)->SetErase(i);
 
-  for(it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
+  for (it = m_ForegroundRenderers.begin(); it != m_ForegroundRenderers.end(); ++it)
     (*it)->SetErase(i);
 }

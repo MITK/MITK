@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKRAWIMAGEFILEREADER_H_
 #define MITKRAWIMAGEFILEREADER_H_
 
@@ -22,43 +21,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+   * The user must set the dimensionality, the dimensions and the pixel type.
+   * If they are incorrect, the image will not be opened or the visualization will be incorrect.
+   */
+  class RawImageFileReaderService : public AbstractFileReader
+  {
+  public:
+    /** Supported pixel types. */
+    typedef enum { UCHAR, SCHAR, USHORT, SSHORT, UINT, SINT, FLOAT, DOUBLE } IOPixelType;
 
-/**
- * The user must set the dimensionality, the dimensions and the pixel type.
- * If they are incorrect, the image will not be opened or the visualization will be incorrect.
- */
-class RawImageFileReaderService : public AbstractFileReader
-{
+    /** Endianity of bits. */
+    typedef enum { LITTLE, BIG } EndianityType;
 
-public:
+    RawImageFileReaderService();
 
-  /** Supported pixel types. */
-  typedef enum {UCHAR,SCHAR,USHORT,SSHORT, UINT, SINT, FLOAT, DOUBLE} IOPixelType;
+  protected:
+    RawImageFileReaderService(const RawImageFileReaderService &other);
 
-  /** Endianity of bits. */
-  typedef enum {LITTLE, BIG} EndianityType;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-  RawImageFileReaderService();
+    using mitk::AbstractFileReader::Read;
 
-protected:
+  private:
+    template <typename TPixel, unsigned int VImageDimensions>
+    mitk::BaseData::Pointer TypedRead(const std::string &path, EndianityType endianity, int *size);
 
-  RawImageFileReaderService(const RawImageFileReaderService& other);
+    RawImageFileReaderService *Clone() const override;
 
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
-
-  using mitk::AbstractFileReader::Read;
-
-private:
-
-  template <typename TPixel, unsigned int VImageDimensions>
-  mitk::BaseData::Pointer TypedRead(const std::string& path, EndianityType endianity, int* size);
-
-  RawImageFileReaderService* Clone() const override;
-
-  /** Vector containing dimensions of image to be read. */
-  itk::Vector<int, 3> m_Dimensions;
-
-};
+    /** Vector containing dimensions of image to be read. */
+    itk::Vector<int, 3> m_Dimensions;
+  };
 
 } // namespace mitk
 

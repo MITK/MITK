@@ -14,27 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkWeakPointerProperty.h"
 
-bool mitk::WeakPointerProperty::IsEqual(const BaseProperty& property) const
+bool mitk::WeakPointerProperty::IsEqual(const BaseProperty &property) const
 {
-    return this->m_WeakPointer == static_cast<const Self&>(property).m_WeakPointer;
+  return this->m_WeakPointer == static_cast<const Self &>(property).m_WeakPointer;
 }
 
-bool mitk::WeakPointerProperty::Assign(const BaseProperty& property)
+bool mitk::WeakPointerProperty::Assign(const BaseProperty &property)
 {
-    this->m_WeakPointer = static_cast<const Self&>(property).m_WeakPointer;
-    return true;
+  this->m_WeakPointer = static_cast<const Self &>(property).m_WeakPointer;
+  return true;
 }
 
-mitk::WeakPointerProperty::WeakPointerProperty(itk::Object* pointer) : m_WeakPointer(pointer)
+mitk::WeakPointerProperty::WeakPointerProperty(itk::Object *pointer) : m_WeakPointer(pointer)
 {
 }
 
-mitk::WeakPointerProperty::WeakPointerProperty(const WeakPointerProperty& other)
-  : mitk::BaseProperty(other)
-  , m_WeakPointer(other.m_WeakPointer)
+mitk::WeakPointerProperty::WeakPointerProperty(const WeakPointerProperty &other)
+  : mitk::BaseProperty(other), m_WeakPointer(other.m_WeakPointer)
 {
 }
 
@@ -51,7 +49,7 @@ std::string mitk::WeakPointerProperty::GetValueAsString() const
 
 mitk::WeakPointerProperty::ValueType mitk::WeakPointerProperty::GetWeakPointer() const
 {
-    return m_WeakPointer.GetPointer();
+  return m_WeakPointer.GetPointer();
 }
 
 mitk::WeakPointerProperty::ValueType mitk::WeakPointerProperty::GetValue() const
@@ -59,13 +57,13 @@ mitk::WeakPointerProperty::ValueType mitk::WeakPointerProperty::GetValue() const
   return GetWeakPointer();
 }
 
-void mitk::WeakPointerProperty::SetWeakPointer(itk::Object* pointer)
+void mitk::WeakPointerProperty::SetWeakPointer(itk::Object *pointer)
 {
-    if(m_WeakPointer.GetPointer() != pointer)
-    {
-        m_WeakPointer = pointer;
-        Modified();
-    }
+  if (m_WeakPointer.GetPointer() != pointer)
+  {
+    m_WeakPointer = pointer;
+    Modified();
+  }
 }
 
 void mitk::WeakPointerProperty::SetValue(const ValueType &value)

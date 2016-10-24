@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include <mitkTestingConfig.h>
 #include <mitkTestFixture.h>
+#include <mitkTestingConfig.h>
 
 #include <mitkIOUtil.h>
 #include <mitkImageGenerator.h>
@@ -38,13 +38,11 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   std::string m_ImagePath;
   std::string m_SurfacePath;
   std::string m_PointSetPath;
 
 public:
-
   void setUp() override
   {
     m_ImagePath = GetTestDataFilePath("Pic3D.nrrd");
@@ -83,21 +81,20 @@ public:
     CPPUNIT_ASSERT(std::remove(tmpFilePath2.c_str()) == 0);
 
     std::ofstream tmpFile3;
-    std::string tmpFilePath3 = mitk::IOUtil::CreateTemporaryFile(tmpFile3, std::ios_base::binary,
-      "my-XXXXXX.TXT", programPath);
+    std::string tmpFilePath3 =
+      mitk::IOUtil::CreateTemporaryFile(tmpFile3, std::ios_base::binary, "my-XXXXXX.TXT", programPath);
     CPPUNIT_ASSERT(tmpFile3 && tmpFile3.is_open());
     CPPUNIT_ASSERT(tmpFilePath3.size() > programPath.size());
     CPPUNIT_ASSERT(tmpFilePath3.substr(0, programPath.size()) == programPath);
     CPPUNIT_ASSERT(tmpFilePath3.substr(tmpFilePath3.size() - 13, 3) == "my-");
     CPPUNIT_ASSERT(tmpFilePath3.substr(tmpFilePath3.size() - 4) == ".TXT");
     tmpFile3.close();
-    //CPPUNIT_ASSERT(std::remove(tmpFilePath3.c_str()) == 0)
+    // CPPUNIT_ASSERT(std::remove(tmpFilePath3.c_str()) == 0)
 
     std::string tmpFilePath4 = mitk::IOUtil::CreateTemporaryFile();
     std::ofstream file;
     file.open(tmpFilePath4.c_str());
-    CPPUNIT_ASSERT_MESSAGE("Testing if file exists after CreateTemporaryFile()",file.is_open());
-
+    CPPUNIT_ASSERT_MESSAGE("Testing if file exists after CreateTemporaryFile()", file.is_open());
 
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::CreateTemporaryFile(tmpFile2, "XX"), mitk::Exception);
 
@@ -116,29 +113,37 @@ public:
   {
     int numberOfFiles = 100;
 
-    //create 100 empty files
+    // create 100 empty files
     std::vector<std::string> v100filenames;
-    for(int i=0; i<numberOfFiles; i++) {v100filenames.push_back(mitk::IOUtil::CreateTemporaryFile());}
-
-    //check if all of them are unique
-    for(int i=0; i<numberOfFiles; i++) for(int j=0; j<numberOfFiles; j++)
+    for (int i = 0; i < numberOfFiles; i++)
     {
-      if(i!=j)
-        {
-        std::stringstream message;
-        message << "Checking if file " << i << " and file " << j << " are different, which should be the case because each of them should be unique.";
-        CPPUNIT_ASSERT_MESSAGE(message.str(),(v100filenames.at(i)!=v100filenames.at(j)));
-        }
+      v100filenames.push_back(mitk::IOUtil::CreateTemporaryFile());
     }
 
-    //delete all the files / clean up
-    for(int i=0; i<numberOfFiles; i++) {std::remove(v100filenames.at(i).c_str());}
+    // check if all of them are unique
+    for (int i = 0; i < numberOfFiles; i++)
+      for (int j = 0; j < numberOfFiles; j++)
+      {
+        if (i != j)
+        {
+          std::stringstream message;
+          message << "Checking if file " << i << " and file " << j
+                  << " are different, which should be the case because each of them should be unique.";
+          CPPUNIT_ASSERT_MESSAGE(message.str(), (v100filenames.at(i) != v100filenames.at(j)));
+        }
+      }
+
+    // delete all the files / clean up
+    for (int i = 0; i < numberOfFiles; i++)
+    {
+      std::remove(v100filenames.at(i).c_str());
+    }
   }
 
   void TestLoadAndSaveImage()
   {
     mitk::Image::Pointer img1 = mitk::IOUtil::LoadImage(m_ImagePath);
-    CPPUNIT_ASSERT( img1.IsNotNull());
+    CPPUNIT_ASSERT(img1.IsNotNull());
 
     std::ofstream tmpStream;
     std::string imagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "diffpic3d-XXXXXX.nrrd");
@@ -150,14 +155,14 @@ public:
     CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Save(img1, imagePath));
     CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Save(img1.GetPointer(), imagePath2));
 
-    //load data which does not exist
+    // load data which does not exist
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage("fileWhichDoesNotExist.nrrd"), mitk::Exception);
 
-    //delete the files after the test is done
+    // delete the files after the test is done
     std::remove(imagePath.c_str());
     std::remove(imagePath2.c_str());
 
-    mitk::Image::Pointer relativImage = mitk::ImageGenerator::GenerateGradientImage<float>(4,4,4,1);
+    mitk::Image::Pointer relativImage = mitk::ImageGenerator::GenerateGradientImage<float>(4, 4, 4, 1);
     std::string imagePath3 = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.nrrd");
     tmpStream.close();
     mitk::IOUtil::Save(relativImage, imagePath3);
@@ -165,11 +170,11 @@ public:
     std::remove(imagePath3.c_str());
   }
 
-
   /**
   * \brief This method calls all available load methods with a nullpointer and an empty pathand expects an exception
   **/
-  void TestNullLoad(){
+  void TestNullLoad()
+  {
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadImage(""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadSurface(""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::LoadPointSet(""), mitk::Exception);
@@ -177,9 +182,11 @@ public:
   }
 
   /**
-  * \brief This method calls the save method (to which all other convenience save methods reference) with null parameters
+  * \brief This method calls the save method (to which all other convenience save methods reference) with null
+  *parameters
   **/
-  void TestNullSave(){
+  void TestNullSave()
+  {
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(NULL, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::SaveImage(mitk::Image::New().GetPointer(), ""), mitk::Exception);
     CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(NULL, mitk::IOUtil::CreateTemporaryFile()), mitk::Exception);
@@ -189,7 +196,7 @@ public:
   void TestLoadAndSavePointSet()
   {
     mitk::PointSet::Pointer pointset = mitk::IOUtil::LoadPointSet(m_PointSetPath);
-    CPPUNIT_ASSERT( pointset.IsNotNull());
+    CPPUNIT_ASSERT(pointset.IsNotNull());
 
     std::ofstream tmpStream;
     std::string pointSetPath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "XXXXXX.mps");
@@ -205,7 +212,7 @@ public:
     // test if defaultextension is inserted if no extension is present
     CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Save(pointset, pointSetPathWithoutDefaultExtension.c_str()));
 
-    //delete the files after the test is done
+    // delete the files after the test is done
     std::remove(pointSetPath.c_str());
     std::remove(pointSetPathWithDefaultExtension.c_str());
     std::remove(pointSetPathWithoutDefaultExtension.c_str());
@@ -214,7 +221,7 @@ public:
   void TestLoadAndSaveSurface()
   {
     mitk::Surface::Pointer surface = mitk::IOUtil::LoadSurface(m_SurfacePath);
-    CPPUNIT_ASSERT( surface.IsNotNull());
+    CPPUNIT_ASSERT(surface.IsNotNull());
 
     std::ofstream tmpStream;
     std::string surfacePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "diffsurface-XXXXXX.stl");
@@ -223,9 +230,9 @@ public:
     CPPUNIT_ASSERT_NO_THROW(mitk::IOUtil::Save(surface, surfacePath));
 
     // test if exception is thrown as expected on unknown extsension
-    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(surface,"testSurface.xXx"), mitk::Exception);
+    CPPUNIT_ASSERT_THROW(mitk::IOUtil::Save(surface, "testSurface.xXx"), mitk::Exception);
 
-    //delete the files after the test is done
+    // delete the files after the test is done
     std::remove(surfacePath.c_str());
   }
 };

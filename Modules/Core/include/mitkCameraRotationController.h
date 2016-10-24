@@ -17,41 +17,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
 #define CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
 
-#include <MitkCoreExports.h>
 #include "mitkBaseController.h"
+#include <MitkCoreExports.h>
 
 class vtkCamera;
 class vtkRenderWindow;
 
-namespace mitk {
-
-
-class MITKCORE_EXPORT CameraRotationController : public BaseController
+namespace mitk
 {
-public:
-  mitkClassMacro(CameraRotationController,BaseController);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-  //mitkNewMacro1Param(Self, const char *);
-
-  void RotateCamera();
-  void AcquireCamera();
-
-  void SetRenderWindow(vtkRenderWindow * renWin)
+  class MITKCORE_EXPORT CameraRotationController : public BaseController
   {
-    m_RenderWindow = renWin;
-  }
+  public:
+    mitkClassMacro(CameraRotationController, BaseController);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      // mitkNewMacro1Param(Self, const char *);
 
-protected:
-  CameraRotationController();
-  virtual ~CameraRotationController();
+      void RotateCamera();
+    void AcquireCamera();
 
-private:
-  int m_LastStepperValue;
-  vtkCamera* m_Camera;
-  vtkRenderWindow* m_RenderWindow;
-};
+    void SetRenderWindow(vtkRenderWindow *renWin) { m_RenderWindow = renWin; }
+  protected:
+    CameraRotationController();
+    virtual ~CameraRotationController();
 
+  private:
+    int m_LastStepperValue;
+    vtkCamera *m_Camera;
+    vtkRenderWindow *m_RenderWindow;
+  };
 }
 
 #endif

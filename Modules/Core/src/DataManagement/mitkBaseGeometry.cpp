@@ -14,34 +14,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
-#include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
+#include <vtkMatrixToLinearTransform.h>
 
-#include "mitkBaseGeometry.h"
-#include "mitkVector.h"
-#include "mitkMatrixConvert.h"
-#include "mitkRotationOperation.h"
-#include "mitkRestorePlanePositionOperation.h"
 #include "mitkApplyTransformMatrixOperation.h"
-#include "mitkPointOperation.h"
-#include "mitkInteractionConst.h"
-#include "mitkModifiedLock.h"
+#include "mitkBaseGeometry.h"
 #include "mitkGeometryTransformHolder.h"
+#include "mitkInteractionConst.h"
+#include "mitkMatrixConvert.h"
+#include "mitkModifiedLock.h"
+#include "mitkPointOperation.h"
+#include "mitkRestorePlanePositionOperation.h"
+#include "mitkRotationOperation.h"
 #include "mitkScaleOperation.h"
+#include "mitkVector.h"
 
-mitk::BaseGeometry::BaseGeometry() : Superclass(), mitk::OperationActor(),
-m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0), m_ImageGeometry(false), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
+mitk::BaseGeometry::BaseGeometry()
+  : Superclass(),
+    mitk::OperationActor(),
+    m_FrameOfReferenceID(0),
+    m_IndexToWorldTransformLastModified(0),
+    m_ImageGeometry(false),
+    m_ModifiedLockFlag(false),
+    m_ModifiedCalledFlag(false)
 {
   m_GeometryTransform = new GeometryTransformHolder();
   Initialize();
 }
 
-mitk::BaseGeometry::BaseGeometry(const BaseGeometry& other) : Superclass(), mitk::OperationActor(),
-m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified),
-m_ImageGeometry(other.m_ImageGeometry), m_ModifiedLockFlag(false), m_ModifiedCalledFlag(false)
+mitk::BaseGeometry::BaseGeometry(const BaseGeometry &other)
+  : Superclass(),
+    mitk::OperationActor(),
+    m_FrameOfReferenceID(other.m_FrameOfReferenceID),
+    m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified),
+    m_ImageGeometry(other.m_ImageGeometry),
+    m_ModifiedLockFlag(false),
+    m_ModifiedCalledFlag(false)
 {
   m_GeometryTransform = new GeometryTransformHolder(*other.GetGeometryTransformHolder());
   other.InitializeGeometry(this);
@@ -62,7 +73,7 @@ const mitk::Point3D mitk::BaseGeometry::GetOrigin() const
   return m_GeometryTransform->GetOrigin();
 }
 
-void mitk::BaseGeometry::SetOrigin(const Point3D & origin)
+void mitk::BaseGeometry::SetOrigin(const Point3D &origin)
 {
   mitk::ModifiedLock lock(this);
 
@@ -80,7 +91,7 @@ const mitk::Vector3D mitk::BaseGeometry::GetSpacing() const
 
 void mitk::BaseGeometry::Initialize()
 {
-  float b[6] = { 0, 1, 0, 1, 0, 1 };
+  float b[6] = {0, 1, 0, 1, 0, 1};
   SetFloatBounds(b);
 
   m_GeometryTransform->Initialize();
@@ -95,7 +106,8 @@ void mitk::BaseGeometry::SetFloatBounds(const float bounds[6])
   mitk::BoundingBox::BoundsArrayType b;
   const float *input = bounds;
   int i = 0;
-  for (mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6; ++i) *it++ = (mitk::ScalarType)*input++;
+  for (mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6; ++i)
+    *it++ = (mitk::ScalarType)*input++;
   SetBounds(b);
 }
 
@@ -104,13 +116,13 @@ void mitk::BaseGeometry::SetFloatBounds(const double bounds[6])
   mitk::BoundingBox::BoundsArrayType b;
   const double *input = bounds;
   int i = 0;
-  for (mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6; ++i) *it++ = (mitk::ScalarType)*input++;
+  for (mitk::BoundingBox::BoundsArrayType::Iterator it = b.Begin(); i < 6; ++i)
+    *it++ = (mitk::ScalarType)*input++;
   SetBounds(b);
 }
 
 /** Initialize the geometry */
-void
-mitk::BaseGeometry::InitializeGeometry(BaseGeometry* newGeometry) const
+void mitk::BaseGeometry::InitializeGeometry(BaseGeometry *newGeometry) const
 {
   newGeometry->SetBounds(m_BoundingBox->GetBounds());
 
@@ -121,13 +133,13 @@ mitk::BaseGeometry::InitializeGeometry(BaseGeometry* newGeometry) const
   newGeometry->m_ImageGeometry = m_ImageGeometry;
 }
 
-void mitk::BaseGeometry::InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry)
+void mitk::BaseGeometry::InitializeGeometryTransformHolder(const BaseGeometry *otherGeometry)
 {
   this->m_GeometryTransform->Initialize(otherGeometry->GetGeometryTransformHolder());
 }
 
 /** Set the bounds */
-void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
+void mitk::BaseGeometry::SetBounds(const BoundsArrayType &bounds)
 {
   mitk::ModifiedLock lock(this);
 
@@ -135,8 +147,7 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
 
   m_BoundingBox = BoundingBoxType::New();
 
-  BoundingBoxType::PointsContainer::Pointer pointscontainer =
-    BoundingBoxType::PointsContainer::New();
+  BoundingBoxType::PointsContainer::Pointer pointscontainer = BoundingBoxType::PointsContainer::New();
   BoundingBoxType::PointType p;
   BoundingBoxType::PointIdentifier pointid;
 
@@ -155,7 +166,7 @@ void mitk::BaseGeometry::SetBounds(const BoundsArrayType& bounds)
   this->Modified();
 }
 
-void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* transform)
+void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D *transform)
 {
   mitk::ModifiedLock lock(this);
 
@@ -165,9 +176,9 @@ void mitk::BaseGeometry::SetIndexToWorldTransform(mitk::AffineTransform3D* trans
   Modified();
 }
 
-void mitk::BaseGeometry::SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D* transform)
+void mitk::BaseGeometry::SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D *transform)
 {
-  //security check
+  // security check
   mitk::Vector3D originalSpacing = this->GetSpacing();
 
   mitk::ModifiedLock lock(this);
@@ -177,7 +188,7 @@ void mitk::BaseGeometry::SetIndexToWorldTransformWithoutChangingSpacing(mitk::Af
   m_GeometryTransform->SetIndexToWorldTransformWithoutChangingSpacing(transform);
   Modified();
 
-  //Security check. Spacig must not have changed
+  // Security check. Spacig must not have changed
   if (!mitk::Equal(originalSpacing, this->GetSpacing()))
   {
     MITK_WARN << "Spacing has changed in a method, where the spacing must not change.";
@@ -185,7 +196,7 @@ void mitk::BaseGeometry::SetIndexToWorldTransformWithoutChangingSpacing(mitk::Af
   }
 }
 
-const  mitk::BaseGeometry::BoundsArrayType  mitk::BaseGeometry::GetBounds() const
+const mitk::BaseGeometry::BoundsArrayType mitk::BaseGeometry::GetBounds() const
 {
   assert(m_BoundingBox.IsNotNull());
   return m_BoundingBox->GetBounds();
@@ -196,13 +207,14 @@ bool mitk::BaseGeometry::IsValid() const
   return true;
 }
 
-void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing)
+void mitk::BaseGeometry::SetSpacing(const mitk::Vector3D &aSpacing, bool enforceSetSpacing)
 {
   PreSetSpacing(aSpacing);
   _SetSpacing(aSpacing, enforceSetSpacing);
 }
 
-void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing){
+void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D &aSpacing, bool enforceSetSpacing)
+{
   m_GeometryTransform->SetSpacing(aSpacing, enforceSetSpacing);
 }
 
@@ -259,8 +271,8 @@ mitk::Point3D mitk::BaseGeometry::GetCenter() const
   Point3D c = m_BoundingBox->GetCenter();
   if (m_ImageGeometry)
   {
-    //Get Center returns the middel of min and max pixel index. In corner based images, this is the right position.
-    //In center based images (imageGeometry == true), the index needs to be shifted back.
+    // Get Center returns the middel of min and max pixel index. In corner based images, this is the right position.
+    // In center based images (imageGeometry == true), the index needs to be shifted back.
     c[0] -= 0.5;
     c[1] -= 0.5;
     c[2] -= 0.5;
@@ -290,18 +302,34 @@ mitk::Point3D mitk::BaseGeometry::GetCornerPoint(int id) const
   Point3D cornerpoint;
   switch (id)
   {
-  case 0: FillVector3D(cornerpoint, bounds[0], bounds[2], bounds[4]); break;
-  case 1: FillVector3D(cornerpoint, bounds[0], bounds[2], bounds[5]); break;
-  case 2: FillVector3D(cornerpoint, bounds[0], bounds[3], bounds[4]); break;
-  case 3: FillVector3D(cornerpoint, bounds[0], bounds[3], bounds[5]); break;
-  case 4: FillVector3D(cornerpoint, bounds[1], bounds[2], bounds[4]); break;
-  case 5: FillVector3D(cornerpoint, bounds[1], bounds[2], bounds[5]); break;
-  case 6: FillVector3D(cornerpoint, bounds[1], bounds[3], bounds[4]); break;
-  case 7: FillVector3D(cornerpoint, bounds[1], bounds[3], bounds[5]); break;
-  default:
-  {
-    itkExceptionMacro(<< "A cube only has 8 corners. These are labeled 0-7.");
-  }
+    case 0:
+      FillVector3D(cornerpoint, bounds[0], bounds[2], bounds[4]);
+      break;
+    case 1:
+      FillVector3D(cornerpoint, bounds[0], bounds[2], bounds[5]);
+      break;
+    case 2:
+      FillVector3D(cornerpoint, bounds[0], bounds[3], bounds[4]);
+      break;
+    case 3:
+      FillVector3D(cornerpoint, bounds[0], bounds[3], bounds[5]);
+      break;
+    case 4:
+      FillVector3D(cornerpoint, bounds[1], bounds[2], bounds[4]);
+      break;
+    case 5:
+      FillVector3D(cornerpoint, bounds[1], bounds[2], bounds[5]);
+      break;
+    case 6:
+      FillVector3D(cornerpoint, bounds[1], bounds[3], bounds[4]);
+      break;
+    case 7:
+      FillVector3D(cornerpoint, bounds[1], bounds[3], bounds[5]);
+      break;
+    default:
+    {
+      itkExceptionMacro(<< "A cube only has 8 corners. These are labeled 0-7.");
+    }
   }
   if (m_ImageGeometry)
   {
@@ -333,7 +361,8 @@ mitk::Point3D mitk::BaseGeometry::GetCornerPoint(bool xFront, bool yFront, bool 
 
 mitk::ScalarType mitk::BaseGeometry::GetExtentInMM(int direction) const
 {
-  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).magnitude()*GetExtent(direction);
+  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).magnitude() *
+         GetExtent(direction);
 }
 
 void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
@@ -346,9 +375,9 @@ void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
     AffineTransform3D::MatrixType::InternalMatrixType vnlmatrix;
     vnlmatrix = m_GeometryTransform->GetVnlMatrix();
     if (len > extentInMM)
-      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction) / len*extentInMM);
+      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction) / len * extentInMM);
     else
-      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction)*extentInMM / len);
+      vnlmatrix.set_column(direction, vnlmatrix.get_column(direction) * extentInMM / len);
     Matrix3D matrix;
     matrix = vnlmatrix;
     m_GeometryTransform->SetMatrix(matrix);
@@ -357,18 +386,18 @@ void mitk::BaseGeometry::SetExtentInMM(int direction, ScalarType extentInMM)
   }
 }
 
-bool mitk::BaseGeometry::IsInside(const mitk::Point3D& p) const
+bool mitk::BaseGeometry::IsInside(const mitk::Point3D &p) const
 {
   mitk::Point3D index;
   WorldToIndex(p, index);
   return IsIndexInside(index);
 }
 
-bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D& index) const
+bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D &index) const
 {
   bool inside = false;
-  //if it is an image geometry, we need to convert the index to discrete values
-  //this is done by applying the rounding function also used in WorldToIndex (see line 323)
+  // if it is an image geometry, we need to convert the index to discrete values
+  // this is done by applying the rounding function also used in WorldToIndex (see line 323)
   if (m_ImageGeometry)
   {
     mitk::Point3D discretIndex;
@@ -377,14 +406,12 @@ bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D& index) const
     discretIndex[2] = itk::Math::RoundHalfIntegerUp<mitk::ScalarType>(index[2]);
 
     inside = this->GetBoundingBox()->IsInside(discretIndex);
-    //we have to check if the index is at the upper border of each dimension,
+    // we have to check if the index is at the upper border of each dimension,
     // because the boundingbox is not centerbased
     if (inside)
     {
-      const BoundingBox::BoundsArrayType& bounds = this->GetBoundingBox()->GetBounds();
-      if ((discretIndex[0] == bounds[1]) ||
-        (discretIndex[1] == bounds[3]) ||
-        (discretIndex[2] == bounds[5]))
+      const BoundingBox::BoundsArrayType &bounds = this->GetBoundingBox()->GetBounds();
+      if ((discretIndex[0] == bounds[1]) || (discretIndex[1] == bounds[3]) || (discretIndex[2] == bounds[5]))
         inside = false;
     }
   }
@@ -397,7 +424,7 @@ bool mitk::BaseGeometry::IsIndexInside(const mitk::Point3D& index) const
 void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const
 {
   mitk::Vector3D tempIn, tempOut;
-  const TransformType::OffsetType& offset = this->GetIndexToWorldTransform()->GetOffset();
+  const TransformType::OffsetType &offset = this->GetIndexToWorldTransform()->GetOffset();
   tempIn = pt_mm.GetVectorFromOrigin() - offset;
 
   WorldToIndex(tempIn, tempOut);
@@ -422,29 +449,35 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Vector3D &vec_mm, mitk::Vector
   }
 
   // Check for valid matrix inversion
-  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
+  const TransformType::MatrixType &inverse = m_InvertedTransform->GetMatrix();
   if (inverse.GetVnlMatrix().has_nans())
   {
-    itkExceptionMacro("Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl
-      << this->GetIndexToWorldTransform()->GetMatrix() << "Suggested inverted matrix is:" << std::endl
-      << inverse);
+    itkExceptionMacro("Internal ITK matrix inversion error, cannot proceed. Matrix was: "
+                      << std::endl
+                      << this->GetIndexToWorldTransform()->GetMatrix()
+                      << "Suggested inverted matrix is:"
+                      << std::endl
+                      << inverse);
   }
 
   vec_units = inverse * vec_mm;
 }
 
-void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D & /*atPt3d_mm*/,
+                                      const mitk::Vector3D &vec_mm,
+                                      mitk::Vector3D &vec_units) const
 {
-  MITK_WARN << "Warning! Call of the deprecated function BaseGeometry::WorldToIndex(point, vec, vec). Use BaseGeometry::WorldToIndex(vec, vec) instead!";
+  MITK_WARN << "Warning! Call of the deprecated function BaseGeometry::WorldToIndex(point, vec, vec). Use "
+               "BaseGeometry::WorldToIndex(vec, vec) instead!";
   this->WorldToIndex(vec_mm, vec_units);
 }
 
 mitk::VnlVector mitk::BaseGeometry::GetOriginVnl() const
 {
-  return const_cast<Self*>(this)->GetOrigin().GetVnlVector();
+  return const_cast<Self *>(this)->GetOrigin().GetVnlVector();
 }
 
-vtkLinearTransform* mitk::BaseGeometry::GetVtkTransform() const
+vtkLinearTransform *mitk::BaseGeometry::GetVtkTransform() const
 {
   return m_GeometryTransform->GetVtkTransform();
 }
@@ -457,21 +490,21 @@ void mitk::BaseGeometry::SetIdentity()
   Modified();
 }
 
-void mitk::BaseGeometry::Compose(const mitk::BaseGeometry::TransformType * other, bool pre)
+void mitk::BaseGeometry::Compose(const mitk::BaseGeometry::TransformType *other, bool pre)
 {
   mitk::ModifiedLock lock(this);
   m_GeometryTransform->Compose(other, pre);
   Modified();
 }
 
-void mitk::BaseGeometry::Compose(const vtkMatrix4x4 * vtkmatrix, bool pre)
+void mitk::BaseGeometry::Compose(const vtkMatrix4x4 *vtkmatrix, bool pre)
 {
   mitk::BaseGeometry::TransformType::Pointer itkTransform = mitk::BaseGeometry::TransformType::New();
   TransferVtkMatrixToItkTransform(vtkmatrix, itkTransform.GetPointer());
   Compose(itkTransform, pre);
 }
 
-void mitk::BaseGeometry::Translate(const Vector3D & vector)
+void mitk::BaseGeometry::Translate(const Vector3D &vector)
 {
   if ((vector[0] != 0) || (vector[1] != 0) || (vector[2] != 0))
   {
@@ -489,7 +522,7 @@ void mitk::BaseGeometry::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vec
   vec_mm = this->GetIndexToWorldTransform()->TransformVector(vec_units);
 }
 
-void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
+void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
 {
   mitk::ModifiedLock lock(this);
 
@@ -497,83 +530,84 @@ void mitk::BaseGeometry::ExecuteOperation(Operation* operation)
   vtktransform->SetMatrix(this->GetVtkMatrix());
   switch (operation->GetOperationType())
   {
-  case OpNOTHING:
-    break;
-  case OpMOVE:
-  {
-    mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
-    if (pointOp == nullptr)
+    case OpNOTHING:
+      break;
+    case OpMOVE:
     {
-      MITK_ERROR << "Point move operation is null!";
-      return;
+      mitk::PointOperation *pointOp = dynamic_cast<mitk::PointOperation *>(operation);
+      if (pointOp == nullptr)
+      {
+        MITK_ERROR << "Point move operation is null!";
+        return;
+      }
+      mitk::Point3D newPos = pointOp->GetPoint();
+      ScalarType data[3];
+      vtktransform->GetPosition(data);
+      vtktransform->PostMultiply();
+      vtktransform->Translate(newPos[0], newPos[1], newPos[2]);
+      vtktransform->PreMultiply();
+      break;
     }
-    mitk::Point3D newPos = pointOp->GetPoint();
-    ScalarType data[3];
-    vtktransform->GetPosition(data);
-    vtktransform->PostMultiply();
-    vtktransform->Translate(newPos[0], newPos[1], newPos[2]);
-    vtktransform->PreMultiply();
-    break;
-  }
-  case OpSCALE:
-  {
-    mitk::ScaleOperation *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
-    if (scaleOp == nullptr)
+    case OpSCALE:
     {
-      MITK_ERROR << "Scale operation is null!";
-      return;
+      mitk::ScaleOperation *scaleOp = dynamic_cast<mitk::ScaleOperation *>(operation);
+      if (scaleOp == nullptr)
+      {
+        MITK_ERROR << "Scale operation is null!";
+        return;
+      }
+      mitk::Point3D newScale = scaleOp->GetScaleFactor();
+      ScalarType scalefactor[3];
+
+      scalefactor[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
+      scalefactor[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
+      scalefactor[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
+
+      mitk::Point3D anchor = scaleOp->GetScaleAnchorPoint();
+
+      vtktransform->PostMultiply();
+      vtktransform->Translate(-anchor[0], -anchor[1], -anchor[2]);
+      vtktransform->Scale(scalefactor[0], scalefactor[1], scalefactor[2]);
+      vtktransform->Translate(anchor[0], anchor[1], anchor[2]);
+      break;
     }
-    mitk::Point3D newScale = scaleOp->GetScaleFactor();
-    ScalarType scalefactor[3];
-
-    scalefactor[0] = 1 + (newScale[0] / GetMatrixColumn(0).magnitude());
-    scalefactor[1] = 1 + (newScale[1] / GetMatrixColumn(1).magnitude());
-    scalefactor[2] = 1 + (newScale[2] / GetMatrixColumn(2).magnitude());
-
-    mitk::Point3D anchor = scaleOp->GetScaleAnchorPoint();
-
-    vtktransform->PostMultiply();
-    vtktransform->Translate(-anchor[0], -anchor[1], -anchor[2]);
-    vtktransform->Scale(scalefactor[0], scalefactor[1], scalefactor[2]);
-    vtktransform->Translate(anchor[0], anchor[1], anchor[2]);
-    break;
-  }
-  case OpROTATE:
-  {
-    mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
-    if (rotateOp == nullptr)
+    case OpROTATE:
     {
-      MITK_ERROR << "Rotation operation is null!";
-      return;
+      mitk::RotationOperation *rotateOp = dynamic_cast<mitk::RotationOperation *>(operation);
+      if (rotateOp == nullptr)
+      {
+        MITK_ERROR << "Rotation operation is null!";
+        return;
+      }
+      Vector3D rotationVector = rotateOp->GetVectorOfRotation();
+      Point3D center = rotateOp->GetCenterOfRotation();
+      ScalarType angle = rotateOp->GetAngleOfRotation();
+      vtktransform->PostMultiply();
+      vtktransform->Translate(-center[0], -center[1], -center[2]);
+      vtktransform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
+      vtktransform->Translate(center[0], center[1], center[2]);
+      vtktransform->PreMultiply();
+      break;
     }
-    Vector3D rotationVector = rotateOp->GetVectorOfRotation();
-    Point3D center = rotateOp->GetCenterOfRotation();
-    ScalarType angle = rotateOp->GetAngleOfRotation();
-    vtktransform->PostMultiply();
-    vtktransform->Translate(-center[0], -center[1], -center[2]);
-    vtktransform->RotateWXYZ(angle, rotationVector[0], rotationVector[1], rotationVector[2]);
-    vtktransform->Translate(center[0], center[1], center[2]);
-    vtktransform->PreMultiply();
-    break;
-  }
-  case OpRESTOREPLANEPOSITION:
-  {
-    //Copy necessary to avoid vtk warning
-    vtkMatrix4x4* matrix = vtkMatrix4x4::New();
-    TransferItkTransformToVtkMatrix(dynamic_cast<mitk::RestorePlanePositionOperation*>(operation)->GetTransform().GetPointer(), matrix);
-    vtktransform->SetMatrix(matrix);
-    matrix->Delete();
-    break;
-  }
-  case OpAPPLYTRANSFORMMATRIX:
-  {
-    ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast<ApplyTransformMatrixOperation*>(operation);
-    vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
-    break;
-  }
-  default:
-    vtktransform->Delete();
-    return;
+    case OpRESTOREPLANEPOSITION:
+    {
+      // Copy necessary to avoid vtk warning
+      vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
+      TransferItkTransformToVtkMatrix(
+        dynamic_cast<mitk::RestorePlanePositionOperation *>(operation)->GetTransform().GetPointer(), matrix);
+      vtktransform->SetMatrix(matrix);
+      matrix->Delete();
+      break;
+    }
+    case OpAPPLYTRANSFORMMATRIX:
+    {
+      ApplyTransformMatrixOperation *applyMatrixOp = dynamic_cast<ApplyTransformMatrixOperation *>(operation);
+      vtktransform->SetMatrix(applyMatrixOp->GetMatrix());
+      break;
+    }
+    default:
+      vtktransform->Delete();
+      return;
   }
   this->SetVtkMatrixDeepCopy(vtktransform);
   Modified();
@@ -585,7 +619,8 @@ mitk::VnlVector mitk::BaseGeometry::GetMatrixColumn(unsigned int direction) cons
   return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction);
 }
 
-mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const
+mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTransform(
+  const mitk::AffineTransform3D *transform) const
 {
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer = mitk::BoundingBox::PointsContainer::New();
 
@@ -612,7 +647,7 @@ mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTra
   return result;
 }
 
-const std::string mitk::BaseGeometry::GetTransformAsString(TransformType* transformType)
+const std::string mitk::BaseGeometry::GetTransformAsString(TransformType *transformType)
 {
   std::ostringstream out;
 
@@ -636,37 +671,42 @@ const std::string mitk::BaseGeometry::GetTransformAsString(TransformType* transf
   return out.str();
 }
 
-void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix)
+void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4 *vtkmatrix)
 {
   m_GeometryTransform->SetIndexToWorldTransformByVtkMatrix(vtkmatrix);
 }
 
-void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4* vtkmatrix)
+void mitk::BaseGeometry::SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4 *vtkmatrix)
 {
   m_GeometryTransform->SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkmatrix);
 }
 
-void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+void mitk::BaseGeometry::IndexToWorld(const mitk::Point3D & /*atPt3d_units*/,
+                                      const mitk::Vector3D &vec_units,
+                                      mitk::Vector3D &vec_mm) const
 {
-  MITK_WARN << "Warning! Call of the deprecated function BaseGeometry::IndexToWorld(point, vec, vec). Use BaseGeometry::IndexToWorld(vec, vec) instead!";
-  //vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
+  MITK_WARN << "Warning! Call of the deprecated function BaseGeometry::IndexToWorld(point, vec, vec). Use "
+               "BaseGeometry::IndexToWorld(vec, vec) instead!";
+  // vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
   this->IndexToWorld(vec_units, vec_mm);
 }
 
-vtkMatrix4x4* mitk::BaseGeometry::GetVtkMatrix(){
+vtkMatrix4x4 *mitk::BaseGeometry::GetVtkMatrix()
+{
   return m_GeometryTransform->GetVtkMatrix();
 }
 
-bool mitk::BaseGeometry::IsBoundingBoxNull() const{
+bool mitk::BaseGeometry::IsBoundingBoxNull() const
+{
   return m_BoundingBox.IsNull();
 }
 
-bool mitk::BaseGeometry::IsIndexToWorldTransformNull() const{
+bool mitk::BaseGeometry::IsIndexToWorldTransformNull() const
+{
   return m_GeometryTransform->IsIndexToWorldTransformNull();
 }
 
-void
-mitk::BaseGeometry::ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry)
+void mitk::BaseGeometry::ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry)
 {
   // If Geometry is switched to ImageGeometry, you have to put an offset to the origin, because
   // imageGeometries origins are pixel-center-based
@@ -676,27 +716,19 @@ mitk::BaseGeometry::ChangeImageGeometryConsideringOriginOffset(const bool isAnIm
   if (m_ImageGeometry == isAnImageGeometry)
     return;
 
-  const BoundingBox::BoundsArrayType& boundsarray =
-    this->GetBoundingBox()->GetBounds();
+  const BoundingBox::BoundsArrayType &boundsarray = this->GetBoundingBox()->GetBounds();
 
-  Point3D  originIndex;
+  Point3D originIndex;
   FillVector3D(originIndex, boundsarray[0], boundsarray[2], boundsarray[4]);
 
   if (isAnImageGeometry == true)
-    FillVector3D(originIndex,
-    originIndex[0] + 0.5,
-    originIndex[1] + 0.5,
-    originIndex[2] + 0.5);
+    FillVector3D(originIndex, originIndex[0] + 0.5, originIndex[1] + 0.5, originIndex[2] + 0.5);
   else
-    FillVector3D(originIndex,
-    originIndex[0] - 0.5,
-    originIndex[1] - 0.5,
-    originIndex[2] - 0.5);
+    FillVector3D(originIndex, originIndex[0] - 0.5, originIndex[1] - 0.5, originIndex[2] - 0.5);
 
   Point3D originWorld;
 
-  originWorld = GetIndexToWorldTransform()
-    ->TransformPoint(originIndex);
+  originWorld = GetIndexToWorldTransform()->TransformPoint(originIndex);
   // instead could as well call  IndexToWorld(originIndex,originWorld);
 
   SetOrigin(originWorld);
@@ -704,7 +736,7 @@ mitk::BaseGeometry::ChangeImageGeometryConsideringOriginOffset(const bool isAnIm
   this->SetImageGeometry(isAnImageGeometry);
 }
 
-void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::BaseGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << " IndexToWorldTransform: ";
   if (this->IsIndexToWorldTransformNull())
@@ -767,40 +799,48 @@ void mitk::BaseGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
   os << indent << " Spacing: " << this->GetSpacing() << std::endl;
 }
 
-void mitk::BaseGeometry::Modified() const{
+void mitk::BaseGeometry::Modified() const
+{
   if (!m_ModifiedLockFlag)
     Superclass::Modified();
   else
     m_ModifiedCalledFlag = true;
 }
 
-mitk::AffineTransform3D* mitk::BaseGeometry::GetIndexToWorldTransform()
+mitk::AffineTransform3D *mitk::BaseGeometry::GetIndexToWorldTransform()
 {
   return m_GeometryTransform->GetIndexToWorldTransform();
 }
 
-const mitk::AffineTransform3D*   mitk::BaseGeometry::GetIndexToWorldTransform() const
+const mitk::AffineTransform3D *mitk::BaseGeometry::GetIndexToWorldTransform() const
 {
   return m_GeometryTransform->GetIndexToWorldTransform();
 }
 
-const mitk::GeometryTransformHolder*
-mitk::BaseGeometry::GetGeometryTransformHolder() const
+const mitk::GeometryTransformHolder *mitk::BaseGeometry::GetGeometryTransformHolder() const
 {
   return m_GeometryTransform;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
+                 const mitk::BaseGeometry::BoundingBoxType *rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
-    MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
+    MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const "
+                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL "
+                  "pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType& leftHandSide, const mitk::BaseGeometry::BoundingBoxType& rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType &leftHandSide,
+                 const mitk::BaseGeometry::BoundingBoxType &rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
   bool result = true;
 
@@ -814,7 +854,8 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType& leftHandSide, const 
       if (verbose)
       {
         MITK_INFO << "[( Geometry3D::BoundingBoxType )] bounds are not equal.";
-        MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft << " and tolerance is " << eps;
+        MITK_INFO << "rightHandSide is " << setprecision(12) << *itRight << " : leftHandSide is " << *itLeft
+                  << " and tolerance is " << eps;
       }
       result = false;
     }
@@ -823,43 +864,52 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType& leftHandSide, const 
   return result;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometry *rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry *leftHandSide,
+                 const mitk::BaseGeometry *rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
-    MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType eps, bool verbose) does not with NULL pointer input.";
+    MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType "
+                  "eps, bool verbose) does not with NULL pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
 }
 
-bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometry& rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry &leftHandSide,
+                 const mitk::BaseGeometry &rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
   bool result = true;
 
-  //Compare spacings
+  // Compare spacings
   if (!mitk::Equal(leftHandSide.GetSpacing(), rightHandSide.GetSpacing(), eps))
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D )] Spacing differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetSpacing() << " : leftHandSide is " << leftHandSide.GetSpacing() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetSpacing() << " : leftHandSide is "
+                << leftHandSide.GetSpacing() << " and tolerance is " << eps;
     }
     result = false;
   }
 
-  //Compare Origins
+  // Compare Origins
   if (!mitk::Equal(leftHandSide.GetOrigin(), rightHandSide.GetOrigin(), eps))
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D )] Origin differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetOrigin() << " : leftHandSide is " << leftHandSide.GetOrigin() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetOrigin() << " : leftHandSide is "
+                << leftHandSide.GetOrigin() << " and tolerance is " << eps;
     }
     result = false;
   }
 
-  //Compare Axis and Extents
+  // Compare Axis and Extents
   for (unsigned int i = 0; i < 3; ++i)
   {
     if (!mitk::Equal(leftHandSide.GetAxisVector(i), rightHandSide.GetAxisVector(i), eps))
@@ -867,7 +917,8 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
       if (verbose)
       {
         MITK_INFO << "[( Geometry3D )] AxisVector #" << i << " differ";
-        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetAxisVector(i) << " : leftHandSide is " << leftHandSide.GetAxisVector(i) << " and tolerance is " << eps;
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetAxisVector(i) << " : leftHandSide is "
+                  << leftHandSide.GetAxisVector(i) << " and tolerance is " << eps;
       }
       result = false;
     }
@@ -877,42 +928,44 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
       if (verbose)
       {
         MITK_INFO << "[( Geometry3D )] Extent #" << i << " differ";
-        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetExtent(i) << " : leftHandSide is " << leftHandSide.GetExtent(i) << " and tolerance is " << eps;
+        MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetExtent(i) << " : leftHandSide is "
+                  << leftHandSide.GetExtent(i) << " and tolerance is " << eps;
       }
       result = false;
     }
   }
 
-  //Compare ImageGeometry Flag
+  // Compare ImageGeometry Flag
   if (rightHandSide.GetImageGeometry() != leftHandSide.GetImageGeometry())
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D )] GetImageGeometry is different.";
-      MITK_INFO << "rightHandSide is " << rightHandSide.GetImageGeometry() << " : leftHandSide is " << leftHandSide.GetImageGeometry();
+      MITK_INFO << "rightHandSide is " << rightHandSide.GetImageGeometry() << " : leftHandSide is "
+                << leftHandSide.GetImageGeometry();
     }
     result = false;
   }
 
-  //Compare FrameOfReference ID
+  // Compare FrameOfReference ID
   if (rightHandSide.GetFrameOfReferenceID() != leftHandSide.GetFrameOfReferenceID())
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D )] GetFrameOfReferenceID is different.";
-      MITK_INFO << "rightHandSide is " << rightHandSide.GetFrameOfReferenceID() << " : leftHandSide is " << leftHandSide.GetFrameOfReferenceID();
+      MITK_INFO << "rightHandSide is " << rightHandSide.GetFrameOfReferenceID() << " : leftHandSide is "
+                << leftHandSide.GetFrameOfReferenceID();
     }
     result = false;
   }
 
-
-  //Compare BoundingBoxes
+  // Compare BoundingBoxes
   if (!mitk::Equal(*leftHandSide.GetBoundingBox(), *rightHandSide.GetBoundingBox(), eps, verbose))
   {
     result = false;
   }
 
-  //Compare IndexToWorldTransform Matrix
+  // Compare IndexToWorldTransform Matrix
   if (!mitk::Equal(*leftHandSide.GetIndexToWorldTransform(), *rightHandSide.GetIndexToWorldTransform(), eps, verbose))
   {
     result = false;
@@ -920,25 +973,33 @@ bool mitk::Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometr
   return result;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
+                 const mitk::BaseGeometry::TransformType *rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
-    MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType *rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
+    MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType "
+                  "*rightHandSide, ScalarType eps, bool verbose ) does not with NULL pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry::TransformType &leftHandSide,
+                 const mitk::BaseGeometry::TransformType &rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
-  //Compare IndexToWorldTransform Matrix
+  // Compare IndexToWorldTransform Matrix
   if (!mitk::MatrixEqualElementWise(leftHandSide.GetMatrix(), rightHandSide.GetMatrix(), eps))
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D::TransformType )] Index to World Transformation matrix differs.";
-      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMatrix() << " : leftHandSide is " << leftHandSide.GetMatrix() << " and tolerance is " << eps;
+      MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMatrix() << " : leftHandSide is "
+                << leftHandSide.GetMatrix() << " and tolerance is " << eps;
     }
     return false;
   }

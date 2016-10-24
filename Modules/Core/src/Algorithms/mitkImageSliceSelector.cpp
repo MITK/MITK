@@ -14,31 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkImageSliceSelector.h"
-
 
 void mitk::ImageSliceSelector::GenerateOutputInformation()
 {
-  mitk::Image::ConstPointer input  = this->GetInput();
+  mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), 2, input->GetDimensions());
 
-  if( (unsigned int)m_SliceNr >= input->GetDimension(2) )
+  if ((unsigned int)m_SliceNr >= input->GetDimension(2))
   {
-    m_SliceNr = input->GetDimension(2)-1;
+    m_SliceNr = input->GetDimension(2) - 1;
   }
 
-  if( (unsigned int)m_TimeNr >= input->GetDimension(3) )
+  if ((unsigned int)m_TimeNr >= input->GetDimension(3))
   {
-    m_TimeNr = input->GetDimension(3)-1;
+    m_TimeNr = input->GetDimension(3) - 1;
   }
 
   // initialize geometry
-  output->SetGeometry(dynamic_cast<BaseGeometry*>(input->GetSlicedGeometry(m_TimeNr)->GetPlaneGeometry(m_SliceNr)->Clone().GetPointer()));
+  output->SetGeometry(dynamic_cast<BaseGeometry *>(
+    input->GetSlicedGeometry(m_TimeNr)->GetPlaneGeometry(m_SliceNr)->Clone().GetPointer()));
   output->SetPropertyList(input->GetPropertyList()->Clone());
 }
 
@@ -51,7 +50,6 @@ mitk::ImageSliceSelector::ImageSliceSelector() : m_SliceNr(0), m_TimeNr(0), m_Ch
 {
 }
 
-
 mitk::ImageSliceSelector::~ImageSliceSelector()
 {
 }
@@ -61,7 +59,7 @@ void mitk::ImageSliceSelector::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   mitk::ImageToImageFilter::InputImagePointer input =
-    const_cast< mitk::ImageToImageFilter::InputImageType * > ( this->GetInput() );
+    const_cast<mitk::ImageToImageFilter::InputImageType *>(this->GetInput());
   mitk::Image::Pointer output = this->GetOutput();
 
   Image::RegionType requestedRegion;
@@ -73,5 +71,5 @@ void mitk::ImageSliceSelector::GenerateInputRequestedRegion()
   requestedRegion.SetSize(3, 1);
   requestedRegion.SetSize(4, 1);
 
-  input->SetRequestedRegion( & requestedRegion );
+  input->SetRequestedRegion(&requestedRegion);
 }

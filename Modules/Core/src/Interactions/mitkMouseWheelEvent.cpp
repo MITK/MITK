@@ -16,15 +16,15 @@
 
 #include "mitkMouseWheelEvent.h"
 
-mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer* baseRenderer,
-    const Point2D& mousePosition,
-    MouseButtons buttonStates,
-    ModifierKeys modifiers,
-    int wheelDelta)
-: InteractionPositionEvent(baseRenderer, mousePosition)
-, m_WheelDelta(wheelDelta)
-, m_ButtonStates(buttonStates)
-, m_Modifiers(modifiers)
+mitk::MouseWheelEvent::MouseWheelEvent(BaseRenderer *baseRenderer,
+                                       const Point2D &mousePosition,
+                                       MouseButtons buttonStates,
+                                       ModifierKeys modifiers,
+                                       int wheelDelta)
+  : InteractionPositionEvent(baseRenderer, mousePosition),
+    m_WheelDelta(wheelDelta),
+    m_ButtonStates(buttonStates),
+    m_Modifiers(modifiers)
 {
 }
 
@@ -62,15 +62,17 @@ mitk::MouseWheelEvent::~MouseWheelEvent()
 {
 }
 
-bool mitk::MouseWheelEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
+bool mitk::MouseWheelEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::MouseWheelEvent& mwe = static_cast<const MouseWheelEvent&>(interactionEvent);
-  return ((this->GetWheelDelta() * mwe.GetWheelDelta() >= 0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
-          && this->GetModifiers() == mwe.GetModifiers() && this->GetButtonStates() == mwe.GetButtonStates() &&
+  const mitk::MouseWheelEvent &mwe = static_cast<const MouseWheelEvent &>(interactionEvent);
+  return ((this->GetWheelDelta() * mwe.GetWheelDelta() >=
+           0) // Consider WheelEvents to be equal if the scrolling is done in the same direction.
+          &&
+          this->GetModifiers() == mwe.GetModifiers() && this->GetButtonStates() == mwe.GetButtonStates() &&
           Superclass::IsEqual(interactionEvent));
 }
 
-bool mitk::MouseWheelEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
+bool mitk::MouseWheelEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<MouseWheelEvent*>(baseClass.GetPointer()) != NULL) ;
+  return (dynamic_cast<MouseWheelEvent *>(baseClass.GetPointer()) != NULL);
 }

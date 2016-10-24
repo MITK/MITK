@@ -18,21 +18,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkNumericTypes.h>
 
-#include <tinyxml.h>
-#include <string>
 #include <cmath>
 #include <iomanip>
+#include <string>
+#include <tinyxml.h>
 
 #include <itksys/SystemTools.hxx>
 
-
-static const std::string  filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
-static const std::string  elementToStoreAttributeName = "DoubleTest";
-static const std::string  attributeToStoreName        = "CommaValue";
+static const std::string filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
+static const std::string elementToStoreAttributeName = "DoubleTest";
+static const std::string attributeToStoreName = "CommaValue";
 
 static double calcPrecision(const unsigned int requiredDecimalPlaces)
 {
-  return pow(10.0, -1.0 * ((double) requiredDecimalPlaces));
+  return pow(10.0, -1.0 * ((double)requiredDecimalPlaces));
 }
 
 /**
@@ -44,25 +43,25 @@ static bool Setup(double valueToWrite)
 {
   // 1. create simple document
   TiXmlDocument document;
-  auto  decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
-  document.LinkEndChild( decl );
+  auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
+  document.LinkEndChild(decl);
 
-  auto  version = new TiXmlElement("Version");
-  version->SetAttribute("Writer",  __FILE__ );
-  version->SetAttribute("CVSRevision",  "$Revision: 17055 $" );
-  version->SetAttribute("FileVersion",  1 );
+  auto version = new TiXmlElement("Version");
+  version->SetAttribute("Writer", __FILE__);
+  version->SetAttribute("CVSRevision", "$Revision: 17055 $");
+  version->SetAttribute("FileVersion", 1);
   document.LinkEndChild(version);
 
   // 2. store one element containing a double value with potentially many after comma digits.
-  auto  vElement = new TiXmlElement( elementToStoreAttributeName );
-  vElement->SetDoubleAttribute( attributeToStoreName, valueToWrite );
+  auto vElement = new TiXmlElement(elementToStoreAttributeName);
+  vElement->SetDoubleAttribute(attributeToStoreName, valueToWrite);
   document.LinkEndChild(vElement);
 
   // 3. store in file.
-  return document.SaveFile( filename );
+  return document.SaveFile(filename);
 }
 
-static int readValueFromSetupDocument(double& readOutValue)
+static int readValueFromSetupDocument(double &readOutValue)
 {
   TiXmlDocument document;
 
@@ -73,7 +72,7 @@ static int readValueFromSetupDocument(double& readOutValue)
   }
   else
   {
-    TiXmlElement* doubleTest = document.FirstChildElement(elementToStoreAttributeName);
+    TiXmlElement *doubleTest = document.FirstChildElement(elementToStoreAttributeName);
     return doubleTest->QueryDoubleAttribute(attributeToStoreName, &readOutValue);
   }
 }
@@ -89,8 +88,9 @@ static bool TearDown()
 
 static void Test_Setup_works()
 {
-  MITK_TEST_CONDITION_REQUIRED(Setup(1.0) && TearDown(),
-      "Test if setup and teardown correctly writes data to " << filename << " and deletes the file after the test");
+  MITK_TEST_CONDITION_REQUIRED(
+    Setup(1.0) && TearDown(),
+    "Test if setup and teardown correctly writes data to " << filename << " and deletes the file after the test");
 }
 
 /**
@@ -104,52 +104,48 @@ static void Test_ReadOutValue_works()
   double readValue;
 
   MITK_TEST_CONDITION_REQUIRED(TIXML_SUCCESS == readValueFromSetupDocument(readValue),
-      "checking if readout mechanism works.");
+                               "checking if readout mechanism works.");
 }
-
-
 
 static void Test_DoubleValueWriteOut()
 {
-  const double valueToWrite          = -1.123456;
-  const int    validDigitsAfterComma = 6; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
-  double       readValue;
+  const double valueToWrite = -1.123456;
+  const int validDigitsAfterComma = 6; // indicates the number of valid digits after comma of valueToWrite
+  const double neededPrecision = calcPrecision(validDigitsAfterComma + 1);
+  double readValue;
 
   Setup(valueToWrite);
 
   readValueFromSetupDocument(readValue);
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, readValue, neededPrecision),
-      std::setprecision(validDigitsAfterComma) <<
-      "Testing if value " << valueToWrite << " equals " << readValue
-      << " which was retrieved from TinyXML document");
+  MITK_TEST_CONDITION_REQUIRED(
+    mitk::Equal(valueToWrite, readValue, neededPrecision),
+    std::setprecision(validDigitsAfterComma) << "Testing if value " << valueToWrite << " equals " << readValue
+                                             << " which was retrieved from TinyXML document");
 
   TearDown();
 }
 
 static void Test_DoubleValueWriteOut_manyDecimalPlaces()
 {
-  const double valueToWrite          = -1.12345678910111;
-  const int    validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision       = calcPrecision(validDigitsAfterComma + 1);
-  double       readValue;
+  const double valueToWrite = -1.12345678910111;
+  const int validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
+  const double neededPrecision = calcPrecision(validDigitsAfterComma + 1);
+  double readValue;
 
   Setup(valueToWrite);
 
   readValueFromSetupDocument(readValue);
 
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(valueToWrite, readValue, neededPrecision),
-      std::setprecision(validDigitsAfterComma) <<
-      "Testing if value " << valueToWrite << " equals " << readValue
-      << " which was retrieved from TinyXML document");
+  MITK_TEST_CONDITION_REQUIRED(
+    mitk::Equal(valueToWrite, readValue, neededPrecision),
+    std::setprecision(validDigitsAfterComma) << "Testing if value " << valueToWrite << " equals " << readValue
+                                             << " which was retrieved from TinyXML document");
 
   TearDown();
 }
 
-
-
-int mitkTinyXMLTest(int /* argc */, char* /*argv*/[])
+int mitkTinyXMLTest(int /* argc */, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("TinyXMLTest");
 

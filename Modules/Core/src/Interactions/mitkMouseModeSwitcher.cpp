@@ -21,8 +21,8 @@
 
 #include "mitkInteractionEventObserver.h"
 
-mitk::MouseModeSwitcher::MouseModeSwitcher() :
-    m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(NULL)
+mitk::MouseModeSwitcher::MouseModeSwitcher()
+  : m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(NULL)
 {
   this->InitializeListeners();
   this->SetInteractionScheme(m_ActiveInteractionScheme);
@@ -43,8 +43,8 @@ void mitk::MouseModeSwitcher::InitializeListeners()
     // Register as listener via micro services
     us::ServiceProperties props;
     props["name"] = std::string("DisplayInteractor");
-    m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(
-        m_CurrentObserver.GetPointer(),props);
+    m_ServiceRegistration =
+      us::GetModuleContext()->RegisterService<InteractionEventObserver>(m_CurrentObserver.GetPointer(), props);
   }
 }
 
@@ -52,33 +52,33 @@ void mitk::MouseModeSwitcher::SetInteractionScheme(InteractionScheme scheme)
 {
   switch (scheme)
   {
-  case MITK:
-  {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
-  }
+    case MITK:
+    {
+      m_CurrentObserver->SetEventConfig("DisplayConfigMITK.xml");
+    }
     break;
-  case PACS:
-  {
-    m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
-  }
-    break;
-
-  case ROTATION:
-  {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
-  }
+    case PACS:
+    {
+      m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
+    }
     break;
 
-  case ROTATIONLINKED:
-  {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotation.xml");
-  }
+    case ROTATION:
+    {
+      m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
+    }
     break;
 
-  case SWIVEL:
-  {
-    m_CurrentObserver->SetEventConfig("DisplayConfigMITKSwivel.xml");
-  }
+    case ROTATIONLINKED:
+    {
+      m_CurrentObserver->SetEventConfig("DisplayConfigMITKRotation.xml");
+    }
+    break;
+
+    case SWIVEL:
+    {
+      m_CurrentObserver->SetEventConfig("DisplayConfigMITKSwivel.xml");
+    }
     break;
   }
   m_ActiveInteractionScheme = scheme;
@@ -92,32 +92,32 @@ void mitk::MouseModeSwitcher::SelectMouseMode(MouseMode mode)
 
   switch (mode)
   {
-  case MousePointer:
-  {
-    m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
-    break;
-  } // case 0
-  case Scroll:
-  {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSScroll.xml");
+    case MousePointer:
+    {
+      m_CurrentObserver->SetEventConfig("DisplayConfigPACS.xml");
+      break;
+    } // case 0
+    case Scroll:
+    {
+      m_CurrentObserver->AddEventConfig("DisplayConfigPACSScroll.xml");
 
-    break;
-  }
-  case LevelWindow:
-  {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSLevelWindow.xml");
-    break;
-  }
-  case Zoom:
-  {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSZoom.xml");
-    break;
-  }
-  case Pan:
-  {
-    m_CurrentObserver->AddEventConfig("DisplayConfigPACSPan.xml");
-    break;
-  }
+      break;
+    }
+    case LevelWindow:
+    {
+      m_CurrentObserver->AddEventConfig("DisplayConfigPACSLevelWindow.xml");
+      break;
+    }
+    case Zoom:
+    {
+      m_CurrentObserver->AddEventConfig("DisplayConfigPACSZoom.xml");
+      break;
+    }
+    case Pan:
+    {
+      m_CurrentObserver->AddEventConfig("DisplayConfigPACSPan.xml");
+      break;
+    }
   } // end switch (mode)
   m_ActiveMouseMode = mode;
   this->InvokeEvent(MouseModeChangedEvent());
@@ -127,4 +127,3 @@ mitk::MouseModeSwitcher::MouseMode mitk::MouseModeSwitcher::GetCurrentMouseMode(
 {
   return m_ActiveMouseMode;
 }
-

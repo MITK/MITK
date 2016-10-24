@@ -19,27 +19,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageVtkWriteAccessor.h"
 
-namespace mitk {
-
-/**
- * @brief ImageVtkAccessor class provides any image read access which is required by Vtk methods
- * @ingroup Data
- * @deprecatedSince{2014_10} Use ImageVtkWriteAccessor instead
- */
-class ImageVtkAccessor : public ImageVtkWriteAccessor
+namespace mitk
 {
-protected:
+  /**
+   * @brief ImageVtkAccessor class provides any image read access which is required by Vtk methods
+   * @ingroup Data
+   * @deprecatedSince{2014_10} Use ImageVtkWriteAccessor instead
+   */
+  class ImageVtkAccessor : public ImageVtkWriteAccessor
+  {
+  protected:
+    ImageVtkAccessor(ImagePointer iP, const ImageDataItem *iDI);
 
-  ImageVtkAccessor(
-      ImagePointer iP,
-      const ImageDataItem* iDI
-      );
-
-public:
-
-  DEPRECATED(static ImageVtkAccessor* New(ImagePointer, const ImageDataItem*));
-};
-
+  public:
+    DEPRECATED(static ImageVtkAccessor *New(ImagePointer, const ImageDataItem *));
+  };
 }
 
 #endif // MITKIMAGEVTKACCESSOR_H

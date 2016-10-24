@@ -18,11 +18,11 @@
 #define SMTRANSITION_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include <itkLightObject.h>
-#include <string>
+#include "mitkInteractionEvent.h"
 #include "mitkStateMachineAction.h"
 #include "mitkStateMachineCondition.h"
-#include "mitkInteractionEvent.h"
+#include <itkLightObject.h>
+#include <string>
 
 #include "MitkCoreExports.h"
 
@@ -52,7 +52,7 @@ namespace mitk
 
   public:
     mitkClassMacroItkParent(StateMachineTransition, itk::LightObject);
-    mitkNewMacro3Param(Self, const std::string&, const std::string&, const std::string&);
+    mitkNewMacro3Param(Self, const std::string &, const std::string &, const std::string &);
 
     SpStateMachineState GetNextState() const;
     std::string GetNextStateName() const;
@@ -61,23 +61,24 @@ namespace mitk
      * classes are the same or the first argument is a superclass of the second.
      * \warn Here the order of arguments matters. !
      */
-    bool operator==(const StateMachineTransition& transition) const;
-
+    bool operator==(const StateMachineTransition &transition) const;
 
     /**
      * @brief Get an iterator on the first action in list.
      **/
     ActionVectorType GetActions() const;
 
-    const ConditionVectorType& GetConditions() const;
+    const ConditionVectorType &GetConditions() const;
 
     /**
      * @brief Set the next state of this object.
      **/
-    void SetNextState(const SpStateMachineState& nextState);
+    void SetNextState(const SpStateMachineState &nextState);
 
   protected:
-    StateMachineTransition(const std::string& nextStateName, const std::string& eventClass, const std::string& eventVariant);
+    StateMachineTransition(const std::string &nextStateName,
+                           const std::string &eventClass,
+                           const std::string &eventVariant);
     virtual ~StateMachineTransition();
 
     // Triggering Event
@@ -85,11 +86,9 @@ namespace mitk
     std::string m_EventVariant;
 
   private:
+    void AddAction(const StateMachineAction::Pointer &action);
 
-    void AddAction(const StateMachineAction::Pointer& action);
-
-    void AddCondition(const StateMachineCondition& condition);
-
+    void AddCondition(const StateMachineCondition &condition);
 
     SpStateMachineState m_NextState;
 

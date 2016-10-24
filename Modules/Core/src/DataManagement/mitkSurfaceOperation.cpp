@@ -16,17 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSurfaceOperation.h"
 
-mitk::SurfaceOperation::SurfaceOperation(mitk::OperationType operationType, vtkPolyData* polyData, unsigned int t)
-: mitk::Operation(operationType), m_polyData(polyData), m_timeStep(t)
+mitk::SurfaceOperation::SurfaceOperation(mitk::OperationType operationType, vtkPolyData *polyData, unsigned int t)
+  : mitk::Operation(operationType), m_polyData(polyData), m_timeStep(t)
 {
 }
-
 
 mitk::SurfaceOperation::~SurfaceOperation()
 {
 }
 
-vtkPolyData* mitk::SurfaceOperation::GetVtkPolyData()
+vtkPolyData *mitk::SurfaceOperation::GetVtkPolyData()
 {
   return m_polyData;
 }

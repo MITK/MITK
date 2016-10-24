@@ -16,8 +16,10 @@
 
 #include "mitkInteractionKeyEvent.h"
 
-mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer* baseRenderer, const std::string& key, ModifierKeys modifiers = ControlKey) :
-    InteractionEvent(baseRenderer), m_Key(key), m_Modifiers(modifiers)
+mitk::InteractionKeyEvent::InteractionKeyEvent(mitk::BaseRenderer *baseRenderer,
+                                               const std::string &key,
+                                               ModifierKeys modifiers = ControlKey)
+  : InteractionEvent(baseRenderer), m_Key(key), m_Modifiers(modifiers)
 {
 }
 
@@ -31,19 +33,18 @@ std::string mitk::InteractionKeyEvent::GetKey() const
   return m_Key;
 }
 
-
 mitk::InteractionKeyEvent::~InteractionKeyEvent()
 {
 }
 
-bool mitk::InteractionKeyEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
+bool mitk::InteractionKeyEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::InteractionKeyEvent& keyEvent = static_cast<const Self&>(interactionEvent);
+  const mitk::InteractionKeyEvent &keyEvent = static_cast<const Self &>(interactionEvent);
   return (this->GetModifiers() == keyEvent.GetModifiers() && this->GetKey() == keyEvent.GetKey() &&
           Superclass::IsEqual(interactionEvent));
 }
 
-bool mitk::InteractionKeyEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
+bool mitk::InteractionKeyEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<InteractionKeyEvent*>(baseClass.GetPointer()) != NULL) ;
+  return (dynamic_cast<InteractionKeyEvent *>(baseClass.GetPointer()) != NULL);
 }

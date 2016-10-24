@@ -20,28 +20,26 @@
 #include "mitkCommon.h"
 #include <MitkCoreExports.h>
 
-#include "mitkDataStorage.h"
 #include "mitkDataNode.h"
+#include "mitkDataStorage.h"
 #include "mitkDispatcher.h"
-
 
 namespace mitk
 {
-/**
- * \class BindDispatcherInteractor
- * \brief This Class is used to connect a DataStorage with the Dispatcher.
- *
- * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
- * When a DataInteractor is registered with a DataNode the Dispatcher will be notified.
- * Also this class registers the MicroService at which InteractionEventObservers can register to receive events.
- *
- * \ingroup Interaction
- */
+  /**
+   * \class BindDispatcherInteractor
+   * \brief This Class is used to connect a DataStorage with the Dispatcher.
+   *
+   * This is done by registering for DataStorage Events and sending the Events to the registered Dispatcher.
+   * When a DataInteractor is registered with a DataNode the Dispatcher will be notified.
+   * Also this class registers the MicroService at which InteractionEventObservers can register to receive events.
+   *
+   * \ingroup Interaction
+   */
   class MITKCORE_EXPORT BindDispatcherInteractor
   {
-
   public:
-    BindDispatcherInteractor( const std::string& );
+    BindDispatcherInteractor(const std::string &);
     ~BindDispatcherInteractor();
 
     /**
@@ -60,21 +58,20 @@ namespace mitk
      */
     Dispatcher::Pointer GetDispatcher() const;
 
-
   private:
     /** @brief Registers for events from DataStorage.
      *
-     * This way whenever a DataNode is added the Dispatcher is notified about this change, and checks whether a DataInteractor
+     * This way whenever a DataNode is added the Dispatcher is notified about this change, and checks whether a
+     * DataInteractor
      * is set for this DataNode
      */
-    void RegisterInteractor(const DataNode* dataNode);
-    void UnRegisterInteractor(const DataNode* dataNode);
+    void RegisterInteractor(const DataNode *dataNode);
+    void UnRegisterInteractor(const DataNode *dataNode);
     void RegisterDataStorageEvents();
     void UnRegisterDataStorageEvents();
 
     Dispatcher::Pointer m_Dispatcher;
     DataStorage::Pointer m_DataStorage;
   };
-
 }
 #endif /* mitkBindDispatcherInteractor_h */

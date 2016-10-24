@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
-#include <mitkNodePredicateDataType.h>
-#include <mitkEnumerationProperty.h>
+#include "mitkTestingMacros.h"
 #include <mitkBaseProperty.h>
+#include <mitkEnumerationProperty.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkPointSet.h>
 
-//VTK
+// VTK
 #include <vtkRegressionTestImage.h>
 
-
-int mitkPointSetVtkMapper2DTransformedPointsTest(int argc, char* argv[])
+int mitkPointSetVtkMapper2DTransformedPointsTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -38,30 +37,31 @@ int mitkPointSetVtkMapper2DTransformedPointsTest(int argc, char* argv[])
 
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
 
-  mitk::DataNode* dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("PointSet"));
+  mitk::DataNode *dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("PointSet"));
 
-  if(dataNode)
+  if (dataNode)
   {
-    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*> ( dataNode->GetData() );
+    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet *>(dataNode->GetData());
 
-    if(pointSet)
+    if (pointSet)
     {
-    mitk::Point3D origin = pointSet->GetGeometry()->GetOrigin();
+      mitk::Point3D origin = pointSet->GetGeometry()->GetOrigin();
 
-    origin[1] += 10;
-    origin[2] += 15;
+      origin[1] += 10;
+      origin[2] += 15;
 
-    pointSet->GetGeometry()->SetOrigin(origin);
-    pointSet->Modified();
-    dataNode->Update();
+      pointSet->GetGeometry()->SetOrigin(origin);
+      pointSet->Modified();
+      dataNode->Update();
     }
   }
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
-  //use this to generate a reference screenshot or save the file:
-  if(false)
+  // use this to generate a reference screenshot or save the file:
+  if (false)
   {
     renderingHelper.SaveReferenceScreenShot("D:/test/output.png");
   }

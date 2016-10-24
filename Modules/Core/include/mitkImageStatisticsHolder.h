@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGESTATISTICSHOLDER_H
 #define MITKIMAGESTATISTICSHOLDER_H
 
-#include <MitkCoreExports.h>
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
+#include <MitkCoreExports.h>
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -26,140 +26,149 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+    @brief Class holding the statistics informations about a single mitk::Image
 
-/**
-  @brief Class holding the statistics informations about a single mitk::Image
+    This computation was previously directly included in the definition and implementation of the mitk::Image class
+    but for having a clear interface, all statistics computation is moved to the ImageStatisticsHolder class.
 
-  This computation was previously directly included in the definition and implementation of the mitk::Image class
-  but for having a clear interface, all statistics computation is moved to the ImageStatisticsHolder class.
-
-  Each mitk::Image holds a normal pointer to its StatisticsHolder object. To get access to the methods, use the GetStatistics() method
-  in mitk::Image class.
-  */
-class MITKCORE_EXPORT ImageStatisticsHolder
-{
-public:
+    Each mitk::Image holds a normal pointer to its StatisticsHolder object. To get access to the methods, use the
+    GetStatistics() method
+    in mitk::Image class.
+    */
+  class MITKCORE_EXPORT ImageStatisticsHolder
+  {
+  public:
     /** Constructor */
-  ImageStatisticsHolder(mitk::Image* image);
+    ImageStatisticsHolder(mitk::Image *image);
 
     /** Desctructor */
     virtual ~ImageStatisticsHolder();
 
     typedef itk::Statistics::Histogram<double> HistogramType;
 
-    virtual const HistogramType* GetScalarHistogram(int t=0, unsigned int =0);
+    virtual const HistogramType *GetScalarHistogram(int t = 0, unsigned int = 0);
 
     //##Documentation
     //## \brief Get the minimum for scalar images. Recomputation performed only when necessary.
-    virtual ScalarType GetScalarValueMin(int t=0, unsigned int component=0);
+    virtual ScalarType GetScalarValueMin(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the maximum for scalar images. Recomputation performed only when necessary.
-    virtual ScalarType GetScalarValueMax(int t=0, unsigned int component=0);
+    virtual ScalarType GetScalarValueMax(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the second smallest value for scalar images. Recomputation performed only when necessary.
-    virtual ScalarType GetScalarValue2ndMin(int t=0, unsigned int component=0);
+    virtual ScalarType GetScalarValue2ndMin(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the smallest value for scalar images, but do not recompute it first
-    virtual mitk::ScalarType GetScalarValueMinNoRecompute( unsigned int t = 0 ) const
+    virtual mitk::ScalarType GetScalarValueMinNoRecompute(unsigned int t = 0) const
     {
-      if ( t < m_ScalarMin.size() )
+      if (t < m_ScalarMin.size())
         return m_ScalarMin[t];
-      else return itk::NumericTraits<ScalarType>::max();
+      else
+        return itk::NumericTraits<ScalarType>::max();
     }
 
     //##Documentation
     //## \brief Get the second smallest value for scalar images, but do not recompute it first
-    virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute( unsigned int t = 0 ) const
+    virtual mitk::ScalarType GetScalarValue2ndMinNoRecompute(unsigned int t = 0) const
     {
-      if ( t < m_Scalar2ndMin.size() )
+      if (t < m_Scalar2ndMin.size())
         return m_Scalar2ndMin[t];
-      else return itk::NumericTraits<ScalarType>::max();
+      else
+        return itk::NumericTraits<ScalarType>::max();
     }
 
     //##Documentation
     //## \brief Get the second largest value for scalar images
-    virtual ScalarType GetScalarValue2ndMax(int t=0, unsigned int component=0);
+    virtual ScalarType GetScalarValue2ndMax(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the largest value for scalar images, but do not recompute it first
-    virtual mitk::ScalarType GetScalarValueMaxNoRecompute( unsigned int t = 0 )
+    virtual mitk::ScalarType GetScalarValueMaxNoRecompute(unsigned int t = 0)
     {
-      if ( t < m_ScalarMax.size() )
+      if (t < m_ScalarMax.size())
         return m_ScalarMax[t];
-      else return itk::NumericTraits<ScalarType>::NonpositiveMin();
+      else
+        return itk::NumericTraits<ScalarType>::NonpositiveMin();
     }
 
     //##Documentation
     //## \brief Get the second largest value for scalar images, but do not recompute it first
-    virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute( unsigned int t = 0 )
+    virtual mitk::ScalarType GetScalarValue2ndMaxNoRecompute(unsigned int t = 0)
     {
-      if ( t < m_Scalar2ndMax.size() )
+      if (t < m_Scalar2ndMax.size())
         return m_Scalar2ndMax[t];
-      else return itk::NumericTraits<ScalarType>::NonpositiveMin();
+      else
+        return itk::NumericTraits<ScalarType>::NonpositiveMin();
     }
 
     //##Documentation
     //## \brief Get the count of voxels with the smallest scalar value in the dataset
-    mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0, unsigned int component=0);
+    mitk::ScalarType GetCountOfMinValuedVoxels(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the count of voxels with the largest scalar value in the dataset
-    mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0, unsigned int component=0);
+    mitk::ScalarType GetCountOfMaxValuedVoxels(int t = 0, unsigned int component = 0);
 
     //##Documentation
     //## \brief Get the count of voxels with the largest scalar value in the dataset
-    virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute( unsigned int t = 0 )
+    virtual unsigned int GetCountOfMaxValuedVoxelsNoRecompute(unsigned int t = 0)
     {
-      if ( t < m_CountOfMaxValuedVoxels.size() )
+      if (t < m_CountOfMaxValuedVoxels.size())
         return m_CountOfMaxValuedVoxels[t];
-      else return 0;
+      else
+        return 0;
     }
 
     //##Documentation
     //## \brief Get the count of voxels with the smallest scalar value in the dataset
-    virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute( unsigned int t = 0 ) const
+    virtual unsigned int GetCountOfMinValuedVoxelsNoRecompute(unsigned int t = 0) const
     {
-      if ( t < m_CountOfMinValuedVoxels.size() )
+      if (t < m_CountOfMinValuedVoxels.size())
         return m_CountOfMinValuedVoxels[t];
-      else return 0;
+      else
+        return 0;
     }
 
-    bool IsValidTimeStep( int t) const;
+    bool IsValidTimeStep(int t) const;
 
-    template < typename ItkImageType >
-      friend void _ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t);
+    template <typename ItkImageType>
+    friend void _ComputeExtremaInItkImage(const ItkImageType *itkImage,
+                                          mitk::ImageStatisticsHolder *statisticsHolder,
+                                          int t);
 
-    template < typename ItkImageType >
-      friend void _ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t, unsigned int component);
+    template <typename ItkImageType>
+    friend void _ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
+                                                mitk::ImageStatisticsHolder *statisticsHolder,
+                                                int t,
+                                                unsigned int component);
 
-protected:
+  protected:
+    virtual void ResetImageStatistics();
 
-      virtual void ResetImageStatistics();
+    virtual void ComputeImageStatistics(int t = 0, unsigned int component = 0);
 
-      virtual void ComputeImageStatistics(int t=0, unsigned int component=0);
+    virtual void Expand(unsigned int timeSteps);
 
-      virtual void Expand( unsigned int timeSteps );
+    ImageTimeSelector::Pointer GetTimeSelector();
 
-      ImageTimeSelector::Pointer GetTimeSelector();
+    mitk::Image *m_Image;
 
-      mitk::Image* m_Image;
+    mutable itk::Object::Pointer m_HistogramGeneratorObject;
 
-      mutable itk::Object::Pointer m_HistogramGeneratorObject;
+    mutable itk::Object::Pointer m_TimeSelectorForExtremaObject;
+    mutable std::vector<unsigned int> m_CountOfMinValuedVoxels;
+    mutable std::vector<unsigned int> m_CountOfMaxValuedVoxels;
+    mutable std::vector<ScalarType> m_ScalarMin;
+    mutable std::vector<ScalarType> m_ScalarMax;
+    mutable std::vector<ScalarType> m_Scalar2ndMin;
+    mutable std::vector<ScalarType> m_Scalar2ndMax;
 
-      mutable itk::Object::Pointer m_TimeSelectorForExtremaObject;
-      mutable std::vector<unsigned int> m_CountOfMinValuedVoxels;
-      mutable std::vector<unsigned int> m_CountOfMaxValuedVoxels;
-      mutable std::vector<ScalarType> m_ScalarMin;
-      mutable std::vector<ScalarType> m_ScalarMax;
-      mutable std::vector<ScalarType> m_Scalar2ndMin;
-      mutable std::vector<ScalarType> m_Scalar2ndMax;
+    itk::TimeStamp m_LastRecomputeTimeStamp;
+  };
 
-      itk::TimeStamp m_LastRecomputeTimeStamp;
-
-};
-
-} //end namespace
+} // end namespace
 #endif // MITKIMAGESTATISTICSHOLDER_H

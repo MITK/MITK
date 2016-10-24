@@ -17,12 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 #define SMSTATE_H_HEADER_INCLUDED_C19A8A5D
 
-#include <string>
-#include <itkLightObject.h>
-#include "mitkStateMachineTransition.h"
 #include "MitkCoreExports.h"
+#include "mitkStateMachineTransition.h"
+#include <itkLightObject.h>
+#include <string>
 
-namespace mitk {
+namespace mitk
+{
   /**
    * \class StateMachineState
    * Represents a state of a state machine pattern.
@@ -34,26 +35,25 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(StateMachineState, itk::LightObject);
-    mitkNewMacro2Param(Self, const std::string&, const std::string&);
-
-
+    mitkNewMacro2Param(Self, const std::string &, const std::string &);
 
     typedef std::vector<mitk::StateMachineState::Pointer> StateMap;
     typedef std::vector<StateMachineTransition::Pointer> TransitionVector;
 
-    bool AddTransition( StateMachineTransition::Pointer transition );
+    bool AddTransition(StateMachineTransition::Pointer transition);
 
     /**
     * @brief Return Transition which matches given event description.
     *
     * \deprecatedSince{2013_09} Use method GetTransitionList() instead.
     */
-    DEPRECATED(StateMachineTransition::Pointer GetTransition(const std::string& eventClass,const std::string& eventVariant));
+    DEPRECATED(StateMachineTransition::Pointer GetTransition(const std::string &eventClass,
+                                                             const std::string &eventVariant));
 
     /**
     * @brief Return Transitions that match given event description.
     **/
-    TransitionVector GetTransitionList(const std::string& eventClass,const std::string& eventVariant);
+    TransitionVector GetTransitionList(const std::string &eventClass, const std::string &eventVariant);
 
     /**
     * @brief Returns the name.
@@ -64,13 +64,13 @@ namespace mitk {
 
     /**
     * @brief Searches dedicated States of all Transitions and sets *nextState of these Transitions.
-    * Required for this is a List of all build States of that StateMachine (allStates). This way the StateMachine can be build up.
+    * Required for this is a List of all build States of that StateMachine (allStates). This way the StateMachine can be
+    *build up.
     **/
-    bool ConnectTransitions(StateMap* allStates);
+    bool ConnectTransitions(StateMap *allStates);
 
   protected:
-
-    StateMachineState(const std::string& name, const std::string& stateMode);
+    StateMachineState(const std::string &name, const std::string &stateMode);
     ~StateMachineState();
 
   private:
@@ -81,8 +81,11 @@ namespace mitk {
     /**
      * State Modus, which determines the behavior of the dispatcher. A State can be in three different modes:
      * REGULAR - standard dispatcher behavior
-     * GRAB_INPUT - all events are given to the statemachine in this modus, if they are not processed by this statemachine the events are dropped.
-     * PREFER_INPUT - events are first given to this statemachine, and if not processed, offered to the other statemachines.
+     * GRAB_INPUT - all events are given to the statemachine in this modus, if they are not processed by this
+     * statemachine
+     * the events are dropped.
+     * PREFER_INPUT - events are first given to this statemachine, and if not processed, offered to the other
+     * statemachines.
      */
     std::string m_StateMode;
 

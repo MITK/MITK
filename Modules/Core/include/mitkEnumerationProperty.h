@@ -23,205 +23,197 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
+#pragma warning(push)
+#pragma warning(disable : 4522)
 #endif
 
-/**
- * This class may be used to store properties similar to enumeration values.
- * Each enumeration value is identified via a string representation and a
- * id. Note, that both string representation and id MUST be unique. This is checked
- * when inserting a new enumeration value. Please note that you have to add valid
- * enumeration values before you may use the Get/SetValue methods.
- *
- * To use the class enumeration property you have 2 choices:
- *
- * 1. Directly use the class and add your possible enumeration values via
- *    AddEnum(name, id). NOte that the ids do not have to be in any order, they
- *    just have to be unique. The current value is set via SetValue(...) and
- *    retrieved via GetValueAsId() or GetValueAsString().
- * 2. Create a subclass, which adds the possible enumeration values in its
- *    constructor and maybe adds some additional convenience functions to
- *    set/get the value. NOte that you should override AddEnum(...) as protected
- *    so that the user may not add additional invalid enumeration values.
- *    As example see mitk::VtkRepresentationProperty or mitk::VtkInterpolationProperty
- *
- * @ingroup DataManagement
- */
-class MITKCORE_EXPORT EnumerationProperty : public BaseProperty
-{
-public:
-
-  mitkClassMacro( EnumerationProperty, BaseProperty );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
   /**
-   * Represents the unique id which is asigned to each enumeration value
+   * This class may be used to store properties similar to enumeration values.
+   * Each enumeration value is identified via a string representation and a
+   * id. Note, that both string representation and id MUST be unique. This is checked
+   * when inserting a new enumeration value. Please note that you have to add valid
+   * enumeration values before you may use the Get/SetValue methods.
+   *
+   * To use the class enumeration property you have 2 choices:
+   *
+   * 1. Directly use the class and add your possible enumeration values via
+   *    AddEnum(name, id). NOte that the ids do not have to be in any order, they
+   *    just have to be unique. The current value is set via SetValue(...) and
+   *    retrieved via GetValueAsId() or GetValueAsString().
+   * 2. Create a subclass, which adds the possible enumeration values in its
+   *    constructor and maybe adds some additional convenience functions to
+   *    set/get the value. NOte that you should override AddEnum(...) as protected
+   *    so that the user may not add additional invalid enumeration values.
+   *    As example see mitk::VtkRepresentationProperty or mitk::VtkInterpolationProperty
+   *
+   * @ingroup DataManagement
    */
-  typedef unsigned int IdType;
+  class MITKCORE_EXPORT EnumerationProperty : public BaseProperty
+  {
+  public:
+    mitkClassMacro(EnumerationProperty, BaseProperty);
 
-  /**
-   * Type used to store a mapping from enumeration id to enumeration string/
-   * description
-   */
-  typedef std::map<IdType, std::string> EnumIdsContainerType;
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  /**
-   * Type used to store a mapping from enumeration string/description to
-   * enumeration id
-   */
-  typedef std::map<std::string, IdType> EnumStringsContainerType;
+      /**
+       * Represents the unique id which is asigned to each enumeration value
+       */
+      typedef unsigned int IdType;
 
-  /**
-   * Type used for iterators over all defined enumeration values.
-   */
-  typedef EnumIdsContainerType::const_iterator EnumConstIterator;
+    /**
+     * Type used to store a mapping from enumeration id to enumeration string/
+     * description
+     */
+    typedef std::map<IdType, std::string> EnumIdsContainerType;
 
-  /**
-   * Adds an enumeration value into the enumeration. The name and id provided
-   * must be unique. This is checked while adding the new enumeration value.
-   * If it is not unique, false is returned. If addition was successful, true
-   * is returned.
-   * @param name the unique string representation of the enumeration value
-   * @param id the unique integer representation of the enumeration value
-   * @returns true, if the name/id combination was successfully added to the
-   * enumeration values or true otherwise
-   */
-  virtual bool AddEnum( const std::string& name, const IdType& id );
+    /**
+     * Type used to store a mapping from enumeration string/description to
+     * enumeration id
+     */
+    typedef std::map<std::string, IdType> EnumStringsContainerType;
 
-  /**
-   * Sets the current value of the enumeration
-   * @param name the string representation of the enumeration value to set
-   * @returns true if the value was successfully set (i.e. it was valid), or
-   * false, if the name provided is incalid.
-   */
-  virtual bool SetValue( const std::string& name );
+    /**
+     * Type used for iterators over all defined enumeration values.
+     */
+    typedef EnumIdsContainerType::const_iterator EnumConstIterator;
 
-  /**
-   * Sets the current value of the enumeration
-   * @param id the integer representation of the enumeration value to set
-   * @returns true if the value was successfully set (i.e. it was valid), or
-   * false, if the id provided is invalid.
-   */
-  virtual bool SetValue( const IdType& id );
+    /**
+     * Adds an enumeration value into the enumeration. The name and id provided
+     * must be unique. This is checked while adding the new enumeration value.
+     * If it is not unique, false is returned. If addition was successful, true
+     * is returned.
+     * @param name the unique string representation of the enumeration value
+     * @param id the unique integer representation of the enumeration value
+     * @returns true, if the name/id combination was successfully added to the
+     * enumeration values or true otherwise
+     */
+    virtual bool AddEnum(const std::string &name, const IdType &id);
 
-  /**
-   * Returns the id of the current enumeration value. If it was not yet set,
-   * the return value is unspecified
-   */
-  virtual IdType GetValueAsId() const;
+    /**
+     * Sets the current value of the enumeration
+     * @param name the string representation of the enumeration value to set
+     * @returns true if the value was successfully set (i.e. it was valid), or
+     * false, if the name provided is incalid.
+     */
+    virtual bool SetValue(const std::string &name);
 
-  /**
-   * Returns the string representation of the current enumeration value. If it
-   * was not yet set, the return value is unspecified
-   */
-  virtual std::string GetValueAsString() const override;
+    /**
+     * Sets the current value of the enumeration
+     * @param id the integer representation of the enumeration value to set
+     * @returns true if the value was successfully set (i.e. it was valid), or
+     * false, if the id provided is invalid.
+     */
+    virtual bool SetValue(const IdType &id);
 
-  /**
-   * Clears all possible enumeration values and the current enumeration value.
-   */
-  virtual void Clear();
+    /**
+     * Returns the id of the current enumeration value. If it was not yet set,
+     * the return value is unspecified
+     */
+    virtual IdType GetValueAsId() const;
 
-  /**
-   * Determines the number of enumeration values which have been added via
-   * AddEnum(...).
-   * @returns the number of enumeration values associated with this Enumeration
-   * Property
-   */
-  virtual EnumIdsContainerType::size_type Size() const;
+    /**
+     * Returns the string representation of the current enumeration value. If it
+     * was not yet set, the return value is unspecified
+     */
+    virtual std::string GetValueAsString() const override;
 
-  /**
-   * Provides access to the set of known enumeration values. The string representation
-   * may be accessed via iterator->second, the id may be access via iterator->first
-   * @returns an iterator over all enumeration values.
-   */
-  virtual EnumConstIterator Begin() const;
+    /**
+     * Clears all possible enumeration values and the current enumeration value.
+     */
+    virtual void Clear();
 
-  /**
-   * Specifies the end of the range of the known enumeration values.
-   * @returns an iterator pointing past the last known element of the possible
-   * enumeration values.
-   */
-  virtual EnumConstIterator End() const;
+    /**
+     * Determines the number of enumeration values which have been added via
+     * AddEnum(...).
+     * @returns the number of enumeration values associated with this Enumeration
+     * Property
+     */
+    virtual EnumIdsContainerType::size_type Size() const;
 
-  /**
-   * Returns the string representation for the given id.
-   * @param id the id for which the string representation should be determined
-   *        if id is invalid, the return value is unspecified.
-   * @returns the string representation of the given enumeration value
-   */
-  virtual std::string GetEnumString( const IdType& id ) const;
+    /**
+     * Provides access to the set of known enumeration values. The string representation
+     * may be accessed via iterator->second, the id may be access via iterator->first
+     * @returns an iterator over all enumeration values.
+     */
+    virtual EnumConstIterator Begin() const;
 
-  /**
-   * Returns the integer representation for the given string.
-   * @param name the enumeration name for which the integer representation should be determined
-   *        if the name is invalid, the return value is unspecified.
-   * @returns the integer representation of the given enumeration value
-   */
-  virtual IdType GetEnumId( const std::string& name ) const;
+    /**
+     * Specifies the end of the range of the known enumeration values.
+     * @returns an iterator pointing past the last known element of the possible
+     * enumeration values.
+     */
+    virtual EnumConstIterator End() const;
 
-  /**
-   * Determines if a given integer representation of an enumeration value
-   * is valid or not
-   * @param val the integer value to check
-   * @returns true if the given value is valid or false otherwise
-   */
-  virtual bool IsValidEnumerationValue( const IdType& val ) const;
+    /**
+     * Returns the string representation for the given id.
+     * @param id the id for which the string representation should be determined
+     *        if id is invalid, the return value is unspecified.
+     * @returns the string representation of the given enumeration value
+     */
+    virtual std::string GetEnumString(const IdType &id) const;
 
-  /**
-   * Determines if a given string representation of an enumeration value
-   * is valid or not
-   * @param val the string to check
-   * @returns true if the given value is valid or false otherwise
-   */
-  virtual bool IsValidEnumerationValue( const std::string& val ) const;
+    /**
+     * Returns the integer representation for the given string.
+     * @param name the enumeration name for which the integer representation should be determined
+     *        if the name is invalid, the return value is unspecified.
+     * @returns the integer representation of the given enumeration value
+     */
+    virtual IdType GetEnumId(const std::string &name) const;
 
-  const EnumIdsContainerType& GetEnumIds() const;
-  const EnumStringsContainerType& GetEnumStrings() const;
+    /**
+     * Determines if a given integer representation of an enumeration value
+     * is valid or not
+     * @param val the integer value to check
+     * @returns true if the given value is valid or false otherwise
+     */
+    virtual bool IsValidEnumerationValue(const IdType &val) const;
 
-  EnumIdsContainerType& GetEnumIds();
-  EnumStringsContainerType& GetEnumStrings();
+    /**
+     * Determines if a given string representation of an enumeration value
+     * is valid or not
+     * @param val the string to check
+     * @returns true if the given value is valid or false otherwise
+     */
+    virtual bool IsValidEnumerationValue(const std::string &val) const;
 
-  using BaseProperty::operator=;
+    const EnumIdsContainerType &GetEnumIds() const;
+    const EnumStringsContainerType &GetEnumStrings() const;
 
-protected:
+    EnumIdsContainerType &GetEnumIds();
+    EnumStringsContainerType &GetEnumStrings();
 
-  /**
-   * Default constructor. The current value of the enumeration is undefined.
-   */
-  EnumerationProperty();
+    using BaseProperty::operator=;
 
-  EnumerationProperty(const EnumerationProperty&);
+  protected:
+    /**
+     * Default constructor. The current value of the enumeration is undefined.
+     */
+    EnumerationProperty();
 
-  virtual bool IsEqual( const BaseProperty& property ) const override;
-  virtual bool Assign( const BaseProperty& property ) override;
+    EnumerationProperty(const EnumerationProperty &);
 
-  itk::LightObject::Pointer InternalClone() const override;
+    virtual bool IsEqual(const BaseProperty &property) const override;
+    virtual bool Assign(const BaseProperty &property) override;
 
+    itk::LightObject::Pointer InternalClone() const override;
 
-private:
+  private:
+    // purposely not implemented
+    EnumerationProperty &operator=(const EnumerationProperty &);
+    IdType m_CurrentValue;
 
-  // purposely not implemented
-  EnumerationProperty& operator=(const EnumerationProperty&);
-  IdType m_CurrentValue;
+    typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
+    typedef std::map<std::string, EnumStringsContainerType> StringMapForClassNameContainerType;
 
-  typedef std::map<std::string, EnumIdsContainerType> IdMapForClassNameContainerType;
-  typedef std::map<std::string, EnumStringsContainerType> StringMapForClassNameContainerType;
-
-  static IdMapForClassNameContainerType s_IdMapForClassName;
-  static StringMapForClassNameContainerType s_StringMapForClassName;
-};
+    static IdMapForClassNameContainerType s_IdMapForClassName;
+    static StringMapForClassNameContainerType s_StringMapForClassName;
+  };
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // namespace
 
 #endif
-
-

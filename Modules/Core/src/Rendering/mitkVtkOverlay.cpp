@@ -15,13 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkVtkOverlay.h"
-#include <vtkProperty.h>
 #include <vtkProp.h>
+#include <vtkProperty.h>
 
 mitk::VtkOverlay::VtkOverlay()
 {
 }
-
 
 mitk::VtkOverlay::~VtkOverlay()
 {
@@ -30,14 +29,13 @@ mitk::VtkOverlay::~VtkOverlay()
 void mitk::VtkOverlay::Update(mitk::BaseRenderer *renderer)
 {
   vtkSmartPointer<vtkProp> prop = GetVtkProp(renderer);
-  if(!IsVisible(renderer))
+  if (!IsVisible(renderer))
   {
     prop->SetVisibility(false);
     return;
   }
   else
   {
-
     prop->SetVisibility(true);
     UpdateVtkOverlay(renderer);
   }
@@ -45,18 +43,18 @@ void mitk::VtkOverlay::Update(mitk::BaseRenderer *renderer)
 
 void mitk::VtkOverlay::AddToBaseRenderer(mitk::BaseRenderer *renderer)
 {
-  if(!renderer)
-     return;
-  AddToRenderer(renderer,renderer->GetVtkRenderer());
+  if (!renderer)
+    return;
+  AddToRenderer(renderer, renderer->GetVtkRenderer());
 }
 
 void mitk::VtkOverlay::AddToRenderer(mitk::BaseRenderer *renderer, vtkRenderer *vtkrenderer)
 {
-  if(!renderer || !vtkrenderer)
+  if (!renderer || !vtkrenderer)
     return;
   Update(renderer);
   vtkSmartPointer<vtkProp> vtkProp = GetVtkProp(renderer);
-  if(renderer && vtkrenderer && !vtkrenderer->HasViewProp(vtkProp))
+  if (renderer && vtkrenderer && !vtkrenderer->HasViewProp(vtkProp))
   {
     vtkrenderer->AddViewProp(vtkProp);
     mitk::RenderingManager::GetInstance()->RequestUpdate(vtkrenderer->GetRenderWindow());
@@ -65,25 +63,25 @@ void mitk::VtkOverlay::AddToRenderer(mitk::BaseRenderer *renderer, vtkRenderer *
 
 void mitk::VtkOverlay::RemoveFromBaseRenderer(mitk::BaseRenderer *renderer)
 {
-  if(!renderer)
-     return;
-  RemoveFromRenderer(renderer,renderer->GetVtkRenderer());
+  if (!renderer)
+    return;
+  RemoveFromRenderer(renderer, renderer->GetVtkRenderer());
 }
 
 void mitk::VtkOverlay::RemoveFromRenderer(mitk::BaseRenderer *renderer, vtkRenderer *vtkrenderer)
 {
-  if(!renderer || !vtkrenderer)
-     return;
+  if (!renderer || !vtkrenderer)
+    return;
   vtkSmartPointer<vtkProp> vtkProp = GetVtkProp(renderer);
-  if(vtkrenderer->HasViewProp(vtkProp))
+  if (vtkrenderer->HasViewProp(vtkProp))
   {
     vtkrenderer->RemoveViewProp(vtkProp);
     mitk::RenderingManager::GetInstance()->RequestUpdate(vtkrenderer->GetRenderWindow());
   }
 }
 
-void mitk::VtkOverlay::Paint( BaseRenderer* renderer )
+void mitk::VtkOverlay::Paint(BaseRenderer *renderer)
 {
-  GetVtkProp( renderer )->RenderOpaqueGeometry(renderer->GetVtkRenderer() );
-  GetVtkProp( renderer )->RenderOverlay( renderer->GetVtkRenderer() );
+  GetVtkProp(renderer)->RenderOpaqueGeometry(renderer->GetVtkRenderer());
+  GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
 }

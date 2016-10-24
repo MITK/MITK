@@ -17,46 +17,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef LEVELWINDOWPRESET_H_HEADER
 #define LEVELWINDOWPRESET_H_HEADER
 
-#include <vtkXMLParser.h>
 #include <MitkCoreExports.h>
 #include <map>
 #include <string>
+#include <vtkXMLParser.h>
 
-namespace mitk {
-
-class MITKCORE_EXPORT LevelWindowPreset : public vtkXMLParser
+namespace mitk
 {
-public:
-  static LevelWindowPreset *New();
-  vtkTypeMacro(LevelWindowPreset,vtkXMLParser);
+  class MITKCORE_EXPORT LevelWindowPreset : public vtkXMLParser
+  {
+  public:
+    static LevelWindowPreset *New();
+    vtkTypeMacro(LevelWindowPreset, vtkXMLParser);
 
-  bool LoadPreset();
-  bool LoadPreset(std::string fileName);
-  double getLevel(std::string name);
-  double getWindow(std::string window);
-  std::map<std::string, double>& getLevelPresets();
-  std::map<std::string, double>& getWindowPresets();
-  void newPresets(std::map<std::string, double> newLevel, std::map<std::string, double> newWindow);
-protected:
-  LevelWindowPreset();
-  ~LevelWindowPreset();
+    bool LoadPreset();
+    bool LoadPreset(std::string fileName);
+    double getLevel(std::string name);
+    double getWindow(std::string window);
+    std::map<std::string, double> &getLevelPresets();
+    std::map<std::string, double> &getWindowPresets();
+    void newPresets(std::map<std::string, double> newLevel, std::map<std::string, double> newWindow);
 
-private:
-  //##Documentation
-  //## @brief method used in XLM-Reading; gets called when a start-tag is read
-  void StartElement (const char *elementName, const char **atts) override;
+  protected:
+    LevelWindowPreset();
+    ~LevelWindowPreset();
 
-  //void saveXML(mitk::XMLWriter& xmlWriter);
-  void save();
+  private:
+    //##Documentation
+    //## @brief method used in XLM-Reading; gets called when a start-tag is read
+    void StartElement(const char *elementName, const char **atts) override;
 
-  //##Documentation
-  //## @brief reads an XML-String-Attribute
-  std::string ReadXMLStringAttribut( std::string name, const char** atts);
+    // void saveXML(mitk::XMLWriter& xmlWriter);
+    void save();
 
-  static const std::string PRESET;
-  std::map<std::string, double> m_Level;
-  std::map<std::string, double> m_Window;
-  std::string m_XmlFileName;
-};
+    //##Documentation
+    //## @brief reads an XML-String-Attribute
+    std::string ReadXMLStringAttribut(std::string name, const char **atts);
+
+    static const std::string PRESET;
+    std::map<std::string, double> m_Level;
+    std::map<std::string, double> m_Window;
+    std::string m_XmlFileName;
+  };
 }
 #endif

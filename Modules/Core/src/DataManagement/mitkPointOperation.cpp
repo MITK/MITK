@@ -14,16 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPointOperation.h"
 
-mitk::PointOperation::PointOperation(OperationType operationType, Point3D point, int index, bool selected, PointSpecificationType type)
-: mitk::Operation(operationType), m_Point(point), m_Index(index), m_Selected(selected), m_Type(type), m_TimeInMS(0)
-{}
+mitk::PointOperation::PointOperation(
+  OperationType operationType, Point3D point, int index, bool selected, PointSpecificationType type)
+  : mitk::Operation(operationType), m_Point(point), m_Index(index), m_Selected(selected), m_Type(type), m_TimeInMS(0)
+{
+}
 
-mitk::PointOperation::PointOperation(OperationType operationType, ScalarType timeInMS, Point3D point, int index, bool selected, PointSpecificationType type)
-: mitk::Operation(operationType), m_Point(point), m_Index(index), m_Selected(selected), m_Type(type), m_TimeInMS(timeInMS)
-{}
+mitk::PointOperation::PointOperation(OperationType operationType,
+                                     ScalarType timeInMS,
+                                     Point3D point,
+                                     int index,
+                                     bool selected,
+                                     PointSpecificationType type)
+  : mitk::Operation(operationType),
+    m_Point(point),
+    m_Index(index),
+    m_Selected(selected),
+    m_Type(type),
+    m_TimeInMS(timeInMS)
+{
+}
 
 mitk::PointOperation::~PointOperation()
 {

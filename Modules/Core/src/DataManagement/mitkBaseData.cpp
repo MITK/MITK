@@ -14,26 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkBaseData.h"
 
-#include <mitkProportionalTimeGeometry.h>
 #include <itkObjectFactoryBase.h>
 #include <mitkException.h>
 #include <mitkGeometry3D.h>
+#include <mitkProportionalTimeGeometry.h>
 
-
-mitk::BaseData::BaseData() :
-  m_SourceOutputIndexDuplicate(0), m_Initialized(true)
+mitk::BaseData::BaseData() : m_SourceOutputIndexDuplicate(0), m_Initialized(true)
 {
   m_TimeGeometry = mitk::ProportionalTimeGeometry::New();
   m_PropertyList = PropertyList::New();
 }
 
-mitk::BaseData::BaseData( const BaseData &other ):
-itk::DataObject(), mitk::OperationActor(),
-m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
-m_Initialized(other.m_Initialized)
+mitk::BaseData::BaseData(const BaseData &other)
+  : itk::DataObject(),
+    mitk::OperationActor(),
+    m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
+    m_Initialized(other.m_Initialized)
 {
   m_TimeGeometry = dynamic_cast<TimeGeometry *>(other.m_TimeGeometry->Clone().GetPointer());
   m_PropertyList = other.m_PropertyList->Clone();
@@ -46,25 +44,25 @@ mitk::BaseData::~BaseData()
 void mitk::BaseData::InitializeTimeGeometry(unsigned int timeSteps)
 {
   mitk::Geometry3D::Pointer geo3D = mitk::Geometry3D::New();
-  mitk::BaseGeometry::Pointer baseGeo = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
+  mitk::BaseGeometry::Pointer baseGeo = dynamic_cast<BaseGeometry *>(geo3D.GetPointer());
   baseGeo->Initialize();
 
   // The geometry is propagated automatically to the other items,
   // if EvenlyTimed is true...
-  //Old timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
+  // Old timeGeometry->InitializeEvenlyTimed( g3d.GetPointer(), timeSteps );
 
   TimeGeometry::Pointer timeGeometry = this->GetTimeGeometry();
   timeGeometry->Initialize();
   timeGeometry->Expand(timeSteps);
   for (TimeStepType step = 0; step < timeSteps; ++step)
   {
-    timeGeometry->SetTimeStepGeometry(baseGeo.GetPointer(),step);
+    timeGeometry->SetTimeStepGeometry(baseGeo.GetPointer(), step);
   }
 }
 
 void mitk::BaseData::UpdateOutputInformation()
 {
-  if ( this->GetSource() )
+  if (this->GetSource())
   {
     this->GetSource()->UpdateOutputInformation();
   }
@@ -74,7 +72,7 @@ void mitk::BaseData::UpdateOutputInformation()
   }
 }
 
-const mitk::TimeGeometry* mitk::BaseData::GetUpdatedTimeGeometry()
+const mitk::TimeGeometry *mitk::BaseData::GetUpdatedTimeGeometry()
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -83,9 +81,9 @@ const mitk::TimeGeometry* mitk::BaseData::GetUpdatedTimeGeometry()
   return GetTimeGeometry();
 }
 
-void mitk::BaseData::Expand( unsigned int timeSteps )
+void mitk::BaseData::Expand(unsigned int timeSteps)
 {
-  if (m_TimeGeometry.IsNotNull() )
+  if (m_TimeGeometry.IsNotNull())
   {
     m_TimeGeometry->Expand(timeSteps);
   }
@@ -95,7 +93,7 @@ void mitk::BaseData::Expand( unsigned int timeSteps )
   }
 }
 
-const mitk::BaseGeometry* mitk::BaseData::GetUpdatedGeometry(int t)
+const mitk::BaseGeometry *mitk::BaseData::GetUpdatedGeometry(int t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -104,10 +102,10 @@ const mitk::BaseGeometry* mitk::BaseData::GetUpdatedGeometry(int t)
   return GetGeometry(t);
 }
 
-void mitk::BaseData::SetGeometry(BaseGeometry* geometry)
+void mitk::BaseData::SetGeometry(BaseGeometry *geometry)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  if(geometry!=nullptr)
+  if (geometry != nullptr)
   {
     timeGeometry->Initialize(geometry, 1);
   }
@@ -115,29 +113,28 @@ void mitk::BaseData::SetGeometry(BaseGeometry* geometry)
   return;
 }
 
-void mitk::BaseData::SetTimeGeometry(TimeGeometry* geometry)
+void mitk::BaseData::SetTimeGeometry(TimeGeometry *geometry)
 {
   m_TimeGeometry = geometry;
   this->Modified();
 }
 
-void mitk::BaseData::SetClonedGeometry(const BaseGeometry* aGeometry3D)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry *aGeometry3D)
 {
-  SetGeometry(static_cast<mitk::BaseGeometry*>(aGeometry3D->Clone().GetPointer()));
+  SetGeometry(static_cast<mitk::BaseGeometry *>(aGeometry3D->Clone().GetPointer()));
 }
 
-void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry* geometry)
+void mitk::BaseData::SetClonedTimeGeometry(const TimeGeometry *geometry)
 {
   TimeGeometry::Pointer clonedGeometry = geometry->Clone();
   SetTimeGeometry(clonedGeometry.GetPointer());
 }
 
-
-void mitk::BaseData::SetClonedGeometry(const BaseGeometry* aGeometry3D, unsigned int time)
+void mitk::BaseData::SetClonedGeometry(const BaseGeometry *aGeometry3D, unsigned int time)
 {
   if (m_TimeGeometry)
   {
-    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::BaseGeometry*>(aGeometry3D->Clone().GetPointer()),time);
+    m_TimeGeometry->SetTimeStepGeometry(static_cast<mitk::BaseGeometry *>(aGeometry3D->Clone().GetPointer()), time);
   }
 }
 
@@ -148,15 +145,15 @@ bool mitk::BaseData::IsEmptyTimeStep(unsigned int) const
 
 bool mitk::BaseData::IsEmpty() const
 {
-  if(IsInitialized() == false)
+  if (IsInitialized() == false)
     return true;
-  const TimeGeometry* timeGeometry = const_cast<BaseData*>(this)->GetUpdatedTimeGeometry();
-  if(timeGeometry == nullptr)
+  const TimeGeometry *timeGeometry = const_cast<BaseData *>(this)->GetUpdatedTimeGeometry();
+  if (timeGeometry == nullptr)
     return true;
   unsigned int timeSteps = timeGeometry->CountTimeSteps();
-  for ( unsigned int t = 0 ; t < timeSteps ; ++t )
+  for (unsigned int t = 0; t < timeSteps; ++t)
   {
-    if(IsEmptyTimeStep(t) == false)
+    if (IsEmptyTimeStep(t) == false)
       return false;
   }
   return true;
@@ -164,7 +161,7 @@ bool mitk::BaseData::IsEmpty() const
 
 itk::SmartPointer<mitk::BaseDataSource> mitk::BaseData::GetSource() const
 {
-  return static_cast<mitk::BaseDataSource*>(Superclass::GetSource().GetPointer());
+  return static_cast<mitk::BaseDataSource *>(Superclass::GetSource().GetPointer());
 }
 
 mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
@@ -172,14 +169,12 @@ mitk::PropertyList::Pointer mitk::BaseData::GetPropertyList() const
   return m_PropertyList;
 }
 
-
 mitk::BaseProperty::Pointer mitk::BaseData::GetProperty(const char *propertyKey) const
 {
   return m_PropertyList->GetProperty(propertyKey);
 }
 
-void mitk::BaseData::SetProperty(const char *propertyKey,
-                                 BaseProperty* propertyValue)
+void mitk::BaseData::SetProperty(const char *propertyKey, BaseProperty *propertyValue)
 {
   m_PropertyList->SetProperty(propertyKey, propertyValue);
 }
@@ -189,11 +184,11 @@ void mitk::BaseData::SetPropertyList(PropertyList *pList)
   m_PropertyList = pList;
 }
 
-void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
+void mitk::BaseData::SetOrigin(const mitk::Point3D &origin)
 {
-  TimeGeometry* timeGeom = GetTimeGeometry();
+  TimeGeometry *timeGeom = GetTimeGeometry();
 
-  assert (timeGeom != nullptr);
+  assert(timeGeom != nullptr);
 
   TimeStepType steps = timeGeom->CountTimeSteps();
   for (TimeStepType timestep = 0; timestep < steps; ++timestep)
@@ -209,9 +204,9 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D& origin)
 unsigned long mitk::BaseData::GetMTime() const
 {
   unsigned long time = Superclass::GetMTime();
-  if(m_TimeGeometry.IsNotNull())
+  if (m_TimeGeometry.IsNotNull())
   {
-    if((time < m_TimeGeometry->GetMTime()))
+    if ((time < m_TimeGeometry->GetMTime()))
     {
       Modified();
       return Superclass::GetMTime();
@@ -220,18 +215,18 @@ unsigned long mitk::BaseData::GetMTime() const
   return time;
 }
 
-void mitk::BaseData::Graft(const itk::DataObject*)
+void mitk::BaseData::Graft(const itk::DataObject *)
 {
   itkExceptionMacro(<< "Graft not implemented for mitk::BaseData subclass " << this->GetNameOfClass())
 }
 
-void mitk::BaseData::CopyInformation( const itk::DataObject* data )
+void mitk::BaseData::CopyInformation(const itk::DataObject *data)
 {
-  const Self* bd = dynamic_cast<const Self*>(data);
+  const Self *bd = dynamic_cast<const Self *>(data);
   if (bd != nullptr)
   {
     m_PropertyList = bd->GetPropertyList()->Clone();
-    if (bd->GetTimeGeometry()!=nullptr)
+    if (bd->GetTimeGeometry() != nullptr)
     {
       m_TimeGeometry = bd->GetTimeGeometry()->Clone();
     }
@@ -240,9 +235,8 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
   {
     // pointer could not be cast back down; this can be the case if your filters input
     // and output objects differ in type; then you have to write your own GenerateOutputInformation method
-    itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast "
-      << typeid(data).name() << " to "
-      << typeid(Self*).name() );
+    itkExceptionMacro(<< "mitk::BaseData::CopyInformation() cannot cast " << typeid(data).name() << " to "
+                      << typeid(Self *).name());
   }
 }
 
@@ -259,23 +253,23 @@ void mitk::BaseData::Clear()
 
 void mitk::BaseData::ClearData()
 {
-  if(m_Initialized)
+  if (m_Initialized)
   {
     ReleaseData();
     m_Initialized = false;
   }
 }
 
-void mitk::BaseData::ExecuteOperation(mitk::Operation* /*operation*/)
+void mitk::BaseData::ExecuteOperation(mitk::Operation * /*operation*/)
 {
-  //empty by default. override if needed!
+  // empty by default. override if needed!
 }
 
-void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::BaseData::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << std::endl;
   os << indent << " TimeGeometry: ";
-  if(GetTimeGeometry() == nullptr)
+  if (GetTimeGeometry() == nullptr)
     os << "NULL" << std::endl;
   else
     GetTimeGeometry()->Print(os, indent);
@@ -283,10 +277,10 @@ void mitk::BaseData::PrintSelf(std::ostream& os, itk::Indent indent) const
   PropertyList::Pointer propertyList = this->GetPropertyList();
   if (propertyList.IsNotNull() && !propertyList->IsEmpty())
   {
-    //general headline
+    // general headline
     os << "Properties of BaseData:" << std::endl;
 
-    const PropertyList::PropertyMap* map = propertyList->GetMap();
+    const PropertyList::PropertyMap *map = propertyList->GetMap();
     for (PropertyList::PropertyMap::const_iterator iter = map->begin(); iter != map->end(); ++iter)
     {
       os << "  " << (*iter).first << "   " << (*iter).second->GetValueAsString() << std::endl;

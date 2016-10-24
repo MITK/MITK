@@ -19,12 +19,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::ItkLoggingAdapter::Initialize()
 {
-   itk::OutputWindow::SetInstance(mitk::ItkLoggingAdapter::New());
+  itk::OutputWindow::SetInstance(mitk::ItkLoggingAdapter::New());
 }
 
-void mitk::ItkLoggingAdapter::DisplayText(const char* s)
+void mitk::ItkLoggingAdapter::DisplayText(const char *s)
 {
-   MITK_INFO("ItkLogging") << s;
+  MITK_INFO("ItkLogging") << s;
 }
 
 mitk::ItkLoggingAdapter::ItkLoggingAdapter()
@@ -34,4 +34,3 @@ mitk::ItkLoggingAdapter::ItkLoggingAdapter()
 mitk::ItkLoggingAdapter::~ItkLoggingAdapter()
 {
 }
-

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "mitkInteractionConst.h"
 #include "mitkOperation.h"
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
-#include "mitkInteractionConst.h"
 
 #include "mitkTestingMacros.h"
 
@@ -25,27 +25,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 int g_GlobalCounter = 0;
 
-namespace mitk {
-
-/**
-* @brief Class to check that the destructor of object Operation is called and memory freed
-**/
-class TestOperation : public Operation
+namespace mitk
 {
-public:
-  TestOperation(OperationType operationType)
-    : Operation(operationType)
+  /**
+  * @brief Class to check that the destructor of object Operation is called and memory freed
+  **/
+  class TestOperation : public Operation
   {
-    g_GlobalCounter++;
+  public:
+    TestOperation(OperationType operationType) : Operation(operationType) { g_GlobalCounter++; };
+    virtual ~TestOperation() { g_GlobalCounter--; };
   };
-
-  virtual ~TestOperation()
-  {
-    g_GlobalCounter--;
-  };
-};
-}//namespace
-
+} // namespace
 
 /**
 *  @brief Test of the LimitedLinearUndo object
@@ -66,77 +57,80 @@ public:
 *  tests, argv is either empty for the simple tests or contains the filename
 *  of a test image for the image tests (see CMakeLists.txt).
 */
-int mitkVerboseLimitedLinearUndoTest(int /* argc */, char* /*argv*/[])
+int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
 {
   // always start with this!
   MITK_TEST_BEGIN("VerboseLimitedLinearUndo")
 
   // an UndoController for the management
-  auto  myUndoController = new mitk::UndoController();
+  auto myUndoController = new mitk::UndoController();
 
-  //set model, even if it is verboseLimitedLinearUndo by default; this already is tested by UndoControllerTest!
+  // set model, even if it is verboseLimitedLinearUndo by default; this already is tested by UndoControllerTest!
   myUndoController->SwitchUndoModel(mitk::UndoController::VERBOSE_LIMITEDLINEARUNDO);
 
-  for (int i = 0; i<2; i++)
+  for (int i = 0; i < 2; i++)
   {
-    auto  doOp = new mitk::TestOperation(mitk::OpTEST);
+    auto doOp = new mitk::TestOperation(mitk::OpTEST);
     auto undoOp = new mitk::TestOperation(mitk::OpTEST);
     mitk::OperationEvent *operationEvent = new mitk::OperationEvent(nullptr, doOp, undoOp, "Test");
     myUndoController->SetOperationEvent(operationEvent);
-    //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
+    // increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at
+    // once.
     mitk::OperationEvent::IncCurrObjectEventId();
   }
 
-  //now 2 * 2 operation should have been instanciated
-  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4,"checking initialization of mitkOperation");
+  // now 2 * 2 operation should have been instanciated
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking initialization of mitkOperation");
 
-  //undo one operation; 1 operationEvent element in undo list, 1 in Redo list
+  // undo one operation; 1 operationEvent element in undo list, 1 in Redo list
   myUndoController->Undo();
 
-  //sending two new OperationEvents: RedoList should be deleted and memory of operations freed
-  for (int i = 0; i<2; i++)
+  // sending two new OperationEvents: RedoList should be deleted and memory of operations freed
+  for (int i = 0; i < 2; i++)
   {
-    auto  doOp = new mitk::TestOperation(mitk::OpTEST);
+    auto doOp = new mitk::TestOperation(mitk::OpTEST);
     auto undoOp = new mitk::TestOperation(mitk::OpTEST);
     mitk::OperationEvent *operationEvent = new mitk::OperationEvent(nullptr, doOp, undoOp, "Test");
     myUndoController->SetOperationEvent(operationEvent);
-    //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
+    // increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at
+    // once.
     mitk::OperationEvent::IncCurrObjectEventId();
   }
 
-  //2 operations should have been deleted, 4 should have been added
-  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 6,"checking adding of operations");
+  // 2 operations should have been deleted, 4 should have been added
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 6, "checking adding of operations");
 
-  //two operations to RedoList
+  // two operations to RedoList
   myUndoController->Undo();
   myUndoController->ClearRedoList();
 
-  //one operationEvent containing 2 operations should have been deleted
-  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4,"checking deleting RedoList");
+  // one operationEvent containing 2 operations should have been deleted
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking deleting RedoList");
 
-  //clear all
+  // clear all
   myUndoController->Clear();
-  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 0,"checking deleting all operations in UndoModel");
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 0, "checking deleting all operations in UndoModel");
 
-  //sending two new OperationEvents
-  for (int i = 0; i<2; i++)
+  // sending two new OperationEvents
+  for (int i = 0; i < 2; i++)
   {
-    auto  doOp = new mitk::TestOperation(mitk::OpTEST);
+    auto doOp = new mitk::TestOperation(mitk::OpTEST);
     auto undoOp = new mitk::TestOperation(mitk::OpTEST);
     mitk::OperationEvent *operationEvent = new mitk::OperationEvent(nullptr, doOp, undoOp, "Test");
     myUndoController->SetOperationEvent(operationEvent);
-    //increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at once.
+    // increase the ID to separate the operationEvents from each other. Otherwise they would be undone all together at
+    // once.
     mitk::OperationEvent::IncCurrObjectEventId();
   }
-  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4,"checking added operations in UndoModel");
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking added operations in UndoModel");
 
   delete myUndoController;
 
-  //after deleting UndoController g_GlobalCounter will still be 4 because m_CurrentUndoModel inside myUndoModel is a static singleton
-  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4,"checking singleton UndoModel");
+  // after deleting UndoController g_GlobalCounter will still be 4 because m_CurrentUndoModel inside myUndoModel is a
+  // static singleton
+  MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking singleton UndoModel");
 
   // always end with this!
   MITK_TEST_END()
-  //operations will be deleted after terminating the application
+  // operations will be deleted after terminating the application
 }
-

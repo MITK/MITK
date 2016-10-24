@@ -18,37 +18,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkVtkLayerController.h"
 
-#include <mitkConfig.h>
-#include <itkObject.h>
 #include <itkMacro.h>
+#include <itkObject.h>
 #include <itksys/SystemTools.hxx>
+#include <mitkConfig.h>
 
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
 #include <vtkObjectFactory.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 
 #include <vtkInteractorObserver.h>
 
 #include <algorithm>
 
-
-mitk::VtkWidgetRendering::VtkWidgetRendering()
-: m_RenderWindow( nullptr ),
-  m_VtkWidget( nullptr ),
-  m_IsEnabled( false )
+mitk::VtkWidgetRendering::VtkWidgetRendering() : m_RenderWindow(nullptr), m_VtkWidget(nullptr), m_IsEnabled(false)
 {
   m_Renderer = vtkRenderer::New();
 }
 
-
 mitk::VtkWidgetRendering::~VtkWidgetRendering()
 {
-  if ( m_RenderWindow != nullptr )
-    if ( this->IsEnabled() )
+  if (m_RenderWindow != nullptr)
+    if (this->IsEnabled())
       this->Disable();
 
-  if ( m_Renderer != nullptr )
+  if (m_Renderer != nullptr)
     m_Renderer->Delete();
 }
 
@@ -57,7 +52,7 @@ mitk::VtkWidgetRendering::~VtkWidgetRendering()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::VtkWidgetRendering::SetRenderWindow( vtkRenderWindow* renderWindow )
+void mitk::VtkWidgetRendering::SetRenderWindow(vtkRenderWindow *renderWindow)
 {
   m_RenderWindow = renderWindow;
 }
@@ -66,7 +61,7 @@ void mitk::VtkWidgetRendering::SetRenderWindow( vtkRenderWindow* renderWindow )
  * Returns the vtkRenderWindow, which is used
  * for displaying the widget
  */
-vtkRenderWindow* mitk::VtkWidgetRendering::GetRenderWindow()
+vtkRenderWindow *mitk::VtkWidgetRendering::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -76,7 +71,7 @@ vtkRenderWindow* mitk::VtkWidgetRendering::GetRenderWindow()
  * rendering the  widget into the
  * vtkRenderWindow
  */
-vtkRenderer* mitk::VtkWidgetRendering::GetVtkRenderer()
+vtkRenderer *mitk::VtkWidgetRendering::GetVtkRenderer()
 {
   return m_Renderer;
 }
@@ -87,23 +82,22 @@ vtkRenderer* mitk::VtkWidgetRendering::GetVtkRenderer()
  */
 void mitk::VtkWidgetRendering::Enable()
 {
-  if(m_IsEnabled)
+  if (m_IsEnabled)
     return;
 
-  if(m_RenderWindow != nullptr)
+  if (m_RenderWindow != nullptr)
   {
     vtkRenderWindowInteractor *interactor = m_RenderWindow->GetInteractor();
 
-    if ( m_VtkWidget != nullptr )
+    if (m_VtkWidget != nullptr)
     {
-      m_VtkWidget->SetInteractor( interactor );
+      m_VtkWidget->SetInteractor(interactor);
 
-      mitk::VtkLayerController *layerController =
-        mitk::VtkLayerController::GetInstance(m_RenderWindow);
+      mitk::VtkLayerController *layerController = mitk::VtkLayerController::GetInstance(m_RenderWindow);
 
-      if ( layerController )
+      if (layerController)
       {
-        layerController->InsertForegroundRenderer(m_Renderer,false);
+        layerController->InsertForegroundRenderer(m_Renderer, false);
       }
 
       m_IsEnabled = true;
@@ -111,19 +105,17 @@ void mitk::VtkWidgetRendering::Enable()
   }
 }
 
-
 /**
  * Disables drawing of the widget.
  * If you want to enable it, call the Enable() function.
  */
 void mitk::VtkWidgetRendering::Disable()
 {
-  if ( this->IsEnabled() )
+  if (this->IsEnabled())
   {
-    mitk::VtkLayerController *layerController =
-      mitk::VtkLayerController::GetInstance(m_RenderWindow);
+    mitk::VtkLayerController *layerController = mitk::VtkLayerController::GetInstance(m_RenderWindow);
 
-    if ( layerController )
+    if (layerController)
     {
       layerController->RemoveRenderer(m_Renderer);
     }
@@ -138,31 +130,30 @@ void mitk::VtkWidgetRendering::Disable()
  */
 bool mitk::VtkWidgetRendering::IsEnabled()
 {
-  return  m_IsEnabled;
+  return m_IsEnabled;
 }
-
 
 void mitk::VtkWidgetRendering::SetRequestedRegionToLargestPossibleRegion()
 {
-    //nothing to do
+  // nothing to do
 }
 
 bool mitk::VtkWidgetRendering::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return false;
+  return false;
 }
 
 bool mitk::VtkWidgetRendering::VerifyRequestedRegion()
 {
-    return true;
+  return true;
 }
 
-void mitk::VtkWidgetRendering::SetRequestedRegion( const itk::DataObject*)
+void mitk::VtkWidgetRendering::SetRequestedRegion(const itk::DataObject *)
 {
-    //nothing to do
+  // nothing to do
 }
 
-void mitk::VtkWidgetRendering::SetVtkWidget( vtkInteractorObserver *widget )
+void mitk::VtkWidgetRendering::SetVtkWidget(vtkInteractorObserver *widget)
 {
   m_VtkWidget = widget;
 }

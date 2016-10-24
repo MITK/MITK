@@ -14,14 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkLookupTables.h"
 
 template class mitk::GenericLookupTable<bool>;
 template class mitk::GenericLookupTable<float>;
 template class mitk::GenericLookupTable<int>;
 template class mitk::GenericLookupTable<std::string>;
-
 
 mitkSpecializeGenericLookupTableOperator(mitk::BoolLookupTable);
 mitkSpecializeGenericLookupTableOperator(mitk::FloatLookupTable);

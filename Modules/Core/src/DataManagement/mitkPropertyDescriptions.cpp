@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPropertyDescriptions.h"
 #include <algorithm>
-#include <utility>
 #include <regex>
+#include <utility>
 
 mitk::PropertyDescriptions::PropertyDescriptions()
 {
@@ -27,12 +27,15 @@ mitk::PropertyDescriptions::~PropertyDescriptions()
 {
 }
 
-bool mitk::PropertyDescriptions::AddDescription(const std::string& propertyName, const std::string& description, const std::string& className, bool overwrite)
+bool mitk::PropertyDescriptions::AddDescription(const std::string &propertyName,
+                                                const std::string &description,
+                                                const std::string &className,
+                                                bool overwrite)
 {
   if (propertyName.empty())
     return false;
 
-  DescriptionMap& descriptions = m_Descriptions[className];
+  DescriptionMap &descriptions = m_Descriptions[className];
   std::pair<DescriptionMapIterator, bool> ret = descriptions.insert(std::make_pair(propertyName, description));
 
   if (!ret.second && overwrite)
@@ -44,21 +47,24 @@ bool mitk::PropertyDescriptions::AddDescription(const std::string& propertyName,
   return ret.second;
 }
 
-bool mitk::PropertyDescriptions::AddDescriptionRegEx(const std::string& propertyRegEx, const std::string& description, const std::string& className, bool overwrite)
+bool mitk::PropertyDescriptions::AddDescriptionRegEx(const std::string &propertyRegEx,
+                                                     const std::string &description,
+                                                     const std::string &className,
+                                                     bool overwrite)
 {
   if (propertyRegEx.empty())
     return false;
 
   try
   {
-    std::regex checker(propertyRegEx); //no exception => valid we can change the info
+    std::regex checker(propertyRegEx); // no exception => valid we can change the info
   }
   catch (std::regex_error)
   {
     return false;
   }
 
-  DescriptionMap& descriptions = m_DescriptionsRegEx[className];
+  DescriptionMap &descriptions = m_DescriptionsRegEx[className];
   std::pair<DescriptionMapIterator, bool> ret = descriptions.insert(std::make_pair(propertyRegEx, description));
 
   if (!ret.second && overwrite)
@@ -70,7 +76,9 @@ bool mitk::PropertyDescriptions::AddDescriptionRegEx(const std::string& property
   return ret.second;
 }
 
-std::string mitk::PropertyDescriptions::GetDescription(const std::string& propertyName, const std::string& className, bool allowNameRegEx) const
+std::string mitk::PropertyDescriptions::GetDescription(const std::string &propertyName,
+                                                       const std::string &className,
+                                                       bool allowNameRegEx) const
 {
   if (!propertyName.empty())
   {
@@ -87,8 +95,7 @@ std::string mitk::PropertyDescriptions::GetDescription(const std::string& proper
 
   if (allowNameRegEx && !propertyName.empty())
   {
-    auto selector = [propertyName](const DescriptionMap::value_type& x)
-    {
+    auto selector = [propertyName](const DescriptionMap::value_type &x) {
       std::regex ex(x.first);
       return std::regex_match(propertyName, ex);
     };
@@ -107,7 +114,9 @@ std::string mitk::PropertyDescriptions::GetDescription(const std::string& proper
   return "";
 }
 
-bool mitk::PropertyDescriptions::HasDescription(const std::string& propertyName, const std::string& className, bool allowNameRegEx) const
+bool mitk::PropertyDescriptions::HasDescription(const std::string &propertyName,
+                                                const std::string &className,
+                                                bool allowNameRegEx) const
 {
   if (!propertyName.empty())
   {
@@ -124,8 +133,7 @@ bool mitk::PropertyDescriptions::HasDescription(const std::string& propertyName,
 
   if (allowNameRegEx && !propertyName.empty())
   {
-    auto selector = [propertyName](const DescriptionMap::value_type& x)
-    {
+    auto selector = [propertyName](const DescriptionMap::value_type &x) {
       std::regex ex(x.first);
       return std::regex_match(propertyName, ex);
     };
@@ -144,13 +152,13 @@ bool mitk::PropertyDescriptions::HasDescription(const std::string& propertyName,
   return false;
 }
 
-void mitk::PropertyDescriptions::RemoveAllDescriptions(const std::string& className)
+void mitk::PropertyDescriptions::RemoveAllDescriptions(const std::string &className)
 {
   m_Descriptions[className].clear();
   m_DescriptionsRegEx[className].clear();
 }
 
-void mitk::PropertyDescriptions::RemoveDescription(const std::string& propertyName, const std::string& className)
+void mitk::PropertyDescriptions::RemoveDescription(const std::string &propertyName, const std::string &className)
 {
   if (!propertyName.empty())
   {

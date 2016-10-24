@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateProperty.h"
 #include "mitkDataNode.h"
 
-
-
-mitk::NodePredicateProperty::NodePredicateProperty(const char* propertyName, mitk::BaseProperty* p, const mitk::BaseRenderer *renderer)
-: NodePredicateBase(), m_ValidProperty(p), m_ValidPropertyName(propertyName), m_Renderer(renderer)
+mitk::NodePredicateProperty::NodePredicateProperty(const char *propertyName,
+                                                   mitk::BaseProperty *p,
+                                                   const mitk::BaseRenderer *renderer)
+  : NodePredicateBase(), m_ValidProperty(p), m_ValidPropertyName(propertyName), m_Renderer(renderer)
 {
 }
 
@@ -28,8 +28,7 @@ mitk::NodePredicateProperty::~NodePredicateProperty()
 {
 }
 
-
-bool mitk::NodePredicateProperty::CheckNode(const mitk::DataNode* node) const
+bool mitk::NodePredicateProperty::CheckNode(const mitk::DataNode *node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateProperty: invalid node");
@@ -39,7 +38,7 @@ bool mitk::NodePredicateProperty::CheckNode(const mitk::DataNode* node) const
 
   // check, if any of the properties of node are equal to m_ValidProperty.
   if (m_ValidProperty.IsNull())
-  //if (m_ValidProperty==NULL)
+  // if (m_ValidProperty==NULL)
   {
     return (node->GetProperty(m_ValidPropertyName.c_str(), m_Renderer) != NULL); // search only for name
   }

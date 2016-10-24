@@ -14,16 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include <mitkImageCast.txx>
 #include <mitkInstantiateAccessFunctions.h>
 
 namespace mitk
 {
+#define InstantiateAccessFunction_CastToItkImage(pixelType, dim)                                                       \
+                                                                                                                       \
+  template MITKCORE_EXPORT void CastToItkImage(const mitk::Image *,                                                    \
+                                               itk::SmartPointer<ImageTypeTrait<pixelType, dim>::ImageType> &);
 
-#define InstantiateAccessFunction_CastToItkImage(pixelType, dim) \
-template MITKCORE_EXPORT void CastToItkImage(const mitk::Image *, itk::SmartPointer<ImageTypeTrait<pixelType,dim>::ImageType>&);
-
-InstantiateAccessFunctionForFixedType(CastToItkImage, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
-
+  InstantiateAccessFunctionForFixedType(CastToItkImage,
+                                        MITK_ACCESSBYITK_PIXEL_TYPES_SEQ MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES_SEQ,
+                                        MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 }

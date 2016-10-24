@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkImage.h"
-#include "mitkImageTimeSelector.h"
 #include "mitkImageGenerator.h"
+#include "mitkImageTimeSelector.h"
 
 #include "mitkTestingMacros.h"
 
@@ -25,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 
 #include <fstream>
-
 
 /** Global members common for all subtests */
 namespace
@@ -35,15 +33,16 @@ namespace
 } // end of anonymous namespace
 
 /** @brief Global test setup */
-static void Setup( )
+static void Setup()
 {
   try
   {
-    m_Image = mitk::IOUtil::LoadImage( m_Filename );
+    m_Image = mitk::IOUtil::LoadImage(m_Filename);
   }
-  catch( const itk::ExceptionObject &e)
+  catch (const itk::ExceptionObject &e)
   {
-    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename <<"\n" << e.what())
+    MITK_TEST_FAILED_MSG(<< "(Setup) Caught exception from IOUtil while loading input : " << m_Filename << "\n"
+                         << e.what())
   }
 }
 
@@ -56,7 +55,7 @@ static void Valid_AllInputTimesteps_ReturnsTrue()
 
   // test all timesteps
   const unsigned int maxTimeStep = m_Image->GetTimeSteps();
-  for( unsigned int t=0; t<maxTimeStep; t++)
+  for (unsigned int t = 0; t < maxTimeStep; t++)
   {
     timeSelector->SetTimeNr(t);
     timeSelector->Update();
@@ -64,13 +63,10 @@ static void Valid_AllInputTimesteps_ReturnsTrue()
     mitk::Image::Pointer currentTimestepImage = timeSelector->GetOutput();
 
     std::stringstream ss;
-    ss << " : Valid image in timestep " << t ;
+    ss << " : Valid image in timestep " << t;
 
-    MITK_TEST_CONDITION_REQUIRED( currentTimestepImage.IsNotNull()
-                                  , ss.str().c_str() );
+    MITK_TEST_CONDITION_REQUIRED(currentTimestepImage.IsNotNull(), ss.str().c_str());
   }
-
-
 }
 
 static void Valid_ImageExpandedByTimestep_ReturnsTrue()
@@ -80,17 +76,17 @@ static void Valid_ImageExpandedByTimestep_ReturnsTrue()
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
 
   const unsigned int maxTimeStep = m_Image->GetTimeSteps();
-  mitk::TimeGeometry* tsg = m_Image->GetTimeGeometry();
-  mitk::ProportionalTimeGeometry* ptg = dynamic_cast<mitk::ProportionalTimeGeometry*>(tsg);
-  ptg->Expand(maxTimeStep+1);
-  ptg->SetTimeStepGeometry( ptg->GetGeometryForTimeStep(0), maxTimeStep );
+  mitk::TimeGeometry *tsg = m_Image->GetTimeGeometry();
+  mitk::ProportionalTimeGeometry *ptg = dynamic_cast<mitk::ProportionalTimeGeometry *>(tsg);
+  ptg->Expand(maxTimeStep + 1);
+  ptg->SetTimeStepGeometry(ptg->GetGeometryForTimeStep(0), maxTimeStep);
 
   mitk::Image::Pointer expandedImage = mitk::Image::New();
-  expandedImage->Initialize( m_Image->GetPixelType(0), *tsg );
+  expandedImage->Initialize(m_Image->GetPixelType(0), *tsg);
 
   timeSelector->SetInput(expandedImage);
 
-  for( unsigned int t=0; t<maxTimeStep+1; t++)
+  for (unsigned int t = 0; t < maxTimeStep + 1; t++)
   {
     timeSelector->SetTimeNr(t);
     timeSelector->Update();
@@ -98,18 +94,17 @@ static void Valid_ImageExpandedByTimestep_ReturnsTrue()
     mitk::Image::Pointer currentTimestepImage = timeSelector->GetOutput();
 
     std::stringstream ss;
-    ss << " : Valid image in timestep " << t ;
+    ss << " : Valid image in timestep " << t;
 
-    MITK_TEST_CONDITION_REQUIRED( currentTimestepImage.IsNotNull()
-                                  , ss.str().c_str() );
+    MITK_TEST_CONDITION_REQUIRED(currentTimestepImage.IsNotNull(), ss.str().c_str());
   }
 }
 
-int mitkImageTimeSelectorTest(int /*argc*/, char* argv[])
+int mitkImageTimeSelectorTest(int /*argc*/, char *argv[])
 {
   MITK_TEST_BEGIN(mitkImageTimeSelectorTest);
 
-  m_Filename = std::string( argv[1] );
+  m_Filename = std::string(argv[1]);
 
   Valid_AllInputTimesteps_ReturnsTrue();
   Valid_ImageExpandedByTimestep_ReturnsTrue();

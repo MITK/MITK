@@ -10,11 +10,11 @@
 
 #include <iomanip>
 
-#include "mitkNumericConstants.h"
 #include "mitkLogMacros.h"
+#include "mitkNumericConstants.h"
 
-namespace mitk {
-
+namespace mitk
+{
   /**
    * Helper method to check if the difference is bigger or equal to a given epsilon
    *
@@ -39,11 +39,14 @@ namespace mitk {
    * @param isEqual function will only output something if the two elements are not equal
    */
   template <typename ElementToOutput1, typename ElementToOutput2>
-  inline void ConditionalOutputOfDifference(ElementToOutput1 elem1, ElementToOutput2 elem2, mitk::ScalarType eps, bool verbose, bool isEqual)
+  inline void ConditionalOutputOfDifference(
+    ElementToOutput1 elem1, ElementToOutput2 elem2, mitk::ScalarType eps, bool verbose, bool isEqual)
   {
-    if(verbose && !isEqual)
+    if (verbose && !isEqual)
     {
-      MITK_INFO << typeid(ElementToOutput1).name() << " and " << typeid(ElementToOutput2).name() << " not equal. Lefthandside " << std::setprecision(12) << elem1 << " - Righthandside " << elem2 << " - epsilon " << eps;
+      MITK_INFO << typeid(ElementToOutput1).name() << " and " << typeid(ElementToOutput2).name()
+                << " not equal. Lefthandside " << std::setprecision(12) << elem1 << " - Righthandside " << elem2
+                << " - epsilon " << eps;
     }
   }
 
@@ -56,17 +59,14 @@ namespace mitk {
    * @param verbose Flag indicating detailed console output.
    * @return True if scalars are equal.
    */
-  inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps=mitk::eps, bool verbose=false)
+  inline bool Equal(ScalarType scalar1, ScalarType scalar2, ScalarType eps = mitk::eps, bool verbose = false)
   {
-    bool isEqual( !DifferenceBiggerOrEqualEps(scalar1-scalar2, eps));
+    bool isEqual(!DifferenceBiggerOrEqualEps(scalar1 - scalar2, eps));
 
     ConditionalOutputOfDifference(scalar1, scalar2, eps, verbose, isEqual);
 
     return isEqual;
   }
-
 }
-
-
 
 #endif /* MITKEQUAL_H_ */

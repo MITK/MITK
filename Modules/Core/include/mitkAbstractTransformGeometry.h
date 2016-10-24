@@ -17,14 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
-#include <MitkCoreExports.h>
 #include "mitkPlaneGeometry.h"
+#include <MitkCoreExports.h>
 
 #include "itkVtkAbstractTransform.h"
 
 class vtkAbstractTransform;
 
-namespace mitk {
+namespace mitk
+{
   //##Documentation
   //## @brief Describes a geometry defined by an vtkAbstractTransform and a plane
   //##
@@ -49,12 +50,11 @@ namespace mitk {
   public:
     mitkClassMacro(AbstractTransformGeometry, PlaneGeometry);
 
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       //##Documentation
       //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
-      virtual vtkAbstractTransform* GetVtkAbstractTransform() const;
+      virtual vtkAbstractTransform *GetVtkAbstractTransform() const;
 
     virtual unsigned long GetMTime() const override;
 
@@ -73,7 +73,9 @@ namespace mitk {
     * \brief projects a given vector starting from given point onto the curved plane
     * \warning no satisfiyng implementation existing yet
     */
-    virtual bool Project(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm) const override;
+    virtual bool Project(const mitk::Point3D &atPt3d_mm,
+                         const mitk::Vector3D &vec3d_mm,
+                         mitk::Vector3D &projectedVec3d_mm) const override;
 
     /**
     * \brief projects a given vector starting from standard point onto the curved plane
@@ -85,9 +87,13 @@ namespace mitk {
 
     virtual void Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const override;
 
-    virtual bool Map(const mitk::Point3D & atPt3d_mm, const mitk::Vector3D &vec3d_mm, mitk::Vector2D &vec2d_mm) const override;
+    virtual bool Map(const mitk::Point3D &atPt3d_mm,
+                     const mitk::Vector3D &vec3d_mm,
+                     mitk::Vector2D &vec2d_mm) const override;
 
-    virtual void Map(const mitk::Point2D & atPt2d_mm, const mitk::Vector2D &vec2d_mm, mitk::Vector3D &vec3d_mm) const override;
+    virtual void Map(const mitk::Point2D &atPt2d_mm,
+                     const mitk::Vector2D &vec2d_mm,
+                     mitk::Vector3D &vec3d_mm) const override;
 
     virtual void IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const override;
 
@@ -96,9 +102,12 @@ namespace mitk {
     //##Documentation
     //## @brief Convert (continuous or discrete) index coordinates of a \em vector
     //## \a vec_units to world coordinates (in mm)
-    //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
+    //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const
+    // mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
     //## For further information about coordinates types, please see the Geometry documentation
-    virtual void IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const override;
+    virtual void IndexToWorld(const mitk::Point2D &atPt2d_units,
+                              const mitk::Vector2D &vec_units,
+                              mitk::Vector2D &vec_mm) const override;
 
     //##Documentation
     //## @brief Convert (continuous or discrete) index coordinates of a \em vector
@@ -109,9 +118,12 @@ namespace mitk {
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em vector
     //## \a vec_mm to (continuous!) index coordinates.
-    //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
+    //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const
+    // mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
     //## For further information about coordinates types, please see the Geometry documentation
-    virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const override;
+    virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm,
+                              const mitk::Vector2D &vec_mm,
+                              mitk::Vector2D &vec_units) const override;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em vector
@@ -119,11 +131,11 @@ namespace mitk {
     //## For further information about coordinates types, please see the Geometry documentation
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const override;
 
-    virtual bool IsAbove(const Point3D& pt3d_mm, bool considerBoundingBox = false) const override;
+    virtual bool IsAbove(const Point3D &pt3d_mm, bool considerBoundingBox = false) const override;
 
     virtual mitk::ScalarType GetParametricExtentInMM(int direction) const;
 
-    virtual const itk::Transform<mitk::ScalarType, 3, 3>* GetParametricTransform() const;
+    virtual const itk::Transform<mitk::ScalarType, 3, 3> *GetParametricTransform() const;
 
     //##Documentation
     //## @brief Change the parametric bounds to @a oversampling times
@@ -149,7 +161,7 @@ namespace mitk {
     //## Maybe used as a hint within which the interpolation shall occur
     //## by concrete sub-classes.
     //## \sa CalculateFrameGeometry
-    virtual void SetFrameGeometry(const mitk::BaseGeometry* frameGeometry);
+    virtual void SetFrameGeometry(const mitk::BaseGeometry *frameGeometry);
 
     virtual itk::LightObject::Pointer InternalClone() const override;
 
@@ -163,7 +175,7 @@ namespace mitk {
     //## @brief Get the parametric bounds
     //##
     //## See AbstractTransformGeometry for an example usage of this.
-    const BoundingBox::BoundsArrayType& GetParametricBounds() const;
+    const BoundingBox::BoundsArrayType &GetParametricBounds() const;
 
     //##Documentation
     //## @brief Get the parametric extent
@@ -173,7 +185,7 @@ namespace mitk {
 
   protected:
     AbstractTransformGeometry();
-    AbstractTransformGeometry(const AbstractTransformGeometry& other);
+    AbstractTransformGeometry(const AbstractTransformGeometry &other);
 
     virtual ~AbstractTransformGeometry();
 
@@ -181,7 +193,7 @@ namespace mitk {
     //## @brief Set the vtkAbstractTransform (stored in m_VtkAbstractTransform)
     //##
     //## Protected in this class, made public in ExternAbstractTransformGeometry.
-    virtual void SetVtkAbstractTransform(vtkAbstractTransform* aVtkAbstractTransform);
+    virtual void SetVtkAbstractTransform(vtkAbstractTransform *aVtkAbstractTransform);
 
     //##Documentation
     //## @brief Set the rectangular area that is used for transformation by
@@ -191,7 +203,7 @@ namespace mitk {
     //## Protected in this class, made public in ExternAbstractTransformGeometry.
     //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
     //## @note The PlaneGeometry is cloned, @em not linked/referenced.
-    virtual void SetPlane(const mitk::PlaneGeometry* aPlane);
+    virtual void SetPlane(const mitk::PlaneGeometry *aPlane);
 
     //##Documentation
     //## @brief The rectangular area that is used for transformation by
@@ -208,7 +220,7 @@ namespace mitk {
     //##
     //## Protected in this class, made public in some sub-classes, e.g.,
     //## ExternAbstractTransformGeometry.
-    virtual void SetParametricBounds(const BoundingBox::BoundsArrayType& bounds);
+    virtual void SetParametricBounds(const BoundingBox::BoundsArrayType &bounds);
 
     mutable mitk::BoundingBox::Pointer m_ParametricBoundingBox;
 
@@ -218,7 +230,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& aSpacing) override{ Superclass::PreSetSpacing(aSpacing); };
+    virtual void PreSetSpacing(const mitk::Vector3D &aSpacing) override { Superclass::PreSetSpacing(aSpacing); };
   };
 } // namespace mitk
 #endif /* MITKVTKABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */

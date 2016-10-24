@@ -19,8 +19,8 @@
 
 #include "itkObject.h"
 #include "mitkCommon.h"
-#include "mitkMessage.h"
 #include "mitkInteractionEventHandler.h"
+#include "mitkMessage.h"
 
 #include <MitkCoreExports.h>
 #include <string>
@@ -30,15 +30,18 @@
  * It assumes that there is a typedef Classname Self in classes that use
  * this macro, as is provided by e.g. mitkClassMacro
  */
-#define CONNECT_FUNCTION(a, f) \
-  ::mitk::EventStateMachine::AddActionFunction(a, ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction*, ::mitk::InteractionEvent*, void>(this, &Self::f));
+#define CONNECT_FUNCTION(a, f)                                                                                         \
+  ::mitk::EventStateMachine::AddActionFunction(                                                                        \
+    a,                                                                                                                 \
+    ::mitk::MessageDelegate2<Self, ::mitk::StateMachineAction *, ::mitk::InteractionEvent *, void>(this, &Self::f));
 
-#define CONNECT_CONDITION(a, f) \
-  ::mitk::EventStateMachine::AddConditionFunction(a, ::mitk::MessageDelegate1<Self,const ::mitk::InteractionEvent*, bool>(this, &Self::f));
+#define CONNECT_CONDITION(a, f)                                                                                        \
+  ::mitk::EventStateMachine::AddConditionFunction(                                                                     \
+    a, ::mitk::MessageDelegate1<Self, const ::mitk::InteractionEvent *, bool>(this, &Self::f));
 
-
-namespace us {
-class Module;
+namespace us
+{
+  class Module;
 }
 
 namespace mitk
@@ -61,21 +64,23 @@ namespace mitk
   class TActionFunctor
   {
   public:
-    virtual bool DoAction(StateMachineAction*, InteractionEvent*)=0;
-    virtual ~TActionFunctor()
-    {
-    }
+    virtual bool DoAction(StateMachineAction *, InteractionEvent *) = 0;
+    virtual ~TActionFunctor() {}
   };
 
   ///**
   // * \class TSpecificActionFunctor
-  // * Specific implementation of ActionFunctor class, implements a reference to the function which is to be executed. It takes two arguments:
-  // * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused the transition.
+  // * Specific implementation of ActionFunctor class, implements a reference to the function which is to be executed.
+  // It
+  // takes two arguments:
+  // * StateMachineAction - the action by which the function call is invoked, InteractionEvent - the event that caused
+  // the
+  // transition.
   // */
-  //template<class T>
-  //class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
+  // template<class T>
+  // class DEPRECATED() TSpecificActionFunctor : public TActionFunctor
   //{
-  //public:
+  // public:
 
   //  TSpecificActionFunctor(T* object, bool (T::*memberFunctionPointer)(StateMachineAction*, InteractionEvent*)) :
   //      m_Object(object), m_MemberFunctionPointer(memberFunctionPointer)
@@ -90,7 +95,7 @@ namespace mitk
   //    return (*m_Object.*m_MemberFunctionPointer)(action, event);// executes member function
   //  }
 
-  //private:
+  // private:
   //  T* m_Object;
   //  bool (T::*m_MemberFunctionPointer)(StateMachineAction*, InteractionEvent*);
   //};
@@ -101,17 +106,18 @@ namespace mitk
    * \brief Super-class that provides the functionality of a StateMachine to DataInteractors.
    *
    * A state machine is created by loading a state machine pattern. It consists of states, transitions and action.
-   * The state represent the current status of the interaction, transitions are means to switch between states. Each transition
-   * is triggered by an event and it is associated with actions that are to be executed when the state change is performed.
+   * The state represent the current status of the interaction, transitions are means to switch between states. Each
+   * transition
+   * is triggered by an event and it is associated with actions that are to be executed when the state change is
+   * performed.
    *
    */
   class MITKCORE_EXPORT EventStateMachine : public mitk::InteractionEventHandler
   {
-
   public:
     mitkClassMacro(EventStateMachine, InteractionEventHandler)
 
-    typedef std::map<std::string, TActionFunctor*> DEPRECATED(ActionFunctionsMapType);
+      typedef std::map<std::string, TActionFunctor *> DEPRECATED(ActionFunctionsMapType);
 
     typedef itk::SmartPointer<StateMachineState> StateMachineStateType;
 
@@ -122,53 +128,49 @@ namespace mitk
       * Default is the Mitk module (core).
       * The files have to be placed in the Resources/Interaction folder of their respective module.
       **/
-    bool LoadStateMachine(const std::string& filename, const us::Module* module = nullptr);
+    bool LoadStateMachine(const std::string &filename, const us::Module *module = nullptr);
     /**
      * Receives Event from Dispatcher.
-     * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening for
-     * such an Event. If this is the case, the transition to the next state it performed and all actions associated with the transition executed,
+     * Event is mapped using the EventConfig Object to a variant, then it is checked if the StateMachine is listening
+     * for
+     * such an Event. If this is the case, the transition to the next state it performed and all actions associated with
+     * the transition executed,
      * and true is returned to the caller.
      * If the StateMachine can't handle this event false is returned.
      * Attention:
      * If a transition is associated with multiple actions - "true" is returned if one action returns true,
-     * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all actions that occur within
+     * and the event is treated as HANDLED even though some actions might not have been executed! So be sure that all
+     * actions that occur within
      * one transitions have the same conditions.
      */
-    bool HandleEvent(InteractionEvent* event, DataNode* dataNode);
+    bool HandleEvent(InteractionEvent *event, DataNode *dataNode);
 
     /**
     * @brief Enables or disabled Undo.
     **/
-    void EnableUndo(bool enable)
-    {
-      m_UndoEnabled = enable;
-    }
-
+    void EnableUndo(bool enable) { m_UndoEnabled = enable; }
     /**
     * @brief Enables/disables the state machine. In un-enabled state it won't react to any events.
     **/
-    void EnableInteraction(bool enable)
-    {
-      m_IsActive = enable;
-    }
-
+    void EnableInteraction(bool enable) { m_IsActive = enable; }
   protected:
     EventStateMachine();
     virtual ~EventStateMachine();
 
-    typedef MessageAbstractDelegate2<StateMachineAction*, InteractionEvent*, void> ActionFunctionDelegate;
-    typedef MessageAbstractDelegate1<const InteractionEvent*, bool> ConditionFunctionDelegate;
+    typedef MessageAbstractDelegate2<StateMachineAction *, InteractionEvent *, void> ActionFunctionDelegate;
+    typedef MessageAbstractDelegate1<const InteractionEvent *, bool> ConditionFunctionDelegate;
 
     /**
-     * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be executed.
+     * Connects action from StateMachine (String in XML file) with a function that is called when this action is to be
+     * executed.
      */
-    DEPRECATED(void AddActionFunction(const std::string& action, TActionFunctor* functor));
+    DEPRECATED(void AddActionFunction(const std::string &action, TActionFunctor *functor));
 
-    void AddActionFunction(const std::string& action, const ActionFunctionDelegate& delegate);
+    void AddActionFunction(const std::string &action, const ActionFunctionDelegate &delegate);
 
-    void AddConditionFunction(const std::string& condition, const ConditionFunctionDelegate& delegate);
+    void AddConditionFunction(const std::string &condition, const ConditionFunctionDelegate &delegate);
 
-    StateMachineState* GetCurrentState() const;
+    StateMachineState *GetCurrentState() const;
 
     /**
      * @brief ResetToStartState Reset state machine to it initial starting state.
@@ -184,13 +186,13 @@ namespace mitk
 
     virtual void ConnectActionsAndFunctions();
 
-    virtual bool CheckCondition( const StateMachineCondition& condition, const InteractionEvent* interactionEvent );
+    virtual bool CheckCondition(const StateMachineCondition &condition, const InteractionEvent *interactionEvent);
 
     /**
      * Looks up function that is associated with action and executes it.
      * To implement your own execution scheme overwrite this in your DataInteractor.
      */
-    virtual void ExecuteAction(StateMachineAction* action, InteractionEvent* interactionEvent);
+    virtual void ExecuteAction(StateMachineAction *action, InteractionEvent *interactionEvent);
 
     /**
      * Implements filter scheme for events.
@@ -206,17 +208,16 @@ namespace mitk
         return interactionEvent->GetSender()->GetMapperID() == BaseRenderer::Standard2D; // only 2D mappers
       }
      \endcode
-     * or to enforce that the interactor only reacts when the corresponding DataNode is selected in the DataManager view..
+     * or to enforce that the interactor only reacts when the corresponding DataNode is selected in the DataManager
+     view..
      */
-    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode);
-
+    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode);
 
     /** \brief Sets the specified mouse cursor.
      *
      * Use this in subclasses instead of using QmitkApplicationCursor directly.
      */
-    void SetMouseCursor( const char *xpm[], int hotspotX, int hotspotY );
-
+    void SetMouseCursor(const char *xpm[], int hotspotX, int hotspotY);
 
     /** \brief Resets the mouse cursor (if modified by the SlicesCoordinator)
      * to its original state.
@@ -224,7 +225,6 @@ namespace mitk
      * Should be used by subclasses and from external application instead
      * of using QmitkApplicationCursor directly to avoid conflicts. */
     void ResetMouseCursor();
-
 
     /**
     * \brief Returns the executable transition for the given event.
@@ -242,27 +242,26 @@ namespace mitk
     * If a transition has no condition, it is automatically returned.
     * If no executable transition is found, NULL is returned.
     */
-    StateMachineTransition* GetExecutableTransition( InteractionEvent* event );
+    StateMachineTransition *GetExecutableTransition(InteractionEvent *event);
 
     // Determines if state machine reacts to events
     bool m_IsActive;
     // Undo/Redo
-    UndoController* m_UndoController;
+    UndoController *m_UndoController;
     bool m_UndoEnabled;
 
   private:
+    typedef std::map<std::string, ActionFunctionDelegate *> ActionDelegatesMapType;
+    typedef std::map<std::string, ConditionFunctionDelegate *> ConditionDelegatesMapType;
 
-    typedef std::map<std::string, ActionFunctionDelegate*> ActionDelegatesMapType;
-    typedef std::map<std::string, ConditionFunctionDelegate*> ConditionDelegatesMapType;
-
-    StateMachineContainer* m_StateMachineContainer; // storage of all states, action, transitions on which the statemachine operates.
-    std::map<std::string, TActionFunctor*> m_ActionFunctionsMap; // stores association between action string
+    StateMachineContainer
+      *m_StateMachineContainer; // storage of all states, action, transitions on which the statemachine operates.
+    std::map<std::string, TActionFunctor *> m_ActionFunctionsMap; // stores association between action string
     ActionDelegatesMapType m_ActionDelegatesMap;
     ConditionDelegatesMapType m_ConditionDelegatesMap;
     StateMachineStateType m_CurrentState;
 
     bool m_MouseCursorSet;
-
   };
 
 } /* namespace mitk */

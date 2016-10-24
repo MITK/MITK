@@ -16,30 +16,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPointSetShapeProperty.h"
 
-
-mitk::PointSetShapeProperty::PointSetShapeProperty( )
+mitk::PointSetShapeProperty::PointSetShapeProperty()
 {
   this->AddPointSetShapes();
-  this->SetValue( CROSS );
+  this->SetValue(CROSS);
 }
 
-mitk::PointSetShapeProperty::PointSetShapeProperty( const IdType& value )
+mitk::PointSetShapeProperty::PointSetShapeProperty(const IdType &value)
 {
   this->AddPointSetShapes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    this->SetValue( value ) ;
+    this->SetValue(value);
   }
   else
     MITK_WARN << "Warning: invalid point set shape";
 }
 
-mitk::PointSetShapeProperty::PointSetShapeProperty( const std::string& value )
+mitk::PointSetShapeProperty::PointSetShapeProperty(const std::string &value)
 {
   this->AddPointSetShapes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    this->SetValue( value );
+    this->SetValue(value);
   }
   else
     MITK_WARN << "Invalid point set shape";
@@ -47,7 +46,7 @@ mitk::PointSetShapeProperty::PointSetShapeProperty( const std::string& value )
 
 int mitk::PointSetShapeProperty::GetPointSetShape() const
 {
-  return static_cast<int>( this->GetValueAsId() );
+  return static_cast<int>(this->GetValueAsId());
 }
 
 void mitk::PointSetShapeProperty::AddPointSetShapes()
@@ -66,9 +65,9 @@ void mitk::PointSetShapeProperty::AddPointSetShapes()
   AddEnum("HookedArrow", HOOKED_ARROW);
 }
 
-bool mitk::PointSetShapeProperty::AddEnum( const std::string& name, const IdType& id )
+bool mitk::PointSetShapeProperty::AddEnum(const std::string &name, const IdType &id)
 {
-  return Superclass::AddEnum( name, id );
+  return Superclass::AddEnum(name, id);
 }
 
 itk::LightObject::Pointer mitk::PointSetShapeProperty::InternalClone() const

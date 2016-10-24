@@ -15,49 +15,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkCameraController.h"
-#include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
-#include <vtkRenderWindowInteractor.h>
+#include "mitkVtkPropRenderer.h"
 #include "vtkCommand.h"
+#include <vtkRenderWindowInteractor.h>
 
 #include "vtkCamera.h"
 #include "vtkRenderer.h"
-#include <vtkTransform.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
 
-mitk::CameraController::CameraController() :
-  BaseController(),
-  m_Renderer(NULL)
+mitk::CameraController::CameraController() : BaseController(), m_Renderer(NULL)
 {
 }
 
 mitk::CameraController::~CameraController()
-{}
+{
+}
 
 mitk::ScalarType mitk::CameraController::ComputeMaxParallelScale()
 {
   double widthInMM = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(0);
   double heightInMM = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(1);
 
-  double dispHeight = this->GetRenderer()->GetViewportSize()[1]; //in pixel!
+  double dispHeight = this->GetRenderer()->GetViewportSize()[1]; // in pixel!
   double dispWidth = this->GetRenderer()->GetViewportSize()[0];
 
-  //To get the right zooming factor, we need to set the (half) height to the vtk camera using SetParallelScale.
-  //However, it could be, that our picture is so wide or the display so small, that we cannot take the height of the picture.
-  //For a wide picture, we have to take the width and adapt the width so that our image fits to the screen.
-  //But we can only set the height. Therefore, if the width is the limiting factor, we need to get the ratio of scaling
-  //for the width and multiply it with the height, so that we have a modified height and set this one. Believe us, we figured it out...
+  // To get the right zooming factor, we need to set the (half) height to the vtk camera using SetParallelScale.
+  // However, it could be, that our picture is so wide or the display so small, that we cannot take the height of the
+  // picture.
+  // For a wide picture, we have to take the width and adapt the width so that our image fits to the screen.
+  // But we can only set the height. Therefore, if the width is the limiting factor, we need to get the ratio of scaling
+  // for the width and multiply it with the height, so that we have a modified height and set this one. Believe us, we
+  // figured it out...
   if ((dispWidth / widthInMM) < (dispHeight / heightInMM))
   {
     heightInMM = widthInMM / dispWidth * dispHeight;
   }
 
-  return heightInMM *0.5;
+  return heightInMM * 0.5;
 }
 
 void mitk::CameraController::AdjustConstrainedCameraPosition(mitk::Point2D &planePoint)
 {
-  //TODO: GetExtentInMM is calculated wrong for rotated planes, e.g. crosshair rotation (bug 19105)
+  // TODO: GetExtentInMM is calculated wrong for rotated planes, e.g. crosshair rotation (bug 19105)
   double widthInMM = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(0);
   double heightInMM = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(1);
 
@@ -65,13 +66,13 @@ void mitk::CameraController::AdjustConstrainedCameraPosition(mitk::Point2D &plan
 
   double xMin, xMax, yMin, yMax;
 
-  //different calculation of min/max if display is lager/smaller than image.
-  //note, that the plane Position defines the middle of the display but is in image coordinates
+  // different calculation of min/max if display is lager/smaller than image.
+  // note, that the plane Position defines the middle of the display but is in image coordinates
   //([0,0] is defined by the image, so planePosition can sometimes be negative).
   if (dispSizeInMM[0] > widthInMM)
   {
     xMin = widthInMM - 0.5 * dispSizeInMM[0];
-    xMax = 0.5 * dispSizeInMM[0] ;
+    xMax = 0.5 * dispSizeInMM[0];
   }
   else
   {
@@ -82,7 +83,7 @@ void mitk::CameraController::AdjustConstrainedCameraPosition(mitk::Point2D &plan
   if (dispSizeInMM[1] > heightInMM)
   {
     yMin = heightInMM - 0.5 * dispSizeInMM[1];
-    yMax = 0.5 * dispSizeInMM[1] ;
+    yMax = 0.5 * dispSizeInMM[1];
   }
   else
   {
@@ -90,10 +91,22 @@ void mitk::CameraController::AdjustConstrainedCameraPosition(mitk::Point2D &plan
     yMax = heightInMM - 0.5 * dispSizeInMM[1];
   }
 
-  if (planePoint[0] < xMin) { planePoint[0] = xMin; }
-  if (planePoint[1] < yMin) { planePoint[1] = yMin; }
-  if (planePoint[0] > xMax) { planePoint[0] = xMax; }
-  if (planePoint[1] > yMax) { planePoint[1] = yMax; }
+  if (planePoint[0] < xMin)
+  {
+    planePoint[0] = xMin;
+  }
+  if (planePoint[1] < yMin)
+  {
+    planePoint[1] = yMin;
+  }
+  if (planePoint[0] > xMax)
+  {
+    planePoint[0] = xMax;
+  }
+  if (planePoint[1] > yMax)
+  {
+    planePoint[1] = yMax;
+  }
 }
 
 void mitk::CameraController::SetViewToAnterior()
@@ -128,14 +141,14 @@ void mitk::CameraController::SetViewToCaudal()
 
 void mitk::CameraController::SetStandardView(mitk::CameraController::StandardView view)
 {
-  const mitk::VtkPropRenderer* glRenderer = dynamic_cast<const mitk::VtkPropRenderer*>(m_Renderer);
+  const mitk::VtkPropRenderer *glRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(m_Renderer);
   if (glRenderer == NULL)
     return;
-  vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();
+  vtkRenderer *vtkRenderer = glRenderer->GetVtkRenderer();
   assert(vtkRenderer);
 
   mitk::BoundingBox::Pointer bb;
-  mitk::DataStorage* ds = m_Renderer->GetDataStorage();
+  mitk::DataStorage *ds = m_Renderer->GetDataStorage();
   if (ds != NULL)
     bb = ds->ComputeBoundingBox();
   else
@@ -143,53 +156,53 @@ void mitk::CameraController::SetStandardView(mitk::CameraController::StandardVie
 
   if (m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D)
   {
-    //set up the view for the 3D render window. The views for 2D are set up in the mitkVtkPropRenderer
+    // set up the view for the 3D render window. The views for 2D are set up in the mitkVtkPropRenderer
     mitk::Point3D middle = bb->GetCenter();
     vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0], middle[1], middle[2]);
     switch (view)
     {
-    case ANTERIOR:
-    case POSTERIOR:
-    case SINISTER:
-    case DEXTER:
-      vtkRenderer->GetActiveCamera()->SetViewUp(0, 0, 1);
-      break;
-    case CRANIAL:
-    case CAUDAL:
-      vtkRenderer->GetActiveCamera()->SetViewUp(0, -1, 0);
-      break;
+      case ANTERIOR:
+      case POSTERIOR:
+      case SINISTER:
+      case DEXTER:
+        vtkRenderer->GetActiveCamera()->SetViewUp(0, 0, 1);
+        break;
+      case CRANIAL:
+      case CAUDAL:
+        vtkRenderer->GetActiveCamera()->SetViewUp(0, -1, 0);
+        break;
     }
     switch (view)
     {
-    case ANTERIOR:
-      vtkRenderer->GetActiveCamera()->SetPosition(middle[0], -100000, middle[2]);
-      break;
-    case POSTERIOR:
-      vtkRenderer->GetActiveCamera()->SetPosition(middle[0], +100000, middle[2]);
-      break;
-    case SINISTER:
-      vtkRenderer->GetActiveCamera()->SetPosition(+100000, middle[1], middle[2]);
-      break;
-    case DEXTER:
-      vtkRenderer->GetActiveCamera()->SetPosition(-100000, middle[1], middle[2]);
-      break;
-    case CRANIAL:
-      vtkRenderer->GetActiveCamera()->SetPosition(middle[0], middle[1], 100000);
-      break;
-    case CAUDAL:
-      vtkRenderer->GetActiveCamera()->SetPosition(middle[0], middle[1], -100000);
-      break;
+      case ANTERIOR:
+        vtkRenderer->GetActiveCamera()->SetPosition(middle[0], -100000, middle[2]);
+        break;
+      case POSTERIOR:
+        vtkRenderer->GetActiveCamera()->SetPosition(middle[0], +100000, middle[2]);
+        break;
+      case SINISTER:
+        vtkRenderer->GetActiveCamera()->SetPosition(+100000, middle[1], middle[2]);
+        break;
+      case DEXTER:
+        vtkRenderer->GetActiveCamera()->SetPosition(-100000, middle[1], middle[2]);
+        break;
+      case CRANIAL:
+        vtkRenderer->GetActiveCamera()->SetPosition(middle[0], middle[1], 100000);
+        break;
+      case CAUDAL:
+        vtkRenderer->GetActiveCamera()->SetPosition(middle[0], middle[1], -100000);
+        break;
     }
     vtkRenderer->ResetCamera();
 
     vtkRenderer->ResetCameraClippingRange();
   }
 
-  mitk::RenderingManager* rm = m_Renderer->GetRenderingManager();
+  mitk::RenderingManager *rm = m_Renderer->GetRenderingManager();
   rm->RequestUpdateAll();
 }
 
-void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D& planePoint)
+void mitk::CameraController::MoveCameraToPoint(const mitk::Point2D &planePoint)
 {
   Point2D moveToPoint = planePoint;
   AdjustCameraToPlane(moveToPoint);
@@ -202,16 +215,18 @@ void mitk::CameraController::MoveBy(const mitk::Vector2D &moveVectorInMM)
   MoveCameraToPoint(GetCameraPositionOnPlane() + moveVectorInMM);
 }
 
-void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInMM)
+void mitk::CameraController::Zoom(ScalarType factor, const Point2D &zoomPointInMM)
 {
-  if (factor <= 0.0) return;
+  if (factor <= 0.0)
+    return;
   if (this->GetRenderer()->GetMapperID() == BaseRenderer::Standard2D)
   {
-    double parallelScale = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->GetParallelScale()/factor;
+    double parallelScale = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->GetParallelScale() / factor;
     if (this->GetRenderer()->GetConstrainZoomingAndPanning() && factor < 1.0)
     {
       double maxParallelScale = ComputeMaxParallelScale();
-      if (maxParallelScale - parallelScale * factor  < mitk::eps)//this is not the famous 05-bug... Return if already near max zooming
+      if (maxParallelScale - parallelScale * factor <
+          mitk::eps) // this is not the famous 05-bug... Return if already near max zooming
         return;
 
       if (parallelScale > maxParallelScale)
@@ -220,7 +235,7 @@ void mitk::CameraController::Zoom(ScalarType factor, const Point2D& zoomPointInM
       }
     }
     this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
-    //Move camera in a way that the clicked point stays visible on the display where it was.
+    // Move camera in a way that the clicked point stays visible on the display where it was.
     Point2D planePoint = GetCameraPositionOnPlane();
     MoveCameraToPoint(planePoint + ((zoomPointInMM - planePoint) * (factor - 1)));
   }
@@ -243,11 +258,11 @@ void mitk::CameraController::AdjustCameraToPlane()
   }
 }
 
-void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
+void mitk::CameraController::AdjustCameraToPlane(const Point2D &PlanePoint)
 {
   if (this->GetRenderer()->GetMapperID() == BaseRenderer::Standard2D)
   {
-    Point2D _planePoint = PlanePoint;//PlanePoint is const...
+    Point2D _planePoint = PlanePoint; // PlanePoint is const...
     if (this->GetRenderer()->GetConstrainZoomingAndPanning())
     {
       double parallelScale = this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
@@ -261,11 +276,11 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
     const PlaneGeometry *planeGeometry = this->GetRenderer()->GetCurrentWorldPlaneGeometry();
     if (planeGeometry != NULL)
     {
-      this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 1, 0); //set the view-up for the camera
+      this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 1, 0); // set the view-up for the camera
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(_planePoint[0], _planePoint[1], 900000);
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(_planePoint[0], _planePoint[1], 0);
-      //Transform the camera to the current position (transversal, coronal and sagittal plane).
-      //This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
+      // Transform the camera to the current position (transversal, coronal and sagittal plane).
+      // This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
       //(Without not all three planes would be visible).
       vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
       vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -299,7 +314,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D& PlanePoint)
       matrix->SetElement(3, 3, 1.0);
 
       trans->SetMatrix(matrix);
-      //Transform the camera to the current position (transversal, coronal and sagittal plane).
+      // Transform the camera to the current position (transversal, coronal and sagittal plane).
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
   }
@@ -311,27 +326,26 @@ void mitk::CameraController::Fit()
   {
     this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(ComputeMaxParallelScale());
 
-    this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()
-      ->SetClippingRange(0.1, 1000000);
-    //Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823) in VTK bugtracker.
+    this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(0.1, 1000000);
+    // Reason for huge range: VTK seems to calculate the clipping planes wrong for small values. See VTK bug (id #7823)
+    // in VTK bugtracker.
 
     Point2D planePoint;
-    planePoint[0] = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(0)*0.5;
-    planePoint[1] = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(1)*0.5;
+    planePoint[0] = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(0) * 0.5;
+    planePoint[1] = this->GetRenderer()->GetCurrentWorldPlaneGeometry()->GetExtentInMM(1) * 0.5;
     MoveCameraToPoint(planePoint);
   }
 }
 
-void mitk::CameraController::SetScaleFactorInMMPerDisplayUnit( ScalarType scale )
+void mitk::CameraController::SetScaleFactorInMMPerDisplayUnit(ScalarType scale)
 {
-  if ( this->GetRenderer()->GetMapperID() != BaseRenderer::Standard2D )
+  if (this->GetRenderer()->GetMapperID() != BaseRenderer::Standard2D)
   {
     return;
   }
 
-  this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(
-    this->GetRenderer()->GetViewportSize()[1] * scale * 0.5 );
+  this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(this->GetRenderer()->GetViewportSize()[1] *
+                                                                             scale * 0.5);
 
   this->Modified();
-
 }

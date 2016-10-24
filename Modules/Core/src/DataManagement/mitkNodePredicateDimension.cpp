@@ -15,34 +15,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNodePredicateDimension.h"
-#include "mitkImage.h"
 #include "mitkDataNode.h"
-
+#include "mitkImage.h"
 
 mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, int pixelComponents)
-: m_Dimension( dimension ),
-  m_PixelComponents( pixelComponents )
+  : m_Dimension(dimension), m_PixelComponents(pixelComponents)
 {
 }
 
-mitk::NodePredicateDimension::NodePredicateDimension( unsigned int dimension )
-: m_Dimension( dimension ),
-m_PixelComponents(1)
+mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension)
+  : m_Dimension(dimension), m_PixelComponents(1)
 {
-
 }
 
 mitk::NodePredicateDimension::~NodePredicateDimension()
 {
 }
 
-
-bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode* node) const
+bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode *node) const
 {
   if (node == nullptr)
     throw std::invalid_argument("NodePredicateDimension: invalid node");
 
-  mitk::Image *image = dynamic_cast<mitk::Image *>( node->GetData() );
+  mitk::Image *image = dynamic_cast<mitk::Image *>(node->GetData());
   if (image != nullptr)
   {
     return (image->GetDimension() == m_Dimension && image->GetPixelType().GetNumberOfComponents() == m_PixelComponents);
@@ -50,4 +45,3 @@ bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode* node) const
 
   return false;
 }
-

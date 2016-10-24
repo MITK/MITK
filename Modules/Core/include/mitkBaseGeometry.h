@@ -17,26 +17,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BaseGeometry_H_HEADER_INCLUDED
 #define BaseGeometry_H_HEADER_INCLUDED
 
+#include "mitkOperationActor.h"
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkOperationActor.h"
 
-#include <itkBoundingBox.h>
+#include "itkScalableAffineTransform.h"
 #include "mitkNumericTypes.h"
 #include <itkAffineGeometryFrame.h>
-#include <itkQuaternionRigidTransform.h>
-#include "itkScalableAffineTransform.h"
+#include <itkBoundingBox.h>
 #include <itkIndex.h>
+#include <itkQuaternionRigidTransform.h>
 #include <mitkAffineTransform3D.h>
 
-#include <vtkTransform.h>
 #include <mitkGeometryTransformHolder.h>
+#include <vtkTransform.h>
 
 class vtkMatrix4x4;
 class vtkMatrixToLinearTransform;
 class vtkLinearTransform;
 
-namespace mitk {
+namespace mitk
+{
   //##Documentation
   //## @brief Standard 3D-BoundingBox typedef
   //##
@@ -45,10 +46,10 @@ namespace mitk {
 
   //##Documentation
   //## @brief Standard typedef for time-bounds
-  typedef itk::FixedArray<ScalarType, 2>  TimeBounds;
+  typedef itk::FixedArray<ScalarType, 2> TimeBounds;
   typedef itk::FixedArray<ScalarType, 3> FixedArrayType;
 
-  typedef itk::AffineGeometryFrame<ScalarType, 3>        AffineGeometryFrame3D;
+  typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 
   //##Documentation
   //## @brief BaseGeometry Describes the geometry of a data object
@@ -105,10 +106,10 @@ namespace mitk {
 
       // ********************************** TypeDef **********************************
 
-      typedef GeometryTransformHolder::TransformType         TransformType;
+      typedef GeometryTransformHolder::TransformType TransformType;
     typedef itk::BoundingBox<unsigned long, 3, ScalarType> BoundingBoxType;
-    typedef BoundingBoxType::BoundsArrayType               BoundsArrayType;
-    typedef BoundingBoxType::Pointer                       BoundingBoxPointer;
+    typedef BoundingBoxType::BoundsArrayType BoundsArrayType;
+    typedef BoundingBoxType::Pointer BoundingBoxPointer;
 
     // ********************************** Origin, Spacing **********************************
 
@@ -119,7 +120,7 @@ namespace mitk {
     //##Documentation
     //## @brief Set the origin, i.e. the upper-left corner of the plane
     //##
-    void SetOrigin(const Point3D& origin);
+    void SetOrigin(const Point3D &origin);
 
     //##Documentation
     //## @brief Get the spacing (size of a pixel).
@@ -130,7 +131,7 @@ namespace mitk {
     //## @brief Set the spacing (m_Spacing).
     //##
     //##The spacing is also changed in the IndexToWorldTransform.
-    void SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
+    void SetSpacing(const mitk::Vector3D &aSpacing, bool enforceSetSpacing = false);
 
     //##Documentation
     //## @brief Get the origin as VnlVector
@@ -171,48 +172,48 @@ namespace mitk {
     //## @brief Initialize the BaseGeometry
     void Initialize();
 
-    void InitializeGeometry(Self * newGeometry) const;
+    void InitializeGeometry(Self *newGeometry) const;
 
     // ********************************** Transformations Set/Get **********************************
 
     //##Documentation
     //## @brief Get the transformation used to convert from index
     //## to world coordinates
-    mitk::AffineTransform3D* GetIndexToWorldTransform();
+    mitk::AffineTransform3D *GetIndexToWorldTransform();
 
     //##Documentation
     //## @brief Get the transformation used to convert from index
     //## to world coordinates
-    const mitk::AffineTransform3D*   GetIndexToWorldTransform() const;
+    const mitk::AffineTransform3D *GetIndexToWorldTransform() const;
 
     //## @brief Set the transformation used to convert from index
     //## to world coordinates. The spacing of the new transform is
     //## copied to m_spacing.
-    void SetIndexToWorldTransform(mitk::AffineTransform3D* transform);
+    void SetIndexToWorldTransform(mitk::AffineTransform3D *transform);
 
     //##Documentation
     //## @brief Convenience method for setting the ITK transform
     //## (m_IndexToWorldTransform) via an vtkMatrix4x4.The spacing of
     //## the new transform is copied to m_spacing.
     //## \sa SetIndexToWorldTransform
-    void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4* vtkmatrix);
+    void SetIndexToWorldTransformByVtkMatrix(vtkMatrix4x4 *vtkmatrix);
 
     //## @brief Set the transformation used to convert from index
     //## to world coordinates.This function keeps the original spacing.
-    void SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D* transform);
+    void SetIndexToWorldTransformWithoutChangingSpacing(mitk::AffineTransform3D *transform);
 
     //##Documentation
     //## @brief Convenience method for setting the ITK transform
     //## (m_IndexToWorldTransform) via an vtkMatrix4x4. This function keeps the original spacing.
     //## \sa SetIndexToWorldTransform
-    void SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4* vtkmatrix);
+    void SetIndexToWorldTransformByVtkMatrixWithoutChangingSpacing(vtkMatrix4x4 *vtkmatrix);
 
     //## Get the Vtk Matrix which describes the transform.
-    vtkMatrix4x4* GetVtkMatrix();
+    vtkMatrix4x4 *GetVtkMatrix();
 
     //##Documentation
     //## @brief Get the m_IndexToWorldTransform as a vtkLinearTransform
-    vtkLinearTransform* GetVtkTransform() const;
+    vtkLinearTransform *GetVtkTransform() const;
 
     //##Documentation
     //## @brief Set the transform to identity, the spacing to 1 and origin to 0
@@ -233,42 +234,42 @@ namespace mitk {
     //## transformation consists of first applying self to the source,
     //## followed by other.
     //## This method also changes m_spacing.
-    void Compose(const TransformType * other, bool pre = 0);
+    void Compose(const TransformType *other, bool pre = 0);
 
     //##Documentation
     //## @brief Compose new IndexToWorldTransform with a given vtkMatrix4x4.
     //##
     //## Converts the vtkMatrix4x4 into a itk-transform and calls the previous method.
-    void Compose(const vtkMatrix4x4 * vtkmatrix, bool pre = 0);
+    void Compose(const vtkMatrix4x4 *vtkmatrix, bool pre = 0);
 
     //##Documentation
     //## @brief Translate the origin by a vector
     //##
-    void Translate(const Vector3D&  vector);
+    void Translate(const Vector3D &vector);
 
     //##Documentation
     //##@brief executes affine operations (translate, rotate, scale)
-    virtual void ExecuteOperation(Operation* operation) override;
+    virtual void ExecuteOperation(Operation *operation) override;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates
     //## \warning If you need (discrete) integer index coordinates (e.g., for iterating easily over an image),
     //## use WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index).
     //## For further information about coordinates types, please see the Geometry documentation
-    void WorldToIndex(const mitk::Point3D& pt_mm, mitk::Point3D& pt_units) const;
+    void WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units) const;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em vector
     //## \a vec_mm to (continuous!) index coordinates.
     //## For further information about coordinates types, please see the Geometry documentation
-    void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
+    void WorldToIndex(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em point to (discrete!) index coordinates.
     //## This method rounds to integer indices!
     //## For further information about coordinates types, please see the Geometry documentation
     template <unsigned int VIndexDimension>
-    void WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index) const
+    void WorldToIndex(const mitk::Point3D &pt_mm, itk::Index<VIndexDimension> &index) const
     {
       typedef itk::Index<VIndexDimension> IndexType;
       mitk::Point3D pt_units;
@@ -279,7 +280,8 @@ namespace mitk {
         index.Fill(0);
         dim = 3;
       }
-      for (i = 0; i < dim; ++i){
+      for (i = 0; i < dim; ++i)
+      {
         index[i] = itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType>(pt_units[i]);
       }
     }
@@ -288,18 +290,18 @@ namespace mitk {
     //## @brief Convert (continuous or discrete) index coordinates of a \em vector
     //## \a vec_units to world coordinates (in mm)
     //## For further information about coordinates types, please see the Geometry documentation
-    void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
+    void IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
     //##Documentation
     //## @brief Convert (continuous or discrete) index coordinates of a \em point to world coordinates (in mm)
     //## For further information about coordinates types, please see the Geometry documentation
-    void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const;
+    void IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const;
 
     //##Documentation
     //## @brief Convert (discrete) index coordinates of a \em point to world coordinates (in mm)
     //## For further information about coordinates types, please see the Geometry documentation
     template <unsigned int VIndexDimension>
-    void IndexToWorld(const itk::Index<VIndexDimension> &index, mitk::Point3D& pt_mm) const
+    void IndexToWorld(const itk::Index<VIndexDimension> &index, mitk::Point3D &pt_mm) const
     {
       mitk::Point3D pt_units;
       pt_units.Fill(0);
@@ -319,16 +321,18 @@ namespace mitk {
     //##Documentation
     //## @brief Convert (continuous or discrete) index coordinates of a \em vector
     //## \a vec_units to world coordinates (in mm)
-    //## @deprecated First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const.
+    //## @deprecated First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const
+    // mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const.
     //## For further information about coordinates types, please see the Geometry documentation
-    void IndexToWorld(const mitk::Point3D& atPt3d_units, const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
+    void IndexToWorld(const mitk::Point3D &atPt3d_units, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const;
 
     //##Documentation
     //## @brief Convert world coordinates (in mm) of a \em vector
     //## \a vec_mm to (continuous!) index coordinates.
-    //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
+    //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const
+    // mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
     //## For further information about coordinates types, please see the Geometry documentation
-    void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
+    void WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const;
 
     //##Documentation
     //## @brief Deprecated for use with ITK version 3.10 or newer.
@@ -336,9 +340,8 @@ namespace mitk {
     //## but without a rotation) into MITK world coordinates (in mm)
     //##
     //## For more information, see WorldToItkPhysicalPoint.
-    template<class TCoordRep>
-    void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3>& itkPhysicalPoint,
-      mitk::Point3D& pt_mm) const
+    template <class TCoordRep>
+    void ItkPhysicalPointToWorld(const itk::Point<TCoordRep, 3> &itkPhysicalPoint, mitk::Point3D &pt_mm) const
     {
       mitk::vtk2itk(itkPhysicalPoint, pt_mm);
     }
@@ -359,9 +362,8 @@ namespace mitk {
     //## coordinate (including the rotation) into a coordinate that
     //## can be used with the ITK image as a ITK physical coordinate
     //## (excluding the rotation).
-    template<class TCoordRep>
-    void WorldToItkPhysicalPoint(const mitk::Point3D& pt_mm,
-      itk::Point<TCoordRep, 3>& itkPhysicalPoint) const
+    template <class TCoordRep>
+    void WorldToItkPhysicalPoint(const mitk::Point3D &pt_mm, itk::Point<TCoordRep, 3> &itkPhysicalPoint) const
     {
       mitk::vtk2itk(pt_mm, itkPhysicalPoint);
     }
@@ -371,7 +373,7 @@ namespace mitk {
     /** Get the bounding box */
     itkGetConstObjectMacro(BoundingBox, BoundingBoxType);
 
-    // a bit of a misuse, but we want only doxygen to see the following:
+// a bit of a misuse, but we want only doxygen to see the following:
 #ifdef DOXYGEN_SKIP
     //##Documentation
     //## @brief Get bounding box (in index/unit coordinates)
@@ -387,7 +389,7 @@ namespace mitk {
     //##
     //## Only possible via the BoundsArray to make clear that a
     //## copy of the bounding-box is stored, not a reference to it.
-    void SetBounds(const BoundsArrayType& bounds);
+    void SetBounds(const BoundsArrayType &bounds);
 
     //##Documentation
     //## @brief Set the bounding box (in index/unit coordinates) via a float array
@@ -407,13 +409,13 @@ namespace mitk {
     //## @brief Calculates a bounding-box around the geometry relative
     //## to a coordinate system defined by a transform
     //##
-    mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D* transform) const;
+    mitk::BoundingBox::Pointer CalculateBoundingBoxRelativeToTransform(const mitk::AffineTransform3D *transform) const;
 
-    //##Documentation
-    //## @brief Set the time bounds (in ms)
-    //void SetTimeBounds(const TimeBounds& timebounds);
+//##Documentation
+//## @brief Set the time bounds (in ms)
+// void SetTimeBounds(const TimeBounds& timebounds);
 
-    // ********************************** Geometry **********************************
+// ********************************** Geometry **********************************
 
 #ifdef DOXYGEN_SKIP
     //##Documentation
@@ -483,12 +485,12 @@ namespace mitk {
     //##Documentation
     //## @brief Test whether the point \a p (world coordinates in mm) is
     //## inside the bounding box
-    bool IsInside(const mitk::Point3D& p) const;
+    bool IsInside(const mitk::Point3D &p) const;
 
     //##Documentation
     //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
     //## inside the bounding box
-    bool IsIndexInside(const mitk::Point3D& index) const;
+    bool IsIndexInside(const mitk::Point3D &index) const;
 
     //##Documentation
     //## @brief Convenience method for working with ITK indices
@@ -507,7 +509,10 @@ namespace mitk {
 
     // ********************************* Image Geometry ********************************
     //##Documentation
-    //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
+    //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to
+    //change
+    // the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and
+    // changes the origin respectively.
     virtual void ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry);
 
     //##Documentation
@@ -528,16 +533,14 @@ namespace mitk {
       //## outside the image (by half of the voxel diameter). Thus, we have
       //## to correct for this and to be able to do that, we need to know
       //## that the BaseGeometry is referring to an Image.
-      itkSetMacro(ImageGeometry, bool)
-      itkBooleanMacro(ImageGeometry)
+      itkSetMacro(ImageGeometry, bool) itkBooleanMacro(ImageGeometry)
 
-      const GeometryTransformHolder* GetGeometryTransformHolder() const;
+        const GeometryTransformHolder *GetGeometryTransformHolder() const;
 
   protected:
-
     // ********************************** Constructor **********************************
     BaseGeometry();
-    BaseGeometry(const BaseGeometry& other);
+    BaseGeometry(const BaseGeometry &other);
     virtual ~BaseGeometry();
 
     //##Documentation
@@ -552,9 +555,9 @@ namespace mitk {
     //## \endcode
     virtual itk::LightObject::Pointer InternalClone() const override = 0;
 
-    virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    static const std::string GetTransformAsString(TransformType* transformType);
+    static const std::string GetTransformAsString(TransformType *transformType);
 
     itkGetConstMacro(NDimensions, unsigned int)
 
@@ -564,7 +567,7 @@ namespace mitk {
 
     void SetVtkMatrixDeepCopy(vtkTransform *vtktransform);
 
-    void _SetSpacing(const mitk::Vector3D& aSpacing, bool enforceSetSpacing = false);
+    void _SetSpacing(const mitk::Vector3D &aSpacing, bool enforceSetSpacing = false);
 
     //##Documentation
     //## @brief PreSetSpacing
@@ -572,7 +575,7 @@ namespace mitk {
     //## These virtual function allows a different beahiour in subclasses.
     //## Do implement them in every subclass of BaseGeometry. If not needed, use
     //## {Superclass::PreSetSpacing();};
-    virtual void PreSetSpacing(const mitk::Vector3D& /*aSpacing*/) {};
+    virtual void PreSetSpacing(const mitk::Vector3D & /*aSpacing*/){};
 
     //##Documentation
     //## @brief CheckBounds
@@ -580,21 +583,22 @@ namespace mitk {
     //## This function is called in SetBounds. Assertions can be implemented in this function (see PlaneGeometry.cpp).
     //## If you implement this function in a subclass, make sure, that all classes were your class inherits from
     //## have an implementation of CheckBounds
-    //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as well!)
-    virtual void CheckBounds(const BoundsArrayType& /*bounds*/){};
+    //## (e.g. inheritance BaseGeometry <- A <- B. Implementation of CheckBounds in class B needs implementation in A as
+    // well!)
+    virtual void CheckBounds(const BoundsArrayType & /*bounds*/){};
 
     //##Documentation
     //## @brief CheckIndexToWorldTransform
     //##
-    //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see PlaneGeometry.cpp).
+    //## This function is called in SetIndexToWorldTransform. Assertions can be implemented in this function (see
+    // PlaneGeometry.cpp).
     //## In Subclasses of BaseGeometry, implement own conditions or call Superclass::CheckBounds(bounds);.
-    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D* /*transform*/){};
+    virtual void CheckIndexToWorldTransform(mitk::AffineTransform3D * /*transform*/){};
 
   private:
+    GeometryTransformHolder *m_GeometryTransform;
 
-    GeometryTransformHolder* m_GeometryTransform;
-
-    void InitializeGeometryTransformHolder(const BaseGeometry* otherGeometry);
+    void InitializeGeometryTransformHolder(const BaseGeometry *otherGeometry);
 
     //##Documentation
     //## @brief Bounding Box, which is axes-parallel in intrinsic coordinates
@@ -603,7 +607,7 @@ namespace mitk {
 
     unsigned int m_FrameOfReferenceID;
 
-    //mitk::TimeBounds m_TimeBounds;
+    // mitk::TimeBounds m_TimeBounds;
 
     static const unsigned int m_NDimensions = 3;
 
@@ -634,7 +638,8 @@ namespace mitk {
   //
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::BaseGeometry& g1, const mitk::BaseGeometry& g2) instead.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
+  * mitk::mitk::BaseGeometry& g1, const mitk::BaseGeometry& g2) instead.
   *
   * @ingroup MITKTestingAPI
   *
@@ -650,7 +655,8 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry* leftHandSide, const mitk::BaseGeometry* rightHandSide, ScalarType eps, bool verbose));
+  DEPRECATED(MITKCORE_EXPORT bool Equal(
+    const mitk::BaseGeometry *leftHandSide, const mitk::BaseGeometry *rightHandSide, ScalarType eps, bool verbose));
 
   /**
   * @brief Equal A function comparing two geometries for beeing identical.
@@ -669,11 +675,15 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry& leftHandSide, const mitk::BaseGeometry& rightHandSide, ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry &leftHandSide,
+                             const mitk::BaseGeometry &rightHandSide,
+                             ScalarType eps,
+                             bool verbose);
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::BaseGeometry::TransformType& t1, const mitk::BaseGeometry::TransformType& t2) instead.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
+  * mitk::mitk::BaseGeometry::TransformType& t1, const mitk::BaseGeometry::TransformType& t2) instead.
   *
   * @ingroup MITKTestingAPI
   *
@@ -686,7 +696,10 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide, const mitk::BaseGeometry::TransformType *rightHandSide, ScalarType eps, bool verbose));
+  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
+                                        const mitk::BaseGeometry::TransformType *rightHandSide,
+                                        ScalarType eps,
+                                        bool verbose));
 
   /**
   * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
@@ -702,11 +715,15 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType& leftHandSide, const mitk::BaseGeometry::TransformType& rightHandSide, ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::TransformType &leftHandSide,
+                             const mitk::BaseGeometry::TransformType &rightHandSide,
+                             ScalarType eps,
+                             bool verbose);
 
   /**
   * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const mitk::mitk::BaseGeometry::BoundingBoxType& b1, const mitk::BaseGeometry::BoundingBoxType& b2) instead.
+  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
+  * mitk::mitk::BaseGeometry::BoundingBoxType& b1, const mitk::BaseGeometry::BoundingBoxType& b2) instead.
   *
   * @ingroup MITKTestingAPI
   *
@@ -719,7 +736,10 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide, const mitk::BaseGeometry::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose));
+  DEPRECATED(MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
+                                        const mitk::BaseGeometry::BoundingBoxType *rightHandSide,
+                                        ScalarType eps,
+                                        bool verbose));
 
   /**
   * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
@@ -735,7 +755,10 @@ namespace mitk {
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return True, if all comparison are true. False in any other case.
   */
-  MITKCORE_EXPORT bool Equal(const  mitk::BaseGeometry::BoundingBoxType& leftHandSide, const mitk::BaseGeometry::BoundingBoxType& rightHandSide, ScalarType eps, bool verbose);
+  MITKCORE_EXPORT bool Equal(const mitk::BaseGeometry::BoundingBoxType &leftHandSide,
+                             const mitk::BaseGeometry::BoundingBoxType &rightHandSide,
+                             ScalarType eps,
+                             bool verbose);
 } // namespace mitk
 
 #endif /* BaseGeometry_H_HEADER_INCLUDED */

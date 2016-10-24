@@ -29,27 +29,16 @@ namespace mitk
     int SingleStep;
   };
 
-  IntPropertyExtension::Impl::Impl()
-    : Maximum(100),
-      Minimum(0),
-      SingleStep(1)
-  {
-  }
-
+  IntPropertyExtension::Impl::Impl() : Maximum(100), Minimum(0), SingleStep(1) {}
   IntPropertyExtension::Impl::Impl(int minimum, int maximum, int singleStep)
-    : Maximum(maximum),
-      Minimum(minimum),
-      SingleStep(singleStep)
+    : Maximum(maximum), Minimum(minimum), SingleStep(singleStep)
   {
   }
 
-  IntPropertyExtension::Impl::~Impl()
-  {
-  }
+  IntPropertyExtension::Impl::~Impl() {}
 }
 
-mitk::IntPropertyExtension::IntPropertyExtension()
-  : m_Impl(new Impl)
+mitk::IntPropertyExtension::IntPropertyExtension() : m_Impl(new Impl)
 {
 }
 

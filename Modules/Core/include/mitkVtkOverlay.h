@@ -17,64 +17,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VTKOVERLAY_H
 #define VTKOVERLAY_H
 
-#include <MitkCoreExports.h>
 #include "mitkOverlay.h"
+#include <MitkCoreExports.h>
 #include <vtkSmartPointer.h>
 
 class vtkProp;
 
-namespace mitk {
-
-/**
- * @brief The VtkOverlay class is the base for all Overlays which are using the VTK framework to render
- *the elements.
- */
-class MITKCORE_EXPORT VtkOverlay : public Overlay {
-public:
-
-  mitkClassMacro(VtkOverlay, Overlay);
-  void Update(BaseRenderer *renderer) override;
-  void AddToBaseRenderer(BaseRenderer *renderer) override;
-  void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
-  void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
-  void RemoveFromBaseRenderer(BaseRenderer *renderer) override;
-
+namespace mitk
+{
   /**
-  * \brief Paints the overlay.
-  *
-  * This method forces a paint of the overlay as it is configured at the moment.
-  * \warn Should only be used as alternative to the OverlayManager mechanism
-  * in GL-Mappers.
-  */
-  void Paint( BaseRenderer* renderer );
-
-protected:
-
-  /**
-   * @brief This method is implemented by the specific VTKOverlays in order to create the element as a vtkProp
-   * @param renderer
-   * @return The element that was created by the subclasses as a vtkProp.
+   * @brief The VtkOverlay class is the base for all Overlays which are using the VTK framework to render
+   *the elements.
    */
-  virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const = 0;
-  virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
+  class MITKCORE_EXPORT VtkOverlay : public Overlay
+  {
+  public:
+    mitkClassMacro(VtkOverlay, Overlay);
+    void Update(BaseRenderer *renderer) override;
+    void AddToBaseRenderer(BaseRenderer *renderer) override;
+    void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
+    void RemoveFromRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) override;
+    void RemoveFromBaseRenderer(BaseRenderer *renderer) override;
 
-  /** \brief explicit constructor which disallows implicit conversions */
-  explicit VtkOverlay();
+    /**
+    * \brief Paints the overlay.
+    *
+    * This method forces a paint of the overlay as it is configured at the moment.
+    * \warn Should only be used as alternative to the OverlayManager mechanism
+    * in GL-Mappers.
+    */
+    void Paint(BaseRenderer *renderer);
 
-  /** \brief virtual destructor in order to derive from this class */
-  virtual ~VtkOverlay();
+  protected:
+    /**
+     * @brief This method is implemented by the specific VTKOverlays in order to create the element as a vtkProp
+     * @param renderer
+     * @return The element that was created by the subclasses as a vtkProp.
+     */
+    virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const = 0;
+    virtual void UpdateVtkOverlay(BaseRenderer *renderer) = 0;
 
-private:
+    /** \brief explicit constructor which disallows implicit conversions */
+    explicit VtkOverlay();
 
-  /** \brief copy constructor */
-  VtkOverlay( const VtkOverlay &);
+    /** \brief virtual destructor in order to derive from this class */
+    virtual ~VtkOverlay();
 
-  /** \brief assignment operator */
-  VtkOverlay &operator=(const VtkOverlay &);
+  private:
+    /** \brief copy constructor */
+    VtkOverlay(const VtkOverlay &);
 
-};
+    /** \brief assignment operator */
+    VtkOverlay &operator=(const VtkOverlay &);
+  };
 
 } // namespace mitk
 #endif // OVERLAY_H
-
-

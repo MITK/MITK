@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_SURFACE_STL_IO_H_
 #define _MITK_SURFACE_STL_IO_H_
 
@@ -22,32 +21,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class SurfaceStlIO : public mitk::SurfaceVtkIO
+  {
+  public:
+    SurfaceStlIO();
 
-class SurfaceStlIO : public mitk::SurfaceVtkIO
-{
-public:
+    // -------------- AbstractFileReader -------------
 
-  SurfaceStlIO();
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-  // -------------- AbstractFileReader -------------
+    // -------------- AbstractFileWriter -------------
 
-  using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    virtual void Write() override;
 
-  // -------------- AbstractFileWriter -------------
+  private:
+    SurfaceStlIO *IOClone() const override;
 
-  virtual void Write() override;
-
-private:
-
-  SurfaceStlIO* IOClone() const override;
-
-  static std::string OPTION_MERGE_POINTS();
-  static std::string OPTION_TAG_SOLIDS();
-  static std::string OPTION_CLEAN();
-
-};
-
+    static std::string OPTION_MERGE_POINTS();
+    static std::string OPTION_TAG_SOLIDS();
+    static std::string OPTION_CLEAN();
+  };
 }
 
 #endif //_MITK_SURFACE_STL_IO_H_

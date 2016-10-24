@@ -17,25 +17,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef FILEWRITERWITHINFORMATION_H_INCLUDED
 #define FILEWRITERWITHINFORMATION_H_INCLUDED
 
-#include "mitkFileWriter.h"
 #include "mitkBaseData.h"
+#include "mitkFileWriter.h"
 
-namespace mitk {
-/**
- * \brief Interface for FileWriters with extra information.
- * Should be merged into FileWriter.
- *
- * \deprecatedSince{2014_10} Use mitk::IFileWriter instead.
-*/
-class FileWriterWithInformation : public FileWriter {
+namespace mitk
+{
+  /**
+   * \brief Interface for FileWriters with extra information.
+   * Should be merged into FileWriter.
+   *
+   * \deprecatedSince{2014_10} Use mitk::IFileWriter instead.
+  */
+  class FileWriterWithInformation : public FileWriter
+  {
   public:
-    mitkClassMacro(FileWriterWithInformation,FileWriter);
+    mitkClassMacro(FileWriterWithInformation, FileWriter);
 
     virtual const char *GetDefaultFilename() = 0;
     virtual const char *GetFileDialogPattern() = 0;
     virtual const char *GetDefaultExtension() = 0;
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) = 0;
     virtual void DoWrite(BaseData::Pointer data) = 0;
-};
+  };
 }
 #endif

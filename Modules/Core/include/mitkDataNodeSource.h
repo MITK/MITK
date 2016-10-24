@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_DATA_TREE_NODE_SOURCE_H
 #define _MITK_DATA_TREE_NODE_SOURCE_H
 
@@ -23,26 +22,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-/**
- * @brief Superclass of all classes generating data tree nodes (instances of class
- * mitk::DataNode) as output.
- *
- * In itk and vtk the generated result of a ProcessObject is only guaranteed
- * to be up-to-date, when Update() of the ProcessObject or the generated
- * DataObject is called immediately before access of the data stored in the
- * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
- * for mitk::DataNodeSource.
- * @ingroup Process
- */
-class MITKCORE_EXPORT DataNodeSource : public itk::ProcessObject
-{
-public:
-    mitkClassMacroItkParent( DataNodeSource, itk::ProcessObject )
+  /**
+   * @brief Superclass of all classes generating data tree nodes (instances of class
+   * mitk::DataNode) as output.
+   *
+   * In itk and vtk the generated result of a ProcessObject is only guaranteed
+   * to be up-to-date, when Update() of the ProcessObject or the generated
+   * DataObject is called immediately before access of the data stored in the
+   * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
+   * for mitk::DataNodeSource.
+   * @ingroup Process
+   */
+  class MITKCORE_EXPORT DataNodeSource : public itk::ProcessObject
+  {
+  public:
+    mitkClassMacroItkParent(DataNodeSource, itk::ProcessObject)
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef mitk::DataNode OutputType;
+        typedef mitk::DataNode OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
 
@@ -52,7 +50,7 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual DataObjectPointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
+    virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -62,18 +60,15 @@ public:
      */
     virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
 
-    OutputType* GetOutput();
-    const OutputType* GetOutput() const;
-    OutputType* GetOutput(DataObjectPointerArraySizeType idx);
-    const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+    OutputType *GetOutput();
+    const OutputType *GetOutput() const;
+    OutputType *GetOutput(DataObjectPointerArraySizeType idx);
+    const OutputType *GetOutput(DataObjectPointerArraySizeType idx) const;
 
-protected:
-
+  protected:
     DataNodeSource();
 
     virtual ~DataNodeSource();
-
-};
-
+  };
 }
 #endif // #define _MITK_BASE_DATA_SOURCE_H

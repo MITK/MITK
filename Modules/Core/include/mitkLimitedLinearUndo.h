@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
 #define LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
 
 // MITK header
-#include <MitkCoreExports.h>
 #include "mitkOperationEvent.h"
 #include "mitkUndoModel.h"
+#include <MitkCoreExports.h>
 // STL header
 #include <vector>
 // ITK header
@@ -29,117 +28,115 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkEventObject.h>
 #pragma GCC visibility pop
 
-namespace mitk {
-
-//##Documentation
-//## @brief A linear undo model with one undo and one redo stack.
-//##
-//## Derived from UndoModel AND itk::Object. Invokes ITK-events to signal listening
-//## GUI elements, whether each of the stacks is empty or not (to enable/disable button, ...)
-class MITKCORE_EXPORT LimitedLinearUndo : public UndoModel
+namespace mitk
 {
-public:
-  typedef std::vector<UndoStackItem*> UndoContainer;
-  typedef std::vector<UndoStackItem*>::reverse_iterator UndoContainerRevIter;
-
-  mitkClassMacro(LimitedLinearUndo, UndoModel);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  virtual bool SetOperationEvent(UndoStackItem* stackItem) override;
-
   //##Documentation
-  //## @brief Undoes the last changes
+  //## @brief A linear undo model with one undo and one redo stack.
   //##
-  //##  Reads the top element of the Undo-Stack,
-  //##  executes the operation,
-  //##  swaps the OperationEvent-Undo with the Operation
-  //##  and sets it to Redo-Stack
-  virtual bool Undo() override;
-  virtual bool Undo(bool) override;
+  //## Derived from UndoModel AND itk::Object. Invokes ITK-events to signal listening
+  //## GUI elements, whether each of the stacks is empty or not (to enable/disable button, ...)
+  class MITKCORE_EXPORT LimitedLinearUndo : public UndoModel
+  {
+  public:
+    typedef std::vector<UndoStackItem *> UndoContainer;
+    typedef std::vector<UndoStackItem *>::reverse_iterator UndoContainerRevIter;
 
-  //##Documentation
-  //## @brief Undoes all changes until ObjectEventID oeid
-  virtual bool Undo(int oeid);
+    mitkClassMacro(LimitedLinearUndo, UndoModel);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  //##Documentation
-  //## @brief Undoes the last changes
-  //##
-  //## Reads the top element of the Redo-Stack,
-  //## executes the operation,
-  //## swaps the OperationEvent-Operation with the Undo-Operation
-  //## and sets it to Undo-Stack
-  virtual bool Redo() override;
-  virtual bool Redo(bool) override;
+      virtual bool SetOperationEvent(UndoStackItem *stackItem) override;
 
-  //##Documentation
-  //## @brief Redoes all changes until ObjectEventID oeid
-  virtual bool Redo(int oeid);
+    //##Documentation
+    //## @brief Undoes the last changes
+    //##
+    //##  Reads the top element of the Undo-Stack,
+    //##  executes the operation,
+    //##  swaps the OperationEvent-Undo with the Operation
+    //##  and sets it to Redo-Stack
+    virtual bool Undo() override;
+    virtual bool Undo(bool) override;
 
-  //##Documentation
-  //## @brief Clears UndoList and RedoList
-  virtual void Clear() override;
+    //##Documentation
+    //## @brief Undoes all changes until ObjectEventID oeid
+    virtual bool Undo(int oeid);
 
-  //##Documentation
-  //## @brief Clears the RedoList
-  virtual void ClearRedoList() override;
+    //##Documentation
+    //## @brief Undoes the last changes
+    //##
+    //## Reads the top element of the Redo-Stack,
+    //## executes the operation,
+    //## swaps the OperationEvent-Operation with the Undo-Operation
+    //## and sets it to Undo-Stack
+    virtual bool Redo() override;
+    virtual bool Redo(bool) override;
 
-  //##Documentation
-  //## @brief True, if RedoList is empty
-  virtual bool RedoListEmpty() override;
+    //##Documentation
+    //## @brief Redoes all changes until ObjectEventID oeid
+    virtual bool Redo(int oeid);
 
-  //##Documentation
-  //## @brief Returns the ObjectEventId of the
-  //## top element in the OperationHistory
-  virtual int GetLastObjectEventIdInList() override;
+    //##Documentation
+    //## @brief Clears UndoList and RedoList
+    virtual void Clear() override;
 
-  //##Documentation
-  //## @brief Returns the GroupEventId of the
-  //## top element in the OperationHistory
-  virtual int GetLastGroupEventIdInList() override;
+    //##Documentation
+    //## @brief Clears the RedoList
+    virtual void ClearRedoList() override;
 
-  //##Documentation
-  //## @brief Returns the last specified OperationEvent in Undo-list
-  //## corresponding to the given values; if nothing found, then returns NULL
-  virtual OperationEvent* GetLastOfType(OperationActor* destination, OperationType opType) override;
+    //##Documentation
+    //## @brief True, if RedoList is empty
+    virtual bool RedoListEmpty() override;
 
-protected:
-  //##Documentation
-  //## Constructor
-  LimitedLinearUndo();
+    //##Documentation
+    //## @brief Returns the ObjectEventId of the
+    //## top element in the OperationHistory
+    virtual int GetLastObjectEventIdInList() override;
 
-  //##Documentation
-  //## Destructor
-  virtual ~LimitedLinearUndo();
+    //##Documentation
+    //## @brief Returns the GroupEventId of the
+    //## top element in the OperationHistory
+    virtual int GetLastGroupEventIdInList() override;
 
-  //## @brief Convenience method to free the memory of
-  //## elements in the list and to clear the list
-  void ClearList(UndoContainer* list);
+    //##Documentation
+    //## @brief Returns the last specified OperationEvent in Undo-list
+    //## corresponding to the given values; if nothing found, then returns NULL
+    virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) override;
 
-  UndoContainer m_UndoList;
+  protected:
+    //##Documentation
+    //## Constructor
+    LimitedLinearUndo();
 
-  UndoContainer m_RedoList;
+    //##Documentation
+    //## Destructor
+    virtual ~LimitedLinearUndo();
 
-private:
-  int FirstObjectEventIdOfCurrentGroup(UndoContainer& stack);
+    //## @brief Convenience method to free the memory of
+    //## elements in the list and to clear the list
+    void ClearList(UndoContainer *list);
 
-};
+    UndoContainer m_UndoList;
+
+    UndoContainer m_RedoList;
+
+  private:
+    int FirstObjectEventIdOfCurrentGroup(UndoContainer &stack);
+  };
 
 #pragma GCC visibility push(default)
 
-/// Some itk events to notify listening GUI elements, when the undo or redo stack is empty (diable undo button)
-/// or when there are items in the stack (enable button)
-itkEventMacro( UndoStackEvent,     itk::ModifiedEvent );
-itkEventMacro( UndoEmptyEvent,     UndoStackEvent );
-itkEventMacro( RedoEmptyEvent,     UndoStackEvent );
-itkEventMacro( UndoNotEmptyEvent,  UndoStackEvent );
-itkEventMacro( RedoNotEmptyEvent,  UndoStackEvent );
-/// Additional unused events, if anybody wants to put an artificial limit to the possible number of items in the stack
-itkEventMacro( UndoFullEvent,      UndoStackEvent );
-itkEventMacro( RedoFullEvent,      UndoStackEvent );
+  /// Some itk events to notify listening GUI elements, when the undo or redo stack is empty (diable undo button)
+  /// or when there are items in the stack (enable button)
+  itkEventMacro(UndoStackEvent, itk::ModifiedEvent);
+  itkEventMacro(UndoEmptyEvent, UndoStackEvent);
+  itkEventMacro(RedoEmptyEvent, UndoStackEvent);
+  itkEventMacro(UndoNotEmptyEvent, UndoStackEvent);
+  itkEventMacro(RedoNotEmptyEvent, UndoStackEvent);
+  /// Additional unused events, if anybody wants to put an artificial limit to the possible number of items in the stack
+  itkEventMacro(UndoFullEvent, UndoStackEvent);
+  itkEventMacro(RedoFullEvent, UndoStackEvent);
 
 #pragma GCC visibility pop
 
-} //namespace mitk
+} // namespace mitk
 
 #endif /* LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96 */

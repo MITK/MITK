@@ -14,16 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkLandmarkProjectorBasedCurvedGeometry.h"
 #include <vtkAbstractTransform.h>
 
 mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry()
-  : AbstractTransformGeometry(), m_LandmarkProjector(nullptr), m_InterpolatingAbstractTransform(nullptr), m_TargetLandmarks(nullptr)
+  : AbstractTransformGeometry(),
+    m_LandmarkProjector(nullptr),
+    m_InterpolatingAbstractTransform(nullptr),
+    m_TargetLandmarks(nullptr)
 {
 }
 
-mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(const mitk::LandmarkProjectorBasedCurvedGeometry& other) : Superclass(other)
+mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry(
+  const mitk::LandmarkProjectorBasedCurvedGeometry &other)
+  : Superclass(other)
 {
   SetTargetLandmarks(other.m_TargetLandmarks);
   this->SetLandmarkProjector(other.m_LandmarkProjector);
@@ -32,24 +36,24 @@ mitk::LandmarkProjectorBasedCurvedGeometry::LandmarkProjectorBasedCurvedGeometry
 
 mitk::LandmarkProjectorBasedCurvedGeometry::~LandmarkProjectorBasedCurvedGeometry()
 {
-  if(m_InterpolatingAbstractTransform!=nullptr)
+  if (m_InterpolatingAbstractTransform != nullptr)
     m_InterpolatingAbstractTransform->Delete();
 }
 
-void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::LandmarkProjector* aLandmarkProjector)
+void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::LandmarkProjector *aLandmarkProjector)
 {
-  itkDebugMacro("setting LandmarkProjector to " << aLandmarkProjector );
-  if(m_LandmarkProjector != aLandmarkProjector)
+  itkDebugMacro("setting LandmarkProjector to " << aLandmarkProjector);
+  if (m_LandmarkProjector != aLandmarkProjector)
   {
     m_LandmarkProjector = aLandmarkProjector;
-    if(m_LandmarkProjector.IsNotNull())
+    if (m_LandmarkProjector.IsNotNull())
     {
-      if(m_FrameGeometry.IsNotNull())
+      if (m_FrameGeometry.IsNotNull())
         m_LandmarkProjector->SetFrameGeometry(m_FrameGeometry);
 
-      if(m_InterpolatingAbstractTransform == nullptr)
+      if (m_InterpolatingAbstractTransform == nullptr)
       {
-        itkWarningMacro(<<"m_InterpolatingAbstractTransform not set.");
+        itkWarningMacro(<< "m_InterpolatingAbstractTransform not set.");
       }
       m_LandmarkProjector->SetInterpolatingAbstractTransform(GetInterpolatingAbstractTransform());
 
@@ -59,16 +63,16 @@ void mitk::LandmarkProjectorBasedCurvedGeometry::SetLandmarkProjector(mitk::Land
   }
 }
 
-void mitk::LandmarkProjectorBasedCurvedGeometry::SetFrameGeometry(const mitk::BaseGeometry* frameGeometry)
+void mitk::LandmarkProjectorBasedCurvedGeometry::SetFrameGeometry(const mitk::BaseGeometry *frameGeometry)
 {
   Superclass::SetFrameGeometry(frameGeometry);
-  if(m_LandmarkProjector.IsNotNull())
+  if (m_LandmarkProjector.IsNotNull())
     m_LandmarkProjector->SetFrameGeometry(frameGeometry);
 }
 
 void mitk::LandmarkProjectorBasedCurvedGeometry::ComputeGeometry()
 {
-  if(m_LandmarkProjector.IsNull())
+  if (m_LandmarkProjector.IsNull())
   {
     itkExceptionMacro(<< "m_LandmarkProjector is not set.");
   }

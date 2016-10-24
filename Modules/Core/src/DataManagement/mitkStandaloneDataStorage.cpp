@@ -16,40 +16,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStandaloneDataStorage.h"
 
+#include "itkMutexLockHolder.h"
+#include "itkSimpleFastMutexLock.h"
 #include "mitkDataNode.h"
-#include "mitkProperties.h"
+#include "mitkGroupTagProperty.h"
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkGroupTagProperty.h"
-#include "itkSimpleFastMutexLock.h"
-#include "itkMutexLockHolder.h"
+#include "mitkProperties.h"
 
-
-mitk::StandaloneDataStorage::StandaloneDataStorage()
-: mitk::DataStorage()
+mitk::StandaloneDataStorage::StandaloneDataStorage() : mitk::DataStorage()
 {
 }
 
-
 mitk::StandaloneDataStorage::~StandaloneDataStorage()
 {
-  for(AdjacencyList::iterator it = m_SourceNodes.begin();
-    it != m_SourceNodes.end(); ++it)
+  for (AdjacencyList::iterator it = m_SourceNodes.begin(); it != m_SourceNodes.end(); ++it)
   {
     this->RemoveListeners(it->first);
   }
 }
-
-
-
 
 bool mitk::StandaloneDataStorage::IsInitialized() const
 {
   return true;
 }
 
-
-void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents)
+void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStorage::SetOfObjects *parents)
 {
   {
     itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
@@ -73,18 +65,22 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
 
     /* Store node and an empty children list in derivations adjacency list */
     mitk::DataStorage::SetOfObjects::Pointer childrenPointer = mitk::DataStorage::SetOfObjects::New();
-    mitk::DataStorage::SetOfObjects::ConstPointer children =  childrenPointer.GetPointer();
+    mitk::DataStorage::SetOfObjects::ConstPointer children = childrenPointer.GetPointer();
     m_DerivedNodes.insert(std::make_pair(node, children));
 
     /* create entry in derivations adjacency list for each parent of the new node */
     for (SetOfObjects::ConstIterator it = sp->Begin(); it != sp->End(); it++)
     {
       mitk::DataNode::ConstPointer parent = it.Value().GetPointer();
-      mitk::DataStorage::SetOfObjects::ConstPointer derivedObjects = m_DerivedNodes[parent]; // get or create pointer to list of derived objects for that parent node
+      mitk::DataStorage::SetOfObjects::ConstPointer derivedObjects =
+        m_DerivedNodes[parent]; // get or create pointer to list of derived objects for that parent node
       if (derivedObjects.IsNull())
-        m_DerivedNodes[parent] = mitk::DataStorage::SetOfObjects::New();  // Create a set of Objects, if it does not already exist
-      mitk::DataStorage::SetOfObjects* deob = const_cast<mitk::DataStorage::SetOfObjects*>(m_DerivedNodes[parent].GetPointer());  // temporarily get rid of const pointer to insert new element
-      deob->InsertElement(deob->Size(), node); // node is derived from parent. Insert it into the parents list of derived objects
+        m_DerivedNodes[parent] =
+          mitk::DataStorage::SetOfObjects::New(); // Create a set of Objects, if it does not already exist
+      mitk::DataStorage::SetOfObjects *deob = const_cast<mitk::DataStorage::SetOfObjects *>(
+        m_DerivedNodes[parent].GetPointer()); // temporarily get rid of const pointer to insert new element
+      deob->InsertElement(deob->Size(),
+                          node); // node is derived from parent. Insert it into the parents list of derived objects
     }
 
     // register for ITK changed events
@@ -93,11 +89,9 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
 
   /* Notify observers */
   EmitAddNodeEvent(node);
-
 }
 
-
-void mitk::StandaloneDataStorage::Remove(const mitk::DataNode* node)
+void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
 {
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
@@ -125,21 +119,26 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode* node)
   }
 }
 
-bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode* node) const
+bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode *node) const
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   return (m_SourceNodes.find(node) != m_SourceNodes.end());
 }
 
-void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataNode* node, AdjacencyList& relation)
+void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataNode *node, AdjacencyList &relation)
 {
-  for (AdjacencyList::const_iterator mapIter = relation.cbegin(); mapIter != relation.cend(); ++mapIter)  // for each node in the relation
-    if (mapIter->second.IsNotNull())      // if node has a relation list
+  for (AdjacencyList::const_iterator mapIter = relation.cbegin(); mapIter != relation.cend();
+       ++mapIter)                    // for each node in the relation
+    if (mapIter->second.IsNotNull()) // if node has a relation list
     {
-      SetOfObjects::Pointer s = const_cast<SetOfObjects*>(mapIter->second.GetPointer());   // search for node to be deleted in the relation list
-      SetOfObjects::STLContainerType::iterator relationListIter = std::find(s->begin(),  s->end(), node);   // this assumes, that the relation list does not contain duplicates (which should be safe to assume)
-      if (relationListIter != s->end())     // if node to be deleted is in relation list
-        s->erase(relationListIter);         // remove it from parentlist
+      SetOfObjects::Pointer s =
+        const_cast<SetOfObjects *>(mapIter->second.GetPointer()); // search for node to be deleted in the relation list
+      SetOfObjects::STLContainerType::iterator relationListIter = std::find(
+        s->begin(),
+        s->end(),
+        node); // this assumes, that the relation list does not contain duplicates (which should be safe to assume)
+      if (relationListIter != s->end()) // if node to be deleted is in relation list
+        s->erase(relationListIter);     // remove it from parentlist
     }
   /* now remove node from the relation */
   AdjacencyList::iterator adIt;
@@ -148,10 +147,9 @@ void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataNode* node,
     relation.erase(adIt);
 }
 
-
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAll() const
 {
-  itk::MutexLockHolder<itk::SimpleFastMutexLock > locked(m_Mutex);
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
 
@@ -162,13 +160,16 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
     if (it->first.IsNull())
       continue;
     else
-      resultset->InsertElement(index++, const_cast<mitk::DataNode*>(it->first.GetPointer()));
+      resultset->InsertElement(index++, const_cast<mitk::DataNode *>(it->first.GetPointer()));
 
   return SetOfObjects::ConstPointer(resultset);
 }
 
-
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRelations(const mitk::DataNode* node, const AdjacencyList& relation, const NodePredicateBase* condition, bool onlyDirectlyRelated) const
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRelations(
+  const mitk::DataNode *node,
+  const AdjacencyList &relation,
+  const NodePredicateBase *condition,
+  bool onlyDirectlyRelated) const
 {
   if (node == NULL)
     throw std::invalid_argument("invalid node");
@@ -177,8 +178,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   if (onlyDirectlyRelated)
   {
     AdjacencyList::const_iterator it = relation.find(node); // get parents of current node
-    if ((it == relation.cend()) || (it->second.IsNull())) // node not found in list or no set of parents
-      return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New());  // return an empty set
+    if ((it == relation.cend()) || (it->second.IsNull()))   // node not found in list or no set of parents
+      return SetOfObjects::ConstPointer(mitk::DataStorage::SetOfObjects::New()); // return an empty set
     else
       return this->FilterSetOfObjects(it->second, condition);
   }
@@ -193,57 +194,68 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
 
   while (openlist.size() > 0)
   {
-    mitk::DataNode::ConstPointer current = openlist.back();  // get element that needs to be processed
-    openlist.pop_back();                      // remove last element, because it gets processed now
-    resultset.push_back(current);             // add current element to resultset
+    mitk::DataNode::ConstPointer current = openlist.back();    // get element that needs to be processed
+    openlist.pop_back();                                       // remove last element, because it gets processed now
+    resultset.push_back(current);                              // add current element to resultset
     AdjacencyList::const_iterator it = relation.find(current); // get parents of current node
-    if (   (it == relation.cend())             // if node not found in list
-        || (it->second.IsNull())              // or no set of parents available
-        || (it->second->Size() == 0))         // or empty set of parents
-      continue;                               // then continue with next node in open list
+    if ((it == relation.cend())                                // if node not found in list
+        ||
+        (it->second.IsNull()) // or no set of parents available
+        ||
+        (it->second->Size() == 0)) // or empty set of parents
+      continue;                    // then continue with next node in open list
     else
-      for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End(); ++parentIt) // for each parent of current node
+      for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End();
+           ++parentIt) // for each parent of current node
       {
         mitk::DataNode::ConstPointer p = parentIt.Value().GetPointer();
-        if (   !(std::find(resultset.cbegin(), resultset.cend(), p) != resultset.end())   // if it is not already in resultset
-            && !(std::find(openlist.cbegin(), openlist.cend(), p) != openlist.cend()))     // and not already in openlist
-          openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed
+        if (!(std::find(resultset.cbegin(), resultset.cend(), p) !=
+              resultset.end()) // if it is not already in resultset
+            &&
+            !(std::find(openlist.cbegin(), openlist.cend(), p) != openlist.cend())) // and not already in openlist
+          openlist.push_back(p); // then add it to openlist, so that it can be processed
       }
   }
 
-  /* now finally copy the results to a proper SetOfObjects variable exluding the initial node and checking the condition if any is given */
+  /* now finally copy the results to a proper SetOfObjects variable exluding the initial node and checking the condition
+   * if any is given */
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
   if (condition != NULL)
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); ++resultIt)
+    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin();
+         resultIt != resultset.cend();
+         ++resultIt)
       if ((*resultIt != node) && (condition->CheckNode(*resultIt) == true))
-        realResultset->InsertElement(realResultset->Size(), mitk::DataNode::Pointer(const_cast<mitk::DataNode*>((*resultIt).GetPointer())));
+        realResultset->InsertElement(realResultset->Size(),
+                                     mitk::DataNode::Pointer(const_cast<mitk::DataNode *>((*resultIt).GetPointer())));
   }
   else
   {
-    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin(); resultIt != resultset.cend(); ++resultIt)
+    for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin();
+         resultIt != resultset.cend();
+         ++resultIt)
       if (*resultIt != node)
-        realResultset->InsertElement(realResultset->Size(), mitk::DataNode::Pointer(const_cast<mitk::DataNode*>((*resultIt).GetPointer())));
+        realResultset->InsertElement(realResultset->Size(),
+                                     mitk::DataNode::Pointer(const_cast<mitk::DataNode *>((*resultIt).GetPointer())));
   }
   return SetOfObjects::ConstPointer(realResultset);
 }
 
-
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetSources(const mitk::DataNode* node, const NodePredicateBase* condition, bool onlyDirectSources) const
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetSources(
+  const mitk::DataNode *node, const NodePredicateBase *condition, bool onlyDirectSources) const
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   return this->GetRelations(node, m_SourceNodes, condition, onlyDirectSources);
 }
 
-
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition, bool onlyDirectDerivations) const
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetDerivations(
+  const mitk::DataNode *node, const NodePredicateBase *condition, bool onlyDirectDerivations) const
 {
-  itk::MutexLockHolder<itk::SimpleFastMutexLock>locked(m_Mutex);
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   return this->GetRelations(node, m_DerivedNodes, condition, onlyDirectDerivations);
 }
 
-
-void mitk::StandaloneDataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::StandaloneDataStorage::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << "StandaloneDataStorage:\n";
   Superclass::PrintSelf(os, indent);

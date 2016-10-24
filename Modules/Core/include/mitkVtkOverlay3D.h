@@ -17,51 +17,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef VTKOVERLAY3D_H
 #define VTKOVERLAY3D_H
 
-#include <MitkCoreExports.h>
 #include "mitkVtkOverlay.h"
+#include <MitkCoreExports.h>
 #include <vtkSmartPointer.h>
 
+namespace mitk
+{
+  /**
+   * @brief The VtkOverlay3D class is the basis for all VTK based Overlays which create
+   * any 3D element as a vtkProp that will be drawn on the renderer.
+   */
+  class MITKCORE_EXPORT VtkOverlay3D : public VtkOverlay
+  {
+  public:
+    void SetPosition3D(const Point3D &position3D, mitk::BaseRenderer *renderer = NULL);
 
-namespace mitk {
+    Point3D GetPosition3D(mitk::BaseRenderer *renderer = NULL) const;
 
-/**
- * @brief The VtkOverlay3D class is the basis for all VTK based Overlays which create
- * any 3D element as a vtkProp that will be drawn on the renderer.
- */
-class MITKCORE_EXPORT VtkOverlay3D : public VtkOverlay {
-public:
+    void SetOffsetVector(const Point3D &OffsetVector, mitk::BaseRenderer *renderer = NULL);
 
-  void SetPosition3D(const Point3D& position3D, mitk::BaseRenderer* renderer = NULL);
+    Point3D GetOffsetVector(mitk::BaseRenderer *renderer = NULL) const;
 
-  Point3D GetPosition3D(mitk::BaseRenderer* renderer = NULL) const;
+    mitkClassMacro(VtkOverlay3D, VtkOverlay);
 
-  void SetOffsetVector(const Point3D& OffsetVector, mitk::BaseRenderer* renderer = NULL);
+  protected:
+    virtual void UpdateVtkOverlay(BaseRenderer *renderer) override = 0;
 
-  Point3D GetOffsetVector(mitk::BaseRenderer* renderer = NULL) const;
+    /** \brief explicit constructor which disallows implicit conversions */
+    explicit VtkOverlay3D();
 
-  mitkClassMacro(VtkOverlay3D, VtkOverlay);
+    /** \brief virtual destructor in order to derive from this class */
+    virtual ~VtkOverlay3D();
 
-protected:
+  private:
+    /** \brief copy constructor */
+    VtkOverlay3D(const VtkOverlay3D &);
 
-  virtual void UpdateVtkOverlay(BaseRenderer *renderer) override = 0;
-
-  /** \brief explicit constructor which disallows implicit conversions */
-  explicit VtkOverlay3D();
-
-  /** \brief virtual destructor in order to derive from this class */
-  virtual ~VtkOverlay3D();
-
-private:
-
-  /** \brief copy constructor */
-  VtkOverlay3D( const VtkOverlay3D &);
-
-  /** \brief assignment operator */
-  VtkOverlay3D &operator=(const VtkOverlay3D &);
-
-};
+    /** \brief assignment operator */
+    VtkOverlay3D &operator=(const VtkOverlay3D &);
+  };
 
 } // namespace mitk
 #endif // OVERLAY_H
-
-

@@ -1,0 +1,36 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+AccessModifierOffset: -2
+AlignEscapedNewlinesLeft: false
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: true
+BinPackArguments: false
+BinPackParameters: false
+BreakBeforeBraces: Allman
+BreakBeforeTernaryOperators: false
+ColumnLimit: 120
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+DerivePointerAlignment: false
+# order of windows.h and psapi.h needs to be preserved to avoid build errors
+IncludeCategories:
+ - Regex: '[Ww]indows.h'
+   Priority: 2
+ - Regex: '[Pp]sapi.h'
+   Priority: 3
+ - Regex: '.\*'
+   Priority: 1
+IndentFunctionDeclarationAfterType: false
+IndentWidth: 2
+IndentWrappedFunctionNames: true
+NamespaceIndentation: All
+PointerAlignment: Right
+SpacesBeforeTrailingComments: 1
+Standard: Cpp11
+TabWidth: 2
+UseTab: Never
+...

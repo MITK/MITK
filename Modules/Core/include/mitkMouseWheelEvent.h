@@ -19,11 +19,11 @@
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
+#include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
+#include "mitkInteractionEvent.h"
 #include "mitkInteractionEventConst.h"
 #include "mitkInteractionPositionEvent.h"
-#include "mitkBaseRenderer.h"
-#include "mitkInteractionEvent.h"
 
 #include <MitkCoreExports.h>
 
@@ -33,31 +33,30 @@
 
 namespace mitk
 {
-  class MITKCORE_EXPORT MouseWheelEvent: public InteractionPositionEvent
+  class MITKCORE_EXPORT MouseWheelEvent : public InteractionPositionEvent
   {
-
   public:
-    mitkClassMacro(MouseWheelEvent,InteractionPositionEvent)
-    mitkNewMacro5Param(Self, BaseRenderer*, const Point2D&, MouseButtons , ModifierKeys, int)
+    mitkClassMacro(MouseWheelEvent, InteractionPositionEvent)
+      mitkNewMacro5Param(Self, BaseRenderer *, const Point2D &, MouseButtons, ModifierKeys, int)
 
-    ModifierKeys GetModifiers() const;
+        ModifierKeys GetModifiers() const;
     MouseButtons GetButtonStates() const;
     void SetModifiers(ModifierKeys modifiers);
     void SetButtonStates(MouseButtons buttons);
     int GetWheelDelta() const;
     void SetWheelDelta(int delta);
 
-    virtual bool IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const override;
+    virtual bool IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const override;
 
   protected:
-    MouseWheelEvent(BaseRenderer* = NULL,
-        const Point2D& mousePosition = Point2D(),
-        MouseButtons buttonStates = NoButton,
-        ModifierKeys modifiers = NoKey,
-        int wheelDelta = 0);
+    MouseWheelEvent(BaseRenderer * = NULL,
+                    const Point2D &mousePosition = Point2D(),
+                    MouseButtons buttonStates = NoButton,
+                    ModifierKeys modifiers = NoKey,
+                    int wheelDelta = 0);
     virtual ~MouseWheelEvent();
 
-    virtual bool IsEqual(const InteractionEvent&) const override;
+    virtual bool IsEqual(const InteractionEvent &) const override;
 
   private:
     int m_WheelDelta;

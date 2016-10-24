@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
 #define MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
 
-#include "mitkSurfaceSource.h"
 #include "mitkGeometry3D.h"
+#include "mitkSurfaceSource.h"
 #include "vtkSystemIncludes.h"
 
 class vtkPlaneSource;
@@ -35,11 +35,12 @@ class vtkTextureMapToPlane;
 class vtkBox;
 class vtkClipPolyData;
 
-namespace mitk {
+namespace mitk
+{
   class PlaneGeometryData;
   class PlaneGeometryDataToSurfaceFilter;
   /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometryDataToSurfaceFilter instead. */
-  DEPRECATED( typedef PlaneGeometryDataToSurfaceFilter Geometry2DDataToSurfaceFilter);
+  DEPRECATED(typedef PlaneGeometryDataToSurfaceFilter Geometry2DDataToSurfaceFilter);
   /** \brief Superclass of all classes having a PlaneGeometryData as input and
   *  generating Images as output
   *
@@ -62,8 +63,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(PlaneGeometryDataToSurfaceFilter, SurfaceSource);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       virtual void GenerateOutputInformation() override;
 
@@ -147,27 +147,26 @@ namespace mitk {
     itkSetMacro(PlaceByGeometry, bool);
     itkBooleanMacro(PlaceByGeometry);
 
-    itkGetConstMacro( UseBoundingBox, bool );
-    itkSetMacro( UseBoundingBox, bool );
-    itkBooleanMacro( UseBoundingBox );
+    itkGetConstMacro(UseBoundingBox, bool);
+    itkSetMacro(UseBoundingBox, bool);
+    itkBooleanMacro(UseBoundingBox);
 
-    void SetBoundingBox( const BoundingBox *boundingBox );
+    void SetBoundingBox(const BoundingBox *boundingBox);
     const BoundingBox *GetBoundingBox() const;
 
   protected:
-
     PlaneGeometryDataToSurfaceFilter();
 
     virtual ~PlaneGeometryDataToSurfaceFilter();
 
     /** \brief Source to create the vtk-representation of the parameter space rectangle of the PlaneGeometry
     */
-    vtkPlaneSource* m_PlaneSource;
+    vtkPlaneSource *m_PlaneSource;
 
     /** \brief Filter to create the vtk-representation of the PlaneGeometry, which is a
     *  transformation of the m_PlaneSource
     */
-    vtkTransformPolyDataFilter* m_VtkTransformPlaneFilter;
+    vtkTransformPolyDataFilter *m_VtkTransformPlaneFilter;
 
     /** \brief If \a true, use Geometry3D::GetParametricBounds() to define the resolution in parameter space,
     *  otherwise use m_XResolution and m_YResolution
@@ -215,7 +214,7 @@ namespace mitk {
     vtkCutter *m_PlaneCutter;
     vtkStripper *m_PlaneStripper;
     vtkPolyData *m_PlanePolyData;
-    vtkPPolyDataNormals * m_NormalsUpdater;
+    vtkPPolyDataNormals *m_NormalsUpdater;
     vtkTriangleFilter *m_PlaneTriangler;
     vtkTextureMapToPlane *m_TextureMapToPlane;
 

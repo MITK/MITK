@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkIntPropertyExtension_h
 #define mitkIntPropertyExtension_h
 
-#include <mitkPropertyExtension.h>
 #include <MitkCoreExports.h>
+#include <mitkPropertyExtension.h>
 
 namespace mitk
 {
@@ -31,9 +31,7 @@ namespace mitk
   public:
     mitkClassMacro(IntPropertyExtension, PropertyExtension);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    mitkNewMacro2Param(Self, int, int);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro2Param(Self, int, int);
     mitkNewMacro3Param(Self, int, int, int);
 
     int GetMaximum() const;
@@ -52,7 +50,7 @@ namespace mitk
     ~IntPropertyExtension();
 
     struct Impl;
-    Impl* m_Impl;
+    Impl *m_Impl;
   };
 }
 

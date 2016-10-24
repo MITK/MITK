@@ -14,16 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <mitkExceptionMacro.h>
 #include <mitkLog.h>
 #include <mitkLogMacros.h>
-#include <mitkExceptionMacro.h>
 
-#include <itkSimpleFastMutexLock.h>
 #include <itkOutputWindow.h>
+#include <itkSimpleFastMutexLock.h>
 
-#include <iostream>
-#include <fstream>
 #include <cstdio>
+#include <fstream>
+#include <iostream>
 
 static itk::SimpleFastMutexLock logMutex;
 static mitk::LoggingBackend *mitkLogBackend = nullptr;
@@ -37,35 +37,36 @@ void mitk::LoggingBackend::EnableAdditionalConsoleWindow(bool enable)
   logOutputWindow = enable;
 }
 
-
-void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
+void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage &l)
 {
   logMutex.Lock();
-  #ifdef _WIN32
-    FormatSmart( l, (int)GetCurrentThreadId() );
-  #else
-    FormatSmart( l );
-  #endif
+#ifdef _WIN32
+  FormatSmart(l, (int)GetCurrentThreadId());
+#else
+  FormatSmart(l);
+#endif
 
-  if(logFile)
+  if (logFile)
   {
-    #ifdef _WIN32
-      FormatFull( *logFile, l, (int)GetCurrentThreadId() );
-    #else
-      FormatFull( *logFile, l );
-    #endif
+#ifdef _WIN32
+    FormatFull(*logFile, l, (int)GetCurrentThreadId());
+#else
+    FormatFull(*logFile, l);
+#endif
   }
-  if(logOutputWindow)
+  if (logOutputWindow)
   {
-    if(outputWindow == nullptr)
-    {  outputWindow = new std::stringstream();}
+    if (outputWindow == nullptr)
+    {
+      outputWindow = new std::stringstream();
+    }
     outputWindow->str("");
     outputWindow->clear();
-    #ifdef _WIN32
-      FormatFull( *outputWindow, l, (int)GetCurrentThreadId() );
-    #else
-      FormatFull( *outputWindow, l );
-    #endif
+#ifdef _WIN32
+    FormatFull(*outputWindow, l, (int)GetCurrentThreadId());
+#else
+    FormatFull(*outputWindow, l);
+#endif
     itk::OutputWindow::GetInstance()->DisplayText(outputWindow->str().c_str());
   }
   logMutex.Unlock();
@@ -73,20 +74,20 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
 
 void mitk::LoggingBackend::Register()
 {
-  if(mitkLogBackend)
+  if (mitkLogBackend)
     return;
   mitkLogBackend = new mitk::LoggingBackend();
-  mbilog::RegisterBackend( mitkLogBackend );
+  mbilog::RegisterBackend(mitkLogBackend);
 }
 
 void mitk::LoggingBackend::Unregister()
 {
-  if(mitkLogBackend)
+  if (mitkLogBackend)
   {
     SetLogFile(nullptr);
-    mbilog::UnregisterBackend( mitkLogBackend );
+    mbilog::UnregisterBackend(mitkLogBackend);
     delete mitkLogBackend;
-    mitkLogBackend=nullptr;
+    mitkLogBackend = nullptr;
   }
 }
 
@@ -98,7 +99,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
     std::string closedFileName;
 
     logMutex.Lock();
-    if(logFile)
+    if (logFile)
     {
       closed = true;
       closedFileName = logFileName;
@@ -108,26 +109,26 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
       logFileName = "";
     }
     logMutex.Unlock();
-    if(closed)
+    if (closed)
     {
-      MITK_INFO << "closing logfile (" << closedFileName << ")" ;
+      MITK_INFO << "closing logfile (" << closedFileName << ")";
     }
   }
 
   // opening new logfile
-  if(file)
+  if (file)
   {
     logMutex.Lock();
 
     logFileName = file;
-    logFile = new std::ofstream( );
+    logFile = new std::ofstream();
 
-    logFile->open( file,  std::ios_base::out | std::ios_base::app );
+    logFile->open(file, std::ios_base::out | std::ios_base::app);
 
-    if(logFile->good())
+    if (logFile->good())
     {
       logMutex.Unlock();
-      MITK_INFO << "Logfile: " << logFileName ;
+      MITK_INFO << "Logfile: " << logFileName;
     }
     else
     {
@@ -146,76 +147,83 @@ std::string mitk::LoggingBackend::GetLogFile()
   return logFileName;
 }
 
-void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
+void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc, char **argv)
 {
   int r;
 
-  for(r=1;r<argc;r++)
+  for (r = 1; r < argc; r++)
   {
-    if(std::string(argv[r])=="--logfile")
+    if (std::string(argv[r]) == "--logfile")
     {
-      if(r+1>=argc)
+      if (r + 1 >= argc)
       {
         --argc;
         MITK_ERROR << "--logfile parameter found, but no file given";
         return;
       }
 
-      mitk::LoggingBackend::SetLogFile(argv[r+1]);
+      mitk::LoggingBackend::SetLogFile(argv[r + 1]);
 
-      for(r+=2;r<argc;r++)
-        argv[r-2]=argv[r];
+      for (r += 2; r < argc; r++)
+        argv[r - 2] = argv[r];
 
-      argc-=2;
+      argc -= 2;
       return;
     }
   }
 }
 
-void mitk::LoggingBackend::RotateLogFiles(const std::string& prefixPath)
+void mitk::LoggingBackend::RotateLogFiles(const std::string &prefixPath)
 {
   static const int numLogFiles = 10;
   std::string newEmptyLogFileName;
 
-  //first: rotate the old log files to get a new, free logfile name
-  newEmptyLogFileName = IncrementLogFileNames(prefixPath,numLogFiles);
+  // first: rotate the old log files to get a new, free logfile name
+  newEmptyLogFileName = IncrementLogFileNames(prefixPath, numLogFiles);
 
-  //now: use the new empty logfile name as name for this run
-   mitk::LoggingBackend::SetLogFile(newEmptyLogFileName.c_str());
-  }
+  // now: use the new empty logfile name as name for this run
+  mitk::LoggingBackend::SetLogFile(newEmptyLogFileName.c_str());
+}
 
-std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string& prefixPath, int numLogFiles)
+std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string &prefixPath, int numLogFiles)
 {
   // delete last one
   {
     std::stringstream s;
-    s << prefixPath.c_str() << "-" << numLogFiles-1 << ".log";
-    //check if the file exists
-    if (CheckIfFileExists(s.str())) //if yes: delete it
-      {
+    s << prefixPath.c_str() << "-" << numLogFiles - 1 << ".log";
+    // check if the file exists
+    if (CheckIfFileExists(s.str())) // if yes: delete it
+    {
       int retVal = ::remove(s.str().c_str());
-      if (retVal!=0) {mitkThrow() << "Problem while deleting the oldest log file. Maybe the access to this files is blocked. Aborting!";}
+      if (retVal != 0)
+      {
+        mitkThrow()
+          << "Problem while deleting the oldest log file. Maybe the access to this files is blocked. Aborting!";
       }
+    }
   }
 
   // rename the others
-  for( int r = numLogFiles-1 ; r >= 1 ; r-- )
+  for (int r = numLogFiles - 1; r >= 1; r--)
   {
     std::stringstream dst;
     dst << prefixPath.c_str() << "-" << r << ".log";
 
     std::stringstream src;
-    src << prefixPath.c_str() << "-" << r-1 << ".log";
+    src << prefixPath.c_str() << "-" << r - 1 << ".log";
 
-    //check if the source exists
-    if (CheckIfFileExists(src.str())) //if yes: rename it
+    // check if the source exists
+    if (CheckIfFileExists(src.str())) // if yes: rename it
+    {
+      int retVal = ::rename(src.str().c_str(), dst.str().c_str());
+      if (retVal != 0)
       {
-      int retVal = ::rename( src.str().c_str(), dst.str().c_str() );
-      if (retVal!=0) {mitkThrow() << "Problem while renaming the log files. Maybe the access to this files is blocked. Aborting!";}
+        mitkThrow() << "Problem while renaming the log files. Maybe the access to this files is blocked. Aborting!";
       }
+    }
   }
 
-  //create new empty name and return it
+  // create new empty name and return it
   {
     std::stringstream s;
     s << prefixPath.c_str() << "-0.log";
@@ -223,12 +231,18 @@ std::string mitk::LoggingBackend::IncrementLogFileNames(const std::string& prefi
   }
 }
 
-bool mitk::LoggingBackend::CheckIfFileExists(const std::string& filename)
+bool mitk::LoggingBackend::CheckIfFileExists(const std::string &filename)
 {
   bool returnValue = false;
   std::ifstream File(filename.c_str());
-  if (File.good()) {returnValue = true;}
-  else {returnValue = false;}
+  if (File.good())
+  {
+    returnValue = true;
+  }
+  else
+  {
+    returnValue = false;
+  }
   File.close();
   return returnValue;
 }

@@ -17,39 +17,38 @@
 #ifndef SMACTION_H_HEADER_INCLUDED_C19AE06B
 #define SMACTION_H_HEADER_INCLUDED_C19AE06B
 
+#include "MitkCoreExports.h"
 #include "mitkCommon.h"
 #include <itkLightObject.h>
 #include <itkObjectFactory.h>
 #include <string>
-#include "MitkCoreExports.h"
 
 namespace mitk
 {
   //##Documentation
   //## @brief Represents an action, that is executed after a certain event (in statemachine-mechanism)
-  //## TODO: implement: Is used to connect the Action-Id in an XML Statemachine description with a functor in the StateMachine
+  //## TODO: implement: Is used to connect the Action-Id in an XML Statemachine description with a functor in the
+  // StateMachine
   //## implementation
   //## @ingroup Interaction
-  class MITKCORE_EXPORT StateMachineAction: public itk::LightObject
+  class MITKCORE_EXPORT StateMachineAction : public itk::LightObject
   {
   public:
-    mitkClassMacroItkParent(StateMachineAction, itk::Object)
-    mitkNewMacro1Param(Self, const std::string&)
-    /**
-     * @brief Returns the String-Id of this action.
-     **/
-    std::string GetActionName() const;
+    mitkClassMacroItkParent(StateMachineAction, itk::Object) mitkNewMacro1Param(Self, const std::string &)
+      /**
+       * @brief Returns the String-Id of this action.
+       **/
+      std::string GetActionName() const;
 
   protected:
-
-    StateMachineAction(const std::string&);
+    StateMachineAction(const std::string &);
     ~StateMachineAction();
+
   private:
     /**
      * @brief The Id-Name of this action.
      **/
     std::string m_ActionName;
-
   };
 
 } // namespace mitk

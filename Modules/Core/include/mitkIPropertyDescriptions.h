@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkIPropertyDescriptions_h
 #define mitkIPropertyDescriptions_h
 
+#include <MitkCoreExports.h>
 #include <mitkServiceInterface.h>
 #include <string>
-#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -43,7 +43,10 @@ namespace mitk
      * \param[in] overwrite Overwrite already existing description.
      * \return True if description was added successfully.
      */
-    virtual bool AddDescription(const std::string& propertyName, const std::string& description, const std::string& className = "", bool overwrite = false) = 0;
+    virtual bool AddDescription(const std::string &propertyName,
+                                const std::string &description,
+                                const std::string &className = "",
+                                bool overwrite = false) = 0;
 
     /** \brief Add a description for all properties matching the property regulary expression.
     *
@@ -53,7 +56,10 @@ namespace mitk
     * \param[in] overwrite Overwrite already existing description.
     * \return True if description was added successfully.
     */
-    virtual bool AddDescriptionRegEx(const std::string& propertyRegEx, const std::string& description, const std::string& className = "", bool overwrite = false) = 0;
+    virtual bool AddDescriptionRegEx(const std::string &propertyRegEx,
+                                     const std::string &description,
+                                     const std::string &className = "",
+                                     bool overwrite = false) = 0;
 
     /** \brief Get the description for a specific property.
      *
@@ -62,7 +68,9 @@ namespace mitk
      * \param[in] allowNameRegEx Indicates of also regular expressions should be regarded.
      * \return Property description or empty string if no description is available.
      */
-    virtual std::string GetDescription(const std::string& propertyName, const std::string& className = "", bool allowNameRegEx = true) const = 0;
+    virtual std::string GetDescription(const std::string &propertyName,
+                                       const std::string &className = "",
+                                       bool allowNameRegEx = true) const = 0;
 
     /** \brief Check if a specific property has a description.
       *
@@ -71,20 +79,22 @@ namespace mitk
       * \param[in] allowNameRegEx Indicates of also regular expressions should be regarded.
       * \return True if the property has a description, false otherwise.
       */
-    virtual bool HasDescription(const std::string& propertyName, const std::string& className = "", bool allowNameRegEx = true) const = 0;
+    virtual bool HasDescription(const std::string &propertyName,
+                                const std::string &className = "",
+                                bool allowNameRegEx = true) const = 0;
 
     /** \brief Remove all descriptions.
       *
       * \param[in] className Optional data node class name to which this description is restricted.
       */
-    virtual void RemoveAllDescriptions(const std::string& className = "") = 0;
+    virtual void RemoveAllDescriptions(const std::string &className = "") = 0;
 
     /** \brief Remove description of specific property.
       *
       * \param[in] propertyName Name of the property.
       * \param[in] className Optional data node class name to which this description is restricted.
       */
-    virtual void RemoveDescription(const std::string& propertyName, const std::string& className = "") = 0;
+    virtual void RemoveDescription(const std::string &propertyName, const std::string &className = "") = 0;
   };
 }
 

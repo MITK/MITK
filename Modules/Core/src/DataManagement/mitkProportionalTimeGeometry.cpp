@@ -13,12 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <mitkProportionalTimeGeometry.h>
 #include <limits>
+#include <mitkProportionalTimeGeometry.h>
 
-mitk::ProportionalTimeGeometry::ProportionalTimeGeometry() :
-  m_FirstTimePoint(0.0),
-  m_StepDuration(1.0)
+mitk::ProportionalTimeGeometry::ProportionalTimeGeometry() : m_FirstTimePoint(0.0), m_StepDuration(1.0)
 {
 }
 
@@ -33,25 +31,25 @@ void mitk::ProportionalTimeGeometry::Initialize()
   m_GeometryVector.resize(1);
 }
 
-mitk::TimeStepType mitk::ProportionalTimeGeometry::CountTimeSteps () const
+mitk::TimeStepType mitk::ProportionalTimeGeometry::CountTimeSteps() const
 {
-  return static_cast<TimeStepType>(m_GeometryVector.size() );
+  return static_cast<TimeStepType>(m_GeometryVector.size());
 }
 
-mitk::TimePointType mitk::ProportionalTimeGeometry::GetMinimumTimePoint () const
+mitk::TimePointType mitk::ProportionalTimeGeometry::GetMinimumTimePoint() const
 {
   return m_FirstTimePoint;
 }
 
-mitk::TimePointType mitk::ProportionalTimeGeometry::GetMaximumTimePoint () const
+mitk::TimePointType mitk::ProportionalTimeGeometry::GetMaximumTimePoint() const
 {
   TimePointType timePoint = m_FirstTimePoint + m_StepDuration * CountTimeSteps();
-  if (timePoint >std::numeric_limits<TimePointType>().max())
+  if (timePoint > std::numeric_limits<TimePointType>().max())
     timePoint = std::numeric_limits<TimePointType>().max();
   return timePoint;
 }
 
-mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds () const
+mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds() const
 {
   TimeBounds bounds;
   bounds[0] = this->GetMinimumTimePoint();
@@ -59,7 +57,7 @@ mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds () const
   return bounds;
 }
 
-mitk::TimePointType  mitk::ProportionalTimeGeometry::GetMinimumTimePoint(TimeStepType step) const
+mitk::TimePointType mitk::ProportionalTimeGeometry::GetMinimumTimePoint(TimeStepType step) const
 {
   TimePointType timePoint;
   if (step == 0)
@@ -70,19 +68,18 @@ mitk::TimePointType  mitk::ProportionalTimeGeometry::GetMinimumTimePoint(TimeSte
   {
     timePoint = m_FirstTimePoint + m_StepDuration * step;
   }
-  if (timePoint >std::numeric_limits<TimePointType>().max())
+  if (timePoint > std::numeric_limits<TimePointType>().max())
     timePoint = std::numeric_limits<TimePointType>().max();
   return timePoint;
 }
 
-mitk::TimePointType   mitk::ProportionalTimeGeometry::GetMaximumTimePoint(TimeStepType step) const
+mitk::TimePointType mitk::ProportionalTimeGeometry::GetMaximumTimePoint(TimeStepType step) const
 {
   TimePointType timePoint = m_FirstTimePoint + m_StepDuration * (step + 1);
-  if (timePoint >std::numeric_limits<TimePointType>().max())
+  if (timePoint > std::numeric_limits<TimePointType>().max())
     timePoint = std::numeric_limits<TimePointType>().max();
   return timePoint;
 }
-
 
 mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds(TimeStepType step) const
 {
@@ -92,17 +89,17 @@ mitk::TimeBounds mitk::ProportionalTimeGeometry::GetTimeBounds(TimeStepType step
   return bounds;
 }
 
-bool mitk::ProportionalTimeGeometry::IsValidTimePoint (TimePointType timePoint) const
+bool mitk::ProportionalTimeGeometry::IsValidTimePoint(TimePointType timePoint) const
 {
   return this->GetMinimumTimePoint() <= timePoint && timePoint < this->GetMaximumTimePoint();
 }
 
-bool mitk::ProportionalTimeGeometry::IsValidTimeStep (TimeStepType timeStep) const
+bool mitk::ProportionalTimeGeometry::IsValidTimeStep(TimeStepType timeStep) const
 {
-  return timeStep <  this->CountTimeSteps();
+  return timeStep < this->CountTimeSteps();
 }
 
-mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint( TimeStepType timeStep) const
+mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint(TimeStepType timeStep) const
 {
   if (m_FirstTimePoint <= itk::NumericTraits<TimePointType>::NonpositiveMin() ||
       m_FirstTimePoint >= itk::NumericTraits<TimePointType>::max() ||
@@ -115,19 +112,19 @@ mitk::TimePointType mitk::ProportionalTimeGeometry::TimeStepToTimePoint( TimeSte
   return m_FirstTimePoint + timeStep * m_StepDuration;
 }
 
-mitk::TimeStepType mitk::ProportionalTimeGeometry::TimePointToTimeStep( TimePointType timePoint) const
+mitk::TimeStepType mitk::ProportionalTimeGeometry::TimePointToTimeStep(TimePointType timePoint) const
 {
   if (m_FirstTimePoint <= timePoint)
-    return static_cast<TimeStepType>((timePoint -m_FirstTimePoint) / m_StepDuration);
+    return static_cast<TimeStepType>((timePoint - m_FirstTimePoint) / m_StepDuration);
   else
     return 0;
 }
 
-mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimeStep( TimeStepType timeStep) const
+mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimeStep(TimeStepType timeStep) const
 {
   if (IsValidTimeStep(timeStep))
   {
-    return dynamic_cast<BaseGeometry*>(m_GeometryVector[timeStep].GetPointer());
+    return dynamic_cast<BaseGeometry *>(m_GeometryVector[timeStep].GetPointer());
   }
   else
   {
@@ -148,8 +145,7 @@ mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimePo
   }
 }
 
-
-mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForTimeStep( TimeStepType timeStep) const
+mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryCloneForTimeStep(TimeStepType timeStep) const
 {
   if (timeStep >= m_GeometryVector.size())
     return nullptr;
@@ -179,24 +175,25 @@ void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
   m_GeometryVector.reserve(size);
   if (m_GeometryVector.size() == 0)
   {
-    while  (m_GeometryVector.size() < size)
+    while (m_GeometryVector.size() < size)
     {
       Geometry3D::Pointer geo3D = Geometry3D::New();
-      m_GeometryVector.push_back(dynamic_cast<BaseGeometry*>(geo3D.GetPointer()));
+      m_GeometryVector.push_back(dynamic_cast<BaseGeometry *>(geo3D.GetPointer()));
     }
-  } else
+  }
+  else
   {
     while (m_GeometryVector.size() < size)
     {
-      BaseGeometry::Pointer clone = dynamic_cast<BaseGeometry*>(m_GeometryVector[0]->Clone().GetPointer());
+      BaseGeometry::Pointer clone = dynamic_cast<BaseGeometry *>(m_GeometryVector[0]->Clone().GetPointer());
       m_GeometryVector.push_back(clone);
     }
   }
 }
 
-void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(BaseGeometry* geometry, TimeStepType timeStep)
+void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(BaseGeometry *geometry, TimeStepType timeStep)
 {
-  assert(timeStep<=m_GeometryVector.size());
+  assert(timeStep <= m_GeometryVector.size());
 
   if (timeStep == m_GeometryVector.size())
     m_GeometryVector.push_back(geometry);
@@ -207,13 +204,12 @@ void mitk::ProportionalTimeGeometry::SetTimeStepGeometry(BaseGeometry* geometry,
 itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
 {
   itk::LightObject::Pointer parent = Superclass::InternalClone();
-  ProportionalTimeGeometry::Pointer newTimeGeometry =
-    dynamic_cast<ProportionalTimeGeometry * > (parent.GetPointer());
+  ProportionalTimeGeometry::Pointer newTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(parent.GetPointer());
   newTimeGeometry->m_FirstTimePoint = this->m_FirstTimePoint;
   newTimeGeometry->m_StepDuration = this->m_StepDuration;
   newTimeGeometry->m_GeometryVector.clear();
   newTimeGeometry->Expand(this->CountTimeSteps());
-  for (TimeStepType i =0; i < CountTimeSteps(); ++i)
+  for (TimeStepType i = 0; i < CountTimeSteps(); ++i)
   {
     BaseGeometry::Pointer tempGeometry = GetGeometryForTimeStep(i)->Clone();
     newTimeGeometry->SetTimeStepGeometry(tempGeometry, i);
@@ -221,7 +217,7 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
   return parent;
 }
 
-void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry* geometry)
+void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometry *geometry)
 {
   for (TimeStepType currentStep = 0; currentStep < this->CountTimeSteps(); ++currentStep)
   {
@@ -230,7 +226,7 @@ void mitk::ProportionalTimeGeometry::ReplaceTimeStepGeometries(const BaseGeometr
   }
 }
 
-void mitk::ProportionalTimeGeometry::Initialize (const BaseGeometry* geometry, TimeStepType timeSteps)
+void mitk::ProportionalTimeGeometry::Initialize(const BaseGeometry *geometry, TimeStepType timeSteps)
 {
   timeSteps = (timeSteps > 0) ? timeSteps : 1;
   m_FirstTimePoint = 0.0;
@@ -242,12 +238,13 @@ void mitk::ProportionalTimeGeometry::Initialize (const BaseGeometry* geometry, T
   }
 
   this->ReserveSpaceForGeometries(timeSteps);
-  try{
-  for (TimeStepType currentStep = 0; currentStep < timeSteps; ++currentStep)
+  try
   {
-    BaseGeometry::Pointer clonedGeometry = geometry->Clone();
-    this->SetTimeStepGeometry(clonedGeometry, currentStep);
-  }
+    for (TimeStepType currentStep = 0; currentStep < timeSteps; ++currentStep)
+    {
+      BaseGeometry::Pointer clonedGeometry = geometry->Clone();
+      this->SetTimeStepGeometry(clonedGeometry, currentStep);
+    }
   }
   catch (...)
   {
@@ -256,16 +253,16 @@ void mitk::ProportionalTimeGeometry::Initialize (const BaseGeometry* geometry, T
   Update();
 }
 
-void mitk::ProportionalTimeGeometry::Initialize (TimeStepType timeSteps)
+void mitk::ProportionalTimeGeometry::Initialize(TimeStepType timeSteps)
 {
   mitk::Geometry3D::Pointer geo3D = Geometry3D::New();
-  mitk::BaseGeometry::Pointer geometry = dynamic_cast<BaseGeometry*>(geo3D.GetPointer());
+  mitk::BaseGeometry::Pointer geometry = dynamic_cast<BaseGeometry *>(geo3D.GetPointer());
   geometry->Initialize();
 
   this->Initialize(geometry.GetPointer(), timeSteps);
 }
 
-void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream& os, itk::Indent indent) const
+void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << " TimeSteps: " << this->CountTimeSteps() << std::endl;
   os << indent << " FirstTimePoint: " << this->GetFirstTimePoint() << std::endl;
@@ -274,18 +271,19 @@ void mitk::ProportionalTimeGeometry::PrintSelf(std::ostream& os, itk::Indent ind
 
   os << std::endl;
   os << indent << " GetGeometryForTimeStep(0): ";
-  if(GetGeometryForTimeStep(0).IsNull())
+  if (GetGeometryForTimeStep(0).IsNull())
     os << "NULL" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
 }
 
-bool mitk::Equal(const ProportionalTimeGeometry& leftHandSide, const ProportionalTimeGeometry& rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const ProportionalTimeGeometry &leftHandSide,
+                 const ProportionalTimeGeometry &rightHandSide,
+                 ScalarType eps,
+                 bool verbose)
 {
-  bool result = mitk::Equal( static_cast<const TimeGeometry&>(leftHandSide),
-                             static_cast<const TimeGeometry&>(rightHandSide),
-                             eps,
-                             verbose);
+  bool result = mitk::Equal(
+    static_cast<const TimeGeometry &>(leftHandSide), static_cast<const TimeGeometry &>(rightHandSide), eps, verbose);
 
   if (!result) // early out if base class already is unhappy
     return false;

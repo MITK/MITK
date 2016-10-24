@@ -17,8 +17,8 @@
 #ifndef mitkDisplayInteractor_h
 #define mitkDisplayInteractor_h
 
-#include <MitkCoreExports.h>
 #include "mitkInteractionEventObserver.h"
+#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -34,19 +34,18 @@ namespace mitk
    * Inherits from mitk::InteractionEventObserver since it doesn't alter any data (only their representation),
    * and its actions cannot be associated with a DataNode. Also inherits from EventStateMachine
    */
-  class MITKCORE_EXPORT DisplayInteractor: public EventStateMachine, public InteractionEventObserver
+  class MITKCORE_EXPORT DisplayInteractor : public EventStateMachine, public InteractionEventObserver
   {
   public:
-    mitkClassMacro(DisplayInteractor, EventStateMachine)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    /**
-     * By this function the Observer gets notified about new events.
-     * Here it is adapted to pass the events to the state machine in order to use
-     * its infrastructure.
-     * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
-     */
-    virtual void Notify(InteractionEvent* interactionEvent, bool isHandled) override;
+    mitkClassMacro(DisplayInteractor, EventStateMachine) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+      /**
+       * By this function the Observer gets notified about new events.
+       * Here it is adapted to pass the events to the state machine in order to use
+       * its infrastructure.
+       * It also checks if event is to be accepted when it already has been processed by a DataInteractor.
+       */
+      virtual void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
+
   protected:
     DisplayInteractor();
     virtual ~DisplayInteractor();
@@ -70,27 +69,27 @@ namespace mitk
      * Here it is used to read out the parameters set in the configuration file,
      * and set the member variables accordingly.
      */
-    virtual bool FilterEvents(InteractionEvent* interactionEvent, DataNode* dataNode) override;
+    virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 
-    virtual bool CheckPositionEvent( const InteractionEvent* interactionEvent );
+    virtual bool CheckPositionEvent(const InteractionEvent *interactionEvent);
 
-    virtual bool CheckRotationPossible( const InteractionEvent* interactionEvent );
+    virtual bool CheckRotationPossible(const InteractionEvent *interactionEvent);
 
-    virtual bool CheckSwivelPossible( const InteractionEvent* interactionEvent );
+    virtual bool CheckSwivelPossible(const InteractionEvent *interactionEvent);
 
     /**
      * \brief Initializes an interaction, saves the pointers start position for further reference.
      */
-    virtual void Init(StateMachineAction*, InteractionEvent*);
+    virtual void Init(StateMachineAction *, InteractionEvent *);
     /**
      * \brief Performs panning of the data set in the render window.
      */
-    virtual void Move(StateMachineAction*, InteractionEvent*);
+    virtual void Move(StateMachineAction *, InteractionEvent *);
 
     /**
      * \brief Sets crosshair at clicked position*
      */
-    virtual void SetCrosshair(StateMachineAction*, InteractionEvent*);
+    virtual void SetCrosshair(StateMachineAction *, InteractionEvent *);
 
     /**
      * \brief Performs zooming relative to mouse/pointer movement.
@@ -98,63 +97,62 @@ namespace mitk
      * Behavior is determined by \see m_ZoomDirection and \see m_ZoomFactor.
      *
      */
-    virtual void Zoom(StateMachineAction*, InteractionEvent*);
+    virtual void Zoom(StateMachineAction *, InteractionEvent *);
     /**
      * \brief Performs scrolling relative to mouse/pointer movement.
      *
      * Behavior is determined by \see m_ScrollDirection and \see m_AutoRepeat.
      *
      */
-    virtual void Scroll(StateMachineAction*, InteractionEvent*);
+    virtual void Scroll(StateMachineAction *, InteractionEvent *);
     /**
      * \brief Scrolls one layer up
      */
-    virtual void ScrollOneDown(StateMachineAction*, InteractionEvent*);
+    virtual void ScrollOneDown(StateMachineAction *, InteractionEvent *);
     /**
      * \brief Scrolls one layer down
      */
-    virtual void ScrollOneUp(StateMachineAction*, InteractionEvent*);
+    virtual void ScrollOneUp(StateMachineAction *, InteractionEvent *);
     /**
      * \brief Adjusts the level windows relative to mouse/pointer movement.
      */
-    virtual void AdjustLevelWindow(StateMachineAction*, InteractionEvent*);
+    virtual void AdjustLevelWindow(StateMachineAction *, InteractionEvent *);
 
     /**
      * \brief Starts crosshair rotation
      */
-    virtual void StartRotation(StateMachineAction*, InteractionEvent*);
-
+    virtual void StartRotation(StateMachineAction *, InteractionEvent *);
 
     /**
      * \brief Ends crosshair rotation
      */
-    virtual void EndRotation(StateMachineAction*, InteractionEvent*);
+    virtual void EndRotation(StateMachineAction *, InteractionEvent *);
 
     /**
      * \brief
      */
-    virtual void Rotate(StateMachineAction*, InteractionEvent* event);
+    virtual void Rotate(StateMachineAction *, InteractionEvent *event);
 
-    virtual void Swivel(StateMachineAction*, InteractionEvent* event);
-
+    virtual void Swivel(StateMachineAction *, InteractionEvent *event);
 
     /**
      * \brief Updates the Statusbar information with the information about the clicked position
      */
-    virtual void UpdateStatusbar(StateMachineAction*, InteractionEvent* event);
+    virtual void UpdateStatusbar(StateMachineAction *, InteractionEvent *event);
 
     /**
     * \brief Method to retrieve bool-value for given property from string-property
     * in given propertylist.
     */
-    bool GetBoolProperty( mitk::PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue );
+    bool GetBoolProperty(mitk::PropertyList::Pointer propertyList, const char *propertyName, bool defaultValue);
 
     // Typedefs
-    typedef std::vector<SliceNavigationController*> SNCVector;
+    typedef std::vector<SliceNavigationController *> SNCVector;
 
   private:
-
-    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,mitk::Point3D worldposition, BaseRenderer* ren);
+    mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes,
+                                            mitk::Point3D worldposition,
+                                            BaseRenderer *ren);
 
     /**
      * \brief Coordinate of the pointer at begin of an interaction translated to mm unit
@@ -200,7 +198,6 @@ namespace mitk
     */
     bool m_InvertScrollDirection;
 
-
     /**
     * Defines scroll behavior.
     * Default is up/down movement of pointer performs zooming
@@ -216,7 +213,6 @@ namespace mitk
     * Defines how the axis of interaction influences move behavior.
     */
     bool m_InvertMoveDirection;
-
 
     /**
     * Defines level/window behavior.
@@ -247,10 +243,11 @@ namespace mitk
     bool m_LinkPlanes;
 
     SNCVector m_RotatableSNCs; /// all SNCs that currently have CreatedWorldGeometries, that can be rotated.
-    SNCVector m_SNCsToBeRotated; /// all SNCs that will be rotated (exceptions are the ones parallel to the one being clicked)
+    SNCVector
+      m_SNCsToBeRotated; /// all SNCs that will be rotated (exceptions are the ones parallel to the one being clicked)
 
-    Point3D  m_LastCursorPosition; /// used for calculation of the rotation angle
-    Point3D  m_CenterOfRotation; /// used for calculation of the rotation angle
+    Point3D m_LastCursorPosition; /// used for calculation of the rotation angle
+    Point3D m_CenterOfRotation;   /// used for calculation of the rotation angle
 
     Point2D m_ReferenceCursor;
 
@@ -260,8 +257,6 @@ namespace mitk
 
     Vector3D m_PreviousRotationAxis;
     ScalarType m_PreviousRotationAngle;
-
-
   };
 }
 #endif

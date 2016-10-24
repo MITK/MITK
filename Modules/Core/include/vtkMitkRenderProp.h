@@ -14,64 +14,62 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723
 #define VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723
 
-#include "vtkProp.h"
 #include "mitkVtkPropRenderer.h"
-
+#include "vtkProp.h"
 
 /*!
 \brief vtkMitkRenderProp
 
 The MITK rendering process is completely integrated into the VTK rendering pipeline.
-The vtkMitkRenderProp is a custom vtkProp derived class, which implements the rendering interface between MITK and VTK. It redirects render() calls to the VtkPropRenderer, which is responsible for rendering of the datatreenodes.
+The vtkMitkRenderProp is a custom vtkProp derived class, which implements the rendering interface between MITK and VTK.
+It redirects render() calls to the VtkPropRenderer, which is responsible for rendering of the datatreenodes.
 
 \sa rendering
 \ingroup rendering
 */
 class MITKCORE_EXPORT vtkMitkRenderProp : public vtkProp
 {
-  public:
-    static vtkMitkRenderProp *New();
-    vtkTypeMacro(vtkMitkRenderProp,vtkProp);
+public:
+  static vtkMitkRenderProp *New();
+  vtkTypeMacro(vtkMitkRenderProp, vtkProp);
 
-    void SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer);
+  void SetPropRenderer(mitk::VtkPropRenderer::Pointer propRenderer);
 
-    int RenderOpaqueGeometry(vtkViewport* viewport) override;
+  int RenderOpaqueGeometry(vtkViewport *viewport) override;
 
-    int RenderOverlay(vtkViewport* viewport) override;
+  int RenderOverlay(vtkViewport *viewport) override;
 
-    double *GetBounds() override;
+  double *GetBounds() override;
 
-    void ReleaseGraphicsResources(vtkWindow* window) override;
+  void ReleaseGraphicsResources(vtkWindow *window) override;
 
-    /**
-     * \brief Used by vtkPointPicker/vtkPicker.
-     * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
-     */
-    virtual void InitPathTraversal() override;
+  /**
+   * \brief Used by vtkPointPicker/vtkPicker.
+   * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+   */
+  virtual void InitPathTraversal() override;
 
-    /**
-     * \brief Used by vtkPointPicker/vtkPicker.
-     * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
-     */
-    virtual vtkAssemblyPath* GetNextPath() override;
+  /**
+   * \brief Used by vtkPointPicker/vtkPicker.
+   * This will query a list of all objects in MITK and provide every vtk based mapper to the picker.
+   */
+  virtual vtkAssemblyPath *GetNextPath() override;
 
-    virtual int GetNumberOfPaths() override;
+  virtual int GetNumberOfPaths() override;
 
-    //BUG (#1551) added method for depth peeling support
-    virtual int HasTranslucentPolygonalGeometry() override;
-    virtual int RenderTranslucentPolygonalGeometry( vtkViewport *) override;
-    virtual int RenderVolumetricGeometry( vtkViewport *) override;
+  // BUG (#1551) added method for depth peeling support
+  virtual int HasTranslucentPolygonalGeometry() override;
+  virtual int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
+  virtual int RenderVolumetricGeometry(vtkViewport *) override;
 
-  protected:
-    vtkMitkRenderProp();
-    ~vtkMitkRenderProp();
+protected:
+  vtkMitkRenderProp();
+  ~vtkMitkRenderProp();
 
-    mitk::VtkPropRenderer::Pointer m_VtkPropRenderer;
+  mitk::VtkPropRenderer::Pointer m_VtkPropRenderer;
 };
-
 
 #endif /* VTKMITKRENDERPROP_H_HEADER_INCLUDED_C1C53723 */

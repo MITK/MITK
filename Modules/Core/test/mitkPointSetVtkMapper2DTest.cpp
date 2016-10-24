@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
+#include "mitkTestingMacros.h"
 
-//VTK
+// VTK
 #include <vtkRegressionTestImage.h>
 
-
-int mitkPointSetVtkMapper2DTest(int argc, char* argv[])
+int mitkPointSetVtkMapper2DTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -40,10 +39,11 @@ int mitkPointSetVtkMapper2DTest(int argc, char* argv[])
   renderingHelper.GetVtkRenderWindow()->SetMultiSamples(0);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
- //use this to generate a reference screenshot or save the file:
-  if(false)
+  // use this to generate a reference screenshot or save the file:
+  if (false)
   {
     renderingHelper.SaveReferenceScreenShot("C:/development_ITK4/output.png");
   }

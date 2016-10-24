@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
 #include "mitkITKImageImport.h"
 #include "mitkImageCast.h"
+#include "mitkTestingMacros.h"
 
 #include "mitkImagePixelReadAccessor.h"
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkRandomImageSource.h>
-
 
 /**
  * Create a test image with random pixel values. The image size is determined by the input parameter.
@@ -30,9 +29,9 @@ See LICENSE.txt or http://www.mitk.org for details.
  * @param size the number of voxels in each dimension
  */
 template <typename TPixel, unsigned int VDimension>
-typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom( short int size )
+typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom(short int size)
 {
-  typedef typename itk::Image< TPixel, VDimension> ImageType;
+  typedef typename itk::Image<TPixel, VDimension> ImageType;
   typedef typename ImageType::Pointer ImagePointer;
 
   itk::Size<VDimension> regionSize;
@@ -47,15 +46,17 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom( short in
 }
 
 /**
- * Create a test vector image (with two components) with a single pixel value. The image size is determined by the input parameter.
+ * Create a test vector image (with two components) with a single pixel value. The image size is determined by the input
+ * parameter.
  *
  * @param value the pixel value the created image is filled with
  * @param size the number of voxels in each dimension
  */
 template <typename TPixel, unsigned int VDimension>
-typename itk::VectorImage<TPixel, VDimension>::Pointer CreateTestVectorImageFixedValue(size_t size, const itk::VariableLengthVector<TPixel>& value)
+typename itk::VectorImage<TPixel, VDimension>::Pointer CreateTestVectorImageFixedValue(
+  size_t size, const itk::VariableLengthVector<TPixel> &value)
 {
-  typedef typename itk::VectorImage< TPixel, VDimension> ImageType;
+  typedef typename itk::VectorImage<TPixel, VDimension> ImageType;
   typedef typename ImageType::Pointer ImagePointer;
 
   typename ImageType::RegionType imageRegion;
@@ -64,8 +65,8 @@ typename itk::VectorImage<TPixel, VDimension>::Pointer CreateTestVectorImageFixe
 
   typename ImageType::RegionType::IndexType regionIndex;
   regionIndex.Fill(0);
-  imageRegion.SetSize( regionSize );
-  imageRegion.SetIndex( regionIndex );
+  imageRegion.SetSize(regionSize);
+  imageRegion.SetIndex(regionIndex);
 
   typename ImageType::SpacingType imageSpacing;
   imageSpacing.Fill(1.0f);
@@ -76,12 +77,12 @@ typename itk::VectorImage<TPixel, VDimension>::Pointer CreateTestVectorImageFixe
   ImagePointer itkImage = ImageType::New();
 
   itkImage->SetVectorLength(value.GetNumberOfElements());
-  itkImage->SetRegions( imageRegion );
-  itkImage->SetOrigin( imageOrigin );
-  itkImage->SetSpacing( imageSpacing );
+  itkImage->SetRegions(imageRegion);
+  itkImage->SetOrigin(imageOrigin);
+  itkImage->SetSpacing(imageSpacing);
   itkImage->Allocate();
 
-  itkImage->FillBuffer( value );
+  itkImage->FillBuffer(value);
 
   return itkImage;
 }
@@ -95,7 +96,7 @@ typename itk::VectorImage<TPixel, VDimension>::Pointer CreateTestVectorImageFixe
 template <typename TPixel, unsigned int VDimension>
 typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageFixedValue(size_t size, TPixel value)
 {
-  typedef typename itk::Image< TPixel, VDimension> ImageType;
+  typedef typename itk::Image<TPixel, VDimension> ImageType;
   typedef typename ImageType::Pointer ImagePointer;
 
   typename ImageType::RegionType imageRegion;
@@ -104,8 +105,8 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageFixedValue(size_
 
   typename ImageType::RegionType::IndexType regionIndex;
   regionIndex.Fill(0);
-  imageRegion.SetSize( regionSize );
-  imageRegion.SetIndex( regionIndex );
+  imageRegion.SetSize(regionSize);
+  imageRegion.SetIndex(regionIndex);
 
   typename ImageType::SpacingType imageSpacing;
   imageSpacing.Fill(1.0f);
@@ -115,24 +116,21 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageFixedValue(size_
 
   ImagePointer itkImage = ImageType::New();
 
-  itkImage->SetRegions( imageRegion );
-  itkImage->SetOrigin( imageOrigin );
-  itkImage->SetSpacing( imageSpacing );
+  itkImage->SetRegions(imageRegion);
+  itkImage->SetOrigin(imageOrigin);
+  itkImage->SetSpacing(imageSpacing);
   itkImage->Allocate();
 
-  itkImage->FillBuffer( value );
+  itkImage->FillBuffer(value);
 
   return itkImage;
 }
-
-
-
 
 /**
  * Compares the meta information of both given images for equality.
  */
 template <typename ImageType>
-bool Assert_ImageMetaData_AreEqual( typename ImageType::Pointer itkImage, mitk::Image::Pointer mitkImage )
+bool Assert_ImageMetaData_AreEqual(typename ImageType::Pointer itkImage, mitk::Image::Pointer mitkImage)
 {
   bool return_value = true;
 
@@ -140,27 +138,27 @@ bool Assert_ImageMetaData_AreEqual( typename ImageType::Pointer itkImage, mitk::
   typename ImageType::SizeType itkImageSize = itkRegion.GetSize();
 
   // check dimension
-  for( unsigned int idx=0; idx < mitkImage->GetDimension(); idx++)
+  for (unsigned int idx = 0; idx < mitkImage->GetDimension(); idx++)
   {
-    return_value &= ( itkImageSize[idx] == mitkImage->GetDimension(idx) );
+    return_value &= (itkImageSize[idx] == mitkImage->GetDimension(idx));
   }
-  MITK_TEST_CONDITION( return_value, " - Dimensions equal!")
+  MITK_TEST_CONDITION(return_value, " - Dimensions equal!")
 
   // check pixel type
-  bool ptype_compare = ( mitkImage->GetPixelType() == mitk::MakePixelType<ImageType>() );
+  bool ptype_compare = (mitkImage->GetPixelType() == mitk::MakePixelType<ImageType>());
   return_value &= ptype_compare;
-  MITK_TEST_CONDITION( ptype_compare, " - Pixel types equal!")
+  MITK_TEST_CONDITION(ptype_compare, " - Pixel types equal!")
 
-  mitk::BaseGeometry* imageGeometry = mitkImage->GetGeometry();
+  mitk::BaseGeometry *imageGeometry = mitkImage->GetGeometry();
   const mitk::Point3D origin = imageGeometry->GetOrigin();
 
   bool origin_compare = true;
-  for( unsigned int idx=0; idx < 3; idx++)
+  for (unsigned int idx = 0; idx < 3; idx++)
   {
-      origin_compare &= ( itkImage->GetOrigin()[idx] == origin[idx] );
+    origin_compare &= (itkImage->GetOrigin()[idx] == origin[idx]);
   }
   return_value &= origin_compare;
-  MITK_TEST_CONDITION( origin_compare, " - Origin equals!")
+  MITK_TEST_CONDITION(origin_compare, " - Origin equals!")
 
   return return_value;
 }
@@ -178,36 +176,35 @@ void Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue()
 
   bool assert_value = true;
 
-  typedef typename itk::Image< TPixel, VDimension> ImageType;
+  typedef typename itk::Image<TPixel, VDimension> ImageType;
   typedef typename ImageType::Pointer ImagePointer;
 
   ImagePointer itkImage = CreateTestImageRandom<TPixel, VDimension>(5);
 
-  mitk::Image::Pointer output_import = mitk::ImportItkImage( itkImage );
+  mitk::Image::Pointer output_import = mitk::ImportItkImage(itkImage);
 
-  itk::ImageRegionConstIteratorWithIndex< ImageType > iter( itkImage, itkImage->GetLargestPossibleRegion() );
+  itk::ImageRegionConstIteratorWithIndex<ImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
   iter.GoToBegin();
 
-  mitk::ImagePixelReadAccessor< TPixel, VDimension > readAccessor( output_import );
+  mitk::ImagePixelReadAccessor<TPixel, VDimension> readAccessor(output_import);
 
   bool difference = false;
-  while( !iter.IsAtEnd() )
+  while (!iter.IsAtEnd())
   {
     TPixel ref = iter.Get();
-    TPixel val = readAccessor.GetPixelByIndex( iter.GetIndex() );
+    TPixel val = readAccessor.GetPixelByIndex(iter.GetIndex());
 
-    difference |= ( ref != val );
-    if( difference )
+    difference |= (ref != val);
+    if (difference)
     {
       std::cout << iter.GetIndex() << ":" << ref << " ? " << val << "\n";
     }
     ++iter;
   }
 
-  assert_value = Assert_ImageMetaData_AreEqual<ImageType>( itkImage, output_import );
+  assert_value = Assert_ImageMetaData_AreEqual<ImageType>(itkImage, output_import);
 
-  MITK_TEST_CONDITION( assert_value && (!difference), "Pixel values are same in voxel-wise comparison." );
-
+  MITK_TEST_CONDITION(assert_value && (!difference), "Pixel values are same in voxel-wise comparison.");
 }
 
 /**
@@ -223,26 +220,26 @@ void Assert_ItkImageImportSucceded_ReturnsTrue()
 
   bool assert_value = true;
 
-  typedef typename itk::Image< TPixel, VDimension> ImageType;
+  typedef typename itk::Image<TPixel, VDimension> ImageType;
   typedef typename ImageType::Pointer ImagePointer;
 
   ImagePointer itkImage = CreateTestImageFixedValue<TPixel, VDimension>(5, itk::NumericTraits<TPixel>::min());
 
-  mitk::Image::Pointer output_import = mitk::ImportItkImage( itkImage );
+  mitk::Image::Pointer output_import = mitk::ImportItkImage(itkImage);
 
-  itk::ImageRegionConstIteratorWithIndex< ImageType > iter( itkImage, itkImage->GetLargestPossibleRegion() );
+  itk::ImageRegionConstIteratorWithIndex<ImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
   iter.GoToBegin();
 
-  mitk::ImagePixelReadAccessor< TPixel, VDimension > readAccessor( output_import );
+  mitk::ImagePixelReadAccessor<TPixel, VDimension> readAccessor(output_import);
 
   bool difference = false;
-  while( !iter.IsAtEnd() )
+  while (!iter.IsAtEnd())
   {
     TPixel ref = iter.Get();
-    TPixel val = readAccessor.GetPixelByIndex( iter.GetIndex() );
+    TPixel val = readAccessor.GetPixelByIndex(iter.GetIndex());
 
-    difference |= ( ref != val );
-    if( difference )
+    difference |= (ref != val);
+    if (difference)
     {
       std::cout << iter.GetIndex() << ":" << ref << " ? " << val << "\n";
     }
@@ -250,15 +247,14 @@ void Assert_ItkImageImportSucceded_ReturnsTrue()
     ++iter;
   }
 
-  assert_value = Assert_ImageMetaData_AreEqual<ImageType>( itkImage, output_import );
+  assert_value = Assert_ImageMetaData_AreEqual<ImageType>(itkImage, output_import);
 
-  MITK_TEST_CONDITION( assert_value && (!difference), "Pixel values are same in voxel-wise comparison." );
-
+  MITK_TEST_CONDITION(assert_value && (!difference), "Pixel values are same in voxel-wise comparison.");
 }
 
 void Assert_ItkVectorImageImportAndCast_ReturnsTrue()
 {
-  typedef itk::VectorImage<short,3> ImageType;
+  typedef itk::VectorImage<short, 3> ImageType;
   ImageType::PixelType value;
   value.SetSize(2);
   value.SetElement(0, 1);
@@ -280,7 +276,7 @@ void Assert_ItkVectorImageImportAndCast_ReturnsTrue()
 
   MITK_TEST_CONDITION(pixelType == mitk::MakePixelType<ImageType>(2), "MITK pixel type equals ITK pixel type")
 
-  typedef itk::VectorImage<int,3> IntImageType;
+  typedef itk::VectorImage<int, 3> IntImageType;
   IntImageType::Pointer itkIntImageOut;
   mitk::CastToItkImage(mitkImage, itkIntImageOut);
   MITK_TEST_CONDITION(!(pixelType == mitk::MakePixelType<IntImageType>(2)), "MITK pixel type != ITK pixel type")
@@ -290,25 +286,24 @@ void Assert_ItkVectorImageImportAndCast_ReturnsTrue()
   MITK_ASSERT_EQUAL(mitkImage, mitkImage3, "Equality for vector images");
 }
 
-int mitkImportItkImageTest(int /*argc*/, char* /*argv*/[])
+int mitkImportItkImageTest(int /*argc*/, char * /*argv*/ [])
 {
-
   MITK_TEST_BEGIN("mitkImportItkImageTest")
 
-  Assert_ItkImageImportSucceded_ReturnsTrue<short, 3>();// "Import succesfull on 3D short");
-  Assert_ItkImageImportSucceded_ReturnsTrue<float, 3>();// "Import succesfull on float");
-  Assert_ItkImageImportSucceded_ReturnsTrue<unsigned char, 3>();// "Import succesfull on uchar");
-  Assert_ItkImageImportSucceded_ReturnsTrue<int, 3>();// "Import succesfull on int");
+  Assert_ItkImageImportSucceded_ReturnsTrue<short, 3>();         // "Import succesfull on 3D short");
+  Assert_ItkImageImportSucceded_ReturnsTrue<float, 3>();         // "Import succesfull on float");
+  Assert_ItkImageImportSucceded_ReturnsTrue<unsigned char, 3>(); // "Import succesfull on uchar");
+  Assert_ItkImageImportSucceded_ReturnsTrue<int, 3>();           // "Import succesfull on int");
 
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<short, 3>();// "Import succesfull on 3D short");
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<float, 3>();// "Import succesfull on float");
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 3>();// "Import succesfull on uchar");
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 3>();// "Import succesfull on int");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<short, 3>();         // "Import succesfull on 3D short");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<float, 3>();         // "Import succesfull on float");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 3>(); // "Import succesfull on uchar");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 3>();           // "Import succesfull on int");
 
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<short, 4>();// "Import succesfull on 3D short");
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<float, 4>();// "Import succesfull on float");
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 4>();// "Import succesfull on uchar");
-  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 4>();// "Import succesfull on int");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<short, 4>();         // "Import succesfull on 3D short");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<float, 4>();         // "Import succesfull on float");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<unsigned char, 4>(); // "Import succesfull on uchar");
+  Assert_ItkImageImportRandomValuesSucceded_ReturnsTrue<int, 4>();           // "Import succesfull on int");
 
   Assert_ItkVectorImageImportAndCast_ReturnsTrue();
 

@@ -19,21 +19,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileReader.h>
 
-namespace mitk {
-
-class DicomSeriesReaderService : public AbstractFileReader
+namespace mitk
 {
-public:
-  DicomSeriesReaderService();
+  class DicomSeriesReaderService : public AbstractFileReader
+  {
+  public:
+    DicomSeriesReaderService();
 
-  using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-private:
-
-  virtual DicomSeriesReaderService* Clone() const override;
-};
-
+  private:
+    virtual DicomSeriesReaderService *Clone() const override;
+  };
 }
 
 #endif // MITKDICOMSERIESREADERSERVICE_H

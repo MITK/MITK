@@ -16,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCoreObjectFactoryBase.h"
 
-void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensionsMap, std::string& fileExtensions)
+void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensionsMap, std::string &fileExtensions)
 {
   std::map<std::string, std::string> aMap;
 
@@ -58,7 +58,7 @@ void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensio
   // e.g. "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;"
   for (std::map<std::string, std::string>::iterator it = aMap.begin(); it != aMap.end(); ++it)
   {
-    //cout << "  [" << (*it).first << ", " << (*it).second << "]" << endl;
+    // cout << "  [" << (*it).first << ", " << (*it).second << "]" << endl;
     std::string aKey = (*it).first;
     if (aKey.compare("") != 0)
     {
@@ -69,4 +69,3 @@ void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensio
     }
   }
 }
-

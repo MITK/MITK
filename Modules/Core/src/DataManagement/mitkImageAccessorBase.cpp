@@ -19,20 +19,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ImageAccessorBase::ThreadIDType mitk::ImageAccessorBase::CurrentThreadHandle()
 {
-  #ifdef ITK_USE_SPROC
-    return GetCurrentThreadId();
-  #endif
+#ifdef ITK_USE_SPROC
+  return GetCurrentThreadId();
+#endif
 
-  #ifdef ITK_USE_PTHREADS
-    return pthread_self();
-  #endif
+#ifdef ITK_USE_PTHREADS
+  return pthread_self();
+#endif
 
-  #ifdef ITK_USE_WIN32_THREADS
-    return GetCurrentThreadId();
-  #endif
+#ifdef ITK_USE_WIN32_THREADS
+  return GetCurrentThreadId();
+#endif
 }
 
-bool mitk::ImageAccessorBase::CompareThreadHandles(mitk::ImageAccessorBase::ThreadIDType handle1, mitk::ImageAccessorBase::ThreadIDType handle2)
+bool mitk::ImageAccessorBase::CompareThreadHandles(mitk::ImageAccessorBase::ThreadIDType handle1,
+                                                   mitk::ImageAccessorBase::ThreadIDType handle2)
 {
   return handle1 == handle2;
 }
@@ -42,13 +43,13 @@ mitk::ImageAccessorBase::~ImageAccessorBase()
 }
 
 mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
-                                           const ImageDataItem* imageDataItem,
+                                           const ImageDataItem *imageDataItem,
                                            int OptionFlags)
   : // m_Image(iP)
-//, imageDataItem(iDI)
-    m_SubRegion(nullptr)
-  , m_Options(OptionFlags)
-  , m_CoherentMemory(false)
+    //, imageDataItem(iDI)
+    m_SubRegion(nullptr),
+    m_Options(OptionFlags),
+    m_CoherentMemory(false)
 {
   m_Thread = CurrentThreadHandle();
 
@@ -66,17 +67,17 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
   }
   */
 
-  if(image)
+  if (image)
   {
     // Make sure, that the Image is initialized properly
-    if(image->m_Initialized==false)
+    if (image->m_Initialized == false)
     {
-      if(image->GetSource().IsNull())
+      if (image->GetSource().IsNull())
       {
         mitkThrow() << "ImageAccessor: No image source is defined";
       }
       image->m_ReadWriteLock.Lock();
-      if(image->GetSource()->Updating()==false)
+      if (image->GetSource()->Updating() == false)
       {
         image->GetSource()->UpdateOutputInformation();
       }
@@ -87,7 +88,7 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
   // Investigate 4 cases of possible image parts/regions
 
   // Case 1: No ImageDataItem and no Subregion => Whole Image is accessed
-  if(imageDataItem == nullptr && m_SubRegion == nullptr)
+  if (imageDataItem == nullptr && m_SubRegion == nullptr)
   {
     m_CoherentMemory = true;
 
@@ -98,51 +99,49 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
 
     // Set memory area
     m_AddressBegin = imageDataItem->m_Data;
-    m_AddressEnd   = (unsigned char*) m_AddressBegin + imageDataItem->m_Size;
+    m_AddressEnd = (unsigned char *)m_AddressBegin + imageDataItem->m_Size;
   }
 
   // Case 2: ImageDataItem but no Subregion
-  if(imageDataItem && m_SubRegion == nullptr)
+  if (imageDataItem && m_SubRegion == nullptr)
   {
     m_CoherentMemory = true;
 
     // Set memory area
     m_AddressBegin = imageDataItem->m_Data;
-    m_AddressEnd   = (unsigned char*) m_AddressBegin + imageDataItem->m_Size;
+    m_AddressEnd = (unsigned char *)m_AddressBegin + imageDataItem->m_Size;
   }
 
   // Case 3: No ImageDataItem but a SubRegion
-  if(imageDataItem == nullptr && m_SubRegion)
+  if (imageDataItem == nullptr && m_SubRegion)
   {
     mitkThrow() << "Invalid ImageAccessor: The use of a SubRegion is not supported (yet).";
   }
 
   // Case 4: ImageDataItem and SubRegion
-  if(imageDataItem == nullptr && m_SubRegion)
+  if (imageDataItem == nullptr && m_SubRegion)
   {
     mitkThrow() << "Invalid ImageAccessor: The use of a SubRegion is not supported (yet).";
   }
-
 }
 
 /** \brief Computes if there is an Overlap of the image part between this instantiation and another ImageAccessor object
  * \throws mitk::Exception if memory area is incoherent (not supported yet)
  */
-bool mitk::ImageAccessorBase::Overlap(const ImageAccessorBase* iAB)
+bool mitk::ImageAccessorBase::Overlap(const ImageAccessorBase *iAB)
 {
-  if(m_CoherentMemory)
+  if (m_CoherentMemory)
   {
-    if((iAB->m_AddressBegin >= m_AddressBegin && iAB->m_AddressBegin <  m_AddressEnd) ||
-       (iAB->m_AddressEnd   >  m_AddressBegin && iAB->m_AddressEnd   <= m_AddressEnd))
+    if ((iAB->m_AddressBegin >= m_AddressBegin && iAB->m_AddressBegin < m_AddressEnd) ||
+        (iAB->m_AddressEnd > m_AddressBegin && iAB->m_AddressEnd <= m_AddressEnd))
     {
       return true;
     }
-    if((m_AddressBegin >= iAB->m_AddressBegin && m_AddressBegin <  iAB->m_AddressEnd) ||
-       (m_AddressEnd   >  iAB->m_AddressBegin && m_AddressEnd   <= iAB->m_AddressEnd))
+    if ((m_AddressBegin >= iAB->m_AddressBegin && m_AddressBegin < iAB->m_AddressEnd) ||
+        (m_AddressEnd > iAB->m_AddressBegin && m_AddressEnd <= iAB->m_AddressEnd))
     {
       return true;
     }
-
   }
   else
   {
@@ -154,7 +153,7 @@ bool mitk::ImageAccessorBase::Overlap(const ImageAccessorBase* iAB)
 }
 
 /** \brief Uses the WaitLock to wait for another ImageAccessor*/
-void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock* wL)
+void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock *wL)
 {
   wL->m_Mutex.Lock();
 
@@ -163,7 +162,7 @@ void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock* wL)
 
   // If there are no more waiting ImageAccessors, delete the Mutex
   // (Der Letzte macht das Licht aus!)
-  if(wL->m_WaiterCount <= 0)
+  if (wL->m_WaiterCount <= 0)
   {
     wL->m_Mutex.Unlock();
     delete wL;
@@ -174,15 +173,16 @@ void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock* wL)
   }
 }
 
-void mitk::ImageAccessorBase::PreventRecursiveMutexLock(mitk::ImageAccessorBase* iAB)
+void mitk::ImageAccessorBase::PreventRecursiveMutexLock(mitk::ImageAccessorBase *iAB)
 {
 #ifdef MITK_USE_RECURSIVE_MUTEX_PREVENTION
   // Prevent deadlock
   ThreadIDType id = CurrentThreadHandle();
-  if(CompareThreadHandles(id,iAB->m_Thread))
+  if (CompareThreadHandles(id, iAB->m_Thread))
   {
     GetImage()->m_ReadWriteLock.Unlock();
-    mitkThrow() << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
+    mitkThrow()
+      << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
   }
 #endif
 }

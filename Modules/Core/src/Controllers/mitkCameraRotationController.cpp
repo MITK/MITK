@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCameraRotationController.h"
 
-#include <vtkCamera.h>
 #include <itkCommand.h>
-#include <vtkRenderer.h>
+#include <vtkCamera.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 
-#include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkVtkPropRenderer.h"
 
 mitk::CameraRotationController::CameraRotationController()
   : BaseController(), m_LastStepperValue(180), m_Camera(NULL), m_RenderWindow(NULL)
@@ -52,40 +52,40 @@ void mitk::CameraRotationController::RotateCamera()
   if (m_Camera)
   {
     int newStepperValue = m_Slice->GetPos();
-    m_Camera->Azimuth( m_LastStepperValue - newStepperValue );
+    m_Camera->Azimuth(m_LastStepperValue - newStepperValue);
     m_LastStepperValue = newStepperValue;
-    //const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!
+    // const_cast< RenderWindow* >(m_RenderWindow)->RequestUpdate(); // TODO does not work with movie generator!
     mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow);
-    //m_MultiWidget->RequestUpdate();
+    // m_MultiWidget->RequestUpdate();
   }
 }
 
 void mitk::CameraRotationController::AcquireCamera()
 {
-  BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow);
+  BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(m_RenderWindow);
 
-  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
+  const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer *>(renderer);
   if (propRenderer)
   {
     // get vtk renderer
-    vtkRenderer* vtkrenderer = propRenderer->GetVtkRenderer();
+    vtkRenderer *vtkrenderer = propRenderer->GetVtkRenderer();
     if (vtkrenderer)
     {
       // get vtk camera
-      vtkCamera* vtkcam = vtkrenderer->GetActiveCamera();
+      vtkCamera *vtkcam = vtkrenderer->GetActiveCamera();
       if (vtkcam)
       {
         // vtk smart pointer handling
         if (!m_Camera)
         {
           m_Camera = vtkcam;
-          m_Camera->Register( NULL );
+          m_Camera->Register(NULL);
         }
         else
         {
-          m_Camera->UnRegister( NULL );
+          m_Camera->UnRegister(NULL);
           m_Camera = vtkcam;
-          m_Camera->Register( NULL );
+          m_Camera->Register(NULL);
         }
       }
     }

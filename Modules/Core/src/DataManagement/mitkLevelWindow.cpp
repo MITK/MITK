@@ -25,23 +25,27 @@ void mitk::LevelWindow::EnsureConsistency()
 {
   // Check if total range is ok
   {
-    if ( m_RangeMin > m_RangeMax )
-      std::swap(m_RangeMin,m_RangeMax);
-    if (m_RangeMin == m_RangeMax )
+    if (m_RangeMin > m_RangeMax)
+      std::swap(m_RangeMin, m_RangeMax);
+    if (m_RangeMin == m_RangeMax)
       m_RangeMin = m_RangeMax - 1;
   }
 
   // Check if current window is ok
   {
-    if ( m_LowerWindowBound > m_UpperWindowBound )
-      std::swap(m_LowerWindowBound,m_UpperWindowBound);
+    if (m_LowerWindowBound > m_UpperWindowBound)
+      std::swap(m_LowerWindowBound, m_UpperWindowBound);
 
-    if ( m_LowerWindowBound <= m_RangeMin ) m_LowerWindowBound = m_RangeMin;
-    if ( m_UpperWindowBound <= m_RangeMin ) m_UpperWindowBound = m_RangeMin + 1;
-    if ( m_LowerWindowBound >= m_RangeMax ) m_LowerWindowBound = m_RangeMax - 1;
-    if ( m_UpperWindowBound >= m_RangeMax ) m_UpperWindowBound = m_RangeMax;
+    if (m_LowerWindowBound <= m_RangeMin)
+      m_LowerWindowBound = m_RangeMin;
+    if (m_UpperWindowBound <= m_RangeMin)
+      m_UpperWindowBound = m_RangeMin + 1;
+    if (m_LowerWindowBound >= m_RangeMax)
+      m_LowerWindowBound = m_RangeMax - 1;
+    if (m_UpperWindowBound >= m_RangeMax)
+      m_UpperWindowBound = m_RangeMax;
 
-    if (m_LowerWindowBound == m_UpperWindowBound )
+    if (m_LowerWindowBound == m_UpperWindowBound)
     {
       m_UpperWindowBound += 0.5;
       m_LowerWindowBound -= 0.5;
@@ -53,28 +57,28 @@ void mitk::LevelWindow::EnsureConsistency()
 }
 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
-  : m_LowerWindowBound( level - window / 2.0 ),
-  m_UpperWindowBound( level + window / 2.0 ),
-  m_RangeMin( -2048.0 ),
-  m_RangeMax( 4096.0 ),
-  m_DefaultLowerBound( -2048.0 ),
-  m_DefaultUpperBound( 4096.0 ),
-  m_IsFloatingImage(false),
-  m_Fixed( false )
+  : m_LowerWindowBound(level - window / 2.0),
+    m_UpperWindowBound(level + window / 2.0),
+    m_RangeMin(-2048.0),
+    m_RangeMax(4096.0),
+    m_DefaultLowerBound(-2048.0),
+    m_DefaultUpperBound(4096.0),
+    m_IsFloatingImage(false),
+    m_Fixed(false)
 {
   SetDefaultLevelWindow(level, window);
   SetLevelWindow(level, window, true);
 }
 
-mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
-  : m_LowerWindowBound( levWin.GetLowerWindowBound() )
-  , m_UpperWindowBound( levWin.GetUpperWindowBound() )
-  , m_RangeMin( levWin.GetRangeMin() )
-  , m_RangeMax( levWin.GetRangeMax() )
-  , m_DefaultLowerBound( levWin.GetDefaultLowerBound() )
-  , m_DefaultUpperBound( levWin.GetDefaultUpperBound() )
-  , m_IsFloatingImage(levWin.IsFloatingValues())
-  , m_Fixed( levWin.GetFixed() )
+mitk::LevelWindow::LevelWindow(const mitk::LevelWindow &levWin)
+  : m_LowerWindowBound(levWin.GetLowerWindowBound()),
+    m_UpperWindowBound(levWin.GetUpperWindowBound()),
+    m_RangeMin(levWin.GetRangeMin()),
+    m_RangeMax(levWin.GetRangeMax()),
+    m_DefaultLowerBound(levWin.GetDefaultLowerBound()),
+    m_DefaultUpperBound(levWin.GetDefaultUpperBound()),
+    m_IsFloatingImage(levWin.IsFloatingValues()),
+    m_Fixed(levWin.GetFixed())
 {
 }
 
@@ -84,22 +88,22 @@ mitk::LevelWindow::~LevelWindow()
 
 mitk::ScalarType mitk::LevelWindow::GetLevel() const
 {
-  return (m_UpperWindowBound-m_LowerWindowBound) / 2.0 + m_LowerWindowBound;
+  return (m_UpperWindowBound - m_LowerWindowBound) / 2.0 + m_LowerWindowBound;
 }
 
 mitk::ScalarType mitk::LevelWindow::GetWindow() const
 {
-  return (m_UpperWindowBound-m_LowerWindowBound);
+  return (m_UpperWindowBound - m_LowerWindowBound);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetDefaultLevel() const
 {
-  return ((m_DefaultUpperBound+m_DefaultLowerBound)/2.0);
+  return ((m_DefaultUpperBound + m_DefaultLowerBound) / 2.0);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetDefaultWindow() const
 {
-  return ((m_DefaultUpperBound-m_DefaultLowerBound));
+  return ((m_DefaultUpperBound - m_DefaultLowerBound));
 }
 
 void mitk::LevelWindow::ResetDefaultLevelWindow()
@@ -119,17 +123,20 @@ mitk::ScalarType mitk::LevelWindow::GetUpperWindowBound() const
 
 void mitk::LevelWindow::SetDefaultLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
 {
-  SetDefaultBoundaries((level-(window/2.0)), (level+(window/2.0)));
+  SetDefaultBoundaries((level - (window / 2.0)), (level + (window / 2.0)));
 }
 
 void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType window, bool expandRangesIfNecessary)
 {
-  SetWindowBounds( (level-(window/2.0)), (level+(window/2.0)), expandRangesIfNecessary );
+  SetWindowBounds((level - (window / 2.0)), (level + (window / 2.0)), expandRangesIfNecessary);
 }
 
-void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::ScalarType upperBound, bool expandRangesIfNecessary)
+void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound,
+                                        mitk::ScalarType upperBound,
+                                        bool expandRangesIfNecessary)
 {
-  if ( IsFixed() ) return;
+  if (IsFixed())
+    return;
 
   m_LowerWindowBound = lowerBound;
   m_UpperWindowBound = upperBound;
@@ -139,12 +146,12 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::Scala
     /* if caller is sure he wants exactly that level/window, we make sure the limits match */
     if (m_LowerWindowBound > m_UpperWindowBound)
       std::swap(m_LowerWindowBound, m_UpperWindowBound);
-    if ( m_LowerWindowBound < m_RangeMin )
+    if (m_LowerWindowBound < m_RangeMin)
     {
       m_RangeMin = m_LowerWindowBound;
     }
 
-    if ( m_UpperWindowBound > m_RangeMax )
+    if (m_UpperWindowBound > m_RangeMax)
     {
       m_RangeMax = m_UpperWindowBound;
     }
@@ -155,7 +162,8 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::Scala
 
 void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
 {
-  if ( IsFixed() ) return;
+  if (IsFixed())
+    return;
   m_RangeMin = min;
   m_RangeMax = max;
   EnsureConsistency();
@@ -163,15 +171,16 @@ void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType ma
 
 void mitk::LevelWindow::SetDefaultBoundaries(mitk::ScalarType low, mitk::ScalarType up)
 {
-  if ( IsFixed() )  return;
+  if (IsFixed())
+    return;
   m_DefaultLowerBound = low;
   m_DefaultUpperBound = up;
   // Check if default window is ok
   {
-    if ( m_DefaultLowerBound > m_DefaultUpperBound )
-      std::swap(m_DefaultLowerBound,m_DefaultUpperBound);
+    if (m_DefaultLowerBound > m_DefaultUpperBound)
+      std::swap(m_DefaultLowerBound, m_DefaultUpperBound);
 
-    if (m_DefaultLowerBound == m_DefaultUpperBound )
+    if (m_DefaultLowerBound == m_DefaultUpperBound)
       m_DefaultLowerBound--;
   }
   EnsureConsistency();
@@ -179,7 +188,7 @@ void mitk::LevelWindow::SetDefaultBoundaries(mitk::ScalarType low, mitk::ScalarT
 
 void mitk::LevelWindow::SetToMaxWindowSize()
 {
-  SetWindowBounds( m_RangeMin , m_RangeMax );
+  SetWindowBounds(m_RangeMin, m_RangeMax);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetRangeMin() const
@@ -194,7 +203,7 @@ mitk::ScalarType mitk::LevelWindow::GetRangeMax() const
 
 mitk::ScalarType mitk::LevelWindow::GetRange() const
 {
-  return  m_RangeMax - m_RangeMin;
+  return m_RangeMax - m_RangeMin;
 }
 
 mitk::ScalarType mitk::LevelWindow::GetDefaultUpperBound() const
@@ -248,65 +257,70 @@ In consequence the level window maximizes contrast with minimal amount of
 computation and does do useful things if the data contains std::min or
 std:max values or has only 1 or 2 or 3 data values.
 */
-void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, bool guessByCentralSlice,
-    unsigned selectedComponent)
+void mitk::LevelWindow::SetAuto(const mitk::Image *image,
+                                bool /*tryPicTags*/,
+                                bool guessByCentralSlice,
+                                unsigned selectedComponent)
 {
-  if ( IsFixed() )
+  if (IsFixed())
     return;
 
-  if ( image == nullptr || !image->IsInitialized() ) return;
+  if (image == nullptr || !image->IsInitialized())
+    return;
 
   if ((image->GetPixelType().GetComponentType() == 9) || (image->GetPixelType().GetComponentType() == 10))
   {
     // Floating image
     m_IsFloatingImage = true;
-  } else
+  }
+  else
   {
     m_IsFloatingImage = false;
   }
 
-  const mitk::Image* wholeImage = image;
+  const mitk::Image *wholeImage = image;
   ScalarType minValue = 0.0;
   ScalarType maxValue = 0.0;
   ScalarType min2ndValue = 0.0;
   ScalarType max2ndValue = 0.0;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
-  if ( guessByCentralSlice )
+  if (guessByCentralSlice)
   {
     sliceSelector->SetInput(image);
-    sliceSelector->SetSliceNr(image->GetDimension(2)/2);
-    sliceSelector->SetTimeNr(image->GetDimension(3)/2);
-    sliceSelector->SetChannelNr(image->GetDimension(4)/2);
+    sliceSelector->SetSliceNr(image->GetDimension(2) / 2);
+    sliceSelector->SetTimeNr(image->GetDimension(3) / 2);
+    sliceSelector->SetChannelNr(image->GetDimension(4) / 2);
     sliceSelector->Update();
     image = sliceSelector->GetOutput();
-    if ( image == nullptr || !image->IsInitialized() ) return;
+    if (image == nullptr || !image->IsInitialized())
+      return;
 
-    minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
-    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+    minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
+    maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute();
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
-    if ( minValue == maxValue )
+    if (minValue == maxValue)
     {
       // guessByCentralSlice seems to have failed, lets look at all data
-      image       = wholeImage;
-      minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
-      maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+      image = wholeImage;
+      minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
+      maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute();
       min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
       max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
     }
   }
   else
   {
-    const_cast<Image*>(image)->Update();
-    minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
-    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
+    const_cast<Image *>(image)->Update();
+    minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
+    maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
     min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
     max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
     for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
       ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);
       if (minValue > minValueTemp)
-        minValue    = minValueTemp;
+        minValue = minValueTemp;
       ScalarType maxValueTemp = image->GetStatistics()->GetScalarValueMaxNoRecompute(i);
       if (maxValue < maxValueTemp)
         maxValue = maxValueTemp;
@@ -320,12 +334,11 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (   image->GetPixelType().GetPixelType()==itk::ImageIOBase::SCALAR
-    && image->GetPixelType().GetComponentType() == itk::ImageIOBase::INT
-    && image->GetPixelType().GetBpe() >= 8)
+  if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR &&
+      image->GetPixelType().GetComponentType() == itk::ImageIOBase::INT && image->GetPixelType().GetBpe() >= 8)
   {
     // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)
-    if (minValue == -( pow( (double) 2.0, static_cast<int>(image->GetPixelType().GetBpe()/2) ) ) )
+    if (minValue == -(pow((double)2.0, static_cast<int>(image->GetPixelType().GetBpe() / 2))))
     {
       minValue = min2ndValue;
     }
@@ -333,15 +346,17 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   // End fix
 
   //// uniform image
-  if ( minValue == maxValue )
+  if (minValue == maxValue)
   {
-    minValue = maxValue-1;
+    minValue = maxValue - 1;
   }
   else
   {
-    //Due to bug #8690 level window now is no longer of fixed range by default but the range adapts according to levelwindow interaction
-    //This is done because the range should be a little bit larger from the beginning so that the scale doesn't start to resize right from the beginning
-    double additionalRange = 0.15*(maxValue-minValue);
+    // Due to bug #8690 level window now is no longer of fixed range by default but the range adapts according to
+    // levelwindow interaction
+    // This is done because the range should be a little bit larger from the beginning so that the scale doesn't start
+    // to resize right from the beginning
+    double additionalRange = 0.15 * (maxValue - minValue);
     minValue -= additionalRange;
     maxValue += additionalRange;
   }
@@ -358,22 +373,23 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   */
 
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
-  for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
+  for (unsigned int k = 0; k < image->GetDimension(); ++k)
+    numPixelsInDataset *= image->GetDimensions()[k];
   unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
   unsigned int maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
-  ScalarType minCountFraction = minCount/ScalarType(numPixelsInDataset);
-  ScalarType maxCountFraction = maxCount/ScalarType(numPixelsInDataset);
+  ScalarType minCountFraction = minCount / ScalarType(numPixelsInDataset);
+  ScalarType maxCountFraction = maxCount / ScalarType(numPixelsInDataset);
 
   //// binary image
-  if ( min2ndValue == maxValue )
+  if (min2ndValue == maxValue)
   {
     // noop; full range is fine
   }
 
   //// triple value image, put middle value in center of gray level ramp
-  else if ( min2ndValue == max2ndValue )
+  else if (min2ndValue == max2ndValue)
   {
-    ScalarType minDelta = std::min(min2ndValue-minValue, maxValue-min2ndValue);
+    ScalarType minDelta = std::min(min2ndValue - minValue, maxValue - min2ndValue);
     minValue = min2ndValue - minDelta;
     maxValue = min2ndValue + minDelta;
   }
@@ -383,22 +399,22 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
   {
     ScalarType innerRange = max2ndValue - min2ndValue;
 
-    if ( minCountFraction > 0.2 )  //// lots of min values -> make different from rest, but not miles away
+    if (minCountFraction > 0.2) //// lots of min values -> make different from rest, but not miles away
     {
-      ScalarType halfInnerRangeGapMinValue = min2ndValue - innerRange/2.0;
+      ScalarType halfInnerRangeGapMinValue = min2ndValue - innerRange / 2.0;
       minValue = std::max(minValue, halfInnerRangeGapMinValue);
     }
-    else  //// few min values -> focus on innerRange
+    else //// few min values -> focus on innerRange
     {
       minValue = min2ndValue;
     }
 
-    if ( maxCountFraction > 0.2 )  //// lots of max values -> make different from rest
+    if (maxCountFraction > 0.2) //// lots of max values -> make different from rest
     {
-      ScalarType halfInnerRangeGapMaxValue = max2ndValue + innerRange/2.0;
+      ScalarType halfInnerRangeGapMaxValue = max2ndValue + innerRange / 2.0;
       maxValue = std::min(maxValue, halfInnerRangeGapMaxValue);
     }
-    else  //// few max values -> focus on innerRange
+    else //// few max values -> focus on innerRange
     {
       maxValue = max2ndValue;
     }
@@ -409,10 +425,11 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
 
 void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
 {
-  if ( IsFixed() )
+  if (IsFixed())
     return;
 
-  if ( image == NULL || !image->IsInitialized() ) return;
+  if (image == NULL || !image->IsInitialized())
+    return;
 
   ScalarType minValue = image->GetStatistics()->GetScalarValueMin(0);
   ScalarType maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
@@ -422,7 +439,7 @@ void mitk::LevelWindow::SetToImageRange(const mitk::Image *image)
   SetDefaultLevelWindow((maxValue - minValue) / 2 + minValue, maxValue - minValue);
 }
 
-void mitk::LevelWindow::SetFixed( bool fixed )
+void mitk::LevelWindow::SetFixed(bool fixed)
 {
   m_Fixed = fixed;
 }
@@ -447,34 +464,34 @@ void mitk::LevelWindow::SetFloatingValues(bool value)
   m_IsFloatingImage = value;
 }
 
-bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
+bool mitk::LevelWindow::operator==(const mitk::LevelWindow &levWin) const
 {
-  return
-    mitk::Equal(this->m_RangeMin, levWin.m_RangeMin, mitk::sqrteps)
-    && mitk::Equal(this->m_RangeMax, levWin.m_RangeMax, mitk::sqrteps)
-    && mitk::Equal(this->m_DefaultLowerBound, levWin.m_DefaultLowerBound, mitk::sqrteps)
-    && mitk::Equal(this->m_DefaultUpperBound, levWin.m_DefaultUpperBound, mitk::sqrteps)
-    && mitk::Equal(this->m_LowerWindowBound, levWin.m_LowerWindowBound, mitk::sqrteps)
-    && mitk::Equal(this->m_UpperWindowBound, levWin.m_UpperWindowBound, mitk::sqrteps)
-    && m_Fixed == levWin.IsFixed()
-    && m_IsFloatingImage == levWin.IsFloatingValues();
+  return mitk::Equal(this->m_RangeMin, levWin.m_RangeMin, mitk::sqrteps) &&
+         mitk::Equal(this->m_RangeMax, levWin.m_RangeMax, mitk::sqrteps) &&
+         mitk::Equal(this->m_DefaultLowerBound, levWin.m_DefaultLowerBound, mitk::sqrteps) &&
+         mitk::Equal(this->m_DefaultUpperBound, levWin.m_DefaultUpperBound, mitk::sqrteps) &&
+         mitk::Equal(this->m_LowerWindowBound, levWin.m_LowerWindowBound, mitk::sqrteps) &&
+         mitk::Equal(this->m_UpperWindowBound, levWin.m_UpperWindowBound, mitk::sqrteps) &&
+         m_Fixed == levWin.IsFixed() && m_IsFloatingImage == levWin.IsFloatingValues();
 }
 
-bool mitk::LevelWindow::operator!=(const mitk::LevelWindow& levWin) const
+bool mitk::LevelWindow::operator!=(const mitk::LevelWindow &levWin) const
 {
-  return ! ( (*this) == levWin);
+  return !((*this) == levWin);
 }
 
-mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
+mitk::LevelWindow &mitk::LevelWindow::operator=(const mitk::LevelWindow &levWin)
 {
-  if (this == &levWin) {
+  if (this == &levWin)
+  {
     return *this;
   }
-  else {
+  else
+  {
     m_RangeMin = levWin.GetRangeMin();
     m_RangeMax = levWin.GetRangeMax();
-    m_LowerWindowBound= levWin.GetLowerWindowBound();
-    m_UpperWindowBound= levWin.GetUpperWindowBound();
+    m_LowerWindowBound = levWin.GetLowerWindowBound();
+    m_UpperWindowBound = levWin.GetUpperWindowBound();
     m_DefaultLowerBound = levWin.GetDefaultLowerBound();
     m_DefaultUpperBound = levWin.GetDefaultUpperBound();
     m_Fixed = levWin.GetFixed();

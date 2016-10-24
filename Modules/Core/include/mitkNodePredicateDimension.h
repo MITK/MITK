@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKNODEPREDICATEDIMENSION_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATEDIMENSION_H_HEADER_INCLUDED_
 
 #include "mitkNodePredicateBase.h"
 
-namespace mitk {
- class BaseData;
+namespace mitk
+{
+  class BaseData;
 
   //##Documentation
   //## @brief Predicate that evaluates if the given DataNodes data object
@@ -37,16 +37,15 @@ namespace mitk {
     mitkNewMacro1Param(NodePredicateDimension, unsigned int);
     mitkNewMacro2Param(NodePredicateDimension, unsigned int, int);
 
-      //##Documentation
+    //##Documentation
     //## @brief Standard Destructor
     virtual ~NodePredicateDimension();
 
     //##Documentation
     //## @brief Checks if the nodes data object is of the specified dimension
-    virtual bool CheckNode(const mitk::DataNode* node) const override;
+    virtual bool CheckNode(const mitk::DataNode *node) const override;
 
   protected:
-
     //##Documentation
     //## @brief Standard Constructor
     NodePredicateDimension(unsigned int dimension);
@@ -61,4 +60,3 @@ namespace mitk {
 } // namespace mitk
 
 #endif /* MITKNodePredicateDimension_H_HEADER_INCLUDED_ */
-

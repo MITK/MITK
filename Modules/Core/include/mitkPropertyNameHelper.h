@@ -17,15 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPropertyNameHelper_h
 #define mitkPropertyNameHelper_h
 
-#include <string>
 #include <mitkPropertyList.h>
+#include <string>
 
 #include "MitkCoreExports.h"
 namespace mitk
 {
-
-    /** returns the correct property name for a simple DICOM tag. The tag is defined
-     * by the passed group and element number (both in hex). */
+  /** returns the correct property name for a simple DICOM tag. The tag is defined
+   * by the passed group and element number (both in hex). */
   std::string MITKCORE_EXPORT GeneratePropertyNameForDICOMTag(unsigned int group, unsigned int element);
 
   /** Simple helper function that can be used on most occasions where deprecated naming styles
@@ -41,7 +40,11 @@ namespace mitk
    *@param propertyValue [out] Value of the found property. Only valid if function returns true.
    *@return indicating if the property was found and the variable propertyValue contains a valid value.*/
 
-  bool MITKCORE_EXPORT GetBackwardsCompatibleDICOMProperty(unsigned int group, unsigned int element, std::string const& backwardsCompatiblePropertyName, PropertyList const* propertyList, std::string& propertyValue);
+  bool MITKCORE_EXPORT GetBackwardsCompatibleDICOMProperty(unsigned int group,
+                                                           unsigned int element,
+                                                           std::string const &backwardsCompatiblePropertyName,
+                                                           PropertyList const *propertyList,
+                                                           std::string &propertyValue);
 }
 
 #endif

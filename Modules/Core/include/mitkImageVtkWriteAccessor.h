@@ -21,46 +21,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class vtkImageData;
 
-namespace mitk {
-
-class Image;
-class ImageDataItem;
-
-/**
- * @brief ImageVtkWriteAccessor class provides any image write access which is required by Vtk methods
- * @ingroup Data
- */
-class MITKCORE_EXPORT ImageVtkWriteAccessor : public ImageAccessorBase
+namespace mitk
 {
+  class Image;
+  class ImageDataItem;
 
-public:
-
-  typedef itk::SmartPointer<Image> ImagePointer;
-
-  /** \brief Creates an ImageVtkWriteAccessor for a whole Image
-   *  \param Image::Pointer specifies the associated Image
+  /**
+   * @brief ImageVtkWriteAccessor class provides any image write access which is required by Vtk methods
+   * @ingroup Data
    */
-  ImageVtkWriteAccessor(
-      ImagePointer iP,
-      const ImageDataItem* iDI,
-      vtkImageData* imageDataVtk
-    );
+  class MITKCORE_EXPORT ImageVtkWriteAccessor : public ImageAccessorBase
+  {
+  public:
+    typedef itk::SmartPointer<Image> ImagePointer;
 
-  ~ImageVtkWriteAccessor();
+    /** \brief Creates an ImageVtkWriteAccessor for a whole Image
+     *  \param Image::Pointer specifies the associated Image
+     */
+    ImageVtkWriteAccessor(ImagePointer iP, const ImageDataItem *iDI, vtkImageData *imageDataVtk);
 
-  vtkImageData* GetVtkImageData() const;
+    ~ImageVtkWriteAccessor();
 
-protected:
+    vtkImageData *GetVtkImageData() const;
 
-  virtual const Image* GetImage() const override;
+  protected:
+    virtual const Image *GetImage() const override;
 
-private:
-
-  // due to smart pointer issues, the image is only kept as a weak pointer.
-  Image* m_Image;
-  vtkImageData* m_ImageDataVtk;
-};
-
+  private:
+    // due to smart pointer issues, the image is only kept as a weak pointer.
+    Image *m_Image;
+    vtkImageData *m_ImageDataVtk;
+  };
 }
 
 #endif // MITKIMAGEVTKWRITEACCESSOR_H

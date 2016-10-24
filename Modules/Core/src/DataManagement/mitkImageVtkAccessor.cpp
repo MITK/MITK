@@ -18,12 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 
-mitk::ImageVtkAccessor::ImageVtkAccessor(ImagePointer iP, const mitk::ImageDataItem* iDI)
+mitk::ImageVtkAccessor::ImageVtkAccessor(ImagePointer iP, const mitk::ImageDataItem *iDI)
   : mitk::ImageVtkWriteAccessor(iP, iDI, nullptr)
 {
 }
 
-mitk::ImageVtkAccessor* mitk::ImageVtkAccessor::New(ImagePointer iP, const mitk::ImageDataItem* iDI)
+mitk::ImageVtkAccessor *mitk::ImageVtkAccessor::New(ImagePointer iP, const mitk::ImageDataItem *iDI)
 {
   return new ImageVtkAccessor(iP, iDI);
 }

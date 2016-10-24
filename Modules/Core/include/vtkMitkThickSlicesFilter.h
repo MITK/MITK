@@ -33,13 +33,13 @@ class MITKCORE_EXPORT vtkMitkThickSlicesFilter : public vtkThreadedImageAlgorith
 {
 public:
   static vtkMitkThickSlicesFilter *New();
-  vtkTypeMacro(vtkMitkThickSlicesFilter,vtkThreadedImageAlgorithm);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkMitkThickSlicesFilter, vtkThreadedImageAlgorithm);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   // Description:
   // Determines how the input is interpreted (set of 2d slices ...)
-  vtkSetClampMacro(Dimensionality,int,2,3);
-  vtkGetMacro(Dimensionality,int);
+  vtkSetClampMacro(Dimensionality, int, 2, 3);
+  vtkGetMacro(Dimensionality, int);
 
   // Description:
   // Get/Set whether to handle boundaries.  If enabled, boundary
@@ -50,8 +50,9 @@ public:
   vtkGetMacro(HandleBoundaries, int);
   vtkBooleanMacro(HandleBoundaries, int);
 
-  enum {
-    MIP=0,
+  enum
+  {
+    MIP = 0,
     SUM,
     WEIGHTED,
     MINIP,
@@ -60,51 +61,32 @@ public:
 
 protected:
   vtkMitkThickSlicesFilter();
-  ~vtkMitkThickSlicesFilter() {};
+  ~vtkMitkThickSlicesFilter(){};
 
   int HandleBoundaries;
   int Dimensionality;
 
-  virtual int RequestInformation (vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*) override;
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*) override;
-  virtual int RequestData(vtkInformation*,
-                          vtkInformationVector**,
-                          vtkInformationVector*) override;
+  virtual int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  virtual int RequestUpdateExtent(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *) override;
 
-  void ThreadedRequestData(vtkInformation*,
-                           vtkInformationVector**,
-                           vtkInformationVector*,
-                           vtkImageData*** inData,
-                           vtkImageData** outData,
+  void ThreadedRequestData(vtkInformation *,
+                           vtkInformationVector **,
+                           vtkInformationVector *,
+                           vtkImageData ***inData,
+                           vtkImageData **outData,
                            int outExt[6],
                            int threadId) override;
-
 
   int m_CurrentMode;
 
 private:
-  vtkMitkThickSlicesFilter(const vtkMitkThickSlicesFilter&);  // Not implemented.
-  void operator=(const vtkMitkThickSlicesFilter&);  // Not implemented.
+  vtkMitkThickSlicesFilter(const vtkMitkThickSlicesFilter &); // Not implemented.
+  void operator=(const vtkMitkThickSlicesFilter &);           // Not implemented.
 
-  public:
-
-  void SetThickSliceMode( int mode)
-  {
-    m_CurrentMode = mode;
-  }
-
-  int GetThickSliceMode()
-  {
-    return m_CurrentMode;
-  }
-
+public:
+  void SetThickSliceMode(int mode) { m_CurrentMode = mode; }
+  int GetThickSliceMode() { return m_CurrentMode; }
 };
 
 #endif
-
-
-

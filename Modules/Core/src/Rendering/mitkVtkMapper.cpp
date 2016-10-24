@@ -24,19 +24,28 @@ mitk::VtkMapper::~VtkMapper()
 {
 }
 
-void mitk::VtkMapper::MitkRender(mitk::BaseRenderer* renderer, mitk::VtkPropRenderer::RenderType type){
-  VtkMapperLocalStorage* ls = m_VtkMapperLSH.GetLocalStorage(renderer);
+void mitk::VtkMapper::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
+{
+  VtkMapperLocalStorage *ls = m_VtkMapperLSH.GetLocalStorage(renderer);
   if (ls->m_ShaderProgram)
   {
     ls->m_ShaderProgram->Activate();
   }
 
-  switch(type)
+  switch (type)
   {
-  case mitk::VtkPropRenderer::Opaque: this->MitkRenderOpaqueGeometry(renderer); break;
-  case mitk::VtkPropRenderer::Translucent: this->MitkRenderTranslucentGeometry(renderer); break;
-  case mitk::VtkPropRenderer::Overlay:       this->MitkRenderOverlay(renderer); break;
-  case mitk::VtkPropRenderer::Volumetric:    this->MitkRenderVolumetricGeometry(renderer); break;
+    case mitk::VtkPropRenderer::Opaque:
+      this->MitkRenderOpaqueGeometry(renderer);
+      break;
+    case mitk::VtkPropRenderer::Translucent:
+      this->MitkRenderTranslucentGeometry(renderer);
+      break;
+    case mitk::VtkPropRenderer::Overlay:
+      this->MitkRenderOverlay(renderer);
+      break;
+    case mitk::VtkPropRenderer::Volumetric:
+      this->MitkRenderVolumetricGeometry(renderer);
+      break;
   }
 
   if (ls->m_ShaderProgram)
@@ -50,100 +59,103 @@ bool mitk::VtkMapper::IsVtkBased() const
   return true;
 }
 
-void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer* renderer)
+void mitk::VtkMapper::MitkRenderOverlay(BaseRenderer *renderer)
 {
-
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
-  if ( !visible) return;
+  if (!visible)
+    return;
 
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
+  if (this->GetVtkProp(renderer)->GetVisibility())
   {
     GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
   }
 }
 
-void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
+void mitk::VtkMapper::MitkRenderOpaqueGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
-  if ( !visible) return;
+  if (!visible)
+    return;
 
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
+  if (this->GetVtkProp(renderer)->GetVisibility())
   {
-    GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+    GetVtkProp(renderer)->RenderOpaqueGeometry(renderer->GetVtkRenderer());
   }
 }
 
-void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
+void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
-  if ( !visible) return;
+  if (!visible)
+    return;
 
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
+  if (this->GetVtkProp(renderer)->GetVisibility())
   {
     GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
   }
 }
 
-void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer* renderer)
+void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer *renderer)
 {
-  IShaderRepository* shaderRepo = CoreServices::GetShaderRepository();
+  IShaderRepository *shaderRepo = CoreServices::GetShaderRepository();
   if (shaderRepo)
   {
     VtkMapperLocalStorage *ls = m_VtkMapperLSH.GetLocalStorage(renderer);
-    shaderRepo->UpdateShaderProgram(ls->m_ShaderProgram,this->GetDataNode(),renderer);
+    shaderRepo->UpdateShaderProgram(ls->m_ShaderProgram, this->GetDataNode(), renderer);
   }
 }
 
-void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
+void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
-  if ( !visible) return;
+  if (!visible)
+    return;
 
-  if ( GetVtkProp(renderer)->GetVisibility() )
+  if (GetVtkProp(renderer)->GetVisibility())
   {
     GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
   }
 }
 
-bool mitk::VtkMapper::HasVtkProp( const vtkProp *prop, BaseRenderer *renderer )
+bool mitk::VtkMapper::HasVtkProp(const vtkProp *prop, BaseRenderer *renderer)
 {
-  vtkProp *myProp = this->GetVtkProp( renderer );
+  vtkProp *myProp = this->GetVtkProp(renderer);
 
   // TODO: check if myProp is a vtkAssembly and if so, check if prop is contained in its leafs
-  return ( prop == myProp );
+  return (prop == myProp);
 }
 
 void mitk::VtkMapper::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
 {
-  if(mapper)
+  if (mapper)
     mapper->SetImmediateModeRendering(mitk::VtkPropRenderer::useImmediateModeRendering());
 }
 
 void mitk::VtkMapper::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
-  vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
+  vtkLinearTransform *vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
 
-  vtkProp3D *prop = dynamic_cast<vtkProp3D*>( GetVtkProp(renderer) );
-  if(prop)
+  vtkProp3D *prop = dynamic_cast<vtkProp3D *>(GetVtkProp(renderer));
+  if (prop)
     prop->SetUserTransform(vtktransform);
 }
 
-void mitk::VtkMapper::ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor)
+void mitk::VtkMapper::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
-  float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-  DataNode * node = GetDataNode();
+  float rgba[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+  DataNode *node = GetDataNode();
 
   // check for color prop and use it for rendering if it exists
   node->GetColor(rgba, renderer, "color");
   // check for opacity prop and use it for rendering if it exists
   node->GetOpacity(rgba[3], renderer, "opacity");
 
-  double drgba[4]={rgba[0],rgba[1],rgba[2],rgba[3]};
+  double drgba[4] = {rgba[0], rgba[1], rgba[2], rgba[3]};
   actor->GetProperty()->SetColor(drgba);
   actor->GetProperty()->SetOpacity(drgba[3]);
 }

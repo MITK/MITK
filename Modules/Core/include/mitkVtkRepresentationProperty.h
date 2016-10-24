@@ -21,100 +21,93 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
+#pragma warning(push)
+#pragma warning(disable : 4522)
 #endif
 
-/**
- * Encapsulates the enumeration vtkRepresentation. Valid values are
- * (VTK constant/Id/string representation):
- * VTK_POINTS/0/Points, VTK_WIREFRAME/1/Wireframe, VTK_SURFACE/2/Surface
- * Default is the Surface representation
- */
-class MITKCORE_EXPORT VtkRepresentationProperty : public EnumerationProperty
-{
-public:
-
-  mitkClassMacro( VtkRepresentationProperty, EnumerationProperty );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  mitkNewMacro1Param(VtkRepresentationProperty, const IdType&);
-
-  mitkNewMacro1Param(VtkRepresentationProperty, const std::string&);
-
   /**
-   * Returns the current representation value as defined by VTK constants.
-   * @returns the current representation as VTK constant.
+   * Encapsulates the enumeration vtkRepresentation. Valid values are
+   * (VTK constant/Id/string representation):
+   * VTK_POINTS/0/Points, VTK_WIREFRAME/1/Wireframe, VTK_SURFACE/2/Surface
+   * Default is the Surface representation
    */
-  virtual int GetVtkRepresentation();
+  class MITKCORE_EXPORT VtkRepresentationProperty : public EnumerationProperty
+  {
+  public:
+    mitkClassMacro(VtkRepresentationProperty, EnumerationProperty);
 
-  /**
-   * Sets the representation type to VTK_POINTS.
-   */
-  virtual void SetRepresentationToPoints();
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  /**
-   * Sets the representation type to VTK_WIREFRAME.
-   */
-  virtual void SetRepresentationToWireframe();
+      mitkNewMacro1Param(VtkRepresentationProperty, const IdType &);
 
-  /**
-   * Sets the representation type to VTK_SURFACE.
-   */
-  virtual void SetRepresentationToSurface();
+    mitkNewMacro1Param(VtkRepresentationProperty, const std::string &);
 
-  using BaseProperty::operator=;
+    /**
+     * Returns the current representation value as defined by VTK constants.
+     * @returns the current representation as VTK constant.
+     */
+    virtual int GetVtkRepresentation();
 
-protected:
+    /**
+     * Sets the representation type to VTK_POINTS.
+     */
+    virtual void SetRepresentationToPoints();
 
-  /**
-   * Constructor. Sets the representation to a default value of Surface(2)
-   */
-  VtkRepresentationProperty( );
+    /**
+     * Sets the representation type to VTK_WIREFRAME.
+     */
+    virtual void SetRepresentationToWireframe();
 
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Surface(2)
-   * @param value the integer representation of the representation
-   */
-  VtkRepresentationProperty( const IdType& value );
+    /**
+     * Sets the representation type to VTK_SURFACE.
+     */
+    virtual void SetRepresentationToSurface();
 
-  /**
-   * Constructor. Sets the representation to the given value. If it is not
-   * valid, the representation is set to Surface(2)
-   * @param value the string representation of the representation
-   */
-  VtkRepresentationProperty( const std::string& value );
+    using BaseProperty::operator=;
 
-  /**
-   * this function is overridden as protected, so that the user may not add
-   * additional invalid representation types.
-   */
-  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
+  protected:
+    /**
+     * Constructor. Sets the representation to a default value of Surface(2)
+     */
+    VtkRepresentationProperty();
 
-  /**
-   * Adds the enumeration types as defined by vtk to the list of known
-   * enumeration values.
-   */
-  virtual void AddRepresentationTypes();
+    /**
+     * Constructor. Sets the representation to the given value. If it is not
+     * valid, the representation is set to Surface(2)
+     * @param value the integer representation of the representation
+     */
+    VtkRepresentationProperty(const IdType &value);
 
-private:
+    /**
+     * Constructor. Sets the representation to the given value. If it is not
+     * valid, the representation is set to Surface(2)
+     * @param value the string representation of the representation
+     */
+    VtkRepresentationProperty(const std::string &value);
 
-  // purposely not implemented
-  VtkRepresentationProperty& operator=(const VtkRepresentationProperty&);
+    /**
+     * this function is overridden as protected, so that the user may not add
+     * additional invalid representation types.
+     */
+    virtual bool AddEnum(const std::string &name, const IdType &id) override;
 
-  virtual itk::LightObject::Pointer InternalClone() const override;
-};
+    /**
+     * Adds the enumeration types as defined by vtk to the list of known
+     * enumeration values.
+     */
+    virtual void AddRepresentationTypes();
+
+  private:
+    // purposely not implemented
+    VtkRepresentationProperty &operator=(const VtkRepresentationProperty &);
+
+    virtual itk::LightObject::Pointer InternalClone() const override;
+  };
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // end of namespace mitk
 #endif
-
-

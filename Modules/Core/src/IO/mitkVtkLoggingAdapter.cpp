@@ -25,12 +25,12 @@ namespace mitk
 
 void mitk::VtkLoggingAdapter::Initialize()
 {
-  mitk::VtkLoggingAdapter* vtklog = mitk::VtkLoggingAdapter::New();
+  mitk::VtkLoggingAdapter *vtklog = mitk::VtkLoggingAdapter::New();
   vtkOutputWindow::SetInstance(vtklog);
   vtklog->Delete();
 }
 
-void mitk::VtkLoggingAdapter::DisplayText(const char* t)
+void mitk::VtkLoggingAdapter::DisplayText(const char *t)
 {
   MITK_INFO("VtkText") << t;
 }

@@ -17,19 +17,18 @@
 #include "mitkInternalEvent.h"
 #include "mitkDataInteractor.h"
 
-mitk::InternalEvent::InternalEvent(mitk::BaseRenderer* baseRenderer, DataInteractor* sourceInteractor, const std::string& signalName)
-: InteractionEvent(baseRenderer)
-, m_DataInteractor(sourceInteractor)
-, m_SignalName(signalName)
+mitk::InternalEvent::InternalEvent(mitk::BaseRenderer *baseRenderer,
+                                   DataInteractor *sourceInteractor,
+                                   const std::string &signalName)
+  : InteractionEvent(baseRenderer), m_DataInteractor(sourceInteractor), m_SignalName(signalName)
 {
 }
 
-bool mitk::InternalEvent::IsEqual(const mitk::InteractionEvent& interactionEvent) const
+bool mitk::InternalEvent::IsEqual(const mitk::InteractionEvent &interactionEvent) const
 {
-  const mitk::InternalEvent& internalEvent = static_cast<const mitk::InternalEvent&>(interactionEvent);
+  const mitk::InternalEvent &internalEvent = static_cast<const mitk::InternalEvent &>(interactionEvent);
   return (m_SignalName == internalEvent.GetSignalName() && Superclass::IsEqual(interactionEvent));
 }
-
 
 mitk::InternalEvent::~InternalEvent()
 {
@@ -40,12 +39,12 @@ std::string mitk::InternalEvent::GetSignalName() const
   return m_SignalName;
 }
 
-mitk::DataInteractor* mitk::InternalEvent::GetTargetInteractor() const
+mitk::DataInteractor *mitk::InternalEvent::GetTargetInteractor() const
 {
   return m_DataInteractor.GetPointer();
 }
 
-bool mitk::InternalEvent::IsSuperClassOf(const InteractionEvent::Pointer& baseClass) const
+bool mitk::InternalEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (NULL != dynamic_cast<InternalEvent*>(baseClass.GetPointer()) );
+  return (NULL != dynamic_cast<InternalEvent *>(baseClass.GetPointer()));
 }

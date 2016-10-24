@@ -16,9 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkStateMachineCondition.h"
 
-mitk::StateMachineCondition::StateMachineCondition( const std::string& conditionName, const bool inverted )
-: m_ConditionName( conditionName )
-, m_Inverted( inverted )
+mitk::StateMachineCondition::StateMachineCondition(const std::string &conditionName, const bool inverted)
+  : m_ConditionName(conditionName), m_Inverted(inverted)
 {
 }
 

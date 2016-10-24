@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_SURFACE_VTK_LEGACY_IO_H_
 #define _MITK_SURFACE_VTK_LEGACY_IO_H_
 
@@ -24,30 +23,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  class SurfaceVtkLegacyIO : public mitk::SurfaceVtkIO
+  {
+  public:
+    SurfaceVtkLegacyIO();
 
-class SurfaceVtkLegacyIO : public mitk::SurfaceVtkIO
-{
-public:
+    // -------------- AbstractFileReader -------------
 
-  SurfaceVtkLegacyIO();
+    using AbstractFileReader::Read;
+    virtual std::vector<BaseData::Pointer> Read() override;
 
-  // -------------- AbstractFileReader -------------
+    virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
-  using AbstractFileReader::Read;
-  virtual std::vector<BaseData::Pointer> Read() override;
+    // -------------- AbstractFileWriter -------------
 
-  virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
+    virtual void Write() override;
 
-  // -------------- AbstractFileWriter -------------
-
-  virtual void Write() override;
-
-private:
-
-  SurfaceVtkLegacyIO* IOClone() const override;
-
-};
-
+  private:
+    SurfaceVtkLegacyIO *IOClone() const override;
+  };
 }
 
 #endif //_MITK_SURFACE_VTK_LEGACY_IO_H_

@@ -35,10 +35,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 class MITKCORE_EXPORT mitkVtkInteractorStyle : public vtkInteractorStyleUser
 {
 public:
-
   // default VTK c'tor
   static mitkVtkInteractorStyle *New();
-  vtkTypeMacro(mitkVtkInteractorStyle,vtkInteractorStyleUser);
+  vtkTypeMacro(mitkVtkInteractorStyle, vtkInteractorStyleUser);
 
   /**
   * \brief Called when scrolling forwards with the mouse-wheel.
@@ -51,14 +50,12 @@ public:
   virtual void OnMouseWheelBackward() override;
 
 protected:
-
   mitkVtkInteractorStyle();
   ~mitkVtkInteractorStyle();
 
-
 private:
-  mitkVtkInteractorStyle(const mitkVtkInteractorStyle&);  // Not implemented.
-  void operator=(const mitkVtkInteractorStyle&);  // Not implemented.
+  mitkVtkInteractorStyle(const mitkVtkInteractorStyle &); // Not implemented.
+  void operator=(const mitkVtkInteractorStyle &);         // Not implemented.
 };
 
 #endif

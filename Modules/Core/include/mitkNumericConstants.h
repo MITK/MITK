@@ -14,20 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKNUMERICCONSTANTS_H_
 #define MITKNUMERICCONSTANTS_H_
 
 #include <MitkCoreExports.h>
 
-namespace mitk {
+namespace mitk
+{
+  typedef double ScalarType;
 
-typedef double ScalarType;
-
-MITKCORE_EXPORT extern const ScalarType eps;
-MITKCORE_EXPORT extern const ScalarType sqrteps;
-MITKCORE_EXPORT extern const double large;
-
+  MITKCORE_EXPORT extern const ScalarType eps;
+  MITKCORE_EXPORT extern const ScalarType sqrteps;
+  MITKCORE_EXPORT extern const double large;
 }
 
 #endif // MITKNUMERICCONSTANTS_H_

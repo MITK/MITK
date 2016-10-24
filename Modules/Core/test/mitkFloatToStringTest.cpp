@@ -19,14 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <boost/lexical_cast.hpp>
 
-#include <math.h>
 #include "mitkEqual.h"
+#include <math.h>
 
 #include "mitkLog.h"
 
-
-#include <limits>
 #include <functional>
+#include <limits>
 
 //!
 //! Verifies boost::lexical<cast> for MITK's serialization purposes
@@ -41,27 +40,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkFloatToStringTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkFloatToStringTestSuite);
-    MITK_TEST(ConfirmStringValues<float>);
-    MITK_TEST(ConfirmStringValues<double>);
-    MITK_TEST(TestConversions<float>);
-    MITK_TEST(TestConversions<double>);
+  MITK_TEST(ConfirmStringValues<float>);
+  MITK_TEST(ConfirmStringValues<double>);
+  MITK_TEST(TestConversions<float>);
+  MITK_TEST(TestConversions<double>);
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   template <typename DATATYPE>
-  void ConfirmNumberToString(DATATYPE number, const std::string& s)
+  void ConfirmNumberToString(DATATYPE number, const std::string &s)
 
   {
-      CPPUNIT_ASSERT_EQUAL( boost::lexical_cast<std::string>(number), s );
+    CPPUNIT_ASSERT_EQUAL(boost::lexical_cast<std::string>(number), s);
   }
 
-
   template <typename DATATYPE>
-  void ConfirmStringToNumber(const std::string& s, DATATYPE number)
+  void ConfirmStringToNumber(const std::string &s, DATATYPE number)
 
   {
-      CPPUNIT_ASSERT_EQUAL( number,  boost::lexical_cast<DATATYPE>(s) );
+    CPPUNIT_ASSERT_EQUAL(number, boost::lexical_cast<DATATYPE>(s));
   }
 
   template <typename DATATYPE>
@@ -70,9 +67,9 @@ public:
     // we want to make sure that the following strings will be accepted and returned
     // by our conversion functions. This must not change in the future to ensure compatibility
     DATATYPE nan = boost::lexical_cast<DATATYPE>("nan");
-    CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan==nan) );
+    CPPUNIT_ASSERT_MESSAGE("nan==nan must be false", !(nan == nan));
     nan = boost::lexical_cast<DATATYPE>("NAN");
-    CPPUNIT_ASSERT_MESSAGE("NAN==NAN must be false", !(nan==nan) );
+    CPPUNIT_ASSERT_MESSAGE("NAN==NAN must be false", !(nan == nan));
 
     std::string s_nan = boost::lexical_cast<std::string>(nan);
     CPPUNIT_ASSERT_EQUAL(std::string("nan"), s_nan);
@@ -91,10 +88,8 @@ public:
     ConfirmNumberToString(-std::numeric_limits<DATATYPE>::infinity(), "-inf");
   }
 
-
   template <typename DATATYPE>
-  void CheckRoundTrip(DATATYPE number,
-                      DATATYPE tolerance)
+  void CheckRoundTrip(DATATYPE number, DATATYPE tolerance)
   {
     std::string s = boost::lexical_cast<std::string>(number);
     DATATYPE number2 = boost::lexical_cast<DATATYPE>(s);
@@ -111,7 +106,7 @@ public:
   }
 
   template <typename DATATYPE>
-  void CheckRoundTrip(const std::string& input)
+  void CheckRoundTrip(const std::string &input)
   {
     DATATYPE number = boost::lexical_cast<DATATYPE>(input);
     std::string result = boost::lexical_cast<std::string>(number);
@@ -144,7 +139,6 @@ public:
     CheckRoundTrip<DATATYPE>("1.1");
     CheckRoundTrip<DATATYPE>("1.12121212");
     CheckRoundTrip<DATATYPE>("1.1e-2");
-
   }
 
 }; // class

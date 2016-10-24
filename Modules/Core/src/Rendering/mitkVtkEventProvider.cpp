@@ -19,14 +19,14 @@
 #include <mbilog.h>
 
 #include <vtkCallbackCommand.h>
+#include <vtkInteractorStyle.h>
 #include <vtkObjectFactory.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyle.h>
 
 #include "mitkInteractionEvent.h"
 
-#define VTKEVENTPROVIDER_INFO  MBI_INFO("mitk.core.vtkeventprovider")
-#define VTKEVENTPROVIDER_WARN  MBI_WARN("mitk.core.vtkeventprovider")
+#define VTKEVENTPROVIDER_INFO MBI_INFO("mitk.core.vtkeventprovider")
+#define VTKEVENTPROVIDER_WARN MBI_WARN("mitk.core.vtkeventprovider")
 #define VTKEVENTPROVIDER_ERROR MBI_ERROR("mitk.core.vtkeventprovider")
 #define VTKEVENTPROVIDER_DEBUG MBI_DEBUG("mitk.core.vtkeventprovider")
 
@@ -40,7 +40,7 @@ mitk::vtkEventProvider::vtkEventProvider()
   // priority of the observer/command; we want MITK events processed in the very beginning
   this->Priority = 99999.99;
 
-  //take over the processing of delete and keypress events from the superclass
+  // take over the processing of delete and keypress events from the superclass
   this->EventCallbackCommand->SetCallback(vtkEventProvider::ProcessEvents);
 
   // Set/Get the passive observer flag. If this is set to true, this
@@ -71,12 +71,12 @@ mitk::vtkEventProvider::~vtkEventProvider()
   this->SetInteractor(0);
 }
 
-void mitk::vtkEventProvider::SetMitkRenderWindow(mitk::RenderWindow* renWin)
+void mitk::vtkEventProvider::SetMitkRenderWindow(mitk::RenderWindow *renWin)
 {
   m_RenderWindow = renWin;
 }
 
-mitk::RenderWindow* mitk::vtkEventProvider::GetRenderWindow()
+mitk::RenderWindow *mitk::vtkEventProvider::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -85,15 +85,15 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
 {
   if (!this->Interactor)
   {
-    VTKEVENTPROVIDER_ERROR <<"The interactor must be set prior to enabling/disabling widget";
+    VTKEVENTPROVIDER_ERROR << "The interactor must be set prior to enabling/disabling widget";
     return;
   }
 
-  if ( enabling ) //----------------------------------------------------------
+  if (enabling) //----------------------------------------------------------
   {
     VTKEVENTPROVIDER_DEBUG << "Enabling widget";
 
-    if ( this->Enabled ) //already enabled, just return
+    if (this->Enabled) // already enabled, just return
     {
       return;
     }
@@ -104,21 +104,20 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
     vtkRenderWindowInteractor *i = this->Interactor;
 
     InteractionEventsVectorType::iterator it;
-    for(it = m_InteractionEventsVector.begin(); it != m_InteractionEventsVector.end(); ++it)
+    for (it = m_InteractionEventsVector.begin(); it != m_InteractionEventsVector.end(); ++it)
     {
       // add observer to interactorStyle
-      i->GetInteractorStyle()->AddObserver((vtkCommand::EventIds) (*it), this->EventCallbackCommand,
-          this->Priority);
+      i->GetInteractorStyle()->AddObserver((vtkCommand::EventIds)(*it), this->EventCallbackCommand, this->Priority);
     }
 
-    this->InvokeEvent(vtkCommand::EnableEvent,NULL);
+    this->InvokeEvent(vtkCommand::EnableEvent, NULL);
   }
 
-  else //disabling-----------------------------------------------------------
+  else // disabling-----------------------------------------------------------
   {
-    VTKEVENTPROVIDER_DEBUG <<"Disabling widget";
+    VTKEVENTPROVIDER_DEBUG << "Disabling widget";
 
-    if ( ! this->Enabled ) //already disabled, just return
+    if (!this->Enabled) // already disabled, just return
     {
       return;
     }
@@ -127,15 +126,15 @@ void mitk::vtkEventProvider::SetEnabled(int enabling)
 
     // don't listen for events any more
     this->Interactor->RemoveObserver(this->EventCallbackCommand);
-    //this->Interactor->HandleEventLoop = 0;
+    // this->Interactor->HandleEventLoop = 0;
 
-    this->InvokeEvent(vtkCommand::DisableEvent,NULL);
+    this->InvokeEvent(vtkCommand::DisableEvent, NULL);
   }
 }
 
 //----------------------------------------------------------------------------
 // This adds the keypress event observer and the delete event observer
-void mitk::vtkEventProvider::SetInteractor(vtkRenderWindowInteractor* i)
+void mitk::vtkEventProvider::SetInteractor(vtkRenderWindowInteractor *i)
 {
   if (i == this->Interactor)
   {
@@ -143,7 +142,7 @@ void mitk::vtkEventProvider::SetInteractor(vtkRenderWindowInteractor* i)
   }
   // if we already have an Interactor then stop observing it
   if (this->Interactor)
-    this->SetEnabled(0); //disable the old interactor
+    this->SetEnabled(0); // disable the old interactor
 
   this->Interactor = i;
 
@@ -151,69 +150,75 @@ void mitk::vtkEventProvider::SetInteractor(vtkRenderWindowInteractor* i)
 }
 
 //----------------------------------------------------------------------------
-void mitk::vtkEventProvider::ProcessEvents(vtkObject* object, unsigned long event, void* clientData, void* vtkNotUsed(callData))
+void mitk::vtkEventProvider::ProcessEvents(vtkObject *object,
+                                           unsigned long event,
+                                           void *clientData,
+                                           void *vtkNotUsed(callData))
 {
-
-  vtkEventProvider* self = reinterpret_cast<vtkEventProvider *>(clientData);
-  vtkRenderWindowInteractor* rwi = static_cast<vtkInteractorStyle *>(object)->GetInteractor();
+  vtkEventProvider *self = reinterpret_cast<vtkEventProvider *>(clientData);
+  vtkRenderWindowInteractor *rwi = static_cast<vtkInteractorStyle *>(object)->GetInteractor();
 
   // base renderer
-  mitk::BaseRenderer* baseRenderer = mitk::BaseRenderer::GetInstance(self->GetRenderWindow()->GetVtkRenderWindow());
+  mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(self->GetRenderWindow()->GetVtkRenderWindow());
   switch (event)
   {
-  // key press
-  case vtkCommand::KeyPressEvent:
-  {
-    VTKEVENTPROVIDER_DEBUG << "key press event";
-    InteractionEvent::Pointer adaptedEvent = VtkEventAdapter::AdaptInteractionKeyEvent(baseRenderer, event, rwi).GetPointer();
-    self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
-    break;
-  }
+    // key press
+    case vtkCommand::KeyPressEvent:
+    {
+      VTKEVENTPROVIDER_DEBUG << "key press event";
+      InteractionEvent::Pointer adaptedEvent =
+        VtkEventAdapter::AdaptInteractionKeyEvent(baseRenderer, event, rwi).GetPointer();
+      self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
+      break;
+    }
 
     // mouse events
-  case vtkCommand::MouseMoveEvent:
-  {
-    VTKEVENTPROVIDER_DEBUG << "mouse move event";
-    InteractionEvent::Pointer adaptedEvent = VtkEventAdapter::AdaptMouseMoveEvent(baseRenderer,event,rwi).GetPointer();
-    self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
-    break;
+    case vtkCommand::MouseMoveEvent:
+    {
+      VTKEVENTPROVIDER_DEBUG << "mouse move event";
+      InteractionEvent::Pointer adaptedEvent =
+        VtkEventAdapter::AdaptMouseMoveEvent(baseRenderer, event, rwi).GetPointer();
+      self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
+      break;
+    }
+
+    case vtkCommand::LeftButtonPressEvent:
+    case vtkCommand::MiddleButtonPressEvent:
+    case vtkCommand::RightButtonPressEvent:
+    {
+      VTKEVENTPROVIDER_DEBUG << "mouse press event";
+      InteractionEvent::Pointer adaptedEvent =
+        VtkEventAdapter::AdaptMousePressEvent(baseRenderer, event, rwi).GetPointer();
+      self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
+      break;
+    }
+
+    case vtkCommand::LeftButtonReleaseEvent:
+    case vtkCommand::MiddleButtonReleaseEvent:
+    case vtkCommand::RightButtonReleaseEvent:
+    {
+      VTKEVENTPROVIDER_DEBUG << "mouse release event";
+      InteractionEvent::Pointer adaptedEvent =
+        VtkEventAdapter::AdaptMouseReleaseEvent(baseRenderer, event, rwi).GetPointer();
+      self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
+      break;
+    }
+
+    // mouse WHEEL
+    case vtkCommand::MouseWheelForwardEvent:
+    case vtkCommand::MouseWheelBackwardEvent:
+    {
+      VTKEVENTPROVIDER_DEBUG << "mouse wheel event";
+      InteractionEvent::Pointer adaptedEvent =
+        VtkEventAdapter::AdaptMouseWheelEvent(baseRenderer, event, rwi).GetPointer();
+      self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
+      break;
+    }
+
+    default:
+      VTKEVENTPROVIDER_INFO << "VTK event not mapped properly.";
+      break;
   }
-
-  case vtkCommand::LeftButtonPressEvent:
-  case vtkCommand::MiddleButtonPressEvent:
-  case vtkCommand::RightButtonPressEvent:
-  {
-    VTKEVENTPROVIDER_DEBUG << "mouse press event";
-    InteractionEvent::Pointer adaptedEvent = VtkEventAdapter::AdaptMousePressEvent(baseRenderer,event,rwi).GetPointer();
-    self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
-    break;
-  }
-
-  case vtkCommand::LeftButtonReleaseEvent:
-  case vtkCommand::MiddleButtonReleaseEvent:
-  case vtkCommand::RightButtonReleaseEvent:
-  {
-    VTKEVENTPROVIDER_DEBUG << "mouse release event";
-    InteractionEvent::Pointer adaptedEvent = VtkEventAdapter::AdaptMouseReleaseEvent(baseRenderer,event,rwi).GetPointer();
-    self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
-    break;
-  }
-
-  // mouse WHEEL
-  case vtkCommand::MouseWheelForwardEvent:
-  case vtkCommand::MouseWheelBackwardEvent:
-  {
-    VTKEVENTPROVIDER_DEBUG << "mouse wheel event";
-    InteractionEvent::Pointer adaptedEvent = VtkEventAdapter::AdaptMouseWheelEvent(baseRenderer,event,rwi).GetPointer();
-    self->GetRenderWindow()->HandleEvent(adaptedEvent.GetPointer());
-    break;
-  }
-
-  default:
-  VTKEVENTPROVIDER_INFO << "VTK event not mapped properly.";
-  break;
-}
-
 }
 
 void mitk::vtkEventProvider::RemoveInteractionEvent(unsigned long ievent)
@@ -236,5 +241,4 @@ void mitk::vtkEventProvider::AddInteractionEvent(unsigned long ievent)
   RemoveInteractionEvent(ievent);
 
   m_InteractionEventsVector.push_back(ievent);
-
 }

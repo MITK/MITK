@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 #define MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
 
+#include "itkObject.h"
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "itkObject.h"
 
-namespace mitk {
+namespace mitk
+{
   class DataNode;
   //##Documentation
   //## @brief Interface for evaluation conditions used in the DataStorage class GetSubset() method
@@ -36,12 +36,10 @@ namespace mitk {
   //##          of these objects and should not keep them alive.
   //##
   //## @ingroup DataStorage
-  class MITKCORE_EXPORT NodePredicateBase: public itk::Object
+  class MITKCORE_EXPORT NodePredicateBase : public itk::Object
   {
-
   public:
-
-    mitkClassMacroItkParent(NodePredicateBase,itk::Object);
+    mitkClassMacroItkParent(NodePredicateBase, itk::Object);
 
     //##Documentation
     //## @brief Standard Destructor
@@ -49,9 +47,8 @@ namespace mitk {
 
     //##Documentation
     //## @brief This method will be used to evaluate the node. Has to be overwritten in subclasses
-    virtual bool CheckNode(const mitk::DataNode* node) const = 0;
+    virtual bool CheckNode(const mitk::DataNode *node) const = 0;
   };
-
 
 } // namespace mitk
 

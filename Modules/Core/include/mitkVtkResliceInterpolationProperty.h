@@ -23,95 +23,88 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
+#pragma warning(push)
+#pragma warning(disable : 4522)
 #endif
 
-/**
- * Encapsulates the enumeration for reslice interpolation. Valid values are
- * (VTK constant/Id/string representation):
- * VTK_RESLICE_NEAREST, VTK_RESLICE_LINEAR, VTK_RESLICE_CUBIC
- * Default is VTK_RESLICE_NEAREST
- */
-class MITKCORE_EXPORT VtkResliceInterpolationProperty : public EnumerationProperty
-{
-public:
-
-  mitkClassMacro( VtkResliceInterpolationProperty, EnumerationProperty );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  mitkNewMacro1Param(VtkResliceInterpolationProperty, const IdType&);
-
-  mitkNewMacro1Param(VtkResliceInterpolationProperty, const std::string&);
-
   /**
-   * Returns the current interpolation value as defined by VTK constants.
+   * Encapsulates the enumeration for reslice interpolation. Valid values are
+   * (VTK constant/Id/string representation):
+   * VTK_RESLICE_NEAREST, VTK_RESLICE_LINEAR, VTK_RESLICE_CUBIC
+   * Default is VTK_RESLICE_NEAREST
    */
-  virtual int GetInterpolation();
+  class MITKCORE_EXPORT VtkResliceInterpolationProperty : public EnumerationProperty
+  {
+  public:
+    mitkClassMacro(VtkResliceInterpolationProperty, EnumerationProperty);
 
-  /**
-   * Sets the interpolation type to VTK_RESLICE_NEAREST.
-   */
-  virtual void SetInterpolationToNearest();
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  /**
-   * Sets the interpolation type to VTK_RESLICE_LINEAR.
-   */
-  virtual void SetInterpolationToLinear();
+      mitkNewMacro1Param(VtkResliceInterpolationProperty, const IdType &);
 
-  /**
-   * Sets the interpolation type to VTK_RESLICE_CUBIC.
-   */
-  virtual void SetInterpolationToCubic();
+    mitkNewMacro1Param(VtkResliceInterpolationProperty, const std::string &);
 
-  using BaseProperty::operator=;
+    /**
+     * Returns the current interpolation value as defined by VTK constants.
+     */
+    virtual int GetInterpolation();
 
-protected:
+    /**
+     * Sets the interpolation type to VTK_RESLICE_NEAREST.
+     */
+    virtual void SetInterpolationToNearest();
 
-  /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
-   */
-  VtkResliceInterpolationProperty( );
+    /**
+     * Sets the interpolation type to VTK_RESLICE_LINEAR.
+     */
+    virtual void SetInterpolationToLinear();
 
-  /**
-   * Constructor. Sets reslice interpolation to the given value.
-   */
-  VtkResliceInterpolationProperty( const IdType& value );
+    /**
+     * Sets the interpolation type to VTK_RESLICE_CUBIC.
+     */
+    virtual void SetInterpolationToCubic();
 
-  /**
-   * Constructor. Sets reslice interpolation to the given value.
-   */
-  VtkResliceInterpolationProperty( const std::string& value );
+    using BaseProperty::operator=;
 
-  /**
-   * this function is overridden as protected, so that the user may not add
-   * additional invalid interpolation types.
-   */
-  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
+  protected:
+    /** Sets reslice interpolation mode to default (VTK_RESLICE_NEAREST).
+     */
+    VtkResliceInterpolationProperty();
 
-  /**
-   * Adds the enumeration types as defined by vtk to the list of known
-   * enumeration values.
-   */
-  virtual void AddInterpolationTypes();
+    /**
+     * Constructor. Sets reslice interpolation to the given value.
+     */
+    VtkResliceInterpolationProperty(const IdType &value);
 
-private:
+    /**
+     * Constructor. Sets reslice interpolation to the given value.
+     */
+    VtkResliceInterpolationProperty(const std::string &value);
 
-  // purposely not implemented
-  VtkResliceInterpolationProperty& operator=(const VtkResliceInterpolationProperty&);
+    /**
+     * this function is overridden as protected, so that the user may not add
+     * additional invalid interpolation types.
+     */
+    virtual bool AddEnum(const std::string &name, const IdType &id) override;
 
-  virtual itk::LightObject::Pointer InternalClone() const override;
-};
+    /**
+     * Adds the enumeration types as defined by vtk to the list of known
+     * enumeration values.
+     */
+    virtual void AddInterpolationTypes();
+
+  private:
+    // purposely not implemented
+    VtkResliceInterpolationProperty &operator=(const VtkResliceInterpolationProperty &);
+
+    virtual itk::LightObject::Pointer InternalClone() const override;
+  };
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // end of namespace mitk
 
 #endif
-
-

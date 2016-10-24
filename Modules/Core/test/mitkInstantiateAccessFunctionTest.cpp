@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkTestingMacros.h"
 
 #include <mitkInstantiateAccessFunctions.h>
@@ -24,26 +23,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 class InstantiateAccessFunctionTest
 {
 public:
-
-  template<typename TPixel, unsigned int VDimension>
-  void AccessItkImage(itk::Image<TPixel, VDimension>*, int)
-  { }
-
+  template <typename TPixel, unsigned int VDimension>
+  void AccessItkImage(itk::Image<TPixel, VDimension> *, int)
+  {
+  }
 };
 
-#define InstantiateAccessFunction_AccessItkImage(Pixel, Dim) \
-  template void InstantiateAccessFunctionTest::AccessItkImage(itk::Image<Pixel, Dim>*, int);
+#define InstantiateAccessFunction_AccessItkImage(Pixel, Dim)                                                           \
+  template void InstantiateAccessFunctionTest::AccessItkImage(itk::Image<Pixel, Dim> *, int);
 
 InstantiateAccessFunctionForFixedPixelType(AccessItkImage, (float)(double))
-InstantiateAccessFunctionForIntegralPixelTypes(AccessItkImage)
+  InstantiateAccessFunctionForIntegralPixelTypes(AccessItkImage)
 
-int mitkInstantiateAccessFunctionTest(int /*argc*/, char* /*argv*/[])
+    int mitkInstantiateAccessFunctionTest(int /*argc*/, char * /*argv*/ [])
 {
-
   MITK_TEST_BEGIN("InstantiateAccessFunction")
 
   MITK_TEST_OUTPUT(<< "Successfully compiled")
 
   MITK_TEST_END()
-
 }

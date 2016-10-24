@@ -18,20 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkDataNode.h"
 
-
-mitk::NodePredicateData::NodePredicateData(mitk::BaseData* d)
-: NodePredicateBase()
+mitk::NodePredicateData::NodePredicateData(mitk::BaseData *d) : NodePredicateBase()
 {
   m_DataObject = d;
 }
-
 
 mitk::NodePredicateData::~NodePredicateData()
 {
 }
 
-
-bool mitk::NodePredicateData::CheckNode(const mitk::DataNode* node) const
+bool mitk::NodePredicateData::CheckNode(const mitk::DataNode *node) const
 {
   if (node == nullptr)
     throw std::invalid_argument("NodePredicateData: invalid node");

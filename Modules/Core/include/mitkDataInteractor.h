@@ -17,10 +17,10 @@
 #ifndef MITKDATAINTERACTOR_H_
 #define MITKDATAINTERACTOR_H_
 
+#include <MitkCoreExports.h>
 #include <mitkCommon.h>
 #include <mitkEventStateMachine.h>
 #include <mitkWeakPointer.h>
-#include <MitkCoreExports.h>
 #include <string>
 
 namespace mitk
@@ -29,19 +29,18 @@ namespace mitk
 
   itkEventMacro(DataInteractorEvent, itk::AnyEvent)
 
-  /** Triggered when interaction is started */
-  itkEventMacro(StartInteraction, DataInteractorEvent)
+    /** Triggered when interaction is started */
+    itkEventMacro(StartInteraction, DataInteractorEvent)
 
-  /** Triggered when result is stored in mitk::DataNode */
-  itkEventMacro(ResultReady, DataInteractorEvent)
+    /** Triggered when result is stored in mitk::DataNode */
+    itkEventMacro(ResultReady, DataInteractorEvent)
 
-  enum ProcessEventMode
-  {
-    REGULAR = 0,
-    GRABINPUT = 1,
-    PREFERINPUT = 2,
-    CONNECTEDMOUSEACTION = 3
-  };
+      enum ProcessEventMode {
+        REGULAR = 0,
+        GRABINPUT = 1,
+        PREFERINPUT = 2,
+        CONNECTEDMOUSEACTION = 3
+      };
 
   /**
   * \brief Base class from with interactors that handle DataNodes are to be derived.
@@ -58,12 +57,10 @@ namespace mitk
     static const std::string IntLeaveWidget;
     static const std::string IntEnterWidget;
 
-    mitkClassMacro(DataInteractor, EventStateMachine)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(DataInteractor, EventStateMachine) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    DataNode* GetDataNode() const;
-    virtual void SetDataNode(DataNode* dataNode); // TODO: Remove virtual, use DataNodeChanged instead in subclasses
+      DataNode *GetDataNode() const;
+    virtual void SetDataNode(DataNode *dataNode); // TODO: Remove virtual, use DataNodeChanged instead in subclasses
 
     int GetLayer() const;
 
@@ -76,7 +73,8 @@ namespace mitk
     /**
      * @brief Overwrite this function to connect actions from StateMachine description with functions.
      *
-     * Following example shows how to connect the 'addpoint' action from the StateMachine XML description using the CONNECT_FUNCTION macro
+     * Following example shows how to connect the 'addpoint' action from the StateMachine XML description using the
+     CONNECT_FUNCTION macro
      * with the AddPoint() function in the TestInteractor.
      * @code
      * void mitk::TestInteractor::ConnectActionsAndFunctions()
@@ -89,7 +87,8 @@ namespace mitk
 
     /** \brief Is called when a DataNode is initially set or changed
      *  To be implemented by sub-classes for initialization code which require a DataNode.
-     *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest Layer,
+     *  \note New DataInteractors usually are expected to have the focus, but this only works if they have the highest
+     * Layer,
      *  since empty DataNodes have a layer of -1, the DataNode must be filled here in order to get a layer assigned.
      *  \note Is also called when the DataNode is set to NULL.
      */

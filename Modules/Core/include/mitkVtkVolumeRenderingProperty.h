@@ -23,91 +23,84 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define VTK_VOLUME_RAY_CAST_MIP_FUNCTION 2
 namespace mitk
 {
-
 #ifdef _MSC_VER
-# pragma warning(push)
-# pragma warning(disable: 4522)
+#pragma warning(push)
+#pragma warning(disable : 4522)
 #endif
 
-/**
- * Encapsulates the enumeration for volume rendering. Valid values are
- * (VTK constant/Id/string representation):
- * VTK_VOLUME_RAY_CAST_MIP_FUNCTION
- * VTK_RAY_CAST_COMPOSITE_FUNCTION
- * Default is NULL
- */
-class MITKCORE_EXPORT VtkVolumeRenderingProperty : public EnumerationProperty
-{
-public:
-
-  mitkClassMacro( VtkVolumeRenderingProperty, EnumerationProperty );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  mitkNewMacro1Param(VtkVolumeRenderingProperty, const IdType&);
-
-  mitkNewMacro1Param(VtkVolumeRenderingProperty, const std::string&);
-
   /**
-   * Returns the current volume rendering type
+   * Encapsulates the enumeration for volume rendering. Valid values are
+   * (VTK constant/Id/string representation):
+   * VTK_VOLUME_RAY_CAST_MIP_FUNCTION
+   * VTK_RAY_CAST_COMPOSITE_FUNCTION
+   * Default is NULL
    */
-  virtual int GetRenderingType();
+  class MITKCORE_EXPORT VtkVolumeRenderingProperty : public EnumerationProperty
+  {
+  public:
+    mitkClassMacro(VtkVolumeRenderingProperty, EnumerationProperty);
 
-  /**
-   * Sets the rendering type to VTK_VOLUME_RAY_CAST_MIP_FUNCTION
-   */
-  virtual void SetRenderingTypeToMIP();
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  /**
-   * Sets the rendering type to VTK_RAY_CAST_COMPOSITE_FUNCTION
-   */
-  virtual void SetRenderingTypeToComposite();
+      mitkNewMacro1Param(VtkVolumeRenderingProperty, const IdType &);
 
-  using BaseProperty::operator=;
+    mitkNewMacro1Param(VtkVolumeRenderingProperty, const std::string &);
 
- protected:
+    /**
+     * Returns the current volume rendering type
+     */
+    virtual int GetRenderingType();
 
-  /** Sets rendering type to default (VTK_RAY_CAST_COMPOSITE_FUNCTION).
-   */
-  VtkVolumeRenderingProperty( );
+    /**
+     * Sets the rendering type to VTK_VOLUME_RAY_CAST_MIP_FUNCTION
+     */
+    virtual void SetRenderingTypeToMIP();
 
-  /**
-   * Constructor. Sets rendering type to the given value.
-   */
-  VtkVolumeRenderingProperty( const IdType& value );
+    /**
+     * Sets the rendering type to VTK_RAY_CAST_COMPOSITE_FUNCTION
+     */
+    virtual void SetRenderingTypeToComposite();
 
-  /**
-   * Constructor. Sets rendering type to the given value.
-   */
-  VtkVolumeRenderingProperty( const std::string& value );
+    using BaseProperty::operator=;
 
-  /**
-   * this function is overridden as protected, so that the user may not add
-   * additional invalid rendering types.
-   */
-  virtual bool AddEnum( const std::string& name, const IdType& id ) override;
+  protected:
+    /** Sets rendering type to default (VTK_RAY_CAST_COMPOSITE_FUNCTION).
+     */
+    VtkVolumeRenderingProperty();
 
-  /**
-   * Adds the enumeration types as defined by vtk to the list of known
-   * enumeration values.
-   */
-  virtual void AddRenderingTypes();
+    /**
+     * Constructor. Sets rendering type to the given value.
+     */
+    VtkVolumeRenderingProperty(const IdType &value);
 
-private:
+    /**
+     * Constructor. Sets rendering type to the given value.
+     */
+    VtkVolumeRenderingProperty(const std::string &value);
 
-  // purposely not implemented
-  VtkVolumeRenderingProperty& operator=(const VtkVolumeRenderingProperty&);
+    /**
+     * this function is overridden as protected, so that the user may not add
+     * additional invalid rendering types.
+     */
+    virtual bool AddEnum(const std::string &name, const IdType &id) override;
 
-  itk::LightObject::Pointer InternalClone() const override;
-};
+    /**
+     * Adds the enumeration types as defined by vtk to the list of known
+     * enumeration values.
+     */
+    virtual void AddRenderingTypes();
+
+  private:
+    // purposely not implemented
+    VtkVolumeRenderingProperty &operator=(const VtkVolumeRenderingProperty &);
+
+    itk::LightObject::Pointer InternalClone() const override;
+  };
 
 #ifdef _MSC_VER
-# pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 } // end of namespace mitk
 
 #endif
-
-

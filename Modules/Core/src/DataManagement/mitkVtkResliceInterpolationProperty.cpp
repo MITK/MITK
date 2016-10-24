@@ -14,80 +14,71 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <vtkProperty.h>
 #include "mitkVtkResliceInterpolationProperty.h"
+#include <vtkProperty.h>
 
-
-
-mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( )
+mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty()
 {
   this->AddInterpolationTypes();
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+  this->SetValue(static_cast<IdType>(VTK_RESLICE_NEAREST));
 }
 
-
-mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( const IdType& value )
+mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty(const IdType &value)
 {
   this->AddInterpolationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    this->SetValue( value ) ;
+    this->SetValue(value);
   }
   else
   {
-    this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+    this->SetValue(static_cast<IdType>(VTK_RESLICE_NEAREST));
   }
 }
 
-mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty( const std::string& value )
+mitk::VtkResliceInterpolationProperty::VtkResliceInterpolationProperty(const std::string &value)
 {
   this->AddInterpolationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    this->SetValue( value );
+    this->SetValue(value);
   }
   else
   {
-    this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+    this->SetValue(static_cast<IdType>(VTK_RESLICE_NEAREST));
   }
 }
-
 
 int mitk::VtkResliceInterpolationProperty::GetInterpolation()
 {
-  return static_cast<int>( this->GetValueAsId() );
+  return static_cast<int>(this->GetValueAsId());
 }
-
 
 void mitk::VtkResliceInterpolationProperty::SetInterpolationToNearest()
 {
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_NEAREST ) );
+  this->SetValue(static_cast<IdType>(VTK_RESLICE_NEAREST));
 }
-
 
 void mitk::VtkResliceInterpolationProperty::SetInterpolationToLinear()
 {
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_LINEAR ) );
+  this->SetValue(static_cast<IdType>(VTK_RESLICE_LINEAR));
 }
-
 
 void mitk::VtkResliceInterpolationProperty::SetInterpolationToCubic()
 {
-  this->SetValue( static_cast<IdType>( VTK_RESLICE_CUBIC ) );
+  this->SetValue(static_cast<IdType>(VTK_RESLICE_CUBIC));
 }
-
 
 void mitk::VtkResliceInterpolationProperty::AddInterpolationTypes()
 {
-  AddEnum( "Nearest", static_cast<IdType>( VTK_RESLICE_NEAREST ) );
-  AddEnum( "Linear", static_cast<IdType>( VTK_RESLICE_LINEAR ) );
-  AddEnum( "Cubic", static_cast<IdType>( VTK_RESLICE_CUBIC ) );
+  AddEnum("Nearest", static_cast<IdType>(VTK_RESLICE_NEAREST));
+  AddEnum("Linear", static_cast<IdType>(VTK_RESLICE_LINEAR));
+  AddEnum("Cubic", static_cast<IdType>(VTK_RESLICE_CUBIC));
 }
 
-
-bool mitk::VtkResliceInterpolationProperty::AddEnum( const std::string& name, const IdType& id )
+bool mitk::VtkResliceInterpolationProperty::AddEnum(const std::string &name, const IdType &id)
 {
-  return Superclass::AddEnum( name, id );
+  return Superclass::AddEnum(name, id);
 }
 
 itk::LightObject::Pointer mitk::VtkResliceInterpolationProperty::InternalClone() const

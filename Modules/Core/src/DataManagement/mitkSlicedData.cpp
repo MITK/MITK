@@ -14,34 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkSlicedData.h"
+#include "mitkAbstractTransformGeometry.h"
 #include "mitkBaseProcess.h"
 #include <mitkProportionalTimeGeometry.h>
-#include "mitkAbstractTransformGeometry.h"
 
-
-mitk::SlicedData::SlicedData()
-  : m_RequestedRegionInitialized(false)
-  , m_UseLargestPossibleRegion(false)
+mitk::SlicedData::SlicedData() : m_RequestedRegionInitialized(false), m_UseLargestPossibleRegion(false)
 {
   unsigned int i;
-  for(i=0;i<4;++i)
+  for (i = 0; i < 4; ++i)
   {
     m_LargestPossibleRegion.SetIndex(i, 0);
-    m_LargestPossibleRegion.SetSize (i, 1);
+    m_LargestPossibleRegion.SetSize(i, 1);
   }
 }
 
-mitk::SlicedData::SlicedData( const SlicedData &other )
-  : BaseData(other)
-  , m_LargestPossibleRegion(other.m_LargestPossibleRegion)
-  , m_RequestedRegion(other.m_RequestedRegion)
-  , m_RequestedRegionInitialized(other.m_RequestedRegionInitialized)
-  , m_BufferedRegion(other.m_BufferedRegion)
-  , m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
+mitk::SlicedData::SlicedData(const SlicedData &other)
+  : BaseData(other),
+    m_LargestPossibleRegion(other.m_LargestPossibleRegion),
+    m_RequestedRegion(other.m_RequestedRegion),
+    m_RequestedRegionInitialized(other.m_RequestedRegionInitialized),
+    m_BufferedRegion(other.m_BufferedRegion),
+    m_UseLargestPossibleRegion(other.m_UseLargestPossibleRegion)
 {
-
 }
 mitk::SlicedData::~SlicedData()
 {
@@ -62,7 +57,7 @@ void mitk::SlicedData::UpdateOutputInformation()
   // requested region was not set yet, (or has been set to something
   // invalid - with no data in it ) then set it to the largest possible
   // region.
-  if ( ! m_RequestedRegionInitialized)
+  if (!m_RequestedRegionInitialized)
   {
     this->SetRequestedRegionToLargestPossibleRegion();
     m_RequestedRegionInitialized = true;
@@ -73,21 +68,21 @@ void mitk::SlicedData::UpdateOutputInformation()
 
 void mitk::SlicedData::PrepareForNewData()
 {
-  if ( GetUpdateMTime() < GetPipelineMTime() || GetDataReleased() )
+  if (GetUpdateMTime() < GetPipelineMTime() || GetDataReleased())
   {
-   ReleaseData();
+    ReleaseData();
   }
 }
 
 void mitk::SlicedData::SetRequestedRegionToLargestPossibleRegion()
 {
   m_UseLargestPossibleRegion = true;
-  if(GetGeometry()==nullptr)
+  if (GetGeometry() == nullptr)
     return;
   unsigned int i;
-  const RegionType::IndexType & index = GetLargestPossibleRegion().GetIndex();
-  const RegionType::SizeType & size = GetLargestPossibleRegion().GetSize();
-  for(i=0;i<RegionDimension;++i)
+  const RegionType::IndexType &index = GetLargestPossibleRegion().GetIndex();
+  const RegionType::SizeType &size = GetLargestPossibleRegion().GetSize();
+  for (i = 0; i < RegionDimension; ++i)
   {
     m_RequestedRegion.SetIndex(i, index[i]);
     m_RequestedRegion.SetSize(i, size[i]);
@@ -103,48 +98,51 @@ bool mitk::SlicedData::RequestedRegionIsOutsideOfTheBufferedRegion()
   // methods used here.
   const IndexType &requestedRegionIndex = m_RequestedRegion.GetIndex();
 
-  const SizeType& requestedRegionSize = m_RequestedRegion.GetSize();
-  const SizeType& largestPossibleRegionSize
-    = GetLargestPossibleRegion().GetSize();
+  const SizeType &requestedRegionSize = m_RequestedRegion.GetSize();
+  const SizeType &largestPossibleRegionSize = GetLargestPossibleRegion().GetSize();
 
   // are whole channels requested?
   int c, cEnd;
-  c=requestedRegionIndex[4];
-  cEnd=c+static_cast<long>(requestedRegionSize[4]);
-  if(requestedRegionSize[3] == largestPossibleRegionSize[3])
+  c = requestedRegionIndex[4];
+  cEnd = c + static_cast<long>(requestedRegionSize[4]);
+  if (requestedRegionSize[3] == largestPossibleRegionSize[3])
   {
-    for (; c< cEnd; ++c)
-      if(IsChannelSet(c)==false) return true;
+    for (; c < cEnd; ++c)
+      if (IsChannelSet(c) == false)
+        return true;
     return false;
   }
 
   // are whole volumes requested?
   int t, tEnd;
-  t=requestedRegionIndex[3];
-  tEnd=t+static_cast<long>(requestedRegionSize[3]);
-  if(requestedRegionSize[2] == largestPossibleRegionSize[2])
+  t = requestedRegionIndex[3];
+  tEnd = t + static_cast<long>(requestedRegionSize[3]);
+  if (requestedRegionSize[2] == largestPossibleRegionSize[2])
   {
-    for (; c< cEnd; ++c)
-      for (; t< tEnd; ++t)
-        if(IsVolumeSet(t, c)==false) return true;
+    for (; c < cEnd; ++c)
+      for (; t < tEnd; ++t)
+        if (IsVolumeSet(t, c) == false)
+          return true;
     return false;
   }
 
   // ok, only slices are requested. Check if they are available.
   int s, sEnd;
-  s=requestedRegionIndex[2];
-  sEnd=s+static_cast<long>(requestedRegionSize[2]);
-  for (; c< cEnd; ++c)
-    for (; t< tEnd; ++t)
-      for (; s< sEnd; ++s)
-        if(IsSliceSet(s, t, c)==false) return true;
+  s = requestedRegionIndex[2];
+  sEnd = s + static_cast<long>(requestedRegionSize[2]);
+  for (; c < cEnd; ++c)
+    for (; t < tEnd; ++t)
+      for (; s < sEnd; ++s)
+        if (IsSliceSet(s, t, c) == false)
+          return true;
 
   return false;
 }
 
 bool mitk::SlicedData::VerifyRequestedRegion()
 {
-  if(GetTimeGeometry() == nullptr) return false;
+  if (GetTimeGeometry() == nullptr)
+    return false;
 
   unsigned int i;
 
@@ -152,18 +150,16 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   // Note that the test is indeed against the largest possible region
   // rather than the buffered region; see DataObject::VerifyRequestedRegion.
   const IndexType &requestedRegionIndex = m_RequestedRegion.GetIndex();
-  const IndexType &largestPossibleRegionIndex
-    = GetLargestPossibleRegion().GetIndex();
+  const IndexType &largestPossibleRegionIndex = GetLargestPossibleRegion().GetIndex();
 
-  const SizeType& requestedRegionSize = m_RequestedRegion.GetSize();
-  const SizeType& largestPossibleRegionSize
-    = GetLargestPossibleRegion().GetSize();
+  const SizeType &requestedRegionSize = m_RequestedRegion.GetSize();
+  const SizeType &largestPossibleRegionSize = GetLargestPossibleRegion().GetSize();
 
-  for (i=0; i< RegionDimension; ++i)
+  for (i = 0; i < RegionDimension; ++i)
   {
-    if ( (requestedRegionIndex[i] < largestPossibleRegionIndex[i]) ||
-      ((requestedRegionIndex[i] + static_cast<long>(requestedRegionSize[i]))
-    > (largestPossibleRegionIndex[i]+static_cast<long>(largestPossibleRegionSize[i]))))
+    if ((requestedRegionIndex[i] < largestPossibleRegionIndex[i]) ||
+        ((requestedRegionIndex[i] + static_cast<long>(requestedRegionSize[i])) >
+         (largestPossibleRegionIndex[i] + static_cast<long>(largestPossibleRegionSize[i]))))
     {
       return false;
     }
@@ -172,11 +168,11 @@ bool mitk::SlicedData::VerifyRequestedRegion()
   return true;
 }
 
-void mitk::SlicedData::SetRequestedRegion( const itk::DataObject *data)
+void mitk::SlicedData::SetRequestedRegion(const itk::DataObject *data)
 {
-  m_UseLargestPossibleRegion=false;
+  m_UseLargestPossibleRegion = false;
 
-  const mitk::SlicedData *slicedData = dynamic_cast<const mitk::SlicedData*>(data);
+  const mitk::SlicedData *slicedData = dynamic_cast<const mitk::SlicedData *>(data);
 
   if (slicedData)
   {
@@ -186,15 +182,17 @@ void mitk::SlicedData::SetRequestedRegion( const itk::DataObject *data)
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro( << "mitk::SlicedData::SetRequestedRegion(DataObject*) cannot cast " << typeid(data).name() << " to " << typeid(SlicedData*).name() );
+    itkExceptionMacro(<< "mitk::SlicedData::SetRequestedRegion(DataObject*) cannot cast " << typeid(data).name()
+                      << " to "
+                      << typeid(SlicedData *).name());
   }
 }
 
 void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
 {
-  m_UseLargestPossibleRegion=false;
+  m_UseLargestPossibleRegion = false;
 
-  if(region!=nullptr)
+  if (region != nullptr)
   {
     m_RequestedRegion = *region;
     m_RequestedRegionInitialized = true;
@@ -202,22 +200,27 @@ void mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType *region)
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro( << "mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(SlicedData*).name() );
+    itkExceptionMacro(<< "mitk::SlicedData::SetRequestedRegion(SlicedData::RegionType*) cannot cast "
+                      << typeid(region).name()
+                      << " to "
+                      << typeid(SlicedData *).name());
   }
 }
 
 void mitk::SlicedData::SetLargestPossibleRegion(SlicedData::RegionType *region)
 {
-
-  if(region!=nullptr)
+  if (region != nullptr)
   {
     m_LargestPossibleRegion = *region;
-    m_UseLargestPossibleRegion=true;
+    m_UseLargestPossibleRegion = true;
   }
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro( << "mitk::SlicedData::SetLargestPossibleRegion(SlicedData::RegionType*) cannot cast " << typeid(region).name() << " to " << typeid(SlicedData*).name() );
+    itkExceptionMacro(<< "mitk::SlicedData::SetLargestPossibleRegion(SlicedData::RegionType*) cannot cast "
+                      << typeid(region).name()
+                      << " to "
+                      << typeid(SlicedData *).name());
   }
 }
 
@@ -228,7 +231,7 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 
   const mitk::SlicedData *slicedData;
 
-  slicedData = dynamic_cast<const mitk::SlicedData*>(data);
+  slicedData = dynamic_cast<const mitk::SlicedData *>(data);
 
   if (slicedData)
   {
@@ -237,11 +240,13 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
   else
   {
     // pointer could not be cast back down
-    itkExceptionMacro( << "mitk::SlicedData::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name() << " to " << typeid(SlicedData*).name() );
+    itkExceptionMacro(<< "mitk::SlicedData::CopyInformation(const DataObject *data) cannot cast " << typeid(data).name()
+                      << " to "
+                      << typeid(SlicedData *).name());
   }
 }
 
-//const mitk::PlaneGeometry* mitk::SlicedData::GetPlaneGeometry(int s, int t) const
+// const mitk::PlaneGeometry* mitk::SlicedData::GetPlaneGeometry(int s, int t) const
 //{
 //  const_cast<SlicedData*>(this)->SetRequestedRegionToLargestPossibleRegion();
 //
@@ -250,14 +255,14 @@ void mitk::SlicedData::CopyInformation(const itk::DataObject *data)
 //  return GetSlicedGeometry(t)->GetPlaneGeometry(s);
 //}
 //
-mitk::SlicedGeometry3D* mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
+mitk::SlicedGeometry3D *mitk::SlicedData::GetSlicedGeometry(unsigned int t) const
 {
   if (GetTimeGeometry() == nullptr)
     return nullptr;
-  return dynamic_cast<SlicedGeometry3D*>(GetTimeGeometry()->GetGeometryForTimeStep(t).GetPointer());
+  return dynamic_cast<SlicedGeometry3D *>(GetTimeGeometry()->GetGeometryForTimeStep(t).GetPointer());
 }
 
-const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)
+const mitk::SlicedGeometry3D *mitk::SlicedData::GetUpdatedSlicedGeometry(unsigned int t)
 {
   SetRequestedRegionToLargestPossibleRegion();
 
@@ -266,18 +271,18 @@ const mitk::SlicedGeometry3D* mitk::SlicedData::GetUpdatedSlicedGeometry(unsigne
   return GetSlicedGeometry(t);
 }
 
-void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
+void mitk::SlicedData::SetGeometry(BaseGeometry *aGeometry3D)
 {
-  if(aGeometry3D!=nullptr)
+  if (aGeometry3D != nullptr)
   {
     ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-    SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D*>(aGeometry3D);
-    if(slicedGeometry.IsNull())
+    SlicedGeometry3D::Pointer slicedGeometry = dynamic_cast<SlicedGeometry3D *>(aGeometry3D);
+    if (slicedGeometry.IsNull())
     {
-      PlaneGeometry* geometry2d = dynamic_cast<PlaneGeometry*>(aGeometry3D);
-      if(geometry2d!=nullptr && dynamic_cast<mitk::AbstractTransformGeometry*>(aGeometry3D) == nullptr)
+      PlaneGeometry *geometry2d = dynamic_cast<PlaneGeometry *>(aGeometry3D);
+      if (geometry2d != nullptr && dynamic_cast<mitk::AbstractTransformGeometry *>(aGeometry3D) == nullptr)
       {
-        if((GetSlicedGeometry()->GetPlaneGeometry(0)==geometry2d) && (GetSlicedGeometry()->GetSlices()==1))
+        if ((GetSlicedGeometry()->GetPlaneGeometry(0) == geometry2d) && (GetSlicedGeometry()->GetSlices() == 1))
           return;
         slicedGeometry = SlicedGeometry3D::New();
         slicedGeometry->InitializeEvenlySpaced(geometry2d, 1);
@@ -297,7 +302,7 @@ void mitk::SlicedData::SetGeometry(BaseGeometry* aGeometry3D)
   }
   else
   {
-    if(GetGeometry()==nullptr)
+    if (GetGeometry() == nullptr)
       return;
     Superclass::SetGeometry(nullptr);
   }
@@ -308,31 +313,31 @@ void mitk::SlicedData::SetSpacing(const ScalarType aSpacing[3])
   this->SetSpacing((mitk::Vector3D)aSpacing);
 }
 
-void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
+void mitk::SlicedData::SetOrigin(const mitk::Point3D &origin)
 {
-  TimeGeometry* timeGeometry = GetTimeGeometry();
+  TimeGeometry *timeGeometry = GetTimeGeometry();
 
-  assert(timeGeometry!=nullptr);
+  assert(timeGeometry != nullptr);
 
-  mitk::SlicedGeometry3D* slicedGeometry;
+  mitk::SlicedGeometry3D *slicedGeometry;
 
   unsigned int steps = timeGeometry->CountTimeSteps();
 
-  for(unsigned int timestep = 0; timestep < steps; ++timestep)
+  for (unsigned int timestep = 0; timestep < steps; ++timestep)
   {
     slicedGeometry = GetSlicedGeometry(timestep);
-    if(slicedGeometry != nullptr)
+    if (slicedGeometry != nullptr)
     {
       slicedGeometry->SetOrigin(origin);
-      if(slicedGeometry->GetEvenlySpaced())
+      if (slicedGeometry->GetEvenlySpaced())
       {
-        mitk::PlaneGeometry* geometry2D = slicedGeometry->GetPlaneGeometry(0);
+        mitk::PlaneGeometry *geometry2D = slicedGeometry->GetPlaneGeometry(0);
         geometry2D->SetOrigin(origin);
         slicedGeometry->InitializeEvenlySpaced(geometry2D, slicedGeometry->GetSlices());
       }
     }
-    //ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
-    //if(timeGeometry != NULL)
+    // ProportionalTimeGeometry* timeGeometry = dynamic_cast<ProportionalTimeGeometry *>(GetTimeGeometry());
+    // if(timeGeometry != NULL)
     //{
     //  timeGeometry->Initialize(slicedGeometry, steps);
     //  break;
@@ -342,21 +347,19 @@ void mitk::SlicedData::SetOrigin(const mitk::Point3D& origin)
 
 void mitk::SlicedData::SetSpacing(mitk::Vector3D aSpacing)
 {
-  TimeGeometry* timeGeometry = GetTimeGeometry();
+  TimeGeometry *timeGeometry = GetTimeGeometry();
 
-  assert(timeGeometry!=nullptr);
+  assert(timeGeometry != nullptr);
 
   unsigned int steps = timeGeometry->CountTimeSteps();
 
-  for(unsigned int timestep = 0; timestep < steps; ++timestep)
+  for (unsigned int timestep = 0; timestep < steps; ++timestep)
   {
-    mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(timestep);
-    if(slicedGeometry != nullptr)
+    mitk::SlicedGeometry3D *slicedGeometry = GetSlicedGeometry(timestep);
+    if (slicedGeometry != nullptr)
     {
       slicedGeometry->SetSpacing(aSpacing);
     }
   }
   timeGeometry->Update();
 }
-
-

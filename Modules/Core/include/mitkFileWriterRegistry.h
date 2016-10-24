@@ -20,55 +20,58 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkCoreExports.h>
 
 // Microservices
-#include <usServiceReference.h>
 #include <usGetModuleContext.h>
 #include <usServiceObjects.h>
+#include <usServiceReference.h>
 
 #include "mitkIFileWriter.h"
 
-namespace mitk {
+namespace mitk
+{
   class BaseData;
 }
 
-namespace mitk {
-
-/**
- * @ingroup IO
- *
- * Provides convenient access to mitk::IFileWriter instances and writing
- * files from mitk::BaseData types.
- *
- * \note The life-time of all mitk::IFileWriter objects returned by an
- * instance of this class ends with the destruction of that instance.
- */
-class MITKCORE_EXPORT FileWriterRegistry
+namespace mitk
 {
+  /**
+   * @ingroup IO
+   *
+   * Provides convenient access to mitk::IFileWriter instances and writing
+   * files from mitk::BaseData types.
+   *
+   * \note The life-time of all mitk::IFileWriter objects returned by an
+   * instance of this class ends with the destruction of that instance.
+   */
+  class MITKCORE_EXPORT FileWriterRegistry
+  {
+  public:
+    typedef us::ServiceReference<IFileWriter> WriterReference;
 
-public:
+    FileWriterRegistry();
+    ~FileWriterRegistry();
 
-  typedef us::ServiceReference<IFileWriter> WriterReference;
+    static std::vector<WriterReference> GetReferences(const BaseData *baseData,
+                                                      us::ModuleContext *context = us::GetModuleContext());
+    static std::vector<WriterReference> GetReferences(const BaseData *baseData,
+                                                      const std::string &mimeType,
+                                                      us::ModuleContext *context = us::GetModuleContext());
 
-  FileWriterRegistry();
-  ~FileWriterRegistry();
+    IFileWriter *GetWriter(const WriterReference &ref, us::ModuleContext *context = us::GetModuleContext());
 
-  static std::vector<WriterReference> GetReferences(const BaseData* baseData, us::ModuleContext* context = us::GetModuleContext());
-  static std::vector<WriterReference> GetReferences(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
+    std::vector<IFileWriter *> GetWriters(const BaseData *baseData,
+                                          const std::string &mimeType,
+                                          us::ModuleContext *context = us::GetModuleContext());
 
-  IFileWriter* GetWriter(const WriterReference& ref, us::ModuleContext* context = us::GetModuleContext());
+    void UngetWriter(IFileWriter *writer);
+    void UngetWriters(const std::vector<IFileWriter *> &writers);
 
-  std::vector<IFileWriter*> GetWriters(const BaseData* baseData, const std::string& mimeType, us::ModuleContext* context = us::GetModuleContext());
+  private:
+    // purposely not implemented
+    FileWriterRegistry(const FileWriterRegistry &);
+    FileWriterRegistry &operator=(const FileWriterRegistry &);
 
-  void UngetWriter(IFileWriter* writer);
-  void UngetWriters(const std::vector<IFileWriter*>& writers);
-
-private:
-
-  // purposely not implemented
-  FileWriterRegistry(const FileWriterRegistry&);
-  FileWriterRegistry& operator=(const FileWriterRegistry&);
-
-  std::map<IFileWriter*, us::ServiceObjects<IFileWriter> > m_ServiceObjects;
-};
+    std::map<IFileWriter *, us::ServiceObjects<IFileWriter>> m_ServiceObjects;
+  };
 
 } // namespace mitk
 

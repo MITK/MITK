@@ -14,36 +14,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKLEGACYFILEREADERSERVICE_H
 #define MITKLEGACYFILEREADERSERVICE_H
 
 #include <mitkAbstractFileReader.h>
 
-namespace mitk {
-
-// This class wraps mitk::FileReader instances registered as
-// "mitkIOAdapter" via the ITK object factory system as a
-// micro service.
-class LegacyFileReaderService : public mitk::AbstractFileReader
+namespace mitk
 {
+  // This class wraps mitk::FileReader instances registered as
+  // "mitkIOAdapter" via the ITK object factory system as a
+  // micro service.
+  class LegacyFileReaderService : public mitk::AbstractFileReader
+  {
+  public:
+    LegacyFileReaderService(const LegacyFileReaderService &other);
 
-public:
+    LegacyFileReaderService(const std::vector<std::string> &extensions, const std::string &category);
+    virtual ~LegacyFileReaderService();
 
-  LegacyFileReaderService(const LegacyFileReaderService& other);
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-  LegacyFileReaderService(const std::vector<std::string>& extensions, const std::string& category);
-  virtual ~LegacyFileReaderService();
+  private:
+    LegacyFileReaderService *Clone() const override;
 
-  using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
-
-private:
-
-  LegacyFileReaderService* Clone() const override;
-
-  us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
-};
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+  };
 
 } // namespace mitk
 

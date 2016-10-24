@@ -19,169 +19,155 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkCoreExports.h"
 
-#include <mitkLogMacros.h>
 #include <mitkCommon.h>
+#include <mitkLogMacros.h>
 
+#include <mitkServiceInterface.h>
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
-#include <mitkServiceInterface.h>
 #include <usServiceReference.h>
 
 #include <cassert>
 
-namespace mitk {
-
-struct IMimeTypeProvider;
-struct IShaderRepository;
-class IPropertyAliases;
-class IPropertyDescriptions;
-class IPropertyExtensions;
-class IPropertyFilters;
-class IPropertyPersistence;
-
-/**
- * @brief Access MITK core services.
- *
- * This class can be used to conveniently access common
- * MITK Core service objects. Some getter methods where implementations
- * exist in the core library are guaranteed to return a non-NULL service object.
- *
- * To ensure that CoreServices::Unget() is called after the caller
- * has finished using a service object, you should use the CoreServicePointer
- * helper class which calls Unget() when it goes out of scope:
- *
- * \code
- * CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
- * // Do something with shaderRepo
- * \endcode
- *
- * @see CoreServicePointer
- */
-class MITKCORE_EXPORT CoreServices
+namespace mitk
 {
-public:
+  struct IMimeTypeProvider;
+  struct IShaderRepository;
+  class IPropertyAliases;
+  class IPropertyDescriptions;
+  class IPropertyExtensions;
+  class IPropertyFilters;
+  class IPropertyPersistence;
 
   /**
-   * @brief Get an IShaderRepository instance.
-   * @param context The module context of the module getting the service.
-   * @return A IShaderRepository instance which can be NULL.
+   * @brief Access MITK core services.
+   *
+   * This class can be used to conveniently access common
+   * MITK Core service objects. Some getter methods where implementations
+   * exist in the core library are guaranteed to return a non-NULL service object.
+   *
+   * To ensure that CoreServices::Unget() is called after the caller
+   * has finished using a service object, you should use the CoreServicePointer
+   * helper class which calls Unget() when it goes out of scope:
+   *
+   * \code
+   * CoreServicePointer<IShaderRepository> shaderRepo(CoreServices::GetShaderRepository());
+   * // Do something with shaderRepo
+   * \endcode
+   *
+   * @see CoreServicePointer
    */
-  static IShaderRepository* GetShaderRepository();
-
-  /**
-   * @brief Get an IPropertyAliases instance.
-   * @param context The module context of the module getting the service.
-   * @return A non-NULL IPropertyAliases instance.
-   */
-  static IPropertyAliases* GetPropertyAliases(us::ModuleContext* context = us::GetModuleContext());
-
-  /**
-   * @brief Get an IPropertyDescriptions instance.
-   * @param context The module context of the module getting the service.
-   * @return A non-NULL IPropertyDescriptions instance.
-   */
-  static IPropertyDescriptions* GetPropertyDescriptions(us::ModuleContext* context = us::GetModuleContext());
-
-  /**
-   * @brief Get an IPropertyExtensions instance.
-   * @param context The module context of the module getting the service.
-   * @return A non-NULL IPropertyExtensions instance.
-   */
-  static IPropertyExtensions* GetPropertyExtensions(us::ModuleContext* context = us::GetModuleContext());
-
-  /**
-   * @brief Get an IPropertyFilters instance.
-   * @param context The module context of the module getting the service.
-   * @return A non-NULL IPropertyFilters instance.
-   */
-  static IPropertyFilters* GetPropertyFilters(us::ModuleContext* context = us::GetModuleContext());
-
-  /**
-  * @brief Get an IPropertyPersistence instance.
-  * @param context The module context of the module getting the service.
-  * @return A non-NULL IPropertyPersistence instance.
-  */
-  static IPropertyPersistence* GetPropertyPersistence(us::ModuleContext* context = us::GetModuleContext());
-
-  /**
-   * @brief Get an IMimeTypeProvider instance.
-   * @param context The module context of the module getting the service.
-   * @return A non-NULL IMimeTypeProvider instance.
-   */
-  static IMimeTypeProvider* GetMimeTypeProvider(us::ModuleContext* context = us::GetModuleContext());
-
-  /**
-   * @brief Unget a previously acquired service instance.
-   * @param service The service instance to be released.
-   * @return \c true if ungetting the service was successful, \c false otherwise.
-   */
-  template<class S>
-  static bool Unget(S* service, us::ModuleContext* context = us::GetModuleContext())
+  class MITKCORE_EXPORT CoreServices
   {
-    return Unget(context, us_service_interface_iid<S>(), service);
-  }
+  public:
+    /**
+     * @brief Get an IShaderRepository instance.
+     * @param context The module context of the module getting the service.
+     * @return A IShaderRepository instance which can be NULL.
+     */
+    static IShaderRepository *GetShaderRepository();
 
-private:
+    /**
+     * @brief Get an IPropertyAliases instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-NULL IPropertyAliases instance.
+     */
+    static IPropertyAliases *GetPropertyAliases(us::ModuleContext *context = us::GetModuleContext());
 
-  static bool Unget(us::ModuleContext* context, const std::string& interfaceId, void* service);
+    /**
+     * @brief Get an IPropertyDescriptions instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-NULL IPropertyDescriptions instance.
+     */
+    static IPropertyDescriptions *GetPropertyDescriptions(us::ModuleContext *context = us::GetModuleContext());
 
-  // purposely not implemented
-  CoreServices();
-  CoreServices(const CoreServices&);
-  CoreServices& operator=(const CoreServices&);
-};
+    /**
+     * @brief Get an IPropertyExtensions instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-NULL IPropertyExtensions instance.
+     */
+    static IPropertyExtensions *GetPropertyExtensions(us::ModuleContext *context = us::GetModuleContext());
 
-/**
- * @brief A RAII helper class for core service objects.
- *
- * This is class is intended for usage in local scopes; it calls
- * CoreServices::Unget(S*) in its destructor. You should not construct
- * multiple CoreServicePointer instances using the same service pointer,
- * unless it is retrieved by a new call to a CoreServices getter method.
- *
- * @see CoreServices
- */
-template<class S>
-class MITK_LOCAL CoreServicePointer
-{
-public:
+    /**
+     * @brief Get an IPropertyFilters instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-NULL IPropertyFilters instance.
+     */
+    static IPropertyFilters *GetPropertyFilters(us::ModuleContext *context = us::GetModuleContext());
 
-  explicit CoreServicePointer(S* service)
-    : m_service(service)
-  {
-    assert(m_service);
-  }
+    /**
+    * @brief Get an IPropertyPersistence instance.
+    * @param context The module context of the module getting the service.
+    * @return A non-NULL IPropertyPersistence instance.
+    */
+    static IPropertyPersistence *GetPropertyPersistence(us::ModuleContext *context = us::GetModuleContext());
 
-  ~CoreServicePointer()
-  {
-    try
+    /**
+     * @brief Get an IMimeTypeProvider instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-NULL IMimeTypeProvider instance.
+     */
+    static IMimeTypeProvider *GetMimeTypeProvider(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
+     * @brief Unget a previously acquired service instance.
+     * @param service The service instance to be released.
+     * @return \c true if ungetting the service was successful, \c false otherwise.
+     */
+    template <class S>
+    static bool Unget(S *service, us::ModuleContext *context = us::GetModuleContext())
     {
-      CoreServices::Unget(m_service);
+      return Unget(context, us_service_interface_iid<S>(), service);
     }
-    catch (const std::exception& e)
-    {
-      MITK_ERROR << e.what();
-    }
-    catch (...)
-    {
-      MITK_ERROR << "Ungetting core service failed.";
-    }
-  }
 
-  S* operator->() const
+  private:
+    static bool Unget(us::ModuleContext *context, const std::string &interfaceId, void *service);
+
+    // purposely not implemented
+    CoreServices();
+    CoreServices(const CoreServices &);
+    CoreServices &operator=(const CoreServices &);
+  };
+
+  /**
+   * @brief A RAII helper class for core service objects.
+   *
+   * This is class is intended for usage in local scopes; it calls
+   * CoreServices::Unget(S*) in its destructor. You should not construct
+   * multiple CoreServicePointer instances using the same service pointer,
+   * unless it is retrieved by a new call to a CoreServices getter method.
+   *
+   * @see CoreServices
+   */
+  template <class S>
+  class MITK_LOCAL CoreServicePointer
   {
-    return m_service;
-  }
+  public:
+    explicit CoreServicePointer(S *service) : m_service(service) { assert(m_service); }
+    ~CoreServicePointer()
+    {
+      try
+      {
+        CoreServices::Unget(m_service);
+      }
+      catch (const std::exception &e)
+      {
+        MITK_ERROR << e.what();
+      }
+      catch (...)
+      {
+        MITK_ERROR << "Ungetting core service failed.";
+      }
+    }
 
-private:
+    S *operator->() const { return m_service; }
+  private:
+    // purposely not implemented
+    CoreServicePointer(const CoreServicePointer &);
+    CoreServicePointer &operator=(const CoreServicePointer &);
 
-  // purposely not implemented
-  CoreServicePointer(const CoreServicePointer&);
-  CoreServicePointer& operator=(const CoreServicePointer&);
-
-  S* const m_service;
-};
-
+    S *const m_service;
+  };
 }
 
 #endif // MITKCORESERVICES_H

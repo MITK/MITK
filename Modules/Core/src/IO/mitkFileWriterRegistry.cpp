@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkFileWriterRegistry.h"
 
 // MITK
-#include "mitkIMimeTypeProvider.h"
-#include "mitkCoreServices.h"
 #include "mitkBaseData.h"
+#include "mitkCoreServices.h"
+#include "mitkIMimeTypeProvider.h"
 
 // Microservices
 #include <usGetModuleContext.h>
+#include <usLDAPProp.h>
 #include <usModuleContext.h>
 #include <usServiceProperties.h>
-#include <usLDAPProp.h>
 
 mitk::FileWriterRegistry::FileWriterRegistry()
 {
@@ -34,69 +33,82 @@ mitk::FileWriterRegistry::FileWriterRegistry()
 
 mitk::FileWriterRegistry::~FileWriterRegistry()
 {
-  for (auto & elem : m_ServiceObjects)
+  for (auto &elem : m_ServiceObjects)
   {
     elem.second.UngetService(elem.first);
   }
 }
 
-std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(const mitk::BaseData* baseData, us::ModuleContext* context)
+std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(
+  const mitk::BaseData *baseData, us::ModuleContext *context)
 {
   return GetReferences(baseData, std::string(), context);
 }
 
-std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
+std::vector<mitk::FileWriterRegistry::WriterReference> mitk::FileWriterRegistry::GetReferences(
+  const mitk::BaseData *baseData, const std::string &mimeType, us::ModuleContext *context)
 {
-  if (baseData == NULL){
+  if (baseData == NULL)
+  {
     mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
     std::vector<mitk::FileWriterRegistry::WriterReference> emptyResult;
     return emptyResult;
   }
 
-  if (context == NULL) context = us::GetModuleContext();
+  if (context == NULL)
+    context = us::GetModuleContext();
 
   std::vector<WriterReference> result;
 
   // loop over the class hierarchy of baseData and get all writers
   // claiming to support the actual baseData class or any of its super classes
   std::vector<std::string> classHierarchy = baseData->GetClassHierarchy();
-  for (std::vector<std::string>::const_iterator clIter = classHierarchy.begin(),
-       clIterEnd = classHierarchy.end(); clIter != clIterEnd; ++clIter)
+  for (std::vector<std::string>::const_iterator clIter = classHierarchy.begin(), clIterEnd = classHierarchy.end();
+       clIter != clIterEnd;
+       ++clIter)
   {
-    std::string filter = us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileWriter>() &&
-                         us::LDAPProp(IFileWriter::PROP_BASEDATA_TYPE()) == *clIter &&
-                         (mimeType.empty() ? us::LDAPPropExpr(std::string()) : us::LDAPProp(IFileWriter::PROP_MIMETYPE()) == mimeType);
+    std::string filter =
+      us::LDAPProp(us::ServiceConstants::OBJECTCLASS()) == us_service_interface_iid<IFileWriter>() &&
+      us::LDAPProp(IFileWriter::PROP_BASEDATA_TYPE()) == *clIter &&
+      (mimeType.empty() ? us::LDAPPropExpr(std::string()) : us::LDAPProp(IFileWriter::PROP_MIMETYPE()) == mimeType);
     std::vector<WriterReference> refs = context->GetServiceReferences<IFileWriter>(filter);
     result.insert(result.end(), refs.begin(), refs.end());
   }
   return result;
 }
 
-mitk::IFileWriter* mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterRegistry::WriterReference& ref, us::ModuleContext* context)
+mitk::IFileWriter *mitk::FileWriterRegistry::GetWriter(const mitk::FileWriterRegistry::WriterReference &ref,
+                                                       us::ModuleContext *context)
 {
-  if (!ref) return NULL;
+  if (!ref)
+    return NULL;
 
-  if (context == NULL) context = us::GetModuleContext();
+  if (context == NULL)
+    context = us::GetModuleContext();
 
   us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(ref);
-  mitk::IFileWriter* writer = serviceObjects.GetService();
+  mitk::IFileWriter *writer = serviceObjects.GetService();
   m_ServiceObjects.insert(std::make_pair(writer, serviceObjects));
   return writer;
 }
 
-std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk::BaseData* baseData, const std::string& mimeType, us::ModuleContext* context)
+std::vector<mitk::IFileWriter *> mitk::FileWriterRegistry::GetWriters(const mitk::BaseData *baseData,
+                                                                      const std::string &mimeType,
+                                                                      us::ModuleContext *context)
 {
-  if (baseData == NULL){
+  if (baseData == NULL)
+  {
     mitkThrow() << "FileWriterRegistry::GetReferences was called with null basedata.";
-    std::vector<mitk::IFileWriter*> emptyResult;
+    std::vector<mitk::IFileWriter *> emptyResult;
     return emptyResult;
   }
 
-  if (context == NULL) context = us::GetModuleContext();
+  if (context == NULL)
+    context = us::GetModuleContext();
 
-  std::vector <mitk::IFileWriter*> result;
+  std::vector<mitk::IFileWriter *> result;
 
-  std::vector <us::ServiceReference<IFileWriter> > refs;
+  std::vector<us::ServiceReference<IFileWriter>> refs;
   if (mimeType.empty())
   {
     refs = GetReferences(baseData, context);
@@ -110,11 +122,12 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk:
   result.reserve(refs.size());
 
   // Translate List of ServiceRefs to List of Pointers
-  for (std::vector<us::ServiceReference<IFileWriter> >::const_reverse_iterator iter = refs.rbegin(), end = refs.rend();
-       iter != end; ++iter)
+  for (std::vector<us::ServiceReference<IFileWriter>>::const_reverse_iterator iter = refs.rbegin(), end = refs.rend();
+       iter != end;
+       ++iter)
   {
     us::ServiceObjects<mitk::IFileWriter> serviceObjects = context->GetServiceObjects(*iter);
-    mitk::IFileWriter* writer = serviceObjects.GetService();
+    mitk::IFileWriter *writer = serviceObjects.GetService();
     m_ServiceObjects.insert(std::make_pair(writer, serviceObjects));
     result.push_back(writer);
   }
@@ -122,10 +135,10 @@ std::vector<mitk::IFileWriter*> mitk::FileWriterRegistry::GetWriters(const mitk:
   return result;
 }
 
-void mitk::FileWriterRegistry::UngetWriter(mitk::IFileWriter* writer)
+void mitk::FileWriterRegistry::UngetWriter(mitk::IFileWriter *writer)
 {
-  std::map<mitk::IFileWriter*, us::ServiceObjects<mitk::IFileWriter> >::iterator writerIter =
-      m_ServiceObjects.find(writer);
+  std::map<mitk::IFileWriter *, us::ServiceObjects<mitk::IFileWriter>>::iterator writerIter =
+    m_ServiceObjects.find(writer);
   if (writerIter != m_ServiceObjects.end())
   {
     writerIter->second.UngetService(writer);
@@ -133,9 +146,9 @@ void mitk::FileWriterRegistry::UngetWriter(mitk::IFileWriter* writer)
   }
 }
 
-void mitk::FileWriterRegistry::UngetWriters(const std::vector<mitk::IFileWriter*>& writers)
+void mitk::FileWriterRegistry::UngetWriters(const std::vector<mitk::IFileWriter *> &writers)
 {
-  for (const auto & writer : writers)
+  for (const auto &writer : writers)
   {
     this->UngetWriter(writer);
   }

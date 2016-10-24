@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
+#include "mitkTestingMacros.h"
 
-//VTK
+// VTK
 #include <vtkRegressionTestImage.h>
 
-int mitkImageVtkMapper2DOpacityTest(int argc, char* argv[])
+int mitkImageVtkMapper2DOpacityTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -30,16 +30,17 @@ int mitkImageVtkMapper2DOpacityTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkImageVtkMapper2DTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
-  //Set the opacity for all images
+  // Set the opacity for all images
   renderingHelper.SetImageProperty("opacity", mitk::FloatProperty::New(0.5f));
-  //for now this test renders in coronal view direction
+  // for now this test renders in coronal view direction
   renderingHelper.SetViewDirection(mitk::SliceNavigationController::Frontal);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
-  //use this to generate a reference screenshot or save the file:
-  if(false)
+  // use this to generate a reference screenshot or save the file:
+  if (false)
   {
     renderingHelper.SaveReferenceScreenShot("d:/tmp/renderingtest.png");
   }

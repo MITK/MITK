@@ -15,40 +15,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRenderWindowBase.h"
-#include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
+#include "mitkVtkLayerController.h"
 #include "vtkRenderer.h"
 
-mitk::RenderWindowBase::RenderWindowBase( )
-: m_RenderProp(NULL)
-, m_InResize(false)
+mitk::RenderWindowBase::RenderWindowBase() : m_RenderProp(NULL), m_InResize(false)
 {
 }
 
 /*
-* "Member functions, including virtual functions (10.3), can be called during construction or destruction (12.6.2). When a
-* virtual function is called directly or indirectly from a constructor (including from the mem-initializer for a data member) or from
-* a destructor, and the object to which the call applies is the object under construction or destruction, the function called is
-* the one defined in the constructor or destructor's own class or in one of its bases, but not a function overriding it in a class
-* derived from the constructor or destructor's class, or overriding it in one of the other base classes of the most derived object[..]"
+* "Member functions, including virtual functions (10.3), can be called during construction or destruction (12.6.2). When
+a
+* virtual function is called directly or indirectly from a constructor (including from the mem-initializer for a data
+member) or from
+* a destructor, and the object to which the call applies is the object under construction or destruction, the function
+called is
+* the one defined in the constructor or destructor's own class or in one of its bases, but not a function overriding it
+in a class
+* derived from the constructor or destructor's class, or overriding it in one of the other base classes of the most
+derived object[..]"
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager, const char* name,mitk::BaseRenderer::RenderingMode::Type renderingMode )
+void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager,
+                                        const char *name,
+                                        mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
-  if ( renderingManager == NULL )
+  if (renderingManager == NULL)
   {
     renderingManager = mitk::RenderingManager::GetInstance();
   }
 
-  if(m_Renderer.IsNull())
+  if (m_Renderer.IsNull())
   {
-      m_Renderer = mitk::VtkPropRenderer::New( name , GetVtkRenderWindow(), renderingManager,renderingMode );
+    m_Renderer = mitk::VtkPropRenderer::New(name, GetVtkRenderWindow(), renderingManager, renderingMode);
   }
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());
 
-  mitk::BaseRenderer::AddInstance(GetVtkRenderWindow(),m_Renderer);
+  mitk::BaseRenderer::AddInstance(GetVtkRenderWindow(), m_Renderer);
 
   renderingManager->AddRenderWindow(GetVtkRenderWindow());
 
@@ -56,14 +61,13 @@ void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManage
   m_RenderProp->SetPropRenderer(m_Renderer);
   m_Renderer->GetVtkRenderer()->AddViewProp(m_RenderProp);
 
-  if((this->GetVtkRenderWindow()->GetSize()[0] > 10)
-      && (this->GetVtkRenderWindow()->GetSize()[1] > 10))
+  if ((this->GetVtkRenderWindow()->GetSize()[0] > 10) && (this->GetVtkRenderWindow()->GetSize()[1] > 10))
     m_Renderer->InitSize(this->GetVtkRenderWindow()->GetSize()[0], this->GetVtkRenderWindow()->GetSize()[1]);
 
   m_InResize = false;
 }
 
-bool mitk::RenderWindowBase::HandleEvent(InteractionEvent* interactionEvent)
+bool mitk::RenderWindowBase::HandleEvent(InteractionEvent *interactionEvent)
 {
   return m_Renderer->GetDispatcher()->ProcessEvent(interactionEvent);
 }
@@ -80,20 +84,20 @@ mitk::RenderWindowBase::~RenderWindowBase()
 {
 }
 
-mitk::SliceNavigationController * mitk::RenderWindowBase::GetSliceNavigationController()
+mitk::SliceNavigationController *mitk::RenderWindowBase::GetSliceNavigationController()
 {
   return mitk::BaseRenderer::GetInstance(this->GetVtkRenderWindow())->GetSliceNavigationController();
 }
 
-mitk::CameraRotationController * mitk::RenderWindowBase::GetCameraRotationController()
+mitk::CameraRotationController *mitk::RenderWindowBase::GetCameraRotationController()
 {
   return mitk::BaseRenderer::GetInstance(this->GetVtkRenderWindow())->GetCameraRotationController();
 }
 
-mitk::BaseController * mitk::RenderWindowBase::GetController()
+mitk::BaseController *mitk::RenderWindowBase::GetController()
 {
-  mitk::BaseRenderer * renderer = mitk::BaseRenderer::GetInstance(GetVtkRenderWindow());
-  switch ( renderer->GetMapperID() )
+  mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(GetVtkRenderWindow());
+  switch (renderer->GetMapperID())
   {
     case mitk::BaseRenderer::Standard2D:
       return GetSliceNavigationController();
@@ -106,7 +110,7 @@ mitk::BaseController * mitk::RenderWindowBase::GetController()
   }
 }
 
-mitk::VtkPropRenderer* mitk::RenderWindowBase::GetRenderer()
+mitk::VtkPropRenderer *mitk::RenderWindowBase::GetRenderer()
 {
   return m_Renderer;
 }

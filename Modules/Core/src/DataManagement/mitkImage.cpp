@@ -822,6 +822,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   PlaneGeometry::Pointer planegeometry = PlaneGeometry::New();
   planegeometry->InitializeStandardPlane(m_Dimensions[0], m_Dimensions[1]);
+  planegeometry->ImageGeometryOn();
 
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
   slicedGeometry->InitializeEvenlySpaced(planegeometry, m_Dimensions[2]);

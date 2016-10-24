@@ -280,6 +280,7 @@ int mitkImageTest(int argc, char* argv[])
 
   //InitializeStandardPlane(rightVector, downVector, spacing)
   mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
+  planegeometry->SetImageGeometry(true);
   planegeometry->InitializeStandardPlane(100, 100, right, bottom, &spacing);
   planegeometry->SetOrigin(origin);
 

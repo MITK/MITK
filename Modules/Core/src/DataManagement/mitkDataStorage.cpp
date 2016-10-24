@@ -372,11 +372,14 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( const 
     // correct bounding-box (is now in mm, should be in index-coordinates)
     // according to spacing
     BoundingBox::BoundsArrayType bounds = result->GetBounds();
-    int i;
-    for(i = 0; i < 6; ++i)
+    AffineTransform3D::OutputVectorType offset;
+    for (int i = 0; i < 3; ++i)
     {
-      bounds[i] /= minSpacing[i/2];
+      offset[i] = bounds[i * 2];
+      bounds[i * 2] = 0.0;
+      bounds[i * 2 + 1] = (bounds[i * 2 + 1] - offset[i]) / minSpacing[i];
     }
+    geometry->GetIndexToWorldTransform()->SetOffset(offset);
     geometry->SetBounds(bounds);
     geometry->SetSpacing(minSpacing);
     // Initialize the time sliced geometry

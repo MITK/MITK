@@ -7,3 +7,6 @@ set(MODULE_CUSTOM_TESTS
     mitkTextOverlay3DRendering3DTest.cpp
     mitkTextOverlay3DColorRenderingTest.cpp
 )
+set(MODULE_TESTS
+    mitkOverlaysTest.cpp
+)

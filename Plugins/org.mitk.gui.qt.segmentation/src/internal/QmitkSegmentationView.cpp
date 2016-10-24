@@ -22,13 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
+#include <QmitkSegmentationOrganNamesHandling.cpp>
 
 #include <QMessageBox>
 
 #include <berryIWorkbenchPage.h>
 
 #include "QmitkSegmentationView.h"
-#include "QmitkSegmentationOrganNamesHandling.cpp"
 
 #include <mitkSurfaceToImageFilter.h>
 
@@ -246,7 +246,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             QStringList organColors;
             if (storedList.isEmpty())
             {
-               organColors = GetDefaultOrganColorString();
+              organColors = mitk::OrganNamesHandling::GetDefaultOrganColorString();
             }
             else
             {
@@ -318,7 +318,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
                   if (!emptySegmentation) return; // could be aborted by user
 
-                  UpdateOrganList( organColors, dialog->GetSegmentationName(), dialog->GetColor() );
+                  mitk::OrganNamesHandling::UpdateOrganList(organColors, dialog->GetSegmentationName(), dialog->GetColor());
 
                   /*
                   escape ';' here (replace by '\;'), see longer comment above

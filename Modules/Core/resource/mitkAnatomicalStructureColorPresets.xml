@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+* Source
+  Based on: https://www.slicer.org/slicerWiki/index.php/Documentation/4.5/SlicerApplication/LookupTables/GenericAnatomyColors
+  Authors: Michael Halle, Florin Talos, Ron Kikinis, Steve Pieper, Nicole Aucoin, Marianna Jakab
+*Coding scheme:
+  http://dicom.nema.org/medical/dicom/current/output/html/part16.html
+*Modifier
+    http://dicom.nema.org/dicom/2013/output/chtml/part16/chapter_B.html#sect_CID_2
+-->
+<mitkAnatomicalStructureColorPresets file_version="0.1" >
+   <preset name="Adrenal Gland">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-B3000" coding_scheme="SRT" code_name="Adrenal Gland"/>
+    <color rgb_r="249" rgb_g="186" rgb_b="150"/>
+  </preset>
+  <preset name="Adrenal Gland (Right)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-B3000" coding_scheme="SRT" code_name="Adrenal Gland">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="249" rgb_g="186" rgb_b="150"/>
+  </preset>
+  <preset name="Adrenal Gland (Left)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-B3000" coding_scheme="SRT" code_name="Adrenal Gland">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="249" rgb_g="186" rgb_b="150"/>
+  </preset>
+  <preset name="Aorta">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-42000" coding_scheme="SRT" code_name="Aorta"/>
+    <color rgb_r="224" rgb_g="97" rgb_b="76"/>
+  </preset>
+    <preset name="Appendix">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-59200" coding_scheme="SRT" code_name="Appendix"/>
+    <color rgb_r="161" rgb_g="107" rgb_b="54"/> <!-- Old color scheme-->
+  </preset>
+  <preset name="Blood vessel">
+    <category code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="T-40000" coding_scheme="SRT" code_name="Blood Vessel"/>
+    <color rgb_r="255" rgb_g="49" rgb_b="49"/> <!-- Old color scheme-->
+  </preset>
+  <preset name="Bone">
+    <category code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="T-D016E" coding_scheme="SRT" code_name="Bone"/>
+    <color rgb_r="241" rgb_g="214" rgb_b="145"/>
+  </preset>
+  <preset name="Brain">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-A0100" coding_scheme="SRT" code_name="Brain"/>
+    <color rgb_r="250" rgb_g="250" rgb_b="225"/>
+  </preset>
+  <preset name="Bronchi">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-A0100" coding_scheme="SRT" code_name="Bronchi"/>
+    <color rgb_r="175" rgb_g="216" rgb_b="244"/>
+  </preset>
+  <preset name="Colon">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-59302" coding_scheme="SRT" code_name="Colon"/>
+    <color rgb_r="204" rgb_g="168" rgb_b="143"/>
+  </preset>
+    <preset name="Coccyx">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-11BF0" coding_scheme="SRT" code_name="Coccyx"/>
+    <color rgb_r="255" rgb_g="255" rgb_b="153"/>
+  </preset>
+  <preset name="Cyst">
+    <category code_value="M-01000" coding_scheme="SRT" code_name="Morphologically Altered Structure"/>
+    <type code_value="M-3340A" coding_scheme="SRT" code_name="Cyst"/>
+    <color rgb_r="205" rgb_g="205" rgb_b="100"/>
+  </preset>
+  <preset name="Elbow">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D06CA" coding_scheme="SRT" code_name="Elbow"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Elbow (Right)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D06CA" coding_scheme="SRT" code_name="Elbow">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Elbow (Left)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D06CA" coding_scheme="SRT" code_name="Elbow">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+    <preset name="Esophagus">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-56000" coding_scheme="SRT" code_name="Esophagus"/>
+    <color rgb_r="211" rgb_g="171" rgb_b="143"/>
+  </preset>
+  <preset name="Eyeball">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-AA636" coding_scheme="SRT" code_name="Fundus of Eye"/>
+    <color rgb_r="194" rgb_g="142" rgb_b="0"/>
+  </preset>
+  <preset name="Eyeball (Right)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-AA636" coding_scheme="SRT" code_name="Fundus of Eye">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="194" rgb_g="142" rgb_b="0"/>
+  </preset>
+  <preset name="Eyeball (Left)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-AA636" coding_scheme="SRT" code_name="Fundus of Eye">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="194" rgb_g="142" rgb_b="0"/>
+  </preset>
+  <preset name="Fallopian Tube">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D6101" coding_scheme="SRT" code_name="Fallopian Tube"/>
+    <color rgb_r="255" rgb_g="190" rgb_b="165"/>
+  </preset>
+  <preset name="Fallopian Tube (Right)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D6101" coding_scheme="SRT" code_name="Fallopian Tube">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="255" rgb_g="190" rgb_b="165"/>
+  </preset>
+  <preset name="Fallopian Tube (Left)">
+    <category code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D6101" coding_scheme="SRT" code_name="Fallopian Tube">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="255" rgb_g="190" rgb_b="165"/>
+  </preset>
+  <preset name="Fat">
+    <category  code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="F-03D38" coding_scheme="SRT" code_name="Body Fat"/>
+    <color rgb_r="230" rgb_g="220" rgb_b="70"/>
+  </preset>
+  <preset name="Gallbladder">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-63002" coding_scheme="SRT" code_name="Gallbladder"/>
+    <color rgb_r="139" rgb_g="150" rgb_b="98"/>
+  </preset>
+  <preset name="Hand">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D8701" coding_scheme="SRT" code_name="Hand"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Hand (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D8701" coding_scheme="SRT" code_name="Hand">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Hand (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D8701" coding_scheme="SRT" code_name="Hand">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Heart">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-32000" coding_scheme="SRT" code_name="Heart"/>
+    <color rgb_r="206" rgb_g="110" rgb_b="84"/>
+  </preset>
+  <preset name="Hip">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D2503" coding_scheme="SRT" code_name="Hip Region"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Hip (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D2503" coding_scheme="SRT" code_name="Hip Region">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Hip (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D2503" coding_scheme="SRT" code_name="Hip Region">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Kidney">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-71000" coding_scheme="SRT" code_name="Kidney"/>
+    <color rgb_r="185" rgb_g="102" rgb_b="83"/>
+  </preset>
+  <preset name="Kidney (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-71000" coding_scheme="SRT" code_name="Kidney">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="185" rgb_g="102" rgb_b="83"/>
+  </preset>
+  <preset name="Kidney (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-71000" coding_scheme="SRT" code_name="Kidney">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="185" rgb_g="102" rgb_b="83"/>
+  </preset>
+  <preset name="Knee">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D03BA" coding_scheme="SRT" code_name="Knee Region"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Knee (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D03BA" coding_scheme="SRT" code_name="Knee Region">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Knee (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D03BA" coding_scheme="SRT" code_name="Knee Region">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Larynx">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-2410C" coding_scheme="SRT" code_name="Larynx"/>
+    <color rgb_r="150" rgb_g="208" rgb_b="243"/>
+  </preset>
+  <preset name="Liver">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-62000" coding_scheme="SRT" code_name="Liver"/>
+    <color rgb_r="221" rgb_g="130" rgb_b="101"/>
+  </preset>
+  <preset name="Lung">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-28000" coding_scheme="SRT" code_name="Lung"/>
+    <color rgb_r="197" rgb_g="165" rgb_b="145"/>
+  </preset>
+  <preset name="Lung (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-28000" coding_scheme="SRT" code_name="Lung">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="197" rgb_g="165" rgb_b="145"/>
+  </preset>
+  <preset name="Lung (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-28000" coding_scheme="SRT" code_name="Lung">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="197" rgb_g="165" rgb_b="145"/>
+  </preset>
+  <preset name="Lymph Node">
+    <category  code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="T-C4000" coding_scheme="SRT" code_name="Lymph Node"/>
+    <color rgb_r="68" rgb_g="172" rgb_b="100"/>
+  </preset>
+  <preset name="Muscle">
+    <category  code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="T-13001" coding_scheme="SRT" code_name="Muscle"/>
+    <color rgb_r="192" rgb_g="104" rgb_b="88"/>
+  </preset>
+  <preset name="Nerve">
+    <category  code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="T-D0598" coding_scheme="SRT" code_name="Nerve"/>
+    <color rgb_r="244" rgb_g="214" rgb_b="49"/>
+  </preset>
+  <preset name="Nose">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-21003" coding_scheme="SRT" code_name="Nose"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Ovary">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-87000" coding_scheme="SRT" code_name="Ovary"/>
+    <color rgb_r="213" rgb_g="141" rgb_b="113"/>
+  </preset>
+  <preset name="Ovary (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-87000" coding_scheme="SRT" code_name="Ovary">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="213" rgb_g="141" rgb_b="113"/>
+  </preset>
+  <preset name="Ovary (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-87000" coding_scheme="SRT" code_name="Ovary">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="213" rgb_g="141" rgb_b="113"/>
+  </preset>
+  <preset name="Pancreas">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D4034" coding_scheme="SRT" code_name="Pancreas"/>
+    <color rgb_r="249" rgb_g="180" rgb_b="111"/>
+  </preset>
+  <preset name="Pelvis">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-12375" coding_scheme="SRT" code_name="Pelvis"/>
+    <color rgb_r="255" rgb_g="255" rgb_b="153"/><!-- Old color scheme-->
+  </preset>
+  <preset name="Penis">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-91000" coding_scheme="SRT" code_name="Penis"/>
+    <color rgb_r="255" rgb_g="222" rgb_b="199"/><!-- Old color scheme-->
+  </preset>
+  <preset name="Pharynx">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-55002" coding_scheme="SRT" code_name="Pharynx "/>
+    <color rgb_r="184" rgb_g="105" rgb_b="108"/>
+  </preset>
+  <preset name="Prostate">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-92000" coding_scheme="SRT" code_name="Prostate"/>
+    <color rgb_r="230" rgb_g="158" rgb_b="140"/>
+  </preset>
+  <preset name="Rectum">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-59600" coding_scheme="SRT" code_name="Rectum"/>
+    <color rgb_r="161" rgb_g="107" rgb_b="54"/><!-- Old color scheme-->
+  </preset>
+  <preset name="Sacrum">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-11AD0" coding_scheme="SRT" code_name="Sacrum"/>
+    <color rgb_r="255" rgb_g="255" rgb_b="153"/><!-- Old color scheme-->
+  </preset>
+  <preset name="Seminal Vesicle">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-93000" coding_scheme="SRT" code_name="Seminal Vesicle"/>
+    <color rgb_r="245" rgb_g="172" rgb_b="147"/>
+  </preset>
+  <preset name="Seminal Vesicle (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-93000" coding_scheme="SRT" code_name="Seminal Vesicle">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="245" rgb_g="172" rgb_b="147"/>
+  </preset>
+  <preset name="Seminal Vesicle (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-93000" coding_scheme="SRT" code_name="Seminal Vesicle">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="245" rgb_g="172" rgb_b="147"/>
+  </preset>
+  <preset name="Shoulder">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D2220" coding_scheme="SRT" code_name="Shoulder"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Shoulder (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D2220" coding_scheme="SRT" code_name="Shoulder">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Shoulder (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D2220" coding_scheme="SRT" code_name="Shoulder">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Spinal Cord">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-A7013" coding_scheme="SRT" code_name="Spinal Cord"/>
+    <color rgb_r="244" rgb_g="214" rgb_b="49"/>
+  </preset>
+  <preset name="Spleen">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-C3000" coding_scheme="SRT" code_name="Spleen"/>
+    <color rgb_r="157" rgb_g="108" rgb_b="162"/>
+  </preset>
+  <preset name="Stomach">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-57001" coding_scheme="SRT" code_name="Stomach"/>
+    <color rgb_r="216" rgb_g="132" rgb_b="105"/>
+  </preset>
+  <preset name="Teeth">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-5401E" coding_scheme="SRT" code_name="Tooth"/>
+    <color rgb_r="255" rgb_g="250" rgb_b="220"/>
+  </preset>
+  <preset name="Testicle">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-94000" coding_scheme="SRT" code_name="Testis"/>
+    <color rgb_r="199" rgb_g="232" rgb_b="255"/><!-- Old color scheme-->
+  </preset>
+    <preset name="Testis (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-94000" coding_scheme="SRT" code_name="Testis">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="199" rgb_g="232" rgb_b="255"/><!-- Old color scheme-->
+  </preset>
+  <preset name="Testis (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-94000" coding_scheme="SRT" code_name="Testis">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="199" rgb_g="232" rgb_b="255"/><!-- Old color scheme-->
+  </preset>
+  <preset name="Thyroid Gland">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-B0004" coding_scheme="SRT" code_name="Thyroid Gland"/>
+    <color rgb_r="62" rgb_g="162" rgb_b="114"/>
+  </preset>
+    <preset name="Tissue">
+    <category  code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <type code_value="T-D0050" coding_scheme="SRT" code_name="Tissue"/>
+    <color rgb_r="128" rgb_g="174" rgb_b="128"/>
+  </preset>
+  <preset name="Tongue">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-5300D" coding_scheme="SRT" code_name="Tongue"/>
+    <color rgb_r="166" rgb_g="84" rgb_b="94"/>
+  </preset>
+  <preset name="Urethra">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-75001" coding_scheme="SRT" code_name="Urethra "/>
+    <color rgb_r="124" rgb_g="186" rgb_b="223"/>
+  </preset>
+  <preset name="Urinary Bladder">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-74000" coding_scheme="SRT" code_name="Bladder"/>
+    <color rgb_r="222" rgb_g="154" rgb_b="132"/>
+  </preset>
+  <preset name="Uterus">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-83000" coding_scheme="SRT" code_name="Uterus"/>
+    <color rgb_r="255" rgb_g="181" rgb_b="158"/>
+  </preset>
+  <preset name="Vagina">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-82003" coding_scheme="SRT" code_name="Vagina"/>
+    <color rgb_r="193" rgb_g="123" rgb_b="103"/>
+  </preset>
+  <preset name="Vertebra">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-11510" coding_scheme="SRT" code_name="Vertebra"/>
+    <color rgb_r="255" rgb_g="255" rgb_b="153"/> <!-- Old color scheme-->
+  </preset>
+  <preset name="Wrist">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D0787" coding_scheme="SRT" code_name="Wrist Region"/>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Wrist (Right)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D0787" coding_scheme="SRT" code_name="Wrist Region">
+      <modifier code_value="G-A100" coding_scheme="SRT" code_name="Right"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+  <preset name="Wrist (Left)">
+    <category  code_value="T-D000A" coding_scheme="SRT" code_name="Anatomical Structure"/>
+    <type code_value="T-D0787" coding_scheme="SRT" code_name="Wrist Region">
+      <modifier code_value="G-A101" coding_scheme="SRT" code_name="Left"/>
+    </type>
+    <color rgb_r="177" rgb_g="122" rgb_b="101"/>
+  </preset>
+</mitkAnatomicalStructureColorPresets>

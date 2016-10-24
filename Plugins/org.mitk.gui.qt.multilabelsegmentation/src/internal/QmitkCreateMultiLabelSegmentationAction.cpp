@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkMultiLabelSegmentationView.h"
-#include "QmitkMultiLabelSegmentationOrganNamesHandling.cpp"
+#include "QmitkSegmentationOrganNamesHandling.cpp"
 //needed for qApp
 #include <qcoreapplication.h>
 

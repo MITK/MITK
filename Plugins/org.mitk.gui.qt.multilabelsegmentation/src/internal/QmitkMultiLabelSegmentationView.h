@@ -138,12 +138,6 @@ protected:
 
   void SetLastFileOpenPath(const QString& path);
 
-  // handling of a list of known (organ name, organ color) combination
-  // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
-//  QStringList GetDefaultOrganColorString();
-//  void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
-//  void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
-
   /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget* m_Parent;
 

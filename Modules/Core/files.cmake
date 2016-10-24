@@ -49,6 +49,7 @@ set(CPP_FILES
   Controllers/mitkUndoController.cpp
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
+  DataManagement/mitkAnatomicalStructureColorPresets.cpp
   DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
   DataManagement/mitkAnnotationProperty.cpp
@@ -309,4 +310,5 @@ Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
 
 mitkLevelWindowPresets.xml
+mitkAnatomicalStructureColorPresets.xml
 )

@@ -131,12 +131,6 @@ protected:
 
   bool m_MouseCursorSet;
 
-  // handling of a list of known (organ name, organ color) combination
-  // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
-  QStringList GetDefaultOrganColorString();
-  void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
-  void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
-
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected (const mitk::DataNode* node);
 

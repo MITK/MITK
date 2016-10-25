@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "usGetModuleContext.h"
 
 const std::string mitk::Overlay::US_INTERFACE_NAME = "org.mitk.services.Overlay";
-const std::string mitk::Overlay::US_PROPKEY_DEVICENAME = US_INTERFACE_NAME + ".devicename";
+const std::string mitk::Overlay::US_PROPKEY_OVERLAYNAME = US_INTERFACE_NAME + ".name";
 const std::string mitk::Overlay::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
-const std::string mitk::Overlay::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
+const std::string mitk::Overlay::US_PROPKEY_RENDERER_ID = US_INTERFACE_NAME + ".rendererId";
+const std::string mitk::Overlay::US_PROPKEY_AR_ID = US_INTERFACE_NAME + ".arId";
 
 mitk::Overlay::Overlay() : m_LayoutedBy(nullptr)
 {
@@ -39,20 +40,18 @@ void mitk::Overlay::SetUSProperty(const std::string & /*propertyKey*/, us::Any /
 {
   if (this->m_ServiceRegistration)
   {
-    //    m_ServiceRegistration.GetReference(). //TODO19786
+    //        m_ServiceRegistration.SetProperties( //TODO19786
   }
 }
 
 void mitk::Overlay::SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
 {
   this->m_PropertyList->SetProperty(propertyKey, propertyValue);
-  this->m_PropertyList->Modified();
 }
 
 void mitk::Overlay::ReplaceProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
 {
   this->m_PropertyList->ReplaceProperty(propertyKey, propertyValue);
-  this->m_PropertyList->Modified();
 }
 
 void mitk::Overlay::AddProperty(const std::string &propertyKey,

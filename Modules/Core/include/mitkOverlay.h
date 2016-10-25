@@ -387,9 +387,10 @@ namespace mitk
     *\brief These Constants are used in conjunction with Microservices
     */
     static const std::string US_INTERFACE_NAME;
-    static const std::string US_PROPKEY_DEVICENAME;
+    static const std::string US_PROPKEY_OVERLAYNAME;
     static const std::string US_PROPKEY_ID;
-    static const std::string US_PROPKEY_ISACTIVE; // NOT IMPLEMENTED YET!
+    static const std::string US_PROPKEY_RENDERER_ID;
+    static const std::string US_PROPKEY_AR_ID;
 
     /**
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
@@ -424,7 +425,7 @@ namespace mitk
     */
     itk::TimeStamp m_DataReferenceChangedTime;
 
-  void SetUSProperty(const std::string& propertyKey, us::Any value);
+    void SetUSProperty(const std::string &propertyKey, us::Any value);
 
   private:
     /** \brief render this overlay on a foreground renderer */

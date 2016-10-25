@@ -23,10 +23,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  const std::string mitk::AnnotationPlacer::ANNOTATIONRENDERER_ID = "AnnotationPlacer";
+  const std::string AnnotationPlacer::ANNOTATIONRENDERER_ID = "AnnotationPlacer";
 
+  AnnotationPlacer::AnnotationPlacer(const std::string &rendererId)
+    : AbstractAnnotationRenderer(rendererId, AnnotationPlacer::ANNOTATIONRENDERER_ID)
+  {
+  }
   AnnotationPlacer::~AnnotationPlacer() {}
-  const std::string AnnotationPlacer::GetID() const { return ANNOTATIONRENDERER_ID; }
   AnnotationPlacer *AnnotationPlacer::GetAnnotationRenderer(const std::string &rendererID)
   {
     AnnotationPlacer *result = nullptr;

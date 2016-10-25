@@ -19,29 +19,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Micro Services
 #include <usGetModuleContext.h>
 
-namespace mitk {
-
-OverlayServiceTracker::OverlayServiceTracker(const us::LDAPFilter& filter)
-  : Superclass(us::GetModuleContext(),filter)
+namespace mitk
 {
-}
-
-OverlayServiceTracker::TrackedType OverlayServiceTracker::AddingService(const OverlayServiceTracker::ServiceReferenceType &reference)
-{
-  Overlay* overlay = Superclass::AddingService(reference);
-  if (overlay)
+  OverlayServiceTracker::OverlayServiceTracker(const us::LDAPFilter &filter)
+    : Superclass(us::GetModuleContext(), filter)
   {
-    m_OverlayServices.push_back(overlay);
   }
-  return overlay;
-}
 
-void OverlayServiceTracker::RemovedService(const OverlayServiceTracker::ServiceReferenceType &, OverlayServiceTracker::TrackedType tracked)
-{
-//  tracked->RemoveFromBaseRenderer() TODO19786
-  m_OverlayServices.erase(std::remove(m_OverlayServices.begin(),
-                                      m_OverlayServices.end(), tracked),
-                          m_OverlayServices.end());
-}
+  OverlayServiceTracker::TrackedType OverlayServiceTracker::AddingService(
+    const OverlayServiceTracker::ServiceReferenceType &reference)
+  {
+    Overlay *overlay = Superclass::AddingService(reference);
+    if (overlay)
+    {
+      m_OverlayServices.push_back(overlay);
+    }
+    return overlay;
+  }
+
+  void OverlayServiceTracker::ModifiedService(const OverlayServiceTracker::ServiceReferenceType &,
+                                              OverlayServiceTracker::TrackedType /*tracked*/)
+  {
+  }
+
+  void OverlayServiceTracker::RemovedService(const OverlayServiceTracker::ServiceReferenceType &,
+                                             OverlayServiceTracker::TrackedType tracked)
+  {
+    //  tracked->RemoveFromBaseRenderer() TODO19786
+    m_OverlayServices.erase(std::remove(m_OverlayServices.begin(), m_OverlayServices.end(), tracked),
+                            m_OverlayServices.end());
+  }
 
 } // end of namespace mitk

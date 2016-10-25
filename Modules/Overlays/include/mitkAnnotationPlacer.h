@@ -36,12 +36,10 @@ namespace mitk
     /** \brief virtual destructor in order to derive from this class */
     virtual ~AnnotationPlacer();
 
-    const std::string GetID() const;
-
     static AnnotationPlacer *GetAnnotationRenderer(const std::string &rendererID);
 
   private:
-    using AbstractAnnotationRenderer::AbstractAnnotationRenderer;
+    AnnotationPlacer(const std::string &rendererId);
 
     static const std::string ANNOTATIONRENDERER_ID;
   };

@@ -17,29 +17,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOVERLAYSERVICETRACKER_H
 #define MITKOVERLAYSERVICETRACKER_H
 
-#include "usServiceTracker.h"
 #include "mitkOverlay.h"
+#include "usServiceTracker.h"
 
-namespace mitk {
-
-class OverlayServiceTracker : public us::ServiceTracker<Overlay>
+namespace mitk
 {
+  class OverlayServiceTracker : public us::ServiceTracker<Overlay>
+  {
+  public:
+    OverlayServiceTracker(const us::LDAPFilter &filter);
 
-public:
+  private:
+    typedef us::ServiceTracker<mitk::Overlay> Superclass;
 
-  OverlayServiceTracker(const us::LDAPFilter &filter);
+    TrackedType AddingService(const ServiceReferenceType &reference) override;
 
-private:
+    void ModifiedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override;
 
-  typedef us::ServiceTracker<mitk::Overlay> Superclass;
+    void RemovedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override;
 
-  TrackedType AddingService(const ServiceReferenceType &reference) override;
-
-  void RemovedService(const ServiceReferenceType& /*reference*/, TrackedType tracked) override;
-
-  std::vector<Overlay*> m_OverlayServices;
-
-};
+    std::vector<Overlay *> m_OverlayServices;
+  };
 
 } // end of namespace mitk
 

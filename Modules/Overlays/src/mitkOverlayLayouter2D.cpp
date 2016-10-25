@@ -23,7 +23,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  const std::string mitk::OverlayLayouter2D::ANNOTATIONRENDERER_ID = "OverlayLayouter2D";
+  const std::string OverlayLayouter2D::ANNOTATIONRENDERER_ID = "OverlayLayouter2D";
+
+  OverlayLayouter2D::OverlayLayouter2D(const std::string &rendererId)
+    : AbstractAnnotationRenderer(rendererId, OverlayLayouter2D::ANNOTATIONRENDERER_ID)
+  {
+  }
 
   OverlayLayouter2D::~OverlayLayouter2D() {}
   const std::string OverlayLayouter2D::GetID() const { return ANNOTATIONRENDERER_ID; }

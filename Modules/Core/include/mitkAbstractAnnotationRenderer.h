@@ -17,57 +17,63 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ABSTRACTANNOTATIONRENDERER_H
 #define ABSTRACTANNOTATIONRENDERER_H
 
-#include <MitkCoreExports.h>
-#include <mitkCommon.h>
+#include "mitkOverlay.h"
 #include "mitkServiceInterface.h"
 #include "usGetModuleContext.h"
-#include "mitkOverlayServiceTracker.h"
+#include "usServiceTracker.h"
+#include <MitkCoreExports.h>
+#include <mitkCommon.h>
 
-namespace mitk {
+namespace mitk
+{
+  class BaseRenderer;
 
-class BaseRenderer;
+  /** @brief Baseclass of Overlay layouters */
+  /**
+   *A AbstractAnnotationRenderer can be implemented to control a set of Overlays by means of position and size.
+   *AbstractAnnotationRenderer::PrepareLayout() should be implemented with a routine to set the position of the internal
+   *m_ManagedOverlays List.
+   *A layouter is always connected to one BaseRenderer, so there is one instance of the layouter for each BaseRenderer.
+   *One type of layouter should always have a unique identifier.
+   *@ingroup Overlays
+  */
+  class MITKCORE_EXPORT AbstractAnnotationRenderer : public us::ServiceTracker<Overlay>
+  {
+  public:
+    typedef us::ServiceTracker<mitk::Overlay> Superclass;
+    AbstractAnnotationRenderer(const std::string &rendererID, const std::string &arID);
 
-/** @brief Baseclass of Overlay layouters */
-/**
- *A AbstractAnnotationRenderer can be implemented to control a set of Overlays by means of position and size.
- *AbstractAnnotationRenderer::PrepareLayout() should be implemented with a routine to set the position of the internal m_ManagedOverlays List.
- *A layouter is always connected to one BaseRenderer, so there is one instance of the layouter for each BaseRenderer.
- *One type of layouter should always have a unique identifier.
- *@ingroup Overlays
-*/
-class MITKCORE_EXPORT AbstractAnnotationRenderer {
+    /** \brief virtual destructor in order to derive from this class */
+    virtual ~AbstractAnnotationRenderer();
 
-public:
+    const std::string GetID() const;
+    const std::string GetRendererID() const;
 
-  explicit AbstractAnnotationRenderer(const std::string& rendererID);
+    static const std::string US_INTERFACE_NAME;
+    static const std::string US_PROPKEY_ID;
+    static const std::string US_PROPKEY_RENDERER_ID;
 
-  /** \brief virtual destructor in order to derive from this class */
-  virtual ~AbstractAnnotationRenderer();
+  private:
+    /** \brief copy constructor */
+    AbstractAnnotationRenderer(const AbstractAnnotationRenderer &);
 
-  virtual const std::string GetID() const = 0;
-  const std::string GetRendererID() const;
+    /** \brief assignment operator */
+    AbstractAnnotationRenderer &operator=(const AbstractAnnotationRenderer &);
 
-  static const std::string US_INTERFACE_NAME;
-  static const std::string US_PROPKEY_ID;
-  static const std::string US_PROPKEY_RENDERER_ID;
+    TrackedType AddingService(const ServiceReferenceType &reference) override;
 
-private:
+    void ModifiedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override;
 
-  /** \brief copy constructor */
-  AbstractAnnotationRenderer( const AbstractAnnotationRenderer &);
+    void RemovedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override;
 
-  /** \brief assignment operator */
-  AbstractAnnotationRenderer &operator=(const AbstractAnnotationRenderer &);
+    std::vector<Overlay *> m_OverlayServices;
 
-  OverlayServiceTracker* m_OverlayServiceTracker;
-
-  const std::string m_RendererID;
-};
+    const std::string m_RendererID;
+    const std::string m_ID;
+  };
 
 } // namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractAnnotationRenderer, "org.mitk.services.AbstractAnnotationRenderer")
 
 #endif // ABSTRACTANNOTATIONRENDERER_H
-
-

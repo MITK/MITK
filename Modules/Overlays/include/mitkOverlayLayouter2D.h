@@ -39,10 +39,10 @@ namespace mitk
 
     static OverlayLayouter2D *GetAnnotationRenderer(const std::string &rendererID);
 
-    static const std::string ANNOTATIONRENDERER_ID;
-
   private:
-    using AbstractAnnotationRenderer::AbstractAnnotationRenderer;
+    OverlayLayouter2D(const std::string &rendererId);
+
+    static const std::string ANNOTATIONRENDERER_ID;
   };
 
 } // namespace mitk

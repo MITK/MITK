@@ -28,8 +28,10 @@ if(MITK_USE_DCMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20160216.tar.gz
-      URL_MD5 273c8a544b9fe09b8a4fb4eb51df8e52
+      #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.1_20160216.tar.gz
+      #URL_MD5 273c8a544b9fe09b8a4fb4eb51df8e52
+      URL https://dl.dropbox.com/s/diu969d3s0lfrxc/DCMTK.tar.gz
+      URL_MD5 b3792016d74d69374392cf0b5720f71b
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMTK.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS

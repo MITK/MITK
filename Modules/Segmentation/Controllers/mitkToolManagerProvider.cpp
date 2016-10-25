@@ -16,34 +16,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManagerProvider.h"
 
-//micro service includes
-#include <usServiceReference.h>
+// micro service includes
 #include <usGetModuleContext.h>
+#include <usServiceReference.h>
 
-
-
-mitk::ToolManagerProvider::ToolManagerProvider():
-  m_ToolManager(mitk::ToolManager::New(NULL))
+mitk::ToolManagerProvider::ToolManagerProvider() : m_ToolManager(mitk::ToolManager::New(NULL))
 {
 }
-
 
 mitk::ToolManagerProvider::~ToolManagerProvider()
 {
   this->m_ToolManager = NULL;
 }
 
-
-mitk::ToolManager* mitk::ToolManagerProvider::GetToolManager()
+mitk::ToolManager *mitk::ToolManagerProvider::GetToolManager()
 {
   return this->m_ToolManager.GetPointer();
 }
 
-
-mitk::ToolManagerProvider* mitk::ToolManagerProvider::GetInstance()
+mitk::ToolManagerProvider *mitk::ToolManagerProvider::GetInstance()
 {
   static us::ServiceReference<mitk::ToolManagerProvider> serviceRef;
-  static us::ModuleContext* context = us::GetModuleContext();
+  static us::ModuleContext *context = us::GetModuleContext();
   if (!serviceRef)
   {
     // This is either the first time GetInstance() was called,

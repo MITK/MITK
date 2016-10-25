@@ -20,16 +20,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTubeElement.h"
 
-namespace mitk {
+namespace mitk
+{
   /**
   * \brief Class for elements which describes tubular structur with a circular cross section.
   */
-  class MITKTUBEGRAPH_EXPORT CircularProfileTubeElement: virtual public TubeElement {
-
+  class MITKTUBEGRAPH_EXPORT CircularProfileTubeElement : virtual public TubeElement
+  {
   public:
-
     CircularProfileTubeElement();
-    CircularProfileTubeElement(float x, float y, float z, float d = 0.0f );
+    CircularProfileTubeElement(float x, float y, float z, float d = 0.0f);
     CircularProfileTubeElement(const Point3D, float d = 0.0f);
     ~CircularProfileTubeElement();
 
@@ -41,7 +41,7 @@ namespace mitk {
     /**
     * Returns the 3D position of the element.
     */
-    const Point3D& GetCoordinates() const override;
+    const Point3D &GetCoordinates() const override;
 
     /**
     * Set the diameter of the circle.
@@ -58,14 +58,13 @@ namespace mitk {
     * @param right The object to compare with.
     * @return true, if the object is the same;false, if not.
     */
-    bool operator==(const TubeElement& right) const override;
+    bool operator==(const TubeElement &right) const override;
 
   private:
-
     Point3D m_coordinates;
     float m_diameter;
 
-  };//class
+  }; // class
 
-}//namespace
+} // namespace
 #endif

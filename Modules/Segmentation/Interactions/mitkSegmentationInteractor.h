@@ -31,15 +31,13 @@ namespace mitk
    * @ingroup Interaction
    **/
 
-  class MITKSEGMENTATION_EXPORT SegmentationInteractor: public DisplayInteractor
+  class MITKSEGMENTATION_EXPORT SegmentationInteractor : public DisplayInteractor
   {
   public:
-    mitkClassMacro(SegmentationInteractor, DisplayInteractor)
-    itkNewMacro(Self)
+    mitkClassMacro(SegmentationInteractor, DisplayInteractor) itkNewMacro(Self)
 
-  protected:
-    SegmentationInteractor() {};
-    virtual ~SegmentationInteractor() {};
+      protected : SegmentationInteractor(){};
+    virtual ~SegmentationInteractor(){};
     /**
      * Derived function.
      * Connects the action names used in the state machine pattern with functions implemented within
@@ -47,10 +45,10 @@ namespace mitk
      */
     virtual void ConnectActionsAndFunctions();
 
-     /**
-     * Changes the active label.
-     */
-    bool ChangeActiveLabel(StateMachineAction*, InteractionEvent*);
+    /**
+    * Changes the active label.
+    */
+    bool ChangeActiveLabel(StateMachineAction *, InteractionEvent *);
   };
 }
 #endif

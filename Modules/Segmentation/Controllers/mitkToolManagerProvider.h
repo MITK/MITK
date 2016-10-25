@@ -19,18 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkSegmentationExports.h>
 
-#include <usModuleContext.h>
 #include <mitkServiceInterface.h>
+#include <usModuleContext.h>
 
 #include "mitkToolManager.h"
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 
-
-
 namespace mitk
 {
-
   class SegmentationModuleActivator;
 
   /**
@@ -53,25 +50,24 @@ namespace mitk
     \brief Returns ToolManager object.
     \note As this service is implemented as a singleton there is always the same ToolManager instance returned.
     */
-    virtual mitk::ToolManager* GetToolManager();
+    virtual mitk::ToolManager *GetToolManager();
 
     /**
     \brief Returns an instance of ToolManagerProvider service.
     */
-    static mitk::ToolManagerProvider* GetInstance();
+    static mitk::ToolManagerProvider *GetInstance();
 
-    //ONLY SegmentationModuleActivator is able to create instances of the service.
+    // ONLY SegmentationModuleActivator is able to create instances of the service.
     friend class mitk::SegmentationModuleActivator;
 
   protected:
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    //hide everything
-    ToolManagerProvider();
+      // hide everything
+      ToolManagerProvider();
     virtual ~ToolManagerProvider();
-    ToolManagerProvider(const ToolManagerProvider&);
-    ToolManagerProvider& operator=(const ToolManagerProvider&);
+    ToolManagerProvider(const ToolManagerProvider &);
+    ToolManagerProvider &operator=(const ToolManagerProvider &);
 
     mitk::ToolManager::Pointer m_ToolManager;
   };

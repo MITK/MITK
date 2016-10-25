@@ -22,12 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //#include <ANN/ANN.h>
 
-
 #include <deque>
 
 namespace mitk
 {
-
   /** \brief Represents a contour in 3D space.
   A ContourElement is consisting of linked vertices implicitely defining the contour.
   They are stored in a double ended queue making it possible to add vertices at front and
@@ -39,27 +37,19 @@ namespace mitk
   */
   class MITKCONTOURMODEL_EXPORT ContourElement : public itk::LightObject
   {
-
   public:
-
     mitkClassMacroItkParent(ContourElement, itk::LightObject);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-// Data container representing vertices
+      // Data container representing vertices
 
-    /** \brief Represents a single vertex of contour.
-    */
-    struct ContourModelVertex
+      /** \brief Represents a single vertex of contour.
+      */
+      struct ContourModelVertex
     {
-      ContourModelVertex(mitk::Point3D &point, bool active=false)
-        : IsControlPoint(active), Coordinates(point)
-      {
-
-      }
-
-      ContourModelVertex( const ContourModelVertex &other)
+      ContourModelVertex(mitk::Point3D &point, bool active = false) : IsControlPoint(active), Coordinates(point) {}
+      ContourModelVertex(const ContourModelVertex &other)
         : IsControlPoint(other.IsControlPoint), Coordinates(other.Coordinates)
       {
       }
@@ -70,10 +60,10 @@ namespace mitk
       /** \brief Coordinates in 3D space. */
       mitk::Point3D Coordinates;
     };
-// END Data container representing vertices
+    // END Data container representing vertices
 
     typedef ContourModelVertex VertexType;
-    typedef std::deque<VertexType*> VertexListType;
+    typedef std::deque<VertexType *> VertexListType;
     typedef VertexListType::iterator VertexIterator;
     typedef VertexListType::const_iterator ConstVertexIterator;
 
@@ -81,38 +71,19 @@ namespace mitk
 
     /** \brief Return a const iterator a the front.
     */
-    virtual ConstVertexIterator ConstIteratorBegin()
-    {
-      return this->m_Vertices->begin();
-    }
-
+    virtual ConstVertexIterator ConstIteratorBegin() { return this->m_Vertices->begin(); }
     /** \brief Return a const iterator a the end.
     */
-    virtual ConstVertexIterator ConstIteratorEnd()
-    {
-      return this->m_Vertices->end();
-    }
-
+    virtual ConstVertexIterator ConstIteratorEnd() { return this->m_Vertices->end(); }
     /** \brief Return an iterator a the front.
     */
-    virtual VertexIterator IteratorBegin()
-    {
-      return this->m_Vertices->begin();
-    }
-
+    virtual VertexIterator IteratorBegin() { return this->m_Vertices->begin(); }
     /** \brief Return an iterator a the end.
     */
-    virtual VertexIterator IteratorEnd()
-    {
-      return this->m_Vertices->end();
-    }
-
+    virtual VertexIterator IteratorEnd() { return this->m_Vertices->end(); }
     /** \brief Returns the number of contained vertices.
     */
-    virtual int GetSize()
-    {
-      return this->m_Vertices->size();
-    }
+    virtual int GetSize() { return this->m_Vertices->size(); }
     //   end of inline methods
 
     /** \brief Add a vertex at the end of the contour
@@ -154,28 +125,28 @@ namespace mitk
     \param pointId Index of vertex.
     \param vertex Vertex.
     */
-    virtual void SetVertexAt(int pointId, const VertexType* vertex);
+    virtual void SetVertexAt(int pointId, const VertexType *vertex);
 
     /** \brief Returns the vertex a given index
     \param index
     */
-    virtual VertexType* GetVertexAt(int index);
+    virtual VertexType *GetVertexAt(int index);
 
     /** \brief Returns the approximate nearest vertex a given posoition in 3D space
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    virtual VertexType* GetVertexAt(const mitk::Point3D &point, float eps);
+    virtual VertexType *GetVertexAt(const mitk::Point3D &point, float eps);
 
     /** \brief Returns the index of the given vertex within the contour.
     \param vertex - the vertex to be searched.
     \return index of vertex. -1 if not found.
     */
-    virtual int GetIndex(const VertexType* vertex);
+    virtual int GetIndex(const VertexType *vertex);
 
     /** \brief Returns the container of the vertices.
     */
-    VertexListType* GetVertexList();
+    VertexListType *GetVertexList();
 
     /** \brief Returns whether the contour element is empty.
     */
@@ -211,12 +182,12 @@ namespace mitk
     \param other - the other contour
     \param check - set it true to avoid intersections
     */
-    void Concatenate(mitk::ContourElement* other, bool check);
+    void Concatenate(mitk::ContourElement *other, bool check);
 
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
     */
-    virtual bool RemoveVertex(const VertexType* vertex);
+    virtual bool RemoveVertex(const VertexType *vertex);
 
     /** \brief Remove a vertex at given index within the container if exists.
     \param index - the index where the vertex should be removed.
@@ -237,21 +208,21 @@ namespace mitk
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    VertexType* BruteForceGetVertexAt(const mitk::Point3D &point, float eps);
+    VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, float eps);
 
     /** \brief Returns the approximate nearest vertex a given posoition in 3D space
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    //VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
+    // VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
 
-    VertexListType* GetControlVertices();
+    VertexListType *GetControlVertices();
 
     /** \brief Uniformly redistribute control points with a given period (in number of vertices)
     \param vertex - the vertex around which the redistribution is done.
     \param period - number of vertices between control points.
     */
-    void RedistributeControlVertices(const VertexType* vertex, int period);
+    void RedistributeControlVertices(const VertexType *vertex, int period);
 
   protected:
     mitkCloneMacro(Self);
@@ -260,9 +231,8 @@ namespace mitk
     ContourElement(const mitk::ContourElement &other);
     virtual ~ContourElement();
 
-    VertexListType* m_Vertices; //double ended queue with vertices
+    VertexListType *m_Vertices; // double ended queue with vertices
     bool m_IsClosed;
-
   };
 } // namespace mitk
 

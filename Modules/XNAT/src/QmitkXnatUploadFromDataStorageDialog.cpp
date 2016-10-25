@@ -6,10 +6,8 @@
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
-QmitkXnatUploadFromDataStorageDialog::QmitkXnatUploadFromDataStorageDialog(QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::QmitkXnatUploadFromDataStorageDialog),
-  m_SelectedNode(0)
+QmitkXnatUploadFromDataStorageDialog::QmitkXnatUploadFromDataStorageDialog(QWidget *parent)
+  : QDialog(parent), ui(new Ui::QmitkXnatUploadFromDataStorageDialog), m_SelectedNode(0)
 {
   ui->setupUi(this);
 
@@ -21,11 +19,19 @@ QmitkXnatUploadFromDataStorageDialog::QmitkXnatUploadFromDataStorageDialog(QWidg
   connect(ui->btnCancel, SIGNAL(clicked()), this, SLOT(OnCancel()));
   connect(ui->btnUpload, SIGNAL(clicked()), this, SLOT(OnUpload()));
   connect(ui->cbUploadMITKProject, SIGNAL(checked()), this, SLOT(OnUploadSceneChecked()));
-  connect(ui->leMITKProjectFileName, SIGNAL(textEdited(const QString&)), this, SLOT(OnMITKProjectFileNameEntered(const QString&)));
-  connect(ui->cBDataSelection, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnDataSelected(const mitk::DataNode*)));
+  connect(ui->leMITKProjectFileName,
+          SIGNAL(textEdited(const QString &)),
+          this,
+          SLOT(OnMITKProjectFileNameEntered(const QString &)));
+  connect(ui->cBDataSelection,
+          SIGNAL(OnSelectionChanged(const mitk::DataNode *)),
+          this,
+          SLOT(OnDataSelected(const mitk::DataNode *)));
 
-  mitk::NodePredicateNot::Pointer noHelper = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
-  mitk::NodePredicateNot::Pointer noHidden = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object"));
+  mitk::NodePredicateNot::Pointer noHelper =
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
+  mitk::NodePredicateNot::Pointer noHidden =
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object"));
   mitk::NodePredicateAnd::Pointer pred = mitk::NodePredicateAnd::New(noHelper, noHidden);
   ui->cBDataSelection->SetPredicate(pred);
 }
@@ -54,13 +60,13 @@ void QmitkXnatUploadFromDataStorageDialog::OnCancel()
   this->done(QDialog::Rejected);
 }
 
-void QmitkXnatUploadFromDataStorageDialog::OnMITKProjectFileNameEntered(const QString& /*text*/)
+void QmitkXnatUploadFromDataStorageDialog::OnMITKProjectFileNameEntered(const QString & /*text*/)
 {
 }
 
-void QmitkXnatUploadFromDataStorageDialog::OnDataSelected(const mitk::DataNode* node)
+void QmitkXnatUploadFromDataStorageDialog::OnDataSelected(const mitk::DataNode *node)
 {
-  m_SelectedNode = const_cast<mitk::DataNode*>(node);
+  m_SelectedNode = const_cast<mitk::DataNode *>(node);
   if (m_SelectedNode.IsNotNull())
     ui->btnUpload->setEnabled(true);
 }

@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkAmoebaOptimizerViewWidgetHIncluded
 #define QmitkAmoebaOptimizerViewWidgetHIncluded
 
-#include "ui_QmitkAmoebaOptimizerControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
+#include "ui_QmitkAmoebaOptimizerControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 class QLineEdit;
 
@@ -33,10 +33,8 @@ class QLineEdit;
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkAmoebaOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
-
 public:
-
-  QmitkAmoebaOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkAmoebaOptimizerView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkAmoebaOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;
@@ -51,21 +49,18 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
 private:
-
   void ShowSimplexDelta();
 
 protected:
-
   Ui::QmitkAmoebaOptimizerControls m_Controls;
 
   int m_NumberTransformParameters;
 
-  std::list<QLineEdit*> simplexDeltaLineEdits;
-  std::list<QLabel*> simplexDeltaLabels;
-
+  std::list<QLineEdit *> simplexDeltaLineEdits;
+  std::list<QLabel *> simplexDeltaLabels;
 };
 
 #endif

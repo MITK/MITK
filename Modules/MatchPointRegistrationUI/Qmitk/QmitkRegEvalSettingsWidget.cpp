@@ -16,14 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRegEvalSettingsWidget.h"
 
-#include <mitkNodePredicateProperty.h>
 #include "mitkMatchPointPropertyTags.h"
-#include "mitkRegEvaluationObject.h"
-#include "mitkRegVisPropertyTags.h"
 #include "mitkRegEvalStyleProperty.h"
 #include "mitkRegEvalWipeStyleProperty.h"
+#include "mitkRegEvaluationObject.h"
+#include "mitkRegVisPropertyTags.h"
+#include <mitkNodePredicateProperty.h>
 
-void QmitkRegEvalSettingsWidget::SetNode(mitk::DataNode* node)
+void QmitkRegEvalSettingsWidget::SetNode(mitk::DataNode *node)
 {
   if (this->m_selectedEvalNode.GetPointer() != node)
   {
@@ -32,8 +32,8 @@ void QmitkRegEvalSettingsWidget::SetNode(mitk::DataNode* node)
   }
 };
 
-
-QmitkRegEvalSettingsWidget::QmitkRegEvalSettingsWidget(QWidget*) : m_internalBlendUpdate(false), m_internalUpdate(false)
+QmitkRegEvalSettingsWidget::QmitkRegEvalSettingsWidget(QWidget *)
+  : m_internalBlendUpdate(false), m_internalUpdate(false)
 {
   this->setupUi(this);
 
@@ -41,12 +41,10 @@ QmitkRegEvalSettingsWidget::QmitkRegEvalSettingsWidget(QWidget*) : m_internalBle
 
   for (unsigned int pos = 0; pos < sampleProp->Size(); ++pos)
   {
-    this->comboStyle->insertItem(pos,
-      QString::fromStdString(sampleProp->GetEnumString(pos)));
+    this->comboStyle->insertItem(pos, QString::fromStdString(sampleProp->GetEnumString(pos)));
   }
 
-  connect(comboStyle, SIGNAL(currentIndexChanged(int)), this,
-    SLOT(OnComboStyleChanged(int)));
+  connect(comboStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(OnComboStyleChanged(int)));
 
   connect(pbBlend50, SIGNAL(clicked()), this, SLOT(OnBlend50Pushed()));
   connect(pbBlendTarget, SIGNAL(clicked()), this, SLOT(OnBlendTargetPushed()));
@@ -73,7 +71,7 @@ void QmitkRegEvalSettingsWidget::ConfigureControls()
 
   if (this->m_selectedEvalNode.IsNotNull())
   {
-    mitk::RegEvalStyleProperty* evalProp = NULL;
+    mitk::RegEvalStyleProperty *evalProp = NULL;
 
     if (this->m_selectedEvalNode->GetProperty(evalProp, mitk::nodeProp_RegEvalStyle))
     {
@@ -182,18 +180,15 @@ void QmitkRegEvalSettingsWidget::OnWipeStyleChanged()
   {
     if (this->radioWipeCross->isChecked())
     {
-      m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle,
-        mitk::RegEvalWipeStyleProperty::New(0));
+      m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(0));
     }
     else if (this->radioWipeH->isChecked())
     {
-      m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle,
-        mitk::RegEvalWipeStyleProperty::New(1));
+      m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(1));
     }
     else
     {
-      m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle,
-        mitk::RegEvalWipeStyleProperty::New(2));
+      m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(2));
     }
 
     if (!m_internalUpdate)
@@ -203,13 +198,11 @@ void QmitkRegEvalSettingsWidget::OnWipeStyleChanged()
   }
 };
 
-
 void QmitkRegEvalSettingsWidget::OnContourStyleChanged()
 {
   if (m_selectedEvalNode.IsNotNull())
   {
-    m_selectedEvalNode->SetBoolProperty(mitk::nodeProp_RegEvalTargetContour,
-      radioTargetContour->isChecked());
+    m_selectedEvalNode->SetBoolProperty(mitk::nodeProp_RegEvalTargetContour, radioTargetContour->isChecked());
     if (!m_internalUpdate)
     {
       emit SettingsChanged(m_selectedEvalNode.GetPointer());

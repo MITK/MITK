@@ -1,20 +1,12 @@
 /**
 \page StyleGuideAndNotesPage The MITK Style Guide and Technical Notes
 
+\tableofcontents
+
 The following document is a description of the accepted coding style for the Medical Imaging Interaction Toolkit (MITK). Developers who wish to contribute code to MITK should read and adhere to the standards described here.
 
 
-Available sections:
- - \ref NameConventions
- - \ref Pointer
- - \ref Namespace
- - \ref CodeLayoutandIndentation
- - \ref UseofBraces
- - \ref IncludeGuards
- - \ref TechnicalNotes
-
-
-\section StyleGuideAndNotesPage_NameConventions Name Conventions
+\section StyleGuideAndNotesPage_NameConventions Naming Conventions
 
 \li Using case change to indicate separate words
 @code
@@ -33,7 +25,7 @@ BoundingBox::Pointer boundingBox = BoundingBox::New();
 
 \li Names are generally spelled out
 @code
-mitk::DataTreeNode* node;
+mitk::DataNode* node;
 @endcode
 
 \li Abbreviation are allowable when in common use e.g. ROI for Region of
@@ -49,19 +41,19 @@ Interest
 class name = <algorithm><input><concept>
 @endcode
 
-\li Examples of concetpts  \n
-Accessor: Access and convert between types e.g. NullScalarAccessor \n
-Container: A container of objects such as points or images e.g. VectorContainer \n
-Filter: A class that participates in the data processing pipeline e.g. AddImageFilter \n
-Mapper: Transform data from one form into another e.g. ContourMapper2D \n
-Reader/Wirter: A class that reads/writes a single data object e.g. VtkSurfaceReader \n
+\li Examples of concepts  \n
+<b>Accessor</b>: Access and convert between types e.g. NullScalarAccessor \n
+<b>Container</b>: A container of objects such as points or images e.g. VectorContainer \n
+<b>Filter</b>: A class that participates in the data processing pipeline e.g. AddImageFilter \n
+<b>Mapper</b>: Transform data from one form into another e.g. ContourMapper2D \n
+<b>Reader/Writer</b>: A class that reads/writes a single data object e.g. VtkSurfaceReader \n
 
 
 \subsection StyleGuideAndNotesPage_NamingFiles Naming Files
 
 \li MITK classes like @a ExampleClass should be in namespace @a mitk and their corresponding files should be named @a mitkExampleClass.h/.cpp.
 @code
-mitkDataStorage
+mitk::DataStorage
 @endcode
 
 \li Qt specific MITK classes like @a QmitkListView should have the prefix Qmitk in their class names and their corresponding files should be named @a QmitkListView.h/.cpp.
@@ -116,23 +108,22 @@ emit SignalFinishedSegmentation();
 
 \subsection StyleGuideAndNotesPage_NamingClassDataMembers Naming Class Data Members
 
-\li Class data member are prepended with m_
+\li Class data members are prefixed with m_
 @code
 m_Volumes
 m_OffsetTable
 m_ImageMask
 @endcode
 
-\li Except of QT class Data Members, those begins in lowercase.
+\li An exception to this rule, Qt class Data members are not prefixed and begin with a lower-case letter
 @code
-loadImageButton;
-closeImageAction;
+loadImageButton
+closeImageAction
 @endcode
-
 
 \subsection StyleGuideAndNotesPage_NamingLocalVariables Naming Local Variables
 
-\li Local variables begin in lowercase
+\li Local variables first letter is lower-case
 @code
 offset
 data
@@ -153,7 +144,7 @@ QRadioButton* binaryImageRadioButton;
 
 \subsection StyleGuideAndNotesPage_NamingTypedefs Naming Typedefs
 
-\li Typedef names end in the word Type
+\li Typedefs must end in the word Type
 @code
 typedef TPixel PixelType;
 typedef itk::Image< TPixel, VImageDimension > ImageType;
@@ -165,14 +156,14 @@ typedef std::list<mitk::Image::Pointer> ImageListType;
 
 \subsection StyleGuideAndNotesPage_DeclarationofPointers Declaration of Pointers
 
-\li Position of * pointers are connected with the declaration type
+\li Position of * pointers are connected with the variable
 @code
-int* counter;
+int *counter;
 @endcode
 
 \li Analog to references
 @code
-int& counter;
+int &counter;
 @endcode
 
 
@@ -236,13 +227,15 @@ switch (actionId)
 
 \subsection StyleGuideAndNotesPage_GeneralLayout General Layout
 
-\li Each line of code should take no more than 81 characters.
+\li Each line of code should take no more than 120 characters.
 
 \li Use lots of whitespace to separate logical blocks of code, intermixed with
 comments
 
 \li <b>DO NOT USE TABS.</b> The standard indention is <b>2 spaces</b> (see <a href="http://www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
 editor accordingly.
+
+\li DO NOT USE trailing whitespaces
 
 \li Declaration of variables should be one declaration per line
 @code
@@ -273,26 +266,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 @endcode
 
-\li Include Guards
-@code
-#ifndef __mitkClassName_h
-#define __mitkClassName_h
-@endcode
-
 \li Includes [A .. Z]
 @code
 #include "... .h"
-@endcode
-
-\li Doxygen
-@code
-/*!
-\brief mitkClassName
-\sa .....
-\verbatim
-Last contributor: $Author$
-\endverbatim
-*/
 @endcode
 
 \li Namespace
@@ -300,6 +276,8 @@ Last contributor: $Author$
 namespace mitk
 {
 @endcode
+DO NOT litter your header with "using namespace;"!
+
 
 \li Class (Template)
 @code
@@ -431,7 +409,6 @@ child.h        #include "grandfather.h"
 @endcode
 
 
-
 \section StyleGuideAndNotesPage_TechnicalNotes Some Technical Notes
 
 \li Use forward declarations in header files wherever possible. Only include those header files in a header file
@@ -485,11 +462,12 @@ switch (actionId)
 @endcode
 Prefixes for the constants are to be used like corresponding others. See file @a Interactions\\mitkBaseInteraction\\mitkInteractionConst.h for further details.
 
-\li Often QmitkFunctionality::Activated() and QmitkFunctionality::Deactivated() is the right place to connect and disconnnect event-handlers
-(e.g., mitk::GlobalStateMachine::AddStateMachine() in Activated() and mitk::GlobalStateMachine::RemoveStateMachine()
- in Deactivated()).
+\section StyleGuideAndNotesPage_AutomaticCodeFormatting Automatic Code Formatting
 
-\li The four widgets of the QmitkStdMultiWidget should be initialized in QmitkFunctionality::Activated(),
- but does @em not need to be restored in QmitkFunctionality::Deactivated(): It is the responsiblity of the
- subsequently activated functionality to initialize them according to its needs.
+We offer a .clang-format file, which can be used to automatically format code acceptably.
+
+\include .clang-format
+
+For an explanation of the different options check out http://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
 */

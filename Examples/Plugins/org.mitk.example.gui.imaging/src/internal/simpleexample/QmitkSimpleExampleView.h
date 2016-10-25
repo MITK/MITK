@@ -33,19 +33,16 @@ class vtkRenderer;
  */
 class QmitkSimpleExampleView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
-
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   QmitkSimpleExampleView();
   ~QmitkSimpleExampleView();
 
 private:
-
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   virtual void SetFocus() override;
@@ -53,16 +50,16 @@ private:
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   /**
    * return the renderwindow of which the movie shall be created, what depends on the combo box
    */
-  QmitkRenderWindow* GetSelectedRenderWindow() const;
+  QmitkRenderWindow *GetSelectedRenderWindow() const;
 
   /// writes a screenshot in JPEG or PNG format to the file fileName
-  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
+  void TakeScreenshot(vtkRenderer *renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
 
   /// returns path to the ffmpeg lib if configured in preferences
   QString GetFFmpegPath() const;
@@ -72,7 +69,7 @@ private slots:
   /**
    * Qt slot for reacting on the selected render window from the combo box
    */
-  void RenderWindowSelected(const QString& id);
+  void RenderWindowSelected(const QString &id);
 
   /**
    * qt slot for event processing from a qt widget defining the stereo mode of a render window
@@ -96,8 +93,7 @@ private slots:
   void OnTakeScreenshot();
 
 private:
-
-  Ui::QmitkSimpleExampleViewControls* m_Controls;
+  Ui::QmitkSimpleExampleViewControls *m_Controls;
 
   bool m_NavigatorsInitialized;
 
@@ -105,7 +101,7 @@ private:
   QScopedPointer<QmitkStepperAdapter> m_TimeStepper;
   QScopedPointer<QmitkStepperAdapter> m_MovieStepper;
 
-  QWidget* m_Parent;
+  QWidget *m_Parent;
 
   QString m_PNGExtension = "PNG File (*.png)";
   QString m_JPGExtension = "JPEG File (*.jpg)";

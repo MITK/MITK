@@ -22,8 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPointSet.h>
 #include <mitkStandaloneDataStorage.h>
 
-#include <itksys/SystemTools.hxx>
 #include <QApplication>
+#include <itksys/SystemTools.hxx>
 #include <mitkOverlay2DLayouter.h>
 #include <mitkOverlayManager.h>
 #include <mitkTextOverlay2D.h>
@@ -32,13 +32,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 //##Documentation
 //## @brief Load image (nrrd format) and display it in a 2D view
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  QApplication qtapplication( argc, argv );
+  QApplication qtapplication(argc, argv);
 
   if (argc < 2)
   {
-    fprintf( stderr, "Usage:   %s [filename] \n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
+    fprintf(stderr, "Usage:   %s [filename] \n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str());
     return 1;
   }
 
@@ -55,15 +55,14 @@ int main(int argc, char* argv[])
   // We use the standard implementation mitk::StandaloneDataStorage.
   mitk::StandaloneDataStorage::Pointer dataStorage = mitk::StandaloneDataStorage::New();
 
-
   //*************************************************************************
   // Part II: Create some data by reading a file
   //*************************************************************************
 
   // Create a DataNodeFactory to read a data format supported
   // by the DataNodeFactory (many image formats, surface formats, etc.)
-  mitk::DataNodeFactory::Pointer reader=mitk::DataNodeFactory::New();
-  const char * filename = argv[1];
+  mitk::DataNodeFactory::Pointer reader = mitk::DataNodeFactory::New();
+  const char *filename = argv[1];
   try
   {
     reader->SetFileName(filename);
@@ -75,9 +74,9 @@ int main(int argc, char* argv[])
     // Add the node to the DataStorage
     dataStorage->Add(reader->GetOutput());
   }
-  catch(...)
+  catch (...)
   {
-    fprintf( stderr, "Could not open file %s \n\n", filename );
+    fprintf(stderr, "Could not open file %s \n\n", filename);
     exit(2);
   }
 
@@ -93,13 +92,13 @@ int main(int argc, char* argv[])
 
   // Initialize the RenderWindow
   mitk::TimeGeometry::Pointer geo = dataStorage->ComputeBoundingGeometry3D(dataStorage->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
-  //mitk::RenderingManager::GetInstance()->InitializeViews();
+  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+  // mitk::RenderingManager::GetInstance()->InitializeViews();
 
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
   if (sliceNaviController)
-    sliceNaviController->GetSlice()->SetPos( 0 );
+    sliceNaviController->GetSlice()->SetPos(0);
 
   //*************************************************************************
   // Part V: Qt-specific initialization
@@ -107,76 +106,78 @@ int main(int argc, char* argv[])
 
   //! [CreateOverlayManager]
   mitk::OverlayManager::Pointer OverlayManagerInstance = mitk::OverlayManager::New();
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow.GetVtkRenderWindow());
+  mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(renderWindow.GetVtkRenderWindow());
   renderer->SetOverlayManager(OverlayManagerInstance);
   //! [CreateOverlayManager]
 
-
   //! [GetOverlayManagerInstance]
-  //The id that is passed identifies the correct mitk::OverlayManager and is '0' by default.
-  mitk::BaseRenderer* renderer2D = mitk::BaseRenderer::GetInstance(renderWindow.GetVtkRenderWindow());
+  // The id that is passed identifies the correct mitk::OverlayManager and is '0' by default.
+  mitk::BaseRenderer *renderer2D = mitk::BaseRenderer::GetInstance(renderWindow.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer overlayManager = renderer2D->GetOverlayManager();
   //! [GetOverlayManagerInstance]
 
-
   //! [AddLayouter]
-  //This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
-  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D);
+  // This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
+  mitk::Overlay2DLayouter::Pointer topleftLayouter =
+    mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D);
 
-  //Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
+  // Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
   overlayManager->AddLayouter(topleftLayouter.GetPointer());
 
-  //Several other Layouters can be added to the overlayManager
-  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), renderer2D);
+  // Several other Layouters can be added to the overlayManager
+  mitk::Overlay2DLayouter::Pointer bottomLayouter =
+    mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), renderer2D);
   overlayManager->AddLayouter(bottomLayouter.GetPointer());
   //! [AddLayouter]
 
-
   //! [TextOverlay2D]
-  //Create a textOverlay2D
+  // Create a textOverlay2D
   mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
 
-  textOverlay->SetText("Test!"); //set UTF-8 encoded text to render
+  textOverlay->SetText("Test!"); // set UTF-8 encoded text to render
   textOverlay->SetFontSize(40);
-  textOverlay->SetColor(1,0,0); //Set text color to red
+  textOverlay->SetColor(1, 0, 0); // Set text color to red
   textOverlay->SetOpacity(1);
 
-  //The position of the Overlay can be set to a fixed coordinate on the display.
+  // The position of the Overlay can be set to a fixed coordinate on the display.
   mitk::Point2D pos;
-  pos[0] = 10,pos[1] = 20;
+  pos[0] = 10, pos[1] = 20;
   textOverlay->SetPosition2D(pos);
 
-  //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
+  // Add the overlay to the overlayManager. It is added to all registered renderers automaticly
   overlayManager->AddOverlay(textOverlay.GetPointer());
 
-  //Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
-  //The Standard TopLeft Layouter has to be registered to the OverlayManager first
-  overlayManager->AddLayouter(mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D).GetPointer());
+  // Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute
+  // position of the overlay is not used anymore
+  // The Standard TopLeft Layouter has to be registered to the OverlayManager first
+  overlayManager->AddLayouter(
+    mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D).GetPointer());
   //! [TextOverlay2D]
 
   //! [SetLayouterToOverlay]
-  //Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
-  overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(),renderer2D);
+  // Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
+  overlayManager->SetLayouter(textOverlay.GetPointer(), mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), renderer2D);
   //! [SetLayouterToOverlay]
-
 
   //! [TextOverlay3D]
   mitk::PointSet::Pointer pointset = mitk::PointSet::New();
 
-  // This vector is used to define an offset for the annotations, in order to show them with a margin to the actual coordinate.
+  // This vector is used to define an offset for the annotations, in order to show them with a margin to the actual
+  // coordinate.
   mitk::Point3D offset;
   offset[0] = .5;
   offset[1] = .5;
   offset[2] = .5;
 
-  //Just a loop to create some points
-  for(int i=0 ; i < 10 ; i++){
-    //To each point, a TextOverlay3D is created
+  // Just a loop to create some points
+  for (int i = 0; i < 10; i++)
+  {
+    // To each point, a TextOverlay3D is created
     mitk::TextOverlay3D::Pointer textOverlay3D = mitk::TextOverlay3D::New();
     mitk::Point3D point;
-    point[0] = i*20;
-    point[1] = i*30;
-    point[2] = -i*50;
+    point[0] = i * 20;
+    point[1] = i * 30;
+    point[2] = -i * 50;
     pointset->InsertPoint(i, point);
     textOverlay3D->SetText("A Point");
 
@@ -196,7 +197,7 @@ int main(int argc, char* argv[])
   dataStorage->Add(datanode);
   //! [TextOverlay3D]
   renderWindow.show();
-  renderWindow.resize( 256, 256 );
+  renderWindow.resize(256, 256);
 
   return qtapplication.exec();
 

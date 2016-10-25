@@ -20,11 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFileReaderWriterOptionsWidget.h"
 #include "mitkIFileReader.h"
 
-QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo& loadInfo,
-                                                           QWidget *parent)
-  : QDialog(parent, Qt::WindowStaysOnTopHint)
-  , ui(new Ui::QmitkFileReaderOptionsDialog)
-  , m_LoadInfo(loadInfo)
+QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo &loadInfo, QWidget *parent)
+  : QDialog(parent, Qt::WindowStaysOnTopHint), ui(new Ui::QmitkFileReaderOptionsDialog), m_LoadInfo(loadInfo)
 
 {
   ui->setupUi(this);
@@ -36,7 +33,9 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
   long selectedReaderId = loadInfo.m_ReaderSelector.GetSelectedId();
   int i = 0;
   for (std::vector<mitk::FileReaderSelector::Item>::const_reverse_iterator iter = m_ReaderItems.rbegin(),
-       iterEnd = m_ReaderItems.rend(); iter != iterEnd; ++iter)
+                                                                           iterEnd = m_ReaderItems.rend();
+       iter != iterEnd;
+       ++iter)
   {
     ui->m_ReaderComboBox->addItem(QString::fromStdString(iter->GetDescription()));
     mitk::IFileReader::Options options = iter->GetReader()->GetOptions();
@@ -52,7 +51,7 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
   }
   ui->m_ReaderComboBox->setCurrentIndex(selectedIndex);
 
-  if(!hasOptions)
+  if (!hasOptions)
   {
     ui->m_OptionsBox->setVisible(false);
   }
@@ -85,7 +84,7 @@ void QmitkFileReaderOptionsDialog::accept()
 {
   const int index = m_ReaderItems.size() - ui->m_ReaderComboBox->currentIndex() - 1;
   m_ReaderItems[index].GetReader()->SetOptions(
-        qobject_cast<QmitkFileReaderWriterOptionsWidget*>(ui->m_StackedOptionsWidget->currentWidget())->GetOptions());
+    qobject_cast<QmitkFileReaderWriterOptionsWidget *>(ui->m_StackedOptionsWidget->currentWidget())->GetOptions());
   m_LoadInfo.m_ReaderSelector.Select(m_ReaderItems[index]);
   QDialog::accept();
 }

@@ -14,87 +14,66 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkUGCombinedRepresentationPropertyWidget.h"
 
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>
 
-#include <mitkPropertyObserver.h>
 #include <mitkProperties.h>
-
+#include <mitkPropertyObserver.h>
 
 class _UGCombinedBoolPropEditor : public mitk::PropertyEditor
 {
+public:
+  _UGCombinedBoolPropEditor(mitk::BoolProperty *boolProp, QmitkUGCombinedRepresentationPropertyWidget *combo)
+    : PropertyEditor(boolProp), m_BoolProperty(boolProp), m_ComboBox(combo)
+  {
+    PropertyChanged();
+  }
 
-  public:
+  virtual ~_UGCombinedBoolPropEditor() {}
+  bool IsEnabled() const { return enabled; }
+  void SetEnabled(bool enable)
+  {
+    this->BeginModifyProperty();
+    m_BoolProperty->SetValue(enable);
+    this->EndModifyProperty();
+  }
 
-    _UGCombinedBoolPropEditor(mitk::BoolProperty* boolProp,
-                              QmitkUGCombinedRepresentationPropertyWidget* combo)
-      : PropertyEditor(boolProp), m_BoolProperty(boolProp),
-      m_ComboBox(combo)
-    {
-      PropertyChanged();
-    }
-
-    virtual ~_UGCombinedBoolPropEditor() {}
-
-    bool IsEnabled() const
-    {
-      return enabled;
-    }
-
-    void SetEnabled(bool enable)
-    {
-      this->BeginModifyProperty();
-      m_BoolProperty->SetValue(enable);
-      this->EndModifyProperty();
-    }
-
-  protected:
-
-    virtual void PropertyChanged() override
-    {
-      if (m_BoolProperty)
-        enabled = m_BoolProperty->GetValue();
-      else
-        enabled = false;
-
-      m_ComboBox->IsVolumeChanged(enabled);
-    }
-
-    virtual void PropertyRemoved() override
-    {
-      m_Property = nullptr;
-      m_BoolProperty = nullptr;
+protected:
+  virtual void PropertyChanged() override
+  {
+    if (m_BoolProperty)
+      enabled = m_BoolProperty->GetValue();
+    else
       enabled = false;
-    }
 
-    mitk::BoolProperty* m_BoolProperty;
-    QmitkUGCombinedRepresentationPropertyWidget* m_ComboBox;
-    bool enabled;
+    m_ComboBox->IsVolumeChanged(enabled);
+  }
 
+  virtual void PropertyRemoved() override
+  {
+    m_Property = nullptr;
+    m_BoolProperty = nullptr;
+    enabled = false;
+  }
+
+  mitk::BoolProperty *m_BoolProperty;
+  QmitkUGCombinedRepresentationPropertyWidget *m_ComboBox;
+  bool enabled;
 };
-
 
 class _UGCombinedEnumPropEditor : public mitk::PropertyEditor
 {
-
 public:
-
-  _UGCombinedEnumPropEditor(mitk::EnumerationProperty* property,
-    QmitkUGCombinedRepresentationPropertyWidget* combo, bool isVolumeProp)
-    : PropertyEditor(property), m_EnumerationProperty(property), m_ComboBox(combo),
-      m_IsVolumeProp(isVolumeProp)
+  _UGCombinedEnumPropEditor(mitk::EnumerationProperty *property,
+                            QmitkUGCombinedRepresentationPropertyWidget *combo,
+                            bool isVolumeProp)
+    : PropertyEditor(property), m_EnumerationProperty(property), m_ComboBox(combo), m_IsVolumeProp(isVolumeProp)
   {
-
   }
 
-  ~_UGCombinedEnumPropEditor()
-  {
-    m_EnumerationProperty = nullptr;
-  }
-
+  ~_UGCombinedEnumPropEditor() { m_EnumerationProperty = nullptr; }
   void IndexChanged(int enumId)
   {
     this->BeginModifyProperty();
@@ -124,18 +103,20 @@ public:
   }
 
 protected:
-
-  mitk::EnumerationProperty* m_EnumerationProperty;
-  QmitkUGCombinedRepresentationPropertyWidget* m_ComboBox;
+  mitk::EnumerationProperty *m_EnumerationProperty;
+  QmitkUGCombinedRepresentationPropertyWidget *m_ComboBox;
   QHash<int, int> m_EnumIdToItemIndex;
   bool m_IsVolumeProp;
 };
 
-
-
-QmitkUGCombinedRepresentationPropertyWidget::QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent) :
-    QComboBox(parent), gridRepPropEditor(nullptr), volumeMapperPropEditor(nullptr), volumePropEditor(nullptr),
-    m_GridRepIndex(0), m_GridVolIndex(0), m_FirstVolumeRepId(0)
+QmitkUGCombinedRepresentationPropertyWidget::QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent)
+  : QComboBox(parent),
+    gridRepPropEditor(nullptr),
+    volumeMapperPropEditor(nullptr),
+    volumePropEditor(nullptr),
+    m_GridRepIndex(0),
+    m_GridVolIndex(0),
+    m_FirstVolumeRepId(0)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnIndexChanged(int)));
 }
@@ -147,10 +128,9 @@ QmitkUGCombinedRepresentationPropertyWidget::~QmitkUGCombinedRepresentationPrope
   delete volumePropEditor;
 }
 
-void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
-    mitk::GridRepresentationProperty* gridRepProp,
-    mitk::GridVolumeMapperProperty* gridVolProp,
-    mitk::BoolProperty* volumeProp)
+void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(mitk::GridRepresentationProperty *gridRepProp,
+                                                              mitk::GridVolumeMapperProperty *gridVolProp,
+                                                              mitk::BoolProperty *volumeProp)
 {
   if (gridRepPropEditor)
   {
@@ -182,10 +162,9 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   int i = 0;
   if (gridRepProp)
   {
-    const mitk::EnumerationProperty::EnumStringsContainerType& repStrings = gridRepProp->GetEnumStrings();
+    const mitk::EnumerationProperty::EnumStringsContainerType &repStrings = gridRepProp->GetEnumStrings();
 
-    for (auto it = repStrings.begin();
-      it != repStrings.end(); ++it, ++i)
+    for (auto it = repStrings.begin(); it != repStrings.end(); ++it, ++i)
     {
       m_MapRepEnumToIndex.insert(it->second, i);
       this->addItem(QString::fromStdString(it->first), it->second);
@@ -194,10 +173,9 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   }
   if (gridVolProp)
   {
-    const mitk::EnumerationProperty::EnumStringsContainerType& volStrings = gridVolProp->GetEnumStrings();
+    const mitk::EnumerationProperty::EnumStringsContainerType &volStrings = gridVolProp->GetEnumStrings();
 
-    for (auto it = volStrings.begin();
-      it != volStrings.end(); ++it, ++i)
+    for (auto it = volStrings.begin(); it != volStrings.end(); ++it, ++i)
     {
       m_MapVolEnumToIndex.insert(it->second, i);
       this->addItem(QString("Volume (") + QString::fromStdString(it->first) + ")", it->second);
@@ -226,7 +204,6 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
     this->SetGridVolumeId(gridVolProp->GetValueAsId());
   }
 }
-
 
 void QmitkUGCombinedRepresentationPropertyWidget::OnIndexChanged(int index)
 {
@@ -271,7 +248,7 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetGridVolumeId(int enumId)
   }
   else
   {
-   return;
+    return;
   }
 }
 
@@ -286,4 +263,3 @@ void QmitkUGCombinedRepresentationPropertyWidget::IsVolumeChanged(bool volume)
     this->SetGridRepresentationId(m_GridRepIndex);
   }
 }
-

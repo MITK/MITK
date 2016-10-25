@@ -14,29 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTransferFunctionProperty.h"
 #include "mitkBasePropertySerializer.h"
+#include "mitkTransferFunctionProperty.h"
 
 namespace mitk
 {
   class MITKSCENESERIALIZATIONBASE_EXPORT TransferFunctionPropertySerializer : public BasePropertySerializer
   {
-    public:
+  public:
+    mitkClassMacro(TransferFunctionPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-      mitkClassMacro( TransferFunctionPropertySerializer, BasePropertySerializer );
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+      virtual TiXmlElement *Serialize() override;
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
 
-      virtual TiXmlElement* Serialize() override;
-      virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override;
+    static bool SerializeTransferFunction(const char *filename, TransferFunction::Pointer tf);
+    static TransferFunction::Pointer DeserializeTransferFunction(const char *filePath);
 
-      static bool SerializeTransferFunction( const char * filename, TransferFunction::Pointer tf );
-      static TransferFunction::Pointer DeserializeTransferFunction( const char *filePath );
-
-    protected:
-
-      TransferFunctionPropertySerializer();
-      virtual ~TransferFunctionPropertySerializer();
+  protected:
+    TransferFunctionPropertySerializer();
+    virtual ~TransferFunctionPropertySerializer();
   };
 } // namespace
-

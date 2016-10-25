@@ -15,9 +15,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPlanarFigureVtkMapper3D.h"
+#include "mitkAbstractTransformGeometry.h"
 #include "mitkImage.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkAbstractTransformGeometry.h"
 #include <mitkPlanarFigure.h>
 #include <vtkCellArray.h>
 #include <vtkIdList.h>
@@ -27,9 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkPolygon.h>
 
-mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage()
-  : m_Actor(vtkSmartPointer<vtkActor>::New())
-  , m_LastMTime(0)
+mitk::PlanarFigureVtkMapper3D::LocalStorage::LocalStorage() : m_Actor(vtkSmartPointer<vtkActor>::New()), m_LastMTime(0)
 {
 }
 
@@ -37,14 +35,13 @@ mitk::PlanarFigureVtkMapper3D::LocalStorage::~LocalStorage()
 {
 }
 
-void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer*, bool)
+void mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRenderer *, bool)
 {
-    node->AddProperty( "planarfigure.3drendering",mitk::BoolProperty::New(false));
-    node->AddProperty( "planarfigure.3drendering.fill",mitk::BoolProperty::New(false));
+  node->AddProperty("planarfigure.3drendering", mitk::BoolProperty::New(false));
+  node->AddProperty("planarfigure.3drendering.fill", mitk::BoolProperty::New(false));
 }
 
-mitk::PlanarFigureVtkMapper3D::PlanarFigureVtkMapper3D()
-    : m_FillPf(false)
+mitk::PlanarFigureVtkMapper3D::PlanarFigureVtkMapper3D() : m_FillPf(false)
 {
 }
 
@@ -52,12 +49,12 @@ mitk::PlanarFigureVtkMapper3D::~PlanarFigureVtkMapper3D()
 {
 }
 
-void mitk::PlanarFigureVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor)
+void mitk::PlanarFigureVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
   if (actor == NULL)
     return;
 
-  const mitk::DataNode* dataNode = this->GetDataNode();
+  const mitk::DataNode *dataNode = this->GetDataNode();
 
   if (dataNode == NULL)
     return;
@@ -71,17 +68,17 @@ void mitk::PlanarFigureVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer*
   float opacity = 1.0f;
   dataNode->GetOpacity(opacity, renderer);
 
-  vtkProperty* property = actor->GetProperty();
+  vtkProperty *property = actor->GetProperty();
   property->SetColor(color[0], color[1], color[2]);
   property->SetOpacity(opacity);
 }
 
-void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer* renderer, vtkActor* actor)
+void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer *renderer, vtkActor *actor)
 {
   if (actor == NULL)
     return;
 
-  const mitk::DataNode* dataNode = this->GetDataNode();
+  const mitk::DataNode *dataNode = this->GetDataNode();
 
   if (dataNode == NULL)
     return;
@@ -94,42 +91,43 @@ void mitk::PlanarFigureVtkMapper3D::ApplyPlanarFigureProperties(BaseRenderer* re
   float lineWidth = 1.0f;
   dataNode->GetFloatProperty("planarfigure.line.width", lineWidth, renderer);
 
-  vtkProperty* property = actor->GetProperty();
+  vtkProperty *property = actor->GetProperty();
   property->SetLineWidth(lineWidth);
 }
 
-void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
+void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer *renderer)
 {
   typedef PlanarFigure::PolyLineType PolyLine;
 
-  const DataNode* node = this->GetDataNode();
+  const DataNode *node = this->GetDataNode();
 
   if (node == NULL)
     return;
 
-  PlanarFigure* planarFigure = dynamic_cast<PlanarFigure*>(node->GetData());
+  PlanarFigure *planarFigure = dynamic_cast<PlanarFigure *>(node->GetData());
 
   if (planarFigure == NULL || !planarFigure->IsPlaced())
     return;
 
-  LocalStorage* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+  LocalStorage *localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
   unsigned long mTime = planarFigure->GetMTime();
 
   bool fillPf = false;
   bool refresh = false;
   node->GetBoolProperty("planarfigure.3drendering.fill", fillPf);
-  if (m_FillPf!=fillPf)
+  if (m_FillPf != fillPf)
   {
-        m_FillPf = fillPf;
-        refresh = true;
+    m_FillPf = fillPf;
+    refresh = true;
   }
 
   if (mTime > localStorage->m_LastMTime || refresh)
   {
     localStorage->m_LastMTime = mTime;
 
-    const PlaneGeometry* planeGeometry = dynamic_cast<const PlaneGeometry*>(planarFigure->GetPlaneGeometry());
-    const AbstractTransformGeometry* abstractTransformGeometry = dynamic_cast<const AbstractTransformGeometry*>(planarFigure->GetPlaneGeometry());
+    const PlaneGeometry *planeGeometry = dynamic_cast<const PlaneGeometry *>(planarFigure->GetPlaneGeometry());
+    const AbstractTransformGeometry *abstractTransformGeometry =
+      dynamic_cast<const AbstractTransformGeometry *>(planarFigure->GetPlaneGeometry());
 
     if (planeGeometry == NULL && abstractTransformGeometry == NULL)
       return;
@@ -149,7 +147,6 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
       const PolyLine polyLine = planarFigure->GetPolyLine(i);
       const vtkIdType numPoints = polyLine.size();
 
-
       vtkSmartPointer<vtkPolygon> polygon = vtkSmartPointer<vtkPolygon>::New();
 
       if (numPoints < 2)
@@ -157,21 +154,19 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
 
       PolyLine::const_iterator polyLineEnd = polyLine.cend();
 
-      for ( PolyLine::const_iterator polyLineIt = polyLine.cbegin();
-            polyLineIt != polyLineEnd;
-            ++polyLineIt )
+      for (PolyLine::const_iterator polyLineIt = polyLine.cbegin(); polyLineIt != polyLineEnd; ++polyLineIt)
       {
         Point3D point;
         planeGeometry->Map(*polyLineIt, point);
         points->InsertNextPoint(point.GetDataPointer());
 
-        const vtkIdType id = polygon->GetPoints()->InsertNextPoint(point[0], point[1], point[2] );
+        const vtkIdType id = polygon->GetPoints()->InsertNextPoint(point[0], point[1], point[2]);
         polygon->GetPointIds()->InsertNextId(id);
       }
 
       vtkSmartPointer<vtkPolyLine> line = vtkSmartPointer<vtkPolyLine>::New();
 
-      vtkIdList* pointIds = line->GetPointIds();
+      vtkIdList *pointIds = line->GetPointIds();
 
       if (planarFigure->IsClosed() && numPoints > 2)
       {
@@ -208,11 +203,11 @@ void mitk::PlanarFigureVtkMapper3D::GenerateDataForRenderer(BaseRenderer* render
   this->ApplyPlanarFigureProperties(renderer, localStorage->m_Actor);
 }
 
-vtkProp* mitk::PlanarFigureVtkMapper3D::GetVtkProp(BaseRenderer* renderer)
+vtkProp *mitk::PlanarFigureVtkMapper3D::GetVtkProp(BaseRenderer *renderer)
 {
   return m_LocalStorageHandler.GetLocalStorage(renderer)->m_Actor;
 }
 
-void mitk::PlanarFigureVtkMapper3D::UpdateVtkTransform(BaseRenderer*)
+void mitk::PlanarFigureVtkMapper3D::UpdateVtkTransform(BaseRenderer *)
 {
 }

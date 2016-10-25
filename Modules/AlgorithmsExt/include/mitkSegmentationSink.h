@@ -22,35 +22,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class MITKALGORITHMSEXT_EXPORT SegmentationSink : public NonBlockingAlgorithm
-{
+  class MITKALGORITHMSEXT_EXPORT SegmentationSink : public NonBlockingAlgorithm
+  {
   public:
-
-    mitkClassMacro( SegmentationSink, NonBlockingAlgorithm )
-    mitkAlgorithmNewMacro( SegmentationSink );
+    mitkClassMacro(SegmentationSink, NonBlockingAlgorithm) mitkAlgorithmNewMacro(SegmentationSink);
 
   protected:
-
-    SegmentationSink();  // use smart pointers
+    SegmentationSink(); // use smart pointers
     virtual ~SegmentationSink();
 
-
-    virtual void Initialize(const NonBlockingAlgorithm* other = nullptr) override;
+    virtual void Initialize(const NonBlockingAlgorithm *other = nullptr) override;
     virtual bool ReadyToRun() override;
 
     virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
-    void InsertBelowGroupNode(mitk::DataNode* node);
-    DataNode* LookForPointerTargetBelowGroupNode(const char* name);
-    DataNode* GetGroupNode();
+    void InsertBelowGroupNode(mitk::DataNode *node);
+    DataNode *LookForPointerTargetBelowGroupNode(const char *name);
+    DataNode *GetGroupNode();
 
   private:
-
-};
+  };
 
 } // namespace
 
 #endif
-
-

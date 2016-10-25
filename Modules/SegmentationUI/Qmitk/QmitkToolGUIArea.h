@@ -25,7 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /**
   \brief Dummy class for putting into a GUI (mainly using Qt Designer).
 
-  This class is nothing more than a QWidget. It is good for use with QmitkToolSelectionBox as a place to display GUIs for active tools.
+  This class is nothing more than a QWidget. It is good for use with QmitkToolSelectionBox as a place to display GUIs
+  for active tools.
 
   Last contributor: $Author$
 */
@@ -33,18 +34,17 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolGUIArea : public QWidget
 {
   Q_OBJECT
 
-  public:
-  QmitkToolGUIArea( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+public:
+  QmitkToolGUIArea(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   virtual ~QmitkToolGUIArea();
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 
-  protected slots:
+protected slots:
 
-  protected:
+protected:
 };
 
 #endif
-

@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkMeanSquaresMetricViewWidgetHIncluded
 #define QmitkMeanSquaresMetricViewWidgetHIncluded
 
-#include "ui_QmitkMeanSquaresMetricControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
+#include "ui_QmitkMeanSquaresMetricControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
@@ -31,38 +31,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkMeanSquaresMetricView : public QmitkRigidRegistrationMetricsGUIBase
 {
-
 public:
-
-  QmitkMeanSquaresMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkMeanSquaresMetricView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkMeanSquaresMetricView();
 
- virtual mitk::MetricParameters::MetricType GetMetricType() override;
+  virtual mitk::MetricParameters::MetricType GetMetricType() override;
 
- virtual itk::Object::Pointer GetMetric() override;
+  virtual itk::Object::Pointer GetMetric() override;
 
- virtual itk::Array<double> GetMetricParameters() override;
+  virtual itk::Array<double> GetMetricParameters() override;
 
- virtual void SetMetricParameters(itk::Array<double> metricValues) override;
+  virtual void SetMetricParameters(itk::Array<double> metricValues) override;
 
- virtual QString GetName() override;
+  virtual QString GetName() override;
 
- virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
- virtual bool Maximize() override;
-
+  virtual bool Maximize() override;
 
 private:
-
- template < class TPixelType, unsigned int VImageDimension >
- itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
+  Ui::QmitkMeanSquaresMetricControls m_Controls;
 
- Ui::QmitkMeanSquaresMetricControls m_Controls;
-
- itk::Object::Pointer m_MetricObject;
-
+  itk::Object::Pointer m_MetricObject;
 };
 
 #endif

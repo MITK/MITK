@@ -15,13 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <QmitkDataStorageListModel.h>
-#include <mitkStandaloneDataStorage.h>
 #include <mitkImage.h>
-#include <mitkSurface.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkStandaloneDataStorage.h>
+#include <mitkSurface.h>
 
-#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
+#include <mitkTestingMacros.h>
 
 //! Tests for QmitkDataStorageListModel
 //!
@@ -36,26 +36,22 @@ class QmitkDataStorageListModelTestSuite : public mitk::TestFixture
   mitk::DataStorage::Pointer m_DataStorage;
 
 public:
-
   void setUp() override
   {
-      m_DataStorage = mitk::StandaloneDataStorage::New();
-      mitk::Image::Pointer image = mitk::Image::New();
-      mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
-      imageNode->SetData(image);
+    m_DataStorage = mitk::StandaloneDataStorage::New();
+    mitk::Image::Pointer image = mitk::Image::New();
+    mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+    imageNode->SetData(image);
 
-      mitk::Surface::Pointer surface = mitk::Surface::New();
-      mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
-      surfaceNode->SetData(surface);
+    mitk::Surface::Pointer surface = mitk::Surface::New();
+    mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
+    surfaceNode->SetData(surface);
 
-      m_DataStorage->Add(imageNode);
-      m_DataStorage->Add(surfaceNode);
+    m_DataStorage->Add(imageNode);
+    m_DataStorage->Add(surfaceNode);
   }
 
-  void tearDown() override
-  {
-  }
-
+  void tearDown() override {}
   //! Test the c'tor variants
   void InstantiationTest()
   {
@@ -100,8 +96,6 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount());
     CPPUNIT_ASSERT_EQUAL(std::size_t(0), model.GetDataNodes().size());
   }
-
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(QmitkDataStorageListModel)

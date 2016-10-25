@@ -34,7 +34,6 @@ mitk::ScaleLegendOverlay::ScaleLegendOverlay()
   SetCornerOffsetFactor(2.0);
 }
 
-
 mitk::ScaleLegendOverlay::~ScaleLegendOverlay()
 {
 }
@@ -50,9 +49,9 @@ mitk::ScaleLegendOverlay::LocalStorage::LocalStorage()
 
 void mitk::ScaleLegendOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
 
-  if(ls->IsGenerateDataRequired(renderer,this))
+  if (ls->IsGenerateDataRequired(renderer, this))
   {
     ls->m_legendScaleActor->SetRightAxisVisibility(this->GetRightAxisVisibility());
     ls->m_legendScaleActor->SetTopAxisVisibility(this->GetTopAxisVisibility());
@@ -60,14 +59,13 @@ void mitk::ScaleLegendOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_legendScaleActor->SetBottomAxisVisibility(this->GetBottomAxisVisibility());
     ls->m_legendScaleActor->SetLegendVisibility(this->GetLegendVisibility());
     ls->m_legendScaleActor->SetRightBorderOffset(this->GetRightBorderOffset());
-    ls->m_legendScaleActor->SetCornerOffsetFactor (this->GetCornerOffsetFactor());
+    ls->m_legendScaleActor->SetCornerOffsetFactor(this->GetCornerOffsetFactor());
   }
-
 }
 
-vtkProp* mitk::ScaleLegendOverlay::GetVtkProp(BaseRenderer *renderer) const
+vtkProp *mitk::ScaleLegendOverlay::GetVtkProp(BaseRenderer *renderer) const
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_legendScaleActor;
 }
 
@@ -85,7 +83,7 @@ bool mitk::ScaleLegendOverlay::GetRightAxisVisibility() const
 
 void mitk::ScaleLegendOverlay::SetLeftAxisVisibility(bool visibility)
 {
-    SetBoolProperty("ScaleLegendOverlay.LeftAxisVisibility", visibility);
+  SetBoolProperty("ScaleLegendOverlay.LeftAxisVisibility", visibility);
 }
 
 bool mitk::ScaleLegendOverlay::GetLeftAxisVisibility() const
@@ -97,7 +95,7 @@ bool mitk::ScaleLegendOverlay::GetLeftAxisVisibility() const
 
 void mitk::ScaleLegendOverlay::SetTopAxisVisibility(bool visibility)
 {
-    SetBoolProperty("ScaleLegendOverlay.TopAxisVisibility", visibility);
+  SetBoolProperty("ScaleLegendOverlay.TopAxisVisibility", visibility);
 }
 
 bool mitk::ScaleLegendOverlay::GetTopAxisVisibility() const
@@ -109,7 +107,7 @@ bool mitk::ScaleLegendOverlay::GetTopAxisVisibility() const
 
 void mitk::ScaleLegendOverlay::SetBottomAxisVisibility(bool visibility)
 {
-    SetBoolProperty("ScaleLegendOverlay.BottomAxisVisibility", visibility);
+  SetBoolProperty("ScaleLegendOverlay.BottomAxisVisibility", visibility);
 }
 
 bool mitk::ScaleLegendOverlay::GetBottomAxisVisibility() const
@@ -121,7 +119,7 @@ bool mitk::ScaleLegendOverlay::GetBottomAxisVisibility() const
 
 void mitk::ScaleLegendOverlay::SetLegendVisibility(bool visibility)
 {
-    SetBoolProperty("ScaleLegendOverlay.SetLegendVisibility", visibility);
+  SetBoolProperty("ScaleLegendOverlay.SetLegendVisibility", visibility);
 }
 
 bool mitk::ScaleLegendOverlay::GetLegendVisibility() const
@@ -133,7 +131,7 @@ bool mitk::ScaleLegendOverlay::GetLegendVisibility() const
 
 void mitk::ScaleLegendOverlay::SetRightBorderOffset(int offset)
 {
-    SetIntProperty("ScaleLegendOverlay.RightBorderOffset", offset);
+  SetIntProperty("ScaleLegendOverlay.RightBorderOffset", offset);
 }
 
 int mitk::ScaleLegendOverlay::GetRightBorderOffset() const

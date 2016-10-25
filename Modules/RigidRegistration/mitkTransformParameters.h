@@ -17,14 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKTRANSFORMPARAMETERS_H
 #define MITKTRANSFORMPARAMETERS_H
 
-#include <itkObjectFactory.h>
 #include "MitkRigidRegistrationExports.h"
-#include <itkArray.h>
 #include "mitkCommon.h"
+#include <itkArray.h>
+#include <itkObjectFactory.h>
 
-namespace mitk {
-
-
+namespace mitk
+{
   /*!
   \brief This class is used to hold all transform parameters needed for a rigid registration process.
 
@@ -32,7 +31,8 @@ namespace mitk {
   belonging to the selected transformation. To let the rigid registration work properly, this instance has to be given
   to mitkImageRegistrationMethod before calling the update() method in mitkImageRegistrationMethod.
 
-  Also instances of the classes mitkMetricParameters and mitkOptimizerParameters have to be set in mitkImageRegistrationMethod
+  Also instances of the classes mitkMetricParameters and mitkOptimizerParameters have to be set in
+  mitkImageRegistrationMethod
   before calling the update() method.
 
 
@@ -45,40 +45,39 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(TransformParameters, ::itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /**
-      \brief Unique integer value for every transform.
-    */
-    enum TransformType {
-      TRANSLATIONTRANSFORM = 0,
-      SCALETRANSFORM,
-      SCALELOGARITHMICTRANSFORM,
-      AFFINETRANSFORM,
-      FIXEDCENTEROFROTATIONAFFINETRANSFORM,
-      EULER3DTRANSFORM,
-      CENTEREDEULER3DTRANSFORM,
-      QUATERNIONRIGIDTRANSFORM,
-      VERSORTRANSFORM,
-      VERSORRIGID3DTRANSFORM,
-      SCALESKEWVERSOR3DTRANSFORM,
-      SIMILARITY3DTRANSFORM,
-      RIGID2DTRANSFORM,
-      CENTEREDRIGID2DTRANSFORM,
-      EULER2DTRANSFORM,
-      SIMILARITY2DTRANSFORM,
-      CENTEREDSIMILARITY2DTRANSFORM
-    };
+      /**
+        \brief Unique integer value for every transform.
+      */
+      enum TransformType {
+        TRANSLATIONTRANSFORM = 0,
+        SCALETRANSFORM,
+        SCALELOGARITHMICTRANSFORM,
+        AFFINETRANSFORM,
+        FIXEDCENTEROFROTATIONAFFINETRANSFORM,
+        EULER3DTRANSFORM,
+        CENTEREDEULER3DTRANSFORM,
+        QUATERNIONRIGIDTRANSFORM,
+        VERSORTRANSFORM,
+        VERSORRIGID3DTRANSFORM,
+        SCALESKEWVERSOR3DTRANSFORM,
+        SIMILARITY3DTRANSFORM,
+        RIGID2DTRANSFORM,
+        CENTEREDRIGID2DTRANSFORM,
+        EULER2DTRANSFORM,
+        SIMILARITY2DTRANSFORM,
+        CENTEREDSIMILARITY2DTRANSFORM
+      };
 
     /**
       \brief Sets the transform used for registration by its unique integer value.
     */
-    itkSetMacro( Transform, int );
+    itkSetMacro(Transform, int);
     /**
       \brief Returns the transform used for registration by its unique integer value.
     */
-    itkGetMacro( Transform, int );
+    itkGetMacro(Transform, int);
 
     /**
       \brief Sets an array that holds the magnitudes of changes for the transforms degrees of freedom.
@@ -107,26 +106,26 @@ namespace mitk {
 
     True = initializer is used, initializer is not used.
     */
-    itkSetMacro( TransformInitializerOn, bool );
+    itkSetMacro(TransformInitializerOn, bool);
     /**
     \brief Returns whether a transform initializer will be used.
 
     True = initializer is used, false = initializer is not used.
     */
-    itkGetMacro( TransformInitializerOn, bool );
+    itkGetMacro(TransformInitializerOn, bool);
 
     /**
     \brief Sets whether the transform initializer will be used to align the images moments or their centers.
 
     True = image moments will be aligned, false = image centers will be aligned.
     */
-    itkSetMacro( MomentsOn, bool );
+    itkSetMacro(MomentsOn, bool);
     /**
     \brief Returns whether the transform initializer will be used to align the images moments or their centers.
 
     True = image moments will be aligned, false = image centers will be aligned.
     */
-    itkGetMacro( MomentsOn, bool );
+    itkGetMacro(MomentsOn, bool);
 
     /**
     \brief Sets whether the optimizer scales will be used to let the optimizer know about different magnitudes for
@@ -134,64 +133,63 @@ namespace mitk {
 
     True = optimizer scales will be used, false = optimizer scales will not be used.
     */
-    itkSetMacro( UseOptimizerScales, bool );
+    itkSetMacro(UseOptimizerScales, bool);
     /**
     \brief Returns whether the optimizer scales will be used to let the optimizer know about different magnitudes for
     the transforms degrees of freedom.
 
     True = optimizer scales will be used, false = optimizer scales will not be used.
     */
-    itkGetMacro( UseOptimizerScales, bool );
+    itkGetMacro(UseOptimizerScales, bool);
 
     /**
     \brief Sets the initial angle for transforms.
     */
-    itkSetMacro( Angle, float );
+    itkSetMacro(Angle, float);
     /**
     \brief Returns the initial angle for transforms.
     */
-    itkGetMacro( Angle, float );
+    itkGetMacro(Angle, float);
 
     /**
     \brief Sets the transforms initial scale.
     */
-    itkSetMacro( Scale, float );
+    itkSetMacro(Scale, float);
     /**
     \brief Returns the transforms initial scale.
     */
-    itkGetMacro( Scale, float );
+    itkGetMacro(Scale, float);
 
     /**
     \brief This setter is used by the mitkTransformFactory to set the transforms initial center in X direction.
     */
-    itkSetMacro( TransformCenterX, double );
+    itkSetMacro(TransformCenterX, double);
     /**
     \brief Returns the transforms initial center in X direction.
     */
-    itkGetMacro( TransformCenterX, double );
+    itkGetMacro(TransformCenterX, double);
 
     /**
     \brief This setter is used by the mitkTransformFactory to set the transforms initial center in Y direction.
     */
-    itkSetMacro( TransformCenterY, double );
+    itkSetMacro(TransformCenterY, double);
     /**
     \brief Returns the transforms initial center in Y direction.
     */
-    itkGetMacro( TransformCenterY, double );
+    itkGetMacro(TransformCenterY, double);
 
     /**
     \brief This setter is used by the mitkTransformFactory to set the transforms initial center in Z direction.
     */
-    itkSetMacro( TransformCenterZ, double );
+    itkSetMacro(TransformCenterZ, double);
     /**
     \brief Returns the transforms initial center in Z direction.
     */
-    itkGetMacro( TransformCenterZ, double );
+    itkGetMacro(TransformCenterZ, double);
 
   protected:
-
     TransformParameters();
-    ~TransformParameters() {};
+    ~TransformParameters(){};
 
     int m_Transform;
     float m_Angle;

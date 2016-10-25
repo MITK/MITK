@@ -17,24 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkOnePlusOneEvolutionaryOptimizerViewWidgetHIncluded
 #define QmitkOnePlusOneEvolutionaryOptimizerViewWidgetHIncluded
 
-#include "ui_QmitkOnePlusOneEvolutionaryOptimizerControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
+#include "ui_QmitkOnePlusOneEvolutionaryOptimizerControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
 *
 * Displays options for rigid registration.
 */
-class MITKRIGIDREGISTRATIONUI_EXPORT QmitkOnePlusOneEvolutionaryOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkOnePlusOneEvolutionaryOptimizerView
+  : public QmitkRigidRegistrationOptimizerGUIBase
 {
-
 public:
-
-  QmitkOnePlusOneEvolutionaryOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkOnePlusOneEvolutionaryOptimizerView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkOnePlusOneEvolutionaryOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;
@@ -49,14 +48,12 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
 protected:
-
   Ui::QmitkOnePlusOneEvolutionaryOptimizerControls m_Controls;
 
   int m_NumberTransformParameters;
-
 };
 
 #endif

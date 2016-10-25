@@ -17,11 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkBSplineRegistrationViewWidgetHIncluded
 #define QmitkBSplineRegistrationViewWidgetHIncluded
 
-#include "mitkDataNode.h"
 #include "MitkDeformableRegistrationUIExports.h"
-#include "ui_QmitkBSplineRegistrationViewControls.h"
+#include "mitkDataNode.h"
 #include "mitkOptimizerParameters.h"
-
+#include "ui_QmitkBSplineRegistrationViewControls.h"
 
 /*!
 * \brief Widget for deformable demons registration
@@ -33,30 +32,23 @@ class MITKDEFORMABLEREGISTRATIONUI_EXPORT QmitkBSplineRegistrationView : public 
   Q_OBJECT
 
 public:
-
-  QmitkBSplineRegistrationView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkBSplineRegistrationView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkBSplineRegistrationView();
 
   int GetNumberOfIterations();
   Ui::QmitkBSplineRegistrationViewControls m_Controls;
 
-  void SetFixedNode( mitk::DataNode * fixedNode );
-  void SetMovingNode( mitk::DataNode * movingNode );
-
-
-
+  void SetFixedNode(mitk::DataNode *fixedNode);
+  void SetMovingNode(mitk::DataNode *movingNode);
 
 public slots:
   void CalculateTransformation();
 
-
 protected slots:
- /*!
-   * Prints the values of the deformationfield
-   */
+  /*!
+    * Prints the values of the deformationfield
+    */
   void PrintDeformationField();
-
-
 
   /*!
    * Select a deformation field
@@ -66,13 +58,10 @@ protected slots:
   void OptimizerSelected(int optimizer);
   void HideAllOptimizerFrames();
 
-
 protected:
-
-  mitk::DataNode* m_FixedNode;
-  mitk::DataNode* m_MovingNode;
+  mitk::DataNode *m_FixedNode;
+  mitk::DataNode *m_MovingNode;
   mitk::OptimizerParameters::Pointer m_OptimizerParameters;
-
 
   void setOptimizerParameters();
 };

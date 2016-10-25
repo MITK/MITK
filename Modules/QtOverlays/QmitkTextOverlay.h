@@ -14,20 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKTEXTOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 #define MITKTEXTOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 
 // MITK
+#include "QmitkOverlay.h"
 #include "mitkCommon.h"
 #include "mitkPropertyList.h"
-#include "QmitkOverlay.h"
 
 // Qt
 #include <QLabel>
 
 #include <MitkQtOverlaysExports.h>
-
 
 /** \class  QmitkTextOverlay
 * \brief object representing a text that is drawn as an overlay
@@ -58,62 +56,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 * \ingroup Qmitk
 */
 
+class MITKQTOVERLAYS_EXPORT QmitkTextOverlay : public QmitkOverlay
+{
+public:
+  /**
+  * @brief Default Constructor
+  **/
+  QmitkTextOverlay(const char *id);
 
-  class MITKQTOVERLAYS_EXPORT QmitkTextOverlay : public QmitkOverlay
-  {
-  public:
+  /**
+  * @brief Default Destructor
+  **/
+  virtual ~QmitkTextOverlay();
 
-    /**
-    * @brief Default Constructor
-    **/
-    QmitkTextOverlay( const char* id );
+  /**
+  * \brief Setup the QLabel with overlay specific information
+  *
+  * First, this method sets text-overlay specific properties as described in the class docu above.
+  * Secondly, the actual text of the label is set.
+  *
+  * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay
+  * will show an empty string!
+  */
+  void GenerateData(mitk::PropertyList::Pointer) override;
 
-    /**
-    * @brief Default Destructor
-    **/
-    virtual ~QmitkTextOverlay();
+  QSize GetNeededSize() override;
 
-    /**
-    * \brief Setup the QLabel with overlay specific information
-    *
-    * First, this method sets text-overlay specific properties as described in the class docu above.
-    * Secondly, the actual text of the label is set.
-    *
-    * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay
-    * will show an empty string!
-    */
-    void GenerateData( mitk::PropertyList::Pointer ) override;
+protected:
+  /**
+  * \brief internal helper class to determine text-properties
+  *
+  * This method is only used internally to apply the font specific properties that can be set
+  * using a mitk::PropertyList. If a property cannot be found, a default value is used.
+  *
+  * The values of these properties are then attributed to the QLabel using QFont and QPalette.
+  */
+  void UpdateFontProperties(mitk::PropertyList::Pointer);
 
-    QSize GetNeededSize() override;
+  void SetupCallback(mitk::BaseProperty::Pointer prop);
 
+  void UpdateDisplayedTextFromProperties();
 
-  protected:
+  /** \brief QLabel internally representing the TextOverlay */
+  QLabel *m_Label;
 
-    /**
-    * \brief internal helper class to determine text-properties
-    *
-    * This method is only used internally to apply the font specific properties that can be set
-    * using a mitk::PropertyList. If a property cannot be found, a default value is used.
-    *
-    * The values of these properties are then attributed to the QLabel using QFont and QPalette.
-    */
-    void UpdateFontProperties( mitk::PropertyList::Pointer );
+  mitk::PropertyList::Pointer m_PropertyList;
 
-    void SetupCallback( mitk::BaseProperty::Pointer prop );
+  mitk::BaseProperty::Pointer m_ObservedProperty;
 
-    void UpdateDisplayedTextFromProperties();
-
-    /** \brief QLabel internally representing the TextOverlay */
-    QLabel* m_Label;
-
-    mitk::PropertyList::Pointer m_PropertyList;
-
-    mitk::BaseProperty::Pointer m_ObservedProperty;
-
-    unsigned long m_ObserverTag;
-  };
-
+  unsigned long m_ObserverTag;
+};
 
 #endif /* MITKTEXTOVERLAY_H_HEADER_INCLUDED_C10DC4EB */
-
-

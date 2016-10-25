@@ -17,14 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkPropertyDelegate_h
 #define QmitkPropertyDelegate_h
 
-
 /// Toolkit includes.
-#include <QStyledItemDelegate>
 #include "mitkBaseProperty.h"
+#include <QStyledItemDelegate>
 
-//MITK
+// MITK
 #include "MitkMatchPointRegistrationUIExports.h"
-
 
 /// Forward declarations.
 
@@ -37,53 +35,48 @@ class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapPropertyDelegate : public QSty
 {
   Q_OBJECT
 
-  public:
-    ///
-    /// Creates a new PropertyDelegate.
-    ///
-    QmitkMapPropertyDelegate(QObject *parent = 0);
+public:
+  ///
+  /// Creates a new PropertyDelegate.
+  ///
+  QmitkMapPropertyDelegate(QObject *parent = 0);
 
-    ///
-    /// Renders a specific property  (overwritten from QItemDelegate)
-    ///
-    void paint(QPainter *painter, const QStyleOptionViewItem &option
-      , const QModelIndex &index) const;
+  ///
+  /// Renders a specific property  (overwritten from QItemDelegate)
+  ///
+  void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    ///
-    /// Create an editor for a specific property  (overwritten from QItemDelegate)
-    ///
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option
-      , const QModelIndex &index) const;
+  ///
+  /// Create an editor for a specific property  (overwritten from QItemDelegate)
+  ///
+  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    ///
-    /// Create an editor for a specific property  (overwritten from QItemDelegate)
-    ///
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+  ///
+  /// Create an editor for a specific property  (overwritten from QItemDelegate)
+  ///
+  void setEditorData(QWidget *editor, const QModelIndex &index) const;
 
-    ///
-    /// When the user accepts input this func commits the data to the model  (overwritten from QItemDelegate)
-    ///
-    void setModelData(QWidget *editor, QAbstractItemModel* model
-      , const QModelIndex &index) const;
+  ///
+  /// When the user accepts input this func commits the data to the model  (overwritten from QItemDelegate)
+  ///
+  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
-    ///
-    /// \brief Fit an editor to some geometry (overwritten from QItemDelegate)
-    ///
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+  ///
+  /// \brief Fit an editor to some geometry (overwritten from QItemDelegate)
+  ///
+  void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-  protected:
+protected:
+  bool eventFilter(QObject *o, QEvent *e);
 
-    bool eventFilter( QObject *o, QEvent *e );
-
-  private slots:
-    ///
-    /// Invoked when the user accepts editor input, that is when he does not pushes ESC.
-    ///
-    void commitAndCloseEditor();
-    void showColorDialog();
-    void ComboBoxCurrentIndexChanged ( int index ) ;
-    void SpinBoxValueChanged ( const QString& value ) ;
-
+private slots:
+  ///
+  /// Invoked when the user accepts editor input, that is when he does not pushes ESC.
+  ///
+  void commitAndCloseEditor();
+  void showColorDialog();
+  void ComboBoxCurrentIndexChanged(int index);
+  void SpinBoxValueChanged(const QString &value);
 };
 
 #endif /* QMITKPROPERTIESTABLEMODEL_H_ */

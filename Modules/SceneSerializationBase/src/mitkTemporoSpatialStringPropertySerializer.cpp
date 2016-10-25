@@ -23,41 +23,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class TemporoSpatialStringPropertySerializer : public BasePropertySerializer
-{
+  class TemporoSpatialStringPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(TemporoSpatialStringPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( TemporoSpatialStringPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const TemporoSpatialStringProperty* prop = dynamic_cast<const TemporoSpatialStringProperty*>(m_Property.GetPointer()))
+      if (const TemporoSpatialStringProperty *prop =
+            dynamic_cast<const TemporoSpatialStringProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("temporo_spatial_string");
+        auto element = new TiXmlElement("temporo_spatial_string");
         std::string content = PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(prop);
         TiXmlText text(content.c_str());
         element->InsertEndChild(text);
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
-      const char* s( element->GetText() );
+      if (!element)
+        return nullptr;
+      const char *s(element->GetText());
       std::string content = s ? s : "";
       return PropertyPersistenceDeserialization::deserializeJSONToTemporoSpatialStringProperty(content);
     }
 
   protected:
-
     TemporoSpatialStringPropertySerializer() {}
     virtual ~TemporoSpatialStringPropertySerializer() {}
-};
+  };
 
 } // namespace
 

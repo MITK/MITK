@@ -21,16 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 class _BoolPropertyWidgetImpl : public mitk::PropertyEditor
 {
 public:
-
-  _BoolPropertyWidgetImpl(mitk::BoolProperty* property, QCheckBox* checkBox)
+  _BoolPropertyWidgetImpl(mitk::BoolProperty *property, QCheckBox *checkBox)
     : PropertyEditor(property), m_BoolProperty(property), m_CheckBox(checkBox)
   {
   }
 
   virtual void PropertyChanged() override
   {
-    if ( m_Property )
-      m_CheckBox->setChecked( m_BoolProperty->GetValue() );
+    if (m_Property)
+      m_CheckBox->setChecked(m_BoolProperty->GetValue());
   }
 
   virtual void PropertyRemoved() override
@@ -47,30 +46,27 @@ public:
 
   void ValueChanged(bool value)
   {
-    this->BeginModifyProperty();  // deregister from events
+    this->BeginModifyProperty(); // deregister from events
     m_BoolProperty->SetValue(value);
-    this->EndModifyProperty();  // again register for events
+    this->EndModifyProperty(); // again register for events
   }
 
 protected:
-
-  mitk::BoolProperty* m_BoolProperty;
-  QCheckBox* m_CheckBox;
-
+  mitk::BoolProperty *m_BoolProperty;
+  QCheckBox *m_CheckBox;
 };
 
-QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(QWidget* parent )
-  : QCheckBox(parent), m_PropEditorImpl(nullptr)
+QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(QWidget *parent) : QCheckBox(parent), m_PropEditorImpl(nullptr)
 {
   setEnabled(false);
 
   connect(this, SIGNAL(toggled(bool)), this, SLOT(onToggle(bool)));
 }
 
-QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(const QString& text, QWidget* parent )
-: QCheckBox(text, parent ), m_PropEditorImpl(nullptr)
+QmitkBoolPropertyWidget::QmitkBoolPropertyWidget(const QString &text, QWidget *parent)
+  : QCheckBox(text, parent), m_PropEditorImpl(nullptr)
 {
-  setEnabled( false );
+  setEnabled(false);
 
   connect(this, SIGNAL(toggled(bool)), this, SLOT(onToggle(bool)));
 }
@@ -80,7 +76,7 @@ QmitkBoolPropertyWidget::~QmitkBoolPropertyWidget()
   delete m_PropEditorImpl;
 }
 
-void QmitkBoolPropertyWidget::SetProperty(mitk::BoolProperty* property)
+void QmitkBoolPropertyWidget::SetProperty(mitk::BoolProperty *property)
 {
   if (m_PropEditorImpl)
   {
@@ -108,4 +104,3 @@ void QmitkBoolPropertyWidget::onToggle(bool on)
     m_PropEditorImpl->ValueChanged(on);
   }
 }
-

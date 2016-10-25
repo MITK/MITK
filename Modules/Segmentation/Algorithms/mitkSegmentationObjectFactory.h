@@ -20,28 +20,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCoreObjectFactoryBase.h"
 #include <MitkSegmentationExports.h>
 
-namespace mitk {
-
+namespace mitk
+{
   class MITKSEGMENTATION_EXPORT SegmentationObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(SegmentationObjectFactory,CoreObjectFactoryBase);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(mitk::DataNode* node) override;
-    virtual const char* GetFileExtensions() override;
+    mitkClassMacro(SegmentationObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual Mapper::Pointer
+      CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    virtual void SetDefaultProperties(mitk::DataNode *node) override;
+    virtual const char *GetFileExtensions() override;
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    virtual const char* GetSaveFileExtensions() override;
+    virtual const char *GetSaveFileExtensions() override;
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
     void RegisterIOFactories();
+
   protected:
     SegmentationObjectFactory();
     void CreateFileExtensionsMap();
     MultimapType m_FileExtensionsMap;
     MultimapType m_SaveFileExtensionsMap;
   };
-
 }
 
 #endif

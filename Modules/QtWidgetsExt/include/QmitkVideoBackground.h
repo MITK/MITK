@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _Qmitk_Video_Background_h_
 
 // MITK
-#include "mitkVideoSource.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "mitkVideoSource.h"
 
 // Qt
 #include <QObject>
@@ -51,7 +51,7 @@ public:
   /// default ctor, TimerDelay is 40 by default
   /// you must SetVideoSource() and AddRenderWindow() afterwards
   ///
-  explicit QmitkVideoBackground(QObject* parent = nullptr);
+  explicit QmitkVideoBackground(QObject *parent = nullptr);
   ///
   /// constructs a video background with the given video source
   /// no parent is set here, dont forget to delete the object or
@@ -59,7 +59,7 @@ public:
   /// TimerDelay = refresh rate of video in ms (25 ms = 40 Hz).
   /// you must call AddRenderWindow() afterwards
   ///
-  explicit QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay = 25);
+  explicit QmitkVideoBackground(mitk::VideoSource *v, int TimerDelay = 25);
   ///
   /// disables all video backgrounds
   ///
@@ -75,16 +75,16 @@ public:
   /// on the video source will be called to get the first frame and
   /// the corresponding size*
   ///
-  void AddRenderWindow(vtkRenderWindow* renderWindow);
+  void AddRenderWindow(vtkRenderWindow *renderWindow);
   ///
   /// \brief removes a renderwindow = disables video background there
   ///
-  void RemoveRenderWindow(vtkRenderWindow* renderWindow);
+  void RemoveRenderWindow(vtkRenderWindow *renderWindow);
   ///
   /// \return true if "renderWindow" is currently connected to the video
   /// background or not
   ///
-  bool IsRenderWindowIncluded(vtkRenderWindow* renderWindow);
+  bool IsRenderWindowIncluded(vtkRenderWindow *renderWindow);
 
   ///
   /// \brief sets the update rate of the video in milli seconds, by default 25.
@@ -106,7 +106,7 @@ public:
   ///
   /// Returns the videosource attached to this background
   ///
-  mitk::VideoSource* GetVideoSource();
+  mitk::VideoSource *GetVideoSource();
   ///
   /// Returns the timer delay
   ///
@@ -124,32 +124,31 @@ public:
   /// sets a *new* video source (if previously enabled, this will stop
   /// the video background if it was previously enabled
   ///
-  void SetVideoSource(mitk::VideoSource* videoSource);
+  void SetVideoSource(mitk::VideoSource *videoSource);
 
   ///
   /// receive renderwindow delete events
   ///
-  static void OnRenderWindowDelete(vtkObject*, unsigned long eid , void* clientdata, void* /*calldata*/);
+  static void OnRenderWindowDelete(vtkObject *, unsigned long eid, void *clientdata, void * /*calldata*/);
 
   ///
   /// receive VideoSource delete event
   ///
-  void OnVideoSourceDelete(const itk::Object* caller
-    , const itk::EventObject &event);
-  public slots:
-    ///
-    /// update all video backgrounds. (called by the timer or manually
-    /// by the user)
-    ///
-    void UpdateVideo();
-  signals:
-    ///
-    /// emitted after all video backgrounds are filled with the new
-    /// video frame
-    ///
-    void NewFrameAvailable(mitk::VideoSource*);
+  void OnVideoSourceDelete(const itk::Object *caller, const itk::EventObject &event);
+public slots:
+  ///
+  /// update all video backgrounds. (called by the timer or manually
+  /// by the user)
+  ///
+  void UpdateVideo();
+signals:
+  ///
+  /// emitted after all video backgrounds are filled with the new
+  /// video frame
+  ///
+  void NewFrameAvailable(mitk::VideoSource *);
 
-    void EndOfVideoSourceReached(mitk::VideoSource*);
+  void EndOfVideoSourceReached(mitk::VideoSource *);
 
 protected:
   ///
@@ -158,17 +157,17 @@ protected:
   ///
   struct VideoBackgroundVectorInfo
   {
-    vtkRenderWindow*  renWin;
-    vtkRenderer*      videoRenderer;
-    vtkImageActor*    videoActor;
-    vtkImageImport*   videoImport;
+    vtkRenderWindow *renWin;
+    vtkRenderer *videoRenderer;
+    vtkImageActor *videoActor;
+    vtkImageImport *videoImport;
     unsigned long renderWindowObserverTag;
   };
 
   ///
   /// removes the renderwindow and also removes the observer if the flag is set
   ///
-  void RemoveRenderWindow(vtkRenderWindow* renderWindow, bool removeObserver);
+  void RemoveRenderWindow(vtkRenderWindow *renderWindow, bool removeObserver);
   ///
   /// reset all video backgrounds
   ///
@@ -192,12 +191,12 @@ protected:
   ///
   /// calls updatevideo repeateadly for framegrabbing
   ///
-  QTimer* m_QTimer;
+  QTimer *m_QTimer;
 
   ///
   /// must implement GetVideoTexture() correctly (must return an OpenGL texture)
   ///
-  mitk::VideoSource* m_VideoSource;
+  mitk::VideoSource *m_VideoSource;
 
   ///
   /// the observer tag for the video source
@@ -206,4 +205,3 @@ protected:
 };
 
 #endif
-

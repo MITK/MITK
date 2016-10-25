@@ -18,38 +18,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _VTK_POINT_SET_XML_READER__H_
 
 #include <MitkLegacyIOExports.h>
-#include <mitkPointSet.h>
-#include <vtkXMLParser.h>
-#include <stack>
 #include <list>
+#include <mitkPointSet.h>
+#include <stack>
 #include <string>
-
+#include <vtkXMLParser.h>
 
 namespace mitk
 {
+  /**
+   * @brief Implementation of the vtkXMLParser interface for reading mitk::PointSets.
+   *
+   * This class implements the XMLParser interface of the vtkXMLParser which is based
+   * on expat. It is used by the mitk::PointSetReader and is NOT INTENDED TO BE USED
+   * FROM THE END-USER. If you want to read point sets, use the mitk::PointSetReader.
+   * @ingroup MitkLegacyIOModule
+   *
+   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   */
+  class DEPRECATED() MITKLEGACYIO_EXPORT vtkPointSetXMLParser : public vtkXMLParser
+  {
+  public:
+    vtkTypeMacro(vtkPointSetXMLParser, vtkXMLParser);
 
-/**
- * @brief Implementation of the vtkXMLParser interface for reading mitk::PointSets.
- *
- * This class implements the XMLParser interface of the vtkXMLParser which is based
- * on expat. It is used by the mitk::PointSetReader and is NOT INTENDED TO BE USED
- * FROM THE END-USER. If you want to read point sets, use the mitk::PointSetReader.
- * @ingroup MitkLegacyIOModule
- *
- * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
- */
-class DEPRECATED() MITKLEGACYIO_EXPORT vtkPointSetXMLParser : public vtkXMLParser
-{
-public:
-    vtkTypeMacro(vtkPointSetXMLParser,vtkXMLParser);
-
-    static vtkPointSetXMLParser* New();
+    static vtkPointSetXMLParser *New();
 
     typedef mitk::PointSet PointSetType;
 
-    typedef std::stack< std::string > ParseStack;
+    typedef std::stack<std::string> ParseStack;
 
-    typedef std::list< PointSetType::Pointer > PointSetList;
+    typedef std::list<PointSetType::Pointer> PointSetList;
 
     typedef PointSetType::DataType::PointIdentifier PointIdentifier;
 
@@ -61,13 +59,13 @@ public:
      * Handler function which is called, when a new xml start-tag
      * has been parsed.
      */
-    virtual void StartElement (const char *name, const char **atts) override;
+    virtual void StartElement(const char *name, const char **atts) override;
 
     /**
      * Handler function which is called, when a xml end-tag
      * has been parsed.
      */
-    virtual void EndElement (const char *name) override;
+    virtual void EndElement(const char *name) override;
 
     /**
      * Handler function which is called, if characted data has been
@@ -75,7 +73,7 @@ public:
      * @param inData a char array containing the parsed string data
      * @param inLength the length of the parsed data string.
      */
-    virtual void CharacterDataHandler (const char *inData, int inLength) override;
+    virtual void CharacterDataHandler(const char *inData, int inLength) override;
 
     /**
      * Converts the given data to mitk::ScalarType.
@@ -93,7 +91,7 @@ public:
      */
     virtual PointSetList GetParsedPointSets();
 
-protected:
+  protected:
     vtkPointSetXMLParser();
     virtual ~vtkPointSetXMLParser();
 
@@ -133,7 +131,6 @@ protected:
     PointIdentifier m_CurrentPointId;
 
     std::locale m_PreviousLocale;
-
-};
+  };
 }
 #endif // _VTK_POINT_SET_XML_READER__H_

@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKOPTIMIZERFACTORY_H
 #define MITKOPTIMIZERFACTORY_H
 
-#include "itkSingleValuedNonLinearOptimizer.h"
 #include "MitkRigidRegistrationExports.h"
+#include "itkSingleValuedNonLinearOptimizer.h"
 #include "mitkOptimizerParameters.h"
 
-namespace mitk {
-
+namespace mitk
+{
   /*!
   \brief This class creates an optimizer for a rigid registration process.
 
@@ -44,12 +44,10 @@ namespace mitk {
   class MITKRIGIDREGISTRATION_EXPORT OptimizerFactory : public ::itk::Object
   {
   public:
-
     mitkClassMacroItkParent(OptimizerFactory, itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
+      typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
 
     /**
     \brief Returns the optimizer which then can be used in combination with a transform, a metric
@@ -73,13 +71,8 @@ namespace mitk {
     /**
     \brief Returns the instance to the optimizer parameters class which holds all parameters for the new optimizer.
     */
-    OptimizerParameters::Pointer GetOptimizerParameters()
-    {
-      return m_OptimizerParameters;
-    }
-
+    OptimizerParameters::Pointer GetOptimizerParameters() { return m_OptimizerParameters; }
   protected:
-
     OptimizerFactory();
     ~OptimizerFactory();
 

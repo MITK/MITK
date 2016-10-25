@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKCUSTOMVARIANTS_H_
 #define QMITKCUSTOMVARIANTS_H_
 
@@ -23,6 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 typedef mitk::DataNode::Pointer mitkDataNodePtr;
 
 Q_DECLARE_METATYPE(mitkDataNodePtr)
-Q_DECLARE_METATYPE(mitk::DataNode*)
+Q_DECLARE_METATYPE(mitk::DataNode *)
 
 #endif /* QMITKCUSTOMVARIANTS_H_ */

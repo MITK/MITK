@@ -32,42 +32,36 @@ class QmitkSurfaceUtilities : public QmitkAbstractView
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
-  public:
+public:
+  static const std::string VIEW_ID;
 
-    static const std::string VIEW_ID;
+  QmitkSurfaceUtilities();
+  ~QmitkSurfaceUtilities();
 
-    QmitkSurfaceUtilities();
-    ~QmitkSurfaceUtilities();
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+  void SetFocus() override;
 
-    void SetFocus() override;
+protected slots:
 
-  protected slots:
+  void OnEulerToMatrixClicked();
+  void OnMoveToOriginClicked();
+  void OnApplyTransformClicked();
+  void OnComputeCoG();
+  void OnGenerateTargetPoints();
+  void OnPerturbeSurface();
+  void OnAddOutliers();
 
-    void OnEulerToMatrixClicked();
-    void OnMoveToOriginClicked();
-    void OnApplyTransformClicked();
-    void OnComputeCoG();
-    void OnGenerateTargetPoints();
-    void OnPerturbeSurface();
-    void OnAddOutliers();
+protected:
+  // methods to read in / write from / to GUI
+  itk::Matrix<double, 3, 3> ReadInFromGUI_RotationMatrix();
+  itk::Vector<double, 3> ReadInFromGUI_TranslationVector();
+  void WriteToGUI_RotationMatrix(itk::Matrix<double, 3, 3> r);
+  void WriteToGUI_TranslationVector(itk::Vector<double, 3> t);
 
+  /** @brief Converts euler angles (in degrees!) to a rotation matrix. */
+  itk::Matrix<double, 3, 3> ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma);
 
-  protected:
-
-
-    //methods to read in / write from / to GUI
-    itk::Matrix<double,3,3> ReadInFromGUI_RotationMatrix();
-    itk::Vector<double,3> ReadInFromGUI_TranslationVector();
-    void WriteToGUI_RotationMatrix(itk::Matrix<double,3,3> r);
-    void WriteToGUI_TranslationVector(itk::Vector<double,3> t);
-
-    /** @brief Converts euler angles (in degrees!) to a rotation matrix. */
-    itk::Matrix<double,3,3> ConvertEulerAnglesToRotationMatrix(double alpha, double beta, double gamma);
-
-
-    Ui::QmitkSurfaceUtilitiesControls m_Controls;
-
+  Ui::QmitkSurfaceUtilitiesControls m_Controls;
 };
 #endif // !defined(QMITK_ISOSURFACE_H__INCLUDED)

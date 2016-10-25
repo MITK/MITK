@@ -26,12 +26,12 @@ const QString QmitkMimeTypes::DataStorageTreeItemPtrs = "application/x-qmitk-dat
 QList<mitk::DataNode *> QmitkMimeTypes::ToDataNodePtrList(const QByteArray &ba)
 {
   QDataStream ds(ba);
-  QList<mitk::DataNode*> result;
-  while(!ds.atEnd())
+  QList<mitk::DataNode *> result;
+  while (!ds.atEnd())
   {
     quintptr dataNodePtr;
     ds >> dataNodePtr;
-    result.push_back(reinterpret_cast<mitk::DataNode*>(dataNodePtr));
+    result.push_back(reinterpret_cast<mitk::DataNode *>(dataNodePtr));
   }
   return result;
 }
@@ -40,7 +40,7 @@ QList<mitk::DataNode *> QmitkMimeTypes::ToDataNodePtrList(const QMimeData *mimeD
 {
   if (mimeData == nullptr || !mimeData->hasFormat(QmitkMimeTypes::DataNodePtrs))
   {
-    return QList<mitk::DataNode*>();
+    return QList<mitk::DataNode *>();
   }
   return ToDataNodePtrList(mimeData->data(QmitkMimeTypes::DataNodePtrs));
 }

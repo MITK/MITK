@@ -14,20 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
-#include "mitkTestingMacros.h"
+// MITK
 #include "mitkRenderingTestHelper.h"
+#include "mitkTestingMacros.h"
 #include <mitkOverlayManager.h>
 #include <mitkPointSet.h>
 
-//VTK
-#include <vtkRegressionTestImage.h>
-#include "mitkTextOverlay2D.h"
-#include "mitkOverlay2DLayouter.h"
+// VTK
 #include "mitkLabelOverlay3D.h"
+#include "mitkOverlay2DLayouter.h"
+#include "mitkTextOverlay2D.h"
+#include <vtkRegressionTestImage.h>
 
-
-int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
+int mitkLabelOverlay3DRendering3DTest(int argc, char *argv[])
 {
   // load all arguments into a datastorage, take last argument as reference rendering
   // setup a renderwindow of fixed size X*Y
@@ -36,12 +35,12 @@ int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
   MITK_TEST_BEGIN("mitkLabelOverlay3DRendering3DTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
-//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
+  //  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   renderingHelper.SetMapperIDToRender3D();
-//  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
+  //  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
+  mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
   mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
   renderer->SetOverlayManager(OverlayManager);
 
@@ -53,12 +52,14 @@ int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
   offset[2] = .5;
   std::vector<std::string> labels;
   int idx = 0;
-  for(int i=-10 ; i < 10 ; i+=2){
-    for(int j=-10 ; j < 10 ; j+=2){
+  for (int i = -10; i < 10; i += 2)
+  {
+    for (int j = -10; j < 10; j += 2)
+    {
       mitk::Point3D point;
       point[0] = i;
       point[1] = j;
-      point[2] = (i*j)/10-30;
+      point[2] = (i * j) / 10 - 30;
       ps->InsertPoint(idx++, point);
       labels.push_back("test");
     }
@@ -77,16 +78,16 @@ int mitkLabelOverlay3DRendering3DTest(int argc, char* argv[])
   renderingHelper.Render();
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
-  MITK_TEST_CONDITION( renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true, "CompareRenderWindowAgainstReference test result positive?" );
+  MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,
+                      "CompareRenderWindowAgainstReference test result positive?");
 
-  //use this to generate a reference screenshot or save the file:
+  // use this to generate a reference screenshot or save the file:
   bool generateReferenceScreenshot = false;
-  if(generateReferenceScreenshot)
+  if (generateReferenceScreenshot)
   {
-    renderingHelper.SaveReferenceScreenShot("/home/christoph/Pictures/RenderingTestData/mitkLabelOverlay3DRendering3DTest.png");
+    renderingHelper.SaveReferenceScreenShot(
+      "/home/christoph/Pictures/RenderingTestData/mitkLabelOverlay3DRendering3DTest.png");
   }
-
 
   MITK_TEST_END();
 }
-

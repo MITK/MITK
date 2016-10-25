@@ -20,37 +20,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace itk
 {
-
-  template<class TInputImageType>
-  void
-    ShortestPathCostFunction<TInputImageType>
-    ::PrintSelf( std::ostream& os, Indent indent ) const
+  template <class TInputImageType>
+  void ShortestPathCostFunction<TInputImageType>::PrintSelf(std::ostream &os, Indent indent) const
   {
-    Superclass::PrintSelf(os,indent);
+    Superclass::PrintSelf(os, indent);
   }
 
-
   template <class TInputImageType>
-  void ShortestPathCostFunction<TInputImageType>::
-    SetStartIndex (const typename TInputImageType::IndexType &index)
+  void ShortestPathCostFunction<TInputImageType>::SetStartIndex(const typename TInputImageType::IndexType &index)
   {
-    for (unsigned int i=0;i<TInputImageType::ImageDimension;++i)
+    for (unsigned int i = 0; i < TInputImageType::ImageDimension; ++i)
     {
       m_StartIndex[i] = index[i];
     }
   }
 
-
   template <class TInputImageType>
-  void ShortestPathCostFunction<TInputImageType>::
-    SetEndIndex (const typename TInputImageType::IndexType &index)
+  void ShortestPathCostFunction<TInputImageType>::SetEndIndex(const typename TInputImageType::IndexType &index)
   {
-    for (unsigned int i=0;i<TInputImageType::ImageDimension;++i)
+    for (unsigned int i = 0; i < TInputImageType::ImageDimension; ++i)
     {
       m_EndIndex[i] = index[i];
     }
   }
-
 
 } // end namespace itk
 

@@ -1,9 +1,8 @@
 #include "QmitkConfirmSegmentationDialog.h"
 #include "ui_QmitkConfirmSegmentationDialog.h"
 
-QmitkConfirmSegmentationDialog::QmitkConfirmSegmentationDialog(QWidget *parent) :
-  QDialog(parent),
-  m_Controls(new Ui::QmitkConfirmSegmentationDialog)
+QmitkConfirmSegmentationDialog::QmitkConfirmSegmentationDialog(QWidget *parent)
+  : QDialog(parent), m_Controls(new Ui::QmitkConfirmSegmentationDialog)
 {
   m_Controls->setupUi(this);
 
@@ -34,6 +33,6 @@ void QmitkConfirmSegmentationDialog::OnCancelSegmentation()
 
 void QmitkConfirmSegmentationDialog::SetSegmentationName(QString name)
 {
-  QString text ("Do you really want to overwrite "+name+"?");
+  QString text("Do you really want to overwrite " + name + "?");
   m_Controls->m_lblDialogText->setText(text);
 }

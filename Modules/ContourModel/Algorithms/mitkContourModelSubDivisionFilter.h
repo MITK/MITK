@@ -18,13 +18,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelSubDivisionFilter_h__
 
 #include "mitkCommon.h"
-#include <MitkContourModelExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
+#include <MitkContourModelExports.h>
 
-
-namespace mitk {
-
+namespace mitk
+{
   /**
   *
   * \brief This filter interpolates a subdivision curve between control points of the contour.
@@ -39,15 +38,11 @@ namespace mitk {
   */
   class MITKCONTOURMODEL_EXPORT ContourModelSubDivisionFilter : public ContourModelSource
   {
-
   public:
-
     mitkClassMacro(ContourModelSubDivisionFilter, ContourModelSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-
-    typedef ContourModel OutputType;
+      typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::ContourModel InputType;
 
@@ -55,33 +50,28 @@ namespace mitk {
     * \brief Set the number of iterations for inserting new interpolated control points.
     *
     */
-    void SetNumberOfIterations( int iterations)
-    {
-      this->m_InterpolationIterations = iterations;
-    }
-
+    void SetNumberOfIterations(int iterations) { this->m_InterpolationIterations = iterations; }
     using Superclass::SetInput;
 
-    virtual void SetInput( const InputType *input);
+    virtual void SetInput(const InputType *input);
 
-    virtual void SetInput( unsigned int idx, const InputType * input);
+    virtual void SetInput(unsigned int idx, const InputType *input);
 
-    const InputType* GetInput(void);
+    const InputType *GetInput(void);
 
-    const InputType* GetInput(unsigned int idx);
+    const InputType *GetInput(unsigned int idx);
 
   protected:
     ContourModelSubDivisionFilter();
 
     virtual ~ContourModelSubDivisionFilter();
 
-    void GenerateOutputInformation() override {};
+    void GenerateOutputInformation() override{};
 
     void GenerateData() override;
 
     int m_InterpolationIterations;
   };
-
 }
 
 #endif

@@ -19,40 +19,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkLegacyGLExports.h"
 
-#include <vtkSmartPointer.h>
-#include <vtkProp.h>
 #include "mitkGLMapper.h"
+#include <vtkProp.h>
+#include <vtkSmartPointer.h>
 
 /**
  * @brief The vtkGLMapperProp class is a VtkProp, wrapping a GLMapper
  */
 class MITKLEGACYGL_EXPORT vtkGLMapperProp : public vtkProp
 {
-  public:
-    static vtkGLMapperProp* New();
-    vtkTypeMacro(vtkGLMapperProp,vtkProp);
+public:
+  static vtkGLMapperProp *New();
+  vtkTypeMacro(vtkGLMapperProp, vtkProp);
 
-    /**
-     * @brief RenderOverlay Calls the render method of the actor and renders it.
-     * @param viewport viewport of the renderwindow.
-     * @return
-     */
-    int RenderOverlay(vtkViewport* viewport) override;
-    int RenderVolumetricGeometry(vtkViewport *) override;
-    int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
-    int RenderOpaqueGeometry(vtkViewport *) override;
+  /**
+   * @brief RenderOverlay Calls the render method of the actor and renders it.
+   * @param viewport viewport of the renderwindow.
+   * @return
+   */
+  int RenderOverlay(vtkViewport *viewport) override;
+  int RenderVolumetricGeometry(vtkViewport *) override;
+  int RenderTranslucentPolygonalGeometry(vtkViewport *) override;
+  int RenderOpaqueGeometry(vtkViewport *) override;
 
-    const mitk::GLMapper *GetWrappedGLMapper() const;
-    void SetWrappedGLMapper(mitk::GLMapper *glMapper);
+  const mitk::GLMapper *GetWrappedGLMapper() const;
+  void SetWrappedGLMapper(mitk::GLMapper *glMapper);
 
-    void SetBaseRenderer(mitk::BaseRenderer* baseRenderer);
+  void SetBaseRenderer(mitk::BaseRenderer *baseRenderer);
+
 protected:
+  vtkGLMapperProp();
+  virtual ~vtkGLMapperProp();
 
-    vtkGLMapperProp();
-    virtual ~vtkGLMapperProp();
-
-    mitk::GLMapper* m_WrappedGLMapper;
-    mitk::BaseRenderer* m_BaseRenderer;
-
+  mitk::GLMapper *m_WrappedGLMapper;
+  mitk::BaseRenderer *m_BaseRenderer;
 };
 #endif /* vtkGLMapperProp2_h */

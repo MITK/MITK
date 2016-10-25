@@ -3,8 +3,9 @@
 
 #include <QDialog>
 
-namespace Ui {
-class QmitkConfirmSegmentationDialog;
+namespace Ui
+{
+  class QmitkConfirmSegmentationDialog;
 }
 
 class QmitkConfirmSegmentationDialog : public QDialog
@@ -19,7 +20,9 @@ public:
 
   enum
   {
-    OVERWRITE_SEGMENTATION, CREATE_NEW_SEGMENTATION, CANCEL_SEGMENTATION
+    OVERWRITE_SEGMENTATION,
+    CREATE_NEW_SEGMENTATION,
+    CANCEL_SEGMENTATION
   };
 
 protected slots:
@@ -31,7 +34,6 @@ protected slots:
   void OnCancelSegmentation();
 
 private:
-
   Ui::QmitkConfirmSegmentationDialog *m_Controls;
 };
 

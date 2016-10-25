@@ -30,25 +30,20 @@ class mitkImageToUnstructuredGridFilterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /** Members used inside the different test methods. All members are initialized via setUp().*/
   mitk::Image::Pointer m_BallImage;
 
 public:
-
   /**
-   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
+   * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp() override
-  {
-    m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd"));
-  }
-
+  void setUp() override { m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
   void testImageToUnstructuredGridFilterInitialization()
   {
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
     CPPUNIT_ASSERT_MESSAGE("Testing instantiation of test object", testFilter.IsNotNull());
-    CPPUNIT_ASSERT_MESSAGE("Testing initialization of threshold member variable",testFilter->GetThreshold() == -0.1);
+    CPPUNIT_ASSERT_MESSAGE("Testing initialization of threshold member variable", testFilter->GetThreshold() == -0.1);
   }
 
   void testInput()
@@ -83,7 +78,6 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Testing Threshold", numberOfPoints1 > numberOfPoints2);
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkImageToUnstructuredGridFilter)

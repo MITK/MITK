@@ -17,17 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRegistrationBase.h"
 #include "mitkProgressBar.h"
 
-namespace mitk {
-
-  RegistrationBase::RegistrationBase()
-  {
-    m_ReferenceImage = Image::New();
-  }
-
-  RegistrationBase::~RegistrationBase()
-  {
-  }
-
+namespace mitk
+{
+  RegistrationBase::RegistrationBase() { m_ReferenceImage = Image::New(); }
+  RegistrationBase::~RegistrationBase() {}
   void RegistrationBase::SetReferenceImage(Image::Pointer fixedImage)
   {
     m_ReferenceImage = fixedImage;
@@ -35,19 +28,12 @@ namespace mitk {
     Modified();
   }
 
-  void RegistrationBase::SetProgress(const itk::EventObject& )
+  void RegistrationBase::SetProgress(const itk::EventObject &)
   {
     ProgressBar::GetInstance()->AddStepsToDo(1);
     ProgressBar::GetInstance()->Progress();
   }
 
-  void RegistrationBase::AddStepsToDo(int steps)
-  {
-    ProgressBar::GetInstance()->AddStepsToDo(steps);
-  }
-
-  void RegistrationBase::SetRemainingProgress(int steps)
-  {
-    ProgressBar::GetInstance()->Progress(steps);
-  }
+  void RegistrationBase::AddStepsToDo(int steps) { ProgressBar::GetInstance()->AddStepsToDo(steps); }
+  void RegistrationBase::SetRemainingProgress(int steps) { ProgressBar::GetInstance()->Progress(steps); }
 }

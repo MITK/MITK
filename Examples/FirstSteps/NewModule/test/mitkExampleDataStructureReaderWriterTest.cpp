@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // Testing
-#include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
 
 // std includes
 #include <string>
@@ -37,14 +37,13 @@ class mitkExampleDataStructureReaderWriterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   mitk::ExampleDataStructure::Pointer m_Data;
   std::string m_DefaultDataString;
 
 public:
-
   /**
-  * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+  * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
+  * members for a new test case. (If the members are not used in a test, the method does not need to be called).
   */
   void setUp() override
   {
@@ -63,11 +62,13 @@ public:
   {
     std::string path = mitk::IOUtil::GetTempPath() + "ExampleDataOutput.txt";
     mitk::IOUtil::SaveBaseData(m_Data, path);
-    mitk::ExampleDataStructure::Pointer loadedData = dynamic_cast<mitk::ExampleDataStructure*>(mitk::IOUtil::LoadBaseData(path).GetPointer());
+    mitk::ExampleDataStructure::Pointer loadedData =
+      dynamic_cast<mitk::ExampleDataStructure *>(mitk::IOUtil::LoadBaseData(path).GetPointer());
 
     itksys::SystemTools::RemoveFile(path);
 
-    CPPUNIT_ASSERT_MESSAGE("Comparing created and loaded example data.", mitk::Equal(m_Data, loadedData, mitk::eps, true));
+    CPPUNIT_ASSERT_MESSAGE("Comparing created and loaded example data.",
+                           mitk::Equal(m_Data, loadedData, mitk::eps, true));
   }
 };
 

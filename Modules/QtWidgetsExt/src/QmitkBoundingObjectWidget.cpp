@@ -17,35 +17,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkBoundingObjectWidget.h"
 
 #include <mitkCone.h>
-#include <mitkCylinder.h>
 #include <mitkCuboid.h>
+#include <mitkCylinder.h>
 #include <mitkEllipsoid.h>
-#include <mitkNodePredicateProperty.h>
 #include <mitkLine.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkPlaneGeometry.h>
 
-#include <QPushButton>
-#include <QCheckBox>
 #include <QBoxLayout>
-#include <QStringList>
+#include <QCheckBox>
 #include <QInputDialog>
+#include <QPushButton>
+#include <QStringList>
 
 #include <mitkAffineBaseDataInteractor3D.h>
-//micro services
-#include <usModuleRegistry.h>
+// micro services
 #include <usGetModuleContext.h>
+#include <usModuleRegistry.h>
 
-QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::WindowFlags f ):QWidget( parent, f ),
-m_DataStorage(NULL),
-m_lastSelectedItem(NULL),
-m_lastAffineObserver(0),
-m_ItemNodeMap(),
-m_BoundingObjectCounter(1)
+QmitkBoundingObjectWidget::QmitkBoundingObjectWidget(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f),
+    m_DataStorage(NULL),
+    m_lastSelectedItem(NULL),
+    m_lastAffineObserver(0),
+    m_ItemNodeMap(),
+    m_BoundingObjectCounter(1)
 {
+  QBoxLayout *mainLayout = new QVBoxLayout(this);
 
-  QBoxLayout* mainLayout = new QVBoxLayout(this);
-
-  QHBoxLayout* buttonLayout = new QHBoxLayout();
+  QHBoxLayout *buttonLayout = new QHBoxLayout();
 
   QStringList boList;
   boList << tr("add") << tr("cube") << tr("cone") << tr("ellipse") << tr("cylinder");
@@ -60,7 +60,6 @@ m_BoundingObjectCounter(1)
 
   m_DelButton = new QPushButton("del");
   buttonLayout->addWidget(m_DelButton);
-
 
   m_SaveButton = new QPushButton("save");
   buttonLayout->addWidget(m_SaveButton);
@@ -84,27 +83,29 @@ m_BoundingObjectCounter(1)
   mainLayout->addWidget(m_TreeWidget);
   mainLayout->addLayout(buttonLayout);
 
-  connect( m_addComboBox , SIGNAL(currentIndexChanged(int)), this, SLOT(CreateBoundingObject(int)) );
-  connect( m_TreeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()) );
-  connect( m_DelButton, SIGNAL(clicked()), this, SLOT(OnDelButtonClicked()) );
+  connect(m_addComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(CreateBoundingObject(int)));
+  connect(m_TreeWidget, SIGNAL(itemSelectionChanged()), this, SLOT(SelectionChanged()));
+  connect(m_DelButton, SIGNAL(clicked()), this, SLOT(OnDelButtonClicked()));
 
-  connect(m_TreeWidget, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(OnItemDoubleClicked(QTreeWidgetItem*, int)) );
-  connect(m_TreeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(OnItemDataChanged(QTreeWidgetItem*, int)) );
-
+  connect(m_TreeWidget,
+          SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+          this,
+          SLOT(OnItemDoubleClicked(QTreeWidgetItem *, int)));
+  connect(
+    m_TreeWidget, SIGNAL(itemChanged(QTreeWidgetItem *, int)), this, SLOT(OnItemDataChanged(QTreeWidgetItem *, int)));
 }
 
 QmitkBoundingObjectWidget::~QmitkBoundingObjectWidget()
 {
-
 }
 
 void QmitkBoundingObjectWidget::setEnabled(bool flag)
 {
   ItemNodeMapType::iterator it = m_ItemNodeMap.begin();
-  while( it != m_ItemNodeMap.end())
+  while (it != m_ItemNodeMap.end())
   {
-    mitk::DataNode* node = it->second;
-    QTreeWidgetItem* item = it->first;
+    mitk::DataNode *node = it->second;
+    QTreeWidgetItem *item = it->first;
 
     if (flag)
       node->SetVisibility(item->checkState(2));
@@ -119,12 +120,11 @@ void QmitkBoundingObjectWidget::setEnabled(bool flag)
 
 void QmitkBoundingObjectWidget::SelectionChanged()
 {
-
-  QList<QTreeWidgetItem*> selectedItems = m_TreeWidget->selectedItems();
+  QList<QTreeWidgetItem *> selectedItems = m_TreeWidget->selectedItems();
   if (selectedItems.size() < 1)
     return;
 
-  QTreeWidgetItem* selectedItem = selectedItems.first();
+  QTreeWidgetItem *selectedItem = selectedItems.first();
 
   if (selectedItem == m_lastSelectedItem)
     return;
@@ -137,9 +137,9 @@ void QmitkBoundingObjectWidget::SelectionChanged()
 
     if (it != m_ItemNodeMap.end())
     {
-      mitk::DataNode* last_node = it->second;
+      mitk::DataNode *last_node = it->second;
 
-      //remove observer
+      // remove observer
       last_node->RemoveObserver(m_lastAffineObserver);
       last_node->SetDataInteractor(nullptr);
     }
@@ -149,7 +149,7 @@ void QmitkBoundingObjectWidget::SelectionChanged()
   if (it == m_ItemNodeMap.end())
     return;
 
-  mitk::DataNode* new_node = it->second;
+  mitk::DataNode *new_node = it->second;
 
   mitk::AffineBaseDataInteractor3D::Pointer affineDataInteractor = mitk::AffineBaseDataInteractor3D::New();
   affineDataInteractor->LoadStateMachine("AffineInteraction3D.xml", us::ModuleRegistry::GetModule("MitkDataTypesExt"));
@@ -157,34 +157,35 @@ void QmitkBoundingObjectWidget::SelectionChanged()
   affineDataInteractor->SetDataNode(new_node);
   new_node->SetBoolProperty("pickable", true);
 
-  //create observer for node
-  itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::New();
+  // create observer for node
+  itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::Pointer command =
+    itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::New();
   command->SetCallbackFunction(this, &QmitkBoundingObjectWidget::OnBoundingObjectModified);
   m_lastAffineObserver = new_node->AddObserver(mitk::AffineInteractionEvent(), command);
 
   m_lastSelectedItem = selectedItem;
 }
 
-void QmitkBoundingObjectWidget::AddItem(mitk::DataNode* node)
+void QmitkBoundingObjectWidget::AddItem(mitk::DataNode *node)
 {
-  mitk::BoundingObject* boundingObject;
+  mitk::BoundingObject *boundingObject;
 
-  boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
+  boundingObject = dynamic_cast<mitk::BoundingObject *>(node->GetData());
 
   std::string name;
   node->GetStringProperty("name", name);
 
   if (boundingObject)
   {
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setData(0, Qt::EditRole,  QString::fromLocal8Bit(name.c_str()));
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    item->setData(0, Qt::EditRole, QString::fromLocal8Bit(name.c_str()));
     item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
 
-    //checkbox for positive flag
+    // checkbox for positive flag
     item->setData(1, Qt::CheckStateRole, tr(""));
     item->setCheckState(1, Qt::Unchecked);
 
-    //checkbox for visibleflag
+    // checkbox for visibleflag
     item->setData(2, Qt::CheckStateRole, tr(""));
     item->setCheckState(2, Qt::Checked);
 
@@ -193,21 +194,19 @@ void QmitkBoundingObjectWidget::AddItem(mitk::DataNode* node)
     m_ItemNodeMap.insert(std::make_pair(item, node));
 
     m_TreeWidget->selectAll();
-    QList<QTreeWidgetItem*> items = m_TreeWidget->selectedItems();
-    for( int i = 0; i<items.size(); i++)
+    QList<QTreeWidgetItem *> items = m_TreeWidget->selectedItems();
+    for (int i = 0; i < items.size(); i++)
     {
       m_TreeWidget->setItemSelected(items.at(i), false);
     }
 
     m_TreeWidget->setItemSelected(item, true);
-
-
   }
   else
     MITK_ERROR << name << " is not a bounding object or does not exist in data storage" << endl;
 }
 
-void QmitkBoundingObjectWidget::OnItemDoubleClicked(QTreeWidgetItem* item, int col)
+void QmitkBoundingObjectWidget::OnItemDoubleClicked(QTreeWidgetItem *item, int col)
 {
   if (col == 0)
   {
@@ -224,38 +223,36 @@ void QmitkBoundingObjectWidget::OnItemDataChanged(QTreeWidgetItem *item, int col
   if (it == m_ItemNodeMap.end())
     return;
 
-  mitk::DataNode* node = it->second;
+  mitk::DataNode *node = it->second;
 
-  //name
+  // name
   if (col == 0)
   {
     m_TreeWidget->closePersistentEditor(item, col);
     node->SetName(item->text(0).toLocal8Bit().data());
   }
-  //positive
+  // positive
   else if (col == 1)
   {
-    mitk::BoundingObject* boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
+    mitk::BoundingObject *boundingObject = dynamic_cast<mitk::BoundingObject *>(node->GetData());
     if (boundingObject)
       boundingObject->SetPositive(!(item->checkState(1)));
     emit BoundingObjectsChanged();
   }
-  //visible
+  // visible
   else if (col == 2)
   {
     node->SetVisibility(item->checkState(2));
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
-
 }
 
 void QmitkBoundingObjectWidget::RemoveItem()
 {
-  //selection mode is set to single selection, so there should not be more than one selected item
-  QList <QTreeWidgetItem*> selectedItems = m_TreeWidget->selectedItems();
-  QTreeWidgetItem* item = selectedItems.first();
+  // selection mode is set to single selection, so there should not be more than one selected item
+  QList<QTreeWidgetItem *> selectedItems = m_TreeWidget->selectedItems();
+  QTreeWidgetItem *item = selectedItems.first();
   QString str = item->text(0);
 
   ItemNodeMapType::iterator it = m_ItemNodeMap.find(item);
@@ -263,15 +260,15 @@ void QmitkBoundingObjectWidget::RemoveItem()
   if (it == m_ItemNodeMap.end())
     return;
 
-  mitk::DataNode* node = it->second;
-  mitk::BoundingObject* boundingObject;
+  mitk::DataNode *node = it->second;
+  mitk::BoundingObject *boundingObject;
 
   if (node)
   {
-    boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
+    boundingObject = dynamic_cast<mitk::BoundingObject *>(node->GetData());
     if (boundingObject)
     {
-      //delete item;
+      // delete item;
       m_TreeWidget->takeTopLevelItem(m_TreeWidget->indexOfTopLevelItem(item));
       m_ItemNodeMap.erase(m_ItemNodeMap.find(item));
       m_DataStorage->Remove(node);
@@ -283,9 +280,9 @@ void QmitkBoundingObjectWidget::RemoveAllItems()
 {
   ItemNodeMapType::iterator it = m_ItemNodeMap.begin();
 
-  while( it != m_ItemNodeMap.end() )
+  while (it != m_ItemNodeMap.end())
   {
-    m_TreeWidget->takeTopLevelItem( m_TreeWidget->indexOfTopLevelItem(it->first) );
+    m_TreeWidget->takeTopLevelItem(m_TreeWidget->indexOfTopLevelItem(it->first));
     m_ItemNodeMap.erase(m_ItemNodeMap.find(it->first));
 
     ++it;
@@ -294,27 +291,26 @@ void QmitkBoundingObjectWidget::RemoveAllItems()
   m_BoundingObjectCounter = 1;
 }
 
-
 mitk::BoundingObject::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObject()
 {
-  mitk::BoundingObject* boundingObject;
-  mitk::DataNode* node = this->GetSelectedBoundingObjectNode();
+  mitk::BoundingObject *boundingObject;
+  mitk::DataNode *node = this->GetSelectedBoundingObjectNode();
 
   if (node)
   {
-    boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
+    boundingObject = dynamic_cast<mitk::BoundingObject *>(node->GetData());
     if (boundingObject)
       return boundingObject;
   }
   return NULL;
 }
 
-void QmitkBoundingObjectWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkBoundingObjectWidget::SetDataStorage(mitk::DataStorage *dataStorage)
 {
   m_DataStorage = dataStorage;
 }
 
-mitk::DataStorage* QmitkBoundingObjectWidget::GetDataStorage()
+mitk::DataStorage *QmitkBoundingObjectWidget::GetDataStorage()
 {
   return m_DataStorage;
 }
@@ -326,12 +322,12 @@ void QmitkBoundingObjectWidget::OnDelButtonClicked()
 
 void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
 {
-
-  //get cross position
+  // get cross position
   mitk::Point3D pos;
-  mitk::RenderingManager::RenderWindowVector windows =  mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+  mitk::RenderingManager::RenderWindowVector windows =
+    mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
-  //hopefully we have the renderwindows in the "normal" order
+  // hopefully we have the renderwindows in the "normal" order
   const mitk::PlaneGeometry *plane1 =
     mitk::BaseRenderer::GetInstance(windows.at(0))->GetSliceNavigationController()->GetCurrentPlaneGeometry();
   const mitk::PlaneGeometry *plane2 =
@@ -340,11 +336,9 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
     mitk::BaseRenderer::GetInstance(windows.at(2))->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
   mitk::Line3D line;
-  if ( (plane1 != NULL) && (plane2 != NULL)
-    && (plane1->IntersectionLine( plane2, line )) )
+  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
   {
-    if ( !((plane3 != NULL)
-      && (plane3->IntersectionPoint( line, pos ))) )
+    if (!((plane3 != NULL) && (plane3->IntersectionPoint(line, pos))))
     {
       return;
     }
@@ -356,27 +350,27 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
     QString name;
     name.setNum(m_BoundingObjectCounter);
 
-    switch (type-1)
+    switch (type - 1)
     {
-    case CUBOID:
-      boundingObject = mitk::Cuboid::New();
-      name.prepend("Cube_");
-      break;
-    case CONE:
-      boundingObject = mitk::Cone::New();
-      name.prepend("Cone_");
-      break;
-    case ELLIPSOID:
-      boundingObject = mitk::Ellipsoid::New();
-      name.prepend("Ellipse_");
-      break;
-    case CYLINDER:
-      boundingObject = mitk::Cylinder::New();
-      name.prepend("Cylinder_");
-      break;
-    default:
-      return;
-      break;
+      case CUBOID:
+        boundingObject = mitk::Cuboid::New();
+        name.prepend("Cube_");
+        break;
+      case CONE:
+        boundingObject = mitk::Cone::New();
+        name.prepend("Cone_");
+        break;
+      case ELLIPSOID:
+        boundingObject = mitk::Ellipsoid::New();
+        name.prepend("Ellipse_");
+        break;
+      case CYLINDER:
+        boundingObject = mitk::Cylinder::New();
+        name.prepend("Cylinder_");
+        break;
+      default:
+        return;
+        break;
     }
     m_BoundingObjectCounter++;
     m_addComboBox->setCurrentIndex(0);
@@ -384,15 +378,15 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
     // set initial size
     mitk::Vector3D size;
     size.Fill(10);
-    boundingObject->GetGeometry()->SetSpacing( size );
+    boundingObject->GetGeometry()->SetSpacing(size);
 
     boundingObject->GetGeometry()->Translate(pos.GetVectorFromOrigin());
     boundingObject->GetTimeGeometry()->Update();
 
-    //create node
-    mitk::DataNode::Pointer node  = mitk::DataNode::New();
-    node->SetData( boundingObject);
-    node->SetProperty("name", mitk::StringProperty::New( name.toLocal8Bit().data()));
+    // create node
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    node->SetData(boundingObject);
+    node->SetProperty("name", mitk::StringProperty::New(name.toLocal8Bit().data()));
     node->SetProperty("color", mitk::ColorProperty::New(0.0, 0.0, 1.0));
     node->SetProperty("opacity", mitk::FloatProperty::New(0.7));
     node->SetProperty("bounding object", mitk::BoolProperty::New(true));
@@ -414,20 +408,21 @@ mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetAllBoundingObjects()
   mitk::BoundingObjectGroup::Pointer boundingObjectGroup = mitk::BoundingObjectGroup::New();
   boundingObjectGroup->SetCSGMode(mitk::BoundingObjectGroup::Union);
 
-  mitk::NodePredicateProperty::Pointer prop = mitk::NodePredicateProperty::New("bounding object", mitk::BoolProperty::New(true));
+  mitk::NodePredicateProperty::Pointer prop =
+    mitk::NodePredicateProperty::New("bounding object", mitk::BoolProperty::New(true));
   mitk::DataStorage::SetOfObjects::ConstPointer allBO = m_DataStorage->GetSubset(prop);
 
   for (mitk::DataStorage::SetOfObjects::const_iterator it = allBO->begin(); it != allBO->end(); ++it)
   {
     mitk::DataNode::Pointer node = *it;
-    mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
+    mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject *>(node->GetData());
     if (boundingObject)
       boundingObjectGroup->AddBoundingObject(boundingObject);
   }
 
   boundingObjectGroupNode->SetData(boundingObjectGroup);
 
-  if (boundingObjectGroup->GetCount() >0)
+  if (boundingObjectGroup->GetCount() > 0)
     return boundingObjectGroupNode;
 
   return NULL;
@@ -435,17 +430,17 @@ mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetAllBoundingObjects()
 
 mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObjectNode()
 {
-  QList <QTreeWidgetItem*> selectedItems = m_TreeWidget->selectedItems();
-  if (selectedItems.size() <1)
+  QList<QTreeWidgetItem *> selectedItems = m_TreeWidget->selectedItems();
+  if (selectedItems.size() < 1)
     return NULL;
 
-  QTreeWidgetItem* item = selectedItems.first();
-  mitk::DataNode* node = m_ItemNodeMap.find(item)->second;
+  QTreeWidgetItem *item = selectedItems.first();
+  mitk::DataNode *node = m_ItemNodeMap.find(item)->second;
 
   return node;
 }
 
-void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject&)
+void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject &)
 {
   emit BoundingObjectsChanged();
 }

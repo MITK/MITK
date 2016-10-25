@@ -20,59 +20,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileWriter.h>
 #include <mitkContourModel.h>
 
-//DEPRECATED
+// DEPRECATED
 #include <mitkTimeGeometry.h>
 
 namespace mitk
 {
+  /**
+   * @brief XML-based writer for mitk::ContourModels
+   *
+   * XML-based writer for mitk::ContourModels. Multiple ContourModels can be written in
+   * a single XML file by simply setting multiple inputs to the filter.
+   *
+   * The xml file will look like:
+   *
+   *   <?xml version="1.0" encoding="utf-8"?>
+   *   <contourModel>
+   *      <head>
+   *        <geometryInfo>
+   *        </geometryInfo>
+   *      </head>
+   *      <data>
+   *        <timestep n="0">
+   *          <controlPoints>
+   *            <point>
+   *              <x></x>
+   *              <y></y>
+   *              <z></z>
+   *            </point>
+   *          </controlPoint>
+   *        </timestep>
+   *      </data>
+   *    </contourModel>
+   *
+   * @ingroup MitkContourModelModule
+   */
 
-/**
- * @brief XML-based writer for mitk::ContourModels
- *
- * XML-based writer for mitk::ContourModels. Multiple ContourModels can be written in
- * a single XML file by simply setting multiple inputs to the filter.
- *
- * The xml file will look like:
- *
- *   <?xml version="1.0" encoding="utf-8"?>
- *   <contourModel>
- *      <head>
- *        <geometryInfo>
- *        </geometryInfo>
- *      </head>
- *      <data>
- *        <timestep n="0">
- *          <controlPoints>
- *            <point>
- *              <x></x>
- *              <y></y>
- *              <z></z>
- *            </point>
- *          </controlPoint>
- *        </timestep>
- *      </data>
- *    </contourModel>
- *
- * @ingroup MitkContourModelModule
- */
+  class TimeSlicedGeometry;
 
-class TimeSlicedGeometry;
+  class ContourModelWriter : public mitk::AbstractFileWriter
+  {
+  public:
+    ContourModelWriter();
+    virtual ~ContourModelWriter();
 
-class ContourModelWriter : public mitk::AbstractFileWriter
-{
-public:
+    using AbstractFileWriter::Write;
+    virtual void Write() override;
 
-  ContourModelWriter();
-  virtual ~ContourModelWriter();
+  protected:
+    ContourModelWriter(const ContourModelWriter &other);
 
-  using AbstractFileWriter::Write;
-  virtual void Write() override;
-
-protected:
-
-  ContourModelWriter(const ContourModelWriter& other);
-
-  virtual mitk::ContourModelWriter* Clone() const override;
+    virtual mitk::ContourModelWriter *Clone() const override;
 
     /**
      * Converts an arbitrary type to a string. The type has to
@@ -81,8 +78,8 @@ protected:
      * @param value the value to convert
      * @returns the string representation of value
      */
-    template < typename T>
-    std::string ConvertToString( T value );
+    template <typename T>
+    std::string ConvertToString(T value);
 
     /**
      * Writes an XML representation of the given point set to
@@ -90,7 +87,7 @@ protected:
      * @param contourModel the point set to be converted to xml
      * @param out the stream to write to.
      */
-    void WriteXML( const mitk::ContourModel* contourModel, std::ostream& out );
+    void WriteXML(const mitk::ContourModel *contourModel, std::ostream &out);
 
     /**
     * Writes the geometry information of the TimeGeometry to an outstream.
@@ -98,7 +95,7 @@ protected:
     * @param geometry the TimeGeometry of the contour.
     * @param the stream to write to.
     */
-    void WriteGeometryInformation( const mitk::TimeGeometry* geometry, std::ostream& out );
+    void WriteGeometryInformation(const mitk::TimeGeometry *geometry, std::ostream &out);
 
     /**
     * Writes the geometry information of the TimeGeometry to an outstream.
@@ -106,74 +103,71 @@ protected:
     * @param geometry the TimeGeometry of the contour.
     * @param the stream to write to.
     *
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
+    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see
+    * http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
     */
-    DEPRECATED(void WriteGeometryInformation(const mitk::TimeSlicedGeometry* geometry, std::ostream& out ));
+    DEPRECATED(void WriteGeometryInformation(const mitk::TimeSlicedGeometry *geometry, std::ostream &out));
 
     /**
      * Writes an standard xml header to the given stream.
      * @param file the stream in which the header is written.
      */
-    void WriteXMLHeader( std::ostream &file );
+    void WriteXMLHeader(std::ostream &file);
 
     /** Write a start element tag */
-    void WriteStartElement( const char *const tag, std::ostream &file );
+    void WriteStartElement(const char *const tag, std::ostream &file);
 
-    void WriteStartElementWithAttribut( const char *const tag, std::vector<std::string> attributes, std::vector<std::string> values, std::ostream &file );
+    void WriteStartElementWithAttribut(const char *const tag,
+                                       std::vector<std::string> attributes,
+                                       std::vector<std::string> values,
+                                       std::ostream &file);
 
     /**
      * Write an end element tag
      * End-Elements following character data should pass indent = false.
      */
-    void WriteEndElement( const char *const tag, std::ostream &file, const bool& indent = true );
+    void WriteEndElement(const char *const tag, std::ostream &file, const bool &indent = true);
 
     /** Write character data inside a tag. */
-    void WriteCharacterData( const char *const data, std::ostream &file );
+    void WriteCharacterData(const char *const data, std::ostream &file);
 
     /** Write a start element tag */
-    void WriteStartElement( std::string &tag, std::ostream &file );
+    void WriteStartElement(std::string &tag, std::ostream &file);
 
     /** Write an end element tag */
-    void WriteEndElement( std::string &tag, std::ostream &file, const bool& indent = true );
+    void WriteEndElement(std::string &tag, std::ostream &file, const bool &indent = true);
 
     /** Write character data inside a tag. */
-    void WriteCharacterData( std::string &data, std::ostream &file );
+    void WriteCharacterData(std::string &data, std::ostream &file);
 
     /** Writes empty spaces to the stream according to m_IndentDepth and m_Indent */
-    void WriteIndent( std::ostream& file );
+    void WriteIndent(std::ostream &file);
 
     unsigned int m_IndentDepth;
 
     unsigned int m_Indent;
 
-public:
+  public:
+    static const char *XML_CONTOURMODEL;
 
-    static const char* XML_CONTOURMODEL;
+    static const char *XML_HEAD;
 
-    static const char* XML_HEAD;
+    static const char *XML_GEOMETRY_INFO;
 
-    static const char* XML_GEOMETRY_INFO;
+    static const char *XML_DATA;
 
-    static const char* XML_DATA;
+    static const char *XML_TIME_STEP;
 
-    static const char* XML_TIME_STEP;
+    static const char *XML_CONTROL_POINTS;
 
-    static const char* XML_CONTROL_POINTS;
+    static const char *XML_POINT;
 
-    static const char* XML_POINT;
+    static const char *XML_X;
 
-    static const char* XML_X;
+    static const char *XML_Y;
 
-    static const char* XML_Y;
-
-    static const char* XML_Z;
-
-
-};
-
-
-
+    static const char *XML_Z;
+  };
 }
-
 
 #endif

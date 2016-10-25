@@ -25,55 +25,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /*
+      \brief Registers mappers and assigns default properties for mitk::Gizmo.
 
-/*
-    \brief Registers mappers and assigns default properties for mitk::Gizmo.
-
-    This class is still required by MITK to register custom mappers.
-    The base class interface requires also methods that describe file
-    reader/writer extensions, but this is already deprecated. We do
-    not implement those methods but use the new micro-service registration
-    via GizmoActivator.
-*/
-class  MITKGIZMO_EXPORT GizmoObjectFactory : public mitk::CoreObjectFactoryBase
-{
-
-public:
+      This class is still required by MITK to register custom mappers.
+      The base class interface requires also methods that describe file
+      reader/writer extensions, but this is already deprecated. We do
+      not implement those methods but use the new micro-service registration
+      via GizmoActivator.
+  */
+  class MITKGIZMO_EXPORT GizmoObjectFactory : public mitk::CoreObjectFactoryBase
+  {
+  public:
     mitkClassMacro(GizmoObjectFactory, CoreObjectFactoryBase);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
     // Create a mapper for given node
-    virtual mitk::Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
+    virtual mitk::Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
 
     // Assign default properties to given node
-    virtual void SetDefaultProperties(mitk::DataNode* node) override;
+    virtual void SetDefaultProperties(mitk::DataNode *node) override;
 
     // Deprecated but required!
-    virtual const char* GetFileExtensions() override
-    {
-        return "";
-    }
-
+    virtual const char *GetFileExtensions() override { return ""; }
     // Deprecated but required!
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
     {
-        return CoreObjectFactoryBase::MultimapType();
+      return CoreObjectFactoryBase::MultimapType();
     }
 
     // Deprecated but required!
-    virtual const char* GetSaveFileExtensions() override
-    {
-        return "";
-    }
-
+    virtual const char *GetSaveFileExtensions() override { return ""; }
     // Deprecated but required!
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
     {
-        return CoreObjectFactoryBase::MultimapType();
+      return CoreObjectFactoryBase::MultimapType();
     }
-};
-
+  };
 }
 
 #endif

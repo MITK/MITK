@@ -19,11 +19,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 //============== XML const chars ===================
 
 //==== Header information ====
-const std::string mitk::TubeGraphDefinitions::XML_TUBEGRAPH_FILE = "tube_graph_file" ;
-const std::string mitk::TubeGraphDefinitions::XML_FILE_VERSION = "file_version" ;
-const std::string mitk::TubeGraphDefinitions::VERSION_STRING = "0.1" ;
-const std::string mitk::TubeGraphDefinitions::ASCII_FILE = "ascii_file" ;
-const std::string mitk::TubeGraphDefinitions::FILE_NAME = "file_name" ;
+const std::string mitk::TubeGraphDefinitions::XML_TUBEGRAPH_FILE = "tube_graph_file";
+const std::string mitk::TubeGraphDefinitions::XML_FILE_VERSION = "file_version";
+const std::string mitk::TubeGraphDefinitions::VERSION_STRING = "0.1";
+const std::string mitk::TubeGraphDefinitions::ASCII_FILE = "ascii_file";
+const std::string mitk::TubeGraphDefinitions::FILE_NAME = "file_name";
 
 //==== Geometry details ====
 const std::string mitk::TubeGraphDefinitions::XML_GEOMETRY = "geometry";
@@ -88,6 +88,6 @@ const std::string mitk::TubeGraphDefinitions::XML_LABEL_COLOR_B = "label_color_b
 const std::string mitk::TubeGraphDefinitions::XML_TUBE_ID_1 = "tube_id_1";
 const std::string mitk::TubeGraphDefinitions::XML_TUBE_ID_2 = "tube_id_2";
 
-    //==== annotation properties ====
+//==== annotation properties ====
 const std::string mitk::TubeGraphDefinitions::XML_ANNOTATION_NAME = "annotation_name";
 const std::string mitk::TubeGraphDefinitions::XML_ANNOTATION_DESCRIPTION = "annotation_description";

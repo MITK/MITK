@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKTRANSFORMFACTORY_H
 #define MITKTRANSFORMFACTORY_H
 
-#include "itkTransform.h"
 #include "MitkRigidRegistrationExports.h"
 #include "itkImage.h"
+#include "itkTransform.h"
 #include "mitkTransformParameters.h"
 
-namespace mitk {
-
+namespace mitk
+{
   /*!
   \brief This class creates a transform for a rigid registration process.
 
@@ -42,24 +42,23 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  template < class TPixelType, unsigned int VImageDimension >
+  template <class TPixelType, unsigned int VImageDimension>
   class MITKRIGIDREGISTRATION_EXPORT TransformFactory : public itk::Object
   {
   public:
     mitkClassMacroItkParent(TransformFactory, itk::Object);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-    typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-    typedef typename itk::Image< TPixelType, 2 >  FixedImage2DType;
-    typedef typename itk::Image< TPixelType, 2 >  MovingImage2DType;
-    typedef typename itk::Image< TPixelType, 3 >  FixedImage3DType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImage3DType;
+      typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+    typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+    typedef typename itk::Image<TPixelType, 2> FixedImage2DType;
+    typedef typename itk::Image<TPixelType, 2> MovingImage2DType;
+    typedef typename itk::Image<TPixelType, 3> FixedImage3DType;
+    typedef typename itk::Image<TPixelType, 3> MovingImage3DType;
 
-    typedef typename itk::Transform< double, VImageDimension, VImageDimension >    TransformType;
+    typedef typename itk::Transform<double, VImageDimension, VImageDimension> TransformType;
 
     typedef typename TransformType::Pointer TransformPointer;
 
@@ -67,17 +66,17 @@ namespace mitk {
     \brief Returns the transform which then can be used in combination with a metric, an optimizer
     and an interpolator within a registration pipeline.
     */
-    TransformPointer GetTransform( );
+    TransformPointer GetTransform();
 
     /**
     \brief Sets the fixed image which is needed by transform initializer.
     */
-    void SetFixedImage(FixedImageType* fixed);
+    void SetFixedImage(FixedImageType *fixed);
 
     /**
     \brief Sets the moving image which is needed by transform initializer.
     */
-    void SetMovingImage(MovingImageType* moving);
+    void SetMovingImage(MovingImageType *moving);
 
     /**
     \brief Sets the instance to the transform parameters class which holds all parameters for the new transform.
@@ -90,14 +89,10 @@ namespace mitk {
     /**
     \brief Returns the instance to the transform parameters class which holds all parameters for the new transform.
     */
-    TransformParameters::Pointer GetTransformParameters()
-    {
-      return m_TransformParameters;
-    }
-
+    TransformParameters::Pointer GetTransformParameters() { return m_TransformParameters; }
   protected:
     TransformFactory();
-    ~TransformFactory() {};
+    ~TransformFactory(){};
 
     TransformParameters::Pointer m_TransformParameters;
     typename FixedImageType::Pointer m_FixedImage;

@@ -14,20 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "Step6.h"
 #include "QmitkRegisterClasses.h"
+#include "Step6.h"
 
 #include "mitkDataStorage.h"
 
 #include <QApplication>
 #include <itksys/SystemTools.hxx>
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  QApplication qtapplication( argc, argv );
+  QApplication qtapplication(argc, argv);
 
-  if(argc<2)
+  if (argc < 2)
   {
-    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
+    fprintf(
+      stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str());
     return 1;
   }
 
@@ -38,13 +39,12 @@ int main(int argc, char* argv[])
   mainWidget.Initialize();
   mainWidget.show();
 
-  // for testing
-  #include "QtTesting.h"
-  if(strcmp(argv[argc-1], "-testing")!=0)
+// for testing
+#include "QtTesting.h"
+  if (strcmp(argv[argc - 1], "-testing") != 0)
     return qtapplication.exec();
   else
     return QtTesting();
-
 }
 /**
 \example Step6main.cpp

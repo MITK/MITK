@@ -18,23 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileReader.h>
 
-namespace mitk {
-//##Documentation
-//## @brief Reader to read unstructured grid files in vtk-format
-class VtkUnstructuredGridReader : public AbstractFileReader
+namespace mitk
 {
-public:
+  //##Documentation
+  //## @brief Reader to read unstructured grid files in vtk-format
+  class VtkUnstructuredGridReader : public AbstractFileReader
+  {
+  public:
+    VtkUnstructuredGridReader();
+    virtual ~VtkUnstructuredGridReader();
 
-  VtkUnstructuredGridReader();
-  virtual ~VtkUnstructuredGridReader();
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-  using AbstractFileReader::Read;
-  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
-
-protected:
-  virtual VtkUnstructuredGridReader* Clone() const override;
-
-};
+  protected:
+    virtual VtkUnstructuredGridReader *Clone() const override;
+  };
 
 } // namespace mitk
 

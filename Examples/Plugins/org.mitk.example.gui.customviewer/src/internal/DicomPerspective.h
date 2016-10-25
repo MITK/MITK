@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef DICOMPERSPECTIVE_H_
 #define DICOMPERSPECTIVE_H_
 
@@ -36,14 +35,12 @@ class DicomPerspective : public QObject, public berry::IPerspectiveFactory
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
-
   DicomPerspective();
 
   /**
    * An instance of DicomView is initially being laid out.
    */
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
-
 };
 
 #endif /* DICOMPERSPECTIVE_H_ */

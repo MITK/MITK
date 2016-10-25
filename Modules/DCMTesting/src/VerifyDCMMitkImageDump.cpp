@@ -18,21 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImage.h"
 
-std::vector<std::string> LoadDumps(const std::string& fileName)
+std::vector<std::string> LoadDumps(const std::string &fileName)
 {
   std::vector<std::string> separatedDumps;
 
-  std::ifstream fileStream( fileName.c_str() );
+  std::ifstream fileStream(fileName.c_str());
 
   std::string buffer;
   std::string line;
-  while(fileStream){
+  while (fileStream)
+  {
     std::getline(fileStream, line);
 
     if (line.find("-- Image ") == 0)
     {
       // separator: starts a new image block
-      if ( !buffer.empty() )
+      if (!buffer.empty())
       {
         // unless this is the first block
         separatedDumps.push_back(buffer);
@@ -47,7 +48,7 @@ std::vector<std::string> LoadDumps(const std::string& fileName)
   fileStream.close();
 
   // eat last image dump
-  if ( !buffer.empty() )
+  if (!buffer.empty())
   {
     separatedDumps.push_back(buffer);
     buffer.clear();
@@ -56,8 +57,7 @@ std::vector<std::string> LoadDumps(const std::string& fileName)
   return separatedDumps;
 }
 
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   /**
     Loads a list of DCM images, compares generated mitk::Images against stored references.
@@ -88,25 +88,25 @@ int main(int argc, char** argv)
 
   std::vector<std::string> expectedDumps = LoadDumps(argv[1]);
 
-  for (int arg = 2; arg < argc; ++arg) files.push_back( argv[arg] );
+  for (int arg = 2; arg < argc; ++arg)
+    files.push_back(argv[arg]);
 
   mitk::TestDCMLoading::ImageList images = loader.LoadFiles(files);
 
   unsigned int imageCounter(0);
-  for ( mitk::TestDCMLoading::ImageList::const_iterator imageIter = images.begin();
-        imageIter != images.end();
-        ++imageIter, ++imageCounter )
+  for (mitk::TestDCMLoading::ImageList::const_iterator imageIter = images.begin(); imageIter != images.end();
+       ++imageIter, ++imageCounter)
   {
-    std::string imageDump = loader.DumpImageInformation( *imageIter );
+    std::string imageDump = loader.DumpImageInformation(*imageIter);
 
     if (imageCounter >= expectedDumps.size())
     {
-      MITK_ERROR << "Loader produces more images than expected. Aborting after image " << (imageCounter-1);
+      MITK_ERROR << "Loader produces more images than expected. Aborting after image " << (imageCounter - 1);
       MITK_INFO << "Image " << imageCounter << " loaded as:\n" << imageDump;
       return EXIT_FAILURE;
     }
 
-    bool loadedAsExpected = loader.CompareImageInformationDumps( expectedDumps[imageCounter], imageDump );
+    bool loadedAsExpected = loader.CompareImageInformationDumps(expectedDumps[imageCounter], imageDump);
     if (loadedAsExpected)
     {
       MITK_INFO << "Image " << imageCounter << " loads as expected.";

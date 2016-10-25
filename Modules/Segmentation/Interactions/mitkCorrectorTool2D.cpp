@@ -17,31 +17,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCorrectorTool2D.h"
 #include "mitkCorrectorAlgorithm.h"
 
-#include "mitkToolManager.h"
-#include "mitkBaseRenderer.h"
-#include "mitkRenderingManager.h"
-#include "mitkImageReadAccessor.h"
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkBaseRenderer.h"
+#include "mitkImageReadAccessor.h"
 #include "mitkLabelSetImage.h"
+#include "mitkRenderingManager.h"
+#include "mitkToolManager.h"
 
 #include "mitkCorrectorTool2D.xpm"
 #include "mitkLabelSetImage.h"
 
 // us
-#include <usModule.h>
-#include <usModuleResource.h>
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleContext.h>
+#include <usModuleResource.h>
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CorrectorTool2D, "Correction tool");
 }
 
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
-:FeedbackContourTool("PressMoveRelease"),
- m_PaintingPixelValue(paintingPixelValue)
+  : FeedbackContourTool("PressMoveRelease"), m_PaintingPixelValue(paintingPixelValue)
 {
-  GetFeedbackContour()->SetClosed( false ); // don't close the contour to a polygon
+  GetFeedbackContour()->SetClosed(false); // don't close the contour to a polygon
 }
 
 mitk::CorrectorTool2D::~CorrectorTool2D()
@@ -50,31 +50,31 @@ mitk::CorrectorTool2D::~CorrectorTool2D()
 
 void mitk::CorrectorTool2D::ConnectActionsAndFunctions()
 {
-  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
-  CONNECT_FUNCTION( "Move", OnMouseMoved);
-  CONNECT_FUNCTION( "Release", OnMouseReleased);
+  CONNECT_FUNCTION("PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION("Move", OnMouseMoved);
+  CONNECT_FUNCTION("Release", OnMouseReleased);
 }
 
-const char** mitk::CorrectorTool2D::GetXPM() const
+const char **mitk::CorrectorTool2D::GetXPM() const
 {
   return mitkCorrectorTool2D_xpm;
 }
 
 us::ModuleResource mitk::CorrectorTool2D::GetIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Correction_48x48.png");
   return resource;
 }
 
 us::ModuleResource mitk::CorrectorTool2D::GetCursorIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Correction_Cursor_32x32.png");
   return resource;
 }
 
-const char* mitk::CorrectorTool2D::GetName() const
+const char *mitk::CorrectorTool2D::GetName() const
 {
   return "Correction";
 }
@@ -89,68 +89,76 @@ void mitk::CorrectorTool2D::Deactivated()
   Superclass::Deactivated();
 }
 
-void mitk::CorrectorTool2D::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::CorrectorTool2D::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return;
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (!positionEvent)
+    return;
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel *contour = FeedbackContourTool::GetFeedbackContour();
   contour->Initialize();
   contour->Expand(timestep + 1);
   contour->SetClosed(false, timestep);
   mitk::Point3D point = positionEvent->GetPositionInWorld();
-  contour->AddVertex( point, timestep );
+  contour->AddVertex(point, timestep);
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 }
 
-void mitk::CorrectorTool2D::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::CorrectorTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return;
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (!positionEvent)
+    return;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
-  ContourModel* contour = FeedbackContourTool::GetFeedbackContour();
+  ContourModel *contour = FeedbackContourTool::GetFeedbackContour();
   mitk::Point3D point = positionEvent->GetPositionInWorld();
-  contour->AddVertex( point, timestep );
+  contour->AddVertex(point, timestep);
 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  assert(positionEvent->GetSender()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's working image corresponds to that
+  // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's
+  // working image corresponds to that
   FeedbackContourTool::SetFeedbackContourVisible(false);
 
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return;
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  // const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent)
+    return;
 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
-  mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  assert(positionEvent->GetSender()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
-  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-  if (!workingNode) return;
+  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+  if (!workingNode)
+    return;
 
-  Image* image = dynamic_cast<Image*>(workingNode->GetData());
-  const PlaneGeometry* planeGeometry( (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || !planeGeometry ) return;
+  Image *image = dynamic_cast<Image *>(workingNode->GetData());
+  const PlaneGeometry *planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
+  if (!image || !planeGeometry)
+    return;
 
-  const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (positionEvent->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-  if ( !image || abstractTransformGeometry ) return;
+  const AbstractTransformGeometry *abstractTransformGeometry(
+    dynamic_cast<const AbstractTransformGeometry *>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
+  if (!image || abstractTransformGeometry)
+    return;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-  m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
+  m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, image);
 
-  if ( m_WorkingSlice.IsNull() )
+  if (m_WorkingSlice.IsNull())
   {
-      MITK_ERROR << "Unable to extract slice." << std::endl;
-      return;
+    MITK_ERROR << "Unable to extract slice." << std::endl;
+    return;
   }
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
@@ -159,18 +167,18 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   mitk::ContourModel::VertexIterator it = FeedbackContourTool::GetFeedbackContour()->Begin(timestep);
   mitk::ContourModel::VertexIterator end = FeedbackContourTool::GetFeedbackContour()->End(timestep);
 
-  while(it!=end)
+  while (it != end)
   {
     singleTimestepContour->AddVertex((*it)->Coordinates);
     it++;
   }
 
   CorrectorAlgorithm::Pointer algorithm = CorrectorAlgorithm::New();
-  algorithm->SetInput( m_WorkingSlice );
-  algorithm->SetContour( singleTimestepContour );
+  algorithm->SetInput(m_WorkingSlice);
+  algorithm->SetContour(singleTimestepContour);
 
-  mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  int workingColorId (1);
+  mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<LabelSetImage *>(workingNode->GetData());
+  int workingColorId(1);
   if (labelSetImage.IsNotNull())
   {
     workingColorId = labelSetImage->GetActiveLabel()->GetValue();
@@ -178,11 +186,11 @@ void mitk::CorrectorTool2D::OnMouseReleased( StateMachineAction*, InteractionEve
   }
   try
   {
-      algorithm->UpdateLargestPossibleRegion();
+    algorithm->UpdateLargestPossibleRegion();
   }
-  catch ( std::exception& e )
+  catch (std::exception &e)
   {
-      MITK_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
+    MITK_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
   }
 
   mitk::Image::Pointer resultSlice = mitk::Image::New();

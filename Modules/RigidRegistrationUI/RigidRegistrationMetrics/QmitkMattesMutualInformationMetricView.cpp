@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMattesMutualInformationMetricView.h"
-#include <itkMattesMutualInformationImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkMattesMutualInformationImageToImageMetric.h>
 
-QmitkMattesMutualInformationMetricView::QmitkMattesMutualInformationMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkMattesMutualInformationMetricView::QmitkMattesMutualInformationMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
-
 }
 
 QmitkMattesMutualInformationMetricView::~QmitkMattesMutualInformationMetricView()
@@ -42,24 +42,27 @@ itk::Object::Pointer QmitkMattesMutualInformationMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMattesMutualInformationMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkMattesMutualInformationMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::MattesMutualInformationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MattesMutualInformationImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::MattesMutualInformationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::MattesMutualInformationImageToImageMetric<FixedImageType, MovingImageType>::New();
   bool useSampling = m_Controls.m_UseSamplingMattesMutualInformation->isChecked();
-  if( useSampling )
+  if (useSampling)
   {
     // set the number of samples to use
-    MetricPointer->SetNumberOfSpatialSamples( m_Controls.m_NumberOfSpatialSamplesMattesMutualInformation->text().toInt() );
+    MetricPointer->SetNumberOfSpatialSamples(
+      m_Controls.m_NumberOfSpatialSamplesMattesMutualInformation->text().toInt());
   }
   else
   {
     MetricPointer->UseAllPixelsOn();
   }
   MetricPointer->SetNumberOfHistogramBins(m_Controls.m_NumberOfHistogramBinsMattesMutualInformation->text().toInt());
-  MetricPointer->ReinitializeSeed( 76926294 );
+  MetricPointer->ReinitializeSeed(76926294);
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -90,10 +93,10 @@ QString QmitkMattesMutualInformationMetricView::GetName()
   return "MattesMutualInformation";
 }
 
-void QmitkMattesMutualInformationMetricView::SetupUI(QWidget* parent)
+void QmitkMattesMutualInformationMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfSpatialSamplesMattesMutualInformation->setValidator(validatorLineEditInput);
   m_Controls.m_NumberOfHistogramBinsMattesMutualInformation->setValidator(validatorLineEditInput);
 }

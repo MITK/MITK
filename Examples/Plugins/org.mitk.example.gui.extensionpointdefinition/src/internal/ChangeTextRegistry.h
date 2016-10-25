@@ -23,9 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ChangeTextRegistry : public berry::Object
 {
-
 public:
-
   ChangeTextRegistry();
   ~ChangeTextRegistry();
 
@@ -37,7 +35,7 @@ public:
    *           the id to search for
    * @return the descriptor or <code>null</code>
    */
-  ChangeTextDescriptor::Pointer Find(const QString& id) const;
+  ChangeTextDescriptor::Pointer Find(const QString &id) const;
 
   /**
    * Return a list of "change texts" defined in the registry.
@@ -47,9 +45,7 @@ public:
   QList<ChangeTextDescriptor::Pointer> GetChangeTexts() const;
 
 private:
-
   QHash<QString, ChangeTextDescriptor::Pointer> m_ListRegisteredTexts;
-
 };
 
 #endif /*CHANGETEXTREGISTRY_H_*/

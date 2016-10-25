@@ -26,7 +26,8 @@ void DicomPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   QString editorArea = layout->GetEditorArea();
   layout->SetEditorAreaVisible(false);
-  layout->AddStandaloneView("org.mitk.customviewer.views.dicomview", false, berry::IPageLayout::LEFT, 1.0f, layout->GetEditorArea());
+  layout->AddStandaloneView(
+    "org.mitk.customviewer.views.dicomview", false, berry::IPageLayout::LEFT, 1.0f, layout->GetEditorArea());
   layout->GetViewLayout("org.mitk.customviewer.views.dicomview")->SetCloseable(false);
   layout->GetViewLayout("org.mitk.customviewer.views.dicomview")->SetMoveable(false);
 }

@@ -16,35 +16,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkScalarBar.h"
 
-#include <QPainter>
 #include <QPaintEvent>
+#include <QPainter>
 
-QmitkScalarBar::QmitkScalarBar(QWidget* parent)
-: QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_MainLine(nullptr)
+QmitkScalarBar::QmitkScalarBar(QWidget *parent)
+  : QWidget(parent, Qt::Tool | Qt::FramelessWindowHint), m_Alignment(vertical), m_MainLine(nullptr)
 {
   m_NumberOfSubDivisions = 7;
 
-  this->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-  this->SetupGeometry( m_Alignment );
+  this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  this->SetupGeometry(m_Alignment);
   this->setBackgroundRole(QPalette::Base);
-  this->setAttribute( Qt::WA_TranslucentBackground, true );
+  this->setAttribute(Qt::WA_TranslucentBackground, true);
   this->setAutoFillBackground(false);
 
   // X11 specific attributes
-  this->setAttribute( Qt::WA_X11NetWmWindowTypeUtility, true );
+  this->setAttribute(Qt::WA_X11NetWmWindowTypeUtility, true);
 
   // mac-specific attributes:
   // making sure overlays are even visible if RenderWindow does not have the focus (not default for Qt::Tool on mac)
-  this->setAttribute( Qt::WA_MacAlwaysShowToolWindow, true );
+  this->setAttribute(Qt::WA_MacAlwaysShowToolWindow, true);
   // testing something
-  this->setAttribute( Qt::WA_MacShowFocusRect, false );
+  this->setAttribute(Qt::WA_MacShowFocusRect, false);
 
+  this->resize(10, 61);
+  this->setFixedWidth(10);
+  this->setFixedHeight(61);
 
-  this->resize( 10,61 );
-  this->setFixedWidth( 10 );
-  this->setFixedHeight( 61 );
-
-  m_Pen = QPen( Qt::red, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin );
+  m_Pen = QPen(Qt::red, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 }
 
 QmitkScalarBar::~QmitkScalarBar()
@@ -52,70 +51,69 @@ QmitkScalarBar::~QmitkScalarBar()
   CleanUpLines();
 }
 
-void QmitkScalarBar::SetupGeometry( alignment align )
+void QmitkScalarBar::SetupGeometry(alignment align)
 {
   this->CleanUpLines();
 
-  switch ( align )
+  switch (align)
   {
-  case vertical :
+    case vertical:
     {
-      //draw subdivision
-      for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
+      // draw subdivision
+      for (unsigned int i = 0; i < m_NumberOfSubDivisions; ++i)
       {
-        int y = this->height()/(m_NumberOfSubDivisions-1)*i;
-        if ( i==0 )
+        int y = this->height() / (m_NumberOfSubDivisions - 1) * i;
+        if (i == 0)
         {
           // this is the first one -> move y 1 down to have this line completely drawn
           y = 1;
         }
-        else if ( i==m_NumberOfSubDivisions-1 )
+        else if (i == m_NumberOfSubDivisions - 1)
         {
           // this is the last one -> move y 1 up to have this line completely drawn
           y = this->height() - 1;
         }
-        m_SubDivisionLines.push_back( new QLine( QPoint(0,y), QPoint(width()-2,y) ) );
+        m_SubDivisionLines.push_back(new QLine(QPoint(0, y), QPoint(width() - 2, y)));
       }
 
-      //draw mainline
-      if ( m_SubDivisionLines.size() > 0 )
+      // draw mainline
+      if (m_SubDivisionLines.size() > 0)
       {
-        m_MainLine = new QLine( QPoint(width()-1,0), QPoint(width()-1,height()) );
+        m_MainLine = new QLine(QPoint(width() - 1, 0), QPoint(width() - 1, height()));
       }
       else
       {
-        m_MainLine = new QLine( QPoint(0,0), QPoint(0,0) ); //do not draw the line
+        m_MainLine = new QLine(QPoint(0, 0), QPoint(0, 0)); // do not draw the line
       }
 
       break;
     }
-  case horizontal :
+    case horizontal:
     {
-      //draw subdivision
-      for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
+      // draw subdivision
+      for (unsigned int i = 0; i < m_NumberOfSubDivisions; ++i)
       {
-        int x = this->width()/(m_NumberOfSubDivisions-1)*i;
-        if ( i==0 )
+        int x = this->width() / (m_NumberOfSubDivisions - 1) * i;
+        if (i == 0)
         {
           x = 1;
         }
-        else if ( i==m_NumberOfSubDivisions-1 )
+        else if (i == m_NumberOfSubDivisions - 1)
         {
           x = this->width() - 1;
         }
-        m_SubDivisionLines.push_back( new QLine( QPoint(x,0), QPoint(x,height()) ) );
+        m_SubDivisionLines.push_back(new QLine(QPoint(x, 0), QPoint(x, height())));
       }
 
-      //draw mainline
-      if ( m_SubDivisionLines.size() > 0 )
+      // draw mainline
+      if (m_SubDivisionLines.size() > 0)
       {
-        m_MainLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
+        m_MainLine = new QLine(QPoint(0, height() / 2), QPoint(width(), height() / 2));
       }
       else
       {
-        m_MainLine = new QLine( QPoint(0,0), QPoint(0,0) ); //do not draw the line
+        m_MainLine = new QLine(QPoint(0, 0), QPoint(0, 0)); // do not draw the line
       }
-
 
       break;
     }
@@ -124,61 +122,60 @@ void QmitkScalarBar::SetupGeometry( alignment align )
 
 void QmitkScalarBar::CleanUpLines()
 {
-  foreach(QLine* line, m_SubDivisionLines)
+  foreach (QLine *line, m_SubDivisionLines)
   {
-    delete line; //QLine is not a QObject
+    delete line; // QLine is not a QObject
     line = nullptr;
   }
 
   m_SubDivisionLines.clear();
 
-  if(m_MainLine != nullptr)
+  if (m_MainLine != nullptr)
   {
     delete m_MainLine;
     m_MainLine = nullptr;
   }
 }
 
-
-void QmitkScalarBar::SetScaleFactor( double scale )
+void QmitkScalarBar::SetScaleFactor(double scale)
 {
   m_ScaleFactor = scale;
 
   // Adopt the number of small, intersecting lines to the size of the widget.
-  if ( this->parentWidget() != nullptr && this->parentWidget()->parentWidget() != nullptr )
+  if (this->parentWidget() != nullptr && this->parentWidget()->parentWidget() != nullptr)
   {
     // If the widget is larger than 80% of the size of the parent -> reduce number by two (must not be smaller than 3)
-    if ( this->height() > this->parentWidget()->parentWidget()->height()*0.7 && m_NumberOfSubDivisions >= 3 )
+    if (this->height() > this->parentWidget()->parentWidget()->height() * 0.7 && m_NumberOfSubDivisions >= 3)
     {
-      m_NumberOfSubDivisions-=2;
+      m_NumberOfSubDivisions -= 2;
     }
     // If the widget is smaller than 30% of the size of the parent -> increase number by two
-    else if ( this->height() < this->parentWidget()->parentWidget()->height()*0.4 && ( m_NumberOfSubDivisions < 7 && m_NumberOfSubDivisions > 0 ) )
+    else if (this->height() < this->parentWidget()->parentWidget()->height() * 0.4 &&
+             (m_NumberOfSubDivisions < 7 && m_NumberOfSubDivisions > 0))
     {
-      m_NumberOfSubDivisions+=2;
+      m_NumberOfSubDivisions += 2;
     }
 
-    if ( m_NumberOfSubDivisions == 1 )
+    if (m_NumberOfSubDivisions == 1)
     {
-      this->resize( 0, 0 );
-      this->setFixedWidth( 0 );
-      this->setFixedHeight( 0 );
+      this->resize(0, 0);
+      this->setFixedWidth(0);
+      this->setFixedHeight(0);
     }
     else
     {
-      this->resize( 10, (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
-      this->setFixedWidth( 10 );
-      this->setFixedHeight( (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
+      this->resize(10, (m_NumberOfSubDivisions - 1) * 10 / m_ScaleFactor);
+      this->setFixedWidth(10);
+      this->setFixedHeight((m_NumberOfSubDivisions - 1) * 10 / m_ScaleFactor);
       this->SetupGeometry(m_Alignment);
     }
 
-    if ( this->height() > this->parentWidget()->parentWidget()->height()*0.7 && m_NumberOfSubDivisions >= 3 )
-      SetScaleFactor( scale );
-
+    if (this->height() > this->parentWidget()->parentWidget()->height() * 0.7 && m_NumberOfSubDivisions >= 3)
+      SetScaleFactor(scale);
   }
 }
 
-void QmitkScalarBar::SetNumberOfSubdivisions( unsigned int subs )
+void QmitkScalarBar::SetNumberOfSubdivisions(unsigned int subs)
 {
   m_NumberOfSubDivisions = subs;
 }
@@ -188,35 +185,33 @@ unsigned int QmitkScalarBar::GetNumberOfSubdivisions()
   return m_NumberOfSubDivisions;
 }
 
-
-void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
+void QmitkScalarBar::paintEvent(QPaintEvent * /*event*/)
 {
-  if ( m_NumberOfSubDivisions > 1 )
+  if (m_NumberOfSubDivisions > 1)
   {
     try
     {
-      //QPainter shadowPainter( this );
-      //shadowPainter.setPen( QPen( QColor(0,0,0,255) ) );
-      //shadowPainter.setBrush( Qt::SolidPattern );
-      //shadowPainter.setRenderHint( QPainter::Antialiasing, true );
+      // QPainter shadowPainter( this );
+      // shadowPainter.setPen( QPen( QColor(0,0,0,255) ) );
+      // shadowPainter.setBrush( Qt::SolidPattern );
+      // shadowPainter.setRenderHint( QPainter::Antialiasing, true );
 
-      //shadowPainter.drawLine( m_VerticalLine->p1()+QPoint(1,1), m_VerticalLine->p2()+QPoint(1,1) );
-      //foreach( QLine* line, m_HorizontalLines )
+      // shadowPainter.drawLine( m_VerticalLine->p1()+QPoint(1,1), m_VerticalLine->p2()+QPoint(1,1) );
+      // foreach( QLine* line, m_HorizontalLines )
       //{
       //  shadowPainter.drawLine( line->p1()+QPoint(1,1), line->p2()+QPoint(1,1) );
       //}
 
-
       QPainter painter(this);
-      painter.setPen( m_Pen );
-      painter.setBrush( Qt::SolidPattern );
-      painter.setRenderHint( QPainter::Antialiasing, true );
+      painter.setPen(m_Pen);
+      painter.setBrush(Qt::SolidPattern);
+      painter.setRenderHint(QPainter::Antialiasing, true);
 
-      painter.drawLine( m_MainLine->p1(), m_MainLine->p2() );
+      painter.drawLine(m_MainLine->p1(), m_MainLine->p2());
 
-      foreach( QLine* line, m_SubDivisionLines )
+      foreach (QLine *line, m_SubDivisionLines)
       {
-        painter.drawLine( line->p1(), line->p2() );
+        painter.drawLine(line->p1(), line->p2());
       }
     }
     catch (...)
@@ -226,14 +221,13 @@ void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
   }
 }
 
-
-void QmitkScalarBar::SetAlignment( alignment align )
+void QmitkScalarBar::SetAlignment(alignment align)
 {
   m_Alignment = align;
-  this->SetupGeometry( align );
+  this->SetupGeometry(align);
 }
 
-void QmitkScalarBar::SetPen( const QPen& pen )
+void QmitkScalarBar::SetPen(const QPen &pen)
 {
   m_Pen = pen;
 }

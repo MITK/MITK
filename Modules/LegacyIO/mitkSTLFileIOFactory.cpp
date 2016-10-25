@@ -20,30 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-STLFileIOFactory::STLFileIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkSTLFileReader",
-                         "mitk STL Surface IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<STLFileReader> >::New());
-}
+  STLFileIOFactory::STLFileIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkSTLFileReader",
+                           "mitk STL Surface IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<STLFileReader>>::New());
+  }
 
-STLFileIOFactory::~STLFileIOFactory()
-{
-}
-
-const char* STLFileIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* STLFileIOFactory::GetDescription() const
-{
-  return "STLFile IO Factory, allows the loading of STL files";
-}
-
+  STLFileIOFactory::~STLFileIOFactory() {}
+  const char *STLFileIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *STLFileIOFactory::GetDescription() const { return "STLFile IO Factory, allows the loading of STL files"; }
 } // end namespace mitk

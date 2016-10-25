@@ -16,4 +16,4 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mbilogLogMessage.h"
 
-//TODO: delete?
+// TODO: delete?

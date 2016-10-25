@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkFramesRegistrationJob.h"
 
 // Mitk
@@ -24,61 +23,53 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QThreadPool>
 
 // Map4CTK
+#include <mitkImageMappingHelper.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include <mitkMatchPointPropertyTags.h>
 #include <mitkUIDHelper.h>
-#include <mitkImageMappingHelper.h>
 
 // MatchPoint
-#include <mapImageRegistrationAlgorithmInterface.h>
-#include <mapRegistrationAlgorithmInterface.h>
 #include <mapAlgorithmEvents.h>
 #include <mapAlgorithmWrapperEvent.h>
 #include <mapExceptionObjectMacros.h>
+#include <mapImageRegistrationAlgorithmInterface.h>
+#include <mapRegistrationAlgorithmInterface.h>
 
-
-const mitk::Image*
-QmitkFramesRegistrationJob::
-GetTargetDataAsImage() const
+const mitk::Image *QmitkFramesRegistrationJob::GetTargetDataAsImage() const
 {
-  return dynamic_cast<const mitk::Image*>(m_spTargetData.GetPointer());
+  return dynamic_cast<const mitk::Image *>(m_spTargetData.GetPointer());
 };
 
-const map::algorithm::RegistrationAlgorithmBase* QmitkFramesRegistrationJob::GetLoadedAlgorithm()
-const
+const map::algorithm::RegistrationAlgorithmBase *QmitkFramesRegistrationJob::GetLoadedAlgorithm() const
 {
   return m_spLoadedAlgorithm;
 };
 
-void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object*, const itk::EventObject& event)
+void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object *, const itk::EventObject &event)
 {
-  const map::events::AlgorithmEvent* pAlgEvent = dynamic_cast < const map::events::AlgorithmEvent* >
-      (&event);
-  const map::events::AlgorithmIterationEvent* pIterationEvent =
-    dynamic_cast<const map::events::AlgorithmIterationEvent*>(&event);
-  const map::events::AlgorithmWrapperEvent* pWrapEvent =
-    dynamic_cast<const map::events::AlgorithmWrapperEvent*>(&event);
-  const map::events::AlgorithmResolutionLevelEvent* pLevelEvent =
-    dynamic_cast<const map::events::AlgorithmResolutionLevelEvent*>(&event);
+  const map::events::AlgorithmEvent *pAlgEvent = dynamic_cast<const map::events::AlgorithmEvent *>(&event);
+  const map::events::AlgorithmIterationEvent *pIterationEvent =
+    dynamic_cast<const map::events::AlgorithmIterationEvent *>(&event);
+  const map::events::AlgorithmWrapperEvent *pWrapEvent =
+    dynamic_cast<const map::events::AlgorithmWrapperEvent *>(&event);
+  const map::events::AlgorithmResolutionLevelEvent *pLevelEvent =
+    dynamic_cast<const map::events::AlgorithmResolutionLevelEvent *>(&event);
 
-  const map::events::InitializingAlgorithmEvent* pInitEvent =
-    dynamic_cast<const map::events::InitializingAlgorithmEvent*>(&event);
-  const map::events::StartingAlgorithmEvent* pStartEvent =
-    dynamic_cast<const map::events::StartingAlgorithmEvent*>(&event);
-  const map::events::StoppingAlgorithmEvent* pStoppingEvent =
-    dynamic_cast<const map::events::StoppingAlgorithmEvent*>(&event);
-  const map::events::StoppedAlgorithmEvent* pStoppedEvent =
-    dynamic_cast<const map::events::StoppedAlgorithmEvent*>(&event);
-  const map::events::FinalizingAlgorithmEvent* pFinalizingEvent =
-    dynamic_cast<const map::events::FinalizingAlgorithmEvent*>(&event);
-  const map::events::FinalizedAlgorithmEvent* pFinalizedEvent =
-    dynamic_cast<const map::events::FinalizedAlgorithmEvent*>(&event);
-  const itk::ProgressEvent* pProgressEvent =
-    dynamic_cast<const itk::ProgressEvent*>(&event);
-  const mitk::FrameRegistrationEvent* pFrameRegEvent =
-    dynamic_cast<const mitk::FrameRegistrationEvent*>(&event);
-  const mitk::FrameMappingEvent* pFrameMapEvent =
-    dynamic_cast<const mitk::FrameMappingEvent*>(&event);
+  const map::events::InitializingAlgorithmEvent *pInitEvent =
+    dynamic_cast<const map::events::InitializingAlgorithmEvent *>(&event);
+  const map::events::StartingAlgorithmEvent *pStartEvent =
+    dynamic_cast<const map::events::StartingAlgorithmEvent *>(&event);
+  const map::events::StoppingAlgorithmEvent *pStoppingEvent =
+    dynamic_cast<const map::events::StoppingAlgorithmEvent *>(&event);
+  const map::events::StoppedAlgorithmEvent *pStoppedEvent =
+    dynamic_cast<const map::events::StoppedAlgorithmEvent *>(&event);
+  const map::events::FinalizingAlgorithmEvent *pFinalizingEvent =
+    dynamic_cast<const map::events::FinalizingAlgorithmEvent *>(&event);
+  const map::events::FinalizedAlgorithmEvent *pFinalizedEvent =
+    dynamic_cast<const map::events::FinalizedAlgorithmEvent *>(&event);
+  const itk::ProgressEvent *pProgressEvent = dynamic_cast<const itk::ProgressEvent *>(&event);
+  const mitk::FrameRegistrationEvent *pFrameRegEvent = dynamic_cast<const mitk::FrameRegistrationEvent *>(&event);
+  const mitk::FrameMappingEvent *pFrameMapEvent = dynamic_cast<const mitk::FrameMappingEvent *>(&event);
 
   if (pProgressEvent)
   {
@@ -110,8 +101,7 @@ void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object*, const itk::
 
     if (!pStoppedEvent->getComment().empty())
     {
-      emit AlgorithmInfo(QString("Stopping condition: ") + QString::fromStdString(
-                           pStoppedEvent->getComment()));
+      emit AlgorithmInfo(QString("Stopping condition: ") + QString::fromStdString(pStoppedEvent->getComment()));
     }
   }
   else if (pFinalizingEvent)
@@ -124,8 +114,8 @@ void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object*, const itk::
   }
   else if (pIterationEvent)
   {
-    const IIterativeAlgorithm* pIterative = dynamic_cast<const IIterativeAlgorithm*>
-                                            (this->m_spLoadedAlgorithm.GetPointer());
+    const IIterativeAlgorithm *pIterative =
+      dynamic_cast<const IIterativeAlgorithm *>(this->m_spLoadedAlgorithm.GetPointer());
 
     map::algorithm::facet::IterativeAlgorithmInterface::IterationCountType count = 0;
     bool hasCount = false;
@@ -140,8 +130,8 @@ void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object*, const itk::
   }
   else if (pLevelEvent)
   {
-    const IMultiResAlgorithm* pResAlg = dynamic_cast<const IMultiResAlgorithm*>
-                                        (this->m_spLoadedAlgorithm.GetPointer());
+    const IMultiResAlgorithm *pResAlg =
+      dynamic_cast<const IMultiResAlgorithm *>(this->m_spLoadedAlgorithm.GetPointer());
 
     map::algorithm::facet::MultiResRegistrationAlgorithmInterface::ResolutionLevelCountType count = 0;
     bool hasCount = false;
@@ -162,10 +152,8 @@ void QmitkFramesRegistrationJob::OnMapAlgorithmEvent(::itk::Object*, const itk::
   }
 }
 
-QmitkFramesRegistrationJob::
-QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase* pAlgorithm) :
-  m_spLoadedAlgorithm(pAlgorithm),
-  m_TargetNodeUID("Missing target UID")
+QmitkFramesRegistrationJob::QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase *pAlgorithm)
+  : m_spLoadedAlgorithm(pAlgorithm), m_TargetNodeUID("Missing target UID")
 {
   m_MappedName = "Unnamed RegJob";
 
@@ -176,15 +164,12 @@ QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase* pAlgorithm
   m_ObserverID = m_spLoadedAlgorithm->AddObserver(::map::events::AlgorithmEvent(), m_spCommand);
 };
 
-QmitkFramesRegistrationJob::
-~QmitkFramesRegistrationJob()
+QmitkFramesRegistrationJob::~QmitkFramesRegistrationJob()
 {
   m_spLoadedAlgorithm->RemoveObserver(m_ObserverID);
 };
 
-void
-QmitkFramesRegistrationJob::
-run()
+void QmitkFramesRegistrationJob::run()
 {
   try
   {
@@ -204,10 +189,10 @@ run()
     m_helper->AddObserver(::map::events::AnyMatchPointEvent(), m_spCommand);
     m_helper->AddObserver(::itk::ProgressEvent(), m_spCommand);
 
-    //perform registration
+    // perform registration
     m_spMappedImageNode = m_helper->GetRegisteredImage();
 
-    //wrap the registration in a data node
+    // wrap the registration in a data node
     if (m_spMappedImageNode.IsNull())
     {
       emit Error(QString("Error. No registration was determined. No results to store."));
@@ -217,7 +202,7 @@ run()
       emit ResultIsAvailable(m_spMappedImageNode, this);
     }
   }
-  catch (::std::exception& e)
+  catch (::std::exception &e)
   {
     emit Error(QString("Error while registering data. Details: ") + QString::fromLatin1(e.what()));
   }

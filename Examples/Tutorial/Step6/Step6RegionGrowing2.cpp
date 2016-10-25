@@ -18,8 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkInstantiateAccessFunctions.h>
 
-#define InstantiateAccessFunction_RegionGrowing(pixelType, dim) \
-template void RegionGrowing(itk::Image<pixelType, dim>*, Step6*);
+#define InstantiateAccessFunction_RegionGrowing(pixelType, dim)                                                        \
+  \
+template void                                                                                                          \
+    RegionGrowing(itk::Image<pixelType, dim> *, Step6 *);
 
 /// Instantiate the access function for 3D and all datatypes.
 /// Instantiation for 2D is done in Step6RegionGrowing1.
@@ -27,6 +29,6 @@ template void RegionGrowing(itk::Image<pixelType, dim>*, Step6*);
 /// instantiation, some even need the separation in 2D/3D.
 InstantiateAccessFunctionForFixedDimension(RegionGrowing, 3)
 
-/**
-\example Step6RegionGrowing2.cpp
-*/
+  /**
+  \example Step6RegionGrowing2.cpp
+  */

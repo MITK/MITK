@@ -15,12 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMeanReciprocalSquareDifferenceMetricView.h"
-#include <itkMeanReciprocalSquareDifferenceImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkMeanReciprocalSquareDifferenceImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkMeanReciprocalSquareDifferenceMetricView::QmitkMeanReciprocalSquareDifferenceMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkMeanReciprocalSquareDifferenceMetricView::QmitkMeanReciprocalSquareDifferenceMetricView(QWidget *parent,
+                                                                                             Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -43,17 +45,19 @@ itk::Object::Pointer QmitkMeanReciprocalSquareDifferenceMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMeanReciprocalSquareDifferenceMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkMeanReciprocalSquareDifferenceMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::MeanReciprocalSquareDifferenceImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanReciprocalSquareDifferenceImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::MeanReciprocalSquareDifferenceImageToImageMetric<FixedImageType, MovingImageType>::Pointer
+    MetricPointer = itk::MeanReciprocalSquareDifferenceImageToImageMetric<FixedImageType, MovingImageType>::New();
   //------------------------------------------------------------
   // The lambda value is the intensity difference that should
   // make the metric drop by 50%
   //------------------------------------------------------------
-  MetricPointer->SetLambda( m_Controls.m_LambdaMeanReciprocalSquareDifference->text().toInt() );
+  MetricPointer->SetLambda(m_Controls.m_LambdaMeanReciprocalSquareDifference->text().toInt());
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -80,10 +84,10 @@ QString QmitkMeanReciprocalSquareDifferenceMetricView::GetName()
   return "MeanReciprocalSquareDifference";
 }
 
-void QmitkMeanReciprocalSquareDifferenceMetricView::SetupUI(QWidget* parent)
+void QmitkMeanReciprocalSquareDifferenceMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_LambdaMeanReciprocalSquareDifference->setValidator(validatorLineEditInput);
 }
 

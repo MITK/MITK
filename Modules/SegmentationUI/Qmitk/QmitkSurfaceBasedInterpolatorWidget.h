@@ -20,22 +20,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkSegmentationUIExports.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
-#include "mitkSurfaceBasedInterpolationController.h"
 #include "mitkLabelSetImage.h"
+#include "mitkSurfaceBasedInterpolationController.h"
 
 #include <map>
 
 #include <QWidget>
 
-//For running 3D interpolation in background
-#include <QtConcurrentRun>
+// For running 3D interpolation in background
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QTimer>
+#include <QtConcurrentRun>
 
 #include "ui_QmitkSurfaceBasedInterpolatorWidgetGUIControls.h"
 
-namespace mitk {
+namespace mitk
+{
   class ToolManager;
 }
 
@@ -48,7 +49,8 @@ namespace mitk {
   \sa QmitkInteractiveSegmentation
   \sa mitk::SurfaceBasedInterpolationController
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
+  QmitkInteractiveSegmentationTechnicalPage
 
   QmitkSurfaceBasedInterpolatorWidgetController is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of suggestions.
@@ -57,70 +59,68 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceBasedInterpolatorWidget : public QWi
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkSurfaceBasedInterpolatorWidget(QWidget *parent = 0, const char *name = 0);
+  virtual ~QmitkSurfaceBasedInterpolatorWidget();
 
-    QmitkSurfaceBasedInterpolatorWidget(QWidget* parent = 0, const char* name = 0);
-    virtual ~QmitkSurfaceBasedInterpolatorWidget();
+  void SetDataStorage(mitk::DataStorage &storage);
 
-    void SetDataStorage(mitk::DataStorage& storage);
+  void OnToolManagerWorkingDataModified();
 
-    void OnToolManagerWorkingDataModified();
+  /**
+     Just public because it is called by itk::Commands. You should not need to call this.
+   */
+  void OnSurfaceInterpolationInfoChanged(const itk::EventObject &);
 
-   /**
-      Just public because it is called by itk::Commands. You should not need to call this.
-    */
-    void OnSurfaceInterpolationInfoChanged(const itk::EventObject&);
+  /**
+   * @brief Set the visibility of the interpolation
+   */
+  void ShowInterpolationResult(bool);
 
-    /**
-     * @brief Set the visibility of the interpolation
-     */
-    void ShowInterpolationResult(bool);
+  Ui::QmitkSurfaceBasedInterpolatorWidgetGUIControls m_Controls;
 
-    Ui::QmitkSurfaceBasedInterpolatorWidgetGUIControls m_Controls;
+public slots:
 
-  public slots:
+  /**
+    \brief Reaction to "Start/Stop" button click
+  */
+  void OnToggleWidgetActivation(bool);
 
-    /**
-      \brief Reaction to "Start/Stop" button click
-    */
-    void OnToggleWidgetActivation(bool);
+protected slots:
 
-  protected slots:
+  void OnAcceptInterpolationClicked();
 
-    void OnAcceptInterpolationClicked();
+  void OnSurfaceInterpolationFinished();
 
-    void OnSurfaceInterpolationFinished();
+  void OnRunInterpolation();
 
-    void OnRunInterpolation();
+  void OnShowMarkers(bool);
 
-    void OnShowMarkers(bool);
+  void StartUpdateInterpolationTimer();
 
-    void StartUpdateInterpolationTimer();
+  void StopUpdateInterpolationTimer();
 
-    void StopUpdateInterpolationTimer();
-
-    void ChangeSurfaceColor();
+  void ChangeSurfaceColor();
 
 private:
+  mitk::SurfaceBasedInterpolationController::Pointer m_SurfaceBasedInterpolatorController;
 
-    mitk::SurfaceBasedInterpolationController::Pointer m_SurfaceBasedInterpolatorController;
+  mitk::ToolManager *m_ToolManager;
 
-    mitk::ToolManager* m_ToolManager;
+  bool m_Activated;
 
-    bool m_Activated;
+  unsigned int m_SurfaceInterpolationInfoChangedObserverTag;
 
-    unsigned int m_SurfaceInterpolationInfoChangedObserverTag;
+  mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
+  mitk::DataNode::Pointer m_3DContourNode;
 
-    mitk::DataNode::Pointer m_InterpolatedSurfaceNode;
-    mitk::DataNode::Pointer m_3DContourNode;
+  mitk::DataStorage::Pointer m_DataStorage;
 
-    mitk::DataStorage::Pointer m_DataStorage;
+  mitk::LabelSetImage::Pointer m_WorkingImage;
 
-    mitk::LabelSetImage::Pointer m_WorkingImage;
-
-    QFuture<void> m_Future;
-    QFutureWatcher<void> m_Watcher;
-    QTimer* m_Timer;
+  QFuture<void> m_Future;
+  QFutureWatcher<void> m_Watcher;
+  QTimer *m_Timer;
 };
 
 #endif

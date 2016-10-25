@@ -17,20 +17,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkAdaptiveRegionGrowingTool_h_Included
 #define mitkAdaptiveRegionGrowingTool_h_Included
 
-#include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkAutoSegmentationTool.h"
+#include "mitkCommon.h"
 #include "mitkDataStorage.h"
-#include "mitkSinglePointDataInteractor.h"
 #include "mitkPointSet.h"
+#include "mitkSinglePointDataInteractor.h"
+#include <MitkSegmentationExports.h>
 
-namespace us {
-class ModuleResource;
+namespace us
+{
+  class ModuleResource;
 }
 
 namespace mitk
 {
-
   /**
   \brief Dummy Tool for AdaptiveRegionGrowingToolGUI to get Tool functionality for AdaptiveRegionGrowing.
   The actual logic is implemented in QmitkAdaptiveRegionGrowingToolGUI.
@@ -43,27 +43,25 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT AdaptiveRegionGrowingTool : public AutoSegmentationTool
   {
   public:
-
     /**
      * @brief mitkClassMacro
      */
     mitkClassMacro(AdaptiveRegionGrowingTool, AutoSegmentationTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    bool CanHandle(BaseData* referenceData) const override;
+      bool CanHandle(BaseData *referenceData) const override;
 
     /**
      * @brief Get XPM
      * @return NULL
      */
-    virtual const char** GetXPM() const override;
+    virtual const char **GetXPM() const override;
 
     /**
      * @brief Get name
      * @return name of the Tool
      */
-    virtual const char* GetName() const override;
+    virtual const char *GetName() const override;
 
     /**
      * @brief Get icon resource
@@ -95,25 +93,23 @@ namespace mitk
      * @brief get reference data
      * @return the current reference data.
      */
-    mitk::DataNode* GetReferenceData();
+    mitk::DataNode *GetReferenceData();
 
     /**
      * @brief Get working data
      * @return a list of all working data.
      */
-    mitk::DataNode* GetWorkingData();
+    mitk::DataNode *GetWorkingData();
 
     /**
      * @brief Get datastorage
      * @return the current data storage.
      */
-    mitk::DataStorage* GetDataStorage();
+    mitk::DataStorage *GetDataStorage();
 
     void ConfirmSegmentation();
 
-
   protected:
-
     /**
      * @brief constructor
      */
@@ -128,8 +124,6 @@ namespace mitk
     PointSet::Pointer m_PointSet;
     SinglePointDataInteractor::Pointer m_SeedPointInteractor;
     DataNode::Pointer m_PointSetNode;
-
-
   };
 
 } // namespace

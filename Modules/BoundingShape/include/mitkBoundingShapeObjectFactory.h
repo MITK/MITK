@@ -17,26 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkBoundingShapeObjectFactory_h
 #define mitkBoundingShapeObjectFactory_h
 
-#include <mitkCoreObjectFactoryBase.h>
 #include <MitkBoundingShapeExports.h>
+#include <mitkCoreObjectFactoryBase.h>
 
 namespace mitk
 {
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeObjectFactory : public CoreObjectFactoryBase
   {
   public:
+    mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual Mapper::Pointer CreateMapper(DataNode* node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(DataNode* node) override;
-    virtual const char* GetFileExtensions() override;
+      virtual Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
+    virtual void SetDefaultProperties(DataNode *node) override;
+    virtual const char *GetFileExtensions() override;
     virtual CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    virtual const char* GetSaveFileExtensions() override;
+    virtual const char *GetSaveFileExtensions() override;
     virtual CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
-    virtual const char* GetDescription() const override;
+    virtual const char *GetDescription() const override;
 
   protected:
     BoundingShapeObjectFactory();

@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkRenderWindow.h>
 
-#include <mitkInteractionConst.h>
-#include <ctkServiceTracker.h>
-#include <berryIBerryPreferences.h>
-#include <mitkIRenderingManager.h>
 #include "org_mitk_example_gui_customviewer_views_Activator.h"
+#include <berryIBerryPreferences.h>
+#include <ctkServiceTracker.h>
+#include <mitkIRenderingManager.h>
+#include <mitkInteractionConst.h>
 
 #include <QVBoxLayout>
 #include <mitkPlaneGeometry.h>
@@ -36,30 +36,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 class AbstractRenderWindowViewPrivate
 {
 public:
-
   AbstractRenderWindowViewPrivate()
-    : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
-    , m_PrefServiceTracker(org_mitk_example_gui_customviewer_views_Activator::GetPluginContext())
-// //! [SimpleRenderWindowViewHelper]
+    : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance())),
+      m_PrefServiceTracker(org_mitk_example_gui_customviewer_views_Activator::GetPluginContext())
+  // //! [SimpleRenderWindowViewHelper]
   {
     m_PrefServiceTracker.open();
   }
 
-  ~AbstractRenderWindowViewPrivate()
-  {
-    delete m_RenderingManagerInterface;
-  }
-
-  mitk::IRenderingManager* m_RenderingManagerInterface;
-  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
+  ~AbstractRenderWindowViewPrivate() { delete m_RenderingManagerInterface; }
+  mitk::IRenderingManager *m_RenderingManagerInterface;
+  ctkServiceTracker<berry::IPreferencesService *> m_PrefServiceTracker;
   berry::IBerryPreferences::Pointer m_Prefs;
 };
 
 const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.customviewer.views.simplerenderwindowview";
 
-
-SimpleRenderWindowView::SimpleRenderWindowView()
-  : m_RenderWindow(0), d(new AbstractRenderWindowViewPrivate)
+SimpleRenderWindowView::SimpleRenderWindowView() : m_RenderWindow(0), d(new AbstractRenderWindowViewPrivate)
 {
 }
 
@@ -74,14 +67,14 @@ QmitkRenderWindow *SimpleRenderWindowView::GetActiveQmitkRenderWindow() const
 
 QHash<QString, QmitkRenderWindow *> SimpleRenderWindowView::GetRenderWindows() const
 {
-  QHash<QString, QmitkRenderWindow*> wnds;
+  QHash<QString, QmitkRenderWindow *> wnds;
   wnds.insert("transversal", m_RenderWindow);
   return wnds;
 }
 
 QHash<QString, QmitkRenderWindow *> SimpleRenderWindowView::GetQmitkRenderWindows() const
 {
-  QHash<QString, QmitkRenderWindow*> wnds;
+  QHash<QString, QmitkRenderWindow *> wnds;
   wnds.insert("transversal", m_RenderWindow);
   return wnds;
 }
@@ -106,8 +99,7 @@ QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &i
 
 mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/) const
 {
-  const mitk::PlaneGeometry* pg =
-      m_RenderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  const mitk::PlaneGeometry *pg = m_RenderWindow->GetSliceNavigationController()->GetCurrentPlaneGeometry();
   if (pg)
   {
     return pg->GetCenter();
@@ -118,7 +110,7 @@ mitk::Point3D SimpleRenderWindowView::GetSelectedPosition(const QString & /*id*/
   }
 }
 
-void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D &pos, const QString &/*id*/)
+void SimpleRenderWindowView::SetSelectedPosition(const mitk::Point3D &pos, const QString & /*id*/)
 {
 }
 
@@ -152,10 +144,10 @@ void SimpleRenderWindowView::SetFocus()
 }
 
 // //! [SimpleRenderWindowViewCreatePartControl]
-void SimpleRenderWindowView::CreateQtPartControl(QWidget* parent)
+void SimpleRenderWindowView::CreateQtPartControl(QWidget *parent)
 {
-  QVBoxLayout* layout = new QVBoxLayout(parent);
-  layout->setContentsMargins(0,0,0,0);
+  QVBoxLayout *layout = new QVBoxLayout(parent);
+  layout->setContentsMargins(0, 0, 0, 0);
 
   m_RenderWindow = new QmitkRenderWindow(parent);
   layout->addWidget(m_RenderWindow);
@@ -167,7 +159,7 @@ void SimpleRenderWindowView::CreateQtPartControl(QWidget* parent)
 }
 // //! [SimpleRenderWindowViewCreatePartControl]
 
-mitk::IRenderingManager* SimpleRenderWindowView::GetRenderingManager() const
+mitk::IRenderingManager *SimpleRenderWindowView::GetRenderingManager() const
 {
   // we use the global rendering manager here. This should maybe replaced
   // by a local one, managing only the render windows specific for the view
@@ -186,7 +178,7 @@ void SimpleRenderWindowView::ForceImmediateUpdate(mitk::RenderingManager::Reques
     GetRenderingManager()->ForceImmediateUpdateAll(requestType);
 }
 
-mitk::SliceNavigationController* SimpleRenderWindowView::GetTimeNavigationController() const
+mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationController() const
 {
   if (GetRenderingManager())
     return GetRenderingManager()->GetTimeNavigationController();

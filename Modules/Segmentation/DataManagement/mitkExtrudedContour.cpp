@@ -14,31 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkExtrudedContour.h"
-#include "mitkNumericTypes.h"
 #include "mitkBaseProcess.h"
+#include "mitkNumericTypes.h"
 #include "mitkProportionalTimeGeometry.h"
 
-#include <vtkLinearExtrusionFilter.h>
-#include <vtkPolyData.h>
-#include <vtkPoints.h>
 #include <vtkCellArray.h>
-#include <vtkPlanes.h>
 #include <vtkClipPolyData.h>
+#include <vtkLinearExtrusionFilter.h>
+#include <vtkPlanes.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
 
-#include <vtkPolygon.h>
-#include <vtkFloatArray.h>
 #include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
 #include <vtkPlane.h>
+#include <vtkPolygon.h>
 
-
-//vtkButterflySubdivisionFilter * subdivs;
+// vtkButterflySubdivisionFilter * subdivs;
+#include <vtkCubeSource.h>
+#include <vtkImageData.h>
+#include <vtkLinearSubdivisionFilter.h>
 #include <vtkSampleFunction.h>
 #include <vtkTriangleFilter.h>
-#include <vtkLinearSubdivisionFilter.h>
-#include <vtkImageData.h>
-#include <vtkCubeSource.h>
 
 mitk::ExtrudedContour::ExtrudedContour()
   : m_Contour(nullptr), m_ClippingGeometry(nullptr), m_AutomaticVectorGeneration(false)
@@ -55,7 +53,7 @@ mitk::ExtrudedContour::ExtrudedContour()
   m_ExtrusionFilter->CappingOff();
   m_ExtrusionFilter->SetExtrusionTypeToVectorExtrusion();
 
-  double vtkvector[3]={0,0,1};
+  double vtkvector[3] = {0, 0, 1};
 
   // set extrusion vector
   m_ExtrusionFilter->SetVector(vtkvector);
@@ -88,40 +86,41 @@ mitk::ExtrudedContour::~ExtrudedContour()
   m_Polygon->Delete();
 }
 
-bool mitk::ExtrudedContour::IsInside(const Point3D& worldPoint) const
+bool mitk::ExtrudedContour::IsInside(const Point3D &worldPoint) const
 {
-  static double polygonNormal[3]={0.0,0.0,1.0};
+  static double polygonNormal[3] = {0.0, 0.0, 1.0};
 
   // project point onto plane
   float xt[3];
   itk2vtk(worldPoint, xt);
 
-  xt[0] = worldPoint[0]-m_Origin[0];
-  xt[1] = worldPoint[1]-m_Origin[1];
-  xt[2] = worldPoint[2]-m_Origin[2];
+  xt[0] = worldPoint[0] - m_Origin[0];
+  xt[1] = worldPoint[1] - m_Origin[1];
+  xt[2] = worldPoint[2] - m_Origin[2];
 
-  float dist=xt[0]*m_Normal[0]+xt[1]*m_Normal[1]+xt[2]*m_Normal[2];
-  xt[0] -= dist*m_Normal[0];
-  xt[1] -= dist*m_Normal[1];
-  xt[2] -= dist*m_Normal[2];
+  float dist = xt[0] * m_Normal[0] + xt[1] * m_Normal[1] + xt[2] * m_Normal[2];
+  xt[0] -= dist * m_Normal[0];
+  xt[1] -= dist * m_Normal[1];
+  xt[2] -= dist * m_Normal[2];
 
   double x[3];
 
-  x[0] = xt[0]*m_Right[0]+xt[1]*m_Right[1]+xt[2]*m_Right[2];
-  x[1] = xt[0]*m_Down[0] +xt[1]*m_Down[1] +xt[2]*m_Down[2];
+  x[0] = xt[0] * m_Right[0] + xt[1] * m_Right[1] + xt[2] * m_Right[2];
+  x[1] = xt[0] * m_Down[0] + xt[1] * m_Down[1] + xt[2] * m_Down[2];
   x[2] = 0;
 
   // determine whether it's in the selection loop and then evaluate point
   // in polygon only if absolutely necessary.
-  if ( x[0] >= this->m_ProjectedContourBounds[0] && x[0] <= this->m_ProjectedContourBounds[1] &&
-    x[1] >= this->m_ProjectedContourBounds[2] && x[1] <= this->m_ProjectedContourBounds[3] &&
-    this->m_Polygon->PointInPolygon(x, m_Polygon->Points->GetNumberOfPoints(),
-    ((vtkDoubleArray *)this->m_Polygon->Points->GetData())->GetPointer(0),
-    (double*)const_cast<mitk::ExtrudedContour*>(this)->m_ProjectedContourBounds, polygonNormal) == 1 )
+  if (x[0] >= this->m_ProjectedContourBounds[0] && x[0] <= this->m_ProjectedContourBounds[1] &&
+      x[1] >= this->m_ProjectedContourBounds[2] && x[1] <= this->m_ProjectedContourBounds[3] &&
+      this->m_Polygon->PointInPolygon(x,
+                                      m_Polygon->Points->GetNumberOfPoints(),
+                                      ((vtkDoubleArray *)this->m_Polygon->Points->GetData())->GetPointer(0),
+                                      (double *)const_cast<mitk::ExtrudedContour *>(this)->m_ProjectedContourBounds,
+                                      polygonNormal) == 1)
     return true;
   else
     return false;
-
 }
 
 mitk::ScalarType mitk::ExtrudedContour::GetVolume()
@@ -131,22 +130,22 @@ mitk::ScalarType mitk::ExtrudedContour::GetVolume()
 
 void mitk::ExtrudedContour::UpdateOutputInformation()
 {
-  if ( this->GetSource() )
+  if (this->GetSource())
   {
     this->GetSource()->UpdateOutputInformation();
   }
-  if(GetMTime() > m_LastCalculateExtrusionTime)
+  if (GetMTime() > m_LastCalculateExtrusionTime)
   {
     BuildGeometry();
     BuildSurface();
   }
-  //if ( ( m_CalculateBoundingBox ) && ( m_PolyDataSeries.size() > 0 ) )
+  // if ( ( m_CalculateBoundingBox ) && ( m_PolyDataSeries.size() > 0 ) )
   //  CalculateBoundingBox();
 }
 
 void mitk::ExtrudedContour::BuildSurface()
 {
-  if(m_Contour.IsNull())
+  if (m_Contour.IsNull())
   {
     SetVtkPolyData(nullptr);
     return;
@@ -154,24 +153,24 @@ void mitk::ExtrudedContour::BuildSurface()
 
   // set extrusion contour
   vtkPolyData *polyData = vtkPolyData::New();
-  vtkCellArray *polys   = vtkCellArray::New();
+  vtkCellArray *polys = vtkCellArray::New();
 
   polys->InsertNextCell(m_Polygon->GetPointIds());
   polyData->SetPoints(m_Polygon->GetPoints());
 
-  //float vtkpoint[3];
-  //unsigned int i, numPts = m_Polygon->GetNumberOfPoints();
-  //for(i=0; i<numPts; ++i)
+  // float vtkpoint[3];
+  // unsigned int i, numPts = m_Polygon->GetNumberOfPoints();
+  // for(i=0; i<numPts; ++i)
   //{
   //  float * vtkpoint = this->m_Polygon->Points->GetPoint(i);
 
   //  pointids[i]=loopPoints->InsertNextPoint(vtkpoint);
   //}
-  //polys->InsertNextCell( i, pointids );
-  //delete [] pointids;
+  // polys->InsertNextCell( i, pointids );
+  // delete [] pointids;
 
-  //polyData->SetPoints( loopPoints );
-  polyData->SetPolys( polys );
+  // polyData->SetPoints( loopPoints );
+  polyData->SetPolys(polys);
   polys->Delete();
 
   m_ExtrusionFilter->SetInputData(polyData);
@@ -181,11 +180,11 @@ void mitk::ExtrudedContour::BuildSurface()
   // set extrusion scale factor
   m_ExtrusionFilter->SetScaleFactor(GetGeometry()->GetExtentInMM(2));
   SetVtkPolyData(m_SubdivisionFilter->GetOutput());
-  //if(m_ClippingGeometry.IsNull())
+  // if(m_ClippingGeometry.IsNull())
   //{
   //  SetVtkPolyData(m_SubdivisionFilter->GetOutput());
   //}
-  //else
+  // else
   //{
   //  m_ClipPolyDataFilter->SetInput(m_SubdivisionFilter->GetOutput());
   //  mitk::BoundingBox::BoundsArrayType bounds=m_ClippingGeometry->GetBounds();
@@ -202,19 +201,20 @@ void mitk::ExtrudedContour::BuildSurface()
 
 void mitk::ExtrudedContour::BuildGeometry()
 {
-  if(m_Contour.IsNull())
+  if (m_Contour.IsNull())
     return;
 
-//  Initialize(1);
+  //  Initialize(1);
 
-  Vector3D nullvector; nullvector.Fill(0.0);
+  Vector3D nullvector;
+  nullvector.Fill(0.0);
   float xProj[3];
   unsigned int i;
-  unsigned int numPts = 20; //m_Contour->GetNumberOfPoints();
+  unsigned int numPts = 20; // m_Contour->GetNumberOfPoints();
   mitk::Contour::PathPointer path = m_Contour->GetContourPath();
   mitk::Contour::PathType::InputType cstart = path->StartOfInput();
-  mitk::Contour::PathType::InputType cend   = path->EndOfInput();
-  mitk::Contour::PathType::InputType cstep  = (cend-cstart)/numPts;
+  mitk::Contour::PathType::InputType cend = path->EndOfInput();
+  mitk::Contour::PathType::InputType cstep = (cend - cstart) / numPts;
   mitk::Contour::PathType::InputType ccur;
 
   // Part I: guarantee/calculate legal vectors
@@ -222,17 +222,17 @@ void mitk::ExtrudedContour::BuildGeometry()
   m_Vector.Normalize();
   itk2vtk(m_Vector, m_Normal);
   // check m_Vector
-  if(mitk::Equal(m_Vector, nullvector) || m_AutomaticVectorGeneration)
+  if (mitk::Equal(m_Vector, nullvector) || m_AutomaticVectorGeneration)
   {
-    if ( m_AutomaticVectorGeneration == false)
-      itkWarningMacro("Extrusion vector is 0 ("<< m_Vector << "); trying to use normal of polygon");
+    if (m_AutomaticVectorGeneration == false)
+      itkWarningMacro("Extrusion vector is 0 (" << m_Vector << "); trying to use normal of polygon");
 
     vtkPoints *loopPoints = vtkPoints::New();
-    //mitk::Contour::PointsContainerIterator pointsIt = m_Contour->GetPoints()->Begin();
+    // mitk::Contour::PointsContainerIterator pointsIt = m_Contour->GetPoints()->Begin();
     double vtkpoint[3];
 
-    unsigned int i=0;
-    for(i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep)
+    unsigned int i = 0;
+    for (i = 0, ccur = cstart; i < numPts; ++i, ccur += cstep)
     {
       itk2vtk(path->Evaluate(ccur), vtkpoint);
       loopPoints->InsertNextPoint(vtkpoint);
@@ -243,37 +243,43 @@ void mitk::ExtrudedContour::BuildGeometry()
     loopPoints->Delete();
 
     vtk2itk(m_Normal, m_Vector);
-    if(mitk::Equal(m_Vector, nullvector))
+    if (mitk::Equal(m_Vector, nullvector))
     {
       itkExceptionMacro("Cannot calculate normal of polygon");
     }
   }
   // check m_RightVector
-  if((mitk::Equal(m_RightVector, nullvector)) || (mitk::Equal(m_RightVector*m_Vector, 0.0)==false))
+  if ((mitk::Equal(m_RightVector, nullvector)) || (mitk::Equal(m_RightVector * m_Vector, 0.0) == false))
   {
-    if(mitk::Equal(m_RightVector, nullvector))
+    if (mitk::Equal(m_RightVector, nullvector))
     {
       itkDebugMacro("Right vector is 0. Calculating.");
     }
     else
     {
-      itkWarningMacro("Right vector ("<<m_RightVector<<") not perpendicular to extrusion vector "<<m_Vector<<": "<<m_RightVector*m_Vector);
+      itkWarningMacro("Right vector (" << m_RightVector << ") not perpendicular to extrusion vector " << m_Vector
+                                       << ": "
+                                       << m_RightVector * m_Vector);
     }
     // calculate a legal m_RightVector
-    if( mitk::Equal( m_Vector[1], 0.0f ) == false )
+    if (mitk::Equal(m_Vector[1], 0.0f) == false)
     {
-      FillVector3D( m_RightVector, 1.0f, -m_Vector[0]/m_Vector[1], 0.0f );
+      FillVector3D(m_RightVector, 1.0f, -m_Vector[0] / m_Vector[1], 0.0f);
       m_RightVector.Normalize();
     }
     else
     {
-      FillVector3D( m_RightVector, 0.0f, 1.0f, 0.0f );
+      FillVector3D(m_RightVector, 0.0f, 1.0f, 0.0f);
     }
   }
 
   // calculate down-vector
-  VnlVector rightDV = m_RightVector.GetVnlVector(); rightDV.normalize(); vnl2vtk(rightDV, m_Right);
-  VnlVector downDV  = vnl_cross_3d( m_Vector.GetVnlVector(), rightDV ); downDV.normalize();  vnl2vtk(downDV,  m_Down);
+  VnlVector rightDV = m_RightVector.GetVnlVector();
+  rightDV.normalize();
+  vnl2vtk(rightDV, m_Right);
+  VnlVector downDV = vnl_cross_3d(m_Vector.GetVnlVector(), rightDV);
+  downDV.normalize();
+  vnl2vtk(downDV, m_Down);
 
   // Part II: calculate plane as base for extrusion, project the contour
   // on this plane and store as polygon for IsInside test and BoundingBox calculation
@@ -283,7 +289,7 @@ void mitk::ExtrudedContour::BuildGeometry()
 
   // create vtkPolygon from contour and simultaneously determine 2D bounds of
   // contour projected on m_ProjectionPlane
-  //mitk::Contour::PointsContainerIterator pointsIt = m_Contour->GetPoints()->Begin();
+  // mitk::Contour::PointsContainerIterator pointsIt = m_Contour->GetPoints()->Begin();
   m_Polygon->Points->Reset();
   m_Polygon->Points->SetNumberOfPoints(numPts);
   m_Polygon->PointIds->Reset();
@@ -293,30 +299,35 @@ void mitk::ExtrudedContour::BuildGeometry()
   mitk::Point2D min, max;
   min.Fill(itk::NumericTraits<mitk::ScalarType>::max());
   max.Fill(itk::NumericTraits<mitk::ScalarType>::min());
-  xProj[2]=0.0;
-  for(i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep)
+  xProj[2] = 0.0;
+  for (i = 0, ccur = cstart; i < numPts; ++i, ccur += cstep)
   {
     pt3d.CastFrom(path->Evaluate(ccur));
     m_ProjectionPlane->Map(pt3d, pt2d);
-    xProj[0]=pt2d[0];
-    if(pt2d[0]<min[0]) min[0]=pt2d[0];
-    if(pt2d[0]>max[0]) max[0]=pt2d[0];
-    xProj[1]=pt2d[1];
-    if(pt2d[1]<min[1]) min[1]=pt2d[1];
-    if(pt2d[1]>max[1]) max[1]=pt2d[1];
+    xProj[0] = pt2d[0];
+    if (pt2d[0] < min[0])
+      min[0] = pt2d[0];
+    if (pt2d[0] > max[0])
+      max[0] = pt2d[0];
+    xProj[1] = pt2d[1];
+    if (pt2d[1] < min[1])
+      min[1] = pt2d[1];
+    if (pt2d[1] > max[1])
+      max[1] = pt2d[1];
     m_Polygon->Points->SetPoint(i, xProj);
     m_Polygon->PointIds->SetId(i, i);
   }
   // shift parametric origin to (0,0)
-  for(i=0; i<numPts; ++i)
+  for (i = 0; i < numPts; ++i)
   {
-    double * pt = this->m_Polygon->Points->GetPoint(i);
+    double *pt = this->m_Polygon->Points->GetPoint(i);
 
-    pt[0]-=min[0]; pt[1]-=min[1];
-    itkDebugMacro( << i << ": (" << pt[0] << "," << pt[1] << "," << pt[2] << ")" );
+    pt[0] -= min[0];
+    pt[1] -= min[1];
+    itkDebugMacro(<< i << ": (" << pt[0] << "," << pt[1] << "," << pt[2] << ")");
   }
   this->m_Polygon->GetBounds(m_ProjectedContourBounds);
-  //m_ProjectedContourBounds[4]=-1.0; m_ProjectedContourBounds[5]=1.0;
+  // m_ProjectedContourBounds[4]=-1.0; m_ProjectedContourBounds[5]=1.0;
 
   // calculate origin (except translation along the normal) and bounds
   // of m_ProjectionPlane:
@@ -324,50 +335,53 @@ void mitk::ExtrudedContour::BuildGeometry()
   //  bounds from the extent of the polygon, both after projecting on the plane
   mitk::Point3D origin;
   m_ProjectionPlane->Map(min, origin);
-  ScalarType bounds[6]={0, max[0]-min[0], 0, max[1]-min[1], 0, 1};
+  ScalarType bounds[6] = {0, max[0] - min[0], 0, max[1] - min[1], 0, 1};
   m_ProjectionPlane->SetBounds(bounds);
   m_ProjectionPlane->SetOrigin(origin);
 
   // Part III: initialize geometry
-  if(m_ClippingGeometry.IsNotNull())
+  if (m_ClippingGeometry.IsNotNull())
   {
-    ScalarType min_dist=itk::NumericTraits<mitk::ScalarType>::max(), max_dist=itk::NumericTraits<mitk::ScalarType>::min(), dist;
+    ScalarType min_dist = itk::NumericTraits<mitk::ScalarType>::max(),
+               max_dist = itk::NumericTraits<mitk::ScalarType>::min(), dist;
     unsigned char i;
-    for(i=0; i<8; ++i)
+    for (i = 0; i < 8; ++i)
     {
-      dist = m_ProjectionPlane->SignedDistance( m_ClippingGeometry->GetCornerPoint(i) );
-      if(dist<min_dist) min_dist=dist;
-      if(dist>max_dist) max_dist=dist;
+      dist = m_ProjectionPlane->SignedDistance(m_ClippingGeometry->GetCornerPoint(i));
+      if (dist < min_dist)
+        min_dist = dist;
+      if (dist > max_dist)
+        max_dist = dist;
     }
-    //incorporate translation along the normal into origin
-    origin = origin+m_Vector*min_dist;
+    // incorporate translation along the normal into origin
+    origin = origin + m_Vector * min_dist;
     m_ProjectionPlane->SetOrigin(origin);
-    bounds[5]=max_dist-min_dist;
+    bounds[5] = max_dist - min_dist;
   }
   else
-    bounds[5]=20;
+    bounds[5] = 20;
 
   itk2vtk(origin, m_Origin);
 
-  mitk::BaseGeometry::Pointer g3d = GetGeometry( 0 );
-  assert( g3d.IsNotNull() );
+  mitk::BaseGeometry::Pointer g3d = GetGeometry(0);
+  assert(g3d.IsNotNull());
   g3d->SetBounds(bounds);
   g3d->SetIndexToWorldTransform(m_ProjectionPlane->GetIndexToWorldTransform());
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  timeGeometry->Initialize(g3d,1);
+  timeGeometry->Initialize(g3d, 1);
   SetTimeGeometry(timeGeometry);
-
 }
 
 unsigned long mitk::ExtrudedContour::GetMTime() const
 {
   unsigned long latestTime = Superclass::GetMTime();
-  if(m_Contour.IsNotNull())
+  if (m_Contour.IsNotNull())
   {
     unsigned long localTime;
     localTime = m_Contour->GetMTime();
-    if(localTime > latestTime) latestTime = localTime;
+    if (localTime > latestTime)
+      latestTime = localTime;
   }
   return latestTime;
 }

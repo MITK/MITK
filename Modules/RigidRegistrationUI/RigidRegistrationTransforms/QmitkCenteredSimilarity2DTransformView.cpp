@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCenteredSimilarity2DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
+#include <QValidator>
 #include <itkCenteredSimilarity2DTransform.h>
 #include <itkCenteredTransformInitializer.h>
-#include <QValidator>
+#include <mitkImageCast.h>
 
-QmitkCenteredSimilarity2DTransformView::QmitkCenteredSimilarity2DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkCenteredSimilarity2DTransformView::QmitkCenteredSimilarity2DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,34 +45,37 @@ itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 2)
   {
-    typedef typename itk::Image< TPixelType, 2 >  FixedImage2DType;
-    typedef typename itk::Image< TPixelType, 2 >  MovingImage2DType;
+    typedef typename itk::Image<TPixelType, 2> FixedImage2DType;
+    typedef typename itk::Image<TPixelType, 2> MovingImage2DType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImage2DType::Pointer fixedImage2D = itkImage1;
 
     // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
-    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk =
-        mitk::ImageToItk<MovingImage2DType>::New();
+    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImage2DType>::New();
     movingImageToItk->SetInput(m_MovingImage);
     movingImageToItk->Update();
     typename MovingImage2DType::Pointer movingImage2D = movingImageToItk->GetOutput();
 
-    typename itk::CenteredSimilarity2DTransform< double >::Pointer transformPointer = itk::CenteredSimilarity2DTransform< double >::New();
+    typename itk::CenteredSimilarity2DTransform<double>::Pointer transformPointer =
+      itk::CenteredSimilarity2DTransform<double>::New();
     transformPointer->SetIdentity();
     if (m_Controls.m_CenterForInitializerCenteredSimilarity2D->isChecked())
     {
-      typedef typename itk::CenteredSimilarity2DTransform< double >    CenteredSimilarity2DTransformType;
-      typedef typename itk::CenteredTransformInitializer<CenteredSimilarity2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
+      typedef typename itk::CenteredSimilarity2DTransform<double> CenteredSimilarity2DTransformType;
+      typedef typename itk::
+        CenteredTransformInitializer<CenteredSimilarity2DTransformType, FixedImage2DType, MovingImage2DType>
+          TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage2D );
-      transformInitializer->SetMovingImage( movingImage2D );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage2D);
+      transformInitializer->SetMovingImage(movingImage2D);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsCenteredSimilarity2D->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -83,8 +86,8 @@ itk::Object::Pointer QmitkCenteredSimilarity2DTransformView::GetTransform2(itk::
       }
       transformInitializer->InitializeTransform();
     }
-    transformPointer->SetScale( m_Controls.m_InitialScaleCenteredSimilarity2D->text().toFloat() );
-    transformPointer->SetAngle( m_Controls.m_AngleCenteredSimilarity2D->text().toFloat() );
+    transformPointer->SetScale(m_Controls.m_InitialScaleCenteredSimilarity2D->text().toFloat());
+    transformPointer->SetAngle(m_Controls.m_AngleCenteredSimilarity2D->text().toFloat());
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];
     m_TransformObject = transformPointer.GetPointer();
@@ -133,10 +136,10 @@ QString QmitkCenteredSimilarity2DTransformView::GetName()
   return "CenteredSimilarity2D";
 }
 
-void QmitkCenteredSimilarity2DTransformView::SetupUI(QWidget* parent)
+void QmitkCenteredSimilarity2DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesCenteredSimilarity2DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesCenteredSimilarity2DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesCenteredSimilarity2DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -162,7 +165,9 @@ itk::Array<double> QmitkCenteredSimilarity2DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkCenteredSimilarity2DTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkCenteredSimilarity2DTransformView::Transform(vtkMatrix4x4 * /*vtkmatrix*/,
+                                                                vtkTransform *vtktransform,
+                                                                itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

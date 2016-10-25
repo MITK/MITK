@@ -14,16 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKEnhancedPointSetVtkMapper3D_H_HEADER_INCLUDED_C1907273
 #define MITKEnhancedPointSetVtkMapper3D_H_HEADER_INCLUDED_C1907273
 
-#include "mitkCommon.h"
 #include "MitkMapperExtExports.h"
-#include "mitkVtkMapper.h"
 #include "mitkBaseRenderer.h"
+#include "mitkCommon.h"
 #include "mitkPointSet.h"
 #include "mitkVector.h"
+#include "mitkVtkMapper.h"
 
 class vtkActor;
 class vtkAssembly;
@@ -34,9 +33,8 @@ class vtkCylinderSource;
 class vtkTubeFilter;
 class vtkProp;
 
-
-namespace mitk {
-
+namespace mitk
+{
   /**
   * \brief Alternative Vtk-based 3D mapper for mitk::PointSet
   *
@@ -71,17 +69,15 @@ namespace mitk {
   public:
     mitkClassMacro(EnhancedPointSetVtkMapper3D, VtkMapper);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual const mitk::PointSet* GetInput();
+      virtual const mitk::PointSet *GetInput();
 
-    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) override;
+    virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
     virtual void UpdateVtkTransform(mitk::BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode* node,
-      mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
@@ -90,34 +86,35 @@ namespace mitk {
 
     virtual ~EnhancedPointSetVtkMapper3D();
 
-    void RemoveEntryFromSourceMaps( mitk::PointSet::PointIdentifier pointID );
-    void DeleteVtkObject(vtkObject* o);  // functor for stl_each in destructor
+    void RemoveEntryFromSourceMaps(mitk::PointSet::PointIdentifier pointID);
+    void DeleteVtkObject(vtkObject *o); // functor for stl_each in destructor
 
     // update all vtk sources, mappers, actors with current data and properties
     void UpdateVtkObjects();
 
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
-    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer* renderer, vtkActor* actor) override;
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
+    virtual void ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor *actor) override;
 
     typedef mitk::PointSet::PointIdentifier PointIdentifier;
-    typedef std::map<PointIdentifier, vtkSphereSource*> SphereSourceMap;
-    typedef std::map<PointIdentifier, vtkCubeSource*> CubeSourceMap;
-    typedef std::map<PointIdentifier, vtkConeSource*> ConeSourceMap;
-    typedef std::map<PointIdentifier, vtkCylinderSource*> CylinderSourceMap;
+    typedef std::map<PointIdentifier, vtkSphereSource *> SphereSourceMap;
+    typedef std::map<PointIdentifier, vtkCubeSource *> CubeSourceMap;
+    typedef std::map<PointIdentifier, vtkConeSource *> ConeSourceMap;
+    typedef std::map<PointIdentifier, vtkCylinderSource *> CylinderSourceMap;
 
-    typedef std::pair<vtkActor*, mitk::PointSpecificationType> ActorAndPointType;
+    typedef std::pair<vtkActor *, mitk::PointSpecificationType> ActorAndPointType;
     typedef std::map<PointIdentifier, ActorAndPointType> ActorMap;
 
-    SphereSourceMap m_SphereSources;      // stores all sphere sources
-    CubeSourceMap m_CubeSources;          // stores all cube sources
-    ConeSourceMap m_ConeSources;          // stores all cone sources
-    CylinderSourceMap m_CylinderSources;  // stores all cylinder sources
-    ActorMap m_PointActors; // stores an actor for each point(referenced by its ID) and the currently used pointspec = which source type is generating the polydata
+    SphereSourceMap m_SphereSources;     // stores all sphere sources
+    CubeSourceMap m_CubeSources;         // stores all cube sources
+    ConeSourceMap m_ConeSources;         // stores all cone sources
+    CylinderSourceMap m_CylinderSources; // stores all cylinder sources
+    ActorMap m_PointActors; // stores an actor for each point(referenced by its ID) and the currently used pointspec =
+                            // which source type is generating the polydata
 
-    vtkActor* m_Contour;
-    vtkTubeFilter* m_ContourSource;
+    vtkActor *m_Contour;
+    vtkTubeFilter *m_ContourSource;
 
-    vtkAssembly* m_PropAssembly;  // this contains everything, this will be returned by GetVtkProp()
+    vtkAssembly *m_PropAssembly; // this contains everything, this will be returned by GetVtkProp()
   };
 } // namespace mitk
 

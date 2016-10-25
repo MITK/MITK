@@ -14,46 +14,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 #define MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 
-#include "mitkLandmarkProjector.h"
 #include "MitkAlgorithmsExtExports.h"
+#include "mitkLandmarkProjector.h"
 #include "mitkPointSet.h"
 
-namespace mitk {
-
-//##Documentation
-//## @brief Thin-plate-spline-based landmark-based curved geometry
-//##
-//## @ingroup Geometry
-class MITKALGORITHMSEXT_EXPORT PlaneLandmarkProjector : public LandmarkProjector
+namespace mitk
 {
-public:
-  mitkClassMacro(PlaneLandmarkProjector, LandmarkProjector);
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
   //##Documentation
-  //## @brief Set the plane-geometry to project the target-landmarks on.
+  //## @brief Thin-plate-spline-based landmark-based curved geometry
   //##
-  itkSetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
-  //##Documentation
-  //## @brief Get the plane-geometry to project the target-landmarks on.
-  //##
-  itkGetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
+  //## @ingroup Geometry
+  class MITKALGORITHMSEXT_EXPORT PlaneLandmarkProjector : public LandmarkProjector
+  {
+  public:
+    mitkClassMacro(PlaneLandmarkProjector, LandmarkProjector);
 
-  virtual void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer* targetLandmarks) override;
-protected:
-  PlaneLandmarkProjector();
-  virtual ~PlaneLandmarkProjector();
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  virtual void ComputeCompleteAbstractTransform() override;
+      //##Documentation
+      //## @brief Set the plane-geometry to project the target-landmarks on.
+      //##
+      itkSetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
+    //##Documentation
+    //## @brief Get the plane-geometry to project the target-landmarks on.
+    //##
+    itkGetConstObjectMacro(ProjectionPlane, mitk::PlaneGeometry);
 
-  mitk::PlaneGeometry::ConstPointer m_ProjectionPlane;
-};
+    virtual void ProjectLandmarks(const mitk::PointSet::DataType::PointsContainer *targetLandmarks) override;
+
+  protected:
+    PlaneLandmarkProjector();
+    virtual ~PlaneLandmarkProjector();
+
+    virtual void ComputeCompleteAbstractTransform() override;
+
+    mitk::PlaneGeometry::ConstPointer m_ProjectionPlane;
+  };
 
 } // namespace mitk
 

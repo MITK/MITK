@@ -16,41 +16,39 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWatershedTool.h"
 
-#include "mitkToolManager.h"
+#include "mitkIOUtil.h"
+#include "mitkITKImageImport.h"
+#include "mitkImage.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
-#include "mitkRenderingManager.h"
-#include <mitkSliceNavigationController.h>
-#include "mitkRenderingModeProperty.h"
+#include "mitkImageStatisticsHolder.h"
+#include "mitkLevelWindowManager.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
-#include "mitkIOUtil.h"
-#include "mitkLevelWindowManager.h"
-#include "mitkImageStatisticsHolder.h"
-#include "mitkToolCommand.h"
 #include "mitkProgressBar.h"
-#include "mitkImage.h"
+#include "mitkRenderingManager.h"
+#include "mitkRenderingModeProperty.h"
+#include "mitkToolCommand.h"
+#include "mitkToolManager.h"
+#include <mitkSliceNavigationController.h>
 
-#include <usModule.h>
-#include <usModuleResource.h>
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleContext.h>
+#include <usModuleResource.h>
 
 #include <vtkLookupTable.h>
 
-#include <itkWatershedImageFilter.h>
-#include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
 #include <itkExceptionObject.h>
+#include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
+#include <itkWatershedImageFilter.h>
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, WatershedTool, "Watershed tool");
 }
 
-
-mitk::WatershedTool::WatershedTool() :
-  m_Threshold(0.0),
-  m_Level(0.0)
+mitk::WatershedTool::WatershedTool() : m_Threshold(0.0), m_Level(0.0)
 {
 }
 
@@ -70,27 +68,26 @@ void mitk::WatershedTool::Deactivated()
 
 us::ModuleResource mitk::WatershedTool::GetIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Watershed_48x48.png");
   return resource;
 }
 
-const char** mitk::WatershedTool::GetXPM() const
+const char **mitk::WatershedTool::GetXPM() const
 {
   return nullptr;
 }
 
-const char* mitk::WatershedTool::GetName() const
+const char *mitk::WatershedTool::GetName() const
 {
   return "Watershed";
 }
 
 void mitk::WatershedTool::DoIt()
 {
-
   // get image from tool manager
   mitk::DataNode::Pointer referenceData = m_ToolManager->GetReferenceData(0);
-  mitk::Image::Pointer input = dynamic_cast<mitk::Image*>(referenceData->GetData());
+  mitk::Image::Pointer input = dynamic_cast<mitk::Image *>(referenceData->GetData());
   if (input.IsNull())
     return;
 
@@ -99,9 +96,10 @@ void mitk::WatershedTool::DoIt()
 
   mitk::Image::Pointer output;
 
-  try {
+  try
+  {
     // create and run itk filter pipeline
-    AccessByItk_1(input.GetPointer(),ITKWatershed,output);
+    AccessByItk_1(input.GetPointer(), ITKWatershed, output);
 
     // create a new datanode for output
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
@@ -111,7 +109,7 @@ void mitk::WatershedTool::DoIt()
     dataNode->SetProperty("binary", mitk::BoolProperty::New(false));
     dataNode->SetProperty("name", mitk::StringProperty::New("Watershed Result"));
     mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue( mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR );
+    renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
     dataNode->SetProperty("Image Rendering.Mode", renderingMode);
 
     // since we create a multi label image, define a vtk lookup table
@@ -123,56 +121,59 @@ void mitk::WatershedTool::DoIt()
     lookupTable->SetValueRange(1.0, 1.0);
     lookupTable->SetTableRange(-1.0, 1.0);
     lookupTable->Build();
-    lookupTable->SetTableValue(1,0,0,0);
+    lookupTable->SetTableValue(1, 0, 0, 0);
     lut->SetVtkLookupTable(lookupTable);
     prop->SetLookupTable(lut);
-    dataNode->SetProperty("LookupTable",prop);
+    dataNode->SetProperty("LookupTable", prop);
 
     // make the levelwindow fit to right values
     mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
     mitk::LevelWindow levelwindow;
     levelwindow.SetRangeMinMax(0, output->GetStatistics()->GetScalarValueMax());
-    levWinProp->SetLevelWindow( levelwindow );
-    dataNode->SetProperty( "levelwindow", levWinProp );
-    dataNode->SetProperty( "opacity", mitk::FloatProperty::New(0.5));
+    levWinProp->SetLevelWindow(levelwindow);
+    dataNode->SetProperty("levelwindow", levWinProp);
+    dataNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
     // set name of data node
     std::string name = referenceData->GetName() + "_Watershed";
-    dataNode->SetName( name );
+    dataNode->SetName(name);
 
     // look, if there is already a node with this name
-    mitk::DataStorage::SetOfObjects::ConstPointer children = m_ToolManager->GetDataStorage()->GetDerivations(referenceData);
+    mitk::DataStorage::SetOfObjects::ConstPointer children =
+      m_ToolManager->GetDataStorage()->GetDerivations(referenceData);
     mitk::DataStorage::SetOfObjects::ConstIterator currentNode = children->Begin();
     mitk::DataNode::Pointer removeNode;
-    while(currentNode != children->End())
+    while (currentNode != children->End())
     {
-      if(dataNode->GetName().compare(currentNode->Value()->GetName()) == 0)
+      if (dataNode->GetName().compare(currentNode->Value()->GetName()) == 0)
       {
         removeNode = currentNode->Value();
       }
       currentNode++;
     }
     // remove node with same name
-    if(removeNode.IsNotNull())
+    if (removeNode.IsNotNull())
       m_ToolManager->GetDataStorage()->Remove(removeNode);
 
     // add output to the data storage
-    m_ToolManager->GetDataStorage()->Add(dataNode,referenceData);
+    m_ToolManager->GetDataStorage()->Add(dataNode, referenceData);
   }
-  catch(itk::ExceptionObject& e)
+  catch (itk::ExceptionObject &e)
   {
-    MITK_ERROR<<"Watershed Filter Error: " << e.GetDescription();
+    MITK_ERROR << "Watershed Filter Error: " << e.GetDescription();
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
-
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& segmentation )
+void mitk::WatershedTool::ITKWatershed(itk::Image<TPixel, VImageDimension> *originalImage,
+                                       mitk::Image::Pointer &segmentation)
 {
-  typedef itk::WatershedImageFilter< itk::Image<float, VImageDimension> > WatershedFilter;
-  typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< itk::Image<TPixel, VImageDimension >, itk::Image<float, VImageDimension> > MagnitudeFilter;
+  typedef itk::WatershedImageFilter<itk::Image<float, VImageDimension>> WatershedFilter;
+  typedef itk::GradientMagnitudeRecursiveGaussianImageFilter<itk::Image<TPixel, VImageDimension>,
+                                                             itk::Image<float, VImageDimension>>
+    MagnitudeFilter;
 
   // at first add a gradient magnitude filter
   typename MagnitudeFilter::Pointer magnitude = MagnitudeFilter::New();
@@ -188,11 +189,13 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   watershed->SetInput(magnitude->GetOutput());
   watershed->SetThreshold(m_Threshold);
   watershed->SetLevel(m_Level);
-  watershed->AddObserver(itk::ProgressEvent(),command);
+  watershed->AddObserver(itk::ProgressEvent(), command);
   watershed->Update();
 
   // then make sure, that the output has the desired pixel type
-  typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType, itk::Image<Tool::DefaultSegmentationDataType,VImageDimension> > CastFilter;
+  typedef itk::CastImageFilter<typename WatershedFilter::OutputImageType,
+                               itk::Image<Tool::DefaultSegmentationDataType, VImageDimension>>
+    CastFilter;
   typename CastFilter::Pointer cast = CastFilter::New();
   cast->SetInput(watershed->GetOutput());
 
@@ -205,5 +208,4 @@ void mitk::WatershedTool::ITKWatershed( itk::Image<TPixel, VImageDimension>* ori
   // since we obtain a new image from our pipeline, we have to make sure, that our mitk::Image::Pointer
   // is responsible for the memory management of the output image
   segmentation = mitk::GrabItkImageMemory(cast->GetOutput());
-
 }

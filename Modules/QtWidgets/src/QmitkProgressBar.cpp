@@ -19,9 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 #include "mitkRenderingManager.h"
 
-#include <qprogressbar.h>
 #include <qapplication.h>
-
+#include <qprogressbar.h>
 
 /**
  * Reset the progress bar. The progress bar "rewinds" and shows no progress.
@@ -61,17 +60,17 @@ void QmitkProgressBar::Progress(unsigned int steps)
   emit SignalProgress(steps);
 }
 
-
-QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
-:QProgressBar(parent), ProgressBarImplementation()
+QmitkProgressBar::QmitkProgressBar(QWidget *parent, const char * /*name*/)
+  : QProgressBar(parent), ProgressBarImplementation()
 {
-  m_TotalSteps = 0; m_Progress = 0;
+  m_TotalSteps = 0;
+  m_Progress = 0;
   this->hide();
   this->SetPercentageVisible(true);
 
-  connect( this, SIGNAL(SignalAddStepsToDo(unsigned int)), this, SLOT(SlotAddStepsToDo(unsigned int)) );
-  connect( this, SIGNAL(SignalProgress(unsigned int)), this, SLOT(SlotProgress(unsigned int)) );
-  connect( this, SIGNAL(SignalSetPercentageVisible(bool)), this, SLOT(SlotSetPercentageVisible(bool)) );
+  connect(this, SIGNAL(SignalAddStepsToDo(unsigned int)), this, SLOT(SlotAddStepsToDo(unsigned int)));
+  connect(this, SIGNAL(SignalProgress(unsigned int)), this, SLOT(SlotProgress(unsigned int)));
+  connect(this, SIGNAL(SignalSetPercentageVisible(bool)), this, SLOT(SlotSetPercentageVisible(bool)));
 
   mitk::ProgressBar::GetInstance()->RegisterImplementationInstance(this);
 }
@@ -90,13 +89,13 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
     Reset();
   else
   {
-     this->show();
+    this->show();
   }
 
   // Update views if repaint has been requested in the meanwhile
   // (because Qt event loop is not reached while progress bar is updating,
   // unless the application is threaded)
-  //qApp->processEvents();
+  // qApp->processEvents();
   mitk::RenderingManager::GetInstance()->ExecutePendingRequests();
 }
 
@@ -120,5 +119,3 @@ void QmitkProgressBar::SlotSetPercentageVisible(bool visible)
 {
   this->setTextVisible(visible);
 }
-
-

@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkKappaStatisticMetricView.h"
-#include <itkKappaStatisticImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkKappaStatisticImageToImageMetric.h>
 
-QmitkKappaStatisticMetricView::QmitkKappaStatisticMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkKappaStatisticMetricView::QmitkKappaStatisticMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
-
 }
 
 QmitkKappaStatisticMetricView::~QmitkKappaStatisticMetricView()
@@ -42,12 +42,13 @@ itk::Object::Pointer QmitkKappaStatisticMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkKappaStatisticMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkKappaStatisticMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::KappaStatisticImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::KappaStatisticImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::KappaStatisticImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::KappaStatisticImageToImageMetric<FixedImageType, MovingImageType>::New();
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -72,7 +73,7 @@ QString QmitkKappaStatisticMetricView::GetName()
   return "KappaStatistic";
 }
 
-void QmitkKappaStatisticMetricView::SetupUI(QWidget* parent)
+void QmitkKappaStatisticMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
 }

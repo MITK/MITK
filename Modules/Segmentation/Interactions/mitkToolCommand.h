@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
 
-namespace mitk {
-
+namespace mitk
+{
   /**
   * \brief A command to get tool process feedback.
   *
@@ -31,57 +31,54 @@ namespace mitk {
   */
   class MITKSEGMENTATION_EXPORT ToolCommand : public itk::Command
   {
-    public:
-      typedef  ToolCommand   Self;
-      typedef  itk::Command                Superclass;
-      typedef  itk::SmartPointer<Self>     Pointer;
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+  public:
+    typedef ToolCommand Self;
+    typedef itk::Command Superclass;
+    typedef itk::SmartPointer<Self> Pointer;
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       /**
       * \brief Reacts on events from ITK filters.
       *
       */
-      void Execute(itk::Object *caller, const itk::EventObject & event) override;
+      void Execute(itk::Object *caller, const itk::EventObject &event) override;
 
-      /**
-      * \brief Not implemented...
-      *
-      */
-      void Execute(const itk::Object * object, const itk::EventObject & event) override;
+    /**
+    * \brief Not implemented...
+    *
+    */
+    void Execute(const itk::Object *object, const itk::EventObject &event) override;
 
-      /**
-      * \brief Add new steps to the progress bar.
-      *
-      */
-      void AddStepsToDo(int steps);
+    /**
+    * \brief Add new steps to the progress bar.
+    *
+    */
+    void AddStepsToDo(int steps);
 
-      /**
-      * \brief Sets the remaining progress to the progress bar when the optimization process is done.
-      *
-      */
-      void SetProgress(int steps);
+    /**
+    * \brief Sets the remaining progress to the progress bar when the optimization process is done.
+    *
+    */
+    void SetProgress(int steps);
 
-      /**
-      * \brief Returns the current progress value.
-      *
-      */
-      double GetCurrentProgressValue();
+    /**
+    * \brief Returns the current progress value.
+    *
+    */
+    double GetCurrentProgressValue();
 
+    /**
+    * \brief Sets the stop processing flag, which is used to call ...
+    *
+    */
+    void SetStopProcessing(bool value);
 
-      /**
-      * \brief Sets the stop processing flag, which is used to call ...
-      *
-      */
-      void SetStopProcessing(bool value);
-
-    protected:
-      ToolCommand();
+  protected:
+    ToolCommand();
 
   private:
     double m_ProgressValue;
     bool m_StopProcessing;
-
   };
 
 } // namespace mitk

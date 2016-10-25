@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkLBFGSOptimizer.h>
 
-QmitkLBFGSOptimizerView::QmitkLBFGSOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkLBFGSOptimizerView::QmitkLBFGSOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkLBFGSOptimizerView::~QmitkLBFGSOptimizerView()
@@ -33,15 +32,14 @@ mitk::OptimizerParameters::OptimizerType QmitkLBFGSOptimizerView::GetOptimizerTy
   return mitk::OptimizerParameters::LBFGSOPTIMIZER;
 }
 
-
 itk::Object::Pointer QmitkLBFGSOptimizerView::GetOptimizer()
 {
   itk::LBFGSOptimizer::Pointer OptimizerPointer = itk::LBFGSOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
-  OptimizerPointer->SetGradientConvergenceTolerance( m_Controls.m_GradientMagnitudeToleranceLBFGS->text().toFloat() );
-  OptimizerPointer->SetLineSearchAccuracy( m_Controls.m_LineSearchAccuracyLBFGS->text().toFloat() );
-  OptimizerPointer->SetDefaultStepLength( m_Controls.m_DefaultStepLengthLBFGS->text().toFloat() );
-  OptimizerPointer->SetMaximumNumberOfFunctionEvaluations( m_Controls.m_MaximumEvaluationsLBFGS->text().toInt() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
+  OptimizerPointer->SetGradientConvergenceTolerance(m_Controls.m_GradientMagnitudeToleranceLBFGS->text().toFloat());
+  OptimizerPointer->SetLineSearchAccuracy(m_Controls.m_LineSearchAccuracyLBFGS->text().toFloat());
+  OptimizerPointer->SetDefaultStepLength(m_Controls.m_DefaultStepLengthLBFGS->text().toFloat());
+  OptimizerPointer->SetMaximumNumberOfFunctionEvaluations(m_Controls.m_MaximumEvaluationsLBFGS->text().toInt());
   OptimizerPointer->SetTrace(m_Controls.m_TraceOnLBFGS->isChecked());
   return OptimizerPointer.GetPointer();
 }
@@ -80,12 +78,12 @@ QString QmitkLBFGSOptimizerView::GetName()
   return "LBFGS";
 }
 
-void QmitkLBFGSOptimizerView::SetupUI(QWidget* parent)
+void QmitkLBFGSOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_MaximumEvaluationsLBFGS->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_GradientMagnitudeToleranceLBFGS->setValidator(validatorLineEditInputFloat);
   m_Controls.m_LineSearchAccuracyLBFGS->setValidator(validatorLineEditInputFloat);
   m_Controls.m_DefaultStepLengthLBFGS->setValidator(validatorLineEditInputFloat);

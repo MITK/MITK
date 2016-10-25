@@ -24,8 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPointSetDataInteractor.h"
 #include "ui_QmitkSimpleMeasurementControls.h"
 
-namespace Ui {
-class QmitkSimpleMeasurementControls;
+namespace Ui
+{
+  class QmitkSimpleMeasurementControls;
 }
 
 /**
@@ -43,14 +44,14 @@ public:
   virtual ~QmitkSimpleMeasurement();
 
 private:
-
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  virtual void CreateQtPartControl(QWidget *parent) override;
 
   virtual void SetFocus() override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+                                  const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  virtual void NodeRemoved(const mitk::DataNode *node) override;
 
   virtual void Activated() override;
   virtual void Deactivated() override;
@@ -68,11 +69,10 @@ private slots:
   void Finished();
 
 private:
-
   /**
    * controls containing sliders for scrolling through the slices
    */
-  Ui::QmitkSimpleMeasurementControls * m_Controls;
+  Ui::QmitkSimpleMeasurementControls *m_Controls;
 
   /*
    * Interactor for performing the simplemeasurements.
@@ -94,7 +94,6 @@ private:
   void StartEditingMeasurement();
   void EndEditingMeasurement();
   void UpdateMeasurementList();
-
 };
 
 #endif // QMITK_MEASUREMENT_H__INCLUDED

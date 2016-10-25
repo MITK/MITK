@@ -32,8 +32,7 @@ mitk::PlanarDoubleEllipse::PlanarDoubleEllipse()
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
 
-
-mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D& point)
+mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
   if (index == 2 && !m_ConstrainCircle)
   {
@@ -47,7 +46,8 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
 
     const double outerMajorRadius = outerMajorVector.GetNorm();
     const double innerMajorRadius = (this->GetControlPoint(3) - centerPoint).GetNorm();
-    const ScalarType radius = std::max(outerMajorRadius - innerMajorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
+    const ScalarType radius =
+      std::max(outerMajorRadius - innerMajorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
 
     return centerPoint + minorDirection * radius;
   }
@@ -58,7 +58,8 @@ mitk::Point2D mitk::PlanarDoubleEllipse::ApplyControlPointConstraints(unsigned i
 
     const double outerMajorRadius = outerMajorVector.GetNorm();
     const double outerMinorRadius = (this->GetControlPoint(2) - centerPoint).GetNorm();
-    const ScalarType radius = std::max(outerMajorRadius - outerMinorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
+    const ScalarType radius =
+      std::max(outerMajorRadius - outerMinorRadius, std::min(centerPoint.EuclideanDistanceTo(point), outerMajorRadius));
 
     outerMajorVector.Normalize();
 
@@ -173,7 +174,7 @@ unsigned int mitk::PlanarDoubleEllipse::GetMinimumNumberOfControlPoints() const
   return 4;
 }
 
-bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2D& point, bool createIfDoesNotExist)
+bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist)
 {
   switch (index)
   {
@@ -247,21 +248,21 @@ bool mitk::PlanarDoubleEllipse::SetControlPoint(unsigned int index, const Point2
   return true;
 }
 
- bool mitk::PlanarDoubleEllipse::Equals(const mitk::PlanarFigure& other) const
- {
-   const mitk::PlanarDoubleEllipse* otherDoubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse*>(&other);
-   if ( otherDoubleEllipse )
-   {
-     if( this->m_ConstrainCircle != otherDoubleEllipse->m_ConstrainCircle)
-       return false;
-     if( this->m_ConstrainThickness != otherDoubleEllipse->m_ConstrainThickness)
-       return false;
-     if( this->m_NumberOfSegments != otherDoubleEllipse->m_NumberOfSegments)
-       return false;
-     return Superclass::Equals(other);
-   }
-   else
-   {
-     return false;
-   }
- }
+bool mitk::PlanarDoubleEllipse::Equals(const mitk::PlanarFigure &other) const
+{
+  const mitk::PlanarDoubleEllipse *otherDoubleEllipse = dynamic_cast<const mitk::PlanarDoubleEllipse *>(&other);
+  if (otherDoubleEllipse)
+  {
+    if (this->m_ConstrainCircle != otherDoubleEllipse->m_ConstrainCircle)
+      return false;
+    if (this->m_ConstrainThickness != otherDoubleEllipse->m_ConstrainThickness)
+      return false;
+    if (this->m_NumberOfSegments != otherDoubleEllipse->m_NumberOfSegments)
+      return false;
+    return Superclass::Equals(other);
+  }
+  else
+  {
+    return false;
+  }
+}

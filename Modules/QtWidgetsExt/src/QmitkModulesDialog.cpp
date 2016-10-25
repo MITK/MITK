@@ -14,28 +14,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkModulesDialog.h"
 
+#include <QDialogButtonBox>
 #include <QHBoxLayout>
-#include <QTableView>
 #include <QHeaderView>
 #include <QSortFilterProxyModel>
-#include <QDialogButtonBox>
+#include <QTableView>
 
 #include "QmitkModuleTableModel.h"
 
-QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) :
-    QDialog(parent, f)
+QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
   this->setWindowTitle("MITK Modules");
 
-  auto  layout = new QVBoxLayout();
+  auto layout = new QVBoxLayout();
   this->setLayout(layout);
 
-  auto  tableView = new QTableView(this);
-  auto  tableModel = new QmitkModuleTableModel(tableView);
-  auto  sortProxyModel = new QSortFilterProxyModel(tableView);
+  auto tableView = new QTableView(this);
+  auto tableModel = new QmitkModuleTableModel(tableView);
+  auto sortProxyModel = new QSortFilterProxyModel(tableView);
   sortProxyModel->setSourceModel(tableModel);
   sortProxyModel->setDynamicSortFilter(true);
   tableView->setModel(sortProxyModel);
@@ -55,11 +53,10 @@ QmitkModulesDialog::QmitkModulesDialog(QWidget *parent, Qt::WindowFlags f) :
 
   layout->addWidget(tableView);
 
-  auto  btnBox = new QDialogButtonBox(QDialogButtonBox::Close);
+  auto btnBox = new QDialogButtonBox(QDialogButtonBox::Close);
   layout->addWidget(btnBox);
 
   this->resize(800, 600);
 
   connect(btnBox, SIGNAL(rejected()), this, SLOT(reject()));
 }
-

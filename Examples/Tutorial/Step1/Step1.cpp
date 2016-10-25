@@ -19,20 +19,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkStandaloneDataStorage.h>
 
-#include <itksys/SystemTools.hxx>
 #include <QApplication>
+#include <itksys/SystemTools.hxx>
 
 #include <mitkIOUtil.h>
 
 //##Documentation
 //## @brief Load image (nrrd format) and display it in a 2D view
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  QApplication qtapplication( argc, argv );
+  QApplication qtapplication(argc, argv);
 
   if (argc < 2)
   {
-    fprintf( stderr, "Usage:   %s [filename] \n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
+    fprintf(stderr, "Usage:   %s [filename] \n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str());
     return 1;
   }
 
@@ -49,13 +49,12 @@ int main(int argc, char* argv[])
   // We use the standard implementation mitk::StandaloneDataStorage.
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-
   //*************************************************************************
   // Part II: Create some data by reading a file
   //*************************************************************************
 
   // Load datanode (eg. many image formats, surface formats, etc.)
-  mitk::IOUtil::Load(argv[1],*ds);
+  mitk::IOUtil::Load(argv[1], *ds);
 
   //*************************************************************************
   // Part IV: Create window and pass the datastorage to it
@@ -69,23 +68,23 @@ int main(int argc, char* argv[])
 
   // Initialize the RenderWindow
   mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews( geo );
-  //mitk::RenderingManager::GetInstance()->InitializeViews();
+  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+  // mitk::RenderingManager::GetInstance()->InitializeViews();
 
   // Select a slice
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
   if (sliceNaviController)
-    sliceNaviController->GetSlice()->SetPos( 0 );
+    sliceNaviController->GetSlice()->SetPos(0);
 
   //*************************************************************************
   // Part V: Qt-specific initialization
   //*************************************************************************
   renderWindow.show();
-  renderWindow.resize( 256, 256 );
+  renderWindow.resize(256, 256);
 
-  // for testing
-  #include "QtTesting.h"
-  if (strcmp(argv[argc-1], "-testing") != 0)
+// for testing
+#include "QtTesting.h"
+  if (strcmp(argv[argc - 1], "-testing") != 0)
     return qtapplication.exec();
   else
     return QtTesting();

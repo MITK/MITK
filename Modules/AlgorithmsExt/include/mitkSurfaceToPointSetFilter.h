@@ -20,28 +20,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 // exports
 #include "MitkAlgorithmsExtExports.h"
 
-//mitk headers
-#include <mitkPointSetSource.h>
+// mitk headers
 #include "mitkSurface.h"
+#include <mitkPointSetSource.h>
 //#include <itkExtendedDoublyLinkedFaceList.h>
 
-namespace mitk {
-
-
- /** Documentation
-  *  @brief This filter converts the input surface into a point set. The output point set contains every point exactly one time
-  *         (no dublicated points like in the stl-format).
-  */
+namespace mitk
+{
+  /** Documentation
+   *  @brief This filter converts the input surface into a point set. The output point set contains every point exactly
+   * one time
+   *         (no dublicated points like in the stl-format).
+   */
 
   class MITKALGORITHMSEXT_EXPORT SurfaceToPointSetFilter : public mitk::PointSetSource
   {
   public:
-
-    mitkClassMacro(SurfaceToPointSetFilter,mitk::PointSetSource);
+    mitkClassMacro(SurfaceToPointSetFilter, mitk::PointSetSource);
     itkNewMacro(Self);
     using itk::ProcessObject::SetInput;
     void SetInput(mitk::Surface::Pointer m_InputSurface);
-
 
     std::string GetErrorMessage();
 
@@ -55,7 +53,6 @@ namespace mitk {
     //############### members ########################
     mitk::Surface::Pointer m_InputSurface;
     std::string m_ErrorMessage;
-
   };
 
 } // namespace mitk

@@ -15,32 +15,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkSimpleHistogram.h>
-#include <mitkTestingMacros.h>
 #include <mitkSurface.h>
+#include <mitkTestingMacros.h>
 
-int mitkSimpleHistogramTest(int /*argc*/, char* /*argv*/[])
+int mitkSimpleHistogramTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("mitkSimpleHistogram");
 
-  auto  myTestSimpleImageHistogram = new mitk::SimpleImageHistogram();
+  auto myTestSimpleImageHistogram = new mitk::SimpleImageHistogram();
 
-  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram!=nullptr,"Testing instanciation.");
-  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetMax()==1,"Testing GetMax().");
-  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetMin()==0,"Testing GetMin().");
-  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetRelativeBin(1.0,5.0) ==0,"Testing GetRelativeBin().");
+  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram != nullptr, "Testing instanciation.");
+  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetMax() == 1, "Testing GetMax().");
+  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetMin() == 0, "Testing GetMin().");
+  MITK_TEST_CONDITION_REQUIRED(myTestSimpleImageHistogram->GetRelativeBin(1.0, 5.0) == 0, "Testing GetRelativeBin().");
   bool success = true;
   try
-    {
+  {
     myTestSimpleImageHistogram->ComputeFromBaseData(nullptr);
-    myTestSimpleImageHistogram->ComputeFromBaseData(mitk::Image::New()); //an empty image
-    myTestSimpleImageHistogram->ComputeFromBaseData(mitk::Surface::New()); //an invalid value
-    }
-  catch(...)
-    {
+    myTestSimpleImageHistogram->ComputeFromBaseData(mitk::Image::New());   // an empty image
+    myTestSimpleImageHistogram->ComputeFromBaseData(mitk::Surface::New()); // an invalid value
+  }
+  catch (...)
+  {
     success = false;
-    }
-  MITK_TEST_CONDITION_REQUIRED(success,"Testing ComputeFromBaseData() with invalid input values.");
-  MITK_TEST_CONDITION_REQUIRED(!myTestSimpleImageHistogram->GetValid(),"Testing if histogram is invalid after invalid input.");
+  }
+  MITK_TEST_CONDITION_REQUIRED(success, "Testing ComputeFromBaseData() with invalid input values.");
+  MITK_TEST_CONDITION_REQUIRED(!myTestSimpleImageHistogram->GetValid(),
+                               "Testing if histogram is invalid after invalid input.");
 
   MITK_TEST_END();
 }

@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryPlatformUI.h>
 
-
 CustomViewer::CustomViewer()
 {
 }
@@ -28,16 +27,15 @@ CustomViewer::~CustomViewer()
 {
 }
 
-QVariant CustomViewer::Start(berry::IApplicationContext* /*context*/)
+QVariant CustomViewer::Start(berry::IApplicationContext * /*context*/)
 {
-  berry::Display* display = berry::PlatformUI::CreateDisplay();
+  berry::Display *display = berry::PlatformUI::CreateDisplay();
 
-  auto  wbAdvisor = new CustomViewerWorkbenchAdvisor;
+  auto wbAdvisor = new CustomViewerWorkbenchAdvisor;
   int code = berry::PlatformUI::CreateAndRunWorkbench(display, wbAdvisor);
 
   // exit the application with an appropriate return code
-  return code == berry::PlatformUI::RETURN_RESTART
-              ? EXIT_RESTART : EXIT_OK;
+  return code == berry::PlatformUI::RETURN_RESTART ? EXIT_RESTART : EXIT_OK;
 }
 
 void CustomViewer::Stop()

@@ -20,65 +20,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSurfaceInterpolationExports.h>
 #include <mitkUnstructuredGridToUnstructuredGridFilter.h>
 
-
 namespace mitk
 {
+  class UnstructuredGrid;
 
-class UnstructuredGrid;
+  /**
+   * @brief Scores an UnstructuredGrid as good as one matches to the other.
+   *
+   * The result UnstructureGrid of the filter are the points where the distance to
+   * the closest point of the other UnstructuredGrid is higher than the average
+   * distance from all points to their closest neighbours of the other
+   * UnstructuredGrid.
+   * The second input is the UnstructuredGrid, which you want to score. All Points
+   * of the output UnstructuredGrid are from the second input.
+   */
+  class MITKSURFACEINTERPOLATION_EXPORT PointCloudScoringFilter : public UnstructuredGridToUnstructuredGridFilter
+  {
+  public:
+    typedef std::pair<int, double> ScorePair;
 
-/**
- * @brief Scores an UnstructuredGrid as good as one matches to the other.
- *
- * The result UnstructureGrid of the filter are the points where the distance to
- * the closest point of the other UnstructuredGrid is higher than the average
- * distance from all points to their closest neighbours of the other
- * UnstructuredGrid.
- * The second input is the UnstructuredGrid, which you want to score. All Points
- * of the output UnstructuredGrid are from the second input.
- */
-class MITKSURFACEINTERPOLATION_EXPORT PointCloudScoringFilter:
-    public UnstructuredGridToUnstructuredGridFilter
-{
+    mitkClassMacro(PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter)
 
-public:
+      itkFactorylessNewMacro(Self)
 
-  typedef std::pair<int, double> ScorePair;
+      /** Number of Points of the scored UnstructuredGrid. These points are far away
+       * from their neighbours */
+      itkGetMacro(NumberOfOutpPoints, int)
 
-  mitkClassMacro( PointCloudScoringFilter, UnstructuredGridToUnstructuredGridFilter)
+      /** A vector in which the point IDs and their distance to their neighbours
+       * is stored */
+      itkGetMacro(FilteredScores, std::vector<ScorePair>)
 
-  itkFactorylessNewMacro(Self)
+        protected :
 
-  /** Number of Points of the scored UnstructuredGrid. These points are far away
-   * from their neighbours */
-  itkGetMacro(NumberOfOutpPoints, int)
+      /** is called by the Update() method */
+      virtual void GenerateData() override;
 
-  /** A vector in which the point IDs and their distance to their neighbours
-   * is stored */
-  itkGetMacro(FilteredScores, std::vector< ScorePair >)
+    /** Defines the output */
+    virtual void GenerateOutputInformation() override;
 
-protected:
+    /** Constructor */
+    PointCloudScoringFilter();
 
-  /** is called by the Update() method */
-  virtual void GenerateData() override;
+    /** Destructor */
+    virtual ~PointCloudScoringFilter();
 
-  /** Defines the output */
-  virtual void GenerateOutputInformation() override;
+  private:
+    /** The Point IDs and their distance to their neighbours */
+    std::vector<ScorePair> m_FilteredScores;
 
-  /** Constructor */
-  PointCloudScoringFilter();
-
-  /** Destructor */
-  virtual ~PointCloudScoringFilter();
-
-private:
-
-  /** The Point IDs and their distance to their neighbours */
-  std::vector< ScorePair > m_FilteredScores;
-
-  /** The number of points which are far aways from their neighbours */
-  int m_NumberOfOutpPoints;
-
-};
-
+    /** The number of points which are far aways from their neighbours */
+    int m_NumberOfOutpPoints;
+  };
 }
 #endif

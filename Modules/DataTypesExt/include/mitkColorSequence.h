@@ -16,35 +16,32 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKCOLORSEQUENCE_H_URTESEINDEUTIGEKENNUNG_01
 #define MITKCOLORSEQUENCE_H_URTESEINDEUTIGEKENNUNG_01
 
-#include <mitkColorProperty.h>
 #include "MitkDataTypesExtExports.h"
+#include <mitkColorProperty.h>
 
 namespace mitk
 {
-
-/*!
-  \brief Inferface for creating a sequence of nice/matching/appropriate/... colors.
-
-  See derived classes for implemented sequences.
-*/
-class MITKDATATYPESEXT_EXPORT ColorSequence
-{
-public:
-  ColorSequence();
-  virtual ~ColorSequence();
-
   /*!
-  \brief Return another color
+    \brief Inferface for creating a sequence of nice/matching/appropriate/... colors.
+
+    See derived classes for implemented sequences.
   */
-  virtual Color GetNextColor() = 0;
+  class MITKDATATYPESEXT_EXPORT ColorSequence
+  {
+  public:
+    ColorSequence();
+    virtual ~ColorSequence();
 
-  /*!
-  \brief Set the color-index to begin again
-  */
-  virtual void GoToBegin() = 0;
+    /*!
+    \brief Return another color
+    */
+    virtual Color GetNextColor() = 0;
 
-};
-
+    /*!
+    \brief Set the color-index to begin again
+    */
+    virtual void GoToBegin() = 0;
+  };
 }
 
 #endif

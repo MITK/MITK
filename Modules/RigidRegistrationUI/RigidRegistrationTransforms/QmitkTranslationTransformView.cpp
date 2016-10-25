@@ -16,10 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkTranslationTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkTranslationTransform.h>
 #include <QValidator>
+#include <itkTranslationTransform.h>
 
-QmitkTranslationTransformView::QmitkTranslationTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
+QmitkTranslationTransformView::QmitkTranslationTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f)
 {
 }
 
@@ -42,12 +43,13 @@ mitk::TransformParameters::TransformType QmitkTranslationTransformView::GetTrans
   return mitk::TransformParameters::TRANSLATIONTRANSFORM;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkTranslationTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkTranslationTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typedef itk::TranslationTransform<double, VImageDimension>  TransformType;
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typedef itk::TranslationTransform<double, VImageDimension> TransformType;
   typename TransformType::Pointer transform = TransformType::New();
   transform->SetIdentity();
   m_TransformObject = transform;
@@ -79,10 +81,10 @@ QString QmitkTranslationTransformView::GetName()
   return "Translation";
 }
 
-void QmitkTranslationTransformView::SetupUI(QWidget* parent)
+void QmitkTranslationTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesTranslationTransformTranslationX->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesTranslationTransformTranslationY->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesTranslationTransformTranslationZ->setValidator(validatorLineEditInputFloat);
@@ -102,7 +104,9 @@ itk::Array<double> QmitkTranslationTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkTranslationTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkTranslationTransformView::Transform(vtkMatrix4x4 * /*vtkmatrix*/,
+                                                       vtkTransform *vtktransform,
+                                                       itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {
@@ -113,7 +117,7 @@ vtkTransform* QmitkTranslationTransformView::Transform(vtkMatrix4x4* /*vtkmatrix
     else if (transformParams.size() == 3)
     {
       vtktransform->Translate(transformParams[0], transformParams[1], transformParams[2]);
-      std::cout<<"Translation is: "<<transformParams[0] << transformParams[1] << transformParams[2] << std::endl;
+      std::cout << "Translation is: " << transformParams[0] << transformParams[1] << transformParams[2] << std::endl;
     }
   }
   return vtktransform;

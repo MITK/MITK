@@ -16,16 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAdaptiveRegionGrowingTool.h"
 #include "mitkImage.h"
-#include "mitkToolManager.h"
 #include "mitkProperties.h"
+#include "mitkToolManager.h"
 // us
-#include <usModule.h>
-#include <usModuleResource.h>
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleContext.h>
+#include <usModuleResource.h>
 
-
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, AdaptiveRegionGrowingTool, "AdaptiveRegionGrowingTool");
 }
 
@@ -42,12 +42,12 @@ mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
 {
 }
 
-bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData* referenceData) const
+bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData *referenceData) const
 {
   if (referenceData == NULL)
     return false;
 
-  Image* image = dynamic_cast<Image*>(referenceData);
+  Image *image = dynamic_cast<Image *>(referenceData);
 
   if (image == NULL)
     return false;
@@ -58,19 +58,19 @@ bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData* referenceData) const
   return true;
 }
 
-const char** mitk::AdaptiveRegionGrowingTool::GetXPM() const
+const char **mitk::AdaptiveRegionGrowingTool::GetXPM() const
 {
   return NULL;
 }
 
-const char* mitk::AdaptiveRegionGrowingTool::GetName() const
+const char *mitk::AdaptiveRegionGrowingTool::GetName() const
 {
   return "Region Growing 3D";
 }
 
 us::ModuleResource mitk::AdaptiveRegionGrowingTool::GetIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
   return resource;
 }
@@ -100,15 +100,18 @@ void mitk::AdaptiveRegionGrowingTool::ConfirmSegmentation()
   m_ToolManager->ActivateTool(-1);
 }
 
-mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetReferenceData(){
+mitk::DataNode *mitk::AdaptiveRegionGrowingTool::GetReferenceData()
+{
   return this->m_ToolManager->GetReferenceData(0);
 }
 
-mitk::DataStorage* mitk::AdaptiveRegionGrowingTool::GetDataStorage(){
+mitk::DataStorage *mitk::AdaptiveRegionGrowingTool::GetDataStorage()
+{
   return this->m_ToolManager->GetDataStorage();
 }
 
-mitk::DataNode* mitk::AdaptiveRegionGrowingTool::GetWorkingData(){
+mitk::DataNode *mitk::AdaptiveRegionGrowingTool::GetWorkingData()
+{
   return this->m_ToolManager->GetWorkingData(0);
 }
 

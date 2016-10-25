@@ -15,43 +15,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 // MITK
-#include <mitkPixelType.h>
+#include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
-#include <mitkImageAccessByItk.h>
+#include <mitkPixelType.h>
 
 // ITK
 #include <itkRGBPixel.h>
 
-
-namespace mitk {
-
-typedef itk::Image<itk::RGBPixel<unsigned short>, 3>  itkImageRGBUS3;
-
-template void  _CastToItkImage2Access(const itkImageRGBUS3*,  itk::SmartPointer<itkImageRGBUS3>&);
-
-template < typename TPixel, unsigned int VImageDimension, class ItkOutputImageType >
-void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+namespace mitk
 {
-  typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-  if(typeid(ItkInputImageType) == typeid(ItkOutputImageType))
+  typedef itk::Image<itk::RGBPixel<unsigned short>, 3> itkImageRGBUS3;
+
+  template void _CastToItkImage2Access(const itkImageRGBUS3 *, itk::SmartPointer<itkImageRGBUS3> &);
+
+  template <typename TPixel, unsigned int VImageDimension, class ItkOutputImageType>
+  void _CastToItkImage2Access(const itk::Image<TPixel, VImageDimension> *itkInputImage,
+                              itk::SmartPointer<ItkOutputImageType> &itkOutputImage)
   {
-    itkOutputImage = const_cast<ItkOutputImageType*>(reinterpret_cast<const ItkOutputImageType*>(itkInputImage));
-    return;
+    typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
+    if (typeid(ItkInputImageType) == typeid(ItkOutputImageType))
+    {
+      itkOutputImage = const_cast<ItkOutputImageType *>(reinterpret_cast<const ItkOutputImageType *>(itkInputImage));
+      return;
+    }
+    typedef itk::CastImageFilter<ItkInputImageType, ItkOutputImageType> CastImageFilterType;
+    typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
+    castImageFilter->SetInput(itkInputImage);
+    castImageFilter->Update();
+    itkOutputImage = castImageFilter->GetOutput();
   }
-  typedef itk::CastImageFilter< ItkInputImageType, ItkOutputImageType > CastImageFilterType;
-  typename CastImageFilterType::Pointer castImageFilter = CastImageFilterType::New();
-  castImageFilter->SetInput( itkInputImage );
-  castImageFilter->Update();
-  itkOutputImage = castImageFilter->GetOutput();
-}
 
-
-template <> void  CastToItkImage<itkImageRGBUS3>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUS3>& itkOutputImage)
-{
-  typedef itkImageRGBUS3 ItkOutputImageType;
-  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::RGBPixel<unsigned short>), (ItkOutputImageType::ImageDimension), itkOutputImage);
-}
-
-
+  template <>
+  void CastToItkImage<itkImageRGBUS3>(const mitk::Image *mitkImage, itk::SmartPointer<itkImageRGBUS3> &itkOutputImage)
+  {
+    typedef itkImageRGBUS3 ItkOutputImageType;
+    AccessFixedTypeByItk_1(mitkImage,
+                           _CastToItkImage2Access,
+                           (itk::RGBPixel<unsigned short>),
+                           (ItkOutputImageType::ImageDimension),
+                           itkOutputImage);
+  }
 }

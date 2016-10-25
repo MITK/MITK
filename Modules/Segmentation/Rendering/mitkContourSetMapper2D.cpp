@@ -14,12 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkContourSetMapper2D.h"
 #include "mitkBaseRenderer.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
 #include "mitkContourSet.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
 
@@ -33,30 +32,30 @@ mitk::ContourSetMapper2D::~ContourSetMapper2D()
 {
 }
 
-
-void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
+void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(!visible) return;
+  if (!visible)
+    return;
 
   ////  @FIXME: Logik fuer update
-  bool updateNeccesary=true;
+  bool updateNeccesary = true;
 
   if (updateNeccesary)
   {
-    //apply color and opacity read from the PropertyList
+    // apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
 
-    mitk::ContourSet::Pointer input =  const_cast<mitk::ContourSet*>(this->GetInput());
+    mitk::ContourSet::Pointer input = const_cast<mitk::ContourSet *>(this->GetInput());
     mitk::ContourSet::ContourVectorType contourVec = input->GetContours();
     mitk::ContourSet::ContourIterator contourIt = contourVec.begin();
 
-    while ( contourIt != contourVec.end() )
+    while (contourIt != contourVec.end())
     {
-      mitk::Contour::Pointer nextContour = (mitk::Contour::Pointer) (*contourIt).second;
-      vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
+      mitk::Contour::Pointer nextContour = (mitk::Contour::Pointer)(*contourIt).second;
+      vtkLinearTransform *transform = GetDataNode()->GetVtkTransform();
 
       //    Contour::OutputType point;
       Contour::BoundingBoxType::PointType point;
@@ -64,41 +63,40 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
       mitk::Point3D p, projected_p;
       float vtkp[3];
 
-      glLineWidth( nextContour->GetWidth() );
+      glLineWidth(nextContour->GetWidth());
 
       if (nextContour->GetClosed())
       {
-        glBegin (GL_LINE_LOOP);
+        glBegin(GL_LINE_LOOP);
       }
       else
       {
-        glBegin (GL_LINE_STRIP);
+        glBegin(GL_LINE_STRIP);
       }
 
-
-      //float rgba[4]={1.0f,1.0f,1.0f,1.0f};
-      //if ( nextContour->GetSelected() )
+      // float rgba[4]={1.0f,1.0f,1.0f,1.0f};
+      // if ( nextContour->GetSelected() )
       //{
       //  rgba[0] = 1.0;
       //  rgba[1] = 0.0;
       //  rgba[2] = 0.0;
       //}
-      //glColor4fv(rgba);
+      // glColor4fv(rgba);
 
       mitk::Contour::PointsContainerPointer points = nextContour->GetPoints();
       mitk::Contour::PointsContainerIterator pointsIt = points->Begin();
 
-      while ( pointsIt != points->End() )
+      while (pointsIt != points->End())
       {
-         point = pointsIt.Value();
+        point = pointsIt.Value();
 
         itk2vtk(point, vtkp);
         transform->TransformPoint(vtkp, vtkp);
-        vtk2itk(vtkp,p);
+        vtk2itk(vtkp, p);
 
         renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
-        Vector3D diff=p-projected_p;
-        if(diff.GetSquaredNorm()<1.0)
+        Vector3D diff = p - projected_p;
+        if (diff.GetSquaredNorm() < 1.0)
         {
           Point2D pt2d, tmp;
           renderer->WorldToDisplay(p, pt2d);
@@ -109,8 +107,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
         //      idx += 1;
       }
 
-
-      glEnd ();
+      glEnd();
 
       glLineWidth(1.0);
 
@@ -119,7 +116,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
   }
 }
 
-const mitk::ContourSet* mitk::ContourSetMapper2D::GetInput(void)
+const mitk::ContourSet *mitk::ContourSetMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::ContourSet * > ( GetDataNode()->GetData() );
+  return static_cast<const mitk::ContourSet *>(GetDataNode()->GetData());
 }

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef mitkBoundingShapeVtkMapper3D_h
 #define mitkBoundingShapeVtkMapper3D_h
 
@@ -31,28 +30,26 @@ namespace mitk
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeVtkMapper3D : public VtkMapper
   {
   public:
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
+    static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
-    mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(BoundingShapeVtkMapper3D, VtkMapper) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    void ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*) override;
-    void ApplyBoundingShapeProperties(BaseRenderer* renderer, vtkActor*);
-    vtkProp* GetVtkProp(BaseRenderer* renderer) override;
- //   virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer) override;
+      void ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *) override;
+    void ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *);
+    vtkProp *GetVtkProp(BaseRenderer *renderer) override;
+    //   virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer) override;
   protected:
-    void GenerateDataForRenderer(BaseRenderer* renderer) override;
+    void GenerateDataForRenderer(BaseRenderer *renderer) override;
 
   private:
     BoundingShapeVtkMapper3D();
     ~BoundingShapeVtkMapper3D();
 
-    BoundingShapeVtkMapper3D(const Self&);
-    Self& operator=(const Self&);
+    BoundingShapeVtkMapper3D(const Self &);
+    Self &operator=(const Self &);
 
     class Impl;
-    Impl* m_Impl;
+    Impl *m_Impl;
   };
 }
 

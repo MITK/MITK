@@ -14,26 +14,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarArrow.h"
 #include "mitkPlaneGeometry.h"
 
-
-mitk::PlanarArrow::PlanarArrow()
-: FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
+mitk::PlanarArrow::PlanarArrow() : FEATURE_ID_LENGTH(this->AddFeature("Length", "mm"))
 {
   // Directed arrow has two control points
-  this->ResetNumberOfControlPoints( 2 );
+  this->ResetNumberOfControlPoints(2);
   m_ArrowTipScaleFactor = -1.0;
 
-  this->SetNumberOfPolyLines( 1 );
-  this->SetNumberOfHelperPolyLines( 2 );
+  this->SetNumberOfPolyLines(1);
+  this->SetNumberOfHelperPolyLines(2);
 
   // Create helper polyline object (for drawing the orthogonal orientation line)
-  m_HelperPolyLinesToBePainted->InsertElement( 0, false );
-  m_HelperPolyLinesToBePainted->InsertElement( 1, false );
+  m_HelperPolyLinesToBePainted->InsertElement(0, false);
+  m_HelperPolyLinesToBePainted->InsertElement(1, false);
 }
-
 
 void mitk::PlanarArrow::GeneratePolyLine()
 {
@@ -47,31 +43,30 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
 {
   // Generate helper polyline (orientation line orthogonal to first line)
   // if the third control point is currently being set
-  if ( this->GetNumberOfControlPoints() != 2 )
+  if (this->GetNumberOfControlPoints() != 2)
   {
-    m_HelperPolyLinesToBePainted->SetElement( 0, false );
-    m_HelperPolyLinesToBePainted->SetElement( 1, false );
+    m_HelperPolyLinesToBePainted->SetElement(0, false);
+    m_HelperPolyLinesToBePainted->SetElement(1, false);
 
     return;
   }
 
   this->ClearHelperPolyLines();
 
-  m_HelperPolyLinesToBePainted->SetElement( 0, true );
-  m_HelperPolyLinesToBePainted->SetElement( 1, true );
+  m_HelperPolyLinesToBePainted->SetElement(0, true);
+  m_HelperPolyLinesToBePainted->SetElement(1, true);
 
-  //Fixed size depending on screen size for the angle
+  // Fixed size depending on screen size for the angle
   float scaleFactor = 0.015;
-  if ( m_ArrowTipScaleFactor > 0.0 )
+  if (m_ArrowTipScaleFactor > 0.0)
   {
     scaleFactor = m_ArrowTipScaleFactor;
   }
   double nonScalingLength = displayHeight * mmPerDisplayUnit * scaleFactor;
 
-
   // Calculate arrow peak
-  const Point2D p1 = this->GetControlPoint( 0 );
-  const Point2D p2 = this->GetControlPoint( 1 );
+  const Point2D p1 = this->GetControlPoint(0);
+  const Point2D p2 = this->GetControlPoint(1);
 
   Vector2D n1 = p1 - p2;
   n1.Normalize();
@@ -90,33 +85,32 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   this->AppendPointToHelperPolyLine(1, Point2D(p1 - temp2 * nonScalingLength));
 }
 
-
 void mitk::PlanarArrow::EvaluateFeaturesInternal()
 {
   // Calculate line length
-  const Point3D &p0 = this->GetWorldControlPoint( 0 );
-  const Point3D &p1 = this->GetWorldControlPoint( 1 );
-  double length = p0.EuclideanDistanceTo( p1 );
+  const Point3D &p0 = this->GetWorldControlPoint(0);
+  const Point3D &p1 = this->GetWorldControlPoint(1);
+  double length = p0.EuclideanDistanceTo(p1);
 
-  this->SetQuantity( FEATURE_ID_LENGTH, length );
+  this->SetQuantity(FEATURE_ID_LENGTH, length);
 }
 
-void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
+void mitk::PlanarArrow::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
-  Superclass::PrintSelf( os, indent );
+  Superclass::PrintSelf(os, indent);
 }
 
-void mitk::PlanarArrow::SetArrowTipScaleFactor( float scale )
+void mitk::PlanarArrow::SetArrowTipScaleFactor(float scale)
 {
   m_ArrowTipScaleFactor = scale;
 }
 
-bool mitk::PlanarArrow::Equals(const mitk::PlanarFigure& other) const
+bool mitk::PlanarArrow::Equals(const mitk::PlanarFigure &other) const
 {
-  const mitk::PlanarArrow* otherArrow = dynamic_cast<const mitk::PlanarArrow*>(&other);
-  if ( otherArrow )
+  const mitk::PlanarArrow *otherArrow = dynamic_cast<const mitk::PlanarArrow *>(&other);
+  if (otherArrow)
   {
-    if ( std::abs(this->m_ArrowTipScaleFactor - otherArrow->m_ArrowTipScaleFactor) > mitk::eps)
+    if (std::abs(this->m_ArrowTipScaleFactor - otherArrow->m_ArrowTipScaleFactor) > mitk::eps)
       return false;
 
     return Superclass::Equals(other);

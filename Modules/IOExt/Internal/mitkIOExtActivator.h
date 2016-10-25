@@ -21,28 +21,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <memory>
 
-namespace mitk {
-
-struct IFileReader;
-struct IFileWriter;
-
-class IOExtActivator : public us::ModuleActivator
+namespace mitk
 {
-public:
+  struct IFileReader;
+  struct IFileWriter;
 
-  void Load(us::ModuleContext*context) override;
-  void Unload(us::ModuleContext* context) override;
+  class IOExtActivator : public us::ModuleActivator
+  {
+  public:
+    void Load(us::ModuleContext *context) override;
+    void Unload(us::ModuleContext *context) override;
 
-private:
+  private:
+    std::unique_ptr<IFileReader> m_SceneReader;
+    std::unique_ptr<IFileReader> m_VtkUnstructuredGridReader;
+    std::unique_ptr<IFileReader> m_ObjReader;
+    std::unique_ptr<IFileWriter> m_ObjWriter;
 
-  std::unique_ptr<IFileReader> m_SceneReader;
-  std::unique_ptr<IFileReader> m_VtkUnstructuredGridReader;
-  std::unique_ptr<IFileReader> m_ObjReader;
-  std::unique_ptr<IFileWriter> m_ObjWriter;
-
-  std::unique_ptr<IFileReader> m_PlyReader;
-};
-
+    std::unique_ptr<IFileReader> m_PlyReader;
+  };
 }
 
 #endif // MITKIOEXTACTIVATOR_H

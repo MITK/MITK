@@ -16,18 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSurfaceStampWidget.h"
 
-#include <mitkRenderingManager.h>
-#include <mitkToolManagerProvider.h>
 #include <mitkLabelSetImage.h>
+#include <mitkRenderingManager.h>
 #include <mitkSurface.h>
+#include <mitkToolManagerProvider.h>
 
 #include <QMessageBox>
 
-
-QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget* parent, const char*  /*name*/)
-: QWidget(parent),
-m_ToolManager(NULL),
-m_DataStorage(NULL)
+QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /*name*/)
+  : QWidget(parent), m_ToolManager(NULL), m_DataStorage(NULL)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
@@ -40,10 +37,10 @@ m_DataStorage(NULL)
   m_SurfacePredicate->AddPredicate(mitk::NodePredicateDataType::New("Surface"));
   m_SurfacePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
-  m_Controls.m_cbSurfaceNodeSelector->SetPredicate( m_SurfacePredicate );
+  m_Controls.m_cbSurfaceNodeSelector->SetPredicate(m_SurfacePredicate);
 
   connect(m_Controls.m_pbStamp, SIGNAL(clicked()), this, SLOT(OnStamp()));
-  connect( m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)) );
+  connect(m_Controls.m_cbShowInformation, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
   m_Controls.m_InformationWidget->hide();
 }
 
@@ -51,7 +48,7 @@ QmitkSurfaceStampWidget::~QmitkSurfaceStampWidget()
 {
 }
 
-void QmitkSurfaceStampWidget::SetDataStorage( mitk::DataStorage* storage )
+void QmitkSurfaceStampWidget::SetDataStorage(mitk::DataStorage *storage)
 {
   m_DataStorage = storage;
   m_Controls.m_cbSurfaceNodeSelector->SetDataStorage(m_DataStorage);
@@ -59,7 +56,7 @@ void QmitkSurfaceStampWidget::SetDataStorage( mitk::DataStorage* storage )
 
 void QmitkSurfaceStampWidget::OnStamp()
 {
-  mitk::DataNode* surfaceNode = m_Controls.m_cbSurfaceNodeSelector->GetSelectedNode();
+  mitk::DataNode *surfaceNode = m_Controls.m_cbSurfaceNodeSelector->GetSelectedNode();
 
   if (!surfaceNode)
   {
@@ -71,40 +68,43 @@ void QmitkSurfaceStampWidget::OnStamp()
   assert(m_ToolManager);
   m_ToolManager->ActivateTool(-1);
 
-  mitk::Surface* surface = dynamic_cast<mitk::Surface*>(surfaceNode->GetData() );
-  if ( !surface )
+  mitk::Surface *surface = dynamic_cast<mitk::Surface *>(surfaceNode->GetData());
+  if (!surface)
   {
     QMessageBox::information(this, "Surface Stamp", "Please load and select a surface before starting some action.");
     return;
   }
 
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
   if (!workingNode)
   {
-   QMessageBox::information( this, "Surface Stamp", "Please load and select a segmentation before starting some action.");
-   return;
-  }
-
-  mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-
-  if (!workingImage)
-  {
-    QMessageBox::information( this, "Surface Stamp", "Please load and select a segmentation before starting some action.");
+    QMessageBox::information(
+      this, "Surface Stamp", "Please load and select a segmentation before starting some action.");
     return;
   }
 
-  QApplication::setOverrideCursor( QCursor(Qt::BusyCursor) );
+  mitk::LabelSetImage *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+
+  if (!workingImage)
+  {
+    QMessageBox::information(
+      this, "Surface Stamp", "Please load and select a segmentation before starting some action.");
+    return;
+  }
+
+  QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
 
   try
   {
-//    workingImage->SurfaceStamp( surface, m_Controls.m_chkOverwrite->isChecked() );
+    //    workingImage->SurfaceStamp( surface, m_Controls.m_chkOverwrite->isChecked() );
   }
-  catch ( mitk::Exception & e )
+  catch (mitk::Exception &e)
   {
     QApplication::restoreOverrideCursor();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
-    QMessageBox::information( this, "Surface Stamp", "Could not stamp the selected surface.\n See error log for details.\n");
+    QMessageBox::information(
+      this, "Surface Stamp", "Could not stamp the selected surface.\n See error log for details.\n");
     return;
   }
 

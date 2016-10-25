@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkVideoBackground.h"
 
 // MITK includes
-#include "mitkVtkLayerController.h"
 #include "mitkRenderingManager.h"
+#include "mitkVtkLayerController.h"
 
 // QT includes
 #include <QTimer>
@@ -27,42 +27,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 // VTK includes
-#include <vtkSystemIncludes.h>
-#include <vtkRenderer.h>
-#include <vtkMapper.h>
-#include <vtkObjectFactory.h>
-#include <vtkImageActor.h>
-#include <vtkRenderWindow.h>
-#include <vtkImageImport.h>
-#include <vtkCommand.h>
+#include <vtkCallbackCommand.h>
 #include <vtkCamera.h>
 #include <vtkCommand.h>
+#include <vtkCommand.h>
+#include <vtkImageActor.h>
+#include <vtkImageImport.h>
+#include <vtkMapper.h>
+#include <vtkObjectFactory.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
-#include <vtkCallbackCommand.h>
+#include <vtkSystemIncludes.h>
 
-QmitkVideoBackground::QmitkVideoBackground( QObject *parent )
-: QObject(parent)
-, m_QTimer(new QTimer(this))
-, m_VideoSource(nullptr)
-, m_VideoSourceObserverTag(0)
+QmitkVideoBackground::QmitkVideoBackground(QObject *parent)
+  : QObject(parent), m_QTimer(new QTimer(this)), m_VideoSource(nullptr), m_VideoSourceObserverTag(0)
 {
   this->ResetVideoBackground();
 }
 
-QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int)
-: QObject(nullptr)
-, m_QTimer(new QTimer(this))
-, m_VideoSource(nullptr)
-, m_VideoSourceObserverTag(0)
+QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource *v, int)
+  : QObject(nullptr), m_QTimer(new QTimer(this)), m_VideoSource(nullptr), m_VideoSourceObserverTag(0)
 {
-  this->SetVideoSource( v );
+  this->SetVideoSource(v);
   this->ResetVideoBackground();
 }
 
 void QmitkVideoBackground::ResetVideoBackground()
 {
   m_QTimer->setInterval(25);
-  connect( m_QTimer, SIGNAL(timeout()), SLOT(UpdateVideo()) );
+  connect(m_QTimer, SIGNAL(timeout()), SLOT(UpdateVideo()));
   m_renderWindowVectorInfo.clear();
 }
 
@@ -71,9 +65,9 @@ QmitkVideoBackground::~QmitkVideoBackground()
   this->Disable();
 }
 
-void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
+void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow *renderWindow)
 {
-  if(!renderWindow || !m_VideoSource)
+  if (!renderWindow || !m_VideoSource)
   {
     MITK_WARN << "No Renderwindow or VideoSource set!";
     return;
@@ -81,33 +75,31 @@ void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
 
   this->RemoveRenderWindow(renderWindow);
 
-  vtkRenderer*    videoRenderer   = vtkRenderer::New();
-  vtkImageActor*  videoActor      = vtkImageActor::New();
-  vtkImageImport* videoImport     = vtkImageImport::New();
+  vtkRenderer *videoRenderer = vtkRenderer::New();
+  vtkImageActor *videoActor = vtkImageActor::New();
+  vtkImageImport *videoImport = vtkImageImport::New();
 
   videoImport->SetDataScalarTypeToUnsignedChar();
   videoImport->SetNumberOfScalarComponents(3);
 
-  if(m_VideoSource->GetImageWidth() == 0)
+  if (m_VideoSource->GetImageWidth() == 0)
     m_VideoSource->FetchFrame();
 
-  videoImport->SetWholeExtent(0, m_VideoSource->GetImageWidth()-1,
-    0, m_VideoSource->GetImageHeight()-1, 0, 1-1);
+  videoImport->SetWholeExtent(0, m_VideoSource->GetImageWidth() - 1, 0, m_VideoSource->GetImageHeight() - 1, 0, 1 - 1);
   videoImport->SetDataExtentToWholeExtent();
 
   VideoBackgroundVectorInfo v;
-  v.renWin        = renderWindow;
+  v.renWin = renderWindow;
   v.videoRenderer = videoRenderer;
-  v.videoActor    = videoActor;
-  v.videoImport   = videoImport;
+  v.videoActor = videoActor;
+  v.videoImport = videoImport;
 
   // callback for the deletion of the renderwindow
-  vtkSmartPointer<vtkCallbackCommand> deleteCallback =
-    vtkSmartPointer<vtkCallbackCommand>::New();
-  deleteCallback->SetCallback ( QmitkVideoBackground::OnRenderWindowDelete );
+  vtkSmartPointer<vtkCallbackCommand> deleteCallback = vtkSmartPointer<vtkCallbackCommand>::New();
+  deleteCallback->SetCallback(QmitkVideoBackground::OnRenderWindowDelete);
   deleteCallback->SetClientData(this);
 
-  v.renderWindowObserverTag = renderWindow->AddObserver( vtkCommand::DeleteEvent, deleteCallback );
+  v.renderWindowObserverTag = renderWindow->AddObserver(vtkCommand::DeleteEvent, deleteCallback);
 
   m_renderWindowVectorInfo.push_back(v);
 
@@ -115,43 +107,40 @@ void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
   this->Modified();
 }
 
-void QmitkVideoBackground::RemoveRenderWindow( vtkRenderWindow* renderWindow )
+void QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow *renderWindow)
 {
   this->RemoveRenderWindow(renderWindow, true);
 }
 
-void QmitkVideoBackground::RemoveRenderWindow( vtkRenderWindow* renderWindow, bool removeObserver )
+void QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow *renderWindow, bool removeObserver)
 {
   // search for renderwindow and remove it
-  for(auto it = m_renderWindowVectorInfo.begin();
-    it != m_renderWindowVectorInfo.end(); it++)
+  for (auto it = m_renderWindowVectorInfo.begin(); it != m_renderWindowVectorInfo.end(); it++)
   {
-    if((*it).renWin == renderWindow)
+    if ((*it).renWin == renderWindow)
     {
-      mitk::VtkLayerController* layerController =
-        mitk::VtkLayerController::GetInstance((*it).renWin);
+      mitk::VtkLayerController *layerController = mitk::VtkLayerController::GetInstance((*it).renWin);
       // unregister video backround renderer from renderwindow
-      if( layerController )
+      if (layerController)
         layerController->RemoveRenderer((*it).videoRenderer);
 
       (*it).videoRenderer->Delete();
       (*it).videoActor->Delete();
       (*it).videoImport->Delete();
       // remove listener
-      if(removeObserver)
-        renderWindow->RemoveObserver( (*it).renderWindowObserverTag );
+      if (removeObserver)
+        renderWindow->RemoveObserver((*it).renderWindowObserverTag);
       m_renderWindowVectorInfo.erase(it);
       break;
     }
   }
 }
 
-bool QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow )
+bool QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow *renderWindow)
 {
-  for(auto it = m_renderWindowVectorInfo.begin();
-    it != m_renderWindowVectorInfo.end(); it++)
+  for (auto it = m_renderWindowVectorInfo.begin(); it != m_renderWindowVectorInfo.end(); it++)
   {
-    if((*it).renWin == renderWindow)
+    if ((*it).renWin == renderWindow)
       return true;
   }
   return false;
@@ -185,14 +174,13 @@ void QmitkVideoBackground::Enable()
  */
 void QmitkVideoBackground::Disable()
 {
-  if ( this->IsEnabled() )
+  if (this->IsEnabled())
   {
-    mitk::VtkLayerController* layerController = nullptr;
-    for(auto it = m_renderWindowVectorInfo.begin();
-      it != m_renderWindowVectorInfo.end(); it++)
+    mitk::VtkLayerController *layerController = nullptr;
+    for (auto it = m_renderWindowVectorInfo.begin(); it != m_renderWindowVectorInfo.end(); it++)
     {
       layerController = mitk::VtkLayerController::GetInstance((*it).renWin);
-      if(layerController)
+      if (layerController)
         layerController->RemoveRenderer((*it).videoRenderer);
     }
     m_QTimer->stop();
@@ -206,7 +194,7 @@ bool QmitkVideoBackground::IsEnabled()
 
 void QmitkVideoBackground::UpdateVideo()
 {
-  if( m_renderWindowVectorInfo.size() > 0 )
+  if (m_renderWindowVectorInfo.size() > 0)
   {
     unsigned char *src = nullptr;
 
@@ -214,24 +202,23 @@ void QmitkVideoBackground::UpdateVideo()
     {
       src = m_VideoSource->GetVideoTexture();
     }
-    catch (const std::logic_error& error)
+    catch (const std::logic_error &error)
     {
-        MITK_DEBUG << error.what();
-        emit EndOfVideoSourceReached(m_VideoSource);
-        return;
+      MITK_DEBUG << error.what();
+      emit EndOfVideoSourceReached(m_VideoSource);
+      return;
     }
 
-    if(src)
+    if (src)
     {
-      for(auto it = m_renderWindowVectorInfo.begin();
-        it != m_renderWindowVectorInfo.end(); it++)
+      for (auto it = m_renderWindowVectorInfo.begin(); it != m_renderWindowVectorInfo.end(); it++)
       {
         (*it).videoImport->SetImportVoidPointer(src);
         (*it).videoImport->Modified();
         (*it).videoImport->Update();
         mitk::RenderingManager::GetInstance()->RequestUpdate((*it).renWin);
       }
-      emit NewFrameAvailable ( m_VideoSource );
+      emit NewFrameAvailable(m_VideoSource);
     }
     else
       MITK_WARN << "No video texture available";
@@ -241,8 +228,7 @@ void QmitkVideoBackground::UpdateVideo()
 void QmitkVideoBackground::Modified()
 {
   // ensures registration of video backrounds in each renderwindow
-  for(auto it = m_renderWindowVectorInfo.begin();
-    it != m_renderWindowVectorInfo.end(); it++)
+  for (auto it = m_renderWindowVectorInfo.begin(); it != m_renderWindowVectorInfo.end(); it++)
   {
     (*it).videoImport->Update();
     (*it).videoActor->SetInputData((*it).videoImport->GetOutput());
@@ -250,43 +236,40 @@ void QmitkVideoBackground::Modified()
     (*it).videoRenderer->ResetCamera();
     (*it).videoRenderer->InteractiveOff();
     (*it).videoRenderer->GetActiveCamera()->ParallelProjectionOn();
-    (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_VideoSource->GetImageHeight()/2);
+    (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_VideoSource->GetImageHeight() / 2);
 
-    mitk::VtkLayerController* layerController =
-      mitk::VtkLayerController::GetInstance((*it).renWin);
+    mitk::VtkLayerController *layerController = mitk::VtkLayerController::GetInstance((*it).renWin);
 
-    if( layerController && !layerController->IsRendererInserted((*it).videoRenderer) )
-      layerController->InsertBackgroundRenderer((*it).videoRenderer,true);
+    if (layerController && !layerController->IsRendererInserted((*it).videoRenderer))
+      layerController->InsertBackgroundRenderer((*it).videoRenderer, true);
   }
 }
 
-void QmitkVideoBackground::SetVideoSource( mitk::VideoSource* videoSource )
+void QmitkVideoBackground::SetVideoSource(mitk::VideoSource *videoSource)
 {
-  if( m_VideoSource == videoSource )
+  if (m_VideoSource == videoSource)
     return;
 
-  if( m_VideoSource )
-    m_VideoSource->RemoveObserver( m_VideoSourceObserverTag );
+  if (m_VideoSource)
+    m_VideoSource->RemoveObserver(m_VideoSourceObserverTag);
 
   m_VideoSource = videoSource;
 
-  if( m_VideoSource )
+  if (m_VideoSource)
   {
     itk::MemberCommand<QmitkVideoBackground>::Pointer _ModifiedCommand =
       itk::MemberCommand<QmitkVideoBackground>::New();
     _ModifiedCommand->SetCallbackFunction(this, &QmitkVideoBackground::OnVideoSourceDelete);
-    m_VideoSourceObserverTag
-      = m_VideoSource->AddObserver(itk::DeleteEvent(), _ModifiedCommand);
+    m_VideoSourceObserverTag = m_VideoSource->AddObserver(itk::DeleteEvent(), _ModifiedCommand);
   }
-
 }
 
-void QmitkVideoBackground::SetTimerDelay( int ms )
+void QmitkVideoBackground::SetTimerDelay(int ms)
 {
-  m_QTimer->setInterval( ms );
+  m_QTimer->setInterval(ms);
 }
 
-mitk::VideoSource* QmitkVideoBackground::GetVideoSource()
+mitk::VideoSource *QmitkVideoBackground::GetVideoSource()
 {
   return m_VideoSource;
 }
@@ -296,19 +279,14 @@ int QmitkVideoBackground::GetTimerDelay()
   return m_QTimer->interval();
 }
 
-void QmitkVideoBackground::OnVideoSourceDelete(const itk::Object*,
-                                               const itk::EventObject&)
+void QmitkVideoBackground::OnVideoSourceDelete(const itk::Object *, const itk::EventObject &)
 {
   this->Disable(); // will only disable if enabled
   m_VideoSource = nullptr;
 }
 
-void QmitkVideoBackground::OnRenderWindowDelete( vtkObject * object,
-                                                 unsigned long,
-                                                 void* clientdata,
-                                                 void*)
+void QmitkVideoBackground::OnRenderWindowDelete(vtkObject *object, unsigned long, void *clientdata, void *)
 {
-  QmitkVideoBackground* instance = static_cast<QmitkVideoBackground*>( clientdata );
-  instance->RemoveRenderWindow( static_cast<vtkRenderWindow*>(object), false );
+  QmitkVideoBackground *instance = static_cast<QmitkVideoBackground *>(clientdata);
+  instance->RemoveRenderWindow(static_cast<vtkRenderWindow *>(object), false);
 }
-

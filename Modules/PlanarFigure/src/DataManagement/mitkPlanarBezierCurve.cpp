@@ -20,14 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <limits>
 
 mitk::PlanarBezierCurve::PlanarBezierCurve()
-  : FEATURE_ID_LENGTH(Superclass::AddFeature("Length", "mm")),
-    m_NumberOfSegments(100)
+  : FEATURE_ID_LENGTH(Superclass::AddFeature("Length", "mm")), m_NumberOfSegments(100)
 {
   this->ResetNumberOfControlPoints(2);
   this->SetNumberOfPolyLines(1);
   this->SetNumberOfHelperPolyLines(1);
 }
-
 
 void mitk::PlanarBezierCurve::EvaluateFeaturesInternal()
 {
@@ -100,7 +98,7 @@ mitk::Point2D mitk::PlanarBezierCurve::ComputeDeCasteljauPoint(mitk::ScalarType 
   return m_DeCasteljauPoints[0];
 }
 
-int mitk::PlanarBezierCurve::GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const
+int mitk::PlanarBezierCurve::GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const
 {
   mitk::PlanarFigure::PolyLineType polyLine = GetPolyLine(polyLineIndex);
 
@@ -144,12 +142,12 @@ bool mitk::PlanarBezierCurve::IsHelperToBePainted(unsigned int index) const
 
 bool mitk::PlanarBezierCurve::Equals(const PlanarFigure &other) const
 {
-  const mitk::PlanarBezierCurve* otherBezierCurve = dynamic_cast<const mitk::PlanarBezierCurve*>(&other);
-  if ( otherBezierCurve )
+  const mitk::PlanarBezierCurve *otherBezierCurve = dynamic_cast<const mitk::PlanarBezierCurve *>(&other);
+  if (otherBezierCurve)
   {
-    if( this->m_NumberOfSegments != otherBezierCurve->m_NumberOfSegments )
+    if (this->m_NumberOfSegments != otherBezierCurve->m_NumberOfSegments)
       return false;
-    if( this->m_DeCasteljauPoints != otherBezierCurve->m_DeCasteljauPoints )
+    if (this->m_DeCasteljauPoints != otherBezierCurve->m_DeCasteljauPoints)
       return false;
     return Superclass::Equals(other);
   }

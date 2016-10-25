@@ -27,16 +27,14 @@ namespace mitk
   {
     typedef PyramidalRegistrationMethodAccessFunctor Self;
 
-    void operator()(const mitk::Image* img, PyramidalRegistrationMethod* method)
+    void operator()(const mitk::Image *img, PyramidalRegistrationMethod *method)
     {
       AccessByItk_1(img, AccessItkImage, method)
     }
 
-    template < typename TPixel, unsigned int VImageDimension >
-    void AccessItkImage( const itk::Image<TPixel, VImageDimension>* itkImage1,
-                         PyramidalRegistrationMethod* method);
+    template <typename TPixel, unsigned int VImageDimension>
+    void AccessItkImage(const itk::Image<TPixel, VImageDimension> *itkImage1, PyramidalRegistrationMethod *method);
   };
 }
 
 #endif // MITKPYRAMIDALREGISTRATIONMETHODACCESSFUNCTOR_H
-

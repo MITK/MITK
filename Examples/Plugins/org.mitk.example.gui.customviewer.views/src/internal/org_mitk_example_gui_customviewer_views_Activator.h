@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef org_mitk_example_gui_customviewer_views_Activator_H
 #define org_mitk_example_gui_customviewer_views_Activator_H
 
@@ -22,24 +21,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class ctkPluginContext;
 
-class org_mitk_example_gui_customviewer_views_Activator :
-  public QObject, public ctkPluginActivator
+class org_mitk_example_gui_customviewer_views_Activator : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_PLUGIN_METADATA(IID "org_mitk_example_gui_customviewer_views")
   Q_INTERFACES(ctkPluginActivator)
 
 public:
+  void start(ctkPluginContext *context) override;
+  void stop(ctkPluginContext *context) override;
 
-  void start(ctkPluginContext* context) override;
-  void stop(ctkPluginContext* context) override;
-
-  static ctkPluginContext* GetPluginContext();
+  static ctkPluginContext *GetPluginContext();
 
 private:
-
-  static ctkPluginContext* PluginContext;
-
+  static ctkPluginContext *PluginContext;
 };
 
 #endif // org_mitk_example_gui_customviewer_views_Activator_H

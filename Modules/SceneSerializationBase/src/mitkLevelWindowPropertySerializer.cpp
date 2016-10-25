@@ -19,27 +19,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkBasePropertySerializer.h"
 #include "mitkLevelWindowProperty.h"
-#include <mitkLocaleSwitch.h>
 #include <boost/lexical_cast.hpp>
+#include <mitkLocaleSwitch.h>
 
 namespace mitk
 {
-
-class LevelWindowPropertySerializer : public BasePropertySerializer
-{
+  class LevelWindowPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(LevelWindowPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( LevelWindowPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const LevelWindowProperty* prop = dynamic_cast<const LevelWindowProperty*>(m_Property.GetPointer()))
+      if (const LevelWindowProperty *prop = dynamic_cast<const LevelWindowProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto  element = new TiXmlElement("LevelWindow");
+        auto element = new TiXmlElement("LevelWindow");
 
         LevelWindow lw = prop->GetLevelWindow();
         std::string boolString("false");
@@ -52,30 +49,31 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
           boolStringFltImage = "true";
         element->SetAttribute("isFloatingImage", boolStringFltImage.c_str());
 
-        auto  child = new TiXmlElement("CurrentSettings");
-        element->LinkEndChild( child );
-          child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetLevel()));
-          child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetWindow()));
+        auto child = new TiXmlElement("CurrentSettings");
+        element->LinkEndChild(child);
+        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetLevel()));
+        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetWindow()));
 
-                      child = new TiXmlElement("DefaultSettings");
-        element->LinkEndChild( child );
-          child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetDefaultLevel()));
-          child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetDefaultWindow()));
+        child = new TiXmlElement("DefaultSettings");
+        element->LinkEndChild(child);
+        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetDefaultLevel()));
+        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetDefaultWindow()));
 
-                      child = new TiXmlElement("CurrentRange");
-        element->LinkEndChild( child );
-          child->SetAttribute("min", boost::lexical_cast<std::string>(lw.GetRangeMin()));
-          child->SetAttribute("max", boost::lexical_cast<std::string>(lw.GetRangeMax()));
-
+        child = new TiXmlElement("CurrentRange");
+        element->LinkEndChild(child);
+        child->SetAttribute("min", boost::lexical_cast<std::string>(lw.GetRangeMin()));
+        child->SetAttribute("max", boost::lexical_cast<std::string>(lw.GetRangeMax()));
 
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
+      if (!element)
+        return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
@@ -88,47 +86,50 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
 
       std::string level_string;
       std::string window_string;
-      TiXmlElement* child = element->FirstChildElement("CurrentSettings");
-        if ( child->QueryStringAttribute( "level", &level_string ) != TIXML_SUCCESS ) return nullptr;
-        if ( child->QueryStringAttribute( "window", &window_string ) != TIXML_SUCCESS ) return nullptr;
+      TiXmlElement *child = element->FirstChildElement("CurrentSettings");
+      if (child->QueryStringAttribute("level", &level_string) != TIXML_SUCCESS)
+        return nullptr;
+      if (child->QueryStringAttribute("window", &window_string) != TIXML_SUCCESS)
+        return nullptr;
 
       std::string defaultLevel_string;
       std::string defaultWindow_string;
-                    child = element->FirstChildElement("DefaultSettings");
-        if ( child->QueryStringAttribute( "level", &defaultLevel_string ) != TIXML_SUCCESS ) return nullptr;
-        if ( child->QueryStringAttribute( "window", &defaultWindow_string ) != TIXML_SUCCESS ) return nullptr;
+      child = element->FirstChildElement("DefaultSettings");
+      if (child->QueryStringAttribute("level", &defaultLevel_string) != TIXML_SUCCESS)
+        return nullptr;
+      if (child->QueryStringAttribute("window", &defaultWindow_string) != TIXML_SUCCESS)
+        return nullptr;
 
       std::string minRange_string;
       std::string maxRange_string;
-                    child = element->FirstChildElement("CurrentRange");
-        if ( child->QueryStringAttribute( "min", &minRange_string ) != TIXML_SUCCESS ) return nullptr;
-        if ( child->QueryStringAttribute( "max", &maxRange_string ) != TIXML_SUCCESS ) return nullptr;
+      child = element->FirstChildElement("CurrentRange");
+      if (child->QueryStringAttribute("min", &minRange_string) != TIXML_SUCCESS)
+        return nullptr;
+      if (child->QueryStringAttribute("max", &maxRange_string) != TIXML_SUCCESS)
+        return nullptr;
 
       LevelWindow lw;
       try
       {
-        lw.SetRangeMinMax( boost::lexical_cast<double>(minRange_string),
-                           boost::lexical_cast<double>(maxRange_string) );
-        lw.SetDefaultLevelWindow( boost::lexical_cast<double>(defaultLevel_string),
-                                  boost::lexical_cast<double>(defaultWindow_string) );
-        lw.SetLevelWindow( boost::lexical_cast<double>(level_string),
-                           boost::lexical_cast<double>(window_string) );
-        lw.SetFixed( isFixed );
+        lw.SetRangeMinMax(boost::lexical_cast<double>(minRange_string), boost::lexical_cast<double>(maxRange_string));
+        lw.SetDefaultLevelWindow(boost::lexical_cast<double>(defaultLevel_string),
+                                 boost::lexical_cast<double>(defaultWindow_string));
+        lw.SetLevelWindow(boost::lexical_cast<double>(level_string), boost::lexical_cast<double>(window_string));
+        lw.SetFixed(isFixed);
         lw.SetFloatingValues(isFloatingImage);
       }
-      catch ( boost::bad_lexical_cast& e )
+      catch (boost::bad_lexical_cast &e)
       {
         MITK_ERROR << "Could not parse string as number: " << e.what();
         return nullptr;
       }
-      return LevelWindowProperty::New( lw ).GetPointer();
+      return LevelWindowProperty::New(lw).GetPointer();
     }
 
   protected:
-
     LevelWindowPropertySerializer() {}
     virtual ~LevelWindowPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -136,4 +137,3 @@ class LevelWindowPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(LevelWindowPropertySerializer);
 
 #endif
-

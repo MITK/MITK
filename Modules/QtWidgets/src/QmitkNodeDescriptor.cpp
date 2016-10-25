@@ -16,18 +16,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeDescriptor.h"
 #include <memory>
-#include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 
-QmitkNodeDescriptor::QmitkNodeDescriptor( const QString& _ClassName, const QString& _PathToIcon
-                                                   , mitk::NodePredicateBase* _Predicate, QObject* parent )
-: QObject(parent)
-, m_ClassName(_ClassName)
-, m_PathToIcon(_PathToIcon)
-, m_Predicate(_Predicate)
-, m_Separator(new QAction(this))
+QmitkNodeDescriptor::QmitkNodeDescriptor(const QString &_ClassName,
+                                         const QString &_PathToIcon,
+                                         mitk::NodePredicateBase *_Predicate,
+                                         QObject *parent)
+  : QObject(parent),
+    m_ClassName(_ClassName),
+    m_PathToIcon(_PathToIcon),
+    m_Predicate(_Predicate),
+    m_Separator(new QAction(this))
 {
   m_Separator->setSeparator(true);
 }
@@ -42,49 +44,47 @@ QIcon QmitkNodeDescriptor::GetIcon() const
   return QIcon(m_PathToIcon);
 }
 
-QList<QAction*> QmitkNodeDescriptor::GetActions() const
+QList<QAction *> QmitkNodeDescriptor::GetActions() const
 {
   return m_Actions;
 }
 
-bool QmitkNodeDescriptor::CheckNode( const mitk::DataNode* node ) const
+bool QmitkNodeDescriptor::CheckNode(const mitk::DataNode *node) const
 {
-  if(m_Predicate.IsNotNull())
+  if (m_Predicate.IsNotNull())
     return m_Predicate->CheckNode(node);
   return false;
 }
 
-void QmitkNodeDescriptor::AddAction( QAction* action, bool isBatchAction )
+void QmitkNodeDescriptor::AddAction(QAction *action, bool isBatchAction)
 {
-  if(!action)
+  if (!action)
     return;
 
-  if(isBatchAction)
+  if (isBatchAction)
     m_BatchActions.push_back(action);
   else
     m_Actions.push_back(action);
-  QObject::connect( action, SIGNAL( destroyed(QObject *) )
-    , this, SLOT( ActionDestroyed(QObject *) ) );
+  QObject::connect(action, SIGNAL(destroyed(QObject *)), this, SLOT(ActionDestroyed(QObject *)));
 }
 
-void QmitkNodeDescriptor::RemoveAction( QAction* _Action )
+void QmitkNodeDescriptor::RemoveAction(QAction *_Action)
 {
   int index = m_Actions.indexOf(_Action);
   int indexOfWidgetAction = m_BatchActions.indexOf(_Action);
 
-  if(index != -1)
+  if (index != -1)
   {
     m_Actions.removeAt(index);
   }
-  else if(indexOfWidgetAction != -1)
+  else if (indexOfWidgetAction != -1)
   {
     m_BatchActions.removeAt(indexOfWidgetAction);
   }
 
-  if( _Action != 0)
+  if (_Action != 0)
   {
-    QObject::disconnect( _Action, SIGNAL( destroyed(QObject *) )
-      , this, SLOT( ActionDestroyed(QObject *) ) );
+    QObject::disconnect(_Action, SIGNAL(destroyed(QObject *)), this, SLOT(ActionDestroyed(QObject *)));
   }
 }
 
@@ -93,17 +93,17 @@ QmitkNodeDescriptor::~QmitkNodeDescriptor()
   // all children are destroyed here by Qt
 }
 
-QAction* QmitkNodeDescriptor::GetSeparator() const
+QAction *QmitkNodeDescriptor::GetSeparator() const
 {
   return m_Separator;
 }
 
-QList<QAction*> QmitkNodeDescriptor::GetBatchActions() const
+QList<QAction *> QmitkNodeDescriptor::GetBatchActions() const
 {
   return m_BatchActions;
 }
 
-void QmitkNodeDescriptor::ActionDestroyed( QObject * obj /*= 0 */ )
+void QmitkNodeDescriptor::ActionDestroyed(QObject *obj /*= 0 */)
 {
-  this->RemoveAction( qobject_cast<QAction*>(obj) );
+  this->RemoveAction(qobject_cast<QAction *>(obj));
 }

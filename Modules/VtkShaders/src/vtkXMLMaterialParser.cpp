@@ -40,21 +40,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "vtkXMLMaterialParser.h"
 
-#include "vtkXMLMaterial.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLMaterial.h"
 
 #include "vtkXMLUtilities.h"
 
 #include <vector>
 
-
 //-----------------------------------------------------------------------------
 class vtkXMLMaterialParserInternals
 {
 public:
-  typedef std::vector<vtkSmartPointer<vtkXMLDataElement> > VectorOfElements;
+  typedef std::vector<vtkSmartPointer<vtkXMLDataElement>> VectorOfElements;
   VectorOfElements Stack;
 };
 
@@ -79,13 +78,13 @@ vtkXMLMaterialParser::~vtkXMLMaterialParser()
 }
 
 //-----------------------------------------------------------------------------
-int vtkXMLMaterialParser::Parse(const char* str)
+int vtkXMLMaterialParser::Parse(const char *str)
 {
   return this->Superclass::Parse(str);
 }
 
 //-----------------------------------------------------------------------------
-int vtkXMLMaterialParser::Parse(const char* str, unsigned int length)
+int vtkXMLMaterialParser::Parse(const char *str, unsigned int length)
 {
   return this->Superclass::Parse(str, length);
 }
@@ -102,53 +101,53 @@ int vtkXMLMaterialParser::InitializeParser()
 {
   int ret = this->Superclass::InitializeParser();
   if (ret)
-    {
+  {
     this->Internals->Stack.clear();
-    }
+  }
   return ret;
 }
 
 //-----------------------------------------------------------------------------
-void vtkXMLMaterialParser::StartElement(const char* name, const char** atts)
+void vtkXMLMaterialParser::StartElement(const char *name, const char **atts)
 {
-  vtkXMLDataElement* element = vtkXMLDataElement::New();
+  vtkXMLDataElement *element = vtkXMLDataElement::New();
   element->SetName(name);
   element->SetXMLByteIndex(this->GetXMLByteIndex());
   vtkXMLUtilities::ReadElementFromAttributeArray(element, atts, VTK_ENCODING_NONE);
-  const char* id = element->GetAttribute("id");
+  const char *id = element->GetAttribute("id");
   if (id)
-    {
+  {
     element->SetId(id);
-    }
+  }
   this->Internals->Stack.push_back(element);
   element->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkXMLMaterialParser::EndElement(const char* vtkNotUsed(name))
+void vtkXMLMaterialParser::EndElement(const char *vtkNotUsed(name))
 {
-  vtkXMLDataElement* finished = this->Internals->Stack.back().GetPointer();
+  vtkXMLDataElement *finished = this->Internals->Stack.back().GetPointer();
   int prev_pos = static_cast<int>(this->Internals->Stack.size()) - 2;
   if (prev_pos >= 0)
-    {
+  {
     this->Internals->Stack[prev_pos].GetPointer()->AddNestedElement(finished);
-    }
+  }
   else
-    {
+  {
     this->Material->SetRootElement(finished);
-    }
+  }
 
   this->Internals->Stack.pop_back();
 }
 
 //-----------------------------------------------------------------------------
-void vtkXMLMaterialParser::CharacterDataHandler( const char* inData, int inLength )
+void vtkXMLMaterialParser::CharacterDataHandler(const char *inData, int inLength)
 {
   if (this->Internals->Stack.size() > 0)
-    {
-    vtkXMLDataElement* elem = this->Internals->Stack.back().GetPointer();
+  {
+    vtkXMLDataElement *elem = this->Internals->Stack.back().GetPointer();
     elem->AddCharacterData(inData, inLength);
-    }
+  }
   /*
   // this wont happen as the XML parser will flag it as an error.
   else
@@ -162,7 +161,6 @@ void vtkXMLMaterialParser::CharacterDataHandler( const char* inData, int inLengt
 void vtkXMLMaterialParser::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Material: " ;
+  os << indent << "Material: ";
   this->Material->PrintSelf(os, indent.GetNextIndent());
 }
-

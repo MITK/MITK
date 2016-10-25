@@ -16,29 +16,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKCOLORSEQUENCE_H_DEFG2390JKD
 #define MITKCOLORSEQUENCE_H_DEFG2390JKD
 
-#include <mitkColorSequence.h>
 #include "MitkDataTypesExtExports.h"
+#include <mitkColorSequence.h>
 
 namespace mitk
 {
+  /*!
+    \brief Creates a list of around 36 different colors, where one is easily distinguished from the preceding one.
 
-/*!
-  \brief Creates a list of around 36 different colors, where one is easily distinguished from the preceding one.
+    The list of colors starts with a fully saturated, full valued red (Hue = 0 = 360).
+    After that the sequence is generated like this:
 
-  The list of colors starts with a fully saturated, full valued red (Hue = 0 = 360).
-  After that the sequence is generated like this:
+    - first cycle through fully saturated colors (increase hue by 60)
+    - then cycle through colors with halfed saturation (increase hue by 60)
+    - then cycle through colors with halfed value (increase hue by 60)
 
-  - first cycle through fully saturated colors (increase hue by 60)
-  - then cycle through colors with halfed saturation (increase hue by 60)
-  - then cycle through colors with halfed value (increase hue by 60)
+    Finally repeat colors.
 
-  Finally repeat colors.
-
-*/
-class MITKDATATYPESEXT_EXPORT ColorSequenceCycleH : public ColorSequence
-{
+  */
+  class MITKDATATYPESEXT_EXPORT ColorSequenceCycleH : public ColorSequence
+  {
   public:
-
     ColorSequenceCycleH();
 
     virtual ~ColorSequenceCycleH();
@@ -62,8 +60,8 @@ class MITKDATATYPESEXT_EXPORT ColorSequenceCycleH : public ColorSequence
     Therefor, the method can just be used to skip steps (i.e. colors) in a cycle.
     Use SetColorCycle if you want to change other values.
     */
-    virtual void ChangeHueValueByCycleSteps( int steps );
-    virtual void ChangeHueValueByAbsoluteNumber( float number );
+    virtual void ChangeHueValueByCycleSteps(int steps);
+    virtual void ChangeHueValueByAbsoluteNumber(float number);
 
     /*!
     \brief Set the color cycle.
@@ -71,18 +69,15 @@ class MITKDATATYPESEXT_EXPORT ColorSequenceCycleH : public ColorSequence
     (see class description for an explanation). Use this in combination with
     the hue value cahnge to generate your dream colors...
     */
-    virtual void SetColorCycle( unsigned short cycle );
+    virtual void SetColorCycle(unsigned short cycle);
 
   protected:
-
     float color_h; // current hue (0 .. 360)
     float color_s; // current saturation (0 .. 1)
     float color_v; // current value (0 .. 1)
 
     unsigned short color_cycle;
-
-};
-
+  };
 }
 
 #endif

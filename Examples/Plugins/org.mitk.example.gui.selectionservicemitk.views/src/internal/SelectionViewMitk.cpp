@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "SelectionViewMitk.h"
 
 // qmitk Includes
-#include <QmitkEnums.h>
 #include <QmitkCustomVariants.h>
+#include <QmitkEnums.h>
 
 const std::string SelectionViewMitk::VIEW_ID = "org.mitk.views.selectionviewmitk";
 
@@ -42,8 +42,8 @@ void SelectionViewMitk::CreateQtPartControl(QWidget *parent)
 
   //! [MITK Selection Provider listwidgetitems]
   // create two QListWidgetItems and name them after the create data nodes
-  QListWidgetItem* listItemDataNode1 = new QListWidgetItem(QString::fromStdString(dataNode1->GetName()));
-  QListWidgetItem* listItemDataNode2 = new QListWidgetItem(QString::fromStdString(dataNode2->GetName()));
+  QListWidgetItem *listItemDataNode1 = new QListWidgetItem(QString::fromStdString(dataNode1->GetName()));
+  QListWidgetItem *listItemDataNode2 = new QListWidgetItem(QString::fromStdString(dataNode2->GetName()));
 
   // set the data of created QListWidgetItems two the informations of the data nodes
   listItemDataNode1->setData(QmitkDataNodeRole, QVariant::fromValue(dataNode1));
@@ -61,15 +61,14 @@ void SelectionViewMitk::CreateQtPartControl(QWidget *parent)
   m_Controls.m_SelectionList->setCurrentRow(0);
 
   m_Parent->setEnabled(true);
-
 }
 
-void SelectionViewMitk::SetFocus ()
+void SelectionViewMitk::SetFocus()
 {
 }
 
 //! [MITK Selection Provider method implementation]
-QItemSelectionModel* SelectionViewMitk::GetDataNodeSelectionModel() const
+QItemSelectionModel *SelectionViewMitk::GetDataNodeSelectionModel() const
 {
   // return the selection model of the QListWidget
   return m_Controls.m_SelectionList->selectionModel();

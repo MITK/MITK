@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkExtrudePlanarFigureFilter_h
 #define mitkExtrudePlanarFigureFilter_h
 
+#include <MitkPlanarFigureExports.h>
+#include <itkProcessObject.h>
 #include <mitkCommon.h>
 #include <mitkVector.h>
-#include <itkProcessObject.h>
-#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
@@ -31,10 +31,9 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(ExtrudePlanarFigureFilter, itk::ProcessObject);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    itkGetMacro(Length, ScalarType);
+      itkGetMacro(Length, ScalarType);
     itkSetMacro(Length, ScalarType);
 
     itkGetMacro(NumberOfSegments, unsigned int);
@@ -56,13 +55,13 @@ namespace mitk
     itkSetMacro(FlipNormals, bool);
 
     virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType idx) override;
-    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType& name) override;
+    virtual DataObjectPointer MakeOutput(const DataObjectIdentifierType &name) override;
 
     using Superclass::SetInput;
-    void SetInput(mitk::PlanarFigure* planarFigure);
+    void SetInput(mitk::PlanarFigure *planarFigure);
 
     using Superclass::GetOutput;
-    mitk::Surface* GetOutput();
+    mitk::Surface *GetOutput();
 
   protected:
     ExtrudePlanarFigureFilter();
@@ -70,7 +69,7 @@ namespace mitk
 
     virtual void GenerateData() override;
     virtual void GenerateOutputInformation() override;
-    void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+    void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
   private:
     ScalarType m_Length;

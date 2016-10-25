@@ -24,53 +24,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  template <class T>
+  class CreateSurfaceWriter : public itk::CreateObjectFunctionBase
+  {
+  public:
+    /** Standard class typedefs. */
+    typedef CreateSurfaceWriter Self;
+    typedef itk::SmartPointer<Self> Pointer;
 
-template <class T>
-class CreateSurfaceWriter : public itk::CreateObjectFunctionBase
-{
-public:
+    /** Methods from itk:LightObject. */
+    itkFactorylessNewMacro(Self);
+    LightObject::Pointer CreateObject() override
+    {
+      typename T::Pointer p = T::New();
+      p->Register();
+      return p.GetPointer();
+    }
 
-  /** Standard class typedefs. */
-  typedef CreateSurfaceWriter  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
+  protected:
+    CreateSurfaceWriter() {}
+    ~CreateSurfaceWriter() {}
+  private:
+    CreateSurfaceWriter(const Self &); // purposely not implemented
+    void operator=(const Self &);      // purposely not implemented
+  };
 
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() override { typename T::Pointer p = T::New();
-    p->Register();
-    return p.GetPointer();
+  SurfaceVtkWriterFactory::SurfaceVtkWriterFactory()
+  {
+    this->RegisterOverride("IOWriter",
+                           "SurfaceVtkWriter",
+                           "Surface Vtk Writer",
+                           1,
+                           mitk::CreateSurfaceWriter<mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>>::New());
   }
 
-protected:
-  CreateSurfaceWriter() {}
-  ~CreateSurfaceWriter() {}
-
-private:
-  CreateSurfaceWriter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
-
-SurfaceVtkWriterFactory::SurfaceVtkWriterFactory()
-{
-  this->RegisterOverride("IOWriter",
-                         "SurfaceVtkWriter",
-                         "Surface Vtk Writer",
-                         1,
-                         mitk::CreateSurfaceWriter< mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter> >::New());
-}
-
-SurfaceVtkWriterFactory::~SurfaceVtkWriterFactory()
-{
-}
-
-const char* SurfaceVtkWriterFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* SurfaceVtkWriterFactory::GetDescription() const
-{
-  return "SurfaceVtkWriterFactory";
-}
-
+  SurfaceVtkWriterFactory::~SurfaceVtkWriterFactory() {}
+  const char *SurfaceVtkWriterFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *SurfaceVtkWriterFactory::GetDescription() const { return "SurfaceVtkWriterFactory"; }
 } // end namespace mitk

@@ -21,20 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 class US_ABI_LOCAL mitkIpPicSupportIOActivator : public us::ModuleActivator
 {
 public:
-
-  void Load(us::ModuleContext*) override
-  {
-    m_Reader = new mitk::PicFileReader();
-  }
-
-  void Unload(us::ModuleContext* ) override
-  {
-    delete m_Reader;
-  }
-
+  void Load(us::ModuleContext *) override { m_Reader = new mitk::PicFileReader(); }
+  void Unload(us::ModuleContext *) override { delete m_Reader; }
 private:
-
-  mitk::IFileReader* m_Reader;
+  mitk::IFileReader *m_Reader;
 };
 
 US_EXPORT_MODULE_ACTIVATOR(mitkIpPicSupportIOActivator)

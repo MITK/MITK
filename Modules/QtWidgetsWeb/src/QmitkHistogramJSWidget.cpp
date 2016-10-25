@@ -14,18 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkHistogramJSWidget.h"
+#include "mitkBaseRenderer.h"
+#include "mitkExtractSliceFilter.h"
+#include "mitkImageTimeSelector.h"
 #include "mitkPixelTypeMultiplex.h"
+#include "mitkRenderingManager.h"
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkIntensityProfile.h>
-#include "mitkRenderingManager.h"
-#include "mitkBaseRenderer.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkExtractSliceFilter.h"
 
-QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
-  QWebEngineView(parent)
+QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) : QWebEngineView(parent)
 {
   // set histogram type to barchart in first instance
   m_UseLineGraph = false;
@@ -41,7 +39,6 @@ QmitkHistogramJSWidget::QmitkHistogramJSWidget(QWidget *parent) :
   // page()->mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAlwaysOff);
 
   m_ParametricPath = ParametricPathType::New();
-
 }
 
 QmitkHistogramJSWidget::~QmitkHistogramJSWidget()
@@ -55,7 +52,7 @@ void QmitkHistogramJSWidget::AddJSObject()
 }
 
 // reloads WebView, everytime its size has been changed, so the size of the Histogram fits to the size of the widget
-void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
+void QmitkHistogramJSWidget::resizeEvent(QResizeEvent *resizeEvent)
 {
   QWebEngineView::resizeEvent(resizeEvent);
 
@@ -65,12 +62,12 @@ void QmitkHistogramJSWidget::resizeEvent(QResizeEvent* resizeEvent)
 }
 
 // method to expose data to JavaScript by using properties
-void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
+void QmitkHistogramJSWidget::ComputeHistogram(HistogramType *histogram)
 {
   m_Histogram = histogram;
   HistogramConstIteratorType startIt = m_Histogram->End();
   HistogramConstIteratorType endIt = m_Histogram->End();
-  HistogramConstIteratorType it  = m_Histogram->Begin();
+  HistogramConstIteratorType it = m_Histogram->Begin();
   ClearData();
   unsigned int i = 0;
   bool firstValue = false;
@@ -89,7 +86,7 @@ void QmitkHistogramJSWidget::ComputeHistogram(HistogramType* histogram)
   }
   ++endIt;
   // generating Lists of measurement and frequencies
-  for (it = startIt ; it != endIt; ++it, ++i)
+  for (it = startIt; it != endIt; ++it, ++i)
   {
     QVariant frequency = QVariant::fromValue(it.GetFrequency());
     QVariant measurement = it.GetMeasurementVector()[0];
@@ -146,22 +143,22 @@ void QmitkHistogramJSWidget::OnLineRadioButtonSelected()
   }
 }
 
-void QmitkHistogramJSWidget::SetImage(mitk::Image* image)
+void QmitkHistogramJSWidget::SetImage(mitk::Image *image)
 {
   m_Image = image;
 }
 
-void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFigure)
+void QmitkHistogramJSWidget::SetPlanarFigure(const mitk::PlanarFigure *planarFigure)
 {
   m_PlanarFigure = planarFigure;
 }
 
 template <class PixelType>
-void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, itk::Index<3> indexPoint, double& value)
+void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, itk::Index<3> indexPoint, double &value)
 {
   if (image->GetDimension() == 2)
   {
-    mitk::ImagePixelReadAccessor<PixelType,2> readAccess(image, image->GetSliceData(0));
+    mitk::ImagePixelReadAccessor<PixelType, 2> readAccess(image, image->GetSliceData(0));
     itk::Index<2> idx;
     idx[0] = indexPoint[0];
     idx[1] = indexPoint[1];
@@ -169,7 +166,7 @@ void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, itk::Index<3> indexP
   }
   else if (image->GetDimension() == 3)
   {
-    mitk::ImagePixelReadAccessor<PixelType,3> readAccess(image, image->GetVolumeData(0));
+    mitk::ImagePixelReadAccessor<PixelType, 3> readAccess(image, image->GetVolumeData(0));
     itk::Index<3> idx;
     idx[0] = indexPoint[0];
     idx[1] = indexPoint[1];
@@ -178,7 +175,7 @@ void ReadPixel(mitk::PixelType, mitk::Image::Pointer image, itk::Index<3> indexP
   }
   else
   {
-    //unhandled
+    // unhandled
   }
 }
 
@@ -213,7 +210,8 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep, bool
     image = m_Image;
   }
 
-  mitk::IntensityProfile::Pointer intensityProfile = mitk::ComputeIntensityProfile(image, const_cast<mitk::PlanarFigure*>(m_PlanarFigure.GetPointer()));
+  mitk::IntensityProfile::Pointer intensityProfile =
+    mitk::ComputeIntensityProfile(image, const_cast<mitk::PlanarFigure *>(m_PlanarFigure.GetPointer()));
 
   m_Frequency.clear();
   m_Measurement.clear();
@@ -227,9 +225,9 @@ void QmitkHistogramJSWidget::ComputeIntensityProfile(unsigned int timeStep, bool
     m_Measurement.push_back(++i);
   }
 
-  if ( computeStatistics )
+  if (computeStatistics)
   {
-    mitk::ComputeIntensityProfileStatistics( intensityProfile, m_Statistics );
+    mitk::ComputeIntensityProfileStatistics(intensityProfile, m_Statistics);
   }
 
   m_IntensityProfile = true;
@@ -241,5 +239,3 @@ bool QmitkHistogramJSWidget::GetIntensityProfile()
 {
   return m_IntensityProfile;
 }
-
-

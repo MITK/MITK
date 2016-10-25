@@ -32,23 +32,22 @@ class QLineEdit;
  * window value of the current image and one to change the level value of
  * the current image.
  */
-class MITKQTWIDGETS_EXPORT QmitkLineEditLevelWindowWidget : public QWidget {
-
+class MITKQTWIDGETS_EXPORT QmitkLineEditLevelWindowWidget : public QWidget
+{
   Q_OBJECT
 
 public:
-
   /// constructor
-  QmitkLineEditLevelWindowWidget( QWidget * parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkLineEditLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /// destructor
   ~QmitkLineEditLevelWindowWidget();
 
   /// inputfield for level value
-  QLineEdit* m_LevelInput;
+  QLineEdit *m_LevelInput;
 
   /// inputfield for window value
-  QLineEdit* m_WindowInput;
+  QLineEdit *m_WindowInput;
 
   /*!
   *  data structure which stores the values manipulated
@@ -60,21 +59,20 @@ public:
   mitk::LevelWindowManager::Pointer m_Manager;
 
   /// sets the manager who is responsible to collect and deliver changes on Level/Window
-  void setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager);
+  void setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager);
 
   /// sets the DataStorage which holds all image-nodes
-  void SetDataStorage( mitk::DataStorage* ds );
+  void SetDataStorage(mitk::DataStorage *ds);
 
   /// returns the manager who is responsible to collect and deliver changes on Level/Window
-  mitk::LevelWindowManager* GetManager();
+  mitk::LevelWindowManager *GetManager();
 
 private:
-
   /// creates the contextmenu for this widget from class QmitkLevelWindowWidgetContextMenu
-  void contextMenuEvent ( QContextMenuEvent * ) override;
+  void contextMenuEvent(QContextMenuEvent *) override;
 
   /// change notifications from the mitkLevelWindowManager
-  void OnPropertyModified(const itk::EventObject& e);
+  void OnPropertyModified(const itk::EventObject &e);
 
 public slots:
 
@@ -85,7 +83,7 @@ public slots:
   void SetWindowValue();
 
   // validator to accept only possible values for Level/Window in lineedits
-  //void setValidator();
+  // void setValidator();
 
 protected:
   unsigned long m_ObserverTag;
@@ -94,7 +92,6 @@ protected:
   /*!
   *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
   */
-  QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
-
+  QmitkLevelWindowWidgetContextMenu *m_Contextmenu;
 };
 #endif // QMITKLINEEDITLEVELWINDOWWIDGET

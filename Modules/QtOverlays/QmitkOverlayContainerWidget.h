@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB
 #define QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB
 
@@ -23,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtOverlaysExports.h>
 
-
 /**
 * \class  QmitkOverlayContainerWidget
 * \brief Widget that overrides the paintEvent method to correctly display
@@ -31,30 +29,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 * QT_DEVIDE_PIXEL_RATIO.
 */
 
-
 class MITKQTOVERLAYS_EXPORT QmitkOverlayContainerWidget : public QWidget
 {
 public:
-
   /**
   * @brief Default Constructor
   **/
-  QmitkOverlayContainerWidget( QWidget * parent = 0, Qt::WindowFlags f = 0 );
+  QmitkOverlayContainerWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
 
   /**
   * @brief Default Destructor
   **/
   virtual ~QmitkOverlayContainerWidget();
 
-
 protected:
-
   /**
   * @brief overridden version of paintEvent that correctly clears its canvas before painting.
   **/
-  virtual void paintEvent( QPaintEvent * event ) override;
-
+  virtual void paintEvent(QPaintEvent *event) override;
 };
-
 
 #endif /* QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB */

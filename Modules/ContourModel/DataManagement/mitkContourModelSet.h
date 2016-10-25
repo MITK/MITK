@@ -25,44 +25,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /** \brief
   */
   class MITKCONTOURMODEL_EXPORT ContourModelSet : public mitk::BaseData
   {
-
   public:
-
     mitkClassMacro(ContourModelSet, mitk::BaseData);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
+      typedef std::deque<mitk::ContourModel::Pointer> ContourModelListType;
     typedef ContourModelListType::iterator ContourModelSetIterator;
 
     //  start of inline methods
 
     /** \brief Return an iterator a the front.
     */
-    virtual ContourModelSetIterator Begin()
-    {
-      return this->m_Contours.begin();
-    }
-
+    virtual ContourModelSetIterator Begin() { return this->m_Contours.begin(); }
     /** \brief Return an iterator a the front.
     */
-    virtual ContourModelSetIterator End()
-    {
-      return this->m_Contours.end();
-    }
-
+    virtual ContourModelSetIterator End() { return this->m_Contours.end(); }
     /** \brief Returns the number of contained contours.
     */
-    virtual int GetSize() const
-    {
-      return this->m_Contours.size();
-    }
+    virtual int GetSize() const { return this->m_Contours.size(); }
     //   end of inline methods
 
     /** \brief Add a ContourModel to the container.
@@ -76,11 +61,11 @@ namespace mitk
     /** \brief Returns the ContourModel a given index
     \param index
     */
-    virtual mitk::ContourModel* GetContourModelAt(int index) const;
+    virtual mitk::ContourModel *GetContourModelAt(int index) const;
 
     /** \brief Returns the container of the contours.
     */
-    ContourModelListType* GetContourModelList();
+    ContourModelListType *GetContourModelList();
 
     /** \brief Returns a bool whether the container is empty or not.
     */
@@ -89,7 +74,7 @@ namespace mitk
     /** \brief Remove the given ContourModel from the container if exists.
     \param ContourModel - the ContourModel to be removed.
     */
-    virtual bool RemoveContourModel(mitk::ContourModel* contourModel);
+    virtual bool RemoveContourModel(mitk::ContourModel *contourModel);
 
     /** \brief Remove a ContourModel at given index within the container if exists.
     \param index - the index where the ContourModel should be removed.
@@ -104,14 +89,10 @@ namespace mitk
 
     /*                  NO support for regions !                    */
 
-    void SetRequestedRegionToLargestPossibleRegion() override{}
-
-    bool RequestedRegionIsOutsideOfTheBufferedRegion() override{return false;}
-
-    bool VerifyRequestedRegion() override{return true;}
-
-    void SetRequestedRegion(const itk::DataObject* ) override{}
-
+    void SetRequestedRegionToLargestPossibleRegion() override {}
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override { return false; }
+    bool VerifyRequestedRegion() override { return true; }
+    void SetRequestedRegion(const itk::DataObject *) override {}
     /**
     \brief Update the OutputInformation of a ContourModel object
 
@@ -121,7 +102,6 @@ namespace mitk
 
     //////////////// END inherit  from mitk::BaseData ////////////////////
 
-
   protected:
     mitkCloneMacro(Self);
 
@@ -129,14 +109,13 @@ namespace mitk
     ContourModelSet(const mitk::ContourModelSet &other);
     virtual ~ContourModelSet();
 
-    //inherit from BaseData. Initial state with no contours and a single timestep.
+    // inherit from BaseData. Initial state with no contours and a single timestep.
     virtual void InitializeEmpty() override;
 
     ContourModelListType m_Contours;
 
-    //only update the bounding geometry if necessary
+    // only update the bounding geometry if necessary
     bool m_UpdateBoundingBox;
-
   };
 } // namespace mitk
 

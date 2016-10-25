@@ -22,41 +22,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkShaderProgram2.h>
 #include <vtkSmartPointer.h>
 
-namespace mitk {
-
-/**
- * \brief SHADERTODO
- */
-class VtkShaderProgram : public IShaderRepository::ShaderProgram
+namespace mitk
 {
-public:
-
-  mitkClassMacro( VtkShaderProgram, IShaderRepository::ShaderProgram )
-  itkFactorylessNewMacro( Self )
-
   /**
-   * Constructor
+   * \brief SHADERTODO
    */
-  VtkShaderProgram();
+  class VtkShaderProgram : public IShaderRepository::ShaderProgram
+  {
+  public:
+    mitkClassMacro(VtkShaderProgram, IShaderRepository::ShaderProgram) itkFactorylessNewMacro(Self)
 
-  /**
-   * Destructor
-   */
-  virtual ~VtkShaderProgram();
+      /**
+       * Constructor
+       */
+      VtkShaderProgram();
 
-  virtual void Activate() override;
-  virtual void Deactivate() override;
+    /**
+     * Destructor
+     */
+    virtual ~VtkShaderProgram();
 
-  void SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram2> p);
-  vtkSmartPointer<vtkShaderProgram2> GetVtkShaderProgram() const;
-  itk::TimeStamp& GetShaderTimestampUpdate();
+    virtual void Activate() override;
+    virtual void Deactivate() override;
 
-private:
+    void SetVtkShaderProgram(vtkSmartPointer<vtkShaderProgram2> p);
+    vtkSmartPointer<vtkShaderProgram2> GetVtkShaderProgram() const;
+    itk::TimeStamp &GetShaderTimestampUpdate();
 
-  vtkSmartPointer<vtkShaderProgram2> m_VtkShaderProgram;
-  itk::TimeStamp m_ShaderTimestampUpdate;
+  private:
+    vtkSmartPointer<vtkShaderProgram2> m_VtkShaderProgram;
+    itk::TimeStamp m_ShaderTimestampUpdate;
+  };
 
-};
-
-} //end of namespace mitk
+} // end of namespace mitk
 #endif

@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkRigidRegistrationMetricsGUIBaseH
 #define QmitkRigidRegistrationMetricsGUIBaseH
 
-#include <QWidget>
 #include "MitkRigidRegistrationUIExports.h"
+#include "mitkImage.h"
+#include "mitkMetricParameters.h"
+#include <QString>
+#include <QWidget>
 #include <itkArray.h>
 #include <itkObject.h>
-#include "mitkImage.h"
-#include <QString>
-#include "mitkMetricParameters.h"
 
 /*!
 * \brief Widget for rigid registration
@@ -32,10 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationMetricsGUIBase : public QWidget
 {
-
 public:
-
-  QmitkRigidRegistrationMetricsGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkRigidRegistrationMetricsGUIBase(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationMetricsGUIBase();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() = 0;
@@ -50,14 +48,12 @@ public:
 
   virtual QString GetName() = 0;
 
-  virtual void SetupUI(QWidget* parent) = 0;
+  virtual void SetupUI(QWidget *parent) = 0;
 
   virtual bool Maximize() = 0;
 
 protected:
-
   mitk::Image::Pointer m_MovingImage;
-
 };
 
-#endif //QmitkRigidRegistrationMetricsGUIBaseH
+#endif // QmitkRigidRegistrationMetricsGUIBaseH

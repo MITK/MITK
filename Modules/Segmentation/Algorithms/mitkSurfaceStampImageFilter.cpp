@@ -15,25 +15,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSurfaceStampImageFilter.h"
-#include "mitkTimeHelper.h"
-#include "mitkImageWriteAccessor.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageWriteAccessor.h"
+#include "mitkTimeHelper.h"
 #include <mitkImageCast.h>
 
-#include <vtkPolyData.h>
-#include <vtkLinearTransform.h>
 #include <vtkCell.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkTransform.h>
+#include <vtkLinearTransform.h>
+#include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 #include <itkTriangleMeshToBinaryImageFilter.h>
 
-mitk::SurfaceStampImageFilter::SurfaceStampImageFilter() :
-m_MakeOutputBinary( false ),
-m_OverwriteBackground( false ),
-m_ForegroundValue( 1.0 ),
-m_BackgroundValue( 0.0 )
+mitk::SurfaceStampImageFilter::SurfaceStampImageFilter()
+  : m_MakeOutputBinary(false), m_OverwriteBackground(false), m_ForegroundValue(1.0), m_BackgroundValue(0.0)
 {
 }
 
@@ -43,11 +40,11 @@ mitk::SurfaceStampImageFilter::~SurfaceStampImageFilter()
 
 void mitk::SurfaceStampImageFilter::GenerateInputRequestedRegion()
 {
-  mitk::Image* outputImage = this->GetOutput();
-  if((outputImage->IsInitialized()==false) )
+  mitk::Image *outputImage = this->GetOutput();
+  if ((outputImage->IsInitialized() == false))
     return;
 
-  GenerateTimeInInputRegion(outputImage, const_cast< mitk::Image * > ( this->GetInput() ));
+  GenerateTimeInInputRegion(outputImage, const_cast<mitk::Image *>(this->GetInput()));
 }
 
 void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
@@ -55,14 +52,13 @@ void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
   mitk::Image::ConstPointer inputImage = this->GetInput();
   mitk::Image::Pointer outputImage = this->GetOutput();
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
-  if( inputImage.IsNull() ||
-     (inputImage->IsInitialized() == false) ||
-     (inputImage->GetTimeGeometry() == NULL)) return;
+  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == NULL))
+    return;
 
   if (m_MakeOutputBinary)
-    outputImage->Initialize(mitk::MakeScalarPixelType<unsigned char>() , *inputImage->GetTimeGeometry());
+    outputImage->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *inputImage->GetTimeGeometry());
   else
     outputImage->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeGeometry());
 
@@ -82,7 +78,7 @@ void mitk::SurfaceStampImageFilter::GenerateData()
     return;
 
   mitk::Image::Pointer outputImage = this->GetOutput();
-  if(outputImage->IsInitialized()==false )
+  if (outputImage->IsInitialized() == false)
     return;
 
   if (m_Surface.IsNull())
@@ -90,20 +86,20 @@ void mitk::SurfaceStampImageFilter::GenerateData()
 
   mitk::Image::RegionType outputRegion = outputImage->GetRequestedRegion();
 
-  int tstart=outputRegion.GetIndex(3);
-  int tmax=tstart+outputRegion.GetSize(3);
+  int tstart = outputRegion.GetIndex(3);
+  int tmax = tstart + outputRegion.GetSize(3);
 
-  if ( tmax > 0)
+  if (tmax > 0)
   {
     int t;
-    for(t=tstart;t<tmax;++t)
+    for (t = tstart; t < tmax; ++t)
     {
-      this->SurfaceStamp( t );
+      this->SurfaceStamp(t);
     }
   }
   else
   {
-    this->SurfaceStamp( 0 );
+    this->SurfaceStamp(0);
   }
 }
 
@@ -118,16 +114,16 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   mitk::TimePointType matchingTimePoint = imageTimeGeometry->TimeStepToTimePoint(time);
   mitk::TimeStepType surfaceTimeStep = surfaceTimeGeometry->TimePointToTimeStep(matchingTimePoint);
 
-  vtkPolyData * polydata = m_Surface->GetVtkPolyData( surfaceTimeStep );
+  vtkPolyData *polydata = m_Surface->GetVtkPolyData(surfaceTimeStep);
   if (!polydata)
     mitkThrow() << "Polydata is null.";
 
   vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   transformFilter->SetInputData(polydata);
-//  transformFilter->ReleaseDataFlagOn();
+  //  transformFilter->ReleaseDataFlagOn();
 
   vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
-  BaseGeometry::Pointer geometry = surfaceTimeGeometry->GetGeometryForTimeStep( surfaceTimeStep );
+  BaseGeometry::Pointer geometry = surfaceTimeGeometry->GetGeometryForTimeStep(surfaceTimeStep);
 
   transform->PostMultiply();
   transform->Concatenate(geometry->GetVtkTransform()->GetMatrix());
@@ -140,65 +136,65 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
 
   polydata = transformFilter->GetOutput();
 
-  if ( !polydata || !polydata->GetNumberOfPoints() )
+  if (!polydata || !polydata->GetNumberOfPoints())
     mitkThrow() << "Polydata retrieved from transformation is null or has no points.";
 
   MeshType::Pointer mesh = MeshType::New();
-  mesh->SetCellsAllocationMethod( MeshType::CellsAllocatedDynamicallyCellByCell );
+  mesh->SetCellsAllocationMethod(MeshType::CellsAllocatedDynamicallyCellByCell);
   unsigned int numberOfPoints = polydata->GetNumberOfPoints();
-  mesh->GetPoints()->Reserve( numberOfPoints );
+  mesh->GetPoints()->Reserve(numberOfPoints);
 
-  vtkPoints* points = polydata->GetPoints();
+  vtkPoints *points = polydata->GetPoints();
 
   MeshType::PointType point;
-  for( int i=0; i < numberOfPoints; i++ )
+  for (int i = 0; i < numberOfPoints; i++)
   {
-    double* aux = points->GetPoint(i);
+    double *aux = points->GetPoint(i);
     point[0] = aux[0];
     point[1] = aux[1];
     point[2] = aux[2];
-    mesh->SetPoint( i, point );
+    mesh->SetPoint(i, point);
   }
 
   // Load the polygons into the itk::Mesh
-  typedef MeshType::CellAutoPointer     CellAutoPointerType;
-  typedef MeshType::CellType            CellType;
-  typedef itk::TriangleCell< CellType > TriangleCellType;
-  typedef MeshType::PointIdentifier     PointIdentifierType;
-  typedef MeshType::CellIdentifier      CellIdentifierType;
+  typedef MeshType::CellAutoPointer CellAutoPointerType;
+  typedef MeshType::CellType CellType;
+  typedef itk::TriangleCell<CellType> TriangleCellType;
+  typedef MeshType::PointIdentifier PointIdentifierType;
+  typedef MeshType::CellIdentifier CellIdentifierType;
 
   // Read the number of polygons
   CellIdentifierType numberOfPolygons = 0;
   numberOfPolygons = polydata->GetNumberOfPolys();
-  vtkCellArray* polys = polydata->GetPolys();
+  vtkCellArray *polys = polydata->GetPolys();
 
   PointIdentifierType numberOfCellPoints = 3;
   CellIdentifierType i = 0;
 
-  for (i=0; i<numberOfPolygons; i++)
+  for (i = 0; i < numberOfPolygons; i++)
   {
     vtkIdList *cellIds;
     vtkCell *vcell = polydata->GetCell(i);
     cellIds = vcell->GetPointIds();
 
     CellAutoPointerType cell;
-    TriangleCellType * triangleCell = new TriangleCellType;
+    TriangleCellType *triangleCell = new TriangleCellType;
     PointIdentifierType k;
-    for( k = 0; k < numberOfCellPoints; k++ )
+    for (k = 0; k < numberOfCellPoints; k++)
     {
-      triangleCell->SetPointId( k, cellIds->GetId(k) );
+      triangleCell->SetPointId(k, cellIds->GetId(k));
     }
 
-    cell.TakeOwnership( triangleCell );
-    mesh->SetCell( i, cell );
+    cell.TakeOwnership(triangleCell);
+    mesh->SetCell(i, cell);
   }
 
-  if ( !mesh->GetNumberOfPoints() )
+  if (!mesh->GetNumberOfPoints())
     mitkThrow() << "Generated itk mesh is empty.";
 
   if (m_MakeOutputBinary)
   {
-    this->SurfaceStampBinaryOutputProcessing( mesh );
+    this->SurfaceStampBinaryOutputProcessing(mesh);
   }
   else
   {
@@ -206,13 +202,13 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   }
 }
 
-void mitk::SurfaceStampImageFilter::SurfaceStampBinaryOutputProcessing( MeshType* mesh )
+void mitk::SurfaceStampImageFilter::SurfaceStampBinaryOutputProcessing(MeshType *mesh)
 {
-  mitk::Image* inputImage = const_cast< mitk::Image* >( this->GetInput() );
+  mitk::Image *inputImage = const_cast<mitk::Image *>(this->GetInput());
 
   mitk::Image::Pointer outputImage = this->GetOutput();
 
-  typedef itk::Image< unsigned char, 3 > BinaryImageType;
+  typedef itk::Image<unsigned char, 3> BinaryImageType;
   BinaryImageType::Pointer itkInputImage;
   mitk::CastToItkImage(inputImage, itkInputImage);
 
@@ -231,19 +227,19 @@ void mitk::SurfaceStampImageFilter::SurfaceStampBinaryOutputProcessing( MeshType
   mitk::CastToMitkImage(resultImage, outputImage);
 }
 
-template < typename TPixel >
-void mitk::SurfaceStampImageFilter::SurfaceStampProcessing(itk::Image< TPixel, 3 >* input, MeshType* mesh)
+template <typename TPixel>
+void mitk::SurfaceStampImageFilter::SurfaceStampProcessing(itk::Image<TPixel, 3> *input, MeshType *mesh)
 {
-  typedef itk::Image< TPixel, 3 > ImageType;
-  typedef itk::Image< unsigned char, 3 > BinaryImageType;
+  typedef itk::Image<TPixel, 3> ImageType;
+  typedef itk::Image<unsigned char, 3> BinaryImageType;
 
   typedef itk::TriangleMeshToBinaryImageFilter<mitk::SurfaceStampImageFilter::MeshType, BinaryImageType> FilterType;
 
   BinaryImageType::Pointer binaryInput = BinaryImageType::New();
-  binaryInput->SetSpacing( input->GetSpacing() );
-  binaryInput->SetOrigin( input->GetOrigin() );
-  binaryInput->SetDirection( input->GetDirection() );
-  binaryInput->SetRegions( input->GetLargestPossibleRegion() );
+  binaryInput->SetSpacing(input->GetSpacing());
+  binaryInput->SetOrigin(input->GetOrigin());
+  binaryInput->SetDirection(input->GetDirection());
+  binaryInput->SetRegions(input->GetLargestPossibleRegion());
   binaryInput->Allocate();
   binaryInput->FillBuffer(0);
 
@@ -261,36 +257,36 @@ void mitk::SurfaceStampImageFilter::SurfaceStampProcessing(itk::Image< TPixel, 3
   typename ImageType::Pointer itkOutputImage;
   mitk::CastToItkImage(outputImage, itkOutputImage);
 
-  typedef itk::ImageRegionConstIterator< BinaryImageType > BinaryIteratorType;
-  typedef itk::ImageRegionConstIterator< ImageType > InputIteratorType;
-  typedef itk::ImageRegionIterator< ImageType > OutputIteratorType;
+  typedef itk::ImageRegionConstIterator<BinaryImageType> BinaryIteratorType;
+  typedef itk::ImageRegionConstIterator<ImageType> InputIteratorType;
+  typedef itk::ImageRegionIterator<ImageType> OutputIteratorType;
 
-  BinaryIteratorType sourceIter( resultImage, resultImage->GetLargestPossibleRegion() );
+  BinaryIteratorType sourceIter(resultImage, resultImage->GetLargestPossibleRegion());
   sourceIter.GoToBegin();
 
-  InputIteratorType inputIter( input, input->GetLargestPossibleRegion() );
+  InputIteratorType inputIter(input, input->GetLargestPossibleRegion());
   inputIter.GoToBegin();
 
-  OutputIteratorType outputIter( itkOutputImage, itkOutputImage->GetLargestPossibleRegion() );
+  OutputIteratorType outputIter(itkOutputImage, itkOutputImage->GetLargestPossibleRegion());
   outputIter.GoToBegin();
 
   typename ImageType::PixelType inputValue;
   unsigned char sourceValue;
 
-  typename ImageType::PixelType fgValue = static_cast< typename ImageType::PixelType >(m_ForegroundValue);
-  typename ImageType::PixelType bgValue = static_cast< typename ImageType::PixelType >(m_BackgroundValue);
+  typename ImageType::PixelType fgValue = static_cast<typename ImageType::PixelType>(m_ForegroundValue);
+  typename ImageType::PixelType bgValue = static_cast<typename ImageType::PixelType>(m_BackgroundValue);
 
-  while ( !sourceIter.IsAtEnd() )
+  while (!sourceIter.IsAtEnd())
   {
-    sourceValue = static_cast< unsigned char >(sourceIter.Get());
-    inputValue =  static_cast< typename ImageType::PixelType >(inputIter.Get());
+    sourceValue = static_cast<unsigned char>(sourceIter.Get());
+    inputValue = static_cast<typename ImageType::PixelType>(inputIter.Get());
 
     if (sourceValue != 0)
-      outputIter.Set( fgValue );
+      outputIter.Set(fgValue);
     else if (m_OverwriteBackground)
-      outputIter.Set( bgValue );
+      outputIter.Set(bgValue);
     else
-      outputIter.Set( inputValue );
+      outputIter.Set(inputValue);
 
     ++sourceIter;
     ++inputIter;

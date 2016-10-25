@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef SELECTIONVIEWMITK_H_
 #define SELECTIONVIEWMITK_H_
 
@@ -37,30 +36,26 @@ class SelectionViewMitk : public QmitkAbstractView
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   SelectionViewMitk();
 
 protected:
-
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
 
 private:
-
   //! [MITK Selection Provider method]
   /** @brief Reimplementation of method from QmitkAbstractView that returns the data node
   *   selection model for the selection listener.
   */
-  QItemSelectionModel* GetDataNodeSelectionModel() const override;
+  QItemSelectionModel *GetDataNodeSelectionModel() const override;
   //! [MITK Selection Provider method]
 
   Ui::SelectionViewMitkControls m_Controls;
 
-  QWidget* m_Parent;
-
+  QWidget *m_Parent;
 };
 
 #endif /*SELECTIONVIEWMITK_H_*/

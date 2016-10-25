@@ -15,12 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkGradientDifferenceMetricView.h"
-#include <itkGradientDifferenceImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkGradientDifferenceImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkGradientDifferenceMetricView::QmitkGradientDifferenceMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkGradientDifferenceMetricView::QmitkGradientDifferenceMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -43,12 +44,14 @@ itk::Object::Pointer QmitkGradientDifferenceMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkGradientDifferenceMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkGradientDifferenceMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::GradientDifferenceImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::GradientDifferenceImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::GradientDifferenceImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::GradientDifferenceImageToImageMetric<FixedImageType, MovingImageType>::New();
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -73,7 +76,7 @@ QString QmitkGradientDifferenceMetricView::GetName()
   return "GradientDifference";
 }
 
-void QmitkGradientDifferenceMetricView::SetupUI(QWidget* parent)
+void QmitkGradientDifferenceMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
 }

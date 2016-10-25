@@ -17,9 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkPropertyItem.h"
 #include <QStringList>
 
-QmitkPropertyItem::QmitkPropertyItem(const QList<QVariant>& data)
-  : m_Data(data),
-    m_Parent(nullptr)
+QmitkPropertyItem::QmitkPropertyItem(const QList<QVariant> &data) : m_Data(data), m_Parent(nullptr)
 {
 }
 
@@ -28,7 +26,7 @@ QmitkPropertyItem::~QmitkPropertyItem()
   qDeleteAll(m_Children);
 }
 
-void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
+void QmitkPropertyItem::AppendChild(QmitkPropertyItem *child)
 {
   if (child == nullptr)
     return;
@@ -63,13 +61,13 @@ void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
     QStringList names = child->GetData(0).toString().split('.');
 
     // Traverse subtree and insert nodes if not already present.
-    QmitkPropertyItem* currentParent = this;
+    QmitkPropertyItem *currentParent = this;
 
     for (int i = 0; i < names.count(); ++i)
     {
       if (i != names.count() - 1)
       {
-        QmitkPropertyItem* currentChild = nullptr;
+        QmitkPropertyItem *currentChild = nullptr;
 
         // Search for current node.
         for (int j = 0; j < currentParent->m_Children.count(); ++j)
@@ -108,7 +106,7 @@ void QmitkPropertyItem::AppendChild(QmitkPropertyItem* child)
   }
 }
 
-QmitkPropertyItem* QmitkPropertyItem::GetChild(int row) const
+QmitkPropertyItem *QmitkPropertyItem::GetChild(int row) const
 {
   return m_Children.value(row);
 }
@@ -128,7 +126,7 @@ QVariant QmitkPropertyItem::GetData(int column) const
   return m_Data.value(column);
 }
 
-QmitkPropertyItem* QmitkPropertyItem::GetParent() const
+QmitkPropertyItem *QmitkPropertyItem::GetParent() const
 {
   return m_Parent;
 }

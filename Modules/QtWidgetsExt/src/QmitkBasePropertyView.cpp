@@ -15,9 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkBasePropertyView.h"
 
-QmitkBasePropertyView::QmitkBasePropertyView( const mitk::BaseProperty* property, QWidget* parent)
-: QLabel( parent ),
-  PropertyView( property )
+QmitkBasePropertyView::QmitkBasePropertyView(const mitk::BaseProperty *property, QWidget *parent)
+  : QLabel(parent), PropertyView(property)
 {
   PropertyChanged();
 }
@@ -28,8 +27,8 @@ QmitkBasePropertyView::~QmitkBasePropertyView()
 
 void QmitkBasePropertyView::PropertyChanged()
 {
-  if ( m_Property )
-    setText( m_Property->GetValueAsString().c_str() );
+  if (m_Property)
+    setText(m_Property->GetValueAsString().c_str());
 }
 
 void QmitkBasePropertyView::PropertyRemoved()
@@ -37,4 +36,3 @@ void QmitkBasePropertyView::PropertyRemoved()
   m_Property = nullptr;
   setText("n/a");
 }
-

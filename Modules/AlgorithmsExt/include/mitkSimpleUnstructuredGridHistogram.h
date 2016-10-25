@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKSIMPLEUNSTRUCTUREDGRIDHISTOGRAM_H
 #define MITKSIMPLEUNSTRUCTUREDGRIDHISTOGRAM_H
 
@@ -24,21 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkListSample.h>
 
-namespace mitk {
-
-class MITKALGORITHMSEXT_EXPORT SimpleUnstructuredGridHistogram : public SimpleHistogram
+namespace mitk
 {
-public:
+  class MITKALGORITHMSEXT_EXPORT SimpleUnstructuredGridHistogram : public SimpleHistogram
+  {
+  public:
     SimpleUnstructuredGridHistogram();
 
     virtual double GetMin() const override;
     virtual double GetMax() const override;
 
-    virtual void ComputeFromBaseData( BaseData* source ) override;
-    virtual float GetRelativeBin( double start, double end ) const override;
+    virtual void ComputeFromBaseData(BaseData *source) override;
+    virtual float GetRelativeBin(double start, double end) const override;
 
-private:
-
+  private:
     typedef double MeasurementType;
     typedef itk::Vector<MeasurementType, 1> MeasurementVectorType;
     typedef itk::Statistics::ListSample<MeasurementVectorType> ListSampleType;
@@ -47,15 +45,14 @@ private:
 
     HistogramType::ConstPointer m_UGHistogram;
 
-    //UnstructuredGridHistogram::Pointer m_UGHistogram;
+    // UnstructuredGridHistogram::Pointer m_UGHistogram;
 
     HistogramType::BinMinContainerType m_Mins;
     HistogramType::BinMaxContainerType m_Maxs;
 
     double m_InvMaxFrequency;
     double m_BinSize;
-};
-
+  };
 }
 
 #endif // MITKSIMPLEUNSTRUCTUREDGRIDHISTOGRAM_H

@@ -21,40 +21,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkWeakPointer.h>
 
-namespace Ui {
-class QmitkColourImageProcessingViewControls;
+namespace Ui
+{
+  class QmitkColourImageProcessingViewControls;
 }
 
 class QmitkColourImageProcessingView : public QmitkAbstractView
 {
-
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   QmitkColourImageProcessingView();
 
 private:
-
   virtual void SetFocus() override;
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+                                  const QList<mitk::DataNode::Pointer> &nodes) override;
 
 private slots:
 
- void OnConvertToRGBAImage();
- void OnConvertImageMaskColorToRGBAImage();
- void OnCombineRGBA();
- void OnChangeColor();
-
+  void OnConvertToRGBAImage();
+  void OnConvertImageMaskColorToRGBAImage();
+  void OnCombineRGBA();
+  void OnChangeColor();
 
 private:
-
-  Ui::QmitkColourImageProcessingViewControls* m_Controls;
+  Ui::QmitkColourImageProcessingViewControls *m_Controls;
 
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode2;

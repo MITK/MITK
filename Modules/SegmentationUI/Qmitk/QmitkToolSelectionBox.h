@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManager.h"
 
-#include <QWidget>
 #include <QButtonGroup>
 #include <QGridLayout>
+#include <QWidget>
 
 #include <map>
 
@@ -38,7 +38,8 @@ class QmitkToolGUI;
   \ingroup org_mitk_gui_qt_interactivesegmentation
   \ingroup ToolManagerEtAl
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
+  QmitkInteractiveSegmentationTechnicalPage
 
   This widget graphically displays the active tool of a mitk::ToolManager as a set
   of toggle buttons. Each button show the identification of a Tool (icon and name).
@@ -58,89 +59,96 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolSelectionBox : public QWidget
 {
   Q_OBJECT
 
-  public:
+public:
+  enum EnabledMode
+  {
+    EnabledWithReferenceAndWorkingDataVisible,
+    EnabledWithReferenceData,
+    EnabledWithWorkingData,
+    AlwaysEnabled
+  };
 
-    enum EnabledMode { EnabledWithReferenceAndWorkingDataVisible, EnabledWithReferenceData, EnabledWithWorkingData, AlwaysEnabled };
+  QmitkToolSelectionBox(QWidget *parent = 0, mitk::DataStorage *storage = 0);
+  virtual ~QmitkToolSelectionBox();
 
-    QmitkToolSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
-    virtual ~QmitkToolSelectionBox();
+  mitk::ToolManager *GetToolManager();
+  void SetToolManager(mitk::ToolManager &); // no NULL pointer allowed here, a manager is required
 
-    mitk::ToolManager* GetToolManager();
-    void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
+  void setTitle(const QString &title);
 
-    void setTitle( const QString& title );
+  /**
+    You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
+    as a string. This method will try to find the tool's group inside the supplied string \param toolGroups. If there is
+    a match,
+    the tool is displayed. Effectively, you can provide a human readable list like "default, lymphnodevolumetry,
+    oldERISstuff".
+  */
+  void SetDisplayedToolGroups(const std::string &toolGroups = 0);
 
-    /**
-      You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
-      as a string. This method will try to find the tool's group inside the supplied string \param toolGroups. If there is a match,
-      the tool is displayed. Effectively, you can provide a human readable list like "default, lymphnodevolumetry, oldERISstuff".
-    */
-    void SetDisplayedToolGroups(const std::string& toolGroups = 0);
+  void OnToolManagerToolModified();
+  void OnToolManagerReferenceDataModified();
+  void OnToolManagerWorkingDataModified();
 
-    void OnToolManagerToolModified();
-    void OnToolManagerReferenceDataModified();
-    void OnToolManagerWorkingDataModified();
+  void OnToolGUIProcessEventsMessage();
+  void OnToolErrorMessage(std::string s);
+  void OnGeneralToolMessage(std::string s);
 
-    void OnToolGUIProcessEventsMessage();
-    void OnToolErrorMessage(std::string s);
-    void OnGeneralToolMessage(std::string s);
+  void RecreateButtons();
 
-    void RecreateButtons();
+signals:
 
-  signals:
+  /// Whenever a tool is activated. id is the index of the active tool. Counting starts at 0, -1 indicates "no tool
+  /// selected"
+  /// This signal is also emitted, when the whole QmitkToolSelectionBox get disabled. Then it will claim
+  /// ToolSelected(-1)
+  /// When it is enabled again, there will be another ToolSelected event with the tool that is currently selected
+  void ToolSelected(int id);
 
-    /// Whenever a tool is activated. id is the index of the active tool. Counting starts at 0, -1 indicates "no tool selected"
-    /// This signal is also emitted, when the whole QmitkToolSelectionBox get disabled. Then it will claim ToolSelected(-1)
-    /// When it is enabled again, there will be another ToolSelected event with the tool that is currently selected
-    void ToolSelected(int id);
+public slots:
 
-  public slots:
+  virtual void setEnabled(bool);
+  virtual void SetEnabledMode(EnabledMode mode);
 
-    virtual void setEnabled( bool );
-    virtual void SetEnabledMode(EnabledMode mode);
+  virtual void SetLayoutColumns(int);
+  virtual void SetShowNames(bool);
+  virtual void SetGenerateAccelerators(bool);
 
-    virtual void SetLayoutColumns(int);
-    virtual void SetShowNames(bool);
-    virtual void SetGenerateAccelerators(bool);
+  virtual void SetToolGUIArea(QWidget *parentWidget);
 
-    virtual void SetToolGUIArea( QWidget* parentWidget );
+protected slots:
 
-  protected slots:
+  void toolButtonClicked(int id);
+  void SetGUIEnabledAccordingToToolManagerState();
 
-    void toolButtonClicked(int id);
-    void SetGUIEnabledAccordingToToolManagerState();
+protected:
+  void showEvent(QShowEvent *) override;
+  void hideEvent(QHideEvent *) override;
 
-  protected:
+  void SetOrUnsetButtonForActiveTool();
 
-    void showEvent( QShowEvent* ) override;
-    void hideEvent( QHideEvent* ) override;
+  mitk::ToolManager::Pointer m_ToolManager;
 
-    void SetOrUnsetButtonForActiveTool();
+  bool m_SelfCall;
 
-    mitk::ToolManager::Pointer m_ToolManager;
+  std::string m_DisplayedGroups;
 
-    bool m_SelfCall;
+  /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager
+  std::map<int, int> m_ButtonIDForToolID;
+  /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager
+  std::map<int, int> m_ToolIDForButtonID;
 
-    std::string m_DisplayedGroups;
+  int m_LayoutColumns;
+  bool m_ShowNames;
+  bool m_GenerateAccelerators;
 
-    /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager
-    std::map<int,int> m_ButtonIDForToolID;
-    /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager
-    std::map<int,int> m_ToolIDForButtonID;
+  QWidget *m_ToolGUIWidget;
+  QmitkToolGUI *m_LastToolGUI;
 
-    int  m_LayoutColumns;
-    bool m_ShowNames;
-    bool m_GenerateAccelerators;
+  // store buttons in this group
+  QButtonGroup *m_ToolButtonGroup;
+  QGridLayout *m_ButtonLayout;
 
-    QWidget* m_ToolGUIWidget;
-    QmitkToolGUI* m_LastToolGUI;
-
-    // store buttons in this group
-    QButtonGroup* m_ToolButtonGroup;
-    QGridLayout* m_ButtonLayout;
-
-    EnabledMode m_EnabledMode;
+  EnabledMode m_EnabledMode;
 };
 
 #endif
-

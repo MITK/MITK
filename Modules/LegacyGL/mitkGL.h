@@ -14,18 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKGL_H_HEADER_INCLUDED_C1C53722
 #define MITKGL_H_HEADER_INCLUDED_C1C53722
 
 #ifdef WIN32
-  #include <windows.h>
+#include <windows.h>
 #endif
 
 #ifndef __APPLE__
-  #include "GL/gl.h"
+#include "GL/gl.h"
 #else
-  #include "OpenGL/gl.h"
+#include "OpenGL/gl.h"
 #endif
 
 #endif /* MITKGL_H_HEADER_INCLUDED_C1C53722 */

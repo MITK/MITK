@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkToolWorkingDataSelectionListBox_h_Included
 
 // mmueller
-#include <QListWidget>
 #include <MitkSegmentationUIExports.h>
+#include <QListWidget>
 
-#include "mitkToolManager.h"
 #include "mitkProperties.h"
+#include "mitkToolManager.h"
 
 /**
 \brief Display the data selection of a ToolManager.
@@ -32,7 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 \ingroup Widgets
 
-There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
+QmitkInteractiveSegmentationTechnicalPage
 
 Shows the working data of a ToolManager in a segmentation setting. By default only the segmentation name is shown.
 
@@ -47,7 +48,6 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolWorkingDataSelectionBox : public QListW
   Q_OBJECT
 
 public:
-
   /**
   * \brief What kind of items should be displayed.
   *
@@ -58,13 +58,17 @@ public:
   *   DEFAULT is: list data if ANY one of the displayed tools' predicate matches.
   * Other option: list data if ALL one of the displayed tools' predicate matches
   */
-  enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
+  enum DisplayMode
+  {
+    ListDataIfAllToolsMatch,
+    ListDataIfAnyToolMatches
+  };
 
-  QmitkToolWorkingDataSelectionBox(QWidget* parent = 0);
+  QmitkToolWorkingDataSelectionBox(QWidget *parent = 0);
   virtual ~QmitkToolWorkingDataSelectionBox();
 
-  mitk::DataStorage* GetDataStorage();
-  void SetDataStorage(mitk::DataStorage& storage);
+  mitk::DataStorage *GetDataStorage();
+  void SetDataStorage(mitk::DataStorage &storage);
 
   /**
   \brief Can be called to trigger an update of the list contents.
@@ -74,19 +78,19 @@ public:
   /**
   \brief Returns the associated mitk::ToolManager.
   */
-  mitk::ToolManager* GetToolManager();
+  mitk::ToolManager *GetToolManager();
 
   /**
   \brief Tell this object to listen to another ToolManager.
   */
-  void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
+  void SetToolManager(mitk::ToolManager &); // no NULL pointer allowed here, a manager is required
 
   /**
   * \brief A list of all displayed DataNode objects.
   * This method might be convenient for program modules that want to display
   * additional information about these nodes, like a total volume of all segmentations, etc.
   */
-  mitk::ToolManager::DataVectorType GetAllNodes( bool onlyDerivedFromOriginal = true );
+  mitk::ToolManager::DataVectorType GetAllNodes(bool onlyDerivedFromOriginal = true);
 
   /**
   * \brief A list of all selected DataNode objects.
@@ -97,9 +101,10 @@ public:
 
   /**
   * \brief Like GetSelectedNodes(), but will only return one object.
-  * Will only return what QListView gives as selected object (documentation says nothing is returned if list is in Single selection mode).
+  * Will only return what QListView gives as selected object (documentation says nothing is returned if list is in
+  * Single selection mode).
   */
-  mitk::DataNode* GetSelectedNode();
+  mitk::DataNode *GetSelectedNode();
 
   /**
   * \brief Callback function, no need to call it.
@@ -115,15 +120,14 @@ public:
 
 signals:
 
-  void WorkingNodeSelected(const mitk::DataNode*);
+  void WorkingNodeSelected(const mitk::DataNode *);
 
-  protected slots:
+protected slots:
 
-    void OnWorkingDataSelectionChanged();
+  void OnWorkingDataSelectionChanged();
 
 protected:
-
-  typedef std::map< QListWidgetItem*, mitk::DataNode* > ItemNodeMapType;
+  typedef std::map<QListWidgetItem *, mitk::DataNode *> ItemNodeMapType;
 
   mitk::ToolManager::Pointer m_ToolManager;
 
@@ -131,7 +135,7 @@ protected:
 
   bool m_SelfCall;
 
-  mitk::DataNode* m_LastSelectedReferenceData;
+  mitk::DataNode *m_LastSelectedReferenceData;
 
   std::string m_ToolGroupsForFiltering;
 
@@ -139,4 +143,3 @@ protected:
 };
 
 #endif
-

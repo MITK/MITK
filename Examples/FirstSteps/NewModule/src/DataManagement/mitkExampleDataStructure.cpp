@@ -22,12 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 void mitk::ExampleDataStructure::UpdateOutputInformation()
 {
-
 }
 
 void mitk::ExampleDataStructure::SetRequestedRegionToLargestPossibleRegion()
 {
-
 }
 
 bool mitk::ExampleDataStructure::RequestedRegionIsOutsideOfTheBufferedRegion()
@@ -42,12 +40,10 @@ bool mitk::ExampleDataStructure::VerifyRequestedRegion()
 
 void mitk::ExampleDataStructure::SetRequestedRegion(const itk::DataObject *)
 {
-
 }
 
 /* Constructor and Destructor */
-mitk::ExampleDataStructure::ExampleDataStructure()
-: m_Data("Initialized")
+mitk::ExampleDataStructure::ExampleDataStructure() : m_Data("Initialized")
 {
   this->SetGeometry(mitk::Geometry3D::New());
 }
@@ -58,41 +54,43 @@ mitk::ExampleDataStructure::~ExampleDataStructure()
 
 void mitk::ExampleDataStructure::AppendAString(const std::string input)
 {
-  m_Data.append( input );
+  m_Data.append(input);
 }
 
-
-bool mitk::Equal( mitk::ExampleDataStructure* leftHandSide, mitk::ExampleDataStructure* rightHandSide, mitk::ScalarType /*eps*/, bool verbose )
+bool mitk::Equal(mitk::ExampleDataStructure *leftHandSide,
+                 mitk::ExampleDataStructure *rightHandSide,
+                 mitk::ScalarType /*eps*/,
+                 bool verbose)
 {
   bool noDifferenceFound = true;
 
-    if( rightHandSide == NULL )
+  if (rightHandSide == NULL)
   {
-    if(verbose)
+    if (verbose)
     {
       MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] rightHandSide NULL.";
     }
     return false;
   }
 
-  if( leftHandSide == NULL )
+  if (leftHandSide == NULL)
   {
-    if(verbose)
+    if (verbose)
     {
       MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] leftHandSide NULL.";
     }
     return false;
   }
 
-  if (!(leftHandSide->GetData() == rightHandSide->GetData()) )
+  if (!(leftHandSide->GetData() == rightHandSide->GetData()))
+  {
+    if (verbose)
     {
-      if(verbose)
-      {
-        MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] Data not equal. ";
-        MITK_INFO << leftHandSide->GetData() << " != " << rightHandSide->GetData();
-      }
-      noDifferenceFound = false;
+      MITK_INFO << "[Equal( ExampleDataStructure*, ExampleDataStructure* )] Data not equal. ";
+      MITK_INFO << leftHandSide->GetData() << " != " << rightHandSide->GetData();
     }
+    noDifferenceFound = false;
+  }
 
   return noDifferenceFound;
 }

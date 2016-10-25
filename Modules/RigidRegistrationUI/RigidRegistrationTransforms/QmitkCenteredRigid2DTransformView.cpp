@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCenteredRigid2DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
+#include <QValidator>
 #include <itkCenteredRigid2DTransform.h>
 #include <itkCenteredTransformInitializer.h>
-#include <QValidator>
+#include <mitkImageCast.h>
 
-QmitkCenteredRigid2DTransformView::QmitkCenteredRigid2DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkCenteredRigid2DTransformView::QmitkCenteredRigid2DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,34 +45,37 @@ itk::Object::Pointer QmitkCenteredRigid2DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkCenteredRigid2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkCenteredRigid2DTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 2)
   {
-    typedef typename itk::Image< TPixelType, 2 >  FixedImage2DType;
-    typedef typename itk::Image< TPixelType, 2 >  MovingImage2DType;
+    typedef typename itk::Image<TPixelType, 2> FixedImage2DType;
+    typedef typename itk::Image<TPixelType, 2> MovingImage2DType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImage2DType::Pointer fixedImage2D = itkImage1;
 
     // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
-    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk =
-        mitk::ImageToItk<MovingImage2DType>::New();
+    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImage2DType>::New();
     movingImageToItk->SetInput(m_MovingImage);
     movingImageToItk->Update();
     typename MovingImage2DType::Pointer movingImage2D = movingImageToItk->GetOutput();
 
-    typename itk::CenteredRigid2DTransform< double >::Pointer transformPointer = itk::CenteredRigid2DTransform< double >::New();
+    typename itk::CenteredRigid2DTransform<double>::Pointer transformPointer =
+      itk::CenteredRigid2DTransform<double>::New();
     transformPointer->SetIdentity();
     if (m_Controls.m_CenterForInitializerCenteredRigid2D->isChecked())
     {
-      typedef typename itk::CenteredRigid2DTransform< double >    CenteredRigid2DTransformType;
-      typedef typename itk::CenteredTransformInitializer<CenteredRigid2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
+      typedef typename itk::CenteredRigid2DTransform<double> CenteredRigid2DTransformType;
+      typedef
+        typename itk::CenteredTransformInitializer<CenteredRigid2DTransformType, FixedImage2DType, MovingImage2DType>
+          TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage2D );
-      transformInitializer->SetMovingImage( movingImage2D );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage2D);
+      transformInitializer->SetMovingImage(movingImage2D);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsCenteredRigid2D->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -83,7 +86,7 @@ itk::Object::Pointer QmitkCenteredRigid2DTransformView::GetTransform2(itk::Image
       }
       transformInitializer->InitializeTransform();
     }
-    transformPointer->SetAngle( m_Controls.m_AngleCenteredRigid2D->text().toFloat() );
+    transformPointer->SetAngle(m_Controls.m_AngleCenteredRigid2D->text().toFloat());
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];
     m_TransformObject = transformPointer.GetPointer();
@@ -128,10 +131,10 @@ QString QmitkCenteredRigid2DTransformView::GetName()
   return "CenteredRigid2D";
 }
 
-void QmitkCenteredRigid2DTransformView::SetupUI(QWidget* parent)
+void QmitkCenteredRigid2DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_AngleCenteredRigid2D->setValidator(validatorLineEditInputFloat);
   m_Controls.m_RotationScaleCenteredRigid2D->setValidator(validatorLineEditInputFloat);
   m_Controls.m_CenterXScaleCenteredRigid2D->setValidator(validatorLineEditInputFloat);
@@ -156,11 +159,14 @@ itk::Array<double> QmitkCenteredRigid2DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkCenteredRigid2DTransformView::Transform(vtkMatrix4x4* /* vtkmatrix */, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkCenteredRigid2DTransformView::Transform(vtkMatrix4x4 * /* vtkmatrix */,
+                                                           vtkTransform *vtktransform,
+                                                           itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {
-    mitk::ScalarType angle = transformParams[0] * 45.0 / atan(1.0);;
+    mitk::ScalarType angle = transformParams[0] * 45.0 / atan(1.0);
+    ;
     vtktransform->PostMultiply();
     vtktransform->Translate(-transformParams[1], -transformParams[2], 0);
     vtktransform->RotateZ(angle);

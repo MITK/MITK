@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkNodePredicateDataType.h"
 
-#include <mitkSliceNavigationController.h>
-#include <mitkBaseRenderer.h>
 #include "QmitkDataStorageComboBox.h"
 #include "mitkCameraController.h"
+#include <mitkBaseRenderer.h>
+#include <mitkSliceNavigationController.h>
 
 #include "itkCommand.h"
 
@@ -29,8 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkViewInitializationView::VIEW_ID = "org.mitk.views.viewinitialization";
 
-QmitkViewInitializationView::QmitkViewInitializationView()
-: m_Controls(NULL)
+QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(NULL)
 {
   m_CommandTag = 0;
 }
@@ -57,16 +56,16 @@ void QmitkViewInitializationView::SetFocus()
 
 void QmitkViewInitializationView::CreateConnections()
 {
-  if ( m_Controls )
+  if (m_Controls)
   {
-    connect( (QObject*)(m_Controls->pbApply), SIGNAL(clicked()),(QObject*) this, SLOT(OnApply()) );
-    connect( (QObject*)(m_Controls->pbReset), SIGNAL(clicked()),(QObject*) this, SLOT(OnResetAll()) );
+    connect((QObject *)(m_Controls->pbApply), SIGNAL(clicked()), (QObject *)this, SLOT(OnApply()));
+    connect((QObject *)(m_Controls->pbReset), SIGNAL(clicked()), (QObject *)this, SLOT(OnResetAll()));
   }
 }
 
 void QmitkViewInitializationView::Activated()
 {
-  //init render window selector (List Widget)
+  // init render window selector (List Widget)
   this->InitRenderWindowSelector();
 }
 
@@ -84,24 +83,25 @@ void QmitkViewInitializationView::Hidden()
 
 void QmitkViewInitializationView::OnApply()
 {
-  mitk::SliceNavigationController::ViewDirection viewDirection( mitk::SliceNavigationController::Axial );
-  if( m_Controls->rbAxial->isChecked() )
+  mitk::SliceNavigationController::ViewDirection viewDirection(mitk::SliceNavigationController::Axial);
+  if (m_Controls->rbAxial->isChecked())
     viewDirection = mitk::SliceNavigationController::Axial;
 
-  else if( m_Controls->rbFrontal->isChecked())
+  else if (m_Controls->rbFrontal->isChecked())
     viewDirection = mitk::SliceNavigationController::Frontal;
 
-  else if( m_Controls->rbSagittal->isChecked() )
+  else if (m_Controls->rbSagittal->isChecked())
     viewDirection = mitk::SliceNavigationController::Sagittal;
 
-  vtkRenderWindow* renderwindow = this->GetSelectedRenderWindow();
-  if(renderwindow != NULL)
+  vtkRenderWindow *renderwindow = this->GetSelectedRenderWindow();
+  if (renderwindow != NULL)
   {
-    mitk::BaseRenderer::GetInstance(renderwindow)->GetSliceNavigationController()->Update(viewDirection,
-      m_Controls->cbTop->isChecked(),
-      m_Controls->cbFrontSide->isChecked(),
-      m_Controls->cbRotated->isChecked()
-      );
+    mitk::BaseRenderer::GetInstance(renderwindow)
+      ->GetSliceNavigationController()
+      ->Update(viewDirection,
+               m_Controls->cbTop->isChecked(),
+               m_Controls->cbFrontSide->isChecked(),
+               m_Controls->cbRotated->isChecked());
     mitk::BaseRenderer::GetInstance(renderwindow)->GetCameraController()->Fit();
   }
 }
@@ -114,20 +114,19 @@ void QmitkViewInitializationView::OnResetAll()
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
-vtkRenderWindow* QmitkViewInitializationView::GetSelectedRenderWindow()
+vtkRenderWindow *QmitkViewInitializationView::GetSelectedRenderWindow()
 {
   int selectedItem = m_Controls->m_lbRenderWindows->currentRow();
   int itemNumber = 0;
 
   mitk::BaseRenderer::BaseRendererMapType::iterator mapit;
-  for(mapit = mitk::BaseRenderer::baseRendererMap.begin();
-    mapit != mitk::BaseRenderer::baseRendererMap.end();
-    mapit++, itemNumber++)
+  for (mapit = mitk::BaseRenderer::baseRendererMap.begin(); mapit != mitk::BaseRenderer::baseRendererMap.end();
+       mapit++, itemNumber++)
   {
-    if(itemNumber==selectedItem)
+    if (itemNumber == selectedItem)
       break;
   }
-   if(itemNumber==selectedItem)
+  if (itemNumber == selectedItem)
   {
     return (*mapit).first;
   }
@@ -138,32 +137,32 @@ void QmitkViewInitializationView::InitRenderWindowSelector()
 {
   itk::SimpleMemberCommand<QmitkViewInitializationView>::Pointer updateRendererListCommand =
     itk::SimpleMemberCommand<QmitkViewInitializationView>::New();
-  updateRendererListCommand->SetCallbackFunction( this, &QmitkViewInitializationView::UpdateRendererList );
+  updateRendererListCommand->SetCallbackFunction(this, &QmitkViewInitializationView::UpdateRendererList);
 
   this->UpdateRendererList();
 }
 
 void QmitkViewInitializationView::UpdateRendererList()
 {
-  vtkRenderWindow* focusedRenderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
+  vtkRenderWindow *focusedRenderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
 
   int selectedItem = -1;
   int itemNumber = 0;
   m_Controls->m_lbRenderWindows->clear();
 
-
-  for(mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin();
-    mapit != mitk::BaseRenderer::baseRendererMap.end(); mapit++, itemNumber++)
+  for (mitk::BaseRenderer::BaseRendererMapType::iterator mapit = mitk::BaseRenderer::baseRendererMap.begin();
+       mapit != mitk::BaseRenderer::baseRendererMap.end();
+       mapit++, itemNumber++)
   {
-    if( (*mapit).second->GetName())
+    if ((*mapit).second->GetName())
     {
       m_Controls->m_lbRenderWindows->addItem(QString((*mapit).second->GetName()));
-      if(focusedRenderWindow==(*mapit).first)
+      if (focusedRenderWindow == (*mapit).first)
         selectedItem = itemNumber;
     }
   }
 
-  if (selectedItem>=0)
+  if (selectedItem >= 0)
   {
     m_Controls->m_lbRenderWindows->setCurrentRow(selectedItem);
   }

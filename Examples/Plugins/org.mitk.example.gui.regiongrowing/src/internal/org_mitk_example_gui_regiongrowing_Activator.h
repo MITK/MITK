@@ -14,28 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef org_mitk_example_gui_regiongrowing_Activator_h
 #define org_mitk_example_gui_regiongrowing_Activator_h
 
 #include <ctkPluginActivator.h>
 
-namespace mitk {
-
-class org_mitk_example_gui_regiongrowing_Activator :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID "org_mitk_example_gui_regiongrowing")
-  Q_INTERFACES(ctkPluginActivator)
+  class org_mitk_example_gui_regiongrowing_Activator : public QObject, public ctkPluginActivator
+  {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org_mitk_example_gui_regiongrowing")
+    Q_INTERFACES(ctkPluginActivator)
 
-public:
+  public:
+    void start(ctkPluginContext *context) override;
+    void stop(ctkPluginContext *context) override;
 
-  void start(ctkPluginContext* context) override;
-  void stop(ctkPluginContext* context) override;
-
-}; // org_mitk_example_gui_regiongrowing_Activator
-
+  }; // org_mitk_example_gui_regiongrowing_Activator
 }
 
 #endif // org_mitk_example_gui_regiongrowing_Activator_h

@@ -17,71 +17,69 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkFastMarchingTool_h_Included
 #define mitkFastMarchingTool_h_Included
 
+#include "mitkDataNode.h"
 #include "mitkFeedbackContourTool.h"
 #include "mitkLegacyAdaptors.h"
-#include <MitkSegmentationExports.h>
-#include "mitkDataNode.h"
 #include "mitkPointSet.h"
 #include "mitkToolCommand.h"
+#include <MitkSegmentationExports.h>
 
 #include "mitkMessage.h"
 
 #include "itkImage.h"
 
-//itk filter
-#include "itkFastMarchingImageFilter.h"
+// itk filter
 #include "itkBinaryThresholdImageFilter.h"
+#include "itkCurvatureAnisotropicDiffusionImageFilter.h"
+#include "itkFastMarchingImageFilter.h"
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "itkSigmoidImageFilter.h"
-#include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 
-namespace us {
-class ModuleResource;
+namespace us
+{
+  class ModuleResource;
 }
 
 namespace mitk
 {
-
   class StateMachineAction;
   class InteractionEvent;
 
-/**
-  \brief FastMarching semgentation tool.
+  /**
+    \brief FastMarching semgentation tool.
 
-  The segmentation is done by setting one or more seed points on the image
-  and adapting the time range and threshold. The pipeline is:
-    Smoothing->GradientMagnitude->SigmoidFunction->FastMarching->Threshold
-  The resulting binary image is seen as a segmentation of an object.
+    The segmentation is done by setting one or more seed points on the image
+    and adapting the time range and threshold. The pipeline is:
+      Smoothing->GradientMagnitude->SigmoidFunction->FastMarching->Threshold
+    The resulting binary image is seen as a segmentation of an object.
 
-  For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
-*/
-class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
-{
+    For detailed documentation see ITK Software Guide section 9.3.1 Fast Marching Segmentation.
+  */
+  class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
+  {
     mitkNewMessageMacro(Ready);
 
   public:
-
     mitkClassMacro(FastMarchingTool, FeedbackContourTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /* typedefs for itk pipeline */
-    typedef float                                     InternalPixelType;
-    typedef itk::Image< InternalPixelType, 2 >        InternalImageType;
-    typedef mitk::Tool::DefaultSegmentationDataType   OutputPixelType;
-    typedef itk::Image< OutputPixelType, 2 >          OutputImageType;
+      /* typedefs for itk pipeline */
+      typedef float InternalPixelType;
+    typedef itk::Image<InternalPixelType, 2> InternalImageType;
+    typedef mitk::Tool::DefaultSegmentationDataType OutputPixelType;
+    typedef itk::Image<OutputPixelType, 2> OutputImageType;
 
-    typedef itk::BinaryThresholdImageFilter< InternalImageType, OutputImageType >                       ThresholdingFilterType;
-    typedef itk::CurvatureAnisotropicDiffusionImageFilter< InternalImageType, InternalImageType >       SmoothingFilterType;
-    typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< InternalImageType, InternalImageType >  GradientFilterType;
-    typedef itk::SigmoidImageFilter< InternalImageType, InternalImageType >                             SigmoidFilterType;
-    typedef itk::FastMarchingImageFilter< InternalImageType, InternalImageType >                        FastMarchingFilterType;
-    typedef FastMarchingFilterType::NodeContainer                                                       NodeContainer;
-    typedef FastMarchingFilterType::NodeType                                                            NodeType;
+    typedef itk::BinaryThresholdImageFilter<InternalImageType, OutputImageType> ThresholdingFilterType;
+    typedef itk::CurvatureAnisotropicDiffusionImageFilter<InternalImageType, InternalImageType> SmoothingFilterType;
+    typedef itk::GradientMagnitudeRecursiveGaussianImageFilter<InternalImageType, InternalImageType> GradientFilterType;
+    typedef itk::SigmoidImageFilter<InternalImageType, InternalImageType> SigmoidFilterType;
+    typedef itk::FastMarchingImageFilter<InternalImageType, InternalImageType> FastMarchingFilterType;
+    typedef FastMarchingFilterType::NodeContainer NodeContainer;
+    typedef FastMarchingFilterType::NodeType NodeType;
 
     /* icon stuff */
-    virtual const char** GetXPM() const override;
-    virtual const char* GetName() const override;
+    virtual const char **GetXPM() const override;
+    virtual const char *GetName() const override;
 
     virtual us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
@@ -117,13 +115,12 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
     void Update();
 
   protected:
-
     FastMarchingTool();
     virtual ~FastMarchingTool();
 
     void ConnectActionsAndFunctions() override;
 
-    //virtual float CanHandleEvent( StateEvent const *stateEvent) const;
+    // virtual float CanHandleEvent( StateEvent const *stateEvent) const;
 
     virtual void Activated() override;
     virtual void Deactivated() override;
@@ -132,10 +129,10 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
     virtual void BuildITKPipeline();
 
     /// \brief Add point action of StateMachine pattern
-    virtual void OnAddPoint ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Delete action of StateMachine pattern
-    virtual void OnDelete ( StateMachineAction*, InteractionEvent* interactionEvent );
+    virtual void OnDelete(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Reset all relevant inputs of the itk pipeline.
     void Reset();
@@ -151,20 +148,20 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
 
     mitk::InteractionPositionEvent::Pointer m_PositionEvent;
 
-    float m_LowerThreshold; //used in Threshold filter
-    float m_UpperThreshold; //used in Threshold filter
-    float m_StoppingValue; //used in Fast Marching filter
-    float m_Sigma; //used in GradientMagnitude filter
-    float m_Alpha; //used in Sigmoid filter
-    float m_Beta; //used in Sigmoid filter
+    float m_LowerThreshold; // used in Threshold filter
+    float m_UpperThreshold; // used in Threshold filter
+    float m_StoppingValue;  // used in Fast Marching filter
+    float m_Sigma;          // used in GradientMagnitude filter
+    float m_Alpha;          // used in Sigmoid filter
+    float m_Beta;           // used in Sigmoid filter
 
-    NodeContainer::Pointer m_SeedContainer; //seed points for FastMarching
+    NodeContainer::Pointer m_SeedContainer; // seed points for FastMarching
 
-    InternalImageType::Pointer m_ReferenceImageSliceAsITK; //the reference image as itk::Image
+    InternalImageType::Pointer m_ReferenceImageSliceAsITK; // the reference image as itk::Image
 
-    mitk::DataNode::Pointer m_ResultImageNode;//holds the result as a preview image
+    mitk::DataNode::Pointer m_ResultImageNode; // holds the result as a preview image
 
-    mitk::DataNode::Pointer m_SeedsAsPointSetNode;//used to visualize the seed points
+    mitk::DataNode::Pointer m_SeedsAsPointSetNode; // used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;
 
     ThresholdingFilterType::Pointer m_ThresholdFilter;
@@ -175,8 +172,7 @@ class MITKSEGMENTATION_EXPORT FastMarchingTool : public FeedbackContourTool
 
   private:
     PlaneGeometry::Pointer m_WorkingPlane;
-
-};
+  };
 
 } // namespace
 

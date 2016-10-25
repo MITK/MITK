@@ -23,21 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExampleIOMimeTypes.h"
 
 mitk::ExampleDataStructureWriterService::ExampleDataStructureWriterService()
-  : AbstractFileWriter(mitk::ExampleDataStructure::GetStaticNameOfClass(), CustomMimeType(mitk::ExampleIOMimeTypes::EXAMPLE_MIMETYPE()), "Default writer for the example data structure")
+  : AbstractFileWriter(mitk::ExampleDataStructure::GetStaticNameOfClass(),
+                       CustomMimeType(mitk::ExampleIOMimeTypes::EXAMPLE_MIMETYPE()),
+                       "Default writer for the example data structure")
 {
   RegisterService();
 }
 
-mitk::ExampleDataStructureWriterService::ExampleDataStructureWriterService(const mitk::ExampleDataStructureWriterService& other)
+mitk::ExampleDataStructureWriterService::ExampleDataStructureWriterService(
+  const mitk::ExampleDataStructureWriterService &other)
   : AbstractFileWriter(other)
 {
 }
 
-
 mitk::ExampleDataStructureWriterService::~ExampleDataStructureWriterService()
-{}
+{
+}
 
-mitk::ExampleDataStructureWriterService* mitk::ExampleDataStructureWriterService::Clone() const
+mitk::ExampleDataStructureWriterService *mitk::ExampleDataStructureWriterService::Clone() const
 {
   return new ExampleDataStructureWriterService(*this);
 }
@@ -45,23 +48,23 @@ mitk::ExampleDataStructureWriterService* mitk::ExampleDataStructureWriterService
 void mitk::ExampleDataStructureWriterService::Write()
 {
   MITK_INFO << "Writing ExampleDataStructure";
-  InputType::ConstPointer input = dynamic_cast<const InputType*>(this->GetInput());
-  if (input.IsNull() )
+  InputType::ConstPointer input = dynamic_cast<const InputType *>(this->GetInput());
+  if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to ExampleDataStructureWriterService is NULL!";
+    MITK_ERROR << "Sorry, input to ExampleDataStructureWriterService is NULL!";
     return;
   }
-  if ( this->GetOutputLocation().empty() )
+  if (this->GetOutputLocation().empty())
   {
-    MITK_ERROR << "Sorry, filename has not been set!" ;
-    return ;
+    MITK_ERROR << "Sorry, filename has not been set!";
+    return;
   }
 
   std::string ext = itksys::SystemTools::GetFilenameLastExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
   // default extension is .txt
-  if(ext == "")
+  if (ext == "")
   {
     ext = ".txt";
     this->SetOutputLocation(this->GetOutputLocation() + ext);
@@ -71,7 +74,7 @@ void mitk::ExampleDataStructureWriterService::Write()
   {
     std::ofstream file(this->GetOutputLocation());
 
-    if ( file.is_open() )
+    if (file.is_open())
     {
       file << input->GetData();
     }
@@ -91,5 +94,4 @@ void mitk::ExampleDataStructureWriterService::Write()
   {
     MITK_ERROR << "Unknown error occurred while trying to write file.";
   }
-
 }

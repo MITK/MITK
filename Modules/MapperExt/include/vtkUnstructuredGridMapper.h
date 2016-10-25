@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __vtkUnstructuredGridMapper_h
 #define __vtkUnstructuredGridMapper_h
 
-#include "mitkCommon.h"
 #include "MitkMapperExtExports.h"
-#include "mitkBoundingObject.h"
 #include "mitkBaseRenderer.h"
+#include "mitkBoundingObject.h"
+#include "mitkCommon.h"
 
 #include "vtkMapper.h"
 
@@ -32,8 +32,8 @@ class MITKMAPPEREXT_EXPORT vtkUnstructuredGridMapper : public vtkMapper
 {
 public:
   static vtkUnstructuredGridMapper *New();
-  vtkTypeMacro(vtkUnstructuredGridMapper,vtkMapper);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkUnstructuredGridMapper, vtkMapper);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
   void Render(vtkRenderer *ren, vtkActor *act) override;
 
   // Description:
@@ -44,16 +44,15 @@ public:
   // Release any graphics resources that are being consumed by this mapper.
   // The parameter window could be used to determine which graphic
   // resources to release.
-   // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
   DEPRECATED(void ReleaseGraphicsResources(vtkWindow *) override);
 
-   // Description:
+  // Description:
   // Release any graphics resources that are being consumed by this mapper.
   // The parameter renderer could be used to determine which graphic
   // resources to release.
-   // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
-  void ReleaseGraphicsResources(mitk::BaseRenderer * renderer);
-
+  // deprecatedSince{2013_12} Use ReleaseGraphicsResources(mitk::BaseRenderer* renderer) instead
+  void ReleaseGraphicsResources(mitk::BaseRenderer *renderer);
 
   // Description:
   // Get the mtime also considering the lookup table.
@@ -64,7 +63,7 @@ public:
   void SetInput(vtkUnstructuredGrid *input);
   vtkUnstructuredGrid *GetInput();
 
-  void SetBoundingObject(mitk::BoundingObject* bo);
+  void SetBoundingObject(mitk::BoundingObject *bo);
 
 protected:
   vtkUnstructuredGridMapper();
@@ -75,14 +74,14 @@ protected:
 
   mitk::BoundingObject::Pointer m_BoundingObject;
 
-  virtual void ReportReferences(vtkGarbageCollector*) override;
+  virtual void ReportReferences(vtkGarbageCollector *) override;
 
   // see algorithm for more info
-  virtual int FillInputPortInformation(int port, vtkInformation* info) override;
+  virtual int FillInputPortInformation(int port, vtkInformation *info) override;
 
 private:
-  vtkUnstructuredGridMapper(const vtkUnstructuredGridMapper&);  // Not implemented.
-  void operator=(const vtkUnstructuredGridMapper&);  // Not implemented.
+  vtkUnstructuredGridMapper(const vtkUnstructuredGridMapper &); // Not implemented.
+  void operator=(const vtkUnstructuredGridMapper &);            // Not implemented.
 };
 
 #endif // __vtkUnstructuredGridMapper_h

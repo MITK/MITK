@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExtExports.h"
 #include <QMenu>
 
-#include "mitkPropertyList.h"
 #include "mitkProperties.h"
+#include "mitkPropertyList.h"
 
 class QmitkMaterialEditor;
 
@@ -34,7 +34,8 @@ class QmitkMaterialEditor;
 
   \brief Displays the properties from a mitk::PropertyList.
 
-  This widget gets a mitk::PropertyList in its constructor, changes its elements like "color", "visible", "material" etc.
+  This widget gets a mitk::PropertyList in its constructor, changes its elements like "color", "visible", "material"
+  etc.
   When all changes are done successfully, clients are notified by the signal propertyListChangesDone.
 
 */
@@ -42,53 +43,54 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPropertyListPopup : public QObject
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkPropertyListPopup(mitk::PropertyList *,
+                         QObject *parent = 0,
+                         bool disableBoolProperties = false,
+                         bool fillMenuImmediatelty = true,
+                         const char *name = 0);
 
-    QmitkPropertyListPopup( mitk::PropertyList*, QObject* parent = 0, bool disableBoolProperties = false, bool fillMenuImmediatelty = true, const char* name = 0 );
+  virtual ~QmitkPropertyListPopup();
 
-    virtual ~QmitkPropertyListPopup();
+  void popup(const QPoint &pos, QAction *action = 0);
 
-    void popup( const QPoint& pos, QAction* action = 0 );
+  void fillPopup();
 
-    void fillPopup();
+signals:
 
-  signals:
+  void propertyListChangesDone();
 
-    void propertyListChangesDone();
+protected slots:
 
-  protected slots:
+  void onNameClicked();
+  void onVisibleClicked();
+  void onColorClicked();
+  void onBoolPropertyClicked(int);
+  virtual void MaterialEditorChangesAccepted(QmitkMaterialEditor *ed);
+  virtual void popupAboutToHide();
+  void popupMenuItemHovered(QAction *action);
 
-    void onNameClicked();
-    void onVisibleClicked();
-    void onColorClicked();
-    void onBoolPropertyClicked(int);
-    virtual void MaterialEditorChangesAccepted(QmitkMaterialEditor* ed);
-    virtual void popupAboutToHide();
-    void popupMenuItemHovered(QAction* action);
+protected:
+  virtual bool AddMaterialPopup();
+  virtual void UpdateNodeMaterialOnPopupHiding(bool &changes);
+  QIcon createColorIcon(QColor color);
+  QMenu *m_PopupMenu;
 
-  protected:
+  mitk::PropertyList::Pointer m_PropertyList;
+  std::vector<mitk::BoolProperty::Pointer> m_BoolProperties;
+  QMenu *m_InfoPopup;
 
-    virtual bool AddMaterialPopup();
-    virtual void UpdateNodeMaterialOnPopupHiding( bool& changes );
-    QIcon createColorIcon(QColor color);
-    QMenu* m_PopupMenu;
+  QAction *m_NameMenuAction;
+  QAction *m_VisibleMenuAction;
+  QAction *m_ColorMenuAction;
+  QAction *m_MaterialMenuAction;
+  QAction *m_OpacityMenuAction;
 
-    mitk::PropertyList::Pointer m_PropertyList;
-    std::vector<mitk::BoolProperty::Pointer> m_BoolProperties;
-    QMenu* m_InfoPopup;
+  bool m_AcceptOnHide;
 
-    QAction* m_NameMenuAction;
-    QAction* m_VisibleMenuAction;
-    QAction* m_ColorMenuAction;
-    QAction* m_MaterialMenuAction;
-    QAction* m_OpacityMenuAction;
+  mitk::FloatProperty::Pointer m_OriginalOpacity;
 
-    bool m_AcceptOnHide;
-
-    mitk::FloatProperty::Pointer m_OriginalOpacity;
-
-    bool m_DisableBoolProperties;
+  bool m_DisableBoolProperties;
 };
 
 #endif
-

@@ -22,40 +22,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVersion.h>
 
-#include <QFileInfo>
 #include <QDateTime>
+#include <QFileInfo>
 
-namespace mitk {
+namespace mitk
+{
+  QmlAppPluginActivator *QmlAppPluginActivator::inst = 0;
 
-    QmlAppPluginActivator* QmlAppPluginActivator::inst = 0;
+  QmlAppPluginActivator::QmlAppPluginActivator() { inst = this; }
+  QmlAppPluginActivator::~QmlAppPluginActivator() {}
+  QmlAppPluginActivator *QmlAppPluginActivator::GetDefault() { return inst; }
+  void QmlAppPluginActivator::start(ctkPluginContext *context)
+  {
+    berry::AbstractUICTKPlugin::start(context);
 
-    QmlAppPluginActivator::QmlAppPluginActivator()
-    {
-        inst = this;
-    }
+    this->context = context;
 
-    QmlAppPluginActivator::~QmlAppPluginActivator()
-    {
-    }
+    BERRY_REGISTER_EXTENSION_CLASS(QmitkQmlApplication, context);
+  }
 
-    QmlAppPluginActivator* QmlAppPluginActivator::GetDefault()
-    {
-        return inst;
-    }
-
-    void QmlAppPluginActivator::start(ctkPluginContext* context)
-    {
-        berry::AbstractUICTKPlugin::start(context);
-
-        this->context = context;
-
-        BERRY_REGISTER_EXTENSION_CLASS(QmitkQmlApplication, context);
-    }
-
-    ctkPluginContext* QmlAppPluginActivator::GetPluginContext() const
-    {
-        return context;
-    }
+  ctkPluginContext *QmlAppPluginActivator::GetPluginContext() const { return context; }
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

@@ -33,9 +33,8 @@ void EmptyView1::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
 
   m_Parent->setEnabled(true);
-
 }
 
-void EmptyView1::SetFocus ()
+void EmptyView1::SetFocus()
 {
 }

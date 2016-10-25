@@ -19,46 +19,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSubtractContourTool.xpm"
 
 // us
-#include <usModule.h>
-#include <usModuleResource.h>
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleContext.h>
+#include <usModuleResource.h>
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, SubtractContourTool, "Subtract tool");
 }
 
-mitk::SubtractContourTool::SubtractContourTool()
-:ContourTool(0)
+mitk::SubtractContourTool::SubtractContourTool() : ContourTool(0)
 {
-  FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
+  FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
 }
 
 mitk::SubtractContourTool::~SubtractContourTool()
 {
 }
 
-const char** mitk::SubtractContourTool::GetXPM() const
+const char **mitk::SubtractContourTool::GetXPM() const
 {
   return mitkSubtractContourTool_xpm;
 }
 
 us::ModuleResource mitk::SubtractContourTool::GetIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Subtract_48x48.png");
   return resource;
 }
 
 us::ModuleResource mitk::SubtractContourTool::GetCursorIconResource() const
 {
-  us::Module* module = us::GetModuleContext()->GetModule();
+  us::Module *module = us::GetModuleContext()->GetModule();
   us::ModuleResource resource = module->GetResource("Subtract_Cursor_32x32.png");
   return resource;
 }
 
-const char* mitk::SubtractContourTool::GetName() const
+const char *mitk::SubtractContourTool::GetName() const
 {
   return "Subtract";
 }
-

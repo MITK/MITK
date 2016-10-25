@@ -35,7 +35,6 @@ class mitkLabelTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void TestSetLock()
   {
     mitk::Label::Pointer label = mitk::Label::New();
@@ -81,7 +80,8 @@ public:
     mitk::Point3D currentIndex = label->GetCenterOfMassIndex();
     mitk::Point3D indexToBeCompared;
     indexToBeCompared.Fill(0);
-    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index", mitk::Equal(currentIndex, indexToBeCompared));
+    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index",
+                           mitk::Equal(currentIndex, indexToBeCompared));
 
     indexToBeCompared.SetElement(0, 234.3f);
     indexToBeCompared.SetElement(1, -53);
@@ -97,7 +97,8 @@ public:
     mitk::Point3D currentPoint = label->GetCenterOfMassCoordinates();
     mitk::Point3D pointToBeCompared;
     pointToBeCompared.Fill(0);
-    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index", mitk::Equal(currentPoint, pointToBeCompared));
+    CPPUNIT_ASSERT_MESSAGE("Initial label has wrong center of mass index",
+                           mitk::Equal(currentPoint, pointToBeCompared));
 
     pointToBeCompared.SetElement(0, 234.3f);
     pointToBeCompared.SetElement(1, -53);
@@ -112,12 +113,12 @@ public:
     mitk::Label::Pointer label = mitk::Label::New();
     mitk::Color currentColor = label->GetColor();
     mitk::Color colorToBeCompared;
-    colorToBeCompared.Set(0,0,0);
+    colorToBeCompared.Set(0, 0, 0);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetBlue() == colorToBeCompared.GetBlue());
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetGreen() == colorToBeCompared.GetGreen());
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetRed() == colorToBeCompared.GetRed());
 
-    colorToBeCompared.Set(0.4f,0.3f,1.0f);
+    colorToBeCompared.Set(0.4f, 0.3f, 1.0f);
     label->SetColor(colorToBeCompared);
     currentColor = label->GetColor();
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong color", currentColor.GetBlue() == colorToBeCompared.GetBlue());
@@ -156,7 +157,7 @@ public:
     mitk::Label::Pointer label = mitk::Label::New();
 
     mitk::StringProperty::Pointer prop = mitk::StringProperty::New("abc");
-    label->SetProperty("cba",prop);
+    label->SetProperty("cba", prop);
     std::string propVal;
     label->GetStringProperty("cba", propVal);
     CPPUNIT_ASSERT_MESSAGE("Initial label has wrong value", propVal.compare("abc") == 0);

@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkGradientDescentOptimizerViewWidgetHIncluded
 #define QmitkGradientDescentOptimizerViewWidgetHIncluded
 
-#include "ui_QmitkGradientDescentOptimizerControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
+#include "ui_QmitkGradientDescentOptimizerControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
@@ -31,10 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkGradientDescentOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
-
 public:
-
-  QmitkGradientDescentOptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkGradientDescentOptimizerView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkGradientDescentOptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;
@@ -49,14 +47,12 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
 protected:
-
   Ui::QmitkGradientDescentOptimizerControls m_Controls;
 
   int m_NumberTransformParameters;
-
 };
 
 #endif

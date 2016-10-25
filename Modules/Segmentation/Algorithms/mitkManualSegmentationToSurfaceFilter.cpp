@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkManualSegmentationToSurfaceFilter.h>
 
-#include <vtkSmartPointer.h>
 #include <vtkImageShiftScale.h>
+#include <vtkSmartPointer.h>
 
 #include "mitkProgressBar.h"
 
@@ -35,41 +35,39 @@ mitk::ManualSegmentationToSurfaceFilter::ManualSegmentationToSurfaceFilter()
   m_InterpolationZ = 1.0f;
 };
 
-
 mitk::ManualSegmentationToSurfaceFilter::~ManualSegmentationToSurfaceFilter(){};
 
 void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 {
   mitk::Surface *surface = this->GetOutput();
-  mitk::Image * image    =  (mitk::Image*)GetInput();
+  mitk::Image *image = (mitk::Image *)GetInput();
   mitk::Image::RegionType outputRegion = image->GetRequestedRegion();
 
-  int tstart=outputRegion.GetIndex(3);
-  int tmax=tstart+outputRegion.GetSize(3); //GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
+  int tstart = outputRegion.GetIndex(3);
+  int tmax = tstart + outputRegion.GetSize(3); // GetSize()==1 - will aber 0 haben, wenn nicht zeitaufgeloest
 
   ScalarType thresholdExpanded = this->m_Threshold;
 
-  if ((tmax-tstart) > 0)
+  if ((tmax - tstart) > 0)
   {
-    ProgressBar::GetInstance()->AddStepsToDo( 7 * (tmax - tstart)  );
+    ProgressBar::GetInstance()->AddStepsToDo(7 * (tmax - tstart));
   }
   else
   {
     ProgressBar::GetInstance()->AddStepsToDo(7);
   }
 
-
-  for( int t=tstart; t<tmax; ++t )
+  for (int t = tstart; t < tmax; ++t)
   {
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D
     MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
-    if(m_MedianFilter3D)
+    if (m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
-      median->SetInputData(vtkimage); //RC++ (VTK < 5.0)
-      median->SetKernelSize(m_MedianKernelSizeX,m_MedianKernelSizeY,m_MedianKernelSizeZ);//Std: 3x3x3
+      median->SetInputData(vtkimage);                                                       // RC++ (VTK < 5.0)
+      median->SetKernelSize(m_MedianKernelSizeX, m_MedianKernelSizeY, m_MedianKernelSizeZ); // Std: 3x3x3
       median->ReleaseDataFlagOn();
       median->UpdateInformation();
       median->Update();
@@ -78,28 +76,28 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     }
     ProgressBar::GetInstance()->Progress();
 
-    //Interpolate image spacing
+    // Interpolate image spacing
     MITK_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
-    if(m_Interpolation)
+    if (m_Interpolation)
     {
-      vtkImageResample * imageresample = vtkImageResample::New();
+      vtkImageResample *imageresample = vtkImageResample::New();
       imageresample->SetInputData(vtkimage);
 
-      //Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)
+      // Set Spacing Manual to 1mm in each direction (Original spacing is lost during image processing)
       imageresample->SetAxisOutputSpacing(0, m_InterpolationX);
       imageresample->SetAxisOutputSpacing(1, m_InterpolationY);
       imageresample->SetAxisOutputSpacing(2, m_InterpolationZ);
       imageresample->UpdateInformation();
       imageresample->Update();
-      vtkimage=imageresample->GetOutput();//->Output
+      vtkimage = imageresample->GetOutput(); //->Output
       imageresample->Delete();
     }
     ProgressBar::GetInstance()->Progress();
 
     MITK_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
-    if(m_UseGaussianImageSmooth)//gauss
+    if (m_UseGaussianImageSmooth) // gauss
     {
-      vtkImageShiftScale* scalefilter = vtkImageShiftScale::New();
+      vtkImageShiftScale *scalefilter = vtkImageShiftScale::New();
       scalefilter->SetScale(100);
       scalefilter->SetInputData(vtkimage);
       scalefilter->Update();
@@ -108,24 +106,24 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       gaussian->SetInputConnection(scalefilter->GetOutputPort());
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
-      gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
+      gaussian->SetStandardDeviation(m_GaussianStandardDeviation);
       gaussian->ReleaseDataFlagOn();
       gaussian->UpdateInformation();
       gaussian->Update();
 
-      vtkimage=scalefilter->GetOutput();
+      vtkimage = scalefilter->GetOutput();
 
       double range[2];
       vtkimage->GetScalarRange(range);
 
       MITK_DEBUG << "Current scalar max is: " << range[1];
-      if (range[1]!=0) //too little slices, image smoothing eliminates all segmentation pixels
+      if (range[1] != 0) // too little slices, image smoothing eliminates all segmentation pixels
       {
         vtkimage = gaussian->GetOutput(); //->Out
       }
       else
       {
-        MITK_INFO<<"Smoothing removes all pixels of the segmentation. Use unsmoothed result";
+        MITK_INFO << "Smoothing removes all pixels of the segmentation. Use unsmoothed result";
       }
       gaussian->Delete();
       scalefilter->Delete();
@@ -139,10 +137,10 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   MITK_INFO << "Updating Time Geometry to ensure right timely displaying";
   // Fixing wrong time geometry
-  TimeGeometry* surfaceTG = surface->GetTimeGeometry();
-  ProportionalTimeGeometry* surfacePTG = dynamic_cast<ProportionalTimeGeometry*>(surfaceTG);
-  TimeGeometry* imageTG = image->GetTimeGeometry();
-  ProportionalTimeGeometry* imagePTG = dynamic_cast<ProportionalTimeGeometry*>(imageTG);
+  TimeGeometry *surfaceTG = surface->GetTimeGeometry();
+  ProportionalTimeGeometry *surfacePTG = dynamic_cast<ProportionalTimeGeometry *>(surfaceTG);
+  TimeGeometry *imageTG = image->GetTimeGeometry();
+  ProportionalTimeGeometry *imagePTG = dynamic_cast<ProportionalTimeGeometry *>(imageTG);
   // Requires ProportionalTimeGeometries to work. May not be available for all steps.
   assert(surfacePTG != nullptr);
   assert(imagePTG != nullptr);
@@ -156,13 +154,12 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   }
 };
 
-
 void mitk::ManualSegmentationToSurfaceFilter::SetMedianKernelSize(int x, int y, int z)
 {
   m_MedianKernelSizeX = x;
   m_MedianKernelSizeY = y;
   m_MedianKernelSizeZ = z;
- }
+}
 
 void mitk::ManualSegmentationToSurfaceFilter::SetInterpolation(vtkDouble x, vtkDouble y, vtkDouble z)
 {

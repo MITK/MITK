@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDicomExternalDataWidget_h
 #define QmitkDicomExternalDataWidget_h
 
-#include <MitkDicomUIExports.h>
 #include "ui_QmitkDicomExternalDataWidgetControls.h"
+#include <MitkDicomUIExports.h>
 
 // include ctk
 #include <ctkDICOMDatabase.h>
 #include <ctkDICOMIndexer.h>
 
-//include QT
+// include QT
 #include <QHash>
 #include <QLabel>
 #include <QProgressDialog>
@@ -48,7 +48,6 @@ class MITKDICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget
   Q_OBJECT
 
 public:
-
   static const std::string Widget_ID;
 
   /**
@@ -78,12 +77,12 @@ public:
 signals:
 
   /// @brief emitted when import into database is finished.
-  void SignalStartDicomImport(const QStringList&);
+  void SignalStartDicomImport(const QStringList &);
 
   /// @brief emitted when view button is clicked.
   void SignalDicomToDataManager(QHash<QString, QVariant>);
 
-  public slots:
+public slots:
 
   /// @brief Called when download button was clicked.
   void OnDownloadButtonClicked();
@@ -92,13 +91,13 @@ signals:
   void OnViewButtonClicked();
 
   /// @brief   Called when adding a dicom directory. Starts a thread adding the directory.
-  void OnStartDicomImport(const QString&);
+  void OnStartDicomImport(const QString &);
 
   void OnSeriesSelectionChanged(const QStringList &s);
 
 protected:
-
-  /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index will be returned.
+  /// \brief Get the list of filepath from current selected index in TreeView. All file paths referring to the index
+  /// will be returned.
   QStringList GetFileNamesFromIndex();
 
   /// \brief SetupImportDialog Sets up import dialog.
@@ -106,14 +105,14 @@ protected:
 
   void SetupProgressDialog();
 
-  ctkDICOMDatabase* m_ExternalDatabase;
-  ctkDICOMIndexer* m_ExternalIndexer;
-  ctkFileDialog* m_ImportDialog;
+  ctkDICOMDatabase *m_ExternalDatabase;
+  ctkDICOMIndexer *m_ExternalIndexer;
+  ctkFileDialog *m_ImportDialog;
 
-  QProgressDialog* m_ProgressDialog;
+  QProgressDialog *m_ProgressDialog;
   QString m_LastImportDirectory;
 
-  Ui::QmitkDicomExternalDataWidgetControls* m_Controls;
+  Ui::QmitkDicomExternalDataWidgetControls *m_Controls;
 };
 
 #endif // _QmitkDicomExternalDataWidget_H_INCLUDED

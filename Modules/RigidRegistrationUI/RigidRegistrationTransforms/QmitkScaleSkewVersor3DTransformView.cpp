@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkScaleSkewVersor3DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkScaleSkewVersor3DTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkScaleSkewVersor3DTransform.h>
+#include <mitkImageCast.h>
 
-QmitkScaleSkewVersor3DTransformView::QmitkScaleSkewVersor3DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkScaleSkewVersor3DTransformView::QmitkScaleSkewVersor3DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -44,13 +44,14 @@ itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 3)
   {
-    typedef typename itk::Image< TPixelType, 3 >  FixedImageType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImageType;
+    typedef typename itk::Image<TPixelType, 3> FixedImageType;
+    typedef typename itk::Image<TPixelType, 3> MovingImageType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImageType::Pointer fixedImage = itkImage1;
@@ -61,17 +62,19 @@ itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform2(itk::Ima
     movingImageToItk->Update();
     typename MovingImageType::Pointer movingImage = movingImageToItk->GetOutput();
 
-
-    typename itk::ScaleSkewVersor3DTransform< double >::Pointer transformPointer = itk::ScaleSkewVersor3DTransform< double >::New();
+    typename itk::ScaleSkewVersor3DTransform<double>::Pointer transformPointer =
+      itk::ScaleSkewVersor3DTransform<double>::New();
     transformPointer->SetIdentity();
     if (m_Controls.m_CenterForInitializerScaleSkewVersorRigid3D->isChecked())
     {
-      typedef typename itk::ScaleSkewVersor3DTransform< double >    ScaleSkewVersor3DTransformType;
-      typedef typename itk::CenteredTransformInitializer<ScaleSkewVersor3DTransformType, FixedImageType, MovingImageType> TransformInitializerType;
+      typedef typename itk::ScaleSkewVersor3DTransform<double> ScaleSkewVersor3DTransformType;
+      typedef
+        typename itk::CenteredTransformInitializer<ScaleSkewVersor3DTransformType, FixedImageType, MovingImageType>
+          TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage );
-      transformInitializer->SetMovingImage( movingImage );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage);
+      transformInitializer->SetMovingImage(movingImage);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsScaleSkewVersorRigid3D->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -145,10 +148,10 @@ QString QmitkScaleSkewVersor3DTransformView::GetName()
   return "ScaleSkewVersor3D";
 }
 
-void QmitkScaleSkewVersor3DTransformView::SetupUI(QWidget* parent)
+void QmitkScaleSkewVersor3DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesScaleSkewVersorRigid3DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesScaleSkewVersorRigid3DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesScaleSkewVersorRigid3DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -192,7 +195,9 @@ itk::Array<double> QmitkScaleSkewVersor3DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkScaleSkewVersor3DTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkScaleSkewVersor3DTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                             vtkTransform *vtktransform,
+                                                             itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

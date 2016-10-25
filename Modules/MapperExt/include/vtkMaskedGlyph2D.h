@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkMapperExtExports.h"
 
-#include "vtkGlyph2D.h"
 #include "mitkCommon.h"
+#include "vtkGlyph2D.h"
 
 class vtkMaskPoints;
 /**
@@ -34,8 +34,8 @@ class vtkMaskPoints;
 class MITKMAPPEREXT_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
 {
 public:
-  vtkTypeMacro(vtkMaskedGlyph2D,vtkGlyph2D);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkMaskedGlyph2D, vtkGlyph2D);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   /**
    * Constructor
@@ -69,39 +69,41 @@ public:
   // * If you want to use an arbitrary scalars array, then set its name here.
   // * By default this in NULL and the filter will use the active scalar array.
   // */
-  //vtkGetStringMacro(InputScalarsSelection);
-  //void SelectInputScalars(const char *fieldName)
+  // vtkGetStringMacro(InputScalarsSelection);
+  // void SelectInputScalars(const char *fieldName)
   //  {this->SetInputScalarsSelection(fieldName);}
 
   ///**
   // * If you want to use an arbitrary vectors array, then set its name here.
   // * By default this in NULL and the filter will use the active vector array.
   // */
-  //vtkGetStringMacro(InputVectorsSelection);
-  //void SelectInputVectors(const char *fieldName)
+  // vtkGetStringMacro(InputVectorsSelection);
+  // void SelectInputVectors(const char *fieldName)
   //  {this->SetInputVectorsSelection(fieldName);}
 
   ///**
   // * If you want to use an arbitrary normals array, then set its name here.
   // * By default this in NULL and the filter will use the active normal array.
   // */
-  //vtkGetStringMacro(InputNormalsSelection);
-  //void SelectInputNormals(const char *fieldName)
+  // vtkGetStringMacro(InputNormalsSelection);
+  // void SelectInputNormals(const char *fieldName)
   //  {this->SetInputNormalsSelection(fieldName);}
 
 protected:
   vtkMaskedGlyph2D();
   ~vtkMaskedGlyph2D();
 
-  virtual int RequestData(vtkInformation* info,vtkInformationVector** inInfoVec,vtkInformationVector* outInfoVec) override;
+  virtual int RequestData(vtkInformation *info,
+                          vtkInformationVector **inInfoVec,
+                          vtkInformationVector *outInfoVec) override;
 
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
   int UseMaskPoints;
 
 private:
-  vtkMaskedGlyph2D(const vtkMaskedGlyph2D&);  // Not implemented.
-  void operator=(const vtkMaskedGlyph2D&);  // Not implemented.
+  vtkMaskedGlyph2D(const vtkMaskedGlyph2D &); // Not implemented.
+  void operator=(const vtkMaskedGlyph2D &);   // Not implemented.
 };
 
 #endif

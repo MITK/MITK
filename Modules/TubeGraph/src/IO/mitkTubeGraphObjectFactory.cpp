@@ -23,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTubeGraph.h"
 #include "mitkTubeGraphVtkMapper3D.h"
 
-mitk::TubeGraphObjectFactory::TubeGraphObjectFactory()
-:CoreObjectFactoryBase()
+mitk::TubeGraphObjectFactory::TubeGraphObjectFactory() : CoreObjectFactoryBase()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -36,13 +35,13 @@ mitk::TubeGraphObjectFactory::TubeGraphObjectFactory()
   }
 }
 
-mitk::Mapper::Pointer mitk::TubeGraphObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
+mitk::Mapper::Pointer mitk::TubeGraphObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper = NULL;
 
-  if ( id == mitk::BaseRenderer::Standard3D )
+  if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<mitk::TubeGraph*>(node->GetData()) != NULL))
+    if ((dynamic_cast<mitk::TubeGraph *>(node->GetData()) != NULL))
     {
       newMapper = mitk::TubeGraphVtkMapper3D::New();
       newMapper->SetDataNode(node);
@@ -52,16 +51,16 @@ mitk::Mapper::Pointer mitk::TubeGraphObjectFactory::CreateMapper(mitk::DataNode*
   return newMapper;
 }
 
-void mitk::TubeGraphObjectFactory::SetDefaultProperties(mitk::DataNode* node)
+void mitk::TubeGraphObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if ((dynamic_cast<mitk::TubeGraph*>(node->GetData()) != NULL))
+  if ((dynamic_cast<mitk::TubeGraph *>(node->GetData()) != NULL))
   {
-    node->SetProperty( "Tube Graph.Clip Structures", mitk::BoolProperty::New( false ) );
+    node->SetProperty("Tube Graph.Clip Structures", mitk::BoolProperty::New(false));
     mitk::TubeGraphVtkMapper3D::SetDefaultProperties(node);
   }
 }
 
-const char* mitk::TubeGraphObjectFactory::GetFileExtensions()
+const char *mitk::TubeGraphObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -73,7 +72,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::TubeGraphObjectFactory::GetFileE
   return m_FileExtensionsMap;
 }
 
-const char* mitk::TubeGraphObjectFactory::GetSaveFileExtensions()
+const char *mitk::TubeGraphObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
@@ -91,15 +90,11 @@ void mitk::TubeGraphObjectFactory::CreateFileExtensionsMap()
 
 struct RegisterTubeGraphObjectFactory
 {
-  RegisterTubeGraphObjectFactory()
-    : m_Factory( mitk::TubeGraphObjectFactory::New() )
+  RegisterTubeGraphObjectFactory() : m_Factory(mitk::TubeGraphObjectFactory::New())
   {
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(m_Factory);
   }
-  ~RegisterTubeGraphObjectFactory()
-  {
-    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
-  }
+  ~RegisterTubeGraphObjectFactory() { mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory(m_Factory); }
   mitk::TubeGraphObjectFactory::Pointer m_Factory;
 };
 

@@ -25,4 +25,3 @@ QmitkErasePaintbrushToolGUI::QmitkErasePaintbrushToolGUI()
 QmitkErasePaintbrushToolGUI::~QmitkErasePaintbrushToolGUI()
 {
 }
-

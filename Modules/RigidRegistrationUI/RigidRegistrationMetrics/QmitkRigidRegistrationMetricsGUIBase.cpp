@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
 
-QmitkRigidRegistrationMetricsGUIBase::QmitkRigidRegistrationMetricsGUIBase(QWidget* parent, Qt::WindowFlags f) : QWidget( parent, f ),
-  m_MovingImage(nullptr)
+QmitkRigidRegistrationMetricsGUIBase::QmitkRigidRegistrationMetricsGUIBase(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f), m_MovingImage(nullptr)
 {
 }
 
@@ -29,4 +29,3 @@ void QmitkRigidRegistrationMetricsGUIBase::SetMovingImage(mitk::Image::Pointer m
 {
   m_MovingImage = movingImage;
 }
-

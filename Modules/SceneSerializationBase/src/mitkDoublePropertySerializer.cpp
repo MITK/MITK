@@ -28,42 +28,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class DoublePropertySerializer : public BasePropertySerializer
-{
+  class DoublePropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(DoublePropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( DoublePropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const DoubleProperty* prop = dynamic_cast<const DoubleProperty*>(m_Property.GetPointer()))
+      if (const DoubleProperty *prop = dynamic_cast<const DoubleProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto  element = new TiXmlElement("double");
+        auto element = new TiXmlElement("double");
         element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
+      if (!element)
+        return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
       std::string d;
-      if ( element->QueryStringAttribute( "value", &d ) == TIXML_SUCCESS )
+      if (element->QueryStringAttribute("value", &d) == TIXML_SUCCESS)
       {
         try
         {
           return DoubleProperty::New(boost::lexical_cast<double>(d)).GetPointer();
         }
-        catch ( boost::bad_lexical_cast& e )
+        catch (boost::bad_lexical_cast &e)
         {
           MITK_ERROR << "Could not parse string as number: " << e.what();
           return nullptr;
@@ -76,10 +75,9 @@ class DoublePropertySerializer : public BasePropertySerializer
     }
 
   protected:
-
     DoublePropertySerializer() {}
     virtual ~DoublePropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -87,4 +85,3 @@ class DoublePropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(DoublePropertySerializer);
 
 #endif
-

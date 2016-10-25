@@ -47,56 +47,53 @@ class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkNewSegmentationDialog(QWidget *parent = nullptr);
 
-    QmitkNewSegmentationDialog(QWidget* parent = nullptr);
+  virtual ~QmitkNewSegmentationDialog();
 
-    virtual ~QmitkNewSegmentationDialog();
+  const QString GetSegmentationName();
+  const char *GetOrganType();
+  mitk::Color GetColor();
 
-    const QString GetSegmentationName();
-    const char* GetOrganType();
-    mitk::Color GetColor();
+  void SetSuggestionList(QStringList organColorList);
 
-    void SetSuggestionList(QStringList organColorList);
+signals:
 
-  signals:
+public slots:
 
-  public slots:
+  void setPrompt(const QString &prompt);
+  void setSegmentationName(const QString &name);
 
-    void setPrompt( const QString& prompt );
-    void setSegmentationName( const QString& name );
+protected slots:
 
-  protected slots:
+  void onAcceptClicked();
+  void onNewOrganNameChanged(const QString &);
+  void onColorBtnClicked();
+  void onColorChange(const QString &completedWord);
 
-    void onAcceptClicked();
-    void onNewOrganNameChanged(const QString&);
-    void onColorBtnClicked();
-    void onColorChange(const QString& completedWord);
+protected:
+  QLabel *lblPrompt;
+  Q3ListBox *lstOrgans;
+  QLineEdit *edtName;
 
-  protected:
+  QPushButton *btnColor;
+  QPushButton *btnOk;
 
-    QLabel*  lblPrompt;
-    Q3ListBox*  lstOrgans;
-    QLineEdit* edtName;
+  QLineEdit *edtNewOrgan;
 
-    QPushButton* btnColor;
-    QPushButton* btnOk;
+  QString selectedOrgan;
 
-    QLineEdit* edtNewOrgan;
+  bool newOrganEntry;
 
-    QString selectedOrgan;
+  QColor m_Color;
 
-    bool newOrganEntry;
+  QCompleter *completer;
 
-    QColor m_Color;
+  QString m_SegmentationName;
 
-    QCompleter* completer;
-
-    QString m_SegmentationName;
-
-    QStringList organList;
-    QList<QColor> colorList;
+  QStringList organList;
+  QList<QColor> colorList;
 };
 
 #endif
-

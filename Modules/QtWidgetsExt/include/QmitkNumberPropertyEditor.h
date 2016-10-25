@@ -16,76 +16,72 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_NUMBERPROPERTYEDITOR_H_INCLUDED
 #define QMITK_NUMBERPROPERTYEDITOR_H_INCLUDED
 
-#include <mitkPropertyObserver.h>
 #include "MitkQtWidgetsExtExports.h"
-#include <mitkProperties.h>
 #include <QSpinBox>
+#include <mitkProperties.h>
+#include <mitkPropertyObserver.h>
 
 /// @ingroup Widgets
 class MITKQTWIDGETSEXT_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
 {
   Q_OBJECT
-  Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )
-  Q_PROPERTY( bool showPercent READ getShowPercent WRITE setShowPercent )
-  Q_PROPERTY( int minValue READ minValue WRITE setMinValue )
-  Q_PROPERTY( int maxValue READ maxValue WRITE setMaxValue )
+  Q_PROPERTY(short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces)
+  Q_PROPERTY(bool showPercent READ getShowPercent WRITE setShowPercent)
+  Q_PROPERTY(int minValue READ minValue WRITE setMinValue)
+  Q_PROPERTY(int maxValue READ maxValue WRITE setMaxValue)
 
-  public:
+public:
+  QmitkNumberPropertyEditor(mitk::IntProperty *, QWidget *parent);
+  QmitkNumberPropertyEditor(mitk::FloatProperty *, QWidget *parent);
+  QmitkNumberPropertyEditor(mitk::DoubleProperty *, QWidget *parent);
 
-    QmitkNumberPropertyEditor( mitk::IntProperty*, QWidget* parent );
-    QmitkNumberPropertyEditor( mitk::FloatProperty*, QWidget* parent );
-    QmitkNumberPropertyEditor( mitk::DoubleProperty*, QWidget* parent );
+  virtual ~QmitkNumberPropertyEditor();
 
-    virtual ~QmitkNumberPropertyEditor();
+  short getDecimalPlaces() const;
+  void setDecimalPlaces(short);
 
-    short getDecimalPlaces() const;
-    void setDecimalPlaces(short);
+  bool getShowPercent() const;
+  void setShowPercent(bool);
 
-    bool getShowPercent() const;
-    void setShowPercent(bool);
+  int minValue() const;
+  void setMinValue(int);
+  int maxValue() const;
+  void setMaxValue(int);
+  double doubleValue() const;
+  void setDoubleValue(double);
 
-    int minValue() const;
-    void setMinValue(int);
-    int maxValue() const;
-    void setMaxValue(int);
-    double doubleValue() const;
-    void setDoubleValue(double);
+protected:
+  void initialize();
 
-  protected:
+  virtual QString textFromValue(int) const override;
+  virtual int valueFromText(const QString &) const override;
 
-    void initialize();
+  virtual void PropertyChanged() override;
+  virtual void PropertyRemoved() override;
 
-    virtual QString textFromValue(int) const override;
-    virtual int valueFromText(const QString&) const override;
+  void DisplayNumber();
 
-    virtual void PropertyChanged() override;
-    virtual void PropertyRemoved() override;
+  union {
+    mitk::GenericProperty<int> *m_IntProperty;
+    mitk::GenericProperty<float> *m_FloatProperty;
+    mitk::GenericProperty<double> *m_DoubleProperty;
+  };
 
-    void DisplayNumber();
+  const int m_DataType;
 
-    union {
-      mitk::GenericProperty<int>*     m_IntProperty;
-      mitk::GenericProperty<float>*   m_FloatProperty;
-      mitk::GenericProperty<double>*  m_DoubleProperty;
-    };
+  short m_DecimalPlaces;            // how many decimal places are shown
+  double m_FactorPropertyToSpinbox; // internal conversion factor. neccessary because spinbox ranges work only with ints
+  double m_FactorSpinboxToDisplay;  // internal conversion factor. neccessary because spinbox ranges work only with ints
+  bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
 
-    const int m_DataType;
+protected slots:
 
-    short m_DecimalPlaces;            // how many decimal places are shown
-    double m_FactorPropertyToSpinbox; // internal conversion factor. neccessary because spinbox ranges work only with ints
-    double m_FactorSpinboxToDisplay;  // internal conversion factor. neccessary because spinbox ranges work only with ints
-    bool m_ShowPercents;              // whether values are given in percent (0.5 -> 50%)
+  void onValueChanged(int);
 
-  protected slots:
+private:
+  void adjustFactors(short, bool);
 
-    void onValueChanged(int);
-
-  private:
-
-    void adjustFactors(short, bool);
-
-    bool m_SelfChangeLock;
+  bool m_SelfChangeLock;
 };
 
 #endif
-

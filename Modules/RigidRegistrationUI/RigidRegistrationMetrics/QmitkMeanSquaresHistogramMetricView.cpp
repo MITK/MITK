@@ -15,12 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMeanSquaresHistogramMetricView.h"
-#include <itkMeanSquaresHistogramImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkMeanSquaresHistogramImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkMeanSquaresHistogramMetricView::QmitkMeanSquaresHistogramMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkMeanSquaresHistogramMetricView::QmitkMeanSquaresHistogramMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -35,55 +36,58 @@ mitk::MetricParameters::MetricType QmitkMeanSquaresHistogramMetricView::GetMetri
 
 itk::Object::Pointer QmitkMeanSquaresHistogramMetricView::GetMetric()
 {
- if (m_MovingImage.IsNotNull())
- {
-   AccessByItk(m_MovingImage, GetMetric2);
-   return m_MetricObject;
- }
- return nullptr;
+  if (m_MovingImage.IsNotNull())
+  {
+    AccessByItk(m_MovingImage, GetMetric2);
+    return m_MetricObject;
+  }
+  return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMeanSquaresHistogramMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkMeanSquaresHistogramMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
- typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
- typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
- typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
- unsigned int nBins = m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->text().toInt();
- typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
- histogramSize[0] = nBins;
- histogramSize[1] = nBins;
- MetricPointer->SetHistogramSize(histogramSize);
- MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
- m_MetricObject = MetricPointer.GetPointer();
- return MetricPointer.GetPointer();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
+  unsigned int nBins = m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->text().toInt();
+  typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType
+    histogramSize;
+  histogramSize[0] = nBins;
+  histogramSize[1] = nBins;
+  MetricPointer->SetHistogramSize(histogramSize);
+  MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
+  m_MetricObject = MetricPointer.GetPointer();
+  return MetricPointer.GetPointer();
 }
 
 itk::Array<double> QmitkMeanSquaresHistogramMetricView::GetMetricParameters()
 {
- itk::Array<double> metricValues;
- metricValues.SetSize(2);
- metricValues.fill(0);
- metricValues[0] = m_Controls.m_ComputeGradient->isChecked();
- metricValues[1] = m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->text().toInt();
- return metricValues;
+  itk::Array<double> metricValues;
+  metricValues.SetSize(2);
+  metricValues.fill(0);
+  metricValues[0] = m_Controls.m_ComputeGradient->isChecked();
+  metricValues[1] = m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->text().toInt();
+  return metricValues;
 }
 
 void QmitkMeanSquaresHistogramMetricView::SetMetricParameters(itk::Array<double> metricValues)
 {
- m_Controls.m_ComputeGradient->setChecked(metricValues[0]);
- m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->setText(QString::number(metricValues[1]));
+  m_Controls.m_ComputeGradient->setChecked(metricValues[0]);
+  m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->setText(QString::number(metricValues[1]));
 }
 
 QString QmitkMeanSquaresHistogramMetricView::GetName()
 {
- return "MeanSquaresHistogram";
+  return "MeanSquaresHistogram";
 }
 
-void QmitkMeanSquaresHistogramMetricView::SetupUI(QWidget* parent)
+void QmitkMeanSquaresHistogramMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->setValidator(validatorLineEditInput);
 }
 

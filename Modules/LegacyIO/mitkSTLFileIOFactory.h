@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define __mitkSTLFileIOFactory_h
 
 #ifdef _MSC_VER
-#pragma warning ( disable : 4786 )
+#pragma warning(disable : 4786)
 #endif
 
 #include <MitkLegacyIOExports.h>
@@ -27,50 +27,48 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-//##Documentation
-//## @brief Create instances of STLFileReader objects using an object factory.
-//##
-//## @ingroup MitkLegacyIOModule
-//## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MITKLEGACYIO_EXPORT STLFileIOFactory : public itk::ObjectFactoryBase
-{
-public:
-  /** Standard class typedefs. */
-  typedef STLFileIOFactory   Self;
-  typedef itk::ObjectFactoryBase  Superclass;
-  typedef itk::SmartPointer<Self>  Pointer;
-  typedef itk::SmartPointer<const Self>  ConstPointer;
-
-  /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const override;
-  virtual const char* GetDescription(void) const override;
-
-  /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self);
-  static STLFileIOFactory* FactoryNew() { return new STLFileIOFactory;}
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(STLFileIOFactory, ObjectFactoryBase);
-
-  /**
-   * Register one factory of this type
-   * \deprecatedSince{2013_09}
-   */
-  DEPRECATED(static void RegisterOneFactory(void))
+  //##Documentation
+  //## @brief Create instances of STLFileReader objects using an object factory.
+  //##
+  //## @ingroup MitkLegacyIOModule
+  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  class DEPRECATED() MITKLEGACYIO_EXPORT STLFileIOFactory : public itk::ObjectFactoryBase
   {
-    STLFileIOFactory::Pointer STLFileIOFactory = STLFileIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(STLFileIOFactory);
-  }
+  public:
+    /** Standard class typedefs. */
+    typedef STLFileIOFactory Self;
+    typedef itk::ObjectFactoryBase Superclass;
+    typedef itk::SmartPointer<Self> Pointer;
+    typedef itk::SmartPointer<const Self> ConstPointer;
 
-protected:
-  STLFileIOFactory();
-  ~STLFileIOFactory();
+    /** Class methods used to interface with the registered factories. */
+    virtual const char *GetITKSourceVersion(void) const override;
+    virtual const char *GetDescription(void) const override;
 
-private:
-  STLFileIOFactory(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
+    /** Method for class instantiation. */
+    itkFactorylessNewMacro(Self);
+    static STLFileIOFactory *FactoryNew() { return new STLFileIOFactory; }
+    /** Run-time type information (and related methods). */
+    itkTypeMacro(STLFileIOFactory, ObjectFactoryBase);
 
-};
+    /**
+     * Register one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void RegisterOneFactory(void))
+    {
+      STLFileIOFactory::Pointer STLFileIOFactory = STLFileIOFactory::New();
+      ObjectFactoryBase::RegisterFactory(STLFileIOFactory);
+    }
 
+  protected:
+    STLFileIOFactory();
+    ~STLFileIOFactory();
+
+  private:
+    STLFileIOFactory(const Self &); // purposely not implemented
+    void operator=(const Self &);   // purposely not implemented
+  };
 
 } // end namespace mitk
 

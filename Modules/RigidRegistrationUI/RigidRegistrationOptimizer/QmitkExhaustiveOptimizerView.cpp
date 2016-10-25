@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkExhaustiveOptimizer.h>
 
-QmitkExhaustiveOptimizerView::QmitkExhaustiveOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-  m_NumberTransformParameters(16)
+QmitkExhaustiveOptimizerView::QmitkExhaustiveOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkExhaustiveOptimizerView::~QmitkExhaustiveOptimizerView()
@@ -33,17 +32,16 @@ mitk::OptimizerParameters::OptimizerType QmitkExhaustiveOptimizerView::GetOptimi
   return mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER;
 }
 
-
 itk::Object::Pointer QmitkExhaustiveOptimizerView::GetOptimizer()
 {
   itk::ExhaustiveOptimizer::Pointer OptimizerPointer = itk::ExhaustiveOptimizer::New();
-  OptimizerPointer->SetStepLength( m_Controls.m_StepLengthExhaustive->text().toFloat() );
-  itk::ExhaustiveOptimizer::StepsType steps( m_NumberTransformParameters );
+  OptimizerPointer->SetStepLength(m_Controls.m_StepLengthExhaustive->text().toFloat());
+  itk::ExhaustiveOptimizer::StepsType steps(m_NumberTransformParameters);
   for (int i = 0; i < m_NumberTransformParameters; i++)
   {
     steps[i] = m_Controls.m_NumberOfStepsExhaustive->text().toInt();
   }
-  OptimizerPointer->SetNumberOfSteps( steps );
+  OptimizerPointer->SetNumberOfSteps(steps);
   return OptimizerPointer.GetPointer();
 }
 
@@ -60,7 +58,7 @@ itk::Array<double> QmitkExhaustiveOptimizerView::GetOptimizerParameters()
 
 void QmitkExhaustiveOptimizerView::SetOptimizerParameters(itk::Array<double> optimizerValues)
 {
-  //m_Controls.m_Maximize->setChecked(optimizerValues[0]);
+  // m_Controls.m_Maximize->setChecked(optimizerValues[0]);
   m_Controls.m_StepLengthExhaustive->setText(QString::number(optimizerValues[1]));
   m_Controls.m_NumberOfStepsExhaustive->setText(QString::number(optimizerValues[2]));
 }
@@ -75,11 +73,11 @@ QString QmitkExhaustiveOptimizerView::GetName()
   return "Exhaustive";
 }
 
-void QmitkExhaustiveOptimizerView::SetupUI(QWidget* parent)
+void QmitkExhaustiveOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfStepsExhaustive->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_StepLengthExhaustive->setValidator(validatorLineEditInputFloat);
 }

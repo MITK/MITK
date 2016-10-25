@@ -15,15 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkColorPropertyView.h"
 #include <QPixmap>
-#define ROUND_P(x) ((int)((x)+0.5))
+#define ROUND_P(x) ((int)((x) + 0.5))
 
-QmitkColorPropertyView::QmitkColorPropertyView( const mitk::ColorProperty* property, QWidget* parent )
-: QLabel( parent ),
-  PropertyView( property ),
-  m_ColorProperty(property)
+QmitkColorPropertyView::QmitkColorPropertyView(const mitk::ColorProperty *property, QWidget *parent)
+  : QLabel(parent), PropertyView(property), m_ColorProperty(property)
 {
   setText("  "); // two spaces for some minimun height
-  setMinimumSize(15,15);
+  setMinimumSize(15, 15);
   PropertyChanged();
 
   m_WidgetPalette = QWidget::palette();
@@ -37,7 +35,7 @@ QmitkColorPropertyView::~QmitkColorPropertyView()
 
 void QmitkColorPropertyView::PropertyChanged()
 {
-  if ( m_Property )
+  if (m_Property)
     DisplayColor();
 }
 
@@ -49,10 +47,9 @@ void QmitkColorPropertyView::PropertyRemoved()
 
 void QmitkColorPropertyView::DisplayColor()
 {
-  const mitk::Color& tmp_col(m_ColorProperty->GetColor());
+  const mitk::Color &tmp_col(m_ColorProperty->GetColor());
 
-  QColor color( ROUND_P(tmp_col[0] * 255.0), ROUND_P(tmp_col[1] * 255.0) , ROUND_P(tmp_col[2] * 255.0) );
+  QColor color(ROUND_P(tmp_col[0] * 255.0), ROUND_P(tmp_col[1] * 255.0), ROUND_P(tmp_col[2] * 255.0));
 
   m_WidgetPalette.setColor(QPalette::Background, color);
 }
-

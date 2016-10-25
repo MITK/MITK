@@ -16,10 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkScaleTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkScaleTransform.h>
 #include <QValidator>
+#include <itkScaleTransform.h>
 
-QmitkScaleTransformView::QmitkScaleTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
+QmitkScaleTransformView::QmitkScaleTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f)
 {
 }
 
@@ -42,12 +43,13 @@ itk::Object::Pointer QmitkScaleTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkScaleTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkScaleTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::ScaleTransform< double, VImageDimension>::Pointer transformPointer = itk::ScaleTransform< double, VImageDimension>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::ScaleTransform<double, VImageDimension>::Pointer transformPointer =
+    itk::ScaleTransform<double, VImageDimension>::New();
   transformPointer->SetIdentity();
   m_TransformObject = transformPointer.GetPointer();
   return transformPointer.GetPointer();
@@ -78,10 +80,10 @@ QString QmitkScaleTransformView::GetName()
   return "Scale";
 }
 
-void QmitkScaleTransformView::SetupUI(QWidget* parent)
+void QmitkScaleTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesScaleTransformScaleX->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesScaleTransformScaleY->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesScaleTransformScaleZ->setValidator(validatorLineEditInputFloat);
@@ -101,11 +103,13 @@ itk::Array<double> QmitkScaleTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkScaleTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkScaleTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                 vtkTransform *vtktransform,
+                                                 itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {
-    for( unsigned int i=0; i<transformParams.size(); i++)
+    for (unsigned int i = 0; i < transformParams.size(); i++)
     {
       vtkmatrix->SetElement(i, i, transformParams[i]);
     }

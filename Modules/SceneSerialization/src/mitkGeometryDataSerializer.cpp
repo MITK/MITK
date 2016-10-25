@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkGeometryDataSerializer.h"
-#include "mitkGeometryData.h"
 #include "mitkGeometry3D.h"
+#include "mitkGeometryData.h"
 #include "mitkIOUtil.h"
 
 #include <tinyxml.h>
@@ -34,11 +34,10 @@ mitk::GeometryDataSerializer::~GeometryDataSerializer()
 std::string mitk::GeometryDataSerializer::Serialize()
 {
   // Verify good input data type
-  const GeometryData* ps = dynamic_cast<const GeometryData *>( m_Data.GetPointer() );
+  const GeometryData *ps = dynamic_cast<const GeometryData *>(m_Data.GetPointer());
   if (ps == NULL)
   {
-    MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::GeometryData. Cannot serialize...";
+    MITK_ERROR << " Object at " << (const void *)this->m_Data << " is not an mitk::GeometryData. Cannot serialize...";
     return "";
   }
 
@@ -54,13 +53,13 @@ std::string mitk::GeometryDataSerializer::Serialize()
 
   try
   {
-    IOUtil::Save( ps, fullname );
+    IOUtil::Save(ps, fullname);
     // in case of success, return only the relative filename part
     return filename;
   }
-  catch (const std::exception& e)
+  catch (const std::exception &e)
   {
-      MITK_ERROR << "Unable to serialize GeometryData object: "<< e.what();
+    MITK_ERROR << "Unable to serialize GeometryData object: " << e.what();
   }
 
   // when failed, return empty string

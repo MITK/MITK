@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QTHANDLENEWAPPINSTANCE_H
 #define QTHANDLENEWAPPINSTANCE_H
 
@@ -22,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class QtSingleApplication;
 
-bool createTemporaryDir(QString& path);
+bool createTemporaryDir(QString &path);
 
-QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** argv, const QString& newInstanceArg);
+QString handleNewAppInstance(QtSingleApplication *singleApp, int argc, char **argv, const QString &newInstanceArg);
 
 #endif // QTHANDLENEWAPPINSTANCE_H

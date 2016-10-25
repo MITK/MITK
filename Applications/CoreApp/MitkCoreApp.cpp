@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QStringList>
 #include <QVariant>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   mitk::BaseApplication app(argc, argv);
 

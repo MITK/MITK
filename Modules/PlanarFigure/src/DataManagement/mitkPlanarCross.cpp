@@ -14,41 +14,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPlanarCross.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
-
 mitk::PlanarCross::PlanarCross()
-: FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Axis", "mm" ) ),
-  FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis", "mm" ) )
+  : FEATURE_ID_LONGESTDIAMETER(this->AddFeature("Longest Axis", "mm")),
+    FEATURE_ID_SHORTAXISDIAMETER(this->AddFeature("Short Axis", "mm"))
 {
   // Cross has two control points at the beginning
-  this->ResetNumberOfControlPoints( 2 );
+  this->ResetNumberOfControlPoints(2);
 
   // Create property for SingleLineMode (default: false)
-  this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( false ) );
+  this->SetProperty("SingleLineMode", mitk::BoolProperty::New(false));
 
   // Create helper polyline object (for drawing the orthogonal orientation line)
-  this->SetNumberOfHelperPolyLines( 1 );
-  m_HelperPolyLinesToBePainted->InsertElement( 0, false );
+  this->SetNumberOfHelperPolyLines(1);
+  m_HelperPolyLinesToBePainted->InsertElement(0, false);
 }
 
-
-void mitk::PlanarCross::SetSingleLineMode( bool singleLineMode )
+void mitk::PlanarCross::SetSingleLineMode(bool singleLineMode)
 {
-  this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( singleLineMode ) );
+  this->SetProperty("SingleLineMode", mitk::BoolProperty::New(singleLineMode));
   this->Modified();
 }
 
-
 bool mitk::PlanarCross::GetSingleLineMode() const
 {
-  const mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >(
-    this->GetProperty( "SingleLineMode" ).GetPointer() );
+  const mitk::BoolProperty *singleLineMode =
+    dynamic_cast<mitk::BoolProperty *>(this->GetProperty("SingleLineMode").GetPointer());
 
-  if ( singleLineMode != nullptr )
+  if (singleLineMode != nullptr)
   {
     return singleLineMode->GetValue();
   }
@@ -57,71 +53,70 @@ bool mitk::PlanarCross::GetSingleLineMode() const
 
 bool mitk::PlanarCross::ResetOnPointSelectNeeded() const
 {
-  return this->GetSingleLineMode() == false || ( m_SelectedControlPoint >= 0 && m_SelectedControlPoint <= 3 );
+  return this->GetSingleLineMode() == false || (m_SelectedControlPoint >= 0 && m_SelectedControlPoint <= 3);
 }
 
 bool mitk::PlanarCross::ResetOnPointSelect()
 {
-  if ( this->GetSingleLineMode() )
+  if (this->GetSingleLineMode())
   {
     // In single line mode --> nothing to reset
     return false;
   }
 
-  switch ( m_SelectedControlPoint )
+  switch (m_SelectedControlPoint)
   {
-  default:
-    // Nothing selected --> nothing to reset
-    return false;
+    default:
+      // Nothing selected --> nothing to reset
+      return false;
 
-  case 0:
+    case 0:
     {
       // Control point 0 selected: exchange points 0 and 1
-      const Point2D tmpPoint = this->GetControlPoint( 0 );
-      this->SetControlPoint( 0, this->GetControlPoint( 1 ) );
-      this->SetControlPoint( 1, tmpPoint );
+      const Point2D tmpPoint = this->GetControlPoint(0);
+      this->SetControlPoint(0, this->GetControlPoint(1));
+      this->SetControlPoint(1, tmpPoint);
       // FALLS THROUGH!
     }
 
-  case 1:
+    case 1:
     {
       // Control point 0 or 1 selected: reset number of control points to two
-      this->ResetNumberOfControlPoints( 2 );
-      this->SelectControlPoint( 1 );
+      this->ResetNumberOfControlPoints(2);
+      this->SelectControlPoint(1);
       return true;
     }
 
-  case 2:
+    case 2:
     {
       // Control point 2 selected: replace point 0 with point 3 and point 1 with point 2
-      this->SetControlPoint( 0, this->GetControlPoint( 3 ) );
-      this->SetControlPoint( 1, this->GetControlPoint( 2 ) );
+      this->SetControlPoint(0, this->GetControlPoint(3));
+      this->SetControlPoint(1, this->GetControlPoint(2));
 
       // Adjust selected control point, reset number of control points to two
-      this->ResetNumberOfControlPoints( 2 );
-      this->SelectControlPoint( 1 );
+      this->ResetNumberOfControlPoints(2);
+      this->SelectControlPoint(1);
       return true;
     }
 
-  case 3:
+    case 3:
     {
       // Control point 3 selected: replace point 0 with point 2 and point 1 with point 3
 
-      this->SetControlPoint( 0, this->GetControlPoint( 2 ) );
-      this->SetControlPoint( 1, this->GetControlPoint( 3 ) );
+      this->SetControlPoint(0, this->GetControlPoint(2));
+      this->SetControlPoint(1, this->GetControlPoint(3));
 
       // Adjust selected control point, reset number of control points to two
-      this->ResetNumberOfControlPoints( 2 );
-      this->SelectControlPoint( 1 );
+      this->ResetNumberOfControlPoints(2);
+      this->SelectControlPoint(1);
       return true;
     }
   }
 }
 
-
 unsigned int mitk::PlanarCross::GetNumberOfFeatures() const
 {
-  if ( this->GetSingleLineMode() || (this->GetNumberOfControlPoints() < 4) )
+  if (this->GetSingleLineMode() || (this->GetNumberOfControlPoints() < 4))
   {
     return 1;
   }
@@ -131,8 +126,7 @@ unsigned int mitk::PlanarCross::GetNumberOfFeatures() const
   }
 }
 
-
-mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
+mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
   // Apply spatial constraints from superclass and from this class until the resulting constrained
   // point converges. Although not an optimal implementation, this iterative approach
@@ -145,42 +139,41 @@ mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int inde
   Point2D superclassConfinedPoint;
   do
   {
-    superclassConfinedPoint = Superclass::ApplyControlPointConstraints( index, confinedPoint );
-    confinedPoint = this->InternalApplyControlPointConstraints( index, superclassConfinedPoint );
+    superclassConfinedPoint = Superclass::ApplyControlPointConstraints(index, confinedPoint);
+    confinedPoint = this->InternalApplyControlPointConstraints(index, superclassConfinedPoint);
     ++count;
-  } while ( (confinedPoint.EuclideanDistanceTo( superclassConfinedPoint ) > mitk::eps)
-         && (count < 32) );
+  } while ((confinedPoint.EuclideanDistanceTo(superclassConfinedPoint) > mitk::eps) && (count < 32));
 
   return confinedPoint;
 }
 
-
-mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned int index, const Point2D& point )
+mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints(unsigned int index, const Point2D &point)
 {
   // Apply constraints depending on current interaction state
-  switch ( index )
+  switch (index)
   {
-  case 2:
+    case 2:
     {
       // Check if 3rd control point is outside of the range (2D area) defined by the first
       // line (via the first two control points); if it is outside, clip it to the bounds
-      const Point2D p1 = this->GetControlPoint( 0 );
-      const Point2D p2 = this->GetControlPoint( 1 );
+      const Point2D p1 = this->GetControlPoint(0);
+      const Point2D p2 = this->GetControlPoint(1);
 
       Vector2D n1 = p2 - p1;
       n1.Normalize();
 
       const Vector2D v1 = point - p1;
       const double dotProduct = n1 * v1;
-      const Point2D crossPoint = p1 + n1 * dotProduct;;
+      const Point2D crossPoint = p1 + n1 * dotProduct;
+      ;
       const Vector2D crossVector = point - crossPoint;
 
-      if ( dotProduct < 0.0 )
+      if (dotProduct < 0.0)
       {
         // Out-of-bounds on the left: clip point to left boundary
         return (p1 + crossVector);
       }
-      else if ( dotProduct > p2.EuclideanDistanceTo( p1 ) )
+      else if (dotProduct > p2.EuclideanDistanceTo(p1))
       {
         // Out-of-bounds on the right: clip point to right boundary
         return (p2 + crossVector);
@@ -192,15 +185,15 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       }
     }
 
-  case 3:
+    case 3:
     {
       // Constrain 4th control point so that with the 3rd control point it forms
       // a line orthogonal to the first line (constraint 1); the 4th control point
       // must lie on the opposite side of the line defined by the first two control
       // points than the 3rd control point (constraint 2)
-      const Point2D p1 = this->GetControlPoint( 0 );
-      const Point2D p2 = this->GetControlPoint( 1 );
-      const Point2D p3 = this->GetControlPoint( 2 );
+      const Point2D p1 = this->GetControlPoint(0);
+      const Point2D p2 = this->GetControlPoint(1);
+      const Point2D p3 = this->GetControlPoint(2);
 
       // Calculate distance of original point from orthogonal line the corrected
       // point should lie on to project the point onto this line
@@ -220,8 +213,8 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
 
       // Determine whether the projected point on the line, or the crossing point should be
       // used (according to the second constraint in the comment above)
-      if ( (pointOnLine.SquaredEuclideanDistanceTo( p3 ) > crossingPoint.SquaredEuclideanDistanceTo( p3 ))
-        && (pointOnLine.SquaredEuclideanDistanceTo( p3 ) > pointOnLine.SquaredEuclideanDistanceTo( crossingPoint )) )
+      if ((pointOnLine.SquaredEuclideanDistanceTo(p3) > crossingPoint.SquaredEuclideanDistanceTo(p3)) &&
+          (pointOnLine.SquaredEuclideanDistanceTo(p3) > pointOnLine.SquaredEuclideanDistanceTo(crossingPoint)))
       {
         return pointOnLine;
       }
@@ -231,11 +224,10 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       }
     }
 
-  default:
-    return point;
+    default:
+      return point;
   }
 }
-
 
 void mitk::PlanarCross::GeneratePolyLine()
 {
@@ -243,7 +235,7 @@ void mitk::PlanarCross::GeneratePolyLine()
   this->ClearPolyLines();
 
   if (this->GetNumberOfControlPoints() > 2)
-    this->SetNumberOfPolyLines( 2 );
+    this->SetNumberOfPolyLines(2);
 
   for (unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i)
   {
@@ -259,21 +251,21 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
 {
   // Generate helper polyline (orientation line orthogonal to first line)
   // if the third control point is currently being set
-  if ( this->GetNumberOfControlPoints() != 3 )
+  if (this->GetNumberOfControlPoints() != 3)
   {
-    m_HelperPolyLinesToBePainted->SetElement( 0, false );
+    m_HelperPolyLinesToBePainted->SetElement(0, false);
     return;
   }
 
-  m_HelperPolyLinesToBePainted->SetElement( 0, true );
+  m_HelperPolyLinesToBePainted->SetElement(0, true);
 
   this->ClearHelperPolyLines();
 
   // Calculate cross point of first line (p1 to p2) and orthogonal line through
   // the third control point (p3)
-  const Point2D p1 = this->GetControlPoint( 0 );
-  const Point2D p2 = this->GetControlPoint( 1 );
-  const Point2D p3 = this->GetControlPoint( 2 );
+  const Point2D p1 = this->GetControlPoint(0);
+  const Point2D p2 = this->GetControlPoint(1);
+  const Point2D p3 = this->GetControlPoint(2);
 
   Vector2D n1 = p2 - p1;
   n1.Normalize();
@@ -282,7 +274,7 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   const Point2D crossPoint = p1 + n1 * (n1 * v1);
 
   const Vector2D v2 = crossPoint - p3;
-  if ( v2.GetNorm() < 1.0 )
+  if (v2.GetNorm() < 1.0)
   {
     // If third point is on the first line, draw orthogonal "infinite" line
     // through cross point on line
@@ -301,26 +293,25 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   }
 }
 
-
 void mitk::PlanarCross::EvaluateFeaturesInternal()
 {
   // Calculate length of first line
-  const Point3D &p0 = this->GetWorldControlPoint( 0 );
-  const Point3D &p1 = this->GetWorldControlPoint( 1 );
-  double l1 = p0.EuclideanDistanceTo( p1 );
+  const Point3D &p0 = this->GetWorldControlPoint(0);
+  const Point3D &p1 = this->GetWorldControlPoint(1);
+  double l1 = p0.EuclideanDistanceTo(p1);
 
   // Calculate length of second line
   double l2 = 0.0;
-  if ( !this->GetSingleLineMode() && (this->GetNumberOfControlPoints() > 3) )
+  if (!this->GetSingleLineMode() && (this->GetNumberOfControlPoints() > 3))
   {
-    const Point3D &p2 = this->GetWorldControlPoint( 2 );
-    const Point3D &p3 = this->GetWorldControlPoint( 3 );
-    l2 = p2.EuclideanDistanceTo( p3 );
+    const Point3D &p2 = this->GetWorldControlPoint(2);
+    const Point3D &p3 = this->GetWorldControlPoint(3);
+    l2 = p2.EuclideanDistanceTo(p3);
   }
 
   double longestDiameter;
   double shortAxisDiameter;
-  if ( l1 > l2 )
+  if (l1 > l2)
   {
     longestDiameter = l1;
     shortAxisDiameter = l2;
@@ -331,25 +322,24 @@ void mitk::PlanarCross::EvaluateFeaturesInternal()
     shortAxisDiameter = l1;
   }
 
-
-  this->SetQuantity( FEATURE_ID_LONGESTDIAMETER, longestDiameter );
-  this->SetQuantity( FEATURE_ID_SHORTAXISDIAMETER, shortAxisDiameter );
+  this->SetQuantity(FEATURE_ID_LONGESTDIAMETER, longestDiameter);
+  this->SetQuantity(FEATURE_ID_SHORTAXISDIAMETER, shortAxisDiameter);
 }
 
-void mitk::PlanarCross::PrintSelf( std::ostream& os, itk::Indent indent) const
+void mitk::PlanarCross::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
-  Superclass::PrintSelf( os, indent );
+  Superclass::PrintSelf(os, indent);
 }
 
- bool mitk::PlanarCross::Equals(const mitk::PlanarFigure& other) const
- {
-   const mitk::PlanarCross* otherCross = dynamic_cast<const mitk::PlanarCross*>(&other);
-   if ( otherCross )
-   {
-     return Superclass::Equals(other);
-   }
-   else
-   {
-     return false;
-   }
- }
+bool mitk::PlanarCross::Equals(const mitk::PlanarFigure &other) const
+{
+  const mitk::PlanarCross *otherCross = dynamic_cast<const mitk::PlanarCross *>(&other);
+  if (otherCross)
+  {
+    return Superclass::Equals(other);
+  }
+  else
+  {
+    return false;
+  }
+}

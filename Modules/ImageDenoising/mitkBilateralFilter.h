@@ -18,31 +18,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkImageDenoisingExports.h"
 
-//MITK
-#include <mitkImage.h>
+// MITK
 #include "mitkImageToImageFilter.h"
 #include <itkImage.h>
+#include <mitkImage.h>
 
 namespace mitk
 {
-
   class MITKIMAGEDENOISING_EXPORT BilateralFilter : public ImageToImageFilter
   {
   public:
+    mitkClassMacro(BilateralFilter, ImageToImageFilter);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( BilateralFilter , ImageToImageFilter );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkSetMacro(DomainSigma, float);
+    itkSetMacro(RangeSigma, float);
+    itkSetMacro(AutoKernel, bool);
+    itkSetMacro(KernelRadius, unsigned int);
 
-    itkSetMacro(DomainSigma,float);
-    itkSetMacro(RangeSigma,float);
-    itkSetMacro(AutoKernel,bool);
-    itkSetMacro(KernelRadius,unsigned int);
-
-    itkGetMacro(DomainSigma,float);
-    itkGetMacro(RangeSigma,float);
-    itkGetMacro(AutoKernel,bool);
-    itkGetMacro(KernelRadius,unsigned int);
+    itkGetMacro(DomainSigma, float);
+    itkGetMacro(RangeSigma, float);
+    itkGetMacro(AutoKernel, bool);
+    itkGetMacro(KernelRadius, unsigned int);
 
   protected:
     /*!
@@ -67,13 +64,13 @@ namespace mitk
     /*!
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
     */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage );
+    template <typename TPixel, unsigned int VImageDimension>
+    void ItkImageProcessing(const itk::Image<TPixel, VImageDimension> *itkImage);
 
-    float m_DomainSigma; ///Sigma of the gaussian kernel. See ITK docu
-    float m_RangeSigma; ///Sigma of the range mask kernel. See ITK docu
-    bool m_AutoKernel; //true: kernel size is calculated from DomainSigma. See ITK Doc; false: set by m_KernelRadius
-    unsigned int m_KernelRadius; //use in combination with m_AutoKernel = true
+    float m_DomainSigma; /// Sigma of the gaussian kernel. See ITK docu
+    float m_RangeSigma;  /// Sigma of the range mask kernel. See ITK docu
+    bool m_AutoKernel;   // true: kernel size is calculated from DomainSigma. See ITK Doc; false: set by m_KernelRadius
+    unsigned int m_KernelRadius; // use in combination with m_AutoKernel = true
   };
-} //END mitk namespace
+} // END mitk namespace
 #endif

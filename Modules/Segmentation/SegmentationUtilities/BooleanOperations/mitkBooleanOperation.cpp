@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkBooleanOperation.h"
-#include <mitkExceptionMacro.h>
-#include <mitkImageCast.h>
-#include <mitkImageTimeSelector.h>
 #include <itkAndImageFilter.h>
 #include <itkNotImageFilter.h>
 #include <itkOrImageFilter.h>
+#include <mitkExceptionMacro.h>
+#include <mitkImageCast.h>
+#include <mitkImageTimeSelector.h>
 
 typedef itk::Image<mitk::Label::PixelType, 3> ImageType;
 
@@ -45,11 +45,11 @@ static ImageType::Pointer CastTo3DItkImage(mitk::Image::Pointer segmentation, un
   return result;
 }
 
-mitk::BooleanOperation::BooleanOperation(Type type, mitk::Image::Pointer segmentationA, mitk::Image::Pointer segmentationB, unsigned int time)
-  : m_Type(type),
-    m_SegmentationA(segmentationA),
-    m_SegmentationB(segmentationB),
-    m_Time(time)
+mitk::BooleanOperation::BooleanOperation(Type type,
+                                         mitk::Image::Pointer segmentationA,
+                                         mitk::Image::Pointer segmentationB,
+                                         unsigned int time)
+  : m_Type(type), m_SegmentationA(segmentationA), m_SegmentationB(segmentationB), m_Time(time)
 {
   this->ValidateSegmentations();
 }
@@ -155,7 +155,9 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
 
   auto pixelType = segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
 
-  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR || (pixelType.GetComponentType() != itk::ImageIOBase::UCHAR && pixelType.GetComponentType() != itk::ImageIOBase::USHORT))
+  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR ||
+      (pixelType.GetComponentType() != itk::ImageIOBase::UCHAR &&
+       pixelType.GetComponentType() != itk::ImageIOBase::USHORT))
     mitkThrow() << "Segmentation is neither of type 'unsigned char' nor type 'unsigned short'!";
 
   auto dimension = segmentation->GetDimension();
@@ -165,7 +167,7 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
 
   if (m_Time != 0)
   {
-    if(dimension < 4)
+    if (dimension < 4)
       mitkThrow() << "Expected four-dimensional segmentation!";
 
     if (segmentation->GetDimension(3) < m_Time)

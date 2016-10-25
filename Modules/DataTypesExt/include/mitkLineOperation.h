@@ -14,17 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKLINEOPERATION_H_INCLUDED
 #define MITKLINEOPERATION_H_INCLUDED
 
-#include "mitkCommon.h"
 #include "MitkDataTypesExtExports.h"
 #include "mitkCellOperation.h"
+#include "mitkCommon.h"
 
-
-namespace mitk {
-
+namespace mitk
+{
   //##Documentation
   //## @brief Operation, that holds everything necessary for an operation on a line.
   //##
@@ -37,7 +35,8 @@ namespace mitk {
     //##Documentation
     //##@brief constructor.
     //##
-    //## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for StateMachine::ExecuteOperation());
+    //## @param operationType is the type of that operation (see mitkOperation.h; e.g. move or add; Information for
+    //StateMachine::ExecuteOperation());
     //## @param cellId Id of the cell
     //## @param vector is for movement
     //## @param pIdA and pIdB are Id's of two points
@@ -47,7 +46,7 @@ namespace mitk {
 
     virtual ~LineOperation(){};
 
-    //int GetCellId();
+    // int GetCellId();
     int GetPIdA();
     int GetPIdB();
     int GetId();
@@ -58,5 +57,5 @@ namespace mitk {
     int m_PIdB;
     int m_Id;
   };
-}//namespace mitk
+} // namespace mitk
 #endif /* MITKLINEOPERATION_H_INCLUDED*/

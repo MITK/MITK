@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkContourModelSource.h"
 
-
 mitk::ContourModelSource::ContourModelSource()
 {
   // Create the output.
@@ -30,17 +29,17 @@ mitk::ContourModelSource::~ContourModelSource()
 {
 }
 
-itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
 {
   return OutputType::New().GetPointer();
 }
 
-itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::ContourModelSource::MakeOutput(const DataObjectIdentifierType &name)
 {
   itkDebugMacro("MakeOutput(" << name << ")");
-  if( this->IsIndexedOutputName(name) )
+  if (this->IsIndexedOutputName(name))
   {
-    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    return this->MakeOutput(this->MakeIndexFromOutputName(name));
   }
   return OutputType::New().GetPointer();
 }

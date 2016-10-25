@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_POINTLIST_VIEW_H_INCLUDED
 #define QMITK_POINTLIST_VIEW_H_INCLUDED
 
-#include <QListView>
-#include <QLabel>
 #include "MitkQtWidgetsExtExports.h"
-#include <mitkSliceNavigationController.h>
 #include "QmitkPointListModel.h"
+#include <QLabel>
+#include <QListView>
+#include <mitkSliceNavigationController.h>
 
 class QmitkStdMultiWidget;
 
@@ -42,28 +42,26 @@ class MITKQTWIDGETSEXT_EXPORT QmitkPointListView : public QListView
   Q_OBJECT
 
 public:
-
-
-  QmitkPointListView( QWidget* parent = 0 );
+  QmitkPointListView(QWidget *parent = 0);
   ~QmitkPointListView();
 
   /// assign a point set for observation
-  void SetPointSetNode( mitk::DataNode* pointSetNode );
+  void SetPointSetNode(mitk::DataNode *pointSetNode);
 
   /// which point set to work on
-  const mitk::PointSet* GetPointSet() const;
+  const mitk::PointSet *GetPointSet() const;
 
   /**
   * \brief If Multiwidget is set, the crosshair is automatically centering to the selected point
   * As an alternative, if you dont have a multiwidget, you can call SetSnc1, SetSnc2, SetSnc3 to set the
   * SliceNavigationControllers directly to enable the focussing feature.
   */
-  void SetMultiWidget( QmitkStdMultiWidget* multiWidget );
+  void SetMultiWidget(QmitkStdMultiWidget *multiWidget);
 
-  QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
+  QmitkStdMultiWidget *GetMultiWidget()
+    const; ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
 
   void SetTimesStep(int i); ///< which time step to display/model
-
 
   ///@{
   /**
@@ -72,9 +70,9 @@ public:
   *
   * \deprecatedSince{2013_03} Use AddSliceNavigationController and RemoveSliceNavigationController instead.
   */
-  DEPRECATED( void SetSnc1(mitk::SliceNavigationController* snc) );
-  DEPRECATED( void SetSnc2(mitk::SliceNavigationController* snc) );
-  DEPRECATED( void SetSnc3(mitk::SliceNavigationController* snc) );
+  DEPRECATED(void SetSnc1(mitk::SliceNavigationController *snc));
+  DEPRECATED(void SetSnc2(mitk::SliceNavigationController *snc));
+  DEPRECATED(void SetSnc3(mitk::SliceNavigationController *snc));
   ///@}
 
   /**
@@ -84,7 +82,7 @@ public:
    * This method adds \c snc to the set of slice navigation controllers which are
    * used to navigate to the selected point.
    */
-  void AddSliceNavigationController(mitk::SliceNavigationController* snc);
+  void AddSliceNavigationController(mitk::SliceNavigationController *snc);
 
   /**
    * @brief Remove a mitk::SliceNavigationController instance.
@@ -93,26 +91,25 @@ public:
    * This method removes \c snc from the set of slice navigation controllers which are
    * used to navigate to the selected point.
    */
-  void RemoveSliceNavigationController(mitk::SliceNavigationController* snc);
-
+  void RemoveSliceNavigationController(mitk::SliceNavigationController *snc);
 
 signals:
 
-  void SignalPointSelectionChanged();  ///< this signal is emmitted, if the selection of a point in the pointset is changed
-
+  void
+    SignalPointSelectionChanged(); ///< this signal is emmitted, if the selection of a point in the pointset is changed
 
 protected slots:
 
   /// Filtering double click event for editing point coordinates via a dialog
-  void OnPointDoubleClicked(const QModelIndex & index);
+  void OnPointDoubleClicked(const QModelIndex &index);
 
   /// called when the point set data structure changes
   void OnPointSetSelectionChanged();
 
   /// called when the selection of the view widget changes
-  void OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+  void OnListViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
-   /// fade the shown timestep out
+  /// fade the shown timestep out
   void fadeTimeStepOut();
 
   /// open ContextMenu
@@ -128,28 +125,23 @@ protected slots:
   void ClearPointListTS();
 
 protected:
+  void keyPressEvent(QKeyEvent *e) override;    ///< react to F2, F3 and DEL keys
+  void wheelEvent(QWheelEvent *event) override; ///< change timestep of the current pointset by mouse wheel
+  void fadeTimeStepIn();                        ///< fade a label with the currently shown timestep in
 
-  void keyPressEvent( QKeyEvent * e ) override; ///< react to F2, F3 and DEL keys
-  void wheelEvent( QWheelEvent* event) override; ///< change timestep of the current pointset by mouse wheel
-  void fadeTimeStepIn(); ///< fade a label with the currently shown timestep in
+  mitk::SliceNavigationController *m_Snc1;
+  mitk::SliceNavigationController *m_Snc2;
+  mitk::SliceNavigationController *m_Snc3;
 
+  std::set<mitk::SliceNavigationController *> m_Sncs;
 
-  mitk::SliceNavigationController* m_Snc1;
-  mitk::SliceNavigationController* m_Snc2;
-  mitk::SliceNavigationController* m_Snc3;
-
-  std::set<mitk::SliceNavigationController*> m_Sncs;
-
-
-  QmitkPointListModel*    m_PointListModel;
-  bool                    m_SelfCall;
-  bool                    m_showFading;
+  QmitkPointListModel *m_PointListModel;
+  bool m_SelfCall;
+  bool m_showFading;
 
   /// used to position the planes on a selected point
-  QmitkStdMultiWidget*    m_MultiWidget;
-  QLabel*                m_TimeStepFaderLabel;
-
+  QmitkStdMultiWidget *m_MultiWidget;
+  QLabel *m_TimeStepFaderLabel;
 };
 
 #endif
-

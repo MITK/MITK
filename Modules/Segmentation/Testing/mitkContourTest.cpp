@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkContour.h"
 #include "mitkCommon.h"
+#include "mitkContour.h"
 #include "mitkTestingMacros.h"
 
 #include <fstream>
 
-int mitkContourTest(int /*argc*/, char* /*argv*/[])
+int mitkContourTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("Contour");
   mitk::Contour::Pointer contour = mitk::Contour::New();
@@ -44,7 +44,7 @@ int mitkContourTest(int /*argc*/, char* /*argv*/[])
   contour->SetPoints(points);
   MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfPoints() == 3, "Testimg SetPoints()!");
 
-  mitk::Contour::PathPointer path =  contour->GetContourPath();
+  mitk::Contour::PathPointer path = contour->GetContourPath();
   MITK_TEST_CONDITION_REQUIRED(path.IsNotNull(), "Testing GetContourPath()!");
 
   contour->UpdateOutputInformation();
@@ -53,8 +53,10 @@ int mitkContourTest(int /*argc*/, char* /*argv*/[])
 
   mitk::Contour::Pointer cloneContour = contour->Clone();
   MITK_TEST_CONDITION_REQUIRED(cloneContour.IsNotNull(), "Testing clone instantiation!");
-  MITK_TEST_CONDITION_REQUIRED(cloneContour.GetPointer() != contour.GetPointer(), "Testing cloned object is not original object!");
-  MITK_TEST_CONDITION_REQUIRED(cloneContour->GetGeometry()->GetCenter() == contour->GetGeometry()->GetCenter(), "Testing if Geometry is cloned!");
+  MITK_TEST_CONDITION_REQUIRED(cloneContour.GetPointer() != contour.GetPointer(),
+                               "Testing cloned object is not original object!");
+  MITK_TEST_CONDITION_REQUIRED(cloneContour->GetGeometry()->GetCenter() == contour->GetGeometry()->GetCenter(),
+                               "Testing if Geometry is cloned!");
   MITK_TEST_CONDITION_REQUIRED(cloneContour->GetPoints() == points, "Testing cloning of point data!");
 
   MITK_TEST_END();

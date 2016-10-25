@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkLabelSetImageConverter.h>
+#include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
-#include <mitkITKImageImport.h>
+#include <mitkLabelSetImageConverter.h>
 
 #include <itkComposeImageFilter.h>
 #include <itkExtractImageFilter.h>
@@ -25,7 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorIndexSelectionCastImageFilter.h>
 
 template <typename TPixel, unsigned int VDimension>
-static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension>*, mitk::LabelSetImage::ConstPointer labelSetImage, mitk::Image::Pointer& image)
+static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension> *,
+                                        mitk::LabelSetImage::ConstPointer labelSetImage,
+                                        mitk::Image::Pointer &image)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::ComposeImageFilter<ImageType> ComposeFilterType;
@@ -40,9 +42,8 @@ static void ConvertLabelSetImageToImage(const itk::Image<TPixel, VDimension>*, m
 
     for (decltype(numberOfLayers) layer = 0; layer < numberOfLayers; ++layer)
     {
-      auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(layer != activeLayer
-        ? labelSetImage->GetLayerImage(layer)
-        : labelSetImage);
+      auto layerImage = mitk::ImageToItkImage<TPixel, VDimension>(
+        layer != activeLayer ? labelSetImage->GetLayerImage(layer) : labelSetImage);
 
       vectorImageComposer->SetInput(layer, layerImage);
     }
@@ -86,7 +87,8 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
 }
 
 template <typename TPixel, unsigned int VDimensions>
-static void ConvertImageToLabelSetImage(const itk::VectorImage<TPixel, VDimensions>* image, mitk::LabelSetImage::Pointer& labelSetImage)
+static void ConvertImageToLabelSetImage(const itk::VectorImage<TPixel, VDimensions> *image,
+                                        mitk::LabelSetImage::Pointer &labelSetImage)
 {
   typedef itk::VectorImage<TPixel, VDimensions> VectorImageType;
   typedef itk::Image<TPixel, VDimensions> ImageType;

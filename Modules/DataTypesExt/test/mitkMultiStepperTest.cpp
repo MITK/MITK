@@ -14,12 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include "mitkStepper.h"
 #include "mitkMultiStepper.h"
+#include "mitkStepper.h"
 #include "mitkTestingMacros.h"
 
-int mitkMultiStepperTest(int /*argc*/, char* /*argv*/[])
+int mitkMultiStepperTest(int /*argc*/, char * /*argv*/ [])
 {
   mitk::Stepper::Pointer stepperA;
   stepperA = mitk::Stepper::New();
@@ -29,10 +28,11 @@ int mitkMultiStepperTest(int /*argc*/, char* /*argv*/[])
   stepperB->SetSteps(6);
   mitk::MultiStepper::Pointer multiStepper = mitk::MultiStepper::New();
 
-  multiStepper->AddStepper(stepperA,2);
+  multiStepper->AddStepper(stepperA, 2);
   multiStepper->AddStepper(stepperB);
 
-  for (int i=0 ; i<10; i++) {
+  for (int i = 0; i < 10; i++)
+  {
     std::cout << i << ": A: " << stepperA->GetPos() << " B:" << stepperB->GetPos() << std::endl;
     multiStepper->Next();
   }

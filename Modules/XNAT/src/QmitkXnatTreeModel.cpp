@@ -23,107 +23,113 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkXnatDataModel.h>
 #include <ctkXnatExperiment.h>
+#include <ctkXnatFile.h>
 #include <ctkXnatProject.h>
 #include <ctkXnatResource.h>
-#include <ctkXnatResourceFolder.h>
-#include <ctkXnatSubject.h>
-#include <ctkXnatFile.h>
 #include <ctkXnatResourceCatalogXmlParser.h>
+#include <ctkXnatResourceFolder.h>
 #include <ctkXnatScan.h>
 #include <ctkXnatScanFolder.h>
+#include <ctkXnatSubject.h>
 
 #include <iostream>
 
-QmitkXnatTreeModel::QmitkXnatTreeModel ()
-  : ctkXnatTreeModel()
+QmitkXnatTreeModel::QmitkXnatTreeModel() : ctkXnatTreeModel()
 {
-
 }
 
-QModelIndexList QmitkXnatTreeModel::match(const QModelIndex &start, int role,
-                                          const QVariant &value, int hits,
-                                          Qt::MatchFlags flags) const
+QModelIndexList QmitkXnatTreeModel::match(
+  const QModelIndex &start, int role, const QVariant &value, int hits, Qt::MatchFlags flags) const
 {
-    QModelIndexList result;
-    uint matchType = flags & 0x0F;
-    Qt::CaseSensitivity cs = flags & Qt::MatchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
-    bool recurse = flags & Qt::MatchRecursive;
-    bool wrap = flags & Qt::MatchWrap;
-    bool allHits = (hits == -1);
-    QString text; // only convert to a string if it is needed
-    QModelIndex p = parent(start);
-    int from = start.row();
-    int to = rowCount(p);
+  QModelIndexList result;
+  uint matchType = flags & 0x0F;
+  Qt::CaseSensitivity cs = flags & Qt::MatchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
+  bool recurse = flags & Qt::MatchRecursive;
+  bool wrap = flags & Qt::MatchWrap;
+  bool allHits = (hits == -1);
+  QString text; // only convert to a string if it is needed
+  QModelIndex p = parent(start);
+  int from = start.row();
+  int to = rowCount(p);
 
-    // iterates twice if wrapping
-    for (int i = 0; (wrap && i < 2) || (!wrap && i < 1); ++i) {
-        for (int r = from; (r < to) && (allHits || result.count() < hits); ++r) {
-            QModelIndex idx = index(r, start.column(), p);
-            if (!idx.isValid())
-                 continue;
-            QVariant v = data(idx, role);
-            // QVariant based matching
-            if (matchType == Qt::MatchExactly) {
-                if (value != v)
-                    result.append(idx);
-            } else { // QString based matching
-                if (text.isEmpty()) // lazy conversion
-                    text = value.toString();
-                QString t = v.toString();
-                switch (matchType) {
-                case Qt::MatchRegExp:
-                    if (!QRegExp(text, cs).exactMatch(t))
-                        result.append(idx);
-                    break;
-                case Qt::MatchWildcard:
-                    if (!QRegExp(text, cs, QRegExp::Wildcard).exactMatch(t))
-                        result.append(idx);
-                    break;
-                case Qt::MatchStartsWith:
-                    if (!t.startsWith(text, cs))
-                        result.append(idx);
-                    break;
-                case Qt::MatchEndsWith:
-                    if (!t.endsWith(text, cs))
-                        result.append(idx);
-                    break;
-                case Qt::MatchFixedString:
-                    if (!t.compare(text, cs) == 0)
-                        result.append(idx);
-                    break;
-                case Qt::MatchContains:
-                default:
-                    if (!t.contains(text, cs))
-                        result.append(idx);
-                }
-            }
-            if (recurse && hasChildren(idx)) { // search the hierarchy
-                result += match(index(0, idx.column(), idx), role,
-                                (text.isEmpty() ? value : text),
-                                (allHits ? -1 : hits - result.count()), flags);
-            }
+  // iterates twice if wrapping
+  for (int i = 0; (wrap && i < 2) || (!wrap && i < 1); ++i)
+  {
+    for (int r = from; (r < to) && (allHits || result.count() < hits); ++r)
+    {
+      QModelIndex idx = index(r, start.column(), p);
+      if (!idx.isValid())
+        continue;
+      QVariant v = data(idx, role);
+      // QVariant based matching
+      if (matchType == Qt::MatchExactly)
+      {
+        if (value != v)
+          result.append(idx);
+      }
+      else
+      {                     // QString based matching
+        if (text.isEmpty()) // lazy conversion
+          text = value.toString();
+        QString t = v.toString();
+        switch (matchType)
+        {
+          case Qt::MatchRegExp:
+            if (!QRegExp(text, cs).exactMatch(t))
+              result.append(idx);
+            break;
+          case Qt::MatchWildcard:
+            if (!QRegExp(text, cs, QRegExp::Wildcard).exactMatch(t))
+              result.append(idx);
+            break;
+          case Qt::MatchStartsWith:
+            if (!t.startsWith(text, cs))
+              result.append(idx);
+            break;
+          case Qt::MatchEndsWith:
+            if (!t.endsWith(text, cs))
+              result.append(idx);
+            break;
+          case Qt::MatchFixedString:
+            if (!t.compare(text, cs) == 0)
+              result.append(idx);
+            break;
+          case Qt::MatchContains:
+          default:
+            if (!t.contains(text, cs))
+              result.append(idx);
         }
-        // prepare for the next iteration
-        from = 0;
-        to = start.row();
+      }
+      if (recurse && hasChildren(idx))
+      { // search the hierarchy
+        result += match(index(0, idx.column(), idx),
+                        role,
+                        (text.isEmpty() ? value : text),
+                        (allHits ? -1 : hits - result.count()),
+                        flags);
+      }
     }
-    return result;
+    // prepare for the next iteration
+    from = 0;
+    to = start.row();
+  }
+  return result;
 }
 
-void QmitkXnatTreeModel::fetchMore(const QModelIndex& index)
+void QmitkXnatTreeModel::fetchMore(const QModelIndex &index)
 {
   try
   {
     ctkXnatTreeModel::fetchMore(index);
   }
-  catch(ctkRuntimeException e)
+  catch (ctkRuntimeException e)
   {
     QmitkHttpStatusCodeHandler::HandleErrorMessage(e.what());
     emit Error(index);
   }
 }
 
-QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
+QVariant QmitkXnatTreeModel::data(const QModelIndex &index, int role) const
 {
   if (!index.isValid())
   {
@@ -132,42 +138,42 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
 
   if (role == Qt::DecorationRole)
   {
-    ctkXnatObject* xnatObject = this->xnatObject(index);
+    ctkXnatObject *xnatObject = this->xnatObject(index);
     QString path;
 
-    if(dynamic_cast<ctkXnatDataModel*>(xnatObject))
+    if (dynamic_cast<ctkXnatDataModel *>(xnatObject))
     {
       path = ":/xnat-module/xnat-server.png";
     }
-    else if(dynamic_cast<ctkXnatProject*>(xnatObject))
+    else if (dynamic_cast<ctkXnatProject *>(xnatObject))
     {
       path = ":/xnat-module/xnat-project.png";
     }
-    else if(dynamic_cast<ctkXnatSubject*>(xnatObject))
+    else if (dynamic_cast<ctkXnatSubject *>(xnatObject))
     {
       path = ":/xnat-module/xnat-subject.png";
     }
-    else if(dynamic_cast<ctkXnatExperiment*>(xnatObject))
+    else if (dynamic_cast<ctkXnatExperiment *>(xnatObject))
     {
       path = ":/xnat-module/xnat-experiment.png";
     }
-    else if (dynamic_cast<ctkXnatResourceFolder*>(xnatObject))
+    else if (dynamic_cast<ctkXnatResourceFolder *>(xnatObject))
     {
       path = ":/xnat-module/xnat-folder.png";
     }
-    else if (dynamic_cast<ctkXnatResource*>(xnatObject))
+    else if (dynamic_cast<ctkXnatResource *>(xnatObject))
     {
       path = ":/xnat-module/xnat-resource.png";
     }
-    else if (dynamic_cast<ctkXnatScanFolder*>(xnatObject))
+    else if (dynamic_cast<ctkXnatScanFolder *>(xnatObject))
     {
       path = ":/xnat-module/xnat-folder.png";
     }
-    else if (dynamic_cast<ctkXnatScan*>(xnatObject))
+    else if (dynamic_cast<ctkXnatScan *>(xnatObject))
     {
       path = ":/xnat-module/xnat-scan.png";
     }
-    else if (dynamic_cast<ctkXnatFile*>(xnatObject))
+    else if (dynamic_cast<ctkXnatFile *>(xnatObject))
     {
       path = ":/xnat-module/xnat-file.png";
     }
@@ -176,19 +182,20 @@ QVariant QmitkXnatTreeModel::data(const QModelIndex& index, int role) const
   return ctkXnatTreeModel::data(index, role);
 }
 
-bool QmitkXnatTreeModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
+bool QmitkXnatTreeModel::dropMimeData(
+  const QMimeData *data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
 {
   if (action == Qt::IgnoreAction)
     return true;
 
   // Return true if data can be handled
-  bool returnVal (false);
+  bool returnVal(false);
 
   if (data->hasFormat(QmitkMimeTypes::DataNodePtrs))
   {
     returnVal = true;
-    QList<mitk::DataNode*> droppedNodes = QmitkMimeTypes::ToDataNodePtrList(data);
-    ctkXnatObject* parentXnatObj = this->xnatObject(parent);
+    QList<mitk::DataNode *> droppedNodes = QmitkMimeTypes::ToDataNodePtrList(data);
+    ctkXnatObject *parentXnatObj = this->xnatObject(parent);
     emit ResourceDropped(droppedNodes, parentXnatObj, parent);
   }
   return returnVal;
@@ -205,10 +212,10 @@ Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
 
   if (index.isValid())
   {
-    bool droppingAllowed = dynamic_cast<ctkXnatSubject*>(this->xnatObject(index)) != nullptr;
-    droppingAllowed |= dynamic_cast<ctkXnatExperiment*>(this->xnatObject(index)) != nullptr;
-    droppingAllowed |= dynamic_cast<ctkXnatResource*>(this->xnatObject(index)) != nullptr;
-    droppingAllowed |= dynamic_cast<ctkXnatResourceFolder*>(this->xnatObject(index)) != nullptr;
+    bool droppingAllowed = dynamic_cast<ctkXnatSubject *>(this->xnatObject(index)) != nullptr;
+    droppingAllowed |= dynamic_cast<ctkXnatExperiment *>(this->xnatObject(index)) != nullptr;
+    droppingAllowed |= dynamic_cast<ctkXnatResource *>(this->xnatObject(index)) != nullptr;
+    droppingAllowed |= dynamic_cast<ctkXnatResourceFolder *>(this->xnatObject(index)) != nullptr;
 
     // No dropping at project, session or data model level allowed
     if (droppingAllowed)
@@ -224,8 +231,9 @@ Qt::ItemFlags QmitkXnatTreeModel::flags(const QModelIndex &index) const
     return defaultFlags;
 }
 
-ctkXnatObject* QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString & xnatObjectType, const QString & url,
-                                                                ctkXnatObject* parent)
+ctkXnatObject *QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString &xnatObjectType,
+                                                                const QString &url,
+                                                                ctkXnatObject *parent)
 {
   // 1. Find project
   int start = url.lastIndexOf(xnatObjectType);
@@ -233,14 +241,14 @@ ctkXnatObject* QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString & 
     return nullptr;
 
   start += xnatObjectType.length();
-  int length = url.indexOf("/",start);
+  int length = url.indexOf("/", start);
   length -= start;
 
   parent->fetch();
-  QList<ctkXnatObject*> children = parent->children();
-  foreach (ctkXnatObject* child, children)
+  QList<ctkXnatObject *> children = parent->children();
+  foreach (ctkXnatObject *child, children)
   {
-    if(url.indexOf(child->resourceUri()) != -1)
+    if (url.indexOf(child->resourceUri()) != -1)
     {
       return child;
     }
@@ -248,19 +256,19 @@ ctkXnatObject* QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString & 
   return nullptr;
 }
 
-ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
+ctkXnatObject *QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString &url)
 {
-  QModelIndex index = this->index(0,0,QModelIndex());
-  ctkXnatObject* currentXnatObject = nullptr;
+  QModelIndex index = this->index(0, 0, QModelIndex());
+  ctkXnatObject *currentXnatObject = nullptr;
   currentXnatObject = this->xnatObject(index);
   if (currentXnatObject != nullptr)
   {
     // 1. Find project
-    ctkXnatObject* project = nullptr;
+    ctkXnatObject *project = nullptr;
     project = this->InternalGetXnatObjectFromUrl("projects/", url, currentXnatObject);
 
     // 2. Find subject
-    ctkXnatObject* subject = nullptr;
+    ctkXnatObject *subject = nullptr;
     if (project != nullptr)
     {
       currentXnatObject = project;
@@ -268,7 +276,7 @@ ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
     }
 
     // 3. Find experiment
-    ctkXnatObject* experiment = nullptr;
+    ctkXnatObject *experiment = nullptr;
     if (subject != nullptr)
     {
       currentXnatObject = subject;
@@ -276,7 +284,7 @@ ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
     }
 
     // 4. Find scan
-    ctkXnatObject* scan = nullptr;
+    ctkXnatObject *scan = nullptr;
     if (experiment != nullptr)
     {
       currentXnatObject = experiment;
@@ -286,8 +294,8 @@ ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
     if (scan != nullptr)
     {
       scan->fetch();
-      QList<ctkXnatObject*> scans = scan->children();
-      foreach (ctkXnatObject* child, scans)
+      QList<ctkXnatObject *> scans = scan->children();
+      foreach (ctkXnatObject *child, scans)
       {
         if (url.indexOf(child->resourceUri()) != -1)
         {
@@ -297,8 +305,8 @@ ctkXnatObject* QmitkXnatTreeModel::GetXnatObjectFromUrl(const QString& url)
     }
 
     currentXnatObject->fetch();
-    QList<ctkXnatObject*> bla = currentXnatObject->children();
-    foreach (ctkXnatObject* child, bla)
+    QList<ctkXnatObject *> bla = currentXnatObject->children();
+    foreach (ctkXnatObject *child, bla)
     {
       if (child->name() == "Resources")
         return child;

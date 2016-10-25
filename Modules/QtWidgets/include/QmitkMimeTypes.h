@@ -19,13 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkQtWidgetsExports.h>
 
-#include <QString>
-#include <QMimeData>
 #include <QByteArray>
 #include <QList>
+#include <QMimeData>
+#include <QString>
 
-namespace mitk {
-class DataNode;
+namespace mitk
+{
+  class DataNode;
 }
 
 /**
@@ -34,13 +35,12 @@ class DataNode;
 class MITKQTWIDGETS_EXPORT QmitkMimeTypes
 {
 public:
-
-  static const QString DataNodePtrs; // = "application/x-qmitk-datanode-ptrs";
+  static const QString DataNodePtrs;            // = "application/x-qmitk-datanode-ptrs";
   static const QString DataStorageTreeItemPtrs; // = "application/x-qmitk-datastorage-treeitem-ptrs";
 
-  static QList<mitk::DataNode*> ToDataNodePtrList(const QByteArray& ba);
+  static QList<mitk::DataNode *> ToDataNodePtrList(const QByteArray &ba);
 
-  static QList<mitk::DataNode*> ToDataNodePtrList(const QMimeData *mimeData);
+  static QList<mitk::DataNode *> ToDataNodePtrList(const QMimeData *mimeData);
 };
 
 #endif // QMITKMIMETYPES_H

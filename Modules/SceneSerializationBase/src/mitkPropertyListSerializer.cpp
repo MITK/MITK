@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPropertyListSerializer.h"
 #include "mitkBasePropertySerializer.h"
 
@@ -23,9 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 #include <itksys/SystemTools.hxx>
 
-mitk::PropertyListSerializer::PropertyListSerializer()
-: m_FilenameHint("unnamed")
-, m_WorkingDirectory("")
+mitk::PropertyListSerializer::PropertyListSerializer() : m_FilenameHint("unnamed"), m_WorkingDirectory("")
 {
 }
 
@@ -37,7 +34,7 @@ std::string mitk::PropertyListSerializer::Serialize()
 {
   m_FailedProperties = PropertyList::New();
 
-  if ( m_PropertyList.IsNull() || m_PropertyList->IsEmpty() )
+  if (m_PropertyList.IsNull() || m_PropertyList->IsEmpty())
   {
     MITK_ERROR << "Not serializing NULL or empty PropertyList";
     return "";
@@ -67,48 +64,47 @@ std::string mitk::PropertyListSerializer::Serialize()
     fullname = fullname.substr(1, length - 2);
 
   TiXmlDocument document;
-  auto  decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....
-  document.LinkEndChild( decl );
+  auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
+  document.LinkEndChild(decl);
 
-  auto  version = new TiXmlElement("Version");
-  version->SetAttribute("Writer",  __FILE__ );
-  version->SetAttribute("Revision",  "$Revision: 17055 $" );
-  version->SetAttribute("FileVersion",  1 );
+  auto version = new TiXmlElement("Version");
+  version->SetAttribute("Writer", __FILE__);
+  version->SetAttribute("Revision", "$Revision: 17055 $");
+  version->SetAttribute("FileVersion", 1);
   document.LinkEndChild(version);
 
   // add XML contents
-  const PropertyList::PropertyMap* propmap = m_PropertyList->GetMap();
-  for ( auto iter = propmap->begin();
-        iter != propmap->end();
-        ++iter )
+  const PropertyList::PropertyMap *propmap = m_PropertyList->GetMap();
+  for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
   {
     std::string key = iter->first;
-    const BaseProperty* property = iter->second;
-    TiXmlElement* element = SerializeOneProperty( key, property );
+    const BaseProperty *property = iter->second;
+    TiXmlElement *element = SerializeOneProperty(key, property);
     if (element)
     {
-      document.LinkEndChild( element );
+      document.LinkEndChild(element);
       // TODO test serializer for error
     }
     else
     {
-      m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
+      m_FailedProperties->ReplaceProperty(key, const_cast<BaseProperty *>(property));
     }
   }
 
   // save XML file
-  if ( !document.SaveFile( fullname ) )
+  if (!document.SaveFile(fullname))
   {
-    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc()
+               << "'";
     return "";
   }
 
   return filename;
 }
 
-TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::string& key, const BaseProperty* property )
+TiXmlElement *mitk::PropertyListSerializer::SerializeOneProperty(const std::string &key, const BaseProperty *property)
 {
-  auto  keyelement = new TiXmlElement("property");
+  auto keyelement = new TiXmlElement("property");
   keyelement->SetAttribute("key", key);
   keyelement->SetAttribute("type", property->GetNameOfClass());
 
@@ -116,7 +112,8 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   std::string serializername(property->GetNameOfClass());
   serializername += "Serializer";
 
-  std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
+  std::list<itk::LightObject::Pointer> allSerializers =
+    itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
   if (allSerializers.size() < 1)
   {
     MITK_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
@@ -126,22 +123,20 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
     MITK_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
   }
 
-  for ( auto iter = allSerializers.begin();
-        iter != allSerializers.end();
-        ++iter )
+  for (auto iter = allSerializers.begin(); iter != allSerializers.end(); ++iter)
   {
-    if (BasePropertySerializer* serializer = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
+    if (BasePropertySerializer *serializer = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
     {
       serializer->SetProperty(property);
       try
       {
-        TiXmlElement* valueelement = serializer->Serialize();
+        TiXmlElement *valueelement = serializer->Serialize();
         if (valueelement)
         {
-          keyelement->LinkEndChild( valueelement );
+          keyelement->LinkEndChild(valueelement);
         }
       }
-      catch (std::exception& e)
+      catch (std::exception &e)
       {
         MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
         // \TODO: log only if all potential serializers fail?
@@ -150,14 +145,15 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
     }
     else
     {
-      MITK_ERROR << "Found a serializer called '" << (*iter)->GetNameOfClass() << "' that does not implement the BasePropertySerializer interface.";
+      MITK_ERROR << "Found a serializer called '" << (*iter)->GetNameOfClass()
+                 << "' that does not implement the BasePropertySerializer interface.";
       continue;
     }
   }
 
   if (keyelement->NoChildren())
   {
-    m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
+    m_FailedProperties->ReplaceProperty(key, const_cast<BaseProperty *>(property));
     return nullptr;
   }
   else
@@ -166,7 +162,7 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   }
 }
 
-mitk::PropertyList* mitk::PropertyListSerializer::GetFailedProperties()
+mitk::PropertyList *mitk::PropertyListSerializer::GetFailedProperties()
 {
   if (m_FailedProperties.IsNotNull() && !m_FailedProperties->IsEmpty())
   {

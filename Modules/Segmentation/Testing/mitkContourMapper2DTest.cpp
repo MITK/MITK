@@ -14,17 +14,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkContour.h"
-#include "mitkDataNode.h"
-#include "mitkContourMapper2D.h"
 #include "mitkCommon.h"
+#include "mitkContour.h"
+#include "mitkContourMapper2D.h"
+#include "mitkDataNode.h"
 #include "mitkStandaloneDataStorage.h"
 
 #include "mitkVtkPropRenderer.h"
 
 #include <fstream>
 
-int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
+int mitkContourMapper2DTest(int /*argc*/, char * /*argv*/ [])
 {
   mitk::Contour::Pointer contour;
   mitk::ContourMapper2D::Pointer contourMapper;
@@ -37,22 +37,24 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   contour = mitk::Contour::New();
   node->SetData(contour);
 
-  if (contour.IsNull()) {
+  if (contour.IsNull())
+  {
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
+  else
+  {
+    std::cout << "[PASSED]" << std::endl;
   }
 
-  contourMapper->SetDataNode( node );
+  contourMapper->SetDataNode(node);
   contourMapper->Update(NULL);
-  mitk::Contour* testContour = (mitk::Contour*)contourMapper->GetInput();
+  mitk::Contour *testContour = (mitk::Contour *)contourMapper->GetInput();
   std::cout << testContour << std::endl;
 
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-  ds->Add( node );
+  ds->Add(node);
 
   mitk::BoundingBox::Pointer bounds = ds->ComputeBoundingBox();
 
@@ -61,15 +63,16 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
   bounds = ds->ComputeVisibleBoundingBox();
   std::cout << "visible bounds: " << bounds << std::endl;
 
-  vtkRenderWindow* renWin = vtkRenderWindow::New();
+  vtkRenderWindow *renWin = vtkRenderWindow::New();
 
-  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "ContourRenderer",renWin, mitk::RenderingManager::GetInstance(),mitk::BaseRenderer::RenderingMode::Standard );
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New(
+    "ContourRenderer", renWin, mitk::RenderingManager::GetInstance(), mitk::BaseRenderer::RenderingMode::Standard);
 
-  std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
+  std::cout << "Testing mitk::BaseRenderer::SetData()" << std::endl;
 
   renderer->SetDataStorage(ds);
 
-  std::cout<<"[TEST DONE]"<<std::endl;
+  std::cout << "[TEST DONE]" << std::endl;
 
   renWin->Delete();
 

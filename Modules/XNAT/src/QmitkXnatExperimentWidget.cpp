@@ -20,16 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QCompleter>
 
-QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(QWidget* parent)
-  : QWidget(parent)
+QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(QWidget *parent) : QWidget(parent)
 {
   m_Mode = INFO;
   Init();
 }
 
-QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(Mode mode, QWidget *parent)
-  : QWidget(parent),
-    m_Mode(mode)
+QmitkXnatExperimentWidget::QmitkXnatExperimentWidget(Mode mode, QWidget *parent) : QWidget(parent), m_Mode(mode)
 {
   Init();
 }
@@ -86,13 +83,13 @@ void QmitkXnatExperimentWidget::Init()
     xsiTypeList << ctkXnatDefaultSchemaTypes::XSI_XCV_SESSION;
 
     // create completer for experiment sessions
-    QCompleter* completer = new QCompleter(xsiTypeList, this);
+    QCompleter *completer = new QCompleter(xsiTypeList, this);
     m_Controls.modalityLineEdit->setCompleter(completer);
     m_Controls.modalityLineEdit->setPlaceholderText("Start with \"xnat::\"");
   }
 }
 
-void QmitkXnatExperimentWidget::SetExperiment(ctkXnatExperiment* experiment)
+void QmitkXnatExperimentWidget::SetExperiment(ctkXnatExperiment *experiment)
 {
   m_Experiment = experiment;
 
@@ -100,7 +97,7 @@ void QmitkXnatExperimentWidget::SetExperiment(ctkXnatExperiment* experiment)
   if (m_Experiment->parent())
   {
     m_Controls.breadcrumbLabel->setText("Project:" + m_Experiment->parent()->parent()->property("name") +
-      " > Subject:" + m_Experiment->parent()->property("label"));
+                                        " > Subject:" + m_Experiment->parent()->property("label"));
   }
   m_Controls.labelLineEdit->setText(m_Experiment->property("label"));
   m_Controls.modalityLineEdit->setText(m_Experiment->property("modality"));
@@ -109,7 +106,7 @@ void QmitkXnatExperimentWidget::SetExperiment(ctkXnatExperiment* experiment)
   m_Controls.scannerLineEdit->setText(m_Experiment->property("scanner"));
 }
 
-ctkXnatExperiment* QmitkXnatExperimentWidget::GetExperiment() const
+ctkXnatExperiment *QmitkXnatExperimentWidget::GetExperiment() const
 {
   if (m_Mode == Mode::CREATE)
   {

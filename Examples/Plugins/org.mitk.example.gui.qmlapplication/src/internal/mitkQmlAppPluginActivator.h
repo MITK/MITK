@@ -17,37 +17,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_EXAMPLEAPP_PLUGIN_ACTIVATOR_H_
 #define MITK_EXAMPLEAPP_PLUGIN_ACTIVATOR_H_
 
-#include <berryAbstractUICTKPlugin.h>
 #include <QString>
+#include <berryAbstractUICTKPlugin.h>
 
-namespace mitk {
-
-class QmlAppPluginActivator : public berry::AbstractUICTKPlugin
+namespace mitk
 {
-  Q_OBJECT
+  class QmlAppPluginActivator : public berry::AbstractUICTKPlugin
+  {
+    Q_OBJECT
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
-  Q_PLUGIN_METADATA(IID "org_mitk_example_gui_qmlapplication")
+    Q_PLUGIN_METADATA(IID "org_mitk_example_gui_qmlapplication")
 #endif
-  Q_INTERFACES(ctkPluginActivator)
+    Q_INTERFACES(ctkPluginActivator)
 
-public:
+  public:
+    QmlAppPluginActivator();
+    ~QmlAppPluginActivator();
 
-  QmlAppPluginActivator();
-  ~QmlAppPluginActivator();
+    static QmlAppPluginActivator *GetDefault();
 
-  static QmlAppPluginActivator* GetDefault();
+    ctkPluginContext *GetPluginContext() const;
 
-  ctkPluginContext* GetPluginContext() const;
+    void start(ctkPluginContext *);
 
-  void start(ctkPluginContext*);
+  private:
+    static QmlAppPluginActivator *inst;
 
-private:
-
-  static QmlAppPluginActivator* inst;
-
-  ctkPluginContext* context;
-};
-
+    ctkPluginContext *context;
+  };
 }
 
 #endif /* MITK_EXAMPLEAPP_PLUGIN_ACTIVATOR_H_ */

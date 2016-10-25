@@ -16,44 +16,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPropertyItemDelegate.h"
 #include "QmitkPropertyItemModel.h"
-#include <mitkBaseProperty.h>
-#include <mitkFloatPropertyExtension.h>
-#include <mitkIntPropertyExtension.h>
-#include <mitkIPropertyExtensions.h>
 #include <QApplication>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLineEdit>
-#include <QPainter>
 #include <QPaintEvent>
+#include <QPainter>
 #include <QSpinBox>
 #include <QToolButton>
 #include <algorithm>
+#include <mitkBaseProperty.h>
+#include <mitkFloatPropertyExtension.h>
+#include <mitkIPropertyExtensions.h>
+#include <mitkIntPropertyExtension.h>
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usServiceReference.h>
 
-mitk::IPropertyExtensions* GetPropertyService()
+mitk::IPropertyExtensions *GetPropertyService()
 {
+  us::ModuleContext *context = us::GetModuleContext();
+  us::ServiceReference<mitk::IPropertyExtensions> serviceRef =
+    context->GetServiceReference<mitk::IPropertyExtensions>();
 
-  us::ModuleContext* context = us::GetModuleContext();
-  us::ServiceReference<mitk::IPropertyExtensions> serviceRef = context->GetServiceReference<mitk::IPropertyExtensions>();
-
-  return serviceRef
-    ? context->GetService<mitk::IPropertyExtensions>(serviceRef)
-    : NULL;
+  return serviceRef ? context->GetService<mitk::IPropertyExtensions>(serviceRef) : NULL;
 }
 
-QmitkColorWidget::QmitkColorWidget(QWidget* parent)
-  : QWidget(parent),
-    m_LineEdit(new QLineEdit),
-    m_Button(new QToolButton)
+QmitkColorWidget::QmitkColorWidget(QWidget *parent)
+  : QWidget(parent), m_LineEdit(new QLineEdit), m_Button(new QToolButton)
 {
   m_LineEdit->setText(m_Color.name());
   m_Button->setText("...");
 
-  QHBoxLayout* layout = new QHBoxLayout;
+  QHBoxLayout *layout = new QHBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
@@ -101,8 +97,7 @@ void QmitkColorWidget::OnButtonClicked()
   }
 }
 
-QmitkComboBoxListView::QmitkComboBoxListView(QComboBox* comboBox)
-  : m_ComboBox(comboBox)
+QmitkComboBoxListView::QmitkComboBoxListView(QComboBox *comboBox) : m_ComboBox(comboBox)
 {
 }
 
@@ -110,7 +105,7 @@ QmitkComboBoxListView::~QmitkComboBoxListView()
 {
 }
 
-void QmitkComboBoxListView::paintEvent(QPaintEvent* event)
+void QmitkComboBoxListView::paintEvent(QPaintEvent *event)
 {
   if (m_ComboBox != NULL)
   {
@@ -138,7 +133,7 @@ void QmitkComboBoxListView::paintEvent(QPaintEvent* event)
   QListView::paintEvent(event);
 }
 
-void QmitkComboBoxListView::resizeEvent(QResizeEvent* event)
+void QmitkComboBoxListView::resizeEvent(QResizeEvent *event)
 {
   int width = this->viewport()->width();
   int height = this->contentsSize().height();
@@ -154,7 +149,7 @@ QStyleOptionViewItem QmitkComboBoxListView::viewOptions() const
   option.showDecorationSelected = true;
 
   if (m_ComboBox != NULL)
-      option.font = m_ComboBox->font();
+    option.font = m_ComboBox->font();
 
   return option;
 }
@@ -162,22 +157,17 @@ QStyleOptionViewItem QmitkComboBoxListView::viewOptions() const
 class PropertyEqualTo
 {
 public:
-  PropertyEqualTo(const mitk::BaseProperty* property)
-    : m_Property(property)
-  {
-  }
-
-  bool operator()(const mitk::PropertyList::PropertyMapElementType& pair) const
+  PropertyEqualTo(const mitk::BaseProperty *property) : m_Property(property) {}
+  bool operator()(const mitk::PropertyList::PropertyMapElementType &pair) const
   {
     return pair.second.GetPointer() == m_Property;
   }
 
 private:
-  const mitk::BaseProperty* m_Property;
+  const mitk::BaseProperty *m_Property;
 };
 
-QmitkPropertyItemDelegate::QmitkPropertyItemDelegate(QObject* parent)
-  : QStyledItemDelegate(parent)
+QmitkPropertyItemDelegate::QmitkPropertyItemDelegate(QObject *parent) : QStyledItemDelegate(parent)
 {
 }
 
@@ -185,7 +175,9 @@ QmitkPropertyItemDelegate::~QmitkPropertyItemDelegate()
 {
 }
 
-QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
+QWidget *QmitkPropertyItemDelegate::createEditor(QWidget *parent,
+                                                 const QStyleOptionViewItem &option,
+                                                 const QModelIndex &index) const
 {
   QVariant data = index.data(Qt::EditRole);
 
@@ -193,14 +185,15 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
   {
     if (data.type() == QVariant::Int)
     {
-      QSpinBox* spinBox = new QSpinBox(parent);
+      QSpinBox *spinBox = new QSpinBox(parent);
 
-      mitk::IPropertyExtensions* extensions = GetPropertyService();
+      mitk::IPropertyExtensions *extensions = GetPropertyService();
       std::string name = this->GetPropertyName(index);
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
       {
-        mitk::IntPropertyExtension::Pointer extension = dynamic_cast<mitk::IntPropertyExtension*>(extensions->GetExtension(name).GetPointer());
+        mitk::IntPropertyExtension::Pointer extension =
+          dynamic_cast<mitk::IntPropertyExtension *>(extensions->GetExtension(name).GetPointer());
 
         if (extension.IsNotNull())
         {
@@ -217,14 +210,15 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
 
     if (data.type() == QVariant::Double || static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
     {
-      QDoubleSpinBox* spinBox = new QDoubleSpinBox(parent);
+      QDoubleSpinBox *spinBox = new QDoubleSpinBox(parent);
 
-      mitk::IPropertyExtensions* extensions = GetPropertyService();
+      mitk::IPropertyExtensions *extensions = GetPropertyService();
       std::string name = this->GetPropertyName(index);
 
       if (extensions != NULL && !name.empty() && extensions->HasExtension(name))
       {
-        mitk::FloatPropertyExtension::Pointer extension = dynamic_cast<mitk::FloatPropertyExtension*>(extensions->GetExtension(name).GetPointer());
+        mitk::FloatPropertyExtension::Pointer extension =
+          dynamic_cast<mitk::FloatPropertyExtension *>(extensions->GetExtension(name).GetPointer());
 
         if (extension.IsNotNull())
         {
@@ -253,7 +247,7 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
 
     if (data.type() == QVariant::StringList)
     {
-      QComboBox* comboBox = new QComboBox(parent);
+      QComboBox *comboBox = new QComboBox(parent);
       comboBox->setView(new QmitkComboBoxListView(comboBox));
 
       comboBox->addItems(data.toStringList());
@@ -265,7 +259,7 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
 
     if (data.type() == QVariant::Color)
     {
-      QmitkColorWidget* colorWidget = new QmitkColorWidget(parent);
+      QmitkColorWidget *colorWidget = new QmitkColorWidget(parent);
 
       connect(colorWidget, SIGNAL(ColorPicked()), this, SLOT(OnColorPicked()));
 
@@ -276,14 +270,16 @@ QWidget* QmitkPropertyItemDelegate::createEditor(QWidget* parent, const QStyleOp
   return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
-std::string QmitkPropertyItemDelegate::GetPropertyName(const QModelIndex& index) const
+std::string QmitkPropertyItemDelegate::GetPropertyName(const QModelIndex &index) const
 {
   if (m_PropertyList.IsNotNull())
   {
-    mitk::BaseProperty* property = reinterpret_cast<mitk::BaseProperty*>(index.data(mitk::PropertyRole).value<void*>());
-    const mitk::PropertyList::PropertyMap* propertyMap = m_PropertyList->GetMap();
+    mitk::BaseProperty *property =
+      reinterpret_cast<mitk::BaseProperty *>(index.data(mitk::PropertyRole).value<void *>());
+    const mitk::PropertyList::PropertyMap *propertyMap = m_PropertyList->GetMap();
 
-    mitk::PropertyList::PropertyMap::const_iterator it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
+    mitk::PropertyList::PropertyMap::const_iterator it =
+      std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
 
     if (it != propertyMap->end())
       return it->first;
@@ -294,7 +290,7 @@ std::string QmitkPropertyItemDelegate::GetPropertyName(const QModelIndex& index)
 
 void QmitkPropertyItemDelegate::OnComboBoxCurrentIndexChanged(int)
 {
-  QComboBox* comboBox = qobject_cast<QComboBox*>(sender());
+  QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
 
   emit commitData(comboBox);
   emit closeEditor(comboBox);
@@ -302,7 +298,7 @@ void QmitkPropertyItemDelegate::OnComboBoxCurrentIndexChanged(int)
 
 void QmitkPropertyItemDelegate::OnSpinBoxEditingFinished()
 {
-  QAbstractSpinBox* spinBox = qobject_cast<QAbstractSpinBox*>(sender());
+  QAbstractSpinBox *spinBox = qobject_cast<QAbstractSpinBox *>(sender());
 
   emit commitData(spinBox);
   emit closeEditor(spinBox);
@@ -310,13 +306,15 @@ void QmitkPropertyItemDelegate::OnSpinBoxEditingFinished()
 
 void QmitkPropertyItemDelegate::OnColorPicked()
 {
-  QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(sender());
+  QmitkColorWidget *colorWidget = qobject_cast<QmitkColorWidget *>(sender());
 
   emit commitData(colorWidget);
   emit closeEditor(colorWidget);
 }
 
-void QmitkPropertyItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void QmitkPropertyItemDelegate::paint(QPainter *painter,
+                                      const QStyleOptionViewItem &option,
+                                      const QModelIndex &index) const
 {
   QVariant data = index.data();
 
@@ -329,7 +327,7 @@ void QmitkPropertyItemDelegate::paint(QPainter* painter, const QStyleOptionViewI
   QStyledItemDelegate::paint(painter, option, index);
 }
 
-void QmitkPropertyItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+void QmitkPropertyItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
   QVariant data = index.data(Qt::EditRole);
 
@@ -338,12 +336,12 @@ void QmitkPropertyItemDelegate::setEditorData(QWidget* editor, const QModelIndex
 
   if (data.type() == QVariant::StringList)
   {
-    QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     comboBox->setCurrentIndex(comboBox->findText(index.data().toString()));
   }
   if (data.type() == QVariant::Color)
   {
-    QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(editor);
+    QmitkColorWidget *colorWidget = qobject_cast<QmitkColorWidget *>(editor);
     colorWidget->SetColor(data.value<QColor>());
   }
   else
@@ -352,7 +350,7 @@ void QmitkPropertyItemDelegate::setEditorData(QWidget* editor, const QModelIndex
   }
 }
 
-void QmitkPropertyItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
+void QmitkPropertyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
   QVariant data = index.data(Qt::EditRole);
 
@@ -361,27 +359,27 @@ void QmitkPropertyItemDelegate::setModelData(QWidget* editor, QAbstractItemModel
 
   if (data.type() == QVariant::Int)
   {
-    QSpinBox* spinBox = qobject_cast<QSpinBox*>(editor);
+    QSpinBox *spinBox = qobject_cast<QSpinBox *>(editor);
     model->setData(index, spinBox->value());
   }
   else if (data.type() == QVariant::Double)
   {
-    QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox*>(editor);
+    QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
     model->setData(index, spinBox->value());
   }
   else if (static_cast<QMetaType::Type>(data.type()) == QMetaType::Float)
   {
-    QDoubleSpinBox* spinBox = qobject_cast<QDoubleSpinBox*>(editor);
+    QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
     model->setData(index, static_cast<float>(spinBox->value()));
   }
   else if (data.type() == QVariant::StringList)
   {
-    QComboBox* comboBox = qobject_cast<QComboBox*>(editor);
+    QComboBox *comboBox = qobject_cast<QComboBox *>(editor);
     model->setData(index, comboBox->currentText());
   }
   else if (data.type() == QVariant::Color)
   {
-    QmitkColorWidget* colorWidget = qobject_cast<QmitkColorWidget*>(editor);
+    QmitkColorWidget *colorWidget = qobject_cast<QmitkColorWidget *>(editor);
     model->setData(index, colorWidget->GetColor());
   }
   else
@@ -390,7 +388,7 @@ void QmitkPropertyItemDelegate::setModelData(QWidget* editor, QAbstractItemModel
   }
 }
 
-void QmitkPropertyItemDelegate::SetPropertyList(mitk::PropertyList* propertyList)
+void QmitkPropertyItemDelegate::SetPropertyList(mitk::PropertyList *propertyList)
 {
   if (m_PropertyList.GetPointer() != propertyList)
     m_PropertyList = propertyList;

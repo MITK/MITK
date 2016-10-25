@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef LISTENERVIEWMITK_H_
 #define LISTENERVIEWMITK_H_
 
@@ -46,13 +45,11 @@ class ListenerViewMitk : public QmitkAbstractView
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   ListenerViewMitk();
 
 protected:
-
   void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
@@ -65,7 +62,8 @@ protected:
    * @see QmitkAbstractView
    *
    */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+                                  const QList<mitk::DataNode::Pointer> &nodes) override;
   //! [MITK Selection Listener method]
 
 private Q_SLOTS:
@@ -77,11 +75,9 @@ private Q_SLOTS:
   void ToggleRadioMethod(QString selectStr);
 
 private:
-
   Ui::ListenerViewMitkControls m_Controls;
 
-  QWidget* m_Parent;
-
+  QWidget *m_Parent;
 };
 
 #endif /*LISTENERVIEWMITK_H_*/

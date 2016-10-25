@@ -16,12 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkContourModelSetWriter.h"
 #include "mitkContourModelWriter.h"
-#include <mitkCustomMimeType.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <mitkCustomMimeType.h>
 
-mitk::ContourModelSetWriter::ContourModelSetWriter()
-  : AbstractFileWriter(ContourModelSet::GetStaticNameOfClass())
+mitk::ContourModelSetWriter::ContourModelSetWriter() : AbstractFileWriter(ContourModelSet::GetStaticNameOfClass())
 {
   std::string category = "ContourModelSet File";
   mitk::CustomMimeType customMimeType;
@@ -34,55 +33,54 @@ mitk::ContourModelSetWriter::ContourModelSetWriter()
   RegisterService();
 }
 
-mitk::ContourModelSetWriter::ContourModelSetWriter(const mitk::ContourModelSetWriter& other)
-  : AbstractFileWriter(other)
+mitk::ContourModelSetWriter::ContourModelSetWriter(const mitk::ContourModelSetWriter &other) : AbstractFileWriter(other)
 {
 }
 
 mitk::ContourModelSetWriter::~ContourModelSetWriter()
-{}
+{
+}
 
 void mitk::ContourModelSetWriter::Write()
 {
-  std::ostream* out;
+  std::ostream *out;
   std::ofstream outStream;
 
-  if( this->GetOutputStream() )
+  if (this->GetOutputStream())
   {
     out = this->GetOutputStream();
   }
   else
   {
-    outStream.open( this->GetOutputLocation().c_str() );
+    outStream.open(this->GetOutputLocation().c_str());
     out = &outStream;
   }
 
-  if ( !out->good() )
+  if (!out->good())
   {
     mitkThrow() << "Stream not good.";
   }
 
-  //Use regular ContourModel writer to write each contour of the set to a single file.
-  //Just use a different file extension .cnt_set
+  // Use regular ContourModel writer to write each contour of the set to a single file.
+  // Just use a different file extension .cnt_set
 
   mitk::ContourModelWriter writer;
 
-  mitk::ContourModelSet::ConstPointer contourModelSet = dynamic_cast<const mitk::ContourModelSet*>(this->GetInput());
+  mitk::ContourModelSet::ConstPointer contourModelSet = dynamic_cast<const mitk::ContourModelSet *>(this->GetInput());
 
   //
   // for each contour object set input of writer
   //
-  for ( int i = 0 ; i < contourModelSet->GetSize(); ++i )
+  for (int i = 0; i < contourModelSet->GetSize(); ++i)
   {
-    const mitk::ContourModel* contour = contourModelSet->GetContourModelAt(i);
-    writer.SetInput( contour );
-    writer.SetOutputStream( this->GetOutputLocation(), out );
+    const mitk::ContourModel *contour = contourModelSet->GetContourModelAt(i);
+    writer.SetInput(contour);
+    writer.SetOutputStream(this->GetOutputLocation(), out);
     writer.Write();
   }
-
 }
 
-mitk::ContourModelSetWriter* mitk::ContourModelSetWriter::Clone() const
+mitk::ContourModelSetWriter *mitk::ContourModelSetWriter::Clone() const
 {
   return new ContourModelSetWriter(*this);
 }

@@ -18,26 +18,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-TiXmlElement* EnumerationPropertySerializer::Serialize()
-{
-  if (const EnumerationProperty* prop = dynamic_cast<const EnumerationProperty*>(m_Property.GetPointer()))
+  TiXmlElement *EnumerationPropertySerializer::Serialize()
   {
-    auto  element = new TiXmlElement("enum");
-    element->SetAttribute("value", prop->GetValueAsString());
-    return element;
+    if (const EnumerationProperty *prop = dynamic_cast<const EnumerationProperty *>(m_Property.GetPointer()))
+    {
+      auto element = new TiXmlElement("enum");
+      element->SetAttribute("value", prop->GetValueAsString());
+      return element;
+    }
+    else
+      return nullptr;
   }
-  else return nullptr;
-}
 
-EnumerationPropertySerializer::EnumerationPropertySerializer()
-{}
-
-EnumerationPropertySerializer::~EnumerationPropertySerializer()
-{}
-
+  EnumerationPropertySerializer::EnumerationPropertySerializer() {}
+  EnumerationPropertySerializer::~EnumerationPropertySerializer() {}
 } // namespace
 
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(EnumerationPropertySerializer);
-

@@ -32,13 +32,11 @@ class QmitkIsoSurface : public QmitkAbstractView
   Q_OBJECT
 
 public:
-
-  QmitkIsoSurface(QObject *parent=nullptr, const char *name=nullptr);
+  QmitkIsoSurface(QObject *parent = nullptr, const char *name = nullptr);
 
   virtual ~QmitkIsoSurface();
 
 private:
-
   /**
    * \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
    */
@@ -56,7 +54,7 @@ private slots:
   /*
    * just an example slot for the example TreeNodeSelector widget
    */
-  void ImageSelected(const mitk::DataNode* item);
+  void ImageSelected(const mitk::DataNode *item);
 
   /**
    * \brief method for creating a surface object
@@ -64,16 +62,15 @@ private slots:
   void CreateSurface();
 
 private:
-
   /**
    * controls containing sliders for scrolling through the slices
    */
-  Ui::QmitkIsoSurfaceControls * m_Controls;
+  Ui::QmitkIsoSurfaceControls *m_Controls;
 
   /**
    * image which is used to create the surface
    */
-  mitk::Image* m_MitkImage;
+  mitk::Image *m_MitkImage;
 
   /**
    * read thresholdvalue from GUI and convert it to float
@@ -89,4 +86,3 @@ private:
 };
 
 #endif // QMITK_ISOSURFACE_H__INCLUDED
-

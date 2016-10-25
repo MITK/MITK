@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkPadImageFilter.h"
 #include "mitkImageCast.h"
 
@@ -36,16 +35,14 @@ mitk::PadImageFilter::~PadImageFilter()
 {
 }
 
-
 void mitk::PadImageFilter::GenerateData()
 {
-  mitk::Image::ConstPointer image = this->GetInput( 0 );
-  mitk::Image::ConstPointer referenceImage = this->GetInput( 1 );
+  mitk::Image::ConstPointer image = this->GetInput(0);
+  mitk::Image::ConstPointer referenceImage = this->GetInput(1);
 
-  typedef itk::Image< short, 3 > ImageType;
+  typedef itk::Image<short, 3> ImageType;
   ImageType::Pointer itkImage = ImageType::New();
-  mitk::CastToItkImage( image, itkImage );
-
+  mitk::CastToItkImage(image, itkImage);
 
   mitk::BaseGeometry *imageGeometry = image->GetGeometry();
   mitk::Point3D origin = imageGeometry->GetOrigin();
@@ -59,54 +56,49 @@ void mitk::PadImageFilter::GenerateData()
   unsigned long padUpperBound[3];
 
   int i;
-  for ( i = 0; i < 3; ++i )
+  for (i = 0; i < 3; ++i)
   {
     outputOrigin[i] = referenceOrigin[i];
 
-    padLowerBound[i] = static_cast< unsigned long >
-      ((origin[i] - referenceOrigin[i]) / spacing[i] + 0.5);
+    padLowerBound[i] = static_cast<unsigned long>((origin[i] - referenceOrigin[i]) / spacing[i] + 0.5);
 
-    padUpperBound[i] = referenceImage->GetDimension( i )
-      - image->GetDimension( i ) - padLowerBound[i];
+    padUpperBound[i] = referenceImage->GetDimension(i) - image->GetDimension(i) - padLowerBound[i];
   }
 
   // The origin of the input image is passed through the filter and used as
   // output origin as well. Hence, it needs to be overwritten accordingly.
-  itkImage->SetOrigin( outputOrigin );
+  itkImage->SetOrigin(outputOrigin);
 
-
-  typedef itk::ConstantPadImageFilter< ImageType, ImageType > PadFilterType;
+  typedef itk::ConstantPadImageFilter<ImageType, ImageType> PadFilterType;
   PadFilterType::Pointer padFilter = PadFilterType::New();
-  padFilter->SetInput( itkImage );
-  padFilter->SetConstant( m_PadConstant );
-  padFilter->SetPadLowerBound( padLowerBound );
-  padFilter->SetPadUpperBound( padUpperBound );
+  padFilter->SetInput(itkImage);
+  padFilter->SetConstant(m_PadConstant);
+  padFilter->SetPadLowerBound(padLowerBound);
+  padFilter->SetPadUpperBound(padUpperBound);
 
   mitk::Image::Pointer outputImage = this->GetOutput();
 
-
   // If the Binary flag is set, use an additional binary threshold filter after
   // padding.
-  if ( m_BinaryFilter )
+  if (m_BinaryFilter)
   {
-    typedef itk::Image< unsigned char, 3 > BinaryImageType;
-    typedef itk::BinaryThresholdImageFilter< ImageType, BinaryImageType >
-      BinaryFilterType;
+    typedef itk::Image<unsigned char, 3> BinaryImageType;
+    typedef itk::BinaryThresholdImageFilter<ImageType, BinaryImageType> BinaryFilterType;
     BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
 
-    binaryFilter->SetInput( padFilter->GetOutput() );
-    binaryFilter->SetLowerThreshold( m_LowerThreshold );
-    binaryFilter->SetUpperThreshold( m_UpperThreshold );
-    binaryFilter->SetInsideValue( 1 );
-    binaryFilter->SetOutsideValue( 0 );
+    binaryFilter->SetInput(padFilter->GetOutput());
+    binaryFilter->SetLowerThreshold(m_LowerThreshold);
+    binaryFilter->SetUpperThreshold(m_UpperThreshold);
+    binaryFilter->SetInsideValue(1);
+    binaryFilter->SetOutsideValue(0);
     binaryFilter->Update();
 
-    mitk::CastToMitkImage( binaryFilter->GetOutput(), outputImage );
+    mitk::CastToMitkImage(binaryFilter->GetOutput(), outputImage);
   }
   else
   {
     padFilter->Update();
-    mitk::CastToMitkImage( padFilter->GetOutput(), outputImage );
+    mitk::CastToMitkImage(padFilter->GetOutput(), outputImage);
   }
 
   outputImage->SetRequestedRegionToLargestPossibleRegion();

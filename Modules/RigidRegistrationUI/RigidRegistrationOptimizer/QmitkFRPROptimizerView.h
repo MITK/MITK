@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkFRPROptimizerViewWidgetHIncluded
 #define QmitkFRPROptimizerViewWidgetHIncluded
 
-#include "ui_QmitkFRPROptimizerControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
+#include "ui_QmitkFRPROptimizerControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
@@ -31,10 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkFRPROptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
-
 public:
-
-  QmitkFRPROptimizerView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkFRPROptimizerView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkFRPROptimizerView();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() override;
@@ -49,14 +47,12 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
 protected:
-
   Ui::QmitkFRPROptimizerControls m_Controls;
 
   int m_NumberTransformParameters;
-
 };
 
 #endif

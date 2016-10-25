@@ -20,10 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkTubeGraphExports.h>
 #include <mitkLocalStorageHandler.h>
 
-#include "mitkVtkMapper3D.h"
-#include "mitkTubeGraphProperty.h"
-#include "mitkTubeGraph.h"
 #include "mitkCircularProfileTubeElement.h"
+#include "mitkTubeGraph.h"
+#include "mitkTubeGraphProperty.h"
+#include "mitkVtkMapper3D.h"
 
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
@@ -42,7 +42,6 @@ namespace mitk
   class MITKTUBEGRAPH_EXPORT TubeGraphVtkMapper3D : public VtkMapper3D
   {
   public:
-
     /* Typedefs */
     typedef TubeGraph::EdgeDescriptorType EdgeDescriptorType;
     typedef TubeGraph::VertexDescriptorType VertexDescriptorType;
@@ -53,18 +52,17 @@ namespace mitk
     * Returns the input data object of the given filter. In this
     * case, a mitk::Graph< TubeGraphVertex, TubeGraphEdge > is returned.
     */
-    virtual const TubeGraph* GetInput();
+    virtual const TubeGraph *GetInput();
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
   protected:
-
     TubeGraphVtkMapper3D();
     virtual ~TubeGraphVtkMapper3D();
 
     /**
     * This method is called, each time a specific renderer is updated.
     */
-    virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer) override;
+    virtual void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /**
     * Generate vtkPolyData containing the tube centerlines and
@@ -75,21 +73,29 @@ namespace mitk
     * pieces from the spheres. Clipping the tubes with each other avoids
     * structures within the general view.
     */
-    virtual void GenerateTubeGraphData(mitk::BaseRenderer* renderer);
+    virtual void GenerateTubeGraphData(mitk::BaseRenderer *renderer);
 
     /**
     * Render only the visual information like color or visibility new.
     */
-    virtual void RenderTubeGraphPropertyInformation(mitk::BaseRenderer* renderer);
-
+    virtual void RenderTubeGraphPropertyInformation(mitk::BaseRenderer *renderer);
 
     /**
     * Converts a single tube into a vtkPolyData. Each point of the
     * tube surface is labeled with the tube id.
     */
-    void GeneratePolyDataForTube(TubeGraphEdge& edge, const TubeGraph::Pointer& graph, const TubeGraphProperty::Pointer& graphProperty, mitk::BaseRenderer* renderer);
-    void GeneratePolyDataForFurcation(TubeGraphVertex& vertex, const TubeGraph::Pointer& graph, mitk::BaseRenderer* renderer);
-    void ClipPolyData(TubeGraphVertex& vertex, const TubeGraph::Pointer& graph, const TubeGraphProperty::Pointer& graphProperty, mitk::BaseRenderer* renderer);
+    void GeneratePolyDataForTube(TubeGraphEdge &edge,
+                                 const TubeGraph::Pointer &graph,
+                                 const TubeGraphProperty::Pointer &graphProperty,
+                                 mitk::BaseRenderer *renderer);
+    void GeneratePolyDataForFurcation(TubeGraphVertex &vertex,
+                                      const TubeGraph::Pointer &graph,
+                                      mitk::BaseRenderer *renderer);
+    void ClipPolyData(TubeGraphVertex &vertex,
+                      const TubeGraph::Pointer &graph,
+                      const TubeGraphProperty::Pointer &graphProperty,
+                      mitk::BaseRenderer *renderer);
+
   private:
     bool ClipStructures();
 
@@ -97,24 +103,17 @@ namespace mitk
     {
     public:
       vtkSmartPointer<vtkAssembly> m_vtkTubeGraphAssembly;
-      std::map<TubeGraph::TubeDescriptorType, vtkSmartPointer<vtkActor> > m_vtkTubesActorMap;
-      std::map<TubeGraph::VertexDescriptorType, vtkSmartPointer<vtkActor> > m_vtkSpheresActorMap;
+      std::map<TubeGraph::TubeDescriptorType, vtkSmartPointer<vtkActor>> m_vtkTubesActorMap;
+      std::map<TubeGraph::VertexDescriptorType, vtkSmartPointer<vtkActor>> m_vtkSpheresActorMap;
 
       itk::TimeStamp m_lastGenerateDataTime;
       itk::TimeStamp m_lastRenderDataTime;
 
-      LocalStorage()
-      {
-        m_vtkTubeGraphAssembly = vtkSmartPointer<vtkAssembly>::New();
-      }
-
-      ~LocalStorage()
-      {
-      }
+      LocalStorage() { m_vtkTubeGraphAssembly = vtkSmartPointer<vtkAssembly>::New(); }
+      ~LocalStorage() {}
     };
 
     LocalStorageHandler<LocalStorage> m_LSH;
-
   };
 } // namespace
 

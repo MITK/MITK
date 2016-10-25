@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkVersorRigid3DTransformOptimizer.h>
 
-QmitkVersorRigid3DTransformOptimizerView::QmitkVersorRigid3DTransformOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkVersorRigid3DTransformOptimizerView::QmitkVersorRigid3DTransformOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkVersorRigid3DTransformOptimizerView::~QmitkVersorRigid3DTransformOptimizerView()
@@ -36,11 +35,12 @@ mitk::OptimizerParameters::OptimizerType QmitkVersorRigid3DTransformOptimizerVie
 itk::Object::Pointer QmitkVersorRigid3DTransformOptimizerView::GetOptimizer()
 {
   itk::VersorRigid3DTransformOptimizer::Pointer OptimizerPointer = itk::VersorRigid3DTransformOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
-  OptimizerPointer->SetGradientMagnitudeTolerance( m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->text().toFloat() );
-  OptimizerPointer->SetMinimumStepLength( m_Controls.m_MinimumStepLengthVersorRigid3DTransform->text().toFloat() );
-  OptimizerPointer->SetMaximumStepLength( m_Controls.m_MaximumStepLengthVersorRigid3DTransform->text().toFloat() );
-  OptimizerPointer->SetNumberOfIterations( m_Controls.m_IterationsVersorRigid3DTransform->text().toInt() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
+  OptimizerPointer->SetGradientMagnitudeTolerance(
+    m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->text().toFloat());
+  OptimizerPointer->SetMinimumStepLength(m_Controls.m_MinimumStepLengthVersorRigid3DTransform->text().toFloat());
+  OptimizerPointer->SetMaximumStepLength(m_Controls.m_MaximumStepLengthVersorRigid3DTransform->text().toFloat());
+  OptimizerPointer->SetNumberOfIterations(m_Controls.m_IterationsVersorRigid3DTransform->text().toInt());
   return OptimizerPointer.GetPointer();
 }
 
@@ -76,12 +76,12 @@ QString QmitkVersorRigid3DTransformOptimizerView::GetName()
   return "VersorRigid3DTransform";
 }
 
-void QmitkVersorRigid3DTransformOptimizerView::SetupUI(QWidget* parent)
+void QmitkVersorRigid3DTransformOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_IterationsVersorRigid3DTransform->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_GradientMagnitudeToleranceVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);
   m_Controls.m_MinimumStepLengthVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);
   m_Controls.m_MaximumStepLengthVersorRigid3DTransform->setValidator(validatorLineEditInputFloat);

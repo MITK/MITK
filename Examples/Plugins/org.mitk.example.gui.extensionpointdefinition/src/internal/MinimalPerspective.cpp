@@ -30,5 +30,5 @@ void MinimalPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
   // Hides the editor area.
   layout->SetEditorAreaVisible(false);
 
-  layout->AddView("org.mitk.views.minimalview", berry::IPageLayout::LEFT,0.5f, editorAreaId);
+  layout->AddView("org.mitk.views.minimalview", berry::IPageLayout::LEFT, 0.5f, editorAreaId);
 }

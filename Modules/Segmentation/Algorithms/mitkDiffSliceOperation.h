@@ -17,17 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDiffSliceOperation_h_Included
 #define mitkDiffSliceOperation_h_Included
 
-#include <MitkSegmentationExports.h>
 #include "mitkCompressedImageContainer.h"
+#include <MitkSegmentationExports.h>
 #include <mitkOperation.h>
 
 #include <vtkSmartPointer.h>
 
-
 namespace mitk
 {
-
-class Image;
+  class Image;
 
   /** \brief An Operation for applying an edited slice to the volume.
     \sa DiffSliceOperationApplier
@@ -43,15 +41,13 @@ class Image;
   */
   class MITKSEGMENTATION_EXPORT DiffSliceOperation : public Operation
   {
-
   public:
-
     mitkClassMacro(DiffSliceOperation, OperationActor);
 
-    //itkFactorylessNewMacro(Self)
-    //itkCloneMacro(Self)
+    // itkFactorylessNewMacro(Self)
+    // itkCloneMacro(Self)
 
-    //mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::PlaneGeometry);
+    // mitkNewMacro4Param(DiffSliceOperation,mitk::Image,mitk::Image,unsigned int, mitk::PlaneGeometry);
 
     /** \brief Creates an empty instance.
       Note that it is not valid yet. The properties of the object have to be set.
@@ -59,38 +55,37 @@ class Image;
     DiffSliceOperation();
 
     /** \brief */
-    DiffSliceOperation( mitk::Image* imageVolume, mitk::Image* slice, SlicedGeometry3D* sliceGeometry, unsigned int timestep, BaseGeometry* currentWorldGeometry);
+    DiffSliceOperation(mitk::Image *imageVolume,
+                       mitk::Image *slice,
+                       SlicedGeometry3D *sliceGeometry,
+                       unsigned int timestep,
+                       BaseGeometry *currentWorldGeometry);
 
     /** \brief Check if it is a valid operation.*/
     bool IsValid();
 
     /** \brief Set the image volume.*/
-    void SetImage(mitk::Image* image){ this->m_Image = image;}
+    void SetImage(mitk::Image *image) { this->m_Image = image; }
     /** \brief Get th image volume.*/
-    mitk::Image* GetImage(){return this->m_Image;}
-
+    mitk::Image *GetImage() { return this->m_Image; }
     /** \brief Set thee slice to be applied.*/
-    void SetImage(vtkImageData* slice){ this->m_Slice = slice;}
+    void SetImage(vtkImageData *slice) { this->m_Slice = slice; }
     /** \brief Get the slice that is applied in the operation.*/
     Image::Pointer GetSlice();
 
     /** \brief Get timeStep.*/
-    void SetTimeStep(unsigned int timestep){this->m_TimeStep = timestep;}
+    void SetTimeStep(unsigned int timestep) { this->m_TimeStep = timestep; }
     /** \brief Set timeStep*/
-    unsigned int GetTimeStep(){return this->m_TimeStep;}
-
+    unsigned int GetTimeStep() { return this->m_TimeStep; }
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetSliceGeometry(SlicedGeometry3D* sliceGeometry){this->m_SliceGeometry = sliceGeometry;}
+    void SetSliceGeometry(SlicedGeometry3D *sliceGeometry) { this->m_SliceGeometry = sliceGeometry; }
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    SlicedGeometry3D* GetSliceGeometry(){return this->m_SliceGeometry;}
-
+    SlicedGeometry3D *GetSliceGeometry() { return this->m_SliceGeometry; }
     /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetCurrentWorldGeometry(BaseGeometry* worldGeometry){this->m_WorldGeometry = worldGeometry;}
+    void SetCurrentWorldGeometry(BaseGeometry *worldGeometry) { this->m_WorldGeometry = worldGeometry; }
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    BaseGeometry* GetWorldGeometry(){return this->m_WorldGeometry;}
-
+    BaseGeometry *GetWorldGeometry() { return this->m_WorldGeometry; }
   protected:
-
     virtual ~DiffSliceOperation();
 
     /** \brief Callback for image observer.*/
@@ -98,7 +93,7 @@ class Image;
 
     CompressedImageContainer::Pointer m_zlibSliceContainer;
 
-    mitk::Image* m_Image;
+    mitk::Image *m_Image;
 
     vtkSmartPointer<vtkImageData> m_Slice;
 
@@ -113,7 +108,6 @@ class Image;
     unsigned long m_DeleteObserverTag;
 
     mitk::BaseGeometry::Pointer m_GuardReferenceGeometry;
-
   };
 }
 #endif

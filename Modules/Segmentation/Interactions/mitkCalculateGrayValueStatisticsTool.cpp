@@ -19,17 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCalculateGrayValueStatisticsTool.xpm"
 
 #include "mitkImageAccessByItk.h"
+#include "mitkImageCast.h"
+#include "mitkImageTimeSelector.h"
 #include "mitkProgressBar.h"
 #include "mitkStatusBar.h"
-#include "mitkImageTimeSelector.h"
-#include "mitkImageCast.h"
 #include "mitkToolManager.h"
 
 #include <itkCommand.h>
 
 #include <itkHistogram.h>
 
-namespace mitk {
+namespace mitk
+{
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, CalculateGrayValueStatisticsTool, "Statistics tool");
 }
 
@@ -41,12 +42,12 @@ mitk::CalculateGrayValueStatisticsTool::~CalculateGrayValueStatisticsTool()
 {
 }
 
-const char** mitk::CalculateGrayValueStatisticsTool::GetXPM() const
+const char **mitk::CalculateGrayValueStatisticsTool::GetXPM() const
 {
   return mitkCalculateGrayValueStatisticsTool_xpm;
 }
 
-const char* mitk::CalculateGrayValueStatisticsTool::GetName() const
+const char *mitk::CalculateGrayValueStatisticsTool::GetName() const
 {
   return "Statistics";
 }
@@ -62,15 +63,17 @@ void mitk::CalculateGrayValueStatisticsTool::StartProcessingAllData()
   m_CompleteReport.str("");
 }
 
-bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData( DataNode* node )
+bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData(DataNode *node)
 {
   if (node)
   {
-    Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
-    if (image.IsNull()) return false;
+    Image::Pointer image = dynamic_cast<Image *>(node->GetData());
+    if (image.IsNull())
+      return false;
 
-    DataNode* referencenode = m_ToolManager->GetReferenceData(0);
-    if (!referencenode) return false;
+    DataNode *referencenode = m_ToolManager->GetReferenceData(0);
+    if (!referencenode)
+      return false;
 
     try
     {
@@ -85,31 +88,31 @@ bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData( DataNode* no
 
       StatusBar::GetInstance()->DisplayText(message.c_str());
 
-      Image::Pointer refImage = dynamic_cast<Image*>( referencenode->GetData() );
-      Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
+      Image::Pointer refImage = dynamic_cast<Image *>(referencenode->GetData());
+      Image::Pointer image = dynamic_cast<Image *>(node->GetData());
 
       m_CompleteReport << "======== Gray value analysis of " << nodename << " ========\n";
 
-      if (image.IsNotNull() && refImage.IsNotNull() )
+      if (image.IsNotNull() && refImage.IsNotNull())
       {
         for (unsigned int timeStep = 0; timeStep < image->GetTimeSteps(); ++timeStep)
         {
           ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-          timeSelector->SetInput( refImage );
-          timeSelector->SetTimeNr( timeStep );
+          timeSelector->SetInput(refImage);
+          timeSelector->SetTimeNr(timeStep);
           timeSelector->UpdateLargestPossibleRegion();
           Image::Pointer refImage3D = timeSelector->GetOutput();
 
           ImageTimeSelector::Pointer timeSelector2 = ImageTimeSelector::New();
-          timeSelector2->SetInput( image );
-          timeSelector2->SetTimeNr( timeStep );
+          timeSelector2->SetInput(image);
+          timeSelector2->SetTimeNr(timeStep);
           timeSelector2->UpdateLargestPossibleRegion();
           Image::Pointer image3D = timeSelector2->GetOutput();
 
-          if (image3D.IsNotNull() && refImage3D.IsNotNull() )
+          if (image3D.IsNotNull() && refImage3D.IsNotNull())
           {
             m_CompleteReport << "=== " << nodename << ", time step " << timeStep << " ===\n";
-            AccessFixedDimensionByItk_2( refImage3D, ITKHistogramming, 3, image3D, m_CompleteReport );
+            AccessFixedDimensionByItk_2(refImage3D, ITKHistogramming, 3, image3D, m_CompleteReport);
           }
         }
       }
@@ -118,7 +121,7 @@ bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData( DataNode* no
 
       ProgressBar::GetInstance()->Progress();
     }
-    catch(...)
+    catch (...)
     {
       return false;
     }
@@ -133,15 +136,16 @@ void mitk::CalculateGrayValueStatisticsTool::FinishProcessingAllData()
 
   // show/send results
   StatisticsCompleted.Send();
-  //MITK_INFO << m_CompleteReport.str() << std::endl;
+  // MITK_INFO << m_CompleteReport.str() << std::endl;
 }
 
-#define ROUND_P(x) ((int)((x)+0.5))
+#define ROUND_P(x) ((int)((x) + 0.5))
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::CalculateGrayValueStatisticsTool::CalculateMinMax(
-    itk::Image<TPixel, VImageDimension>* referenceImage, Image* segmentation, TPixel& minimum,
-    TPixel& maximum)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::CalculateGrayValueStatisticsTool::CalculateMinMax(itk::Image<TPixel, VImageDimension> *referenceImage,
+                                                             Image *segmentation,
+                                                             TPixel &minimum,
+                                                             TPixel &maximum)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
@@ -149,15 +153,12 @@ void mitk::CalculateGrayValueStatisticsTool::CalculateMinMax(
   typename SegmentationType::Pointer segmentationItk;
   CastToItkImage(segmentation, segmentationItk);
 
-  typename SegmentationType::RegionType segmentationRegion =
-      segmentationItk->GetLargestPossibleRegion();
+  typename SegmentationType::RegionType segmentationRegion = segmentationItk->GetLargestPossibleRegion();
 
   segmentationRegion.Crop(referenceImage->GetLargestPossibleRegion());
 
-  itk::ImageRegionConstIteratorWithIndex<SegmentationType> segmentationIterator(segmentationItk,
-      segmentationRegion);
-  itk::ImageRegionConstIteratorWithIndex<ImageType> referenceIterator(referenceImage,
-      segmentationRegion);
+  itk::ImageRegionConstIteratorWithIndex<SegmentationType> segmentationIterator(segmentationItk, segmentationRegion);
+  itk::ImageRegionConstIteratorWithIndex<ImageType> referenceIterator(referenceImage, segmentationRegion);
 
   segmentationIterator.GoToBegin();
   referenceIterator.GoToBegin();
@@ -181,7 +182,6 @@ void mitk::CalculateGrayValueStatisticsTool::CalculateMinMax(
 
       if (segmentationIterator.Get() > 0)
       {
-
         if (referenceIterator.Get() < minimum)
           minimum = referenceIterator.Get();
         if (referenceIterator.Get() > maximum)
@@ -191,27 +191,26 @@ void mitk::CalculateGrayValueStatisticsTool::CalculateMinMax(
 
     ++segmentationIterator;
   }
-
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
-    itk::Image<TPixel, VImageDimension>* referenceImage, Image* segmentation,
-    std::stringstream& report)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(itk::Image<TPixel, VImageDimension> *referenceImage,
+                                                              Image *segmentation,
+                                                              std::stringstream &report)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
 
   typename SegmentationType::Pointer segmentationItk;
-  CastToItkImage( segmentation, segmentationItk );
+  CastToItkImage(segmentation, segmentationItk);
 
   // generate histogram
   typename SegmentationType::RegionType segmentationRegion = segmentationItk->GetLargestPossibleRegion();
 
-  segmentationRegion.Crop( referenceImage->GetLargestPossibleRegion() );
+  segmentationRegion.Crop(referenceImage->GetLargestPossibleRegion());
 
-  itk::ImageRegionConstIteratorWithIndex< SegmentationType > segmentationIterator( segmentationItk, segmentationRegion);
-  itk::ImageRegionConstIteratorWithIndex< ImageType >        referenceIterator( referenceImage, segmentationRegion);
+  itk::ImageRegionConstIteratorWithIndex<SegmentationType> segmentationIterator(segmentationItk, segmentationRegion);
+  itk::ImageRegionConstIteratorWithIndex<ImageType> referenceIterator(referenceImage, segmentationRegion);
 
   segmentationIterator.GoToBegin();
   referenceIterator.GoToBegin();
@@ -223,14 +222,14 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
 
   CalculateMinMax(referenceImage, segmentation, minimum, maximum);
 
-  //initialize the histogram to the range of the cropped region
+  // initialize the histogram to the range of the cropped region
   HistogramType::SizeType size;
 #if defined(ITK_USE_REVIEW_STATISTICS)
   typedef typename HistogramType::SizeType::ValueType HSizeValueType;
 #else
   typedef typename HistogramType::SizeType::SizeValueType HSizeValueType;
 #endif
-  size.Fill(static_cast<HSizeValueType> (maximum - minimum + 1));
+  size.Fill(static_cast<HSizeValueType>(maximum - minimum + 1));
   HistogramType::MeasurementVectorType lowerBound;
   HistogramType::MeasurementVectorType upperBound;
   lowerBound[0] = minimum;
@@ -241,30 +240,31 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
   double sd(0.0);
   double voxelCount(0.0);
 
-  //iterate through the cropped region add the values to the histogram
+  // iterate through the cropped region add the values to the histogram
   while (!segmentationIterator.IsAtEnd())
   {
-    itk::Point< float, 3 > pt;
-    segmentationItk->TransformIndexToPhysicalPoint( segmentationIterator.GetIndex(), pt );
+    itk::Point<float, 3> pt;
+    segmentationItk->TransformIndexToPhysicalPoint(segmentationIterator.GetIndex(), pt);
 
     typename ImageType::IndexType ind;
     itk::ContinuousIndex<float, 3> contInd;
     if (referenceImage->TransformPhysicalPointToContinuousIndex(pt, contInd))
     {
-      for (unsigned int i = 0; i < 3; ++i) ind[i] = ROUND_P(contInd[i]);
+      for (unsigned int i = 0; i < 3; ++i)
+        ind[i] = ROUND_P(contInd[i]);
 
-      referenceIterator.SetIndex( ind );
+      referenceIterator.SetIndex(ind);
 
-      if ( segmentationIterator.Get() > 0 )
+      if (segmentationIterator.Get() > 0)
       {
         HistogramType::MeasurementVectorType currentMeasurementVector;
 
-        currentMeasurementVector[0]
-            = static_cast<HistogramType::MeasurementType> (referenceIterator.Get());
+        currentMeasurementVector[0] = static_cast<HistogramType::MeasurementType>(referenceIterator.Get());
         m_ITKHistogram->IncreaseFrequencyOfMeasurement(currentMeasurementVector, 1);
 
-        mean = (mean * (static_cast<double> (voxelCount) / static_cast<double> (voxelCount + 1))) // 3 points:   old center * 2/3 + currentPoint * 1/3;
-            + static_cast<double> (referenceIterator.Get()) / static_cast<double> (voxelCount + 1);
+        mean = (mean * (static_cast<double>(voxelCount) /
+                        static_cast<double>(voxelCount + 1))) // 3 points:   old center * 2/3 + currentPoint * 1/3;
+               + static_cast<double>(referenceIterator.Get()) / static_cast<double>(voxelCount + 1);
 
         voxelCount += 1.0;
       }
@@ -276,22 +276,24 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
   // second pass for SD
   segmentationIterator.GoToBegin();
   referenceIterator.GoToBegin();
-  while ( !segmentationIterator.IsAtEnd() )
+  while (!segmentationIterator.IsAtEnd())
   {
-    itk::Point< float, 3 > pt;
-    segmentationItk->TransformIndexToPhysicalPoint( segmentationIterator.GetIndex(), pt );
+    itk::Point<float, 3> pt;
+    segmentationItk->TransformIndexToPhysicalPoint(segmentationIterator.GetIndex(), pt);
 
     typename ImageType::IndexType ind;
     itk::ContinuousIndex<float, 3> contInd;
     if (referenceImage->TransformPhysicalPointToContinuousIndex(pt, contInd))
     {
-      for (unsigned int i = 0; i < 3; ++i) ind[i] = ROUND_P(contInd[i]);
+      for (unsigned int i = 0; i < 3; ++i)
+        ind[i] = ROUND_P(contInd[i]);
 
-      referenceIterator.SetIndex( ind );
+      referenceIterator.SetIndex(ind);
 
-      if ( segmentationIterator.Get() > 0 )
+      if (segmentationIterator.Get() > 0)
       {
-        sd += ((static_cast<double>(referenceIterator.Get() ) - mean)*(static_cast<double>(referenceIterator.Get() ) - mean));
+        sd += ((static_cast<double>(referenceIterator.Get()) - mean) *
+               (static_cast<double>(referenceIterator.Get()) - mean));
       }
     }
 
@@ -299,7 +301,7 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
   }
 
   sd /= static_cast<double>(voxelCount - 1);
-  sd = sqrt( sd );
+  sd = sqrt(sd);
 
   // generate quantiles
   TPixel histogramQuantileValues[5];
@@ -314,16 +316,10 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
   std::locale originalLocale = report.getloc();
   report.imbue(C);
 
-  report   << "         Minimum:" << minimum
-           << "\n  5% quantile: " << histogramQuantileValues[0]
-           << "\n 25% quantile: " << histogramQuantileValues[1]
-           << "\n 50% quantile: " << histogramQuantileValues[2]
-           << "\n 75% quantile: " << histogramQuantileValues[3]
-           << "\n 95% quantile: " << histogramQuantileValues[4]
-           << "\n      Maximum: " << maximum
-           << "\n         Mean: " << mean
-           << "\n           SD: " << sd
-           << "\n";
+  report << "         Minimum:" << minimum << "\n  5% quantile: " << histogramQuantileValues[0]
+         << "\n 25% quantile: " << histogramQuantileValues[1] << "\n 50% quantile: " << histogramQuantileValues[2]
+         << "\n 75% quantile: " << histogramQuantileValues[3] << "\n 95% quantile: " << histogramQuantileValues[4]
+         << "\n      Maximum: " << maximum << "\n         Mean: " << mean << "\n           SD: " << sd << "\n";
 
   report.imbue(originalLocale);
 }
@@ -333,8 +329,8 @@ std::string mitk::CalculateGrayValueStatisticsTool::GetReport() const
   return m_CompleteReport.str();
 }
 
-mitk::CalculateGrayValueStatisticsTool::HistogramType::ConstPointer mitk::CalculateGrayValueStatisticsTool::GetHistogram()
+mitk::CalculateGrayValueStatisticsTool::HistogramType::ConstPointer
+  mitk::CalculateGrayValueStatisticsTool::GetHistogram()
 {
   return m_ITKHistogram.GetPointer();
 }
-

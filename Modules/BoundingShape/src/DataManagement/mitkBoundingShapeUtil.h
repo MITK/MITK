@@ -21,8 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkBaseGeometry.h>
 #include <mitkInteractionConst.h>
 
-
-
 namespace mitk
 {
   /**

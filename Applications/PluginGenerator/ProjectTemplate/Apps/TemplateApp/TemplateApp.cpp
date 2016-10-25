@@ -4,7 +4,7 @@ $(license)
 
 #include <QVariant>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   // Create a QApplication instance first
   mitk::BaseApplication myApp(argc, argv);

@@ -20,30 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-PlanarFigureIOFactory::PlanarFigureIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkPlanarFigureReader",
-                         "mitk PlanarFigure IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<PlanarFigureReader> >::New());
-}
+  PlanarFigureIOFactory::PlanarFigureIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkPlanarFigureReader",
+                           "mitk PlanarFigure IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<PlanarFigureReader>>::New());
+  }
 
-PlanarFigureIOFactory::~PlanarFigureIOFactory()
-{
-}
-
-const char* PlanarFigureIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* PlanarFigureIOFactory::GetDescription() const
-{
-  return "PlanarFigure IO Factory, allows the loading of .pf files";
-}
+  PlanarFigureIOFactory::~PlanarFigureIOFactory() {}
+  const char *PlanarFigureIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *PlanarFigureIOFactory::GetDescription() const
+  {
+    return "PlanarFigure IO Factory, allows the loading of .pf files";
+  }
 
 } // end namespace mitk

@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkAmoebaOptimizer.h>
 
-QmitkAmoebaOptimizerView::QmitkAmoebaOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(15)
+QmitkAmoebaOptimizerView::QmitkAmoebaOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(15)
 {
 }
 
@@ -35,19 +35,20 @@ mitk::OptimizerParameters::OptimizerType QmitkAmoebaOptimizerView::GetOptimizerT
 itk::Object::Pointer QmitkAmoebaOptimizerView::GetOptimizer()
 {
   itk::AmoebaOptimizer::Pointer OptimizerPointer = itk::AmoebaOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
-  OptimizerPointer->SetParametersConvergenceTolerance(m_Controls.m_ParametersConvergenceToleranceAmoeba->text().toFloat());
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
+  OptimizerPointer->SetParametersConvergenceTolerance(
+    m_Controls.m_ParametersConvergenceToleranceAmoeba->text().toFloat());
   OptimizerPointer->SetFunctionConvergenceTolerance(m_Controls.m_FunctionConvergenceToleranceAmoeba->text().toFloat());
   typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
-  OptimizerType::ParametersType simplexDelta( m_NumberTransformParameters );
+  OptimizerType::ParametersType simplexDelta(m_NumberTransformParameters);
   itk::Array<double> simplexDeltaAmoeba = this->GetOptimizerParameters();
   for (int i = 0; i < m_NumberTransformParameters; i++)
   {
-    simplexDelta[i] = simplexDeltaAmoeba[i+1];
+    simplexDelta[i] = simplexDeltaAmoeba[i + 1];
   }
   OptimizerPointer->AutomaticInitialSimplexOff();
-  OptimizerPointer->SetInitialSimplexDelta( simplexDelta );
-  OptimizerPointer->SetMaximumNumberOfIterations( m_Controls.m_IterationsAmoeba->text().toInt() );
+  OptimizerPointer->SetInitialSimplexDelta(simplexDelta);
+  OptimizerPointer->SetMaximumNumberOfIterations(m_Controls.m_IterationsAmoeba->text().toInt());
   return OptimizerPointer.GetPointer();
 }
 
@@ -112,12 +113,12 @@ QString QmitkAmoebaOptimizerView::GetName()
   return "Amoeba";
 }
 
-void QmitkAmoebaOptimizerView::SetupUI(QWidget* parent)
+void QmitkAmoebaOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_IterationsAmoeba->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_SimplexDeltaAmoeba1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_SimplexDeltaAmoeba2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_SimplexDeltaAmoeba3->setValidator(validatorLineEditInputFloat);

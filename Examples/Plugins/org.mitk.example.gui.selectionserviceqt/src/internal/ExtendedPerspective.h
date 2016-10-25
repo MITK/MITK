@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef EXTENDEDPERSPECTIVE_H_
 #define EXTENDEDPERSPECTIVE_H_
 
@@ -30,9 +29,7 @@ class ExtendedPerspective : public QObject, public berry::IPerspectiveFactory
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
-
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
-
 };
 
 #endif /* EXTENDEDPERSPECTIVE_H_ */

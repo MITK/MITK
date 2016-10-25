@@ -28,9 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <iostream>
 //
 //
-//class ExtractionTesting{
+// class ExtractionTesting{
 //
-//public:
+// public:
 //
 //  struct Testcase
 //  {
@@ -83,7 +83,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //    renderWindow->AddRenderer(renderer);
 //
 //    // Setup render window interactor
-//    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+//    vtkSmartPointer<vtkRenderWindowInteractor>::New();
 //    vtkSmartPointer<vtkInteractorStyleImage> style = vtkSmartPointer<vtkInteractorStyleImage>::New();
 //    renderWindowInteractor->SetInteractorStyle(style);
 //
@@ -185,7 +186,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //    return tests;
 //  }
 //
-//protected:
+// protected:
 //
 //  static mitk::Image::Pointer GetImageToTest(std::string filename){
 //    //retrieve referenceImage
@@ -221,27 +222,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //  static mitk::Geometry2D::Pointer TestCoronal()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //  static mitk::Geometry2D::Pointer TestAxial()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test_u_Rotation()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test_v_Rotation()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //  static mitk::Geometry2D::Pointer TestTwoDirectionalRotation()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test4DImage()
@@ -251,12 +252,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //
 //  static mitk::Geometry2D::Pointer Test2DImage()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test1DImage()
 //  {
-//return NULL;
+// return NULL;
 //  }
 //
 //};
@@ -270,7 +271,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // *  tests, argv is either empty for the simple tests or contains the filename
 // *  of a test image for the image tests (see CMakeLists.txt).
 // */
-//int mitkExtractDirectedPlaneImageFilterTest(int /* argc */, char* /*argv*/[])
+// int mitkExtractDirectedPlaneImageFilterTest(int /* argc */, char* /*argv*/[])
 //{
 //  // always start with this!
 //  MITK_TEST_BEGIN("mitkExtractDirectedPlaneImageFilter")

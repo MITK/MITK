@@ -15,245 +15,240 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPropertyListsXmlFileReaderAndWriter.h"
-#include "mitkStandaloneDataStorage.h"
 #include "mitkProperties.h"
-#include <tinyxml.h>
+#include "mitkStandaloneDataStorage.h"
 #include <itksys/SystemTools.hxx>
+#include <tinyxml.h>
 
 namespace mitk
 {
-
-bool PropertyListsXmlFileReaderAndWriter::PropertyFromXmlElem(std::string& name, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem) const
-{
-    if(!elem)
+  bool PropertyListsXmlFileReaderAndWriter::PropertyFromXmlElem(std::string &name,
+                                                                mitk::BaseProperty::Pointer &prop,
+                                                                TiXmlElement *elem) const
+  {
+    if (!elem)
     {
-        return false;
+      return false;
     }
 
     bool readOp = false;
     std::string type = "";
     readOp = elem->QueryStringAttribute("type", &type) == TIXML_SUCCESS;
-    if( readOp )
-        readOp = elem->QueryStringAttribute("name", &name) == TIXML_SUCCESS;
+    if (readOp)
+      readOp = elem->QueryStringAttribute("name", &name) == TIXML_SUCCESS;
     else
-        MITK_WARN << "type" << " attribute not found in a property";
+      MITK_WARN << "type"
+                << " attribute not found in a property";
 
-    if( readOp )
+    if (readOp)
     {
-        if( type == "BoolProperty" )
+      if (type == "BoolProperty")
+      {
+        int val = 0;
+        readOp = elem->QueryIntAttribute("value", &val) == TIXML_SUCCESS;
+        if (readOp)
         {
-            int val = 0;
-            readOp = elem->QueryIntAttribute("value", &val) == TIXML_SUCCESS;
-            if( readOp )
-            {
-                prop = mitk::BoolProperty::New(val==1?true: false);
-            }
+          prop = mitk::BoolProperty::New(val == 1 ? true : false);
         }
-        else if( type == "StringProperty" )
+      }
+      else if (type == "StringProperty")
+      {
+        std::string val = "";
+        readOp = elem->QueryStringAttribute("value", &val) == TIXML_SUCCESS;
+        if (readOp)
         {
-            std::string val = "";
-            readOp = elem->QueryStringAttribute("value", &val) == TIXML_SUCCESS;
-            if( readOp )
-            {
-                prop = mitk::StringProperty::New(val);
-            }
+          prop = mitk::StringProperty::New(val);
         }
-        else if( type == "IntProperty" )
+      }
+      else if (type == "IntProperty")
+      {
+        int val = 0;
+        readOp = elem->QueryIntAttribute("value", &val) == TIXML_SUCCESS;
+        if (readOp)
         {
-            int val = 0;
-            readOp = elem->QueryIntAttribute("value", &val) == TIXML_SUCCESS;
-            if( readOp )
-            {
-                prop = mitk::IntProperty::New(val);
-            }
+          prop = mitk::IntProperty::New(val);
         }
-        else if( type == "DoubleProperty" )
+      }
+      else if (type == "DoubleProperty")
+      {
+        double val = 0;
+        readOp = elem->QueryDoubleAttribute("value", &val) == TIXML_SUCCESS;
+        if (readOp)
         {
-            double val = 0;
-            readOp = elem->QueryDoubleAttribute("value", &val) == TIXML_SUCCESS;
-            if( readOp )
-            {
-                prop = mitk::DoubleProperty::New(val);
-            }
-
+          prop = mitk::DoubleProperty::New(val);
         }
-        else if( type == "FloatProperty" )
+      }
+      else if (type == "FloatProperty")
+      {
+        float val = 0;
+        readOp = elem->QueryFloatAttribute("value", &val) == TIXML_SUCCESS;
+        if (readOp)
         {
-            float val = 0;
-            readOp = elem->QueryFloatAttribute("value", &val) == TIXML_SUCCESS;
-            if( readOp )
-            {
-                prop = mitk::FloatProperty::New(val);
-            }
+          prop = mitk::FloatProperty::New(val);
         }
-        else
-        {
-            readOp = false;
-            MITK_WARN << "type" << " attribute unknown. Only BoolProperty, StringProperty, IntProperty, DoubleProperty or FloatProperty allowed.";
-        }
+      }
+      else
+      {
+        readOp = false;
+        MITK_WARN << "type"
+                  << " attribute unknown. Only BoolProperty, StringProperty, IntProperty, DoubleProperty or "
+                     "FloatProperty allowed.";
+      }
     }
     else
-        MITK_WARN << "name" << " attribute not found in a property";
+      MITK_WARN << "name"
+                << " attribute not found in a property";
 
-    if( !readOp )
-        MITK_WARN << "value" << " attribute not found in a property";
+    if (!readOp)
+      MITK_WARN << "value"
+                << " attribute not found in a property";
 
     return readOp;
-
-}
-bool PropertyListsXmlFileReaderAndWriter::PropertyToXmlElem(const std::string& name, const mitk::BaseProperty* prop, TiXmlElement* elem)  const
-{
-    if(!prop || !elem)
+  }
+  bool PropertyListsXmlFileReaderAndWriter::PropertyToXmlElem(const std::string &name,
+                                                              const mitk::BaseProperty *prop,
+                                                              TiXmlElement *elem) const
+  {
+    if (!prop || !elem)
     {
-        return false;
+      return false;
     }
 
-    const mitk::IntProperty* intProp = nullptr;
-    const mitk::FloatProperty* floatProp = nullptr;
-    const mitk::DoubleProperty* doubleProp = nullptr;
-    const mitk::BoolProperty* boolProp = nullptr;
-    const mitk::StringProperty* stringProp = nullptr;
+    const mitk::IntProperty *intProp = nullptr;
+    const mitk::FloatProperty *floatProp = nullptr;
+    const mitk::DoubleProperty *doubleProp = nullptr;
+    const mitk::BoolProperty *boolProp = nullptr;
+    const mitk::StringProperty *stringProp = nullptr;
     bool writeOp = true;
 
-    if( (boolProp = dynamic_cast<const BoolProperty*>( prop  ) ) )
+    if ((boolProp = dynamic_cast<const BoolProperty *>(prop)))
     {
-        elem->SetAttribute(GetPropertyListIdElementName(), name);
-        elem->SetAttribute("value", boolProp->GetValue()? 1: 0);
-        elem->SetAttribute("type", "BoolProperty");
+      elem->SetAttribute(GetPropertyListIdElementName(), name);
+      elem->SetAttribute("value", boolProp->GetValue() ? 1 : 0);
+      elem->SetAttribute("type", "BoolProperty");
     }
-    else if( (stringProp = dynamic_cast<const StringProperty*>( prop  ) ) )
+    else if ((stringProp = dynamic_cast<const StringProperty *>(prop)))
     {
-        elem->SetAttribute(GetPropertyListIdElementName(), name);
-        elem->SetAttribute("value", stringProp->GetValue());
-        elem->SetAttribute("type", "StringProperty");
+      elem->SetAttribute(GetPropertyListIdElementName(), name);
+      elem->SetAttribute("value", stringProp->GetValue());
+      elem->SetAttribute("type", "StringProperty");
     }
-    else if( (intProp = dynamic_cast<const IntProperty*>( prop ) ) )
+    else if ((intProp = dynamic_cast<const IntProperty *>(prop)))
     {
-        elem->SetAttribute(GetPropertyListIdElementName(), name);
-        elem->SetAttribute("value", intProp->GetValue());
-        elem->SetAttribute("type", "IntProperty");
+      elem->SetAttribute(GetPropertyListIdElementName(), name);
+      elem->SetAttribute("value", intProp->GetValue());
+      elem->SetAttribute("type", "IntProperty");
     }
-    else if( (doubleProp = dynamic_cast<const DoubleProperty*>( prop  ) ) )
+    else if ((doubleProp = dynamic_cast<const DoubleProperty *>(prop)))
     {
-        elem->SetAttribute(GetPropertyListIdElementName(), name);
-        elem->SetDoubleAttribute("value", doubleProp->GetValue());
-        elem->SetAttribute("type", "DoubleProperty");
+      elem->SetAttribute(GetPropertyListIdElementName(), name);
+      elem->SetDoubleAttribute("value", doubleProp->GetValue());
+      elem->SetAttribute("type", "DoubleProperty");
     }
-    else if( (floatProp = dynamic_cast<const FloatProperty*>( prop ) ) )
+    else if ((floatProp = dynamic_cast<const FloatProperty *>(prop)))
     {
-        elem->SetAttribute(GetPropertyListIdElementName(), name);
-        elem->SetDoubleAttribute("value", static_cast<float>( floatProp->GetValue() ) );
-        elem->SetAttribute("type", "FloatProperty");
+      elem->SetAttribute(GetPropertyListIdElementName(), name);
+      elem->SetDoubleAttribute("value", static_cast<float>(floatProp->GetValue()));
+      elem->SetAttribute("type", "FloatProperty");
     }
     else
     {
-        MITK_WARN("PropertyListImportFromXmlFile") << "Base property " << name << " is unknown";
-        writeOp = false;
+      MITK_WARN("PropertyListImportFromXmlFile") << "Base property " << name << " is unknown";
+      writeOp = false;
     }
     return writeOp;
-}
-bool PropertyListsXmlFileReaderAndWriter::WriteLists( const std::string& fileName, const std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const
-{
-
+  }
+  bool PropertyListsXmlFileReaderAndWriter::WriteLists(
+    const std::string &fileName, const std::map<std::string, mitk::PropertyList::Pointer> &_PropertyLists) const
+  {
     TiXmlDocument doc;
 
-    auto  decl = new TiXmlDeclaration( "1.0", "", "" );
-    doc.LinkEndChild( decl );
+    auto decl = new TiXmlDeclaration("1.0", "", "");
+    doc.LinkEndChild(decl);
     // create root
-    auto  propertyListsElem = new TiXmlElement( "PropertyLists" );
+    auto propertyListsElem = new TiXmlElement("PropertyLists");
 
     bool allPropsConverted = true;
     auto it = _PropertyLists.begin();
-    while( it != _PropertyLists.end() )
+    while (it != _PropertyLists.end())
     {
-        const std::string& id = (*it).first;
-        const PropertyList* propList = (*it).second;
-        auto  propertyListElem = new TiXmlElement( "PropertyList" );
-        propertyListElem->SetAttribute(GetPropertyListIdElementName(), id);
+      const std::string &id = (*it).first;
+      const PropertyList *propList = (*it).second;
+      auto propertyListElem = new TiXmlElement("PropertyList");
+      propertyListElem->SetAttribute(GetPropertyListIdElementName(), id);
 
-        const std::map< std::string, BaseProperty::Pointer>* propMap = propList->GetMap();
-        auto propMapIt = propMap->begin();
-        while( propMapIt != propMap->end() )
-        {
-            const std::string& propName = (*propMapIt).first;
-            const BaseProperty* prop = (*propMapIt).second;
-            auto  propertyElem = new TiXmlElement( "Property" );
+      const std::map<std::string, BaseProperty::Pointer> *propMap = propList->GetMap();
+      auto propMapIt = propMap->begin();
+      while (propMapIt != propMap->end())
+      {
+        const std::string &propName = (*propMapIt).first;
+        const BaseProperty *prop = (*propMapIt).second;
+        auto propertyElem = new TiXmlElement("Property");
 
-            if( !this->PropertyToXmlElem(propName, prop, propertyElem) )
-                allPropsConverted = false;
+        if (!this->PropertyToXmlElem(propName, prop, propertyElem))
+          allPropsConverted = false;
 
-            propertyListElem->LinkEndChild(propertyElem);
-            ++propMapIt;
-        }
+        propertyListElem->LinkEndChild(propertyElem);
+        ++propMapIt;
+      }
 
-        propertyListsElem->LinkEndChild(propertyListElem);
-        ++it;
+      propertyListsElem->LinkEndChild(propertyListElem);
+      ++it;
     }
 
-    doc.LinkEndChild( propertyListsElem );
+    doc.LinkEndChild(propertyListsElem);
 
-    return ( allPropsConverted && doc.SaveFile( fileName.c_str() ) );
-}
-bool PropertyListsXmlFileReaderAndWriter::ReadLists( const std::string& fileName, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists )  const
-{
+    return (allPropsConverted && doc.SaveFile(fileName.c_str()));
+  }
+  bool PropertyListsXmlFileReaderAndWriter::ReadLists(
+    const std::string &fileName, std::map<std::string, mitk::PropertyList::Pointer> &_PropertyLists) const
+  {
     // reread
-    TiXmlDocument doc( fileName );
+    TiXmlDocument doc(fileName);
     doc.LoadFile();
 
-    TiXmlHandle docHandle( &doc );
-    TiXmlElement* elem = docHandle.FirstChildElement( "PropertyLists" ).FirstChildElement( "PropertyList" ).ToElement();
+    TiXmlHandle docHandle(&doc);
+    TiXmlElement *elem = docHandle.FirstChildElement("PropertyLists").FirstChildElement("PropertyList").ToElement();
 
-    if(!elem)
+    if (!elem)
     {
-        MITK_WARN("PropertyListFromXml") << "Cannot find a PropertyList element (inside a PropertyLists element)";
-        return false;
+      MITK_WARN("PropertyListFromXml") << "Cannot find a PropertyList element (inside a PropertyLists element)";
+      return false;
     }
 
     bool opRead = false;
-    while(elem)
+    while (elem)
     {
-        std::string propListId;
-        opRead = elem->QueryStringAttribute( GetPropertyListIdElementName(), &propListId ) == TIXML_SUCCESS;
-        if( !opRead )
-            break;
+      std::string propListId;
+      opRead = elem->QueryStringAttribute(GetPropertyListIdElementName(), &propListId) == TIXML_SUCCESS;
+      if (!opRead)
+        break;
 
-        mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
+      mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
 
-        TiXmlElement* propElem = elem->FirstChildElement("Property");
+      TiXmlElement *propElem = elem->FirstChildElement("Property");
 
-        while(propElem)
-        {
-            std::string name;
-            mitk::BaseProperty::Pointer prop;
-            opRead = this->PropertyFromXmlElem( name, prop, propElem );
-            if(!opRead)
-                break;
-            propList->SetProperty( name, prop );
-            propElem = propElem->NextSiblingElement( "Property" );
-        }
+      while (propElem)
+      {
+        std::string name;
+        mitk::BaseProperty::Pointer prop;
+        opRead = this->PropertyFromXmlElem(name, prop, propElem);
+        if (!opRead)
+          break;
+        propList->SetProperty(name, prop);
+        propElem = propElem->NextSiblingElement("Property");
+      }
 
-        if( !opRead )
-            break;
-        _PropertyLists[propListId] = propList;
-        elem = elem->NextSiblingElement( "PropertyList" );
+      if (!opRead)
+        break;
+      _PropertyLists[propListId] = propList;
+      elem = elem->NextSiblingElement("PropertyList");
     }
 
     return opRead;
-}
+  }
 
-PropertyListsXmlFileReaderAndWriter::PropertyListsXmlFileReaderAndWriter()
-{
-
-}
-
-PropertyListsXmlFileReaderAndWriter::~PropertyListsXmlFileReaderAndWriter()
-{
-
-}
-
-const char* PropertyListsXmlFileReaderAndWriter::GetPropertyListIdElementName()
-{
-  return "name";
-}
-
+  PropertyListsXmlFileReaderAndWriter::PropertyListsXmlFileReaderAndWriter() {}
+  PropertyListsXmlFileReaderAndWriter::~PropertyListsXmlFileReaderAndWriter() {}
+  const char *PropertyListsXmlFileReaderAndWriter::GetPropertyListIdElementName() { return "name"; }
 }

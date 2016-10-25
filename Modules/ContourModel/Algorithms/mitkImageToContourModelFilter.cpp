@@ -17,93 +17,79 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageToContourModelFilter.h"
 #include "mitkImageAccessByItk.h"
 
-#include <itkContourExtractor2DImageFilter.h>
 #include <itkConstantPadImageFilter.h>
+#include <itkContourExtractor2DImageFilter.h>
 
-
-
-mitk::ImageToContourModelFilter::ImageToContourModelFilter()
-  : m_SliceGeometry(nullptr),
-    m_ContourValue(0.5)
+mitk::ImageToContourModelFilter::ImageToContourModelFilter() : m_SliceGeometry(nullptr), m_ContourValue(0.5)
 {
 }
-
-
 
 mitk::ImageToContourModelFilter::~ImageToContourModelFilter()
 {
-
 }
 
-
-
-void mitk::ImageToContourModelFilter::SetInput ( const mitk::ImageToContourModelFilter::InputType* input )
+void mitk::ImageToContourModelFilter::SetInput(const mitk::ImageToContourModelFilter::InputType *input)
 {
-  this->SetInput( 0, input );
+  this->SetInput(0, input);
 }
 
-
-
-void mitk::ImageToContourModelFilter::SetInput ( unsigned int idx, const mitk::ImageToContourModelFilter::InputType* input )
+void mitk::ImageToContourModelFilter::SetInput(unsigned int idx,
+                                               const mitk::ImageToContourModelFilter::InputType *input)
 {
-  if ( idx + 1 > this->GetNumberOfInputs() )
+  if (idx + 1 > this->GetNumberOfInputs())
   {
     this->SetNumberOfRequiredInputs(idx + 1);
   }
-  if ( input != static_cast<InputType*> ( this->ProcessObject::GetInput ( idx ) ) )
+  if (input != static_cast<InputType *>(this->ProcessObject::GetInput(idx)))
   {
-    this->ProcessObject::SetNthInput ( idx, const_cast<InputType*> ( input ) );
+    this->ProcessObject::SetNthInput(idx, const_cast<InputType *>(input));
     this->Modified();
   }
 }
 
-
-
-const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( void )
+const mitk::ImageToContourModelFilter::InputType *mitk::ImageToContourModelFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
     return nullptr;
-  return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(0));
+  return static_cast<const mitk::ImageToContourModelFilter::InputType *>(this->ProcessObject::GetInput(0));
 }
 
-
-
-const mitk::ImageToContourModelFilter::InputType* mitk::ImageToContourModelFilter::GetInput( unsigned int idx )
+const mitk::ImageToContourModelFilter::InputType *mitk::ImageToContourModelFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
     return nullptr;
-  return static_cast<const mitk::ImageToContourModelFilter::InputType*>(this->ProcessObject::GetInput(idx));
+  return static_cast<const mitk::ImageToContourModelFilter::InputType *>(this->ProcessObject::GetInput(idx));
 }
-
 
 void mitk::ImageToContourModelFilter::SetContourValue(float contourValue)
 {
-    this->m_ContourValue = contourValue;
-    this->Modified();
+  this->m_ContourValue = contourValue;
+  this->Modified();
 }
-
 
 float mitk::ImageToContourModelFilter::GetContourValue()
 {
-    return this->m_ContourValue;
+  return this->m_ContourValue;
 }
-
 
 void mitk::ImageToContourModelFilter::GenerateData()
 {
   mitk::Image::ConstPointer sliceImage = this->GetInput();
 
-  if ( !sliceImage )
+  if (!sliceImage)
   {
     MITK_ERROR << "mitk::ImageToContourModelFilter: No input available. Please set the input!" << std::endl;
     itkExceptionMacro("mitk::ImageToContourModelFilter: No input available. Please set the input!");
     return;
   }
 
-  if ( sliceImage->GetDimension() > 2 || sliceImage->GetDimension() < 2)
+  if (sliceImage->GetDimension() > 2 || sliceImage->GetDimension() < 2)
   {
-    MITK_ERROR << "mitk::ImageToContourModelFilter::GenerateData() works only with 2D images. Please assure that your input image is 2D!" << std::endl;
-    itkExceptionMacro("mitk::ImageToContourModelFilter::GenerateData() works only with 2D images. Please assure that your input image is 2D!");
+    MITK_ERROR << "mitk::ImageToContourModelFilter::GenerateData() works only with 2D images. Please assure that your "
+                  "input image is 2D!"
+               << std::endl;
+    itkExceptionMacro("mitk::ImageToContourModelFilter::GenerateData() works only with 2D images. Please assure that "
+                      "your input image is 2D!");
     return;
   }
 
@@ -112,8 +98,8 @@ void mitk::ImageToContourModelFilter::GenerateData()
   AccessFixedDimensionByItk(sliceImage, Itk2DContourExtraction, 2);
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::ImageToContourModelFilter::Itk2DContourExtraction(const itk::Image<TPixel, VImageDimension> *sliceImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::ContourExtractor2DImageFilter<ImageType> ContourExtractor;
@@ -152,7 +138,7 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
 
   for (unsigned int i = 0; i < foundPaths; i++)
   {
-    const ContourPath* currentPath = contourExtractor->GetOutput(i)->GetVertexList();
+    const ContourPath *currentPath = contourExtractor->GetOutput(i)->GetVertexList();
 
     mitk::Point3D currentPoint;
     mitk::Point3D currentWorldPoint;
@@ -160,7 +146,7 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
     mitk::ContourModel::Pointer contour = this->GetOutput(i);
     if (contour.IsNull())
     {
-        contour = mitk::ContourModel::New();
+      contour = mitk::ContourModel::New();
     }
 
     if (contour.IsNull())
@@ -168,7 +154,6 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
 
     for (unsigned int j = 0; j < currentPath->Size(); j++)
     {
-
       currentPoint[0] = currentPath->ElementAt(j)[0];
       currentPoint[1] = currentPath->ElementAt(j)[1];
       currentPoint[2] = 0;
@@ -176,9 +161,9 @@ void mitk::ImageToContourModelFilter::Itk2DContourExtraction (const itk::Image<T
       m_SliceGeometry->IndexToWorld(currentPoint, currentWorldPoint);
 
       contour->AddVertex(currentWorldPoint);
-    }//for2
+    } // for2
 
     contour->Close();
 
-  }//for1
+  } // for1
 }

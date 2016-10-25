@@ -17,23 +17,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKPIECEWISEFUNCTIONCANVAS_H_INCLUDED
 #define QMITKPIECEWISEFUNCTIONCANVAS_H_INCLUDED
 
-#include "QmitkTransferFunctionCanvas.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "QmitkTransferFunctionCanvas.h"
 
 #include <vtkPiecewiseFunction.h>
 
-class MITKQTWIDGETSEXT_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
+class MITKQTWIDGETSEXT_EXPORT QmitkPiecewiseFunctionCanvas : public QmitkTransferFunctionCanvas
 {
-Q_OBJECT
+  Q_OBJECT
 
 public:
+  QmitkPiecewiseFunctionCanvas(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  virtual void paintEvent(QPaintEvent *e) override;
+  void SetTitle(const QString &title);
+  int GetNearHandle(int x, int y, unsigned int maxSquaredDistance = 32) override;
 
-  QmitkPiecewiseFunctionCanvas( QWidget * parent=nullptr,  Qt::WindowFlags f = nullptr );
-  virtual void paintEvent( QPaintEvent* e ) override;
-  void SetTitle(const QString& title);
-  int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32) override;
-
-  void SetPiecewiseFunction(vtkPiecewiseFunction* piecewiseFunction)
+  void SetPiecewiseFunction(vtkPiecewiseFunction *piecewiseFunction)
   {
     this->m_PiecewiseFunction = piecewiseFunction;
     this->SetMin(m_PiecewiseFunction->GetRange()[0]);
@@ -43,11 +42,7 @@ public:
     update();
   }
 
-  int AddFunctionPoint(double x,double val) override
-  {
-    return m_PiecewiseFunction->AddPoint(x,val);
-  }
-
+  int AddFunctionPoint(double x, double val) override { return m_PiecewiseFunction->AddPoint(x, val); }
   void RemoveFunctionPoint(double x) override
   {
     int old_size = GetFunctionSize();
@@ -59,43 +54,24 @@ public:
     }
   }
 
-  double GetFunctionX(int index) override
-  {
-    return m_PiecewiseFunction->GetDataPointer()[index*2];
-  }
-
+  double GetFunctionX(int index) override { return m_PiecewiseFunction->GetDataPointer()[index * 2]; }
   double GetFunctionY(int index) override
   {
-    return m_PiecewiseFunction->GetValue(m_PiecewiseFunction->GetDataPointer()[index*2]);
+    return m_PiecewiseFunction->GetValue(m_PiecewiseFunction->GetDataPointer()[index * 2]);
   }
 
-  int GetFunctionSize() override
-  {
-    return m_PiecewiseFunction->GetSize();
-  }
+  int GetFunctionSize() override { return m_PiecewiseFunction->GetSize(); }
+  void DoubleClickOnHandle(int) override {}
+  void MoveFunctionPoint(int index, std::pair<double, double> pos) override;
 
-  void DoubleClickOnHandle(int) override
-  {
-  }
-
-  void MoveFunctionPoint(int index, std::pair<double,double> pos) override;
-
-  double GetFunctionMax()
-  {
-    return m_PiecewiseFunction->GetRange()[1];
-  }
-
-  double GetFunctionMin()
-  {
-    return m_PiecewiseFunction->GetRange()[0];
-  }
-
+  double GetFunctionMax() { return m_PiecewiseFunction->GetRange()[1]; }
+  double GetFunctionMin() { return m_PiecewiseFunction->GetRange()[0]; }
   double GetFunctionRange()
   {
     double range;
-    if((m_PiecewiseFunction->GetRange()[0])<0)
+    if ((m_PiecewiseFunction->GetRange()[0]) < 0)
     {
-      range = (m_PiecewiseFunction->GetRange()[1])-(m_PiecewiseFunction->GetRange()[0]);
+      range = (m_PiecewiseFunction->GetRange()[1]) - (m_PiecewiseFunction->GetRange()[0]);
       return range;
     }
     else
@@ -107,24 +83,21 @@ public:
 
   void RemoveAllFunctionPoints()
   {
-    m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,this->GetFunctionMax(),1);
-    m_PiecewiseFunction->AddPoint(0.0,0.0);
+    m_PiecewiseFunction->AddSegment(this->GetFunctionMin(), 0, this->GetFunctionMax(), 1);
+    m_PiecewiseFunction->AddPoint(0.0, 0.0);
   }
 
   void ResetGO()
-  { //Gradient Opacity
-    m_PiecewiseFunction->AddSegment(this->GetFunctionMin(),0,0,1);
-    m_PiecewiseFunction->AddSegment(0,1,((this->GetFunctionRange())*0.125),1);
-    m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.125),1,((this->GetFunctionRange())*0.2),1);
-    m_PiecewiseFunction->AddSegment(((this->GetFunctionRange())*0.2),1,((this->GetFunctionRange())*0.25),1);
+  { // Gradient Opacity
+    m_PiecewiseFunction->AddSegment(this->GetFunctionMin(), 0, 0, 1);
+    m_PiecewiseFunction->AddSegment(0, 1, ((this->GetFunctionRange()) * 0.125), 1);
+    m_PiecewiseFunction->AddSegment(((this->GetFunctionRange()) * 0.125), 1, ((this->GetFunctionRange()) * 0.2), 1);
+    m_PiecewiseFunction->AddSegment(((this->GetFunctionRange()) * 0.2), 1, ((this->GetFunctionRange()) * 0.25), 1);
   }
 
 protected:
-
-  vtkPiecewiseFunction* m_PiecewiseFunction;
+  vtkPiecewiseFunction *m_PiecewiseFunction;
   QString m_Title;
-
 };
 
 #endif
-

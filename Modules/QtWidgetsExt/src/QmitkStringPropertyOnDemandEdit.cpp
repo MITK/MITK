@@ -16,12 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkStringPropertyOnDemandEdit.h"
 #include <QInputDialog>
 
-QmitkStringPropertyOnDemandEdit::QmitkStringPropertyOnDemandEdit( mitk::StringProperty* property, QWidget* parent )
-: QFrame( parent ),
-  PropertyEditor( property ),
-  m_StringProperty(property)
+QmitkStringPropertyOnDemandEdit::QmitkStringPropertyOnDemandEdit(mitk::StringProperty *property, QWidget *parent)
+  : QFrame(parent), PropertyEditor(property), m_StringProperty(property)
 {
-  setFrameStyle( QFrame::NoFrame );
+  setFrameStyle(QFrame::NoFrame);
   setLineWidth(0);
 
   // create HBoxLayout with two buttons
@@ -37,7 +35,7 @@ QmitkStringPropertyOnDemandEdit::QmitkStringPropertyOnDemandEdit( mitk::StringPr
 
   m_layout->addStretch(10);
 
-  connect( m_toolbutton, SIGNAL( clicked() ) , this, SLOT(onToolButtonClicked()) );
+  connect(m_toolbutton, SIGNAL(clicked()), this, SLOT(onToolButtonClicked()));
 
   ensurePolished();
   adjustSize();
@@ -51,8 +49,8 @@ QmitkStringPropertyOnDemandEdit::~QmitkStringPropertyOnDemandEdit()
 
 void QmitkStringPropertyOnDemandEdit::PropertyChanged()
 {
-  if ( m_Property )
-    m_label->setText( m_StringProperty->GetValue() );
+  if (m_Property)
+    m_label->setText(m_StringProperty->GetValue());
 }
 
 void QmitkStringPropertyOnDemandEdit::PropertyRemoved()
@@ -65,21 +63,16 @@ void QmitkStringPropertyOnDemandEdit::PropertyRemoved()
 void QmitkStringPropertyOnDemandEdit::onToolButtonClicked()
 {
   bool ok(false);
-  QString newText = QInputDialog::getText(this,
-                                          "Change text",
-                                          "You can change the displayed text here",
-                                          QLineEdit::Normal,
-                                          m_label->text(),
-                                          &ok);
+  QString newText = QInputDialog::getText(
+    this, "Change text", "You can change the displayed text here", QLineEdit::Normal, m_label->text(), &ok);
 
   if (ok)
   {
-    BeginModifyProperty();  // deregister from events
+    BeginModifyProperty(); // deregister from events
 
     m_StringProperty->SetValue(newText.toStdString());
     m_label->setText(newText);
 
-    EndModifyProperty();  // again register for events
+    EndModifyProperty(); // again register for events
   }
 }
-

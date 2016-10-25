@@ -17,54 +17,61 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolWorkingDataSelectionBox.h"
 #include "mitkToolManagerProvider.h"
 
-QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent)
-:QListWidget(parent),
-m_SelfCall(false),
-m_LastSelectedReferenceData(NULL),
-m_ToolGroupsForFiltering("default"),
-m_DisplayOnlyDerivedNodes(true)
+QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget *parent)
+  : QListWidget(parent),
+    m_SelfCall(false),
+    m_LastSelectedReferenceData(NULL),
+    m_ToolGroupsForFiltering("default"),
+    m_DisplayOnlyDerivedNodes(true)
 {
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); // this widget should be placeable from designer so it can't take other than the defaul parameters
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); // this widget should be placeable from
+                                                                              // designer so it can't take other than
+                                                                              // the defaul parameters
 
-  QListWidget::setSelectionMode( QListWidget::MultiSelection );
+  QListWidget::setSelectionMode(QListWidget::MultiSelection);
   QListWidget::setDragDropMode(QListWidget::InternalMove);
 
-  connect( this, SIGNAL(itemSelectionChanged()), this, SLOT(OnWorkingDataSelectionChanged()) );
+  connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(OnWorkingDataSelectionChanged()));
 
-  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
+    this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
+    this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified);
 }
 
 QmitkToolWorkingDataSelectionBox::~QmitkToolWorkingDataSelectionBox()
 {
-
 }
 
-mitk::DataStorage* QmitkToolWorkingDataSelectionBox::GetDataStorage()
+mitk::DataStorage *QmitkToolWorkingDataSelectionBox::GetDataStorage()
 {
   return m_ToolManager->GetDataStorage();
 }
 
-void QmitkToolWorkingDataSelectionBox::SetDataStorage(mitk::DataStorage& storage)
+void QmitkToolWorkingDataSelectionBox::SetDataStorage(mitk::DataStorage &storage)
 {
   m_ToolManager->SetDataStorage(storage);
 }
 
-
-mitk::ToolManager* QmitkToolWorkingDataSelectionBox::GetToolManager()
+mitk::ToolManager *QmitkToolWorkingDataSelectionBox::GetToolManager()
 {
   return m_ToolManager;
 }
 
-void QmitkToolWorkingDataSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
+void QmitkToolWorkingDataSelectionBox::SetToolManager(
+  mitk::ToolManager &newManager) // no NULL pointer allowed here, a manager is required
 {
-  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
+    this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
+    this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified);
 
   m_ToolManager = &newManager;
 
-  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>( this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
+    this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
+    this, &QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified);
 
   UpdateDataDisplay();
 }
@@ -77,9 +84,9 @@ void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
 
   previouslySelectedNodes = selection;
 
-  if (selection.size() >0)
+  if (selection.size() > 0)
   {
-    const mitk::DataNode* node = selection[0];
+    const mitk::DataNode *node = selection[0];
     emit WorkingNodeSelected(node);
   }
   else
@@ -88,15 +95,16 @@ void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
   }
 
   m_SelfCall = true;
-  m_ToolManager->SetWorkingData( selection ); // maybe empty
+  m_ToolManager->SetWorkingData(selection); // maybe empty
   m_SelfCall = false;
 }
 
 void QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified()
 {
-  if (m_SelfCall) return;
+  if (m_SelfCall)
+    return;
 
-  const mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
+  const mitk::DataNode *node = m_ToolManager->GetWorkingData(0);
   emit WorkingNodeSelected(node);
 
   UpdateDataDisplay();
@@ -104,7 +112,7 @@ void QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified()
 
 void QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified()
 {
-  if ( m_ToolManager->GetReferenceData(0) != m_LastSelectedReferenceData )
+  if (m_ToolManager->GetReferenceData(0) != m_LastSelectedReferenceData)
   {
     m_ToolManager->SetWorkingData(NULL);
     UpdateDataDisplay();
@@ -115,41 +123,43 @@ void QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified()
 
 void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
 {
-
   // clear all
   QListWidget::clear();
   m_Node.clear();
 
   // rebuild contents
-  mitk::ToolManager::DataVectorType allObjects = GetAllNodes( false );
-  for ( mitk::ToolManager::DataVectorType::const_iterator objectIter = allObjects.begin();
-    objectIter != allObjects.end();
-    ++objectIter)
+  mitk::ToolManager::DataVectorType allObjects = GetAllNodes(false);
+  for (mitk::ToolManager::DataVectorType::const_iterator objectIter = allObjects.begin();
+       objectIter != allObjects.end();
+       ++objectIter)
   {
-    mitk::DataNode* node = *objectIter;
+    mitk::DataNode *node = *objectIter;
 
     if (node) // delete this check when datastorage is really used
     {
       // get name and color
       std::string name = node->GetName();
-      float rgb[3]; rgb[0] = 1.0; rgb[1] = 0.0; rgb[2] = 0.0;
+      float rgb[3];
+      rgb[0] = 1.0;
+      rgb[1] = 0.0;
+      rgb[2] = 0.0;
       node->GetColor(rgb);
-      QRgb qrgb = qRgb( (int)(rgb[0]*255.0), (int)(rgb[1]*255.0),  (int)(rgb[2]*255.0) );
+      QRgb qrgb = qRgb((int)(rgb[0] * 255.0), (int)(rgb[1] * 255.0), (int)(rgb[2] * 255.0));
 
-      QPixmap pixmap(25,18);
+      QPixmap pixmap(25, 18);
       pixmap.fill(QColor(qrgb));
 
       // create a list item
-      QListWidgetItem* newItem = new QListWidgetItem();
+      QListWidgetItem *newItem = new QListWidgetItem();
       QString qname = QString::fromLocal8Bit(name.c_str());
 
-      //set name and color
+      // set name and color
       newItem->setText(qname);
       newItem->setIcon(QIcon(pixmap));
 
       this->addItem(newItem);
 
-      m_Node.insert( std::make_pair( newItem, node ) );
+      m_Node.insert(std::make_pair(newItem, node));
     }
   }
 }
@@ -159,22 +169,21 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetSelectedN
   mitk::ToolManager::DataVectorType result;
 
   QList<QListWidgetItem *> items;
-  for (int j=0; j<this->count(); j++)
+  for (int j = 0; j < this->count(); j++)
   {
     if (this->item(j)->isSelected())
       items.append(this->item(j));
   }
 
-  for (int i=0; i<items.size();++i)
+  for (int i = 0; i < items.size(); ++i)
   {
-
-    QListWidgetItem* item = items.at(i);
+    QListWidgetItem *item = items.at(i);
     if (item)
     {
       ItemNodeMapType::iterator it = m_Node.find(item);
       if (it != m_Node.end())
       {
-        mitk::DataNode::Pointer node =   it->second;
+        mitk::DataNode::Pointer node = it->second;
         if (node)
           result.push_back(node);
       }
@@ -184,13 +193,13 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetSelectedN
   return result;
 }
 
-mitk::DataNode* QmitkToolWorkingDataSelectionBox::GetSelectedNode()
+mitk::DataNode *QmitkToolWorkingDataSelectionBox::GetSelectedNode()
 {
-  QListWidgetItem* item = QListWidget::selectedItems().first();
+  QListWidgetItem *item = QListWidget::selectedItems().first();
   if (item)
   {
     ItemNodeMapType::iterator iter = m_Node.find(item);
-    if ( iter != m_Node.end() )
+    if (iter != m_Node.end())
     {
       return iter->second;
     }
@@ -199,9 +208,9 @@ mitk::DataNode* QmitkToolWorkingDataSelectionBox::GetSelectedNode()
   return NULL;
 }
 
-mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes( bool onlyDerivedFromOriginal )
+mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(bool onlyDerivedFromOriginal)
 {
-  mitk::DataStorage* dataStorage = m_ToolManager->GetDataStorage();
+  mitk::DataStorage *dataStorage = m_ToolManager->GetDataStorage();
   if (!dataStorage)
   {
     return mitk::ToolManager::DataVectorType();
@@ -210,11 +219,12 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   /**
   * Build up predicate:
   *  - ask each tool that is displayed for a predicate (indicating the type of data that this tool will work with)
-  *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or ListDataIfAnyToolMatches)
+  *  - connect all predicates using AND or OR, depending on the parameter m_DisplayMode (ListDataIfAllToolsMatch or
+  * ListDataIfAnyToolMatches)
   *    \sa SetDisplayMode
   */
 
-  std::vector< mitk::NodePredicateBase::ConstPointer > m_Predicates;
+  std::vector<mitk::NodePredicateBase::ConstPointer> m_Predicates;
   mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
   bool rebuildNeeded = true;
   if (rebuildNeeded)
@@ -223,20 +233,18 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
 
     const mitk::ToolManager::ToolVectorTypeConst allTools = m_ToolManager->GetTools();
 
-    for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
-      iter != allTools.end();
-      ++iter )
+    for (mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin(); iter != allTools.end(); ++iter)
     {
-      const mitk::Tool* tool = *iter;
+      const mitk::Tool *tool = *iter;
 
-      if ( (m_ToolGroupsForFiltering.empty()) || ( m_ToolGroupsForFiltering.find( tool->GetGroup() ) != std::string::npos ) ||
-        ( m_ToolGroupsForFiltering.find( tool->GetName() )  != std::string::npos )
-        )
+      if ((m_ToolGroupsForFiltering.empty()) ||
+          (m_ToolGroupsForFiltering.find(tool->GetGroup()) != std::string::npos) ||
+          (m_ToolGroupsForFiltering.find(tool->GetName()) != std::string::npos))
       {
         if (completePredicate.IsNotNull())
         {
-
-          m_Predicates.push_back( mitk::NodePredicateOr::New( completePredicate, tool->GetWorkingDataPreference()).GetPointer() );
+          m_Predicates.push_back(
+            mitk::NodePredicateOr::New(completePredicate, tool->GetWorkingDataPreference()).GetPointer());
 
           completePredicate = m_Predicates.back();
         }
@@ -257,12 +265,12 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   *  - display everything matching the predicate (else)
   */
 
-  if ( onlyDerivedFromOriginal )
+  if (onlyDerivedFromOriginal)
   {
-    mitk::DataNode* sourceNode( m_ToolManager->GetReferenceData(0) );
+    mitk::DataNode *sourceNode(m_ToolManager->GetReferenceData(0));
     if (sourceNode)
     {
-      allObjects = dataStorage->GetDerivations( sourceNode, completePredicate, false );
+      allObjects = dataStorage->GetDerivations(sourceNode, completePredicate, false);
     }
     else
     {
@@ -273,7 +281,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   {
     if (completePredicate)
     {
-      allObjects = dataStorage->GetSubset( completePredicate );
+      allObjects = dataStorage->GetSubset(completePredicate);
     }
     else
     {
@@ -286,12 +294,12 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
 
   mitk::ToolManager::DataVectorType resultVector;
 
-  for ( mitk::DataStorage::SetOfObjects::const_iterator objectIter = allObjects->begin();
-    objectIter != allObjects->end();
-    ++objectIter )
+  for (mitk::DataStorage::SetOfObjects::const_iterator objectIter = allObjects->begin();
+       objectIter != allObjects->end();
+       ++objectIter)
   {
-    mitk::DataNode* node = (*objectIter).GetPointer();
-    resultVector.push_back( node );
+    mitk::DataNode *node = (*objectIter).GetPointer();
+    resultVector.push_back(node);
   }
 
   return resultVector;

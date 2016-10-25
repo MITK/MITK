@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITK_ALGORITHM_PROFILE_VIEWER_H
 #define QMITK_ALGORITHM_PROFILE_VIEWER_H
 
@@ -29,12 +28,13 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \class QmitkAlgorithmProfileViewer
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmProfileViewer : public QWidget, private Ui::QmitkAlgorithmProfileViewer
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmProfileViewer : public QWidget,
+                                                                        private Ui::QmitkAlgorithmProfileViewer
 {
   Q_OBJECT
 
 public:
-  QmitkAlgorithmProfileViewer(QWidget* parent=0);
+  QmitkAlgorithmProfileViewer(QWidget *parent = 0);
 
   /**
    * \brief Updates the widget according to the new info.
@@ -42,13 +42,13 @@ public:
    * \remark The DLLInfo is not stored internally or as reference
    * to update the widget you must use the updateInfo() method.
    */
-  void updateInfo(const map::deployment::DLLInfo* newInfo);
+  void updateInfo(const map::deployment::DLLInfo *newInfo);
 
 public Q_SLOTS:
   /**
     * \brief Slot that can be used to trigger updateInfo();
     */
-  void OnInfoChanged(const map::deployment::DLLInfo* newInfo);
+  void OnInfoChanged(const map::deployment::DLLInfo *newInfo);
 };
 
 #endif // QmitkAlgorithmProfileViewer_H

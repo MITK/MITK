@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNormalizedCorrelationMetricViewWidgetHIncluded
 #define QmitkNormalizedCorrelationMetricViewWidgetHIncluded
 
-#include "ui_QmitkNormalizedCorrelationMetricControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
+#include "ui_QmitkNormalizedCorrelationMetricControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
@@ -31,10 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkNormalizedCorrelationMetricView : public QmitkRigidRegistrationMetricsGUIBase
 {
-
 public:
-
-  QmitkNormalizedCorrelationMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkNormalizedCorrelationMetricView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkNormalizedCorrelationMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;
@@ -47,22 +45,18 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
   virtual bool Maximize() override;
 
-
 private:
-
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
-
   Ui::QmitkNormalizedCorrelationMetricControls m_Controls;
 
   itk::Object::Pointer m_MetricObject;
-
 };
 
 #endif

@@ -21,8 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTestDCMLoading.h"
 #include <stack>
 
-mitk::TestDCMLoading::TestDCMLoading()
-:m_PreviousCLocale(nullptr)
+mitk::TestDCMLoading::TestDCMLoading() : m_PreviousCLocale(nullptr)
 {
 }
 
@@ -38,7 +37,7 @@ void mitk::TestDCMLoading::SetDefaultLocale()
 
     m_PreviousCppLocale = std::cin.getloc();
 
-    std::locale l( "C" );
+    std::locale l("C");
     std::cin.imbue(l);
     std::cout.imbue(l);
   }
@@ -57,34 +56,34 @@ void mitk::TestDCMLoading::ResetUserLocale()
   }
 }
 
-
-mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringContainer& files, itk::SmartPointer<Image> preLoadedVolume )
+mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles(const StringContainer &files,
+                                                                itk::SmartPointer<Image> preLoadedVolume)
 {
-  for (auto iter = files.begin();
-       iter != files.end();
-       ++iter)
+  for (auto iter = files.begin(); iter != files.end(); ++iter)
   {
     MITK_DEBUG << "File " << *iter;
   }
 
   ImageList result;
 
-  DicomSeriesReader::FileNamesGrouping seriesInFiles = DicomSeriesReader::GetSeries( files, true );
+  DicomSeriesReader::FileNamesGrouping seriesInFiles = DicomSeriesReader::GetSeries(files, true);
 
-  // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
+  // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a
+  // standard topic??)
   for (DicomSeriesReader::FileNamesGrouping::const_iterator seriesIter = seriesInFiles.begin();
        seriesIter != seriesInFiles.end();
        ++seriesIter)
   {
     StringContainer files = seriesIter->second.GetFilenames();
 
-    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files, true, true, true, nullptr, preLoadedVolume ); // true, true, true ist just a copy of the default values
+    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries(
+      files, true, true, true, nullptr, preLoadedVolume); // true, true, true ist just a copy of the default values
 
     if (node.IsNotNull())
     {
-      Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
 
-      result.push_back( image );
+      result.push_back(image);
     }
     else
     {
@@ -94,8 +93,7 @@ mitk::TestDCMLoading::ImageList mitk::TestDCMLoading::LoadFiles( const StringCon
   return result;
 }
 
-std::string
-mitk::TestDCMLoading::ComponentTypeToString(int type)
+std::string mitk::TestDCMLoading::ComponentTypeToString(int type)
 {
   if (type == itk::ImageIOBase::UCHAR)
     return "UCHAR";
@@ -121,30 +119,32 @@ mitk::TestDCMLoading::ComponentTypeToString(int type)
     return "UNKNOWN";
 }
 
-
 // add a line to stringstream result (see DumpImageInformation
 #define DumpLine(field, data) DumpILine(0, field, data)
 
 // add an indented(!) line to stringstream result (see DumpImageInformation
-#define DumpILine(indent, field, data) \
-{ \
-  std::string DumpLine_INDENT; DumpLine_INDENT.resize(indent, ' ' ); \
-  result << DumpLine_INDENT << field << ": " << data << "\n"; \
+#define DumpILine(indent, field, data)                                                                                 \
+  \
+{                                                                                                                 \
+    std::string DumpLine_INDENT;                                                                                       \
+    DumpLine_INDENT.resize(indent, ' ');                                                                               \
+    result << DumpLine_INDENT << field << ": " << data << "\n";                                                        \
+  \
 }
 
-std::string
-mitk::TestDCMLoading::DumpImageInformation( const Image* image )
+std::string mitk::TestDCMLoading::DumpImageInformation(const Image *image)
 {
   std::stringstream result;
 
-  if (image == nullptr) return result.str();
+  if (image == nullptr)
+    return result.str();
 
   SetDefaultLocale();
 
   // basic image data
-  DumpLine( "Pixeltype",    ComponentTypeToString(image->GetPixelType().GetComponentType()) );
-  DumpLine( "BitsPerPixel", image->GetPixelType().GetBpe() );
-  DumpLine( "Dimension",    image->GetDimension() );
+  DumpLine("Pixeltype", ComponentTypeToString(image->GetPixelType().GetComponentType()));
+  DumpLine("BitsPerPixel", image->GetPixelType().GetBpe());
+  DumpLine("Dimension", image->GetDimension());
 
   result << "Dimensions: ";
   for (unsigned int dim = 0; dim < image->GetDimension(); ++dim)
@@ -153,59 +153,67 @@ mitk::TestDCMLoading::DumpImageInformation( const Image* image )
 
   // geometry data
   result << "Geometry: \n";
-  BaseGeometry* geometry = image->GetGeometry();
+  BaseGeometry *geometry = image->GetGeometry();
   if (geometry)
   {
-    AffineTransform3D* transform = geometry->GetIndexToWorldTransform();
+    AffineTransform3D *transform = geometry->GetIndexToWorldTransform();
     if (transform)
     {
-      result << "  " << "Matrix: ";
-      const AffineTransform3D::MatrixType& matrix = transform->GetMatrix();
+      result << "  "
+             << "Matrix: ";
+      const AffineTransform3D::MatrixType &matrix = transform->GetMatrix();
       for (unsigned int i = 0; i < 3; ++i)
         for (unsigned int j = 0; j < 3; ++j)
           result << matrix[i][j] << " ";
       result << "\n";
 
-      result << "  " << "Offset: ";
-      const AffineTransform3D::OutputVectorType& offset = transform->GetOffset();
+      result << "  "
+             << "Offset: ";
+      const AffineTransform3D::OutputVectorType &offset = transform->GetOffset();
       for (unsigned int i = 0; i < 3; ++i)
-          result << offset[i] << " ";
+        result << offset[i] << " ";
       result << "\n";
 
-      result << "  " << "Center: ";
-      const AffineTransform3D::InputPointType& center = transform->GetCenter();
+      result << "  "
+             << "Center: ";
+      const AffineTransform3D::InputPointType &center = transform->GetCenter();
       for (unsigned int i = 0; i < 3; ++i)
-          result << center[i] << " ";
+        result << center[i] << " ";
       result << "\n";
 
-      result << "  " << "Translation: ";
-      const AffineTransform3D::OutputVectorType& translation = transform->GetTranslation();
+      result << "  "
+             << "Translation: ";
+      const AffineTransform3D::OutputVectorType &translation = transform->GetTranslation();
       for (unsigned int i = 0; i < 3; ++i)
-          result << translation[i] << " ";
+        result << translation[i] << " ";
       result << "\n";
 
-      result << "  " << "Scale: ";
-      const double* scale = transform->GetScale();
+      result << "  "
+             << "Scale: ";
+      const double *scale = transform->GetScale();
       for (unsigned int i = 0; i < 3; ++i)
-          result << scale[i] << " ";
+        result << scale[i] << " ";
       result << "\n";
 
-      result << "  " << "Origin: ";
-      const Point3D& origin = geometry->GetOrigin();
+      result << "  "
+             << "Origin: ";
+      const Point3D &origin = geometry->GetOrigin();
       for (unsigned int i = 0; i < 3; ++i)
-          result << origin[i] << " ";
+        result << origin[i] << " ";
       result << "\n";
 
-      result << "  " << "Spacing: ";
-      const Vector3D& spacing = geometry->GetSpacing();
+      result << "  "
+             << "Spacing: ";
+      const Vector3D &spacing = geometry->GetSpacing();
       for (unsigned int i = 0; i < 3; ++i)
-          result << spacing[i] << " ";
+        result << spacing[i] << " ";
       result << "\n";
 
-      result << "  " << "TimeBounds: ";
+      result << "  "
+             << "TimeBounds: ";
       const TimeBounds timeBounds = image->GetTimeGeometry()->GetTimeBounds();
       for (unsigned int i = 0; i < 2; ++i)
-          result << timeBounds[i] << " ";
+        result << timeBounds[i] << " ";
       result << "\n";
     }
   }
@@ -215,9 +223,7 @@ mitk::TestDCMLoading::DumpImageInformation( const Image* image )
   return result.str();
 }
 
-std::string
-mitk::TestDCMLoading::trim(const std::string& pString,
-                             const std::string& pWhitespace)
+std::string mitk::TestDCMLoading::trim(const std::string &pString, const std::string &pWhitespace)
 {
   const size_t beginStr = pString.find_first_not_of(pWhitespace);
   if (beginStr == std::string::npos)
@@ -232,10 +238,9 @@ mitk::TestDCMLoading::trim(const std::string& pString,
   return pString.substr(beginStr, range);
 }
 
-std::string
-mitk::TestDCMLoading::reduce(const std::string& pString,
-                               const std::string& pFill,
-                               const std::string& pWhitespace)
+std::string mitk::TestDCMLoading::reduce(const std::string &pString,
+                                         const std::string &pFill,
+                                         const std::string &pWhitespace)
 {
   // trim first
   std::string result(trim(pString, pWhitespace));
@@ -244,8 +249,7 @@ mitk::TestDCMLoading::reduce(const std::string& pString,
   size_t beginSpace = result.find_first_of(pWhitespace);
   while (beginSpace != std::string::npos)
   {
-    const size_t endSpace =
-      result.find_first_not_of(pWhitespace, beginSpace);
+    const size_t endSpace = result.find_first_not_of(pWhitespace, beginSpace);
     const size_t range = endSpace - beginSpace;
 
     result.replace(beginSpace, range, pFill);
@@ -257,11 +261,9 @@ mitk::TestDCMLoading::reduce(const std::string& pString,
   return result;
 }
 
-
-bool
-mitk::TestDCMLoading::CompareSpacedValueFields( const std::string& reference,
-                                                  const std::string& test,
-                                                  double /*eps*/ )
+bool mitk::TestDCMLoading::CompareSpacedValueFields(const std::string &reference,
+                                                    const std::string &test,
+                                                    double /*eps*/)
 {
   bool result(true);
 
@@ -271,31 +273,31 @@ mitk::TestDCMLoading::CompareSpacedValueFields( const std::string& reference,
 
   std::string refToken;
   std::string testToken;
-  while ( std::getline( referenceStream,  refToken, ' ' ) &&
-          std::getline (     testStream, testToken, ' ' ) )
+  while (std::getline(referenceStream, refToken, ' ') && std::getline(testStream, testToken, ' '))
   {
     float refNumber;
     float testNumber;
-    if ( this->StringToNumber(refToken, refNumber) )
+    if (this->StringToNumber(refToken, refNumber))
     {
-      if ( this->StringToNumber(testToken, testNumber) )
+      if (this->StringToNumber(testToken, testNumber))
       {
         // print-out compared tokens if DEBUG output allowed
-        MITK_DEBUG << "Reference Token '" << refToken << "'" << " value " << refNumber
-                   << ", test Token '" << testToken << "'" << " value " << testNumber;
-
-
+        MITK_DEBUG << "Reference Token '" << refToken << "'"
+                   << " value " << refNumber << ", test Token '" << testToken << "'"
+                   << " value " << testNumber;
 
         bool old_result = result;
 
-        result &= ( fabs(refNumber - testNumber) < 0.0001 /*mitk::eps*/ );
+        result &= (fabs(refNumber - testNumber) < 0.0001 /*mitk::eps*/);
         // log the token/number which causes the test to fail
-        if( old_result != result)
+        if (old_result != result)
         {
-          MITK_ERROR << std::setprecision(16) << "Reference Token '" << refToken << "'" << " value " << refNumber
-                     << ", test Token '" << testToken << "'" << " value " << testNumber;
+          MITK_ERROR << std::setprecision(16) << "Reference Token '" << refToken << "'"
+                     << " value " << refNumber << ", test Token '" << testToken << "'"
+                     << " value " << testNumber;
 
-          MITK_ERROR << "[FALSE] - difference: " << std::setprecision(16) <<  fabs(refNumber - testNumber) << " EPS: " << 0.0001;// mitk::eps;
+          MITK_ERROR << "[FALSE] - difference: " << std::setprecision(16) << fabs(refNumber - testNumber)
+                     << " EPS: " << 0.0001; // mitk::eps;
         }
       }
       else
@@ -305,28 +307,29 @@ mitk::TestDCMLoading::CompareSpacedValueFields( const std::string& reference,
     }
     else
     {
-      MITK_DEBUG << "Token '" << refToken << "'" << " handled as string";
+      MITK_DEBUG << "Token '" << refToken << "'"
+                 << " handled as string";
       result &= refToken == testToken;
     }
   }
 
-  if ( std::getline( referenceStream, refToken, ' ' ) )
+  if (std::getline(referenceStream, refToken, ' '))
   {
-    MITK_ERROR << "Reference string still had values when test string was already parsed: ref '" << reference << "', test '" << test << "'";
+    MITK_ERROR << "Reference string still had values when test string was already parsed: ref '" << reference
+               << "', test '" << test << "'";
     result = false;
   }
-  else if ( std::getline( testStream, testToken, ' ' ) )
+  else if (std::getline(testStream, testToken, ' '))
   {
-    MITK_ERROR << "Test string still had values when reference string was already parsed: ref '" << reference << "', test '" << test << "'";
+    MITK_ERROR << "Test string still had values when reference string was already parsed: ref '" << reference
+               << "', test '" << test << "'";
     result = false;
   }
 
   return result;
 }
 
-bool
-mitk::TestDCMLoading::CompareImageInformationDumps( const std::string& referenceDump,
-                                                      const std::string& testDump )
+bool mitk::TestDCMLoading::CompareImageInformationDumps(const std::string &referenceDump, const std::string &testDump)
 {
   KeyValueMap reference = ParseDump(referenceDump);
   KeyValueMap test = ParseDump(testDump);
@@ -334,41 +337,38 @@ mitk::TestDCMLoading::CompareImageInformationDumps( const std::string& reference
   bool testResult(true);
 
   // verify all expected values
-  for (KeyValueMap::const_iterator refIter = reference.begin();
-       refIter != reference.end();
-       ++refIter)
+  for (KeyValueMap::const_iterator refIter = reference.begin(); refIter != reference.end(); ++refIter)
   {
-    const std::string& refKey = refIter->first;
-    const std::string& refValue = refIter->second;
+    const std::string &refKey = refIter->first;
+    const std::string &refValue = refIter->second;
 
-    if ( test.find(refKey) != test.end() )
+    if (test.find(refKey) != test.end())
     {
-      const std::string& testValue = test[refKey];
+      const std::string &testValue = test[refKey];
 
-      bool thisTestResult = CompareSpacedValueFields( refValue, testValue );
+      bool thisTestResult = CompareSpacedValueFields(refValue, testValue);
       testResult &= thisTestResult;
 
-      MITK_DEBUG << refKey << ": '" << refValue << "' == '" << testValue << "' ? " << (thisTestResult?"YES":"NO");
+      MITK_DEBUG << refKey << ": '" << refValue << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
     }
     else
     {
-      MITK_ERROR << "Reference dump contains a key'" << refKey << "' (value '" << refValue << "')." ;
-      MITK_ERROR << "This key is expected to be generated for tests (but was not). Most probably you need to update your test data.";
+      MITK_ERROR << "Reference dump contains a key'" << refKey << "' (value '" << refValue << "').";
+      MITK_ERROR << "This key is expected to be generated for tests (but was not). Most probably you need to update "
+                    "your test data.";
       return false;
     }
   }
 
   // now check test dump does not contain any additional keys
-  for (KeyValueMap::const_iterator testIter = test.begin();
-       testIter != test.end();
-       ++testIter)
+  for (KeyValueMap::const_iterator testIter = test.begin(); testIter != test.end(); ++testIter)
   {
-    const std::string& key = testIter->first;
-    const std::string& value = testIter->second;
+    const std::string &key = testIter->first;
+    const std::string &value = testIter->second;
 
-    if ( reference.find(key) == reference.end() )
+    if (reference.find(key) == reference.end())
     {
-      MITK_ERROR << "Test dump contains an unexpected key'" << key << "' (value '" << value << "')." ;
+      MITK_ERROR << "Test dump contains an unexpected key'" << key << "' (value '" << value << "').";
       MITK_ERROR << "This key is not expected. Most probably you need to update your test data.";
       return false;
     }
@@ -377,8 +377,7 @@ mitk::TestDCMLoading::CompareImageInformationDumps( const std::string& reference
   return testResult;
 }
 
-mitk::TestDCMLoading::KeyValueMap
-mitk::TestDCMLoading::ParseDump( const std::string& dump )
+mitk::TestDCMLoading::KeyValueMap mitk::TestDCMLoading::ParseDump(const std::string &dump)
 {
   KeyValueMap parsedResult;
 
@@ -391,14 +390,15 @@ mitk::TestDCMLoading::ParseDump( const std::string& dump )
 
   while (true)
   {
-    std::string::size_type newLinePos = shredder.find( '\n' );
-    if (newLinePos == std::string::npos || newLinePos == 0) break;
+    std::string::size_type newLinePos = shredder.find('\n');
+    if (newLinePos == std::string::npos || newLinePos == 0)
+      break;
 
-    std::string line = shredder.substr( 0, newLinePos );
-    shredder = shredder.erase( 0, newLinePos+1 );
+    std::string line = shredder.substr(0, newLinePos);
+    shredder = shredder.erase(0, newLinePos + 1);
 
-    std::string::size_type keyPosition = line.find_first_not_of( ' ' );
-    std::string::size_type colonPosition = line.find( ':' );
+    std::string::size_type keyPosition = line.find_first_not_of(' ');
+    std::string::size_type colonPosition = line.find(':');
 
     std::string key = line.substr(keyPosition, colonPosition - keyPosition);
     std::string::size_type firstSpacePosition = key.find_first_of(" ");
@@ -407,12 +407,12 @@ mitk::TestDCMLoading::ParseDump( const std::string& dump )
       key.erase(firstSpacePosition);
     }
 
-    if ( keyPosition > expectedIndents.top() )
+    if (keyPosition > expectedIndents.top())
     {
       // more indent than before
       expectedIndents.push(keyPosition);
     }
-    else if (keyPosition == expectedIndents.top() )
+    else if (keyPosition == expectedIndents.top())
     {
       if (!surroundingKeys.empty())
       {
@@ -422,7 +422,8 @@ mitk::TestDCMLoading::ParseDump( const std::string& dump )
     else
     {
       // less indent than before
-      do expectedIndents.pop();
+      do
+        expectedIndents.pop();
       while (expectedIndents.top() != keyPosition); // unwind until current indent is found
     }
 
@@ -433,9 +434,9 @@ mitk::TestDCMLoading::ParseDump( const std::string& dump )
 
     surroundingKeys.push(key); // this is the new embracing key
 
-    std::string value = line.substr(colonPosition+1);
+    std::string value = line.substr(colonPosition + 1);
 
-    MITK_DEBUG << "  Key: '" << key << "' value '" << value << "'" ;
+    MITK_DEBUG << "  Key: '" << key << "' value '" << value << "'";
 
     parsedResult[key] = value; // store parsing result
   }

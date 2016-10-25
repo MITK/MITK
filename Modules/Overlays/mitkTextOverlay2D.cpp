@@ -15,10 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTextOverlay2D.h"
-#include <vtkTextProperty.h>
 #include "vtkUnicodeString.h"
-#include <vtkTextActor.h>
 #include <vtkPropAssembly.h>
+#include <vtkTextActor.h>
+#include <vtkTextProperty.h>
 
 mitk::TextOverlay2D::TextOverlay2D()
 {
@@ -28,10 +28,10 @@ mitk::TextOverlay2D::TextOverlay2D()
   this->SetOffsetVector(position);
   this->SetText("");
   this->SetFontSize(20);
-  this->SetColor(1.0,1.0,1.0);
-  this->SetStringProperty("font.family","Arial");
-  this->SetBoolProperty( "font.bold", false );
-  this->SetBoolProperty( "font.italic", false );
+  this->SetColor(1.0, 1.0, 1.0);
+  this->SetStringProperty("font.family", "Arial");
+  this->SetBoolProperty("font.bold", false);
+  this->SetBoolProperty("font.italic", false);
   this->SetBoolProperty("drawShadow", false);
 }
 
@@ -41,7 +41,7 @@ mitk::TextOverlay2D::~TextOverlay2D()
 
 mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer *renderer) const
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   mitk::Overlay::Bounds bounds;
   bounds.Position = ls->m_TextActor->GetPosition();
 
@@ -52,9 +52,9 @@ mitk::Overlay::Bounds mitk::TextOverlay2D::GetBoundsOnDisplay(mitk::BaseRenderer
   return bounds;
 }
 
-void mitk::TextOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, const mitk::Overlay::Bounds& bounds)
+void mitk::TextOverlay2D::SetBoundsOnDisplay(mitk::BaseRenderer *renderer, const mitk::Overlay::Bounds &bounds)
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
 
   mitk::Point2D posT, posS;
   posT[0] = bounds.Position[0];
@@ -85,11 +85,11 @@ mitk::TextOverlay2D::LocalStorage::LocalStorage()
 
 void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
 
   if (ls->IsGenerateDataRequired(renderer, this))
   {
-    float color[3] = { 0.0, 1.0, 0.0 };
+    float color[3] = {0.0, 1.0, 0.0};
     float opacity = 1.0;
     GetColor(color, renderer);
     GetOpacity(opacity, renderer);
@@ -101,23 +101,22 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_STextProp->SetOpacity(opacity);
 
     std::string fontFamilyAsString;
-    if ( GetStringProperty( "font.family", fontFamilyAsString ) == false )
+    if (GetStringProperty("font.family", fontFamilyAsString) == false)
     {
       fontFamilyAsString = "Arial";
     }
-    ls->m_TextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
-    ls->m_STextProp->SetFontFamilyAsString( fontFamilyAsString.c_str() );
+    ls->m_TextProp->SetFontFamilyAsString(fontFamilyAsString.c_str());
+    ls->m_STextProp->SetFontFamilyAsString(fontFamilyAsString.c_str());
 
     bool boldFont(false);
-    GetBoolProperty( "font.bold", boldFont );
-    ls->m_TextProp->SetBold( boldFont );
-    ls->m_STextProp->SetBold( boldFont );
+    GetBoolProperty("font.bold", boldFont);
+    ls->m_TextProp->SetBold(boldFont);
+    ls->m_STextProp->SetBold(boldFont);
 
     bool italicFont(false);
-    GetBoolProperty( "font.italic", italicFont );
-    ls->m_TextProp->SetBold( italicFont );
-    ls->m_STextProp->SetBold( italicFont );
-
+    GetBoolProperty("font.italic", italicFont);
+    ls->m_TextProp->SetBold(italicFont);
+    ls->m_STextProp->SetBold(italicFont);
 
     bool drawShadow;
     GetBoolProperty("drawShadow", drawShadow);
@@ -142,12 +141,12 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
 
 vtkProp *mitk::TextOverlay2D::GetVtkProp(mitk::BaseRenderer *renderer) const
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_Assembly;
 }
 
-vtkActor2D* mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer) const
+vtkActor2D *mitk::TextOverlay2D::GetVtkActor2D(BaseRenderer *renderer) const
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_TextActor;
 }

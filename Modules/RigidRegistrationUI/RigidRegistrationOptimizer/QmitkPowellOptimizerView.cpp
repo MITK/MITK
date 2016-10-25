@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkPowellOptimizer.h>
 
-QmitkPowellOptimizerView::QmitkPowellOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkPowellOptimizerView::QmitkPowellOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkPowellOptimizerView::~QmitkPowellOptimizerView()
@@ -36,11 +35,11 @@ mitk::OptimizerParameters::OptimizerType QmitkPowellOptimizerView::GetOptimizerT
 itk::Object::Pointer QmitkPowellOptimizerView::GetOptimizer()
 {
   itk::PowellOptimizer::Pointer OptimizerPointer = itk::PowellOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
-  OptimizerPointer->SetStepLength( m_Controls.m_StepLengthPowell->text().toFloat() );
-  OptimizerPointer->SetStepTolerance( m_Controls.m_StepTolerancePowell->text().toFloat() );
-  OptimizerPointer->SetValueTolerance( m_Controls.m_ValueTolerancePowell->text().toFloat() );
-  OptimizerPointer->SetMaximumIteration( m_Controls.m_IterationsPowell->text().toInt() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
+  OptimizerPointer->SetStepLength(m_Controls.m_StepLengthPowell->text().toFloat());
+  OptimizerPointer->SetStepTolerance(m_Controls.m_StepTolerancePowell->text().toFloat());
+  OptimizerPointer->SetValueTolerance(m_Controls.m_ValueTolerancePowell->text().toFloat());
+  OptimizerPointer->SetMaximumIteration(m_Controls.m_IterationsPowell->text().toInt());
   return OptimizerPointer.GetPointer();
 }
 
@@ -76,12 +75,12 @@ QString QmitkPowellOptimizerView::GetName()
   return "Powell";
 }
 
-void QmitkPowellOptimizerView::SetupUI(QWidget* parent)
+void QmitkPowellOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_IterationsPowell->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_StepLengthPowell->setValidator(validatorLineEditInputFloat);
   m_Controls.m_StepTolerancePowell->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ValueTolerancePowell->setValidator(validatorLineEditInputFloat);

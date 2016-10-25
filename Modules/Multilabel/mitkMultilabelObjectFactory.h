@@ -21,19 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileIO.h>
 
-namespace mitk {
-
+namespace mitk
+{
   class MultilabelObjectFactory : public CoreObjectFactoryBase
   {
   public:
     mitkClassMacro(MultilabelObjectFactory, CoreObjectFactoryBase);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
-    virtual void SetDefaultProperties(mitk::DataNode* node) override;
-    virtual const char* GetFileExtensions() override;
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual Mapper::Pointer
+      CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    virtual void SetDefaultProperties(mitk::DataNode *node) override;
+    virtual const char *GetFileExtensions() override;
     virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    virtual const char* GetSaveFileExtensions() override;
+    virtual const char *GetSaveFileExtensions() override;
     virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
   protected:
@@ -47,9 +46,8 @@ namespace mitk {
     itk::ObjectFactoryBase::Pointer m_LabelSetImageIOFactory;
     itk::ObjectFactoryBase::Pointer m_LabelSetImageWriterFactory;
 
-    std::vector<mitk::AbstractFileIO*> m_FileIOs;
+    std::vector<mitk::AbstractFileIO *> m_FileIOs;
   };
-
 }
 
 #endif

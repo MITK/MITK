@@ -16,12 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRigid3DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkVersorRigid3DTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkVersorRigid3DTransform.h>
 
-QmitkRigid3DTransformView::QmitkRigid3DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkRigid3DTransformView::QmitkRigid3DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -44,14 +44,14 @@ itk::Object::Pointer QmitkRigid3DTransformView::GetTransform()
   return NULL;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
   if (VImageDimension == 3)
   {
-    typename itk::VersorRigid3DTransform< double >::Pointer transformPointer = itk::VersorRigid3DTransform< double >::New();
+    typename itk::VersorRigid3DTransform<double>::Pointer transformPointer = itk::VersorRigid3DTransform<double>::New();
     transformPointer->SetIdentity();
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];
@@ -110,10 +110,10 @@ QString QmitkRigid3DTransformView::GetName()
   return "Rigid3D";
 }
 
-void QmitkRigid3DTransformView::SetupUI(QWidget* parent)
+void QmitkRigid3DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesRigid3DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesRigid3DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesRigid3DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -151,7 +151,9 @@ itk::Array<double> QmitkRigid3DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkRigid3DTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkRigid3DTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                   vtkTransform *vtktransform,
+                                                   itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

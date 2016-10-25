@@ -15,24 +15,21 @@
  ===================================================================*/
 
 #include "itkObject.h"
-#include "itkSmartPointer.h"
 #include "itkObjectFactory.h"
+#include "itkSmartPointer.h"
 #include "mitkCommon.h"
 #include "mitkDataInteractor.h"
 #include <mitkPointSet.h>
 
-
 namespace mitk
 {
-  class ExampleInteractor: public DataInteractor
+  class ExampleInteractor : public DataInteractor
   {
   public:
     mitkClassMacro(ExampleInteractor, DataInteractor);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  protected:
-    ExampleInteractor();
+      protected : ExampleInteractor();
     virtual ~ExampleInteractor();
     virtual void ConnectActionsAndFunctions();
     /**
@@ -44,9 +41,10 @@ namespace mitk
     virtual void ConfigurationChanged();
 
   private:
-    bool AddPoint(StateMachineAction* , InteractionEvent*); // function to add new points
-    bool EnoughPoints(StateMachineAction* , InteractionEvent*); // function changes color of pointset to indicate, it is full
-    bool CheckPoint(const InteractionEvent* interactionEvent); // function checks if the clicked point is valid
+    bool AddPoint(StateMachineAction *, InteractionEvent *); // function to add new points
+    bool EnoughPoints(StateMachineAction *,
+                      InteractionEvent *); // function changes color of pointset to indicate, it is full
+    bool CheckPoint(const InteractionEvent *interactionEvent); // function checks if the clicked point is valid
 
     PointSet::Pointer m_PointSet;
     int m_NumberOfPoints;

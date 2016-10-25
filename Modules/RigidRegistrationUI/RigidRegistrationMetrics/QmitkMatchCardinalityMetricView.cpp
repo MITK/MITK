@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMatchCardinalityMetricView.h"
-#include <itkMatchCardinalityImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkMatchCardinalityImageToImageMetric.h>
 
-QmitkMatchCardinalityMetricView::QmitkMatchCardinalityMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkMatchCardinalityMetricView::QmitkMatchCardinalityMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
-
 }
 
 QmitkMatchCardinalityMetricView::~QmitkMatchCardinalityMetricView()
@@ -42,12 +42,14 @@ itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::MatchCardinalityImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MatchCardinalityImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::MatchCardinalityImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::MatchCardinalityImageToImageMetric<FixedImageType, MovingImageType>::New();
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -72,7 +74,7 @@ QString QmitkMatchCardinalityMetricView::GetName()
   return "MatchCardinality";
 }
 
-void QmitkMatchCardinalityMetricView::SetupUI(QWidget* parent)
+void QmitkMatchCardinalityMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
 }

@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkToolGUI_h_Included
 #define QmitkToolGUI_h_Included
 
-#include <qwidget.h>
 #include <MitkSegmentationUIExports.h>
+#include <qwidget.h>
 
 #include "mitkCommon.h"
 #include "mitkTool.h"
@@ -37,32 +37,30 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolGUI : public QWidget, public itk::Objec
 {
   Q_OBJECT
 
-  public:
-    mitkClassMacroItkParent(QmitkToolGUI, itk::Object);
+public:
+  mitkClassMacroItkParent(QmitkToolGUI, itk::Object);
 
-    void SetTool( mitk::Tool* tool );
+  void SetTool(mitk::Tool *tool);
 
-    // just make sure ITK won't take care of anything (especially not destruction)
-    virtual void Register() const override;
-    virtual void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
-    virtual void SetReferenceCount(int) override;
+  // just make sure ITK won't take care of anything (especially not destruction)
+  virtual void Register() const override;
+  virtual void UnRegister() const ITK_NOEXCEPT ITK_OVERRIDE;
+  virtual void SetReferenceCount(int) override;
 
-    virtual ~QmitkToolGUI();
+  virtual ~QmitkToolGUI();
 
-  signals:
+signals:
 
-    void NewToolAssociated( mitk::Tool* );
+  void NewToolAssociated(mitk::Tool *);
 
-  public slots:
+public slots:
 
-  protected slots:
+protected slots:
 
-  protected:
+protected:
+  mitk::Tool::Pointer m_Tool;
 
-    mitk::Tool::Pointer m_Tool;
-
-    virtual void BusyStateChanged(bool) {};
+  virtual void BusyStateChanged(bool){};
 };
 
 #endif
-

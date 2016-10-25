@@ -17,20 +17,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkTool_h_Included
 #define mitkTool_h_Included
 
-#include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
-#include "mitkToolEvents.h"
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"
-#include "mitkToolFactoryMacro.h"
-#include "mitkMessage.h"
+#include "mitkCommon.h"
 #include "mitkDataNode.h"
-#include "mitkNodePredicateProperty.h"
+#include "mitkMessage.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateOr.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkToolEvents.h"
+#include "mitkToolFactoryMacro.h"
+#include <MitkSegmentationExports.h>
 
 #include <iostream>
 #include <map>
@@ -40,18 +40,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "usServiceRegistration.h"
 
-#include "mitkInteractionEventObserver.h"
 #include "mitkEventStateMachine.h"
+#include "mitkInteractionEventObserver.h"
 #include <mitkLabel.h>
 
-
-namespace us {
-class ModuleResource;
+namespace us
+{
+  class ModuleResource;
 }
 
 namespace mitk
 {
-
   class ToolManager;
 
   /**
@@ -65,30 +64,34 @@ namespace mitk
 
   There is a separate page describing the \ref QmitkInteractiveSegmentationTechnicalPage.
 
-  Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know is, that
-  every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated, because mitk::Tool
-  resets the StateMachine in this method. Only if you are very sure that you covered all possible things that might happen to your
+  Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know
+  is, that
+  every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated,
+  because mitk::Tool
+  resets the StateMachine in this method. Only if you are very sure that you covered all possible things that might
+  happen to your
   own tool, you should consider not to reset the StateMachine from time to time.
 
   To learn about the MITK implementation of state machines in general, have a look at \ref InteractionPage.
 
-  To derive a non-abstract tool, you inherit from mitk::Tool (or some other base class further down the inheritance tree), and in your
-  own parameterless constructor (that is called from the itkFactorylessNewMacro that you use) you pass a StateMachine pattern name to the superclass.
+  To derive a non-abstract tool, you inherit from mitk::Tool (or some other base class further down the inheritance
+  tree), and in your
+  own parameterless constructor (that is called from the itkFactorylessNewMacro that you use) you pass a StateMachine
+  pattern name to the superclass.
   Names for valid patterns can be found in StateMachine.xml (which might be enhanced by you).
 
   You have to implement at least GetXPM() and GetName() to provide some identification.
 
   Each Tool knows its ToolManager, which can provide the data that the tool should work on.
 
-  \warning Only to be instantiated by mitk::ToolManager (because SetToolManager has to be called). All other uses are unsupported.
+  \warning Only to be instantiated by mitk::ToolManager (because SetToolManager has to be called). All other uses are
+  unsupported.
 
   $Author$
   */
-  class MITKSEGMENTATION_EXPORT Tool : public EventStateMachine
-                                 , public InteractionEventObserver
+  class MITKSEGMENTATION_EXPORT Tool : public EventStateMachine, public InteractionEventObserver
   {
   public:
-
     typedef mitk::Label::PixelType DefaultSegmentationDataType;
 
     /**
@@ -120,9 +123,10 @@ namespace mitk
 
     This icon has to fit into some kind of button in most applications, so make it smaller than 25x25 pixels.
 
-    XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could also "draw" it with an editor.
+    XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could
+    also "draw" it with an editor.
     */
-    virtual const char** GetXPM() const = 0;
+    virtual const char **GetXPM() const = 0;
 
     /**
      * \brief Returns the path of an icon.
@@ -130,7 +134,6 @@ namespace mitk
      * This icon is preferred to the XPM icon.
      */
     virtual std::string GetIconPath() const { return ""; }
-
     /**
      * \brief Returns the path of a cursor icon.
      *
@@ -149,14 +152,15 @@ namespace mitk
 
     This name has to fit into some kind of button in most applications, so take some time to think of a good name!
     */
-    virtual const char* GetName() const = 0;
+    virtual const char *GetName() const = 0;
 
     /**
     \brief Name of a group.
 
-    You can group several tools by assigning a group name. Graphical tool selectors might use this information to group tools. (What other reason could there be?)
+    You can group several tools by assigning a group name. Graphical tool selectors might use this information to group
+    tools. (What other reason could there be?)
     */
-    virtual const char* GetGroup() const;
+    virtual const char *GetGroup() const;
 
     virtual void InitializeStateMachine();
 
@@ -171,29 +175,32 @@ namespace mitk
     *  - There may be several instances of a GUI at the same time.
     *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
     *  - The GUI part inherits both from itk::Object and some GUI toolkit class
-    *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g. MyTool -> wxMyToolGUI
+    *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g.
+    * MyTool -> wxMyToolGUI
     *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
     *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
     *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
     *  - Calling methods of a tool by its GUI is done directly.
     *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool.
-    *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a method call.
+    *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a
+    * method call.
     */
-    virtual itk::Object::Pointer GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix);
+    virtual itk::Object::Pointer GetGUI(const std::string &toolkitPrefix, const std::string &toolkitPostfix);
 
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
     virtual NodePredicateBase::ConstPointer GetWorkingDataPreference() const;
 
-    DataNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
-    DataNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
+    DataNode::Pointer CreateEmptySegmentationNode(Image *original,
+                                                  const std::string &organName,
+                                                  const mitk::Color &color);
+    DataNode::Pointer CreateSegmentationNode(Image *image, const std::string &organName, const mitk::Color &color);
 
-    virtual bool CanHandle(BaseData* referenceData) const;
+    virtual bool CanHandle(BaseData *referenceData) const;
 
   protected:
-
     friend class ToolManager;
 
-    virtual void SetToolManager(ToolManager*);
+    virtual void SetToolManager(ToolManager *);
 
     void ConnectActionsAndFunctions() override;
 
@@ -216,18 +223,17 @@ namespace mitk
     */
     std::string m_EventConfig;
 
-    Tool(); // purposely hidden
-    Tool( const char*); // purposely hidden
+    Tool();             // purposely hidden
+    Tool(const char *); // purposely hidden
     virtual ~Tool();
 
-    virtual void Notify( InteractionEvent* interactionEvent,bool isHandled ) override;
+    virtual void Notify(InteractionEvent *interactionEvent, bool isHandled) override;
 
-    bool FilterEvents(InteractionEvent* , DataNode* ) override;
+    bool FilterEvents(InteractionEvent *, DataNode *) override;
 
-    ToolManager* m_ToolManager;
+    ToolManager *m_ToolManager;
 
   private:
-
     // for reference data
     NodePredicateDataType::Pointer m_PredicateImages;
     NodePredicateDimension::Pointer m_PredicateDim3;
@@ -256,10 +262,8 @@ namespace mitk
     std::string m_InteractorType;
 
     std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
-
   };
 
 } // namespace
 
 #endif
-

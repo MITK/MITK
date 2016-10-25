@@ -19,10 +19,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkRenderingManager.h>
 
-#include <itkCommand.h>
-#include <QValidator>
 #include <QLayout>
 #include <QLineEdit>
+#include <QValidator>
+#include <itkCommand.h>
 #include <limits>
 #include <sstream>
 
@@ -31,68 +31,70 @@ using namespace std;
 /**
 * Constructor
 */
-QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f)
+QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   m_Manager = mitk::LevelWindowManager::New();
 
-  itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
+  itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command =
+    itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
   command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
   m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
   m_IsObserverTagSet = true;
 
   m_Contextmenu = new QmitkLevelWindowWidgetContextMenu(this); // true);
 
-  auto  layout = new QVBoxLayout( this );
+  auto layout = new QVBoxLayout(this);
   layout->setMargin(0);
   layout->setSpacing(0);
 
-  m_LevelInput = new QLineEdit( this );
-  m_LevelInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
+  m_LevelInput = new QLineEdit(this);
+  m_LevelInput->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
   m_LevelInput->setToolTip("Edit this field to change the center of the levelwindow.");
-  //m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
-  //m_LevelInput->setFrameShadow( QLineEdit::Sunken );
+  // m_LevelInput->setFrameShape( QLineEdit::LineEditPanel );
+  // m_LevelInput->setFrameShadow( QLineEdit::Sunken );
 
-  m_WindowInput = new QLineEdit( this );
-  m_WindowInput->setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred));
-  m_WindowInput->setToolTip("Edit this field to change the span of the levelwindow. This number describes the whole span around the center.");
-  //m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
-  //m_WindowInput->setFrameShadow( QLineEdit::Sunken );
+  m_WindowInput = new QLineEdit(this);
+  m_WindowInput->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
+  m_WindowInput->setToolTip(
+    "Edit this field to change the span of the levelwindow. This number describes the whole span around the center.");
+  // m_WindowInput->setFrameShape( QLineEdit::LineEditPanel );
+  // m_WindowInput->setFrameShadow( QLineEdit::Sunken );
 
   layout->addWidget(m_LevelInput);
   layout->addWidget(m_WindowInput);
 
   // signals and slots connections
-  connect( m_LevelInput, SIGNAL(editingFinished()), this, SLOT( SetLevelValue() ) );
-  connect( m_WindowInput, SIGNAL(editingFinished()), this, SLOT( SetWindowValue() ) );
+  connect(m_LevelInput, SIGNAL(editingFinished()), this, SLOT(SetLevelValue()));
+  connect(m_WindowInput, SIGNAL(editingFinished()), this, SLOT(SetWindowValue()));
 
   // Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  //QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
-  QValidator* validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), 2, this);
+  // QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
+  QValidator *validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), 2, this);
   m_WindowInput->setValidator(validatorWindowInput);
 
-  //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  //QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
-  //m_LevelInput->setValidator(validatorLevelInput);
+  // QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
+  // QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(),
+  // numeric_limits<double>::max(), 2, this);
+  // m_LevelInput->setValidator(validatorLevelInput);
 
   this->hide();
 }
 
 QmitkLineEditLevelWindowWidget::~QmitkLineEditLevelWindowWidget()
 {
-  if( m_IsObserverTagSet )
+  if (m_IsObserverTagSet)
   {
     m_Manager->RemoveObserver(m_ObserverTag);
     m_IsObserverTagSet = false;
   }
 }
 
-void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
+void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject &)
 {
   try
   {
     m_LevelWindow = m_Manager->GetLevelWindow();
-    //setValidator();
+    // setValidator();
     QString level;
     QString window;
     if (m_LevelWindow.IsFloatingValues())
@@ -103,7 +105,8 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
       ssWindow << std::setprecision(3) << m_LevelWindow.GetWindow();
       level = ssLevel.str().c_str();
       window = ssWindow.str().c_str();
-    } else
+    }
+    else
     {
       level.setNum((int)(m_LevelWindow.GetLevel()));
       window.setNum((int)(m_LevelWindow.GetWindow()));
@@ -114,41 +117,42 @@ void QmitkLineEditLevelWindowWidget::OnPropertyModified(const itk::EventObject& 
     m_WindowInput->setEnabled(!m_LevelWindow.IsFixed());
     this->show();
   }
-  catch(...)
+  catch (...)
   {
     try
     {
       this->hide();
     }
-    catch(...)
+    catch (...)
     {
     }
   }
 }
 
-void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager* levelWindowManager)
+void QmitkLineEditLevelWindowWidget::setLevelWindowManager(mitk::LevelWindowManager *levelWindowManager)
 {
-  if( m_IsObserverTagSet )
+  if (m_IsObserverTagSet)
   {
     m_Manager->RemoveObserver(m_ObserverTag);
     m_IsObserverTagSet = false;
   }
   m_Manager = levelWindowManager;
-  if ( m_Manager.IsNotNull() )
+  if (m_Manager.IsNotNull())
   {
-    itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
+    itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::Pointer command =
+      itk::ReceptorMemberCommand<QmitkLineEditLevelWindowWidget>::New();
     command->SetCallbackFunction(this, &QmitkLineEditLevelWindowWidget::OnPropertyModified);
     m_ObserverTag = m_Manager->AddObserver(itk::ModifiedEvent(), command);
     m_IsObserverTagSet = true;
   }
 }
 
-void QmitkLineEditLevelWindowWidget::SetDataStorage( mitk::DataStorage* ds )
+void QmitkLineEditLevelWindowWidget::SetDataStorage(mitk::DataStorage *ds)
 {
   m_Manager->SetDataStorage(ds);
 }
 
-//read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
+// read the levelInput and change level and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetLevelValue()
 {
   double level = m_LevelInput->text().toDouble();
@@ -157,7 +161,7 @@ void QmitkLineEditLevelWindowWidget::SetLevelValue()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-//read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
+// read the windowInput and change window and slider when the button "ENTER" was pressed in the windowInput-LineEdit
 void QmitkLineEditLevelWindowWidget::SetWindowValue()
 {
   double window = m_WindowInput->text().toDouble();
@@ -166,13 +170,13 @@ void QmitkLineEditLevelWindowWidget::SetWindowValue()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
+void QmitkLineEditLevelWindowWidget::contextMenuEvent(QContextMenuEvent *)
 {
   m_Contextmenu->setLevelWindowManager(m_Manager.GetPointer());
   m_Contextmenu->getContextMenu();
 }
 
-mitk::LevelWindowManager* QmitkLineEditLevelWindowWidget::GetManager()
+mitk::LevelWindowManager *QmitkLineEditLevelWindowWidget::GetManager()
 {
   return m_Manager.GetPointer();
 }

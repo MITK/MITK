@@ -14,172 +14,168 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_CONTOUR_H_
 #define _MITK_CONTOUR_H_
 
+#include "mitkBaseData.h"
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>
-#include "mitkBaseData.h"
 #include <vtkRenderWindow.h>
 
 #include <itkPolyLineParametricPath.h>
 
 namespace mitk
 {
-
-/**
-  \brief Stores vertices for drawing a contour.
-  \deprecated Use class mitk::ContourModel instead.
-
-  \sa ContourModel
-*/
-class MITKSEGMENTATION_EXPORT Contour : public BaseData
-{
-public:
-  mitkClassMacro(Contour, BaseData);
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  typedef itk::PolyLineParametricPath<3>                        PathType;
-  typedef PathType::Pointer                                     PathPointer;
-  typedef PathType::ContinuousIndexType                         ContinuousIndexType;
-  typedef PathType::InputType                                   InputType;
-  typedef PathType::OutputType                                  OutputType;
-  typedef PathType::OffsetType                                  OffsetType;
-  typedef itk::BoundingBox<unsigned long, 3, ScalarType,
-    itk::VectorContainer< unsigned long, mitk::Point< ScalarType, 3 > > >        BoundingBoxType;
-  typedef BoundingBoxType::PointsContainer                      PointsContainer;
-  typedef BoundingBoxType::PointsContainer::Pointer             PointsContainerPointer;
-  typedef BoundingBoxType::PointsContainerIterator              PointsContainerIterator;
-
   /**
-  * sets whether the contour should be closed or open.
-  * by default the contour is closed
+    \brief Stores vertices for drawing a contour.
+    \deprecated Use class mitk::ContourModel instead.
+
+    \sa ContourModel
   */
-  itkSetMacro(Closed, bool);
+  class MITKSEGMENTATION_EXPORT Contour : public BaseData
+  {
+  public:
+    mitkClassMacro(Contour, BaseData);
 
-  /**
-  * returns if the contour is closed or opened
-  */
-  itkGetMacro(Closed, bool);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  itkSetMacro(Selected, bool);
+      typedef itk::PolyLineParametricPath<3> PathType;
+    typedef PathType::Pointer PathPointer;
+    typedef PathType::ContinuousIndexType ContinuousIndexType;
+    typedef PathType::InputType InputType;
+    typedef PathType::OutputType OutputType;
+    typedef PathType::OffsetType OffsetType;
+    typedef itk::
+      BoundingBox<unsigned long, 3, ScalarType, itk::VectorContainer<unsigned long, mitk::Point<ScalarType, 3>>>
+        BoundingBoxType;
+    typedef BoundingBoxType::PointsContainer PointsContainer;
+    typedef BoundingBoxType::PointsContainer::Pointer PointsContainerPointer;
+    typedef BoundingBoxType::PointsContainerIterator PointsContainerIterator;
 
-  itkGetMacro(Selected, bool);
+    /**
+    * sets whether the contour should be closed or open.
+    * by default the contour is closed
+    */
+    itkSetMacro(Closed, bool);
 
-  itkSetMacro(Width, float);
+    /**
+    * returns if the contour is closed or opened
+    */
+    itkGetMacro(Closed, bool);
 
-  itkGetMacro(Width, float);
+    itkSetMacro(Selected, bool);
 
+    itkGetMacro(Selected, bool);
 
-  /**
-  * clean up the contour data
-  */
-  void Initialize() override;
+    itkSetMacro(Width, float);
 
-  /**
-  * add a new vertex to the contour
-  */
-  void AddVertex(mitk::Point3D newPoint);
+    itkGetMacro(Width, float);
 
-  /**
-  * return an itk parametric path of the contour
-  */
-  PathPointer GetContourPath() const;
+    /**
+    * clean up the contour data
+    */
+    void Initialize() override;
 
-  /**
-  * set the current render window. This is helpful if one
-  * wants to draw the contour in one special window only.
-  */
-  void SetCurrentWindow(vtkRenderWindow* rw);
+    /**
+    * add a new vertex to the contour
+    */
+    void AddVertex(mitk::Point3D newPoint);
 
-  /**
-  * returns the points to the current render window
-  */
-  vtkRenderWindow* GetCurrentWindow() const;
+    /**
+    * return an itk parametric path of the contour
+    */
+    PathPointer GetContourPath() const;
 
-  /**
-  * returns the number of points stored in the contour
-  */
-  unsigned int GetNumberOfPoints() const;
+    /**
+    * set the current render window. This is helpful if one
+    * wants to draw the contour in one special window only.
+    */
+    void SetCurrentWindow(vtkRenderWindow *rw);
 
-  /**
-  * returns the container of the contour points
-  */
-  PointsContainerPointer GetPoints() const;
+    /**
+    * returns the points to the current render window
+    */
+    vtkRenderWindow *GetCurrentWindow() const;
 
-  /**
-  * set the contour points container.
-  */
-  void SetPoints(PointsContainerPointer points);
+    /**
+    * returns the number of points stored in the contour
+    */
+    unsigned int GetNumberOfPoints() const;
 
-  /**
-  * intherited from parent
-  */
-  virtual void UpdateOutputInformation() override;
+    /**
+    * returns the container of the contour points
+    */
+    PointsContainerPointer GetPoints() const;
 
-  /**
-  * intherited from parent
-  */
-  virtual void SetRequestedRegionToLargestPossibleRegion() override;
+    /**
+    * set the contour points container.
+    */
+    void SetPoints(PointsContainerPointer points);
 
-  /**
-  * intherited from parent
-  */
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    /**
+    * intherited from parent
+    */
+    virtual void UpdateOutputInformation() override;
 
-  /**
-  * intherited from parent
-  */
-  virtual bool VerifyRequestedRegion() override;
+    /**
+    * intherited from parent
+    */
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
-  /**
-  * intherited from parent
-  */
-  virtual void SetRequestedRegion( const itk::DataObject *data) override;
+    /**
+    * intherited from parent
+    */
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-protected:
-  mitkCloneMacro(Self);
+    /**
+    * intherited from parent
+    */
+    virtual bool VerifyRequestedRegion() override;
 
-  Contour();
-  Contour(const Contour & other);
-  virtual ~Contour();
+    /**
+    * intherited from parent
+    */
+    virtual void SetRequestedRegion(const itk::DataObject *data) override;
 
-  virtual void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+  protected:
+    mitkCloneMacro(Self);
 
-private:
+    Contour();
+    Contour(const Contour &other);
+    virtual ~Contour();
 
-  /**
-  * parametric path of a contour;
-  */
-  PathType::Pointer m_ContourPath;
+    virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-  /**
-  * the current render window
-  */
-  vtkRenderWindow* m_CurrentWindow;
+  private:
+    /**
+    * parametric path of a contour;
+    */
+    PathType::Pointer m_ContourPath;
 
-  /**
-  * the bounding box of the contour
-  */
-  BoundingBoxType::Pointer m_BoundingBox;
+    /**
+    * the current render window
+    */
+    vtkRenderWindow *m_CurrentWindow;
 
-  /**
-  * container for all contour points
-  */
-  BoundingBoxType::PointsContainer::Pointer m_Vertices;
+    /**
+    * the bounding box of the contour
+    */
+    BoundingBoxType::Pointer m_BoundingBox;
 
-  /**
-  * decide whether th contour is open or closed
-  */
-  bool m_Closed;
+    /**
+    * container for all contour points
+    */
+    BoundingBoxType::PointsContainer::Pointer m_Vertices;
 
-  bool m_Selected;
+    /**
+    * decide whether th contour is open or closed
+    */
+    bool m_Closed;
 
-  float m_Width;
-};
+    bool m_Selected;
+
+    float m_Width;
+  };
 
 } // namespace mitk
 

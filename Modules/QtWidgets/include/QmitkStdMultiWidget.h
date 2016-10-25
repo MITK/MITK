@@ -19,17 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkQtWidgetsExports.h"
 
-#include <mitkLogoOverlay.h>
 #include <mitkDataStorage.h>
+#include <mitkLogoOverlay.h>
 
 #include <mitkMouseModeSwitcher.h>
 
-#include <qwidget.h>
-#include <qsplitter.h>
 #include <QFrame>
+#include <qsplitter.h>
+#include <qwidget.h>
 
-#include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
+#include <QmitkRenderWindow.h>
 
 #include <mitkBaseRenderer.h>
 
@@ -42,8 +42,9 @@ class QmitkRenderWindow;
 class vtkCornerAnnotation;
 class vtkMitkRectangleProp;
 
-namespace mitk {
-class RenderingManager;
+namespace mitk
+{
+  class RenderingManager;
 }
 
 /// \ingroup QmitkModule
@@ -52,29 +53,31 @@ class MITKQTWIDGETS_EXPORT QmitkStdMultiWidget : public QWidget
   Q_OBJECT
 
 public:
-  QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::RenderingManager* renderingManager = 0, mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard, const QString& name = "stdmulti");
+  QmitkStdMultiWidget(
+    QWidget *parent = 0,
+    Qt::WindowFlags f = 0,
+    mitk::RenderingManager *renderingManager = 0,
+    mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard,
+    const QString &name = "stdmulti");
   virtual ~QmitkStdMultiWidget();
 
-  mitk::SliceNavigationController*
-  GetTimeNavigationController();
+  mitk::SliceNavigationController *GetTimeNavigationController();
 
   void RequestUpdate();
 
   void ForceImmediateUpdate();
 
-  mitk::MouseModeSwitcher* GetMouseModeSwitcher();
+  mitk::MouseModeSwitcher *GetMouseModeSwitcher();
 
-  QmitkRenderWindow* GetRenderWindow1() const;
+  QmitkRenderWindow *GetRenderWindow1() const;
 
-  QmitkRenderWindow* GetRenderWindow2() const;
+  QmitkRenderWindow *GetRenderWindow2() const;
 
-  QmitkRenderWindow* GetRenderWindow3() const;
+  QmitkRenderWindow *GetRenderWindow3() const;
 
-  QmitkRenderWindow* GetRenderWindow4() const;
+  QmitkRenderWindow *GetRenderWindow4() const;
 
-
-  const mitk::Point3D
-  GetCrossPosition() const;
+  const mitk::Point3D GetCrossPosition() const;
 
   void EnablePositionTracking();
 
@@ -117,7 +120,7 @@ public:
 
   void AddPlanesToDataStorage();
 
-  void SetDataStorage( mitk::DataStorage* ds );
+  void SetDataStorage(mitk::DataStorage *ds);
 
   /** \brief Listener to the CrosshairPositionEvent
 
@@ -126,7 +129,7 @@ public:
   void HandleCrosshairPositionEvent();
 
   /// activate Menu Widget. true: activated, false: deactivated
-  void ActivateMenuWidget( bool state );
+  void ActivateMenuWidget(bool state);
 
   bool IsMenuWidgetEnabled() const;
 
@@ -135,7 +138,6 @@ public:
   bool IsCornerAnnotationVisible(void) const;
 
 protected:
-
   void UpdateAllWidgets();
 
   void HideAllWidgetToolbars();
@@ -185,21 +187,21 @@ public slots:
 
   void DisableStandardLevelWindow();
 
-  bool InitializeStandardViews( const mitk::Geometry3D * geometry );
+  bool InitializeStandardViews(const mitk::Geometry3D *geometry);
 
-  void wheelEvent( QWheelEvent * e ) override;
+  void wheelEvent(QWheelEvent *e) override;
 
-  void mousePressEvent(QMouseEvent * e) override;
+  void mousePressEvent(QMouseEvent *e) override;
 
-  void moveEvent( QMoveEvent* e ) override;
+  void moveEvent(QMoveEvent *e) override;
 
-  void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D&p);
+  void EnsureDisplayContainsPoint(mitk::BaseRenderer *renderer, const mitk::Point3D &p);
 
-  void MoveCrossToPosition(const mitk::Point3D& newPosition);
+  void MoveCrossToPosition(const mitk::Point3D &newPosition);
 
-  //void EnableNavigationControllerEventListening();
+  // void EnableNavigationControllerEventListening();
 
-  //void DisableNavigationControllerEventListening();
+  // void DisableNavigationControllerEventListening();
 
   void EnableGradientBackground();
 
@@ -213,36 +215,36 @@ public slots:
 
   void DisableColoredRectangles();
 
-  void SetWidgetPlaneVisibility(const char* widgetName, bool visible, mitk::BaseRenderer *renderer=NULL);
+  void SetWidgetPlaneVisibility(const char *widgetName, bool visible, mitk::BaseRenderer *renderer = NULL);
 
-  void SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer=NULL);
+  void SetWidgetPlanesVisibility(bool visible, mitk::BaseRenderer *renderer = NULL);
 
   void SetWidgetPlanesLocked(bool locked);
 
   void SetWidgetPlanesRotationLocked(bool locked);
 
-  void SetWidgetPlanesRotationLinked( bool link );
+  void SetWidgetPlanesRotationLinked(bool link);
 
-  void SetWidgetPlaneMode( int mode );
+  void SetWidgetPlaneMode(int mode);
 
-  void SetGradientBackgroundColors( const mitk::Color & upper, const mitk::Color & lower );
+  void SetGradientBackgroundColors(const mitk::Color &upper, const mitk::Color &lower);
 
-  void SetDepartmentLogoPath( const char * path );
+  void SetDepartmentLogoPath(const char *path);
 
-  void SetWidgetPlaneModeToSlicing( bool activate );
+  void SetWidgetPlaneModeToSlicing(bool activate);
 
-  void SetWidgetPlaneModeToRotation( bool activate );
+  void SetWidgetPlaneModeToRotation(bool activate);
 
-  void SetWidgetPlaneModeToSwivel( bool activate );
+  void SetWidgetPlaneModeToSwivel(bool activate);
 
-  void OnLayoutDesignChanged( int layoutDesignIndex );
+  void OnLayoutDesignChanged(int layoutDesignIndex);
 
   void ResetCrosshair();
 
 signals:
 
   void LeftMouseClicked(mitk::Point3D pointValue);
-  void WheelMoved(QWheelEvent*);
+  void WheelMoved(QWheelEvent *);
   void WidgetPlanesRotationLinked(bool);
   void WidgetPlanesRotationEnabled(bool);
   void ViewsInitialized();
@@ -254,24 +256,40 @@ signals:
   void Moved();
 
 public:
-
   /** Define RenderWindow (public)*/
-  QmitkRenderWindow* mitkWidget1;
-  QmitkRenderWindow* mitkWidget2;
-  QmitkRenderWindow* mitkWidget3;
-  QmitkRenderWindow* mitkWidget4;
-  QmitkLevelWindowWidget* levelWindowWidget;
+  QmitkRenderWindow *mitkWidget1;
+  QmitkRenderWindow *mitkWidget2;
+  QmitkRenderWindow *mitkWidget3;
+  QmitkRenderWindow *mitkWidget4;
+  QmitkLevelWindowWidget *levelWindowWidget;
   /********************************/
 
-  enum { PLANE_MODE_SLICING = 0, PLANE_MODE_ROTATION, PLANE_MODE_SWIVEL };
-  enum { LAYOUT_DEFAULT = 0, LAYOUT_2D_IMAGES_UP, LAYOUT_2D_IMAGES_LEFT,
-         LAYOUT_BIG_3D, LAYOUT_WIDGET1, LAYOUT_WIDGET2, LAYOUT_WIDGET3,
-         LAYOUT_2X_2D_AND_3D_WIDGET, LAYOUT_ROW_WIDGET_3_AND_4,
-         LAYOUT_COLUMN_WIDGET_3_AND_4, LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4 ,
-         LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET,
-         LAYOUT_2D_UP_AND_3D_DOWN};
+  enum
+  {
+    PLANE_MODE_SLICING = 0,
+    PLANE_MODE_ROTATION,
+    PLANE_MODE_SWIVEL
+  };
+  enum
+  {
+    LAYOUT_DEFAULT = 0,
+    LAYOUT_2D_IMAGES_UP,
+    LAYOUT_2D_IMAGES_LEFT,
+    LAYOUT_BIG_3D,
+    LAYOUT_WIDGET1,
+    LAYOUT_WIDGET2,
+    LAYOUT_WIDGET3,
+    LAYOUT_2X_2D_AND_3D_WIDGET,
+    LAYOUT_ROW_WIDGET_3_AND_4,
+    LAYOUT_COLUMN_WIDGET_3_AND_4,
+    LAYOUT_ROW_WIDGET_SMALL3_AND_BIG4,
+    LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4,
+    LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET,
+    LAYOUT_2D_UP_AND_3D_DOWN
+  };
 
-  enum {
+  enum
+  {
     AXIAL,
     SAGITTAL,
     CORONAL,
@@ -301,7 +319,9 @@ public:
    * @param lower Lower color of the gradient background.
    * @param widgetNumber The widget (0-3).
    */
-  void SetGradientBackgroundColorForRenderWindow(const mitk::Color &upper, const mitk::Color &lower, unsigned int widgetNumber);
+  void SetGradientBackgroundColorForRenderWindow(const mitk::Color &upper,
+                                                 const mitk::Color &lower,
+                                                 unsigned int widgetNumber);
 
   /**
    * @brief GetDecorationColorForWidget Get the color for annotation, crosshair and rectangle.
@@ -333,21 +353,21 @@ public:
    * @return A pair of colors. First: upper, second: lower.
    */
   std::pair<mitk::Color, mitk::Color> GetGradientColors(unsigned int widgetNumber);
-protected:
 
-  QHBoxLayout* QmitkStdMultiWidgetLayout;
+protected:
+  QHBoxLayout *QmitkStdMultiWidgetLayout;
 
   int m_Layout;
   int m_PlaneMode;
 
-  mitk::RenderingManager* m_RenderingManager;
+  mitk::RenderingManager *m_RenderingManager;
 
   mitk::LogoOverlay::Pointer m_LogoRendering;
 
   bool m_GradientBackgroundFlag;
 
   mitk::MouseModeSwitcher::Pointer m_MouseModeSwitcher;
-  mitk::SliceNavigationController* m_TimeNavigationController;
+  mitk::SliceNavigationController *m_TimeNavigationController;
 
   mitk::DataStorage::Pointer m_DataStorage;
 

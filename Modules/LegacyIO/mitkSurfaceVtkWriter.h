@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_SURFACE_VTK_WRITER__H_
 #define _MITK_SURFACE_VTK_WRITER__H_
 
 #include <iomanip>
 
-#include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
+#include <vtkSTLWriter.h>
 #include <vtkXMLPolyDataWriter.h>
 
 #include <MitkLegacyIOExports.h>
@@ -36,34 +35,31 @@ class vtkTransformPolyDataFilter;
 
 namespace mitk
 {
+  /**
+   * @brief VTK-based writer for mitk::Surface
+   *
+   * The mitk::Surface is written using the VTK-writer-type provided as the
+   * template argument. If the mitk::Surface contains multiple points of
+   * time, multiple files are written. The life-span (time-bounds) of each
+   * each point of time is included in the filename according to the
+   * following scheme:
+   * &lt;filename&gt;_S&lt;timebounds[0]&gt;E&lt;timebounds[1]&gt;_T&lt;framenumber&gt;
+   * (S=start, E=end, T=time).
+   * Writing of multiple files according to a given filename pattern is not
+   * yet supported.
+   * @ingroup MitkLegacyIOModule
+   *
+   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  */
+  template <class VTKWRITER>
+  class MITKLEGACYIO_EXPORT SurfaceVtkWriter : public mitk::FileWriterWithInformation
+  {
+  public:
+    mitkClassMacro(SurfaceVtkWriter, mitk::FileWriter);
 
-/**
- * @brief VTK-based writer for mitk::Surface
- *
- * The mitk::Surface is written using the VTK-writer-type provided as the
- * template argument. If the mitk::Surface contains multiple points of
- * time, multiple files are written. The life-span (time-bounds) of each
- * each point of time is included in the filename according to the
- * following scheme:
- * &lt;filename&gt;_S&lt;timebounds[0]&gt;E&lt;timebounds[1]&gt;_T&lt;framenumber&gt;
- * (S=start, E=end, T=time).
- * Writing of multiple files according to a given filename pattern is not
- * yet supported.
- * @ingroup MitkLegacyIOModule
- *
- * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-*/
-template <class VTKWRITER>
-class MITKLEGACYIO_EXPORT SurfaceVtkWriter : public mitk::FileWriterWithInformation
-{
-public:
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( SurfaceVtkWriter, mitk::FileWriter );
-
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    mitkWriterMacro;
+      mitkWriterMacro;
 
     typedef VTKWRITER VtkWriterType;
 
@@ -71,12 +67,12 @@ public:
      * Sets the filename of the file to write.
      * @param _arg the name of the file to write.
      */
-    itkSetStringMacro( FileName );
+    itkSetStringMacro(FileName);
 
     /**
      * @returns the name of the file to be written to disk.
      */
-    itkGetStringMacro( FileName );
+    itkGetStringMacro(FileName);
 
     /**
      * \brief Explicitly set the extension to be added to the filename.
@@ -86,14 +82,14 @@ public:
      * Partial template specialization is used for some vtk-writer types
      * to set a default extension.
      */
-    itkSetStringMacro( Extension );
+    itkSetStringMacro(Extension);
 
     /**
      * \brief Get the extension to be added to the filename.
      * @returns the extension to be added to the filename (e.g.,
      * ".vtk").
      */
-    itkGetStringMacro( Extension );
+    itkGetStringMacro(Extension);
 
     /**
      * \brief Set the extension to be added to the filename to the default
@@ -106,33 +102,33 @@ public:
     /**
      * @warning multiple write not (yet) supported
      */
-    itkSetStringMacro( FilePrefix );
+    itkSetStringMacro(FilePrefix);
 
     /**
      * @warning multiple write not (yet) supported
      */
-    itkGetStringMacro( FilePrefix );
+    itkGetStringMacro(FilePrefix);
 
     /**
      * @warning multiple write not (yet) supported
      */
-    itkSetStringMacro( FilePattern );
+    itkSetStringMacro(FilePattern);
 
     /**
      * @warning multiple write not (yet) supported
      */
-    itkGetStringMacro( FilePattern );
+    itkGetStringMacro(FilePattern);
 
     /**
      * Sets the 0'th input object for the filter.
      * @param input the first input for the filter.
      */
-    void SetInput( mitk::Surface* input );
+    void SetInput(mitk::Surface *input);
 
     /**
      * @returns the 0'th input object of the filter.
      */
-    const mitk::Surface* GetInput();
+    const mitk::Surface *GetInput();
 
     /**
     * @brief Return the extension to be added to the filename.
@@ -142,7 +138,7 @@ public:
     /**
     * @brief Check if the Writer can write the Content of the DataTreenode.
     */
-    virtual bool CanWriteDataType( DataNode* ) override;
+    virtual bool CanWriteDataType(DataNode *) override;
 
     /**
     * @brief Return the MimeType of the saved File.
@@ -153,29 +149,22 @@ public:
     /**
     * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
     */
-    virtual void SetInput( DataNode* );
+    virtual void SetInput(DataNode *);
 
-    VtkWriterType* GetVtkWriter()
-    {
-      return m_VtkWriter;
-    }
-
+    VtkWriterType *GetVtkWriter() { return m_VtkWriter; }
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
     virtual std::vector<std::string> GetPossibleFileExtensions() override;
 
-    virtual std::string GetSupportedBaseData() const override
-    { return Surface::GetStaticNameOfClass(); }
-
+    virtual std::string GetSupportedBaseData() const override { return Surface::GetStaticNameOfClass(); }
     virtual const char *GetDefaultFilename() override;
     virtual const char *GetFileDialogPattern() override;
     virtual const char *GetDefaultExtension() override;
     virtual bool CanWriteBaseDataType(BaseData::Pointer data) override;
     virtual void DoWrite(BaseData::Pointer data) override;
 
-protected:
-
+  protected:
     /**
      * Constructor.
      */
@@ -188,7 +177,7 @@ protected:
 
     virtual void GenerateData() override;
 
-    void ExecuteWrite( VtkWriterType* vtkWriter );
+    void ExecuteWrite(VtkWriterType *vtkWriter);
 
     std::string m_FileName;
 
@@ -203,14 +192,13 @@ protected:
     vtkSmartPointer<VtkWriterType> m_VtkWriter;
 
     bool m_WriterWriteHasReturnValue;
-};
+  };
 
 #ifndef MitkLegacyIO_EXPORTS
-extern template class SurfaceVtkWriter<vtkSTLWriter>;
-extern template class SurfaceVtkWriter<vtkPolyDataWriter>;
-extern template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;
+  extern template class SurfaceVtkWriter<vtkSTLWriter>;
+  extern template class SurfaceVtkWriter<vtkPolyDataWriter>;
+  extern template class SurfaceVtkWriter<vtkXMLPolyDataWriter>;
 #endif
-
 }
 
 #endif //_MITK_SURFACE_VTK_WRITER__H_

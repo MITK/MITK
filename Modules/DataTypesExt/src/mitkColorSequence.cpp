@@ -17,15 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-ColorSequence::ColorSequence()
-{
-
-}//end of constructor
-
-ColorSequence::~ColorSequence()
-{
-
-}//end of destructor
-
-}//end of namespace
+  ColorSequence::ColorSequence() {}  // end of constructor
+  ColorSequence::~ColorSequence() {} // end of destructor
+} // end of namespace

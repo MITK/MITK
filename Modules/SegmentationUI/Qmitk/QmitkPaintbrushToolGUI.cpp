@@ -19,39 +19,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>
-#include <qslider.h>
-#include <qpushbutton.h>
 #include <qlayout.h>
 #include <qpainter.h>
+#include <qpushbutton.h>
+#include <qslider.h>
 
-QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI()
-:QmitkToolGUI(),
- m_Slider(NULL)
+QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI() : QmitkToolGUI(), m_Slider(NULL)
 {
   // create the visible widgets
-  QBoxLayout* layout = new QHBoxLayout( this );
-  this->setContentsMargins( 0, 0, 0, 0 );
+  QBoxLayout *layout = new QHBoxLayout(this);
+  this->setContentsMargins(0, 0, 0, 0);
 
-  QLabel* label = new QLabel( "Size ", this );
+  QLabel *label = new QLabel("Size ", this);
   QFont f = label->font();
   f.setBold(false);
-  label->setFont( f );
+  label->setFont(f);
   layout->addWidget(label);
 
-  m_SizeLabel = new QLabel( " 10", this );
+  m_SizeLabel = new QLabel(" 10", this);
   f = m_SizeLabel->font();
   f.setBold(false);
-  m_SizeLabel->setFont( f );
+  m_SizeLabel->setFont(f);
   layout->addWidget(m_SizeLabel);
 
-  //m_Slider = new QSlider( 1, 50, 1, 10, Qt::Horizontal, this );
-  m_Slider = new QSlider( Qt::Horizontal, this );
+  // m_Slider = new QSlider( 1, 50, 1, 10, Qt::Horizontal, this );
+  m_Slider = new QSlider(Qt::Horizontal, this);
   m_Slider->setMinimum(1);
   m_Slider->setMaximum(50);
   m_Slider->setPageStep(1);
   m_Slider->setValue(10);
-  connect( m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
-  layout->addWidget( m_Slider );
+  connect(m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
+  layout->addWidget(m_Slider);
 
   /*
   m_Frame = new QFrame( this );
@@ -61,7 +59,7 @@ QmitkPaintbrushToolGUI::QmitkPaintbrushToolGUI()
   layout->addWidget( m_Frame );
   */
 
-  connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
+  connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
 QmitkPaintbrushToolGUI::~QmitkPaintbrushToolGUI()
@@ -69,23 +67,25 @@ QmitkPaintbrushToolGUI::~QmitkPaintbrushToolGUI()
   // !!!
   if (m_PaintbrushTool.IsNotNull())
   {
-    m_PaintbrushTool->SizeChanged -= mitk::MessageDelegate1<QmitkPaintbrushToolGUI, int>( this, &QmitkPaintbrushToolGUI::OnSizeChanged );
+    m_PaintbrushTool->SizeChanged -=
+      mitk::MessageDelegate1<QmitkPaintbrushToolGUI, int>(this, &QmitkPaintbrushToolGUI::OnSizeChanged);
   }
-
 }
 
-void QmitkPaintbrushToolGUI::OnNewToolAssociated(mitk::Tool* tool)
+void QmitkPaintbrushToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 {
   if (m_PaintbrushTool.IsNotNull())
   {
-    m_PaintbrushTool->SizeChanged -= mitk::MessageDelegate1<QmitkPaintbrushToolGUI, int>( this, &QmitkPaintbrushToolGUI::OnSizeChanged );
+    m_PaintbrushTool->SizeChanged -=
+      mitk::MessageDelegate1<QmitkPaintbrushToolGUI, int>(this, &QmitkPaintbrushToolGUI::OnSizeChanged);
   }
 
-  m_PaintbrushTool = dynamic_cast<mitk::PaintbrushTool*>( tool );
+  m_PaintbrushTool = dynamic_cast<mitk::PaintbrushTool *>(tool);
 
   if (m_PaintbrushTool.IsNotNull())
   {
-    m_PaintbrushTool->SizeChanged += mitk::MessageDelegate1<QmitkPaintbrushToolGUI, int>( this, &QmitkPaintbrushToolGUI::OnSizeChanged );
+    m_PaintbrushTool->SizeChanged +=
+      mitk::MessageDelegate1<QmitkPaintbrushToolGUI, int>(this, &QmitkPaintbrushToolGUI::OnSizeChanged);
   }
 }
 
@@ -93,7 +93,7 @@ void QmitkPaintbrushToolGUI::OnSliderValueChanged(int value)
 {
   if (m_PaintbrushTool.IsNotNull())
   {
-    m_PaintbrushTool->SetSize( value );
+    m_PaintbrushTool->SetSize(value);
   }
 
   VisualizePaintbrushSize(value);
@@ -121,4 +121,3 @@ void QmitkPaintbrushToolGUI::OnSizeChanged(int current)
 {
   m_Slider->setValue(current);
 }
-

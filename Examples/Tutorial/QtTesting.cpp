@@ -16,17 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QApplication>
 #include <QTimer>
 
-#include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
 
 int QtTesting()
 {
-  //QtTestingClass *qttestingclass = new QtTestingClass;
+  // QtTestingClass *qttestingclass = new QtTestingClass;
   std::cout << "Testing ... " << std::endl;
-  auto timer = new QTimer( QApplication::instance() );
+  auto timer = new QTimer(QApplication::instance());
   timer->setSingleShot(true);
-  QObject::connect( timer, SIGNAL(timeout()), QApplication::instance(), SLOT(quit()) );
-  timer->start( 2000 ); // 2 seconds single-shot timer
+  QObject::connect(timer, SIGNAL(timeout()), QApplication::instance(), SLOT(quit()));
+  timer->start(2000); // 2 seconds single-shot timer
   QApplication::instance()->exec();
   return EXIT_SUCCESS;
 }

@@ -17,17 +17,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKHISTOGRAMMATCHING_H
 #define MITKHISTOGRAMMATCHING_H
 
-#include "itkHistogramMatchingImageFilter.h"
 #include "MitkDeformableRegistrationExports.h"
+#include "itkHistogramMatchingImageFilter.h"
 
-#include "mitkRegistrationBase.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkRegistrationBase.h"
 
 namespace mitk
 {
-
   /*!
-  \brief This class performes a histogram matching between the fixed image and moving image to improve the registration results.
+  \brief This class performes a histogram matching between the fixed image and moving image to improve the registration
+  results.
 
   \ingroup DeformableRegistration
 
@@ -36,20 +36,18 @@ namespace mitk
 
   class MITKDEFORMABLEREGISTRATION_EXPORT HistogramMatching : public RegistrationBase
   {
-
   public:
     mitkClassMacro(HistogramMatching, RegistrationBase);
 
     /*!
     * \brief Method for creation through the object factory.
     */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /*!
-    * \brief Sets the number of match points for the histogram generation.
-    */
-    void SetNumberOfMatchPoints(int matchPoints);
+      /*!
+      * \brief Sets the number of match points for the histogram generation.
+      */
+      void SetNumberOfMatchPoints(int matchPoints);
 
     /*!
     * \brief Sets the number of histogram levels for the histogram generation.
@@ -73,7 +71,6 @@ namespace mitk
     }
 
   protected:
-
     /*!
     * \brief Default constructor
     */
@@ -87,8 +84,8 @@ namespace mitk
     /*!
     * \brief Template class to perform the histogram matching with any kind of image. Called by GenerateData().
     */
-    template < typename TPixel, unsigned int VImageDimension >
-    void GenerateData2( const itk::Image<TPixel, VImageDimension>* itkImage1);
+    template <typename TPixel, unsigned int VImageDimension>
+    void GenerateData2(const itk::Image<TPixel, VImageDimension> *itkImage1);
 
     bool m_ThresholdAtMeanIntensity;
     int m_NumberOfHistogramLevels;

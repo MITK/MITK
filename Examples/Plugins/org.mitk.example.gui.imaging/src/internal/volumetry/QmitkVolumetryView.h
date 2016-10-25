@@ -21,10 +21,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkWeakPointer.h"
 
-namespace Ui {
-class QmitkVolumetryViewControls;
+namespace Ui
+{
+  class QmitkVolumetryViewControls;
 }
-
 
 /**
  * \brief QmitkVolumetryView
@@ -36,13 +36,11 @@ class QmitkVolumetryView : public QmitkAbstractView
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   QmitkVolumetryView();
 
 private:
-
   virtual void CreateQtPartControl(QWidget *parent) override;
 
   virtual void SetFocus() override;
@@ -50,11 +48,12 @@ private:
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part,
+                                  const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  mitk::Image* GetImage() const;
+  mitk::Image *GetImage() const;
 
-  mitk::DataNode* GetOverlayNode() const;
+  mitk::DataNode *GetOverlayNode() const;
 
   void CreateOverlayChild();
 
@@ -62,7 +61,7 @@ private:
 
   void UpdateSlider();
 
-  const mitk::DataNode* GetImageNode() const;
+  const mitk::DataNode *GetImageNode() const;
 
 private slots:
 
@@ -70,13 +69,12 @@ private slots:
 
   void OnTimeSeriesButtonClicked();
 
-  void OnThresholdSliderChanged( int value );
+  void OnThresholdSliderChanged(int value);
 
   void OnSaveCsvButtonClicked();
 
 private:
-
-  Ui::QmitkVolumetryViewControls* m_Controls;
+  Ui::QmitkVolumetryViewControls *m_Controls;
 
   /// store weak pointer of the DataNode
   mitk::WeakPointer<mitk::DataNode> m_SelectedDataNode;
@@ -85,11 +83,7 @@ private:
 
   mitk::DataStorage::Pointer m_DataStorage;
 
-  QWidget* m_ParentWidget;
+  QWidget *m_ParentWidget;
 };
 
-
-
-
 #endif // _QMITKVOLUMETRYVIEW_H_INCLUDED
-

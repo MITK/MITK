@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTestingMacros.h"
-#include <mitkTestingConfig.h>
 #include <mitkTestFixture.h>
+#include <mitkTestingConfig.h>
 
 #include <mitkIOUtil.h>
 #include <mitkInteractionTestHelper.h>
@@ -31,10 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPlanarDoubleEllipse.h>
 #include <mitkPlanarEllipse.h>
 #include <mitkPlanarFourPointAngle.h>
-#include <mitkPlanarSubdivisionPolygon.h>
 #include <mitkPlanarLine.h>
 #include <mitkPlanarPolygon.h>
 #include <mitkPlanarRectangle.h>
+#include <mitkPlanarSubdivisionPolygon.h>
 
 #include <vtkDebugLeaks.h>
 
@@ -42,7 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
 {
-
   CPPUNIT_TEST_SUITE(mitkPlanarFigureInteractionTestSuite);
   MITK_TEST(AngleInteractionCreate);
   MITK_TEST(Angle2InteractionCreate);
@@ -55,36 +54,30 @@ class mitkPlanarFigureInteractionTestSuite : public mitk::TestFixture
   MITK_TEST(NonClosedPlanarPolygonInteractionCreate);
   MITK_TEST(RectangleInteractionCreate);
   // BUG 19304
-  //MITK_TEST(PlanarSubdivisionInteractionCreate);
+  // MITK_TEST(PlanarSubdivisionInteractionCreate);
 
   CPPUNIT_TEST_SUITE_END();
 
-
 public:
-
   void setUp()
   {
     /// \todo Fix leaks of vtkObjects. Bug 18095.
     vtkDebugLeaks::SetExitError(0);
   }
 
-  void tearDown()
-  {
-  }
-
+  void tearDown() {}
   void RunTest(mitk::PlanarFigure::Pointer figure, std::string interactionXmlPath, std::string referenceFigurePath)
   {
     mitk::DataNode::Pointer node;
     mitk::PlanarFigureInteractor::Pointer figureInteractor;
 
-    //Create DataNode as a container for our PlanarFigure
+    // Create DataNode as a container for our PlanarFigure
     node = mitk::DataNode::New();
     node->SetData(figure);
 
     mitk::InteractionTestHelper interactionTestHelper(GetTestDataFilePath(interactionXmlPath));
 
-
-    //Load a bounding image
+    // Load a bounding image
     mitk::Image::Pointer testImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("Pic3D.nrrd"));
     figure->SetGeometry(testImage->GetGeometry());
 
@@ -93,30 +86,28 @@ public:
     interactionTestHelper.AddNodeToStorage(dn);
     interactionTestHelper.GetDataStorage()->Add(node, dn);
 
-
     node->SetName("PLANAR FIGURE");
     // set as selected
     node->SetSelected(true);
     node->AddProperty("selected", mitk::BoolProperty::New(true));
 
-    //Load state machine
+    // Load state machine
     figureInteractor = mitk::PlanarFigureInteractor::New();
-    us::Module* planarFigureModule = us::ModuleRegistry::GetModule("MitkPlanarFigure");
-    figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule );
-    figureInteractor->SetEventConfig( "PlanarFigureConfig.xml", planarFigureModule );
-    figureInteractor->SetDataNode( node );
+    us::Module *planarFigureModule = us::ModuleRegistry::GetModule("MitkPlanarFigure");
+    figureInteractor->LoadStateMachine("PlanarFigureInteraction.xml", planarFigureModule);
+    figureInteractor->SetEventConfig("PlanarFigureConfig.xml", planarFigureModule);
+    figureInteractor->SetDataNode(node);
 
-
-    //Start Interaction
+    // Start Interaction
     interactionTestHelper.PlaybackInteraction();
 
-    //Load reference PlanarFigure
+    // Load reference PlanarFigure
     mitk::PlanarFigureReader::Pointer reader = mitk::PlanarFigureReader::New();
     reader->SetFileName(GetTestDataFilePath(referenceFigurePath));
     reader->Update();
     mitk::PlanarFigure::Pointer reference = reader->GetOutput(0);
 
-    //Compare figures
+    // Compare figures
     MITK_ASSERT_EQUAL(figure, reference, "Compare figure with reference");
   }
 
@@ -152,21 +143,27 @@ public:
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarDoubleEllipse::New();
-    RunTest(figure, "InteractionTestData/Interactions/DoubleEllipse.xml", "InteractionTestData/ReferenceData/DoubleEllipse.pf");
+    RunTest(figure,
+            "InteractionTestData/Interactions/DoubleEllipse.xml",
+            "InteractionTestData/ReferenceData/DoubleEllipse.pf");
   }
 
   void PlanarSubdivisionInteractionCreate()
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarSubdivisionPolygon::New();
-    RunTest(figure, "InteractionTestData/Interactions/SubdivisionPolygon.xml", "InteractionTestData/ReferenceData/SubDivision.pf");
+    RunTest(figure,
+            "InteractionTestData/Interactions/SubdivisionPolygon.xml",
+            "InteractionTestData/ReferenceData/SubDivision.pf");
   }
 
   void PlanarFourPointAngleInteractionCreate()
   {
     mitk::PlanarFigure::Pointer figure;
     figure = mitk::PlanarFourPointAngle::New();
-    RunTest(figure, "InteractionTestData/Interactions/Planar4PointAngle.xml", "InteractionTestData/ReferenceData/Planar4PointAngle.pf");
+    RunTest(figure,
+            "InteractionTestData/Interactions/Planar4PointAngle.xml",
+            "InteractionTestData/ReferenceData/Planar4PointAngle.pf");
   }
 
   void PlanarLineInteractionCreate()
@@ -188,7 +185,8 @@ public:
     mitk::PlanarPolygon::Pointer figure;
     figure = mitk::PlanarPolygon::New();
     figure->ClosedOff();
-    RunTest(figure.GetPointer(), "InteractionTestData/Interactions/Path.xml", "InteractionTestData/ReferenceData/Path.pf");
+    RunTest(
+      figure.GetPointer(), "InteractionTestData/Interactions/Path.xml", "InteractionTestData/ReferenceData/Path.pf");
   }
 
   void RectangleInteractionCreate()
@@ -197,7 +195,6 @@ public:
     figure = mitk::PlanarRectangle::New();
     RunTest(figure, "InteractionTestData/Interactions/Rectangle.xml", "InteractionTestData/ReferenceData/Rectangle.pf");
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkPlanarFigureInteraction)

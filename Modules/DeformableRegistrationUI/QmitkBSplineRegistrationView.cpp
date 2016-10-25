@@ -14,62 +14,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <qvalidator.h>
+#include "QmitkBSplineRegistrationView.h"
+#include "itkImageFileReader.h"
+#include "itkRegularStepGradientDescentOptimizer.h"
+#include "mitkBSplineRegistration.h"
+#include "ui_QmitkBSplineRegistrationViewControls.h"
 #include <mitkImageCast.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkRenderingManager.h>
-#include "itkRegularStepGradientDescentOptimizer.h"
 #include <qfiledialog.h>
 #include <qmessagebox.h>
-#include "QmitkBSplineRegistrationView.h"
-#include "ui_QmitkBSplineRegistrationViewControls.h"
-#include "mitkBSplineRegistration.h"
-#include "itkImageFileReader.h"
+#include <qvalidator.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+typedef itk::Vector<float, 3> VectorType;
+typedef itk::Image<VectorType, 3> DeformationFieldType;
 
-typedef itk::Vector< float, 3 >       VectorType;
-typedef itk::Image< VectorType, 3 >   DeformationFieldType;
+typedef itk::ImageFileReader<DeformationFieldType> ImageReaderType;
 
-typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
-
-QmitkBSplineRegistrationView::QmitkBSplineRegistrationView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(nullptr), m_MovingNode(nullptr)
+QmitkBSplineRegistrationView::QmitkBSplineRegistrationView(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f), m_FixedNode(nullptr), m_MovingNode(nullptr)
 {
   m_Controls.setupUi(parent);
 
-  QObject::connect( (QObject*)(m_Controls.m_PrintDeformField),
-              SIGNAL(clicked()),
-              (QObject*) this,
-              SLOT(PrintDeformationField()) );
+  QObject::connect(
+    (QObject *)(m_Controls.m_PrintDeformField), SIGNAL(clicked()), (QObject *)this, SLOT(PrintDeformationField()));
 
+  QObject::connect((QObject *)(m_Controls.m_BrowseDeformationField),
+                   SIGNAL(clicked()),
+                   (QObject *)this,
+                   SLOT(SelectDeformationField()));
 
-
-
-  QObject::connect( (QObject*)(m_Controls.m_BrowseDeformationField),
-              SIGNAL(clicked()),
-              (QObject*) this,
-              SLOT(SelectDeformationField()) );
-
-  connect( m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), m_Controls.m_OptimizerWidgetStack, SLOT(setCurrentIndex(int)));
-  connect( m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), this, SLOT(OptimizerSelected(int)));
-
+  connect(m_Controls.m_OptimizerSelector,
+          SIGNAL(activated(int)),
+          m_Controls.m_OptimizerWidgetStack,
+          SLOT(setCurrentIndex(int)));
+  connect(m_Controls.m_OptimizerSelector, SIGNAL(activated(int)), this, SLOT(OptimizerSelected(int)));
 }
 
 QmitkBSplineRegistrationView::~QmitkBSplineRegistrationView()
 {
 }
 
-
 void QmitkBSplineRegistrationView::OptimizerSelected(int optimizer)
 {
   HideAllOptimizerFrames();
-  if(optimizer == 0)
+  if (optimizer == 0)
   {
     m_Controls.m_LBFGSFrame->show();
   }
-  else if(optimizer == 1)
+  else if (optimizer == 1)
   {
     m_Controls.m_GradientDescentFrame->show();
   }
@@ -84,13 +79,13 @@ void QmitkBSplineRegistrationView::HideAllOptimizerFrames()
 void QmitkBSplineRegistrationView::SelectDeformationField()
 {
   // SELECT FOLDER DIALOG
-  QFileDialog* w = new QFileDialog( this, "Select Deformation Field" );
-  w->setFileMode( QFileDialog::ExistingFiles );
-  w->setNameFilter( "Images (*.mhd)" );
+  QFileDialog *w = new QFileDialog(this, "Select Deformation Field");
+  w->setFileMode(QFileDialog::ExistingFiles);
+  w->setNameFilter("Images (*.mhd)");
   w->setDirectory("G:\\home\\vanbrugg\\testimages\\deformable");
 
   // RETRIEVE SELECTION
-  if ( w->exec() != QDialog::Accepted )
+  if (w->exec() != QDialog::Accepted)
   {
     return;
     cout << "Failed to load" << endl;
@@ -98,44 +93,38 @@ void QmitkBSplineRegistrationView::SelectDeformationField()
 
   QStringList filenames = w->selectedFiles();
   QStringList::Iterator it = filenames.begin();
-  if( it != filenames.end() ) {
-    std::string filename = ( *it ).toStdString();
+  if (it != filenames.end())
+  {
+    std::string filename = (*it).toStdString();
     ++it;
-    QString qStr = QString( filename.c_str() );
+    QString qStr = QString(filename.c_str());
     m_Controls.m_DeformationField->setText(qStr);
   }
-
 }
-
-
 
 void QmitkBSplineRegistrationView::PrintDeformationField()
 {
-
-  ImageReaderType::Pointer reader  = ImageReaderType::New();
-  reader->SetFileName(  m_Controls.m_DeformationField->text().toStdString()  );
+  ImageReaderType::Pointer reader = ImageReaderType::New();
+  reader->SetFileName(m_Controls.m_DeformationField->text().toStdString());
   reader->Update();
 
   DeformationFieldType::Pointer deformationField = reader->GetOutput();
 
-
   typedef itk::ImageRegionIterator<DeformationFieldType> IteratorType;
   IteratorType deformIter(deformationField, deformationField->GetRequestedRegion());
 
-  for(deformIter.GoToBegin(); !deformIter.IsAtEnd(); ++deformIter)
+  for (deformIter.GoToBegin(); !deformIter.IsAtEnd(); ++deformIter)
   {
     std::cout << deformIter.Get() << std::endl;
   }
 }
 
-
 void QmitkBSplineRegistrationView::CalculateTransformation()
 {
   if (m_FixedNode != nullptr && m_MovingNode != nullptr)
   {
-    mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
-    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
-
+    mitk::Image::Pointer fimage = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
+    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image *>(m_MovingNode->GetData());
 
     mitk::BSplineRegistration::Pointer registration = mitk::BSplineRegistration::New();
 
@@ -146,25 +135,24 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
     // Read out optimizer parameters from the interface
     setOptimizerParameters();
 
-    registration->SetNumberOfGridPoints( m_Controls.m_NumberOfGridNodes->text().toInt() );
+    registration->SetNumberOfGridPoints(m_Controls.m_NumberOfGridNodes->text().toInt());
     registration->SetOptimizerParameters(m_OptimizerParameters);
     registration->SetUpdateInputImage(true);
 
-    if(m_Controls.m_SaveDeformFieldCheck->isChecked())
+    if (m_Controls.m_SaveDeformFieldCheck->isChecked())
     {
       // Set some parameters to save the deformation field
       registration->SetSaveDeformationField(true);
-      registration->SetDeformationFileName( m_Controls.m_DeformationField->text().toStdString() );
+      registration->SetDeformationFileName(m_Controls.m_DeformationField->text().toStdString());
     }
-
 
     try
     {
       registration->Update();
     }
-    catch (itk::ExceptionObject& excpt)
+    catch (itk::ExceptionObject &excpt)
     {
-      QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+      QMessageBox::information(this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok);
     }
 
     mitk::Image::Pointer image = registration->GetOutput();
@@ -174,9 +162,9 @@ void QmitkBSplineRegistrationView::CalculateTransformation()
       m_MovingNode->SetData(image);
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelWindow;
-      levelWindow.SetAuto( image );
+      levelWindow.SetAuto(image);
       levWinProp->SetLevelWindow(levelWindow);
-      m_MovingNode->GetPropertyList()->SetProperty("levelwindow",levWinProp);
+      m_MovingNode->GetPropertyList()->SetProperty("levelwindow", levWinProp);
     }
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -187,30 +175,29 @@ void QmitkBSplineRegistrationView::setOptimizerParameters()
 {
   m_OptimizerParameters = mitk::OptimizerParameters::New();
 
-  if(m_Controls.m_OptimizerSelector->currentText() == "LBFGSOptimizer")
+  if (m_Controls.m_OptimizerSelector->currentText() == "LBFGSOptimizer")
   {
     m_OptimizerParameters->SetOptimizer(mitk::OptimizerParameters::LBFGSOPTIMIZER);
-    m_OptimizerParameters->SetGradientConvergenceToleranceLBFGS( m_Controls.m_GradConvTolerance->text().toFloat() );
-    m_OptimizerParameters->SetLineSearchAccuracyLBFGS( m_Controls.m_LineSearchAccuracy->text().toFloat() );
-    m_OptimizerParameters->SetDefaultStepLengthLBFGS( m_Controls.m_DefaultStepLength->text().toFloat() );
-    m_OptimizerParameters->SetNumberOfIterationsLBFGS( m_Controls.m_FunctionEvaluations->text().toInt() );
+    m_OptimizerParameters->SetGradientConvergenceToleranceLBFGS(m_Controls.m_GradConvTolerance->text().toFloat());
+    m_OptimizerParameters->SetLineSearchAccuracyLBFGS(m_Controls.m_LineSearchAccuracy->text().toFloat());
+    m_OptimizerParameters->SetDefaultStepLengthLBFGS(m_Controls.m_DefaultStepLength->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsLBFGS(m_Controls.m_FunctionEvaluations->text().toInt());
   }
-  else if(m_Controls.m_OptimizerSelector->currentText() == "Gradient Descent")
+  else if (m_Controls.m_OptimizerSelector->currentText() == "Gradient Descent")
   {
     m_OptimizerParameters->SetOptimizer(mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER);
-    m_OptimizerParameters->SetLearningRateGradientDescent( m_Controls.m_LearningRateGradientDescent->text().toFloat() );
-    m_OptimizerParameters->SetNumberOfIterationsGradientDescent (m_Controls.m_NumberOfIterationsGradientDescent->text().toInt() );
+    m_OptimizerParameters->SetLearningRateGradientDescent(m_Controls.m_LearningRateGradientDescent->text().toFloat());
+    m_OptimizerParameters->SetNumberOfIterationsGradientDescent(
+      m_Controls.m_NumberOfIterationsGradientDescent->text().toInt());
   }
 }
 
-
-void QmitkBSplineRegistrationView::SetFixedNode( mitk::DataNode * fixedNode )
+void QmitkBSplineRegistrationView::SetFixedNode(mitk::DataNode *fixedNode)
 {
   m_FixedNode = fixedNode;
 }
 
-void QmitkBSplineRegistrationView::SetMovingNode( mitk::DataNode * movingNode )
+void QmitkBSplineRegistrationView::SetMovingNode(mitk::DataNode *movingNode)
 {
   m_MovingNode = movingNode;
 }
-

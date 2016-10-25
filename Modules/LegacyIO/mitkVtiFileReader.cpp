@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkXMLImageDataReader.h>
 
-mitk::VtiFileReader::VtiFileReader()
-: m_FileName(""), m_FilePrefix(""), m_FilePattern("")
+mitk::VtiFileReader::VtiFileReader() : m_FileName(""), m_FilePrefix(""), m_FilePattern("")
 {
 }
 
@@ -30,26 +29,28 @@ mitk::VtiFileReader::~VtiFileReader()
 
 void mitk::VtiFileReader::GenerateData()
 {
-  if( m_FileName != "")
+  if (m_FileName != "")
   {
-  vtkXMLImageDataReader * vtkReader = vtkXMLImageDataReader::New();
-  vtkReader->SetFileName( m_FileName.c_str() );
-  vtkReader->Update();
+    vtkXMLImageDataReader *vtkReader = vtkXMLImageDataReader::New();
+    vtkReader->SetFileName(m_FileName.c_str());
+    vtkReader->Update();
 
-  if ( vtkReader->GetOutput() != nullptr )
-  {
-    mitk::Image::Pointer output = this->GetOutput();
-    output->Initialize( vtkReader->GetOutput() );
-    output->SetVolume( vtkReader->GetOutput()->GetScalarPointer() );
-  }
-  vtkReader->Delete();
+    if (vtkReader->GetOutput() != nullptr)
+    {
+      mitk::Image::Pointer output = this->GetOutput();
+      output->Initialize(vtkReader->GetOutput());
+      output->SetVolume(vtkReader->GetOutput()->GetScalarPointer());
+    }
+    vtkReader->Delete();
   }
 }
 
-bool mitk::VtiFileReader::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
+bool mitk::VtiFileReader::CanReadFile(const std::string filename,
+                                      const std::string /*filePrefix*/,
+                                      const std::string /*filePattern*/)
 {
   // First check the extension
-  if(  filename == "" )
+  if (filename == "")
     return false;
 
   bool extensionFound = false;

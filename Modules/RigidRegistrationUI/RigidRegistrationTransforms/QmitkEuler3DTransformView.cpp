@@ -16,12 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkEuler3DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkEuler3DTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkEuler3DTransform.h>
 
-QmitkEuler3DTransformView::QmitkEuler3DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkEuler3DTransformView::QmitkEuler3DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -44,12 +44,12 @@ itk::Object::Pointer QmitkEuler3DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkEuler3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkEuler3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
   if (VImageDimension == 3)
   {
-    typename itk::Euler3DTransform< double >::Pointer transformPointer = itk::Euler3DTransform< double >::New();
+    typename itk::Euler3DTransform<double>::Pointer transformPointer = itk::Euler3DTransform<double>::New();
     transformPointer->SetIdentity();
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];
@@ -96,10 +96,10 @@ QString QmitkEuler3DTransformView::GetName()
   return "Euler3D";
 }
 
-void QmitkEuler3DTransformView::SetupUI(QWidget* parent)
+void QmitkEuler3DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesEuler3DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesEuler3DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesEuler3DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -125,7 +125,9 @@ itk::Array<double> QmitkEuler3DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkEuler3DTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkEuler3DTransformView::Transform(vtkMatrix4x4 * /*vtkmatrix*/,
+                                                   vtkTransform *vtktransform,
+                                                   itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

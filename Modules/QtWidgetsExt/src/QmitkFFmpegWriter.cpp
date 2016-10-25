@@ -16,20 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFFmpegWriter.h"
 #include <QMessageBox>
-#include <mitkLogMacros.h>
 #include <mitkExceptionMacro.h>
+#include <mitkLogMacros.h>
 
-QmitkFFmpegWriter::QmitkFFmpegWriter(QObject* parent)
-  : QObject(parent),
-    m_Process(new QProcess(this)),
-    m_Framerate(0),
-    m_IsRunning(false)
+QmitkFFmpegWriter::QmitkFFmpegWriter(QObject *parent)
+  : QObject(parent), m_Process(new QProcess(this)), m_Framerate(0), m_IsRunning(false)
 {
-  this->connect(m_Process, SIGNAL(error(QProcess::ProcessError)),
-    this, SLOT(OnProcessError(QProcess::ProcessError)));
+  this->connect(m_Process, SIGNAL(error(QProcess::ProcessError)), this, SLOT(OnProcessError(QProcess::ProcessError)));
 
-  this->connect(m_Process, SIGNAL(finished(int, QProcess::ExitStatus)),
-    this, SLOT(OnProcessFinished(int, QProcess::ExitStatus)));
+  this->connect(
+    m_Process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OnProcessFinished(int, QProcess::ExitStatus)));
 }
 
 QmitkFFmpegWriter::~QmitkFFmpegWriter()
@@ -41,7 +37,7 @@ QString QmitkFFmpegWriter::GetFFmpegPath() const
   return m_FFmpegPath;
 }
 
-void QmitkFFmpegWriter::SetFFmpegPath(const QString& path)
+void QmitkFFmpegWriter::SetFFmpegPath(const QString &path)
 {
   m_FFmpegPath = path;
 }
@@ -51,7 +47,7 @@ QSize QmitkFFmpegWriter::GetSize() const
   return m_Size;
 }
 
-void QmitkFFmpegWriter::SetSize(const QSize& size)
+void QmitkFFmpegWriter::SetSize(const QSize &size)
 {
   m_Size = size;
 }
@@ -76,7 +72,7 @@ QString QmitkFFmpegWriter::GetOutputPath() const
   return m_OutputPath;
 }
 
-void QmitkFFmpegWriter::SetOutputPath(const QString& path)
+void QmitkFFmpegWriter::SetOutputPath(const QString &path)
 {
   m_OutputPath = path;
 }
@@ -95,17 +91,25 @@ void QmitkFFmpegWriter::Start()
   if (m_OutputPath.isEmpty())
     mitkThrow() << "Output path is empty!";
 
-  m_Process->start(m_FFmpegPath, QStringList()
-    << "-y"
-    << "-f" << "rawvideo"
-    << "-pix_fmt" << "rgb24"
-    << "-s" << QString("%1x%2").arg(m_Size.width()).arg(m_Size.height())
-    << "-r" << QString("%1").arg(m_Framerate)
-    << "-i" << "-"
-    << "-vf" << "vflip"
-    << "-pix_fmt" << "yuv420p"
-    << "-crf" << "18"
-    << m_OutputPath);
+  m_Process->start(m_FFmpegPath,
+                   QStringList() << "-y"
+                                 << "-f"
+                                 << "rawvideo"
+                                 << "-pix_fmt"
+                                 << "rgb24"
+                                 << "-s"
+                                 << QString("%1x%2").arg(m_Size.width()).arg(m_Size.height())
+                                 << "-r"
+                                 << QString("%1").arg(m_Framerate)
+                                 << "-i"
+                                 << "-"
+                                 << "-vf"
+                                 << "vflip"
+                                 << "-pix_fmt"
+                                 << "yuv420p"
+                                 << "-crf"
+                                 << "18"
+                                 << m_OutputPath);
 
   m_Process->waitForStarted();
   m_IsRunning = true;
@@ -116,12 +120,12 @@ bool QmitkFFmpegWriter::IsRunning() const
   return m_IsRunning;
 }
 
-void QmitkFFmpegWriter::WriteFrame(const unsigned char* frame)
+void QmitkFFmpegWriter::WriteFrame(const unsigned char *frame)
 {
   if (frame == nullptr || !m_Process->isOpen())
     return;
 
-  m_Process->write(reinterpret_cast<const char*>(frame), m_Size.width() * m_Size.height() * 3);
+  m_Process->write(reinterpret_cast<const char *>(frame), m_Size.width() * m_Size.height() * 3);
   m_Process->waitForBytesWritten();
 }
 

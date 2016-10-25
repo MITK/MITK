@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKITKPICTUREWRITE_H
 #define MITKITKPICTUREWRITE_H
 
-#include <mitkCommon.h>
 #include <itkImage.h>
+#include <mitkCommon.h>
 
 /**
  * @brief ITK-Like method to be called for writing an single-component image using the AccessByItk Macros
@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-template < typename TPixel, unsigned int VImageDimension >
-DEPRECATED( void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );
+template <typename TPixel, unsigned int VImageDimension>
+DEPRECATED(void _mitkItkPictureWrite(itk::Image<TPixel, VImageDimension> *itkImage, const std::string &fileName));
 
 /**
  * @brief ITK-Like method to be called for writing an image
@@ -39,7 +39,8 @@ DEPRECATED( void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itk
  *
  * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
  */
-template < typename TPixel, unsigned int VImageDimension >
-DEPRECATED( void _mitkItkPictureWriteComposite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName) );
+template <typename TPixel, unsigned int VImageDimension>
+DEPRECATED(void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage,
+                                              const std::string &fileName));
 
 #endif /* MITKITKPICTUREWRITE_H */

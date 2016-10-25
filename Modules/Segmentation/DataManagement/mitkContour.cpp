@@ -14,30 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkContour.h"
 #include <mitkProportionalTimeGeometry.h>
 
-mitk::Contour::Contour() :
-m_ContourPath (PathType::New()),
-m_CurrentWindow ( nullptr ),
-m_BoundingBox (BoundingBoxType::New()),
-m_Vertices ( BoundingBoxType::PointsContainer::New() ),
-m_Closed ( true ),
-m_Selected ( false ),
-m_Width (3.0)
+mitk::Contour::Contour()
+  : m_ContourPath(PathType::New()),
+    m_CurrentWindow(nullptr),
+    m_BoundingBox(BoundingBoxType::New()),
+    m_Vertices(BoundingBoxType::PointsContainer::New()),
+    m_Closed(true),
+    m_Selected(false),
+    m_Width(3.0)
 {
   Superclass::InitializeTimeGeometry();
 }
 
-mitk::Contour::Contour( const Contour & other ): BaseData(other),
-m_ContourPath(other.m_ContourPath),
-m_CurrentWindow(other.m_CurrentWindow),
-m_BoundingBox(other.m_BoundingBox),
-m_Vertices(other.m_Vertices),
-m_Closed(other.m_Closed),
-m_Selected(other.m_Selected),
-m_Width(other.m_Width)
+mitk::Contour::Contour(const Contour &other)
+  : BaseData(other),
+    m_ContourPath(other.m_ContourPath),
+    m_CurrentWindow(other.m_CurrentWindow),
+    m_BoundingBox(other.m_BoundingBox),
+    m_Vertices(other.m_Vertices),
+    m_Closed(other.m_Closed),
+    m_Selected(other.m_Selected),
+    m_Width(other.m_Width)
 {
 }
 
@@ -61,7 +61,8 @@ void mitk::Contour::UpdateOutputInformation()
 {
   // \todo probably we should do this additionally for each time-step
   ScalarType mitkBounds[6];
-  if (m_Vertices->Size() == 0)  {
+  if (m_Vertices->Size() == 0)
+  {
     mitkBounds[0] = 0.0;
     mitkBounds[1] = 0.0;
     mitkBounds[2] = 0.0;
@@ -80,7 +81,7 @@ void mitk::Contour::UpdateOutputInformation()
     mitkBounds[4] = tmp[4];
     mitkBounds[5] = tmp[5];
   }
-  BaseGeometry* geometry3d = GetGeometry(0);
+  BaseGeometry *geometry3d = GetGeometry(0);
   geometry3d->SetBounds(mitkBounds);
   GetTimeGeometry()->Update();
 }
@@ -99,7 +100,7 @@ bool mitk::Contour::VerifyRequestedRegion()
   return true;
 }
 
-void mitk::Contour::SetRequestedRegion( const itk::DataObject*)
+void mitk::Contour::SetRequestedRegion(const itk::DataObject *)
 {
 }
 
@@ -108,12 +109,12 @@ mitk::Contour::PathType::Pointer mitk::Contour::GetContourPath() const
   return m_ContourPath;
 }
 
-void mitk::Contour::SetCurrentWindow(vtkRenderWindow* rw)
+void mitk::Contour::SetCurrentWindow(vtkRenderWindow *rw)
 {
   m_CurrentWindow = rw;
 }
 
-vtkRenderWindow* mitk::Contour::GetCurrentWindow() const
+vtkRenderWindow *mitk::Contour::GetCurrentWindow() const
 {
   return m_CurrentWindow;
 }
@@ -134,8 +135,7 @@ unsigned int mitk::Contour::GetNumberOfPoints() const
   return m_Vertices->Size();
 }
 
-mitk::Contour::PointsContainerPointer
-mitk::Contour::GetPoints() const
+mitk::Contour::PointsContainerPointer mitk::Contour::GetPoints() const
 {
   return m_Vertices;
 }
@@ -146,9 +146,9 @@ void mitk::Contour::SetPoints(mitk::Contour::PointsContainerPointer points)
   Modified();
 }
 
-void mitk::Contour::PrintSelf( std::ostream& os, itk::Indent indent) const
+void mitk::Contour::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
-  Superclass::PrintSelf( os, indent );
+  Superclass::PrintSelf(os, indent);
 
   os << indent << "Number of verticies:  " << GetNumberOfPoints() << std::endl;
 
@@ -157,9 +157,10 @@ void mitk::Contour::PrintSelf( std::ostream& os, itk::Indent indent) const
   os << indent << "Verticies:  " << std::endl;
 
   int i = 0;
-  while ( pointsIt != end )
+  while (pointsIt != end)
   {
     os << indent << indent << i << ": " << pointsIt.Value() << std::endl;
-    ++pointsIt; ++i;
+    ++pointsIt;
+    ++i;
   }
 }

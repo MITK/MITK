@@ -17,27 +17,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPlanarBezierCurve_h
 #define mitkPlanarBezierCurve_h
 
-#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
+#include <mitkPlanarFigure.h>
 
 namespace mitk
 {
   class MITKPLANARFIGURE_EXPORT PlanarBezierCurve : public PlanarFigure
   {
   public:
-    mitkClassMacro(PlanarBezierCurve, PlanarFigure)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(PlanarBezierCurve, PlanarFigure) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    unsigned int GetNumberOfSegments() const;
+      unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
     /**
     * \brief Returns the id of the control-point that corresponds to the given
     * polyline-point.
     */
-    int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const override;
-
+    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const override;
 
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
@@ -45,14 +42,14 @@ namespace mitk
 
     const unsigned int FEATURE_ID_LENGTH;
 
-    virtual bool Equals(const mitk::PlanarFigure& other)const override;
+    virtual bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarBezierCurve();
 
     mitkCloneMacro(Self)
 
-    virtual void EvaluateFeaturesInternal() override;
+      virtual void EvaluateFeaturesInternal() override;
     virtual void GenerateHelperPolyLine(double, unsigned int) override;
     virtual void GeneratePolyLine() override;
 

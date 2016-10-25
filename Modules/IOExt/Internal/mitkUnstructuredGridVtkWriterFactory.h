@@ -22,44 +22,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
-{
-public:
-
-  mitkClassMacroItkParent( mitk::UnstructuredGridVtkWriterFactory, itk::ObjectFactoryBase )
-
-  /** Class methods used to interface with the registered factories. */
-  virtual const char* GetITKSourceVersion(void) const override;
-  virtual const char* GetDescription(void) const override;
-
-  /** Method for class instantiation. */
-  itkFactorylessNewMacro(Self);
-
-  /**
-   * Register one factory of this type
-   * \deprecatedSince{2013_09}
-   */
-  DEPRECATED(static void RegisterOneFactory(void))
+  class UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
   {
-    static bool IsRegistered = false;
-    if ( !IsRegistered )
+  public:
+    mitkClassMacroItkParent(mitk::UnstructuredGridVtkWriterFactory, itk::ObjectFactoryBase)
+
+      /** Class methods used to interface with the registered factories. */
+      virtual const char *GetITKSourceVersion(void) const override;
+    virtual const char *GetDescription(void) const override;
+
+    /** Method for class instantiation. */
+    itkFactorylessNewMacro(Self);
+
+    /**
+     * Register one factory of this type
+     * \deprecatedSince{2013_09}
+     */
+    DEPRECATED(static void RegisterOneFactory(void))
     {
-      UnstructuredGridVtkWriterFactory::Pointer ugVtkWriterFactory = UnstructuredGridVtkWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( ugVtkWriterFactory );
-      IsRegistered = true;
+      static bool IsRegistered = false;
+      if (!IsRegistered)
+      {
+        UnstructuredGridVtkWriterFactory::Pointer ugVtkWriterFactory = UnstructuredGridVtkWriterFactory::New();
+        ObjectFactoryBase::RegisterFactory(ugVtkWriterFactory);
+        IsRegistered = true;
+      }
     }
-  }
 
-protected:
-  UnstructuredGridVtkWriterFactory();
-  ~UnstructuredGridVtkWriterFactory();
+  protected:
+    UnstructuredGridVtkWriterFactory();
+    ~UnstructuredGridVtkWriterFactory();
 
-private:
-  UnstructuredGridVtkWriterFactory(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-
-};
+  private:
+    UnstructuredGridVtkWriterFactory(const Self &); // purposely not implemented
+    void operator=(const Self &);                   // purposely not implemented
+  };
 
 } // end namespace mitk
 

@@ -16,8 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkToolGUIArea.h"
 
-QmitkToolGUIArea::QmitkToolGUIArea( QWidget* parent, Qt::WindowFlags f )
-  : QWidget(parent,f)
+QmitkToolGUIArea::QmitkToolGUIArea(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   QWidget::setContentsMargins(0, 0, 0, 0);
 }

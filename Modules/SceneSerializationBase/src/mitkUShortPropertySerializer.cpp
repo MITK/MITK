@@ -23,32 +23,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class UShortPropertySerializer : public BasePropertySerializer
-{
+  class UShortPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(UShortPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( UShortPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const UShortProperty* prop = dynamic_cast<const UShortProperty*>(m_Property.GetPointer()))
+      if (const UShortProperty *prop = dynamic_cast<const UShortProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("unsigned");
+        auto element = new TiXmlElement("unsigned");
         element->SetAttribute("value", static_cast<unsigned short>(prop->GetValue()));
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
+      if (!element)
+        return nullptr;
 
       unsigned int value;
-      if ( element->QueryUnsignedAttribute( "value", &value ) == TIXML_SUCCESS )
+      if (element->QueryUnsignedAttribute("value", &value) == TIXML_SUCCESS)
       {
         return UShortProperty::New(static_cast<unsigned short>(value)).GetPointer();
       }
@@ -59,10 +58,9 @@ class UShortPropertySerializer : public BasePropertySerializer
     }
 
   protected:
-
     UShortPropertySerializer() {}
     virtual ~UShortPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -70,4 +68,3 @@ class UShortPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(UShortPropertySerializer);
 
 #endif
-

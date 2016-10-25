@@ -18,11 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkOtsuTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include <MitkSegmentationUIExports.h>
 #include "mitkOtsuTool3D.h"
+#include "ui_QmitkOtsuToolWidgetControls.h"
+#include <MitkSegmentationUIExports.h>
 #include <QListWidget>
 #include <QPushButton>
-#include "ui_QmitkOtsuToolWidgetControls.h"
 
 class QSpinBox;
 class QLabel;
@@ -40,49 +40,47 @@ class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
-  public:
-    mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+public:
+  mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  signals:
+    signals :
 
-  public slots:
+    public slots :
 
-  protected slots:
+    protected slots :
 
-    void OnNewToolAssociated(mitk::Tool*);
+    void OnNewToolAssociated(mitk::Tool *);
 
-    void OnSpinboxValueAccept();
+  void OnSpinboxValueAccept();
 
-    void OnSegmentationRegionAccept();
+  void OnSegmentationRegionAccept();
 
-    void OnRegionSelectionChanged();
+  void OnRegionSelectionChanged();
 
-    void OnRegionSpinboxChanged(int);
+  void OnRegionSpinboxChanged(int);
 
-    void OnVolumePreviewChecked(int);
+  void OnVolumePreviewChecked(int);
 
-  private slots:
+private slots:
 
-    void OnAdvancedSettingsButtonToggled(bool toggled);
+  void OnAdvancedSettingsButtonToggled(bool toggled);
 
-  protected:
+protected:
+  QmitkOtsuTool3DGUI();
+  virtual ~QmitkOtsuTool3DGUI();
 
-    QmitkOtsuTool3DGUI();
-    virtual ~QmitkOtsuTool3DGUI();
+  mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
 
-    mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
+  Ui_QmitkOtsuToolWidgetControls m_Controls;
 
-    Ui_QmitkOtsuToolWidgetControls m_Controls;
+  int m_NumberOfRegions;
 
-    int m_NumberOfRegions;
+  bool m_UseValleyEmphasis;
 
-    bool m_UseValleyEmphasis;
+  int m_NumberOfBins;
 
-    int m_NumberOfBins;
-
-    QList<QListWidgetItem *> m_SelectedItems;
+  QList<QListWidgetItem *> m_SelectedItems;
 };
 
 #endif

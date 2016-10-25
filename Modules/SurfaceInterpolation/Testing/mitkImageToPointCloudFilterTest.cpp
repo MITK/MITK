@@ -30,20 +30,15 @@ class mitkImageToPointCloudFilterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /** Members used inside the different test methods. All members are initialized via setUp().*/
   mitk::Image::Pointer m_BallImage;
 
 public:
-
   /**
-   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
+   * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp()
-  {
-    m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd"));
-  }
-
+  void setUp() { m_BallImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("BallBinary30x30x30.nrrd")); }
   void testImageToPointCloudFilterInitialization()
   {
     mitk::ImageToUnstructuredGridFilter::Pointer testFilter = mitk::ImageToUnstructuredGridFilter::New();
@@ -82,7 +77,6 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Testing Threshold", numberOfPoints1 > numberOfPoints2);
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkImageToPointCloudFilter)

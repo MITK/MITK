@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPaintbrushToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include <MitkSegmentationUIExports.h>
 #include "mitkPaintbrushTool.h"
+#include <MitkSegmentationUIExports.h>
 
 class QSlider;
 class QLabel;
@@ -38,34 +38,32 @@ class MITKSEGMENTATIONUI_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 
-  public:
-    mitkClassMacro(QmitkPaintbrushToolGUI, QmitkToolGUI);
+public:
+  mitkClassMacro(QmitkPaintbrushToolGUI, QmitkToolGUI);
 
-    void OnSizeChanged(int current);
+  void OnSizeChanged(int current);
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 
-  protected slots:
+protected slots:
 
-    void OnNewToolAssociated(mitk::Tool*);
+  void OnNewToolAssociated(mitk::Tool *);
 
-    void OnSliderValueChanged(int value);
+  void OnSliderValueChanged(int value);
 
-    void VisualizePaintbrushSize(int size);
+  void VisualizePaintbrushSize(int size);
 
-  protected:
+protected:
+  QmitkPaintbrushToolGUI();
+  virtual ~QmitkPaintbrushToolGUI();
 
-    QmitkPaintbrushToolGUI();
-    virtual ~QmitkPaintbrushToolGUI();
+  QSlider *m_Slider;
+  QLabel *m_SizeLabel;
+  QFrame *m_Frame;
 
-    QSlider* m_Slider;
-    QLabel* m_SizeLabel;
-    QFrame* m_Frame;
-
-    mitk::PaintbrushTool::Pointer m_PaintbrushTool;
+  mitk::PaintbrushTool::Pointer m_PaintbrushTool;
 };
 
 #endif
-

@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkUnstructuredGridSource.h"
 #include "mitkUnstructuredGrid.h"
 
@@ -30,17 +29,17 @@ mitk::UnstructuredGridSource::~UnstructuredGridSource()
 {
 }
 
-itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput ( DataObjectPointerArraySizeType /*idx*/ )
+itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput(DataObjectPointerArraySizeType /*idx*/)
 {
   return OutputType::New().GetPointer();
 }
 
-itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput( const DataObjectIdentifierType & name )
+itk::DataObject::Pointer mitk::UnstructuredGridSource::MakeOutput(const DataObjectIdentifierType &name)
 {
   itkDebugMacro("MakeOutput(" << name << ")");
-  if( this->IsIndexedOutputName(name) )
+  if (this->IsIndexedOutputName(name))
   {
-    return this->MakeOutput( this->MakeIndexFromOutputName(name) );
+    return this->MakeOutput(this->MakeIndexFromOutputName(name));
   }
   return static_cast<itk::DataObject *>(OutputType::New().GetPointer());
 }

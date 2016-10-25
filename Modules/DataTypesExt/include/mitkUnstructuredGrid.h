@@ -14,100 +14,93 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_UNSTRUCTURED_GRID_H_
 #define _MITK_UNSTRUCTURED_GRID_H_
 
-#include "mitkBaseData.h"
 #include "MitkDataTypesExtExports.h"
 #include "itkImageRegion.h"
+#include "mitkBaseData.h"
 
 class vtkUnstructuredGrid;
 
-namespace mitk {
-
-//##Documentation
-//## @brief Class for storing unstructured grids (vtkUnstructuredGrid)
-//## @ingroup Data
-class MITKDATATYPESEXT_EXPORT UnstructuredGrid : public BaseData
+namespace mitk
 {
-
-public:
-  // not yet the best choice of a region-type for surfaces, but it works for the time being
-  typedef itk::ImageRegion< 5 >  RegionType;
-
-  mitkClassMacro(UnstructuredGrid, BaseData);
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid* grid, unsigned int t = 0);
-
-  virtual vtkUnstructuredGrid* GetVtkUnstructuredGrid(unsigned int t = 0);
-
-  virtual void UpdateOutputInformation() override;
-
-  virtual void SetRequestedRegionToLargestPossibleRegion() override;
-
-  virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-
-  virtual bool VerifyRequestedRegion() override;
-
-  virtual void SetRequestedRegion( const itk::DataObject *data) override;
-
-  virtual void SetRequestedRegion(UnstructuredGrid::RegionType *region);
-
-  virtual void Graft(const DataObject* data) override;
-
-  virtual void CopyInformation(const itk::DataObject *data) override;
-
-  virtual void Update() override;
-
-  // Initialize should not be called manually;
-  // The polydata vector is initialized automatically when enlarged;
-  virtual void Expand( unsigned int timeSteps = 1 ) override;
-
-  const RegionType& GetLargestPossibleRegion() const
-  {
-    m_LargestPossibleRegion.SetIndex(3, 0);
-    m_LargestPossibleRegion.SetSize(3, GetTimeGeometry()->CountTimeSteps());
-    return m_LargestPossibleRegion;
-  }
-
   //##Documentation
-  //## Get the region object that defines the size and starting index
-  //## for the region of the image requested (i.e., the region of the
-  //## image to be operated on by a filter).
-  virtual const RegionType& GetRequestedRegion() const
+  //## @brief Class for storing unstructured grids (vtkUnstructuredGrid)
+  //## @ingroup Data
+  class MITKDATATYPESEXT_EXPORT UnstructuredGrid : public BaseData
   {
-    return m_RequestedRegion;
-  }
+  public:
+    // not yet the best choice of a region-type for surfaces, but it works for the time being
+    typedef itk::ImageRegion<5> RegionType;
 
-  void CalculateBoundingBox();
+    mitkClassMacro(UnstructuredGrid, BaseData);
 
-protected:
-  mitkCloneMacro(Self);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  typedef std::vector< vtkUnstructuredGrid* > VTKUnstructuredGridSeries;
+      virtual void SetVtkUnstructuredGrid(vtkUnstructuredGrid *grid, unsigned int t = 0);
 
-  UnstructuredGrid();
+    virtual vtkUnstructuredGrid *GetVtkUnstructuredGrid(unsigned int t = 0);
 
-  UnstructuredGrid(const mitk::UnstructuredGrid & other);
+    virtual void UpdateOutputInformation() override;
 
-  virtual ~UnstructuredGrid();
+    virtual void SetRequestedRegionToLargestPossibleRegion() override;
 
-  virtual void ClearData() override;
+    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
 
-  virtual void InitializeEmpty() override;
+    virtual bool VerifyRequestedRegion() override;
 
-  VTKUnstructuredGridSeries m_GridSeries;
+    virtual void SetRequestedRegion(const itk::DataObject *data) override;
 
-  mutable RegionType m_LargestPossibleRegion;
+    virtual void SetRequestedRegion(UnstructuredGrid::RegionType *region);
 
-  RegionType m_RequestedRegion;
+    virtual void Graft(const DataObject *data) override;
 
-  bool m_CalculateBoundingBox;
-};
+    virtual void CopyInformation(const itk::DataObject *data) override;
+
+    virtual void Update() override;
+
+    // Initialize should not be called manually;
+    // The polydata vector is initialized automatically when enlarged;
+    virtual void Expand(unsigned int timeSteps = 1) override;
+
+    const RegionType &GetLargestPossibleRegion() const
+    {
+      m_LargestPossibleRegion.SetIndex(3, 0);
+      m_LargestPossibleRegion.SetSize(3, GetTimeGeometry()->CountTimeSteps());
+      return m_LargestPossibleRegion;
+    }
+
+    //##Documentation
+    //## Get the region object that defines the size and starting index
+    //## for the region of the image requested (i.e., the region of the
+    //## image to be operated on by a filter).
+    virtual const RegionType &GetRequestedRegion() const { return m_RequestedRegion; }
+    void CalculateBoundingBox();
+
+  protected:
+    mitkCloneMacro(Self);
+
+    typedef std::vector<vtkUnstructuredGrid *> VTKUnstructuredGridSeries;
+
+    UnstructuredGrid();
+
+    UnstructuredGrid(const mitk::UnstructuredGrid &other);
+
+    virtual ~UnstructuredGrid();
+
+    virtual void ClearData() override;
+
+    virtual void InitializeEmpty() override;
+
+    VTKUnstructuredGridSeries m_GridSeries;
+
+    mutable RegionType m_LargestPossibleRegion;
+
+    RegionType m_RequestedRegion;
+
+    bool m_CalculateBoundingBox;
+  };
 
 } // namespace mitk
 

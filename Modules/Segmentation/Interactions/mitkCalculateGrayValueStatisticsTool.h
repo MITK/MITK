@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCalculateGrayValueStatisticsTool_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkSegmentationsProcessingTool.h"
+#include <MitkSegmentationExports.h>
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -30,73 +30,70 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+   \brief Calculates some gray value statistics for segmentations.
 
-/**
- \brief Calculates some gray value statistics for segmentations.
+   \ingroup ToolManagerEtAl
+   \sa mitk::Tool
+   \sa QmitkInteractiveSegmentation
 
- \ingroup ToolManagerEtAl
- \sa mitk::Tool
- \sa QmitkInteractiveSegmentation
-
- Last contributor: $Author$
-*/
-class MITKSEGMENTATION_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
-{
+   Last contributor: $Author$
+  */
+  class MITKSEGMENTATION_EXPORT CalculateGrayValueStatisticsTool : public SegmentationsProcessingTool
+  {
   public:
-
-  Message<> StatisticsCompleted;
+    Message<> StatisticsCompleted;
 
     mitkClassMacro(CalculateGrayValueStatisticsTool, SegmentationsProcessingTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  virtual const char** GetXPM() const override;
-  virtual const char* GetName() const override;
+      virtual const char **GetXPM() const override;
+    virtual const char *GetName() const override;
 
-  virtual std::string GetReport() const;
-  //
-  // Insight/Code/Review/Algorithms version of Histogram takes
-  // only one template parameter, and the 'release' version
-  // takes 2, but the default value for the second, 1, is what
-  // was specified here.
-  typedef itk::Statistics::Histogram<double> HistogramType;
-  HistogramType::Pointer m_ITKHistogram;
+    virtual std::string GetReport() const;
+    //
+    // Insight/Code/Review/Algorithms version of Histogram takes
+    // only one template parameter, and the 'release' version
+    // takes 2, but the default value for the second, 1, is what
+    // was specified here.
+    typedef itk::Statistics::Histogram<double> HistogramType;
+    HistogramType::Pointer m_ITKHistogram;
 
-  HistogramType::ConstPointer GetHistogram();
+    HistogramType::ConstPointer GetHistogram();
 
-  typedef HistogramType::MeasurementType HistogramMeasurementType;
+    typedef HistogramType::MeasurementType HistogramMeasurementType;
 
-protected:
+  protected:
+    CalculateGrayValueStatisticsTool(); // purposely hidden
+    virtual ~CalculateGrayValueStatisticsTool();
 
-  CalculateGrayValueStatisticsTool(); // purposely hidden
-  virtual ~CalculateGrayValueStatisticsTool();
+    virtual void StartProcessingAllData() override;
+    virtual bool ProcessOneWorkingData(DataNode *node) override;
+    virtual void FinishProcessingAllData() override;
 
-  virtual void StartProcessingAllData() override;
-    virtual bool ProcessOneWorkingData( DataNode* node ) override;
-  virtual void FinishProcessingAllData() override;
+    virtual std::string GetErrorMessage() override;
 
-  virtual std::string GetErrorMessage() override;
+    /**
+     Calculates the minimum and maximum of the pixelvalues. They have to be known to initialize the histogram.
+     */
+    template <typename TPixel, unsigned int VImageDimension>
+    void CalculateMinMax(itk::Image<TPixel, VImageDimension> *referenceImage,
+                         Image *segmentation,
+                         TPixel &minimum,
+                         TPixel &maximum);
 
-  /**
-   Calculates the minimum and maximum of the pixelvalues. They have to be known to initialize the histogram.
-   */
-  template<typename TPixel, unsigned int VImageDimension>
-  void CalculateMinMax(itk::Image<TPixel, VImageDimension>* referenceImage, Image* segmentation,
-      TPixel& minimum, TPixel& maximum);
+    /**
+     - initializes and fills the histogram
+     - calculates mean, sd and quantiles
+     */
+    template <typename TPixel, unsigned int VImageDimension>
+    void ITKHistogramming(itk::Image<TPixel, VImageDimension> *referenceImage,
+                          Image *segmentation,
+                          std::stringstream &report);
 
-  /**
-   - initializes and fills the histogram
-   - calculates mean, sd and quantiles
-   */
-  template<typename TPixel, unsigned int VImageDimension>
-  void ITKHistogramming(itk::Image<TPixel, VImageDimension>* referenceImage, Image* segmentation,
-      std::stringstream& report);
-
-  std::stringstream m_CompleteReport;
-
-};
+    std::stringstream m_CompleteReport;
+  };
 
 } // namespace
 
 #endif
-

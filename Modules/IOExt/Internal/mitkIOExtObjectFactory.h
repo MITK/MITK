@@ -19,41 +19,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkCoreObjectFactoryBase.h"
 
-namespace mitk {
-
-class IOExtObjectFactory : public CoreObjectFactoryBase
+namespace mitk
 {
+  class IOExtObjectFactory : public CoreObjectFactoryBase
+  {
+  public:
+    mitkClassMacro(IOExtObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-public:
+      virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
+    virtual void SetDefaultProperties(mitk::DataNode *node) override;
+    virtual const char *GetFileExtensions() override;
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
+    virtual const char *GetSaveFileExtensions() override;
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
 
-  mitkClassMacro(IOExtObjectFactory,CoreObjectFactoryBase)
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  private:
+    IOExtObjectFactory();
+    ~IOExtObjectFactory();
 
-  virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) override;
-  virtual void SetDefaultProperties(mitk::DataNode* node) override;
-  virtual const char* GetFileExtensions() override;
-  virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-  virtual const char* GetSaveFileExtensions() override;
-  virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
+    void CreateFileExtensionsMap();
+    MultimapType m_FileExtensionsMap;
+    MultimapType m_SaveFileExtensionsMap;
 
-private:
+    itk::ObjectFactoryBase::Pointer m_ParRecFileIOFactory;
+    itk::ObjectFactoryBase::Pointer m_VtkUnstructuredGridIOFactory;
+    itk::ObjectFactoryBase::Pointer m_StlVolumeTimeSeriesIOFactory;
+    itk::ObjectFactoryBase::Pointer m_VtkVolumeTimeSeriesIOFactory;
 
-  IOExtObjectFactory();
-  ~IOExtObjectFactory();
-
-  void CreateFileExtensionsMap();
-  MultimapType m_FileExtensionsMap;
-  MultimapType m_SaveFileExtensionsMap;
-
-  itk::ObjectFactoryBase::Pointer m_ParRecFileIOFactory;
-  itk::ObjectFactoryBase::Pointer m_VtkUnstructuredGridIOFactory;
-  itk::ObjectFactoryBase::Pointer m_StlVolumeTimeSeriesIOFactory;
-  itk::ObjectFactoryBase::Pointer m_VtkVolumeTimeSeriesIOFactory;
-
-  itk::ObjectFactoryBase::Pointer m_UnstructuredGridVtkWriterFactory;
-};
-
+    itk::ObjectFactoryBase::Pointer m_UnstructuredGridVtkWriterFactory;
+  };
 }
 
 #endif

@@ -14,31 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef __QMITK_FRAMES_REGISTRATION_JOB_H
 #define __QMITK_FRAMES_REGISTRATION_JOB_H
 
-
-//QT
-#include <QRunnable>
+// QT
 #include <QObject>
+#include <QRunnable>
 
 // ITK
 #include <itkCommand.h>
 
-//MITK
+// MITK
+#include <QmitkMappingJob.h>
 #include <mitkDataNode.h>
 #include <mitkImage.h>
-#include <QmitkMappingJob.h>
 
 // MatchPoint
 #include <mapDeploymentDLLInfo.h>
-#include <mapRegistrationAlgorithmBase.h>
 #include <mapIterativeAlgorithmInterface.h>
 #include <mapMultiResRegistrationAlgorithmInterface.h>
+#include <mapRegistrationAlgorithmBase.h>
 #include <mapRegistrationBase.h>
 
-//Map4CTK
+// Map4CTK
 #include "mitkUIDHelper.h"
 #include <mitkTimeFramesRegistrationHelper.h>
 
@@ -46,15 +44,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /** Simple helper job class that could be used to process a frame registration in a paralell thread.
  * This is e.g. used be plugins to keep the GUI responsive while doing a frame registration*/
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkFramesRegistrationJob : public QObject, public QRunnable,
-  public QmitkMappingJobSettings
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkFramesRegistrationJob : public QObject,
+                                                                       public QRunnable,
+                                                                       public QmitkMappingJobSettings
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
-  QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase* pAlgorithm);
+  QmitkFramesRegistrationJob(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
   ~QmitkFramesRegistrationJob();
 
   void run();
@@ -62,7 +61,7 @@ public:
 signals:
   void Finished();
   void Error(QString err);
-  void ResultIsAvailable(mitk::Image::Pointer spResult, const QmitkFramesRegistrationJob* pJob);
+  void ResultIsAvailable(mitk::Image::Pointer spResult, const QmitkFramesRegistrationJob *pJob);
   void AlgorithmIterated(QString info, bool hasIterationCount, unsigned long currentIteration);
   void LevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel);
   void AlgorithmStatusChanged(QString info);
@@ -72,17 +71,17 @@ signals:
   void FrameMapped(double progress);
 
 public:
-  //Inputs
+  // Inputs
   mitk::BaseData::ConstPointer m_spTargetData;
 
   mitk::Image::ConstPointer m_spTargetMask;
 
-  //job settings
+  // job settings
   mitk::TimeFramesRegistrationHelper::IgnoreListType m_IgnoreList;
   mitk::NodeUIDType m_TargetNodeUID;
   mitk::NodeUIDType m_TargetMaskNodeUID;
 
-  const map::algorithm::RegistrationAlgorithmBase* GetLoadedAlgorithm() const;
+  const map::algorithm::RegistrationAlgorithmBase *GetLoadedAlgorithm() const;
 
 private:
   typedef map::algorithm::facet::IterativeAlgorithmInterface IIterativeAlgorithm;
@@ -96,11 +95,10 @@ private:
 
   mitk::TimeFramesRegistrationHelper::Pointer m_helper;
 
-  //Helper functions
-  const mitk::Image* GetTargetDataAsImage() const;
+  // Helper functions
+  const mitk::Image *GetTargetDataAsImage() const;
 
-  void OnMapAlgorithmEvent(::itk::Object*, const itk::EventObject& event);
+  void OnMapAlgorithmEvent(::itk::Object *, const itk::EventObject &event);
 };
 
 #endif
-

@@ -18,30 +18,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class SceneReaderV1 : public SceneReader
-{
+  class SceneReaderV1 : public SceneReader
+  {
   public:
+    mitkClassMacro(SceneReaderV1, SceneReader);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( SceneReaderV1, SceneReader);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual bool LoadScene( TiXmlDocument& document, const std::string& workingDirectory, DataStorage* storage ) override;
+      virtual bool LoadScene(TiXmlDocument &document,
+                             const std::string &workingDirectory,
+                             DataStorage *storage) override;
 
   protected:
-
     /**
       \brief tries to create one DataNode from a given XML <node> element
     */
-    DataNode::Pointer LoadBaseDataFromDataTag( TiXmlElement* dataElement,
-                                                   const std::string& workingDirectory,
-                                                   bool& error );
+    DataNode::Pointer LoadBaseDataFromDataTag(TiXmlElement *dataElement,
+                                              const std::string &workingDirectory,
+                                              bool &error);
 
     /**
       \brief reads all the properties from the XML document and recreates them in node
     */
-    bool DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory);
+    bool DecorateNodeWithProperties(DataNode *node, TiXmlElement *nodeElement, const std::string &workingDirectory);
 
     /**
       \brief Clear a default property list and handle some exceptions.
@@ -54,26 +52,26 @@ class SceneReaderV1 : public SceneReader
       This method also handles some exceptions for backwards compatibility.
       Those exceptions are documented directly in the code of the method.
     */
-    void ClearNodePropertyListWithExceptions(DataNode& node, PropertyList& propertyList);
+    void ClearNodePropertyListWithExceptions(DataNode &node, PropertyList &propertyList);
 
     /**
       \brief reads all properties assigned to a base data element and assigns the list to the base data object
 
       The baseDataNodeElem is supposed to be the <properties file="..."> element.
     */
-    bool DecorateBaseDataWithProperties(BaseData::Pointer data, TiXmlElement* baseDataNodeElem, const std::string& workingDir);
+    bool DecorateBaseDataWithProperties(BaseData::Pointer data,
+                                        TiXmlElement *baseDataNodeElem,
+                                        const std::string &workingDir);
 
-    typedef std::pair<DataNode::Pointer, std::list<std::string> >   NodesAndParentsPair;
-    typedef std::list< NodesAndParentsPair > OrderedNodesList;
-    typedef std::map<std::string, DataNode*> IDToNodeMappingType;
-    typedef std::map<DataNode*, std::string> NodeToIDMappingType;
+    typedef std::pair<DataNode::Pointer, std::list<std::string>> NodesAndParentsPair;
+    typedef std::list<NodesAndParentsPair> OrderedNodesList;
+    typedef std::map<std::string, DataNode *> IDToNodeMappingType;
+    typedef std::map<DataNode *, std::string> NodeToIDMappingType;
 
-    OrderedNodesList        m_OrderedNodePairs;
-    IDToNodeMappingType     m_NodeForID;
-    NodeToIDMappingType     m_IDForNode;
+    OrderedNodesList m_OrderedNodePairs;
+    IDToNodeMappingType m_NodeForID;
+    NodeToIDMappingType m_IDForNode;
 
     UIDGenerator m_UIDGen;
-};
-
+  };
 }
-

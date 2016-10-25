@@ -17,27 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKPYRAMIDALREGISTRATIONMETHOD_H
 #define MITKPYRAMIDALREGISTRATIONMETHOD_H
 
-#include "itkImageRegistrationMethod.h"
 #include "MitkRigidRegistrationExports.h"
+#include "itkImageRegistrationMethod.h"
 #include "itkSingleValuedNonLinearOptimizer.h"
 
-#include "mitkImageToImageFilter.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkRigidRegistrationObserver.h"
 #include "mitkCommon.h"
-#include "mitkOptimizerParameters.h"
-#include "mitkTransformParameters.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkImageToImageFilter.h"
 #include "mitkMetricParameters.h"
+#include "mitkOptimizerParameters.h"
+#include "mitkRigidRegistrationObserver.h"
+#include "mitkTransformParameters.h"
 
 #include "itkImageMaskSpatialObject.h"
 #include "mitkRigidRegistrationPreset.h"
 
-
-
 namespace mitk
 {
-
-
   /*!
   \brief Main class for the rigid registration pipeline.
 
@@ -49,19 +45,15 @@ namespace mitk
   \author Thomas van Bruggen  */
   class MITKRIGIDREGISTRATION_EXPORT PyramidalRegistrationMethod : public ImageToImageFilter
   {
-
   public:
-
-    typedef itk::SingleValuedNonLinearOptimizer         OptimizerType;
-    typedef itk::ImageMaskSpatialObject< 3 >            MaskType;
-
+    typedef itk::SingleValuedNonLinearOptimizer OptimizerType;
+    typedef itk::ImageMaskSpatialObject<3> MaskType;
 
     mitkClassMacro(PyramidalRegistrationMethod, ImageToImageFilter);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    static const int LINEARINTERPOLATOR = 0;
+      static const int LINEARINTERPOLATOR = 0;
     static const int NEARESTNEIGHBORINTERPOLATOR = 1;
 
     void SetObserver(RigidRegistrationObserver::Pointer observer);
@@ -70,54 +62,33 @@ namespace mitk
 
     virtual void GenerateData() override;
 
-    virtual void SetReferenceImage( Image::Pointer fixedImage);
+    virtual void SetReferenceImage(Image::Pointer fixedImage);
 
-    virtual void SetFixedMask( Image::Pointer fixedMask);
+    virtual void SetFixedMask(Image::Pointer fixedMask);
 
-    virtual void SetMovingMask( Image::Pointer movingMask);
+    virtual void SetMovingMask(Image::Pointer movingMask);
 
     void SetOptimizerParameters(OptimizerParameters::Pointer optimizerParameters)
     {
       m_OptimizerParameters = optimizerParameters;
     }
 
-    OptimizerParameters::Pointer GetOptimizerParameters()
-    {
-      return m_OptimizerParameters;
-    }
-
+    OptimizerParameters::Pointer GetOptimizerParameters() { return m_OptimizerParameters; }
     void SetTransformParameters(TransformParameters::Pointer transformParameters)
     {
       m_TransformParameters = transformParameters;
     }
 
-    TransformParameters::Pointer GetTransformParameters()
-    {
-      return m_TransformParameters;
-    }
-
-    void SetMetricParameters(MetricParameters::Pointer metricParameters)
-    {
-      m_MetricParameters = metricParameters;
-    }
-
-    MetricParameters::Pointer GetMetricParameters()
-    {
-      return m_MetricParameters;
-    }
-
-    void SetPresets(std::vector<std::string> presets)
-    {
-      m_Presets = presets;
-    }
-
+    TransformParameters::Pointer GetTransformParameters() { return m_TransformParameters; }
+    void SetMetricParameters(MetricParameters::Pointer metricParameters) { m_MetricParameters = metricParameters; }
+    MetricParameters::Pointer GetMetricParameters() { return m_MetricParameters; }
+    void SetPresets(std::vector<std::string> presets) { m_Presets = presets; }
     itkSetMacro(FixedSchedule, itk::Array2D<unsigned int>);
     itkSetMacro(MovingSchedule, itk::Array2D<unsigned int>);
     itkSetMacro(MatchHistograms, bool);
-    itkGetMacro(Preset, mitk::RigidRegistrationPreset*);
+    itkGetMacro(Preset, mitk::RigidRegistrationPreset *);
     itkSetMacro(BlurFixedImage, bool);
     itkSetMacro(BlurMovingImage, bool);
-
 
   protected:
     PyramidalRegistrationMethod();
@@ -133,19 +104,17 @@ namespace mitk
 
     void GenerateOutputInformation() override{};
 
-
   private:
     OptimizerParameters::Pointer m_OptimizerParameters;
     TransformParameters::Pointer m_TransformParameters;
     MetricParameters::Pointer m_MetricParameters;
 
     std::vector<std::string> m_Presets;
-    mitk::RigidRegistrationPreset* m_Preset;
+    mitk::RigidRegistrationPreset *m_Preset;
 
     // Schedules
     itk::Array2D<unsigned int> m_FixedSchedule;
     itk::Array2D<unsigned int> m_MovingSchedule;
-
 
     bool m_UseMask;
     bool m_MatchHistograms;
@@ -156,11 +125,7 @@ namespace mitk
     mitk::TransformParameters::Pointer ParseTransformParameters(itk::Array<double> transformValues);
     mitk::MetricParameters::Pointer ParseMetricParameters(itk::Array<double> metricValues);
     mitk::OptimizerParameters::Pointer ParseOptimizerParameters(itk::Array<double> optimizerValues);
-
-
   };
 }
 
-
 #endif // MITKIMAGEREGISTRATIONMETHOD_H
-

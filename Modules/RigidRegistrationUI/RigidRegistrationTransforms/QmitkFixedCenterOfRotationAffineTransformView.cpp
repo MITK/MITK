@@ -16,13 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkFixedCenterOfRotationAffineTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkFixedCenterOfRotationAffineTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkFixedCenterOfRotationAffineTransform.h>
+#include <mitkImageCast.h>
 
-QmitkFixedCenterOfRotationAffineTransformView::QmitkFixedCenterOfRotationAffineTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkFixedCenterOfRotationAffineTransformView::QmitkFixedCenterOfRotationAffineTransformView(QWidget *parent,
+                                                                                             Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,11 +46,12 @@ itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
 
   // the fixedImage is the input parameter (fix for Bug #14626)
   typename FixedImageType::Pointer fixedImage = itkImage1;
@@ -60,17 +62,21 @@ itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform
   movingImageToItk->Update();
   typename MovingImageType::Pointer movingImage = movingImageToItk->GetOutput();
 
-  typedef typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension >    CenteredAffineTransformType;
-  typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension>::Pointer transformPointer = itk::FixedCenterOfRotationAffineTransform< double, VImageDimension>::New();
+  typedef typename itk::FixedCenterOfRotationAffineTransform<double, VImageDimension> CenteredAffineTransformType;
+  typename itk::FixedCenterOfRotationAffineTransform<double, VImageDimension>::Pointer transformPointer =
+    itk::FixedCenterOfRotationAffineTransform<double, VImageDimension>::New();
   transformPointer->SetIdentity();
   if (m_Controls.m_CenterForInitializerFixedCenterOfRotationAffine->isChecked())
   {
-    typedef typename itk::FixedCenterOfRotationAffineTransform< double, VImageDimension >    FixedCenterOfRotationAffineTransformType;
-    typedef typename itk::CenteredTransformInitializer<FixedCenterOfRotationAffineTransformType, FixedImageType, MovingImageType> TransformInitializerType;
+    typedef typename itk::FixedCenterOfRotationAffineTransform<double, VImageDimension>
+      FixedCenterOfRotationAffineTransformType;
+    typedef typename itk::
+      CenteredTransformInitializer<FixedCenterOfRotationAffineTransformType, FixedImageType, MovingImageType>
+        TransformInitializerType;
     typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-    transformInitializer->SetFixedImage( fixedImage );
-    transformInitializer->SetMovingImage( movingImage );
-    transformInitializer->SetTransform( transformPointer );
+    transformInitializer->SetFixedImage(fixedImage);
+    transformInitializer->SetMovingImage(movingImage);
+    transformInitializer->SetTransform(transformPointer);
     if (m_Controls.m_MomentsFixedCenterOfRotationAffine->isChecked())
     {
       transformInitializer->MomentsOn();
@@ -123,9 +129,12 @@ void QmitkFixedCenterOfRotationAffineTransformView::SetTransformParameters(itk::
   m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale7->setText(QString::number(transformValues[7]));
   m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale8->setText(QString::number(transformValues[8]));
   m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale9->setText(QString::number(transformValues[9]));
-  m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationX->setText(QString::number(transformValues[10]));
-  m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationY->setText(QString::number(transformValues[11]));
-  m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationZ->setText(QString::number(transformValues[12]));
+  m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationX->setText(
+    QString::number(transformValues[10]));
+  m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationY->setText(
+    QString::number(transformValues[11]));
+  m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScaleTranslationZ->setText(
+    QString::number(transformValues[12]));
   m_Controls.m_CenterForInitializerFixedCenterOfRotationAffine->setChecked(transformValues[13]);
   m_Controls.m_MomentsFixedCenterOfRotationAffine->setChecked(transformValues[14]);
   m_Controls.m_GeometryFixedCenterOfRotationAffine->setChecked(!transformValues[14]);
@@ -136,10 +145,10 @@ QString QmitkFixedCenterOfRotationAffineTransformView::GetName()
   return "FixedCenterOfRotationAffine";
 }
 
-void QmitkFixedCenterOfRotationAffineTransformView::SetupUI(QWidget* parent)
+void QmitkFixedCenterOfRotationAffineTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesFixedCenterOfRotationAffineTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -177,7 +186,9 @@ itk::Array<double> QmitkFixedCenterOfRotationAffineTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkFixedCenterOfRotationAffineTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkFixedCenterOfRotationAffineTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                                       vtkTransform *vtktransform,
+                                                                       itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

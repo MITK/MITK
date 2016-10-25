@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkVersorRigid3DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkVersorRigid3DTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkVersorRigid3DTransform.h>
+#include <mitkImageCast.h>
 
-QmitkVersorRigid3DTransformView::QmitkVersorRigid3DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkVersorRigid3DTransformView::QmitkVersorRigid3DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,13 +45,13 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 3)
   {
-    typedef typename itk::Image< TPixelType, 3 >  FixedImage3DType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImage3DType;
+    typedef typename itk::Image<TPixelType, 3> FixedImage3DType;
+    typedef typename itk::Image<TPixelType, 3> MovingImage3DType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImage3DType::Pointer fixedImage = itkImage1;
@@ -62,16 +62,18 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<T
     movingImageToItk->Update();
     typename MovingImage3DType::Pointer movingImage = movingImageToItk->GetOutput();
 
-    typename itk::VersorRigid3DTransform< double >::Pointer transformPointer = itk::VersorRigid3DTransform< double >::New();
+    typename itk::VersorRigid3DTransform<double>::Pointer transformPointer = itk::VersorRigid3DTransform<double>::New();
     transformPointer->SetIdentity();
-    typedef typename itk::VersorRigid3DTransform< double >    VersorRigid3DTransformType;
+    typedef typename itk::VersorRigid3DTransform<double> VersorRigid3DTransformType;
     if (m_Controls.m_CenterForInitializerVersorRigid3D->isChecked())
     {
-      typedef typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
+      typedef
+        typename itk::CenteredTransformInitializer<VersorRigid3DTransformType, FixedImage3DType, MovingImage3DType>
+          TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage );
-      transformInitializer->SetMovingImage( movingImage );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage);
+      transformInitializer->SetMovingImage(movingImage);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsVersorRigid3D->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -82,11 +84,11 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<T
       }
       transformInitializer->InitializeTransform();
     }
-    typedef VersorRigid3DTransformType::VersorType  VersorType;
-    typedef VersorType::VectorType     VectorType;
+    typedef VersorRigid3DTransformType::VersorType VersorType;
+    typedef VersorType::VectorType VectorType;
 
-    VersorType     rotation;
-    VectorType     axis;
+    VersorType rotation;
+    VectorType axis;
 
     axis[0] = 0.0;
     axis[1] = 0.0;
@@ -94,9 +96,9 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<T
 
     const double angle = 0;
 
-    rotation.Set(  axis, angle  );
+    rotation.Set(axis, angle);
 
-    transformPointer->SetRotation( rotation );
+    transformPointer->SetRotation(rotation);
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];
     m_CenterZ = transformPointer->GetCenter()[2];
@@ -142,10 +144,10 @@ QString QmitkVersorRigid3DTransformView::GetName()
   return "VersorRigid3D";
 }
 
-void QmitkVersorRigid3DTransformView::SetupUI(QWidget* parent)
+void QmitkVersorRigid3DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesVersorRigid3DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesVersorRigid3DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesVersorRigid3DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -171,7 +173,9 @@ itk::Array<double> QmitkVersorRigid3DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkVersorRigid3DTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkVersorRigid3DTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                         vtkTransform *vtktransform,
+                                                         itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

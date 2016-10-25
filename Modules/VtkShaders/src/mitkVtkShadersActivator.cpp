@@ -14,46 +14,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <memory>
 #include <mitkVtkShaderRepository.h>
+#include <usModule.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 #include <usModuleEvent.h>
-#include <usModule.h>
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
-#include <memory>
 
 namespace mitk
 {
   class VtkShadersActivator : public us::ModuleActivator
   {
   public:
-    VtkShadersActivator()
-    {
-    }
-
-    ~VtkShadersActivator()
-    {
-    }
-
-    void Load(us::ModuleContext* context) override
+    VtkShadersActivator() {}
+    ~VtkShadersActivator() {}
+    void Load(us::ModuleContext *context) override
     {
       m_VtkShaderRepository.reset(new VtkShaderRepository);
       context->RegisterService<IShaderRepository>(m_VtkShaderRepository.get());
     }
 
-    void Unload(us::ModuleContext*) override
-    {
-      m_VtkShaderRepository.reset(NULL);
-    }
-
+    void Unload(us::ModuleContext *) override { m_VtkShaderRepository.reset(NULL); }
   private:
-    VtkShadersActivator(const VtkShadersActivator&);
-    VtkShadersActivator& operator=(const VtkShadersActivator&);
+    VtkShadersActivator(const VtkShadersActivator &);
+    VtkShadersActivator &operator=(const VtkShadersActivator &);
 
     std::unique_ptr<VtkShaderRepository> m_VtkShaderRepository;
   };
-
 }
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::VtkShadersActivator)

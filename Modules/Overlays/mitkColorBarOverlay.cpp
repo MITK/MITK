@@ -35,7 +35,6 @@ mitk::ColorBarOverlay::ColorBarOverlay()
   SetLookupTable(NULL);
 }
 
-
 mitk::ColorBarOverlay::~ColorBarOverlay()
 {
 }
@@ -51,9 +50,9 @@ mitk::ColorBarOverlay::LocalStorage::LocalStorage()
 
 void mitk::ColorBarOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
 
-  if(ls->IsGenerateDataRequired(renderer,this))
+  if (ls->IsGenerateDataRequired(renderer, this))
   {
     ls->m_ScalarBarActor->SetDrawAnnotations(this->GetDrawAnnotations());
     ls->m_ScalarBarActor->SetLookupTable(this->GetLookupTable());
@@ -62,31 +61,31 @@ void mitk::ColorBarOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_ScalarBarActor->SetMaximumNumberOfColors(this->GetMaxNumberOfColors());
     ls->m_ScalarBarActor->SetNumberOfLabels(this->GetNumberOfLabels());
     ls->m_ScalarBarActor->SetAnnotationTextScaling(this->GetAnnotationTextScaling());
-    //manually set position so there is no overlap with mitk logo in 3d renderwindow
-    if (this->GetOrientation()==1)
+    // manually set position so there is no overlap with mitk logo in 3d renderwindow
+    if (this->GetOrientation() == 1)
     {
-      ls->m_ScalarBarActor->SetPosition(0.80,0.15);
+      ls->m_ScalarBarActor->SetPosition(0.80, 0.15);
       ls->m_ScalarBarActor->SetWidth(0.15);
       ls->m_ScalarBarActor->SetHeight(0.85);
-    }else
+    }
+    else
     {
-      ls->m_ScalarBarActor->SetPosition(0.03,0.03);
+      ls->m_ScalarBarActor->SetPosition(0.03, 0.03);
       ls->m_ScalarBarActor->SetWidth(0.8);
       ls->m_ScalarBarActor->SetHeight(0.15);
     }
   }
-
 }
 
-vtkProp* mitk::ColorBarOverlay::GetVtkProp(BaseRenderer *renderer) const
+vtkProp *mitk::ColorBarOverlay::GetVtkProp(BaseRenderer *renderer) const
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_ScalarBarActor;
 }
 
 void mitk::ColorBarOverlay::SetDrawAnnotations(bool annotations)
 {
-    SetBoolProperty("ColorBarOverlay.DrawAnnotations", annotations);
+  SetBoolProperty("ColorBarOverlay.DrawAnnotations", annotations);
 }
 
 bool mitk::ColorBarOverlay::GetDrawAnnotations() const
@@ -98,23 +97,24 @@ bool mitk::ColorBarOverlay::GetDrawAnnotations() const
 
 void mitk::ColorBarOverlay::SetLookupTable(vtkSmartPointer<vtkLookupTable> table)
 {
-    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-    mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-    lut->SetVtkLookupTable(table);
-    prop->SetLookupTable(lut);
-    SetProperty("ColorBarOverlay.LookupTable", prop.GetPointer());
+  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+  mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+  lut->SetVtkLookupTable(table);
+  prop->SetLookupTable(lut);
+  SetProperty("ColorBarOverlay.LookupTable", prop.GetPointer());
 }
 
 vtkSmartPointer<vtkLookupTable> mitk::ColorBarOverlay::GetLookupTable() const
 {
   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-  lut = dynamic_cast<mitk::LookupTableProperty*>(GetPropertyList()->GetProperty("ColorBarOverlay.LookupTable"))->GetLookupTable();
+  lut = dynamic_cast<mitk::LookupTableProperty *>(GetPropertyList()->GetProperty("ColorBarOverlay.LookupTable"))
+          ->GetLookupTable();
   return lut->GetVtkLookupTable();
 }
 
 void mitk::ColorBarOverlay::SetOrientation(int orientation)
 {
-    SetIntProperty("ColorBarOverlay.Orientation", orientation);
+  SetIntProperty("ColorBarOverlay.Orientation", orientation);
 }
 
 int mitk::ColorBarOverlay::GetOrientation() const
@@ -126,7 +126,7 @@ int mitk::ColorBarOverlay::GetOrientation() const
 
 void mitk::ColorBarOverlay::SetDrawTickLabels(bool ticks)
 {
-    SetBoolProperty("ColorBarOverlay.DrawTicks", ticks);
+  SetBoolProperty("ColorBarOverlay.DrawTicks", ticks);
 }
 
 bool mitk::ColorBarOverlay::GetDrawTickLabels() const
@@ -148,7 +148,7 @@ void mitk::ColorBarOverlay::SetOrientationToVertical()
 
 void mitk::ColorBarOverlay::SetMaxNumberOfColors(int numberOfColors)
 {
-    SetIntProperty("ColorBarOverlay.MaximumNumberOfColors", numberOfColors);
+  SetIntProperty("ColorBarOverlay.MaximumNumberOfColors", numberOfColors);
 }
 
 int mitk::ColorBarOverlay::GetMaxNumberOfColors() const
@@ -160,7 +160,7 @@ int mitk::ColorBarOverlay::GetMaxNumberOfColors() const
 
 void mitk::ColorBarOverlay::SetNumberOfLabels(int numberOfLabels)
 {
-    SetIntProperty("ColorBarOverlay.NumberOfLabels", numberOfLabels);
+  SetIntProperty("ColorBarOverlay.NumberOfLabels", numberOfLabels);
 }
 
 int mitk::ColorBarOverlay::GetNumberOfLabels() const
@@ -172,7 +172,7 @@ int mitk::ColorBarOverlay::GetNumberOfLabels() const
 
 void mitk::ColorBarOverlay::SetAnnotationTextScaling(bool scale)
 {
-    SetBoolProperty("ColorBarOverlay.ScaleAnnotationText", scale);
+  SetBoolProperty("ColorBarOverlay.ScaleAnnotationText", scale);
 }
 
 bool mitk::ColorBarOverlay::GetAnnotationTextScaling() const

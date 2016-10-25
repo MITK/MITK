@@ -16,10 +16,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkScaleLogarithmicTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <itkScaleLogarithmicTransform.h>
 #include <QValidator>
+#include <itkScaleLogarithmicTransform.h>
 
-QmitkScaleLogarithmicTransformView::QmitkScaleLogarithmicTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
+QmitkScaleLogarithmicTransformView::QmitkScaleLogarithmicTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f)
 {
 }
 
@@ -42,12 +43,14 @@ itk::Object::Pointer QmitkScaleLogarithmicTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkScaleLogarithmicTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkScaleLogarithmicTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::ScaleLogarithmicTransform< double, VImageDimension>::Pointer transformPointer = itk::ScaleLogarithmicTransform< double, VImageDimension>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::ScaleLogarithmicTransform<double, VImageDimension>::Pointer transformPointer =
+    itk::ScaleLogarithmicTransform<double, VImageDimension>::New();
   transformPointer->SetIdentity();
   m_TransformObject = transformPointer.GetPointer();
   return transformPointer.GetPointer();
@@ -78,10 +81,10 @@ QString QmitkScaleLogarithmicTransformView::GetName()
   return "ScaleLogarithmic";
 }
 
-void QmitkScaleLogarithmicTransformView::SetupUI(QWidget* parent)
+void QmitkScaleLogarithmicTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesScaleLogarithmicTransformScaleX->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesScaleLogarithmicTransformScaleY->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesScaleLogarithmicTransformScaleZ->setValidator(validatorLineEditInputFloat);
@@ -101,11 +104,13 @@ itk::Array<double> QmitkScaleLogarithmicTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkScaleLogarithmicTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkScaleLogarithmicTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                            vtkTransform *vtktransform,
+                                                            itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {
-    for( unsigned int i=0; i<transformParams.size(); i++)
+    for (unsigned int i = 0; i < transformParams.size(); i++)
     {
       vtkmatrix->SetElement(i, i, transformParams[i]);
     }

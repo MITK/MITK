@@ -19,16 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkXnatSubject.h>
 #include <iostream>
 
-QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(QWidget* parent)
-  : QWidget(parent)
+QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(QWidget *parent) : QWidget(parent)
 {
   m_Mode = INFO;
   Init();
 }
 
-QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(Mode mode, QWidget *parent)
-  : QWidget(parent),
-    m_Mode(mode)
+QmitkXnatSubjectWidget::QmitkXnatSubjectWidget(Mode mode, QWidget *parent) : QWidget(parent), m_Mode(mode)
 {
   Init();
 }
@@ -50,7 +47,7 @@ void QmitkXnatSubjectWidget::Init()
   }
 }
 
-void QmitkXnatSubjectWidget::SetSubject(ctkXnatSubject* subject)
+void QmitkXnatSubjectWidget::SetSubject(ctkXnatSubject *subject)
 {
   m_Subject = subject;
 
@@ -67,7 +64,7 @@ void QmitkXnatSubjectWidget::SetSubject(ctkXnatSubject* subject)
   m_Controls.weightLineEdit->setText(m_Subject->property("weight"));
 }
 
-ctkXnatSubject* QmitkXnatSubjectWidget::GetSubject() const
+ctkXnatSubject *QmitkXnatSubjectWidget::GetSubject() const
 {
   if (m_Mode == CREATE)
   {

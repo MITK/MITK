@@ -20,20 +20,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkAbstractView.h>
 #include <mitkILifecycleAwarePart.h>
 
-#include <string>
 #include "vtkRenderWindow.h"
+#include <string>
 
 #include "ui_QmitkViewInitializationViewControls.h"
 
-
 class QmitkViewInitializationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
-
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   QmitkViewInitializationView();
@@ -47,8 +44,7 @@ public:
   virtual void CreateConnections();
 
 private:
-
-  vtkRenderWindow* GetSelectedRenderWindow();
+  vtkRenderWindow *GetSelectedRenderWindow();
 
   void InitRenderWindowSelector();
 
@@ -65,16 +61,10 @@ private slots:
 
   virtual void OnResetAll();
 
-
 private:
-
-  Ui::QmitkViewInitializationViewControls* m_Controls;
+  Ui::QmitkViewInitializationViewControls *m_Controls;
 
   unsigned long m_CommandTag;
 };
 
-
-
-
 #endif // _QMITKVIEWINITIALIZATIONVIEW_H_INCLUDED
-

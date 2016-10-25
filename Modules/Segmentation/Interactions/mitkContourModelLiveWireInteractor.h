@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkContourModelLiveWireInteractor_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkContourModelInteractor.h"
+#include <MitkSegmentationExports.h>
 
 #include <mitkImageLiveWireContourModelFilter.h>
 
@@ -34,38 +34,35 @@ namespace mitk
   \ingroup Interaction
 
 
-  \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments will not work!
+  \warning Make sure the working image is properly set, otherwise the algorithm for computing livewire contour segments
+  will not work!
 
   */
   class MITKSEGMENTATION_EXPORT ContourModelLiveWireInteractor : public ContourModelInteractor
   {
   public:
+    mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor) itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
-    mitkClassMacro(ContourModelLiveWireInteractor, ContourModelInteractor)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+        virtual void SetEditingContourModelNode(mitk::DataNode *_arg);
 
-    virtual void SetEditingContourModelNode (mitk::DataNode* _arg);
-
-    virtual void SetWorkingImage (mitk::Image* _arg);
+    virtual void SetWorkingImage(mitk::Image *_arg);
 
     virtual void ConnectActionsAndFunctions() override;
 
   protected:
-
     ContourModelLiveWireInteractor();
     virtual ~ContourModelLiveWireInteractor();
 
+    virtual bool OnCheckPointClick(const InteractionEvent *interactionEvent) override;
+    virtual bool IsHovering(const InteractionEvent *interactionEvent) override;
 
-    virtual bool OnCheckPointClick( const InteractionEvent* interactionEvent ) override;
-    virtual bool IsHovering(const InteractionEvent* interactionEvent) override;
+    virtual void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    virtual void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    virtual void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
-    virtual void OnMovePoint(StateMachineAction *, InteractionEvent* interactionEvent) override;
-    virtual void OnDeletePoint(StateMachineAction*, InteractionEvent* interactionEvent) override;
-    virtual void OnFinishEditing(StateMachineAction*, InteractionEvent* interactionEvent) override;
-
-    int SplitContourFromSelectedVertex(mitk::ContourModel* srcContour,
-                                       mitk::ContourModel* destContour,
+    int SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
+                                       mitk::ContourModel *destContour,
                                        bool fromSelectedUpwards,
                                        int timestep);
 
@@ -78,12 +75,11 @@ namespace mitk
     mitk::ContourModel::VertexIterator m_NextActiveVertexDownIter;
     mitk::ContourModel::VertexIterator m_NextActiveVertexUpIter;
 
-    std::vector < itk::Index<2> > m_ContourBeingModified;
+    std::vector<itk::Index<2>> m_ContourBeingModified;
 
     mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;
     mitk::ContourModel::Pointer m_ContourRight;
-
   };
 
 } // namespace mitk

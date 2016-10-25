@@ -35,8 +35,8 @@ class vtkMaskPoints;
 class MITKMAPPEREXT_EXPORT vtkMaskedGlyph3D : public vtkGlyph3D
 {
 public:
-  vtkTypeMacro(vtkMaskedGlyph3D,vtkGlyph3D);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkMaskedGlyph3D, vtkGlyph3D);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   /**
    * Constructor
@@ -66,7 +66,7 @@ public:
   void SetRandomMode(int mode);
   int GetRandomMode();
 
-  virtual void SetInputConnection(vtkAlgorithmOutput* input) override;
+  virtual void SetInputConnection(vtkAlgorithmOutput *input) override;
 
   using vtkGlyph3D::SetInputConnection;
 
@@ -81,8 +81,8 @@ protected:
   int UseMaskPoints;
 
 private:
-  vtkMaskedGlyph3D(const vtkMaskedGlyph3D&);  // Not implemented.
-  void operator=(const vtkMaskedGlyph3D&);  // Not implemented.
+  vtkMaskedGlyph3D(const vtkMaskedGlyph3D &); // Not implemented.
+  void operator=(const vtkMaskedGlyph3D &);   // Not implemented.
 };
 
 #endif

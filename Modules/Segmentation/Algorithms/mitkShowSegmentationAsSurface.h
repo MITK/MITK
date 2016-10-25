@@ -18,26 +18,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_SHOW_SEGMENTATION_AS_SURFACE_H_INCLUDET_WAD
 
 #include "mitkSegmentationSink.h"
-#include <MitkSegmentationExports.h>
-#include "mitkUIDGenerator.h"
 #include "mitkSurface.h"
+#include "mitkUIDGenerator.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
-
-class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSink
-{
+  class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSink
+  {
   public:
-
-    mitkClassMacro( ShowSegmentationAsSurface, SegmentationSink )
-    mitkAlgorithmNewMacro( ShowSegmentationAsSurface );
+    mitkClassMacro(ShowSegmentationAsSurface, SegmentationSink) mitkAlgorithmNewMacro(ShowSegmentationAsSurface);
 
   protected:
-
-    ShowSegmentationAsSurface();  // use smart pointers
+    ShowSegmentationAsSurface(); // use smart pointers
     virtual ~ShowSegmentationAsSurface();
 
-    virtual void Initialize(const NonBlockingAlgorithm* other = NULL) override;
+    virtual void Initialize(const NonBlockingAlgorithm *other = NULL) override;
     virtual bool ReadyToRun() override;
 
     virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
@@ -45,18 +41,14 @@ class MITKSEGMENTATION_EXPORT ShowSegmentationAsSurface : public SegmentationSin
     virtual void ThreadedUpdateSuccessful() override; // will be called from a thread after calling StartAlgorithm
 
   private:
-
     UIDGenerator m_UIDGeneratorSurfaces;
 
     Surface::Pointer m_Surface;
     DataNode::Pointer m_Node;
 
     bool m_AddToTree;
-
-};
+  };
 
 } // namespace
 
 #endif
-
-

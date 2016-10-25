@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSimilarity3DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkSimilarity3DTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkSimilarity3DTransform.h>
+#include <mitkImageCast.h>
 
-QmitkSimilarity3DTransformView::QmitkSimilarity3DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkSimilarity3DTransformView::QmitkSimilarity3DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,13 +45,13 @@ itk::Object::Pointer QmitkSimilarity3DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkSimilarity3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkSimilarity3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 3)
   {
-    typedef typename itk::Image< TPixelType, 3 >  FixedImage3DType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImage3DType;
+    typedef typename itk::Image<TPixelType, 3> FixedImage3DType;
+    typedef typename itk::Image<TPixelType, 3> MovingImage3DType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImage3DType::Pointer fixedImage = itkImage1;
@@ -62,16 +62,17 @@ itk::Object::Pointer QmitkSimilarity3DTransformView::GetTransform2(itk::Image<TP
     movingImageToItk->Update();
     typename MovingImage3DType::Pointer movingImage = movingImageToItk->GetOutput();
 
-    typename itk::Similarity3DTransform< double >::Pointer transformPointer = itk::Similarity3DTransform< double >::New();
+    typename itk::Similarity3DTransform<double>::Pointer transformPointer = itk::Similarity3DTransform<double>::New();
     transformPointer->SetIdentity();
     if (m_Controls.m_CenterForInitializerSimilarity3D->isChecked())
     {
-      typedef typename itk::Similarity3DTransform< double >    Similarity3DTransformType;
-      typedef typename itk::CenteredTransformInitializer<Similarity3DTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
+      typedef typename itk::Similarity3DTransform<double> Similarity3DTransformType;
+      typedef typename itk::CenteredTransformInitializer<Similarity3DTransformType, FixedImage3DType, MovingImage3DType>
+        TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage );
-      transformInitializer->SetMovingImage( movingImage );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage);
+      transformInitializer->SetMovingImage(movingImage);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsSimilarity3D->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -129,10 +130,10 @@ QString QmitkSimilarity3DTransformView::GetName()
   return "Similarity3D";
 }
 
-void QmitkSimilarity3DTransformView::SetupUI(QWidget* parent)
+void QmitkSimilarity3DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesSimilarity3DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesSimilarity3DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesSimilarity3DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -160,7 +161,9 @@ itk::Array<double> QmitkSimilarity3DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkSimilarity3DTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkSimilarity3DTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                        vtkTransform *vtktransform,
+                                                        itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

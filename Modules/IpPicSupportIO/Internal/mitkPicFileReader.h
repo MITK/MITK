@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 #define PICFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
@@ -24,33 +23,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkIpPic.h"
 
-
-namespace mitk {
-//##Documentation
-//## @brief Reader to read files in DKFZ-pic-format
-class PicFileReader : public AbstractFileReader
+namespace mitk
 {
+  //##Documentation
+  //## @brief Reader to read files in DKFZ-pic-format
+  class PicFileReader : public AbstractFileReader
+  {
+  public:
+    PicFileReader();
 
-public:
+    using AbstractFileReader::Read;
+    std::vector<mitk::BaseData::Pointer> Read() override;
 
-  PicFileReader();
+  protected:
+    void FillImage(Image::Pointer image);
 
-  using AbstractFileReader::Read;
-  std::vector<mitk::BaseData::Pointer> Read() override;
+    Image::Pointer CreateImage();
 
-protected:
+  private:
+    static void ConvertHandedness(mitkIpPicDescriptor *pic);
 
-  void FillImage(Image::Pointer image);
-
-  Image::Pointer CreateImage();
-
-private:
-
-  static void ConvertHandedness(mitkIpPicDescriptor* pic);
-
-  PicFileReader* Clone() const override;
-
-};
+    PicFileReader *Clone() const override;
+  };
 
 } // namespace mitk
 

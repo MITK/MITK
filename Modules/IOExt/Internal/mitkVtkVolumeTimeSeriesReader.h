@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _Vtk_VOLUME_TIME_SERIES_READER__H_
 #define _Vtk_VOLUME_TIME_SERIES_READER__H_
 
@@ -24,18 +23,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-//##Documentation
-//## @brief Reader to read a series of volume files in Vtk-format
-class VtkVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
-{
-public:
-    mitkClassMacro( VtkVolumeTimeSeriesReader, FileReader );
+  //##Documentation
+  //## @brief Reader to read a series of volume files in Vtk-format
+  class VtkVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
+  {
+  public:
+    mitkClassMacro(VtkVolumeTimeSeriesReader, FileReader);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    itkSetStringMacro(FileName);
+      itkSetStringMacro(FileName);
     itkGetStringMacro(FileName);
 
     itkSetStringMacro(FilePrefix);
@@ -46,7 +44,7 @@ public:
 
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
-protected:
+  protected:
     virtual void GenerateData() override;
 
     VtkVolumeTimeSeriesReader();
@@ -56,8 +54,7 @@ protected:
     //##Description
     //## @brief Time when Header was last read
     itk::TimeStamp m_ReadHeaderTime;
-
-};
+  };
 
 } // namespace mitk
 

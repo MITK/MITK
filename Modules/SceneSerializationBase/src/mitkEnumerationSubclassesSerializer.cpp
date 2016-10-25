@@ -19,51 +19,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnumerationPropertySerializer.h"
 
+#include "mitkModalityProperty.h"
 #include "mitkPlaneOrientationProperty.h"
+#include "mitkPointSetShapeProperty.h"
+#include "mitkRenderingModeProperty.h"
 #include "mitkShaderProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkVtkVolumeRenderingProperty.h"
-#include "mitkModalityProperty.h"
-#include "mitkRenderingModeProperty.h"
-#include "mitkPointSetShapeProperty.h"
 
-#define MITK_REGISTER_ENUM_SUB_SERIALIZER(classname) \
- \
-namespace mitk \
-{ \
- \
-class classname ## Serializer : public EnumerationPropertySerializer \
-{ \
-  public: \
-     \
-    mitkClassMacro( classname ## Serializer, EnumerationPropertySerializer ) \
-    itkFactorylessNewMacro(Self) \
-    itkCloneMacro(Self) \
- \
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override \
-    { \
-        if (!element) return NULL; \
-            const char* sa( element->Attribute("value") ); \
-         \
-        std::string s(sa?sa:""); \
-        classname::Pointer property = classname::New(); \
-        property->SetValue( s ); \
-         \
-        return property.GetPointer(); \
-    } \
- \
-  protected: \
- \
-    classname ## Serializer () {} \
-    virtual ~classname ## Serializer () {} \
-}; \
- \
-} \
- \
-MITK_REGISTER_SERIALIZER( classname ## Serializer );
+#define MITK_REGISTER_ENUM_SUB_SERIALIZER(classname)                                                                   \
+  \
+namespace mitk                                                                                                         \
+  \
+{                                                                                                                 \
+    \
+class classname##Serializer                                                                                            \
+      : public EnumerationPropertySerializer\
+{public :                                                                                                              \
+                                                                                                                       \
+          mitkClassMacro(classname##Serializer, EnumerationPropertySerializer) itkFactorylessNewMacro(Self)            \
+            itkCloneMacro(Self)                                                                                        \
+                                                                                                                       \
+              virtual BaseProperty::Pointer Deserialize(TiXmlElement * element) override{if (!element) return NULL;    \
+    const char *sa(element->Attribute("value"));                                                                       \
+                                                                                                                       \
+    std::string s(sa ? sa : "");                                                                                       \
+    classname::Pointer property = classname::New();                                                                    \
+    property->SetValue(s);                                                                                             \
+                                                                                                                       \
+    return property.GetPointer();                                                                                      \
+  }                                                                                                                    \
+                                                                                                                       \
+protected:                                                                                                             \
+  classname##Serializer() {}                                                                                           \
+  virtual ~classname##Serializer() {}                                                                                  \
+  \
+}                                                                                                                 \
+  ;                                                                                                                    \
+  \
+}                                                                                                                 \
+  \
+MITK_REGISTER_SERIALIZER(classname##Serializer);
 
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PlaneOrientationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(ShaderProperty);
@@ -76,6 +75,4 @@ MITK_REGISTER_ENUM_SUB_SERIALIZER(ModalityProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(RenderingModeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PointSetShapeProperty);
 
-
 #endif
-

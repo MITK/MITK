@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef qclickablelabelhincluded
 #define qclickablelabelhincluded
 
-#include <QLabel>
 #include "MitkQtWidgetsExtExports.h"
+#include <QLabel>
 
-#include <vector>
 #include <map>
+#include <vector>
 
 #include "mitkCommon.h"
 
@@ -36,41 +35,38 @@ class MITKQTWIDGETSEXT_EXPORT QClickableLabel : public QLabel
 {
   Q_OBJECT
 
-  public:
-    QClickableLabel( QWidget* parent, Qt::WindowFlags f = nullptr );
-    QClickableLabel( const QString& text, QWidget* parent, Qt::WindowFlags f = nullptr );
-    virtual ~QClickableLabel();
+public:
+  QClickableLabel(QWidget *parent, Qt::WindowFlags f = nullptr);
+  QClickableLabel(const QString &text, QWidget *parent, Qt::WindowFlags f = nullptr);
+  virtual ~QClickableLabel();
 
-    void AddHotspot( const QString& name, const QRect position );
+  void AddHotspot(const QString &name, const QRect position);
 
-    void RemoveHotspot( const QString& name );
-    void RemoveHotspot( unsigned int hotspotIndex );
-    void RemoveAllHotspots();
+  void RemoveHotspot(const QString &name);
+  void RemoveHotspot(unsigned int hotspotIndex);
+  void RemoveAllHotspots();
 
-  signals:
+signals:
 
-    void mousePressed( const QString& hotspotName );
-    void mousePressed( unsigned int hotspotIndex );
-    void mouseReleased( const QString& hotspotName );
-    void mouseReleased( unsigned int hotspotIndex );
+  void mousePressed(const QString &hotspotName);
+  void mousePressed(unsigned int hotspotIndex);
+  void mouseReleased(const QString &hotspotName);
+  void mouseReleased(unsigned int hotspotIndex);
 
-  protected:
+protected:
+  virtual void mousePressEvent(QMouseEvent *e) override;
+  virtual void mouseReleaseEvent(QMouseEvent *e) override;
 
-    virtual void mousePressEvent ( QMouseEvent* e ) override;
-    virtual void mouseReleaseEvent ( QMouseEvent* e ) override;
+  /// returns index == m_Hotspots.size() if nothing is hit
+  unsigned int matchingRect(const QPoint &p);
 
-    /// returns index == m_Hotspots.size() if nothing is hit
-    unsigned int matchingRect( const QPoint& p );
+  typedef std::vector<QRect> RectVectorType;
+  RectVectorType m_Hotspots;
 
-    typedef std::vector< QRect > RectVectorType;
-    RectVectorType m_Hotspots;
-
-    typedef std::map< QString, unsigned int > NameToIndexMapType;
-    typedef std::map< unsigned int, QString > IndexToNameMapType;
-    NameToIndexMapType m_HotspotIndexForName;
-    IndexToNameMapType m_HotspotNameForIndex;
-
+  typedef std::map<QString, unsigned int> NameToIndexMapType;
+  typedef std::map<unsigned int, QString> IndexToNameMapType;
+  NameToIndexMapType m_HotspotIndexForName;
+  IndexToNameMapType m_HotspotNameForIndex;
 };
 
 #endif
-

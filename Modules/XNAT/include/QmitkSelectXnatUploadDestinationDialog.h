@@ -5,8 +5,9 @@
 
 #include <QDialog>
 
-namespace Ui {
-class QmitkSelectXnatUploadDestinationDialog;
+namespace Ui
+{
+  class QmitkSelectXnatUploadDestinationDialog;
 }
 
 class ctkXnatObject;
@@ -19,11 +20,11 @@ class MITKXNAT_EXPORT QmitkSelectXnatUploadDestinationDialog : public QDialog
   Q_OBJECT
 
 public:
-  explicit QmitkSelectXnatUploadDestinationDialog(ctkXnatSession* session, const QStringList&, QWidget *parent = 0);
+  explicit QmitkSelectXnatUploadDestinationDialog(ctkXnatSession *session, const QStringList &, QWidget *parent = 0);
   ~QmitkSelectXnatUploadDestinationDialog();
 
   ctkXnatObject *GetUploadDestination();
-  void SetXnatResourceFolderUrl(const QString& url);
+  void SetXnatResourceFolderUrl(const QString &url);
 
 protected slots:
 
@@ -32,11 +33,11 @@ protected slots:
   void OnSelectFromTreeView(bool selectFromTreeView);
   void OnResourceEntered(const QString &resourceEntered);
   void OnResourceSelected(const QString &resource);
-  void OnXnatNodeSelected(const QModelIndex&);
+  void OnXnatNodeSelected(const QModelIndex &);
   void OnCancel();
 
 private:
-  QmitkXnatTreeModel* m_TreeModel;
+  QmitkXnatTreeModel *m_TreeModel;
   QString m_Url;
   QString m_ResourceName;
   bool m_CreateNewFolder;

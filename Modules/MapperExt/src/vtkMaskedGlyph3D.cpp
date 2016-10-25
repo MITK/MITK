@@ -33,10 +33,10 @@ vtkMaskedGlyph3D::vtkMaskedGlyph3D()
 
 vtkMaskedGlyph3D::~vtkMaskedGlyph3D()
 {
-  if(this->MaskPoints)
-    {
+  if (this->MaskPoints)
+  {
     this->MaskPoints->Delete();
-    }
+  }
 }
 
 void vtkMaskedGlyph3D::SetInput(vtkDataSet *input)
@@ -45,7 +45,7 @@ void vtkMaskedGlyph3D::SetInput(vtkDataSet *input)
   this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
 }
 
-void vtkMaskedGlyph3D::SetInputConnection(vtkAlgorithmOutput* input)
+void vtkMaskedGlyph3D::SetInputConnection(vtkAlgorithmOutput *input)
 {
   this->MaskPoints->SetInputConnection(input);
   this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
@@ -61,17 +61,16 @@ int vtkMaskedGlyph3D::GetRandomMode()
   return this->MaskPoints->GetRandomMode();
 }
 
-int vtkMaskedGlyph3D::RequestData(
-  vtkInformation *request,
-  vtkInformationVector **inputVector,
-  vtkInformationVector *outputVector)
+int vtkMaskedGlyph3D::RequestData(vtkInformation *request,
+                                  vtkInformationVector **inputVector,
+                                  vtkInformationVector *outputVector)
 {
   if (this->UseMaskPoints)
   {
     this->Superclass::SetInputConnection(this->MaskPoints->GetOutputPort());
     vtkIdType numPts = this->MaskPoints->GetPolyDataInput(0)->GetNumberOfPoints();
-    this->MaskPoints->SetMaximumNumberOfPoints( MaximumNumberOfPoints );
-    this->MaskPoints->SetOnRatio( numPts / MaximumNumberOfPoints );
+    this->MaskPoints->SetMaximumNumberOfPoints(MaximumNumberOfPoints);
+    this->MaskPoints->SetOnRatio(numPts / MaximumNumberOfPoints);
     this->MaskPoints->Update();
   }
   else
@@ -79,16 +78,14 @@ int vtkMaskedGlyph3D::RequestData(
     this->Superclass::SetInputData(this->MaskPoints->GetInput());
   }
 
-  return this->Superclass::RequestData(
-    request,inputVector,outputVector);
+  return this->Superclass::RequestData(request, inputVector, outputVector);
 }
 
-void vtkMaskedGlyph3D::PrintSelf(ostream& os, vtkIndent indent)
+void vtkMaskedGlyph3D::PrintSelf(ostream &os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "MaximumNumberOfPoints: " << this->GetMaximumNumberOfPoints()
-     << endl;
+  os << indent << "MaximumNumberOfPoints: " << this->GetMaximumNumberOfPoints() << endl;
 
-  os << indent << "UseMaskPoints: " << (this->UseMaskPoints?"on":"off") << endl;
+  os << indent << "UseMaskPoints: " << (this->UseMaskPoints ? "on" : "off") << endl;
 }

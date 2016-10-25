@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QMessageBox>
 
-QmitkLevelWindowRangeChangeDialog::QmitkLevelWindowRangeChangeDialog(QWidget* parent, Qt::WindowFlags f)
- : QDialog(parent, f)
+QmitkLevelWindowRangeChangeDialog::QmitkLevelWindowRangeChangeDialog(QWidget *parent, Qt::WindowFlags f)
+  : QDialog(parent, f)
 {
   this->setupUi(this);
 
@@ -36,12 +36,12 @@ double QmitkLevelWindowRangeChangeDialog::getUpperLimit()
   return rangeMaxDoubleSpinBox->value();
 }
 
-void QmitkLevelWindowRangeChangeDialog::setLowerLimit( double rangeMin )
+void QmitkLevelWindowRangeChangeDialog::setLowerLimit(double rangeMin)
 {
   rangeMinDoubleSpinBox->setValue(rangeMin);
 }
 
-void QmitkLevelWindowRangeChangeDialog::setUpperLimit( double rangeMax )
+void QmitkLevelWindowRangeChangeDialog::setUpperLimit(double rangeMax)
 {
   rangeMaxDoubleSpinBox->setValue(rangeMax);
 }
@@ -50,9 +50,10 @@ void QmitkLevelWindowRangeChangeDialog::inputValidator()
 {
   if (!(rangeMinDoubleSpinBox->value() < rangeMaxDoubleSpinBox->value()))
   {
-    QMessageBox::critical( this, "Change Range",
-    "Upper limit has to be greater than lower limit.\n"
-    "Please enter limits again." );
+    QMessageBox::critical(this,
+                          "Change Range",
+                          "Upper limit has to be greater than lower limit.\n"
+                          "Please enter limits again.");
   }
   else
     this->accept();

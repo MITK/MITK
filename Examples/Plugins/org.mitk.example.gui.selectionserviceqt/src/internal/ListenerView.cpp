@@ -22,22 +22,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryQModelIndexObject.h>
 
 // Qt includes
-#include <QString>
 #include <QModelIndex>
+#include <QString>
 #include <QVariant>
 
 const std::string ListenerView::VIEW_ID = "org.mitk.views.listenerview";
 
 ListenerView::ListenerView()
-  : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged))
-  , m_Parent(nullptr)
+  : m_SelectionListener(new berry::SelectionChangedAdapter<ListenerView>(this, &ListenerView::SelectionChanged)),
+    m_Parent(nullptr)
 {
 }
 
 ListenerView::~ListenerView()
 {
   // remove selection service
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService *s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->RemoveSelectionListener(m_SelectionListener.data());
 }
 
@@ -56,8 +56,10 @@ void ListenerView::CreateQtPartControl(QWidget *parent)
 void ListenerView::ToggleRadioMethod(QString selectStr)
 {
   // change the radio button state according to the name of the selected element
-  if (selectStr == "Selection 1") m_Controls.radioButton->toggle();
-  else if (selectStr == "Selection 2") m_Controls.radioButton_2->toggle();
+  if (selectStr == "Selection 1")
+    m_Controls.radioButton->toggle();
+  else if (selectStr == "Selection 2")
+    m_Controls.radioButton_2->toggle();
 }
 
 void ListenerView::SetFocus()
@@ -65,8 +67,8 @@ void ListenerView::SetFocus()
 }
 
 //! [Qt Selection Listener method implementation]
-void ListenerView::SelectionChanged(const berry::IWorkbenchPart::Pointer& sourcepart,
-                                    const berry::ISelection::ConstPointer& selection)
+void ListenerView::SelectionChanged(const berry::IWorkbenchPart::Pointer &sourcepart,
+                                    const berry::ISelection::ConstPointer &selection)
 {
   // check for null selection
   if (selection.IsNull())
@@ -74,13 +76,11 @@ void ListenerView::SelectionChanged(const berry::IWorkbenchPart::Pointer& source
     return;
   }
   // exclude own selection events and check whether this kind of selection can be handled
-  if (sourcepart != this &&
-      selection.Cast<const berry::IStructuredSelection>())
+  if (sourcepart != this && selection.Cast<const berry::IStructuredSelection>())
   {
     berry::IStructuredSelection::ConstPointer currentSelection = selection.Cast<const berry::IStructuredSelection>();
     // iterate over the selections (for the BlueBerry example this is always 1
-    for (berry::IStructuredSelection::iterator itr = currentSelection->Begin();
-         itr != currentSelection->End(); ++itr)
+    for (berry::IStructuredSelection::iterator itr = currentSelection->Begin(); itr != currentSelection->End(); ++itr)
     {
       if (berry::QModelIndexObject::Pointer object = itr->Cast<berry::QModelIndexObject>())
       {

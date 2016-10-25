@@ -22,41 +22,46 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-class Point3iPropertySerializer : public BasePropertySerializer
-{
+  class Point3iPropertySerializer : public BasePropertySerializer
+  {
   public:
-    mitkClassMacro( Point3iPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(Point3iPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const Point3iProperty* prop = dynamic_cast<const Point3iProperty*>(m_Property.GetPointer()))
+      if (const Point3iProperty *prop = dynamic_cast<const Point3iProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("point");
+        auto element = new TiXmlElement("point");
         Point3I point = prop->GetValue();
         element->SetAttribute("x", point[0]);
         element->SetAttribute("y", point[1]);
         element->SetAttribute("z", point[2]);
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
+      if (!element)
+        return nullptr;
 
       Point3I v;
-      if ( element->QueryIntAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return nullptr;
-      if ( element->QueryIntAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return nullptr;
-      if ( element->QueryIntAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return nullptr;
-     return Point3iProperty::New( v ).GetPointer();
+      if (element->QueryIntAttribute("x", &v[0]) != TIXML_SUCCESS)
+        return nullptr;
+      if (element->QueryIntAttribute("y", &v[1]) != TIXML_SUCCESS)
+        return nullptr;
+      if (element->QueryIntAttribute("z", &v[2]) != TIXML_SUCCESS)
+        return nullptr;
+      return Point3iProperty::New(v).GetPointer();
     }
+
   protected:
     Point3iPropertySerializer() {}
     virtual ~Point3iPropertySerializer() {}
-};
+  };
 } // namespace
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(Point3iPropertySerializer);

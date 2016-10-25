@@ -23,8 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkActor2D.h>
 #include <vtkCutter.h>
-#include <vtkPolyDataMapper2D.h>
 #include <vtkPlane.h>
+#include <vtkPolyDataMapper2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkSmartPointer.h>
 #include <vtkSphereSource.h>
@@ -54,32 +54,31 @@ namespace mitk
       double m_ZoomFactor;
 
     private:
-      LocalStorage(const LocalStorage&);
-      LocalStorage& operator=(const LocalStorage&);
+      LocalStorage(const LocalStorage &);
+      LocalStorage &operator=(const LocalStorage &);
     };
 
   public:
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false);
+    static void SetDefaultProperties(DataNode *node, BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     mitkClassMacro(BoundingShapeVtkMapper2D, VtkMapper);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    void ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*) override;
-    vtkProp* GetVtkProp(BaseRenderer* renderer) override;
+      void ApplyColorAndOpacityProperties(BaseRenderer *, vtkActor *) override;
+    vtkProp *GetVtkProp(BaseRenderer *renderer) override;
 
   private:
     BoundingShapeVtkMapper2D();
     ~BoundingShapeVtkMapper2D();
 
-    BoundingShapeVtkMapper2D(const Self&);
-    Self& operator=(const Self&);
+    BoundingShapeVtkMapper2D(const Self &);
+    Self &operator=(const Self &);
 
-    void GenerateDataForRenderer(BaseRenderer* renderer) override;
-    void Update(mitk::BaseRenderer* renderer) override;
+    void GenerateDataForRenderer(BaseRenderer *renderer) override;
+    void Update(mitk::BaseRenderer *renderer) override;
 
     class Impl;
-    Impl* m_Impl;
+    Impl *m_Impl;
   };
 }
 

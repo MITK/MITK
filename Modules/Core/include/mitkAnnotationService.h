@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkAnnotationService_h
 #define mitkAnnotationService_h
 
+#include <MitkCoreExports.h>
 #include <memory>
 #include <vector>
-#include <MitkCoreExports.h>
 
 namespace mitk
 {
@@ -28,20 +28,18 @@ namespace mitk
   class MITKCORE_EXPORT AnnotationService
   {
   public:
-    typedef std::vector<std::unique_ptr<AbstractAnnotationRenderer> > AnnotationRendererServices;
+    typedef std::vector<std::unique_ptr<AbstractAnnotationRenderer>> AnnotationRendererServices;
     AnnotationService();
     ~AnnotationService();
 
-    static AbstractAnnotationRenderer* GetAnnotationRenderer(const std::string& arTypeID,
-                                                             const std::string& rendererID);
+    static AbstractAnnotationRenderer *GetAnnotationRenderer(const std::string &arTypeID,
+                                                             const std::string &rendererID);
 
-    static void RegisterAnnotationRenderer(AbstractAnnotationRenderer* annotationRenderer);
+    static void RegisterAnnotationRenderer(AbstractAnnotationRenderer *annotationRenderer);
 
   private:
-
-    AnnotationService(const AnnotationService&);
-    AnnotationService& operator=(const AnnotationService&);
-
+    AnnotationService(const AnnotationService &);
+    AnnotationService &operator=(const AnnotationService &);
   };
 }
 

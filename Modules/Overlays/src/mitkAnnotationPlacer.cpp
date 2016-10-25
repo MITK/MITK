@@ -17,38 +17,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAnnotationPlacer.h"
 #include "mitkBaseRenderer.h"
 
-#include <mitkVtkLayerController.h>
-#include "mitkOverlay2DLayouter.h"
 #include "mitkAnnotationService.h"
+#include "mitkOverlay2DLayouter.h"
+#include <mitkVtkLayerController.h>
 
 namespace mitk
 {
+  const std::string mitk::AnnotationPlacer::ANNOTATIONRENDERER_ID = "AnnotationPlacer";
 
-const std::string mitk::AnnotationPlacer::ANNOTATIONRENDERER_ID = "AnnotationPlacer";
-
-AnnotationPlacer::~AnnotationPlacer()
-{
-}
-
-const std::string AnnotationPlacer::GetID() const
-{
-  return ANNOTATIONRENDERER_ID;
-}
-
-AnnotationPlacer *AnnotationPlacer::GetAnnotationRenderer(const std::string &rendererID)
-{
-  AnnotationPlacer* result = nullptr;
-  AbstractAnnotationRenderer* registeredService =
-      AnnotationService::GetAnnotationRenderer(ANNOTATIONRENDERER_ID,rendererID);
-  if(registeredService)
-    result = dynamic_cast<AnnotationPlacer*>(registeredService);
-  if(!result)
+  AnnotationPlacer::~AnnotationPlacer() {}
+  const std::string AnnotationPlacer::GetID() const { return ANNOTATIONRENDERER_ID; }
+  AnnotationPlacer *AnnotationPlacer::GetAnnotationRenderer(const std::string &rendererID)
   {
-    result = new AnnotationPlacer(rendererID);
-    AnnotationService::RegisterAnnotationRenderer(result);
+    AnnotationPlacer *result = nullptr;
+    AbstractAnnotationRenderer *registeredService =
+      AnnotationService::GetAnnotationRenderer(ANNOTATIONRENDERER_ID, rendererID);
+    if (registeredService)
+      result = dynamic_cast<AnnotationPlacer *>(registeredService);
+    if (!result)
+    {
+      result = new AnnotationPlacer(rendererID);
+      AnnotationService::RegisterAnnotationRenderer(result);
+    }
+    return result;
   }
-  return result;
-}
-
-
 }

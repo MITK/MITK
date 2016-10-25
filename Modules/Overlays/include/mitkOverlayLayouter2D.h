@@ -20,36 +20,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkOverlaysExports.h"
 #include "mitkAbstractAnnotationRenderer.h"
 
-namespace mitk {
+namespace mitk
+{
+  class BaseRenderer;
 
-class BaseRenderer;
+  /** \brief The OverlayLayouter2D updates and manages Overlays and the respective Layouters. */
+  /** An Instance of the OverlayLayouter2D can be registered to several BaseRenderer instances in order to
+   * call the update method of each Overlay during the rendering phase of the renderer.
+   * See \ref OverlaysPage for more info.
+  */
+  class MITKOVERLAYS_EXPORT OverlayLayouter2D : public AbstractAnnotationRenderer
+  {
+  public:
+    /** \brief virtual destructor in order to derive from this class */
+    virtual ~OverlayLayouter2D();
 
-/** \brief The OverlayLayouter2D updates and manages Overlays and the respective Layouters. */
-/** An Instance of the OverlayLayouter2D can be registered to several BaseRenderer instances in order to
- * call the update method of each Overlay during the rendering phase of the renderer.
- * See \ref OverlaysPage for more info.
-*/
-class MITKOVERLAYS_EXPORT OverlayLayouter2D : public AbstractAnnotationRenderer {
+    const std::string GetID() const;
 
-public:
+    static OverlayLayouter2D *GetAnnotationRenderer(const std::string &rendererID);
 
-  /** \brief virtual destructor in order to derive from this class */
-  virtual ~OverlayLayouter2D();
+    static const std::string ANNOTATIONRENDERER_ID;
 
-  const std::string GetID() const;
-
-  static OverlayLayouter2D *GetAnnotationRenderer(const std::string& rendererID);
-
-  static const std::string ANNOTATIONRENDERER_ID;
-
-private:
-
-  using AbstractAnnotationRenderer::AbstractAnnotationRenderer;
-
-};
+  private:
+    using AbstractAnnotationRenderer::AbstractAnnotationRenderer;
+  };
 
 } // namespace mitk
 
 #endif // OVERLAYLAYOUTER2D_H
-
-

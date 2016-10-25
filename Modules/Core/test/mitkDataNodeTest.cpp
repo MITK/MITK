@@ -26,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Basedata Test
 #include <mitkGeometryData.h>
 #include <mitkImage.h>
-#include <mitkManufacturerLogo.h>
 #include <mitkPlaneGeometryData.h>
 #include <mitkPointSet.h>
 #include <mitkSurface.h>

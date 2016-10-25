@@ -40,7 +40,7 @@ namespace mitk
   class MITKCORE_EXPORT AbstractAnnotationRenderer : public us::ServiceTracker<Overlay>
   {
   public:
-    typedef us::ServiceTracker<mitk::Overlay> Superclass;
+    typedef us::ServiceTracker<Overlay> Superclass;
     AbstractAnnotationRenderer(const std::string &rendererID, const std::string &arID);
 
     /** \brief virtual destructor in order to derive from this class */

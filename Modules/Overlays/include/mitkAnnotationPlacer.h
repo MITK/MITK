@@ -38,6 +38,10 @@ namespace mitk
 
     static AnnotationPlacer *GetAnnotationRenderer(const std::string &rendererID);
 
+    static void AddOverlay(Overlay *overlay, const std::string &rendererID);
+
+    static void AddOverlay(Overlay *overlay, BaseRenderer *renderer);
+
   private:
     AnnotationPlacer(const std::string &rendererId);
 

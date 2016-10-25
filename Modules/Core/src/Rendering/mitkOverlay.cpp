@@ -296,12 +296,12 @@ mitk::PropertyList *mitk::Overlay::GetPropertyList() const
   return m_PropertyList;
 }
 
-void mitk::Overlay::RegisterAsMicroservice()
+void mitk::Overlay::RegisterAsMicroservice(us::ServiceProperties props)
 {
-  // Get Context
+  if (m_ServiceRegistration != NULL)
+    m_ServiceRegistration.Unregister();
   us::ModuleContext *context = us::GetModuleContext();
   // Define ServiceProps
-  us::ServiceProperties props;
   mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.Overlay.id_", 16);
   props[US_PROPKEY_ID] = uidGen.GetUID();
   m_ServiceRegistration = context->RegisterService(this, props);

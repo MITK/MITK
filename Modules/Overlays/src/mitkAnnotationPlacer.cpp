@@ -44,4 +44,17 @@ namespace mitk
     }
     return result;
   }
+
+  void AnnotationPlacer::AddOverlay(Overlay *overlay, const std::string &rendererID)
+  {
+    GetAnnotationRenderer(rendererID);
+    us::ServiceProperties props;
+    props[Overlay::US_PROPKEY_AR_ID] = ANNOTATIONRENDERER_ID;
+    props[Overlay::US_PROPKEY_RENDERER_ID] = rendererID;
+    overlay->RegisterAsMicroservice(props);
+  }
+  void AnnotationPlacer::AddOverlay(Overlay *overlay, BaseRenderer *renderer)
+  {
+    AddOverlay(overlay, renderer->GetName());
+  }
 }

@@ -396,7 +396,7 @@ namespace mitk
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
     * To unregister, call UnregisterMicroservice().
     */
-    virtual void RegisterAsMicroservice();
+    virtual void RegisterAsMicroservice(us::ServiceProperties props);
 
     /**
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.

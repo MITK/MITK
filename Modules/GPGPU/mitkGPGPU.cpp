@@ -14,9 +14,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkGPGPU.h"
+// Qt includes need to be placed before class header include, due to defines
 #include <QApplication>
 #include <QWidget>
+
+#include "mitkGPGPU.h"
 
 #include <iostream>
 

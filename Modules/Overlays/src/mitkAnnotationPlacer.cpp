@@ -26,12 +26,6 @@ namespace mitk
 
 const std::string mitk::AnnotationPlacer::ANNOTATIONRENDERER_ID = "AnnotationPlacer";
 
-AnnotationPlacer::AnnotationPlacer(const std::string& rendererID):
-  AbstractAnnotationRenderer(rendererID)
-{
-
-}
-
 AnnotationPlacer::~AnnotationPlacer()
 {
 }

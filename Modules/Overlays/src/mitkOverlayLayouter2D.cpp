@@ -26,12 +26,6 @@ namespace mitk
 
 const std::string mitk::OverlayLayouter2D::ANNOTATIONRENDERER_ID = "OverlayLayouter2D";
 
-OverlayLayouter2D::OverlayLayouter2D(const std::string& rendererID):
-  AbstractAnnotationRenderer(rendererID)
-{
-
-}
-
 OverlayLayouter2D::~OverlayLayouter2D()
 {
 

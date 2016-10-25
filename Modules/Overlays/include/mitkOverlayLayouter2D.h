@@ -44,13 +44,7 @@ public:
 
 private:
 
-  OverlayLayouter2D(const std::string& rendererID);
-
-  /** \brief copy constructor */
-  OverlayLayouter2D( const OverlayLayouter2D &);
-
-  /** \brief assignment operator */
-  OverlayLayouter2D &operator=(const OverlayLayouter2D &);
+  using AbstractAnnotationRenderer::AbstractAnnotationRenderer;
 
 };
 

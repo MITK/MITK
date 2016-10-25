@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
-#include "mitkOverlay.h"
 #include "mitkServiceInterface.h"
 #include "usGetModuleContext.h"
 #include "mitkOverlayServiceTracker.h"
@@ -40,7 +39,7 @@ class MITKCORE_EXPORT AbstractAnnotationRenderer {
 
 public:
 
-  AbstractAnnotationRenderer(const std::string& rendererID);
+  explicit AbstractAnnotationRenderer(const std::string& rendererID);
 
   /** \brief virtual destructor in order to derive from this class */
   virtual ~AbstractAnnotationRenderer();

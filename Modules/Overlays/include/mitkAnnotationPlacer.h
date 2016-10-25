@@ -42,13 +42,7 @@ public:
 
 private:
 
-  AnnotationPlacer(const std::string& rendererID);
-
-  /** \brief copy constructor */
-  AnnotationPlacer( const AnnotationPlacer &);
-
-  /** \brief assignment operator */
-  AnnotationPlacer &operator=(const AnnotationPlacer &);
+  using AbstractAnnotationRenderer::AbstractAnnotationRenderer;
 
   static const std::string ANNOTATIONRENDERER_ID;
 };

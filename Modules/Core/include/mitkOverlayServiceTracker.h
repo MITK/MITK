@@ -24,7 +24,10 @@ namespace mitk {
 
 class OverlayServiceTracker : public us::ServiceTracker<Overlay>
 {
-  OverlayServiceTracker();
+
+public:
+
+  OverlayServiceTracker(const us::LDAPFilter &filter);
 
 private:
 
@@ -33,8 +36,6 @@ private:
   TrackedType AddingService(const ServiceReferenceType &reference) override;
 
   void RemovedService(const ServiceReferenceType& /*reference*/, TrackedType tracked) override;
-
-private:
 
   std::vector<Overlay*> m_OverlayServices;
 

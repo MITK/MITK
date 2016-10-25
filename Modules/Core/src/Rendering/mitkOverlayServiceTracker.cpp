@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
 
-OverlayServiceTracker::OverlayServiceTracker()
-  : Superclass(us::GetModuleContext())
+OverlayServiceTracker::OverlayServiceTracker(const us::LDAPFilter& filter)
+  : Superclass(us::GetModuleContext(),filter)
 {
 }
 

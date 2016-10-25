@@ -35,6 +35,14 @@ mitk::Overlay::~Overlay()
   this->UnRegisterMicroservice();
 }
 
+void mitk::Overlay::SetUSProperty(const std::string & /*propertyKey*/, us::Any /*value*/)
+{
+  if (this->m_ServiceRegistration)
+  {
+    //    m_ServiceRegistration.GetReference(). //TODO19786
+  }
+}
+
 void mitk::Overlay::SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
 {
   this->m_PropertyList->SetProperty(propertyKey, propertyValue);
@@ -292,16 +300,17 @@ mitk::PropertyList *mitk::Overlay::GetPropertyList() const
 void mitk::Overlay::RegisterAsMicroservice()
 {
   // Get Context
-  us::ModuleContext* context = us::GetModuleContext();
+  us::ModuleContext *context = us::GetModuleContext();
   // Define ServiceProps
   us::ServiceProperties props;
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.Overlay.id_", 16);
-  props[ US_PROPKEY_ID ] = uidGen.GetUID();
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("org.mitk.services.Overlay.id_", 16);
+  props[US_PROPKEY_ID] = uidGen.GetUID();
   m_ServiceRegistration = context->RegisterService(this, props);
 }
 
 void mitk::Overlay::UnRegisterMicroservice()
 {
-  if (m_ServiceRegistration != NULL) m_ServiceRegistration.Unregister();
+  if (m_ServiceRegistration != NULL)
+    m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }

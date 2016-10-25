@@ -424,6 +424,8 @@ namespace mitk
     */
     itk::TimeStamp m_DataReferenceChangedTime;
 
+  void SetUSProperty(const std::string& propertyKey, us::Any value);
+
   private:
     /** \brief render this overlay on a foreground renderer */
     bool m_ForceInForeground;

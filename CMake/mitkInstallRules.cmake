@@ -73,6 +73,9 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicon.dll"
+            DESTINATION "bin/plugins/iconengines"
+            CONFIGURATIONS Release)
     if(MITK_USE_QT_WEBENGINE)
       MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
     endif()
@@ -87,6 +90,9 @@ if(WIN32)
             CONFIGURATIONS Debug)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
             DESTINATION "bin/plugins/imageformats"
+            CONFIGURATIONS Debug)
+    install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicond.dll"
+            DESTINATION "bin/plugins/iconengines"
             CONFIGURATIONS Debug)
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"

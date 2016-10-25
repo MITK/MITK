@@ -32,7 +32,7 @@ namespace mitk {
   const std::string AnatomicalStructureColorPresets::COLOR = "color";
 
   const std::string AnatomicalStructureColorPresets::CODE_VALUE = "code_value";
-  const std::string AnatomicalStructureColorPresets::CODE_SCHEME = "code_scheme";
+  const std::string AnatomicalStructureColorPresets::CODE_SCHEME = "coding_scheme";
   const std::string AnatomicalStructureColorPresets::CODE_NAME = "code_name";
 
   const std::string AnatomicalStructureColorPresets::COLOR_R = "rgb_r";

@@ -27,7 +27,7 @@ namespace mitk {
 
 class MITKCORE_EXPORT AnatomicalStructureColorPresets : public vtkXMLParser
 {
-
+public:
   struct Category
   {
     std::string codeValue;
@@ -55,7 +55,6 @@ class MITKCORE_EXPORT AnatomicalStructureColorPresets : public vtkXMLParser
     Type(std::string value, std::string scheme, std::string name) : codeValue(value), codeScheme(scheme), codeName(name){}
   };
 
-public:
   static AnatomicalStructureColorPresets *New();
   vtkTypeMacro(AnatomicalStructureColorPresets,vtkXMLParser);
 

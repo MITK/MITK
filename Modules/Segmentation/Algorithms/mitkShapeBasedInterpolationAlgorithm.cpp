@@ -20,19 +20,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 
 #include <itkFastChamferDistanceImageFilter.h>
-#include <itkIsoContourDistanceImageFilter.h>
 #include <itkInvertIntensityImageFilter.h>
+#include <itkIsoContourDistanceImageFilter.h>
 #include <itkSubtractImageFilter.h>
 
-mitk::Image::Pointer
-mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
-                               Image::ConstPointer lowerSlice, unsigned int lowerSliceIndex,
-                               Image::ConstPointer upperSlice, unsigned int upperSliceIndex,
-                               unsigned int requestedIndex,
-                               unsigned int /*sliceDimension*/, // commented variables are not used
-                               Image::Pointer resultImage,
-                               unsigned int /*timeStep*/,
-                               Image::ConstPointer /*referenceImage*/)
+mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
+  Image::ConstPointer lowerSlice,
+  unsigned int lowerSliceIndex,
+  Image::ConstPointer upperSlice,
+  unsigned int upperSliceIndex,
+  unsigned int requestedIndex,
+  unsigned int /*sliceDimension*/, // commented variables are not used
+  Image::Pointer resultImage,
+  unsigned int /*timeStep*/,
+  Image::ConstPointer /*referenceImage*/)
 {
   mitk::Image::Pointer lowerDistanceImage = mitk::Image::New();
   AccessFixedDimensionByItk_1(lowerSlice, ComputeDistanceMap, 2, lowerDistanceImage);
@@ -42,20 +43,22 @@ mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
   // calculate where the current slice is in comparison to the lower and upper neighboring slices
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
-  AccessFixedDimensionByItk_3(resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
+  AccessFixedDimensionByItk_3(
+    resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
 
   return resultImage;
 }
 
-template < typename TPixel, unsigned int VImageDimension >
-void mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(const itk::Image<TPixel, VImageDimension> *binaryImage, mitk::Image::Pointer &result)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(const itk::Image<TPixel, VImageDimension> *binaryImage,
+                                                                mitk::Image::Pointer &result)
 {
   typedef itk::Image<TPixel, VImageDimension> DistanceFilterInputImageType;
 
-  typedef  itk::FastChamferDistanceImageFilter< DistanceFilterImageType, DistanceFilterImageType > DistanceFilterType;
-  typedef  itk::IsoContourDistanceImageFilter< DistanceFilterInputImageType, DistanceFilterImageType >   IsoContourType;
-  typedef  itk::InvertIntensityImageFilter <DistanceFilterInputImageType> InvertIntensityImageFilterType;
-  typedef  itk::SubtractImageFilter <DistanceFilterImageType, DistanceFilterImageType > SubtractImageFilterType;
+  typedef itk::FastChamferDistanceImageFilter<DistanceFilterImageType, DistanceFilterImageType> DistanceFilterType;
+  typedef itk::IsoContourDistanceImageFilter<DistanceFilterInputImageType, DistanceFilterImageType> IsoContourType;
+  typedef itk::InvertIntensityImageFilter<DistanceFilterInputImageType> InvertIntensityImageFilterType;
+  typedef itk::SubtractImageFilter<DistanceFilterImageType, DistanceFilterImageType> SubtractImageFilterType;
 
   typename DistanceFilterType::Pointer distanceFilter = DistanceFilterType::New();
   typename DistanceFilterType::Pointer distanceFilterInverted = DistanceFilterType::New();
@@ -94,11 +97,11 @@ void mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(const itk::Image
   result = mitk::GrabItkImageMemory(subtractImageFilter->GetOutput());
 }
 
-template < typename TPixel, unsigned int VImageDimension >
-void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::Image<TPixel, VImageDimension>* result,
-                                                                             const mitk::Image::Pointer &lower,
-                                                                             const mitk::Image::Pointer &upper,
-                                                                             float ratio)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::Image<TPixel, VImageDimension> *result,
+                                                                          const mitk::Image::Pointer &lower,
+                                                                          const mitk::Image::Pointer &upper,
+                                                                          float ratio)
 {
   typedef itk::Image<TPixel, VImageDimension> ResultImageType;
 
@@ -108,7 +111,8 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
   CastToItkImage(lower, lowerITK);
   CastToItkImage(upper, upperITK);
 
-  itk::ImageRegionConstIteratorWithIndex<DistanceFilterImageType> lowerIter (lowerITK, lowerITK->GetLargestPossibleRegion());
+  itk::ImageRegionConstIteratorWithIndex<DistanceFilterImageType> lowerIter(lowerITK,
+                                                                            lowerITK->GetLargestPossibleRegion());
 
   lowerIter.GoToBegin();
 
@@ -120,7 +124,7 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
     return;
   }
 
-  float weight[2] = {1.0f-ratio, ratio};
+  float weight[2] = {1.0f - ratio, ratio};
 
   while (!lowerIter.IsAtEnd())
   {
@@ -128,11 +132,10 @@ void mitk::ShapeBasedInterpolationAlgorithm::InterpolateIntermediateSlice(itk::I
     typename DistanceFilterImageType::PixelType upperPixelVal = upperITK->GetPixel(lowerIter.GetIndex());
 
     typename DistanceFilterImageType::PixelType intermediatePixelVal =
-        (weight [0] * upperPixelVal + weight [1] * lowerPixelVal > 0 ? 0 : 1);
+      (weight[0] * upperPixelVal + weight[1] * lowerPixelVal > 0 ? 0 : 1);
 
     result->SetPixel(lowerIter.GetIndex(), static_cast<TPixel>(intermediatePixelVal));
 
     ++lowerIter;
   }
 }
-

@@ -29,27 +29,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkMemoryUsageIndicatorView.h"
 #include <mitkMemoryUtilities.h>
 
-#include <qtimer.h>
-#include <qimage.h>
-#include <qpixmap.h>
 #include <qapplication.h>
 #include <qeventloop.h>
+#include <qimage.h>
+#include <qpixmap.h>
+#include <qtimer.h>
 
+#include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <iomanip>
 
 #include "QmitkMemoryUsageIndicatorImagesGreen.xpm"
-#include "QmitkMemoryUsageIndicatorImagesYellow.xpm"
 #include "QmitkMemoryUsageIndicatorImagesOrange.xpm"
 #include "QmitkMemoryUsageIndicatorImagesRed.xpm"
+#include "QmitkMemoryUsageIndicatorImagesYellow.xpm"
 
-QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView( QWidget *  /*parent*/, Qt::WindowFlags  /*f*/ )
+QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView(QWidget * /*parent*/, Qt::WindowFlags /*f*/)
 {
   this->setupUi(this);
 
-  auto timer = new QTimer( this );
-  QObject::connect( timer, SIGNAL( timeout() ), this, SLOT( UpdateMemoryUsage() ) );
+  auto timer = new QTimer(this);
+  QObject::connect(timer, SIGNAL(timeout()), this, SLOT(UpdateMemoryUsage()));
   timer->start(1000);
   m_LEDGreen = QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm);
   m_LEDYellow = QPixmap(QmitkMemoryUsageIndicatorImagesYellow_xpm);
@@ -66,30 +66,30 @@ QmitkMemoryUsageIndicatorView::~QmitkMemoryUsageIndicatorView()
 void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
 {
   size_t processSize = mitk::MemoryUtilities::GetProcessMemoryUsage();
-  size_t totalSize =  mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
-  float percentage = ( (float) processSize / (float) totalSize ) * 100.0;
-  m_Label->setText( GetMemoryDescription( processSize, percentage ).c_str() );
-  if ( percentage < 50.0 )
+  size_t totalSize = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
+  float percentage = ((float)processSize / (float)totalSize) * 100.0;
+  m_Label->setText(GetMemoryDescription(processSize, percentage).c_str());
+  if (percentage < 50.0)
   {
-    if(m_PreviousState != 0)
+    if (m_PreviousState != 0)
     {
       m_LED->setPixmap(m_LEDGreen);
       m_PreviousState = 0;
       m_LED->update();
     }
   }
-  else if ( percentage < 65.0 )
+  else if (percentage < 65.0)
   {
-    if(m_PreviousState != 1)
+    if (m_PreviousState != 1)
     {
       m_LED->setPixmap(m_LEDYellow);
       m_PreviousState = 1;
       m_LED->update();
     }
   }
-  else if ( percentage < 80.0 )
+  else if (percentage < 80.0)
   {
-    if(m_PreviousState != 2)
+    if (m_PreviousState != 2)
     {
       m_LED->setPixmap(m_LEDOrange);
       m_PreviousState = 2;
@@ -98,7 +98,7 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
   }
   else
   {
-    if(m_PreviousState != 3)
+    if (m_PreviousState != 3)
     {
       m_LED->setPixmap(m_LEDRed);
       m_PreviousState = 3;
@@ -107,22 +107,21 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
   }
 }
 
-
-std::string QmitkMemoryUsageIndicatorView::FormatMemorySize( size_t size )
+std::string QmitkMemoryUsageIndicatorView::FormatMemorySize(size_t size)
 {
   double val = size;
   std::string descriptor("B");
-  if ( val >= 1000.0 )
+  if (val >= 1000.0)
   {
     val /= 1024.0;
     descriptor = "KB";
   }
-  if ( val >= 1000.0 )
+  if (val >= 1000.0)
   {
     val /= 1024.0;
     descriptor = "MB";
   }
-  if ( val >= 1000.0 )
+  if (val >= 1000.0)
   {
     val /= 1024.0;
     descriptor = "GB";
@@ -133,18 +132,19 @@ std::string QmitkMemoryUsageIndicatorView::FormatMemorySize( size_t size )
   return str.str();
 }
 
-std::string QmitkMemoryUsageIndicatorView::FormatPercentage( double val )
+std::string QmitkMemoryUsageIndicatorView::FormatPercentage(double val)
 {
   std::ostringstream str;
   str.imbue(std::locale::classic());
-  str << std::fixed << std::setprecision(2) << val << " " << "%";
+  str << std::fixed << std::setprecision(2) << val << " "
+      << "%";
   return str.str();
 }
 
-std::string QmitkMemoryUsageIndicatorView::GetMemoryDescription( size_t processSize, float percentage )
+std::string QmitkMemoryUsageIndicatorView::GetMemoryDescription(size_t processSize, float percentage)
 {
   std::ostringstream str;
   str.imbue(std::locale::classic());
-  str << FormatMemorySize(processSize) << " (" << FormatPercentage( percentage ) <<")" ;
+  str << FormatMemorySize(processSize) << " (" << FormatPercentage(percentage) << ")";
   return str.str();
 }

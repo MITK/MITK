@@ -17,14 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKSLICEWIDGET_H_
 #define QMITKSLICEWIDGET_H_
 
-#include "ui_QmitkSliceWidget.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "ui_QmitkSliceWidget.h"
 
 #include "QmitkRenderWindow.h"
-#include "mitkSliceNavigationController.h"
 #include "mitkDataStorage.h"
-#include "mitkStandaloneDataStorage.h"
+#include "mitkSliceNavigationController.h"
 #include "mitkSlicedGeometry3D.h"
+#include "mitkStandaloneDataStorage.h"
 #include <QWidget>
 
 class MITKQTWIDGETSEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
@@ -32,71 +32,63 @@ class MITKQTWIDGETSEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::Qmit
   Q_OBJECT
 
 public:
+  QmitkSliceWidget(QWidget *parent = 0, const char *name = 0, Qt::WindowFlags f = 0);
 
-  QmitkSliceWidget(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags f = 0);
+  mitk::VtkPropRenderer *GetRenderer();
 
-
-  mitk::VtkPropRenderer* GetRenderer();
-
-  QFrame* GetSelectionFrame();
+  QFrame *GetSelectionFrame();
 
   void UpdateGL();
 
-  void mousePressEvent( QMouseEvent * e ) override;
+  void mousePressEvent(QMouseEvent *e) override;
 
-  void setPopUpEnabled( bool b );
+  void setPopUpEnabled(bool b);
 
-  void SetDataStorage( mitk::StandaloneDataStorage::Pointer storage );
+  void SetDataStorage(mitk::StandaloneDataStorage::Pointer storage);
 
-  mitk::StandaloneDataStorage* GetDataStorage();
+  mitk::StandaloneDataStorage *GetDataStorage();
 
-  QmitkSliderNavigatorWidget* GetNavigatorWidget();
+  QmitkSliderNavigatorWidget *GetNavigatorWidget();
 
   bool IsLevelWindowEnabled();
 
-  QmitkRenderWindow* GetRenderWindow();
+  QmitkRenderWindow *GetRenderWindow();
 
-  mitk::SliceNavigationController* GetSliceNavigationController() const;
+  mitk::SliceNavigationController *GetSliceNavigationController() const;
 
-  mitk::CameraRotationController* GetCameraRotationController() const;
+  mitk::CameraRotationController *GetCameraRotationController() const;
 
-  mitk::BaseController* GetController() const;
-
+  mitk::BaseController *GetController() const;
 
 public slots:
 
- void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it);
+  void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it);
 
- void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it, mitk::SliceNavigationController::ViewDirection view);
+  void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it, mitk::SliceNavigationController::ViewDirection view);
 
- void SetData( mitk::DataNode::Pointer node  );
+  void SetData(mitk::DataNode::Pointer node);
 
-  void SetData( mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view );
+  void SetData(mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view);
 
-  void InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection );
+  void InitWidget(mitk::SliceNavigationController::ViewDirection viewDirection);
 
-  void wheelEvent( QWheelEvent * e ) override;
+  void wheelEvent(QWheelEvent *e) override;
 
-  void ChangeView(QAction* val);
+  void ChangeView(QAction *val);
 
-  void SetLevelWindowEnabled( bool enable );
-
+  void SetLevelWindowEnabled(bool enable);
 
 protected:
-
-  QmitkRenderWindow* m_RenderWindow;
+  QmitkRenderWindow *m_RenderWindow;
   mitk::SliceNavigationController::ViewDirection m_View;
 
 private:
-
   bool popUpEnabled;
   mitk::VtkPropRenderer::Pointer m_Renderer;
   mitk::SlicedGeometry3D::Pointer m_SlicedGeometry;
   mitk::StandaloneDataStorage::Pointer m_DataStorage;
 
-  QMenu* popUp;
-
+  QMenu *popUp;
 };
 
 #endif
-

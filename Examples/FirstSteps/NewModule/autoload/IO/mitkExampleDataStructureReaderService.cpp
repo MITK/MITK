@@ -17,40 +17,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkExampleDataStructureReaderService.h"
 
 // mitk includes
+#include "mitkExampleIOMimeTypes.h"
 #include "mitkGeometry3D.h"
 #include <mitkCustomMimeType.h>
-#include "mitkExampleIOMimeTypes.h"
 
 // itk includes
 #include "itksys/SystemTools.hxx"
 
 namespace mitk
 {
-
-  ExampleDataStructureReaderService::ExampleDataStructureReaderService(const ExampleDataStructureReaderService& other)
+  ExampleDataStructureReaderService::ExampleDataStructureReaderService(const ExampleDataStructureReaderService &other)
     : mitk::AbstractFileReader(other)
   {
   }
 
   ExampleDataStructureReaderService::ExampleDataStructureReaderService()
-    : mitk::AbstractFileReader( CustomMimeType( mitk::ExampleIOMimeTypes::EXAMPLE_MIMETYPE() ), "Default reader for the example data structure" )
+    : mitk::AbstractFileReader(CustomMimeType(mitk::ExampleIOMimeTypes::EXAMPLE_MIMETYPE()),
+                               "Default reader for the example data structure")
   {
     m_ServiceReg = this->RegisterService();
   }
 
-  ExampleDataStructureReaderService::~ExampleDataStructureReaderService()
+  ExampleDataStructureReaderService::~ExampleDataStructureReaderService() {}
+  std::vector<itk::SmartPointer<BaseData>> ExampleDataStructureReaderService::Read()
   {
-  }
-
-  std::vector<itk::SmartPointer<BaseData> > ExampleDataStructureReaderService::Read()
-  {
-    std::vector<itk::SmartPointer<mitk::BaseData> > result;
+    std::vector<itk::SmartPointer<mitk::BaseData>> result;
     std::string location = GetInputLocation();
 
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(location);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if ( location == "")
+    if (location == "")
     {
       MITK_ERROR << "No file name specified.";
     }
@@ -82,7 +79,7 @@ namespace mitk
     {
       MITK_ERROR << e.GetDescription();
     }
-    catch(...)
+    catch (...)
     {
       MITK_ERROR << "Unknown error occurred while trying to read file.";
     }
@@ -90,10 +87,9 @@ namespace mitk
     return result;
   }
 
+} // namespace MITK
 
-} //namespace MITK
-
-mitk::ExampleDataStructureReaderService* mitk::ExampleDataStructureReaderService::Clone() const
+mitk::ExampleDataStructureReaderService *mitk::ExampleDataStructureReaderService::Clone() const
 {
   return new ExampleDataStructureReaderService(*this);
 }

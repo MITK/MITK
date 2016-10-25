@@ -31,7 +31,6 @@ namespace mitk
   class LabelSetImageIO : public mitk::AbstractFileIO
   {
   public:
-
     typedef mitk::LabelSetImage InputType;
 
     LabelSetImageIO();
@@ -58,8 +57,7 @@ namespace mitk
     std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
 
   private:
-
-    LabelSetImageIO* IOClone() const override;
+    LabelSetImageIO *IOClone() const override;
   };
 } // end of namespace mitk
 

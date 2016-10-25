@@ -15,26 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkPointListModel.h"
-#include <itkCommand.h>
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 #include "mitkRenderingManager.h"
-#include <mitkPointSetDataInteractor.h>
+#include <itkCommand.h>
 #include <mitkInteractionConst.h>
 #include <mitkInternalEvent.h>
+#include <mitkPointSetDataInteractor.h>
 
-
-QmitkPointListModel::QmitkPointListModel( mitk::DataNode* pointSetNode, int t, QObject* parent )
-:QAbstractListModel(parent),
-m_PointSetNode(NULL),
-m_PointSetModifiedObserverTag(0),
-m_PointSetDeletedObserverTag(0),
-m_TimeStep(t)
+QmitkPointListModel::QmitkPointListModel(mitk::DataNode *pointSetNode, int t, QObject *parent)
+  : QAbstractListModel(parent),
+    m_PointSetNode(NULL),
+    m_PointSetModifiedObserverTag(0),
+    m_PointSetDeletedObserverTag(0),
+    m_TimeStep(t)
 {
-  ObserveNewPointSet( pointSetNode );
+  ObserveNewPointSet(pointSetNode);
 }
 
-Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex& /*index*/) const
+Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex & /*index*/) const
 {
   // no editing so far, return default (enabled, selectable)
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -42,18 +41,18 @@ Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex& /*index*/) const
 
 QmitkPointListModel::~QmitkPointListModel()
 {
-  this->ObserveNewPointSet( NULL );
+  this->ObserveNewPointSet(NULL);
 }
 
-void QmitkPointListModel::SetPointSetNode( mitk::DataNode* pointSetNode )
+void QmitkPointListModel::SetPointSetNode(mitk::DataNode *pointSetNode)
 {
-  this->ObserveNewPointSet( pointSetNode );
+  this->ObserveNewPointSet(pointSetNode);
   QAbstractListModel::beginResetModel();
   QAbstractListModel::endResetModel();
   emit SignalUpdateSelection();
 }
 
-mitk::PointSet* QmitkPointListModel::GetPointSet() const
+mitk::PointSet *QmitkPointListModel::GetPointSet() const
 {
   return this->CheckForPointSetInNode(m_PointSetNode);
 }
@@ -71,43 +70,45 @@ int QmitkPointListModel::GetTimeStep() const
   return m_TimeStep;
 }
 
-void QmitkPointListModel::ObserveNewPointSet( mitk::DataNode* pointSetNode )
+void QmitkPointListModel::ObserveNewPointSet(mitk::DataNode *pointSetNode)
 {
-
-  //remove old observers
+  // remove old observers
   if (m_PointSetNode != NULL)
   {
-    try //here sometimes an exception is thrown which leads to a crash. So catch this exception but give an error message. See bug 18316 for details.
-      {
-      mitk::PointSet::Pointer oldPointSet = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
+    try // here sometimes an exception is thrown which leads to a crash. So catch this exception but give an error
+        // message. See bug 18316 for details.
+    {
+      mitk::PointSet::Pointer oldPointSet = dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData());
       if (oldPointSet.IsNotNull())
-        {
+      {
         oldPointSet->RemoveObserver(m_PointSetModifiedObserverTag);
         oldPointSet->RemoveObserver(m_PointSetDeletedObserverTag);
-        }
       }
-    catch(std::exception& e)
-      {
-        MITK_ERROR << "Exception while removing observer from old point set node: " << e.what();
-      }
+    }
+    catch (std::exception &e)
+    {
+      MITK_ERROR << "Exception while removing observer from old point set node: " << e.what();
+    }
   }
 
-  //get the new pointset
+  // get the new pointset
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(pointSetNode);
 
   m_PointSetNode = pointSetNode;
 
-  if ( pointSet.IsNotNull())
+  if (pointSet.IsNotNull())
   {
     // add new observer for modified if necessary
-    itk::ReceptorMemberCommand<QmitkPointListModel>::Pointer modCommand = itk::ReceptorMemberCommand<QmitkPointListModel>::New();
-    modCommand->SetCallbackFunction( this, &QmitkPointListModel::OnPointSetChanged );
-    m_PointSetModifiedObserverTag = pointSet->AddObserver( itk::ModifiedEvent(), modCommand );
+    itk::ReceptorMemberCommand<QmitkPointListModel>::Pointer modCommand =
+      itk::ReceptorMemberCommand<QmitkPointListModel>::New();
+    modCommand->SetCallbackFunction(this, &QmitkPointListModel::OnPointSetChanged);
+    m_PointSetModifiedObserverTag = pointSet->AddObserver(itk::ModifiedEvent(), modCommand);
 
     // add new observer for detele if necessary
-    itk::ReceptorMemberCommand<QmitkPointListModel>::Pointer delCommand = itk::ReceptorMemberCommand<QmitkPointListModel>::New();
-    delCommand->SetCallbackFunction( this, &QmitkPointListModel::OnPointSetDeleted );
-    m_PointSetDeletedObserverTag = pointSet->AddObserver( itk::DeleteEvent(), delCommand );
+    itk::ReceptorMemberCommand<QmitkPointListModel>::Pointer delCommand =
+      itk::ReceptorMemberCommand<QmitkPointListModel>::New();
+    delCommand->SetCallbackFunction(this, &QmitkPointListModel::OnPointSetDeleted);
+    m_PointSetDeletedObserverTag = pointSet->AddObserver(itk::DeleteEvent(), delCommand);
   }
   else
   {
@@ -116,14 +117,14 @@ void QmitkPointListModel::ObserveNewPointSet( mitk::DataNode* pointSetNode )
   }
 }
 
-void QmitkPointListModel::OnPointSetChanged(const itk::EventObject&)
+void QmitkPointListModel::OnPointSetChanged(const itk::EventObject &)
 {
   QAbstractListModel::beginResetModel();
   QAbstractListModel::endResetModel();
   emit SignalUpdateSelection();
 }
 
-void QmitkPointListModel::OnPointSetDeleted(const itk::EventObject&)
+void QmitkPointListModel::OnPointSetDeleted(const itk::EventObject &)
 {
   mitk::PointSet::Pointer ps = CheckForPointSetInNode(m_PointSetNode);
   if (ps)
@@ -138,10 +139,10 @@ void QmitkPointListModel::OnPointSetDeleted(const itk::EventObject&)
   QAbstractListModel::endResetModel();
 }
 
-int QmitkPointListModel::rowCount(const QModelIndex&) const
+int QmitkPointListModel::rowCount(const QModelIndex &) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
-  if ( pointSet.IsNotNull() )
+  if (pointSet.IsNotNull())
   {
     return pointSet->GetSize(m_TimeStep);
   }
@@ -151,21 +152,21 @@ int QmitkPointListModel::rowCount(const QModelIndex&) const
   }
 }
 
-QVariant QmitkPointListModel::data(const QModelIndex& index, int role) const
+QVariant QmitkPointListModel::data(const QModelIndex &index, int role) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
 
-  if ( pointSet.IsNull() )
+  if (pointSet.IsNull())
   {
     return QVariant();
   }
 
-  if ( !index.isValid() )
+  if (!index.isValid())
   {
     return QVariant();
   }
 
-  if ( index.row() >= pointSet->GetSize(m_TimeStep) )
+  if (index.row() >= pointSet->GetSize(m_TimeStep))
   {
     return QVariant();
   }
@@ -178,11 +179,7 @@ QVariant QmitkPointListModel::data(const QModelIndex& index, int role) const
     if (pointFound == false)
       return QVariant();
 
-    QString s = QString("%0: (%1, %2, %3)")
-      .arg( id, 3)
-      .arg( p[0], 0, 'f', 3 )
-      .arg( p[1], 0, 'f', 3 )
-      .arg( p[2], 0, 'f', 3 );
+    QString s = QString("%0: (%1, %2, %3)").arg(id, 3).arg(p[0], 0, 'f', 3).arg(p[1], 0, 'f', 3).arg(p[2], 0, 'f', 3);
     return QVariant(s);
   }
   else
@@ -208,8 +205,9 @@ QVariant QmitkPointListModel::headerData(int section, Qt::Orientation orientatio
   }
 }
 
-bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p,
-                                                mitk::PointSet::PointIdentifier& id) const
+bool QmitkPointListModel::GetPointForModelIndex(const QModelIndex &index,
+                                                mitk::PointSet::PointType &p,
+                                                mitk::PointSet::PointIdentifier &id) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
   if (pointSet.IsNull())
@@ -229,7 +227,6 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
 
     if (it == pointSet->GetPointSet(m_TimeStep)->GetPoints()->End())
       return false;
-
   }
 
   if (it != pointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end,
@@ -242,7 +239,7 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
   return false;
 }
 
-bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifier id, QModelIndex& index) const
+bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifier id, QModelIndex &index) const
 {
   mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
   if (pointSet.IsNull())
@@ -277,7 +274,8 @@ void QmitkPointListModel::MoveSelectedPointUp()
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  mitk::PointOperation *doOp =
+    new mitk::PointOperation(mitk::OpMOVEPOINTUP, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
@@ -291,11 +289,11 @@ void QmitkPointListModel::MoveSelectedPointDown()
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  mitk::PointOperation *doOp = new mitk::PointOperation(
+    mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
-
 
 void QmitkPointListModel::RemoveSelectedPoint()
 {
@@ -306,19 +304,19 @@ void QmitkPointListModel::RemoveSelectedPoint()
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
   mitk::ScalarType tsInMS = pointSet->GetTimeGeometry()->TimeStepToTimePoint(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  mitk::PointOperation *doOp =
+    new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   pointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
 
-mitk::PointSet* QmitkPointListModel::CheckForPointSetInNode(mitk::DataNode* node) const
+mitk::PointSet *QmitkPointListModel::CheckForPointSetInNode(mitk::DataNode *node) const
 {
   if (node != NULL)
   {
-    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
+    mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet *>(node->GetData());
     if (pointSet.IsNotNull())
       return pointSet;
   }
   return NULL;
 }
-

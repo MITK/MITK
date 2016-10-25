@@ -18,17 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkConjugateGradientOptimizer.h>
 
-QmitkConjugateGradientOptimizerView::QmitkConjugateGradientOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkConjugateGradientOptimizerView::QmitkConjugateGradientOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 mitk::OptimizerParameters::OptimizerType QmitkConjugateGradientOptimizerView::GetOptimizerType()
 {
   return mitk::OptimizerParameters::CONJUGATEGRADIENTOPTIMIZER;
 }
-
 
 QmitkConjugateGradientOptimizerView::~QmitkConjugateGradientOptimizerView()
 {
@@ -37,7 +35,7 @@ QmitkConjugateGradientOptimizerView::~QmitkConjugateGradientOptimizerView()
 itk::Object::Pointer QmitkConjugateGradientOptimizerView::GetOptimizer()
 {
   itk::ConjugateGradientOptimizer::Pointer OptimizerPointer = itk::ConjugateGradientOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
   /*typedef  itk::ConjugateGradientOptimizer::InternalOptimizerType  vnlOptimizerType;
   vnlOptimizerType * vnlOptimizer = OptimizerPointer->GetOptimizer();
   vnlOptimizer->set_f_tolerance( 1e-3 );
@@ -74,7 +72,7 @@ QString QmitkConjugateGradientOptimizerView::GetName()
   return "ConjugateGradient";
 }
 
-void QmitkConjugateGradientOptimizerView::SetupUI(QWidget* parent)
+void QmitkConjugateGradientOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
 }

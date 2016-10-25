@@ -19,28 +19,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPlanarFigureSerializer.h"
 
-#define MITK_REGISTER_PF_SUB_SERIALIZER(classname) \
+#define MITK_REGISTER_PF_SUB_SERIALIZER(classname)                                                                     \
+                                                                                                                       \
+  namespace mitk                                                                                                       \
   \
-  namespace mitk \
-{ \
+{                                                                                                                 \
+    \
+class classname##Serializer : public PlanarFigureSerializer\
+{                                                        \
+      \
+public :                                                                                                               \
+                                                                                                                       \
+        mitkClassMacro(classname##Serializer, PlanarFigureSerializer) itkFactorylessNewMacro(Self) itkCloneMacro(Self) \
+      \
+protected :                                                                                                            \
+                                                                                                                       \
+        classname##Serializer(){} virtual ~classname##Serializer(){}                                                   \
+    \
+};                                                                                                                     \
   \
-class classname ## Serializer : public PlanarFigureSerializer \
-{ \
-public: \
-  \
-  mitkClassMacro( classname ## Serializer, PlanarFigureSerializer ) \
-  itkFactorylessNewMacro(Self) \
-  itkCloneMacro(Self) \
-  \
-protected: \
-  \
-  classname ## Serializer () {} \
-  virtual ~classname ## Serializer () {} \
-}; \
-  \
-} \
-  \
-  MITK_REGISTER_SERIALIZER( classname ## Serializer );
+}                                                                                                                 \
+                                                                                                                       \
+  MITK_REGISTER_SERIALIZER(classname##Serializer);
 
 MITK_REGISTER_PF_SUB_SERIALIZER(PlanarAngle)
 MITK_REGISTER_PF_SUB_SERIALIZER(PlanarCircle)

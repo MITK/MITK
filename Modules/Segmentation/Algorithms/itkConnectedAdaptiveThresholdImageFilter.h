@@ -16,9 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __itkConnectedAdaptiveThresholdImageFilter_h
 #define __itkConnectedAdaptiveThresholdImageFilter_h
 
-#include "itkImage.h"
 #include "itkConnectedThresholdImageFilter.h"
-
+#include "itkImage.h"
 
 namespace itk
 {
@@ -29,47 +28,38 @@ namespace itk
   * \ingroup RegionGrowingSegmentation
   */
   template <class TInputImage, class TOutputImage>
-  class ITK_EXPORT ConnectedAdaptiveThresholdImageFilter:
-    public ConnectedThresholdImageFilter<TInputImage,TOutputImage>
+  class ITK_EXPORT ConnectedAdaptiveThresholdImageFilter
+    : public ConnectedThresholdImageFilter<TInputImage, TOutputImage>
   {
   public:
     /** Standard class typedefs. */
     typedef ConnectedAdaptiveThresholdImageFilter Self;
-    typedef ConnectedThresholdImageFilter<TInputImage,TOutputImage> Superclass;
+    typedef ConnectedThresholdImageFilter<TInputImage, TOutputImage> Superclass;
     typedef SmartPointer<Self> Pointer;
     typedef SmartPointer<const Self> ConstPointer;
 
-
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /** Run-time type information (and related methods).  */
-    itkTypeMacro(ConnectedAdaptiveThresholdImageFilter,
-      ConnectedThresholdImageFilter);
+      /** Run-time type information (and related methods).  */
+      itkTypeMacro(ConnectedAdaptiveThresholdImageFilter, ConnectedThresholdImageFilter);
 
     typedef TInputImage InputImageType;
     typedef TOutputImage OutputImageType;
     typedef typename OutputImageType::Pointer OutputImagePointer;
-    typedef typename InputImageType::IndexType    IndexType;
-    typedef typename InputImageType::PixelType    PixelType;
+    typedef typename InputImageType::IndexType IndexType;
+    typedef typename InputImageType::PixelType PixelType;
 
-
-    void SetGrowingDirectionIsUpwards(bool upwards)
-    {
-      m_GrowingDirectionIsUpwards = upwards;
-    }
-
+    void SetGrowingDirectionIsUpwards(bool upwards) { m_GrowingDirectionIsUpwards = upwards; }
     /* Switch between fine and raw leakage detection. */
     void SetFineDetectionMode(bool fine)
-    {m_FineDetectionMode = fine; m_DiscardLastPreview = false;}
+    {
+      m_FineDetectionMode = fine;
+      m_DiscardLastPreview = false;
+    }
 
-    int GetSeedpointValue(void)
-    {return m_SeedpointValue;}
-
-    int GetLeakagePoint(void)
-    {return m_DetectedLeakagePoint;}
-
+    int GetSeedpointValue(void) { return m_SeedpointValue; }
+    int GetLeakagePoint(void) { return m_DetectedLeakagePoint; }
     bool m_SegmentationCancelled;
 
     /*
@@ -89,16 +79,20 @@ namespace itk
     unsigned int AdjustIteratorMask();
 
     /* Sets parameters needed for adjusting the iterator mask
-    * @param iteratorMaskForFineSegmentation pointer to the image containing the complete segmentation result of one leaf (inclusively leakage-segmentation)
+    * @param iteratorMaskForFineSegmentation pointer to the image containing the complete segmentation result of one
+    * leaf (inclusively leakage-segmentation)
     * @param adjLowerTh lower threshold value of the segmentation without leakage-segmentation
     * @param adjLowerTh upper threshold value of the segmentation without leakage-segmentation
-    * @param discardLeafSegmentation flag if the last segmentation preview ended with a leakage already in the first step
+    * @param discardLeafSegmentation flag if the last segmentation preview ended with a leakage already in the first
+    * step
     */
-    void SetParameterForFineSegmentation( TOutputImage * iteratorMaskForFineSegmentation ,unsigned int adjLowerTh, unsigned int adjUpperTh, itk::Index<3> seedPoint, bool discardLeafSegmentation);
+    void SetParameterForFineSegmentation(TOutputImage *iteratorMaskForFineSegmentation,
+                                         unsigned int adjLowerTh,
+                                         unsigned int adjUpperTh,
+                                         itk::Index<3> seedPoint,
+                                         bool discardLeafSegmentation);
 
-
-
-    TOutputImage* GetResultImage();
+    TOutputImage *GetResultImage();
 
   protected:
     ConnectedAdaptiveThresholdImageFilter();
@@ -106,14 +100,14 @@ namespace itk
 
     void GenerateData();
 
-    TOutputImage * m_IteratorMaskForFineSegmentation;
+    TOutputImage *m_IteratorMaskForFineSegmentation;
 
   private:
     OutputImagePointer m_OutoutImageMaskFineSegmentation;
     bool m_GrowingDirectionIsUpwards;
     PixelType m_SeedpointValue;
     PixelType m_DetectedLeakagePoint;
-    PixelType m_InitValue ;
+    PixelType m_InitValue;
     unsigned int m_AdjLowerTh;
     unsigned int m_AdjUpperTh;
     itk::Index<3> m_SeedPointIndex;
@@ -122,12 +116,9 @@ namespace itk
     bool m_FineDetectionMode;
 
     bool m_DiscardLastPreview;
-
   };
 
-
-}// end namespace itk
-
+} // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
 #include "itkConnectedAdaptiveThresholdImageFilter.txx"

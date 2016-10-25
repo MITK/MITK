@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22
 #define PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
@@ -22,51 +21,52 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 
-namespace mitk {
-//##Documentation
-//## @brief Reader to read files in Philips PAR/REC file format
-class ParRecFileReader : public ImageSource, public FileReader
+namespace mitk
 {
-public:
-  mitkClassMacro(ParRecFileReader, FileReader);
+  //##Documentation
+  //## @brief Reader to read files in Philips PAR/REC file format
+  class ParRecFileReader : public ImageSource, public FileReader
+  {
+  public:
+    mitkClassMacro(ParRecFileReader, FileReader);
 
-  /** Method for creation through the object factory. */
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    /** Method for creation through the object factory. */
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  itkSetStringMacro(FileName);
-  itkGetStringMacro(FileName);
+      itkSetStringMacro(FileName);
+    itkGetStringMacro(FileName);
 
-  itkSetStringMacro(FilePrefix);
-  itkGetStringMacro(FilePrefix);
+    itkSetStringMacro(FilePrefix);
+    itkGetStringMacro(FilePrefix);
 
-  itkSetStringMacro(FilePattern);
-  itkGetStringMacro(FilePattern);
+    itkSetStringMacro(FilePattern);
+    itkGetStringMacro(FilePattern);
 
-  static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
-protected:
-  virtual void GenerateData() override;
+  protected:
+    virtual void GenerateData() override;
 
-  virtual void GenerateOutputInformation() override;
+    virtual void GenerateOutputInformation() override;
 
-  ParRecFileReader();
+    ParRecFileReader();
 
-  ~ParRecFileReader();
+    ~ParRecFileReader();
 
-  //##Description
-  //## @brief Time when Header was last read
-  itk::TimeStamp m_ReadHeaderTime;
+    //##Description
+    //## @brief Time when Header was last read
+    itk::TimeStamp m_ReadHeaderTime;
 
-  int m_StartFileIndex;
-protected:
-  std::string m_FileName;
-  std::string m_RecFileName;
+    int m_StartFileIndex;
 
-  std::string m_FilePrefix;
+  protected:
+    std::string m_FileName;
+    std::string m_RecFileName;
 
-  std::string m_FilePattern;
-};
+    std::string m_FilePrefix;
+
+    std::string m_FilePattern;
+  };
 
 } // namespace mitk
 

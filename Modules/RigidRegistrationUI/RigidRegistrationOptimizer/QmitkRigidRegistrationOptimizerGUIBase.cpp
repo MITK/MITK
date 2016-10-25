@@ -16,7 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
 
-QmitkRigidRegistrationOptimizerGUIBase::QmitkRigidRegistrationOptimizerGUIBase(QWidget* parent, Qt::WindowFlags f) : QWidget( parent, f )
+QmitkRigidRegistrationOptimizerGUIBase::QmitkRigidRegistrationOptimizerGUIBase(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f)
 {
 }
 

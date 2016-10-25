@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 
-static QString GetAnyWidgetLabel(const std::string& name)
+static QString GetAnyWidgetLabel(const std::string &name)
 {
   QString label;
   // get the last segment from the option name and use it as the label
@@ -36,9 +36,9 @@ static QString GetAnyWidgetLabel(const std::string& name)
   return label;
 }
 
-static QWidget* GetAnyWidget(const std::string& name, const us::Any& any, const std::string& defaultValue)
+static QWidget *GetAnyWidget(const std::string &name, const us::Any &any, const std::string &defaultValue)
 {
-  const std::type_info& anyType = any.Type();
+  const std::type_info &anyType = any.Type();
 
   if (anyType == typeid(std::string))
   {
@@ -90,14 +90,14 @@ static QWidget* GetAnyWidget(const std::string& name, const us::Any& any, const 
   }
 }
 
-QmitkFileReaderWriterOptionsWidget::QmitkFileReaderWriterOptionsWidget(const Options& options, QWidget* parent)
+QmitkFileReaderWriterOptionsWidget::QmitkFileReaderWriterOptionsWidget(const Options &options, QWidget *parent)
   : QWidget(parent)
 {
   Options filteredOptions = options;
   std::map<std::string, std::string> optionToDefaultValue;
-  for(const auto & option : options)
+  for (const auto &option : options)
   {
-    const std::string& name = option.first;
+    const std::string &name = option.first;
     if (name.size() > 4 && name.substr(name.size() - 4) == "enum")
     {
       filteredOptions.erase(name);
@@ -112,9 +112,8 @@ QmitkFileReaderWriterOptionsWidget::QmitkFileReaderWriterOptionsWidget(const Opt
     }
   }
 
-  auto  formLayout = new QFormLayout();
-  for(Options::const_iterator iter = filteredOptions.begin(), iterEnd = filteredOptions.end();
-      iter != iterEnd; ++iter)
+  auto formLayout = new QFormLayout();
+  for (Options::const_iterator iter = filteredOptions.begin(), iterEnd = filteredOptions.end(); iter != iterEnd; ++iter)
   {
     formLayout->addRow(GetAnyWidgetLabel(iter->first),
                        GetAnyWidget(iter->first, iter->second, optionToDefaultValue[iter->first]));
@@ -127,11 +126,11 @@ QmitkFileReaderWriterOptionsWidget::Options QmitkFileReaderWriterOptionsWidget::
 {
   Options options;
 
-  QFormLayout* layout = qobject_cast<QFormLayout*>(this->layout());
+  QFormLayout *layout = qobject_cast<QFormLayout *>(this->layout());
   const int rows = layout->rowCount();
-  for(int i = 0; i < rows; ++i)
+  for (int i = 0; i < rows; ++i)
   {
-    QmitkAnyAdapter* anyAdapter = dynamic_cast<QmitkAnyAdapter*>(layout->itemAt(i, QFormLayout::FieldRole)->widget());
+    QmitkAnyAdapter *anyAdapter = dynamic_cast<QmitkAnyAdapter *>(layout->itemAt(i, QFormLayout::FieldRole)->widget());
     if (anyAdapter)
     {
       options.insert(std::make_pair(anyAdapter->GetName(), anyAdapter->GetAny()));
@@ -140,10 +139,8 @@ QmitkFileReaderWriterOptionsWidget::Options QmitkFileReaderWriterOptionsWidget::
   return options;
 }
 
-
-QmitkAnyStringWidget::QmitkAnyStringWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QLineEdit(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyStringWidget::QmitkAnyStringWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QLineEdit(parent), QmitkAnyAdapter(name)
 {
   this->setText(QString::fromStdString(any.ToString()));
 }
@@ -153,10 +150,8 @@ us::Any QmitkAnyStringWidget::GetAny() const
   return us::Any(this->text().toStdString());
 }
 
-
-QmitkAnyBoolWidget::QmitkAnyBoolWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QCheckBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyBoolWidget::QmitkAnyBoolWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QCheckBox(parent), QmitkAnyAdapter(name)
 {
   this->setChecked(us::any_cast<bool>(any));
 }
@@ -166,10 +161,8 @@ us::Any QmitkAnyBoolWidget::GetAny() const
   return us::Any(this->isChecked());
 }
 
-
-QmitkAnyShortWidget::QmitkAnyShortWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QSpinBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyShortWidget::QmitkAnyShortWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QSpinBox(parent), QmitkAnyAdapter(name)
 {
   this->setRange(std::numeric_limits<short>::min(), std::numeric_limits<short>::max());
   this->setValue(us::any_cast<short>(any));
@@ -180,10 +173,8 @@ us::Any QmitkAnyShortWidget::GetAny() const
   return us::Any(static_cast<short>(this->value()));
 }
 
-
-QmitkAnyUShortWidget::QmitkAnyUShortWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QSpinBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyUShortWidget::QmitkAnyUShortWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QSpinBox(parent), QmitkAnyAdapter(name)
 {
   this->setRange(std::numeric_limits<unsigned short>::min(), std::numeric_limits<unsigned short>::max());
   this->setValue(us::any_cast<unsigned short>(any));
@@ -194,10 +185,8 @@ us::Any QmitkAnyUShortWidget::GetAny() const
   return us::Any(static_cast<unsigned short>(this->value()));
 }
 
-
-QmitkAnyIntWidget::QmitkAnyIntWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QSpinBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyIntWidget::QmitkAnyIntWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QSpinBox(parent), QmitkAnyAdapter(name)
 {
   this->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
   this->setValue(us::any_cast<int>(any));
@@ -208,10 +197,8 @@ us::Any QmitkAnyIntWidget::GetAny() const
   return us::Any(this->value());
 }
 
-
-QmitkAnyUIntWidget::QmitkAnyUIntWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QSpinBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyUIntWidget::QmitkAnyUIntWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QSpinBox(parent), QmitkAnyAdapter(name)
 {
   this->setRange(std::numeric_limits<unsigned int>::min(), std::numeric_limits<unsigned int>::max());
   this->setValue(us::any_cast<unsigned int>(any));
@@ -222,10 +209,8 @@ us::Any QmitkAnyUIntWidget::GetAny() const
   return us::Any(static_cast<unsigned int>(this->value()));
 }
 
-
-QmitkAnyFloatWidget::QmitkAnyFloatWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QDoubleSpinBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyFloatWidget::QmitkAnyFloatWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QDoubleSpinBox(parent), QmitkAnyAdapter(name)
 {
   this->setRange(std::numeric_limits<float>::min(), std::numeric_limits<float>::max());
   this->setValue(static_cast<double>(us::any_cast<float>(any)));
@@ -236,10 +221,8 @@ us::Any QmitkAnyFloatWidget::GetAny() const
   return us::Any(static_cast<float>(this->value()));
 }
 
-
-QmitkAnyDoubleWidget::QmitkAnyDoubleWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QDoubleSpinBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyDoubleWidget::QmitkAnyDoubleWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QDoubleSpinBox(parent), QmitkAnyAdapter(name)
 {
   this->setRange(std::numeric_limits<double>::min(), std::numeric_limits<double>::max());
   this->setValue(us::any_cast<double>(any));
@@ -250,10 +233,8 @@ us::Any QmitkAnyDoubleWidget::GetAny() const
   return us::Any(this->value());
 }
 
-
-QmitkInvalidAnyWidget::QmitkInvalidAnyWidget(const std::string& name, const us::Any& any, QWidget* parent)
-  : QLabel(parent)
-  , QmitkAnyAdapter(name)
+QmitkInvalidAnyWidget::QmitkInvalidAnyWidget(const std::string &name, const us::Any &any, QWidget *parent)
+  : QLabel(parent), QmitkAnyAdapter(name)
 {
   this->setText(QString("Unknown option type '%1'").arg(any.Type().name()));
 }
@@ -263,15 +244,16 @@ us::Any QmitkInvalidAnyWidget::GetAny() const
   return us::Any();
 }
 
-QmitkAnyVectorWidget::QmitkAnyVectorWidget(const std::string& name, const us::Any& any, const QString& defaultValue, QWidget* parent)
-  : QComboBox(parent)
-  , QmitkAnyAdapter(name)
+QmitkAnyVectorWidget::QmitkAnyVectorWidget(const std::string &name,
+                                           const us::Any &any,
+                                           const QString &defaultValue,
+                                           QWidget *parent)
+  : QComboBox(parent), QmitkAnyAdapter(name)
 {
-  const std::vector<std::string>& entries = us::ref_any_cast<std::vector<std::string> >(any);
+  const std::vector<std::string> &entries = us::ref_any_cast<std::vector<std::string>>(any);
   int index = 0;
   int defaultIndex = 0;
-  for (auto iter = entries.begin(), iterEnd = entries.end();
-       iter != iterEnd; ++iter, ++index)
+  for (auto iter = entries.begin(), iterEnd = entries.end(); iter != iterEnd; ++iter, ++index)
   {
     QString item = QString::fromStdString(*iter);
     this->addItem(item);

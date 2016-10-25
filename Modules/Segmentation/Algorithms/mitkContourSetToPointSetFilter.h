@@ -18,52 +18,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourSetToPointSetFilter_h__
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
+#include "mitkContourSet.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
-#include "mitkContourSet.h"
+#include <MitkSegmentationExports.h>
 
-namespace mitk {
-
-/**
- *
- * @brief Converts a contour set to a point set.
- *
- * The resulting pointset consists of sample points of all the contours
- *
- * @ingroup SurfaceFilters
- * @ingroup Process
- */
-class MITKSEGMENTATION_EXPORT ContourSetToPointSetFilter : public PointSetSource
+namespace mitk
 {
-public:
-  mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  /**
+   *
+   * @brief Converts a contour set to a point set.
+   *
+   * The resulting pointset consists of sample points of all the contours
+   *
+   * @ingroup SurfaceFilters
+   * @ingroup Process
+   */
+  class MITKSEGMENTATION_EXPORT ContourSetToPointSetFilter : public PointSetSource
+  {
+  public:
+    mitkClassMacro(ContourSetToPointSetFilter, PointSetSource);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
+      itkSetMacro(Frequency, unsigned int);
 
-  itkSetMacro(Frequency, unsigned int);
+    itkGetMacro(Frequency, unsigned int);
 
-  itkGetMacro(Frequency, unsigned int);
+    virtual void GenerateOutputInformation() override;
 
-  virtual void GenerateOutputInformation() override;
+    virtual void GenerateData() override;
 
-  virtual void GenerateData() override;
+    const mitk::ContourSet *GetInput(void);
 
-  const mitk::ContourSet* GetInput(void);
+    using Superclass::SetInput;
+    virtual void SetInput(const mitk::ContourSet *contourSet);
 
-  using Superclass::SetInput;
-  virtual void SetInput(const mitk::ContourSet *contourSet);
+  protected:
+    ContourSetToPointSetFilter();
 
-protected:
-  ContourSetToPointSetFilter();
+    virtual ~ContourSetToPointSetFilter();
 
-  virtual ~ContourSetToPointSetFilter();
-
-protected:
-  unsigned int m_Frequency;
-
-};
+  protected:
+    unsigned int m_Frequency;
+  };
 
 } // namespace mitk
 

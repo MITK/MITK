@@ -14,86 +14,77 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include <vtkProperty.h>
 #include "mitkGridRepresentationProperty.h"
+#include <vtkProperty.h>
 
-
-mitk::GridRepresentationProperty::GridRepresentationProperty( )
+mitk::GridRepresentationProperty::GridRepresentationProperty()
 {
   AddRepresentationTypes();
-  SetValue( WIREFRAME );
+  SetValue(WIREFRAME);
 }
 
-
-mitk::GridRepresentationProperty::GridRepresentationProperty(const mitk::GridRepresentationProperty& other)
+mitk::GridRepresentationProperty::GridRepresentationProperty(const mitk::GridRepresentationProperty &other)
   : mitk::EnumerationProperty(other)
 {
 }
 
-
-mitk::GridRepresentationProperty::GridRepresentationProperty( const IdType& value )
+mitk::GridRepresentationProperty::GridRepresentationProperty(const IdType &value)
 {
   AddRepresentationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    SetValue( value );
+    SetValue(value);
   }
   else
   {
-    SetValue( WIREFRAME );
+    SetValue(WIREFRAME);
   }
 }
 
-
-mitk::GridRepresentationProperty::GridRepresentationProperty( const std::string& value )
+mitk::GridRepresentationProperty::GridRepresentationProperty(const std::string &value)
 {
   AddRepresentationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    SetValue( value );
+    SetValue(value);
   }
   else
   {
-    SetValue( WIREFRAME );
+    SetValue(WIREFRAME);
   }
 }
-
 
 void mitk::GridRepresentationProperty::SetRepresentationToPoints()
 {
-  SetValue( POINTS );
+  SetValue(POINTS);
 }
-
 
 void mitk::GridRepresentationProperty::SetRepresentationToWireframe()
 {
-  SetValue( WIREFRAME );
+  SetValue(WIREFRAME);
 }
-
 
 void mitk::GridRepresentationProperty::SetRepresentationToSurface()
 {
-  SetValue( SURFACE );
+  SetValue(SURFACE);
 }
 
 void mitk::GridRepresentationProperty::SetRepresentationToWireframeSurface()
 {
-  //SetValue( WIREFRAME_SURFACE );
+  // SetValue( WIREFRAME_SURFACE );
 }
 
 void mitk::GridRepresentationProperty::AddRepresentationTypes()
 {
-  AddEnum( "Points", POINTS );
-  AddEnum( "Wireframe", WIREFRAME );
-  AddEnum( "Surface", SURFACE );
-  //AddEnum( "WireframeSurface", WIREFRAME_SURFACE );
+  AddEnum("Points", POINTS);
+  AddEnum("Wireframe", WIREFRAME);
+  AddEnum("Surface", SURFACE);
+  // AddEnum( "WireframeSurface", WIREFRAME_SURFACE );
 }
 
-
-bool mitk::GridRepresentationProperty::AddEnum( const std::string& name, const IdType& id )
+bool mitk::GridRepresentationProperty::AddEnum(const std::string &name, const IdType &id)
 {
-  return Superclass::AddEnum( name, id );
+  return Superclass::AddEnum(name, id);
 }
 
 itk::LightObject::Pointer mitk::GridRepresentationProperty::InternalClone() const

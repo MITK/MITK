@@ -18,40 +18,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkSetRegionTool_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
+#include <MitkSegmentationExports.h>
 
 namespace mitk
 {
+  class Image;
+  class StateMachineAction;
+  class InteractionEvent;
+  /**
+    \brief Fills or erases a 2D region
 
-class Image;
-class StateMachineAction;
-class InteractionEvent;
-/**
-  \brief Fills or erases a 2D region
+    \sa FeedbackContourTool
+    \sa ExtractImageFilter
+    \sa OverwriteSliceImageFilter
 
-  \sa FeedbackContourTool
-  \sa ExtractImageFilter
-  \sa OverwriteSliceImageFilter
+    \ingroup Interaction
+    \ingroup ToolManagerEtAl
 
-  \ingroup Interaction
-  \ingroup ToolManagerEtAl
+    Finds the outer contour of a shape in 2D (possibly including holes) and sets all
+    the inside pixels to a specified value. This might fill holes or erase segmentations.
 
-  Finds the outer contour of a shape in 2D (possibly including holes) and sets all
-  the inside pixels to a specified value. This might fill holes or erase segmentations.
+    \warning Only to be instantiated by mitk::ToolManager.
 
-  \warning Only to be instantiated by mitk::ToolManager.
-
-  $Author$
-*/
-class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
-{
+    $Author$
+  */
+  class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
+  {
   public:
-
     mitkClassMacro(SetRegionTool, FeedbackContourTool);
 
   protected:
-
     SetRegionTool(int paintingPixelValue = 1); // purposely hidden
     virtual ~SetRegionTool();
 
@@ -60,15 +57,13 @@ class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
     virtual void Activated() override;
     virtual void Deactivated() override;
 
-    virtual void OnMousePressed ( StateMachineAction*, InteractionEvent* );
-    virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* );
-    virtual void OnMouseMoved ( StateMachineAction*, InteractionEvent* );
+    virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
+    virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);
+    virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *);
 
     int m_PaintingPixelValue;
-};
+  };
 
 } // namespace
 
 #endif
-
-

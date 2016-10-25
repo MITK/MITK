@@ -15,33 +15,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <usGetModuleContext.h>
+#include <usModule.h>
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
-#include <usModule.h>
 
 #include "mitkToolManagerProvider.h"
 
 namespace mitk
 {
-
   /**
   \brief Registers services for segmentation module.
   */
   class SegmentationModuleActivator : public us::ModuleActivator
   {
   public:
-
-    void Load(us::ModuleContext* context) override
+    void Load(us::ModuleContext *context) override
     {
       /*register ToolManager provider service*/
       m_ToolManagerProvider = mitk::ToolManagerProvider::New();
       context->RegisterService<mitk::ToolManagerProvider>(m_ToolManagerProvider);
     }
 
-    void Unload(us::ModuleContext*) override
-    {
-    }
-
+    void Unload(us::ModuleContext *) override {}
   private:
     mitk::ToolManagerProvider::Pointer m_ToolManagerProvider;
   };

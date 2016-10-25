@@ -16,10 +16,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkSegmentationObjectFactory.h"
 
-#include "mitkProperties.h"
 #include "mitkBaseRenderer.h"
-#include "mitkDataNode.h"
 #include "mitkCoreObjectFactory.h"
+#include "mitkDataNode.h"
+#include "mitkProperties.h"
 
 #include "mitkContour.h"
 #include "mitkContourMapper2D.h"
@@ -29,8 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkVtkGLMapperWrapper.h>
 
-mitk::SegmentationObjectFactory::SegmentationObjectFactory()
-:CoreObjectFactoryBase()
+mitk::SegmentationObjectFactory::SegmentationObjectFactory() : CoreObjectFactoryBase()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -43,33 +42,33 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory()
   }
 }
 
-mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
+mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper=NULL;
+  mitk::Mapper::Pointer newMapper = NULL;
   mitk::BaseData *data = node->GetData();
 
-  if ( id == mitk::BaseRenderer::Standard2D )
+  if (id == mitk::BaseRenderer::Standard2D)
   {
     std::string classname("ContourModel");
-    if( dynamic_cast<mitk::Contour*>(node->GetData())!=NULL )
+    if (dynamic_cast<mitk::Contour *>(node->GetData()) != NULL)
     {
       newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
-    else if( dynamic_cast<mitk::ContourSet*>(node->GetData())!=NULL )
+    else if (dynamic_cast<mitk::ContourSet *>(node->GetData()) != NULL)
     {
       newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourSetMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
   }
-  else if ( id == mitk::BaseRenderer::Standard3D )
+  else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if((dynamic_cast<Contour*>(data)!=NULL))
+    if ((dynamic_cast<Contour *>(data) != NULL))
     {
       newMapper = mitk::ContourVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    else if((dynamic_cast<ContourSet*>(data)!=NULL))
+    else if ((dynamic_cast<ContourSet *>(data) != NULL))
     {
       newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataNode(node);
@@ -78,26 +77,26 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
   return newMapper;
 }
 
-void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
+void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if(node==NULL)
+  if (node == NULL)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
 
-//  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-//  if(image.IsNotNull() && image->IsInitialized())
-//  {
-//    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
-//  }
-//
-//  if (dynamic_cast<mitk::UnstructuredGrid*>(node->GetData()))
-//  {
-//    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
-//  }
+  //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  //  if(image.IsNotNull() && image->IsInitialized())
+  //  {
+  //    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
+  //  }
+  //
+  //  if (dynamic_cast<mitk::UnstructuredGrid*>(node->GetData()))
+  //  {
+  //    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
+  //  }
 }
 
-const char* mitk::SegmentationObjectFactory::GetFileExtensions()
+const char *mitk::SegmentationObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -118,7 +117,7 @@ void mitk::SegmentationObjectFactory::CreateFileExtensionsMap()
 {
 }
 
-const char* mitk::SegmentationObjectFactory::GetSaveFileExtensions()
+const char *mitk::SegmentationObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
@@ -129,18 +128,14 @@ void mitk::SegmentationObjectFactory::RegisterIOFactories()
 {
 }
 
-struct RegisterSegmentationObjectFactory{
-  RegisterSegmentationObjectFactory()
-    : m_Factory( mitk::SegmentationObjectFactory::New() )
+struct RegisterSegmentationObjectFactory
+{
+  RegisterSegmentationObjectFactory() : m_Factory(mitk::SegmentationObjectFactory::New())
   {
-    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory( m_Factory );
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(m_Factory);
   }
 
-  ~RegisterSegmentationObjectFactory()
-  {
-    mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory( m_Factory );
-  }
-
+  ~RegisterSegmentationObjectFactory() { mitk::CoreObjectFactory::GetInstance()->UnRegisterExtraFactory(m_Factory); }
   mitk::SegmentationObjectFactory::Pointer m_Factory;
 };
 

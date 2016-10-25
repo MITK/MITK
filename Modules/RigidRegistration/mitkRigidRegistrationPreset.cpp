@@ -20,56 +20,51 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTransformParameters.h"
 
 #include "usGetModuleContext.h"
-#include "usModuleContext.h"
 #include "usModule.h"
+#include "usModuleContext.h"
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
 
-namespace mitk {
-
+namespace mitk
+{
   RigidRegistrationPreset::RigidRegistrationPreset()
   {
     m_Name = "";
     m_XmlFileName = "mitkRigidRegistrationPresets.xml";
   }
 
-  RigidRegistrationPreset::~RigidRegistrationPreset()
-  {
-  }
-
-  bool RigidRegistrationPreset::LoadPreset()
-  {
-    return LoadPreset("mitkRigidRegistrationPresets.xml");
-  }
-
+  RigidRegistrationPreset::~RigidRegistrationPreset() {}
+  bool RigidRegistrationPreset::LoadPreset() { return LoadPreset("mitkRigidRegistrationPresets.xml"); }
   bool RigidRegistrationPreset::LoadPreset(std::string fileName)
   {
-    if ( fileName.empty() )
+    if (fileName.empty())
       return false;
 
     us::ModuleResource presetResource = us::GetModuleContext()->GetModule()->GetResource(fileName);
-    if (!presetResource) return false;
+    if (!presetResource)
+      return false;
 
     us::ModuleResourceStream presetStream(presetResource);
 
     vtkXMLParser::SetStream(&presetStream);
 
-    if ( !vtkXMLParser::Parse() )
+    if (!vtkXMLParser::Parse())
     {
-  #ifdef INTERDEBUG
-      MITK_INFO<<"RigidRegistrationPreset::LoadPreset xml file cannot parse!"<<std::endl;
-  #endif
+#ifdef INTERDEBUG
+      MITK_INFO << "RigidRegistrationPreset::LoadPreset xml file cannot parse!" << std::endl;
+#endif
     }
 
     return true;
   }
 
-  bool RigidRegistrationPreset::newPresets( std::map<std::string, itk::Array<double> > newTransformValues,
-                                            std::map<std::string, itk::Array<double> > newMetricValues,
-                                            std::map<std::string, itk::Array<double> > newOptimizerValues,
-                                            std::map<std::string, itk::Array<double> > newInterpolatorValues, std::string fileName)
+  bool RigidRegistrationPreset::newPresets(std::map<std::string, itk::Array<double>> newTransformValues,
+                                           std::map<std::string, itk::Array<double>> newMetricValues,
+                                           std::map<std::string, itk::Array<double>> newOptimizerValues,
+                                           std::map<std::string, itk::Array<double>> newInterpolatorValues,
+                                           std::string fileName)
   {
-    if ( !fileName.empty() )
+    if (!fileName.empty())
     {
       m_XmlFileName = fileName;
     }
@@ -80,19 +75,19 @@ namespace mitk {
     return save();
   }
 
-  void  RigidRegistrationPreset::StartElement (const char *elementName, const char **atts)
+  void RigidRegistrationPreset::StartElement(const char *elementName, const char **atts)
   {
     std::string elementNameString = elementName;
-    if ( elementNameString == "preset" )
+    if (elementNameString == "preset")
     {
-      m_Name = ReadXMLStringAttribut( "NAME", atts );
+      m_Name = ReadXMLStringAttribut("NAME", atts);
     }
     else if (elementNameString == "transform")
     {
       itk::Array<double> transformValues;
       transformValues.SetSize(25);
       transformValues.fill(0);
-      std::string transform = ReadXMLStringAttribut( "TRANSFORM", atts );
+      std::string transform = ReadXMLStringAttribut("TRANSFORM", atts);
       double trans = atof(transform.c_str());
       transformValues[0] = trans;
       MITK_DEBUG("RigidRegistration.Preset.StartElement ") << "Name tag: " << m_Name;
@@ -104,7 +99,7 @@ namespace mitk {
       itk::Array<double> metricValues;
       metricValues.SetSize(25);
       metricValues.fill(0);
-      std::string metric = ReadXMLStringAttribut( "METRIC", atts );
+      std::string metric = ReadXMLStringAttribut("METRIC", atts);
       double met = atof(metric.c_str());
       metricValues[0] = met;
       metricValues = this->loadMetricValues(metricValues, met, atts);
@@ -115,7 +110,7 @@ namespace mitk {
       itk::Array<double> optimizerValues;
       optimizerValues.SetSize(25);
       optimizerValues.fill(0);
-      std::string optimizer = ReadXMLStringAttribut( "OPTIMIZER", atts );
+      std::string optimizer = ReadXMLStringAttribut("OPTIMIZER", atts);
       double opt = atof(optimizer.c_str());
       optimizerValues[0] = opt;
       optimizerValues = this->loadOptimizerValues(optimizerValues, opt, atts);
@@ -126,23 +121,23 @@ namespace mitk {
       itk::Array<double> interpolatorValues;
       interpolatorValues.SetSize(25);
       interpolatorValues.fill(0);
-      std::string interpolator = ReadXMLStringAttribut( "INTERPOLATOR", atts );
+      std::string interpolator = ReadXMLStringAttribut("INTERPOLATOR", atts);
       double inter = atof(interpolator.c_str());
       interpolatorValues[0] = inter;
-      interpolatorValues = this->loadInterpolatorValues(interpolatorValues/*, inter, atts*/);
+      interpolatorValues = this->loadInterpolatorValues(interpolatorValues /*, inter, atts*/);
       m_InterpolatorValues[m_Name] = interpolatorValues;
     }
   }
 
-  std::string RigidRegistrationPreset::ReadXMLStringAttribut( std::string name, const char** atts )
+  std::string RigidRegistrationPreset::ReadXMLStringAttribut(std::string name, const char **atts)
   {
-    if(atts)
+    if (atts)
     {
-      const char** attsIter = atts;
+      const char **attsIter = atts;
 
-      while(*attsIter)
+      while (*attsIter)
       {
-        if ( name == *attsIter )
+        if (name == *attsIter)
         {
           attsIter++;
           return *attsIter;
@@ -155,21 +150,9 @@ namespace mitk {
     return std::string();
   }
 
-  itk::Array<double> RigidRegistrationPreset::getTransformValues(std::string name)
-  {
-    return m_TransformValues[name];
-  }
-
-  itk::Array<double> RigidRegistrationPreset::getMetricValues(std::string name)
-  {
-    return m_MetricValues[name];
-  }
-
-  itk::Array<double> RigidRegistrationPreset::getOptimizerValues(std::string name)
-  {
-    return m_OptimizerValues[name];
-  }
-
+  itk::Array<double> RigidRegistrationPreset::getTransformValues(std::string name) { return m_TransformValues[name]; }
+  itk::Array<double> RigidRegistrationPreset::getMetricValues(std::string name) { return m_MetricValues[name]; }
+  itk::Array<double> RigidRegistrationPreset::getOptimizerValues(std::string name) { return m_OptimizerValues[name]; }
   itk::Array<double> RigidRegistrationPreset::getInterpolatorValues(std::string name)
   {
     return m_InterpolatorValues[name];
@@ -179,30 +162,30 @@ namespace mitk {
   {
     // use the loaded transoform values to access the names
 
-    for( auto preset : m_TransformValues)
+    for (auto preset : m_TransformValues)
     {
-      m_LoadedPresets.push_back( preset.first );
+      m_LoadedPresets.push_back(preset.first);
     }
 
     return m_LoadedPresets;
   }
 
-  std::map<std::string, itk::Array<double> >& RigidRegistrationPreset::getTransformValuesPresets()
+  std::map<std::string, itk::Array<double>> &RigidRegistrationPreset::getTransformValuesPresets()
   {
     return m_TransformValues;
   }
 
-  std::map<std::string, itk::Array<double> >& RigidRegistrationPreset::getMetricValuesPresets()
+  std::map<std::string, itk::Array<double>> &RigidRegistrationPreset::getMetricValuesPresets()
   {
     return m_MetricValues;
   }
 
-  std::map<std::string, itk::Array<double> >& RigidRegistrationPreset::getOptimizerValuesPresets()
+  std::map<std::string, itk::Array<double>> &RigidRegistrationPreset::getOptimizerValuesPresets()
   {
     return m_OptimizerValues;
   }
 
-  std::map<std::string, itk::Array<double> >& RigidRegistrationPreset::getInterpolatorValuesPresets()
+  std::map<std::string, itk::Array<double>> &RigidRegistrationPreset::getInterpolatorValuesPresets()
   {
     return m_InterpolatorValues;
   }
@@ -213,289 +196,297 @@ namespace mitk {
     return false;
   }
 
-  itk::Array<double> RigidRegistrationPreset::loadTransformValues(itk::Array<double> transformValues, double transform, const char **atts)
+  itk::Array<double> RigidRegistrationPreset::loadTransformValues(itk::Array<double> transformValues,
+                                                                  double transform,
+                                                                  const char **atts)
   {
-    if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM || transform == mitk::TransformParameters::SCALETRANSFORM ||
-          transform == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM || transform == mitk::TransformParameters::VERSORTRANSFORM ||
-          transform == mitk::TransformParameters::RIGID2DTRANSFORM || transform == mitk::TransformParameters::EULER2DTRANSFORM)
+    if (transform == mitk::TransformParameters::TRANSLATIONTRANSFORM ||
+        transform == mitk::TransformParameters::SCALETRANSFORM ||
+        transform == mitk::TransformParameters::SCALELOGARITHMICTRANSFORM ||
+        transform == mitk::TransformParameters::VERSORTRANSFORM ||
+        transform == mitk::TransformParameters::RIGID2DTRANSFORM ||
+        transform == mitk::TransformParameters::EULER2DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
     }
-    else if (transform == mitk::TransformParameters::AFFINETRANSFORM || transform == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
+    else if (transform == mitk::TransformParameters::AFFINETRANSFORM ||
+             transform == mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+      std::string scale5 = ReadXMLStringAttribut("SCALE5", atts);
       double sca5 = atof(scale5.c_str());
       transformValues[6] = sca5;
-      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
+      std::string scale6 = ReadXMLStringAttribut("SCALE6", atts);
       double sca6 = atof(scale6.c_str());
       transformValues[7] = sca6;
-      std::string scale7 = ReadXMLStringAttribut( "SCALE7", atts );
+      std::string scale7 = ReadXMLStringAttribut("SCALE7", atts);
       double sca7 = atof(scale7.c_str());
       transformValues[8] = sca7;
-      std::string scale8 = ReadXMLStringAttribut( "SCALE8", atts );
+      std::string scale8 = ReadXMLStringAttribut("SCALE8", atts);
       double sca8 = atof(scale8.c_str());
       transformValues[9] = sca8;
-      std::string scale9 = ReadXMLStringAttribut( "SCALE9", atts );
+      std::string scale9 = ReadXMLStringAttribut("SCALE9", atts);
       double sca9 = atof(scale9.c_str());
       transformValues[10] = sca9;
-      std::string scale10 = ReadXMLStringAttribut( "SCALE10", atts );
+      std::string scale10 = ReadXMLStringAttribut("SCALE10", atts);
       double sca10 = atof(scale10.c_str());
       transformValues[11] = sca10;
-      std::string scale11 = ReadXMLStringAttribut( "SCALE11", atts );
+      std::string scale11 = ReadXMLStringAttribut("SCALE11", atts);
       double sca11 = atof(scale11.c_str());
       transformValues[12] = sca11;
-      std::string scale12 = ReadXMLStringAttribut( "SCALE12", atts );
+      std::string scale12 = ReadXMLStringAttribut("SCALE12", atts);
       double sca12 = atof(scale12.c_str());
       transformValues[13] = sca12;
 
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[14] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[15] = useMo;
     }
 
-    else if (transform == mitk::TransformParameters::EULER3DTRANSFORM || transform == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM
-          || transform == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
+    else if (transform == mitk::TransformParameters::EULER3DTRANSFORM ||
+             transform == mitk::TransformParameters::CENTEREDEULER3DTRANSFORM ||
+             transform == mitk::TransformParameters::VERSORRIGID3DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+      std::string scale5 = ReadXMLStringAttribut("SCALE5", atts);
       double sca5 = atof(scale5.c_str());
       transformValues[6] = sca5;
-      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
+      std::string scale6 = ReadXMLStringAttribut("SCALE6", atts);
       double sca6 = atof(scale6.c_str());
       transformValues[7] = sca6;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[8] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[9] = useMo;
     }
-    else if (transform == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM || transform == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
+    else if (transform == mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM ||
+             transform == mitk::TransformParameters::SIMILARITY3DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+      std::string scale5 = ReadXMLStringAttribut("SCALE5", atts);
       double sca5 = atof(scale5.c_str());
       transformValues[6] = sca5;
-      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
+      std::string scale6 = ReadXMLStringAttribut("SCALE6", atts);
       double sca6 = atof(scale6.c_str());
       transformValues[7] = sca6;
-      std::string scale7 = ReadXMLStringAttribut( "SCALE7", atts );
+      std::string scale7 = ReadXMLStringAttribut("SCALE7", atts);
       double sca7 = atof(scale7.c_str());
       transformValues[8] = sca7;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[9] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[10] = useMo;
     }
     else if (transform == mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+      std::string scale5 = ReadXMLStringAttribut("SCALE5", atts);
       double sca5 = atof(scale5.c_str());
       transformValues[6] = sca5;
-      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
+      std::string scale6 = ReadXMLStringAttribut("SCALE6", atts);
       double sca6 = atof(scale6.c_str());
       transformValues[7] = sca6;
-      std::string scale7 = ReadXMLStringAttribut( "SCALE7", atts );
+      std::string scale7 = ReadXMLStringAttribut("SCALE7", atts);
       double sca7 = atof(scale7.c_str());
       transformValues[8] = sca7;
-      std::string scale8 = ReadXMLStringAttribut( "SCALE8", atts );
+      std::string scale8 = ReadXMLStringAttribut("SCALE8", atts);
       double sca8 = atof(scale8.c_str());
       transformValues[9] = sca8;
-      std::string scale9 = ReadXMLStringAttribut( "SCALE9", atts );
+      std::string scale9 = ReadXMLStringAttribut("SCALE9", atts);
       double sca9 = atof(scale9.c_str());
       transformValues[10] = sca9;
-      std::string scale10 = ReadXMLStringAttribut( "SCALE10", atts );
+      std::string scale10 = ReadXMLStringAttribut("SCALE10", atts);
       double sca10 = atof(scale10.c_str());
       transformValues[11] = sca10;
-      std::string scale11 = ReadXMLStringAttribut( "SCALE11", atts );
+      std::string scale11 = ReadXMLStringAttribut("SCALE11", atts);
       double sca11 = atof(scale11.c_str());
       transformValues[12] = sca11;
-      std::string scale12 = ReadXMLStringAttribut( "SCALE12", atts );
+      std::string scale12 = ReadXMLStringAttribut("SCALE12", atts);
       double sca12 = atof(scale12.c_str());
       transformValues[13] = sca12;
-      std::string scale13 = ReadXMLStringAttribut( "SCALE13", atts );
+      std::string scale13 = ReadXMLStringAttribut("SCALE13", atts);
       double sca13 = atof(scale13.c_str());
       transformValues[14] = sca13;
-      std::string scale14 = ReadXMLStringAttribut( "SCALE14", atts );
+      std::string scale14 = ReadXMLStringAttribut("SCALE14", atts);
       double sca14 = atof(scale14.c_str());
       transformValues[15] = sca14;
-      std::string scale15 = ReadXMLStringAttribut( "SCALE15", atts );
+      std::string scale15 = ReadXMLStringAttribut("SCALE15", atts);
       double sca15 = atof(scale15.c_str());
       transformValues[16] = sca15;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[17] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[18] = useMo;
     }
     else if (transform == mitk::TransformParameters::CENTEREDRIGID2DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+      std::string scale5 = ReadXMLStringAttribut("SCALE5", atts);
       double sca5 = atof(scale5.c_str());
       transformValues[6] = sca5;
-      std::string angle = ReadXMLStringAttribut( "ANGLE", atts );
+      std::string angle = ReadXMLStringAttribut("ANGLE", atts);
       double ang = atof(angle.c_str());
       transformValues[7] = ang;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[8] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[9] = useMo;
     }
     else if (transform == mitk::TransformParameters::SIMILARITY2DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale = ReadXMLStringAttribut( "SCALE", atts );
+      std::string scale = ReadXMLStringAttribut("SCALE", atts);
       double sca = atof(scale.c_str());
       transformValues[6] = sca;
-      std::string angle = ReadXMLStringAttribut( "ANGLE", atts );
+      std::string angle = ReadXMLStringAttribut("ANGLE", atts);
       double ang = atof(angle.c_str());
       transformValues[7] = ang;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[8] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[9] = useMo;
     }
     else if (transform == mitk::TransformParameters::CENTEREDSIMILARITY2DTRANSFORM)
     {
-      std::string useScales = ReadXMLStringAttribut( "USESCALES", atts );
+      std::string useScales = ReadXMLStringAttribut("USESCALES", atts);
       double useSca = atof(useScales.c_str());
       transformValues[1] = useSca;
-      std::string scale1 = ReadXMLStringAttribut( "SCALE1", atts );
+      std::string scale1 = ReadXMLStringAttribut("SCALE1", atts);
       double sca1 = atof(scale1.c_str());
       transformValues[2] = sca1;
-      std::string scale2 = ReadXMLStringAttribut( "SCALE2", atts );
+      std::string scale2 = ReadXMLStringAttribut("SCALE2", atts);
       double sca2 = atof(scale2.c_str());
       transformValues[3] = sca2;
-      std::string scale3 = ReadXMLStringAttribut( "SCALE3", atts );
+      std::string scale3 = ReadXMLStringAttribut("SCALE3", atts);
       double sca3 = atof(scale3.c_str());
       transformValues[4] = sca3;
-      std::string scale4 = ReadXMLStringAttribut( "SCALE4", atts );
+      std::string scale4 = ReadXMLStringAttribut("SCALE4", atts);
       double sca4 = atof(scale4.c_str());
       transformValues[5] = sca4;
-      std::string scale5 = ReadXMLStringAttribut( "SCALE5", atts );
+      std::string scale5 = ReadXMLStringAttribut("SCALE5", atts);
       double sca5 = atof(scale5.c_str());
       transformValues[6] = sca5;
-      std::string scale6 = ReadXMLStringAttribut( "SCALE6", atts );
+      std::string scale6 = ReadXMLStringAttribut("SCALE6", atts);
       double sca6 = atof(scale6.c_str());
       transformValues[7] = sca6;
-      std::string scale = ReadXMLStringAttribut( "SCALE", atts );
+      std::string scale = ReadXMLStringAttribut("SCALE", atts);
       double sca = atof(scale.c_str());
       transformValues[8] = sca;
-      std::string angle = ReadXMLStringAttribut( "ANGLE", atts );
+      std::string angle = ReadXMLStringAttribut("ANGLE", atts);
       double ang = atof(angle.c_str());
       transformValues[9] = ang;
-      std::string useInitializer = ReadXMLStringAttribut( "USEINITIALIZER", atts );
+      std::string useInitializer = ReadXMLStringAttribut("USEINITIALIZER", atts);
       double useIni = atof(useInitializer.c_str());
       transformValues[10] = useIni;
-      std::string useMoments = ReadXMLStringAttribut( "USEMOMENTS", atts );
+      std::string useMoments = ReadXMLStringAttribut("USEMOMENTS", atts);
       double useMo = atof(useMoments.c_str());
       transformValues[11] = useMo;
     }
@@ -504,89 +495,95 @@ namespace mitk {
     return transformValues;
   }
 
-  itk::Array<double> RigidRegistrationPreset::loadMetricValues(itk::Array<double> metricValues, double metric, const char **atts)
+  itk::Array<double> RigidRegistrationPreset::loadMetricValues(itk::Array<double> metricValues,
+                                                               double metric,
+                                                               const char **atts)
   {
-    std::string computeGradient = ReadXMLStringAttribut( "COMPUTEGRADIENT", atts );
+    std::string computeGradient = ReadXMLStringAttribut("COMPUTEGRADIENT", atts);
     double compGra = atof(computeGradient.c_str());
     metricValues[1] = compGra;
-    if (metric == mitk::MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC || metric == mitk::MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC
-        || metric == mitk::MetricParameters::GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC || metric == mitk::MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC
-        || metric == mitk::MetricParameters::KAPPASTATISTICIMAGETOIMAGEMETRIC)
+    if (metric == mitk::MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC ||
+        metric == mitk::MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC ||
+        metric == mitk::MetricParameters::GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC ||
+        metric == mitk::MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC ||
+        metric == mitk::MetricParameters::KAPPASTATISTICIMAGETOIMAGEMETRIC)
     {
     }
-    else if (metric == mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC
-      || metric == mitk::MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
+    else if (metric == mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC ||
+             metric == mitk::MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC ||
+             metric == mitk::MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC ||
+             metric == mitk::MetricParameters::MUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC ||
+             metric == mitk::MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC)
     {
-      std::string histogramBins = ReadXMLStringAttribut( "HISTOGRAMBINS", atts );
+      std::string histogramBins = ReadXMLStringAttribut("HISTOGRAMBINS", atts);
       double histBins = atof(histogramBins.c_str());
       metricValues[2] = histBins;
     }
     else if (metric == mitk::MetricParameters::MATTESMUTUALINFORMATIONIMAGETOIMAGEMETRIC)
     {
-      std::string useSampling = ReadXMLStringAttribut( "USESAMPLING", atts );
+      std::string useSampling = ReadXMLStringAttribut("USESAMPLING", atts);
       double useSamp = atof(useSampling.c_str());
       metricValues[2] = useSamp;
-      std::string spatialSamples = ReadXMLStringAttribut( "SPATIALSAMPLES", atts );
+      std::string spatialSamples = ReadXMLStringAttribut("SPATIALSAMPLES", atts);
       double spatSamp = atof(spatialSamples.c_str());
       metricValues[3] = spatSamp;
-      std::string histogramBins = ReadXMLStringAttribut( "HISTOGRAMBINS", atts );
+      std::string histogramBins = ReadXMLStringAttribut("HISTOGRAMBINS", atts);
       double histBins = atof(histogramBins.c_str());
       metricValues[4] = histBins;
     }
     else if (metric == mitk::MetricParameters::MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC)
     {
-      std::string lambda = ReadXMLStringAttribut( "LAMBDA", atts );
+      std::string lambda = ReadXMLStringAttribut("LAMBDA", atts);
       double lamb = atof(lambda.c_str());
       metricValues[2] = lamb;
     }
     else if (metric == mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC)
     {
-      std::string spatialSamples = ReadXMLStringAttribut( "SPATIALSAMPLES", atts );
+      std::string spatialSamples = ReadXMLStringAttribut("SPATIALSAMPLES", atts);
       double spatSamp = atof(spatialSamples.c_str());
       metricValues[2] = spatSamp;
-      std::string fixedStandardDeviation = ReadXMLStringAttribut( "FIXEDSTANDARDDEVIATION", atts );
+      std::string fixedStandardDeviation = ReadXMLStringAttribut("FIXEDSTANDARDDEVIATION", atts);
       double fiStaDev = atof(fixedStandardDeviation.c_str());
       metricValues[3] = fiStaDev;
-      std::string movingStandardDeviation = ReadXMLStringAttribut( "MOVINGSTANDARDDEVIATION", atts );
+      std::string movingStandardDeviation = ReadXMLStringAttribut("MOVINGSTANDARDDEVIATION", atts);
       double moStaDev = atof(movingStandardDeviation.c_str());
       metricValues[4] = moStaDev;
-      std::string useNormalizer = ReadXMLStringAttribut( "USENORMALIZERANDSMOOTHER", atts );
+      std::string useNormalizer = ReadXMLStringAttribut("USENORMALIZERANDSMOOTHER", atts);
       double useNormal = atof(useNormalizer.c_str());
       metricValues[5] = useNormal;
-      std::string fixedSmootherVariance = ReadXMLStringAttribut( "FIXEDSMOOTHERVARIANCE", atts );
+      std::string fixedSmootherVariance = ReadXMLStringAttribut("FIXEDSMOOTHERVARIANCE", atts);
       double fiSmoVa = atof(fixedSmootherVariance.c_str());
       metricValues[6] = fiSmoVa;
-      std::string movingSmootherVariance = ReadXMLStringAttribut( "MOVINGSMOOTHERVARIANCE", atts );
+      std::string movingSmootherVariance = ReadXMLStringAttribut("MOVINGSMOOTHERVARIANCE", atts);
       double moSmoVa = atof(movingSmootherVariance.c_str());
       metricValues[7] = moSmoVa;
     }
     return metricValues;
   }
 
-  itk::Array<double> RigidRegistrationPreset::loadOptimizerValues(itk::Array<double> optimizerValues, double optimizer, const char **atts)
+  itk::Array<double> RigidRegistrationPreset::loadOptimizerValues(itk::Array<double> optimizerValues,
+                                                                  double optimizer,
+                                                                  const char **atts)
   {
-    std::string maximize = ReadXMLStringAttribut( "MAXIMIZE", atts );
+    std::string maximize = ReadXMLStringAttribut("MAXIMIZE", atts);
     double max = atof(maximize.c_str());
     optimizerValues[1] = max;
     if (optimizer == mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER)
     {
-      std::string stepLength = ReadXMLStringAttribut( "STEPLENGTH", atts );
+      std::string stepLength = ReadXMLStringAttribut("STEPLENGTH", atts);
       double stepLe = atof(stepLength.c_str());
       optimizerValues[2] = stepLe;
-      std::string numberOfSteps = ReadXMLStringAttribut( "NUMBEROFSTEPS", atts );
+      std::string numberOfSteps = ReadXMLStringAttribut("NUMBEROFSTEPS", atts);
       double numSteps = atof(numberOfSteps.c_str());
       optimizerValues[3] = numSteps;
     }
-    else if (optimizer == mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER
-            || optimizer == mitk::OptimizerParameters::QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER)
+    else if (optimizer == mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER ||
+             optimizer == mitk::OptimizerParameters::QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER)
     {
-      std::string learningRate = ReadXMLStringAttribut( "LEARNINGRATE", atts );
+      std::string learningRate = ReadXMLStringAttribut("LEARNINGRATE", atts);
       double learn = atof(learningRate.c_str());
       optimizerValues[2] = learn;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[3] = numIt;
     }
@@ -595,139 +592,140 @@ namespace mitk {
     }
     else if (optimizer == mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER)
     {
-      std::string shrinkFactor = ReadXMLStringAttribut( "SHRINKFACTOR", atts );
+      std::string shrinkFactor = ReadXMLStringAttribut("SHRINKFACTOR", atts);
       double shrink = atof(shrinkFactor.c_str());
       optimizerValues[2] = shrink;
-      std::string growthFactor = ReadXMLStringAttribut( "GROWTHFACTOR", atts );
+      std::string growthFactor = ReadXMLStringAttribut("GROWTHFACTOR", atts);
       double growth = atof(growthFactor.c_str());
       optimizerValues[3] = growth;
-      std::string epsilon = ReadXMLStringAttribut( "EPSILON", atts );
+      std::string epsilon = ReadXMLStringAttribut("EPSILON", atts);
       double eps = atof(epsilon.c_str());
       optimizerValues[4] = eps;
-      std::string initialRadius = ReadXMLStringAttribut( "INITIALRADIUS", atts );
+      std::string initialRadius = ReadXMLStringAttribut("INITIALRADIUS", atts);
       double initRad = atof(initialRadius.c_str());
       optimizerValues[5] = initRad;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[6] = numIt;
     }
     else if (optimizer == mitk::OptimizerParameters::POWELLOPTIMIZER)
     {
-      std::string stepLength = ReadXMLStringAttribut( "STEPLENGTH", atts );
+      std::string stepLength = ReadXMLStringAttribut("STEPLENGTH", atts);
       double stepLe = atof(stepLength.c_str());
       optimizerValues[2] = stepLe;
-      std::string stepTolerance = ReadXMLStringAttribut( "STEPTOLERANCE", atts );
+      std::string stepTolerance = ReadXMLStringAttribut("STEPTOLERANCE", atts);
       double stepTo = atof(stepTolerance.c_str());
       optimizerValues[3] = stepTo;
-      std::string valueTolerance = ReadXMLStringAttribut( "VALUETOLERANCE", atts );
+      std::string valueTolerance = ReadXMLStringAttribut("VALUETOLERANCE", atts);
       double valTo = atof(valueTolerance.c_str());
       optimizerValues[4] = valTo;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[5] = numIt;
     }
     else if (optimizer == mitk::OptimizerParameters::FRPROPTIMIZER)
     {
-      std::string useFletchReeves = ReadXMLStringAttribut( "USEFLETCHREEVES", atts );
+      std::string useFletchReeves = ReadXMLStringAttribut("USEFLETCHREEVES", atts);
       double useFleRe = atof(useFletchReeves.c_str());
       optimizerValues[2] = useFleRe;
-      std::string stepLength = ReadXMLStringAttribut( "STEPLENGTH", atts );
+      std::string stepLength = ReadXMLStringAttribut("STEPLENGTH", atts);
       double stepLe = atof(stepLength.c_str());
       optimizerValues[3] = stepLe;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[4] = numIt;
     }
     else if (optimizer == mitk::OptimizerParameters::REGULARSTEPGRADIENTDESCENTOPTIMIZER)
     {
-      std::string gradientMagnitudeTolerance = ReadXMLStringAttribut( "GRADIENTMAGNITUDETOLERANCE", atts );
+      std::string gradientMagnitudeTolerance = ReadXMLStringAttribut("GRADIENTMAGNITUDETOLERANCE", atts);
       double graMagTo = atof(gradientMagnitudeTolerance.c_str());
       optimizerValues[2] = graMagTo;
-      std::string minStepLength = ReadXMLStringAttribut( "MINSTEPLENGTH", atts );
+      std::string minStepLength = ReadXMLStringAttribut("MINSTEPLENGTH", atts);
       double minStep = atof(minStepLength.c_str());
       optimizerValues[3] = minStep;
-      std::string maxStepLength = ReadXMLStringAttribut( "MAXSTEPLENGTH", atts );
+      std::string maxStepLength = ReadXMLStringAttribut("MAXSTEPLENGTH", atts);
       double maxStep = atof(maxStepLength.c_str());
       optimizerValues[4] = maxStep;
-      std::string relaxationFactor = ReadXMLStringAttribut( "RELAXATIONFACTOR", atts );
+      std::string relaxationFactor = ReadXMLStringAttribut("RELAXATIONFACTOR", atts);
       double relFac = atof(relaxationFactor.c_str());
       optimizerValues[5] = relFac;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[6] = numIt;
     }
-    else if (optimizer == mitk::OptimizerParameters::VERSORTRANSFORMOPTIMIZER || optimizer == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
+    else if (optimizer == mitk::OptimizerParameters::VERSORTRANSFORMOPTIMIZER ||
+             optimizer == mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER)
     {
-      std::string gradientMagnitudeTolerance = ReadXMLStringAttribut( "GRADIENTMAGNITUDETOLERANCE", atts );
+      std::string gradientMagnitudeTolerance = ReadXMLStringAttribut("GRADIENTMAGNITUDETOLERANCE", atts);
       double graMagTo = atof(gradientMagnitudeTolerance.c_str());
       optimizerValues[2] = graMagTo;
-      std::string minStepLength = ReadXMLStringAttribut( "MINSTEPLENGTH", atts );
+      std::string minStepLength = ReadXMLStringAttribut("MINSTEPLENGTH", atts);
       double minStep = atof(minStepLength.c_str());
       optimizerValues[3] = minStep;
-      std::string maxStepLength = ReadXMLStringAttribut( "MAXSTEPLENGTH", atts );
+      std::string maxStepLength = ReadXMLStringAttribut("MAXSTEPLENGTH", atts);
       double maxStep = atof(maxStepLength.c_str());
       optimizerValues[4] = maxStep;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[5] = numIt;
     }
     else if (optimizer == mitk::OptimizerParameters::AMOEBAOPTIMIZER)
     {
-      std::string simplexDelta1 = ReadXMLStringAttribut( "SIMPLEXDELTA1", atts );
+      std::string simplexDelta1 = ReadXMLStringAttribut("SIMPLEXDELTA1", atts);
       double simpDel1 = atof(simplexDelta1.c_str());
       optimizerValues[2] = simpDel1;
-      std::string simplexDelta2 = ReadXMLStringAttribut( "SIMPLEXDELTA2", atts );
+      std::string simplexDelta2 = ReadXMLStringAttribut("SIMPLEXDELTA2", atts);
       double simpDel2 = atof(simplexDelta2.c_str());
       optimizerValues[3] = simpDel2;
-      std::string simplexDelta3 = ReadXMLStringAttribut( "SIMPLEXDELTA3", atts );
+      std::string simplexDelta3 = ReadXMLStringAttribut("SIMPLEXDELTA3", atts);
       double simpDel3 = atof(simplexDelta3.c_str());
       optimizerValues[4] = simpDel3;
-      std::string simplexDelta4 = ReadXMLStringAttribut( "SIMPLEXDELTA4", atts );
+      std::string simplexDelta4 = ReadXMLStringAttribut("SIMPLEXDELTA4", atts);
       double simpDel4 = atof(simplexDelta4.c_str());
       optimizerValues[5] = simpDel4;
-      std::string simplexDelta5 = ReadXMLStringAttribut( "SIMPLEXDELTA5", atts );
+      std::string simplexDelta5 = ReadXMLStringAttribut("SIMPLEXDELTA5", atts);
       double simpDel5 = atof(simplexDelta5.c_str());
       optimizerValues[6] = simpDel5;
-      std::string simplexDelta6 = ReadXMLStringAttribut( "SIMPLEXDELTA6", atts );
+      std::string simplexDelta6 = ReadXMLStringAttribut("SIMPLEXDELTA6", atts);
       double simpDel6 = atof(simplexDelta6.c_str());
       optimizerValues[7] = simpDel6;
-      std::string simplexDelta7 = ReadXMLStringAttribut( "SIMPLEXDELTA7", atts );
+      std::string simplexDelta7 = ReadXMLStringAttribut("SIMPLEXDELTA7", atts);
       double simpDel7 = atof(simplexDelta7.c_str());
       optimizerValues[8] = simpDel7;
-      std::string simplexDelta8 = ReadXMLStringAttribut( "SIMPLEXDELTA8", atts );
+      std::string simplexDelta8 = ReadXMLStringAttribut("SIMPLEXDELTA8", atts);
       double simpDel8 = atof(simplexDelta8.c_str());
       optimizerValues[9] = simpDel8;
-      std::string simplexDelta9 = ReadXMLStringAttribut( "SIMPLEXDELTA9", atts );
+      std::string simplexDelta9 = ReadXMLStringAttribut("SIMPLEXDELTA9", atts);
       double simpDel9 = atof(simplexDelta9.c_str());
       optimizerValues[10] = simpDel9;
-      std::string simplexDelta10 = ReadXMLStringAttribut( "SIMPLEXDELTA10", atts );
+      std::string simplexDelta10 = ReadXMLStringAttribut("SIMPLEXDELTA10", atts);
       double simpDel10 = atof(simplexDelta10.c_str());
       optimizerValues[11] = simpDel10;
-      std::string simplexDelta11 = ReadXMLStringAttribut( "SIMPLEXDELTA11", atts );
+      std::string simplexDelta11 = ReadXMLStringAttribut("SIMPLEXDELTA11", atts);
       double simpDel11 = atof(simplexDelta11.c_str());
       optimizerValues[12] = simpDel11;
-      std::string simplexDelta12 = ReadXMLStringAttribut( "SIMPLEXDELTA12", atts );
+      std::string simplexDelta12 = ReadXMLStringAttribut("SIMPLEXDELTA12", atts);
       double simpDel12 = atof(simplexDelta12.c_str());
       optimizerValues[13] = simpDel12;
-      std::string simplexDelta13 = ReadXMLStringAttribut( "SIMPLEXDELTA13", atts );
+      std::string simplexDelta13 = ReadXMLStringAttribut("SIMPLEXDELTA13", atts);
       double simpDel13 = atof(simplexDelta13.c_str());
       optimizerValues[14] = simpDel13;
-      std::string simplexDelta14 = ReadXMLStringAttribut( "SIMPLEXDELTA14", atts );
+      std::string simplexDelta14 = ReadXMLStringAttribut("SIMPLEXDELTA14", atts);
       double simpDel14 = atof(simplexDelta14.c_str());
       optimizerValues[15] = simpDel14;
-      std::string simplexDelta15 = ReadXMLStringAttribut( "SIMPLEXDELTA15", atts );
+      std::string simplexDelta15 = ReadXMLStringAttribut("SIMPLEXDELTA15", atts);
       double simpDel15 = atof(simplexDelta15.c_str());
       optimizerValues[16] = simpDel15;
-      std::string simplexDelta16 = ReadXMLStringAttribut( "SIMPLEXDELTA16", atts );
+      std::string simplexDelta16 = ReadXMLStringAttribut("SIMPLEXDELTA16", atts);
       double simpDel16 = atof(simplexDelta16.c_str());
       optimizerValues[17] = simpDel16;
-      std::string parametersConvergenceTolerance = ReadXMLStringAttribut( "PARAMETERSCONVERGENCETOLERANCE", atts );
+      std::string parametersConvergenceTolerance = ReadXMLStringAttribut("PARAMETERSCONVERGENCETOLERANCE", atts);
       double paramConv = atof(parametersConvergenceTolerance.c_str());
       optimizerValues[18] = paramConv;
-      std::string functionConvergenceTolerance = ReadXMLStringAttribut( "FUNCTIONCONVERGENCETOLERANCE", atts );
+      std::string functionConvergenceTolerance = ReadXMLStringAttribut("FUNCTIONCONVERGENCETOLERANCE", atts);
       double funcConv = atof(functionConvergenceTolerance.c_str());
       optimizerValues[19] = funcConv;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[20] = numIt;
     }
@@ -736,59 +734,60 @@ namespace mitk {
     }
     else if (optimizer == mitk::OptimizerParameters::LBFGSOPTIMIZER)
     {
-      std::string GradientConvergenceTolerance = ReadXMLStringAttribut( "GRADIENTCONVERGENCETOLERANCE", atts );
+      std::string GradientConvergenceTolerance = ReadXMLStringAttribut("GRADIENTCONVERGENCETOLERANCE", atts);
       double graConTo = atof(GradientConvergenceTolerance.c_str());
       optimizerValues[2] = graConTo;
-      std::string lineSearchAccuracy = ReadXMLStringAttribut( "LINESEARCHACCURACY", atts );
+      std::string lineSearchAccuracy = ReadXMLStringAttribut("LINESEARCHACCURACY", atts);
       double lineSearch = atof(lineSearchAccuracy.c_str());
       optimizerValues[3] = lineSearch;
-      std::string defaultStepLength = ReadXMLStringAttribut( "DEFAULTSTEPLENGTH", atts );
+      std::string defaultStepLength = ReadXMLStringAttribut("DEFAULTSTEPLENGTH", atts);
       double defStep = atof(defaultStepLength.c_str());
       optimizerValues[4] = defStep;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[5] = numIt;
-      std::string useTrace = ReadXMLStringAttribut( "USETRACE", atts );
+      std::string useTrace = ReadXMLStringAttribut("USETRACE", atts);
       double useTr = atof(useTrace.c_str());
       optimizerValues[6] = useTr;
     }
     else if (optimizer == mitk::OptimizerParameters::SPSAOPTIMIZER)
     {
-      std::string a = ReadXMLStringAttribut( "a", atts );
+      std::string a = ReadXMLStringAttribut("a", atts);
       double a1 = atof(a.c_str());
       optimizerValues[2] = a1;
-      std::string a2 = ReadXMLStringAttribut( "A", atts );
+      std::string a2 = ReadXMLStringAttribut("A", atts);
       double a3 = atof(a2.c_str());
       optimizerValues[3] = a3;
-      std::string alpha = ReadXMLStringAttribut( "ALPHA", atts );
+      std::string alpha = ReadXMLStringAttribut("ALPHA", atts);
       double alp = atof(alpha.c_str());
       optimizerValues[4] = alp;
-      std::string c = ReadXMLStringAttribut( "c", atts );
+      std::string c = ReadXMLStringAttribut("c", atts);
       double c1 = atof(c.c_str());
       optimizerValues[5] = c1;
-      std::string gamma = ReadXMLStringAttribut( "GAMMA", atts );
+      std::string gamma = ReadXMLStringAttribut("GAMMA", atts);
       double gam = atof(gamma.c_str());
       optimizerValues[6] = gam;
-      std::string tolerance = ReadXMLStringAttribut( "TOLERANCE", atts );
+      std::string tolerance = ReadXMLStringAttribut("TOLERANCE", atts);
       double tol = atof(tolerance.c_str());
       optimizerValues[7] = tol;
-      std::string stateOfConvergenceDecayRate = ReadXMLStringAttribut( "STATEOFCONVERGENCEDECAYRATE", atts );
+      std::string stateOfConvergenceDecayRate = ReadXMLStringAttribut("STATEOFCONVERGENCEDECAYRATE", atts);
       double stateOfConvergence = atof(stateOfConvergenceDecayRate.c_str());
       optimizerValues[8] = stateOfConvergence;
-      std::string minNumberIterations = ReadXMLStringAttribut( "MINNUMBERITERATIONS", atts );
+      std::string minNumberIterations = ReadXMLStringAttribut("MINNUMBERITERATIONS", atts);
       double minNumIt = atof(minNumberIterations.c_str());
       optimizerValues[9] = minNumIt;
-      std::string numberPerturbations = ReadXMLStringAttribut( "NUMBERPERTURBATIONS", atts );
+      std::string numberPerturbations = ReadXMLStringAttribut("NUMBERPERTURBATIONS", atts);
       double numPer = atof(numberPerturbations.c_str());
       optimizerValues[10] = numPer;
-      std::string numberIterations = ReadXMLStringAttribut( "NUMBERITERATIONS", atts );
+      std::string numberIterations = ReadXMLStringAttribut("NUMBERITERATIONS", atts);
       double numIt = atof(numberIterations.c_str());
       optimizerValues[11] = numIt;
     }
     return optimizerValues;
   }
 
-  itk::Array<double> RigidRegistrationPreset::loadInterpolatorValues(itk::Array<double> interpolatorValues/*, double interpolator, const char **atts*/)
+  itk::Array<double> RigidRegistrationPreset::loadInterpolatorValues(
+    itk::Array<double> interpolatorValues /*, double interpolator, const char **atts*/)
   {
     return interpolatorValues;
   }

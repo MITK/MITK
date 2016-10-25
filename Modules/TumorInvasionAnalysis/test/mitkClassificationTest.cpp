@@ -13,20 +13,20 @@
  See LICENSE.txt or http://www.mitk.org for details.
 
  ===================================================================*/
-#pragma warning (disable : 4996)
+#pragma warning(disable : 4996)
 
-#include "mitkTestingMacros.h"
 #include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
 
 #include "mitkCompareImageDataFilter.h"
 #include "mitkIOUtil.h"
 
-#include "mitkDataCollection.h"
 #include "mitkCollectionReader.h"
 #include "mitkCollectionWriter.h"
+#include "mitkDataCollection.h"
 
-#include <vtkSmartPointer.h>
 #include "mitkTumorInvasionClassification.h"
+#include <vtkSmartPointer.h>
 
 /**
  * @brief mitkClassificationTestSuite
@@ -42,20 +42,13 @@ class mitkClassificationTestSuite : public mitk::TestFixture
   MITK_TEST(TestClassification);
   CPPUNIT_TEST_SUITE_END();
 
-
 public:
-
   /**
-   * @brief Setup - Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   * @brief Setup - Always call this method before each Test-case to ensure correct and new intialization of the used
+   * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
-  void setUp()
-  {
-  }
-
-  void tearDown()
-  {
-  }
-
+  void setUp() {}
+  void tearDown() {}
   void TestClassification()
   {
     size_t forestSize = 10;
@@ -64,12 +57,10 @@ public:
     std::string train = GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/Train.xml");
     std::string eval = GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/Test.xml");
 
-
     std::vector<std::string> modalities;
 
     modalities.push_back("MOD0");
     modalities.push_back("MOD1");
-
 
     mitk::CollectionReader colReader;
     mitk::DataCollection::Pointer collection = colReader.LoadCollection(train);
@@ -81,18 +72,19 @@ public:
     mitk::TumorInvasionClassification progression;
 
     progression.SetClassRatio(1);
-    progression.SetTrainMargin(4,0);
+    progression.SetTrainMargin(4, 0);
     progression.SetMaskID("MASK");
 
     progression.SelectTrainingSamples(collection);
-    progression.LearnProgressionFeatures(collection, modalities, forestSize,treeDepth);
+    progression.LearnProgressionFeatures(collection, modalities, forestSize, treeDepth);
 
-    progression.PredictInvasion(evaluation,modalities);
+    progression.PredictInvasion(evaluation, modalities);
 
-    mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/TESTING_RESULT.nrrd"));
+    mitk::Image::Pointer refImage = mitk::IOUtil::LoadImage(
+      GetTestDataFilePath("DiffusionImaging/ProgressionAnalysis/Classification/TESTING_RESULT.nrrd"));
 
-    mitk::DataCollection* patCol = dynamic_cast<mitk::DataCollection*> (evaluation->GetData(0).GetPointer());
-    mitk::DataCollection* subCol = dynamic_cast<mitk::DataCollection*> (patCol->GetData(0).GetPointer());
+    mitk::DataCollection *patCol = dynamic_cast<mitk::DataCollection *>(evaluation->GetData(0).GetPointer());
+    mitk::DataCollection *subCol = dynamic_cast<mitk::DataCollection *>(patCol->GetData(0).GetPointer());
     mitk::Image::Pointer resultImage = subCol->GetMitkImage("RESULT");
 
     // Test result against fixed reference.
@@ -109,7 +101,7 @@ public:
     compareFilter->SetTolerance(.1);
     compareFilter->Update();
 
-    MITK_TEST_CONDITION_REQUIRED(compareFilter->GetResult(240) , "Compare prediction results to reference image.")
+    MITK_TEST_CONDITION_REQUIRED(compareFilter->GetResult(240), "Compare prediction results to reference image.")
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkClassification)

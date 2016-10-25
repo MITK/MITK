@@ -15,12 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkCorrelationCoefficientHistogramMetricView.h"
-#include <itkCorrelationCoefficientHistogramImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkCorrelationCoefficientHistogramImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkCorrelationCoefficientHistogramMetricView::QmitkCorrelationCoefficientHistogramMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkCorrelationCoefficientHistogramMetricView::QmitkCorrelationCoefficientHistogramMetricView(QWidget *parent,
+                                                                                               Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -43,14 +45,18 @@ itk::Object::Pointer QmitkCorrelationCoefficientHistogramMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkCorrelationCoefficientHistogramMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkCorrelationCoefficientHistogramMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer
+    MetricPointer = itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
   unsigned int nBins = m_Controls.m_NumberOfHistogramBinsCorrelationCoefficientHistogram->text().toInt();
-  typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
+  typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType,
+                                                                  MovingImageType>::HistogramType::SizeType
+    histogramSize;
   histogramSize[0] = nBins;
   histogramSize[1] = nBins;
   MetricPointer->SetHistogramSize(histogramSize);
@@ -80,13 +86,12 @@ QString QmitkCorrelationCoefficientHistogramMetricView::GetName()
   return "CorrelationCoefficientHistogram";
 }
 
-void QmitkCorrelationCoefficientHistogramMetricView::SetupUI(QWidget* parent)
+void QmitkCorrelationCoefficientHistogramMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsCorrelationCoefficientHistogram->setValidator(validatorLineEditInput);
 }
-
 
 bool QmitkCorrelationCoefficientHistogramMetricView::Maximize()
 {

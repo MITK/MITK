@@ -30,15 +30,15 @@ mitk::SurfaceSerializer::~SurfaceSerializer()
 
 std::string mitk::SurfaceSerializer::Serialize()
 {
-  const Surface* surface = dynamic_cast<const Surface*>( m_Data.GetPointer() );
+  const Surface *surface = dynamic_cast<const Surface *>(m_Data.GetPointer());
   if (!surface)
   {
-    MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::Surface. Cannot serialize as surface.";
+    MITK_ERROR << " Object at " << (const void *)this->m_Data
+               << " is not an mitk::Surface. Cannot serialize as surface.";
     return "";
   }
 
-  std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
+  std::string filename(this->GetUniqueFilenameInWorkingDirectory());
   filename += "_";
   filename += m_FilenameHint;
   filename += ".vtp";
@@ -51,16 +51,12 @@ std::string mitk::SurfaceSerializer::Serialize()
   {
     IOUtil::Save(surface, fullname);
   }
-  catch (std::exception& e)
+  catch (std::exception &e)
   {
-    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
-              << " to "
-              << fullname
-              << ": "
-              << e.what();
+    MITK_ERROR << " Error serializing object at " << (const void *)this->m_Data << " to " << fullname << ": "
+               << e.what();
     return "";
   }
 
   return filename;
 }
-

@@ -23,213 +23,204 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-ShowSegmentationAsSurface::ShowSegmentationAsSurface()
-:m_UIDGeneratorSurfaces("Surface_"),
- m_AddToTree(false)
-{
-}
-
-
-ShowSegmentationAsSurface::~ShowSegmentationAsSurface()
-{
-}
-
-void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm* other)
-{
-  Superclass::Initialize(other);
-
-  bool syncVisibility(false);
-
-  if (other)
+  ShowSegmentationAsSurface::ShowSegmentationAsSurface() : m_UIDGeneratorSurfaces("Surface_"), m_AddToTree(false) {}
+  ShowSegmentationAsSurface::~ShowSegmentationAsSurface() {}
+  void ShowSegmentationAsSurface::Initialize(const NonBlockingAlgorithm *other)
   {
-    other->GetParameter("Sync visibility", syncVisibility);
+    Superclass::Initialize(other);
+
+    bool syncVisibility(false);
+
+    if (other)
+    {
+      other->GetParameter("Sync visibility", syncVisibility);
+    }
+
+    SetParameter("Sync visibility", syncVisibility);
+    SetParameter("Median kernel size", 3u);
+    SetParameter("Apply median", true);
+    SetParameter("Smooth", true);
+    SetParameter("Gaussian SD", 1.5f);
+    SetParameter("Decimate mesh", true);
+    SetParameter("Decimation rate", 0.8f);
+    SetParameter("Wireframe", false);
   }
 
-  SetParameter("Sync visibility", syncVisibility );
-  SetParameter("Median kernel size", 3u);
-  SetParameter("Apply median", true );
-  SetParameter("Smooth", true );
-  SetParameter("Gaussian SD", 1.5f );
-  SetParameter("Decimate mesh", true );
-  SetParameter("Decimation rate", 0.8f );
-  SetParameter("Wireframe", false );
-}
+  bool ShowSegmentationAsSurface::ReadyToRun()
+  {
+    try
+    {
+      Image::Pointer image;
+      GetPointerParameter("Input", image);
 
+      return image.IsNotNull() && GetGroupNode();
+    }
+    catch (std::invalid_argument &)
+    {
+      return false;
+    }
+  }
 
-bool ShowSegmentationAsSurface::ReadyToRun()
-{
-  try
+  bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   {
     Image::Pointer image;
     GetPointerParameter("Input", image);
 
-    return image.IsNotNull() && GetGroupNode();
-  }
-  catch (std::invalid_argument&)
-  {
-    return false;
-  }
-}
-
-
-bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
-{
-  Image::Pointer image;
-  GetPointerParameter("Input", image);
-
-  bool smooth(true);
-  GetParameter("Smooth", smooth);
-
-  bool applyMedian(true);
-  GetParameter("Apply median", applyMedian);
-
-  bool decimateMesh(true);
-  GetParameter("Decimate mesh", decimateMesh);
-
-  unsigned int medianKernelSize(3);
-  GetParameter("Median kernel size", medianKernelSize);
-
-  float gaussianSD(1.5);
-  GetParameter("Gaussian SD", gaussianSD );
-
-  float reductionRate(0.8);
-  GetParameter("Decimation rate", reductionRate );
-
-  MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD
-                                         << " median " << applyMedian << " median kernel " << medianKernelSize
-                                         << " mesh reduction " << decimateMesh << " reductionRate " << reductionRate;
-
-  ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
-  surfaceFilter->SetInput( image );
-  surfaceFilter->SetThreshold( 0.5 ); //expects binary image with zeros and ones
-
-  surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
-  surfaceFilter->SetSmooth(smooth);
-  if (smooth)
-  {
-    surfaceFilter->InterpolationOn();
-    surfaceFilter->SetGaussianStandardDeviation( gaussianSD );
-  }
-
-  surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?
-  if (applyMedian)
-  {
-    surfaceFilter->SetMedianKernelSize(medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
-  }
-
-  //fix to avoid vtk warnings see bug #5390
-  if ( image->GetDimension() > 3 )
-    decimateMesh = false;
-
-  if (decimateMesh)
-  {
-    surfaceFilter->SetDecimate( ImageToSurfaceFilter::QuadricDecimation );
-    surfaceFilter->SetTargetReduction( reductionRate );
-  }
-  else
-  {
-    surfaceFilter->SetDecimate( ImageToSurfaceFilter::NoDecimation );
-  }
-
-  surfaceFilter->UpdateLargestPossibleRegion();
-
-  // calculate normals for nicer display
-  m_Surface = surfaceFilter->GetOutput();
-
-  vtkPolyData* polyData = m_Surface->GetVtkPolyData();
-
-  if (!polyData) throw std::logic_error("Could not create polygon model");
-
-  polyData->SetVerts(0);
-  polyData->SetLines(0);
-
-  if ( smooth || applyMedian || decimateMesh)
-  {
-    vtkPolyDataNormals* normalsGen = vtkPolyDataNormals::New();
-
-    normalsGen->AutoOrientNormalsOn();
-    normalsGen->FlipNormalsOff();
-    normalsGen->SetInputData( polyData );
-    normalsGen->Update();
-
-    m_Surface->SetVtkPolyData( normalsGen->GetOutput() );
-
-    normalsGen->Delete();
-  }
-  else
-  {
-    m_Surface->SetVtkPolyData( polyData );
-  }
-
-  return true;
-}
-
-void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
-{
-  m_Node = DataNode::New();
-
-  bool wireframe(false);
-  GetParameter("Wireframe", wireframe );
-  if (wireframe)
-  {
-    VtkRepresentationProperty *np = dynamic_cast<VtkRepresentationProperty*>(m_Node->GetProperty("material.representation"));
-    if (np)
-      np->SetRepresentationToWireframe();
-  }
-
-  m_Node->SetProperty("opacity", FloatProperty::New(0.3) );
-  m_Node->SetProperty("line width", IntProperty::New(1) );
-  m_Node->SetProperty("scalar visibility", BoolProperty::New(false) );
-
-  std::string groupNodesName ("surface");
-
-  DataNode* groupNode = GetGroupNode();
-  if (groupNode)
-  {
-    groupNode->GetName( groupNodesName );
-    //if parameter smooth is set add extension to node name
     bool smooth(true);
     GetParameter("Smooth", smooth);
-    if(smooth) groupNodesName.append("_smoothed");
+
+    bool applyMedian(true);
+    GetParameter("Apply median", applyMedian);
+
+    bool decimateMesh(true);
+    GetParameter("Decimate mesh", decimateMesh);
+
+    unsigned int medianKernelSize(3);
+    GetParameter("Median kernel size", medianKernelSize);
+
+    float gaussianSD(1.5);
+    GetParameter("Gaussian SD", gaussianSD);
+
+    float reductionRate(0.8);
+    GetParameter("Decimation rate", reductionRate);
+
+    MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD << " median "
+              << applyMedian << " median kernel " << medianKernelSize << " mesh reduction " << decimateMesh
+              << " reductionRate " << reductionRate;
+
+    ManualSegmentationToSurfaceFilter::Pointer surfaceFilter = ManualSegmentationToSurfaceFilter::New();
+    surfaceFilter->SetInput(image);
+    surfaceFilter->SetThreshold(0.5); // expects binary image with zeros and ones
+
+    surfaceFilter->SetUseGaussianImageSmooth(smooth); // apply gaussian to thresholded image ?
+    surfaceFilter->SetSmooth(smooth);
+    if (smooth)
+    {
+      surfaceFilter->InterpolationOn();
+      surfaceFilter->SetGaussianStandardDeviation(gaussianSD);
+    }
+
+    surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?
+    if (applyMedian)
+    {
+      surfaceFilter->SetMedianKernelSize(
+        medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
+    }
+
+    // fix to avoid vtk warnings see bug #5390
+    if (image->GetDimension() > 3)
+      decimateMesh = false;
+
+    if (decimateMesh)
+    {
+      surfaceFilter->SetDecimate(ImageToSurfaceFilter::QuadricDecimation);
+      surfaceFilter->SetTargetReduction(reductionRate);
+    }
+    else
+    {
+      surfaceFilter->SetDecimate(ImageToSurfaceFilter::NoDecimation);
+    }
+
+    surfaceFilter->UpdateLargestPossibleRegion();
+
+    // calculate normals for nicer display
+    m_Surface = surfaceFilter->GetOutput();
+
+    vtkPolyData *polyData = m_Surface->GetVtkPolyData();
+
+    if (!polyData)
+      throw std::logic_error("Could not create polygon model");
+
+    polyData->SetVerts(0);
+    polyData->SetLines(0);
+
+    if (smooth || applyMedian || decimateMesh)
+    {
+      vtkPolyDataNormals *normalsGen = vtkPolyDataNormals::New();
+
+      normalsGen->AutoOrientNormalsOn();
+      normalsGen->FlipNormalsOff();
+      normalsGen->SetInputData(polyData);
+      normalsGen->Update();
+
+      m_Surface->SetVtkPolyData(normalsGen->GetOutput());
+
+      normalsGen->Delete();
+    }
+    else
+    {
+      m_Surface->SetVtkPolyData(polyData);
+    }
+
+    return true;
   }
-  m_Node->SetProperty( "name", StringProperty::New(groupNodesName) );
 
-  // synchronize this object's color with the parent's color
-  //surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );
-  //surfaceNode->SetProperty( "visible", parentNode->GetProperty( "visible" ) );
+  void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
+  {
+    m_Node = DataNode::New();
 
-  m_Node->SetData( m_Surface );
+    bool wireframe(false);
+    GetParameter("Wireframe", wireframe);
+    if (wireframe)
+    {
+      VtkRepresentationProperty *np =
+        dynamic_cast<VtkRepresentationProperty *>(m_Node->GetProperty("material.representation"));
+      if (np)
+        np->SetRepresentationToWireframe();
+    }
 
-  BaseProperty* colorProp = groupNode->GetProperty("color");
-  if (colorProp)
-    m_Node->ReplaceProperty("color", colorProp->Clone());
-  else
-    m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
+    m_Node->SetProperty("opacity", FloatProperty::New(0.3));
+    m_Node->SetProperty("line width", IntProperty::New(1));
+    m_Node->SetProperty("scalar visibility", BoolProperty::New(false));
 
-  bool showResult(true);
-  GetParameter("Show result", showResult );
+    std::string groupNodesName("surface");
 
-  bool syncVisibility(false);
-  GetParameter("Sync visibility", syncVisibility );
+    DataNode *groupNode = GetGroupNode();
+    if (groupNode)
+    {
+      groupNode->GetName(groupNodesName);
+      // if parameter smooth is set add extension to node name
+      bool smooth(true);
+      GetParameter("Smooth", smooth);
+      if (smooth)
+        groupNodesName.append("_smoothed");
+    }
+    m_Node->SetProperty("name", StringProperty::New(groupNodesName));
 
-  Image::Pointer image;
-  GetPointerParameter("Input", image);
+    // synchronize this object's color with the parent's color
+    // surfaceNode->SetProperty( "color", parentNode->GetProperty( "color" ) );
+    // surfaceNode->SetProperty( "visible", parentNode->GetProperty( "visible" ) );
 
-  BaseProperty* organTypeProp = image->GetProperty("organ type");
-  if (organTypeProp)
-    m_Surface->SetProperty("organ type", organTypeProp);
+    m_Node->SetData(m_Surface);
 
-  BaseProperty* visibleProp = groupNode->GetProperty("visible");
-  if (visibleProp && syncVisibility)
-    m_Node->ReplaceProperty("visible", visibleProp->Clone());
-  else
-    m_Node->SetProperty("visible", BoolProperty::New(showResult));
+    BaseProperty *colorProp = groupNode->GetProperty("color");
+    if (colorProp)
+      m_Node->ReplaceProperty("color", colorProp->Clone());
+    else
+      m_Node->SetProperty("color", ColorProperty::New(1.0, 1.0, 0.0));
 
-  InsertBelowGroupNode(m_Node);
+    bool showResult(true);
+    GetParameter("Show result", showResult);
 
-  Superclass::ThreadedUpdateSuccessful();
-}
+    bool syncVisibility(false);
+    GetParameter("Sync visibility", syncVisibility);
+
+    Image::Pointer image;
+    GetPointerParameter("Input", image);
+
+    BaseProperty *organTypeProp = image->GetProperty("organ type");
+    if (organTypeProp)
+      m_Surface->SetProperty("organ type", organTypeProp);
+
+    BaseProperty *visibleProp = groupNode->GetProperty("visible");
+    if (visibleProp && syncVisibility)
+      m_Node->ReplaceProperty("visible", visibleProp->Clone());
+    else
+      m_Node->SetProperty("visible", BoolProperty::New(showResult));
+
+    InsertBelowGroupNode(m_Node);
+
+    Superclass::ThreadedUpdateSuccessful();
+  }
 
 } // namespace
-

@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMeanSquaresMetricView.h"
-#include <itkMeanSquaresImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkMeanSquaresImageToImageMetric.h>
 
-QmitkMeanSquaresMetricView::QmitkMeanSquaresMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkMeanSquaresMetricView::QmitkMeanSquaresMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
-
 }
 
 QmitkMeanSquaresMetricView::~QmitkMeanSquaresMetricView()
@@ -42,12 +42,13 @@ itk::Object::Pointer QmitkMeanSquaresMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMeanSquaresMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkMeanSquaresMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::New();
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -72,7 +73,7 @@ QString QmitkMeanSquaresMetricView::GetName()
   return "MeanSquares";
 }
 
-void QmitkMeanSquaresMetricView::SetupUI(QWidget* parent)
+void QmitkMeanSquaresMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
 }

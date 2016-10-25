@@ -27,25 +27,25 @@ class MITKQTWIDGETSEXT_EXPORT QmitkFFmpegWriter : public QObject
   Q_OBJECT
 
 public:
-  explicit QmitkFFmpegWriter(QObject* parent = nullptr);
+  explicit QmitkFFmpegWriter(QObject *parent = nullptr);
   ~QmitkFFmpegWriter();
 
   QString GetFFmpegPath() const;
-  void SetFFmpegPath(const QString& path);
+  void SetFFmpegPath(const QString &path);
 
   QSize GetSize() const;
-  void SetSize(const QSize& size);
+  void SetSize(const QSize &size);
   void SetSize(int width, int height);
 
   int GetFramerate() const;
   void SetFramerate(int framerate);
 
   QString GetOutputPath() const;
-  void SetOutputPath(const QString& path);
+  void SetOutputPath(const QString &path);
 
   void Start();
   bool IsRunning() const;
-  void WriteFrame(const unsigned char* frame);
+  void WriteFrame(const unsigned char *frame);
   void Stop();
 
 private slots:
@@ -53,7 +53,7 @@ private slots:
   void OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-  QProcess* m_Process;
+  QProcess *m_Process;
   QString m_FFmpegPath;
   QSize m_Size;
   int m_Framerate;

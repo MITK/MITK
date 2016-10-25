@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkQtWidgetsExtExports.h"
 
-
 #include <QComboBox>
 #include <QHash>
 
@@ -35,22 +34,18 @@ class MITKQTWIDGETSEXT_EXPORT QmitkEnumerationPropertyWidget : public QComboBox
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkEnumerationPropertyWidget(QWidget *parent = nullptr);
+  ~QmitkEnumerationPropertyWidget();
 
-    QmitkEnumerationPropertyWidget(QWidget* parent = nullptr);
-    ~QmitkEnumerationPropertyWidget();
+  void SetProperty(mitk::EnumerationProperty *property);
 
-    void SetProperty(mitk::EnumerationProperty* property);
+protected slots:
 
-  protected slots:
+  void OnIndexChanged(int index);
 
-    void OnIndexChanged(int index);
-
-  protected:
-
-    _EnumPropEditorImpl* propView;
-
+protected:
+  _EnumPropEditorImpl *propView;
 };
 
 #endif
-

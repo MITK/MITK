@@ -16,15 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkFeatureBasedEdgeDetectionFilter.h"
 
+#include <SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.h>
+#include <mitkITKImageImport.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageStatisticsCalculator.h>
 #include <mitkImageToUnstructuredGridFilter.h>
-#include <mitkITKImageImport.h>
 #include <mitkProgressBar.h>
 #include <mitkUnstructuredGrid.h>
-#include <SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.h>
-
 
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryContourImageFilter.h>
@@ -40,13 +39,15 @@ mitk::FeatureBasedEdgeDetectionFilter::FeatureBasedEdgeDetectionFilter()
   this->SetNumberOfIndexedOutputs(1);
 }
 
-mitk::FeatureBasedEdgeDetectionFilter::~FeatureBasedEdgeDetectionFilter(){}
+mitk::FeatureBasedEdgeDetectionFilter::~FeatureBasedEdgeDetectionFilter()
+{
+}
 
 void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 {
   mitk::Image::Pointer image = ImageToUnstructuredGridFilter::GetInput();
 
-  if(m_SegmentationMask.IsNull())
+  if (m_SegmentationMask.IsNull())
   {
     MITK_WARN << "Please set a segmentation mask first" << std::endl;
     return;
@@ -72,7 +73,8 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   mitk::Image::Pointer thresholdImage = mitk::Image::New();
   AccessByItk_3(image.GetPointer(), ITKThresholding, lowerThreshold, upperThreshold, thresholdImage)
 
-  mitk::ProgressBar::GetInstance()->Progress(2);
+    mitk::ProgressBar::GetInstance()
+      ->Progress(2);
 
   // Postprocess threshold segmentation
   // First a closing will be executed
@@ -86,7 +88,7 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 
   // Extract the binary edges of the resulting segmentation
   mitk::Image::Pointer edgeImage = mitk::Image::New();
-  AccessByItk_1(closedImage,ContourSearch, edgeImage);
+  AccessByItk_1(closedImage, ContourSearch, edgeImage);
 
   // Convert the edge image into an unstructured grid
   mitk::ImageToUnstructuredGridFilter::Pointer i2UFilter = mitk::ImageToUnstructuredGridFilter::New();
@@ -98,13 +100,14 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
   if (m_PointGrid.IsNull())
     m_PointGrid = mitk::UnstructuredGrid::New();
 
-  m_PointGrid->SetVtkUnstructuredGrid( i2UFilter->GetOutput()->GetVtkUnstructuredGrid() );
+  m_PointGrid->SetVtkUnstructuredGrid(i2UFilter->GetOutput()->GetVtkUnstructuredGrid());
 
   mitk::ProgressBar::GetInstance()->Progress();
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::FeatureBasedEdgeDetectionFilter::ThreadedClosing( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& result)
+void mitk::FeatureBasedEdgeDetectionFilter::ThreadedClosing(itk::Image<TPixel, VImageDimension> *originalImage,
+                                                            mitk::Image::Pointer &result)
 {
   typedef itk::BinaryBallStructuringElement<TPixel, VImageDimension> myKernelType;
 
@@ -114,14 +117,16 @@ void mitk::FeatureBasedEdgeDetectionFilter::ThreadedClosing( itk::Image<TPixel, 
 
   typedef typename itk::Image<TPixel, VImageDimension> ImageType;
 
-  typename itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer dilationFilter = itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
+  typename itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer dilationFilter =
+    itk::DilateObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
   dilationFilter->SetInput(originalImage);
   dilationFilter->SetKernel(ball);
   dilationFilter->Update();
 
   typename itk::Image<TPixel, VImageDimension>::Pointer dilatedImage = dilationFilter->GetOutput();
 
-  typename itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer erodeFilter = itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
+  typename itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::Pointer erodeFilter =
+    itk::ErodeObjectMorphologyImageFilter<ImageType, ImageType, myKernelType>::New();
   erodeFilter->SetInput(dilatedImage);
   erodeFilter->SetKernel(ball);
   erodeFilter->Update();
@@ -130,12 +135,13 @@ void mitk::FeatureBasedEdgeDetectionFilter::ThreadedClosing( itk::Image<TPixel, 
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image::Pointer& result)
+void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch(itk::Image<TPixel, VImageDimension> *originalImage,
+                                                          mitk::Image::Pointer &result)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::BinaryContourImageFilter<ImageType, ImageType> binaryContourImageFilterType;
   typedef unsigned short OutputPixelType;
-  typedef itk::Image< OutputPixelType, VImageDimension > OutputImageType;
+  typedef itk::Image<OutputPixelType, VImageDimension> OutputImageType;
 
   typename binaryContourImageFilterType::Pointer binaryContourFilter = binaryContourImageFilterType::New();
   binaryContourFilter->SetInput(originalImage);
@@ -150,19 +156,22 @@ void mitk::FeatureBasedEdgeDetectionFilter::ContourSearch( itk::Image<TPixel, VI
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, double lower, double upper, mitk::Image::Pointer& result)
+void mitk::FeatureBasedEdgeDetectionFilter::ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+                                                            double lower,
+                                                            double upper,
+                                                            mitk::Image::Pointer &result)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned short, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
-  if( typeid(TPixel) != typeid(float) && typeid(TPixel) != typeid(double))
+  if (typeid(TPixel) != typeid(float) && typeid(TPixel) != typeid(double))
   {
-    //round the thresholds if we have nor a float or double image
+    // round the thresholds if we have nor a float or double image
     lower = std::floor(lower + 0.5);
     upper = std::floor(upper - 0.5);
   }
-  if(lower >= upper)
+  if (lower >= upper)
   {
     upper = lower;
   }

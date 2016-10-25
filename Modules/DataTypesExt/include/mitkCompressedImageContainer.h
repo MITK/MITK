@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkCompressedImageContainer_h_Included
 #define mitkCompressedImageContainer_h_Included
 
-#include "mitkCommon.h"
 #include "MitkDataTypesExtExports.h"
-#include "mitkImage.h"
+#include "mitkCommon.h"
 #include "mitkGeometry3D.h"
+#include "mitkImage.h"
 #include "mitkImageDataItem.h"
 
 #include <itkObject.h>
@@ -29,29 +29,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+    \brief Holds one (compressed) mitk::Image
 
-/**
-  \brief Holds one (compressed) mitk::Image
+    Uses zlib to compress the data of an mitk::Image.
 
-  Uses zlib to compress the data of an mitk::Image.
-
-  $Author$
-*/
-class MITKDATATYPESEXT_EXPORT CompressedImageContainer : public itk::Object
-{
+    $Author$
+  */
+  class MITKDATATYPESEXT_EXPORT CompressedImageContainer : public itk::Object
+  {
   public:
-
     mitkClassMacroItkParent(CompressedImageContainer, itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /**
-     * \brief Creates a compressed version of the image.
-     *
-     * Will not hold any further SmartPointers to the image.
-     *
-     */
-    void SetImage( Image* );
+      /**
+       * \brief Creates a compressed version of the image.
+       *
+       * Will not hold any further SmartPointers to the image.
+       *
+       */
+      void SetImage(Image *);
 
     /**
      * \brief Creates a full mitk::Image from its compressed version.
@@ -63,7 +60,6 @@ class MITKDATATYPESEXT_EXPORT CompressedImageContainer : public itk::Object
     Image::Pointer GetImage();
 
   protected:
-
     CompressedImageContainer(); // purposely hidden
     virtual ~CompressedImageContainer();
 
@@ -72,15 +68,15 @@ class MITKDATATYPESEXT_EXPORT CompressedImageContainer : public itk::Object
     unsigned int m_ImageDimension;
     std::vector<unsigned int> m_ImageDimensions;
 
-    unsigned long  m_OneTimeStepImageSizeInBytes;
+    unsigned long m_OneTimeStepImageSizeInBytes;
 
     unsigned int m_NumberOfTimeSteps;
 
     /// one for each timestep. first = pointer to compressed data; second = size of buffer in bytes
-    std::vector< std::pair<unsigned char*, unsigned long> > m_ByteBuffers;
+    std::vector<std::pair<unsigned char *, unsigned long>> m_ByteBuffers;
 
     BaseGeometry::Pointer m_ImageGeometry;
-};
+  };
 
 } // namespace
 

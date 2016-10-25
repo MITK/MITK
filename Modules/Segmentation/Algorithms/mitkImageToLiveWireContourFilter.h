@@ -18,19 +18,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkImageToLiveWireContourFilter_h__
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
+#include <MitkSegmentationExports.h>
 
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 
-
-
-
-namespace mitk {
-
+namespace mitk
+{
   /**
   *
   * \brief
@@ -40,14 +37,11 @@ namespace mitk {
   */
   class MITKSEGMENTATION_EXPORT ImageToLiveWireContourFilter : public ContourModelSource
   {
-
   public:
-
     mitkClassMacro(ImageToLiveWireContourFilter, ContourModelSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef ContourModel OutputType;
+      typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::Image InputType;
 
@@ -57,15 +51,14 @@ namespace mitk {
     itkSetMacro(EndPoint, mitk::Point3D);
     itkGetMacro(EndPoint, mitk::Point3D);
 
-
-    virtual void SetInput( const InputType *input);
+    virtual void SetInput(const InputType *input);
 
     using Superclass::SetInput;
-    virtual void SetInput( unsigned int idx, const InputType * input);
+    virtual void SetInput(unsigned int idx, const InputType *input);
 
-    const InputType* GetInput(void);
+    const InputType *GetInput(void);
 
-    const InputType* GetInput(unsigned int idx);
+    const InputType *GetInput(unsigned int idx);
 
   protected:
     ImageToLiveWireContourFilter();
@@ -74,7 +67,7 @@ namespace mitk {
 
     void GenerateData() override;
 
-    void GenerateOutputInformation() override {};
+    void GenerateOutputInformation() override{};
 
     mitk::Point3D m_StartPoint;
     mitk::Point3D m_EndPoint;
@@ -83,12 +76,8 @@ namespace mitk {
     mitk::Point3D m_EndPointInIndex;
 
   private:
-
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage);
-
-
+    template <typename TPixel, unsigned int VImageDimension>
+    void ItkProcessImage(const itk::Image<TPixel, VImageDimension> *inputImage);
   };
-
 }
 #endif

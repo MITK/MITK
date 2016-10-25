@@ -20,31 +20,27 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itksys/SystemTools.hxx>
 
-
 MITK_REGISTER_SERIALIZER(ExampleDataStructureSerializer)
-
 
 mitk::ExampleDataStructureSerializer::ExampleDataStructureSerializer()
 {
 }
 
-
 mitk::ExampleDataStructureSerializer::~ExampleDataStructureSerializer()
 {
 }
 
-
 std::string mitk::ExampleDataStructureSerializer::Serialize()
 {
-  const ExampleDataStructure* exData = dynamic_cast<const ExampleDataStructure*>( m_Data.GetPointer() );
+  const ExampleDataStructure *exData = dynamic_cast<const ExampleDataStructure *>(m_Data.GetPointer());
   if (exData == NULL)
   {
-    MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::ExampleDataStructure. Cannot serialize as ExampleDataStructure.";
+    MITK_ERROR << " Object at " << (const void *)this->m_Data
+               << " is not an mitk::ExampleDataStructure. Cannot serialize as ExampleDataStructure.";
     return "";
   }
 
-  std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
+  std::string filename(this->GetUniqueFilenameInWorkingDirectory());
   filename += "_";
   filename += m_FilenameHint;
   filename += ".txt";
@@ -57,15 +53,11 @@ std::string mitk::ExampleDataStructureSerializer::Serialize()
   {
     mitk::IOUtil::Save(exData, fullname);
   }
-  catch (std::exception& e)
+  catch (std::exception &e)
   {
-    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
-              << " to "
-              << fullname
-              << ": "
-              << e.what();
+    MITK_ERROR << " Error serializing object at " << (const void *)this->m_Data << " to " << fullname << ": "
+               << e.what();
     return "";
   }
   return filename;
 }
-

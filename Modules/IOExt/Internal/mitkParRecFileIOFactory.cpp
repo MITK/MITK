@@ -20,30 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-ParRecFileIOFactory::ParRecFileIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkParRecFileReader",
-                         "mitk ParRec Image IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<ParRecFileReader> >::New());
-}
+  ParRecFileIOFactory::ParRecFileIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkParRecFileReader",
+                           "mitk ParRec Image IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<ParRecFileReader>>::New());
+  }
 
-ParRecFileIOFactory::~ParRecFileIOFactory()
-{
-}
-
-const char* ParRecFileIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* ParRecFileIOFactory::GetDescription() const
-{
-  return "ParRecFile IO Factory, allows the loading of ParRec images";
-}
+  ParRecFileIOFactory::~ParRecFileIOFactory() {}
+  const char *ParRecFileIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *ParRecFileIOFactory::GetDescription() const
+  {
+    return "ParRecFile IO Factory, allows the loading of ParRec images";
+  }
 
 } // end namespace mitk

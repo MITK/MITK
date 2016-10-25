@@ -23,7 +23,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkSurfaceStampWidgetGUIControls.h"
 
-namespace mitk {
+namespace mitk
+{
   class ToolManager;
 }
 
@@ -38,27 +39,24 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceStampWidget : public QWidget
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkSurfaceStampWidget(QWidget *parent = 0, const char *name = 0);
+  virtual ~QmitkSurfaceStampWidget();
 
-    QmitkSurfaceStampWidget(QWidget* parent = 0, const char* name = 0);
-    virtual ~QmitkSurfaceStampWidget();
+  void SetDataStorage(mitk::DataStorage *storage);
 
+protected slots:
 
-    void SetDataStorage( mitk::DataStorage* storage );
+  void OnShowInformation(bool);
 
-  protected slots:
-
-    void OnShowInformation(bool);
-
-    void OnStamp();
+  void OnStamp();
 
 private:
+  mitk::ToolManager *m_ToolManager;
 
-    mitk::ToolManager* m_ToolManager;
+  mitk::DataStorage *m_DataStorage;
 
-    mitk::DataStorage* m_DataStorage;
-
-    Ui::QmitkSurfaceStampWidgetGUIControls m_Controls;
+  Ui::QmitkSurfaceStampWidgetGUIControls m_Controls;
 };
 
 #endif

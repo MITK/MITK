@@ -13,11 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <mitkTestingMacros.h>
 #include <mitkContourModel.h>
+#include <mitkTestingMacros.h>
 
-
-//Add a vertex to the contour and see if size changed
+// Add a vertex to the contour and see if size changed
 static void TestAddVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -28,12 +27,9 @@ static void TestAddVertex()
   contour->AddVertex(p);
 
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() > 0, "Add a Vertex, size increased");
-
 }
 
-
-
-//Select a vertex by index. successful if the selected vertex member of the contour is no longer set to null
+// Select a vertex by index. successful if the selected vertex member of the contour is no longer set to null
 static void TestSelectVertexAtIndex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -48,9 +44,7 @@ static void TestSelectVertexAtIndex()
   MITK_TEST_CONDITION(contour->GetSelectedVertex() != nullptr, "Vertex was selected at index");
 }
 
-
-
-//Select a vertex by worldposition. successful if the selected vertex member of the contour is no longer set to null
+// Select a vertex by worldposition. successful if the selected vertex member of the contour is no longer set to null
 static void TestSelectVertexAtWorldposition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -60,15 +54,13 @@ static void TestSelectVertexAtWorldposition()
 
   contour->AddVertex(p);
 
-  //same point is used here so the epsilon can be chosen very small
+  // same point is used here so the epsilon can be chosen very small
   contour->SelectVertexAt(p, 0.01);
 
   MITK_TEST_CONDITION(contour->GetSelectedVertex() != nullptr, "Vertex was selected at position");
 }
 
-
-
-//Move a vertex by a translation vector
+// Move a vertex by a translation vector
 static void TestMoveSelectedVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -78,7 +70,7 @@ static void TestMoveSelectedVertex()
 
   contour->AddVertex(p);
 
-  //Same point is used here so the epsilon can be chosen very small
+  // Same point is used here so the epsilon can be chosen very small
   contour->SelectVertexAt(p, 0.01);
 
   mitk::Vector3D v;
@@ -88,20 +80,17 @@ static void TestMoveSelectedVertex()
 
   contour->ShiftSelectedVertex(v);
 
-  const mitk::ContourModel::VertexType* vertex = contour->GetSelectedVertex();
+  const mitk::ContourModel::VertexType *vertex = contour->GetSelectedVertex();
 
   bool correctlyMoved = false;
 
-  correctlyMoved = (vertex->Coordinates)[0] == (v[0]) &&
-    (vertex->Coordinates)[1] == (v[1]) &&
-    (vertex->Coordinates)[2] == (v[2]);
+  correctlyMoved =
+    (vertex->Coordinates)[0] == (v[0]) && (vertex->Coordinates)[1] == (v[1]) && (vertex->Coordinates)[2] == (v[2]);
 
   MITK_TEST_CONDITION(correctlyMoved, "Vertex has been moved");
 }
 
-
-
-//Test to move the whole contour
+// Test to move the whole contour
 /*
 static void TestMoveContour()
 {
@@ -143,8 +132,7 @@ static void TestMoveContour()
 }
 */
 
-
-//Remove a vertex by index
+// Remove a vertex by index
 static void TestRemoveVertexAtIndex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -159,9 +147,7 @@ static void TestRemoveVertexAtIndex()
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "removed vertex");
 }
 
-
-
-//Remove a vertex by position
+// Remove a vertex by position
 static void TestRemoveVertexAtWorldPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -176,9 +162,7 @@ static void TestRemoveVertexAtWorldPosition()
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "removed vertex");
 }
 
-
-
-//Check closeable contour
+// Check closeable contour
 static void TestIsclosed()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -187,7 +171,6 @@ static void TestIsclosed()
   p[0] = p[1] = p[2] = 0;
 
   contour->AddVertex(p);
-
 
   mitk::Point3D p2;
   p2[0] = p2[1] = p2[2] = 1;
@@ -198,7 +181,7 @@ static void TestIsclosed()
 
   MITK_TEST_CONDITION(contour->IsClosed(), "closed contour");
 
-  //no vertices should be added to a closed contour
+  // no vertices should be added to a closed contour
   int oldNumberOfVertices = contour->GetNumberOfVertices();
 
   mitk::Point3D p3;
@@ -211,9 +194,7 @@ static void TestIsclosed()
   MITK_TEST_CONDITION(oldNumberOfVertices != newNumberOfVertices, "vertices added to closed contour");
 }
 
-
-
-//Test concatenating two contours
+// Test concatenating two contours
 static void TestConcatenate()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -223,12 +204,10 @@ static void TestConcatenate()
 
   contour->AddVertex(p);
 
-
   mitk::Point3D p2;
   p2[0] = p2[1] = p2[2] = 1;
 
   contour->AddVertex(p2);
-
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
@@ -238,7 +217,6 @@ static void TestConcatenate()
   p3[2] = 0;
 
   contour2->AddVertex(p3);
-
 
   mitk::Point3D p4;
   p4[0] = -3;
@@ -252,10 +230,8 @@ static void TestConcatenate()
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 4, "two contours were concatenated");
 }
 
-
-
-//Try to select a vertex at position (within a epsilon of course) where no vertex is.
-//So the selected verted member should be null.
+// Try to select a vertex at position (within a epsilon of course) where no vertex is.
+// So the selected verted member should be null.
 static void TestSelectVertexAtWrongPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -274,7 +250,6 @@ static void TestSelectVertexAtWrongPosition()
   MITK_TEST_CONDITION(contour->GetSelectedVertex() == nullptr, "Vertex was not selected");
 }
 
-
 static void TestInsertVertex()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -283,7 +258,6 @@ static void TestInsertVertex()
   p[0] = p[1] = p[2] = 0;
 
   contour->AddVertex(p);
-
 
   mitk::Point3D p2;
   p2[0] = p2[1] = p2[2] = 1;
@@ -298,11 +272,9 @@ static void TestInsertVertex()
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 3, "test insert vertex");
 
   MITK_TEST_CONDITION(contour->GetVertexAt(1)->Coordinates == pointToInsert, "compare inserted vertex");
-
 }
 
-
-//try to access an invalid timestep
+// try to access an invalid timestep
 static void TestInvalidTimeStep()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
@@ -310,7 +282,6 @@ static void TestInvalidTimeStep()
   p[0] = p[1] = p[2] = 0;
 
   contour->AddVertex(p);
-
 
   mitk::Point3D p2;
   p2[0] = p2[1] = p2[2] = 1;
@@ -328,7 +299,8 @@ static void TestInvalidTimeStep()
   MITK_TEST_CONDITION(contour->IsClosed(invalidTimeStep) == false, "test close at invalid timestep");
 
   contour->SetClosed(true, invalidTimeStep);
-  MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1, "test number of vertices at invalid timestep");
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1,
+                      "test number of vertices at invalid timestep");
 
   contour->AddVertex(p2, invalidTimeStep);
   MITK_TEST_CONDITION(contour->GetNumberOfVertices(invalidTimeStep) == -1, "test add vertex at invalid timestep");
@@ -339,9 +311,7 @@ static void TestInvalidTimeStep()
   MITK_TEST_CONDITION(contour->SelectVertexAt(0, invalidTimeStep) == false, "test select vertex at invalid timestep");
 
   MITK_TEST_CONDITION(contour->RemoveVertexAt(0, invalidTimeStep) == false, "test remove vertex at invalid timestep");
-
 }
-
 
 static void TestEmptyContour()
 {
@@ -351,7 +321,6 @@ static void TestEmptyContour()
 
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 0, "test numberof vertices of empty contour");
 }
-
 
 static void TestSetVertices()
 {
@@ -366,9 +335,9 @@ static void TestSetVertices()
 
   newCoordinates[0] = newCoordinates[1] = newCoordinates[2] = 1;
 
-  contour->SetVertexAt(0, newCoordinates );
+  contour->SetVertexAt(0, newCoordinates);
 
-  MITK_TEST_EQUAL(contour->GetVertexAt(0)->Coordinates, newCoordinates, "set coordinates" );
+  MITK_TEST_EQUAL(contour->GetVertexAt(0)->Coordinates, newCoordinates, "set coordinates");
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
@@ -378,7 +347,6 @@ static void TestSetVertices()
   p3[2] = 0;
 
   contour2->AddVertex(p3);
-
 
   mitk::Point3D p4;
   p4[0] = -3;
@@ -391,10 +359,9 @@ static void TestSetVertices()
 
   contour->SetVertexAt(1, contour2->GetVertexAt(1));
 
-  MITK_TEST_EQUAL(contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates, "Use setter and getter combination");
-
+  MITK_TEST_EQUAL(
+    contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates, "Use setter and getter combination");
 }
-
 
 static void TestContourModelAPI()
 {
@@ -407,9 +374,8 @@ static void TestContourModelAPI()
 
   contour1->AddVertex(p1);
 
-  //adding vertices should always copy the content and not store pointers or references.
-  MITK_TEST_CONDITION( &p1 != &(contour1->GetVertexAt(0)->Coordinates), "copied point" );
-
+  // adding vertices should always copy the content and not store pointers or references.
+  MITK_TEST_CONDITION(&p1 != &(contour1->GetVertexAt(0)->Coordinates), "copied point");
 
   mitk::Point3D p2;
   p2[0] = -3;
@@ -418,15 +384,14 @@ static void TestContourModelAPI()
 
   contour1->AddVertex(p2);
 
-  //test use of setter and getter with const and non-const pointers
-  const mitk::ContourModel::VertexType* vertex = contour1->GetVertexAt(1);
+  // test use of setter and getter with const and non-const pointers
+  const mitk::ContourModel::VertexType *vertex = contour1->GetVertexAt(1);
 
   MITK_TEST_CONDITION(contour1->GetIndex(vertex) == 1, "Get index");
 
-  mitk::ContourModel::VertexType* nonConstVertex = const_cast<mitk::ContourModel::VertexType*>(vertex);
+  mitk::ContourModel::VertexType *nonConstVertex = const_cast<mitk::ContourModel::VertexType *>(vertex);
 
   MITK_TEST_CONDITION(contour1->GetIndex(nonConstVertex) == 1, "Get index non-const");
-
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
@@ -435,8 +400,7 @@ static void TestContourModelAPI()
   MITK_TEST_CONDITION(contour2->GetNumberOfVertices() == 1, "Add call with another contour");
 }
 
-
-int mitkContourModelTest(int /*argc*/, char* /*argv*/[])
+int mitkContourModelTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("mitkContourModelTest")
 

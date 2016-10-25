@@ -14,99 +14,72 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_PLANAR_SUBDIVISION_POLYGON_H_
 #define _MITK_PLANAR_SUBDIVISION_POLYGON_H_
 
 #include "mitkPlanarFigure.h"
-#include <MitkPlanarFigureExports.h>
 #include "mitkPlanarPolygon.h"
+#include <MitkPlanarFigureExports.h>
 
 namespace mitk
 {
-
-class PlaneGeometry;
-
-/**
- * \brief Implementation of PlanarFigure representing a polygon
- * with two or more control points
- */
-class MITKPLANARFIGURE_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
-{
-public:
-  mitkClassMacro( PlanarSubdivisionPolygon, PlanarFigure );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  /** \brief Subdivision Polygon has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const override
-  {
-    return 3;
-  }
-
-
-  /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const override
-  {
-    return 1000;
-  }
-
-  /** \brief How many times should we generate a round of subdivisions? */
-  unsigned int GetSubdivisionRounds() const
-  {
-      return m_SubdivisionRounds;
-  }
-
-  void SetSubdivisionRounds( int subdivisionRounds )
-  {
-    m_SubdivisionRounds = subdivisionRounds;
-  }
+  class PlaneGeometry;
 
   /**
-  * \brief Returns the id of the control-point that corresponds to the given
-  * polyline-point.
-  */
-  int GetControlPointForPolylinePoint( int indexOfPolylinePoint, int polyLineIndex ) const;
-
-
-  /** \brief Parameter w_tension defines the tension.
-   * the higher w_tension, the lower the "tension" on points.
-   * Rule: 0 < w_tension < 0.1
-   * 0.0625 (1 / 16) seems to be a good value.
+   * \brief Implementation of PlanarFigure representing a polygon
+   * with two or more control points
    */
-  float GetTensionParameter() const
+  class MITKPLANARFIGURE_EXPORT PlanarSubdivisionPolygon : public PlanarPolygon
   {
-      return m_TensionParameter;
-  }
+  public:
+    mitkClassMacro(PlanarSubdivisionPolygon, PlanarFigure);
 
-  void SetTensionParameter(float tensionParameter )
-  {
-    m_TensionParameter = tensionParameter;
-  }
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  std::vector<mitk::Point2D> CheckForLineIntersection( const Point2D& p1, const Point2D& p2 ) const;
+      /** \brief Subdivision Polygon has 3 control points per definition. */
+      unsigned int GetMinimumNumberOfControlPoints() const override
+    {
+      return 3;
+    }
 
-  void IncreaseSubdivisions();
-  void DecreaseSubdivisions();
+    /** \brief Polygon maximum number of control points is principally not limited. */
+    unsigned int GetMaximumNumberOfControlPoints() const override { return 1000; }
+    /** \brief How many times should we generate a round of subdivisions? */
+    unsigned int GetSubdivisionRounds() const { return m_SubdivisionRounds; }
+    void SetSubdivisionRounds(int subdivisionRounds) { m_SubdivisionRounds = subdivisionRounds; }
+    /**
+    * \brief Returns the id of the control-point that corresponds to the given
+    * polyline-point.
+    */
+    int GetControlPointForPolylinePoint(int indexOfPolylinePoint, int polyLineIndex) const;
 
-  virtual bool Equals(const mitk::PlanarFigure& other) const override;
+    /** \brief Parameter w_tension defines the tension.
+     * the higher w_tension, the lower the "tension" on points.
+     * Rule: 0 < w_tension < 0.1
+     * 0.0625 (1 / 16) seems to be a good value.
+     */
+    float GetTensionParameter() const { return m_TensionParameter; }
+    void SetTensionParameter(float tensionParameter) { m_TensionParameter = tensionParameter; }
+    std::vector<mitk::Point2D> CheckForLineIntersection(const Point2D &p1, const Point2D &p2) const;
 
-protected:
-  PlanarSubdivisionPolygon();
+    void IncreaseSubdivisions();
+    void DecreaseSubdivisions();
 
-  mitkCloneMacro(Self);
+    virtual bool Equals(const mitk::PlanarFigure &other) const override;
 
-  /** \brief Generates the poly-line representation of the planar figure. */
-  virtual void GeneratePolyLine() override;
+  protected:
+    PlanarSubdivisionPolygon();
 
-  float m_TensionParameter;
-  int m_SubdivisionRounds;
+    mitkCloneMacro(Self);
 
+    /** \brief Generates the poly-line representation of the planar figure. */
+    virtual void GeneratePolyLine() override;
 
-private:
+    float m_TensionParameter;
+    int m_SubdivisionRounds;
 
-};
+  private:
+  };
 
 } // namespace mitk
 

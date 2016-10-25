@@ -24,20 +24,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class AnnotationPropertySerializer : public BasePropertySerializer
-{
+  class AnnotationPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(AnnotationPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( AnnotationPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const AnnotationProperty* prop = dynamic_cast<const AnnotationProperty*>(m_Property.GetPointer()))
+      if (const AnnotationProperty *prop = dynamic_cast<const AnnotationProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("annotation");
+        auto element = new TiXmlElement("annotation");
         element->SetAttribute("label", prop->GetLabel());
         Point3D point = prop->GetPosition();
         element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
@@ -45,26 +42,28 @@ class AnnotationPropertySerializer : public BasePropertySerializer
         element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]));
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
-      const char* label( element->Attribute("label") );
+      if (!element)
+        return nullptr;
+      const char *label(element->Attribute("label"));
       std::string p_string[3];
-      if ( element->QueryStringAttribute( "x", &p_string[0] ) != TIXML_SUCCESS )
+      if (element->QueryStringAttribute("x", &p_string[0]) != TIXML_SUCCESS)
         return nullptr;
-      if ( element->QueryStringAttribute( "y", &p_string[1] ) != TIXML_SUCCESS )
+      if (element->QueryStringAttribute("y", &p_string[1]) != TIXML_SUCCESS)
         return nullptr;
-      if ( element->QueryStringAttribute( "z", &p_string[2] ) != TIXML_SUCCESS )
+      if (element->QueryStringAttribute("z", &p_string[2]) != TIXML_SUCCESS)
         return nullptr;
       Point3D p;
       try
       {
         StringsToNumbers<double>(3, p_string, p);
       }
-      catch (boost::bad_lexical_cast& e)
+      catch (boost::bad_lexical_cast &e)
       {
         MITK_ERROR << "Could not parse string as number: " << e.what();
         return nullptr;
@@ -74,10 +73,9 @@ class AnnotationPropertySerializer : public BasePropertySerializer
     }
 
   protected:
-
     AnnotationPropertySerializer() {}
     virtual ~AnnotationPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -85,4 +83,3 @@ class AnnotationPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(AnnotationPropertySerializer);
 
 #endif
-

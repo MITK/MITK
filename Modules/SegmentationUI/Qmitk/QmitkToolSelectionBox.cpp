@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkToolGUI.h"
 #include "mitkBaseRenderer.h"
 
-#include <qtoolbutton.h>
 #include <QList>
-#include <qtooltip.h>
-#include <qmessagebox.h>
-#include <qlayout.h>
 #include <qapplication.h>
+#include <qlayout.h>
+#include <qmessagebox.h>
+#include <qtoolbutton.h>
+#include <qtooltip.h>
 
 #include <queue>
 
@@ -34,22 +34,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkToolManagerProvider.h"
 
-QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* )
-:QWidget(parent),
- m_SelfCall(false),
- m_DisplayedGroups("default"),
- m_LayoutColumns(2),
- m_ShowNames(true),
- m_GenerateAccelerators(false),
- m_ToolGUIWidget(NULL),
- m_LastToolGUI(NULL),
- m_ToolButtonGroup(NULL),
- m_ButtonLayout(NULL),
- m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
+QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage *)
+  : QWidget(parent),
+    m_SelfCall(false),
+    m_DisplayedGroups("default"),
+    m_LayoutColumns(2),
+    m_ShowNames(true),
+    m_GenerateAccelerators(false),
+    m_ToolGUIWidget(NULL),
+    m_LastToolGUI(NULL),
+    m_ToolButtonGroup(NULL),
+    m_ButtonLayout(NULL),
+    m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
 {
   QFont currentFont = QWidget::font();
   currentFont.setBold(true);
-  QWidget::setFont( currentFont );
+  QWidget::setFont(currentFont);
 
   m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
@@ -57,37 +57,42 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage*
   // QButtonGroup
   m_ToolButtonGroup = new QButtonGroup(this);
   // some features of QButtonGroup
-  m_ToolButtonGroup->setExclusive( false ); // mutually exclusive toggle buttons
+  m_ToolButtonGroup->setExclusive(false); // mutually exclusive toggle buttons
 
   RecreateButtons();
 
   QWidget::setContentsMargins(0, 0, 0, 0);
-  if ( layout() != NULL )
+  if (layout() != NULL)
   {
     layout()->setContentsMargins(0, 0, 0, 0);
   }
 
   // reactions to signals
-  connect( m_ToolButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(toolButtonClicked(int)) );
+  connect(m_ToolButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(toolButtonClicked(int)));
 
   // reactions to ToolManager events
 
-  m_ToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
-  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ActiveToolChanged +=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerToolModified);
+  m_ToolManager->ReferenceDataChanged +=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged +=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
   // show active tool
   SetOrUnsetButtonForActiveTool();
 
-  QWidget::setEnabled( false );
+  QWidget::setEnabled(false);
 }
 
 QmitkToolSelectionBox::~QmitkToolSelectionBox()
 {
-  m_ToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
-  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
-
+  m_ToolManager->ActiveToolChanged -=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerToolModified);
+  m_ToolManager->ReferenceDataChanged -=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged -=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 }
 
 void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
@@ -96,19 +101,23 @@ void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
   SetGUIEnabledAccordingToToolManagerState();
 }
 
-mitk::ToolManager* QmitkToolSelectionBox::GetToolManager()
+mitk::ToolManager *QmitkToolSelectionBox::GetToolManager()
 {
   return m_ToolManager;
 }
 
-void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no NULL pointer allowed here, a manager is required
+void QmitkToolSelectionBox::SetToolManager(
+  mitk::ToolManager &newManager) // no NULL pointer allowed here, a manager is required
 {
   // say bye to the old manager
-  m_ToolManager->ActiveToolChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
-  m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ActiveToolChanged -=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerToolModified);
+  m_ToolManager->ReferenceDataChanged -=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged -=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
-  if ( QWidget::isEnabled() )
+  if (QWidget::isEnabled())
   {
     m_ToolManager->UnregisterClient();
   }
@@ -117,11 +126,14 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
   RecreateButtons();
 
   // greet the new one
-  m_ToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerToolModified );
-  m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified );
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified );
+  m_ToolManager->ActiveToolChanged +=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerToolModified);
+  m_ToolManager->ReferenceDataChanged +=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
+  m_ToolManager->WorkingDataChanged +=
+    mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
 
-  if ( QWidget::isEnabled() )
+  if (QWidget::isEnabled())
   {
     m_ToolManager->RegisterClient();
   }
@@ -132,16 +144,20 @@ void QmitkToolSelectionBox::SetToolManager(mitk::ToolManager& newManager) // no 
 
 void QmitkToolSelectionBox::toolButtonClicked(int id)
 {
-  if ( !QWidget::isEnabled() ) return; // this method could be triggered from the constructor, when we are still disabled
+  if (!QWidget::isEnabled())
+    return; // this method could be triggered from the constructor, when we are still disabled
 
   MITK_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
 
-  //QToolButton* toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find(id) );
-  QToolButton* toolButton = dynamic_cast<QToolButton*>( m_ToolButtonGroup->buttons().at(id) );
+  // QToolButton* toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find(id) );
+  QToolButton *toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(id));
   if (toolButton)
   {
-    if (    (m_ButtonIDForToolID.find( m_ToolManager->GetActiveToolID() ) != m_ButtonIDForToolID.end()) // if we have this tool in our box
-         && (m_ButtonIDForToolID[ m_ToolManager->GetActiveToolID() ] == id) ) // the tool corresponding to this button is already active
+    if ((m_ButtonIDForToolID.find(m_ToolManager->GetActiveToolID()) !=
+         m_ButtonIDForToolID.end()) // if we have this tool in our box
+        &&
+        (m_ButtonIDForToolID[m_ToolManager->GetActiveToolID()] ==
+         id)) // the tool corresponding to this button is already active
     {
       // disable this button, disable all tools
       // mmueller
@@ -153,12 +169,11 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
       // enable the corresponding tool
       m_SelfCall = true;
 
-      m_ToolManager->ActivateTool( m_ToolIDForButtonID[id] );
+      m_ToolManager->ActivateTool(m_ToolIDForButtonID[id]);
 
       m_SelfCall = false;
     }
   }
-
 }
 
 void QmitkToolSelectionBox::OnToolManagerToolModified()
@@ -168,60 +183,60 @@ void QmitkToolSelectionBox::OnToolManagerToolModified()
 
 void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
 {
-  // we want to emit a signal in any case, whether we selected ourselves or somebody else changes "our" tool manager. --> emit before check on m_SelfCall
+  // we want to emit a signal in any case, whether we selected ourselves or somebody else changes "our" tool manager.
+  // --> emit before check on m_SelfCall
   int id = m_ToolManager->GetActiveToolID();
 
   // don't emit signal for shape model tools
   bool emitSignal = true;
-  mitk::Tool* tool = m_ToolManager->GetActiveTool();
-  if(tool && std::string(tool->GetGroup()) == "organ_segmentation")
+  mitk::Tool *tool = m_ToolManager->GetActiveTool();
+  if (tool && std::string(tool->GetGroup()) == "organ_segmentation")
     emitSignal = false;
 
-  if(emitSignal)
+  if (emitSignal)
     emit ToolSelected(id);
 
   // delete old GUI (if any)
-  if ( m_LastToolGUI && m_ToolGUIWidget )
+  if (m_LastToolGUI && m_ToolGUIWidget)
   {
     if (m_ToolGUIWidget->layout())
     {
       m_ToolGUIWidget->layout()->removeWidget(m_LastToolGUI);
     }
 
-
-    //m_LastToolGUI->reparent(NULL, QPoint(0,0));
+    // m_LastToolGUI->reparent(NULL, QPoint(0,0));
     // TODO: reparent <-> setParent, Daniel fragen
     m_LastToolGUI->setParent(0);
     delete m_LastToolGUI; // will hopefully notify parent and layouts
     m_LastToolGUI = NULL;
 
-    QLayout* layout = m_ToolGUIWidget->layout();
+    QLayout *layout = m_ToolGUIWidget->layout();
     if (layout)
     {
       layout->activate();
     }
   }
 
-  QToolButton* toolButton(NULL);
-  //mitk::Tool* tool = m_ToolManager->GetActiveTool();
+  QToolButton *toolButton(NULL);
+  // mitk::Tool* tool = m_ToolManager->GetActiveTool();
 
   if (m_ButtonIDForToolID.find(id) != m_ButtonIDForToolID.end()) // if this tool is in our box
   {
-    //toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find( m_ButtonIDForToolID[id] ) );
-    toolButton = dynamic_cast<QToolButton*>( m_ToolButtonGroup->buttons().at( m_ButtonIDForToolID[id] ) );
+    // toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find( m_ButtonIDForToolID[id] ) );
+    toolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->buttons().at(m_ButtonIDForToolID[id]));
   }
 
-  if ( toolButton )
+  if (toolButton)
   {
     // mmueller
     // uncheck all other buttons
-    QAbstractButton* tmpBtn = 0;
-    QList<QAbstractButton*>::iterator it;
-    for(int i=0; i < m_ToolButtonGroup->buttons().size(); ++i)
+    QAbstractButton *tmpBtn = 0;
+    QList<QAbstractButton *>::iterator it;
+    for (int i = 0; i < m_ToolButtonGroup->buttons().size(); ++i)
     {
       tmpBtn = m_ToolButtonGroup->buttons().at(i);
-      if(tmpBtn != toolButton)
-        dynamic_cast<QToolButton*>( tmpBtn )->setChecked(false);
+      if (tmpBtn != toolButton)
+        dynamic_cast<QToolButton *>(tmpBtn)->setChecked(false);
     }
 
     toolButton->setChecked(true);
@@ -230,30 +245,30 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
     {
       // create and reparent new GUI (if any)
       itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI").GetPointer(); // prefix and postfix
-      QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
+      QmitkToolGUI *gui = dynamic_cast<QmitkToolGUI *>(possibleGUI.GetPointer());
 
       //!
       m_LastToolGUI = gui;
       if (gui)
       {
-        gui->SetTool( tool );
+        gui->SetTool(tool);
 
         // mmueller
-        //gui->reparent(m_ToolGUIWidget, gui->geometry().topLeft(), true );
+        // gui->reparent(m_ToolGUIWidget, gui->geometry().topLeft(), true );
         gui->setParent(m_ToolGUIWidget);
         gui->move(gui->geometry().topLeft());
         gui->show();
 
-        QLayout* layout = m_ToolGUIWidget->layout();
+        QLayout *layout = m_ToolGUIWidget->layout();
         if (!layout)
         {
-          layout = new QVBoxLayout( m_ToolGUIWidget );
+          layout = new QVBoxLayout(m_ToolGUIWidget);
         }
         if (layout)
         {
           // mmueller
-          layout->addWidget( gui );
-          //layout->add( gui );
+          layout->addWidget(gui);
+          // layout->add( gui );
           layout->activate();
         }
       }
@@ -262,20 +277,22 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   else
   {
     // disable all buttons
-    QToolButton* selectedToolButton = dynamic_cast<QToolButton*>( m_ToolButtonGroup->checkedButton() );
-    //QToolButton* selectedToolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find( Q3ButtonGroup::selectedId() ) );
+    QToolButton *selectedToolButton = dynamic_cast<QToolButton *>(m_ToolButtonGroup->checkedButton());
+    // QToolButton* selectedToolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find( Q3ButtonGroup::selectedId() )
+    // );
     if (selectedToolButton)
     {
       // mmueller
       selectedToolButton->setChecked(false);
-      //selectedToolButton->setOn(false);
+      // selectedToolButton->setOn(false);
     }
   }
 }
 
 void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
 {
-  if (m_SelfCall) return;
+  if (m_SelfCall)
+    return;
 
   MITK_DEBUG << "OnToolManagerReferenceDataModified()";
 
@@ -284,7 +301,8 @@ void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
 
 void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 {
-  if (m_SelfCall) return;
+  if (m_SelfCall)
+    return;
 
   MITK_DEBUG << "OnToolManagerWorkingDataModified()";
 
@@ -296,21 +314,24 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 */
 void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
-  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataNode *referenceNode = m_ToolManager->GetReferenceData(0);
+  mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
 
-  //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
+  // MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode
+  // << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
   bool enabled = true;
 
-  switch ( m_EnabledMode )
+  switch (m_EnabledMode)
   {
     default:
     case EnabledWithReferenceAndWorkingDataVisible:
-      enabled = referenceNode && workingNode
-                  && referenceNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))
-                  && workingNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")))
-                  && isVisible();
+      enabled = referenceNode && workingNode &&
+                referenceNode->IsVisible(
+                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))) &&
+                workingNode->IsVisible(
+                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))) &&
+                isVisible();
       break;
     case EnabledWithReferenceData:
       enabled = referenceNode && isVisible();
@@ -323,9 +344,10 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
       break;
   }
 
-  if ( QWidget::isEnabled() == enabled ) return; // nothing to change
+  if (QWidget::isEnabled() == enabled)
+    return; // nothing to change
 
-  QWidget::setEnabled( enabled );
+  QWidget::setEnabled(enabled);
   if (enabled)
   {
     m_ToolManager->RegisterClient();
@@ -340,21 +362,20 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 
     emit ToolSelected(-1);
   }
-
 }
 
 /**
  External enableization...
 */
-void QmitkToolSelectionBox::setEnabled( bool /*enable*/ )
+void QmitkToolSelectionBox::setEnabled(bool /*enable*/)
 {
   SetGUIEnabledAccordingToToolManagerState();
 }
 
-
 void QmitkToolSelectionBox::RecreateButtons()
 {
-  if (m_ToolManager.IsNull()) return;
+  if (m_ToolManager.IsNull())
+    return;
 
   /*
   // remove all buttons that are there
@@ -379,13 +400,13 @@ void QmitkToolSelectionBox::RecreateButtons()
   QList<QAbstractButton *> l = m_ToolButtonGroup->buttons();
   // remove all buttons that are there
   QList<QAbstractButton *>::iterator it;
-  QAbstractButton * btn;
+  QAbstractButton *btn;
 
-  for(it=l.begin(); it!=l.end();++it)
+  for (it = l.begin(); it != l.end(); ++it)
   {
     btn = *it;
     m_ToolButtonGroup->removeButton(btn);
-    //this->removeChild(btn);
+    // this->removeChild(btn);
     delete btn;
   }
   // end mmueller Qt impl
@@ -393,57 +414,56 @@ void QmitkToolSelectionBox::RecreateButtons()
   mitk::ToolManager::ToolVectorTypeConst allPossibleTools = m_ToolManager->GetTools();
   mitk::ToolManager::ToolVectorTypeConst allTools;
 
-  typedef std::pair< std::string::size_type, const mitk::Tool* > SortPairType;
-  typedef std::priority_queue< SortPairType > SortedToolQueueType;
+  typedef std::pair<std::string::size_type, const mitk::Tool *> SortPairType;
+  typedef std::priority_queue<SortPairType> SortedToolQueueType;
   SortedToolQueueType toolPositions;
 
   // clear and sort all tools
   // step one: find name/group of all tools in m_DisplayedGroups string. remember these positions for all tools.
-  for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allPossibleTools.begin();
-        iter != allPossibleTools.end();
-        ++iter)
+  for (mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allPossibleTools.begin();
+       iter != allPossibleTools.end();
+       ++iter)
   {
-    const mitk::Tool* tool = *iter;
+    const mitk::Tool *tool = *iter;
 
-    std::string::size_type namePos =  m_DisplayedGroups.find( std::string("'") + tool->GetName() + "'" );
-    std::string::size_type groupPos = m_DisplayedGroups.find( std::string("'") + tool->GetGroup() + "'" );
+    std::string::size_type namePos = m_DisplayedGroups.find(std::string("'") + tool->GetName() + "'");
+    std::string::size_type groupPos = m_DisplayedGroups.find(std::string("'") + tool->GetGroup() + "'");
 
-    if ( !m_DisplayedGroups.empty() && namePos == std::string::npos && groupPos == std::string::npos ) continue; // skip
+    if (!m_DisplayedGroups.empty() && namePos == std::string::npos && groupPos == std::string::npos)
+      continue; // skip
 
-    if ( m_DisplayedGroups.empty() && std::string(tool->GetName()).length() > 0 )
+    if (m_DisplayedGroups.empty() && std::string(tool->GetName()).length() > 0)
     {
-      namePos = static_cast<std::string::size_type> (tool->GetName()[0]);
+      namePos = static_cast<std::string::size_type>(tool->GetName()[0]);
     }
 
-    SortPairType thisPair = std::make_pair( namePos < groupPos ? namePos : groupPos, *iter );
-    toolPositions.push( thisPair );
+    SortPairType thisPair = std::make_pair(namePos < groupPos ? namePos : groupPos, *iter);
+    toolPositions.push(thisPair);
   }
 
   // step two: sort tools according to previously found positions in m_DisplayedGroups
   MITK_DEBUG << "Sorting order of tools (lower number --> earlier in button group)";
-  while ( !toolPositions.empty() )
+  while (!toolPositions.empty())
   {
     SortPairType thisPair = toolPositions.top();
     MITK_DEBUG << "Position " << thisPair.first << " : " << thisPair.second->GetName();
 
-    allTools.push_back( thisPair.second );
+    allTools.push_back(thisPair.second);
     toolPositions.pop();
   }
-  std::reverse( allTools.begin(), allTools.end() );
+  std::reverse(allTools.begin(), allTools.end());
 
   MITK_DEBUG << "Sorted tools:";
-  for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
-        iter != allTools.end();
-        ++iter)
+  for (mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin(); iter != allTools.end(); ++iter)
   {
     MITK_DEBUG << (*iter)->GetName();
   }
 
   // try to change layout... bad?
-  //Q3GroupBox::setColumnLayout ( m_LayoutColumns, Qt::Horizontal );
+  // Q3GroupBox::setColumnLayout ( m_LayoutColumns, Qt::Horizontal );
   // mmueller using gridlayout instead of Q3GroupBox
-  //this->setLayout(0);
-  if(m_ButtonLayout == NULL)
+  // this->setLayout(0);
+  if (m_ButtonLayout == NULL)
     m_ButtonLayout = new QGridLayout;
   /*else
     delete m_ButtonLayout;*/
@@ -454,20 +474,18 @@ void QmitkToolSelectionBox::RecreateButtons()
   int currentButtonID(0);
   m_ButtonIDForToolID.clear();
   m_ToolIDForButtonID.clear();
-  QToolButton* button = 0;
+  QToolButton *button = 0;
 
   MITK_DEBUG << "Creating buttons for tools";
   // fill group box with buttons
-  for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
-        iter != allTools.end();
-        ++iter)
+  for (mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin(); iter != allTools.end(); ++iter)
   {
-    const mitk::Tool* tool = *iter;
-    int currentToolID( m_ToolManager->GetToolID( tool ) );
+    const mitk::Tool *tool = *iter;
+    int currentToolID(m_ToolManager->GetToolID(tool));
 
     ++column;
     // new line if we are at the maximum columns
-    if(column == m_LayoutColumns)
+    if (column == m_LayoutColumns)
     {
       ++row;
       column = 0;
@@ -484,22 +502,22 @@ void QmitkToolSelectionBox::RecreateButtons()
 
     if (m_LayoutColumns == 1)
     {
-      //button->setTextPosition( QToolButton::BesideIcon );
+      // button->setTextPosition( QToolButton::BesideIcon );
       // mmueller
-      button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+      button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     }
     else
     {
-      //button->setTextPosition( QToolButton::BelowIcon );
+      // button->setTextPosition( QToolButton::BelowIcon );
       // mmueller
-      button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );
+      button->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     }
 
-    //button->setToggleButton( true );
+    // button->setToggleButton( true );
     // mmueller
-    button->setCheckable ( true );
+    button->setCheckable(true);
 
-    if(currentToolID == m_ToolManager->GetActiveToolID())
+    if (currentToolID == m_ToolManager->GetActiveToolID())
       button->setChecked(true);
 
     QString label;
@@ -509,9 +527,10 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     label += tool->GetName();
     QString tooltip = tool->GetName();
-    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '" << tooltip.toLocal8Bit().constData();
+    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '"
+               << tooltip.toLocal8Bit().constData();
 
-    if ( m_ShowNames )
+    if (m_ShowNames)
     {
       /*
       button->setUsesTextLabel(true);
@@ -519,13 +538,13 @@ void QmitkToolSelectionBox::RecreateButtons()
       QToolTip::add( button, tooltip );
       */
       // mmueller Qt
-      button->setText( label );              // a label
-      button->setToolTip( tooltip );
+      button->setText(label); // a label
+      button->setToolTip(tooltip);
       // mmueller
 
       QFont currentFont = button->font();
       currentFont.setBold(false);
-      button->setFont( currentFont );
+      button->setFont(currentFont);
     }
 
     us::ModuleResource iconResource = tool->GetIconResource();
@@ -541,11 +560,11 @@ void QmitkToolSelectionBox::RecreateButtons()
       std::ios::pos_type length = resourceStream.tellg();
       resourceStream.seekg(0, std::ios::beg);
 
-      char* data = new char[length];
+      char *data = new char[length];
       resourceStream.read(data, length);
       QPixmap pixmap;
       pixmap.loadFromData(QByteArray::fromRawData(data, length));
-      QIcon* icon = new QIcon(pixmap);
+      QIcon *icon = new QIcon(pixmap);
       delete[] data;
 
       button->setIcon(*icon);
@@ -562,19 +581,20 @@ void QmitkToolSelectionBox::RecreateButtons()
       else
       {
         button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        button->setIconSize(QSize(32,32));
+        button->setIconSize(QSize(32, 32));
         button->setToolTip(tooltip);
       }
     }
 
     if (m_GenerateAccelerators)
     {
-      QString firstLetter = QString( tool->GetName() );
-      firstLetter.truncate( 1 );
-      button->setShortcut( firstLetter );                      // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
+      QString firstLetter = QString(tool->GetName());
+      firstLetter.truncate(1);
+      button->setShortcut(
+        firstLetter); // a keyboard shortcut (just the first letter of the given name w/o any CTRL or something)
     }
 
-    mitk::DataNode* dataNode = m_ToolManager->GetReferenceData(0);
+    mitk::DataNode *dataNode = m_ToolManager->GetReferenceData(0);
 
     if (dataNode != NULL && !tool->CanHandle(dataNode->GetData()))
       button->setEnabled(false);
@@ -585,16 +605,21 @@ void QmitkToolSelectionBox::RecreateButtons()
     MITK_DEBUG << "m_ButtonIDForToolID[" << currentToolID << "] == " << currentButtonID;
     MITK_DEBUG << "m_ToolIDForButtonID[" << currentButtonID << "] == " << currentToolID;
 
-    tool->GUIProcessEventsMessage += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
-    tool->ErrorMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
-    tool->GeneralMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnGeneralToolMessage );
+    tool->GUIProcessEventsMessage += mitk::MessageDelegate<QmitkToolSelectionBox>(
+      this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage); // will never add a listener twice, so we don't have
+                                                                    // to check here
+    tool->ErrorMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>(
+      this,
+      &QmitkToolSelectionBox::OnToolErrorMessage); // will never add a listener twice, so we don't have to check here
+    tool->GeneralMessage +=
+      mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>(this, &QmitkToolSelectionBox::OnGeneralToolMessage);
 
     ++currentButtonID;
   }
   // setting grid layout for this groupbox
   this->setLayout(m_ButtonLayout);
 
-  //this->update();
+  // this->update();
 }
 
 void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
@@ -604,21 +629,23 @@ void QmitkToolSelectionBox::OnToolGUIProcessEventsMessage()
 
 void QmitkToolSelectionBox::OnToolErrorMessage(std::string s)
 {
-  QMessageBox::critical(this, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+  QMessageBox::critical(
+    this, "MITK", QString(s.c_str()), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
 void QmitkToolSelectionBox::OnGeneralToolMessage(std::string s)
 {
-  QMessageBox::information(this, "MITK", QString( s.c_str() ), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+  QMessageBox::information(
+    this, "MITK", QString(s.c_str()), QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
 }
 
-void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string& toolGroups)
+void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string &toolGroups)
 {
   if (m_DisplayedGroups != toolGroups)
   {
     QString q_DisplayedGroups = toolGroups.c_str();
     // quote all unquoted single words
-    q_DisplayedGroups = q_DisplayedGroups.replace( QRegExp("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'" );
+    q_DisplayedGroups = q_DisplayedGroups.replace(QRegExp("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'");
     MITK_DEBUG << "m_DisplayedGroups was \"" << toolGroups << "\"";
 
     m_DisplayedGroups = q_DisplayedGroups.toLocal8Bit().constData();
@@ -656,22 +683,22 @@ void QmitkToolSelectionBox::SetGenerateAccelerators(bool accel)
   }
 }
 
-void QmitkToolSelectionBox::SetToolGUIArea( QWidget* parentWidget )
+void QmitkToolSelectionBox::SetToolGUIArea(QWidget *parentWidget)
 {
   m_ToolGUIWidget = parentWidget;
 }
 
-void QmitkToolSelectionBox::setTitle( const QString& /*title*/ )
+void QmitkToolSelectionBox::setTitle(const QString & /*title*/)
 {
 }
 
-void QmitkToolSelectionBox::showEvent( QShowEvent* e )
+void QmitkToolSelectionBox::showEvent(QShowEvent *e)
 {
   QWidget::showEvent(e);
   SetGUIEnabledAccordingToToolManagerState();
 }
 
-void QmitkToolSelectionBox::hideEvent( QHideEvent* e )
+void QmitkToolSelectionBox::hideEvent(QHideEvent *e)
 {
   QWidget::hideEvent(e);
   SetGUIEnabledAccordingToToolManagerState();

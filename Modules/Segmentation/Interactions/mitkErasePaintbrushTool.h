@@ -20,52 +20,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPaintbrushTool.h"
 #include <MitkSegmentationExports.h>
 
-namespace us {
-class ModuleResource;
+namespace us
+{
+  class ModuleResource;
 }
 
 namespace mitk
 {
+  /**
+   \brief Paintbrush tool for InteractiveSegmentation
 
- /**
-  \brief Paintbrush tool for InteractiveSegmentation
+   \sa FeedbackContourTool
+   \sa ExtractImageFilter
+   \sa OverwriteSliceImageFilter
 
-  \sa FeedbackContourTool
-  \sa ExtractImageFilter
-  \sa OverwriteSliceImageFilter
+   \ingroup Interaction
+   \ingroup ToolManagerEtAl
 
-  \ingroup Interaction
-  \ingroup ToolManagerEtAl
+   Simple paintbrush drawing tool. Right now there are only circular pens of varying size.
 
-  Simple paintbrush drawing tool. Right now there are only circular pens of varying size.
+   This class specified only the drawing "color" for the super class PaintbrushTool.
 
-  This class specified only the drawing "color" for the super class PaintbrushTool.
-
-  \warning Only to be instantiated by mitk::ToolManager.
-  $Author: maleike $
-*/
-class MITKSEGMENTATION_EXPORT ErasePaintbrushTool : public PaintbrushTool
-{
+   \warning Only to be instantiated by mitk::ToolManager.
+   $Author: maleike $
+ */
+  class MITKSEGMENTATION_EXPORT ErasePaintbrushTool : public PaintbrushTool
+  {
   public:
-
     mitkClassMacro(ErasePaintbrushTool, PaintbrushTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const override;
+      virtual const char **GetXPM() const override;
     virtual us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const override;
+    virtual const char *GetName() const override;
 
   protected:
-
     ErasePaintbrushTool(); // purposely hidden
     virtual ~ErasePaintbrushTool();
-
-};
+  };
 
 } // namespace
 
 #endif
-

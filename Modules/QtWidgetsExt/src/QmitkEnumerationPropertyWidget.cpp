@@ -16,27 +16,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkEnumerationPropertyWidget.h"
 
-#include <mitkPropertyObserver.h>
 #include <mitkEnumerationProperty.h>
+#include <mitkPropertyObserver.h>
 
 class _EnumPropEditorImpl : public mitk::PropertyEditor
 {
-
 public:
-
-  _EnumPropEditorImpl(mitk::EnumerationProperty* property,
-                                     QComboBox* combo, const QHash<int, int>& enumIdToItemIndex)
-    : PropertyEditor(property), m_EnumerationProperty(property), m_ComboBox(combo),
-    m_EnumIdToItemIndex(enumIdToItemIndex)
+  _EnumPropEditorImpl(mitk::EnumerationProperty *property, QComboBox *combo, const QHash<int, int> &enumIdToItemIndex)
+    : PropertyEditor(property),
+      m_EnumerationProperty(property),
+      m_ComboBox(combo),
+      m_EnumIdToItemIndex(enumIdToItemIndex)
   {
-
   }
 
-  ~_EnumPropEditorImpl()
-  {
-    m_EnumerationProperty = nullptr;
-  }
-
+  ~_EnumPropEditorImpl() { m_EnumerationProperty = nullptr; }
   void IndexChanged(int enumId)
   {
     this->BeginModifyProperty();
@@ -60,15 +54,12 @@ public:
   }
 
 protected:
-
-  mitk::EnumerationProperty* m_EnumerationProperty;
-  QComboBox* m_ComboBox;
+  mitk::EnumerationProperty *m_EnumerationProperty;
+  QComboBox *m_ComboBox;
   QHash<int, int> m_EnumIdToItemIndex;
 };
 
-
-QmitkEnumerationPropertyWidget::QmitkEnumerationPropertyWidget(QWidget* parent)
-: QComboBox(parent), propView(nullptr)
+QmitkEnumerationPropertyWidget::QmitkEnumerationPropertyWidget(QWidget *parent) : QComboBox(parent), propView(nullptr)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnIndexChanged(int)));
 }
@@ -78,9 +69,9 @@ QmitkEnumerationPropertyWidget::~QmitkEnumerationPropertyWidget()
   delete propView;
 }
 
-void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* property)
+void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty *property)
 {
-  if(propView)
+  if (propView)
   {
     delete propView;
     propView = nullptr;
@@ -88,19 +79,18 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
 
   this->clear();
 
-  if(!property)
+  if (!property)
   {
     return;
   }
 
   this->setEnabled(true);
 
-  QHash<int,int> enumIdToItemIndex;
+  QHash<int, int> enumIdToItemIndex;
 
-  const mitk::EnumerationProperty::EnumStringsContainerType& strings = property->GetEnumStrings();
+  const mitk::EnumerationProperty::EnumStringsContainerType &strings = property->GetEnumStrings();
   int index = 0;
-  for (auto it = strings.begin();
-       it != strings.end(); ++it, ++index)
+  for (auto it = strings.begin(); it != strings.end(); ++it, ++index)
   {
     enumIdToItemIndex.insert(it->second, index);
     this->addItem(QString::fromStdString(it->first), it->second);
@@ -110,12 +100,11 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
   propView->PropertyChanged();
 }
 
- void QmitkEnumerationPropertyWidget::OnIndexChanged(int index)
- {
-   if (propView)
-   {
-     int enumIndex = this->itemData(index, Qt::UserRole).toInt();
-     propView->IndexChanged(enumIndex);
-   }
- }
-
+void QmitkEnumerationPropertyWidget::OnIndexChanged(int index)
+{
+  if (propView)
+  {
+    int enumIndex = this->itemData(index, Qt::UserRole).toInt();
+    propView->IndexChanged(enumIndex);
+  }
+}

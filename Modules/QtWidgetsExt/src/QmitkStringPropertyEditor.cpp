@@ -15,13 +15,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkStringPropertyEditor.h"
 
-QmitkStringPropertyEditor::QmitkStringPropertyEditor( mitk::StringProperty* property, QWidget* parent )
-: QLineEdit( parent ),
-  PropertyEditor( property ),
-  m_StringProperty(property)
+QmitkStringPropertyEditor::QmitkStringPropertyEditor(mitk::StringProperty *property, QWidget *parent)
+  : QLineEdit(parent), PropertyEditor(property), m_StringProperty(property)
 {
   PropertyChanged();
-  connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(onTextChanged(const QString&)));
+  connect(this, SIGNAL(textChanged(const QString &)), this, SLOT(onTextChanged(const QString &)));
 }
 
 QmitkStringPropertyEditor::~QmitkStringPropertyEditor()
@@ -30,8 +28,8 @@ QmitkStringPropertyEditor::~QmitkStringPropertyEditor()
 
 void QmitkStringPropertyEditor::PropertyChanged()
 {
-  if ( m_Property )
-    setText( m_StringProperty->GetValue() );
+  if (m_Property)
+    setText(m_StringProperty->GetValue());
 }
 
 void QmitkStringPropertyEditor::PropertyRemoved()
@@ -41,15 +39,14 @@ void QmitkStringPropertyEditor::PropertyRemoved()
   setText("n/a");
 }
 
-void QmitkStringPropertyEditor::onTextChanged(const QString& text)
+void QmitkStringPropertyEditor::onTextChanged(const QString &text)
 {
-  if( m_StringProperty == nullptr )
+  if (m_StringProperty == nullptr)
     return;
 
-  BeginModifyProperty();  // deregister from events
+  BeginModifyProperty(); // deregister from events
 
   m_StringProperty->SetValue(text.toStdString());
 
-  EndModifyProperty();  // again register for events
+  EndModifyProperty(); // again register for events
 }
-

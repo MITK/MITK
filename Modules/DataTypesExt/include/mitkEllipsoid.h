@@ -14,32 +14,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKELLIPSEDATA_H_HEADER_INCLUDED
 #define MITKELLIPSEDATA_H_HEADER_INCLUDED
 
-#include "mitkBoundingObject.h"
 #include "MitkDataTypesExtExports.h"
+#include "mitkBoundingObject.h"
 
-namespace mitk {
-
-//##Documentation
-//## @brief Data class containing an ellipsoid
-//## @ingroup Data
-class MITKDATATYPESEXT_EXPORT Ellipsoid : public BoundingObject
+namespace mitk
 {
-public:
-  mitkClassMacro(Ellipsoid, BoundingObject);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  //##Documentation
+  //## @brief Data class containing an ellipsoid
+  //## @ingroup Data
+  class MITKDATATYPESEXT_EXPORT Ellipsoid : public BoundingObject
+  {
+  public:
+    mitkClassMacro(Ellipsoid, BoundingObject);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  virtual mitk::ScalarType GetVolume() override;
-  virtual bool IsInside(const Point3D& p) const override;
+      virtual mitk::ScalarType GetVolume() override;
+    virtual bool IsInside(const Point3D &p) const override;
 
-protected:
-  Ellipsoid();
-  virtual ~Ellipsoid();
-};
-
+  protected:
+    Ellipsoid();
+    virtual ~Ellipsoid();
+  };
 }
 #endif /* MITKELLIPSEDATA_H_HEADER_INCLUDED */

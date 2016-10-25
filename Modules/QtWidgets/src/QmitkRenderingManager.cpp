@@ -16,79 +16,55 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRenderingManager.h"
 
-
-#include "mitkGeometry3D.h"
 #include "mitkBaseRenderer.h"
+#include "mitkGeometry3D.h"
 #include "mitkSliceNavigationController.h"
 
 #include <QApplication>
 #include <QTimer>
 
-
-QmitkRenderingManager
-::QmitkRenderingManager()
+QmitkRenderingManager::QmitkRenderingManager()
 {
-  pendingTimerCallbacks=0;
+  pendingTimerCallbacks = 0;
 }
 
-
-void
-QmitkRenderingManager
-::DoMonitorRendering()
-{
-
-}
-
-
-void
-QmitkRenderingManager
-::DoFinishAbortRendering()
-{
-
-}
-
-
-QmitkRenderingManager
-::~QmitkRenderingManager()
+void QmitkRenderingManager::DoMonitorRendering()
 {
 }
 
-
-void
-QmitkRenderingManager
-::GenerateRenderingRequestEvent()
+void QmitkRenderingManager::DoFinishAbortRendering()
 {
-  QApplication::postEvent( this, new QmitkRenderingRequestEvent );
 }
 
+QmitkRenderingManager::~QmitkRenderingManager()
+{
+}
 
-void
-QmitkRenderingManager
-::StartOrResetTimer()
+void QmitkRenderingManager::GenerateRenderingRequestEvent()
+{
+  QApplication::postEvent(this, new QmitkRenderingRequestEvent);
+}
+
+void QmitkRenderingManager::StartOrResetTimer()
 {
   QTimer::singleShot(200, this, SLOT(TimerCallback()));
   pendingTimerCallbacks++;
 }
 
-void
-QmitkRenderingManager
-::TimerCallback()
+void QmitkRenderingManager::TimerCallback()
 {
-  if(!--pendingTimerCallbacks)
+  if (!--pendingTimerCallbacks)
     this->ExecutePendingHighResRenderingRequest();
 }
 
-bool
-QmitkRenderingManager
-::event( QEvent *event )
+bool QmitkRenderingManager::event(QEvent *event)
 {
-  if ( event->type() == (QEvent::Type) QmitkRenderingRequestEvent::RenderingRequest )
-{
+  if (event->type() == (QEvent::Type)QmitkRenderingRequestEvent::RenderingRequest)
+  {
     // Directly process all pending rendering requests
     this->ExecutePendingRequests();
     return true;
-}
+  }
 
   return false;
 }
-

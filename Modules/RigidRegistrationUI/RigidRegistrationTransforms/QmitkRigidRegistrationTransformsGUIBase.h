@@ -17,16 +17,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkRigidRegistrationTransformsGUIBaseH
 #define QmitkRigidRegistrationTransformsGUIBaseH
 
-#include <QWidget>
 #include "MitkRigidRegistrationUIExports.h"
+#include "mitkImage.h"
+#include "mitkOptimizerParameters.h"
+#include "mitkTransformParameters.h"
+#include <QString>
+#include <QWidget>
 #include <itkArray.h>
 #include <itkObject.h>
-#include "mitkImage.h"
-#include <QString>
-#include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
-#include "mitkTransformParameters.h"
-#include "mitkOptimizerParameters.h"
+#include <vtkTransform.h>
 
 /*!
 * \brief Widget for rigid registration
@@ -35,10 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationTransformsGUIBase : public QWidget
 {
-
 public:
-
-  QmitkRigidRegistrationTransformsGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkRigidRegistrationTransformsGUIBase(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationTransformsGUIBase();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() = 0;
@@ -55,21 +53,19 @@ public:
 
   virtual QString GetName() = 0;
 
-  virtual void SetupUI(QWidget* parent) = 0;
+  virtual void SetupUI(QWidget *parent) = 0;
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams) = 0;
+  virtual vtkTransform *Transform(vtkMatrix4x4 *vtkmatrix,
+                                  vtkTransform *vtktransform,
+                                  itk::Array<double> transformParams) = 0;
 
   void SetFixedImage(mitk::Image::Pointer fixedImage);
 
   void SetMovingImage(mitk::Image::Pointer movingImage);
 
-
-
 protected:
-
   mitk::Image::Pointer m_FixedImage;
   mitk::Image::Pointer m_MovingImage;
-
 };
 
-#endif //QmitkRigidRegistrationTransformsGUIBaseH
+#endif // QmitkRigidRegistrationTransformsGUIBaseH

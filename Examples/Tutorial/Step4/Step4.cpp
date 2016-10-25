@@ -18,15 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
+#include "mitkNodePredicateDataType.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
-#include "mitkNodePredicateDataType.h"
 #include <mitkIOUtil.h>
 
-#include <itksys/SystemTools.hxx>
 #include <QApplication>
 #include <QHBoxLayout>
+#include <itksys/SystemTools.hxx>
 #include <mitkImage.h>
 
 //##Documentation
@@ -43,13 +43,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 //## QmitkSliceWidget, one for axial and one for sagittal slicing.
 //## The two slices are also shown at their correct position in 3D as
 //## well as intersection-line, each in the other 2D view.
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-  QApplication qtapplication( argc, argv );
+  QApplication qtapplication(argc, argv);
 
-  if(argc<2)
+  if (argc < 2)
   {
-    fprintf( stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str() );
+    fprintf(
+      stderr, "Usage:   %s [filename1] [filename2] ...\n\n", itksys::SystemTools::GetFilenameName(argv[0]).c_str());
     return 1;
   }
 
@@ -63,21 +64,21 @@ int main(int argc, char* argv[])
   // Create a DataStorage
   mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
 
-
   //*************************************************************************
   // Part II: Create some data by reading files
   //*************************************************************************
   int i;
-  for(i=1; i<argc; ++i)
+  for (i = 1; i < argc; ++i)
   {
     // For testing
-    if(strcmp(argv[i], "-testing")==0) continue;
+    if (strcmp(argv[i], "-testing") == 0)
+      continue;
 
     //*********************************************************************
     // Part III: Put the data into the datastorage
     //*********************************************************************
     // Load datanode (eg. many image formats, surface formats, etc.)
-    mitk::IOUtil::Load(argv[i],*ds);
+    mitk::IOUtil::Load(argv[i], *ds);
   }
 
   //*************************************************************************
@@ -127,10 +128,9 @@ int main(int argc, char* argv[])
 
   // Get the image from the data storage. A predicate (mitk::NodePredicateBase)
   // is used to get only nodes of the type mitk::Image.
-  mitk::DataStorage::SetOfObjects::ConstPointer rs =
-      ds->GetSubset(mitk::TNodePredicateDataType<mitk::Image>::New());
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(mitk::TNodePredicateDataType<mitk::Image>::New());
 
-  view2.SetData(rs->Begin(),mitk::SliceNavigationController::Axial);
+  view2.SetData(rs->Begin(), mitk::SliceNavigationController::Axial);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
   ds->Add(view2.GetRenderer()->GetCurrentWorldGeometry2DNode());
@@ -160,9 +160,9 @@ int main(int argc, char* argv[])
   //*************************************************************************
   toplevelWidget.show();
 
-  // for testing
-  #include "QtTesting.h"
-  if(strcmp(argv[argc-1], "-testing")!=0)
+// for testing
+#include "QtTesting.h"
+  if (strcmp(argv[argc - 1], "-testing") != 0)
     return qtapplication.exec();
   else
     return QtTesting();

@@ -24,39 +24,36 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkLocalVariationImageFilter.h"
 
 #include "itkConstShapedNeighborhoodIterator.h"
-#include "itkNeighborhoodInnerProduct.h"
 #include "itkImageRegionIterator.h"
 #include "itkNeighborhoodAlgorithm.h"
-#include "itkZeroFluxNeumannBoundaryCondition.h"
+#include "itkNeighborhoodInnerProduct.h"
 #include "itkOffset.h"
 #include "itkProgressReporter.h"
 #include "itkVectorImage.h"
+#include "itkZeroFluxNeumannBoundaryCondition.h"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 namespace itk
 {
+  template <class TInputImage, class TOutputImage>
+  LocalVariationImageFilter<TInputImage, TOutputImage>::LocalVariationImageFilter()
+  {
+  }
 
   template <class TInputImage, class TOutputImage>
-  LocalVariationImageFilter<TInputImage, TOutputImage>
-    ::LocalVariationImageFilter()
-  {}
-
-  template <class TInputImage, class TOutputImage>
-  void
-    LocalVariationImageFilter<TInputImage, TOutputImage>
-    ::GenerateInputRequestedRegion() throw (InvalidRequestedRegionError)
+  void LocalVariationImageFilter<TInputImage, TOutputImage>::GenerateInputRequestedRegion() throw(
+    InvalidRequestedRegionError)
   {
     // call the superclass' implementation of this method
     Superclass::GenerateInputRequestedRegion();
 
     // get pointers to the input and output
-    typename Superclass::InputImagePointer inputPtr =
-      const_cast< TInputImage * >( this->GetInput() );
+    typename Superclass::InputImagePointer inputPtr = const_cast<TInputImage *>(this->GetInput());
     typename Superclass::OutputImagePointer outputPtr = this->GetOutput();
 
-    if ( !inputPtr || !outputPtr )
+    if (!inputPtr || !outputPtr)
     {
       return;
     }
@@ -67,12 +64,12 @@ namespace itk
     inputRequestedRegion = inputPtr->GetRequestedRegion();
 
     // pad the input requested region by 1
-    inputRequestedRegion.PadByRadius( 1 );
+    inputRequestedRegion.PadByRadius(1);
 
     // crop the input requested region at the input's largest possible region
-    if ( inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion()) )
+    if (inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion()))
     {
-      inputPtr->SetRequestedRegion( inputRequestedRegion );
+      inputPtr->SetRequestedRegion(inputRequestedRegion);
       return;
     }
     else
@@ -81,7 +78,7 @@ namespace itk
       // possible region).  Throw an exception.
 
       // store what we tried to request (prior to trying to crop)
-      inputPtr->SetRequestedRegion( inputRequestedRegion );
+      inputPtr->SetRequestedRegion(inputRequestedRegion);
 
       // build an exception
       InvalidRequestedRegionError e(__FILE__, __LINE__);
@@ -92,72 +89,61 @@ namespace itk
     }
   }
 
-  template<> double SquaredEuclideanMetric<itk::VariableLengthVector<float> >::
-    Calc(itk::VariableLengthVector<float> p)
+  template <>
+  double SquaredEuclideanMetric<itk::VariableLengthVector<float>>::Calc(itk::VariableLengthVector<float> p)
   {
     return p.GetSquaredNorm();
   }
 
-  template<> double SquaredEuclideanMetric<itk::VariableLengthVector<double> >::
-    Calc(itk::VariableLengthVector<double> p)
+  template <>
+  double SquaredEuclideanMetric<itk::VariableLengthVector<double>>::Calc(itk::VariableLengthVector<double> p)
   {
     return p.GetSquaredNorm();
   }
 
-  template<class TPixelType> double
-    SquaredEuclideanMetric<TPixelType>::Calc(TPixelType p)
+  template <class TPixelType>
+  double SquaredEuclideanMetric<TPixelType>::Calc(TPixelType p)
   {
-    return p*p;
+    return p * p;
   }
 
-  template< class TInputImage, class TOutputImage>
-  void
-    LocalVariationImageFilter< TInputImage, TOutputImage>
-    ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-    ThreadIdType threadId)
+  template <class TInputImage, class TOutputImage>
+  void LocalVariationImageFilter<TInputImage, TOutputImage>::ThreadedGenerateData(
+    const OutputImageRegionType &outputRegionForThread, ThreadIdType threadId)
   {
-
     // Allocate output
     typename OutputImageType::Pointer output = this->GetOutput();
-    typename  InputImageType::ConstPointer input  = this->GetInput();
+    typename InputImageType::ConstPointer input = this->GetInput();
 
     itk::Size<InputImageDimension> size;
-    for( int i=0; i<InputImageDimension; i++)
+    for (int i = 0; i < InputImageDimension; i++)
       size[i] = 1;
 
     // Find the data-set boundary "faces"
     NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType> bC;
-    typename NeighborhoodAlgorithm::
-      ImageBoundaryFacesCalculator<InputImageType>::FaceListType
-      faceList = bC(input, outputRegionForThread, size);
+    typename NeighborhoodAlgorithm::ImageBoundaryFacesCalculator<InputImageType>::FaceListType faceList =
+      bC(input, outputRegionForThread, size);
 
     // support progress methods/callbacks
-    ProgressReporter progress(
-      this, threadId, outputRegionForThread.GetNumberOfPixels());
+    ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
 
     ZeroFluxNeumannBoundaryCondition<InputImageType> nbc;
     std::vector<InputPixelType> pixels;
 
     // Process each of the boundary faces.  These are N-d regions which border
     // the edge of the buffer.
-    for ( auto
-      fit=faceList.begin(); fit != faceList.end(); ++fit)
+    for (auto fit = faceList.begin(); fit != faceList.end(); ++fit)
     {
-
       // iterators over output and input
-      ImageRegionIterator<OutputImageType>
-        output_image_it(output, *fit);
-      ImageRegionConstIterator<InputImageType>
-        input_image_it(input.GetPointer(), *fit);
+      ImageRegionIterator<OutputImageType> output_image_it(output, *fit);
+      ImageRegionConstIterator<InputImageType> input_image_it(input.GetPointer(), *fit);
 
       // neighborhood iterator for input image
-      ConstShapedNeighborhoodIterator<InputImageType>
-        input_image_neighbors_it(size, input, *fit);
-      typename ConstShapedNeighborhoodIterator<InputImageType>::
-        OffsetType offset;
+      ConstShapedNeighborhoodIterator<InputImageType> input_image_neighbors_it(size, input, *fit);
+      typename ConstShapedNeighborhoodIterator<InputImageType>::OffsetType offset;
       input_image_neighbors_it.OverrideBoundaryCondition(&nbc);
       input_image_neighbors_it.ClearActiveList();
-      for(int i=0; i<InputImageDimension; i++)
+      for (int i = 0; i < InputImageDimension; i++)
       {
         offset.Fill(0);
         offset[i] = -1;
@@ -166,23 +152,18 @@ namespace itk
         input_image_neighbors_it.ActivateOffset(offset);
       }
       input_image_neighbors_it.GoToBegin();
-      //const unsigned int neighborhoodSize = InputImageDimension*2;
+      // const unsigned int neighborhoodSize = InputImageDimension*2;
 
-      while ( ! input_image_neighbors_it.IsAtEnd() )
+      while (!input_image_neighbors_it.IsAtEnd())
       {
         // collect all the pixels in the neighborhood, note that we use
         // GetPixel on the NeighborhoodIterator to honor the boundary conditions
         typename OutputImageType::PixelType locVariation = 0;
-        typename ConstShapedNeighborhoodIterator<InputImageType>::
-          ConstIterator input_neighbors_it;
-        for (input_neighbors_it = input_image_neighbors_it.Begin();
-          ! input_neighbors_it.IsAtEnd();
-          input_neighbors_it++)
+        typename ConstShapedNeighborhoodIterator<InputImageType>::ConstIterator input_neighbors_it;
+        for (input_neighbors_it = input_image_neighbors_it.Begin(); !input_neighbors_it.IsAtEnd(); input_neighbors_it++)
         {
-            typename TInputImage::PixelType diffVec =
-              input_neighbors_it.Get()-input_image_it.Get();
-            locVariation += SquaredEuclideanMetric
-              <typename TInputImage::PixelType>::Calc(diffVec);
+          typename TInputImage::PixelType diffVec = input_neighbors_it.Get() - input_image_it.Get();
+          locVariation += SquaredEuclideanMetric<typename TInputImage::PixelType>::Calc(diffVec);
         }
         locVariation = sqrt(locVariation + 0.0001);
         output_image_it.Set(locVariation);
@@ -202,13 +183,9 @@ namespace itk
   * Standard "PrintSelf" method
   */
   template <class TInputImage, class TOutput>
-  void
-    LocalVariationImageFilter<TInputImage, TOutput>
-    ::PrintSelf(
-    std::ostream& os,
-    Indent indent) const
+  void LocalVariationImageFilter<TInputImage, TOutput>::PrintSelf(std::ostream &os, Indent indent) const
   {
-    Superclass::PrintSelf( os, indent );
+    Superclass::PrintSelf(os, indent);
   }
 
 } // end namespace itk

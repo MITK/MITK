@@ -19,28 +19,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MBILOG_ENABLE_DEBUG
 
 // Microservices
-#include <usModuleActivator.h>
 #include "mitkPersistenceService.h"
+#include <usModuleActivator.h>
 #include <usServiceRegistration.h>
 
 namespace mitk
 {
-    ///
-    /// installs the PersistenceService
-    /// runs all initial commands (setting env paths etc)
-    ///
-    class PersistenceActivator : public us::ModuleActivator
-    {
-    public:
-        PersistenceActivator();
-        void Load(us::ModuleContext* context) override;
-        void Unload(us::ModuleContext* context) override;
-        virtual ~PersistenceActivator();
+  ///
+  /// installs the PersistenceService
+  /// runs all initial commands (setting env paths etc)
+  ///
+  class PersistenceActivator : public us::ModuleActivator
+  {
+  public:
+    PersistenceActivator();
+    void Load(us::ModuleContext *context) override;
+    void Unload(us::ModuleContext *context) override;
+    virtual ~PersistenceActivator();
 
-    private:
-        itk::SmartPointer<mitk::PersistenceService> m_PersistenceService;
-        us::ServiceRegistration<mitk::IPersistenceService> m_PersistenceServiceRegistration;
-    };
+  private:
+    itk::SmartPointer<mitk::PersistenceService> m_PersistenceService;
+    us::ServiceRegistration<mitk::IPersistenceService> m_PersistenceServiceRegistration;
+  };
 }
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::PersistenceActivator)

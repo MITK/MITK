@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkContourMapper2D.h"
 #include "mitkBaseRenderer.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
-#include "mitkProperties.h"
 #include "mitkContour.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkProperties.h"
 #include <vtkLinearTransform.h>
 
 #include "mitkGL.h"
@@ -33,25 +32,25 @@ mitk::ContourMapper2D::~ContourMapper2D()
 {
 }
 
-
-void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
-  {
+void mitk::ContourMapper2D::Paint(mitk::BaseRenderer *renderer)
+{
   bool visible = true;
   GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-  if(!visible) return;
+  if (!visible)
+    return;
 
   ////  @FIXME: Logik fuer update
-  bool updateNeccesary=true;
+  bool updateNeccesary = true;
 
   if (updateNeccesary)
-    {
-    mitk::Contour::Pointer input =  const_cast<mitk::Contour*>(this->GetInput());
+  {
+    mitk::Contour::Pointer input = const_cast<mitk::Contour *>(this->GetInput());
 
-    //apply color and opacity read from the PropertyList
+    // apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
 
-    vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
+    vtkLinearTransform *transform = GetDataNode()->GetVtkTransform();
 
     //    Contour::OutputType point;
     Contour::BoundingBoxType::PointType point;
@@ -61,50 +60,48 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
     float lineWidth = 3.0;
 
     if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width")) != NULL)
-      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("Width"))->GetValue();
+      lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width"))->GetValue();
     glLineWidth(lineWidth);
 
     if (input->GetClosed())
-      {
-      glBegin (GL_LINE_LOOP);
-      }
+    {
+      glBegin(GL_LINE_LOOP);
+    }
     else
-      {
-      glBegin (GL_LINE_STRIP);
-      }
+    {
+      glBegin(GL_LINE_STRIP);
+    }
 
-    //Contour::InputType end = input->GetContourPath()->EndOfInput();
-    //if (end > 50000) end = 0;
+    // Contour::InputType end = input->GetContourPath()->EndOfInput();
+    // if (end > 50000) end = 0;
 
     mitk::Contour::PointsContainerPointer points = input->GetPoints();
     mitk::Contour::PointsContainerIterator pointsIt = points->Begin();
 
-
-
-    while ( pointsIt != points->End() )
-      {
-      //while ( idx != end )
+    while (pointsIt != points->End())
+    {
+      // while ( idx != end )
       //{
       //      point = input->GetContourPath()->Evaluate(idx);
       point = pointsIt.Value();
 
       itk2vtk(point, vtkp);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp,p);
+      vtk2itk(vtkp, p);
 
       renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
-      bool projectmode=false;
+      bool projectmode = false;
       GetDataNode()->GetVisibility(projectmode, renderer, "project");
-      bool drawit=false;
-      if(projectmode)
-        drawit=true;
+      bool drawit = false;
+      if (projectmode)
+        drawit = true;
       else
       {
-        Vector3D diff=p-projected_p;
-        if(diff.GetSquaredNorm()<1.0)
-          drawit=true;
+        Vector3D diff = p - projected_p;
+        if (diff.GetSquaredNorm() < 1.0)
+          drawit = true;
       }
-      if(drawit)
+      if (drawit)
       {
         Point2D pt2d, tmp;
         renderer->WorldToDisplay(p, pt2d);
@@ -113,15 +110,14 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       pointsIt++;
       //      idx += 1;
-      }
-    glEnd ();
+    }
+    glEnd();
 
     glLineWidth(1.0);
-
-    }
   }
+}
 
-const mitk::Contour* mitk::ContourMapper2D::GetInput(void)
+const mitk::Contour *mitk::ContourMapper2D::GetInput(void)
 {
-  return static_cast<const mitk::Contour * > ( GetDataNode()->GetData() );
+  return static_cast<const mitk::Contour *>(GetDataNode()->GetData());
 }

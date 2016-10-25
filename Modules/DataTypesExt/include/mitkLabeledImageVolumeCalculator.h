@@ -14,84 +14,67 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
 #define _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
 
-#include <itkObject.h>
 #include "MitkDataTypesExtExports.h"
+#include <itkObject.h>
 
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
 
 #include <itkImage.h>
 
-
 namespace mitk
 {
+  /**
+   * \brief Class for calculating the volume (or area) for each label in a
+   * labeled image.
+   *
+   * Labels are expected to be of an unsigned integer type.
+   *
+   * TODO: Extend class for time resolved images
+   */
+  class MITKDATATYPESEXT_EXPORT LabeledImageVolumeCalculator : public itk::Object
+  {
+  public:
+    typedef std::vector<double> VolumeVector;
+    typedef std::vector<Point3D> PointVector;
 
-/**
- * \brief Class for calculating the volume (or area) for each label in a
- * labeled image.
- *
- * Labels are expected to be of an unsigned integer type.
- *
- * TODO: Extend class for time resolved images
- */
-class MITKDATATYPESEXT_EXPORT LabeledImageVolumeCalculator : public itk::Object
-{
-public:
+    mitkClassMacroItkParent(LabeledImageVolumeCalculator, itk::Object);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  typedef std::vector< double > VolumeVector;
-  typedef std::vector< Point3D > PointVector;
+      itkSetConstObjectMacro(Image, mitk::Image);
 
-  mitkClassMacroItkParent( LabeledImageVolumeCalculator, itk::Object );
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    virtual void Calculate();
 
-  itkSetConstObjectMacro( Image, mitk::Image );
+    double GetVolume(unsigned int label) const;
 
+    const Point3D &GetCentroid(unsigned int label) const;
 
-  virtual void Calculate();
+    const VolumeVector &GetVolumes() const;
 
+    const PointVector &GetCentroids() const;
 
-  double GetVolume( unsigned int label ) const;
+  protected:
+    LabeledImageVolumeCalculator();
 
-  const Point3D &GetCentroid( unsigned int label ) const;
+    virtual ~LabeledImageVolumeCalculator();
 
+    template <typename TPixel, unsigned int VImageDimension>
+    void _InternalCalculateVolumes(itk::Image<TPixel, VImageDimension> *image,
+                                   LabeledImageVolumeCalculator *volumeCalculator,
+                                   BaseGeometry *geometry);
 
-  const VolumeVector &GetVolumes() const;
+    ImageTimeSelector::Pointer m_InputTimeSelector;
 
-  const PointVector &GetCentroids() const;
+    Image::ConstPointer m_Image;
 
+    VolumeVector m_VolumeVector;
+    PointVector m_CentroidVector;
 
-protected:
-
-  LabeledImageVolumeCalculator();
-
-  virtual ~LabeledImageVolumeCalculator();
-
-
-  template < typename TPixel, unsigned int VImageDimension >
-  void _InternalCalculateVolumes(
-    itk::Image< TPixel, VImageDimension > *image,
-    LabeledImageVolumeCalculator *volumeCalculator,
-    BaseGeometry *geometry );
-
-
-  ImageTimeSelector::Pointer m_InputTimeSelector;
-
-
-  Image::ConstPointer m_Image;
-
-
-  VolumeVector m_VolumeVector;
-  PointVector m_CentroidVector;
-
-  Point3D m_DummyPoint;
-
-};
-
+    Point3D m_DummyPoint;
+  };
 }
 
 #endif // #define _MITK_LABELEDIMAGEVOLUMECALCULATOR_H

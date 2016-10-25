@@ -16,14 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAboutDialog.h"
 #include "QmitkModulesDialog.h"
-#include <mitkVersion.h>
-#include <itkConfigure.h>
-#include <vtkConfigure.h>
 #include <QPushButton>
+#include <itkConfigure.h>
+#include <mitkVersion.h>
+#include <vtkConfigure.h>
 #include <vtkVersionMacros.h>
 
-QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
-  : QDialog(parent, f)
+QmitkAboutDialog::QmitkAboutDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
   m_GUI.setupUi(this);
 
@@ -40,7 +39,7 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   m_GUI.m_RevisionLabel->setText(revisionText);
   m_GUI.m_ToolkitVersionsLabel->setText(QString("ITK %1, VTK %2, Qt %3").arg(itkVersion, vtkVersion, QT_VERSION_STR));
 
-  QPushButton* btnModules = new QPushButton(QIcon(":/QtWidgetsExt/ModuleView.png"), "Modules");
+  QPushButton *btnModules = new QPushButton(QIcon(":/QtWidgetsExt/ModuleView.png"), "Modules");
   m_GUI.m_ButtonBox->addButton(btnModules, QDialogButtonBox::ActionRole);
 
   connect(btnModules, SIGNAL(clicked()), this, SLOT(ShowModules()));
@@ -86,4 +85,3 @@ void QmitkAboutDialog::SetRevisionText(const QString &text)
 {
   m_GUI.m_RevisionLabel->setText(text);
 }
-

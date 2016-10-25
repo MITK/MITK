@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "org_mitk_example_gui_minimalapplication_Activator.h"
 
 #include "MinimalApplication.h"
 #include "MinimalPerspective.h"
 
-void org_mitk_example_gui_minimalapplication_Activator::start(ctkPluginContext* context)
+void org_mitk_example_gui_minimalapplication_Activator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(MinimalApplication, context)
   BERRY_REGISTER_EXTENSION_CLASS(MinimalPerspective, context)
 }
 
-void org_mitk_example_gui_minimalapplication_Activator::stop(ctkPluginContext* context)
+void org_mitk_example_gui_minimalapplication_Activator::stop(ctkPluginContext *context)
 {
   Q_UNUSED(context)
 }

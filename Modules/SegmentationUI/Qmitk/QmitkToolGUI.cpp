@@ -38,10 +38,9 @@ void QmitkToolGUI::SetReferenceCount(int)
   // empty on purpose, just don't let ITK handle calls to SetReferenceCount()
 }
 
-void QmitkToolGUI::SetTool( mitk::Tool* tool )
+void QmitkToolGUI::SetTool(mitk::Tool *tool)
 {
   m_Tool = tool;
 
-  emit( NewToolAssociated(tool) );
+  emit(NewToolAssociated(tool));
 }
-

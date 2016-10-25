@@ -37,52 +37,53 @@ class MITKQTWIDGETS_EXPORT QmitkMouseModeSwitcher : public QToolBar
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkMouseModeSwitcher(QWidget *parent = 0);
+  virtual ~QmitkMouseModeSwitcher();
 
-    QmitkMouseModeSwitcher( QWidget* parent = 0 );
-    virtual ~QmitkMouseModeSwitcher();
+  typedef mitk::MouseModeSwitcher::MouseMode MouseMode;
 
-    typedef mitk::MouseModeSwitcher::MouseMode MouseMode;
+public slots:
 
-  public slots:
+  /**
+    \brief Connect to non-GUI class.
 
-    /**
-      \brief Connect to non-GUI class.
+    When a button is pressed, given mitk::MouseModeSwitcher is informed to adapt interactors.
 
-      When a button is pressed, given mitk::MouseModeSwitcher is informed to adapt interactors.
+    \todo QmitkMouseModeSwitcher could be enhanced to actively observe mitk::MouseModeSwitcher and change available
+    actions or visibility appropriately.
+  */
+  void setMouseModeSwitcher(mitk::MouseModeSwitcher *);
 
-      \todo QmitkMouseModeSwitcher could be enhanced to actively observe mitk::MouseModeSwitcher and change available actions or visibility appropriately.
-    */
-    void setMouseModeSwitcher( mitk::MouseModeSwitcher* );
+signals:
 
-  signals:
+  /**
+    \brief Mode activated.
 
-    /**
-      \brief Mode activated.
+    This signal is needed for other GUI element to react appropriately.
+    Sadly this is needed to provide "normal" functionality of QmitkStdMultiWidget,
+    because this must enable/disable automatic reaction of SliceNavigationControllers
+    to mouse clicks - depending on which mode is active.
+  */
+  void MouseModeSelected(mitk::MouseModeSwitcher::MouseMode id); // TODO change int to enum of MouseModeSwitcher
 
-      This signal is needed for other GUI element to react appropriately.
-      Sadly this is needed to provide "normal" functionality of QmitkStdMultiWidget,
-      because this must enable/disable automatic reaction of SliceNavigationControllers
-      to mouse clicks - depending on which mode is active.
-    */
-    void MouseModeSelected(mitk::MouseModeSwitcher::MouseMode id); // TODO change int to enum of MouseModeSwitcher
+protected slots:
 
-  protected slots:
+  void modeSelectedByUser();
+  void addButton(MouseMode id,
+                 const QString &toolName,
+                 const QIcon &icon,
+                 bool on = false); // TODO change int to enum of MouseModeSwitcher
 
-    void modeSelectedByUser();
-    void addButton( MouseMode id, const QString& toolName, const QIcon& icon, bool on = false ); // TODO change int to enum of MouseModeSwitcher
+protected:
+  void OnMouseModeChanged(const itk::EventObject &);
 
-  protected:
+  QActionGroup *m_ActionGroup;
+  mitk::MouseModeSwitcher *m_MouseModeSwitcher;
 
-    void OnMouseModeChanged(const itk::EventObject&);
+  unsigned long m_ObserverTag;
 
-    QActionGroup* m_ActionGroup;
-    mitk::MouseModeSwitcher* m_MouseModeSwitcher;
-
-    unsigned long m_ObserverTag;
-
-    bool m_InObservationReaction;
+  bool m_InObservationReaction;
 };
 
 #endif
-

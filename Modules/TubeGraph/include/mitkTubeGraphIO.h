@@ -27,7 +27,6 @@ class TiXmlElement;
 
 namespace mitk
 {
-
   /**
   * @brief reader and writer for xml representations of mitk::TubeGraph
   *
@@ -36,7 +35,6 @@ namespace mitk
   class TubeGraphIO : public mitk::AbstractFileIO
   {
   public:
-
     TubeGraphIO();
 
     // -------------- AbstractFileReader -------------
@@ -66,12 +64,10 @@ namespace mitk
     }
 
   private:
-    TubeGraphIO* IOClone() const override;
-    TubeGraphIO(const TubeGraphIO& other);
-    const BoundingBox::Pointer ComputeBoundingBox(TubeGraph::Pointer graph ) const;
-
+    TubeGraphIO *IOClone() const override;
+    TubeGraphIO(const TubeGraphIO &other);
+    const BoundingBox::Pointer ComputeBoundingBox(TubeGraph::Pointer graph) const;
   };
-
 }
 
 #endif //_MITK_SURFACE_VTK_IO_H_

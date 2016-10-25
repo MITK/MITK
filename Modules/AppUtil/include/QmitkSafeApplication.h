@@ -19,15 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <MitkAppUtilExports.h>
 
-#include <QMessageBox>
 #include <QApplication>
+#include <QMessageBox>
 
 class MITKAPPUTIL_EXPORT QmitkSafeApplication : public QApplication
 {
-
 public:
-
-  QmitkSafeApplication(int& argc, char** argv);
+  QmitkSafeApplication(int &argc, char **argv);
 
   /**
    * Reimplement notify to catch unhandled exceptions and open an error message.
@@ -36,16 +34,14 @@ public:
    * @param event
    * @return
    */
-  bool notify(QObject* receiver, QEvent* event) override;
+  bool notify(QObject *receiver, QEvent *event) override;
 
   void setSafeMode(bool safeMode);
 
   bool getSafeMode() const;
 
 private:
-
   bool m_SafeMode;
-
 };
 
 #endif // QMITKSAFEAPPLICATION_H

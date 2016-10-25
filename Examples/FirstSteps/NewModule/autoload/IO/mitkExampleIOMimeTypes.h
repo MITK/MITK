@@ -21,38 +21,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 
-namespace mitk {
-
-class ExampleIOMimeTypes
+namespace mitk
 {
-public:
-
-  // Deriving your own MimeType will probably be overkill in most situations.
-  class ExampleDataStructureMimeType : public CustomMimeType
+  class ExampleIOMimeTypes
   {
   public:
-    ExampleDataStructureMimeType();
-    virtual bool AppliesTo(const std::string &path) const override;
-    virtual ExampleDataStructureMimeType* Clone() const override;
+    // Deriving your own MimeType will probably be overkill in most situations.
+    class ExampleDataStructureMimeType : public CustomMimeType
+    {
+    public:
+      ExampleDataStructureMimeType();
+      virtual bool AppliesTo(const std::string &path) const override;
+      virtual ExampleDataStructureMimeType *Clone() const override;
+    };
+
+    static ExampleDataStructureMimeType EXAMPLE_MIMETYPE();
+    static std::string EXAMPLE_MIMETYPE_NAME();
+
+    // Simpler method of creating a new MimeType
+    static CustomMimeType EXAMPLE_TWO_MIMETYPE();
+    static std::string EXAMPLE_TWO_MIMETYPE_NAME();
+
+    // Get all example Mime Types
+    static std::vector<CustomMimeType *> Get();
+
+  private:
+    // purposely not implemented
+    ExampleIOMimeTypes();
+    ExampleIOMimeTypes(const ExampleIOMimeTypes &);
   };
-
-  static ExampleDataStructureMimeType EXAMPLE_MIMETYPE();
-  static std::string EXAMPLE_MIMETYPE_NAME();
-
-  // Simpler method of creating a new MimeType
-  static CustomMimeType EXAMPLE_TWO_MIMETYPE();
-  static std::string EXAMPLE_TWO_MIMETYPE_NAME();
-
-  // Get all example Mime Types
-  static std::vector<CustomMimeType*> Get();
-
-private:
-
-  // purposely not implemented
-  ExampleIOMimeTypes();
-  ExampleIOMimeTypes(const ExampleIOMimeTypes&);
-};
-
 }
 
 #endif // MITKEXAMPLEIOMIMETYPES_H

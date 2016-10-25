@@ -16,8 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
 
-QmitkRigidRegistrationTransformsGUIBase::QmitkRigidRegistrationTransformsGUIBase(QWidget* parent, Qt::WindowFlags f) : QWidget( parent, f ),
-  m_FixedImage(nullptr), m_MovingImage(nullptr)
+QmitkRigidRegistrationTransformsGUIBase::QmitkRigidRegistrationTransformsGUIBase(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f), m_FixedImage(nullptr), m_MovingImage(nullptr)
 {
 }
 

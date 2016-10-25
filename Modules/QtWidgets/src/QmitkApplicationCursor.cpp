@@ -27,7 +27,7 @@ QmitkApplicationCursor::QmitkApplicationCursor()
   mitk::ApplicationCursor::RegisterImplementation(this);
 }
 
-void QmitkApplicationCursor::PushCursor(std::istream& cursorStream, int hotspotX, int hotspotY)
+void QmitkApplicationCursor::PushCursor(std::istream &cursorStream, int hotspotX, int hotspotY)
 {
   if (cursorStream)
   {
@@ -35,21 +35,21 @@ void QmitkApplicationCursor::PushCursor(std::istream& cursorStream, int hotspotX
     std::ios::pos_type length = cursorStream.tellg();
     cursorStream.seekg(0, std::ios::beg);
 
-    auto  data = new char[length];
+    auto data = new char[length];
     cursorStream.read(data, length);
     QPixmap pixmap;
     pixmap.loadFromData(QByteArray::fromRawData(data, length));
-    QCursor cursor( pixmap, hotspotX, hotspotY ); // no test for validity in QPixmap(xpm)!
-    QApplication::setOverrideCursor( cursor );
+    QCursor cursor(pixmap, hotspotX, hotspotY); // no test for validity in QPixmap(xpm)!
+    QApplication::setOverrideCursor(cursor);
     delete[] data;
   }
 }
 
-void QmitkApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY)
+void QmitkApplicationCursor::PushCursor(const char *XPM[], int hotspotX, int hotspotY)
 {
-  QPixmap pixmap( XPM );
-  QCursor cursor( pixmap, hotspotX, hotspotY ); // no test for validity in QPixmap(xpm)!
-  QApplication::setOverrideCursor( cursor );
+  QPixmap pixmap(XPM);
+  QCursor cursor(pixmap, hotspotX, hotspotY); // no test for validity in QPixmap(xpm)!
+  QApplication::setOverrideCursor(cursor);
 }
 
 void QmitkApplicationCursor::PopCursor()
@@ -66,13 +66,12 @@ const mitk::Point2I QmitkApplicationCursor::GetCursorPosition()
   return mp;
 }
 
-void QmitkApplicationCursor::SetCursorPosition(const mitk::Point2I& p)
+void QmitkApplicationCursor::SetCursorPosition(const mitk::Point2I &p)
 {
   static bool selfCall = false;
-  if (selfCall) return;  // this is to avoid recursive calls
+  if (selfCall)
+    return; // this is to avoid recursive calls
   selfCall = true;
-  QCursor::setPos( p[0], p[1] );
+  QCursor::setPos(p[0], p[1]);
   selfCall = false;
 }
-
-

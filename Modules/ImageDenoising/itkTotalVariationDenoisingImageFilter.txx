@@ -24,33 +24,28 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkTotalVariationDenoisingImageFilter.h"
 
 #include "itkConstShapedNeighborhoodIterator.h"
-#include "itkNeighborhoodInnerProduct.h"
-#include "itkImageRegionIterator.h"
 #include "itkImageRegionConstIterator.h"
+#include "itkImageRegionIterator.h"
+#include "itkLocalVariationImageFilter.h"
 #include "itkNeighborhoodAlgorithm.h"
-#include "itkZeroFluxNeumannBoundaryCondition.h"
+#include "itkNeighborhoodInnerProduct.h"
 #include "itkOffset.h"
 #include "itkProgressReporter.h"
-#include "itkLocalVariationImageFilter.h"
+#include "itkZeroFluxNeumannBoundaryCondition.h"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 namespace itk
 {
-
   template <class TInputImage, class TOutputImage>
-  TotalVariationDenoisingImageFilter<TInputImage, TOutputImage>
-    ::TotalVariationDenoisingImageFilter()
+  TotalVariationDenoisingImageFilter<TInputImage, TOutputImage>::TotalVariationDenoisingImageFilter()
   {
     m_Lambda = 1.0;
   }
 
-
-  template< class TInputImage, class TOutputImage>
-  void
-    TotalVariationDenoisingImageFilter< TInputImage, TOutputImage>
-    ::GenerateData()
+  template <class TInputImage, class TOutputImage>
+  void TotalVariationDenoisingImageFilter<TInputImage, TOutputImage>::GenerateData()
   {
     // first we cast the input image to match output type
     typename CastType::Pointer infilter = CastType::New();
@@ -65,41 +60,34 @@ namespace itk
     typename TOutputImage::Pointer origImage = infilter->GetOutput();
 
     typename SingleIterationFilterType::Pointer filter;
-    for(int i=0; i<m_NumberIterations; i++)
+    for (int i = 0; i < m_NumberIterations; i++)
     {
       filter = SingleIterationFilterType::New();
-      filter->SetInput( image );
-      filter->SetOriginalImage( origImage );
+      filter->SetInput(image);
+      filter->SetOriginalImage(origImage);
       filter->SetLambda(m_Lambda);
       filter->SetNumberOfThreads(this->GetNumberOfThreads());
       filter->UpdateLargestPossibleRegion();
       image = filter->GetOutput();
-      std::cout << "Iteration " << i+1 << "/" <<
-        m_NumberIterations << std::endl;
+      std::cout << "Iteration " << i + 1 << "/" << m_NumberIterations << std::endl;
     }
 
     typename OutputImageType::Pointer output = this->GetOutput();
     output->SetSpacing(image->GetSpacing());
     typename OutputImageType::RegionType largestPossibleRegion;
-    largestPossibleRegion.SetSize(
-      image->GetLargestPossibleRegion().GetSize() );
-    largestPossibleRegion.SetIndex(
-      image->GetLargestPossibleRegion().GetIndex() );
-    output->SetLargestPossibleRegion(
-      image->GetLargestPossibleRegion() );
-    output->SetBufferedRegion(
-      image->GetLargestPossibleRegion() );
+    largestPossibleRegion.SetSize(image->GetLargestPossibleRegion().GetSize());
+    largestPossibleRegion.SetIndex(image->GetLargestPossibleRegion().GetIndex());
+    output->SetLargestPossibleRegion(image->GetLargestPossibleRegion());
+    output->SetBufferedRegion(image->GetLargestPossibleRegion());
     output->Allocate();
 
-    itk::ImageRegionIterator<OutputImageType> oit(
-      output, output->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<OutputImageType> oit(output, output->GetLargestPossibleRegion());
     oit.GoToBegin();
 
-    itk::ImageRegionConstIterator<OutputImageType> iit(
-      image, image->GetLargestPossibleRegion());
+    itk::ImageRegionConstIterator<OutputImageType> iit(image, image->GetLargestPossibleRegion());
     iit.GoToBegin();
 
-    while(!oit.IsAtEnd())
+    while (!oit.IsAtEnd())
     {
       oit.Set(iit.Get());
       ++iit;
@@ -107,18 +95,13 @@ namespace itk
     }
   }
 
-
   /**
   * Standard "PrintSelf" method
   */
   template <class TInputImage, class TOutput>
-  void
-    TotalVariationDenoisingImageFilter<TInputImage, TOutput>
-    ::PrintSelf(
-    std::ostream& os,
-    Indent indent) const
+  void TotalVariationDenoisingImageFilter<TInputImage, TOutput>::PrintSelf(std::ostream &os, Indent indent) const
   {
-    Superclass::PrintSelf( os, indent );
+    Superclass::PrintSelf(os, indent);
   }
 
 } // end namespace itk

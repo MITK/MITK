@@ -20,59 +20,50 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOMimeTypes.h>
 #include <mitkSceneIO.h>
 
-namespace mitk {
-
-SceneFileReader::SceneFileReader()
-  : AbstractFileReader()
+namespace mitk
 {
-  CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".scene");
-  mimeType.SetComment("MITK Scene Files");
-  mimeType.SetCategory("MITK Scenes");
-  mimeType.AddExtension("mitk");
-
-  this->SetDescription("MITK Scene Reader");
-  this->SetMimeType(mimeType);
-
-  this->RegisterService();
-}
-
-DataStorage::SetOfObjects::Pointer SceneFileReader::Read(DataStorage& ds)
-{
-  //const DataStorage::SetOfObjects::STLContainerType& oldNodes = ds.GetAll()->CastToSTLConstContainer();
-  DataStorage::SetOfObjects::ConstPointer oldNodes = ds.GetAll();
-  SceneIO::Pointer sceneIO = SceneIO::New();
-  sceneIO->LoadScene(this->GetLocalFileName(), &ds, false);
-  DataStorage::SetOfObjects::ConstPointer newNodes = ds.GetAll();
-
-  // Compute the difference
-  DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
-
-  unsigned int index = 0;
-  for (DataStorage::SetOfObjects::ConstIterator iter = newNodes->Begin(),
-        iterEnd = newNodes->End(); iter != iterEnd; ++iter)
+  SceneFileReader::SceneFileReader() : AbstractFileReader()
   {
-    if (!oldNodes->empty())
-    {
-      if (std::find(oldNodes->begin(), oldNodes->end(), iter.Value()) == oldNodes->end())
-        result->InsertElement(index++, iter.Value());
-    }
-    else
-    {
-      result->InsertElement(index++, iter.Value());
-    }
+    CustomMimeType mimeType(IOMimeTypes::DEFAULT_BASE_NAME() + ".scene");
+    mimeType.SetComment("MITK Scene Files");
+    mimeType.SetCategory("MITK Scenes");
+    mimeType.AddExtension("mitk");
+
+    this->SetDescription("MITK Scene Reader");
+    this->SetMimeType(mimeType);
+
+    this->RegisterService();
   }
 
-  return result;
-}
+  DataStorage::SetOfObjects::Pointer SceneFileReader::Read(DataStorage &ds)
+  {
+    // const DataStorage::SetOfObjects::STLContainerType& oldNodes = ds.GetAll()->CastToSTLConstContainer();
+    DataStorage::SetOfObjects::ConstPointer oldNodes = ds.GetAll();
+    SceneIO::Pointer sceneIO = SceneIO::New();
+    sceneIO->LoadScene(this->GetLocalFileName(), &ds, false);
+    DataStorage::SetOfObjects::ConstPointer newNodes = ds.GetAll();
 
-std::vector<BaseData::Pointer> SceneFileReader::Read()
-{
-  return AbstractFileReader::Read();
-}
+    // Compute the difference
+    DataStorage::SetOfObjects::Pointer result = DataStorage::SetOfObjects::New();
 
-SceneFileReader* SceneFileReader::Clone() const
-{
-  return new SceneFileReader(*this);
-}
+    unsigned int index = 0;
+    for (DataStorage::SetOfObjects::ConstIterator iter = newNodes->Begin(), iterEnd = newNodes->End(); iter != iterEnd;
+         ++iter)
+    {
+      if (!oldNodes->empty())
+      {
+        if (std::find(oldNodes->begin(), oldNodes->end(), iter.Value()) == oldNodes->end())
+          result->InsertElement(index++, iter.Value());
+      }
+      else
+      {
+        result->InsertElement(index++, iter.Value());
+      }
+    }
 
+    return result;
+  }
+
+  std::vector<BaseData::Pointer> SceneFileReader::Read() { return AbstractFileReader::Read(); }
+  SceneFileReader *SceneFileReader::Clone() const { return new SceneFileReader(*this); }
 }

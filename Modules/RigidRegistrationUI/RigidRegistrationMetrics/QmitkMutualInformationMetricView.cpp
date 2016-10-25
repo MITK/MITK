@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkMutualInformationMetricView.h"
-#include <itkMutualInformationImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkMutualInformationImageToImageMetric.h>
 
-QmitkMutualInformationMetricView::QmitkMutualInformationMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkMutualInformationMetricView::QmitkMutualInformationMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
-
 }
 
 QmitkMutualInformationMetricView::~QmitkMutualInformationMetricView()
@@ -42,15 +42,19 @@ itk::Object::Pointer QmitkMutualInformationMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMutualInformationMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkMutualInformationMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::MutualInformationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MutualInformationImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::MutualInformationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::MutualInformationImageToImageMetric<FixedImageType, MovingImageType>::New();
   MetricPointer->SetNumberOfSpatialSamples(m_Controls.m_NumberOfSpatialSamplesMutualInformation->text().toInt());
-  MetricPointer->SetFixedImageStandardDeviation(m_Controls.m_FixedImageStandardDeviationMutualInformation->text().toFloat());
-  MetricPointer->SetMovingImageStandardDeviation(m_Controls.m_MovingImageStandardDeviationMutualInformation->text().toFloat());
+  MetricPointer->SetFixedImageStandardDeviation(
+    m_Controls.m_FixedImageStandardDeviationMutualInformation->text().toFloat());
+  MetricPointer->SetMovingImageStandardDeviation(
+    m_Controls.m_MovingImageStandardDeviationMutualInformation->text().toFloat());
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -81,12 +85,12 @@ QString QmitkMutualInformationMetricView::GetName()
   return "MutualInformation";
 }
 
-void QmitkMutualInformationMetricView::SetupUI(QWidget* parent)
+void QmitkMutualInformationMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfSpatialSamplesMutualInformation->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_FixedImageStandardDeviationMutualInformation->setValidator(validatorLineEditInputFloat);
   m_Controls.m_MovingImageStandardDeviationMutualInformation->setValidator(validatorLineEditInputFloat);
 }

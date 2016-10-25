@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkPlanarDoubleEllipse_h
 #define mitkPlanarDoubleEllipse_h
 
-#include <mitkPlanarFigure.h>
 #include <MitkPlanarFigureExports.h>
+#include <mitkPlanarFigure.h>
 
 namespace mitk
 {
@@ -26,28 +26,27 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarDoubleEllipse, PlanarFigure);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    unsigned int GetNumberOfSegments() const;
+      unsigned int GetNumberOfSegments() const;
     void SetNumberOfSegments(unsigned int numSegments);
 
     virtual unsigned int GetMaximumNumberOfControlPoints() const override;
     virtual unsigned int GetMinimumNumberOfControlPoints() const override;
-    virtual bool SetControlPoint(unsigned int index, const Point2D& point, bool createIfDoesNotExist = true) override;
+    virtual bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = true) override;
 
     const unsigned int FEATURE_ID_MAJOR_AXIS;
     const unsigned int FEATURE_ID_MINOR_AXIS;
     const unsigned int FEATURE_ID_THICKNESS;
 
-    virtual bool Equals(const mitk::PlanarFigure& other) const override;
+    virtual bool Equals(const mitk::PlanarFigure &other) const override;
 
   protected:
     PlanarDoubleEllipse();
 
     mitkCloneMacro(Self)
 
-    virtual mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D& point) override;
+      virtual mitk::Point2D ApplyControlPointConstraints(unsigned int index, const Point2D &point) override;
     virtual void EvaluateFeaturesInternal() override;
     virtual void GenerateHelperPolyLine(double, unsigned int) override;
     virtual void GeneratePolyLine() override;

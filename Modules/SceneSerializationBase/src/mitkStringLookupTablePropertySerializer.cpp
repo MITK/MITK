@@ -23,45 +23,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class StringLookupTablePropertySerializer : public BasePropertySerializer
-{
+  class StringLookupTablePropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(StringLookupTablePropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( StringLookupTablePropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      const StringLookupTableProperty* prop = dynamic_cast<const StringLookupTableProperty*>(m_Property.GetPointer());
+      const StringLookupTableProperty *prop = dynamic_cast<const StringLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
         return nullptr;
       StringLookupTable lut = prop->GetValue();
-      //if (lut.IsNull())
+      // if (lut.IsNull())
       //  return NULL; // really?
-      const StringLookupTable::LookupTableType& map = lut.GetLookupTable();
+      const StringLookupTable::LookupTableType &map = lut.GetLookupTable();
 
-      auto  element = new TiXmlElement("StringLookupTable");
+      auto element = new TiXmlElement("StringLookupTable");
       for (auto it = map.begin(); it != map.end(); ++it)
-        {
-          auto  tableEntry = new TiXmlElement("LUTValue");
-          tableEntry->SetAttribute("id", it->first);
-          tableEntry->SetAttribute("value", it->second);
-          element->LinkEndChild( tableEntry );
-        }
-        return element;
+      {
+        auto tableEntry = new TiXmlElement("LUTValue");
+        tableEntry->SetAttribute("id", it->first);
+        tableEntry->SetAttribute("value", it->second);
+        element->LinkEndChild(tableEntry);
+      }
+      return element;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
 
       StringLookupTable lut;
-      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))
+      for (TiXmlElement *child = element->FirstChildElement("LUTValue"); child != nullptr;
+           child = child->NextSiblingElement("LUTValue"))
       {
-
         int temp;
         if (child->QueryIntAttribute("id", &temp) == TIXML_WRONG_TYPE)
           return nullptr; // TODO: can we do a better error handling?
@@ -74,10 +71,11 @@ class StringLookupTablePropertySerializer : public BasePropertySerializer
       }
       return StringLookupTableProperty::New(lut).GetPointer();
     }
+
   protected:
     StringLookupTablePropertySerializer() {}
     virtual ~StringLookupTablePropertySerializer() {}
-};
+  };
 } // namespace
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(StringLookupTablePropertySerializer);

@@ -21,27 +21,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-/**
-  \brief Serializes mitk::Surface for mitk::SceneIO
-*/
-class SurfaceSerializer : public BaseDataSerializer
-{
+  /**
+    \brief Serializes mitk::Surface for mitk::SceneIO
+  */
+  class SurfaceSerializer : public BaseDataSerializer
+  {
   public:
+    mitkClassMacro(SurfaceSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( SurfaceSerializer, BaseDataSerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual std::string Serialize() override;
+      virtual std::string Serialize() override;
 
   protected:
-
     SurfaceSerializer();
     virtual ~SurfaceSerializer();
-};
+  };
 
 } // namespace
 
 #endif
-

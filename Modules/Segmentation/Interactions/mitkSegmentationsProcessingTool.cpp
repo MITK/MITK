@@ -15,11 +15,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkSegmentationsProcessingTool.h"
-#include "mitkToolManager.h"
 #include "mitkProgressBar.h"
+#include "mitkToolManager.h"
 
-mitk::SegmentationsProcessingTool::SegmentationsProcessingTool()
-:Tool("dummy")
+mitk::SegmentationsProcessingTool::SegmentationsProcessingTool() : Tool("dummy")
 {
 }
 
@@ -27,7 +26,7 @@ mitk::SegmentationsProcessingTool::~SegmentationsProcessingTool()
 {
 }
 
-const char* mitk::SegmentationsProcessingTool::GetGroup() const
+const char *mitk::SegmentationsProcessingTool::GetGroup() const
 {
   return "segmentationProcessing";
 }
@@ -54,17 +53,15 @@ void mitk::SegmentationsProcessingTool::ProcessAllObjects()
   ProgressBar::GetInstance()->AddStepsToDo(nodes.size() + 2);
 
   // for all selected nodes
-  for ( ToolManager::DataVectorType::iterator nodeiter = nodes.begin();
-        nodeiter != nodes.end();
-        ++nodeiter )
+  for (ToolManager::DataVectorType::iterator nodeiter = nodes.begin(); nodeiter != nodes.end(); ++nodeiter)
   {
     DataNode::Pointer node = *nodeiter;
 
-    if ( !ProcessOneWorkingData(node) )
+    if (!ProcessOneWorkingData(node))
     {
       std::string nodeName;
       m_FailedNodes += " '";
-      if ( node->GetName( nodeName ) )
+      if (node->GetName(nodeName))
       {
         m_FailedNodes += nodeName.c_str();
       }
@@ -80,14 +77,13 @@ void mitk::SegmentationsProcessingTool::ProcessAllObjects()
 
   FinishProcessingAllData();
   ProgressBar::GetInstance()->Progress(2);
-
 }
 
 void mitk::SegmentationsProcessingTool::StartProcessingAllData()
 {
 }
 
-bool mitk::SegmentationsProcessingTool::ProcessOneWorkingData( DataNode* )
+bool mitk::SegmentationsProcessingTool::ProcessOneWorkingData(DataNode *)
 {
   return true;
 }
@@ -99,9 +95,9 @@ void mitk::SegmentationsProcessingTool::FinishProcessingAllData()
 
 void mitk::SegmentationsProcessingTool::SendErrorMessageIfAny()
 {
-  if ( !m_FailedNodes.empty() )
+  if (!m_FailedNodes.empty())
   {
-    Tool::ErrorMessage( GetErrorMessage() + m_FailedNodes );
+    Tool::ErrorMessage(GetErrorMessage() + m_FailedNodes);
   }
 }
 
@@ -109,4 +105,3 @@ std::string mitk::SegmentationsProcessingTool::GetErrorMessage()
 {
   return "Processing of these nodes failed:";
 }
-

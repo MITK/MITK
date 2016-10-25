@@ -20,11 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkStdMultiWidget.h>
 #include <QmitkVideoBackground.h>
 
-QmitkVideoPlayer::QmitkVideoPlayer()
-  : m_VideoSource(0)
-  , m_VideoBackground( new QmitkVideoBackground(m_VideoSource) )
+QmitkVideoPlayer::QmitkVideoPlayer() : m_VideoSource(0), m_VideoBackground(new QmitkVideoBackground(m_VideoSource))
 {
-
 }
 
 QmitkVideoPlayer::~QmitkVideoPlayer()
@@ -32,23 +29,23 @@ QmitkVideoPlayer::~QmitkVideoPlayer()
   // save video preferences
 }
 
-void QmitkVideoPlayer::CreateQtPartControl( QWidget* parent )
+void QmitkVideoPlayer::CreateQtPartControl(QWidget *parent)
 {
   // retrieve old preferences
   m_VideoSource = mitk::OpenCVVideoSource::New();
   m_VideoBackground = new QmitkVideoBackground(m_VideoSource);
   m_VideoBackground->setParent(parent);
 
-  QVBoxLayout* layout = new QVBoxLayout;
-  QmitkRenderWindow* renderWindow = NULL;
+  QVBoxLayout *layout = new QVBoxLayout;
+  QmitkRenderWindow *renderWindow = NULL;
   if (this->GetRenderWindowPart())
   {
     renderWindow = this->GetRenderWindowPart()->GetActiveQmitkRenderWindow();
   }
   m_OpenCVVideoControls = new QmitkOpenCVVideoControls(m_VideoBackground, renderWindow);
-  layout->addWidget( m_OpenCVVideoControls );
+  layout->addWidget(m_OpenCVVideoControls);
 
-  parent->setLayout( layout );
+  parent->setLayout(layout);
 }
 
 void QmitkVideoPlayer::SetFocus()
@@ -56,12 +53,12 @@ void QmitkVideoPlayer::SetFocus()
   m_OpenCVVideoControls->setFocus();
 }
 
-void QmitkVideoPlayer::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkVideoPlayer::RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart)
 {
   m_OpenCVVideoControls->SetRenderWindow(renderWindowPart->GetActiveQmitkRenderWindow());
 }
 
-void QmitkVideoPlayer::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+void QmitkVideoPlayer::RenderWindowPartDeactivated(mitk::IRenderWindowPart * /*renderWindowPart*/)
 {
   m_OpenCVVideoControls->SetRenderWindow(NULL);
 }

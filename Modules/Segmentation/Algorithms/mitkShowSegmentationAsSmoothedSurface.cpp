@@ -15,28 +15,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkShowSegmentationAsSmoothedSurface.h"
-#include "mitkImageToItk.h"
-#include "mitkImageCast.h"
 #include "itkIntelligentBinaryClosingFilter.h"
-#include <mitkUIDGenerator.h>
-#include <mitkGeometry3D.h>
-#include <mitkProgressBar.h>
-#include <mitkStatusBar.h>
-#include <mitkImageTimeSelector.h>
-#include <mitkImageToSurfaceFilter.h>
-#include <mitkVtkRepresentationProperty.h>
-#include <itkImageRegionIteratorWithIndex.h>
-#include <itkRegionOfInterestImageFilter.h>
-#include <itkConstantPadImageFilter.h>
+#include "mitkImageCast.h"
+#include "mitkImageToItk.h"
+#include <itkAddImageFilter.h>
 #include <itkBinaryMedianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkDiscreteGaussianImageFilter.h>
-#include <itkMultiplyImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>
-#include <itkAddImageFilter.h>
-#include <vtkQuadricDecimation.h>
+#include <itkConstantPadImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+#include <itkImageRegionIteratorWithIndex.h>
+#include <itkMultiplyImageFilter.h>
+#include <itkRegionOfInterestImageFilter.h>
+#include <mitkGeometry3D.h>
+#include <mitkImageTimeSelector.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkProgressBar.h>
+#include <mitkStatusBar.h>
+#include <mitkUIDGenerator.h>
+#include <mitkVtkRepresentationProperty.h>
 #include <vtkCleanPolyData.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkQuadricDecimation.h>
 
 using namespace mitk;
 using namespace std;
@@ -220,7 +220,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   typedef itk::ConstantPadImageFilter<CharImageType, CharImageType> PadFilterType;
 
   PadFilterType::Pointer padFilter = PadFilterType::New();
-  const PadFilterType::SizeValueType pad[3] = { 10, 10, 10 };
+  const PadFilterType::SizeValueType pad[3] = {10, 10, 10};
 
   padFilter->SetInput(roiFilter->GetOutput());
   padFilter->SetConstant(0);
@@ -259,7 +259,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
   typedef itk::BinaryMedianImageFilter<CharImageType, CharImageType> MedianFilterType;
 
   MedianFilterType::Pointer medianFilter = MedianFilterType::New();
-  CharImageType::SizeType radius = { 0 };
+  CharImageType::SizeType radius = {0};
 
   medianFilter->SetRadius(radius);
   medianFilter->SetBackgroundValue(0);
@@ -424,7 +424,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
     quadricDecimation->GlobalWarningDisplayOff();
     quadricDecimation->Update();
 
-    vtkCleanPolyData* cleaner = vtkCleanPolyData::New();
+    vtkCleanPolyData *cleaner = vtkCleanPolyData::New();
     cleaner->SetInputConnection(quadricDecimation->GetOutputPort());
     cleaner->PieceInvariantOn();
     cleaner->ConvertLinesToPointsOn();
@@ -439,7 +439,7 @@ bool ShowSegmentationAsSmoothedSurface::ThreadedUpdateFunction()
 
   // Compute Normals
 
-  vtkPolyDataNormals* computeNormals = vtkPolyDataNormals::New();
+  vtkPolyDataNormals *computeNormals = vtkPolyDataNormals::New();
   computeNormals->SetInputData(m_Surface->GetVtkPolyData());
   computeNormals->SetFeatureAngle(360.0f);
   computeNormals->AutoOrientNormalsOn();
@@ -460,8 +460,8 @@ void ShowSegmentationAsSmoothedSurface::ThreadedUpdateSuccessful()
 
   if (wireframe)
   {
-    VtkRepresentationProperty *representation = dynamic_cast<VtkRepresentationProperty *>(
-      node->GetProperty("material.representation"));
+    VtkRepresentationProperty *representation =
+      dynamic_cast<VtkRepresentationProperty *>(node->GetProperty("material.representation"));
 
     if (representation != nullptr)
       representation->SetRepresentationToWireframe();

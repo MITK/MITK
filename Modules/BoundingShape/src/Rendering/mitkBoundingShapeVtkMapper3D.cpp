@@ -14,19 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "../DataManagement/mitkBoundingShapeUtil.h"
-#include <vtkAppendPolyData.h>
 #include "mitkBoundingShapeVtkMapper3D.h"
+#include "../DataManagement/mitkBoundingShapeUtil.h"
 #include <mitkBaseProperty.h>
-#include <vtkCubeSource.h>
+#include <vtkAppendPolyData.h>
 #include <vtkCamera.h>
+#include <vtkCubeSource.h>
 #include <vtkDataSetMapper.h>
 #include <vtkMath.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkSphereSource.h>
 #include <vtkTransformFilter.h>
-
 
 namespace mitk
 {
@@ -38,8 +37,8 @@ namespace mitk
       LocalStorage();
       ~LocalStorage();
 
-      LocalStorage(const LocalStorage&) = delete;
-      LocalStorage& operator=(const LocalStorage&) = delete;
+      LocalStorage(const LocalStorage &) = delete;
+      LocalStorage &operator=(const LocalStorage &) = delete;
 
       std::vector<vtkSmartPointer<vtkSphereSource>> Handles;
       vtkSmartPointer<vtkActor> Actor;
@@ -49,8 +48,7 @@ namespace mitk
     };
 
   public:
-    Impl()
-      : DistanceFromCam(1.0)
+    Impl() : DistanceFromCam(1.0)
     {
       Point3D initialPoint;
       initialPoint.Fill(0);
@@ -79,13 +77,12 @@ mitk::BoundingShapeVtkMapper3D::Impl::LocalStorage::~LocalStorage()
 {
 }
 
-void mitk::BoundingShapeVtkMapper3D::SetDefaultProperties(DataNode* node, BaseRenderer* renderer, bool overwrite)
+void mitk::BoundingShapeVtkMapper3D::SetDefaultProperties(DataNode *node, BaseRenderer *renderer, bool overwrite)
 {
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-mitk::BoundingShapeVtkMapper3D::BoundingShapeVtkMapper3D()
-  : m_Impl(new Impl)
+mitk::BoundingShapeVtkMapper3D::BoundingShapeVtkMapper3D() : m_Impl(new Impl)
 {
 }
 
@@ -94,12 +91,12 @@ mitk::BoundingShapeVtkMapper3D::~BoundingShapeVtkMapper3D()
   delete m_Impl;
 }
 
-void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer* renderer, vtkActor* actor)
+void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
   Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 }
 
-void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer* renderer, vtkActor* actor)
+void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor)
 {
   if (actor == nullptr)
     return;
@@ -121,14 +118,14 @@ void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer* 
   property->SetLineWidth(lineWidth);
 }
 
-void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* renderer)
+void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *renderer)
 {
   auto dataNode = this->GetDataNode();
 
   if (dataNode == nullptr)
     return;
 
-  vtkCamera* camera = renderer->GetVtkRenderer()->GetActiveCamera();
+  vtkCamera *camera = renderer->GetVtkRenderer()->GetActiveCamera();
 
   auto localStorage = m_Impl->LocalStorageHandler.GetLocalStorage(renderer);
   bool needGenerateData = localStorage->GetLastGenerateDataTime() < dataNode->GetMTime();
@@ -152,7 +149,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     }
 
     // set the input-object at time t for the mapper
-    GeometryData* geometryData = dynamic_cast<GeometryData*>(dataNode->GetData());
+    GeometryData *geometryData = dynamic_cast<GeometryData *>(dataNode->GetData());
     if (geometryData == nullptr)
       return;
 
@@ -168,14 +165,18 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     Point3D p4 = cornerPoints[4];
 
     Point3D extent;
-    extent[0] = sqrt((p0[0] - p4[0])*(p0[0] - p4[0]) + (p0[1] - p4[1])*(p0[1] - p4[1]) + (p0[2] - p4[2])*(p0[2] - p4[2]));
-    extent[1] = sqrt((p0[0] - p2[0])*(p0[0] - p2[0]) + (p0[1] - p2[1])*(p0[1] - p2[1]) + (p0[2] - p2[2])*(p0[2] - p2[2]));
-    extent[2] = sqrt((p0[0] - p1[0])*(p0[0] - p1[0]) + (p0[1] - p1[1])*(p0[1] - p1[1]) + (p0[2] - p1[2])*(p0[2] - p1[2]));
+    extent[0] =
+      sqrt((p0[0] - p4[0]) * (p0[0] - p4[0]) + (p0[1] - p4[1]) * (p0[1] - p4[1]) + (p0[2] - p4[2]) * (p0[2] - p4[2]));
+    extent[1] =
+      sqrt((p0[0] - p2[0]) * (p0[0] - p2[0]) + (p0[1] - p2[1]) * (p0[1] - p2[1]) + (p0[2] - p2[2]) * (p0[2] - p2[2]));
+    extent[2] =
+      sqrt((p0[0] - p1[0]) * (p0[0] - p1[0]) + (p0[1] - p1[1]) * (p0[1] - p1[1]) + (p0[2] - p1[2]) * (p0[2] - p1[2]));
 
     // calculate center based on half way of the distance between two opposing cornerpoints
     mitk::Point3D center = CalcAvgPoint(cornerPoints[7], cornerPoints[0]);
 
-    if (m_Impl->HandlePropertyList.size() == 6){
+    if (m_Impl->HandlePropertyList.size() == 6)
+    {
       // set handle positions
       Point3D pointLeft = CalcAvgPoint(cornerPoints[5], cornerPoints[6]);
       Point3D pointRight = CalcAvgPoint(cornerPoints[1], cornerPoints[2]);
@@ -200,7 +201,9 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     // calculates translation based on offset+extent not on the transformation matrix
     vtkSmartPointer<vtkMatrix4x4> imageTransform = geometry->GetVtkTransform()->GetMatrix();
     auto translation = vtkSmartPointer<vtkTransform>::New();
-    translation->Translate(center[0] - imageTransform->GetElement(0, 3), center[1] - imageTransform->GetElement(1, 3), center[2] - imageTransform->GetElement(2, 3));
+    translation->Translate(center[0] - imageTransform->GetElement(0, 3),
+                           center[1] - imageTransform->GetElement(1, 3),
+                           center[2] - imageTransform->GetElement(2, 3));
 
     auto transform = vtkSmartPointer<vtkTransform>::New();
     transform->SetMatrix(imageTransform);
@@ -215,7 +218,6 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     transformFilter->Update();
     cube->Delete();
 
-
     vtkSmartPointer<vtkPolyData> polydata = transformFilter->GetPolyDataOutput();
     if (polydata == nullptr)
     {
@@ -223,15 +225,18 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
       return;
     }
 
-    mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
+    mitk::DoubleProperty::Pointer handleSizeProperty =
+      dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
 
     ScalarType initialHandleSize;
     if (handleSizeProperty != nullptr)
       initialHandleSize = handleSizeProperty->GetValue();
     else
-      initialHandleSize = 1.0/40.0;
+      initialHandleSize = 1.0 / 40.0;
 
-    double handlesize = ((camera->GetDistance()*std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0)*initialHandleSize;
+    double handlesize =
+      ((camera->GetDistance() * std::tan(vtkMath::RadiansFromDegrees(camera->GetViewAngle()))) / 2.0) *
+      initialHandleSize;
 
     if (localStorage->PropAssembly->GetParts()->IsItemPresent(localStorage->HandleActor))
       localStorage->PropAssembly->RemovePart(localStorage->HandleActor);
@@ -241,7 +246,8 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     auto selectedhandlemapper = vtkSmartPointer<vtkPolyDataMapper>::New();
     auto appendPoly = vtkSmartPointer<vtkAppendPolyData>::New();
 
-    mitk::IntProperty::Pointer activeHandleId = dynamic_cast<mitk::IntProperty*>(dataNode->GetProperty("Bounding Shape.Active Handle ID"));
+    mitk::IntProperty::Pointer activeHandleId =
+      dynamic_cast<mitk::IntProperty *>(dataNode->GetProperty("Bounding Shape.Active Handle ID"));
 
     int i = 0;
     for (auto &handle : localStorage->Handles)
@@ -283,8 +289,9 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     localStorage->Actor->GetMapper()->SetInputDataObject(polydata);
     localStorage->Actor->GetProperty()->SetOpacity(0.3);
 
-    mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(dataNode->GetProperty("color"));
-    if (selectedColor != nullptr){
+    mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty *>(dataNode->GetProperty("color"));
+    if (selectedColor != nullptr)
+    {
       mitk::Color color = selectedColor->GetColor();
       localStorage->Actor->GetProperty()->SetColor(color[0], color[1], color[2]);
     }
@@ -326,7 +333,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer* rende
     localStorage->UpdateGenerateDataTime();
   }
 }
-vtkProp* mitk::BoundingShapeVtkMapper3D::GetVtkProp(BaseRenderer* renderer)
+vtkProp *mitk::BoundingShapeVtkMapper3D::GetVtkProp(BaseRenderer *renderer)
 {
   return m_Impl->LocalStorageHandler.GetLocalStorage(renderer)->PropAssembly;
 }

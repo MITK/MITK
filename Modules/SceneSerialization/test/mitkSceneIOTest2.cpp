@@ -14,14 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestFixture.h"
 #include "mitkException.h"
+#include "mitkTestFixture.h"
 #include "mitkTestingMacros.h"
 
+#include "mitkDataStorageCompare.h"
 #include "mitkIOUtil.h"
 #include "mitkSceneIO.h"
 #include "mitkSceneIOTestScenarioProvider.h"
-#include "mitkDataStorageCompare.h"
 
 /**
   \brief Test cases for SceneIO.
@@ -51,7 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
     - existing error reporting should mention failures (create faulty test scene files!)
   - Error reporting methods
     - why do they return C pointers??
-    - failed properties are not meaningful, they lack association with a data node (even if it could be deduced from the input data storage)
+    - failed properties are not meaningful, they lack association with a data node (even if it could be deduced from the
+  input data storage)
     - don't test that too much, this is worth re-thinking
   - I/O tests:
     - data storage could be compared: calculate bounds, get group tags
@@ -86,12 +87,7 @@ class mitkSceneIOTest2Suite : public mitk::TestFixture
   mitk::SceneIOTestScenarioProvider m_TestCaseProvider;
 
 public:
-
-  void Test_SceneIOInterfaces()
-  {
-    CPPUNIT_ASSERT_MESSAGE("Not urgent", true);
-  }
-
+  void Test_SceneIOInterfaces() { CPPUNIT_ASSERT_MESSAGE("Not urgent", true); }
   void Test_ReconstructionOfScenes()
   {
     std::string tempDir = mitk::IOUtil::CreateTemporaryDirectory("SceneIOTest_XXXXXX");
@@ -105,38 +101,37 @@ public:
       std::string archiveFilename = mitk::IOUtil::CreateTemporaryFile("scene_XXXXXX.mitk", tempDir);
       mitk::SceneIO::Pointer writer = mitk::SceneIO::New();
       mitk::DataStorage::Pointer originalStorage = scenario.BuildDataStorage();
-      CPPUNIT_ASSERT_MESSAGE(std::string("Save test scenario '") + scenario.key + "' to '" + archiveFilename + "'",
-          scenario.serializable == writer->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename)
-          );
+      CPPUNIT_ASSERT_MESSAGE(
+        std::string("Save test scenario '") + scenario.key + "' to '" + archiveFilename + "'",
+        scenario.serializable == writer->SaveScene(originalStorage->GetAll(), originalStorage, archiveFilename));
 
       if (scenario.serializable)
       {
         mitk::SceneIO::Pointer reader = mitk::SceneIO::New();
         mitk::DataStorage::Pointer restoredStorage;
         CPPUNIT_ASSERT_NO_THROW(restoredStorage = reader->LoadScene(archiveFilename));
-        CPPUNIT_ASSERT_MESSAGE(std::string("Comparing restored test scenario '") + scenario.key + "'",
-            mitk::DataStorageCompare(originalStorage,
-                                     restoredStorage,
-                                     // TODO make those flags part of the scenario object
-                                     // TODO make known/expected failures also part of the
-                                     //      scenario object (but this needs a way to describe them, first)
-                                     mitk::DataStorageCompare::CMP_Hierarchy |
-                                     mitk::DataStorageCompare::CMP_Data |
+        CPPUNIT_ASSERT_MESSAGE(
+          std::string("Comparing restored test scenario '") + scenario.key + "'",
+          mitk::DataStorageCompare(originalStorage,
+                                   restoredStorage,
+                                   // TODO make those flags part of the scenario object
+                                   // TODO make known/expected failures also part of the
+                                   //      scenario object (but this needs a way to describe them, first)
+                                   mitk::DataStorageCompare::CMP_Hierarchy | mitk::DataStorageCompare::CMP_Data |
                                      mitk::DataStorageCompare::CMP_Properties |
                                      // mappers tested although SceneIO leaves default mappers
                                      mitk::DataStorageCompare::CMP_Mappers,
-                                     //mitk::DataStorageCompare::CMP_Interactors
-                                     // interactors skipped for now
-                                     scenario.comparisonPrecision
-                                     ).CompareVerbose()
-            );
+                                   // mitk::DataStorageCompare::CMP_Interactors
+                                   // interactors skipped for now
+                                   scenario.comparisonPrecision)
+            .CompareVerbose());
       }
     }
   }
 
 }; // class
 
-int mitkSceneIOTest2(int /*argc*/, char* /*argv*/[])
+int mitkSceneIOTest2(int /*argc*/, char * /*argv*/ [])
 {
   CppUnit::TextUi::TestRunner runner;
   runner.addTest(mitkSceneIOTest2Suite::suite());

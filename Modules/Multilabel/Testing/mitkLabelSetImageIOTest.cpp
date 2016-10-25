@@ -35,11 +35,10 @@ private:
   mitk::LabelSetImage::Pointer multilabelImage;
 
 public:
-
   void setUp() override
   {
     regularImage = mitk::Image::New();
-    unsigned int dimensions[3] = {256,256,312};
+    unsigned int dimensions[3] = {256, 256, 312};
     regularImage->Initialize(mitk::MakeScalarPixelType<int>(), 3, dimensions);
 
     multilabelImage = mitk::LabelSetImage::New();
@@ -75,17 +74,17 @@ public:
 
     mitk::IOUtil::Save(multilabelImage, pathToImage);
 
-    //dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetInput(multilabelImage);
-    //dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetOutputLocation(pathToImage);
-    //dynamic_cast<mitk::IFileWriter*>(lsetIO)->Write();
+    // dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetInput(multilabelImage);
+    // dynamic_cast<mitk::IFileWriter*>(lsetIO)->SetOutputLocation(pathToImage);
+    // dynamic_cast<mitk::IFileWriter*>(lsetIO)->Write();
   }
 
   void TestReadLabelSetImage()
   {
-    dynamic_cast<mitk::IFileReader*>(lsetIO)->SetInput(pathToImage);
-    std::vector<mitk::BaseData::Pointer> data = dynamic_cast<mitk::IFileReader*>(lsetIO)->Read();
+    dynamic_cast<mitk::IFileReader *>(lsetIO)->SetInput(pathToImage);
+    std::vector<mitk::BaseData::Pointer> data = dynamic_cast<mitk::IFileReader *>(lsetIO)->Read();
     CPPUNIT_ASSERT_MESSAGE("Too many images have been read", data.size() == 1);
-    mitk::LabelSetImage::Pointer loadedImage = dynamic_cast<mitk::LabelSetImage*>(data.at(0).GetPointer());
+    mitk::LabelSetImage::Pointer loadedImage = dynamic_cast<mitk::LabelSetImage *>(data.at(0).GetPointer());
 
     // This information is currently not serialized but also checked within the Equals function
     loadedImage->SetActiveLayer(multilabelImage->GetActiveLayer());

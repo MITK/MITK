@@ -14,16 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkTestingMacros.h>
-#include <mitkSurface.h>
 #include <mitkIOUtil.h>
-#include <vtkCleanPolyData.h>
+#include <mitkSurface.h>
 #include <mitkTestFixture.h>
-
+#include <mitkTestingMacros.h>
+#include <vtkCleanPolyData.h>
 
 #include "mitkAnisotropicIterativeClosestPointRegistration.h"
-#include "mitkCovarianceMatrixCalculator.h"
 #include "mitkAnisotropicRegistrationCommon.h"
+#include "mitkCovarianceMatrixCalculator.h"
 
 /**
  * Test to verify the results of the A-ICP registration.
@@ -37,10 +36,9 @@ class mitkAnisotropicIterativeClosestPointRegistrationTestSuite : public mitk::T
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
-  typedef itk::Matrix < double, 3, 3 > Matrix3x3;
-  typedef itk::Vector < double, 3 > Vector3;
-  typedef std::vector < Matrix3x3 > CovarianceMatrixList;
+  typedef itk::Matrix<double, 3, 3> Matrix3x3;
+  typedef itk::Vector<double, 3> Vector3;
+  typedef std::vector<Matrix3x3> CovarianceMatrixList;
 
   mitk::Surface::Pointer m_MovingSurface;
   mitk::Surface::Pointer m_FixedSurface;
@@ -54,7 +52,6 @@ private:
   double m_FRENormalizationFactor;
 
 public:
-
   /**
    * @brief Setup Always call this method before each Test-case to ensure
    * correct and new intialization of the used members for a new test case.
@@ -62,8 +59,7 @@ public:
    */
   void setUp() override
   {
-    mitk::CovarianceMatrixCalculator::Pointer matrixCalculator
-                                      = mitk::CovarianceMatrixCalculator::New();
+    mitk::CovarianceMatrixCalculator::Pointer matrixCalculator = mitk::CovarianceMatrixCalculator::New();
 
     m_MovingSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_green.stl"));
     m_FixedSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("AICPRegistration/head_red.stl"));
@@ -82,7 +78,7 @@ public:
     m_SigmasFixedSurface = matrixCalculator->GetCovarianceMatrices();
     const double meanVarY = matrixCalculator->GetMeanVariance();
 
-    m_FRENormalizationFactor = sqrt( meanVarX + meanVarY );
+    m_FRENormalizationFactor = sqrt(meanVarX + meanVarY);
   }
 
   void tearDown() override
@@ -102,7 +98,7 @@ public:
     const double expFRE = 27.5799;
     const double expTRE = 1.68835;
     mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
-                      mitk::AnisotropicIterativeClosestPointRegistration::New();
+      mitk::AnisotropicIterativeClosestPointRegistration::New();
 
     // set up parameters
     aICP->SetMovingSurface(m_MovingSurface);
@@ -117,21 +113,20 @@ public:
 
     MITK_INFO << "FRE: Expected: " << expFRE << ", computed: " << aICP->GetFRE();
     CPPUNIT_ASSERT_MESSAGE("mitkAnisotropicIterativeClosestPointRegistrationTest:AicpRegistration Test FRE",
-                           mitk::Equal(aICP->GetFRE(),expFRE,0.0001));
+                           mitk::Equal(aICP->GetFRE(), expFRE, 0.0001));
 
     // compute the target registration Error
-    const double tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(
-                                                                                     m_TargetsMovingSurface.GetPointer(),
-                                                                                     m_TargetsFixedSurface.GetPointer(),
-                                                                                     aICP->GetRotation(),
-                                                                                     aICP->GetTranslation()
-                                                                                   );
+    const double tre =
+      mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(m_TargetsMovingSurface.GetPointer(),
+                                                                          m_TargetsFixedSurface.GetPointer(),
+                                                                          aICP->GetRotation(),
+                                                                          aICP->GetTranslation());
 
-   // MITK_INFO << "R:\n" << aICP->GetRotation() << "T: "<< aICP->GetTranslation();
+    // MITK_INFO << "R:\n" << aICP->GetRotation() << "T: "<< aICP->GetTranslation();
 
     MITK_INFO << "TRE: Expected: " << expTRE << ", computed: " << tre;
     CPPUNIT_ASSERT_MESSAGE("mitkAnisotropicIterativeClosestPointRegistrationTest:AicpRegistration Test TRE",
-                           mitk::Equal(tre,expTRE,0.00001));
+                           mitk::Equal(tre, expTRE, 0.00001));
   }
 
   void testTrimmedAicpregistration()
@@ -140,7 +135,7 @@ public:
     const double expTRE = 0.0484215;
 
     mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
-                      mitk::AnisotropicIterativeClosestPointRegistration::New();
+      mitk::AnisotropicIterativeClosestPointRegistration::New();
 
     // Swap X and Y for partial overlapping registration
     aICP->SetMovingSurface(m_MovingSurface);
@@ -157,19 +152,18 @@ public:
     MITK_INFO << "FRE: Expected: " << expFRE << ", computed: " << aICP->GetFRE();
 
     CPPUNIT_ASSERT_MESSAGE("mitkAnisotropicIterativeClosestPointRegistrationTest:AicpRegistration Test FRE",
-                           mitk::Equal(aICP->GetFRE(),expFRE,0.01));
+                           mitk::Equal(aICP->GetFRE(), expFRE, 0.01));
 
     // compute the target registration Error
-    const double tre = mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(
-                                                                                     m_TargetsMovingSurface.GetPointer(),
-                                                                                     m_TargetsFixedSurface.GetPointer(),
-                                                                                     aICP->GetRotation(),
-                                                                                     aICP->GetTranslation()
-                                                                                   );
+    const double tre =
+      mitk::AnisotropicRegistrationCommon::ComputeTargetRegistrationError(m_TargetsMovingSurface.GetPointer(),
+                                                                          m_TargetsFixedSurface.GetPointer(),
+                                                                          aICP->GetRotation(),
+                                                                          aICP->GetTranslation());
 
     MITK_INFO << "TRE: Expected: " << expTRE << ", computed: " << tre;
     CPPUNIT_ASSERT_MESSAGE("mitkAnisotropicIterativeClosestPointRegistrationTest:AicpRegistration Test TRE",
-                          mitk::Equal(tre,expTRE,0.01));
+                           mitk::Equal(tre, expTRE, 0.01));
   }
 };
 

@@ -15,12 +15,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNormalizedCorrelationMetricView.h"
-#include <itkNormalizedCorrelationImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkNormalizedCorrelationImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkNormalizedCorrelationMetricView::QmitkNormalizedCorrelationMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkNormalizedCorrelationMetricView::QmitkNormalizedCorrelationMetricView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -43,12 +44,14 @@ itk::Object::Pointer QmitkNormalizedCorrelationMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkNormalizedCorrelationMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkNormalizedCorrelationMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer =
+    itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::New();
   MetricPointer->SetComputeGradient(m_Controls.m_ComputeGradient->isChecked());
   m_MetricObject = MetricPointer.GetPointer();
   return MetricPointer.GetPointer();
@@ -73,7 +76,7 @@ QString QmitkNormalizedCorrelationMetricView::GetName()
   return "NormalizedCorrelation";
 }
 
-void QmitkNormalizedCorrelationMetricView::SetupUI(QWidget* parent)
+void QmitkNormalizedCorrelationMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
 }

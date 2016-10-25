@@ -29,15 +29,14 @@ class mitkFeatureBasedEdgeDetectionFilterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   /** Members used inside the different test methods. All members are initialized via setUp().*/
   mitk::Image::Pointer m_Pic3D;
   mitk::Image::Pointer m_Segmentation;
 
 public:
-
   /**
-   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used members for a new test case. (If the members are not used in a test, the method does not need to be called).
+   * @brief Setup Always call this method before each Test-case to ensure correct and new intialization of the used
+   * members for a new test case. (If the members are not used in a test, the method does not need to be called).
    */
   void setUp()
   {
@@ -67,7 +66,6 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testFilter->GetOutput()->GetVtkUnstructuredGrid() != NULL);
   }
-
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkFeatureBasedEdgeDetectionFilter)

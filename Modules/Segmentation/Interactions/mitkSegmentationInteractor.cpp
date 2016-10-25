@@ -15,8 +15,8 @@
  ===================================================================*/
 
 #include "mitkSegmentationInteractor.h"
-#include "mitkLabelSetImage.h"
 #include "mitkInteractionPositionEvent.h"
+#include "mitkLabelSetImage.h"
 #include "mitkToolManager.h"
 #include "mitkToolManagerProvider.h"
 
@@ -26,36 +26,36 @@ void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 {
   Superclass::ConnectActionsAndFunctions();
 
-  //CONNECT_FUNCTION("change_active_label", ChangeActiveLabel);
+  // CONNECT_FUNCTION("change_active_label", ChangeActiveLabel);
 }
 
-bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction*, InteractionEvent* interactionEvent)
+bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  InteractionPositionEvent* positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
+  InteractionPositionEvent *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
 
-  //MLI TODO
-  //m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
-  //m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
+  // MLI TODO
+  // m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
+  // m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
 
-  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  mitk::ToolManager *toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert(toolManager);
 
-  DataNode* workingNode( toolManager->GetWorkingData(0) );
+  DataNode *workingNode(toolManager->GetWorkingData(0));
   if (workingNode)
   {
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    mitk::LabelSetImage *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
     assert(workingImage);
 
     int timestep = positionEvent->GetSender()->GetTimeStep();
-    int pixelValue = workingImage->GetPixelValueByWorldCoordinate( positionEvent->GetPositionInWorld(), timestep );
+    int pixelValue = workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep);
     workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
 
     // Call Events
-    //workingImage->ActiveLabelEvent.Send(pixelValue);
+    // workingImage->ActiveLabelEvent.Send(pixelValue);
 
-    //MLI TODO
-    //toolManager->WorkingDataModified.Send();
+    // MLI TODO
+    // toolManager->WorkingDataModified.Send();
   }
 
   sender->GetRenderingManager()->RequestUpdateAll();

@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkSurfaceInterpolationExports.h>
 
 #include "mitkImageSource.h"
-#include "mitkSurface.h"
 #include "mitkProgressBar.h"
+#include "mitkSurface.h"
 
 #include "vnl/vnl_vector_fixed.h"
 
@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Eigen/Dense>
 
-namespace mitk {
-
+namespace mitk
+{
   /**
   \brief This filter interpolates the 3D surface for a segmented area. The basis for the interpolation
          are the edge-points of contours that are drawn into an image.
@@ -45,15 +45,21 @@ namespace mitk {
 
          Based on the contour edge points and their normal this filter calculates a distance function with the following
          properties:
-         - Putting a point into the distance function that lies inside the considered surface gives a negativ scalar value
-         - Putting a point into the distance function that lies outside the considered surface gives a positive scalar value
+         - Putting a point into the distance function that lies inside the considered surface gives a negativ scalar
+  value
+         - Putting a point into the distance function that lies outside the considered surface gives a positive scalar
+  value
          - Putting a point into the distance function that lies exactly on the considered surface gives the value zero
 
-         With this interpolated distance function a distance image will be created. The desired surface can then be extract e.g.
-         with the marching cubes algorithm. (Within the  distance image the surface goes exactly where the pixelvalues are zero)
+         With this interpolated distance function a distance image will be created. The desired surface can then be
+  extract e.g.
+         with the marching cubes algorithm. (Within the  distance image the surface goes exactly where the pixelvalues
+  are zero)
 
-         Note that the obtained distance image has always an isotropig spacing. The size (in this case volume) of the image can be
-         adjusted by calling SetDistanceImageVolume(unsigned int volume) which specifies the number ob pixels enclosed by the image.
+         Note that the obtained distance image has always an isotropig spacing. The size (in this case volume) of the
+  image can be
+         adjusted by calling SetDistanceImageVolume(unsigned int volume) which specifies the number ob pixels enclosed
+  by the image.
 
   \ingroup Process
 
@@ -61,39 +67,34 @@ namespace mitk {
   */
   class MITKSURFACEINTERPOLATION_EXPORT CreateDistanceImageFromSurfaceFilter : public ImageSource
   {
-
   public:
-
-    typedef vnl_vector_fixed<double,3> PointType;
+    typedef vnl_vector_fixed<double, 3> PointType;
 
     typedef itk::Image<double, 3> DistanceImageType;
     typedef DistanceImageType::IndexType IndexType;
 
-    typedef std::vector< PointType > NormalList;
-    typedef std::vector< PointType > CenterList;
+    typedef std::vector<PointType> NormalList;
+    typedef std::vector<PointType> CenterList;
 
     typedef std::vector<Surface::Pointer> SurfaceList;
 
+    mitkClassMacro(CreateDistanceImageFromSurfaceFilter, ImageSource);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro(CreateDistanceImageFromSurfaceFilter,ImageSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      itkGetMacro(DistanceImageSpacing, double)
 
-    itkGetMacro(DistanceImageSpacing, double)
+        using Superclass::SetInput;
 
-    using Superclass::SetInput;
+    // Methods copied from mitkSurfaceToSurfaceFilter
+    virtual void SetInput(const mitk::Surface *surface);
 
-    //Methods copied from mitkSurfaceToSurfaceFilter
-    virtual void SetInput( const mitk::Surface* surface );
+    virtual void SetInput(unsigned int idx, const mitk::Surface *surface);
 
-    virtual void SetInput( unsigned int idx, const mitk::Surface* surface );
+    virtual const mitk::Surface *GetInput();
 
-    virtual const mitk::Surface* GetInput();
+    virtual const mitk::Surface *GetInput(unsigned int idx);
 
-    virtual const mitk::Surface* GetInput( unsigned int idx );
-
-    virtual void RemoveInputs(mitk::Surface* input);
-
+    virtual void RemoveInputs(mitk::Surface *input);
 
     /**
     \brief Set the size of the output distance image. The size is specified by the image's volume
@@ -104,7 +105,7 @@ namespace mitk {
 
     void PrintEquationSystem();
 
-    //Resets the filter, i.e. removes all inputs and outputs
+    // Resets the filter, i.e. removes all inputs and outputs
     void Reset();
 
     /**
@@ -121,8 +122,7 @@ namespace mitk {
     */
     void SetProgressStepSize(unsigned int stepSize);
 
-    void SetReferenceImage( itk::ImageBase<3>::Pointer referenceImage );
-
+    void SetReferenceImage(itk::ImageBase<3>::Pointer referenceImage);
 
   protected:
     CreateDistanceImageFromSurfaceFilter();
@@ -130,13 +130,11 @@ namespace mitk {
     virtual void GenerateData() override;
     virtual void GenerateOutputInformation() override;
 
-
   private:
-
     void CreateSolutionMatrixAndFunctionValues();
     double CalculateDistanceValue(PointType p);
 
-    void FillDistanceImage ();
+    void FillDistanceImage();
 
     /**
     * \brief This method fills the given variables with the minimum and
@@ -152,16 +150,15 @@ namespace mitk {
     *
     * These minimal and maximal points are then set to the given variables.
     */
-    void DetermineBounds( DistanceImageType::PointType &minPointInWorldCoordinates,
-                          DistanceImageType::PointType &maxPointInWorldCoordinates,
-                          DistanceImageType::IndexType &minPointInIndexCoordinates,
-                          DistanceImageType::IndexType &maxPointInIndexCoordinates );
-
+    void DetermineBounds(DistanceImageType::PointType &minPointInWorldCoordinates,
+                         DistanceImageType::PointType &maxPointInWorldCoordinates,
+                         DistanceImageType::IndexType &minPointInIndexCoordinates,
+                         DistanceImageType::IndexType &maxPointInIndexCoordinates);
 
     void PreprocessContourPoints();
     void CreateEmptyDistanceImage();
 
-    //Datastructures for the interpolation
+    // Datastructures for the interpolation
     CenterList m_Centers;
     NormalList m_Normals;
 
@@ -180,7 +177,6 @@ namespace mitk {
     unsigned int m_ProgressStepSize;
   };
 
-}//namespace
-
+} // namespace
 
 #endif

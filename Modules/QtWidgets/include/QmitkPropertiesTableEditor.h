@@ -42,17 +42,14 @@ class MITKQTWIDGETS_EXPORT QmitkPropertiesTableEditor : public QWidget
   Q_OBJECT
 
 public:
-
   ///
   /// Constructs a new QmitkDataStorageTableModel
   /// and sets the DataNode for this TableModel.
-  QmitkPropertiesTableEditor(QWidget* parent = 0, Qt::WindowFlags f = 0,mitk::DataNode::Pointer _Node = 0);
+  QmitkPropertiesTableEditor(QWidget *parent = 0, Qt::WindowFlags f = 0, mitk::DataNode::Pointer _Node = 0);
 
   ///
   /// Standard dtor. Nothing to do here.
   virtual ~QmitkPropertiesTableEditor();
-
-
 
   ///
   /// Convenience method. Sets the property list in the model.
@@ -62,12 +59,13 @@ public:
   ///
   /// Get the model.
   ///
-  QmitkPropertiesTableModel* getModel() const;
+  QmitkPropertiesTableModel *getModel() const;
 
-  QTableView* getTable() const;
+  QTableView *getTable() const;
 
-  protected slots:
-    void PropertyFilterKeyWordTextChanged(const QString & text);
+protected slots:
+  void PropertyFilterKeyWordTextChanged(const QString &text);
+
 protected:
   ///
   /// Initialise empty GUI.
@@ -76,16 +74,17 @@ protected:
   ///
   /// The table view that renders the property list.
   ///
-  QTableView* m_NodePropertiesTableView;
+  QTableView *m_NodePropertiesTableView;
   ///
-  /// A text field in which the user can enter a filter keyword for the properties. Only properties containing with this keyword
+  /// A text field in which the user can enter a filter keyword for the properties. Only properties containing with this
+  /// keyword
   /// will be selected.
   ///
-  QLineEdit* m_TxtPropertyFilterKeyWord;
+  QLineEdit *m_TxtPropertyFilterKeyWord;
   ///
   /// The property list table model.
   ///
-  QmitkPropertiesTableModel* m_Model;
+  QmitkPropertiesTableModel *m_Model;
 };
 
 #endif /* QMITKPROPERTIESTABLEMODEL_H_ */

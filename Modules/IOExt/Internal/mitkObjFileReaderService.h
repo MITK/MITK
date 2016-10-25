@@ -14,39 +14,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef ObjFileReaderService_h
 #define ObjFileReaderService_h
 
 #include <mitkAbstractFileReader.h>
 #include <mitkIOMimeTypes.h>
 
-namespace mitk {
-
+namespace mitk
+{
   class BaseData;
-
 
   /**
   * @brief Used to read surfaces from Wavefront OBJ files.
   *
   * @ingroup IOExt
   */
-class ObjFileReaderService : public AbstractFileReader
-{
-public:
+  class ObjFileReaderService : public AbstractFileReader
+  {
+  public:
+    ObjFileReaderService();
+    virtual ~ObjFileReaderService();
 
-  ObjFileReaderService();
-  virtual ~ObjFileReaderService();
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-  using AbstractFileReader::Read;
-  virtual std::vector< itk::SmartPointer<BaseData> > Read() override;
+    static mitk::CustomMimeType mimeType;
 
-  static mitk::CustomMimeType mimeType;
-
-private:
-
-  ObjFileReaderService* Clone() const override;
-};
+  private:
+    ObjFileReaderService *Clone() const override;
+  };
 
 } // namespace mitk
 

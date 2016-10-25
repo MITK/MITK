@@ -18,22 +18,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <ctkPluginActivator.h>
 
-namespace mitk {
-
-  class PluginActivator :
-    public QObject, public ctkPluginActivator
+namespace mitk
+{
+  class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_examplesopencv")
     Q_INTERFACES(ctkPluginActivator)
 
   public:
-
-    void start(ctkPluginContext* context) override;
-    void stop(ctkPluginContext* context) override;
+    void start(ctkPluginContext *context) override;
+    void stop(ctkPluginContext *context) override;
 
   }; // PluginActivator
-
 }
 
 #endif // MITKPLUGINACTIVATOR_H

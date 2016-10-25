@@ -26,8 +26,6 @@ void QtWidgetsExtRegisterClasses()
 
     static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;
 
-
     alreadyDone = true;
   }
 }
-

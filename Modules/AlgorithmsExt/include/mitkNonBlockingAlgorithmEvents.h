@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkEventObject.h>
 
-namespace mitk {
-
+namespace mitk
+{
   class NonBlockingAlgorithm;
 
   class NonBlockingAlgorithmEvent : public itk::AnyEvent
@@ -29,72 +29,34 @@ namespace mitk {
     typedef NonBlockingAlgorithmEvent Self;
     typedef itk::AnyEvent Superclass;
 
-    NonBlockingAlgorithmEvent( const NonBlockingAlgorithm* algorithm = nullptr )
-      : m_Algorithm(algorithm) {}
-
+    NonBlockingAlgorithmEvent(const NonBlockingAlgorithm *algorithm = nullptr) : m_Algorithm(algorithm) {}
     virtual ~NonBlockingAlgorithmEvent() {}
-
-    virtual const char * GetEventName() const override
-    {
-      return "NonBlockingAlgorithmEvent";
-    }
-
-    virtual bool CheckEvent(const ::itk::EventObject* e) const override
-    {
-      return dynamic_cast<const Self*>(e);
-    }
-
-    virtual ::itk::EventObject* MakeObject() const override
-    {
-      return new Self( m_Algorithm );
-    }
-
-    const mitk::NonBlockingAlgorithm* GetAlgorithm() const
-    {
-      return m_Algorithm.GetPointer();
-    }
-
-    NonBlockingAlgorithmEvent(const Self& s) : itk::AnyEvent(s), m_Algorithm(s.m_Algorithm) {};
+    virtual const char *GetEventName() const override { return "NonBlockingAlgorithmEvent"; }
+    virtual bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+    virtual ::itk::EventObject *MakeObject() const override { return new Self(m_Algorithm); }
+    const mitk::NonBlockingAlgorithm *GetAlgorithm() const { return m_Algorithm.GetPointer(); }
+    NonBlockingAlgorithmEvent(const Self &s) : itk::AnyEvent(s), m_Algorithm(s.m_Algorithm){};
 
   protected:
     mitk::NonBlockingAlgorithm::ConstPointer m_Algorithm;
 
   private:
-    void operator=(const Self&);
-
+    void operator=(const Self &);
   };
-
 
   class ResultAvailable : public NonBlockingAlgorithmEvent
   {
-    public:
-
-      ResultAvailable( const NonBlockingAlgorithm* algorithm = nullptr )
-      : NonBlockingAlgorithmEvent(algorithm)
-      {
-      }
-
-      virtual ~ResultAvailable()
-      {
-      }
+  public:
+    ResultAvailable(const NonBlockingAlgorithm *algorithm = nullptr) : NonBlockingAlgorithmEvent(algorithm) {}
+    virtual ~ResultAvailable() {}
   };
 
   class ProcessingError : public NonBlockingAlgorithmEvent
   {
-    public:
-
-      ProcessingError( const NonBlockingAlgorithm* algorithm = nullptr )
-      : NonBlockingAlgorithmEvent(algorithm)
-      {
-      }
-
-      virtual ~ProcessingError()
-      {
-      }
+  public:
+    ProcessingError(const NonBlockingAlgorithm *algorithm = nullptr) : NonBlockingAlgorithmEvent(algorithm) {}
+    virtual ~ProcessingError() {}
   };
-
-
-
 }
 
 #endif

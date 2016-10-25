@@ -15,43 +15,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "Step6.h"
 
-#include <mitkProperties.h>
 #include <mitkPointSet.h>
+#include <mitkProperties.h>
 
-#include <itkCurvatureFlowImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>
+#include <itkCurvatureFlowImageFilter.h>
 
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkLevelWindowProperty.h>
 
-template < typename TPixel, unsigned int VImageDimension >
-void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 )
+template <typename TPixel, unsigned int VImageDimension>
+void RegionGrowing(itk::Image<TPixel, VImageDimension> *itkImage, Step6 *step6)
 {
-  typedef itk::Image< TPixel, VImageDimension > ImageType;
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
 
   typedef float InternalPixelType;
-  typedef itk::Image< InternalPixelType, VImageDimension > InternalImageType;
+  typedef itk::Image<InternalPixelType, VImageDimension> InternalImageType;
 
-  mitk::BaseGeometry* geometry = step6->m_FirstImage->GetGeometry();
+  mitk::BaseGeometry *geometry = step6->m_FirstImage->GetGeometry();
 
   // create itk::CurvatureFlowImageFilter for smoothing and set itkImage as input
-  typedef itk::CurvatureFlowImageFilter< ImageType, InternalImageType >
-    CurvatureFlowFilter;
+  typedef itk::CurvatureFlowImageFilter<ImageType, InternalImageType> CurvatureFlowFilter;
   typename CurvatureFlowFilter::Pointer smoothingFilter = CurvatureFlowFilter::New();
 
-  smoothingFilter->SetInput( itkImage );
-  smoothingFilter->SetNumberOfIterations( 4 );
-  smoothingFilter->SetTimeStep( 0.0625 );
+  smoothingFilter->SetInput(itkImage);
+  smoothingFilter->SetNumberOfIterations(4);
+  smoothingFilter->SetTimeStep(0.0625);
 
   // create itk::ConnectedThresholdImageFilter and set filtered image as input
-  typedef itk::ConnectedThresholdImageFilter< InternalImageType, ImageType > RegionGrowingFilterType;
+  typedef itk::ConnectedThresholdImageFilter<InternalImageType, ImageType> RegionGrowingFilterType;
   typedef typename RegionGrowingFilterType::IndexType IndexType;
   typename RegionGrowingFilterType::Pointer regGrowFilter = RegionGrowingFilterType::New();
 
-  regGrowFilter->SetInput( smoothingFilter->GetOutput() );
-  regGrowFilter->SetLower( step6->GetThresholdMin() );
-  regGrowFilter->SetUpper( step6->GetThresholdMax() );
+  regGrowFilter->SetInput(smoothingFilter->GetOutput());
+  regGrowFilter->SetLower(step6->GetThresholdMin());
+  regGrowFilter->SetUpper(step6->GetThresholdMax());
 
   // convert the points in the PointSet m_Seeds (in world-coordinates) to
   // "index" values, i.e. points in pixel coordinates, and add these as seeds
@@ -61,7 +60,7 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   for (pit = step6->m_Seeds->GetPointSet()->GetPoints()->Begin(); pit != pend; ++pit)
   {
     geometry->WorldToIndex(pit.Value(), seedIndex);
-    regGrowFilter->AddSeed( seedIndex );
+    regGrowFilter->AddSeed(seedIndex);
   }
 
   regGrowFilter->GetOutput()->Update();
@@ -77,16 +76,16 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
   // set some additional properties
   step6->m_ResultNode->SetProperty("name", mitk::StringProperty::New("segmentation"));
   step6->m_ResultNode->SetProperty("binary", mitk::BoolProperty::New(true));
-  step6->m_ResultNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+  step6->m_ResultNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
   step6->m_ResultNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
   step6->m_ResultNode->SetProperty("layer", mitk::IntProperty::New(1));
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   mitk::LevelWindow levelwindow;
-  levelwindow.SetAuto( mitkImage );
-  levWinProp->SetLevelWindow( levelwindow );
-  step6->m_ResultNode->SetProperty( "levelwindow", levWinProp );
+  levelwindow.SetAuto(mitkImage);
+  levWinProp->SetLevelWindow(levelwindow);
+  step6->m_ResultNode->SetProperty("levelwindow", levWinProp);
 
-  step6->m_ResultImage = static_cast<mitk::Image*>(step6->m_ResultNode->GetData());
+  step6->m_ResultImage = static_cast<mitk::Image *>(step6->m_ResultNode->GetData());
 }
 
 /**

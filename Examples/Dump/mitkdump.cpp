@@ -37,30 +37,29 @@
 */
 
 #include "mitkDICOMFileReaderSelector.h"
-#include "mitkDICOMReaderConfigurator.h"
 #include "mitkDICOMImageFrameInfo.h"
+#include "mitkDICOMReaderConfigurator.h"
 
 using mitk::DICOMTag;
 
 std::string buildDateString()
 {
   std::time_t rawtime;
-  std::tm* timeinfo;
-  char buffer [80];
+  std::tm *timeinfo;
+  char buffer[80];
 
   std::time(&rawtime);
   timeinfo = std::localtime(&rawtime);
 
-  std::strftime(buffer,80,"%Y%m%d-%H%M%S",timeinfo);
+  std::strftime(buffer, 80, "%Y%m%d-%H%M%S", timeinfo);
 
   return std::string(buffer);
 }
 
 void gen_random(char *s, const int len)
 {
-  static const char alphanum[] =
-    "0123456789"
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  static const char alphanum[] = "0123456789"
+                                 "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   for (int i = 0; i < len; ++i)
   {
@@ -84,19 +83,14 @@ std::string gen_random(const int len)
   }
 }
 
-std::string removeUnsafeChars(const std::string& str)
+std::string removeUnsafeChars(const std::string &str)
 {
   std::string retval;
-  for(std::string::const_iterator it = str.begin(); it != str.end(); ++it)
+  for (std::string::const_iterator it = str.begin(); it != str.end(); ++it)
   {
-    const char& c = *it;
-    if (   (c >= '0' && c <= '9')
-        || (c >= 'A' && c <= 'Z')
-        || (c >= 'a' && c <= 'z')
-        || (c == '.')
-        || (c == '-')
-        || (c == '_')
-       )
+    const char &c = *it;
+    if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == '.') || (c == '-') ||
+        (c == '_'))
     {
       retval += c;
     }
@@ -104,10 +98,10 @@ std::string removeUnsafeChars(const std::string& str)
   return retval;
 }
 
-std::string extractDirString(const std::string& dirString)
+std::string extractDirString(const std::string &dirString)
 {
   std::string wholeprefix = dirString.substr(0, dirString.find_last_of("/\\"));
-  std::string lastDirectoryPart = wholeprefix.substr(wholeprefix.find_last_of("/\\")+1);
+  std::string lastDirectoryPart = wholeprefix.substr(wholeprefix.find_last_of("/\\") + 1);
   std::string cleanLastDirectoryPart = removeUnsafeChars(lastDirectoryPart);
   if (!cleanLastDirectoryPart.empty())
   {
@@ -122,7 +116,7 @@ std::string extractDirString(const std::string& dirString)
   }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   bool fileDetails(false);
   bool loadimage(false);
@@ -142,12 +136,11 @@ int main(int argc, char* argv[])
     ++firstFileIndex;
   }
 
-
   // analyze files from argv
   mitk::StringList inputFiles;
   for (int a = firstFileIndex; a < argc; ++a)
   {
-    inputFiles.push_back( std::string(argv[a]) );
+    inputFiles.push_back(std::string(argv[a]));
   }
 
   if (inputFiles.empty())
@@ -158,7 +151,7 @@ int main(int argc, char* argv[])
 
   mitk::DICOMFileReaderSelector::Pointer configSelector = mitk::DICOMFileReaderSelector::New();
   configSelector->LoadBuiltIn3DConfigs(); // a set of compiled in ressources with standard configurations that work well
-  configSelector->SetInputFiles( inputFiles );
+  configSelector->SetInputFiles(inputFiles);
   mitk::DICOMFileReader::Pointer reader = configSelector->GetFirstReaderWithMinimumNumberOfOutputImages();
   if (reader.IsNull())
   {
@@ -167,14 +160,16 @@ int main(int argc, char* argv[])
   }
 
   // output best reader result
-  MITK_INFO << "---- Best reader configuration '" << reader->GetConfigurationLabel() << "' with " << reader->GetNumberOfOutputs() << " outputs";
+  MITK_INFO << "---- Best reader configuration '" << reader->GetConfigurationLabel() << "' with "
+            << reader->GetNumberOfOutputs() << " outputs";
   if (fileDetails)
   {
     reader->PrintOutputs(std::cout, fileDetails);
   }
 
   // construct the name of a log file
-  std::string datestring = buildDateString();;
+  std::string datestring = buildDateString();
+  ;
   std::string dirString = extractDirString(argv[firstFileIndex]);
   std::string logfilename = datestring + "_dir_" + dirString + ".mitkdump";
   MITK_INFO << "Logfile " << logfilename;
@@ -182,8 +177,9 @@ int main(int argc, char* argv[])
   // write output to file for later analysis
   std::ofstream fs;
   fs.open(logfilename.c_str());
-  fs << "---- " << dirString << ": Best reader configuration '" << reader->GetConfigurationLabel() << "' with " << reader->GetNumberOfOutputs() << " outputs" << std::endl;
-  reader->PrintOutputs( fs, true); // always verbose in log file
+  fs << "---- " << dirString << ": Best reader configuration '" << reader->GetConfigurationLabel() << "' with "
+     << reader->GetNumberOfOutputs() << " outputs" << std::endl;
+  reader->PrintOutputs(fs, true); // always verbose in log file
   fs.close();
 
   // serialize, deserialize, analyze again, verify result!
@@ -193,32 +189,34 @@ int main(int argc, char* argv[])
   bool outputError(false);
   for (unsigned int outputIndex = 0; outputIndex < reader->GetNumberOfOutputs(); ++outputIndex)
   {
-    const mitk::DICOMImageBlockDescriptor& outputDescriptor = reader->GetOutput(outputIndex);
+    const mitk::DICOMImageBlockDescriptor &outputDescriptor = reader->GetOutput(outputIndex);
 
     mitk::StringList filenamesOfThisGroup;
-    const mitk::DICOMImageFrameList& frames = outputDescriptor.GetImageFrameList();
+    const mitk::DICOMImageFrameList &frames = outputDescriptor.GetImageFrameList();
     for (auto fIter = frames.begin(); fIter != frames.end(); ++fIter)
     {
-      filenamesOfThisGroup.push_back( (*fIter)->Filename );
+      filenamesOfThisGroup.push_back((*fIter)->Filename);
     }
 
     mitk::DICOMReaderConfigurator::Pointer readerConfigurator = mitk::DICOMReaderConfigurator::New();
-    mitk::DICOMFileReader::Pointer dicomReader = readerConfigurator->CreateFromUTF8ConfigString( readerSerialization );
-    dicomReader->SetInputFiles( filenamesOfThisGroup );
+    mitk::DICOMFileReader::Pointer dicomReader = readerConfigurator->CreateFromUTF8ConfigString(readerSerialization);
+    dicomReader->SetInputFiles(filenamesOfThisGroup);
     dicomReader->AnalyzeInputFiles();
     if (dicomReader->GetNumberOfOutputs() != 1)
     {
-      MITK_ERROR << "****** Re-analyzing files of output group " << outputIndex << " yields " << dicomReader->GetNumberOfOutputs() << " groups";
+      MITK_ERROR << "****** Re-analyzing files of output group " << outputIndex << " yields "
+                 << dicomReader->GetNumberOfOutputs() << " groups";
       outputError = true;
 
       for (auto fIter = frames.begin(); fIter != frames.end(); ++fIter)
       {
-        MITK_INFO << "filename group " << outputIndex << ": "  << (*fIter)->Filename;
+        MITK_INFO << "filename group " << outputIndex << ": " << (*fIter)->Filename;
       }
     }
     else
     {
-      MITK_INFO << "Re-analyzing files of output group " << outputIndex << " yields " << dicomReader->GetNumberOfOutputs() << " groups";
+      MITK_INFO << "Re-analyzing files of output group " << outputIndex << " yields "
+                << dicomReader->GetNumberOfOutputs() << " groups";
     }
   }
 
@@ -229,7 +227,7 @@ int main(int argc, char* argv[])
     reader->PrintConfiguration(es);
     es << std::endl;
     mitk::DICOMReaderConfigurator::Pointer readerConfigurator = mitk::DICOMReaderConfigurator::New();
-    mitk::DICOMFileReader::Pointer dicomReader = readerConfigurator->CreateFromUTF8ConfigString( readerSerialization );
+    mitk::DICOMFileReader::Pointer dicomReader = readerConfigurator->CreateFromUTF8ConfigString(readerSerialization);
     es << "New reader configuration: " << std::endl;
     dicomReader->PrintConfiguration(es);
     es << std::endl;
@@ -249,33 +247,35 @@ int main(int argc, char* argv[])
     mitk::BaseGeometry::Pointer geo3D = image->GetGeometry();
     if (geo3D.IsNotNull())
     {
-      mitk::SlicedGeometry3D::Pointer sg = dynamic_cast<mitk::SlicedGeometry3D*>(geo3D.GetPointer());
+      mitk::SlicedGeometry3D::Pointer sg = dynamic_cast<mitk::SlicedGeometry3D *>(geo3D.GetPointer());
       if (sg.IsNotNull())
       {
         unsigned int nos = sg->GetSlices();
         mitk::PlaneGeometry::ConstPointer first = sg->GetPlaneGeometry(0);
-        mitk::PlaneGeometry::ConstPointer last = sg->GetPlaneGeometry(nos-1);
+        mitk::PlaneGeometry::ConstPointer last = sg->GetPlaneGeometry(nos - 1);
 
         mitk::Point3D firstOrigin = first->GetOrigin();
         mitk::Point3D lastOrigin = last->GetOrigin();
         MITK_INFO << "Geometry says: First slice at " << firstOrigin << ", last slice at " << lastOrigin;
 
         mitk::StringLookupTableProperty::Pointer sliceLocations =
-          dynamic_cast<mitk::StringLookupTableProperty*>( image->GetProperty("dicom.image.0020.1041").GetPointer() );
+          dynamic_cast<mitk::StringLookupTableProperty *>(image->GetProperty("dicom.image.0020.1041").GetPointer());
         if (sliceLocations.IsNotNull())
         {
           std::string firstSliceLocation = sliceLocations->GetValue().GetTableValue(0);
-          std::string lastSliceLocation = sliceLocations->GetValue().GetTableValue(nos-1);
-          MITK_INFO << "Image properties says: first slice location at " << firstSliceLocation << ", last slice location at " << lastSliceLocation;
+          std::string lastSliceLocation = sliceLocations->GetValue().GetTableValue(nos - 1);
+          MITK_INFO << "Image properties says: first slice location at " << firstSliceLocation
+                    << ", last slice location at " << lastSliceLocation;
         }
 
         mitk::StringLookupTableProperty::Pointer instanceNumbers =
-          dynamic_cast<mitk::StringLookupTableProperty*>( image->GetProperty("dicom.image.0020.0013").GetPointer() );
+          dynamic_cast<mitk::StringLookupTableProperty *>(image->GetProperty("dicom.image.0020.0013").GetPointer());
         if (instanceNumbers.IsNotNull())
         {
           std::string firstInstanceNumber = instanceNumbers->GetValue().GetTableValue(0);
-          std::string lastInstanceNumber = instanceNumbers->GetValue().GetTableValue(nos-1);
-          MITK_INFO << "Image properties says: first instance number at " << firstInstanceNumber << ", last instance number at " << lastInstanceNumber;
+          std::string lastInstanceNumber = instanceNumbers->GetValue().GetTableValue(nos - 1);
+          MITK_INFO << "Image properties says: first instance number at " << firstInstanceNumber
+                    << ", last instance number at " << lastInstanceNumber;
         }
       }
     }

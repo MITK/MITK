@@ -17,21 +17,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageRegistrationMethod.h"
 #include "mitkImageRegistrationMethodAccessFunctor.h"
 
-namespace mitk {
-
-  ImageRegistrationMethod::ImageRegistrationMethod()
-  : m_Interpolator(0),
-    m_MultiResolutionScales(1)
+namespace mitk
+{
+  ImageRegistrationMethod::ImageRegistrationMethod() : m_Interpolator(0), m_MultiResolutionScales(1)
   {
     m_ReferenceImage = Image::New();
     m_OptimizerScales.clear();
   }
 
-  ImageRegistrationMethod::~ImageRegistrationMethod()
-  {
-
-  }
-
+  ImageRegistrationMethod::~ImageRegistrationMethod() {}
   void ImageRegistrationMethod::GenerateData()
   {
     if (this->GetInput())
@@ -40,16 +34,8 @@ namespace mitk {
     }
   }
 
-  void ImageRegistrationMethod::SetObserver(RigidRegistrationObserver::Pointer observer)
-  {
-    m_Observer = observer;
-  }
-
-  void ImageRegistrationMethod::SetInterpolator(int interpolator)
-  {
-    m_Interpolator = interpolator;
-  }
-
+  void ImageRegistrationMethod::SetObserver(RigidRegistrationObserver::Pointer observer) { m_Observer = observer; }
+  void ImageRegistrationMethod::SetInterpolator(int interpolator) { m_Interpolator = interpolator; }
   void ImageRegistrationMethod::SetReferenceImage(Image::Pointer fixedImage)
   {
     m_ReferenceImage = fixedImage;
@@ -78,25 +64,13 @@ namespace mitk {
     MITK_INFO("Image.Registration.Method") << "Transform : " << m_Transform;
   }
 
-  void ImageRegistrationMethod::SetMetric(itk::Object::Pointer metric)
-  {
-    m_Metric = metric;
-  }
-
-  void ImageRegistrationMethod::SetOptimizer(itk::Object::Pointer optimizer)
-  {
-    m_Optimizer = optimizer;
-  }
-
+  void ImageRegistrationMethod::SetMetric(itk::Object::Pointer metric) { m_Metric = metric; }
+  void ImageRegistrationMethod::SetOptimizer(itk::Object::Pointer optimizer) { m_Optimizer = optimizer; }
   void ImageRegistrationMethod::SetOptimizerScales(itk::Array<double> scales)
   {
-    m_OptimizerScales.set_size( scales.size() );
-    m_OptimizerScales.copy_in( scales.data_block() );
+    m_OptimizerScales.set_size(scales.size());
+    m_OptimizerScales.copy_in(scales.data_block());
   }
 
-  void ImageRegistrationMethod::SetNumberOfLevels(unsigned int levels)
-  {
-    m_MultiResolutionScales = levels;
-  }
-
+  void ImageRegistrationMethod::SetNumberOfLevels(unsigned int levels) { m_MultiResolutionScales = levels; }
 } // end namespace

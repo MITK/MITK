@@ -16,33 +16,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPaintbrushTool.h"
 
-#include "mitkToolManager.h"
-#include "mitkOverwriteSliceImageFilter.h"
-#include "mitkBaseRenderer.h"
-#include "mitkImageDataItem.h"
 #include "ipSegmentation.h"
 #include "mitkAbstractTransformGeometry.h"
+#include "mitkBaseRenderer.h"
+#include "mitkImageDataItem.h"
+#include "mitkOverwriteSliceImageFilter.h"
+#include "mitkToolManager.h"
 
-#include "mitkLevelWindowProperty.h"
-#include "mitkLabelSetImage.h"
 #include "mitkContourModelUtils.h"
+#include "mitkLabelSetImage.h"
+#include "mitkLevelWindowProperty.h"
 
-#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
+#define ROUND(a) ((a) > 0 ? (int)((a) + 0.5) : -(int)(0.5 - (a)))
 
 int mitk::PaintbrushTool::m_Size = 1;
 
 mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
-:FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
- m_PaintingPixelValue(paintingPixelValue),
- m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
+  : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
+    m_PaintingPixelValue(paintingPixelValue),
+    m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
   m_MasterContour = ContourModel::New();
   m_MasterContour->Initialize();
   m_CurrentPlane = nullptr;
 
   m_WorkingNode = DataNode::New();
-  m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
-  m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+  m_WorkingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));
+  m_WorkingNode->SetProperty("binary", mitk::BoolProperty::New(true));
 }
 
 mitk::PaintbrushTool::~PaintbrushTool()
@@ -51,11 +51,11 @@ mitk::PaintbrushTool::~PaintbrushTool()
 
 void mitk::PaintbrushTool::ConnectActionsAndFunctions()
 {
-  CONNECT_FUNCTION( "PrimaryButtonPressed", OnMousePressed);
-  CONNECT_FUNCTION( "Move", OnPrimaryButtonPressedMoved);
-  CONNECT_FUNCTION( "MouseMove", OnMouseMoved);
-  CONNECT_FUNCTION( "Release", OnMouseReleased);
-  CONNECT_FUNCTION( "InvertLogic", OnInvertLogic);
+  CONNECT_FUNCTION("PrimaryButtonPressed", OnMousePressed);
+  CONNECT_FUNCTION("Move", OnPrimaryButtonPressedMoved);
+  CONNECT_FUNCTION("MouseMove", OnMouseMoved);
+  CONNECT_FUNCTION("Release", OnMouseReleased);
+  CONNECT_FUNCTION("InvertLogic", OnInvertLogic);
 }
 
 void mitk::PaintbrushTool::Activated()
@@ -64,17 +64,19 @@ void mitk::PaintbrushTool::Activated()
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
-  m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
+  m_ToolManager->WorkingDataChanged +=
+    mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
 }
 
 void mitk::PaintbrushTool::Deactivated()
 {
   FeedbackContourTool::SetFeedbackContourVisible(false);
   if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
-      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+    m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
   m_WorkingSlice = nullptr;
   m_CurrentPlane = nullptr;
-  m_ToolManager->WorkingDataChanged -= mitk::MessageDelegate<mitk::PaintbrushTool>( this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified );
+  m_ToolManager->WorkingDataChanged -=
+    mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
 
   Superclass::Deactivated();
 }
@@ -86,31 +88,30 @@ void mitk::PaintbrushTool::SetSize(int value)
 
 mitk::Point2D mitk::PaintbrushTool::upperLeft(mitk::Point2D p)
 {
-   p[0] -= 0.5;
-   p[1] += 0.5;
-   return p;
+  p[0] -= 0.5;
+  p[1] += 0.5;
+  return p;
 }
 
-
-void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positionEvent)
+void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positionEvent)
 {
-  //MITK_INFO<<"Update...";
+  // MITK_INFO<<"Update...";
   // examine stateEvent and create a contour that matches the pixel mask that we are going to draw
-  //mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (!positionEvent) return;
+  // mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  // const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
+  if (!positionEvent)
+    return;
 
   // Get Spacing of current Slice
-  //mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing();
+  // mitk::Vector3D vSpacing = m_WorkingSlice->GetSlicedGeometry()->GetPlaneGeometry(0)->GetSpacing();
 
   //
   // Draw a contour in Square according to selected brush size
   //
-  int radius = (m_Size)/2;
+  int radius = (m_Size) / 2;
   float fradius = static_cast<float>(m_Size) / 2.0f;
 
   ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-
 
   // estimate center point of the brush ( relative to the pixel the mouse points on )
   // -- left upper corner for even sizes,
@@ -120,75 +121,73 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
 
   // even --> correction of [+0.5, +0.5]
   bool evenSize = ((m_Size % 2) == 0);
-  if( evenSize )
+  if (evenSize)
   {
     centerCorrection[0] += 0.5;
     centerCorrection[1] += 0.5;
   }
 
   // we will compute the control points for the upper left quarter part of a circle contour
-  std::vector< mitk::Point2D > quarterCycleUpperRight;
-  std::vector< mitk::Point2D > quarterCycleLowerRight;
-  std::vector< mitk::Point2D > quarterCycleLowerLeft;
-  std::vector< mitk::Point2D > quarterCycleUpperLeft;
-
+  std::vector<mitk::Point2D> quarterCycleUpperRight;
+  std::vector<mitk::Point2D> quarterCycleLowerRight;
+  std::vector<mitk::Point2D> quarterCycleLowerLeft;
+  std::vector<mitk::Point2D> quarterCycleUpperLeft;
 
   mitk::Point2D curPoint;
   bool curPointIsInside = true;
   curPoint[0] = 0;
   curPoint[1] = radius;
-  quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+  quarterCycleUpperRight.push_back(upperLeft(curPoint));
 
   // to estimate if a pixel is inside the circle, we need to compare against the 'outer radius'
   // i.e. the distance from the midpoint [0,0] to the border of the pixel [0,radius]
-  //const float outer_radius = static_cast<float>(radius) + 0.5;
+  // const float outer_radius = static_cast<float>(radius) + 0.5;
 
   while (curPoint[1] > 0)
   {
-     // Move right until pixel is outside circle
-     float curPointX_squared = 0.0f;
-     float curPointY_squared = (curPoint[1] - centerCorrection[1] ) * (curPoint[1] - centerCorrection[1] );
-     while( curPointIsInside )
-     {
-        // increment posX and chec
-        curPoint[0]++;
-        curPointX_squared = (curPoint[0] - centerCorrection[0] ) * (curPoint[0] - centerCorrection[0] );
-        const float len = sqrt( curPointX_squared + curPointY_squared);
-        if ( len > fradius )
-        {
-           // found first Pixel in this horizontal line, that is outside the circle
-           curPointIsInside = false;
-        }
-     }
-     quarterCycleUpperRight.push_back( upperLeft(curPoint) );
+    // Move right until pixel is outside circle
+    float curPointX_squared = 0.0f;
+    float curPointY_squared = (curPoint[1] - centerCorrection[1]) * (curPoint[1] - centerCorrection[1]);
+    while (curPointIsInside)
+    {
+      // increment posX and chec
+      curPoint[0]++;
+      curPointX_squared = (curPoint[0] - centerCorrection[0]) * (curPoint[0] - centerCorrection[0]);
+      const float len = sqrt(curPointX_squared + curPointY_squared);
+      if (len > fradius)
+      {
+        // found first Pixel in this horizontal line, that is outside the circle
+        curPointIsInside = false;
+      }
+    }
+    quarterCycleUpperRight.push_back(upperLeft(curPoint));
 
-     // Move down until pixel is inside circle
-     while( !curPointIsInside )
-     {
-        // increment posX and chec
-        curPoint[1]--;
-        curPointY_squared = (curPoint[1] - centerCorrection[1] ) * (curPoint[1] - centerCorrection[1] );
-        const float len = sqrt( curPointX_squared + curPointY_squared);
-        if ( len <= fradius )
-        {
-           // found first Pixel in this horizontal line, that is outside the circle
-           curPointIsInside = true;
-           quarterCycleUpperRight.push_back( upperLeft(curPoint) );
-        }
+    // Move down until pixel is inside circle
+    while (!curPointIsInside)
+    {
+      // increment posX and chec
+      curPoint[1]--;
+      curPointY_squared = (curPoint[1] - centerCorrection[1]) * (curPoint[1] - centerCorrection[1]);
+      const float len = sqrt(curPointX_squared + curPointY_squared);
+      if (len <= fradius)
+      {
+        // found first Pixel in this horizontal line, that is outside the circle
+        curPointIsInside = true;
+        quarterCycleUpperRight.push_back(upperLeft(curPoint));
+      }
 
-        // Quarter cycle is full, when curPoint y position is 0
-        if (curPoint[1] <= 0)
-           break;
-     }
-
-   }
+      // Quarter cycle is full, when curPoint y position is 0
+      if (curPoint[1] <= 0)
+        break;
+    }
+  }
 
   // QuarterCycle is full! Now copy quarter cycle to other quarters.
 
-  if( !evenSize )
+  if (!evenSize)
   {
-    std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
-    while( it != quarterCycleUpperRight.end() )
+    std::vector<mitk::Point2D>::const_iterator it = quarterCycleUpperRight.begin();
+    while (it != quarterCycleUpperRight.end())
     {
       mitk::Point2D p;
       p = *it;
@@ -212,10 +211,10 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
   }
   else
   {
-    std::vector< mitk::Point2D >::const_iterator it = quarterCycleUpperRight.begin();
-    while( it != quarterCycleUpperRight.end() )
+    std::vector<mitk::Point2D>::const_iterator it = quarterCycleUpperRight.begin();
+    while (it != quarterCycleUpperRight.end())
     {
-      mitk::Point2D p,q;
+      mitk::Point2D p, q;
       p = *it;
 
       q = p;
@@ -237,7 +236,7 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
       // but with x negative
       q = p;
       q[0] *= -1;
-      q[0] +=  1;
+      q[0] += 1;
       quarterCycleUpperLeft.push_back(q);
 
       it++;
@@ -246,62 +245,62 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent* positio
 
   // fill contour with poins in right ordering, starting with the upperRight block
   mitk::Point3D tempPoint;
-  for (unsigned int i=0; i<quarterCycleUpperRight.size(); i++)
+  for (unsigned int i = 0; i < quarterCycleUpperRight.size(); i++)
   {
-     tempPoint[0] = quarterCycleUpperRight[i][0];
-     tempPoint[1] = quarterCycleUpperRight[i][1];
-     tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint );
+    tempPoint[0] = quarterCycleUpperRight[i][0];
+    tempPoint[1] = quarterCycleUpperRight[i][1];
+    tempPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
   // the lower right has to be parsed in reverse order
-  for (int i=quarterCycleLowerRight.size()-1; i>=0; i--)
+  for (int i = quarterCycleLowerRight.size() - 1; i >= 0; i--)
   {
-     tempPoint[0] = quarterCycleLowerRight[i][0];
-     tempPoint[1] = quarterCycleLowerRight[i][1];
-     tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint );
+    tempPoint[0] = quarterCycleLowerRight[i][0];
+    tempPoint[1] = quarterCycleLowerRight[i][1];
+    tempPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
-  for (unsigned int i=0; i<quarterCycleLowerLeft.size(); i++)
+  for (unsigned int i = 0; i < quarterCycleLowerLeft.size(); i++)
   {
-     tempPoint[0] = quarterCycleLowerLeft[i][0];
-     tempPoint[1] = quarterCycleLowerLeft[i][1];
-     tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint );
+    tempPoint[0] = quarterCycleLowerLeft[i][0];
+    tempPoint[1] = quarterCycleLowerLeft[i][1];
+    tempPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
   // the upper left also has to be parsed in reverse order
-  for (int i=quarterCycleUpperLeft.size()-1; i>=0; i--)
+  for (int i = quarterCycleUpperLeft.size() - 1; i >= 0; i--)
   {
-     tempPoint[0] = quarterCycleUpperLeft[i][0];
-     tempPoint[1] = quarterCycleUpperLeft[i][1];
-     tempPoint[2] = 0;
-     contourInImageIndexCoordinates->AddVertex( tempPoint );
+    tempPoint[0] = quarterCycleUpperLeft[i][0];
+    tempPoint[1] = quarterCycleUpperLeft[i][1];
+    tempPoint[2] = 0;
+    contourInImageIndexCoordinates->AddVertex(tempPoint);
   }
 
   m_MasterContour = contourInImageIndexCoordinates;
-
 }
 
 /**
   Just show the contour, get one point as the central point and add surrounding points to the contour.
   */
-void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  m_WorkingSlice->GetGeometry()->WorldToIndex( positionEvent->GetPositionInWorld(), m_LastPosition );
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
 
-  if (!positionEvent) return;
+  if (!positionEvent)
+    return;
 
   // create new working node
   // a fresh node is needed to only display the actual drawing process for
   // the undo function
   if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
-      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+    m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
   m_WorkingSlice = nullptr;
   m_CurrentPlane = nullptr;
 
   m_WorkingNode = DataNode::New();
-  m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
-  m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+  m_WorkingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));
+  m_WorkingNode->SetProperty("binary", mitk::BoolProperty::New(true));
 
   this->m_WorkingNode->SetVisibility(true);
 
@@ -310,60 +309,56 @@ void mitk::PaintbrushTool::OnMousePressed ( StateMachineAction*, InteractionEven
 
   m_MasterContour->SetClosed(true);
   this->MouseMoved(interactionEvent, true);
-
 }
 
-void mitk::PaintbrushTool::OnMouseMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
 {
- MouseMoved(interactionEvent, false);
+  MouseMoved(interactionEvent, false);
 }
 
-void mitk::PaintbrushTool::OnPrimaryButtonPressedMoved( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnPrimaryButtonPressedMoved(StateMachineAction *, InteractionEvent *interactionEvent)
 {
- MouseMoved(interactionEvent, true);
+  MouseMoved(interactionEvent, true);
 }
 
 /**
   Insert the point to the feedback contour,finish to build the contour and at the same time the painting function
   */
-void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, bool leftMouseButtonPressed)
+void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, bool leftMouseButtonPressed)
 {
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
-  CheckIfCurrentSliceHasChanged( positionEvent );
+  CheckIfCurrentSliceHasChanged(positionEvent);
 
-  if ( m_LastContourSize != m_Size )
+  if (m_LastContourSize != m_Size)
   {
-    UpdateContour( positionEvent );
+    UpdateContour(positionEvent);
     m_LastContourSize = m_Size;
   }
 
   Point3D worldCoordinates = positionEvent->GetPositionInWorld();
   Point3D indexCoordinates;
 
-  m_WorkingSlice->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
+  m_WorkingSlice->GetGeometry()->WorldToIndex(worldCoordinates, indexCoordinates);
 
   MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
   MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
 
   // round to nearest voxel center (abort if this hasn't changed)
-  if ( m_Size % 2 == 0 ) // even
+  if (m_Size % 2 == 0) // even
   {
-    indexCoordinates[0] = ROUND( indexCoordinates[0]);// /*+ 0.5*/) + 0.5;
-    indexCoordinates[1] = ROUND( indexCoordinates[1]);// /*+ 0.5*/ ) + 0.5;
+    indexCoordinates[0] = ROUND(indexCoordinates[0]); // /*+ 0.5*/) + 0.5;
+    indexCoordinates[1] = ROUND(indexCoordinates[1]); // /*+ 0.5*/ ) + 0.5;
   }
   else // odd
   {
-    indexCoordinates[0] = ROUND( indexCoordinates[0]  ) ;
-    indexCoordinates[1] = ROUND( indexCoordinates[1] ) ;
+    indexCoordinates[0] = ROUND(indexCoordinates[0]);
+    indexCoordinates[1] = ROUND(indexCoordinates[1]);
   }
 
   static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
-  if ( fabs(indexCoordinates[0] - lastPos[0]) > mitk::eps ||
-       fabs(indexCoordinates[1] - lastPos[1]) > mitk::eps ||
-       fabs(indexCoordinates[2] - lastPos[2]) > mitk::eps ||
-       leftMouseButtonPressed
-     )
+  if (fabs(indexCoordinates[0] - lastPos[0]) > mitk::eps || fabs(indexCoordinates[1] - lastPos[1]) > mitk::eps ||
+      fabs(indexCoordinates[2] - lastPos[2]) > mitk::eps || leftMouseButtonPressed)
   {
     lastPos = indexCoordinates;
   }
@@ -384,13 +379,13 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   ContourModel::VertexIterator it = m_MasterContour->Begin();
   ContourModel::VertexIterator end = m_MasterContour->End();
 
-  while(it != end)
+  while (it != end)
   {
     Point3D point = (*it)->Coordinates;
-    point[0] += indexCoordinates[ 0 ];
-    point[1] += indexCoordinates[ 1 ];
+    point[0] += indexCoordinates[0];
+    point[1] += indexCoordinates[1];
 
-    contour->AddVertex( point, timestep );
+    contour->AddVertex(point, timestep);
     it++;
   }
 
@@ -399,25 +394,26 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
     const double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
     const double radius = static_cast<double>(m_Size) / 2.0;
 
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-    Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
-    LabelSetImage* labelImage = dynamic_cast<LabelSetImage*>(image.GetPointer());
+    DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+    Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
+    LabelSetImage *labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
     int activeColor = 1;
     if (labelImage != 0)
     {
       activeColor = labelImage->GetActiveLabel()->GetValue();
     }
 
-    mitk::ContourModelUtils::FillContourInSlice(contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue*activeColor);
+    mitk::ContourModelUtils::FillContourInSlice(
+      contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
 
     m_WorkingNode->SetData(m_WorkingSlice);
     m_WorkingNode->Modified();
 
     // if points are >= radius away draw rectangle to fill empty holes
     // in between the 2 points
-    if ( dist > radius )
+    if (dist > radius)
     {
-      const mitk::Point3D& currentPos = indexCoordinates;
+      const mitk::Point3D &currentPos = indexCoordinates;
       mitk::Point3D direction;
       mitk::Point3D vertex;
       mitk::Point3D normal;
@@ -460,14 +456,16 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
 
       contour->AddVertex(vertex);
 
-      FeedbackContourTool::FillContourInSlice( contour, timestep, m_WorkingSlice, m_PaintingPixelValue );
+      FeedbackContourTool::FillContourInSlice(contour, timestep, m_WorkingSlice, m_PaintingPixelValue);
       m_WorkingNode->SetData(m_WorkingSlice);
       m_WorkingNode->Modified();
     }
-  } else {
-      // switched from different renderwindow
-      // no activate hover highlighting. Otherwise undo / redo wont work
-      this->m_WorkingNode->SetVisibility(false);
+  }
+  else
+  {
+    // switched from different renderwindow
+    // no activate hover highlighting. Otherwise undo / redo wont work
+    this->m_WorkingNode->SetVisibility(false);
   }
 
   m_LastPosition = indexCoordinates;
@@ -476,126 +474,129 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent* interactionEvent, 
   ContourModel::Pointer displayContour = FeedbackContourTool::GetFeedbackContour();
   displayContour->Clear();
 
-  ContourModel::Pointer tmp = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), /*displayContour*/contour );
+  ContourModel::Pointer tmp =
+    FeedbackContourTool::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), /*displayContour*/ contour);
 
   // copy transformed contour into display contour
-  it =  tmp->Begin();
+  it = tmp->Begin();
   end = tmp->End();
 
-  while(it != end)
+  while (it != end)
   {
     Point3D point = (*it)->Coordinates;
 
-    displayContour->AddVertex( point, timestep );
+    displayContour->AddVertex(point, timestep);
     it++;
   }
 
   m_FeedbackContourNode->GetData()->Modified();
 
-  assert( positionEvent->GetSender()->GetRenderWindow() );
+  assert(positionEvent->GetSender()->GetRenderWindow());
 
-  RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-
-void mitk::PaintbrushTool::OnMouseReleased( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  //When mouse is released write segmentationresult back into image
-  mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent );
-  if (!positionEvent) return;
+  // When mouse is released write segmentationresult back into image
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (!positionEvent)
+    return;
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 
   // deactivate visibility of helper node
   m_WorkingNode->SetVisibility(false);
 
-  RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
+  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
 /**
   Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
   */
-void mitk::PaintbrushTool::OnInvertLogic( StateMachineAction*, InteractionEvent* interactionEvent )
+void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-    // Inversion only for 0 and 1 as painting values
-    if (m_PaintingPixelValue == 1)
-    {
-      m_PaintingPixelValue = 0;
-      FeedbackContourTool::SetFeedbackContourColor( 1.0, 0.0, 0.0 );
-    }
-    else if (m_PaintingPixelValue == 0)
-    {
-      m_PaintingPixelValue = 1;
-      FeedbackContourTool::SetFeedbackContourColorDefault();
-    }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  // Inversion only for 0 and 1 as painting values
+  if (m_PaintingPixelValue == 1)
+  {
+    m_PaintingPixelValue = 0;
+    FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
+  }
+  else if (m_PaintingPixelValue == 0)
+  {
+    m_PaintingPixelValue = 1;
+    FeedbackContourTool::SetFeedbackContourColorDefault();
+  }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
-    const PlaneGeometry* planeGeometry( (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-    const AbstractTransformGeometry* abstractTransformGeometry( dynamic_cast<const AbstractTransformGeometry*> (event->GetSender()->GetCurrentWorldPlaneGeometry() ) );
-    DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  const PlaneGeometry *planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  const AbstractTransformGeometry *abstractTransformGeometry(
+    dynamic_cast<const AbstractTransformGeometry *>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
 
-    if (!workingNode)
-        return;
+  if (!workingNode)
+    return;
 
-    Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+  Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
 
-    if ( !image || !planeGeometry || abstractTransformGeometry )
-        return;
+  if (!image || !planeGeometry || abstractTransformGeometry)
+    return;
 
-    if(m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
+  if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
+  {
+    m_CurrentPlane = const_cast<PlaneGeometry *>(planeGeometry);
+    m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+    m_WorkingNode->ReplaceProperty("color", workingNode->GetProperty("color"));
+    m_WorkingNode->SetData(m_WorkingSlice);
+  }
+  else
+  {
+    bool isSameSlice(false);
+    isSameSlice = mitk::MatrixEqualElementWise(planeGeometry->GetIndexToWorldTransform()->GetMatrix(),
+                                               m_CurrentPlane->GetIndexToWorldTransform()->GetMatrix());
+    isSameSlice = mitk::Equal(planeGeometry->GetIndexToWorldTransform()->GetOffset(),
+                              m_CurrentPlane->GetIndexToWorldTransform()->GetOffset());
+    if (!isSameSlice)
     {
-        m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
-        m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-        m_WorkingNode->ReplaceProperty( "color", workingNode->GetProperty("color") );
-        m_WorkingNode->SetData(m_WorkingSlice);
+      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+      m_CurrentPlane = nullptr;
+      m_WorkingSlice = nullptr;
+      m_WorkingNode = nullptr;
+      m_CurrentPlane = const_cast<PlaneGeometry *>(planeGeometry);
+      m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+
+      m_WorkingNode = mitk::DataNode::New();
+      m_WorkingNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(mitk::LevelWindow(0, 1)));
+      m_WorkingNode->SetProperty("binary", mitk::BoolProperty::New(true));
+
+      m_WorkingNode->SetData(m_WorkingSlice);
+
+      // So that the paintbrush contour vanished in the previous render window
+      RenderingManager::GetInstance()->RequestUpdateAll();
     }
-    else
-    {
-        bool isSameSlice (false);
-        isSameSlice = mitk::MatrixEqualElementWise(planeGeometry->GetIndexToWorldTransform()->GetMatrix(),m_CurrentPlane->GetIndexToWorldTransform()->GetMatrix());
-        isSameSlice = mitk::Equal(planeGeometry->GetIndexToWorldTransform()->GetOffset(),m_CurrentPlane->GetIndexToWorldTransform()->GetOffset());
-        if (!isSameSlice)
-        {
-            m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
-            m_CurrentPlane = nullptr;
-            m_WorkingSlice = nullptr;
-            m_WorkingNode = nullptr;
-            m_CurrentPlane = const_cast<PlaneGeometry*>(planeGeometry);
-            m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+  }
 
-            m_WorkingNode = mitk::DataNode::New();
-            m_WorkingNode->SetProperty( "levelwindow", mitk::LevelWindowProperty::New( mitk::LevelWindow(0, 1) ) );
-            m_WorkingNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
+  if (!m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
+  {
+    m_WorkingNode->SetProperty("outline binary", mitk::BoolProperty::New(true));
+    m_WorkingNode->SetProperty("color", workingNode->GetProperty("color"));
+    m_WorkingNode->SetProperty("name", mitk::StringProperty::New("Paintbrush_Node"));
+    m_WorkingNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+    m_WorkingNode->SetProperty("opacity", mitk::FloatProperty::New(0.8));
+    m_WorkingNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+    m_WorkingNode->SetVisibility(
+      false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
-            m_WorkingNode->SetData(m_WorkingSlice);
-
-            //So that the paintbrush contour vanished in the previous render window
-            RenderingManager::GetInstance()->RequestUpdateAll();
-        }
-
-    }
-
-    if(!m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
-    {
-
-        m_WorkingNode->SetProperty( "outline binary", mitk::BoolProperty::New(true) );
-        m_WorkingNode->SetProperty( "color", workingNode->GetProperty("color") );
-        m_WorkingNode->SetProperty( "name", mitk::StringProperty::New("Paintbrush_Node") );
-        m_WorkingNode->SetProperty( "helper object", mitk::BoolProperty::New(true) );
-        m_WorkingNode->SetProperty( "opacity", mitk::FloatProperty::New(0.8) );
-        m_WorkingNode->SetProperty( "includeInBoundingBox", mitk::BoolProperty::New(false));
-        m_WorkingNode->SetVisibility(false, mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-
-        m_ToolManager->GetDataStorage()->Add(m_WorkingNode);
-    }
+    m_ToolManager->GetDataStorage()->Add(m_WorkingNode);
+  }
 }
 
 void mitk::PaintbrushTool::OnToolManagerWorkingDataModified()
 {
-  //Here we simply set the current working slice to null. The next time the mouse is moved
-  //within a renderwindow a new slice will be extracted from the new working data
+  // Here we simply set the current working slice to null. The next time the mouse is moved
+  // within a renderwindow a new slice will be extracted from the new working data
   m_WorkingSlice = nullptr;
 }

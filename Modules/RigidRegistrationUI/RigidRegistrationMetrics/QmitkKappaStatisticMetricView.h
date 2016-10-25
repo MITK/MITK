@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkKappaStatisticMetricViewWidgetHIncluded
 #define QmitkKappaStatisticMetricViewWidgetHIncluded
 
-#include "ui_QmitkKappaStatisticMetricControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
+#include "ui_QmitkKappaStatisticMetricControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
@@ -31,10 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkKappaStatisticMetricView : public QmitkRigidRegistrationMetricsGUIBase
 {
-
 public:
-
-  QmitkKappaStatisticMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkKappaStatisticMetricView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkKappaStatisticMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;
@@ -47,22 +45,18 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
   virtual bool Maximize() override;
 
-
 private:
-
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
-
   Ui::QmitkKappaStatisticMetricControls m_Controls;
 
   itk::Object::Pointer m_MetricObject;
-
 };
 
 #endif

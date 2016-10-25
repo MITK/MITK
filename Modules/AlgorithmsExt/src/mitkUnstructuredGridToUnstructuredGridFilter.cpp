@@ -16,30 +16,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkUnstructuredGridToUnstructuredGridFilter.h>
 
-#include <vtkSmartPointer.h>
 #include <vtkPoints.h>
+#include <vtkSmartPointer.h>
 #include <vtkUnstructuredGrid.h>
 
 #include <itkImageRegionIterator.h>
 
 #include <mitkImageAccessByItk.h>
 
-
 mitk::UnstructuredGridToUnstructuredGridFilter::UnstructuredGridToUnstructuredGridFilter()
 {
   this->m_UnstructGrid = mitk::UnstructuredGrid::New();
 }
 
-mitk::UnstructuredGridToUnstructuredGridFilter::~UnstructuredGridToUnstructuredGridFilter(){}
-
-void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(const mitk::UnstructuredGrid* grid)
+mitk::UnstructuredGridToUnstructuredGridFilter::~UnstructuredGridToUnstructuredGridFilter()
 {
-  this->ProcessObject::SetNthInput(0, const_cast< mitk::UnstructuredGrid* >( grid ) );
 }
 
-void mitk::UnstructuredGridToUnstructuredGridFilter::CreateOutputsForAllInputs(unsigned int  /*idx*/)
+void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(const mitk::UnstructuredGrid *grid)
 {
-  this->SetNumberOfIndexedOutputs( this->GetNumberOfIndexedInputs() );
+  this->ProcessObject::SetNthInput(0, const_cast<mitk::UnstructuredGrid *>(grid));
+}
+
+void mitk::UnstructuredGridToUnstructuredGridFilter::CreateOutputsForAllInputs(unsigned int /*idx*/)
+{
+  this->SetNumberOfIndexedOutputs(this->GetNumberOfIndexedInputs());
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedInputs(); ++idx)
   {
     if (this->GetOutput(idx) == nullptr)
@@ -51,30 +52,30 @@ void mitk::UnstructuredGridToUnstructuredGridFilter::CreateOutputsForAllInputs(u
   this->Modified();
 }
 
-void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(unsigned int idx, const mitk::UnstructuredGrid* grid )
+void mitk::UnstructuredGridToUnstructuredGridFilter::SetInput(unsigned int idx, const mitk::UnstructuredGrid *grid)
 {
-  if ( this->GetInput(idx) != grid )
+  if (this->GetInput(idx) != grid)
   {
-    this->SetNthInput( idx, const_cast<mitk::UnstructuredGrid*>( grid ) );
+    this->SetNthInput(idx, const_cast<mitk::UnstructuredGrid *>(grid));
     this->CreateOutputsForAllInputs(idx);
     this->Modified();
   }
 }
 
-const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::GetInput(void)
+const mitk::UnstructuredGrid *mitk::UnstructuredGridToUnstructuredGridFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
     return nullptr;
 
-  return static_cast<const mitk::UnstructuredGrid* >( this->ProcessObject::GetInput(0) );
+  return static_cast<const mitk::UnstructuredGrid *>(this->ProcessObject::GetInput(0));
 }
 
-const mitk::UnstructuredGrid* mitk::UnstructuredGridToUnstructuredGridFilter::GetInput( unsigned int idx)
+const mitk::UnstructuredGrid *mitk::UnstructuredGridToUnstructuredGridFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
     return nullptr;
 
-  return static_cast<const mitk::UnstructuredGrid*>(this->ProcessObject::GetInput(idx));
+  return static_cast<const mitk::UnstructuredGrid *>(this->ProcessObject::GetInput(idx));
 }
 
 void mitk::UnstructuredGridToUnstructuredGridFilter::GenerateOutputInformation()
@@ -83,7 +84,8 @@ void mitk::UnstructuredGridToUnstructuredGridFilter::GenerateOutputInformation()
 
   m_UnstructGrid = this->GetOutput();
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
-  if(inputImage.IsNull()) return;
+  if (inputImage.IsNull())
+    return;
 }

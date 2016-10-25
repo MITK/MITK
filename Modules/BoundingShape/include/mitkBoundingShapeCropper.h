@@ -14,22 +14,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef BOUNDINGSHAPECROPPER_H
 #define BOUNDINGSHAPECROPPER_H
 
-#include "mitkBoundingShapeCropper.h"
 #include "MitkBoundingShapeExports.h"
+#include "mitkBoundingShapeCropper.h"
 #include "mitkCommon.h"
 #include "mitkGeometryData.h"
-#include "mitkImageToImageFilter.h"
-#include "mitkImageTimeSelector.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageTimeSelector.h"
+#include "mitkImageToImageFilter.h"
 
 #include "itkImage.h"
 
-namespace mitk {
-
+namespace mitk
+{
   /** Documentation
   * @brief Crops or masks an Boundingbox defined by GeometryData out of an mitk Image
   *
@@ -42,18 +41,16 @@ namespace mitk {
   {
   public:
     mitkClassMacro(BoundingShapeCropper, ImageToImageFilter);
-    itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
       /**
       * @brief Set geometry of the bounding object
       */
-    void SetGeometry(const mitk::GeometryData* geometry);
+      void SetGeometry(const mitk::GeometryData *geometry);
     /**
     * @brief Get geometry of the bounding object
     */
-    //const mitk::GeometryData* GetGeometryData() const;
-
+    // const mitk::GeometryData* GetGeometryData() const;
 
     /**
     * @brief Sets and Gets the outside value for masking
@@ -93,15 +90,15 @@ namespace mitk {
     /**
     * @brief Template Function for cropping and masking images with scalar pixel type
     */
-    template < typename TPixel, unsigned int VImageDimension >
-     void  CutImage(itk::Image< TPixel, VImageDimension >* inputItkImage, int timeStep);
+    template <typename TPixel, unsigned int VImageDimension>
+    void CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, int timeStep);
 
     /**
     *@brief Process the image and create the output
      **/
-   virtual void ComputeData(mitk::Image* input3D, int boTimeStep);
+    virtual void ComputeData(mitk::Image *input3D, int boTimeStep);
 
-  // virtual void ComputeData(mitk::LabelSetImage* image, int boTimeStep);
+    // virtual void ComputeData(mitk::LabelSetImage* image, int boTimeStep);
 
   private:
     /**
@@ -117,7 +114,7 @@ namespace mitk {
     /**
     * @brief Use m_UseCropTimeStepOnly for only cropping a single time step(default: \a false)
     */
-    bool  m_UseCropTimeStepOnly;
+    bool m_UseCropTimeStepOnly;
 
     /**
     * @brief Current time step displayed
@@ -145,7 +142,6 @@ namespace mitk {
     * @brief Time when Header was last initialized
     **/
     itk::TimeStamp m_TimeOfHeaderInitialization;
-
   };
 } // namespace mitk
 

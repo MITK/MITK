@@ -20,23 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /**
   \brief Registers services for tube graph module.
   */
   class TubeGraphActivator : public us::ModuleActivator
   {
-    std::vector<AbstractFileIO*> m_FileIOs;
+    std::vector<AbstractFileIO *> m_FileIOs;
+
   public:
-
-    void Load(us::ModuleContext* /*context*/) override
+    void Load(us::ModuleContext * /*context*/) override { m_FileIOs.push_back(new TubeGraphIO()); }
+    void Unload(us::ModuleContext *) override
     {
-      m_FileIOs.push_back(new TubeGraphIO());
-    }
-
-    void Unload(us::ModuleContext*) override
-    {
-      for(auto & elem : m_FileIOs)
+      for (auto &elem : m_FileIOs)
       {
         delete elem;
       }

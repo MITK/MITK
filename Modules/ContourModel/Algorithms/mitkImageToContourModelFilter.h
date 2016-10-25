@@ -18,14 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkImageToContourModelFilter_h__
 
 #include "mitkCommon.h"
-#include <MitkContourModelExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
+#include <MitkContourModelExports.h>
 #include <mitkImage.h>
 
-
-namespace mitk {
-
+namespace mitk
+{
   /**
   *
   * \brief Base class for all filters with mitk::Image as input and mitk::ContourModel
@@ -34,25 +33,21 @@ namespace mitk {
   */
   class MITKCONTOURMODEL_EXPORT ImageToContourModelFilter : public ContourModelSource
   {
-
   public:
-
     mitkClassMacro(ImageToContourModelFilter, ContourModelSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef mitk::Image InputType;
-
+      typedef mitk::Image InputType;
 
     using Superclass::SetInput;
 
-    virtual void SetInput( const InputType *input);
+    virtual void SetInput(const InputType *input);
 
-    virtual void SetInput( unsigned int idx, const InputType * input);
+    virtual void SetInput(unsigned int idx, const InputType *input);
 
-    const InputType* GetInput(void);
+    const InputType *GetInput(void);
 
-    const InputType* GetInput(unsigned int idx);
+    const InputType *GetInput(unsigned int idx);
 
     void SetContourValue(float contourValue);
 
@@ -65,15 +60,13 @@ namespace mitk {
 
     void GenerateData() override;
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void Itk2DContourExtraction (const itk::Image<TPixel, VImageDimension>* sliceImage);
+    template <typename TPixel, unsigned int VImageDimension>
+    void Itk2DContourExtraction(const itk::Image<TPixel, VImageDimension> *sliceImage);
 
   private:
-    const BaseGeometry* m_SliceGeometry;
+    const BaseGeometry *m_SliceGeometry;
     float m_ContourValue;
-
   };
-
 }
 
 #endif

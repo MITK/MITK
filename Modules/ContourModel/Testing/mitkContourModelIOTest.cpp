@@ -13,31 +13,30 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <mitkTestingMacros.h>
 #include "mitkTestingConfig.h"
+#include <mitkTestingMacros.h>
 
-#include <mitkContourModelWriter.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <locale>
+#include <mitkContourModelWriter.h>
 
 #include <mitkIOUtil.h>
 
-
-
-static void TestContourModel(mitk::ContourModel* contour, std::string fileName)
+static void TestContourModel(mitk::ContourModel *contour, std::string fileName)
 {
-  std::string filename = std::string( MITK_TEST_OUTPUT_DIR ) + fileName;
+  std::string filename = std::string(MITK_TEST_OUTPUT_DIR) + fileName;
 
   mitk::IOUtil::Save(contour, filename);
 
-  std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = mitk::IOUtil::Load(filename);
+  std::vector<itk::SmartPointer<mitk::BaseData>> readerOutput = mitk::IOUtil::Load(filename);
 
-  mitk::ContourModel::Pointer contour2 = dynamic_cast<mitk::ContourModel*>(readerOutput.at(0).GetPointer());
+  mitk::ContourModel::Pointer contour2 = dynamic_cast<mitk::ContourModel *>(readerOutput.at(0).GetPointer());
 
-  MITK_TEST_CONDITION_REQUIRED(contour2.IsNotNull(),"contour is not null");
+  MITK_TEST_CONDITION_REQUIRED(contour2.IsNotNull(), "contour is not null");
 
-  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfVertices() == contour2->GetNumberOfVertices(),"contours have the same number of vertices");
+  MITK_TEST_CONDITION_REQUIRED(contour->GetNumberOfVertices() == contour2->GetNumberOfVertices(),
+                               "contours have the same number of vertices");
 
   mitk::ContourModel::VertexIterator it = contour2->IteratorBegin();
   mitk::ContourModel::VertexIterator end = contour2->IteratorEnd();
@@ -46,15 +45,15 @@ static void TestContourModel(mitk::ContourModel* contour, std::string fileName)
 
   bool areEqual = true;
 
-  while(it != end)
+  while (it != end)
   {
     areEqual &= ((*it)->Coordinates == (*it2)->Coordinates);
-    it++; it2++;
+    it++;
+    it2++;
   }
 
   MITK_TEST_CONDITION(areEqual, "contours are equal");
 }
-
 
 static void TestContourModelIO_OneTimeStep()
 {
@@ -87,19 +86,15 @@ static void TestContourModelIO_OneTimeStep()
   TestContourModel(contour.GetPointer(), "/contour.cnt");
 }
 
-
-
 static void TestContourModelIO_EmptyContourModel()
 {
- // Commented out: Saving of empty basedatas is invalid since Reader/Writer redesign
- // mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+  // Commented out: Saving of empty basedatas is invalid since Reader/Writer redesign
+  // mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
- // TestContourModel(contour.GetPointer(), "/contourEmpty.cnt");
+  // TestContourModel(contour.GetPointer(), "/contourEmpty.cnt");
 }
 
-
-
-int mitkContourModelIOTest(int /*argc*/, char* /*argv*/[])
+int mitkContourModelIOTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("mitkContourModelIOTest")
 

@@ -20,26 +20,26 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkSurface.h>
 
 // VTK
-#include <vtkPLYWriter.h>
-#include <vtkSmartPointer.h>
 #include <vtkDataObject.h>
+#include <vtkPLYWriter.h>
 #include <vtkPolyData.h>
-
+#include <vtkSmartPointer.h>
 
 mitk::PlyFileWriterService::PlyFileWriterService()
   : AbstractFileWriter(mitk::Surface::GetStaticNameOfClass(),
-                       CustomMimeType(IOMimeTypes::STANFORD_PLY_MIMETYPE()), "Stanford Triangle PLY Writer")
+                       CustomMimeType(IOMimeTypes::STANFORD_PLY_MIMETYPE()),
+                       "Stanford Triangle PLY Writer")
 {
   RegisterService();
 }
 
-mitk::PlyFileWriterService::PlyFileWriterService(const mitk::PlyFileWriterService& other)
-  : AbstractFileWriter(other)
+mitk::PlyFileWriterService::PlyFileWriterService(const mitk::PlyFileWriterService &other) : AbstractFileWriter(other)
 {
 }
 
 mitk::PlyFileWriterService::~PlyFileWriterService()
-{}
+{
+}
 
 void mitk::PlyFileWriterService::Write()
 {
@@ -47,13 +47,13 @@ void mitk::PlyFileWriterService::Write()
   writer->SetFileTypeToBinary();
   writer->SetFileName(GetOutputLocation().c_str());
 
-  const mitk::Surface* surface = static_cast<const mitk::Surface*> (this->GetInput());
+  const mitk::Surface *surface = static_cast<const mitk::Surface *>(this->GetInput());
   writer->SetInputDataObject(surface->GetVtkPolyData());
 
   writer->Write();
 }
 
-mitk::PlyFileWriterService* mitk::PlyFileWriterService::Clone() const
+mitk::PlyFileWriterService *mitk::PlyFileWriterService::Clone() const
 {
   return new PlyFileWriterService(*this);
 }

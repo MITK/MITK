@@ -14,24 +14,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITK_ContourModelSetGLMapper2D_H_
 #define MITK_ContourModelSetGLMapper2D_H_
 
+#include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
-#include <MitkContourModelExports.h>
 #include "mitkContourModelGLMapper2DBase.h"
 #include "mitkContourModelSet.h"
-#include "mitkBaseRenderer.h"
+#include <MitkContourModelExports.h>
 
-
-namespace mitk {
-
+namespace mitk
+{
   class BaseRenderer;
   class ContourModel;
 
   /**
-  * @brief OpenGL-based mapper to display a mitk::ContourModelSet object containing several contours in a 2D render window
+  * @brief OpenGL-based mapper to display a mitk::ContourModelSet object containing several contours in a 2D render
+  * window
   *
   *
   * @ingroup MitkContourModelModule
@@ -39,18 +38,16 @@ namespace mitk {
   class MITKCONTOURMODEL_EXPORT ContourModelSetGLMapper2D : public ContourModelGLMapper2DBase
   {
   public:
-
     mitkClassMacro(ContourModelSetGLMapper2D, ContourModelGLMapper2DBase);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /**
-    * reimplemented from Baseclass
-    */
-    virtual void Paint(BaseRenderer * renderer) override;
+      /**
+      * reimplemented from Baseclass
+      */
+      virtual void Paint(BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
 
     LocalStorageHandler<BaseLocalStorage> m_LSH;
 
@@ -59,18 +56,15 @@ namespace mitk {
 
     virtual ~ContourModelSetGLMapper2D();
 
-    void InternalDrawContour(mitk::ContourModel* contour, mitk::BaseRenderer* renderer) override;
+    void InternalDrawContour(mitk::ContourModel *contour, mitk::BaseRenderer *renderer) override;
 
   private:
-
     /**
     * return a refernce of the rendered data object
     */
-    ContourModelSet* GetInput(void);
+    ContourModelSet *GetInput(void);
   };
 
 } // namespace mitk
-
-
 
 #endif

@@ -17,52 +17,49 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSurfaceInterpolationController_h_Included
 #define mitkSurfaceInterpolationController_h_Included
 
+#include "mitkColorProperty.h"
 #include "mitkCommon.h"
-#include <MitkSurfaceInterpolationExports.h>
+#include "mitkInteractionConst.h"
+#include "mitkProperties.h"
 #include "mitkRestorePlanePositionOperation.h"
 #include "mitkSurface.h"
-#include "mitkInteractionConst.h"
-#include "mitkColorProperty.h"
-#include "mitkProperties.h"
+#include <MitkSurfaceInterpolationExports.h>
 
+#include "mitkComputeContourSetNormalsFilter.h"
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkReduceContourSetFilter.h"
-#include "mitkComputeContourSetNormalsFilter.h"
 
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 
-#include "vtkPolygon.h"
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkPolyData.h"
-#include "vtkSmartPointer.h"
 #include "vtkAppendPolyData.h"
+#include "vtkCellArray.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
+#include "vtkPolygon.h"
+#include "vtkSmartPointer.h"
 
-#include "vtkMarchingCubes.h"
-#include "vtkImageData.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkProperty.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkVtkRepresentationProperty.h"
+#include "vtkImageData.h"
+#include "vtkMarchingCubes.h"
+#include "vtkProperty.h"
 
 #include "mitkProgressBar.h"
 
 namespace mitk
 {
-
- class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
- {
-
+  class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
+  {
   public:
+    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object) itkFactorylessNewMacro(Self)
+      itkCloneMacro(Self)
 
-    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+        itkGetMacro(DistanceImageSpacing, double)
 
-    itkGetMacro(DistanceImageSpacing, double)
-
-    struct ContourPositionInformation {
+          struct ContourPositionInformation
+    {
       Surface::Pointer contour;
       Vector3D contourNormal;
       Point3D contourPoint;
@@ -70,56 +67,52 @@ namespace mitk
 
     typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
     typedef std::vector<ContourPositionInformationList> ContourPositionInformationVec2D;
-    //typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
-    typedef std::map<mitk::Image*, ContourPositionInformationVec2D> ContourListMap;
+    // typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
+    typedef std::map<mitk::Image *, ContourPositionInformationVec2D> ContourListMap;
 
-    static SurfaceInterpolationController* GetInstance();
+    static SurfaceInterpolationController *GetInstance();
 
-    void SetCurrentTimeStep( unsigned int ts )
+    void SetCurrentTimeStep(unsigned int ts)
     {
-      if ( m_CurrentTimeStep != ts )
+      if (m_CurrentTimeStep != ts)
       {
         m_CurrentTimeStep = ts;
 
-        if ( m_SelectedSegmentation )
+        if (m_SelectedSegmentation)
         {
           this->ReinitializeInterpolation();
         }
       }
     };
 
-    unsigned int GetCurrentTimeStep()
-    {
-      return m_CurrentTimeStep;
-    };
-
+    unsigned int GetCurrentTimeStep() { return m_CurrentTimeStep; };
     /**
      * @brief Adds a new extracted contour to the list
      * @param newContour the contour to be added. If a contour at that position
      *        already exists the related contour will be updated
      */
-    void AddNewContour (Surface::Pointer newContour);
+    void AddNewContour(Surface::Pointer newContour);
 
     /**
      * @brief Removes the contour for a given plane for the current selected segmenation
      * @param contourInfo the contour which should be removed
      * @return true if a contour was found and removed, false if no contour was found
      */
-    bool RemoveContour (ContourPositionInformation contourInfo );
+    bool RemoveContour(ContourPositionInformation contourInfo);
 
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
      * @param newContours the list of the contours
      */
-    void AddNewContours (std::vector<Surface::Pointer> newContours);
+    void AddNewContours(std::vector<Surface::Pointer> newContours);
 
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
     * @param ontourInfo the contour which should be returned
     * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
     */
-    const mitk::Surface* GetContour (ContourPositionInformation contourInfo );
+    const mitk::Surface *GetContour(ContourPositionInformation contourInfo);
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation
@@ -130,7 +123,7 @@ namespace mitk
     /**
      * Interpolates the 3D surface from the given extracted contours
      */
-    void Interpolate ();
+    void Interpolate();
 
     mitk::Surface::Pointer GetInterpolationResult();
 
@@ -158,7 +151,7 @@ namespace mitk
      */
     mitk::Image::Pointer GetCurrentSegmentation();
 
-    Surface* GetContoursAsSurface();
+    Surface *GetContoursAsSurface();
 
     void SetDataStorage(DataStorage::Pointer ds);
 
@@ -167,7 +160,7 @@ namespace mitk
      * @param segmentation The current selected segmentation
      * \deprecatedSince{2014_03}
      */
-    DEPRECATED (void SetCurrentSegmentationInterpolationList(mitk::Image::Pointer segmentation));
+    DEPRECATED(void SetCurrentSegmentationInterpolationList(mitk::Image::Pointer segmentation));
 
     /**
      * Sets the current list of contourpoints which is used for the surface interpolation
@@ -180,7 +173,7 @@ namespace mitk
      * @param segmentation The segmentation to be removed
      * \deprecatedSince{2014_03}
      */
-    DEPRECATED (void RemoveSegmentationFromContourList(mitk::Image* segmentation));
+    DEPRECATED(void RemoveSegmentationFromContourList(mitk::Image *segmentation));
 
     /**
      * @brief Remove interpolation session
@@ -209,7 +202,7 @@ namespace mitk
      */
     void ReinitializeInterpolation(mitk::Surface::Pointer contours);
 
-    mitk::Image* GetImage();
+    mitk::Image *GetImage();
 
     /**
      * Estimates the memory which is needed to build up the equationsystem for the interpolation.
@@ -219,21 +212,20 @@ namespace mitk
 
     unsigned int GetNumberOfInterpolationSessions();
 
- protected:
+  protected:
+    SurfaceInterpolationController();
 
-   SurfaceInterpolationController();
+    ~SurfaceInterpolationController();
 
-   ~SurfaceInterpolationController();
+    template <typename TPixel, unsigned int VImageDimension>
+    void GetImageBase(itk::Image<TPixel, VImageDimension> *input, itk::ImageBase<3>::Pointer &result);
 
-   template<typename TPixel, unsigned int VImageDimension> void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
+  private:
+    void ReinitializeInterpolation();
 
- private:
+    void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
-   void ReinitializeInterpolation();
-
-   void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
-
-   void AddToInterpolationPipeline(ContourPositionInformation contourInfo );
+    void AddToInterpolationPipeline(ContourPositionInformation contourInfo);
 
     ReduceContourSetFilter::Pointer m_ReduceFilter;
     ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
@@ -253,11 +245,11 @@ namespace mitk
 
     unsigned int m_CurrentNumberOfReducedContours;
 
-    mitk::Image* m_SelectedSegmentation;
+    mitk::Image *m_SelectedSegmentation;
 
-    std::map<mitk::Image*, unsigned long> m_SegmentationObserverTags;
+    std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
 
     unsigned int m_CurrentTimeStep;
- };
+  };
 }
 #endif

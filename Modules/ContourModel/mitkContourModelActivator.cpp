@@ -14,47 +14,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkContourModelSetReader.h"
 #include "mitkContourModelReader.h"
-#include "mitkContourModelWriter.h"
+#include "mitkContourModelSetReader.h"
 #include "mitkContourModelSetWriter.h"
+#include "mitkContourModelWriter.h"
 
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-
-namespace mitk {
-
-/*
- * This is the module activator for the "ContourModel" module.
- */
-class ContourModelActivator : public us::ModuleActivator
+namespace mitk
 {
-public:
-
-  void Load(us::ModuleContext* /*context*/) override
+  /*
+   * This is the module activator for the "ContourModel" module.
+   */
+  class ContourModelActivator : public us::ModuleActivator
   {
-    m_ContourModelReader = new ContourModelReader();
-    m_ContourModelSetReader = new ContourModelSetReader();
-    m_ContourModelWriter = new ContourModelWriter();
-    m_ContourModelSetWriter = new ContourModelSetWriter();
-  }
+  public:
+    void Load(us::ModuleContext * /*context*/) override
+    {
+      m_ContourModelReader = new ContourModelReader();
+      m_ContourModelSetReader = new ContourModelSetReader();
+      m_ContourModelWriter = new ContourModelWriter();
+      m_ContourModelSetWriter = new ContourModelSetWriter();
+    }
 
-  void Unload(us::ModuleContext* ) override
-  {
-    delete m_ContourModelReader;
-    delete m_ContourModelSetReader;
-    delete m_ContourModelWriter;
-    delete m_ContourModelSetWriter;
-  }
+    void Unload(us::ModuleContext *) override
+    {
+      delete m_ContourModelReader;
+      delete m_ContourModelSetReader;
+      delete m_ContourModelWriter;
+      delete m_ContourModelSetWriter;
+    }
 
-private:
-
-  mitk::ContourModelReader* m_ContourModelReader;
-  mitk::ContourModelSetReader* m_ContourModelSetReader;
-  mitk::ContourModelWriter* m_ContourModelWriter;
-  mitk::ContourModelSetWriter* m_ContourModelSetWriter;
-};
+  private:
+    mitk::ContourModelReader *m_ContourModelReader;
+    mitk::ContourModelSetReader *m_ContourModelSetReader;
+    mitk::ContourModelWriter *m_ContourModelWriter;
+    mitk::ContourModelSetWriter *m_ContourModelSetWriter;
+  };
 }
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::ContourModelActivator)

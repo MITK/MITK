@@ -20,19 +20,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mbilogExports.h"
 #include "mbilogLogMessage.h"
 
-namespace mbilog{
-
-/**
- * This enum defines the type of the output of a backend.
- * Console: output generated to the console
- * File: output generated to a file
- * Other: all other kinds of output
- */
-enum MBILOG_EXPORT OutputType{
-  Console = 0,
-  File,
-  Other = 100
-};
+namespace mbilog
+{
+  /**
+   * This enum defines the type of the output of a backend.
+   * Console: output generated to the console
+   * File: output generated to a file
+   * Other: all other kinds of output
+   */
+  enum MBILOG_EXPORT OutputType
+  {
+    Console = 0,
+    File,
+    Other = 100
+  };
   /**
    *  \brief This class is an interface for logging backends that can be registered in the mbi logging mechanism.
    *
@@ -41,7 +42,6 @@ enum MBILOG_EXPORT OutputType{
   class MBILOG_EXPORT BackendBase
   {
   public:
-
     virtual ~BackendBase();
 
     /**
@@ -51,15 +51,13 @@ enum MBILOG_EXPORT OutputType{
      * \param logMessage Logging message which was emitted.
      *
      */
-    virtual void ProcessMessage(const mbilog::LogMessage& logMessage)=0;
+    virtual void ProcessMessage(const mbilog::LogMessage &logMessage) = 0;
 
     /**
      * @return The type of this backend.
      */
-    virtual OutputType GetOutputType() const =0;
+    virtual OutputType GetOutputType() const = 0;
   };
-
 }
-
 
 #endif

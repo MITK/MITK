@@ -14,20 +14,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkTestingMacros.h>
-#include <mitkTestingConfig.h>
-#include <mitkTestFixture.h>
-#include <mitkManualSegmentationToSurfaceFilter.h>
 #include <mitkIOUtil.h>
+#include <mitkManualSegmentationToSurfaceFilter.h>
+#include <mitkTestFixture.h>
+#include <mitkTestingConfig.h>
+#include <mitkTestingMacros.h>
 
 class mitkManualSegmentationToSurfaceFilterTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkManualSegmentationToSurfaceFilterTestSuite);
-  //Add tests with reference data.
-  //For now I only add reference for BallBinary, since
-  //other images do not really make sense.
-  //Note: .stl consumes much more memory and even loses
-  //some vertices and triangles during saving. Hence,
+  // Add tests with reference data.
+  // For now I only add reference for BallBinary, since
+  // other images do not really make sense.
+  // Note: .stl consumes much more memory and even loses
+  // some vertices and triangles during saving. Hence,
   //.vtp is preferred as reference format.
   MITK_PARAMETERIZED_TEST_2(Update_BallBinary_OutputEqualsReference,
                             "BallBinary30x30x30.nrrd",
@@ -38,20 +38,18 @@ class mitkManualSegmentationToSurfaceFilterTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-
   mitk::ManualSegmentationToSurfaceFilter::Pointer m_Filter;
   mitk::Surface::Pointer m_ReferenceSurface;
 
 public:
-
   void setUp() override
   {
     std::vector<std::string> parameter = GetTestParameter();
     m_Filter = mitk::ManualSegmentationToSurfaceFilter::New();
-    if(parameter.size() == 2)
+    if (parameter.size() == 2)
     {
       m_Filter->SetInput(mitk::IOUtil::LoadImage(GetTestDataFilePath(parameter.at(0))));
-      //For the tests which have reference data
+      // For the tests which have reference data
       m_ReferenceSurface = mitk::IOUtil::LoadSurface(GetTestDataFilePath(parameter.at(1)));
     }
     else
@@ -79,8 +77,8 @@ public:
     m_Filter->SetGaussianStandardDeviation(1.5);
     m_Filter->InterpolationOn();
     m_Filter->UseGaussianImageSmoothOn();
-    m_Filter->SetThreshold( 1 );
-    m_Filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
+    m_Filter->SetThreshold(1);
+    m_Filter->SetDecimate(mitk::ImageToSurfaceFilter::DecimatePro);
     m_Filter->SetTargetReduction(0.05f);
     m_Filter->SmoothOn();
     m_Filter->Update();
@@ -90,4 +88,3 @@ public:
   }
 };
 MITK_TEST_SUITE_REGISTRATION(mitkManualSegmentationToSurfaceFilter)
-

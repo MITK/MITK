@@ -14,17 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkEllipsoid.h"
-#include "vtkLinearTransform.h"
 #include "mitkNumericTypes.h"
+#include "vtkLinearTransform.h"
 #include "vtkSphereSource.h"
 
-
-mitk::Ellipsoid::Ellipsoid()
-: BoundingObject()
+mitk::Ellipsoid::Ellipsoid() : BoundingObject()
 {
-  vtkSphereSource* sphere = vtkSphereSource::New();
+  vtkSphereSource *sphere = vtkSphereSource::New();
   sphere->SetRadius(1.0);
   sphere->SetThetaResolution(20);
   sphere->SetPhiResolution(20);
@@ -33,14 +30,11 @@ mitk::Ellipsoid::Ellipsoid()
   sphere->Delete();
 }
 
-
-
 mitk::Ellipsoid::~Ellipsoid()
 {
 }
 
-
-bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
+bool mitk::Ellipsoid::IsInside(const Point3D &worldPoint) const
 {
   // transform point from world to object coordinates
   ScalarType p[4];
@@ -54,11 +48,8 @@ bool mitk::Ellipsoid::IsInside(const Point3D& worldPoint) const
   return (pow(p[0], 2) + pow(p[1], 2) + pow(p[2], 2) <= 1);
 }
 
-
 mitk::ScalarType mitk::Ellipsoid::GetVolume()
 {
-  return   GetGeometry()->GetExtentInMM(0) * 0.5
-    * GetGeometry()->GetExtentInMM(1) * 0.5
-    * GetGeometry()->GetExtentInMM(2) * 0.5
-    * vnl_math::pi * 4.0/3.0;
+  return GetGeometry()->GetExtentInMM(0) * 0.5 * GetGeometry()->GetExtentInMM(1) * 0.5 *
+         GetGeometry()->GetExtentInMM(2) * 0.5 * vnl_math::pi * 4.0 / 3.0;
 }

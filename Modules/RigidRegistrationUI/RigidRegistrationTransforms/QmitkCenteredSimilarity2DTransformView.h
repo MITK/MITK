@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkCenteredSimilarity2DTransformViewWidgetHIncluded
 #define QmitkCenteredSimilarity2DTransformViewWidgetHIncluded
 
-#include "ui_QmitkCenteredSimilarity2DTransformControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
+#include "ui_QmitkCenteredSimilarity2DTransformControls.h"
 #include <itkImage.h>
 
 /*!
@@ -27,16 +27,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 *
 * Displays options for rigid registration.
 */
-class MITKRIGIDREGISTRATIONUI_EXPORT QmitkCenteredSimilarity2DTransformView : public QmitkRigidRegistrationTransformsGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkCenteredSimilarity2DTransformView
+  : public QmitkRigidRegistrationTransformsGUIBase
 {
-
 public:
-
-  QmitkCenteredSimilarity2DTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkCenteredSimilarity2DTransformView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkCenteredSimilarity2DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;
-
 
   virtual itk::Object::Pointer GetTransform() override;
 
@@ -46,21 +44,21 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
   virtual itk::Array<double> GetScales() override;
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams) override;
+  virtual vtkTransform *Transform(vtkMatrix4x4 *vtkmatrix,
+                                  vtkTransform *vtktransform,
+                                  itk::Array<double> transformParams) override;
 
   virtual int GetNumberOfTransformParameters() override;
 
 private:
-
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
-
   Ui::QmitkCenteredSimilarity2DTransformControls m_Controls;
 
   itk::Object::Pointer m_TransformObject;
@@ -68,7 +66,6 @@ protected:
   double m_CenterX;
   double m_CenterY;
   double m_CenterZ;
-
 };
 
 #endif

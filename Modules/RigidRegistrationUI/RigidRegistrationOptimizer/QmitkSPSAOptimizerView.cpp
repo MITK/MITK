@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkSPSAOptimizer.h>
 
-QmitkSPSAOptimizerView::QmitkSPSAOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkSPSAOptimizerView::QmitkSPSAOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkSPSAOptimizerView::~QmitkSPSAOptimizerView()
@@ -36,12 +35,12 @@ mitk::OptimizerParameters::OptimizerType QmitkSPSAOptimizerView::GetOptimizerTyp
 itk::Object::Pointer QmitkSPSAOptimizerView::GetOptimizer()
 {
   itk::SPSAOptimizer::Pointer OptimizerPointer = itk::SPSAOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
-  OptimizerPointer->Seta( m_Controls.m_aSPSA->text().toFloat() );
-  OptimizerPointer->SetA( m_Controls.m_ASPSA->text().toFloat() );
-  OptimizerPointer->SetAlpha( m_Controls.m_AlphaSPSA->text().toFloat() );
-  OptimizerPointer->Setc( m_Controls.m_cSPSA->text().toFloat() );
-  OptimizerPointer->SetGamma( m_Controls.m_GammaSPSA->text().toFloat() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
+  OptimizerPointer->Seta(m_Controls.m_aSPSA->text().toFloat());
+  OptimizerPointer->SetA(m_Controls.m_ASPSA->text().toFloat());
+  OptimizerPointer->SetAlpha(m_Controls.m_AlphaSPSA->text().toFloat());
+  OptimizerPointer->Setc(m_Controls.m_cSPSA->text().toFloat());
+  OptimizerPointer->SetGamma(m_Controls.m_GammaSPSA->text().toFloat());
   OptimizerPointer->SetTolerance(m_Controls.m_ToleranceSPSA->text().toFloat());
   OptimizerPointer->SetStateOfConvergenceDecayRate(m_Controls.m_StateOfConvergenceDecayRateSPSA->text().toFloat());
   OptimizerPointer->SetMinimumNumberOfIterations(m_Controls.m_MinimumNumberOfIterationsSPSA->text().toInt());
@@ -94,14 +93,14 @@ QString QmitkSPSAOptimizerView::GetName()
   return "SPSA";
 }
 
-void QmitkSPSAOptimizerView::SetupUI(QWidget* parent)
+void QmitkSPSAOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_MinimumNumberOfIterationsSPSA->setValidator(validatorLineEditInput);
   m_Controls.m_NumberOfPerturbationsSPSA->setValidator(validatorLineEditInput);
   m_Controls.m_IterationsSPSA->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_aSPSA->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ASPSA->setValidator(validatorLineEditInputFloat);
   m_Controls.m_AlphaSPSA->setValidator(validatorLineEditInputFloat);

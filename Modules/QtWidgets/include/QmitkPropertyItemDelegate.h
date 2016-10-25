@@ -33,7 +33,7 @@ class QmitkColorWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit QmitkColorWidget(QWidget* parent = nullptr);
+  explicit QmitkColorWidget(QWidget *parent = nullptr);
   ~QmitkColorWidget();
 
   QColor GetColor() const;
@@ -42,14 +42,14 @@ public:
 signals:
   void ColorPicked();
 
-  private slots:
+private slots:
   void OnButtonClicked();
   void OnLineEditEditingFinished();
 
 private:
   QColor m_Color;
-  QLineEdit* m_LineEdit;
-  QToolButton* m_Button;
+  QLineEdit *m_LineEdit;
+  QToolButton *m_Button;
 };
 
 class QmitkComboBoxListView : public QListView
@@ -57,16 +57,16 @@ class QmitkComboBoxListView : public QListView
   Q_OBJECT
 
 public:
-  explicit QmitkComboBoxListView(QComboBox* comboBox = NULL);
+  explicit QmitkComboBoxListView(QComboBox *comboBox = NULL);
   ~QmitkComboBoxListView();
 
 protected:
-  void paintEvent(QPaintEvent* event) override;
-  void resizeEvent(QResizeEvent* event) override;
+  void paintEvent(QPaintEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
   QStyleOptionViewItem viewOptions() const override;
 
 private:
-  QComboBox* m_ComboBox;
+  QComboBox *m_ComboBox;
 };
 
 class MITKQTWIDGETS_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegate
@@ -74,14 +74,14 @@ class MITKQTWIDGETS_EXPORT QmitkPropertyItemDelegate : public QStyledItemDelegat
   Q_OBJECT
 
 public:
-  explicit QmitkPropertyItemDelegate(QObject* parent = NULL);
+  explicit QmitkPropertyItemDelegate(QObject *parent = NULL);
   ~QmitkPropertyItemDelegate();
 
-  QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-  void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
-  void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
-  void SetPropertyList(mitk::PropertyList* propertyList);
+  QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+  void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+  void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+  void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+  void SetPropertyList(mitk::PropertyList *propertyList);
 
 private slots:
   void OnComboBoxCurrentIndexChanged(int index);
@@ -89,7 +89,7 @@ private slots:
   void OnColorPicked();
 
 private:
-  std::string GetPropertyName(const QModelIndex& index) const;
+  std::string GetPropertyName(const QModelIndex &index) const;
 
   mitk::WeakPointer<mitk::PropertyList> m_PropertyList;
 };

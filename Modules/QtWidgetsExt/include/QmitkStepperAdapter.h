@@ -14,15 +14,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 #define QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 
-#include "qobject.h"
 #include "MitkQtWidgetsExtExports.h"
-#include "mitkStepper.h"
-#include "itkObject.h"
 #include "itkCommand.h"
+#include "itkObject.h"
+#include "mitkStepper.h"
+#include "qobject.h"
 
 //##Documentation
 //## @brief Helper class to connect Qt-based navigators to instances of Stepper
@@ -40,34 +39,27 @@ class MITKQTWIDGETSEXT_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
 public:
-  QmitkStepperAdapter( QObject * navigator, mitk::Stepper * stepper, const char * name );
+  QmitkStepperAdapter(QObject *navigator, mitk::Stepper *stepper, const char *name);
   virtual ~QmitkStepperAdapter();
 
-  void SetStepper( mitk::Stepper* stepper )
+  void SetStepper(mitk::Stepper *stepper)
   {
-    this->SendStepper( stepper );
+    this->SendStepper(stepper);
     this->Refetch();
   }
 
   class MITKQTWIDGETSEXT_EXPORT ItkEventListener : public itk::Command
   {
-    public:
-      mitkClassMacroItkParent(ItkEventListener, itk::Command);
-      ItkEventListener(QmitkStepperAdapter* receiver) :
-        m_Receiver(receiver)
-      {
+  public:
+    mitkClassMacroItkParent(ItkEventListener, itk::Command);
+    ItkEventListener(QmitkStepperAdapter *receiver)
+      : m_Receiver(receiver){
 
-      };
-      virtual void   Execute (itk::Object*, const itk::EventObject&) override
-      {
-        emit m_Receiver->Refetch();
-      };
-      virtual void   Execute (const itk::Object*, const itk::EventObject&) override
-      {
-        emit m_Receiver->Refetch();
-      };
-    protected:
-      QmitkStepperAdapter* m_Receiver;
+        };
+    virtual void Execute(itk::Object *, const itk::EventObject &) override { emit m_Receiver->Refetch(); };
+    virtual void Execute(const itk::Object *, const itk::EventObject &) override { emit m_Receiver->Refetch(); };
+  protected:
+    QmitkStepperAdapter *m_Receiver;
   };
 
 signals:
@@ -84,4 +76,3 @@ protected:
 };
 
 #endif
-

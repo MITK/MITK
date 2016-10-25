@@ -14,38 +14,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
 #define MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
 
-#include "mitkLookupTable.h"
 #include "MitkDataTypesExtExports.h"
 #include "mitkCommon.h"
+#include "mitkLookupTable.h"
 
 #include "itkProcessObject.h"
 
 namespace mitk
 {
+  /**
+   * @brief Base class for all objects which have an object of type
+   * mitkLookupTable as output
+   *
+   * Base class for all objects which have an object of type mitkLookupTable
+   * as output. It is assumed, that mitkLookupTableSources do not provide support
+   * for streaming, that is, that the requested region is always the largest
+   * possible region.
+   * @ingroup Process
+   */
+  class MITKDATATYPESEXT_EXPORT LookupTableSource : public itk::ProcessObject
+  {
+  public:
+    mitkClassMacroItkParent(LookupTableSource, itk::ProcessObject) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-/**
- * @brief Base class for all objects which have an object of type
- * mitkLookupTable as output
- *
- * Base class for all objects which have an object of type mitkLookupTable
- * as output. It is assumed, that mitkLookupTableSources do not provide support
- * for streaming, that is, that the requested region is always the largest
- * possible region.
- * @ingroup Process
- */
-class MITKDATATYPESEXT_EXPORT LookupTableSource : public itk::ProcessObject
-{
-public:
-
-    mitkClassMacroItkParent( LookupTableSource, itk::ProcessObject )
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    typedef mitk::LookupTable OutputType;
+      typedef mitk::LookupTable OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
 
@@ -57,7 +52,7 @@ public:
      * @param idx the index of the output for which an object should be created
      * @returns the new object
      */
-    virtual itk::DataObject::Pointer MakeOutput ( DataObjectPointerArraySizeType idx ) override;
+    virtual itk::DataObject::Pointer MakeOutput(DataObjectPointerArraySizeType idx) override;
 
     /**
      * This is a default implementation to make sure we have something.
@@ -79,21 +74,18 @@ public:
      * @todo provide a more usefule implementation
      * @param output the intended output of the lookup table source.
      */
-    virtual void GraftOutput( OutputType* output );
+    virtual void GraftOutput(OutputType *output);
 
-    virtual OutputType* GetOutput();
-    virtual const OutputType* GetOutput() const;
-    virtual OutputType* GetOutput(DataObjectPointerArraySizeType idx);
-    virtual const OutputType* GetOutput(DataObjectPointerArraySizeType idx) const;
+    virtual OutputType *GetOutput();
+    virtual const OutputType *GetOutput() const;
+    virtual OutputType *GetOutput(DataObjectPointerArraySizeType idx);
+    virtual const OutputType *GetOutput(DataObjectPointerArraySizeType idx) const;
 
-protected:
+  protected:
     LookupTableSource();
     virtual ~LookupTableSource();
-
-};
+  };
 
 } // namespace mitk
-
-
 
 #endif

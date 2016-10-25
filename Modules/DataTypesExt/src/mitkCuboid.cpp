@@ -14,18 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkCuboid.h"
-#include "vtkLinearTransform.h"
 #include "mitkNumericTypes.h"
 #include "vtkCubeSource.h"
+#include "vtkLinearTransform.h"
 
 #include <vtkSTLReader.h>
 
-mitk::Cuboid::Cuboid()
-: BoundingObject()
+mitk::Cuboid::Cuboid() : BoundingObject()
 {
-  vtkCubeSource* cube = vtkCubeSource::New();
+  vtkCubeSource *cube = vtkCubeSource::New();
   cube->SetXLength(2.0);
   cube->SetYLength(2.0);
   cube->SetZLength(2.0);
@@ -36,10 +34,9 @@ mitk::Cuboid::Cuboid()
 
 mitk::Cuboid::~Cuboid()
 {
-
 }
 
-bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
+bool mitk::Cuboid::IsInside(const Point3D &worldPoint) const
 {
   // transform point from world to object coordinates
   ScalarType p[4];
@@ -50,15 +47,11 @@ bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
 
   GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
-  return (p[0] >= -1) && (p[0] <= 1)
-    && (p[1] >= -1) && (p[1] <= 1)
-    && (p[2] >= -1) && (p[2] <= 1);
+  return (p[0] >= -1) && (p[0] <= 1) && (p[1] >= -1) && (p[1] <= 1) && (p[2] >= -1) && (p[2] <= 1);
 }
 
 mitk::ScalarType mitk::Cuboid::GetVolume()
 {
-  TimeGeometry* geometry = GetTimeGeometry();
-  return   geometry->GetExtentInWorld(0)
-    * geometry->GetExtentInWorld(1)
-    * geometry->GetExtentInWorld(2);
+  TimeGeometry *geometry = GetTimeGeometry();
+  return geometry->GetExtentInWorld(0) * geometry->GetExtentInWorld(1) * geometry->GetExtentInWorld(2);
 }

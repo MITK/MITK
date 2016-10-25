@@ -18,18 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mapAlgorithmProfileHelper.h"
 
-
-
-QmitkAlgorithmListModel::
-  QmitkAlgorithmListModel(QObject *parent) :
-QAbstractTableModel(parent)
+QmitkAlgorithmListModel::QmitkAlgorithmListModel(QObject *parent) : QAbstractTableModel(parent)
 {
-
 }
 
-void
-  QmitkAlgorithmListModel::
-  SetAlgorithms(::map::deployment::DLLDirectoryBrowser::DLLInfoListType algList)
+void QmitkAlgorithmListModel::SetAlgorithms(::map::deployment::DLLDirectoryBrowser::DLLInfoListType algList)
 {
   emit beginResetModel();
 
@@ -38,11 +31,9 @@ void
   emit endResetModel();
 };
 
-int
-  QmitkAlgorithmListModel::
-  rowCount(const QModelIndex &parent) const
+int QmitkAlgorithmListModel::rowCount(const QModelIndex &parent) const
 {
-  if(parent.isValid())
+  if (parent.isValid())
   {
     return 0;
   }
@@ -50,97 +41,89 @@ int
   return m_AlgList.size();
 }
 
-int
-  QmitkAlgorithmListModel::
-  columnCount(const QModelIndex &parent) const
+int QmitkAlgorithmListModel::columnCount(const QModelIndex &parent) const
 {
-  if(parent.isValid())
+  if (parent.isValid())
     return 0;
 
   return 4;
 }
 
-QVariant
-  QmitkAlgorithmListModel::
-  data(const QModelIndex &index, int role) const
+QVariant QmitkAlgorithmListModel::data(const QModelIndex &index, int role) const
 {
-  if(!index.isValid())
+  if (!index.isValid())
     return QVariant();
 
   QVariant result;
 
-  if(index.row()<m_AlgList.size())
+  if (index.row() < m_AlgList.size())
   {
-    const ::map::deployment::DLLInfo* info = m_AlgList[index.row()].GetPointer();
+    const ::map::deployment::DLLInfo *info = m_AlgList[index.row()].GetPointer();
 
-    if(Qt::DisplayRole == role)
+    if (Qt::DisplayRole == role)
     {
-      switch(index.column())
+      switch (index.column())
       {
-      case 0:
-        result = QVariant(info->getAlgorithmUID().getName().c_str());
-        break;
-      case 1:
-        result = QVariant(info->getAlgorithmUID().getNamespace().c_str());
-        break;
-      case 2:
-        result = QVariant(info->getAlgorithmUID().getVersion().c_str());
-        break;
-      case 3:
-        std::stringstream descriptionString;
-        ::map::algorithm::profile::ValueListType keys = ::map::algorithm::profile::getKeywords(info->getAlgorithmProfileStr());
-        for (::map::algorithm::profile::ValueListType::const_iterator keyPos = keys.begin(); keyPos!=keys.end();++keyPos)
-        {
-          if (keyPos != keys.begin())
+        case 0:
+          result = QVariant(info->getAlgorithmUID().getName().c_str());
+          break;
+        case 1:
+          result = QVariant(info->getAlgorithmUID().getNamespace().c_str());
+          break;
+        case 2:
+          result = QVariant(info->getAlgorithmUID().getVersion().c_str());
+          break;
+        case 3:
+          std::stringstream descriptionString;
+          ::map::algorithm::profile::ValueListType keys =
+            ::map::algorithm::profile::getKeywords(info->getAlgorithmProfileStr());
+          for (::map::algorithm::profile::ValueListType::const_iterator keyPos = keys.begin(); keyPos != keys.end();
+               ++keyPos)
           {
-            descriptionString << "; ";
+            if (keyPos != keys.begin())
+            {
+              descriptionString << "; ";
+            }
+            descriptionString << *keyPos;
           }
-          descriptionString << *keyPos;
-        }
-        descriptionString << "</p>";
-        result =  QVariant(descriptionString.str().c_str());
-        break;
+          descriptionString << "</p>";
+          result = QVariant(descriptionString.str().c_str());
+          break;
       }
     }
     else if (Qt::UserRole == role)
     {
       result = QVariant(index.row());
     }
-
   }
 
   return result;
 }
 
-Qt::ItemFlags
-  QmitkAlgorithmListModel::
-  flags(const QModelIndex &index) const
+Qt::ItemFlags QmitkAlgorithmListModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
 
   return flags;
 }
 
-QVariant
-  QmitkAlgorithmListModel::
-  headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkAlgorithmListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if( (Qt::DisplayRole == role) &&
-    (Qt::Horizontal == orientation))
+  if ((Qt::DisplayRole == role) && (Qt::Horizontal == orientation))
   {
-    if (section==0)
+    if (section == 0)
     {
       return QVariant("Name");
     }
-    else if (section==1)
+    else if (section == 1)
     {
       return QVariant("Namespace");
     }
-    else if (section==2)
+    else if (section == 2)
     {
       return QVariant("Version");
     }
-    else if (section==3)
+    else if (section == 3)
     {
       return QVariant("Keywords");
     }

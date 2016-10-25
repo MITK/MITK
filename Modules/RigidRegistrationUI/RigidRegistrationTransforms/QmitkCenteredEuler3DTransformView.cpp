@@ -16,12 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCenteredEuler3DTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <QValidator>
 #include <itkCenteredEuler3DTransform.h>
 #include <itkCenteredTransformInitializer.h>
-#include <QValidator>
 
-QmitkCenteredEuler3DTransformView::QmitkCenteredEuler3DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkCenteredEuler3DTransformView::QmitkCenteredEuler3DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -44,14 +44,16 @@ itk::Object::Pointer QmitkCenteredEuler3DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkCenteredEuler3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkCenteredEuler3DTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
   if (VImageDimension == 3)
   {
-    typename itk::CenteredEuler3DTransform< double >::Pointer transformPointer = itk::CenteredEuler3DTransform< double >::New();
+    typename itk::CenteredEuler3DTransform<double>::Pointer transformPointer =
+      itk::CenteredEuler3DTransform<double>::New();
     transformPointer->SetIdentity();
     m_CenterX = transformPointer->GetCenter()[0];
     m_CenterY = transformPointer->GetCenter()[1];
@@ -98,10 +100,10 @@ QString QmitkCenteredEuler3DTransformView::GetName()
   return "CenteredEuler3D";
 }
 
-void QmitkCenteredEuler3DTransformView::SetupUI(QWidget* parent)
+void QmitkCenteredEuler3DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesCenteredEuler3DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesCenteredEuler3DTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesCenteredEuler3DTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -127,7 +129,9 @@ itk::Array<double> QmitkCenteredEuler3DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkCenteredEuler3DTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkCenteredEuler3DTransformView::Transform(vtkMatrix4x4 * /*vtkmatrix*/,
+                                                           vtkTransform *vtktransform,
+                                                           itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

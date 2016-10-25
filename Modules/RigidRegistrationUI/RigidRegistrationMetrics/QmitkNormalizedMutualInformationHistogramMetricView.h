@@ -17,24 +17,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkNormalizedMutualInformationHistogramMetricViewWidgetHIncluded
 #define QmitkNormalizedMutualInformationHistogramMetricViewWidgetHIncluded
 
-#include "ui_QmitkNormalizedMutualInformationHistogramMetricControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
+#include "ui_QmitkNormalizedMutualInformationHistogramMetricControls.h"
 #include <itkArray.h>
-#include <itkObject.h>
 #include <itkImage.h>
+#include <itkObject.h>
 
 /*!
 * \brief Widget for rigid registration
 *
 * Displays options for rigid registration.
 */
-class MITKRIGIDREGISTRATIONUI_EXPORT QmitkNormalizedMutualInformationHistogramMetricView : public QmitkRigidRegistrationMetricsGUIBase
+class MITKRIGIDREGISTRATIONUI_EXPORT QmitkNormalizedMutualInformationHistogramMetricView
+  : public QmitkRigidRegistrationMetricsGUIBase
 {
-
 public:
-
-  QmitkNormalizedMutualInformationHistogramMetricView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkNormalizedMutualInformationHistogramMetricView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkNormalizedMutualInformationHistogramMetricView();
 
   virtual mitk::MetricParameters::MetricType GetMetricType() override;
@@ -47,22 +46,18 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
   virtual bool Maximize() override;
 
-
 private:
-
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetMetric2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
-
   Ui::QmitkNormalizedMutualInformationHistogramMetricControls m_Controls;
 
   itk::Object::Pointer m_MetricObject;
-
 };
 
 #endif

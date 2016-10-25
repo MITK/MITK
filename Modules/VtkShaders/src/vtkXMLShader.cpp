@@ -33,17 +33,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkObjectFactory.h"
 #include "vtkXMLDataElement.h"
 
-#include <vtksys/SystemTools.hxx>
 #include <assert.h>
+#include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkXMLShader);
 vtkCxxSetObjectMacro(vtkXMLShader, SourceLibraryElement, vtkXMLDataElement);
 //-----------------------------------------------------------------------------
-vtkXMLShader::vtkXMLShader()
-  : Code(nullptr),
-    RootElement(nullptr),
-    SourceLibraryElement(nullptr),
-    Args(nullptr)
+vtkXMLShader::vtkXMLShader() : Code(nullptr), RootElement(nullptr), SourceLibraryElement(nullptr), Args(nullptr)
 {
 }
 
@@ -51,17 +47,17 @@ vtkXMLShader::vtkXMLShader()
 vtkXMLShader::~vtkXMLShader()
 {
   if (this->RootElement)
-    {
+  {
     this->RootElement->UnRegister(this);
     this->RootElement = nullptr;
-    }
+  }
   this->SetSourceLibraryElement(nullptr);
   this->SetCode(nullptr);
   this->CleanupArgs();
 }
 
 //-----------------------------------------------------------------------------
-void vtkXMLShader::SetRootElement(vtkXMLDataElement* root)
+void vtkXMLShader::SetRootElement(vtkXMLDataElement *root)
 {
   vtkSetObjectBodyMacro(RootElement, vtkXMLDataElement, root);
   this->SetCode(nullptr);
@@ -71,50 +67,50 @@ void vtkXMLShader::SetRootElement(vtkXMLDataElement* root)
 //-----------------------------------------------------------------------------
 // Note that this method allocates a new string which must be deleted by
 // the caller.
-char* vtkXMLShader::LocateFile(const char* filename)
+char *vtkXMLShader::LocateFile(const char *filename)
 {
-  if(!filename)
-    {
+  if (!filename)
+  {
     return nullptr;
-    }
+  }
 
   // if filename is absolute path, return the same.
   if (vtksys::SystemTools::FileExists(filename))
-    {
+  {
     return vtksys::SystemTools::DuplicateString(filename);
-    }
+  }
 
   // Fetch any runtime defined user paths for materials
   std::vector<std::string> paths;
   std::string userpaths;
   vtksys::SystemTools::GetEnv("USER_MATERIALS_DIRS", userpaths);
-  if (userpaths.size()>0)
-    {
+  if (userpaths.size() > 0)
+  {
     vtksys::SystemTools::Split(userpaths.c_str(), paths, ';');
-    }
+  }
 
 #ifdef VTK_MATERIALS_DIRS
   // search thru default paths to locate file.
   vtksys::SystemTools::Split(VTK_MATERIALS_DIRS, paths, ';');
 #endif
-  for (unsigned int i =0; i < paths.size(); i++)
-    {
+  for (unsigned int i = 0; i < paths.size(); i++)
+  {
     std::string path = paths[i];
     if (path.size() == 0)
-      {
+    {
       continue;
-      }
+    }
     vtksys::SystemTools::ConvertToUnixSlashes(path);
-    if (path[path.size()-1] != '/')
-      {
+    if (path[path.size() - 1] != '/')
+    {
       path += "/";
-      }
+    }
     path += filename;
     if (vtksys::SystemTools::FileExists(path.c_str()))
-      {
+    {
       return vtksys::SystemTools::DuplicateString(path.c_str());
-      }
     }
+  }
   return nullptr;
 }
 
@@ -122,25 +118,25 @@ char* vtkXMLShader::LocateFile(const char* filename)
 int vtkXMLShader::GetScope()
 {
   if (this->RootElement)
-    {
-    const char* scope = this->RootElement->GetAttribute("scope");
+  {
+    const char *scope = this->RootElement->GetAttribute("scope");
     if (!scope)
-      {
+    {
       vtkErrorMacro("Shader description missing \"scope\" attribute.");
-      }
-    else if (strcmp(scope, "Vertex") == 0)
-      {
-      return vtkXMLShader::SCOPE_VERTEX;
-      }
-    else if (strcmp(scope, "Fragment") == 0)
-      {
-      return vtkXMLShader::SCOPE_FRAGMENT;
-      }
-    else if (strcmp(scope, "Geometry") == 0)
-      {
-      return vtkXMLShader::SCOPE_GEOMETRY;
-      }
     }
+    else if (strcmp(scope, "Vertex") == 0)
+    {
+      return vtkXMLShader::SCOPE_VERTEX;
+    }
+    else if (strcmp(scope, "Fragment") == 0)
+    {
+      return vtkXMLShader::SCOPE_FRAGMENT;
+    }
+    else if (strcmp(scope, "Geometry") == 0)
+    {
+      return vtkXMLShader::SCOPE_GEOMETRY;
+    }
+  }
   return vtkXMLShader::SCOPE_NONE;
 }
 
@@ -148,58 +144,58 @@ int vtkXMLShader::GetScope()
 // \post valid_result: result==1 || result==2
 int vtkXMLShader::GetStyle()
 {
-  int result=1;
-  if(this->RootElement)
+  int result = 1;
+  if (this->RootElement)
+  {
+    const char *loc = this->RootElement->GetAttribute("style");
+    if (loc == nullptr)
     {
-    const char *loc=this->RootElement->GetAttribute("style");
-    if(loc==nullptr)
-      {
       // fine. this attribute is optional.
-      }
+    }
     else
+    {
+      if (strcmp(loc, "1") == 0)
       {
-      if(strcmp(loc,"1")==0)
-        {
         // fine. default value.
-        }
+      }
       else
+      {
+        if (strcmp(loc, "2") == 0)
         {
-        if(strcmp(loc,"2")==0)
-          {
-          result=2; // new style
-          }
+          result = 2; // new style
+        }
         else
-          {
-          vtkErrorMacro(<<"style number not supported. Expect 1 or 2. We force it to be 1.");
-          }
+        {
+          vtkErrorMacro(<< "style number not supported. Expect 1 or 2. We force it to be 1.");
         }
       }
     }
+  }
 
-  assert("post valid_result" && (result==1 || result==2) );
+  assert("post valid_result" && (result == 1 || result == 2));
   return result;
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkXMLShader::GetName()
+const char *vtkXMLShader::GetName()
 {
-  return (this->RootElement)? this->RootElement->GetAttribute("name") : nullptr;
+  return (this->RootElement) ? this->RootElement->GetAttribute("name") : nullptr;
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkXMLShader::GetEntry()
+const char *vtkXMLShader::GetEntry()
 {
-  return (this->RootElement)? this->RootElement->GetAttribute("entry") : nullptr;
+  return (this->RootElement) ? this->RootElement->GetAttribute("entry") : nullptr;
 }
 
 //-----------------------------------------------------------------------------
-const char** vtkXMLShader::GetArgs()
+const char **vtkXMLShader::GetArgs()
 {
   this->CleanupArgs();
   if (!this->RootElement || !this->RootElement->GetAttribute("args"))
-    {
+  {
     return nullptr;
-    }
+  }
 
   std::vector<std::string> args;
   vtksys::SystemTools::Split(this->RootElement->GetAttribute("args"), args, ' ');
@@ -207,94 +203,91 @@ const char** vtkXMLShader::GetArgs()
   int i;
   int size = static_cast<int>(args.size());
   if (size == 0)
-    {
+  {
     return nullptr;
-    }
-  this->Args = new char*[size+1];
-  for (i=0; i < size; i++)
-    {
+  }
+  this->Args = new char *[size + 1];
+  for (i = 0; i < size; i++)
+  {
     this->Args[i] = vtksys::SystemTools::DuplicateString(args[i].c_str());
-    }
+  }
   this->Args[size] = nullptr;
-  return const_cast<const char**>(this->Args);
+  return const_cast<const char **>(this->Args);
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkXMLShader::GetCode()
+const char *vtkXMLShader::GetCode()
 {
   return this->RootElement->GetCharacterData();
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkXMLShader::CleanupArgs()
 {
   if (this->Args)
-    {
-    char** a = this->Args;
+  {
+    char **a = this->Args;
     while (*a)
-      {
-      delete [] (*a);
+    {
+      delete[](*a);
       a++;
-      }
-    delete [] this->Args;
-    this->Args = nullptr;
     }
+    delete[] this->Args;
+    this->Args = nullptr;
+  }
 }
 
 //-----------------------------------------------------------------------------
-void vtkXMLShader::PrintSelf(ostream& os, vtkIndent indent)
+void vtkXMLShader::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Name: " << (this->GetName()? this->GetName() : "(none)")
-                                                                    << endl;
+  os << indent << "Name: " << (this->GetName() ? this->GetName() : "(none)") << endl;
   os << indent << "Scope: ";
-  switch(this->GetScope())
-    {
-  case SCOPE_NONE:
-    os << "None";
-    break;
-  case SCOPE_MIXED:
-    os << "Mixed";
-    break;
-  case SCOPE_VERTEX:
-    os << "Vertex";
-    break;
-  case SCOPE_FRAGMENT:
-    os << "Fragment";
-    break;
-  case SCOPE_GEOMETRY:
-    os << "Geometry";
-    break;
-    }
+  switch (this->GetScope())
+  {
+    case SCOPE_NONE:
+      os << "None";
+      break;
+    case SCOPE_MIXED:
+      os << "Mixed";
+      break;
+    case SCOPE_VERTEX:
+      os << "Vertex";
+      break;
+    case SCOPE_FRAGMENT:
+      os << "Fragment";
+      break;
+    case SCOPE_GEOMETRY:
+      os << "Geometry";
+      break;
+  }
   os << endl;
 
-  os << indent << "Entry: "
-    <<  (this->GetEntry()? this->GetEntry() : "(none)") << endl;
+  os << indent << "Entry: " << (this->GetEntry() ? this->GetEntry() : "(none)") << endl;
   os << indent << "Args: ";
-  const char** args = this->GetArgs();
+  const char **args = this->GetArgs();
   if (!args)
-    {
+  {
     os << "(none)" << endl;
-    }
+  }
   else
-    {
+  {
     while (*args)
-      {
+    {
       os << indent << *args << " ";
       args++;
-      }
-    os << endl;
     }
+    os << endl;
+  }
 
   os << indent << "RootElement: ";
   if (this->RootElement)
-    {
+  {
     os << endl;
     this->RootElement->PrintSelf(os, indent.GetNextIndent());
-    }
+  }
   else
-    {
+  {
     os << "(none)" << endl;
-    }
+  }
 }

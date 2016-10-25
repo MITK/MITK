@@ -18,60 +18,64 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkOverwriteSliceImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkImageToImageFilter.h"
+#include <MitkSegmentationExports.h>
 
 #include <itkImage.h>
 
 namespace mitk
 {
+  /**
+    \deprecated This class is deprecated. Use mitkVtkImageOverwrite instead.
+    \sa mitkVtkImageOverwrite
 
-/**
-  \deprecated This class is deprecated. Use mitkVtkImageOverwrite instead.
-  \sa mitkVtkImageOverwrite
+    \brief Writes a 2D slice into a 3D image.
 
-  \brief Writes a 2D slice into a 3D image.
+    \sa SegTool2D
+    \sa ContourTool
+    \sa ExtractImageFilter
 
-  \sa SegTool2D
-  \sa ContourTool
-  \sa ExtractImageFilter
+    \ingroup Process
+    \ingroup ToolManagerEtAl
 
-  \ingroup Process
-  \ingroup ToolManagerEtAl
+    There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
+    QmitkInteractiveSegmentationTechnicalPage
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+    This class takes a 3D mitk::Image as input and tries to replace one slice in it with the second input image, which
+    is specified
+    by calling SetSliceImage with a 2D mitk::Image.
 
-  This class takes a 3D mitk::Image as input and tries to replace one slice in it with the second input image, which is specified
-  by calling SetSliceImage with a 2D mitk::Image.
+    Two parameters determine which slice is replaced: the "slice dimension" is that one, which is constant for all
+    points in the plane, e.g. axial would mean 2.
+    The "slice index" is the slice index in the image direction you specified with "affected dimension". Indices count
+    from zero.
 
-  Two parameters determine which slice is replaced: the "slice dimension" is that one, which is constant for all points in the plane, e.g. axial would mean 2.
-  The "slice index" is the slice index in the image direction you specified with "affected dimension". Indices count from zero.
+    This class works with all kind of image types, the only restrictions being that the input is 3D, and the slice image
+    is 2D.
 
-  This class works with all kind of image types, the only restrictions being that the input is 3D, and the slice image is 2D.
+    If requested by SetCreateUndoInformation(true), this class will create instances of ApplyDiffImageOperation for the
+    undo stack.
+    These operations will (on user request) be executed by DiffImageApplier to perform undo.
 
-  If requested by SetCreateUndoInformation(true), this class will create instances of ApplyDiffImageOperation for the undo stack.
-  These operations will (on user request) be executed by DiffImageApplier to perform undo.
-
-  Last contributor: $Author$
-*/
-class MITKSEGMENTATION_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
-{
+    Last contributor: $Author$
+  */
+  class MITKSEGMENTATION_EXPORT OverwriteSliceImageFilter : public ImageToImageFilter
+  {
   public:
-
     mitkClassMacro(OverwriteSliceImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    /**
-      \brief Which slice to overwrite (first one has index 0).
-    */
-    itkSetMacro(SliceIndex, unsigned int);
+      /**
+        \brief Which slice to overwrite (first one has index 0).
+      */
+      itkSetMacro(SliceIndex, unsigned int);
     itkGetConstMacro(SliceIndex, unsigned int);
 
     /**
       \brief The orientation of the slice to overwrite.
 
-      \a Parameter \a SliceDimension Number of the dimension which is constant for all pixels of the desired slices (e.g. 0 for axial)
+      \a Parameter \a SliceDimension Number of the dimension which is constant for all pixels of the desired slices
+      (e.g. 0 for axial)
     */
     itkSetMacro(SliceDimension, unsigned int);
     itkGetConstMacro(SliceDimension, unsigned int);
@@ -89,24 +93,22 @@ class MITKSEGMENTATION_EXPORT OverwriteSliceImageFilter : public ImageToImageFil
     itkGetConstMacro(CreateUndoInformation, bool);
 
     itkSetObjectMacro(SliceImage, Image);
-    const Image* GetSliceImage() { return m_SliceImage.GetPointer(); }
-
-    const Image* GetLastDifferenceImage() { return m_SliceDifferenceImage.GetPointer(); }
-
+    const Image *GetSliceImage() { return m_SliceImage.GetPointer(); }
+    const Image *GetLastDifferenceImage() { return m_SliceDifferenceImage.GetPointer(); }
   protected:
-
     OverwriteSliceImageFilter(); // purposely hidden
     virtual ~OverwriteSliceImageFilter();
 
     virtual void GenerateData() override;
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageSwitch( itk::Image<TPixel,VImageDimension>* image );
+    template <typename TPixel, unsigned int VImageDimension>
+    void ItkImageSwitch(itk::Image<TPixel, VImageDimension> *image);
 
-    template<typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
-    void ItkImageProcessing( const itk::Image<TPixel1,VImageDimension1>* itkImage1, itk::Image<TPixel2,VImageDimension2>* itkImage2 );
+    template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+    void ItkImageProcessing(const itk::Image<TPixel1, VImageDimension1> *itkImage1,
+                            itk::Image<TPixel2, VImageDimension2> *itkImage2);
 
-    std::string EventDescription( unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep );
+    std::string EventDescription(unsigned int sliceDimension, unsigned int sliceIndex, unsigned int timeStep);
 
     Image::ConstPointer m_SliceImage;
     Image::Pointer m_SliceDifferenceImage;
@@ -118,10 +120,8 @@ class MITKSEGMENTATION_EXPORT OverwriteSliceImageFilter : public ImageToImageFil
     unsigned int m_Dimension1;
 
     bool m_CreateUndoInformation;
-};
+  };
 
 } // namespace
 
 #endif
-
-

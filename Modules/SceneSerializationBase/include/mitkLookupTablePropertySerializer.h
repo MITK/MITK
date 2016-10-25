@@ -17,13 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkLookupTablePropertySerializer_h_included
 #define mitkLookupTablePropertySerializer_h_included
 
-#include <MitkSceneSerializationBaseExports.h>
 #include "mitkBasePropertySerializer.h"
-
+#include <MitkSceneSerializationBaseExports.h>
 
 namespace mitk
 {
-
   /**
   \brief Base class for objects that serialize BaseData types.
 
@@ -38,31 +36,25 @@ namespace mitk
   class MITKSCENESERIALIZATIONBASE_EXPORT LookupTablePropertySerializer : public BasePropertySerializer
   {
   public:
+    mitkClassMacro(LookupTablePropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( LookupTablePropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+      /**
+        \brief Serializes given BaseData object.
+        \return the filename of the newly created file.
 
-    /**
-      \brief Serializes given BaseData object.
-      \return the filename of the newly created file.
+        This should be overwritten by specific sub-classes.
+       */
+      virtual TiXmlElement *Serialize() override;
 
-      This should be overwritten by specific sub-classes.
-     */
-    virtual TiXmlElement* Serialize() override;
-
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override;
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
 
   protected:
-
     LookupTablePropertySerializer(){};
     virtual ~LookupTablePropertySerializer(){};
-
   };
-
 }
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(LookupTablePropertySerializer);
 
 #endif
-

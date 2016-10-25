@@ -29,10 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkRenderWindowInteractor.h>
 
 mitk::TubeGraphDataInteractor::TubeGraphDataInteractor()
-  : m_LastPickedTube(TubeGraph::ErrorId)
-  , m_SecondLastPickedTube(TubeGraph::ErrorId)
-  , m_ActivationMode(None)
-  , m_ActionMode(AttributationMode)
+  : m_LastPickedTube(TubeGraph::ErrorId),
+    m_SecondLastPickedTube(TubeGraph::ErrorId),
+    m_ActivationMode(None),
+    m_ActionMode(AttributationMode)
 {
 }
 
@@ -42,24 +42,26 @@ mitk::TubeGraphDataInteractor::~TubeGraphDataInteractor()
 
 void mitk::TubeGraphDataInteractor::ConnectActionsAndFunctions()
 {
-  // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually executing an action
+  // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually
+  // executing an action
   CONNECT_CONDITION("isOverTube", CheckOverTube);
 
   // **Function** in the statmachine patterns also referred to as **Actions**
-  CONNECT_FUNCTION("selectTube",SelectTube);
-  CONNECT_FUNCTION("deselectTube",DeselectTube);
+  CONNECT_FUNCTION("selectTube", SelectTube);
+  CONNECT_FUNCTION("deselectTube", DeselectTube);
 }
 
 void mitk::TubeGraphDataInteractor::DataNodeChanged()
 {
   if (GetDataNode() != nullptr)
   {
-    if(GetDataNode()->GetData() != NULL)
+    if (GetDataNode()->GetData() != NULL)
     {
-      m_TubeGraph = dynamic_cast< TubeGraph* >(GetDataNode()->GetData());
-      m_TubeGraphProperty = dynamic_cast< TubeGraphProperty* >(m_TubeGraph->GetProperty( "Tube Graph.Visualization Information" ).GetPointer());
+      m_TubeGraph = dynamic_cast<TubeGraph *>(GetDataNode()->GetData());
+      m_TubeGraphProperty = dynamic_cast<TubeGraphProperty *>(
+        m_TubeGraph->GetProperty("Tube Graph.Visualization Information").GetPointer());
       if (m_TubeGraphProperty.IsNull())
-        MITK_ERROR<< "Something went wrong! No tube graph property!";
+        MITK_ERROR << "Something went wrong! No tube graph property!";
     }
     else
       m_TubeGraph = NULL;
@@ -68,28 +70,28 @@ void mitk::TubeGraphDataInteractor::DataNodeChanged()
     m_TubeGraph = NULL;
 }
 
-bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent* interactionEvent)
+bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
-  if(positionEvent == NULL)
+  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
+  if (positionEvent == NULL)
     return false;
 
-  TubeGraphPicker* picker = new mitk::TubeGraphPicker();
+  TubeGraphPicker *picker = new mitk::TubeGraphPicker();
   picker->SetTubeGraph(m_TubeGraph);
 
   TubeGraph::TubeDescriptorType tubeDescriptor = picker->GetPickedTube(positionEvent->GetPositionInWorld()).first;
 
-  if(tubeDescriptor != TubeGraph::ErrorId )
+  if (tubeDescriptor != TubeGraph::ErrorId)
   {
     m_SecondLastPickedTube = m_LastPickedTube;
     m_LastPickedTube = tubeDescriptor;
     return true;
   }
-  else//nothing picked
+  else // nothing picked
     return false;
 }
 
-void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if (m_TubeGraph.IsNull())
     return;
@@ -103,28 +105,27 @@ void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction*, InteractionE
     // show tube id on status bar
     std::stringstream displayText;
     displayText << "Picked tube: ID [" << m_LastPickedTube.first << "," << m_LastPickedTube.second << "]";
-    StatusBar::GetInstance()->DisplayText( displayText.str().c_str() );
-    //TODO!!!  this->InvokeEvent(SelectionChangedTubeGraphEvent());
+    StatusBar::GetInstance()->DisplayText(displayText.str().c_str());
+    // TODO!!!  this->InvokeEvent(SelectionChangedTubeGraphEvent());
   }
 }
 
-void mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   if (m_TubeGraph.IsNull())
     return;
 
-  if ((m_ActivationMode != Multiple)
-    && (m_ActivationMode != Points))
+  if ((m_ActivationMode != Multiple) && (m_ActivationMode != Points))
   {
     m_TubeGraphProperty->DeactivateAllTubes();
     interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
-    //TODO!!!this->InvokeEvent(SelectionChangedTubeGraphEvent());
+    // TODO!!!this->InvokeEvent(SelectionChangedTubeGraphEvent());
   }
   // show info on status bar
   StatusBar::GetInstance()->DisplayText("No tube hit!");
 }
 
-void mitk::TubeGraphDataInteractor::SetActivationMode(const ActivationMode& activationMode)
+void mitk::TubeGraphDataInteractor::SetActivationMode(const ActivationMode &activationMode)
 {
   m_ActivationMode = activationMode;
   if (m_TubeGraph.IsNotNull())
@@ -137,7 +138,7 @@ mitk::TubeGraphDataInteractor::ActivationMode mitk::TubeGraphDataInteractor::Get
   return m_ActivationMode;
 }
 
-void mitk::TubeGraphDataInteractor::SetActionMode(const ActionMode& actionMode)
+void mitk::TubeGraphDataInteractor::SetActionMode(const ActionMode &actionMode)
 {
   m_ActionMode = actionMode;
 }
@@ -162,11 +163,11 @@ void mitk::TubeGraphDataInteractor::UpdateActivation()
     m_TubeGraphProperty->DeactivateAllTubes();
     m_TubeGraphProperty->SetTubeActive(m_LastPickedTube, true);
 
-    //QmitkTubeGraphSelectRootDialog* dialog = new QmitkTubeGraphSelectRootDialog(m_Parent);
-    //int dialogReturnValue = dialog->exec();
-    //delete dialog;
+    // QmitkTubeGraphSelectRootDialog* dialog = new QmitkTubeGraphSelectRootDialog(m_Parent);
+    // int dialogReturnValue = dialog->exec();
+    // delete dialog;
 
-    //if ( dialogReturnValue != QDialog::Rejected ) // user doesn't clicked cancel or pressed Esc or something similar
+    // if ( dialogReturnValue != QDialog::Rejected ) // user doesn't clicked cancel or pressed Esc or something similar
     //{
     m_TubeGraph->SetRootTube(m_LastPickedTube);
     //}
@@ -177,37 +178,37 @@ void mitk::TubeGraphDataInteractor::UpdateActivation()
   {
     switch (m_ActivationMode)
     {
-    case None :
+      case None:
       {
         m_TubeGraphProperty->DeactivateAllTubes();
       }
       break;
 
-    case Single:
+      case Single:
       {
         m_TubeGraphProperty->DeactivateAllTubes();
         m_TubeGraphProperty->SetTubeActive(m_LastPickedTube, true);
       }
       break;
 
-    case Multiple:
-      { //special deactivation for multiple modus
-        //if activated--> deactivate; if not activated--> activate
-        if(m_TubeGraphProperty->IsTubeActive(m_LastPickedTube))
+      case Multiple:
+      { // special deactivation for multiple modus
+        // if activated--> deactivate; if not activated--> activate
+        if (m_TubeGraphProperty->IsTubeActive(m_LastPickedTube))
           m_TubeGraphProperty->SetTubeActive(m_LastPickedTube, false);
         else
           m_TubeGraphProperty->SetTubeActive(m_LastPickedTube, true);
       }
       break;
 
-    case ToRoot:
+      case ToRoot:
       {
         m_TubeGraphProperty->DeactivateAllTubes();
         std::vector<TubeGraph::TubeDescriptorType> activeTubes = this->GetTubesToRoot();
         m_TubeGraphProperty->SetTubesActive(activeTubes);
       }
       break;
-    case ToPeriphery:
+      case ToPeriphery:
       {
         m_TubeGraphProperty->DeactivateAllTubes();
         std::vector<TubeGraph::TubeDescriptorType> activeTubes = this->GetPathToPeriphery();
@@ -215,7 +216,7 @@ void mitk::TubeGraphDataInteractor::UpdateActivation()
       }
       break;
 
-    case Points:
+      case Points:
       {
         m_TubeGraphProperty->DeactivateAllTubes();
         std::vector<TubeGraph::TubeDescriptorType> activeTubes = this->GetTubesBetweenPoints();
@@ -223,9 +224,9 @@ void mitk::TubeGraphDataInteractor::UpdateActivation()
       }
       break;
 
-    default:
-      MITK_WARN<<"Unknown tube graph interaction mode!";
-      break;
+      default:
+        MITK_WARN << "Unknown tube graph interaction mode!";
+        break;
     }
   }
 }
@@ -233,7 +234,7 @@ void mitk::TubeGraphDataInteractor::UpdateActivation()
 std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraphDataInteractor::GetTubesToRoot()
 {
   TubeGraph::TubeDescriptorType root = m_TubeGraph->GetRootTube();
-  if(root == TubeGraph::ErrorId)
+  if (root == TubeGraph::ErrorId)
   {
     root = m_TubeGraph->GetThickestTube();
     m_TubeGraph->SetRootTube(root);
@@ -247,7 +248,8 @@ std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraphDataInteractor::
   return this->GetPathBetweenTubes(m_LastPickedTube, m_SecondLastPickedTube);
 }
 
-std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraphDataInteractor::GetPathBetweenTubes(const mitk::TubeGraph::TubeDescriptorType& start,const mitk::TubeGraph::TubeDescriptorType& end)
+std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraphDataInteractor::GetPathBetweenTubes(
+  const mitk::TubeGraph::TubeDescriptorType &start, const mitk::TubeGraph::TubeDescriptorType &end)
 {
   std::vector<mitk::TubeGraph::TubeDescriptorType> solutionPath;
   if ((start != TubeGraph::ErrorId) && (end != TubeGraph::ErrorId))

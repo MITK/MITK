@@ -20,30 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-PointSetIOFactory::PointSetIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkPointSetReader",
-                         "mitk PointSet IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<PointSetReader> >::New());
-}
+  PointSetIOFactory::PointSetIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkPointSetReader",
+                           "mitk PointSet IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<PointSetReader>>::New());
+  }
 
-PointSetIOFactory::~PointSetIOFactory()
-{
-}
-
-const char* PointSetIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* PointSetIOFactory::GetDescription() const
-{
-  return "PointSet IO Factory, allows the loading of MITK pointsets";
-}
+  PointSetIOFactory::~PointSetIOFactory() {}
+  const char *PointSetIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *PointSetIOFactory::GetDescription() const
+  {
+    return "PointSet IO Factory, allows the loading of MITK pointsets";
+  }
 
 } // end namespace mitk

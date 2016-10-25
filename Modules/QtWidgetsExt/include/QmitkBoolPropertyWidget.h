@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITK_BOOLPROPERTYVIEW_H_INCLUDED
 
 #include "MitkQtWidgetsExtExports.h"
-#include <mitkProperties.h>
 #include <QCheckBox>
+#include <mitkProperties.h>
 
 class _BoolPropertyWidgetImpl;
 
@@ -27,23 +27,19 @@ class MITKQTWIDGETSEXT_EXPORT QmitkBoolPropertyWidget : public QCheckBox
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkBoolPropertyWidget(QWidget *parent = nullptr);
+  QmitkBoolPropertyWidget(const QString &text, QWidget *parent = nullptr);
+  virtual ~QmitkBoolPropertyWidget();
 
-    QmitkBoolPropertyWidget(QWidget* parent = nullptr );
-    QmitkBoolPropertyWidget(const QString& text, QWidget* parent = nullptr );
-    virtual ~QmitkBoolPropertyWidget();
+  void SetProperty(mitk::BoolProperty *property);
 
-    void SetProperty(mitk::BoolProperty* property);
+protected slots:
 
-  protected slots:
+  void onToggle(bool on);
 
-    void onToggle(bool on);
-
-  protected:
-
-    _BoolPropertyWidgetImpl* m_PropEditorImpl;
-
+protected:
+  _BoolPropertyWidgetImpl *m_PropEditorImpl;
 };
 
 #endif
-

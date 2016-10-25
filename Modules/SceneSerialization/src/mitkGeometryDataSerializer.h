@@ -21,23 +21,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-/**
-  \brief Serializes mitk::GeometryData for mitk::SceneIO.
+  /**
+    \brief Serializes mitk::GeometryData for mitk::SceneIO.
 
-  \warning depends on mitk::GeometryDataWriterService which is first implemented only for the Geometry3D class!
-           See current status of that class if you want to use other geomety types.
-*/
-class GeometryDataSerializer : public BaseDataSerializer
-{
+    \warning depends on mitk::GeometryDataWriterService which is first implemented only for the Geometry3D class!
+             See current status of that class if you want to use other geomety types.
+  */
+  class GeometryDataSerializer : public BaseDataSerializer
+  {
   public:
-    mitkClassMacro( GeometryDataSerializer, BaseDataSerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    mitkClassMacro(GeometryDataSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual std::string Serialize() override;
+
   protected:
     GeometryDataSerializer();
     virtual ~GeometryDataSerializer();
-};
+  };
 
 } // namespace
 #endif

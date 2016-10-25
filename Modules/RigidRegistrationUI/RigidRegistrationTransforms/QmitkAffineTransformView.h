@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkAffineTransformViewWidgetHIncluded
 #define QmitkAffineTransformViewWidgetHIncluded
 
-#include "ui_QmitkAffineTransformControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
+#include "ui_QmitkAffineTransformControls.h"
 #include <itkImage.h>
 
 /*!
@@ -29,10 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkAffineTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
-
 public:
-
-  QmitkAffineTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkAffineTransformView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkAffineTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;
@@ -45,21 +43,22 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
   virtual itk::Array<double> GetScales() override;
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams) override;
+  virtual vtkTransform *Transform(vtkMatrix4x4 *vtkmatrix,
+                                  vtkTransform *vtktransform,
+                                  itk::Array<double> transformParams) override;
 
   virtual int GetNumberOfTransformParameters() override;
 
 private:
-
-  template < class TPixelType, class MovingPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1, itk::Image<MovingPixelType, VImageDimension>* itkImage2);
+  template <class TPixelType, class MovingPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1,
+                                     itk::Image<MovingPixelType, VImageDimension> *itkImage2);
 
 protected:
-
   Ui::QmitkAffineTransformControls m_Controls;
 
   itk::Object::Pointer m_TransformObject;
@@ -67,7 +66,6 @@ protected:
   double m_CenterX;
   double m_CenterY;
   double m_CenterZ;
-
 };
 
 #endif

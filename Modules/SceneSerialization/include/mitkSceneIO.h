@@ -28,39 +28,40 @@ class TiXmlElement;
 
 namespace mitk
 {
+  class BaseData;
+  class PropertyList;
 
-class BaseData;
-class PropertyList;
-
-class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
-{
+  class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
+  {
   public:
+    mitkClassMacroItkParent(SceneIO, itk::Object);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacroItkParent( SceneIO, itk::Object );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    typedef DataStorage::SetOfObjects                                FailedBaseDataListType;
+      typedef DataStorage::SetOfObjects FailedBaseDataListType;
 
     /**
      * \brief Load a scene of objects from file
-     * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and GetFailedProperties() for more detail.
+     * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and
+     * GetFailedProperties() for more detail.
      *
      * Attempts to read the provided file and create objects with
      * parent/child relations into a DataStorage.
      *
      * \param filename full filename of the scene file
      * \param storage If given, this DataStorage is used instead of a newly created one
-     * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded objects
+     * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
+     * objects
      */
-    virtual DataStorage::Pointer LoadScene( const std::string& filename,
-                                            DataStorage* storage = NULL,
-                                            bool clearStorageFirst = false );
+    virtual DataStorage::Pointer LoadScene(const std::string &filename,
+                                           DataStorage *storage = NULL,
+                                           bool clearStorageFirst = false);
 
     /**
      * \brief Save a scene of objects to file
-     * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if false is returned,
-               it just will not contain every node/property. If writing failed, query GetFailedNodes() and GetFailedProperties() for more detail.
+     * \return True if complete success, false if any problem occurred. Note that a scene file might still be written if
+     false is returned,
+               it just will not contain every node/property. If writing failed, query GetFailedNodes() and
+     GetFailedProperties() for more detail.
      *
      * Attempts to write a scene file, which contains the nodes of the
      * provided DataStorage, their parent/child relations, and properties.
@@ -69,8 +70,9 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      * \param filename full filename of the scene file
      * \param predicate defining which items of the datastorage to use and which not
      */
-    virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                            const std::string& filename);
+    virtual bool SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes,
+                           const DataStorage *storage,
+                           const std::string &filename);
 
     /**
      * \brief Get a list of nodes (BaseData containers) that failed to be read/written.
@@ -78,7 +80,7 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      * FailedBaseDataListType hold all those nodes that contain BaseData objects
      * which could not be read or written during the last call to LoadScene or SaveScene.
      */
-    const FailedBaseDataListType*   GetFailedNodes();
+    const FailedBaseDataListType *GetFailedNodes();
 
     /**
      * \brief Get a list of properties that failed to be read/written.
@@ -91,29 +93,26 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      *   <li> Any of a DataNodes's render window specific PropertyLists
      * </ul>
      */
-    const PropertyList* GetFailedProperties();
+    const PropertyList *GetFailedProperties();
 
   protected:
-
     SceneIO();
     virtual ~SceneIO();
 
     std::string CreateEmptyTempDirectory();
 
-    TiXmlElement* SaveBaseData( BaseData* data, const std::string& filenamehint, bool& error);
-    TiXmlElement* SavePropertyList( PropertyList* propertyList, const std::string& filenamehint );
+    TiXmlElement *SaveBaseData(BaseData *data, const std::string &filenamehint, bool &error);
+    TiXmlElement *SavePropertyList(PropertyList *propertyList, const std::string &filenamehint);
 
-    void OnUnzipError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
-    void OnUnzipOk(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info);
+    void OnUnzipError(const void *pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> &info);
+    void OnUnzipOk(const void *pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> &info);
 
     FailedBaseDataListType::Pointer m_FailedNodes;
-    PropertyList::Pointer           m_FailedProperties;
+    PropertyList::Pointer m_FailedProperties;
 
-    std::string  m_WorkingDirectory;
+    std::string m_WorkingDirectory;
     unsigned int m_UnzipErrors;
-};
-
+  };
 }
 
 #endif
-

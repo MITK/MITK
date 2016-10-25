@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_APPLICATION_CURSOR_H_INCLUDED
 #define QMITK_APPLICATION_CURSOR_H_INCLUDED
 
-#include <MitkQtWidgetsExports.h>
 #include "mitkApplicationCursor.h"
+#include <MitkQtWidgetsExports.h>
 
 /*!
   \ingroup QmitkModule
@@ -29,21 +29,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKQTWIDGETS_EXPORT QmitkApplicationCursor : public mitk::ApplicationCursorImplementation
 {
-  public:
+public:
+  // Will be instantiated automatically from QmitkApplicationCursor.cpp once
+  QmitkApplicationCursor();
 
-    // Will be instantiated automatically from QmitkApplicationCursor.cpp once
-    QmitkApplicationCursor();
+  virtual void PushCursor(const char *XPM[], int hotspotX, int hotspotY) override;
+  virtual void PushCursor(std::istream &, int hotspotX, int hotspotY) override;
+  virtual void PopCursor() override;
+  virtual const mitk::Point2I GetCursorPosition() override;
+  virtual void SetCursorPosition(const mitk::Point2I &) override;
 
-    virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY) override;
-    virtual void PushCursor(std::istream&, int hotspotX, int hotspotY) override;
-    virtual void PopCursor() override;
-    virtual const mitk::Point2I GetCursorPosition() override;
-    virtual void SetCursorPosition(const mitk::Point2I&) override;
-
-
-  protected:
-  private:
+protected:
+private:
 };
 
 #endif
-

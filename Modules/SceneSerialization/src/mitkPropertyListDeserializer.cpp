@@ -26,56 +26,58 @@ mitk::PropertyListDeserializer::~PropertyListDeserializer()
 {
 }
 
-
 bool mitk::PropertyListDeserializer::Deserialize()
 {
   bool error(false);
 
-  TiXmlDocument document( m_Filename );
+  TiXmlDocument document(m_Filename);
   if (!document.LoadFile())
   {
-    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc()
+               << std::endl;
     return false;
   }
 
   // find version node --> note version in some variable
   int fileVersion = 1;
-  TiXmlElement* versionObject = document.FirstChildElement("Version");
+  TiXmlElement *versionObject = document.FirstChildElement("Version");
   if (versionObject)
   {
-    if ( versionObject->QueryIntAttribute( "FileVersion", &fileVersion ) != TIXML_SUCCESS )
+    if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != TIXML_SUCCESS)
     {
-      MITK_ERROR << "Property file " << m_Filename << " does not contain version information! Trying version 1 format." << std::endl;
+      MITK_ERROR << "Property file " << m_Filename << " does not contain version information! Trying version 1 format."
+                 << std::endl;
     }
   }
 
   std::stringstream propertyListDeserializerClassName;
   propertyListDeserializerClassName << "PropertyListDeserializerV" << fileVersion;
 
-  std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyListDeserializerClassName.str().c_str());
+  std::list<itk::LightObject::Pointer> readers =
+    itk::ObjectFactoryBase::CreateAllInstance(propertyListDeserializerClassName.str().c_str());
   if (readers.size() < 1)
   {
     MITK_ERROR << "No property list reader found for file version " << fileVersion;
   }
   if (readers.size() > 1)
   {
-    MITK_WARN << "Multiple property list readers found for file version " << fileVersion << ". Using arbitrary first one.";
+    MITK_WARN << "Multiple property list readers found for file version " << fileVersion
+              << ". Using arbitrary first one.";
   }
 
-  for ( auto iter = readers.begin();
-        iter != readers.end();
-        ++iter )
+  for (auto iter = readers.begin(); iter != readers.end(); ++iter)
   {
-    if (PropertyListDeserializer* reader = dynamic_cast<PropertyListDeserializer*>( iter->GetPointer() ) )
+    if (PropertyListDeserializer *reader = dynamic_cast<PropertyListDeserializer *>(iter->GetPointer()))
     {
-      reader->SetFilename( m_Filename );
+      reader->SetFilename(m_Filename);
       bool success = reader->Deserialize();
       error |= !success;
       m_PropertyList = reader->GetOutput();
 
-      if ( error )
+      if (error)
       {
-        MITK_ERROR << "There were errors while loading property list file " << m_Filename << ". Your data may be corrupted";
+        MITK_ERROR << "There were errors while loading property list file " << m_Filename
+                   << ". Your data may be corrupted";
       }
       break;
     }
@@ -84,10 +86,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
   return !error;
 }
 
-
 mitk::PropertyList::Pointer mitk::PropertyListDeserializer::GetOutput()
 {
   return m_PropertyList;
 }
-
-

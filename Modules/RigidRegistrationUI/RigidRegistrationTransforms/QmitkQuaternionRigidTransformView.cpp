@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkQuaternionRigidTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkQuaternionRigidTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkQuaternionRigidTransform.h>
+#include <mitkImageCast.h>
 
-QmitkQuaternionRigidTransformView::QmitkQuaternionRigidTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkQuaternionRigidTransformView::QmitkQuaternionRigidTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,13 +45,14 @@ itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform2(
+  itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 3)
   {
-    typedef typename itk::Image< TPixelType, 3 >  FixedImageType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImageType;
+    typedef typename itk::Image<TPixelType, 3> FixedImageType;
+    typedef typename itk::Image<TPixelType, 3> MovingImageType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImageType::Pointer fixedImage = itkImage1;
@@ -62,16 +63,18 @@ itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform2(itk::Image
     movingImageToItk->Update();
     typename MovingImageType::Pointer movingImage = movingImageToItk->GetOutput();
 
-    typename itk::QuaternionRigidTransform< double >::Pointer transformPointer = itk::QuaternionRigidTransform< double >::New();
+    typename itk::QuaternionRigidTransform<double>::Pointer transformPointer =
+      itk::QuaternionRigidTransform<double>::New();
     transformPointer->SetIdentity();
-    typedef typename itk::QuaternionRigidTransform< double >    QuaternionRigidTransformType;
+    typedef typename itk::QuaternionRigidTransform<double> QuaternionRigidTransformType;
     if (m_Controls.m_CenterForInitializerQuaternionRigid->isChecked())
     {
-      typedef typename itk::CenteredTransformInitializer<QuaternionRigidTransformType, FixedImageType, MovingImageType> TransformInitializerType;
+      typedef typename itk::CenteredTransformInitializer<QuaternionRigidTransformType, FixedImageType, MovingImageType>
+        TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage );
-      transformInitializer->SetMovingImage( movingImage );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage);
+      transformInitializer->SetMovingImage(movingImage);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsQuaternionRigid->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -129,10 +132,10 @@ QString QmitkQuaternionRigidTransformView::GetName()
   return "QuaternionRigid";
 }
 
-void QmitkQuaternionRigidTransformView::SetupUI(QWidget* parent)
+void QmitkQuaternionRigidTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesQuaternionRigidTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesQuaternionRigidTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesQuaternionRigidTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -160,7 +163,9 @@ itk::Array<double> QmitkQuaternionRigidTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkQuaternionRigidTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkQuaternionRigidTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                           vtkTransform *vtktransform,
+                                                           itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

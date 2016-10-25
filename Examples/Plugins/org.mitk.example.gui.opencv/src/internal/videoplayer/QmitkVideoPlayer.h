@@ -28,27 +28,25 @@ class QmitkOpenCVVideoControls;
 /**
  * \brief Allows to play videos with OpenCV
  */
-class QmitkVideoPlayer: public QmitkAbstractView, public mitk::IRenderWindowPartListener
+class QmitkVideoPlayer : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
-
   QmitkVideoPlayer();
   virtual ~QmitkVideoPlayer();
 
 private:
-
-  void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
 
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   mitk::OpenCVVideoSource::Pointer m_VideoSource;
-  QmitkVideoBackground* m_VideoBackground;
-  QmitkOpenCVVideoControls* m_OpenCVVideoControls;
+  QmitkVideoBackground *m_VideoBackground;
+  QmitkOpenCVVideoControls *m_OpenCVVideoControls;
 };
 
 #endif // QmitkVideoPlayer_h

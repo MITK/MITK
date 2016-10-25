@@ -16,43 +16,41 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkCrossWidget.h"
 
-#include <QMouseEvent>
 #include <QCursor>
+#include <QMouseEvent>
 
-QmitkCrossWidget::QmitkCrossWidget(QWidget * parent, Qt::WindowFlags f) :
-  QLabel(parent, f)
+QmitkCrossWidget::QmitkCrossWidget(QWidget *parent, Qt::WindowFlags f) : QLabel(parent, f)
 {
   setEnabled(true);
   setVisible(true);
   setFocusPolicy(Qt::ClickFocus);
 }
 
-void QmitkCrossWidget::mousePressEvent(QMouseEvent * )
+void QmitkCrossWidget::mousePressEvent(QMouseEvent *)
 {
   QPoint p = QCursor::pos();
 
   lastX = p.x();
   lastY = p.y();
 
-  emit SignalDeltaMove( 0 , 0 );
+  emit SignalDeltaMove(0, 0);
 }
 
-void QmitkCrossWidget::mouseMoveEvent(QMouseEvent * )
+void QmitkCrossWidget::mouseMoveEvent(QMouseEvent *)
 {
   QPoint p = QCursor::pos();
 
   int newX = p.x();
   int newY = p.y();
 
-  int deltaX = newX-lastX;
-  int deltaY = newY-lastY;
+  int deltaX = newX - lastX;
+  int deltaY = newY - lastY;
 
-  this->ResetMousePosition( lastX,lastY);
+  this->ResetMousePosition(lastX, lastY);
 
-  emit SignalDeltaMove( deltaX , deltaY );
+  emit SignalDeltaMove(deltaX, deltaY);
 }
 
-void QmitkCrossWidget::mouseReleaseEvent(QMouseEvent*)
+void QmitkCrossWidget::mouseReleaseEvent(QMouseEvent *)
 {
 }
-

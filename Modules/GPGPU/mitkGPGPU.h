@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKGPGPU_H
 #define MITKGPGPU_H
 
@@ -31,19 +30,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <GL/gl.h>
 
-
 #include "mitkCommon.h"
 
-
-namespace mitk {
-
-//##Documentation
-//## @brief GPGPU
-
-class MITKGPGPU_EXPORT GPGPU
+namespace mitk
 {
-  public:
+  //##Documentation
+  //## @brief GPGPU
 
+  class MITKGPGPU_EXPORT GPGPU
+  {
+  public:
     enum TextureFormat
     {
       FLOAT32_LUMINANCE,
@@ -52,57 +48,51 @@ class MITKGPGPU_EXPORT GPGPU
       UINT8_RGBA,
     };
 
-    class MITKGPGPU_EXPORT Texture {
+    class MITKGPGPU_EXPORT Texture
+    {
+    public:
+      Texture(mitk::GPGPU::TextureFormat format, int width, int height, int depth = 0);
+      ~Texture();
 
-      public:
+      void ActivateAsSource(int unit);
+      void ActivateAsDestination();
+      void Upload(mitk::GPGPU::TextureFormat inputformat, const void *src);
+      void Download(mitk::GPGPU::TextureFormat inputformat, void *dst);
+      int GetWidth();
+      int GetHeigth();
+      int GetDepth();
 
-        Texture(mitk::GPGPU::TextureFormat format,int width,int height,int depth=0);
-        ~Texture();
+    private:
+      mitk::GPGPU::TextureFormat myFormat;
+      int myWidth, myHeight, myDepth;
 
-        void ActivateAsSource(int unit);
-        void ActivateAsDestination();
-        void Upload(mitk::GPGPU::TextureFormat inputformat,const void *src);
-        void Download(mitk::GPGPU::TextureFormat inputformat,void *dst);
-    int GetWidth();
-    int GetHeigth();
-    int GetDepth();
-
-      private:
-
-        mitk::GPGPU::TextureFormat myFormat;
-        int myWidth,myHeight,myDepth;
-
-        int glTarget;
-        int glTextureHandle;
-        int glFBOHandle;
+      int glTarget;
+      int glTextureHandle;
+      int glFBOHandle;
     };
 
-    class MITKGPGPU_EXPORT Shader {
+    class MITKGPGPU_EXPORT Shader
+    {
+    public:
+      Shader(char *source);
+      ~Shader();
 
-      public:
+      void Activate();
+      void SetUniform(char *name, int i0);
+      void SetUniform(char *name, int i0, int i1);
+      void SetUniform(char *name, int i0, int i1, int i2);
+      void SetUniform(char *name, int i0, int i1, int i2, int i3);
+      void SetUniform(char *name, float i0);
+      void SetUniform(char *name, float i0, float i1);
+      void SetUniform(char *name, float i0, float i1, float i2);
+      void SetUniform(char *name, float i0, float i1, float i2, float i3);
 
-        Shader(char *source);
-        ~Shader();
+    private:
+      int GetUniformLocation(char *name);
 
-        void Activate();
-        void SetUniform(char *name,int i0);
-        void SetUniform(char *name,int i0,int i1);
-        void SetUniform(char *name,int i0,int i1,int i2);
-        void SetUniform(char *name,int i0,int i1,int i2,int i3);
-        void SetUniform(char *name,float i0);
-        void SetUniform(char *name,float i0,float i1);
-        void SetUniform(char *name,float i0,float i1,float i2);
-        void SetUniform(char *name,float i0,float i1,float i2,float i3);
-
-      private:
-
-        int GetUniformLocation(char *name);
-
-        int glHandleVertex;
-        int glHandleFragment;
-        int glHandleProgram;
-
-
+      int glHandleVertex;
+      int glHandleFragment;
+      int glHandleProgram;
     };
 
     GPGPU();
@@ -111,7 +101,7 @@ class MITKGPGPU_EXPORT GPGPU
     void Activate();
     void Deactivate();
     void Run();
-    void Run(float start,float end);
+    void Run(float start, float end);
 
   private:
 #ifdef _WIN32
@@ -123,13 +113,9 @@ class MITKGPGPU_EXPORT GPGPU
     GLXDrawable GLX_drawable;
     Display *X_display;
 #endif
-
-
-};
+  };
 
 } // namespace mitk
-
-
 
 /*{
   mitk::GPGPU *gpu=new mitk::GPGPU();
@@ -186,6 +172,5 @@ class MITKGPGPU_EXPORT GPGPU
 
   delete gpu;
 }*/
-
 
 #endif

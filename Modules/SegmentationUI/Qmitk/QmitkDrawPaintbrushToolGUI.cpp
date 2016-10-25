@@ -25,4 +25,3 @@ QmitkDrawPaintbrushToolGUI::QmitkDrawPaintbrushToolGUI()
 QmitkDrawPaintbrushToolGUI::~QmitkDrawPaintbrushToolGUI()
 {
 }
-

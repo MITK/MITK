@@ -14,11 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "QmitkStepperAdapter.h"
 
-QmitkStepperAdapter::QmitkStepperAdapter( QObject * navigator, mitk::Stepper * stepper, const char *)
-  : QObject( navigator ), m_Stepper(stepper)
+QmitkStepperAdapter::QmitkStepperAdapter(QObject *navigator, mitk::Stepper *stepper, const char *)
+  : QObject(navigator), m_Stepper(stepper)
 {
   connect(this, SIGNAL(SendStepper(mitk::Stepper *)), navigator, SLOT(SetStepper(mitk::Stepper *)));
   connect(this, SIGNAL(Refetch()), navigator, SLOT(Refetch()));
@@ -35,4 +34,3 @@ QmitkStepperAdapter::~QmitkStepperAdapter()
   m_ItkEventListener->Delete();
   m_Stepper->RemoveObserver(m_ObserverTag);
 }
-

@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkVersorTransformOptimizer.h>
 
-QmitkVersorTransformOptimizerView::QmitkVersorTransformOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkVersorTransformOptimizerView::QmitkVersorTransformOptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkVersorTransformOptimizerView::~QmitkVersorTransformOptimizerView()
@@ -36,11 +35,12 @@ mitk::OptimizerParameters::OptimizerType QmitkVersorTransformOptimizerView::GetO
 itk::Object::Pointer QmitkVersorTransformOptimizerView::GetOptimizer()
 {
   itk::VersorTransformOptimizer::Pointer OptimizerPointer = itk::VersorTransformOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
-  OptimizerPointer->SetGradientMagnitudeTolerance( m_Controls.m_GradientMagnitudeToleranceVersorTransform->text().toFloat() );
-  OptimizerPointer->SetMinimumStepLength( m_Controls.m_MinimumStepLengthVersorTransform->text().toFloat() );
-  OptimizerPointer->SetMaximumStepLength( m_Controls.m_MaximumStepLengthVersorTransform->text().toFloat() );
-  OptimizerPointer->SetNumberOfIterations( m_Controls.m_IterationsVersorTransform->text().toInt() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
+  OptimizerPointer->SetGradientMagnitudeTolerance(
+    m_Controls.m_GradientMagnitudeToleranceVersorTransform->text().toFloat());
+  OptimizerPointer->SetMinimumStepLength(m_Controls.m_MinimumStepLengthVersorTransform->text().toFloat());
+  OptimizerPointer->SetMaximumStepLength(m_Controls.m_MaximumStepLengthVersorTransform->text().toFloat());
+  OptimizerPointer->SetNumberOfIterations(m_Controls.m_IterationsVersorTransform->text().toInt());
   return OptimizerPointer.GetPointer();
 }
 
@@ -76,12 +76,12 @@ QString QmitkVersorTransformOptimizerView::GetName()
   return "VersorTransform";
 }
 
-void QmitkVersorTransformOptimizerView::SetupUI(QWidget* parent)
+void QmitkVersorTransformOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_IterationsVersorTransform->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_GradientMagnitudeToleranceVersorTransform->setValidator(validatorLineEditInputFloat);
   m_Controls.m_MinimumStepLengthVersorTransform->setValidator(validatorLineEditInputFloat);
   m_Controls.m_MaximumStepLengthVersorTransform->setValidator(validatorLineEditInputFloat);

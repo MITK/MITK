@@ -17,38 +17,35 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkCollectionGrayDilation_H
 #define mitkCollectionGrayDilation_H
 
-//MITK
+// MITK
 #include "mitkCommon.h"
-#include <mitkDataCollection.h>
 #include <MitkTumorInvasionAnalysisExports.h>
-
+#include <mitkDataCollection.h>
 
 namespace mitk
 {
-class MITKTUMORINVASIONANALYSIS_EXPORT CollectionGrayOpening
-{
-public:
+  class MITKTUMORINVASIONANALYSIS_EXPORT CollectionGrayOpening
+  {
+  public:
+    // typedef unsigned char BinaryType;
+    typedef itk::Image<mitk::ScalarType, 3> ImageType;
 
-  //typedef unsigned char BinaryType;
-  typedef itk::Image<mitk::ScalarType, 3> ImageType;
+    CollectionGrayOpening() {}
+    ~CollectionGrayOpening() {}
+    /**
+     * @brief PerformGrayOpening - Opening operation on a specific modality type wihtin the DataCollection. Creates a
+     * new item.
+     * @param dataCollection
+     * @param name
+     * @param suffix
+     */
+    static void PerformGrayOpening(mitk::DataCollection *dataCollection, std::string name, std::string suffix);
 
-  CollectionGrayOpening(){}
-  ~CollectionGrayOpening(){}
+  protected:
+  private:
+    // DATA
 
-  /**
-   * @brief PerformGrayOpening - Opening operation on a specific modality type wihtin the DataCollection. Creates a new item.
-   * @param dataCollection
-   * @param name
-   * @param suffix
-   */
-  static void PerformGrayOpening(mitk::DataCollection *dataCollection, std::string name, std::string suffix);
-
-protected:
-
-private:
-  // DATA
-
-  // FUNCTIONS
-};
+    // FUNCTIONS
+  };
 } // end namespace
 #endif

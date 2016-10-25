@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "MitkMultilabelExports.h"
 
-//MITK
-#include <mitkImage.h>
+// MITK
 #include "mitkImageToImageFilter.h"
 #include <itkImage.h>
+#include <mitkImage.h>
 #include <mitkSurface.h>
 
 namespace mitk
@@ -29,15 +29,15 @@ namespace mitk
   class MITKMULTILABEL_EXPORT LabelSetImageSurfaceStampFilter : public ImageToImageFilter
   {
   public:
-
-    mitkClassMacro( LabelSetImageSurfaceStampFilter , ImageToImageFilter );
+    mitkClassMacro(LabelSetImageSurfaceStampFilter, ImageToImageFilter);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    itkGetConstMacro(Surface,Surface::Pointer);
-    itkSetMacro(Surface,Surface::Pointer);
-    itkGetConstMacro(ForceOverwrite,bool);
-    itkSetMacro(ForceOverwrite,bool);
+    itkGetConstMacro(Surface, Surface::Pointer);
+    itkSetMacro(Surface, Surface::Pointer);
+    itkGetConstMacro(ForceOverwrite, bool);
+    itkSetMacro(ForceOverwrite, bool);
+
   private:
     /*!
     \brief standard constructor
@@ -61,11 +61,11 @@ namespace mitk
     /*!
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.
     */
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkImageProcessing( itk::Image<TPixel,VImageDimension>* itkImage, mitk::Image::Pointer resultImage );
+    template <typename TPixel, unsigned int VImageDimension>
+    void ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage, mitk::Image::Pointer resultImage);
 
     Surface::Pointer m_Surface;
     bool m_ForceOverwrite;
   };
-} //END mitk namespace
+} // END mitk namespace
 #endif

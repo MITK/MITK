@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MINIMALPERSPECTIVE_H_
 #define MINIMALPERSPECTIVE_H_
 
@@ -30,11 +29,9 @@ class MinimalPerspective : public QObject, public berry::IPerspectiveFactory
   Q_INTERFACES(berry::IPerspectiveFactory)
 
 public:
-
   MinimalPerspective();
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
-
 };
 
 #endif /* MINIMALPERSPECTIVE_H_ */

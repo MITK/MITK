@@ -16,17 +16,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNodeDescriptorManager.h"
 #include <memory>
-#include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 
 #include <QList>
 #include <QSet>
 
-
-QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()
+QmitkNodeDescriptorManager *QmitkNodeDescriptorManager::GetInstance()
 {
   static QmitkNodeDescriptorManager _Instance;
   return &_Instance;
@@ -37,15 +36,19 @@ void QmitkNodeDescriptorManager::Initialize()
   auto isImage = mitk::NodePredicateDataType::New("Image");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("Image"), QString(":/Qmitk/Images_48.png"), isImage, this));
 
-  auto isMultiComponentImage = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateProperty::New("Image.Displayed Component"));
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("MultiComponentImage"), QString(": / Qmitk / Images_48.png"), isMultiComponentImage, this));
+  auto isMultiComponentImage =
+    mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateProperty::New("Image.Displayed Component"));
+  this->AddDescriptor(new QmitkNodeDescriptor(
+    tr("MultiComponentImage"), QString(": / Qmitk / Images_48.png"), isMultiComponentImage, this));
 
   auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   auto isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("ImageMask"), QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
+  this->AddDescriptor(
+    new QmitkNodeDescriptor(tr("ImageMask"), QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
 
   auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("LabelSetImage"), QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this));
+  this->AddDescriptor(
+    new QmitkNodeDescriptor(tr("LabelSetImage"), QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this));
 
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
@@ -55,70 +58,70 @@ void QmitkNodeDescriptorManager::Initialize()
 
   auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
   auto isNoneBinaryImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
-
+  this->AddDescriptor(
+    new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
 }
 
-void QmitkNodeDescriptorManager::AddDescriptor( QmitkNodeDescriptor* _Descriptor )
+void QmitkNodeDescriptorManager::AddDescriptor(QmitkNodeDescriptor *_Descriptor)
 {
   _Descriptor->setParent(this);
   m_NodeDescriptors.push_back(_Descriptor);
 }
 
-void QmitkNodeDescriptorManager::RemoveDescriptor( QmitkNodeDescriptor* _Descriptor )
+void QmitkNodeDescriptorManager::RemoveDescriptor(QmitkNodeDescriptor *_Descriptor)
 {
   int index = m_NodeDescriptors.indexOf(_Descriptor);
 
-  if(index != -1)
+  if (index != -1)
   {
     m_NodeDescriptors.removeAt(index);
     _Descriptor->setParent(0);
     delete _Descriptor;
   }
-
 }
 
-QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const mitk::DataNode* _Node ) const
+QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetDescriptor(const mitk::DataNode *_Node) const
 {
-  QmitkNodeDescriptor* _Descriptor = m_UnknownDataNodeDescriptor;
+  QmitkNodeDescriptor *_Descriptor = m_UnknownDataNodeDescriptor;
 
-  for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+  for (QList<QmitkNodeDescriptor *>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
   {
-    if((*it)->CheckNode(_Node))
+    if ((*it)->CheckNode(_Node))
       _Descriptor = *it;
   }
 
   return _Descriptor;
 }
 
-QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const QString& _ClassName ) const
+QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetDescriptor(const QString &_ClassName) const
 {
-  QmitkNodeDescriptor* _Descriptor = 0;
+  QmitkNodeDescriptor *_Descriptor = 0;
 
-  if( _ClassName == "Unknown" )
+  if (_ClassName == "Unknown")
   {
-      return m_UnknownDataNodeDescriptor;
+    return m_UnknownDataNodeDescriptor;
   }
   else
   {
-      for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
-      {
-        if ((*it)->GetNameOfClass() == _ClassName)
-          _Descriptor = *it;
-      }
+    for (QList<QmitkNodeDescriptor *>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end();
+         ++it)
+    {
+      if ((*it)->GetNameOfClass() == _ClassName)
+        _Descriptor = *it;
+    }
   }
 
   return _Descriptor;
 }
-QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataNode* _Node ) const
+QList<QAction *> QmitkNodeDescriptorManager::GetActions(const mitk::DataNode *_Node) const
 {
-  QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
+  QList<QAction *> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
   actions.append(m_UnknownDataNodeDescriptor->GetActions());
-  QmitkNodeDescriptor* lastDescriptor = m_UnknownDataNodeDescriptor;
+  QmitkNodeDescriptor *lastDescriptor = m_UnknownDataNodeDescriptor;
 
-  for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
+  for (QList<QmitkNodeDescriptor *>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
   {
-    if((*it)->CheckNode(_Node))
+    if ((*it)->CheckNode(_Node))
     {
       actions.append(lastDescriptor->GetSeparator());
       lastDescriptor = *it;
@@ -130,11 +133,11 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataNode* _N
   return actions;
 }
 
-QList<QAction*> QmitkNodeDescriptorManager::GetActions( const QList<mitk::DataNode::Pointer> &_Nodes ) const
+QList<QAction *> QmitkNodeDescriptorManager::GetActions(const QList<mitk::DataNode::Pointer> &_Nodes) const
 {
-  QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
-  QSet<QmitkNodeDescriptor*> nodeDescriptors;
-  QmitkNodeDescriptor* lastDescriptor;
+  QList<QAction *> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
+  QSet<QmitkNodeDescriptor *> nodeDescriptors;
+  QmitkNodeDescriptor *lastDescriptor;
 
   // find all descriptors for the nodes (unique)
   foreach (mitk::DataNode::Pointer node, _Nodes)
@@ -144,7 +147,7 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const QList<mitk::DataNo
   }
   // add all actions for the found descriptors
   lastDescriptor = m_UnknownDataNodeDescriptor;
-  foreach (QmitkNodeDescriptor* descr, nodeDescriptors)
+  foreach (QmitkNodeDescriptor *descr, nodeDescriptors)
   {
     actions.append(lastDescriptor->GetSeparator());
     lastDescriptor = descr;
@@ -155,18 +158,18 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const QList<mitk::DataNo
 }
 
 QmitkNodeDescriptorManager::QmitkNodeDescriptorManager()
-: m_UnknownDataNodeDescriptor(new QmitkNodeDescriptor("Unknown", QString(":/Qmitk/DataTypeUnknown_48.png"), 0, this))
+  : m_UnknownDataNodeDescriptor(new QmitkNodeDescriptor("Unknown", QString(":/Qmitk/DataTypeUnknown_48.png"), 0, this))
 {
   this->Initialize();
 }
 
 QmitkNodeDescriptorManager::~QmitkNodeDescriptorManager()
 {
-  //delete m_UnknownDataNodeDescriptor;
-  //qDeleteAll(m_NodeDescriptors);
+  // delete m_UnknownDataNodeDescriptor;
+  // qDeleteAll(m_NodeDescriptors);
 }
 
-QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor() const
+QmitkNodeDescriptor *QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor() const
 {
   return m_UnknownDataNodeDescriptor;
 }

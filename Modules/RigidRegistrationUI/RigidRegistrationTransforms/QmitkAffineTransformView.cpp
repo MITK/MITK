@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAffineTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
+#include <QValidator>
 #include <itkAffineTransform.h>
 #include <itkCenteredTransformInitializer.h>
-#include <QValidator>
+#include <mitkImageCast.h>
 
-QmitkAffineTransformView::QmitkAffineTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkAffineTransformView::QmitkAffineTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,31 +45,34 @@ itk::Object::Pointer QmitkAffineTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, class MovingPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1, itk::Image<MovingPixelType, VImageDimension>* itkImage2)
+template <class TPixelType, class MovingPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1,
+                                                             itk::Image<MovingPixelType, VImageDimension> *itkImage2)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< MovingPixelType, VImageDimension >  MovingImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<MovingPixelType, VImageDimension> MovingImageType;
 
   // the fixedImage is the input parameter (fix for Bug #14626)
   typename FixedImageType::Pointer fixedImage = itkImage1;
 
-//  // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
-//  typename mitk::ImageToItk<MovingImageType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImageType>::New();
-//  movingImageToItk->SetInput(m_MovingImage);
-//  movingImageToItk->Update();
+  //  // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
+  //  typename mitk::ImageToItk<MovingImageType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImageType>::New();
+  //  movingImageToItk->SetInput(m_MovingImage);
+  //  movingImageToItk->Update();
   typename MovingImageType::Pointer movingImage = itkImage2;
 
-  typename itk::AffineTransform< double, VImageDimension>::Pointer transformPointer = itk::AffineTransform< double, VImageDimension>::New();
+  typename itk::AffineTransform<double, VImageDimension>::Pointer transformPointer =
+    itk::AffineTransform<double, VImageDimension>::New();
   transformPointer->SetIdentity();
   if (m_Controls.m_CenterForInitializerAffine->isChecked())
   {
-    typedef typename itk::AffineTransform< double, VImageDimension >    AffineTransformType;
-    typedef typename itk::CenteredTransformInitializer<AffineTransformType, FixedImageType, MovingImageType> TransformInitializerType;
+    typedef typename itk::AffineTransform<double, VImageDimension> AffineTransformType;
+    typedef typename itk::CenteredTransformInitializer<AffineTransformType, FixedImageType, MovingImageType>
+      TransformInitializerType;
     typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-    transformInitializer->SetFixedImage( fixedImage );
-    transformInitializer->SetMovingImage( movingImage );
-    transformInitializer->SetTransform( transformPointer );
+    transformInitializer->SetFixedImage(fixedImage);
+    transformInitializer->SetMovingImage(movingImage);
+    transformInitializer->SetTransform(transformPointer);
     if (m_Controls.m_MomentsAffine->isChecked())
     {
       transformInitializer->MomentsOn();
@@ -135,10 +138,10 @@ QString QmitkAffineTransformView::GetName()
   return "Affine";
 }
 
-void QmitkAffineTransformView::SetupUI(QWidget* parent)
+void QmitkAffineTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesAffineTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesAffineTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesAffineTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -173,7 +176,9 @@ itk::Array<double> QmitkAffineTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkAffineTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkAffineTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                  vtkTransform *vtktransform,
+                                                  itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {
@@ -196,7 +201,7 @@ vtkTransform* QmitkAffineTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTr
     center[1] = m_CenterY;
     center[2] = m_CenterZ;
     center[3] = 1;
-    std::cout<< "rotation center: " << center[0] << " " << center[1] << " " << center [2] << std::endl;
+    std::cout << "rotation center: " << center[0] << " " << center[1] << " " << center[2] << std::endl;
 
     float translation[4];
     vtkmatrix->MultiplyPoint(center, translation);

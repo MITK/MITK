@@ -25,41 +25,40 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /**
+   * @brief BaseDataIO creates instances of BaseData objects using an object factory.
+   *
+   * @ingroup MitkLegacyIOModule
+   * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+   */
+  class DEPRECATED() MITKLEGACYIO_EXPORT BaseDataIO : public itk::Object
+  {
+  public:
+    /** Standard class typedefs. */
+    typedef BaseDataIO Self;
+    typedef itk::Object Superclass;
+    typedef itk::SmartPointer<Self> Pointer;
+    typedef itk::SmartPointer<const Self> ConstPointer;
 
-/**
- * @brief BaseDataIO creates instances of BaseData objects using an object factory.
- *
- * @ingroup MitkLegacyIOModule
- * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
- */
-class DEPRECATED() MITKLEGACYIO_EXPORT BaseDataIO : public itk::Object
-{
-public:
+    /** Class Methods used to interface with the registered factories */
 
-  /** Standard class typedefs. */
-  typedef BaseDataIO   Self;
-  typedef itk::Object  Superclass;
-  typedef itk::SmartPointer<Self>  Pointer;
-  typedef itk::SmartPointer<const Self>  ConstPointer;
+    /** Run-time type information (and related methods). */
+    itkTypeMacro(BaseDataIO, Object);
 
-  /** Class Methods used to interface with the registered factories */
+    /** Create the appropriate BaseData depending on the particulars of the file. */
+    static std::vector<mitk::BaseData::Pointer> LoadBaseDataFromFile(const std::string path,
+                                                                     const std::string filePrefix,
+                                                                     const std::string filePattern,
+                                                                     bool series);
 
-  /** Run-time type information (and related methods). */
-  itkTypeMacro(BaseDataIO, Object);
+  protected:
+    BaseDataIO();
+    ~BaseDataIO();
 
-  /** Create the appropriate BaseData depending on the particulars of the file. */
-  static std::vector<mitk::BaseData::Pointer> LoadBaseDataFromFile(const std::string path, const std::string filePrefix, const std::string filePattern, bool series);
-
-protected:
-  BaseDataIO();
-  ~BaseDataIO();
-
-private:
-  BaseDataIO(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-
-};
-
+  private:
+    BaseDataIO(const Self &);     // purposely not implemented
+    void operator=(const Self &); // purposely not implemented
+  };
 
 } // end namespace mitk
 

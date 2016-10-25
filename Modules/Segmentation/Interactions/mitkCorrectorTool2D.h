@@ -18,56 +18,54 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkCorrectorTool2D_h_Included
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkFeedbackContourTool.h"
+#include <MitkSegmentationExports.h>
 
-namespace us {
-class ModuleResource;
+namespace us
+{
+  class ModuleResource;
 }
 
 namespace mitk
 {
+  class Image;
+  class StateMachineAction;
+  class InteractionEvent;
 
-class Image;
-class StateMachineAction;
-class InteractionEvent;
+  /**
+    \brief Corrector tool for 2D binary segmentations
 
-/**
-  \brief Corrector tool for 2D binary segmentations
+    \sa FeedbackContourTool
+    \sa ExtractImageFilter
+    \sa OverwriteSliceImageFilter
 
-  \sa FeedbackContourTool
-  \sa ExtractImageFilter
-  \sa OverwriteSliceImageFilter
+    \ingroup Interaction
+    \ingroup ToolManagerEtAl
 
-  \ingroup Interaction
-  \ingroup ToolManagerEtAl
+    Lets the user draw a (multi-point) line and intelligently decides what to do. The underlying algorithm
+    tests if the line begins and ends inside or outside a segmentation and either adds or subtracts a piece of
+    segmentation.
 
-  Lets the user draw a (multi-point) line and intelligently decides what to do. The underlying algorithm
-  tests if the line begins and ends inside or outside a segmentation and either adds or subtracts a piece of
-  segmentation.
+    Algorithm is implemented in CorrectorAlgorithm (so that it could be reimplemented in a more modern fashion some
+    time).
 
-  Algorithm is implemented in CorrectorAlgorithm (so that it could be reimplemented in a more modern fashion some time).
+    \warning Only to be instantiated by mitk::ToolManager.
 
-  \warning Only to be instantiated by mitk::ToolManager.
-
-  $Author$
-*/
-class MITKSEGMENTATION_EXPORT CorrectorTool2D : public FeedbackContourTool
-{
+    $Author$
+  */
+  class MITKSEGMENTATION_EXPORT CorrectorTool2D : public FeedbackContourTool
+  {
   public:
-
     mitkClassMacro(CorrectorTool2D, FeedbackContourTool);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual const char** GetXPM() const override;
+      virtual const char **GetXPM() const override;
     virtual us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
-    virtual const char* GetName() const override;
+    virtual const char *GetName() const override;
 
   protected:
-
     CorrectorTool2D(int paintingPixelValue = 1); // purposely hidden
     virtual ~CorrectorTool2D();
 
@@ -76,16 +74,14 @@ class MITKSEGMENTATION_EXPORT CorrectorTool2D : public FeedbackContourTool
     virtual void Activated() override;
     virtual void Deactivated() override;
 
-    virtual void OnMousePressed ( StateMachineAction*, InteractionEvent* );
-    virtual void OnMouseMoved   ( StateMachineAction*, InteractionEvent* );
-    virtual void OnMouseReleased( StateMachineAction*, InteractionEvent* );
+    virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
+    virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *);
+    virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);
     int m_PaintingPixelValue;
 
     Image::Pointer m_WorkingSlice;
-};
+  };
 
 } // namespace
 
 #endif
-
-

@@ -14,7 +14,6 @@
 
   ===================================================================*/
 
-
 #ifndef __mitkVtkLogoRepresentation_h
 #define __mitkVtkLogoRepresentation_h
 
@@ -23,22 +22,20 @@
 class mitkVtkLogoRepresentation : public vtkLogoRepresentation
 {
 public:
-
   // Description:
   // Instantiate this class.
   static mitkVtkLogoRepresentation *New();
 
   // Description:
   // Standard VTK class methods.
-  vtkTypeMacro(mitkVtkLogoRepresentation,vtkLogoRepresentation);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(mitkVtkLogoRepresentation, vtkLogoRepresentation);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   // Description:
   // Satisfy the superclasses' API.
   virtual void BuildRepresentation() override;
 
-  void SetCornerPosition(int corner){cornerPosition = corner;}
-
+  void SetCornerPosition(int corner) { cornerPosition = corner; }
 protected:
   mitkVtkLogoRepresentation();
   ~mitkVtkLogoRepresentation();
@@ -49,8 +46,8 @@ protected:
   int cornerPosition;
 
 private:
-  mitkVtkLogoRepresentation(const mitkVtkLogoRepresentation&);  //Not implemented
-  void operator=(const mitkVtkLogoRepresentation&);  //Not implemented
+  mitkVtkLogoRepresentation(const mitkVtkLogoRepresentation &); // Not implemented
+  void operator=(const mitkVtkLogoRepresentation &);            // Not implemented
 };
 
 #endif

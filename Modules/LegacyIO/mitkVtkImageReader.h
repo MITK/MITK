@@ -14,58 +14,56 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef VtkImageReader_H_HEADER_INCLUDED
 #define VtkImageReader_H_HEADER_INCLUDED
 
-#include <MitkLegacyIOExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
+#include <MitkLegacyIOExports.h>
 
-namespace mitk {
-//##Documentation
-//## @brief Reader to read image files in vtk file format
-//## @ingroup MitkLegacyIOModule
-//## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MITKLEGACYIO_EXPORT VtkImageReader : public ImageSource, public FileReader
+namespace mitk
 {
-public:
-  mitkClassMacro(VtkImageReader, FileReader);
+  //##Documentation
+  //## @brief Reader to read image files in vtk file format
+  //## @ingroup MitkLegacyIOModule
+  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  class DEPRECATED() MITKLEGACYIO_EXPORT VtkImageReader : public ImageSource, public FileReader
+  {
+  public:
+    mitkClassMacro(VtkImageReader, FileReader);
 
-  /** Method for creation through the object factory. */
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+    /** Method for creation through the object factory. */
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  itkSetStringMacro(FileName);
-  itkGetStringMacro(FileName);
+      itkSetStringMacro(FileName);
+    itkGetStringMacro(FileName);
 
-  itkSetStringMacro(FilePrefix);
-  itkGetStringMacro(FilePrefix);
+    itkSetStringMacro(FilePrefix);
+    itkGetStringMacro(FilePrefix);
 
-  itkSetStringMacro(FilePattern);
-  itkGetStringMacro(FilePattern);
+    itkSetStringMacro(FilePattern);
+    itkGetStringMacro(FilePattern);
 
-  static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
+    static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
-protected:
+  protected:
+    VtkImageReader();
 
-   VtkImageReader();
+    ~VtkImageReader();
 
-  ~VtkImageReader();
+    virtual void GenerateData() override;
 
-  virtual void GenerateData() override;
+    //##Description
+    //## @brief Time when Header was last read
+    // itk::TimeStamp m_ReadHeaderTime;
 
-  //##Description
-  //## @brief Time when Header was last read
-  //itk::TimeStamp m_ReadHeaderTime;
+  protected:
+    std::string m_FileName;
 
-protected:
-  std::string m_FileName;
+    std::string m_FilePrefix;
 
-  std::string m_FilePrefix;
-
-  std::string m_FilePattern;
-};
+    std::string m_FilePattern;
+  };
 
 } // namespace mitk
 

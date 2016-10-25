@@ -14,10 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include "mitkSerializerMacros.h"
 #include "mitkPropertyListDeserializerV1.h"
 #include "mitkBasePropertySerializer.h"
+#include "mitkSerializerMacros.h"
 #include <tinyxml.h>
 
 MITK_REGISTER_SERIALIZER(PropertyListDeserializerV1)
@@ -36,26 +35,29 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
 
   m_PropertyList = PropertyList::New();
 
-  TiXmlDocument document( m_Filename );
+  TiXmlDocument document(m_Filename);
   if (!document.LoadFile())
   {
-    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc()
+               << std::endl;
     return false;
   }
 
-  for( TiXmlElement* propertyElement = document.FirstChildElement("property"); propertyElement != nullptr; propertyElement = propertyElement->NextSiblingElement("property") )
+  for (TiXmlElement *propertyElement = document.FirstChildElement("property"); propertyElement != nullptr;
+       propertyElement = propertyElement->NextSiblingElement("property"))
   {
-    const char* keya = propertyElement->Attribute("key");
-    std::string key( keya ? keya : "");
+    const char *keya = propertyElement->Attribute("key");
+    std::string key(keya ? keya : "");
 
-    const char* typea = propertyElement->Attribute("type");
-    std::string type( typea ? typea : "");
+    const char *typea = propertyElement->Attribute("type");
+    std::string type(typea ? typea : "");
 
     // hand propertyElement to specific reader
     std::stringstream propertyDeserializerClassName;
     propertyDeserializerClassName << type << "Serializer";
 
-    std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
+    std::list<itk::LightObject::Pointer> readers =
+      itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
     if (readers.size() < 1)
     {
       MITK_ERROR << "No property reader found for " << type;
@@ -66,20 +68,19 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
       MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
     }
 
-    for ( auto iter = readers.begin();
-          iter != readers.end();
-          ++iter )
+    for (auto iter = readers.begin(); iter != readers.end(); ++iter)
     {
-      if (BasePropertySerializer* reader = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
+      if (BasePropertySerializer *reader = dynamic_cast<BasePropertySerializer *>(iter->GetPointer()))
       {
-        BaseProperty::Pointer property = reader->Deserialize( propertyElement->FirstChildElement() );
+        BaseProperty::Pointer property = reader->Deserialize(propertyElement->FirstChildElement());
         if (property.IsNotNull())
         {
           m_PropertyList->ReplaceProperty(key, property);
         }
         else
         {
-          MITK_ERROR << "There were errors while loading property '" << key << "' of type " << type << ". Your data may be corrupted";
+          MITK_ERROR << "There were errors while loading property '" << key << "' of type " << type
+                     << ". Your data may be corrupted";
           error = true;
         }
         break;

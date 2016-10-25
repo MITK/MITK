@@ -21,19 +21,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-/**
-  \brief Deserializes a mitk::PropertyList
-*/
-class PropertyListDeserializer : public itk::Object
-{
+  /**
+    \brief Deserializes a mitk::PropertyList
+  */
+  class PropertyListDeserializer : public itk::Object
+  {
   public:
-
-    mitkClassMacroItkParent( PropertyListDeserializer, itk::Object );
+    mitkClassMacroItkParent(PropertyListDeserializer, itk::Object);
     itkFactorylessNewMacro(Self) // is this needed? should never be instantiated, only subclasses should
-    itkCloneMacro(Self)
+      itkCloneMacro(Self)
 
-    itkSetStringMacro(Filename);
+        itkSetStringMacro(Filename);
     itkGetStringMacro(Filename);
 
     /**
@@ -45,15 +43,13 @@ class PropertyListDeserializer : public itk::Object
     virtual PropertyList::Pointer GetOutput();
 
   protected:
-
     PropertyListDeserializer();
     virtual ~PropertyListDeserializer();
 
     std::string m_Filename;
     PropertyList::Pointer m_PropertyList;
-};
+  };
 
 } // namespace
 
 #endif
-

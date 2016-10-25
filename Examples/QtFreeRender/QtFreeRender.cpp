@@ -16,31 +16,31 @@
 
 #include "mitkRenderWindow.h"
 
-#include <mitkStandaloneDataStorage.h>
+#include "mitkCameraController.h"
+#include "mitkDisplayInteractor.h"
+#include "mitkDisplayInteractor.h"
+#include "mitkInteractionConst.h"
+#include "mitkLine.h"
+#include "mitkPlaneGeometryDataMapper2D.h"
+#include "mitkProperties.h"
+#include "mitkVtkLayerController.h"
 #include <mitkProperties.h>
+#include <mitkRenderingManager.h>
+#include <mitkStandaloneDataStorage.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
-#include <mitkRenderingManager.h>
-#include "mitkProperties.h"
-#include "mitkPlaneGeometryDataMapper2D.h"
-#include "mitkDisplayInteractor.h"
-#include "mitkCameraController.h"
-#include "mitkLine.h"
-#include "mitkInteractionConst.h"
-#include "mitkVtkLayerController.h"
-#include "mitkDisplayInteractor.h"
 
 #include "mitkDataStorage.h"
 #include "mitkIOUtil.h"
 
-#include "vtkTextProperty.h"
-#include "vtkCornerAnnotation.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
 #include "vtkAnnotatedCubeActor.h"
+#include "vtkCornerAnnotation.h"
 #include "vtkMitkRectangleProp.h"
 #include "vtkOrientationMarkerWidget.h"
 #include "vtkProperty.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkTextProperty.h"
 
 // us
 #include "usGetModuleContext.h"
@@ -62,7 +62,7 @@ vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering2;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering3;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering4;
 
-mitk::SliceNavigationController* m_TimeNavigationController = NULL;
+mitk::SliceNavigationController *m_TimeNavigationController = NULL;
 
 mitk::DataStorage::Pointer m_DataStorage;
 mitk::DataNode::Pointer m_PlaneNode1;
@@ -72,30 +72,29 @@ mitk::DataNode::Pointer m_Node;
 
 void InitializeWindows()
 {
-
   // Set default view directions for SNCs
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
 
-  //initialize m_TimeNavigationController: send time via sliceNavigationControllers
+  // initialize m_TimeNavigationController: send time via sliceNavigationControllers
   m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
   m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController(), false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController(), false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetSliceNavigationController(), false);
-  mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
+  mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(
+    mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
 
-  //reverse connection between sliceNavigationControllers and m_TimeNavigationController
+  // reverse connection between sliceNavigationControllers and m_TimeNavigationController
   mitkWidget1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
   mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 
-
-  mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.1,0.1,0.1);
-  mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.5,0.5,0.5);
+  mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.1, 0.1, 0.1);
+  mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.5, 0.5, 0.5);
   mitkWidget4->GetRenderer()->GetVtkRenderer()->GradientBackgroundOn();
 
   m_RectangleRendering1 = vtkSmartPointer<vtkMitkRectangleProp>::New();
@@ -113,7 +112,6 @@ void InitializeWindows()
   m_RectangleRendering4 = vtkSmartPointer<vtkMitkRectangleProp>::New();
   m_RectangleRendering4->SetColor(1.0, 1.0, 0.0);
   mitkWidget4->GetRenderer()->GetVtkRenderer()->AddViewProp(m_RectangleRendering4);
-
 }
 
 void AddDisplayPlaneSubTree()
@@ -121,13 +119,13 @@ void AddDisplayPlaneSubTree()
   // add the displayed planes of the multiwidget to a node to which the subtree
   // @a planesSubTree points ...
 
-  float white[3] =
-  { 1.0f, 1.0f, 1.0f };
+  float white[3] = {1.0f, 1.0f, 1.0f};
   mitk::PlaneGeometryDataMapper2D::Pointer mapper;
   mitk::IntProperty::Pointer layer = mitk::IntProperty::New(1000);
 
   // ... of widget 1
-  m_PlaneNode1 = (mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+  m_PlaneNode1 =
+    (mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode1->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
   m_PlaneNode1->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode1->SetProperty("name", mitk::StringProperty::New("widget1Plane"));
@@ -139,7 +137,8 @@ void AddDisplayPlaneSubTree()
   m_PlaneNode1->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 2
-  m_PlaneNode2 = (mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+  m_PlaneNode2 =
+    (mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode2->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
   m_PlaneNode2->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode2->SetProperty("name", mitk::StringProperty::New("widget2Plane"));
@@ -151,7 +150,8 @@ void AddDisplayPlaneSubTree()
   m_PlaneNode2->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
   // ... of widget 3
-  m_PlaneNode3 = (mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
+  m_PlaneNode3 =
+    (mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow()))->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode3->SetColor(white, mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
   m_PlaneNode3->SetProperty("visible", mitk::BoolProperty::New(true));
   m_PlaneNode3->SetProperty("name", mitk::StringProperty::New("widget3Plane"));
@@ -162,7 +162,7 @@ void AddDisplayPlaneSubTree()
   mapper = mitk::PlaneGeometryDataMapper2D::New();
   m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
-  //AddPlanesToDataStorage
+  // AddPlanesToDataStorage
   if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
   {
     if (m_DataStorage.IsNotNull())
@@ -176,7 +176,7 @@ void AddDisplayPlaneSubTree()
 
 void Fit()
 {
-  vtkRenderer * vtkrenderer;
+  vtkRenderer *vtkrenderer;
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetVtkRenderWindow())->GetCameraController()->Fit();
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetVtkRenderWindow())->GetCameraController()->Fit();
   mitk::BaseRenderer::GetInstance(mitkWidget3->GetVtkRenderWindow())->GetCameraController()->Fit();
@@ -204,7 +204,7 @@ void Fit()
   vtkObject::SetGlobalWarningDisplay(w);
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   if (argc < 2)
   {
@@ -231,11 +231,12 @@ int main(int argc, char* argv[])
       // Read the file and add it as a data node to the data storage
       mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::IOUtil::Load(filename, *m_DataStorage);
 
-      for (mitk::DataStorage::SetOfObjects::Iterator nodeIter = nodes->Begin(),
-           nodeIterEnd = nodes->End(); nodeIter != nodeIterEnd; ++nodeIter)
+      for (mitk::DataStorage::SetOfObjects::Iterator nodeIter = nodes->Begin(), nodeIterEnd = nodes->End();
+           nodeIter != nodeIterEnd;
+           ++nodeIter)
       {
         mitk::DataNode::Pointer node = nodeIter->Value();
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+        mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
         if (image.IsNotNull())
         {
           // Set the property "volumerendering" to the Boolean value "true"
@@ -244,7 +245,8 @@ int main(int argc, char* argv[])
           node->SetProperty("layer", mitk::IntProperty::New(1));
         }
       }
-    } catch (...)
+    }
+    catch (...)
     {
       std::cerr << "Could not open file " << filename << std::endl;
       exit(2);
@@ -271,7 +273,6 @@ int main(int argc, char* argv[])
   mitkWidget3->GetRenderer()->SetDataStorage(m_DataStorage);
   mitkWidget4->GetRenderer()->SetDataStorage(m_DataStorage);
 
-
   // instantiate display interactor
   if (m_DisplayInteractor.IsNull())
   {
@@ -280,9 +281,8 @@ int main(int argc, char* argv[])
     m_DisplayInteractor->SetEventConfig("DisplayConfigMITK.xml");
     // Register as listener via micro services
 
-    us::ModuleContext* context = us::GetModuleContext();
-    context->RegisterService<mitk::InteractionEventObserver>(
-        m_DisplayInteractor.GetPointer());
+    us::ModuleContext *context = us::GetModuleContext();
+    context->RegisterService<mitk::InteractionEventObserver>(m_DisplayInteractor.GetPointer());
   }
   // Use it as a 2D View
   mitkWidget1->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
@@ -293,15 +293,15 @@ int main(int argc, char* argv[])
   mitkWidget1->SetSize(400, 400);
 
   mitkWidget2->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0] + 420,
-      mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]);
+                                                 mitkWidget1->GetVtkRenderWindow()->GetPosition()[1]);
   mitkWidget2->SetSize(400, 400);
 
   mitkWidget3->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0],
-      mitkWidget1->GetVtkRenderWindow()->GetPosition()[1] + 450);
+                                                 mitkWidget1->GetVtkRenderWindow()->GetPosition()[1] + 450);
   mitkWidget3->SetSize(400, 400);
 
   mitkWidget4->GetVtkRenderWindow()->SetPosition(mitkWidget1->GetVtkRenderWindow()->GetPosition()[0] + 420,
-      mitkWidget1->GetVtkRenderWindow()->GetPosition()[1] + 450);
+                                                 mitkWidget1->GetVtkRenderWindow()->GetPosition()[1] + 450);
   mitkWidget4->SetSize(400, 400);
 
   InitializeWindows();
@@ -332,4 +332,3 @@ int main(int argc, char* argv[])
 
   return 0;
 }
-

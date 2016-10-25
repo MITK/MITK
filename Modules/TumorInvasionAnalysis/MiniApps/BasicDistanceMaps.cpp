@@ -16,19 +16,19 @@
 
 #include <mitkIOUtil.h>
 
+#include "mitkCommandLineParser.h"
+#include "mitkITKImageImport.h"
 #include "mitkImage.h"
 #include <mitkImageCast.h>
-#include "mitkITKImageImport.h"
-#include "mitkCommandLineParser.h"
 
 #include "itkSignedDanielssonDistanceMapImageFilter.h"
 
 using namespace std;
 
-typedef itk::Image<unsigned char,3> BinaryType;
-typedef itk::Image<mitk::ScalarType,3> ResultType;
+typedef itk::Image<unsigned char, 3> BinaryType;
+typedef itk::Image<mitk::ScalarType, 3> ResultType;
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
   mitkCommandLineParser parser;
   parser.setTitle("Basic Distance Maps");
@@ -37,13 +37,13 @@ int main(int argc, char* argv[])
   parser.setContributor("MBI");
 
   parser.setArgumentPrefix("--", "-");
-  parser.addArgument("input", "i",mitkCommandLineParser::InputImage, "(binary) seed file");
+  parser.addArgument("input", "i", mitkCommandLineParser::InputImage, "(binary) seed file");
   parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "distance map file name");
 
   map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
   // Show a help message
-  if ( parsedArgs.size()==0 || parsedArgs.count("help") || parsedArgs.count("h"))
+  if (parsedArgs.size() == 0 || parsedArgs.count("help") || parsedArgs.count("h"))
   {
     std::cout << parser.helpText();
     return EXIT_SUCCESS;
@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
 
   mitk::CastToItkImage(seedImage, itkSeed);
 
-  itk::SignedDanielssonDistanceMapImageFilter<BinaryType, ResultType>::Pointer danielssonDistance
-      = itk::SignedDanielssonDistanceMapImageFilter<BinaryType, ResultType>::New();
+  itk::SignedDanielssonDistanceMapImageFilter<BinaryType, ResultType>::Pointer danielssonDistance =
+    itk::SignedDanielssonDistanceMapImageFilter<BinaryType, ResultType>::New();
   danielssonDistance->SetInput(itkSeed);
   danielssonDistance->SetUseImageSpacing(true);
   danielssonDistance->Update();

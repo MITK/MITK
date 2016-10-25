@@ -23,74 +23,64 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-/**
- * \brief Defines the rendering style of control points for PlanarFigure objects.
- * \sa mitk::PlanarFigureMapper2D
- * @ingroup MitkPlanarFigureModule
- *
- * Used by PlanarFigureMapper2D to determine which of several control point shapes to use.
- * Currently this is basically the choice between squares and circles. If more options
- * are implemented, this class should be enhanced.
- *
- * After construction, the default shape is a square.
- *
- */
-class MITKPLANARFIGURE_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
-{
-public:
-
-  mitkClassMacro( PlanarFigureControlPointStyleProperty, EnumerationProperty );
-
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
-
-  mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const IdType&);
-
-  mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const std::string&);
-
-  typedef enum
+  /**
+   * \brief Defines the rendering style of control points for PlanarFigure objects.
+   * \sa mitk::PlanarFigureMapper2D
+   * @ingroup MitkPlanarFigureModule
+   *
+   * Used by PlanarFigureMapper2D to determine which of several control point shapes to use.
+   * Currently this is basically the choice between squares and circles. If more options
+   * are implemented, this class should be enhanced.
+   *
+   * After construction, the default shape is a square.
+   *
+   */
+  class MITKPLANARFIGURE_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
   {
-    Square, Circle
-  } Shape;
+  public:
+    mitkClassMacro(PlanarFigureControlPointStyleProperty, EnumerationProperty);
 
-  virtual Shape GetShape();
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  virtual void SetShape( Shape );
+      mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const IdType &);
 
-protected:
+    mitkNewMacro1Param(PlanarFigureControlPointStyleProperty, const std::string &);
 
-  PlanarFigureControlPointStyleProperty( );
+    typedef enum { Square, Circle } Shape;
 
-  PlanarFigureControlPointStyleProperty( const IdType &value );
+    virtual Shape GetShape();
 
-  /**
-   * Constructor. Sets the decoration type to the given value. If it is not
-   * valid, the representation is set to none
-   */
-  PlanarFigureControlPointStyleProperty( const std::string &value );
+    virtual void SetShape(Shape);
 
+  protected:
+    PlanarFigureControlPointStyleProperty();
 
-  /**
-   * this function is overridden as protected, so that the user may not add
-   * additional invalid types.
-   */
-  virtual bool AddEnum( const std::string &name, const IdType &id ) override;
+    PlanarFigureControlPointStyleProperty(const IdType &value);
 
-  /**
-   * Adds the standard enumeration types with corresponding strings.
-   */
-  virtual void AddEnumTypes();
+    /**
+     * Constructor. Sets the decoration type to the given value. If it is not
+     * valid, the representation is set to none
+     */
+    PlanarFigureControlPointStyleProperty(const std::string &value);
 
-private:
+    /**
+     * this function is overridden as protected, so that the user may not add
+     * additional invalid types.
+     */
+    virtual bool AddEnum(const std::string &name, const IdType &id) override;
 
-  // purposely not implemented
-  PlanarFigureControlPointStyleProperty& operator=(const PlanarFigureControlPointStyleProperty&);
+    /**
+     * Adds the standard enumeration types with corresponding strings.
+     */
+    virtual void AddEnumTypes();
 
-  virtual itk::LightObject::Pointer InternalClone() const override;
-};
+  private:
+    // purposely not implemented
+    PlanarFigureControlPointStyleProperty &operator=(const PlanarFigureControlPointStyleProperty &);
+
+    virtual itk::LightObject::Pointer InternalClone() const override;
+  };
 
 } // end of namespace mitk
-
 
 #endif

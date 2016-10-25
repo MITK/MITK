@@ -18,9 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkImageLiveWireContourModelFilter_h__
 
 #include "mitkCommon.h"
-#include <MitkSegmentationExports.h>
 #include "mitkContourModel.h"
 #include "mitkContourModelSource.h"
+#include <MitkSegmentationExports.h>
 
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
@@ -29,21 +29,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkShortestPathCostFunctionLiveWire.h>
 #include <itkShortestPathImageFilter.h>
 
-
-namespace mitk {
-
+namespace mitk
+{
   /**
 
    \brief Calculates a LiveWire contour between two points in an image.
 
-   For defining costs between two pixels specific features are extraced from the image and tranformed into a single cost value.
+   For defining costs between two pixels specific features are extraced from the image and tranformed into a single cost
+   value.
    \sa ShortestPathCostFunctionLiveWire
 
    The filter is able to create dynamic cost tranfer map and thus use on the fly training.
    \Note On the fly training will only be used for next update.
    The computation uses the last calculated segment to map cost according to features in the area of the segment.
 
-   For time resolved purposes use ImageLiveWireContourModelFilter::SetTimestep( unsigned int ) to create the LiveWire contour
+   For time resolved purposes use ImageLiveWireContourModelFilter::SetTimestep( unsigned int ) to create the LiveWire
+   contour
    at a specific timestep.
 
    \ingroup ContourModelFilters
@@ -51,21 +52,18 @@ namespace mitk {
   */
   class MITKSEGMENTATION_EXPORT ImageLiveWireContourModelFilter : public ContourModelSource
   {
-
   public:
-
     mitkClassMacro(ImageLiveWireContourModelFilter, ContourModelSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef ContourModel OutputType;
+      typedef ContourModel OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::Image InputType;
 
-    typedef itk::Image< float,  2 >                                              InternalImageType;
-    typedef itk::ShortestPathImageFilter< InternalImageType, InternalImageType > ShortestPathImageFilterType;
-    typedef itk::ShortestPathCostFunctionLiveWire< InternalImageType >           CostFunctionType;
-    typedef std::vector< itk::Index<2> >                                         ShortestPathType;
+    typedef itk::Image<float, 2> InternalImageType;
+    typedef itk::ShortestPathImageFilter<InternalImageType, InternalImageType> ShortestPathImageFilterType;
+    typedef itk::ShortestPathCostFunctionLiveWire<InternalImageType> CostFunctionType;
+    typedef std::vector<itk::Index<2>> ShortestPathType;
 
     /** \brief start point in world coordinates*/
     itkSetMacro(StartPoint, mitk::Point3D);
@@ -93,38 +91,38 @@ namespace mitk {
 
     /** \brief Set a vector with repulsive points to use in the cost function
     */
-    void SetRepulsivePoints(const ShortestPathType& points);
+    void SetRepulsivePoints(const ShortestPathType &points);
 
     /** \brief Add a single repulsive point to the cost function
     */
-    void AddRepulsivePoint( const itk::Index<2>& idx );
+    void AddRepulsivePoint(const itk::Index<2> &idx);
 
     /** \brief Remove a single repulsive point from the cost function
     */
-    void RemoveRepulsivePoint( const itk::Index<2>& idx );
+    void RemoveRepulsivePoint(const itk::Index<2> &idx);
 
-    virtual void SetInput( const InputType *input);
+    virtual void SetInput(const InputType *input);
 
     using Superclass::SetInput;
-    virtual void SetInput( unsigned int idx, const InputType * input);
+    virtual void SetInput(unsigned int idx, const InputType *input);
 
-    const InputType* GetInput(void);
+    const InputType *GetInput(void);
 
-    const InputType* GetInput(unsigned int idx);
+    const InputType *GetInput(unsigned int idx);
 
-    virtual OutputType* GetOutput();
+    virtual OutputType *GetOutput();
 
     virtual void DumpMaskImage();
 
     /** \brief Create dynamic cost tranfer map - on the fly training*/
-    bool CreateDynamicCostMap(mitk::ContourModel* path=NULL);
+    bool CreateDynamicCostMap(mitk::ContourModel *path = NULL);
 
   protected:
     ImageLiveWireContourModelFilter();
 
     virtual ~ImageLiveWireContourModelFilter();
 
-    void GenerateOutputInformation() override {};
+    void GenerateOutputInformation() override{};
 
     void GenerateData() override;
 
@@ -153,16 +151,15 @@ namespace mitk {
 
     unsigned int m_TimeStep;
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void ItkPreProcessImage (const itk::Image<TPixel, VImageDimension>* inputImage);
+    template <typename TPixel, unsigned int VImageDimension>
+    void ItkPreProcessImage(const itk::Image<TPixel, VImageDimension> *inputImage);
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void CreateDynamicCostMapByITK(const itk::Image<TPixel, VImageDimension>* inputImage, mitk::ContourModel* path=NULL);
+    template <typename TPixel, unsigned int VImageDimension>
+    void CreateDynamicCostMapByITK(const itk::Image<TPixel, VImageDimension> *inputImage,
+                                   mitk::ContourModel *path = NULL);
 
     InternalImageType::Pointer m_InternalImage;
-
   };
-
 }
 
 #endif

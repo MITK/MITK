@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKTRANSFERFUNCTIONWIDGET_H
 #define QMITKTRANSFERFUNCTIONWIDGET_H
 
-#include "ui_QmitkTransferFunctionWidget.h"
 #include "MitkQtWidgetsExtExports.h"
+#include "ui_QmitkTransferFunctionWidget.h"
 
 #include <mitkCommon.h>
 
@@ -27,62 +27,57 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataNode.h>
 #include <mitkTransferFunctionProperty.h>
 
-#include <QSlider>
 #include <QPushButton>
+#include <QSlider>
 
 #include <QmitkTransferFunctionWidget.h>
 
-namespace mitk {
-class BaseRenderer;
+namespace mitk
+{
+  class BaseRenderer;
 }
 
 class MITKQTWIDGETSEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
-
   Q_OBJECT
 
-  public:
+public:
+  QmitkTransferFunctionWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  ~QmitkTransferFunctionWidget();
 
-    QmitkTransferFunctionWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-    ~QmitkTransferFunctionWidget () ;
+  void SetDataNode(mitk::DataNode *node, const mitk::BaseRenderer *renderer = nullptr);
 
-    void SetDataNode(mitk::DataNode* node, const mitk::BaseRenderer* renderer = nullptr);
+  void SetScalarLabel(const QString &scalarLabel);
 
-   void SetScalarLabel(const QString& scalarLabel);
+  void ShowScalarOpacityFunction(bool show);
+  void ShowColorFunction(bool show);
+  void ShowGradientOpacityFunction(bool show);
 
-   void ShowScalarOpacityFunction(bool show);
-   void ShowColorFunction(bool show);
-   void ShowGradientOpacityFunction(bool show);
+  void SetScalarOpacityFunctionEnabled(bool enable);
+  void SetColorFunctionEnabled(bool enable);
+  void SetGradientOpacityFunctionEnabled(bool enable);
 
-   void SetScalarOpacityFunctionEnabled(bool enable);
-   void SetColorFunctionEnabled(bool enable);
-   void SetGradientOpacityFunctionEnabled(bool enable);
+public slots:
 
-  public slots:
+  void SetXValueScalar(const QString text);
+  void SetYValueScalar(const QString text);
+  void SetXValueGradient(const QString text);
+  void SetYValueGradient(const QString text);
+  void SetXValueColor(const QString text);
 
-    void SetXValueScalar( const QString text );
-    void SetYValueScalar( const QString text );
-    void SetXValueGradient( const QString text );
-    void SetYValueGradient( const QString text );
-    void SetXValueColor( const QString text );
+  void OnUpdateCanvas();
+  void UpdateRanges();
+  void OnResetSlider();
 
-    void OnUpdateCanvas();
-    void UpdateRanges();
-    void OnResetSlider();
+  void OnSpanChanged(int lower, int upper);
 
-   void OnSpanChanged (int lower, int upper);
+protected:
+  mitk::TransferFunctionProperty::Pointer tfpToChange;
 
+  int m_RangeSliderMin;
+  int m_RangeSliderMax;
 
-  protected:
-
-    mitk::TransferFunctionProperty::Pointer tfpToChange;
-
-    int m_RangeSliderMin;
-    int m_RangeSliderMax;
-
-    mitk::SimpleHistogramCache histogramCache;
-
+  mitk::SimpleHistogramCache histogramCache;
 };
 
 #endif
-

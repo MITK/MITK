@@ -26,11 +26,10 @@ class QmitkQmlApplication : public QObject, public berry::IApplication
   Q_INTERFACES(berry::IApplication)
 
 public:
-
   QmitkQmlApplication();
-  QmitkQmlApplication(const QmitkQmlApplication& other);
+  QmitkQmlApplication(const QmitkQmlApplication &other);
 
-  QVariant Start(berry::IApplicationContext* context);
+  QVariant Start(berry::IApplicationContext *context);
   void Stop();
 };
 

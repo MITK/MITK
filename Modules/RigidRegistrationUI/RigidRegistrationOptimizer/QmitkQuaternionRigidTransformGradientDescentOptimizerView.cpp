@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkQuaternionRigidTransformGradientDescentOptimizer.h>
 
-QmitkQuaternionRigidTransformGradientDescentOptimizerView::QmitkQuaternionRigidTransformGradientDescentOptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkQuaternionRigidTransformGradientDescentOptimizerView::QmitkQuaternionRigidTransformGradientDescentOptimizerView(
+  QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkQuaternionRigidTransformGradientDescentOptimizerView::~QmitkQuaternionRigidTransformGradientDescentOptimizerView()
@@ -35,10 +35,12 @@ mitk::OptimizerParameters::OptimizerType QmitkQuaternionRigidTransformGradientDe
 
 itk::Object::Pointer QmitkQuaternionRigidTransformGradientDescentOptimizerView::GetOptimizer()
 {
-  itk::QuaternionRigidTransformGradientDescentOptimizer::Pointer OptimizerPointer = itk::QuaternionRigidTransformGradientDescentOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked());
+  itk::QuaternionRigidTransformGradientDescentOptimizer::Pointer OptimizerPointer =
+    itk::QuaternionRigidTransformGradientDescentOptimizer::New();
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
   OptimizerPointer->SetLearningRate(m_Controls.m_LearningRateQuaternionRigidTransformGradientDescent->text().toFloat());
-  OptimizerPointer->SetNumberOfIterations( m_Controls.m_IterationsQuaternionRigidTransformGradientDescent->text().toInt() );
+  OptimizerPointer->SetNumberOfIterations(
+    m_Controls.m_IterationsQuaternionRigidTransformGradientDescent->text().toInt());
   return OptimizerPointer.GetPointer();
 }
 
@@ -53,7 +55,8 @@ itk::Array<double> QmitkQuaternionRigidTransformGradientDescentOptimizerView::Ge
   return optimizerValues;
 }
 
-void QmitkQuaternionRigidTransformGradientDescentOptimizerView::SetOptimizerParameters(itk::Array<double> optimizerValues)
+void QmitkQuaternionRigidTransformGradientDescentOptimizerView::SetOptimizerParameters(
+  itk::Array<double> optimizerValues)
 {
   m_Controls.m_Maximize->setChecked(optimizerValues[0]);
   m_Controls.m_LearningRateQuaternionRigidTransformGradientDescent->setText(QString::number(optimizerValues[1]));
@@ -70,11 +73,11 @@ QString QmitkQuaternionRigidTransformGradientDescentOptimizerView::GetName()
   return "QuaternionRigidTransformGradientDescent";
 }
 
-void QmitkQuaternionRigidTransformGradientDescentOptimizerView::SetupUI(QWidget* parent)
+void QmitkQuaternionRigidTransformGradientDescentOptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_IterationsQuaternionRigidTransformGradientDescent->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_LearningRateQuaternionRigidTransformGradientDescent->setValidator(validatorLineEditInputFloat);
 }

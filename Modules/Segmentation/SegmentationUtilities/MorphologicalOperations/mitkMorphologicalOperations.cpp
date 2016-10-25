@@ -15,10 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkMorphologicalOperations.h"
-#include <mitkImageAccessByItk.h>
-#include <mitkImageCast.h>
-#include <mitkImageReadAccessor.h>
-#include <mitkImageTimeSelector.h>
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryCrossStructuringElement.h>
 #include <itkBinaryDilateImageFilter.h>
@@ -26,8 +22,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkBinaryFillholeImageFilter.h>
 #include <itkBinaryMorphologicalClosingImageFilter.h>
 #include <itkBinaryMorphologicalOpeningImageFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageReadAccessor.h>
+#include <mitkImageTimeSelector.h>
 
-void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer& image, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
+void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer &image,
+                                            int factor,
+                                            mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
   MITK_INFO << "Start Closing...";
 
@@ -62,7 +64,9 @@ void mitk::MorphologicalOperations::Closing(mitk::Image::Pointer& image, int fac
   MITK_INFO << "Finished Closing";
 }
 
-void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer& image, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
+void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer &image,
+                                          int factor,
+                                          mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
   MITK_INFO << "Start Erode...";
 
@@ -83,7 +87,7 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer& image, int facto
       mitk::Image::Pointer img3D = timeSelector->GetOutput();
       img3D->DisconnectPipeline();
 
-      AccessByItk_3(img3D, itkErode,  img3D, factor, structuralElement);
+      AccessByItk_3(img3D, itkErode, img3D, factor, structuralElement);
 
       mitk::ImageReadAccessor accessor(img3D);
       image->SetVolume(accessor.GetData(), t);
@@ -97,7 +101,9 @@ void mitk::MorphologicalOperations::Erode(mitk::Image::Pointer& image, int facto
   MITK_INFO << "Finished Erode";
 }
 
-void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer& image, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
+void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer &image,
+                                           int factor,
+                                           mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
   MITK_INFO << "Start Dilate...";
 
@@ -132,7 +138,9 @@ void mitk::MorphologicalOperations::Dilate(mitk::Image::Pointer& image, int fact
   MITK_INFO << "Finished Dilate";
 }
 
-void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer& image, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElement)
+void mitk::MorphologicalOperations::Opening(mitk::Image::Pointer &image,
+                                            int factor,
+                                            mitk::MorphologicalOperations::StructuralElementType structuralElement)
 {
   MITK_INFO << "Start Opening...";
 
@@ -202,8 +210,12 @@ void mitk::MorphologicalOperations::FillHoles(mitk::Image::Pointer &image)
   MITK_INFO << "Finished FillHole";
 }
 
-template<typename TPixel, unsigned int VDimension>
-void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
+template <typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkClosing(
+  itk::Image<TPixel, VDimension> *sourceImage,
+  mitk::Image::Pointer &resultImage,
+  int factor,
+  mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
@@ -211,9 +223,9 @@ void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* s
   typedef typename itk::BinaryMorphologicalClosingImageFilter<ImageType, ImageType, BallType> BallClosingFilterType;
   typedef typename itk::BinaryMorphologicalClosingImageFilter<ImageType, ImageType, CrossType> CrossClosingFilterType;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal |  Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
   {
-    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
     typename BallClosingFilterType::Pointer closingFilter = BallClosingFilterType::New();
     closingFilter->SetKernel(ball);
@@ -225,7 +237,7 @@ void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* s
   }
   else
   {
-    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags, factor);
 
     typename CrossClosingFilterType::Pointer closingFilter = CrossClosingFilterType::New();
     closingFilter->SetKernel(cross);
@@ -237,8 +249,12 @@ void mitk::MorphologicalOperations::itkClosing(itk::Image<TPixel, VDimension>* s
   }
 }
 
-template<typename TPixel, unsigned int VDimension>
-void mitk::MorphologicalOperations::itkErode(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
+template <typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkErode(
+  itk::Image<TPixel, VDimension> *sourceImage,
+  mitk::Image::Pointer &resultImage,
+  int factor,
+  mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
@@ -246,9 +262,9 @@ void mitk::MorphologicalOperations::itkErode(itk::Image<TPixel, VDimension>* sou
   typedef typename itk::BinaryErodeImageFilter<ImageType, ImageType, BallType> BallErodeFilterType;
   typedef typename itk::BinaryErodeImageFilter<ImageType, ImageType, CrossType> CrossErodeFilterType;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal |  Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
   {
-    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
     typename BallErodeFilterType::Pointer erodeFilter = BallErodeFilterType::New();
     erodeFilter->SetKernel(ball);
@@ -260,7 +276,7 @@ void mitk::MorphologicalOperations::itkErode(itk::Image<TPixel, VDimension>* sou
   }
   else
   {
-    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags, factor);
 
     typename CrossErodeFilterType::Pointer erodeFilter = CrossErodeFilterType::New();
     erodeFilter->SetKernel(cross);
@@ -272,8 +288,12 @@ void mitk::MorphologicalOperations::itkErode(itk::Image<TPixel, VDimension>* sou
   }
 }
 
-template<typename TPixel, unsigned int VDimension>
-void mitk::MorphologicalOperations::itkDilate(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor,  mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
+template <typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkDilate(
+  itk::Image<TPixel, VDimension> *sourceImage,
+  mitk::Image::Pointer &resultImage,
+  int factor,
+  mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
@@ -281,9 +301,9 @@ void mitk::MorphologicalOperations::itkDilate(itk::Image<TPixel, VDimension>* so
   typedef typename itk::BinaryDilateImageFilter<ImageType, ImageType, BallType> BallDilateFilterType;
   typedef typename itk::BinaryDilateImageFilter<ImageType, ImageType, CrossType> CrossDilateFilterType;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal |  Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
   {
-    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
     typename BallDilateFilterType::Pointer dilateFilter = BallDilateFilterType::New();
     dilateFilter->SetKernel(ball);
@@ -295,7 +315,7 @@ void mitk::MorphologicalOperations::itkDilate(itk::Image<TPixel, VDimension>* so
   }
   else
   {
-    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags, factor);
 
     typename CrossDilateFilterType::Pointer dilateFilter = CrossDilateFilterType::New();
     dilateFilter->SetKernel(cross);
@@ -307,8 +327,12 @@ void mitk::MorphologicalOperations::itkDilate(itk::Image<TPixel, VDimension>* so
   }
 }
 
-template<typename TPixel, unsigned int VDimension>
-void mitk::MorphologicalOperations::itkOpening(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage, int factor, mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
+template <typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkOpening(
+  itk::Image<TPixel, VDimension> *sourceImage,
+  mitk::Image::Pointer &resultImage,
+  int factor,
+  mitk::MorphologicalOperations::StructuralElementType structuralElementFlags)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef itk::BinaryBallStructuringElement<TPixel, VDimension> BallType;
@@ -316,9 +340,9 @@ void mitk::MorphologicalOperations::itkOpening(itk::Image<TPixel, VDimension>* s
   typedef typename itk::BinaryMorphologicalOpeningImageFilter<ImageType, ImageType, BallType> BallOpeningFiltertype;
   typedef typename itk::BinaryMorphologicalOpeningImageFilter<ImageType, ImageType, CrossType> CrossOpeningFiltertype;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal |  Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
   {
-    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags,factor);
+    BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
     typename BallOpeningFiltertype::Pointer openingFilter = BallOpeningFiltertype::New();
     openingFilter->SetKernel(ball);
@@ -331,7 +355,7 @@ void mitk::MorphologicalOperations::itkOpening(itk::Image<TPixel, VDimension>* s
   }
   else
   {
-    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags,factor);
+    CrossType cross = CreateStructuringElement<CrossType>(structuralElementFlags, factor);
 
     typename CrossOpeningFiltertype::Pointer openingFilter = CrossOpeningFiltertype::New();
     openingFilter->SetKernel(cross);
@@ -344,8 +368,9 @@ void mitk::MorphologicalOperations::itkOpening(itk::Image<TPixel, VDimension>* s
   }
 }
 
-template<typename TPixel, unsigned int VDimension>
-void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension>* sourceImage, mitk::Image::Pointer& resultImage)
+template <typename TPixel, unsigned int VDimension>
+void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension> *sourceImage,
+                                                 mitk::Image::Pointer &resultImage)
 {
   typedef itk::Image<TPixel, VDimension> ImageType;
   typedef typename itk::BinaryFillholeImageFilter<ImageType> FillHoleFilterType;

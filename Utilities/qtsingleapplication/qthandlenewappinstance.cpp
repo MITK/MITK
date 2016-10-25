@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QTemporaryDir>
 
-bool createTemporaryDir(QString& path)
+bool createTemporaryDir(QString &path)
 {
   QString baseName = QCoreApplication::applicationName();
   if (baseName.isEmpty())
@@ -42,7 +42,7 @@ bool createTemporaryDir(QString& path)
   return false;
 }
 
-QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** argv, const QString& newInstanceArg)
+QString handleNewAppInstance(QtSingleApplication *singleApp, int argc, char **argv, const QString &newInstanceArg)
 {
   if (singleApp->isRunning())
   {
@@ -74,7 +74,7 @@ QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** ar
       QDataStream msg(&ba, QIODevice::WriteOnly);
       msg << QString("$cmdLineArgs"); // This message contains command line arguments
       msg << args;
-      if(singleApp->sendMessage(ba))
+      if (singleApp->sendMessage(ba))
       {
         exit(EXIT_SUCCESS);
       }
@@ -87,4 +87,3 @@ QString handleNewAppInstance(QtSingleApplication* singleApp, int argc, char** ar
   }
   return QString();
 }
-

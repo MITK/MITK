@@ -36,14 +36,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkCommandLineParser_h
 #define __mitkCommandLineParser_h
 
-#include <usAny.h>
 #include <map>
+#include <usAny.h>
 
 #include <MitkCommandLineExports.h>
 
 #ifdef _MSC_VER
-#pragma warning( push )
-#pragma warning( disable : 4251 )
+#pragma warning(push)
+#pragma warning(disable : 4251)
 #endif
 
 /**
@@ -117,13 +117,13 @@ public:
  *         to a us::Any containing the value.
  */
 
-  std::map<std::string, us::Any> parseArguments( const StringContainerType& arguments, bool* ok = nullptr );
+  std::map<std::string, us::Any> parseArguments(const StringContainerType &arguments, bool *ok = nullptr);
 
   /**
   * Convenient method allowing to parse a given list of command line arguments.
   * @see parseArguments(const StringContainerType &, bool*)
   */
- std:: map<std::string, us::Any> parseArguments( int argc, char** argv, bool* ok = nullptr );
+  std::map<std::string, us::Any> parseArguments(int argc, char **argv, bool *ok = nullptr);
 
   /**
  * Returns a detailed error description if a call to <code>parseArguments()</code>
@@ -143,7 +143,7 @@ public:
  *
  * @return A list containing unparsed arguments.
  */
-  const StringContainerType& unparsedArguments() const;
+  const StringContainerType &unparsedArguments() const;
 
   /**
  * Checks if the given argument has been added via a call
@@ -155,7 +155,7 @@ public:
  * @return <code>true</code> if the argument was added, <code>false</code>
  *         otherwise.
  */
-  bool argumentAdded( const std::string& argument ) const;
+  bool argumentAdded(const std::string &argument) const;
 
   /**
  * Checks if the given argument has been parsed successfully by a previous
@@ -165,7 +165,7 @@ public:
  * @return <code>true</code> if the argument was parsed, <code>false</code>
  *         otherwise.
  */
-  bool argumentParsed( const std::string& argument ) const;
+  bool argumentParsed(const std::string &argument) const;
 
   /**
  * Adds a command line argument. An argument can have a long name
@@ -212,15 +212,15 @@ public:
  * @throws std::logic_error If the us::Any type of <code>defaultValue</code>
  *         does not match <code>type</code>, a <code>std::logic_error</code> is thrown.
  */
-  void addArgument( const std::string& longarg,
-                    const std::string& shortarg,
-                    Type type,
-                    const std::string& argLabel,
-                    const std::string& argHelp = std::string(),
-                    const us::Any& defaultValue = us::Any(),
-                    bool optional = true,
-                    bool ignoreRest = false,
-                    bool deprecated = false );
+  void addArgument(const std::string &longarg,
+                   const std::string &shortarg,
+                   Type type,
+                   const std::string &argLabel,
+                   const std::string &argHelp = std::string(),
+                   const us::Any &defaultValue = us::Any(),
+                   bool optional = true,
+                   bool ignoreRest = false,
+                   bool deprecated = false);
 
   /**
  * Adds a deprecated command line argument. If a deprecated argument is provided
@@ -234,8 +234,10 @@ public:
  * @param shortarg The short argument name.
  * @param argHelp A help string describing alternatives to the deprecated argument.
  */
-  void
-  addDeprecatedArgument( const std::string& longarg, const std::string& shortarg, const std::string& argLabel, const std::string& argHelp );
+  void addDeprecatedArgument(const std::string &longarg,
+                             const std::string &shortarg,
+                             const std::string &argLabel,
+                             const std::string &argHelp);
 
   /**
  * Sets a custom regular expression for validating argument parameters. The method
@@ -251,9 +253,9 @@ public:
  *
  * @see errorString()
  */
-  bool setExactMatchRegularExpression( const std::string& argument,
-                                       const std::string& expression,
-                                       const std::string& exactMatchFailedMessage );
+  bool setExactMatchRegularExpression(const std::string &argument,
+                                      const std::string &expression,
+                                      const std::string &exactMatchFailedMessage);
 
   /**
  * The field width for the argument names without the help text.
@@ -296,7 +298,7 @@ public:
  * @param longPrefix The prefix for long argument names.
  * @param shortPrefix The prefix for short argument names.
  */
-  void setArgumentPrefix( const std::string& longPrefix, const std::string& shortPrefix );
+  void setArgumentPrefix(const std::string &longPrefix, const std::string &shortPrefix);
 
   /**
  * Begins a new group for documenting arguments. All newly added arguments via
@@ -308,7 +310,7 @@ public:
  *
  * @param description The description of the group
  */
-  void beginGroup( const std::string& description );
+  void beginGroup(const std::string &description);
 
   /**
  * Ends the current group.
@@ -323,7 +325,7 @@ public:
  *
  * @see parseArguments(const StringContainerType &, bool*)
  */
-  void setStrictModeEnabled( bool strictMode );
+  void setStrictModeEnabled(bool strictMode);
 
   /**
    * Is used to generate an XML output for any commandline program.
@@ -335,25 +337,25 @@ public:
    *
    * @param title The title of the app.
    */
-  void setTitle( std::string title );
+  void setTitle(std::string title);
   /**
    * Is used to set the contributor for the help view in the auto generated interface.
    *
    * @param contributor Contributor of the app.
    */
-  void setContributor( std::string contributor );
+  void setContributor(std::string contributor);
   /**
    * Is used to categorize the apps in the commandline module.
    *
    * @param category The category of the app.
    */
-  void setCategory( std::string category );
+  void setCategory(std::string category);
   /**
    * Is used as the help text in the auto generated interface.
    *
    * @param description A short description for the app.
    */
-  void setDescription( std::string description );
+  void setDescription(std::string description);
   /**
    * Is used to group several Parameters in one groupbox in the auto generated interface.
    * Default name is "Parameters", with the tooltip: "Groupbox containing parameters."
@@ -363,11 +365,11 @@ public:
    * @param name The name of the groupbox.
    * @param tooltip The tooltip of the groupbox.
    */
-  void changeParameterGroup( std::string name, std::string tooltip );
+  void changeParameterGroup(std::string name, std::string tooltip);
 
 private:
   class ctkInternal;
-  ctkInternal* Internal;
+  ctkInternal *Internal;
 
   std::string Title;
   std::string Contributor;

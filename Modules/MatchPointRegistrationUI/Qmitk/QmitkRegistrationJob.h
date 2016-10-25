@@ -17,60 +17,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __QMITK_REGISTRATION_JOB_H
 #define __QMITK_REGISTRATION_JOB_H
 
-
-//QT
-#include <QRunnable>
+// QT
 #include <QObject>
+#include <QRunnable>
 
 // ITK
 #include <itkCommand.h>
 
-//MITK
+// MITK
+#include "mitkUIDHelper.h"
 #include <mitkDataNode.h>
 #include <mitkImage.h>
-#include "mitkUIDHelper.h"
 #include <mitkMAPRegistrationWrapper.h>
 
 // MatchPoint
 #include <mapDeploymentDLLInfo.h>
-#include <mapRegistrationAlgorithmBase.h>
 #include <mapIterativeAlgorithmInterface.h>
 #include <mapMultiResRegistrationAlgorithmInterface.h>
+#include <mapRegistrationAlgorithmBase.h>
 #include <mapRegistrationBase.h>
-
 
 #include <MitkMatchPointRegistrationUIExports.h>
 
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationJob : public QObject, public QRunnable
 {
-    // this is needed for all Qt objects that should have a Qt meta-object
-    // (everything that derives from QObject and wants to have signal/slots)
-    Q_OBJECT
+  // this is needed for all Qt objects that should have a Qt meta-object
+  // (everything that derives from QObject and wants to have signal/slots)
+  Q_OBJECT
 
 public:
-    QmitkRegistrationJob(map::algorithm::RegistrationAlgorithmBase* pAlgorithm);
-    ~QmitkRegistrationJob();
+  QmitkRegistrationJob(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
+  ~QmitkRegistrationJob();
 
-    void run();
+  void run();
 
 signals:
-    void Finished();
-    void Error(QString err);
-    void RegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer spResultRegistration, const QmitkRegistrationJob* pJob);
-    void AlgorithmIterated(QString info, bool hasIterationCount, unsigned long currentIteration);
-    void LevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel);
-    void AlgorithmStatusChanged(QString info);
-    void AlgorithmInfo(QString info);
+  void Finished();
+  void Error(QString err);
+  void RegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer spResultRegistration,
+                            const QmitkRegistrationJob *pJob);
+  void AlgorithmIterated(QString info, bool hasIterationCount, unsigned long currentIteration);
+  void LevelChanged(QString info, bool hasLevelCount, unsigned long currentLevel);
+  void AlgorithmStatusChanged(QString info);
+  void AlgorithmInfo(QString info);
 
 public:
-  //Inputs
+  // Inputs
   mitk::BaseData::ConstPointer m_spTargetData;
   mitk::BaseData::ConstPointer m_spMovingData;
 
   mitk::Image::ConstPointer m_spTargetMask;
   mitk::Image::ConstPointer m_spMovingMask;
 
-  //job settings
+  // job settings
   bool m_MapEntity;
   bool m_StoreReg;
   bool m_ErrorOccured;
@@ -80,7 +79,7 @@ public:
   mitk::NodeUIDType m_TargetMaskNodeUID;
   mitk::NodeUIDType m_MovingMaskNodeUID;
 
-  const map::algorithm::RegistrationAlgorithmBase* GetLoadedAlgorithm() const;
+  const map::algorithm::RegistrationAlgorithmBase *GetLoadedAlgorithm() const;
 
 protected:
   typedef map::algorithm::facet::IterativeAlgorithmInterface IIterativeAlgorithm;
@@ -96,12 +95,11 @@ protected:
   unsigned long m_ObserverID;
   map::algorithm::RegistrationAlgorithmBase::Pointer m_spLoadedAlgorithm;
 
-  //Helper functions
-  const mitk::Image* GetTargetDataAsImage() const;
-  const mitk::Image* GetMovingDataAsImage() const;
+  // Helper functions
+  const mitk::Image *GetTargetDataAsImage() const;
+  const mitk::Image *GetMovingDataAsImage() const;
 
   void OnMapAlgorithmEvent(::itk::Object *, const itk::EventObject &event);
 };
 
 #endif
-

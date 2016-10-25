@@ -14,74 +14,66 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
-#include <vtkProperty.h>
 #include "mitkGridVolumeMapperProperty.h"
+#include <vtkProperty.h>
 
-mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( )
+mitk::GridVolumeMapperProperty::GridVolumeMapperProperty()
 {
   AddRepresentationTypes();
-  SetValue( PT );
+  SetValue(PT);
 }
 
-
-mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( const IdType& value )
+mitk::GridVolumeMapperProperty::GridVolumeMapperProperty(const IdType &value)
 {
   AddRepresentationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    SetValue( value );
+    SetValue(value);
   }
   else
   {
-    SetValue( PT );
+    SetValue(PT);
   }
 }
 
-
-mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( const std::string& value )
+mitk::GridVolumeMapperProperty::GridVolumeMapperProperty(const std::string &value)
 {
   AddRepresentationTypes();
-  if ( IsValidEnumerationValue( value ) )
+  if (IsValidEnumerationValue(value))
   {
-    SetValue( value );
+    SetValue(value);
   }
   else
   {
-    SetValue( PT );
+    SetValue(PT);
   }
 }
-
 
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToPT()
 {
-  SetValue( PT );
+  SetValue(PT);
 }
-
 
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToZSweep()
 {
-  SetValue( ZSWEEP );
+  SetValue(ZSWEEP);
 }
-
 
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToRayCast()
 {
-  SetValue( RAYCAST );
+  SetValue(RAYCAST);
 }
-
 
 void mitk::GridVolumeMapperProperty::AddRepresentationTypes()
 {
-  AddEnum( "Ray Cast", RAYCAST );
-  AddEnum( "Projected Tetrahedra", PT );
-  AddEnum( "ZSweep", ZSWEEP );
+  AddEnum("Ray Cast", RAYCAST);
+  AddEnum("Projected Tetrahedra", PT);
+  AddEnum("ZSweep", ZSWEEP);
 }
 
-
-bool mitk::GridVolumeMapperProperty::AddEnum( const std::string& name, const IdType& id )
+bool mitk::GridVolumeMapperProperty::AddEnum(const std::string &name, const IdType &id)
 {
-  return Superclass::AddEnum( name, id );
+  return Superclass::AddEnum(name, id);
 }
 
 itk::LightObject::Pointer mitk::GridVolumeMapperProperty::InternalClone() const

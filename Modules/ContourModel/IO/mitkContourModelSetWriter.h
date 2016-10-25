@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /**
   * @brief XML-based writer for mitk::ContourModelSet
   *
@@ -41,12 +40,10 @@ namespace mitk
     virtual void Write() override;
 
   protected:
-    ContourModelSetWriter(const ContourModelSetWriter& other);
+    ContourModelSetWriter(const ContourModelSetWriter &other);
 
-    virtual mitk::ContourModelSetWriter* Clone() const override;
+    virtual mitk::ContourModelSetWriter *Clone() const override;
   };
-
 }
-
 
 #endif

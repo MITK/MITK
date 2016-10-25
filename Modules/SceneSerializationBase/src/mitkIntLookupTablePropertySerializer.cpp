@@ -23,45 +23,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class IntLookupTablePropertySerializer : public BasePropertySerializer
-{
+  class IntLookupTablePropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(IntLookupTablePropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( IntLookupTablePropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      const IntLookupTableProperty* prop = dynamic_cast<const IntLookupTableProperty*>(m_Property.GetPointer());
+      const IntLookupTableProperty *prop = dynamic_cast<const IntLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
         return nullptr;
       IntLookupTable lut = prop->GetValue();
-      //if (lut.IsNull())
+      // if (lut.IsNull())
       //  return NULL; // really?
-      const IntLookupTable::LookupTableType& map = lut.GetLookupTable();
+      const IntLookupTable::LookupTableType &map = lut.GetLookupTable();
 
-      auto  element = new TiXmlElement("IntLookupTableTable");
+      auto element = new TiXmlElement("IntLookupTableTable");
       for (auto it = map.begin(); it != map.end(); ++it)
-        {
-          auto  tableEntry = new TiXmlElement("LUTValue");
-          tableEntry->SetAttribute("id", it->first);
-          tableEntry->SetAttribute("value", it->second);
-          element->LinkEndChild( tableEntry );
-        }
-        return element;
+      {
+        auto tableEntry = new TiXmlElement("LUTValue");
+        tableEntry->SetAttribute("id", it->first);
+        tableEntry->SetAttribute("value", it->second);
+        element->LinkEndChild(tableEntry);
+      }
+      return element;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
       if (!element)
         return nullptr;
 
       IntLookupTable lut;
-      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != nullptr; child = child->NextSiblingElement("LUTValue"))
+      for (TiXmlElement *child = element->FirstChildElement("LUTValue"); child != nullptr;
+           child = child->NextSiblingElement("LUTValue"))
       {
-
         int temp;
         if (child->QueryIntAttribute("id", &temp) == TIXML_WRONG_TYPE)
           return nullptr; // TODO: can we do a better error handling?
@@ -73,10 +70,11 @@ class IntLookupTablePropertySerializer : public BasePropertySerializer
       }
       return IntLookupTableProperty::New(lut).GetPointer();
     }
+
   protected:
     IntLookupTablePropertySerializer() {}
     virtual ~IntLookupTablePropertySerializer() {}
-};
+  };
 } // namespace
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(IntLookupTablePropertySerializer);

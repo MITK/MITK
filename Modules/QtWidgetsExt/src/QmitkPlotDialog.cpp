@@ -19,14 +19,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPlotDialog.h"
 
-QmitkPlotDialog::QmitkPlotDialog(const char* title, QWidget* parent, const char*): QDialog(parent)
+QmitkPlotDialog::QmitkPlotDialog(const char *title, QWidget *parent, const char *) : QDialog(parent)
 {
-  auto  boxLayout = new QVBoxLayout(this);
-  m_Plot = new QmitkPlotWidget( this, title ) ;
+  auto boxLayout = new QVBoxLayout(this);
+  m_Plot = new QmitkPlotWidget(this, title);
   m_CloseDialogButton = new QPushButton("close plot window", this);
-  boxLayout->addWidget( m_Plot );
-  boxLayout->addWidget( m_CloseDialogButton );
-  connect( m_CloseDialogButton, SIGNAL( clicked( ) ), this, SLOT( accept() ) );
+  boxLayout->addWidget(m_Plot);
+  boxLayout->addWidget(m_CloseDialogButton);
+  connect(m_CloseDialogButton, SIGNAL(clicked()), this, SLOT(accept()));
 }
 
 QmitkPlotDialog::~QmitkPlotDialog()
@@ -34,13 +34,12 @@ QmitkPlotDialog::~QmitkPlotDialog()
   delete m_Plot;
 }
 
-QmitkPlotWidget* QmitkPlotDialog::GetPlot()
+QmitkPlotWidget *QmitkPlotDialog::GetPlot()
 {
   return m_Plot;
 }
 
-QwtPlot* QmitkPlotDialog::GetQwtPlot()
+QwtPlot *QmitkPlotDialog::GetQwtPlot()
 {
   return m_Plot->GetPlot();
 }
-

@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QAbstractTableModel>
 #include <QStringList>
 
-//MITK
+// MITK
 #include "MitkMatchPointRegistrationUIExports.h"
 
 // MatchPoint
-#include <mapRegistrationAlgorithmBase.h>
 #include <mapMetaPropertyAlgorithmInterface.h>
+#include <mapRegistrationAlgorithmBase.h>
 
 /*!
   \class QmitkMAPAlgorithmModel
@@ -39,38 +39,38 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMAPAlgorithmModel : public QAbstractTableModel
 {
-    Q_OBJECT
+  Q_OBJECT
 
-  public:
-    QmitkMAPAlgorithmModel(QObject *parent = NULL);
-    virtual ~QmitkMAPAlgorithmModel() {};
+public:
+  QmitkMAPAlgorithmModel(QObject *parent = NULL);
+  virtual ~QmitkMAPAlgorithmModel(){};
 
-    void SetAlgorithm(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
-    void SetAlgorithm(map::algorithm::facet::MetaPropertyAlgorithmInterface *pMetaInterface);
+  void SetAlgorithm(map::algorithm::RegistrationAlgorithmBase *pAlgorithm);
+  void SetAlgorithm(map::algorithm::facet::MetaPropertyAlgorithmInterface *pMetaInterface);
 
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-
+  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+  virtual QVariant data(const QModelIndex &index, int role) const;
+  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+  virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+  virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+  virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
 private:
-    void UpdateMetaProperties() const ;
+  void UpdateMetaProperties() const;
 
-    /** Method uses m_pMetaInterface to retrieve the MetaProperty and unwraps it into an
-     * suitable QVariant depending on the passed QT role. If the MetaProperty type is not supported, the QVariant is invalid.
-     */
-    QVariant GetPropertyValue(const map::algorithm::MetaPropertyInfo* pInfo, int role) const;
+  /** Method uses m_pMetaInterface to retrieve the MetaProperty and unwraps it into an
+   * suitable QVariant depending on the passed QT role. If the MetaProperty type is not supported, the QVariant is
+   * invalid.
+   */
+  QVariant GetPropertyValue(const map::algorithm::MetaPropertyInfo *pInfo, int role) const;
 
-    template <typename TValueType> bool CheckCastAndSetProp(const map::algorithm::MetaPropertyInfo* pInfo, const QVariant& value);
+  template <typename TValueType>
+  bool CheckCastAndSetProp(const map::algorithm::MetaPropertyInfo *pInfo, const QVariant &value);
 
-    bool SetPropertyValue(const map::algorithm::MetaPropertyInfo* pInfo, const QVariant& value);
+  bool SetPropertyValue(const map::algorithm::MetaPropertyInfo *pInfo, const QVariant &value);
 
-    map::algorithm::facet::MetaPropertyAlgorithmInterface *m_pMetaInterface;
-    mutable map::algorithm::facet::MetaPropertyAlgorithmInterface::MetaPropertyVectorType m_MetaProperties;
+  map::algorithm::facet::MetaPropertyAlgorithmInterface *m_pMetaInterface;
+  mutable map::algorithm::facet::MetaPropertyAlgorithmInterface::MetaPropertyVectorType m_MetaProperties;
 };
 
 #endif
-

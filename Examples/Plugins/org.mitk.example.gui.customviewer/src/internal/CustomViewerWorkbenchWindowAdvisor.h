@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_
 #define CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_
 
-#include <berryWorkbenchWindowAdvisor.h>
 #include <berryIWorkbenchWindowConfigurer.h>
+#include <berryWorkbenchWindowAdvisor.h>
 
 #include <QmitkFileOpenAction.h>
 
@@ -30,7 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  * i.e. a perspectives tab-bar is arranged according to the PageComposite. The PageComposite is then
  * laid out according to perspective related contents by the WindowConfigurer.
  *
- * @see{ CustomViewerWorkbenchWindowAdvisor::PreWindowOpen(), CustomViewerWorkbenchWindowAdvisor::CreateWindowContents() }
+ * @see{ CustomViewerWorkbenchWindowAdvisor::PreWindowOpen(), CustomViewerWorkbenchWindowAdvisor::CreateWindowContents()
+ * }
  */
 // //! [CustomViewerWorkbenchWindowAdvisorClassDeclaration]
 class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::WorkbenchWindowAdvisor
@@ -39,7 +40,6 @@ class CustomViewerWorkbenchWindowAdvisor : public QObject, public berry::Workben
   Q_OBJECT
 
 public:
-
   /**
    * Standard constructor.
    */
@@ -73,7 +73,6 @@ private Q_SLOTS:
   */
   void UpdateStyle();
   void OpenFile();
-
 };
 
 #endif /*CUSTOMVIEWERWORKBENCHWINDOWADVISOR_H_*/

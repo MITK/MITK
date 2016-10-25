@@ -17,31 +17,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSerializeBaseData_h_included
 #define mitkSerializeBaseData_h_included
 
-#include <MitkSceneSerializationBaseExports.h>
 #include "mitkSerializerMacros.h"
+#include <MitkSceneSerializationBaseExports.h>
 
-#include <itkObjectFactoryBase.h>
 #include "mitkBaseData.h"
+#include <itkObjectFactoryBase.h>
 
 namespace mitk
 {
+  /**
+    \brief Base class for objects that serialize BaseData types.
 
-/**
-  \brief Base class for objects that serialize BaseData types.
+    The name of sub-classes must be deduced from the class name of the object that should be serialized.
+    The serialization assumes that
 
-  The name of sub-classes must be deduced from the class name of the object that should be serialized.
-  The serialization assumes that
-
-  \verbatim
-  If the class derived from BaseData is called GreenData
-  Then the serializer for this class must be called GreenDataSerializer
-  \endverbatim
-*/
-class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
-{
+    \verbatim
+    If the class derived from BaseData is called GreenData
+    Then the serializer for this class must be called GreenDataSerializer
+    \endverbatim
+  */
+  class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
+  {
   public:
-
-    mitkClassMacroItkParent( BaseDataSerializer, itk::Object );
+    mitkClassMacroItkParent(BaseDataSerializer, itk::Object);
 
     itkSetStringMacro(FilenameHint);
     itkGetStringMacro(FilenameHint);
@@ -60,7 +58,6 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
     virtual std::string Serialize();
 
   protected:
-
     BaseDataSerializer();
     virtual ~BaseDataSerializer();
 
@@ -69,9 +66,8 @@ class MITKSCENESERIALIZATIONBASE_EXPORT BaseDataSerializer : public itk::Object
     std::string m_FilenameHint;
     std::string m_WorkingDirectory;
     BaseData::ConstPointer m_Data;
-};
+  };
 
 } // namespace
 
 #endif
-

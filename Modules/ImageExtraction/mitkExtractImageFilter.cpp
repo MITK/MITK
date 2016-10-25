@@ -15,20 +15,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkExtractImageFilter.h"
-#include "mitkImageCast.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkITKImageImport.h"
+#include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
+#include "mitkPlaneGeometry.h"
 
 #include <itkExtractImageFilter.h>
 
 #include <mitkImageAccessByItk.h>
 
 mitk::ExtractImageFilter::ExtractImageFilter()
-:m_SliceIndex(0),
- m_SliceDimension(0),
- m_TimeStep(0),
- m_DirectionCollapseToStrategy( DIRECTIONCOLLAPSETOGUESS )
+  : m_SliceIndex(0), m_SliceDimension(0), m_TimeStep(0), m_DirectionCollapseToStrategy(DIRECTIONCOLLAPSETOGUESS)
 {
   MITK_WARN << "Class ExtractImageFilter is deprecated! Use ExtractSliceFilter instead.";
 }
@@ -39,41 +36,42 @@ mitk::ExtractImageFilter::~ExtractImageFilter()
 
 void mitk::ExtractImageFilter::GenerateData()
 {
-   Image::ConstPointer input = ImageToImageFilter::GetInput(0);
+  Image::ConstPointer input = ImageToImageFilter::GetInput(0);
 
-   if ( (input->GetDimension() > 4) || (input->GetDimension() < 2) )
-   {
-     MITK_ERROR << "mitk::ExtractImageFilter:GenerateData works only with 3D and 3D+t images, sorry." << std::endl;
-     itkExceptionMacro("mitk::ExtractImageFilter works only with 3D and 3D+t images, sorry.");
-     return;
-   }
-   else if (input->GetDimension() == 4)
-   {
-     mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
-     timeSelector->SetInput( input );
-     timeSelector->SetTimeNr( m_TimeStep );
-     timeSelector->UpdateLargestPossibleRegion();
-     input = timeSelector->GetOutput();
-   }
-   else if (input->GetDimension() == 2)
-   {
-     Image::Pointer resultImage = ImageToImageFilter::GetOutput();
-     resultImage = const_cast<Image*>(input.GetPointer());
-     ImageToImageFilter::SetNthOutput( 0, resultImage );
-     return;
-   }
-
-  if ( m_SliceDimension >= input->GetDimension() )
+  if ((input->GetDimension() > 4) || (input->GetDimension() < 2))
   {
-    MITK_ERROR << "mitk::ExtractImageFilter:GenerateData  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
+    MITK_ERROR << "mitk::ExtractImageFilter:GenerateData works only with 3D and 3D+t images, sorry." << std::endl;
+    itkExceptionMacro("mitk::ExtractImageFilter works only with 3D and 3D+t images, sorry.");
+    return;
+  }
+  else if (input->GetDimension() == 4)
+  {
+    mitk::ImageTimeSelector::Pointer timeSelector = ImageTimeSelector::New();
+    timeSelector->SetInput(input);
+    timeSelector->SetTimeNr(m_TimeStep);
+    timeSelector->UpdateLargestPossibleRegion();
+    input = timeSelector->GetOutput();
+  }
+  else if (input->GetDimension() == 2)
+  {
+    Image::Pointer resultImage = ImageToImageFilter::GetOutput();
+    resultImage = const_cast<Image *>(input.GetPointer());
+    ImageToImageFilter::SetNthOutput(0, resultImage);
+    return;
+  }
+
+  if (m_SliceDimension >= input->GetDimension())
+  {
+    MITK_ERROR << "mitk::ExtractImageFilter:GenerateData  m_SliceDimension == " << m_SliceDimension
+               << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
     itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
     return;
   }
 
-   AccessFixedDimensionByItk( input, ItkImageProcessing, 3 );
+  AccessFixedDimensionByItk(input, ItkImageProcessing, 3);
 
   // set a nice geometry for display and point transformations
-  BaseGeometry* inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
+  BaseGeometry *inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
   if (!inputImageGeometry)
   {
     MITK_ERROR << "In ExtractImageFilter::ItkImageProcessing: Input image has no geometry!" << std::endl;
@@ -82,7 +80,7 @@ void mitk::ExtractImageFilter::GenerateData()
 
   PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Axial;
 
-  switch ( m_SliceDimension )
+  switch (m_SliceDimension)
   {
     default:
     case 2:
@@ -94,31 +92,31 @@ void mitk::ExtractImageFilter::GenerateData()
     case 0:
       orientation = PlaneGeometry::Sagittal;
       break;
-   }
+  }
 
   PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
-  planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex, true, false );
+  planeGeometry->InitializeStandardPlane(inputImageGeometry, orientation, (ScalarType)m_SliceIndex, true, false);
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();
   planeGeometry->ChangeImageGeometryConsideringOriginOffset(true);
-  resultImage->SetGeometry( planeGeometry );
+  resultImage->SetGeometry(planeGeometry);
 }
 
-template<typename TPixel, unsigned int VImageDimension>
-void mitk::ExtractImageFilter::ItkImageProcessing( const itk::Image<TPixel,VImageDimension>* itkImage )
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::ExtractImageFilter::ItkImageProcessing(const itk::Image<TPixel, VImageDimension> *itkImage)
 {
   // use the itk::ExtractImageFilter to get a 2D image
-  typedef itk::Image< TPixel, VImageDimension >   ImageType3D;
-  typedef itk::Image< TPixel, VImageDimension-1 > ImageType2D;
+  typedef itk::Image<TPixel, VImageDimension> ImageType3D;
+  typedef itk::Image<TPixel, VImageDimension - 1> ImageType2D;
 
   typedef itk::ExtractImageFilter<ImageType3D, ImageType2D> ExtractImageFilterType;
   typename ImageType3D::RegionType inSliceRegion = itkImage->GetLargestPossibleRegion();
 
-  inSliceRegion.SetSize( m_SliceDimension, 0 );
+  inSliceRegion.SetSize(m_SliceDimension, 0);
 
   typename ExtractImageFilterType::Pointer sliceExtractor = ExtractImageFilterType::New();
 
   typename ExtractImageFilterType::DIRECTIONCOLLAPSESTRATEGY collapseStrategy;
-  switch( m_DirectionCollapseToStrategy )
+  switch (m_DirectionCollapseToStrategy)
   {
     case DIRECTIONCOLLAPSETOUNKOWN:
       collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOUNKOWN;
@@ -135,12 +133,12 @@ void mitk::ExtractImageFilter::ItkImageProcessing( const itk::Image<TPixel,VImag
       break;
   }
 
-  sliceExtractor->SetDirectionCollapseToStrategy( collapseStrategy );
-  sliceExtractor->SetInput( itkImage );
+  sliceExtractor->SetDirectionCollapseToStrategy(collapseStrategy);
+  sliceExtractor->SetInput(itkImage);
 
-  inSliceRegion.SetIndex( m_SliceDimension, m_SliceIndex );
+  inSliceRegion.SetIndex(m_SliceDimension, m_SliceIndex);
 
-  sliceExtractor->SetExtractionRegion( inSliceRegion );
+  sliceExtractor->SetExtractionRegion(inSliceRegion);
 
   // calculate the output
   sliceExtractor->UpdateLargestPossibleRegion();
@@ -171,7 +169,7 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  ImageToImageFilter::InputImagePointer input = const_cast< ImageToImageFilter::InputImageType* > ( this->GetInput() );
+  ImageToImageFilter::InputImagePointer input = const_cast<ImageToImageFilter::InputImageType *>(this->GetInput());
   Image::Pointer output = this->GetOutput();
 
   if (input->GetDimension() == 2)
@@ -189,10 +187,10 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
   requestedRegion.SetSize(1, input->GetDimension(1));
   requestedRegion.SetSize(2, input->GetDimension(2));
 
-  requestedRegion.SetIndex( m_SliceDimension, m_SliceIndex ); // only one slice needed
-  requestedRegion.SetSize( m_SliceDimension, 1 );
+  requestedRegion.SetIndex(m_SliceDimension, m_SliceIndex); // only one slice needed
+  requestedRegion.SetSize(m_SliceDimension, 1);
 
-  input->SetRequestedRegion( &requestedRegion );
+  input->SetRequestedRegion(&requestedRegion);
 }
 
 /*
@@ -208,26 +206,28 @@ void mitk::ExtractImageFilter::GenerateInputRequestedRegion()
  */
 void mitk::ExtractImageFilter::GenerateOutputInformation()
 {
- Image::Pointer output = this->GetOutput();
- Image::ConstPointer input = this->GetInput();
- if (input.IsNull()) return;
+  Image::Pointer output = this->GetOutput();
+  Image::ConstPointer input = this->GetInput();
+  if (input.IsNull())
+    return;
 
- if ( m_SliceDimension >= input->GetDimension() && input->GetDimension() != 2 )
- {
-   MITK_ERROR << "mitk::ExtractImageFilter:GenerateOutputInformation  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
-   itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
-   return;
- }
+  if (m_SliceDimension >= input->GetDimension() && input->GetDimension() != 2)
+  {
+    MITK_ERROR << "mitk::ExtractImageFilter:GenerateOutputInformation  m_SliceDimension == " << m_SliceDimension
+               << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
+    itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
+    return;
+  }
 
- unsigned int sliceDimension( m_SliceDimension );
- if ( input->GetDimension() == 2)
- {
-   sliceDimension = 2;
- }
+  unsigned int sliceDimension(m_SliceDimension);
+  if (input->GetDimension() == 2)
+  {
+    sliceDimension = 2;
+  }
 
   unsigned int tmpDimensions[2];
 
-  switch ( sliceDimension )
+  switch (sliceDimension)
   {
     default:
     case 2:
@@ -250,16 +250,14 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
   output->Initialize(input->GetPixelType(), 2, tmpDimensions, 1 /*input->GetNumberOfChannels()*/);
 
   // initialize the spacing of the output
-/*
-  Vector3D spacing = input->GetSlicedGeometry()->GetSpacing();
-  if(input->GetDimension()>=2)
-    spacing[2]=spacing[1];
-  else
-    spacing[2] = 1.0;
-  output->GetSlicedGeometry()->SetSpacing(spacing);
-*/
+  /*
+    Vector3D spacing = input->GetSlicedGeometry()->GetSpacing();
+    if(input->GetDimension()>=2)
+      spacing[2]=spacing[1];
+    else
+      spacing[2] = 1.0;
+    output->GetSlicedGeometry()->SetSpacing(spacing);
+  */
 
   output->SetPropertyList(input->GetPropertyList()->Clone());
 }
-
-

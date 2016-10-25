@@ -14,16 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
+// MITK
 #include "mitkObjFileReaderService.h"
-#include <mitkSurface.h>
-#include <mitkIOMimeTypes.h>
 #include <mitkCustomMimeType.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkSurface.h>
 
 // VTK
 #include <vtkOBJReader.h>
 #include <vtkSmartPointer.h>
-
 
 mitk::ObjFileReaderService::ObjFileReaderService()
   : AbstractFileReader(CustomMimeType(IOMimeTypes::WAVEFRONT_OBJ_MIMETYPE()), "Wavefront OBJ Reader")
@@ -35,24 +34,24 @@ mitk::ObjFileReaderService::~ObjFileReaderService()
 {
 }
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::ObjFileReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ObjFileReaderService::Read()
 {
-  std::vector< itk::SmartPointer<BaseData> > result;
+  std::vector<itk::SmartPointer<BaseData>> result;
 
-  vtkSmartPointer <vtkOBJReader> reader = vtkSmartPointer <vtkOBJReader>::New();
-  reader->SetFileName( GetInputLocation().c_str() );
+  vtkSmartPointer<vtkOBJReader> reader = vtkSmartPointer<vtkOBJReader>::New();
+  reader->SetFileName(GetInputLocation().c_str());
   reader->Update();
 
-  if (reader->GetOutput() != NULL){
+  if (reader->GetOutput() != NULL)
+  {
     mitk::Surface::Pointer surface = mitk::Surface::New();
     surface->SetVtkPolyData(reader->GetOutput());
-    result.push_back(dynamic_cast<mitk::BaseData*> (surface.GetPointer()));
+    result.push_back(dynamic_cast<mitk::BaseData *>(surface.GetPointer()));
   }
   return result;
 }
 
-
-mitk::ObjFileReaderService* mitk::ObjFileReaderService::Clone() const
+mitk::ObjFileReaderService *mitk::ObjFileReaderService::Clone() const
 {
   return new ObjFileReaderService(*this);
 }

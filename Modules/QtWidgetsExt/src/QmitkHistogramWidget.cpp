@@ -20,30 +20,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImageStatisticsHolder.h"
 
-#include <QVBoxLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QTextEdit>
+#include <QVBoxLayout>
 
+#include <qwt_picker_machine.h>
 #include <qwt_plot.h>
 #include <qwt_plot_grid.h>
 #include <qwt_plot_marker.h>
 #include <qwt_plot_picker.h>
 #include <qwt_plot_zoomer.h>
-#include <qwt_picker_machine.h>
 #include <qwt_series_data.h>
-#include <qwt_text_label.h>
-#include <qwt_text.h>
 #include <qwt_symbol.h>
+#include <qwt_text.h>
+#include <qwt_text_label.h>
 
-QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
-  : QDialog(parent)
-  , m_Plot(nullptr)
-  , m_Textedit(nullptr)
-  , m_Marker(nullptr)
-  , m_Picker(nullptr)
-  , m_Zoomer(nullptr)
-  , m_Histogram(nullptr)
+QmitkHistogramWidget::QmitkHistogramWidget(QWidget *parent, bool showreport)
+  : QDialog(parent),
+    m_Plot(nullptr),
+    m_Textedit(nullptr),
+    m_Marker(nullptr),
+    m_Picker(nullptr),
+    m_Zoomer(nullptr),
+    m_Histogram(nullptr)
 {
   QBoxLayout *layout = new QVBoxLayout(this);
 
@@ -63,7 +63,7 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
   grid->enableXMin(true);
   grid->enableYMin(true);
   grid->setMajorPen(QPen(Qt::black, 0, Qt::DotLine));
-  grid->setMinorPen(QPen(Qt::gray, 0 , Qt::DotLine));
+  grid->setMinorPen(QPen(Qt::gray, 0, Qt::DotLine));
   grid->attach(m_Plot);
 
   layout->addWidget(hgroupbox);
@@ -88,14 +88,12 @@ QmitkHistogramWidget::QmitkHistogramWidget(QWidget * parent, bool showreport)
     layout->addWidget(rgroupbox);
   }
 
-  m_Picker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                               QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
-                               m_Plot->canvas());
+  m_Picker = new QwtPlotPicker(
+    QwtPlot::xBottom, QwtPlot::yLeft, QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn, m_Plot->canvas());
   // the m_PickerMachine pointer is managed by the m_Picker instance
   m_Picker->setStateMachine(new QwtPickerClickPointMachine());
 
-  connect(m_Picker, SIGNAL(selected(const QwtDoublePoint &)),
-    SLOT(OnSelect(const QwtDoublePoint &)));
+  connect(m_Picker, SIGNAL(selected(const QwtDoublePoint &)), SLOT(OnSelect(const QwtDoublePoint &)));
 }
 
 QmitkHistogramWidget::~QmitkHistogramWidget()
@@ -112,12 +110,13 @@ void QmitkHistogramWidget::SetHistogram(HistogramType::ConstPointer itkHistogram
 
   for (unsigned int i = 0; i < size[0]; ++i)
   {
-    index[0] = static_cast<HistogramType::IndexValueType> (i);
+    index[0] = static_cast<HistogramType::IndexValueType>(i);
     currentMeasurementVector = itkHistogram->GetMeasurementVector(index);
     if (currentMeasurementVector[0] != 0.0)
     {
-      intervalSeries[i] = QwtIntervalSample(static_cast<double> (itkHistogram->GetFrequency(index)),
-                                            Round(currentMeasurementVector[0]-1), Round(currentMeasurementVector[0]));
+      intervalSeries[i] = QwtIntervalSample(static_cast<double>(itkHistogram->GetFrequency(index)),
+                                            Round(currentMeasurementVector[0] - 1),
+                                            Round(currentMeasurementVector[0]));
     }
   }
 
@@ -135,7 +134,7 @@ void QmitkHistogramWidget::SetHistogram(HistogramType::ConstPointer itkHistogram
   m_Plot->replot();
 }
 
-void QmitkHistogramWidget::SetHistogram( mitk::Image* mitkImage )
+void QmitkHistogramWidget::SetHistogram(mitk::Image *mitkImage)
 {
   this->SetHistogram(mitkImage->GetStatistics()->GetScalarHistogram());
 }
@@ -151,12 +150,10 @@ void QmitkHistogramWidget::InitializeMarker()
   m_Marker->setXValue(0.);
   m_Marker->setLineStyle(QwtPlotMarker::VLine);
   m_Marker->setLabelAlignment(Qt::AlignHCenter | Qt::AlignRight);
-  m_Marker->setLinePen(QPen(QColor(200,150,0), 3, Qt::SolidLine));
-  m_Marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond,
-                                    QColor(Qt::red), QColor(Qt::red), QSize(10,10)));
+  m_Marker->setLinePen(QPen(QColor(200, 150, 0), 3, Qt::SolidLine));
+  m_Marker->setSymbol(new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::red), QColor(Qt::red), QSize(10, 10)));
   m_Marker->attach(m_Plot);
 }
-
 
 void QmitkHistogramWidget::InitializeZoomer()
 {
@@ -165,13 +162,12 @@ void QmitkHistogramWidget::InitializeZoomer()
   m_Zoomer->setTrackerPen(QPen(Qt::red));
 }
 
-void QmitkHistogramWidget::OnSelect( const QPointF& pos )
+void QmitkHistogramWidget::OnSelect(const QPointF &pos)
 {
-  m_Marker->setXValue( this->Round(pos.x()) );
-  QString str = QString( "%1" )
-    .arg( (int)(this->Round(pos.x())), 0, 10 );
+  m_Marker->setXValue(this->Round(pos.x()));
+  QString str = QString("%1").arg((int)(this->Round(pos.x())), 0, 10);
   QwtText text(str);
-  text.setBackgroundBrush(QColor(200,150,0));
+  text.setBackgroundBrush(QColor(200, 150, 0));
   text.setFont(QFont("Helvetica", 14, QFont::Bold));
   m_Marker->setLabel(text);
   m_Plot->replot();
@@ -185,9 +181,8 @@ double QmitkHistogramWidget::GetMarkerPosition()
 double QmitkHistogramWidget::Round(double val)
 {
   double ival = (double)(int)val;
-  if( (val - ival) > 0.5)
-    return ival+1;
+  if ((val - ival) > 0.5)
+    return ival + 1;
   else
     return ival;
 }
-

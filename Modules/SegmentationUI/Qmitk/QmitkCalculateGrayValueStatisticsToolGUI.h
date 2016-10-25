@@ -26,7 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::CalculateGrayValueStatisticsTool.
 
-  Shows nothing. Only when the corresponding tool send a message that statistics are ready, this class pops up a window showing the results.
+  Shows nothing. Only when the corresponding tool send a message that statistics are ready, this class pops up a window
+  showing the results.
 
   Last contributor: $Author$
 */
@@ -34,31 +35,27 @@ class MITKSEGMENTATIONUI_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : publi
 {
   Q_OBJECT
 
-  public:
-
-    mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+public:
+  mitkClassMacro(QmitkCalculateGrayValueStatisticsToolGUI, QmitkToolGUI);
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
     /// Reacts to signals from mitk::CalculateGrayValueStatisticsTool
     void OnCalculationsDone();
 
-  signals:
+signals:
 
-  public slots:
+public slots:
 
-  protected slots:
+protected slots:
 
-    /// Connected to signal from QmitkToolGUI. We remember the current tool here
-    void OnNewToolAssociated(mitk::Tool*);
+  /// Connected to signal from QmitkToolGUI. We remember the current tool here
+  void OnNewToolAssociated(mitk::Tool *);
 
-  protected:
+protected:
+  QmitkCalculateGrayValueStatisticsToolGUI();
+  virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
 
-    QmitkCalculateGrayValueStatisticsToolGUI();
-    virtual ~QmitkCalculateGrayValueStatisticsToolGUI();
-
-    mitk::CalculateGrayValueStatisticsTool::Pointer m_CalculateGrayValueStatisticsTool;
+  mitk::CalculateGrayValueStatisticsTool::Pointer m_CalculateGrayValueStatisticsTool;
 };
 
 #endif
-

@@ -14,13 +14,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef SELECTIONVIEW_H_
 #define SELECTIONVIEW_H_
 
 // berry includes
-#include <berryQtViewPart.h>
 #include <berryQtSelectionProvider.h>
+#include <berryQtViewPart.h>
 
 // ui includes
 #include "ui_SelectionViewControls.h"
@@ -38,7 +37,6 @@ class SelectionView : public berry::QtViewPart
   Q_OBJECT
 
 public:
-
   static const std::string VIEW_ID;
 
   //! [Qt Selection Provider]
@@ -49,17 +47,14 @@ public:
   SelectionView();
 
 protected:
-
   void CreateQtPartControl(QWidget *parent) override;
 
   void SetFocus() override;
 
 private:
-
   Ui::SelectionViewControls m_Controls;
 
-  QWidget* m_Parent;
-
+  QWidget *m_Parent;
 };
 
 #endif /*SELECTIONVIEW_H_*/

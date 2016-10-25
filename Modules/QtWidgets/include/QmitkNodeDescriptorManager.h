@@ -34,7 +34,7 @@ public:
   ///
   /// \return the solely instance of QmitkNodeDescriptorManager
   ///
-  static QmitkNodeDescriptorManager* GetInstance();
+  static QmitkNodeDescriptorManager *GetInstance();
 
   ///
   /// Initializes the QmitkNodeDescriptorManager.
@@ -50,12 +50,12 @@ public:
   ///
   /// Adds a new descriptor to the manager. The manager takes the ownership.
   ///
-  void AddDescriptor(QmitkNodeDescriptor* _Descriptor);
+  void AddDescriptor(QmitkNodeDescriptor *_Descriptor);
 
   ///
   /// Removes and deletes a descriptor from the manager
   ///
-  void RemoveDescriptor(QmitkNodeDescriptor* _Descriptor);
+  void RemoveDescriptor(QmitkNodeDescriptor *_Descriptor);
 
   ///
   /// Get the last descriptor in the descriptors list that matches the given node.
@@ -65,19 +65,19 @@ public:
   /// \return a QmitkNodeDescriptor for the given node or a QmitkNodeDescriptor describing unknown nodes (never 0)
   /// \sa AddDescriptor()
   ///
-  QmitkNodeDescriptor* GetDescriptor(const mitk::DataNode* _Node) const;
+  QmitkNodeDescriptor *GetDescriptor(const mitk::DataNode *_Node) const;
 
   ///
   /// Get the last QmitkNodeDescriptor for the given class name
   ///
   /// \return a QmitkNodeDescriptor for the given class name or 0 if there is no QmitkNodeDescriptor for _ClassName
   ///
-  QmitkNodeDescriptor* GetDescriptor(const QString& _ClassName) const;
+  QmitkNodeDescriptor *GetDescriptor(const QString &_ClassName) const;
 
   ///
   /// \return The UnknownDataNodeDescriptor, which is the default Descriptor for all Nodes.
   ///
-  QmitkNodeDescriptor* GetUnknownDataNodeDescriptor() const;
+  QmitkNodeDescriptor *GetUnknownDataNodeDescriptor() const;
 
   ///
   /// Returns a list of all actions that are associated with the given node.
@@ -86,31 +86,32 @@ public:
   /// E.g. all actions from the "unknown" DataNodes will be added to
   /// this list. Generic Actions like Save, Load, etc. are stored there.
   ///
-  QList<QAction*> GetActions(const mitk::DataNode* _Node) const;
+  QList<QAction *> GetActions(const mitk::DataNode *_Node) const;
   ///
   /// \return a list of actions associated with the given nodes
   ///
-  QList<QAction*> GetActions( const QList<mitk::DataNode::Pointer>& _Nodes ) const;
+  QList<QAction *> GetActions(const QList<mitk::DataNode::Pointer> &_Nodes) const;
   ///
   /// Deletes all Descriptors in the list
   ///
   virtual ~QmitkNodeDescriptorManager();
+
 protected:
   ///
   /// Creates the m_UnknownDataNodeDescriptor
   /// Calls Initialize
   ///
   QmitkNodeDescriptorManager();
+
 protected:
   ///
   /// This is the standard QmitkNodeDescriptor matching every node
   ///
-  QmitkNodeDescriptor* m_UnknownDataNodeDescriptor;
+  QmitkNodeDescriptor *m_UnknownDataNodeDescriptor;
   ///
   /// Holds all user defined descriptors
   ///
-  QList<QmitkNodeDescriptor*> m_NodeDescriptors;
-
+  QList<QmitkNodeDescriptor *> m_NodeDescriptors;
 };
 
 #endif // QmitkNodeDescriptorManager_h

@@ -31,16 +31,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 
 #include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 //##Documentation
 //## @brief Start region-grower at interactively added points
-Step6::Step6(int argc, char* argv[], QWidget *parent)
-: QWidget(parent)
+Step6::Step6(int argc, char *argv[], QWidget *parent) : QWidget(parent)
 {
   // load data as in the previous steps; a reference to the first loaded
   // image is kept in the member m_FirstImage and used as input for the
@@ -58,7 +57,7 @@ void Step6::Initialize()
   QWidget *controlsParent = new QWidget(this);
   this->layout()->addWidget(controlsParent);
 
-  QHBoxLayout* hlayout = new QHBoxLayout(controlsParent);
+  QHBoxLayout *hlayout = new QHBoxLayout(controlsParent);
   hlayout->setSpacing(2);
 
   QLabel *labelThresholdMin = new QLabel("Lower Threshold:", controlsParent);
@@ -75,8 +74,7 @@ void Step6::Initialize()
 
   // create button to start the segmentation and connect its clicked()
   // signal to method StartRegionGrowing
-  QPushButton* startButton = new QPushButton("start region growing",
-      controlsParent);
+  QPushButton *startButton = new QPushButton("start region growing", controlsParent);
   hlayout->addWidget(startButton);
 
   connect(startButton, SIGNAL(clicked()), this, SLOT(StartRegionGrowing()));
@@ -116,7 +114,7 @@ void Step6::StartRegionGrowing()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void Step6::Load(int argc, char* argv[])
+void Step6::Load(int argc, char *argv[])
 {
   //*************************************************************************
   // Part I: Basic initialization
@@ -135,15 +133,15 @@ void Step6::Load(int argc, char* argv[])
       continue;
 
     // Load datanode (eg. many image formats, surface formats, etc.)
-    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i],*m_DataStorage);
+    mitk::StandaloneDataStorage::SetOfObjects::Pointer dataNodes = mitk::IOUtil::Load(argv[i], *m_DataStorage);
 
-    if(dataNodes->empty())
+    if (dataNodes->empty())
     {
-      fprintf( stderr, "Could not open file %s \n\n", argv[i] );
+      fprintf(stderr, "Could not open file %s \n\n", argv[i]);
       exit(2);
     }
 
-    mitk::Image::Pointer image =  dynamic_cast<mitk::Image*> (dataNodes->at(0)->GetData());
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(dataNodes->at(0)->GetData());
     if ((m_FirstImage.IsNull()) && (image.IsNotNull()))
       m_FirstImage = image;
   }
@@ -156,15 +154,15 @@ void Step6::SetupWidgets()
   //*************************************************************************
 
   // Create toplevel widget with vertical layout
-  QVBoxLayout* vlayout = new QVBoxLayout(this);
+  QVBoxLayout *vlayout = new QVBoxLayout(this);
   vlayout->setMargin(0);
   vlayout->setSpacing(2);
 
   // Create viewParent widget with horizontal layout
-  QWidget* viewParent = new QWidget(this);
+  QWidget *viewParent = new QWidget(this);
   vlayout->addWidget(viewParent);
 
-  QHBoxLayout* hlayout = new QHBoxLayout(viewParent);
+  QHBoxLayout *hlayout = new QHBoxLayout(viewParent);
   hlayout->setMargin(0);
   hlayout->setSpacing(2);
 
@@ -173,7 +171,7 @@ void Step6::SetupWidgets()
   //*************************************************************************
 
   // Create a renderwindow
-  QmitkRenderWindow* renderWindow = new QmitkRenderWindow(viewParent);
+  QmitkRenderWindow *renderWindow = new QmitkRenderWindow(viewParent);
   hlayout->addWidget(renderWindow);
 
   // Tell the renderwindow which (part of) the tree to render

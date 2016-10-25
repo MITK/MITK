@@ -27,9 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 struct ClustersQuadrics
 {
-  explicit ClustersQuadrics(int size)
-    : Elements(new double*[size]),
-      Size(size)
+  explicit ClustersQuadrics(int size) : Elements(new double *[size]), Size(size)
   {
     for (int i = 0; i < size; ++i)
     {
@@ -48,12 +46,12 @@ struct ClustersQuadrics
     delete Elements;
   }
 
-  double** Elements;
+  double **Elements;
   int Size;
 
 private:
-  ClustersQuadrics(const ClustersQuadrics&);
-  ClustersQuadrics& operator=(const ClustersQuadrics&);
+  ClustersQuadrics(const ClustersQuadrics &);
+  ClustersQuadrics &operator=(const ClustersQuadrics &);
 };
 
 static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
@@ -64,7 +62,7 @@ static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
   if (t >= surface->GetSizeOfPolyDataSeries())
     mitkThrow() << "Input surface doesn't have data at time step " << t << "!";
 
-  vtkPolyData* polyData = const_cast<mitk::Surface*>(surface.GetPointer())->GetVtkPolyData(t);
+  vtkPolyData *polyData = const_cast<mitk::Surface *>(surface.GetPointer())->GetVtkPolyData(t);
 
   if (polyData == nullptr)
     mitkThrow() << "PolyData of input surface at time step " << t << " is NULL!";
@@ -73,14 +71,22 @@ static void ValidateSurface(mitk::Surface::ConstPointer surface, unsigned int t)
     mitkThrow() << "Input surface has no polygons at time step " << t << "!";
 }
 
-mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::ConstPointer surface, unsigned int t, int numVertices, double gradation, int subsampling, double edgeSplitting, int optimizationLevel, bool forceManifold, bool boundaryFixing)
+mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::ConstPointer surface,
+                                          unsigned int t,
+                                          int numVertices,
+                                          double gradation,
+                                          int subsampling,
+                                          double edgeSplitting,
+                                          int optimizationLevel,
+                                          bool forceManifold,
+                                          bool boundaryFixing)
 {
   ValidateSurface(surface, t);
 
   MITK_INFO << "Start remeshing...";
 
   vtkSmartPointer<vtkPolyData> surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
-  surfacePolyData->DeepCopy(const_cast<Surface*>(surface.GetPointer())->GetVtkPolyData(t));
+  surfacePolyData->DeepCopy(const_cast<Surface *>(surface.GetPointer())->GetVtkPolyData(t));
 
   vtkSmartPointer<vtkSurface> mesh = vtkSmartPointer<vtkSurface>::New();
 
@@ -133,7 +139,8 @@ mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::ConstPointer surface, u
           int numIds = static_cast<int>(faceList->GetNumberOfIds());
 
           for (int j = 0; j < numIds; ++j)
-            vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster], remesherInput, faceList->GetId(j), false);
+            vtkQuadricTools::AddTriangleQuadric(
+              clustersQuadrics.Elements[cluster], remesherInput, faceList->GetId(j), false);
         }
         else
         {
@@ -185,14 +192,14 @@ mitk::Surface::Pointer mitk::ACVD::Remesh(mitk::Surface::ConstPointer surface, u
 }
 
 mitk::ACVD::RemeshFilter::RemeshFilter()
-: m_TimeStep(0),
-  m_NumVertices(0),
-  m_Gradation(1.0),
-  m_Subsampling(10),
-  m_EdgeSplitting(0.0),
-  m_OptimizationLevel(1),
-  m_ForceManifold(false),
-  m_BoundaryFixing(false)
+  : m_TimeStep(0),
+    m_NumVertices(0),
+    m_Gradation(1.0),
+    m_Subsampling(10),
+    m_EdgeSplitting(0.0),
+    m_OptimizationLevel(1),
+    m_ForceManifold(false),
+    m_BoundaryFixing(false)
 {
   Surface::Pointer output = Surface::New();
   this->SetNthOutput(0, output);
@@ -204,6 +211,14 @@ mitk::ACVD::RemeshFilter::~RemeshFilter()
 
 void mitk::ACVD::RemeshFilter::GenerateData()
 {
-  Surface::Pointer output = Remesh(this->GetInput(), m_TimeStep, m_NumVertices, m_Gradation, m_Subsampling, m_EdgeSplitting, m_OptimizationLevel, m_ForceManifold, m_BoundaryFixing);
+  Surface::Pointer output = Remesh(this->GetInput(),
+                                   m_TimeStep,
+                                   m_NumVertices,
+                                   m_Gradation,
+                                   m_Subsampling,
+                                   m_EdgeSplitting,
+                                   m_OptimizationLevel,
+                                   m_ForceManifold,
+                                   m_BoundaryFixing);
   this->SetNthOutput(0, output);
 }

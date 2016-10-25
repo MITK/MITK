@@ -17,10 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkDemonsRegistrationViewWidgetHIncluded
 #define QmitkDemonsRegistrationViewWidgetHIncluded
 
+#include "MitkDeformableRegistrationUIExports.h"
 #include "mitkDataNode.h"
 #include "ui_QmitkDemonsRegistrationViewControls.h"
-#include "MitkDeformableRegistrationUIExports.h"
-
 
 /*!
 * \brief Widget for deformable demons registration
@@ -32,21 +31,21 @@ class MITKDEFORMABLEREGISTRATIONUI_EXPORT QmitkDemonsRegistrationView : public Q
   Q_OBJECT
 
 public:
-
-  QmitkDemonsRegistrationView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkDemonsRegistrationView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkDemonsRegistrationView();
 
   int GetNumberOfIterations();
   float GetStandardDeviation();
 
-  void SetFixedNode( mitk::DataNode * fixedNode );
-  void SetMovingNode( mitk::DataNode * movingNode );
-  void UseHistogramMatching( bool useHM );
+  void SetFixedNode(mitk::DataNode *fixedNode);
+  void SetMovingNode(mitk::DataNode *movingNode);
+  void UseHistogramMatching(bool useHM);
   mitk::Image::Pointer GetResultImage();
   mitk::Image::Pointer GetResultDeformationfield();
 
 public slots:
   void CalculateTransformation();
+
 protected:
   Ui::QmitkDemonsRegistrationViewControls m_Controls;
   mitk::DataNode::Pointer m_FixedNode;

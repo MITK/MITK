@@ -28,9 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDicomExternalDataWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomExternalDataWidget";
 
 QmitkDicomExternalDataWidget::QmitkDicomExternalDataWidget(QWidget *parent)
-  : QWidget(parent)
-  , m_Controls(nullptr)
-  , m_ProgressDialog(nullptr)
+  : QWidget(parent), m_Controls(nullptr), m_ProgressDialog(nullptr)
 {
   Initialize();
   CreateQtPartControl(this);
@@ -40,7 +38,7 @@ QmitkDicomExternalDataWidget::~QmitkDicomExternalDataWidget()
 {
 }
 
-void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
+void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
 {
   // build up qt Widget, unless already done
   if (!m_Controls)
@@ -60,14 +58,19 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl( QWidget *parent )
     connect(m_Controls->viewExternalDataButton, SIGNAL(clicked()), this, SLOT(OnViewButtonClicked()));
     connect(m_Controls->directoryButton, SIGNAL(clicked()), m_ImportDialog, SLOT(show()));
 
-    connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesSelectionChanged(const QStringList&)),
-      this, SLOT(OnSeriesSelectionChanged(const QStringList&)));
-    connect(m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex&)),
-      this, SLOT(OnViewButtonClicked()));
+    connect(m_Controls->ctkDICOMBrowser,
+            SIGNAL(seriesSelectionChanged(const QStringList &)),
+            this,
+            SLOT(OnSeriesSelectionChanged(const QStringList &)));
+    connect(
+      m_Controls->ctkDICOMBrowser, SIGNAL(seriesDoubleClicked(const QModelIndex &)), this, SLOT(OnViewButtonClicked()));
 
     connect(m_ImportDialog, SIGNAL(fileSelected(QString)), this, SLOT(OnStartDicomImport(QString)));
 
-    connect(m_ExternalIndexer, SIGNAL(indexingFilePath(const QString&)), m_ProgressDialog, SLOT(setLabelText(const QString&)));
+    connect(m_ExternalIndexer,
+            SIGNAL(indexingFilePath(const QString &)),
+            m_ProgressDialog,
+            SLOT(setLabelText(const QString &)));
     connect(m_ExternalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
     // actually the progress dialog closes if the maximum value is reached, BUT
     // the following line is needed since the external indexer wont reach maximum value (100 % progress)
@@ -80,10 +83,12 @@ void QmitkDicomExternalDataWidget::Initialize()
 {
   m_ExternalDatabase = new ctkDICOMDatabase(this);
 
-  try{
+  try
+  {
     m_ExternalDatabase->openDatabase(QString(":memory:"), QString("EXTERNAL-DB"));
   }
-  catch (std::exception e){
+  catch (std::exception e)
+  {
     MITK_ERROR << "Database error: " << m_ExternalDatabase->lastError().toStdString();
     m_ExternalDatabase->closeDatabase();
     return;
@@ -109,7 +114,7 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
 {
   QStringList uids = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
   QString uid;
-  foreach(uid, uids)
+  foreach (uid, uids)
   {
     QStringList filesForSeries = m_ExternalDatabase->filesForSeries(uid);
     QHash<QString, QVariant> eventProperty;
@@ -129,20 +134,19 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
 
   QString uid;
   QStringList seriesUIDs = m_Controls->ctkDICOMBrowser->currentSeriesSelection();
-  foreach(uid, seriesUIDs)
+  foreach (uid, seriesUIDs)
   {
     filePaths.append(m_ExternalDatabase->filesForSeries(uid));
-
   }
   if (!filePaths.empty())
     return filePaths;
 
   QStringList studyUIDs = m_Controls->ctkDICOMBrowser->currentStudiesSelection();
 
-  foreach(uid, studyUIDs)
+  foreach (uid, studyUIDs)
   {
     seriesUIDs = m_ExternalDatabase->seriesForStudy(uid);
-    foreach(uid, seriesUIDs)
+    foreach (uid, seriesUIDs)
     {
       filePaths.append(m_ExternalDatabase->filesForSeries(uid));
     }
@@ -152,14 +156,14 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
 
   QStringList patientsUIDs = m_Controls->ctkDICOMBrowser->currentPatientsSelection();
 
-  foreach(uid, patientsUIDs)
+  foreach (uid, patientsUIDs)
   {
     studyUIDs = m_ExternalDatabase->studiesForPatient(uid);
 
-    foreach(uid, studyUIDs)
+    foreach (uid, studyUIDs)
     {
       seriesUIDs = m_ExternalDatabase->seriesForStudy(uid);
-      foreach(uid, seriesUIDs)
+      foreach (uid, seriesUIDs)
       {
         filePaths.append(m_ExternalDatabase->filesForSeries(uid));
       }
@@ -168,24 +172,24 @@ QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
   return filePaths;
 }
 
-void QmitkDicomExternalDataWidget::OnStartDicomImport(const QString& directory)
+void QmitkDicomExternalDataWidget::OnStartDicomImport(const QString &directory)
 {
   m_ImportDialog->close();
-  // no need to show / start the progress dialog, as the dialog 
+  // no need to show / start the progress dialog, as the dialog
   // appears by receiving the progress signal from the external indexer
 
   m_LastImportDirectory = directory;
   m_ExternalIndexer->addDirectory(*m_ExternalDatabase, m_LastImportDirectory);
 }
 
-void QmitkDicomExternalDataWidget::OnSeriesSelectionChanged(const QStringList& s)
+void QmitkDicomExternalDataWidget::OnSeriesSelectionChanged(const QStringList &s)
 {
   m_Controls->viewExternalDataButton->setEnabled((s.size() != 0));
 }
 
 void QmitkDicomExternalDataWidget::SetupImportDialog()
 {
-  //Initialize import widget
+  // Initialize import widget
   m_ImportDialog = new ctkFileDialog(this);
   // Since copy on import is not working at the moment
   // this feature is disabled

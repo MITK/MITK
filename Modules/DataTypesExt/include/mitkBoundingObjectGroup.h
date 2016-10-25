@@ -16,12 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED
 #define BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED
 
-#include <mitkBoundingObject.h>
 #include "MitkDataTypesExtExports.h"
 #include <deque>
+#include <mitkBoundingObject.h>
 
-namespace mitk {
-
+namespace mitk
+{
   //##Documentation
   //## @brief group object, that contains several mitk::BoundingObjects
   //##
@@ -30,7 +30,6 @@ namespace mitk {
   class MITKDATATYPESEXT_EXPORT BoundingObjectGroup : public mitk::BoundingObject
   {
   public:
-
     enum CSGMode
     {
       Union,
@@ -38,12 +37,12 @@ namespace mitk {
       Difference
     };
 
-    mitkClassMacro(BoundingObjectGroup, mitk::BoundingObject);// itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer>);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(BoundingObjectGroup,
+                   mitk::BoundingObject); // itk::VectorContainer<unsigned int ,mitk::BoundingObject::Pointer>);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    virtual void UpdateOutputInformation() override;
-    virtual bool IsInside(const mitk::Point3D& p) const override;
+      virtual void UpdateOutputInformation() override;
+    virtual bool IsInside(const mitk::Point3D &p) const override;
 
     void SetBoundingObjects(const std::deque<mitk::BoundingObject::Pointer> boundingObjects);
     std::deque<mitk::BoundingObject::Pointer> GetBoundingObjects();
@@ -54,7 +53,7 @@ namespace mitk {
     void AddBoundingObject(mitk::BoundingObject::Pointer boundingObject);
     void RemoveBoundingObject(mitk::BoundingObject::Pointer boundingObject);
     unsigned int GetCount() const;
-    mitk::BaseGeometry *  GetGeometry (int t=0) const;
+    mitk::BaseGeometry *GetGeometry(int t = 0) const;
 
     virtual bool VerifyRequestedRegion() override;
 
@@ -66,6 +65,5 @@ namespace mitk {
     unsigned int m_Counter;
     CSGMode m_CSGMode;
   };
-
 }
 #endif /* BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED */

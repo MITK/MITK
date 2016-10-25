@@ -15,12 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkNormalizedMutualInformationHistogramMetricView.h"
-#include <itkNormalizedMutualInformationHistogramImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkNormalizedMutualInformationHistogramImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkNormalizedMutualInformationHistogramMetricView::QmitkNormalizedMutualInformationHistogramMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkNormalizedMutualInformationHistogramMetricView::QmitkNormalizedMutualInformationHistogramMetricView(
+  QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -43,14 +45,18 @@ itk::Object::Pointer QmitkNormalizedMutualInformationHistogramMetricView::GetMet
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkNormalizedMutualInformationHistogramMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkNormalizedMutualInformationHistogramMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer
+    MetricPointer = itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
   unsigned int nBins = m_Controls.m_NumberOfHistogramBinsNormalizedMutualInformationHistogram->text().toInt();
-  typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
+  typename itk::NormalizedMutualInformationHistogramImageToImageMetric<FixedImageType,
+                                                                       MovingImageType>::HistogramType::SizeType
+    histogramSize;
   histogramSize[0] = nBins;
   histogramSize[1] = nBins;
   MetricPointer->SetHistogramSize(histogramSize);
@@ -80,10 +86,10 @@ QString QmitkNormalizedMutualInformationHistogramMetricView::GetName()
   return "NormalizedMutualInformationHistogram";
 }
 
-void QmitkNormalizedMutualInformationHistogramMetricView::SetupUI(QWidget* parent)
+void QmitkNormalizedMutualInformationHistogramMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsNormalizedMutualInformationHistogram->setValidator(validatorLineEditInput);
 }
 

@@ -19,46 +19,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 // MITK
 #include <mitkAbstractFileReader.h>
 #include <mitkBaseData.h>
-#include <mitkMimeType.h>
 #include <mitkContourModel.h>
+#include <mitkMimeType.h>
 
-
-#include <string>
 #include <stack>
-#include <vtkXMLParser.h>
+#include <string>
 #include <tinyxml.h>
+#include <vtkXMLParser.h>
 
 namespace mitk
 {
-/**
- * @brief
- * @ingroup MitkContourModelModule
-*/
-class ContourModelReader : public mitk::AbstractFileReader
-{
-public:
-  ContourModelReader(const ContourModelReader& other);
+  /**
+   * @brief
+   * @ingroup MitkContourModelModule
+  */
+  class ContourModelReader : public mitk::AbstractFileReader
+  {
+  public:
+    ContourModelReader(const ContourModelReader &other);
 
-  ContourModelReader();
+    ContourModelReader();
 
-  virtual ~ContourModelReader();
+    virtual ~ContourModelReader();
 
-  using AbstractFileReader::Read;
-  virtual std::vector<itk::SmartPointer<BaseData> > Read() override;
+    using AbstractFileReader::Read;
+    virtual std::vector<itk::SmartPointer<BaseData>> Read() override;
 
-protected:
+  protected:
+    virtual void ReadPoints(mitk::ContourModel::Pointer newContourModel,
+                            TiXmlElement *currentTimeSeries,
+                            unsigned int currentTimeStep);
 
-  virtual void ReadPoints(mitk::ContourModel::Pointer newContourModel,
-    TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
+  private:
+    ContourModelReader *Clone() const override;
 
-private:
-
-  ContourModelReader* Clone() const override;
-
-  us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
-};
-
+    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+  };
 }
-
 
 #endif

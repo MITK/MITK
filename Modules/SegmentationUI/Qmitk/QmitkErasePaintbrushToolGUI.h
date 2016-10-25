@@ -33,23 +33,20 @@ class MITKSEGMENTATIONUI_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintb
 {
   Q_OBJECT
 
-  public:
+public:
+  mitkClassMacro(QmitkErasePaintbrushToolGUI, QmitkPaintbrushToolGUI);
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro(QmitkErasePaintbrushToolGUI, QmitkPaintbrushToolGUI);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    signals :
 
-  signals:
+    public slots :
 
-  public slots:
+    protected slots :
 
-  protected slots:
-
-  protected:
+    protected :
 
     QmitkErasePaintbrushToolGUI();
-    virtual ~QmitkErasePaintbrushToolGUI();
+  virtual ~QmitkErasePaintbrushToolGUI();
 };
 
 #endif
-

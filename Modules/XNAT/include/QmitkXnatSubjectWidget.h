@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKXNATSUBJECTWIDGET_H
 #define QMITKXNATSUBJECTWIDGET_H
 
-#include <ui_QmitkXnatSubjectWidgetControls.h>
 #include <MitkXNATExports.h>
+#include <ui_QmitkXnatSubjectWidgetControls.h>
 
 // Qt
 #include <QWidget>
@@ -31,19 +31,18 @@ class MITKXNAT_EXPORT QmitkXnatSubjectWidget : public QWidget
   Q_OBJECT
 
 public:
-
   enum Mode
   {
     INFO,
     CREATE
   };
 
-  QmitkXnatSubjectWidget(QWidget* parent = nullptr);
-  QmitkXnatSubjectWidget(Mode mode, QWidget* parent = nullptr);
+  QmitkXnatSubjectWidget(QWidget *parent = nullptr);
+  QmitkXnatSubjectWidget(Mode mode, QWidget *parent = nullptr);
   ~QmitkXnatSubjectWidget();
 
-  void SetSubject(ctkXnatSubject* subject);
-  ctkXnatSubject* GetSubject() const;
+  void SetSubject(ctkXnatSubject *subject);
+  ctkXnatSubject *GetSubject() const;
 
 protected:
   Ui::QmitkXnatSubjectWidgetControls m_Controls;
@@ -51,7 +50,7 @@ protected:
 private:
   void Init();
   Mode m_Mode;
-  ctkXnatSubject* m_Subject;
+  ctkXnatSubject *m_Subject;
 };
 
 #endif // QMITKXNATSUBJECTWIDGET_H

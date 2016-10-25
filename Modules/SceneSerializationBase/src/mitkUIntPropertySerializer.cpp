@@ -23,32 +23,31 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class UIntPropertySerializer : public BasePropertySerializer
-{
+  class UIntPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(UIntPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( UIntPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const UIntProperty* prop = dynamic_cast<const UIntProperty*>(m_Property.GetPointer()))
+      if (const UIntProperty *prop = dynamic_cast<const UIntProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("unsigned");
+        auto element = new TiXmlElement("unsigned");
         element->SetAttribute("value", static_cast<unsigned int>(prop->GetValue()));
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
+      if (!element)
+        return nullptr;
 
       unsigned int integer;
-      if ( element->QueryUnsignedAttribute( "value", &integer ) == TIXML_SUCCESS )
+      if (element->QueryUnsignedAttribute("value", &integer) == TIXML_SUCCESS)
       {
         return UIntProperty::New(integer).GetPointer();
       }
@@ -59,10 +58,9 @@ class UIntPropertySerializer : public BasePropertySerializer
     }
 
   protected:
-
     UIntPropertySerializer() {}
     virtual ~UIntPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -70,4 +68,3 @@ class UIntPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(UIntPropertySerializer);
 
 #endif
-

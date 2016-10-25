@@ -14,26 +14,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkMeshMapper2D.h"
-#include "mitkMesh.h"
 #include "mitkBaseRenderer.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
-#include "mitkProperties.h"
-#include "mitkLine.h"
 #include "mitkGL.h"
+#include "mitkLine.h"
+#include "mitkMesh.h"
+#include "mitkPlaneGeometry.h"
+#include "mitkProperties.h"
 
 #include <vtkLinearTransform.h>
 
 #include <algorithm>
 
-const float selectedColor[] = {1.0f, 0.0f, 0.6f}; //for selected!
+const float selectedColor[] = {1.0f, 0.0f, 0.6f}; // for selected!
 
 mitk::MeshMapper2D::MeshMapper2D()
 {
 }
-
 
 mitk::MeshMapper2D::~MeshMapper2D()
 {
@@ -41,38 +39,39 @@ mitk::MeshMapper2D::~MeshMapper2D()
 
 const mitk::Mesh *mitk::MeshMapper2D::GetInput(void)
 {
-    return static_cast<const mitk::Mesh * > ( GetDataNode()->GetData() );
+  return static_cast<const mitk::Mesh *>(GetDataNode()->GetData());
 }
 
 // Return whether a point is "smaller" than the second
-static bool point3DSmaller( const mitk::Point3D& elem1, const mitk::Point3D& elem2 )
+static bool point3DSmaller(const mitk::Point3D &elem1, const mitk::Point3D &elem2)
 {
-  if(elem1[0]!=elem2[0])
+  if (elem1[0] != elem2[0])
     return elem1[0] < elem2[0];
-  if(elem1[1]!=elem2[1])
+  if (elem1[1] != elem2[1])
     return elem1[1] < elem2[1];
   return elem1[2] < elem2[2];
 }
 
-void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
+void mitk::MeshMapper2D::Paint(mitk::BaseRenderer *renderer)
 {
-    bool visible = true;
+  bool visible = true;
 
-    GetDataNode()->GetVisibility(visible, renderer, "visible");
+  GetDataNode()->GetVisibility(visible, renderer, "visible");
 
-    if(!visible) return;
+  if (!visible)
+    return;
 
   //  @FIXME: Logik fuer update
   bool updateNeccesary = true;
 
   if (updateNeccesary)
   {
-  //aus GenerateData
-    mitk::Mesh::Pointer input = const_cast<mitk::Mesh*>(this->GetInput());
+    // aus GenerateData
+    mitk::Mesh::Pointer input = const_cast<mitk::Mesh *>(this->GetInput());
 
     // Get the TimeGeometry of the input object
-    const TimeGeometry* inputTimeGeometry = input->GetTimeGeometry();
-    if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->CountTimeSteps() == 0 ) )
+    const TimeGeometry *inputTimeGeometry = input->GetTimeGeometry();
+    if ((inputTimeGeometry == NULL) || (inputTimeGeometry->CountTimeSteps() == 0))
     {
       return;
     }
@@ -85,141 +84,159 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     //
     // convert the world time in time steps of the input object
     //
-    int timeStep=0;
-    if ( time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin() )
-      timeStep = inputTimeGeometry->TimePointToTimeStep( time );
-    if ( inputTimeGeometry->IsValidTimeStep( timeStep ) == false )
+    int timeStep = 0;
+    if (time > itk::NumericTraits<mitk::ScalarType>::NonpositiveMin())
+      timeStep = inputTimeGeometry->TimePointToTimeStep(time);
+    if (inputTimeGeometry->IsValidTimeStep(timeStep) == false)
     {
       return;
     }
 
+    mitk::Mesh::MeshType::Pointer itkMesh = input->GetMesh(timeStep);
 
-    mitk::Mesh::MeshType::Pointer itkMesh = input->GetMesh( timeStep );
-
-    if ( itkMesh.GetPointer() == NULL)
+    if (itkMesh.GetPointer() == NULL)
     {
       return;
     }
 
+    const PlaneGeometry *worldplanegeometry = (renderer->GetCurrentWorldPlaneGeometry());
 
-    const PlaneGeometry* worldplanegeometry = (renderer->GetCurrentWorldPlaneGeometry());
-
-    //apply color and opacity read from the PropertyList
+    // apply color and opacity read from the PropertyList
     ApplyColorAndOpacityProperties(renderer);
 
-    vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
+    vtkLinearTransform *transform = GetDataNode()->GetVtkTransform();
 
-    //List of the Points
+    // List of the Points
     Mesh::DataType::PointsContainerConstIterator it, end;
-    it=itkMesh->GetPoints()->Begin();
-    end=itkMesh ->GetPoints()->End();
+    it = itkMesh->GetPoints()->Begin();
+    end = itkMesh->GetPoints()->End();
 
-    //iterator on the additional data of each point
-    Mesh::PointDataIterator dataIt;//, dataEnd;
-    dataIt=itkMesh->GetPointData()->Begin();
+    // iterator on the additional data of each point
+    Mesh::PointDataIterator dataIt; //, dataEnd;
+    dataIt = itkMesh->GetPointData()->Begin();
 
-    //for switching back to old color after using selected color
+    // for switching back to old color after using selected color
     float unselectedColor[4];
-    glGetFloatv(GL_CURRENT_COLOR,unselectedColor);
+    glGetFloatv(GL_CURRENT_COLOR, unselectedColor);
 
-    while(it!=end)
+    while (it != end)
     {
       mitk::Point3D p, projected_p;
       float vtkp[3];
 
       itk2vtk(it->Value(), vtkp);
       transform->TransformPoint(vtkp, vtkp);
-      vtk2itk(vtkp,p);
+      vtk2itk(vtkp, p);
 
       renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
-      Vector3D diff=p-projected_p;
-      if(diff.GetSquaredNorm()<4.0)
+      Vector3D diff = p - projected_p;
+      if (diff.GetSquaredNorm() < 4.0)
       {
         Point2D pt2d, tmp;
         renderer->WorldToDisplay(p, pt2d);
 
-        Vector2D horz,vert;
-        horz[0]=5; horz[1]=0;
-        vert[0]=0; vert[1]=5;
+        Vector2D horz, vert;
+        horz[0] = 5;
+        horz[1] = 0;
+        vert[0] = 0;
+        vert[1] = 5;
 
-        //check if the point is to be marked as selected
+        // check if the point is to be marked as selected
         if (dataIt->Value().selected)
         {
-          horz[0]=8;
-          vert[1]=8;
-          glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
+          horz[0] = 8;
+          vert[1] = 8;
+          glColor3f(selectedColor[0], selectedColor[1], selectedColor[2]); // red
 
           switch (dataIt->Value().pointSpec)
           {
-          case PTSTART:
+            case PTSTART:
             {
-              //a quad
-              glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz+vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d+horz+vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d+horz-vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d-horz-vert;      glVertex2dv(&tmp[0]);
-              glEnd ();
+              // a quad
+              glBegin(GL_LINE_LOOP);
+              tmp = pt2d - horz + vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + horz + vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + horz - vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d - horz - vert;
+              glVertex2dv(&tmp[0]);
+              glEnd();
             }
             break;
-          case PTUNDEFINED:
+            case PTUNDEFINED:
             {
-              //a diamond around the point
-              glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
-                tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
-                tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
-              glEnd ();
+              // a diamond around the point
+              glBegin(GL_LINE_LOOP);
+              tmp = pt2d - horz;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + horz;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d - vert;
+              glVertex2dv(&tmp[0]);
+              glEnd();
             }
             break;
-          default:
-            break;
-          }//switch
+            default:
+              break;
+          } // switch
 
-          //the actual point
-          glBegin (GL_POINTS);
-            tmp=pt2d;             glVertex2dv(&tmp[0]);
-          glEnd ();
+          // the actual point
+          glBegin(GL_POINTS);
+          tmp = pt2d;
+          glVertex2dv(&tmp[0]);
+          glEnd();
         }
-        else //if not selected
+        else // if not selected
         {
-          glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
+          glColor3f(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
           switch (dataIt->Value().pointSpec)
           {
-          case PTSTART:
+            case PTSTART:
             {
-              //a quad
-              glBegin (GL_LINE_LOOP);
-                tmp=pt2d-horz+vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d+horz+vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d+horz-vert;      glVertex2dv(&tmp[0]);
-                tmp=pt2d-horz-vert;      glVertex2dv(&tmp[0]);
-              glEnd ();
+              // a quad
+              glBegin(GL_LINE_LOOP);
+              tmp = pt2d - horz + vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + horz + vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + horz - vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d - horz - vert;
+              glVertex2dv(&tmp[0]);
+              glEnd();
             }
-          case PTUNDEFINED:
+            case PTUNDEFINED:
             {
-              //drawing crosses
-              glBegin (GL_LINES);
-                  tmp=pt2d-horz;      glVertex2dv(&tmp[0]);
-                  tmp=pt2d+horz;      glVertex2dv(&tmp[0]);
-                  tmp=pt2d-vert;      glVertex2dv(&tmp[0]);
-                  tmp=pt2d+vert;      glVertex2dv(&tmp[0]);
-              glEnd ();
+              // drawing crosses
+              glBegin(GL_LINES);
+              tmp = pt2d - horz;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + horz;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d - vert;
+              glVertex2dv(&tmp[0]);
+              tmp = pt2d + vert;
+              glVertex2dv(&tmp[0]);
+              glEnd();
             }
-    default:
+            default:
             {
-        break;
+              break;
             }
-          }//switch
-        }//else
+          } // switch
+        }   // else
       }
       ++it;
       ++dataIt;
     }
 
-    //now connect the lines inbetween
-    mitk::Mesh::PointType thisPoint; thisPoint.Fill(0);
+    // now connect the lines inbetween
+    mitk::Mesh::PointType thisPoint;
+    thisPoint.Fill(0);
     Point2D *firstOfCell = NULL;
     Point2D *lastPoint = NULL;
     unsigned int lastPointId = 0;
@@ -232,9 +249,9 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     std::vector<mitk::Point3D> intersectionPoints;
     double t;
 
-    //iterate through all cells and then iterate through all indexes of points in that cell
+    // iterate through all cells and then iterate through all indexes of points in that cell
     Mesh::CellIterator cellIt, cellEnd;
-    Mesh::CellDataIterator cellDataIt;//, cellDataEnd;
+    Mesh::CellDataIterator cellDataIt; //, cellDataEnd;
     Mesh::PointIdIterator cellIdIt, cellIdEnd;
 
     cellIt = itkMesh->GetCells()->Begin();
@@ -244,31 +261,31 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     while (cellIt != cellEnd)
     {
       unsigned int numOfPointsInCell = cellIt->Value()->GetNumberOfPoints();
-      if (numOfPointsInCell>1)
+      if (numOfPointsInCell > 1)
       {
-        //iterate through all id's in the cell
+        // iterate through all id's in the cell
         cellIdIt = cellIt->Value()->PointIdsBegin();
         cellIdEnd = cellIt->Value()->PointIdsEnd();
 
-        firstOfCell3D = input->GetPoint(*cellIdIt,timeStep);
+        firstOfCell3D = input->GetPoint(*cellIdIt, timeStep);
 
         intersectionPoints.clear();
         intersectionPoints.reserve(numOfPointsInCell);
 
         first = true;
 
-        while(cellIdIt != cellIdEnd)
+        while (cellIdIt != cellIdEnd)
         {
           lastPoint3D = thisPoint;
 
-          thisPoint = input->GetPoint(*cellIdIt,timeStep);
+          thisPoint = input->GetPoint(*cellIdIt, timeStep);
 
-          //search in data (vector<> selectedLines) if the index of the point is set. if so, then the line is selected.
+          // search in data (vector<> selectedLines) if the index of the point is set. if so, then the line is selected.
           lineSelected = false;
           Mesh::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
 
-          //a line between 1(lastPoint) and 2(pt2d) has the Id 1, so look for the Id of lastPoint
-          //since we only start, if we have more than one point in the cell, lastPointId is initiated with 0
+          // a line between 1(lastPoint) and 2(pt2d) has the Id 1, so look for the Id of lastPoint
+          // since we only start, if we have more than one point in the cell, lastPointId is initiated with 0
           Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
           if (position != selectedLines.end())
           {
@@ -279,17 +296,17 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
           float vtkp[3];
           itk2vtk(thisPoint, vtkp);
           transform->TransformPoint(vtkp, vtkp);
-          vtk2itk(vtkp,p);
+          vtk2itk(vtkp, p);
           renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
-          Vector3D diff=p-projected_p;
-          if(diff.GetSquaredNorm()<4.0)
+          Vector3D diff = p - projected_p;
+          if (diff.GetSquaredNorm() < 4.0)
           {
             Point2D pt2d, tmp;
             renderer->WorldToDisplay(p, pt2d);
 
             if (lastPoint == NULL)
             {
-              //set the first point in the cell. This point in needed to close the polygon
+              // set the first point in the cell. This point in needed to close the polygon
               firstOfCell = new Point2D;
               *firstOfCell = pt2d;
               lastPoint = new Point2D;
@@ -300,81 +317,80 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
             {
               if (lineSelected)
               {
-                glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
-                //a line from lastPoint to thisPoint
-                glBegin (GL_LINES);
-                  glVertex2dv(&(*lastPoint)[0]);
-                  glVertex2dv(&pt2d[0]);
-                glEnd ();
+                glColor3f(selectedColor[0], selectedColor[1], selectedColor[2]); // red
+                // a line from lastPoint to thisPoint
+                glBegin(GL_LINES);
+                glVertex2dv(&(*lastPoint)[0]);
+                glVertex2dv(&pt2d[0]);
+                glEnd();
               }
-              else //if not selected
+              else // if not selected
               {
-                glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-                //drawing crosses
-                glBegin (GL_LINES);
-                  glVertex2dv(&(*lastPoint)[0]);
-                  glVertex2dv(&pt2d[0]);
-                glEnd ();
+                glColor3f(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
+                // drawing crosses
+                glBegin(GL_LINES);
+                glVertex2dv(&(*lastPoint)[0]);
+                glVertex2dv(&pt2d[0]);
+                glEnd();
               }
-              //to draw the line to the next in iteration step
+              // to draw the line to the next in iteration step
               *lastPoint = pt2d;
-              //and to search for the selection state of the line
+              // and to search for the selection state of the line
               lastPointId = *cellIdIt;
-            }//if..else
-          }//if <4.0
+            } // if..else
+          }   // if <4.0
 
-          //fill off-plane polygon part 1
-          if((!first) && (worldplanegeometry!=NULL))
+          // fill off-plane polygon part 1
+          if ((!first) && (worldplanegeometry != NULL))
           {
             line.SetPoints(lastPoint3D, thisPoint);
-            if(worldplanegeometry->IntersectionPointParam(line, t) &&
-              ((t>=0) && (t<=1))
-              )
+            if (worldplanegeometry->IntersectionPointParam(line, t) && ((t >= 0) && (t <= 1)))
             {
               intersectionPoints.push_back(line.GetPoint(t));
             }
           }
           ++cellIdIt;
-          first=false;
-        }//while cellIdIter
+          first = false;
+        } // while cellIdIter
 
-        //closed polygon?
-        if ( cellDataIt->Value().closed )
+        // closed polygon?
+        if (cellDataIt->Value().closed)
         {
-          //close the polygon if needed
-          if( firstOfCell != NULL )
+          // close the polygon if needed
+          if (firstOfCell != NULL)
           {
             lineSelected = false;
             Mesh::SelectedLinesType selectedLines = cellDataIt->Value().selectedLines;
             Mesh::SelectedLinesIter position = std::find(selectedLines.begin(), selectedLines.end(), lastPointId);
-            if (position != selectedLines.end())//found the index
+            if (position != selectedLines.end()) // found the index
             {
-              glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
-              //a line from lastPoint to firstPoint
-              glBegin (GL_LINES);
-                glVertex2dv(&(*lastPoint)[0]);
-                glVertex2dv(&(*firstOfCell)[0]);
-              glEnd ();
+              glColor3f(selectedColor[0], selectedColor[1], selectedColor[2]); // red
+              // a line from lastPoint to firstPoint
+              glBegin(GL_LINES);
+              glVertex2dv(&(*lastPoint)[0]);
+              glVertex2dv(&(*firstOfCell)[0]);
+              glEnd();
             }
             else
             {
-              glColor3f(unselectedColor[0],unselectedColor[1],unselectedColor[2]);
-              glBegin (GL_LINES);
-                glVertex2dv(&(*lastPoint)[0]);
-                glVertex2dv(&(*firstOfCell)[0]);
-              glEnd ();
+              glColor3f(unselectedColor[0], unselectedColor[1], unselectedColor[2]);
+              glBegin(GL_LINES);
+              glVertex2dv(&(*lastPoint)[0]);
+              glVertex2dv(&(*firstOfCell)[0]);
+              glEnd();
             }
           }
-        }//if closed
+        } // if closed
 
-        //Axis-aligned bounding box(AABB) around the cell if selected and set in Property
+        // Axis-aligned bounding box(AABB) around the cell if selected and set in Property
         bool showBoundingBox;
         if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox")) == NULL)
           showBoundingBox = false;
         else
-          showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox"))->GetValue();
+          showBoundingBox =
+            dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox"))->GetValue();
 
-        if(showBoundingBox)
+        if (showBoundingBox)
         {
           if (cellDataIt->Value().selected)
           {
@@ -385,77 +401,75 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
               min = aABB->GetMinimum();
               max = aABB->GetMaximum();
 
-              //project to the displayed geometry
+              // project to the displayed geometry
               Point2D min2D, max2D;
               Point3D p, projected_p;
               float vtkp[3];
               itk2vtk(min, vtkp);
               transform->TransformPoint(vtkp, vtkp);
-              vtk2itk(vtkp,p);
+              vtk2itk(vtkp, p);
               renderer->WorldToDisplay(p, min2D);
 
               itk2vtk(max, vtkp);
               transform->TransformPoint(vtkp, vtkp);
-              vtk2itk(vtkp,p);
+              vtk2itk(vtkp, p);
               renderer->GetCurrentWorldPlaneGeometry()->Project(p, projected_p);
-              Vector3D diff=p-projected_p;
-              if(diff.GetSquaredNorm()<4.0)
+              Vector3D diff = p - projected_p;
+              if (diff.GetSquaredNorm() < 4.0)
               {
                 renderer->WorldToDisplay(p, max2D);
 
-                //draw the BoundingBox
-                glColor3f(selectedColor[0],selectedColor[1],selectedColor[2]);//red
-                //a line from lastPoint to firstPoint
+                // draw the BoundingBox
+                glColor3f(selectedColor[0], selectedColor[1], selectedColor[2]); // red
+                // a line from lastPoint to firstPoint
                 glBegin(GL_LINE_LOOP);
-                  glVertex2f(min2D[0], min2D[1]);
-                  glVertex2f(min2D[0], max2D[1]);
-                  glVertex2f(max2D[0], max2D[1]);
-                  glVertex2f(max2D[0], min2D[1]);
+                glVertex2f(min2D[0], min2D[1]);
+                glVertex2f(min2D[0], max2D[1]);
+                glVertex2f(max2D[0], max2D[1]);
+                glVertex2f(max2D[0], min2D[1]);
                 glEnd();
-              }//draw bounding-box
-            }//bounding-box exists
-          }//cell selected
-        }//show bounding-box
+              } // draw bounding-box
+            }   // bounding-box exists
+          }     // cell selected
+        }       // show bounding-box
 
-        //fill off-plane polygon part 2
-        if(worldplanegeometry!=NULL)
+        // fill off-plane polygon part 2
+        if (worldplanegeometry != NULL)
         {
-          //consider line from last to first
+          // consider line from last to first
           line.SetPoints(thisPoint, firstOfCell3D);
-          if(worldplanegeometry->IntersectionPointParam(line, t) &&
-            ((t>=0) && (t<=1))
-            )
+          if (worldplanegeometry->IntersectionPointParam(line, t) && ((t >= 0) && (t <= 1)))
           {
             intersectionPoints.push_back(line.GetPoint(t));
           }
           std::sort(intersectionPoints.begin(), intersectionPoints.end(), point3DSmaller);
           std::vector<mitk::Point3D>::iterator it, end;
-          end=intersectionPoints.end();
-          if((intersectionPoints.size()%2)!=0)
+          end = intersectionPoints.end();
+          if ((intersectionPoints.size() % 2) != 0)
           {
-            --end; //ensure even number of intersection-points
+            --end; // ensure even number of intersection-points
           }
           Point2D pt2d;
-          for ( it = intersectionPoints.begin( ); it != end; ++it )
+          for (it = intersectionPoints.begin(); it != end; ++it)
           {
-            glBegin (GL_LINES);
-              renderer->WorldToDisplay(*it, pt2d);
-              glVertex2dv(pt2d.GetDataPointer());
-              ++it;
-              renderer->WorldToDisplay(*it, pt2d);
-              glVertex2dv(pt2d.GetDataPointer());
-            glEnd ();
+            glBegin(GL_LINES);
+            renderer->WorldToDisplay(*it, pt2d);
+            glVertex2dv(pt2d.GetDataPointer());
+            ++it;
+            renderer->WorldToDisplay(*it, pt2d);
+            glVertex2dv(pt2d.GetDataPointer());
+            glEnd();
           }
-          if(it!=intersectionPoints.end())
+          if (it != intersectionPoints.end())
           {
-            glBegin (GL_LINES);
+            glBegin(GL_LINES);
             renderer->WorldToDisplay(*it, pt2d);
             glVertex2dv(pt2d.GetDataPointer());
             glVertex2dv(pt2d.GetDataPointer());
-            glEnd ();
+            glEnd();
           }
-        }//fill off-plane polygon part 2
-      }//if numOfPointsInCell>1
+        } // fill off-plane polygon part 2
+      }   // if numOfPointsInCell>1
       delete firstOfCell;
       delete lastPoint;
       lastPoint = NULL;

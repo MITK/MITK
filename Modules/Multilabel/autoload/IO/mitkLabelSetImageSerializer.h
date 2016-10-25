@@ -27,7 +27,7 @@ namespace mitk
   class LabelSetImageSerializer : public BaseDataSerializer
   {
   public:
-    mitkClassMacro( LabelSetImageSerializer, BaseDataSerializer );
+    mitkClassMacro(LabelSetImageSerializer, BaseDataSerializer);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
     virtual std::string Serialize() override;

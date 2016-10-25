@@ -16,21 +16,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSearchLabelDialog.h"
 
-
 #include "mitkOrganTypeProperty.h"
 
 #include <itkRGBPixel.h>
 
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qlabel.h>
+#include <QAbstractItemModel>
 #include <QColorDialog>
 #include <QStringListModel>
-#include <QAbstractItemModel>
+#include <qlabel.h>
+#include <qlayout.h>
+#include <qlineedit.h>
+#include <qpushbutton.h>
 
-QmitkSearchLabelDialog::QmitkSearchLabelDialog(QWidget* parent, Qt::WindowFlags f)
-:QDialog(parent, f)
+QmitkSearchLabelDialog::QmitkSearchLabelDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
   m_Controls = new Ui::QmitkSearchLabelDialogGUI();
   m_Controls->setupUi(this);
@@ -43,9 +41,9 @@ QmitkSearchLabelDialog::QmitkSearchLabelDialog(QWidget* parent, Qt::WindowFlags 
   m_Completer->setCaseSensitivity(Qt::CaseInsensitive);
   m_Controls->m_LabelName->setCompleter(m_Completer);
 
-  connect( m_Completer, SIGNAL(activated(const QString&)), this, SLOT(OnLabelCompleterChanged(const QString&)) );
-  connect( m_Controls->m_pbCancel, SIGNAL(clicked()), this, SLOT(reject()) );
-  connect( m_Controls->m_pbAccept, SIGNAL(clicked()), this, SLOT(accept()) );
+  connect(m_Completer, SIGNAL(activated(const QString &)), this, SLOT(OnLabelCompleterChanged(const QString &)));
+  connect(m_Controls->m_pbCancel, SIGNAL(clicked()), this, SLOT(reject()));
+  connect(m_Controls->m_pbAccept, SIGNAL(clicked()), this, SLOT(accept()));
 
   m_Controls->m_LabelName->setFocus();
 }
@@ -56,27 +54,27 @@ QmitkSearchLabelDialog::~QmitkSearchLabelDialog()
 
 int QmitkSearchLabelDialog::GetLabelSetWidgetTableIndex()
 {
-    return m_LabelIndex;
+  return m_LabelIndex;
 }
 
 QString QmitkSearchLabelDialog::GetLabelSetWidgetTableCompleteWord()
 {
-    return m_CompleteWord;
+  return m_CompleteWord;
 }
 
 void QmitkSearchLabelDialog::SetLabelSuggestionList(QStringList stringList)
 {
   m_LabelList = stringList;
-  QStringListModel* completeModel = static_cast<QStringListModel*> (m_Completer->model());
+  QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
   completeModel->setStringList(m_LabelList);
 }
 
-void QmitkSearchLabelDialog::OnLabelCompleterChanged(const QString& completedWord)
+void QmitkSearchLabelDialog::OnLabelCompleterChanged(const QString &completedWord)
 {
   if (m_LabelList.contains(completedWord))
   {
     m_LabelIndex = m_LabelList.indexOf(completedWord);
     m_CompleteWord = completedWord;
-//    emit(goToLabel(m_LabelIndex));
+    //    emit(goToLabel(m_LabelIndex));
   }
 }

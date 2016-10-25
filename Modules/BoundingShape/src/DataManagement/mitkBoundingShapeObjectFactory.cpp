@@ -27,11 +27,11 @@ mitk::BoundingShapeObjectFactory::~BoundingShapeObjectFactory()
 {
 }
 
-mitk::Mapper::Pointer mitk::BoundingShapeObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
+mitk::Mapper::Pointer mitk::BoundingShapeObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId slotId)
 {
   Mapper::Pointer mapper;
 
-  if (dynamic_cast<GeometryData*>(node->GetData()) != nullptr)
+  if (dynamic_cast<GeometryData *>(node->GetData()) != nullptr)
   {
     if (slotId == BaseRenderer::Standard2D)
     {
@@ -49,12 +49,12 @@ mitk::Mapper::Pointer mitk::BoundingShapeObjectFactory::CreateMapper(mitk::DataN
   return mapper;
 }
 
-const char* mitk::BoundingShapeObjectFactory::GetDescription() const
+const char *mitk::BoundingShapeObjectFactory::GetDescription() const
 {
   return "BoundingShape Object Factory";
 }
 
-const char* mitk::BoundingShapeObjectFactory::GetFileExtensions()
+const char *mitk::BoundingShapeObjectFactory::GetFileExtensions()
 {
   return nullptr;
 }
@@ -64,7 +64,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetF
   return MultimapType();
 }
 
-const char* mitk::BoundingShapeObjectFactory::GetSaveFileExtensions()
+const char *mitk::BoundingShapeObjectFactory::GetSaveFileExtensions()
 {
   return nullptr;
 }
@@ -74,12 +74,12 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::BoundingShapeObjectFactory::GetS
   return MultimapType();
 }
 
-void mitk::BoundingShapeObjectFactory::SetDefaultProperties(mitk::DataNode* node)
+void mitk::BoundingShapeObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
   if (node == nullptr)
     return;
 
-  if (dynamic_cast<GeometryData*>(node->GetData()) != nullptr)
+  if (dynamic_cast<GeometryData *>(node->GetData()) != nullptr)
   {
     BoundingShapeVtkMapper2D::SetDefaultProperties(node);
     BoundingShapeVtkMapper3D::SetDefaultProperties(node);

@@ -21,15 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "org_mitk_example_gui_extensionpointdefinition_Export.h"
 
-struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText
-    : public virtual berry::Object
+struct org_mitk_example_gui_extensionpointdefinition_EXPORT IChangeText : public virtual berry::Object
 {
   berryObjectMacro(IChangeText)
 
-  virtual ~IChangeText();
+    virtual ~IChangeText();
 
-  virtual QString ChangeText(const QString& s) = 0;
-
+  virtual QString ChangeText(const QString &s) = 0;
 };
 
 Q_DECLARE_INTERFACE(IChangeText, "org.mitk.example.IChangeText")

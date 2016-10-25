@@ -18,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkFRPROptimizer.h>
 
-QmitkFRPROptimizerView::QmitkFRPROptimizerView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationOptimizerGUIBase (parent, f),
-m_NumberTransformParameters(16)
+QmitkFRPROptimizerView::QmitkFRPROptimizerView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationOptimizerGUIBase(parent, f), m_NumberTransformParameters(16)
 {
-
 }
 
 QmitkFRPROptimizerView::~QmitkFRPROptimizerView()
@@ -33,11 +32,10 @@ mitk::OptimizerParameters::OptimizerType QmitkFRPROptimizerView::GetOptimizerTyp
   return mitk::OptimizerParameters::FRPROPTIMIZER;
 }
 
-
 itk::Object::Pointer QmitkFRPROptimizerView::GetOptimizer()
 {
   itk::FRPROptimizer::Pointer OptimizerPointer = itk::FRPROptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
+  OptimizerPointer->SetMaximize(m_Controls.m_Maximize->isChecked());
   OptimizerPointer->SetStepLength(m_Controls.m_StepLengthFRPR->text().toFloat());
   if (m_Controls.m_FletchReevesFRPR->isChecked())
   {
@@ -47,7 +45,7 @@ itk::Object::Pointer QmitkFRPROptimizerView::GetOptimizer()
   {
     OptimizerPointer->SetToPolakRibiere();
   }
-  OptimizerPointer->SetMaximumIteration( m_Controls.m_IterationsFRPR->text().toInt() );
+  OptimizerPointer->SetMaximumIteration(m_Controls.m_IterationsFRPR->text().toInt());
   return OptimizerPointer.GetPointer();
 }
 
@@ -82,11 +80,11 @@ QString QmitkFRPROptimizerView::GetName()
   return "FRPR";
 }
 
-void QmitkFRPROptimizerView::SetupUI(QWidget* parent)
+void QmitkFRPROptimizerView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_IterationsFRPR->setValidator(validatorLineEditInput);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_StepLengthFRPR->setValidator(validatorLineEditInputFloat);
 }

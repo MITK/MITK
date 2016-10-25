@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef _MITK_VECTOR_IMAGE_MAPPER_2D__H_
 #define _MITK_VECTOR_IMAGE_MAPPER_2D__H_
 
@@ -32,47 +31,49 @@ class vtkGlyph2D;
 class vtkPlane;
 class vtkCutter;
 
-
 namespace mitk
 {
+  class BaseRenderer;
+  class PlaneGeometry;
 
-class BaseRenderer;
-class PlaneGeometry;
+  class MITKMAPPEREXT_EXPORT VectorImageMapper2D : public GLMapper
+  {
+  public:
+    mitkClassMacro(VectorImageMapper2D, GLMapper);
 
-class MITKMAPPEREXT_EXPORT VectorImageMapper2D : public GLMapper
-{
-public:
-    mitkClassMacro( VectorImageMapper2D, GLMapper );
-
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    typedef double vtkScalarType;
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) typedef double vtkScalarType;
 
     /**
      * @returns the image held by the associated with the mapper or the image
      *          which has been explicitly set by SetImage(...)
      */
-    const mitk::Image * GetInput( void );
+    const mitk::Image *GetInput(void);
 
-    virtual void Paint( mitk::BaseRenderer * renderer ) override;
+    virtual void Paint(mitk::BaseRenderer *renderer) override;
 
     /**
      * Explicitly set an vector image. This image will be used for
      * rendering instead of the image returned by GetData()
      */
-    itkSetConstObjectMacro( Image, mitk::Image );
+    itkSetConstObjectMacro(Image, mitk::Image);
 
     /**
      * Get the explicitly set image
      * @returns NULL if no Image has been set instead of GetData();
      */
-    itkGetConstObjectMacro( Image, mitk::Image );
+    itkGetConstObjectMacro(Image, mitk::Image);
 
-    virtual void PaintCells( vtkPolyData* contour, const PlaneGeometry* /*worldGeometry*/, vtkLinearTransform* vtktransform, BaseRenderer* renderer, vtkScalarsToColors *lut, mitk::Color color, float lwidth, double *spacing );
+    virtual void PaintCells(vtkPolyData *contour,
+                            const PlaneGeometry * /*worldGeometry*/,
+                            vtkLinearTransform *vtktransform,
+                            BaseRenderer *renderer,
+                            vtkScalarsToColors *lut,
+                            mitk::Color color,
+                            float lwidth,
+                            double *spacing);
 
-protected:
-
-    int GetCurrentTimeStep( mitk::BaseData* data, mitk::BaseRenderer* renderer );
+  protected:
+    int GetCurrentTimeStep(mitk::BaseData *data, mitk::BaseRenderer *renderer);
 
     VectorImageMapper2D();
 
@@ -82,12 +83,10 @@ protected:
 
     vtkLookupTable *m_LUT;
 
-    vtkPlane* m_Plane;
+    vtkPlane *m_Plane;
 
-    vtkCutter* m_Cutter;
-
-};
-
+    vtkCutter *m_Cutter;
+  };
 
 } // namespace mitk
 #endif

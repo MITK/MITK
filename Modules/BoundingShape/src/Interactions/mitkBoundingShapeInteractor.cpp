@@ -14,39 +14,37 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "../DataManagement/mitkBoundingShapeUtil.h"
 #include <mitkBoundingShapeInteractor.h>
 #include <mitkDisplayInteractor.h>
-#include "../DataManagement/mitkBoundingShapeUtil.h"
 #include <mitkInteractionConst.h>
-#include <mitkInteractionPositionEvent.h>
-#include <mitkInteractionKeyEvent.h>
 #include <mitkInteractionEventObserver.h>
+#include <mitkInteractionKeyEvent.h>
+#include <mitkInteractionPositionEvent.h>
 #include <mitkMouseWheelEvent.h>
 
 #include <vtkCamera.h>
-#include <vtkInteractorStyle.h>
 #include <vtkInteractorObserver.h>
+#include <vtkInteractorStyle.h>
 #include <vtkPointData.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkSmartPointer.h>
 
-#include "usModuleRegistry.h"
 #include "usGetModuleContext.h"
+#include "usModuleRegistry.h"
 
 // Properties to allow the user to interact with the base data
-const char* selectedColorPropertyName = "Bounding Shape.Selected Color";
-const char* deselectedColorPropertyName = "Bounding Shape.Deselected Color";
-const char* activeHandleIdPropertyName = "Bounding Shape.Active Handle ID";
-const char* boundingShapePropertyName = "Bounding Shape";
+const char *selectedColorPropertyName = "Bounding Shape.Selected Color";
+const char *deselectedColorPropertyName = "Bounding Shape.Deselected Color";
+const char *activeHandleIdPropertyName = "Bounding Shape.Active Handle ID";
+const char *boundingShapePropertyName = "Bounding Shape";
 
 namespace mitk
 {
   class BoundingShapeInteractor::Impl
   {
   public:
-    Impl()
-      : ScrollEnabled(false),
-      RotationEnabled(false)
+    Impl() : ScrollEnabled(false), RotationEnabled(false)
     {
       Point3D initialPoint;
       initialPoint.Fill(0.0);
@@ -55,10 +53,7 @@ namespace mitk
         Handles.push_back(Handle(initialPoint, i, GetHandleIndices(i)));
     }
 
-    ~Impl()
-    {
-    }
-
+    ~Impl() {}
     bool ScrollEnabled;
     Point3D InitialPickedWorldPoint;
     Point3D LastPickedWorldPoint;
@@ -71,8 +66,7 @@ namespace mitk
   };
 }
 
-mitk::BoundingShapeInteractor::BoundingShapeInteractor()
-  : m_Impl(new Impl)
+mitk::BoundingShapeInteractor::BoundingShapeInteractor() : m_Impl(new Impl)
 {
 }
 
@@ -84,7 +78,8 @@ mitk::BoundingShapeInteractor::~BoundingShapeInteractor()
 
 void mitk::BoundingShapeInteractor::ConnectActionsAndFunctions()
 {
-  // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually executing an action
+  // **Conditions** that can be used in the state machine, to ensure that certain conditions are met, before actually
+  // executing an action
   CONNECT_CONDITION("isHoveringOverObject", CheckOverObject);
   CONNECT_CONDITION("isHoveringOverHandles", CheckOverHandles);
 
@@ -96,13 +91,12 @@ void mitk::BoundingShapeInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("translateObject", TranslateObject);
   CONNECT_FUNCTION("selectHandle", SelectHandle);
   CONNECT_FUNCTION("scaleObject", ScaleObject);
-  //CONNECT_FUNCTION("rotateObject",RotateObject);
-
+  // CONNECT_FUNCTION("rotateObject",RotateObject);
 }
 
-
-//RotateObject(StateMachineAction*, InteractionEvent* interactionEvent)
-//void mitk::BoundingShapeInteractor::RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry* geometry)
+// RotateObject(StateMachineAction*, InteractionEvent* interactionEvent)
+// void mitk::BoundingShapeInteractor::RotateGeometry(mitk::ScalarType angle, int rotationaxis, mitk::BaseGeometry*
+// geometry)
 //{
 //  mitk::Vector3D rotationAxis = geometry->GetAxisVector(rotationaxis);
 //  float pointX = 0.0f;
@@ -123,7 +117,6 @@ void mitk::BoundingShapeInteractor::ConnectActionsAndFunctions()
 //  delete doOp;
 //}
 
-
 void mitk::BoundingShapeInteractor::SetRotationEnabled(bool rotationEnabled)
 {
   m_Impl->RotationEnabled = rotationEnabled;
@@ -136,9 +129,11 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
   if (newInputNode == nullptr)
     return;
 
-  //add color properties
-  mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty(selectedColorPropertyName));
-  mitk::ColorProperty::Pointer deselectedColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty(deselectedColorPropertyName));
+  // add color properties
+  mitk::ColorProperty::Pointer selectedColor =
+    dynamic_cast<mitk::ColorProperty *>(newInputNode->GetProperty(selectedColorPropertyName));
+  mitk::ColorProperty::Pointer deselectedColor =
+    dynamic_cast<mitk::ColorProperty *>(newInputNode->GetProperty(deselectedColorPropertyName));
 
   if (selectedColor.IsNull())
     newInputNode->AddProperty(selectedColorPropertyName, mitk::ColorProperty::New(0.0, 1.0, 0.0));
@@ -152,7 +147,8 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
   newInputNode->SetBoolProperty("fixedLayer", mitk::BoolProperty::New(true));
   newInputNode->SetBoolProperty("pickable", true);
 
-  mitk::ColorProperty::Pointer initialColor = dynamic_cast<mitk::ColorProperty*>(newInputNode->GetProperty(deselectedColorPropertyName));
+  mitk::ColorProperty::Pointer initialColor =
+    dynamic_cast<mitk::ColorProperty *>(newInputNode->GetProperty(deselectedColorPropertyName));
   if (initialColor.IsNotNull())
   {
     newInputNode->SetColor(initialColor->GetColor());
@@ -161,14 +157,15 @@ void mitk::BoundingShapeInteractor::DataNodeChanged()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::BoundingShapeInteractor::HandlePositionChanged(const InteractionEvent* interactionEvent, Point3D &center)
+void mitk::BoundingShapeInteractor::HandlePositionChanged(const InteractionEvent *interactionEvent, Point3D &center)
 {
-  GeometryData::Pointer geometryData = dynamic_cast<GeometryData*>(this->GetDataNode()->GetData());
+  GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   mitk::BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
 
   std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
-  if (m_Impl->Handles.size() == 6){
+  if (m_Impl->Handles.size() == 6)
+  {
     // set handle positions
     Point3D pointLeft = CalcAvgPoint(cornerPoints[5], cornerPoints[6]);
     Point3D pointRight = CalcAvgPoint(cornerPoints[1], cornerPoints[2]);
@@ -187,13 +184,11 @@ void mitk::BoundingShapeInteractor::HandlePositionChanged(const InteractionEvent
     // calculate center based on half way of the distance between two opposing cornerpoints
     center = CalcAvgPoint(cornerPoints[7], cornerPoints[0]);
   }
-
-
 }
 
-void mitk::BoundingShapeInteractor::SetDataNode(DataNode* node)
+void mitk::BoundingShapeInteractor::SetDataNode(DataNode *node)
 {
-  this->RestoreNodeProperties(); //if there is another node set, restore it's color
+  this->RestoreNodeProperties(); // if there is another node set, restore it's color
 
   if (node == nullptr)
     return;
@@ -201,22 +196,25 @@ void mitk::BoundingShapeInteractor::SetDataNode(DataNode* node)
   this->DataNodeChanged();
 }
 
-bool mitk::BoundingShapeInteractor::CheckOverObject(const InteractionEvent* interactionEvent)
+bool mitk::BoundingShapeInteractor::CheckOverObject(const InteractionEvent *interactionEvent)
 {
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
-  GeometryData::Pointer geometryData = dynamic_cast<GeometryData*>(this->GetDataNode()->GetData());
+  GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
   BaseGeometry::Pointer geometry = geometryData->GetGeometry(timeStep);
 
-  // calculates translation based on offset+extent not on the transformation matrix (because the cube is located in the center not in the origin)
+  // calculates translation based on offset+extent not on the transformation matrix (because the cube is located in the
+  // center not in the origin)
   vtkSmartPointer<vtkMatrix4x4> imageTransform = geometry->GetVtkTransform()->GetMatrix();
   Point3D center = geometry->GetCenter();
   auto translation = vtkSmartPointer<vtkTransform>::New();
   auto transform = vtkSmartPointer<vtkTransform>::New();
-  translation->Translate(center[0] - imageTransform->GetElement(0, 3), center[1] - imageTransform->GetElement(1, 3), center[2] - imageTransform->GetElement(2, 3));
+  translation->Translate(center[0] - imageTransform->GetElement(0, 3),
+                         center[1] - imageTransform->GetElement(1, 3),
+                         center[2] - imageTransform->GetElement(2, 3));
   transform->SetMatrix(imageTransform);
   transform->PostMultiply();
   transform->Concatenate(translation);
@@ -238,18 +236,18 @@ bool mitk::BoundingShapeInteractor::CheckOverObject(const InteractionEvent* inte
   // transform point from world to object coordinates
   transform->GetInverse()->TransformPoint(transformedPosition, transformedPosition);
   // check if the world point is within bounds
-  bool isInside = (transformedPosition[0] >= (-extent[0] / 2.0)) && (transformedPosition[0] <= (extent[0] / 2.0))
-    && (transformedPosition[1] >= (-extent[1] / 2.0)) && (transformedPosition[1] <= (extent[1] / 2.0))
-    && (transformedPosition[2] >= (-extent[2] / 2.0)) && (transformedPosition[2] <= (extent[2] / 2.0));
+  bool isInside = (transformedPosition[0] >= (-extent[0] / 2.0)) && (transformedPosition[0] <= (extent[0] / 2.0)) &&
+                  (transformedPosition[1] >= (-extent[1] / 2.0)) && (transformedPosition[1] <= (extent[1] / 2.0)) &&
+                  (transformedPosition[2] >= (-extent[2] / 2.0)) && (transformedPosition[2] <= (extent[2] / 2.0));
 
   return isInside;
 }
 
-bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* interactionEvent)
+bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *interactionEvent)
 {
   Point3D boundingBoxCenter;
   HandlePositionChanged(interactionEvent, boundingBoxCenter);
-  const InteractionPositionEvent* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
@@ -257,12 +255,13 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
   // to do: change to actual time step (currently not necessary because geometry remains the same for each timestep
   int timeStep = 0;
 
-  GeometryData::Pointer geometryData = dynamic_cast<GeometryData*>(this->GetDataNode()->GetData());
+  GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
   BaseGeometry::Pointer geometry = geometryData->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
   std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
   interactionEvent->GetSender()->WorldToDisplay(boundingBoxCenter, displayCenterPoint);
-  double scale = interactionEvent->GetSender()->GetScaleFactorMMPerDisplayUnit(); //GetDisplaySizeInMM
-  mitk::DoubleProperty::Pointer handleSizeProperty = dynamic_cast<mitk::DoubleProperty*>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
+  double scale = interactionEvent->GetSender()->GetScaleFactorMMPerDisplayUnit(); // GetDisplaySizeInMM
+  mitk::DoubleProperty::Pointer handleSizeProperty =
+    dynamic_cast<mitk::DoubleProperty *>(this->GetDataNode()->GetProperty("Bounding Shape.Handle Size Factor"));
 
   ScalarType initialHandleSize;
   if (handleSizeProperty != nullptr)
@@ -271,7 +270,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
     initialHandleSize = 1.0 / 40.0;
 
   mitk::Point2D displaysize = interactionEvent->GetSender()->GetDisplaySizeInMM();
-  ScalarType handlesize = ((displaysize[0] + displaysize[1]) / 2.0)*initialHandleSize;
+  ScalarType handlesize = ((displaysize[0] + displaysize[1]) / 2.0) * initialHandleSize;
   unsigned int handleNum = 0;
 
   for (auto &handle : m_Impl->Handles)
@@ -280,12 +279,14 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
     interactionEvent->GetSender()->WorldToDisplay(handle.GetPosition(), centerpoint);
     Point2D currentDisplayPosition = positionEvent->GetPointerPositionOnScreen();
 
-    if ((currentDisplayPosition.EuclideanDistanceTo(centerpoint) < (handlesize / scale))
-      && (currentDisplayPosition.EuclideanDistanceTo(displayCenterPoint) > (handlesize / scale))) // check if mouse is hovering over center point
+    if ((currentDisplayPosition.EuclideanDistanceTo(centerpoint) < (handlesize / scale)) &&
+        (currentDisplayPosition.EuclideanDistanceTo(displayCenterPoint) >
+         (handlesize / scale))) // check if mouse is hovering over center point
     {
       handle.SetActive(true);
       m_Impl->ActiveHandle = handle;
-      this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName, mitk::IntProperty::New(handleNum++));
+      this->GetDataNode()->GetPropertyList()->SetProperty(activeHandleIdPropertyName,
+                                                          mitk::IntProperty::New(handleNum++));
       this->GetDataNode()->GetData()->Modified();
       interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
       return true;
@@ -301,7 +302,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent* int
   return false;
 }
 
-void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   this->DisableCrosshairNavigation();
   DataNode::Pointer node = this->GetDataNode();
@@ -309,7 +310,8 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction*, Interactio
   if (node.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(node->GetProperty(deselectedColorPropertyName));
+  mitk::ColorProperty::Pointer selectedColor =
+    dynamic_cast<mitk::ColorProperty *>(node->GetProperty(deselectedColorPropertyName));
   if (selectedColor.IsNotNull())
   {
     this->GetDataNode()->GetPropertyList()->SetProperty("color", selectedColor);
@@ -320,7 +322,7 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction*, Interactio
   return;
 }
 
-void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   this->DisableCrosshairNavigation();
   DataNode::Pointer node = this->GetDataNode();
@@ -336,17 +338,16 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction*, Interac
   return;
 }
 
-
-
-void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction*, InteractionEvent*)
+void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, InteractionEvent *)
 {
-  this->DisableCrosshairNavigation(); //disable crosshair interaction and scolling if user is hovering over the object
+  this->DisableCrosshairNavigation(); // disable crosshair interaction and scolling if user is hovering over the object
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer selectedColor = dynamic_cast<mitk::ColorProperty*>(node->GetProperty(selectedColorPropertyName));
+  mitk::ColorProperty::Pointer selectedColor =
+    dynamic_cast<mitk::ColorProperty *>(node->GetProperty(selectedColorPropertyName));
   if (selectedColor.IsNotNull())
   {
     node->GetPropertyList()->SetProperty("color", selectedColor);
@@ -357,16 +358,17 @@ void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction*, Interactio
   return;
 }
 
-void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  this->EnableCrosshairNavigation(); //enable crosshair interaction and scolling if user is hovering over the object
+  this->EnableCrosshairNavigation(); // enable crosshair interaction and scolling if user is hovering over the object
 
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
     return;
 
-  mitk::ColorProperty::Pointer deselectedColor = dynamic_cast<mitk::ColorProperty*>(node->GetProperty(deselectedColorPropertyName));
+  mitk::ColorProperty::Pointer deselectedColor =
+    dynamic_cast<mitk::ColorProperty *>(node->GetProperty(deselectedColorPropertyName));
   if (deselectedColor.IsNotNull())
   {
     node->GetPropertyList()->SetProperty("color", deselectedColor);
@@ -378,19 +380,18 @@ void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction*, Interact
   return;
 }
 
-void mitk::BoundingShapeInteractor::InitInteraction(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::InitInteraction(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InitMembers(interactionEvent);
 }
 
-
-bool mitk::BoundingShapeInteractor::InitMembers(InteractionEvent* interactionEvent)
+bool mitk::BoundingShapeInteractor::InitMembers(InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return false;
 
-  //get initial position coordinates
+  // get initial position coordinates
   m_Impl->InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
   m_Impl->InitialPickedWorldPoint = positionEvent->GetPositionInWorld();
   m_Impl->LastPickedWorldPoint = positionEvent->GetPositionInWorld();
@@ -398,25 +399,27 @@ bool mitk::BoundingShapeInteractor::InitMembers(InteractionEvent* interactionEve
   return true;
 }
 
-void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
   int timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
-  mitk::BaseGeometry::Pointer geometry = this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
+  mitk::BaseGeometry::Pointer geometry =
+    this->GetDataNode()->GetData()->GetUpdatedTimeGeometry()->GetGeometryForTimeStep(timeStep);
   Vector3D spacing = geometry->GetSpacing();
   Point3D currentPickedPoint;
   interactionEvent->GetSender()->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), currentPickedPoint);
   Vector3D interactionMove;
 
   // pixel aligned shifting of the bounding box
-  interactionMove[0] = std::round((currentPickedPoint[0] - m_Impl->LastPickedWorldPoint[0]) / spacing[0])*  spacing[0];
-  interactionMove[1] = std::round((currentPickedPoint[1] - m_Impl->LastPickedWorldPoint[1]) / spacing[1])*  spacing[1];
-  interactionMove[2] = std::round((currentPickedPoint[2] - m_Impl->LastPickedWorldPoint[2]) / spacing[2])*  spacing[2];
+  interactionMove[0] = std::round((currentPickedPoint[0] - m_Impl->LastPickedWorldPoint[0]) / spacing[0]) * spacing[0];
+  interactionMove[1] = std::round((currentPickedPoint[1] - m_Impl->LastPickedWorldPoint[1]) / spacing[1]) * spacing[1];
+  interactionMove[2] = std::round((currentPickedPoint[2] - m_Impl->LastPickedWorldPoint[2]) / spacing[2]) * spacing[2];
 
-  if ((interactionMove[0] + interactionMove[1] + interactionMove[2]) != 0.0) // only update current position if a movement occured
+  if ((interactionMove[0] + interactionMove[1] + interactionMove[2]) !=
+      0.0) // only update current position if a movement occured
   {
     m_Impl->LastPickedWorldPoint = currentPickedPoint;
 
@@ -429,14 +432,13 @@ void mitk::BoundingShapeInteractor::TranslateObject(StateMachineAction*, Interac
   return;
 }
 
-
-void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InteractionPositionEvent* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
+  InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
   if (positionEvent == nullptr)
     return;
 
-  GeometryData::Pointer geometryData = dynamic_cast<GeometryData*>(this->GetDataNode()->GetData());
+  GeometryData::Pointer geometryData = dynamic_cast<GeometryData *>(this->GetDataNode()->GetData());
   Point3D handlePickedPoint = m_Impl->ActiveHandle.GetPosition();
   Point3D currentPickedPoint;
   interactionEvent->GetSender()->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), currentPickedPoint);
@@ -468,7 +470,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
   faceNormal[0] = handlePickedPoint[0] - center[0];
   faceNormal[1] = handlePickedPoint[1] - center[1];
   faceNormal[2] = handlePickedPoint[2] - center[2];
-  Vector3D faceShift = ((faceNormal * interactionMove) / (faceNormal.GetNorm()*faceNormal.GetNorm())) *faceNormal;
+  Vector3D faceShift = ((faceNormal * interactionMove) / (faceNormal.GetNorm() * faceNormal.GetNorm())) * faceNormal;
 
   // calculate cornerpoints from geometry without visualization offset to update actual geometry
   cornerPoints = GetCornerPoints(geometry, false);
@@ -484,7 +486,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
     if ((numFaces != faces[0]) && (numFaces != faces[1]) && (numFaces != faces[2]) && (numFaces != faces[3]))
     {
       Point3D point = pointscontainer->GetElement(numFaces);
-      if (m_Impl->RotationEnabled)  // apply if geometry is rotated at a pixel aligned shift is not possible
+      if (m_Impl->RotationEnabled) // apply if geometry is rotated at a pixel aligned shift is not possible
       {
         point[0] += faceShift[0];
         point[1] += faceShift[1];
@@ -492,10 +494,9 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
       }
       else // shift pixelwise
       {
-        point[0] += std::round(faceShift[0] / spacing[0])*spacing[0];
-        point[1] += std::round(faceShift[1] / spacing[1])*spacing[1];
-        point[2] += std::round(faceShift[2] / spacing[2])*spacing[2];
-
+        point[0] += std::round(faceShift[0] / spacing[0]) * spacing[0];
+        point[1] += std::round(faceShift[1] / spacing[1]) * spacing[1];
+        point[2] += std::round(faceShift[2] / spacing[2]) * spacing[2];
       }
 
       if (point == pointscontainer->GetElement(numFaces))
@@ -509,7 +510,6 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
 
   if (positionChangeThreshold) // update only if bounding box is shifted at least by one pixel
   {
-
     auto inverse = mitk::AffineTransform3D::New();
     geometry->GetIndexToWorldTransform()->GetInverse(inverse);
     for (unsigned int pointid = 0; pointid < 8; pointid++)
@@ -522,9 +522,9 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction*, Interaction
     bbox->ComputeBoundingBox();
     mitk::Point3D BBmin = bbox->GetMinimum();
     mitk::Point3D BBmax = bbox->GetMaximum();
-    if (abs(BBmin[0] - BBmax[0]) > 0.01 && abs(BBmin[1] - BBmax[1]) > 0.01 && abs(BBmin[2] - BBmax[2]) > 0.01) //TODO: check if the extent is greater than zero
+    if (abs(BBmin[0] - BBmax[0]) > 0.01 && abs(BBmin[1] - BBmax[1]) > 0.01 &&
+        abs(BBmin[2] - BBmax[2]) > 0.01) // TODO: check if the extent is greater than zero
     {
-
       geometry->SetBounds(bbox->GetBounds());
       geometry->Modified();
       this->GetDataNode()->GetData()->UpdateOutputInformation(); // Geometry is up-to-date
@@ -551,7 +551,7 @@ void mitk::BoundingShapeInteractor::RestoreNodeProperties()
   inputNode->GetPropertyList()->DeleteProperty(activeHandleIdPropertyName);
 
   EnableCrosshairNavigation();
-  //update rendering
+  // update rendering
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -561,11 +561,12 @@ void mitk::BoundingShapeInteractor::EnableCrosshairNavigation()
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
   for (std::map<us::ServiceReferenceU, mitk::EventConfig>::iterator it = m_Impl->DisplayInteractorConfigs.begin();
-    it != m_Impl->DisplayInteractorConfigs.end(); ++it)
+       it != m_Impl->DisplayInteractorConfigs.end();
+       ++it)
   {
     if (it->first)
     {
-      mitk::DisplayInteractor* displayInteractor = static_cast<mitk::DisplayInteractor*>(
+      mitk::DisplayInteractor *displayInteractor = static_cast<mitk::DisplayInteractor *>(
         us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(it->first));
       if (displayInteractor != nullptr)
       {
@@ -585,14 +586,19 @@ void mitk::BoundingShapeInteractor::DisableCrosshairNavigation()
   if (m_Impl->ScrollEnabled == false)
     return;
 
-  // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts with tools
-  // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction will still be enabled
+  // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts
+  // with tools
+  // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction
+  // will still be enabled
   m_Impl->DisplayInteractorConfigs.clear();
-  std::vector<us::ServiceReference<mitk::InteractionEventObserver> > listEventObserver = us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
-  for (std::vector<us::ServiceReference<mitk::InteractionEventObserver> >::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+  std::vector<us::ServiceReference<mitk::InteractionEventObserver>> listEventObserver =
+    us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
+  for (std::vector<us::ServiceReference<mitk::InteractionEventObserver>>::iterator it = listEventObserver.begin();
+       it != listEventObserver.end();
+       ++it)
   {
-    mitk::DisplayInteractor* displayInteractor = dynamic_cast<mitk::DisplayInteractor*>(
-      us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
+    mitk::DisplayInteractor *displayInteractor =
+      dynamic_cast<mitk::DisplayInteractor *>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
     if (displayInteractor != nullptr)
     {
       // remember the original configuration

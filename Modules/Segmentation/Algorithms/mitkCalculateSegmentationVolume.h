@@ -17,44 +17,36 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITK_CALCULATE_SEGMENTATION_VOLUME_H_INCLUDET_WAD
 #define MITK_CALCULATE_SEGMENTATION_VOLUME_H_INCLUDET_WAD
 
+#include "mitkImageCast.h"
 #include "mitkSegmentationSink.h"
 #include <MitkSegmentationExports.h>
-#include "mitkImageCast.h"
 
 namespace mitk
 {
-
-class MITKSEGMENTATION_EXPORT CalculateSegmentationVolume : public SegmentationSink
-{
+  class MITKSEGMENTATION_EXPORT CalculateSegmentationVolume : public SegmentationSink
+  {
   public:
-
-    mitkClassMacro( CalculateSegmentationVolume, SegmentationSink )
-    mitkAlgorithmNewMacro( CalculateSegmentationVolume );
+    mitkClassMacro(CalculateSegmentationVolume, SegmentationSink) mitkAlgorithmNewMacro(CalculateSegmentationVolume);
 
   protected:
-
-    CalculateSegmentationVolume();  // use smart pointers
+    CalculateSegmentationVolume(); // use smart pointers
     virtual ~CalculateSegmentationVolume();
 
     virtual bool ReadyToRun() override;
 
     virtual bool ThreadedUpdateFunction() override; // will be called from a thread after calling StartAlgorithm
 
-    template < typename TPixel, unsigned int VImageDimension >
-    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, TPixel* dummy = NULL );
+    template <typename TPixel, unsigned int VImageDimension>
+    void ItkImageProcessing(itk::Image<TPixel, VImageDimension> *itkImage, TPixel *dummy = NULL);
 
   private:
-
     unsigned int m_Volume;
 
     Vector3D m_CenterOfMass;
     Vector3D m_MinIndexOfBoundingBox;
     Vector3D m_MaxIndexOfBoundingBox;
-
-};
+  };
 
 } // namespace
 
 #endif
-
-

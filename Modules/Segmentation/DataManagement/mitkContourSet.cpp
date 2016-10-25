@@ -14,13 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkContourSet.h"
 #include <mitkProportionalTimeGeometry.h>
 
-mitk::ContourSet::ContourSet() :
-  m_ContourVector( ContourVectorType() ),
-  m_NumberOfContours (0)
+mitk::ContourSet::ContourSet() : m_ContourVector(ContourVectorType()), m_NumberOfContours(0)
 {
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
   timeGeometry->Initialize(1);
@@ -33,13 +30,12 @@ mitk::ContourSet::~ContourSet()
 
 void mitk::ContourSet::AddContour(unsigned int index, mitk::Contour::Pointer contour)
 {
-  m_ContourVector.insert(std::make_pair( index , contour) );
+  m_ContourVector.insert(std::make_pair(index, contour));
 }
-
 
 void mitk::ContourSet::RemoveContour(unsigned long index)
 {
-  m_ContourVector.erase( index );
+  m_ContourVector.erase(index);
 }
 
 void mitk::ContourSet::UpdateOutputInformation()
@@ -49,12 +45,12 @@ void mitk::ContourSet::UpdateOutputInformation()
   auto contoursIteratorEnd = contourVec.end();
 
   // initialize container
-  mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
+  mitk::BoundingBox::PointsContainer::Pointer pointscontainer = mitk::BoundingBox::PointsContainer::New();
 
-  mitk::BoundingBox::PointIdentifier pointid=0;
+  mitk::BoundingBox::PointIdentifier pointid = 0;
   mitk::Point3D point;
 
-  mitk::AffineTransform3D* transform = GetGeometry(0)->GetIndexToWorldTransform();
+  mitk::AffineTransform3D *transform = GetGeometry(0)->GetIndexToWorldTransform();
   mitk::AffineTransform3D::Pointer inverse = mitk::AffineTransform3D::New();
   transform->GetInverse(inverse);
 
@@ -62,16 +58,17 @@ void mitk::ContourSet::UpdateOutputInformation()
   // \todo probably we should do this additionally for each time-step
   while (contoursIterator != contoursIteratorEnd)
   {
-    const TimeGeometry* geometry = (*contoursIterator).second->GetUpdatedTimeGeometry();
+    const TimeGeometry *geometry = (*contoursIterator).second->GetUpdatedTimeGeometry();
     unsigned char i;
-    for(i=0; i<8; ++i)
+    for (i = 0; i < 8; ++i)
     {
       point = inverse->TransformPoint(geometry->GetCornerPointInWorld(i));
-      if(point[0]*point[0]+point[1]*point[1]+point[2]*point[2] < mitk::large)
-        pointscontainer->InsertElement( pointid++, point);
+      if (point[0] * point[0] + point[1] * point[1] + point[2] * point[2] < mitk::large)
+        pointscontainer->InsertElement(pointid++, point);
       else
       {
-        itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. BoundingObject: " << (*contoursIterator).second );
+        itkGenericOutputMacro(<< "Unrealistically distant corner point encountered. Ignored. BoundingObject: "
+                              << (*contoursIterator).second);
       }
     }
     ++contoursIterator;
@@ -81,14 +78,13 @@ void mitk::ContourSet::UpdateOutputInformation()
   boundingBox->SetPoints(pointscontainer);
   boundingBox->ComputeBoundingBox();
 
-  BaseGeometry* geometry3d = GetGeometry(0);
+  BaseGeometry *geometry3d = GetGeometry(0);
   geometry3d->SetIndexToWorldTransform(transform);
   geometry3d->SetBounds(boundingBox->GetBounds());
 
   ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-  timeGeometry->Initialize(geometry3d,GetTimeGeometry()->CountTimeSteps());
+  timeGeometry->Initialize(geometry3d, GetTimeGeometry()->CountTimeSteps());
   SetTimeGeometry(timeGeometry);
-
 }
 
 void mitk::ContourSet::SetRequestedRegionToLargestPossibleRegion()
@@ -97,15 +93,15 @@ void mitk::ContourSet::SetRequestedRegionToLargestPossibleRegion()
 
 bool mitk::ContourSet::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
-    return true;
+  return true;
 }
 
 bool mitk::ContourSet::VerifyRequestedRegion()
 {
-    return true;
+  return true;
 }
 
-void mitk::ContourSet::SetRequestedRegion( const itk::DataObject*)
+void mitk::ContourSet::SetRequestedRegion(const itk::DataObject *)
 {
 }
 
@@ -116,7 +112,6 @@ void mitk::ContourSet::Initialize()
   timeGeometry->Initialize(1);
   SetTimeGeometry(timeGeometry);
 }
-
 
 unsigned int mitk::ContourSet::GetNumberOfContours()
 {

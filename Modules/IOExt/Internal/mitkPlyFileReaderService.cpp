@@ -14,16 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-//MITK
+// MITK
 #include "mitkPlyFileReaderService.h"
-#include <mitkSurface.h>
-#include <mitkIOMimeTypes.h>
 #include <mitkCustomMimeType.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkSurface.h>
 
 // VTK
 #include <vtkPLYReader.h>
 #include <vtkSmartPointer.h>
-
 
 mitk::PlyFileReaderService::PlyFileReaderService()
   : AbstractFileReader(CustomMimeType(IOMimeTypes::STANFORD_PLY_MIMETYPE()), "Stanford Triangle PLY Reader")
@@ -35,24 +34,24 @@ mitk::PlyFileReaderService::~PlyFileReaderService()
 {
 }
 
-std::vector< itk::SmartPointer<mitk::BaseData> > mitk::PlyFileReaderService::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PlyFileReaderService::Read()
 {
-  std::vector< itk::SmartPointer<BaseData> > result;
+  std::vector<itk::SmartPointer<BaseData>> result;
 
-  vtkSmartPointer <vtkPLYReader> reader = vtkSmartPointer <vtkPLYReader>::New();
-  reader->SetFileName( GetInputLocation().c_str() );
+  vtkSmartPointer<vtkPLYReader> reader = vtkSmartPointer<vtkPLYReader>::New();
+  reader->SetFileName(GetInputLocation().c_str());
   reader->Update();
 
-  if (reader->GetOutput() != NULL){
+  if (reader->GetOutput() != NULL)
+  {
     mitk::Surface::Pointer surface = mitk::Surface::New();
     surface->SetVtkPolyData(reader->GetOutput());
-    result.push_back(dynamic_cast<mitk::BaseData*> (surface.GetPointer()));
+    result.push_back(dynamic_cast<mitk::BaseData *>(surface.GetPointer()));
   }
   return result;
 }
 
-
-mitk::PlyFileReaderService* mitk::PlyFileReaderService::Clone() const
+mitk::PlyFileReaderService *mitk::PlyFileReaderService::Clone() const
 {
   return new PlyFileReaderService(*this);
 }

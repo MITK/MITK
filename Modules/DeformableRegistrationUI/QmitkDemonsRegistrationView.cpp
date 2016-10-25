@@ -14,42 +14,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <qvalidator.h>
-#include <mitkImageCast.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <mitkLevelWindowProperty.h>
-#include <mitkRenderingManager.h>
-#include "itkRegularStepGradientDescentOptimizer.h"
-#include <qfiledialog.h>
-#include <qmessagebox.h>
 #include "QmitkDemonsRegistrationView.h"
-#include "ui_QmitkDemonsRegistrationViewControls.h"
+#include "itkRegularStepGradientDescentOptimizer.h"
 #include "mitkITKImageImport.h"
 #include "mitkProgressBar.h"
+#include "ui_QmitkDemonsRegistrationViewControls.h"
+#include <mitkImageCast.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkRenderingManager.h>
+#include <qfiledialog.h>
+#include <qmessagebox.h>
+#include <qvalidator.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-QmitkDemonsRegistrationView::QmitkDemonsRegistrationView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
-m_FixedNode(nullptr), m_MovingNode(nullptr), m_ResultImage(nullptr), m_ResultDeformationField(nullptr)
+QmitkDemonsRegistrationView::QmitkDemonsRegistrationView(QWidget *parent, Qt::WindowFlags f)
+  : QWidget(parent, f),
+    m_FixedNode(nullptr),
+    m_MovingNode(nullptr),
+    m_ResultImage(nullptr),
+    m_ResultDeformationField(nullptr)
 {
   m_Controls.setupUi(parent);
 
-  QValidator* validatorHistogramLevels = new QIntValidator(1, 20000000, this);
+  QValidator *validatorHistogramLevels = new QIntValidator(1, 20000000, this);
   m_Controls.m_NumberOfHistogramLevels->setValidator(validatorHistogramLevels);
 
-  QValidator* validatorMatchPoints = new QIntValidator(1, 20000000, this);
+  QValidator *validatorMatchPoints = new QIntValidator(1, 20000000, this);
   m_Controls.m_NumberOfMatchPoints->setValidator(validatorMatchPoints);
 
-  QValidator* validatorIterations = new QIntValidator(1, 20000000, this);
+  QValidator *validatorIterations = new QIntValidator(1, 20000000, this);
   m_Controls.m_Iterations->setValidator(validatorIterations);
 
-  QValidator* validatorStandardDeviation = new QDoubleValidator(0, 20000000, 2, this);
+  QValidator *validatorStandardDeviation = new QDoubleValidator(0, 20000000, 2, this);
   m_Controls.m_StandardDeviation->setValidator(validatorStandardDeviation);
 }
 
 QmitkDemonsRegistrationView::~QmitkDemonsRegistrationView()
 {
 }
-
 
 int QmitkDemonsRegistrationView::GetNumberOfIterations()
 {
@@ -75,18 +78,19 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
 {
   if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
   {
-    mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
-    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
+    mitk::Image::Pointer fimage = dynamic_cast<mitk::Image *>(m_FixedNode->GetData());
+    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image *>(m_MovingNode->GetData());
     // workaround to ensure that fimage covers a bigger region than mimage
     mitk::Image::RegionType fimageRegion = fimage->GetLargestPossibleRegion();
     mitk::Image::RegionType mimageRegion = mimage->GetLargestPossibleRegion();
-    if (!((fimageRegion.GetSize(0)>=mimageRegion.GetSize(0))&&(fimageRegion.GetSize(1)>=mimageRegion.GetSize(1))
-        &&(fimageRegion.GetSize(2)>=mimageRegion.GetSize(2))))
+    if (!((fimageRegion.GetSize(0) >= mimageRegion.GetSize(0)) &&
+          (fimageRegion.GetSize(1) >= mimageRegion.GetSize(1)) && (fimageRegion.GetSize(2) >= mimageRegion.GetSize(2))))
     {
-      QMessageBox::information(nullptr,"Registration","Fixed image must be equal or bigger in size than moving image.");
+      QMessageBox::information(
+        nullptr, "Registration", "Fixed image must be equal or bigger in size than moving image.");
       return;
     }
-    if ( m_Controls.m_RegistrationSelection->currentIndex() == 0)
+    if (m_Controls.m_RegistrationSelection->currentIndex() == 0)
     {
       mitk::DemonsRegistration::Pointer registration = mitk::DemonsRegistration::New();
       registration->SetSaveDeformationField(false);
@@ -121,18 +125,18 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       {
         registration->Update();
       }
-      catch (itk::ExceptionObject& excpt)
+      catch (itk::ExceptionObject &excpt)
       {
-        QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+        QMessageBox::information(this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok);
         mitk::ProgressBar::GetInstance()->Progress(4);
         return;
       }
       m_ResultImage = registration->GetOutput();
-      typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
+      typedef itk::Image<itk::Vector<float, 3>, 3> VectorImageType;
       VectorImageType::Pointer deformationField = registration->GetDeformationField();
       m_ResultDeformationField = mitk::ImportItkImage(deformationField)->Clone();
     }
-    else if(m_Controls.m_RegistrationSelection->currentIndex() == 1)
+    else if (m_Controls.m_RegistrationSelection->currentIndex() == 1)
     {
       mitk::SymmetricForcesDemonsRegistration::Pointer registration = mitk::SymmetricForcesDemonsRegistration::New();
       registration->SetSaveDeformationField(false);
@@ -167,31 +171,31 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       {
         registration->Update();
       }
-      catch (itk::ExceptionObject& excpt)
+      catch (itk::ExceptionObject &excpt)
       {
-        QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+        QMessageBox::information(this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok);
         mitk::ProgressBar::GetInstance()->Progress(4);
         return;
       }
       m_ResultImage = registration->GetOutput();
-      typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;
+      typedef itk::Image<itk::Vector<float, 3>, 3> VectorImageType;
       VectorImageType::Pointer deformationField = registration->GetDeformationField();
       m_ResultDeformationField = mitk::ImportItkImage(deformationField)->Clone();
     }
   }
 }
 
-void QmitkDemonsRegistrationView::SetFixedNode( mitk::DataNode * fixedNode )
+void QmitkDemonsRegistrationView::SetFixedNode(mitk::DataNode *fixedNode)
 {
   m_FixedNode = fixedNode;
 }
 
-void QmitkDemonsRegistrationView::SetMovingNode( mitk::DataNode * movingNode )
+void QmitkDemonsRegistrationView::SetMovingNode(mitk::DataNode *movingNode)
 {
   m_MovingNode = movingNode;
 }
 
-void QmitkDemonsRegistrationView::UseHistogramMatching( bool useHM )
+void QmitkDemonsRegistrationView::UseHistogramMatching(bool useHM)
 {
   if (useHM)
   {

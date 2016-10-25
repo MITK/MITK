@@ -14,32 +14,30 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef RawImageFileReader_H_HEADER_INCLUDED
 #define RawImageFileReader_H_HEADER_INCLUDED
 #include "itkVector.h"
-#include <MitkLegacyIOExports.h>
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
+#include <MitkLegacyIOExports.h>
 
 namespace mitk
 {
-
-//##Documentation
-//## @brief Reader to read raw image files
-/**  The user must set the dimensionality, the dimensions and the pixel type. If they are incorrect, the image will not be opened or the visualization will be incorrect. */
-//## @ingroup MitkLegacyIOModule
-//## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
-class DEPRECATED() MITKLEGACYIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
-{
-public:
+  //##Documentation
+  //## @brief Reader to read raw image files
+  /**  The user must set the dimensionality, the dimensions and the pixel type. If they are incorrect, the image will
+   * not be opened or the visualization will be incorrect. */
+  //## @ingroup MitkLegacyIOModule
+  //## @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileReaderRegistry instead.
+  class DEPRECATED() MITKLEGACYIO_EXPORT RawImageFileReader : public ImageSource, public FileReader
+  {
+  public:
     mitkClassMacro(RawImageFileReader, FileReader);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    itkSetMacro(FileName, std::string);
+      itkSetMacro(FileName, std::string);
     itkSetStringMacro(FileName);
     itkGetMacro(FileName, std::string);
     itkGetStringMacro(FileName);
@@ -55,11 +53,11 @@ public:
     itkGetStringMacro(FilePattern);
 
     /** Supported pixel types. */
-    typedef enum {UCHAR,SCHAR,USHORT,SSHORT, UINT, SINT, FLOAT, DOUBLE} IOPixelType;
+    typedef enum { UCHAR, SCHAR, USHORT, SSHORT, UINT, SINT, FLOAT, DOUBLE } IOPixelType;
     itkSetMacro(PixelType, IOPixelType);
 
     /** Endianity of bits. */
-    typedef enum {LITTLE, BIG} EndianityType;
+    typedef enum { LITTLE, BIG } EndianityType;
     itkSetMacro(Endianity, EndianityType);
 
     itkSetMacro(Dimensionality, int);
@@ -72,15 +70,15 @@ public:
 
     static bool CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern);
 
-protected:
-
+  protected:
     RawImageFileReader();
 
     ~RawImageFileReader();
 
     virtual void GenerateData() override;
 
-    template < typename TPixel, unsigned int VImageDimensions > void TypedGenerateData();
+    template <typename TPixel, unsigned int VImageDimensions>
+    void TypedGenerateData();
 
     /** Name of file to be read.*/
     std::string m_FileName;
@@ -102,8 +100,7 @@ protected:
 
     /** Vector containing dimensions of image to be read. */
     itk::Vector<int, 3> m_Dimensions;
-
-};
+  };
 
 } // namespace mitk
 

@@ -16,19 +16,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkContourModelSetReader.h"
 #include "mitkContourModelReader.h"
-#include <mitkCustomMimeType.h>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <mitkCustomMimeType.h>
 #include <mitkLocaleSwitch.h>
 
-
-mitk::ContourModelSetReader::ContourModelSetReader(const mitk::ContourModelSetReader& other)
+mitk::ContourModelSetReader::ContourModelSetReader(const mitk::ContourModelSetReader &other)
   : mitk::AbstractFileReader(other)
 {
 }
 
-mitk::ContourModelSetReader::ContourModelSetReader()
-  : AbstractFileReader()
+mitk::ContourModelSetReader::ContourModelSetReader() : AbstractFileReader()
 {
   std::string category = "ContourModelSet File";
   CustomMimeType customMimeType;
@@ -45,38 +43,39 @@ mitk::ContourModelSetReader::~ContourModelSetReader()
 {
 }
 
-std::vector<itk::SmartPointer<mitk::BaseData> > mitk::ContourModelSetReader::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelSetReader::Read()
 {
-  std::vector<itk::SmartPointer<mitk::BaseData> > result;
-  std::vector<itk::SmartPointer<mitk::BaseData> > internalResult;
+  std::vector<itk::SmartPointer<mitk::BaseData>> result;
+  std::vector<itk::SmartPointer<mitk::BaseData>> internalResult;
 
   std::string location = GetInputLocation();
 
   // Switch the current locale to "C"
   LocaleSwitch localeSwitch("C");
 
-  try{
+  try
+  {
     mitk::ContourModelSet::Pointer contourSet = mitk::ContourModelSet::New();
 
     mitk::ContourModelReader reader;
     reader.SetInput(location);
     internalResult = reader.Read();
 
-    for(unsigned int i = 0; i < internalResult.size(); ++i)
+    for (unsigned int i = 0; i < internalResult.size(); ++i)
     {
-      contourSet->AddContourModel( dynamic_cast<mitk::ContourModel*>(internalResult.at(i).GetPointer()) );
+      contourSet->AddContourModel(dynamic_cast<mitk::ContourModel *>(internalResult.at(i).GetPointer()));
     }
-    result.push_back(dynamic_cast<mitk::BaseData*>(contourSet.GetPointer()));
-
-  }catch(...)
+    result.push_back(dynamic_cast<mitk::BaseData *>(contourSet.GetPointer()));
+  }
+  catch (...)
   {
-    MITK_ERROR  << "Cannot read contourModel.";
+    MITK_ERROR << "Cannot read contourModel.";
   }
 
   return result;
 }
 
-mitk::ContourModelSetReader* mitk::ContourModelSetReader::Clone() const
+mitk::ContourModelSetReader *mitk::ContourModelSetReader::Clone() const
 {
   return new ContourModelSetReader(*this);
 }

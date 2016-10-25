@@ -45,7 +45,8 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
   \sa mitk::SegmentationInterpolation
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
+  QmitkInteractiveSegmentationTechnicalPage
 
   While mitk::SegmentationInterpolation does the bookkeeping of interpolation
   (keeping track of which slices contain how much segmentation) and the algorithmic work,
@@ -62,138 +63,140 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSliceBasedInterpolatorWidget : public QWidg
 {
   Q_OBJECT
 
-  public:
+public:
+  QmitkSliceBasedInterpolatorWidget(QWidget *parent = 0, const char *name = 0);
+  virtual ~QmitkSliceBasedInterpolatorWidget();
 
-    QmitkSliceBasedInterpolatorWidget(QWidget* parent = 0, const char* name = 0);
-    virtual ~QmitkSliceBasedInterpolatorWidget();
+  void SetDataStorage(mitk::DataStorage &storage);
 
-    void SetDataStorage(mitk::DataStorage& storage);
+  /**
+    Sets the slice navigation controllers for getting slice changed events from the views.
+  */
+  void SetSliceNavigationControllers(const QList<mitk::SliceNavigationController *> &controllers);
 
-    /**
-      Sets the slice navigation controllers for getting slice changed events from the views.
-    */
-    void SetSliceNavigationControllers(const QList<mitk::SliceNavigationController*> &controllers);
+  void OnToolManagerWorkingDataModified();
 
-    void OnToolManagerWorkingDataModified();
+  void OnTimeChanged(itk::Object *sender, const itk::EventObject &);
 
-    void OnTimeChanged(itk::Object* sender, const itk::EventObject&);
+  void OnSliceChanged(itk::Object *sender, const itk::EventObject &);
 
-    void OnSliceChanged(itk::Object* sender, const itk::EventObject&);
+  void OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject &);
 
-    void OnSliceNavigationControllerDeleted(const itk::Object *sender, const itk::EventObject& );
+  /**
+    Just public because it is called by itk::Commands. You should not need to call this.
+  */
+  void OnSliceInterpolationInfoChanged(const itk::EventObject &);
 
-    /**
-      Just public because it is called by itk::Commands. You should not need to call this.
-    */
-    void OnSliceInterpolationInfoChanged(const itk::EventObject&);
+  Ui::QmitkSliceBasedInterpolatorWidgetGUIControls m_Controls;
 
-    Ui::QmitkSliceBasedInterpolatorWidgetGUIControls m_Controls;
+signals:
 
-  signals:
+  void signalSliceBasedInterpolationEnabled(bool);
 
-    void signalSliceBasedInterpolationEnabled(bool);
+public slots:
 
-  public slots:
+  /**
+    \brief Reaction to "Start/Stop" button click
+  */
+  void OnToggleWidgetActivation(bool);
 
-    /**
-      \brief Reaction to "Start/Stop" button click
-    */
-    void OnToggleWidgetActivation(bool);
+protected slots:
 
-  protected slots:
+  /**
+    \brief Reaction to "Accept Current Slice" button click.
+  */
+  void OnAcceptInterpolationClicked();
 
-    /**
-      \brief Reaction to "Accept Current Slice" button click.
-    */
-    void OnAcceptInterpolationClicked();
+  /*
+    \brief Reaction to "Accept All Slices" button click.
+    Opens popup to ask about which orientation should be interpolated
+  */
+  void OnAcceptAllInterpolationsClicked();
 
-    /*
-      \brief Reaction to "Accept All Slices" button click.
-      Opens popup to ask about which orientation should be interpolated
-    */
-    void OnAcceptAllInterpolationsClicked();
+  /*
+    \brief Called from popup menu of OnAcceptAllInterpolationsClicked()
+     Will trigger interpolation for all slices in given orientation
+  */
+  void OnAcceptAllPopupActivated(QAction *action);
 
-    /*
-      \brief Called from popup menu of OnAcceptAllInterpolationsClicked()
-       Will trigger interpolation for all slices in given orientation
-    */
-    void OnAcceptAllPopupActivated(QAction* action);
+protected:
+  typedef std::map<QAction *, mitk::SliceNavigationController *> ActionToSliceDimensionMapType;
 
-  protected:
+  const ActionToSliceDimensionMapType CreateActionToSliceDimension();
 
-    typedef std::map<QAction*, mitk::SliceNavigationController*> ActionToSliceDimensionMapType;
+  ActionToSliceDimensionMapType m_ActionToSliceDimensionMap;
 
-    const ActionToSliceDimensionMapType CreateActionToSliceDimension();
+  void AcceptAllInterpolations(mitk::SliceNavigationController *slicer);
 
-    ActionToSliceDimensionMapType m_ActionToSliceDimensionMap;
+  void WaitCursorOn();
 
-    void AcceptAllInterpolations(mitk::SliceNavigationController* slicer);
+  void WaitCursorOff();
 
-    void WaitCursorOn();
+  void RestoreOverrideCursor();
 
-    void WaitCursorOff();
+  /**
+    Gets the working slice based on the given plane geometry and last saved interaction
 
-    void RestoreOverrideCursor();
+    \param planeGeometry a plane geometry
+  */
+  mitk::Image::Pointer GetWorkingSlice(const mitk::PlaneGeometry *planeGeometry);
 
-    /**
-      Gets the working slice based on the given plane geometry and last saved interaction
+  /**
+    Retrieves the currently selected PlaneGeometry from a SlicedGeometry3D that is generated by a
+    SliceNavigationController
+    and calls Interpolate to further process this PlaneGeometry into an interpolation.
 
-      \param planeGeometry a plane geometry
-    */
-    mitk::Image::Pointer GetWorkingSlice(const mitk::PlaneGeometry* planeGeometry);
+    \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
+    \param slice the SliceNavigationController
+  */
+  void TranslateAndInterpolateChangedSlice(const itk::EventObject &e, mitk::SliceNavigationController *slicer);
 
-    /**
-      Retrieves the currently selected PlaneGeometry from a SlicedGeometry3D that is generated by a SliceNavigationController
-      and calls Interpolate to further process this PlaneGeometry into an interpolation.
+  /**
+    Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated
+    ToolManager)
+    should be interpolated. The actual work is then done by our SegmentationInterpolation object.
+  */
+  void Interpolate(mitk::PlaneGeometry *plane, unsigned int timeStep, mitk::SliceNavigationController *slicer);
 
-      \param e is a actually a mitk::SliceNavigationController::GeometrySliceEvent, sent by a SliceNavigationController
-      \param slice the SliceNavigationController
-    */
-    void TranslateAndInterpolateChangedSlice(const itk::EventObject& e, mitk::SliceNavigationController* slicer);
-
-    /**
-      Given a PlaneGeometry, this method figures out which slice of the first working image (of the associated ToolManager)
-      should be interpolated. The actual work is then done by our SegmentationInterpolation object.
-    */
-    void Interpolate( mitk::PlaneGeometry* plane, unsigned int timeStep, mitk::SliceNavigationController *slicer );
-
-    /**
-      Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an interpolation.
-     */
-    void UpdateVisibleSuggestion();
+  /**
+    Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an
+    interpolation.
+   */
+  void UpdateVisibleSuggestion();
 
 private:
+  mitk::SliceBasedInterpolationController::Pointer m_SliceInterpolatorController;
 
-    mitk::SliceBasedInterpolationController::Pointer m_SliceInterpolatorController;
+  mitk::ToolManager *m_ToolManager;
 
-    mitk::ToolManager* m_ToolManager;
+  bool m_Activated;
 
-    bool m_Activated;
+  template <typename TPixel, unsigned int VImageDimension>
+  void WritePreviewOnWorkingImage(itk::Image<TPixel, VImageDimension> *target,
+                                  const mitk::Image *source,
+                                  int overwritevalue);
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void WritePreviewOnWorkingImage( itk::Image<TPixel,VImageDimension>* target, const mitk::Image* source, int overwritevalue );
+  QHash<mitk::SliceNavigationController *, int> m_ControllerToTimeObserverTag;
+  QHash<mitk::SliceNavigationController *, int> m_ControllerToSliceObserverTag;
+  QHash<mitk::SliceNavigationController *, int> m_ControllerToDeleteObserverTag;
 
-    QHash<mitk::SliceNavigationController*, int> m_ControllerToTimeObserverTag;
-    QHash<mitk::SliceNavigationController*, int> m_ControllerToSliceObserverTag;
-    QHash<mitk::SliceNavigationController*, int> m_ControllerToDeleteObserverTag;
+  unsigned int m_InterpolationInfoChangedObserverTag;
 
-    unsigned int m_InterpolationInfoChangedObserverTag;
+  mitk::DiffSliceOperation *m_doOperation;
+  mitk::DiffSliceOperation *m_undoOperation;
 
-    mitk::DiffSliceOperation* m_doOperation;
-    mitk::DiffSliceOperation* m_undoOperation;
+  mitk::DataNode::Pointer m_PreviewNode;
+  mitk::Image::Pointer m_PreviewImage;
 
-    mitk::DataNode::Pointer  m_PreviewNode;
-    mitk::Image::Pointer     m_PreviewImage;
+  mitk::LabelSetImage::Pointer m_WorkingImage;
 
-    mitk::LabelSetImage::Pointer m_WorkingImage;
+  mitk::SliceNavigationController *m_LastSNC;
 
-    mitk::SliceNavigationController* m_LastSNC;
+  unsigned int m_LastSliceIndex;
 
-    unsigned int m_LastSliceIndex;
+  QHash<mitk::SliceNavigationController *, unsigned int> m_TimeStep;
 
-    QHash<mitk::SliceNavigationController*, unsigned int> m_TimeStep;
-
-    mitk::DataStorage::Pointer m_DataStorage;
+  mitk::DataStorage::Pointer m_DataStorage;
 };
 
 #endif

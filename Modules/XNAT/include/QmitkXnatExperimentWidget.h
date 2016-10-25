@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKXNATEXPERIMENTWIDGET_H
 
 // XNATUI
-#include <ui_QmitkXnatExperimentWidgetControls.h>
 #include <MitkXNATExports.h>
+#include <ui_QmitkXnatExperimentWidgetControls.h>
 
 // Qt
 #include <QWidget>
@@ -32,19 +32,18 @@ class MITKXNAT_EXPORT QmitkXnatExperimentWidget : public QWidget
   Q_OBJECT
 
 public:
-
   enum Mode
   {
     INFO,
     CREATE
   };
 
-  QmitkXnatExperimentWidget(QWidget* parent = nullptr);
-  QmitkXnatExperimentWidget(Mode mode, QWidget* parent = nullptr);
+  QmitkXnatExperimentWidget(QWidget *parent = nullptr);
+  QmitkXnatExperimentWidget(Mode mode, QWidget *parent = nullptr);
   ~QmitkXnatExperimentWidget();
 
-  void SetExperiment(ctkXnatExperiment* experiment);
-  ctkXnatExperiment* GetExperiment() const;
+  void SetExperiment(ctkXnatExperiment *experiment);
+  ctkXnatExperiment *GetExperiment() const;
 
 protected:
   Ui::QmitkXnatExperimentWidgetControls m_Controls;
@@ -52,7 +51,7 @@ protected:
 private:
   void Init();
   Mode m_Mode;
-  ctkXnatExperiment* m_Experiment;
+  ctkXnatExperiment *m_Experiment;
 };
 
 #endif // QMITKXNATEXPERIMENTWIDGET_H

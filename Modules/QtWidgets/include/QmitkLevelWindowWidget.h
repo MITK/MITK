@@ -28,14 +28,14 @@ class MITKQTWIDGETS_EXPORT QmitkLevelWindowWidget : public QWidget, public Ui::Q
 {
   Q_OBJECT
 public:
-  QmitkLevelWindowWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
-  mitk::LevelWindowManager* GetManager();
+  QmitkLevelWindowWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  mitk::LevelWindowManager *GetManager();
 
 public slots:
-  void SetDataStorage( mitk::DataStorage* ds );
+  void SetDataStorage(mitk::DataStorage *ds);
 
 protected:
-  //unsigned long m_ObserverTag;
+  // unsigned long m_ObserverTag;
   mitk::LevelWindowManager::Pointer m_Manager;
 };
 #endif /*QMITKLEVELWINDOWWIDGET_H_*/

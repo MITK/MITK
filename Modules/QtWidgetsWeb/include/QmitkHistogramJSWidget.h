@@ -14,17 +14,16 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKHISTOGRAMJSWIDGET_H
 #define QMITKHISTOGRAMJSWIDGET_H
 
-#include <QWidget>
-#include <QUrl>
-#include <QWebEngineView>
 #include "MitkQtWidgetsWebExports.h"
-#include <QVariant>
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
+#include <QUrl>
+#include <QVariant>
+#include <QWebEngineView>
+#include <QWidget>
 #include <itkPolyLineParametricPath.h>
 #include <mitkImageStatisticsCalculator.h>
 
@@ -46,8 +45,7 @@ class MITKQTWIDGETSWEB_EXPORT QmitkHistogramJSWidget : public QWebEngineView
   * It holds a QList, containing the measurements of the current histogram.
   * @see GetMeasurement()
   */
-  Q_PROPERTY(QList<QVariant> measurement
-             READ GetMeasurement)
+  Q_PROPERTY(QList<QVariant> measurement READ GetMeasurement)
 
   /**
   * \brief Frequency property.
@@ -56,8 +54,7 @@ class MITKQTWIDGETSWEB_EXPORT QmitkHistogramJSWidget : public QWebEngineView
   * It holds a QList, containing the frequencies of the current histogram.
   * @see GetFrequency()
   */
-  Q_PROPERTY(QList<QVariant> frequency
-             READ GetFrequency)
+  Q_PROPERTY(QList<QVariant> frequency READ GetFrequency)
 
   /**
   * \brief Line graph property.
@@ -66,8 +63,7 @@ class MITKQTWIDGETSWEB_EXPORT QmitkHistogramJSWidget : public QWebEngineView
   * It holds a boolean, which sais wether to use a line or not.
   * @see GetUseLineGraph()
   */
-  Q_PROPERTY(bool useLineGraph
-             READ GetUseLineGraph)
+  Q_PROPERTY(bool useLineGraph READ GetUseLineGraph)
 
   /**
   * @brief intensity profile property.
@@ -76,18 +72,16 @@ class MITKQTWIDGETSWEB_EXPORT QmitkHistogramJSWidget : public QWebEngineView
   * It holds a boolean, which says whether to use an intensity profile or not.
   * @see GetIntensityProfile()
   */
-  Q_PROPERTY(bool intensityProfile
-             READ GetIntensityProfile)
+  Q_PROPERTY(bool intensityProfile READ GetIntensityProfile)
 
 public:
   typedef mitk::Image::HistogramType HistogramType;
   typedef mitk::Image::HistogramType::ConstIterator HistogramConstIteratorType;
-  typedef itk::PolyLineParametricPath< 3 > ParametricPathType;
-  typedef itk::ParametricPath< 3 >::Superclass PathType;
+  typedef itk::PolyLineParametricPath<3> ParametricPathType;
+  typedef itk::ParametricPath<3>::Superclass PathType;
   typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
 
   explicit QmitkHistogramJSWidget(QWidget *parent = nullptr);
-
 
   ~QmitkHistogramJSWidget();
 
@@ -97,7 +91,7 @@ public:
   * Reimplemented from QWebView::resizeEvent(),
   * reloads the webframe
   */
-  void resizeEvent(QResizeEvent* resizeEvent) override;
+  void resizeEvent(QResizeEvent *resizeEvent) override;
 
   /**
   * \brief Calculates the histogram.
@@ -107,7 +101,7 @@ public:
   * m_Measurement and m_Frequency.
   * The SignalDataChanged is called, to update the information, which is displayed in the webframe.
   */
-  void ComputeHistogram(HistogramType* histogram);
+  void ComputeHistogram(HistogramType *histogram);
 
   /**
   * \brief Calculates the intensityprofile.
@@ -117,7 +111,7 @@ public:
   * Sets m_IntensityProfile and m_UseLineGraph to true.
   * The SignalDataChanged is called, to update the information, which is displayed in the webframe.
   */
-  void ComputeIntensityProfile(unsigned int timeStep = 0, bool computeStatistics = false );
+  void ComputeIntensityProfile(unsigned int timeStep = 0, bool computeStatistics = false);
 
   /**
   * \brief Clears the Histogram.
@@ -155,27 +149,22 @@ public:
   */
   bool GetIntensityProfile();
 
-  mitk::ImageStatisticsCalculator::Statistics& GetStatistics()
-  {
-    return m_Statistics;
-  };
-
+  mitk::ImageStatisticsCalculator::Statistics &GetStatistics() { return m_Statistics; };
   /**
   * \brief Setter for reference image.
   *
   * @param image The corresponding image for an intensity profile.
   */
-  void SetImage(mitk::Image* image);
+  void SetImage(mitk::Image *image);
 
   /**
   * \brief Setter for planarFigure.
   *
   * @param planarFigure The pathelement for an intensity profile.
   */
-  void SetPlanarFigure(const mitk::PlanarFigure* planarFigure);
+  void SetPlanarFigure(const mitk::PlanarFigure *planarFigure);
 
 private:
-
   /**
   * \brief List of frequencies.
   *
@@ -233,7 +222,7 @@ private:
   * Clears the QLists m_Measurement and m_Frequency
   */
   void ClearData();
-  QWebEnginePage* m_Page;
+  QWebEnginePage *m_Page;
 
 private slots:
 
@@ -282,4 +271,3 @@ signals:
 };
 
 #endif
-

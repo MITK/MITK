@@ -19,28 +19,28 @@
 
 #include <mitkDataStorage.h>
 
-#include <QQmlEngine>
 #include <QObject>
+#include <QQmlEngine>
 #include <QQuickItem>
 #include <QString>
 #include <QStringList>
 
 class QmlMitkWorkbench : public QQuickItem
 {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    static QmlMitkWorkbench* instance;
-    static mitk::DataStorage::Pointer storage;
-    static QUrl workbench;
+  static QmlMitkWorkbench *instance;
+  static mitk::DataStorage::Pointer storage;
+  static QUrl workbench;
 
-    QmlMitkWorkbench();
-    ~QmlMitkWorkbench();
+  QmlMitkWorkbench();
+  ~QmlMitkWorkbench();
 
-    static void initialize(QQmlEngine &engine);
+  static void initialize(QQmlEngine &engine);
 
 public slots:
-    void loadFiles();
+  void loadFiles();
 };
 
 #endif

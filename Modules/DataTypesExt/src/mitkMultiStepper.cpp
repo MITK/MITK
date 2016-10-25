@@ -14,7 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkMultiStepper.h"
 #include "mitkStepper.h"
 
@@ -25,12 +24,14 @@ mitk::MultiStepper::MultiStepper()
 mitk::MultiStepper::~MultiStepper()
 {
 }
-void mitk::MultiStepper::AddStepper(Stepper::Pointer stepper,unsigned int repeat) {
+void mitk::MultiStepper::AddStepper(Stepper::Pointer stepper, unsigned int repeat)
+{
   m_SubSteppers.insert(stepper);
-  m_ScaleFactors.insert(std::make_pair(stepper,repeat));
+  m_ScaleFactors.insert(std::make_pair(stepper, repeat));
   UpdateStepCount();
 }
-void mitk::MultiStepper::RemoveStepper(Stepper::Pointer stepper, unsigned int /* repeat */) {
+void mitk::MultiStepper::RemoveStepper(Stepper::Pointer stepper, unsigned int /* repeat */)
+{
   m_SubSteppers.erase(stepper);
   m_ScaleFactors.erase(stepper);
   UpdateStepCount();
@@ -56,28 +57,35 @@ void mitk::MultiStepper::Last() {
   }
 }*/
 
-void mitk::MultiStepper::SetPos(unsigned int pos) {
+void mitk::MultiStepper::SetPos(unsigned int pos)
+{
   Stepper::SetPos(pos);
-  for (auto it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
+  for (auto it = m_SubSteppers.begin(); it != m_SubSteppers.end(); it++)
+  {
     unsigned int count = (*it)->GetSteps() * m_ScaleFactors[(*it)];
-  if ((this->GetSteps() != 0 ) && ((*it)->GetSteps() != 0)) {
-    (*it)->SetPos((pos * count / this->GetSteps() ) % (*it)->GetSteps()) ;
-  }
+    if ((this->GetSteps() != 0) && ((*it)->GetSteps() != 0))
+    {
+      (*it)->SetPos((pos * count / this->GetSteps()) % (*it)->GetSteps());
+    }
   }
 };
 
-void mitk::MultiStepper::SetSteps(unsigned int /*steps*/) {
+void mitk::MultiStepper::SetSteps(unsigned int /*steps*/)
+{
   assert(false);
 };
 
-void mitk::MultiStepper::UpdateStepCount() {
-  m_Steps=0;
+void mitk::MultiStepper::UpdateStepCount()
+{
+  m_Steps = 0;
   m_LargestRangeStepper = nullptr;
-  for (auto it = m_SubSteppers.begin(); it != m_SubSteppers.end() ; it++ ) {
+  for (auto it = m_SubSteppers.begin(); it != m_SubSteppers.end(); it++)
+  {
     unsigned int count = (*it)->GetSteps() * m_ScaleFactors[(*it)];
-    if (count > m_Steps) {
-       m_Steps = count;
-       m_LargestRangeStepper = *it;
+    if (count > m_Steps)
+    {
+      m_Steps = count;
+      m_LargestRangeStepper = *it;
     }
   }
 }

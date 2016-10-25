@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkRigidRegistrationOptimizerGUIBaseH
 #define QmitkRigidRegistrationOptimizerGUIBaseH
 
-#include <QWidget>
 #include "MitkRigidRegistrationUIExports.h"
+#include "mitkImage.h"
+#include "mitkOptimizerParameters.h"
+#include <QString>
+#include <QWidget>
 #include <itkArray.h>
 #include <itkObject.h>
-#include "mitkImage.h"
-#include <QString>
-#include "mitkOptimizerParameters.h"
 
 /*!
 * \brief Widget for rigid registration
@@ -32,10 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigidRegistrationOptimizerGUIBase : public QWidget
 {
-
 public:
-
-  QmitkRigidRegistrationOptimizerGUIBase(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkRigidRegistrationOptimizerGUIBase(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkRigidRegistrationOptimizerGUIBase();
 
   virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() = 0;
@@ -50,11 +48,9 @@ public:
 
   virtual QString GetName() = 0;
 
-  virtual void SetupUI(QWidget* parent) = 0;
-
+  virtual void SetupUI(QWidget *parent) = 0;
 
 protected:
-
 };
 
-#endif //QmitkRigidRegistrationOptimizerGUIBaseH
+#endif // QmitkRigidRegistrationOptimizerGUIBaseH

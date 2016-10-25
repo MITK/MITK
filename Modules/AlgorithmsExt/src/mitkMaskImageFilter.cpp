@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #include "mitkMaskImageFilter.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkTimeHelper.h"
 #include "mitkProperties.h"
+#include "mitkTimeHelper.h"
 
-#include "mitkImageToItk.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageToItk.h"
 
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
@@ -32,8 +31,8 @@ mitk::MaskImageFilter::MaskImageFilter() : m_Mask(nullptr)
 {
   this->SetNumberOfIndexedInputs(2);
   this->SetNumberOfRequiredInputs(2);
-  m_InputTimeSelector  = mitk::ImageTimeSelector::New();
-  m_MaskTimeSelector   = mitk::ImageTimeSelector::New();
+  m_InputTimeSelector = mitk::ImageTimeSelector::New();
+  m_MaskTimeSelector = mitk::ImageTimeSelector::New();
   m_OutputTimeSelector = mitk::ImageTimeSelector::New();
   m_OverrideOutsideValue = false;
   m_OutsideValue = 0;
@@ -41,17 +40,16 @@ mitk::MaskImageFilter::MaskImageFilter() : m_Mask(nullptr)
 
 mitk::MaskImageFilter::~MaskImageFilter()
 {
-
 }
 
-void mitk::MaskImageFilter::SetMask( const mitk::Image* mask )
+void mitk::MaskImageFilter::SetMask(const mitk::Image *mask)
 {
   // Process object is not const-correct so the const_cast is required here
-  m_Mask = const_cast< mitk::Image * >( mask );
-  this->ProcessObject::SetNthInput(1, m_Mask );
+  m_Mask = const_cast<mitk::Image *>(mask);
+  this->ProcessObject::SetNthInput(1, m_Mask);
 }
 
-const mitk::Image* mitk::MaskImageFilter::GetMask() const
+const mitk::Image *mitk::MaskImageFilter::GetMask() const
 {
   return m_Mask;
 }
@@ -60,10 +58,10 @@ void mitk::MaskImageFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
 
-  mitk::Image* output = this->GetOutput();
-  mitk::Image* input = const_cast< mitk::Image * > ( this->GetInput() );
-  mitk::Image* mask  = m_Mask ;
-  if((output->IsInitialized()==false) || (mask == nullptr) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
+  mitk::Image *output = this->GetOutput();
+  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *mask = m_Mask;
+  if ((output->IsInitialized() == false) || (mask == nullptr) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
   input->SetRequestedRegionToLargestPossibleRegion();
@@ -81,7 +79,7 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
   if ((output->IsInitialized()) && (this->GetMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
-  itkDebugMacro(<<"GenerateOutputInformation()");
+  itkDebugMacro(<< "GenerateOutputInformation()");
 
   output->Initialize(input->GetPixelType(), *input->GetTimeGeometry());
 
@@ -90,46 +88,50 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
   m_TimeOfHeaderInitialization.Modified();
 }
 
-template < typename TPixel, unsigned int VImageDimension >
-void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkImage)
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimension> *inputItkImage)
 {
   // dirty quick fix, duplicating code so both unsigned char and unsigned short are supported
   // this should be changed once unsigned char segmentations can be converted to unsigned short
-  mitk::PixelType pixelType = m_MaskTimeSelector->GetOutput()->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
+  mitk::PixelType pixelType =
+    m_MaskTimeSelector->GetOutput()->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
   if (pixelType.GetComponentType() == itk::ImageIOBase::UCHAR)
   {
     typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
     typedef itk::Image<unsigned char, VImageDimension> ItkMaskImageType;
     typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
 
-    typedef itk::ImageRegionConstIterator< ItkInputImageType > ItkInputImageIteratorType;
-    typedef itk::ImageRegionConstIterator< ItkMaskImageType > ItkMaskImageIteratorType;
-    typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
+    typedef itk::ImageRegionConstIterator<ItkInputImageType> ItkInputImageIteratorType;
+    typedef itk::ImageRegionConstIterator<ItkMaskImageType> ItkMaskImageIteratorType;
+    typedef itk::ImageRegionIteratorWithIndex<ItkOutputImageType> ItkOutputImageIteratorType;
 
     typename mitk::ImageToItk<ItkMaskImageType>::Pointer maskimagetoitk = mitk::ImageToItk<ItkMaskImageType>::New();
     maskimagetoitk->SetInput(m_MaskTimeSelector->GetOutput());
     maskimagetoitk->Update();
     typename ItkMaskImageType::Pointer maskItkImage = maskimagetoitk->GetOutput();
 
-    typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
+    typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk =
+      mitk::ImageToItk<ItkOutputImageType>::New();
     outputimagetoitk->SetInput(m_OutputTimeSelector->GetOutput());
     outputimagetoitk->Update();
     typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
     // create the iterators
     typename ItkInputImageType::RegionType inputRegionOfInterest = inputItkImage->GetLargestPossibleRegion();
-    ItkInputImageIteratorType  inputIt(inputItkImage, inputRegionOfInterest);
-    ItkMaskImageIteratorType  maskIt(maskItkImage, inputRegionOfInterest);
+    ItkInputImageIteratorType inputIt(inputItkImage, inputRegionOfInterest);
+    ItkMaskImageIteratorType maskIt(maskItkImage, inputRegionOfInterest);
     ItkOutputImageIteratorType outputIt(outputItkImage, inputRegionOfInterest);
 
-    //typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
+    // typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename
+    // ItkOutputImageType::PixelType>::min();
     if (!m_OverrideOutsideValue)
       m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
 
     m_MinValue = std::numeric_limits<mitk::ScalarType>::max();
     m_MaxValue = std::numeric_limits<mitk::ScalarType>::min();
 
-    for (inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd(); ++inputIt, ++maskIt, ++outputIt)
+    for (inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd();
+         ++inputIt, ++maskIt, ++outputIt)
     {
       if (maskIt.Get() > itk::NumericTraits<typename ItkMaskImageType::PixelType>::Zero)
       {
@@ -150,34 +152,37 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
       typedef itk::Image<unsigned short, VImageDimension> ItkMaskImageType;
       typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
 
-      typedef itk::ImageRegionConstIterator< ItkInputImageType > ItkInputImageIteratorType;
-      typedef itk::ImageRegionConstIterator< ItkMaskImageType > ItkMaskImageIteratorType;
-      typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
+      typedef itk::ImageRegionConstIterator<ItkInputImageType> ItkInputImageIteratorType;
+      typedef itk::ImageRegionConstIterator<ItkMaskImageType> ItkMaskImageIteratorType;
+      typedef itk::ImageRegionIteratorWithIndex<ItkOutputImageType> ItkOutputImageIteratorType;
 
       typename mitk::ImageToItk<ItkMaskImageType>::Pointer maskimagetoitk = mitk::ImageToItk<ItkMaskImageType>::New();
       maskimagetoitk->SetInput(m_MaskTimeSelector->GetOutput());
       maskimagetoitk->Update();
       typename ItkMaskImageType::Pointer maskItkImage = maskimagetoitk->GetOutput();
 
-      typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
+      typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk =
+        mitk::ImageToItk<ItkOutputImageType>::New();
       outputimagetoitk->SetInput(m_OutputTimeSelector->GetOutput());
       outputimagetoitk->Update();
       typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
       // create the iterators
       typename ItkInputImageType::RegionType inputRegionOfInterest = inputItkImage->GetLargestPossibleRegion();
-      ItkInputImageIteratorType  inputIt(inputItkImage, inputRegionOfInterest);
-      ItkMaskImageIteratorType  maskIt(maskItkImage, inputRegionOfInterest);
+      ItkInputImageIteratorType inputIt(inputItkImage, inputRegionOfInterest);
+      ItkMaskImageIteratorType maskIt(maskItkImage, inputRegionOfInterest);
       ItkOutputImageIteratorType outputIt(outputItkImage, inputRegionOfInterest);
 
-      //typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
+      // typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename
+      // ItkOutputImageType::PixelType>::min();
       if (!m_OverrideOutsideValue)
         m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
 
       m_MinValue = std::numeric_limits<mitk::ScalarType>::max();
       m_MaxValue = std::numeric_limits<mitk::ScalarType>::min();
 
-      for (inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd(); ++inputIt, ++maskIt, ++outputIt)
+      for (inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd();
+           ++inputIt, ++maskIt, ++outputIt)
       {
         if (maskIt.Get() > itk::NumericTraits<typename ItkMaskImageType::PixelType>::Zero)
         {
@@ -197,10 +202,10 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
 void mitk::MaskImageFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
-  mitk::Image::Pointer mask  = m_Mask;
+  mitk::Image::Pointer mask = m_Mask;
   mitk::Image::Pointer output = this->GetOutput();
 
-  if((output->IsInitialized()==false) || (mask.IsNull()) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
+  if ((output->IsInitialized() == false) || (mask.IsNull()) || (mask->GetTimeGeometry()->CountTimeSteps() == 0))
     return;
 
   m_InputTimeSelector->SetInput(input);
@@ -213,27 +218,27 @@ void mitk::MaskImageFilter::GenerateData()
   const mitk::TimeGeometry *maskTimeGeometry = mask->GetTimeGeometry();
   ScalarType timeInMS;
 
-  int timestep=0;
-  int tstart=outputRegion.GetIndex(3);
-  int tmax=tstart+outputRegion.GetSize(3);
+  int timestep = 0;
+  int tstart = outputRegion.GetIndex(3);
+  int tmax = tstart + outputRegion.GetSize(3);
 
   int t;
-  for(t=tstart;t<tmax;++t)
+  for (t = tstart; t < tmax; ++t)
   {
-    timeInMS = outputTimeGeometry->TimeStepToTimePoint( t );
+    timeInMS = outputTimeGeometry->TimeStepToTimePoint(t);
 
-    timestep = inputTimeGeometry->TimePointToTimeStep( timeInMS );
+    timestep = inputTimeGeometry->TimePointToTimeStep(timeInMS);
 
     m_InputTimeSelector->SetTimeNr(timestep);
     m_InputTimeSelector->UpdateLargestPossibleRegion();
     m_OutputTimeSelector->SetTimeNr(t);
     m_OutputTimeSelector->UpdateLargestPossibleRegion();
 
-    timestep = maskTimeGeometry->TimePointToTimeStep( timeInMS );
+    timestep = maskTimeGeometry->TimePointToTimeStep(timeInMS);
     m_MaskTimeSelector->SetTimeNr(timestep);
     m_MaskTimeSelector->UpdateLargestPossibleRegion();
 
-    AccessByItk(m_InputTimeSelector->GetOutput(),InternalComputeMask);
+    AccessByItk(m_InputTimeSelector->GetOutput(), InternalComputeMask);
   }
 
   m_TimeOfHeaderInitialization.Modified();

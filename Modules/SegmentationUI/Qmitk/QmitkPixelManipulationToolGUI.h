@@ -16,9 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKPIXELMANIPULATIONTOOLGUI_H
 #define QMITKPIXELMANIPULATIONTOOLGUI_H
 
+#include "QmitkDataStorageComboBox.h"
 #include "QmitkToolGUI.h"
 #include "mitkPixelManipulationTool.h"
-#include "QmitkDataStorageComboBox.h"
 #include <QSlider>
 #include <QSpinBox>
 
@@ -26,28 +26,25 @@ class QmitkPixelManipulationToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 public:
-
   mitkClassMacro(QmitkPixelManipulationToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  protected slots:
+    protected slots :
 
-    void OnNewToolAssociated(mitk::Tool*);
-    void OnSliderValueChanged(int);
-    void OnSpinBoxChanged();
-    void OnOkButtonClicked();
-    void SetFixedValueOn(bool);
-    void SetFixedValueOff(bool);
+    void OnNewToolAssociated(mitk::Tool *);
+  void OnSliderValueChanged(int);
+  void OnSpinBoxChanged();
+  void OnOkButtonClicked();
+  void SetFixedValueOn(bool);
+  void SetFixedValueOff(bool);
 
 protected:
-
   QmitkPixelManipulationToolGUI();
   virtual ~QmitkPixelManipulationToolGUI();
 
   mitk::PixelManipulationTool::Pointer m_PixelManipulationTool;
-  QSlider* m_Slider;
-  QSpinBox* m_Spinner;
+  QSlider *m_Slider;
+  QSpinBox *m_Spinner;
 
-};//class
+}; // class
 #endif

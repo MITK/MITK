@@ -19,17 +19,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-    ///
-    /// Just a base class for persistable classes
-    ///
-    class MITKPERSISTENCE_EXPORT IPersistable
-    {
-    public:
-        virtual bool Save(const std::string& fileName="") = 0;
-        virtual bool Load(const std::string& fileName="") = 0;
-        virtual void SetId(const std::string& id) = 0;
-        virtual std::string GetId() const = 0;
-    };
+  ///
+  /// Just a base class for persistable classes
+  ///
+  class MITKPERSISTENCE_EXPORT IPersistable
+  {
+  public:
+    virtual bool Save(const std::string &fileName = "") = 0;
+    virtual bool Load(const std::string &fileName = "") = 0;
+    virtual void SetId(const std::string &id) = 0;
+    virtual std::string GetId() const = 0;
+  };
 }
 
 #endif

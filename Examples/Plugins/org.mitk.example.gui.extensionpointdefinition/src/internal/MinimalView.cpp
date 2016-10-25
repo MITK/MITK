@@ -32,13 +32,13 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   m_Parent = parent;
   m_Controls.setupUi(parent);
 
-  auto  layout = new QVBoxLayout(m_Controls.m_ButtonContainer);
+  auto layout = new QVBoxLayout(m_Controls.m_ButtonContainer);
   //! [Collect extensions through registry]
   QList<ChangeTextDescriptor::Pointer> changeTexts = m_Registry.GetChangeTexts();
-  foreach(const ChangeTextDescriptor::Pointer& changeText, changeTexts)
+  foreach (const ChangeTextDescriptor::Pointer &changeText, changeTexts)
   {
     // Create a push button for each "changetext" descriptor
-    QPushButton* button = new QPushButton(changeText->GetName(), m_Controls.m_ButtonContainer);
+    QPushButton *button = new QPushButton(changeText->GetName(), m_Controls.m_ButtonContainer);
     button->setToolTip(changeText->GetDescription());
     button->setObjectName(changeText->GetID());
     layout->addWidget(button);
@@ -52,13 +52,13 @@ void MinimalView::CreateQtPartControl(QWidget *parent)
   //! [Collect extensions through registry]
 }
 
-void MinimalView::SetFocus ()
+void MinimalView::SetFocus()
 {
   m_Controls.m_InputText->setFocus();
 }
 
 //! [Use extended functionality to alter input text]
-void MinimalView::ChangeText(const QString& id)
+void MinimalView::ChangeText(const QString &id)
 {
   ChangeTextDescriptor::Pointer changeTextDescr = m_Registry.Find(id);
 

@@ -18,44 +18,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define mitkPlanarFigureSegmentationController_h_Included
 
 #include "mitkCommon.h"
-#include <MitkPlanarFigureSegmentationExports.h>
 #include "mitkImage.h"
+#include <MitkPlanarFigureSegmentationExports.h>
 
 #include "mitkPlanarFigure.h"
-#include <mitkSurface.h>
 #include "mitkReduceContourSetFilter.h"
 #include <mitkComputeContourSetNormalsFilter.h>
 #include <mitkCreateDistanceImageFromSurfaceFilter.h>
-
+#include <mitkSurface.h>
 
 namespace mitk
 {
+  /**
+  * \brief This class creates a binary image from a set of PlanarFigures.
+  *
+  * The class offers a convenient way to create a binary image from a
+  * variable number of contours that are represented by PlanarFigures.
+  *
+  * The first step is to create a mitkSurface for each PlanarFigure.
+  *
+  * The actual segmentation is done by interpolating these surfaces
+  * by means of the mitkCreateDistanceImageFromSurfaceFilter.
+  *
+  * Using the vtkMarchingCubes a surface is created from the resulting
+  * distance-image. This surface is then turned into a binary image using the
+  * mitkSurfaceToImageFilter.
+  */
 
-/**
-* \brief This class creates a binary image from a set of PlanarFigures.
-*
-* The class offers a convenient way to create a binary image from a
-* variable number of contours that are represented by PlanarFigures.
-*
-* The first step is to create a mitkSurface for each PlanarFigure.
-*
-* The actual segmentation is done by interpolating these surfaces
-* by means of the mitkCreateDistanceImageFromSurfaceFilter.
-*
-* Using the vtkMarchingCubes a surface is created from the resulting
-* distance-image. This surface is then turned into a binary image using the
-* mitkSurfaceToImageFilter.
-*/
-
-class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : public itk::Object
-{
+  class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : public itk::Object
+  {
   public:
-
     mitkClassMacroItkParent(PlanarFigureSegmentationController, itk::Object);
-    itkFactorylessNewMacro(PlanarFigureSegmentationController) /// specify the segmentation image that should be interpolated
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(
+      PlanarFigureSegmentationController) /// specify the segmentation image that should be interpolated
+      itkCloneMacro(Self)
 
-    virtual ~PlanarFigureSegmentationController();
+        virtual ~PlanarFigureSegmentationController();
 
     typedef std::vector<PlanarFigure::Pointer> PlanarFigureListType;
     typedef std::vector<Surface::Pointer> SurfaceListType;
@@ -67,7 +65,7 @@ class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : p
     * performed. It's needed to set the correct geometry information
     * on the segmentation result (pixel-spacing, slice-thickness, etc.).
     */
-    void SetReferenceImage( Image::Pointer referenceImage );
+    void SetReferenceImage(Image::Pointer referenceImage);
 
     /**
     * \brief Adds a new PlanarFigure to be considered in the interpolation.
@@ -80,9 +78,9 @@ class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : p
     * \warn The method does NOT check if there are two PlanarFigures on
     * the same slice. Doing this will lead to wrong segmentation results.
     */
-    void AddPlanarFigure( PlanarFigure::Pointer planarFigure );
+    void AddPlanarFigure(PlanarFigure::Pointer planarFigure);
 
-    void RemovePlanarFigure( mitk::PlanarFigure::Pointer planarFigure );
+    void RemovePlanarFigure(mitk::PlanarFigure::Pointer planarFigure);
 
     /**
     * \brief Performs the interpolation and returns the result
@@ -99,7 +97,6 @@ class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : p
     */
     Image::Pointer GetInterpolationResult();
 
-
     /**
     * \brief Method to create a surface from a PlanarFigure
     *
@@ -108,22 +105,19 @@ class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : p
     * The resulting surface contains of only ONE vtkPolygon that contains
     * all points of the PlanarFigure's polyline.
     */
-    static Surface::Pointer CreateSurfaceFromPlanarFigure( PlanarFigure::Pointer figure );
+    static Surface::Pointer CreateSurfaceFromPlanarFigure(PlanarFigure::Pointer figure);
 
     PlanarFigureListType GetAllPlanarFigures();
 
-    void SetReferenceDirectionVector( mitk::Vector3D vector );
-
-
+    void SetReferenceDirectionVector(mitk::Vector3D vector);
 
   protected:
-
     PlanarFigureSegmentationController();
 
     void InitializeFilters();
 
-    template<typename TPixel, unsigned int VImageDimension>
-    void GetImageBase(itk::Image<TPixel, VImageDimension>* input, itk::ImageBase<3>::Pointer& result);
+    template <typename TPixel, unsigned int VImageDimension>
+    void GetImageBase(itk::Image<TPixel, VImageDimension> *input, itk::ImageBase<3>::Pointer &result);
 
     PlanarFigureListType m_PlanarFigureList;
     SurfaceListType m_SurfaceList;
@@ -148,12 +142,8 @@ class MITKPLANARFIGURESEGMENTATION_EXPORT PlanarFigureSegmentationController : p
     Image::Pointer m_SegmentationAsImage;
 
     mitk::Vector3D m_ReferenceDirectionVector;
-
-
-};
+  };
 
 } // namespace
 
 #endif
-
-

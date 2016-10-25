@@ -15,7 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #ifdef _MSC_VER
-#pragma warning ( disable : 4786 )
+#pragma warning(disable : 4786)
 #endif
 
 #include "mitkBaseDataIOFactory.h"
@@ -24,11 +24,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-std::vector<BaseData::Pointer> BaseDataIO::LoadBaseDataFromFile(const std::string path, const std::string /*filePrefix*/,
-                                                                const std::string /*filePattern*/, bool /*series*/)
-{
-  return IOUtil::Load(path);
-}
+  std::vector<BaseData::Pointer> BaseDataIO::LoadBaseDataFromFile(const std::string path,
+                                                                  const std::string /*filePrefix*/,
+                                                                  const std::string /*filePattern*/,
+                                                                  bool /*series*/)
+  {
+    return IOUtil::Load(path);
+  }
 
 } // end namespace itk

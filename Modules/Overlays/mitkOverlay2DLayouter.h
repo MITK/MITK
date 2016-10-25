@@ -20,55 +20,60 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <MitkOverlaysExports.h>
 #include <mitkAbstractOverlayLayouter.h>
 
-namespace mitk {
+namespace mitk
+{
+  /** @brief A simple implementation of a layouter for 2D Overlays
+   */
+  class MITKOVERLAYS_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter
+  {
+  public:
+    enum Alignment
+    {
+      TopLeft,
+      Top,
+      TopRight,
+      BottomLeft,
+      Bottom,
+      BottomRight
+    };
+    mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-/** @brief A simple implementation of a layouter for 2D Overlays
- */
-class MITKOVERLAYS_EXPORT Overlay2DLayouter : public mitk::AbstractOverlayLayouter {
-public:
-  enum Alignment{TopLeft, Top, TopRight, BottomLeft, Bottom, BottomRight};
-  mitkClassMacro(Overlay2DLayouter, mitk::AbstractOverlayLayouter);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+      static std::string STANDARD_2D_TOPLEFT();
+    static std::string STANDARD_2D_TOP();
+    static std::string STANDARD_2D_TOPRIGHT();
+    static std::string STANDARD_2D_BOTTOMLEFT();
+    static std::string STANDARD_2D_BOTTOM();
+    static std::string STANDARD_2D_BOTTOMRIGHT();
 
-  static std::string STANDARD_2D_TOPLEFT();
-  static std::string STANDARD_2D_TOP();
-  static std::string STANDARD_2D_TOPRIGHT();
-  static std::string STANDARD_2D_BOTTOMLEFT();
-  static std::string STANDARD_2D_BOTTOM();
-  static std::string STANDARD_2D_BOTTOMRIGHT();
+    /** \brief Factory method for the different kinds of Layouters */
+    /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
+    static Overlay2DLayouter::Pointer CreateLayouter(Alignment alignment, BaseRenderer *renderer);
 
-  /** \brief Factory method for the different kinds of Layouters */
-  /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
-  static Overlay2DLayouter::Pointer CreateLayouter(Alignment alignment, BaseRenderer* renderer);
+    /** \brief Factory method for the different kinds of Layouters */
+    /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
+    static Overlay2DLayouter::Pointer CreateLayouter(const std::string &identifier, BaseRenderer *renderer);
 
-  /** \brief Factory method for the different kinds of Layouters */
-  /** Create a Layouter that, depending on the identifier sorts the Overlays in one corner of the Renderwindow*/
-  static Overlay2DLayouter::Pointer CreateLayouter(const std::string& identifier, BaseRenderer* renderer);
+    void PrepareLayout() override;
 
-  void PrepareLayout() override;
-protected:
+  protected:
+    /** \brief explicit constructor which disallows implicit conversions */
+    explicit Overlay2DLayouter();
 
-  /** \brief explicit constructor which disallows implicit conversions */
-  explicit Overlay2DLayouter();
+    /** \brief virtual destructor in order to derive from this class */
+    virtual ~Overlay2DLayouter();
 
-  /** \brief virtual destructor in order to derive from this class */
-  virtual ~Overlay2DLayouter();
+    Alignment m_Alignment;
 
-  Alignment m_Alignment;
+    double m_Margin;
 
-  double m_Margin;
+  private:
+    /** \brief copy constructor */
+    Overlay2DLayouter(const Overlay2DLayouter &);
 
-private:
-
-  /** \brief copy constructor */
-  Overlay2DLayouter( const Overlay2DLayouter &);
-
-  /** \brief assignment operator */
-  Overlay2DLayouter &operator=(const Overlay2DLayouter &);
-};
+    /** \brief assignment operator */
+    Overlay2DLayouter &operator=(const Overlay2DLayouter &);
+  };
 
 } // namespace mitk
 #endif // MITKOVERLAY2DLAYOUTER_H
-
-

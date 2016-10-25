@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkVersorTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkVersorTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkVersorTransform.h>
+#include <mitkImageCast.h>
 
-QmitkVersorTransformView::QmitkVersorTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkVersorTransformView::QmitkVersorTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,13 +45,13 @@ itk::Object::Pointer QmitkVersorTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkVersorTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkVersorTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 3)
   {
-    typedef typename itk::Image< TPixelType, 3 >  FixedImage3DType;
-    typedef typename itk::Image< TPixelType, 3 >  MovingImage3DType;
+    typedef typename itk::Image<TPixelType, 3> FixedImage3DType;
+    typedef typename itk::Image<TPixelType, 3> MovingImage3DType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImage3DType::Pointer fixedImage = itkImage1;
@@ -62,16 +62,17 @@ itk::Object::Pointer QmitkVersorTransformView::GetTransform2(itk::Image<TPixelTy
     movingImageToItk->Update();
     typename MovingImage3DType::Pointer movingImage = movingImageToItk->GetOutput();
 
-    typename itk::VersorTransform< double >::Pointer transformPointer = itk::VersorTransform< double >::New();
+    typename itk::VersorTransform<double>::Pointer transformPointer = itk::VersorTransform<double>::New();
     transformPointer->SetIdentity();
-    typedef typename itk::VersorTransform< double >    VersorTransformType;
+    typedef typename itk::VersorTransform<double> VersorTransformType;
     if (m_Controls.m_CenterForInitializerVersor->isChecked())
     {
-      typedef typename itk::CenteredTransformInitializer<VersorTransformType, FixedImage3DType, MovingImage3DType> TransformInitializerType;
+      typedef typename itk::CenteredTransformInitializer<VersorTransformType, FixedImage3DType, MovingImage3DType>
+        TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage );
-      transformInitializer->SetMovingImage( movingImage );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage);
+      transformInitializer->SetMovingImage(movingImage);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsVersor->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -121,10 +122,10 @@ QString QmitkVersorTransformView::GetName()
   return "Versor";
 }
 
-void QmitkVersorTransformView::SetupUI(QWidget* parent)
+void QmitkVersorTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesVersorTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesVersorTransformScale2->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesVersorTransformScale3->setValidator(validatorLineEditInputFloat);
@@ -144,7 +145,9 @@ itk::Array<double> QmitkVersorTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkVersorTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkVersorTransformView::Transform(vtkMatrix4x4 *vtkmatrix,
+                                                  vtkTransform *vtktransform,
+                                                  itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

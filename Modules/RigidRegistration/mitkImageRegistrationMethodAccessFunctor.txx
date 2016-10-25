@@ -14,168 +14,164 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkImageRegistrationMethodAccessFunctor.h"
 #include "mitkImageRegistrationMethod.h"
+#include "mitkImageRegistrationMethodAccessFunctor.h"
 
 #include <mitkImageCast.h>
 
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkMultiResolutionImageRegistrationMethod.h>
 
-namespace mitk {
-
-template<typename TPixel, unsigned int VImageDimension>
-void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixel, VImageDimension>* itkImage1,
-                                                          ImageRegistrationMethod* method)
+namespace mitk
 {
-
-
-
-  //convert mitk masks to itk masks
-  typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
-  typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
-  typedef typename itk::Image< unsigned char, VImageDimension >  MaskImageType;
-  typedef typename itk::ImageMaskSpatialObject< VImageDimension > ImageMaskType;
-  typename ImageMaskType::Pointer movingImageMask;
-  if(method->m_MovingMask.IsNotNull())
+  template <typename TPixel, unsigned int VImageDimension>
+  void ImageRegistrationMethodAccessFunctor::AccessItkImage(const itk::Image<TPixel, VImageDimension> *itkImage1,
+                                                            ImageRegistrationMethod *method)
   {
-    typename MovingImageType::Pointer movingMask = MovingImageType::New();
-    mitk::CastToItkImage(method->m_MovingMask, movingMask);
-    typename itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MaskImageType>::New();
-    maskImageCaster->SetInput(movingMask);
-    maskImageCaster->UpdateLargestPossibleRegion();
-    movingImageMask = ImageMaskType::New();
-    movingImageMask->SetImage(maskImageCaster->GetOutput());
-  }
-
-  typename ImageMaskType::Pointer fixedImageMask;
-  if(method->m_FixedMask.IsNotNull())
-  {
-    typename FixedImageType::Pointer fixedMask = FixedImageType::New();
-    mitk::CastToItkImage(method->m_FixedMask, fixedMask);
-    typename itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, MaskImageType>::New();
-    maskImageCaster->SetInput(fixedMask);
-    maskImageCaster->UpdateLargestPossibleRegion();
-    fixedImageMask = ImageMaskType::New();
-    fixedImageMask->SetImage(maskImageCaster->GetOutput());
-  }
-
-  // typedefs
-  typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
-  typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
-  typedef typename itk::LinearInterpolateImageFunction<MovingImageType, double> InterpolatorType;
-  typedef itk::NearestNeighborInterpolateImageFunction<MovingImageType, double> InterpolatorType2;
-  //typedef typename itk::ImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
-  typedef typename itk::MultiResolutionImageRegistrationMethod< FixedImageType, MovingImageType > RegistrationType;
-  typedef typename itk::Transform< double, VImageDimension, VImageDimension > TransformType;
-  typedef typename itk::MatrixOffsetTransformBase< double, VImageDimension, VImageDimension > MatrixTransformType;
-  typedef typename TransformType::Pointer                TransformPointer;
-  typedef typename itk::ImageToImageMetric<FixedImageType, MovingImageType>    MetricType;
-  typedef typename MetricType::Pointer                MetricPointer;
-  typedef typename itk::SingleValuedNonLinearOptimizer OptimizerType;
-  // the fixed and the moving image
-  typename FixedImageType::Pointer fixedImage = FixedImageType::New();
-  typename MovingImageType::ConstPointer movingImage = itkImage1;
-  mitk::CastToItkImage(method->m_ReferenceImage, fixedImage);
-
-
-  // the metric
-  MetricPointer metric = dynamic_cast<MetricType*>(method->m_Metric.GetPointer());
-  if(movingImageMask.IsNotNull())
-    metric->SetMovingImageMask(movingImageMask);
-  if(fixedImageMask.IsNotNull())
-    metric->SetFixedImageMask(fixedImageMask);
-
-  // the transform
-  TransformPointer transform = dynamic_cast<TransformType*>(method->m_Transform.GetPointer());
-  if( transform.IsNull() )
-    mitkThrow() << "Failed to retrieve registration transform, dynamic cast failed";
-
-  // the optimizer
-  typename OptimizerType::Pointer optimizer = dynamic_cast<OptimizerType*>(method->m_Optimizer.GetPointer());
-
-
-  // optimizer scales
-  if (method->m_OptimizerScales.Size() != 0)
-  {
-    typename OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
-    for (unsigned int i = 0; i < scales.Size(); i++)
+    // convert mitk masks to itk masks
+    typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
+    typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
+    typedef typename itk::Image<unsigned char, VImageDimension> MaskImageType;
+    typedef typename itk::ImageMaskSpatialObject<VImageDimension> ImageMaskType;
+    typename ImageMaskType::Pointer movingImageMask;
+    if (method->m_MovingMask.IsNotNull())
     {
-      scales[i] = method->m_OptimizerScales[i];
+      typename MovingImageType::Pointer movingMask = MovingImageType::New();
+      mitk::CastToItkImage(method->m_MovingMask, movingMask);
+      typename itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster =
+        itk::CastImageFilter<MovingImageType, MaskImageType>::New();
+      maskImageCaster->SetInput(movingMask);
+      maskImageCaster->UpdateLargestPossibleRegion();
+      movingImageMask = ImageMaskType::New();
+      movingImageMask->SetImage(maskImageCaster->GetOutput());
     }
-    optimizer->SetScales( scales );
-  }
-  // the registration method
-  typename RegistrationType::Pointer registration = RegistrationType::New();
-  registration->SetNumberOfLevels( method->m_MultiResolutionScales );
-  registration->SetMetric(metric);
-  registration->SetOptimizer(optimizer);
-  registration->SetTransform(transform);
-  registration->SetFixedImage(fixedImage);
-  registration->SetMovingImage(movingImage);
-  registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
 
-  // set initial position to identity by first setting the transformation to identity
-  // and then using its parameters
+    typename ImageMaskType::Pointer fixedImageMask;
+    if (method->m_FixedMask.IsNotNull())
+    {
+      typename FixedImageType::Pointer fixedMask = FixedImageType::New();
+      mitk::CastToItkImage(method->m_FixedMask, fixedMask);
+      typename itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster =
+        itk::CastImageFilter<FixedImageType, MaskImageType>::New();
+      maskImageCaster->SetInput(fixedMask);
+      maskImageCaster->UpdateLargestPossibleRegion();
+      fixedImageMask = ImageMaskType::New();
+      fixedImageMask->SetImage(maskImageCaster->GetOutput());
+    }
 
-  typename TransformType::ParametersType identityParameters = transform->GetParameters();
-  // the SetIdentity avialable only for a transform subset (of type matrix offset)
-  MatrixTransformType* matrix_transform = dynamic_cast< MatrixTransformType* >( method->m_Transform.GetPointer() );
-  if( matrix_transform != nullptr)
-  {
-    matrix_transform->SetIdentity();
-    identityParameters = matrix_transform->GetParameters();
-  }
+    // typedefs
+    typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
+    typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
+    typedef typename itk::LinearInterpolateImageFunction<MovingImageType, double> InterpolatorType;
+    typedef itk::NearestNeighborInterpolateImageFunction<MovingImageType, double> InterpolatorType2;
+    // typedef typename itk::ImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
+    typedef typename itk::MultiResolutionImageRegistrationMethod<FixedImageType, MovingImageType> RegistrationType;
+    typedef typename itk::Transform<double, VImageDimension, VImageDimension> TransformType;
+    typedef typename itk::MatrixOffsetTransformBase<double, VImageDimension, VImageDimension> MatrixTransformType;
+    typedef typename TransformType::Pointer TransformPointer;
+    typedef typename itk::ImageToImageMetric<FixedImageType, MovingImageType> MetricType;
+    typedef typename MetricType::Pointer MetricPointer;
+    typedef typename itk::SingleValuedNonLinearOptimizer OptimizerType;
+    // the fixed and the moving image
+    typename FixedImageType::Pointer fixedImage = FixedImageType::New();
+    typename MovingImageType::ConstPointer movingImage = itkImage1;
+    mitk::CastToItkImage(method->m_ReferenceImage, fixedImage);
 
-  registration->SetInitialTransformParameters( identityParameters );
-  optimizer->SetInitialPosition( identityParameters );
+    // the metric
+    MetricPointer metric = dynamic_cast<MetricType *>(method->m_Metric.GetPointer());
+    if (movingImageMask.IsNotNull())
+      metric->SetMovingImageMask(movingImageMask);
+    if (fixedImageMask.IsNotNull())
+      metric->SetFixedImageMask(fixedImageMask);
 
-  if (method->m_Interpolator == ImageRegistrationMethod::LINEARINTERPOLATOR)
-  {
-    typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
-    registration->SetInterpolator(interpolator);
-  }
-  else if (method->m_Interpolator == ImageRegistrationMethod::NEARESTNEIGHBORINTERPOLATOR)
-  {
-    typename InterpolatorType2::Pointer interpolator = InterpolatorType2::New();
-    registration->SetInterpolator(interpolator);
-  }
+    // the transform
+    TransformPointer transform = dynamic_cast<TransformType *>(method->m_Transform.GetPointer());
+    if (transform.IsNull())
+      mitkThrow() << "Failed to retrieve registration transform, dynamic cast failed";
 
+    // the optimizer
+    typename OptimizerType::Pointer optimizer = dynamic_cast<OptimizerType *>(method->m_Optimizer.GetPointer());
 
-  // registering command observer with the optimizer
-  unsigned int pyramid_observer_tag = 0;
-  if (method->m_Observer.IsNotNull())
-  {
-    method->m_Observer->AddStepsToDo(20);
-    optimizer->AddObserver(itk::IterationEvent(), method->m_Observer);
-    //registration->AddObserver(itk::IterationEvent(), method->m_Observer);
-    transform->AddObserver(itk::IterationEvent(), method->m_Observer);
+    // optimizer scales
+    if (method->m_OptimizerScales.Size() != 0)
+    {
+      typename OptimizerType::ScalesType scales(transform->GetNumberOfParameters());
+      for (unsigned int i = 0; i < scales.Size(); i++)
+      {
+        scales[i] = method->m_OptimizerScales[i];
+      }
+      optimizer->SetScales(scales);
+    }
+    // the registration method
+    typename RegistrationType::Pointer registration = RegistrationType::New();
+    registration->SetNumberOfLevels(method->m_MultiResolutionScales);
+    registration->SetMetric(metric);
+    registration->SetOptimizer(optimizer);
+    registration->SetTransform(transform);
+    registration->SetFixedImage(fixedImage);
+    registration->SetMovingImage(movingImage);
+    registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
 
-    typename mitk::RigidRegistrationPyramidObserver<RegistrationType>::Pointer pyramid_observer =
+    // set initial position to identity by first setting the transformation to identity
+    // and then using its parameters
+
+    typename TransformType::ParametersType identityParameters = transform->GetParameters();
+    // the SetIdentity avialable only for a transform subset (of type matrix offset)
+    MatrixTransformType *matrix_transform = dynamic_cast<MatrixTransformType *>(method->m_Transform.GetPointer());
+    if (matrix_transform != nullptr)
+    {
+      matrix_transform->SetIdentity();
+      identityParameters = matrix_transform->GetParameters();
+    }
+
+    registration->SetInitialTransformParameters(identityParameters);
+    optimizer->SetInitialPosition(identityParameters);
+
+    if (method->m_Interpolator == ImageRegistrationMethod::LINEARINTERPOLATOR)
+    {
+      typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      registration->SetInterpolator(interpolator);
+    }
+    else if (method->m_Interpolator == ImageRegistrationMethod::NEARESTNEIGHBORINTERPOLATOR)
+    {
+      typename InterpolatorType2::Pointer interpolator = InterpolatorType2::New();
+      registration->SetInterpolator(interpolator);
+    }
+
+    // registering command observer with the optimizer
+    unsigned int pyramid_observer_tag = 0;
+    if (method->m_Observer.IsNotNull())
+    {
+      method->m_Observer->AddStepsToDo(20);
+      optimizer->AddObserver(itk::IterationEvent(), method->m_Observer);
+      // registration->AddObserver(itk::IterationEvent(), method->m_Observer);
+      transform->AddObserver(itk::IterationEvent(), method->m_Observer);
+
+      typename mitk::RigidRegistrationPyramidObserver<RegistrationType>::Pointer pyramid_observer =
         mitk::RigidRegistrationPyramidObserver<RegistrationType>::New();
 
-    pyramid_observer_tag = registration->AddObserver( itk::IterationEvent(), pyramid_observer );
-  }
+      pyramid_observer_tag = registration->AddObserver(itk::IterationEvent(), pyramid_observer);
+    }
 
-  registration->Update();
+    registration->Update();
 
-  if( pyramid_observer_tag )
-  {
-    registration->RemoveObserver( pyramid_observer_tag );
-  }
+    if (pyramid_observer_tag)
+    {
+      registration->RemoveObserver(pyramid_observer_tag);
+    }
 
-  if (method->m_Observer.IsNotNull())
-  {
-    optimizer->RemoveAllObservers();
-    registration->RemoveAllObservers();
-    transform->RemoveAllObservers();
-    method->m_Observer->SetRemainingProgress(15);
-  }
+    if (method->m_Observer.IsNotNull())
+    {
+      optimizer->RemoveAllObservers();
+      registration->RemoveAllObservers();
+      transform->RemoveAllObservers();
+      method->m_Observer->SetRemainingProgress(15);
+    }
 
-  if (method->m_Observer.IsNotNull())
-  {
-    method->m_Observer->SetRemainingProgress(5);
+    if (method->m_Observer.IsNotNull())
+    {
+      method->m_Observer->SetRemainingProgress(5);
+    }
   }
-}
 
 } // end namespace

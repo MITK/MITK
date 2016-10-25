@@ -23,24 +23,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QmitkPropertyItem
 {
 public:
-  explicit QmitkPropertyItem(const QList<QVariant>& data);
+  explicit QmitkPropertyItem(const QList<QVariant> &data);
   ~QmitkPropertyItem();
 
-  void AppendChild(QmitkPropertyItem* child);
-  QmitkPropertyItem* GetChild(int row) const;
+  void AppendChild(QmitkPropertyItem *child);
+  QmitkPropertyItem *GetChild(int row) const;
   int GetChildCount() const;
   int GetColumnCount() const;
   QVariant GetData(int column) const;
-  QmitkPropertyItem* GetParent() const;
+  QmitkPropertyItem *GetParent() const;
   int GetRow();
 
 private:
-  QmitkPropertyItem(const QmitkPropertyItem&);
-  QmitkPropertyItem& operator=(const QmitkPropertyItem&);
+  QmitkPropertyItem(const QmitkPropertyItem &);
+  QmitkPropertyItem &operator=(const QmitkPropertyItem &);
 
   QList<QVariant> m_Data;
-  QList<QmitkPropertyItem*> m_Children;
-  QmitkPropertyItem* m_Parent;
+  QList<QmitkPropertyItem *> m_Children;
+  QmitkPropertyItem *m_Parent;
 };
 
 #endif

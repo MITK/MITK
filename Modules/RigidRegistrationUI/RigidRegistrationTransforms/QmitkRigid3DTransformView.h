@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkRigid3DTransformViewWidgetHIncluded
 #define QmitkRigid3DTransformViewWidgetHIncluded
 
-#include "ui_QmitkRigid3DTransformControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
+#include "ui_QmitkRigid3DTransformControls.h"
 #include <itkImage.h>
 
 /*!
@@ -29,10 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkRigid3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
-
 public:
-
-  QmitkRigid3DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+  QmitkRigid3DTransformView(QWidget *parent = 0, Qt::WindowFlags f = 0);
   ~QmitkRigid3DTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType();
@@ -45,21 +43,21 @@ public:
 
   virtual QString GetName();
 
-  virtual void SetupUI(QWidget* parent);
+  virtual void SetupUI(QWidget *parent);
 
   virtual itk::Array<double> GetScales();
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams);
+  virtual vtkTransform *Transform(vtkMatrix4x4 *vtkmatrix,
+                                  vtkTransform *vtktransform,
+                                  itk::Array<double> transformParams);
 
   virtual int GetNumberOfTransformParameters();
 
 private:
-
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
-
   Ui::QmitkRigid3DTransformControls m_Controls;
 
   itk::Object::Pointer m_TransformObject;
@@ -67,7 +65,6 @@ protected:
   double m_CenterX;
   double m_CenterY;
   double m_CenterZ;
-
 };
 
 #endif

@@ -17,13 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKMETRICFACTORY_H
 #define MITKMETRICFACTORY_H
 
-#include "itkImageToImageMetric.h"
 #include "itkImage.h"
-#include "mitkMetricParameters.h"
 #include "itkImageMaskSpatialObject.h"
+#include "itkImageToImageMetric.h"
+#include "mitkMetricParameters.h"
 
-namespace mitk {
-
+namespace mitk
+{
   /*!
   \brief This class creates a metric for a rigid registration process.
 
@@ -42,51 +42,42 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  template < class TPixelType, unsigned int VImageDimension >
+  template <class TPixelType, unsigned int VImageDimension>
   class MetricFactory : public itk::Object
   {
   public:
     mitkClassMacroItkParent(MetricFactory, itk::Object);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-    typedef typename itk::Image< unsigned char, VImageDimension >  FixedMaskImageType;
-    typedef typename itk::ImageMaskSpatialObject< VImageDimension > FixedImageMaskType;
-    typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-    typedef typename itk::Image< unsigned char, VImageDimension >  MovingMaskImageType;
-    typedef typename itk::ImageMaskSpatialObject< VImageDimension > MovingImageMaskType;
+      typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+    typedef typename itk::Image<unsigned char, VImageDimension> FixedMaskImageType;
+    typedef typename itk::ImageMaskSpatialObject<VImageDimension> FixedImageMaskType;
+    typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+    typedef typename itk::Image<unsigned char, VImageDimension> MovingMaskImageType;
+    typedef typename itk::ImageMaskSpatialObject<VImageDimension> MovingImageMaskType;
 
-    typedef typename itk::ImageToImageMetric< FixedImageType, MovingImageType >    MetricType;
-    typedef typename MetricType::Pointer                MetricPointer;
+    typedef typename itk::ImageToImageMetric<FixedImageType, MovingImageType> MetricType;
+    typedef typename MetricType::Pointer MetricPointer;
 
     /**
     \brief Returns the metric which then can be used in combination with a transform, an optimizer
     and an interpolator within a registration pipeline.
     */
-    MetricPointer GetMetric( );
+    MetricPointer GetMetric();
 
     /**
     \brief Sets the instance to the metric parameters class which holds all parameters for the new metric.
     */
-    void SetMetricParameters(MetricParameters::Pointer metricParameters)
-    {
-      m_MetricParameters = metricParameters;
-    }
-
+    void SetMetricParameters(MetricParameters::Pointer metricParameters) { m_MetricParameters = metricParameters; }
     /**
     \brief Returns the instance to the metric parameters class which holds all parameters for the new metric.
     */
-    MetricParameters::Pointer GetMetricParameters()
-    {
-      return m_MetricParameters;
-    }
-
+    MetricParameters::Pointer GetMetricParameters() { return m_MetricParameters; }
   protected:
     MetricFactory();
-    ~MetricFactory() {};
+    ~MetricFactory(){};
 
     MetricParameters::Pointer m_MetricParameters;
   };

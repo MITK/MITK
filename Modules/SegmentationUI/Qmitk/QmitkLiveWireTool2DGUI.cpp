@@ -18,26 +18,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkNewSegmentationDialog.h"
 
+#include "mitkBaseRenderer.h"
+#include "mitkStepper.h"
 #include <qlabel.h>
-#include <qslider.h>
-#include <qpushbutton.h>
 #include <qlayout.h>
 #include <qpainter.h>
-#include "mitkStepper.h"
-#include "mitkBaseRenderer.h"
-
+#include <qpushbutton.h>
+#include <qslider.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLiveWireTool2DGUI, "")
 
-QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI()
-  : QmitkToolGUI()
+QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI() : QmitkToolGUI()
 {
   m_Controls.setupUi(this);
   m_Controls.m_Information->hide();
 
   connect(m_Controls.m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()));
   connect(m_Controls.m_ClearButton, SIGNAL(clicked()), this, SLOT(OnClearSegmentation()));
-  connect(this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)));
+  connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
   connect(m_Controls.m_InformationCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
 }
 
@@ -45,11 +43,10 @@ QmitkLiveWireTool2DGUI::~QmitkLiveWireTool2DGUI()
 {
 }
 
-void QmitkLiveWireTool2DGUI::OnNewToolAssociated(mitk::Tool* tool)
+void QmitkLiveWireTool2DGUI::OnNewToolAssociated(mitk::Tool *tool)
 {
-  m_LiveWireTool = dynamic_cast<mitk::LiveWireTool2D*>(tool);
+  m_LiveWireTool = dynamic_cast<mitk::LiveWireTool2D *>(tool);
 }
-
 
 void QmitkLiveWireTool2DGUI::OnConfirmSegmentation()
 {

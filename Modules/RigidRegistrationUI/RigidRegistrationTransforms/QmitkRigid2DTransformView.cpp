@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkRigid2DTransformView.h"
 #include "mitkImageAccessByItk.h"
-#include <mitkImageCast.h>
-#include <itkRigid2DTransform.h>
-#include <itkCenteredTransformInitializer.h>
 #include <QValidator>
+#include <itkCenteredTransformInitializer.h>
+#include <itkRigid2DTransform.h>
+#include <mitkImageCast.h>
 
-QmitkRigid2DTransformView::QmitkRigid2DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f),
-m_CenterX(0), m_CenterY(0), m_CenterZ(0)
+QmitkRigid2DTransformView::QmitkRigid2DTransformView(QWidget *parent, Qt::WindowFlags f)
+  : QmitkRigidRegistrationTransformsGUIBase(parent, f), m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 {
 }
 
@@ -45,34 +45,34 @@ itk::Object::Pointer QmitkRigid2DTransformView::GetTransform()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkRigid2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkRigid2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1)
 {
   if (VImageDimension == 2)
   {
-    typedef typename itk::Image< TPixelType, 2 >  FixedImage2DType;
-    typedef typename itk::Image< TPixelType, 2 >  MovingImage2DType;
+    typedef typename itk::Image<TPixelType, 2> FixedImage2DType;
+    typedef typename itk::Image<TPixelType, 2> MovingImage2DType;
 
     // the fixedImage is the input parameter (fix for Bug #14626)
     typename FixedImage2DType::Pointer fixedImage2D = itkImage1;
 
     // the movingImage type is known, use the ImageToItk filter (fix for Bug #14626)
-    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk =
-        mitk::ImageToItk<MovingImage2DType>::New();
+    typename mitk::ImageToItk<MovingImage2DType>::Pointer movingImageToItk = mitk::ImageToItk<MovingImage2DType>::New();
     movingImageToItk->SetInput(m_MovingImage);
     movingImageToItk->Update();
     typename MovingImage2DType::Pointer movingImage2D = movingImageToItk->GetOutput();
 
-    typename itk::Rigid2DTransform< double >::Pointer transformPointer = itk::Rigid2DTransform< double >::New();
+    typename itk::Rigid2DTransform<double>::Pointer transformPointer = itk::Rigid2DTransform<double>::New();
     transformPointer->SetIdentity();
     if (m_Controls.m_CenterForInitializerRigid2D->isChecked())
     {
-      typedef typename itk::Rigid2DTransform< double > Rigid2DTransformType;
-      typedef typename itk::CenteredTransformInitializer<Rigid2DTransformType, FixedImage2DType, MovingImage2DType> TransformInitializerType;
+      typedef typename itk::Rigid2DTransform<double> Rigid2DTransformType;
+      typedef typename itk::CenteredTransformInitializer<Rigid2DTransformType, FixedImage2DType, MovingImage2DType>
+        TransformInitializerType;
       typename TransformInitializerType::Pointer transformInitializer = TransformInitializerType::New();
-      transformInitializer->SetFixedImage( fixedImage2D );
-      transformInitializer->SetMovingImage( movingImage2D );
-      transformInitializer->SetTransform( transformPointer );
+      transformInitializer->SetFixedImage(fixedImage2D);
+      transformInitializer->SetMovingImage(movingImage2D);
+      transformInitializer->SetTransform(transformPointer);
       if (m_Controls.m_MomentsRigid2D->isChecked())
       {
         transformInitializer->MomentsOn();
@@ -119,10 +119,10 @@ QString QmitkRigid2DTransformView::GetName()
   return "Rigid2D";
 }
 
-void QmitkRigid2DTransformView::SetupUI(QWidget* parent)
+void QmitkRigid2DTransformView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  QValidator *validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
   m_Controls.m_ScalesRigid2DTransformScale1->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesRigid2DTransformScaleTranslationX->setValidator(validatorLineEditInputFloat);
   m_Controls.m_ScalesRigid2DTransformScaleTranslationY->setValidator(validatorLineEditInputFloat);
@@ -142,7 +142,9 @@ itk::Array<double> QmitkRigid2DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkRigid2DTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform *QmitkRigid2DTransformView::Transform(vtkMatrix4x4 * /*vtkmatrix*/,
+                                                   vtkTransform *vtktransform,
+                                                   itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

@@ -17,74 +17,64 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MovieGeneratorWin32WIN32_H_HEADER_INCLUDED
 #define MovieGeneratorWin32WIN32_H_HEADER_INCLUDED
 
-#include "mitkMovieGenerator.h"
 #include "MitkAlgorithmsExtExports.h"
+#include "mitkMovieGenerator.h"
 #include <comdef.h>
 #include <memory.h>
-#include <tchar.h>
 #include <string.h>
+#include <tchar.h>
 #include <vfw.h>
 
-#pragma message("     _Adding library: vfw32.lib" )
-#pragma comment ( lib, "vfw32.lib")
+#pragma message("     _Adding library: vfw32.lib")
+#pragma comment(lib, "vfw32.lib")
 
-
-namespace mitk {
-
-
-class MITKALGORITHMSEXT_EXPORT MovieGeneratorWin32 : public MovieGenerator
+namespace mitk
 {
+  class MITKALGORITHMSEXT_EXPORT MovieGeneratorWin32 : public MovieGenerator
+  {
+  public:
+    mitkClassMacro(MovieGeneratorWin32, MovieGenerator);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-public:
+      virtual void SetFileName(const char *fileName);
 
-  mitkClassMacro(MovieGeneratorWin32, MovieGenerator);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  protected:
+    MovieGeneratorWin32();
 
-  virtual void SetFileName( const char *fileName );
+    //! reads out size of current OpenGL context and stores it
+    void InitBitmapHeader();
 
+    //! called directly before the first frame is added
+    virtual bool InitGenerator();
 
-protected:
+    //! used to add a frame
+    virtual bool AddFrame(void *data);
 
-  MovieGeneratorWin32();
+    //! called after the last frame is added
+    virtual bool TerminateGenerator();
 
-  //! reads out size of current OpenGL context and stores it
-  void InitBitmapHeader();
+    //! name of output file
+    _bstr_t m_sFile;
 
-  //! called directly before the first frame is added
-  virtual bool InitGenerator();
+    //! structure contains information for a single stream
+    BITMAPINFOHEADER m_bih;
 
-  //! used to add a frame
-  virtual bool AddFrame( void *data );
+    //! last error string
+    _bstr_t m_sError;
 
-  //! called after the last frame is added
-  virtual bool TerminateGenerator();
+  private:
+    //! frame counter
+    long m_lFrame;
 
-  //! name of output file
-  _bstr_t m_sFile;
+    //! file interface pointer
+    PAVIFILE m_pAVIFile;
 
-  //! structure contains information for a single stream
-  BITMAPINFOHEADER m_bih;
+    //! Address of the stream interface
+    PAVISTREAM m_pStream;
 
-  //! last error string
-  _bstr_t m_sError;
-
-
-private:
-
-  //! frame counter
-  long m_lFrame;
-
-  //! file interface pointer
-  PAVIFILE m_pAVIFile;
-
-  //! Address of the stream interface
-  PAVISTREAM m_pStream;
-
-  //! Address of the compressed video stream
-  PAVISTREAM m_pStreamCompressed;
-
-};
+    //! Address of the compressed video stream
+    PAVISTREAM m_pStreamCompressed;
+  };
 
 } // namespace mitk
 

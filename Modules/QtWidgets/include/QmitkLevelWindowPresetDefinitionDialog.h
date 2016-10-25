@@ -28,16 +28,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 /// \ingroup QmitkModule
-class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog, public Ui::QmitkLevelWindowPresetDefinition
+class MITKQTWIDGETS_EXPORT QmitkLevelWindowPresetDefinitionDialog : public QDialog,
+                                                                    public Ui::QmitkLevelWindowPresetDefinition
 {
   Q_OBJECT
 
 public:
-
-  QmitkLevelWindowPresetDefinitionDialog(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkLevelWindowPresetDefinitionDialog(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkLevelWindowPresetDefinitionDialog();
 
-  void setPresets(std::map<std::string, double>& level, std::map<std::string, double>& window, QString initLevel, QString initWindow);
+  void setPresets(std::map<std::string, double> &level,
+                  std::map<std::string, double> &window,
+                  QString initLevel,
+                  QString initWindow);
 
   std::map<std::string, double> getLevelPresets();
 
@@ -49,59 +52,53 @@ protected slots:
   void removePreset();
   void changePreset();
 
-  void ListViewSelectionChanged(const QItemSelection&, const QItemSelection&);
+  void ListViewSelectionChanged(const QItemSelection &, const QItemSelection &);
   void sortPresets(int index);
 
-
 protected:
-
   class PresetTableModel : public QAbstractTableModel
   {
-
   public:
-
-    struct Entry {
+    struct Entry
+    {
       std::string name;
       double level;
       double window;
 
-      Entry(const std::string& n, double l, double w)
-       : name(n), level(l), window(w) {}
+      Entry(const std::string &n, double l, double w) : name(n), level(l), window(w) {}
     };
 
-    PresetTableModel(std::map<std::string, double>& levels,
-                     std::map<std::string, double>& windows,
-                     QObject* parent = nullptr);
+    PresetTableModel(std::map<std::string, double> &levels,
+                     std::map<std::string, double> &windows,
+                     QObject *parent = nullptr);
 
-    int rowCount(const QModelIndex&) const override;
-    int columnCount(const QModelIndex&) const override;
-    QVariant data(const QModelIndex& index, int) const override;
+    int rowCount(const QModelIndex &) const override;
+    int columnCount(const QModelIndex &) const override;
+    QVariant data(const QModelIndex &index, int) const override;
 
     QVariant headerData(int section, Qt::Orientation orientation, int) const override;
 
-    void addPreset(std::string& name, double level, double window);
-    void removePreset(const QModelIndex&);
-    void changePreset(int row, std::string& name, double level, double window);
+    void addPreset(std::string &name, double level, double window);
+    void removePreset(const QModelIndex &);
+    void changePreset(int row, std::string &name, double level, double window);
 
-    void getLevels(std::map<std::string, double>& levels);
-    void getWindows(std::map<std::string, double>& windows);
+    void getLevels(std::map<std::string, double> &levels);
+    void getWindows(std::map<std::string, double> &windows);
 
-    bool contains(std::string& name);
+    bool contains(std::string &name);
 
-    Entry getPreset(const QModelIndex&) const;
+    Entry getPreset(const QModelIndex &) const;
 
   private:
-
-     std::vector<Entry> m_Entries;
-
+    std::vector<Entry> m_Entries;
   };
 
-  void resizeEvent(QResizeEvent* event) override;
-  void showEvent(QShowEvent* event) override;
+  void resizeEvent(QResizeEvent *event) override;
+  void showEvent(QShowEvent *event) override;
 
   void resizeColumns();
 
-  PresetTableModel* m_TableModel;
+  PresetTableModel *m_TableModel;
   QSortFilterProxyModel m_SortModel;
 };
 

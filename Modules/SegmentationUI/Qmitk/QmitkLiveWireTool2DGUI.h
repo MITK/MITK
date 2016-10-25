@@ -18,16 +18,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkLiveWireTool2DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include <MitkSegmentationUIExports.h>
 #include "mitkLiveWireTool2D.h"
 #include "ui_QmitkLiveWireTool2DGUIControls.h"
+#include <MitkSegmentationUIExports.h>
 
 class QSlider;
 class QLabel;
 class QFrame;
 class QPushButton;
 #include <QCheckBox>
-
 
 #include "QmitkStepperAdapter.h"
 
@@ -44,21 +43,19 @@ class MITKSEGMENTATIONUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkLiveWireTool2DGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  protected slots:
+    protected slots :
 
-    void OnNewToolAssociated(mitk::Tool*);
+    void OnNewToolAssociated(mitk::Tool *);
 
-    void OnConfirmSegmentation();
+  void OnConfirmSegmentation();
 
-    void OnClearSegmentation();
+  void OnClearSegmentation();
 
-    void OnShowInformation( bool on );
+  void OnShowInformation(bool on);
 
 protected:
-
   QmitkLiveWireTool2DGUI();
   virtual ~QmitkLiveWireTool2DGUI();
 

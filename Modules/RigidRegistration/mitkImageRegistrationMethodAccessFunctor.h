@@ -27,16 +27,14 @@ namespace mitk
   {
     typedef ImageRegistrationMethodAccessFunctor Self;
 
-    void operator()(const mitk::Image* img, ImageRegistrationMethod* method)
+    void operator()(const mitk::Image *img, ImageRegistrationMethod *method)
     {
       AccessByItk_1(img, AccessItkImage, method)
     }
 
-    template < typename TPixel, unsigned int VImageDimension >
-    void AccessItkImage( const itk::Image<TPixel, VImageDimension>* itkImage1,
-                         ImageRegistrationMethod* method);
+    template <typename TPixel, unsigned int VImageDimension>
+    void AccessItkImage(const itk::Image<TPixel, VImageDimension> *itkImage1, ImageRegistrationMethod *method);
   };
 }
 
 #endif // MITKIMAGEREGISTRATIONMETHODACCESSFUNCTOR_H
-

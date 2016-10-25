@@ -16,17 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkSliceWidget.h"
 #include "QmitkStepperAdapter.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkImage.h"
 #include "mitkCameraController.h"
-#include <mitkProportionalTimeGeometry.h>
+#include "mitkImage.h"
+#include "mitkNodePredicateDataType.h"
 #include <QMenu>
 #include <QMouseEvent>
 #include <mitkCameraController.h>
+#include <mitkProportionalTimeGeometry.h>
 
-QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
-    Qt::WindowFlags f) :
-  QWidget(parent, f)
+QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::WindowFlags f) : QWidget(parent, f)
 {
   this->setupUi(this);
 
@@ -38,7 +36,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
   popUp->addAction("Frontal");
   popUp->addAction("Sagittal");
 
-  QObject::connect(popUp, SIGNAL(triggered(QAction*)), this, SLOT(ChangeView(QAction*)) );
+  QObject::connect(popUp, SIGNAL(triggered(QAction *)), this, SLOT(ChangeView(QAction *)));
   setPopUpEnabled(false);
 
   m_SlicedGeometry = 0;
@@ -57,44 +55,39 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget* parent, const char* name,
   m_Renderer = m_RenderWindow->GetRenderer();
   hlayout->addWidget(m_RenderWindow);
 
-  new QmitkStepperAdapter(m_NavigatorWidget,
-      m_RenderWindow->GetSliceNavigationController()->GetSlice(),
-      "navigation");
+  new QmitkStepperAdapter(m_NavigatorWidget, m_RenderWindow->GetSliceNavigationController()->GetSlice(), "navigation");
 
   SetLevelWindowEnabled(true);
 }
 
-mitk::VtkPropRenderer* QmitkSliceWidget::GetRenderer()
+mitk::VtkPropRenderer *QmitkSliceWidget::GetRenderer()
 {
   return m_Renderer;
 }
 
-QFrame* QmitkSliceWidget::GetSelectionFrame()
+QFrame *QmitkSliceWidget::GetSelectionFrame()
 {
   return SelectionFrame;
 }
 
-void QmitkSliceWidget::SetDataStorage(
-    mitk::StandaloneDataStorage::Pointer storage)
+void QmitkSliceWidget::SetDataStorage(mitk::StandaloneDataStorage::Pointer storage)
 {
   m_DataStorage = storage;
   m_Renderer->SetDataStorage(m_DataStorage);
 }
 
-mitk::StandaloneDataStorage* QmitkSliceWidget::GetDataStorage()
+mitk::StandaloneDataStorage *QmitkSliceWidget::GetDataStorage()
 {
   return m_DataStorage;
 }
 
-void QmitkSliceWidget::SetData(
-    mitk::DataStorage::SetOfObjects::ConstIterator it)
+void QmitkSliceWidget::SetData(mitk::DataStorage::SetOfObjects::ConstIterator it)
 {
   SetData(it->Value(), m_View);
 }
 
-void QmitkSliceWidget::SetData(
-    mitk::DataStorage::SetOfObjects::ConstIterator it,
-    mitk::SliceNavigationController::ViewDirection view)
+void QmitkSliceWidget::SetData(mitk::DataStorage::SetOfObjects::ConstIterator it,
+                               mitk::SliceNavigationController::ViewDirection view)
 {
   SetData(it->Value(), view);
 }
@@ -107,16 +100,16 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node)
     {
       m_DataStorage->Add(node);
     }
-  } catch (...)
+  }
+  catch (...)
   {
   }
   SetData(node, m_View);
 }
 
-void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node,
-    mitk::SliceNavigationController::ViewDirection view)
+void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view)
 {
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
 
   if (image.IsNull())
   {
@@ -128,18 +121,15 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node,
   this->InitWidget(view);
 }
 
-void QmitkSliceWidget::InitWidget(
-    mitk::SliceNavigationController::ViewDirection viewDirection)
+void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection viewDirection)
 {
   m_View = viewDirection;
 
-  mitk::SliceNavigationController* controller =
-      m_RenderWindow->GetSliceNavigationController();
+  mitk::SliceNavigationController *controller = m_RenderWindow->GetSliceNavigationController();
 
   if (viewDirection == mitk::SliceNavigationController::Axial)
   {
-    controller->SetViewDirection(
-        mitk::SliceNavigationController::Axial);
+    controller->SetViewDirection(mitk::SliceNavigationController::Axial);
   }
   else if (viewDirection == mitk::SliceNavigationController::Frontal)
   {
@@ -156,18 +146,14 @@ void QmitkSliceWidget::InitWidget(
     return;
   }
 
+  mitk::BaseGeometry::Pointer geometry = static_cast<mitk::BaseGeometry *>(m_SlicedGeometry->Clone().GetPointer());
 
-  mitk::BaseGeometry::Pointer geometry =
-          static_cast<mitk::BaseGeometry*> (m_SlicedGeometry->Clone().GetPointer());
-
-  const mitk::BoundingBox::Pointer boundingbox =
-    m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
+  const mitk::BoundingBox::Pointer boundingbox = m_DataStorage->ComputeVisibleBoundingBox(GetRenderer(), NULL);
 
   if (boundingbox->GetPoints()->Size() > 0)
   {
-    //let's see if we have data with a limited live-span ...
-    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(
-        GetRenderer(), NULL);
+    // let's see if we have data with a limited live-span ...
+    mitk::TimeBounds timebounds = m_DataStorage->ComputeTimeBounds(GetRenderer(), NULL);
 
     mitk::ProportionalTimeGeometry::Pointer timeGeometry = mitk::ProportionalTimeGeometry::New();
     timeGeometry->Initialize(geometry, 1);
@@ -177,8 +163,7 @@ void QmitkSliceWidget::InitWidget(
       timeGeometry->SetStepDuration(1.0);
     }
 
-    if (const_cast<mitk::BoundingBox*> (timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2()
-        >= mitk::eps)
+    if (const_cast<mitk::BoundingBox *>(timeGeometry->GetBoundingBoxInWorld())->GetDiagonalLength2() >= mitk::eps)
     {
       controller->SetInputWorldTimeGeometry(timeGeometry);
       controller->Update();
@@ -186,18 +171,16 @@ void QmitkSliceWidget::InitWidget(
   }
 
   GetRenderer()->GetCameraController()->Fit();
-  mitk::RenderingManager::GetInstance()->RequestUpdate(
-      GetRenderer()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderer()->GetRenderWindow());
 }
 
 void QmitkSliceWidget::UpdateGL()
 {
   GetRenderer()->GetCameraController()->Fit();
-  mitk::RenderingManager::GetInstance()->RequestUpdate(
-      GetRenderer()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(GetRenderer()->GetRenderWindow());
 }
 
-void QmitkSliceWidget::mousePressEvent(QMouseEvent * e)
+void QmitkSliceWidget::mousePressEvent(QMouseEvent *e)
 {
   if (e->button() == Qt::RightButton && popUpEnabled)
   {
@@ -205,7 +188,7 @@ void QmitkSliceWidget::mousePressEvent(QMouseEvent * e)
   }
 }
 
-void QmitkSliceWidget::wheelEvent(QWheelEvent * e)
+void QmitkSliceWidget::wheelEvent(QWheelEvent *e)
 {
   int val = m_NavigatorWidget->GetPos();
 
@@ -220,7 +203,7 @@ void QmitkSliceWidget::wheelEvent(QWheelEvent * e)
   }
 }
 
-void QmitkSliceWidget::ChangeView(QAction* val)
+void QmitkSliceWidget::ChangeView(QAction *val)
 {
   if (val->text() == "Axial")
   {
@@ -241,7 +224,7 @@ void QmitkSliceWidget::setPopUpEnabled(bool b)
   popUpEnabled = b;
 }
 
-QmitkSliderNavigatorWidget* QmitkSliceWidget::GetNavigatorWidget()
+QmitkSliderNavigatorWidget *QmitkSliceWidget::GetNavigatorWidget()
 {
   return m_NavigatorWidget;
 }
@@ -266,25 +249,22 @@ bool QmitkSliceWidget::IsLevelWindowEnabled()
   return levelWindow->isEnabled();
 }
 
-QmitkRenderWindow* QmitkSliceWidget::GetRenderWindow()
+QmitkRenderWindow *QmitkSliceWidget::GetRenderWindow()
 {
   return m_RenderWindow;
 }
 
-mitk::SliceNavigationController*
-QmitkSliceWidget::GetSliceNavigationController() const
+mitk::SliceNavigationController *QmitkSliceWidget::GetSliceNavigationController() const
 {
   return m_RenderWindow->GetSliceNavigationController();
 }
 
-mitk::CameraRotationController*
-QmitkSliceWidget::GetCameraRotationController() const
+mitk::CameraRotationController *QmitkSliceWidget::GetCameraRotationController() const
 {
   return m_RenderWindow->GetCameraRotationController();
 }
 
-mitk::BaseController*
-QmitkSliceWidget::GetController() const
+mitk::BaseController *QmitkSliceWidget::GetController() const
 {
   return m_RenderWindow->GetController();
 }

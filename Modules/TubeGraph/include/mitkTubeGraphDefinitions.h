@@ -21,14 +21,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
   /** \brief The XML consts for reading and writing
   */
 
   class TubeGraphDefinitions
   {
   public:
-
     //============== XML const chars ===================
 
     //==== Header information ====
@@ -109,9 +107,8 @@ namespace mitk
   private:
     TubeGraphDefinitions();
     ~TubeGraphDefinitions();
-
   };
 
-} //namespace MITK
+} // namespace MITK
 
 #endif // __mitkTubeGraphDefinitions_h

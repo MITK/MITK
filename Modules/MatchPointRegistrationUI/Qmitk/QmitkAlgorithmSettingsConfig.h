@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITK_ALGORITHM_SETTINGS_CONFIG_H
 #define QMITK_ALGORITHM_SETTINGS_CONFIG_H
 
-#include <QWidget>
 #include <QSortFilterProxyModel>
+#include <QWidget>
 
 #include <mapDeploymentDLLInfo.h>
 
@@ -32,28 +32,29 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \class QmitkAlgorithmSettingsConfig
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmSettingsConfig : public QWidget, private Ui::QmitkAlgorithmSettingsConfig
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkAlgorithmSettingsConfig : public QWidget,
+                                                                         private Ui::QmitkAlgorithmSettingsConfig
 {
   Q_OBJECT
 
 public:
-  QmitkAlgorithmSettingsConfig(QWidget* parent=0);
+  QmitkAlgorithmSettingsConfig(QWidget *parent = 0);
 
   /**
    * \brief Changes the current algorithm and updates widget accordingly.
    * \param pointer to the algorithm instance.
    */
-  void setAlgorithm(map::algorithm::RegistrationAlgorithmBase* alg);
+  void setAlgorithm(map::algorithm::RegistrationAlgorithmBase *alg);
 
-  map::algorithm::RegistrationAlgorithmBase* getAlgorithm();
+  map::algorithm::RegistrationAlgorithmBase *getAlgorithm();
 
 protected:
   /** Pointer to the algorithm that should be configured */
   map::algorithm::RegistrationAlgorithmBase::Pointer m_currentAlg;
 
   // control the properties of the selected algorithm
-  QmitkMAPAlgorithmModel* m_AlgorithmModel;
-  QSortFilterProxyModel* m_ProxyModel;
+  QmitkMAPAlgorithmModel *m_AlgorithmModel;
+  QSortFilterProxyModel *m_ProxyModel;
 };
 
 #endif // QmitkAlgorithmSettingsConfig_H

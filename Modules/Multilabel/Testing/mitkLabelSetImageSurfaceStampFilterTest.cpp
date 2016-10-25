@@ -14,15 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <mitkImageStatisticsHolder.h>
 #include <mitkIOUtil.h>
+#include <mitkImageStatisticsHolder.h>
 #include <mitkLabelSetImage.h>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-#include <mitkLabelSetImageSurfaceStampFilter.h>
-#include <mitkImageGenerator.h>
 #include <mitkEqual.h>
+#include <mitkImageGenerator.h>
+#include <mitkLabelSetImageSurfaceStampFilter.h>
 
 class mitkLabelSetImageSurfaceStampFilterTestSuite : public mitk::TestFixture
 {
@@ -37,11 +37,12 @@ private:
   mitk::Surface::Pointer m_Surface;
 
 public:
-
   void setUp() override
   {
-    mitk::Image::Pointer regularImage = mitk::ImageGenerator::GenerateRandomImage<int>(50,50,50,1,1,1,1,0.3,0.2);
-    m_LabelSetImage = dynamic_cast<mitk::LabelSetImage*>(mitk::IOUtil::LoadBaseData(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation.nrrd")).GetPointer());
+    mitk::Image::Pointer regularImage =
+      mitk::ImageGenerator::GenerateRandomImage<int>(50, 50, 50, 1, 1, 1, 1, 0.3, 0.2);
+    m_LabelSetImage = dynamic_cast<mitk::LabelSetImage *>(
+      mitk::IOUtil::LoadBaseData(GetTestDataFilePath("Multilabel/EmptyMultiLabelSegmentation.nrrd")).GetPointer());
     mitk::Label::Pointer label1 = mitk::Label::New();
     label1->SetName("Label1");
     mitk::Label::PixelType value1 = 1;
@@ -52,7 +53,7 @@ public:
     mitk::Label::PixelType value2 = 2;
     label2->SetValue(value2);
 
-    m_Surface =  mitk::IOUtil::LoadSurface(GetTestDataFilePath("BallBinary30x30x30Reference.vtp"));
+    m_Surface = mitk::IOUtil::LoadSurface(GetTestDataFilePath("BallBinary30x30x30Reference.vtp"));
   }
 
   void tearDown() override
@@ -68,19 +69,20 @@ public:
     filter->SetForceOverwrite(true);
     filter->SetInput(m_LabelSetImage);
     filter->Update();
-    mitk::LabelSetImage::Pointer result =dynamic_cast<mitk::LabelSetImage*>(m_LabelSetImage.GetPointer());//dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
-    //result->DisconnectPipeline();
-    //mitk::LabelSetImage::Pointer result =dynamic_cast<mitk::LabelSetImage*>(m_LabelSetImage->Clone().GetPointer());//dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
+    mitk::LabelSetImage::Pointer result = dynamic_cast<mitk::LabelSetImage *>(
+      m_LabelSetImage.GetPointer()); // dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
+    // result->DisconnectPipeline();
+    // mitk::LabelSetImage::Pointer result
+    // =dynamic_cast<mitk::LabelSetImage*>(m_LabelSetImage->Clone().GetPointer());//dynamic_cast<mitk::LabelSetImage*>(filter->GetOutput());
 
-    mitk::LabelSetImage::Pointer expectedResult =  dynamic_cast<mitk::LabelSetImage*>(mitk::IOUtil::LoadBaseData(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd")).GetPointer());
+    mitk::LabelSetImage::Pointer expectedResult = dynamic_cast<mitk::LabelSetImage *>(
+      mitk::IOUtil::LoadBaseData(GetTestDataFilePath("Multilabel/StampResultBasedOnEmptyML.nrrd")).GetPointer());
 
     MITK_ASSERT_EQUAL(result, expectedResult, "Result after stamping should be equal to the saved version");
   }
 
   // Reduce contours with nth point
-  void TestGetActiveLabel()
-  {
-  }
+  void TestGetActiveLabel() {}
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkLabelSetImageSurfaceStampFilter)

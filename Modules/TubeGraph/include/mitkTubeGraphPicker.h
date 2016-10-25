@@ -23,27 +23,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkTubeGraph.h"
 #include "mitkTubeGraphProperty.h"
 
-
-
 namespace mitk
 {
   class MITKTUBEGRAPH_EXPORT TubeGraphPicker
   {
   public:
+    /* mitkClassMacro( TubeGraphPicker, BaseDataSource );
+     itkNewMacro( Self );*/
 
-   /* mitkClassMacro( TubeGraphPicker, BaseDataSource );
-    itkNewMacro( Self );*/
+    void SetTubeGraph(const TubeGraph *tubeGraph);
 
-    void SetTubeGraph (const TubeGraph* tubeGraph);
-
-    std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement*> GetPickedTube( const Point3D pickedPosition);
+    std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> GetPickedTube(const Point3D pickedPosition);
 
     TubeGraphPicker();
     virtual ~TubeGraphPicker();
 
-
   protected:
-
     Point3D m_WorldPosition;
     TubeGraph::Pointer m_TubeGraph;
     TubeGraphProperty::Pointer m_TubeGraphProperty;

@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QMITKXNATPROJECTWIDGET_H
 
 // XNATUI
-#include <ui_QmitkXnatProjectWidgetControls.h>
 #include <MitkXNATExports.h>
+#include <ui_QmitkXnatProjectWidgetControls.h>
 
 // Qt
 #include <QWidget>
@@ -32,28 +32,26 @@ class MITKXNAT_EXPORT QmitkXnatProjectWidget : public QWidget
   Q_OBJECT
 
 public:
-
   enum Mode
   {
     INFO,
     CREATE
   };
 
-  QmitkXnatProjectWidget(QWidget* parent = nullptr);
-  QmitkXnatProjectWidget(Mode mode, QWidget* parent = nullptr);
+  QmitkXnatProjectWidget(QWidget *parent = nullptr);
+  QmitkXnatProjectWidget(Mode mode, QWidget *parent = nullptr);
   ~QmitkXnatProjectWidget();
 
-  void SetProject(ctkXnatProject* project);
-  ctkXnatProject* GetProject() const;
+  void SetProject(ctkXnatProject *project);
+  ctkXnatProject *GetProject() const;
 
 protected:
   Ui::QmitkXnatProjectWidgetControls m_Controls;
 
 private:
-
   void Init();
   Mode m_Mode;
-  ctkXnatProject* m_Project;
+  ctkXnatProject *m_Project;
 };
 
 #endif // QMITKXNATPROJECTWIDGET_H

@@ -13,12 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#include <stdlib.h>
 #include <mitkLogMacros.h>
+#include <stdlib.h>
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int /*argc*/, char ** /*argv*/)
 {
-  MITK_INFO << "Test log ..." ;
+  MITK_INFO << "Test log ...";
   return EXIT_SUCCESS;
 }
-

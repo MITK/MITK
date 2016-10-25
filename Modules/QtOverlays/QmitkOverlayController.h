@@ -14,21 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191
 #define MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191
 
 // MITK-Stuff
+#include "QmitkOverlay.h"
 #include "mitkCommon.h"
 #include "mitkPropertyList.h"
-#include "QmitkOverlay.h"
 
 #include <QObject>
 
 #include <string>
 
 #include <MitkQtOverlaysExports.h>
-
 
 class QmitkRenderWindow;
 
@@ -61,11 +59,10 @@ class MITKQTOVERLAYS_EXPORT QmitkOverlayController : public QObject
   Q_OBJECT
 
 public:
-
   /**
   * \brief constructor with mandatory QmitkRenderWindow and optional mitk::PropertyList
   */
-  QmitkOverlayController( QmitkRenderWindow* rw, mitk::PropertyList* pl = NULL );
+  QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl = NULL);
   virtual ~QmitkOverlayController();
 
   /**
@@ -75,46 +72,43 @@ public:
   * It will be added to the correct position in the RenderWindow as it's defined by the overlays
   * position-variable. The layer-property will only be considered if necessary.
   */
-  void AddOverlay( QmitkOverlay* );
+  void AddOverlay(QmitkOverlay *);
 
-  void RemoveOverlay( QmitkOverlay* );
+  void RemoveOverlay(QmitkOverlay *);
 
   void RemoveAllOverlays();
-
 
   /**
   * \brief setting the visibility of all overlays
   */
-  void SetOverlayVisibility( bool visible );
+  void SetOverlayVisibility(bool visible);
 
   /**
   * \brief getter for the RenderWindow-specific PropertyList
   */
-  mitk::PropertyList* GetPropertyList();
+  mitk::PropertyList *GetPropertyList();
 
   /**
   * \brief setter for the RenderWindow-specific PropertyList
   */
-  void SetPropertyList( mitk::PropertyList* );
+  void SetPropertyList(mitk::PropertyList *);
 
+public slots:
+  /**
+  * \brief adjusts the position of all overlays to the position of the RenderWindow
+  *
+  * This method updates the position of all Widgets according to the position of the RenderWindow
+  * and the extend of the overlays.
+  */
+  void AdjustAllOverlayPosition();
 
-public slots :
-    /**
-    * \brief adjusts the position of all overlays to the position of the RenderWindow
-    *
-    * This method updates the position of all Widgets according to the position of the RenderWindow
-    * and the extend of the overlays.
-    */
-    void AdjustAllOverlayPosition();
+  void AdjustOverlayPosition(QmitkOverlay::DisplayPosition displayPosition);
 
-    void AdjustOverlayPosition( QmitkOverlay::DisplayPosition displayPosition );
+  void UpdateAllOverlays();
 
-    void UpdateAllOverlays();
-
-    void UpdateOverlayData( QmitkOverlay* overlay );
+  void UpdateOverlayData(QmitkOverlay *overlay);
 
 protected:
-
   /**
   * \brief setting up the widgets that will hold all overlays
   *
@@ -133,36 +127,34 @@ protected:
   /**
   * \brief initializes one QWidget - internally used by InitializeOverlayLayout()
   */
-  void InitializeWidget( QmitkOverlay::DisplayPosition pos );
+  void InitializeWidget(QmitkOverlay::DisplayPosition pos);
 
-  void RestackOverlays( QmitkOverlay::DisplayPosition pos );
+  void RestackOverlays(QmitkOverlay::DisplayPosition pos);
 
-  QSize GetMinimumSizeForWidget( QmitkOverlay::DisplayPosition displayPosition );
+  QSize GetMinimumSizeForWidget(QmitkOverlay::DisplayPosition displayPosition);
 
-  typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
-  typedef std::vector< QmitkOverlay* > OverlayVector;
+  typedef std::map<QmitkOverlay::DisplayPosition, QWidget *> OverlayPositionMap;
+  typedef std::vector<QmitkOverlay *> OverlayVector;
 
   /**
   * \brief all QmitkOverlays that are currently added
   */
-  OverlayVector                 m_AllOverlays;
+  OverlayVector m_AllOverlays;
 
   /**
   * \brief all possible positions and the QWidgets representing the corresponding QmitkOverlays
   */
-  OverlayPositionMap            m_PositionedOverlays;
+  OverlayPositionMap m_PositionedOverlays;
 
   /**
   * \brief RenderWindow that all Overlays will be added to
   */
-  QmitkRenderWindow*            m_RenderWindow;
+  QmitkRenderWindow *m_RenderWindow;
 
   /**
   * \brief PropertyList for RenderWindow-specific properties
   */
-  mitk::PropertyList::Pointer   m_PropertyList;
-
+  mitk::PropertyList::Pointer m_PropertyList;
 };
-
 
 #endif /* MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191 */

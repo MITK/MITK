@@ -23,20 +23,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class BoolPropertySerializer : public BasePropertySerializer
-{
+  class BoolPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(BoolPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( BoolPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (const BoolProperty* prop = dynamic_cast<const BoolProperty*>(m_Property.GetPointer()))
+      if (const BoolProperty *prop = dynamic_cast<const BoolProperty *>(m_Property.GetPointer()))
       {
-        auto  element = new TiXmlElement("bool");
+        auto element = new TiXmlElement("bool");
         if (prop->GetValue() == true)
         {
           element->SetAttribute("value", "true");
@@ -47,20 +44,21 @@ class BoolPropertySerializer : public BasePropertySerializer
         }
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *element) override
     {
-      if (!element) return nullptr;
-      return BoolProperty::New( std::string(element->Attribute("value")) == "true" ).GetPointer();
+      if (!element)
+        return nullptr;
+      return BoolProperty::New(std::string(element->Attribute("value")) == "true").GetPointer();
     }
 
   protected:
-
     BoolPropertySerializer() {}
     virtual ~BoolPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -68,4 +66,3 @@ class BoolPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(BoolPropertySerializer);
 
 #endif
-

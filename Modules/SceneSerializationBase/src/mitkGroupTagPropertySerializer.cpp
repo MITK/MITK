@@ -23,37 +23,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-
-class GroupTagPropertySerializer : public BasePropertySerializer
-{
+  class GroupTagPropertySerializer : public BasePropertySerializer
+  {
   public:
+    mitkClassMacro(GroupTagPropertySerializer, BasePropertySerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro( GroupTagPropertySerializer, BasePropertySerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    virtual TiXmlElement* Serialize() override
+      virtual TiXmlElement *Serialize() override
     {
-      if (dynamic_cast<const GroupTagProperty*>(m_Property.GetPointer()) != nullptr)
+      if (dynamic_cast<const GroupTagProperty *>(m_Property.GetPointer()) != nullptr)
       {
-        auto  element = new TiXmlElement("GroupTag");
+        auto element = new TiXmlElement("GroupTag");
         return element;
       }
-      else return nullptr;
+      else
+        return nullptr;
     }
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement*) override
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement *) override
     {
-      //if (!element)
+      // if (!element)
       //  return NULL;
       return GroupTagProperty::New().GetPointer();
     }
 
   protected:
-
     GroupTagPropertySerializer() {}
     virtual ~GroupTagPropertySerializer() {}
-};
+  };
 
 } // namespace
 
@@ -61,4 +58,3 @@ class GroupTagPropertySerializer : public BasePropertySerializer
 MITK_REGISTER_SERIALIZER(GroupTagPropertySerializer);
 
 #endif
-

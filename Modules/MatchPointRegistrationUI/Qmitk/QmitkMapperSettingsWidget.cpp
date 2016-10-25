@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkMappingJob.h>
 
-QmitkMapperSettingsWidget::QmitkMapperSettingsWidget(QWidget*) : m_MaskMode(false), m_allowSampling(true)
+QmitkMapperSettingsWidget::QmitkMapperSettingsWidget(QWidget *) : m_MaskMode(false), m_allowSampling(true)
 {
   this->setupUi(this);
 
@@ -26,7 +26,7 @@ QmitkMapperSettingsWidget::QmitkMapperSettingsWidget(QWidget*) : m_MaskMode(fals
   connect(m_sbXFactor, SIGNAL(valueChanged(double)), this, SLOT(OnXFactorChanged(double)));
 }
 
-void QmitkMapperSettingsWidget::ConfigureJobSettings(QmitkMappingJobSettings* settings)
+void QmitkMapperSettingsWidget::ConfigureJobSettings(QmitkMappingJobSettings *settings)
 {
   if (!settings)
   {
@@ -41,25 +41,25 @@ void QmitkMapperSettingsWidget::ConfigureJobSettings(QmitkMappingJobSettings* se
 
   switch (m_comboInterpolator->currentIndex())
   {
-  case 0:
-    settings->m_InterpolatorType = mitk::ImageMappingInterpolator::NearestNeighbor;
-    break;
+    case 0:
+      settings->m_InterpolatorType = mitk::ImageMappingInterpolator::NearestNeighbor;
+      break;
 
-  case 1:
-    settings->m_InterpolatorType = mitk::ImageMappingInterpolator::Linear;
-    break;
+    case 1:
+      settings->m_InterpolatorType = mitk::ImageMappingInterpolator::Linear;
+      break;
 
-  case 2:
-    settings->m_InterpolatorType = mitk::ImageMappingInterpolator::BSpline_3;
-    break;
+    case 2:
+      settings->m_InterpolatorType = mitk::ImageMappingInterpolator::BSpline_3;
+      break;
 
-  case 3:
-    settings->m_InterpolatorType = mitk::ImageMappingInterpolator::WSinc_Hamming;
-    break;
+    case 3:
+      settings->m_InterpolatorType = mitk::ImageMappingInterpolator::WSinc_Hamming;
+      break;
 
-  case 4:
-    settings->m_InterpolatorType = mitk::ImageMappingInterpolator::WSinc_Welch;
-    break;
+    case 4:
+      settings->m_InterpolatorType = mitk::ImageMappingInterpolator::WSinc_Welch;
+      break;
   }
 }
 
@@ -102,7 +102,6 @@ void QmitkMapperSettingsWidget::SetMaskMode(bool activeMask)
 
   m_MaskMode = activeMask;
 }
-
 
 void QmitkMapperSettingsWidget::AllowSampling(bool allow)
 {

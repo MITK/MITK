@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkFastMarchingTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
-#include <MitkSegmentationUIExports.h>
 #include "mitkFastMarchingTool3D.h"
+#include <MitkSegmentationUIExports.h>
 
 class ctkSliderWidget;
 class ctkRangeWidget;
@@ -38,28 +38,25 @@ class MITKSEGMENTATIONUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkFastMarchingTool3DGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self)
-  itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  void OnThresholdChanged(int current);
+    void OnThresholdChanged(int current);
 
+protected slots:
 
-  protected slots:
+  void OnNewToolAssociated(mitk::Tool *);
 
-    void OnNewToolAssociated(mitk::Tool*);
-
-    void OnThresholdChanged(double, double);
-    void OnAlphaChanged(double);
-    void OnBetaChanged(double);
-    void OnSigmaChanged(double);
-    void OnStoppingValueChanged(double);
-    void OnConfirmSegmentation();
-    void Refetch();
-    void SetStepper(mitk::Stepper *);
-    void OnClearSeeds();
+  void OnThresholdChanged(double, double);
+  void OnAlphaChanged(double);
+  void OnBetaChanged(double);
+  void OnSigmaChanged(double);
+  void OnStoppingValueChanged(double);
+  void OnConfirmSegmentation();
+  void Refetch();
+  void SetStepper(mitk::Stepper *);
+  void OnClearSeeds();
 
 protected:
-
   QmitkFastMarchingTool3DGUI();
   virtual ~QmitkFastMarchingTool3DGUI();
 
@@ -67,14 +64,14 @@ protected:
 
   void Update();
 
-  ctkRangeWidget*  m_slwThreshold;
-  ctkSliderWidget* m_slStoppingValue;
-  ctkSliderWidget* m_slSigma;
-  ctkSliderWidget* m_slAlpha;
-  ctkSliderWidget* m_slBeta;
+  ctkRangeWidget *m_slwThreshold;
+  ctkSliderWidget *m_slStoppingValue;
+  ctkSliderWidget *m_slSigma;
+  ctkSliderWidget *m_slAlpha;
+  ctkSliderWidget *m_slBeta;
 
-  QPushButton* m_btConfirm;
-  QPushButton* m_btClearSeeds;
+  QPushButton *m_btConfirm;
+  QPushButton *m_btClearSeeds;
 
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
 

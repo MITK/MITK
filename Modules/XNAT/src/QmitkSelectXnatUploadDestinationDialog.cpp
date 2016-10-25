@@ -10,12 +10,14 @@
 
 #include <QModelIndex>
 
-QmitkSelectXnatUploadDestinationDialog::QmitkSelectXnatUploadDestinationDialog(ctkXnatSession* session, const QStringList& availableResources, QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::QmitkSelectXnatUploadDestinationDialog),
-  m_Url(""),
-  m_ResourceName(""),
-  m_CreateNewFolder(false)
+QmitkSelectXnatUploadDestinationDialog::QmitkSelectXnatUploadDestinationDialog(ctkXnatSession *session,
+                                                                               const QStringList &availableResources,
+                                                                               QWidget *parent)
+  : QDialog(parent),
+    ui(new Ui::QmitkSelectXnatUploadDestinationDialog),
+    m_Url(""),
+    m_ResourceName(""),
+    m_CreateNewFolder(false)
 {
   ui->setupUi(this);
 
@@ -23,11 +25,14 @@ QmitkSelectXnatUploadDestinationDialog::QmitkSelectXnatUploadDestinationDialog(c
   m_TreeModel->addDataModel(session->dataModel());
   ui->treeView->setModel(m_TreeModel);
 
-  connect(ui->cbSelectResources, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnResourceSelected(const QString&)));
-  connect(ui->treeView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(OnXnatNodeSelected(const QModelIndex&)));
+  connect(ui->cbSelectResources,
+          SIGNAL(currentIndexChanged(const QString &)),
+          this,
+          SLOT(OnResourceSelected(const QString &)));
+  connect(ui->treeView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(OnXnatNodeSelected(const QModelIndex &)));
   connect(ui->rbSelectResource, SIGNAL(toggled(bool)), this, SLOT(OnSelectResource(bool)));
   connect(ui->rbSelectFromTreeView, SIGNAL(toggled(bool)), this, SLOT(OnSelectFromTreeView(bool)));
-  connect(ui->leResourceName, SIGNAL(textChanged(const QString&)), this, SLOT(OnResourceEntered(const QString&)));
+  connect(ui->leResourceName, SIGNAL(textChanged(const QString &)), this, SLOT(OnResourceEntered(const QString &)));
   connect(ui->pbCancel, SIGNAL(clicked()), this, SLOT(OnCancel()));
   connect(ui->pbUpload, SIGNAL(clicked()), this, SLOT(OnUpload()));
 
@@ -89,16 +94,16 @@ void QmitkSelectXnatUploadDestinationDialog::SetXnatResourceFolderUrl(const QStr
   m_Url = url;
 }
 
-ctkXnatObject* QmitkSelectXnatUploadDestinationDialog::GetUploadDestination()
+ctkXnatObject *QmitkSelectXnatUploadDestinationDialog::GetUploadDestination()
 {
   if (ui->rbSelectResource->isChecked() && !m_Url.isEmpty() && !m_ResourceName.isEmpty())
   {
-    ctkXnatObject* selectedXnatObject = m_TreeModel->GetXnatObjectFromUrl(m_Url);
+    ctkXnatObject *selectedXnatObject = m_TreeModel->GetXnatObjectFromUrl(m_Url);
 
-    ctkXnatResource* resource = new ctkXnatResource();
+    ctkXnatResource *resource = new ctkXnatResource();
     resource->setName(m_ResourceName);
     resource->setParent(selectedXnatObject);
-    if(!resource->exists())
+    if (!resource->exists())
       resource->save();
     return resource;
   }
@@ -109,7 +114,7 @@ ctkXnatObject* QmitkSelectXnatUploadDestinationDialog::GetUploadDestination()
   }
 }
 
-void QmitkSelectXnatUploadDestinationDialog::OnResourceSelected(const QString& resource)
+void QmitkSelectXnatUploadDestinationDialog::OnResourceSelected(const QString &resource)
 {
   if (resource.isEmpty())
     ui->pbUpload->setEnabled(false);
@@ -127,19 +132,18 @@ void QmitkSelectXnatUploadDestinationDialog::OnResourceSelected(const QString& r
   }
 }
 
-void QmitkSelectXnatUploadDestinationDialog::OnResourceEntered(const QString& resourceEntered)
+void QmitkSelectXnatUploadDestinationDialog::OnResourceEntered(const QString &resourceEntered)
 {
   m_CreateNewFolder = !resourceEntered.isEmpty();
   ui->pbUpload->setEnabled(m_CreateNewFolder);
   m_ResourceName = resourceEntered;
 }
 
-void QmitkSelectXnatUploadDestinationDialog::OnXnatNodeSelected(const QModelIndex& index)
+void QmitkSelectXnatUploadDestinationDialog::OnXnatNodeSelected(const QModelIndex &index)
 {
   if (!index.isValid())
     return;
 
-  ctkXnatObject* selectedObject = m_TreeModel->xnatObject(index);
-  ui->pbUpload->setEnabled(dynamic_cast<ctkXnatResource*>(selectedObject) != nullptr);
+  ctkXnatObject *selectedObject = m_TreeModel->xnatObject(index);
+  ui->pbUpload->setEnabled(dynamic_cast<ctkXnatResource *>(selectedObject) != nullptr);
 }
-

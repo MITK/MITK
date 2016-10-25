@@ -18,13 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define _mitkContourModelToPointSetFilter_h__
 
 #include "mitkCommon.h"
-#include <MitkContourModelExports.h>
+#include "mitkContourModel.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetSource.h"
-#include "mitkContourModel.h"
+#include <MitkContourModelExports.h>
 
-namespace mitk {
-
+namespace mitk
+{
   /**
   *
   * @brief Converts a contour set to a point set.
@@ -35,28 +35,21 @@ namespace mitk {
   */
   class MITKCONTOURMODEL_EXPORT ContourModelToPointSetFilter : public PointSetSource
   {
-
   public:
+    mitkClassMacro(ContourModelToPointSetFilter, PointSetSource) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    mitkClassMacro(ContourModelToPointSetFilter, PointSetSource)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
-    typedef PointSet OutputType;
+      typedef PointSet OutputType;
     typedef OutputType::Pointer OutputTypePointer;
     typedef mitk::ContourModel InputType;
 
   protected:
-
     ContourModelToPointSetFilter();
 
     virtual ~ContourModelToPointSetFilter();
 
     void GenerateOutputInformation() override {}
-
     void GenerateData() override;
   };
-
 }
 
 #endif

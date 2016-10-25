@@ -1,26 +1,23 @@
 $(license)
 
-#ifndef $(activator-file-name)_h
-#define $(activator-file-name)_h
+#ifndef $(activator - file - name) _h
+#define $(activator - file - name) _h
 
 #include <ctkPluginActivator.h>
 
-namespace mitk {
-
-class $(activator-class-name) :
-  public QObject, public ctkPluginActivator
+namespace mitk
 {
-  Q_OBJECT
-  Q_PLUGIN_METADATA(IID "$(plugin-target)")
-  Q_INTERFACES(ctkPluginActivator)
+  class $(activator - class - name) : public QObject, public ctkPluginActivator
+  {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "$(plugin-target)")
+    Q_INTERFACES(ctkPluginActivator)
 
-public:
+  public:
+    void start(ctkPluginContext *context);
+    void stop(ctkPluginContext *context);
 
-  void start(ctkPluginContext* context);
-  void stop(ctkPluginContext* context);
-
-}; // $(activator-class-name)
-
+  }; // $(activator-class-name)
 }
 
 #endif // $(activator-file-name)_h

@@ -17,12 +17,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkToolReferenceDataSelectionBox_h_Included
 #define QmitkToolReferenceDataSelectionBox_h_Included
 
+#include "mitkDataStorage.h"
 #include "mitkToolManager.h"
 #include <MitkSegmentationUIExports.h>
-#include "mitkDataStorage.h"
 
-#include <QWidget>
 #include <QVBoxLayout>
+#include <QWidget>
 
 class QmitkDataStorageComboBox;
 
@@ -35,7 +35,8 @@ class QmitkDataStorageComboBox;
 \ingroup ToolManagerEtAl
 \ingroup Widgets
 
-There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
+QmitkInteractiveSegmentationTechnicalPage
 
 Shows the reference data of a ToolManager in a segmentation setting.
 
@@ -48,7 +49,6 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolReferenceDataSelectionBox : public QWid
   Q_OBJECT
 
 public:
-
   /**
   * \brief What kind of items should be displayed.
   *
@@ -59,21 +59,25 @@ public:
   *   DEFAULT is: list data if ANY one of the displayed tools' predicate matches.
   * Other option: list data if ALL one of the displayed tools' predicate matches
   */
-  enum DisplayMode { ListDataIfAllToolsMatch, ListDataIfAnyToolMatches};
+  enum DisplayMode
+  {
+    ListDataIfAllToolsMatch,
+    ListDataIfAnyToolMatches
+  };
 
-  QmitkToolReferenceDataSelectionBox(QWidget* parent = 0);
+  QmitkToolReferenceDataSelectionBox(QWidget *parent = 0);
   virtual ~QmitkToolReferenceDataSelectionBox();
 
-  mitk::DataStorage* GetDataStorage();
-  void SetDataStorage(mitk::DataStorage& storage);
+  mitk::DataStorage *GetDataStorage();
+  void SetDataStorage(mitk::DataStorage &storage);
 
   /// initialization with a data storage object
-  void Initialize(mitk::DataStorage*);
+  void Initialize(mitk::DataStorage *);
 
   void UpdateDataDisplay();
 
-  mitk::ToolManager* GetToolManager();
-  void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
+  mitk::ToolManager *GetToolManager();
+  void SetToolManager(mitk::ToolManager &); // no NULL pointer allowed here, a manager is required
 
   void OnToolManagerReferenceDataModified();
 
@@ -85,7 +89,7 @@ public:
   * setting the 'groups' string this can be restricted to certain groups of tools
   * or single tools.
   */
-  void SetToolGroupsForFiltering(const std::string& groups);
+  void SetToolGroupsForFiltering(const std::string &groups);
 
   /**
   * \brief How the list contents is determined.
@@ -94,35 +98,33 @@ public:
   *
   * \sa DisplayMode
   */
-  void SetDisplayMode( DisplayMode mode );
-
+  void SetDisplayMode(DisplayMode mode);
 
 signals:
 
-  void ReferenceNodeSelected(const mitk::DataNode*);
+  void ReferenceNodeSelected(const mitk::DataNode *);
 
 protected slots:
 
-  void OnReferenceDataSelected(const mitk::DataNode* node);
+  void OnReferenceDataSelected(const mitk::DataNode *node);
 
   void EnsureOnlyReferenceImageIsVisibile();
 
 protected:
-
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllPossibleReferenceImages();
 
   mitk::NodePredicateBase::ConstPointer GetAllPossibleReferenceImagesPredicate();
 
   mitk::ToolManager::Pointer m_ToolManager;
 
-  QmitkDataStorageComboBox* m_ReferenceDataSelectionBox;
+  QmitkDataStorageComboBox *m_ReferenceDataSelectionBox;
 
   bool m_SelfCall;
 
   DisplayMode m_DisplayMode;
   std::string m_ToolGroupsForFiltering;
 
-  QVBoxLayout* m_Layout;
+  QVBoxLayout *m_Layout;
 };
 
 #endif

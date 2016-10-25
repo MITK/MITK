@@ -14,14 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKPROGRESSBAR_H
 #define QMITKPROGRESSBAR_H
 
 #include <MitkQtWidgetsExports.h>
 
-#include <mitkProgressBarImplementation.h>
 #include <QProgressBar>
+#include <mitkProgressBarImplementation.h>
 
 /**
  * \ingroup QmitkModule
@@ -32,15 +31,13 @@ See LICENSE.txt or http://www.mitk.org for details.
  */
 class MITKQTWIDGETS_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
-
   Q_OBJECT
 
 public:
-
   //##Documentation
   //##@brief Constructor;
   //## holds param instance internally and connects this to the mitkProgressBar
-  QmitkProgressBar(QWidget * parent = nullptr, const char * name = nullptr);
+  QmitkProgressBar(QWidget *parent = nullptr, const char *name = nullptr);
 
   //##Documentation
   //##@brief Destructor
@@ -72,7 +69,6 @@ protected slots:
   virtual void SlotSetPercentageVisible(bool visible);
 
 private:
-
   //##Documentation
   //## @brief Reset the progress bar. The progress bar "rewinds" and shows no progress.
   void Reset() override;
@@ -80,7 +76,6 @@ private:
   unsigned int m_TotalSteps;
 
   unsigned int m_Progress;
-
 };
 
 #endif /* define QMITKPROGRESSBAR_H */

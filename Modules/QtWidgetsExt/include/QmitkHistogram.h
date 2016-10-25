@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKHISTOGRAM_H
 #define QMITKHISTOGRAM_H
 
-#include <qglobal.h>
 #include <qcolor.h>
+#include <qglobal.h>
 
 #include <qwt_plot_item.h>
 #include <qwt_series_data.h>
@@ -28,37 +28,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 See QmitkHistogramWidget for an example of its usage.
 */
 
-class QmitkHistogram: public QwtPlotItem
+class QmitkHistogram : public QwtPlotItem
 {
 public:
-    explicit QmitkHistogram(const QString &title = QString::null);
-    explicit QmitkHistogram(const QwtText &title);
-    virtual ~QmitkHistogram();
+  explicit QmitkHistogram(const QString &title = QString::null);
+  explicit QmitkHistogram(const QwtText &title);
+  virtual ~QmitkHistogram();
 
-    void setData(const QwtIntervalSeriesData &data);
-    const QwtIntervalSeriesData &data() const;
+  void setData(const QwtIntervalSeriesData &data);
+  const QwtIntervalSeriesData &data() const;
 
-    void setColor(const QColor &);
-    QColor color() const;
+  void setColor(const QColor &);
+  QColor color() const;
 
-    virtual QRectF boundingRect() const override;
+  virtual QRectF boundingRect() const override;
 
-    virtual void draw(QPainter *, const QwtScaleMap &xMap,
-        const QwtScaleMap &yMap, const QRectF &) const override;
+  virtual void draw(QPainter *, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &) const override;
 
-    void setBaseline(double reference);
-    double baseline() const;
+  void setBaseline(double reference);
+  double baseline() const;
 
 protected:
-    virtual void drawBar(QPainter *,
-        Qt::Orientation o, const QRect &) const;
+  virtual void drawBar(QPainter *, Qt::Orientation o, const QRect &) const;
 
 private:
-    void init();
+  void init();
 
-    class HistogramData;
-    HistogramData *m_Data;
+  class HistogramData;
+  HistogramData *m_Data;
 };
 
 #endif
-

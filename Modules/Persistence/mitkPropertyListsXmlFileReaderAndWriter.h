@@ -23,30 +23,28 @@ class TiXmlElement;
 
 namespace mitk
 {
-class PropertyListsXmlFileReaderAndWriter;
+  class PropertyListsXmlFileReaderAndWriter;
 
-class PropertyListsXmlFileReaderAndWriter : public itk::Object
-{
+  class PropertyListsXmlFileReaderAndWriter : public itk::Object
+  {
   public:
-    static const char* GetPropertyListIdElementName();
+    static const char *GetPropertyListIdElementName();
 
-    mitkClassMacroItkParent( PropertyListsXmlFileReaderAndWriter, itk::Object );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(PropertyListsXmlFileReaderAndWriter, itk::Object);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-    bool WriteLists( const std::string& fileName, const std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;
-    bool ReadLists( const std::string& fileName, std::map<std::string, mitk::PropertyList::Pointer>& _PropertyLists ) const;
+      bool WriteLists(const std::string &fileName,
+                      const std::map<std::string, mitk::PropertyList::Pointer> &_PropertyLists) const;
+    bool ReadLists(const std::string &fileName,
+                   std::map<std::string, mitk::PropertyList::Pointer> &_PropertyLists) const;
 
   protected:
-
     PropertyListsXmlFileReaderAndWriter();
     virtual ~PropertyListsXmlFileReaderAndWriter();
 
-    bool PropertyFromXmlElem(std::string& name, mitk::BaseProperty::Pointer& prop, TiXmlElement* elem) const;
-    bool PropertyToXmlElem(const std::string& name, const mitk::BaseProperty* prop, TiXmlElement* elem) const;
-};
-
+    bool PropertyFromXmlElem(std::string &name, mitk::BaseProperty::Pointer &prop, TiXmlElement *elem) const;
+    bool PropertyToXmlElem(const std::string &name, const mitk::BaseProperty *prop, TiXmlElement *elem) const;
+  };
 }
 
 #endif
-

@@ -21,17 +21,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::BoundingObjectToSegmentationFilter::BoundingObjectToSegmentationFilter()
 {
   this->SetNumberOfRequiredInputs(1);
-
 }
 
 mitk::BoundingObjectToSegmentationFilter::~BoundingObjectToSegmentationFilter()
 {
-
 }
 
 void mitk::BoundingObjectToSegmentationFilter::SetBoundingObject(mitk::BoundingObject::Pointer boundingObject)
 {
-  mitk::BoundingObjectGroup* testgroup = dynamic_cast<mitk::BoundingObjectGroup*> (boundingObject.GetPointer());
+  mitk::BoundingObjectGroup *testgroup = dynamic_cast<mitk::BoundingObjectGroup *>(boundingObject.GetPointer());
   if (testgroup)
     m_boundingObjectGroup = testgroup;
   else
@@ -52,13 +50,14 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
   CastToItkImage(outputImage, itkImage);
   itkImage->FillBuffer(0);
 
-  for (unsigned int i=0; i<m_boundingObjectGroup->GetCount(); i++)
+  for (unsigned int i = 0; i < m_boundingObjectGroup->GetCount(); i++)
   {
-     //create region for boundingobject
+    // create region for boundingobject
     mitk::BoundingObject::Pointer boundingObject = m_boundingObjectGroup->GetBoundingObjects().at(i);
     mitk::BaseGeometry::Pointer boGeometry = boundingObject->GetGeometry();
     mitk::BaseGeometry::Pointer inputImageGeometry = inputImage->GetSlicedGeometry();
-    mitk::BoundingBox::Pointer boToIm = boGeometry->CalculateBoundingBoxRelativeToTransform(inputImageGeometry->GetIndexToWorldTransform());
+    mitk::BoundingBox::Pointer boToIm =
+      boGeometry->CalculateBoundingBoxRelativeToTransform(inputImageGeometry->GetIndexToWorldTransform());
 
     mitk::BoundingBox::ConstPointer imgBB = inputImageGeometry->GetBoundingBox();
     mitk::BoundingBox::PointType minImg = imgBB->GetMinimum();
@@ -70,19 +69,18 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
     mitk::BoundingBox::PointType min = boToIm->GetMinimum();
     mitk::BoundingBox::PointType max = boToIm->GetMaximum();
 
-    //check if boundingbox is inside imageregion
-    for (int i =0; i<3; i++)
+    // check if boundingbox is inside imageregion
+    for (int i = 0; i < 3; i++)
     {
-      if (min [i] < minImg[i])
+      if (min[i] < minImg[i])
         min[i] = minImg[i];
-      if (max [i] < minImg[i])
+      if (max[i] < minImg[i])
         max[i] = minImg[i];
       if (max[i] > maxImg[i])
         max[i] = maxImg[i];
-      if (min [i] > maxImg[i])
-        min[i] = maxImg[i]-1;
+      if (min[i] > maxImg[i])
+        min[i] = maxImg[i] - 1;
     }
-
 
     // add 0.5 (boGeometry is no image geometry)
     boIndex[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0] + 0.5);
@@ -90,24 +88,25 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
     boIndex[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2] + 0.5);
 
     // add 1 because we need 0.5 for each index
-    boSize[0] = (mitk::SlicedData::IndexType::IndexValueType) (max[0]-min[0]);
-    boSize[1] = (mitk::SlicedData::IndexType::IndexValueType) (max[1]-min[1]);
-    boSize[2] = (mitk::SlicedData::IndexType::IndexValueType) (max[2]-min[2]);
+    boSize[0] = (mitk::SlicedData::IndexType::IndexValueType)(max[0] - min[0]);
+    boSize[1] = (mitk::SlicedData::IndexType::IndexValueType)(max[1] - min[1]);
+    boSize[2] = (mitk::SlicedData::IndexType::IndexValueType)(max[2] - min[2]);
 
     itkImageType::RegionType region(boIndex, boSize);
 
-    //create region iterator
-    itk::ImageRegionIteratorWithIndex<itkImageType> itBoundingObject =  itk::ImageRegionIteratorWithIndex<itkImageType>(itkImage, region );
+    // create region iterator
+    itk::ImageRegionIteratorWithIndex<itkImageType> itBoundingObject =
+      itk::ImageRegionIteratorWithIndex<itkImageType>(itkImage, region);
     itBoundingObject.GoToBegin();
 
-    while(!itBoundingObject.IsAtEnd())
+    while (!itBoundingObject.IsAtEnd())
     {
       itkImageType::IndexType index = itBoundingObject.GetIndex();
       mitk::Point3D p;
       p[0] = index[0];
       p[1] = index[1];
       p[2] = index[2];
-      inputImageGeometry->IndexToWorld(p,p);
+      inputImageGeometry->IndexToWorld(p, p);
 
       if (boundingObject->IsInside(p) && boundingObject->GetPositive())
         itBoundingObject.Set(1);

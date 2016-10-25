@@ -21,19 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-/**
-  \brief Serializes mitk::Surface for mitk::SceneIO
-*/
-class PointSetSerializer : public BaseDataSerializer
-{
+  /**
+    \brief Serializes mitk::Surface for mitk::SceneIO
+  */
+  class PointSetSerializer : public BaseDataSerializer
+  {
   public:
-    mitkClassMacro( PointSetSerializer, BaseDataSerializer );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-    virtual std::string Serialize() override;
+    mitkClassMacro(PointSetSerializer, BaseDataSerializer);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual std::string Serialize() override;
+
   protected:
     PointSetSerializer();
     virtual ~PointSetSerializer();
-};
+  };
 } // namespace
 #endif

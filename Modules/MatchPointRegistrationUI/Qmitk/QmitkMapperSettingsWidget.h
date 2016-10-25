@@ -28,12 +28,13 @@ struct QmitkMappingJobSettings;
  * \class QmitkMapperSettingsWidget
  * \brief Widget that views the information and profile of an algorithm stored in an DLLInfo object.
  */
-class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapperSettingsWidget : public QWidget, private Ui::QmitkMapperSettingsWidget
+class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkMapperSettingsWidget : public QWidget,
+                                                                      private Ui::QmitkMapperSettingsWidget
 {
   Q_OBJECT
 
 public:
-  QmitkMapperSettingsWidget(QWidget* parent=0);
+  QmitkMapperSettingsWidget(QWidget *parent = 0);
 
   /**
    * Configures the passed settings according to the current state of the
@@ -41,7 +42,7 @@ public:
    * \param pointer to a instance based on QmitkMappingJobSettings.
    * \pre settings must point to a valid instance..
    */
-  void ConfigureJobSettings(QmitkMappingJobSettings* settings);
+  void ConfigureJobSettings(QmitkMappingJobSettings *settings);
 
 public Q_SLOTS:
   /**

@@ -20,30 +20,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "itkVersion.h"
 
-
 namespace mitk
 {
-StlVolumeTimeSeriesIOFactory::StlVolumeTimeSeriesIOFactory()
-{
-  this->RegisterOverride("mitkIOAdapter",
-                         "mitkStlVolumeTimeSeriesReader",
-                         "mitk Stl Surface IO",
-                         1,
-                         itk::CreateObjectFunction<IOAdapter<StlVolumeTimeSeriesReader> >::New());
-}
+  StlVolumeTimeSeriesIOFactory::StlVolumeTimeSeriesIOFactory()
+  {
+    this->RegisterOverride("mitkIOAdapter",
+                           "mitkStlVolumeTimeSeriesReader",
+                           "mitk Stl Surface IO",
+                           1,
+                           itk::CreateObjectFunction<IOAdapter<StlVolumeTimeSeriesReader>>::New());
+  }
 
-StlVolumeTimeSeriesIOFactory::~StlVolumeTimeSeriesIOFactory()
-{
-}
-
-const char* StlVolumeTimeSeriesIOFactory::GetITKSourceVersion() const
-{
-  return ITK_SOURCE_VERSION;
-}
-
-const char* StlVolumeTimeSeriesIOFactory::GetDescription() const
-{
-  return "StlVolumeTimeSeries IO Factory, allows the loading of Stl surfaces";
-}
+  StlVolumeTimeSeriesIOFactory::~StlVolumeTimeSeriesIOFactory() {}
+  const char *StlVolumeTimeSeriesIOFactory::GetITKSourceVersion() const { return ITK_SOURCE_VERSION; }
+  const char *StlVolumeTimeSeriesIOFactory::GetDescription() const
+  {
+    return "StlVolumeTimeSeries IO Factory, allows the loading of Stl surfaces";
+  }
 
 } // end namespace mitk

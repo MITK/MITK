@@ -24,9 +24,8 @@ class Step7 : public Step6
 {
   Q_OBJECT
 public:
-  Step7( int argc, char* argv[], QWidget *parent=nullptr );
+  Step7(int argc, char *argv[], QWidget *parent = nullptr);
   ~Step7() {}
-
 protected slots:
   virtual void StartRegionGrowing() override;
 };

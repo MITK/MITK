@@ -17,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkQuaternionRigidTransformViewWidgetHIncluded
 #define QmitkQuaternionRigidTransformViewWidgetHIncluded
 
-#include "ui_QmitkQuaternionRigidTransformControls.h"
 #include "MitkRigidRegistrationUIExports.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
+#include "ui_QmitkQuaternionRigidTransformControls.h"
 #include <itkImage.h>
 
 /*!
@@ -29,10 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 class MITKRIGIDREGISTRATIONUI_EXPORT QmitkQuaternionRigidTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
-
 public:
-
-  QmitkQuaternionRigidTransformView( QWidget* parent = nullptr, Qt::WindowFlags f = nullptr );
+  QmitkQuaternionRigidTransformView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkQuaternionRigidTransformView();
 
   virtual mitk::TransformParameters::TransformType GetTransformType() override;
@@ -45,21 +43,21 @@ public:
 
   virtual QString GetName() override;
 
-  virtual void SetupUI(QWidget* parent) override;
+  virtual void SetupUI(QWidget *parent) override;
 
   virtual itk::Array<double> GetScales() override;
 
-  virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams) override;
+  virtual vtkTransform *Transform(vtkMatrix4x4 *vtkmatrix,
+                                  vtkTransform *vtktransform,
+                                  itk::Array<double> transformParams) override;
 
   virtual int GetNumberOfTransformParameters() override;
 
 private:
-
-  template < class TPixelType, unsigned int VImageDimension >
-  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1);
+  template <class TPixelType, unsigned int VImageDimension>
+  itk::Object::Pointer GetTransform2(itk::Image<TPixelType, VImageDimension> *itkImage1);
 
 protected:
-
   Ui::QmitkQuaternionRigidTransformControls m_Controls;
 
   itk::Object::Pointer m_TransformObject;
@@ -67,7 +65,6 @@ protected:
   double m_CenterX;
   double m_CenterY;
   double m_CenterZ;
-
 };
 
 #endif

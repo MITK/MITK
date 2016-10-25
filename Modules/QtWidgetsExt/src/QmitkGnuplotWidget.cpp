@@ -14,13 +14,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include "QmitkGnuplotWidget.h"
 #include <QClipboard>
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <ui_QmitkGnuplotWidget.h>
-#include "QmitkGnuplotWidget.h"
 
-QmitkGnuplotWidget::QmitkGnuplotWidget(QWidget* parent)
+QmitkGnuplotWidget::QmitkGnuplotWidget(QWidget *parent)
   : QWidget(parent),
     m_Ui(new Ui::QmitkGnuplotWidget),
     m_ContextMenu(nullptr),
@@ -30,9 +30,11 @@ QmitkGnuplotWidget::QmitkGnuplotWidget(QWidget* parent)
 {
   m_Ui->setupUi(this);
 
-  connect(m_Process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(OnProcessStateChanged(QProcess::ProcessState)));
+  connect(
+    m_Process, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(OnProcessStateChanged(QProcess::ProcessState)));
   connect(m_Process, SIGNAL(error(QProcess::ProcessError)), this, SLOT(OnProcessError(QProcess::ProcessError)));
-  connect(m_Process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OnProcessFinished(int, QProcess::ExitStatus)));
+  connect(
+    m_Process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(OnProcessFinished(int, QProcess::ExitStatus)));
 
   this->CreateContextMenu();
 }
@@ -51,14 +53,12 @@ void QmitkGnuplotWidget::CreateContextMenu()
 
   m_ContextMenu = new QMenu(this);
 
-  m_ContextMenu->addActions(QList<QAction*>()
-    << m_CopyPlotAction
-    << m_CopyScriptAction);
+  m_ContextMenu->addActions(QList<QAction *>() << m_CopyPlotAction << m_CopyScriptAction);
 }
 
-void QmitkGnuplotWidget::contextMenuEvent(QContextMenuEvent* event)
+void QmitkGnuplotWidget::contextMenuEvent(QContextMenuEvent *event)
 {
-  const QPixmap* plot = m_Ui->label->pixmap();
+  const QPixmap *plot = m_Ui->label->pixmap();
 
   m_CopyPlotAction->setEnabled(plot != nullptr && !plot->isNull());
   m_CopyScriptAction->setEnabled(!m_Commands.empty());
@@ -70,7 +70,7 @@ void QmitkGnuplotWidget::contextMenuEvent(QContextMenuEvent* event)
 
 void QmitkGnuplotWidget::OnCopyPlot()
 {
-  const QPixmap* plot = m_Ui->label->pixmap();
+  const QPixmap *plot = m_Ui->label->pixmap();
 
   if (plot != nullptr && !plot->isNull())
     QApplication::clipboard()->setPixmap(*plot);
@@ -83,7 +83,7 @@ void QmitkGnuplotWidget::OnCopyScript()
 
   QString script = this->CreateSetTermCommand();
 
-  Q_FOREACH(const QString& command, m_Commands)
+  Q_FOREACH (const QString &command, m_Commands)
   {
     script += command + "\n";
   }
@@ -91,7 +91,7 @@ void QmitkGnuplotWidget::OnCopyScript()
   QApplication::clipboard()->setText(script);
 }
 
-void QmitkGnuplotWidget::resizeEvent(QResizeEvent*)
+void QmitkGnuplotWidget::resizeEvent(QResizeEvent *)
 {
   m_ModifiedTime.Modified();
 
@@ -117,7 +117,7 @@ QStringList QmitkGnuplotWidget::GetCommands() const
   return m_Commands;
 }
 
-void QmitkGnuplotWidget::SetCommands(const QStringList& commands)
+void QmitkGnuplotWidget::SetCommands(const QStringList &commands)
 {
   m_Commands = commands;
   m_ModifiedTime.Modified();
@@ -151,7 +151,7 @@ void QmitkGnuplotWidget::OnProcessStateChanged(QProcess::ProcessState state)
 
     m_Process->write(this->CreateSetTermCommand().toLatin1());
 
-    Q_FOREACH(const QString& command, m_Commands)
+    Q_FOREACH (const QString &command, m_Commands)
     {
       m_Process->write(QString("%1\n").arg(command).toLatin1());
     }
@@ -165,29 +165,29 @@ void QmitkGnuplotWidget::OnProcessError(QProcess::ProcessError error)
 {
   switch (error)
   {
-  case QProcess::FailedToStart:
-    m_Ui->label->setText("Gnuplot failed to start!");
-    break;
+    case QProcess::FailedToStart:
+      m_Ui->label->setText("Gnuplot failed to start!");
+      break;
 
-  case QProcess::Crashed:
-    m_Ui->label->setText("Gnuplot crashed!");
-    break;
+    case QProcess::Crashed:
+      m_Ui->label->setText("Gnuplot crashed!");
+      break;
 
-  case QProcess::Timedout:
-    m_Ui->label->setText("Gnuplot timed out!");
-    break;
+    case QProcess::Timedout:
+      m_Ui->label->setText("Gnuplot timed out!");
+      break;
 
-  case QProcess::WriteError:
-    m_Ui->label->setText("Could not write to gnuplot!");
-    break;
+    case QProcess::WriteError:
+      m_Ui->label->setText("Could not write to gnuplot!");
+      break;
 
-  case QProcess::ReadError:
-    m_Ui->label->setText("Could not read from gnuplot!");
-    break;
+    case QProcess::ReadError:
+      m_Ui->label->setText("Could not read from gnuplot!");
+      break;
 
-  default:
-    m_Ui->label->setText("An unknown error occurred!");
-    break;
+    default:
+      m_Ui->label->setText("An unknown error occurred!");
+      break;
   }
 }
 

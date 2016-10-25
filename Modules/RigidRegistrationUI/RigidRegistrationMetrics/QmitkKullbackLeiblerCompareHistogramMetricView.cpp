@@ -15,12 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "QmitkKullbackLeiblerCompareHistogramMetricView.h"
-#include <itkKullbackLeiblerCompareHistogramImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
+#include <itkKullbackLeiblerCompareHistogramImageToImageMetric.h>
 
 #include "QValidator"
 
-QmitkKullbackLeiblerCompareHistogramMetricView::QmitkKullbackLeiblerCompareHistogramMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
+QmitkKullbackLeiblerCompareHistogramMetricView::QmitkKullbackLeiblerCompareHistogramMetricView(QWidget *parent,
+                                                                                               Qt::WindowFlags f)
+  : QmitkRigidRegistrationMetricsGUIBase(parent, f)
 {
 }
 
@@ -43,14 +45,18 @@ itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric()
   return nullptr;
 }
 
-template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
+template <class TPixelType, unsigned int VImageDimension>
+itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric2(
+  itk::Image<TPixelType, VImageDimension> * /*itkImage1*/)
 {
-  typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
-  typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
-  typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
+  typedef typename itk::Image<TPixelType, VImageDimension> FixedImageType;
+  typedef typename itk::Image<TPixelType, VImageDimension> MovingImageType;
+  typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer
+    MetricPointer = itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
   unsigned int nBins = m_Controls.m_NumberOfHistogramBinsKullbackLeiblerCompareHistogram->text().toInt();
-  typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
+  typename itk::KullbackLeiblerCompareHistogramImageToImageMetric<FixedImageType,
+                                                                  MovingImageType>::HistogramType::SizeType
+    histogramSize;
   histogramSize[0] = nBins;
   histogramSize[1] = nBins;
   MetricPointer->SetHistogramSize(histogramSize);
@@ -80,10 +86,10 @@ QString QmitkKullbackLeiblerCompareHistogramMetricView::GetName()
   return "KullbackLeiblerCompareHistogram";
 }
 
-void QmitkKullbackLeiblerCompareHistogramMetricView::SetupUI(QWidget* parent)
+void QmitkKullbackLeiblerCompareHistogramMetricView::SetupUI(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
+  QValidator *validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsKullbackLeiblerCompareHistogram->setValidator(validatorLineEditInput);
 }
 

@@ -18,8 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string SelectionView::VIEW_ID = "org.mitk.views.selectionview";
 
-SelectionView::SelectionView()
-  : m_Parent(nullptr)
+SelectionView::SelectionView() : m_Parent(nullptr)
 {
 }
 
@@ -45,9 +44,8 @@ void SelectionView::CreateQtPartControl(QWidget *parent)
   m_Controls.m_SelectionList->setCurrentRow(0);
 
   m_Parent->setEnabled(true);
-
 }
 
-void SelectionView::SetFocus ()
+void SelectionView::SetFocus()
 {
 }

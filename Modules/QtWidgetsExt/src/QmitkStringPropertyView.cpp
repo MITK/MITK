@@ -15,10 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 #include "QmitkStringPropertyView.h"
 
-QmitkStringPropertyView::QmitkStringPropertyView( const mitk::StringProperty* property, QWidget* parent )
-: QLabel( parent ),
-  PropertyView( property ),
-  m_StringProperty(property)
+QmitkStringPropertyView::QmitkStringPropertyView(const mitk::StringProperty *property, QWidget *parent)
+  : QLabel(parent), PropertyView(property), m_StringProperty(property)
 {
   PropertyChanged();
 }
@@ -29,8 +27,8 @@ QmitkStringPropertyView::~QmitkStringPropertyView()
 
 void QmitkStringPropertyView::PropertyChanged()
 {
-  if ( m_Property )
-    setText( m_StringProperty->GetValue() );
+  if (m_Property)
+    setText(m_StringProperty->GetValue());
 }
 
 void QmitkStringPropertyView::PropertyRemoved()
@@ -39,4 +37,3 @@ void QmitkStringPropertyView::PropertyRemoved()
   m_StringProperty = nullptr;
   setText("n/a");
 }
-

@@ -21,8 +21,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QDialog>
 
-namespace Ui {
-class QmitkFileReaderOptionsDialog;
+namespace Ui
+{
+  class QmitkFileReaderOptionsDialog;
 }
 
 class QmitkFileReaderWriterOptionsWidget;
@@ -32,9 +33,7 @@ class QmitkFileReaderOptionsDialog : public QDialog
   Q_OBJECT
 
 public:
-
-  explicit QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo& loadInfo,
-                                        QWidget *parent = 0);
+  explicit QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInfo &loadInfo, QWidget *parent = 0);
   ~QmitkFileReaderOptionsDialog();
 
   bool ReuseOptions() const;
@@ -42,9 +41,8 @@ public:
   virtual void accept() override;
 
 private:
-
-  Ui::QmitkFileReaderOptionsDialog* ui;
-  mitk::IOUtil::LoadInfo& m_LoadInfo;
+  Ui::QmitkFileReaderOptionsDialog *ui;
+  mitk::IOUtil::LoadInfo &m_LoadInfo;
   std::vector<mitk::FileReaderSelector::Item> m_ReaderItems;
 };
 

@@ -37,8 +37,10 @@ void ListenerViewMitk::CreateQtPartControl(QWidget *parent)
 void ListenerViewMitk::ToggleRadioMethod(QString selectStr)
 {
   // change the radio button state according to the name of the selected data node
-  if (selectStr == "DataNode 1") m_Controls.radioButton->toggle();
-  else if (selectStr == "DataNode 2") m_Controls.radioButton_2->toggle();
+  if (selectStr == "DataNode 1")
+    m_Controls.radioButton->toggle();
+  else if (selectStr == "DataNode 2")
+    m_Controls.radioButton_2->toggle();
 }
 
 void ListenerViewMitk::SetFocus()
@@ -46,12 +48,13 @@ void ListenerViewMitk::SetFocus()
 }
 
 //! [MITK Selection Listener method implementation]
-void ListenerViewMitk::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer> &nodes)
+void ListenerViewMitk::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
+                                          const QList<mitk::DataNode::Pointer> &nodes)
 {
-  //any nodes there?
+  // any nodes there?
   if (!nodes.empty())
   {
-    //get the selected node (in the BlueBerry example there is always only one node)
+    // get the selected node (in the BlueBerry example there is always only one node)
     mitk::DataNode::Pointer dataNode = nodes.front();
     // pass the name of the selected node to method
     ToggleRadioMethod(QString::fromStdString(dataNode->GetName()));

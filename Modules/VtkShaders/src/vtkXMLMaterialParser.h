@@ -94,46 +94,47 @@ class vtkXMLMaterialParser : public vtkXMLParser
 {
 public:
   static vtkXMLMaterialParser *New();
-  vtkTypeMacro(vtkXMLMaterialParser,vtkXMLParser);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+  vtkTypeMacro(vtkXMLMaterialParser, vtkXMLParser);
+  void PrintSelf(ostream &os, vtkIndent indent) override;
 
   // Description:
   // Set/Get the vtkXMLMaterial representation of the parsed material.
   vtkGetObjectMacro(Material, vtkXMLMaterial);
-  void SetMaterial(vtkXMLMaterial*);
+  void SetMaterial(vtkXMLMaterial *);
 
   // Description:
   // Overridden to initialize the internal structures before
   // the parsing begins.
   virtual int Parse() override;
-  virtual int Parse(const char* inputString) override;
-  virtual int Parse(const char* inputString, unsigned int length) override;
+  virtual int Parse(const char *inputString) override;
+  virtual int Parse(const char *inputString, unsigned int length) override;
 
   // Description:
   // Overridden to clean up internal structures before the chunk-parsing
   // begins.
   virtual int InitializeParser() override;
+
 protected:
   vtkXMLMaterialParser();
   ~vtkXMLMaterialParser();
 
   // Description:
   // Event for handling the start of an element
-  virtual void StartElement(const char* name, const char** atts) override;
+  virtual void StartElement(const char *name, const char **atts) override;
 
   // Description:
   // Event for handling the end of an element
-  virtual void EndElement(const char*) override;
+  virtual void EndElement(const char *) override;
 
   // Description:
   // Handle character data, not yet implemented
-  virtual void CharacterDataHandler( const char* data, int length ) override;
+  virtual void CharacterDataHandler(const char *data, int length) override;
 
-  vtkXMLMaterial* Material;
-  vtkXMLMaterialParserInternals* Internals;
+  vtkXMLMaterial *Material;
+  vtkXMLMaterialParserInternals *Internals;
 
 private:
-  vtkXMLMaterialParser(const vtkXMLMaterialParser&); // Not implemented
-  void operator=(const vtkXMLMaterialParser&); // Not implemented
+  vtkXMLMaterialParser(const vtkXMLMaterialParser &); // Not implemented
+  void operator=(const vtkXMLMaterialParser &);       // Not implemented
 };
 #endif

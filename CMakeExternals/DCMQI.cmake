@@ -3,16 +3,17 @@
 #-----------------------------------------------------------------------------
 
 if(MITK_USE_DCMQI)
-  set(proj DCMQI)
-  set(proj_DEPENDENCIES DCMTK ITK)
-  set(${proj}_DEPENDS ${proj})
 
   # Sanity checks
-  if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
-    message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")
+  if(DEFINED DCMQI_DIR AND NOT EXISTS ${DCMQI_DIR})
+    message(FATAL_ERROR "DCMQI_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
-  if(NOT DEFINED ${proj}_DIR)
+  set(proj DCMQI)
+  set(proj_DEPENDENCIES DCMTK ITK)
+  set(DCMQI_DEPENDS ${proj})
+
+  if(NOT DEFINED DCMQI_DIR)
     set(additional_cmake_args)
 
     if(CTEST_USE_LAUNCHERS)
@@ -46,7 +47,7 @@ if(MITK_USE_DCMQI)
 
 
     ExternalProject_Get_Property(${proj} binary_dir)
-    set(${proj}_DIR ${binary_dir})
+    set(DCMQI_DIR ${binary_dir})
     #set(${proj}_DIR ${ep_prefix})
     #message(${proj}_DIR: ${${proj}_DIR})
     #mitkFunctionInstallExternalCMakeProject(${proj})

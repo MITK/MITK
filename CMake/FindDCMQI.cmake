@@ -25,7 +25,7 @@ find_package_handle_standard_args(DCMQI
 
   # Find Debug libraries
   find_library(DCMQI_LIBRARY_DEBUG
-    dcmqi
+    dcmqi${DCMTK_CMAKE_DEBUG_POSTFIX}
     PATHS
     ${DCMQI_DIR}/bin
     ${DCMQI_DIR}/bin/Debug
@@ -37,12 +37,11 @@ find_package_handle_standard_args(DCMQI
 
   # Add libraries to variable according to build type
   set(DCMQI_LIBRARY)
+  mark_as_advanced(DCMQI_LIBRARY)
   if(DCMQI_LIBRARY_RELEASE)
-    list(APPEND DCMQI_LIBRARIES optimized ${DCMQI_LIBRARY_RELEASE})
     list(APPEND DCMQI_LIBRARY optimized ${DCMQI_LIBRARY_RELEASE})
   endif()
 
   if(DCMQI_LIBRARY_DEBUG)
-    list(APPEND DCMQI_LIBRARIES debug ${DCMQI_LIBRARY_DEBUG})
     list(APPEND DCMQI_LIBRARY debug ${DCMQI_LIBRARY_DEBUG})
   endif()

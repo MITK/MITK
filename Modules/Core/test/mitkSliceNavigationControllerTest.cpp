@@ -178,7 +178,7 @@ int testGeometry(const mitk::Geometry3D *geometry,
 
   std::cout << "Testing result of CreatedWorldGeometry(): ";
   mitk::Point3D axialcornerpoint0;
-  axialcornerpoint0 = cornerpoint0 + bottom + normal * (numSlices - 1 + 0.5); // really -1?
+  axialcornerpoint0 = cornerpoint0 + bottom;
   result = compareGeometry(*sliceCtrl->GetCreatedWorldGeometry(),
                            width,
                            height,
@@ -189,7 +189,7 @@ int testGeometry(const mitk::Geometry3D *geometry,
                            axialcornerpoint0,
                            right,
                            bottom * (-1.0),
-                           normal * (-1.0));
+                           normal);
   if (result != EXIT_SUCCESS)
   {
     std::cout << "[FAILED]" << std::endl;

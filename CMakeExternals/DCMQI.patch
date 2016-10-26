@@ -1,8 +1,18 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 845863f..857d83a 100644
+old mode 100644
+new mode 100755
+index 845863f..e23cb9e
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -206,17 +206,6 @@ foreach(file
+@@ -158,6 +158,7 @@ set(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
+ mark_as_advanced(ADDITIONAL_C_FLAGS)
+ mark_as_superbuild(ADDITIONAL_C_FLAGS)
+
++set(CMAKE_CXX_FLAGS "-fPIC")
+ set(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
+ mark_as_advanced(ADDITIONAL_CXX_FLAGS)
+ mark_as_superbuild(ADDITIONAL_CXX_FLAGS)
+@@ -206,17 +207,6 @@ foreach(file
    install(FILES ${file} DESTINATION ${DCMQI_INSTALL_CMAKE_DIR} COMPONENT Development)
  endforeach()
 
@@ -20,7 +30,7 @@ index 845863f..857d83a 100644
 
 
  #-----------------------------------------------------------------------------
-@@ -229,11 +218,26 @@ if(DCMQI_SUPERBUILD)
+@@ -229,11 +219,26 @@ if(DCMQI_SUPERBUILD)
  endif()
 
  find_package(DCMTK NO_MODULE REQUIRED)
@@ -49,7 +59,7 @@ index 845863f..857d83a 100644
 
  include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/FindGit.cmake)
  include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/dcmqiMacroExtractRepositoryInfo.cmake)
-@@ -255,7 +259,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp)
+@@ -255,7 +260,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp)
  set(JSONCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp/jsoncpp.cpp)
 
  add_subdirectory("libsrc")
@@ -61,3 +71,25 @@ index 845863f..857d83a 100644
 +if(SlicerExecutionModel_FOUND)
 +  add_subdirectory("apps")
 +endif()
+diff --git a/jsoncpp/jsoncpp.cpp b/jsoncpp/jsoncpp.cpp
+index dd2a1e3..d18ca40 100644
+--- a/jsoncpp/jsoncpp.cpp
++++ b/jsoncpp/jsoncpp.cpp
+@@ -231,7 +231,7 @@ static int       stackDepth_g = 0;  // see readValue()
+ namespace Json {
+
+ #if __GNUC__ >= 6
+-typedef std::scoped_ptr<CharReader> const  CharReaderPtr;
++typedef std::unique_ptr<CharReader> const  CharReaderPtr;
+ #else
+ typedef std::auto_ptr<CharReader>          CharReaderPtr;
+ #endif
+@@ -3800,7 +3800,7 @@ Value& Path::make(Value& root) const {
+ namespace Json {
+
+ #if __GNUC__ >= 6
+-typedef std::scoped_ptr<StreamWriter> const  StreamWriterPtr;
++typedef std::unique_ptr<StreamWriter> const  StreamWriterPtr;
+ #else
+ typedef std::auto_ptr<StreamWriter>          StreamWriterPtr;
+ #endif

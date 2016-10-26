@@ -81,7 +81,6 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets
   m_Parent = parent;
   m_Controls.setupUi(parent);
-  m_Controls.m_SliceNavigatorAxial->SetInverseDirection(true);
 
   connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
   connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));

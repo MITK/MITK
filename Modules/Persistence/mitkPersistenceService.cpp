@@ -200,7 +200,7 @@ bool mitk::PersistenceService::Load(const std::string &fileName, bool enforceRel
   if (theFile.empty())
     theFile = PersistenceService::GetDefaultPersistenceFile();
 
-  MITK_INFO << "Load persistence data from file: " << theFile;
+  MITK_DEBUG << "Load persistence data from file: " << theFile;
 
   if (!itksys::SystemTools::FileExists(theFile.c_str()))
     return false;
@@ -281,7 +281,7 @@ void mitk::PersistenceService::RemovePropertyListReplacedObserver(PropertyListRe
 
 void mitk::PersistenceService::LoadModule()
 {
-  MITK_INFO << "Persistence Module loaded.";
+  MITK_DEBUG << "Persistence Module loaded.";
 }
 
 us::ModuleContext *mitk::PersistenceService::GetModuleContext()

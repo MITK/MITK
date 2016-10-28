@@ -106,14 +106,6 @@ public:
   */
   void OnDataSelectionChanged(const mitk::DataNode* node);
   /*!
-  * @brief Changes the colors of the bounding object
-  */
-  void OnSelectedColorChanged();
-  /*!
-  * @brief Changes the colors of the bounding object
-  */
-  void OnDeselectedColorChanged();
-  /*!
   * @brief Sets the scalar value for outside pixels in case of masking
   */
   void OnSliderValueChanged(int slidervalue);
@@ -129,10 +121,6 @@ protected:
   @brief Sets the selected bounding object as current bounding object and set up interactor
   */
   void OnComboBoxSelectionChanged(const mitk::DataNode* node);
-  /*!
-  @brief Change color of the selected or deselected bounding shape
-  */
-  void ChangeColor(mitk::ColorProperty::Pointer colorProperty, bool selected);
   /*!
   * @brief Initializes a new bounding shape using the selected image geometry.
   */

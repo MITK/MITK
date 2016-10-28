@@ -91,7 +91,6 @@ QmitkImageCropper::~QmitkImageCropper()
 void QmitkImageCropper::SetFocus()
 {
   m_Controls.buttonCreateNewBoundingBox->setFocus();
-  m_Controls.comboBoxBoundingObject->setFocus();
 }
 
 void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
@@ -111,8 +110,6 @@ void QmitkImageCropper::CreateQtPartControl(QWidget *parent)
     this, SLOT(OnDataSelectionChanged(const mitk::DataNode*)));
   connect(m_Controls.buttonCreateNewBoundingBox, SIGNAL(clicked()), this, SLOT(DoCreateNewBoundingObject()));
   connect(m_Controls.buttonAdvancedSettings, SIGNAL(clicked()), this, SLOT(OnAdvancedSettingsButtonToggled()));
-  connect(m_Controls.buttonDeselectedColor, SIGNAL(clicked()), this, SLOT(OnDeselectedColorChanged()));
-  connect(m_Controls.buttonSelectedColor, SIGNAL(clicked()), this, SLOT(OnSelectedColorChanged()));
   connect(m_Controls.spinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
 
   m_Controls.spinBox->setValue(-1000);
@@ -141,34 +138,6 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode* node)
     m_CroppingObject = dynamic_cast<mitk::GeometryData*>(m_CroppingObjectNode->GetData());
     m_Advanced = true;
 
-    mitk::ColorProperty::Pointer selcolorProperty = dynamic_cast<mitk::ColorProperty*>
-      (m_CroppingObjectNode->GetProperty("Bounding Shape.Selected Color"));
-    mitk::ColorProperty::Pointer deselcolorProperty = dynamic_cast<mitk::ColorProperty*>
-      (m_CroppingObjectNode->GetProperty("Bounding Shape.Deselected Color"));
-    if (selcolorProperty && deselcolorProperty)
-    {
-      mitk::Color deselColor = deselcolorProperty->GetColor();
-      mitk::Color selColor = selcolorProperty->GetColor();
-
-      QColor selCurrentColor((int)(selColor.GetRed() * 255), (int)(selColor.GetGreen() * 255), (int)(selColor.GetBlue() * 255));
-      m_Controls.buttonSelectedColor->setAutoFillBackground(true);
-
-      auto styleSheet = QString("background-color:rgb(%1,%2,%3)")
-        .arg(selCurrentColor.red())
-        .arg(selCurrentColor.green())
-        .arg(selCurrentColor.blue());
-
-      m_Controls.buttonSelectedColor->setStyleSheet(styleSheet);
-
-      QColor deselCurrentColor((int)(deselColor.GetRed() * 255), (int)(deselColor.GetGreen() * 255), (int)(deselColor.GetBlue() * 255));
-      m_Controls.buttonDeselectedColor->setAutoFillBackground(true);
-      auto styleSheet2 = QString("background-color:rgb(%1,%2,%3)")
-        .arg(deselCurrentColor.red())
-        .arg(deselCurrentColor.green())
-        .arg(deselCurrentColor.blue());
-
-      m_Controls.buttonDeselectedColor->setStyleSheet(styleSheet2);
-    }
     mitk::RenderingManager::GetInstance()->InitializeViews();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -180,24 +149,12 @@ void QmitkImageCropper::OnDataSelectionChanged(const mitk::DataNode* node)
     m_BoundingShapeInteractor->SetDataNode(nullptr);
     m_Advanced = false;
     this->OnAdvancedSettingsButtonToggled();
-    QColor defaultColor((int)(255), (int)(255), (int)(255));
-    auto styleSheet = QString("background-color:rgb(%1,%2,%3)")
-      .arg(defaultColor.red())
-      .arg(defaultColor.green())
-      .arg(defaultColor.blue());
-
-    m_Controls.buttonSelectedColor->setAutoFillBackground(true);
-    m_Controls.buttonSelectedColor->setStyleSheet(styleSheet);
-    m_Controls.buttonDeselectedColor->setAutoFillBackground(true);
-    m_Controls.buttonDeselectedColor->setStyleSheet(styleSheet);
   }
 
 }
 
 void QmitkImageCropper::OnAdvancedSettingsButtonToggled()
 {
-  m_Controls.groupBoxShape->setVisible(m_Advanced);
-  m_Controls.groupBoxColors->setVisible(m_Advanced);
   m_Controls.groupImageSettings->setVisible(m_Advanced);
   m_Advanced = !m_Advanced;
 }
@@ -234,15 +191,15 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
 {
   if (m_ImageNode.IsNotNull())
   {
-    m_Controls.buttonCropping->setEnabled(true);
-    m_Controls.buttonMasking->setEnabled(true);
-    m_Controls.boundingShapeSelector->setEnabled(true);
-
     bool ok = false;
     QString name = QInputDialog::getText(QApplication::activeWindow()
       , "Add cropping shape...", "Enter name for the new cropping shape", QLineEdit::Normal, "BoundingShape", &ok);
     if (!ok || name.isEmpty())
       return;
+
+    m_Controls.buttonCropping->setEnabled(true);
+    m_Controls.buttonMasking->setEnabled(true);
+    m_Controls.boundingShapeSelector->setEnabled(true);
 
     // to do: check whether stdmulti.widget is valid
     // get current timestep to support 3d+t images //to do: check if stdmultiwidget is valid
@@ -289,11 +246,10 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
     m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
     m_Controls.labelWarningImage->setText(QString::fromStdString("Select an image."));
     m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-    m_Controls.labelWarningBB->setText(QString::fromStdString("No bounding object available."));
+    m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
     m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
     m_Controls.buttonCropping->setEnabled(false);
     m_Controls.buttonMasking->setEnabled(false);
-    m_Controls.comboBoxBoundingObject->setEnabled(false);
     m_Controls.labelWarningRotation->setVisible(false);
     return;
   }
@@ -305,7 +261,6 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
     {
       m_ImageNode = nodes[0];
       m_Controls.groupBoundingObject->setEnabled(true);
-      m_Controls.comboBoxBoundingObject->setEnabled(true);
       m_Controls.labelWarningImage->setStyleSheet(" QLabel { color: rgb(0, 0, 0) }");
       m_Controls.labelWarningImage->setText(QString::fromStdString("File name: " + m_ImageNode->GetName()));
       m_Controls.buttonCreateNewBoundingBox->setEnabled(true);
@@ -374,7 +329,7 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
           m_Controls.buttonMasking->setEnabled(false);
           m_Controls.boundingShapeSelector->setEnabled(false);
           m_Controls.labelWarningBB->setStyleSheet(" QLabel { color: rgb(255, 0, 0) }");
-          m_Controls.labelWarningBB->setText(QString::fromStdString("No bounding object available."));
+          m_Controls.labelWarningBB->setText(QString::fromStdString("Create a bounding shape below."));
         }
         return;
       }
@@ -384,64 +339,9 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
       m_Controls.buttonCropping->setEnabled(false);
       m_Controls.buttonMasking->setEnabled(false);
       m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
-      m_Controls.comboBoxBoundingObject->setEnabled(false);
-      m_Controls.buttonDeselectedColor->setAutoFillBackground(false);
-      m_Controls.buttonDeselectedColor->setAutoFillBackground(false);
       m_Controls.boundingShapeSelector->setEnabled(false);
       m_ParentWidget->setEnabled(true);
       m_Controls.labelWarningRotation->setVisible(false);
-    }
-  }
-}
-
-void QmitkImageCropper::OnSelectedColorChanged()
-{
-  mitk::ColorProperty::Pointer colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("Bounding Shape.Selected Color"));
-  this->ChangeColor(colorProperty, true);
-}
-
-void QmitkImageCropper::OnDeselectedColorChanged()
-{
-  mitk::ColorProperty* colorProperty = dynamic_cast<mitk::ColorProperty*>(m_CroppingObjectNode->GetProperty("Bounding Shape.Deselected Color"));
-  this->ChangeColor(colorProperty, false);
-
-}
-
-void QmitkImageCropper::ChangeColor(mitk::ColorProperty::Pointer colorProperty, bool selected)
-{
-  if (m_CroppingObjectNode != nullptr)
-  {
-    if (colorProperty)
-    {
-      mitk::Color color = colorProperty->GetColor();
-      QColor currentColor((int)(color.GetRed() * 255), (int)(color.GetGreen() * 255), (int)(color.GetBlue() * 255));
-      QColor result = QColorDialog::getColor(currentColor);
-      if (result.isValid())
-      {
-        color.SetRed(result.red() / 255.0);
-        color.SetGreen(result.green() / 255.0);
-        color.SetBlue(result.blue() / 255.0);
-        colorProperty->SetColor(color);
-
-        auto styleSheet = QString("background-color:rgb(%1,%2,%3)")
-          .arg(result.red())
-          .arg(result.green())
-          .arg(result.blue());
-
-        if (!selected)
-        {
-          m_Controls.buttonDeselectedColor->setAutoFillBackground(true);
-          m_Controls.buttonDeselectedColor->setStyleSheet(styleSheet);
-        }
-        else
-        {
-          m_Controls.buttonSelectedColor->setAutoFillBackground(true);
-          m_Controls.buttonSelectedColor->setStyleSheet(styleSheet);
-        }
-        m_BoundingShapeInteractor->SetDataNode(m_CroppingObjectNode);
-        mitk::RenderingManager::GetInstance()->InitializeViews();
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-      }
     }
   }
 }

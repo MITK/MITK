@@ -131,7 +131,7 @@ void mitk::BoundingShapeVtkMapper3D::GenerateDataForRenderer(BaseRenderer *rende
   bool needGenerateData = localStorage->GetLastGenerateDataTime() < dataNode->GetMTime();
   double distance = camera->GetDistance();
 
-  if (abs(distance - m_Impl->DistanceFromCam) > mitk::eps)
+  if (std::abs(distance - m_Impl->DistanceFromCam) > mitk::eps)
   {
     m_Impl->DistanceFromCam = distance;
     needGenerateData = true;

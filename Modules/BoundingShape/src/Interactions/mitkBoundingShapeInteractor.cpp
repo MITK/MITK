@@ -522,8 +522,8 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
     bbox->ComputeBoundingBox();
     mitk::Point3D BBmin = bbox->GetMinimum();
     mitk::Point3D BBmax = bbox->GetMaximum();
-    if (abs(BBmin[0] - BBmax[0]) > 0.01 && abs(BBmin[1] - BBmax[1]) > 0.01 &&
-        abs(BBmin[2] - BBmax[2]) > 0.01) // TODO: check if the extent is greater than zero
+    if (std::abs(BBmin[0] - BBmax[0]) > 0.01 && std::abs(BBmin[1] - BBmax[1]) > 0.01 &&
+        std::abs(BBmin[2] - BBmax[2]) > 0.01) // TODO: check if the extent is greater than zero
     {
       geometry->SetBounds(bbox->GetBounds());
       geometry->Modified();

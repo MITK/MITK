@@ -812,7 +812,8 @@ void QmitkMITKIGTTrackingToolboxView::UpdateRenderTrackingTimer()
     i = 0;
     if (m_ToolVisualizationFilter->GetOutput(0)->IsDataValid())
     {
-      if (mitk::Equal(lastPositionTool1, m_ToolVisualizationFilter->GetOutput(0)->GetPosition(), 0.000000001, false))
+        if (mitk::Equal(lastPositionTool1, m_ToolVisualizationFilter->GetOutput(0)->GetPosition(), 0.000000001, false)
+          && m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() != "Da Vinci")
       {
         MITK_WARN << "Seems as tracking (of at least tool 1) is frozen which means that bug 17713 occurred. Restart tracking might help.";
         //display further information to find the bug

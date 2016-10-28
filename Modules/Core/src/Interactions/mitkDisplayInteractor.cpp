@@ -753,21 +753,13 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       node->GetIntProperty("Image.Displayed Component", component);
     }
   }
-  std::stringstream stream;
-  stream.imbue(std::locale::classic());
 
   // get the position and gray value from the image and build up status bar text
   if (image3D.IsNotNull())
   {
     itk::Index<3> p;
     image3D->GetGeometry()->WorldToIndex(worldposition, p);
-    stream.precision(2);
-    stream << "Position: <" << std::fixed << worldposition[0] << ", " << std::fixed << worldposition[1] << ", "
-           << std::fixed << worldposition[2] << "> mm";
-    stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
-
     mitk::ScalarType pixelValue;
-
     mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
                             image3D->GetChannelDescriptor().GetPixelType(),
                             image3D,
@@ -775,24 +767,12 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
                             p,
                             pixelValue,
                             component);
-
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-    {
-      stream << "; Time: " << posEvent->GetSender()->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue
-             << "  ";
-    }
-    else
-    {
-      stream << "; Time: " << posEvent->GetSender()->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
-    }
+    mitk::StatusBar::GetInstance()->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
   }
   else
   {
-    stream << "No image information at this position!";
+    mitk::StatusBar::GetInstance()->DisplayImageInfoInvalid();
   }
-
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
 }
 
 void mitk::DisplayInteractor::ConfigurationChanged()

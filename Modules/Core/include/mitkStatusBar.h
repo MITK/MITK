@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStatusBarImplementation.h"
 #include <MitkCoreExports.h>
 #include <itkObject.h>
+#include <mitkPoint.h>
+#include <itkIndex.h>
 
 namespace mitk
 {
@@ -61,6 +63,13 @@ namespace mitk
     void DisplayGenericOutputText(const char *t);
     void DisplayDebugText(const char *t);
     void DisplayGreyValueText(const char *t);
+
+    //##Documentation
+    //## @brief Display position, index, time and pixel value
+    void DisplayImageInfo(const mitk::Point3D point, const itk::Index<3> index, const mitk::ScalarType time, const mitk::ScalarType pixelValue);
+    //##Documentation
+    //## @brief Display placeholder text for invalid information
+    void DisplayImageInfoInvalid();
 
     //##Documentation
     //## @brief removes any temporary message being shown.

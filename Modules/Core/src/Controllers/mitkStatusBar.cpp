@@ -71,6 +71,27 @@ namespace mitk
     if (m_Implementation != nullptr)
       m_Implementation->DisplayGreyValueText(t);
   }
+  void StatusBar::DisplayImageInfo(const mitk::Point3D point, const itk::Index<3> index, const mitk::ScalarType time, const mitk::ScalarType pixelValue)
+  {
+    if (m_Implementation != nullptr)
+    {
+      std::stringstream stream;
+      stream.imbue(std::locale::classic());
+      stream.precision(2);
+      stream << "Position: <" << std::fixed << point[0] << ", " << std::fixed << point[1] << ", " << std::fixed << point[2] << "> mm";
+      stream << "; Index: <" << index[0] << ", " << index[1] << ", " << index[2] << "> ";
+      stream << "; Time: " << time << " ms; Pixelvalue ";
+      if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+        stream << std::scientific;
+      stream << pixelValue;
+      m_Implementation->DisplayGreyValueText(stream.str().c_str());
+    }
+  }
+  void StatusBar::DisplayImageInfoInvalid()
+  {
+    if (m_Implementation != nullptr)
+      m_Implementation->DisplayGreyValueText("No image information at this position!");
+  }
   void StatusBar::Clear()
   {
     if (m_Implementation != nullptr)

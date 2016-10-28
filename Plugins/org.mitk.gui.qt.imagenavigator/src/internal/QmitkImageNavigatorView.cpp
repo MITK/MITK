@@ -189,7 +189,6 @@ void QmitkImageNavigatorView::UpdateStatusBar()
   if (m_IRenderWindowPart != nullptr)
   {
     mitk::Point3D position = m_IRenderWindowPart->GetSelectedPosition();
-    std::string statusText;
     mitk::BaseRenderer::Pointer renderer = mitk::BaseRenderer::GetInstance(m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetVtkRenderWindow());
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
 
@@ -233,20 +232,13 @@ void QmitkImageNavigatorView::UpdateStatusBar()
           node->GetIntProperty("Image.Displayed Component", component);
         }
       }
-      std::stringstream stream;
-      stream.imbue(std::locale::classic());
 
       // get the position and gray value from the image and build up status bar text
       if (image3D.IsNotNull())
       {
         itk::Index<3> p;
         image3D->GetGeometry()->WorldToIndex(position, p);
-        stream.precision(2);
-        stream << "Position: <" << std::fixed << position[0] << ", " << std::fixed << position[1] << ", " << std::fixed << position[2] << "> mm";
-        stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
-
         mitk::ScalarType pixelValue;
-
         mitkPixelTypeMultiplex5(
           mitk::FastSinglePixelAccess,
           image3D->GetChannelDescriptor().GetPixelType(),
@@ -255,25 +247,12 @@ void QmitkImageNavigatorView::UpdateStatusBar()
           p,
           pixelValue,
           component);
-
-
-
-        if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-        {
-          stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
-        }
-        else
-        {
-          stream << "; Time: " << renderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
-        }
+        mitk::StatusBar::GetInstance()->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue);
       }
       else
       {
-        stream << "No image information at this position!";
+        mitk::StatusBar::GetInstance()->DisplayImageInfoInvalid();
       }
-
-      statusText = stream.str();
-      mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
     }
   }
 }

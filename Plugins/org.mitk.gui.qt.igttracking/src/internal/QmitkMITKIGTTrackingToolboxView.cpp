@@ -468,6 +468,10 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
 {
+  //show tracking volume
+  this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
+  //Reset the view to a defined start. Do it here and not in OnStartTrackingFinished, to give other tracking devices the chance to reset the view to a different direction.
+  this->GlobalReinit();
   m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eStartTracking);
   m_WorkerThread->start();
   this->m_Controls->m_MainWidget->setEnabled(false);
@@ -532,15 +536,11 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
     m_IGTLMessageProvider->RegisterAsMicroservice();
   }
 
-  //show tracking volume
-  this->OnTrackingVolumeChanged(m_Controls->m_VolumeSelectionBox->currentText());
-
   m_tracking = true;
   m_Controls->m_ConnectDisconnectButton->setEnabled(false);
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(true);
 
-  this->GlobalReinit();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
@@ -581,8 +581,6 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
     m_IGTLConversionFilter->UnRegisterMicroservice();
     m_IGTLMessageProvider->UnRegisterMicroservice();
   }
-
-  this->GlobalReinit();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()

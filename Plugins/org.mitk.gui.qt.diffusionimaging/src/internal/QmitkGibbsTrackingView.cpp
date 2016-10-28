@@ -59,7 +59,7 @@ void QmitkTrackingWorker::run()
     m_View->m_GlobalTracker->SetMaskImage(m_View->m_MaskImage);
     m_View->m_GlobalTracker->SetStartTemperature((float)m_View->m_Controls->m_StartTempSlider->value()/100);
     m_View->m_GlobalTracker->SetEndTemperature((float)m_View->m_Controls->m_EndTempSlider->value()/10000);
-    m_View->m_GlobalTracker->SetIterations(m_View->m_Iterations);
+    m_View->m_GlobalTracker->SetIterations(m_View->m_Controls->m_IterationsBox->text().toDouble());
     m_View->m_GlobalTracker->SetParticleWeight((float)m_View->m_Controls->m_ParticleWeightSlider->value()/10000);
     m_View->m_GlobalTracker->SetParticleWidth((float)(m_View->m_Controls->m_ParticleWidthSlider->value())/10);
     m_View->m_GlobalTracker->SetParticleLength((float)(m_View->m_Controls->m_ParticleLengthSlider->value())/10);
@@ -94,8 +94,6 @@ QmitkGibbsTrackingView::QmitkGibbsTrackingView()
     , m_FiberBundleNode(NULL)
     , m_ThreadIsRunning(false)
     , m_ElapsedTime(0)
-    , m_Iterations(10000000)
-    , m_LastStep(0)
     , m_GlobalTracker(NULL)
     , m_TrackingWorker(this)
     , m_TrackingNode(NULL)
@@ -120,12 +118,8 @@ QmitkGibbsTrackingView::~QmitkGibbsTrackingView()
 // update tracking status and generate fiber bundle
 void QmitkGibbsTrackingView::TimerUpdate()
 {
-    int currentStep = m_GlobalTracker->GetCurrentStep();
-
-    mitk::ProgressBar::GetInstance()->Progress(currentStep-m_LastStep);
     UpdateTrackingStatus();
     GenerateFiberBundle();
-    m_LastStep = currentStep;
 }
 
 // tell global tractography filter to stop after current step
@@ -134,7 +128,6 @@ void QmitkGibbsTrackingView::StopGibbsTracking()
     if (m_GlobalTracker.IsNull())
         return;
 
-    //mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep+1);
     m_GlobalTracker->SetAbortTracking(true);
     m_Controls->m_TrackingStop->setEnabled(false);
     m_Controls->m_TrackingStop->setText("Stopping Tractography ...");
@@ -147,7 +140,6 @@ void QmitkGibbsTrackingView::AfterThread()
     m_ThreadIsRunning = false;
     m_TrackingTimer->stop();
 
-    mitk::ProgressBar::GetInstance()->Progress(m_GlobalTracker->GetSteps()-m_LastStep+1);
     UpdateGUI();
 
     if( !m_GlobalTracker->GetIsInValidState() )
@@ -191,7 +183,6 @@ void QmitkGibbsTrackingView::BeforeThread()
     m_TrackingTime = QTime::currentTime();
     m_ElapsedTime = 0;
     m_TrackingTimer->start(1000);
-    m_LastStep = 0;
 
     UpdateGUI();
 }
@@ -214,7 +205,6 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_AdvancedSettingsCheckbox, SIGNAL(clicked()), this, SLOT(AdvancedSettings()) );
         connect( m_Controls->m_SaveTrackingParameters, SIGNAL(clicked()), this, SLOT(SaveTrackingParameters()) );
         connect( m_Controls->m_LoadTrackingParameters, SIGNAL(clicked()), this, SLOT(LoadTrackingParameters()) );
-        connect( m_Controls->m_IterationsSlider, SIGNAL(valueChanged(int)), this, SLOT(SetIterations(int)) );
         connect( m_Controls->m_ParticleWidthSlider, SIGNAL(valueChanged(int)), this, SLOT(SetParticleWidth(int)) );
         connect( m_Controls->m_ParticleLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(SetParticleLength(int)) );
         connect( m_Controls->m_InExBalanceSlider, SIGNAL(valueChanged(int)), this, SLOT(SetInExBalance(int)) );
@@ -285,53 +275,6 @@ void QmitkGibbsTrackingView::SetCurvatureThreshold(int value)
     m_Controls->m_CurvatureThresholdLabel->setText(QString::number(value)+"°");
 }
 
-void QmitkGibbsTrackingView::SetIterations(int value)
-{
-    switch(value)
-    {
-    case 0:
-        m_Controls->m_IterationsLabel->setText("Iterations: 1x10^4");
-        m_Iterations = 10000;
-        break;
-    case 1:
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^4");
-        m_Iterations = 50000;
-        break;
-    case 2:
-        m_Controls->m_IterationsLabel->setText("Iterations: 1x10^5");
-        m_Iterations = 100000;
-        break;
-    case 3:
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^5");
-        m_Iterations = 500000;
-        break;
-    case 4:
-        m_Controls->m_IterationsLabel->setText("Iterations: 1x10^6");
-        m_Iterations = 1000000;
-        break;
-    case 5:
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^6");
-        m_Iterations = 5000000;
-        break;
-    case 6:
-        m_Controls->m_IterationsLabel->setText("Iterations: 1x10^7");
-        m_Iterations = 10000000;
-        break;
-    case 7:
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^7");
-        m_Iterations = 50000000;
-        break;
-    case 8:
-        m_Controls->m_IterationsLabel->setText("Iterations: 1x10^8");
-        m_Iterations = 100000000;
-        break;
-    case 9:
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^8");
-        m_Iterations = 500000000;
-        break;
-    }
-}
-
 void QmitkGibbsTrackingView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
 {
     m_MultiWidget = &stdMultiWidget;
@@ -400,7 +343,7 @@ void QmitkGibbsTrackingView::UpdateTrackingStatus()
     m_Controls->m_TrackingTimeLabel->setText( QString::number(hours)+QString("h ")+QString::number(minutes)+QString("m ")+QString::number(seconds)+QString("s") );
     m_Controls->m_NumConnectionsLabel->setText( QString::number(m_GlobalTracker->GetNumConnections()) );
     m_Controls->m_NumParticlesLabel->setText( QString::number(m_GlobalTracker->GetNumParticles()) );
-    m_Controls->m_CurrentStepLabel->setText( QString::number(100*(float)(m_GlobalTracker->GetCurrentStep()-1)/m_GlobalTracker->GetSteps())+"%" );
+    m_Controls->m_CurrentStepLabel->setText( QString::number(100*m_GlobalTracker->GetCurrentIteration()/m_GlobalTracker->GetIterations())+"%" );
     m_Controls->m_AcceptedFibersLabel->setText( QString::number(m_GlobalTracker->GetNumAcceptedFibers()) );
 }
 
@@ -427,7 +370,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
         m_Controls->m_TrackingStop->setEnabled(false);
         m_Controls->m_TrackingStart->setEnabled(true);
         m_Controls->m_LoadTrackingParameters->setEnabled(true);
-        m_Controls->m_IterationsSlider->setEnabled(true);
+        m_Controls->m_IterationsBox->setEnabled(true);
         m_Controls->m_AdvancedFrame->setEnabled(true);
         m_Controls->m_TrackingStop->setText("Stop Tractography");
         m_Controls->m_TrackingStart->setToolTip("Start tractography. No further change of parameters possible.");
@@ -438,7 +381,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
         m_Controls->m_TrackingStop->setEnabled(false);
         m_Controls->m_TrackingStart->setEnabled(false);
         m_Controls->m_LoadTrackingParameters->setEnabled(true);
-        m_Controls->m_IterationsSlider->setEnabled(true);
+        m_Controls->m_IterationsBox->setEnabled(true);
         m_Controls->m_AdvancedFrame->setEnabled(true);
         m_Controls->m_TrackingStop->setText("Stop Tractography");
         m_Controls->m_TrackingStart->setToolTip("No Q-Ball image selected.");
@@ -449,7 +392,7 @@ void QmitkGibbsTrackingView::UpdateGUI()
         m_Controls->m_TrackingStop->setEnabled(true);
         m_Controls->m_TrackingStart->setEnabled(false);
         m_Controls->m_LoadTrackingParameters->setEnabled(false);
-        m_Controls->m_IterationsSlider->setEnabled(false);
+        m_Controls->m_IterationsBox->setEnabled(false);
         m_Controls->m_AdvancedFrame->setEnabled(false);
         m_Controls->m_AdvancedFrame->setVisible(false);
         m_Controls->m_AdvancedSettingsCheckbox->setChecked(false);
@@ -542,13 +485,6 @@ void QmitkGibbsTrackingView::StartGibbsTracking()
     }
     catch(...){};
 
-    unsigned int steps = m_Iterations/10000;
-    if (steps<10)
-        steps = 10;
-
-    m_LastStep = 1;
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(steps);
-
     // start worker thread
     m_TrackingThread.start(QThread::LowestPriority);
 }
@@ -625,7 +561,7 @@ void QmitkGibbsTrackingView::SaveTrackingParameters()
     documentXML.LinkEndChild(mainXML);
 
     TiXmlElement* paramXML = new TiXmlElement("parameter_set");
-    paramXML->SetAttribute("iterations", QString::number(m_Iterations).toStdString());
+    paramXML->SetAttribute("iterations", m_Controls->m_IterationsBox->text().toStdString());
     paramXML->SetAttribute("particle_length", QString::number((float)m_Controls->m_ParticleLengthSlider->value()/10).toStdString());
     paramXML->SetAttribute("particle_width", QString::number((float)m_Controls->m_ParticleWidthSlider->value()/10).toStdString());
     paramXML->SetAttribute("particle_weight", QString::number((float)m_Controls->m_ParticleWeightSlider->value()/10000).toStdString());
@@ -648,61 +584,6 @@ void QmitkGibbsTrackingView::SaveTrackingParameters()
     documentXML.SaveFile( filename.toStdString() );
 }
 
-void QmitkGibbsTrackingView::UpdateIteraionsGUI(unsigned long iterations)
-{
-    switch(iterations)
-    {
-    case 10000:
-        m_Controls->m_IterationsSlider->setValue(0);
-        m_Controls->m_IterationsLabel->setText("Iterations: 10^4");
-        break;
-    case 50000:
-        m_Controls->m_IterationsSlider->setValue(1);
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^4");
-        break;
-    case 100000:
-        m_Controls->m_IterationsSlider->setValue(2);
-        m_Controls->m_IterationsLabel->setText("Iterations: 10^5");
-        break;
-    case 500000:
-        m_Controls->m_IterationsSlider->setValue(3);
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^5");
-        break;
-    case 1000000:
-        m_Controls->m_IterationsSlider->setValue(4);
-        m_Controls->m_IterationsLabel->setText("Iterations: 10^6");
-        break;
-    case 5000000:
-        m_Controls->m_IterationsSlider->setValue(5);
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^6");
-        break;
-    case 10000000:
-        m_Controls->m_IterationsSlider->setValue(6);
-        m_Controls->m_IterationsLabel->setText("Iterations: 10^7");
-        break;
-    case 50000000:
-        m_Controls->m_IterationsSlider->setValue(7);
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^7");
-        break;
-    case 100000000:
-        m_Controls->m_IterationsSlider->setValue(8);
-        m_Controls->m_IterationsLabel->setText("Iterations: 10^8");
-        break;
-    case 500000000:
-        m_Controls->m_IterationsSlider->setValue(9);
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^8");
-        break;
-    case 1000000000:
-        m_Controls->m_IterationsSlider->setValue(10);
-        m_Controls->m_IterationsLabel->setText("Iterations: 10^9");
-        break;
-    case 5000000000:
-        m_Controls->m_IterationsSlider->setValue(11);
-        m_Controls->m_IterationsLabel->setText("Iterations: 5x10^9");
-        break;
-    }
-}
-
 // load current tracking paramters from xml file (.gtp)
 void QmitkGibbsTrackingView::LoadTrackingParameters()
 {
@@ -722,8 +603,7 @@ void QmitkGibbsTrackingView::LoadTrackingParameters()
     pElem = hRoot.FirstChildElement("parameter_set").Element();
 
     QString iterations(pElem->Attribute("iterations"));
-    m_Iterations = iterations.toULong();
-    UpdateIteraionsGUI(m_Iterations);
+    m_Controls->m_IterationsBox->setText(iterations);
 
     QString particleLength(pElem->Attribute("particle_length"));
     float pLength = particleLength.toFloat();

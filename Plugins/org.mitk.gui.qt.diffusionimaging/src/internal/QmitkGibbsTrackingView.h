@@ -105,7 +105,6 @@ protected slots:
   void LoadTrackingParameters();            ///< load tracking parameters from xml file
 
   /** update labels if parameters have changed */
-  void SetIterations(int value);
   void SetParticleWidth(int value);
   void SetParticleLength(int value);
   void SetInExBalance(int value);
@@ -136,7 +135,7 @@ private:
 
   /** data objects */
   mitk::DataNode::Pointer       m_TrackingNode;     ///< actual node that is tracked
-  mitk::FiberBundle::Pointer   m_FiberBundle;      ///< tracking output
+  mitk::FiberBundle::Pointer    m_FiberBundle;      ///< tracking output
   ItkFloatImageType::Pointer    m_MaskImage;        ///< used to reduce the algorithms search space. tracking only inside of the mask.
   mitk::TensorImage::Pointer    m_TensorImage;      ///< actual image that is tracked
   mitk::QBallImage::Pointer     m_QBallImage;       ///< actual image that is tracked
@@ -153,8 +152,6 @@ private:
   QTimer*         m_TrackingTimer;
   QTime           m_TrackingTime;
   unsigned long   m_ElapsedTime;
-  unsigned long   m_Iterations;
-  int             m_LastStep;
   QString         m_OutputFileName;
 
   /** global tracker and friends */

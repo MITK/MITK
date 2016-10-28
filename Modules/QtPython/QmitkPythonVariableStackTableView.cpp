@@ -85,7 +85,7 @@ void QmitkPythonVariableStackTableView::OnVariableStackDoubleClicked(const QMode
     {
       mitkImage = m_PythonService->CopyCvImageFromPython(varName.toStdString());
     }
-    else if( value.startsWith("(vtkPolyData)") )
+    else if( value.startsWith("(vtkCommonDataModelPython.vtkPolyData)") )
     {
       mitkSurface = m_PythonService->CopyVtkPolyDataFromPython(varName.toStdString());
     }

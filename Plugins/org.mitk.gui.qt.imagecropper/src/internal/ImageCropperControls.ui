@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ImageCropperControls</class>
- <widget class="QWidget" name="ImageCropperNewControls">
+ <widget class="QWidget" name="ImageCropperControls">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -37,7 +37,7 @@
         <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
        </property>
        <property name="text">
-        <string>Please select an image!</string>
+        <string>Please select an image.</string>
        </property>
       </widget>
      </item>
@@ -459,7 +459,7 @@
         </palette>
        </property>
        <property name="text">
-        <string>Please select a bounding object!</string>
+        <string>Please select a bounding object.</string>
        </property>
       </widget>
      </item>
@@ -986,7 +986,13 @@
       </palette>
      </property>
      <property name="text">
-      <string>ImageGeometry is rotated, result is not pixel-aligned. Please Reinit!</string>
+      <string>Image geometry is rotated, result won't be pixel-aligned. You can reinit your image to get a pixel-aligned result, though.</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -1022,159 +1028,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBoxShape">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Bounding Shape</string>
-     </property>
-     <widget class="QWidget" name="verticalLayoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>321</width>
-        <height>71</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QmitkDataStorageComboBox" name="comboBoxBoundingObject">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>Cuboid</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Cone</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Cylinder</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Ellipsoid</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="buttonReset">
-         <property name="text">
-          <string>Reset bounding object</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBoxColors">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>60</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>6777215</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Bounding Shape Color</string>
-     </property>
-     <widget class="QWidget" name="verticalLayoutWidget_3">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>20</y>
-        <width>309</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QPushButton" name="buttonDeselectedColor">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Deselected</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="buttonSelectedColor">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Selected </string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupImageSettings">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1196,7 +1049,7 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>321</width>
+        <width>333</width>
         <height>161</height>
        </rect>
       </property>
@@ -1212,7 +1065,7 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Outside Pixel Value:</string>
+            <string>Outside pixel value (masking):</string>
            </property>
           </widget>
          </item>
@@ -1240,7 +1093,7 @@
        <item>
         <widget class="QCheckBox" name="checkOverwriteImage">
          <property name="text">
-          <string>Overwrite original image</string>
+          <string>Overrride original image</string>
          </property>
          <property name="checked">
           <bool>false</bool>
@@ -1250,7 +1103,7 @@
        <item>
         <widget class="QCheckBox" name="checkBoxCropTimeStepOnly">
          <property name="text">
-          <string>Crop current timestep only (for timeseries)</string>
+          <string>Only crop current timestep / cut off other timesteps</string>
          </property>
         </widget>
        </item>

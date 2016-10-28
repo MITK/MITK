@@ -167,6 +167,10 @@ bool QmitkDataStorageTreeModel::dropMimeData(
 
     // First we extract a Qlist of TreeItem* pointers.
     QList<TreeItem *> listOfItemsToDrop = ToTreeItemPtrList(data);
+    if (listOfItemsToDrop.empty())
+    {
+      return false;
+    }
 
     // Retrieve the TreeItem* where we are dropping stuff, and its parent.
     TreeItem *dropItem = this->TreeItemFromIndex(parent);

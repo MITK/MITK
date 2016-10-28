@@ -91,16 +91,16 @@ endif()
 #-----------------------------------------------------------------------------
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # require at least gcc 4.7.3 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 12.04
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.7.3)
-    message(FATAL_ERROR "GCC version must be at least 4.7.3
-If you are using Ubuntu 12.04, you can easily install gcc and g++ 4.7.3 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
+  # require at least gcc 4.9 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 12.04
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
+    message(FATAL_ERROR "GCC version must be at least 4.9
+If you are using Ubuntu 12.04, you can easily install gcc and g++ 4.9 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
   sudo add-apt-repository ppa:ubuntu-toolchain-r/test
   sudo apt-get update
-  sudo apt-get install gcc-4.7 g++-4.7
+  sudo apt-get install gcc-4.9 g++-4.9
 Make sure to explicitly specify these compilers when configuring MITK:
-  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.7
-  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.7
+  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.9
+  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.9
 For more information on the proposed PPA see the Toolchain Updates section of https://wiki.ubuntu.com/ToolChain.")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -114,9 +114,9 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     message(FATAL_ERROR "Apple Clang version must be at least 5.0")
   endif()
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # require at least Visual Studio 2012
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17.0.61030.0)
-    message(FATAL_ERROR "Microsoft Visual Studio 2012 Update 4 or newer required (MSVC 17.0.61030.0)")
+  # require at least Visual Studio 2013
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 18.0.40629.0)
+    message(FATAL_ERROR "Microsoft Visual Studio 2013 Update 5 or newer required (MSVC 18.0.40629.0)")
   endif()
 else()
   message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")

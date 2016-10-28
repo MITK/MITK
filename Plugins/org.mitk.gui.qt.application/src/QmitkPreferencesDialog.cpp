@@ -149,8 +149,6 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
   QObject::connect(this, SIGNAL(accepted()), this, SLOT(OnDialogAccepted()));
   QObject::connect(this, SIGNAL(rejected()), this, SLOT(OnDialogRejected()));
 
-  d->buttonBox->button(QDialogButtonBox::Cancel)->setDefault(true);
-
   this->UpdateTree();
 }
 

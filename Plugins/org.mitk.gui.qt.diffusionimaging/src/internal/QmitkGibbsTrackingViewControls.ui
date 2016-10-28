@@ -120,7 +120,7 @@
          <string>Start Tractography</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+         <iconset resource="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc">
           <normaloff>:/QtWidgetsExt/play.xpm</normaloff>:/QtWidgetsExt/play.xpm</iconset>
         </property>
        </widget>
@@ -140,7 +140,7 @@
          <string>Stop Tractography</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+         <iconset resource="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc">
           <normaloff>:/QtWidgetsExt/stop.xpm</normaloff>:/QtWidgetsExt/stop.xpm</iconset>
         </property>
        </widget>
@@ -157,8 +157,8 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="m_IterationsLabel">
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_CurvatureThresholdLabel_3">
         <property name="toolTip">
          <string/>
         </property>
@@ -169,26 +169,14 @@
          <string/>
         </property>
         <property name="text">
-         <string>Iterations: 10^8</string>
+         <string>Output File:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QSlider" name="m_IterationsSlider">
-        <property name="toolTip">
-         <string>Specify number of iterations for the tracking algorithm.</string>
-        </property>
-        <property name="maximum">
-         <number>9</number>
-        </property>
-        <property name="value">
-         <number>8</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::TicksBelow</enum>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="m_AdvancedSettingsCheckbox">
+        <property name="text">
+         <string>Advanced Settings</string>
         </property>
        </widget>
       </item>
@@ -205,46 +193,6 @@
         </property>
         <property name="checked">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QToolButton" name="m_VisualizeOnceButton">
-        <property name="toolTip">
-         <string>Visualize intermediate result.</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-          <normaloff>:/QmitkDiffusionImaging/Refresh_48.png</normaloff>:/QmitkDiffusionImaging/Refresh_48.png</iconset>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="m_AdvancedSettingsCheckbox">
-        <property name="text">
-         <string>Advanced Settings</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="m_CurvatureThresholdLabel_3">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="statusTip">
-         <string/>
-        </property>
-        <property name="whatsThis">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Output File:</string>
         </property>
        </widget>
       </item>
@@ -275,7 +223,7 @@
          <property name="spacing">
           <number>0</number>
          </property>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <widget class="QToolButton" name="m_OutputFileButton">
            <property name="toolTip">
             <string>Select output file name and folder.</string>
@@ -285,7 +233,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QLineEdit" name="m_OutputFileLabel">
            <property name="text">
             <string>N/A</string>
@@ -296,6 +244,46 @@
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QToolButton" name="m_VisualizeOnceButton">
+        <property name="toolTip">
+         <string>Visualize intermediate result.</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
+          <normaloff>:/QmitkDiffusionImaging/Refresh_48.png</normaloff>:/QmitkDiffusionImaging/Refresh_48.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_IterationsLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="whatsThis">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Iterations:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="m_IterationsBox">
+        <property name="text">
+         <string>1e9</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -859,7 +847,7 @@
          <string>Save Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+         <iconset resource="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc">
           <normaloff>:/QtWidgetsExt/btnMoveDown.png</normaloff>:/QtWidgetsExt/btnMoveDown.png</iconset>
         </property>
        </widget>
@@ -879,7 +867,7 @@
          <string>Load Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc">
+         <iconset resource="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc">
           <normaloff>:/QtWidgetsExt/btnMoveUp.png</normaloff>:/QtWidgetsExt/btnMoveUp.png</iconset>
         </property>
        </widget>
@@ -1108,7 +1096,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../../../Modules/QtWidgetsExt/resources/QtWidgetsExt.qrc"/>
+  <include location="../../../../Modules/QtWidgetsExt/resource/QtWidgetsExt.qrc"/>
   <include location="../../resources/QmitkDiffusionImaging.qrc"/>
  </resources>
  <connections/>

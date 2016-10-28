@@ -45,7 +45,8 @@ template< class ItkQBallImageType >
 GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_StartTemperature(0.1),
     m_EndTemperature(0.001),
-    m_Iterations(500000),
+    m_Iterations(1e9),
+    m_CurrentIteration(0.0),
     m_CurrentStep(0),
     m_ParticleWeight(0),
     m_ParticleWidth(0),
@@ -57,7 +58,6 @@ GibbsTrackingFilter< ItkQBallImageType >::GibbsTrackingFilter():
     m_AbortTracking(false),
     m_NumAcceptedFibers(0),
     m_BuildFibers(false),
-    m_Steps(10),
     m_ProposalAcceptance(0),
     m_CurvatureThreshold(0.7),
     m_DuplicateImage(true),
@@ -222,17 +222,9 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
         EstimateParticleWeight();
 
     float alpha = log(m_EndTemperature/m_StartTemperature);
-    m_Steps = m_Iterations/10000;
-    if (m_Steps<10)
-        m_Steps = 10;
-    if (m_Steps>m_Iterations)
-    {
-        MITK_INFO << "GibbsTrackingFilter: not enough iterations!";
-        m_AbortTracking = true;
-    }
+
     if (m_CurvatureThreshold < mitk::eps)
         m_CurvatureThreshold = 0;
-    unsigned long singleIts = (unsigned long)((1.0*m_Iterations) / (1.0*m_Steps));
 
     // seed random generators
     Statistics::MersenneTwisterRandomVariateGenerator::Pointer randGen = Statistics::MersenneTwisterRandomVariateGenerator::New();
@@ -273,7 +265,6 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
 
     MITK_INFO << "----------------------------------------";
     MITK_INFO << "Iterations: " << m_Iterations;
-    MITK_INFO << "Steps: " << m_Steps;
     MITK_INFO << "Particle length: " << m_ParticleLength;
     MITK_INFO << "Particle width: " << m_ParticleWidth;
     MITK_INFO << "Particle weight: " << m_ParticleWeight;
@@ -289,41 +280,34 @@ void GibbsTrackingFilter< ItkQBallImageType >::GenerateData()
     preClock.Stop();
     TimeProbe clock; clock.Start();
     m_NumAcceptedFibers = 0;
-    unsigned long counter = 1;
-
-    boost::progress_display disp(m_Steps*singleIts);
+    m_CurrentIteration = 0;
+    boost::progress_display disp(m_Iterations);
     if (!m_AbortTracking)
-    for( m_CurrentStep = 1; m_CurrentStep <= m_Steps; m_CurrentStep++ )
+    while (m_CurrentIteration<m_Iterations)
     {
+        ++disp;
+        m_CurrentIteration++;
+        if (m_AbortTracking)
+            break;
+
         // update temperatur for simulated annealing process
-        float temperature = m_StartTemperature * exp(alpha*(((1.0)*m_CurrentStep)/((1.0)*m_Steps)));
+        float temperature = m_StartTemperature * exp(alpha*m_CurrentIteration/m_Iterations);
         sampler->SetTemperature(temperature);
 
-        for (unsigned long i=0; i<singleIts; i++)
-        {
-            ++disp;
-            if (m_AbortTracking)
-                break;
 
-            sampler->MakeProposal();
+        sampler->MakeProposal();
 
-            if (m_BuildFibers || (i==singleIts-1 && m_CurrentStep==m_Steps))
-            {
-                m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/counter;
-                m_NumParticles = particleGrid->m_NumParticles;
-                m_NumConnections = particleGrid->m_NumConnections;
-
-                FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
-                m_FiberPolyData = fiberBuilder.iterate(m_MinFiberLength);
-                m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
-                m_BuildFibers = false;
-            }
-            counter++;
-        }
-
-        m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/counter;
+        m_ProposalAcceptance = (float)sampler->GetNumAcceptedProposals()/m_CurrentIteration;
         m_NumParticles = particleGrid->m_NumParticles;
         m_NumConnections = particleGrid->m_NumConnections;
+
+        if (m_BuildFibers)
+        {
+            FiberBuilder fiberBuilder(particleGrid, m_MaskImage);
+            m_FiberPolyData = fiberBuilder.iterate(m_MinFiberLength);
+            m_NumAcceptedFibers = m_FiberPolyData->GetNumberOfLines();
+            m_BuildFibers = false;
+        }
 
         if (m_AbortTracking)
             break;
@@ -421,7 +405,7 @@ bool GibbsTrackingFilter< ItkQBallImageType >::LoadParameters()
         pElem = hRoot.FirstChildElement("parameter_set").Element();
 
         string iterations(pElem->Attribute("iterations"));
-        m_Iterations = boost::lexical_cast<unsigned long>(iterations);
+        m_Iterations = boost::lexical_cast<double>(iterations);
 
         string particleLength(pElem->Attribute("particle_length"));
         m_ParticleLength = boost::lexical_cast<float>(particleLength);

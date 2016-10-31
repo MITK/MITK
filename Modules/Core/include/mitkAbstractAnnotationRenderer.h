@@ -49,6 +49,12 @@ namespace mitk
     const std::string GetID() const;
     const std::string GetRendererID() const;
 
+    void CurrentBaseRendererChanged();
+
+    void RemoveAllOverlays();
+
+    void Update();
+
     static const std::string US_INTERFACE_NAME;
     static const std::string US_PROPKEY_ID;
     static const std::string US_PROPKEY_RENDERER_ID;
@@ -66,7 +72,7 @@ namespace mitk
 
     void RemovedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override;
 
-    std::vector<Overlay *> m_OverlayServices;
+    BaseRenderer *GetCurrentBaseRenderer();
 
     const std::string m_RendererID;
     const std::string m_ID;

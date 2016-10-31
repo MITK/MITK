@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAbstractAnnotationRenderer.h"
+#include "mitkBaseRenderer.h"
+#include "mitkRenderingManager.h"
 #include "usGetModuleContext.h"
 #include <memory>
 
@@ -35,14 +37,50 @@ namespace mitk
 
   AbstractAnnotationRenderer::~AbstractAnnotationRenderer() {}
   const std::string AbstractAnnotationRenderer::GetRendererID() const { return m_RendererID; }
+  void AbstractAnnotationRenderer::CurrentBaseRendererChanged()
+  {
+    BaseRenderer *renderer = GetCurrentBaseRenderer();
+    if (renderer)
+    {
+      for (Overlay *o : this->GetServices())
+      {
+        o->AddToBaseRenderer(renderer);
+      }
+    }
+  }
+
+  void AbstractAnnotationRenderer::RemoveAllOverlays()
+  {
+    BaseRenderer *renderer = GetCurrentBaseRenderer();
+    if (renderer)
+    {
+      for (Overlay *o : this->GetServices())
+      {
+        o->RemoveFromBaseRenderer(renderer);
+      }
+    }
+  }
+
+  void AbstractAnnotationRenderer::Update()
+  {
+    BaseRenderer *renderer = GetCurrentBaseRenderer();
+    if (renderer)
+    {
+      for (Overlay *o : this->GetServices())
+      {
+        o->Update(renderer);
+      }
+    }
+  }
   const std::string AbstractAnnotationRenderer::GetID() const { return m_ID; }
   AbstractAnnotationRenderer::TrackedType AbstractAnnotationRenderer::AddingService(
     const AbstractAnnotationRenderer::ServiceReferenceType &reference)
   {
     Overlay *overlay = Superclass::AddingService(reference);
-    if (overlay)
+    BaseRenderer *renderer = GetCurrentBaseRenderer();
+    if (overlay && renderer)
     {
-      m_OverlayServices.push_back(overlay);
+      overlay->AddToBaseRenderer(renderer);
     }
     return overlay;
   }
@@ -55,8 +93,15 @@ namespace mitk
   void AbstractAnnotationRenderer::RemovedService(const AbstractAnnotationRenderer::ServiceReferenceType &,
                                                   AbstractAnnotationRenderer::TrackedType tracked)
   {
-    //  tracked->RemoveFromBaseRenderer() TODO19786
-    m_OverlayServices.erase(std::remove(m_OverlayServices.begin(), m_OverlayServices.end(), tracked),
-                            m_OverlayServices.end());
+    BaseRenderer *renderer = GetCurrentBaseRenderer();
+    if (tracked && renderer)
+    {
+      tracked->RemoveFromBaseRenderer(renderer);
+    }
+  }
+
+  BaseRenderer *AbstractAnnotationRenderer::GetCurrentBaseRenderer()
+  {
+    return BaseRenderer::GetByName(this->GetRendererID());
   }
 }

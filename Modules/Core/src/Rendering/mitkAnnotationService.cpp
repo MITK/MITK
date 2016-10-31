@@ -56,4 +56,22 @@ namespace mitk
     us::GetModuleContext()->RegisterService(annotationRenderer, props);
     AnnotationRendererServices.push_back(std::unique_ptr<AbstractAnnotationRenderer>(annotationRenderer));
   }
+
+  void AnnotationService::UpdateAnnotationRenderer(const std::string &rendererID)
+  { // get the context
+    us::ModuleContext *context = us::GetModuleContext();
+
+    // specify a filter that defines the requested type
+    std::string filter = "(&(" + AbstractAnnotationRenderer::US_PROPKEY_ID + "=*)(" +
+                         AbstractAnnotationRenderer::US_PROPKEY_RENDERER_ID + "=" + rendererID + "))";
+    // find the fitting service
+    std::vector<us::ServiceReferenceU> serviceReferences =
+      context->GetServiceReferences(AbstractAnnotationRenderer::US_INTERFACE_NAME, filter);
+
+    for (us::ServiceReferenceU service : serviceReferences)
+    {
+      AbstractAnnotationRenderer *annotationRenderer = context->GetService<AbstractAnnotationRenderer>(service);
+      annotationRenderer->Update();
+    }
+  }
 }

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometryDataVtkMapper3D.h"
 #include "mitkVtkMapper.h"
 
+#include "mitkAnnotationService.h"
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkGeometry3D.h>
 #include <mitkImageSliceSelector.h>
@@ -182,6 +183,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 
   // Update overlays in case a mapper has changed them
   this->UpdateOverlays();
+  AnnotationService::UpdateAnnotationRenderer(GetName());
 
   // Render text
   if (type == VtkPropRenderer::Overlay)

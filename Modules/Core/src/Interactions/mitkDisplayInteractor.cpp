@@ -1068,7 +1068,8 @@ mitk::DataNode::Pointer mitk::DisplayInteractor::GetTopLayerNode(mitk::DataStora
     for (unsigned int x = 0; x < nodes->size(); x++)
     {
       nodes->at(x)->GetBoolProperty("helper object", isHelper);
-      if(nodes->at(x)->GetData()->GetGeometry()->IsInside(worldposition) && isHelper == false)
+      auto nodeData = nodes->at(x)->GetData();
+      if (!isHelper && nodeData && nodeData->GetGeometry()->IsInside(worldposition))
       {
         int layer = 0;
         if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;

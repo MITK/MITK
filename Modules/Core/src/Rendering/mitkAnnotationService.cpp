@@ -58,7 +58,15 @@ namespace mitk
   }
 
   void AnnotationService::UpdateAnnotationRenderer(const std::string &rendererID)
-  { // get the context
+  {
+    for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(rendererID))
+    {
+      annotationRenderer->Update();
+    }
+  }
+
+  std::vector<AbstractAnnotationRenderer *> AnnotationService::GetAnnotationRenderer(const std::string &rendererID)
+  {
     us::ModuleContext *context = us::GetModuleContext();
 
     // specify a filter that defines the requested type
@@ -67,11 +75,11 @@ namespace mitk
     // find the fitting service
     std::vector<us::ServiceReferenceU> serviceReferences =
       context->GetServiceReferences(AbstractAnnotationRenderer::US_INTERFACE_NAME, filter);
-
+    std::vector<AbstractAnnotationRenderer *> arList;
     for (us::ServiceReferenceU service : serviceReferences)
     {
-      AbstractAnnotationRenderer *annotationRenderer = context->GetService<AbstractAnnotationRenderer>(service);
-      annotationRenderer->Update();
+      arList.push_back(context->GetService<AbstractAnnotationRenderer>(service));
     }
+    return arList;
   }
 }

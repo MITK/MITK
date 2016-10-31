@@ -133,10 +133,6 @@ void KurtosisMapComputation( mitk::Image::Pointer input,
     mitk::CastToItkImage( segmentation, vectorSeg );
     kurtosis_filter->SetImageMask(vectorSeg) ;
   }
-  else
-  {
-//    kurtosis_filter->SetMapOutputRegion(vectorImage -> GetLargestPossibleRegion());
-  }
 
   try
   {
@@ -175,17 +171,16 @@ int main( int argc, char* argv[] )
 
   mitkCommandLineParser parser;
 
-  parser.setTitle("Diffusion IVIM (Kurtosis) Fit");
+  parser.setTitle("Diffusion Kurtosis Fit");
   parser.setCategory("Signal Reconstruction");
   parser.setContributor("MIC");
-  parser.setDescription("Fitting of IVIM / Kurtosis");
+  parser.setDescription("Fitting Kurtosis");
   parser.setArgumentPrefix("--","-");
 
   // mandatory arguments
   parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input: ", "input image (DWI)", us::Any(), false);
   parser.addArgument("output", "o", mitkCommandLineParser::String, "Output Preifx: ", "Prefix for the output images, will append _f, _K, _D accordingly ", us::Any(), false);
   parser.addArgument("output_type", "ot", mitkCommandLineParser::String, "Output Type: ", "choose data type of output image, e.g. '.nii' or '.nrrd' ", us::Any(), false);
-  parser.addArgument("fit", "f", mitkCommandLineParser::String, "Fit model: ", "choose the fit model, i.e. 'Kurtosis' or 'IVIM' ", us::Any(), false);
 
   // optional arguments
   parser.addArgument("mask", "m", mitkCommandLineParser::InputFile, "Masking Image: ", "ROI (segmentation)", us::Any());
@@ -205,8 +200,6 @@ int main( int argc, char* argv[] )
   // mandatory arguments
   std::string inFileName = us::any_cast<std::string>(parsedArgs["input"]);
   std::string out_prefix = us::any_cast<std::string>(parsedArgs["output"]);
-  std::string out_type = us::any_cast<std::string>(parsedArgs["output_type"]);
-  std::string fit_name = us::any_cast<std::string>(parsedArgs["fit"]);
   std::string maskPath = "";
 
   mitk::Image::Pointer inputImage = mitk::IOUtil::LoadImage(inFileName);
@@ -214,13 +207,17 @@ int main( int argc, char* argv[] )
   bool omitBZero = false;
   double lower = -1000;
   double upper = 1000;
+  std::string  out_type = "nrrd";
 
   if (parsedArgs.count("mask") || parsedArgs.count("m"))
   {
     maskPath = us::any_cast<std::string>(parsedArgs["mask"]);
   }
 
-
+  if (parsedArgs.count("output_type") || parsedArgs.count("ot"))
+  {
+    out_type = us::any_cast<std::string>(parsedArgs["output_type"]);
+  }
 
   if (parsedArgs.count("omitbzero") || parsedArgs.count("om"))
   {
@@ -243,29 +240,14 @@ int main( int argc, char* argv[] )
     return EXIT_FAILURE;
   }
 
-  if( fit_name == "Kurtosis" )
-  {
-    MITK_INFO("DiffusionIVIMFit.Main") << "-----[ Kurtosis Fit ]-----";
 
-    KurtosisMapComputation( inputImage,
-                            out_prefix ,
-                            out_type,
-                            maskPath,
-                            omitBZero,
-                            lower,
-                            upper);
 
-  }
-  else if (fit_name == "IVIM" )
-  {
-    MITK_INFO("DiffusionIVIMFit.Main") << "IVIM Fit not fully implemented yet. Aborting...";
-    return EXIT_FAILURE;
-  }
-  else
-  {
-    MITK_ERROR("DiffusionIVIMFit.Main") << "Unrecognized option: " << fit_name << ". Valid values [\"IVIM\", \"Kurtosis\"] \n Aborting... \n";
-    return EXIT_FAILURE;
-
-  }
+KurtosisMapComputation( inputImage,
+                        out_prefix ,
+                        out_type,
+                        maskPath,
+                        omitBZero,
+                        lower,
+                        upper);
 
 }

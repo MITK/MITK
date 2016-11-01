@@ -190,14 +190,24 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
         for (char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
         {
-          for (unsigned int sample = 0; sample < beamformedSamples; sample++)
-          {
-            for (short line = 0; line < beamformedLines; line++)
+        
+            for (unsigned int sample = 0; sample < beamformedSamples; sample++)
             {
-              flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
-                = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
-            }
-          } // the beamformed image is flipped by 90 degrees; we need to flip it manually
+              for (short line = 0; line < beamformedLines; line++)
+              {
+                if (currentSet == 0)
+                {
+                  flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
+                    = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
+                }
+                else
+                {
+                  flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
+                    = rfDataArrayBeamformed[sample*beamformedLines + line + pixelsPerImage*currentSet];
+                }
+              }
+            } // the beamformed laser image is flipped by 90 degrees; we need to flip it manually
+          
         }
         
         for (int i = 0; i < beamformedTotalDatasets; i++) {

@@ -167,6 +167,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   {
 
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
+    else { return; }
 
     // initialize mitk::Image with given image size on the first time
     if ( ! m_Image->IsInitialized() )
@@ -198,7 +199,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
             }
           } // the beamformed image is flipped by 90 degrees; we need to flip it manually
         }
-
+        
         for (int i = 0; i < beamformedTotalDatasets; i++) {
           m_Image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
           // set every image to a different slice
@@ -206,8 +207,12 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         delete[] flipme;
         break;
       }
-    }
-    if (m_ImageMutex.IsNotNull()) { m_ImageMutex->Unlock(); }
+    }/*
+    for (int i = 0; i < channelDataTotalDatasets; i++) {
+      m_Image->SetSlice(&rfDataChannelData[i*channelDataChannelsPerDataset*channelDataSamplesPerChannel], i);
+      // set every image to a different slice
+    }*/
+    m_ImageMutex->Unlock();
   }
 
   // if the user decides to start recording, we feed the vector the generated images
@@ -334,7 +339,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string currentDate = std::ctime(timeptr);
     replaceAll(currentDate, ":", "-");
     currentDate.pop_back();
-    std::string MakeFolder = "mkdir \"d:/DiPhASImageData/" + currentDate + "\"";
+    std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
     system(MakeFolder.c_str());
 
     // if checked, we add the bmode filter here
@@ -346,8 +351,8 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
     Image::Pointer LaserImage = Image::New();
     Image::Pointer SoundImage = Image::New();
-    std::string pathLaser = "d:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
-    std::string pathSound = "d:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    std::string pathLaser = "c:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
+    std::string pathSound = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     
     // order the images and save them
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a LaserImage if we used interleaved mode
@@ -371,11 +376,11 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage
 {
   unsigned int width  = m_device->GetScanMode().imageWidth;
   unsigned int height = m_device->GetScanMode().imageHeight;
-  unsigned int events = m_device->GetScanMode().transmitEventsCount;
+  unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the laser event is not included in the transmitEvents, so we add 1 here
 
   unsigned int dimLaser[] = { width, height, m_recordedImages.size() / events};
   unsigned int dimSound[] = { width, height, m_recordedImages.size() / events * (events-1)};
-  
+
   LaserImage->Initialize(m_Image->GetPixelType(), 3, dimLaser);
   LaserImage->SetGeometry(m_Image->GetGeometry());
 

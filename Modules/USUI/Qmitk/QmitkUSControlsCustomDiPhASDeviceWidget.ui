@@ -67,6 +67,9 @@
        <property name="text">
         <string>Use BMode Envelope Filter</string>
        </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -128,7 +131,7 @@
         <double>0.100000000000000</double>
        </property>
        <property name="value">
-        <double>5.000000000000000</double>
+        <double>7.500000000000000</double>
        </property>
       </widget>
      </item>
@@ -138,7 +141,7 @@
         <number>1</number>
        </property>
        <property name="value">
-        <number>2</number>
+        <number>1</number>
        </property>
       </widget>
      </item>
@@ -264,7 +267,7 @@
         <number>42</number>
        </property>
        <property name="value">
-        <number>10</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -281,7 +284,7 @@
         <number>42</number>
        </property>
        <property name="value">
-        <number>24</number>
+        <number>0</number>
        </property>
       </widget>
      </item>
@@ -299,12 +302,12 @@
        </property>
        <item>
         <property name="text">
-         <string>Image Data</string>
+         <string>Beamformed Data</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Beamformed Data</string>
+         <string>Image Data</string>
         </property>
        </item>
       </widget>
@@ -363,7 +366,7 @@
      <item row="3" column="0">
       <widget class="QSpinBox" name="ReconstructedLines">
        <property name="minimum">
-        <number>128</number>
+        <number>256</number>
        </property>
        <property name="maximum">
         <number>1024</number>
@@ -372,7 +375,7 @@
         <number>128</number>
        </property>
        <property name="value">
-        <number>128</number>
+        <number>256</number>
        </property>
       </widget>
      </item>
@@ -389,7 +392,7 @@
         <double>0.100000000000000</double>
        </property>
        <property name="value">
-        <double>0.300000000000000</double>
+        <double>0.150000000000000</double>
        </property>
       </widget>
      </item>

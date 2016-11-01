@@ -104,13 +104,11 @@ bool mitk::USDiPhASDevice::OnConnection()
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
 
   InitializeScanMode();
-
   initBeamformer();                     //start the hardware connection
-  m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
 
+  m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
-
   return true;
 }
 
@@ -200,7 +198,7 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
 
   m_ScanMode.transmitSequenceCount = 1;
   m_ScanMode.transmitSequences = new SequenceNative[m_ScanMode.transmitSequenceCount];
-  m_ScanMode.transmitSequences[0].startEvent = 1;
+  m_ScanMode.transmitSequences[0].startEvent = 0;
   m_ScanMode.transmitSequences[0].endEvent = m_ScanMode.transmitEventsCount;
 }
 
@@ -236,13 +234,13 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   // setup beamforming parameters:
   SetInterleaved(true);
 
-  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
-  m_ScanMode.reconstructionLines = 128;
+  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.15f;
+  m_ScanMode.reconstructionLines = 256;
   m_ScanMode.reconstructionSamplesPerLine = 2048;
-  m_ScanMode.transferBeamformedData = false;
+  m_ScanMode.transferBeamformedData = true;
 
   // configure the transmit sequence(s):
-  m_ScanMode.transmitEventsCount = 2;
+  m_ScanMode.transmitEventsCount = 1;
   m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
   m_ScanMode.voltageV = 70;
   UpdateTransmitEvents();
@@ -294,7 +292,7 @@ void mitk::USDiPhASDevice::SetInterleaved(bool interleaved)
     paramsInterleaved.OptoacousticDelay = 0.0000003; // 300ns
     paramsInterleaved.filter = Filter::None;
 
-    m_ScanMode.beamformingAlgorithmParameters = (void*)&paramsInterleaved;
+    m_ScanMode.beamformingAlgorithmParameters = &paramsInterleaved;
   }
   else {
     m_CurrentBeamformingAlgorithm = Beamforming::PlaneWaveCompound;
@@ -303,7 +301,7 @@ void mitk::USDiPhASDevice::SetInterleaved(bool interleaved)
     paramsPlaneWave.angleSkipFactor = 1;
     paramsPlaneWave.usePhaseCoherence = 0;
 
-    m_ScanMode.beamformingAlgorithmParameters = (void*)&paramsPlaneWave;
+    m_ScanMode.beamformingAlgorithmParameters = &paramsPlaneWave;
   }
   m_ScanMode.beamformingAlgorithm = m_CurrentBeamformingAlgorithm;
 }

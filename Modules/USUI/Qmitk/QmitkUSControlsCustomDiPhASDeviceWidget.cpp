@@ -161,7 +161,6 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitEventsChanged()
 
   m_ControlInterface->SetTransmitEvents(ui->TransmitEvents->value());
 }
-
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnVoltageChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
@@ -176,6 +175,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnModeChanged()
 
   if (Mode == "Ultrasound only") {
     m_ControlInterface->SetMode(false);
+    ui->TransmitEvents->setValue(1);
   }
   else if (Mode == "Interleaved") {
     m_ControlInterface->SetMode(true);

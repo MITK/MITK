@@ -83,7 +83,6 @@ public:
 
   void SetGUIOutput(std::function<void(QString)> out);
   void SetDataType(int DataT);
-  void SetDisplayedEvent(int event);
   void SetUseBModeFilter(bool isSet);
 
   /** REinitializes the image according to the DataType set. */
@@ -120,7 +119,6 @@ protected:
    */
   float                           startTime;
   bool                            useGUIOutPut;
-  int                             displayedEvent;
   BeamformerStateInfoNative       BeamformerInfos;
   int                             DataType;       // 0: Use image data; 1: Use beamformed data
   bool                            useBModeFilter;

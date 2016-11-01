@@ -50,7 +50,7 @@
    <item>
     <layout class="QHBoxLayout" name="General">
      <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -96,7 +96,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_2">
+      <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -138,7 +138,7 @@
         <number>1</number>
        </property>
        <property name="value">
-        <number>1</number>
+        <number>2</number>
        </property>
       </widget>
      </item>
@@ -299,12 +299,12 @@
        </property>
        <item>
         <property name="text">
-         <string>Beamformed Data</string>
+         <string>Image Data</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Image Data</string>
+         <string>Beamformed Data</string>
         </property>
        </item>
       </widget>
@@ -322,7 +322,7 @@
         <double>1000.000000000000000</double>
        </property>
        <property name="value">
-        <double>100.000000000000000</double>
+        <double>50.000000000000000</double>
        </property>
       </widget>
      </item>

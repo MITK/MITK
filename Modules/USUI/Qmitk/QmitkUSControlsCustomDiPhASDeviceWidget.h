@@ -37,7 +37,6 @@ class QmitkUSControlsCustomDiPhASDeviceWidget : public QmitkUSAbstractCustomWidg
     Q_OBJECT
 
 private slots:
-
   virtual void OnUseBModeFilterChanged();
   virtual void OnRecordChanged();
 

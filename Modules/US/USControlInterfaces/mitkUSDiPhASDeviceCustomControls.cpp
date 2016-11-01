@@ -151,7 +151,6 @@ void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
 
 
 //OnSetDummies
-void mitk::USDiPhASDeviceCustomControls::OnSetEventDisplay(int event) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetUseBModeFilter(bool isSet) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetRecord(bool record) {}
 //Transmit

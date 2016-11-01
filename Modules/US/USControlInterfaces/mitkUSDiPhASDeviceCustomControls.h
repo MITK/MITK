@@ -93,7 +93,6 @@ protected:
   /** virtual handlers implemented in Device Controls
     */
 
-  virtual void OnSetEventDisplay(int event);
   virtual void OnSetUseBModeFilter(bool isSet);
   virtual void OnSetRecord(bool record);
 

@@ -314,6 +314,9 @@ void UltrasoundSupport::UpdateImage()
 
 void UltrasoundSupport::RenderImage2d()
 {
+  if (!m_Controls.m_Update2DView->isChecked())
+    return;
+
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
@@ -328,6 +331,9 @@ void UltrasoundSupport::RenderImage2d()
 
 void UltrasoundSupport::RenderImage3d()
 {
+  if (!m_Controls.m_Update3DView->isChecked())
+    return;
+
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
   m_FrameCounter3d++;
   if (m_FrameCounter3d >= 10)

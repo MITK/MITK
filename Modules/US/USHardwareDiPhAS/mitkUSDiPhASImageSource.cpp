@@ -14,10 +14,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// std dependencies
+#include <ctime>
+
+// mitk dependencies
 #include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASDevice.h"
 #include <mitkIOUtil.h>
-#include <ctime>
+#include "mitkUSDiPhASBModeImageFilter.h"
+#include "mitkImageCast.h"
+#include "mitkITKImageImport.h"
+
+// itk dependencies
+#include "itkImage.h"
+#include "itkResampleImageFilter.h"
+#include "itkCastImageFilter.h"
+#include "itkCropImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
+#include "itkIntensityWindowingImageFilter.h"
+
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
 	: m_Image(mitk::Image::New()),
@@ -26,7 +41,6 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   startTime(((float)std::clock()) / CLOCKS_PER_SEC),
   useGUIOutPut(false),
   DataType(0),
-  displayedEvent(0),
   m_GUIOutput(nullptr),
   useBModeFilter(false),
   currentlyRecording(false)
@@ -37,18 +51,9 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource( )
 {
 }
 
-#include "mitkUSDiPhASBModeImageFilter.h"
-#include "itkImage.h"
-#include "itkResampleImageFilter.h"
-#include "itkCastImageFilter.h"
-#include "itkCropImageFilter.h"
-#include "itkRescaleIntensityImageFilter.h"
-#include "itkIntensityWindowingImageFilter.h"
-#include "mitkImageCast.h"
-#include "mitkITKImageImport.h"
-
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
+  // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
   m_ImageMutex->Lock();
 
   if (m_Image->IsInitialized())
@@ -66,17 +71,12 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       image->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     }
 
-    // if DataType == 0 : just bypass the filter here, if imageData is given, as imageData is already enveloped..
+    // if DataType == 0 : if imageData is given just bypass the filter here, as imageData is already enveloped.
     if (!useBModeFilter || DataType == 0)  
     {
-      // copy contents of the given image into the member variable, slice after slice
-      for (int sliceNumber = 0; sliceNumber < m_Image->GetDimension(2); ++sliceNumber)
-      {
-        if (m_Image->IsSliceSet(sliceNumber)) {
-          mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(sliceNumber, 0, 0));
-          image->SetSlice(inputReadAccessor.GetData(), sliceNumber);
-        }
-      }
+      // copy contents of the given image into the member variable
+      mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetVolumeData());
+      image->SetVolume(inputReadAccessor.GetData());
     }
     else {
       // feed the m_image to the BMode filter and grab it back; 
@@ -111,6 +111,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
 {
+  // we use this seperate ApplyBmodeFilter Method for processing of images that are to be saved later on (see SetRecordingStatus(bool)).
+
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
   typedef itk::Image< float, 2 > itkInputImageType;
   typedef itk::Image< short, 2 > itkOutputImageType;
@@ -163,6 +165,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   bool writeImage = ((DataType == 0) && (imageData != nullptr)) || ((DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
+
     if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
 
     // initialize mitk::Image with given image size on the first time
@@ -200,28 +203,25 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
           m_Image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
           // set every image to a different slice
         }
-        delete flipme;
+        delete[] flipme;
         break;
       }
     }
     if (m_ImageMutex.IsNotNull()) { m_ImageMutex->Unlock(); }
   }
+
   // if the user decides to start recording, we feed the vector the generated images
   if (currentlyRecording) {
-    Image::Pointer savedImage = Image::New();
-    bool sliceSet = true;
-    int index = 0;
     for (int index = 0; index < m_Image->GetDimension(2); ++index)
     {
       if (m_Image->IsSliceSet(index))
       {
-        savedImage->Initialize(m_Image->GetPixelType(), 2, m_Image->GetDimensions());
-        savedImage->SetGeometry(m_Image->GetGeometry());
+        m_recordedImages.push_back(Image::New());
+        m_recordedImages.back()->Initialize(m_Image->GetPixelType(), 2, m_Image->GetDimensions());
+        m_recordedImages.back()->SetGeometry(m_Image->GetGeometry());
 
         mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index));
-        savedImage->SetSlice(inputReadAccessor.GetData());
-
-        m_recordedImages.push_back(savedImage);
+        m_recordedImages.back()->SetSlice(inputReadAccessor.GetData());
       }
     }
   }
@@ -232,7 +232,8 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
   int addEvents = 0;
   if (m_device->IsInterleaved())
     addEvents = 1;
-  unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount +addEvents}; // image dimensions; every image needs a seperate slice!
+  unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount + addEvents }; // image dimensions; every image needs a seperate slice!
+
   m_ImageMutex->Lock();
 
   m_Image = mitk::Image::New();
@@ -282,10 +283,6 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
 	  MITK_WARN << "image or geometry was NULL, can't adapt geometry";
   }
   m_ImageMutex->Unlock();
-
-  MITK_INFO << "UpdateImageGeometry called!";
-  MITK_INFO << "depth in mm: " << (recordTime*speedOfSound / 2);
-  MITK_INFO << "new spacing: " << spacing;
 }
 
 void mitk::USDiPhASImageSource::SetDataType(int DataT)
@@ -295,13 +292,6 @@ void mitk::USDiPhASImageSource::SetDataType(int DataT)
     DataType = DataT;
     UpdateImageDataType(m_device->GetScanMode().imageHeight, m_device->GetScanMode().imageWidth);
   }
-}
-
-void mitk::USDiPhASImageSource::SetDisplayedEvent(int event)
-{
-  displayedEvent = event;
-  auto& ScanMode = m_device->GetScanMode();
-  UpdateImageDataType(ScanMode.imageHeight, ScanMode.imageWidth);
 }
 
 void mitk::USDiPhASImageSource::SetGUIOutput(std::function<void(QString)> out)
@@ -314,7 +304,8 @@ void mitk::USDiPhASImageSource::SetUseBModeFilter(bool isSet)
   useBModeFilter = isSet;
 }
 
-void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+// this is just a little function to set the filenames below right
+inline void replaceAll(std::string& str, const std::string& from, const std::string& to) {
   if (from.empty())
     return;
   size_t start_pos = 0;
@@ -337,26 +328,28 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   {
     currentlyRecording = false;
 
+    // get the time and date, put them into a nice string and create a folder for the images
     time_t time = std::time(nullptr);
     time_t* timeptr = &time;
     std::string currentDate = std::ctime(timeptr);
     replaceAll(currentDate, ":", "-");
     currentDate.pop_back();
-    std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
+    std::string MakeFolder = "mkdir \"d:/DiPhASImageData/" + currentDate + "\"";
     system(MakeFolder.c_str());
 
+    // if checked, we add the bmode filter here
     for (int index = 0; index < m_recordedImages.size(); ++index)
     {
-      // add the Bmode filter here
       if (DataType == 1 && useBModeFilter)
         m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
     }
 
     Image::Pointer LaserImage = Image::New();
     Image::Pointer SoundImage = Image::New();
-    std::string pathLaser = "c:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
-    std::string pathSound = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    std::string pathLaser = "d:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
+    std::string pathSound = "d:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     
+    // order the images and save them
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a LaserImage if we used interleaved mode
     {
       OrderImagesInterleaved(LaserImage, SoundImage);
@@ -380,8 +373,8 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage
   unsigned int height = m_device->GetScanMode().imageHeight;
   unsigned int events = m_device->GetScanMode().transmitEventsCount;
 
-  unsigned int dimLaser[] = { width, height, m_recordedImages.size()/(events+1)};
-  unsigned int dimSound[] = { width, height, m_recordedImages.size()/(events+1)*events};
+  unsigned int dimLaser[] = { width, height, m_recordedImages.size() / events};
+  unsigned int dimSound[] = { width, height, m_recordedImages.size() / events * (events-1)};
   
   LaserImage->Initialize(m_Image->GetPixelType(), 3, dimLaser);
   LaserImage->SetGeometry(m_Image->GetGeometry());
@@ -391,15 +384,14 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage
 
   for (int index = 0; index < m_recordedImages.size(); ++index)
   {
+    mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
     if (index % events == 0)
     {
-      mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
       LaserImage->SetSlice(inputReadAccessor.GetData(), index / events);
     }
     else
     {
-      mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
-      SoundImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events));
+      SoundImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
     }
   }
 }

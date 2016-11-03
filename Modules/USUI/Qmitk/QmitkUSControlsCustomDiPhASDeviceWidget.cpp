@@ -28,6 +28,13 @@ QmitkUSControlsCustomDiPhASDeviceWidget::QmitkUSControlsCustomDiPhASDeviceWidget
 
 QmitkUSControlsCustomDiPhASDeviceWidget::~QmitkUSControlsCustomDiPhASDeviceWidget()
 {
+  m_ControlInterface = dynamic_cast<mitk::USDiPhASDeviceCustomControls*>
+    (this->GetDevice()->GetControlInterfaceCustom().GetPointer());
+
+  if (m_ControlInterface.IsNotNull())
+  {
+    m_ControlInterface->passGUIOut([](QString str)->void {} );
+  }
   delete ui;
 }
 

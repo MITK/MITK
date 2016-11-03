@@ -182,51 +182,52 @@ void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
   DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
-
-  if (!workingNode)
-    return;
-
-  Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
-
-  if (!workingImage)
-    return;
-
-  // for all contours in list (currently created by tool)
-  std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
-  std::vector<SliceInformation> sliceList;
-  sliceList.reserve(m_WorkingContours.size());
-  while(itWorkingContours != this->m_WorkingContours.end() )
+  if (workingNode) 
   {
-    // if node contains data
-    if( itWorkingContours->first->GetData() )
+
+    Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
+    if (workingImage) 
     {
 
-      // if this is a contourModel
-      mitk::ContourModel* contourModel = dynamic_cast<mitk::ContourModel*>(itWorkingContours->first->GetData());
-      if( contourModel )
+      // for all contours in list (currently created by tool)
+      std::vector< std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer> >::iterator itWorkingContours = this->m_WorkingContours.begin();
+      std::vector<SliceInformation> sliceList;
+      sliceList.reserve(m_WorkingContours.size());
+      while (itWorkingContours != this->m_WorkingContours.end())
       {
-
-        // for each timestep of this contourModel
-        for( TimeStepType currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->CountTimeSteps(); ++currentTimestep)
+        // if node contains data
+        if (itWorkingContours->first->GetData())
         {
 
-          //get the segmentation image slice at current timestep
-          mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
+          // if this is a contourModel
+          mitk::ContourModel* contourModel = dynamic_cast<mitk::ContourModel*>(itWorkingContours->first->GetData());
+          if (contourModel)
+          {
 
-          mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
-          mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, 1.0);
+            // for each timestep of this contourModel
+            for (TimeStepType currentTimestep = 0; currentTimestep < contourModel->GetTimeGeometry()->CountTimeSteps(); ++currentTimestep)
+            {
 
-          //write back to image volume
-          SliceInformation sliceInfo (workingSlice, itWorkingContours->second, currentTimestep);
-          sliceList.push_back(sliceInfo);
-          this->WriteSliceToVolume(sliceInfo);
+              //get the segmentation image slice at current timestep
+              mitk::Image::Pointer workingSlice = this->GetAffectedImageSliceAs2DImage(itWorkingContours->second, workingImage, currentTimestep);
+
+              mitk::ContourModel::Pointer projectedContour = mitk::ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contourModel, true, false);
+              mitk::ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, 1.0);
+
+              //write back to image volume
+              SliceInformation sliceInfo(workingSlice, itWorkingContours->second, currentTimestep);
+              sliceList.push_back(sliceInfo);
+              this->WriteSliceToVolume(sliceInfo);
+            }
+          }
         }
+        ++itWorkingContours;
       }
+
+      this->WriteBackSegmentationResult(sliceList, false);
     }
-    ++itWorkingContours;
   }
 
-  this->WriteBackSegmentationResult(sliceList, false);
   this->ClearSegmentation();
 }
 

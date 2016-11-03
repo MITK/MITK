@@ -302,12 +302,12 @@
        </property>
        <item>
         <property name="text">
-         <string>Beamformed Data</string>
+         <string>Image Data</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Image Data</string>
+         <string>Beamformed Data</string>
         </property>
        </item>
       </widget>

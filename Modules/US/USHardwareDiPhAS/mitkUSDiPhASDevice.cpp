@@ -156,8 +156,10 @@ void mitk::USDiPhASDevice::UpdateScanmode()
   if (m_IsRunning)
     m_IsRunning = toggleFreeze();
 
-  m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
-  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;
+  /*m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
+  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;*/
+  m_ScanMode.imageHeight = 512;
+  m_ScanMode.imageWidth = 512;
   // a higher resolution is useless, this also ensures correct spacing using any data types
 
   UpdateTransmitEvents();

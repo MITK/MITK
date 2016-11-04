@@ -88,10 +88,10 @@ void WrapperImageDataCallback(
 
 	double timeStamp)
 {
-	 w_ISource->ImageDataCallback(
-		rfDataChannelData, channelDatalinesPerDataset, channelDatalinesPerDataset, channelDataTotalDatasets,
-		rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
-		imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
+	/* w_ISource->ImageDataCallback(
+		 rfDataChannelData, channelDatalinesPerDataset, channelDatalinesPerDataset, channelDataTotalDatasets,
+		 rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
+		 imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);*/
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
@@ -262,8 +262,8 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   // Trigger setup:
   m_ScanMode.triggerSetup.enabled = true;
   m_ScanMode.triggerSetup.constantPulseRepetitionRateHz = 20;
-  m_ScanMode.triggerSetup.triggerWidthMicroseconds = 300;
-  m_ScanMode.triggerSetup.delayTrigger2Microseconds = -1;
+  m_ScanMode.triggerSetup.triggerWidthMicroseconds = 15;
+  m_ScanMode.triggerSetup.delayTrigger2Microseconds = 300;
 }
 
 // callback for the DiPhAS API 

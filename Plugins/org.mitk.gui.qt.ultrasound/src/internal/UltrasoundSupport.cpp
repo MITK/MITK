@@ -210,7 +210,7 @@ void UltrasoundSupport::UpdateAmountOfOutputs()
 
     // initialize the slice images as 2d images with the size of m_Images
     unsigned int* dimOld = m_Image->GetDimensions();
-    unsigned int dim[2] = { dimOld[0], dimOld[1]};
+    unsigned int dim[2] = { dimOld[0], dimOld[1] };
     m_curOutput.back()->Initialize(m_Image->GetPixelType(), 2, dim);
   }
   while (m_curOutput.size() > m_AmountOfOutputs) {
@@ -250,10 +250,10 @@ void UltrasoundSupport::UpdateImage()
 
       if (!m_Image->IsEmpty())
       {
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(m_AmountOfOutputs-index-1,0,0,nullptr,mitk::Image::ReferenceMemory)); 
+        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(m_AmountOfOutputs-index-1,0,0,nullptr,mitk::Image::ReferenceMemory));
         //we'll switch here the order of the images to get the laser image as the top image; also just reference the slices, to get a small performance gain
         m_curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
-        m_curOutput.at(index)->SetGeometry(m_Image->GetGeometry()); 
+        m_curOutput.at(index)->GetGeometry()->SetIndexToWorldTransform(m_Image->GetSlicedGeometry()->GetIndexToWorldTransform());
         // Update the image Output with seperate slices
       }
 
@@ -275,22 +275,22 @@ void UltrasoundSupport::UpdateImage()
       }
     }
 
-    // if the geometry changed: reinitialize the ultrasound image. we use the m_Image to readjust the geometry
+    // if the geometry changed: reinitialize the ultrasound image. we use the m_curOutput.at(0) to readjust the geometry
     if ((m_OldGeometry.IsNotNull()) &&
-      (m_Image->GetGeometry() != NULL) &&
-      (!mitk::Equal(m_OldGeometry.GetPointer(), m_Image->GetGeometry(), 0.0001, false))
+      (m_curOutput.at(0)->GetGeometry() != NULL) &&
+      (!mitk::Equal(m_OldGeometry.GetPointer(), m_curOutput.at(0)->GetGeometry(), 0.0001, false))
       )
     {
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-      if ((renderWindow != NULL) && (m_Image->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
+      if ((renderWindow != NULL) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
       {
         renderWindow->GetRenderingManager()->InitializeViews(
-          m_Image->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+          m_curOutput.at(0)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
         renderWindow->GetRenderingManager()->RequestUpdateAll();
       }
-      m_CurrentImageWidth = m_Image->GetDimension(0);
-      m_CurrentImageHeight = m_Image->GetDimension(1);
-      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_Image->GetGeometry());
+      m_CurrentImageWidth = m_curOutput.at(0)->GetDimension(0);
+      m_CurrentImageHeight = m_curOutput.at(0)->GetDimension(1);
+      m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_curOutput.at(0)->GetGeometry());
     }
   }
 
@@ -316,8 +316,9 @@ void UltrasoundSupport::RenderImage2d()
 {
   if (!m_Controls.m_Update2DView->isChecked())
     return;
-
-  this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+  //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
   {

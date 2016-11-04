@@ -165,10 +165,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   bool writeImage = ((DataType == 0) && (imageData != nullptr)) || ((DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
-
-    if ( m_ImageMutex.IsNotNull() ) { m_ImageMutex->Lock(); }
-    else { return; }
-
+    m_ImageMutex->Lock();
     // initialize mitk::Image with given image size on the first time
     if ( ! m_Image->IsInitialized() )
     {
@@ -249,8 +246,6 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
     addEvents = 1;
   unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount + addEvents }; // image dimensions; every image needs a seperate slice!
 
-  m_ImageMutex->Lock();
-
   m_Image = mitk::Image::New();
 
   switch (DataType)
@@ -265,7 +260,6 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
     }
   } // 0:imageData 1:beamformed
 
-  m_ImageMutex->Unlock();
   UpdateImageGeometry();                            // update the image geometry
 
   startTime = ((float)std::clock()) / CLOCKS_PER_SEC; //wait till the callback is available again

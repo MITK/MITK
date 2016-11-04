@@ -76,17 +76,9 @@ public:
 
     double& timeStamp);
 
-  /**
-  * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
-  */
-  void UpdateImageGeometry();
-
   void SetGUIOutput(std::function<void(QString)> out);
   void SetDataType(int DataT);
   void SetUseBModeFilter(bool isSet);
-
-  /** REinitializes the image according to the DataType set. */
-  void UpdateImageDataType(int imageHeight, int imageWidth);
 
   /** This starts or ends the recording session*/
   void SetRecordingStatus(bool record);
@@ -104,10 +96,17 @@ protected:
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);
 
+  /** Reinitializes the image according to the DataType set. */
+  void UpdateImageDataType(int imageHeight, int imageWidth);
+
+  /**
+  * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
+  */
+  void UpdateImageGeometry();
+
   /** This image holds the image to be displayed right now*/
   mitk::Image::Pointer                  m_Image;
 
-  itk::FastMutexLock::Pointer           m_ImageMutex;
   mitk::USDiPhASDevice*                 m_device;
 
   /** This is a callback to pass text data to the GUI. */
@@ -120,7 +119,7 @@ protected:
   float                           startTime;
   bool                            useGUIOutPut;
   BeamformerStateInfoNative       BeamformerInfos;
-  int                             DataType;       // 0: Use image data; 1: Use beamformed data
+  int                             m_DataType;       // 0: Use image data; 1: Use beamformed data
   bool                            useBModeFilter;
   bool                            currentlyRecording;
 };

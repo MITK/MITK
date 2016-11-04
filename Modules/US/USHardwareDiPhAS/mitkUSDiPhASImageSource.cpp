@@ -36,15 +36,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
 	: m_Image(mitk::Image::New()),
-	m_ImageMutex(itk::FastMutexLock::New()),
   m_device(device),
   startTime(((float)std::clock()) / CLOCKS_PER_SEC),
   useGUIOutPut(false),
-  DataType(0),
+  m_DataType(0),
   m_GUIOutput(nullptr),
   useBModeFilter(false),
   currentlyRecording(false)
 {
+
 }
 
 mitk::USDiPhASImageSource::~USDiPhASImageSource( )
@@ -54,7 +54,10 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource( )
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
-  m_ImageMutex->Lock();
+
+  //static itk::FastMutexLock::Pointer nextImageMutex = itk::FastMutexLock::New();
+
+  //nextImageMutex->Lock();
 
   if (m_Image->IsInitialized())
   {
@@ -72,7 +75,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
 
     // if DataType == 0 : if imageData is given just bypass the filter here, as imageData is already enveloped.
-    if (!useBModeFilter || DataType == 0)  
+    if (!useBModeFilter || m_DataType == 0)
     {
       // copy contents of the given image into the member variable
       mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetVolumeData());
@@ -80,14 +83,12 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
     else {
       // feed the m_image to the BMode filter and grab it back; 
-      if (DataType==1)
+      if (m_DataType ==1)
         image = ApplyBmodeFilter(m_Image);
     }
     // always copy the geometry from the m_Image
     image->SetGeometry(m_Image->GetGeometry());
   }
-
-  m_ImageMutex->Unlock();
 
   if (!useGUIOutPut && m_GUIOutput) {
     // Need to do this because the program initializes the GUI twice
@@ -107,6 +108,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 
     m_GUIOutput(QString::fromStdString(s.str()));
   }
+
+  //nextImageMutex->Unlock();
 }
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
@@ -162,18 +165,17 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
-  bool writeImage = ((DataType == 0) && (imageData != nullptr)) || ((DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
+  bool writeImage = ((m_DataType == 0) && (imageData != nullptr)) || ((m_DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
-    m_ImageMutex->Lock();
+    
     // initialize mitk::Image with given image size on the first time
-    if ( ! m_Image->IsInitialized() )
+    if ( !m_Image->IsInitialized() )
     {
       UpdateImageDataType(imageHeight, imageWidth);     // update data type and image pixel dimensions
     }
-
     // lock the image for writing an copy the given buffer into the image then
-    switch (DataType)
+    switch (m_DataType)
     {
       case 0: {
         for (int i = 0; i < imageSetsTotal; i++) {
@@ -219,7 +221,6 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       m_Image->SetSlice(&rfDataChannelData[i*channelDataChannelsPerDataset*channelDataSamplesPerChannel], i);
       // set every image to a different slice
     }*/
-    m_ImageMutex->Unlock();
   }
 
   // if the user decides to start recording, we feed the vector the generated images
@@ -241,14 +242,16 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
 void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWidth)
 {
+  
   int addEvents = 0;
   if (m_device->IsInterleaved())
     addEvents = 1;
   unsigned int dim[] = { imageWidth, imageHeight, m_device->GetScanMode().transmitEventsCount + addEvents }; // image dimensions; every image needs a seperate slice!
 
+  
   m_Image = mitk::Image::New();
 
-  switch (DataType)
+  switch (m_DataType)
   {
     case 0: {
       m_Image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, dim);
@@ -269,19 +272,20 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
 void mitk::USDiPhASImageSource::UpdateImageGeometry()
 {
   mitk::Vector3D spacing;
+  MITK_INFO << "Retreaving Image Geometry Information for Spacing...";
   float& recordTime        = m_device->GetScanMode().receivePhaseLengthSeconds;
   int& speedOfSound        = m_device->GetScanMode().averageSpeedOfSound;
   int& imageWidth          = m_device->GetScanMode().imageWidth;
   int& imageHeight         = m_device->GetScanMode().imageHeight;
   float& pitch             = m_device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
   int& reconstructionLines = m_device->GetScanMode().reconstructionLines;
+  MITK_INFO << "Retreaving Image Geometry Information for Spacing...[DONE]";
 
-  spacing[0] = (pitch*reconstructionLines)/imageWidth;
-  spacing[1] = ((recordTime*speedOfSound/2)*1000)/imageHeight;
+  spacing[0] = (pitch*reconstructionLines) / imageWidth;
+  spacing[1] = ((recordTime*speedOfSound / 2) * 1000) / imageHeight;
   spacing[2] = 1; 
   //recalculate correct spacing
 
-  m_ImageMutex->Lock();
   if (m_Image.IsNotNull() && (m_Image->GetGeometry() != NULL))
   {
 	  m_Image->GetGeometry()->SetSpacing(spacing);
@@ -291,14 +295,13 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   {
 	  MITK_WARN << "image or geometry was NULL, can't adapt geometry";
   }
-  m_ImageMutex->Unlock();
 }
 
 void mitk::USDiPhASImageSource::SetDataType(int DataT)
 {
-  if (DataT != DataType)
+  if (DataT != m_DataType)
   {
-    DataType = DataT;
+    m_DataType = DataT;
     UpdateImageDataType(m_device->GetScanMode().imageHeight, m_device->GetScanMode().imageWidth);
   }
 }
@@ -349,7 +352,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     // if checked, we add the bmode filter here
     for (int index = 0; index < m_recordedImages.size(); ++index)
     {
-      if (DataType == 1 && useBModeFilter)
+      if (m_DataType == 1 && useBModeFilter)
         m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
     }
 

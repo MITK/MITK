@@ -88,10 +88,10 @@ void WrapperImageDataCallback(
 
 	double timeStamp)
 {
-	/* w_ISource->ImageDataCallback(
+	 w_ISource->ImageDataCallback(
 		 rfDataChannelData, channelDatalinesPerDataset, channelDatalinesPerDataset, channelDataTotalDatasets,
 		 rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
-		 imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);*/
+		 imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ bool mitk::USDiPhASDevice::OnConnection()
   InitializeScanMode();
   initBeamformer();                     //start the hardware connection
 
-  m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
+  //m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
   return true;
@@ -167,7 +167,6 @@ void mitk::USDiPhASDevice::UpdateScanmode()
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))
   {
     setupScan(this->m_ScanMode);
-    m_ImageSource->UpdateImageDataType(m_ScanMode.imageHeight, m_ScanMode.imageWidth);
   }
 
   if (!m_IsRunning)

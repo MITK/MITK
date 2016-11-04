@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
+#include "ctkServiceTracker.h"
 #include "mitkILifecycleAwarePart.h"
 #include "mitkOverlay.h"
 #include "ui_QmitkOverlayManagerViewControls.h"
@@ -46,7 +47,8 @@ namespace mitk
 */
 class QmitkOverlayManagerView : public QmitkAbstractView,
                                 public mitk::IRenderWindowPartListener,
-                                public mitk::ILifecycleAwarePart
+                                public mitk::ILifecycleAwarePart,
+                                public ctkServiceTracker<mitk::Overlay *>
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -106,6 +108,8 @@ private:
   /** \see berry::IPartListener::PartHidden */
   virtual void Hidden();
 
+  mitk::Overlay *AddingService(const ctkServiceReference &) { OnActivateOverlayList(); }
+  void RemovedService(const ctkServiceReference &, mitk::Overlay *) { OnActivateOverlayList(); }
   QWidget *m_Parent;
   unsigned long m_PropertyNameChangedTag;
   unsigned long m_OverlayManagerObserverTag;

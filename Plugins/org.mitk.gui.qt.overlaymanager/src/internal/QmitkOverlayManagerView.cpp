@@ -33,7 +33,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QPainter>
 #include <QSortFilterProxyModel>
 
+#include "internal/org_mitk_gui_qt_overlaymanager_Activator.h"
+
 #include "mitkAnnotationPlacer.h"
+#include "mitkAnnotationService.h"
 #include "mitkGetPropertyService.h"
 #include "mitkOverlayManager.h"
 #include "mitkRenderingManager.h"
@@ -50,7 +53,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymanager";
 
 QmitkOverlayManagerView::QmitkOverlayManagerView()
-  : m_Parent(nullptr),
+  : ctkServiceTracker<mitk::Overlay *>(mitk::org_mitk_gui_qt_overlaymanager_Activator::GetContext()),
+    m_Parent(nullptr),
     m_PropertyNameChangedTag(0),
     m_OverlayManagerObserverTag(0),
     m_PropertyAliases(nullptr),
@@ -344,16 +348,17 @@ void QmitkOverlayManagerView::OnAddNewProperty()
 
 void QmitkOverlayManagerView::OnActivateOverlayList()
 {
-  typedef mitk::OverlayManager::OverlaySet OverlaySet;
-  mitk::OverlayManager *om = mitk::OverlayManager::GetInstance();
-  m_Controls.m_OverlayList->clear();
-  if (om)
+  if (!m_Renderer)
+    return;
+  std::vector<mitk::AbstractAnnotationRenderer *> arList =
+    mitk::AnnotationService::GetAnnotationRenderer(m_Renderer->GetName());
+  //  m_Controls.m_OverlayList->clear();
+  for (auto ar : arList)
   {
-    OverlaySet oset = om->GetAllOverlays();
-    for (auto overlay : oset)
+    for (auto overlay : ar->GetServices())
     {
       QListWidgetItem *item = new QListWidgetItem();
-      item->setData(Qt::UserRole, QVariant::fromValue<void *>(overlay.GetPointer()));
+      item->setData(Qt::UserRole, QVariant::fromValue<void *>(overlay));
       QString text(overlay->GetName().c_str());
       if (text.length() > 0)
       {

@@ -158,7 +158,6 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList &pa
   if (!errMsg.empty())
   {
     QMessageBox::warning(parent, "Error reading files", QString::fromStdString(errMsg));
-    mitkThrow() << errMsg;
   }
   return nodeResult;
 }

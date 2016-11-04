@@ -1,6 +1,7 @@
 set(CPP_FILES
   mitkOpotekPumpLaserController.cpp
   mitkGalilMotor.cpp
+  mitkOphirPyro.cpp
 )
 
 set(RESOURCE_FILES

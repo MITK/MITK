@@ -5,6 +5,9 @@ IF(WIN32)
   configure_file( ${MITK_GALIL_API_PATH}/dll/x64/gclibo.dll ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
   configure_file( ${MITK_GALIL_API_PATH}/dll/x64/gclib.dll ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
   configure_file( ${MITK_GALIL_API_PATH}/dll/x64/gclibo.dll ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
+
+  configure_file( ${MITK_OPHIR_API_PATH}/OphirPyroWrapper.dll ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
+  configure_file( ${MITK_OPHIR_API_PATH}/OphirPyroWrapper.dll ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
 ENDIF(WIN32)
 
 mitk_create_plugin(

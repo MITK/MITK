@@ -153,8 +153,7 @@ void mitk::USDiPhASDevice::OnFreeze(bool freeze)
 
 void mitk::USDiPhASDevice::UpdateScanmode()
 {
-  if (m_IsRunning)
-    m_IsRunning = toggleFreeze();
+  OnFreeze(true);
 
   /*m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
   m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;*/
@@ -169,8 +168,7 @@ void mitk::USDiPhASDevice::UpdateScanmode()
     setupScan(this->m_ScanMode);
   }
 
-  if (!m_IsRunning)
-    m_IsRunning = toggleFreeze();
+  OnFreeze(false);
 }
 
 void mitk::USDiPhASDevice::UpdateTransmitEvents()
@@ -286,6 +284,7 @@ void mitk::USDiPhASDevice::SetInterleaved(bool interleaved)
 {
   m_Interleaved = interleaved;
   if (interleaved) {
+    m_ScanMode.scanModeName = "Interleaved Beamforming Mode";
     m_CurrentBeamformingAlgorithm = Beamforming::Interleaved_OA_US;
 
     paramsInterleaved.SpeedOfSoundMeterPerSecond = m_ScanMode.averageSpeedOfSound;
@@ -296,10 +295,11 @@ void mitk::USDiPhASDevice::SetInterleaved(bool interleaved)
     m_ScanMode.beamformingAlgorithmParameters = &paramsInterleaved;
   }
   else {
+    m_ScanMode.scanModeName = "Plane Wave Beamforming Mode";
     m_CurrentBeamformingAlgorithm = Beamforming::PlaneWaveCompound;
 
     paramsPlaneWave.SpeedOfSoundMeterPerSecond = m_ScanMode.averageSpeedOfSound;
-    paramsPlaneWave.angleSkipFactor = 1;
+    paramsPlaneWave.angleSkipFactor = 0;
     paramsPlaneWave.usePhaseCoherence = 0;
 
     m_ScanMode.beamformingAlgorithmParameters = &paramsPlaneWave;

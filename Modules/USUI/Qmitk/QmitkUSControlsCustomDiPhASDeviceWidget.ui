@@ -124,6 +124,9 @@
     <layout class="QGridLayout" name="Transmit">
      <item row="1" column="0">
       <widget class="QDoubleSpinBox" name="ExcitationFrequency">
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
        <property name="maximum">
         <double>15.000000000000000</double>
        </property>
@@ -154,11 +157,17 @@
      </item>
      <item row="0" column="0">
       <widget class="QDoubleSpinBox" name="TransmitPhaseLength">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
        <property name="decimals">
         <number>1</number>
        </property>
        <property name="minimum">
-        <double>0.100000000000000</double>
+        <double>1.000000000000000</double>
        </property>
        <property name="maximum">
         <double>10000.000000000000000</double>
@@ -184,6 +193,9 @@
      </item>
      <item row="4" column="0">
       <widget class="QComboBox" name="Mode">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <item>
         <property name="text">
          <string>Interleaved</string>
@@ -198,6 +210,9 @@
      </item>
      <item row="3" column="0">
       <widget class="QSpinBox" name="Voltage">
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
        <property name="minimum">
         <number>5</number>
        </property>
@@ -247,7 +262,7 @@
         <number>1</number>
        </property>
        <property name="maximum">
-        <number>10000</number>
+        <number>100</number>
        </property>
        <property name="value">
         <number>1</number>
@@ -302,12 +317,12 @@
        </property>
        <item>
         <property name="text">
-         <string>Image Data</string>
+         <string>Beamformed Data</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Beamformed Data</string>
+         <string>Image Data</string>
         </property>
        </item>
       </widget>
@@ -366,13 +381,13 @@
      <item row="3" column="0">
       <widget class="QSpinBox" name="ReconstructedLines">
        <property name="minimum">
-        <number>256</number>
+        <number>128</number>
        </property>
        <property name="maximum">
         <number>1024</number>
        </property>
        <property name="singleStep">
-        <number>256</number>
+        <number>128</number>
        </property>
        <property name="value">
         <number>256</number>

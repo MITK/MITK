@@ -76,7 +76,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnExcitationFrequencyChanged();
   OnTransmitEventsChanged();
   OnVoltageChanged();
-  OnScanDepthChanged();
+  OnScanDepthChanged(); // HERE
   OnAveragingCountChanged();
   OnTGCMinChanged();
   OnTGCMaxChanged();
@@ -88,11 +88,11 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnBandpassEnabledChanged();
   OnLowCutChanged();
   OnHighCutChanged();
-  OnUseBModeFilterChanged();
+  OnUseBModeFilterChanged(); // HERE
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
 
-  OnModeChanged();
+  OnModeChanged(); // HERE
 }
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()

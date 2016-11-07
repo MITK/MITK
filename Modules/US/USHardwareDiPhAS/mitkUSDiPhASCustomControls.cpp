@@ -48,7 +48,7 @@ void mitk::USDiPhASCustomControls::passGUIOut(std::function<void(QString)> callb
 void mitk::USDiPhASCustomControls::OnSetUseBModeFilter(bool isSet)
 {
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
-  imageSource->SetUseBModeFilter(isSet);
+  imageSource->ModifyUseBModeFilter(isSet);
 }
 
 void mitk::USDiPhASCustomControls::OnSetRecord(bool record)
@@ -133,14 +133,14 @@ void mitk::USDiPhASCustomControls::OnSetDataType(int type)
       scanMode.transferBeamformedData = false;
       scanMode.transferImageData = true;
       m_device->UpdateScanmode();
-      imageSource->SetDataType(0);
+      imageSource->ModifyDataType(0);
       break; 
     }
     case 1: {
       scanMode.transferBeamformedData = true;
       scanMode.transferImageData = false;
       m_device->UpdateScanmode();
-      imageSource->SetDataType(1);
+      imageSource->ModifyDataType(1);
       break;
     }
 

@@ -42,7 +42,11 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_DataType(0),
   m_GUIOutput(nullptr),
   useBModeFilter(false),
-  currentlyRecording(false)
+  currentlyRecording(false),
+  m_DataTypeModified(true),
+  m_DataTypeNext(0),
+  m_UseBModeFilterModified(true),
+  m_UseBModeFilterNext(true)
 {
 
 }
@@ -168,16 +172,29 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   bool writeImage = ((m_DataType == 0) && (imageData != nullptr)) || ((m_DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
-    
-    // initialize mitk::Image with given image size on the first time
-    if ( !m_Image->IsInitialized() )
+
+    if (m_DataTypeModified)
     {
-      UpdateImageDataType(imageHeight, imageWidth);     // update data type and image pixel dimensions
+      SetDataType(m_DataTypeNext);
+      m_DataTypeModified = false;
     }
+
+    if (m_UseBModeFilterModified)
+    {
+      SetUseBModeFilter(m_UseBModeFilterNext);
+      m_UseBModeFilterModified = false;
+    }
+
+
     // lock the image for writing an copy the given buffer into the image then
     switch (m_DataType)
     {
       case 0: {
+        // initialize mitk::Image with given image size on the first time
+        if (!m_Image->IsInitialized())
+        {
+          UpdateImageDataType(imageHeight, imageWidth);     // update data type and image pixel dimensions
+        }
         for (int i = 0; i < imageSetsTotal; i++) {
           m_Image->SetSlice(&imageData[i*imageHeight*imageWidth], i);
         }
@@ -186,6 +203,16 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       case 1: {
         short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
         int pixelsPerImage = beamformedLines*beamformedSamples;
+
+        MITK_INFO << "Debug Garbage:";
+        MITK_INFO << "Datasets: " << beamformedTotalDatasets;
+        MITK_INFO << "Beamformed Lines: " << beamformedLines;
+        MITK_INFO << "Beamformed Samples: " << beamformedSamples;
+        // initialize mitk::Image with given image size on the first time
+        if (!m_Image->IsInitialized())
+        {
+          UpdateImageDataType(beamformedSamples, beamformedLines);     // update data type and image pixel dimensions
+        }
 
         for (char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
         {
@@ -251,6 +278,7 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
   
   m_Image = mitk::Image::New();
 
+  MITK_INFO << "Initializing image...";
   switch (m_DataType)
   {
     case 0: {
@@ -262,8 +290,11 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
       break;
     }
   } // 0:imageData 1:beamformed
+  MITK_INFO << "Initializing image...[DOINE]";
 
+  MITK_INFO << "Updating geometry...";
   UpdateImageGeometry();                            // update the image geometry
+  MITK_INFO << "Updating geometry...[DOINE]";
 
   startTime = ((float)std::clock()) / CLOCKS_PER_SEC; //wait till the callback is available again
   useGUIOutPut = false;
@@ -275,15 +306,30 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   MITK_INFO << "Retreaving Image Geometry Information for Spacing...";
   float& recordTime        = m_device->GetScanMode().receivePhaseLengthSeconds;
   int& speedOfSound        = m_device->GetScanMode().averageSpeedOfSound;
-  int& imageWidth          = m_device->GetScanMode().imageWidth;
-  int& imageHeight         = m_device->GetScanMode().imageHeight;
   float& pitch             = m_device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
   int& reconstructionLines = m_device->GetScanMode().reconstructionLines;
-  MITK_INFO << "Retreaving Image Geometry Information for Spacing...[DONE]";
 
-  spacing[0] = (pitch*reconstructionLines) / imageWidth;
-  spacing[1] = ((recordTime*speedOfSound / 2) * 1000) / imageHeight;
-  spacing[2] = 1; 
+  switch (m_DataType)
+  {
+  case 0: {
+    int& imageWidth = m_device->GetScanMode().imageWidth;
+    int& imageHeight = m_device->GetScanMode().imageHeight;
+    spacing[0] = pitch * reconstructionLines / imageWidth;
+    spacing[1] = recordTime * speedOfSound / 2 * 1000 / imageHeight;
+    break;
+  }
+  case 1: {
+    int& imageWidth = reconstructionLines;
+    int& imageHeight = m_device->GetScanMode().reconstructionSamplesPerLine;
+    spacing[0] = pitch;
+    spacing[1] = recordTime * speedOfSound / 2 * 1000 / imageHeight;
+    break;
+  }
+  } // 0:imageData 1:beamformed
+
+  MITK_INFO << "Retreaving Image Geometry Information for Spacing " << spacing[0] << " ... " << spacing[1] << " ... " << spacing[2] << " ...[DONE]";
+
+  spacing[2] = 0.6;
   //recalculate correct spacing
 
   if (m_Image.IsNotNull() && (m_Image->GetGeometry() != NULL))
@@ -297,12 +343,36 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   }
 }
 
+void mitk::USDiPhASImageSource::ModifyDataType(int DataT)
+{
+  m_DataTypeModified = true;
+  m_DataTypeNext = DataT;
+}
+
+void mitk::USDiPhASImageSource::ModifyUseBModeFilter(bool isSet)
+{
+  m_UseBModeFilterModified = true;
+  m_UseBModeFilterNext = isSet;
+}
+
 void mitk::USDiPhASImageSource::SetDataType(int DataT)
 {
   if (DataT != m_DataType)
   {
     m_DataType = DataT;
-    UpdateImageDataType(m_device->GetScanMode().imageHeight, m_device->GetScanMode().imageWidth);
+    MITK_INFO << "Setting new DataType..." << DataT;
+    switch (m_DataType)
+    {
+    case 0:
+      MITK_INFO << "height: " << m_device->GetScanMode().imageHeight << " width: " << m_device->GetScanMode().imageWidth;
+      UpdateImageDataType(m_device->GetScanMode().imageHeight, m_device->GetScanMode().imageWidth);
+      break;
+    case 1:
+      MITK_INFO << "samples: " << m_device->GetScanMode().reconstructionSamplesPerLine << " lines: " << m_device->GetScanMode().reconstructionLines;
+      UpdateImageDataType(m_device->GetScanMode().reconstructionSamplesPerLine, m_device->GetScanMode().reconstructionLines);
+      break;
+    } // 0:imageData 1:beamformed
+    MITK_INFO << "Setting new DataType...[DOINE]";
   }
 }
 

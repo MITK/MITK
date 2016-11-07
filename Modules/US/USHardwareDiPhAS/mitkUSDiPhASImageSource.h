@@ -77,13 +77,17 @@ public:
     double& timeStamp);
 
   void SetGUIOutput(std::function<void(QString)> out);
-  void SetDataType(int DataT);
-  void SetUseBModeFilter(bool isSet);
 
   /** This starts or ends the recording session*/
   void SetRecordingStatus(bool record);
 
+  void ModifyDataType(int DataT);
+  void ModifyUseBModeFilter(bool isSet);
+
 protected:
+  void SetDataType(int DataT);
+  void SetUseBModeFilter(bool isSet);
+
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
   virtual ~USDiPhASImageSource( );
 
@@ -122,6 +126,10 @@ protected:
   int                             m_DataType;       // 0: Use image data; 1: Use beamformed data
   bool                            useBModeFilter;
   bool                            currentlyRecording;
+  bool m_DataTypeModified;
+  int m_DataTypeNext;
+  bool m_UseBModeFilterModified;
+  bool m_UseBModeFilterNext;
 };
 } // namespace mitk
 

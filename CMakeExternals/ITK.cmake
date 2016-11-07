@@ -47,8 +47,8 @@ if(NOT DEFINED ITK_DIR)
   if(MITK_USE_OpenCL)
     list(APPEND additional_cmake_args
          -DITK_USE_GPU:BOOL=ON
-         -DOpenCL_INCLUDE_DIR:PATH=${OpenCL_INCLUDE_DIR}
-         -DOpenCL_LIBRARY:FILEPATH=${OpenCL_LIBRARY}
+         -DOPENCL_INCLUDE_DIRS:PATH=${OpenCL_INCLUDE_DIR}
+         -DOPENCL_LIBRARIES:FILEPATH=${OpenCL_LIBRARY}
         )
   endif()
 

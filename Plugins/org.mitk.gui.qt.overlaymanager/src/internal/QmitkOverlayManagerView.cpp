@@ -53,8 +53,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymanager";
 
 QmitkOverlayManagerView::QmitkOverlayManagerView()
-  : ctkServiceTracker<mitk::Overlay *>(mitk::org_mitk_gui_qt_overlaymanager_Activator::GetContext()),
-    m_Parent(nullptr),
+  : m_Parent(nullptr),
     m_PropertyNameChangedTag(0),
     m_OverlayManagerObserverTag(0),
     m_PropertyAliases(nullptr),
@@ -90,11 +89,13 @@ void QmitkOverlayManagerView::CreateQtPartControl(QWidget *parent)
 
     Q_FOREACH (QString renderWindow, renderWindows.keys())
     {
+      if (!m_Renderer)
+        m_Renderer = renderWindows[renderWindow]->GetRenderer();
       m_Controls.m_RendererCB->addItem(renderWindow);
     }
   }
 
-  InitializeAddAnimationMenu();
+  InitializeAddOverlayMenu();
 
   m_ProxyModel = new QSortFilterProxyModel(m_Controls.m_PropertyTree);
   m_Model = new QmitkPropertyItemModel(m_ProxyModel);
@@ -279,7 +280,7 @@ void QmitkOverlayManagerView::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
 {
 }
 
-void QmitkOverlayManagerView::InitializeAddAnimationMenu()
+void QmitkOverlayManagerView::InitializeAddOverlayMenu()
 {
   m_AddOverlayMenu = new QMenu(m_Controls.m_AddOverlay);
 
@@ -291,17 +292,9 @@ void QmitkOverlayManagerView::InitializeAddAnimationMenu()
   m_AddOverlayMenu->addAction("LogoOverlay");
 }
 
-void QmitkOverlayManagerView::OnOverlayAdded(itk::Object *, const itk::EventObject &event)
-{
-  const mitk::OverlayAddEvent *addEvent = dynamic_cast<const mitk::OverlayAddEvent *>(&event);
-  if (addEvent)
-  {
-    OnActivateOverlayList();
-  }
-}
-
 void QmitkOverlayManagerView::Activated()
 {
+  this->OnActivateOverlayList();
 }
 
 void QmitkOverlayManagerView::Deactivated()
@@ -310,13 +303,6 @@ void QmitkOverlayManagerView::Deactivated()
 
 void QmitkOverlayManagerView::Visible()
 {
-  mitk::OverlayManager *om = mitk::OverlayManager::GetInstance();
-  if (om && m_OverlayManagerObserverTag == 0)
-  {
-    itk::MemberCommand<QmitkOverlayManagerView>::Pointer command = itk::MemberCommand<QmitkOverlayManagerView>::New();
-    command->SetCallbackFunction(this, &QmitkOverlayManagerView::OnOverlayAdded);
-    m_OverlayManagerObserverTag = om->AddObserver(mitk::OverlayAddEvent(), command);
-  }
   this->OnActivateOverlayList();
 }
 
@@ -352,13 +338,13 @@ void QmitkOverlayManagerView::OnActivateOverlayList()
     return;
   std::vector<mitk::AbstractAnnotationRenderer *> arList =
     mitk::AnnotationService::GetAnnotationRenderer(m_Renderer->GetName());
-  //  m_Controls.m_OverlayList->clear();
+  m_Controls.m_OverlayList->clear();
   for (auto ar : arList)
   {
     for (auto overlay : ar->GetServices())
     {
       QListWidgetItem *item = new QListWidgetItem();
-      item->setData(Qt::UserRole, QVariant::fromValue<void *>(overlay));
+      item->setData(Qt::UserRole, QVariant(overlay->GetMicroserviceID().c_str()));
       QString text(overlay->GetName().c_str());
       if (text.length() > 0)
       {
@@ -386,8 +372,25 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
   }
 
   mitk::Overlay *overlay = nullptr;
+  QString oID;
   if (current)
-    overlay = reinterpret_cast<mitk::Overlay *>(current->data(Qt::UserRole).value<void *>());
+  {
+    oID = current->data(Qt::UserRole).toString();
+    OverlayMapType::iterator it = m_OverlayMap.find(oID.toStdString());
+    if (it != m_OverlayMap.end())
+      overlay = it->second;
+    else
+    {
+      std::string ldapFilter = "(" + mitk::Overlay::US_PROPKEY_ID + "=" + oID.toStdString() + ")";
+      std::vector<us::ServiceReference<mitk::Overlay>> overlays =
+        us::GetModuleContext()->GetServiceReferences<mitk::Overlay>(ldapFilter);
+      if (!overlays.empty())
+      {
+        overlay = us::GetModuleContext()->GetService<mitk::Overlay>(overlays.front());
+      }
+    }
+  }
+
   if (!overlay)
   {
     m_SelectedOverlay = NULL;
@@ -446,76 +449,72 @@ void QmitkOverlayManagerView::OnAddOverlay()
 {
   QAction *action = m_AddOverlayMenu->exec(QCursor::pos());
 
+  mitk::Overlay::Pointer overlay;
+
   if (action != NULL)
   {
     const QString widgetKey = action->text();
 
     if (widgetKey == "TextOverlay2D")
-      OnAddTextOverlay2D();
+      overlay = CreateTextOverlay2D();
 
     else if (widgetKey == "TextOverlay3D")
-      OnAddTextOverlay3D();
+      overlay = CreateTextOverlay3D();
 
     else if (widgetKey == "LabelOverlay")
-      OnAddLabelOverlay();
+      overlay = CreateLabelOverlay();
 
     else if (widgetKey == "ColorBarOverlay")
-      OnAddColorBarOverlay();
+      overlay = CreateColorBarOverlay();
 
     else if (widgetKey == "ScaleLegendOverlay")
-      OnAddScaleLegendOverlay();
+      overlay = CreateScaleLegendOverlay();
 
     else if (widgetKey == "LogoOverlay")
-      OnAddLogoOverlay();
+      overlay = CreateLogoOverlay();
+
+    mitk::BaseRenderer *renderer =
+      this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
+    mitk::AnnotationPlacer::AddOverlay(overlay, renderer);
+    m_OverlayMap[overlay->GetMicroserviceID()] = overlay;
   }
+  OnActivateOverlayList();
 }
 
-void QmitkOverlayManagerView::OnAddTextOverlay2D()
+mitk::Overlay::Pointer QmitkOverlayManagerView::CreateTextOverlay2D()
 {
   mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
-  mitk::BaseRenderer *renderer =
-    this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-  mitk::AnnotationPlacer::AddOverlay(to.GetPointer(), renderer);
+  return to.GetPointer();
 }
 
-void QmitkOverlayManagerView::OnAddTextOverlay3D()
+mitk::Overlay::Pointer QmitkOverlayManagerView::CreateTextOverlay3D()
 {
   mitk::TextOverlay3D::Pointer to = mitk::TextOverlay3D::New();
-  mitk::BaseRenderer *renderer =
-    this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-  mitk::AnnotationPlacer::AddOverlay(to.GetPointer(), renderer);
+  return to.GetPointer();
 }
 
-void QmitkOverlayManagerView::OnAddLabelOverlay()
+mitk::Overlay::Pointer QmitkOverlayManagerView::CreateLabelOverlay()
 {
   mitk::LabelOverlay3D::Pointer to = mitk::LabelOverlay3D::New();
-  mitk::BaseRenderer *renderer =
-    this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-  mitk::AnnotationPlacer::AddOverlay(to.GetPointer(), renderer);
+  return to.GetPointer();
 }
 
-void QmitkOverlayManagerView::OnAddColorBarOverlay()
+mitk::Overlay::Pointer QmitkOverlayManagerView::CreateColorBarOverlay()
 {
   mitk::ColorBarOverlay::Pointer to = mitk::ColorBarOverlay::New();
-  mitk::BaseRenderer *renderer =
-    this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-  mitk::AnnotationPlacer::AddOverlay(to.GetPointer(), renderer);
+  return to.GetPointer();
 }
 
-void QmitkOverlayManagerView::OnAddScaleLegendOverlay()
+mitk::Overlay::Pointer QmitkOverlayManagerView::CreateScaleLegendOverlay()
 {
   mitk::ScaleLegendOverlay::Pointer to = mitk::ScaleLegendOverlay::New();
-  mitk::BaseRenderer *renderer =
-    this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-  mitk::AnnotationPlacer::AddOverlay(to.GetPointer(), renderer);
+  return to.GetPointer();
 }
 
-void QmitkOverlayManagerView::OnAddLogoOverlay()
+mitk::Overlay::Pointer QmitkOverlayManagerView::CreateLogoOverlay()
 {
   mitk::LogoOverlay::Pointer to = mitk::LogoOverlay::New();
-  mitk::BaseRenderer *renderer =
-    this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-  mitk::AnnotationPlacer::AddOverlay(to.GetPointer(), renderer);
+  return to.GetPointer();
 }
 
 void QmitkOverlayManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart * /*renderWindowPart*/)

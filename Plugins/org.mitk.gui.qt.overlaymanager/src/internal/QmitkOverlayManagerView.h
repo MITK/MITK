@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include "ctkServiceTracker.h"
 #include "mitkILifecycleAwarePart.h"
 #include "mitkOverlay.h"
 #include "ui_QmitkOverlayManagerViewControls.h"
@@ -47,14 +46,14 @@ namespace mitk
 */
 class QmitkOverlayManagerView : public QmitkAbstractView,
                                 public mitk::IRenderWindowPartListener,
-                                public mitk::ILifecycleAwarePart,
-                                public ctkServiceTracker<mitk::Overlay *>
+                                public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
+  typedef std::map<std::string, mitk::Overlay::Pointer> OverlayMapType;
   static const std::string VIEW_ID;
   QmitkOverlayManagerView();
   ~QmitkOverlayManagerView();
@@ -81,20 +80,18 @@ private slots:
   void OnAddOverlay();
 
 private:
-  void OnAddTextOverlay2D();
-  void OnAddTextOverlay3D();
-  void OnAddLabelOverlay();
-  void OnAddColorBarOverlay();
-  void OnAddScaleLegendOverlay();
-  void OnAddLogoOverlay();
+  mitk::Overlay::Pointer CreateTextOverlay2D();
+  mitk::Overlay::Pointer CreateTextOverlay3D();
+  mitk::Overlay::Pointer CreateLabelOverlay();
+  mitk::Overlay::Pointer CreateColorBarOverlay();
+  mitk::Overlay::Pointer CreateScaleLegendOverlay();
+  mitk::Overlay::Pointer CreateLogoOverlay();
 
   QString GetPropertyNameOrAlias(const QModelIndex &index);
   void OnPropertyNameChanged(const itk::EventObject &event);
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  void InitializeAddAnimationMenu();
-
-  void OnOverlayAdded(itk::Object * /*caller*/, const itk::EventObject &event);
+  void InitializeAddOverlayMenu();
 
   /** \see berry::IPartListener::PartActivated */
   virtual void Activated();
@@ -108,8 +105,6 @@ private:
   /** \see berry::IPartListener::PartHidden */
   virtual void Hidden();
 
-  mitk::Overlay *AddingService(const ctkServiceReference &) { OnActivateOverlayList(); }
-  void RemovedService(const ctkServiceReference &, mitk::Overlay *) { OnActivateOverlayList(); }
   QWidget *m_Parent;
   unsigned long m_PropertyNameChangedTag;
   unsigned long m_OverlayManagerObserverTag;
@@ -124,6 +119,7 @@ private:
   mitk::BaseRenderer *m_Renderer;
   QMenu *m_AddOverlayMenu;
   unsigned long m_RenderWindowFocusObserverTag;
+  OverlayMapType m_OverlayMap;
 };
 
 #endif // QmitkOverlayManagerView_h

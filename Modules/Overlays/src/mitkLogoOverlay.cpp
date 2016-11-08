@@ -39,6 +39,7 @@ mitk::LogoOverlay::LogoOverlay()
   offset.Fill(0.03);
   SetOffsetVector(offset);
   SetRelativeSize(0.2);
+  SetLogoImagePath("mbiLogo");
   SetCornerPosition(3);
   m_VtkImageImport = vtkSmartPointer<vtkImageImport>::New();
 }

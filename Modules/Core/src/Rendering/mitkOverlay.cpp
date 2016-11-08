@@ -20,15 +20,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string mitk::Overlay::US_INTERFACE_NAME = "org.mitk.services.Overlay";
 const std::string mitk::Overlay::US_PROPKEY_OVERLAYNAME = US_INTERFACE_NAME + ".name";
 const std::string mitk::Overlay::US_PROPKEY_ID = US_INTERFACE_NAME + ".id";
+const std::string mitk::Overlay::US_PROPKEY_MODIFIED = US_INTERFACE_NAME + ".modified";
 const std::string mitk::Overlay::US_PROPKEY_RENDERER_ID = US_INTERFACE_NAME + ".rendererId";
 const std::string mitk::Overlay::US_PROPKEY_AR_ID = US_INTERFACE_NAME + ".arId";
 
-mitk::Overlay::Overlay() : m_LayoutedBy(nullptr)
+mitk::Overlay::Overlay() : m_LayoutedBy(nullptr), m_PropertyListModifiedObserverTag(0)
 {
   m_PropertyList = mitk::PropertyList::New();
+  itk::MemberCommand<mitk::Overlay>::Pointer _PropertyListModifiedCommand = itk::MemberCommand<mitk::Overlay>::New();
+  _PropertyListModifiedCommand->SetCallbackFunction(this, &mitk::Overlay::PropertyListModified);
+  m_PropertyListModifiedObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), _PropertyListModifiedCommand);
   this->SetName(this->GetNameOfClass());
   this->SetVisibility(true);
   this->SetOpacity(1.0);
+}
+
+void mitk::Overlay::PropertyListModified(const itk::Object * /*caller*/, const itk::EventObject &)
+{
+  OverlayModified();
 }
 
 mitk::Overlay::~Overlay()
@@ -36,17 +45,26 @@ mitk::Overlay::~Overlay()
   this->UnRegisterMicroservice();
 }
 
-void mitk::Overlay::SetUSProperty(const std::string & /*propertyKey*/, us::Any /*value*/)
+void mitk::Overlay::SetUSProperty(const std::string &propertyKey, us::Any value)
 {
   if (this->m_ServiceRegistration)
   {
-    //        m_ServiceRegistration.SetProperties( //TODO19786
+    us::ServiceProperties props;
+    std::vector<std::string> propertyKeys;
+    m_ServiceRegistration.GetReference().GetPropertyKeys(propertyKeys);
+    for (std::string key : propertyKeys)
+    {
+      props[key] = m_ServiceRegistration.GetReference().GetProperty(key);
+    }
+    props[propertyKey] = value;
+    m_ServiceRegistration.SetProperties(props);
   }
 }
 
 void mitk::Overlay::SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
 {
   this->m_PropertyList->SetProperty(propertyKey, propertyValue);
+  MITK_INFO << "19786 SetProperty " << propertyKey;
 }
 
 void mitk::Overlay::ReplaceProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
@@ -254,6 +272,8 @@ void mitk::Overlay::SetVisibility(bool visible, const std::string &propertyKey)
   mitk::BoolProperty::Pointer prop;
   prop = mitk::BoolProperty::New(visible);
   this->m_PropertyList->SetProperty(propertyKey, prop);
+  Modified();
+  MITK_INFO << "19786 SetVisibility";
 }
 
 bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Overlay *overlay)
@@ -317,4 +337,10 @@ void mitk::Overlay::UnRegisterMicroservice()
   if (m_ServiceRegistration != NULL)
     m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
+}
+
+void mitk::Overlay::OverlayModified()
+{
+  Modified();
+  this->SetUSProperty(US_PROPKEY_MODIFIED, this->GetMTime());
 }

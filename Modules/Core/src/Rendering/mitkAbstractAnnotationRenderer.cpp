@@ -87,8 +87,13 @@ namespace mitk
   }
 
   void AbstractAnnotationRenderer::ModifiedService(const AbstractAnnotationRenderer::ServiceReferenceType &,
-                                                   AbstractAnnotationRenderer::TrackedType /*tracked*/)
+                                                   AbstractAnnotationRenderer::TrackedType tracked)
   {
+    BaseRenderer *renderer = GetCurrentBaseRenderer();
+    if (tracked && renderer)
+    {
+      tracked->Update(renderer);
+    }
   }
 
   void AbstractAnnotationRenderer::RemovedService(const AbstractAnnotationRenderer::ServiceReferenceType &,

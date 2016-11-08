@@ -389,6 +389,7 @@ namespace mitk
     static const std::string US_INTERFACE_NAME;
     static const std::string US_PROPKEY_OVERLAYNAME;
     static const std::string US_PROPKEY_ID;
+    static const std::string US_PROPKEY_MODIFIED;
     static const std::string US_PROPKEY_RENDERER_ID;
     static const std::string US_PROPKEY_AR_ID;
 
@@ -402,6 +403,8 @@ namespace mitk
     *\brief Registers this object as a Microservice, making it available to every module and/or plugin.
     */
     virtual void UnRegisterMicroservice();
+
+    void OverlayModified();
 
     mitkClassMacroItkParent(Overlay, itk::Object);
 
@@ -442,6 +445,9 @@ namespace mitk
 
   private:
     us::ServiceRegistration<Self> m_ServiceRegistration;
+
+    unsigned long m_PropertyListModifiedObserverTag;
+    void PropertyListModified(const itk::Object *, const itk::EventObject &);
   };
 
 } // namespace mitk

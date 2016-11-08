@@ -150,6 +150,7 @@ void QmitkOverlayManagerView::OnFocusChanged(itk::Object * /*caller*/, const itk
         m_Controls.m_RendererCB->setCurrentText(renderWindow);
       }
     }
+    this->OnActivateOverlayList();
   }
 }
 
@@ -294,7 +295,7 @@ void QmitkOverlayManagerView::InitializeAddOverlayMenu()
 
 void QmitkOverlayManagerView::Activated()
 {
-  this->OnActivateOverlayList();
+  //  this->OnActivateOverlayList();
 }
 
 void QmitkOverlayManagerView::Deactivated()
@@ -321,6 +322,7 @@ void QmitkOverlayManagerView::OnPropertyListChanged(int index)
   m_Renderer = renwin ? renwin->GetRenderer() : nullptr;
 
   this->OnOverlaySelectionChanged(m_Controls.m_OverlayList->currentItem(), nullptr);
+  this->OnActivateOverlayList();
 }
 
 void QmitkOverlayManagerView::OnAddNewProperty()

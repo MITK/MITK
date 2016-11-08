@@ -64,7 +64,6 @@ void mitk::Overlay::SetUSProperty(const std::string &propertyKey, us::Any value)
 void mitk::Overlay::SetProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
 {
   this->m_PropertyList->SetProperty(propertyKey, propertyValue);
-  MITK_INFO << "19786 SetProperty " << propertyKey;
 }
 
 void mitk::Overlay::ReplaceProperty(const std::string &propertyKey, const BaseProperty::Pointer &propertyValue)
@@ -273,7 +272,6 @@ void mitk::Overlay::SetVisibility(bool visible, const std::string &propertyKey)
   prop = mitk::BoolProperty::New(visible);
   this->m_PropertyList->SetProperty(propertyKey, prop);
   Modified();
-  MITK_INFO << "19786 SetVisibility";
 }
 
 bool mitk::Overlay::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Overlay *overlay)

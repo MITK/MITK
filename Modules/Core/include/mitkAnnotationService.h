@@ -41,6 +41,8 @@ namespace mitk
 
     static void UpdateAnnotationRenderer(const std::string &rendererID);
 
+    static void BaseRendererChanged(const std::string &rendererID);
+
   private:
     AnnotationService(const AnnotationService &);
     AnnotationService &operator=(const AnnotationService &);

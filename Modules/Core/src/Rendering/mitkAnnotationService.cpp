@@ -65,6 +65,14 @@ namespace mitk
     }
   }
 
+  void AnnotationService::BaseRendererChanged(const std::string &rendererID)
+  {
+    for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(rendererID))
+    {
+      annotationRenderer->CurrentBaseRendererChanged();
+    }
+  }
+
   std::vector<AbstractAnnotationRenderer *> AnnotationService::GetAnnotationRenderer(const std::string &rendererID)
   {
     us::ModuleContext *context = us::GetModuleContext();

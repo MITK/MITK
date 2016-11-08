@@ -45,7 +45,7 @@ namespace mitk
   void OverlayServiceTracker::RemovedService(const OverlayServiceTracker::ServiceReferenceType &,
                                              OverlayServiceTracker::TrackedType tracked)
   {
-    //  tracked->RemoveFromBaseRenderer() TODO19786
+    //  tracked->RemoveFromBaseRenderer() TODO19786 remove this class?
     m_OverlayServices.erase(std::remove(m_OverlayServices.begin(), m_OverlayServices.end(), tracked),
                             m_OverlayServices.end());
   }

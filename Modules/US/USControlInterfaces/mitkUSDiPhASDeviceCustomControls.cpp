@@ -106,7 +106,7 @@ void mitk::USDiPhASDeviceCustomControls::SetTGCMax(int max)
   this->OnSetTGCMax(max);
 }
 
-void mitk::USDiPhASDeviceCustomControls::SetDataType(int type)
+void mitk::USDiPhASDeviceCustomControls::SetDataType(DataType type)
 {
   this->OnSetDataType(type);
 }
@@ -164,7 +164,7 @@ void mitk::USDiPhASDeviceCustomControls::OnSetScanDepth(double mm) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetAveragingCount(int count) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetTGCMin(int min) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetTGCMax(int max) {}
-void mitk::USDiPhASDeviceCustomControls::OnSetDataType(int type) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetDataType(DataType type) {}
 //Beamforming
 void mitk::USDiPhASDeviceCustomControls::OnSetPitch(double mm) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetReconstructedSamples(int samples) {}

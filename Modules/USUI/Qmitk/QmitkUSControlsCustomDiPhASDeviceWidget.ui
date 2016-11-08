@@ -194,7 +194,7 @@
      <item row="4" column="0">
       <widget class="QComboBox" name="Mode">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <item>
         <property name="text">
@@ -380,6 +380,9 @@
      </item>
      <item row="3" column="0">
       <widget class="QSpinBox" name="ReconstructedLines">
+       <property name="contextMenuPolicy">
+        <enum>Qt::PreventContextMenu</enum>
+       </property>
        <property name="minimum">
         <number>128</number>
        </property>

@@ -234,12 +234,12 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
   if (m_ControlInterface.IsNull()) { return; }
   QString DataType = ui->DataType->currentText();
   if (DataType == "Image Data") {
-    m_ControlInterface->SetDataType(0);
+    m_ControlInterface->SetDataType(mitk::USDiPhASDeviceCustomControls::DataType::Image_uChar);
   }
   else if (DataType == "Beamformed Data") {
-    m_ControlInterface->SetDataType(1);
+    m_ControlInterface->SetDataType(mitk::USDiPhASDeviceCustomControls::DataType::Beamformed_Short);
   }
-} // 0= image; 1= beamformed;
+}
 
 //Beamforming
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnPitchChanged()

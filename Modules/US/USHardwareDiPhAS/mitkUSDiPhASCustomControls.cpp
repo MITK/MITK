@@ -124,23 +124,23 @@ void mitk::USDiPhASCustomControls::OnSetTGCMax(int max)
   m_device->UpdateScanmode();
 }
 
-void mitk::USDiPhASCustomControls::OnSetDataType(int type)
+void mitk::USDiPhASCustomControls::OnSetDataType(DataType type)
 {
   auto& scanMode = m_device->GetScanMode();
   auto imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
   switch (type) {
-    case 0: {
+    case DataType::Image_uChar : {
       scanMode.transferBeamformedData = false;
       scanMode.transferImageData = true;
       m_device->UpdateScanmode();
-      imageSource->ModifyDataType(0);
+      imageSource->ModifyDataType(DataType::Image_uChar);
       break; 
     }
-    case 1: {
+    case DataType::Beamformed_Short : {
       scanMode.transferBeamformedData = true;
       scanMode.transferImageData = false;
       m_device->UpdateScanmode();
-      imageSource->ModifyDataType(1);
+      imageSource->ModifyDataType(DataType::Beamformed_Short);
       break;
     }
 

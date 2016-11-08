@@ -159,9 +159,10 @@ void mitk::USDiPhASDevice::UpdateScanmode()
   m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;*/
   m_ScanMode.imageHeight = 512;
   m_ScanMode.imageWidth = 512;
-  // a higher resolution is useless, this also ensures correct spacing using any data types
 
   UpdateTransmitEvents();
+
+  m_ImageSource->UpdateImageGeometry();
 
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))
   {

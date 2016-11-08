@@ -42,6 +42,7 @@ public:
     */
   virtual void SetIsActive( bool isActive ) override;
 
+  enum DataType { Image_uChar, Beamformed_Short };
   /**
     * \return if this custom controls are currently activated
     */
@@ -62,7 +63,7 @@ public:
   virtual void SetAveragingCount(int count);
   virtual void SetTGCMin(int min);
   virtual void SetTGCMax(int max);
-  virtual void SetDataType(int type); // 0= image; 1= beamformed;
+  virtual void SetDataType(DataType type);
 
   //Beamforming
   virtual void SetPitch(double mm);
@@ -78,6 +79,8 @@ public:
   virtual void passGUIOut(std::function<void(QString)> callback);
   virtual void SetSilentUpdate(bool silent);
   virtual bool GetSilentUpdate();
+
+
 
 protected:
   /**
@@ -108,7 +111,7 @@ protected:
   virtual void OnSetAveragingCount(int count);
   virtual void OnSetTGCMin(int min);
   virtual void OnSetTGCMax(int max);
-  virtual void OnSetDataType(int type); // 0= image; 1= beamformed;
+  virtual void OnSetDataType(DataType type);
 
   //Beamforming
   virtual void OnSetPitch(double mm);

@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkUSImageSource.h"
+#include "mitkUSDiPhASCustomControls.h"
 
 #include "Framework.IBMT.US.CWrapper.h"
 
@@ -28,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <qstring.h>
 #include <ctime>
 #include <string>
+#include <mutex>
+
 
 namespace mitk {
 
@@ -42,10 +45,13 @@ class USDiPhASDevice;
   */
 class USDiPhASImageSource : public USImageSource
 {
+  
 public:
   mitkClassMacro(USDiPhASImageSource, USImageSource);
   mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);
   itkCloneMacro(Self);
+
+  typedef mitk::USDiPhASDeviceCustomControls::DataType DataType;
 
   /**
     * Implementation of the superclass method. Returns the pointer
@@ -81,11 +87,16 @@ public:
   /** This starts or ends the recording session*/
   void SetRecordingStatus(bool record);
 
-  void ModifyDataType(int DataT);
+  void ModifyDataType(DataType DataT);
   void ModifyUseBModeFilter(bool isSet);
 
+  /**
+  * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
+  */
+  void UpdateImageGeometry();
+
 protected:
-  void SetDataType(int DataT);
+  void SetDataType(DataType DataT);
   void SetUseBModeFilter(bool isSet);
 
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
@@ -103,11 +114,6 @@ protected:
   /** Reinitializes the image according to the DataType set. */
   void UpdateImageDataType(int imageHeight, int imageWidth);
 
-  /**
-  * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
-  */
-  void UpdateImageGeometry();
-
   /** This image holds the image to be displayed right now*/
   mitk::Image::Pointer                  m_Image;
 
@@ -123,13 +129,16 @@ protected:
   float                           startTime;
   bool                            useGUIOutPut;
   BeamformerStateInfoNative       BeamformerInfos;
-  int                             m_DataType;       // 0: Use image data; 1: Use beamformed data
   bool                            useBModeFilter;
   bool                            currentlyRecording;
-  bool m_DataTypeModified;
-  int m_DataTypeNext;
-  bool m_UseBModeFilterModified;
-  bool m_UseBModeFilterNext;
+  bool                            m_DataTypeModified;
+  DataType                        m_DataTypeNext;
+  bool                            m_UseBModeFilterModified;
+  bool                            m_UseBModeFilterNext;
+
+  DataType                        m_DataType;
+
+  std::mutex m_ImageMutex;
 };
 } // namespace mitk
 

@@ -17,9 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKUSDiPhASCustomControls_H_HEADER_INCLUDED_
 #define MITKUSDiPhASCustomControls_H_HEADER_INCLUDED_
 
-#include "mitkUSDevice.h"
 #include "mitkUSDiPhASDeviceCustomControls.h"
+#include "mitkUSDevice.h"
 #include "mitkUSDiPhASDevice.h"
+#include "Framework.IBMT.US.CWrapper.h"
 
 #include <itkObjectFactory.h>
 
@@ -33,6 +34,8 @@ class USDiPhASCustomControls : public USDiPhASDeviceCustomControls
 public:
   mitkClassMacro(USDiPhASCustomControls, USAbstractControlInterface);
   mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);
+
+  typedef USDiPhASDeviceCustomControls::DataType DataType;
 
   /**
     * Activate or deactivate the custom controls. This is just for handling
@@ -80,7 +83,7 @@ protected:
   virtual void OnSetAveragingCount(int count) override;
   virtual void OnSetTGCMin(int min) override;
   virtual void OnSetTGCMax(int max) override;
-  virtual void OnSetDataType(int type) override; // 0= image; 1= beamformed;
+  virtual void OnSetDataType(DataType type) override;
 
   //Beamforming
   virtual void OnSetPitch(double mm) override;

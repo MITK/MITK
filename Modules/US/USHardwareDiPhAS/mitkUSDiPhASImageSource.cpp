@@ -18,8 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctime>
 
 // mitk dependencies
-#include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASDevice.h"
+#include "mitkUSDiPhASImageSource.h"
 #include <mitkIOUtil.h>
 #include "mitkUSDiPhASBModeImageFilter.h"
 #include "mitkImageCast.h"
@@ -39,16 +39,15 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_device(device),
   startTime(((float)std::clock()) / CLOCKS_PER_SEC),
   useGUIOutPut(false),
-  m_DataType(0),
+  m_DataType(DataType::Image_uChar),
   m_GUIOutput(nullptr),
   useBModeFilter(false),
   currentlyRecording(false),
   m_DataTypeModified(true),
-  m_DataTypeNext(0),
+  m_DataTypeNext(DataType::Image_uChar),
   m_UseBModeFilterModified(true),
   m_UseBModeFilterNext(true)
 {
-
 }
 
 mitk::USDiPhASImageSource::~USDiPhASImageSource( )
@@ -59,10 +58,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
 
-  //static itk::FastMutexLock::Pointer nextImageMutex = itk::FastMutexLock::New();
-
-  //nextImageMutex->Lock();
-
+  m_ImageMutex.lock();
+  MITK_INFO << "GNRI: LOCK";
   if (m_Image->IsInitialized())
   {
     //initialize the image the first time
@@ -87,8 +84,9 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
     else {
       // feed the m_image to the BMode filter and grab it back; 
-      if (m_DataType ==1)
+      if (m_DataType == DataType::Beamformed_Short) {
         image = ApplyBmodeFilter(m_Image);
+      }
     }
     // always copy the geometry from the m_Image
     image->SetGeometry(m_Image->GetGeometry());
@@ -113,7 +111,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_GUIOutput(QString::fromStdString(s.str()));
   }
 
-  //nextImageMutex->Unlock();
+  m_ImageMutex.unlock();
+  MITK_INFO << "GNRI: UNLOCK";
 }
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
@@ -136,6 +135,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage)
 {
+  MITK_INFO << "Applying BMode Filter";
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
   typedef itk::Image< float, 3 > itkInputImageType;
   typedef itk::Image< short, 3 > itkOutputImageType;
@@ -147,6 +147,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   mitk::CastToItkImage(inputImage, itkImage);
   photoacousticBModeFilter->SetInput(itkImage);
   photoacousticBModeFilter->SetDirection(0);
+  MITK_INFO << "Done Applying BMode Filter";
   return mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
 }
 
@@ -169,9 +170,11 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
-  bool writeImage = ((m_DataType == 0) && (imageData != nullptr)) || ((m_DataType == 1) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
+  bool writeImage = ((m_DataType == DataType::Image_uChar) && (imageData != nullptr)) || ((m_DataType == DataType::Beamformed_Short) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
+    m_ImageMutex.lock();
+    MITK_INFO << "CB: LOCK";
 
     if (m_DataTypeModified)
     {
@@ -185,11 +188,10 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       m_UseBModeFilterModified = false;
     }
 
-
     // lock the image for writing an copy the given buffer into the image then
     switch (m_DataType)
     {
-      case 0: {
+    case DataType::Image_uChar: {
         // initialize mitk::Image with given image size on the first time
         if (!m_Image->IsInitialized())
         {
@@ -200,39 +202,40 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         }
         break;
       }
-      case 1: {
+
+    case DataType::Beamformed_Short: {
         short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
         int pixelsPerImage = beamformedLines*beamformedSamples;
 
-        MITK_INFO << "Debug Garbage:";
+        /*MITK_INFO << "Debug Garbage:";
         MITK_INFO << "Datasets: " << beamformedTotalDatasets;
         MITK_INFO << "Beamformed Lines: " << beamformedLines;
-        MITK_INFO << "Beamformed Samples: " << beamformedSamples;
+        MITK_INFO << "Beamformed Samples: " << beamformedSamples;*/
         // initialize mitk::Image with given image size on the first time
         if (!m_Image->IsInitialized())
         {
           UpdateImageDataType(beamformedSamples, beamformedLines);     // update data type and image pixel dimensions
         }
 
-        for (char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
+        for (int currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
         {
         
-            for (unsigned int sample = 0; sample < beamformedSamples; sample++)
+            for (int sample = 0; sample < beamformedSamples; sample++)
             {
-              for (short line = 0; line < beamformedLines; line++)
+              for (int line = 0; line < beamformedLines; line++)
               {
-                if (currentSet == 0)
-                {
+                //if (currentSet == 0)
+                //{
                   flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
                     = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
-                }
-                else
-                {
-                  flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
-                    = rfDataArrayBeamformed[sample*beamformedLines + line + pixelsPerImage*currentSet];
-                }
+                //}
+                //else
+                //{
+                //  flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
+                //    = rfDataArrayBeamformed[sample*beamformedLines + line + pixelsPerImage*currentSet];
+                //}
               }
-            } // the beamformed laser image is flipped by 90 degrees; we need to flip it manually
+            } // the beamformed pa image is flipped by 90 degrees; we need to flip it manually
           
         }
         
@@ -243,27 +246,26 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         delete[] flipme;
         break;
       }
-    }/*
-    for (int i = 0; i < channelDataTotalDatasets; i++) {
-      m_Image->SetSlice(&rfDataChannelData[i*channelDataChannelsPerDataset*channelDataSamplesPerChannel], i);
-      // set every image to a different slice
-    }*/
-  }
+    }
 
-  // if the user decides to start recording, we feed the vector the generated images
-  if (currentlyRecording) {
-    for (int index = 0; index < m_Image->GetDimension(2); ++index)
-    {
-      if (m_Image->IsSliceSet(index))
+    // if the user decides to start recording, we feed the vector the generated images
+    if (currentlyRecording) {
+      for (int index = 0; index < m_Image->GetDimension(2); ++index)
       {
-        m_recordedImages.push_back(Image::New());
-        m_recordedImages.back()->Initialize(m_Image->GetPixelType(), 2, m_Image->GetDimensions());
-        m_recordedImages.back()->SetGeometry(m_Image->GetGeometry());
+        if (m_Image->IsSliceSet(index))
+        {
+          m_recordedImages.push_back(Image::New());
+          m_recordedImages.back()->Initialize(m_Image->GetPixelType(), 2, m_Image->GetDimensions());
+          m_recordedImages.back()->SetGeometry(m_Image->GetGeometry());
 
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index));
-        m_recordedImages.back()->SetSlice(inputReadAccessor.GetData());
+          mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index));
+          m_recordedImages.back()->SetSlice(inputReadAccessor.GetData());
+        }
       }
     }
+
+    //MITK_INFO << "CB: UNLOCK";
+    m_ImageMutex.unlock();
   }
 }
 
@@ -281,11 +283,11 @@ void mitk::USDiPhASImageSource::UpdateImageDataType(int imageHeight, int imageWi
   MITK_INFO << "Initializing image...";
   switch (m_DataType)
   {
-    case 0: {
+  case DataType::Image_uChar : {
       m_Image->Initialize(mitk::MakeScalarPixelType<unsigned char>(), 3, dim);
       break;
     }
-    case 1: {
+  case DataType::Beamformed_Short: {
       m_Image->Initialize(mitk::MakeScalarPixelType<short>(), 3, dim);
       break;
     }
@@ -311,14 +313,14 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
 
   switch (m_DataType)
   {
-  case 0: {
+  case DataType::Image_uChar : {
     int& imageWidth = m_device->GetScanMode().imageWidth;
     int& imageHeight = m_device->GetScanMode().imageHeight;
     spacing[0] = pitch * reconstructionLines / imageWidth;
     spacing[1] = recordTime * speedOfSound / 2 * 1000 / imageHeight;
     break;
   }
-  case 1: {
+  case DataType::Beamformed_Short : {
     int& imageWidth = reconstructionLines;
     int& imageHeight = m_device->GetScanMode().reconstructionSamplesPerLine;
     spacing[0] = pitch;
@@ -343,7 +345,7 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   }
 }
 
-void mitk::USDiPhASImageSource::ModifyDataType(int DataT)
+void mitk::USDiPhASImageSource::ModifyDataType(DataType DataT)
 {
   m_DataTypeModified = true;
   m_DataTypeNext = DataT;
@@ -355,7 +357,7 @@ void mitk::USDiPhASImageSource::ModifyUseBModeFilter(bool isSet)
   m_UseBModeFilterNext = isSet;
 }
 
-void mitk::USDiPhASImageSource::SetDataType(int DataT)
+void mitk::USDiPhASImageSource::SetDataType(DataType DataT)
 {
   if (DataT != m_DataType)
   {
@@ -363,15 +365,15 @@ void mitk::USDiPhASImageSource::SetDataType(int DataT)
     MITK_INFO << "Setting new DataType..." << DataT;
     switch (m_DataType)
     {
-    case 0:
+    case DataType::Image_uChar :
       MITK_INFO << "height: " << m_device->GetScanMode().imageHeight << " width: " << m_device->GetScanMode().imageWidth;
       UpdateImageDataType(m_device->GetScanMode().imageHeight, m_device->GetScanMode().imageWidth);
       break;
-    case 1:
+    case DataType::Beamformed_Short :
       MITK_INFO << "samples: " << m_device->GetScanMode().reconstructionSamplesPerLine << " lines: " << m_device->GetScanMode().reconstructionLines;
       UpdateImageDataType(m_device->GetScanMode().reconstructionSamplesPerLine, m_device->GetScanMode().reconstructionLines);
       break;
-    } // 0:imageData 1:beamformed
+    }
     MITK_INFO << "Setting new DataType...[DOINE]";
   }
 }

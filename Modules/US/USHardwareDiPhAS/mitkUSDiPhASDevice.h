@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSDiPhASDevice_H_HEADER_INCLUDED_
 
 #include <functional>
-
-#include "mitkUSDevice.h"
 #include "mitkUSDiPhASImageSource.h"
+#include "mitkUSDevice.h"
 #include "mitkUSDiPhASProbesControls.h"
+#include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASCustomControls.h"
 
 #include "Framework.IBMT.US.CWrapper.h"
@@ -45,6 +45,7 @@ namespace mitk {
     * Images given by the device are put into an object of
     * mitk::USDiPhASImageSource.
     */
+  class USDiPhASImageSource;
 	
   class USDiPhASDevice : public USDevice
   {
@@ -159,7 +160,7 @@ namespace mitk {
     USDiPhASProbesControls::Pointer                m_ControlsProbes;
     itk::SmartPointer<USAbstractControlInterface>  m_ControlInterfaceCustom;
 
-    USDiPhASImageSource::Pointer                   m_ImageSource;
+    mitk::USDiPhASImageSource::Pointer                   m_ImageSource;
 
     bool                                           m_IsRunning;
     ScanModeNative                                 m_ScanMode;

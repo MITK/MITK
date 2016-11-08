@@ -220,7 +220,7 @@ void UltrasoundSupport::UpdateAmountOfOutputs()
 
 void UltrasoundSupport::UpdateImage()
 {
-  if(m_Controls.m_ShowImageStream->isChecked()) 
+  if(m_Controls.m_ShowImageStream->isChecked())
   {
     m_Device->Modified();
     m_Device->Update();
@@ -250,8 +250,8 @@ void UltrasoundSupport::UpdateImage()
 
       if (!m_Image->IsEmpty())
       {
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(m_AmountOfOutputs-index-1,0,0,nullptr,mitk::Image::ReferenceMemory));
-        //we'll switch here the order of the images to get the laser image as the top image; also just reference the slices, to get a small performance gain
+        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index,0,0,nullptr,mitk::Image::ReferenceMemory));
+        // just reference the slices, to get a small performance gain
         m_curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
         m_curOutput.at(index)->GetGeometry()->SetIndexToWorldTransform(m_Image->GetSlicedGeometry()->GetIndexToWorldTransform());
         // Update the image Output with seperate slices

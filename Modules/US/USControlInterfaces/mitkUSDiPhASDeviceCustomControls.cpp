@@ -110,7 +110,6 @@ void mitk::USDiPhASDeviceCustomControls::SetDataType(DataType type)
 {
   this->OnSetDataType(type);
 }
-// 0= image; 1= beamformed;
 
 //Beamforming
 void mitk::USDiPhASDeviceCustomControls::SetPitch(double mm)

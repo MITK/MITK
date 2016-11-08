@@ -48,6 +48,7 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_UseBModeFilterModified(true),
   m_UseBModeFilterNext(true)
 {
+  m_ImageMutex = itk::FastMutexLock::New();
 }
 
 mitk::USDiPhASImageSource::~USDiPhASImageSource( )
@@ -58,8 +59,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
 
-  m_ImageMutex.lock();
-  MITK_INFO << "GNRI: LOCK";
+  m_ImageMutex->Lock();
+  std::this_thread::sleep_for(std::chrono::milliseconds(1));
   if (m_Image->IsInitialized())
   {
     //initialize the image the first time
@@ -76,16 +77,13 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
 
     // if DataType == 0 : if imageData is given just bypass the filter here, as imageData is already enveloped.
-    if (!useBModeFilter || m_DataType == 0)
+    mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetVolumeData());
+    image->SetVolume(inputReadAccessor.GetData());
+    if (useBModeFilter && m_DataType == DataType::Beamformed_Short)
     {
-      // copy contents of the given image into the member variable
-      mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetVolumeData());
-      image->SetVolume(inputReadAccessor.GetData());
-    }
-    else {
       // feed the m_image to the BMode filter and grab it back; 
       if (m_DataType == DataType::Beamformed_Short) {
-        image = ApplyBmodeFilter(m_Image);
+        //image = ApplyBmodeFilter(image); // possible crash because of corrupted second image
       }
     }
     // always copy the geometry from the m_Image
@@ -111,8 +109,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_GUIOutput(QString::fromStdString(s.str()));
   }
 
-  m_ImageMutex.unlock();
-  MITK_INFO << "GNRI: UNLOCK";
+  m_ImageMutex->Unlock();
+  //MITK_INFO << "GNRI: UNLOCK";
 }
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
@@ -173,8 +171,8 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   bool writeImage = ((m_DataType == DataType::Image_uChar) && (imageData != nullptr)) || ((m_DataType == DataType::Beamformed_Short) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
-    m_ImageMutex.lock();
-    MITK_INFO << "CB: LOCK";
+    m_ImageMutex->Lock();
+    //MITK_INFO << "CB: LOCK";
 
     if (m_DataTypeModified)
     {
@@ -265,7 +263,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     }
 
     //MITK_INFO << "CB: UNLOCK";
-    m_ImageMutex.unlock();
+    m_ImageMutex->Unlock();
   }
 }
 
@@ -353,6 +351,7 @@ void mitk::USDiPhASImageSource::ModifyDataType(DataType DataT)
 
 void mitk::USDiPhASImageSource::ModifyUseBModeFilter(bool isSet)
 {
+  MITK_INFO << "modify<";
   m_UseBModeFilterModified = true;
   m_UseBModeFilterNext = isSet;
 }
@@ -453,9 +452,20 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
 void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage)
 {
-  unsigned int width  = m_device->GetScanMode().imageWidth;
-  unsigned int height = m_device->GetScanMode().imageHeight;
+  unsigned int width  = 32;
+  unsigned int height = 32;
   unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the laser event is not included in the transmitEvents, so we add 1 here
+
+  if (m_DataType == DataType::Beamformed_Short)
+  {
+    width = m_device->GetScanMode().reconstructionLines;
+    height = m_device->GetScanMode().reconstructionSamplesPerLine;
+  }
+  else if (m_DataType == DataType::Image_uChar)
+  {
+    width = m_device->GetScanMode().imageWidth;
+    height = m_device->GetScanMode().imageHeight;
+  }
 
   unsigned int dimLaser[] = { width, height, m_recordedImages.size() / events};
   unsigned int dimSound[] = { width, height, m_recordedImages.size() / events * (events-1)};
@@ -482,9 +492,20 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage
 
 void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer SoundImage)
 {
-  unsigned int width  = m_device->GetScanMode().imageWidth;
-  unsigned int height = m_device->GetScanMode().imageHeight;
+  unsigned int width  = 32;
+  unsigned int height = 32;
   unsigned int events = m_device->GetScanMode().transmitEventsCount;
+
+  if (m_DataType == DataType::Beamformed_Short)
+  {
+    width = m_device->GetScanMode().reconstructionLines;
+    height = m_device->GetScanMode().reconstructionSamplesPerLine;
+  }
+  else if (m_DataType == DataType::Image_uChar)
+  {
+    width = m_device->GetScanMode().imageWidth;
+    height = m_device->GetScanMode().imageHeight;
+  }
 
   unsigned int dimSound[] = { width, height, m_recordedImages.size()};
 

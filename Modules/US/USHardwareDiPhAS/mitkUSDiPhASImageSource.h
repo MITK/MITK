@@ -138,7 +138,7 @@ protected:
 
   DataType                        m_DataType;
 
-  std::mutex m_ImageMutex;
+  itk::FastMutexLock::Pointer m_ImageMutex;
 };
 } // namespace mitk
 

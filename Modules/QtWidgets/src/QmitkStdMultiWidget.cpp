@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
+#include <mitkAnnotationPlacer.h>
 #include <mitkCameraController.h>
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
@@ -269,12 +270,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   layer = mitk::IntProperty::New(1000);
   m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
-  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetOverlayManager(OverlayManager);
-
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
@@ -317,7 +312,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
   m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  mitk::AnnotationPlacer::AddOverlay(m_LogoRendering.GetPointer(), renderer4);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()

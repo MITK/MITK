@@ -54,8 +54,6 @@ int mitkTextOverlay2DRenderingTest(int argc, char *argv[])
   //  renderingHelper.SetAutomaticallyCloseRenderWindow(false);
 
   mitk::BaseRenderer *renderer = mitk::BaseRenderer::GetInstance(renderingHelper.GetVtkRenderWindow());
-  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
-  renderer->SetOverlayManager(OverlayManager);
 
   // Add the overlay to the overlayManager. It is added to all registered renderers automaticly
   OverlayManager->AddOverlay(createTextOverlay(20, 1, 0, 0, 200, 400, "Test1").GetPointer());

@@ -30,7 +30,6 @@
 #include "mitkVtkLayerController.h"
 
 #include "mitkInteractionConst.h"
-#include "mitkOverlayManager.h"
 #include "mitkProperties.h"
 #include "mitkWeakPointerProperty.h"
 
@@ -202,11 +201,6 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
 
 mitk::BaseRenderer::~BaseRenderer()
 {
-  if (m_OverlayManager.IsNotNull())
-  {
-    m_OverlayManager->RemoveBaseRenderer(this);
-  }
-
   if (m_VtkRenderer != nullptr)
   {
     m_VtkRenderer->Delete();
@@ -334,36 +328,6 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
     else
       Modified();
   }
-}
-
-void mitk::BaseRenderer::SetOverlayManager(itk::SmartPointer<OverlayManager> overlayManager)
-{
-  if (overlayManager.IsNull())
-    return;
-
-  if (this->m_OverlayManager.IsNotNull())
-  {
-    if (this->m_OverlayManager.GetPointer() == overlayManager.GetPointer())
-    {
-      return;
-    }
-    else
-    {
-      this->m_OverlayManager->RemoveBaseRenderer(this);
-    }
-  }
-  this->m_OverlayManager = overlayManager;
-  this->m_OverlayManager->AddBaseRenderer(this); // TODO
-}
-
-itk::SmartPointer<mitk::OverlayManager> mitk::BaseRenderer::GetOverlayManager()
-{
-  if (this->m_OverlayManager.IsNull())
-  {
-    m_OverlayManager = mitk::OverlayManager::New();
-    m_OverlayManager->AddBaseRenderer(this);
-  }
-  return this->m_OverlayManager;
 }
 
 void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
@@ -529,14 +493,6 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::BaseGeometry *geometry)
     m_EmptyWorldGeometry = true;
   else
     m_EmptyWorldGeometry = false;
-}
-
-void mitk::BaseRenderer::UpdateOverlays()
-{
-  if (m_OverlayManager.IsNotNull())
-  {
-    m_OverlayManager->UpdateOverlays(this);
-  }
 }
 
 void mitk::BaseRenderer::SetGeometry(const itk::EventObject &geometrySendEvent)

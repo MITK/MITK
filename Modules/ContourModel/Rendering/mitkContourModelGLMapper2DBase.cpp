@@ -22,9 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProperties.h"
 #include <vtkLinearTransform.h>
 
+#include "mitkAnnotationPlacer.h"
 #include "mitkBaseRenderer.h"
 #include "mitkContourModel.h"
-#include "mitkOverlayManager.h"
 #include "mitkTextOverlay2D.h"
 
 #include "mitkGL.h"
@@ -46,10 +46,10 @@ void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel *rendering
     m_RendererList.push_back(renderer);
   }
 
-  renderer->GetOverlayManager()->AddOverlay(m_PointNumbersOverlay.GetPointer(), renderer);
+  mitk::AnnotationPlacer::AddOverlay(m_PointNumbersOverlay.GetPointer(), renderer);
   m_PointNumbersOverlay->SetVisibility(false);
 
-  renderer->GetOverlayManager()->AddOverlay(m_ControlPointNumbersOverlay.GetPointer(), renderer);
+  mitk::AnnotationPlacer::AddOverlay(m_ControlPointNumbersOverlay.GetPointer(), renderer);
   m_ControlPointNumbersOverlay->SetVisibility(false);
 
   InternalDrawContour(renderingContour, renderer);

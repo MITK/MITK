@@ -23,7 +23,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometryDataVtkMapper3D.h"
 #include "mitkVtkMapper.h"
 
-#include "mitkAnnotationService.h"
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkGeometry3D.h>
 #include <mitkImageSliceSelector.h>
@@ -161,8 +160,6 @@ Called by the vtkMitkRenderProp in order to start MITK rendering process.
 */
 int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
 {
-  // Update all overlays in any case
-  this->UpdateOverlays();
   // Do we have objects to render?
   if (this->GetEmptyWorldGeometry())
     return 0;
@@ -180,10 +177,6 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     Mapper *mapper = (*it).second;
     mapper->MitkRender(this, type);
   }
-
-  // Update overlays in case a mapper has changed them
-  this->UpdateOverlays();
-  AnnotationService::UpdateAnnotationRenderer(GetName());
 
   // Render text
   if (type == VtkPropRenderer::Overlay)

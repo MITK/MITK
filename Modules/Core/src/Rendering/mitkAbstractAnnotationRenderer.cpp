@@ -33,6 +33,7 @@ namespace mitk
       m_RendererID(rendererID),
       m_ID(arID)
   {
+    this->Open();
   }
 
   AbstractAnnotationRenderer::~AbstractAnnotationRenderer() {}
@@ -91,13 +92,8 @@ namespace mitk
   }
 
   void AbstractAnnotationRenderer::RemovedService(const AbstractAnnotationRenderer::ServiceReferenceType &,
-                                                  AbstractAnnotationRenderer::TrackedType tracked)
+                                                  AbstractAnnotationRenderer::TrackedType /*tracked*/)
   {
-    BaseRenderer *renderer = GetCurrentBaseRenderer();
-    if (tracked && renderer)
-    {
-      tracked->RemoveFromBaseRenderer(renderer);
-    }
   }
 
   BaseRenderer *AbstractAnnotationRenderer::GetCurrentBaseRenderer()

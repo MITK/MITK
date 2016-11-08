@@ -296,6 +296,11 @@ mitk::PropertyList *mitk::Overlay::GetPropertyList() const
   return m_PropertyList;
 }
 
+std::string mitk::Overlay::GetMicroserviceID()
+{
+  return this->m_ServiceRegistration.GetReference().GetProperty(US_PROPKEY_ID).ToString();
+}
+
 void mitk::Overlay::RegisterAsMicroservice(us::ServiceProperties props)
 {
   if (m_ServiceRegistration != NULL)

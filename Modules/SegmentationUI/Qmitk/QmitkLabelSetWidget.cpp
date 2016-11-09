@@ -352,6 +352,8 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
     GetWorkingImage()->EraseLabel(pixelValue);
     this->WaitCursorOff();
   }
+
+  this->ResetAllTableWidgetItems();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

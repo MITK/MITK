@@ -486,8 +486,6 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 
   OnNewLabel();
-
-  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 }
 
 void QmitkMultiLabelSegmentationView::OnNewLabel()
@@ -521,6 +519,8 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
 
   UpdateControls();
+
+  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 }
 
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)

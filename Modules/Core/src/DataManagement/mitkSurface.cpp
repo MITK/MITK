@@ -151,13 +151,14 @@ vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t) const
 {
   if (t < m_PolyDatas.size())
   {
-    if(m_PolyDatas[t] == nullptr && this->GetSource().IsNotNull())
+    auto source = GetSource();
+    if (m_PolyDatas[t] == nullptr && source)
     {
       RegionType requestedRegion;
       requestedRegion.SetIndex(3, t);
       requestedRegion.SetSize(3, 1);
       this->m_RequestedRegion = requestedRegion;
-      this->GetSource()->Update();
+      source->Update();
     }
 
     return m_PolyDatas[t].GetPointer();
@@ -168,8 +169,9 @@ vtkPolyData* mitk::Surface::GetVtkPolyData(unsigned int t) const
 
 void mitk::Surface::UpdateOutputInformation()
 {
-  if (this->GetSource().IsNotNull())
-    this->GetSource()->UpdateOutputInformation();
+  auto source = GetSource();
+  if (source)
+    source->UpdateOutputInformation();
 
   if (m_CalculateBoundingBox == true && !m_PolyDatas.empty())
     this->CalculateBoundingBox();

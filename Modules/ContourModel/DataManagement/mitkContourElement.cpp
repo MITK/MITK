@@ -266,7 +266,10 @@ bool mitk::ContourElement::IsNearContour(const mitk::Point3D &point, float eps)
 {
     ConstVertexIterator it1 = this->m_Vertices->begin();
     ConstVertexIterator it2 = this->m_Vertices->begin();
-    it2 ++; // it2 runs one position ahead
+    if (it2 != this->m_Vertices->end())
+    {
+      it2++; // it2 runs one position ahead
+    }
 
     ConstVertexIterator end = this->m_Vertices->end();
 

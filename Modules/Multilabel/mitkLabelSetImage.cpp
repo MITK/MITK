@@ -155,7 +155,8 @@ void mitk::LabelSetImage::RemoveLayer()
   GetLabelSet(layerToDelete)->RemoveAllObservers();
 
   // set the active layer to one below, if exists.
-  SetActiveLayer(layerToDelete - 1);
+  if (layerToDelete != 0)
+    SetActiveLayer(layerToDelete - 1);
 
   // remove labelset and image data
   m_LabelSetContainer.erase(m_LabelSetContainer.begin() + layerToDelete);

@@ -383,13 +383,7 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
       overlay = it->second;
     else
     {
-      std::string ldapFilter = "(" + mitk::Overlay::US_PROPKEY_ID + "=" + oID.toStdString() + ")";
-      std::vector<us::ServiceReference<mitk::Overlay>> overlays =
-        us::GetModuleContext()->GetServiceReferences<mitk::Overlay>(ldapFilter);
-      if (!overlays.empty())
-      {
-        overlay = us::GetModuleContext()->GetService<mitk::Overlay>(overlays.front());
-      }
+      overlay = mitk::AnnotationService::GetOverlay(oID.toStdString());
     }
   }
 

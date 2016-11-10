@@ -15,6 +15,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkAnnotationService.h"
+#include "mitkOverlay.h"
 #include <mitkAbstractAnnotationRenderer.h>
 
 namespace mitk
@@ -71,6 +72,20 @@ namespace mitk
     {
       annotationRenderer->CurrentBaseRendererChanged();
     }
+  }
+
+  Overlay *AnnotationService::GetOverlay(const std::string &overlayID)
+  {
+    std::string ldapFilter = "(" + Overlay::US_PROPKEY_ID + "=" + overlayID + ")";
+    us::ModuleContext *context = us::GetModuleContext();
+    std::vector<us::ServiceReference<mitk::Overlay>> overlays =
+      context->GetServiceReferences<mitk::Overlay>(ldapFilter);
+    Overlay *overlay = nullptr;
+    if (!overlays.empty())
+    {
+      overlay = us::GetModuleContext()->GetService<mitk::Overlay>(overlays.front());
+    }
+    return overlay;
   }
 
   std::vector<AbstractAnnotationRenderer *> AnnotationService::GetAnnotationRenderer(const std::string &rendererID)

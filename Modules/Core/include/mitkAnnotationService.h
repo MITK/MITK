@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   class AbstractAnnotationRenderer;
+  class Overlay;
 
   class MITKCORE_EXPORT AnnotationService
   {
@@ -42,6 +43,8 @@ namespace mitk
     static void UpdateAnnotationRenderer(const std::string &rendererID);
 
     static void BaseRendererChanged(const std::string &rendererID);
+
+    static mitk::Overlay *GetOverlay(const std::string &overlayID);
 
   private:
     AnnotationService(const AnnotationService &);

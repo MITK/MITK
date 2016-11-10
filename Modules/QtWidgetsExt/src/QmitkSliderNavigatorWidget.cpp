@@ -255,5 +255,9 @@ void QmitkSliderNavigatorWidget::SetPos(int val)
 
 void QmitkSliderNavigatorWidget::SetInverseDirection(bool inverseDirection)
 {
-  m_InverseDirection = inverseDirection;
+  if (inverseDirection != m_InverseDirection)
+  {
+    m_InverseDirection = inverseDirection;
+    this->Refetch();
+  }
 }

@@ -53,7 +53,7 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_BufferSize = 100;
 
   m_LastWrittenImage = m_BufferSize - 1;
-  m_ImageBuffer.insert(m_ImageBuffer.end(), m_BufferSize, nullptr);
+  m_ImageBuffer.insert(m_ImageBuffer.begin(), m_BufferSize, nullptr);
 }
 
 mitk::USDiPhASImageSource::~USDiPhASImageSource( )
@@ -63,7 +63,6 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource( )
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
-
   if (m_DataTypeModified)
   {
     SetDataType(m_DataTypeNext);
@@ -76,7 +75,6 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   }
 
   image = &(*m_ImageBuffer[m_LastWrittenImage]);
-  //m_ImageBuffer.at(m_LastWrittenImage) = nullptr;
   
   if (image != nullptr)
   {
@@ -88,24 +86,25 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     }
   }
 
-  if (!useGUIOutPut && m_GUIOutput) {
-    // Need to do this because the program initializes the GUI twice
-    // this is probably a bug in UltrasoundSupport, if it's fixed the timing becomes unneccesary
-    float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
-    if (timePassed > 10)
-    {
-      useGUIOutPut = true;
-    }
-  }
-  if (useGUIOutPut) {
-    // pass some beamformer state infos to the GUI
-    getSystemInfo(&BeamformerInfos);
+  // [sic!] Thomas: This kills everything, so we commented it out and now it doesnt kill anything..
+  //if (!useGUIOutPut && m_GUIOutput) {
+  //  // Need to do this because the program initializes the GUI twice
+  //  // this is probably a bug in UltrasoundSupport, if it's fixed the timing becomes unneccesary
+  //  float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
+  //  if (timePassed > 10)
+  //  {
+  //    useGUIOutPut = true;
+  //  }
+  //}
+  //if (useGUIOutPut) {
+  //  // pass some beamformer state infos to the GUI
+  //  getSystemInfo(&BeamformerInfos);
 
-    std::ostringstream s;
-    s << "state info: PRF:" << BeamformerInfos.systemPRF << "Hz, datarate: " << BeamformerInfos.dataTransferRateMBit << "MBit/s";
+  //  std::ostringstream s;
+  //  s << "state info: PRF:" << BeamformerInfos.systemPRF << "Hz, datarate: " << BeamformerInfos.dataTransferRateMBit << "MBit/s";
 
-    m_GUIOutput(QString::fromStdString(s.str()));
-  }
+  //  m_GUIOutput(QString::fromStdString(s.str()));
+  //}
 }
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
@@ -163,13 +162,11 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
-  cout << "call";
   bool writeImage = ((m_DataType == DataType::Image_uChar) && (imageData != nullptr)) || ((m_DataType == DataType::Beamformed_Short) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
     // create a new image and initialize it
     mitk::Image::Pointer image = mitk::Image::New();
-    cout << m_LastWrittenImage << '\n';
 
     switch (m_DataType)
     {
@@ -243,9 +240,8 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         }
       }
     }
-    m_ImageBuffer.at((m_LastWrittenImage+1)%m_BufferSize) = image;
+    m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
     m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
-    cout << "end" << '\n';
   }
 }
 

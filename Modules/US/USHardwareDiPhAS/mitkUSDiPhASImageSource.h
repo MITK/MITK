@@ -105,14 +105,18 @@ protected:
   /** This vector holds all the images we record, if recording is set to active. */
   std::vector<mitk::Image::Pointer>     m_recordedImages;
 
+  std::vector<mitk::Image::Pointer>     m_ImageBuffer;
+  int                                   m_LastWrittenImage;
+  int                                   m_BufferSize;
+
+  unsigned int                          m_ImageDimensions[3];
+  mitk::Vector3D                        m_ImageSpacing;
+
   mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage);
   mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage);
 
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);
-
-  /** Reinitializes the image according to the DataType set. */
-  void UpdateImageDataType(int imageHeight, int imageWidth);
 
   /** This image holds the image to be displayed right now*/
   mitk::Image::Pointer                  m_Image;

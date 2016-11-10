@@ -106,7 +106,7 @@ bool mitk::USDiPhASDevice::OnConnection()
   InitializeScanMode();
   initBeamformer();                     //start the hardware connection
 
-  //m_ImageSource->UpdateImageGeometry(); //make sure the image geometry fits the current scanmode
+  m_ImageSource->UpdateImageGeometry(); //make sure the image geometry is initialized!
   // pass the new scanmode to the device:
   setupScan(this->m_ScanMode);
   return true;
@@ -162,11 +162,10 @@ void mitk::USDiPhASDevice::UpdateScanmode()
 
   UpdateTransmitEvents();
 
-  m_ImageSource->UpdateImageGeometry();
-
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))
   {
     setupScan(this->m_ScanMode);
+    m_ImageSource->UpdateImageGeometry();
   }
 
   OnFreeze(false);

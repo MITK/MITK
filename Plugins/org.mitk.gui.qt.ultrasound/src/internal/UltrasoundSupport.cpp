@@ -250,7 +250,7 @@ void UltrasoundSupport::UpdateImage()
 
       if (!m_Image->IsEmpty())
       {
-        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(index,0,0,nullptr,mitk::Image::ReferenceMemory));
+        mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(m_AmountOfOutputs-index-1,0,0,nullptr,mitk::Image::ReferenceMemory));
         // just reference the slices, to get a small performance gain
         m_curOutput.at(index)->SetSlice(inputReadAccessor.GetData());
         m_curOutput.at(index)->GetGeometry()->SetIndexToWorldTransform(m_Image->GetSlicedGeometry()->GetIndexToWorldTransform());

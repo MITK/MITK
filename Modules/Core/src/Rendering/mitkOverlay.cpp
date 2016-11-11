@@ -206,20 +206,6 @@ int mitk::Overlay::GetFontSize() const
   return fontSize;
 }
 
-void mitk::Overlay::SetMargin2D(const Point2D &OffsetVector)
-{
-  mitk::Point2dProperty::Pointer OffsetVectorProperty = mitk::Point2dProperty::New(OffsetVector);
-  SetProperty("Margin2D", OffsetVectorProperty.GetPointer());
-}
-
-mitk::Point2D mitk::Overlay::GetMargin2D() const
-{
-  mitk::Point2D OffsetVector;
-  OffsetVector.Fill(0);
-  GetPropertyValue<mitk::Point2D>("Margin2D", OffsetVector);
-  return OffsetVector;
-}
-
 bool mitk::Overlay::GetVisibility(bool &visible, const std::string &propertyKey) const
 {
   return GetBoolProperty(propertyKey, visible);

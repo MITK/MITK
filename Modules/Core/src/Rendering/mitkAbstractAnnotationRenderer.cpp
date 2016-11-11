@@ -83,6 +83,7 @@ namespace mitk
     {
       overlay->AddToBaseRenderer(renderer);
     }
+    OnAnnotationRenderersChanged();
     return overlay;
   }
 
@@ -94,11 +95,13 @@ namespace mitk
     {
       tracked->Update(renderer);
     }
+    OnAnnotationRenderersChanged();
   }
 
   void AbstractAnnotationRenderer::RemovedService(const AbstractAnnotationRenderer::ServiceReferenceType &,
                                                   AbstractAnnotationRenderer::TrackedType /*tracked*/)
   {
+    OnAnnotationRenderersChanged();
   }
 
   BaseRenderer *AbstractAnnotationRenderer::GetCurrentBaseRenderer()

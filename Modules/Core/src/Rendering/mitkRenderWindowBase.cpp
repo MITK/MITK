@@ -60,7 +60,7 @@ void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager
   renderingManager->AddRenderWindow(GetVtkRenderWindow());
 
   // Add previously created overlays to new BaseRenderer
-  mitk::AnnotationService::BaseRendererChanged(m_Renderer->GetName());
+  mitk::AnnotationService::BaseRendererChanged(m_Renderer);
 
   m_RenderProp = vtkMitkRenderProp::New();
   m_RenderProp->SetPropRenderer(m_Renderer);

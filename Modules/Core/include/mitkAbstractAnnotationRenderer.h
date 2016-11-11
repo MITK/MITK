@@ -51,6 +51,7 @@ namespace mitk
 
     void CurrentBaseRendererChanged();
 
+    virtual void OnRenderWindowModified() {}
     void RemoveAllOverlays();
 
     void Update();

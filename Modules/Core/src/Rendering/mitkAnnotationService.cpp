@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAnnotationService.h"
 #include "mitkOverlay.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCommand.h"
 #include <mitkAbstractAnnotationRenderer.h>
 
 namespace mitk
@@ -66,11 +68,27 @@ namespace mitk
     }
   }
 
-  void AnnotationService::BaseRendererChanged(const std::string &rendererID)
+  void AnnotationService::BaseRendererChanged(BaseRenderer *renderer)
   {
-    for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(rendererID))
+    for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(renderer->GetName()))
     {
       annotationRenderer->CurrentBaseRendererChanged();
+    }
+    vtkCallbackCommand *renderCallbackCommand = vtkCallbackCommand::New();
+    renderCallbackCommand->SetCallback(AnnotationService::RenderWindowCallback);
+    renderer->GetRenderWindow()->AddObserver(vtkCommand::ModifiedEvent, renderCallbackCommand);
+    renderCallbackCommand->Delete();
+  }
+
+  void AnnotationService::RenderWindowCallback(vtkObject *caller, unsigned long, void *, void *)
+  {
+    vtkRenderWindow *renderWindow = dynamic_cast<vtkRenderWindow *>(caller);
+    if (!renderWindow)
+      return;
+    BaseRenderer *renderer = BaseRenderer::GetInstance(renderWindow);
+    for (AbstractAnnotationRenderer *annotationRenderer : GetAnnotationRenderer(renderer->GetName()))
+    {
+      annotationRenderer->OnRenderWindowModified();
     }
   }
 

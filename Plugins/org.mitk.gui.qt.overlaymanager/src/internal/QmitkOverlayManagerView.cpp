@@ -38,6 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAnnotationPlacer.h"
 #include "mitkAnnotationService.h"
 #include "mitkGetPropertyService.h"
+#include "mitkOverlayLayouter2D.h"
 #include "mitkOverlayManager.h"
 #include "mitkRenderingManager.h"
 #include <mitkColorBarOverlay.h>
@@ -471,7 +472,7 @@ void QmitkOverlayManagerView::OnAddOverlay()
 
     mitk::BaseRenderer *renderer =
       this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-    mitk::AnnotationPlacer::AddOverlay(overlay, renderer);
+    mitk::OverlayLayouter2D::AddOverlay(overlay, renderer);
     m_OverlayMap[overlay->GetMicroserviceID()] = overlay;
   }
   OnActivateOverlayList();
@@ -480,6 +481,7 @@ void QmitkOverlayManagerView::OnAddOverlay()
 mitk::Overlay::Pointer QmitkOverlayManagerView::CreateTextOverlay2D()
 {
   mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  to->SetText("Test");
   return to.GetPointer();
 }
 

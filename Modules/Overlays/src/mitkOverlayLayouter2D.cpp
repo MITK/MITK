@@ -29,13 +29,31 @@ namespace mitk
   const std::string OverlayLayouter2D::PROP_LAYOUT = "Layout";
   const std::string OverlayLayouter2D::PROP_LAYOUT_PRIORITY = PROP_LAYOUT + ".priority";
   const std::string OverlayLayouter2D::PROP_LAYOUT_ALIGNMENT = PROP_LAYOUT + ".alignment";
+  const std::string OverlayLayouter2D::PROP_LAYOUT_MARGIN = PROP_LAYOUT + ".margin";
+
+  void OverlayLayouter2D::SetMargin2D(Overlay *overlay, const Point2D &OffsetVector)
+  {
+    mitk::Point2dProperty::Pointer OffsetVectorProperty = mitk::Point2dProperty::New(OffsetVector);
+    overlay->SetProperty(PROP_LAYOUT_MARGIN, OffsetVectorProperty.GetPointer());
+  }
+
+  Point2D OverlayLayouter2D::GetMargin2D(Overlay *overlay)
+  {
+    mitk::Point2D OffsetVector;
+    OffsetVector.Fill(0);
+    overlay->GetPropertyValue<mitk::Point2D>(PROP_LAYOUT_MARGIN, OffsetVector);
+    return OffsetVector;
+  }
 
   OverlayLayouter2D::OverlayLayouter2D(const std::string &rendererId)
     : AbstractAnnotationRenderer(rendererId, OverlayLayouter2D::ANNOTATIONRENDERER_ID)
   {
   }
 
-  void OverlayLayouter2D::AddAlignmentProperty(Overlay *overlay, Alignment activeAlignment, int priority)
+  void OverlayLayouter2D::AddAlignmentProperty(Overlay *overlay,
+                                               Alignment activeAlignment,
+                                               Point2D margin,
+                                               int priority)
   {
     EnumerationProperty::Pointer alignmentProperty(mitk::EnumerationProperty::New());
     alignmentProperty->AddEnum("TopLeft", TopLeft);
@@ -49,21 +67,28 @@ namespace mitk
     alignmentProperty->SetValue(activeAlignment);
     overlay->AddProperty(PROP_LAYOUT_ALIGNMENT, alignmentProperty.GetPointer());
     overlay->SetIntProperty(PROP_LAYOUT_PRIORITY, priority);
+    SetMargin2D(overlay, margin);
   }
 
   void OverlayLayouter2D::OnAnnotationRenderersChanged()
   {
+    if (!this->GetCurrentBaseRenderer())
+      return;
     m_OverlayContainerMap.clear();
     for (Overlay *overlay : this->GetServices())
     {
+      if (!overlay)
+        continue;
       BaseProperty *prop = overlay->GetProperty(PROP_LAYOUT_ALIGNMENT);
       EnumerationProperty *enumProb = dynamic_cast<EnumerationProperty *>(prop);
       Alignment currentAlignment = TopLeft;
+      Point2D margin;
+      margin.Fill(5);
       int priority = -1;
       overlay->GetIntProperty(PROP_LAYOUT_PRIORITY, priority);
       if (!enumProb)
       {
-        AddAlignmentProperty(overlay, currentAlignment, priority);
+        AddAlignmentProperty(overlay, currentAlignment, margin, priority);
       }
       else
       {
@@ -84,6 +109,7 @@ namespace mitk
       }
       overlayVec.push_back(overlay);
     }
+    this->PrepareLayout();
   }
 
   OverlayLayouter2D::~OverlayLayouter2D() {}
@@ -103,31 +129,41 @@ namespace mitk
     return result;
   }
 
-  void OverlayLayouter2D::AddOverlay(Overlay *overlay, const std::string &rendererID, Alignment alignment, int priority)
+  void OverlayLayouter2D::OnRenderWindowModified() { PrepareLayout(); }
+  void OverlayLayouter2D::AddOverlay(
+    Overlay *overlay, const std::string &rendererID, Alignment alignment, double marginX, double marginY, int priority)
   {
     GetAnnotationRenderer(rendererID);
     us::ServiceProperties props;
     props[Overlay::US_PROPKEY_AR_ID] = ANNOTATIONRENDERER_ID;
     props[Overlay::US_PROPKEY_RENDERER_ID] = rendererID;
     overlay->RegisterAsMicroservice(props);
-    AddAlignmentProperty(overlay, alignment, priority);
+    Point2D margin;
+    margin[0] = marginX;
+    margin[1] = marginY;
+    AddAlignmentProperty(overlay, alignment, margin, priority);
   }
 
-  void OverlayLayouter2D::AddOverlay(Overlay *overlay, BaseRenderer *renderer, Alignment alignment, int priority)
+  void OverlayLayouter2D::AddOverlay(
+    Overlay *overlay, BaseRenderer *renderer, Alignment alignment, double marginX, double marginY, int priority)
   {
-    AddOverlay(overlay, renderer->GetName(), alignment, priority);
+    AddOverlay(overlay, renderer->GetName(), alignment, marginX, marginY, priority);
   }
 
   void OverlayLayouter2D::PrepareLayout()
   {
-    //    std::vector<mitk::Overlay *> managedOverlays = this->GetServices();
-    //    std::list<mitk::Overlay *>::iterator it;
-    //    mitk::Overlay::Bounds bounds;
-    //    int *size = this->GetCurrentBaseRenderer()->GetVtkRenderer()->GetSize();
-
-    // The alignment enum defines the type of this layouter
+    if (!this->GetCurrentBaseRenderer())
+      return;
+    int *size = this->GetCurrentBaseRenderer()->GetVtkRenderer()->GetSize();
+    PrepareTopLeftLayout(size);
+    PrepareTopLayout(size);
+    PrepareTopRightLayout(size);
+    PrepareBottomLeftLayout(size);
+    PrepareBottomLayout(size);
+    PrepareBottomRightLayout(size);
+    PrepareLeftLayout(size);
+    PrepareRightLayout(size);
   }
-
   void OverlayLayouter2D::PrepareTopLeftLayout(int *displaySize)
   {
     double posX, posY;
@@ -137,12 +173,11 @@ namespace mitk
     mitk::Overlay::Bounds bounds;
     for (mitk::Overlay *overlay : m_OverlayContainerMap[TopLeft])
     {
-      margin = overlay->GetMargin2D();
+      margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
-      posX += margin[0];
       posY -= bounds.Size[1] + margin[1];
-      bounds.Position[0] = posX;
+      bounds.Position[0] = posX + margin[0];
       bounds.Position[1] = posY;
       overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
     }
@@ -156,7 +191,7 @@ namespace mitk
     mitk::Overlay::Bounds bounds;
     for (mitk::Overlay *overlay : m_OverlayContainerMap[Top])
     {
-      margin = overlay->GetMargin2D();
+      margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
       posX = displaySize[0] / 2 - bounds.Size[0] / 2;
@@ -175,7 +210,7 @@ namespace mitk
     mitk::Overlay::Bounds bounds;
     for (mitk::Overlay *overlay : m_OverlayContainerMap[TopRight])
     {
-      margin = overlay->GetMargin2D();
+      margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
       posX = displaySize[0] - (bounds.Size[0] + margin[0]);
@@ -185,6 +220,45 @@ namespace mitk
       overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
     }
   }
+
+  void OverlayLayouter2D::PrepareRightLayout(int *displaySize)
+  {
+    double posY;
+    Point2D margin;
+    double height = GetHeight(m_OverlayContainerMap[Right], GetCurrentBaseRenderer());
+    posY = (height / 2.0 + displaySize[1]) / 2.0;
+    mitk::Overlay::Bounds bounds;
+    for (mitk::Overlay *overlay : m_OverlayContainerMap[Right])
+    {
+      margin = GetMargin2D(overlay);
+      bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
+
+      posY -= bounds.Size[1] + margin[1];
+      bounds.Position[0] = displaySize[0] - (bounds.Size[0] + margin[0]);
+      bounds.Position[1] = posY + margin[1];
+      overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
+    }
+  }
+
+  void OverlayLayouter2D::PrepareLeftLayout(int *displaySize)
+  {
+    double posY;
+    Point2D margin;
+    double height = GetHeight(m_OverlayContainerMap[Left], GetCurrentBaseRenderer());
+    posY = (height / 2.0 + displaySize[1]) / 2.0;
+    mitk::Overlay::Bounds bounds;
+    for (mitk::Overlay *overlay : m_OverlayContainerMap[Left])
+    {
+      margin = GetMargin2D(overlay);
+      bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
+
+      posY -= bounds.Size[1] + margin[1];
+      bounds.Position[0] = margin[0];
+      bounds.Position[1] = posY;
+      overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
+    }
+  }
+
   void OverlayLayouter2D::PrepareBottomLeftLayout(int * /*displaySize*/)
   {
     double posX, posY;
@@ -194,7 +268,7 @@ namespace mitk
     mitk::Overlay::Bounds bounds;
     for (mitk::Overlay *overlay : m_OverlayContainerMap[BottomLeft])
     {
-      margin = overlay->GetMargin2D();
+      margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
       bounds.Position[0] = posX + margin[0];
@@ -212,7 +286,7 @@ namespace mitk
     mitk::Overlay::Bounds bounds;
     for (mitk::Overlay *overlay : m_OverlayContainerMap[Bottom])
     {
-      margin = overlay->GetMargin2D();
+      margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
       posX = displaySize[0] / 2 - bounds.Size[0] / 2;
@@ -231,51 +305,12 @@ namespace mitk
     mitk::Overlay::Bounds bounds;
     for (mitk::Overlay *overlay : m_OverlayContainerMap[BottomRight])
     {
-      margin = overlay->GetMargin2D();
+      margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
       posX = displaySize[0] - (bounds.Size[0] + margin[0]);
       bounds.Position[0] = posX;
       bounds.Position[1] = posY + margin[1];
-      overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
-      posY += bounds.Size[1] + margin[1];
-    }
-  }
-  void OverlayLayouter2D::PrepareLeftLayout(int *displaySize)
-  {
-    double posX, posY;
-    Point2D margin;
-    posX = displaySize[0];
-    posY = displaySize[1] / 2.0;
-    mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[Left])
-    {
-      margin = overlay->GetMargin2D();
-      bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
-
-      posY = (displaySize[1] - bounds.Size[1]) / 2.0;
-      posX = displaySize[0] - (bounds.Size[0] + margin[0]);
-      bounds.Position[0] = posX;
-      bounds.Position[1] = posY + margin[1];
-      overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
-      posY += bounds.Size[1];
-    }
-  }
-  void OverlayLayouter2D::PrepareRightLayout(int *displaySize)
-  {
-    double posX, posY;
-    Point2D margin;
-    posX = 0;
-    posY = displaySize[1] / 2.0;
-    mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[Right])
-    {
-      margin = overlay->GetMargin2D();
-      bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
-
-      posY = (displaySize[1] - bounds.Size[1]) / 2.0;
-      bounds.Position[0] = posX + margin[0];
-      bounds.Position[1] = posY;
       overlay->SetBoundsOnDisplay(this->GetCurrentBaseRenderer(), bounds);
       posY += bounds.Size[1] + margin[1];
     }
@@ -288,7 +323,7 @@ namespace mitk
     {
       Overlay::Bounds bounds = overlay->GetBoundsOnDisplay(renderer);
       height += bounds.Size[0];
-      height += overlay->GetMargin2D()[0];
+      height += GetMargin2D(overlay)[0];
     }
     return height;
   }

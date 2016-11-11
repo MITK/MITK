@@ -21,10 +21,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <memory>
 #include <vector>
 
+class vtkObject;
+
 namespace mitk
 {
   class AbstractAnnotationRenderer;
   class Overlay;
+  class BaseRenderer;
 
   class MITKCORE_EXPORT AnnotationService
   {
@@ -42,13 +45,15 @@ namespace mitk
 
     static void UpdateAnnotationRenderer(const std::string &rendererID);
 
-    static void BaseRendererChanged(const std::string &rendererID);
+    static void BaseRendererChanged(BaseRenderer *renderer);
 
     static mitk::Overlay *GetOverlay(const std::string &overlayID);
 
   private:
     AnnotationService(const AnnotationService &);
     AnnotationService &operator=(const AnnotationService &);
+
+    static void RenderWindowCallback(vtkObject *caller, unsigned long, void *, void *);
   };
 }
 

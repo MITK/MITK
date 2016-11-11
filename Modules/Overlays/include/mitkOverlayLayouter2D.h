@@ -35,6 +35,7 @@ namespace mitk
     static const std::string PROP_LAYOUT;
     static const std::string PROP_LAYOUT_PRIORITY;
     static const std::string PROP_LAYOUT_ALIGNMENT;
+    static const std::string PROP_LAYOUT_MARGIN;
     enum Alignment
     {
       TopLeft,
@@ -56,19 +57,28 @@ namespace mitk
 
     static OverlayLayouter2D *GetAnnotationRenderer(const std::string &rendererID);
 
+    void OnRenderWindowModified();
+
     static void AddOverlay(Overlay *overlay,
                            const std::string &rendererID,
                            Alignment alignment = TopLeft,
+                           double marginX = 5,
+                           double marginY = 5,
                            int priority = -1);
 
-    static void AddOverlay(Overlay *overlay, BaseRenderer *renderer, Alignment alignment = TopLeft, int priority = -1);
+    static void AddOverlay(Overlay *overlay,
+                           BaseRenderer *renderer,
+                           Alignment alignment = TopLeft,
+                           double marginX = 5,
+                           double marginY = 5,
+                           int priority = -1);
 
     void PrepareLayout();
 
   private:
     OverlayLayouter2D(const std::string &rendererId);
 
-    static void AddAlignmentProperty(Overlay *overlay, Alignment activeAlignment, int priority);
+    static void AddAlignmentProperty(Overlay *overlay, Alignment activeAlignment, Point2D margin, int priority);
 
     void PrepareTopLeftLayout(int *displaySize);
     void PrepareTopLayout(int *displaySize);
@@ -84,6 +94,8 @@ namespace mitk
     virtual void OnAnnotationRenderersChanged();
     static const std::string ANNOTATIONRENDERER_ID;
     OverlayLayouterContainerMap m_OverlayContainerMap;
+    static void SetMargin2D(Overlay *overlay, const Point2D &OffsetVector);
+    static Point2D GetMargin2D(Overlay *overlay);
   };
 
 } // namespace mitk

@@ -15,7 +15,7 @@
     <Signal-high>950.000</Signal-high>
   </Signal>
   <Seriell>
-    <PortNumber>7</PortNumber>
+    <PortNumber>5</PortNumber>
     <Baud>115200</Baud>
     <DataBits>8</DataBits>
     <Parity>0</Parity>
@@ -32,7 +32,7 @@
 </Motor>
 <PumpLaser>
   <Seriell>
-    <PortNumber>6</PortNumber>
+    <PortNumber>4</PortNumber>
     <Baud>115200</Baud>
     <DataBits>8</DataBits>
     <Parity>N</Parity>

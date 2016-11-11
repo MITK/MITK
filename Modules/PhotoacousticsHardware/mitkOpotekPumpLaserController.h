@@ -42,7 +42,7 @@ namespace mitk {
       mitkClassMacroItkParent(OpotekPumpLaserController, itk::LightObject);
       itkFactorylessNewMacro(Self);
 
-      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
+      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6, STATE7 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
       /**
        * \brief Opens a connection to the device
        *

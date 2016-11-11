@@ -74,7 +74,7 @@ mitk::OpotekPumpLaserController::~OpotekPumpLaserController()
 
 std::string mitk::OpotekPumpLaserController::SendAndReceiveLine(const std::string* input, std::string* answer)
 {
-  MITK_INFO << "[]" << input->c_str();
+  MITK_INFO << "[Pump Laser Debug] sending: " << input->c_str();
   if (input == nullptr)
     return "SERIALSENDERROR";
   
@@ -97,7 +97,7 @@ std::string mitk::OpotekPumpLaserController::SendAndReceiveLine(const std::strin
   m_SerialCommunication->ClearReceiveBuffer();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   m_SerialCommunication->ClearReceiveBuffer();
-  MITK_INFO << "[]" << answer->c_str();
+  MITK_INFO << "[Pump Laser Debug] received: " << answer->c_str();
   return "OK";
 }
 
@@ -115,7 +115,7 @@ void mitk::OpotekPumpLaserController::LoadResorceFile(std::string filename, std:
   }
   else
   {
-    MITK_ERROR << "Resource file was not valid";
+    MITK_ERROR << "[Pump Laser Debug] Resource file was not valid";
   }
 }
 
@@ -161,7 +161,7 @@ bool mitk::OpotekPumpLaserController::OpenConnection(std::string configurationFi
   {
     m_SerialCommunication->CloseConnection();
     m_SerialCommunication = nullptr;
-    MITK_ERROR << "[Pump Laser] " << "Can not open serial port";
+    MITK_ERROR << "[Pump Laser Debug] " << "Can not open serial port";
     return false;
   }
 
@@ -210,7 +210,7 @@ mitk::OpotekPumpLaserController::PumpLaserState mitk::OpotekPumpLaserController:
   std::string answer("");
   command->assign("STATE");
   this->SendAndReceiveLine(command, &answer);
-  MITK_INFO << "get state:" << answer;
+  MITK_INFO << "[Pump Laser Debug] get state:" << answer;
   if (answer == "STATE = 0\n")
     m_State = STATE0;
   else if(answer == "STATE = 1\n")
@@ -251,6 +251,13 @@ mitk::OpotekPumpLaserController::PumpLaserState mitk::OpotekPumpLaserController:
   else if (answer == "STATE = 6\n")
   {
     m_State = STATE6;
+    m_FlashlampRunning = true;
+    m_ShutterOpen = true;
+    m_LaserEmission = true;
+  }
+  else if (answer == "STATE = 7\n")
+  {
+    m_State = STATE7;
     m_FlashlampRunning = true;
     m_ShutterOpen = true;
     m_LaserEmission = true;
@@ -300,12 +307,12 @@ bool mitk::OpotekPumpLaserController::StartFlashing()
     }
     else
     {
-      MITK_ERROR << "[Pump Laser] " << "Cannot start flashlamps." << " Laser is telling me: " << answer;
+      MITK_ERROR << "[Pump Laser Debug] " << "Cannot start flashlamps." << " Laser is telling me: " << answer;
       return false;
     }
   }
   else
-    MITK_INFO << "[Pump Laser] " << "Flashlamps are already running";
+    MITK_INFO << "[Pump Laser Debug] " << "Flashlamps are already running";
   
   return true;
 }
@@ -331,13 +338,13 @@ bool mitk::OpotekPumpLaserController::StopFlashing()
     }
     else
     {  
-      MITK_ERROR << "[Pump Laser] " << "Cannot Stop flashlamps." << " Laser is telling me: " << answer;
+      MITK_ERROR << "[Pump Laser Debug] " << "Cannot Stop flashlamps." << " Laser is telling me: " << answer;
       return false;
     }
 
   }
   else
-    MITK_INFO << "[Pump Laser] " << "Flashlamps are not running";
+    MITK_INFO << "[Pump Laser Debug] " << "Flashlamps are not running";
 
   return true;
 }
@@ -360,13 +367,13 @@ bool mitk::OpotekPumpLaserController::StartQswitching()
     }
     else
     {
-      MITK_ERROR << "[Pump Laser] " << "Cannot start Qswitch." << " Laser is telling me: " << answer;
+      MITK_ERROR << "[Pump Laser Debug] " << "Cannot start Qswitch." << " Laser is telling me: " << answer;
       return false;
     }
   }
   else
   {
-    MITK_INFO << "[Pump Laser] " << "Laser is already emitting";
+    MITK_INFO << "[Pump Laser Debug] " << "Laser is already emitting";
     return true;
   }
 }
@@ -386,7 +393,7 @@ bool mitk::OpotekPumpLaserController::StopQswitching()
       m_LaserEmission = false;
     }
     else
-      MITK_ERROR << "[Pump Laser] " << "Cannot stop Q-switch.";
+      MITK_ERROR << "[Pump Laser Debug] " << "Cannot stop Q-switch.";
 
   }
   return true;

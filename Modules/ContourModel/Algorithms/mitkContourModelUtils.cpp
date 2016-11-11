@@ -176,61 +176,12 @@ void mitk::ContourModelUtils::FillContourInSlice(ContourModel *projectedContour,
   imgstenc->ReverseStencilOff();
   imgstenc->SetBackgroundValue(outval);
   imgstenc->Update();
-  // mitk::LabelSetImage* labelImage; // Todo: Get the working Image
-  // int activePixelValue = eraseMode;
-  // labelImage = dynamic_cast<LabelSetImage*>(workingImage.GetPointer());
-  // if (labelImage)
-  //{
-  //  activePixelValue = labelImage->GetActiveLabel()->GetValue();
-  //}
 
   // Fill according to the Color Team
   vtkSmartPointer<vtkImageData> filledImage = imgstenc->GetOutput();
   vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
   FillSliceInSlice(filledImage, resultImage, workingImage, paintingPixelValue);
-  /*
-  count = filledImage->GetNumberOfPoints();
-  if (activePixelValue == 0)
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
-      {
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-      }
-    }
-  }
-  else if (eraseMode != 0) // We are not erasing...
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
-      {
-        int targetValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
-        if (labelImage)
-        {
-          if (!labelImage->GetLabel(targetValue)->GetLocked())
-          {
-            resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-          }
-        } else
-        {
-          resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-        }
-      }
-    }
-  }
-  else
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if ((resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue) &
-  (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1))
-      {
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-      }
-    }
-  }*/
+
   sliceImage->SetVolume(resultImage->GetScalarPointer());
 }
 

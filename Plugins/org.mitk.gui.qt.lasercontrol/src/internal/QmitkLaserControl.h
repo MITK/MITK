@@ -26,8 +26,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFuture>
 #include <QFutureWatcher>
+
+// Photoacoustics Hardware
 #include <mitkOpotekPumpLaserController.h>
 #include <mitkGalilMotor.h>
+#include <mitkOphirPyro.h>
 
 #include <vector>
 
@@ -60,6 +63,7 @@ public:
 
     void ShutterCountDown();
     void EnableLaser();
+    void ShowEnergy();
 
     void ToggleFlashlamp();
     void ToggleQSwitch();
@@ -79,13 +83,17 @@ public:
     Ui::OPOLaserControlControls m_Controls;
     bool m_PumpLaserConnected;
     bool m_OPOConnected;
+    bool m_PyroConnected;
     bool m_SyncFromSpinBox;
     bool m_SyncFromSlider;
+    double m_CurrentPulseEnergy;
 
-    QFutureWatcher<void> m_Watcher;
+    QFutureWatcher<void> m_ShutterWatcher;
+    QFutureWatcher<void> m_EnergyWatcher;
 
     mitk::OpotekPumpLaserController::Pointer m_PumpLaserController;
     mitk::GalilMotor::Pointer m_OPOMotor;
+    mitk::OphirPyro::Pointer m_Pyro;
 
 };
 

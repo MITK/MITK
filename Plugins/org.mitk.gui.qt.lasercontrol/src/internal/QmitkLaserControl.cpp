@@ -25,9 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 #include <QtConcurrentRun>
 
-//mitk
-#include <mitkOpotekPumpLaserController.h>
-
 const std::string OPOLaserControl::VIEW_ID = "org.mitk.views.lasercontrol";
 
 void OPOLaserControl::SetFocus()
@@ -45,13 +42,14 @@ void OPOLaserControl::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.buttonQSwitch, SIGNAL(clicked()), this, SLOT(ToggleQSwitch()));
   connect(m_Controls.sliderWavelength, SIGNAL(valueChanged(int)), this, SLOT(SyncWavelengthSetBySlider()));
   connect(m_Controls.spinBoxWavelength, SIGNAL(valueChanged(double)), this, SLOT(SyncWavelengthSetBySpinBox()));
-  connect(&m_Watcher, SIGNAL(finished()), this, SLOT(EnableLaser()));
+  connect(&m_ShutterWatcher, SIGNAL(finished()), this, SLOT(EnableLaser()));
 
   m_SyncFromSpinBox = true;
   m_SyncFromSlider = true;
 
   m_PumpLaserConnected = false;
   m_OPOConnected = false;
+  m_PyroConnected = false;
 }
 
 void OPOLaserControl::EnableLaser()
@@ -97,18 +95,32 @@ void OPOLaserControl::InitLaser()
       m_Controls.buttonQSwitch->setEnabled(false);
       m_Controls.buttonInitLaser->setText("Reset and Release Laser");
 
-      std::string command("TRIG EE"); // set both Triggers external
       std::string answer("");
+      std::string triggerCommand("TRIG ");
+      if (m_Controls.checkBoxTriggerExternally->isChecked())
+      {
+        triggerCommand.append("EE"); // set both Triggers external
+        m_PumpLaserController->SendAndReceiveLine(&triggerCommand, &answer);
+        MITK_INFO << answer;
+      }
+      else
+      {
+        triggerCommand.append("II"); // set both Triggers internal
+        m_PumpLaserController->SendAndReceiveLine(&triggerCommand, &answer);
+        MITK_INFO << answer;
+        std::string energyCommand("QDLY 30");
+        m_PumpLaserController->SendAndReceiveLine(&energyCommand, &answer);
+        MITK_INFO << answer;
+      }
 
-      m_PumpLaserController->SendAndReceiveLine(&command, &answer);
-      MITK_INFO << answer;
       m_PumpLaserConnected = true;
       this->GetState();
     }
     else
     {
-      MITK_ERROR << "Opotek Pump Laser Initialization Failed.";
+      QMessageBox::warning(NULL, "Laser Control", "Opotek Pump Laser Initialization Failed.");
       m_Controls.buttonInitLaser->setText("Init Laser");
+      m_Controls.buttonInitLaser->setEnabled(true);
       return;
     }
   }
@@ -124,7 +136,7 @@ void OPOLaserControl::InitLaser()
     }
     else
     {
-      MITK_ERROR << "Opotek Pump Laser Release failed.";
+      QMessageBox::warning(NULL, "Laser Control", "Opotek Pump Laser Release Failed.");
       m_Controls.buttonInitLaser->setText("Reset and Release Laser");
     }
   }
@@ -146,7 +158,7 @@ void OPOLaserControl::InitLaser()
     }
     else
     {
-      MITK_ERROR << "OPO Initialization Failed.";
+      QMessageBox::warning(NULL, "Laser Control", "OPO Initialization Failed.");
       m_Controls.buttonInitLaser->setText("Init Laser");
     }
   }
@@ -162,12 +174,35 @@ void OPOLaserControl::InitLaser()
     }
     else
     {
-      MITK_ERROR << "OPO release failed.";
+      QMessageBox::warning(NULL, "Laser Control", "OPO Release Failed.");
       m_Controls.buttonInitLaser->setText("Reset and Release Laser");
     }
   }
   m_Controls.buttonInitLaser->setEnabled(true);
   this->GetState();
+  if (!m_PyroConnected)
+  {
+    m_Pyro = mitk::OphirPyro::New();
+    MITK_INFO << "[Pyro Debug] OpenConnection: " << m_Pyro->OpenConnection();
+    MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
+    m_CurrentPulseEnergy = 0;
+    m_PyroConnected = true;
+    //QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShowEnergy);
+    MITK_INFO << "[Pyro Debug] 1";
+    //m_EnergyWatcher.setFuture(future);
+    MITK_INFO << "[Pyro Debug] 12";
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    unsigned int drg = m_Pyro->GetDataFromSensor();
+    MITK_INFO << "[Pyro Debug] 13";
+  }
+  else
+  {
+    MITK_INFO << "[Pyro Debug] StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
+    MITK_INFO << "[Pyro Debug] CloseConnection: " << m_Pyro->CloseConnection();
+
+    m_CurrentPulseEnergy = 0;
+    m_PyroConnected = false;
+  }
 }
 
 void OPOLaserControl::TuneWavelength()
@@ -235,8 +270,20 @@ void OPOLaserControl::ShutterCountDown()
   std::this_thread::sleep_for(std::chrono::seconds(1));
   m_Controls.buttonQSwitch->setText("1s ...");
   std::this_thread::sleep_for(std::chrono::seconds(1));
-  //m_Controls.buttonQSwitch->setEnabled(true);
-  //m_Controls.buttonQSwitch->setText("Start Laser");
+}
+
+void OPOLaserControl::ShowEnergy()
+{
+  while(m_PyroConnected)
+  {
+    MITK_INFO << "[Pyro Debug] 2";
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    //m_Pyro->GetDataFromSensor();
+    MITK_INFO << "[Pyro Debug] 2";
+    //m_CurrentPulseEnergy = 60000 * m_Pyro->LookupCurrentPulseEnergy();
+    MITK_INFO << "[Pyro Debug] 22";
+    //m_Controls.labelEnergy->setText(std::to_string(m_CurrentPulseEnergy).append(" mJ").c_str());
+  }
 }
 
 void OPOLaserControl::ToggleFlashlamp()
@@ -247,7 +294,7 @@ void OPOLaserControl::ToggleFlashlamp()
     if (m_PumpLaserController->StartFlashing())
     {
       QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShutterCountDown);
-      m_Watcher.setFuture(future);
+      m_ShutterWatcher.setFuture(future);
     }
     else
       m_Controls.buttonFlashlamp->setText("Start Lamp");

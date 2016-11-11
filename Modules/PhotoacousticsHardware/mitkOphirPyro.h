@@ -42,12 +42,21 @@ namespace mitk {
 
     virtual bool OpenConnection();
     virtual bool CloseConnection();
-    virtual bool AcquireData();
+    virtual bool StartDataAcquisition();
+    virtual bool StopDataAcquisition();
+    unsigned int GetDataFromSensor();
+    virtual double LookupCurrentPulseEnergy();
     virtual double GetNextPulseEnergy();
+    virtual double LookupCurrentPulseEnergy(double* timestamp, int* status);
+    virtual double GetNextPulseEnergy(double* timestamp, int* status);
 
   protected:
     OphirPyro();
     virtual ~OphirPyro();
+    OphirPyroWrapper ophirAPI;
+    char* m_SerialNumber;
+    int m_DeviceHandle;
+    bool m_Connected;
     std::vector<double> m_PulseEnergy;
     std::vector<double> m_PulseTime;
     std::vector<int> m_PulseStatus;

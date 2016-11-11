@@ -39,6 +39,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 using namespace std;
 
+static std::vector<std::string> splitString(const std::string &s, char delim=' ')
+{
+  std::vector < std::string > elems;
+  std::stringstream ss(s);
+  std::string item;
+  while (std::getline(ss, item, delim))
+  {
+    elems.push_back(item);
+  }
+  return elems;
+}
+
 class QmitkPreferencesDialogPrivate : public Ui::QmitkPreferencesDialog
 {
 public:
@@ -49,7 +61,7 @@ public:
   struct PrefPage
   {
     PrefPage(QString _id, QString _name, QString _category
-      , QString _className, QString _keywords, berry::IConfigurationElement::Pointer _confElem)
+             , QString _className, QString _keywords, berry::IConfigurationElement::Pointer _confElem)
       : id(_id), name(_name), category(_category), className(_className), keywords(_keywords),
         prefPage(nullptr), confElem(_confElem), treeWidgetItem(nullptr)
     {}
@@ -95,7 +107,7 @@ public:
         //# collect keywords
         QList<berry::IConfigurationElement::Pointer> keywordRefs = (*prefPagesIt)->GetChildren("keywordreference"); // get all keyword references
         for (keywordRefsIt = keywordRefs.begin()
-          ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
+             ; keywordRefsIt != keywordRefs.end(); ++keywordRefsIt) // iterate over all refs
         {
           QString keywordRefId = (*keywordRefsIt)->GetAttribute("id"); // get referenced id
 
@@ -171,7 +183,7 @@ void QmitkPreferencesDialog::SetSelectedPage(const QString& id)
 void QmitkPreferencesDialog::OnImportButtonClicked()
 {
   int answer = QMessageBox::question(this, "Importing Preferences"
-    , "All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?", QMessageBox::Yes | QMessageBox::No );
+                                     , "All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?", QMessageBox::Yes | QMessageBox::No );
   if(answer == QMessageBox::No)
     return;
 
@@ -354,7 +366,7 @@ void QmitkPreferencesDialog::UpdateTree()
   std::list< QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator > deferredItems;
 
   for (QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
-    it != d->m_PrefPages.end(); ++it)
+       it != d->m_PrefPages.end(); ++it)
   {
     if (it->treeWidgetItem == nullptr)
     {
@@ -406,20 +418,42 @@ void QmitkPreferencesDialog::UpdateTree()
     }
   }
 
+  //First, set all pages to hidden to avoid prolems
+  //when iterating over the child page first which contains a specific keyword
+  //and sets the parent to visible
+  //but after this the parent is searched for the keyword. However, the keyword might not be available
+  //so the parent and all of its children will be set to hidden.
+  if(!keyword.isEmpty())
+  {
+    for (QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
+         it != d->m_PrefPages.end(); ++it)
+    {
+      it->treeWidgetItem->setHidden(true);
+    }
+  }
   // we have to iterate over the list a second time, as only
   // now all parents and items are guaranteed to be created
   for (QList<QmitkPreferencesDialogPrivate::PrefPage>::iterator it = d->m_PrefPages.begin();
-    it != d->m_PrefPages.end(); ++it)
+       it != d->m_PrefPages.end(); ++it)
   {
-
     // hide treeWidgetItem if keyword not matches
     if(!keyword.isEmpty())
     {
-      if (it->keywords.indexOf(keyword) == -1)
+      //Split text of search box into multiple single strings
+      vector<string> keywordsAvailable = splitString(keyword.toUtf8().constData());
+      bool foundAll = true;
+
+      //perform an AND-search
+      for(unsigned int i = 0; i < keywordsAvailable.size(); i++)
       {
-        it->treeWidgetItem->setHidden(true);
+        if (it->keywords.indexOf(QString::fromStdString(keywordsAvailable[i])) == -1)
+        {
+          foundAll = false;
+          break;
+        }
       }
-      else
+
+      if(foundAll)
       {
         //#make the whole branch visible
         QTreeWidgetItem* treeWidgetParent = it->treeWidgetItem->parent();

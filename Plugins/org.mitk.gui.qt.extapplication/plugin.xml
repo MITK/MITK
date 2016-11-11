@@ -54,7 +54,7 @@
        name="Perspectives"
        category="org.mitk.GeneralPreferencePage"
        class="berry::ExtensionFactory:perspectivesPreferencePage">
-       <keywordReference id="org.blueberry.ui.perspectives"/>
+       <keywordreference id="org.blueberry.ui.perspectives"/>
      </page>
    </extension>
 </plugin>

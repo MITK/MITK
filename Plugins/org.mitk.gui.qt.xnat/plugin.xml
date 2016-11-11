@@ -28,7 +28,7 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.XnatConnectionPreferencePageKeywords" label="xnat session connection login"></keyword>
+    <keyword id="org.mitk.gui.qt.application.XnatConnectionPreferencePageKeywords" label="xnat session connection login settings server address port username password download path network proxy silent mode test connection"></keyword>
   </extension>
 
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">

@@ -11,15 +11,17 @@
     </page>
     <page id="org.mitk.ExternalProgramsPreferencePage" name="External Programs"
           class="QmitkExternalProgramsPreferencePage" >
+          <keywordreference id="org.mitk.ExternalProgramsPreferencePageKeywords"/>
     </page>
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.ExternalProgramsPreferencePageKeywords" label="External program gnuplot ffmpeg libav"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="3D mouse"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="WiiMote"/>
     <keyword id="org.mitk.InputDevicesPreferencePageKeywords" label="Input Devices"/>
-    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances"/>
-    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene"/>
+    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="application instances running multiple behavior repeated invocations mitk"/>
+    <keyword id="org.mitk.AppInstancesPreferencePageKeywords" label="scene file .mitk"/>
   </extension>
 
   <extension point="org.blueberry.ui.views">

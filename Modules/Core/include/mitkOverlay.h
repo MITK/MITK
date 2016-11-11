@@ -408,6 +408,10 @@ namespace mitk
 
     mitkClassMacroItkParent(Overlay, itk::Object);
 
+    void SetMargin2D(const Point2D &OffsetVector);
+
+    mitk::Point2D GetMargin2D() const;
+
   protected:
     /** \brief explicit constructor which disallows implicit conversions */
     Overlay();

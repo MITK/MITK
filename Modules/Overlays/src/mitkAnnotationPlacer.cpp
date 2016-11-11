@@ -53,6 +53,7 @@ namespace mitk
     props[Overlay::US_PROPKEY_RENDERER_ID] = rendererID;
     overlay->RegisterAsMicroservice(props);
   }
+
   void AnnotationPlacer::AddOverlay(Overlay *overlay, BaseRenderer *renderer)
   {
     AddOverlay(overlay, renderer->GetName());

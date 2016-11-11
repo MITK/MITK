@@ -32,6 +32,23 @@ namespace mitk
   class MITKOVERLAYS_EXPORT OverlayLayouter2D : public AbstractAnnotationRenderer
   {
   public:
+    static const std::string PROP_LAYOUT;
+    static const std::string PROP_LAYOUT_PRIORITY;
+    static const std::string PROP_LAYOUT_ALIGNMENT;
+    enum Alignment
+    {
+      TopLeft,
+      Top,
+      TopRight,
+      BottomLeft,
+      Bottom,
+      BottomRight,
+      Left,
+      Right
+    };
+    typedef std::vector<mitk::Overlay *> OverlayVector;
+    typedef std::map<Alignment, OverlayVector> OverlayLayouterContainerMap;
+
     /** \brief virtual destructor in order to derive from this class */
     virtual ~OverlayLayouter2D();
 
@@ -39,10 +56,34 @@ namespace mitk
 
     static OverlayLayouter2D *GetAnnotationRenderer(const std::string &rendererID);
 
+    static void AddOverlay(Overlay *overlay,
+                           const std::string &rendererID,
+                           Alignment alignment = TopLeft,
+                           int priority = -1);
+
+    static void AddOverlay(Overlay *overlay, BaseRenderer *renderer, Alignment alignment = TopLeft, int priority = -1);
+
+    void PrepareLayout();
+
   private:
     OverlayLayouter2D(const std::string &rendererId);
 
+    static void AddAlignmentProperty(Overlay *overlay, Alignment activeAlignment, int priority);
+
+    void PrepareTopLeftLayout(int *displaySize);
+    void PrepareTopLayout(int *displaySize);
+    void PrepareTopRightLayout(int *displaySize);
+    void PrepareBottomLeftLayout(int *displaySize);
+    void PrepareBottomLayout(int *displaySize);
+    void PrepareBottomRightLayout(int *displaySize);
+    void PrepareLeftLayout(int *displaySize);
+    void PrepareRightLayout(int *displaySize);
+
+    static double GetHeight(OverlayVector &overlays, BaseRenderer *renderer);
+
+    virtual void OnAnnotationRenderersChanged();
     static const std::string ANNOTATIONRENDERER_ID;
+    OverlayLayouterContainerMap m_OverlayContainerMap;
   };
 
 } // namespace mitk

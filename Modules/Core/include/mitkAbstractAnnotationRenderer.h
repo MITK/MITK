@@ -59,6 +59,9 @@ namespace mitk
     static const std::string US_PROPKEY_ID;
     static const std::string US_PROPKEY_RENDERER_ID;
 
+  protected:
+    BaseRenderer *GetCurrentBaseRenderer();
+
   private:
     /** \brief copy constructor */
     AbstractAnnotationRenderer(const AbstractAnnotationRenderer &);
@@ -72,8 +75,7 @@ namespace mitk
 
     void RemovedService(const ServiceReferenceType & /*reference*/, TrackedType tracked) override;
 
-    BaseRenderer *GetCurrentBaseRenderer();
-
+    virtual void OnAnnotationRenderersChanged() {}
     const std::string m_RendererID;
     const std::string m_ID;
   };

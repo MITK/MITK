@@ -226,7 +226,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     if (currentlyRecording) {
       for (int index = 0; index < image->GetDimension(2); ++index)
       {
-        if (m_Image->IsSliceSet(index))
+        if (image->IsSliceSet(index))
         {
           m_recordedImages.push_back(Image::New());
           m_recordedImages.back()->Initialize(image->GetPixelType(), 2, image->GetDimensions());
@@ -365,7 +365,6 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     currentDate.pop_back();
     std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
     system(MakeFolder.c_str());
-
     // if checked, we add the bmode filter here
     for (int index = 0; index < m_recordedImages.size(); ++index)
     {
@@ -373,22 +372,22 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
         m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
     }
 
-    Image::Pointer LaserImage = Image::New();
-    Image::Pointer SoundImage = Image::New();
-    std::string pathLaser = "c:\\DiPhASImageData\\" + currentDate + "\\" + "LaserImages" + ".nrrd";
-    std::string pathSound = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
-    
+    Image::Pointer PAImage = Image::New();
+    Image::Pointer USImage = Image::New();
+    std::string pathPA = "c:\\DiPhASImageData\\" + currentDate + "\\" + "PAImages" + ".nrrd";
+    std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+
     // order the images and save them
-    if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a LaserImage if we used interleaved mode
+    if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
-      OrderImagesInterleaved(LaserImage, SoundImage);
-      mitk::IOUtil::Save(SoundImage, pathSound);
-      mitk::IOUtil::Save(LaserImage, pathLaser);
+      OrderImagesInterleaved(PAImage, USImage);
+      mitk::IOUtil::Save(USImage, pathUS);
+      mitk::IOUtil::Save(PAImage, pathPA);
     }
-    else if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no LaserImage if we used US only mode
+    else if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no PAImage if we used US only mode
     {
-      OrderImagesUltrasound(SoundImage);
-      mitk::IOUtil::Save(SoundImage, pathSound);
+      OrderImagesUltrasound(USImage);
+      mitk::IOUtil::Save(USImage, pathUS);
     }
 
     m_recordedImages.clear(); // clean up the images
@@ -396,12 +395,11 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 }
 
 
-void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage)
+void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage)
 {
   unsigned int width  = 32;
   unsigned int height = 32;
-  unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the laser event is not included in the transmitEvents, so we add 1 here
-
+  unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
   if (m_DataType == DataType::Beamformed_Short)
   {
     width = m_device->GetScanMode().reconstructionLines;
@@ -412,26 +410,22 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer LaserImage
     width = m_device->GetScanMode().imageWidth;
     height = m_device->GetScanMode().imageHeight;
   }
-
   unsigned int dimLaser[] = { width, height, m_recordedImages.size() / events};
   unsigned int dimSound[] = { width, height, m_recordedImages.size() / events * (events-1)};
-
-  LaserImage->Initialize(m_recordedImages.back()->GetPixelType(), 3, dimLaser);
-  LaserImage->SetGeometry(m_recordedImages.back()->GetGeometry());
-
-  SoundImage->Initialize(m_recordedImages.back()->GetPixelType(), 3, dimSound);
-  SoundImage->SetGeometry(m_recordedImages.back()->GetGeometry());
-
+  PAImage->Initialize(m_recordedImages.back()->GetPixelType(), 3, dimLaser);
+  PAImage->SetGeometry(m_recordedImages.back()->GetGeometry());
+  USImage->Initialize(m_recordedImages.back()->GetPixelType(), 3, dimSound);
+  USImage->SetGeometry(m_recordedImages.back()->GetGeometry());
   for (int index = 0; index < m_recordedImages.size(); ++index)
   {
     mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));
     if (index % events == 0)
     {
-      LaserImage->SetSlice(inputReadAccessor.GetData(), index / events);
+      PAImage->SetSlice(inputReadAccessor.GetData(), index / events);
     }
     else
     {
-      SoundImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
+      USImage->SetSlice(inputReadAccessor.GetData(), ((index - (index % events)) / events) + (index % events)-1);
     }
   }
 }

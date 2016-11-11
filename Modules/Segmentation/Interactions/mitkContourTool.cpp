@@ -171,6 +171,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
 
+  // m_PaintingPixelValue only decides whether to paint or erase
   mitk::ContourModelUtils::FillContourInSlice(
     projectedContour, timestep, slice, image, (m_PaintingPixelValue * m_CurrentLabelID));
 

@@ -85,26 +85,6 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
       image = ApplyBmodeFilter(image);
     }
   }
-
-  // [sic!] Thomas: This kills everything, so we commented it out and now it doesnt kill anything..
-  //if (!useGUIOutPut && m_GUIOutput) {
-  //  // Need to do this because the program initializes the GUI twice
-  //  // this is probably a bug in UltrasoundSupport, if it's fixed the timing becomes unneccesary
-  //  float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
-  //  if (timePassed > 10)
-  //  {
-  //    useGUIOutPut = true;
-  //  }
-  //}
-  //if (useGUIOutPut) {
-  //  // pass some beamformer state infos to the GUI
-  //  getSystemInfo(&BeamformerInfos);
-
-  //  std::ostringstream s;
-  //  s << "state info: PRF:" << BeamformerInfos.systemPRF << "Hz, datarate: " << BeamformerInfos.dataTransferRateMBit << "MBit/s";
-
-  //  m_GUIOutput(QString::fromStdString(s.str()));
-  //}
 }
 
 mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage)
@@ -121,7 +101,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::
 
   mitk::CastToItkImage(inputImage, itkImage);
   photoacousticBModeFilter->SetInput(itkImage);
-  photoacousticBModeFilter->SetDirection(0);
+  photoacousticBModeFilter->SetDirection(1);
   return mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
 }
 
@@ -129,18 +109,35 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
 {
   //MITK_INFO << "Applying BMode Filter";
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-  typedef itk::Image< float, 3 > itkInputImageType;
-  typedef itk::Image< short, 3 > itkOutputImageType;
-  typedef itk::PhotoacousticBModeImageFilter < itkInputImageType, itkOutputImageType > PhotoacousticBModeImageFilter;
-
+  typedef itk::Image< float, 3 > itkFloatImageType;
+  typedef itk::PhotoacousticBModeImageFilter < itkFloatImageType, itkFloatImageType > PhotoacousticBModeImageFilter;
   PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
-  itkInputImageType::Pointer itkImage;
-
+  typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
+  ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
+  itkFloatImageType::Pointer itkImage;
   mitk::CastToItkImage(inputImage, itkImage);
   photoacousticBModeFilter->SetInput(itkImage);
-  photoacousticBModeFilter->SetDirection(0);
-  //MITK_INFO << "Done Applying BMode Filter";
-  return mitk::GrabItkImageMemory(photoacousticBModeFilter->GetOutput());
+  photoacousticBModeFilter->SetDirection(1);
+  itkFloatImageType::Pointer bmode = photoacousticBModeFilter->GetOutput();
+  itkFloatImageType::SpacingType outputSpacing;
+  itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
+  itkFloatImageType::SizeType outputSize = inputSize;
+  outputSize[0] = 128;
+
+  outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
+  outputSpacing[1] = outputSpacing[0] / 2;
+  outputSpacing[2] = 0.6;
+
+  outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
+
+  typedef itk::IdentityTransform<double, 3> TransformType;
+  resampleImageFilter->SetInput(bmode);
+  resampleImageFilter->SetSize(outputSize);
+  resampleImageFilter->SetOutputSpacing(outputSpacing);
+  resampleImageFilter->SetTransform(TransformType::New());
+
+  resampleImageFilter->UpdateLargestPossibleRegion();
+  return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
 }
 
 void mitk::USDiPhASImageSource::ImageDataCallback(
@@ -240,6 +237,25 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         }
       }
     }
+    // [sic!] Thomas: This kills everything, so we commented it out and now it doesnt kill anything..
+  //  if (!useGUIOutPut && m_GUIOutput) {
+  //    // Need to do this because the program initializes the GUI twice
+  //    // this is probably a bug in UltrasoundSupport, if it's fixed the timing becomes unneccesary
+  //    float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
+  //    if (timePassed > 10)
+  //    {
+  //      useGUIOutPut = true;
+  //    }
+  //  }
+  //  if (useGUIOutPut) {
+  //    // pass some beamformer state infos to the GUI
+  //    getSystemInfo(&BeamformerInfos);
+
+  //    std::ostringstream s;
+  //    s << "state info: PRF:" << BeamformerInfos.systemPRF << "Hz, datarate: " << BeamformerInfos.dataTransferRateMBit << "MBit/s";
+
+  //    m_GUIOutput(QString::fromStdString(s.str()));
+  //  }
     m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
     m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
   }

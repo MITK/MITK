@@ -47,8 +47,8 @@ namespace mitk
       Left,
       Right
     };
-    typedef std::vector<mitk::Overlay *> OverlayVector;
-    typedef std::map<Alignment, OverlayVector> OverlayLayouterContainerMap;
+    typedef std::multimap<int, mitk::Overlay *> OverlayRankedMap;
+    typedef std::map<Alignment, OverlayRankedMap> OverlayLayouterContainerMap;
 
     /** \brief virtual destructor in order to derive from this class */
     virtual ~OverlayLayouter2D();
@@ -89,7 +89,7 @@ namespace mitk
     void PrepareLeftLayout(int *displaySize);
     void PrepareRightLayout(int *displaySize);
 
-    static double GetHeight(OverlayVector &overlays, BaseRenderer *renderer);
+    static double GetHeight(OverlayRankedMap &overlays, BaseRenderer *renderer);
 
     virtual void OnAnnotationRenderersChanged();
     static const std::string ANNOTATIONRENDERER_ID;

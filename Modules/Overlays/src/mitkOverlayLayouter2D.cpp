@@ -94,20 +94,16 @@ namespace mitk
       {
         currentAlignment = static_cast<Alignment>(enumProb->GetValueAsId());
       }
-      OverlayVector &overlayVec = m_OverlayContainerMap[currentAlignment];
-      if (!overlayVec.empty() && priority >= 0)
+      OverlayRankedMap &overlayVec = m_OverlayContainerMap[currentAlignment];
+      if (!overlayVec.empty() && priority < 0)
       {
-        for (auto it = overlayVec.begin(); it != overlayVec.end(); ++it)
-        {
-          int listPrio = -1;
-          (*it)->GetIntProperty(PROP_LAYOUT_PRIORITY, listPrio);
-          if (listPrio >= priority)
-          {
-            overlayVec.insert(it + 1, overlay);
-          }
-        }
+        int max = overlayVec.rbegin()->first;
+        if (max < 100)
+          priority = 100;
+        else
+          priority = max + 1;
       }
-      overlayVec.push_back(overlay);
+      overlayVec.insert(std::pair<int, Overlay *>(priority, overlay));
     }
     this->PrepareLayout();
   }
@@ -171,8 +167,10 @@ namespace mitk
     posX = 0;
     posY = displaySize[1];
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[TopLeft])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[TopLeft];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -189,8 +187,10 @@ namespace mitk
     posX = 0;
     posY = displaySize[1];
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[Top])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[Top];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -208,8 +208,10 @@ namespace mitk
     posX = 0;
     posY = displaySize[1];
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[TopRight])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[TopRight];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -228,8 +230,10 @@ namespace mitk
     double height = GetHeight(m_OverlayContainerMap[Right], GetCurrentBaseRenderer());
     posY = (height / 2.0 + displaySize[1]) / 2.0;
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[Right])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[Right];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -247,8 +251,10 @@ namespace mitk
     double height = GetHeight(m_OverlayContainerMap[Left], GetCurrentBaseRenderer());
     posY = (height / 2.0 + displaySize[1]) / 2.0;
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[Left])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[Left];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -266,8 +272,10 @@ namespace mitk
     posX = 0;
     posY = 0;
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[BottomLeft])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[BottomLeft];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -284,8 +292,10 @@ namespace mitk
     posX = 0;
     posY = 0;
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[Bottom])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[Bottom];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -303,8 +313,10 @@ namespace mitk
     posX = 0;
     posY = 0;
     mitk::Overlay::Bounds bounds;
-    for (mitk::Overlay *overlay : m_OverlayContainerMap[BottomRight])
+    OverlayRankedMap &overlayMap = m_OverlayContainerMap[BottomRight];
+    for (auto it = overlayMap.cbegin(); it != overlayMap.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       margin = GetMargin2D(overlay);
       bounds = overlay->GetBoundsOnDisplay(this->GetCurrentBaseRenderer());
 
@@ -316,11 +328,12 @@ namespace mitk
     }
   }
 
-  double OverlayLayouter2D::GetHeight(OverlayVector &overlays, BaseRenderer *renderer)
+  double OverlayLayouter2D::GetHeight(OverlayRankedMap &overlays, BaseRenderer *renderer)
   {
     double height = 0;
-    for (auto overlay : overlays)
+    for (auto it = overlays.cbegin(); it != overlays.cend(); ++it)
     {
+      Overlay *overlay = it->second;
       Overlay::Bounds bounds = overlay->GetBoundsOnDisplay(renderer);
       height += bounds.Size[0];
       height += GetMargin2D(overlay)[0];

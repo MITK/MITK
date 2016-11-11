@@ -83,7 +83,7 @@ namespace mitk
     {
       overlay->AddToBaseRenderer(renderer);
     }
-    OnAnnotationRenderersChanged();
+    //    OnAnnotationRenderersChanged();
     return overlay;
   }
 

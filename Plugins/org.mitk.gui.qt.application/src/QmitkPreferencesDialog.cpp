@@ -345,6 +345,8 @@ void QmitkPreferencesDialog::UpdateTree()
   if(d->m_PreferencesTree == nullptr)
     return;
 
+  d->m_PreferencesTree->sortByColumn(0, Qt::AscendingOrder);
+
   //m_PreferencesTree->clear();
   QString keyword = d->m_Keyword->text().toLower();
 

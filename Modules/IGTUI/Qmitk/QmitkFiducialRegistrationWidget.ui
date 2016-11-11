@@ -55,24 +55,7 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QCheckBox" name="m_UseICPRegistration">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Find fiducial correspondences (needs 6+ fiducial pairs)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>    Find fiducial
- correspondences</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
+   <item row="0" column="3">
     <widget class="QPushButton" name="m_RegisterFiducialsBtn">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -91,7 +74,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="1" column="0" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QGroupBox" name="sourceLandmarksGroupBox">
@@ -102,7 +85,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string> Image / object fiducials</string>
+        <string> Image / object / moving fiducials</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="leftMargin">
@@ -206,7 +189,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Tracker fiducials </string>
+        <string>Tracker / fixed fiducials </string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <property name="leftMargin">
@@ -304,7 +287,7 @@ instrument position</string>
      </item>
     </layout>
    </item>
-   <item row="2" column="0" colspan="3">
+   <item row="2" column="0" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="statusLabel">
@@ -334,9 +317,36 @@ instrument position</string>
      </item>
     </layout>
    </item>
+   <item row="0" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
+     <item>
+      <widget class="QCheckBox" name="m_MoveImagePoints">
+       <property name="text">
+        <string>Move Image Points</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_UseICPRegistration">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Find fiducial correspondences (needs 6+ fiducial pairs)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>    Find fiducial
+ correspondences</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
   <zorder>m_RegisterFiducialsBtn</zorder>
-  <zorder>m_UseICPRegistration</zorder>
   <zorder>m_gbFiducialRegistration</zorder>
  </widget>
  <customwidgets>

@@ -65,7 +65,9 @@ public:
 protected:
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
   virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes);
+    const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  virtual void NodeRemoved(const mitk::DataNode* node) override;
 
   virtual void SetFocus();
 
@@ -94,7 +96,6 @@ private:
   void ConfigureControls();
 
   mitk::DataNode::Pointer m_selectedEvalNode;
-  mitk::DataStorage::SetOfObjects::ConstPointer m_evalNodes;
 
   QmitkSliceNavigationListener m_SliceChangeListener;
 

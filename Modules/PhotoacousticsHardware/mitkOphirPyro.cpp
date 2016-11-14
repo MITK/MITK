@@ -18,11 +18,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <chrono>
 #include <thread>
+#include <exception>
 
 mitk::OphirPyro::OphirPyro() :
 m_CurrentWavelength(0),
 m_DeviceHandle(0),
 m_Connected(false),
+m_Streaming(false),
 m_SerialNumber(nullptr)
 {
   m_PulseEnergy.clear();
@@ -38,69 +40,97 @@ mitk::OphirPyro::~OphirPyro()
 
 bool mitk::OphirPyro::StartDataAcquisition()
 {
-  return ophirAPI.StartStream(m_DeviceHandle);
+  if (ophirAPI.StartStream(m_DeviceHandle))
+    m_Streaming = true;
+  return m_Streaming;
 }
 
 bool mitk::OphirPyro::StopDataAcquisition()
 {
-  return ophirAPI.StopStream(m_DeviceHandle);
+  if (ophirAPI.StopStream(m_DeviceHandle))
+    m_Streaming = false;
+  return !m_Streaming;
 }
 
 unsigned int mitk::OphirPyro::GetDataFromSensor()
 {
-  std::vector<double> newEnergy;
-  std::vector<double> newTimestamp;
-  std::vector<int> newStatus;
-  unsigned int noPackages = ophirAPI.GetData(m_DeviceHandle, &newEnergy, &newTimestamp, &newStatus);
-  //newEnergy.resize(noPackages);
-  //newTimestamp.resize(noPackages);
-  //newStatus.resize(noPackages);
-
-  MITK_INFO << "[Pyro Debug] -- nop:" << noPackages;
-  MITK_INFO << "[Pyro Debug] -- newEnergy:" << newEnergy.size();
-  if (newEnergy.size() != 0)
-    m_PulseEnergy.insert(m_PulseEnergy.end(), newEnergy.begin(), newEnergy.end());
-  if (newTimestamp.size() != 0)
-    newTimestamp.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
-  if (newStatus.size() != 0)
-    m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
-  MITK_INFO << "[Pyro Debug] --";
-  return 0;//noPackages;
+  if (m_Streaming)
+  {
+    std::vector<double> newEnergy;
+    std::vector<double> newTimestamp;
+    std::vector<int> newStatus;
+    MITK_INFO << "DAFUQ";
+    unsigned int noPackages = 0;
+    try
+    {
+      noPackages = ophirAPI.GetData(m_DeviceHandle, &newEnergy, &newTimestamp, &newStatus);
+      if (noPackages > 0)
+      {
+        m_PulseEnergy.insert(m_PulseEnergy.end(), newEnergy.begin(), newEnergy.end());
+        m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
+        m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
+      }
+    }
+    catch (std::exception& ex)
+    {
+      MITK_INFO << "this is weird: " << ex.what();
+    }
+    return noPackages;
+  }
+  return 0;
 }
 
 double mitk::OphirPyro::LookupCurrentPulseEnergy()
 {
-  if (!m_PulseEnergy.empty())
-    return m_PulseEnergy.back();
-  else
-    return 0;
+  if (m_Connected)
+  {
+    if (!m_PulseEnergy.empty())
+    {
+      MITK_INFO << m_PulseEnergy.size();
+      return m_PulseEnergy.back();
+    }
+
+    else
+      return 0;
+  }
 }
 
 double mitk::OphirPyro::GetNextPulseEnergy()
 {
-  double out = m_PulseEnergy.front();
-  m_PulseEnergy.erase(m_PulseEnergy.begin());
-  m_PulseTime.erase(m_PulseTime.begin());
-  m_PulseStatus.erase(m_PulseStatus.begin());
-  return out;
+  if (m_Connected)
+  {
+    double out = m_PulseEnergy.front();
+    m_PulseEnergy.erase(m_PulseEnergy.begin());
+    m_PulseTime.erase(m_PulseTime.begin());
+    m_PulseStatus.erase(m_PulseStatus.begin());
+    return out;
+  }
 }
 
 double mitk::OphirPyro::LookupCurrentPulseEnergy(double* timestamp, int* status)
 {
-  *timestamp = m_PulseTime.back();
-  *status = m_PulseStatus.back();
-  return m_PulseEnergy.back();
+  if (m_Connected)
+  {
+    *timestamp = m_PulseTime.back();
+    *status = m_PulseStatus.back();
+    return m_PulseEnergy.back();
+  }
+  return 0;
 }
 
 double mitk::OphirPyro::GetNextPulseEnergy(double* timestamp, int* status)
 {
-  double out = m_PulseEnergy.front();
-  *timestamp = m_PulseTime.front();
-  *status = m_PulseStatus.front();
-  m_PulseEnergy.erase(m_PulseEnergy.begin());
-  m_PulseTime.erase(m_PulseTime.begin());
-  m_PulseStatus.erase(m_PulseStatus.begin());
-  return out;
+  if (m_Connected)
+  {
+    double out = m_PulseEnergy.front();
+    *timestamp = m_PulseTime.front();
+    *status = m_PulseStatus.front();
+    m_PulseEnergy.erase(m_PulseEnergy.begin());
+    m_PulseTime.erase(m_PulseTime.begin());
+    m_PulseStatus.erase(m_PulseStatus.begin());
+    return out;
+  }
+  return 0;
 }
 
 bool mitk::OphirPyro::OpenConnection()
@@ -125,7 +155,10 @@ bool mitk::OphirPyro::CloseConnection()
 {
   if (m_Connected)
   {
-    return ophirAPI.CloseDevice(m_DeviceHandle);
+    bool closed = ophirAPI.CloseDevice(m_DeviceHandle);
+    if (closed) m_DeviceHandle = 0;
+    m_Connected = !closed;
+    return closed;
   }
   return false;
 }

@@ -85,6 +85,7 @@ void OPOLaserControl::InitLaser()
 {
   m_Controls.buttonInitLaser->setEnabled(false);
   m_Controls.buttonInitLaser->setText("working ...");
+  QThread::sleep(1);
   if (!m_PumpLaserConnected)
   {
     m_PumpLaserController = mitk::OpotekPumpLaserController::New();
@@ -180,27 +181,24 @@ void OPOLaserControl::InitLaser()
   }
   m_Controls.buttonInitLaser->setEnabled(true);
   this->GetState();
-  if (!m_PyroConnected)
+  try
   {
-    m_Pyro = mitk::OphirPyro::New();
-    MITK_INFO << "[Pyro Debug] OpenConnection: " << m_Pyro->OpenConnection();
-    MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
-    m_CurrentPulseEnergy = 0;
-    m_PyroConnected = true;
-    //QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShowEnergy);
-    MITK_INFO << "[Pyro Debug] 1";
-    //m_EnergyWatcher.setFuture(future);
-    MITK_INFO << "[Pyro Debug] 12";
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    unsigned int drg = m_Pyro->GetDataFromSensor();
-    MITK_INFO << "[Pyro Debug] 13";
-  }
-  else
-  {
-    MITK_INFO << "[Pyro Debug] StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
-    MITK_INFO << "[Pyro Debug] CloseConnection: " << m_Pyro->CloseConnection();
-
-    m_CurrentPulseEnergy = 0;
+    if (!m_PyroConnected)
+    {
+      m_Pyro = mitk::OphirPyro::New();
+      MITK_INFO << "[Pyro Debug] OpenConnection: " << m_Pyro->OpenConnection();
+      MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
+      m_CurrentPulseEnergy = 0;
+      m_PyroConnected = true;
+      QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShowEnergy);
+      m_EnergyWatcher.setFuture(future);
+    }
+    else
+    {
+      m_PyroConnected = false;
+    }
+  } catch (...) {
+    MITK_INFO << " While trying to connect to the Pyro an exception was caught (this almost always happens on the first try after reboot - try again!)";
     m_PyroConnected = false;
   }
 }
@@ -270,19 +268,25 @@ void OPOLaserControl::ShutterCountDown()
   std::this_thread::sleep_for(std::chrono::seconds(1));
   m_Controls.buttonQSwitch->setText("1s ...");
   std::this_thread::sleep_for(std::chrono::seconds(1));
+  return;
 }
 
 void OPOLaserControl::ShowEnergy()
 {
-  while(m_PyroConnected)
+  forever
   {
-    MITK_INFO << "[Pyro Debug] 2";
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    //m_Pyro->GetDataFromSensor();
-    MITK_INFO << "[Pyro Debug] 2";
-    //m_CurrentPulseEnergy = 60000 * m_Pyro->LookupCurrentPulseEnergy();
-    MITK_INFO << "[Pyro Debug] 22";
-    //m_Controls.labelEnergy->setText(std::to_string(m_CurrentPulseEnergy).append(" mJ").c_str());
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    if (!m_PyroConnected)
+    {
+      MITK_INFO << "[Pyro Debug] StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
+      MITK_INFO << "[Pyro Debug] CloseConnection: " << m_Pyro->CloseConnection();
+      m_CurrentPulseEnergy = 0;
+      return;
+    }
+    m_Pyro->GetDataFromSensor();
+    m_CurrentPulseEnergy = 60000 * m_Pyro->LookupCurrentPulseEnergy();
+    m_Controls.labelEnergy->setText(std::to_string(m_CurrentPulseEnergy).append(" mJ").c_str());
   }
 }
 

@@ -57,6 +57,7 @@ namespace mitk {
     char* m_SerialNumber;
     int m_DeviceHandle;
     bool m_Connected;
+    bool m_Streaming;
     std::vector<double> m_PulseEnergy;
     std::vector<double> m_PulseTime;
     std::vector<int> m_PulseStatus;

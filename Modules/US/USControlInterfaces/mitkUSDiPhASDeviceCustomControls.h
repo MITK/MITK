@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkObjectFactory.h>
 
+#include <functional>
+#include <qstring.h>
+
 namespace mitk {
 /**
   * \brief Custom controls for mitk::USDiPhASDevice.
@@ -39,10 +42,45 @@ public:
     */
   virtual void SetIsActive( bool isActive ) override;
 
+  enum DataType { Image_uChar, Beamformed_Short };
   /**
     * \return if this custom controls are currently activated
     */
   virtual bool GetIsActive( ) override;
+
+  virtual void SetUseBModeFilter(bool isSet);
+  virtual void SetRecord(bool record);
+
+  //Transmit
+  virtual void SetTransmitPhaseLength(double us);
+  virtual void SetExcitationFrequency(double MHz);
+  virtual void SetTransmitEvents(int events);
+  virtual void SetVoltage(int voltage);
+  virtual void SetMode(bool interleaved);
+
+  //Receive
+  virtual void SetScanDepth(double mm);
+  virtual void SetAveragingCount(int count);
+  virtual void SetTGCMin(int min);
+  virtual void SetTGCMax(int max);
+  virtual void SetDataType(DataType type);
+
+  //Beamforming
+  virtual void SetPitch(double mm);
+  virtual void SetReconstructedSamples(int samples);
+  virtual void SetReconstructedLines(int lines);
+  virtual void SetSpeedOfSound(int mps);
+
+  //Bandpass
+  virtual void SetBandpassEnabled(bool bandpass);
+  virtual void SetLowCut(double MHz);
+  virtual void SetHighCut(double MHz);
+
+  virtual void passGUIOut(std::function<void(QString)> callback);
+  virtual void SetSilentUpdate(bool silent);
+  virtual bool GetSilentUpdate();
+
+
 
 protected:
   /**
@@ -53,6 +91,39 @@ protected:
 
   bool                          m_IsActive;
   USImageVideoSource::Pointer   m_ImageSource;
+  bool                          silentUpdate;
+
+  /** virtual handlers implemented in Device Controls
+    */
+
+  virtual void OnSetUseBModeFilter(bool isSet);
+  virtual void OnSetRecord(bool record);
+
+  //Transmit
+  virtual void OnSetTransmitPhaseLength(double us);
+  virtual void OnSetExcitationFrequency(double MHz);
+  virtual void OnSetTransmitEvents(int events);
+  virtual void OnSetVoltage(int voltage);
+  virtual void OnSetMode(bool interleaved);
+
+  //Receive
+  virtual void OnSetScanDepth(double mm);
+  virtual void OnSetAveragingCount(int count);
+  virtual void OnSetTGCMin(int min);
+  virtual void OnSetTGCMax(int max);
+  virtual void OnSetDataType(DataType type);
+
+  //Beamforming
+  virtual void OnSetPitch(double mm);
+  virtual void OnSetReconstructedSamples(int samples);
+  virtual void OnSetReconstructedLines(int lines);
+  virtual void OnSetSpeedOfSound(int mps);
+
+  //Bandpass
+  virtual void OnSetBandpassEnabled(bool bandpass);
+  virtual void OnSetLowCut(double MHz);
+  virtual void OnSetHighCut(double MHz);
+
 };
 } // namespace mitk
 

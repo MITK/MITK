@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>449</width>
-    <height>246</height>
+    <width>579</width>
+    <height>903</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,173 +15,499 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="CurrentState">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::WinPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <property name="text">
+        <string>Started</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="GeneralLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;General Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="General">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="UseBModeFilter">
+       <property name="text">
+        <string>Use BMode Envelope Filter</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_1">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="StartStopRecord">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Start Recording</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="TransmitLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Transmit Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="Transmit">
+     <item row="1" column="0">
+      <widget class="QDoubleSpinBox" name="ExcitationFrequency">
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>15.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.100000000000000</double>
+       </property>
+       <property name="value">
+        <double>7.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QSpinBox" name="TransmitEvents">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="TransmitEventsLabel">
+       <property name="text">
+        <string>Transmit Events</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QDoubleSpinBox" name="TransmitPhaseLength">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="TransmitPhaseLengthLabel">
+       <property name="text">
+        <string>Transmit Phase Length [us]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="ExcitationFrequencyLabel">
+       <property name="text">
+        <string>Excitation Frequency [MHz]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QComboBox" name="Mode">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>Interleaved</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Ultrasound only</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QSpinBox" name="Voltage">
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+       <property name="minimum">
+        <number>5</number>
+       </property>
+       <property name="maximum">
+        <number>75</number>
+       </property>
+       <property name="value">
+        <number>70</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="VoltageLabel">
+       <property name="text">
+        <string>Voltage [V]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="ModeLabel">
+       <property name="text">
+        <string> Mode</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="ReceiveLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Receive Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="Receive">
+     <item row="0" column="1">
+      <widget class="QLabel" name="ScanDepthLabel">
+       <property name="text">
+        <string>Scan Depth [mm]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QSpinBox" name="AveragingCount">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="AveragingCountLabel">
+       <property name="text">
+        <string>Averaging Count</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QSpinBox" name="TimeGainCompensationMin">
+       <property name="maximum">
+        <number>42</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="TimeGainCompensationMinLabel">
+       <property name="text">
+        <string>TimeGainCompensationMin</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QSpinBox" name="TimeGainCompensationMax">
+       <property name="maximum">
+        <number>42</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="TimeGainCompensationMaxlabel">
+       <property name="text">
+        <string>TimeGainCompensationMax</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QComboBox" name="DataType">
+       <property name="editable">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>Beamformed Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Image Data</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="DataTypeLabel">
+       <property name="text">
+        <string>DataType</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QDoubleSpinBox" name="ScanDepth">
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>40.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="BeamformingLabel">
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Beamforming Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QGridLayout" name="gridLayout">
+    <layout class="QGridLayout" name="Beamforming">
      <item row="1" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QDoubleSpinBox" name="doubleSpinBox">
-         <property name="singleStep">
-          <double>0.100000000000000</double>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Pitch of Transducer</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Line" name="line_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>mm</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="line_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QSpinBox" name="spinBox_3">
-           <property name="maximum">
-            <number>4096</number>
-           </property>
-           <property name="singleStep">
-            <number>256</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
-           <item>
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Reconstructed Samples per Line</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-      </layout>
+      <widget class="QSpinBox" name="ReconstructedSamplesPerLine">
+       <property name="minimum">
+        <number>256</number>
+       </property>
+       <property name="maximum">
+        <number>4096</number>
+       </property>
+       <property name="singleStep">
+        <number>256</number>
+       </property>
+       <property name="value">
+        <number>2048</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="PitchOfTransducerLabel">
+       <property name="text">
+        <string>Pitch of Transducer [mm]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QSpinBox" name="ReconstructedLines">
+       <property name="contextMenuPolicy">
+        <enum>Qt::PreventContextMenu</enum>
+       </property>
+       <property name="minimum">
+        <number>128</number>
+       </property>
+       <property name="maximum">
+        <number>1024</number>
+       </property>
+       <property name="singleStep">
+        <number>128</number>
+       </property>
+       <property name="value">
+        <number>256</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="ReconstructedSamplesPerLineLabel">
+       <property name="text">
+        <string>Reconstructed Samples per Line</string>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QSpinBox" name="spinBox">
-           <property name="maximum">
-            <number>1000000</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Speed of Sound</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>m/s</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QSpinBox" name="spinBox_2">
-           <property name="maximum">
-            <number>1024</number>
-           </property>
-           <property name="singleStep">
-            <number>128</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Reconstructed Lines</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-      </layout>
+      <widget class="QDoubleSpinBox" name="PitchOfTransducer">
+       <property name="singleStep">
+        <double>0.050000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.150000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="SpeedOfSoundLabel">
+       <property name="text">
+        <string>Speed of Sound [m/s]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QSpinBox" name="SpeedOfSound">
+       <property name="maximum">
+        <number>1000000</number>
+       </property>
+       <property name="value">
+        <number>1540</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="ReconstructedLinesLabel">
+       <property name="text">
+        <string>Reconstructed Lines</string>
+       </property>
+      </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="BandpassLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Bandpass Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="BandpassParameters">
+     <item row="2" column="1">
+      <widget class="QLabel" name="HighCutLabel">
+       <property name="text">
+        <string>High Cut [MHz]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="LowCutLabel">
+       <property name="text">
+        <string>Low Cut [MHz]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="BandpassEnabledLabel">
+       <property name="text">
+        <string>Bandpass Enabled</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QDoubleSpinBox" name="LowCut"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QDoubleSpinBox" name="HighCut">
+       <property name="value">
+        <double>5.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QComboBox" name="BandpassEnabled">
+       <item>
+        <property name="text">
+         <string>Off</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>On</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

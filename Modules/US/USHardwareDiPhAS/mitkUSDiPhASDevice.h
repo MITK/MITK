@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITKUSDiPhASDevice_H_HEADER_INCLUDED_
 
 #include <functional>
-
-#include "mitkUSDevice.h"
 #include "mitkUSDiPhASImageSource.h"
+#include "mitkUSDevice.h"
 #include "mitkUSDiPhASProbesControls.h"
+#include "mitkUSDiPhASImageSource.h"
 #include "mitkUSDiPhASCustomControls.h"
 
 #include "Framework.IBMT.US.CWrapper.h"
@@ -45,6 +45,7 @@ namespace mitk {
     * Images given by the device are put into an object of
     * mitk::USDiPhASImageSource.
     */
+  class USDiPhASImageSource;
 	
   class USDiPhASDevice : public USDevice
   {
@@ -119,7 +120,17 @@ namespace mitk {
     /** @return Returns the currently used scanmode of this device*/
     ScanModeNative& GetScanMode();
 
+    /** Updates the Scanmode and feeds it to the hardware
+      */
+    void UpdateScanmode();
+    /** This method forwards messages from the API to the user*/
     void MessageCallback(const char* message);
+    void SetBursts(int bursts);
+    void SetInterleaved(bool interleaved);
+    bool IsInterleaved();
+
+    BeamformingParametersInterleaved_OA_US paramsInterleaved;
+    BeamformingParametersPlaneWaveCompound paramsPlaneWave;
 
   protected:
     /**
@@ -144,14 +155,18 @@ namespace mitk {
     * This method sets up the scanmode at the begining
     */
     void InitializeScanMode();
+    void UpdateTransmitEvents();
 
     USDiPhASProbesControls::Pointer                m_ControlsProbes;
     itk::SmartPointer<USAbstractControlInterface>  m_ControlInterfaceCustom;
 
-    USDiPhASImageSource::Pointer                   m_ImageSource;
+    mitk::USDiPhASImageSource::Pointer                   m_ImageSource;
 
     bool                                           m_IsRunning;
     ScanModeNative                                 m_ScanMode;
+    int                                            m_BurstHalfwaveClockCount;
+    Beamforming                                    m_CurrentBeamformingAlgorithm;
+    bool                                           m_Interleaved;
   };
 } // namespace mitk
 

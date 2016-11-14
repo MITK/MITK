@@ -19,11 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 #include "mitkUSImageSource.h"
+#include "mitkUSDiPhASCustomControls.h"
 
 #include "Framework.IBMT.US.CWrapper.h"
 
 #include "mitkImageReadAccessor.h"
 #include "itkFastMutexLock.h"
+#include <functional>
+#include <qstring.h>
+#include <ctime>
+#include <string>
+#include <mutex>
+
 
 namespace mitk {
 
@@ -38,10 +45,13 @@ class USDiPhASDevice;
   */
 class USDiPhASImageSource : public USImageSource
 {
+  
 public:
   mitkClassMacro(USDiPhASImageSource, USImageSource);
   mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);
   itkCloneMacro(Self);
+
+  typedef mitk::USDiPhASDeviceCustomControls::DataType DataType;
 
   /**
     * Implementation of the superclass method. Returns the pointer
@@ -51,9 +61,9 @@ public:
 
   /**
     * The API calls this function to pass the image data to the
-	* user; here the m_Image is updated
+	  * user; here the m_Image is updated
     */
-void mitk::USDiPhASImageSource::ImageDataCallback(
+  void mitk::USDiPhASImageSource::ImageDataCallback(
     short* rfDataChannelData,
     int& channelDataChannelsPerDataset,
     int& channelDataSamplesPerChannel,
@@ -67,23 +77,72 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     unsigned char* imageData,
     int& imageWidth,
     int& imageHeight,
-	int& imagePixelFormat,
+    int& imagePixelFormat,
     int& imageSetsTotal,
 
     double& timeStamp);
 
+  void SetGUIOutput(std::function<void(QString)> out);
+
+  /** This starts or ends the recording session*/
+  void SetRecordingStatus(bool record);
+
+  void ModifyDataType(DataType DataT);
+  void ModifyUseBModeFilter(bool isSet);
+
+  /**
+  * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
+  */
+  void UpdateImageGeometry();
+
 protected:
+  void SetDataType(DataType DataT);
+  void SetUseBModeFilter(bool isSet);
+
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
   virtual ~USDiPhASImageSource( );
 
+  /** This vector holds all the images we record, if recording is set to active. */
+  std::vector<mitk::Image::Pointer>     m_recordedImages;
+
+  std::vector<mitk::Image::Pointer>     m_ImageBuffer;
+  int                                   m_LastWrittenImage;
+  int                                   m_BufferSize;
+
+  unsigned int                          m_ImageDimensions[3];
+  mitk::Vector3D                        m_ImageSpacing;
+
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage);
+  mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage);
+
+  void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
+  void OrderImagesUltrasound(Image::Pointer SoundImage);
+
+  /** This image holds the image to be displayed right now*/
+  mitk::Image::Pointer                  m_Image;
+
+  mitk::USDiPhASDevice*                 m_device;
+
+  /** This is a callback to pass text data to the GUI. */
+  std::function<void(QString)>          m_GUIOutput;
+
+
   /**
-    * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
-    */
-  void UpdateImageGeometry();
-  
-  mitk::Image::Pointer             m_Image;
-  itk::FastMutexLock::Pointer      m_ImageMutex;
-  mitk::USDiPhASDevice*            m_device;
+   * Variables for management of current state.
+   */
+  float                           startTime;
+  bool                            useGUIOutPut;
+  BeamformerStateInfoNative       BeamformerInfos;
+  bool                            useBModeFilter;
+  bool                            currentlyRecording;
+  bool                            m_DataTypeModified;
+  DataType                        m_DataTypeNext;
+  bool                            m_UseBModeFilterModified;
+  bool                            m_UseBModeFilterNext;
+
+  DataType                        m_DataType;
+
+  itk::FastMutexLock::Pointer m_ImageMutex;
 };
 } // namespace mitk
 

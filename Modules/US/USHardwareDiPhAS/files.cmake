@@ -5,4 +5,6 @@ mitkUSDiPhASImageSource.cpp
 mitkUSDiPhASProbe.cpp
 mitkUSDiPhASProbesControls.cpp
 mitkUSDiPhASCustomControls.cpp
+mitkUSDiPhASBModeImageFilter.hxx
+mitkUSDiPhASBModeImageFilter.h
 )

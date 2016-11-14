@@ -1,5 +1,5 @@
 set(CPP_FILES
-  mitkOpotekPumpLaserController.cpp
+  mitkQuantelLaser.cpp
   mitkGalilMotor.cpp
   mitkOphirPyro.cpp
 )

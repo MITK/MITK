@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITKOpotekPumpLaserController_H_HEADER_INCLUDED
-#define MITKOpotekPumpLaserController_H_HEADER_INCLUDED
+#ifndef MITKQUANTELLASER_H_HEADER_INCLUDED
+#define MITKQUANTELLASER_H_HEADER_INCLUDED
 
 #include "itkObject.h"
 #include "mitkCommon.h"
@@ -36,13 +36,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk {
     
-  class MITKPHOTOACOUSTICSHARDWARE_EXPORT OpotekPumpLaserController : public itk::LightObject
+  class MITKPHOTOACOUSTICSHARDWARE_EXPORT QuantelLaser : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(OpotekPumpLaserController, itk::LightObject);
+      mitkClassMacroItkParent(QuantelLaser, itk::LightObject);
       itkFactorylessNewMacro(Self);
 
-      enum PumpLaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6, STATE7 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
+      enum LaserState { UNCONNECTED, STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6, STATE7 };   ///< Type for STATE variable. The LaserDevice is always in one of these states
       /**
        * \brief Opens a connection to the device
        *
@@ -69,7 +69,7 @@ namespace mitk {
       virtual bool IsEmitting();
       virtual bool IsFlashing();
 
-      virtual PumpLaserState GetState();
+      virtual LaserState GetState();
 
       typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection
       typedef mitk::SerialCommunication::BaudRate BaudRate;     ///< Baud rate of the serial connection
@@ -79,11 +79,11 @@ namespace mitk {
       typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
 
     private:
-      PumpLaserState m_State; ///< current Laser state
+      LaserState m_State; ///< current Laser state
     protected:
 
-      OpotekPumpLaserController();
-      virtual ~OpotekPumpLaserController();
+      QuantelLaser();
+      virtual ~QuantelLaser();
 
       bool m_KeepAlive = false;
       bool m_FlashlampRunning = false;
@@ -106,4 +106,4 @@ namespace mitk {
     };
 } // namespace mitk
 
-#endif /* MITKOpotekPumpLaserController_H_HEADER_INCLUDED */
+#endif /* MITKQUANTELLASER_H_HEADER_INCLUDED */

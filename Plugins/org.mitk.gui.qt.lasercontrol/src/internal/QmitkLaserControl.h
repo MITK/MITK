@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFutureWatcher>
 
 // Photoacoustics Hardware
-#include <mitkOpotekPumpLaserController.h>
+#include <mitkQuantelLaser.h>
 #include <mitkGalilMotor.h>
 #include <mitkOphirPyro.h>
 
@@ -91,7 +91,7 @@ public:
     QFutureWatcher<void> m_ShutterWatcher;
     QFutureWatcher<void> m_EnergyWatcher;
 
-    mitk::OpotekPumpLaserController::Pointer m_PumpLaserController;
+    mitk::QuantelLaser::Pointer m_PumpLaserController;
     mitk::GalilMotor::Pointer m_OPOMotor;
     mitk::OphirPyro::Pointer m_Pyro;
 

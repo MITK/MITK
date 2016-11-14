@@ -88,7 +88,7 @@ void OPOLaserControl::InitLaser()
   QThread::sleep(1);
   if (!m_PumpLaserConnected)
   {
-    m_PumpLaserController = mitk::OpotekPumpLaserController::New();
+    m_PumpLaserController = mitk::QuantelLaser::New();
 
     if (m_PumpLaserController->OpenConnection("OpotekPhocusMobile"))
     {
@@ -344,22 +344,24 @@ void OPOLaserControl::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source
 
 void OPOLaserControl::GetState()
 {
-  mitk::OpotekPumpLaserController::PumpLaserState pumpLaserState = m_PumpLaserController->GetState();
+  mitk::QuantelLaser::LaserState pumpLaserState = m_PumpLaserController->GetState();
 
-  if (pumpLaserState == mitk::OpotekPumpLaserController::STATE0)
+  if (pumpLaserState == mitk::QuantelLaser::STATE0)
     m_Controls.labelStatus->setText("PL0: Boot Fault.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE1)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE1)
     m_Controls.labelStatus->setText("PL1: Warm Up.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE2)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE2)
     m_Controls.labelStatus->setText("PL2: Laser Ready.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE3)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE3)
     m_Controls.labelStatus->setText("PL3: Flashing. Pulse Disabled.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE4)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE4)
     m_Controls.labelStatus->setText("PL4: Flashing. Shutter Closed.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE5)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE5)
     m_Controls.labelStatus->setText("PL5: Flashing. Shutter Open.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::STATE6)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE6)
     m_Controls.labelStatus->setText("PL6: Flashing. Pulse Enabled.");
-  else if (pumpLaserState == mitk::OpotekPumpLaserController::UNCONNECTED)
+  else if (pumpLaserState == mitk::QuantelLaser::STATE7)
+    m_Controls.labelStatus->setText("PL7: Undefined State.");
+  else if (pumpLaserState == mitk::QuantelLaser::UNCONNECTED)
     m_Controls.labelStatus->setText("PL Not Connected.");
 }

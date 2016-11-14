@@ -1,6 +1,7 @@
 A C++/CLI Wrapper for Ophir Pyroelectrical Sensors
 
-compile wapper via: cl /clr /LD OphirPyroWrapper.cpp
+compile release version of wapper via: cl /clr /LD OphirPyroWrapper.cpp
+compile debug version of wapper via: cl /clr /LDd OphirPyroWrapper.cpp
 you'll need: Interop.OphirLMMeasurementLib.dll
 
 compile shitty console example via: cl ConsoleExample.cpp OphirPyroWrapper.lib

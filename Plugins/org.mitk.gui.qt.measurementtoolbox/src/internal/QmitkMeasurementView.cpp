@@ -171,7 +171,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
 {
   d->m_Parent = parent;
 
-  auto selectedImageLabel = new QLabel("Reference Image: ");
+  auto selectedImageLabel = new QLabel(tr("Reference Image: "));
 
   d->m_SelectedImageLabel = new QLabel;
   d->m_SelectedImageLabel->setStyleSheet("font-weight: bold;");
@@ -180,47 +180,47 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_DrawActionsGroup = new QActionGroup(this);
   d->m_DrawActionsGroup->setExclusive(true);
 
-  auto* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), "Draw Line");
+  auto* currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), tr("Draw Line"));
   currentAction->setCheckable(true);
   d->m_DrawLine = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), "Draw Path");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), tr("Draw Path"));
   currentAction->setCheckable(true);
   d->m_DrawPath = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), "Draw Angle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), tr("Draw Angle"));
   currentAction->setCheckable(true);
   d->m_DrawAngle = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), "Draw Four Point Angle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), tr("Draw Four Point Angle"));
   currentAction->setCheckable(true);
   d->m_DrawFourPointAngle = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), "Draw Circle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), tr("Draw Circle"));
   currentAction->setCheckable(true);
   d->m_DrawCircle = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/ellipse.png"), "Draw Ellipse");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/ellipse.png"), tr("Draw Ellipse"));
   currentAction->setCheckable(true);
   d->m_DrawEllipse = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/doubleellipse.png"), "Draw Double Ellipse");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/doubleellipse.png"), tr("Draw Double Ellipse"));
   currentAction->setCheckable(true);
   d->m_DrawDoubleEllipse = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), "Draw Rectangle");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), tr("Draw Rectangle"));
   currentAction->setCheckable(true);
   d->m_DrawRectangle = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), "Draw Polygon");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), tr("Draw Polygon"));
   currentAction->setCheckable(true);
   d->m_DrawPolygon = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/beziercurve.png"), "Draw Bezier Curve");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/beziercurve.png"), tr("Draw Bezier Curve"));
   currentAction->setCheckable(true);
   d->m_DrawBezierCurve = currentAction;
 
-  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/subdivisionpolygon.png"), "Draw Subdivision Polygon");
+  currentAction = d->m_DrawActionsToolBar->addAction(QIcon(":/measurement/subdivisionpolygon.png"), tr("Draw Subdivision Polygon"));
   currentAction->setCheckable(true);
   d->m_DrawSubdivisionPolygon = currentAction;
 
@@ -228,7 +228,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_SelectedPlanarFiguresText = new QTextBrowser;
 
   // copy to clipboard button
-  d->m_CopyToClipboard = new QPushButton("Copy to Clipboard");
+  d->m_CopyToClipboard = new QPushButton(tr("Copy to Clipboard"));
 
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
@@ -355,13 +355,13 @@ void QmitkMeasurementView::CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeg
   }
   else if (d->m_UnintializedPlanarFigure == false && nodeElements->size() != 0)
   {
-    d->m_SelectedImageLabel->setText(QString::fromStdString("Working without an image..."));
+    d->m_SelectedImageLabel->setText(tr("Working without an image..."));
     d->m_DrawActionsToolBar->setEnabled(true);
   }
   else
   {
     if (d->m_UnintializedPlanarFigure == false)
-      d->m_SelectedImageLabel->setText("No visible data available.");
+      d->m_SelectedImageLabel->setText(tr("No visible data available."));
 
     d->m_DrawActionsToolBar->setEnabled(false);
   }
@@ -491,7 +491,7 @@ void QmitkMeasurementView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, co
   {
     // bug 18440: resetting the selected image label here because unselecting the
     // current node did not reset the label
-    d->m_SelectedImageLabel->setText("No visible image available.");
+    d->m_SelectedImageLabel->setText(tr("No visible image available."));
 
     auto isPlanarFigure = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
     auto planarFigures = this->GetDataStorage()->GetSubset(isPlanarFigure);

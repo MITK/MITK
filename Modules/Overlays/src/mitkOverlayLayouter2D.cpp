@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAnnotationService.h"
 #include "mitkEnumerationProperty.h"
-#include "mitkOverlay2DLayouter.h"
 #include <mitkVtkLayerController.h>
 
 namespace mitk
@@ -91,7 +90,7 @@ namespace mitk
         AddAlignmentProperty(overlay, currentAlignment, margin, priority);
       }
       else
-      {
+      { // TODO19786 insert
         currentAlignment = static_cast<Alignment>(enumProb->GetValueAsId());
       }
       OverlayRankedMap &overlayVec = m_OverlayContainerMap[currentAlignment];

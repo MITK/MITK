@@ -38,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkOverlayManager.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>

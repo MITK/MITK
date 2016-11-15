@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBaseRenderer.h"
 
 #include "mitkAnnotationService.h"
-#include "mitkOverlay2DLayouter.h"
 #include <mitkVtkLayerController.h>
 
 namespace mitk
@@ -47,7 +46,7 @@ namespace mitk
 
   void AnnotationPlacer::AddOverlay(Overlay *overlay, const std::string &rendererID)
   {
-    GetAnnotationRenderer(rendererID);
+    GetAnnotationRenderer(rendererID); // rename ??
     us::ServiceProperties props;
     props[Overlay::US_PROPKEY_AR_ID] = ANNOTATIONRENDERER_ID;
     props[Overlay::US_PROPKEY_RENDERER_ID] = rendererID;

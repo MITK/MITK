@@ -130,7 +130,7 @@ namespace mitk
         mitk::BaseRenderer::GetInstance(renderWindow)->SetDataStorage(m_DataStorage.GetPointer());
 
       // Register vtkRenderWindow instance
-      renderWindow->Register(NULL);
+      renderWindow->Register(nullptr);
 
       // Add callbacks for rendering abort mechanism
       // BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );

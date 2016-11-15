@@ -207,6 +207,13 @@ namespace mitk
     bool GetFloatProperty(const std::string &propertyKey, float &floatValue) const;
 
     /**
+    * @brief Convenience access method for double properties (instances of
+    * DoubleProperty)
+    * @return @a true property was found
+    */
+    bool GetDoubleProperty(const std::string &propertyKey, double &doubleValue) const;
+
+    /**
     * @brief Convenience access method for string properties (instances of
     * StringProperty)
     * @return @a true property was found
@@ -230,6 +237,12 @@ namespace mitk
     * IntProperty)
     */
     void SetFloatProperty(const std::string &propertyKey, float floatValue);
+
+    /**
+    * @brief Convenience method for setting int properties (instances of
+    * IntProperty)
+    */
+    void SetDoubleProperty(const std::string &propertyKey, double doubleValue);
 
     /**
     * @brief Convenience method for setting int properties (instances of

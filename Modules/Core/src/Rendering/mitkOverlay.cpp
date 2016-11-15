@@ -158,6 +158,12 @@ void mitk::Overlay::SetFloatProperty(const std::string &propertyKey, float float
   Modified();
 }
 
+void mitk::Overlay::SetDoubleProperty(const std::string &propertyKey, double doubleValue)
+{
+  this->m_PropertyList->SetProperty(propertyKey, mitk::DoubleProperty::New(doubleValue));
+  Modified();
+}
+
 void mitk::Overlay::SetStringProperty(const std::string &propertyKey, const std::string &stringValue)
 {
   this->m_PropertyList->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));

@@ -66,8 +66,20 @@ namespace mitk
     void SetRightBorderOffset(int offset);
     int GetRightBorderOffset() const;
 
-    void SetCornerOffsetFactor(float offsetFactor);
-    float GetCornerOffsetFactor() const;
+    void SetLeftBorderOffset(int offset);
+    int GetLeftBorderOffset() const;
+
+    void SetTopBorderOffset(int offset);
+    int GetTopBorderOffset() const;
+
+    void SetBottomBorderOffset(int offset);
+    int GetBottomBorderOffset() const;
+
+    void SetFontFactor(double fontFactor);
+    double GetFontFactor() const;
+
+    void SetCornerOffsetFactor(double offsetFactor);
+    double GetCornerOffsetFactor() const;
 
   protected:
     /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */

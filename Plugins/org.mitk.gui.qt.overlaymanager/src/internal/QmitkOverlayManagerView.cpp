@@ -438,7 +438,6 @@ void QmitkOverlayManagerView::OnDelete()
   QListWidgetItem *item = items[0];
   if (item)
     overlay = reinterpret_cast<mitk::Overlay *>(item->data(Qt::UserRole).value<void *>());
-  mitk::OverlayManager::GetInstance()->RemoveOverlay(overlay);
 }
 
 void QmitkOverlayManagerView::OnAddOverlay()

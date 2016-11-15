@@ -160,7 +160,7 @@ namespace mitk
 
   MITKDICOMREADER_EXPORT std::ostream& operator<<(std::ostream& os, const DICOMTagPath& path);
 
-  MITKDICOMREADER_EXPORT std::string DICOMTagPathToPropertRegEx(const DICOMTagPath& tagPath);
+  MITKDICOMREADER_EXPORT std::string DICOMTagPathToPropertyRegEx(const DICOMTagPath& tagPath);
   MITKDICOMREADER_EXPORT std::string DICOMTagPathToPersistenceKeyRegEx(const DICOMTagPath& tagPath);
   MITKDICOMREADER_EXPORT std::string DICOMTagPathToPersistenceKeyTemplate(const DICOMTagPath& tagPath);
   MITKDICOMREADER_EXPORT std::string DICOMTagPathToPersistenceNameTemplate(const DICOMTagPath& tagPath);

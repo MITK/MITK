@@ -854,12 +854,16 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     //    StartupThreading.runWithoutExceptions(new StartupRunnable() {
     //
     //      public void runWithException() {
-    if (!shellBounds.intersects(displayBounds))
-    {
-      QRect clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
-      shellBounds.setX(clientArea.x());
-      shellBounds.setY(clientArea.y());
-    }
+    //
+    //FIXME: QtWidgetsTweakletImpl::GetAvailableScreenSize works onlt with single screen
+    //Breaks restoring state from secondary monitor
+    //
+    //if (!shellBounds.intersects(displayBounds))
+    //{
+    //  QRect clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
+    //  shellBounds.setX(clientArea.x());
+    //  shellBounds.setY(clientArea.y());
+    //}
     GetShell()->SetBounds(shellBounds);
     //      }});
   }

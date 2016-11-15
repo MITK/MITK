@@ -39,7 +39,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAnnotationService.h"
 #include "mitkGetPropertyService.h"
 #include "mitkOverlayLayouter2D.h"
-#include "mitkOverlayManager.h"
 #include "mitkRenderingManager.h"
 #include <mitkColorBarOverlay.h>
 #include <mitkIPropertyAliases.h>

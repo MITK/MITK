@@ -1,12 +1,18 @@
-set(MODULE_CUSTOM_TESTS
-    #mitkLabelOverlay3DRendering2DTest.cpp
-    #mitkLabelOverlay3DRendering3DTest.cpp
-    #mitkTextOverlay2DRenderingTest.cpp
-    mitkTextOverlay2DLayouterRenderingTest.cpp
-    #mitkTextOverlay3DRendering2DTest.cpp
-    #mitkTextOverlay3DRendering3DTest.cpp
-    #mitkTextOverlay3DColorRenderingTest.cpp
-)
+
 set(MODULE_TESTS
     mitkOverlaysTest.cpp
 )
+
+if(MITK_ENABLE_RENDERING_TESTING)
+set(MODULE_TESTS
+  ${MODULE_TESTS}
+  mitkAnnotationPlacerTest.cpp
+  mitkColorBarOverlayTest.cpp
+  mitkLabelOverlay3DTest.cpp
+  mitkLogoOverlayTest.cpp
+  mitkOverlayLayouter2DTest.cpp
+  mitkScaleLegendOverlayTest.cpp
+  mitkTextOverlay2DTest.cpp
+  mitkTextOverlay3DTest.cpp
+)
+endif()

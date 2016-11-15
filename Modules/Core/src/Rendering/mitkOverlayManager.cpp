@@ -144,6 +144,7 @@ namespace mitk
                                   BaseRenderer * /*renderer*/,
                                   bool /*ForceInForeground*/)
   {
+    // TODO19786 Implement legacy method
     //    std::pair<OverlaySet::iterator, bool> inSet;
     //    inSet = m_OverlaySet.insert(overlay);
     //    if (inSet.second)

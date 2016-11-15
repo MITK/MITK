@@ -64,7 +64,8 @@ mitk::RenderingTestHelper::RenderingTestHelper(
 
 void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
 {
-  m_RenderWindow = mitk::RenderWindow::New(NULL, "unnamed renderer", NULL, renderingMode);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
+  m_RenderWindow = mitk::RenderWindow::New(NULL, uidGen.GetUID().c_str(), NULL, renderingMode);
 
   m_DataStorage = mitk::StandaloneDataStorage::New();
 

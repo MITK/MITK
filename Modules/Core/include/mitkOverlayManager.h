@@ -35,15 +35,16 @@ namespace mitk
   /** An Instance of the OverlayManager can be registered to several BaseRenderer instances in order to
    * call the update method of each Overlay during the rendering phase of the renderer.
    * See \ref OverlaysPage for more info.
+   * @deprecatedSince{2016_03} Use mitk::AnnotationService, mitk::AnnotationPlacer and mitk::OverlayLayouter2D instead
   */
   class MITKCORE_EXPORT OverlayManager : public itk::Object
   {
   public:
-  typedef std::set<std::string> BaseRendererSet;
+    typedef std::set<std::string> BaseRendererSet;
     typedef std::set<Overlay::Pointer> OverlaySet;
     typedef std::map<const std::string, AbstractOverlayLayouter::Pointer> LayouterMap;
-  typedef std::map<std::string,LayouterMap > LayouterRendererMap;
-  typedef std::map<std::string,vtkSmartPointer<vtkRenderer> > ForegroundRendererMap;
+    typedef std::map<std::string, LayouterMap> LayouterRendererMap;
+    typedef std::map<std::string, vtkSmartPointer<vtkRenderer>> ForegroundRendererMap;
 
     mitkClassMacroItkParent(OverlayManager, itk::Object) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
@@ -73,7 +74,7 @@ namespace mitk
 
     void RemoveBaseRenderer(mitk::BaseRenderer *renderer);
 
-  void RemoveBaseRenderer(const std::string& rendererName);
+    void RemoveBaseRenderer(const std::string &rendererName);
 
     void RemoveAllBaseRenderers();
 

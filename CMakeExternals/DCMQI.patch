@@ -1,95 +1,20 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-old mode 100644
-new mode 100755
-index 845863f..e23cb9e
+index 91365f5..a8c8744 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -158,6 +158,7 @@ set(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
- mark_as_advanced(ADDITIONAL_C_FLAGS)
- mark_as_superbuild(ADDITIONAL_C_FLAGS)
+@@ -304,7 +304,6 @@ if(NOT Slicer_DIR)
+   # For a build tree
+   set(CONFIG_DIR_CONFIG ${CMAKE_BINARY_DIR})
+   set(DCMTK_DIR_CONFIG ${DCMTK_DIR})
+-  set(SlicerExecutionModel_DIR_CONFIG ${SlicerExecutionModel_DIR})
+   set(${PROJECT_NAME}_CONFIG_CODE "####### Expanded from \@DCMQI_CONFIG_CODE\@ #######\n")
+   set(${PROJECT_NAME}_CONFIG_CODE "find_package(DCMTK NO_MODULE REQUIRED)\n")
+   set(${PROJECT_NAME}_CONFIG_CODE "${${PROJECT_NAME}_CONFIG_CODE}##################################################")
+@@ -316,7 +315,6 @@ if(NOT Slicer_DIR)
+       PATH_VARS
+         CONFIG_DIR_CONFIG
+         DCMTK_DIR_CONFIG
+-        SlicerExecutionModel_DIR_CONFIG
+       NO_CHECK_REQUIRED_COMPONENTS_MACRO
+   )
 
-+set(CMAKE_CXX_FLAGS "-fPIC")
- set(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
- mark_as_advanced(ADDITIONAL_CXX_FLAGS)
- mark_as_superbuild(ADDITIONAL_CXX_FLAGS)
-@@ -206,17 +207,6 @@ foreach(file
-   install(FILES ${file} DESTINATION ${DCMQI_INSTALL_CMAKE_DIR} COMPONENT Development)
- endforeach()
-
--#-----------------------------------------------------------------------------
--# DCMQI dependencies - Projects should be TOPOLOGICALLY ordered
--#-----------------------------------------------------------------------------
--set(DCMQI_DEPENDENCIES
--  zlib
--  DCMTK
--  ITK
--  SlicerExecutionModel
--  )
--
--include(CMake/ctkBlockCheckDependencies.cmake)
-
-
- #-----------------------------------------------------------------------------
-@@ -229,11 +219,26 @@ if(DCMQI_SUPERBUILD)
- endif()
-
- find_package(DCMTK NO_MODULE REQUIRED)
--find_package(SlicerExecutionModel NO_MODULE REQUIRED GenerateCLP)
-+find_package(SlicerExecutionModel QUIET NO_MODULE)
- find_package(ITK NO_MODULE REQUIRED)
- include(${ITK_USE_FILE})
-
--include(${SlicerExecutionModel_USE_FILE})
-+#-----------------------------------------------------------------------------
-+# DCMQI dependencies - Projects should be TOPOLOGICALLY ordered
-+#-----------------------------------------------------------------------------
-+set(DCMQI_DEPENDENCIES
-+  zlib
-+  DCMTK
-+  ITK
-+  )
-+
-+if(SlicerExecutionModel_FOUND)
-+  list(APPEND DCMQI_DEPENDENCIES SlicerExecutionModel)
-+  include(${SlicerExecutionModel_USE_FILE})
-+  find_package(SlicerExecutionModel NO_MODULE REQUIRED GenerateCLP)
-+endif()
-+
-+include(CMake/ctkBlockCheckDependencies.cmake)
-
- include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/FindGit.cmake)
- include(${CMAKE_CURRENT_SOURCE_DIR}/CMake/dcmqiMacroExtractRepositoryInfo.cmake)
-@@ -255,7 +260,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp)
- set(JSONCPP_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp/jsoncpp.cpp)
-
- add_subdirectory("libsrc")
--
--add_subdirectory("apps")
--
- add_subdirectory("doc")
-+
-+if(SlicerExecutionModel_FOUND)
-+  add_subdirectory("apps")
-+endif()
-diff --git a/jsoncpp/jsoncpp.cpp b/jsoncpp/jsoncpp.cpp
-index dd2a1e3..d18ca40 100644
---- a/jsoncpp/jsoncpp.cpp
-+++ b/jsoncpp/jsoncpp.cpp
-@@ -231,7 +231,7 @@ static int       stackDepth_g = 0;  // see readValue()
- namespace Json {
-
- #if __GNUC__ >= 6
--typedef std::scoped_ptr<CharReader> const  CharReaderPtr;
-+typedef std::unique_ptr<CharReader> const  CharReaderPtr;
- #else
- typedef std::auto_ptr<CharReader>          CharReaderPtr;
- #endif
-@@ -3800,7 +3800,7 @@ Value& Path::make(Value& root) const {
- namespace Json {
-
- #if __GNUC__ >= 6
--typedef std::scoped_ptr<StreamWriter> const  StreamWriterPtr;
-+typedef std::unique_ptr<StreamWriter> const  StreamWriterPtr;
- #else
- typedef std::auto_ptr<StreamWriter>          StreamWriterPtr;
- #endif

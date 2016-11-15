@@ -26,7 +26,7 @@ if(MITK_USE_DCMQI)
       LIST_SEPARATOR ${sep}
       #TODO MITK-Data
       URL https://dl.dropbox.com/s/1rye5oewqxx4zn5/dcmqi-src-org.tar.gz
-      URL_MD5 f8333c11efdc84fc2a54bf9c276c103c
+      URL_MD5 d0e0b5c6333f814d3869f23dc84c6407
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMQI.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
@@ -35,6 +35,7 @@ if(MITK_USE_DCMQI)
         ${ep_common_args}
         ${additional_cmake_args}
         #-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+        -DDCMQI_BUILD_APPS=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
         -DITK_DIR:PATH=${ITK_DIR}
         -DDCMQI_SUPERBUILD:BOOL=OFF

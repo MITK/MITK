@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>579</width>
+    <width>259</width>
     <height>903</height>
    </rect>
   </property>
@@ -15,30 +15,32 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QLabel" name="CurrentState">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::WinPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <property name="text">
-        <string>Started</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QLabel" name="CurrentState">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>25</height>
+      </size>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::WinPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="text">
+      <string>Started</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="GeneralLabel">
@@ -65,7 +67,7 @@
      <item>
       <widget class="QCheckBox" name="UseBModeFilter">
        <property name="text">
-        <string>Use BMode Envelope Filter</string>
+        <string>Envelope Filter</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -90,7 +92,7 @@
        <property name="minimumSize">
         <size>
          <width>100</width>
-         <height>50</height>
+         <height>25</height>
         </size>
        </property>
        <property name="text">
@@ -110,6 +112,227 @@
         </size>
        </property>
       </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="ReceiveLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Receive Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="Receive">
+     <item row="2" column="0">
+      <widget class="QSlider" name="TimeGainCompensationMinSlider">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>200</height>
+        </size>
+       </property>
+       <property name="maximum">
+        <number>42</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QSlider" name="TimeGainCompensationMaxSlider">
+       <property name="maximum">
+        <number>42</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickInterval">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="ScanDepthLabel">
+       <property name="text">
+        <string>Scan Depth [mm]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QSpinBox" name="AveragingCount">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="AveragingCountLabel">
+       <property name="text">
+        <string>Averaging Count</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QComboBox" name="DataType">
+       <property name="editable">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>Beamformed Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Image Data</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QDoubleSpinBox" name="ScanDepth">
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>40.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="DataTypeLabel">
+       <property name="text">
+        <string>DataType</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="TimeGainCompensationMinLabel">
+       <property name="text">
+        <string>TGC Min</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="TimeGainCompensationMaxlabel">
+       <property name="text">
+        <string>TGC Max</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="BeamformingLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Beamforming Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="Beamforming">
+     <item row="2" column="0">
+      <widget class="QSpinBox" name="ReconstructedSamplesPerLine">
+       <property name="minimum">
+        <number>256</number>
+       </property>
+       <property name="maximum">
+        <number>4096</number>
+       </property>
+       <property name="singleStep">
+        <number>256</number>
+       </property>
+       <property name="value">
+        <number>2048</number>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QDoubleSpinBox" name="PitchOfTransducer">
+       <property name="singleStep">
+        <double>0.050000000000000</double>
+       </property>
+       <property name="value">
+        <double>0.150000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QSpinBox" name="ReconstructedLines">
+       <property name="contextMenuPolicy">
+        <enum>Qt::PreventContextMenu</enum>
+       </property>
+       <property name="minimum">
+        <number>128</number>
+       </property>
+       <property name="maximum">
+        <number>1024</number>
+       </property>
+       <property name="singleStep">
+        <number>128</number>
+       </property>
+       <property name="value">
+        <number>256</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="ReconstructedSamplesPerLineLabel">
+       <property name="text">
+        <string>Samples per Line</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="ReconstructedLinesLabel">
+       <property name="text">
+        <string>Reconstructed Lines</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QSpinBox" name="SpeedOfSound">
+       <property name="maximum">
+        <number>1000000</number>
+       </property>
+       <property name="value">
+        <number>1540</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="SpeedOfSoundLabel">
+       <property name="text">
+        <string>Speed of Sound [m/s]</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="PitchOfTransducerLabel">
+       <property name="text">
+        <string>Pitch of Transducer [mm]</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -241,207 +464,10 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="ReceiveLabel">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Receive Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="Receive">
-     <item row="0" column="1">
-      <widget class="QLabel" name="ScanDepthLabel">
-       <property name="text">
-        <string>Scan Depth [mm]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QSpinBox" name="AveragingCount">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="maximum">
-        <number>100</number>
-       </property>
-       <property name="value">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="AveragingCountLabel">
-       <property name="text">
-        <string>Averaging Count</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QSpinBox" name="TimeGainCompensationMin">
-       <property name="maximum">
-        <number>42</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="TimeGainCompensationMinLabel">
-       <property name="text">
-        <string>TimeGainCompensationMin</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QSpinBox" name="TimeGainCompensationMax">
-       <property name="maximum">
-        <number>42</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLabel" name="TimeGainCompensationMaxlabel">
-       <property name="text">
-        <string>TimeGainCompensationMax</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QComboBox" name="DataType">
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string>Beamformed Data</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Image Data</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="DataTypeLabel">
-       <property name="text">
-        <string>DataType</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QDoubleSpinBox" name="ScanDepth">
-       <property name="maximum">
-        <double>1000.000000000000000</double>
-       </property>
-       <property name="value">
-        <double>40.000000000000000</double>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="BeamformingLabel">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Beamforming Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="Beamforming">
-     <item row="1" column="0">
-      <widget class="QSpinBox" name="ReconstructedSamplesPerLine">
-       <property name="minimum">
-        <number>256</number>
-       </property>
-       <property name="maximum">
-        <number>4096</number>
-       </property>
-       <property name="singleStep">
-        <number>256</number>
-       </property>
-       <property name="value">
-        <number>2048</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="PitchOfTransducerLabel">
-       <property name="text">
-        <string>Pitch of Transducer [mm]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QSpinBox" name="ReconstructedLines">
-       <property name="contextMenuPolicy">
-        <enum>Qt::PreventContextMenu</enum>
-       </property>
-       <property name="minimum">
-        <number>128</number>
-       </property>
-       <property name="maximum">
-        <number>1024</number>
-       </property>
-       <property name="singleStep">
-        <number>128</number>
-       </property>
-       <property name="value">
-        <number>256</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="ReconstructedSamplesPerLineLabel">
-       <property name="text">
-        <string>Reconstructed Samples per Line</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QDoubleSpinBox" name="PitchOfTransducer">
-       <property name="singleStep">
-        <double>0.050000000000000</double>
-       </property>
-       <property name="value">
-        <double>0.150000000000000</double>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLabel" name="SpeedOfSoundLabel">
-       <property name="text">
-        <string>Speed of Sound [m/s]</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QSpinBox" name="SpeedOfSound">
-       <property name="maximum">
-        <number>1000000</number>
-       </property>
-       <property name="value">
-        <number>1540</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLabel" name="ReconstructedLinesLabel">
-       <property name="text">
-        <string>Reconstructed Lines</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <widget class="QLabel" name="BandpassLabel">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Bandpass Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -451,6 +477,9 @@
     <layout class="QGridLayout" name="BandpassParameters">
      <item row="2" column="1">
       <widget class="QLabel" name="HighCutLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>High Cut [MHz]</string>
        </property>
@@ -458,6 +487,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QLabel" name="LowCutLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Low Cut [MHz]</string>
        </property>
@@ -465,16 +497,26 @@
      </item>
      <item row="0" column="1">
       <widget class="QLabel" name="BandpassEnabledLabel">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Bandpass Enabled</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QDoubleSpinBox" name="LowCut"/>
+      <widget class="QDoubleSpinBox" name="LowCut">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
      <item row="2" column="0">
       <widget class="QDoubleSpinBox" name="HighCut">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="value">
         <double>5.000000000000000</double>
        </property>
@@ -482,6 +524,9 @@
      </item>
      <item row="0" column="0">
       <widget class="QComboBox" name="BandpassEnabled">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <item>
         <property name="text">
          <string>Off</string>

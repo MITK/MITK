@@ -142,7 +142,7 @@ void UltrasoundSupport::UpdateColormaps()
     }
     SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::JET_TRANSPARENT);
     m_Node.back()->GetLevelWindow(levelWindow);
-    levelWindow.SetWindowBounds(55, 125, true);
+    levelWindow.SetWindowBounds(10, 150, true);
     m_Node.back()->SetLevelWindow(levelWindow);
   }
   else if (m_Node.size() == 1)

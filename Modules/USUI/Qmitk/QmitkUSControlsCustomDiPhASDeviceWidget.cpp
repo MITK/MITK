@@ -112,8 +112,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
   //Receive
   connect(ui->ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(OnScanDepthChanged()));
   connect(ui->AveragingCount, SIGNAL(valueChanged(int)), this, SLOT(OnAveragingCountChanged()));
-  connect(ui->TimeGainCompensationMin, SIGNAL(valueChanged(int)), this, SLOT(OnTGCMinChanged()));
-  connect(ui->TimeGainCompensationMax, SIGNAL(valueChanged(int)), this, SLOT(OnTGCMaxChanged()));
+  connect(ui->TimeGainCompensationMinSlider, SIGNAL(valueChanged(int)), this, SLOT(OnTGCMinChanged()));
+  connect(ui->TimeGainCompensationMaxSlider, SIGNAL(valueChanged(int)), this, SLOT(OnTGCMaxChanged()));
   connect(ui->DataType, SIGNAL(currentTextChanged(QString)), this, SLOT(OnDataTypeChanged()));
 
   //Beamforming
@@ -207,27 +207,27 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMinChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
 
-  int tgcMin = ui->TimeGainCompensationMin->value();
-  int tgcMax = ui->TimeGainCompensationMax->value();
+  int tgcMin = ui->TimeGainCompensationMinSlider->value();
+  int tgcMax = ui->TimeGainCompensationMaxSlider->value();
   if (tgcMin > tgcMax) {
-    ui->TimeGainCompensationMin->setValue(tgcMax);
+    ui->TimeGainCompensationMinSlider->setValue(tgcMax);
     MITK_INFO << "User tried to set tgcMin>tgcMax.";
   }
   
-  m_ControlInterface->SetTGCMin(ui->TimeGainCompensationMin->value());
+  m_ControlInterface->SetTGCMin(ui->TimeGainCompensationMinSlider->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
 
-  int tgcMin = ui->TimeGainCompensationMin->value();
-  int tgcMax = ui->TimeGainCompensationMax->value();
+  int tgcMin = ui->TimeGainCompensationMinSlider->value();
+  int tgcMax = ui->TimeGainCompensationMaxSlider->value();
   if (tgcMin > tgcMax) {
-    ui->TimeGainCompensationMax->setValue(tgcMin);
+    ui->TimeGainCompensationMaxSlider->setValue(tgcMin);
     MITK_INFO << "User tried to set tgcMin>tgcMax.";
   }
   
-  m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMax->value());
+  m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMaxSlider->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
 {

@@ -419,6 +419,7 @@ static void CheckIntersectionWithRotatedGeometry()
   mitk::PlaneGeometry::Pointer planeGeometry3 = mitk::PlaneGeometry::New();
   planeGeometry3->InitializePlane(origin3, normal3);
   planeGeometry3->SetSpacing(spacing);
+  planeGeometry3->SetImageGeometry(true);
 
   mitk::BoundingBox::BoundsArrayType moreBounds = planeGeometry3->GetBounds();
   moreBounds[0] = 0;
@@ -746,6 +747,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char *[])
   // Initialize PlaneGeometry:
   mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializePlane(origin, normal);
+  planeGeometry->SetImageGeometry(true);
 
   // Set Bounds:
   mitk::BoundingBox::BoundsArrayType bounds = planeGeometry->GetBounds();
@@ -776,6 +778,7 @@ int mitkClippedSurfaceBoundsCalculatorTest(int, char *[])
   // Initialize PlaneGeometry:
   mitk::PlaneGeometry::Pointer planeGeometry2 = mitk::PlaneGeometry::New();
   planeGeometry2->InitializePlane(origin2, normal2);
+  planeGeometry2->SetImageGeometry(true);
 
   // Initialize SlicedGeometry3D:
   mitk::SlicedGeometry3D::Pointer secondSlicedGeometry3D = mitk::SlicedGeometry3D::New();

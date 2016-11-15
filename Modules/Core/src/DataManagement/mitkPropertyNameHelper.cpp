@@ -25,8 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 std::string mitk::GeneratePropertyNameForDICOMTag(unsigned int group, unsigned int element)
 {
   std::ostringstream nameStream;
-  nameStream << "DICOM." << std::setw(4) << std::setfill('0') << std::hex << group << "." << std::setw(4)
-             << std::setfill('0') << std::hex << element;
+  nameStream << "DICOM."
+    << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << group << std::nouppercase << "."
+    << std::setw(4) << std::setfill('0') << std::hex << std::uppercase << element;
 
   return nameStream.str();
 };

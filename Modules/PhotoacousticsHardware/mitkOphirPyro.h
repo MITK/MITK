@@ -31,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 #include <usModuleResourceStream.h>
+#include <iostream>
+#include <fstream>
+#include <chrono>
 
 namespace mitk {
 
@@ -53,6 +56,7 @@ namespace mitk {
   protected:
     OphirPyro();
     virtual ~OphirPyro();
+    void SaveCsvData();
     OphirPyroWrapper ophirAPI;
     char* m_SerialNumber;
     int m_DeviceHandle;
@@ -61,6 +65,7 @@ namespace mitk {
     std::vector<double> m_PulseEnergy;
     std::vector<double> m_PulseTime;
     std::vector<int> m_PulseStatus;
+    std::vector<long long> m_TimeStamps;
     double m_CurrentWavelength;
     double m_CurrentEnergyRange;
   };

@@ -431,18 +431,20 @@ void UltrasoundSupport::CreateControlWidgets()
 
   // create b mode widget for current device
   m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
-  m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
-  if (!m_Device->GetControlInterfaceBMode())
+  
+  if (m_Device->GetControlInterfaceBMode())
   {
-    m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count() - 1, false);
+    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
+    //m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count() - 1, false);
   }
 
   // create doppler widget for current device
   m_ControlDopplerWidget = new QmitkUSControlsDopplerWidget(m_Device->GetControlInterfaceDoppler(), m_Controls.m_ToolBoxControlWidgets);
-  m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");
-  if (!m_Device->GetControlInterfaceDoppler())
+  
+  if (m_Device->GetControlInterfaceDoppler())
   {
-    m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count() - 1, false);
+    m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");
+    //m_Controls.m_ToolBoxControlWidgets->setItemEnabled(m_Controls.m_ToolBoxControlWidgets->count() - 1, false);
   }
 
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();

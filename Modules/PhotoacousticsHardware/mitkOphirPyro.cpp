@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkOphirPyro.h"
 
 #include <chrono>
+#include <ctime>
 #include <thread>
 #include <exception>
 
@@ -30,6 +31,7 @@ m_SerialNumber(nullptr)
   m_PulseEnergy.clear();
   m_PulseTime.clear();
   m_PulseStatus.clear();
+  m_TimeStamps.clear();
 }
 
 mitk::OphirPyro::~OphirPyro()
@@ -45,10 +47,49 @@ bool mitk::OphirPyro::StartDataAcquisition()
   return m_Streaming;
 }
 
+// this is just a little function to set the filenames below right
+inline void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+  if (from.empty())
+    return;
+  size_t start_pos = 0;
+  while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+    str.replace(start_pos, from.length(), to);
+    start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+  }
+}
+
+void mitk::OphirPyro::SaveCsvData()
+{
+  // get the time and date, put them into a nice string and create a folder for the images
+  time_t time = std::time(nullptr);
+  time_t* timeptr = &time;
+  std::string currentDate = std::ctime(timeptr);
+  replaceAll(currentDate, ":", "-");
+  currentDate.pop_back();
+  std::string MakeFolder = "mkdir \"c:/DiPhASTimeStamps/" + currentDate + "\"";
+  system(MakeFolder.c_str());
+
+  std::string pathTS = "c:\\DiPhASTimeStamps\\" + currentDate + " Timestamps" + ".csv";
+
+  std::ofstream timestampFile;
+  timestampFile.open(pathTS);
+
+  timestampFile << "[index],[timestamp],[PulseEnergy]";
+
+  for (int index = 0; index < m_TimeStamps.size(); ++index)
+  {
+    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergy.at(index);
+  }
+  timestampFile.close();
+}
+
 bool mitk::OphirPyro::StopDataAcquisition()
 {
   if (ophirAPI.StopStream(m_DeviceHandle))
     m_Streaming = false;
+
+  SaveCsvData();
+
   return !m_Streaming;
 }
 
@@ -59,7 +100,6 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
     std::vector<double> newEnergy;
     std::vector<double> newTimestamp;
     std::vector<int> newStatus;
-    MITK_INFO << "DAFUQ";
     unsigned int noPackages = 0;
     try
     {
@@ -67,6 +107,8 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
       if (noPackages > 0)
       {
         m_PulseEnergy.insert(m_PulseEnergy.end(), newEnergy.begin(), newEnergy.end());
+        m_TimeStamps.push_back(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+
         m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
         m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
       }

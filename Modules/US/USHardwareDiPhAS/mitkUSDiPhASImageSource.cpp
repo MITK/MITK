@@ -16,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // std dependencies
 #include <ctime>
+#include <chrono>
 
 // mitk dependencies
 #include "mitkUSDiPhASDevice.h"
@@ -32,6 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkCropImageFilter.h"
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkIntensityWindowingImageFilter.h"
+#include <itkIndex.h>
 
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
@@ -46,7 +48,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_DataTypeModified(true),
   m_DataTypeNext(DataType::Image_uChar),
   m_UseBModeFilterModified(false),
-  m_UseBModeFilterNext(false)
+  m_UseBModeFilterNext(false),
+  m_currenttime(0)
 {
   m_ImageMutex = itk::FastMutexLock::New();
 
@@ -122,7 +125,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   itkFloatImageType::SpacingType outputSpacing;
   itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
   itkFloatImageType::SizeType outputSize = inputSize;
-  outputSize[0] = 128;
+  outputSize[0] = 256;
 
   outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
   outputSpacing[1] = outputSpacing[0] / 2;
@@ -162,6 +165,9 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   bool writeImage = ((m_DataType == DataType::Image_uChar) && (imageData != nullptr)) || ((m_DataType == DataType::Beamformed_Short) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
+    //get the timestamp we might later on save
+    m_currenttime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+
     // create a new image and initialize it
     mitk::Image::Pointer image = mitk::Image::New();
 
@@ -188,20 +194,19 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     // write the given buffer into the image
     switch (m_DataType)
     {
-    case DataType::Image_uChar: {
+      case DataType::Image_uChar: {
         for (int i = 0; i < imageSetsTotal; i++) {
           image->SetSlice(&imageData[i*imageHeight*imageWidth], i);
         }
         break;
       }
 
-    case DataType::Beamformed_Short: {
+      case DataType::Beamformed_Short: {
         short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
         int pixelsPerImage = beamformedLines*beamformedSamples;
 
         for (int currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
         {
-        
             for (int sample = 0; sample < beamformedSamples; sample++)
             {
               for (int line = 0; line < beamformedLines; line++)
@@ -236,6 +241,8 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
           m_recordedImages.back()->SetSlice(inputReadAccessor.GetData());
         }
       }
+      // save timestamps for each laser image!
+      m_timestamps.push_back(m_currenttime);
     }
     // [sic!] Thomas: This kills everything, so we commented it out and now it doesnt kill anything..
   //  if (!useGUIOutPut && m_GUIOutput) {
@@ -349,8 +356,10 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   // start the recording process
   if (record)
   {
-    currentlyRecording = true;
     m_recordedImages.clear();  // we make sure there are no leftovers
+    m_timestamps.clear();      // also for the timestamps
+    m_pixelValues.clear();     // aaaand for the pixel values
+    currentlyRecording = true;
   }
   // save images, end recording, and clean up
   else
@@ -365,17 +374,13 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     currentDate.pop_back();
     std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
     system(MakeFolder.c_str());
-    // if checked, we add the bmode filter here
-    for (int index = 0; index < m_recordedImages.size(); ++index)
-    {
-      if (m_DataType == 1 && useBModeFilter)
-        m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
-    }
 
+    // initialize file paths and the images
     Image::Pointer PAImage = Image::New();
     Image::Pointer USImage = Image::New();
     std::string pathPA = "c:\\DiPhASImageData\\" + currentDate + "\\" + "PAImages" + ".nrrd";
     std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "Timestamps" + ".csv";
 
     // order the images and save them
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
@@ -383,6 +388,22 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       OrderImagesInterleaved(PAImage, USImage);
       mitk::IOUtil::Save(USImage, pathUS);
       mitk::IOUtil::Save(PAImage, pathPA);
+
+      // read the pixelvalues of the enveloped images at this position
+      itk::Index<3> pixel = { { m_recordedImages.at(1)->GetDimension(0) / 2, 22, 0 } };
+      GetPixelValues(pixel);
+
+      // save the timestamps!
+      ofstream timestampFile;
+
+      timestampFile.open(pathTS);
+      timestampFile << "[index],[timestamp],[pixelvalue]"; // write the header
+
+      for (int index = 0; index < m_timestamps.size(); ++index)
+      {
+        timestampFile << "\n" << index << "," << m_timestamps.at(index) << "," << m_pixelValues.at(index);
+      }
+      timestampFile.close();
     }
     else if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no PAImage if we used US only mode
     {
@@ -390,7 +411,19 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       mitk::IOUtil::Save(USImage, pathUS);
     }
 
+    m_pixelValues.clear();    // clean up the pixel values
     m_recordedImages.clear(); // clean up the images
+    m_timestamps.clear();     // clean up the timestamps
+  }
+}
+
+void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel)
+{
+  unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  for (int index = 0; index < m_recordedImages.size(); index += events)  // omit sound images
+  {
+    m_recordedImages.at(index) = ApplyBmodeFilter2d(m_recordedImages.at(index));
+    m_pixelValues.push_back(m_recordedImages.at(index).GetPointer()->GetPixelValueByIndex(pixel));
   }
 }
 
@@ -400,6 +433,7 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   unsigned int width  = 32;
   unsigned int height = 32;
   unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+
   if (m_DataType == DataType::Beamformed_Short)
   {
     width = m_device->GetScanMode().reconstructionLines;
@@ -410,12 +444,15 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
     width = m_device->GetScanMode().imageWidth;
     height = m_device->GetScanMode().imageHeight;
   }
+
   unsigned int dimLaser[] = { width, height, m_recordedImages.size() / events};
   unsigned int dimSound[] = { width, height, m_recordedImages.size() / events * (events-1)};
+
   PAImage->Initialize(m_recordedImages.back()->GetPixelType(), 3, dimLaser);
   PAImage->SetGeometry(m_recordedImages.back()->GetGeometry());
   USImage->Initialize(m_recordedImages.back()->GetPixelType(), 3, dimSound);
   USImage->SetGeometry(m_recordedImages.back()->GetGeometry());
+
   for (int index = 0; index < m_recordedImages.size(); ++index)
   {
     mitk::ImageReadAccessor inputReadAccessor(m_recordedImages.at(index));

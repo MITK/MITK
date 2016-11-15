@@ -30,6 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctime>
 #include <string>
 #include <mutex>
+#include <iostream>
+#include <fstream>
 
 
 namespace mitk {
@@ -104,6 +106,11 @@ protected:
 
   /** This vector holds all the images we record, if recording is set to active. */
   std::vector<mitk::Image::Pointer>     m_recordedImages;
+  std::vector<long long>                m_timestamps;
+  std::vector<double>                   m_pixelValues;
+  long long                             m_currenttime;
+  bool                                  currentlyRecording;
+
 
   std::vector<mitk::Image::Pointer>     m_ImageBuffer;
   int                                   m_LastWrittenImage;
@@ -117,6 +124,8 @@ protected:
 
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);
+
+  void GetPixelValues(itk::Index<3> pixel);
 
   /** This image holds the image to be displayed right now*/
   mitk::Image::Pointer                  m_Image;
@@ -134,7 +143,7 @@ protected:
   bool                            useGUIOutPut;
   BeamformerStateInfoNative       BeamformerInfos;
   bool                            useBModeFilter;
-  bool                            currentlyRecording;
+
   bool                            m_DataTypeModified;
   DataType                        m_DataTypeNext;
   bool                            m_UseBModeFilterModified;

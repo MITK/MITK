@@ -42,8 +42,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "dcmqi/ImageSEGConverter.h"
 #include "dcmqi/JSONSegmentationMetaInformationHandler.h"
 
-#include <mitkIOUtil.h>
-
 namespace mitk
 {
   DICOMSegmentationIO::DICOMSegmentationIO()
@@ -225,6 +223,7 @@ namespace mitk
 
       dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
       metaInfo.read();
+      MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
 
       map<unsigned, ImageType::Pointer> segItkImages = dcmqiOutput.first;
 
@@ -330,7 +329,6 @@ namespace mitk
   {
     const mitk::LabelSetImage *image = dynamic_cast<const mitk::LabelSetImage *>(this->GetInput());
 
-
     const std::string output;
 
     dcmqi::JSONSegmentationMetaInformationHandler handler;
@@ -347,17 +345,13 @@ namespace mitk
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 
-
     const LabelSet *labelSet = image->GetLabelSet(layer);
-    vector<map<unsigned, dcmqi::SegmentAttributes *>> segAttrMappingList = handler.segmentsAttributesMappingList;
-    map<unsigned, dcmqi::SegmentAttributes *> labelID2SegmentAttributes;
 
     for (int i = 1; i < image->GetNumberOfLabels(); ++i)
     {
       const Label *label = labelSet->GetLabel(i);
       if (label != nullptr)
       {
-
         mitk::DICOMTagPath segmentNumberPath;
         segmentNumberPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0004);
         StringProperty *segmentNumberProp = dynamic_cast<mitk::StringProperty *>(
@@ -427,33 +421,34 @@ namespace mitk
         StringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeMeaningPath).c_str()));
 
-        dcmqi::SegmentAttributes *segAttr = handler.createAndGetNewSegment((int) segmentNumberProp->GetValue());
-        segAttr->setSegmentDescription(segmentLabelProp->GetValueAsString());
-        segAttr->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
-        segAttr->setSegmentAlgorithmName("");
-        if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr && segmentCategoryCodeMeaningProp!= nullptr)
-        segAttr->setSegmentedPropertyCategoryCode(segmentCategoryCodeValueProp->GetValueAsString(),
-          segmentCategoryCodeSchemeProp->GetValueAsString(),
-          segmentCategoryCodeMeaningProp->GetValueAsString());
-        if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr && segmentTypeCodeMeaningProp != nullptr)
-        segAttr->setSegmentedPropertyType(segmentTypeCodeValueProp->GetValueAsString(),
-          segmentTypeCodeSchemeProp->GetValueAsString(),
-          segmentTypeCodeMeaningProp->GetValueAsString());
-        if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr && segmentModifierCodeMeaningProp != nullptr)
-        segAttr->setSegmentedPropertyTypeModifier(segmentModifierCodeValueProp->GetValueAsString(),
-          segmentModifierCodeSchemeProp->GetValueAsString(),
-          segmentModifierCodeMeaningProp->GetValueAsString());
-         segAttr->setAnatomicRegion(CodeSequenceMacro());
-         segAttr->setAnatomicRegionModifier(CodeSequenceMacro());
-        Color color = label->GetColor();
-        segAttr->setRecommendedDisplayRGBValue(color[0]*255, color[1]*255, color[2]*255);
-        labelID2SegmentAttributes[(int) segmentNumberProp->GetValue()] = segAttr;
-        segAttrMappingList.push_back(labelID2SegmentAttributes);
+        int labelId = std::stoi(segmentNumberProp->GetValue());
+        dcmqi::SegmentAttributes *segAttr = handler.createAndGetNewSegment(labelId);
+        if (segAttr != nullptr)
+        {
+          segAttr->setSegmentDescription(segmentLabelProp->GetValueAsString());
+          segAttr->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
+          segAttr->setSegmentAlgorithmName("");
+          if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
+              segmentCategoryCodeMeaningProp != nullptr)
+            segAttr->setSegmentedPropertyCategoryCode(segmentCategoryCodeValueProp->GetValueAsString(),
+                                                      segmentCategoryCodeSchemeProp->GetValueAsString(),
+                                                      segmentCategoryCodeMeaningProp->GetValueAsString());
+          if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
+              segmentTypeCodeMeaningProp != nullptr)
+            segAttr->setSegmentedPropertyType(segmentTypeCodeValueProp->GetValueAsString(),
+                                              segmentTypeCodeSchemeProp->GetValueAsString(),
+                                              segmentTypeCodeMeaningProp->GetValueAsString());
+          if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
+              segmentModifierCodeMeaningProp != nullptr)
+            segAttr->setSegmentedPropertyTypeModifier(segmentModifierCodeValueProp->GetValueAsString(),
+                                                      segmentModifierCodeSchemeProp->GetValueAsString(),
+                                                      segmentModifierCodeMeaningProp->GetValueAsString());
+
+          Color color = label->GetColor();
+          segAttr->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
+        }
       }
     }
-
-    handler.segmentsAttributesMappingList = segAttrMappingList;
-
     return handler.getJSONOutputAsString();
   }
 

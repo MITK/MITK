@@ -16,15 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkAddNewPropertyDialog.h"
 #include "mitkGetPropertyService.h"
-#include <mitkIPropertyPersistence.h>
-#include <mitkProperties.h>
 #include <QMessageBox>
 #include <cassert>
+#include <mitkIPropertyPersistence.h>
+#include <mitkProperties.h>
 
-QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::Overlay::Pointer overlay, mitk::BaseRenderer::Pointer renderer, QWidget* parent)
-  : QDialog(parent),
-    m_Overlay(overlay),
-    m_Renderer(renderer)
+QmitkAddNewPropertyDialog::QmitkAddNewPropertyDialog(mitk::Annotation::Pointer overlay,
+                                                     mitk::BaseRenderer::Pointer renderer,
+                                                     QWidget *parent)
+  : QDialog(parent), m_Overlay(overlay), m_Renderer(renderer)
 {
   this->Initialize();
 }
@@ -38,11 +38,18 @@ void QmitkAddNewPropertyDialog::Initialize()
   m_Controls.setupUi(this);
 
   QStringList types;
-  types << "bool" << "double" << "float" << "int" << "string";
+  types << "bool"
+        << "double"
+        << "float"
+        << "int"
+        << "string";
 
   m_Controls.typeComboBox->addItems(types);
 
-  connect(m_Controls.typeComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(ShowAdequateValueWidget(const QString&)));
+  connect(m_Controls.typeComboBox,
+          SIGNAL(currentIndexChanged(const QString &)),
+          this,
+          SLOT(ShowAdequateValueWidget(const QString &)));
   connect(m_Controls.addButton, SIGNAL(clicked()), this, SLOT(AddNewProperty()));
   connect(m_Controls.cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
@@ -141,7 +148,7 @@ bool QmitkAddNewPropertyDialog::ValidateValue()
   return false;
 }
 
-void QmitkAddNewPropertyDialog::ShowAdequateValueWidget(const QString& type)
+void QmitkAddNewPropertyDialog::ShowAdequateValueWidget(const QString &type)
 {
   m_Controls.valueLineEdit->clear();
   m_Controls.valueLineEdit->hide();

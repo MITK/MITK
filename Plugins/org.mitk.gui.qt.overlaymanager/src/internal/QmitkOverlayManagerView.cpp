@@ -35,20 +35,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "internal/org_mitk_gui_qt_overlaymanager_Activator.h"
 
-#include "mitkAnnotationPlacer.h"
-#include "mitkAnnotationService.h"
+#include "mitkAnnotationUtils.h"
 #include "mitkGetPropertyService.h"
-#include "mitkOverlayLayouter2D.h"
+#include "mitkLayoutAnnotationRenderer.h"
+#include "mitkManualPlacementAnnotationRenderer.h"
 #include "mitkRenderingManager.h"
-#include <mitkColorBarOverlay.h>
+#include <mitkColorBarAnnotation.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>
 #include <mitkIPropertyPersistence.h>
-#include <mitkLabelOverlay3D.h>
-#include <mitkLogoOverlay.h>
-#include <mitkScaleLegendOverlay.h>
-#include <mitkTextOverlay2D.h>
-#include <mitkTextOverlay3D.h>
+#include <mitkLabelAnnotation3D.h>
+#include <mitkLogoAnnotation.h>
+#include <mitkScaleLegendAnnotation.h>
+#include <mitkTextAnnotation2D.h>
+#include <mitkTextAnnotation3D.h>
 
 const std::string QmitkOverlayManagerView::VIEW_ID = "org.mitk.views.overlaymanager";
 
@@ -285,12 +285,12 @@ void QmitkOverlayManagerView::InitializeAddOverlayMenu()
 {
   m_AddOverlayMenu = new QMenu(m_Controls.m_AddOverlay);
 
-  m_AddOverlayMenu->addAction("TextOverlay2D");
-  m_AddOverlayMenu->addAction("TextOverlay3D");
-  m_AddOverlayMenu->addAction("LabelOverlay");
-  m_AddOverlayMenu->addAction("ColorBarOverlay");
-  m_AddOverlayMenu->addAction("ScaleLegendOverlay");
-  m_AddOverlayMenu->addAction("LogoOverlay");
+  m_AddOverlayMenu->addAction("TextAnnotation2D");
+  m_AddOverlayMenu->addAction("TextAnnotation3D");
+  m_AddOverlayMenu->addAction("LabelAnnotation");
+  m_AddOverlayMenu->addAction("ColorBarAnnotation");
+  m_AddOverlayMenu->addAction("ScaleLegendAnnotation");
+  m_AddOverlayMenu->addAction("LogoAnnotation");
 }
 
 void QmitkOverlayManagerView::Activated()
@@ -339,7 +339,7 @@ void QmitkOverlayManagerView::OnActivateOverlayList()
   if (!m_Renderer)
     return;
   std::vector<mitk::AbstractAnnotationRenderer *> arList =
-    mitk::AnnotationService::GetAnnotationRenderer(m_Renderer->GetName());
+    mitk::AnnotationUtils::GetAnnotationRenderer(m_Renderer->GetName());
   m_Controls.m_OverlayList->clear();
   for (auto ar : arList)
   {
@@ -373,7 +373,7 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
     m_PropertyNameChangedTag = 0;
   }
 
-  mitk::Overlay *overlay = nullptr;
+  mitk::Annotation *overlay = nullptr;
   QString oID;
   if (current)
   {
@@ -383,7 +383,7 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
       overlay = it->second;
     else
     {
-      overlay = mitk::AnnotationService::GetOverlay(oID.toStdString());
+      overlay = mitk::AnnotationUtils::GetAnnotation(oID.toStdString());
     }
   }
 
@@ -434,82 +434,82 @@ void QmitkOverlayManagerView::OnDelete()
   auto items = m_Controls.m_OverlayList->selectedItems();
   if (items.count() < 1)
     return;
-  mitk::Overlay *overlay = nullptr;
+  mitk::Annotation *overlay = nullptr;
   QListWidgetItem *item = items[0];
   if (item)
-    overlay = reinterpret_cast<mitk::Overlay *>(item->data(Qt::UserRole).value<void *>());
+    overlay = reinterpret_cast<mitk::Annotation *>(item->data(Qt::UserRole).value<void *>());
 }
 
 void QmitkOverlayManagerView::OnAddOverlay()
 {
   QAction *action = m_AddOverlayMenu->exec(QCursor::pos());
 
-  mitk::Overlay::Pointer overlay;
+  mitk::Annotation::Pointer overlay;
 
   if (action != NULL)
   {
     const QString widgetKey = action->text();
 
-    if (widgetKey == "TextOverlay2D")
+    if (widgetKey == "TextAnnotation2D")
       overlay = CreateTextOverlay2D();
 
-    else if (widgetKey == "TextOverlay3D")
+    else if (widgetKey == "TextAnnotation3D")
       overlay = CreateTextOverlay3D();
 
-    else if (widgetKey == "LabelOverlay")
+    else if (widgetKey == "LabelAnnotation")
       overlay = CreateLabelOverlay();
 
-    else if (widgetKey == "ColorBarOverlay")
+    else if (widgetKey == "ColorBarAnnotation")
       overlay = CreateColorBarOverlay();
 
-    else if (widgetKey == "ScaleLegendOverlay")
+    else if (widgetKey == "ScaleLegendAnnotation")
       overlay = CreateScaleLegendOverlay();
 
-    else if (widgetKey == "LogoOverlay")
+    else if (widgetKey == "LogoAnnotation")
       overlay = CreateLogoOverlay();
 
     mitk::BaseRenderer *renderer =
       this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
-    mitk::OverlayLayouter2D::AddOverlay(overlay, renderer);
+    mitk::LayoutAnnotationRenderer::AddAnnotation(overlay, renderer);
     m_OverlayMap[overlay->GetMicroserviceID()] = overlay;
   }
   OnActivateOverlayList();
 }
 
-mitk::Overlay::Pointer QmitkOverlayManagerView::CreateTextOverlay2D()
+mitk::Annotation::Pointer QmitkOverlayManagerView::CreateTextOverlay2D()
 {
-  mitk::TextOverlay2D::Pointer to = mitk::TextOverlay2D::New();
+  mitk::TextAnnotation2D::Pointer to = mitk::TextAnnotation2D::New();
   to->SetText("Test");
   return to.GetPointer();
 }
 
-mitk::Overlay::Pointer QmitkOverlayManagerView::CreateTextOverlay3D()
+mitk::Annotation::Pointer QmitkOverlayManagerView::CreateTextOverlay3D()
 {
-  mitk::TextOverlay3D::Pointer to = mitk::TextOverlay3D::New();
+  mitk::TextAnnotation3D::Pointer to = mitk::TextAnnotation3D::New();
   return to.GetPointer();
 }
 
-mitk::Overlay::Pointer QmitkOverlayManagerView::CreateLabelOverlay()
+mitk::Annotation::Pointer QmitkOverlayManagerView::CreateLabelOverlay()
 {
-  mitk::LabelOverlay3D::Pointer to = mitk::LabelOverlay3D::New();
+  mitk::LabelAnnotation3D::Pointer to = mitk::LabelAnnotation3D::New();
   return to.GetPointer();
 }
 
-mitk::Overlay::Pointer QmitkOverlayManagerView::CreateColorBarOverlay()
+mitk::Annotation::Pointer QmitkOverlayManagerView::CreateColorBarOverlay()
 {
-  mitk::ColorBarOverlay::Pointer to = mitk::ColorBarOverlay::New();
+  mitk::ColorBarAnnotation::Pointer to = mitk::ColorBarAnnotation::New();
   return to.GetPointer();
 }
 
-mitk::Overlay::Pointer QmitkOverlayManagerView::CreateScaleLegendOverlay()
+mitk::Annotation::Pointer QmitkOverlayManagerView::CreateScaleLegendOverlay()
 {
-  mitk::ScaleLegendOverlay::Pointer to = mitk::ScaleLegendOverlay::New();
+  mitk::ScaleLegendAnnotation::Pointer to = mitk::ScaleLegendAnnotation::New();
   return to.GetPointer();
 }
 
-mitk::Overlay::Pointer QmitkOverlayManagerView::CreateLogoOverlay()
+mitk::Annotation::Pointer QmitkOverlayManagerView::CreateLogoOverlay()
 {
-  mitk::LogoOverlay::Pointer to = mitk::LogoOverlay::New();
+  mitk::LogoAnnotation::Pointer to = mitk::LogoAnnotation::New();
   return to.GetPointer();
 }
 

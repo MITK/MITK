@@ -257,14 +257,14 @@ set(CPP_FILES
   IO/mitkVtkLoggingAdapter.cpp
 
   Rendering/mitkAbstractAnnotationRenderer.cpp
-  Rendering/mitkAnnotationService.cpp
+  Rendering/mitkAnnotationUtils.cpp
   Rendering/mitkBaseRenderer.cpp
   #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkIShaderRepository.cpp
   Rendering/mitkMapper.cpp
-  Rendering/mitkOverlay.cpp
+  Rendering/mitkAnnotation.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp

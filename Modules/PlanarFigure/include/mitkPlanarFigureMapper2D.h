@@ -27,7 +27,7 @@ namespace mitk
 {
   class BaseRenderer;
   class Contour;
-  class TextOverlay2D;
+  class TextAnnotation2D;
 
   /**
   * \brief OpenGL-based mapper to render display sub-class instances of mitk::PlanarFigure
@@ -298,8 +298,8 @@ namespace mitk
     // Bool flag that indicates if a node modified observer was added
     bool m_NodeModifiedObserverAdded;
 
-    itk::SmartPointer<mitk::TextOverlay2D> m_AnnotationOverlay;
-    itk::SmartPointer<mitk::TextOverlay2D> m_QuantityOverlay;
+    itk::SmartPointer<mitk::TextAnnotation2D> m_AnnotationAnnotation;
+    itk::SmartPointer<mitk::TextAnnotation2D> m_QuantityAnnotation;
   };
 
 } // namespace mitk

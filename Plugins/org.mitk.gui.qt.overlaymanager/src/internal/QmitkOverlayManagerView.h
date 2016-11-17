@@ -19,8 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
+#include "mitkAnnotation.h"
 #include "mitkILifecycleAwarePart.h"
-#include "mitkOverlay.h"
 #include "ui_QmitkOverlayManagerViewControls.h"
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -53,7 +53,7 @@ class QmitkOverlayManagerView : public QmitkAbstractView,
   Q_OBJECT
 
 public:
-  typedef std::map<std::string, mitk::Overlay::Pointer> OverlayMapType;
+  typedef std::map<std::string, mitk::Annotation::Pointer> OverlayMapType;
   static const std::string VIEW_ID;
   QmitkOverlayManagerView();
   ~QmitkOverlayManagerView();
@@ -80,12 +80,12 @@ private slots:
   void OnAddOverlay();
 
 private:
-  mitk::Overlay::Pointer CreateTextOverlay2D();
-  mitk::Overlay::Pointer CreateTextOverlay3D();
-  mitk::Overlay::Pointer CreateLabelOverlay();
-  mitk::Overlay::Pointer CreateColorBarOverlay();
-  mitk::Overlay::Pointer CreateScaleLegendOverlay();
-  mitk::Overlay::Pointer CreateLogoOverlay();
+  mitk::Annotation::Pointer CreateTextOverlay2D();
+  mitk::Annotation::Pointer CreateTextOverlay3D();
+  mitk::Annotation::Pointer CreateLabelOverlay();
+  mitk::Annotation::Pointer CreateColorBarOverlay();
+  mitk::Annotation::Pointer CreateScaleLegendOverlay();
+  mitk::Annotation::Pointer CreateLogoOverlay();
 
   QString GetPropertyNameOrAlias(const QModelIndex &index);
   void OnPropertyNameChanged(const itk::EventObject &event);
@@ -115,7 +115,7 @@ private:
   QSortFilterProxyModel *m_ProxyModel;
   QmitkPropertyItemModel *m_Model;
   QmitkPropertyItemDelegate *m_Delegate;
-  mitk::Overlay::Pointer m_SelectedOverlay;
+  mitk::Annotation::Pointer m_SelectedOverlay;
   mitk::BaseRenderer *m_Renderer;
   QMenu *m_AddOverlayMenu;
   unsigned long m_RenderWindowFocusObserverTag;

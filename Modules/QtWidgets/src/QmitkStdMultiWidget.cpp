@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
-#include <mitkAnnotationPlacer.h>
+#include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkCameraController.h>
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
@@ -302,7 +302,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
 
   // setup the department logo rendering
-  m_LogoRendering = mitk::LogoOverlay::New();
+  m_LogoRendering = mitk::LogoAnnotation::New();
   mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
   m_LogoRendering->SetOpacity(0.5);
   mitk::Point2D offset;
@@ -311,7 +311,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
   m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  mitk::AnnotationPlacer::AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoRendering.GetPointer(), renderer4);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -1424,7 +1424,7 @@ void QmitkStdMultiWidget::moveEvent(QMoveEvent *e)
 {
   QWidget::moveEvent(e);
 
-  // it is necessary to readjust the position of the overlays as the StdMultiWidget has moved
+  // it is necessary to readjust the position of the Annotation as the StdMultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
   emit Moved();
 }

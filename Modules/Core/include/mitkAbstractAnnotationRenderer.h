@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef ABSTRACTANNOTATIONRENDERER_H
 #define ABSTRACTANNOTATIONRENDERER_H
 
-#include "mitkOverlay.h"
+#include "mitkAnnotation.h"
 #include "mitkServiceInterface.h"
 #include "usGetModuleContext.h"
 #include "usServiceTracker.h"
@@ -28,19 +28,19 @@ namespace mitk
 {
   class BaseRenderer;
 
-  /** @brief Baseclass of Overlay layouters */
+  /** @brief Baseclass of Annotation layouters */
   /**
-   *A AbstractAnnotationRenderer can be implemented to control a set of Overlays by means of position and size.
+   *A AbstractAnnotationRenderer can be implemented to control a set of Annotation by means of position and size.
    *AbstractAnnotationRenderer::PrepareLayout() should be implemented with a routine to set the position of the internal
-   *m_ManagedOverlays List.
+   *m_ManagedAnnotation List.
    *A layouter is always connected to one BaseRenderer, so there is one instance of the layouter for each BaseRenderer.
    *One type of layouter should always have a unique identifier.
-   *@ingroup Overlays
+   *@ingroup Annotation
   */
-  class MITKCORE_EXPORT AbstractAnnotationRenderer : public us::ServiceTracker<Overlay>
+  class MITKCORE_EXPORT AbstractAnnotationRenderer : public us::ServiceTracker<Annotation>
   {
   public:
-    typedef us::ServiceTracker<Overlay> Superclass;
+    typedef us::ServiceTracker<Annotation> Superclass;
     AbstractAnnotationRenderer(const std::string &rendererID, const std::string &arID);
 
     /** \brief virtual destructor in order to derive from this class */
@@ -52,7 +52,7 @@ namespace mitk
     void CurrentBaseRendererChanged();
 
     virtual void OnRenderWindowModified() {}
-    void RemoveAllOverlays();
+    void RemoveAllAnnotation();
 
     void Update();
 

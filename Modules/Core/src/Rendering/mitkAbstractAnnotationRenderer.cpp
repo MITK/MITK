@@ -28,8 +28,8 @@ namespace mitk
 
   AbstractAnnotationRenderer::AbstractAnnotationRenderer(const std::string &rendererID, const std::string &arID)
     : Superclass(us::GetModuleContext(),
-                 us::LDAPFilter("(&(" + Overlay::US_PROPKEY_RENDERER_ID + "=" + rendererID + ")(" +
-                                Overlay::US_PROPKEY_AR_ID + "=" + arID + "))")),
+                 us::LDAPFilter("(&(" + Annotation::US_PROPKEY_RENDERER_ID + "=" + rendererID + ")(" +
+                                Annotation::US_PROPKEY_AR_ID + "=" + arID + "))")),
       m_RendererID(rendererID),
       m_ID(arID)
   {
@@ -43,19 +43,19 @@ namespace mitk
     BaseRenderer *renderer = GetCurrentBaseRenderer();
     if (renderer)
     {
-      for (Overlay *o : this->GetServices())
+      for (Annotation *o : this->GetServices())
       {
         o->AddToBaseRenderer(renderer);
       }
     }
   }
 
-  void AbstractAnnotationRenderer::RemoveAllOverlays()
+  void AbstractAnnotationRenderer::RemoveAllAnnotation()
   {
     BaseRenderer *renderer = GetCurrentBaseRenderer();
     if (renderer)
     {
-      for (Overlay *o : this->GetServices())
+      for (Annotation *o : this->GetServices())
       {
         o->RemoveFromBaseRenderer(renderer);
       }
@@ -67,7 +67,7 @@ namespace mitk
     BaseRenderer *renderer = GetCurrentBaseRenderer();
     if (renderer)
     {
-      for (Overlay *o : this->GetServices())
+      for (Annotation *o : this->GetServices())
       {
         o->Update(renderer);
       }
@@ -77,14 +77,14 @@ namespace mitk
   AbstractAnnotationRenderer::TrackedType AbstractAnnotationRenderer::AddingService(
     const AbstractAnnotationRenderer::ServiceReferenceType &reference)
   {
-    Overlay *overlay = Superclass::AddingService(reference);
+    Annotation *Annotation = Superclass::AddingService(reference);
     BaseRenderer *renderer = GetCurrentBaseRenderer();
-    if (overlay && renderer)
+    if (Annotation && renderer)
     {
-      overlay->AddToBaseRenderer(renderer);
+      Annotation->AddToBaseRenderer(renderer);
     }
     //    OnAnnotationRenderersChanged();
-    return overlay;
+    return Annotation;
   }
 
   void AbstractAnnotationRenderer::ModifiedService(const AbstractAnnotationRenderer::ServiceReferenceType &,

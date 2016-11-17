@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Photoacoustics Hardware
 #include <mitkQuantelLaser.h>
 #include <mitkGalilMotor.h>
-#include <mitkOphirPyro.h>
+//#include <mitkOphirPyro.h>
 
 #include <vector>
 
@@ -93,7 +93,7 @@ public:
 
     mitk::QuantelLaser::Pointer m_PumpLaserController;
     mitk::GalilMotor::Pointer m_OPOMotor;
-    mitk::OphirPyro::Pointer m_Pyro;
+    //mitk::OphirPyro::Pointer m_Pyro;
 
 };
 

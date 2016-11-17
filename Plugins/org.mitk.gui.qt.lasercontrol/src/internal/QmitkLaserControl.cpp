@@ -181,6 +181,7 @@ void OPOLaserControl::InitLaser()
   }
   m_Controls.buttonInitLaser->setEnabled(true);
   this->GetState();
+  /*
   try
   {
     if (!m_PyroConnected)
@@ -190,8 +191,8 @@ void OPOLaserControl::InitLaser()
       MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
       m_CurrentPulseEnergy = 0;
       m_PyroConnected = true;
-      QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShowEnergy);
-      m_EnergyWatcher.setFuture(future);
+      //QFuture<void> future = QtConcurrent::run(this, &OPOLaserControl::ShowEnergy);
+      //m_EnergyWatcher.setFuture(future);
     }
     else
     {
@@ -200,7 +201,7 @@ void OPOLaserControl::InitLaser()
   } catch (...) {
     MITK_INFO << " While trying to connect to the Pyro an exception was caught (this almost always happens on the first try after reboot - try again!)";
     m_PyroConnected = false;
-  }
+  }*/
 }
 
 void OPOLaserControl::TuneWavelength()
@@ -273,7 +274,7 @@ void OPOLaserControl::ShutterCountDown()
 
 void OPOLaserControl::ShowEnergy()
 {
-  forever
+  /*forever
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     MITK_INFO << "[Pyro Debug] ShowEnergy()";
@@ -287,7 +288,7 @@ void OPOLaserControl::ShowEnergy()
   //  m_Pyro->GetDataFromSensor();
     m_CurrentPulseEnergy = 60000 * m_Pyro->LookupCurrentPulseEnergy();
     m_Controls.labelEnergy->setText(std::to_string(m_CurrentPulseEnergy).append(" mJ").c_str());
-  }
+  }*/
 }
 
 void OPOLaserControl::ToggleFlashlamp()

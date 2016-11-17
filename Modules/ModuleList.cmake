@@ -52,6 +52,7 @@ set(mitk_modules
   ToFHardware
   ToFProcessing
   ToFUI
+  PhotoacousticsHardware
   US
   USUI
   DicomUI
@@ -71,7 +72,6 @@ set(mitk_modules
   BiophotonicsHardware
   Classification
   TumorInvasionAnalysis
-  PhotoacousticsHardware
   MatchPointRegistration
   MatchPointRegistrationUI
 )

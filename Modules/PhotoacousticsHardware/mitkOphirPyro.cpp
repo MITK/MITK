@@ -27,7 +27,9 @@ m_DeviceHandle(0),
 m_Connected(false),
 m_Streaming(false),
 m_SerialNumber(nullptr),
-m_GetDataThread()
+m_GetDataThread(),
+m_ImagePyroDelay(0),
+m_EnergyMultiplicator(60000)
 {
   m_PulseEnergy.clear();
   m_PulseTime.clear();
@@ -125,6 +127,7 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
 
         m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
         m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
+        MITK_INFO << "Data";
       }
     }
     catch (std::exception& ex)
@@ -156,9 +159,64 @@ double mitk::OphirPyro::LookupCurrentPulseEnergy()
   return 0;
 }
 
+double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double interval)
+{
+  if (!(m_PulseTime.size() > 0))
+    return 0;
+
+  long long searchTime = (ImageTimeStamp/1000000) - m_ImagePyroDelay; // conversion from ns to ms
+  int foundIndex = 0;
+  long long shortestDifference = 5*interval;
+
+  // search the list for a fitting energy value time
+  for (int index = 0; index < m_PulseTime.size();++index)
+  {
+    if ((m_PulseTime[index] - searchTime) < shortestDifference)
+    {
+      shortestDifference = m_PulseTime[index] - searchTime;
+      foundIndex = index;
+    }
+  }
+
+  if (abs(shortestDifference) < interval)
+  {
+    // delete all elements before the one found
+    m_PulseEnergy.erase(m_PulseEnergy.begin(), m_PulseEnergy.begin() + foundIndex);
+    m_PulseTime.erase(m_PulseTime.begin(), m_PulseTime.begin() + foundIndex);
+    m_PulseStatus.erase(m_PulseStatus.begin(), m_PulseStatus.begin() + foundIndex);
+
+    // multipy with m_EnergyMultiplicator, because the Pyro gives just a fraction of the actual Laser Energy
+    return (GetNextPulseEnergy()*m_EnergyMultiplicator);
+  }
+
+  MITK_INFO << "No matching energy value for image found in interval of " << interval << "ms.";
+  return -1;
+}
+
+double mitk::OphirPyro::GetNextEnergyInmj(long long ImageTimeStamp, double interval)
+{
+  if (m_Connected && !(m_PulseTime.size() > 0))
+    return 0;
+
+  long long searchTime = (ImageTimeStamp / 1000000) - m_ImagePyroDelay; // conversion from ns to ms
+
+  if (abs(searchTime - m_PulseTime.front()) < interval)
+  {
+    return (GetNextPulseEnergy()*m_EnergyMultiplicator); // multipy with m_EnergyMultiplicator, because the Pyro gives just a fraction of the actual Laser Energy
+  }
+
+  MITK_INFO << "Image aquisition and energy measurement ran out of sync";
+  return -1;
+}
+
+void mitk::OphirPyro::SetSyncDelay(long long FirstImageTimeStamp)
+{
+  m_ImagePyroDelay = (FirstImageTimeStamp / 1000000) - m_PulseTime.at(0);
+}
+
 double mitk::OphirPyro::GetNextPulseEnergy()
 {
-  if (m_Connected)
+  if (m_Connected && m_PulseEnergy.size()>=1)
   {
     double out = m_PulseEnergy.front();
     m_PulseEnergy.erase(m_PulseEnergy.begin());

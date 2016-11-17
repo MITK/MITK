@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mutex>
 #include <iostream>
 #include <fstream>
+#include <mitkOphirPyro.h>
 
 
 namespace mitk {
@@ -110,6 +111,8 @@ protected:
   std::vector<double>                   m_pixelValues;
   long long                             m_currenttime;
   bool                                  currentlyRecording;
+  mitk::OphirPyro::Pointer              m_Pyro;
+  bool                                  m_PyroConnected;
 
 
   std::vector<mitk::Image::Pointer>     m_ImageBuffer;

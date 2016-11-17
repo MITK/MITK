@@ -49,7 +49,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_DataTypeNext(DataType::Image_uChar),
   m_UseBModeFilterModified(false),
   m_UseBModeFilterNext(false),
-  m_currenttime(0)
+  m_currenttime(0),
+  m_PyroConnected(false)
 {
   m_ImageMutex = itk::FastMutexLock::New();
 
@@ -263,6 +264,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
   //    m_GUIOutput(QString::fromStdString(s.str()));
   //  }
+
     m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
     m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
   }
@@ -359,12 +361,40 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     m_recordedImages.clear();  // we make sure there are no leftovers
     m_timestamps.clear();      // also for the timestamps
     m_pixelValues.clear();     // aaaand for the pixel values
+
+    // start the pyro data acquisition
+    try
+    {
+      if (!m_PyroConnected)
+      {
+        m_Pyro = mitk::OphirPyro::New();
+        MITK_INFO << "[Pyro Debug] OpenConnection: " << m_Pyro->OpenConnection();
+        MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
+        m_PyroConnected = true;
+      }
+      else
+      {
+        m_PyroConnected = false;
+      }
+    }
+    catch (...) {
+      MITK_INFO << "While trying to connect to the Pyro an exception was caught (this almost always happens on the first try after reboot - try again!)";
+      m_PyroConnected = false;
+    }
+
+    // tell the callback to start recording images
     currentlyRecording = true;
   }
   // save images, end recording, and clean up
   else
   {
     currentlyRecording = false;
+
+    // close the pyro
+    MITK_INFO << "[Pyro Debug] StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
+    MITK_INFO << "[Pyro Debug] CloseConnection: " << m_Pyro->CloseConnection();
+    m_PyroConnected = false;
+    m_Pyro = nullptr;
 
     // get the time and date, put them into a nice string and create a folder for the images
     time_t time = std::time(nullptr);
@@ -380,14 +410,18 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     Image::Pointer USImage = Image::New();
     std::string pathPA = "c:\\DiPhASImageData\\" + currentDate + "\\" + "PAImages" + ".nrrd";
     std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
-    std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "Timestamps" + ".csv";
+    std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "TimestampsImages" + ".csv";
 
     // order the images and save them
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
-      OrderImagesInterleaved(PAImage, USImage);
-      mitk::IOUtil::Save(USImage, pathUS);
-      mitk::IOUtil::Save(PAImage, pathPA);
+      bool saveImageData = false;
+      if (saveImageData)
+      {
+        OrderImagesInterleaved(PAImage, USImage);
+        mitk::IOUtil::Save(USImage, pathUS);
+        mitk::IOUtil::Save(PAImage, pathPA);
+      }
 
       // read the pixelvalues of the enveloped images at this position
       itk::Index<3> pixel = { { m_recordedImages.at(1)->GetDimension(0) / 2, 84, 0 } }; //22/532*2048
@@ -426,7 +460,6 @@ void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel)
     m_pixelValues.push_back(m_recordedImages.at(index).GetPointer()->GetPixelValueByIndex(pixel));
   }
 }
-
 
 void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage)
 {

@@ -50,10 +50,15 @@ namespace mitk {
     virtual bool StopDataAcquisition();
     unsigned int GetDataFromSensor();
     void GetDataFromSensorThread();
+
     virtual double LookupCurrentPulseEnergy();
     virtual double GetNextPulseEnergy();
     virtual double LookupCurrentPulseEnergy(double* timestamp, int* status);
     virtual double GetNextPulseEnergy(double* timestamp, int* status);
+
+    virtual double GetClosestEnergyInmJ(long long ImageTimeStamp, double interval=20);
+    virtual double GetNextEnergyInmJ(long long ImageTimeStamp, double interval = 20);
+    virtual void SetSyncDelay(long long FirstImageTimeStamp);
 
   protected:
     OphirPyro();
@@ -70,6 +75,8 @@ namespace mitk {
     std::vector<long long> m_TimeStamps;
     double m_CurrentWavelength;
     double m_CurrentEnergyRange;
+    long long m_ImagePyroDelay;
+    float m_EnergyMultiplicator;
 
     std::thread m_GetDataThread;
   };

@@ -263,7 +263,7 @@ void mitk::PlaneGeometryDataToSurfaceFilter::GenerateOutputInformation()
       m_Transform->Identity();
       m_Transform->Concatenate(planeGeometry->GetVtkTransform()->GetLinearInverse());
 
-      BaseGeometry *referenceGeometry = planeGeometry->GetReferenceGeometry();
+      const BaseGeometry *referenceGeometry = planeGeometry->GetReferenceGeometry();
       if (referenceGeometry)
       {
         m_Transform->Concatenate(referenceGeometry->GetVtkTransform());

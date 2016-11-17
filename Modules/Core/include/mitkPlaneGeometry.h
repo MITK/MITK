@@ -544,12 +544,12 @@ namespace mitk
     * This would usually be the BaseGeometry of the underlying dataset, but
     * setting it is optional.
     */
-    void SetReferenceGeometry(mitk::BaseGeometry *geometry);
+    void SetReferenceGeometry(const mitk::BaseGeometry *geometry);
 
     /**
     * \brief Get the geometrical frame of reference for this PlaneGeometry.
     */
-    BaseGeometry *GetReferenceGeometry() const;
+    const BaseGeometry *GetReferenceGeometry() const;
     bool HasReferenceGeometry() const;
 
   protected:
@@ -561,7 +561,7 @@ namespace mitk
 
     virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    mitk::BaseGeometry *m_ReferenceGeometry;
+    const mitk::BaseGeometry *m_ReferenceGeometry;
 
     //##Documentation
     //## @brief PreSetSpacing

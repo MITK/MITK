@@ -78,13 +78,15 @@ void org_mitk_core_services_Activator::start(ctkPluginContext* context)
   QString logFilenamePrefix = "mitk";
   QFileInfo path = context->getDataFile(logFilenamePrefix);
   try
-    {
-    mitk::LoggingBackend::RotateLogFiles(path.absoluteFilePath().toStdString());
-    }
+  {
+    // using local8bit, because ofstream is not unicode aware (at least on windows)
+    // to use utf-8 with ofstream it's possible to use "nowide.boots" lib
+    mitk::LoggingBackend::RotateLogFiles(path.absoluteFilePath().toLocal8Bit().constData());
+  }
   catch(mitk::Exception& e)
-    {
-      MITK_ERROR << "Problem during logfile initialization: " << e.GetDescription() << " Caution: Logging to harddisc might be disabled!";
-    }
+  {
+    MITK_ERROR << "Problem during logfile initialization: " << e.GetDescription() << " Caution: Logging to harddisc might be disabled!";
+  }
   mitk::VtkLoggingAdapter::Initialize();
   mitk::ItkLoggingAdapter::Initialize();
 

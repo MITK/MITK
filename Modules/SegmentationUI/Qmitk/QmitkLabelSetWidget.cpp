@@ -236,7 +236,7 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint &pos)
     QWidgetAction *OpacityAction = new QWidgetAction(this);
     OpacityAction->setDefaultWidget(_OpacityWidget);
     //  QObject::connect( m_OpacityAction, SIGNAL( changed() ), this, SLOT( OpacityActionChanged() ) );
-    opacitySlider->setValue(static_cast<int>(GetWorkingImage()->GetLabel(pixelValue)->GetOpacity() * 100));
+    opacitySlider->setValue(static_cast<int>(GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetOpacity() * 100));
 
     menu->addAction(OpacityAction);
   }
@@ -275,12 +275,12 @@ void QmitkLabelSetWidget::OnSetOnlyActiveLabelVisible(bool /*value*/)
   int pixelValue = GetPixelValueOfSelectedItem();
 
   workingImage->GetActiveLabelSet()->SetAllLabelsVisible(false);
-  workingImage->GetLabel(pixelValue)->SetVisible(true);
+  workingImage->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetVisible(true);
 
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 
   this->WaitCursorOn();
-  const mitk::Point3D &pos = workingImage->GetLabel(pixelValue)->GetCenterOfMassCoordinates();
+  const mitk::Point3D &pos = workingImage->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
   this->WaitCursorOff();
   if (pos.GetVnlVector().max_value() > 0.0)
     emit goToLabel(pos);
@@ -320,7 +320,7 @@ void QmitkLabelSetWidget::OnEraseLabel(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
   QString question = "Do you really want to erase the contents of label \"";
-  question.append(QString::fromStdString(GetWorkingImage()->GetLabel(pixelValue)->GetName()));
+  question.append(QString::fromStdString(GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetName()));
   question.append("\"?");
 
   QMessageBox::StandardButton answerButton =
@@ -339,7 +339,7 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
   QString question = "Do you really want to remove label \"";
-  question.append(QString::fromStdString(GetWorkingImage()->GetLabel(pixelValue)->GetName()));
+  question.append(QString::fromStdString(GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetName()));
   question.append("\"?");
 
   QMessageBox::StandardButton answerButton =
@@ -352,6 +352,8 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
     GetWorkingImage()->EraseLabel(pixelValue);
     this->WaitCursorOff();
   }
+
+  this->ResetAllTableWidgetItems();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -368,8 +370,8 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
     return;
   int pixelValue = GetWorkingImage()->GetActiveLabel()->GetValue();
 
-  GetWorkingImage()->GetLabel(pixelValue)->SetColor(dialog.GetColor());
-  GetWorkingImage()->GetLabel(pixelValue)->SetName(dialog.GetSegmentationName().toStdString());
+  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(dialog.GetColor());
+  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetName(dialog.GetSegmentationName().toStdString());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 }
 
@@ -445,7 +447,7 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
   QString question = "Do you really want to merge selected labels into \"";
-  question.append(QString::fromStdString(GetWorkingImage()->GetLabel(pixelValue)->GetName()));
+  question.append(QString::fromStdString(GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetName()));
   question.append("\"?");
 
   QMessageBox::StandardButton answerButton = QMessageBox::question(
@@ -487,7 +489,7 @@ void QmitkLabelSetWidget::OnLockedButtonClicked()
   if (row >= 0 && row < m_Controls.m_LabelSetTableWidget->rowCount())
   {
     int pixelValue = m_Controls.m_LabelSetTableWidget->item(row, 0)->data(Qt::UserRole).toInt();
-    GetWorkingImage()->GetLabel(pixelValue)->SetLocked(!GetWorkingImage()->GetLabel(pixelValue)->GetLocked());
+    GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetLocked(!GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetLocked());
   }
 }
 
@@ -508,7 +510,7 @@ void QmitkLabelSetWidget::OnVisibleButtonClicked()
     QTableWidgetItem *item = m_Controls.m_LabelSetTableWidget->item(row, 0);
     OnItemClicked(item);
     int pixelValue = item->data(Qt::UserRole).toInt();
-    GetWorkingImage()->GetLabel(pixelValue)->SetVisible(!GetWorkingImage()->GetLabel(pixelValue)->GetVisible());
+    GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetVisible(!GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetVisible());
     GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -528,7 +530,7 @@ void QmitkLabelSetWidget::OnColorButtonClicked()
   if (row >= 0 && row < m_Controls.m_LabelSetTableWidget->rowCount())
   {
     int pixelValue = m_Controls.m_LabelSetTableWidget->item(row, 0)->data(Qt::UserRole).toInt();
-    const mitk::Color &color = GetWorkingImage()->GetLabel(pixelValue)->GetColor();
+    const mitk::Color &color = GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetColor();
     QColor initial(color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255);
     QColor qcolor = QColorDialog::getColor(initial, 0, QString("Change color"));
     if (!qcolor.isValid())
@@ -554,7 +556,7 @@ void QmitkLabelSetWidget::OnColorButtonClicked()
     newColor.SetGreen(qcolor.green() / 255.0);
     newColor.SetBlue(qcolor.blue() / 255.0);
 
-    GetWorkingImage()->GetLabel(pixelValue)->SetColor(newColor);
+    GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(newColor);
 
     GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
   }
@@ -563,7 +565,7 @@ void QmitkLabelSetWidget::OnColorButtonClicked()
 void QmitkLabelSetWidget::OnRandomColor(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
-  GetWorkingImage()->GetLabel(pixelValue)->SetColor(m_ColorSequenceRainbow.GetNextColor());
+  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(m_ColorSequenceRainbow.GetNextColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 }
 
@@ -609,7 +611,7 @@ void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   WaitCursorOn();
   mitk::LabelSetImage *workingImage = GetWorkingImage();
   workingImage->UpdateCenterOfMass(pixelValue);
-  const mitk::Point3D &pos = workingImage->GetLabel(pixelValue)->GetCenterOfMassCoordinates();
+  const mitk::Point3D &pos = workingImage->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
   WaitCursorOff();
   if (pos.GetVnlVector().max_value() > 0.0)
     emit goToLabel(pos);
@@ -741,7 +743,7 @@ void QmitkLabelSetWidget::UpdateAllTableWidgetItems()
 void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
 {
   mitk::LabelSetImage *workingImage = GetWorkingImage();
-  mitk::Label *label = workingImage->GetLabel(item->data(Qt::UserRole).toInt());
+  mitk::Label *label = workingImage->GetLabel(item->data(Qt::UserRole).toInt(), workingImage->GetActiveLayer());
 
   const mitk::Color &color = label->GetColor();
 
@@ -883,7 +885,7 @@ void QmitkLabelSetWidget::OnOpacityChanged(int value)
 {
   int pixelValue = m_Controls.m_LabelSetTableWidget->currentItem()->data(Qt::UserRole).toInt();
   float opacity = static_cast<float>(value) / 100.0f;
-  GetWorkingImage()->GetLabel(pixelValue)->SetOpacity(opacity);
+  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetOpacity(opacity);
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 }
 
@@ -927,7 +929,7 @@ void QmitkLabelSetWidget::OnSearchLabel()
   m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   this->WaitCursorOn();
-  mitk::Point3D pos = GetWorkingImage()->GetLabel(pixelValue)->GetCenterOfMassCoordinates();
+  mitk::Point3D pos = GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
 
   m_ToolManager->WorkingDataChanged();
 
@@ -936,7 +938,7 @@ void QmitkLabelSetWidget::OnSearchLabel()
   else
   {
     GetWorkingImage()->UpdateCenterOfMass(pixelValue);
-    mitk::Point3D pos = GetWorkingImage()->GetLabel(pixelValue)->GetCenterOfMassCoordinates();
+    mitk::Point3D pos = GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetCenterOfMassCoordinates();
     emit goToLabel(pos);
   }
 
@@ -1026,7 +1028,7 @@ void QmitkLabelSetWidget::OnCreateCroppedMask(bool)
   maskNode->SetBoolProperty("outline binary", true);
   maskNode->SetBoolProperty("outline binary shadow", true);
   maskNode->SetFloatProperty("outline width", 2.0);
-  maskNode->SetColor(workingImage->GetLabel(pixelValue)->GetColor());
+  maskNode->SetColor(workingImage->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetColor());
   maskNode->SetOpacity(1.0);
 
   m_DataStorage->Add(maskNode, workingNode);
@@ -1072,7 +1074,7 @@ void QmitkLabelSetWidget::OnCreateMask(bool /*triggered*/)
   maskNode->SetBoolProperty("outline binary", true);
   maskNode->SetBoolProperty("outline binary shadow", true);
   maskNode->SetFloatProperty("outline width", 2.0);
-  maskNode->SetColor(workingImage->GetLabel(pixelValue)->GetColor());
+  maskNode->SetColor(workingImage->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetColor());
   maskNode->SetOpacity(1.0);
 
   m_DataStorage->Add(maskNode, workingNode);

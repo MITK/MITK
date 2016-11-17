@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   : QDialog(parent), // true, modal
-    selectedOrgan("undefined"),
+    selectedOrgan(tr("undefined")),
     newOrganEntry(false)
 {
   QDialog::setFixedSize(250, 105);
@@ -42,7 +42,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   mitk::OrganTypeProperty::Pointer organTypes = mitk::OrganTypeProperty::New();
 
   // to enter a name for the segmentation
-  lblPrompt = new QLabel("Name and color of the segmentation", this);
+  lblPrompt = new QLabel(tr("Name and color of the segmentation"), this);
   verticalLayout->addWidget(lblPrompt);
 
   // to choose a color

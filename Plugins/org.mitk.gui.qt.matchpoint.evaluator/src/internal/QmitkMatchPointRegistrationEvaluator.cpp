@@ -177,6 +177,23 @@ void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchP
 	this->ConfigureControls();
 };
 
+
+void QmitkMatchPointRegistrationEvaluator::NodeRemoved(const mitk::DataNode* node)
+{
+  if (node == this->m_spSelectedMovingNode
+    || node == this->m_spSelectedRegNode
+    || node == this->m_spSelectedTargetNode
+    || node == this->m_selectedEvalNode)
+  {
+    if (node == this->m_selectedEvalNode)
+    {
+      this->m_selectedEvalNode = nullptr;
+    }
+    this->OnStopBtnPushed();
+    MITK_INFO << "Stopped current MatchPoint evaluation session, because at least one relevant node was removed from storage.";
+  }
+}
+
 void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 {
   //configure input data widgets
@@ -321,8 +338,12 @@ void QmitkMatchPointRegistrationEvaluator::OnStopBtnPushed()
 {
   this->m_activeEvaluation = false;
 
-  this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  if (this->m_selectedEvalNode.IsNotNull())
+  {
+    this->GetDataStorage()->Remove(this->m_selectedEvalNode);
+  }
   this->m_selectedEvalNode = nullptr;
+
   this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
 
   this->CheckInputs();

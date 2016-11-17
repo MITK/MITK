@@ -155,7 +155,8 @@ void mitk::LabelSetImage::RemoveLayer()
   GetLabelSet(layerToDelete)->RemoveAllObservers();
 
   // set the active layer to one below, if exists.
-  SetActiveLayer(layerToDelete - 1);
+  if (layerToDelete != 0)
+    SetActiveLayer(layerToDelete - 1);
 
   // remove labelset and image data
   m_LabelSetContainer.erase(m_LabelSetContainer.begin() + layerToDelete);
@@ -884,23 +885,37 @@ bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
     return false;
   }
 
-  // working image data
-  returnValue = mitk::Equal((const mitk::Image &)leftHandSide, (const mitk::Image &)rightHandSide, eps, verbose);
-  if (!returnValue)
+  if (4 == leftHandSide.GetDimension())
   {
-    MITK_INFO(verbose) << "Working image data not equal.";
-    return false;
+    MITK_INFO(verbose) << "Can not compare image data for 4D images - skipping check.";
+  }
+  else
+  {
+    // working image data
+    returnValue = mitk::Equal((const mitk::Image &)leftHandSide, (const mitk::Image &)rightHandSide, eps, verbose);
+    if (!returnValue)
+    {
+      MITK_INFO(verbose) << "Working image data not equal.";
+      return false;
+    }
   }
 
   for (unsigned int layerIndex = 0; layerIndex < leftHandSide.GetNumberOfLayers(); layerIndex++)
   {
-    // layer image data
-    returnValue =
-      mitk::Equal(*leftHandSide.GetLayerImage(layerIndex), *rightHandSide.GetLayerImage(layerIndex), eps, verbose);
-    if (!returnValue)
+    if (4 == leftHandSide.GetDimension())
     {
-      MITK_INFO(verbose) << "Layer image data not equal.";
-      return false;
+      MITK_INFO(verbose) << "Can not compare image data for 4D images - skipping check.";
+    }
+    else
+    {
+      // layer image data
+      returnValue =
+        mitk::Equal(*leftHandSide.GetLayerImage(layerIndex), *rightHandSide.GetLayerImage(layerIndex), eps, verbose);
+      if (!returnValue)
+      {
+        MITK_INFO(verbose) << "Layer image data not equal.";
+        return false;
+      }
     }
     // layer labelset data
 

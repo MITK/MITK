@@ -19,11 +19,10 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="panning"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="level window"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="PACS"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="mouse"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="background"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming panning contraint"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard multisampling enable antialiasing depth peeling"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>
   </extension>
 </plugin>

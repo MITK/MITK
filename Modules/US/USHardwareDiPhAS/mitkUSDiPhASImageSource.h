@@ -107,9 +107,9 @@ protected:
 
   /** This vector holds all the images we record, if recording is set to active. */
   std::vector<mitk::Image::Pointer>     m_recordedImages;
-  std::vector<long long>                m_timestamps;
-  std::vector<double>                   m_pixelValues;
-  long long                             m_currenttime;
+  std::vector<long long>                m_ImageTimestamps;
+  std::vector<float>                    m_pixelValues;
+  long long                             m_CurrentImageTimestamp;
   bool                                  currentlyRecording;
   mitk::OphirPyro::Pointer              m_Pyro;
   bool                                  m_PyroConnected;
@@ -129,6 +129,7 @@ protected:
   void OrderImagesUltrasound(Image::Pointer SoundImage);
 
   void GetPixelValues(itk::Index<3> pixel);
+  float GetPixelValue(itk::Index<3> pixel);
 
   /** This image holds the image to be displayed right now*/
   mitk::Image::Pointer                  m_Image;

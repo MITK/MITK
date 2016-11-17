@@ -40,14 +40,17 @@ m_EnergyMultiplicator(60000)
 mitk::OphirPyro::~OphirPyro()
 {
   if (m_Connected)
+  {
     this->CloseConnection();
+    if (m_GetDataThread.joinable())
+    {
+      m_GetDataThread.join();
+      MITK_INFO << "[OphirPyro Debug] joined data thread";
+    }
+  }
   MITK_INFO << "[OphirPyro Debug] destroying that Pyro";
   /* cleanup thread */
-  if (m_GetDataThread.joinable())
-  {
-    m_GetDataThread.join();
-    MITK_INFO << "[OphirPyro Debug] joined data thread";
-  }
+
 }
 
 bool mitk::OphirPyro::StartDataAcquisition()
@@ -57,7 +60,6 @@ bool mitk::OphirPyro::StartDataAcquisition()
     m_Streaming = true;
     m_GetDataThread = std::thread(&mitk::OphirPyro::GetDataFromSensorThread, this);
   }
-
   return m_Streaming;
 }
 
@@ -104,7 +106,11 @@ bool mitk::OphirPyro::StopDataAcquisition()
 
   SaveCsvData();
   MITK_INFO << "[OphirPyro Debug] m_Streaming = "<< m_Streaming;
-
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  if (m_GetDataThread.joinable())
+  {
+    m_GetDataThread.join();
+  }
   return !m_Streaming;
 }
 
@@ -161,20 +167,26 @@ double mitk::OphirPyro::LookupCurrentPulseEnergy()
 
 double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double interval)
 {
-  if (!(m_PulseTime.size() > 0))
+  if (m_PulseTime.size() == 0)
     return 0;
 
-  long long searchTime = (ImageTimeStamp/1000000) - m_ImagePyroDelay; // conversion from ns to ms
-  int foundIndex = 0;
-  long long shortestDifference = 5*interval;
+  long long searchTime = (ImageTimeStamp/1000000) + m_ImagePyroDelay; // conversion from ns to ms
+
+  //MITK_INFO << "searchTime = " << searchTime;
+  int foundIndex = -1;
+  long long shortestDifference = 250*interval;
 
   // search the list for a fitting energy value time
   for (int index = 0; index < m_PulseTime.size();++index)
   {
-    if ((m_PulseTime[index] - searchTime) < shortestDifference)
+    long long newDifference = abs(((int)m_PulseTime[index]) - searchTime);
+    MITK_INFO << "newDifference[" << index << "] = " << newDifference;
+    if (newDifference < shortestDifference)
     {
-      shortestDifference = m_PulseTime[index] - searchTime;
+      shortestDifference = newDifference;
       foundIndex = index;
+      //MITK_INFO << "foundIndex = " << foundIndex;
+
     }
   }
 
@@ -187,13 +199,15 @@ double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double in
 
     // multipy with m_EnergyMultiplicator, because the Pyro gives just a fraction of the actual Laser Energy
     return (GetNextPulseEnergy()*m_EnergyMultiplicator);
+    MITK_INFO << "found " << shortestDifference;
+
   }
 
-  MITK_INFO << "No matching energy value for image found in interval of " << interval << "ms.";
+  MITK_INFO << "No matching energy value for image found in interval of " << interval << "ms. sd: " << shortestDifference;
   return -1;
 }
 
-double mitk::OphirPyro::GetNextEnergyInmj(long long ImageTimeStamp, double interval)
+double mitk::OphirPyro::GetNextEnergyInmJ(long long ImageTimeStamp, double interval)
 {
   if (m_Connected && !(m_PulseTime.size() > 0))
     return 0;
@@ -211,7 +225,19 @@ double mitk::OphirPyro::GetNextEnergyInmj(long long ImageTimeStamp, double inter
 
 void mitk::OphirPyro::SetSyncDelay(long long FirstImageTimeStamp)
 {
+  while (!m_PulseTime.size())
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
   m_ImagePyroDelay = (FirstImageTimeStamp / 1000000) - m_PulseTime.at(0);
+
+  MITK_INFO << "m_ImagePyroDelay = " << m_ImagePyroDelay;
+  return;
+}
+
+bool mitk::OphirPyro::IsSyncDelaySet()
+{
+  return (m_ImagePyroDelay != 0);
 }
 
 double mitk::OphirPyro::GetNextPulseEnergy()

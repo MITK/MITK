@@ -59,6 +59,8 @@ namespace mitk {
     virtual double GetClosestEnergyInmJ(long long ImageTimeStamp, double interval=20);
     virtual double GetNextEnergyInmJ(long long ImageTimeStamp, double interval = 20);
     virtual void SetSyncDelay(long long FirstImageTimeStamp);
+    virtual bool IsSyncDelaySet();
+
 
   protected:
     OphirPyro();

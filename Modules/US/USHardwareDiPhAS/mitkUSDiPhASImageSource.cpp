@@ -49,7 +49,7 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_DataTypeNext(DataType::Image_uChar),
   m_UseBModeFilterModified(false),
   m_UseBModeFilterNext(false),
-  m_currenttime(0),
+  m_CurrentImageTimestamp(0),
   m_PyroConnected(false)
 {
   m_ImageMutex = itk::FastMutexLock::New();
@@ -60,8 +60,13 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_ImageBuffer.insert(m_ImageBuffer.begin(), m_BufferSize, nullptr);
 }
 
-mitk::USDiPhASImageSource::~USDiPhASImageSource( )
+mitk::USDiPhASImageSource::~USDiPhASImageSource()
 {
+  // close the pyro
+  MITK_INFO("Pyro Debug") << "StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
+  MITK_INFO("Pyro Debug") << "CloseConnection: " << m_Pyro->CloseConnection();
+  m_PyroConnected = false;
+  m_Pyro = nullptr;
 }
 
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
@@ -79,7 +84,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   }
 
   image = &(*m_ImageBuffer[m_LastWrittenImage]);
-  
+
   if (image != nullptr)
   {
     // do image processing before displaying it
@@ -163,11 +168,24 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
+  if (!m_PyroConnected)
+  {
+    m_Pyro = mitk::OphirPyro::New();
+    MITK_INFO << "[Pyro Debug] OpenConnection: " << m_Pyro->OpenConnection();
+    MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
+    m_PyroConnected = true;
+  }
+
   bool writeImage = ((m_DataType == DataType::Image_uChar) && (imageData != nullptr)) || ((m_DataType == DataType::Beamformed_Short) && (rfDataArrayBeamformed != nullptr)) && !m_Image.IsNull();
   if (writeImage)
   {
-    //get the timestamp we might later on save
-    m_currenttime = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    //get the timestamp we might save later on
+    m_CurrentImageTimestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    m_ImageTimestamps.push_back(m_CurrentImageTimestamp);
+    if (m_ImageTimestamps.size())
+    {
+      float cf = m_Pyro->GetClosestEnergyInmJ(m_CurrentImageTimestamp);
+    }
 
     // create a new image and initialize it
     mitk::Image::Pointer image = mitk::Image::New();
@@ -228,6 +246,13 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       }
     }
 
+    itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 84, 0 } }; //22/532*2048
+    if (!m_Pyro->IsSyncDelaySet() &&(image->GetPixelValueByIndex(pixel) < -30)) // #MagicNumber
+    {
+      MITK_INFO << "Setting SyncDelay";
+      m_Pyro->SetSyncDelay(m_CurrentImageTimestamp);
+    }
+
     // if the user decides to start recording, we feed the vector the generated images
     if (currentlyRecording) {
       for (int index = 0; index < image->GetDimension(2); ++index)
@@ -243,7 +268,6 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         }
       }
       // save timestamps for each laser image!
-      m_timestamps.push_back(m_currenttime);
     }
     // [sic!] Thomas: This kills everything, so we commented it out and now it doesnt kill anything..
   //  if (!useGUIOutPut && m_GUIOutput) {
@@ -359,28 +383,8 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   if (record)
   {
     m_recordedImages.clear();  // we make sure there are no leftovers
-    m_timestamps.clear();      // also for the timestamps
+    m_ImageTimestamps.clear();      // also for the timestamps
     m_pixelValues.clear();     // aaaand for the pixel values
-
-    // start the pyro data acquisition
-    try
-    {
-      if (!m_PyroConnected)
-      {
-        m_Pyro = mitk::OphirPyro::New();
-        MITK_INFO << "[Pyro Debug] OpenConnection: " << m_Pyro->OpenConnection();
-        MITK_INFO << "[Pyro Debug] StartDataAcquisition: " << m_Pyro->StartDataAcquisition();
-        m_PyroConnected = true;
-      }
-      else
-      {
-        m_PyroConnected = false;
-      }
-    }
-    catch (...) {
-      MITK_INFO << "While trying to connect to the Pyro an exception was caught (this almost always happens on the first try after reboot - try again!)";
-      m_PyroConnected = false;
-    }
 
     // tell the callback to start recording images
     currentlyRecording = true;
@@ -389,12 +393,6 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   else
   {
     currentlyRecording = false;
-
-    // close the pyro
-    MITK_INFO << "[Pyro Debug] StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
-    MITK_INFO << "[Pyro Debug] CloseConnection: " << m_Pyro->CloseConnection();
-    m_PyroConnected = false;
-    m_Pyro = nullptr;
 
     // get the time and date, put them into a nice string and create a folder for the images
     time_t time = std::time(nullptr);
@@ -433,9 +431,9 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       timestampFile.open(pathTS);
       timestampFile << ",timestamp,pixelvalue"; // write the header
 
-      for (int index = 0; index < m_timestamps.size(); ++index)
+      for (int index = 0; index < m_ImageTimestamps.size(); ++index)
       {
-        timestampFile << "\n" << index << "," << m_timestamps.at(index) << "," << m_pixelValues.at(index);
+        timestampFile << "\n" << index << "," << m_ImageTimestamps.at(index) << "," << m_pixelValues.at(index);
       }
       timestampFile.close();
     }
@@ -447,7 +445,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
     m_pixelValues.clear();    // clean up the pixel values
     m_recordedImages.clear(); // clean up the images
-    m_timestamps.clear();     // clean up the timestamps
+    m_ImageTimestamps.clear();     // clean up the timestamps
   }
 }
 

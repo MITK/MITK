@@ -66,7 +66,7 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   //Ask for the name of the point set
   bool ok = false;
   QString name = QInputDialog::getText( QApplication::activeWindow()
-    , "Add point set...", "Enter name for the new point set", QLineEdit::Normal, "PointSet", &ok );
+    , tr("Add point set..."), tr("Enter name for the new point set"), QLineEdit::Normal, tr("PointSet"), &ok );
   if ( ! ok || name.isEmpty() )
     return;
 
@@ -115,7 +115,7 @@ void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode
   }
   else
   {
-    m_Controls->m_CurrentPointSetLabel->setText("None");
+    m_Controls->m_CurrentPointSetLabel->setText(tr("None"));
     m_Controls->m_PointListWidget->SetPointSetNode(nullptr);
     std::vector<mitk::DataNode*> emptyList;
     emptyList.push_back(nullptr);

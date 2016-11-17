@@ -78,26 +78,27 @@ namespace mitk
 
     // Get DICOM information from referenced image
     vector<DcmDataset *> dcmDatasets;
+    DcmFileFormat *readFileFormat = new DcmFileFormat();
     try
     {
       // TODO: Generate dcmdataset witk DICOM tags from property list
-      DcmFileFormat readFileFormat;
-      mitk::StringLookupTableProperty::Pointer files =
+      mitk::StringLookupTableProperty::Pointer filesProp =
         dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("files").GetPointer());
 
-      if (files.IsNull())
+      if (filesProp.IsNull())
       {
         MITK_ERROR << "No property with dicom file path.";
         return;
       }
 
-      for (int i = 0; i < (int)files->GetValue().GetLookupTable().size(); ++i)
+      StringLookupTable filesLut = filesProp->GetValue();
+      const StringLookupTable::LookupTableType &map = filesLut.GetLookupTable();
+
+      for (auto it = map.begin(); it != map.end(); ++it)
       {
-        const char *fileName = files->GetValue().GetTableValue(i).c_str();
-        readFileFormat.loadFile(fileName);
-        DcmDataset *dataSet = readFileFormat.getDataset();
-        if (dataSet != nullptr)
-          dcmDatasets.push_back(dataSet);
+        const char *fileName = (it->second).c_str();
+        if (readFileFormat->loadFile(fileName, EXS_Unknown).good())
+          dcmDatasets.push_back(readFileFormat->getAndRemoveDataset());
       }
     }
     catch (const std::exception &e)
@@ -165,7 +166,14 @@ namespace mitk
         mitkThrow() << e.what();
       }
     }
+
     // end image write
+    if (readFileFormat)
+      delete readFileFormat;
+    for (int i = 0; i < dcmDatasets.size(); i++)
+    {
+      delete dcmDatasets[i];
+    }
   }
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetReaderConfidenceLevel() const
@@ -427,7 +435,7 @@ namespace mitk
         {
           segAttr->setSegmentDescription(segmentLabelProp->GetValueAsString());
           segAttr->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
-          segAttr->setSegmentAlgorithmName("");
+          segAttr->setSegmentAlgorithmName("MITK Segmentation");
           if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
               segmentCategoryCodeMeaningProp != nullptr)
             segAttr->setSegmentedPropertyCategoryCode(segmentCategoryCodeValueProp->GetValueAsString(),

@@ -219,7 +219,7 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
   GSleep(1000);
   m_ReturnCode = GCmd(m_GalilSystem, "XQ"); // FTUNE
   MITK_INFO << "[Galil Debug] after asking XQ#FTUNE = " << m_ReturnCode;
-  GSleep(5000);
+  GSleep(10000);
   int count = -1;
   m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
   MITK_INFO << "[Galil Debug] cycles = " << count;
@@ -227,23 +227,6 @@ bool mitk::GalilMotor::FastTuneWavelengths(std::vector<double> wavelengthList)
   MITK_INFO << "[Galil Debug] pos = " << count;
   m_ReturnCode = GCmdI(m_GalilSystem, "points=?", &count);
   MITK_INFO << "[Galil Debug] points = " << count;
-  std::this_thread::sleep_for(std::chrono::seconds(10));
-  m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
-  MITK_INFO << "[Galil Debug] cycles = " << count;
-
-  m_ReturnCode = GCmdI(m_GalilSystem, "pos=?", &count);
-  MITK_INFO << "[Galil Debug] pos = " << count;
-  m_ReturnCode = GCmdI(m_GalilSystem, "points=?", &count);
-  MITK_INFO << "[Galil Debug] points = " << count;
-  std::this_thread::sleep_for(std::chrono::seconds(10));
-  m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
-  MITK_INFO << "[Galil Debug] cycles = " << count;
-  std::this_thread::sleep_for(std::chrono::seconds(10));
-  m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
-  MITK_INFO << "[Galil Debug] cycles = " << count;
-  std::this_thread::sleep_for(std::chrono::seconds(10));
-  m_ReturnCode = GCmdI(m_GalilSystem, "count=?", &count);
-  MITK_INFO << "[Galil Debug] cycles = " << count;
 
   if (count > 0)
     return true;

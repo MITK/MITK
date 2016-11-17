@@ -52,6 +52,6 @@ EN
 #ININT
 idx = count % points
 PA pos[idx];BG;AM;
-WT1
+WT 10
 count = count + 1
 RI 1;

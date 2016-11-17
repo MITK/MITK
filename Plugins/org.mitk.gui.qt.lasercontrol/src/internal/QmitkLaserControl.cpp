@@ -85,7 +85,7 @@ void OPOLaserControl::InitLaser()
 {
   m_Controls.buttonInitLaser->setEnabled(false);
   m_Controls.buttonInitLaser->setText("working ...");
-  QThread::sleep(1);
+
   if (!m_PumpLaserConnected)
   {
     m_PumpLaserController = mitk::QuantelLaser::New();
@@ -275,8 +275,8 @@ void OPOLaserControl::ShowEnergy()
 {
   forever
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    MITK_INFO << "[Pyro Debug] ShowEnergy()";
     if (!m_PyroConnected)
     {
       MITK_INFO << "[Pyro Debug] StopDataAcquisition: " << m_Pyro->StopDataAcquisition();
@@ -284,7 +284,7 @@ void OPOLaserControl::ShowEnergy()
       m_CurrentPulseEnergy = 0;
       return;
     }
-    m_Pyro->GetDataFromSensor();
+  //  m_Pyro->GetDataFromSensor();
     m_CurrentPulseEnergy = 60000 * m_Pyro->LookupCurrentPulseEnergy();
     m_Controls.labelEnergy->setText(std::to_string(m_CurrentPulseEnergy).append(" mJ").c_str());
   }

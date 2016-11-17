@@ -26,7 +26,8 @@ m_CurrentWavelength(0),
 m_DeviceHandle(0),
 m_Connected(false),
 m_Streaming(false),
-m_SerialNumber(nullptr)
+m_SerialNumber(nullptr),
+m_GetDataThread()
 {
   m_PulseEnergy.clear();
   m_PulseTime.clear();
@@ -36,14 +37,25 @@ m_SerialNumber(nullptr)
 
 mitk::OphirPyro::~OphirPyro()
 {
-  this->CloseConnection();
-  MITK_INFO << "[OphirPyro Debug] destroyed that Pyro";
+  if (m_Connected)
+    this->CloseConnection();
+  MITK_INFO << "[OphirPyro Debug] destroying that Pyro";
+  /* cleanup thread */
+  if (m_GetDataThread.joinable())
+  {
+    m_GetDataThread.join();
+    MITK_INFO << "[OphirPyro Debug] joined data thread";
+  }
 }
 
 bool mitk::OphirPyro::StartDataAcquisition()
 {
   if (ophirAPI.StartStream(m_DeviceHandle))
+  {
     m_Streaming = true;
+    m_GetDataThread = std::thread(&mitk::OphirPyro::GetDataFromSensorThread, this);
+  }
+
   return m_Streaming;
 }
 
@@ -74,11 +86,11 @@ void mitk::OphirPyro::SaveCsvData()
   std::ofstream timestampFile;
   timestampFile.open(pathTS);
 
-  timestampFile << "[index],[timestamp],[PulseEnergy]";
+  timestampFile << ",timestamp,PulseEnergy,PulseTime";
 
   for (int index = 0; index < m_TimeStamps.size(); ++index)
   {
-    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergy.at(index);
+    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergy.at(index) << "," << (long)m_PulseTime.at(index);
   }
   timestampFile.close();
 }
@@ -89,6 +101,7 @@ bool mitk::OphirPyro::StopDataAcquisition()
     m_Streaming = false;
 
   SaveCsvData();
+  MITK_INFO << "[OphirPyro Debug] m_Streaming = "<< m_Streaming;
 
   return !m_Streaming;
 }
@@ -107,7 +120,8 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
       if (noPackages > 0)
       {
         m_PulseEnergy.insert(m_PulseEnergy.end(), newEnergy.begin(), newEnergy.end());
-        m_TimeStamps.push_back(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+        for (int i=0; i<noPackages; i++)
+          m_TimeStamps.push_back(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
         m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
         m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
@@ -122,19 +136,24 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
   return 0;
 }
 
+void mitk::OphirPyro::GetDataFromSensorThread()
+{
+  while(m_Connected && m_Streaming)
+  {
+    this->GetDataFromSensor();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  }
+  return;
+}
+
 double mitk::OphirPyro::LookupCurrentPulseEnergy()
 {
-  if (m_Connected)
+  if (m_Connected && !m_PulseEnergy.empty())
   {
-    if (!m_PulseEnergy.empty())
-    {
-      MITK_INFO << m_PulseEnergy.size();
-      return m_PulseEnergy.back();
-    }
-
-    else
-      return 0;
+    MITK_INFO << m_PulseEnergy.size();
+    return m_PulseEnergy.back();
   }
+  return 0;
 }
 
 double mitk::OphirPyro::GetNextPulseEnergy()
@@ -147,6 +166,7 @@ double mitk::OphirPyro::GetNextPulseEnergy()
     m_PulseStatus.erase(m_PulseStatus.begin());
     return out;
   }
+  return 0;
 }
 
 double mitk::OphirPyro::LookupCurrentPulseEnergy(double* timestamp, int* status)

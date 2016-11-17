@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <thread>
 
 namespace mitk {
 
@@ -48,6 +49,7 @@ namespace mitk {
     virtual bool StartDataAcquisition();
     virtual bool StopDataAcquisition();
     unsigned int GetDataFromSensor();
+    void GetDataFromSensorThread();
     virtual double LookupCurrentPulseEnergy();
     virtual double GetNextPulseEnergy();
     virtual double LookupCurrentPulseEnergy(double* timestamp, int* status);
@@ -68,6 +70,8 @@ namespace mitk {
     std::vector<long long> m_TimeStamps;
     double m_CurrentWavelength;
     double m_CurrentEnergyRange;
+
+    std::thread m_GetDataThread;
   };
 } // namespace mitk
 

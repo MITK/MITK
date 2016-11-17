@@ -390,14 +390,14 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       mitk::IOUtil::Save(PAImage, pathPA);
 
       // read the pixelvalues of the enveloped images at this position
-      itk::Index<3> pixel = { { m_recordedImages.at(1)->GetDimension(0) / 2, 22, 0 } };
+      itk::Index<3> pixel = { { m_recordedImages.at(1)->GetDimension(0) / 2, 84, 0 } }; //22/532*2048
       GetPixelValues(pixel);
 
       // save the timestamps!
       ofstream timestampFile;
 
       timestampFile.open(pathTS);
-      timestampFile << "[index],[timestamp],[pixelvalue]"; // write the header
+      timestampFile << ",timestamp,pixelvalue"; // write the header
 
       for (int index = 0; index < m_timestamps.size(); ++index)
       {

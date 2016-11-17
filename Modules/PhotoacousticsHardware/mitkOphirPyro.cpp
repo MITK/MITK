@@ -170,7 +170,7 @@ double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double in
   if (m_PulseTime.size() == 0)
     return 0;
 
-  long long searchTime = (ImageTimeStamp/1000000) + m_ImagePyroDelay; // conversion from ns to ms
+  long long searchTime = (ImageTimeStamp/1000000) - m_ImagePyroDelay; // conversion from ns to ms
 
   //MITK_INFO << "searchTime = " << searchTime;
   int foundIndex = -1;
@@ -180,7 +180,7 @@ double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double in
   for (int index = 0; index < m_PulseTime.size();++index)
   {
     long long newDifference = abs(((int)m_PulseTime[index]) - searchTime);
-    MITK_INFO << "newDifference[" << index << "] = " << newDifference;
+    //MITK_INFO << "newDifference[" << index << "] = " << newDifference;
     if (newDifference < shortestDifference)
     {
       shortestDifference = newDifference;
@@ -199,11 +199,9 @@ double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double in
 
     // multipy with m_EnergyMultiplicator, because the Pyro gives just a fraction of the actual Laser Energy
     return (GetNextPulseEnergy()*m_EnergyMultiplicator);
-    MITK_INFO << "found " << shortestDifference;
-
   }
 
-  MITK_INFO << "No matching energy value for image found in interval of " << interval << "ms. sd: " << shortestDifference;
+  //MITK_INFO << "No matching energy value for image found in interval of " << interval << "ms. sd: " << shortestDifference;
   return -1;
 }
 

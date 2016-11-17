@@ -107,7 +107,8 @@ protected:
 
   /** This vector holds all the images we record, if recording is set to active. */
   std::vector<mitk::Image::Pointer>     m_recordedImages;
-  std::vector<long long>                m_ImageTimestamps;
+  std::vector<long long>                m_ImageTimestampRecord;
+  std::vector<long long>                m_ImageTimestampBuffer;
   std::vector<float>                    m_pixelValues;
   long long                             m_CurrentImageTimestamp;
   bool                                  currentlyRecording;

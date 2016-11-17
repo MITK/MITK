@@ -50,12 +50,13 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_UseBModeFilterModified(false),
   m_UseBModeFilterNext(false),
   m_CurrentImageTimestamp(0),
-  m_PyroConnected(false)
+  m_PyroConnected(false),
+  m_ImageTimestampBuffer()
 {
   m_ImageMutex = itk::FastMutexLock::New();
 
   m_BufferSize = 100;
-
+  m_ImageTimestampBuffer.insert(m_ImageTimestampBuffer.begin(), m_BufferSize, 0);
   m_LastWrittenImage = m_BufferSize - 1;
   m_ImageBuffer.insert(m_ImageBuffer.begin(), m_BufferSize, nullptr);
 }
@@ -83,7 +84,25 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_UseBModeFilterModified = false;
   }
 
-  image = &(*m_ImageBuffer[m_LastWrittenImage]);
+  float cf = 0;
+  int i = 100;
+  while ((cf <= 0)&&(i>90))
+  {
+    if (m_ImageTimestampBuffer[(m_LastWrittenImage + i) % 100] != 0)
+    {
+      cf = m_Pyro->GetClosestEnergyInmJ(m_ImageTimestampBuffer[(m_LastWrittenImage + i) % 100]);
+      i--;
+      //MITK_INFO << cf;
+    }
+    else
+    {
+      cf = 40; // todo: correct by fixed value and say that you dont compensate
+      i = 99;
+    }
+  }
+  i++;
+
+  image = &(*m_ImageBuffer[(m_LastWrittenImage + i) % 100]);
 
   if (image != nullptr)
   {
@@ -181,11 +200,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   {
     //get the timestamp we might save later on
     m_CurrentImageTimestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    m_ImageTimestamps.push_back(m_CurrentImageTimestamp);
-    if (m_ImageTimestamps.size())
-    {
-      float cf = m_Pyro->GetClosestEnergyInmJ(m_CurrentImageTimestamp);
-    }
+    m_ImageTimestampRecord.push_back(m_CurrentImageTimestamp);
 
     // create a new image and initialize it
     mitk::Image::Pointer image = mitk::Image::New();
@@ -288,7 +303,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
   //    m_GUIOutput(QString::fromStdString(s.str()));
   //  }
-
+    m_ImageTimestampBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = m_CurrentImageTimestamp;
     m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
     m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
   }
@@ -383,7 +398,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   if (record)
   {
     m_recordedImages.clear();  // we make sure there are no leftovers
-    m_ImageTimestamps.clear();      // also for the timestamps
+    m_ImageTimestampRecord.clear();      // also for the timestamps
     m_pixelValues.clear();     // aaaand for the pixel values
 
     // tell the callback to start recording images
@@ -431,9 +446,9 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       timestampFile.open(pathTS);
       timestampFile << ",timestamp,pixelvalue"; // write the header
 
-      for (int index = 0; index < m_ImageTimestamps.size(); ++index)
+      for (int index = 0; index < m_ImageTimestampRecord.size(); ++index)
       {
-        timestampFile << "\n" << index << "," << m_ImageTimestamps.at(index) << "," << m_pixelValues.at(index);
+        timestampFile << "\n" << index << "," << m_ImageTimestampRecord.at(index) << "," << m_pixelValues.at(index);
       }
       timestampFile.close();
     }
@@ -445,7 +460,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
     m_pixelValues.clear();    // clean up the pixel values
     m_recordedImages.clear(); // clean up the images
-    m_ImageTimestamps.clear();     // clean up the timestamps
+    m_ImageTimestampRecord.clear();     // clean up the timestamps
   }
 }
 

@@ -97,33 +97,33 @@ mitk::VtkPropRenderer::~VtkPropRenderer()
     checkState();
   }
 
-  if (m_LightKit != NULL)
+  if (m_LightKit != nullptr)
     m_LightKit->Delete();
 
-  if (m_VtkRenderer != NULL)
+  if (m_VtkRenderer != nullptr)
   {
-    m_CameraController = NULL;
+    m_CameraController = nullptr;
 
     m_VtkRenderer->Delete();
 
-    m_VtkRenderer = NULL;
+    m_VtkRenderer = nullptr;
   }
   else
-    m_CameraController = NULL;
+    m_CameraController = nullptr;
 
-  if (m_WorldPointPicker != NULL)
+  if (m_WorldPointPicker != nullptr)
     m_WorldPointPicker->Delete();
-  if (m_PointPicker != NULL)
+  if (m_PointPicker != nullptr)
     m_PointPicker->Delete();
-  if (m_CellPicker != NULL)
+  if (m_CellPicker != nullptr)
     m_CellPicker->Delete();
-  if (m_TextRenderer != NULL)
+  if (m_TextRenderer != nullptr)
     m_TextRenderer->Delete();
 }
 
 void mitk::VtkPropRenderer::SetDataStorage(mitk::DataStorage *storage)
 {
-  if (storage == NULL)
+  if (storage == nullptr || storage == m_DataStorage)
     return;
 
   BaseRenderer::SetDataStorage(storage);
@@ -141,7 +141,7 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
     return false;
 
   // initialize world geometry
-  mitk::TimeGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D(NULL, "includeInBoundingBox");
+  mitk::TimeGeometry::Pointer geometry = m_DataStorage->ComputeVisibleBoundingGeometry3D(nullptr, "includeInBoundingBox");
 
   if (geometry.IsNull())
     return false;
@@ -265,7 +265,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
 
 void mitk::VtkPropRenderer::Update(mitk::DataNode *datatreenode)
 {
-  if (datatreenode != NULL)
+  if (datatreenode != nullptr)
   {
     mitk::Mapper::Pointer mapper = datatreenode->GetMapper(m_MapperID);
     if (mapper.IsNotNull())
@@ -275,7 +275,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode *datatreenode)
         mapper->Update(this);
         {
           VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper.GetPointer());
-          if (vtkmapper != NULL)
+          if (vtkmapper != nullptr)
           {
             vtkmapper->UpdateVtkTransform(this);
           }
@@ -312,7 +312,7 @@ void mitk::VtkPropRenderer::InitRenderer(vtkRenderWindow *renderWindow)
   renderWindow->GetInteractor()->AddObserver(vtkCommand::RenderEvent, renderCallbackCommand);
   renderCallbackCommand->Delete();
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
   {
     m_InitNeeded = false;
     m_ResizeNeeded = false;
@@ -350,7 +350,7 @@ void mitk::VtkPropRenderer::InitSize(int w, int h)
   Superclass::InitSize(w, h);
   Modified();
   Update();
-  if (m_VtkRenderer != NULL)
+  if (m_VtkRenderer != nullptr)
   {
     int w = vtkObject::GetGlobalWarningDisplay();
     vtkObject::GlobalWarningDisplayOff();
@@ -398,7 +398,7 @@ void mitk::VtkPropRenderer::SetMapperID(const MapperSlotId mapperId)
 */
 void mitk::VtkPropRenderer::MakeCurrent()
 {
-  if (m_RenderWindow != NULL)
+  if (m_RenderWindow != nullptr)
     m_RenderWindow->MakeCurrent();
 }
 
@@ -442,7 +442,7 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
   for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin(); it != allObjects->End(); ++it)
   {
     const DataNode *node = it->Value();
-    if (node == NULL)
+    if (node == nullptr)
       continue;
 
     bool pickable = false;
@@ -451,11 +451,11 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
       continue;
 
     VtkMapper *mapper = dynamic_cast<VtkMapper *>(node->GetMapper(m_MapperID));
-    if (mapper == NULL)
+    if (mapper == nullptr)
       continue;
 
     vtkProp *prop = mapper->GetVtkProp((mitk::BaseRenderer *)this);
-    if (prop == NULL)
+    if (prop == nullptr)
       continue;
 
     m_CellPicker->AddPickList(prop);
@@ -469,9 +469,9 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
   vtk2itk(m_CellPicker->GetPickPosition(), worldPosition);
   vtkProp *prop = m_CellPicker->GetViewProp();
 
-  if (prop == NULL)
+  if (prop == nullptr)
   {
-    return NULL;
+    return nullptr;
   }
 
   // Iterate over all DataStorage objects to determine if the retrieved
@@ -483,7 +483,7 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
       continue;
 
     mitk::Mapper *mapper = node->GetMapper(m_MapperID);
-    if (mapper == NULL)
+    if (mapper == nullptr)
       continue;
 
     mitk::VtkMapper *vtkmapper = dynamic_cast<VtkMapper *>(mapper);
@@ -497,7 +497,7 @@ mitk::DataNode *mitk::VtkPropRenderer::PickObject(const Point2D &displayPosition
       }
     }
   }
-  return NULL;
+  return nullptr;
 }
 // todo: is this 2D renderwindow picking?
 //    return Superclass::PickObject( displayPosition, worldPosition );

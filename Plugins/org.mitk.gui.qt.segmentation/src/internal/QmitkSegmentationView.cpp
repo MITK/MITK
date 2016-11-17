@@ -1169,7 +1169,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // all part of open source MITK
    m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
    m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer2D );
-   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups(tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'"));
+   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups(tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'").toStdString());
    m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
    m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
    connect( m_Controls->m_ManualToolSelectionBox2D, SIGNAL(ToolSelected(int)), this, SLOT(OnManualTool2DSelected(int)) );
@@ -1178,7 +1178,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
    m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer3D );
    //specify tools to be added to 3D Tool area
-   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups(tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking"));
+   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups(tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking").toStdString());
    m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
    m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
 

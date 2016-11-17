@@ -385,7 +385,7 @@ namespace mitk
                                               bool frontside,
                                               bool rotated)
   {
-    this->SetReferenceGeometry(const_cast<BaseGeometry *>(geometry3D));
+    this->SetReferenceGeometry(geometry3D);
 
     ScalarType width, height;
 
@@ -910,7 +910,7 @@ namespace mitk
     assert(false);
   }
 
-  void PlaneGeometry::SetReferenceGeometry(mitk::BaseGeometry *geometry) { m_ReferenceGeometry = geometry; }
-  mitk::BaseGeometry *PlaneGeometry::GetReferenceGeometry() const { return m_ReferenceGeometry; }
+  void PlaneGeometry::SetReferenceGeometry(const mitk::BaseGeometry *geometry) { m_ReferenceGeometry = geometry; }
+  const mitk::BaseGeometry *PlaneGeometry::GetReferenceGeometry() const { return m_ReferenceGeometry; }
   bool PlaneGeometry::HasReferenceGeometry() const { return (m_ReferenceGeometry != nullptr); }
 } // namespace

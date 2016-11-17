@@ -269,7 +269,7 @@ namespace mitk
       // Clip the PlaneGeometry with the reference geometry bounds (if available)
       if (input->GetPlaneGeometry()->HasReferenceGeometry())
       {
-        BaseGeometry *referenceGeometry = input->GetPlaneGeometry()->GetReferenceGeometry();
+        const BaseGeometry *referenceGeometry = input->GetPlaneGeometry()->GetReferenceGeometry();
 
         BoundingBox::PointType boundingBoxMin, boundingBoxMax;
         boundingBoxMin = referenceGeometry->GetBoundingBox()->GetMinimum();

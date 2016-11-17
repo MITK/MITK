@@ -236,7 +236,7 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
                                               bool frontside,
                                               bool rotated)
 {
-  m_ReferenceGeometry = const_cast<BaseGeometry *>(geometry3D);
+  m_ReferenceGeometry = geometry3D;
 
   PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane(geometry3D, top, planeorientation, frontside, rotated);
@@ -468,7 +468,12 @@ bool mitk::SlicedGeometry3D::IsValidSlice(int s) const
   return ((s >= 0) && (s < (int)m_Slices));
 }
 
-void mitk::SlicedGeometry3D::SetReferenceGeometry(BaseGeometry *referenceGeometry)
+const mitk::BaseGeometry *mitk::SlicedGeometry3D::GetReferenceGeometry() const
+{
+  return m_ReferenceGeometry;
+}
+
+void mitk::SlicedGeometry3D::SetReferenceGeometry(const BaseGeometry *referenceGeometry)
 {
   m_ReferenceGeometry = referenceGeometry;
 
@@ -478,6 +483,11 @@ void mitk::SlicedGeometry3D::SetReferenceGeometry(BaseGeometry *referenceGeometr
   {
     (*it)->SetReferenceGeometry(referenceGeometry);
   }
+}
+
+bool mitk::SlicedGeometry3D::HasReferenceGeometry() const
+{
+  return ( m_ReferenceGeometry != nullptr );
 }
 
 void mitk::SlicedGeometry3D::PreSetSpacing(const mitk::Vector3D &aSpacing)

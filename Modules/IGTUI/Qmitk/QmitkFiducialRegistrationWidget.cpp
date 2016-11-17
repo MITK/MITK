@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkLandmarkTransform.h>
 #include <mitkStaticIGTHelperFunctions.h>
 
+#include <mitkRenderingManager.h>
 
 #define FRW_LOG MITK_INFO("Fiducial Registration Widget")
 #define FRW_WARN MITK_WARN("Fiducial Registration Widget")
@@ -307,8 +308,7 @@ void QmitkFiducialRegistrationWidget::AddTrackerPoint()
 bool QmitkFiducialRegistrationWidget::CheckRegistrationInitialization()
 {
   if (m_DataStorage.IsNull()) { return false; } //here the widget should simply do nothing (for backward compatibility)
-  else if (m_ImageNode.IsNull() ||
-      m_ImageFiducialsNode.IsNull() ||
+  else if ( m_ImageFiducialsNode.IsNull() ||
       m_TrackerFiducialsNode.IsNull()
       ) {MITK_WARN << "Registration not correctly initialized"; return false;}
   else {return true;}
@@ -390,15 +390,36 @@ void QmitkFiducialRegistrationWidget::Register()
   m_T_ObjectReg = mitk::NavigationData::New(mitkTransform); // this is stored in a member because it is needed for permanent registration later on
 
   //transform surface/image
+  //only move image if we have one. Sometimes, this widget is used just to register point sets without images.
+  if (m_ImageNode.IsNotNull())
+  {
+    //first we have to store the original ct image transform to compose it with the new transform later
+    mitk::AffineTransform3D::Pointer imageTransform = m_ImageNode->GetData()->GetGeometry()->GetIndexToWorldTransform();
+    imageTransform->Compose(mitkTransform);
+    mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
+    itk::Matrix<mitk::ScalarType, 3, 3> rotationFloatNew = imageTransform->GetMatrix();
+    itk::Vector<mitk::ScalarType, 3> translationFloatNew = imageTransform->GetOffset();
+    newImageTransform->SetMatrix(rotationFloatNew);
+    newImageTransform->SetOffset(translationFloatNew);
+    m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+  }
 
-  //first we have to store the original ct image transform to compose it with the new transform later
-  mitk::AffineTransform3D::Pointer imageTransform = m_ImageNode->GetData()->GetGeometry()->GetIndexToWorldTransform();
-  imageTransform->Compose(mitkTransform);
-  mitk::AffineTransform3D::Pointer newImageTransform = mitk::AffineTransform3D::New(); //create new image transform... setting the composed directly leads to an error
-  itk::Matrix<mitk::ScalarType, 3, 3> rotationFloatNew = imageTransform->GetMatrix();
-  itk::Vector<mitk::ScalarType, 3> translationFloatNew = imageTransform->GetOffset();
-  newImageTransform->SetMatrix(rotationFloatNew);
-  newImageTransform->SetOffset(translationFloatNew);
-  m_ImageNode->GetData()->GetGeometry()->SetIndexToWorldTransform(newImageTransform);
+  //If this option is set, each point will be transformed and the acutal coordinates of the points change.
+  if (this->m_Controls->m_MoveImagePoints->isChecked())
+  {
+    mitk::PointSet* pointSet_orig = dynamic_cast<mitk::PointSet*>(m_ImageFiducialsNode->GetData());
+    mitk::PointSet::Pointer pointSet_moved = mitk::PointSet::New();
 
+    for (int i = 0; i < pointSet_orig->GetSize(); i++)
+    {
+      pointSet_moved->InsertPoint(mitkTransform->TransformPoint(pointSet_orig->GetPoint(i)));
+    }
+
+    pointSet_orig->Clear();
+    for (int i = 0; i < pointSet_moved->GetSize(); i++)
+      pointSet_orig->InsertPoint(pointSet_moved->GetPoint(i));
+  }
+
+  //Do a global reinit
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
 }

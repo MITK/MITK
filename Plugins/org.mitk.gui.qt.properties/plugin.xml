@@ -6,13 +6,16 @@
           class="QmitkPropertyTreeView"
           icon="resources/icon.png" >
           <description>View, Set, and Change properties of DataNodes</description>
-          <keywordReference id="org.mitk.views.properties.Keyword"/>
     </view>
   </extension>
-  <extension point="org.blueberry.ui.keywords">
-    <keyword label="DataNode Data Show" id="org.mitk.views.properties.Keyword"/>
-  </extension>
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.application.PropertiesPreferencePage" name="Properties" class="QmitkPropertiesPreferencePage" />
+    <page id="org.mitk.gui.qt.application.PropertiesPreferencePage" name="Properties" class="QmitkPropertiesPreferencePage">
+      <keywordreference id="org.mitk.views.properties.Keyword"/>
+    </page>
   </extension>
+  <extension point="org.blueberry.ui.keywords">
+    <keyword id="org.mitk.views.properties.Keyword" label="DataNode Data Show aliases properties replace genuine property name by" />
+    <keyword id="org.mitk.views.properties.Keyword" label="show description persistence info filters filtered developer mode enabled" />
+  </extension>
+
 </plugin>

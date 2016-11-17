@@ -228,6 +228,22 @@ void QmitkMatchPointRegistrationManipulator::OnSelectionChanged(berry::IWorkbenc
 	this->ConfigureControls();
 };
 
+
+void QmitkMatchPointRegistrationManipulator::NodeRemoved(const mitk::DataNode* node)
+{
+  if (node == this->m_SelectedMovingNode
+    || node == this->m_SelectedTargetNode
+    || node == this->m_EvalNode)
+  {
+    if (node == this->m_EvalNode)
+    {
+      this->m_EvalNode = nullptr;
+    }
+    this->OnCancelBtnPushed();
+    MITK_INFO << "Stopped current MatchPoint manual registration session, because at least one relevant node was removed from storage.";
+  }
+}
+
 void QmitkMatchPointRegistrationManipulator::ConfigureControls()
 {
   //configure input data widgets
@@ -388,7 +404,11 @@ void QmitkMatchPointRegistrationManipulator::StopSession()
   this->m_CurrentRegistration = nullptr;
   this->m_CurrentRegistrationWrapper = nullptr;
 
-  this->GetDataStorage()->Remove(this->m_EvalNode);
+  if (this->m_EvalNode.IsNotNull())
+  {
+    this->GetDataStorage()->Remove(this->m_EvalNode);
+  }
+
   this->m_EvalNode = nullptr;
 
   this->m_activeManipulation = false;

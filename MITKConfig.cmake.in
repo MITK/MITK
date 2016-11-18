@@ -158,7 +158,7 @@ set(BOOST_LIBRARYDIR "@BOOST_LIBRARYDIR@" CACHE PATH "")
 set(Boost_ADDITIONAL_VERSIONS "1.60" "1.60.0")
 
 # We need this later for a DCMTK workaround
-set(_dcmtk_dir_orig "@DCMTK_DIR@")
+set(_dcmtk_dir_orig "@DCMTK_ROOT@")
 
 # -----------------------------------------
 # External dependencies from the superbuild

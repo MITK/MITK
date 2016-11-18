@@ -54,11 +54,11 @@ public:
   {
     std::string result = mitk::GeneratePropertyNameForDICOMTag(0x0018, 0x0080);
     MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0018.0080",
-                                 "Testing GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0018, 0x0080)");
+                                 "Testing GeneratePropertyNameForDICOMTag(mitk::DICOMTag(0x0018, 0x0080)");
 
     result = mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x001a);
-    MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0008.001a",
-                                 "Testing GeneratPropertyNameForDICOMTag(mitk::DICOMTag(0x0008, 0x001a)");
+    MITK_TEST_CONDITION_REQUIRED(result == "DICOM.0008.001A",
+                                 "Testing GeneratePropertyNameForDICOMTag(mitk::DICOMTag(0x0008, 0x001a)");
   }
 
   void GetBackwardsCompatibleDICOMProperty()

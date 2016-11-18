@@ -30,8 +30,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Util/HelpFormatter.h>
 
-#include <QSplashscreen>
-#include <QRunnable> 
+#include <QSplashScreen>
+#include <QRunnable>
 #include <QFileInfo>
 #include <QCoreApplication>
 #include <QDebug>

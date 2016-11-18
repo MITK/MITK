@@ -6,7 +6,7 @@ project(org_mitk_gui_qt_dicom)
 # Therefore we look for the the storescp command in the '../../bin' directory, too.
 find_program(DCMTK_STORESCP
   NAMES storescp storescp${DCMTK_CMAKE_DEBUG_POSTFIX} storescp${CMAKE_DEBUG_POSTFIX}
-  PATHS "${DCMTK_DIR}/bin" "${DCMTK_DIR}/../../bin"
+  PATHS "${DCMTK_DIR}/bin" "${DCMTK_DIR}/../bin" "${DCMTK_DIR}/../../bin"
   PATH_SUFFIXES Release Debug
   DOC "Dcmtk storage provider which is used to store dicom files which are transfered over network."
   NO_DEFAULT_PATH

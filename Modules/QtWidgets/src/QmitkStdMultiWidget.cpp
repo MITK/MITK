@@ -75,7 +75,8 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
     mitkWidget3Container(NULL),
     mitkWidget4Container(NULL),
     m_PendingCrosshairPositionEvent(false),
-    m_CrosshairNavigationEnabled(false)
+    m_CrosshairNavigationEnabled(false),
+    m_displayMetaInfo(true)
 {
   /******************************************************
    * Use the global RenderingManager if none was specified
@@ -290,6 +291,19 @@ void QmitkStdMultiWidget::InitializeWidget()
   SetDecorationProperties("Coronal", GetDecorationColor(2), 2);
   SetDecorationProperties("3D", GetDecorationColor(3), 3);
 
+  for(int i = 0; i < 4; i++)
+  {
+    cornerText[i] = vtkCornerAnnotation::New();
+    textProp[i] = vtkTextProperty::New();
+    ren[i] = vtkRenderer::New();
+    ren[i]->AddActor(cornerText[i]);
+    ren[i]->InteractiveOff();
+  }
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(ren[0], true);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(ren[1], true);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(ren[2], true);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->InsertForegroundRenderer(ren[3], true);
+
   // connect to the "time navigation controller": send time via sliceNavigationControllers
   m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController(), false);
@@ -307,17 +321,24 @@ void QmitkStdMultiWidget::InitializeWidget()
 
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
 
+  mitkWidget1->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
+  mitkWidget2->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
+  mitkWidget3->GetSliceNavigationController()->crosshairPositionEvent.AddListener(mitk::MessageDelegate<QmitkStdMultiWidget>(this, &QmitkStdMultiWidget::HandleCrosshairPositionEvent));
+
   // setup the department logo rendering
-  m_LogoRendering = mitk::LogoOverlay::New();
-  mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
-  m_LogoRendering->SetOpacity(0.5);
-  mitk::Point2D offset;
-  offset.Fill(0.03);
-  m_LogoRendering->SetOffsetVector(offset);
-  m_LogoRendering->SetRelativeSize(0.15);
-  m_LogoRendering->SetCornerPosition(1);
-  m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  if (!m_displayMetaInfo)
+  {
+    m_LogoRendering = mitk::LogoOverlay::New();
+    mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
+    m_LogoRendering->SetOpacity(0.5);
+    mitk::Point2D offset;
+    offset.Fill(0.03);
+    m_LogoRendering->SetOffsetVector(offset);
+    m_LogoRendering->SetRelativeSize(0.15);
+    m_LogoRendering->SetCornerPosition(1);
+    m_LogoRendering->SetLogoImagePath("DefaultLogo");
+    renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  }
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -417,6 +438,17 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
   m_TimeNavigationController->Disconnect(mitkWidget2->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget3->GetSliceNavigationController());
   m_TimeNavigationController->Disconnect(mitkWidget4->GetSliceNavigationController());
+
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->RemoveRenderer( ren[0] );
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->RemoveRenderer( ren[1] );
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( ren[2] );
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow4()->GetRenderWindow())->RemoveRenderer( ren[3] );
+
+  for(int i = 0; i < 4; i++) {
+    cornerText[i]->Delete();
+    textProp[i]->Delete();
+    ren[i]->Delete();
+  }
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
@@ -623,6 +655,26 @@ void QmitkStdMultiWidget::SetDecorationProperties(std::string text, mitk::Color 
   {
     renderer->AddViewProp(frame);
   }
+}
+
+void QmitkStdMultiWidget::setDisplayMetaInfo(bool metainfo)
+{
+  m_displayMetaInfo = metainfo;
+}
+
+void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* text)
+{
+  // empty or NULL string breaks renderer
+  // and white square appears
+  if ((text == NULL) || (text[0] == 0))
+  {
+    text = " ";
+  }
+  cornerText[i]->SetText(corner, text);
+  cornerText[i]->SetMaximumFontSize(14);
+  textProp[i]->SetColor(1.0, 1.0, 1.0);
+  textProp[i]->SetFontFamilyToArial();
+  cornerText[i]->SetTextProperty(textProp[i]);
 }
 
 void QmitkStdMultiWidget::SetCornerAnnotationVisibility(bool visibility)
@@ -1584,7 +1636,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
   mitk::Point3D crosshairPos = this->GetCrossPosition();
   std::string statusText;
-  std::stringstream stream;
   itk::Index<3> p;
   mitk::BaseRenderer *baseRenderer = this->mitkWidget1->GetSliceNavigationController()->GetRenderer();
   unsigned int timestep = baseRenderer->GetTimeStep();
@@ -1592,37 +1643,77 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
   if (image.IsNotNull() && (image->GetTimeSteps() > timestep))
   {
     image->GetGeometry()->WorldToIndex(crosshairPos, p);
-    stream.precision(2);
-    stream << "Position: <" << std::fixed << crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", "
-           << std::fixed << crosshairPos[2] << "> mm";
-    stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
 
-    mitk::ScalarType pixelValue;
-
-    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
-                            image->GetChannelDescriptor().GetPixelType(),
-                            image,
-                            image->GetVolumeData(baseRenderer->GetTimeStep()),
-                            p,
-                            pixelValue,
-                            component);
-
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+    /// Screen annotations
+    mitk::BoundingBox::BoundsArrayType bounds = image->GetGeometry()->GetBounds();
+    std::stringstream _infoStringStream[3];
+    std::string cornerimgtext[3];
+    for(int i = 0; i < 3; i++)
     {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
+      _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
+      cornerimgtext[i] = _infoStringStream[i].str();
+      setCornerAnnotation(2, i, cornerimgtext[i].c_str());
     }
-    else
+
+    /// Whether clicked image is changed
+    unsigned long newImageMTime = image->GetMTime();
+    if (imageMTime != newImageMTime)
     {
-      stream << "; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: " << pixelValue << "  ";
+      imageMTime = newImageMTime;
+      std::string patient, patientId,
+        birthday, sex, institution, studyDate, studyTime;
+
+      imageProperties = image->GetPropertyList();
+      imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
+      imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
+      imageProperties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
+      imageProperties->GetStringProperty("dicom.patient.PatientsSex", sex);
+      imageProperties->GetStringProperty("dicom.study.InstitutionName", institution);
+      imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
+      imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
+
+      std::stringstream infoStringStream[2];
+
+      char yy[5]; yy[4] = 0;
+      char mm[3]; mm[2] = 0;
+      char dd[3]; dd[2] = 0;
+      char hh[3]; hh[2] = 0;
+      char mi[3]; mi[2] = 0;
+      char ss[3]; ss[2] = 0;
+
+      if (m_displayMetaInfo && (birthday != "")) {
+        sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
+        infoStringStream[0]
+          << "\n\n" << patient.c_str()
+          << "\n" << patientId.c_str()
+          << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
+          << "\n" << institution.c_str();
+      } else {
+        infoStringStream[0].clear();
+      }
+
+      if (m_displayMetaInfo && (studyDate != "" && studyTime != "")) {
+        sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
+        sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
+        infoStringStream[1]
+          << dd << "." << mm << "." << yy
+          << " " << hh << ":" << mi << ":" << ss;
+      } else {
+        infoStringStream[1].clear();
+      }
+
+      auto render_annotation = [&] (int j, int corner) {
+        const std::string infoString = infoStringStream[j].str();
+        setCornerAnnotation(corner, 3, infoString.c_str());
+      };
+      render_annotation(0, 3);
+      render_annotation(1, 1);
+      this->GetRenderWindow1()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow2()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow3()->GetRenderer()->RequestUpdate();
+      this->GetRenderWindow4()->GetRenderer()->RequestUpdate();
     }
   }
-  else
-  {
-    stream << "No image information at this position!";
-  }
-
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
 }
 
 int QmitkStdMultiWidget::GetLayout() const

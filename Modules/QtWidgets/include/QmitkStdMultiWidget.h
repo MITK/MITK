@@ -137,10 +137,23 @@ public:
 
   bool IsCornerAnnotationVisible(void) const;
 
+  void setDisplayMetaInfo(bool metainfo);
+
 protected:
   void UpdateAllWidgets();
 
   void HideAllWidgetToolbars();
+
+  bool m_displayMetaInfo;
+
+  mitk::PropertyList::Pointer imageProperties;
+  unsigned long imageMTime;
+
+  vtkCornerAnnotation* cornerText[4];
+  vtkTextProperty* textProp[4];
+  vtkRenderer* ren[4];
+
+  void setCornerAnnotation(int corner, int i, const char* text);
 
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 

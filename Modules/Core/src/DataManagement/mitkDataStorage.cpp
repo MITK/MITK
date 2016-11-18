@@ -318,11 +318,20 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
           // Attention: Objects with zero bounding box are not respected in time bound calculation
           for (TimeStepType i = 0; i < timeGeometry->CountTimeSteps(); i++)
           {
-            Vector3D spacing = node->GetData()->GetGeometry(i)->GetSpacing();
-            for (int axis = 0; axis < 3; ++axis)
+            // We must not use 'node->GetData()->GetGeometry(i)->GetSpacing()' here, as it returns the spacing
+            // in its original space, which, in case of an image geometry, can have the values in different
+            // order than in world space. For the further calculations, we need to have the spacing values
+            // in world coordinate order (sag-cor-ax).
+            Vector3D spacing;
+            spacing.Fill(1.0);
+            node->GetData()->GetGeometry(i)->IndexToWorld(spacing, spacing);
+            for (int axis = 0; axis < 3; ++ axis)
             {
-              if (spacing[axis] < minSpacing[axis])
-                minSpacing[axis] = spacing[axis];
+              ScalarType space = std::abs(spacing[axis]);
+              if (space < minSpacing[axis])
+              {
+                minSpacing[axis] = space;
+              }
             }
 
             const TimeBounds &curTimeBounds = node->GetData()->GetTimeGeometry()->GetTimeBounds(i);
@@ -374,11 +383,14 @@ mitk::TimeGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D(const S
     // correct bounding-box (is now in mm, should be in index-coordinates)
     // according to spacing
     BoundingBox::BoundsArrayType bounds = result->GetBounds();
-    int i;
-    for (i = 0; i < 6; ++i)
+    AffineTransform3D::OutputVectorType offset;
+    for (int i = 0; i < 3; ++i)
     {
-      bounds[i] /= minSpacing[i / 2];
+      offset[i] = bounds[i * 2];
+      bounds[i * 2] = 0.0;
+      bounds[i * 2 + 1] = (bounds[i * 2 + 1] - offset[i]) / minSpacing[i];
     }
+    geometry->GetIndexToWorldTransform()->SetOffset(offset);
     geometry->SetBounds(bounds);
     geometry->SetSpacing(minSpacing);
     // Initialize the time sliced geometry

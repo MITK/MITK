@@ -86,7 +86,8 @@ namespace mitk
     {
       this->m_Splashscreen = splashscreen;
     }
-    void SplashCloserCallback::run()
+
+    void run()
     {
       this->m_Splashscreen->close();
     }

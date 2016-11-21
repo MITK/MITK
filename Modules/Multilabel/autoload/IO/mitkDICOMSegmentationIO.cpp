@@ -39,8 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkThresholdImageFilter.h"
 
 // dcmqi
-#include "dcmqi/ImageSEGConverter.h"
-#include "dcmqi/JSONSegmentationMetaInformationHandler.h"
+#include <dcmqi/ImageSEGConverter.h>
+#include <dcmqi/JSONSegmentationMetaInformationHandler.h>
 
 namespace mitk
 {
@@ -341,15 +341,15 @@ namespace mitk
 
     dcmqi::JSONSegmentationMetaInformationHandler handler;
     handler.setContentCreatorName("MITK");
-    handler.setClinicalTrialSeriesID("");
-    handler.setClinicalTrialTimePointID("1");
+    handler.setClinicalTrialSeriesID("Session 1");
+    handler.setClinicalTrialTimePointID("0");
 
     std::string seriesDescription = "";
     image->GetPropertyList()->GetStringProperty("name", seriesDescription);
     if (seriesDescription.empty())
       seriesDescription = "Segmentation";
     handler.setSeriesDescription(seriesDescription);
-    handler.setSeriesNumber("");
+    handler.setSeriesNumber("340"); // TODO:Create own series number
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 
@@ -443,9 +443,12 @@ namespace mitk
                                                       segmentCategoryCodeMeaningProp->GetValueAsString());
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
               segmentTypeCodeMeaningProp != nullptr)
+          {
             segAttr->setSegmentedPropertyType(segmentTypeCodeValueProp->GetValueAsString(),
                                               segmentTypeCodeSchemeProp->GetValueAsString(),
                                               segmentTypeCodeMeaningProp->GetValueAsString());
+            handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
+          }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
               segmentModifierCodeMeaningProp != nullptr)
             segAttr->setSegmentedPropertyTypeModifier(segmentModifierCodeValueProp->GetValueAsString(),

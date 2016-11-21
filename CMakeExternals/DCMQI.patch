@@ -1,3 +1,15 @@
+diff --git a/CMake/DCMQIConfig.cmake.in b/CMake/DCMQIConfig.cmake.in
+index 7cf66b2..c0d7827 100644
+--- a/CMake/DCMQIConfig.cmake.in
++++ b/CMake/DCMQIConfig.cmake.in
+@@ -1,7 +1,6 @@
+ @PACKAGE_INIT@
+
+ set_and_check(DCMTK_DIR "@PACKAGE_DCMTK_DIR_CONFIG@")
+-set_and_check(SlicerExecutionModel_DIR "@PACKAGE_SlicerExecutionModel_DIR_CONFIG@")
+ set_and_check(DCMQI_CONFIG_DIR "@PACKAGE_CONFIG_DIR_CONFIG@")
+ set_and_check(DCMQI_TARGETS "@PACKAGE_CONFIG_DIR_CONFIG@/DCMQITargets.cmake")
+
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 91365f5..a8c8744 100644
 --- a/CMakeLists.txt
@@ -17,4 +29,3 @@ index 91365f5..a8c8744 100644
 -        SlicerExecutionModel_DIR_CONFIG
        NO_CHECK_REQUIRED_COMPONENTS_MACRO
    )
-

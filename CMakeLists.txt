@@ -861,6 +861,15 @@ if(MITK_USE_DCMTK)
   find_package(DCMTK REQUIRED MODULE)
 endif()
 
+if(MITK_USE_DCMQI)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMQIConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMQI.
+    # Help our FindDCMQI.cmake script find our super-build DCMQI
+  set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  find_package(DCMQI REQUIRED)
+endif()
+
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)
   find_package(PythonInterp REQUIRED)

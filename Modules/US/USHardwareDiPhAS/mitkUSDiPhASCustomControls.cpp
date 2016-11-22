@@ -60,7 +60,7 @@ void mitk::USDiPhASCustomControls::OnSetRecord(bool record)
 //Transmit
 void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {
-  m_device->GetScanMode().transmitPhaseLengthSeconds = us*1000*1000;
+  m_device->GetScanMode().transmitPhaseLengthSeconds = us/1000000;
   m_device->UpdateScanmode();
 }
 

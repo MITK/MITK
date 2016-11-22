@@ -106,12 +106,12 @@ protected:
   virtual ~USDiPhASImageSource( );
 
   /** This vector holds all the images we record, if recording is set to active. */
-  std::vector<mitk::Image::Pointer>     m_recordedImages;
+  std::vector<mitk::Image::Pointer>     m_RecordedImages;
   std::vector<long long>                m_ImageTimestampRecord;
   std::vector<long long>                m_ImageTimestampBuffer;
-  std::vector<float>                    m_pixelValues;
+  std::vector<float>                    m_PixelValues;
   long long                             m_CurrentImageTimestamp;
-  bool                                  currentlyRecording;
+  bool                                  m_CurrentlyRecording;
   mitk::OphirPyro::Pointer              m_Pyro;
   bool                                  m_PyroConnected;
 
@@ -124,16 +124,13 @@ protected:
   mitk::Vector3D                        m_ImageSpacing;
 
   mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage);
-  mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage);
+  mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage, bool UseLogFilter = false, int resampleSpacing = 0.15);
 
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);
 
   void GetPixelValues(itk::Index<3> pixel);
   float GetPixelValue(itk::Index<3> pixel);
-
-  /** This image holds the image to be displayed right now*/
-  mitk::Image::Pointer                  m_Image;
 
   mitk::USDiPhASDevice*                 m_device;
 
@@ -144,10 +141,10 @@ protected:
   /**
    * Variables for management of current state.
    */
-  float                           startTime;
-  bool                            useGUIOutPut;
-  BeamformerStateInfoNative       BeamformerInfos;
-  bool                            useBModeFilter;
+  float                           m_StartTime;
+  bool                            m_UseGUIOutPut;
+  BeamformerStateInfoNative       m_BeamformerInfos;
+  bool                            m_UseBModeFilter;
 
   bool                            m_DataTypeModified;
   DataType                        m_DataTypeNext;
@@ -156,7 +153,7 @@ protected:
 
   DataType                        m_DataType;
 
-  itk::FastMutexLock::Pointer m_ImageMutex;
+  itk::FastMutexLock::Pointer     m_ImageMutex;
 };
 } // namespace mitk
 

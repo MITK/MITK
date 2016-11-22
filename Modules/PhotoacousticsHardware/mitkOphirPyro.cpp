@@ -50,7 +50,6 @@ mitk::OphirPyro::~OphirPyro()
   }
   MITK_INFO << "[OphirPyro Debug] destroying that Pyro";
   /* cleanup thread */
-
 }
 
 bool mitk::OphirPyro::StartDataAcquisition()
@@ -186,7 +185,6 @@ double mitk::OphirPyro::GetClosestEnergyInmJ(long long ImageTimeStamp, double in
       shortestDifference = newDifference;
       foundIndex = index;
       //MITK_INFO << "foundIndex = " << foundIndex;
-
     }
   }
 

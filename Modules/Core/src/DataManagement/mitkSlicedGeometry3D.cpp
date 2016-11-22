@@ -154,16 +154,15 @@ void mitk::SlicedGeometry3D::InitializeSlicedGeometry(unsigned int slices)
   m_DirectionVector.Fill(0);
 }
 
-void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D, unsigned int slices, bool flipped)
+void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D, unsigned int slices)
 {
   assert(geometry2D != nullptr);
-  this->InitializeEvenlySpaced(geometry2D, geometry2D->GetExtentInMM(2) / geometry2D->GetExtent(2), slices, flipped);
+  this->InitializeEvenlySpaced(geometry2D, geometry2D->GetExtentInMM(2) / geometry2D->GetExtent(2), slices);
 }
 
 void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D,
                                                     mitk::ScalarType zSpacing,
-                                                    unsigned int slices,
-                                                    bool flipped)
+                                                    unsigned int slices)
 {
   assert(geometry2D != nullptr);
   assert(geometry2D->GetExtent(0) > 0);
@@ -186,32 +185,18 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometr
   directionVector.Normalize();
   directionVector *= zSpacing;
 
-  if (flipped == false)
-  {
-    // Normally we should use the following four lines to create a copy of
-    // the transform contrained in geometry2D, because it may not be changed
-    // by us. But we know that SetSpacing creates a new transform without
-    // changing the old (coming from geometry2D), so we can use the fifth
-    // line instead. We check this at (**).
-    //
-    // AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    // transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
-    // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
-    // SetIndexToWorldTransform(transform);
+  // Normally we should use the following four lines to create a copy of
+  // the transform contrained in geometry2D, because it may not be changed
+  // by us. But we know that SetSpacing creates a new transform without
+  // changing the old (coming from geometry2D), so we can use the fifth
+  // line instead. We check this at (**).
+  //
+  // AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  // transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
+  // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
+  // SetIndexToWorldTransform(transform);
 
-    this->SetIndexToWorldTransform(const_cast<AffineTransform3D *>(geometry2D->GetIndexToWorldTransform()));
-  }
-  else
-  {
-    directionVector *= -1.0;
-    this->SetIndexToWorldTransform(AffineTransform3D::New());
-    this->GetIndexToWorldTransform()->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
-
-    AffineTransform3D::OutputVectorType scaleVector;
-    FillVector3D(scaleVector, 1.0, 1.0, -1.0);
-    this->GetIndexToWorldTransform()->Scale(scaleVector, true);
-    this->GetIndexToWorldTransform()->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
-  }
+  this->SetIndexToWorldTransform(const_cast<AffineTransform3D *>(geometry2D->GetIndexToWorldTransform()));
 
   mitk::Vector3D spacing;
   FillVector3D(spacing, geometry2D->GetExtentInMM(0) / bounds[1], geometry2D->GetExtentInMM(1) / bounds[3], zSpacing);
@@ -258,48 +243,44 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
       inverseMatrix[0][worldAxis],
       inverseMatrix[1][worldAxis],
       inverseMatrix[2][worldAxis]);
-  int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
 
   ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
   unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis));
 
-  /// MITK currently only supports right-handed plane geometries. If you pass 'true' for
-  /// the 'flipped' argument in the `InitializeEvenlySpaced` call, you basically stack up
-  /// the plane geometries against to their normals. This makes a right-handed sliced
-  /// geometry from left-handed planes or the other way around. Also, this leads into a
-  /// weird situation where the volume of the first plane geometry is outside of the volume
-  /// of the sliced geometry, and there is no plane geometry at the place of the last slice
-  /// of the volume.
-  ///
-  /// Since the mappers only use the origin and the right and bottom vectors of the plane
-  /// geometries but not their normals, this 'anomaly' will not be visible in the renderer.
+#ifndef NDEBUG
+  int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
 
-  /// The normal of the axial axis in the reference geometry. It can be left- or right-handed,
-  /// depending on how the reference geometry has been created.
-  Vector3D planeNormalInWorld;
-  for (int i = 0; i < 3; ++i)
-  {
-    planeNormalInWorld[i] = inverseMatrix[dominantAxis][i] * upDirection;
-  }
+  /// The normal vector of an imaginary plane that points from the world origin (bottom left back
+  /// corner or the world, with the lowest physical coordinates) towards the inside of the volume,
+  /// along the renderer axis. Length is the slice thickness.
+  Vector3D worldPlaneNormal = inverseMatrix.get_row(dominantAxis) * (upDirection * viewSpacing);
 
-  /// The normal of the standard plane geometry. Always right-handed. Calculated as the
-  /// cross-product of the right- and bottom vectors, multiplied by the z spacing.
+  /// The normal of the standard plane geometry just created.
   Vector3D standardPlaneNormal = planeGeometry->GetNormal();
-  standardPlaneNormal.Normalize();
 
-  /// If the standard plane normal points against to normal of corresponding world plane,
-  /// then we have to stack the planes up in reverse order, i.e. with `flipped == true`.
-  /// It is not enough to check the up direction, because we have to flip if and only if
-  /// `PlaneGeometry::InitializeStandardPlane()` flipped the normal compared to what was
-  /// intended, to ensure right-handedness.
-  ///
-  /// We also have to flip if `top == false`, as this means that we want the slice on the
-  /// side opposite to the origin to be the first.
-  ///
-  /// So, in the end, we flip when either top is false or the normal was flipped but not both.
-  bool flipped = (planeNormalInWorld == standardPlaneNormal) != top;
+  /// The standard plane must be parallel to the 'world plane'. The normal of the standard plane
+  /// must point against the world plane if and only if 'top' is 'false'. The length of the
+  /// standard plane normal must be equal to the slice thickness.
+  assert((standardPlaneNormal - (top ? 1.0 : -1.0) * worldPlaneNormal).GetSquaredNorm() < 0.000001);
+#endif
 
-  this->InitializeEvenlySpaced(planeGeometry, viewSpacing, slices, flipped);
+  this->InitializeEvenlySpaced(planeGeometry, viewSpacing, slices);
+
+#ifndef NDEBUG
+  /// The standard plane normal and the z axis vector of the sliced geometry must point in
+  /// the same direction.
+  Vector3D zAxisVector = this->GetAxisVector(2);
+  Vector3D upscaledStandardPlaneNormal = standardPlaneNormal;
+  upscaledStandardPlaneNormal *= slices;
+  assert((zAxisVector - upscaledStandardPlaneNormal).GetSquaredNorm() < 0.000001);
+
+  /// You can use this test is to check the handedness of the coordinate system of the current
+  /// geometry. In principle, you can use either left- or right-handed coordinate systems, but
+  /// you normally want it to be consistent, that is the handedness should be the same across
+  /// the renderers of the same viewer.
+//  ScalarType det = vnl_det(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix());
+//  MITK_DEBUG << "world axis: " << worldAxis << (det > 0 ? " ; right-handed" : " ; left-handed");
+#endif
 }
 
 void mitk::SlicedGeometry3D::ReinitializePlanes(const Point3D &center, const Point3D &referencePoint)

@@ -195,7 +195,7 @@ namespace mitk
     * Initializes the bounding box according to the width/height of the
     * PlaneGeometry and \a slices. The spacing is calculated from the PlaneGeometry.
     */
-    virtual void InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D, unsigned int slices, bool flipped = false);
+    virtual void InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D, unsigned int slices);
 
     /**
     * \brief Completely initialize this instance as evenly-spaced with slices
@@ -208,8 +208,7 @@ namespace mitk
     */
     virtual void InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D,
                                         mitk::ScalarType zSpacing,
-                                        unsigned int slices,
-                                        bool flipped = false);
+                                        unsigned int slices);
 
     /**
     * \brief Completely initialize this instance as evenly-spaced plane slices

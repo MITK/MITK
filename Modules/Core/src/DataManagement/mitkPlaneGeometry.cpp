@@ -163,7 +163,8 @@ namespace mitk
                                               PlaneGeometry::PlaneOrientation planeorientation,
                                               ScalarType zPosition,
                                               bool frontside,
-                                              bool rotated)
+                                              bool rotated,
+                                              bool top)
   {
     AffineTransform3D::Pointer transform;
 
@@ -178,7 +179,7 @@ namespace mitk
     transform->SetIdentity();
     transform->SetMatrix(matrix);
 
-    InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside, rotated);
+    InitializeStandardPlane(width, height, transform.GetPointer(), planeorientation, zPosition, frontside, rotated, top);
   }
 
   void PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width,
@@ -187,7 +188,8 @@ namespace mitk
                                               PlaneGeometry::PlaneOrientation planeorientation /* = Axial */,
                                               mitk::ScalarType zPosition /* = 0 */,
                                               bool frontside /* = true */,
-                                              bool rotated /* = false */)
+                                              bool rotated /* = false */,
+                                              bool top /* = true */)
   {
     Superclass::Initialize();
 
@@ -350,33 +352,29 @@ namespace mitk
         itkExceptionMacro("unknown PlaneOrientation");
     }
 
-    /// Checking if lefthanded or righthanded:
-    mitk::ScalarType lhOrRhSign = (+1);
-    if (transform != nullptr)
+    VnlVector normal(3);
+    FillVector3D(normal, 0, 0, 0);
+    normal[normalDirection] = top ? 1 : -1;
+
+    if ( transform != nullptr )
     {
-      lhOrRhSign = ((0 < vnl_determinant(transform->GetMatrix().GetVnlMatrix())) ? (+1) : (-1));
-
-      MITK_DEBUG
-        << "mitk::PlaneGeometry::InitializeStandardPlane(): lhOrRhSign, normalDirection, NameOfClass, ObjectName = "
-        << lhOrRhSign << ", " << normalDirection << ", " << transform->GetNameOfClass() << ", "
-        << transform->GetObjectName() << ".";
-
-      origin = transform->TransformPoint(origin);
-      rightDV = transform->TransformVector(rightDV);
-      bottomDV = transform->TransformVector(bottomDV);
-
-      /// Signing normal vector according to l.h./r.h. coordinate system:
-      this->SetMatrixByVectors(
-        rightDV, bottomDV, transform->GetMatrix().GetVnlMatrix().get_column(normalDirection).two_norm() * lhOrRhSign);
-    }
-    else
-    {
-      this->SetMatrixByVectors(rightDV, bottomDV);
+      origin = transform->TransformPoint( origin );
+      rightDV = transform->TransformVector( rightDV );
+      bottomDV = transform->TransformVector( bottomDV );
+      normal = transform->TransformVector( normal );
     }
 
     ScalarType bounds[6] = {0, width, 0, height, 0, 1};
-
     this->SetBounds(bounds);
+
+    AffineTransform3D::Pointer planeTransform = AffineTransform3D::New();
+    Matrix3D matrix;
+    matrix.GetVnlMatrix().set_column(0, rightDV);
+    matrix.GetVnlMatrix().set_column(1, bottomDV);
+    matrix.GetVnlMatrix().set_column(2, normal);
+    planeTransform->SetMatrix(matrix);
+    planeTransform->SetOffset(this->GetIndexToWorldTransform()->GetOffset());
+    this->SetIndexToWorldTransform(planeTransform);
 
     this->SetOrigin(origin);
   }
@@ -385,7 +383,8 @@ namespace mitk
                                               PlaneOrientation planeorientation,
                                               ScalarType zPosition,
                                               bool frontside,
-                                              bool rotated)
+                                              bool rotated,
+                                              bool top)
   {
     this->SetReferenceGeometry(geometry3D);
 
@@ -431,11 +430,13 @@ namespace mitk
     matrix[1][2] = inverseMatrix[axes[2]][1] * directions[2] * spacings[2];
     matrix[2][2] = inverseMatrix[axes[2]][2] * directions[2] * spacings[2];
 
-    /// The new origin is the bottom left back corner in the world coordinate system.
-    Point3D origin = geometry3D->GetOrigin();
+    /// The "world origin" is the corner with the lowest physical coordinates.
+    /// We use it as a reference point so that we get the correct anatomical
+    /// orientations.
+    Point3D worldOrigin = geometry3D->GetOrigin();
     for (int i = 0; i < 3; ++i)
     {
-      /// The distance of the origin from the bottom left back corner in voxels.
+      /// The distance of the plane origin from the world origin in voxels.
       double offset = directions[i] > 0 ? 0.0 : extents[i];
 
       if (geometry3D->GetImageGeometry())
@@ -445,7 +446,7 @@ namespace mitk
 
       for (int j = 0; j < 3; ++j)
       {
-        origin[j] -= offset * matrix[j][i];
+        worldOrigin[j] -= offset * matrix[j][i];
       }
     }
 
@@ -475,10 +476,10 @@ namespace mitk
 
     AffineTransform3D::Pointer transform = AffineTransform3D::New();
     transform->SetMatrix(matrix);
-    transform->SetOffset(origin.GetVectorFromOrigin());
+    transform->SetOffset(worldOrigin.GetVectorFromOrigin());
 
     InitializeStandardPlane(
-      width, height, transform, planeorientation, zPosition, frontside, rotated);
+      width, height, transform, planeorientation, zPosition, frontside, rotated, top);
   }
 
   void PlaneGeometry::InitializeStandardPlane(
@@ -520,7 +521,7 @@ namespace mitk
 
     ScalarType zPosition = top ? 0.5 : geometry3D->GetExtent(dominantAxis) - 0.5;
 
-    InitializeStandardPlane(geometry3D, planeorientation, zPosition, frontside, rotated);
+    InitializeStandardPlane(geometry3D, planeorientation, zPosition, frontside, rotated, top);
   }
 
   void PlaneGeometry::InitializeStandardPlane(const Vector3D &rightVector,

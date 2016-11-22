@@ -150,7 +150,8 @@ namespace mitk
                                          PlaneOrientation planeorientation = Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
-                                         bool rotated = false);
+                                         bool rotated = false,
+                                         bool top = true);
 
     /**
     * \brief Initialize a plane with orientation \a planeorientation
@@ -190,7 +191,8 @@ namespace mitk
                                          PlaneOrientation planeorientation = Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
-                                         bool rotated = false);
+                                         bool rotated = false,
+                                         bool top = true);
 
     /**
     * \brief Initialize plane with orientation \a planeorientation
@@ -203,7 +205,8 @@ namespace mitk
                                          PlaneOrientation planeorientation = Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
-                                         bool rotated = false);
+                                         bool rotated = false,
+                                         bool top = true);
 
     /**
     * \brief Initialize plane by width and height in pixels, right-/down-vector

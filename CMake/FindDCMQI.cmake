@@ -6,7 +6,7 @@ find_path(DCMQI_INCLUDE_DIR
   PATH_SUFFIXES include include/dcmqi
 )
 
-set(DCMQI_INCLUDE_DIR ${DCMQI_DIR}/include ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/include ${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/jsoncpp ${DCMQI_DIR})
+set(DCMQI_INCLUDE_DIR "${DCMQI_DIR}/include" "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/include" "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/jsoncpp" ${DCMQI_DIR})
 
 find_package_handle_standard_args(DCMQI
   FOUND_VAR DCMQI_FOUND
@@ -20,6 +20,7 @@ find_package_handle_standard_args(DCMQI
     PATHS
     ${DCMQI_DIR}/bin
     ${DCMQI_DIR}/bin/Release
+    ${DCMQI_DIR}/bin/RelWithDebInfo
     NO_DEFAULT_PATH
     )
 
@@ -36,12 +37,12 @@ find_package_handle_standard_args(DCMQI
   mark_as_advanced(DCMQI_LIBRARY_DEBUG)
 
   # Add libraries to variable according to build type
-  set(DCMQI_LIBRARY)
-  mark_as_advanced(DCMQI_LIBRARY)
+  set(DCMQI_LIBRARIES)
+
   if(DCMQI_LIBRARY_RELEASE)
-    list(APPEND DCMQI_LIBRARY optimized ${DCMQI_LIBRARY_RELEASE})
+    list(APPEND DCMQI_LIBRARIES optimized ${DCMQI_LIBRARY_RELEASE})
   endif()
 
   if(DCMQI_LIBRARY_DEBUG)
-    list(APPEND DCMQI_LIBRARY debug ${DCMQI_LIBRARY_DEBUG})
+    list(APPEND DCMQI_LIBRARIES debug ${DCMQI_LIBRARY_DEBUG})
   endif()

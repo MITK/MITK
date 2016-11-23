@@ -239,11 +239,11 @@ private:
   void Show2DInterpolationControls(bool show);
   void Show3DInterpolationControls(bool show);
   void CheckSupportedImageDimension();
+  void WaitForFutures();
+  void NodeRemoved(const mitk::DataNode* node);
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
-    void WaitForFutures();
-    void nodeRemoved(const mitk::DataNode* node);
 
   mitk::FeatureBasedEdgeDetectionFilter::Pointer m_EdgeDetector;
   mitk::PointCloudScoringFilter::Pointer m_PointScorer;

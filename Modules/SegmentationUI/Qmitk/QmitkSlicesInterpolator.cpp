@@ -199,19 +199,27 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
 
 void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
 {
-  if (m_DataStorage)
+  if (m_DataStorage == storage)
+  {
+    return;
+  }
+
+  if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->RemoveNodeEvent.RemoveListener(
-      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
     );
   }
    
   m_DataStorage = storage;
   m_SurfaceInterpolator->SetDataStorage(storage);
 
-  m_DataStorage->RemoveNodeEvent.AddListener(
-    mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
-  );
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->RemoveNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
+    );
+  }
 }
 
 mitk::DataStorage *QmitkSlicesInterpolator::GetDataStorage()
@@ -315,12 +323,11 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   WaitForFutures();
 
-  m_DataStorage->RemoveNodeEvent.RemoveListener(
-    mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
-  );
-
   if (m_DataStorage.IsNotNull()) 
   {
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
+    );
     if (m_DataStorage->Exists(m_3DContourNode))
       m_DataStorage->Remove(m_3DContourNode);
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
@@ -1334,7 +1341,7 @@ void QmitkSlicesInterpolator::WaitForFutures()
   }
 }
 
-void QmitkSlicesInterpolator::nodeRemoved(const mitk::DataNode* node)
+void QmitkSlicesInterpolator::NodeRemoved(const mitk::DataNode* node)
 {
   if ((m_ToolManager && m_ToolManager->GetWorkingData(0) == node) ||
       node == m_3DContourNode ||

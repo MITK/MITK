@@ -1,0 +1,12 @@
+--- a/cmake/EigenConfigureTesting.cmake	2016-11-23 15:30:25.509304332 +0400
++++ b/cmake/EigenConfigureTesting.cmake	2016-11-23 15:29:49.869661223 +0400
+@@ -19,7 +19,7 @@
+ # save CMAKE_MAKE_PROGRAM
+ set(CMAKE_MAKE_PROGRAM_SAVE ${CMAKE_MAKE_PROGRAM})
+ # and set a fake one
+-set(CMAKE_MAKE_PROGRAM "@EIGEN_MAKECOMMAND_PLACEHOLDER@")
++#set(CMAKE_MAKE_PROGRAM "@EIGEN_MAKECOMMAND_PLACEHOLDER@")
+ 
+ # This call activates testing and generates the DartConfiguration.tcl
+ include(CTest)
+

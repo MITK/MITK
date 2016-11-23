@@ -885,7 +885,7 @@ void ::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
 void ::QmitkSlicesInterpolator::RunPlaneSuggestion()
 {
   if (m_FirstRun)
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(7);
   else
     mitk::ProgressBar::GetInstance()->AddStepsToDo(3);
 

@@ -362,11 +362,12 @@ namespace mitk
     handler.setContentCreatorName("MITK");
     handler.setClinicalTrialSeriesID("Session 1");
     handler.setClinicalTrialTimePointID("0");
+    handler.setClinicalTrialCoordinatingCenterName("Unknown");
 
     std::string seriesDescription = "";
     image->GetPropertyList()->GetStringProperty("name", seriesDescription);
     if (seriesDescription.empty())
-      seriesDescription = "Segmentation";
+      seriesDescription = "MITK Segmentation";
     handler.setSeriesDescription(seriesDescription);
     handler.setSeriesNumber("34" + std::to_string(layer)); // TODO:Create own series number
     handler.setInstanceNumber("1");

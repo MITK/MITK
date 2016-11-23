@@ -345,7 +345,7 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
   segmentation->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), StringProperty::New("SEG"));
   // Add DICOM Tag (0008,103E) Series Description
   segmentation->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str(),
-                            StringProperty::New("Segmentation"));
+                            StringProperty::New("MITK Segmentation"));
   //------------------------------------------------------------
   // Add Segment Sequence tags (0062, 0002)
   mitk::DICOMTagPath segmentSequencePath;

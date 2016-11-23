@@ -1038,7 +1038,7 @@ void QmitkMultiLabelSegmentationView::AddDICOMSegmentationProperties(mitk::Label
   image->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), mitk::StringProperty::New("SEG"));
   // Add DICOM Tag (0008,103E) Series Description
   image->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str(),
-                     mitk::StringProperty::New("Segmentation"));
+                     mitk::StringProperty::New("MITK Segmentation"));
 
   // Check if original image is a DICOM image; if so, store relevant DICOM Tags into the PropertyList of new
   // segmentation image

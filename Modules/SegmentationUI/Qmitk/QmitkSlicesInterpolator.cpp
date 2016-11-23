@@ -218,7 +218,12 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
 void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage::Pointer storage )
 {
-  if (m_DataStorage)
+  if (m_DataStorage == storage)
+  {
+    return;
+  }
+
+  if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->RemoveNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
@@ -228,9 +233,12 @@ void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage::Pointer storage
   m_DataStorage = storage;
   m_SurfaceInterpolator->SetDataStorage(storage);
 
-  m_DataStorage->RemoveNodeEvent.AddListener(
-    mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
-  );
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->RemoveNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
+    );
+  }
 }
 
 mitk::DataStorage* QmitkSlicesInterpolator::GetDataStorage()
@@ -325,11 +333,11 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
 
   WaitForFutures();
 
-  m_DataStorage->RemoveNodeEvent.RemoveListener(
-    mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
-  );
-
-  if (m_DataStorage.IsNotNull()) {
+  if (m_DataStorage.IsNotNull()) 
+  {
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::nodeRemoved)
+    );
     if (m_DataStorage->Exists(m_3DContourNode))
       m_DataStorage->Remove(m_3DContourNode);
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))

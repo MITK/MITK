@@ -101,6 +101,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 
   connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
   connect(ui->StartStopRecord, SIGNAL(clicked()), this, SLOT(OnRecordChanged()));
+  connect(ui->VerticalSpacing, SIGNAL(valueChanged(double)), this, SLOT(OnVerticalSpacingChanged()));
 
   //transmit
   connect(ui->TransmitPhaseLength, SIGNAL(valueChanged(double)), this, SLOT(OnTransmitPhaseLengthChanged()));
@@ -149,6 +150,11 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
     ui->StartStopRecord->setText("Start Recording");
     m_ControlInterface->SetRecord(false);
   }
+}
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnVerticalSpacingChanged()
+{
+  m_ControlInterface->SetVerticalSpacing(ui->VerticalSpacing->value());
 }
 
 //Transmit
@@ -260,6 +266,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedLinesChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnSpeedOfSoundChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+
   m_ControlInterface->SetSpeedOfSound(ui->SpeedOfSound->value());
 }
 

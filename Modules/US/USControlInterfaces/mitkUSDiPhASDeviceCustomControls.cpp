@@ -59,6 +59,11 @@ void mitk::USDiPhASDeviceCustomControls::SetRecord(bool record)
   this->OnSetRecord(record);
 }
 
+void mitk::USDiPhASDeviceCustomControls::SetVerticalSpacing(float mm)
+{
+  this->SetVerticalSpacing(mm);
+}
+
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::SetTransmitPhaseLength(double us)
 {
@@ -152,6 +157,7 @@ void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
 //OnSetDummies
 void mitk::USDiPhASDeviceCustomControls::OnSetUseBModeFilter(bool isSet) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetRecord(bool record) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetVerticalSpacing(float mm) {}
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double ms) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double MHz) {}

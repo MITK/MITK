@@ -89,6 +89,7 @@ public:
 
   /** This starts or ends the recording session*/
   void SetRecordingStatus(bool record);
+  void SetVerticalSpacing(float mm);
 
   void ModifyDataType(DataType DataT);
   void ModifyUseBModeFilter(bool isSet);
@@ -113,6 +114,7 @@ protected:
   bool                                  m_CurrentlyRecording;
   mitk::OphirPyro::Pointer              m_Pyro;
   bool                                  m_PyroConnected;
+  float                                 m_VerticalSpacing;
 
 
   std::vector<mitk::Image::Pointer>     m_ImageBuffer;

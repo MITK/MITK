@@ -57,6 +57,11 @@ void mitk::USDiPhASCustomControls::OnSetRecord(bool record)
   imageSource->SetRecordingStatus(record);
 }
 
+void mitk::USDiPhASCustomControls::OnSetVerticalSpacing(float mm)
+{
+
+}
+
 //Transmit
 void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {

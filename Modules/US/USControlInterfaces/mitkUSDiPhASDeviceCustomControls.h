@@ -49,6 +49,7 @@ public:
   virtual bool GetIsActive( ) override;
 
   virtual void SetUseBModeFilter(bool isSet);
+  virtual void SetVerticalSpacing(float mm);
   virtual void SetRecord(bool record);
 
   //Transmit
@@ -98,6 +99,7 @@ protected:
 
   virtual void OnSetUseBModeFilter(bool isSet);
   virtual void OnSetRecord(bool record);
+  virtual void OnSetVerticalSpacing(float mm);
 
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us);

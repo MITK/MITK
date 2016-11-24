@@ -51,7 +51,8 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_UseBModeFilterNext(false),
   m_CurrentImageTimestamp(0),
   m_PyroConnected(false),
-  m_ImageTimestampBuffer()
+  m_ImageTimestampBuffer(),
+  m_VerticalSpacing(0)
 {
   m_BufferSize = 100;
   m_ImageTimestampBuffer.insert(m_ImageTimestampBuffer.begin(), m_BufferSize, 0);
@@ -395,6 +396,12 @@ void mitk::USDiPhASImageSource::SetGUIOutput(std::function<void(QString)> out)
 void mitk::USDiPhASImageSource::SetUseBModeFilter(bool isSet)
 {
   m_UseBModeFilter = isSet;
+}
+
+void mitk::USDiPhASImageSource::SetVerticalSpacing(float mm)
+{
+  m_VerticalSpacing = mm;
+  cout << m_VerticalSpacing;
 }
 
 // this is just a little function to set the filenames below right

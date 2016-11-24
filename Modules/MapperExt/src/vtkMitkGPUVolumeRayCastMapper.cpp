@@ -622,5 +622,3 @@ void vtkMitkGPUVolumeRayCastMapper::ClipCroppingRegionPlanes()
     ++i;
   }
 }
-
-#endif

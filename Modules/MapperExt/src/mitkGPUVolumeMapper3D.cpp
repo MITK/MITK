@@ -116,9 +116,6 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer *renderer)
   ls->m_cpuInitialized = true;
 }
 
-{
-}
-
 void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer *renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -204,7 +201,6 @@ void mitk::GPUVolumeMapper3D::InitVtkMapper(mitk::BaseRenderer *renderer)
   if (IsRAYEnabled(renderer))
   {
     DeinitCPU(renderer);
-    DeinitGPU(renderer);
     if (!InitRAY(renderer))
     {
       GPU_WARN << "hardware renderer can't initialize ... falling back to software renderer";
@@ -224,7 +220,6 @@ void mitk::GPUVolumeMapper3D::InitVtkMapper(mitk::BaseRenderer *renderer)
   else
   {
   fallback:
-    DeinitGPU(renderer);
     DeinitRAY(renderer);
     InitCPU(renderer);
   }

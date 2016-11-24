@@ -155,11 +155,6 @@ void mitk::USDiPhASDevice::UpdateScanmode()
 {
   OnFreeze(true);
 
-  /*m_ScanMode.imageHeight = m_ScanMode.reconstructionSamplesPerLine;
-  m_ScanMode.imageWidth = m_ScanMode.reconstructionLines;*/
-  m_ScanMode.imageHeight = 512;
-  m_ScanMode.imageWidth = 512;
-
   UpdateTransmitEvents();
 
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))

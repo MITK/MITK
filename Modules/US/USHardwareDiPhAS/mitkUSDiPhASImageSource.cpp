@@ -53,8 +53,6 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_PyroConnected(false),
   m_ImageTimestampBuffer()
 {
-  m_ImageMutex = itk::FastMutexLock::New();
-
   m_BufferSize = 100;
   m_ImageTimestampBuffer.insert(m_ImageTimestampBuffer.begin(), m_BufferSize, 0);
   m_LastWrittenImage = m_BufferSize - 1;
@@ -104,52 +102,49 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   {
     image = &(*m_ImageBuffer[m_LastWrittenImage]);
     ImageEnergyValue = 40;
+    if (image == nullptr)
+      return;
   }
 
   // do image processing before displaying it
-  if (image != nullptr)
+  if (image.IsNotNull())
   {
     // first, we compensate using our ImageEnergyValue
 
-    // doooo
+    // dooooooooit
 
     // now apply BmodeFilter to the image, if the option has been selected.
     if (m_UseBModeFilter && m_DataType == DataType::Beamformed_Short)
     {
-      if (image->GetDimension(2) == 1 || true)
+      if (image->GetDimension(2) == 1)
       {
-        image = ApplyBmodeFilter(image);
+        image = ApplyBmodeFilter(image, true, 0.15);
       } // this is for ultrasound only mode
       else
       {
-        // to put a logfilter only on the ultrasound images, we have to apply the filter seperately to each slice of image
-        for (int slice = 0; slice < image->GetDimension(2); ++slice)
-        {
-          MITK_INFO << "1";
-          mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(slice, 0, 0, nullptr));// , mitk::Image::ReferenceMemory));
-          // just reference the slices, to get a small performance gain here
+        Image::Pointer imageCopy = Image::New();
+        unsigned int dim[] = { image->GetDimension(0),image->GetDimension(1),1};
+        imageCopy->Initialize(image->GetPixelType(), 3, dim);
+        imageCopy->SetGeometry(image->GetGeometry());
+        mitk::ImageReadAccessor inputReadAccessorCopy(image, image->GetSliceData(0));
+        imageCopy->SetSlice(inputReadAccessorCopy.GetData(), 0);
 
-          mitk::Image::Pointer ImageSlice = Image::New();
-          unsigned int imageDimensions[] = { image->GetDimension(0),image->GetDimension(1) };
-          ImageSlice->Initialize(image->GetPixelType(), 2, imageDimensions);
-          ImageSlice->SetGeometry(image->GetGeometry());
+        image = ApplyBmodeFilter(image ,true , 0);
+        imageCopy = ApplyBmodeFilter(imageCopy, false, 0);
 
-          ImageSlice->SetSlice(inputReadAccessor.GetData());
-
-          image->SetSlice(ApplyBmodeFilter2d(ImageSlice,(slice!=0),0.15), slice);
-          MITK_INFO << "5";
-        }
+        mitk::ImageReadAccessor inputReadAccessor(imageCopy, imageCopy->GetSliceData(0));
+        image->SetSlice(inputReadAccessor.GetData(), 0);
       }
     }
   }
 }
 
-mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::Pointer inputImage, bool UseLogFilter, int resampleSpacing)
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter, int resampleSpacing)
 {
   // we use this seperate ApplyBmodeFilter Method for processing of two-dimensional images
 
   // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-  typedef itk::Image< float, 2 > itkFloatImageType;
+  typedef itk::Image< float, 3 > itkFloatImageType;
   
   typedef itk::BModeImageFilter < itkFloatImageType, itkFloatImageType > BModeFilterType;
   BModeFilterType::Pointer bModeFilter = BModeFilterType::New();  // LogFilter
@@ -166,10 +161,8 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::
 
   itkFloatImageType::Pointer bmode;
 
-
   if (UseLogFilter)
   {
-    bModeFilter->SetInput(itkImage);
     bModeFilter->SetInput(itkImage);
     bModeFilter->SetDirection(1);
     bmode = bModeFilter->GetOutput();
@@ -181,6 +174,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::
     bmode = photoacousticBModeFilter->GetOutput();
   }
   
+  // resampleSpacing == 0 means: do no resampling
   if (resampleSpacing == 0)
   {
     return mitk::GrabItkImageMemory(bmode);
@@ -197,46 +191,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter2d(mitk::Image::
 
   outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
 
-  typedef itk::IdentityTransform<double, 2> TransformType;
-  resampleImageFilter->SetInput(bmode);
-  resampleImageFilter->SetSize(outputSize);
-  resampleImageFilter->SetOutputSpacing(outputSpacing);
-  resampleImageFilter->SetTransform(TransformType::New());
-
-  resampleImageFilter->UpdateLargestPossibleRegion();
-  return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
-}
-
-mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage)
-{
-  //MITK_INFO << "Applying BMode Filter";
-  // the image needs to be of floating point type for the envelope filter to work; the casting is done automatically by the CastToItkImage
-  typedef itk::Image< float, 3 > itkFloatImageType;
-  typedef itk::PhotoacousticBModeImageFilter < itkFloatImageType, itkFloatImageType > PhotoacousticBModeImageFilter;
-  PhotoacousticBModeImageFilter::Pointer photoacousticBModeFilter = PhotoacousticBModeImageFilter::New();
-
-  typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
-  ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
-
-  itkFloatImageType::Pointer itkImage;
-
-  mitk::CastToItkImage(inputImage, itkImage);
-  photoacousticBModeFilter->SetInput(itkImage);
-  photoacousticBModeFilter->SetDirection(1);
-
-  itkFloatImageType::Pointer bmode = photoacousticBModeFilter->GetOutput();
-  itkFloatImageType::SpacingType outputSpacing;
-  itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
-  itkFloatImageType::SizeType outputSize = inputSize;
-  outputSize[0] = 256;
-
-  outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
-  outputSpacing[1] = outputSpacing[0] / 2;
-  outputSpacing[2] = 0.6;
-
-  outputSize[1] = inputSize[1] * itkImage->GetSpacing()[1] / outputSpacing[1];
-
-  typedef itk::IdentityTransform<double, 3> TransformType;
+  typedef itk::IdentityTransform<double,3> TransformType;
   resampleImageFilter->SetInput(bmode);
   resampleImageFilter->SetSize(outputSize);
   resampleImageFilter->SetOutputSpacing(outputSpacing);
@@ -353,7 +308,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         if (image->IsSliceSet(index))
         {
           m_RecordedImages.push_back(Image::New());
-          m_RecordedImages.back()->Initialize(image->GetPixelType(), 2, image->GetDimensions());
+          m_RecordedImages.back()->Initialize(image->GetPixelType(), 3, image->GetDimensions());
           m_RecordedImages.back()->SetGeometry(image->GetGeometry());
 
           mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(index));
@@ -362,25 +317,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       }
       // save timestamps for each laser image!
     }
-    // [sic!] Thomas: This kills everything, so we commented it out and now it doesnt kill anything..
-  //  if (!useGUIOutPut && m_GUIOutput) {
-  //    // Need to do this because the program initializes the GUI twice
-  //    // this is probably a bug in UltrasoundSupport, if it's fixed the timing becomes unneccesary
-  //    float timePassed = ((float)std::clock()) / CLOCKS_PER_SEC - startTime;
-  //    if (timePassed > 10)
-  //    {
-  //      useGUIOutPut = true;
-  //    }
-  //  }
-  //  if (useGUIOutPut) {
-  //    // pass some beamformer state infos to the GUI
-  //    getSystemInfo(&BeamformerInfos);
 
-  //    std::ostringstream s;
-  //    s << "state info: PRF:" << BeamformerInfos.systemPRF << "Hz, datarate: " << BeamformerInfos.dataTransferRateMBit << "MBit/s";
-
-  //    m_GUIOutput(QString::fromStdString(s.str()));
-  //  }
     m_ImageTimestampBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = m_CurrentImageTimestamp;
     m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
     m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
@@ -506,13 +443,9 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     // order the images and save them
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
-      bool saveImageData = true;  // in the end delete this debugging "if"
-      if (saveImageData)
-      {
-        OrderImagesInterleaved(PAImage, USImage);
-        mitk::IOUtil::Save(USImage, pathUS);
-        mitk::IOUtil::Save(PAImage, pathPA);
-      }
+      OrderImagesInterleaved(PAImage, USImage);
+      mitk::IOUtil::Save(USImage, pathUS);
+      mitk::IOUtil::Save(PAImage, pathPA);
 
       // read the pixelvalues of the enveloped images at this position
       itk::Index<3> pixel = { { m_RecordedImages.at(1)->GetDimension(0) / 2, 84, 0 } }; //22/532*2048
@@ -536,9 +469,9 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       mitk::IOUtil::Save(USImage, pathUS);
     }
 
-    m_PixelValues.clear();    // clean up the pixel values
-    m_RecordedImages.clear(); // clean up the images
-    m_ImageTimestampRecord.clear();     // clean up the timestamps
+    m_PixelValues.clear();            // clean up the pixel values
+    m_RecordedImages.clear();         // clean up the images
+    m_ImageTimestampRecord.clear();   // clean up the timestamps
   }
 }
 
@@ -547,8 +480,8 @@ void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel)
   unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
   for (int index = 0; index < m_RecordedImages.size(); index += events)  // omit sound images
   {
-    m_RecordedImages.at(index) = ApplyBmodeFilter2d(m_RecordedImages.at(index));
-    m_PixelValues.push_back(m_RecordedImages.at(index).GetPointer()->GetPixelValueByIndex(pixel));
+    Image::Pointer image = ApplyBmodeFilter(m_RecordedImages.at(index));
+    m_PixelValues.push_back(image.GetPointer()->GetPixelValueByIndex(pixel));
   }
 }
 

@@ -109,7 +109,6 @@ protected:
   std::vector<mitk::Image::Pointer>     m_RecordedImages;
   std::vector<long long>                m_ImageTimestampRecord;
   std::vector<long long>                m_ImageTimestampBuffer;
-  std::vector<float>                    m_PixelValues;
   long long                             m_CurrentImageTimestamp;
   bool                                  m_CurrentlyRecording;
   mitk::OphirPyro::Pointer              m_Pyro;
@@ -123,14 +122,14 @@ protected:
   unsigned int                          m_ImageDimensions[3];
   mitk::Vector3D                        m_ImageSpacing;
 
-  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage);
-  mitk::Image::Pointer ApplyBmodeFilter2d(mitk::Image::Pointer inputImage, bool UseLogFilter = false, int resampleSpacing = 0.15);
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, int resampleSpacing = 0.15);
 
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);
 
   void GetPixelValues(itk::Index<3> pixel);
   float GetPixelValue(itk::Index<3> pixel);
+  std::vector<float>                    m_PixelValues;
 
   mitk::USDiPhASDevice*                 m_device;
 
@@ -143,17 +142,17 @@ protected:
    */
   float                           m_StartTime;
   bool                            m_UseGUIOutPut;
+
   BeamformerStateInfoNative       m_BeamformerInfos;
   bool                            m_UseBModeFilter;
 
   bool                            m_DataTypeModified;
   DataType                        m_DataTypeNext;
+
   bool                            m_UseBModeFilterModified;
   bool                            m_UseBModeFilterNext;
 
   DataType                        m_DataType;
-
-  itk::FastMutexLock::Pointer     m_ImageMutex;
 };
 } // namespace mitk
 

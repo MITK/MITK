@@ -156,7 +156,10 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
 
-  this->AdjustRenderWindowMenuVisibility(me->pos());
+  if (m_MenuWidget)
+  {
+    m_MenuWidget->ShowMenu();
+  }
 
   mitk::MouseMoveEvent::Pointer mMoveEvent =
     mitk::MouseMoveEvent::New(m_Renderer, displayPos, GetButtonState(me), GetModifiers(me));
@@ -203,22 +206,20 @@ void QmitkRenderWindow::enterEvent(QEvent *e)
   QVTKWidget::enterEvent(e);
 }
 
-void QmitkRenderWindow::DeferredHideMenu()
-{
-  MITK_DEBUG << "QmitkRenderWindow::DeferredHideMenu";
-
-  if (m_MenuWidget)
-    m_MenuWidget->HideMenu();
-}
-
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
+  // It's possible to "leave" on the m_MenuWidget so we are still inside
+  // the render window but Qt doesn't know it.
+  const auto rect = this->rect();
+  const auto pos = this->mapFromGlobal(QCursor::pos());
+  if (rect.contains(pos)) { return; }
+
   mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, NULL, "LeaveRenderWindow");
 
   this->HandleEvent(internalEvent.GetPointer());
 
   if (m_MenuWidget)
-    m_MenuWidget->smoothHide();
+    m_MenuWidget->HideMenu();
 
   QVTKWidget::leaveEvent(e);
 }
@@ -273,20 +274,6 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdM
   }
 }
 
-void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint & /*pos*/)
-{
-  if (m_MenuWidget)
-  {
-    m_MenuWidget->ShowMenu();
-    m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
-  }
-}
-
-void QmitkRenderWindow::HideRenderWindowMenu()
-{
-  // DEPRECATED METHOD
-}
-
 void QmitkRenderWindow::OnChangeLayoutDesign(int layoutDesignIndex)
 {
   emit SignalLayoutDesignChanged(layoutDesignIndex);
@@ -296,12 +283,6 @@ void QmitkRenderWindow::OnWidgetPlaneModeChanged(int mode)
 {
   if (m_MenuWidget)
     m_MenuWidget->NotifyNewWidgetPlanesMode(mode);
-}
-
-void QmitkRenderWindow::FullScreenMode(bool state)
-{
-  if (m_MenuWidget)
-    m_MenuWidget->ChangeFullScreenMode(state);
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)

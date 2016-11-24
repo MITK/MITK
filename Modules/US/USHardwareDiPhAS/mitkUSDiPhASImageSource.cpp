@@ -441,9 +441,12 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "TimestampsImages" + ".csv";
 
-    // order the images and save them
     if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
+      // first, save the data, so the pyro does not aquire more unneccessary timestamps
+      m_Pyro->SaveData();
+
+      // now order the images and save them
       OrderImagesInterleaved(PAImage, USImage);
       mitk::IOUtil::Save(USImage, pathUS);
       mitk::IOUtil::Save(PAImage, pathPA);

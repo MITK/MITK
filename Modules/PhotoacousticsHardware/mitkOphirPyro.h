@@ -50,6 +50,7 @@ namespace mitk {
     virtual bool StopDataAcquisition();
     unsigned int GetDataFromSensor();
     void GetDataFromSensorThread();
+    void SaveData();
 
     virtual double LookupCurrentPulseEnergy();
     virtual double GetNextPulseEnergy();

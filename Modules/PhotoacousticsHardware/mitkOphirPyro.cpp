@@ -91,11 +91,18 @@ void mitk::OphirPyro::SaveCsvData()
 
   timestampFile << ",timestamp,PulseEnergy,PulseTime";
 
-  for (int index = 0; index < m_TimeStamps.size(); ++index)
+  int currentSize = m_TimeStamps.size();
+
+  for (int index = 0; index < currentSize; ++index)
   {
     timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergy.at(index) << "," << (long)m_PulseTime.at(index);
   }
   timestampFile.close();
+}
+
+void mitk::OphirPyro::SaveData()
+{
+  SaveCsvData();
 }
 
 bool mitk::OphirPyro::StopDataAcquisition()

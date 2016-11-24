@@ -233,7 +233,6 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
   {
     //get the timestamp we might save later on
     m_CurrentImageTimestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    m_ImageTimestampRecord.push_back(m_CurrentImageTimestamp);
 
     // create a new image and initialize it
     mitk::Image::Pointer image = mitk::Image::New();
@@ -301,6 +300,10 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       m_Pyro->SetSyncDelay(m_CurrentImageTimestamp);
     }
 
+    m_ImageTimestampBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = m_CurrentImageTimestamp;
+    m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
+    m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
+
     // if the user decides to start recording, we feed the vector the generated images
     if (m_CurrentlyRecording) {
       for (int index = 0; index < image->GetDimension(2); ++index)
@@ -308,19 +311,17 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         if (image->IsSliceSet(index))
         {
           m_RecordedImages.push_back(Image::New());
-          m_RecordedImages.back()->Initialize(image->GetPixelType(), 3, image->GetDimensions());
+          unsigned int dim[] = { image ->GetDimension(0), image->GetDimension(1), 1};
+          m_RecordedImages.back()->Initialize(image->GetPixelType(), 3, dim);
           m_RecordedImages.back()->SetGeometry(image->GetGeometry());
 
           mitk::ImageReadAccessor inputReadAccessor(image, image->GetSliceData(index));
-          m_RecordedImages.back()->SetSlice(inputReadAccessor.GetData());
+          m_RecordedImages.back()->SetSlice(inputReadAccessor.GetData(),0);
         }
       }
+      m_ImageTimestampRecord.push_back(m_CurrentImageTimestamp);
       // save timestamps for each laser image!
     }
-
-    m_ImageTimestampBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = m_CurrentImageTimestamp;
-    m_ImageBuffer[(m_LastWrittenImage + 1) % m_BufferSize] = image;
-    m_LastWrittenImage = (m_LastWrittenImage + 1) % m_BufferSize;
   }
 }
 

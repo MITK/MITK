@@ -127,7 +127,7 @@ void mitk::ContourModelUtils::FillContourInSlice(ContourModel *projectedContour,
                                                  unsigned int timeStep,
                                                  Image *sliceImage,
                                                  mitk::Image::Pointer workingImage,
-                                                 int eraseMode)
+                                                 int paintingPixelValue)
 {
   // create a surface of the input ContourModel
   mitk::Surface::Pointer surface = mitk::Surface::New();
@@ -176,118 +176,72 @@ void mitk::ContourModelUtils::FillContourInSlice(ContourModel *projectedContour,
   imgstenc->ReverseStencilOff();
   imgstenc->SetBackgroundValue(outval);
   imgstenc->Update();
-  // mitk::LabelSetImage* labelImage; // Todo: Get the working Image
-  // int activePixelValue = eraseMode;
-  // labelImage = dynamic_cast<LabelSetImage*>(workingImage.GetPointer());
-  // if (labelImage)
-  //{
-  //  activePixelValue = labelImage->GetActiveLabel()->GetValue();
-  //}
 
   // Fill according to the Color Team
   vtkSmartPointer<vtkImageData> filledImage = imgstenc->GetOutput();
   vtkSmartPointer<vtkImageData> resultImage = sliceImage->GetVtkImageData();
-  FillSliceInSlice(filledImage, resultImage, workingImage, eraseMode);
-  /*
-  count = filledImage->GetNumberOfPoints();
-  if (activePixelValue == 0)
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
-      {
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-      }
-    }
-  }
-  else if (eraseMode != 0) // We are not erasing...
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
-      {
-        int targetValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
-        if (labelImage)
-        {
-          if (!labelImage->GetLabel(targetValue)->GetLocked())
-          {
-            resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-          }
-        } else
-        {
-          resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-        }
-      }
-    }
-  }
-  else
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if ((resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue) &
-  (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1))
-      {
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-      }
-    }
-  }*/
+  FillSliceInSlice(filledImage, resultImage, workingImage, paintingPixelValue);
+
   sliceImage->SetVolume(resultImage->GetScalarPointer());
 }
 
 void mitk::ContourModelUtils::FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                                vtkSmartPointer<vtkImageData> resultImage,
                                                mitk::Image::Pointer image,
-                                               int eraseMode)
+                                               int paintingPixelValue)
 {
   mitk::LabelSetImage *labelImage; // Todo: Get the working Image
-  int activePixelValue = eraseMode;
   labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
-  if (labelImage)
+  int count = filledImage->GetNumberOfPoints();
+
+  // if image is not a LabelSetImage just paint or erase
+  if (!labelImage)
   {
-    activePixelValue = labelImage->GetActiveLabel()->GetValue();
+    for (vtkIdType i = 0; i < count; ++i)
+    {
+      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+      {
+        resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
+      }
+    }
   }
 
-  int count = filledImage->GetNumberOfPoints();
-  if (activePixelValue == 0)
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
-      {
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-      }
-    }
-  }
-  else if (eraseMode != 0) // We are not erasing...
-  {
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
-      {
-        int targetValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
-        if (labelImage)
-        {
-          if (!labelImage->GetLabel(targetValue)->GetLocked())
-          {
-            resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-          }
-        }
-        else
-        {
-          resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
-        }
-      }
-    }
-  }
+  // now for LabelSetImages
   else
   {
-    for (vtkIdType i = 0; i < count; ++i)
+    auto backgroundValue = labelImage->GetExteriorLabel()->GetValue();
+
+    // paint, but do not overwrite locked pixels
+    if (paintingPixelValue != backgroundValue)
     {
-      if ((resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue) &
-          (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1))
+      for (vtkIdType i = 0; i < count; ++i)
       {
-        resultImage->GetPointData()->GetScalars()->SetTuple1(i, eraseMode);
+        if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+        {
+          auto existingValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
+          if (!labelImage->GetLabel(existingValue, labelImage->GetActiveLayer())->GetLocked())
+          {
+            resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
+          }
+        }
       }
     }
+
+    // erase, but only active label (regardless of locked state)
+    else
+    {
+      auto activePixelValue = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
+
+      for (vtkIdType i = 0; i < count; ++i)
+      {
+        if (filledImage->GetPointData()->GetScalars()->GetTuple1(i) > 1)
+        {
+          if (resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue)
+          {
+            resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
+          }
+        }
+      }
+     }
   }
 }

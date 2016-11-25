@@ -548,9 +548,35 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
     // If there is a projected contour, fill it
     if (projectedContour.IsNotNull())
     {
+      // Get working data to pass to following method so we don't overwrite locked labels in a LabelSetImage
+      mitk::DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+      mitk::LabelSetImage *labelImage;
+      if (workingNode)
+      {
+        labelImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+      }
+
       MITK_DEBUG << "Filling Segmentation";
-      FeedbackContourTool::FillContourInSlice(
-        projectedContour, positionEvent->GetSender()->GetTimeStep(), m_WorkingSlice, m_PaintingPixelValue);
+
+      if (labelImage)
+      {
+        // m_PaintingPixelValue only decides whether to paint or not
+        // For LabelSetImages we want to paint with the active label value
+        auto activeLabel = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
+        mitk::ContourModelUtils::FillContourInSlice(projectedContour,
+                                                    positionEvent->GetSender()->GetTimeStep(),
+                                                    m_WorkingSlice,
+                                                    labelImage,
+                                                    m_PaintingPixelValue * activeLabel);
+      }
+      else
+      {
+        mitk::ContourModelUtils::FillContourInSlice(projectedContour,
+                                                    positionEvent->GetSender()->GetTimeStep(),
+                                                    m_WorkingSlice,
+                                                    m_WorkingSlice,
+                                                    m_PaintingPixelValue);
+      }
       this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
       FeedbackContourTool::SetFeedbackContourVisible(false);
     }

@@ -104,37 +104,29 @@ QWidget* QmitkXnatConnectionPreferencePage::GetQtControl() const
 
 bool QmitkXnatConnectionPreferencePage::PerformOk()
 {
-  if (!UserInformationEmpty())
+  IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
+  if (_XnatConnectionPreferencesNode.IsNotNull())
   {
-    IPreferences::Pointer _XnatConnectionPreferencesNode = m_XnatConnectionPreferencesNode.Lock();
-    if (_XnatConnectionPreferencesNode.IsNotNull())
-    {
-      _XnatConnectionPreferencesNode->Put(m_Controls.xnatHostAddressLabel->text(), m_Controls.inXnatHostAddress->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.xnatPortLabel->text(), m_Controls.inXnatPort->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.xnatUsernameLabel->text(), m_Controls.inXnatUsername->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.xnatPasswortLabel->text(), m_Controls.inXnatPassword->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.xnatDownloadPathLabel->text(), m_Controls.inXnatDownloadPath->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.xnatHostAddressLabel->text(), m_Controls.inXnatHostAddress->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.xnatPortLabel->text(), m_Controls.inXnatPort->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.xnatUsernameLabel->text(), m_Controls.inXnatUsername->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.xnatPasswortLabel->text(), m_Controls.inXnatPassword->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.xnatDownloadPathLabel->text(), m_Controls.inXnatDownloadPath->text());
 
-      // Network proxy settings
-      _XnatConnectionPreferencesNode->PutBool(m_Controls.cbUseNetworkProxy->text(), m_Controls.cbUseNetworkProxy->isChecked());
-      _XnatConnectionPreferencesNode->Put(m_Controls.proxyAddressLabel->text(), m_Controls.inProxyAddress->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.proxyPortLabel->text(), m_Controls.inProxyPort->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.proxyUsernameLabel->text(), m_Controls.inProxyUsername->text());
-      _XnatConnectionPreferencesNode->Put(m_Controls.proxyPasswordLabel->text(), m_Controls.inProxyPassword->text());
+    // Network proxy settings
+    _XnatConnectionPreferencesNode->PutBool(m_Controls.cbUseNetworkProxy->text(), m_Controls.cbUseNetworkProxy->isChecked());
+    _XnatConnectionPreferencesNode->Put(m_Controls.proxyAddressLabel->text(), m_Controls.inProxyAddress->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.proxyPortLabel->text(), m_Controls.inProxyPort->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.proxyUsernameLabel->text(), m_Controls.inProxyUsername->text());
+    _XnatConnectionPreferencesNode->Put(m_Controls.proxyPasswordLabel->text(), m_Controls.inProxyPassword->text());
 
-      // Silent Mode
-      _XnatConnectionPreferencesNode->PutBool(m_Controls.cbUseSilentMode->text(), m_Controls.cbUseSilentMode->isChecked());
+    // Silent Mode
+    _XnatConnectionPreferencesNode->PutBool(m_Controls.cbUseSilentMode->text(), m_Controls.cbUseSilentMode->isChecked());
 
-      //Write
-      _XnatConnectionPreferencesNode->Flush();
+    //Write
+    _XnatConnectionPreferencesNode->Flush();
 
-      return true;
-    }
-  }
-  else
-  {
-    QMessageBox::critical(QApplication::activeWindow(), "Saving Preferences failed",
-                          "The connection parameters in XNAT Preferences were empty.\nPlease use the 'Connect' button to validate the connection parameters.");
+    return true;
   }
   return false;
 }
@@ -206,7 +198,7 @@ void QmitkXnatConnectionPreferencePage::Update()
 
     // Silent Mode
     m_Controls.cbUseSilentMode->setChecked(_XnatConnectionPreferencesNode->GetBool(
-                                               m_Controls.cbUseSilentMode->text(), false));
+                                             m_Controls.cbUseSilentMode->text(), false));
   }
 }
 
@@ -263,6 +255,10 @@ void QmitkXnatConnectionPreferencePage::OnDownloadPathButtonClicked()
 
 void QmitkXnatConnectionPreferencePage::TestConnection()
 {
+  if(UserInformationEmpty())
+  {
+    return;
+  }
   ctkXnatSession* session = 0;
 
   try

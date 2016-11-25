@@ -397,12 +397,14 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
     DataNode *workingNode(m_ToolManager->GetWorkingData(0));
     Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
     LabelSetImage *labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
+
     int activeColor = 1;
-    if (labelImage != 0)
+    if (labelImage)
     {
-      activeColor = labelImage->GetActiveLabel()->GetValue();
+      activeColor = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
     }
 
+    // m_PaintingPixelValue only decides whether to paint or erase
     mitk::ContourModelUtils::FillContourInSlice(
       contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
 
@@ -456,7 +458,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
       contour->AddVertex(vertex);
 
-      FeedbackContourTool::FillContourInSlice(contour, timestep, m_WorkingSlice, m_PaintingPixelValue);
+      mitk::ContourModelUtils::FillContourInSlice(contour, timestep, m_WorkingSlice, image, m_PaintingPixelValue * activeColor);
       m_WorkingNode->SetData(m_WorkingSlice);
       m_WorkingNode->Modified();
     }

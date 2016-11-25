@@ -80,7 +80,7 @@ namespace mitk
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                  vtkSmartPointer<vtkImageData> resultImage,
                                  mitk::Image::Pointer image,
-                                 int eraseMode);
+                                 int paintingPixelValue);
 
   protected:
     ContourModelUtils();

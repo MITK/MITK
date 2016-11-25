@@ -766,6 +766,7 @@ void QmitkStdMultiWidget::changeLayoutToBig3D()
 
   // update Alle Widgets
   this->UpdateAllWidgets();
+  mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget4->GetVtkRenderWindow());
 }
 
 void QmitkStdMultiWidget::changeLayoutToWidget1()
@@ -810,6 +811,8 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 
   // update Alle Widgets
   this->UpdateAllWidgets();
+
+  mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget1->GetVtkRenderWindow());
 }
 
 void QmitkStdMultiWidget::changeLayoutToWidget2()
@@ -854,6 +857,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
 
   // update Alle Widgets
   this->UpdateAllWidgets();
+  mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget2->GetVtkRenderWindow());
 }
 
 void QmitkStdMultiWidget::changeLayoutToWidget3()
@@ -898,6 +902,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 
   // update Alle Widgets
   this->UpdateAllWidgets();
+  mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget3->GetVtkRenderWindow());
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()

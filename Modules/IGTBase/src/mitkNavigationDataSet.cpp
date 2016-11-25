@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkNavigationDataSet.h"
+#include "mitkPointSet.h"
+#include "mitkBaseRenderer.h"
 
 mitk::NavigationDataSet::NavigationDataSet( unsigned int numberOfTools )
   : m_NavigationDataVectors(std::vector<std::vector<mitk::NavigationData::Pointer> >()), m_NumberOfTools(numberOfTools)
@@ -150,6 +152,27 @@ void mitk::NavigationDataSet::SetRequestedRegion(const DataObject * )
 bool mitk::NavigationDataSet::IsEmpty() const
 {
   return (Size() == 0);
+}
+
+void mitk::NavigationDataSet::ConvertNavigationDataToPointSet() const
+{
+  //iterate over all tools
+  for (int toolIndex = 0; toolIndex < this->GetNumberOfTools(); ++ toolIndex)
+  {
+    mitk::PointSet::Pointer _tempPointSet = mitk::PointSet::New();
+    //iterate over all time steps
+    for (int time = 0; time < m_NavigationDataVectors.size(); time++)
+    {
+      _tempPointSet->InsertPoint(time,m_NavigationDataVectors[time][toolIndex]->GetPosition());
+      MITK_DEBUG << m_NavigationDataVectors[time][toolIndex]->GetPosition() << " --- " << _tempPointSet->GetPoint(time);
+    }
+    mitk::DataNode::Pointer dn = mitk::DataNode::New();
+    std::stringstream str;
+    str << "NavigationData Tool " << toolIndex;
+    dn->SetProperty("name", mitk::StringProperty::New(str.str()));
+    dn->SetData(_tempPointSet);
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetDataStorage()->Add(dn);
+  }
 }
 
 // <--- methods necessary for BaseData

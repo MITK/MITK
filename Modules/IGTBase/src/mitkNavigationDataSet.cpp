@@ -157,11 +157,11 @@ bool mitk::NavigationDataSet::IsEmpty() const
 void mitk::NavigationDataSet::ConvertNavigationDataToPointSet() const
 {
   //iterate over all tools
-  for (int toolIndex = 0; toolIndex < this->GetNumberOfTools(); ++ toolIndex)
+  for (unsigned int toolIndex = 0; toolIndex < this->GetNumberOfTools(); ++ toolIndex)
   {
     mitk::PointSet::Pointer _tempPointSet = mitk::PointSet::New();
     //iterate over all time steps
-    for (int time = 0; time < m_NavigationDataVectors.size(); time++)
+    for (unsigned int time = 0; time < m_NavigationDataVectors.size(); time++)
     {
       _tempPointSet->InsertPoint(time,m_NavigationDataVectors[time][toolIndex]->GetPosition());
       MITK_DEBUG << m_NavigationDataVectors[time][toolIndex]->GetPosition() << " --- " << _tempPointSet->GetPoint(time);

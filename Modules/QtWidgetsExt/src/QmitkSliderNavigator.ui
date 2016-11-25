@@ -48,71 +48,12 @@
     <number>0</number>
    </property>
    <item row="0" column="3">
-    <widget class="QSpinBox" name="m_SpinBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximum">
-      <number>0</number>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QSlider" name="m_Slider">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximum">
-      <number>0</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="m_SliderLabelRight">
+    <widget class="ctkDoubleSpinBox" name="m_SpinBox" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>45</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>45</width>
-       <height>32767</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>&lt;p align=&quot;center&quot;&gt;XXX&lt;/p&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -147,45 +88,64 @@
      </property>
     </widget>
    </item>
+   <item row="0" column="1">
+    <widget class="ctkDoubleSlider" name="m_Slider" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="m_SliderLabelRight">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>45</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>45</width>
+       <height>32767</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>&lt;p align=&quot;center&quot;&gt;XXX&lt;/p&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="0" margin="0"/>
+ <customwidgets>
+  <customwidget>
+   <class>ctkDoubleSlider</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkDoubleSlider.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkDoubleSpinBox</class>
+   <extends>QWidget</extends>
+   <header location="global">ctkDoubleSpinBox.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <includes>
   <include location="global">mitkStepper.h</include>
  </includes>
  <resources/>
- <connections>
-  <connection>
-   <sender>m_Slider</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>QmitkSliderNavigator</receiver>
-   <slot>slider_valueChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>m_SpinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>QmitkSliderNavigator</receiver>
-   <slot>spinBox_valueChanged(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

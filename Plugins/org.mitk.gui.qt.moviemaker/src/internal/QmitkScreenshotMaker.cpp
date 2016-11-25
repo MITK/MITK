@@ -115,7 +115,14 @@ void QmitkScreenshotMaker::GenerateScreenshot()
     mitk::BaseRenderer* baserenderer = mitk::BaseRenderer::GetInstance(renderWindow);
 
     if (baserenderer == nullptr)
-        return;
+    {
+       mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(m_MultiWidget->mitkWidget1->GetRenderWindow());
+       vtkRenderWindow* renderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
+       baserenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+
+       if( baserenderer == nullptr )
+          return;
+    }
     this->TakeScreenshot(baserenderer->GetVtkRenderer(), 1, fileName, filter);
 }
 

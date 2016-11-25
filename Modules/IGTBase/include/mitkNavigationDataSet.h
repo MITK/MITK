@@ -145,6 +145,9 @@ namespace mitk {
     */
     virtual bool IsEmpty() const override;
 
+    //Converts Navigation Data for each tool to a Point Set and adds it to the data storage
+    void ConvertNavigationDataToPointSet() const;
+
   protected:
     /**
     * \brief Constructs set with fixed number of tools.

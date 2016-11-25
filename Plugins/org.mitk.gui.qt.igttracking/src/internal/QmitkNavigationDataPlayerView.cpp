@@ -104,6 +104,9 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
     return;
   }
 
+  if (m_Controls->m_ChkConvertToPointSet->isChecked())
+    m_Data->ConvertNavigationDataToPointSet();
+
   // Update Labels
   m_Controls->m_LblFilePath->setText(fileName);
   m_Controls->m_LblFrames->setText(QString::number(m_Data->Size()));

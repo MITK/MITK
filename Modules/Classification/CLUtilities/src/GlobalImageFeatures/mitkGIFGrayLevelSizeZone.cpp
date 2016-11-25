@@ -183,7 +183,7 @@ void
 }
 
 mitk::GIFGrayLevelSizeZone::GIFGrayLevelSizeZone():
-m_Range(1.0), m_UseCtRange(false), m_Direction(0)
+m_Range(1.0), m_UseCtRange(false)
 {
   SetShortName("glsz");
   SetLongName("greylevelsizezone");
@@ -196,7 +196,7 @@ mitk::GIFGrayLevelSizeZone::FeatureListType mitk::GIFGrayLevelSizeZone::Calculat
   ParameterStruct params;
   params.m_UseCtRange=m_UseCtRange;
   params.m_Range = m_Range;
-  params.m_Direction = m_Direction;
+  params.m_Direction = GetDirection();
 
   AccessByItk_3(image, CalculateGrayLevelSizeZoneFeatures, mask, featureList,params);
 

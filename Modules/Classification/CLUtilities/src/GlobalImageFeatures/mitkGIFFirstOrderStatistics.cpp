@@ -55,7 +55,15 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   {
     labelStatisticsImageFilter->SetHistogramParameters(1024.5+3096.5, -1024.5,3096.5);
   } else {
-    labelStatisticsImageFilter->SetHistogramParameters(params.m_HistogramSize, minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+    double min = minMaxComputer->GetMinimum() -0.5;
+    double max = minMaxComputer->GetMaximum() +0.5;
+
+    if (params.UseMinimumIntensity)
+      min = params.MinimumIntensity;
+    if (params.UseMaximumIntensity)
+      max = params.MaximumIntensity;
+
+    labelStatisticsImageFilter->SetHistogramParameters(params.Bins, min,max);
   }
   labelStatisticsImageFilter->Update();
 
@@ -182,7 +190,7 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
 }
 
 mitk::GIFFirstOrderStatistics::GIFFirstOrderStatistics() :
-  m_HistogramSize(256), m_UseCtRange(false)
+m_HistogramSize(256), m_UseCtRange(false)
 {
   SetShortName("fo");
   SetLongName("first-order");
@@ -195,6 +203,12 @@ mitk::GIFFirstOrderStatistics::FeatureListType mitk::GIFFirstOrderStatistics::Ca
   ParameterStruct params;
   params.m_HistogramSize = this->m_HistogramSize;
   params.m_UseCtRange = this->m_UseCtRange;
+
+  params.MinimumIntensity = GetMinimumIntensity();
+  params.MaximumIntensity = GetMaximumIntensity();
+  params.UseMinimumIntensity = GetUseMinimumIntensity();
+  params.UseMaximumIntensity = GetUseMaximumIntensity();
+  params.Bins = GetBins();
 
   AccessByItk_3(image, CalculateFirstOrderStatistics, mask, featureList, params);
 
@@ -230,7 +244,7 @@ mitk::GIFFirstOrderStatistics::CalculateFeaturesUsingParameters(const Image::Poi
   if (parsedArgs.count(GetLongName()))
   {
     MITK_INFO << "Start calculating first order features ....";
-    auto localResults = this->CalculateFeatures(feature, mask);
+    auto localResults = this->CalculateFeatures(feature, maskNoNAN);
     featureList.insert(featureList.end(), localResults.begin(), localResults.end());
     MITK_INFO << "Finished calculating first order features....";
   }

@@ -101,7 +101,7 @@ void
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  int rangeOfPixels = params.m_Range;
+  int rangeOfPixels = params.Bins;
   if (rangeOfPixels < 2)
     rangeOfPixels = 256;
 
@@ -111,8 +111,16 @@ void
     filter->SetNumberOfBinsPerAxis(3096.5+1024.5);
   } else
   {
+    double minRange = minMaxComputer->GetMinimum() - 0.5;
+    double maxRange = minMaxComputer->GetMaximum() + 0.5;
+
+    if (params.UseMinimumIntensity)
+      minRange = params.MinimumIntensity;
+    if (params.UseMaximumIntensity)
+      maxRange = params.MaximumIntensity;
+
     MITK_INFO << "Min: " << minMaxComputer->GetMinimum() << " Max: " << minMaxComputer->GetMaximum() << " Range: " << rangeOfPixels;
-    filter->SetPixelValueMinMax(minMaxComputer->GetMinimum(),minMaxComputer->GetMaximum());
+    filter->SetPixelValueMinMax(minRange, maxRange);
     filter->SetNumberOfBinsPerAxis(rangeOfPixels);
   }
 
@@ -205,7 +213,7 @@ void
 }
 
 mitk::GIFGrayLevelRunLength::GIFGrayLevelRunLength():
-m_Range(1.0), m_UseCtRange(false), m_Direction(0)
+m_Range(1.0), m_UseCtRange(false)
 {
   SetShortName("rl");
   SetLongName("run-length");
@@ -218,7 +226,13 @@ mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::Calcul
   ParameterStruct params;
   params.m_UseCtRange=m_UseCtRange;
   params.m_Range = m_Range;
-  params.m_Direction = m_Direction;
+  params.m_Direction = GetDirection();
+
+  params.MinimumIntensity = GetMinimumIntensity();
+  params.MaximumIntensity = GetMaximumIntensity();
+  params.UseMinimumIntensity = GetUseMinimumIntensity();
+  params.UseMaximumIntensity = GetUseMaximumIntensity();
+  params.Bins = GetBins();
 
   AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,params);
 
@@ -255,8 +269,7 @@ void mitk::GIFGrayLevelRunLength::AddArguments(mitkCommandLineParser &parser)
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
-  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+  parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "RL Bins", "Define the number of bins that is used (Semicolon-separated)", us::Any());
 }
 
 void
@@ -267,29 +280,23 @@ mitk::GIFGrayLevelRunLength::CalculateFeaturesUsingParameters(const Image::Point
 
   if (parsedArgs.count(GetLongName()))
   {
-    int direction = 0;
-    if (parsedArgs.count(name + "::direction"))
+    std::vector<double> bins;
+    if (parsedArgs.count(name + "::bins"))
     {
-      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
-    }
-    std::vector<double> ranges;
-    if (parsedArgs.count(name + "::range"))
-    {
-      ranges = SplitDouble(parsedArgs[name + "::range"].ToString(), ';');
+      bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';');
     }
     else
     {
-      ranges.push_back(1);
+      bins.push_back(1);
     }
 
-    for (std::size_t i = 0; i < ranges.size(); ++i)
+    for (std::size_t i = 0; i < bins.size(); ++i)
     {
-      MITK_INFO << "Start calculating Run-length with range " << ranges[i] << "....";
-      this->SetRange(ranges[i]);
-      this->SetDirection(direction);
+      MITK_INFO << "Start calculating Run-length with range " << bins[i] << "....";
+      this->SetBins(bins[i]);
       auto localResults = this->CalculateFeatures(feature, maskNoNAN);
       featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating Run-length with range " << ranges[i] << "....";
+      MITK_INFO << "Finished calculating Run-length with range " << bins[i] << "....";
     }
   }
 

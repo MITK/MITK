@@ -289,8 +289,13 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   double rangeMin = -0.5 + minMaxComputer->GetMinimum();
   double rangeMax = 0.5 + minMaxComputer->GetMaximum();
 
+  if (config.UseMinimumIntensity)
+    rangeMin = config.MinimumIntensity;
+  if (config.UseMaximumIntensity)
+    rangeMax = config.MaximumIntensity;
+
   // Define Range
-  int numberOfBins = 6;
+  int numberOfBins = config.Bins;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -319,12 +324,28 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
       offsetVector.push_back(offset);
     }
   }
+  if (config.direction == 1)
+  {
+    offsetVector.clear();
+    offset[0] = 0;
+    offset[1] = 0;
+    offset[2] = 1;
+  }
 
   std::vector<mitk::CoocurenceMatrixFeatures> resultVector;
   mitk::CoocurenceMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins);
   mitk::CoocurenceMatrixFeatures overallFeature;
   for (int i = 0; i < offsetVector.size(); ++i)
   {
+    if (config.direction)
+    {
+      if ((config.direction > 1) && offsetVector[i][config.direction - 2] != 0)
+      {
+        continue;
+      }
+    }
+
+
     offset = offsetVector[i];
     MITK_INFO << offset;
     mitk::CoocurenceMatrixHolder holder(rangeMin, rangeMax, numberOfBins);
@@ -511,7 +532,7 @@ void NormalizeMatrixFeature(mitk::CoocurenceMatrixFeatures &features,
 }
 
 mitk::GIFCooccurenceMatrix2::GIFCooccurenceMatrix2():
-m_Range(1.0), m_Direction(0)
+m_Range(1.0), m_Bins(128)
 {
   SetShortName("cooc2");
   SetLongName("cooccurence2");
@@ -522,8 +543,14 @@ mitk::GIFCooccurenceMatrix2::FeatureListType mitk::GIFCooccurenceMatrix2::Calcul
   FeatureListType featureList;
 
   GIFCooccurenceMatrix2Configuration config;
-  config.direction = m_Direction;
+  config.direction = GetDirection();
   config.range = m_Range;
+
+  config.MinimumIntensity = GetMinimumIntensity();
+  config.MaximumIntensity = GetMaximumIntensity();
+  config.UseMinimumIntensity = GetUseMinimumIntensity();
+  config.UseMaximumIntensity = GetUseMaximumIntensity();
+  config.Bins = GetBins();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -533,62 +560,6 @@ mitk::GIFCooccurenceMatrix2::FeatureListType mitk::GIFCooccurenceMatrix2::Calcul
 mitk::GIFCooccurenceMatrix2::FeatureNameListType mitk::GIFCooccurenceMatrix2::GetFeatureNames()
 {
   FeatureNameListType featureList;
-  featureList.push_back("co-occ. Energy Means");
-  featureList.push_back("co-occ. Energy Std.");
-  featureList.push_back("co-occ. Entropy Means");
-  featureList.push_back("co-occ. Entropy Std.");
-  featureList.push_back("co-occ. Correlation Means");
-  featureList.push_back("co-occ. Correlation Std.");
-  featureList.push_back("co-occ. InverseDifferenceMoment Means");
-  featureList.push_back("co-occ. InverseDifferenceMoment Std.");
-  featureList.push_back("co-occ. Inertia Means");
-  featureList.push_back("co-occ. Inertia Std.");
-  featureList.push_back("co-occ. ClusterShade Means");
-  featureList.push_back("co-occ. ClusterShade Std.");
-  featureList.push_back("co-occ. ClusterProminence Means");
-  featureList.push_back("co-occ. ClusterProminence Std.");
-  featureList.push_back("co-occ. HaralickCorrelation Means");
-  featureList.push_back("co-occ. HaralickCorrelation Std.");
-  featureList.push_back("co-occ. Autocorrelation Means");
-  featureList.push_back("co-occ. Autocorrelation Std.");
-  featureList.push_back("co-occ. Contrast Means");
-  featureList.push_back("co-occ. Contrast Std.");
-  featureList.push_back("co-occ. Dissimilarity Means");
-  featureList.push_back("co-occ. Dissimilarity Std.");
-  featureList.push_back("co-occ. MaximumProbability Means");
-  featureList.push_back("co-occ. MaximumProbability Std.");
-  featureList.push_back("co-occ. InverseVariance Means");
-  featureList.push_back("co-occ. InverseVariance Std.");
-  featureList.push_back("co-occ. Homogeneity1 Means");
-  featureList.push_back("co-occ. Homogeneity1 Std.");
-  featureList.push_back("co-occ. ClusterTendency Means");
-  featureList.push_back("co-occ. ClusterTendency Std.");
-  featureList.push_back("co-occ. Variance Means");
-  featureList.push_back("co-occ. Variance Std.");
-  featureList.push_back("co-occ. SumAverage Means");
-  featureList.push_back("co-occ. SumAverage Std.");
-  featureList.push_back("co-occ. SumEntropy Means");
-  featureList.push_back("co-occ. SumEntropy Std.");
-  featureList.push_back("co-occ. SumVariance Means");
-  featureList.push_back("co-occ. SumVariance Std.");
-  featureList.push_back("co-occ. DifferenceAverage Means");
-  featureList.push_back("co-occ. DifferenceAverage Std.");
-  featureList.push_back("co-occ. DifferenceEntropy Means");
-  featureList.push_back("co-occ. DifferenceEntropy Std.");
-  featureList.push_back("co-occ. DifferenceVariance Means");
-  featureList.push_back("co-occ. DifferenceVariance Std.");
-  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Means");
-  featureList.push_back("co-occ. InverseDifferenceMomentNormalized Std.");
-  featureList.push_back("co-occ. InverseDifferenceNormalized Means");
-  featureList.push_back("co-occ. InverseDifferenceNormalized Std.");
-  featureList.push_back("co-occ. InverseDifference Means");
-  featureList.push_back("co-occ. InverseDifference Std.");
-  featureList.push_back("co-occ. JointAverage Means");
-  featureList.push_back("co-occ. JointAverage Std.");
-  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Means");
-  featureList.push_back("co-occ. FirstMeasurementOfInformationCorrelation Std.");
-  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Means");
-  featureList.push_back("co-occ. SecondMeasurementOfInformationCorrelation Std.");
   return featureList;
 }
 
@@ -601,7 +572,7 @@ void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser)
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
   parser.addArgument(name+"::range", name+"::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name+"::direction", name+"::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+  parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "Cooc 2 Number of Bins", "Define the number of bins that is used ", us::Any());
 }
 
 void
@@ -612,11 +583,6 @@ mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Point
 
   if (parsedArgs.count(GetLongName()))
   {
-    int direction = 0;
-    if (parsedArgs.count(name + "::direction"))
-    {
-      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
-    }
     std::vector<double> ranges;
     if (parsedArgs.count(name + "::range"))
     {
@@ -626,12 +592,16 @@ mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Point
     {
       ranges.push_back(1);
     }
+    if (parsedArgs.count(name + "::bins"))
+    {
+      auto bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';')[0];
+      this->SetBins(bins);
+    }
 
     for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
       this->SetRange(ranges[i]);
-      this->SetDirection(direction);
       auto localResults = this->CalculateFeatures(feature, maskNoNAN);
       featureList.insert(featureList.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";

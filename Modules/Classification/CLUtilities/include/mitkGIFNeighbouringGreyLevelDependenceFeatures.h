@@ -114,8 +114,6 @@ namespace mitk
 
       itkGetConstMacro(Range,double);
       itkSetMacro(Range, double);
-    itkGetConstMacro(Direction, unsigned int);
-    itkSetMacro(Direction, unsigned int);
     itkGetConstMacro(Alpha, int);
     itkSetMacro(Alpha, int);
     itkGetConstMacro(Bins, int);
@@ -130,12 +128,16 @@ namespace mitk
       double range;
       unsigned int direction;
       int alpha;
-      int bins;
+
+      double MinimumIntensity;
+      bool UseMinimumIntensity;
+      double MaximumIntensity;
+      bool UseMaximumIntensity;
+      int Bins;
     };
 
     private:
     double m_Range;
-    unsigned int m_Direction;
     int m_Alpha;
     int m_Bins;
   };

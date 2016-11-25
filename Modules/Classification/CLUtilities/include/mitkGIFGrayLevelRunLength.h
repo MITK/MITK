@@ -32,9 +32,6 @@ namespace mitk
     itkGetConstMacro(UseCtRange, bool);
     itkSetMacro(UseCtRange, bool);
 
-    itkGetConstMacro(Direction, unsigned int);
-    itkSetMacro(Direction, unsigned int);
-
     virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
     virtual void AddArguments(mitkCommandLineParser &parser);
 
@@ -44,12 +41,17 @@ namespace mitk
       bool  m_UseCtRange;
       double m_Range;
       unsigned int m_Direction;
+
+      double MinimumIntensity;
+      bool UseMinimumIntensity;
+      double MaximumIntensity;
+      bool UseMaximumIntensity;
+      int Bins;
     };
 
   private:
     double m_Range;
     bool m_UseCtRange;
-    unsigned int m_Direction;
   };
 }
 #endif //mitkGIFGrayLevelRunLength_h

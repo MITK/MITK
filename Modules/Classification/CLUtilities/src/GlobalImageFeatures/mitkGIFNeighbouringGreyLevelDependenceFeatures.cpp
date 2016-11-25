@@ -64,6 +64,7 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
                     itk::Image<unsigned char, VImageDimension>* mask,
                     int alpha,
                     int range,
+                    int direction,
                     mitk::NGLDMMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -76,8 +77,16 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
   holder.m_NumberOfNeighbourVoxels = 0;
   holder.m_NumberOfDependenceNeighbourVoxels = 0;
 
+  MITK_INFO << direction;
+
   itk::Size<VImageDimension> radius;
   radius.Fill(range);
+
+  if ((direction > 1) && (direction +2 <VImageDimension))
+  {
+    radius[direction - 2] = 0;
+  }
+
   ShapeIterType imageIter(radius, itkImage, itkImage->GetLargestPossibleRegion());
   ShapeMaskIterType maskIter(radius, mask, mask->GetLargestPossibleRegion());
 
@@ -138,7 +147,7 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
 
 }
 
-void CalculateFeatures(
+void LocalCalculateFeatures(
   mitk::NGLDMMatrixHolder &holder,
   mitk::NGLDMMatrixFeatures & results
   )
@@ -261,8 +270,13 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   double rangeMin = -0.5 + minMaxComputer->GetMinimum();
   double rangeMax = 0.5 + minMaxComputer->GetMaximum();
 
+  if (config.UseMinimumIntensity)
+    rangeMin = config.MinimumIntensity;
+  if (config.UseMaximumIntensity)
+    rangeMax = config.MaximumIntensity;
+
   // Define Range
-  int numberOfBins = 6;
+  int numberOfBins = config.Bins;
 
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
@@ -270,9 +284,8 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   std::vector<mitk::NGLDMMatrixFeatures> resultVector;
   mitk::NGLDMMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins,37);
   mitk::NGLDMMatrixFeatures overallFeature;
-  CalculateNGLDMMatrix<TPixel, VImageDimension>(itkImage, maskImage, config.alpha, config.range, holderOverall);
-  CalculateFeatures(holderOverall, overallFeature);
-  //NormalizeMatrixFeature(overallFeature, offsetVector.size());
+  CalculateNGLDMMatrix<TPixel, VImageDimension>(itkImage, maskImage, config.alpha, config.range, config.direction, holderOverall);
+  LocalCalculateFeatures(holderOverall, overallFeature);
 
   std::ostringstream  ss;
   ss << config.range;
@@ -294,7 +307,7 @@ void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
   featureList.push_back(std::make_pair(prefix + " Low Dependence Low Grey Level Emphasis", features.LowDependenceLowGreyLevelEmphasis));
   featureList.push_back(std::make_pair(prefix + " Low Dependence High Grey Level Emphasis", features.LowDependenceHighGreyLevelEmphasis));
   featureList.push_back(std::make_pair(prefix + " High Dependence Low Grey Level Emphasis", features.HighDependenceLowGreyLevelEmphasis));
-  featureList.push_back(std::make_pair(prefix + " High Dependence Low Grey Level Emphasis", features.HighDependenceHighGreyLevelEmphasis));
+  featureList.push_back(std::make_pair(prefix + " High Dependence High Grey Level Emphasis", features.HighDependenceHighGreyLevelEmphasis));
 
   featureList.push_back(std::make_pair(prefix + " Grey Level Non-Uniformity", features.GreyLevelNonUniformity));
   featureList.push_back(std::make_pair(prefix + " Grey Level Non-Uniformity Normalised", features.GreyLevelNonUniformityNormalised));
@@ -316,8 +329,8 @@ void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
 
 }
 
-mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeature():
-m_Range(1.0), m_Direction(0)
+mitk::GIFNeighbouringGreyLevelDependenceFeature::GIFNeighbouringGreyLevelDependenceFeature() :
+m_Range(1.0), m_Bins(6)
 {
   SetShortName("ngldm");
   SetLongName("ngldm");
@@ -328,9 +341,15 @@ mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType mitk::GIFNeighb
   FeatureListType featureList;
 
   GIFNeighbouringGreyLevelDependenceFeatureConfiguration config;
-  config.direction = m_Direction;
+  config.direction = GetDirection();
   config.range = m_Range;
   config.alpha = 0;
+
+  config.MinimumIntensity = GetMinimumIntensity();
+  config.MaximumIntensity = GetMaximumIntensity();
+  config.UseMinimumIntensity = GetUseMinimumIntensity();
+  config.UseMaximumIntensity = GetUseMaximumIntensity();
+  config.Bins = GetBins();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -353,8 +372,8 @@ void mitk::GIFNeighbouringGreyLevelDependenceFeature::AddArguments(mitkCommandLi
   std::string name = GetOptionPrefix();
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Calculate Neighbouring grey level dependence based features", "Calculate Neighbouring grey level dependence based features", us::Any());
-  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
+  parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "NGLD Range", "Define the range that is used (Semicolon-separated)", us::Any());
+  parser.addArgument(name + "::bins", name + "::bins", mitkCommandLineParser::String, "NGLD Number of Bins", "Define the number of bins that is used ", us::Any());
 }
 
 void
@@ -365,11 +384,6 @@ mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeaturesUsingParameter
 
   if (parsedArgs.count(GetLongName()))
   {
-    int direction = 0;
-    if (parsedArgs.count(name + "::direction"))
-    {
-      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
-    }
     std::vector<double> ranges;
     if (parsedArgs.count(name + "::range"))
     {
@@ -379,12 +393,16 @@ mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeaturesUsingParameter
     {
       ranges.push_back(1);
     }
+    if (parsedArgs.count(name + "::bins"))
+    {
+      auto bins = SplitDouble(parsedArgs[name + "::bins"].ToString(), ';')[0];
+      this->SetBins(bins);
+    }
 
     for (std::size_t i = 0; i < ranges.size(); ++i)
     {
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
       this->SetRange(ranges[i]);
-      this->SetDirection(direction);
       auto localResults = this->CalculateFeatures(feature, maskNoNAN);
       featureList.insert(featureList.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";

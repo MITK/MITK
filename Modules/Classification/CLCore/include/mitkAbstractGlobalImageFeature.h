@@ -62,12 +62,26 @@ public:
   itkSetMacro(Prefix, std::string);
   itkSetMacro(ShortName, std::string);
   itkSetMacro(LongName, std::string);
-  ParameterTypes GetParameter() { return m_Parameter; };
+  itkSetMacro(Direction, int);
+  void SetParameter(ParameterTypes param) { m_Parameter=param; };
 
   itkGetConstMacro(Prefix, std::string);
   itkGetConstMacro(ShortName, std::string);
   itkGetConstMacro(LongName, std::string);
   itkGetConstMacro(Parameter, ParameterTypes);
+  itkGetConstMacro(Direction, int);
+
+  itkSetMacro(MinimumIntensity, float);
+  itkSetMacro(UseMinimumIntensity, bool);
+  itkSetMacro(MaximumIntensity, float);
+  itkSetMacro(UseMaximumIntensity, bool);
+  itkGetConstMacro(MinimumIntensity, float);
+  itkGetConstMacro(UseMinimumIntensity, bool);
+  itkGetConstMacro(MaximumIntensity, float);
+  itkGetConstMacro(UseMaximumIntensity, bool);
+
+  itkSetMacro(Bins, int);
+  itkGetConstMacro(Bins, int);
 
   std::string GetOptionPrefix() const
   {
@@ -106,6 +120,15 @@ private:
   std::string m_ShortName; // Name of all variables
   std::string m_LongName; // Long version of the name (For turning on)
   ParameterTypes m_Parameter; // Parameter setting
+
+  double m_MinimumIntensity = 0;
+  bool m_UseMinimumIntensity = false;
+  double m_MaximumIntensity = 100;
+  bool m_UseMaximumIntensity = false;
+
+
+  int m_Bins = 256;
+  int m_Direction = 0;
 
 //#endif // Skip Doxygen
 

@@ -56,6 +56,12 @@ namespace mitk
     struct ParameterStruct {
       int m_HistogramSize;
       bool m_UseCtRange;
+
+      double MinimumIntensity;
+      bool UseMinimumIntensity;
+      double MaximumIntensity;
+      bool UseMaximumIntensity;
+      int Bins;
     };
 
   private:

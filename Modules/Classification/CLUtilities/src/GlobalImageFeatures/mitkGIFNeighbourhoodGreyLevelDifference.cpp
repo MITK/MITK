@@ -139,7 +139,7 @@ void
 }
 
 mitk::GIFNeighbourhoodGreyLevelDifference::GIFNeighbourhoodGreyLevelDifference():
-m_Range(1.0), m_UseCtRange(false), m_Direction(0)
+m_Range(1.0), m_UseCtRange(false)
 {
   SetShortName("ngld");
   SetLongName("NeighbourhoodGreyLevelDifference");
@@ -152,7 +152,7 @@ mitk::GIFNeighbourhoodGreyLevelDifference::FeatureListType mitk::GIFNeighbourhoo
   ParameterStruct params;
   params.m_UseCtRange=m_UseCtRange;
   params.m_Range = m_Range;
-  params.m_Direction = m_Direction;
+  params.m_Direction = GetDirection();
 
   AccessByItk_3(image, CalculateGrayLevelNeighbourhoodGreyLevelDifferenceFeatures, mask, featureList,params);
 

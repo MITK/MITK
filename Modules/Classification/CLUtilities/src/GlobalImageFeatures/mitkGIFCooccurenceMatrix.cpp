@@ -98,7 +98,15 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
-  filter->SetPixelValueMinMax(minMaxComputer->GetMinimum()-0.5,minMaxComputer->GetMaximum()+0.5);
+
+  double min = minMaxComputer->GetMinimum() - 0.5;
+  double max = minMaxComputer->GetMaximum() + 0.5;
+  if (config.UseMinimumIntensity)
+    min = config.MinimumIntensity;
+  if (config.UseMaximumIntensity)
+    max = config.MaximumIntensity;
+
+  filter->SetPixelValueMinMax(min,max);
   //filter->SetPixelValueMinMax(-1024,3096);
   //filter->SetNumberOfBinsPerAxis(5);
   filter->Update();
@@ -232,7 +240,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 }
 
 mitk::GIFCooccurenceMatrix::GIFCooccurenceMatrix():
-m_Range(1.0), m_Direction(0)
+m_Range(1.0)
 {
   SetShortName("cooc");
   SetLongName("cooccurence");
@@ -243,8 +251,14 @@ mitk::GIFCooccurenceMatrix::FeatureListType mitk::GIFCooccurenceMatrix::Calculat
   FeatureListType featureList;
 
   GIFCooccurenceMatrixConfiguration config;
-  config.direction = m_Direction;
+  config.direction = GetDirection();
   config.range = m_Range;
+
+  config.MinimumIntensity = GetMinimumIntensity();
+  config.MaximumIntensity = GetMaximumIntensity();
+  config.UseMinimumIntensity = GetUseMinimumIntensity();
+  config.UseMaximumIntensity = GetUseMaximumIntensity();
+  config.Bins = GetBins();
 
   AccessByItk_3(image, CalculateCoocurenceFeatures, mask, featureList,config);
 
@@ -321,7 +335,6 @@ void mitk::GIFCooccurenceMatrix::AddArguments(mitkCommandLineParser &parser)
 
   parser.addArgument(GetLongName(), name, mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
   parser.addArgument(name + "::range", name + "::range", mitkCommandLineParser::String, "Cooc 2 Range", "Define the range that is used (Semicolon-separated)", us::Any());
-  parser.addArgument(name + "::direction", name + "::dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... without dimension 0,1,2... ", us::Any());
 }
 
 void
@@ -332,11 +345,6 @@ mitk::GIFCooccurenceMatrix::CalculateFeaturesUsingParameters(const Image::Pointe
 
   if (parsedArgs.count(GetLongName()))
   {
-    int direction = 0;
-    if (parsedArgs.count(name + "::direction"))
-    {
-      direction = SplitDouble(parsedArgs[name + "::direction"].ToString(), ';')[0];
-    }
     std::vector<double> ranges;
     if (parsedArgs.count(name + "::range"))
     {
@@ -352,7 +360,6 @@ mitk::GIFCooccurenceMatrix::CalculateFeaturesUsingParameters(const Image::Pointe
       MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
       mitk::GIFCooccurenceMatrix::Pointer coocCalculator = mitk::GIFCooccurenceMatrix::New();
       coocCalculator->SetRange(ranges[i]);
-      coocCalculator->SetDirection(direction);
       auto localResults = coocCalculator->CalculateFeatures(feature, maskNoNAN);
       featureList.insert(featureList.end(), localResults.begin(), localResults.end());
       MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";

@@ -603,8 +603,15 @@ void QmitkImageNavigatorView::OnRefetch()
             /// match neither the world direction, nor the direction of the corresponding axis of
             /// the reference geometry. Hence, it is a merely internal information that should not
             /// be exposed to the GUI.
+            ///
+            /// So that one can navigate in the same world direction by dragging the slider
+            /// right, regardless of the direction of the corresponding axis of the reference
+            /// geometry, we invert the direction of the controls if the reference geometry axis
+            /// is inverted but the direction is not ('inversDirection' is false) or the other
+            /// way around.
 
             bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
+            bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
 
             QmitkSliderNavigatorWidget* navigatorWidget =
                 worldAxis == 0 ? m_Controls.m_SliceNavigatorSagittal :
@@ -612,6 +619,7 @@ void QmitkImageNavigatorView::OnRefetch()
                                  m_Controls.m_SliceNavigatorAxial;
 
             navigatorWidget->SetInverseDirection(inverseDirection);
+            navigatorWidget->SetInvertedControls(invertedControls);
           }
         }
       }

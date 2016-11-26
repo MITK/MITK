@@ -106,10 +106,11 @@ namespace mitk
       mitkThrow() << e.what();
     }
 
-    //
-    vector<itkInternalImageType::Pointer> segmentations;
+    //Iterate over all layers. For each adcm file is generated
     for (unsigned int layer = 0; layer < input->GetNumberOfLayers(); ++layer)
     {
+      vector<itkInternalImageType::Pointer> segmentations;
+
       try
       {
         const LabelSet *labelSet = input->GetLabelSet(layer);
@@ -118,7 +119,7 @@ namespace mitk
         {
           typedef itk::CastImageFilter<itkInputImageType, itkInternalImageType> castItkImageFilterType;
           ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
-
+          // BUG: It must be the layer image, but there are some errors with it (dcmqi: generate the dcmSeg "No frame data available") --> input->GetLayerImage(layer)
           imageToItkFilter->SetInput(input);
           imageToItkFilter->Update();
 
@@ -149,6 +150,7 @@ namespace mitk
       // Create segmentation meta information
       const std::string &tmpMetaInfoFile = this->CreateMetaDataJsonFile(layer);
 
+
       MITK_INFO << "Writing image: " << path << std::endl;
       try
       {
@@ -158,8 +160,15 @@ namespace mitk
         // Todo for each layer
         // write dicom file
         DcmFileFormat dcmFileFormat(result);
-        // TODO: Check if path contains filename with ending .dcm
-        dcmFileFormat.saveFile(path.c_str(), EXS_LittleEndianExplicit);
+
+        std::string filePath = path.substr(0, path.find_last_of("."));
+        // if there is more than one layer, we have to write more than 1 dicom file
+        if (input->GetNumberOfLayers() != 1)
+          filePath = filePath + std::to_string(layer) + ".dcm";
+        else
+          filePath = filePath + ".dcm";
+
+        dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
       }
       catch (const std::exception &e)
       {
@@ -349,7 +358,7 @@ namespace mitk
     if (seriesDescription.empty())
       seriesDescription = "Segmentation";
     handler.setSeriesDescription(seriesDescription);
-    handler.setSeriesNumber("340"); // TODO:Create own series number
+    handler.setSeriesNumber("34"+ std::to_string(layer)); // TODO:Create own series number
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 

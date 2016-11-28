@@ -33,6 +33,14 @@ if(NOT DEFINED ITK_DIR)
        -DUSE_WRAP_ITK:BOOL=OFF
       )
 
+  if(MITK_USE_OpenCL)
+    list(APPEND additional_cmake_args
+         -DITK_USE_GPU:BOOL=ON
+         -DOPENCL_INCLUDE_DIRS:PATH=${OpenCL_INCLUDE_DIR}
+         -DOPENCL_LIBRARIES:FILEPATH=${OpenCL_LIBRARY}
+        )
+  endif()
+
   if(MITK_USE_OpenCV)
     list(APPEND additional_cmake_args
          -DModule_ITKVideoBridgeOpenCV:BOOL=ON

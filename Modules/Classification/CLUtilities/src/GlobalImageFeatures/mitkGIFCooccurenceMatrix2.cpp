@@ -576,7 +576,7 @@ void mitk::GIFCooccurenceMatrix2::AddArguments(mitkCommandLineParser &parser)
 }
 
 void
-mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::GIFCooccurenceMatrix2::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
 {
   auto parsedArgs = GetParameter();
   std::string name = GetOptionPrefix();

@@ -238,7 +238,7 @@ void mitk::GIFFirstOrderStatistics::AddArguments(mitkCommandLineParser &parser)
 }
 
 void
-mitk::GIFFirstOrderStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::GIFFirstOrderStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
 {
   auto parsedArgs = GetParameter();
   if (parsedArgs.count(GetLongName()))

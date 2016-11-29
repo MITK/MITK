@@ -412,7 +412,7 @@ void mitk::GIFVolumetricStatistics::AddArguments(mitkCommandLineParser &parser)
 }
 
 void
-mitk::GIFVolumetricStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::GIFVolumetricStatistics::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &, FeatureListType &featureList)
 {
   auto parsedArgs = GetParameter();
   if (parsedArgs.count(GetLongName()))

@@ -40,6 +40,8 @@ private slots:
   virtual void OnUseBModeFilterChanged();
   virtual void OnVerticalSpacingChanged();
   virtual void OnRecordChanged();
+  virtual void OnScatteringCoefficientChanged();
+  virtual void OnCompensateScatteringChanged();
 
   //Transmit
   virtual void OnTransmitPhaseLengthChanged();

@@ -59,7 +59,19 @@ void mitk::USDiPhASCustomControls::OnSetRecord(bool record)
 
 void mitk::USDiPhASCustomControls::OnSetVerticalSpacing(float mm)
 {
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->SetVerticalSpacing(mm);
+}
 
+void mitk::USDiPhASCustomControls::OnSetScatteringCoefficient(float coeff)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->ModifyScatteringCoefficient(coeff);
+}
+void mitk::USDiPhASCustomControls::OnSetCompensateScattering(bool compensate)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->ModifyCompensateForScattering(compensate);
 }
 
 //Transmit

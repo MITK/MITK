@@ -50,7 +50,9 @@ public:
 
   virtual void SetUseBModeFilter(bool isSet);
   virtual void SetVerticalSpacing(float mm);
-  virtual void SetRecord(bool record);
+  virtual void SetRecord(bool record);  
+  virtual void SetScatteringCoefficient(float coeff);
+  virtual void SetCompensateScattering(bool compensate);
 
   //Transmit
   virtual void SetTransmitPhaseLength(double us);
@@ -100,7 +102,8 @@ protected:
   virtual void OnSetUseBModeFilter(bool isSet);
   virtual void OnSetRecord(bool record);
   virtual void OnSetVerticalSpacing(float mm);
-
+  virtual void OnSetScatteringCoefficient(float coeff);
+  virtual void OnSetCompensateScattering(bool compensate);
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us);
   virtual void OnSetExcitationFrequency(double MHz);

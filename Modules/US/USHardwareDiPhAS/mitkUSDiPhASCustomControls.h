@@ -71,6 +71,8 @@ protected:
   virtual void OnSetUseBModeFilter(bool isSet) override;
   virtual void OnSetRecord(bool record) override;
   virtual void OnSetVerticalSpacing(float mm) override;
+  virtual void OnSetScatteringCoefficient(float coeff) override;
+  virtual void OnSetCompensateScattering(bool compensate) override;
 
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us) override;

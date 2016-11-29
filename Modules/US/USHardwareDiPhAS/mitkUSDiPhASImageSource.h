@@ -93,6 +93,8 @@ public:
 
   void ModifyDataType(DataType DataT);
   void ModifyUseBModeFilter(bool isSet);
+  void ModifyScatteringCoefficient(int coeff);
+  void ModifyCompensateForScattering(bool useIt);
 
   /**
   * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
@@ -114,8 +116,10 @@ protected:
   bool                                  m_CurrentlyRecording;
   mitk::OphirPyro::Pointer              m_Pyro;
   bool                                  m_PyroConnected;
-  float                                 m_VerticalSpacing;
 
+  std::vector<Image::Pointer>           m_FluenceCompOriginal;
+  std::vector<Image::Pointer>           m_FluenceCompResized;
+  std::vector<double*>                  m_FluenceCompRaw;
 
   std::vector<mitk::Image::Pointer>     m_ImageBuffer;
   int                                   m_LastWrittenImage;
@@ -124,7 +128,9 @@ protected:
   unsigned int                          m_ImageDimensions[3];
   mitk::Vector3D                        m_ImageSpacing;
 
-  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, int resampleSpacing = 0.15);
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, float resampleSpacing = 0.15);
+  mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
+  mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
 
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);
@@ -153,6 +159,18 @@ protected:
 
   bool                            m_UseBModeFilterModified;
   bool                            m_UseBModeFilterNext;
+
+  float                           m_VerticalSpacing;
+  float                           m_VerticalSpacingNext;
+  bool                            m_VerticalSpacingModified;
+
+  int                             m_ScatteringCoefficient;
+  int                             m_ScatteringCoefficientNext;
+  bool                            m_ScatteringCoefficientModified;
+
+  bool                            m_CompensateForScattering;
+  bool                            m_CompensateForScatteringNext;
+  bool                            m_CompensateForScatteringModified;
 
   DataType                        m_DataType;
 };

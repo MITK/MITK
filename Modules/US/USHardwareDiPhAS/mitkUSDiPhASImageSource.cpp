@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkRescaleIntensityImageFilter.h"
 #include "itkIntensityWindowingImageFilter.h"
 #include <itkIndex.h>
+#include "itkMultiplyImageFilter.h"
 
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
@@ -47,17 +48,40 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_CurrentlyRecording(false),
   m_DataTypeModified(true),
   m_DataTypeNext(DataType::Image_uChar),
-  m_UseBModeFilterModified(false),
-  m_UseBModeFilterNext(false),
   m_CurrentImageTimestamp(0),
   m_PyroConnected(false),
   m_ImageTimestampBuffer(),
-  m_VerticalSpacing(0)
+  m_VerticalSpacing(0),
+  m_UseBModeFilterModified(false),
+  m_UseBModeFilterNext(false),
+  m_ScatteringCoefficientModified(false),
+  m_CompensateForScatteringModified(false),
+  m_VerticalSpacingModified(false),
+  m_ScatteringCoefficient(15),
+  m_CompensateForScattering(false)
 {
   m_BufferSize = 100;
   m_ImageTimestampBuffer.insert(m_ImageTimestampBuffer.begin(), m_BufferSize, 0);
   m_LastWrittenImage = m_BufferSize - 1;
   m_ImageBuffer.insert(m_ImageBuffer.begin(), m_BufferSize, nullptr);
+
+  us::ModuleResource resourceFile;
+  std::string name;
+  for (int i = 5; i <= 25; ++i)
+  {
+    name = "Fluence" + i;
+    name += ".nrrd";
+
+    name = "FranzTissue.nrrd";
+
+    resourceFile = us::GetModuleContext()->GetModule()->GetResource(name);
+
+    //m_FluenceCompensationImagesOriginal.push_back(mitk::IOUtil::LoadImage(resourceFile.GetResourcePath()));
+    m_FluenceCompOriginal.push_back(mitk::IOUtil::LoadImage("d:\\FranzTissue.nrrd")); // TODO: make it actually load the images we want, not some test image....
+  }
+
+  m_FluenceCompResized.insert(m_FluenceCompResized.begin(), 21, Image::New());
+  m_FluenceCompRaw.insert(m_FluenceCompRaw.begin(), 21, nullptr);
 }
 
 mitk::USDiPhASImageSource::~USDiPhASImageSource()
@@ -73,6 +97,9 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
 
+  // resize the fluence reference images, if needed
+
+  // modify all settings
   if (m_DataTypeModified)
   {
     SetDataType(m_DataTypeNext);
@@ -82,6 +109,21 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   {
     SetUseBModeFilter(m_UseBModeFilterNext);
     m_UseBModeFilterModified = false;
+  }
+  if (m_VerticalSpacingModified)
+  { 
+    m_VerticalSpacing = m_VerticalSpacingNext;
+    m_VerticalSpacingModified = false;
+  }
+  if (m_ScatteringCoefficientModified)
+  {
+    m_ScatteringCoefficient = m_ScatteringCoefficientNext;
+    m_ScatteringCoefficientModified = false;
+  }
+  if (m_CompensateForScatteringModified)
+  {
+    m_CompensateForScattering = m_CompensateForScatteringNext;
+    m_CompensateForScatteringModified = false;
   }
 
   // make sure image is nullptr
@@ -110,16 +152,17 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   // do image processing before displaying it
   if (image.IsNotNull())
   {
+
     // first, we compensate using our ImageEnergyValue
 
     // dooooooooit
 
-    // now apply BmodeFilter to the image, if the option has been selected.
-    if (m_UseBModeFilter && m_DataType == DataType::Beamformed_Short)
+    // now apply BmodeFilter and/or scattering compensation to the image, if the option has been selected.
+    if ((m_CompensateForScattering || m_UseBModeFilter) && m_DataType == DataType::Beamformed_Short)
     {
-      if (image->GetDimension(2) == 1)
+      if (image->GetDimension(2) == 1 && m_UseBModeFilter)
       {
-        image = ApplyBmodeFilter(image, true, 0.15);
+        image = ApplyBmodeFilter(image, true, m_VerticalSpacing);
       } // this is for ultrasound only mode
       else
       {
@@ -129,9 +172,23 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
         imageCopy->SetGeometry(image->GetGeometry());
         mitk::ImageReadAccessor inputReadAccessorCopy(image, image->GetSliceData(0));
         imageCopy->SetSlice(inputReadAccessorCopy.GetData(), 0);
+        if (m_UseBModeFilter)
+        {
+          image = ApplyBmodeFilter(image, true, m_VerticalSpacing);
+          imageCopy = ApplyBmodeFilter(imageCopy, false, m_VerticalSpacing);
+        }
+        if (m_CompensateForScattering)
+        {
+          // update the fluence reference images!
+          bool doResampling = image->GetDimension(0) != m_FluenceCompResized.at(m_ScatteringCoefficient)->GetDimension(0) || image->GetDimension(1) != m_FluenceCompResized.at(m_ScatteringCoefficient)->GetDimension(1);
+          if (doResampling)
+          {
+            m_FluenceCompResized.at(m_ScatteringCoefficient) = ApplyResampling(m_FluenceCompOriginal.at(m_ScatteringCoefficient), image->GetGeometry()->GetSpacing(), image->GetDimensions());
+            m_FluenceCompRaw.at(m_ScatteringCoefficient) = (double*)m_FluenceCompResized.at(m_ScatteringCoefficient)->GetData();
+          }
 
-        image = ApplyBmodeFilter(image ,true , 0);
-        imageCopy = ApplyBmodeFilter(imageCopy, false, 0);
+          imageCopy = ApplyScatteringCompensation(imageCopy, m_ScatteringCoefficient);
+        }
 
         mitk::ImageReadAccessor inputReadAccessor(imageCopy, imageCopy->GetSliceData(0));
         image->SetSlice(inputReadAccessor.GetData(), 0);
@@ -140,7 +197,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   }
 }
 
-mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter, int resampleSpacing)
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter, float resampleSpacing)
 {
   // we use this seperate ApplyBmodeFilter Method for processing of two-dimensional images
 
@@ -196,6 +253,72 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   resampleImageFilter->SetInput(bmode);
   resampleImageFilter->SetSize(outputSize);
   resampleImageFilter->SetOutputSpacing(outputSpacing);
+  resampleImageFilter->SetTransform(TransformType::New());
+
+  resampleImageFilter->UpdateLargestPossibleRegion();
+  return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
+}
+
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
+{
+  Image::Pointer image = Image::New();
+  image->Initialize(inputImage);
+  image->SetGeometry(inputImage->GetGeometry());
+
+  mitk::Vector3D imageSpacing = inputImage->GetGeometry()->GetSpacing();
+  mitk::Vector3D refSpacing = m_FluenceCompOriginal[0]->GetGeometry()->GetSpacing();
+
+  unsigned int* imageDimensions = inputImage->GetDimensions();
+  unsigned int* refDimensions = m_FluenceCompOriginal[0]->GetDimensions();
+
+  itk::Index<3> curPixel;
+  itk::Index<3> refPixel;
+
+  for (curPixel = { 0,0,0 }; curPixel[2] < imageDimensions[2]; ++curPixel[2])
+  {
+    refPixel[2] = 0;
+    for (curPixel; curPixel[1] < imageDimensions[1]; ++curPixel[1])
+    {
+
+      refPixel[1] = 0;
+      for (curPixel; curPixel[0] < imageDimensions[0]; ++curPixel[0])
+      {
+
+      }
+    }
+  }
+
+  image = inputImage;
+  return image;
+}
+
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3])
+{
+  typedef itk::Image< double, 3 > itkFloatImageType; 
+  
+  typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
+  ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
+
+  itkFloatImageType::Pointer itkImage;
+
+  mitk::CastToItkImage(inputImage, itkImage);
+
+  itkFloatImageType::SpacingType outputSpacingItk;
+  itkFloatImageType::SizeType inputSizeItk = itkImage->GetLargestPossibleRegion().GetSize();
+  itkFloatImageType::SizeType outputSizeItk = inputSizeItk;
+
+  outputSpacingItk[0] = outputSpacing[0];
+  outputSpacingItk[1] = outputSpacing[1];
+  outputSpacingItk[2] = outputSpacing[2];
+
+  outputSizeItk[0] = outputSize[0];
+  outputSizeItk[1] = outputSize[1];
+  outputSizeItk[2] = 1;
+
+  typedef itk::IdentityTransform<double, 3> TransformType;
+  resampleImageFilter->SetInput(itkImage);
+  resampleImageFilter->SetSize(outputSizeItk);
+  resampleImageFilter->SetOutputSpacing(outputSpacingItk);
   resampleImageFilter->SetTransform(TransformType::New());
 
   resampleImageFilter->UpdateLargestPossibleRegion();
@@ -368,6 +491,18 @@ void mitk::USDiPhASImageSource::ModifyUseBModeFilter(bool isSet)
   m_UseBModeFilterNext = isSet;
 }
 
+void mitk::USDiPhASImageSource::ModifyScatteringCoefficient(int coeff)
+{
+  m_ScatteringCoefficientNext = coeff;
+  m_ScatteringCoefficientModified = true;
+}
+
+void mitk::USDiPhASImageSource::ModifyCompensateForScattering(bool useIt)
+{
+  m_CompensateForScatteringNext = useIt;
+  m_CompensateForScatteringModified = true;
+}
+
 void mitk::USDiPhASImageSource::SetDataType(DataType DataT)
 {
   if (DataT != m_DataType)
@@ -400,8 +535,8 @@ void mitk::USDiPhASImageSource::SetUseBModeFilter(bool isSet)
 
 void mitk::USDiPhASImageSource::SetVerticalSpacing(float mm)
 {
-  m_VerticalSpacing = mm;
-  cout << m_VerticalSpacing;
+  m_VerticalSpacingNext = mm;
+  m_VerticalSpacingModified = true;
 }
 
 // this is just a little function to set the filenames below right

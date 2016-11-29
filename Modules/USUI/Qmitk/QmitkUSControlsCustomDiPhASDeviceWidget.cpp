@@ -89,6 +89,9 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnLowCutChanged();
   OnHighCutChanged();
   OnUseBModeFilterChanged(); // HERE
+  OnVerticalSpacingChanged();
+  OnScatteringCoefficientChanged();
+  OnCompensateScatteringChanged();
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
 
@@ -101,6 +104,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 
   connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
   connect(ui->StartStopRecord, SIGNAL(clicked()), this, SLOT(OnRecordChanged()));
+  connect(ui->ScatteringCoefficient, SIGNAL(valueChanged(int)), this, SLOT(OnScatteringCoefficientChanged()));
+  connect(ui->CompensateScattering, SIGNAL(stateChanged(int)), this, SLOT(OnCompensateScatteringChanged()));
   connect(ui->VerticalSpacing, SIGNAL(valueChanged(double)), this, SLOT(OnVerticalSpacingChanged()));
 
   //transmit
@@ -140,6 +145,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnUseBModeFilterChanged()
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
 {
+  if (m_ControlInterface.IsNull()) { return; }
   if (ui->StartStopRecord->text() == "Start Recording")
   {
     ui->StartStopRecord->setText("Stop Recording");
@@ -154,8 +160,22 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnVerticalSpacingChanged()
 {
+  if (m_ControlInterface.IsNull()) { return; }
   m_ControlInterface->SetVerticalSpacing(ui->VerticalSpacing->value());
 }
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnScatteringCoefficientChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetScatteringCoefficient(ui->ScatteringCoefficient->value());
+}
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnCompensateScatteringChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  m_ControlInterface->SetCompensateScattering(ui->CompensateScattering->isChecked());
+}
+
 
 //Transmit
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitPhaseLengthChanged()

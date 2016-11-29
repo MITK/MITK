@@ -66,7 +66,9 @@ namespace mitk
 
     //##Documentation
     //## @brief Display position, index, time and pixel value
-    void DisplayImageInfo(const mitk::Point3D point, const itk::Index<3> index, const mitk::ScalarType time, const mitk::ScalarType pixelValue);
+    void DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, mitk::ScalarType pixelValue);
+    //## @brief Display rotation, index, time and custom pixel value
+    void DisplayImageInfo(mitk::Point3D point, itk::Index<3> index, mitk::ScalarType time, const char *pixelValue);
     //##Documentation
     //## @brief Display placeholder text for invalid information
     void DisplayImageInfoInvalid();
@@ -84,6 +86,7 @@ namespace mitk
   protected:
     StatusBar();
     virtual ~StatusBar();
+
     static StatusBarImplementation *m_Implementation;
     static StatusBar *m_Instance;
   };

@@ -72,12 +72,9 @@ namespace mitk
       m_Implementation->DisplayGreyValueText(t);
   }
 
-  static std::ostringstream WriteCommonImageInfo(Point3D point, itk::Index<3> index, ScalarType time)
+  static void WriteCommonImageInfo(
+    std::ostringstream &stream, Point3D point, itk::Index<3> index, ScalarType time)
   {
-    std::ostringstream stream;
-    stream.imbue(std::locale::classic());
-    stream.precision(2);
-
     stream << "Position: <" << std::fixed << point[0] << ", "
                             << std::fixed << point[1] << ", "
                             << std::fixed << point[2] << "> mm; ";
@@ -87,8 +84,6 @@ namespace mitk
                          << index[2] << "> ; ";
 
     stream << "Time: " << time << " ms";
-
-    return stream;
   }
 
   void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, ScalarType pixelValue)
@@ -96,7 +91,11 @@ namespace mitk
     if (m_Implementation == nullptr)
       return;
 
-    std::ostringstream stream = WriteCommonImageInfo(point, index, time);
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream.precision(2);
+
+    WriteCommonImageInfo(stream, point, index, time);
     stream << "; Pixel value: ";
 
     if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
@@ -112,7 +111,11 @@ namespace mitk
     if (m_Implementation == nullptr)
       return;
 
-    std::ostringstream stream = WriteCommonImageInfo(point, index, time);
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream.precision(2);
+
+    WriteCommonImageInfo(stream, point, index, time);
     stream << "; " << pixelValue;
 
     m_Implementation->DisplayGreyValueText(stream.str().c_str());

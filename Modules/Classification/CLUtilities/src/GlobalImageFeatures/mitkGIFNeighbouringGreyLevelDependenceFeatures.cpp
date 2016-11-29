@@ -18,22 +18,19 @@ static
 void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
                       std::string prefix,
                       mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType &featureList);
-static
-void CalculateMeanAndStdDevFeatures(std::vector<mitk::NGLDMMatrixFeatures> featureList,
-                                    mitk::NGLDMMatrixFeatures &meanFeature,
-                                    mitk::NGLDMMatrixFeatures  &stdFeature);
-static
-void NormalizeMatrixFeature(mitk::NGLDMMatrixFeatures &features,
-                            std::size_t number);
-
-
 
 
 mitk::NGLDMMatrixHolder::NGLDMMatrixHolder(double min, double max, int number, int depenence) :
                                             m_MinimumRange(min),
                                             m_MaximumRange(max),
+                                            m_Stepsize(0),
+                                            m_NumberOfDependences(depenence),
                                             m_NumberOfBins(number),
-                                            m_NumberOfDependences(depenence)
+                                            m_NeighbourhoodSize(1),
+                                            m_NumberOfNeighbourVoxels(0),
+                                            m_NumberOfDependenceNeighbourVoxels(0),
+                                            m_NumberOfNeighbourhoods(0),
+                                            m_NumberOfCompleteNeighbourhoods(0)
 {
   m_Matrix.resize(number, depenence);
   m_Matrix.fill(0);
@@ -155,8 +152,8 @@ void LocalCalculateFeatures(
   auto sijMatrix = holder.m_Matrix;
   auto piMatrix = holder.m_Matrix;
   auto pjMatrix = holder.m_Matrix;
-  double Ng = holder.m_NumberOfBins;
-  int NgSize = holder.m_NumberOfBins;
+  // double Ng = holder.m_NumberOfBins;
+  // int NgSize = holder.m_NumberOfBins;
   double Ns = sijMatrix.sum();
   piMatrix.rowwise().normalize();
   pjMatrix.colwise().normalize();
@@ -256,9 +253,6 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned char, VImageDimension> MaskType;
   typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
-  typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
-  typedef itk::Offset<VImageDimension> OffsetType;
-
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
 

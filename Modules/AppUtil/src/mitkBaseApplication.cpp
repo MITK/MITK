@@ -30,6 +30,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Util/HelpFormatter.h>
 
+#include <QSplashScreen>
+#include <QRunnable>
+#include <QFileInfo>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDesktopServices>
@@ -57,6 +60,8 @@ namespace mitk
   QString BaseApplication::ARG_TESTPLUGIN = "BlueBerry.testplugin";
   QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 
+  QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
+
   QString BaseApplication::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
   QString BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
   QString BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registryMultiLanguage";
@@ -74,6 +79,23 @@ namespace mitk
   QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
   QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
 
+  class SplashCloserCallback : public QRunnable
+  {
+  public:
+    SplashCloserCallback(QSplashScreen* splashscreen)
+    {
+      this->m_Splashscreen = splashscreen;
+    }
+
+    void run()
+    {
+      this->m_Splashscreen->close();
+    }
+
+  private:
+    QSplashScreen* m_Splashscreen;
+  };
+
   struct BaseApplication::Impl
   {
     ctkProperties m_FWProps;
@@ -90,10 +112,15 @@ namespace mitk
     bool m_SingleMode;
     bool m_SafeMode;
 
+    QSplashScreen* m_Splashscreen;
+    SplashCloserCallback* m_SplashscreenClosingCallback;
+
     QStringList m_PreloadLibs;
     QString m_ProvFile;
 
-    Impl(int argc, char **argv) : m_Argc(argc), m_Argv(argv), m_SingleMode(false), m_SafeMode(true)
+    Impl(int argc, char **argv)
+      : m_Argc(argc), m_Argv(argv), m_SingleMode(false), m_SafeMode(true),
+        m_Splashscreen(0), m_SplashscreenClosingCallback(nullptr)
     {
 #ifdef Q_OS_MAC
       /*
@@ -296,8 +323,22 @@ namespace mitk
     }
   };
 
-  BaseApplication::BaseApplication(int argc, char **argv) : Application(), d(new Impl(argc, argv)) {}
-  BaseApplication::~BaseApplication() {}
+  BaseApplication::BaseApplication(int argc, char **argv) : Application(), d(new Impl(argc, argv))
+  {
+  }
+
+  BaseApplication::~BaseApplication()
+  {
+    if (d->m_Splashscreen != 0)
+    {
+      delete(d->m_Splashscreen);
+    }
+    if (d->m_SplashscreenClosingCallback != 0)
+    {
+      delete(d->m_SplashscreenClosingCallback);
+    }
+  }
+
   void BaseApplication::printHelp(const std::string & /*name*/, const std::string & /*value*/)
   {
     Poco::Util::HelpFormatter help(this->options());
@@ -488,14 +529,18 @@ namespace mitk
     //    framework properties.
     d->initializeCTKPluginFrameworkProperties(this->config());
 
-    // 6. Set the custom CTK Plugin Framework storage directory
+  // 6. Initialize splash screen if an image path is provided
+  //    in the .ini file
+  this->initializeSplashScreen(qApp);
+
+  // 7. Set the custom CTK Plugin Framework storage directory
     QString storageDir = this->getCTKFrameworkStorageDir();
     if (!storageDir.isEmpty())
     {
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storageDir;
     }
 
-    // 7. Set the library search paths and the pre-load library property
+  // 8. Set the library search paths and the pre-load library property
     this->initializeLibraryPaths();
     QStringList preloadLibs = this->getPreloadLibraries();
     if (!preloadLibs.isEmpty())
@@ -503,13 +548,13 @@ namespace mitk
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_PRELOAD_LIBRARIES] = preloadLibs;
     }
 
-    // 8. Initialize the CppMicroServices library.
+  // 9. Initialize the CppMicroServices library.
     //    The initializeCppMicroServices() method reuses the
     //    FRAMEWORK_STORAGE property, so we call it after the
     //    getCTKFrameworkStorageDir method.
     this->initializeCppMicroServices();
 
-    // 9. Parse the (optional) provisioning file and set the
+  // 10. Parse the (optional) provisioning file and set the
     //    correct framework properties.
     d->parseProvisioningFile(this->getProvisioningFilePath());
 
@@ -646,7 +691,14 @@ namespace mitk
       arguments.push_back(QString::fromStdString(arg));
     }
 
-    return ctkPluginFrameworkLauncher::run(NULL, QVariant::fromValue(arguments)).toInt();
+    if (d->m_Splashscreen != 0)
+    {
+      // a splash screen is displayed,
+      // creating the closing callback
+      d->m_SplashscreenClosingCallback = new SplashCloserCallback(d->m_Splashscreen);
+    }
+
+    return ctkPluginFrameworkLauncher::run(d->m_SplashscreenClosingCallback, QVariant::fromValue(arguments)).toInt();
   }
 
   void BaseApplication::defineOptions(Poco::Util::OptionSet &options)
@@ -724,6 +776,10 @@ namespace mitk
     registryMultiLanguageOption.callback(Poco::Util::OptionCallback<Impl>(d.data(), &Impl::handleBooleanOption));
     options.addOption(registryMultiLanguageOption);
 
+  Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");
+  splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
+  options.addOption(splashScreenOption);
+
     Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
     xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());
     options.addOption(xargsOption);
@@ -744,7 +800,23 @@ namespace mitk
     return nullptr;
   }
 
+  void BaseApplication::initializeSplashScreen(QCoreApplication * application) const
+  {
+    QVariant pixmapFileNameProp = d->getProperty(ARG_SPLASH_IMAGE);
+    if (!pixmapFileNameProp.isNull()) {
+      QString pixmapFileName = pixmapFileNameProp.toString();
+      QFileInfo checkFile(pixmapFileName);
+      if (checkFile.exists() && checkFile.isFile()) {
+        QPixmap pixmap(checkFile.absoluteFilePath());
+        d->m_Splashscreen = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+        d->m_Splashscreen->show();
+        application->processEvents();
+      }
+    }
+  }
+
   QHash<QString, QVariant> BaseApplication::getFrameworkProperties() const { return d->m_FWProps; }
+
   int BaseApplication::run()
   {
     this->init(d->m_Argc, d->m_Argv);

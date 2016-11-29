@@ -36,11 +36,12 @@
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkRotationOperation.h>
 
-//
 #include "mitkImage.h"
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
 #include "mitkStatusBar.h"
+
+#include <mitkCompositePixelValueToString.h>
 
 void mitk::DisplayInteractor::Notify(InteractionEvent *interactionEvent, bool isHandled)
 {
@@ -755,23 +756,37 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   }
 
   // get the position and gray value from the image and build up status bar text
-  if (image3D.IsNotNull())
+  auto statusBar = StatusBar::GetInstance();
+
+  if (image3D.IsNotNull() && statusBar != nullptr)
   {
     itk::Index<3> p;
     image3D->GetGeometry()->WorldToIndex(worldposition, p);
-    mitk::ScalarType pixelValue;
-    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
-                            image3D->GetChannelDescriptor().GetPixelType(),
-                            image3D,
-                            image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
-                            p,
-                            pixelValue,
-                            component);
-    mitk::StatusBar::GetInstance()->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
+
+    auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
+
+    if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
+    {
+      std::string pixelValue = "Pixel RGB(A) value: ";
+      pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
+      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
+    }
+    else
+    {
+      mitk::ScalarType pixelValue;
+      mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
+        image3D->GetChannelDescriptor().GetPixelType(),
+        image3D,
+        image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
+        p,
+        pixelValue,
+        component);
+      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
+    }
   }
   else
   {
-    mitk::StatusBar::GetInstance()->DisplayImageInfoInvalid();
+    statusBar->DisplayImageInfoInvalid();
   }
 }
 

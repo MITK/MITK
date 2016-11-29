@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkNodePredicateProperty.h>
 
+#include <mitkCompositePixelValueToString.h>
+
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 
@@ -233,25 +235,41 @@ void QmitkImageNavigatorView::UpdateStatusBar()
         }
       }
 
-      // get the position and gray value from the image and build up status bar text
-      if (image3D.IsNotNull())
+      // get the position and pixel value from the image and build up status bar text
+      auto statusBar = mitk::StatusBar::GetInstance();
+
+      if (image3D.IsNotNull() && statusBar != nullptr)
       {
         itk::Index<3> p;
         image3D->GetGeometry()->WorldToIndex(position, p);
-        mitk::ScalarType pixelValue;
-        mitkPixelTypeMultiplex5(
-          mitk::FastSinglePixelAccess,
-          image3D->GetChannelDescriptor().GetPixelType(),
-          image3D,
-          image3D->GetVolumeData(renderer->GetTimeStep()),
-          p,
-          pixelValue,
-          component);
-        mitk::StatusBar::GetInstance()->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue);
+
+        auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
+
+        if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
+        {
+          std::string pixelValue = "Pixel RGB(A) value: ";
+          pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
+          statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue.c_str());
+        }
+        else
+        {
+          itk::Index<3> p;
+          image3D->GetGeometry()->WorldToIndex(position, p);
+          mitk::ScalarType pixelValue;
+          mitkPixelTypeMultiplex5(
+            mitk::FastSinglePixelAccess,
+            image3D->GetChannelDescriptor().GetPixelType(),
+            image3D,
+            image3D->GetVolumeData(renderer->GetTimeStep()),
+            p,
+            pixelValue,
+            component);
+          statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue);
+        }
       }
       else
       {
-        mitk::StatusBar::GetInstance()->DisplayImageInfoInvalid();
+        statusBar->DisplayImageInfoInvalid();
       }
     }
   }

@@ -71,22 +71,53 @@ namespace mitk
     if (m_Implementation != nullptr)
       m_Implementation->DisplayGreyValueText(t);
   }
-  void StatusBar::DisplayImageInfo(const mitk::Point3D point, const itk::Index<3> index, const mitk::ScalarType time, const mitk::ScalarType pixelValue)
+
+  static std::ostringstream WriteCommonImageInfo(Point3D point, itk::Index<3> index, ScalarType time)
   {
-    if (m_Implementation != nullptr)
-    {
-      std::stringstream stream;
-      stream.imbue(std::locale::classic());
-      stream.precision(2);
-      stream << "Position: <" << std::fixed << point[0] << ", " << std::fixed << point[1] << ", " << std::fixed << point[2] << "> mm";
-      stream << "; Index: <" << index[0] << ", " << index[1] << ", " << index[2] << "> ";
-      stream << "; Time: " << time << " ms; Pixelvalue ";
-      if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-        stream << std::scientific;
-      stream << pixelValue;
-      m_Implementation->DisplayGreyValueText(stream.str().c_str());
-    }
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream.precision(2);
+
+    stream << "Position: <" << std::fixed << point[0] << ", "
+                            << std::fixed << point[1] << ", "
+                            << std::fixed << point[2] << "> mm; ";
+
+    stream << "Index: <" << index[0] << ", "
+                         << index[1] << ", "
+                         << index[2] << "> ; ";
+
+    stream << "Time: " << time << " ms";
+
+    return stream;
   }
+
+  void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, ScalarType pixelValue)
+  {
+    if (m_Implementation == nullptr)
+      return;
+
+    std::ostringstream stream = WriteCommonImageInfo(point, index, time);
+    stream << "; Pixel value: ";
+
+    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
+      stream << std::scientific;
+
+    stream << pixelValue;
+
+    m_Implementation->DisplayGreyValueText(stream.str().c_str());
+  }
+
+  void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, const char *pixelValue)
+  {
+    if (m_Implementation == nullptr)
+      return;
+
+    std::ostringstream stream = WriteCommonImageInfo(point, index, time);
+    stream << "; " << pixelValue;
+
+    m_Implementation->DisplayGreyValueText(stream.str().c_str());
+  }
+
   void StatusBar::DisplayImageInfoInvalid()
   {
     if (m_Implementation != nullptr)

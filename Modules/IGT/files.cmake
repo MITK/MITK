@@ -42,6 +42,7 @@ set(CPP_FILES
 
   Rendering/mitkCameraVisualization.cpp
   Rendering/mitkNavigationDataObjectVisualizationFilter.cpp
+  Rendering/mitkNavigationDataSliceVisualization.cpp
 
   TrackingDevices/mitkClaronTool.cpp
   TrackingDevices/mitkClaronTrackingDevice.cpp

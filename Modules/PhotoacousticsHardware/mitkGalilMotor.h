@@ -71,7 +71,8 @@ namespace mitk {
       double m_MinWavelength;
       double m_MaxWavelength;
       double m_CurrentWavelength;
-      double m_WavelengthToStepCalibration[8];
+      double m_WavelengthToStepCalibration[7];
+      double m_HomePosition;
 
     };
 } // namespace mitk

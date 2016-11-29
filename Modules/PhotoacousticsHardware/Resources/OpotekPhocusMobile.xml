@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Motor>
   <Coefficients>
-    <lambda0>-6187087.064930105</lambda0>
-    <lambda1>37807.86591042109</lambda1>
-    <lambda2>-90.9545284966227</lambda2>
-    <lambda3>0.1086628082386</lambda3>
-    <lambda4>-0.0000646677475</lambda4>
-    <lambda5>0.000000015363910983201</lambda5>
+    <lambda0>-3.26731848e+07</lambda0>
+    <lambda1>2.35443306e+05</lambda1>
+    <lambda2>-7.04376397e+02</lambda2>
+    <lambda3>1.12232174e+00</lambda3>
+    <lambda4>-1.00519593e-03</lambda4>
+    <lambda5>4.79945765e-07</lambda5>
+    <lambda6>-9.54424480e-11</lambda6>
     <home>32561</home>
   </Coefficients>
   <Signal>

@@ -30,7 +30,8 @@ mitk::GalilMotor::GalilMotor() :
 m_ComPort(0),
 m_BaudRate(0),
 m_ErrorMessage("undefined"),
-m_CurrentWavelength(0)
+m_CurrentWavelength(0),
+m_HomePosition(32561)
 {
 }
 
@@ -83,8 +84,10 @@ bool mitk::GalilMotor::OpenConnection(std::string configuration)
       m_WavelengthToStepCalibration[4] = std::stod(element->GetText());
       element = elementNode->FirstChildElement("lambda5");
       m_WavelengthToStepCalibration[5] = std::stod(element->GetText());
-      element = elementNode->FirstChildElement("home");
+      element = elementNode->FirstChildElement("lambda6");
       m_WavelengthToStepCalibration[6] = std::stod(element->GetText());
+      element = elementNode->FirstChildElement("home");
+      m_HomePosition = std::stod(element->GetText());
       elementNode = root->FirstChildElement("Signal");
       element = elementNode->FirstChildElement("Signal-low");
       m_MinWavelength = std::stod(element->GetText());
@@ -127,12 +130,13 @@ bool mitk::GalilMotor::CloseConnection()
 int mitk::GalilMotor::GetPositionFromWavelength(double wavelength)
 {
   double posDouble = 0;
-  posDouble = m_WavelengthToStepCalibration[0] - m_WavelengthToStepCalibration[6];
+  posDouble = m_WavelengthToStepCalibration[0] - m_HomePosition;
   posDouble += (m_WavelengthToStepCalibration[1] * wavelength);
   posDouble += (m_WavelengthToStepCalibration[2] * std::pow(wavelength, 2));
   posDouble += (m_WavelengthToStepCalibration[3] * std::pow(wavelength, 3));
   posDouble += (m_WavelengthToStepCalibration[4] * std::pow(wavelength, 4));
   posDouble += (m_WavelengthToStepCalibration[5] * std::pow(wavelength, 5));
+  posDouble += (m_WavelengthToStepCalibration[6] * std::pow(wavelength, 6));
   int pos = posDouble;
   return pos;
 }
@@ -146,7 +150,7 @@ bool mitk::GalilMotor::TuneToWavelength(double wavelength, bool isRecalibrating)
   }
   else
   {
-    int posAbs = wavelength - 32561;
+    int posAbs = wavelength - m_HomePosition;
     positionCommand = "pos=" + std::to_string(posAbs);
   }
 

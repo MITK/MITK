@@ -1287,6 +1287,11 @@ void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
 
 void QmitkStdMultiWidget::SetDataStorage(mitk::DataStorage *ds)
 {
+  if (ds == m_DataStorage)
+  {
+    return;
+  }
+
   mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetDataStorage(ds);
   mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetDataStorage(ds);
   mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetDataStorage(ds);

@@ -338,7 +338,7 @@ IntensityProfile::Pointer mitk::CreateIntensityProfileFromVector(const std::vect
   return result;
 }
 
-void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensityProfile, ImageStatisticsCalculator::Statistics &stats)
+void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensityProfile, ImageStatisticsCalculator::StatisticsContainer::Pointer stats)
 {
   typedef std::vector<IntensityProfile::MeasurementType> StatsVecType;
 
@@ -371,10 +371,10 @@ void mitk::ComputeIntensityProfileStatistics(IntensityProfile::Pointer intensity
 
   rms = sqrt( rms );
 
-  stats.SetMin( static_cast<double>( min ) );
-  stats.SetMax( static_cast<double>( max ) );
-  stats.SetN( numSamples );
-  stats.SetMean( mean );
-  stats.SetVariance( var );
-  stats.SetRMS( rms );
+  stats->SetMin( static_cast<double>( min ) );
+  stats->SetMax( static_cast<double>( max ) );
+  stats->SetN( numSamples );
+  stats->SetMean( mean );
+  stats->SetVariance( var );
+  stats->SetRMS( rms );
 }

@@ -98,15 +98,20 @@ public:
       /** \brief Toogle GUI elements if histogram default bin size checkbox value changed. */
       void OnDefaultBinSizeBoxChanged();
 
+      void OnShowSubchartBoxChanged();
+
+      void OnBarRadioButtonSelected();
+
+      void OnLineRadioButtonSelected();
+
 signals:
       /** \brief Method to set the data to the member and start the threaded statistics update */
       void StatisticsUpdate();
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
-  void FillStatisticsTableView( const std::vector<mitk::ImageStatisticsCalculator::Statistics> &s,
-    const mitk::Image *image );
-
+  void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
+          const mitk::Image *image );
 
   std::vector<QString> CalculateStatisticsForPlanarFigure( const mitk::Image *image);
 
@@ -183,6 +188,8 @@ protected:
   bool m_StatisticsIntegrationPending;
   bool m_DataNodeSelectionChanged;
   bool m_Visible;
+
+  double m_HistogramBinSize;
 
   std::vector<mitk::Point3D>     m_WorldMinList;
   std::vector<mitk::Point3D>     m_WorldMaxList;

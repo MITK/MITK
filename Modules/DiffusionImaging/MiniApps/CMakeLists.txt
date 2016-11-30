@@ -12,6 +12,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     set( diffusionminiapps
     NetworkCreation^^MitkFiberTracking_MitkConnectomics
     NetworkStatistics^^MitkConnectomics
+
     Fiberfox^^MitkFiberTracking
     MultishellMethods^^MitkFiberTracking
     PeaksAngularError^^MitkFiberTracking

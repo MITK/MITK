@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToUnstructuredGridFilter.h>
 #include <mitkProgressBar.h>
 #include <mitkUnstructuredGrid.h>
+#include <SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.h>
+#include <mitkImageMaskGenerator.h>
 
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryContourImageFilter.h>
@@ -57,14 +59,14 @@ void mitk::FeatureBasedEdgeDetectionFilter::GenerateData()
 
   // Compute mean and stdDev based on the current segmentation
   mitk::ImageStatisticsCalculator::Pointer statCalc = mitk::ImageStatisticsCalculator::New();
-  statCalc->SetImage(image);
-  statCalc->SetMaskingModeToImage();
-  statCalc->SetImageMask(m_SegmentationMask);
-  statCalc->ComputeStatistics();
+  statCalc->SetInputImage(image);
 
-  mitk::ImageStatisticsCalculator::Statistics stats = statCalc->GetStatistics();
-  double mean = stats.GetMean();
-  double stdDev = stats.GetSigma();
+  mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
+  imgMask->SetImageMask(m_SegmentationMask);
+
+  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats = statCalc->GetStatistics();
+  double mean = stats->GetMean();
+  double stdDev = stats->GetStd();
 
   double upperThreshold = mean + stdDev;
   double lowerThreshold = mean - stdDev;

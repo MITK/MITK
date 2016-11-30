@@ -19,26 +19,29 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkAbstractView.h>
 
-#include <mitkUSCombinedModality.h>
-#include "Widgets/QmitkUSNavigationProcessWidget.h"
 #include "IO/mitkUSNavigationLoggingBackend.h"
-#include "mitkUSImageLoggingFilter.h"
+#include "Widgets/QmitkUSNavigationProcessWidget.h"
 #include "mitkNavigationDataRecorder.h"
 #include "mitkNodeDisplacementFilter.h"
+#include "mitkUSImageLoggingFilter.h"
 #include <mitkMessage.h>
-#include <mitkOverlayManager.h>
-#include <mitkTextOverlay2D.h>
+#include <mitkTextAnnotation2D.h>
+#include <mitkUSCombinedModality.h>
 
-namespace itk {
-  template<class T> class SmartPointer;
+namespace itk
+{
+  template <class T>
+  class SmartPointer;
 }
 
-namespace mitk {
+namespace mitk
+{
   class USNavigationStepTimer;
   class USNavigationExperimentLogging;
 }
 
-namespace Ui {
+namespace Ui
+{
   class USNavigationMarkerPlacement;
 }
 
@@ -60,7 +63,7 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
 {
   Q_OBJECT
 
-    protected slots:
+protected slots:
   /**
    * \brief Called periodically to update the rendering.
    * The standard multi widget is changed to fit the navigation process once it
@@ -108,12 +111,12 @@ class USNavigationMarkerPlacement : public QmitkAbstractView
   void OnChangeAblationZone(int id, int newSize);
 
 public:
-  static const char* DATANAME_TUMOUR;
-  static const char* DATANAME_TARGETSURFACE;
-  static const char* DATANAME_ZONES;
-  static const char* DATANAME_TARGETS;
-  static const char* DATANAME_TARGETS_PATHS;
-  static const char* DATANAME_REACHED_TARGETS;
+  static const char *DATANAME_TUMOUR;
+  static const char *DATANAME_TARGETSURFACE;
+  static const char *DATANAME_ZONES;
+  static const char *DATANAME_TARGETS;
+  static const char *DATANAME_TARGETS_PATHS;
+  static const char *DATANAME_REACHED_TARGETS;
 
   explicit USNavigationMarkerPlacement();
   ~USNavigationMarkerPlacement();
@@ -122,7 +125,7 @@ public:
 
   static const std::string VIEW_ID;
 
-  void OnCombinedModalityPropertyChanged(const std::string&, const std::string&);
+  void OnCombinedModalityPropertyChanged(const std::string &, const std::string &);
 
 protected:
   /**
@@ -142,44 +145,44 @@ protected:
 
   void CreateOverlays();
 
-  QWidget*                                             m_Parent;
+  QWidget *m_Parent;
   QmitkUSNavigationProcessWidget::NavigationStepVector m_NavigationSteps;
-  QTimer*                                              m_UpdateTimer;
-  QTimer*                                              m_ImageAndNavigationDataLoggingTimer;
-  QmitkStdMultiWidget*                                 m_StdMultiWidget;
-  itk::SmartPointer<mitk::USCombinedModality>          m_CombinedModality;
-  bool                                                 m_ReinitAlreadyDone;
-  bool                                                 m_IsExperimentRunning;
-  std::string                                          m_CurrentApplicationName;
+  QTimer *m_UpdateTimer;
+  QTimer *m_ImageAndNavigationDataLoggingTimer;
+  QmitkStdMultiWidget *m_StdMultiWidget;
+  itk::SmartPointer<mitk::USCombinedModality> m_CombinedModality;
+  bool m_ReinitAlreadyDone;
+  bool m_IsExperimentRunning;
+  std::string m_CurrentApplicationName;
 
-  itk::SmartPointer<mitk::USNavigationStepTimer>       m_NavigationStepTimer;
+  itk::SmartPointer<mitk::USNavigationStepTimer> m_NavigationStepTimer;
   itk::SmartPointer<mitk::USNavigationExperimentLogging> m_ExperimentLogging;
 
-  QPixmap                                              m_IconRunning;
-  QPixmap                                              m_IconNotRunning;
+  QPixmap m_IconRunning;
+  QPixmap m_IconNotRunning;
 
-  QString                                              m_ResultsDirectory;
-  QString                                              m_ExperimentName;
-  QString                                              m_ExperimentResultsSubDirectory;
-  std::vector<QString>                                 m_NavigationStepNames; //stores the names of the navigation steps which are currently used (for logging purposes)
+  QString m_ResultsDirectory;
+  QString m_ExperimentName;
+  QString m_ExperimentResultsSubDirectory;
+  std::vector<QString>
+    m_NavigationStepNames; // stores the names of the navigation steps which are currently used (for logging purposes)
 
-  mitk::USNavigationLoggingBackend                     m_LoggingBackend;
-  mitk::USImageLoggingFilter::Pointer                  m_USImageLoggingFilter;
-  mitk::NavigationDataRecorder::Pointer                m_NavigationDataRecorder; //records navigation data files
-  mitk::NodeDisplacementFilter::Pointer                m_TargetNodeDisplacementFilter;
-  mitk::NodeDisplacementFilter::Pointer                m_AblationZonesDisplacementFilter;
-  std::vector<mitk::DataNode::Pointer>                 m_AblationZonesVector;
+  mitk::USNavigationLoggingBackend m_LoggingBackend;
+  mitk::USImageLoggingFilter::Pointer m_USImageLoggingFilter;
+  mitk::NavigationDataRecorder::Pointer m_NavigationDataRecorder; // records navigation data files
+  mitk::NodeDisplacementFilter::Pointer m_TargetNodeDisplacementFilter;
+  mitk::NodeDisplacementFilter::Pointer m_AblationZonesDisplacementFilter;
+  std::vector<mitk::DataNode::Pointer> m_AblationZonesVector;
 
   int m_NeedleIndex;
   int m_MarkerIndex;
 
-  int                                                  m_SceneNumber;
+  int m_SceneNumber;
 
-  itk::SmartPointer<mitk::OverlayManager>              m_OverlayManager;
-  itk::SmartPointer<mitk::TextOverlay2D>               m_WarnOverlay;
+  itk::SmartPointer<mitk::TextAnnotation2D> m_WarnOverlay;
 
 private:
-  mitk::MessageDelegate2<USNavigationMarkerPlacement, const std::string&, const std::string&> m_ListenerDeviceChanged;
+  mitk::MessageDelegate2<USNavigationMarkerPlacement, const std::string &, const std::string &> m_ListenerDeviceChanged;
 
   Ui::USNavigationMarkerPlacement *ui;
 };

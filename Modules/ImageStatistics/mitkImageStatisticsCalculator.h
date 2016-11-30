@@ -396,7 +396,12 @@ namespace mitk
     * corresponding to the PlanarFigure will be extracted from the original
     * image. If masking is disabled, the original image is simply passed
     * through. */
-    void ExtractImageAndMask( unsigned int timeStep = 0 );
+    void ExtractImageAndMask(
+      unsigned int timeStep, 
+      mitk::Image::ConstPointer& internalImage,
+      MaskImage3DType::Pointer& internalImageMask3D,
+      MaskImage2DType::Pointer& internalImageMask2D
+    );
 
     /*calculate the min and max value, this is done because we need the min and max value before execution the statistics filter to have the wright range for the histogramm*/
     template < typename TPixel, unsigned int VImageDimension >
@@ -424,7 +429,7 @@ namespace mitk
 
     template < typename TPixel, unsigned int VImageDimension >
     void InternalCalculateMaskFromPlanarFigure(
-      const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
+      const itk::Image< TPixel, VImageDimension > *image, unsigned int axis, MaskImage2DType::Pointer& internalImageMask2D);
 
     template < typename TPixel, unsigned int VImageDimension >
     void InternalMaskIgnoredPixels(
@@ -565,11 +570,6 @@ namespace mitk
 
     unsigned int m_MaskingMode;
     bool m_MaskingModeChanged;
-
-    /** m_InternalImage contains a image volume at one time step (e.g. 2D, 3D)*/
-    mitk::Image::ConstPointer m_InternalImage;
-    MaskImage3DType::Pointer m_InternalImageMask3D;
-    MaskImage2DType::Pointer m_InternalImageMask2D;
 
     TimeStampVectorType m_ImageStatisticsTimeStampVector;
     TimeStampVectorType m_MaskedImageStatisticsTimeStampVector;

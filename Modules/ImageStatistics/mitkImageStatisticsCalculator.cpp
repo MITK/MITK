@@ -652,7 +652,10 @@ namespace mitk
 
     // Depending on masking mode, extract and/or generate the required image
     // and mask data from the user input
-    this->ExtractImageAndMask( timeStep );
+    mitk::Image::ConstPointer internalImage;
+    MaskImage3DType::Pointer internalImageMask3D;
+    MaskImage2DType::Pointer internalImageMask2D;
+    this->ExtractImageAndMask(timeStep, internalImage, internalImageMask3D, internalImageMask2D);
 
 
     StatisticsContainer *statisticsContainer;
@@ -697,12 +700,12 @@ namespace mitk
     }
 
     // Calculate statistics and histogram(s)
-    if ( m_InternalImage->GetDimension() == 3 )
+    if (internalImage->GetDimension() == 3)
     {
       if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
       {
         AccessFixedDimensionByItk_2(
-          m_InternalImage,
+          internalImage,
           InternalCalculateStatisticsUnmasked,
           3,
           statisticsContainer,
@@ -711,20 +714,20 @@ namespace mitk
       else
       {
         AccessFixedDimensionByItk_3(
-          m_InternalImage,
+          internalImage,
           InternalCalculateStatisticsMasked,
           3,
-          m_InternalImageMask3D.GetPointer(),
+          internalImageMask3D.GetPointer(),
           statisticsContainer,
           histogramContainer );
       }
     }
-    else if ( m_InternalImage->GetDimension() == 2 )
+    else if (internalImage->GetDimension() == 2)
     {
       if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
       {
         AccessFixedDimensionByItk_2(
-          m_InternalImage,
+          internalImage,
           InternalCalculateStatisticsUnmasked,
           2,
           statisticsContainer,
@@ -733,10 +736,10 @@ namespace mitk
       else
       {
         AccessFixedDimensionByItk_3(
-          m_InternalImage,
+          internalImage,
           InternalCalculateStatisticsMasked,
           2,
-          m_InternalImageMask2D.GetPointer(),
+          internalImageMask2D.GetPointer(),
           statisticsContainer,
           histogramContainer );
       }
@@ -745,14 +748,6 @@ namespace mitk
     {
       MITK_ERROR << "ImageStatistics: Image dimension not supported!";
     }
-
-
-    // Release unused image smart pointers to free memory
-    m_InternalImage = mitk::Image::ConstPointer();
-    m_InternalImageMask3D = MaskImage3DType::Pointer();
-    m_InternalImageMask2D = MaskImage2DType::Pointer();
-
-
 
     return true;
   }
@@ -888,7 +883,12 @@ namespace mitk
 
 
 
-  void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
+  void ImageStatisticsCalculator::ExtractImageAndMask(
+    unsigned int timeStep, 
+    mitk::Image::ConstPointer& internalImage,
+    MaskImage3DType::Pointer& internalImageMask3D,
+    MaskImage2DType::Pointer& internalImageMask2D
+  )
   {
     if ( m_Image.IsNull() )
     {
@@ -911,26 +911,26 @@ namespace mitk
     {
     case MASKING_MODE_NONE:
       {
-        m_InternalImage = timeSliceImage;
-        m_InternalImageMask2D = nullptr;
-        m_InternalImageMask3D = nullptr;
+        internalImage = timeSliceImage;
+        internalImageMask2D = nullptr;
+        internalImageMask3D = nullptr;
         if(m_DoIgnorePixelValue)
         {
-          if( m_InternalImage->GetDimension() == 3 )
+          if (internalImage->GetDimension() == 3)
           {
             if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
-              CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+              CastToItkImage( timeSliceImage, internalImageMask3D );
             else
-              CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask3D  );
-            m_InternalImageMask3D->FillBuffer(1);
+              CastToItkImage( timeSliceImage->Clone(), internalImageMask3D  );
+            internalImageMask3D->FillBuffer(1);
           }
-          if( m_InternalImage->GetDimension() == 2 )
+          if (internalImage->GetDimension() == 2)
           {
             if(itk::ImageIOBase::USHORT != timeSliceImage->GetPixelType().GetComponentType())
-              CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+              CastToItkImage( timeSliceImage, internalImageMask2D );
             else
-              CastToItkImage( timeSliceImage->Clone(), m_InternalImageMask2D );
-            m_InternalImageMask2D->FillBuffer(1);
+              CastToItkImage( timeSliceImage->Clone(), internalImageMask2D );
+            internalImageMask2D->FillBuffer(1);
           }
         }
         break;
@@ -959,8 +959,8 @@ namespace mitk
           maskedImageTimeSelector->UpdateLargestPossibleRegion();
           mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
 
-          m_InternalImage = timeSliceImage;
-          CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
+          internalImage = timeSliceImage;
+          CastToItkImage( timeSliceMaskedImage, internalImageMask3D );
         }
         else
         {
@@ -970,7 +970,7 @@ namespace mitk
       }
     case MASKING_MODE_PLANARFIGURE:
       {
-        m_InternalImageMask2D = nullptr;
+        internalImageMask2D = nullptr;
 
         if ( m_PlanarFigure.IsNull() )
         {
@@ -1027,38 +1027,38 @@ namespace mitk
           imageExtractor->SetSliceDimension( axis );
           imageExtractor->SetSliceIndex( slice );
           imageExtractor->Update();
-          m_InternalImage = imageExtractor->GetOutput();
+          internalImage = imageExtractor->GetOutput();
         }
         else
         {
-          m_InternalImage = timeSliceImage;
+          internalImage = timeSliceImage;
         }
 
         // Compute mask from PlanarFigure
-        AccessFixedDimensionByItk_1(
-          m_InternalImage,
+        AccessFixedDimensionByItk_2(
+          internalImage,
           InternalCalculateMaskFromPlanarFigure,
-          2, axis );
+          2, axis, internalImageMask2D);
       }
     }
 
     if(m_DoIgnorePixelValue)
     {
-      if ( m_InternalImage->GetDimension() == 3 )
+      if (internalImage->GetDimension() == 3)
       {
         AccessFixedDimensionByItk_1(
-          m_InternalImage,
+          internalImage,
           InternalMaskIgnoredPixels,
           3,
-          m_InternalImageMask3D.GetPointer() );
+          internalImageMask3D.GetPointer() );
       }
-      else if ( m_InternalImage->GetDimension() == 2 )
+      else if (internalImage->GetDimension() == 2)
       {
         AccessFixedDimensionByItk_1(
-          m_InternalImage,
+          internalImage,
           InternalMaskIgnoredPixels,
           2,
-          m_InternalImageMask2D.GetPointer() );
+          internalImageMask2D.GetPointer() );
       }
     }
   }
@@ -2052,7 +2052,7 @@ namespace mitk
 
   template < typename TPixel, unsigned int VImageDimension >
   void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
-    const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
+    const itk::Image< TPixel, VImageDimension > *image, unsigned int axis, MaskImage2DType::Pointer& internalImageMask2D)
   {
     typedef itk::Image< TPixel, VImageDimension > ImageType;
 
@@ -2225,7 +2225,7 @@ namespace mitk
     duplicator->Update();
 
     // Store mask
-    m_InternalImageMask2D = duplicator->GetOutput();
+    internalImageMask2D = duplicator->GetOutput();
   }
 
 

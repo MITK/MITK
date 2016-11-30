@@ -16,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkImageNavigatorView.h"
 
+#include <itkSpatialOrientationAdapter.h>
+
 #include <QmitkStepperAdapter.h>
 #include <QmitkRenderWindow.h>
 
@@ -83,7 +85,6 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
   // create GUI widgets
   m_Parent = parent;
   m_Controls.setupUi(parent);
-  m_Controls.m_SliceNavigatorAxial->SetInverseDirection(true);
 
   connect(m_Controls.m_XWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
   connect(m_Controls.m_YWorldCoordinateSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnMillimetreCoordinateValueChanged()));
@@ -183,6 +184,9 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_SliceNavigatorTime->setEnabled(false);
       m_Controls.m_TimeLabel->setEnabled(false);
     }
+
+    this->OnRefetch();
+    this->UpdateStatusBar();
   }
 }
 
@@ -547,6 +551,61 @@ void QmitkImageNavigatorView::OnRefetch()
       m_Controls.m_XWorldCoordinateSpinBox->blockSignals(false);
       m_Controls.m_YWorldCoordinateSpinBox->blockSignals(false);
       m_Controls.m_ZWorldCoordinateSpinBox->blockSignals(false);
+
+      /// Calculating 'inverse direction' property.
+      /// Note that in the axial renderer the slices are numbered in opposite direction
+      /// than in the world geometries, i.e. slice indices increase from top to bottom.
+      /// See the mitk::SliceNavigationController::Update() function for details.
+      /// Here we want to display and control the slice indices as they were 'directed'
+      /// in the original, 'reference' or 'input' geometry that was used to initialise
+      /// the renderers. If it was a non-image world geometry (e.g. after global re-init)
+      /// then the sliders should show the world index coordinates. However, if it was
+      /// an image geometry (e.g. re-init) then they should show the image index coordinates.
+
+      mitk::SliceNavigationController::ViewDirection viewDirection =
+          m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetViewDirection();
+
+      bool inverseDirection;
+      int worldAxis;
+      QmitkSliderNavigatorWidget* navigatorWidget;
+
+      if (viewDirection == mitk::SliceNavigationController::Sagittal)
+      {
+        inverseDirection = false;
+        worldAxis = 0;
+        navigatorWidget = m_Controls.m_SliceNavigatorSagittal;
+      }
+      else if (viewDirection == mitk::SliceNavigationController::Frontal)
+      {
+        inverseDirection = false;
+        worldAxis = 1;
+        navigatorWidget = m_Controls.m_SliceNavigatorFrontal;
+      }
+      else
+      {
+        inverseDirection = true;
+        worldAxis = 2;
+        navigatorWidget = m_Controls.m_SliceNavigatorAxial;
+      }
+
+      mitk::AffineTransform3D::ConstPointer affineTransform = geometry->GetIndexToWorldTransform();
+      mitk::AffineTransform3D::MatrixType affineTransformMatrix = affineTransform->GetMatrix();
+      affineTransformMatrix.GetVnlMatrix().normalize_columns();
+      mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseTransformMatrix = affineTransformMatrix.GetInverse();
+
+      int dominantAxis = itk::Function::Max3(
+          inverseTransformMatrix[0][worldAxis],
+          inverseTransformMatrix[1][worldAxis],
+          inverseTransformMatrix[2][worldAxis]);
+
+      int sign = itk::Function::Sign(inverseTransformMatrix[dominantAxis][worldAxis]);
+
+      if (sign < 0)
+      {
+        inverseDirection = !inverseDirection;
+      }
+
+      navigatorWidget->SetInverseDirection(inverseDirection);
     }
 
     this->SetBorderColors();

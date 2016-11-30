@@ -19,10 +19,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 //QT headers
 #include <QMessageBox>
 #include <QApplication>
+#include <mitkImageMaskGenerator.h>
+#include <mitkPlanarFigureMaskGenerator.h>
+#include <mitkIgnorePixelMaskGenerator.h>
 
 QmitkImageStatisticsCalculationThread::QmitkImageStatisticsCalculationThread():QThread(),
   m_StatisticsImage(nullptr), m_BinaryMask(nullptr), m_PlanarFigureMask(nullptr), m_TimeStep(0),
-  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(1.0), m_UseDefaultBinSize(true)
+  m_IgnoreZeros(false), m_CalculationSuccessful(false), m_StatisticChanged(false), m_HistogramBinSize(10.0), m_UseDefaultNBins(true), m_nBinsForHistogramStatistics(100), m_prioritizeNBinsOverBinSize(true)
 {
 }
 
@@ -51,9 +54,9 @@ void QmitkImageStatisticsCalculationThread::Initialize( mitk::Image::Pointer ima
     this->m_PlanarFigureMask = planarFig->Clone();
 }
 
-void QmitkImageStatisticsCalculationThread::SetUseDefaultBinSize(bool useDefault)
+void QmitkImageStatisticsCalculationThread::SetUseDefaultNBins(bool useDefault)
 {
-    m_UseDefaultBinSize = useDefault;
+    m_UseDefaultNBins = useDefault;
 }
 
 void QmitkImageStatisticsCalculationThread::SetTimeStep( int times )
@@ -66,7 +69,7 @@ int QmitkImageStatisticsCalculationThread::GetTimeStep()
   return this->m_TimeStep;
 }
 
-std::vector<mitk::ImageStatisticsCalculator::Statistics> QmitkImageStatisticsCalculationThread::GetStatisticsData()
+std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> QmitkImageStatisticsCalculationThread::GetStatisticsData()
 {
   return this->m_StatisticsVector;
 }
@@ -89,11 +92,23 @@ bool QmitkImageStatisticsCalculationThread::GetIgnoreZeroValueVoxel()
 void QmitkImageStatisticsCalculationThread::SetHistogramBinSize(double size)
 {
   this->m_HistogramBinSize = size;
+  this->m_prioritizeNBinsOverBinSize = false;
 }
 
-double QmitkImageStatisticsCalculationThread::GetHistogramBinSize()
+double QmitkImageStatisticsCalculationThread::GetHistogramBinSize() const
 {
   return this->m_HistogramBinSize;
+}
+
+void QmitkImageStatisticsCalculationThread::SetHistogramNBins(double size)
+{
+  this->m_nBinsForHistogramStatistics = size;
+  this->m_prioritizeNBinsOverBinSize = true;
+}
+
+double QmitkImageStatisticsCalculationThread::GetHistogramNBins() const
+{
+  return this->m_nBinsForHistogramStatistics;
 }
 
 std::string QmitkImageStatisticsCalculationThread::GetLastErrorMessage()
@@ -127,8 +142,7 @@ void QmitkImageStatisticsCalculationThread::run()
 
   if(this->m_StatisticsImage.IsNotNull())
   {
-    calculator->SetImage(m_StatisticsImage);
-    calculator->SetMaskingModeToNone();
+    calculator->SetInputImage(m_StatisticsImage);
   }
   else
   {
@@ -142,14 +156,16 @@ void QmitkImageStatisticsCalculationThread::run()
   {
     if(this->m_BinaryMask.IsNotNull())
     {
-
-      calculator->SetImageMask(m_BinaryMask);
-      calculator->SetMaskingModeToImage();
+      mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
+      imgMask->SetImageMask(m_BinaryMask);
+      calculator->SetMask(imgMask.GetPointer());
     }
     if(this->m_PlanarFigureMask.IsNotNull())
     {
-      calculator->SetPlanarFigure(m_PlanarFigureMask);
-      calculator->SetMaskingModeToPlanarFigure();
+      mitk::PlanarFigureMaskGenerator::Pointer pfMaskGen = mitk::PlanarFigureMaskGenerator::New();
+      pfMaskGen->SetInputImage(m_StatisticsImage);
+      pfMaskGen->SetPlanarFigure(m_PlanarFigureMask);
+      calculator->SetMask(pfMaskGen.GetPointer());
     }
   }
   catch( const itk::ExceptionObject& e)
@@ -157,18 +173,61 @@ void QmitkImageStatisticsCalculationThread::run()
     MITK_ERROR << "ITK Exception:" << e.what();
     statisticCalculationSuccessful = false;
   }
+  catch( const mitk::Exception& e )
+  {
+    MITK_ERROR<< "MITK Exception: " << e.what();
+    statisticCalculationSuccessful = false;
+  }
+  catch ( const std::runtime_error &e )
+  {
+    MITK_ERROR<< "Runtime Exception: " << e.what();
+    statisticCalculationSuccessful = false;
+  }
+  catch ( const std::exception &e )
+  {
+    //m_message = "Failure: " + std::string(e.what());
+    MITK_ERROR<< "Standard Exception: " << e.what();
+    statisticCalculationSuccessful = false;
+  }
+
   bool statisticChanged = false;
 
-  calculator->SetDoIgnorePixelValue(this->m_IgnoreZeros);
-  calculator->SetIgnorePixelValue(0);
-  calculator->SetHistogramBinSize( m_HistogramBinSize );
-  calculator->SetUseDefaultBinSize( m_UseDefaultBinSize );
+  if (this->m_IgnoreZeros)
+  {
+      mitk::IgnorePixelMaskGenerator::Pointer ignorePixelValueMaskGen = mitk::IgnorePixelMaskGenerator::New();
+      ignorePixelValueMaskGen->SetIgnoredPixelValue(0);
+      ignorePixelValueMaskGen->SetInputImage(m_StatisticsImage);
+      calculator->SetSecondaryMask(ignorePixelValueMaskGen.GetPointer());
+  }
+  else
+  {
+      calculator->SetSecondaryMask(nullptr);
+  }
+
+  if (m_UseDefaultNBins)
+  {
+      calculator->SetNBinsForHistogramStatistics(100);
+  }
+  else
+  {
+      if (!m_prioritizeNBinsOverBinSize)
+      {
+          calculator->SetBinSizeForHistogramStatistics(m_HistogramBinSize);
+      }
+      else
+      {
+          calculator->SetNBinsForHistogramStatistics(100);
+      }
+  }
+
+  //calculator->SetHistogramBinSize( m_HistogramBinSize );
+  //calculator->SetUseDefaultBinSize( m_UseDefaultBinSize );
 
   for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
   {
     try
     {
-      statisticChanged = calculator->ComputeStatistics(i);
+      calculator->GetStatistics(i);
     }
     catch ( mitk::Exception& e)
     {
@@ -201,9 +260,7 @@ void QmitkImageStatisticsCalculationThread::run()
     for (unsigned int i = 0; i < m_StatisticsImage->GetTimeSteps(); i++)
     {
       this->m_StatisticsVector.push_back(calculator->GetStatistics(i));
-      this->m_HistogramVector.push_back((HistogramType*)calculator->GetHistogram(i));
+      this->m_HistogramVector.push_back((HistogramType*)this->m_StatisticsVector[i]->GetHistogram());
     }
   }
-
-  m_HistogramBinSize = calculator->GetHistogramBinSize();
 }

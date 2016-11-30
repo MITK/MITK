@@ -155,6 +155,18 @@ namespace mitk
                                             BaseRenderer *ren);
 
     /**
+     * @brief UpdateStatusBar
+     * @param image3D
+     * @param idx
+     * @param time
+     * @param component If the PixelType of image3D is a vector (for example a 2D velocity vector), then only one of the vector components can be
+     * displayed at once. Setting this parameter will determine which of the vector's components will be used to determine the displayed PixelValue.
+     * Set this to 0 for scalar images
+     */
+    void UpdateStatusBar(itk::SmartPointer<mitk::Image> image3D, itk::Index<3> idx, TimeStepType time=0, int component=0);
+
+
+    /**
      * \brief Coordinate of the pointer at begin of an interaction translated to mm unit
      */
     mitk::Point2D m_StartCoordinateInMM;
@@ -170,6 +182,8 @@ namespace mitk
      * \brief Current coordinates of the pointer.
      */
     mitk::Point2D m_CurrentDisplayCoordinate;
+
+
     /**
      * \brief Modifier that defines how many slices are scrolled per pixel that the mouse has moved
      *

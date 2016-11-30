@@ -14,9 +14,10 @@
 
  ===================================================================*/
 
-#include "MiniAppManager.h"
+//#include "MiniAppManager.h"
 
-#include "ctkCommandLineParser.h"
+//#include "ctkCommandLineParser.h"
+#include "mitkCommandLineParser.cpp"
 #include "mitkImage.h"
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkIOUtil.h"
@@ -49,6 +50,7 @@ int ExtractImageStatistics(int argc, char* argv[])
     std::cout << parser.helpText();
     return EXIT_SUCCESS;
   }
+
 
   // Parameters:
   bool ignoreZeroValues = false;

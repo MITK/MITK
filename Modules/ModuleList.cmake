@@ -20,12 +20,12 @@ set(mitk_modules
   PlanarFigure
   ImageDenoising
   ImageExtraction
-  ImageStatistics
   LegacyAdaptors
   SceneSerialization
   Gizmo
   GraphAlgorithms
   Multilabel
+  ImageStatistics
   ContourModel
   SurfaceInterpolation
   Segmentation
@@ -33,7 +33,7 @@ set(mitk_modules
   OpenViewCore
   QtWidgets
   QtWidgetsExt
-  QtWidgetsWeb
+  C3js
   QmlItems
   SegmentationUI
   DiffusionImaging

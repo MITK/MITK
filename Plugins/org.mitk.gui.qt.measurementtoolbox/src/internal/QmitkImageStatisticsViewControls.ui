@@ -167,6 +167,9 @@
         <property name="rowCount">
          <number>14</number>
         </property>
+        <property name="columnCount">
+         <number>1</number>
+        </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
         </attribute>
@@ -360,8 +363,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>150</width>
-       <height>160</height>
+       <width>400</width>
+       <height>450</height>
       </size>
      </property>
      <property name="title">
@@ -461,6 +464,16 @@
           </widget>
          </item>
          <item>
+          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
+           <property name="text">
+            <string>Show Subchart</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QFrame" name="m_BinSizeFrame">
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -484,7 +497,7 @@
             <property name="spacing">
              <number>0</number>
             </property>
-            <item row="0" column="0">
+            <item row="1" column="0">
              <widget class="QLabel" name="m_HistogramBinSizeCaptionLabel">
               <property name="minimumSize">
                <size>
@@ -503,7 +516,7 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="1">
+            <item row="1" column="1">
              <widget class="QDoubleSpinBox" name="m_HistogramBinSizeSpinbox">
               <property name="toolTip">
                <string>Press enter to recalculate statistics with new bin size.</string>
@@ -521,7 +534,7 @@
                <double>1000000.000000000000000</double>
               </property>
               <property name="value">
-               <double>10.000000000000000</double>
+               <double>100.000000000000000</double>
               </property>
              </widget>
             </item>
@@ -533,10 +546,16 @@
       </item>
       <item>
        <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QmitkHistogramJSWidget" name="m_JSHistogram">
+        <widget class="QmitkC3jsWidget" name="m_JSHistogram">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -585,8 +604,8 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>413</width>
+             <height>17</height>
             </size>
            </property>
           </spacer>
@@ -614,10 +633,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkHistogramJSWidget</class>
+   <class>QmitkC3jsWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkHistogramJSWidget.h</header>
-   <container>1</container>
+   <header location="global">QmitkC3jsWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

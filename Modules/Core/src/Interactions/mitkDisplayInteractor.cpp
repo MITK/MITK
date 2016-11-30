@@ -69,6 +69,7 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("setCrosshair", SetCrosshair);
 
   CONNECT_FUNCTION("updateStatusbar", UpdateStatusbar)
+
   CONNECT_FUNCTION("startRotation", StartRotation);
   CONNECT_FUNCTION("endRotation", EndRotation);
   CONNECT_FUNCTION("rotate", Rotate);

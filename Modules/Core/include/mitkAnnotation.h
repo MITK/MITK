@@ -25,18 +25,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  class AbstractAnnotationLayouter;
-
-  /** \brief Base class for all Annotation */
-  /** This class is to be implemented in order to create Annotation which are managed by the AnnotationManager and can be
-  placed by a AbstractAnnotationLayouter.
-  This class contains an internal Propertylist, and another PropertyList for each BaseRenderer.
-  A property that is specified for a specific renderer always overrides the general internal property of the same name.
-  AddAnnotation, RemoveAnnotation and UpdateAnnotation methods have to be implemented.*/
+  /** \brief Base class for all Annotation
+   * This class is to be implemented in order to create Annotation which are managed by a AbstractAnnotationRenderer.
+   * This class contains an internal Propertylist for configuring the appearance of the implemented Overlay. */
   class MITKCORE_EXPORT Annotation : public itk::Object
   {
-    friend class AbstractAnnotationLayouter;
-
   public:
     /** \brief Container for position and size on the display.*/
     struct Bounds
@@ -361,11 +354,13 @@ namespace mitk
     */
     void SetVisibility(bool visible, const std::string &propertyKey = "visible");
 
-    /** \brief Adds the Annotation to the specified renderer. Update Annotation should be called soon in order to apply all
+    /** \brief Adds the Annotation to the specified renderer. Update Annotation should be called soon in order to apply
+     * all
      * properties*/
     virtual void AddToBaseRenderer(BaseRenderer *renderer) = 0;
 
-    /** \brief Adds the Annotation to the specified renderer. Update Annotation should be called soon in order to apply all
+    /** \brief Adds the Annotation to the specified renderer. Update Annotation should be called soon in order to apply
+     * all
      * properties*/
     virtual void AddToRenderer(BaseRenderer *renderer, vtkRenderer *vtkrenderer) = 0;
 
@@ -452,9 +447,6 @@ namespace mitk
 
     /** \brief assignment operator */
     Annotation &operator=(const Annotation &);
-
-    /** \brief Reference to the layouter in which this Annotation is managed. */
-    AbstractAnnotationLayouter *m_LayoutedBy;
 
   private:
     us::ServiceRegistration<Self> m_ServiceRegistration;

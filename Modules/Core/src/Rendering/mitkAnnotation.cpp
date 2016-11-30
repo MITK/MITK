@@ -24,10 +24,11 @@ const std::string mitk::Annotation::US_PROPKEY_MODIFIED = US_INTERFACE_NAME + ".
 const std::string mitk::Annotation::US_PROPKEY_RENDERER_ID = US_INTERFACE_NAME + ".rendererId";
 const std::string mitk::Annotation::US_PROPKEY_AR_ID = US_INTERFACE_NAME + ".arId";
 
-mitk::Annotation::Annotation() : m_LayoutedBy(nullptr), m_PropertyListModifiedObserverTag(0)
+mitk::Annotation::Annotation() : m_PropertyListModifiedObserverTag(0)
 {
   m_PropertyList = mitk::PropertyList::New();
-  itk::MemberCommand<mitk::Annotation>::Pointer _PropertyListModifiedCommand = itk::MemberCommand<mitk::Annotation>::New();
+  itk::MemberCommand<mitk::Annotation>::Pointer _PropertyListModifiedCommand =
+    itk::MemberCommand<mitk::Annotation>::New();
   _PropertyListModifiedCommand->SetCallbackFunction(this, &mitk::Annotation::PropertyListModified);
   m_PropertyListModifiedObserverTag = m_PropertyList->AddObserver(itk::ModifiedEvent(), _PropertyListModifiedCommand);
   this->SetName(this->GetNameOfClass());
@@ -72,8 +73,8 @@ void mitk::Annotation::ReplaceProperty(const std::string &propertyKey, const Bas
 }
 
 void mitk::Annotation::AddProperty(const std::string &propertyKey,
-                                const BaseProperty::Pointer &propertyValue,
-                                bool overwrite)
+                                   const BaseProperty::Pointer &propertyValue,
+                                   bool overwrite)
 {
   if ((overwrite) || (GetProperty(propertyKey) == NULL))
   {
@@ -280,7 +281,8 @@ void mitk::Annotation::SetVisibility(bool visible, const std::string &propertyKe
   Modified();
 }
 
-bool mitk::Annotation::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer, mitk::Annotation *Annotation)
+bool mitk::Annotation::BaseLocalStorage::IsGenerateDataRequired(mitk::BaseRenderer *renderer,
+                                                                mitk::Annotation *Annotation)
 {
   if (m_LastGenerateDataTime < Annotation->GetMTime())
     return true;

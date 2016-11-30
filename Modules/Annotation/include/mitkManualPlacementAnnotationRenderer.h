@@ -25,12 +25,15 @@ namespace mitk
 {
   class BaseRenderer;
 
-  /** \brief The ManualPlacementAnnotationRenderer updates and manages Annotation and the respective Layouters. */
-  /** An Instance of the ManualPlacementAnnotationRenderer can be registered to several BaseRenderer instances in order
-   * to
-   * call the update method of each Annotation during the rendering phase of the renderer.
+  /** \brief The ManualPlacementAnnotationRenderer is used for the simple placement of mitk::Annotation Objects.
+   *
+   * An instance of this service is registered for a specific Baserenderer and is used to manage all annotations which
+   * are added to it.
+   * The static function AddAnnotation is used to register an annotation to a specific service and to create this
+   * service if it does not exist yet.
+   *
    * See \ref AnnotationPage for more info.
-  */
+   **/
   class MITKANNOTATION_EXPORT ManualPlacementAnnotationRenderer : public AbstractAnnotationRenderer
   {
   public:

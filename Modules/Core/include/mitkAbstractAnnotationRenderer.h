@@ -28,14 +28,9 @@ namespace mitk
 {
   class BaseRenderer;
 
-  /** @brief Baseclass of Annotation layouters */
-  /**
-   *A AbstractAnnotationRenderer can be implemented to control a set of Annotation by means of position and size.
-   *AbstractAnnotationRenderer::PrepareLayout() should be implemented with a routine to set the position of the internal
-   *m_ManagedAnnotation List.
-   *A layouter is always connected to one BaseRenderer, so there is one instance of the layouter for each BaseRenderer.
-   *One type of layouter should always have a unique identifier.
-   *@ingroup Annotation
+  /** @brief Baseclass of Annotation layouters
+   * An AbstractAnnotationRenderer can be implemented to control a set of Annotation by means of position and size.
+   * @ingroup Annotation
   */
   class MITKCORE_EXPORT AbstractAnnotationRenderer : public us::ServiceTracker<Annotation>
   {
@@ -55,7 +50,6 @@ namespace mitk
     void RemoveAllAnnotation();
 
     void Update();
-
     static const std::string US_INTERFACE_NAME;
     static const std::string US_PROPKEY_ID;
     static const std::string US_PROPKEY_RENDERER_ID;

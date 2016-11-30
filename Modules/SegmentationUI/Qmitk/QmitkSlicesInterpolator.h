@@ -242,6 +242,8 @@ private:
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;
+    void WaitForFutures();
+    void nodeRemoved(const mitk::DataNode* node);
 
   mitk::FeatureBasedEdgeDetectionFilter::Pointer m_EdgeDetector;
   mitk::PointCloudScoringFilter::Pointer m_PointScorer;

@@ -153,11 +153,6 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   // do image processing before displaying it
   if (image.IsNotNull())
   {
-
-    // first, we compensate using our ImageEnergyValue
-
-    // dooooooooit
-
     // now apply BmodeFilter and/or scattering compensation to the image, if the option has been selected.
     if ((m_CompensateForScattering || m_UseBModeFilter) && m_DataType == DataType::Beamformed_Short)
     {
@@ -173,11 +168,16 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
         imageCopy->SetGeometry(image->GetGeometry());
         mitk::ImageReadAccessor inputReadAccessorCopy(image, image->GetSliceData(0));
         imageCopy->SetSlice(inputReadAccessorCopy.GetData(), 0);
+
+        // first, we compensate using our ImageEnergyValue
+        imageCopy = MultiplyImage(imageCopy, 40*1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
+        // the we apply the BModeFilter
         if (m_UseBModeFilter)
         {
           image = ApplyBmodeFilter(image, true, m_VerticalSpacing);
           imageCopy = ApplyBmodeFilter(imageCopy, false, m_VerticalSpacing);
         }
+        // and finally the scattering corrections
         if (m_CompensateForScattering)
         {
           // update the fluence reference images!
@@ -325,6 +325,21 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Poi
 
   resampleImageFilter->UpdateLargestPossibleRegion();
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
+}
+
+mitk::Image::Pointer mitk::USDiPhASImageSource::MultiplyImage(mitk::Image::Pointer inputImage, double value)
+{
+  typedef itk::Image< float, 3 > itkFloatImageType;
+  typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
+
+  itkFloatImageType::Pointer itkImage;
+  mitk::CastToItkImage(inputImage, itkImage);
+
+  MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
+  multiplyFilter->SetInput1(itkImage);
+  multiplyFilter->SetConstant(value);
+
+  return mitk::GrabItkImageMemory(multiplyFilter->GetOutput());
 }
 
 void mitk::USDiPhASImageSource::ImageDataCallback(

@@ -131,6 +131,7 @@ protected:
   mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, float resampleSpacing = 0.15);
   mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
   mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
+  mitk::Image::Pointer MultiplyImage(mitk::Image::Pointer inputImage, double value);
 
   void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
   void OrderImagesUltrasound(Image::Pointer SoundImage);

@@ -76,6 +76,12 @@ namespace mitk {
     std::vector<double>           m_PulseTime;
     std::vector<int>              m_PulseStatus;
     std::vector<long long>        m_TimeStamps;
+
+    std::vector<double>           m_PulseEnergySaved;
+    std::vector<double>           m_PulseTimeSaved;
+    std::vector<int>              m_PulseStatusSaved;
+    std::vector<long long>        m_TimeStampsSaved;
+
     double                        m_CurrentWavelength;
     double                        m_CurrentEnergyRange;
     long long                     m_ImagePyroDelay;

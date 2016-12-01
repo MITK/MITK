@@ -154,7 +154,7 @@ void mitk::USDiPhASDevice::OnFreeze(bool freeze)
 void mitk::USDiPhASDevice::UpdateScanmode()
 {
   OnFreeze(true);
-
+  SetInterleaved(m_Interleaved); // update the beamforming parameters...
   UpdateTransmitEvents();
 
   if (!(dynamic_cast<mitk::USDiPhASCustomControls*>(this->m_ControlInterfaceCustom.GetPointer())->GetSilentUpdate()))

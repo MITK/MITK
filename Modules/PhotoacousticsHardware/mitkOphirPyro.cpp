@@ -95,7 +95,7 @@ void mitk::OphirPyro::SaveCsvData()
 
   for (int index = 0; index < currentSize; ++index)
   {
-    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergy.at(index) << "," << (long)m_PulseTime.at(index);
+    timestampFile << "\n" << index << "," << m_TimeStamps.at(index) << ","<< m_PulseEnergySaved.at(index) << "," << (long)m_PulseTimeSaved.at(index);
   }
   timestampFile.close();
 }
@@ -139,7 +139,10 @@ unsigned int mitk::OphirPyro::GetDataFromSensor()
 
         m_PulseTime.insert(m_PulseTime.end(), newTimestamp.begin(), newTimestamp.end());
         m_PulseStatus.insert(m_PulseStatus.end(), newStatus.begin(), newStatus.end());
-        MITK_INFO << "Data";
+
+        m_PulseEnergySaved.insert(m_PulseEnergySaved.end(), newEnergy.begin(), newEnergy.end());
+        m_PulseTimeSaved.insert(m_PulseTimeSaved.end(), newTimestamp.begin(), newTimestamp.end());
+        m_PulseStatusSaved.insert(m_PulseStatusSaved.end(), newStatus.begin(), newStatus.end());
       }
     }
     catch (std::exception& ex)

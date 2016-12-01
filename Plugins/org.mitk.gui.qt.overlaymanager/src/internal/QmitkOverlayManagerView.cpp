@@ -431,13 +431,12 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
 
 void QmitkOverlayManagerView::OnDelete()
 {
-  auto items = m_Controls.m_OverlayList->selectedItems();
-  if (items.count() < 1)
-    return;
-  mitk::Annotation *overlay = nullptr;
-  QListWidgetItem *item = items[0];
-  if (item)
-    overlay = reinterpret_cast<mitk::Annotation *>(item->data(Qt::UserRole).value<void *>());
+  if (m_SelectedOverlay.IsNotNull())
+  {
+    m_OverlayMap.erase(m_SelectedOverlay->GetMicroserviceID());
+    m_SelectedOverlay->Delete();
+    OnActivateOverlayList();
+  }
 }
 
 void QmitkOverlayManagerView::OnAddOverlay()

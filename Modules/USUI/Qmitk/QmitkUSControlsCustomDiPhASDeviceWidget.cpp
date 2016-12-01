@@ -173,6 +173,11 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnScatteringCoefficientChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnCompensateScatteringChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+  if (ui->CompensateScattering->isChecked())
+    ui->ScatteringCoefficient->setEnabled(true);
+  else
+    ui->ScatteringCoefficient->setEnabled(false);
+
   m_ControlInterface->SetCompensateScattering(ui->CompensateScattering->isChecked());
 }
 

@@ -119,7 +119,7 @@ protected:
 
   std::vector<Image::Pointer>           m_FluenceCompOriginal;
   std::vector<Image::Pointer>           m_FluenceCompResized;
-  std::vector<double*>                  m_FluenceCompRaw;
+  std::vector<itk::Image<float, 3>::Pointer>     m_FluenceCompResizedItk;
 
   std::vector<mitk::Image::Pointer>     m_ImageBuffer;
   int                                   m_LastWrittenImage;

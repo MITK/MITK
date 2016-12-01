@@ -1,27 +1,24 @@
 /**
-\page AnnotationModulePage Overlays and Annotations Module
+\page AnnotationModulePage Annotation Module
 
 \tableofcontents
 
-\section AnnotationModulePage_Introduction Overlays and Annotations
+\section AnnotationModulePage_Introduction Annotations
 
-The overlays in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Overlay represents an arbitrary
+The annotations in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Annotation represents an arbitrary
 2D or 3D object that can be rendered as an overlay. This can for example be used for the annotation of 3D points or to overlay despriptions in the window corners.
-The mitk::OverlayManager is used to add the overlays to the renderwindows, updating them and manage the respective layout managers.
-The following features are implemented in this framework.
+Instances of the MicroService mitk::AbstractAnnotationRenderer are used to add the annotations to the renderwindows, updating them and depending on their implementation, organize them in a layout.
+This module contains implementations for mitk::AbstractAnnotationRenderer as well as mitk::Annotation. Currently, the following features are realized within the Annotation module.
 <ol>
-  <li>Definition of graphical elements that can be displayed in the render windows.
-  <li>It is possible to manage multiple elements in each window.
-  <li>A single Overlay can be rendered on any number of available render windows.
-  <li>2D and 3D textelements are already defined in the Overlay module and are using VTK to create custom annotations.
-  <li>The mitk::BaseLayouter interface enables the implementation of layout managers, to handle the placement of the overlays.
+  <li>2D and 3D textelements are already defined in the Annotation module and are using VTK to create custom annotations.
+  <li>2D and 3D annotations can be placed freely by providing a display position
+  <li>2D annotations can be placed in a layout, which organizes the annotations in the display corners.
 </ol>
 
-\section AnnotationModulePage_ArchitectureSection General Architecture
 \section AnnotationModulePage_UsageSection Usage of Predefined Overlays
 
-\subsection AnnotationModulePage_TextWidget2DUsageSubsection mitkTextOverlay2D
-This exemplary overlay can render UTF-8 encoded text as a 2D Overlay. The Overlay2DLayouter can be used to automatically place a group of overlays to a
+\subsection AnnotationModulePage_TextWidget2DUsageSubsection mitkTextAnnotation2D
+This exemplary overlay can render text as a 2D Overlay. The Overlay2DLayouter can be used to automatically place a group of overlays to a
 specific corner.
 \snippet OverlayExample.cpp TextOverlay2D
 \snippet OverlayExample.cpp SetLayouterToOverlay

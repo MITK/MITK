@@ -46,6 +46,13 @@ mitk::LogoAnnotation::LogoAnnotation()
 
 mitk::LogoAnnotation::~LogoAnnotation()
 {
+  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
+  {
+    if (renderer)
+    {
+      this->RemoveFromBaseRenderer(renderer);
+    }
+  }
 }
 
 mitk::LogoAnnotation::LocalStorage::~LocalStorage()

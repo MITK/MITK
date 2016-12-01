@@ -37,6 +37,13 @@ mitk::ColorBarAnnotation::ColorBarAnnotation()
 
 mitk::ColorBarAnnotation::~ColorBarAnnotation()
 {
+  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
+  {
+    if (renderer)
+    {
+      this->RemoveFromBaseRenderer(renderer);
+    }
+  }
 }
 
 mitk::ColorBarAnnotation::LocalStorage::~LocalStorage()

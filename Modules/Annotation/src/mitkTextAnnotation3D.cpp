@@ -37,6 +37,13 @@ mitk::TextAnnotation3D::TextAnnotation3D()
 
 mitk::TextAnnotation3D::~TextAnnotation3D()
 {
+  for (BaseRenderer *renderer : m_LSH.GetRegisteredBaseRenderer())
+  {
+    if (renderer)
+    {
+      this->RemoveFromBaseRenderer(renderer);
+    }
+  }
 }
 
 mitk::TextAnnotation3D::LocalStorage::~LocalStorage()

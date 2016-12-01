@@ -434,7 +434,7 @@ void QmitkOverlayManagerView::OnDelete()
   if (m_SelectedOverlay.IsNotNull())
   {
     m_OverlayMap.erase(m_SelectedOverlay->GetMicroserviceID());
-    m_SelectedOverlay->Delete();
+    m_SelectedOverlay = nullptr;
     OnActivateOverlayList();
   }
 }

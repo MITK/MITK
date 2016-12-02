@@ -74,6 +74,7 @@ set(mitk_modules
   MatchPointRegistration
   MatchPointRegistrationUI
   BoundingShape
+  RenderWindowManager
 )
 
 if(MITK_ENABLE_PIC_READER)

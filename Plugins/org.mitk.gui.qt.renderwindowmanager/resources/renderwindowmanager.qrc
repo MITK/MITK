@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.renderwindowmanager">
+        <file>LayerManager_48.png</file>
+    </qresource>
+</RCC>

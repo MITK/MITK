@@ -29,11 +29,6 @@ mitk::DataInteractor::DataInteractor()
 
 mitk::DataInteractor::~DataInteractor()
 {
-  if (m_DataNode.IsNotNull())
-  {
-    if (m_DataNode->GetDataInteractor() == this)
-      m_DataNode->SetDataInteractor(nullptr);
-  }
 }
 
 mitk::DataNode* mitk::DataInteractor::GetDataNode() const

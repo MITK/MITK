@@ -79,10 +79,12 @@ int main(int argc, char *argv[])
 
   std::string rendererID = renderWindow.GetRenderer()->GetName();
 
+  // The LayoutAnnotationRenderer can place the TextAnnotation2D at some defined corner positions
   mitk::LayoutAnnotationRenderer::AddAnnotation(
     textAnnotation, rendererID, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  //![TextAnnotation2D]
 
-  //! [TextAnnotation3D]
+  //![TextAnnotation3D]
   mitk::PointSet::Pointer pointset = mitk::PointSet::New();
 
   // This vector is used to define an offset for the annotations, in order to show them with a margin to the actual

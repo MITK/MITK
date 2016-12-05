@@ -6,7 +6,7 @@
 \section AnnotationModulePage_Introduction Annotations
 
 The annotations in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Annotation represents an arbitrary
-2D or 3D object that can be rendered as an overlay. This can for example be used for the annotation of 3D points or to overlay despriptions in the window corners.
+2D or 3D object that can be rendered as an Annotation. This can for example be used for the annotation of 3D points or to Annotation despriptions in the window corners.
 Instances of the MicroService mitk::AbstractAnnotationRenderer are used to add the annotations to the renderwindows, updating them and depending on their implementation, organize them in a layout.
 This module contains implementations for mitk::AbstractAnnotationRenderer as well as mitk::Annotation. Currently, the following features are realized within the Annotation module.
 <ol>
@@ -15,37 +15,31 @@ This module contains implementations for mitk::AbstractAnnotationRenderer as wel
   <li>2D annotations can be placed in a layout, which organizes the annotations in the display corners.
 </ol>
 
-\section AnnotationModulePage_UsageSection Usage of Predefined Overlays
+\section AnnotationModulePage_UsageSection Usage of Predefined Annotations
 
 \subsection AnnotationModulePage_TextWidget2DUsageSubsection mitkTextAnnotation2D
-This exemplary overlay can render text as a 2D Overlay. The Overlay2DLayouter can be used to automatically place a group of overlays to a
-specific corner.
-\snippet OverlayExample.cpp TextOverlay2D
-\snippet OverlayExample.cpp SetLayouterToOverlay
+This exemplary Annotation can render text as a 2D Annotation which can be placed with the LayoutAnnotationRenderer
+\snippet AnnotationExample.cpp TextAnnotation2D
 
-\subsection AnnotationModulePage_TextWidget3DUsageSubsection mitkTextOverlay3D
-This overlay displays labels in 3D coordinates. The labels always face the camera.
+\subsection AnnotationModulePage_TextWidget3DUsageSubsection mitkTextAnnotation3D
+This Annotation displays labels in 3D coordinates. The labels always face the camera.
 
-\snippet OverlayExample.cpp TextOverlay3D
+\snippet AnnotationExample.cpp TextAnnotation3D
 
-\subsection AnnotationModulePage_NotManagedSubsection Manually Managed Overlays
-In order to integrate an Overlay into an mitk::Mapper, it is advised not to use the OverlayManager but to manually manage the Overlay.
-To do so, the update methods of the overlays have to be called manually before the start of each rendering procedure. It must only be called if the Properties have changed or if your custom overlay implements its own rendering mechanism.
+\section AnnotationModulePage_CustomAnnotationSection Implement a Custom Annotation
 
-\section AnnotationModulePage_CustomOverlaySection Implement a Custom Overlay
-
-A new custom Overlay should derive from mitkOverlay or one of the later mentioned subclasses VtkOverlay2D oder VtkOverlay3D. There should always be an implementation for the methods
-AddOverlay, RemoveOverlay and Update Overlay.
-UpdateOverlay is the procedure that is called in each rendering step. If the Overlay is rendered by VTK, this method only applies the properties to the representation.
-If the custom Overlay requires additional properties, they should be made accessible by getters and setters for a better usability:
+A new custom Annotation should derive from mitkAnnotation or one of the later mentioned subclasses VtkAnnotation2D oder VtkAnnotation3D. There should always be an implementation for the methods
+AddToBaseRenderer, AddToRenderer, RemoveFromBaseRenderer RemoveFromRenderer and Update.
+UpdateAnnotation is the procedure that is called when the Annotation properties have changed. If the Annotation is rendered by VTK, this method only applies the properties to the representation.
+If the custom Annotation requires additional properties, they should be made accessible by getters and setters for a better usability:
 \code
-void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
+void mitk::VtkAnnotation3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
 {
   mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
   SetProperty("Position3D", position3dProperty,renderer);
 }
 
-mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
+mitk::Point3D mitk::VtkAnnotation3D::GetPosition3D(mitk::BaseRenderer *renderer)
 {
   mitk::Point3D position3D;
   GetPropertyValue<mitk::Point3D>("Position3D", position3D, renderer);
@@ -53,27 +47,15 @@ mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
 }
 \endcode
 
-\subsection AnnotationModulePage_CustomVTK2DOverlaySubsection VTK 2D Overlay
+\subsection AnnotationModulePage_CustomVTK2DAnnotationSubsection VTK 2D Annotation
 
-VTK based overlays which are meant to be displayed in 2D over the render window should derive from the mitk::VtkOverlay2D.
-The mitk::VtkOverlay2D is a subclass of Vtk::Overlay, that uses VTK to render the overlay. This class creates the Overlay representation as a vtkActor2D, and is very easy to implement
-because only UpdateVtkOverlay2D and GetVtkActor2D have to be implemented. The add, update and remove methods are implemented in the superclasses.
-UpdateVtkOverlay2D only needs to apply the specific properties and GetVtkActor2D simply returns the created vtkActor.
+VTK based Annotations which are meant to be displayed in 2D over the render window should derive from the mitk::VtkAnnotation2D.
+The mitk::VtkAnnotation2D is a subclass of Vtk::Annotation, that uses VTK to render the Annotation. This class creates the Annotation representation as a vtkActor2D, and is very easy to implement
+because only UpdateVtkAnnotation2D and GetVtkActor2D have to be implemented. The add, update and remove methods are implemented in the superclasses.
+UpdateVtkAnnotation2D only needs to apply the specific properties and GetVtkActor2D simply returns the created vtkActor.
 
-\subsection AnnotationModulePage_CustomVTK3DOverlaySubsection VTK 3D Overlay
+\subsection AnnotationModulePage_CustomVTK3DAnnotationSubsection VTK 3D Annotation
 
-The mitkVtkOverlay3D works just like mitkVtkOverlay2D, but it is designed for arbitrary 3D objects which derive from vtkProp,
-
-\section AnnotationModulePage_CustomLayouterSection Implement a Custom Layouter
-
-A Layouter is used for an automatic positioning of a group of Overlays and is derived from mitkBaseLayouter. Every Layouter that manages a group of Layouts should have a unique identifier
-which is used to register the Layouter in the OverlayManager. A Layouter is always uniquely defined by the identifier and one BaseRenderer. Before a Layouter can be used by the
-OverlayManager it has to be added, using the AddLayouter Method. An Overlay can then be added to a Layout as follows:
-
-\code
-overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT,axialRenderer);
-\endcode
-
-A new Layouter has to implement PrepareLayout which should parse the internal Overlay list and set their position as required.
+The mitkVtkAnnotation3D works just like mitkVtkAnnotation2D, but it is designed for arbitrary 3D objects which derive from vtkProp,
 
 */

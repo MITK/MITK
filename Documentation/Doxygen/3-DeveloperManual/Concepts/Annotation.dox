@@ -1,123 +1,51 @@
 /**
-\page AnnotationPage Overlays and Annotations Concepts
+\page AnnotationPage Annotation Concept
 
 \tableofcontents
 
-\section AnnotationPage_Introduction Overlays and Annotations
+\section AnnotationPage_Introduction Annotations
 
-The overlays in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Overlay represents an arbitrary
-2D or 3D object that can be rendered as an overlay. This can for example be used for the annotation of 3D points or to overlay despriptions in the window corners.
-The mitk::OverlayManager is used to add the overlays to the renderwindows, updating them and manage the respective layout managers.
-The following features are implemented in this framework.
+The annotations in MITK are a simple way to display additional information on the render windows. A class, deriving from mitk::Annotation represents an arbitrary
+2D or 3D object that can be rendered as an Annotation. This can for example be used for the annotation of 3D points or to Annotation despriptions in the window corners.
+Instances of the MicroService mitk::AbstractAnnotationRenderer are used to add the annotations to the renderwindows, updating them and depending on their implementation, organize them in a layout.
+This module contains implementations for mitk::AbstractAnnotationRenderer as well as mitk::Annotation. Currently, the following features are realized within the Annotation module.
 <ol>
-  <li>Definition of graphical elements that can be displayed in the render windows.
-  <li>It is possible to manage multiple elements in each window.
-  <li>A single Overlay can be rendered on any number of available render windows.
-  <li>2D and 3D textelements are already defined in the Overlay module and are using VTK to create custom annotations.
-  <li>The mitk::BaseLayouter interface enables the implementation of layout managers, to handle the placement of the overlays.
+  <li>2D and 3D textelements are already defined in the Annotation module and are using VTK to create custom annotations.
+  <li>2D and 3D annotations can be placed freely by providing a display position
+  <li>2D annotations can be placed in a layout, which organizes the annotations in the display corners.
 </ol>
-
 \section AnnotationPage_ArchitectureSection General Architecture
 
-\dot
-digraph linker_deps {
-  node [shape=record, fontname=Helvetica, fontsize=10];
-  BR [ label="BaseRenderer" ];
-  BL [ label="{BaseLayouter|+ArrangeOverlays()}" ];
-  O [ label="{Overlay|-PropertyList|+RemoveOverlay(BaseRenderer*)\n+UpdateOverlay(BaseRenderer*)\n+RemoveOverlay(BaseRenderer*)}" ];
-  OM [ label="{OverlayManager|+AddOverlay(Overlay*)\n+RemoveOverlay(Overlay*)}" ];
-  TO [ label="TextOverlay" ];
-  VTKO [ label="{vtkOverlay|#GetVtkActor()}" ];
-  TO -> VTKO;
-  VTKO -> O;
-  OM -> O [style="dashed",label="manages"];
-  OM -> BL [style="dashed"];
-  OM -> BR [style="dashed"];
-  BR -> OM [style="dashed"];
-}
-\enddot
+The mitk::Annotation can be implemented using a custom rendering framework like VTK. In this diagram, the vtkAnnotation is shown as the superclass for all Annotations which use the vtk framework for rendering.
+The AnnotationManager can be registered to several BaseRenderer instances in order to call the update method of each Annotation during the rendering phase of the renderer.
+It also manages the respective Layouters which are used to manage the placement of a group of Annotations.
 
-The mitk::Overlay can be implemented using a custom rendering framework like VTK. In this diagram, the vtkOverlay is shown as the superclass for all Overlays which use the vtk framework for rendering.
-The OverlayManager can be registered to several BaseRenderer instances in order to call the update method of each Overlay during the rendering phase of the renderer.
-It also manages the respective Layouters which are used to manage the placement of a group of Overlays.
+\subsection AnnotationPage_AnnotationSubsection Annotation
 
-\subsection AnnotationPage_OverlaySubsection Overlay
+The mitk::Annotation is an abstract class that can manage property lists like the mitk::DataNode and provides the interfaces to the methods
+AddToBaseRenderer, AddToRenderer, RemoveFromBaseRenderer RemoveFromRenderer and Update. The subclasses of the mitk::Annotation have to implement these methods
+in order to provide the functionallity of an Annotation. There are already a few implementations of mitk::Annotation which are using VTK as a rendering
+framework to display the Annotations. In order to show an Annotation, it has to be registered as a MicroService.
 
-The mitk::Overlay is an abstract class that can manage property lists like the mitk::DataNode and provides the interfaces to thr three methods
-mitk::Overlay::AddOverlay, mitk::Overlay::UpdateOverlay and mitk::Overlay::RemoveOverlay. The subclasses of the mitk::Overlay have to implement these methods
-in order to provide the functionallity of an overlay. There are already a few implementations of mitk::Overlay which are using VTK as a rendering
-framework to display the Overlays. However the mitk::Overlay can also be implemented using OpenGL to draw the Overlay on the renderwindows.
+\subsection AnnotationPage_AnnotationRendererSubsection AbstractAnnotationRenderer
 
-\subsection AnnotationPage_OverlayManagerSubsection OverlayManager
+The AbstractAnnotationRenderer is the base class for all types of AnnotationRenderers, which are used for the management of multiple annotations in a specific BaseRenderer.
+For each BaseRenderer, an AnnotationRenderer is registerered as a MicroService, using the type and the renderer name as a unique identifier. This way it is possible to keep the Annotations for a specific BaseRenderer
+even if this renderer is temporarilly not existent (e.g. when a RenderWindow was closed).
 
-The mitk::OverlayManager is the manager for a set of Overlays and the respective Layouters.
-Before the manager can be used, all mitk::BaseRenderer have to be registered to the mitk::OverlayManager instance like this:
+Implementations of the AbstractAnnotationRenderer are using the us::ServiceTracker in order to manage all registered Annotations and to listen to the events which are thrown if a new Annotation is registered,
+if an Annotation was unregistered or if it was modified.
 
-\snippet OverlayExample.cpp CreateOverlayManager
+\subsubsection AnnotationPage_ManualPlacementAnnotationRendererSubsection ManualPlacementAnnotationRenderer
 
-The mitk::OverlayManager can then be used anywhere in the program by fetching it as follows:
+Using the ManualPlacementAnnotationRenderer, allows for a simple placement of Annotations. The Annotation manages its placement internally or using the Position2D / Position3D properties.
 
-\snippet OverlayExample.cpp GetOverlayManagerInstance
+\subsubsection AnnotationPage_LayoutAnnotationRendererSubsection LayoutAnnotationRenderer
 
-All mitk::Overlay instances can now be added to the OverlayManager by calling mitk::OverlayManager::AddOverlay.
+The LayoutAnnotationRenderer allows automatic placement in the RenderWindow corners and sorts the Annotations by a specified priority.
 
-\subsection AnnotationPage_LayouterSubsection Layouter
+\subsection AnnotationPage_AnnotationUtilsSubsection AnnotationUtils
 
-In order to use Layouters for the positioning
-of the Overlays, each Layouter object that has been created has to be added to an internal list in the OverlayManager:
-
-\snippet OverlayExample.cpp AddLayouter
-
-The mitk::OverlayManager::SetLayouter method can then be used to configure an Overlay to be positioned by a certain Layouter:
-
-\snippet OverlayExample.cpp SetLayouterToOverlay
-
-\subsection AnnotationPage_NotManagedSubsection Manually Managed Overlays
-In order to integrate an Overlay into an mitk::Mapper, it is advised not to use the OverlayManager but to manually manage the Overlay.
-To do so, the update methods of the overlays have to be called manually before the start of each rendering procedure. It must only be called if the Properties have changed or if your custom overlay implements its own rendering mechanism.
-
-\section AnnotationPage_CustomOverlaySection Implement a Custom Overlay
-
-A new custom Overlay should derive from mitkOverlay or one of the later mentioned subclasses VtkOverlay2D oder VtkOverlay3D. There should always be an implementation for the methods
-AddOverlay, RemoveOverlay and Update Overlay.
-UpdateOverlay is the procedure that is called in each rendering step. If the Overlay is rendered by VTK, this method only applies the properties to the representation.
-If the custom Overlay requires additional properties, they should be made accessible by getters and setters for a better usability:
-\code
-void mitk::VtkOverlay3D::SetPosition3D(Point3D position3D, mitk::BaseRenderer *renderer)
-{
-  mitk::Point3dProperty::Pointer position3dProperty = mitk::Point3dProperty::New(position3D);
-  SetProperty("Position3D", position3dProperty,renderer);
-}
-
-mitk::Point3D mitk::VtkOverlay3D::GetPosition3D(mitk::BaseRenderer *renderer)
-{
-  mitk::Point3D position3D;
-  GetPropertyValue<mitk::Point3D>("Position3D", position3D, renderer);
-  return position3D;
-}
-\endcode
-
-\subsection AnnotationPage_CustomVTK2DOverlaySubsection VTK 2D Overlay
-
-VTK based overlays which are meant to be displayed in 2D over the render window should derive from the mitk::VtkOverlay2D.
-The mitk::VtkOverlay2D is a subclass of Vtk::Overlay, that uses VTK to render the overlay. This class creates the Overlay representation as a vtkActor2D, and is very easy to implement
-because only UpdateVtkOverlay2D and GetVtkActor2D have to be implemented. The add, update and remove methods are implemented in the superclasses.
-UpdateVtkOverlay2D only needs to apply the specific properties and GetVtkActor2D simply returns the created vtkActor.
-
-\subsection AnnotationPage_CustomVTK3DOverlaySubsection VTK 3D Overlay
-
-The mitkVtkOverlay3D works just like mitkVtkOverlay2D, but it is designed for arbitrary 3D objects which derive from vtkProp,
-
-\section AnnotationPage_CustomLayouterSection Implement a Custom Layouter
-
-A Layouter is used for an automatic positioning of a group of Overlays and is derived from mitkBaseLayouter. Every Layouter that manages a group of Layouts should have a unique identifier
-which is used to register the Layouter in the OverlayManager. A Layouter is always uniquely defined by the identifier and one BaseRenderer. Before a Layouter can be used by the
-OverlayManager it has to be added, using the AddLayouter Method. An Overlay can then be added to a Layout as follows:
-
-\code
-overlayManager->SetLayouter(textOverlay.GetPointer(),mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT,axialRenderer);
-\endcode
-
-A new Layouter has to implement PrepareLayout which should parse the internal Overlay list and set their position as required.
+mitk::AnnotationUtils is a collection of static convenience functions, for the registration of AnnotationRenderers and to request certain registered Annotations.
 
 */

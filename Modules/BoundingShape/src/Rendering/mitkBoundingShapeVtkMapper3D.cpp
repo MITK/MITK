@@ -93,7 +93,7 @@ mitk::BoundingShapeVtkMapper3D::~BoundingShapeVtkMapper3D()
 
 void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
 {
-  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
+  //Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 }
 
 void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor)

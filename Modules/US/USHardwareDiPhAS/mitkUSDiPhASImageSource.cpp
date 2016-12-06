@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // std dependencies
 #include <ctime>
 #include <chrono>
+#include <algorithm>
 
 // mitk dependencies
 #include "mitkUSDiPhASDevice.h"
@@ -100,6 +101,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   {
     SetDataType(m_DataTypeNext);
     m_DataTypeModified = false;
+    UpdateImageGeometry();
   }
   if (m_UseBModeFilterModified)
   {
@@ -181,26 +183,38 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
         // and finally the scattering corrections
         if (m_CompensateForScattering)
         {
+          auto curResizeImage = m_FluenceCompResized.at(m_ScatteringCoefficient); // just for convenience
+
           // update the fluence reference images!
-          bool doResampling = image->GetDimension(0) != m_FluenceCompResized.at(m_ScatteringCoefficient)->GetDimension(0) || image->GetDimension(1) != m_FluenceCompResized.at(m_ScatteringCoefficient)->GetDimension(1);
+          bool doResampling = image->GetDimension(0) != curResizeImage->GetDimension(0) || image->GetDimension(1) != curResizeImage->GetDimension(1)
+            || image->GetGeometry()->GetSpacing()[0] != curResizeImage->GetGeometry()->GetSpacing()[0] || image->GetGeometry()->GetSpacing()[1] != curResizeImage->GetGeometry()->GetSpacing()[1];
           if (doResampling)
           {
-            auto curResizeImage = m_FluenceCompResized.at(m_ScatteringCoefficient); // just for convenience
             curResizeImage = ApplyResampling(m_FluenceCompOriginal.at(m_ScatteringCoefficient), image->GetGeometry()->GetSpacing(), image->GetDimensions());
 
             double* rawOutputData = new double[image->GetDimension(0)*image->GetDimension(1)];
             double* rawScatteringData = (double*)curResizeImage->GetData();
             int sizeRawScatteringData = curResizeImage->GetDimension(0) * curResizeImage->GetDimension(1);
+            int imageSize = image->GetDimension(0)*image->GetDimension(1);
 
-            for (int i = 0; i < image->GetDimension(0)*image->GetDimension(1); ++i)
+            //everything above 1.5mm is still inside the transducer; therefore the fluence compensation image has to be positioned a little lower
+            float upperCutoffmm = 1.5;
+            int lowerBound = std::round(upperCutoffmm / image->GetGeometry()->GetSpacing()[1])*image->GetDimension(0);
+            int upperBound = lowerBound + sizeRawScatteringData;
+
+            for (int i = 0; i < lowerBound && i < imageSize; ++i)
             {
-              if (i < sizeRawScatteringData)
-              {
-                rawOutputData[i] = 1 / rawScatteringData[i];
-              }
-              else
-                rawOutputData[i] = 0; // everything than cannot be compensated shall be treated as garbage
+              rawOutputData[i] = 0; // everything than cannot be compensated shall be treated as garbage, here the upper 0.15mm
             }
+            for (int i = lowerBound; i < upperBound && i < imageSize; ++i)
+            {
+              rawOutputData[i] = 1 / rawScatteringData[i-lowerBound];
+            }
+            for (int i = upperBound; i < imageSize; ++i)
+            {
+              rawOutputData[i] = 0; // everything than cannot be compensated shall be treated as garbage
+            }
+
 
             unsigned int dim[] = { image->GetDimension(0), image->GetDimension(1), 1 };
             curResizeImage->Initialize(mitk::MakeScalarPixelType<double>(), 3, dim);
@@ -268,7 +282,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
   itkFloatImageType::SpacingType outputSpacing;
   itkFloatImageType::SizeType inputSize = itkImage->GetLargestPossibleRegion().GetSize();
   itkFloatImageType::SizeType outputSize = inputSize;
-  outputSize[0] = 256;
+  outputSize[0] = inputSize[0]; // don't do any resampling in x-direction!
 
   outputSpacing[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSize[0]) / static_cast<double>(outputSize[0]));
   outputSpacing[1] = resampleSpacing;
@@ -318,10 +332,11 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Poi
   itkFloatImageType::SpacingType inputSpacing = itkImage->GetSpacing();
 
   outputSizeItk[0] = outputSize[0];
-  outputSizeItk[1] = outputSize[0];
+  outputSizeItk[1] = 10*(inputSpacing[1] * inputSizeItk[1]) / (outputSpacing[1]);
+  
   outputSizeItk[2] = 1;
 
-  outputSpacingItk[0] = 0.996*inputSpacing[0] * (static_cast<double>(inputSizeItk[0]) / static_cast<double>(outputSizeItk[0])); // TODO: find out why the spacing is not correct, so we need that factor; ?!?!
+  outputSpacingItk[0] = 0.996 * inputSpacing[0] * (static_cast<double>(inputSizeItk[0]) / static_cast<double>(outputSizeItk[0])); // TODO: find out why the spacing is not correct, so we need that factor; ?!?!
   outputSpacingItk[1] = inputSpacing[1] * (static_cast<double>(inputSizeItk[1]) / static_cast<double>(outputSizeItk[1]));
   outputSpacingItk[2] = outputSpacing[2];
 

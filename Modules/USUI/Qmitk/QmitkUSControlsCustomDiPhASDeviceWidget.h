@@ -107,6 +107,7 @@ protected:
 private:
   Ui::QmitkUSControlsCustomDiPhASDeviceWidget*         ui;
   mitk::USDiPhASDeviceCustomControls::Pointer  m_ControlInterface;
+  int m_OldReconstructionLines;
 };
 
 #endif // QmitkUSControlsCustomDiPhASDeviceWidget_H

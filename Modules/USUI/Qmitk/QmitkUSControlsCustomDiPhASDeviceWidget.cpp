@@ -70,6 +70,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
 
   //now pass the default values
 
+  m_OldReconstructionLines = 0;
+
   m_ControlInterface->SetSilentUpdate(true); // don't update the scanmode everytime
 
   OnTransmitPhaseLengthChanged();
@@ -286,7 +288,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedSamplesChanged()
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnReconstructedLinesChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }
+  if (m_OldReconstructionLines == 0)
+    m_OldReconstructionLines = ui->ReconstructedLines->value();
+
   m_ControlInterface->SetReconstructedLines(ui->ReconstructedLines->value());
+
+  ui->PitchOfTransducer->setValue(ui->PitchOfTransducer->value()*((double)m_OldReconstructionLines / (double)ui->ReconstructedLines->value()));
+  m_OldReconstructionLines = ui->ReconstructedLines->value();
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnSpeedOfSoundChanged()
 {

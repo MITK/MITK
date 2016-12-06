@@ -12,12 +12,12 @@ set(proj_DEPENDENCIES)
 set(MITK-Data_DEPENDS ${proj})
 
 if(BUILD_TESTING)
-  set(revision_tag e2d97a94) # first 8 characters of hash-tag
+  set(revision_tag b8db25fb) # first 8 characters of hash-tag
 #                  ^^^^^^^^  these are just to check correct length of hash part
 
   ExternalProject_Add(${proj}
     SOURCE_DIR ${proj}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MITK-Data_${revision_tag}.tar.gz
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/mitk-data_${revision_tag}.tar.gz
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

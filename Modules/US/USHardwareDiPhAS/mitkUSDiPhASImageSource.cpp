@@ -39,7 +39,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
-  : m_device(device),
+  : m_Device(device),
   m_StartTime(((float)std::clock()) / CLOCKS_PER_SEC),
   m_UseGUIOutPut(false),
   m_DataType(DataType::Image_uChar),
@@ -93,14 +93,9 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource()
   m_PyroConnected = false;
   m_Pyro = nullptr;
 }
-
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
-  // we get this image pointer from the USDevice and write into it the data we got from the DiPhAS API
-
-  // resize the fluence reference images, if needed
-
-  // modify all settings
+  // modify all settings that have been changed here, so we don't get multithreading issues
   if (m_DataTypeModified)
   {
     SetDataType(m_DataTypeNext);
@@ -153,30 +148,36 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
   // do image processing before displaying it
   if (image.IsNotNull())
   {
-    // now apply BmodeFilter and/or scattering compensation to the image, if the option has been selected.
+    // now apply filters to the image, if the options have been selected.
     if ((m_CompensateForScattering || m_UseBModeFilter) && m_DataType == DataType::Beamformed_Short)
     {
-      if (image->GetDimension(2) == 1 && m_UseBModeFilter)
+      if (m_Device->GetScanMode().beamformingAlgorithm == Beamforming::PlaneWaveCompound)
       {
-        image = ApplyBmodeFilter(image, true, m_VerticalSpacing);
+        if(m_UseBModeFilter)
+          image = ApplyBmodeFilter(image, true, m_VerticalSpacing);
       } // this is for ultrasound only mode
+
       else
       {
-        Image::Pointer imageCopy = Image::New();
+        Image::Pointer imagePA = Image::New();
         unsigned int dim[] = { image->GetDimension(0),image->GetDimension(1),1};
-        imageCopy->Initialize(image->GetPixelType(), 3, dim);
-        imageCopy->SetGeometry(image->GetGeometry());
-        mitk::ImageReadAccessor inputReadAccessorCopy(image, image->GetSliceData(0));
-        imageCopy->SetSlice(inputReadAccessorCopy.GetData(), 0);
+        imagePA->Initialize(image->GetPixelType(), 3, dim);
+        imagePA->SetGeometry(image->GetGeometry());
 
-        // first, we compensate using our ImageEnergyValue
-        imageCopy = MultiplyImage(imageCopy, 40*1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
-        // the we apply the BModeFilter
+        mitk::ImageReadAccessor inputReadAccessorCopy(image, image->GetSliceData(0));
+        imagePA->SetSlice(inputReadAccessorCopy.GetData(), 0);
+        // first, seperate  the PA image from the USImages
+
+        // then, we compensate the PAImage using our ImageEnergyValue
+        imagePA = MultiplyImage(imagePA, 40*1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
+
+        // now we apply the BModeFilter
         if (m_UseBModeFilter)
         {
-          image = ApplyBmodeFilter(image, true, m_VerticalSpacing);
-          imageCopy = ApplyBmodeFilter(imageCopy, false, m_VerticalSpacing);
+          image = ApplyBmodeFilter(image, true, m_VerticalSpacing);     // the US Images get a logarithmic filter
+          imagePA = ApplyBmodeFilter(imagePA, false, m_VerticalSpacing);
         }
+
         // and finally the scattering corrections
         if (m_CompensateForScattering)
         {
@@ -184,7 +185,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
           bool doResampling = image->GetDimension(0) != m_FluenceCompResized.at(m_ScatteringCoefficient)->GetDimension(0) || image->GetDimension(1) != m_FluenceCompResized.at(m_ScatteringCoefficient)->GetDimension(1);
           if (doResampling)
           {
-            auto& curResizeImage = m_FluenceCompResized.at(m_ScatteringCoefficient);
+            auto curResizeImage = m_FluenceCompResized.at(m_ScatteringCoefficient); // just for convenience
             curResizeImage = ApplyResampling(m_FluenceCompOriginal.at(m_ScatteringCoefficient), image->GetGeometry()->GetSpacing(), image->GetDimensions());
 
             double* rawOutputData = new double[image->GetDimension(0)*image->GetDimension(1)];
@@ -194,9 +195,11 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
             for (int i = 0; i < image->GetDimension(0)*image->GetDimension(1); ++i)
             {
               if (i < sizeRawScatteringData)
-                rawOutputData[i] = 1/rawScatteringData[i];
+              {
+                rawOutputData[i] = 1 / rawScatteringData[i];
+              }
               else
-                rawOutputData[i] = 0;
+                rawOutputData[i] = 0; // everything than cannot be compensated shall be treated as garbage
             }
 
             unsigned int dim[] = { image->GetDimension(0), image->GetDimension(1), 1 };
@@ -204,18 +207,24 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
             curResizeImage->SetGeometry(image->GetGeometry());
             curResizeImage->SetSlice(rawOutputData,0);
 
+            delete[] rawOutputData;
+
             mitk::CastToItkImage(curResizeImage, m_FluenceCompResizedItk.at(m_ScatteringCoefficient));
+            m_FluenceCompResized.at(m_ScatteringCoefficient) = mitk::GrabItkImageMemory(m_FluenceCompResizedItk.at(m_ScatteringCoefficient));
+
+            MITK_INFO << "Resized a fluence image.";
           }
-          imageCopy = ApplyScatteringCompensation(imageCopy, m_ScatteringCoefficient);
+          // actually apply the scattering compensation
+          imagePA = ApplyScatteringCompensation(imagePA, m_ScatteringCoefficient);
         }
-        mitk::ImageReadAccessor inputReadAccessor(imageCopy, imageCopy->GetSliceData(0));
+        mitk::ImageReadAccessor inputReadAccessor(imagePA, imagePA->GetSliceData(0));
         image->SetSlice(inputReadAccessor.GetData(), 0);
       }
     }
   }
 }
 
-mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter, float resampleSpacing)
+mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool useLogFilter, float resampleSpacing)
 {
   // we use this seperate ApplyBmodeFilter Method for processing of two-dimensional images
 
@@ -237,7 +246,7 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyBmodeFilter(mitk::Image::Po
 
   itkFloatImageType::Pointer bmode;
 
-  if (UseLogFilter)
+  if (useLogFilter)
   {
     bModeFilter->SetInput(itkImage);
     bModeFilter->SetDirection(1);
@@ -303,18 +312,17 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Poi
 
   mitk::CastToItkImage(inputImage, itkImage);
 
-
   itkFloatImageType::SpacingType outputSpacingItk;
   itkFloatImageType::SizeType inputSizeItk = itkImage->GetLargestPossibleRegion().GetSize();
   itkFloatImageType::SizeType outputSizeItk = inputSizeItk;
   itkFloatImageType::SpacingType inputSpacing = itkImage->GetSpacing();
 
   outputSizeItk[0] = outputSize[0];
-  outputSizeItk[1] = (inputSizeItk[1] * outputSize[0] / inputSizeItk[1]);
+  outputSizeItk[1] = outputSize[0];
   outputSizeItk[2] = 1;
 
-  outputSpacingItk[0] = inputSpacing[0] * (double)inputSizeItk[0] / (double)outputSize[0];
-  outputSpacingItk[1] = inputSpacing[1] * (double)inputSizeItk[1] / (double)outputSize[1];
+  outputSpacingItk[0] = 0.996*inputSpacing[0] * (static_cast<double>(inputSizeItk[0]) / static_cast<double>(outputSizeItk[0])); // TODO: find out why the spacing is not correct, so we need that factor; ?!?!
+  outputSpacingItk[1] = inputSpacing[1] * (static_cast<double>(inputSizeItk[1]) / static_cast<double>(outputSizeItk[1]));
   outputSpacingItk[2] = outputSpacing[2];
 
   typedef itk::IdentityTransform<double, 3> TransformType;
@@ -361,6 +369,9 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     double& timeStamp)
 {
+  if (m_DataTypeModified)
+    return;
+
   if (!m_PyroConnected)
   {
     m_Pyro = mitk::OphirPyro::New();
@@ -469,23 +480,23 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 void mitk::USDiPhASImageSource::UpdateImageGeometry()
 {
   MITK_INFO << "Retreaving Image Geometry Information for Spacing...";
-  float& recordTime        = m_device->GetScanMode().receivePhaseLengthSeconds;
-  int& speedOfSound        = m_device->GetScanMode().averageSpeedOfSound;
-  float& pitch             = m_device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
-  int& reconstructionLines = m_device->GetScanMode().reconstructionLines;
+  float& recordTime        = m_Device->GetScanMode().receivePhaseLengthSeconds;
+  int& speedOfSound        = m_Device->GetScanMode().averageSpeedOfSound;
+  float& pitch             = m_Device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
+  int& reconstructionLines = m_Device->GetScanMode().reconstructionLines;
 
   switch (m_DataType)
   {
     case DataType::Image_uChar : {
-      int& imageWidth = m_device->GetScanMode().imageWidth;
-      int& imageHeight = m_device->GetScanMode().imageHeight;
+      int& imageWidth = m_Device->GetScanMode().imageWidth;
+      int& imageHeight = m_Device->GetScanMode().imageHeight;
       m_ImageSpacing[0] = pitch * reconstructionLines / imageWidth;
       m_ImageSpacing[1] = recordTime * speedOfSound / 2 * 1000 / imageHeight;
       break;
     }
     case DataType::Beamformed_Short : {
       int& imageWidth = reconstructionLines;
-      int& imageHeight = m_device->GetScanMode().reconstructionSamplesPerLine;
+      int& imageHeight = m_Device->GetScanMode().reconstructionSamplesPerLine;
       m_ImageSpacing[0] = pitch;
       m_ImageSpacing[1] = recordTime * speedOfSound / 2 * 1000 / imageHeight;
       break;
@@ -496,10 +507,10 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
   MITK_INFO << "Retreaving Image Geometry Information for Spacing " << m_ImageSpacing[0] << " ... " << m_ImageSpacing[1] << " ... " << m_ImageSpacing[2] << " ...[DONE]";
 }
 
-void mitk::USDiPhASImageSource::ModifyDataType(DataType DataT)
+void mitk::USDiPhASImageSource::ModifyDataType(DataType dataT)
 {
   m_DataTypeModified = true;
-  m_DataTypeNext = DataT;
+  m_DataTypeNext = dataT;
 }
 
 void mitk::USDiPhASImageSource::ModifyUseBModeFilter(bool isSet)
@@ -520,19 +531,19 @@ void mitk::USDiPhASImageSource::ModifyCompensateForScattering(bool useIt)
   m_CompensateForScatteringModified = true;
 }
 
-void mitk::USDiPhASImageSource::SetDataType(DataType DataT)
+void mitk::USDiPhASImageSource::SetDataType(DataType dataT)
 {
-  if (DataT != m_DataType)
+  if (dataT != m_DataType)
   {
-    m_DataType = DataT;
-    MITK_INFO << "Setting new DataType..." << DataT;
+    m_DataType = dataT;
+    MITK_INFO << "Setting new DataType..." << dataT;
     switch (m_DataType)
     {
     case DataType::Image_uChar :
-      MITK_INFO << "height: " << m_device->GetScanMode().imageHeight << " width: " << m_device->GetScanMode().imageWidth;
+      MITK_INFO << "height: " << m_Device->GetScanMode().imageHeight << " width: " << m_Device->GetScanMode().imageWidth;
       break;
     case DataType::Beamformed_Short :
-      MITK_INFO << "samples: " << m_device->GetScanMode().reconstructionSamplesPerLine << " lines: " << m_device->GetScanMode().reconstructionLines;
+      MITK_INFO << "samples: " << m_Device->GetScanMode().reconstructionSamplesPerLine << " lines: " << m_Device->GetScanMode().reconstructionLines;
       break;
     }
   }
@@ -600,7 +611,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "TimestampsImages" + ".csv";
 
-    if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
+    if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
       // first, save the data, so the pyro does not aquire more unneccessary timestamps
       m_Pyro->SaveData();
@@ -626,7 +637,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       }
       timestampFile.close();
     }
-    else if (m_device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no PAImage if we used US only mode
+    else if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no PAImage if we used US only mode
     {
       OrderImagesUltrasound(USImage);
       mitk::IOUtil::Save(USImage, pathUS);
@@ -640,7 +651,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
 void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel)
 {
-  unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
   for (int index = 0; index < m_RecordedImages.size(); index += events)  // omit sound images
   {
     Image::Pointer image = ApplyBmodeFilter(m_RecordedImages.at(index));
@@ -652,17 +663,17 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
 {
   unsigned int width  = 32;
   unsigned int height = 32;
-  unsigned int events = m_device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
+  unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
 
   if (m_DataType == DataType::Beamformed_Short)
   {
-    width = m_device->GetScanMode().reconstructionLines;
-    height = m_device->GetScanMode().reconstructionSamplesPerLine;
+    width = m_Device->GetScanMode().reconstructionLines;
+    height = m_Device->GetScanMode().reconstructionSamplesPerLine;
   }
   else if (m_DataType == DataType::Image_uChar)
   {
-    width = m_device->GetScanMode().imageWidth;
-    height = m_device->GetScanMode().imageHeight;
+    width = m_Device->GetScanMode().imageWidth;
+    height = m_Device->GetScanMode().imageHeight;
   }
 
   unsigned int dimLaser[] = { width, height, m_RecordedImages.size() / events};
@@ -687,31 +698,31 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   }
 }
 
-void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer SoundImage)
+void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer soundImage)
 {
   unsigned int width  = 32;
   unsigned int height = 32;
-  unsigned int events = m_device->GetScanMode().transmitEventsCount;
+  unsigned int events = m_Device->GetScanMode().transmitEventsCount;
 
   if (m_DataType == DataType::Beamformed_Short)
   {
-    width = m_device->GetScanMode().reconstructionLines;
-    height = m_device->GetScanMode().reconstructionSamplesPerLine;
+    width = m_Device->GetScanMode().reconstructionLines;
+    height = m_Device->GetScanMode().reconstructionSamplesPerLine;
   }
   else if (m_DataType == DataType::Image_uChar)
   {
-    width = m_device->GetScanMode().imageWidth;
-    height = m_device->GetScanMode().imageHeight;
+    width = m_Device->GetScanMode().imageWidth;
+    height = m_Device->GetScanMode().imageHeight;
   }
 
   unsigned int dimSound[] = { width, height, m_RecordedImages.size()};
 
-  SoundImage->Initialize(m_RecordedImages.back()->GetPixelType(), 3, dimSound);
-  SoundImage->SetGeometry(m_RecordedImages.back()->GetGeometry());
+  soundImage->Initialize(m_RecordedImages.back()->GetPixelType(), 3, dimSound);
+  soundImage->SetGeometry(m_RecordedImages.back()->GetGeometry());
 
   for (int index = 0; index < m_RecordedImages.size(); ++index)
   {
     mitk::ImageReadAccessor inputReadAccessor(m_RecordedImages.at(index));
-    SoundImage->SetSlice(inputReadAccessor.GetData(), index);
+    soundImage->SetSlice(inputReadAccessor.GetData(), index);
   }
 }

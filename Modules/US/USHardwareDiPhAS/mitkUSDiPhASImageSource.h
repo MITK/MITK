@@ -91,7 +91,7 @@ public:
   void SetRecordingStatus(bool record);
   void SetVerticalSpacing(float mm);
 
-  void ModifyDataType(DataType DataT);
+  void ModifyDataType(DataType dataT);
   void ModifyUseBModeFilter(bool isSet);
   void ModifyScatteringCoefficient(int coeff);
   void ModifyCompensateForScattering(bool useIt);
@@ -102,7 +102,7 @@ public:
   void UpdateImageGeometry();
 
 protected:
-  void SetDataType(DataType DataT);
+  void SetDataType(DataType dataT);
   void SetUseBModeFilter(bool isSet);
 
 	USDiPhASImageSource(mitk::USDiPhASDevice* device);
@@ -128,23 +128,22 @@ protected:
   unsigned int                          m_ImageDimensions[3];
   mitk::Vector3D                        m_ImageSpacing;
 
-  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, float resampleSpacing = 0.15);
+  mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool useLogFilter = false, float resampleSpacing = 0.15);
   mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
   mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
   mitk::Image::Pointer MultiplyImage(mitk::Image::Pointer inputImage, double value);
 
-  void OrderImagesInterleaved(Image::Pointer LaserImage, Image::Pointer SoundImage);
-  void OrderImagesUltrasound(Image::Pointer SoundImage);
+  void OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage);
+  void OrderImagesUltrasound(Image::Pointer soundImage);
 
   void GetPixelValues(itk::Index<3> pixel);
   float GetPixelValue(itk::Index<3> pixel);
   std::vector<float>                    m_PixelValues;
 
-  mitk::USDiPhASDevice*                 m_device;
+  mitk::USDiPhASDevice*                 m_Device;
 
   /** This is a callback to pass text data to the GUI. */
   std::function<void(QString)>          m_GUIOutput;
-
 
   /**
    * Variables for management of current state.

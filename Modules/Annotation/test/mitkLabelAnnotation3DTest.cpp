@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class mitkLabelAnnotation3DTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLabelAnnotation3DTestSuite);
-  MITK_TEST(Render2DAnnotation);
+//  MITK_TEST(Render2DAnnotation);
   MITK_TEST(Render3DAnnotation);
 
   CPPUNIT_TEST_SUITE_END();

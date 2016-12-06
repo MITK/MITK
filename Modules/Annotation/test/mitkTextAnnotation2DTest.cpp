@@ -97,7 +97,7 @@ public:
     mitk::ManualPlacementAnnotationRenderer::AddAnnotation(textAnnotation2D.GetPointer(), renderer);
 
     m_RenderingTestHelper.Render();
-    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
+//    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
     m_RenderingTestHelper.SetAutomaticallyCloseRenderWindow(true);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }

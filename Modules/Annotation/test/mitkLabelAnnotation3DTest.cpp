@@ -70,7 +70,7 @@ public:
   void tearDown() {}
   void Render2DAnnotation()
   {
-    std::string refImagePath = GetTestDataFilePath(m_ReferenceImagePath + "mitkLabelAnnotation3D.png");
+    std::string refImagePath = GetTestDataFilePath(m_ReferenceImagePath + "mitkLabelAnnotation2D.png");
     // reference screenshot for this test
     m_CommandlineArgs.push_back(refImagePath);
     // Convert vector of strings to argc/argv
@@ -112,7 +112,7 @@ public:
     mitk::ManualPlacementAnnotationRenderer::AddAnnotation(label3d.GetPointer(), renderer);
 
     m_RenderingTestHelper.Render();
-    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
+//    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
     m_RenderingTestHelper.SetAutomaticallyCloseRenderWindow(true);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }
@@ -161,7 +161,7 @@ public:
     mitk::ManualPlacementAnnotationRenderer::AddAnnotation(label3d.GetPointer(), renderer);
 
     m_RenderingTestHelper.Render();
-    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
+//    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
     m_RenderingTestHelper.SetAutomaticallyCloseRenderWindow(true);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }

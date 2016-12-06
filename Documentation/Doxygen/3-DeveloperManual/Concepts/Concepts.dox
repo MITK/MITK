@@ -1,7 +1,7 @@
 /**
 \page Concepts MITK Concepts
 
-The following items describe some issues about MITK on a more abstract level. 
+The following items describe some issues about MITK on a more abstract level.
 
 -# \subpage OverviewPage
 -# \subpage CodingPage "Coding Concepts"
@@ -17,7 +17,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
  -# \subpage PipelineingConceptPage
- -# \subpage OverlaysPage
+ -# \subpage AnnotationPage
  -# \subpage PersistenceConceptPage
 -# \subpage QVTKRendering
 -# Interaction

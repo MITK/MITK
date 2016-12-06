@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkQtWidgetsExports.h"
 
 #include <mitkDataStorage.h>
-#include <mitkLogoOverlay.h>
+#include <mitkLogoAnnotation.h>
 
 #include <mitkMouseModeSwitcher.h>
 
@@ -362,7 +362,7 @@ protected:
 
   mitk::RenderingManager *m_RenderingManager;
 
-  mitk::LogoOverlay::Pointer m_LogoRendering;
+  mitk::LogoAnnotation::Pointer m_LogoRendering;
 
   bool m_GradientBackgroundFlag;
 

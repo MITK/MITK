@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
 
-#include "mitkTextOverlay2D.h"
+#include "mitkTextAnnotation2D.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -34,8 +34,8 @@ static const float PLANAR_OFFSET = 0.5f;
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false)
 {
-  m_AnnotationOverlay = mitk::TextOverlay2D::New();
-  m_QuantityOverlay = mitk::TextOverlay2D::New();
+  m_AnnotationAnnotation = mitk::TextAnnotation2D::New();
+  m_QuantityAnnotation = mitk::TextAnnotation2D::New();
 
   this->InitializeDefaultPlanarFigureProperties();
 }
@@ -52,9 +52,9 @@ void mitk::PlanarFigureMapper2D::Paint(mitk::BaseRenderer *renderer)
 {
   bool visible = true;
 
-  m_AnnotationOverlay->SetVisibility(false, renderer);
+  m_AnnotationAnnotation->SetVisibility(false);
 
-  m_QuantityOverlay->SetVisibility(false, renderer);
+  m_QuantityAnnotation->SetVisibility(false);
 
   GetDataNode()->GetVisibility(visible, renderer, "visible");
   if (!visible)
@@ -707,17 +707,17 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
     return;
   }
 
-  m_AnnotationOverlay->SetText(name);
-  m_AnnotationOverlay->SetColor(m_AnnotationColor[lineDisplayMode][0],
+  m_AnnotationAnnotation->SetText(name);
+  m_AnnotationAnnotation->SetColor(m_AnnotationColor[lineDisplayMode][0],
                                 m_AnnotationColor[lineDisplayMode][1],
                                 m_AnnotationColor[lineDisplayMode][2]);
-  m_AnnotationOverlay->SetOpacity(globalOpacity);
-  m_AnnotationOverlay->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
-  m_AnnotationOverlay->SetBoolProperty("drawShadow", m_AnnotationsShadow);
-  m_AnnotationOverlay->SetVisibility(true, renderer);
-  m_AnnotationOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
-  m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
+  m_AnnotationAnnotation->SetOpacity(globalOpacity);
+  m_AnnotationAnnotation->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
+  m_AnnotationAnnotation->SetBoolProperty("drawShadow", m_AnnotationsShadow);
+  m_AnnotationAnnotation->SetVisibility(true);
+  m_AnnotationAnnotation->SetStringProperty("font.family", m_AnnotationFontFamily);
+  m_AnnotationAnnotation->SetBoolProperty("font.bold", m_DrawAnnotationBold);
+  m_AnnotationAnnotation->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
 
   mitk::Point2D offset;
   offset.Fill(5);
@@ -729,13 +729,13 @@ void mitk::PlanarFigureMapper2D::RenderAnnotations(mitk::BaseRenderer *renderer,
   offset[0] = offset[0] * m_DevicePixelRatio;
   offset[1] = offset[1] * m_DevicePixelRatio;
 
-  m_AnnotationOverlay->SetPosition2D(scaledAnchorPoint);
-  m_AnnotationOverlay->SetOffsetVector(offset);
+  m_AnnotationAnnotation->SetPosition2D(scaledAnchorPoint);
+  m_AnnotationAnnotation->SetOffsetVector(offset);
 
-  m_AnnotationOverlay->Update(renderer);
-  m_AnnotationOverlay->Paint(renderer);
+  m_AnnotationAnnotation->Update(renderer);
+  m_AnnotationAnnotation->Paint(renderer);
   annotationOffset -= 15.0;
-  //  annotationOffset -= m_AnnotationOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+  //  annotationOffset -= m_AnnotationAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
 }
 
 void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *planarFigure,
@@ -769,20 +769,20 @@ void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *plan
     }
   }
 
-  m_QuantityOverlay->SetColor(m_AnnotationColor[lineDisplayMode][0],
+  m_QuantityAnnotation->SetColor(m_AnnotationColor[lineDisplayMode][0],
                               m_AnnotationColor[lineDisplayMode][1],
                               m_AnnotationColor[lineDisplayMode][2]);
 
-  m_QuantityOverlay->SetOpacity(globalOpacity);
-  m_QuantityOverlay->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
-  m_QuantityOverlay->SetBoolProperty("drawShadow", m_DrawShadow);
-  m_QuantityOverlay->SetVisibility(true, renderer);
+  m_QuantityAnnotation->SetOpacity(globalOpacity);
+  m_QuantityAnnotation->SetFontSize(m_AnnotationSize * m_DevicePixelRatio);
+  m_QuantityAnnotation->SetBoolProperty("drawShadow", m_DrawShadow);
+  m_QuantityAnnotation->SetVisibility(true);
 
-  m_AnnotationOverlay->SetStringProperty("font.family", m_AnnotationFontFamily);
-  m_AnnotationOverlay->SetBoolProperty("font.bold", m_DrawAnnotationBold);
-  m_AnnotationOverlay->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
+  m_AnnotationAnnotation->SetStringProperty("font.family", m_AnnotationFontFamily);
+  m_AnnotationAnnotation->SetBoolProperty("font.bold", m_DrawAnnotationBold);
+  m_AnnotationAnnotation->SetBoolProperty("font.italic", m_DrawAnnotationItalic);
 
-  m_QuantityOverlay->SetText(quantityString.str().c_str());
+  m_QuantityAnnotation->SetText(quantityString.str().c_str());
   mitk::Point2D offset;
   offset.Fill(5);
   offset[1] += annotationOffset;
@@ -794,12 +794,12 @@ void mitk::PlanarFigureMapper2D::RenderQuantities(const mitk::PlanarFigure *plan
   offset[0] = offset[0] * m_DevicePixelRatio;
   offset[1] = offset[1] * m_DevicePixelRatio;
 
-  m_QuantityOverlay->SetPosition2D(scaledAnchorPoint);
-  m_QuantityOverlay->SetOffsetVector(offset);
+  m_QuantityAnnotation->SetPosition2D(scaledAnchorPoint);
+  m_QuantityAnnotation->SetOffsetVector(offset);
 
-  m_QuantityOverlay->Update(renderer);
-  m_QuantityOverlay->Paint(renderer);
-  //  annotationOffset -= m_QuantityOverlay->GetBoundsOnDisplay( renderer ).Size[1];
+  m_QuantityAnnotation->Update(renderer);
+  m_QuantityAnnotation->Paint(renderer);
+  //  annotationOffset -= m_QuantityAnnotation->GetBoundsOnDisplay( renderer ).Size[1];
   annotationOffset -= 15.0;
 }
 

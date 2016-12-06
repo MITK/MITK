@@ -280,7 +280,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel *re
           rgb[1] = 0.0;
           rgb[2] = 0.0;
 
-          WriteTextWithOverlay(m_PointNumbersOverlay, l.c_str(), rgb, pt2d, renderer);
+          WriteTextWithAnnotation(m_PointNumbersAnnotation, l.c_str(), rgb, pt2d, renderer);
         }
 
         if (showControlPointsNumbers && (*pointsIt)->IsControlPoint)
@@ -295,7 +295,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel *re
           rgb[1] = 1.0;
           rgb[2] = 0.0;
 
-          WriteTextWithOverlay(m_ControlPointNumbersOverlay, l.c_str(), rgb, pt2d, renderer);
+          WriteTextWithAnnotation(m_ControlPointNumbersAnnotation, l.c_str(), rgb, pt2d, renderer);
         }
 
         index++;

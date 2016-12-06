@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkVtkLayerController.h"
 #include "vtkRenderer.h"
 
+#include "mitkAnnotationUtils.h"
+
 mitk::RenderWindowBase::RenderWindowBase() : m_RenderProp(NULL), m_InResize(false)
 {
 }
@@ -56,6 +58,9 @@ void mitk::RenderWindowBase::Initialize(mitk::RenderingManager *renderingManager
   mitk::BaseRenderer::AddInstance(GetVtkRenderWindow(), m_Renderer);
 
   renderingManager->AddRenderWindow(GetVtkRenderWindow());
+
+  // Add previously created overlays to new BaseRenderer
+  mitk::AnnotationUtils::BaseRendererChanged(m_Renderer);
 
   m_RenderProp = vtkMitkRenderProp::New();
   m_RenderProp->SetPropRenderer(m_Renderer);

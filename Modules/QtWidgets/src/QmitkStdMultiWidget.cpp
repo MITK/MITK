@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkImagePixelReadAccessor.h"
 #include "mitkPixelTypeMultiplex.h"
+#include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkCameraController.h>
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
@@ -37,7 +38,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkOverlayManager.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
 #include <mitkPointSet.h>
 #include <mitkProperties.h>
@@ -269,12 +269,6 @@ void QmitkStdMultiWidget::InitializeWidget()
   layer = mitk::IntProperty::New(1000);
   m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
-  mitk::OverlayManager::Pointer OverlayManager = mitk::OverlayManager::New();
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->SetOverlayManager(OverlayManager);
-  mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetOverlayManager(OverlayManager);
-
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
@@ -308,7 +302,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_MouseModeSwitcher = mitk::MouseModeSwitcher::New();
 
   // setup the department logo rendering
-  m_LogoRendering = mitk::LogoOverlay::New();
+  m_LogoRendering = mitk::LogoAnnotation::New();
   mitk::BaseRenderer::Pointer renderer4 = mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow());
   m_LogoRendering->SetOpacity(0.5);
   mitk::Point2D offset;
@@ -317,7 +311,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_LogoRendering->SetRelativeSize(0.15);
   m_LogoRendering->SetCornerPosition(1);
   m_LogoRendering->SetLogoImagePath("DefaultLogo");
-  renderer4->GetOverlayManager()->AddOverlay(m_LogoRendering.GetPointer(), renderer4);
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_LogoRendering.GetPointer(), renderer4);
 }
 
 void QmitkStdMultiWidget::FillGradientBackgroundWithBlack()
@@ -1430,7 +1424,7 @@ void QmitkStdMultiWidget::moveEvent(QMoveEvent *e)
 {
   QWidget::moveEvent(e);
 
-  // it is necessary to readjust the position of the overlays as the StdMultiWidget has moved
+  // it is necessary to readjust the position of the Annotation as the StdMultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
   emit Moved();
 }
@@ -1679,7 +1673,7 @@ void QmitkStdMultiWidget::DisableDepartmentLogo()
 
 bool QmitkStdMultiWidget::IsDepartmentLogoEnabled() const
 {
-  return m_LogoRendering->IsVisible(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
+  return m_LogoRendering->IsVisible();
 }
 
 void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char *widgetName, bool visible, mitk::BaseRenderer *renderer)

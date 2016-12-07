@@ -13,11 +13,10 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-#ifndef __mitkExtendedStatisticsImageFilter_h
-#define __mitkExtendedStatisticsImageFilter_h
+#ifndef __mitkExtendedStatisticsImageFilter
+#define __mitkExtendedStatisticsImageFilter
 
 #include "itkStatisticsImageFilter.h"
-#include "itkScalarImageToHistogramGenerator.h"
 #include <mbilog.h>
 #include <mitkLogMacros.h>
 
@@ -31,15 +30,9 @@ namespace itk
   * uses its results for the calculation of other additional coefficients:
   * the Skewness and Kurtosis.
   *
-  * As these coefficient are based on the mean and the sigma which are both calculated
-  * by the StatisticsImageFilter, the method AfterThreadedGenerateData() is overwritten
-  * and calls ComputeSkewnessKurtosisAndMPP() and ComputeEntropyUniformityAndUPP
-  * after the AfterThreadedGenerateData()
-  * implementation of the superclass is called.
-  *
   * As the StatisticsImageFilter stores the statistics in the outputs 1 to 6 by the
-  * StatisticsImageFilter, the skewness, kurtosis,MPP,UPP,Uniformity and Entropy are stored in the outputs
-  * 7 to 13 by this filter.
+  * StatisticsImageFilter, the skewness, kurtosis, MPP, UPP, Uniformity, Entropy and Median are stored in the outputs
+  * 7 to 14 by this filter.
   */
   template< class TInputImage >
   class ExtendedStatisticsImageFilter : public StatisticsImageFilter< TInputImage >
@@ -54,13 +47,13 @@ namespace itk
     typedef typename Superclass::RealObjectType              RealObjectType;
     typedef typename Superclass::PixelType                   PixelType;
 
+    /** Histogram-related typedefs */
+    typedef itk::Statistics::Histogram< RealType > HistogramType;
+    typedef typename HistogramType::Pointer        HistogramPointer;
+
     itkFactorylessNewMacro( Self );
     itkCloneMacro( Self );
     itkTypeMacro( ExtendedStatisticsImageFilter, StatisticsImageFilter );
-
-
-        typedef itk::Statistics::ScalarImageToHistogramGenerator< TInputImage >
-          HistogramGeneratorType;
 
     /**
     * \brief Return the computed Skewness.
@@ -121,16 +114,23 @@ namespace itk
       /**
       * \brief Return the computed Histogram.
       */
-      const typename HistogramGeneratorType::HistogramType*
+      const typename HistogramType::Pointer
         GetHistogram()
       {
-        return m_HistogramGenerator->GetOutput();
+          if (m_HistogramCalculated)
+          {
+              return m_Histogram;
+          }
+          else
+          {
+              return ITK_NULLPTR;
+          }
       }
 
-      /**
-      * \brief Set the Binsize for the Histogram.
-      */
-    void SetBinSize(int size);
+
+    /** specify Histogram parameters  */
+    void SetHistogramParameters(const int numBins, RealType lowerBound,
+                                RealType upperBound);
 
   protected:
 
@@ -138,29 +138,17 @@ namespace itk
 
     virtual ~ExtendedStatisticsImageFilter(){};
 
+    void BeforeThreadedGenerateData();
+
+    /** Multi-thread version GenerateData. */
+    void  ThreadedGenerateData(const typename StatisticsImageFilter<TInputImage>::RegionType &
+                               outputRegionForThread,
+                               ThreadIdType threadId);
+
     /**
     * brief Calls AfterThreadedGenerateData() of the superclass and the main methods
     */
     void AfterThreadedGenerateData();
-    void CalculateHistogram();
-
-    /**
-    * \brief Compute Entropy,uniformity,MPP,UPP, Median.
-    *
-    * The Entropy,uniformity,MPP, Median and UPP will be calculated with the Sigma, Histogram and Mean Value of the
-    * itkStatisticsImageFilter which comes out of the threadedGenerateData().
-    */
-    void ComputeSkewnessKurtosisAndMPP();
-    void ComputeEntropyUniformityMedianAndUPP();
-
-  /**
-    * \brief Histogram.
-    *
-    * new members for setting and calculating the hisotgram for those coefficients which depends on this
-    */
-    typename  HistogramGeneratorType::Pointer  m_HistogramGenerator;
-    int m_BinSize;
-    bool m_HistogramCalculated;
 
 
     RealObjectType* GetSkewnessOutput();
@@ -192,6 +180,23 @@ namespace itk
     const RealObjectType* GetMedianOutput() const;
 
     virtual DataObject::Pointer MakeOutput( ProcessObject::DataObjectPointerArraySizeType idx );
+
+private:
+    Array< RealType >       m_ThreadSum;
+    Array< RealType >       m_SumOfSquares;
+    Array< RealType >       m_SumOfCubes;
+    Array< RealType >       m_SumOfQuadruples;
+    Array< SizeValueType >  m_Count;
+    Array< SizeValueType >  m_PositivePixelCount;
+    Array< RealType >       m_ThreadSumOfPositivePixels;
+    Array< PixelType >      m_ThreadMin;
+    Array< PixelType >      m_ThreadMax;
+    std::vector< HistogramPointer > m_HistogramPerThread;
+    HistogramPointer        m_Histogram;
+    bool                    m_UseHistogram;
+    bool                    m_HistogramCalculated;
+    RealType                m_LowerBound, m_UpperBound;
+    int                     m_NumBins;
 
 
   }; // end of class

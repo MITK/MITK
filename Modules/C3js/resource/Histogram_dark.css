@@ -1,0 +1,36 @@
+body {
+    background-color: darkgrey !important;
+}
+
+/*-- Bar --*/
+.c3-bar {
+  fill-opacity: 1; 
+  }
+  
+.c3-bar._expanded_ {
+  fill: red !important; /*-- The !important tag prevents the color from being overwritten at rendering--*/
+  fill-opacity: 1; 
+}
+
+/*-- Line --*/
+.c3-line {
+  stroke-width: 1px;
+  stroke: white;
+  /*stroke-dasharray: 5,5; /*to make it dashed*/
+}
+
+/*-- Point --*/
+.c3-circle._expanded_ {
+  stroke-width: 1px;
+  stroke: red !important;
+  fill: red !important; /*-- The !important tag prevents the color from being overwritten at rendering--*/}
+
+path.domain { stroke: white !important; }
+.c3 .c3-axis-x path, .c3 .c3-axis-x line {
+    stroke: white !important;
+}
+.c3 .c3-axis-y path, .c3 .c3-axis-y line {
+    stroke: white !important;
+}
+.tick text { stroke: white !important; }
+.c3-legend-item text { stroke: white !important; }

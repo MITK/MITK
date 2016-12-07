@@ -1,8 +1,0 @@
-if(MITK_USE_QT_WEBENGINE)
-  MITK_CREATE_MODULE(
-    DEPENDS MitkQtWidgetsExt
-    PACKAGE_DEPENDS
-      PUBLIC Qt5|WebEngineWidgets
-    WARNINGS_AS_ERRORS
-  )
-endif()

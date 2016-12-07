@@ -1,8 +1,0 @@
-<RCC>
-  <qresource prefix="/QtWidgetsWeb">
-    <file>d3.v2.js</file>
-    <file>Histogram.css</file>
-    <file>Histogram.html</file>
-    <file>Histogram.js</file>
-  </qresource>
-</RCC>

@@ -115,7 +115,7 @@ public:
     StatisticsFilterType::Pointer StatisticsFilter;
     StatisticsFilter = StatisticsFilterType::New();
     StatisticsFilter->SetInput( image );
-    StatisticsFilter->SetBinSize( 20 );
+    StatisticsFilter->SetHistogramParameters( 20, -10, 10 );
     StatisticsFilter->Update();
 
 

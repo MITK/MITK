@@ -505,6 +505,7 @@ void mitk::ReduceContourSetFilter::Reset()
   this->SetNumberOfIndexedInputs(0);
   this->SetNumberOfIndexedOutputs(0);
 
+  // BUG XXXXX Fix
   mitk::Surface::Pointer output = mitk::Surface::New();
   this->SetNthOutput(0, output.GetPointer());
 

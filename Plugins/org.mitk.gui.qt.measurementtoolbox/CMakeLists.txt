@@ -5,5 +5,5 @@ project(org_mitk_gui_qt_measurementtoolbox)
 mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_QT_MEASUREMENTTOOLBOX
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgetsWeb MitkImageStatistics MitkPlanarFigure
+  MODULE_DEPENDS MitkQtWidgetsExt MitkImageStatistics MitkPlanarFigure MitkC3js
 )

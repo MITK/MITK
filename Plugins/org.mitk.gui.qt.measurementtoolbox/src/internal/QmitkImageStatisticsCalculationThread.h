@@ -53,13 +53,13 @@ public:
   ~QmitkImageStatisticsCalculationThread();
   /*!
    *\brief Automatically calculate bin size to obtain 200 bins. */
-  void SetUseDefaultBinSize(bool useDefault);
+  void SetUseDefaultNBins(bool useDefault);
   /*!
   /brief Initializes the object with necessary data. */
   void Initialize( mitk::Image::Pointer image, mitk::Image::Pointer binaryImage, mitk::PlanarFigure::Pointer planarFig );
   /*!
   /brief returns the calculated image statistics. */
-  std::vector<mitk::ImageStatisticsCalculator::Statistics> GetStatisticsData();
+  std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> GetStatisticsData();
   /*!
   /brief */
   mitk::Image::Pointer GetStatisticsImage();
@@ -80,7 +80,13 @@ public:
   void SetHistogramBinSize( double size);
   /*!
   /brief Get bin size for histogram resolution.*/
-  double GetHistogramBinSize();
+  double GetHistogramBinSize() const;
+  /*!
+  /brief Set bin size for histogram resolution.*/
+  void SetHistogramNBins( double size);
+  /*!
+  /brief Get bin size for histogram resolution.*/
+  double GetHistogramNBins() const;
   /*!
   /brief Returns the histogram of the currently selected time step. */
   HistogramType::Pointer GetTimeStepHistogram(unsigned int t = 0);
@@ -102,7 +108,7 @@ private:
   mitk::Image::Pointer m_StatisticsImage;                         ///< member variable holds the input image for which the statistics need to be calculated.
   mitk::Image::Pointer m_BinaryMask;                              ///< member variable holds the binary mask image for segmentation image statistics calculation.
   mitk::PlanarFigure::Pointer m_PlanarFigureMask;                 ///< member variable holds the planar figure for segmentation image statistics calculation.
-  std::vector<mitk::ImageStatisticsCalculator::Statistics> m_StatisticsVector; ///< member variable holds the result structs.
+  std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> m_StatisticsVector; ///< member variable holds the result structs.
   int m_TimeStep;                                                 ///< member variable holds the time step for statistics calculation
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   double m_HistogramBinSize;                                      ///< member variable holds the bin size for histogram resolution.
@@ -110,6 +116,8 @@ private:
   bool m_CalculationSuccessful;                                   ///< flag set if statistics calculation was successful
   std::vector<HistogramType::Pointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
   std::string m_message;
-  bool m_UseDefaultBinSize;
+  bool m_UseDefaultNBins;
+  unsigned int m_nBinsForHistogramStatistics;
+  bool m_prioritizeNBinsOverBinSize;
 };
 #endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED

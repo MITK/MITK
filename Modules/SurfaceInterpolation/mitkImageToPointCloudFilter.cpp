@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkPolyVertex.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkSmartPointer.h>
 
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
@@ -88,12 +89,12 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
   lapFilter->UpdateLargestPossibleRegion();
   mitk::Image::Pointer edgeImage = mitk::ImportItkImage(lapFilter->GetOutput());
 
-  mitk::ImageStatisticsCalculator::Pointer statCalc = mitk::ImageStatisticsCalculator::New();
-  statCalc->SetImage(edgeImage);
-  statCalc->ComputeStatistics();
-  mitk::ImageStatisticsCalculator::Statistics stats = statCalc->GetStatistics();
-  double mean = stats.GetMean();
-  double stdDev = stats.GetSigma();
+  mitk::ImageStatisticsCalculator::Pointer statCalc =
+                                         mitk::ImageStatisticsCalculator::New();
+  statCalc->SetInputImage(edgeImage);
+  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats = statCalc->GetStatistics();
+  double mean = stats->GetMean();
+  double stdDev = stats->GetStd();
 
   double upperThreshold = mean + stdDev * amount;
   double lowerThreshold = mean - stdDev * amount;

@@ -1,0 +1,13 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/C3js">
+    <file>c3.min.css</file>
+    <file>Histogram.css</file>
+    <file>Histogram_dark.css</file>
+    <file>c3.min.js</file>
+    <file>d3.min.js</file>
+    <file>empty.html</file>
+    <file>QmitkC3jsWidget.html</file>
+    <file>Histogram.js</file>
+  </qresource>
+</RCC>

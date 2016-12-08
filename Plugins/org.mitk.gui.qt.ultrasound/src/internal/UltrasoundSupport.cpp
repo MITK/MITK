@@ -26,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageGenerator.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkRenderingManager.h>
+#include <mitkTextOverlay3D.h>
+#include <mitkOverlay2DLayouter.h>
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -123,6 +125,17 @@ void UltrasoundSupport::DestroyLastNode()
   UpdateColormaps();
 }
 
+void UltrasoundSupport::AddOverlay()
+{
+  mitk::TextOverlay3D::Pointer to = mitk::TextOverlay3D::New();
+  to->SetText("HALLooooooooooooooo"); mitk::Point3D p;
+  p.Fill(50);
+  to->SetFontSize(50);
+  to->SetColor(1, 0, 0);
+  to->SetPosition3D(p);
+  m_OverlayManager->AddOverlay(to.GetPointer());
+}
+
 
 void UltrasoundSupport::UpdateColormaps()
 {
@@ -153,7 +166,6 @@ void UltrasoundSupport::UpdateColormaps()
       levelWindow.SetAuto(m_Image, true, true);
     m_Node.back()->SetLevelWindow(levelWindow);
   }
-  
 }
 void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
 {
@@ -222,6 +234,11 @@ void UltrasoundSupport::UpdateImage()
 {
   if(m_Controls.m_ShowImageStream->isChecked())
   {
+    if (m_Renderer == nullptr || m_OverlayManager == nullptr)
+    {
+      m_Renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
+      m_OverlayManager = m_Renderer.GetPointer()->GetOverlayManager();
+    }
     m_Device->Modified();
     m_Device->Update();
     // Update device
@@ -552,7 +569,7 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
-  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0)
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0), m_Renderer(nullptr), m_OverlayManager(nullptr)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

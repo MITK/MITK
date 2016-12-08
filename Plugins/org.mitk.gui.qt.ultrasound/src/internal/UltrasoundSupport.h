@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
+#include <mitkOverlayManager.h>
 
 #include <berryISelectionListener.h>
 
@@ -29,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSControlsBModeWidget.h"
 #include "QmitkUSControlsDopplerWidget.h"
 #include "QmitkUSControlsProbesWidget.h"
+#include <mitkBaseRenderer.h>
 
 #include <QTime>
 
@@ -99,6 +101,8 @@ protected:
   void CreateControlWidgets();
   void RemoveControlWidgets();
 
+  void AddOverlay();
+
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
 
@@ -150,6 +154,9 @@ protected:
   mitk::SlicedGeometry3D::Pointer m_OldGeometry;
 
   Ui::UltrasoundSupportControls m_Controls;
+
+  mitk::OverlayManager::Pointer m_OverlayManager;
+  mitk::BaseRenderer::Pointer m_Renderer;
 
   QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
   QmitkUSControlsBModeWidget*   m_ControlBModeWidget;

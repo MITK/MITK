@@ -287,6 +287,9 @@
      </item>
      <item row="6" column="0">
       <widget class="QDoubleSpinBox" name="PitchOfTransducer">
+       <property name="minimum">
+        <double>0.010000000000000</double>
+       </property>
        <property name="singleStep">
         <double>0.050000000000000</double>
        </property>

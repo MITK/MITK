@@ -71,15 +71,17 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_FluenceCompOriginal.insert(m_FluenceCompOriginal.begin(), 5, Image::New());
   for (int i = 5; i <= 25; ++i)
   {
-    name = "Fluence" + i;
-    name += ".nrrd";
-
-    name = "FranzTissue.nrrd";
+    if (i < 10)
+      name = "Fluence0" + std::to_string(i) + ".nrrd";
+    else
+      name = "Fluence" + std::to_string(i) + ".nrrd";
 
     resourceFile = us::GetModuleContext()->GetModule()->GetResource(name);
+    MITK_INFO << resourceFile.GetPath() << "size: "<< resourceFile.GetSize();
 
     //m_FluenceCompensationImagesOriginal.push_back(mitk::IOUtil::LoadImage(resourceFile.GetResourcePath()));
     m_FluenceCompOriginal.push_back(mitk::IOUtil::LoadImage("d:\\FranzTissue.nrrd")); // TODO: make it actually load the images we want, not some test image....
+    //Image::Pointer image = dynamic_cast<mitk::Image*>(mitk::IOUtil::Load(resourceFile)[0].GetPointer()); // i dont get why this does not work...
   }
 
   m_FluenceCompResized.insert(m_FluenceCompResized.begin(), 26, Image::New());
@@ -94,6 +96,7 @@ mitk::USDiPhASImageSource::~USDiPhASImageSource()
   m_PyroConnected = false;
   m_Pyro = nullptr;
 }
+
 void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
 {
   // modify all settings that have been changed here, so we don't get multithreading issues
@@ -171,7 +174,7 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
         // first, seperate  the PA image from the USImages
 
         // then, we compensate the PAImage using our ImageEnergyValue
-        imagePA = MultiplyImage(imagePA, 40*1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
+        imagePA = MultiplyImage(imagePA, 1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
 
         // now we apply the BModeFilter
         if (m_UseBModeFilter)

@@ -91,9 +91,9 @@ mitk::BoundingShapeVtkMapper3D::~BoundingShapeVtkMapper3D()
   delete m_Impl;
 }
 
-void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer *renderer, vtkActor *actor)
+void mitk::BoundingShapeVtkMapper3D::ApplyColorAndOpacityProperties(BaseRenderer*, vtkActor*)
 {
-  Superclass::ApplyColorAndOpacityProperties(renderer, actor);
+  //Superclass::ApplyColorAndOpacityProperties(renderer, actor);
 }
 
 void mitk::BoundingShapeVtkMapper3D::ApplyBoundingShapeProperties(BaseRenderer *renderer, vtkActor *actor)

@@ -154,7 +154,7 @@ public:
       Annotation, mitk::LayoutAnnotationRenderer::BottomRight, renderer, 15, 1.0, 1.0, 1.0, 3, "BottomRight3");
 
     m_RenderingTestHelper.Render();
-    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
+//    m_RenderingTestHelper.SaveReferenceScreenShot(refImagePath);
     m_RenderingTestHelper.SetAutomaticallyCloseRenderWindow(true);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }

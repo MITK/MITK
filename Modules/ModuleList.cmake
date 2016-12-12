@@ -53,6 +53,7 @@ set(mitk_modules
   ToFProcessing
   ToFUI
   PhotoacousticsHardware
+  PhotoacousticsAlgorithms
   US
   USUI
   DicomUI

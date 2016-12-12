@@ -146,7 +146,6 @@ set(CPP_FILES
   DataManagement/mitkRestorePlanePositionOperation.cpp
   DataManagement/mitkRotationOperation.cpp
   DataManagement/mitkScaleOperation.cpp
-  DataManagement/mitkShaderProperty.cpp
   DataManagement/mitkSlicedData.cpp
   DataManagement/mitkSlicedGeometry3D.cpp
   DataManagement/mitkSmartPointerProperty.cpp
@@ -264,7 +263,6 @@ set(CPP_FILES
   #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
-  Rendering/mitkIShaderRepository.cpp
   Rendering/mitkMapper.cpp
   Rendering/mitkAnnotation.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp

@@ -32,7 +32,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   struct IMimeTypeProvider;
-  struct IShaderRepository;
   class IPropertyAliases;
   class IPropertyDescriptions;
   class IPropertyExtensions;
@@ -60,12 +59,6 @@ namespace mitk
   class MITKCORE_EXPORT CoreServices
   {
   public:
-    /**
-     * @brief Get an IShaderRepository instance.
-     * @param context The module context of the module getting the service.
-     * @return A IShaderRepository instance which can be NULL.
-     */
-    static IShaderRepository *GetShaderRepository();
 
     /**
      * @brief Get an IPropertyAliases instance.

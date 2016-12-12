@@ -25,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIEditorPart.h"
 #include "berryIWorkbenchPage.h"
 
-#include "mitkShaderProperty.h"
-
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 
@@ -135,20 +133,18 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
   {
     mitk::PropertyList* SrcPL = SrcND->GetPropertyList();
 
-    mitk::ShaderProperty::Pointer shaderEnum = dynamic_cast<mitk::ShaderProperty*>(SrcPL->GetProperty("shader"));
-
     std::string shaderState = "fixed";
 
-    if(shaderEnum.IsNotNull())
-    {
-      shaderState = shaderEnum->GetValueAsString();
+//    if(shaderEnum.IsNotNull())
+//    {
+//      shaderState = shaderEnum->GetValueAsString();
 
-      itk::MemberCommand<QmitkMITKSurfaceMaterialEditorView>::Pointer propertyModifiedCommand = itk::MemberCommand<QmitkMITKSurfaceMaterialEditorView>::New();
-      propertyModifiedCommand->SetCallbackFunction(this, &QmitkMITKSurfaceMaterialEditorView::shaderEnumChange);
-      observerIndex = shaderEnum->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
-      observedProperty = shaderEnum;
-      observerAllocated=true;
-    }
+//      itk::MemberCommand<QmitkMITKSurfaceMaterialEditorView>::Pointer propertyModifiedCommand = itk::MemberCommand<QmitkMITKSurfaceMaterialEditorView>::New();
+//      propertyModifiedCommand->SetCallbackFunction(this, &QmitkMITKSurfaceMaterialEditorView::shaderEnumChange);
+//      observerIndex = shaderEnum->AddObserver(itk::ModifiedEvent(), propertyModifiedCommand);
+//      observedProperty = shaderEnum;
+//      observerAllocated=true;
+//    }
 
     MITK_INFO << "PROPERTIES SCAN BEGIN";
 

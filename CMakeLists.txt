@@ -1,4 +1,4 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.2)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.5)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------

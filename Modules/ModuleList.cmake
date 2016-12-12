@@ -30,7 +30,7 @@ set(mitk_modules
   SurfaceInterpolation
   Segmentation
   PlanarFigureSegmentation
-  #OpenViewCore
+  OpenViewCore
   QtWidgets
   QtWidgetsExt
   C3js

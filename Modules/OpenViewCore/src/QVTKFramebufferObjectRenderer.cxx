@@ -16,7 +16,6 @@
 
 #include "QVTKInternalOpenglRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
-#include <vtkgl.h>
 
 #include <vtkCubeSource.h>
 #include <vtkPolyDataMapper.h>

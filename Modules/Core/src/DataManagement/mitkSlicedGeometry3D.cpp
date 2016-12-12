@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <itkSpatialOrientationAdapter.h>
+
 #include "mitkSlicedGeometry3D.h"
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkApplyTransformMatrixOperation.h"
@@ -241,58 +243,61 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
   PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane(geometry3D, top, planeorientation, frontside, rotated);
 
-  ScalarType viewSpacing = 1;
-  unsigned int slices = 1;
+  int worldAxis =
+      planeorientation == PlaneGeometry::Sagittal ? 0 :
+      planeorientation == PlaneGeometry::Frontal  ? 1 : 2;
 
-  switch (planeorientation)
+  // Inspired by:
+  // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3
+
+  mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
+  matrix.GetVnlMatrix().normalize_columns();
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+
+  int dominantAxis = itk::Function::Max3(
+      inverseMatrix[0][worldAxis],
+      inverseMatrix[1][worldAxis],
+      inverseMatrix[2][worldAxis]);
+  int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
+
+  ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
+  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis));
+
+  /// MITK currently only supports right-handed plane geometries. If you pass 'true' for
+  /// the 'flipped' argument in the `InitializeEvenlySpaced` call, you basically stack up
+  /// the plane geometries against to their normals. This makes a right-handed sliced
+  /// geometry from left-handed planes or the other way around. Also, this leads into a
+  /// weird situation where the volume of the first plane geometry is outside of the volume
+  /// of the sliced geometry, and there is no plane geometry at the place of the last slice
+  /// of the volume.
+  ///
+  /// Since the mappers only use the origin and the right and bottom vectors of the plane
+  /// geometries but not their normals, this 'anomaly' will not be visible in the renderer.
+
+  /// The normal of the axial axis in the reference geometry. It can be left- or right-handed,
+  /// depending on how the reference geometry has been created.
+  Vector3D planeNormalInWorld;
+  for (int i = 0; i < 3; ++i)
   {
-    case PlaneGeometry::None:
-      break;
-
-    case PlaneGeometry::Axial:
-      viewSpacing = geometry3D->GetSpacing()[2];
-      slices = (unsigned int)geometry3D->GetExtent(2);
-      break;
-
-    case PlaneGeometry::Frontal:
-      viewSpacing = geometry3D->GetSpacing()[1];
-      slices = (unsigned int)geometry3D->GetExtent(1);
-      break;
-
-    case PlaneGeometry::Sagittal:
-      viewSpacing = geometry3D->GetSpacing()[0];
-      slices = (unsigned int)geometry3D->GetExtent(0);
-      break;
-
-    default:
-      itkExceptionMacro("unknown PlaneOrientation");
+    planeNormalInWorld[i] = inverseMatrix[dominantAxis][i] * upDirection;
   }
 
-  mitk::Vector3D normal = this->AdjustNormal(planeGeometry->GetNormal());
+  /// The normal of the standard plane geometry. Always right-handed. Calculated as the
+  /// cross-product of the right- and bottom vectors, multiplied by the z spacing.
+  Vector3D standardPlaneNormal = planeGeometry->GetNormal();
+  standardPlaneNormal.Normalize();
 
-  ScalarType directedExtent = std::abs(m_ReferenceGeometry->GetExtentInMM(0) * normal[0]) +
-                              std::abs(m_ReferenceGeometry->GetExtentInMM(1) * normal[1]) +
-                              std::abs(m_ReferenceGeometry->GetExtentInMM(2) * normal[2]);
-
-  if (directedExtent >= viewSpacing)
-  {
-    slices = static_cast<int>(directedExtent / viewSpacing + 0.5);
-  }
-  else
-  {
-    slices = 1;
-  }
-
-  bool flipped = (top == false);
-
-  if (frontside == false)
-  {
-    flipped = !flipped;
-  }
-  if (planeorientation == PlaneGeometry::Frontal)
-  {
-    flipped = !flipped;
-  }
+  /// If the standard plane normal points against to normal of corresponding world plane,
+  /// then we have to stack the planes up in reverse order, i.e. with `flipped == true`.
+  /// It is not enough to check the up direction, because we have to flip if and only if
+  /// `PlaneGeometry::InitializeStandardPlane()` flipped the normal compared to what was
+  /// intended, to ensure right-handedness.
+  ///
+  /// We also have to flip if `top == false`, as this means that we want the slice on the
+  /// side opposite to the origin to be the first.
+  ///
+  /// So, in the end, we flip when either top is false or the normal was flipped but not both.
+  bool flipped = (planeNormalInWorld == standardPlaneNormal) != top;
 
   this->InitializeEvenlySpaced(planeGeometry, viewSpacing, slices, flipped);
 }

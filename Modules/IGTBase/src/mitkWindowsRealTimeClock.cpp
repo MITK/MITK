@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkWindowsRealTimeClock.h"
 
 #include "windows.h"
+#include <chrono>
 
 
 /**
@@ -48,19 +49,8 @@ void mitk::WindowsRealTimeClock::SetFrequency()
 */
 double mitk::WindowsRealTimeClock::GetCurrentStamp()
 {
-// "if defined" not really necessary in this case, as the class is only available on Windows-systems
-  __int64 time, ticks = 0;
-
-  if (m_Frequency.QuadPart < 1)
-  {
-    return -1.0;
-  }
-
-  QueryPerformanceCounter( (LARGE_INTEGER*) &ticks);
-  time = (ticks * 100000) / this->m_Frequency.QuadPart;
-  double milliseconds = (double) (time & 0xffffffff);
-  milliseconds /= (double)100.0;
-  return milliseconds;
+  double hns = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+  return hns / 10000;
 }
 
 /**

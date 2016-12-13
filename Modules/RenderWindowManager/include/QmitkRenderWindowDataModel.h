@@ -14,13 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QmitkRenderWindowDataModel_h
-#define QmitkRenderWindowDataModel_h
+#ifndef QMITKRENDERWINDOWDATAMODEL_H
+#define QMITKRENDERWINDOWDATAMODEL_H
 
 // render window manager
 #include "MitkRenderWindowManagerExports.h"
+#include "mitkRenderWindowLayerUtilities.h"
 
 //mitk
+#include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 
 // qt
@@ -35,13 +37,8 @@ class MITKRENDERWINDOWMANAGER_EXPORT QmitkRenderWindowDataModel : public QAbstra
 
 public:
 
-  typedef std::string RenderWindowName;
-  typedef std::vector<std::string> DataNodeNamesVector;
-  // TODO: use std::map<RenderWindowName, std::map<int
-  typedef std::map<RenderWindowName, DataNodeNamesVector> RenderWindowDataNodesMap;
-
   QmitkRenderWindowDataModel(QObject* parent = nullptr);
-  virtual ~QmitkRenderWindowDataModel() {};
+  virtual ~QmitkRenderWindowDataModel();
 
   //////////////////////////////////////////////////////////////////////////
   /// overridden functions from QAbstractItemModel
@@ -56,23 +53,17 @@ public:
   /// end override
   /////////////////////////////////////////////////////////////////////////
 
+  // currently not needed (uses data storage of the layer controller (e.g. for call of GetLayerStack))
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
-  void SetCurrentRenderWindowName(std::string renderWindowName);
-
-  void InsertLayerNode(std::string dataNodeName, std::string renderer);
-  void MoveNodeUp(int rowIndex, std::string dataNodeName, std::string renderer);
-  void MoveNodeDown(int rowIndex, std::string dataNodeName, std::string renderer);
-
-signals:
-  void VisibilityChanged(int index, bool isDataNodeVisible);
+  void SetCurrentRenderer(std::string rendererName);
+  void DataChanged(const mitk::DataNode* dataNode);
 
 private:
 
   mitk::DataStorage::Pointer m_DataStorage;
-  // map from render window name / id to vector of data node names of the specific render window
-  RenderWindowDataNodesMap m_RenderWindowDataNodesMap;
-  RenderWindowName m_CurrentRenderWindowName;
+  mitk::BaseRenderer::Pointer m_BaseRenderer;
+  RenderWindowLayerUtilities::LayerStack m_TempLayerStack;
 
 };
 
-#endif // QmitkRenderWindowDataModel_h
+#endif // QMITKRENDERWINDOWDATAMODEL_H

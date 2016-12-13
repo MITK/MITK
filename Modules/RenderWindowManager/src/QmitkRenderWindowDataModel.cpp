@@ -14,39 +14,34 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QColor>
-#include <QSize>
-
 #include "QmitkRenderWindowDataModel.h"
 
-// mitk
-#include <mitkBaseRenderer.h>
-
-QmitkRenderWindowDataModel::QmitkRenderWindowDataModel(QObject* parent)
+QmitkRenderWindowDataModel::QmitkRenderWindowDataModel(QObject* parent /*= nullptr*/)
   : QAbstractTableModel(parent)
 {
-
+  // nothing here
 }
 
-int QmitkRenderWindowDataModel::rowCount(const QModelIndex &parent) const
+QmitkRenderWindowDataModel::~QmitkRenderWindowDataModel()
+{
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->ChangedNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowDataModel, const mitk::DataNode*>(this, &QmitkRenderWindowDataModel::DataChanged));
+    m_DataStorage->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowDataModel, const mitk::DataNode*>(this, &QmitkRenderWindowDataModel::DataChanged));
+  }
+}
+
+int QmitkRenderWindowDataModel::rowCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
   if (parent.isValid())
   {
     return 0;
   }
 
-  std::map<RenderWindowName, DataNodeNamesVector>::const_iterator iterator = m_RenderWindowDataNodesMap.find(m_CurrentRenderWindowName);
-  if (iterator == m_RenderWindowDataNodesMap.end())
-  {
-    return 0;
-  }
-  else
-  {
-    return iterator->second.size();
-  }
+  return static_cast<int>(m_TempLayerStack.size());
 }
 
-int QmitkRenderWindowDataModel::columnCount(const QModelIndex &parent) const
+int QmitkRenderWindowDataModel::columnCount(const QModelIndex &parent /*= QModelIndex()*/) const
 {
   if (parent.isValid())
   {
@@ -63,47 +58,43 @@ QVariant QmitkRenderWindowDataModel::data(const QModelIndex &index, int role) co
     return QVariant();
   }
 
-  // find the list of data nodes of the given render window
-  std::map<RenderWindowName, DataNodeNamesVector>::const_iterator iterator = m_RenderWindowDataNodesMap.find(m_CurrentRenderWindowName);
-  if (iterator != m_RenderWindowDataNodesMap.end()
-    && static_cast<size_t>(index.row()) < iterator->second.size())
+  if ((index.row()) < static_cast<int>(m_TempLayerStack.size()))
   {
-    const std::string &dataNodeName = iterator->second.at(iterator->second.size() - index.row() - 1);
-    // different behavior for the columns
-    switch (index.column())
+    RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_TempLayerStack.begin();
+    std::advance(layerStackIt, index.row());
+    mitk::DataNode* dataNode = layerStackIt->second;
+    if (Qt::CheckStateRole == role && 0 == index.column())
     {
-    case 0:
-      if (role == Qt::CheckStateRole)
+      bool visibility = false;
+      dataNode->GetVisibility(visibility, m_BaseRenderer);
+      if (visibility)
       {
-        const mitk::DataNode* selectedDataNode = m_DataStorage->GetNamedNode(dataNodeName);
-        const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_CurrentRenderWindowName);
-
-        bool visibility = false;
-        // TODO: use the current renderer
-        selectedDataNode->GetVisibility(visibility, selectedRenderer);
-        if (visibility)
-        {
-          return Qt::Checked;
-        }
-        else
-        {
-          return Qt::Unchecked;
-        }
+        return Qt::Checked;
       }
-      else if (role == Qt::ToolTipRole)
+      else
+      {
+        return Qt::Unchecked;
+      }
+    }
+    else if (Qt::DisplayRole == role && 1 == index.column())
+    {
+      return QVariant(QString::fromStdString(dataNode->GetName()));
+    }
+    else if (Qt::ToolTipRole == role)
+    {
+      if (0 == index.column())
       {
         return QVariant("Show/hide data node.");
       }
-      break;
-    case 1:
-      if (role == Qt::DisplayRole)
-      {
-        return QVariant(QString::fromStdString(dataNodeName));
-      }
-      else if (role == Qt::ToolTipRole)
+      else if (1 == index.column())
       {
         return QVariant("Name of the data node.");
       }
+    }
+    else if (Qt::UserRole == role)
+    {
+      // user role always returns the data node name, as the name is needed to manipulate a data node
+      return QVariant(QString::fromStdString(dataNode->GetName()));
     }
   }
   return QVariant();
@@ -112,7 +103,7 @@ QVariant QmitkRenderWindowDataModel::data(const QModelIndex &index, int role) co
 Qt::ItemFlags QmitkRenderWindowDataModel::flags(const QModelIndex &index) const
 {
   Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-  if (index.column() == 0)
+  if (0 == index.column())
   {
     flags |= Qt::ItemIsUserCheckable;
   }
@@ -124,11 +115,11 @@ QVariant QmitkRenderWindowDataModel::headerData(int section, Qt::Orientation ori
 {
   if (Qt::Horizontal == orientation && Qt::DisplayRole == role)
   {
-    if (section == 0)
+    if (1 == section)
     {
       return QVariant("Visibility");
     }
-    else if (section == 1)
+    else if (1 == section)
     {
       return QVariant("Data node");
     }
@@ -136,38 +127,32 @@ QVariant QmitkRenderWindowDataModel::headerData(int section, Qt::Orientation ori
   return QVariant();
 }
 
-bool QmitkRenderWindowDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool QmitkRenderWindowDataModel::setData(const QModelIndex &index, const QVariant &value, int role /*= Qt::EditRole*/)
 {
   if (!index.isValid())
   {
     return false;
   }
 
-  // find the list of data nodes of the given render window
-  std::map<RenderWindowName, DataNodeNamesVector>::const_iterator iterator = m_RenderWindowDataNodesMap.find(m_CurrentRenderWindowName);
-  if (iterator != m_RenderWindowDataNodesMap.end()
-    && static_cast<size_t>(index.row()) < iterator->second.size())
+  if ((index.row()) < static_cast<int>(m_TempLayerStack.size()))
   {
-
+    RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_TempLayerStack.begin();
+    std::advance(layerStackIt, index.row());
+    mitk::DataNode* dataNode = layerStackIt->second;
     if (Qt::CheckStateRole == role)
     {
       Qt::CheckState newCheckState = static_cast<Qt::CheckState>(value.toInt());
 
-      // retrieve the data node from the data storage
-      const std::string &dataNodeName = iterator->second.at(iterator->second.size() - index.row() - 1);
-      mitk::DataNode* selectedDataNode = m_DataStorage->GetNamedNode(dataNodeName);
-      const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_CurrentRenderWindowName);
-
       if (Qt::PartiallyChecked == newCheckState || Qt::Checked == newCheckState)
       {
-        selectedDataNode->SetVisibility(true, selectedRenderer);
+        dataNode->SetVisibility(true, m_BaseRenderer);
       }
       else
       {
-        selectedDataNode->SetVisibility(false, selectedRenderer);
+        dataNode->SetVisibility(false, m_BaseRenderer);
       }
       emit dataChanged(index, index);
-      mitk::RenderingManager::GetInstance()->RequestUpdate(selectedRenderer->GetRenderWindow());
+      mitk::RenderingManager::GetInstance()->RequestUpdate(m_BaseRenderer->GetRenderWindow());
       return true;
     }
   }
@@ -178,49 +163,42 @@ void QmitkRenderWindowDataModel::SetDataStorage(mitk::DataStorage::Pointer dataS
 {
   if (m_DataStorage != dataStorage)
   {
+    // given data storage is a new data storage
+    if (m_DataStorage.IsNotNull())
+    {
+      // remove listener from old data storage
+      m_DataStorage->ChangedNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowDataModel, const mitk::DataNode*>(this, &QmitkRenderWindowDataModel::DataChanged));
+      m_DataStorage->RemoveNodeEvent.RemoveListener(mitk::MessageDelegate1<QmitkRenderWindowDataModel, const mitk::DataNode*>(this, &QmitkRenderWindowDataModel::DataChanged));
+    }
     // set the new data storage
     m_DataStorage = dataStorage;
+    // register new data storage listener
+    if (m_DataStorage.IsNotNull())
+    {
+      m_DataStorage->ChangedNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowDataModel, const mitk::DataNode*>(this, &QmitkRenderWindowDataModel::DataChanged));
+      m_DataStorage->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowDataModel, const mitk::DataNode*>(this, &QmitkRenderWindowDataModel::DataChanged));
+    }
+    DataChanged(nullptr);
   }
 }
 
-void QmitkRenderWindowDataModel::SetCurrentRenderWindowName(std::string renderWindowName)
+void QmitkRenderWindowDataModel::SetCurrentRenderer(std::string renderWindowName)
 {
-  m_CurrentRenderWindowName = renderWindowName;
-
-  int numberOfRows = m_RenderWindowDataNodesMap[m_CurrentRenderWindowName].size();
-
-  // notify view, so that the table will be filled with the nodes information of the newly selected renderer
-  emit dataChanged(createIndex(0, 0), createIndex(numberOfRows, columnCount()));
-}
-
-void QmitkRenderWindowDataModel::InsertLayerNode(std::string dataNodeName, std::string renderer)
-{
-  // checking for the node list of the given renderer
-  // checking with [] creates an empty 'DataNodeNamesVector' if the renderer is currently not used as a key
-  DataNodeNamesVector &dataNodeNamesVector = m_RenderWindowDataNodesMap[renderer];
-  beginInsertRows(QModelIndex(), 0, 0);
-  dataNodeNamesVector.push_back(dataNodeName);
-  endInsertRows();
-}
-
-void QmitkRenderWindowDataModel::MoveNodeUp(int rowIndex, std::string dataNodeName, std::string renderer)
-{
-  std::map<RenderWindowName, DataNodeNamesVector>::iterator iterator = m_RenderWindowDataNodesMap.find(renderer);
-  if (iterator != m_RenderWindowDataNodesMap.end())
+  m_BaseRenderer = mitk::BaseRenderer::GetByName(renderWindowName);
+  if (m_DataStorage.IsNotNull())
   {
-    // swap item at 'dataNodeName' with the previous data node in the vector
-    std::swap(iterator->second[rowIndex], iterator->second[rowIndex - 1]);
-    emit dataChanged(createIndex(rowIndex, 1), createIndex(rowIndex - 1, 1));
+    DataChanged(nullptr);
   }
 }
 
-void QmitkRenderWindowDataModel::MoveNodeDown(int rowIndex, std::string dataNodeName, std::string renderer)
+void QmitkRenderWindowDataModel::DataChanged(const mitk::DataNode* /*dataNode*/)
 {
-  std::map<RenderWindowName, DataNodeNamesVector>::iterator iterator = m_RenderWindowDataNodesMap.find(renderer);
-  if (iterator != m_RenderWindowDataNodesMap.end())
+  if (m_BaseRenderer.IsNotNull())
   {
-    // swap item at 'dataNodeName' with the next data node in the vector
-    std::swap(iterator->second[rowIndex], iterator->second[rowIndex + 1]);
-    emit dataChanged(createIndex(rowIndex, 1), createIndex(rowIndex + 1, 1));
+    // update the model, so that the table will be filled with the nodes information of the new data storage
+    beginResetModel();
+    // get the current layer stack of the given base renderer
+    m_TempLayerStack = RenderWindowLayerUtilities::GetLayerStack(m_DataStorage, m_BaseRenderer, true);
+    endResetModel();
   }
 }

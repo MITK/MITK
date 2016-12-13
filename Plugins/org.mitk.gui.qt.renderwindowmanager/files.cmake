@@ -1,18 +1,18 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkRenderWindowManagerView.cpp
-	QmitkLayerManagerAddNodeWidget.cpp
+	QmitkLayerManagerAddLayerWidget.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkRenderWindowManagerControls.ui
-	src/internal/QmitkLayerManagerAddNodeControls.ui
+	src/internal/QmitkLayerManagerAddLayerControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkRenderWindowManagerView.h
-  src/internal/QmitkLayerManagerAddNodeWidget.h
+  src/internal/QmitkLayerManagerAddLayerWidget.h
 )
 
 set(CACHED_RESOURCE_FILES

@@ -14,10 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef QMITKLAYERMANAGERADDNODEWIDGET_H
-#define QMITKLAYERMANAGERADDNODEWIDGET_H
+#ifndef QMITKLAYERMANAGERADDLAYERWIDGET_H
+#define QMITKLAYERMANAGERADDLAYERWIDGET_H
 
-#include "ui_QmitkLayerManagerAddNodeControls.h"
+#include "ui_QmitkLayerManagerAddLayerControls.h"
 
 // mitk
 #include <mitkDataStorage.h>
@@ -31,15 +31,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 * @brief
 *
 */
-class QmitkLayerManagerAddNodeWidget : public QWidget
+class QmitkLayerManagerAddLayerWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   static const QString VIEW_ID;
 
-  QmitkLayerManagerAddNodeWidget(QWidget* parent = nullptr);
-  ~QmitkLayerManagerAddNodeWidget();
+  QmitkLayerManagerAddLayerWidget(QWidget* parent = nullptr);
+  ~QmitkLayerManagerAddLayerWidget();
 
   /**
   * @brief set the data storage of the tree model
@@ -48,23 +48,21 @@ public:
   */
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
 
-  void ListDataNodes();
+  void ListLayer();
 
 public Q_SLOTS:
-  void AddDataNodeToRenderer();
+  void AddLayerToRenderer();
 
 Q_SIGNALS:
-  void NodeToAddSelected(mitk::DataNode* dataNode);
+  void LayerToAddSelected(mitk::DataNode* dataNode);
 
 private:
   void Init();
 
-  Ui::QmitkLayerManagerAddNodeControls m_Controls;
+  Ui::QmitkLayerManagerAddLayerControls m_Controls;
 
-  QStringListModel* m_DataNodeListModel;
+  QStringListModel* m_LayerListModel;
   mitk::DataStorage::Pointer m_DataStorage;
-
-  // TODO: map for nodename (to display) and sopinstanceuid for identifying a data node
 };
 
-#endif // QMITKLAYERMANAGERADDNODEWIDGET_H
+#endif // QMITKLAYERMANAGERADDLAYERWIDGET_H

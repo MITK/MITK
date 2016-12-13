@@ -14,44 +14,44 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "QmitkLayerManagerAddNodeWidget.h"
+#include "QmitkLayerManagerAddLayerWidget.h"
 
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
 
-const QString QmitkLayerManagerAddNodeWidget::VIEW_ID = "org.mitk.Widgets.QmitkLayerManagerAddNode";
+const QString QmitkLayerManagerAddLayerWidget::VIEW_ID = "org.mitk.Widgets.QmitkLayerManagerAddLayer";
 
-QmitkLayerManagerAddNodeWidget::QmitkLayerManagerAddNodeWidget(QWidget* parent /*= nullptr*/)
+QmitkLayerManagerAddLayerWidget::QmitkLayerManagerAddLayerWidget(QWidget* parent /*= nullptr*/)
   : QWidget(parent, Qt::Window)
   , m_DataStorage(nullptr)
 {
   Init();
 }
 
-QmitkLayerManagerAddNodeWidget::~QmitkLayerManagerAddNodeWidget()
+QmitkLayerManagerAddLayerWidget::~QmitkLayerManagerAddLayerWidget()
 {
   // nothing here
 }
 
-void QmitkLayerManagerAddNodeWidget::Init()
+void QmitkLayerManagerAddLayerWidget::Init()
 {
   m_Controls.setupUi(this);
-  m_DataNodeListModel = new QStringListModel(this);
-  m_Controls.listViewDataNodes->setModel(m_DataNodeListModel);
-  m_Controls.listViewDataNodes->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  m_LayerListModel = new QStringListModel(this);
+  m_Controls.listViewLayers->setModel(m_LayerListModel);
+  m_Controls.listViewLayers->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-  connect(m_Controls.pushButtonAddDataNode, SIGNAL(clicked()), this, SLOT(AddDataNodeToRenderer()));
-  connect(m_Controls.pushButtonAddDataNode, SIGNAL(clicked()), this, SLOT(hide()));
+  connect(m_Controls.pushButtonAddLayer, SIGNAL(clicked()), this, SLOT(AddLayerToRenderer()));
+  connect(m_Controls.pushButtonAddLayer, SIGNAL(clicked()), this, SLOT(hide()));
 
-  m_Controls.pushButtonAddDataNode->setEnabled(false);
+  m_Controls.pushButtonAddLayer->setEnabled(false);
 }
 
-void QmitkLayerManagerAddNodeWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
+void QmitkLayerManagerAddLayerWidget::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
   m_DataStorage = dataStorage;
 }
 
-void QmitkLayerManagerAddNodeWidget::ListDataNodes()
+void QmitkLayerManagerAddLayerWidget::ListLayer()
 {
   if (m_DataStorage.IsNotNull())
   {
@@ -66,29 +66,28 @@ void QmitkLayerManagerAddNodeWidget::ListDataNodes()
       stringList << QString::fromStdString(it->Value()->GetName());
     }
 
-    m_DataNodeListModel->setStringList(stringList);
+    m_LayerListModel->setStringList(stringList);
 
     if (stringList.isEmpty())
     {
-      m_Controls.pushButtonAddDataNode->setEnabled(false);
+      m_Controls.pushButtonAddLayer->setEnabled(false);
     }
     else
     {
-      m_Controls.pushButtonAddDataNode->setEnabled(true);
+      m_Controls.pushButtonAddLayer->setEnabled(true);
     }
   }
 }
 
-void QmitkLayerManagerAddNodeWidget::AddDataNodeToRenderer()
+void QmitkLayerManagerAddLayerWidget::AddLayerToRenderer()
 {  
-  QModelIndex selectedIndex = m_Controls.listViewDataNodes->currentIndex();
+  QModelIndex selectedIndex = m_Controls.listViewLayers->currentIndex();
   if (selectedIndex.isValid())
   {
     int listRow = selectedIndex.row();
-    QString dataNodeName = m_DataNodeListModel->stringList().at(listRow);
-
+    QString dataNodeName = m_LayerListModel->stringList().at(listRow);
     mitk::DataNode* dataNode = m_DataStorage->GetNamedNode(dataNodeName.toStdString());
 
-    emit NodeToAddSelected(dataNode);
+    emit LayerToAddSelected(dataNode);
   }
 }

@@ -42,36 +42,32 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   m_Parent = parent;
   m_Controls.setupUi(m_Parent);
 
-  // initialize the render window layer controller and set the controller renderer (in constructor) and the data storage 
-  m_RenderWindowLayerController = new mitk::RenderWindowLayerController();
+  // initialize the render window layer controller and the render window view direction controller
+  // and set the controller renderer (in constructor) and the data storage 
+  m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
+  m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
   m_RenderWindowLayerController->SetDataStorage(GetDataStorage());
+  m_RenderWindowViewDirectionController->SetDataStorage(GetDataStorage());
   mitk::RenderWindowLayerController::RendererVector controlledRenderer = m_RenderWindowLayerController->GetControlledRenderer();
   for (const auto& renderer : controlledRenderer)
   {
     m_Controls.comboBoxRenderWindowSelection->addItem(renderer->GetName());
   }
 
-  m_CurrentRendererName = m_Controls.comboBoxRenderWindowSelection->itemText(0);
-
   // create a new model
-  m_RenderWindowModel.insert(m_CurrentRendererName, new QmitkRenderWindowDataModel(this));
-  m_Controls.renderWindowTableView->setModel(m_RenderWindowModel.value(m_CurrentRendererName));
+  m_RenderWindowDataModel = std::make_unique<QmitkRenderWindowDataModel>(this);
+  m_RenderWindowDataModel->SetDataStorage(GetDataStorage());
+  m_RenderWindowDataModel->SetCurrentRenderer(m_Controls.comboBoxRenderWindowSelection->itemText(0).toStdString());
+
+  m_Controls.renderWindowTableView->setModel(m_RenderWindowDataModel.get());
   m_Controls.renderWindowTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
   m_Controls.renderWindowTableView->horizontalHeader()->setStretchLastSection(true);
-
-  m_RenderWindowModel.value(m_CurrentRendererName)->SetDataStorage(GetDataStorage());
   //m_VisibilityDelegate = new QmitkVisibilityDelegate(this);
   //m_Controls.renderWindowTableView->setItemDelegateForColumn(0, m_VisibilityDelegate);
 
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetByName(m_CurrentRendererName.toStdString());
-  mitk::RenderWindowLayerController::LayerStack layerStack = m_RenderWindowLayerController->GetLayerStack(renderer, true);
-  m_RenderWindowModel.value(m_CurrentRendererName)->UpdateTableForRenderWindow(layerStack);
-
-  m_Controls.radioButtonAxial->setChecked(true);
-
-  m_AddDataNodeWidget = new QmitkLayerManagerAddNodeWidget(m_Parent);
-  m_AddDataNodeWidget->hide();
-  m_AddDataNodeWidget->SetDataStorage(GetDataStorage());
+  m_AddLayerWidget = new QmitkLayerManagerAddLayerWidget(m_Parent);
+  m_AddLayerWidget->hide();
+  m_AddLayerWidget->SetDataStorage(GetDataStorage());
 
   SetUpConnections();
 }
@@ -80,75 +76,104 @@ void QmitkRenderWindowManagerView::SetUpConnections(void)
 {
   connect(m_Controls.comboBoxRenderWindowSelection, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnRenderWindowSelectionChanged(const QString&)));
 
+  connect(m_Controls.pushButtonAddLayer, SIGNAL(clicked()), this, SLOT(ShowAddLayerWidget()));
+  connect(m_Controls.pushButtonRemoveLayer, SIGNAL(clicked()), this, SLOT(RemoveLayer()));
+  connect(m_Controls.pushButtonSetAsBaseLayer, SIGNAL(clicked()), this, SLOT(SetAsBaseLayer()));
+
   QSignalMapper* udSignalMapper = new QSignalMapper(this);
   udSignalMapper->setMapping(m_Controls.pushButtonMoveUp, QString("up"));
   udSignalMapper->setMapping(m_Controls.pushButtonMoveDown, QString("down"));
-
+  connect(udSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(MoveLayer(const QString&)));
   connect(m_Controls.pushButtonMoveUp, SIGNAL(clicked()), udSignalMapper, SLOT(map()));
   connect(m_Controls.pushButtonMoveDown, SIGNAL(clicked()), udSignalMapper, SLOT(map()));
-  connect(udSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(MoveDataNode(const QString&)));
 
-  connect(m_Controls.pushButtonAddNode, SIGNAL(clicked()), this, SLOT(ShowAddDataNodeWidget()));
-  connect(m_Controls.pushButtonRemoveNode, SIGNAL(clicked()), this, SLOT(RemoveDataNode()));
-  connect(m_Controls.pushButtonSetAsBaseNode, SIGNAL(clicked()), this, SLOT(SetAsBaseDataNode()));
+  connect(m_Controls.pushButtonResetRenderer, SIGNAL(clicked()), this, SLOT(ResetRenderer()));
+  connect(m_Controls.pushButtonClearRenderer, SIGNAL(clicked()), this, SLOT(ClearRenderer()));
 
-  //connect(m_Controls.radioButtonAxial, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
-  //connect(m_Controls.radioButtonCoronal, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
-  //connect(m_Controls.radioButtonSagittal, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
+  QSignalMapper* changeViewDirectionSignalMapper = new QSignalMapper(this);
+  changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonAxial, QString("axial"));
+  changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonCoronal, QString("coronal"));
+  changeViewDirectionSignalMapper->setMapping(m_Controls.radioButtonSagittal, QString("sagittal"));
+  connect(changeViewDirectionSignalMapper, SIGNAL(mapped(const QString&)), this, SLOT(ChangeViewDirection(const QString&)));
+  connect(m_Controls.radioButtonAxial, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
+  connect(m_Controls.radioButtonCoronal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
+  connect(m_Controls.radioButtonSagittal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
 
-  connect(m_AddDataNodeWidget, SIGNAL(NodeToAddSelected(mitk::DataNode*)), this, SLOT(AddDataNode(mitk::DataNode*)));
+  connect(m_AddLayerWidget, SIGNAL(LayerToAddSelected(mitk::DataNode*)), this, SLOT(AddLayer(mitk::DataNode*)));
 }
 
 void QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged(const QString &renderWindowId)
 {
-  m_CurrentRendererName = renderWindowId;
-  if (!m_RenderWindowModel.contains(m_CurrentRendererName))
+  std::string currentRendererName = renderWindowId.toStdString();
+  m_RenderWindowDataModel->SetCurrentRenderer(currentRendererName);
+
+  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(currentRendererName);
+  mitk::SliceNavigationController::ViewDirection viewDirection = selectedRenderer->GetSliceNavigationController()->GetDefaultViewDirection();
+  switch (viewDirection)
   {
-    m_RenderWindowModel.insert(m_CurrentRendererName, new QmitkRenderWindowDataModel(this));
-    m_RenderWindowModel.value(m_CurrentRendererName)->SetDataStorage(GetDataStorage());
+  case mitk::SliceNavigationController::Axial:
+    m_Controls.radioButtonAxial->setChecked(true);
+    break;
+  case mitk::SliceNavigationController::Frontal:
+    m_Controls.radioButtonCoronal->setChecked(true);
+    break;
+  case mitk::SliceNavigationController::Sagittal:
+    m_Controls.radioButtonSagittal->setChecked(true);
+    break;
+  default:
+    break;
   }
-
-  m_Controls.renderWindowTableView->setModel(m_RenderWindowModel.value(m_CurrentRendererName));
-
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetByName(m_CurrentRendererName.toStdString());
-  mitk::RenderWindowLayerController::LayerStack layerStack = m_RenderWindowLayerController->GetLayerStack(renderer, true);
-
-  m_RenderWindowModel.value(m_CurrentRendererName)->UpdateTableForRenderWindow(layerStack);
 }
 
-void QmitkRenderWindowManagerView::ShowAddDataNodeWidget()
+void QmitkRenderWindowManagerView::ShowAddLayerWidget()
 {
-  m_AddDataNodeWidget->ListDataNodes();
-  m_AddDataNodeWidget->show();
+  m_AddLayerWidget->ListLayer();
+  m_AddLayerWidget->show();
 }
 
-void QmitkRenderWindowManagerView::AddDataNode(mitk::DataNode* dataNode)
+void QmitkRenderWindowManagerView::AddLayer(mitk::DataNode* dataNode)
 {
-  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_CurrentRendererName.toStdString());
+  const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
   m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, selectedRenderer);
-
-  m_RenderWindowModel.value(m_CurrentRendererName)->UpdateTableForRenderWindow(m_RenderWindowLayerController->GetLayerStack(selectedRenderer, true));
 }
 
-void QmitkRenderWindowManagerView::RemoveDataNode()
-{
-  // TODO: not yet implemented
-}
-
-void QmitkRenderWindowManagerView::SetAsBaseDataNode()
-{
-  // TODO: not yet implemented
-}
-
-void QmitkRenderWindowManagerView::MoveDataNode(const QString &direction)
+void QmitkRenderWindowManagerView::RemoveLayer()
 {
   QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant rowData = m_RenderWindowModel.value(m_CurrentRendererName)->data(selectedIndex, Qt::DisplayRole);
-
+    QVariant rowData = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
     mitk::DataNode* dataNode = GetDataStorage()->GetNamedNode(rowData.toString().toStdString());
-    mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_CurrentRendererName.toStdString());
+    const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
+
+    m_RenderWindowLayerController->RemoveLayerNode(dataNode, selectedRenderer);
+    m_Controls.renderWindowTableView->clearSelection();
+  }
+}
+
+void QmitkRenderWindowManagerView::SetAsBaseLayer()
+{
+  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  if (selectedIndex.isValid())
+  {
+    QVariant rowData = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    mitk::DataNode* dataNode = GetDataStorage()->GetNamedNode(rowData.toString().toStdString());
+    const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
+
+    m_RenderWindowLayerController->SetBaseDataNode(dataNode, selectedRenderer);
+    m_Controls.renderWindowTableView->clearSelection();
+  }
+}
+
+void QmitkRenderWindowManagerView::MoveLayer(const QString &direction)
+{
+  QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
+  if (selectedIndex.isValid())
+  {
+    QVariant rowData = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    mitk::DataNode* dataNode = GetDataStorage()->GetNamedNode(rowData.toString().toStdString());
+    const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
+
     if ("up" == direction)
     {
       m_RenderWindowLayerController->MoveNodeUp(dataNode, selectedRenderer);
@@ -156,9 +181,38 @@ void QmitkRenderWindowManagerView::MoveDataNode(const QString &direction)
     else
     {
       m_RenderWindowLayerController->MoveNodeDown(dataNode, selectedRenderer);
-
     }
-
-    m_RenderWindowModel.value(m_CurrentRendererName)->UpdateTableForRenderWindow(m_RenderWindowLayerController->GetLayerStack(selectedRenderer, true));
+    m_Controls.renderWindowTableView->clearSelection();
   }
+}
+
+void QmitkRenderWindowManagerView::ResetRenderer()
+{
+  const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
+
+  m_RenderWindowLayerController->ResetRenderer(true, selectedRenderer);
+  m_Controls.renderWindowTableView->clearSelection();
+}
+
+void QmitkRenderWindowManagerView::ClearRenderer()
+{
+  const mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
+
+  m_RenderWindowLayerController->ResetRenderer(false, selectedRenderer);
+  m_Controls.renderWindowTableView->clearSelection();
+}
+
+void QmitkRenderWindowManagerView::ChangeViewDirection(const QString &viewDirection)
+{
+  mitk::BaseRenderer* selectedRenderer = mitk::BaseRenderer::GetByName(m_Controls.comboBoxRenderWindowSelection->currentText().toStdString());
+
+  m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString(), selectedRenderer);
+}
+
+void QmitkRenderWindowManagerView::NodeAdded(const mitk::DataNode* node)
+{
+  // initially set new node as invisible in all render windows
+  // this way, each single renderer overwrites the common renderer and the node is invisible
+  // until it is inserted in the node list of a render window
+  m_RenderWindowLayerController->HideDataNodeInAllRenderer(node);
 }

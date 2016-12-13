@@ -55,6 +55,8 @@ int main(int argc, char* argv[])
 
     parser.addArgument("masks", "m", mitkCommandLineParser::StringList, "Masks:", "restrict trining using a binary mask image", us::Any());
     parser.addArgument("wmmasks", "w", mitkCommandLineParser::StringList, "WM-Masks:", "if no binary white matter mask is specified, the envelope of the input tractogram is used", us::Any());
+    parser.addArgument("volmod", "v", mitkCommandLineParser::StringList, "Volume modification images:", "specify a list of float images that modify the fiber density", us::Any());
+    parser.addArgument("addfeatures", "a", mitkCommandLineParser::StringList, "Additional feature images:", "specify a list of float images that hold additional features (float)", us::Any());
 
     parser.addArgument("stepsize", "s", mitkCommandLineParser::Float, "Stepsize:", "resampling parameter for the input tractogram in mm (determines number of white-matter samples)", us::Any());
     parser.addArgument("gmsamples", "g", mitkCommandLineParser::Int, "Number of gray matter samples per voxel:", "Number of gray matter samples per voxel", us::Any());
@@ -70,6 +72,14 @@ int main(int argc, char* argv[])
     mitkCommandLineParser::StringContainerType wmMaskFiles;
     if (parsedArgs.count("wmmasks"))
         wmMaskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["wmmasks"]);
+
+    mitkCommandLineParser::StringContainerType volModFiles;
+    if (parsedArgs.count("volmod"))
+        volModFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["volmod"]);
+
+    mitkCommandLineParser::StringContainerType addFeatFiles;
+    if (parsedArgs.count("addfeatures"))
+        addFeatFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["addfeatures"]);
 
     mitkCommandLineParser::StringContainerType maskFiles;
     if (parsedArgs.count("masks"))
@@ -110,6 +120,7 @@ int main(int argc, char* argv[])
         rawData.push_back(dwi);
     }
 
+    typedef itk::Image<float, 3> ItkFloatImgType;
     typedef itk::Image<unsigned char, 3> ItkUcharImgType;
     MITK_INFO << "loading mask images";
     std::vector< ItkUcharImgType::Pointer > maskImageVector;
@@ -139,10 +150,37 @@ int main(int argc, char* argv[])
         tractograms.push_back(fib);
     }
 
+    MITK_INFO << "loading white volume modification images";
+    std::vector< ItkFloatImgType::Pointer > volumeModImages;
+    for (auto file : volModFiles)
+    {
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
+        ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
+        mitk::CastToItkImage(img, itkimg);
+        volumeModImages.push_back(itkimg);
+    }
+
+    MITK_INFO << "loading additional feature images";
+    std::vector< std::vector< ItkFloatImgType::Pointer > > addFeatImages;
+    for (int i=0; i<rawData.size(); i++)
+        addFeatImages.push_back(std::vector< ItkFloatImgType::Pointer >());
+
+    int c = 0;
+    for (auto file : addFeatFiles)
+    {
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
+        ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
+        mitk::CastToItkImage(img, itkimg);
+        addFeatImages.at(c%addFeatImages.size()).push_back(itkimg);
+        c++;
+    }
+
     mitk::TrackingForestHandler<> forestHandler;
     forestHandler.SetRawData(rawData);
     forestHandler.SetMaskImages(maskImageVector);
     forestHandler.SetWhiteMatterImages(wmMaskImageVector);
+    forestHandler.SetFiberVolumeModImages(volumeModImages);
+    forestHandler.SetAdditionalFeatureImages(addFeatImages);
     forestHandler.SetTractograms(tractograms);
     forestHandler.SetNumTrees(numTrees);
     forestHandler.SetMaxTreeDepth(max_tree_depth);

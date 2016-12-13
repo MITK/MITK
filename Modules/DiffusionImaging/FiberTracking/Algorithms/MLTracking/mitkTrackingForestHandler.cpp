@@ -169,6 +169,94 @@ namespace mitk
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
+  template< class TPixelType >
+  TPixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate)
+  {
+    // transform physical point to index coordinates
+    itk::Index<3> idx;
+    itk::ContinuousIndex< double, 3> cIdx;
+    image->TransformPhysicalPointToIndex(itkP, idx);
+    image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+
+    TPixelType pix = 0.0;
+    if ( image->GetLargestPossibleRegion().IsInside(idx) )
+    {
+      pix = image->GetPixel(idx);
+      if (!interpolate)
+        return pix;
+    }
+    else
+      return pix;
+
+    double frac_x = cIdx[0] - idx[0];
+    double frac_y = cIdx[1] - idx[1];
+    double frac_z = cIdx[2] - idx[2];
+    if (frac_x<0)
+    {
+      idx[0] -= 1;
+      frac_x += 1;
+    }
+    if (frac_y<0)
+    {
+      idx[1] -= 1;
+      frac_y += 1;
+    }
+    if (frac_z<0)
+    {
+      idx[2] -= 1;
+      frac_z += 1;
+    }
+    frac_x = 1-frac_x;
+    frac_y = 1-frac_y;
+    frac_z = 1-frac_z;
+
+    // int coordinates inside image?
+    if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
+      idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
+      idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
+    {
+      // trilinear interpolation
+      vnl_vector_fixed<double, 8> interpWeights;
+      interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
+      interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
+      interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
+      interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
+      interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
+      interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
+      interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
+      interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+      pix = image->GetPixel(idx) * interpWeights[0];
+
+      typename itk::Image<TPixelType, 3>::IndexType tmpIdx = idx; tmpIdx[0]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[1];
+
+      tmpIdx = idx; tmpIdx[1]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[2];
+
+      tmpIdx = idx; tmpIdx[2]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[3];
+
+      tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[4];
+
+      tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[5];
+
+      tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[6];
+
+      tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+      pix +=  image->GetPixel(tmpIdx) * interpWeights[7];
+    }
+
+    if (pix!=pix)
+      mitkThrow() << "nan values in volume modification image!";
+
+    return pix;
+  }
+
+  template< int ShOrder, int NumberOfSignalFeatures >
   typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetFeatureValues(itk::Point<float, 3> itkP)
   {
     // transform physical point to index coordinates
@@ -252,7 +340,7 @@ namespace mitk
       return direction;
 
     // store feature pixel values in a vigra data type
-    vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,NumberOfSignalFeatures+3) );
+    vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,m_Forest->feature_count()) );
     typename FeatureImageType::PixelType featurePixel = GetFeatureValues(pos);
     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
       featureData(0,f) = featurePixel[f];
@@ -267,6 +355,18 @@ namespace mitk
       else
         featureData(0,f) = olddir[c];
       c++;
+    }
+
+    // additional feature images
+    if (m_AdditionalFeatureImages.size()>0)
+    {
+      int add_feat_c = 0;
+      for (auto img : m_AdditionalFeatureImages.at(0))
+      {
+        float v = GetImageValue<float>(pos, img, false);
+        add_feat_c++;
+        featureData(0,NumberOfSignalFeatures+2+add_feat_c) = v;
+      }
     }
 
     // perform classification
@@ -312,7 +412,7 @@ namespace mitk
           }
         }
         else
-          pNonFib += probs(0,i);  // probability that we are not in the whte matter anymore
+          pNonFib += probs(0,i);  // probability that we are not in the white matter anymore
       }
     }
 
@@ -356,7 +456,10 @@ namespace mitk
   template< int ShOrder, int NumberOfSignalFeatures >
   bool TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::IsForestValid()
   {
-    if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3))
+    int additional_features = 0;
+    if (m_AdditionalFeatureImages.size()>0)
+      additional_features = m_AdditionalFeatureImages.at(0).size();
+    if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3+additional_features))
       return true;
     return false;
   }
@@ -377,6 +480,38 @@ namespace mitk
       qballfilter->Update();
       //      FeatureImageType::Pointer itkFeatureImage = qballfilter->GetCoefficientImage();
       m_InterpolatedRawImages.push_back(qballfilter->GetOutput());
+
+      if (i>=m_AdditionalFeatureImages.size())
+      {
+        m_AdditionalFeatureImages.push_back(std::vector< ItkFloatImgType::Pointer >());
+      }
+
+      if (i>=m_FiberVolumeModImages.size())
+      {
+        ItkFloatImgType::Pointer img = ItkFloatImgType::New();
+        img->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
+        img->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
+        img->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
+        img->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        img->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        img->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        img->Allocate();
+        img->FillBuffer(1);
+        m_FiberVolumeModImages.push_back(img);
+      }
+
+      if (m_FiberVolumeModImages.at(i)==nullptr)
+      {
+        m_FiberVolumeModImages.at(i) = ItkFloatImgType::New();
+        m_FiberVolumeModImages.at(i)->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
+        m_FiberVolumeModImages.at(i)->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
+        m_FiberVolumeModImages.at(i)->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
+        m_FiberVolumeModImages.at(i)->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        m_FiberVolumeModImages.at(i)->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        m_FiberVolumeModImages.at(i)->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        m_FiberVolumeModImages.at(i)->Allocate();
+        m_FiberVolumeModImages.at(i)->FillBuffer(1);
+      }
 
       if (i>=m_MaskImages.size())
       {
@@ -410,6 +545,7 @@ namespace mitk
     m_NumberOfSamples = 0;
     for (unsigned int t=0; t<m_Tractograms.size(); t++)
     {
+      ItkFloatImgType::Pointer fiber_folume = m_FiberVolumeModImages.at(t);
       ItkUcharImgType::Pointer mask = m_MaskImages.at(t);
       ItkUcharImgType::Pointer wmmask;
       if (t<m_WhiteMatterImages.size() && m_WhiteMatterImages.at(t)!=nullptr)
@@ -445,9 +581,10 @@ namespace mitk
       }
 
       m_Tractograms.at(t)->ResampleSpline(m_WmSampleDistance);
+
       unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
+      MITK_INFO << "Unweighted samples inside of WM: " << wmSamples;
       m_NumberOfSamples += wmSamples;
-      MITK_INFO << "Samples inside of WM: " << wmSamples;
 
       // calculate gray-matter samples
       itk::ImageRegionConstIterator<ItkUcharImgType> it(wmmask, wmmask->GetLargestPossibleRegion());
@@ -467,6 +604,7 @@ namespace mitk
       }
       else if (OUTOFWM>0)
       {
+        MITK_INFO << "Non-white matter samples: " << wmSamples;
         m_GmSamples.push_back(0.5+(double)wmSamples/(double)OUTOFWM);
         m_NumberOfSamples += m_GmSamples.back()*OUTOFWM;
         MITK_INFO << "Non-white matter samples per voxel: " << m_GmSamples.back();
@@ -494,8 +632,9 @@ namespace mitk
 
     int numDirectionFeatures = 3;
 
-    m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+numDirectionFeatures) );
+    m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+numDirectionFeatures+m_AdditionalFeatureImages.at(0).size()) );
     m_LabelData.reshape( vigra::Shape2(m_NumberOfSamples,1) );
+    m_Weights.reshape( vigra::Shape2(m_NumberOfSamples,1) );
     MITK_INFO << "Number of features: " << m_FeatureData.shape(1);
 
     itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
@@ -504,6 +643,7 @@ namespace mitk
     int sampleCounter = 0;
     for (unsigned int t=0; t<m_Tractograms.size(); t++)
     {
+      ItkFloatImgType::Pointer fiber_folume = m_FiberVolumeModImages.at(t);
       typename InterpolatedRawImageType::Pointer image = m_InterpolatedRawImages.at(t);
       ItkUcharImgType::Pointer wmMask = m_WhiteMatterImages.at(t);
       ItkUcharImgType::Pointer mask;
@@ -525,10 +665,25 @@ namespace mitk
             if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
               m_FeatureData(sampleCounter,f) = 0;
           }
+
+          // direction feature
           m_FeatureData(sampleCounter,NumberOfSignalFeatures) = 0;
           m_FeatureData(sampleCounter,NumberOfSignalFeatures+1) = 0;
           m_FeatureData(sampleCounter,NumberOfSignalFeatures+2) = 0;
+
+          // additional feature images
+          int add_feat_c = 0;
+          for (auto img : m_AdditionalFeatureImages.at(t))
+          {
+            itk::Point<float, 3> itkP;
+            image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
+            float v = GetImageValue<float>(itkP, img, false);
+            add_feat_c++;
+            m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
+          }
+
           m_LabelData(sampleCounter,0) = directionIndices.size();
+          m_Weights(sampleCounter,0) = 1.0;
           sampleCounter++;
 
           // random directions
@@ -540,6 +695,8 @@ namespace mitk
               if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
                 m_FeatureData(sampleCounter,f) = 0;
             }
+
+            // direction feature
             int c=0;
             vnl_vector_fixed<double,3> probe;
             probe[0] = m_RandGen->GetVariate()*2-1;
@@ -553,7 +710,20 @@ namespace mitk
               m_FeatureData(sampleCounter,f) = probe[c];
               c++;
             }
+
+            // additional feature images
+            int add_feat_c = 0;
+            for (auto img : m_AdditionalFeatureImages.at(t))
+            {
+              itk::Point<float, 3> itkP;
+              image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
+              float v = GetImageValue<float>(itkP, img, false);
+              add_feat_c++;
+              m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
+            }
+
             m_LabelData(sampleCounter,0) = directionIndices.size();
+            m_Weights(sampleCounter,0) = 1.0;
             sampleCounter++;
           }
         }
@@ -568,6 +738,7 @@ namespace mitk
         vtkCell* cell = polyData->GetCell(i);
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
+        double fiber_weight = fib->GetFiberWeight(i);
 
         vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
 
@@ -577,6 +748,8 @@ namespace mitk
           double* p1 = points->GetPoint(j);
           itk::Point<float, 3> itkP1;
           itkP1[0] = p1[0]; itkP1[1] = p1[1]; itkP1[2] = p1[2];
+
+          float volume_mod = GetImageValue<float>(itkP1, fiber_folume, false);
 
           vnl_vector_fixed<double,3> dir; dir.fill(0.0);
 
@@ -621,6 +794,15 @@ namespace mitk
             c++;
           }
 
+          // additional feature images
+          int add_feat_c = 0;
+          for (auto img : m_AdditionalFeatureImages.at(t))
+          {
+            float v = GetImageValue<float>(itkP1, img, false);
+            add_feat_c++;
+            m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
+          }
+
           // set label values
           double angle = 0;
           double m = dir.magnitude();
@@ -632,6 +814,8 @@ namespace mitk
               if (a>angle)
               {
                 m_LabelData(sampleCounter,0) = f;
+                m_Weights(sampleCounter,0) = fiber_weight*volume_mod;
+                //MITK_INFO << "m_Weights(sampleCounter,0): " << m_Weights(sampleCounter,0) << ' ' << fiber_weight << ' ' << volume_mod;
                 angle = a;
               }
             }
@@ -651,6 +835,14 @@ namespace mitk
     MITK_INFO << "Sample fraction per tree: " << m_SampleFraction;
     MITK_INFO << "Number of trees: " << m_NumTrees;
 
+
+    DefaultSplitType splitter;
+    splitter.UsePointBasedWeights(true);
+    splitter.SetWeights(m_Weights);
+    splitter.UseRandomSplit(false);
+    splitter.SetPrecision(mitk::eps);
+    splitter.SetMaximumTreeDepth(m_MaxTreeDepth);
+
     std::vector< std::shared_ptr< vigra::RandomForest<int> > > trees;
     int count = 0;
 #pragma omp parallel for
@@ -664,7 +856,7 @@ namespace mitk
       lrf->set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
       lrf->ext_param_.max_tree_depth = m_MaxTreeDepth;
 
-      lrf->learn(m_FeatureData, m_LabelData);
+      lrf->learn(m_FeatureData, m_LabelData,vigra::rf::visitors::VisitorBase(),splitter);
 #pragma omp critical
       {
         count++;
@@ -686,10 +878,12 @@ namespace mitk
   {
     MITK_INFO << "Saving forest to " << forestFile;
     if (IsForestValid())
+    {
       vigra::rf_export_HDF5( *m_Forest, forestFile, "" );
+      MITK_INFO << "Forest saved successfully.";
+    }
     else
       MITK_INFO << "Forest invalid! Could not be saved.";
-    MITK_INFO << "Forest saved successfully.";
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >

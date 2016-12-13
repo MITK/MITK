@@ -150,12 +150,6 @@ int main(int argc, char* argv[])
     {
         mitk::FiberBundle::Pointer fib = LoadFib(inFileName);
 
-        if (minFiberLength>0)
-            fib->RemoveShortFibers(minFiberLength);
-
-        if (maxFiberLength>0)
-            fib->RemoveLongFibers(maxFiberLength);
-
         if (maxAngularDev>0)
         {
             auto filter = itk::FiberCurvatureFilter::New();
@@ -166,6 +160,12 @@ int main(int argc, char* argv[])
             filter->Update();
             fib = filter->GetOutputFiberBundle();
         }
+
+        if (minFiberLength>0)
+            fib->RemoveShortFibers(minFiberLength);
+
+        if (maxFiberLength>0)
+            fib->RemoveLongFibers(maxFiberLength);
 
         if (smoothDist>0)
             fib->ResampleSpline(smoothDist);

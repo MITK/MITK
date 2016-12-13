@@ -32,6 +32,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vigra/multi_array.hxx>
 #include <vigra/random_forest_hdf5_impex.hxx>
 
+//#include <mitkVigraRandomForestClassifier.h>
+#include <mitkLinearSplitting.h>
+#include <mitkThresholdSplit.h>
+#include <mitkImpurityLoss.h>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -50,9 +55,12 @@ public:
     TrackingForestHandler();
     ~TrackingForestHandler();
 
+    typedef itk::Image<short, 3>                                                ItkShortImgType;
+    typedef itk::Image<float, 3>                                                ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                        ItkUcharImgType;
     typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures*2 > , 3 >    InterpolatedRawImageType;
     typedef itk::Image< Vector< float, NumberOfSignalFeatures > , 3 >           FeatureImageType;
+    typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::ImpurityLoss<> >,int,vigra::ClassificationTag> DefaultSplitType;
 
     void SetRawData( std::vector< Image::Pointer > images ){ m_RawData = images; }
     void AddRawData( Image::Pointer img ){ m_RawData.push_back(img); }
@@ -66,6 +74,8 @@ public:
     }
     void SetMaskImages( std::vector< ItkUcharImgType::Pointer > images ){ m_MaskImages = images; }
     void SetWhiteMatterImages( std::vector< ItkUcharImgType::Pointer > images ){ m_WhiteMatterImages = images; }
+    void SetFiberVolumeModImages( std::vector< ItkFloatImgType::Pointer > images ){ m_FiberVolumeModImages = images; }
+    void SetAdditionalFeatureImages( std::vector< std::vector< ItkFloatImgType::Pointer > > images ){ m_AdditionalFeatureImages = images; }
 
     void StartTraining();
     void SaveForest(std::string forestFile);
@@ -91,6 +101,10 @@ protected:
     void InputDataValidForTracking();                                                   ///< check if raw data is set and tracking forest is valid
     typename FeatureImageType::PixelType GetFeatureValues(itk::Point<float, 3> itkP);   ///< get trilinearly interpolated feature values at given world position
 
+    template< class TPixelType >
+    TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate);
+
+
     // training
     void InputDataValidForTraining();       ///< Check if everything is tehere for training (raw datasets, fiber tracts)
     void PreprocessInputDataForTraining();  ///< Generate masks if necessary, resample fibers, spherically interpolate raw DWIs
@@ -105,6 +119,8 @@ protected:
     std::chrono::time_point<std::chrono::system_clock> m_EndTime;
 
     // only for training
+    std::vector< std::vector< ItkFloatImgType::Pointer > >      m_AdditionalFeatureImages;
+    std::vector< ItkFloatImgType::Pointer >                     m_FiberVolumeModImages;     ///< used to correct the fiber density
     std::vector< FiberBundle::Pointer >                         m_Tractograms;              ///< training tractograms
     std::vector< ItkUcharImgType::Pointer >                     m_MaskImages;               ///< binary mask images to constrain training to a certain area (e.g. brain mask)
     std::vector< ItkUcharImgType::Pointer >                     m_WhiteMatterImages;        ///< defines white matter voxels. if not set, theses mask images are automatically generated from the input tractograms
@@ -121,6 +137,7 @@ protected:
     // only for tracking
     typename FeatureImageType::Pointer                          m_FeatureImage;             ///< feature image used for tracking
     vigra::MultiArray<2, double>                                m_LabelData;                ///< vigra container for training labels
+    vigra::MultiArray<2, double>                                m_Weights;                  ///< vigra container for training labels
     std::vector< int >                                          m_DirectionIndices;         ///< maps each of the NumberOfSignalFeatures possible output directions to one of the 2*NumberOfSignalFeatures ODF directions.
     itk::OrientationDistributionFunction< double, NumberOfSignalFeatures*2 >  m_DirContainer;   ///< direction container
 };

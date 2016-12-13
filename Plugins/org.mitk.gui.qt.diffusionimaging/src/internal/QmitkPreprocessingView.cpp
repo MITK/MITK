@@ -443,10 +443,11 @@ void QmitkPreprocessingView::DoCropImage()
     cropper->Update();
 
     ItkDwiType::Pointer itkOutImage = cropper->GetOutput();
+    ItkDwiType::DirectionType dir = itkOutImage->GetDirection();
     itk::Point<double,3> origin = itkOutImage->GetOrigin();
-    origin[0] += lower[0]*itkOutImage->GetSpacing()[0];
-    origin[1] += lower[1]*itkOutImage->GetSpacing()[1];
-    origin[2] += lower[2]*itkOutImage->GetSpacing()[2];
+    origin[0] += lower[0]*itkOutImage->GetSpacing()[0]*dir[0][0]/std::fabs(dir[0][0]);
+    origin[1] += lower[1]*itkOutImage->GetSpacing()[1]*dir[1][1]/std::fabs(dir[1][1]);
+    origin[2] += lower[2]*itkOutImage->GetSpacing()[2]*dir[2][2]/std::fabs(dir[2][2]);
     itkOutImage->SetOrigin(origin);
 
     mitk::Image::Pointer newimage = mitk::GrabItkImageMemory( itkOutImage );
@@ -518,10 +519,12 @@ void QmitkPreprocessingView::TemplatedCropImage( itk::Image<TPixel, VImageDimens
   cropper->Update();
 
   typename ImageType::Pointer itkOutImage = cropper->GetOutput();
+  typename ImageType::DirectionType dir = itkOutImage->GetDirection();
   itk::Point<double,3> origin = itkOutImage->GetOrigin();
-  origin[0] += lower[0]*itkOutImage->GetSpacing()[0];
-  origin[1] += lower[1]*itkOutImage->GetSpacing()[1];
-  origin[2] += lower[2]*itkOutImage->GetSpacing()[2];
+  origin[0] += lower[0]*itkOutImage->GetSpacing()[0]*dir[0][0]/std::fabs(dir[0][0]);
+  origin[1] += lower[1]*itkOutImage->GetSpacing()[1]*dir[1][1]/std::fabs(dir[1][1]);
+  origin[2] += lower[2]*itkOutImage->GetSpacing()[2]*dir[2][2]/std::fabs(dir[2][2]);
+
   itkOutImage->SetOrigin(origin);
   mitk::Image::Pointer image = mitk::Image::New();
   image->InitializeByItk( itkOutImage.GetPointer() );

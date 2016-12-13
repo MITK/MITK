@@ -38,6 +38,9 @@ namespace itk {
 template< class PixelType >
 MrtrixPeakImageConverter< PixelType >::MrtrixPeakImageConverter():
     m_NormalizationMethod(NO_NORM)
+  , m_InvertX(false)
+  , m_InvertY(false)
+  , m_InvertZ(false)
 {
 
 }
@@ -147,6 +150,12 @@ void MrtrixPeakImageConverter< PixelType >
                     }
                     dirVec.normalize();
                     dirVec = m_InputImage->GetDirection()*dirVec;
+                    if (m_InvertX)
+                        dirVec[0] *= -1;
+                    if (m_InvertY)
+                        dirVec[1] *= -1;
+                    if (m_InvertZ)
+                        dirVec[2] *= -1;
 
                     itk::Point<double> worldStart;
                     worldStart[0] = worldCenter[0]-dirVec[0]/2 * minSpacing;

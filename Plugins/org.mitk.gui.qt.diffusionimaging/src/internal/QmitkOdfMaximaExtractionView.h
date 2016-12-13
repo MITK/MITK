@@ -66,6 +66,7 @@ public:
   void StartFiniteDiff();           ///< ODF maxima extraction using finite differences on the densely sampled sphere
   void StartTensor();               ///< extract principal eigenvectors from tensor image
 
+
 protected:
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed

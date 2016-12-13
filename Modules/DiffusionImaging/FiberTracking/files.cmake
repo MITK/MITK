@@ -47,6 +47,9 @@ set(H_FILES
   Algorithms/GibbsTracking/mitkFiberBuilder.h
   Algorithms/MLTracking/mitkTrackingForestHandler.h
   Algorithms/MLTracking/itkMLBSTrackingFilter.h
+  Algorithms/MLTracking/mitkLinearSplitting.h
+  Algorithms/MLTracking/mitkThresholdSplit.h
+  Algorithms/MLTracking/mitkImpurityLoss.h
 
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h

@@ -263,6 +263,9 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         }
 
         filter->SetInputImages(inputVec);
+        filter->SetInvertX(m_Controls->m_InvertX->isChecked());
+        filter->SetInvertY(m_Controls->m_InvertY->isChecked());
+        filter->SetInvertZ(m_Controls->m_InvertZ->isChecked());
         filter->GenerateData();
 
         mitk::Vector3D outImageSpacing = geom->GetSpacing();
@@ -318,6 +321,9 @@ void QmitkOdfMaximaExtractionView::ConvertPeaks()
         FilterType::InputImageType::Pointer itkImg = caster->GetOutput();
 
         filter->SetInputImage(itkImg);
+        filter->SetInvertX(m_Controls->m_InvertX->isChecked());
+        filter->SetInvertY(m_Controls->m_InvertY->isChecked());
+        filter->SetInvertZ(m_Controls->m_InvertZ->isChecked());
         filter->GenerateData();
 
         mitk::Vector3D outImageSpacing = geom->GetSpacing();

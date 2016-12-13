@@ -65,6 +65,10 @@ public:
   itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)   ///< container for output peaks
   itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                    ///< number of peaks per voxel
 
+  itkSetMacro( InvertX, bool )
+  itkSetMacro( InvertY, bool )
+  itkSetMacro( InvertZ, bool )
+
   void GenerateData() override;
 
 protected:
@@ -76,6 +80,9 @@ protected:
   InputImageType::Pointer               m_InputImage;                   ///< MRtrix direction image of type itk::Image< float, 4 >
   DirectionImageContainerType::Pointer  m_DirectionImageContainer;      ///< container for output peaks
   ItkUcharImgType::Pointer              m_NumDirectionsImage;           ///< number of peaks per voxel
+  bool                                  m_InvertX;
+  bool                                  m_InvertY;
+  bool                                  m_InvertZ;
 
 private:
 

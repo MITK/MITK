@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
 
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("image", "i", mitkCommandLineParser::String, "DWI:", "input diffusion-weighted image", us::Any(), false);
+    parser.addArgument("addfeatures", "a", mitkCommandLineParser::StringList, "Additional feature images:", "specify a list of float images that hold additional features (float)", us::Any());
     parser.addArgument("forest", "f", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any(), false);
     parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle", us::Any(), false);
 
@@ -101,6 +102,10 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("seeds"))
         seeds = us::any_cast<int>(parsedArgs["seeds"]);
 
+    mitkCommandLineParser::StringContainerType addFeatFiles;
+    if (parsedArgs.count("addfeatures"))
+        addFeatFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["addfeatures"]);
+
     typedef itk::Image<unsigned char, 3> ItkUcharImgType;
 
     MITK_INFO << "loading diffusion-weighted image";
@@ -133,9 +138,23 @@ int main(int argc, char* argv[])
         mitk::CastToItkImage(img, stop);
     }
 
+    MITK_INFO << "loading additional feature images";
+    typedef itk::Image<float, 3> ItkFloatImgType;
+    std::vector< std::vector< ItkFloatImgType::Pointer > > addFeatImages;
+    addFeatImages.push_back(std::vector< ItkFloatImgType::Pointer >());
+
+    for (auto file : addFeatFiles)
+    {
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
+        ItkFloatImgType::Pointer itkimg = ItkFloatImgType::New();
+        mitk::CastToItkImage(img, itkimg);
+        addFeatImages.at(0).push_back(itkimg);
+    }
+
     mitk::TrackingForestHandler<> tfh;
     tfh.LoadForest(forestFile);
     tfh.AddRawData(dwi);
+    tfh.SetAdditionalFeatureImages(addFeatImages);
 
     typedef itk::MLBSTrackingFilter<> TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();

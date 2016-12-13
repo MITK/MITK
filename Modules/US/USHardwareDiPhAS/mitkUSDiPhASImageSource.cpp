@@ -577,6 +577,11 @@ void mitk::USDiPhASImageSource::SetVerticalSpacing(float mm)
   m_VerticalSpacingModified = true;
 }
 
+void mitk::USDiPhASImageSource::SetSavingSettings(SavingSettings settings)
+{
+  m_SavingSettings = settings;
+}
+
 // this is just a little function to set the filenames below right
 inline void replaceAll(std::string& str, const std::string& from, const std::string& to) {
   if (from.empty())
@@ -596,6 +601,11 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     m_RecordedImages.clear();  // we make sure there are no leftovers
     m_ImageTimestampRecord.clear();      // also for the timestamps
     m_PixelValues.clear();     // aaaand for the pixel values
+
+    if (m_SavingSettings.saveRaw)
+    {
+      // TODO: setup everything so the raw Data can be saved
+    }
 
     // tell the callback to start recording images
     m_CurrentlyRecording = true;

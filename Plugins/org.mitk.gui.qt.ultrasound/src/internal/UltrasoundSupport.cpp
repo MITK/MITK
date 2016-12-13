@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkRenderingManager.h>
 #include <mitkTextOverlay3D.h>
 #include <mitkOverlay2DLayouter.h>
+#include <mitkTextOverlay2D.h>
+#include "QmitkRegisterClasses.h"
+#include "QmitkRenderWindow.h"
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -97,6 +100,15 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   m_FrameCounter3d = 0;
 
   m_Controls.tabWidget->setTabEnabled(1, false);
+
+  // Tell the RenderWindow which (part of) the datastorage to render
+  m_PARenderWindow.GetRenderer()->SetDataStorage(this->GetDataStorage());
+
+  // Initialize the RenderWindow
+  mitk::TimeGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+
+  m_PARenderWindow.show();
 }
 
 #include <mitkRenderingModeProperty.h>
@@ -127,15 +139,42 @@ void UltrasoundSupport::DestroyLastNode()
 
 void UltrasoundSupport::AddOverlay()
 {
-  mitk::TextOverlay3D::Pointer to = mitk::TextOverlay3D::New();
-  to->SetText("HALLooooooooooooooo"); mitk::Point3D p;
-  p.Fill(50);
-  to->SetFontSize(50);
-  to->SetColor(1, 0, 0);
-  to->SetPosition3D(p);
-  m_OverlayManager->AddOverlay(to.GetPointer());
+
+  //This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
+  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), m_Renderer);
+
+  //Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
+  m_OverlayManager->AddLayouter(topleftLayouter.GetPointer());
+
+  //Several other Layouters can be added to the overlayManager
+  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), m_Renderer);
+  m_OverlayManager->AddLayouter(bottomLayouter.GetPointer());
+
+  //Create a textOverlay2D
+  mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
+
+  textOverlay->SetText("Test!"); //set UTF-8 encoded text to render
+  textOverlay->SetFontSize(40);
+  textOverlay->SetColor(1, 0, 0); //Set text color to red
+  textOverlay->SetOpacity(1);
+
+  //The position of the Overlay can be set to a fixed coordinate on the display.
+  mitk::Point2D pos;
+  pos[0] = 10, pos[1] = 20;
+  textOverlay->SetPosition2D(pos);
+
+  //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
+  m_OverlayManager->AddOverlay(textOverlay.GetPointer());
+
+  //Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
+  //Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
+  //m_OverlayManager->SetLayouter(textOverlay.GetPointer(), mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), m_Renderer);
 }
 
+void UltrasoundSupport::RemoveOverlays()
+{
+  m_OverlayManager->RemoveAllOverlays();
+}
 
 void UltrasoundSupport::UpdateColormaps()
 {
@@ -236,11 +275,14 @@ void UltrasoundSupport::UpdateImage()
   {
     if (m_Renderer == nullptr || m_OverlayManager == nullptr)
     {
-      m_Renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
-      mitk::OverlayManager::Pointer OverlayManagerInstance = mitk::OverlayManager::New();
-      m_Renderer->SetOverlayManager(OverlayManagerInstance);
+      //setup an overlay manager
 
-      //m_OverlayManager = m_Renderer->GetVtkRenderer()->GetOverlayManager();
+      mitk::OverlayManager::Pointer OverlayManagerInstance = mitk::OverlayManager::New();
+      m_Renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
+      m_Renderer->SetOverlayManager(OverlayManagerInstance);
+      m_OverlayManager = m_Renderer->GetOverlayManager();
+
+      AddOverlay();
     }
     m_Device->Modified();
     m_Device->Update();

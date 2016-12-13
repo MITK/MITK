@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSControlsDopplerWidget.h"
 #include "QmitkUSControlsProbesWidget.h"
 #include <mitkBaseRenderer.h>
+#include "QmitkRenderWindow.h"
 
 #include <QTime>
 
@@ -102,6 +103,10 @@ protected:
   void RemoveControlWidgets();
 
   void AddOverlay();
+  void RemoveOverlays();
+
+  QmitkRenderWindow m_PARenderWindow; // window for the PA images
+  QmitkRenderWindow m_USRenderWindow; // window for the US images
 
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;

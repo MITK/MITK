@@ -74,6 +74,12 @@ void mitk::USDiPhASCustomControls::OnSetCompensateScattering(bool compensate)
   imageSource->ModifyCompensateForScattering(compensate);
 }
 
+void mitk::USDiPhASCustomControls::OnSetSavingSettings(SavingSettings settings)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->SetSavingSettings(settings);
+}
+
 //Transmit
 void mitk::USDiPhASCustomControls::OnSetTransmitPhaseLength(double us)
 {

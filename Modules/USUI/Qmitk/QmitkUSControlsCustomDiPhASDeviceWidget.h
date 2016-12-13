@@ -42,6 +42,7 @@ private slots:
   virtual void OnRecordChanged();
   virtual void OnScatteringCoefficientChanged();
   virtual void OnCompensateScatteringChanged();
+  virtual void OnChangedSavingSettings();
 
   //Transmit
   virtual void OnTransmitPhaseLengthChanged();

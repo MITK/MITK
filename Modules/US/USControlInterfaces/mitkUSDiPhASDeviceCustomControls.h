@@ -43,6 +43,12 @@ public:
   virtual void SetIsActive( bool isActive ) override;
 
   enum DataType { Image_uChar, Beamformed_Short };
+
+  struct SavingSettings
+  {
+    bool saveRaw;
+    bool saveBeamformed;
+  };
   /**
     * \return if this custom controls are currently activated
     */
@@ -53,6 +59,7 @@ public:
   virtual void SetRecord(bool record);  
   virtual void SetScatteringCoefficient(float coeff);
   virtual void SetCompensateScattering(bool compensate);
+  virtual void SetSavingSettings(SavingSettings settings);
 
   //Transmit
   virtual void SetTransmitPhaseLength(double us);
@@ -98,7 +105,7 @@ protected:
 
   /** virtual handlers implemented in Device Controls
     */
-
+  virtual void OnSetSavingSettings(SavingSettings settings);
   virtual void OnSetUseBModeFilter(bool isSet);
   virtual void OnSetRecord(bool record);
   virtual void OnSetVerticalSpacing(float mm);

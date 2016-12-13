@@ -73,6 +73,11 @@ void  mitk::USDiPhASDeviceCustomControls::SetCompensateScattering(bool compensat
   this->OnSetCompensateScattering(compensate);
 }
 
+void mitk::USDiPhASDeviceCustomControls::SetSavingSettings(SavingSettings settings)
+{
+  this->OnSetSavingSettings(settings);
+}
+
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::SetTransmitPhaseLength(double us)
 {
@@ -169,6 +174,7 @@ void mitk::USDiPhASDeviceCustomControls::OnSetRecord(bool record) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetVerticalSpacing(float mm) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetScatteringCoefficient(float coeff) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetCompensateScattering(bool compensate) {}
+void mitk::USDiPhASDeviceCustomControls::OnSetSavingSettings(SavingSettings settings) {}
 //Transmit
 void mitk::USDiPhASDeviceCustomControls::OnSetTransmitPhaseLength(double ms) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetExcitationFrequency(double MHz) {}

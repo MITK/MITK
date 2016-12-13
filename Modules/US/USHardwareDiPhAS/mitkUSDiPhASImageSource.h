@@ -55,6 +55,7 @@ public:
   itkCloneMacro(Self);
 
   typedef mitk::USDiPhASDeviceCustomControls::DataType DataType;
+  typedef mitk::USDiPhASDeviceCustomControls::SavingSettings SavingSettings;
 
   /**
     * Implementation of the superclass method. Returns the pointer
@@ -89,6 +90,7 @@ public:
 
   /** This starts or ends the recording session*/
   void SetRecordingStatus(bool record);
+  void SetSavingSettings(SavingSettings settings);
   void SetVerticalSpacing(float mm);
 
   void ModifyDataType(DataType dataT);
@@ -148,6 +150,8 @@ protected:
   /**
    * Variables for management of current state.
    */
+  SavingSettings                  m_SavingSettings;
+
   float                           m_StartTime;
   bool                            m_UseGUIOutPut;
 

@@ -36,7 +36,7 @@ public:
   mitkNewMacro1Param(Self, mitk::USDiPhASDevice*);
 
   typedef USDiPhASDeviceCustomControls::DataType DataType;
-
+  typedef USDiPhASDeviceCustomControls::SavingSettings SavingSettings;
   /**
     * Activate or deactivate the custom controls. This is just for handling
     * widget visibility in a GUI for example.
@@ -73,6 +73,7 @@ protected:
   virtual void OnSetVerticalSpacing(float mm) override;
   virtual void OnSetScatteringCoefficient(float coeff) override;
   virtual void OnSetCompensateScattering(bool compensate) override;
+  virtual void OnSetSavingSettings(SavingSettings settings) override;
 
   //Transmit
   virtual void OnSetTransmitPhaseLength(double us) override;

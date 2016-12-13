@@ -94,6 +94,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnVerticalSpacingChanged();
   OnScatteringCoefficientChanged();
   OnCompensateScatteringChanged();
+  OnChangedSavingSettings();
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
 
@@ -109,7 +110,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
   connect(ui->ScatteringCoefficient, SIGNAL(valueChanged(int)), this, SLOT(OnScatteringCoefficientChanged()));
   connect(ui->CompensateScattering, SIGNAL(stateChanged(int)), this, SLOT(OnCompensateScatteringChanged()));
   connect(ui->VerticalSpacing, SIGNAL(valueChanged(double)), this, SLOT(OnVerticalSpacingChanged()));
-
+  connect(ui->SaveBeamformed, SIGNAL(stateChanged(int)), this, SLOT(OnChangedSavingSettings()));
+  connect(ui->SaveRaw, SIGNAL(stateChanged(int)), this, SLOT(OnChangedSavingSettings()));
   //transmit
   connect(ui->TransmitPhaseLength, SIGNAL(valueChanged(double)), this, SLOT(OnTransmitPhaseLengthChanged()));
   connect(ui->ExcitationFrequency, SIGNAL(valueChanged(double)), this, SLOT(OnExcitationFrequencyChanged()));
@@ -151,11 +153,62 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
   if (ui->StartStopRecord->text() == "Start Recording")
   {
     ui->StartStopRecord->setText("Stop Recording");
+
+    ui->UseBModeFilter->setEnabled(false);
+    ui->ScatteringCoefficient->setEnabled(false);
+    ui->CompensateScattering->setEnabled(false);
+    ui->VerticalSpacing->setEnabled(false);
+    ui->SaveBeamformed->setEnabled(false);
+    ui->SaveRaw->setEnabled(false);
+    ui->TransmitPhaseLength->setEnabled(false);
+    ui->ExcitationFrequency->setEnabled(false);
+    ui->TransmitEvents->setEnabled(false);
+    ui->Voltage->setEnabled(false);
+    ui->Mode->setEnabled(false);
+    ui->ScanDepth->setEnabled(false);
+    ui->AveragingCount->setEnabled(false);
+    ui->TimeGainCompensationMinSlider->setEnabled(false);
+    ui->TimeGainCompensationMaxSlider->setEnabled(false);
+    ui->DataType->setEnabled(false);
+    ui->PitchOfTransducer->setEnabled(false);
+    ui->ReconstructedSamplesPerLine->setEnabled(false);
+    ui->ReconstructedLines->setEnabled(false);
+    ui->SpeedOfSound->setEnabled(false);
+    ui->BandpassEnabled->setEnabled(false);
+    ui->LowCut->setEnabled(false);
+    ui->HighCut->setEnabled(false);
+
     m_ControlInterface->SetRecord(true);
   }
   else
   {
     ui->StartStopRecord->setText("Start Recording");
+
+    ui->UseBModeFilter->setEnabled(true);
+    ui->CompensateScattering->setEnabled(true);
+    if(ui->CompensateScattering->isChecked())
+      ui->ScatteringCoefficient->setEnabled(true);
+    ui->VerticalSpacing->setEnabled(true);
+    ui->SaveBeamformed->setEnabled(true);
+    ui->SaveRaw->setEnabled(true);
+    ui->TransmitPhaseLength->setEnabled(true);
+    ui->ExcitationFrequency->setEnabled(true);
+    ui->TransmitEvents->setEnabled(true);
+    ui->Voltage->setEnabled(true);
+    ui->Mode->setEnabled(true);
+    ui->ScanDepth->setEnabled(true);
+    ui->AveragingCount->setEnabled(true);
+    ui->TimeGainCompensationMinSlider->setEnabled(true);
+    ui->TimeGainCompensationMaxSlider->setEnabled(true);
+    ui->DataType->setEnabled(true);
+    ui->PitchOfTransducer->setEnabled(true);
+    ui->ReconstructedSamplesPerLine->setEnabled(true);
+    ui->ReconstructedLines->setEnabled(true);
+    ui->SpeedOfSound->setEnabled(true);
+    ui->BandpassEnabled->setEnabled(true);
+    ui->LowCut->setEnabled(true);
+    ui->HighCut->setEnabled(true);
+
     m_ControlInterface->SetRecord(false);
   }
 }
@@ -183,6 +236,17 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnCompensateScatteringChanged()
   m_ControlInterface->SetCompensateScattering(ui->CompensateScattering->isChecked());
 }
 
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnChangedSavingSettings()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+
+  mitk::USDiPhASDeviceCustomControls::SavingSettings settings;
+
+  settings.saveBeamformed = ui->SaveBeamformed->isChecked();
+  settings.saveRaw = ui->SaveRaw->isChecked();
+
+  m_ControlInterface->SetSavingSettings(settings);
+}
 
 //Transmit
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTransmitPhaseLengthChanged()

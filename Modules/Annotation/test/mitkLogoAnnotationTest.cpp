@@ -57,7 +57,7 @@ public:
 
     m_PathToBall = GetTestDataFilePath("ball.stl");
     m_PathToImage = GetTestDataFilePath("Pic3D.nrrd");
-    m_PathToLogo = GetTestDataFilePath("RenderingTestData/rgbaImage.png");
+    m_PathToLogo = GetTestDataFilePath("RenderingTestData/texture.jpg");
     m_ReferenceImagePath = "RenderingTestData/ReferenceScreenshots/Annotation/";
 
     // Build a command line for the vtkTesting::Test method.

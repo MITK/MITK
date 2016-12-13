@@ -101,14 +101,27 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
 
   m_Controls.tabWidget->setTabEnabled(1, false);
 
+  auto renderingManager = mitk::RenderingManager::GetInstance();
+
   // Tell the RenderWindow which (part of) the datastorage to render
-  m_PARenderWindow.GetRenderer()->SetDataStorage(this->GetDataStorage());
+  m_PARenderWindow.GetRenderer()->SetDataStorage(m_PADataStorage);
 
   // Initialize the RenderWindow
-  mitk::TimeGeometry::Pointer geo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+  mitk::TimeGeometry::Pointer PAgeo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews(PAgeo);
 
   m_PARenderWindow.show();
+  renderingManager->AddRenderWindow(m_PARenderWindow.GetRenderWindow());
+
+  // Tell the RenderWindow which (part of) the datastorage to render
+  m_USRenderWindow.GetRenderer()->SetDataStorage(m_USDataStorage);
+
+  // Initialize the RenderWindow
+  mitk::TimeGeometry::Pointer USgeo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews(USgeo);
+
+  m_USRenderWindow.show();
+  renderingManager->AddRenderWindow(m_USRenderWindow.GetRenderWindow());
 }
 
 #include <mitkRenderingModeProperty.h>
@@ -117,6 +130,7 @@ void UltrasoundSupport::InitNewNode()
 {
   m_Node.push_back(nullptr);
   auto& Node = m_Node.back();
+
   Node = mitk::DataNode::New();
   Node->SetName("No Data received yet ...");
   //create a dummy image (gray values 0..255) for correct initialization of level window, etc.
@@ -141,14 +155,14 @@ void UltrasoundSupport::AddOverlay()
 {
 
   //This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
-  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), m_Renderer);
+  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), m_PARenderer);
 
   //Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
-  m_OverlayManager->AddLayouter(topleftLayouter.GetPointer());
+  m_PAOverlayManager->AddLayouter(topleftLayouter.GetPointer());
 
   //Several other Layouters can be added to the overlayManager
-  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), m_Renderer);
-  m_OverlayManager->AddLayouter(bottomLayouter.GetPointer());
+  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), m_PARenderer);
+  m_PAOverlayManager->AddLayouter(bottomLayouter.GetPointer());
 
   //Create a textOverlay2D
   mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
@@ -164,7 +178,7 @@ void UltrasoundSupport::AddOverlay()
   textOverlay->SetPosition2D(pos);
 
   //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
-  m_OverlayManager->AddOverlay(textOverlay.GetPointer());
+  m_PAOverlayManager->AddOverlay(textOverlay.GetPointer());
 
   //Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
   //Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
@@ -173,7 +187,7 @@ void UltrasoundSupport::AddOverlay()
 
 void UltrasoundSupport::RemoveOverlays()
 {
-  m_OverlayManager->RemoveAllOverlays();
+  m_PAOverlayManager->RemoveAllOverlays();
 }
 
 void UltrasoundSupport::UpdateColormaps()
@@ -267,20 +281,40 @@ void UltrasoundSupport::UpdateAmountOfOutputs()
   while (m_curOutput.size() > m_AmountOfOutputs) {
     m_curOutput.pop_back();
   }
+
+  auto iterPA = m_PADataStorage->GetAll();
+  for (int i = 0; i < iterPA->Size(); ++i)
+  {
+    m_PADataStorage->Remove(iterPA->GetElement(i));
+  }
+
+  auto iterUS = m_USDataStorage->GetAll();
+  for (int i = 0; i < iterUS->Size(); ++i)
+  {
+    m_USDataStorage->Remove(iterUS->GetElement(i));
+  }
+
+  m_PADataStorage->Add(m_Node.back());
+  for (int i = 0; i < m_Node.size() - 1; ++i)
+    m_USDataStorage->Add(m_Node.at(i));
 }
 
 void UltrasoundSupport::UpdateImage()
 {
   if(m_Controls.m_ShowImageStream->isChecked())
   {
-    if (m_Renderer == nullptr || m_OverlayManager == nullptr)
+    if (m_PARenderer == nullptr || m_PAOverlayManager == nullptr || m_USRenderer == nullptr || m_USOverlayManager == nullptr)
     {
       //setup an overlay manager
+      mitk::OverlayManager::Pointer OverlayManagerInstancePA = mitk::OverlayManager::New();
+      m_PARenderer = mitk::BaseRenderer::GetInstance(m_PARenderWindow.GetVtkRenderWindow());
+      m_PARenderer->SetOverlayManager(OverlayManagerInstancePA);
+      m_PAOverlayManager = m_PARenderer->GetOverlayManager();
 
-      mitk::OverlayManager::Pointer OverlayManagerInstance = mitk::OverlayManager::New();
-      m_Renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
-      m_Renderer->SetOverlayManager(OverlayManagerInstance);
-      m_OverlayManager = m_Renderer->GetOverlayManager();
+      mitk::OverlayManager::Pointer OverlayManagerInstanceUS = mitk::OverlayManager::New();
+      m_USRenderer = mitk::BaseRenderer::GetInstance(m_USRenderWindow.GetVtkRenderWindow());
+      m_USRenderer->SetOverlayManager(OverlayManagerInstanceUS);
+      m_USOverlayManager = m_USRenderer->GetOverlayManager();
 
       AddOverlay();
     }
@@ -380,6 +414,11 @@ void UltrasoundSupport::RenderImage2d()
     return;
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
   renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+
+  auto renderingManager = mitk::RenderingManager::GetInstance();
+  renderingManager->RequestUpdate(m_PARenderWindow.GetRenderWindow());
+  renderingManager->RequestUpdate(m_USRenderWindow.GetRenderWindow());
+
   //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
@@ -614,7 +653,9 @@ void UltrasoundSupport::OnDeciveServiceEvent(const ctkServiceEvent event)
 UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
-  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0), m_Renderer(nullptr), m_OverlayManager(nullptr)
+  m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0), 
+  m_PARenderer(nullptr), m_PAOverlayManager(nullptr), m_USRenderer(nullptr), m_USOverlayManager(nullptr),
+  m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New())
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

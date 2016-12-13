@@ -32,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkUSControlsProbesWidget.h"
 #include <mitkBaseRenderer.h>
 #include "QmitkRenderWindow.h"
+#include <mitkStandaloneDataStorage.h>
 
 #include <QTime>
 
@@ -108,6 +109,14 @@ protected:
   QmitkRenderWindow m_PARenderWindow; // window for the PA images
   QmitkRenderWindow m_USRenderWindow; // window for the US images
 
+  mitk::StandaloneDataStorage::Pointer m_PADataStorage;
+  mitk::StandaloneDataStorage::Pointer m_USDataStorage;
+
+  mitk::OverlayManager::Pointer m_PAOverlayManager;
+  mitk::OverlayManager::Pointer m_USOverlayManager;
+  mitk::BaseRenderer::Pointer m_PARenderer;
+  mitk::BaseRenderer::Pointer m_USRenderer;
+
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
 
@@ -159,9 +168,6 @@ protected:
   mitk::SlicedGeometry3D::Pointer m_OldGeometry;
 
   Ui::UltrasoundSupportControls m_Controls;
-
-  mitk::OverlayManager::Pointer m_OverlayManager;
-  mitk::BaseRenderer::Pointer m_Renderer;
 
   QmitkUSAbstractCustomWidget*  m_ControlCustomWidget;
   QmitkUSControlsBModeWidget*   m_ControlBModeWidget;

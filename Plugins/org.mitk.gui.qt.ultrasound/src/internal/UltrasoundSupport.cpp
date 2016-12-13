@@ -237,7 +237,10 @@ void UltrasoundSupport::UpdateImage()
     if (m_Renderer == nullptr || m_OverlayManager == nullptr)
     {
       m_Renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
-      m_OverlayManager = m_Renderer.GetPointer()->GetOverlayManager();
+      mitk::OverlayManager::Pointer OverlayManagerInstance = mitk::OverlayManager::New();
+      m_Renderer->SetOverlayManager(OverlayManagerInstance);
+
+      //m_OverlayManager = m_Renderer->GetVtkRenderer()->GetOverlayManager();
     }
     m_Device->Modified();
     m_Device->Update();

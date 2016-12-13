@@ -262,6 +262,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
   
   m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMaxSlider->value());
 }
+
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnDataTypeChanged()
 {
   if (m_ControlInterface.IsNull()) { return; }

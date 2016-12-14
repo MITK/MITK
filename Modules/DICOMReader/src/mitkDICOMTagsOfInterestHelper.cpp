@@ -65,7 +65,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
 {
   DICOMTagPathMapType result;
     //These tags are copied from DICOMSeriesReader. The old naming style (deprecated)
-    //is keept for backwards compatibility until it is removed.
+    //is kept for backwards compatibility until it is removed.
     //Below we have also already added the properties with the new naming style
 
     // Patient module
@@ -130,6 +130,23 @@ mitk::GetDefaultDICOMTagsOfInterest()
     /*dicom.InstitutionName*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x0080)));
     /*dicom.StationName*/ result.insert(MakeEntry(DICOMTag(0x0008, 0x1010)));
     /*dicom.DoseGridScaling*/ result.insert(MakeEntry(DICOMTag(0x3004, 0x000e)));
+
+    //Additions for RTPLAN
+    DICOMTagPath doseReferenceSequence;
+    doseReferenceSequence.AddAnySelection(0x300A, 0x0010);
+    DICOMTagPath fractionGroupSequence;
+    fractionGroupSequence.AddAnySelection(0x300A, 0x0070);
+    DICOMTagPath beamSequence;
+    beamSequence.AddAnySelection(0x300A, 0x00B0);
+    DICOMTagPath referencedStructureSetSequence;
+    referencedStructureSetSequence.AddAnySelection(0x300C, 0x0060);
+    result.insert(MakeEntry(DICOMTagPath(doseReferenceSequence).AddElement(0x300A, 0x0013))); //dicom.DoseReferenceSequence.DoseReferenceUID
+    result.insert(MakeEntry(DICOMTagPath(doseReferenceSequence).AddElement(0x300A, 0x0016))); //dicom.DoseReferenceSequence.DoseReferenceDescription
+    result.insert(MakeEntry(DICOMTagPath(doseReferenceSequence).AddElement(0x300A, 0x0026))); //dicom.DoseReferenceSequence.TargetPrescriptionDose
+    result.insert(MakeEntry(DICOMTagPath(fractionGroupSequence).AddElement(0x300A, 0x0078))); //dicom.FractionGroupSequence.NumberOfFractionsPlanned
+    result.insert(MakeEntry(DICOMTagPath(fractionGroupSequence).AddElement(0x300A, 0x0080))); //dicom.FractionGroupSequence.NumberOfBeams
+    result.insert(MakeEntry(DICOMTagPath(beamSequence).AddElement(0x300A, 0x00C6)));          //dicom.BeamSequence.RadiationType
+    result.insert(MakeEntry(DICOMTagPath(referencedStructureSetSequence).AddElement(0x0008, 0x1155))); //dicom.ReferencedStructureSetSequence.ReferencedSOPInstanceUID
 
     //Additions for PET
     DICOMTagPath radioPharmaRootTag;

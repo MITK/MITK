@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkRTPlanReader.h"
 #include "mitkImage.h"
-#include "mitkGenericProperty.h"
+#include "mitkTemporoSpatialStringProperty.h"
 #include "mitkBaseProperty.h"
 
 class mitkRTPlanReaderTestSuite : public mitk::TestFixture
@@ -46,52 +46,32 @@ public:
 
   void TestProperties()
   {
-      CheckStringProperty("DICOM.300A.0010.[*].300A.0013.0", "1.2.246.352.72.11.320687012.17740.20090508173031");
-      CheckStringProperty("DICOM.300A.0010.[*].300A.0013.1", "1.2.246.352.72.11.320687012.17741.20090508173031");
-
-      CheckStringProperty("DICOM.300A.0010.[*].300A.0016.0", "Breast");
-      CheckStringProperty("DICOM.300A.0010.[*].300A.0016.1", "CALC POINT");
+      CheckStringProperty("DICOM.300A.0010.[0].300A.0013", "1.2.246.352.72.11.320687012.17740.20090508173031");
+      CheckStringProperty("DICOM.300A.0010.[1].300A.0013", "1.2.246.352.72.11.320687012.17741.20090508173031");
+      CheckStringProperty("DICOM.300A.0010.[0].300A.0016", "Breast");
+      CheckStringProperty("DICOM.300A.0010.[1].300A.0016", "CALC POINT");
+      CheckStringProperty("DICOM.300A.0010.[0].300A.0026", "14");
+      CheckStringProperty("DICOM.300A.0010.[1].300A.0026", "11.3113869239676");
       
-      CheckDoubleProperty("DICOM.300A.0010.[*].300A.0026.0", 14.0);
-      CheckDoubleProperty("DICOM.300A.0010.[*].300A.0026.1", 11.3113869239676);
-      
-      CheckIntProperty("DICOM.300A.0070.[*].300A.0078.0", 7);
+      CheckStringProperty("DICOM.300A.0070.[0].300A.0078", "7");
+      CheckStringProperty("DICOM.300A.0070.[0].300A.0080", "4");
 
-      CheckIntProperty("DICOM.300A.0070.[*].300A.0080.0", 4);
+      CheckStringProperty("DICOM.300A.00B0.[0].300A.00C6", "PHOTON");
+      CheckStringProperty("DICOM.300A.00B0.[1].300A.00C6", "PHOTON");
+      CheckStringProperty("DICOM.300A.00B0.[2].300A.00C6", "PHOTON");
+      CheckStringProperty("DICOM.300A.00B0.[3].300A.00C6", "PHOTON");
 
-      CheckStringProperty("DICOM.300A.00B0.[*].300A.00C6.0", "PHOTON");
-
-      CheckStringProperty("DICOM.300C.0060.[*].0008.1155.0", "1.2.246.352.71.4.320687012.3190.20090511122144");
+      CheckStringProperty("DICOM.300C.0060.[0].0008.1155", "1.2.246.352.71.4.320687012.3190.20090511122144");
   }
 
   void CheckStringProperty(std::string propertyName, std::string expectedPropertyValue)
   {
       auto actualProperty = m_image->GetProperty(propertyName.c_str());
       CPPUNIT_ASSERT_EQUAL_MESSAGE("Property not found: " + propertyName, actualProperty.IsNotNull(), true);
-      auto actualGenericStringProperty = dynamic_cast<mitk::GenericProperty<std::string>*>(actualProperty.GetPointer());
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Property has not type string: " + propertyName, actualGenericStringProperty != nullptr, true);
-      std::string actualStringProperty = actualGenericStringProperty->GetValue();
+      auto actualTemporoSpatialStringProperty = dynamic_cast<mitk::TemporoSpatialStringProperty*>(actualProperty.GetPointer());
+      CPPUNIT_ASSERT_EQUAL_MESSAGE("Property has not type string: " + propertyName, actualTemporoSpatialStringProperty != nullptr, true);
+      std::string actualStringProperty = actualTemporoSpatialStringProperty->GetValue();
       CPPUNIT_ASSERT_EQUAL_MESSAGE(propertyName + " is not as expected", actualStringProperty, expectedPropertyValue);
-  }
-
-  void CheckDoubleProperty(std::string propertyName, double expectedPropertyValue)
-  {
-      auto actualProperty = m_image->GetProperty(propertyName.c_str());
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Property not found: " + propertyName, actualProperty.IsNotNull(), true);
-      auto actualGenericDoubleProperty = dynamic_cast<mitk::GenericProperty<double>*>(actualProperty.GetPointer());
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Property has not type string: " + propertyName, actualGenericDoubleProperty != nullptr, true);
-      double actualDoubleProperty = actualGenericDoubleProperty->GetValue();
-      CPPUNIT_ASSERT_EQUAL_MESSAGE(propertyName + " is not as expected", actualDoubleProperty, expectedPropertyValue);
-  }
-
-  void CheckIntProperty(std::string propertyName, int expectedPropertyValue)
-  {
-      auto actualProperty = m_image->GetProperty(propertyName.c_str());
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Property not found: " + propertyName, actualProperty.IsNotNull(), true);
-      auto actualGenericIntProperty = dynamic_cast<mitk::GenericProperty<int>*>(actualProperty.GetPointer());
-      CPPUNIT_ASSERT_EQUAL_MESSAGE("Property has not type string: " + propertyName, actualGenericIntProperty != nullptr, true);
-      int actualIntProperty = actualGenericIntProperty->GetValue();
-      CPPUNIT_ASSERT_EQUAL_MESSAGE(propertyName + " is not as expected", actualIntProperty, expectedPropertyValue);
   }
 
 

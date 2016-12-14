@@ -22,22 +22,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <string>
 #include <vector>
-#include <tuple>
 
 #include "mitkImage.h"
+#include "mitkIDICOMTagsOfInterest.h"
 #include "mitkDICOMDatasetAccessingImageFrameInfo.h"
+
+#include <usModuleContext.h>
 
 #include "MitkDicomRTExports.h"
 
 namespace mitk
 {
-    struct DICOMDatasetFinding;
-    class DICOMTagPath;
-
+    /**
+    * \brief RTPlanReader reads DICOM files of modality RTPLAN.
+      \details The tags are defined in mitk::GetDefaultDICOMTagsOfInterest(). They are stored as TemporoSpatialStringProperty.
+      with the key as their respective DICOM tags.
+      \note No image information is in RTPLAN.
+    */
     class MITKDICOMRT_EXPORT RTPlanReader : public mitk::AbstractFileReader
   {
 
   public:
+      typedef std::vector<mitk::DICOMDatasetAccess::FindingsListType> FindingsListVectorType;
       RTPlanReader();
       RTPlanReader(const RTPlanReader& other);
 
@@ -48,14 +54,12 @@ namespace mitk
 
   private:
     RTPlanReader* Clone() const override;
+    FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList& pathsOfInterest, const DICOMDatasetAccessingImageFrameList& frames) const;
+    void SetProperties(Image::Pointer image, const FindingsListVectorType& findings) const;
+    mitk::IDICOMTagsOfInterest* GetDicomTagsOfInterestService() const;
 
-    DICOMTagPath GenerateDicomTagPath(unsigned int tag1, unsigned int tag2, unsigned int sqTag1, unsigned int sqTag2) const;
-    std::vector<std::tuple<std::string, std::string, mitk::DICOMTagPath> > GeneratePathsOfInterest() const;
-    std::vector<DICOMTagPath> ExtractDicomPathList(const std::vector<std::tuple<std::string, std::string, mitk::DICOMTagPath> >& pathsOfInterestInformation) const;
-    std::vector<std::tuple<std::string, std::string, std::list<DICOMDatasetFinding> > > ReadPathsOfInterest(const std::vector<std::tuple<std::string, std::string, mitk::DICOMTagPath> >& pathsOfInterestInformation, const DICOMDatasetAccessingImageFrameList& frames) const;
-    void SetProperties(Image::Pointer dummyImage, const std::vector<std::tuple<std::string, std::string, std::list<DICOMDatasetFinding> > >& findings) const;
-
-    us::ServiceRegistration<mitk::IFileReader> m_ServiceReg;
+    us::ServiceRegistration<mitk::IFileReader> m_FileReaderServiceReg;
+    IDICOMTagsOfInterest* m_DICOMTagsOfInterestService;
   };
 }
 

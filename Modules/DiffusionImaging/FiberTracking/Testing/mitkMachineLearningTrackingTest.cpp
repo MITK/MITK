@@ -62,7 +62,7 @@ public:
         mitk::CastToItkImage(img, seed);
 
         tfh.LoadForest(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
-        tfh.AddRawData(dwi);
+        tfh.AddDwi(dwi);
     }
 
     void tearDown() override
@@ -82,7 +82,6 @@ public:
         tracker->SetMinTractLength(20);
         tracker->SetMaxTractLength(400);
         tracker->SetForestHandler(tfh);
-        tracker->SetNumberOfSamples(30);
         tracker->SetAposterioriCurvCheck(false);
         tracker->SetRemoveWmEndFibers(false);
         tracker->SetAvoidStop(true);

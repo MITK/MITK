@@ -48,7 +48,9 @@ MLBSTrackingFilter<  ShOrder, NumImageFeatures >
     , m_SeedsPerVoxel(1)
     , m_RandomSampling(false)
     , m_SamplingDistance(-1)
-    , m_NumberOfSamples(50)
+    , m_DeflectionMod(1.0)
+    , m_OnlyForwardSamples(true)
+    , m_UseStopVotes(true)
     , m_StoppingRegions(NULL)
     , m_SeedImage(NULL)
     , m_MaskImage(NULL)
@@ -58,12 +60,6 @@ MLBSTrackingFilter<  ShOrder, NumImageFeatures >
     , m_DemoMode(false)
 {
     this->SetNumberOfRequiredInputs(1);
-}
-
-template<  int ShOrder, int NumImageFeatures >
-double MLBSTrackingFilter<  ShOrder, NumImageFeatures >
-::RoundToNearest(double num) {
-    return (num > 0.0) ? floor(num + 0.5) : ceil(num - 0.5);
 }
 
 template<  int ShOrder, int NumImageFeatures >
@@ -154,9 +150,11 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
     std::cout << "MLBSTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
     std::cout << "MLBSTrackingFilter: Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
     std::cout << "MLBSTrackingFilter: Max. sampling distance: " << m_SamplingDistance << " mm" << std::endl;
-    std::cout << "MLBSTrackingFilter: Number of samples: " << m_NumberOfSamples << std::endl;
+    std::cout << "MLBSTrackingFilter: Deflection modifier: " << m_DeflectionMod << std::endl;
     std::cout << "MLBSTrackingFilter: Max. tract length: " << m_MaxTractLength << " mm" << std::endl;
     std::cout << "MLBSTrackingFilter: Min. tract length: " << m_MinTractLength << " mm" << std::endl;
+    std::cout << "MLBSTrackingFilter: Use stop votes: " << m_UseStopVotes << std::endl;
+    std::cout << "MLBSTrackingFilter: Only frontal samples: " << m_OnlyForwardSamples << std::endl;
     std::cout << "MLBSTrackingFilter: Starting streamline tracking using " << this->GetNumberOfThreads() << " threads." << std::endl;
 }
 
@@ -219,13 +217,15 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
         direction *= w;  // HERE WE ARE WEIGHTING AGAIN EVEN THOUGH THE OUTPUT DIRECTIONS ARE ALREADY WEIGHTED!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED.
     }
 
-    itk::OrientationDistributionFunction< double, 50 >  probeVecs;
+    itk::OrientationDistributionFunction< double, 30 >  probeVecs;
     itk::Point<double, 3> sample_pos;
     int alternatives = 1;
-    for (int i=0; i<m_NumberOfSamples; i++)
+    int stop_votes = 0;
+    int possible_stop_votes = 0;
+    for (int i=0; i<probeVecs.GetNumberOfComponents(); i++)
     {
         vnl_vector_fixed<double,3> d;
-
+        bool is_stop_voter = false;
         if (m_RandomSampling)
         {
             d[0] = GetRandDouble();
@@ -236,6 +236,14 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
         }
         else
         {
+          double dot = dot_product(probeVecs.GetDirection(i), olddir);
+            if (m_UseStopVotes && dot>0.7)
+            {
+              is_stop_voter = true;
+              possible_stop_votes++;
+            }
+            else if (m_OnlyForwardSamples && dot<0)
+              continue;
             d = probeVecs.GetDirection(i)*m_SamplingDistance;
         }
 
@@ -255,33 +263,38 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
         }
         else if (m_AvoidStop && candidates==0 && olddir.magnitude()>0) // out of white matter
         {
-            double dot = dot_product(d, olddir);
-            if (dot >= 0.0) // in front of plane defined by pos and olddir
-                d = -d + 2*dot*olddir; // reflect
-            else
-                d = -d; // invert
+          if (is_stop_voter)
+            stop_votes++;
 
-            // look a bit further into the other direction
-            sample_pos[0] = pos[0] + d[0];
-            sample_pos[1] = pos[1] + d[1];
-            sample_pos[2] = pos[2] + d[2];
-            if(m_DemoMode)
-                m_AlternativePointset->InsertPoint(alternatives, sample_pos);
-            alternatives++;
-            candidates = 0;
-            vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
-            if (IsValidPosition(sample_pos))
-                tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
+          double dot = dot_product(d, olddir);
+          if (dot >= 0.0) // in front of plane defined by pos and olddir
+              d = -d + 2*dot*olddir; // reflect
+          else
+              d = -d; // invert
 
-            if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
-            {
-                direction += d;         // go into the direction of the white matter
-                direction += tempDir*w;  // go into the direction of the white matter direction at this location
-            }
+          // look a bit further into the other direction
+          sample_pos[0] = pos[0] + d[0];
+          sample_pos[1] = pos[1] + d[1];
+          sample_pos[2] = pos[2] + d[2];
+          if(m_DemoMode)
+              m_AlternativePointset->InsertPoint(alternatives, sample_pos);
+          alternatives++;
+          candidates = 0;
+          vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
+          if (IsValidPosition(sample_pos))
+              tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
+
+          if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
+          {
+              direction += d * m_DeflectionMod;         // go into the direction of the white matter
+              direction += tempDir*w;  // go into the direction of the white matter direction at this location
+          }
         }
+        else if (is_stop_voter)
+            stop_votes++;
     }
 
-    if (direction.magnitude()>0.001)
+    if (direction.magnitude()>0.001 && (possible_stop_votes==0 || (float)stop_votes/possible_stop_votes<0.5) )
     {
         direction.normalize();
         olddir[0] = direction[0];
@@ -298,11 +311,9 @@ template<  int ShOrder, int NumImageFeatures >
 double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
 {
     vnl_vector_fixed<double,3> dirOld = dir;
-    dirOld = dir;
 
     for (int step=0; step< m_MaxLength/2; step++)
     {
-
         // get new position
         CalculateNewPosition(pos, dir);
 

@@ -271,7 +271,7 @@ void QmitkMLBTView::StartTracking()
         return;
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
-    m_ForestHandler.AddRawData(dwi);
+    m_ForestHandler.AddDwi(dwi);
 
 //    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 
@@ -310,8 +310,10 @@ void QmitkMLBTView::StartTracking()
     tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
     tracker->SetForestHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
-    tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
+    tracker->SetDeflectionMod(m_Controls->m_DeflectionModBox->value());
     tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
+    tracker->SetUseStopVotes(m_Controls->m_UseStopVotes->isChecked());
+    tracker->SetOnlyForwardSamples(m_Controls->m_OnlyForwardSamples->isChecked());
     tracker->Update();
 }
 
@@ -388,7 +390,7 @@ void QmitkMLBTView::StartTraining()
             m_WhiteMatterImages.push_back(nullptr);
     }
 
-    m_ForestHandler.SetRawData(m_SelectedDiffImages);
+    m_ForestHandler.SetDwis(m_SelectedDiffImages);
     m_ForestHandler.SetTractograms(m_SelectedFB);
     m_ForestHandler.SetMaskImages(m_MaskImages);
     m_ForestHandler.SetWhiteMatterImages(m_WhiteMatterImages);

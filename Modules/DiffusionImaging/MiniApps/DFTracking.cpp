@@ -62,9 +62,12 @@ int main(int argc, char* argv[])
     parser.addArgument("seed", "s", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
 
     parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize (in voxels)", us::Any());
-    parser.addArgument("samples", "ns", mitkCommandLineParser::Int, "Samples:", "number of neighborhood samples", us::Any());
     parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", us::Any());
     parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", us::Any());
+
+    parser.addArgument("stopvotes", "sv", mitkCommandLineParser::Int, "Use stop votes:", "use stop votes", us::Any());
+    parser.addArgument("forward", "fs", mitkCommandLineParser::Int, "Use only forward samples:", "use only forward samples", us::Any());
+
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -73,6 +76,14 @@ int main(int argc, char* argv[])
     string imageFile = us::any_cast<string>(parsedArgs["image"]);
     string forestFile = us::any_cast<string>(parsedArgs["forest"]);
     string outFile = us::any_cast<string>(parsedArgs["out"]);
+
+    bool stopvotes = true;
+    if (parsedArgs.count("stopvotes"))
+        stopvotes = us::any_cast<int>(parsedArgs["stopvotes"]);
+
+    bool forward = true;
+    if (parsedArgs.count("forward"))
+        forward = us::any_cast<int>(parsedArgs["forward"]);
 
     string maskFile = "";
     if (parsedArgs.count("mask"))
@@ -93,10 +104,6 @@ int main(int argc, char* argv[])
     float samplingdist = 0.25;
     if (parsedArgs.count("samplingdist"))
         samplingdist = us::any_cast<float>(parsedArgs["samplingdist"]);
-
-    int samples = 30;
-    if (parsedArgs.count("samples"))
-        samples = us::any_cast<int>(parsedArgs["samples"]);
 
     int seeds = 1;
     if (parsedArgs.count("seeds"))
@@ -151,12 +158,12 @@ int main(int argc, char* argv[])
         addFeatImages.at(0).push_back(itkimg);
     }
 
-    mitk::TrackingForestHandler<> tfh;
+    mitk::TrackingForestHandler<6,100> tfh;
     tfh.LoadForest(forestFile);
-    tfh.AddRawData(dwi);
+    tfh.AddDwi(dwi);
     tfh.SetAdditionalFeatureImages(addFeatImages);
 
-    typedef itk::MLBSTrackingFilter<> TrackerType;
+    typedef itk::MLBSTrackingFilter<6,100> TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
     tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
     tracker->SetMaskImage(mask);
@@ -166,7 +173,9 @@ int main(int argc, char* argv[])
     tracker->SetStepSize(stepsize);
     tracker->SetForestHandler(tfh);
     tracker->SetSamplingDistance(samplingdist);
-    tracker->SetNumberOfSamples(samples);
+    tracker->SetUseStopVotes(stopvotes);
+    tracker->SetOnlyForwardSamples(forward);
+    //tracker->SetDeflectionMod(deflection);
     //tracker->SetAvoidStop(false);
     tracker->SetAposterioriCurvCheck(false);
     tracker->SetRemoveWmEndFibers(false);

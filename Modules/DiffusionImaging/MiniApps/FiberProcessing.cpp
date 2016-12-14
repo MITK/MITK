@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
     parser.addArgument("minLength", "l", mitkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
     parser.addArgument("maxLength", "m", mitkCommandLineParser::Float, "Maximum length:", "Maximum fiber length (in mm)");
     parser.addArgument("maxAngle", "a", mitkCommandLineParser::Float, "Maximum angle:", "Maximum angular STDEV over 1cm (in degree)");
+    parser.addArgument("remove", "rm", mitkCommandLineParser::Int, "Remove fibers exceeding curvature threshold:", "if 0, only the high curvature parts are removed");
     parser.addArgument("mirror", "p", mitkCommandLineParser::Int, "Invert coordinates:", "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
     parser.addArgument("rotate-x", "rx", mitkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
@@ -81,6 +82,10 @@ int main(int argc, char* argv[])
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
+
+    bool remove = true;
+    if (parsedArgs.count("remove"))
+        remove = us::any_cast<int>(parsedArgs["remove"]);
 
     float smoothDist = -1;
     if (parsedArgs.count("smooth"))
@@ -156,7 +161,7 @@ int main(int argc, char* argv[])
             filter->SetInputFiberBundle(fib);
             filter->SetAngularDeviation(maxAngularDev);
             filter->SetDistance(10);
-            filter->SetRemoveFibers(true);
+            filter->SetRemoveFibers(remove);
             filter->Update();
             fib = filter->GetOutputFiberBundle();
         }

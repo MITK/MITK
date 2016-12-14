@@ -175,8 +175,8 @@ int main(int argc, char* argv[])
         c++;
     }
 
-    mitk::TrackingForestHandler<> forestHandler;
-    forestHandler.SetRawData(rawData);
+    mitk::TrackingForestHandler<6,100> forestHandler;
+    forestHandler.SetDwis(rawData);
     forestHandler.SetMaskImages(maskImageVector);
     forestHandler.SetWhiteMatterImages(wmMaskImageVector);
     forestHandler.SetFiberVolumeModImages(volumeModImages);

@@ -51,7 +51,7 @@ public:
   static const std::string VIEW_ID;
 
   typedef itk::Image<unsigned char, 3>      ItkUcharImgType;
-  typedef itk::MLBSTrackingFilter<>         TrackerType;
+  typedef itk::MLBSTrackingFilter<6,100>         TrackerType;
 
   QmitkMLBTView();
   virtual ~QmitkMLBTView();
@@ -87,7 +87,7 @@ protected:
   Ui::QmitkMLBTViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
 
-  mitk::TrackingForestHandler<> m_ForestHandler;
+  mitk::TrackingForestHandler<6,100> m_ForestHandler;
 
   QFutureWatcher<void> m_TrainingWatcher;
   QFutureWatcher<void> m_TrackingWatcher;

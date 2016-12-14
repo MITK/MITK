@@ -50,7 +50,7 @@ namespace itk{
 /**
 * \brief Performes deterministic streamline tracking on the input tensor image.   */
 
-template<  int ShOrder=6, int NumImageFeatures=100 >
+template<  int ShOrder=6, int NumImageFeatures=28 >
 class MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
 {
 
@@ -97,7 +97,9 @@ public:
     itkSetMacro( MaxTractLength, double )               ///< Streamline progression stops if tract is longer than specified.
     itkSetMacro( AngularThreshold, double )             ///< Probabilities for directions with larger angular deviation from previous direction is set to 0
     itkSetMacro( SamplingDistance, double )             ///< Maximum distance of sampling points in mm
-    itkSetMacro( NumberOfSamples, int )                 ///< Number of sampling points
+    itkSetMacro( UseStopVotes, bool )                   ///< Frontal sampling points can vote for stopping the streamline even if the remaining sampling points keep pushing
+    itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
+    itkSetMacro( DeflectionMod, double )                 ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
     itkSetMacro( RemoveWmEndFibers, bool )              ///< Checks if fiber ending is located in the white matter. If this is the case, the streamline is discarded.
@@ -105,7 +107,7 @@ public:
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
 
-    void SetForestHandler( mitk::TrackingForestHandler<ShOrder> fh )   ///< Stores random forest classifier and performs actual classification
+    void SetForestHandler( mitk::TrackingForestHandler<ShOrder, NumImageFeatures> fh )   ///< Stores random forest classifier and performs actual classification
     {
         m_ForestHandler = fh;
     }
@@ -120,7 +122,6 @@ public:
     vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& olddir); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
     double GetRandDouble(double min=-1, double max=1);
-    double RoundToNearest(double num);
 
     void BeforeThreadedGenerateData() override;
     void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
@@ -139,7 +140,9 @@ public:
     int                                 m_SeedsPerVoxel;
     bool                                m_RandomSampling;
     double                              m_SamplingDistance;
-    int                                 m_NumberOfSamples;
+    double                              m_DeflectionMod;
+    bool                                m_OnlyForwardSamples;
+    bool                                m_UseStopVotes;
 
     SimpleFastMutexLock                 m_Mutex;
     ItkUcharImgType::Pointer            m_StoppingRegions;
@@ -155,7 +158,7 @@ public:
     int CheckCurvature(FiberType* fib, bool front);
 
     // decision forest
-    mitk::TrackingForestHandler<ShOrder>       m_ForestHandler;
+    mitk::TrackingForestHandler<ShOrder, NumImageFeatures>       m_ForestHandler;
     typename InputImageType::Pointer    m_InputImage;
 
 

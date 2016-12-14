@@ -32,6 +32,15 @@ namespace mitk
     , m_NumberOfSamples(0)
     , m_GmSamplesPerVoxel(50)
   {
+    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+
+    itk::OrientationDistributionFunction< double, 200 > odf;
+    m_DirectionContainer.clear();
+    for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
+    {
+      if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
+        m_DirectionContainer.push_back(odf.GetDirection(i));  // store indices for later mapping the classifier output to the actual direction
+    }
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
@@ -40,7 +49,7 @@ namespace mitk
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
-  typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InterpolatedRawImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetImageValues(itk::Point<float, 3> itkP, typename InterpolatedRawImageType::Pointer image)
+  typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image)
   {
     // transform physical point to index coordinates
     itk::Index<3> idx;
@@ -48,7 +57,7 @@ namespace mitk
     image->TransformPhysicalPointToIndex(itkP, idx);
     image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
-    typename InterpolatedRawImageType::PixelType pix; pix.Fill(0.0);
+    typename DwiFeatureImageType::PixelType pix; pix.Fill(0.0);
     if ( image->GetLargestPossibleRegion().IsInside(idx) )
       pix = image->GetPixel(idx);
     else
@@ -93,7 +102,7 @@ namespace mitk
       interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
 
       pix = image->GetPixel(idx) * interpWeights[0];
-      typename InterpolatedRawImageType::IndexType tmpIdx = idx; tmpIdx[0]++;
+      typename DwiFeatureImageType::IndexType tmpIdx = idx; tmpIdx[0]++;
       pix +=  image->GetPixel(tmpIdx) * interpWeights[1];
       tmpIdx = idx; tmpIdx[1]++;
       pix +=  image->GetPixel(tmpIdx) * interpWeights[2];
@@ -115,7 +124,7 @@ namespace mitk
   template< int ShOrder, int NumberOfSignalFeatures >
   void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
   {
-    if (m_RawData.empty())
+    if (m_InputDwis.empty())
       mitkThrow() << "No diffusion-weighted images set!";
     if (!IsForestValid())
       mitkThrow() << "No or invalid random forest detected!";
@@ -130,42 +139,48 @@ namespace mitk
     typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
     typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_RawData.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_RawData.at(0)) );
-    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_RawData.at(0)));
+    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(0)) );
+    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(0)));
     filter->SetLambda(0.006);
     filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
     filter->Update();
 
-    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-    itk::OrientationDistributionFunction< double, NumberOfSignalFeatures*2 > odf;
-    m_DirectionIndices.clear();
-    for (unsigned int f=0; f<NumberOfSignalFeatures*2; f++)
+    m_DwiFeatureImages.clear();
+
+    //m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+
     {
-      if (dot_product(ref, odf.GetDirection(f))>0)    // only used directions on one hemisphere
-        m_DirectionIndices.push_back(f);            // store indices for later mapping the classifier output to the actual direction
+      typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
+      dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
+      dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
+      dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
+      dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+      dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+      dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+      dwiFeatureImage->Allocate();
+
+      // get signal values and store them in the feature image
+      vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+      itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
+      itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
+      while(!it.IsAtEnd())
+      {
+        typename DwiFeatureImageType::PixelType pix;
+        int f = 0;
+        for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
+        {
+          if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
+          {
+            pix[f] = it.Get()[i];
+            f++;
+          }
+        }
+        dwiFeatureImage->SetPixel(it.GetIndex(), pix);
+        ++it;
+      }
+
+      m_DwiFeatureImages.push_back(dwiFeatureImage);
     }
-
-    m_FeatureImage = FeatureImageType::New();
-    m_FeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
-    m_FeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
-    m_FeatureImage->SetDirection(filter->GetOutput()->GetDirection());
-    m_FeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    m_FeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    m_FeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-    m_FeatureImage->Allocate();
-
-    // get signal values and store them in the feature image
-    itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
-    while(!it.IsAtEnd())
-    {
-      typename FeatureImageType::PixelType pix;
-      for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-        pix[f] = it.Get()[m_DirectionIndices.at(f)];
-      m_FeatureImage->SetPixel(it.GetIndex(), pix);
-      ++it;
-    }
-
-    //m_Forest->multithreadPrediction = false;
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
@@ -257,93 +272,25 @@ namespace mitk
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
-  typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::FeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetFeatureValues(itk::Point<float, 3> itkP)
-  {
-    // transform physical point to index coordinates
-    itk::Index<3> idx;
-    itk::ContinuousIndex< double, 3> cIdx;
-    m_FeatureImage->TransformPhysicalPointToIndex(itkP, idx);
-    m_FeatureImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
-
-    typename FeatureImageType::PixelType pix; pix.Fill(0.0);
-    if ( m_FeatureImage->GetLargestPossibleRegion().IsInside(idx) )
-      pix = m_FeatureImage->GetPixel(idx);
-    else
-      return pix;
-
-    double frac_x = cIdx[0] - idx[0];
-    double frac_y = cIdx[1] - idx[1];
-    double frac_z = cIdx[2] - idx[2];
-    if (frac_x<0)
-    {
-      idx[0] -= 1;
-      frac_x += 1;
-    }
-    if (frac_y<0)
-    {
-      idx[1] -= 1;
-      frac_y += 1;
-    }
-    if (frac_z<0)
-    {
-      idx[2] -= 1;
-      frac_z += 1;
-    }
-    frac_x = 1-frac_x;
-    frac_y = 1-frac_y;
-    frac_z = 1-frac_z;
-
-    // int coordinates inside image?
-    if (idx[0] >= 0 && idx[0] < m_FeatureImage->GetLargestPossibleRegion().GetSize(0)-1 &&
-      idx[1] >= 0 && idx[1] < m_FeatureImage->GetLargestPossibleRegion().GetSize(1)-1 &&
-      idx[2] >= 0 && idx[2] < m_FeatureImage->GetLargestPossibleRegion().GetSize(2)-1)
-    {
-      // trilinear interpolation
-      vnl_vector_fixed<double, 8> interpWeights;
-      interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
-      interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
-      interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
-      interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
-      interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
-      interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
-      interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
-      interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
-
-      pix = m_FeatureImage->GetPixel(idx) * interpWeights[0];
-      typename FeatureImageType::IndexType tmpIdx = idx; tmpIdx[0]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[1];
-      tmpIdx = idx; tmpIdx[1]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[2];
-      tmpIdx = idx; tmpIdx[2]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[3];
-      tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[4];
-      tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[5];
-      tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[6];
-      tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-      pix +=  m_FeatureImage->GetPixel(tmpIdx) * interpWeights[7];
-    }
-
-    return pix;
-  }
-
-  template< int ShOrder, int NumberOfSignalFeatures >
   vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w, ItkUcharImgType::Pointer mask)
   {
+
     vnl_vector_fixed<double,3> direction; direction.fill(0);
 
     itk::Index<3> idx;
-    m_FeatureImage->TransformPhysicalPointToIndex(pos, idx);
+    m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, idx);
     if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
       return direction;
 
+    //std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+    //std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime);
+    //MITK_INFO << "time 1: " << ms.count() << "ms";
+
     // store feature pixel values in a vigra data type
     vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,m_Forest->feature_count()) );
-    typename FeatureImageType::PixelType featurePixel = GetFeatureValues(pos);
+    typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0));
     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-      featureData(0,f) = featurePixel[f];
+      featureData(0,f) = dwiFeaturePixel[f];
 
     // append normalized previous direction to feature vector
     int c = 0;
@@ -384,10 +331,10 @@ namespace mitk
         int classLabel = 0;
         m_Forest->ext_param_.to_classlabel(i, classLabel);
 
-        if (classLabel<m_DirectionIndices.size())   // does class label correspond to a direction or to the out-of-wm class?
+        if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
         {
           candidates++;   // now we have one direction more with probability > 0 (DO WE NEED THIS???)
-          vnl_vector_fixed<double,3> d = m_DirContainer.GetDirection(m_DirectionIndices.at(classLabel));  // get direction vector assiciated with the respective direction index
+          vnl_vector_fixed<double,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
 
           if (olddir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
           {
@@ -432,9 +379,49 @@ namespace mitk
   {
     m_StartTime = std::chrono::system_clock::now();
     InputDataValidForTraining();
-    PreprocessInputDataForTraining();
-    CalculateFeaturesForTraining();
-    TrainForest();
+    InitForTraining();
+    CalculateTrainingSamples();
+
+    MITK_INFO << "Maximum tree depths: " << m_MaxTreeDepth;
+    MITK_INFO << "Sample fraction per tree: " << m_SampleFraction;
+    MITK_INFO << "Number of trees: " << m_NumTrees;
+
+    DefaultSplitType splitter;
+    splitter.UsePointBasedWeights(true);
+    splitter.SetWeights(m_Weights);
+    splitter.UseRandomSplit(false);
+    splitter.SetPrecision(mitk::eps);
+    splitter.SetMaximumTreeDepth(m_MaxTreeDepth);
+
+    std::vector< std::shared_ptr< vigra::RandomForest<int> > > trees;
+    int count = 0;
+#pragma omp parallel for
+    for (int i = 0; i < m_NumTrees; ++i)
+    {
+      std::shared_ptr< vigra::RandomForest<int> > lrf = std::make_shared< vigra::RandomForest<int> >();
+      lrf->set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
+      lrf->set_options().sample_with_replacement(true); // if sampled with replacement or not
+      lrf->set_options().samples_per_tree(m_SampleFraction); // Fraction of samples that are used to train a tree
+      lrf->set_options().tree_count(1); // Number of trees that are calculated;
+      lrf->set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
+      lrf->ext_param_.max_tree_depth = m_MaxTreeDepth;
+
+      lrf->learn(m_FeatureData, m_LabelData,vigra::rf::visitors::VisitorBase(),splitter);
+#pragma omp critical
+      {
+        count++;
+        MITK_INFO << "Tree " << count << " finished training.";
+        trees.push_back(lrf);
+      }
+    }
+
+    for (int i = 1; i < m_NumTrees; ++i)
+      trees.at(0)->trees_.push_back(trees.at(i)->trees_[0]);
+
+    m_Forest = trees.at(0);
+    m_Forest->options_.tree_count_ = m_NumTrees;
+    MITK_INFO << "Training finsihed";
+
     m_EndTime = std::chrono::system_clock::now();
     std::chrono::hours   hh = std::chrono::duration_cast<std::chrono::hours>(m_EndTime - m_StartTime);
     std::chrono::minutes mm = std::chrono::duration_cast<std::chrono::minutes>(m_EndTime - m_StartTime);
@@ -445,11 +432,11 @@ namespace mitk
   template< int ShOrder, int NumberOfSignalFeatures >
   void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTraining()
   {
-    if (m_RawData.empty())
+    if (m_InputDwis.empty())
       mitkThrow() << "No diffusion-weighted images set!";
     if (m_Tractograms.empty())
       mitkThrow() << "No tractograms set!";
-    if (m_RawData.size()!=m_Tractograms.size())
+    if (m_InputDwis.size()!=m_Tractograms.size())
       mitkThrow() << "Unequal number of diffusion-weighted images and tractograms detected!";
   }
 
@@ -465,21 +452,54 @@ namespace mitk
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
-  void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::PreprocessInputDataForTraining()
+  void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
   {
     typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
     MITK_INFO << "Spherical signal interpolation and sampling ...";
-    for (unsigned int i=0; i<m_RawData.size(); i++)
+    for (unsigned int i=0; i<m_InputDwis.size(); i++)
     {
-      typename InterpolationFilterType::Pointer qballfilter = InterpolationFilterType::New();
-      qballfilter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_RawData.at(i)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_RawData.at(i)) );
-      qballfilter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_RawData.at(i)));
-      qballfilter->SetLambda(0.006);
-      qballfilter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
-      qballfilter->Update();
-      //      FeatureImageType::Pointer itkFeatureImage = qballfilter->GetCoefficientImage();
-      m_InterpolatedRawImages.push_back(qballfilter->GetOutput());
+      typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
+      filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(i)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(i)) );
+      filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(i)));
+      filter->SetLambda(0.006);
+      filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
+      filter->Update();
+
+      //m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+
+      {
+        typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
+        dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
+        dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
+        dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
+        dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+        dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+        dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+        dwiFeatureImage->Allocate();
+
+        // get signal values and store them in the feature image
+        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+        itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
+        itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
+        while(!it.IsAtEnd())
+        {
+          typename DwiFeatureImageType::PixelType pix;
+          int f = 0;
+          for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
+          {
+            if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
+            {
+              pix[f] = it.Get()[i];
+              f++;
+            }
+          }
+          dwiFeatureImage->SetPixel(it.GetIndex(), pix);
+          ++it;
+        }
+
+        m_DwiFeatureImages.push_back(dwiFeatureImage);
+      }
 
       if (i>=m_AdditionalFeatureImages.size())
       {
@@ -489,12 +509,12 @@ namespace mitk
       if (i>=m_FiberVolumeModImages.size())
       {
         ItkFloatImgType::Pointer img = ItkFloatImgType::New();
-        img->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
-        img->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
-        img->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
-        img->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        img->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        img->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        img->SetSpacing( m_DwiFeatureImages.at(i)->GetSpacing() );
+        img->SetOrigin( m_DwiFeatureImages.at(i)->GetOrigin() );
+        img->SetDirection( m_DwiFeatureImages.at(i)->GetDirection() );
+        img->SetLargestPossibleRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        img->SetBufferedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        img->SetRequestedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
         img->Allocate();
         img->FillBuffer(1);
         m_FiberVolumeModImages.push_back(img);
@@ -503,12 +523,12 @@ namespace mitk
       if (m_FiberVolumeModImages.at(i)==nullptr)
       {
         m_FiberVolumeModImages.at(i) = ItkFloatImgType::New();
-        m_FiberVolumeModImages.at(i)->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
-        m_FiberVolumeModImages.at(i)->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
-        m_FiberVolumeModImages.at(i)->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
-        m_FiberVolumeModImages.at(i)->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        m_FiberVolumeModImages.at(i)->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        m_FiberVolumeModImages.at(i)->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        m_FiberVolumeModImages.at(i)->SetSpacing( m_DwiFeatureImages.at(i)->GetSpacing() );
+        m_FiberVolumeModImages.at(i)->SetOrigin( m_DwiFeatureImages.at(i)->GetOrigin() );
+        m_FiberVolumeModImages.at(i)->SetDirection( m_DwiFeatureImages.at(i)->GetDirection() );
+        m_FiberVolumeModImages.at(i)->SetLargestPossibleRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        m_FiberVolumeModImages.at(i)->SetBufferedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        m_FiberVolumeModImages.at(i)->SetRequestedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
         m_FiberVolumeModImages.at(i)->Allocate();
         m_FiberVolumeModImages.at(i)->FillBuffer(1);
       }
@@ -516,12 +536,12 @@ namespace mitk
       if (i>=m_MaskImages.size())
       {
         ItkUcharImgType::Pointer newMask = ItkUcharImgType::New();
-        newMask->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
-        newMask->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
-        newMask->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
-        newMask->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        newMask->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        newMask->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        newMask->SetSpacing( m_DwiFeatureImages.at(i)->GetSpacing() );
+        newMask->SetOrigin( m_DwiFeatureImages.at(i)->GetOrigin() );
+        newMask->SetDirection( m_DwiFeatureImages.at(i)->GetDirection() );
+        newMask->SetLargestPossibleRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        newMask->SetBufferedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        newMask->SetRequestedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
         newMask->Allocate();
         newMask->FillBuffer(1);
         m_MaskImages.push_back(newMask);
@@ -530,12 +550,12 @@ namespace mitk
       if (m_MaskImages.at(i)==nullptr)
       {
         m_MaskImages.at(i) = ItkUcharImgType::New();
-        m_MaskImages.at(i)->SetSpacing( m_InterpolatedRawImages.at(i)->GetSpacing() );
-        m_MaskImages.at(i)->SetOrigin( m_InterpolatedRawImages.at(i)->GetOrigin() );
-        m_MaskImages.at(i)->SetDirection( m_InterpolatedRawImages.at(i)->GetDirection() );
-        m_MaskImages.at(i)->SetLargestPossibleRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        m_MaskImages.at(i)->SetBufferedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
-        m_MaskImages.at(i)->SetRequestedRegion( m_InterpolatedRawImages.at(i)->GetLargestPossibleRegion() );
+        m_MaskImages.at(i)->SetSpacing( m_DwiFeatureImages.at(i)->GetSpacing() );
+        m_MaskImages.at(i)->SetOrigin( m_DwiFeatureImages.at(i)->GetOrigin() );
+        m_MaskImages.at(i)->SetDirection( m_DwiFeatureImages.at(i)->GetDirection() );
+        m_MaskImages.at(i)->SetLargestPossibleRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        m_MaskImages.at(i)->SetBufferedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
+        m_MaskImages.at(i)->SetRequestedRegion( m_DwiFeatureImages.at(i)->GetLargestPossibleRegion() );
         m_MaskImages.at(i)->Allocate();
         m_MaskImages.at(i)->FillBuffer(1);
       }
@@ -569,7 +589,7 @@ namespace mitk
       // Calculate white-matter samples
       if (m_WmSampleDistance<0)
       {
-        typename InterpolatedRawImageType::Pointer image = m_InterpolatedRawImages.at(t);
+        typename DwiFeatureImageType::Pointer image = m_DwiFeatureImages.at(t);
         float minSpacing = 1;
         if(image->GetSpacing()[0]<image->GetSpacing()[1] && image->GetSpacing()[0]<image->GetSpacing()[2])
           minSpacing = image->GetSpacing()[0];
@@ -619,16 +639,9 @@ namespace mitk
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
-  void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateFeaturesForTraining()
+  void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTrainingSamples()
   {
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-    itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > directions;
-    std::vector< int > directionIndices;
-    for (unsigned int f=0; f<2*NumberOfSignalFeatures; f++)
-    {
-      if (dot_product(ref, directions.GetDirection(f))>0)
-        directionIndices.push_back(f);
-    }
 
     int numDirectionFeatures = 3;
 
@@ -644,7 +657,7 @@ namespace mitk
     for (unsigned int t=0; t<m_Tractograms.size(); t++)
     {
       ItkFloatImgType::Pointer fiber_folume = m_FiberVolumeModImages.at(t);
-      typename InterpolatedRawImageType::Pointer image = m_InterpolatedRawImages.at(t);
+      typename DwiFeatureImageType::Pointer image = m_DwiFeatureImages.at(t);
       ItkUcharImgType::Pointer wmMask = m_WhiteMatterImages.at(t);
       ItkUcharImgType::Pointer mask;
       if (t<m_MaskImages.size())
@@ -656,12 +669,12 @@ namespace mitk
       {
         if (it.Get()==0 && (mask.IsNull() || (mask.IsNotNull() && mask->GetPixel(it.GetIndex())>0)))
         {
-          typename InterpolatedRawImageType::PixelType pix = image->GetPixel(it.GetIndex());
+          typename DwiFeatureImageType::PixelType pix = image->GetPixel(it.GetIndex());
 
           // null direction
           for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
           {
-            m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
+            m_FeatureData(sampleCounter,f) = pix[f];
             if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
               m_FeatureData(sampleCounter,f) = 0;
           }
@@ -682,7 +695,7 @@ namespace mitk
             m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
           }
 
-          m_LabelData(sampleCounter,0) = directionIndices.size();
+          m_LabelData(sampleCounter,0) = m_DirectionContainer.size();
           m_Weights(sampleCounter,0) = 1.0;
           sampleCounter++;
 
@@ -691,7 +704,7 @@ namespace mitk
           {
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
             {
-              m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
+              m_FeatureData(sampleCounter,f) = pix[f];
               if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
                 m_FeatureData(sampleCounter,f) = 0;
             }
@@ -722,7 +735,7 @@ namespace mitk
               m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
             }
 
-            m_LabelData(sampleCounter,0) = directionIndices.size();
+            m_LabelData(sampleCounter,0) = m_DirectionContainer.size();
             m_Weights(sampleCounter,0) = 1.0;
             sampleCounter++;
           }
@@ -779,9 +792,9 @@ namespace mitk
           }
 
           // get voxel values
-          typename InterpolatedRawImageType::PixelType pix = GetImageValues(itkP1, image);
+          typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image);
           for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-            m_FeatureData(sampleCounter,f) = pix[directionIndices[f]];
+            m_FeatureData(sampleCounter,f) = pix[f];
 
           // direction training features
           int c = 0;
@@ -808,16 +821,18 @@ namespace mitk
           double m = dir.magnitude();
           if (m>0.0001)
           {
-            for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
+            int l = 0;
+            for (auto d : m_DirectionContainer)
             {
-              double a = fabs(dot_product(dir, directions.GetDirection(directionIndices[f])));
+              double a = fabs(dot_product(dir, d));
               if (a>angle)
               {
-                m_LabelData(sampleCounter,0) = f;
+                m_LabelData(sampleCounter,0) = l;
                 m_Weights(sampleCounter,0) = fiber_weight*volume_mod;
                 //MITK_INFO << "m_Weights(sampleCounter,0): " << m_Weights(sampleCounter,0) << ' ' << fiber_weight << ' ' << volume_mod;
                 angle = a;
               }
+              l++;
             }
           }
 
@@ -826,51 +841,6 @@ namespace mitk
         }
       }
     }
-  }
-
-  template< int ShOrder, int NumberOfSignalFeatures >
-  void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrainForest()
-  {
-    MITK_INFO << "Maximum tree depths: " << m_MaxTreeDepth;
-    MITK_INFO << "Sample fraction per tree: " << m_SampleFraction;
-    MITK_INFO << "Number of trees: " << m_NumTrees;
-
-
-    DefaultSplitType splitter;
-    splitter.UsePointBasedWeights(true);
-    splitter.SetWeights(m_Weights);
-    splitter.UseRandomSplit(false);
-    splitter.SetPrecision(mitk::eps);
-    splitter.SetMaximumTreeDepth(m_MaxTreeDepth);
-
-    std::vector< std::shared_ptr< vigra::RandomForest<int> > > trees;
-    int count = 0;
-#pragma omp parallel for
-    for (int i = 0; i < m_NumTrees; ++i)
-    {
-      std::shared_ptr< vigra::RandomForest<int> > lrf = std::make_shared< vigra::RandomForest<int> >();
-      lrf->set_options().use_stratification(vigra::RF_NONE); // How the data should be made equal
-      lrf->set_options().sample_with_replacement(true); // if sampled with replacement or not
-      lrf->set_options().samples_per_tree(m_SampleFraction); // Fraction of samples that are used to train a tree
-      lrf->set_options().tree_count(1); // Number of trees that are calculated;
-      lrf->set_options().min_split_node_size(5); // Minimum number of datapoints that must be in a node
-      lrf->ext_param_.max_tree_depth = m_MaxTreeDepth;
-
-      lrf->learn(m_FeatureData, m_LabelData,vigra::rf::visitors::VisitorBase(),splitter);
-#pragma omp critical
-      {
-        count++;
-        MITK_INFO << "Tree " << count << " finished training.";
-        trees.push_back(lrf);
-      }
-    }
-
-    for (int i = 1; i < m_NumTrees; ++i)
-      trees.at(0)->trees_.push_back(trees.at(i)->trees_[0]);
-
-    m_Forest = trees.at(0);
-    m_Forest->options_.tree_count_ = m_NumTrees;
-    MITK_INFO << "Training finsihed";
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >

@@ -206,11 +206,14 @@
      </item>
      <item row="0" column="0">
       <widget class="QDoubleSpinBox" name="ScanDepth">
+       <property name="minimum">
+        <double>2.000000000000000</double>
+       </property>
        <property name="maximum">
         <double>1000.000000000000000</double>
        </property>
        <property name="value">
-        <double>40.000000000000000</double>
+        <double>45.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -331,7 +334,7 @@
         <number>128</number>
        </property>
        <property name="value">
-        <number>256</number>
+        <number>128</number>
        </property>
       </widget>
      </item>
@@ -401,14 +404,17 @@
       <layout class="QHBoxLayout" name="VerticalSpacingSubGroup">
        <item>
         <widget class="QDoubleSpinBox" name="VerticalSpacing">
+         <property name="minimum">
+          <double>0.010000000000000</double>
+         </property>
          <property name="maximum">
-          <double>1.000000000000000</double>
+          <double>1.200000000000000</double>
          </property>
          <property name="singleStep">
           <double>0.050000000000000</double>
          </property>
          <property name="value">
-          <double>0.150000000000000</double>
+          <double>0.300000000000000</double>
          </property>
         </widget>
        </item>
@@ -530,7 +536,7 @@
         <number>75</number>
        </property>
        <property name="value">
-        <number>70</number>
+        <number>75</number>
        </property>
       </widget>
      </item>

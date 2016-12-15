@@ -239,6 +239,8 @@ private:
   void Show2DInterpolationControls(bool show);
   void Show3DInterpolationControls(bool show);
   void CheckSupportedImageDimension();
+  void WaitForFutures();
+  void NodeRemoved(const mitk::DataNode* node);
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

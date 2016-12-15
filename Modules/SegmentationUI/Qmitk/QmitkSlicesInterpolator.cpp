@@ -199,8 +199,27 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
 
 void QmitkSlicesInterpolator::SetDataStorage(mitk::DataStorage::Pointer storage)
 {
+  if (m_DataStorage == storage)
+  {
+    return;
+  }
+
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
+    );
+  }
+   
   m_DataStorage = storage;
   m_SurfaceInterpolator->SetDataStorage(storage);
+
+  if (m_DataStorage.IsNotNull())
+  {
+    m_DataStorage->RemoveNodeEvent.AddListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
+    );
+  }
 }
 
 mitk::DataStorage *QmitkSlicesInterpolator::GetDataStorage()
@@ -302,8 +321,13 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
     Uninitialize();
   }
 
-  if (m_DataStorage.IsNotNull())
+  WaitForFutures();
+
+  if (m_DataStorage.IsNotNull()) 
   {
+    m_DataStorage->RemoveNodeEvent.RemoveListener(
+      mitk::MessageDelegate1<QmitkSlicesInterpolator, const mitk::DataNode*>(this, &QmitkSlicesInterpolator::NodeRemoved)
+    );
     if (m_DataStorage->Exists(m_3DContourNode))
       m_DataStorage->Remove(m_3DContourNode);
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
@@ -861,7 +885,7 @@ void ::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
 void ::QmitkSlicesInterpolator::RunPlaneSuggestion()
 {
   if (m_FirstRun)
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(8);
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(7);
   else
     mitk::ProgressBar::GetInstance()->AddStepsToDo(3);
 
@@ -1301,5 +1325,29 @@ void QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted(const itk::Obje
     m_ControllerToTimeObserverTag.remove(slicer);
     m_ControllerToSliceObserverTag.remove(slicer);
     m_ControllerToDeleteObserverTag.remove(slicer);
+  }
+}
+
+void QmitkSlicesInterpolator::WaitForFutures()
+{
+  if (m_Watcher.isRunning())
+  {
+    m_Watcher.waitForFinished();
+  }
+
+  if (m_PlaneWatcher.isRunning())
+  {
+    m_PlaneWatcher.waitForFinished();
+  }
+}
+
+void QmitkSlicesInterpolator::NodeRemoved(const mitk::DataNode* node)
+{
+  if ((m_ToolManager && m_ToolManager->GetWorkingData(0) == node) ||
+      node == m_3DContourNode ||
+      node == m_FeedbackNode ||
+      node == m_InterpolatedSurfaceNode)
+  {
+    WaitForFutures();
   }
 }

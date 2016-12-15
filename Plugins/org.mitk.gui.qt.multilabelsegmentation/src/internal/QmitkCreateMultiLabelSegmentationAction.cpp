@@ -37,6 +37,14 @@ QmitkCreateMultiLabelSegmentationAction::~QmitkCreateMultiLabelSegmentationActio
 
 void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
+  if (m_DataStorage.IsNull())
+  {
+    auto message = tr("Data storage not set.");
+    MITK_ERROR << message;
+    QMessageBox::warning(nullptr, "New Segmentation Session", message);
+    return;
+  }
+
   foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
   {
     if (referenceNode.IsNotNull())
@@ -61,7 +69,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
       catch ( mitk::Exception& e )
       {
         MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::information(NULL, "New Segmentation Session", "Could not create a new segmentation session.\n");
+        QMessageBox::warning(nullptr, "New Segmentation Session", "Could not create a new segmentation session.");
         return;
       }
 

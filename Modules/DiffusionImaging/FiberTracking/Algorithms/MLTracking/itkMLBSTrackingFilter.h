@@ -50,7 +50,7 @@ namespace itk{
 /**
 * \brief Performes deterministic streamline tracking on the input tensor image.   */
 
-template<  int ShOrder=6, int NumImageFeatures=28 >
+template<  int ShOrder=6, int NumImageFeatures=100 >
 class MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
 {
 
@@ -102,6 +102,7 @@ public:
     itkSetMacro( DeflectionMod, double )                 ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
+    itkSetMacro( NumberOfSamples, int )                 ///< Number of neighborhood sampling points
     itkSetMacro( RemoveWmEndFibers, bool )              ///< Checks if fiber ending is located in the white matter. If this is the case, the streamline is discarded.
     itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
@@ -122,6 +123,7 @@ public:
     vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& olddir); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
     double GetRandDouble(double min=-1, double max=1);
+    std::vector< vnl_vector_fixed<double,3> > CreateDirections(int NPoints);
 
     void BeforeThreadedGenerateData() override;
     void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
@@ -143,6 +145,7 @@ public:
     double                              m_DeflectionMod;
     bool                                m_OnlyForwardSamples;
     bool                                m_UseStopVotes;
+    int                                 m_NumberOfSamples;
 
     SimpleFastMutexLock                 m_Mutex;
     ItkUcharImgType::Pointer            m_StoppingRegions;

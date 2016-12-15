@@ -31,6 +31,7 @@ namespace mitk
     , m_SampleFraction(1.0)
     , m_NumberOfSamples(0)
     , m_GmSamplesPerVoxel(50)
+    , m_NumPreviousDirections(1)
   {
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
@@ -275,12 +276,12 @@ namespace mitk
   vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w, ItkUcharImgType::Pointer mask)
   {
 
-    vnl_vector_fixed<double,3> direction; direction.fill(0);
+    vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
 
     itk::Index<3> idx;
     m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, idx);
     if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
-      return direction;
+      return output_direction;
 
     //std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
     //std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime);
@@ -292,9 +293,9 @@ namespace mitk
     for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
       featureData(0,f) = dwiFeaturePixel[f];
 
-    // append normalized previous direction to feature vector
-    int c = 0;
+    // append normalized previous direction(s) to feature vector
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+    int c = 0;
     for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
     {
       if (dot_product(ref, olddir)<0)
@@ -348,13 +349,13 @@ namespace mitk
               if (dot<0)                          // make sure we don't walk backwards
                 d *= -1;
               double w_i = probs(0,i)*fabs(dot);
-              direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
+              output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
               w += w_i;           // increase output weight of the final direction
             }
           }
           else
           {
-            direction += probs(0,i)*d;
+            output_direction += probs(0,i)*d;
             w += probs(0,i);
           }
         }
@@ -368,10 +369,10 @@ namespace mitk
     {
       candidates = 0;
       w = 0;
-      direction.fill(0.0);
+      output_direction.fill(0.0);
     }
 
-    return direction;
+    return output_direction;
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >

@@ -46,7 +46,7 @@ namespace mitk
 /**
 * \brief  Manages random forests for fiber tractography. The preparation of the features from the inputa data and the training process are handled here. The data preprocessing and actual prediction for the tracking process is also performed here. The tracking itself is performed in MLBSTrackingFilter. */
 
-template< int ShOrder=6, int NumberOfSignalFeatures=28 >
+template< int ShOrder=6, int NumberOfSignalFeatures=100 >
 class TrackingForestHandler
 {
 
@@ -132,6 +132,7 @@ protected:
     std::vector< unsigned int >                                 m_GmSamples;                ///< number of gray matter samples
     int                                                         m_GmSamplesPerVoxel;        ///< number of gray matter samplees per voxel. if -1, then the number is automatically chosen to gain an overall number of GM samples close to the number of WM samples.
     vigra::MultiArray<2, double>                                m_FeatureData;              ///< vigra container for training features
+    int                                                         m_NumPreviousDirections;    ///< How many "old" directions should be used as classification features?
 
     // only for tracking
     vigra::MultiArray<2, double>                                m_LabelData;                ///< vigra container for training labels

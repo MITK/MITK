@@ -66,17 +66,17 @@ int main(int argc, char* argv[])
     parser.addArgument("remove", "rm", mitkCommandLineParser::Int, "Remove fibers exceeding curvature threshold:", "if 0, only the high curvature parts are removed");
     parser.addArgument("mirror", "p", mitkCommandLineParser::Int, "Invert coordinates:", "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
-    parser.addArgument("rotate-x", "rx", mitkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
-    parser.addArgument("rotate-y", "ry", mitkCommandLineParser::Float, "Rotate y-axis:", "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
-    parser.addArgument("rotate-z", "rz", mitkCommandLineParser::Float, "Rotate z-axis:", "Rotate around z-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-x", "rx", mitkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (in deg)");
+    parser.addArgument("rotate-y", "ry", mitkCommandLineParser::Float, "Rotate y-axis:", "Rotate around y-axis (in deg)");
+    parser.addArgument("rotate-z", "rz", mitkCommandLineParser::Float, "Rotate z-axis:", "Rotate around z-axis (in deg)");
 
-    parser.addArgument("scale-x", "sx", mitkCommandLineParser::Float, "Scale x-axis:", "Scale in direction of x-axis (if copy is given the copy is scaled)");
-    parser.addArgument("scale-y", "sy", mitkCommandLineParser::Float, "Scale y-axis:", "Scale in direction of y-axis (if copy is given the copy is scaled)");
-    parser.addArgument("scale-z", "sz", mitkCommandLineParser::Float, "Scale z-axis", "Scale in direction of z-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-x", "sx", mitkCommandLineParser::Float, "Scale x-axis:", "Scale in direction of x-axis");
+    parser.addArgument("scale-y", "sy", mitkCommandLineParser::Float, "Scale y-axis:", "Scale in direction of y-axis");
+    parser.addArgument("scale-z", "sz", mitkCommandLineParser::Float, "Scale z-axis", "Scale in direction of z-axis");
 
-    parser.addArgument("translate-x", "tx", mitkCommandLineParser::Float, "Translate x-axis:", "Translate in direction of x-axis (if copy is given the copy is translated, in mm)");
-    parser.addArgument("translate-y", "ty", mitkCommandLineParser::Float, "Translate y-axis:", "Translate in direction of y-axis (if copy is given the copy is translated, in mm)");
-    parser.addArgument("translate-z", "tz", mitkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-x", "tx", mitkCommandLineParser::Float, "Translate x-axis:", "Translate in direction of x-axis (in mm)");
+    parser.addArgument("translate-y", "ty", mitkCommandLineParser::Float, "Translate y-axis:", "Translate in direction of y-axis (in mm)");
+    parser.addArgument("translate-z", "tz", mitkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (in mm)");
 
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

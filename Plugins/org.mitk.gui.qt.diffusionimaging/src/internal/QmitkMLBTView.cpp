@@ -306,7 +306,8 @@ void QmitkMLBTView::StartTracking()
     tracker->SetMinTractLength(m_Controls->m_MinLengthBox->value());
     tracker->SetMaxTractLength(m_Controls->m_MaxLengthBox->value());
     tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
-    tracker->SetRemoveWmEndFibers(false);
+    tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
+    tracker->SetRemoveWmEndFibers(m_Controls->m_RemoveWmFibers->isChecked());
     tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
     tracker->SetForestHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());

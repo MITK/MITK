@@ -734,7 +734,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::ConfirmSegmentation()
       return;
   }
 
-  mitk::Image *img = dynamic_cast<mitk::Image *>(newNode->GetData());
+  mitk::Image::Pointer img = dynamic_cast<mitk::Image *>(newNode->GetData());
   AccessByItk(img, ITKThresholding);
 
   // disable volume rendering preview after the segmentation node was created

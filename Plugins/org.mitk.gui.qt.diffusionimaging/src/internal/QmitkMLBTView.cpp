@@ -315,6 +315,7 @@ void QmitkMLBTView::StartTracking()
     tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
     tracker->SetUseStopVotes(m_Controls->m_UseStopVotes->isChecked());
     tracker->SetOnlyForwardSamples(m_Controls->m_OnlyForwardSamples->isChecked());
+    tracker->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
     tracker->Update();
 }
 
@@ -400,6 +401,7 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler.SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
     m_ForestHandler.SetSampleFraction(m_Controls->m_SampleFractionBox->value());
     m_ForestHandler.SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
+    m_ForestHandler.SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
     m_ForestHandler.StartTraining();
 }
 

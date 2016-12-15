@@ -53,6 +53,7 @@ MLBSTrackingFilter<  ShOrder, NumImageFeatures >
   , m_OnlyForwardSamples(true)
   , m_UseStopVotes(true)
   , m_NumberOfSamples(30)
+  , m_NumPreviousDirections(1)
   , m_StoppingRegions(NULL)
   , m_SeedImage(NULL)
   , m_MaskImage(NULL)
@@ -163,13 +164,13 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
 template<  int ShOrder, int NumImageFeatures >
 void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
 {
+  // DON'T CHANGE DIR!!
   //    vnl_matrix_fixed< double, 3, 3 > rot = m_FeatureImage->GetDirection().GetTranspose();
   //    dir = rot*dir;
 
-  dir *= m_StepSize;
-  pos[0] += dir[0];
-  pos[1] += dir[1];
-  pos[2] += dir[2];
+  pos[0] += dir[0]*m_StepSize;
+  pos[1] += dir[1]*m_StepSize;
+  pos[2] += dir[2]*m_StepSize;
 }
 
 template<  int ShOrder, int NumImageFeatures >
@@ -228,7 +229,7 @@ std::vector< vnl_vector_fixed<double,3> > MLBSTrackingFilter<  ShOrder, NumImage
 }
 
 template<  int ShOrder, int NumImageFeatures >
-vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::GetNewDirection(itk::Point<double, 3> &pos, vnl_vector_fixed<double, 3>& olddir)
+vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::GetNewDirection(itk::Point<double, 3> &pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs)
 {
   if (m_DemoMode)
   {
@@ -245,18 +246,15 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
   if (m_MaskImage.IsNotNull() && ((m_MaskImage->GetLargestPossibleRegion().IsInside(idx) && m_MaskImage->GetPixel(idx)<=0) || !m_MaskImage->GetLargestPossibleRegion().IsInside(idx)) )
     return direction;
 
-  if (olddir.magnitude()>0)
-    olddir.normalize();
-
   int candidates = 0; // number of directions with probability > 0
   double w = 0;       // weight of the direction predicted at each sampling point
   if (IsValidPosition(pos))
   {
-    direction = m_ForestHandler.Classify(pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // get direction proposal at current streamline position
+    direction = m_ForestHandler.Classify(pos, candidates, olddirs, m_AngularThreshold, w, m_MaskImage); // get direction proposal at current streamline position
     direction *= w;  // HERE WE ARE WEIGHTING AGAIN EVEN THOUGH THE OUTPUT DIRECTIONS ARE ALREADY WEIGHTED!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED.
   }
 
-  //itk::OrientationDistributionFunction< double, 30 >  probeVecs;
+  vnl_vector_fixed<double,3> olddir = olddirs.back();
   std::vector< vnl_vector_fixed<double,3> > probeVecs = CreateDirections(m_NumberOfSamples);
   itk::Point<double, 3> sample_pos;
   int alternatives = 1;
@@ -297,7 +295,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
     candidates = 0;
     vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
     if (IsValidPosition(sample_pos))
-      tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
+      tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddirs, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
     if (candidates>0 && tempDir.magnitude()>0.001)
     {
       direction += tempDir*w;
@@ -323,7 +321,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
       candidates = 0;
       vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
       if (IsValidPosition(sample_pos))
-        tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddir, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
+        tempDir = m_ForestHandler.Classify(sample_pos, candidates, olddirs, m_AngularThreshold, w, m_MaskImage); // sample neighborhood
 
       if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
       {
@@ -336,12 +334,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
   }
 
   if (direction.magnitude()>0.001 && (possible_stop_votes==0 || (float)stop_votes/possible_stop_votes<0.5) )
-  {
     direction.normalize();
-    olddir[0] = direction[0];
-    olddir[1] = direction[1];
-    olddir[2] = direction[2];
-  }
   else
     direction.fill(0);
 
@@ -351,16 +344,13 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter<  ShOrder, NumImageFeatures >::Get
 template<  int ShOrder, int NumImageFeatures >
 double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
 {
-//  std::queue< vnl_vector_fixed<double,3> > last_dirs;
-  vnl_vector_fixed<double,3> dirOld = dir;
+  vnl_vector_fixed<double,3> zero_dir; zero_dir.fill(0.0);
+  std::deque< vnl_vector_fixed<double,3> > last_dirs;
+  for (int i=0; i<m_NumPreviousDirections-1; i++)
+    last_dirs.push_back(zero_dir);
 
   for (int step=0; step< m_MaxLength/2; step++)
   {
-//    last_dirs.push(dir);
-//    dirOld = last_dirs.front();
-//    if (last_dirs.size()>=5)
-//      last_dirs.pop();
-
     // get new position
     CalculateNewPosition(pos, dir);
 
@@ -411,7 +401,10 @@ double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::FollowStreamline(itk::P
       }
     }
 
-    dir = GetNewDirection(pos, dirOld);
+    last_dirs.push_back(dir);
+    if (last_dirs.size()>m_NumPreviousDirections)
+      last_dirs.pop_front();
+    dir = GetNewDirection(pos, last_dirs);
 
     while (m_PauseTracking){}
 
@@ -542,44 +535,23 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
       // get starting direction
       int candidates = 0;
       double prob = 0;
-      vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
       vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+      std::deque< vnl_vector_fixed<double,3> > olddirs;
+      for (int i=0; i<m_NumPreviousDirections; i++)
+        olddirs.push_back(dir); // start without old directions (only zero directions)
       if (IsValidPosition(worldPos))
-        dir = m_ForestHandler.Classify(worldPos, candidates, dirOld, 0, prob, m_MaskImage);
+        dir = m_ForestHandler.Classify(worldPos, candidates, olddirs, 0, prob, m_MaskImage);
       if (dir.magnitude()<0.0001)
         continue;
+      dir.normalize();
 
       // forward tracking
       tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
       fib.push_front(worldPos);
 
-      if (m_RemoveWmEndFibers)
-      {
-        itk::Point<double> check = fib.back();
-        dirOld.fill(0.0);
-        vnl_vector_fixed<double,3> check2 = GetNewDirection(check, dirOld);
-        if (check2.magnitude()>0.001)
-        {
-          MITK_INFO << "Detected WM ending. Discarding fiber.";
-          continue;
-        }
-      }
-
       // backward tracking
       tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
       counter = fib.size();
-
-      if (m_RemoveWmEndFibers)
-      {
-        itk::Point<double> check = fib.front();
-        dirOld.fill(0.0);
-        vnl_vector_fixed<double,3> check2 = GetNewDirection(check, dirOld);
-        if (check2.magnitude()>0.001)
-        {
-          MITK_INFO << "Detected WM ending. Discarding fiber.";
-          continue;
-        }
-      }
 
       if (tractLength<m_MinTractLength || counter<2)
         continue;

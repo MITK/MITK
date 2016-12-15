@@ -273,7 +273,7 @@ namespace mitk
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
-  vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w, ItkUcharImgType::Pointer mask)
+  vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double angularThreshold, double& w, ItkUcharImgType::Pointer mask)
   {
 
     vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
@@ -283,10 +283,6 @@ namespace mitk
     if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
       return output_direction;
 
-    //std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-    //std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - startTime);
-    //MITK_INFO << "time 1: " << ms.count() << "ms";
-
     // store feature pixel values in a vigra data type
     vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,m_Forest->feature_count()) );
     typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0));
@@ -294,32 +290,42 @@ namespace mitk
       featureData(0,f) = dwiFeaturePixel[f];
 
     // append normalized previous direction(s) to feature vector
+    int i = 0;
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-    int c = 0;
-    for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
+    for (auto d : olddirs)
     {
-      if (dot_product(ref, olddir)<0)
-        featureData(0,f) = -olddir[c];
-      else
-        featureData(0,f) = olddir[c];
-      c++;
+      int c = 0;
+      for (unsigned int f=NumberOfSignalFeatures+3*i; f<NumberOfSignalFeatures+3*(i+1); f++)
+      {
+        if (dot_product(ref, d)<0)
+          featureData(0,f) = -d[c];
+        else
+          featureData(0,f) = d[c];
+        c++;
+      }
+      i++;
     }
 
     // additional feature images
     if (m_AdditionalFeatureImages.size()>0)
     {
-      int add_feat_c = 0;
+      int c = 0;
       for (auto img : m_AdditionalFeatureImages.at(0))
       {
         float v = GetImageValue<float>(pos, img, false);
-        add_feat_c++;
-        featureData(0,NumberOfSignalFeatures+2+add_feat_c) = v;
+        featureData(0,NumberOfSignalFeatures+m_NumPreviousDirections*3+c) = v;
+        c++;
       }
     }
 
     // perform classification
     vigra::MultiArray<2, double> probs(vigra::Shape2(1, m_Forest->class_count()));
     m_Forest->predictProbabilities(featureData, probs);
+
+    vnl_vector_fixed<double,3> last_dir;
+    if (!olddirs.empty())
+      last_dir = olddirs.back();
+
 
     double pNonFib = 0;     // probability that we left the white matter
     w = 0;                  // weight of the predicted direction
@@ -337,13 +343,13 @@ namespace mitk
           candidates++;   // now we have one direction more with probability > 0 (DO WE NEED THIS???)
           vnl_vector_fixed<double,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
 
-          if (olddir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
+          if (!olddirs.empty() && last_dir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
           {
             // TODO: check if hard curvature threshold is necessary.
             // alternatively try square of dot pruduct as weight.
             // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
 
-            double dot = dot_product(d, olddir);    // claculate angle between the candidate direction vector and the previous streamline direction
+            double dot = dot_product(d, last_dir);    // claculate angle between the candidate direction vector and the previous streamline direction
             if (fabs(dot)>angularThreshold)         // is angle between the directions smaller than our hard threshold?
             {
               if (dot<0)                          // make sure we don't walk backwards
@@ -447,7 +453,7 @@ namespace mitk
     int additional_features = 0;
     if (m_AdditionalFeatureImages.size()>0)
       additional_features = m_AdditionalFeatureImages.at(0).size();
-    if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3+additional_features))
+    if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
       return true;
     return false;
   }
@@ -603,8 +609,8 @@ namespace mitk
 
       m_Tractograms.at(t)->ResampleSpline(m_WmSampleDistance);
 
-      unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
-      MITK_INFO << "Unweighted samples inside of WM: " << wmSamples;
+      unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints(); //-2*m_Tractograms.at(t)->GetNumFibers();
+      MITK_INFO << "White matter samples: " << wmSamples;
       m_NumberOfSamples += wmSamples;
 
       // calculate gray-matter samples
@@ -625,7 +631,6 @@ namespace mitk
       }
       else if (OUTOFWM>0)
       {
-        MITK_INFO << "Non-white matter samples: " << wmSamples;
         m_GmSamples.push_back(0.5+(double)wmSamples/(double)OUTOFWM);
         m_NumberOfSamples += m_GmSamples.back()*OUTOFWM;
         MITK_INFO << "Non-white matter samples per voxel: " << m_GmSamples.back();
@@ -634,7 +639,7 @@ namespace mitk
       {
         m_GmSamples.push_back(0);
       }
-      MITK_INFO << "Samples outside of WM: " << m_GmSamples.back()*OUTOFWM;
+      MITK_INFO << "Non-white matter samples: " << m_GmSamples.back()*OUTOFWM;
     }
     MITK_INFO << "Number of samples: " << m_NumberOfSamples;
   }
@@ -644,9 +649,7 @@ namespace mitk
   {
     vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
-    int numDirectionFeatures = 3;
-
-    m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+numDirectionFeatures+m_AdditionalFeatureImages.at(0).size()) );
+    m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+m_NumPreviousDirections*3+m_AdditionalFeatureImages.at(0).size()) );
     m_LabelData.reshape( vigra::Shape2(m_NumberOfSamples,1) );
     m_Weights.reshape( vigra::Shape2(m_NumberOfSamples,1) );
     MITK_INFO << "Number of features: " << m_FeatureData.shape(1);
@@ -672,37 +675,10 @@ namespace mitk
         {
           typename DwiFeatureImageType::PixelType pix = image->GetPixel(it.GetIndex());
 
-          // null direction
-          for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
-          {
-            m_FeatureData(sampleCounter,f) = pix[f];
-            if(m_FeatureData(sampleCounter,f)!=m_FeatureData(sampleCounter,f))
-              m_FeatureData(sampleCounter,f) = 0;
-          }
-
-          // direction feature
-          m_FeatureData(sampleCounter,NumberOfSignalFeatures) = 0;
-          m_FeatureData(sampleCounter,NumberOfSignalFeatures+1) = 0;
-          m_FeatureData(sampleCounter,NumberOfSignalFeatures+2) = 0;
-
-          // additional feature images
-          int add_feat_c = 0;
-          for (auto img : m_AdditionalFeatureImages.at(t))
-          {
-            itk::Point<float, 3> itkP;
-            image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
-            float v = GetImageValue<float>(itkP, img, false);
-            add_feat_c++;
-            m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
-          }
-
-          m_LabelData(sampleCounter,0) = m_DirectionContainer.size();
-          m_Weights(sampleCounter,0) = 1.0;
-          sampleCounter++;
-
           // random directions
-          for (int i=1; i<m_GmSamples.at(t); i++)
+          for (int i=0; i<m_GmSamples.at(t); i++)
           {
+            // diffusion signal features
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
             {
               m_FeatureData(sampleCounter,f) = pix[f];
@@ -711,18 +687,27 @@ namespace mitk
             }
 
             // direction feature
-            int c=0;
-            vnl_vector_fixed<double,3> probe;
-            probe[0] = m_RandGen->GetVariate()*2-1;
-            probe[1] = m_RandGen->GetVariate()*2-1;
-            probe[2] = m_RandGen->GetVariate()*2-1;
-            probe.normalize();
-            if (dot_product(ref, probe)<0)
-              probe *= -1;
-            for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
+            int num_zero_dirs = m_RandGen->GetIntegerVariate(m_NumPreviousDirections);  // how many directions should be zero?
+            for (unsigned int i=0; i<m_NumPreviousDirections; i++)
             {
-              m_FeatureData(sampleCounter,f) = probe[c];
-              c++;
+              int c=0;
+              vnl_vector_fixed<double,3> probe;
+              if (i<num_zero_dirs)
+                probe.fill(0.0);
+              else
+              {
+                probe[0] = m_RandGen->GetVariate()*2-1;
+                probe[1] = m_RandGen->GetVariate()*2-1;
+                probe[2] = m_RandGen->GetVariate()*2-1;
+                probe.normalize();
+                if (dot_product(ref, probe)<0)
+                  probe *= -1;
+              }
+              for (unsigned int f=NumberOfSignalFeatures+3*i; f<NumberOfSignalFeatures+3*(i+1); f++)
+              {
+                m_FeatureData(sampleCounter,f) = probe[c];
+                c++;
+              }
             }
 
             // additional feature images
@@ -732,10 +717,11 @@ namespace mitk
               itk::Point<float, 3> itkP;
               image->TransformIndexToPhysicalPoint(it.GetIndex(), itkP);
               float v = GetImageValue<float>(itkP, img, false);
+              m_FeatureData(sampleCounter,NumberOfSignalFeatures+m_NumPreviousDirections*3+add_feat_c) = v;
               add_feat_c++;
-              m_FeatureData(sampleCounter,NumberOfSignalFeatures+2+add_feat_c) = v;
             }
 
+            // label and sample weight
             m_LabelData(sampleCounter,0) = m_DirectionContainer.size();
             m_Weights(sampleCounter,0) = 1.0;
             sampleCounter++;
@@ -747,6 +733,7 @@ namespace mitk
       // white matter samples
       mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
       vtkSmartPointer< vtkPolyData > polyData = fib->GetFiberPolyData();
+      vnl_vector_fixed<double,3> zero_dir; zero_dir.fill(0.0);
       for (int i=0; i<fib->GetNumFibers(); i++)
       {
         vtkCell* cell = polyData->GetCell(i);
@@ -754,59 +741,106 @@ namespace mitk
         vtkPoints* points = cell->GetPoints();
         double fiber_weight = fib->GetFiberWeight(i);
 
-        vnl_vector_fixed<double,3> dirOld; dirOld.fill(0.0);
-
-        for (int j=0; j<numPoints-1; j++)
+        for (int j=0; j<numPoints; j++)
         {
-          // calculate direction
-          double* p1 = points->GetPoint(j);
-          itk::Point<float, 3> itkP1;
-          itkP1[0] = p1[0]; itkP1[1] = p1[1]; itkP1[2] = p1[2];
+          itk::Point<float, 3> itkP1, itkP2;
 
-          float volume_mod = GetImageValue<float>(itkP1, fiber_folume, false);
+          bool reverse = m_RandGen->GetIntegerVariate(1);
+          if ( (!reverse && j==0) || (reverse && j==numPoints-1) )
+            reverse = !reverse;
 
-          vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+          int num_nonzero_dirs = 0;
+          if (!reverse)
+            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), j);
+          else
+            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), numPoints-j-1);
 
-          itk::Point<float, 3> itkP2;
-          double* p2 = points->GetPoint(j+1);
-          itkP2[0] = p2[0]; itkP2[1] = p2[1]; itkP2[2] = p2[2];
-          dir[0]=itkP2[0]-itkP1[0];
-          dir[1]=itkP2[1]-itkP1[1];
-          dir[2]=itkP2[2]-itkP1[2];
+          vnl_vector_fixed<double,3> dir;
+          // zero directions
+          for (unsigned int k=0; k<m_NumPreviousDirections-num_nonzero_dirs; k++)
+          {
+            dir.fill(0.0);
+            int c = 0;
+            for (unsigned int f=NumberOfSignalFeatures+3*k; f<NumberOfSignalFeatures+3*(k+1); f++)
+            {
+              m_FeatureData(sampleCounter,f) = dir[c];
+              c++;
+            }
+          }
+
+          // nonzero directions
+          for (unsigned int k=0; k<num_nonzero_dirs; k++)
+          {
+            double* p = nullptr;
+            int n_idx = num_nonzero_dirs-k;
+            if (!reverse)
+            {
+              p = points->GetPoint(j-n_idx);
+              itkP1[0] = p[0]; itkP1[1] = p[1]; itkP1[2] = p[2];
+              p = points->GetPoint(j-n_idx+1);
+              itkP2[0] = p[0]; itkP2[1] = p[1]; itkP2[2] = p[2];
+            }
+            else
+            {
+              p = points->GetPoint(j+n_idx);
+              itkP1[0] = p[0]; itkP1[1] = p[1]; itkP1[2] = p[2];
+              p = points->GetPoint(j+n_idx-1);
+              itkP2[0] = p[0]; itkP2[1] = p[1]; itkP2[2] = p[2];
+            }
+
+            dir[0]=itkP1[0]-itkP2[0];
+            dir[1]=itkP1[1]-itkP2[1];
+            dir[2]=itkP1[2]-itkP2[2];
+
+            if (dir.magnitude()<0.0001)
+              mitkThrow() << "streamline error!";
+            dir.normalize();
+            if (dir[0]!=dir[0] || dir[1]!=dir[1] || dir[2]!=dir[2])
+              mitkThrow() << "ERROR: NaN direction!";
+
+            if (dot_product(ref, dir)<0)
+              dir *= -1;
+
+            int c = 0;
+            for (unsigned int f=NumberOfSignalFeatures+3*(k+m_NumPreviousDirections-num_nonzero_dirs); f<NumberOfSignalFeatures+3*(k+1+m_NumPreviousDirections-num_nonzero_dirs); f++)
+            {
+              m_FeatureData(sampleCounter,f) = dir[c];
+              c++;
+            }
+          }
+
+          // get target direction
+          double* p = points->GetPoint(j);
+          itkP1[0] = p[0]; itkP1[1] = p[1]; itkP1[2] = p[2];
+          if (!reverse)
+          {
+            p = points->GetPoint(j-1);
+            itkP2[0] = p[0]; itkP2[1] = p[1]; itkP2[2] = p[2];
+          }
+          else
+          {
+            p = points->GetPoint(j+1);
+            itkP2[0] = p[0]; itkP2[1] = p[1]; itkP2[2] = p[2];
+          }
+          dir[0]=itkP1[0]-itkP2[0];
+          dir[1]=itkP1[1]-itkP2[1];
+          dir[2]=itkP1[2]-itkP2[2];
 
           if (dir.magnitude()<0.0001)
-          {
-            MITK_INFO << "streamline error!";
-            continue;
-          }
+            mitkThrow() << "streamline error!";
           dir.normalize();
           if (dir[0]!=dir[0] || dir[1]!=dir[1] || dir[2]!=dir[2])
-          {
-            MITK_INFO << "ERROR: NaN direction!";
-            continue;
-          }
+            mitkThrow() << "ERROR: NaN direction!";
+          if (dot_product(ref, dir)<0)
+            dir *= -1;
 
-          if (j==0)
-          {
-            dirOld = dir;
-            continue;
-          }
+          // image features
+          float volume_mod = GetImageValue<float>(itkP1, fiber_folume, false);
 
-          // get voxel values
+          // diffusion signal features
           typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image);
           for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
             m_FeatureData(sampleCounter,f) = pix[f];
-
-          // direction training features
-          int c = 0;
-          if (dot_product(ref, dirOld)<0)
-            dirOld *= -1;
-
-          for (unsigned int f=NumberOfSignalFeatures; f<NumberOfSignalFeatures+3; f++)
-          {
-            m_FeatureData(sampleCounter,f) = dirOld[c];
-            c++;
-          }
 
           // additional feature images
           int add_feat_c = 0;
@@ -830,14 +864,12 @@ namespace mitk
               {
                 m_LabelData(sampleCounter,0) = l;
                 m_Weights(sampleCounter,0) = fiber_weight*volume_mod;
-                //MITK_INFO << "m_Weights(sampleCounter,0): " << m_Weights(sampleCounter,0) << ' ' << fiber_weight << ' ' << volume_mod;
                 angle = a;
               }
               l++;
             }
           }
 
-          dirOld = dir;
           sampleCounter++;
         }
       }

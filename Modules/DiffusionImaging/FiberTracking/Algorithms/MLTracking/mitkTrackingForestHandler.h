@@ -83,6 +83,7 @@ public:
     void LoadForest(std::string forestFile);
 
     // training parameters
+    void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
     void SetNumTrees(int num){ m_NumTrees = num; }
     void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
     void SetStepSize(double step){ m_WmSampleDistance = step; }
@@ -90,8 +91,8 @@ public:
     void SetSampleFraction(double fraction){ m_SampleFraction = fraction; }
     std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
-    void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images from the war input DWI
-    vnl_vector_fixed<double,3> Classify(itk::Point<double, 3>& pos, int& candidates, vnl_vector_fixed<double,3>& olddir, double angularThreshold, double& w, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
+    void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
+    vnl_vector_fixed<double,3> Classify(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double angularThreshold, double& w, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
 
     bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
 

@@ -107,6 +107,7 @@ public:
     itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
+    itkSetMacro( NumPreviousDirections, int )           ///< How many "old" steps do we want to consider in our decision where to go next?
 
     void SetForestHandler( mitk::TrackingForestHandler<ShOrder, NumImageFeatures> fh )   ///< Stores random forest classifier and performs actual classification
     {
@@ -120,7 +121,7 @@ public:
     void CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& dir);    ///< Calculate next integration step.
     double FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front);       ///< Start streamline in one direction.
     bool IsValidPosition(itk::Point<double, 3>& pos);   ///< Are we outside of the mask image?
-    vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& olddir); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
+    vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
     double GetRandDouble(double min=-1, double max=1);
     std::vector< vnl_vector_fixed<double,3> > CreateDirections(int NPoints);
@@ -146,6 +147,7 @@ public:
     bool                                m_OnlyForwardSamples;
     bool                                m_UseStopVotes;
     int                                 m_NumberOfSamples;
+    int                                 m_NumPreviousDirections;
 
     SimpleFastMutexLock                 m_Mutex;
     ItkUcharImgType::Pointer            m_StoppingRegions;

@@ -284,11 +284,14 @@ void mitk::PaintbrushTool::UpdateContour(const InteractionPositionEvent *positio
   */
 void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
+  if (m_WorkingSlice.IsNull())
+    return;
 
+  mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
     return;
+
+  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
 
   // create new working node
   // a fresh node is needed to only display the actual drawing process for

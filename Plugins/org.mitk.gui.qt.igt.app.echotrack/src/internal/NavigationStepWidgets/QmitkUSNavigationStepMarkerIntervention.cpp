@@ -63,23 +63,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention(QWidget *parent)
   : QmitkUSAbstractNavigationStep(parent),
-    m_NumberOfTargets(0),
-    m_TargetProgressBar(0),
-    m_PlannedTargetProgressBar(0),
-    m_CurrentTargetIndex(0),
-    m_CurrentTargetReached(false),
-    m_ShowPlanningColors(false),
-    m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
-    m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
-    m_TargetUpdateFilter(mitk::USNavigationTargetUpdateFilter::New()),
-    m_TargetOcclusionFilter(mitk::USNavigationTargetOcclusionFilter::New()),
-    m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
-    m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
-    m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
-    m_TargetStructureWarnOverlay(mitk::TextAnnotation2D::New()),
-    m_ReferenceSensorIndex(1),
-    m_NeedleSensorIndex(0),
-    ui(new Ui::QmitkUSNavigationStepMarkerIntervention)
+  m_NumberOfTargets(0),
+  m_TargetProgressBar(0),
+  m_PlannedTargetProgressBar(0),
+  m_CurrentTargetIndex(0),
+  m_CurrentTargetReached(false),
+  m_ShowPlanningColors(false),
+  m_NeedleProjectionFilter(mitk::NeedleProjectionFilter::New()),
+  m_NodeDisplacementFilter(mitk::NodeDisplacementFilter::New()),
+  m_TargetUpdateFilter(mitk::USNavigationTargetUpdateFilter::New()),
+  m_TargetOcclusionFilter(mitk::USNavigationTargetOcclusionFilter::New()),
+  m_TargetIntersectionFilter(mitk::USNavigationTargetIntersectionFilter::New()),
+  m_PlacementQualityCalculator(mitk::USTargetPlacementQualityCalculator::New()),
+  m_ListenerTargetCoordinatesChanged(this, &QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates),
+  m_TargetStructureWarnOverlay(mitk::TextAnnotation2D::New()),
+  m_ReferenceSensorIndex(1),
+  m_NeedleSensorIndex(0),
+  ui(new Ui::QmitkUSNavigationStepMarkerIntervention)
 {
   m_ActiveTargetColor[0] = 1;
   m_ActiveTargetColor[1] = 1;
@@ -99,9 +99,9 @@ QmitkUSNavigationStepMarkerIntervention::QmitkUSNavigationStepMarkerIntervention
   connect(this, SIGNAL(TargetReached(int)), this, SLOT(OnTargetReached()));
   connect(this, SIGNAL(TargetLeft(int)), this, SLOT(OnTargetLeft()));
   connect(ui->riskStructuresRangeWidget,
-          SIGNAL(SignalZoneViolated(const mitk::DataNode *, mitk::Point3D)),
-          this,
-          SLOT(OnRiskZoneViolated(const mitk::DataNode *, mitk::Point3D)));
+    SIGNAL(SignalZoneViolated(const mitk::DataNode *, mitk::Point3D)),
+    this,
+    SLOT(OnRiskZoneViolated(const mitk::DataNode *, mitk::Point3D)));
 
   m_PointMarkInteractor = mitk::USPointMarkInteractor::New();
   m_PointMarkInteractor->CoordinatesChangedEvent.AddListener(m_ListenerTargetCoordinatesChanged);
@@ -182,8 +182,8 @@ bool QmitkUSNavigationStepMarkerIntervention::OnStopStep()
 
   // remove all reached nodes from the data storage
   for (QVector<itk::SmartPointer<mitk::DataNode>>::iterator it = m_ReachedTargetsNodes.begin();
-       it != m_ReachedTargetsNodes.end();
-       ++it)
+    it != m_ReachedTargetsNodes.end();
+    ++it)
   {
     dataStorage->Remove(*it);
   }
@@ -220,7 +220,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
 
   // get target node from data storage and make sure that it contains data
   m_TargetNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TARGETSURFACE,
-                                           USNavigationMarkerPlacement::DATANAME_TUMOUR);
+    USNavigationMarkerPlacement::DATANAME_TUMOUR);
   if (m_TargetNode.IsNull() || m_TargetNode->GetData() == 0)
   {
     mitkThrow() << "Target node (" << USNavigationMarkerPlacement::DATANAME_TARGETSURFACE << ") must not be null.";
@@ -231,7 +231,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   if (m_TargetSurface.IsNull())
   {
     mitkThrow() << "Target node (" << USNavigationMarkerPlacement::DATANAME_TARGETSURFACE
-                << ") data must be of type mitk::Surface";
+      << ") data must be of type mitk::Surface";
   }
 
   // delete progress bars for reinitializing them again afterwards
@@ -247,7 +247,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   this->UpdateTargetProgressDisplay();
 
   mitk::DataNode::Pointer tumourNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TUMOUR,
-                                                                 QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
+    QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   if (tumourNode.IsNotNull())
   {
     // do not show tumour node during intervention (target surface is shown)
@@ -266,7 +266,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
 
   //
   mitk::DataNode::Pointer targetsBaseNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_TARGETS,
-                                                                      QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
+    QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   mitk::DataStorage::SetOfObjects::ConstPointer plannedTargetNodes;
   if (targetsBaseNode.IsNotNull())
   {
@@ -275,8 +275,8 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
   if (plannedTargetNodes.IsNotNull() && plannedTargetNodes->Size() > 0)
   {
     for (mitk::DataStorage::SetOfObjects::ConstIterator it = plannedTargetNodes->Begin();
-         it != plannedTargetNodes->End();
-         ++it)
+      it != plannedTargetNodes->End();
+      ++it)
     {
       m_PlannedTargetsNodes.push_back(it->Value());
     }
@@ -287,7 +287,7 @@ bool QmitkUSNavigationStepMarkerIntervention::OnActivateStep()
 
   // add progress bars for risk zone nodes
   mitk::DataNode::Pointer zonesBaseNode = this->GetNamedDerivedNode(USNavigationMarkerPlacement::DATANAME_ZONES,
-                                                                    QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
+    QmitkUSAbstractNavigationStep::DATANAME_BASENODE);
   // only add progress bars if the base node for zones was created
   if (zonesBaseNode.IsNotNull())
   {
@@ -319,7 +319,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnUpdate()
   if (navigationDataSource.IsNull())
   {
     MITK_ERROR("QmitkUSAbstractNavigationStep")
-    ("QmitkUSNavigationStepMarkerIntervention") << "Navigation Data Source of Combined Modality must not be null.";
+      ("QmitkUSNavigationStepMarkerIntervention") << "Navigation Data Source of Combined Modality must not be null.";
     mitkThrow() << "Navigation Data Source of Combined Modality must not be null.";
   }
 
@@ -428,7 +428,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnTargetLeft()
     this->GetDataStorage()->Add(
       node,
       this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS,
-                                         QmitkUSAbstractNavigationStep::DATANAME_BASENODE));
+      QmitkUSAbstractNavigationStep::DATANAME_BASENODE));
     m_ReachedTargetsNodes.push_back(node);
   }
 
@@ -465,7 +465,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnBackToLastTargetClicked()
   {
     this->GetDataStorage()->Remove(m_ReachedTargetsNodes.last());
     MITK_INFO("QmitkUSAbstractNavigationStep")
-    ("QmitkUSNavigationStepMarkerIntervention") << "Removed Target " << m_ReachedTargetsNodes.size();
+      ("QmitkUSNavigationStepMarkerIntervention") << "Removed Target " << m_ReachedTargetsNodes.size();
     m_ReachedTargetsNodes.pop_back();
   }
 
@@ -508,7 +508,7 @@ void QmitkUSNavigationStepMarkerIntervention::OnFreeze(bool freezed)
       this->GetDataStorage()->Add(
         node,
         this->GetNamedDerivedNodeAndCreate(USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS,
-                                           QmitkUSAbstractNavigationStep::DATANAME_BASENODE));
+        QmitkUSAbstractNavigationStep::DATANAME_BASENODE));
       m_ReachedTargetsNodes.push_back(node);
     }
 
@@ -538,7 +538,7 @@ void QmitkUSNavigationStepMarkerIntervention::ClearZones()
   // remove all reached target nodes from the data storage and clear the list
   mitk::DataStorage::Pointer dataStorage = this->GetDataStorage();
   for (QVector<mitk::DataNode::Pointer>::iterator it = m_ReachedTargetsNodes.begin(); it != m_ReachedTargetsNodes.end();
-       ++it)
+    ++it)
   {
     if (it->IsNotNull())
     {
@@ -552,8 +552,8 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates(mitk::Data
 {
   m_NodeDisplacementFilter->ResetNodes();
   for (QVector<itk::SmartPointer<mitk::DataNode>>::iterator it = m_ReachedTargetsNodes.begin();
-       it != m_ReachedTargetsNodes.end();
-       ++it)
+    it != m_ReachedTargetsNodes.end();
+    ++it)
   {
     if (it->IsNotNull() && (*it)->GetData() != 0)
     {
@@ -581,8 +581,8 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetCoordinates(mitk::Data
   }
 
   MITK_INFO("QmitkUSAbstractNavigationStep")
-  ("QmitkUSNavigationStepMarkerIntervention") << "Target " << m_CurrentTargetIndex << " reached at position "
-                                              << geometry->GetOrigin();
+    ("QmitkUSNavigationStepMarkerIntervention") << "Target " << m_CurrentTargetIndex << " reached at position "
+    << geometry->GetOrigin();
 
   this->CalculateTargetPlacementQuality();
 }
@@ -592,7 +592,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateBodyMarkerStatus(mitk::Navig
   if (bodyMarker.IsNull())
   {
     MITK_ERROR("QmitkUSAbstractNavigationStep")
-    ("QmitkUSNavigationStepMarkerIntervention")
+      ("QmitkUSNavigationStepMarkerIntervention")
       << "Current Navigation Data for body marker of Combined Modality must not be null.";
     mitkThrow() << "Current Navigation Data for body marker of Combined Modality must not be null.";
   }
@@ -759,8 +759,8 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetScore()
 
         mitk::ScalarType minDistance = -1;
         for (QVector<itk::SmartPointer<mitk::DataNode>>::iterator it = m_PlannedTargetsNodes.begin();
-             it != m_PlannedTargetsNodes.end();
-             ++it)
+          it != m_PlannedTargetsNodes.end();
+          ++it)
         {
           mitk::ScalarType distance =
             intersectionPoint.EuclideanDistanceTo((*it)->GetData()->GetGeometry()->GetOrigin());
@@ -794,7 +794,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetProgressDisplay()
   else
   {
     description = QString("Distance to Target ") + QString::number(m_CurrentTargetIndex + 1) + QString(" of ") +
-                  QString::number(m_NumberOfTargets);
+      QString::number(m_NumberOfTargets);
     if (m_TargetProgressBar)
     {
       m_TargetProgressBar->show();
@@ -840,7 +840,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdatePlannedTargetProgressDisplay
   }
   else
   {
-    float red[3] = {0.6, 0, 0};
+    float red[3] = { 0.6, 0, 0 };
     m_TargetProgressBar->SetBorderColor(red);
     m_TargetProgressBar->setValueInvalid();
   }
@@ -862,7 +862,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetViolationStatus()
   // show warning if the needle tip is inside the target surface
   if (enclosedPoints->IsInsideSurface(needleTip[0], needleTip[1], needleTip[2]))
   {
-    if (!m_TargetStructureWarnOverlay->IsVisible(NULL))
+    if (!m_TargetStructureWarnOverlay->IsVisible())
     {
       m_TargetStructureWarnOverlay->SetVisibility(true);
 
@@ -874,7 +874,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateTargetViolationStatus()
     }
 
     MITK_INFO("QmitkUSAbstractNavigationStep")
-    ("QmitkUSNavigationStepMarkerIntervention") << "Target surface violated at " << needleTip << ".";
+      ("QmitkUSNavigationStepMarkerIntervention") << "Target surface violated at " << needleTip << ".";
   }
   else
   {
@@ -908,8 +908,8 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
   // for the quality calculator
   mitk::PointSet::PointIdentifier n = 0;
   for (QVector<itk::SmartPointer<mitk::DataNode>>::iterator it = m_ReachedTargetsNodes.begin();
-       it != m_ReachedTargetsNodes.end();
-       ++it)
+    it != m_ReachedTargetsNodes.end();
+    ++it)
   {
     targetPointSet->InsertPoint(n++, (*it)->GetData()->GetGeometry()->GetOrigin());
   }
@@ -944,7 +944,7 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
     {
       mitk::ScalarType distance =
         m_PlannedTargetsNodes.at(n)->GetData()->GetGeometry()->GetOrigin().EuclideanDistanceTo(
-          m_ReachedTargetsNodes.at(n)->GetData()->GetGeometry()->GetOrigin());
+        m_ReachedTargetsNodes.at(n)->GetData()->GetGeometry()->GetOrigin());
 
       reachedPlannedDifferences.put(n, distance);
       reachedPlannedDifferencesSum += distance;
@@ -957,12 +957,12 @@ void QmitkUSNavigationStepMarkerIntervention::CalculateTargetPlacementQuality()
 
     // add distances between planning and reality to the quality intermediate result
     placementQualityResult->SetProperty("USNavigation::PlanningRealityDistances",
-                                        mitk::GenericProperty<mitk::VnlVector>::New(reachedPlannedDifferences));
+      mitk::GenericProperty<mitk::VnlVector>::New(reachedPlannedDifferences));
     placementQualityResult->SetProperty(
       "USNavigation::MeanPlanningRealityDistance",
       mitk::DoubleProperty::New(reachedPlannedDifferencesSum / static_cast<double>(m_NumberOfTargets)));
     placementQualityResult->SetProperty("USNavigation::MaximumPlanningRealityDistance",
-                                        mitk::DoubleProperty::New(reachedPlannedDifferencesMax));
+      mitk::DoubleProperty::New(reachedPlannedDifferencesMax));
   }
 
   emit SignalIntermediateResult(placementQualityResult);
@@ -991,7 +991,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateSensorsNames()
     catch (const std::exception &e)
     {
       MITK_WARN("QmitkUSAbstractNavigationStep")
-      ("QmitkUSNavigationStepPlacementPlanning") << "Cannot get index for needle sensor name: " << e.what();
+        ("QmitkUSNavigationStepPlacementPlanning") << "Cannot get index for needle sensor name: " << e.what();
     }
   }
   if (this->GetNavigationStepState() >= QmitkUSAbstractNavigationStep::State_Active)
@@ -1008,7 +1008,7 @@ void QmitkUSNavigationStepMarkerIntervention::UpdateSensorsNames()
     catch (const std::exception &e)
     {
       MITK_WARN("QmitkUSAbstractNavigationStep")
-      ("QmitkUSNavigationStepPlacementPlanning") << "Cannot get index for reference sensor name: " << e.what();
+        ("QmitkUSNavigationStepPlacementPlanning") << "Cannot get index for reference sensor name: " << e.what();
     }
   }
   if (this->GetNavigationStepState() >= QmitkUSAbstractNavigationStep::State_Active)

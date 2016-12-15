@@ -73,7 +73,7 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   {
     name = "c:\\HomogeneousScatteringAssumptions\\Scattering" + std::to_string(i) + ".nrrd";
 
-    m_FluenceCompOriginal.push_back(mitk::IOUtil::LoadImage(name)); // TODO: make it actually load the images we want, not some test image....
+    m_FluenceCompOriginal.push_back(mitk::IOUtil::LoadImage(name));
   }
 
   m_FluenceCompResized.insert(m_FluenceCompResized.begin(), 26, Image::New());
@@ -455,7 +455,36 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       }
     }
 
-    itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 84, 0 } }; //22/532*2048  TODO: make this more general to any Spacing/Sampling, Depth, etc
+    if (m_SavingSettings.saveRaw && m_CurrentlyRecording && rfDataChannelData != nullptr)
+    {
+      unsigned int dim[3];
+      dim[0] = channelDataChannelsPerDataset;
+      dim[1] = channelDataSamplesPerChannel;
+      dim[2] = 1;
+
+      // save the raw images when recording
+      for (int i = 0; i < channelDataTotalDatasets; ++i)
+      {
+        mitk::Image::Pointer rawImage = mitk::Image::New();
+        rawImage->Initialize(mitk::MakeScalarPixelType<short>(), 3, dim);
+        rawImage->SetSlice(&rfDataChannelData[i*channelDataChannelsPerDataset*channelDataSamplesPerChannel]);
+
+        float& recordTime = m_Device->GetScanMode().receivePhaseLengthSeconds;
+        int& speedOfSound = m_Device->GetScanMode().averageSpeedOfSound;
+
+        mitk::Vector3D rawSpacing;
+        rawSpacing[0] = m_Device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
+        rawSpacing[1] = recordTime * speedOfSound / 2 * 1000 / channelDataSamplesPerChannel;
+        rawSpacing[2] = 0.6;
+
+        rawImage->GetGeometry()->SetSpacing(rawSpacing);
+        rawImage->GetGeometry()->Modified();
+
+        m_RawRecordedImages.push_back(rawImage);
+      }
+    }
+
+    itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 84, 0 } }; //22/532*2048  TODO: make this more general
     if (!m_Pyro->IsSyncDelaySet() &&(image->GetPixelValueByIndex(pixel) < -30)) // #MagicNumber
     {
       MITK_INFO << "Setting SyncDelay";
@@ -598,13 +627,18 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   // start the recording process
   if (record)
   {
-    m_RecordedImages.clear();  // we make sure there are no leftovers
-    m_ImageTimestampRecord.clear();      // also for the timestamps
-    m_PixelValues.clear();     // aaaand for the pixel values
+    m_RecordedImages.clear();  
+    m_RawRecordedImages.clear(); // we make sure there are no leftovers
+    m_ImageTimestampRecord.clear(); // also for the timestamps
+    m_PixelValues.clear(); // aaaand for the pixel values
 
     if (m_SavingSettings.saveRaw)
     {
-      // TODO: setup everything so the raw Data can be saved
+      m_Device->GetScanMode().transferChannelData = true;
+      MITK_INFO << "eeeeeeeeeeeeeeeeeeeeee";
+      m_Device->GetScanMode().transferImageData = true;
+      m_Device->UpdateScanmode();
+      // set the raw Data to be transfered
     }
 
     // tell the callback to start recording images
@@ -614,6 +648,9 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   else
   {
     m_CurrentlyRecording = false;
+
+    m_Device->GetScanMode().transferChannelData = false; // make sure raw Channel Data is not transferred anymore!
+    m_Device->UpdateScanmode();
 
     // get the time and date, put them into a nice string and create a folder for the images
     time_t time = std::time(nullptr);
@@ -631,15 +668,29 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "TimestampsImages" + ".csv";
 
+    // idon't forget the raw Images (if chosen to be saved)
+    Image::Pointer PAImageRaw = Image::New();
+    Image::Pointer USImageRaw = Image::New();
+    std::string pathPARaw = "c:\\DiPhASImageData\\" + currentDate + "\\" + "PAImagesRaw" + ".nrrd";
+    std::string pathUSRaw = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImagesRaw" + ".nrrd";
+
     if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
       // first, save the data, so the pyro does not aquire more unneccessary timestamps
       m_Pyro->SaveData();
 
       // now order the images and save them
-      OrderImagesInterleaved(PAImage, USImage);
+      OrderImagesInterleaved(PAImage, USImage, m_RecordedImages, false);
       mitk::IOUtil::Save(USImage, pathUS);
       mitk::IOUtil::Save(PAImage, pathPA);
+
+      if (m_SavingSettings.saveRaw)
+      {
+        // and the raw images
+        OrderImagesInterleaved(PAImageRaw, USImageRaw, m_RawRecordedImages, true);
+        mitk::IOUtil::Save(USImageRaw, pathUSRaw);
+        mitk::IOUtil::Save(PAImageRaw, pathPARaw);
+      }
 
       // read the pixelvalues of the enveloped images at this position
       itk::Index<3> pixel = { { m_RecordedImages.at(1)->GetDimension(0) / 2, 84, 0 } }; //22/532*2048
@@ -659,11 +710,12 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     }
     else if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no PAImage if we used US only mode
     {
-      OrderImagesUltrasound(USImage);
+      OrderImagesUltrasound(USImage, m_RecordedImages);
       mitk::IOUtil::Save(USImage, pathUS);
     }
 
     m_PixelValues.clear();            // clean up the pixel values
+    m_RawRecordedImages.clear();
     m_RecordedImages.clear();         // clean up the images
     m_ImageTimestampRecord.clear();   // clean up the timestamps
   }
@@ -679,13 +731,18 @@ void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel)
   }
 }
 
-void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage)
+void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage, std::vector<Image::Pointer> recordedList, bool raw)
 {
   unsigned int width  = 32;
   unsigned int height = 32;
   unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
 
-  if (m_DataType == DataType::Beamformed_Short)
+  if (raw)
+  {
+    width = recordedList.at(0)->GetDimension(0);
+    height = recordedList.at(0)->GetDimension(1);
+  }
+  else if (m_DataType == DataType::Beamformed_Short)
   {
     width = m_Device->GetScanMode().reconstructionLines;
     height = m_Device->GetScanMode().reconstructionSamplesPerLine;
@@ -696,17 +753,17 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
     height = m_Device->GetScanMode().imageHeight;
   }
 
-  unsigned int dimLaser[] = { width, height, m_RecordedImages.size() / events};
-  unsigned int dimSound[] = { width, height, m_RecordedImages.size() / events * (events-1)};
+  unsigned int dimLaser[] = { width, height, recordedList.size() / events};
+  unsigned int dimSound[] = { width, height, recordedList.size() / events * (events-1)};
 
-  PAImage->Initialize(m_RecordedImages.back()->GetPixelType(), 3, dimLaser);
-  PAImage->SetGeometry(m_RecordedImages.back()->GetGeometry());
-  USImage->Initialize(m_RecordedImages.back()->GetPixelType(), 3, dimSound);
-  USImage->SetGeometry(m_RecordedImages.back()->GetGeometry());
+  PAImage->Initialize(recordedList.back()->GetPixelType(), 3, dimLaser);
+  PAImage->SetGeometry(recordedList.back()->GetGeometry());
+  USImage->Initialize(recordedList.back()->GetPixelType(), 3, dimSound);
+  USImage->SetGeometry(recordedList.back()->GetGeometry());
 
-  for (int index = 0; index < m_RecordedImages.size(); ++index)
+  for (int index = 0; index < recordedList.size(); ++index)
   {
-    mitk::ImageReadAccessor inputReadAccessor(m_RecordedImages.at(index));
+    mitk::ImageReadAccessor inputReadAccessor(recordedList.at(index));
     if (index % events == 0)
     {
       PAImage->SetSlice(inputReadAccessor.GetData(), index / events);
@@ -718,7 +775,7 @@ void mitk::USDiPhASImageSource::OrderImagesInterleaved(Image::Pointer PAImage, I
   }
 }
 
-void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer soundImage)
+void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer USImage, std::vector<Image::Pointer> recordedList)
 {
   unsigned int width  = 32;
   unsigned int height = 32;
@@ -735,14 +792,14 @@ void mitk::USDiPhASImageSource::OrderImagesUltrasound(Image::Pointer soundImage)
     height = m_Device->GetScanMode().imageHeight;
   }
 
-  unsigned int dimSound[] = { width, height, m_RecordedImages.size()};
+  unsigned int dimSound[] = { width, height, recordedList.size()};
 
-  soundImage->Initialize(m_RecordedImages.back()->GetPixelType(), 3, dimSound);
-  soundImage->SetGeometry(m_RecordedImages.back()->GetGeometry());
+  USImage->Initialize(recordedList.back()->GetPixelType(), 3, dimSound);
+  USImage->SetGeometry(recordedList.back()->GetGeometry());
 
-  for (int index = 0; index < m_RecordedImages.size(); ++index)
+  for (int index = 0; index < recordedList.size(); ++index)
   {
-    mitk::ImageReadAccessor inputReadAccessor(m_RecordedImages.at(index));
-    soundImage->SetSlice(inputReadAccessor.GetData(), index);
+    mitk::ImageReadAccessor inputReadAccessor(recordedList.at(index));
+    USImage->SetSlice(inputReadAccessor.GetData(), index);
   }
 }

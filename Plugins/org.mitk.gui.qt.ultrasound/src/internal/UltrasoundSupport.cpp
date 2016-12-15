@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTextOverlay2D.h>
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
+#include "mitkScaleLegendOverlay.h"
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -178,7 +179,11 @@ void UltrasoundSupport::AddOverlay()
   textOverlay->SetPosition2D(pos);
 
   //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
-  m_PAOverlayManager->AddOverlay(textOverlay.GetPointer());
+  //m_PAOverlayManager->AddOverlay(textOverlay.GetPointer());
+
+  mitk::ScaleLegendOverlay::Pointer scaleOverlay = mitk::ScaleLegendOverlay::New();
+  scaleOverlay->SetLeftAxisVisibility(true);
+  m_PAOverlayManager->AddOverlay(scaleOverlay.GetPointer());
 
   //Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
   //Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.

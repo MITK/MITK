@@ -89,7 +89,7 @@ void WrapperImageDataCallback(
 	double timeStamp)
 {
 	 w_ISource->ImageDataCallback(
-		 rfDataChannelData, channelDatalinesPerDataset, channelDatalinesPerDataset, channelDataTotalDatasets,
+		 rfDataChannelData, channelDatalinesPerDataset, channelDataSamplesPerChannel, channelDataTotalDatasets,
 		 rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
 		 imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
 }
@@ -219,7 +219,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.averagingCount = 1;
 
   // configure general processing:
-  m_ScanMode.transferChannelData = false;
+  m_ScanMode.transferChannelData = true;
 
   // configure reconstruction processing:
   m_ScanMode.averageSpeedOfSound = 1540;
@@ -228,15 +228,15 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   // setup beamforming parameters:
   SetInterleaved(true);
 
-  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.15f;
-  m_ScanMode.reconstructionLines = 256;
+  m_ScanMode.reconstructedLinePitchMmOrAngleDegree = 0.3f;
+  m_ScanMode.reconstructionLines = 128;
   m_ScanMode.reconstructionSamplesPerLine = 2048;
   m_ScanMode.transferBeamformedData = true;
 
   // configure the transmit sequence(s):
   m_ScanMode.transmitEventsCount = 1;
   m_ScanMode.transmitPhaseLengthSeconds = 1e-6f;
-  m_ScanMode.voltageV = 70;
+  m_ScanMode.voltageV = 75;
   UpdateTransmitEvents();
 
   // configure bandpass:
@@ -249,7 +249,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.imageHeight = 512;
   m_ScanMode.imageMultiplier = 1;
   m_ScanMode.imageLeveling = 0;
-  m_ScanMode.transferImageData = true;
+  m_ScanMode.transferImageData = false;
 
   // Trigger setup:
   m_ScanMode.triggerSetup.enabled = true;

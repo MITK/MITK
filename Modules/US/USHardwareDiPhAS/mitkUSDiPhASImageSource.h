@@ -112,6 +112,7 @@ protected:
 
   /** This vector holds all the images we record, if recording is set to active. */
   std::vector<mitk::Image::Pointer>     m_RecordedImages;
+  std::vector<mitk::Image::Pointer>     m_RawRecordedImages;
   std::vector<long long>                m_ImageTimestampRecord;
   std::vector<long long>                m_ImageTimestampBuffer;
   long long                             m_CurrentImageTimestamp;
@@ -135,8 +136,8 @@ protected:
   mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
   mitk::Image::Pointer MultiplyImage(mitk::Image::Pointer inputImage, double value);
 
-  void OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage);
-  void OrderImagesUltrasound(Image::Pointer soundImage);
+  void OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage, std::vector<Image::Pointer> recordedList, bool raw);
+  void OrderImagesUltrasound(Image::Pointer USImage, std::vector<Image::Pointer> recordedList);
 
   void GetPixelValues(itk::Index<3> pixel);
   float GetPixelValue(itk::Index<3> pixel);

@@ -29,18 +29,10 @@ namespace mitk
     RTPlanReader::RTPlanReader() : AbstractFileReader(IOMimeTypes::DICOM_MIMETYPE_NAME(), "DICOM RTPlan File Reader") {
         m_FileReaderServiceReg = RegisterService();
         m_DICOMTagsOfInterestService = GetDicomTagsOfInterestService();
-
-        DICOMTagPathMapType tagmap = GetDefaultDICOMTagsOfInterest();
-        for (const auto& tag : tagmap)
-        {
-            m_DICOMTagsOfInterestService->AddTagOfInterest(tag.first);
-        }
     }
 
     RTPlanReader::RTPlanReader(const RTPlanReader& other) : mitk::AbstractFileReader(other)
-    {
-
-    }
+    {}
 
     RTPlanReader::~RTPlanReader(){}
 

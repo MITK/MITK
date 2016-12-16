@@ -42,7 +42,6 @@ class QToolBar;
 class QMenu;
 class QSignalMapper;
 
-class QmitkDnDFrameWidget;
 class QmitkDataStorageTreeModel;
 class QmitkDataManagerItemDelegate;
 class QmitkNumberPropertySlider;
@@ -212,7 +211,6 @@ protected:
 protected:
 
   QWidget* m_Parent;
-  QmitkDnDFrameWidget* m_DndFrameWidget;
 
   ///
   /// \brief A plain widget as the base pane.

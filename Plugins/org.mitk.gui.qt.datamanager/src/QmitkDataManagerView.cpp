@@ -37,7 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIRenderingManager.h>
 #include <mitkImageCast.h>
 //## Qmitk
-#include <QmitkDnDFrameWidget.h>
 #include <QmitkIOUtil.h>
 #include <QmitkDataStorageTreeModel.h>
 #include <QmitkCustomVariants.h>
@@ -438,15 +437,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   unknownDataNodeDescriptor->AddAction(actionShowInfoDialog);
   m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,actionShowInfoDialog));
 
-  QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
-  _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
-  _DndFrameWidgetLayout->setContentsMargins(0,0,0,0);
-
-  m_DndFrameWidget = new QmitkDnDFrameWidget(m_Parent);
-  m_DndFrameWidget->setLayout(_DndFrameWidgetLayout);
-
   QVBoxLayout* layout = new QVBoxLayout(parent);
-  layout->addWidget(m_DndFrameWidget);
+  layout->addWidget(m_NodeTreeView);
   layout->setContentsMargins(0,0,0,0);
 
   m_Parent->setLayout(layout);

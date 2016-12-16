@@ -64,9 +64,16 @@ int main(int argc, char* argv[])
     parser.addArgument("max_tree_depth", "d", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());
     parser.addArgument("sample_fraction", "sf", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", us::Any());
 
+    parser.addArgument("shfeatures", "shf", mitkCommandLineParser::Int, "Use SH features:", "use SH features", us::Any());
+
+
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
+
+    bool shfeatures = false;
+    if (parsedArgs.count("shfeatures"))
+        shfeatures = us::any_cast<int>(parsedArgs["shfeatures"]);
 
     mitkCommandLineParser::StringContainerType imageFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["images"]);
     mitkCommandLineParser::StringContainerType wmMaskFiles;
@@ -175,20 +182,40 @@ int main(int argc, char* argv[])
         c++;
     }
 
-    mitk::TrackingForestHandler<6,100> forestHandler;
-    forestHandler.SetDwis(rawData);
-    forestHandler.SetMaskImages(maskImageVector);
-    forestHandler.SetWhiteMatterImages(wmMaskImageVector);
-    forestHandler.SetFiberVolumeModImages(volumeModImages);
-    forestHandler.SetAdditionalFeatureImages(addFeatImages);
-    forestHandler.SetTractograms(tractograms);
-    forestHandler.SetNumTrees(numTrees);
-    forestHandler.SetMaxTreeDepth(max_tree_depth);
-    forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
-    forestHandler.SetSampleFraction(sample_fraction);
-    forestHandler.SetStepSize(stepsize);
-    forestHandler.StartTraining();
-    forestHandler.SaveForest(forestFile);
+    if (shfeatures)
+    {
+        mitk::TrackingForestHandler<6,28> forestHandler;
+        forestHandler.SetDwis(rawData);
+        forestHandler.SetMaskImages(maskImageVector);
+        forestHandler.SetWhiteMatterImages(wmMaskImageVector);
+        forestHandler.SetFiberVolumeModImages(volumeModImages);
+        forestHandler.SetAdditionalFeatureImages(addFeatImages);
+        forestHandler.SetTractograms(tractograms);
+        forestHandler.SetNumTrees(numTrees);
+        forestHandler.SetMaxTreeDepth(max_tree_depth);
+        forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
+        forestHandler.SetSampleFraction(sample_fraction);
+        forestHandler.SetStepSize(stepsize);
+        forestHandler.StartTraining();
+        forestHandler.SaveForest(forestFile);
+    }
+    else
+    {
+        mitk::TrackingForestHandler<6,100> forestHandler;
+        forestHandler.SetDwis(rawData);
+        forestHandler.SetMaskImages(maskImageVector);
+        forestHandler.SetWhiteMatterImages(wmMaskImageVector);
+        forestHandler.SetFiberVolumeModImages(volumeModImages);
+        forestHandler.SetAdditionalFeatureImages(addFeatImages);
+        forestHandler.SetTractograms(tractograms);
+        forestHandler.SetNumTrees(numTrees);
+        forestHandler.SetMaxTreeDepth(max_tree_depth);
+        forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
+        forestHandler.SetSampleFraction(sample_fraction);
+        forestHandler.SetStepSize(stepsize);
+        forestHandler.StartTraining();
+        forestHandler.SaveForest(forestFile);
+    }
 
     return EXIT_SUCCESS;
 }

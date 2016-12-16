@@ -307,7 +307,6 @@ void QmitkMLBTView::StartTracking()
     tracker->SetMaxTractLength(m_Controls->m_MaxLengthBox->value());
     tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
-    tracker->SetRemoveWmEndFibers(m_Controls->m_RemoveWmFibers->isChecked());
     tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
     tracker->SetForestHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
@@ -316,6 +315,7 @@ void QmitkMLBTView::StartTracking()
     tracker->SetUseStopVotes(m_Controls->m_UseStopVotes->isChecked());
     tracker->SetOnlyForwardSamples(m_Controls->m_OnlyForwardSamples->isChecked());
     tracker->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
+    tracker->SetNumberOfThreads(1);
     tracker->Update();
 }
 

@@ -58,7 +58,6 @@ MLBSTrackingFilter<  ShOrder, NumImageFeatures >
   , m_SeedImage(NULL)
   , m_MaskImage(NULL)
   , m_AposterioriCurvCheck(false)
-  , m_RemoveWmEndFibers(false)
   , m_AvoidStop(true)
   , m_DemoMode(false)
 {

@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
     parser.addArgument("stopvotes", "sv", mitkCommandLineParser::Int, "Use stop votes:", "use stop votes", us::Any());
     parser.addArgument("forward", "fs", mitkCommandLineParser::Int, "Use only forward samples:", "use only forward samples", us::Any());
 
+    parser.addArgument("shfeatures", "shf", mitkCommandLineParser::Int, "Use SH features:", "use SH features", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -76,6 +77,10 @@ int main(int argc, char* argv[])
     string imageFile = us::any_cast<string>(parsedArgs["image"]);
     string forestFile = us::any_cast<string>(parsedArgs["forest"]);
     string outFile = us::any_cast<string>(parsedArgs["out"]);
+
+    bool shfeatures = false;
+    if (parsedArgs.count("shfeatures"))
+        shfeatures = us::any_cast<int>(parsedArgs["shfeatures"]);
 
     bool stopvotes = true;
     if (parsedArgs.count("stopvotes"))
@@ -158,32 +163,55 @@ int main(int argc, char* argv[])
         addFeatImages.at(0).push_back(itkimg);
     }
 
-    mitk::TrackingForestHandler<6,100> tfh;
-    tfh.LoadForest(forestFile);
-    tfh.AddDwi(dwi);
-    tfh.SetAdditionalFeatureImages(addFeatImages);
+    if (shfeatures)
+    {
+        mitk::TrackingForestHandler<6,28> tfh;
+        tfh.LoadForest(forestFile);
+        tfh.AddDwi(dwi);
+        tfh.SetAdditionalFeatureImages(addFeatImages);
+        typedef itk::MLBSTrackingFilter<6,28> TrackerType;
+        TrackerType::Pointer tracker = TrackerType::New();
+        tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
+        tracker->SetMaskImage(mask);
+        tracker->SetSeedImage(seed);
+        tracker->SetStoppingRegions(stop);
+        tracker->SetSeedsPerVoxel(seeds);
+        tracker->SetStepSize(stepsize);
+        tracker->SetForestHandler(tfh);
+        tracker->SetSamplingDistance(samplingdist);
+        tracker->SetUseStopVotes(stopvotes);
+        tracker->SetOnlyForwardSamples(forward);
+        tracker->SetAposterioriCurvCheck(false);
+        tracker->Update();
+        vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
+        mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
+        mitk::IOUtil::Save(outFib, outFile);
+    }
+    else
+    {
+        mitk::TrackingForestHandler<6,100> tfh;
+        tfh.LoadForest(forestFile);
+        tfh.AddDwi(dwi);
+        tfh.SetAdditionalFeatureImages(addFeatImages);
 
-    typedef itk::MLBSTrackingFilter<6,100> TrackerType;
-    TrackerType::Pointer tracker = TrackerType::New();
-    tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
-    tracker->SetMaskImage(mask);
-    tracker->SetSeedImage(seed);
-    tracker->SetStoppingRegions(stop);
-    tracker->SetSeedsPerVoxel(seeds);
-    tracker->SetStepSize(stepsize);
-    tracker->SetForestHandler(tfh);
-    tracker->SetSamplingDistance(samplingdist);
-    tracker->SetUseStopVotes(stopvotes);
-    tracker->SetOnlyForwardSamples(forward);
-    //tracker->SetDeflectionMod(deflection);
-    //tracker->SetAvoidStop(false);
-    tracker->SetAposterioriCurvCheck(false);
-    tracker->SetRemoveWmEndFibers(false);
-    tracker->Update();
-    vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
-    mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-
-    mitk::IOUtil::Save(outFib, outFile);
+        typedef itk::MLBSTrackingFilter<6,100> TrackerType;
+        TrackerType::Pointer tracker = TrackerType::New();
+        tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
+        tracker->SetMaskImage(mask);
+        tracker->SetSeedImage(seed);
+        tracker->SetStoppingRegions(stop);
+        tracker->SetSeedsPerVoxel(seeds);
+        tracker->SetStepSize(stepsize);
+        tracker->SetForestHandler(tfh);
+        tracker->SetSamplingDistance(samplingdist);
+        tracker->SetUseStopVotes(stopvotes);
+        tracker->SetOnlyForwardSamples(forward);
+        tracker->SetAposterioriCurvCheck(false);
+        tracker->Update();
+        vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
+        mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
+        mitk::IOUtil::Save(outFib, outFile);
+    }
 
     return EXIT_SUCCESS;
 }

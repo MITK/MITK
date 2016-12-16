@@ -131,57 +131,124 @@ namespace mitk
       mitkThrow() << "No or invalid random forest detected!";
   }
 
+  template< int ShOrder, int NumberOfSignalFeatures>
+  template<typename T>
+  typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
+  {
+    MITK_INFO << "Calculating spherical harmonics features";
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
+
+    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
+    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
+    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(mitk_dwi));
+    filter->SetLambda(0.006);
+    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
+    filter->Update();
+
+    m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+  }
+
+  template< int ShOrder, int NumberOfSignalFeatures>
+  template<typename T>
+  typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
+  {
+    MITK_INFO << "Interpolating raw dwi signal features";
+    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
+
+    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
+    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
+    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(mitk_dwi));
+    filter->SetLambda(0.006);
+    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
+    filter->Update();
+
+    typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
+    dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
+    dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
+    dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
+    dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+    dwiFeatureImage->Allocate();
+
+    // get signal values and store them in the feature image
+    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+    itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
+    itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
+    while(!it.IsAtEnd())
+    {
+      typename DwiFeatureImageType::PixelType pix;
+      int f = 0;
+      for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
+      {
+        if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
+        {
+          pix[f] = it.Get()[i];
+          f++;
+        }
+      }
+      dwiFeatureImage->SetPixel(it.GetIndex(), pix);
+      ++it;
+    }
+    m_DwiFeatureImages.push_back(dwiFeatureImage);
+  }
+
   template< int ShOrder, int NumberOfSignalFeatures >
   void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
   {
     InputDataValidForTracking();
 
-    MITK_INFO << "Spherically interpolating raw data and creating feature image ...";
-    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
+//    MITK_INFO << "Spherically interpolating raw data and creating feature image ...";
+//    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
-    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(0)) );
-    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(0)));
-    filter->SetLambda(0.006);
-    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
-    filter->Update();
+//    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
+//    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(0)) );
+//    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(0)));
+//    filter->SetLambda(0.006);
+//    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
+//    filter->Update();
 
     m_DwiFeatureImages.clear();
 
-    //m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+    InitDwiImageFeatures<>(m_InputDwis.at(0));
 
-    {
-      typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
-      dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
-      dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
-      dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
-      dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-      dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-      dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-      dwiFeatureImage->Allocate();
+//    {
+//      m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+//    }
 
-      // get signal values and store them in the feature image
-      vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-      itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
-      itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
-      while(!it.IsAtEnd())
-      {
-        typename DwiFeatureImageType::PixelType pix;
-        int f = 0;
-        for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
-        {
-          if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
-          {
-            pix[f] = it.Get()[i];
-            f++;
-          }
-        }
-        dwiFeatureImage->SetPixel(it.GetIndex(), pix);
-        ++it;
-      }
+//    {
+//      typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
+//      dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
+//      dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
+//      dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
+//      dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+//      dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+//      dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+//      dwiFeatureImage->Allocate();
 
-      m_DwiFeatureImages.push_back(dwiFeatureImage);
-    }
+//      // get signal values and store them in the feature image
+//      vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+//      itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
+//      itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
+//      while(!it.IsAtEnd())
+//      {
+//        typename DwiFeatureImageType::PixelType pix;
+//        int f = 0;
+//        for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
+//        {
+//          if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
+//          {
+//            pix[f] = it.Get()[i];
+//            f++;
+//          }
+//        }
+//        dwiFeatureImage->SetPixel(it.GetIndex(), pix);
+//        ++it;
+//      }
+//      m_DwiFeatureImages.push_back(dwiFeatureImage);
+//    }
+
+
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
@@ -466,47 +533,49 @@ namespace mitk
     MITK_INFO << "Spherical signal interpolation and sampling ...";
     for (unsigned int i=0; i<m_InputDwis.size(); i++)
     {
-      typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-      filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(i)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(i)) );
-      filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(i)));
-      filter->SetLambda(0.006);
-      filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
-      filter->Update();
+//      typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
+//      filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(i)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(i)) );
+//      filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(i)));
+//      filter->SetLambda(0.006);
+//      filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
+//      filter->Update();
 
       //m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+      InitDwiImageFeatures<>(m_InputDwis.at(i));
 
-      {
-        typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
-        dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
-        dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
-        dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
-        dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-        dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-        dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-        dwiFeatureImage->Allocate();
 
-        // get signal values and store them in the feature image
-        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-        itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
-        itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
-        while(!it.IsAtEnd())
-        {
-          typename DwiFeatureImageType::PixelType pix;
-          int f = 0;
-          for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
-          {
-            if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
-            {
-              pix[f] = it.Get()[i];
-              f++;
-            }
-          }
-          dwiFeatureImage->SetPixel(it.GetIndex(), pix);
-          ++it;
-        }
+//      {
+//        typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
+//        dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
+//        dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
+//        dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
+//        dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
+//        dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+//        dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
+//        dwiFeatureImage->Allocate();
 
-        m_DwiFeatureImages.push_back(dwiFeatureImage);
-      }
+//        // get signal values and store them in the feature image
+//        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+//        itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
+//        itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
+//        while(!it.IsAtEnd())
+//        {
+//          typename DwiFeatureImageType::PixelType pix;
+//          int f = 0;
+//          for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
+//          {
+//            if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
+//            {
+//              pix[f] = it.Get()[i];
+//              f++;
+//            }
+//          }
+//          dwiFeatureImage->SetPixel(it.GetIndex(), pix);
+//          ++it;
+//        }
+
+//        m_DwiFeatureImages.push_back(dwiFeatureImage);
+//      }
 
       if (i>=m_AdditionalFeatureImages.size())
       {
@@ -572,7 +641,6 @@ namespace mitk
     m_NumberOfSamples = 0;
     for (unsigned int t=0; t<m_Tractograms.size(); t++)
     {
-      ItkFloatImgType::Pointer fiber_folume = m_FiberVolumeModImages.at(t);
       ItkUcharImgType::Pointer mask = m_MaskImages.at(t);
       ItkUcharImgType::Pointer wmmask;
       if (t<m_WhiteMatterImages.size() && m_WhiteMatterImages.at(t)!=nullptr)
@@ -874,6 +942,7 @@ namespace mitk
         }
       }
     }
+    m_Tractograms.clear();
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >

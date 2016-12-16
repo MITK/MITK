@@ -381,24 +381,178 @@
        <string>Tractography</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="m_AvoidStop">
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="m_OnlyForwardSamples">
          <property name="text">
-          <string>Avoid premature termination</string>
+          <string>Only frontal samples</string>
          </property>
          <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="m_Curvcheck2">
-         <property name="text">
-          <string>Secondary curvature check</string>
+       <item row="8" column="0">
+        <widget class="QFrame" name="frame_5">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
          </property>
-         <property name="checked">
-          <bool>false</bool>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QToolButton" name="m_PauseTrackingButton">
+            <property name="toolTip">
+             <string>Pause tractography</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+              <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-pause.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-pause.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QToolButton" name="m_StartTrackingButton">
+            <property name="toolTip">
+             <string>Start tractography</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+              <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QToolButton" name="m_AbortTrackingButton">
+            <property name="toolTip">
+             <string>Abort tractography</string>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+              <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="12" column="0">
+        <widget class="QFrame" name="frame_4">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="m_DemoModeBox">
+            <property name="text">
+             <string>Demo Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="m_TimerIntervalBox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QFrame" name="frame_3">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="6" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingStopImageBox"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingSeedImageBox"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingMaskImageBox"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Mask Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Seed Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Stop Image:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item row="2" column="0">
@@ -411,15 +565,18 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="m_UseStopVotes">
-         <property name="text">
-          <string>Use stop votes</string>
+       <item row="13" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="checked">
-          <bool>true</bool>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-        </widget>
+        </spacer>
        </item>
        <item row="1" column="0">
         <widget class="QFrame" name="frame_2">
@@ -612,134 +769,24 @@
          </layout>
         </widget>
        </item>
-       <item row="7" column="0">
-        <widget class="QCheckBox" name="m_OnlyForwardSamples">
+       <item row="5" column="0">
+        <widget class="QCheckBox" name="m_UseStopVotes">
          <property name="text">
-          <string>Only frontal samples</string>
+          <string>Use stop votes</string>
          </property>
          <property name="checked">
           <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QFrame" name="frame_3">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="m_Curvcheck2">
+         <property name="text">
+          <string>Secondary curvature check</string>
          </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+         <property name="checked">
+          <bool>false</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item row="6" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingStopImageBox"/>
-          </item>
-          <item row="4" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingSeedImageBox"/>
-          </item>
-          <item row="2" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingMaskImageBox"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Mask Image:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Seed Image:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Stop Image:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QFrame" name="frame_5">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item row="0" column="1">
-           <widget class="QToolButton" name="m_PauseTrackingButton">
-            <property name="toolTip">
-             <string>Pause tractography</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-              <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-pause.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-pause.svg</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QToolButton" name="m_StartTrackingButton">
-            <property name="toolTip">
-             <string>Start tractography</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-              <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QToolButton" name="m_AbortTrackingButton">
-            <property name="toolTip">
-             <string>Abort tractography</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-              <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
        <item row="0" column="0">
@@ -749,70 +796,13 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="13" column="0">
-        <widget class="QFrame" name="frame_4">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="m_DemoModeBox">
-            <property name="text">
-             <string>Demo Mode</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="m_TimerIntervalBox">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>1000</number>
-            </property>
-            <property name="value">
-             <number>10</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="m_RemoveWmFibers">
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="m_AvoidStop">
          <property name="text">
-          <string>Remove fibers ending in WM</string>
+          <string>Avoid premature termination</string>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>

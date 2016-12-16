@@ -40,7 +40,7 @@ private:
 
     /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
     mitk::FiberBundle::Pointer ref;
-    mitk::TrackingForestHandler<> tfh;
+    mitk::TrackingForestHandler<6, 100> tfh;
     mitk::Image::Pointer dwi;
     ItkUcharImgType::Pointer seed;
 
@@ -72,7 +72,7 @@ public:
 
     void Track1()
     {
-        typedef itk::MLBSTrackingFilter<> TrackerType;
+        typedef itk::MLBSTrackingFilter<6,100> TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
         tracker->SetDemoMode(false);
@@ -83,7 +83,6 @@ public:
         tracker->SetMaxTractLength(400);
         tracker->SetForestHandler(tfh);
         tracker->SetAposterioriCurvCheck(false);
-        tracker->SetRemoveWmEndFibers(false);
         tracker->SetAvoidStop(true);
         tracker->SetSamplingDistance(0.5);
         tracker->SetRandomSampling(false);

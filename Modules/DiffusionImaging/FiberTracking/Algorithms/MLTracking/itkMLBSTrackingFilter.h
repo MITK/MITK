@@ -50,7 +50,7 @@ namespace itk{
 /**
 * \brief Performes deterministic streamline tracking on the input tensor image.   */
 
-template<  int ShOrder=6, int NumImageFeatures=100 >
+template<  int ShOrder, int NumImageFeatures >
 class MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
 {
 
@@ -103,7 +103,6 @@ public:
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
     itkSetMacro( NumberOfSamples, int )                 ///< Number of neighborhood sampling points
-    itkSetMacro( RemoveWmEndFibers, bool )              ///< Checks if fiber ending is located in the white matter. If this is the case, the streamline is discarded.
     itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
@@ -155,7 +154,6 @@ public:
     ItkUcharImgType::Pointer            m_MaskImage;
 
     bool                                m_AposterioriCurvCheck;
-    bool                                m_RemoveWmEndFibers;
     bool                                m_AvoidStop;
     int                                 m_Threads;
     bool                                m_DemoMode;

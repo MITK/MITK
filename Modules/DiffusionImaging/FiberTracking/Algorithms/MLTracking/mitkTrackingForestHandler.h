@@ -46,7 +46,7 @@ namespace mitk
 /**
 * \brief  Manages random forests for fiber tractography. The preparation of the features from the inputa data and the training process are handled here. The data preprocessing and actual prediction for the tracking process is also performed here. The tracking itself is performed in MLBSTrackingFilter. */
 
-template< int ShOrder=6, int NumberOfSignalFeatures=100 >
+template< int ShOrder, int NumberOfSignalFeatures >
 class TrackingForestHandler
 {
 
@@ -58,7 +58,6 @@ public:
     typedef itk::Image<short, 3>                                                ItkShortImgType;
     typedef itk::Image<float, 3>                                                ItkFloatImgType;
     typedef itk::Image<unsigned char, 3>                                        ItkUcharImgType;
-    //typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures*2 > , 3 >    DwiFeatureImageType;
     typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures > , 3 >      DwiFeatureImageType;
 
     typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::ImpurityLoss<> >,int,vigra::ClassificationTag> DefaultSplitType;
@@ -69,9 +68,7 @@ public:
     {
         m_Tractograms.clear();
         for (auto fib : tractograms)
-        {
-            m_Tractograms.push_back(fib->GetDeepCopy());
-        }
+            m_Tractograms.push_back(fib);
     }
     void SetMaskImages( std::vector< ItkUcharImgType::Pointer > images ){ m_MaskImages = images; }
     void SetWhiteMatterImages( std::vector< ItkUcharImgType::Pointer > images ){ m_WhiteMatterImages = images; }
@@ -98,13 +95,17 @@ public:
 
 protected:
 
-    // tracking
     void InputDataValidForTracking();                                                   ///< check if raw data is set and tracking forest is valid
 
     template< class TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate);
 
-    // training
+    template<typename T=bool>
+    typename std::enable_if<NumberOfSignalFeatures <= 99, T>::type InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi);
+
+    template<typename T=bool>
+    typename std::enable_if<NumberOfSignalFeatures >= 100, T>::type InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi);
+
     void InputDataValidForTraining();       ///< Check if everything is tehere for training (raw datasets, fiber tracts)
     void InitForTraining();  ///< Generate masks if necessary, resample fibers, spherically interpolate raw DWIs
     void CalculateTrainingSamples();    ///< Calculate GM and WM features using the interpolated raw data, the WM masks and the fibers

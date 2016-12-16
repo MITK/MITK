@@ -37,6 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDicomSeriesReader.h>
 
 #include <mitkRTDoseReader.h>
+#include <mitkRTPlanReader.h>
 #include <mitkRTStructureSetReader.h>
 #include <mitkRTConstants.h>
 #include <mitkIsoDoseLevelCollections.h>
@@ -75,14 +76,15 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
     //for rt data, if the modality tag isn't defined or is "CT" the image is handled like before
     if(ctkEvent.containsProperty("Modality") &&
        (ctkEvent.getProperty("Modality").toString().compare("RTDOSE",Qt::CaseInsensitive) == 0 ||
-        ctkEvent.getProperty("Modality").toString().compare("RTSTRUCT",Qt::CaseInsensitive) == 0))
+        ctkEvent.getProperty("Modality").toString().compare("RTSTRUCT",Qt::CaseInsensitive) == 0 ||
+        ctkEvent.getProperty("Modality").toString().compare("RTPLAN", Qt::CaseInsensitive) == 0))
     {
       QString modality = ctkEvent.getProperty("Modality").toString();
 
       if(modality.compare("RTDOSE",Qt::CaseInsensitive) == 0)
       {
           auto doseReader = mitk::RTDoseReader();
-          doseReader.SetInput(listOfFilesForSeries.at(0).toStdString());
+          doseReader.SetInput(listOfFilesForSeries.front().toStdString());
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = doseReader.Read();
           if (!readerOutput.empty()){
             mitk::Image::Pointer doseImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
@@ -265,6 +267,27 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
           }
           mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
         }
+      }
+      else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
+      {
+          std::cout << "RTPLAN" << std::endl;
+          auto planReader = mitk::RTPlanReader();
+          planReader.SetInput(listOfFilesForSeries.front().toStdString());
+          std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();
+          if (!readerOutput.empty()){
+              //there is no image, only the properties are interesting
+              mitk::Image::Pointer planDummyImage = dynamic_cast<mitk::Image*>(readerOutput.at(0).GetPointer());
+
+              mitk::DataNode::Pointer planImageNode = mitk::DataNode::New();
+              planImageNode->SetData(planDummyImage);
+              planImageNode->SetName("RTPlan");
+
+              ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+              mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+              mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+              dataStorage->Add(planImageNode);
+          }
       }
     }
     else

@@ -148,14 +148,12 @@ public:
     int                                 m_NumberOfSamples;
     int                                 m_NumPreviousDirections;
 
-    SimpleFastMutexLock                 m_Mutex;
     ItkUcharImgType::Pointer            m_StoppingRegions;
     ItkUcharImgType::Pointer            m_SeedImage;
     ItkUcharImgType::Pointer            m_MaskImage;
 
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;
-    int                                 m_Threads;
     bool                                m_DemoMode;
     void BuildFibers(bool check);
     int CheckCurvature(FiberType* fib, bool front);

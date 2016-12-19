@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <omp.h>
 #include "itkMLBSTrackingFilter.h"
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
@@ -142,7 +143,6 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
     m_AngularThreshold = 0.5*minSpacing;
   m_BuildFibersReady = 0;
   m_BuildFibersFinished = false;
-  m_Threads = 0;
   m_Tractogram.clear();
   m_SamplingPointset = mitk::PointSet::New();
   m_AlternativePointset = mitk::PointSet::New();
@@ -158,6 +158,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
   std::cout << "MLBSTrackingFilter: Use stop votes: " << m_UseStopVotes << std::endl;
   std::cout << "MLBSTrackingFilter: Only frontal samples: " << m_OnlyForwardSamples << std::endl;
   std::cout << "MLBSTrackingFilter: Starting streamline tracking using " << this->GetNumberOfThreads() << " threads." << std::endl;
+  this->SetNumberOfThreads(1);
 }
 
 template<  int ShOrder, int NumImageFeatures >
@@ -387,14 +388,14 @@ double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::FollowStreamline(itk::P
       if (tractLength>m_MaxTractLength)
         return tractLength;
     }
+
+#pragma omp critical
     if (m_DemoMode) // CHECK: warum sind die samplingpunkte der streamline in der visualisierung immer einen schritt voras?
     {
-      m_Mutex.Lock();
       m_BuildFibersReady++;
       m_Tractogram.push_back(*fib);
       BuildFibers(true);
       m_Stop = true;
-      m_Mutex.Unlock();
 
       while (m_Stop){
       }
@@ -488,16 +489,13 @@ int MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckCurvature(FiberType* 
 template<  int ShOrder, int NumImageFeatures >
 void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType threadId)
 {
-  m_Mutex.Lock();
-  m_Threads++;
-  m_Mutex.Unlock();
   typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
   MaskIteratorType    sit(m_SeedImage, regionForThread );
   MaskIteratorType    mit(m_MaskImage, regionForThread );
 
+  std::vector< itk::Point<double> > seedpoints;
   sit.GoToBegin();
   mit.GoToBegin();
-  itk::Point<double> worldPos;
   while( !sit.IsAtEnd() )
   {
     if (sit.Value()==0 || mit.Value()==0)
@@ -509,11 +507,8 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
 
     for (int s=0; s<m_SeedsPerVoxel; s++)
     {
-      FiberType fib;
-      double tractLength = 0;
       typename FeatureImageType::IndexType index = sit.GetIndex();
       itk::ContinuousIndex<double, 3> start;
-      unsigned int counter = 0;
 
       if (m_SeedsPerVoxel>1)
       {
@@ -528,53 +523,64 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
         start[2] = index[2];
       }
 
-      // get staring position
+      itk::Point<double> worldPos;
       m_SeedImage->TransformContinuousIndexToPhysicalPoint( start, worldPos );
-
-      // get starting direction
-      int candidates = 0;
-      double prob = 0;
-      vnl_vector_fixed<double,3> dir; dir.fill(0.0);
-      std::deque< vnl_vector_fixed<double,3> > olddirs;
-      for (int i=0; i<m_NumPreviousDirections; i++)
-        olddirs.push_back(dir); // start without old directions (only zero directions)
-      if (IsValidPosition(worldPos))
-        dir = m_ForestHandler.Classify(worldPos, candidates, olddirs, 0, prob, m_MaskImage);
-      if (dir.magnitude()<0.0001)
-        continue;
-      dir.normalize();
-
-      // forward tracking
-      tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
-      fib.push_front(worldPos);
-
-      // backward tracking
-      tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
-      counter = fib.size();
-
-      if (tractLength<m_MinTractLength || counter<2)
-        continue;
-
-      m_Mutex.Lock();
-      m_Tractogram.push_back(fib);
-      m_Mutex.Unlock();
-
-      if (m_AbortTracking)
-        break;
+      seedpoints.push_back(worldPos);
     }
-    if (m_AbortTracking)
-      break;
     ++sit;
     ++mit;
   }
-  m_Threads--;
-  std::cout << "Thread " << threadId << " finished tracking" << std::endl;
+
+int progress = 0;
+#pragma omp parallel for
+  for (int i=0; i<seedpoints.size(); i++)
+  {
+#pragma omp critical
+    {
+      progress++;
+      std::cout << progress << '/' << seedpoints.size() << '\r';
+      cout.flush();
+    }
+    itk::Point<double> worldPos = seedpoints.at(i);
+    FiberType fib;
+    double tractLength = 0;
+    unsigned int counter = 0;
+
+    // get starting direction
+    int candidates = 0;
+    double prob = 0;
+    vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+    std::deque< vnl_vector_fixed<double,3> > olddirs;
+    for (int i=0; i<m_NumPreviousDirections; i++)
+      olddirs.push_back(dir); // start without old directions (only zero directions)
+    if (IsValidPosition(worldPos))
+      dir = m_ForestHandler.Classify(worldPos, candidates, olddirs, 0, prob, m_MaskImage);
+    if (dir.magnitude()<0.0001)
+      continue;
+    dir.normalize();
+
+    // forward tracking
+    tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
+    fib.push_front(worldPos);
+
+    // backward tracking
+    tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
+    counter = fib.size();
+
+    if (tractLength<m_MinTractLength || counter<2)
+      continue;
+
+#pragma omp critical
+    {
+      m_Tractogram.push_back(fib);
+    }
+  }
 }
 
 template<  int ShOrder, int NumImageFeatures >
 void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BuildFibers(bool check)
 {
-  if (m_BuildFibersReady<m_Threads && check)
+  if (m_BuildFibersReady<omp_get_num_threads() && check)
     return;
 
   m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();

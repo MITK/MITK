@@ -315,7 +315,6 @@ void QmitkMLBTView::StartTracking()
     tracker->SetUseStopVotes(m_Controls->m_UseStopVotes->isChecked());
     tracker->SetOnlyForwardSamples(m_Controls->m_OnlyForwardSamples->isChecked());
     tracker->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
-    tracker->SetNumberOfThreads(1);
     tracker->Update();
 }
 

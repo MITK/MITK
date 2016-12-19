@@ -51,6 +51,10 @@ public:
 
   int GetPos();
 
+  bool GetInverseDirection() const;
+
+  bool GetInvertedControls() const;
+
 public slots:
 
   /**
@@ -75,9 +79,11 @@ public slots:
 
   void SetInverseDirection(bool inverseDirection);
 
+  void SetInvertedControls(bool invertedControls);
+
 protected slots:
 
-  void slider_valueChanged(int);
+  void slider_valueChanged(double);
 
   /**
    * \brief Set range minimum and maximum (displayed as labels left and right
@@ -98,7 +104,8 @@ protected slots:
    */
   void SetLabels();
 
-  void spinBox_valueChanged(int);
+  void spinBox_valueChanged(double);
+
 
 protected:
   bool m_HasLabelUnit;
@@ -112,6 +119,8 @@ protected:
   float m_MaxValue;
 
   bool m_InverseDirection;
+  bool m_InvertedControls;
+
 };
 
 #endif

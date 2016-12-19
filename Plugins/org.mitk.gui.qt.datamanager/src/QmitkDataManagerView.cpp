@@ -187,20 +187,26 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     connect(m_ShowInMapper, SIGNAL(mapped(QString)), this, SLOT(ShowIn(QString)));
   }
 
-  QmitkNodeDescriptor* unknownDataNodeDescriptor =
+  auto unknownDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataNodeDescriptor();
 
-  QmitkNodeDescriptor* imageDataNodeDescriptor =
+  auto imageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
   auto multiComponentImageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("MultiComponentImage");
 
-  QmitkNodeDescriptor* diffusionImageDataNodeDescriptor =
+  auto diffusionImageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("DiffusionImage");
 
-  QmitkNodeDescriptor* surfaceDataNodeDescriptor =
+  auto surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
+
+  auto labelSetImageDataNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("LabelSetImage");
+
+  auto pointSetNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PointSet");
 
   QAction* globalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), tr("Global Reinit"), this);
   QObject::connect( globalReinitAction, SIGNAL( triggered(bool) )
@@ -317,8 +323,39 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   colorAction->setDefaultWidget(_ColorWidget);
   QObject::connect( colorAction, SIGNAL( changed() )
     , this, SLOT( ColorActionChanged() ) );
-  unknownDataNodeDescriptor->AddAction(colorAction, false);
-  m_DescriptorActionList.push_back(std::pair<QmitkNodeDescriptor*, QAction*>(unknownDataNodeDescriptor,colorAction));
+
+  { // only give the color context menu option where appropriate
+    if (imageDataNodeDescriptor != NULL)
+    {
+      imageDataNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(imageDataNodeDescriptor, colorAction));
+    }
+    if (multiComponentImageDataNodeDescriptor != NULL)
+    {
+      multiComponentImageDataNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(multiComponentImageDataNodeDescriptor, colorAction));
+    }
+    if (diffusionImageDataNodeDescriptor != NULL)
+    {
+      diffusionImageDataNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(diffusionImageDataNodeDescriptor, colorAction));
+    }
+    if (surfaceDataNodeDescriptor != NULL)
+    {
+      surfaceDataNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(surfaceDataNodeDescriptor, colorAction));
+    }
+    if (pointSetNodeDescriptor != NULL)
+    {
+      pointSetNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(pointSetNodeDescriptor, colorAction));
+    }
+  }
 
   m_ComponentSlider = new QmitkNumberPropertySlider;
   m_ComponentSlider->setOrientation(Qt::Horizontal);

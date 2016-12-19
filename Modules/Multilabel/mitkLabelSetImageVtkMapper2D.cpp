@@ -537,31 +537,6 @@ void mitk::LabelSetImageVtkMapper2D::Update(mitk::BaseRenderer *renderer)
     this->GenerateDataForRenderer(renderer);
     localStorage->m_LastDataUpdateTime.Modified();
   }
-  else if ((localStorage->m_LastPropertyUpdateTime < node->GetPropertyList()->GetMTime()) // was a property modified?
-           ||
-           (localStorage->m_LastPropertyUpdateTime < node->GetPropertyList(renderer)->GetMTime()))
-  {
-    // Change color of first label
-    auto firstLabel = image->GetLabel(1);
-    if (firstLabel == nullptr)
-    {
-      firstLabel = image->GetActiveLabel();
-    }
-
-    mitk::Color color = firstLabel->GetColor();
-
-    if (this->GetDataNode()->GetColor(color.GetDataPointer(), renderer))
-    {
-      firstLabel->SetColor(color);
-      image->GetActiveLabelSet()->UpdateLookupTable(firstLabel->GetValue());
-    }
-
-    this->ApplyColor(renderer, color);
-    this->ApplyOpacity(renderer, image->GetActiveLayer());
-    this->ApplyLookuptable(renderer, image->GetActiveLayer());
-
-    localStorage->m_LastPropertyUpdateTime.Modified();
-  }
 }
 
 // set the two points defining the textured plane according to the dimension and spacing
@@ -631,7 +606,6 @@ void mitk::LabelSetImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node,
 {
   // add/replace the following properties
   node->SetProperty("opacity", FloatProperty::New(1.0f), renderer);
-  node->SetProperty("color", ColorProperty::New(1.0, 0.0, 0.0), renderer);
   node->SetProperty("binary", BoolProperty::New(false), renderer);
 
   mitk::RenderingModeProperty::Pointer renderingModeProperty =

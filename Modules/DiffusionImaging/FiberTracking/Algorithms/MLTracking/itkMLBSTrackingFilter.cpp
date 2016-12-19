@@ -148,6 +148,11 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
   m_AlternativePointset = mitk::PointSet::New();
   m_StartTime = std::chrono::system_clock::now();
 
+  if (m_DemoMode)
+  {
+    omp_set_num_threads(1);
+    this->SetNumberOfThreads(1);
+  }
   std::cout << "MLBSTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
   std::cout << "MLBSTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
   std::cout << "MLBSTrackingFilter: Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
@@ -487,7 +492,7 @@ int MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckCurvature(FiberType* 
 }
 
 template<  int ShOrder, int NumImageFeatures >
-void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType threadId)
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType )
 {
   typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
   MaskIteratorType    sit(m_SeedImage, regionForThread );

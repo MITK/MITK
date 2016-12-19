@@ -1768,18 +1768,22 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
 
     MITK_INFO << "Smoothing fibers";
     boost::progress_display disp(m_NumFibers);
+#pragma omp parallel for
     for (int i=0; i<m_NumFibers; i++)
     {
-        ++disp;
-        vtkCell* cell = m_FiberPolyData->GetCell(i);
-        int numPoints = cell->GetNumberOfPoints();
-        vtkPoints* points = cell->GetPoints();
-
         vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
-        for (int j=0; j<numPoints; j++)
-            newPoints->InsertNextPoint(points->GetPoint(j));
+        float length = 0;
+#pragma omp critical
+        {
+            length = m_FiberLengths.at(i);
+            ++disp;
+            vtkCell* cell = m_FiberPolyData->GetCell(i);
+            int numPoints = cell->GetNumberOfPoints();
+            vtkPoints* points = cell->GetPoints();
+            for (int j=0; j<numPoints; j++)
+                newPoints->InsertNextPoint(points->GetPoint(j));
+        }
 
-        float length = m_FiberLengths.at(i);
         int sampling = std::ceil(length/pointDistance);
 
         vtkSmartPointer<vtkKochanekSpline> xSpline = vtkSmartPointer<vtkKochanekSpline>::New();
@@ -1808,13 +1812,17 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
         vtkSmartPointer<vtkPolyLine> smoothLine = vtkSmartPointer<vtkPolyLine>::New();
         smoothLine->GetPointIds()->SetNumberOfIds(tmpSmoothPnts->GetNumberOfPoints());
 
-        for (int j=0; j<smoothLine->GetNumberOfPoints(); j++)
+#pragma omp critical
         {
-            smoothLine->GetPointIds()->SetId(j, j+pointHelperCnt);
-            vtkSmoothPoints->InsertNextPoint(tmpSmoothPnts->GetPoint(j));
+            for (int j=0; j<smoothLine->GetNumberOfPoints(); j++)
+            {
+                smoothLine->GetPointIds()->SetId(j, j+pointHelperCnt);
+                vtkSmoothPoints->InsertNextPoint(tmpSmoothPnts->GetPoint(j));
+            }
+
+            vtkSmoothCells->InsertNextCell(smoothLine);
+            pointHelperCnt += tmpSmoothPnts->GetNumberOfPoints();
         }
-        vtkSmoothCells->InsertNextCell(smoothLine);
-        pointHelperCnt += tmpSmoothPnts->GetNumberOfPoints();
     }
 
     m_FiberPolyData = vtkSmartPointer<vtkPolyData>::New();
@@ -1849,18 +1857,36 @@ void mitk::FiberBundle::Compress(float error)
     unsigned long numRemovedPoints = 0;
     boost::progress_display disp(m_FiberPolyData->GetNumberOfCells());
 
+#pragma omp parallel for
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)
     {
-        ++disp;
-        vtkCell* cell = m_FiberPolyData->GetCell(i);
-        int numPoints = cell->GetNumberOfPoints();
-        vtkPoints* points = cell->GetPoints();
+
+        std::vector< vnl_vector_fixed< double, 3 > > vertices;
+
+#pragma omp critical
+        {
+            ++disp;
+            vtkCell* cell = m_FiberPolyData->GetCell(i);
+            int numPoints = cell->GetNumberOfPoints();
+            vtkPoints* points = cell->GetPoints();
+
+            for (int j=0; j<numPoints; j++)
+            {
+                double cand[3];
+                points->GetPoint(j, cand);
+                vnl_vector_fixed< double, 3 > candV;
+                candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2];
+                vertices.push_back(candV);
+            }
+        }
 
         // calculate curvatures
+        int numPoints = vertices.size();
         std::vector< int > removedPoints; removedPoints.resize(numPoints, 0);
         removedPoints[0]=-1; removedPoints[numPoints-1]=-1;
 
         vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        int remCounter = 0;
 
         bool pointFound = true;
         while (pointFound)
@@ -1869,23 +1895,18 @@ void mitk::FiberBundle::Compress(float error)
             double minError = error;
             int removeIndex = -1;
 
-            for (int j=0; j<numPoints; j++)
+            for (int j=0; j<vertices.size(); j++)
             {
                 if (removedPoints[j]==0)
                 {
-                    double cand[3];
-                    points->GetPoint(j, cand);
-                    vnl_vector_fixed< double, 3 > candV;
-                    candV[0]=cand[0]; candV[1]=cand[1]; candV[2]=cand[2];
+                    vnl_vector_fixed< double, 3 > candV = vertices.at(j);
 
                     int validP = -1;
                     vnl_vector_fixed< double, 3 > pred;
                     for (int k=j-1; k>=0; k--)
                         if (removedPoints[k]<=0)
                         {
-                            double ref[3];
-                            points->GetPoint(k, ref);
-                            pred[0]=ref[0]; pred[1]=ref[1]; pred[2]=ref[2];
+                            pred = vertices.at(k);
                             validP = k;
                             break;
                         }
@@ -1894,9 +1915,7 @@ void mitk::FiberBundle::Compress(float error)
                     for (int k=j+1; k<numPoints; k++)
                         if (removedPoints[k]<=0)
                         {
-                            double ref[3];
-                            points->GetPoint(k, ref);
-                            succ[0]=ref[0]; succ[1]=ref[1]; succ[2]=ref[2];
+                            succ = vertices.at(k);
                             validS = k;
                             break;
                         }
@@ -1922,7 +1941,7 @@ void mitk::FiberBundle::Compress(float error)
             if (pointFound)
             {
                 removedPoints[removeIndex] = 1;
-                numRemovedPoints++;
+                remCounter++;
             }
         }
 
@@ -1930,14 +1949,19 @@ void mitk::FiberBundle::Compress(float error)
         {
             if (removedPoints[j]<=0)
             {
-                double cand[3];
-                points->GetPoint(j, cand);
-                vtkIdType id = vtkNewPoints->InsertNextPoint(cand);
-                container->GetPointIds()->InsertNextId(id);
+#pragma omp critical
+                {
+                    vtkIdType id = vtkNewPoints->InsertNextPoint(vertices.at(j).data_block());
+                    container->GetPointIds()->InsertNextId(id);
+                }
             }
         }
 
-        vtkNewCells->InsertNextCell(container);
+#pragma omp critical
+        {
+            numRemovedPoints += remCounter;
+            vtkNewCells->InsertNextCell(container);
+        }
     }
 
     if (vtkNewCells->GetNumberOfCells()>0)

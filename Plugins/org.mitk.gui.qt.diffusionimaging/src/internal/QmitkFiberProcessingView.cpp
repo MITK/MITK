@@ -274,7 +274,10 @@ void QmitkFiberProcessingView::ApplyCurvatureThreshold()
         filter->Update();
         mitk::FiberBundle::Pointer newFib = filter->GetOutputFiberBundle();
         if (newFib->GetNumFibers()>0)
+        {
+            newFib->ColorFibersByOrientation();
             node->SetData(newFib);
+        }
         else
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
@@ -1321,6 +1324,7 @@ void QmitkFiberProcessingView::CompressSelectedBundles()
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->Compress(factor);
+        fib->ColorFibersByOrientation();
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
 }

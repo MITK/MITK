@@ -78,6 +78,7 @@ set(MODULE_TESTS
   mitkCompositePixelValueToStringTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
+  mitkNodePredicateDataPropertyTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   mitkExceptionTest.cpp

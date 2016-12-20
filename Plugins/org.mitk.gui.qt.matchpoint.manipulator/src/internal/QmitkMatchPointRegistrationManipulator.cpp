@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Mitk
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
@@ -168,23 +168,23 @@ void QmitkMatchPointRegistrationManipulator::CheckInputs()
       {
         this->m_SelectedPreRegNode = regNode;
 
-        mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetProperty(mitk::nodeProp_RegAlgMovingData);
+        mitk::BaseProperty* uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
         if (uidProp)
         {
           //search for the moving node
-          mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+          mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
             uidProp);
           this->m_SelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
           this->m_autoMoving = this->m_SelectedMovingNode.IsNotNull();
         }
 
-        uidProp = m_SelectedPreRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+        uidProp = m_SelectedPreRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
         if (uidProp)
         {
           //search for the target node
-          mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+          mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
             uidProp);
           this->m_SelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
           this->m_autoTarget = this->m_SelectedTargetNode.IsNotNull();
@@ -543,7 +543,7 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 
   mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
     this->m_Controls.lbNewRegName->text().toStdString(), newRegWrapper, "org.mitk::manual_registration",
-    mitk::EnsureUID(m_SelectedMovingNode), mitk::EnsureUID(m_SelectedTargetNode));
+    mitk::EnsureUID(m_SelectedMovingNode->GetData()), mitk::EnsureUID(m_SelectedTargetNode->GetData()));
 
   this->GetDataStorage()->Add(spResultRegistrationNode);
 
@@ -553,7 +553,7 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
     pMapJob->setAutoDelete(true);
 
     pMapJob->m_spInputData = this->m_SelectedMovingNode->GetData();
-    pMapJob->m_InputNodeUID = mitk::EnsureUID(m_SelectedMovingNode);
+    pMapJob->m_InputDataUID = mitk::EnsureUID(m_SelectedMovingNode->GetData());
     pMapJob->m_spRegNode = spResultRegistrationNode;
     pMapJob->m_doGeometryRefinement = false;
     pMapJob->m_spRefGeometry = this->m_SelectedTargetNode->GetData()->GetGeometry()->Clone().GetPointer();
@@ -586,7 +586,7 @@ void QmitkMatchPointRegistrationManipulator::OnMapResultIsAvailable(mitk::BaseDa
   const QmitkMappingJob* job)
 {
   mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
-    spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputNodeUID,
+    spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
     job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
   this->GetRenderWindowPart()->RequestUpdate();

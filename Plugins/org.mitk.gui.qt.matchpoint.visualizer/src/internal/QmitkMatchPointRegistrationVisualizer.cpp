@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkProperties.h>
 #include <mitkColorProperty.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include "mitkRegVisDirectionProperty.h"
 #include "mitkRegVisStyleProperty.h"
 #include "mitkRegVisColorStyleProperty.h"
@@ -150,24 +150,24 @@ mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetRefNodeOfReg(b
 {
     mitk::DataNode::Pointer spResult = NULL;
 
-    if (this->m_spSelectedRegNode.IsNotNull())
+    if (this->m_spSelectedRegNode.IsNotNull() && m_spSelectedRegNode->GetData())
     {
         std::string nodeName;
         mitk::BaseProperty* uidProp;
 
         if (target)
         {
-            uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+          uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
         }
         else
         {
-            uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgMovingData);
+          uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
         }
 
         if (uidProp)
         {
             //search for the target node
-            mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+            mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
                 uidProp);
             spResult = this->GetDataStorage()->GetNode(predicate);
         }

@@ -677,7 +677,7 @@ namespace mitk
 
       m_Tractograms.at(t)->ResampleSpline(m_WmSampleDistance);
 
-      unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints(); //-2*m_Tractograms.at(t)->GetNumFibers();
+      unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()*2*(m_NumPreviousDirections+1); //-2*m_Tractograms.at(t)->GetNumFibers();
       MITK_INFO << "White matter samples: " << wmSamples;
       m_NumberOfSamples += wmSamples;
 
@@ -744,7 +744,7 @@ namespace mitk
           typename DwiFeatureImageType::PixelType pix = image->GetPixel(it.GetIndex());
 
           // random directions
-          for (int i=0; i<m_GmSamples.at(t); i++)
+          for (unsigned int i=0; i<m_GmSamples.at(t); i++)
           {
             // diffusion signal features
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
@@ -809,19 +809,21 @@ namespace mitk
         vtkPoints* points = cell->GetPoints();
         double fiber_weight = fib->GetFiberWeight(i);
 
+        for (int num_nonzero_dirs = 0; num_nonzero_dirs<=m_NumPreviousDirections; num_nonzero_dirs++)
+        for (bool reverse : {true, false})
         for (int j=0; j<numPoints; j++)
         {
           itk::Point<float, 3> itkP1, itkP2;
 
-          bool reverse = m_RandGen->GetIntegerVariate(1);
+          //bool reverse = m_RandGen->GetIntegerVariate(1);
           if ( (!reverse && j==0) || (reverse && j==numPoints-1) )
             reverse = !reverse;
 
-          int num_nonzero_dirs = 0;
-          if (!reverse)
-            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), j);
-          else
-            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), numPoints-j-1);
+//          int num_nonzero_dirs = m_NumPreviousDirections;
+//          if (!reverse)
+//            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), j);
+//          else
+//            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), numPoints-j-1);
 
           vnl_vector_fixed<double,3> dir;
           // zero directions

@@ -134,7 +134,7 @@ protected:
     std::vector< unsigned int >                                 m_GmSamples;                ///< number of gray matter samples
     int                                                         m_GmSamplesPerVoxel;        ///< number of gray matter samplees per voxel. if -1, then the number is automatically chosen to gain an overall number of GM samples close to the number of WM samples.
     vigra::MultiArray<2, double>                                m_FeatureData;              ///< vigra container for training features
-    int                                                         m_NumPreviousDirections;    ///< How many "old" directions should be used as classification features?
+    unsigned int                                                m_NumPreviousDirections;    ///< How many "old" directions should be used as classification features?
 
     // only for tracking
     vigra::MultiArray<2, double>                                m_LabelData;                ///< vigra container for training labels

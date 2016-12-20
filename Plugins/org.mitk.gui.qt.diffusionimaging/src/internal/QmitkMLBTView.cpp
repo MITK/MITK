@@ -210,10 +210,10 @@ void QmitkMLBTView::StartTrackingThread()
 {
     m_TractogramNode = mitk::DataNode::New();
     m_TractogramNode->SetName("MLBT Result");
-    m_TractogramNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(20));
-    m_TractogramNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    m_TractogramNode->SetProperty("LineWidth", mitk::IntProperty::New(2));
-    m_TractogramNode->SetProperty("color",mitk::ColorProperty::New(0, 1, 1));
+    //m_TractogramNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(20));
+    m_TractogramNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(true));
+    m_TractogramNode->SetProperty("LineWidth", mitk::IntProperty::New(1));
+    //m_TractogramNode->SetProperty("color",mitk::ColorProperty::New(0, 1, 1));
     this->GetDataStorage()->Add(m_TractogramNode);
 
     m_SamplingPointsNode = mitk::DataNode::New();

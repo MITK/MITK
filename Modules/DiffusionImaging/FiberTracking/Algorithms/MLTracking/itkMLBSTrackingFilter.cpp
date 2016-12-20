@@ -406,6 +406,7 @@ double MLBSTrackingFilter<  ShOrder, NumImageFeatures >::FollowStreamline(itk::P
       }
     }
 
+    dir.normalize();
     last_dirs.push_back(dir);
     if (last_dirs.size()>m_NumPreviousDirections)
       last_dirs.pop_front();
@@ -562,7 +563,6 @@ int progress = 0;
       dir = m_ForestHandler.Classify(worldPos, candidates, olddirs, 0, prob, m_MaskImage);
     if (dir.magnitude()<0.0001)
       continue;
-    dir.normalize();
 
     // forward tracking
     tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);

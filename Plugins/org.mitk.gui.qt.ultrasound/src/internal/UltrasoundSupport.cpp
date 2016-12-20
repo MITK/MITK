@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 #include "mitkScaleLegendOverlay.h"
+#include <QApplication>
+#include <QHBoxLayout>
 
 // Qmitk
 #include "UltrasoundSupport.h"
@@ -102,7 +104,11 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
 
   m_Controls.tabWidget->setTabEnabled(1, false);
 
-  auto renderingManager = mitk::RenderingManager::GetInstance();
+  
+  m_Layout_PA.setSpacing(2);
+  m_Layout_PA.setMargin(0);
+
+  m_LevelWindow_PA.SetDataStorage(m_PADataStorage);
 
   // Tell the RenderWindow which (part of) the datastorage to render
   m_PARenderWindow.GetRenderer()->SetDataStorage(m_PADataStorage);
@@ -111,8 +117,24 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   mitk::TimeGeometry::Pointer PAgeo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(PAgeo);
 
-  m_PARenderWindow.show();
+  // Use it as a 2D view
+  m_PARenderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+
+  m_Layout_PA.addWidget(&m_PARenderWindow,44);
+  m_Layout_PA.addWidget(&m_LevelWindow_PA);
+  m_ToplevelWidget_PA.setLayout(&m_Layout_PA);
+
+  m_ToplevelWidget_PA.show();
+
+  auto renderingManager = mitk::RenderingManager::GetInstance();
   renderingManager->AddRenderWindow(m_PARenderWindow.GetRenderWindow());
+
+
+  m_Layout_US.setSpacing(2);
+  m_Layout_US.setMargin(0);
+
+  m_LevelWindow_US.SetDataStorage(m_USDataStorage);
 
   // Tell the RenderWindow which (part of) the datastorage to render
   m_USRenderWindow.GetRenderer()->SetDataStorage(m_USDataStorage);
@@ -121,7 +143,16 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   mitk::TimeGeometry::Pointer USgeo = this->GetDataStorage()->ComputeBoundingGeometry3D(this->GetDataStorage()->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(USgeo);
 
-  m_USRenderWindow.show();
+  // Use it as a 2D view
+  m_USRenderWindow.GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+
+  m_Layout_US.addWidget(&m_USRenderWindow, 44);
+  m_Layout_US.addWidget(&m_LevelWindow_US);
+  m_ToplevelWidget_US.setLayout(&m_Layout_US);
+
+  m_ToplevelWidget_US.show();
+
   renderingManager->AddRenderWindow(m_USRenderWindow.GetRenderWindow());
 }
 
@@ -152,38 +183,42 @@ void UltrasoundSupport::DestroyLastNode()
   UpdateColormaps();
 }
 
-void UltrasoundSupport::AddOverlay()
+void UltrasoundSupport::AddOverlays()
 {
 
   //This creates a 2DLayouter that is only active for the recently fetched axialRenderer and positione
-  mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), m_PARenderer);
+  //mitk::Overlay2DLayouter::Pointer topleftLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOPLEFT(), m_PARenderer);
 
   //Now, the created Layouter is added to the OverlayManager and can be referred to by its identification string.
-  m_PAOverlayManager->AddLayouter(topleftLayouter.GetPointer());
+  //m_PAOverlayManager->AddLayouter(topleftLayouter.GetPointer());
 
   //Several other Layouters can be added to the overlayManager
-  mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), m_PARenderer);
-  m_PAOverlayManager->AddLayouter(bottomLayouter.GetPointer());
+  //mitk::Overlay2DLayouter::Pointer bottomLayouter = mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_BOTTOM(), m_PARenderer);
+  //m_PAOverlayManager->AddLayouter(bottomLayouter.GetPointer());
 
   //Create a textOverlay2D
-  mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
-
-  textOverlay->SetText("Test!"); //set UTF-8 encoded text to render
-  textOverlay->SetFontSize(40);
-  textOverlay->SetColor(1, 0, 0); //Set text color to red
-  textOverlay->SetOpacity(1);
+  //mitk::TextOverlay2D::Pointer textOverlay = mitk::TextOverlay2D::New();
+  //
+  //textOverlay->SetText("Test!"); //set UTF-8 encoded text to render
+  //textOverlay->SetFontSize(40);
+  //textOverlay->SetColor(1, 0, 0); //Set text color to red
+  //textOverlay->SetOpacity(1);
 
   //The position of the Overlay can be set to a fixed coordinate on the display.
-  mitk::Point2D pos;
+  /*mitk::Point2D pos;
   pos[0] = 10, pos[1] = 20;
-  textOverlay->SetPosition2D(pos);
+  textOverlay->SetPosition2D(pos);*/
 
   //Add the overlay to the overlayManager. It is added to all registered renderers automaticly
   //m_PAOverlayManager->AddOverlay(textOverlay.GetPointer());
 
   mitk::ScaleLegendOverlay::Pointer scaleOverlay = mitk::ScaleLegendOverlay::New();
   scaleOverlay->SetLeftAxisVisibility(true);
+  scaleOverlay->SetRightAxisVisibility(false);
+  scaleOverlay->SetTopAxisVisibility(true);
+  scaleOverlay->SetCornerOffsetFactor(0);
   m_PAOverlayManager->AddOverlay(scaleOverlay.GetPointer());
+  m_USOverlayManager->AddOverlay(scaleOverlay.GetPointer());
 
   //Alternatively, a layouter can be used to manage the position of the overlay. If a layouter is set, the absolute position of the overlay is not used anymore
   //Because a Layouter is specified by the identification string AND the Renderer, both have to be passed to the call.
@@ -197,6 +232,8 @@ void UltrasoundSupport::RemoveOverlays()
 
 void UltrasoundSupport::UpdateColormaps()
 {
+  //return; // TODO: review the colormap functionality
+
   // we update here both the colormaps of the nodes, as well as the
   // level window for the current dynamic range
   mitk::LevelWindow levelWindow;
@@ -211,7 +248,7 @@ void UltrasoundSupport::UpdateColormaps()
         levelWindow.SetAuto(m_Image, true, true);
       m_Node.at(index)->SetLevelWindow(levelWindow);
     }
-    SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::JET_TRANSPARENT);
+    SetColormap(m_Node.back(), mitk::LookupTable::LookupTableType::GRAYSCALE);
     m_Node.back()->GetLevelWindow(levelWindow);
     levelWindow.SetWindowBounds(10, 150, true);
     m_Node.back()->SetLevelWindow(levelWindow);
@@ -321,8 +358,9 @@ void UltrasoundSupport::UpdateImage()
       m_USRenderer->SetOverlayManager(OverlayManagerInstanceUS);
       m_USOverlayManager = m_USRenderer->GetOverlayManager();
 
-      AddOverlay();
+      AddOverlays();
     }
+
     m_Device->Modified();
     m_Device->Update();
     // Update device
@@ -417,8 +455,10 @@ void UltrasoundSupport::RenderImage2d()
 {
   if (!m_Controls.m_Update2DView->isChecked())
     return;
-  mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+  //mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+  //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+
+  // TODO: figure out how to proceed with the standard display
 
   auto renderingManager = mitk::RenderingManager::GetInstance();
   renderingManager->RequestUpdate(m_PARenderWindow.GetRenderWindow());

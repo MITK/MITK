@@ -77,6 +77,7 @@ set(MODULE_TESTS
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
+  mitkNodePredicateDataPropertyTest.cpp
   mitkVectorTest.cpp
   mitkClippedSurfaceBoundsCalculatorTest.cpp
   mitkExceptionTest.cpp

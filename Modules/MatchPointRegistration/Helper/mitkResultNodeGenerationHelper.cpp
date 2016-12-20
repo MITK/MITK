@@ -31,10 +31,10 @@ mitk::DataNode::Pointer
   mitk::DataNode::Pointer m_spRegNode = mitk::DataNode::New();
   m_spRegNode->SetData(resultReg);
   m_spRegNode->SetName(nodeName);
-  m_spRegNode->AddProperty(mitk::nodeProp_RegAlgUsed,mitk::StringProperty::New(algorithmUID));
-  m_spRegNode->AddProperty(mitk::nodeProp_RegAlgMovingData,mitk::StringProperty::New(movingNodeUID));
-  m_spRegNode->AddProperty(mitk::nodeProp_RegAlgTargetData,mitk::StringProperty::New(targetNodeUID));
-  m_spRegNode->AddProperty(mitk::nodeProp_RegUID,mitk::StringProperty::New(resultReg->GetRegistration()->getRegistrationUID()));
+  resultReg->SetProperty(mitk::Prop_RegAlgUsed, mitk::StringProperty::New(algorithmUID));
+  resultReg->SetProperty(mitk::Prop_RegAlgMovingData, mitk::StringProperty::New(movingNodeUID));
+  resultReg->SetProperty(mitk::Prop_RegAlgTargetData, mitk::StringProperty::New(targetNodeUID));
+  resultReg->SetProperty(mitk::Prop_RegUID, mitk::StringProperty::New(resultReg->GetRegistration()->getRegistrationUID()));
 
   return m_spRegNode;
 };
@@ -54,13 +54,13 @@ mitk::DataNode::Pointer
   mappedDataNode->SetName(nodeName);
   if (!regUID.empty())
   {
-    mappedDataNode->AddProperty(mitk::nodeProp_RegUID, mitk::StringProperty::New(regUID));
+    mappedData->SetProperty(mitk::Prop_RegUID, mitk::StringProperty::New(regUID));
   }
-  mappedDataNode->AddProperty(mitk::nodeProp_MappingInputData,mitk::StringProperty::New(inputNodeUID));
+  mappedData->SetProperty(mitk::Prop_MappingInputData, mitk::StringProperty::New(inputNodeUID));
   if (refinedGeometry)
   {
-    mappedDataNode->AddProperty(mitk::nodeProp_MappingInterpolator,mitk::StringProperty::New("None"));
-    mappedDataNode->AddProperty(mitk::nodeProp_MappingRefinedGeometry,mitk::BoolProperty::New(true));
+    mappedData->SetProperty(mitk::Prop_MappingInterpolator, mitk::StringProperty::New("None"));
+    mappedData->SetProperty(mitk::Prop_MappingRefinedGeometry, mitk::BoolProperty::New(true));
   }
   else
   {
@@ -68,12 +68,12 @@ mitk::DataNode::Pointer
 
     if(image)
     {
-      mappedDataNode->AddProperty(mitk::nodeProp_MappingInterpolator,mitk::StringProperty::New(interpolator));
+      mappedData->SetProperty(mitk::Prop_MappingInterpolator, mitk::StringProperty::New(interpolator));
     }
     else
     {
-      mappedDataNode->AddProperty(mitk::nodeProp_MappingInterpolator,mitk::StringProperty::New("None"));
-      mappedDataNode->SetColor(0.0,0.0,1.0);
+      mappedData->SetProperty(mitk::Prop_MappingInterpolator, mitk::StringProperty::New("None"));
+      mappedDataNode->SetColor(0.0, 0.0, 1.0);
     }
   }
 

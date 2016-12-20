@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Mitk
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
@@ -113,28 +113,28 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
   if (dataNodes.size() > 0)
   {
     //test if auto select works
-    if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]))
+    if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]) && dataNodes[0]->GetData())
     {
       this->m_spSelectedRegNode = dataNodes[0];
       dataNodes.pop_front();
 
-      mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgMovingData);
+      mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
       if (uidProp)
       {
         //search for the moving node
-        mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+        mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
         this->m_spSelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
         this->m_autoMoving = this->m_spSelectedMovingNode.IsNotNull();
       }
 
-      uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+      uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
       if (uidProp)
       {
         //search for the target node
-        mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+        mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
         this->m_spSelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
         this->m_autoTarget = this->m_spSelectedTargetNode.IsNotNull();

@@ -83,7 +83,7 @@ public:
   // Inputs
   mitk::DataNode::Pointer m_spRegNode;
   mitk::BaseData::ConstPointer m_spInputData;
-  mitk::NodeUIDType m_InputNodeUID;
+  mitk::NodeUIDType m_InputDataUID;
   mitk::BaseGeometry::Pointer m_spRefGeometry;
 
   const map::core::RegistrationBase *GetRegistration() const;

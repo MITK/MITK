@@ -730,19 +730,19 @@ void QmitkMatchPoint::OnStartRegBtnPushed()
 
   pJob->m_spTargetData = m_spSelectedTargetData;
   pJob->m_spMovingData = m_spSelectedMovingData;
-  pJob->m_TargetNodeUID = mitk::EnsureUID(this->m_spSelectedTargetNode);
-  pJob->m_MovingNodeUID = mitk::EnsureUID(this->m_spSelectedMovingNode);
+  pJob->m_TargetDataUID = mitk::EnsureUID(this->m_spSelectedTargetNode->GetData());
+  pJob->m_MovingDataUID = mitk::EnsureUID(this->m_spSelectedMovingNode->GetData());
 
   if (m_spSelectedTargetMaskData.IsNotNull())
   {
     pJob->m_spTargetMask = m_spSelectedTargetMaskData;
-    pJob->m_TargetMaskNodeUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode);
+    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData());
   }
 
   if (m_spSelectedMovingMaskData.IsNotNull())
   {
     pJob->m_spMovingMask = m_spSelectedMovingMaskData;
-    pJob->m_MovingMaskNodeUID = mitk::EnsureUID(this->m_spSelectedMovingMaskNode);
+    pJob->m_MovingMaskDataUID = mitk::EnsureUID(this->m_spSelectedMovingMaskNode->GetData());
   }
 
   pJob->m_JobName = m_Controls.m_leRegJobName->text().toStdString();
@@ -754,9 +754,6 @@ void QmitkMatchPoint::OnStartRegBtnPushed()
   connect(pJob, SIGNAL(RegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer,
                        const QmitkRegistrationJob*)), this,
           SLOT(OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Pointer, const QmitkRegistrationJob*)),
-          Qt::BlockingQueuedConnection);
-  connect(pJob, SIGNAL(MapResultNodeIsAvailable(mitk::BaseData::Pointer, const QmitkMappingJob*)),
-          this, SLOT(OnMapResultIsAvailable(mitk::BaseData::Pointer, const QmitkMappingJob*)),
           Qt::BlockingQueuedConnection);
 
   connect(pJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnAlgorithmInfo(QString)));
@@ -851,7 +848,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
 {
   mitk::DataNode::Pointer spResultRegistrationNode = mitk::generateRegistrationResultNode(
         pRegJob->m_JobName, spResultRegistration, pRegJob->GetLoadedAlgorithm()->getUID()->toStr(),
-        pRegJob->m_MovingNodeUID, pRegJob->m_TargetNodeUID);
+        pRegJob->m_MovingDataUID, pRegJob->m_TargetDataUID);
 
   if (pRegJob->m_StoreReg)
   {
@@ -868,7 +865,7 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
     pMapJob->setAutoDelete(true);
 
     pMapJob->m_spInputData = pRegJob->m_spMovingData;
-    pMapJob->m_InputNodeUID = pRegJob->m_MovingNodeUID;
+    pMapJob->m_InputDataUID = pRegJob->m_MovingDataUID;
     pMapJob->m_spRegNode = spResultRegistrationNode;
     pMapJob->m_doGeometryRefinement = false;
     pMapJob->m_spRefGeometry = pRegJob->m_spTargetData->GetGeometry()->Clone().GetPointer();
@@ -907,7 +904,7 @@ void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedDat
                              QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
   mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
-                                         spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputNodeUID,
+                                         spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
                                          job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
   this->GetRenderWindowPart()->RequestUpdate();

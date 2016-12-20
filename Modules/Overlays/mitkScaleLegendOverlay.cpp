@@ -61,6 +61,7 @@ void mitk::ScaleLegendOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
     ls->m_legendScaleActor->SetLegendVisibility(this->GetLegendVisibility());
     ls->m_legendScaleActor->SetRightBorderOffset(this->GetRightBorderOffset());
     ls->m_legendScaleActor->SetCornerOffsetFactor (this->GetCornerOffsetFactor());
+	ls->m_legendScaleActor->SetLabelModeToXYCoordinates();
   }
 
 }

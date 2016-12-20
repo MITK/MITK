@@ -423,7 +423,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     switch (m_DataType)
     {
       case DataType::Image_uChar: {
-        for (int i = 0; i < imageSetsTotal; i++) {
+        for (unsigned char i = 0; i < imageSetsTotal; i++) {
           image->SetSlice(&imageData[i*imageHeight*imageWidth], i);
         }
         break;
@@ -433,11 +433,11 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         short* flipme = new short[beamformedLines*beamformedSamples*beamformedTotalDatasets];
         int pixelsPerImage = beamformedLines*beamformedSamples;
 
-        for (int currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
+        for (unsigned char currentSet = 0; currentSet < beamformedTotalDatasets; currentSet++)
         {
-            for (int sample = 0; sample < beamformedSamples; sample++)
+            for (unsigned short sample = 0; sample < beamformedSamples; sample++)
             {
-              for (int line = 0; line < beamformedLines; line++)
+              for (unsigned short line = 0; line < beamformedLines; line++)
               {
                 flipme[sample*beamformedLines + line + pixelsPerImage*currentSet]
                   = rfDataArrayBeamformed[line*beamformedSamples + sample + pixelsPerImage*currentSet];
@@ -445,7 +445,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
             } // the beamformed pa image is flipped by 90 degrees; we need to flip it manually
         }
         
-        for (int i = 0; i < beamformedTotalDatasets; i++) {
+        for (unsigned char i = 0; i < beamformedTotalDatasets; i++) {
           image->SetSlice(&flipme[i*beamformedLines*beamformedSamples], i);
           // set every image to a different slice
         }
@@ -461,13 +461,28 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       dim[0] = channelDataChannelsPerDataset;
       dim[1] = channelDataSamplesPerChannel;
       dim[2] = 1;
+      short offset = m_Device->GetScanMode().accumulation * 2048;
+
+      short* noOffset = new short[channelDataChannelsPerDataset*channelDataSamplesPerChannel*channelDataTotalDatasets];
+      for (unsigned char set = 0; set < channelDataTotalDatasets; ++set)
+      {
+        for (unsigned short sam = 0; sam < channelDataSamplesPerChannel; ++sam)
+        {
+          for (unsigned short chan = 0; chan < channelDataChannelsPerDataset; ++chan)
+          {
+            noOffset[set*channelDataSamplesPerChannel*channelDataChannelsPerDataset + sam * channelDataChannelsPerDataset + chan] =
+              rfDataChannelData[set*channelDataSamplesPerChannel*channelDataChannelsPerDataset + sam * channelDataChannelsPerDataset + chan] - offset; // this offset in the raw Images is given by the API...
+          }
+        }
+      }
 
       // save the raw images when recording
-      for (int i = 0; i < channelDataTotalDatasets; ++i)
+      for (unsigned char i = 0; i < channelDataTotalDatasets; ++i)
       {
         mitk::Image::Pointer rawImage = mitk::Image::New();
         rawImage->Initialize(mitk::MakeScalarPixelType<short>(), 3, dim);
-        rawImage->SetSlice(&rfDataChannelData[i*channelDataChannelsPerDataset*channelDataSamplesPerChannel]);
+
+        rawImage->SetSlice(&noOffset[i*channelDataChannelsPerDataset*channelDataSamplesPerChannel]);
 
         float& recordTime = m_Device->GetScanMode().receivePhaseLengthSeconds;
         int& speedOfSound = m_Device->GetScanMode().averageSpeedOfSound;
@@ -482,6 +497,8 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
         m_RawRecordedImages.push_back(rawImage);
       }
+
+      delete[] noOffset;
     }
 
     itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 84, 0 } }; //22/532*2048  TODO: make this more general
@@ -497,7 +514,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
     // if the user decides to start recording, we feed the vector the generated images
     if (m_CurrentlyRecording) {
-      for (int index = 0; index < image->GetDimension(2); ++index)
+      for (unsigned char index = 0; index < image->GetDimension(2); ++index)
       {
         if (image->IsSliceSet(index))
         {
@@ -635,8 +652,6 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     if (m_SavingSettings.saveRaw)
     {
       m_Device->GetScanMode().transferChannelData = true;
-      MITK_INFO << "eeeeeeeeeeeeeeeeeeeeee";
-      m_Device->GetScanMode().transferImageData = true;
       m_Device->UpdateScanmode();
       // set the raw Data to be transfered
     }
@@ -680,13 +695,17 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       m_Pyro->SaveData();
 
       // now order the images and save them
-      OrderImagesInterleaved(PAImage, USImage, m_RecordedImages, false);
-      mitk::IOUtil::Save(USImage, pathUS);
-      mitk::IOUtil::Save(PAImage, pathPA);
+      // the beamformed ones...
+      if (m_SavingSettings.saveBeamformed)
+      {
+        OrderImagesInterleaved(PAImage, USImage, m_RecordedImages, false);
+        mitk::IOUtil::Save(USImage, pathUS);
+        mitk::IOUtil::Save(PAImage, pathPA);
+      }
 
+      // ...and the raw images
       if (m_SavingSettings.saveRaw)
       {
-        // and the raw images
         OrderImagesInterleaved(PAImageRaw, USImageRaw, m_RawRecordedImages, true);
         mitk::IOUtil::Save(USImageRaw, pathUSRaw);
         mitk::IOUtil::Save(PAImageRaw, pathPARaw);
@@ -714,8 +733,8 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       mitk::IOUtil::Save(USImage, pathUS);
     }
 
-    m_PixelValues.clear();            // clean up the pixel values
-    m_RawRecordedImages.clear();
+    m_PixelValues.clear();            
+    m_RawRecordedImages.clear();      // clean up the pixel values
     m_RecordedImages.clear();         // clean up the images
     m_ImageTimestampRecord.clear();   // clean up the timestamps
   }

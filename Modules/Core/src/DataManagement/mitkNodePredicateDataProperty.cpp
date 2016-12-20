@@ -31,23 +31,27 @@ mitk::NodePredicateDataProperty::~NodePredicateDataProperty()
 
 bool mitk::NodePredicateDataProperty::CheckNode(const mitk::DataNode *node) const
 {
-  if (node == NULL)
-    mitkThrow()<<"NodePredicateDataProperty cannot check invalid node";
+  if (node == nullptr)
+  {
+    mitkThrow() << "NodePredicateDataProperty cannot check invalid node";
+  }
 
   if (m_ValidPropertyName.empty())
+  {
     mitkThrow() << "NodePredicateDataProperty cannot check invalid (empty) property name";
+  }
 
   bool result = false;
-
-  if (node->GetData())
+  auto data = node->GetData();
+  if (data)
   {
     if (m_ValidProperty.IsNull())
     {
-      result = node->GetData()->GetProperty(m_ValidPropertyName.c_str()).IsNotNull(); // search only for name
+      result = data->GetProperty(m_ValidPropertyName.c_str()).IsNotNull(); // search only for name
     }
     else
     {
-      mitk::BaseProperty::Pointer p = node->GetData()->GetProperty(m_ValidPropertyName.c_str());
+      mitk::BaseProperty::Pointer p = data->GetProperty(m_ValidPropertyName.c_str());
 
       if (p.IsNotNull())
       {

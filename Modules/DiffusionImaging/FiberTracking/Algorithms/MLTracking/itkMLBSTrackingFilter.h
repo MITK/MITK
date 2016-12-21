@@ -14,11 +14,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-/*===================================================================
-
-This file is based heavily on a corresponding ITK filter.
-
-===================================================================*/
 #ifndef __itkMLBSTrackingFilter_h_
 #define __itkMLBSTrackingFilter_h_
 
@@ -91,6 +86,7 @@ public:
     itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
     itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
+    itkSetMacro( FourTTImage, ItkUcharImgType::Pointer) ///<
     itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
     itkSetMacro( StepSize, double)                      ///< Integration step size in mm
     itkSetMacro( MinTractLength, double )               ///< Shorter tracts are discarded.
@@ -102,11 +98,11 @@ public:
     itkSetMacro( DeflectionMod, double )                 ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
-    itkSetMacro( NumberOfSamples, int )                 ///< Number of neighborhood sampling points
+    itkSetMacro( NumberOfSamples, unsigned int )        ///< Number of neighborhood sampling points
     itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
-    itkSetMacro( NumPreviousDirections, int )           ///< How many "old" steps do we want to consider in our decision where to go next?
+    itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
 
     void SetForestHandler( mitk::TrackingForestHandler<ShOrder, NumImageFeatures> fh )   ///< Stores random forest classifier and performs actual classification
     {
@@ -116,6 +112,9 @@ public:
     protected:
         MLBSTrackingFilter();
     ~MLBSTrackingFilter() {}
+
+    void InitGrayMatterEndings();
+    void CheckFiberForGmEnding(FiberType* fib);
 
     void CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& dir);    ///< Calculate next integration step.
     double FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front);       ///< Start streamline in one direction.
@@ -133,6 +132,7 @@ public:
     vtkSmartPointer<vtkPoints>          m_Points;
     vtkSmartPointer<vtkCellArray>       m_Cells;
     BundleType                          m_Tractogram;
+    BundleType                          m_GmStubs;
 
     double                              m_AngularThreshold;
     double                              m_StepSize;
@@ -145,12 +145,16 @@ public:
     double                              m_DeflectionMod;
     bool                                m_OnlyForwardSamples;
     bool                                m_UseStopVotes;
-    int                                 m_NumberOfSamples;
-    int                                 m_NumPreviousDirections;
+    unsigned int                        m_NumberOfSamples;
+    unsigned int                        m_NumPreviousDirections;
+    int                                 m_WmLabel;
+    int                                 m_GmLabel;
+    bool                                m_SeedOnlyGm;
 
     ItkUcharImgType::Pointer            m_StoppingRegions;
     ItkUcharImgType::Pointer            m_SeedImage;
     ItkUcharImgType::Pointer            m_MaskImage;
+    ItkUcharImgType::Pointer            m_FourTTImage;
 
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;

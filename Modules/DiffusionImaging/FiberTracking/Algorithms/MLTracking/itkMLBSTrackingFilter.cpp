@@ -61,6 +61,7 @@ MLBSTrackingFilter<  ShOrder, NumImageFeatures >
   , m_AposterioriCurvCheck(false)
   , m_AvoidStop(true)
   , m_DemoMode(false)
+  , m_SeedOnlyGm(false)
 {
   this->SetNumberOfRequiredInputs(1);
 }
@@ -148,6 +149,9 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
   m_AlternativePointset = mitk::PointSet::New();
   m_StartTime = std::chrono::system_clock::now();
 
+  if (m_SeedOnlyGm)
+    InitGrayMatterEndings();
+
   if (m_DemoMode)
   {
     omp_set_num_threads(1);
@@ -167,12 +171,83 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::BeforeThreadedGenerateDat
 }
 
 template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::InitGrayMatterEndings()
+{
+  m_GmStubs.clear();
+  if (m_FourTTImage.IsNotNull())
+  {
+    ImageRegionConstIterator< ItkUcharImgType > it(m_FourTTImage, m_FourTTImage->GetLargestPossibleRegion() );
+    it.GoToBegin();
+
+    int candidates = 0;
+    double prob = 0;
+    vnl_vector_fixed<double,3> d1; d1.fill(0.0);
+    std::deque< vnl_vector_fixed<double,3> > olddirs;
+    while (olddirs.size()<m_NumPreviousDirections)
+      olddirs.push_back(d1);
+
+    while( !it.IsAtEnd() )
+    {
+      if (it.Value()==2)
+      {
+        typename ItkUcharImgType::IndexType s_idx = it.GetIndex();
+        itk::ContinuousIndex<double, 3> start;
+        m_FourTTImage->TransformIndexToPhysicalPoint(s_idx, start);
+        itk::Point<double, 3> wm_p;
+        double max = -1;
+        FiberType fib;
+
+        for (int x : {-1,0,1})
+          for (int y : {-1,0,1})
+            for (int z : {-1,0,1})
+            {
+              if (x==y && y==z)
+                continue;
+
+              typename ItkUcharImgType::IndexType e_idx;
+              e_idx[0] = s_idx[0] + x;
+              e_idx[1] = s_idx[1] + y;
+              e_idx[2] = s_idx[2] + z;
+
+              if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=1 )
+                continue;
+
+              itk::ContinuousIndex<double, 3> end;
+              m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
+
+              d1 = m_ForestHandler.Classify(end, candidates, olddirs, 0, prob, m_MaskImage);
+              if (d1.magnitude()<0.0001)
+                continue;
+              d1.normalize();
+
+              vnl_vector_fixed< double, 3 > d2;
+              d2[0] = end[0] - start[0];
+              d2[1] = end[1] - start[1];
+              d2[2] = end[2] - start[2];
+              d2.normalize();
+              double a = fabs(dot_product(d1,d2));
+              if (a>max)
+              {
+                max = a;
+                wm_p = end;
+              }
+            }
+
+        if (max>=0)
+        {
+          fib.push_back(start);
+          fib.push_back(wm_p);
+          m_GmStubs.push_back(fib);
+        }
+      }
+      ++it;
+    }
+  }
+}
+
+template<  int ShOrder, int NumImageFeatures >
 void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
 {
-  // DON'T CHANGE DIR!!
-  //    vnl_matrix_fixed< double, 3, 3 > rot = m_FeatureImage->GetDirection().GetTranspose();
-  //    dir = rot*dir;
-
   pos[0] += dir[0]*m_StepSize;
   pos[1] += dir[1]*m_StepSize;
   pos[2] += dir[2]*m_StepSize;
@@ -495,49 +570,59 @@ int MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckCurvature(FiberType* 
 template<  int ShOrder, int NumImageFeatures >
 void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType )
 {
-  typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
-  MaskIteratorType    sit(m_SeedImage, regionForThread );
-  MaskIteratorType    mit(m_MaskImage, regionForThread );
-
   std::vector< itk::Point<double> > seedpoints;
-  sit.GoToBegin();
-  mit.GoToBegin();
-  while( !sit.IsAtEnd() )
+
+  m_GmStubs.clear();
+  if (m_GmStubs.empty())
   {
-    if (sit.Value()==0 || mit.Value()==0)
+    typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
+    MaskIteratorType    sit(m_SeedImage, regionForThread );
+    MaskIteratorType    mit(m_MaskImage, regionForThread );
+    sit.GoToBegin();
+    mit.GoToBegin();
+
+    while( !sit.IsAtEnd() )
     {
+      if (sit.Value()==0 || mit.Value()==0)
+      {
+        ++sit;
+        ++mit;
+        continue;
+      }
+
+      for (int s=0; s<m_SeedsPerVoxel; s++)
+      {
+        typename FeatureImageType::IndexType index = sit.GetIndex();
+        itk::ContinuousIndex<double, 3> start;
+
+        if (m_SeedsPerVoxel>1)
+        {
+          start[0] = index[0]+GetRandDouble(-0.5, 0.5);
+          start[1] = index[1]+GetRandDouble(-0.5, 0.5);
+          start[2] = index[2]+GetRandDouble(-0.5, 0.5);
+        }
+        else
+        {
+          start[0] = index[0];
+          start[1] = index[1];
+          start[2] = index[2];
+        }
+
+        itk::Point<double> worldPos;
+        m_SeedImage->TransformContinuousIndexToPhysicalPoint( start, worldPos );
+        seedpoints.push_back(worldPos);
+      }
       ++sit;
       ++mit;
-      continue;
     }
-
-    for (int s=0; s<m_SeedsPerVoxel; s++)
-    {
-      typename FeatureImageType::IndexType index = sit.GetIndex();
-      itk::ContinuousIndex<double, 3> start;
-
-      if (m_SeedsPerVoxel>1)
-      {
-        start[0] = index[0]+GetRandDouble(-0.5, 0.5);
-        start[1] = index[1]+GetRandDouble(-0.5, 0.5);
-        start[2] = index[2]+GetRandDouble(-0.5, 0.5);
-      }
-      else
-      {
-        start[0] = index[0];
-        start[1] = index[1];
-        start[2] = index[2];
-      }
-
-      itk::Point<double> worldPos;
-      m_SeedImage->TransformContinuousIndexToPhysicalPoint( start, worldPos );
-      seedpoints.push_back(worldPos);
-    }
-    ++sit;
-    ++mit;
+  }
+  else
+  {
+    for (auto s : m_GmStubs)
+      seedpoints.push_back(s[1]);
   }
 
-int progress = 0;
+  int progress = 0;
 #pragma omp parallel for
   for (int i=0; i<seedpoints.size(); i++)
   {
@@ -557,19 +642,54 @@ int progress = 0;
     double prob = 0;
     vnl_vector_fixed<double,3> dir; dir.fill(0.0);
     std::deque< vnl_vector_fixed<double,3> > olddirs;
-    for (int i=0; i<m_NumPreviousDirections; i++)
+    while (olddirs.size()<m_NumPreviousDirections)
       olddirs.push_back(dir); // start without old directions (only zero directions)
+
+
+    vnl_vector_fixed< double, 3 > gm_start_dir;
+    if (!m_GmStubs.empty())
+    {
+      gm_start_dir[0] = m_GmStubs[i][1][0] - m_GmStubs[i][0][0];
+      gm_start_dir[1] = m_GmStubs[i][1][1] - m_GmStubs[i][0][1];
+      gm_start_dir[2] = m_GmStubs[i][1][2] - m_GmStubs[i][0][2];
+      gm_start_dir.normalize();
+      olddirs.pop_back();
+      olddirs.push_back(gm_start_dir);
+    }
+
     if (IsValidPosition(worldPos))
       dir = m_ForestHandler.Classify(worldPos, candidates, olddirs, 0, prob, m_MaskImage);
     if (dir.magnitude()<0.0001)
       continue;
 
+    if (!m_GmStubs.empty())
+    {
+      double a = dot_product(gm_start_dir, dir);
+      if (a<0)
+        dir = -dir;
+    }
+
     // forward tracking
     tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
     fib.push_front(worldPos);
 
-    // backward tracking
-    tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
+    if (!m_GmStubs.empty())
+    {
+      fib.push_front(m_GmStubs[i][0]);
+      CheckFiberForGmEnding(&fib);
+    }
+    else
+    {
+      // backward tracking (only if we don't explicitely start in the GM)
+      tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
+      if (m_FourTTImage.IsNotNull())
+      {
+        CheckFiberForGmEnding(&fib);
+        std::reverse(fib.begin(),fib.end());
+        CheckFiberForGmEnding(&fib);
+      }
+    }
+
     counter = fib.size();
 
     if (tractLength<m_MinTractLength || counter<2)
@@ -580,6 +700,80 @@ int progress = 0;
       m_Tractogram.push_back(fib);
     }
   }
+}
+
+
+template<  int ShOrder, int NumImageFeatures >
+void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckFiberForGmEnding(FiberType* fib)
+{
+  if (m_FourTTImage.IsNull())
+    return;
+
+  // first check if the current fibe rendpoint is located inside of the white matter
+  // if not, remove last fiber point and repeat
+  bool in_wm = false;
+  while (!in_wm && fib->size()>2)
+  {
+    typename ItkUcharImgType::IndexType idx;
+    m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), idx);
+    if (m_FourTTImage->GetPixel(idx)==1)
+      in_wm = true;
+    else
+      fib->pop_back();
+  }
+  if (fib->size()<3 || !in_wm)
+  {
+    fib->clear();
+    return;
+  }
+
+  // get fiber direction at end point
+  vnl_vector_fixed< double, 3 > d1;
+  d1[0] = fib->back()[0] - fib->at(fib->size()-2)[0];
+  d1[1] = fib->back()[1] - fib->at(fib->size()-2)[1];
+  d1[2] = fib->back()[2] - fib->at(fib->size()-2)[2];
+  d1.normalize();
+
+  // find closest gray matter voxel
+  typename ItkUcharImgType::IndexType s_idx;
+  m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), s_idx);
+  itk::Point<double> gm_endp;
+  double max = -1;
+
+  for (int x : {-1,0,1})
+    for (int y : {-1,0,1})
+      for (int z : {-1,0,1})
+      {
+        if (x==y && y==z)
+          continue;
+
+        typename ItkUcharImgType::IndexType e_idx;
+        e_idx[0] = s_idx[0] + x;
+        e_idx[1] = s_idx[1] + y;
+        e_idx[2] = s_idx[2] + z;
+
+        if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=2 )
+          continue;
+
+        itk::ContinuousIndex<double, 3> end;
+        m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
+        vnl_vector_fixed< double, 3 > d2;
+        d2[0] = end[0] - fib->back()[0];
+        d2[1] = end[1] - fib->back()[1];
+        d2[2] = end[2] - fib->back()[2];
+        d2.normalize();
+        double a = dot_product(d1,d2);
+        if (a>max)
+        {
+          max = a;
+          gm_endp = end;
+        }
+      }
+
+  if (max>=0)
+    fib->push_back(gm_endp);
+  else  // no gray matter enpoint found -> delete fiber
+    fib->clear();
 }
 
 template<  int ShOrder, int NumImageFeatures >

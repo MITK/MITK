@@ -197,58 +197,8 @@ namespace mitk
   void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
   {
     InputDataValidForTracking();
-
-//    MITK_INFO << "Spherically interpolating raw data and creating feature image ...";
-//    typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
-
-//    typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-//    filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(0)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(0)) );
-//    filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(0)));
-//    filter->SetLambda(0.006);
-//    filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
-//    filter->Update();
-
     m_DwiFeatureImages.clear();
-
     InitDwiImageFeatures<>(m_InputDwis.at(0));
-
-//    {
-//      m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
-//    }
-
-//    {
-//      typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
-//      dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
-//      dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
-//      dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
-//      dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-//      dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-//      dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-//      dwiFeatureImage->Allocate();
-
-//      // get signal values and store them in the feature image
-//      vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-//      itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
-//      itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
-//      while(!it.IsAtEnd())
-//      {
-//        typename DwiFeatureImageType::PixelType pix;
-//        int f = 0;
-//        for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
-//        {
-//          if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
-//          {
-//            pix[f] = it.Get()[i];
-//            f++;
-//          }
-//        }
-//        dwiFeatureImage->SetPixel(it.GetIndex(), pix);
-//        ++it;
-//      }
-//      m_DwiFeatureImages.push_back(dwiFeatureImage);
-//    }
-
-
   }
 
   template< int ShOrder, int NumberOfSignalFeatures >
@@ -533,49 +483,7 @@ namespace mitk
     MITK_INFO << "Spherical signal interpolation and sampling ...";
     for (unsigned int i=0; i<m_InputDwis.size(); i++)
     {
-//      typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-//      filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(m_InputDwis.at(i)), mitk::DiffusionPropertyHelper::GetItkVectorImage(m_InputDwis.at(i)) );
-//      filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(m_InputDwis.at(i)));
-//      filter->SetLambda(0.006);
-//      filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
-//      filter->Update();
-
-      //m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
       InitDwiImageFeatures<>(m_InputDwis.at(i));
-
-
-//      {
-//        typename DwiFeatureImageType::Pointer dwiFeatureImage = DwiFeatureImageType::New();
-//        dwiFeatureImage->SetSpacing(filter->GetOutput()->GetSpacing());
-//        dwiFeatureImage->SetOrigin(filter->GetOutput()->GetOrigin());
-//        dwiFeatureImage->SetDirection(filter->GetOutput()->GetDirection());
-//        dwiFeatureImage->SetLargestPossibleRegion(filter->GetOutput()->GetLargestPossibleRegion());
-//        dwiFeatureImage->SetBufferedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-//        dwiFeatureImage->SetRequestedRegion(filter->GetOutput()->GetLargestPossibleRegion());
-//        dwiFeatureImage->Allocate();
-
-//        // get signal values and store them in the feature image
-//        vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-//        itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
-//        itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
-//        while(!it.IsAtEnd())
-//        {
-//          typename DwiFeatureImageType::PixelType pix;
-//          int f = 0;
-//          for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
-//          {
-//            if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
-//            {
-//              pix[f] = it.Get()[i];
-//              f++;
-//            }
-//          }
-//          dwiFeatureImage->SetPixel(it.GetIndex(), pix);
-//          ++it;
-//        }
-
-//        m_DwiFeatureImages.push_back(dwiFeatureImage);
-//      }
 
       if (i>=m_AdditionalFeatureImages.size())
       {
@@ -677,7 +585,7 @@ namespace mitk
 
       m_Tractograms.at(t)->ResampleSpline(m_WmSampleDistance);
 
-      unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()*2*(m_NumPreviousDirections+1); //-2*m_Tractograms.at(t)->GetNumFibers();
+      unsigned int wmSamples = (m_NumPreviousDirections+1)*2*(m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers());
       MITK_INFO << "White matter samples: " << wmSamples;
       m_NumberOfSamples += wmSamples;
 
@@ -798,6 +706,7 @@ namespace mitk
         ++it;
       }
 
+      MITK_INFO << "WM samples...";
       // white matter samples
       mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
       vtkSmartPointer< vtkPolyData > polyData = fib->GetFiberPolyData();
@@ -809,21 +718,17 @@ namespace mitk
         vtkPoints* points = cell->GetPoints();
         double fiber_weight = fib->GetFiberWeight(i);
 
-        for (int num_nonzero_dirs = 0; num_nonzero_dirs<=m_NumPreviousDirections; num_nonzero_dirs++)
+        for (int n = 0; n<=m_NumPreviousDirections; n++)
         for (bool reverse : {true, false})
-        for (int j=0; j<numPoints; j++)
+        for (int j=1; j<numPoints-1; j++)
         {
           itk::Point<float, 3> itkP1, itkP2;
 
-          //bool reverse = m_RandGen->GetIntegerVariate(1);
-          if ( (!reverse && j==0) || (reverse && j==numPoints-1) )
-            reverse = !reverse;
-
-//          int num_nonzero_dirs = m_NumPreviousDirections;
-//          if (!reverse)
-//            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), j);
-//          else
-//            num_nonzero_dirs = std::min((int)m_RandGen->GetIntegerVariate(m_NumPreviousDirections), numPoints-j-1);
+          int num_nonzero_dirs = m_NumPreviousDirections;
+          if (!reverse)
+            num_nonzero_dirs = std::min(n, j);
+          else
+            num_nonzero_dirs = std::min(n, numPoints-j-1);
 
           vnl_vector_fixed<double,3> dir;
           // zero directions
@@ -882,7 +787,7 @@ namespace mitk
           // get target direction
           double* p = points->GetPoint(j);
           itkP1[0] = p[0]; itkP1[1] = p[1]; itkP1[2] = p[2];
-          if (!reverse)
+          if (reverse)
           {
             p = points->GetPoint(j-1);
             itkP2[0] = p[0]; itkP2[1] = p[1]; itkP2[2] = p[2];
@@ -892,9 +797,9 @@ namespace mitk
             p = points->GetPoint(j+1);
             itkP2[0] = p[0]; itkP2[1] = p[1]; itkP2[2] = p[2];
           }
-          dir[0]=itkP1[0]-itkP2[0];
-          dir[1]=itkP1[1]-itkP2[1];
-          dir[2]=itkP1[2]-itkP2[2];
+          dir[0]=itkP2[0]-itkP1[0];
+          dir[1]=itkP2[1]-itkP1[1];
+          dir[2]=itkP2[2]-itkP1[2];
 
           if (dir.magnitude()<0.0001)
             mitkThrow() << "streamline error!";

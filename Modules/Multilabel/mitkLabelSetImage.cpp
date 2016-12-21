@@ -42,7 +42,7 @@ void SetToZero(itk::Image<TPixel, VDimensions> *source)
 }
 
 mitk::LabelSetImage::LabelSetImage()
-  : mitk::Image(), m_ActiveLayer(0), m_ExteriorLabel(nullptr), m_activeLayerInvalid(false)
+  : mitk::Image(), m_ActiveLayer(0), m_activeLayerInvalid(false), m_ExteriorLabel(nullptr)
 {
   // Iniitlaize Background Label
   mitk::Color color;
@@ -58,8 +58,8 @@ mitk::LabelSetImage::LabelSetImage()
 mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   : Image(other),
     m_ActiveLayer(other.GetActiveLayer()),
-    m_ExteriorLabel(other.GetExteriorLabel()->Clone()),
-    m_activeLayerInvalid(false)
+    m_activeLayerInvalid(false),
+    m_ExteriorLabel(other.GetExteriorLabel()->Clone())
 {
   for (unsigned int i = 0; i < other.GetNumberOfLayers(); i++)
   {
@@ -273,7 +273,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
   {
     if (4 == this->GetDimension())
     {
-      if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()) || m_activeLayerInvalid)
+      if (((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers())) || m_activeLayerInvalid)
       {
         BeforeChangeLayerEvent.Send();
 
@@ -294,7 +294,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
     }
     else
     {
-      if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()) || m_activeLayerInvalid)
+      if (((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers())) || m_activeLayerInvalid)
       {
         BeforeChangeLayerEvent.Send();
 

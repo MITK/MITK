@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
 #include <mitkITKImageImport.h>
+#include <mitkConvert2Dto3DImageFilter.h>
+
 
 #include <itkImageDuplicator.h>
 #include <itkImageRegionIterator.h>
@@ -334,8 +336,34 @@ int main(int argc, char* argv[])
     resampleMask = us::any_cast<bool>(parsedArgs["resample-mask"]);
   }
 
-  mitk::Image::Pointer image = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
-  mitk::Image::Pointer mask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  mitk::Image::Pointer image;
+  mitk::Image::Pointer mask;
+
+  mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
+  mitk::Image::Pointer tmpMask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  image = tmpImage;
+  mask = tmpMask;
+
+  if ((image->GetDimension() != mask->GetDimension()))
+  {
+    MITK_INFO << "Dimension of image does not match. ";
+    MITK_INFO << "Correct one image, may affect the result";
+    if (image->GetDimension() == 2)
+    {
+      mitk::Convert2Dto3DImageFilter::Pointer multiFilter2 = mitk::Convert2Dto3DImageFilter::New();
+      multiFilter2->SetInput(tmpImage);
+      multiFilter2->Update();
+      image = multiFilter2->GetOutput();
+    }
+    if (mask->GetDimension() == 2)
+    {
+      mitk::Convert2Dto3DImageFilter::Pointer multiFilter3 = mitk::Convert2Dto3DImageFilter::New();
+      multiFilter3->SetInput(tmpMask);
+      multiFilter3->Update();
+      mask = multiFilter3->GetOutput();
+    }
+  }
+
 
 
   if (parsedArgs.count("fixed-isotropic"))
@@ -417,7 +445,9 @@ int main(int argc, char* argv[])
     MITK_INFO << "Enabled slice-wise";
     sliceWise = true;
     sliceDirection = splitDouble(parsedArgs["slice-wise"].ToString(), ';')[0];
+    MITK_INFO << sliceDirection;
     ExtractSlicesFromImages(image, mask, maskNoNaN, sliceDirection, floatVector, maskVector, maskNoNaNVector);
+    MITK_INFO << "Slice";
   }
 
   if (parsedArgs.count("minimum-intensity"))

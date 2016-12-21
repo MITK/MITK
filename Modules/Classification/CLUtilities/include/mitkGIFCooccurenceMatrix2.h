@@ -5,7 +5,9 @@
 #include <mitkBaseData.h>
 #include <MitkCLUtilitiesExports.h>
 
-#include <eigen3\Eigen\src\Core\Array.h>
+//#include <eigen3\Eigen\src\Core\Array.h>
+//#include <Eigen\Array>
+#include <Eigen\src\Core\Array.h>
 
 namespace mitk
 {

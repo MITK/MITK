@@ -273,7 +273,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
   {
     if (4 == this->GetDimension())
     {
-      if (((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers())) || m_activeLayerInvalid)
+      if ((layer != GetActiveLayer() || m_activeLayerInvalid) && (layer < this->GetNumberOfLayers()))
       {
         BeforeChangeLayerEvent.Send();
 
@@ -294,7 +294,7 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
     }
     else
     {
-      if (((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers())) || m_activeLayerInvalid)
+      if ((layer != GetActiveLayer() || m_activeLayerInvalid) && (layer < this->GetNumberOfLayers()))
       {
         BeforeChangeLayerEvent.Send();
 

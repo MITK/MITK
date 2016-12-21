@@ -311,6 +311,8 @@ namespace mitk
 
     int m_ActiveLayer;
 
+    bool m_activeLayerInvalid;
+
     mitk::Label::Pointer m_ExteriorLabel;
   };
 
@@ -327,7 +329,7 @@ namespace mitk
   *
   * @param rightHandSide An image to be compared
   * @param leftHandSide An image to be compared
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
+  * @param eps Tolerance for comparison. You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
   * @return true, if all subsequent comparisons are true, false otherwise
   */

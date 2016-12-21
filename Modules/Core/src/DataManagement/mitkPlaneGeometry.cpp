@@ -382,7 +382,6 @@ namespace mitk
   void PlaneGeometry::InitializeStandardPlane(const BaseGeometry *geometry3D,
                                               PlaneOrientation planeorientation,
                                               ScalarType zPosition,
-                                              bool top,
                                               bool frontside,
                                               bool rotated,
                                               bool top)

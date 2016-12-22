@@ -68,6 +68,8 @@ class MITKSEGMENTATION_EXPORT RegionGrowingTool : public FeedbackContourTool
 
     virtual const char* GetName() const override;
 
+    Message2<double, double> thresholdsChanged;
+
   protected:
 
     RegionGrowingTool(); // purposely hidden

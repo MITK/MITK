@@ -41,7 +41,8 @@ void SetToZero(itk::Image<TPixel, VDimensions> *source)
   source->FillBuffer(0);
 }
 
-mitk::LabelSetImage::LabelSetImage() : mitk::Image(), m_ActiveLayer(0), m_ExteriorLabel(nullptr)
+mitk::LabelSetImage::LabelSetImage()
+  : mitk::Image(), m_ActiveLayer(0), m_activeLayerInvalid(false), m_ExteriorLabel(nullptr)
 {
   // Iniitlaize Background Label
   mitk::Color color;
@@ -55,7 +56,10 @@ mitk::LabelSetImage::LabelSetImage() : mitk::Image(), m_ActiveLayer(0), m_Exteri
 }
 
 mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
-  : Image(other), m_ActiveLayer(other.GetActiveLayer()), m_ExteriorLabel(other.GetExteriorLabel()->Clone())
+  : Image(other),
+    m_ActiveLayer(other.GetActiveLayer()),
+    m_activeLayerInvalid(false),
+    m_ExteriorLabel(other.GetExteriorLabel()->Clone())
 {
   for (unsigned int i = 0; i < other.GetNumberOfLayers(); i++)
   {
@@ -156,11 +160,23 @@ void mitk::LabelSetImage::RemoveLayer()
 
   // set the active layer to one below, if exists.
   if (layerToDelete != 0)
+  {
     SetActiveLayer(layerToDelete - 1);
+  }
+  else
+  {
+    // we are deleting layer zero, it should not be copied back into the vector
+    m_activeLayerInvalid = true;
+  }
 
   // remove labelset and image data
   m_LabelSetContainer.erase(m_LabelSetContainer.begin() + layerToDelete);
   m_LayerContainer.erase(m_LayerContainer.begin() + layerToDelete);
+
+  if (layerToDelete == 0)
+  {
+    this->SetActiveLayer(layerToDelete);
+  }
 
   this->Modified();
 }
@@ -257,11 +273,19 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
   {
     if (4 == this->GetDimension())
     {
-      if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()))
+      if ((layer != GetActiveLayer() || m_activeLayerInvalid) && (layer < this->GetNumberOfLayers()))
       {
         BeforeChangeLayerEvent.Send();
 
-        AccessFixedDimensionByItk_n(this, ImageToLayerContainerProcessing, 4, (GetActiveLayer()));
+        if (m_activeLayerInvalid)
+        {
+          // We should not write the invalid layer back to the vector
+          m_activeLayerInvalid = false;
+        }
+        else
+        {
+          AccessFixedDimensionByItk_n(this, ImageToLayerContainerProcessing, 4, (GetActiveLayer()));
+        }
         m_ActiveLayer = layer; // only at this place m_ActiveLayer should be manipulated!!! Use Getter and Setter
         AccessFixedDimensionByItk_n(this, LayerContainerToImageProcessing, 4, (GetActiveLayer()));
 
@@ -270,11 +294,19 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
     }
     else
     {
-      if ((layer != GetActiveLayer()) && (layer < this->GetNumberOfLayers()))
+      if ((layer != GetActiveLayer() || m_activeLayerInvalid) && (layer < this->GetNumberOfLayers()))
       {
         BeforeChangeLayerEvent.Send();
 
-        AccessByItk_1(this, ImageToLayerContainerProcessing, GetActiveLayer());
+        if (m_activeLayerInvalid)
+        {
+          // We should not write the invalid layer back to the vector
+          m_activeLayerInvalid = false;
+        }
+        else
+        {
+          AccessByItk_1(this, ImageToLayerContainerProcessing, GetActiveLayer());
+        }
         m_ActiveLayer = layer; // only at this place m_ActiveLayer should be manipulated!!! Use Getter and Setter
         AccessByItk_1(this, LayerContainerToImageProcessing, GetActiveLayer());
 

@@ -189,11 +189,11 @@ int mitkSlicedGeometry3DTest(int /*argc*/, char * /*argv*/ [])
   planegeometry3->InitializeStandardPlane(planegeometry2, mitk::PlaneGeometry::Axial, 0, false);
 
   std::cout
-    << "Testing SlicedGeometry3D::InitializeEvenlySpaced(planegeometry3, zSpacing = 1, slices = 5, flipped = false): "
+    << "Testing SlicedGeometry3D::InitializeEvenlySpaced(planegeometry3, zSpacing = 1, slices = 5): "
     << std::endl;
   mitk::SlicedGeometry3D::Pointer slicedWorldGeometry = mitk::SlicedGeometry3D::New();
   unsigned int numSlices = 5;
-  slicedWorldGeometry->InitializeEvenlySpaced(planegeometry3, 1, numSlices, false);
+  slicedWorldGeometry->InitializeEvenlySpaced(planegeometry3, 1, numSlices);
 
   std::cout << "Testing availability and type (PlaneGeometry) of first geometry in the SlicedGeometry3D: ";
   mitk::PlaneGeometry *accessedplanegeometry3 =

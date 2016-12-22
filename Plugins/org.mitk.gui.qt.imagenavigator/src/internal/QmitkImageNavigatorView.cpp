@@ -611,7 +611,6 @@ void QmitkImageNavigatorView::OnRefetch()
             /// way around.
 
             bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
-            bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
 
             QmitkSliderNavigatorWidget* navigatorWidget =
                 worldAxis == 0 ? m_Controls.m_SliceNavigatorSagittal :
@@ -619,7 +618,10 @@ void QmitkImageNavigatorView::OnRefetch()
                                  m_Controls.m_SliceNavigatorAxial;
 
             navigatorWidget->SetInverseDirection(inverseDirection);
-            navigatorWidget->SetInvertedControls(invertedControls);
+
+            // This should be a preference (see T22254)
+            // bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
+            // navigatorWidget->SetInvertedControls(invertedControls);
           }
         }
       }

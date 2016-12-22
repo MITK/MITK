@@ -501,7 +501,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
       delete[] noOffset;
     }
 
-    itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 84, 0 } }; //22/532*2048  TODO: make this more general
+    itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine, 0 } }; //22/532*2048 = 84
     if (!m_Pyro->IsSyncDelaySet() &&(image->GetPixelValueByIndex(pixel) < -30)) // #MagicNumber
     {
       MITK_INFO << "Setting SyncDelay";
@@ -712,7 +712,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       }
 
       // read the pixelvalues of the enveloped images at this position
-      itk::Index<3> pixel = { { m_RecordedImages.at(1)->GetDimension(0) / 2, 84, 0 } }; //22/532*2048
+      itk::Index<3> pixel = { { m_RecordedImages.at(1)->GetDimension(0) / 2, 22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine, 0 } }; //22/532*2048 = 84
       GetPixelValues(pixel);
 
       // save the timestamps!

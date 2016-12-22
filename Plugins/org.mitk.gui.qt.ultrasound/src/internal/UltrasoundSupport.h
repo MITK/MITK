@@ -107,16 +107,16 @@ protected:
   void AddOverlays();
   void RemoveOverlays();
 
-  QmitkRenderWindow m_PARenderWindow; // window for the PA images
-  QmitkRenderWindow m_USRenderWindow; // window for the US images
+  QmitkRenderWindow* m_PARenderWindow; // window for the PA images
+  QmitkRenderWindow* m_USRenderWindow; // window for the US images
 
-  QWidget m_ToplevelWidget_PA;
-  QHBoxLayout m_Layout_PA;
-  QmitkLevelWindowWidget m_LevelWindow_PA;
+  QWidget* m_ToplevelWidget_PA;
+  QHBoxLayout* m_Layout_PA;
+  QmitkLevelWindowWidget* m_LevelWindow_PA;
 
-  QWidget m_ToplevelWidget_US;
-  QHBoxLayout m_Layout_US;
-  QmitkLevelWindowWidget m_LevelWindow_US;
+  QWidget* m_ToplevelWidget_US;
+  QHBoxLayout* m_Layout_US;
+  QmitkLevelWindowWidget* m_LevelWindow_US;
 
   mitk::StandaloneDataStorage::Pointer m_PADataStorage;
   mitk::StandaloneDataStorage::Pointer m_USDataStorage;

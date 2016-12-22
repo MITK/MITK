@@ -510,7 +510,7 @@
      <item row="4" column="0">
       <widget class="QComboBox" name="Mode">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <item>
         <property name="text">

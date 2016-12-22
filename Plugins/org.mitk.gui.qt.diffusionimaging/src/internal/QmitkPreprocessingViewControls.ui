@@ -55,7 +55,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -518,6 +518,25 @@
               <number>0</number>
              </property>
              <item row="0" column="1">
+              <widget class="QSpinBox" name="m_NewStdev">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="toolTip">
+                <string>New b-0 stdev</string>
+               </property>
+               <property name="maximum">
+                <number>100000</number>
+               </property>
+               <property name="singleStep">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>500</number>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
               <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_NormalizationMaskBox">
                <property name="toolTip">
                 <string>Select binary mask image.</string>
@@ -528,28 +547,22 @@
               </widget>
              </item>
              <item row="0" column="0">
-              <widget class="QmitkDataStorageComboBox" name="m_NormalizationReferenceBox">
+              <widget class="QSpinBox" name="m_NewMean">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
                <property name="toolTip">
-                <string>Select normalization reference.</string>
+                <string>New mean b-0 value</string>
                </property>
-               <property name="sizeAdjustPolicy">
-                <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+               <property name="maximum">
+                <number>100000</number>
                </property>
-               <item>
-                <property name="text">
-                 <string>White matter</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>CSF</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Voxel-wise baseline</string>
-                </property>
-               </item>
+               <property name="singleStep">
+                <number>100</number>
+               </property>
+               <property name="value">
+                <number>1000</number>
+               </property>
               </widget>
              </item>
             </layout>

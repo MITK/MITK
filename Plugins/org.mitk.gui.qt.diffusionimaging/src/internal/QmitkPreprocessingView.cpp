@@ -1221,6 +1221,8 @@ void QmitkPreprocessingView::DoDwiNormalization()
   filter->SetGradientDirections( static_cast<mitk::GradientDirectionsProperty*>
                                  ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
                                    ->GetGradientDirectionsContainer() );
+  filter->SetNewMean(m_Controls->m_NewMean->value());
+  filter->SetNewStdev(m_Controls->m_NewStdev->value());
 
   UcharImageType::Pointer itkImage = NULL;
   if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
@@ -1231,88 +1233,6 @@ void QmitkPreprocessingView::DoDwiNormalization()
       mitk::CastToItkImage( dynamic_cast<mitk::Image*>(m_Controls->m_NormalizationMaskBox->GetSelectedNode()->GetData()), itkImage );
     }
     filter->SetMaskImage(itkImage);
-  }
-
-  // determin normalization reference
-  switch(m_Controls->m_NormalizationReferenceBox->currentIndex())
-  {
-    case 0: // normalize relative to mean white matter signal intensity
-    {
-      typedef itk::DiffusionTensor3DReconstructionImageFilter< short, short, double > TensorReconstructionImageFilterType;
-      TensorReconstructionImageFilterType::Pointer dtFilter = TensorReconstructionImageFilterType::New();
-      dtFilter->SetGradientImage( gradientContainer, itkVectorImagePointer );
-      dtFilter->SetBValue( static_cast<mitk::FloatProperty*>
-                           (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                             ->GetValue() );
-      dtFilter->Update();
-      itk::Image< itk::DiffusionTensor3D< double >, 3 >::Pointer tensorImage = dtFilter->GetOutput();
-      itk::ImageRegionIterator< itk::Image< itk::DiffusionTensor3D< double >, 3 > > inIt(tensorImage, tensorImage->GetLargestPossibleRegion());
-      double ref = 0;
-      unsigned int count = 0;
-      while ( !inIt.IsAtEnd() )
-      {
-        if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
-        {
-          ++inIt;
-          continue;
-        }
-
-        double FA = inIt.Get().GetFractionalAnisotropy();
-        if (FA>0.4 && FA<0.99)
-        {
-          ref += itkVectorImagePointer->GetPixel(inIt.GetIndex())[b0Index];
-          count++;
-        }
-        ++inIt;
-      }
-      if (count>0)
-      {
-        ref /= count;
-        filter->SetUseGlobalReference(true);
-        filter->SetReference(ref);
-      }
-      break;
-    }
-    case 1: // normalize relative to mean CSF signal intensity
-    {
-      itk::AdcImageFilter< short, double >::Pointer adcFilter = itk::AdcImageFilter< short, double >::New();
-      adcFilter->SetInput( itkVectorImagePointer );
-      adcFilter->SetGradientDirections( gradientContainer);
-      adcFilter->SetB_value( static_cast<mitk::FloatProperty*>
-                             (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
-                               ->GetValue() );
-      adcFilter->Update();
-      ItkDoubleImageType::Pointer adcImage = adcFilter->GetOutput();
-      itk::ImageRegionIterator<ItkDoubleImageType> inIt(adcImage, adcImage->GetLargestPossibleRegion());
-      double max = 0.0030;
-      double ref = 0;
-      unsigned int count = 0;
-      while ( !inIt.IsAtEnd() )
-      {
-        if (itkImage.IsNotNull() && itkImage->GetPixel(inIt.GetIndex())<=0)
-        {
-          ++inIt;
-          continue;
-        }
-        if (inIt.Get()>max && inIt.Get()<0.004)
-        {
-          ref += itkVectorImagePointer->GetPixel(inIt.GetIndex())[b0Index];
-          count++;
-        }
-        ++inIt;
-      }
-      if (count>0)
-      {
-        ref /= count;
-        filter->SetUseGlobalReference(true);
-        filter->SetReference(ref);
-      }
-      break;
-    }
-    case 2:
-    {
-      filter->SetUseGlobalReference(false);
-    }
   }
   filter->Update();
 

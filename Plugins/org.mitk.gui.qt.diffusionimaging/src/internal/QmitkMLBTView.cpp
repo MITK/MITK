@@ -412,6 +412,8 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler.SetSampleFraction(m_Controls->m_SampleFractionBox->value());
     m_ForestHandler.SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
     m_ForestHandler.SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
+    m_ForestHandler.SetBidirectionalFiberSampling(m_Controls->m_BidirectionalSampling->isChecked());
+    m_ForestHandler.SetZeroDirWmFeatures(m_Controls->m_ZeroDirBox->isChecked());
     m_ForestHandler.StartTraining();
 }
 

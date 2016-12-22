@@ -14,17 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_8">
-   <item row="0" column="0">
-    <widget class="QLabel" name="statusLabel">
-     <property name="text">
-      <string>Please load or train random forest!</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="3" column="0">
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
       <number>1</number>
@@ -42,13 +32,6 @@
        <string>Training</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="9" column="0">
-        <widget class="QCommandLinkButton" name="m_SaveForestButton">
-         <property name="text">
-          <string>Save Forest</string>
-         </property>
-        </widget>
-       </item>
        <item row="5" column="0">
         <widget class="QFrame" name="frame_6">
          <property name="frameShape">
@@ -196,6 +179,36 @@
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item row="11" column="0">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="9" column="0">
+        <widget class="QCommandLinkButton" name="m_StartTrainingButton">
+         <property name="text">
+          <string>Start Training</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QCheckBox" name="m_ZeroDirBox">
+         <property name="text">
+          <string>Zero-direction features</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item row="6" column="0">
@@ -346,25 +359,22 @@
          </layout>
         </widget>
        </item>
-       <item row="8" column="0">
-        <widget class="QCommandLinkButton" name="m_StartTrainingButton">
+       <item row="10" column="0">
+        <widget class="QCommandLinkButton" name="m_SaveForestButton">
          <property name="text">
-          <string>Start Training</string>
+          <string>Save Forest</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="7" column="0">
+        <widget class="QCheckBox" name="m_BidirectionalSampling">
+         <property name="text">
+          <string>Bidirectional sampling</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="checked">
+          <bool>false</bool>
          </property>
-        </spacer>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -381,154 +391,6 @@
        <string>Tractography</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QCommandLinkButton" name="m_LoadForestButton">
-         <property name="text">
-          <string>Load Forest</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="0">
-        <widget class="QFrame" name="frame_4">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="m_DemoModeBox">
-            <property name="text">
-             <string>Demo Mode</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="m_TimerIntervalBox">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>1000</number>
-            </property>
-            <property name="value">
-             <number>10</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="m_OnlyForwardSamples">
-         <property name="text">
-          <string>Only frontal samples</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QFrame" name="frame_3">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item row="4" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingSeedImageBox"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Mask Image:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string>Seed Image:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingMaskImageBox"/>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Stop Image:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingStopImageBox"/>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_22">
-            <property name="text">
-             <string>4TT Image:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FourTTImageBox"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QCheckBox" name="m_RandomSampling">
-         <property name="text">
-          <string>Random sampling</string>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="15" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="1" column="0">
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
@@ -720,13 +582,20 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="m_AvoidStop">
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="m_Curvcheck2">
          <property name="text">
-          <string>Avoid premature termination</string>
+          <string>Secondary curvature check</string>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCommandLinkButton" name="m_LoadForestButton">
+         <property name="text">
+          <string>Load Forest</string>
          </property>
         </widget>
        </item>
@@ -740,7 +609,84 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="16" column="0">
+        <widget class="QFrame" name="frame_4">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="m_DemoModeBox">
+            <property name="text">
+             <string>Demo Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QSpinBox" name="m_TimerIntervalBox">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>1000</number>
+            </property>
+            <property name="value">
+             <number>10</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="m_OnlyForwardSamples">
+         <property name="text">
+          <string>Only frontal samples</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="m_RandomSampling">
+         <property name="text">
+          <string>Random sampling</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="0">
         <widget class="QFrame" name="frame_5">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -806,18 +752,92 @@
          </layout>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QCheckBox" name="m_Curvcheck2">
+       <item row="3" column="0">
+        <widget class="QCheckBox" name="m_AvoidStop">
          <property name="text">
-          <string>Secondary curvature check</string>
+          <string>Avoid premature termination</string>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QFrame" name="frame_3">
+         <property name="frameShape">
+          <enum>QFrame::NoFrame</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item row="4" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingSeedImageBox"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Mask Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Seed Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingMaskImageBox"/>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Stop Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TrackingStopImageBox"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>4TT Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FourTTImageBox"/>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="statusLabel">
+     <property name="text">
+      <string>Please load or train random forest!</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
    </item>
   </layout>

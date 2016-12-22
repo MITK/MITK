@@ -86,6 +86,8 @@ public:
     void SetStepSize(double step){ m_WmSampleDistance = step; }
     void SetGrayMatterSamplesPerVoxel(int samples){ m_GmSamplesPerVoxel = samples; }
     void SetSampleFraction(double fraction){ m_SampleFraction = fraction; }
+    void SetBidirectionalFiberSampling(bool val) { m_BidirectionalFiberSampling = val; }
+    void SetZeroDirWmFeatures(bool val) { m_ZeroDirWmFeatures = val; }
     std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
@@ -112,8 +114,8 @@ protected:
     typename DwiFeatureImageType::PixelType GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image);   ///< get trilinearly interpolated raw image values at given world position
 
 
-    std::vector< Image::Pointer >                               m_InputDwis;  ///< original input DWI data
-    std::shared_ptr< vigra::RandomForest<int> >                 m_Forest;   ///< random forest classifier
+    std::vector< Image::Pointer >                               m_InputDwis;                ///< original input DWI data
+    std::shared_ptr< vigra::RandomForest<int> >                 m_Forest;                   ///< random forest classifier
     std::chrono::time_point<std::chrono::system_clock>          m_StartTime;
     std::chrono::time_point<std::chrono::system_clock>          m_EndTime;
 
@@ -134,13 +136,15 @@ protected:
     std::vector< unsigned int >                                 m_GmSamples;                ///< number of gray matter samples
     int                                                         m_GmSamplesPerVoxel;        ///< number of gray matter samplees per voxel. if -1, then the number is automatically chosen to gain an overall number of GM samples close to the number of WM samples.
     vigra::MultiArray<2, double>                                m_FeatureData;              ///< vigra container for training features
-    unsigned int                                                m_NumPreviousDirections;    ///< How many "old" directions should be used as classification features?
+    unsigned int                                                m_NumPreviousDirections;        ///< How many "old" directions should be used as classification features?
 
     // only for tracking
-    vigra::MultiArray<2, double>                                m_LabelData;                ///< vigra container for training labels
-    vigra::MultiArray<2, double>                                m_Weights;                  ///< vigra container for training sample weights
-
+    vigra::MultiArray<2, double>                                m_LabelData;                    ///< vigra container for training labels
+    vigra::MultiArray<2, double>                                m_Weights;                      ///< vigra container for training sample weights
     std::vector< vnl_vector_fixed<double,3> >                   m_DirectionContainer;
+
+    bool                                                        m_BidirectionalFiberSampling;
+    bool                                                        m_ZeroDirWmFeatures;
 };
 
 }

@@ -28,6 +28,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLN4^^MitkCore
         CLMultiForestPrediction^^MitkDataCollection_MitkCLVigraRandomForest
         CLNrrdToPoly^^MitkCore
+        CL2Dto3DImage^^MitkCore
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 

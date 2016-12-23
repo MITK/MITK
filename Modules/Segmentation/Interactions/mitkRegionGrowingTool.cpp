@@ -42,8 +42,6 @@ namespace mitk {
 MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrowingTool, "Region growing tool");
 }
 
-#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
-
 mitk::RegionGrowingTool::RegionGrowingTool()
     :FeedbackContourTool("PressMoveRelease"),
       m_SeedValue(0),
@@ -461,6 +459,8 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         m_Thresholds[0] = std::min<ScalarType>(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
         m_Thresholds[1] = std::max<ScalarType>(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
         MITK_DEBUG << "Screen difference X: " << m_ScreenXDifference;
+
+        thresholdsChanged.Send(m_Thresholds[0], m_Thresholds[1]);
 
         // Perform region growing again and show the result
         mitk::Image::Pointer resultImage = mitk::Image::New();

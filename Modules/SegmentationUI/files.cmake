@@ -24,6 +24,7 @@ Qmitk/QmitkToolRoiDataSelectionBox.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
+Qmitk/QmitkRegionGrowingToolGUI.cpp
 )
 
 set(MOC_H_FILES
@@ -51,6 +52,7 @@ Qmitk/QmitkToolRoiDataSelectionBox.h
 Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
+Qmitk/QmitkRegionGrowingToolGUI.h
 )
 
 set(UI_FILES
@@ -59,4 +61,5 @@ Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkPickingToolGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkRegionGrowingToolGUIControls.ui
 )

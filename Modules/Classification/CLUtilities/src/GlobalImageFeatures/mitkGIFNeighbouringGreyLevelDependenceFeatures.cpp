@@ -74,8 +74,6 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
   holder.m_NumberOfNeighbourVoxels = 0;
   holder.m_NumberOfDependenceNeighbourVoxels = 0;
 
-  MITK_INFO << direction;
-
   itk::Size<VImageDimension> radius;
   radius.Fill(range);
 

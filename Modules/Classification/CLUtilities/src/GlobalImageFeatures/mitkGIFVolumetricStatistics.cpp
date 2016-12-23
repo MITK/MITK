@@ -206,6 +206,11 @@ mitk::GIFVolumetricStatistics::GIFVolumetricStatistics()
 mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::CalculateFeatures(const Image::Pointer & image, const Image::Pointer &mask)
 {
   FeatureListType featureList;
+  if (image->GetDimension() < 3)
+  {
+    return featureList;
+  }
+
 
   AccessByItk_2(image, CalculateVolumeStatistic, mask, featureList);
   AccessByItk_2(mask, CalculateLargestDiameter, image, featureList);

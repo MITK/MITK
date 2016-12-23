@@ -294,7 +294,6 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   typename MaskType::Pointer maskImage = MaskType::New();
   mitk::CastToItkImage(mask, maskImage);
 
-
   //Find possible directions
   std::vector < itk::Offset<VImageDimension> > offsetVector;
   NeighborhoodType hood;
@@ -331,9 +330,9 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   mitk::CoocurenceMatrixFeatures overallFeature;
   for (int i = 0; i < offsetVector.size(); ++i)
   {
-    if (config.direction)
+    if (config.direction > 1)
     {
-      if ((config.direction > 1) && offsetVector[i][config.direction - 2] != 0)
+      if (offsetVector[i][config.direction - 2] != 0)
       {
         continue;
       }
@@ -341,7 +340,6 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
 
 
     offset = offsetVector[i];
-    MITK_INFO << offset;
     mitk::CoocurenceMatrixHolder holder(rangeMin, rangeMax, numberOfBins);
     mitk::CoocurenceMatrixFeatures coocResults;
     CalculateCoOcMatrix<TPixel, VImageDimension>(itkImage, maskImage, offset, config.range, holder);

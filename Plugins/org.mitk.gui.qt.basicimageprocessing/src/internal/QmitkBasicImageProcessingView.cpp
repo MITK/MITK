@@ -174,6 +174,9 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 {
+  if (m_TimeStepperAdapter) {
+    delete m_TimeStepperAdapter;
+  }
   //berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   //if(s)
   //  s->RemoveSelectionListener(m_SelectionListener);
@@ -272,6 +275,10 @@ void QmitkBasicImageProcessing::InternalGetTimeNavigationController()
     auto tnc = renwin_part->GetTimeNavigationController();
     if( tnc != nullptr )
     {
+      if (m_TimeStepperAdapter) {
+        delete m_TimeStepperAdapter;
+      }
+
       m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, tnc->GetTime(), "sliceNavigatorTimeFromBIP");
     }
   }

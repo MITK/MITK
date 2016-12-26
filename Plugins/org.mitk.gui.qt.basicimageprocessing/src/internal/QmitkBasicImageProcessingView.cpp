@@ -174,6 +174,9 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 {
+  if (m_TimeStepperAdapter) {
+    delete m_TimeStepperAdapter;
+  }
   //berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   //if(s)
   //  s->RemoveSelectionListener(m_SelectionListener);
@@ -272,6 +275,10 @@ void QmitkBasicImageProcessing::InternalGetTimeNavigationController()
     auto tnc = renwin_part->GetTimeNavigationController();
     if( tnc != nullptr )
     {
+      if (m_TimeStepperAdapter) {
+        delete m_TimeStepperAdapter;
+      }
+
       m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, tnc->GetTime(), "sliceNavigatorTimeFromBIP");
     }
   }
@@ -303,6 +310,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointe
   *m_SelectedImageNode = _DataNode;
   //try to cast to image
   mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
+  this->InternalGetTimeNavigationController();
 
     //no image
     if( tempImage.IsNull() || (tempImage->IsInitialized() == false) )
@@ -325,8 +333,6 @@ void QmitkBasicImageProcessing::OnSelectionChanged(berry::IWorkbenchPart::Pointe
     if ( tempImage->GetDimension() > 3 )
     {
       // try to retrieve the TNC (for 4-D Processing )
-      this->InternalGetTimeNavigationController();
-
       m_Controls->sliceNavigatorTime->setEnabled(true);
       m_Controls->tlTime->setEnabled(true);
     }

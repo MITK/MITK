@@ -67,13 +67,11 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   connect( m_WindowInput, SIGNAL(editingFinished()), this, SLOT( SetWindowValue() ) );
 
   // Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  //QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
-  QValidator* validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), 2, this);
+  QValidator* validatorWindowInput = new QIntValidator(1, INT_MAX, this);
   m_WindowInput->setValidator(validatorWindowInput);
 
-  //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  //QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
-  //m_LevelInput->setValidator(validatorLevelInput);
+  QValidator* validatorLevelInput = new QIntValidator(INT_MIN, INT_MAX, this);
+  m_LevelInput->setValidator(validatorLevelInput);
 
   this->hide();
 }

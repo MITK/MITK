@@ -40,9 +40,17 @@
 #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info)
 #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error) << "Error: "
 #define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::trace)
-#define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) << "Debug: "
 #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning) << "Warning: "
 #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal) << "Fatal Error: "
+
+extern struct _t _;
+template <typename T> _t & operator<<(_t&__, T) { return __; }
+
+#ifdef DEBUG_INFO
+  #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) << "Debug: "
+#else
+  #define AUTOPLAN_DEBUG _
+#endif
 
 namespace Logger
 {

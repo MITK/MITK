@@ -126,6 +126,8 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     GetOpacity(opacity, renderer);
     ls->m_TextProp->SetColor(color[0], color[1], color[2]);
     ls->m_STextProp->SetColor(0, 0, 0);
+    ls->m_TextProp->SetBackgroundColor(0.0, 0.0, 0.0);
+    ls->m_TextProp->SetBackgroundOpacity(0.8);
     ls->m_TextProp->SetOpacity(opacity);
     ls->m_STextProp->SetOpacity(opacity);
 

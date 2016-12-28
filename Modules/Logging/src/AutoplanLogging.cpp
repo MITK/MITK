@@ -7,7 +7,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/date_time.hpp>
 
-struct _t {} _ = {};
+struct ThrowAwayPattern {} _ = {};
 
 namespace Logger {
 

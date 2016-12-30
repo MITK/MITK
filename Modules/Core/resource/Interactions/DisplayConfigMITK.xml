@@ -71,9 +71,6 @@
     <attribute name="Modifiers" value="ctrl"/>
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
-  <event_variant class="MouseReleaseEvent" name="EndScrolling">
-    <attribute name="EventButton" value="LeftMouseButton"/>
-  </event_variant>
   <event_variant class="MouseMoveEvent" name="Scrolling">
     <attribute name="Modifiers" value="ctrl"/>
     <attribute name="ButtonState" value="LeftMouseButton"/>

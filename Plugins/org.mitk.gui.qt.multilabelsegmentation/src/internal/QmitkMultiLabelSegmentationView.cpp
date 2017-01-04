@@ -131,8 +131,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
 
-  //  this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
-
   // *------------------------
   // * ToolManager
   // *------------------------
@@ -232,6 +230,10 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_pbNewLabel->setEnabled(false);
   m_Controls.m_btLockExterior->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setEnabled(false);
+
+  // Make sure the GUI notices if appropriate data is already present on creation
+  this->OnReferenceSelectionChanged(m_Controls.m_cbReferenceNodeSelector->GetSelectedNode());
+  this->OnSegmentationSelectionChanged(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
 }
 
 void QmitkMultiLabelSegmentationView::Activated()

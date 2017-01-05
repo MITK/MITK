@@ -34,6 +34,7 @@ TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrackingForestHandler(
   , m_NumPreviousDirections(1)
   , m_ZeroDirWmFeatures(true)
   , m_BidirectionalFiberSampling(false)
+  , m_MaxNumWmSamples(-1)
 {
   vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
@@ -594,7 +595,35 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
       wmSamples *= (m_NumPreviousDirections+1);
 
     MITK_INFO << "White matter samples: " << wmSamples;
-    m_NumberOfSamples += wmSamples;
+    m_NumberOfSamples = wmSamples;
+
+    // upper limit for samples
+    if (m_MaxNumWmSamples>0 && m_NumberOfSamples>m_MaxNumWmSamples)
+    {
+      if ((double)m_MaxNumWmSamples/m_NumberOfSamples > 0.8)
+        m_SampleUsage = std::vector<bool>(m_NumberOfSamples, true);
+      else
+      {
+        m_SampleUsage = std::vector<bool>(m_NumberOfSamples, false);
+        m_NumberOfSamples = m_MaxNumWmSamples;
+        MITK_INFO << "Limiting white matter samples to: " << m_NumberOfSamples;
+
+        itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randgen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
+        randgen->SetSeed();
+        unsigned int c = 0;
+        while (c<m_MaxNumWmSamples)
+        {
+          int idx = randgen->GetIntegerVariate(m_MaxNumWmSamples-1);
+          if (m_SampleUsage[idx]==false)
+          {
+            m_SampleUsage[idx]=true;
+            c++;
+          }
+        }
+      }
+    }
+    else
+      m_SampleUsage = std::vector<bool>(m_NumberOfSamples, true);
 
     // calculate gray-matter samples
     itk::ImageRegionConstIterator<ItkUcharImgType> it(wmmask, wmmask->GetLargestPossibleRegion());
@@ -614,7 +643,10 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
     }
     else if (OUTOFWM>0)
     {
-      m_GmSamples.push_back(0.5+(double)wmSamples/(double)OUTOFWM);
+      int gm_per_voxel = 0.5+(double)m_NumberOfSamples/(double)OUTOFWM;
+      if (gm_per_voxel<=0)
+        gm_per_voxel = 1;
+      m_GmSamples.push_back(gm_per_voxel);
       m_NumberOfSamples += m_GmSamples.back()*OUTOFWM;
       MITK_INFO << "Non-white matter samples per voxel: " << m_GmSamples.back();
     }
@@ -640,7 +672,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
   itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer m_RandGen = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
   m_RandGen->SetSeed();
   MITK_INFO <<  "Creating training data ...";
-  int sampleCounter = 0;
+  unsigned int sampleCounter = 0;
   for (unsigned int t=0; t<m_Tractograms.size(); t++)
   {
     ItkFloatImgType::Pointer fiber_folume = m_FiberVolumeModImages.at(t);
@@ -713,6 +745,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
       ++it;
     }
 
+    unsigned int num_gm_samples = sampleCounter;
     MITK_INFO << "WM samples...";
     // white matter samples
     mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
@@ -733,6 +766,9 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
         {
           for (int j=1; j<numPoints-1; j++)
           {
+            if (!m_SampleUsage[sampleCounter-num_gm_samples])
+              continue;
+
             itk::Point<float, 3> itkP1, itkP2;
 
             int num_nonzero_dirs = m_NumPreviousDirections;

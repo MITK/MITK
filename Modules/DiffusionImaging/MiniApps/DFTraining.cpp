@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     parser.addArgument("sample_fraction", "sf", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", us::Any());
 
     parser.addArgument("shfeatures", "shf", mitkCommandLineParser::Int, "Use SH features:", "use SH features", us::Any());
-
+    parser.addArgument("max_wm_samples", "mws", mitkCommandLineParser::Int, "Max. num. WM samples:", "upper limit for the number of WM samples", us::Any());
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -117,6 +117,10 @@ int main(int argc, char* argv[])
     double sample_fraction = 0.6;
     if (parsedArgs.count("sample_fraction"))
         sample_fraction = us::any_cast<float>(parsedArgs["sample_fraction"]);
+
+    int maxWmSamples = -1;
+    if (parsedArgs.count("max_wm_samples"))
+        maxWmSamples = us::any_cast<int>(parsedArgs["max_wm_samples"]);
 
 
     MITK_INFO << "loading diffusion-weighted images";
@@ -196,6 +200,7 @@ int main(int argc, char* argv[])
         forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
         forestHandler.SetSampleFraction(sample_fraction);
         forestHandler.SetStepSize(stepsize);
+        forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
         forestHandler.SaveForest(forestFile);
     }
@@ -213,6 +218,7 @@ int main(int argc, char* argv[])
         forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
         forestHandler.SetSampleFraction(sample_fraction);
         forestHandler.SetStepSize(stepsize);
+        forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
         forestHandler.SaveForest(forestFile);
     }

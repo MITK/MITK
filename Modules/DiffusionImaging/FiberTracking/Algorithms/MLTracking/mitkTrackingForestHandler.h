@@ -79,7 +79,7 @@ public:
     void SaveForest(std::string forestFile);
     void LoadForest(std::string forestFile);
 
-    // training parameters
+    void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
     void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
     void SetNumTrees(int num){ m_NumTrees = num; }
     void SetMaxTreeDepth(int depth){ m_MaxTreeDepth = depth; }
@@ -145,6 +145,8 @@ protected:
 
     bool                                                        m_BidirectionalFiberSampling;
     bool                                                        m_ZeroDirWmFeatures;
+    int                                                         m_MaxNumWmSamples;
+    std::vector< bool >                                         m_SampleUsage;
 };
 
 }

@@ -57,6 +57,7 @@ public:
   itkSetMacro( InputImage, typename OutputImageType::Pointer)   ///< use input image geometry to initialize output image
   itkSetMacro( UseTrilinearInterpolation, bool )
   itkSetMacro( DoFiberResampling, bool )
+  itkSetMacro( WorkOnFiberCopy, bool )
 
   void GenerateData();
 
@@ -68,7 +69,7 @@ protected:
   virtual ~TractDensityImageFilter();
 
   typename OutputImageType::Pointer m_InputImage;           ///< use input image geometry to initialize output image
-  mitk::FiberBundle::Pointer       m_FiberBundle;          ///< input fiber bundle
+  mitk::FiberBundle::Pointer        m_FiberBundle;          ///< input fiber bundle
   float                             m_UpsamplingFactor;     ///< use higher resolution for ouput image
   bool                              m_InvertImage;          ///< voxelvalue = 1-voxelvalue
   bool                              m_BinaryOutput;         ///< generate binary fiber envelope
@@ -76,6 +77,7 @@ protected:
   bool                              m_OutputAbsoluteValues; ///< do not normalize image values to 0-1
   bool                              m_UseTrilinearInterpolation;
   bool                              m_DoFiberResampling;
+  bool                              m_WorkOnFiberCopy;
 };
 
 }

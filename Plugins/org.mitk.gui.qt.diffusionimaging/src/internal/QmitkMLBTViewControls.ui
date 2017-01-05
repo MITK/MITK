@@ -6,26 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>696</width>
-    <height>907</height>
+    <width>503</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_8">
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>678</width>
-        <height>813</height>
+        <width>471</width>
+        <height>388</height>
        </rect>
       </property>
       <attribute name="label">
@@ -203,11 +203,14 @@
        </item>
        <item row="8" column="0">
         <widget class="QCheckBox" name="m_ZeroDirBox">
+         <property name="toolTip">
+          <string>Use direction as well as zero-vector as directional training feature at each point. This enables to learn to predict the direction without a previous direction (e.g. at seed point).</string>
+         </property>
          <property name="text">
           <string>Zero-direction features</string>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -368,11 +371,14 @@
        </item>
        <item row="7" column="0">
         <widget class="QCheckBox" name="m_BidirectionalSampling">
+         <property name="toolTip">
+          <string>Sample fibers in both directions.</string>
+         </property>
          <property name="text">
           <string>Bidirectional sampling</string>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -383,8 +389,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>678</width>
-        <height>813</height>
+        <width>471</width>
+        <height>631</height>
        </rect>
       </property>
       <attribute name="label">
@@ -415,7 +421,7 @@
           <item row="0" column="1">
            <widget class="QmitkDataStorageComboBox" name="m_TrackingRawImageBox"/>
           </item>
-          <item row="8" column="1">
+          <item row="7" column="1">
            <widget class="QDoubleSpinBox" name="m_MaxLengthBox">
             <property name="maximum">
              <double>999999999.000000000000000</double>
@@ -428,7 +434,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
              <string>Deflection distance modifier:</string>
@@ -448,7 +454,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="m_DeflectionModBox">
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -468,7 +474,7 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="4" column="1">
            <widget class="QDoubleSpinBox" name="m_SamplingDistanceBox">
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -478,28 +484,28 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_8">
             <property name="text">
              <string>Step Size:</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>Num. Samples:</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="m_TrackingStepSizeBox">
             <property name="value">
              <double>0.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="6" column="1">
            <widget class="QDoubleSpinBox" name="m_MinLengthBox">
             <property name="maximum">
              <double>999999999.000000000000000</double>
@@ -512,7 +518,7 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_10">
             <property name="text">
              <string>Sampling Distance:</string>
@@ -526,21 +532,21 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>Max. Length</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>Min. Length</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="5" column="1">
            <widget class="QSpinBox" name="m_NumSamplesBox">
             <property name="statusTip">
              <string>Number of seeds per voxel.</string>
@@ -553,29 +559,6 @@
             </property>
             <property name="value">
              <number>30</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Num. previous directions:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSpinBox" name="m_NumPrevDirs">
-            <property name="statusTip">
-             <string>Number of seeds per voxel.</string>
-            </property>
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>50</number>
-            </property>
-            <property name="value">
-             <number>1</number>
             </property>
            </widget>
           </item>
@@ -837,6 +820,57 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Training and tractography</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Num. previous directions:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="m_NumPrevDirs">
+        <property name="statusTip">
+         <string>Number of seeds per voxel.</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>50</number>
+        </property>
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>

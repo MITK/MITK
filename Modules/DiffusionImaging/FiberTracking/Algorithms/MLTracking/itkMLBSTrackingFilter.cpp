@@ -62,6 +62,8 @@ MLBSTrackingFilter<  ShOrder, NumImageFeatures >
   , m_AvoidStop(true)
   , m_DemoMode(false)
   , m_SeedOnlyGm(false)
+  , m_WmLabel(3) // mrtrix 5ttseg labels
+  , m_GmLabel(1) // mrtrix 5ttseg labels
 {
   this->SetNumberOfRequiredInputs(1);
 }
@@ -176,6 +178,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::InitGrayMatterEndings()
   m_GmStubs.clear();
   if (m_FourTTImage.IsNotNull())
   {
+    std::cout << "MLBSTrackingFilter: initializing GM endings" << std::endl;
     ImageRegionConstIterator< ItkUcharImgType > it(m_FourTTImage, m_FourTTImage->GetLargestPossibleRegion() );
     it.GoToBegin();
 
@@ -188,7 +191,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::InitGrayMatterEndings()
 
     while( !it.IsAtEnd() )
     {
-      if (it.Value()==2)
+      if (it.Value()==m_GmLabel)
       {
         typename ItkUcharImgType::IndexType s_idx = it.GetIndex();
         itk::ContinuousIndex<double, 3> start;
@@ -209,7 +212,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::InitGrayMatterEndings()
               e_idx[1] = s_idx[1] + y;
               e_idx[2] = s_idx[2] + z;
 
-              if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=1 )
+              if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=m_WmLabel )
                 continue;
 
               itk::ContinuousIndex<double, 3> end;
@@ -572,7 +575,6 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
 {
   std::vector< itk::Point<double> > seedpoints;
 
-  m_GmStubs.clear();
   if (m_GmStubs.empty())
   {
     typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
@@ -716,7 +718,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckFiberForGmEnding(Fib
   {
     typename ItkUcharImgType::IndexType idx;
     m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), idx);
-    if (m_FourTTImage->GetPixel(idx)==1)
+    if (m_FourTTImage->GetPixel(idx)==m_WmLabel)
       in_wm = true;
     else
       fib->pop_back();
@@ -752,7 +754,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::CheckFiberForGmEnding(Fib
         e_idx[1] = s_idx[1] + y;
         e_idx[2] = s_idx[2] + z;
 
-        if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=2 )
+        if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=m_GmLabel )
           continue;
 
         itk::ContinuousIndex<double, 3> end;

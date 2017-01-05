@@ -98,6 +98,7 @@ public:
     itkSetMacro( DeflectionMod, double )                 ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
+    itkSetMacro( SeedOnlyGm, bool )
     itkSetMacro( NumberOfSamples, unsigned int )        ///< Number of neighborhood sampling points
     itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination

@@ -60,10 +60,13 @@ int main(int argc, char* argv[])
     parser.addArgument("stop", "st", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
     parser.addArgument("mask", "m", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
     parser.addArgument("seed", "s", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
+    parser.addArgument("tissue", "t", mitkCommandLineParser::String, "Tissue type image:", "image with tissue type labels (WM=3, GM=1)", us::Any());
 
     parser.addArgument("stepsize", "se", mitkCommandLineParser::Float, "Stepsize:", "stepsize (in voxels)", us::Any());
     parser.addArgument("samplingdist", "sd", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", us::Any());
     parser.addArgument("seeds", "nse", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", us::Any());
+
+    parser.addArgument("seed_gm", "sgm", mitkCommandLineParser::Int, "Seed only GM:", "Seed only in gray matter (requires tissue type image -t)", us::Any());
 
     parser.addArgument("stopvotes", "sv", mitkCommandLineParser::Int, "Use stop votes:", "use stop votes", us::Any());
     parser.addArgument("forward", "fs", mitkCommandLineParser::Int, "Use only forward samples:", "use only forward samples", us::Any());
@@ -81,6 +84,10 @@ int main(int argc, char* argv[])
     bool shfeatures = false;
     if (parsedArgs.count("shfeatures"))
         shfeatures = us::any_cast<int>(parsedArgs["shfeatures"]);
+
+    bool seed_gm = false;
+    if (parsedArgs.count("seed_gm"))
+        seed_gm = us::any_cast<int>(parsedArgs["seed_gm"]);
 
     bool stopvotes = true;
     if (parsedArgs.count("stopvotes"))
@@ -101,6 +108,10 @@ int main(int argc, char* argv[])
     string stopFile = "";
     if (parsedArgs.count("stop"))
         stopFile = us::any_cast<string>(parsedArgs["stop"]);
+
+    string tissueFile = "";
+    if (parsedArgs.count("tissue"))
+        tissueFile = us::any_cast<string>(parsedArgs["tissue"]);
 
     float stepsize = -1;
     if (parsedArgs.count("stepsize"))
@@ -150,11 +161,20 @@ int main(int argc, char* argv[])
         mitk::CastToItkImage(img, stop);
     }
 
+
+    ItkUcharImgType::Pointer tissue;
+    if (!tissueFile.empty())
+    {
+        MITK_INFO << "loading tissue image";
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(tissueFile).GetPointer());
+        tissue = ItkUcharImgType::New();
+        mitk::CastToItkImage(img, tissue);
+    }
+
     MITK_INFO << "loading additional feature images";
     typedef itk::Image<float, 3> ItkFloatImgType;
     std::vector< std::vector< ItkFloatImgType::Pointer > > addFeatImages;
     addFeatImages.push_back(std::vector< ItkFloatImgType::Pointer >());
-
     for (auto file : addFeatFiles)
     {
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(file).GetPointer());
@@ -182,6 +202,8 @@ int main(int argc, char* argv[])
         tracker->SetUseStopVotes(stopvotes);
         tracker->SetOnlyForwardSamples(forward);
         tracker->SetAposterioriCurvCheck(false);
+        tracker->SetFourTTImage(tissue);
+        tracker->SetSeedOnlyGm(seed_gm);
         tracker->Update();
         vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
@@ -207,6 +229,8 @@ int main(int argc, char* argv[])
         tracker->SetUseStopVotes(stopvotes);
         tracker->SetOnlyForwardSamples(forward);
         tracker->SetAposterioriCurvCheck(false);
+        tracker->SetFourTTImage(tissue);
+        tracker->SetSeedOnlyGm(seed_gm);
         tracker->Update();
         vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);

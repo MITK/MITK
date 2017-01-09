@@ -43,6 +43,7 @@
 #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning) << "Warning: "
 #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal) << "Fatal Error: "
 
+struct ThrowAwayPattern {};
 MITKLOGGING_EXPORT extern struct ThrowAwayPattern _;
 
 template <typename T>

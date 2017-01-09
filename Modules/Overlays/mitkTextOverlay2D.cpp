@@ -129,6 +129,8 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_TextProp->SetBackgroundColor(0.0, 0.0, 0.0);
     ls->m_TextProp->SetBackgroundOpacity(0.8);
     ls->m_TextProp->SetOpacity(opacity);
+    ls->m_TextProp->SetLineOffset(5);
+    ls->m_STextProp->SetLineOffset(5);
     ls->m_STextProp->SetOpacity(opacity);
 
     std::string fontFamilyAsString;

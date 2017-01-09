@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "windows.h"
 #include <chrono>
+#include <ctime>
 
 
 /**
@@ -49,8 +50,7 @@ void mitk::WindowsRealTimeClock::SetFrequency()
 */
 double mitk::WindowsRealTimeClock::GetCurrentStamp()
 {
-  double hns = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  return hns / 10000;
+  return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 }
 
 /**

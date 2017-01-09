@@ -240,7 +240,7 @@ void mitk::GIFGrayLevelSizeZone::AddArguments(mitkCommandLineParser &parser)
 }
 
 void
-mitk::GIFGrayLevelSizeZone::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::GIFGrayLevelSizeZone::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
 {
   auto parsedArgs = GetParameter();
   std::string name = GetOptionPrefix();

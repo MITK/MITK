@@ -216,7 +216,7 @@ void CalculateFeatures(
     for (int j = 0; j < holder.m_NumberOfBins; ++j)
     {
       double iInt = holder.IndexToMeanIntensity(i);
-      double jInt = holder.IndexToMeanIntensity(j);
+      //double jInt = holder.IndexToMeanIntensity(j);
       double pij = pijMatrix(i, j);
 
       results.JointVariance += (iInt - results.JointAverage)* (iInt - results.JointAverage)*pij;
@@ -273,12 +273,6 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   typedef itk::MinimumMaximumImageCalculator<ImageType> MinMaxComputerType;
   typedef itk::Neighborhood<TPixel, VImageDimension > NeighborhoodType;
   typedef itk::Offset<VImageDimension> OffsetType;
-
-  typedef itk::Statistics::EnhancedScalarImageToTextureFeaturesFilter<ImageType> FilterType;
-
-  typedef typename FilterType::TextureFeaturesFilterType TextureFilterType;
-
-
 
   ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -419,7 +413,7 @@ void CalculateMeanAndStdDevFeatures(std::vector<mitk::CoocurenceMatrixFeatures> 
 #define ADDFEATURE(a) meanFeature.a += featureList[i].a;stdFeature.a += featureList[i].a*featureList[i].a
 #define CALCVARIANCE(a) stdFeature.a =sqrt(stdFeature.a - meanFeature.a*meanFeature.a)
 
-  for (int i = 0; i < featureList.size(); ++i)
+  for (std::size_t i = 0; i < featureList.size(); ++i)
   {
     ADDFEATURE(JointMaximum);
     ADDFEATURE(JointAverage);

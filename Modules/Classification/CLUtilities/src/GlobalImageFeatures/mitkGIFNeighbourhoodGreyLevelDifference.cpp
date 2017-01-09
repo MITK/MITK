@@ -187,7 +187,7 @@ void mitk::GIFNeighbourhoodGreyLevelDifference::AddArguments(mitkCommandLinePars
 }
 
 void
-mitk::GIFNeighbourhoodGreyLevelDifference::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
+mitk::GIFNeighbourhoodGreyLevelDifference::CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &, const Image::Pointer &maskNoNAN, FeatureListType &featureList)
 {
   auto parsedArgs = GetParameter();
   std::string name = GetOptionPrefix();

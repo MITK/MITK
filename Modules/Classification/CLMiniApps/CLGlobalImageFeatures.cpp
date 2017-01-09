@@ -96,12 +96,12 @@ CreateNoNaNMask(itk::Image<TPixel, VImageDimension>* itkValue, mitk::Image::Poin
 {
   typedef itk::Image< TPixel, VImageDimension>                 LFloatImageType;
   typedef itk::Image< unsigned char, VImageDimension>          LMaskImageType;
-  LMaskImageType::Pointer itkMask = LMaskImageType::New();
+  typename LMaskImageType::Pointer itkMask = LMaskImageType::New();
 
   mitk::CastToItkImage(mask, itkMask);
 
   typedef itk::ImageDuplicator< LMaskImageType > DuplicatorType;
-  DuplicatorType::Pointer duplicator = DuplicatorType::New();
+  typename DuplicatorType::Pointer duplicator = DuplicatorType::New();
   duplicator->SetInputImage(itkMask);
   duplicator->Update();
 
@@ -138,12 +138,12 @@ ResampleMask(itk::Image<TPixel, VImageDimension>* itkMoving, mitk::Image::Pointe
   typedef itk::NearestNeighborInterpolateImageFunction< LMaskImageType> NearestNeighborInterpolateImageFunctionType;
   typedef itk::ResampleImageFilter<LMaskImageType, LMaskImageType> ResampleFilterType;
 
-  NearestNeighborInterpolateImageFunctionType::Pointer nn_interpolator = NearestNeighborInterpolateImageFunctionType::New();
-  LMaskImageType::Pointer itkRef = LMaskImageType::New();
+  typename NearestNeighborInterpolateImageFunctionType::Pointer nn_interpolator = NearestNeighborInterpolateImageFunctionType::New();
+  typename LMaskImageType::Pointer itkRef = LMaskImageType::New();
   mitk::CastToItkImage(ref, itkRef);
 
 
-  ResampleFilterType::Pointer resampler = ResampleFilterType::New();
+  typename ResampleFilterType::Pointer resampler = ResampleFilterType::New();
   resampler->SetInput(itkMoving);
   resampler->SetReferenceImage(itkRef);
   resampler->UseReferenceImageOn();

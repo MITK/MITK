@@ -93,6 +93,7 @@ namespace mitk {
       itkSetMacro(IGTTimeStamp, TimeStampType);
       /**
       * \brief gets the IGT timestamp of the NavigationData object
+      * Please note, that there is also the GetTimeStamp method provided by the ITK object. Within IGT you should always use GetIGTTimeStamp !
       */
       itkGetConstMacro(IGTTimeStamp, TimeStampType);
       /**

@@ -80,6 +80,7 @@ macro(mitk_create_executable)
     endif()
 
     # Create batch and VS user files for Windows platforms
+    include(mitkFunctionCreateWindowsBatchScript)
     if(WIN32)
       set(_batch_file_in "${CMAKE_CURRENT_SOURCE_DIR}/${MODULE_TARGET}.bat.in")
       if(NOT EXISTS "${_batch_file_in}")

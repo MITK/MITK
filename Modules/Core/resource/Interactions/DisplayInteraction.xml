@@ -87,6 +87,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoving" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>
 
       <!-- Case when we jumped in from rotation (wanted to rotate, but not possible, so alternative action is to set crosshair) -->
       <transition event_class="InteractionPositionEvent"  event_variant="Rotate" target="crosshair">
@@ -114,6 +117,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="move"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndMoving" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>
     </state>
     <state name="zoom">
       <transition event_class="InteractionPositionEvent" event_variant="Zooming" target="zoom">
@@ -129,6 +135,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrollingVar" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoving" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>      
     </state>
     <state name="adjustlevelwindow">
       <transition event_class="InteractionPositionEvent" event_variant="adjustlevelwindow" target="adjustlevelwindow">
@@ -136,6 +145,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="levelWindow"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoving" target="start"/>
     </state>
     <state name="rotationPossible">
       <transition event_class="InteractionPositionEvent" event_variant="StartRotate" target="rotation">

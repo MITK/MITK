@@ -538,7 +538,6 @@ include(mitkFunctionCreateCommandLineApp)
 include(mitkFunctionCreateModule)
 include(mitkFunctionCreatePlugin)
 include(mitkFunctionCreateProvisioningFile)
-include(mitkFunctionCreateWindowsBatchScript)
 include(mitkFunctionGetLibrarySearchPaths)
 include(mitkFunctionGetVersion)
 include(mitkFunctionGetVersionDescription)
@@ -1371,24 +1370,6 @@ configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
 
 write_basic_config_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   VERSION ${MITK_VERSION_STRING} COMPATIBILITY AnyNewerVersion)
-
-# If we are under Windows, create two batch files which correctly
-# set up the environment for the application and for Visual Studio
-if(WIN32)
-  include(mitkFunctionCreateWindowsBatchScript)
-
-  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
-  if(MITK_USE_HDF5)
-    list(APPEND MITK_LIBRARY_DIRS ${HDF5_DIR}/install/bin)
-    message(STATUS "MITK-Runtime " ${MITK_RUNTIME_PATH})
-  endif(MITK_USE_HDF5)
-  foreach(VS_BUILD_TYPE debug release)
-    mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
-      ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat
-      ${VS_BUILD_TYPE})
-  endforeach()
-endif(WIN32)
-
 
 #-----------------------------------------------------------------------------
 # MITK Applications

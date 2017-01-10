@@ -10,7 +10,6 @@
         <file>ProjectTemplate/CMake/CPackSetup.cmake</file>
         <file>ProjectTemplate/CMake/CTestCustom.cmake.in</file>
         <file>ProjectTemplate/CMake/MacroEmptyExternalProject.cmake</file>
-        <file>ProjectTemplate/CMake/StartVS.bat.in</file>
         <file>ProjectTemplate/CMakeExternals/MITK.cmake</file>
         <file>ProjectTemplate/Plugins/Plugins.cmake</file>
         <file>LICENSE.txt</file>

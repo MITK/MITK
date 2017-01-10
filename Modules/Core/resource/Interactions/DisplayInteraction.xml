@@ -129,6 +129,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrollingVar" target="start"/>
+      <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
     </state>
     <state name="adjustlevelwindow">
       <transition event_class="InteractionPositionEvent" event_variant="adjustlevelwindow" target="adjustlevelwindow">

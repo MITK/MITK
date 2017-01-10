@@ -107,6 +107,8 @@ protected:
   void AddOverlays();
   void RemoveOverlays();
 
+  void CreateWindows();
+
   QmitkRenderWindow* m_PARenderWindow; // window for the PA images
   QmitkRenderWindow* m_USRenderWindow; // window for the US images
 

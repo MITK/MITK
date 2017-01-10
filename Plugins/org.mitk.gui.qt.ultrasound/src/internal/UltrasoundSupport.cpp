@@ -104,8 +104,13 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
 
   m_Controls.tabWidget->setTabEnabled(1, false);
 
-  auto renderingManager = mitk::RenderingManager::GetInstance();
+  CreateWindows();
+}
 
+void UltrasoundSupport::CreateWindows()
+{
+
+  auto renderingManager = mitk::RenderingManager::GetInstance();
 
   m_Layout_PA->setSpacing(2);
   m_Layout_PA->setMargin(0);
@@ -118,7 +123,8 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
 
   m_LevelWindow_PA->SetDataStorage(m_PADataStorage);
   m_LevelWindow_PA->setSizePolicy(sizePolicyPA);
-  m_LevelWindow_PA->setMaximumWidth(50);
+  m_LevelWindow_PA->setMinimumWidth(28);
+  m_LevelWindow_PA->setMaximumWidth(28);
 
   // Tell the RenderWindow which (part of) the datastorage to render
   m_PARenderWindow->GetRenderer()->SetDataStorage(m_PADataStorage);
@@ -126,7 +132,7 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   // Use it as a 2D view
   m_PARenderWindow->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);
 
-  m_Layout_PA->addWidget(m_PARenderWindow,44);
+  m_Layout_PA->addWidget(m_PARenderWindow, 44);
   m_Layout_PA->addWidget(m_LevelWindow_PA);
   m_ToplevelWidget_PA->setLayout(m_Layout_PA);
 
@@ -573,6 +579,9 @@ void UltrasoundSupport::OnChangedActiveDevice()
   {
     m_Controls.m_TimerWidget->setEnabled(false);
   }
+
+  m_ToplevelWidget_PA->show();
+  m_ToplevelWidget_US->show();
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()

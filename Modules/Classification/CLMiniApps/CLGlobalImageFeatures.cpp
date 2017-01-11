@@ -300,6 +300,7 @@ int main(int argc, char* argv[])
   parser.addArgument("minimum-intensity", "minimum", mitkCommandLineParser::String, "Float", "Minimum intensity. If set, it is overwritten by more specific intensity minima", us::Any());
   parser.addArgument("maximum-intensity", "maximum", mitkCommandLineParser::String, "Float", "Maximum intensity. If set, it is overwritten by more specific intensity maxima", us::Any());
   parser.addArgument("bins", "bins", mitkCommandLineParser::String, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
+  parser.addArgument("output-mode", "omode", mitkCommandLineParser::String, "Int", "Defines if the results of an image / slice are written in a single row (0 , default) or column (1).");
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -318,7 +319,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version: "<< 1.9;
+  MITK_INFO << "Version: "<< 1.10;
 
   //bool useCooc = parsedArgs.count("cooccurence");
 
@@ -356,6 +357,11 @@ int main(int argc, char* argv[])
     }
   }
 
+  int writeDirection = 0;
+  if (parsedArgs.count("output-mode"))
+  {
+    writeDirection = us::any_cast<int>(parsedArgs["output-mode"]);
+  }
 
 
   if (parsedArgs.count("fixed-isotropic"))
@@ -501,7 +507,7 @@ int main(int argc, char* argv[])
   rlCalculator->SetDirection(direction);
 
   //std::ofstream output(parsedArgs["output"].ToString(), std::ios::app);
-  mitk::cl::FeatureResultWritter writer(parsedArgs["output"].ToString(), 1);
+  mitk::cl::FeatureResultWritter writer(parsedArgs["output"].ToString(), writeDirection);
   bool addDescription = parsedArgs.count("description");
   std::string description = "";
   if (addDescription)

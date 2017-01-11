@@ -20,6 +20,22 @@ QmitkSliderNavigatorWidget::QmitkSliderNavigatorWidget(QWidget *parent, Qt::Wind
 {
   this->setupUi(this);
 
+  m_Slider->setOrientation(Qt::Horizontal);
+  m_Slider->setMinimum(0);
+  m_Slider->setMaximum(0);
+  m_Slider->setValue(0);
+  m_Slider->setSingleStep(1);
+  m_Slider->setPageStep(10);
+
+  m_SpinBox->setMinimum( 0 );
+  m_SpinBox->setMaximum(0);
+  m_SpinBox->setValue(0);
+  m_SpinBox->setDecimals(0);
+  m_SpinBox->setSingleStep(1);
+
+  this->connect(m_Slider, SIGNAL(valueChanged(double)), SLOT(slider_valueChanged(double)));
+  this->connect(m_SpinBox, SIGNAL(valueChanged(double)), SLOT(spinBox_valueChanged(double)));
+
   // this avoids trying to use m_Stepper until it is set to something != NULL
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = true;
@@ -33,6 +49,7 @@ QmitkSliderNavigatorWidget::QmitkSliderNavigatorWidget(QWidget *parent, Qt::Wind
   m_HasLabels = false;
   m_HasLabelUnit = true;
   m_InverseDirection = false;
+  m_InvertedControls = false;
 }
 
 void QmitkSliderNavigatorWidget::Refetch()
@@ -41,26 +58,34 @@ void QmitkSliderNavigatorWidget::Refetch()
   {
     m_InRefetch = true;
 
-    m_Slider->setMinimum(0);
-    m_Slider->setMaximum(m_Stepper->GetSteps() - 1);
-    if (m_InverseDirection)
+    if (m_Stepper->GetSteps() == 0)
     {
-      m_Slider->setValue(m_Stepper->GetSteps() - 1 - m_Stepper->GetPos());
+      m_Slider->setMaximum(0);
+      m_Slider->setValue(0);
+      m_SpinBox->setMaximum(0);
+      m_SpinBox->setValue(0);
     }
     else
     {
-      m_Slider->setValue(m_Stepper->GetPos());
-    }
+      m_Slider->setMaximum(m_Stepper->GetSteps() - 1);
+      if (m_InverseDirection)
+      {
+        m_Slider->setValue(m_Stepper->GetSteps() - 1 - m_Stepper->GetPos());
+      }
+      else
+      {
+        m_Slider->setValue(m_Stepper->GetPos());
+      }
 
-    m_SpinBox->setMinimum(0);
-    m_SpinBox->setMaximum(m_Stepper->GetSteps() - 1);
-    if (m_InverseDirection)
-    {
-      m_SpinBox->setValue(m_Stepper->GetSteps() - 1 - m_Stepper->GetPos());
-    }
-    else
-    {
-      m_SpinBox->setValue(m_Stepper->GetPos());
+      m_SpinBox->setMaximum(m_Stepper->GetSteps() - 1);
+      if (m_InverseDirection)
+      {
+        m_SpinBox->setValue(m_Stepper->GetSteps() - 1 - m_Stepper->GetPos());
+      }
+      else
+      {
+        m_SpinBox->setValue(m_Stepper->GetPos());
+      }
     }
 
     if (m_Stepper->HasRange() && m_HasLabels)
@@ -107,7 +132,8 @@ void QmitkSliderNavigatorWidget::SetStepper(mitk::Stepper *stepper)
   m_InRefetch = (stepper == nullptr);
 }
 
-void QmitkSliderNavigatorWidget::slider_valueChanged(int)
+
+void QmitkSliderNavigatorWidget::slider_valueChanged(double)
 {
   if (!m_InRefetch)
   {
@@ -224,7 +250,7 @@ void QmitkSliderNavigatorWidget::SetLabels()
   m_SliderLabelRight->setText(maxText);
 }
 
-void QmitkSliderNavigatorWidget::spinBox_valueChanged(int)
+void QmitkSliderNavigatorWidget::spinBox_valueChanged(double)
 {
   if (!m_InRefetch)
   {
@@ -253,7 +279,33 @@ void QmitkSliderNavigatorWidget::SetPos(int val)
   }
 }
 
+bool QmitkSliderNavigatorWidget::GetInverseDirection() const
+{
+  return m_InverseDirection;
+}
+
 void QmitkSliderNavigatorWidget::SetInverseDirection(bool inverseDirection)
 {
-  m_InverseDirection = inverseDirection;
+  if (inverseDirection != m_InverseDirection)
+  {
+    m_InverseDirection = inverseDirection;
+    this->Refetch();
+  }
 }
+
+bool QmitkSliderNavigatorWidget::GetInvertedControls() const
+{
+  return m_InvertedControls;
+}
+
+void QmitkSliderNavigatorWidget::SetInvertedControls(bool invertedControls)
+{
+  if (invertedControls != m_InvertedControls)
+  {
+    m_InvertedControls = invertedControls;
+    m_Slider->setInvertedAppearance(invertedControls);
+    m_Slider->setInvertedControls(invertedControls);
+    m_SpinBox->setInvertedControls(invertedControls);
+  }
+}
+

@@ -27,7 +27,7 @@ namespace mitk
 
     private:
       int m_Mode;
-      int m_CurrentRow;
+      std::size_t m_CurrentRow;
       int m_CurrentElement;
       std::string m_Separator;
       std::ofstream m_Output;

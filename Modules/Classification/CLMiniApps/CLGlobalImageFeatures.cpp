@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version: "<< 1.10;
+  MITK_INFO << "Version:  1.10";
 
   //bool useCooc = parsedArgs.count("cooccurence");
 
@@ -438,7 +438,7 @@ int main(int argc, char* argv[])
   std::vector<mitk::Image::Pointer> maskVector;
   std::vector<mitk::Image::Pointer> maskNoNaNVector;
 
-  if (parsedArgs.count("slice-wise"))
+  if ((parsedArgs.count("slice-wise")) && image->GetDimension() > 2)
   {
     MITK_INFO << "Enabled slice-wise";
     sliceWise = true;

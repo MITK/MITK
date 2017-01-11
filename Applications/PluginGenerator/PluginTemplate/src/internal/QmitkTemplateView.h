@@ -1,7 +1,7 @@
 $(license)
 
-#ifndef $(view - file - name) _h
-#define $(view - file - name) _h
+#ifndef $(view-file-name)_h
+#define $(view-file-name)_h
 
 #include <berryISelectionListener.h>
 
@@ -17,7 +17,7 @@ $(license)
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
-class $(view - class - name) : public QmitkAbstractView
+class $(view-class-name) : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -40,7 +40,7 @@ protected:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  Ui::$(view - file - name) Controls m_Controls;
+  Ui::$(view-file-name)Controls m_Controls;
 };
 
 #endif // $(view-file-name)_h

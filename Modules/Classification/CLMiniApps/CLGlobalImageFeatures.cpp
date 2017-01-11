@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkITKImageImport.h>
 #include <mitkConvert2Dto3DImageFilter.h>
 
+#include <mitkCLResultWritter.h>
 
 #include <itkImageDuplicator.h>
 #include <itkImageRegionIterator.h>
@@ -288,13 +289,6 @@ int main(int argc, char* argv[])
 
   parser.addArgument("--", "-", mitkCommandLineParser::String, "---", "---", us::Any(), true);
 
-
-  //parser.addArgument("cooccurence", "cooc", mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features", us::Any());
-  //parser.addArgument("cooccurence2", "cooc2", mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features (new implementation)", us::Any());
-  //parser.addArgument("ngldm", "ngldm", mitkCommandLineParser::String, "Calculate Neighbouring grey level dependence based features", "Calculate Neighbouring grey level dependence based features", us::Any());
-  //parser.addArgument("volume","vol",mitkCommandLineParser::String, "Use Volume-Statistic", "calculates volume based features",us::Any());
-  //parser.addArgument("run-length","rl",mitkCommandLineParser::String, "Use Co-occurence matrix", "calculates Co-occurence based features",us::Any());
-  //parser.addArgument("first-order","fo",mitkCommandLineParser::String, "Use First Order Features", "calculates First order based features",us::Any());
   parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
   parser.addArgument("same-space", "sp", mitkCommandLineParser::String, "Bool", "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
@@ -306,8 +300,6 @@ int main(int argc, char* argv[])
   parser.addArgument("minimum-intensity", "minimum", mitkCommandLineParser::String, "Float", "Minimum intensity. If set, it is overwritten by more specific intensity minima", us::Any());
   parser.addArgument("maximum-intensity", "maximum", mitkCommandLineParser::String, "Float", "Maximum intensity. If set, it is overwritten by more specific intensity maxima", us::Any());
   parser.addArgument("bins", "bins", mitkCommandLineParser::String, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
-
-
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -374,18 +366,6 @@ int main(int argc, char* argv[])
     image = newImage;
   }
 
-  if (resampleMask)
-  {
-    mitk::Image::Pointer newMaskImage = mitk::Image::New();
-    AccessByItk_2(mask, ResampleMask, image, newMaskImage);
-    mask = newMaskImage;
-    if (parsedArgs.count("save-resample-mask"))
-    {
-      mitk::IOUtil::SaveImage(mask, parsedArgs["save-resample-mask"].ToString());
-    }
-  }
-
-
   bool fixDifferentSpaces = parsedArgs.count("same-space");
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))
   {
@@ -401,6 +381,18 @@ int main(int argc, char* argv[])
       return -1;
     }
   }
+
+  if (resampleMask)
+  {
+    mitk::Image::Pointer newMaskImage = mitk::Image::New();
+    AccessByItk_2(mask, ResampleMask, image, newMaskImage);
+    mask = newMaskImage;
+    if (parsedArgs.count("save-resample-mask"))
+    {
+      mitk::IOUtil::SaveImage(mask, parsedArgs["save-resample-mask"].ToString());
+    }
+  }
+
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetSpacing(), image->GetGeometry(0)->GetSpacing()))
   {
     MITK_INFO << "Not equal Sapcings";
@@ -495,10 +487,6 @@ int main(int argc, char* argv[])
     rlCalculator->SetBins(minimum);
   }
 
-
-
-
-
   firstOrderCalculator->SetParameter(parsedArgs);
   firstOrderCalculator->SetDirection(direction);
   volCalculator->SetParameter(parsedArgs);
@@ -512,7 +500,14 @@ int main(int argc, char* argv[])
   rlCalculator->SetParameter(parsedArgs);
   rlCalculator->SetDirection(direction);
 
-  std::ofstream output(parsedArgs["output"].ToString(), std::ios::app);
+  //std::ofstream output(parsedArgs["output"].ToString(), std::ios::app);
+  mitk::cl::FeatureResultWritter writer(parsedArgs["output"].ToString(), 1);
+  bool addDescription = parsedArgs.count("description");
+  std::string description = "";
+  if (addDescription)
+  {
+    description = parsedArgs["description"].ToString();
+  }
 
   mitk::Image::Pointer cImage = image;
   mitk::Image::Pointer cMask = mask;
@@ -545,48 +540,10 @@ int main(int argc, char* argv[])
     {
       std::cout << stats[i].first << " - " << stats[i].second << std::endl;
     }
-
-    if (parsedArgs.count("header") && (currentSlice == 0))
-    {
-      if (parsedArgs.count("description"))
-      {
-        output << "Description" << ";";
-      }
-      if (sliceWise)
-      {
-        output << "SliceNumber" << ";";
-      }
-      for (std::size_t i = 0; i < stats.size(); ++i)
-      {
-        output << stats[i].first << ";";
-      }
-      output << "EndOfMeasurement;";
-      output << std::endl;
-    }
-
-    if (parsedArgs.count("description"))
-    {
-      output << parsedArgs["description"].ToString() << ";";
-    }
-    if (sliceWise)
-    {
-      output << currentSlice << ";";
-    }
-    for (std::size_t i = 0; i < stats.size(); ++i)
-    {
-      output << stats[i].second << ";";
-    }
-    output << "EndOfMeasurement;";
-    output << std::endl;
+    writer.AddResult(description, currentSlice, stats, addDescription);
 
     ++currentSlice;
   }
-  if (sliceWise)
-  {
-    output << "EndOfFile" << std::endl;
-  }
-  output.close();
-
   return 0;
 }
 

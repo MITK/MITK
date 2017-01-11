@@ -75,9 +75,11 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double uncorrected_std_dev = std::sqrt((count - 1) / count * labelStatisticsImageFilter->GetVariance(1));
   double mean = labelStatisticsImageFilter->GetMean(1);
   auto histogram = labelStatisticsImageFilter->GetHistogram(1);
+  bool histogramIsCalculated = histogram;
+
   HIndexType index;
   index.SetSize(1);
-  double binWidth = histogram->GetBinMax(0, 0) - histogram->GetBinMin(0, 0);
+
 
   double uniformity = 0;
   double entropy = 0;
@@ -86,36 +88,49 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   double mean_absolut_deviation = 0;
   double skewness = 0;
   double sum_prob = 0;
+  double binWidth = 0;
+  double p10th = 0;
+  double p25th = 0;
+  double p75th = 0;
+  double p90th = 0;
+  double voxelValue = 0;
 
-  double p10th = histogram->Quantile(0,0.10);
-  double p25th = histogram->Quantile(0,0.25);
-  double p75th = histogram->Quantile(0,0.75);
-  double p90th = histogram->Quantile(0,0.90);
-
-  double Log2=log(2);
-  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+  if (histogramIsCalculated)
   {
-    index[0] = i;
-    double prob = histogram->GetFrequency(index);
-
-    if (prob < 0.1)
-      continue;
-
-    double voxelValue = histogram->GetBinMin(0, i) +binWidth * 0.5;
-
-    sum_prob += prob;
-    squared_sum += prob * voxelValue*voxelValue;
-
-    prob /= count;
-    mean_absolut_deviation += prob* std::abs(voxelValue - mean);
-
-    kurtosis +=prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-    skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
-
-    uniformity += prob*prob;
-    if (prob > 0)
+    binWidth = histogram->GetBinMax(0, 0) - histogram->GetBinMin(0, 0);
+    p10th = histogram->Quantile(0, 0.10);
+    p25th = histogram->Quantile(0, 0.25);
+    p75th = histogram->Quantile(0, 0.75);
+    p90th = histogram->Quantile(0, 0.90);
+  }
+  double Log2=log(2);
+  if (histogramIsCalculated)
+  {
+    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
     {
-      entropy += prob * std::log(prob) / Log2;
+      index[0] = i;
+      double prob = histogram->GetFrequency(index);
+
+      if (prob < 0.1)
+        continue;
+      if (histogramIsCalculated)
+      {
+        voxelValue = histogram->GetBinMin(0, i) + binWidth * 0.5;
+      }
+      sum_prob += prob;
+      squared_sum += prob * voxelValue*voxelValue;
+
+      prob /= count;
+      mean_absolut_deviation += prob* std::abs(voxelValue - mean);
+
+      kurtosis += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+      skewness += prob* (voxelValue - mean) * (voxelValue - mean) * (voxelValue - mean);
+
+      uniformity += prob*prob;
+      if (prob > 0)
+      {
+        entropy += prob * std::log(prob) / Log2;
+      }
     }
   }
   entropy = -entropy;
@@ -150,42 +165,45 @@ CalculateFirstOrderStatistics(itk::Image<TPixel, VImageDimension>* itkImage, mit
   featureList.push_back(std::make_pair("FirstOrder 90th Percentile",p90th));
   featureList.push_back(std::make_pair("FirstOrder Interquartile Range",(p75th - p25th)));
 
-  //Calculate the robus mean absolute deviation
+  //Calculate the robust mean absolute deviation
   //First, set all frequencies to 0 that are <10th or >90th percentile
-  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
-  {
-    index[0] = i;
-    if (histogram->GetBinMax(0, i) < p10th)
-    {
-      histogram->SetFrequencyOfIndex(index, 0);
-    }
-    else if (histogram->GetBinMin(0, i) > p90th)
-    {
-      histogram->SetFrequencyOfIndex(index, 0);
-    }
-  }
-
-  //Calculate the mean
   double meanRobust = 0.0;
-  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
-  {
-    index[0] = i;
-    meanRobust += histogram->GetFrequency(index) * 0.5 * (histogram->GetBinMin(0,i) + histogram->GetBinMax(0,i));
-  }
-  meanRobust = meanRobust / histogram->GetTotalFrequency();
   double robustMeanAbsoluteDeviation = 0.0;
-  for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+  if (histogramIsCalculated)
   {
-    index[0] = i;
-    robustMeanAbsoluteDeviation += std::abs(histogram->GetFrequency(index) *
-                                            ( (0.5 * (histogram->GetBinMin(0,i) + histogram->GetBinMax(0,i)))
-                                              - meanRobust
-                                              ));
-  }
-  robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
+    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+    {
+      index[0] = i;
+      if (histogram->GetBinMax(0, i) < p10th)
+      {
+        histogram->SetFrequencyOfIndex(index, 0);
+      }
+      else if (histogram->GetBinMin(0, i) > p90th)
+      {
+        histogram->SetFrequencyOfIndex(index, 0);
+      }
+    }
 
+    //Calculate the mean
+    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+    {
+      index[0] = i;
+      meanRobust += histogram->GetFrequency(index) * 0.5 * (histogram->GetBinMin(0, i) + histogram->GetBinMax(0, i));
+    }
+    meanRobust = meanRobust / histogram->GetTotalFrequency();
+    for (int i = 0; i < (int)(histogram->GetSize(0)); ++i)
+    {
+      index[0] = i;
+      robustMeanAbsoluteDeviation += std::abs(histogram->GetFrequency(index) *
+        ((0.5 * (histogram->GetBinMin(0, i) + histogram->GetBinMax(0, i)))
+        - meanRobust
+        ));
+    }
+    robustMeanAbsoluteDeviation = robustMeanAbsoluteDeviation / histogram->GetTotalFrequency();
+  }
   featureList.push_back(std::make_pair("FirstOrder Robust Mean", meanRobust));
-  featureList.push_back(std::make_pair("FirstOrder Robust Mean Absolute Deviation",robustMeanAbsoluteDeviation));
+  featureList.push_back(std::make_pair("FirstOrder Robust Mean Absolute Deviation", robustMeanAbsoluteDeviation));
+
 
 }
 

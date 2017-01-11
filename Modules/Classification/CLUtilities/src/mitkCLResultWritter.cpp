@@ -14,7 +14,7 @@ mitk::cl::FeatureResultWritter::FeatureResultWritter(std::string file, int mode)
 
 mitk::cl::FeatureResultWritter::~FeatureResultWritter()
 {
-  for (int i = 0; i < m_List.size(); ++i)
+  for (std::size_t i = 0; i < m_List.size(); ++i)
   {
     m_Output << m_List[i] << std::endl;
   }

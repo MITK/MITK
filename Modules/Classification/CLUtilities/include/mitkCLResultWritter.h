@@ -23,7 +23,7 @@ namespace mitk
       void AddColumn(double value);
       void NewRow(std::string endName);
 
-      void AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader);
+      void AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription);
 
     private:
       int m_Mode;

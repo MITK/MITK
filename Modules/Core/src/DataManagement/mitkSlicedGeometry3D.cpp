@@ -48,6 +48,7 @@ mitk::SlicedGeometry3D::SlicedGeometry3D(const SlicedGeometry3D &other)
 
   if (m_EvenlySpaced)
   {
+    assert(!other.m_PlaneGeometries.empty() && "This may happen when you use one of the old Initialize methods, which had a bool parameter that is implicitly casted to the number of slices now.");
     PlaneGeometry::Pointer geometry = other.m_PlaneGeometries[0]->Clone();
     assert(geometry.IsNotNull());
     SetPlaneGeometry(geometry, 0);

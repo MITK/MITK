@@ -283,6 +283,7 @@ int mitkImageTest(int argc, char *argv[])
   mitk::PlaneGeometry::Pointer planegeometry = mitk::PlaneGeometry::New();
   planegeometry->InitializeStandardPlane(100, 100, right, bottom, &spacing);
   planegeometry->SetOrigin(origin);
+  planegeometry->SetImageGeometry(true);
 
   // Testing Initialize(const mitk::PixelType& type, const mitk::Geometry3D& geometry, unsigned int slices) with
   // PlaneGeometry and GetData(): ";

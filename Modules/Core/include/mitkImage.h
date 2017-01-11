@@ -307,10 +307,18 @@ namespace mitk
     //## PlaneGeometry and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
     //## The spacing is calculated from the PlaneGeometry.
     //## \sa SlicedGeometry3D::InitializeEvenlySpaced
+    //## \deprecatedSince{2016_11} Use a left-handed or right-handed PlaneGeometry to define the
+    //## direction of the image stack instead of the flipped parameter
+    DEPRECATED(virtual void Initialize(const mitk::PixelType &type,
+                            int sDim,
+                            const mitk::PlaneGeometry &geometry2d,
+                            bool flipped,
+                            unsigned int channels = 1,
+                            int tDim = 1));
+
     virtual void Initialize(const mitk::PixelType &type,
                             int sDim,
                             const mitk::PlaneGeometry &geometry2d,
-                            bool flipped = false,
                             unsigned int channels = 1,
                             int tDim = 1);
 

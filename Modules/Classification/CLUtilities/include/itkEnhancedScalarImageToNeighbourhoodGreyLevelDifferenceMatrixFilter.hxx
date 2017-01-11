@@ -74,7 +74,7 @@ EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter<TImageType, TH
   output->SetMeasurementVectorSize( measurementVectorSize );
 
   m_siMatrix = new double[m_NumberOfBinsPerAxis];
-  for(int i = 0; i < m_NumberOfBinsPerAxis; i++)
+  for(unsigned int i = 0; i < m_NumberOfBinsPerAxis; i++)
   {
     m_siMatrix[i] = 0;
   }
@@ -107,7 +107,7 @@ EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceMatrixFilter<TImageType, TH
   OffsetVectorPointer offsetVector = OffsetVector::New();
   typename OffsetVector::ConstIterator offsets;
   //MITK_WARN << "We have " << this->GetOffsets()->size() << " offsets!";
-  for( int i = 0; i < _offsets.size(); i++)
+  for( std::size_t i = 0; i < _offsets.size(); i++)
   {
   offsetVector->push_back(_offsets[i]);
   auto k = _offsets[i];

@@ -304,7 +304,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   {
     offset = hood.GetOffset(d);
     bool useOffset = true;
-    for (int i = 0; i < VImageDimension; ++i)
+    for (unsigned int i = 0; i < VImageDimension; ++i)
     {
       offset[i] *= config.range;
       if (config.direction == i + 2 && offset[i] != 0)
@@ -328,7 +328,7 @@ CalculateCoocurenceFeatures(itk::Image<TPixel, VImageDimension>* itkImage, mitk:
   std::vector<mitk::CoocurenceMatrixFeatures> resultVector;
   mitk::CoocurenceMatrixHolder holderOverall(rangeMin, rangeMax, numberOfBins);
   mitk::CoocurenceMatrixFeatures overallFeature;
-  for (int i = 0; i < offsetVector.size(); ++i)
+  for (std::size_t i = 0; i < offsetVector.size(); ++i)
   {
     if (config.direction > 1)
     {

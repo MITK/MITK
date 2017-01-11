@@ -96,11 +96,11 @@ void
     auto offset = iterator.GetOffset(i);
     double deltaS = 1;
     int nonZeros = 0;
-    for (int j = 0; j < VImageDimension; ++j)
+    for (unsigned int j = 0; j < VImageDimension; ++j)
     {
       if (offset[j] != 0 && nonZeros == 0)
       {
-        for (int k = 0; k < VImageDimension; ++k)
+        for (unsigned int k = 0; k < VImageDimension; ++k)
         {
           if (k != j)
             deltaS *= mask->GetSpacing()[k];

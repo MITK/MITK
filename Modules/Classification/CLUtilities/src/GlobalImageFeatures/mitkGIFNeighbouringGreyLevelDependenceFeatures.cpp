@@ -61,7 +61,7 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
                     itk::Image<unsigned char, VImageDimension>* mask,
                     int alpha,
                     int range,
-                    int direction,
+                    unsigned int direction,
                     mitk::NGLDMMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
@@ -104,7 +104,7 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
       continue;
     }
 
-    for (int position = 0; position < iterSize; ++position)
+    for (unsigned int position = 0; position < iterSize; ++position)
     {
       if ((position == center) ||
          ( ! region.IsInside(maskIter.GetIndex(position))))

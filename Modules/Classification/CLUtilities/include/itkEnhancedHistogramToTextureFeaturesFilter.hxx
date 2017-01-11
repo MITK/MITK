@@ -277,10 +277,10 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
   std::vector<double> pj_margins;
 
   //pi.
-  for ( int i = 1; i <= inputHistogram->GetSize(0); i++ )
+  for ( std::size_t i = 1; i <= inputHistogram->GetSize(0); i++ )
   {
     double pi_tmp= 0.0;
-    for( int j = 1; j <= inputHistogram->GetSize(1); j++ )
+    for( std::size_t j = 1; j <= inputHistogram->GetSize(1); j++ )
     {
       globalIndex[0] = i;
       globalIndex[1] = j;
@@ -290,10 +290,10 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
   }
 
   //pj.
-  for ( int j = 1; j <= inputHistogram->GetSize(1); j++ )
+  for ( std::size_t j = 1; j <= inputHistogram->GetSize(1); j++ )
   {
     double pj_tmp= 0.0;
-    for( int i = 1; i <= inputHistogram->GetSize(0); i++ )
+    for( std::size_t i = 1; i <= inputHistogram->GetSize(0); i++ )
     {
       globalIndex[0] = i;
       globalIndex[1] = j;
@@ -305,7 +305,7 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
   //Calculate HX
   double hx = 0.0;
 
-  for ( int i = 0; i < inputHistogram->GetSize(0); i++ )
+  for ( std::size_t i = 0; i < inputHistogram->GetSize(0); i++ )
   {
     double pi_margin = pi_margins[i];
     hx -= ( pi_margin > 0.0001 ) ? pi_margin *std::log(pi_margin) / log2:0;
@@ -314,9 +314,9 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
   //Calculate HXY1
   double hxy1 = 0.0;
 
-  for ( int i = 0; i < inputHistogram->GetSize(0); i++ )
+  for ( std::size_t i = 0; i < inputHistogram->GetSize(0); i++ )
   {
-    for ( int j = 0; j < inputHistogram->GetSize(1); j++ )
+    for ( std::size_t j = 0; j < inputHistogram->GetSize(1); j++ )
     {
       globalIndex[0] = i;
       globalIndex[1] = j;
@@ -333,9 +333,9 @@ EnhancedHistogramToTextureFeaturesFilter< THistogram >::GenerateData(void)
   //Calculate HXY2
   double hxy2 = 0.0;
 
-  for ( int i = 0; i < inputHistogram->GetSize(0); i++ )
+  for ( std::size_t i = 0; i < inputHistogram->GetSize(0); i++ )
   {
-    for ( int j = 0; j < inputHistogram->GetSize(1); j++ )
+    for ( std::size_t j = 0; j < inputHistogram->GetSize(1); j++ )
     {
       globalIndex[0] = i;
       globalIndex[1] = j;

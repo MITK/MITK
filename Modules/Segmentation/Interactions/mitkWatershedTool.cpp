@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIOUtil.h"
 #include "mitkITKImageImport.h"
 #include "mitkImage.h"
+#include "mitkLabelSetImage.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageStatisticsHolder.h"
@@ -101,38 +102,12 @@ void mitk::WatershedTool::DoIt()
     // create and run itk filter pipeline
     AccessByItk_1(input.GetPointer(), ITKWatershed, output);
 
+    mitk::LabelSetImage::Pointer labelSetOutput = mitk::LabelSetImage::New();
+    labelSetOutput->InitializeByLabeledImage(output);
+
     // create a new datanode for output
     mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
-    dataNode->SetData(output);
-
-    // set properties of datanode
-    dataNode->SetProperty("binary", mitk::BoolProperty::New(false));
-    dataNode->SetProperty("name", mitk::StringProperty::New("Watershed Result"));
-    mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-    renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-    dataNode->SetProperty("Image Rendering.Mode", renderingMode);
-
-    // since we create a multi label image, define a vtk lookup table
-    mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-    mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-    vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-    lookupTable->SetHueRange(1.0, 0.0);
-    lookupTable->SetSaturationRange(1.0, 1.0);
-    lookupTable->SetValueRange(1.0, 1.0);
-    lookupTable->SetTableRange(-1.0, 1.0);
-    lookupTable->Build();
-    lookupTable->SetTableValue(1, 0, 0, 0);
-    lut->SetVtkLookupTable(lookupTable);
-    prop->SetLookupTable(lut);
-    dataNode->SetProperty("LookupTable", prop);
-
-    // make the levelwindow fit to right values
-    mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-    mitk::LevelWindow levelwindow;
-    levelwindow.SetRangeMinMax(0, output->GetStatistics()->GetScalarValueMax());
-    levWinProp->SetLevelWindow(levelwindow);
-    dataNode->SetProperty("levelwindow", levWinProp);
-    dataNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+    dataNode->SetData(labelSetOutput);
 
     // set name of data node
     std::string name = referenceData->GetName() + "_Watershed";

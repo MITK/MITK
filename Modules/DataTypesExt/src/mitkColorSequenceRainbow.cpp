@@ -29,8 +29,7 @@ namespace mitk
   ColorSequenceRainbow::~ColorSequenceRainbow() {} // end of destructor
   Color ColorSequenceRainbow::GetNextColor()
   {
-    m_Color = m_ColorList[m_ColorIndex];
-    if (m_ColorIndex < m_ColorList.size())
+    if (m_ColorIndex < (m_ColorList.size() - 1))
     {
       m_ColorIndex++;
     }
@@ -38,6 +37,7 @@ namespace mitk
     {
       m_ColorIndex = 0;
     }
+    m_Color = m_ColorList[m_ColorIndex];
     return m_Color;
   } // end of GetNextMitkColor()
 
@@ -52,7 +52,7 @@ namespace mitk
     magenta.Set(1.0, 0.0, 1.0);
     cyan.Set(0.0, 1.0, 1.0);
     orange.Set(1.0, 0.6, 0.0);
-    // m_ColorList.push_back(defaultColor);
+    m_ColorList.push_back(defaultColor);
     m_ColorList.push_back(red);
     m_ColorList.push_back(yellow);
     m_ColorList.push_back(blue);
@@ -60,8 +60,6 @@ namespace mitk
     m_ColorList.push_back(magenta);
     m_ColorList.push_back(cyan);
     m_ColorList.push_back(orange);
-    m_ColorList.push_back(defaultColor);
-
   } // end of ColorList
 
   void ColorSequenceRainbow::GoToBegin() { m_ColorIndex = 0; }

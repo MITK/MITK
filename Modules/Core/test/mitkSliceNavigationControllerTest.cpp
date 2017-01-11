@@ -289,11 +289,11 @@ int testReorientPlanes()
   // Create SlicedGeometry3D out of planeGeometry
   mitk::SlicedGeometry3D::Pointer slicedgeometry1 = mitk::SlicedGeometry3D::New();
   unsigned int numSlices = 20;
-  slicedgeometry1->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+  slicedgeometry1->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices);
 
   // Create another slicedgeo which will be rotated
   mitk::SlicedGeometry3D::Pointer slicedgeometry2 = mitk::SlicedGeometry3D::New();
-  slicedgeometry2->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+  slicedgeometry2->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices);
 
   // Create  geo3D as reference
   mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
@@ -445,11 +445,11 @@ int testRestorePlanePostionOperation()
   // Create SlicedGeometry3D out of planeGeometry
   mitk::SlicedGeometry3D::Pointer slicedgeometry1 = mitk::SlicedGeometry3D::New();
   unsigned int numSlices = 300;
-  slicedgeometry1->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+  slicedgeometry1->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices);
 
   // Create another slicedgeo which will be rotated
   mitk::SlicedGeometry3D::Pointer slicedgeometry2 = mitk::SlicedGeometry3D::New();
-  slicedgeometry2->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+  slicedgeometry2->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices);
 
   // Create  geo3D as reference
   mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
@@ -574,7 +574,7 @@ int mitkSliceNavigationControllerTest(int /*argc*/, char * /*argv*/ [])
   std::cout << "Creating and initializing a SlicedGeometry3D with the PlaneGeometry: ";
   mitk::SlicedGeometry3D::Pointer slicedgeometry = mitk::SlicedGeometry3D::New();
   unsigned int numSlices = 5;
-  slicedgeometry->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices, false);
+  slicedgeometry->InitializeEvenlySpaced(planegeometry, thicknessInMM, numSlices);
   std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Creating a Geometry3D with the same extent as the SlicedGeometry3D: ";

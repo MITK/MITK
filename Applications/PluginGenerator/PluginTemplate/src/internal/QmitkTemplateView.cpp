@@ -13,21 +13,21 @@ $(license)
 // mitk image
 #include <mitkImage.h>
 
-const std::string $(view - class - name)::VIEW_ID = "$(view-id)";
+const std::string $(view-class-name)::VIEW_ID = "$(view-id)";
 
-void $(view - class - name)::SetFocus()
+void $(view-class-name)::SetFocus()
 {
   m_Controls.buttonPerformImageProcessing->setFocus();
 }
 
-void $(view - class - name)::CreateQtPartControl(QWidget *parent)
+void $(view-class-name)::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.buttonPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()));
 }
 
-void $(view - class - name)::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
+void $(view-class-name)::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
                                                 const QList<mitk::DataNode::Pointer> &nodes)
 {
   // iterate all selected objects, adjust warning visibility
@@ -45,7 +45,7 @@ void $(view - class - name)::OnSelectionChanged(berry::IWorkbenchPart::Pointer /
   m_Controls.buttonPerformImageProcessing->setEnabled(false);
 }
 
-void $(view - class - name)::DoImageProcessing()
+void $(view-class-name)::DoImageProcessing()
 {
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty())

@@ -62,7 +62,7 @@ private:
   // private test members that are initialized by setUp()
   mitk::PlaneGeometry::Pointer planegeometry;
   mitk::Point3D origin;
-  mitk::Vector3D right, bottom, normal;
+  mitk::Vector3D right, bottom, normal, spacing;
   mitk::ScalarType width, height;
   mitk::ScalarType widthInMM, heightInMM, thicknessInMM;
 
@@ -79,9 +79,11 @@ public:
     mitk::FillVector3D(right, widthInMM, 0, 0);
     mitk::FillVector3D(bottom, 0, heightInMM, 0);
     mitk::FillVector3D(normal, 0, 0, thicknessInMM);
+    mitk::FillVector3D(spacing, 1.0, 1.0, thicknessInMM);
 
-    planegeometry->InitializeStandardPlane(right.GetVnlVector(), bottom.GetVnlVector());
+    planegeometry->InitializeStandardPlane(right, bottom);
     planegeometry->SetOrigin(origin);
+    planegeometry->SetSpacing(spacing);
   }
 
   void tearDown() override {}
@@ -660,9 +662,7 @@ public:
   void TestSaggitalInitialization()
   {
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
-
-    mitk::PlaneGeometry::Pointer clonedplanegeometry =
-      dynamic_cast<mitk::PlaneGeometry *>(planegeometry->Clone().GetPointer());
+    mitk::PlaneGeometry::Pointer clonedplanegeometry = planegeometry->Clone();
 
     // Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Sagittal, zPosition = 0, frontside=true):
     planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Sagittal);
@@ -747,7 +747,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of backsidedly, axially initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), -bottom, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of backsidedly, axially initialized version: ",
-                           mitk::Equal(planegeometry->GetAxisVector(2), -normal, testEps));
+                           mitk::Equal(planegeometry->GetAxisVector(2), normal, testEps)); // T22254: Flipped sign
 
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
   }
@@ -799,7 +799,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of frontally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of frontally initialized version: ",
-                           mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps));
+                           mitk::Equal(planegeometry->GetAxisVector(2), -newnormal, testEps)); // T22254: Flipped sign
 
     mappingTests2D(planegeometry, width, 1, widthInMM, thicknessInMM, origin, newright, newbottom);
 
@@ -834,7 +834,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
-                           mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps));
+                           mitk::Equal(planegeometry->GetAxisVector(2), -newnormal, testEps)); // T22254: Flipped sign
 
     mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
 
@@ -870,7 +870,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
     CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
-                           mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps));
+                           mitk::Equal(planegeometry->GetAxisVector(2), -newnormal, testEps)); // T22254: Flipped sign
     mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
   }
 

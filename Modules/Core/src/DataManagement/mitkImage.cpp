@@ -996,15 +996,24 @@ void mitk::Image::Initialize(const mitk::PixelType &type,
     }*/
 }
 
+void mitk::Image::Initialize(const mitk::PixelType &,
+                             int,
+                             const mitk::PlaneGeometry &,
+                             bool,
+                             unsigned int,
+                             int)
+{
+  mitkThrow() << "Use this method without the flipped parameter (direction is specified by the handedness of the PlaneGeometry instead).";
+}
+
 void mitk::Image::Initialize(const mitk::PixelType &type,
                              int sDim,
                              const mitk::PlaneGeometry &geometry2d,
-                             bool flipped,
                              unsigned int channels,
                              int tDim)
 {
   SlicedGeometry3D::Pointer slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->InitializeEvenlySpaced(static_cast<PlaneGeometry *>(geometry2d.Clone().GetPointer()), sDim, flipped);
+  slicedGeometry->InitializeEvenlySpaced(geometry2d.Clone(), sDim);
   Initialize(type, *slicedGeometry, channels, tDim);
 }
 

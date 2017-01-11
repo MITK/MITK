@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <itkSpatialOrientationAdapter.h>
+
 #include "mitkSlicedGeometry3D.h"
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkApplyTransformMatrixOperation.h"
@@ -152,16 +154,15 @@ void mitk::SlicedGeometry3D::InitializeSlicedGeometry(unsigned int slices)
   m_DirectionVector.Fill(0);
 }
 
-void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D, unsigned int slices, bool flipped)
+void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D, unsigned int slices)
 {
   assert(geometry2D != nullptr);
-  this->InitializeEvenlySpaced(geometry2D, geometry2D->GetExtentInMM(2) / geometry2D->GetExtent(2), slices, flipped);
+  this->InitializeEvenlySpaced(geometry2D, geometry2D->GetExtentInMM(2) / geometry2D->GetExtent(2), slices);
 }
 
 void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometry2D,
                                                     mitk::ScalarType zSpacing,
-                                                    unsigned int slices,
-                                                    bool flipped)
+                                                    unsigned int slices)
 {
   assert(geometry2D != nullptr);
   assert(geometry2D->GetExtent(0) > 0);
@@ -184,32 +185,18 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometr
   directionVector.Normalize();
   directionVector *= zSpacing;
 
-  if (flipped == false)
-  {
-    // Normally we should use the following four lines to create a copy of
-    // the transform contrained in geometry2D, because it may not be changed
-    // by us. But we know that SetSpacing creates a new transform without
-    // changing the old (coming from geometry2D), so we can use the fifth
-    // line instead. We check this at (**).
-    //
-    // AffineTransform3D::Pointer transform = AffineTransform3D::New();
-    // transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
-    // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
-    // SetIndexToWorldTransform(transform);
+  // Normally we should use the following four lines to create a copy of
+  // the transform contrained in geometry2D, because it may not be changed
+  // by us. But we know that SetSpacing creates a new transform without
+  // changing the old (coming from geometry2D), so we can use the fifth
+  // line instead. We check this at (**).
+  //
+  // AffineTransform3D::Pointer transform = AffineTransform3D::New();
+  // transform->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
+  // transform->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
+  // SetIndexToWorldTransform(transform);
 
-    this->SetIndexToWorldTransform(const_cast<AffineTransform3D *>(geometry2D->GetIndexToWorldTransform()));
-  }
-  else
-  {
-    directionVector *= -1.0;
-    this->SetIndexToWorldTransform(AffineTransform3D::New());
-    this->GetIndexToWorldTransform()->SetMatrix(geometry2D->GetIndexToWorldTransform()->GetMatrix());
-
-    AffineTransform3D::OutputVectorType scaleVector;
-    FillVector3D(scaleVector, 1.0, 1.0, -1.0);
-    this->GetIndexToWorldTransform()->Scale(scaleVector, true);
-    this->GetIndexToWorldTransform()->SetOffset(geometry2D->GetIndexToWorldTransform()->GetOffset());
-  }
+  this->SetIndexToWorldTransform(const_cast<AffineTransform3D *>(geometry2D->GetIndexToWorldTransform()));
 
   mitk::Vector3D spacing;
   FillVector3D(spacing, geometry2D->GetExtentInMM(0) / bounds[1], geometry2D->GetExtentInMM(1) / bounds[3], zSpacing);
@@ -241,60 +228,60 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
   PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   planeGeometry->InitializeStandardPlane(geometry3D, top, planeorientation, frontside, rotated);
 
-  ScalarType viewSpacing = 1;
-  unsigned int slices = 1;
+  int worldAxis =
+      planeorientation == PlaneGeometry::Sagittal ? 0 :
+      planeorientation == PlaneGeometry::Frontal  ? 1 : 2;
 
-  switch (planeorientation)
-  {
-    case PlaneGeometry::None:
-      break;
+  // Inspired by:
+  // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3
 
-    case PlaneGeometry::Axial:
-      viewSpacing = geometry3D->GetSpacing()[2];
-      slices = (unsigned int)geometry3D->GetExtent(2);
-      break;
+  mitk::AffineTransform3D::MatrixType matrix = geometry3D->GetIndexToWorldTransform()->GetMatrix();
+  matrix.GetVnlMatrix().normalize_columns();
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
 
-    case PlaneGeometry::Frontal:
-      viewSpacing = geometry3D->GetSpacing()[1];
-      slices = (unsigned int)geometry3D->GetExtent(1);
-      break;
+  int dominantAxis = itk::Function::Max3(
+      inverseMatrix[0][worldAxis],
+      inverseMatrix[1][worldAxis],
+      inverseMatrix[2][worldAxis]);
 
-    case PlaneGeometry::Sagittal:
-      viewSpacing = geometry3D->GetSpacing()[0];
-      slices = (unsigned int)geometry3D->GetExtent(0);
-      break;
+  ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
+  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis));
 
-    default:
-      itkExceptionMacro("unknown PlaneOrientation");
-  }
+#ifndef NDEBUG
+  int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);
 
-  mitk::Vector3D normal = this->AdjustNormal(planeGeometry->GetNormal());
+  /// The normal vector of an imaginary plane that points from the world origin (bottom left back
+  /// corner or the world, with the lowest physical coordinates) towards the inside of the volume,
+  /// along the renderer axis. Length is the slice thickness.
 
-  ScalarType directedExtent = std::abs(m_ReferenceGeometry->GetExtentInMM(0) * normal[0]) +
-                              std::abs(m_ReferenceGeometry->GetExtentInMM(1) * normal[1]) +
-                              std::abs(m_ReferenceGeometry->GetExtentInMM(2) * normal[2]);
+  Vector3D worldPlaneNormal = inverseMatrix.get_row(dominantAxis) * (upDirection * viewSpacing);
 
-  if (directedExtent >= viewSpacing)
-  {
-    slices = static_cast<int>(directedExtent / viewSpacing + 0.5);
-  }
-  else
-  {
-    slices = 1;
-  }
+  /// The normal of the standard plane geometry just created.
+  Vector3D standardPlaneNormal = planeGeometry->GetNormal();
 
-  bool flipped = (top == false);
+  /// The standard plane must be parallel to the 'world plane'. The normal of the standard plane
+  /// must point against the world plane if and only if 'top' is 'false'. The length of the
+  /// standard plane normal must be equal to the slice thickness.
+  assert((standardPlaneNormal - (top ? 1.0 : -1.0) * worldPlaneNormal).GetSquaredNorm() < 0.000001);
+#endif
 
-  if (frontside == false)
-  {
-    flipped = !flipped;
-  }
-  if (planeorientation == PlaneGeometry::Frontal)
-  {
-    flipped = !flipped;
-  }
+  this->InitializeEvenlySpaced(planeGeometry, viewSpacing, slices);
 
-  this->InitializeEvenlySpaced(planeGeometry, viewSpacing, slices, flipped);
+#ifndef NDEBUG
+  /// The standard plane normal and the z axis vector of the sliced geometry must point in
+  /// the same direction.
+  Vector3D zAxisVector = this->GetAxisVector(2);
+  Vector3D upscaledStandardPlaneNormal = standardPlaneNormal;
+  upscaledStandardPlaneNormal *= slices;
+  assert((zAxisVector - upscaledStandardPlaneNormal).GetSquaredNorm() < 0.000001);
+
+  /// You can use this test is to check the handedness of the coordinate system of the current
+  /// geometry. In principle, you can use either left- or right-handed coordinate systems, but
+  /// you normally want it to be consistent, that is the handedness should be the same across
+  /// the renderers of the same viewer.
+//  ScalarType det = vnl_det(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix());
+//  MITK_DEBUG << "world axis: " << worldAxis << (det > 0 ? " ; right-handed" : " ; left-handed");
+#endif
 }
 
 void mitk::SlicedGeometry3D::ReinitializePlanes(const Point3D &center, const Point3D &referencePoint)

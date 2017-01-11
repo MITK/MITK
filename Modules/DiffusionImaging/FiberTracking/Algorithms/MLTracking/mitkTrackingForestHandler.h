@@ -146,7 +146,7 @@ protected:
     bool                                                        m_BidirectionalFiberSampling;
     bool                                                        m_ZeroDirWmFeatures;
     int                                                         m_MaxNumWmSamples;
-    std::vector< bool >                                         m_SampleUsage;
+    std::vector< std::vector< bool > >                          m_SampleUsage;
 };
 
 }

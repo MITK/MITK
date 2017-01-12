@@ -14,9 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// render window manager module
 #include "mitkRenderWindowLayerUtilities.h"
 
-// mitk
+// mitk core
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -51,7 +52,7 @@ RenderWindowLayerUtilities::LayerStack RenderWindowLayerUtilities::GetLayerStack
     bool layerFound = dataNode->GetIntProperty("layer", layer, renderer);
     if (layerFound)
     {
-      if (layer != 0 || withBaseNode)
+      if (BASE_LAYER_INDEX != layer|| withBaseNode)
       {
         // data node is not on the base layer or the base layer should be included anyway
         stackedLayers.insert(std::make_pair(layer, dataNode));

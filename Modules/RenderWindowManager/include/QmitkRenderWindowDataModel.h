@@ -17,11 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKRENDERWINDOWDATAMODEL_H
 #define QMITKRENDERWINDOWDATAMODEL_H
 
-// render window manager
+// render window manager module
 #include "MitkRenderWindowManagerExports.h"
 #include "mitkRenderWindowLayerUtilities.h"
 
-//mitk
+//mitk core
 #include <mitkBaseRenderer.h>
 #include <mitkDataStorage.h>
 
@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QAbstractTableModel>
 
 /*
-* @brief This class extends the 'QAbstractItemModel' to meet the specific requirements of the QmitkRenderWindowDataModel.
+* @brief This class extends the 'QAbstractTableModel' to meet the specific requirements of the QmitkRenderWindowDataModel.
 */
 class MITKRENDERWINDOWMANAGER_EXPORT QmitkRenderWindowDataModel : public QAbstractTableModel
 {
@@ -38,7 +38,7 @@ class MITKRENDERWINDOWMANAGER_EXPORT QmitkRenderWindowDataModel : public QAbstra
 public:
 
   QmitkRenderWindowDataModel(QObject* parent = nullptr);
-  virtual ~QmitkRenderWindowDataModel();
+  ~QmitkRenderWindowDataModel();
 
   //////////////////////////////////////////////////////////////////////////
   /// overridden functions from QAbstractItemModel
@@ -53,7 +53,6 @@ public:
   /// end override
   /////////////////////////////////////////////////////////////////////////
 
-  // currently not needed (uses data storage of the layer controller (e.g. for call of GetLayerStack))
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
   void SetCurrentRenderer(std::string rendererName);
   void DataChanged(const mitk::DataNode* dataNode);

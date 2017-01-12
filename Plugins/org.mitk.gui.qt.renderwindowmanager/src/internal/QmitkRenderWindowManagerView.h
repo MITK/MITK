@@ -14,18 +14,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-
 #ifndef QMITKRENDERWINDOWMANAGERVIEW_H
 #define QMITKRENDERWINDOWMANAGERVIEW_H
 
 // render window manager plugin
 #include "ui_QmitkRenderWindowManagerControls.h"
 #include "QmitkLayerManagerAddLayerWidget.h"
+
 // render window manager module
 #include <mitkRenderWindowLayerController.h>
 #include <mitkRenderWindowViewDirectionController.h>
 #include <QmitkRenderWindowDataModel.h>
-#include "QmitkVisibilityDelegate.h"
+//#include <QmitkVisibilityDelegate.h>
 
 // blueberry
 #include <berryISelectionListener.h>

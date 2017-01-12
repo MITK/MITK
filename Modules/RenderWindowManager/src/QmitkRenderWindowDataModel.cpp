@@ -115,7 +115,7 @@ QVariant QmitkRenderWindowDataModel::headerData(int section, Qt::Orientation ori
 {
   if (Qt::Horizontal == orientation && Qt::DisplayRole == role)
   {
-    if (1 == section)
+    if (0 == section)
     {
       return QVariant("Visibility");
     }

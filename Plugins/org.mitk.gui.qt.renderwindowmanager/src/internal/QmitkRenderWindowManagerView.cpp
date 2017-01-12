@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 
-// mitk
+// mitk core
 #include <mitkBaseRenderer.h>
 
 // qt
@@ -62,6 +62,8 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   m_Controls.renderWindowTableView->setModel(m_RenderWindowDataModel.get());
   m_Controls.renderWindowTableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
   m_Controls.renderWindowTableView->horizontalHeader()->setStretchLastSection(true);
+  m_Controls.renderWindowTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+  m_Controls.renderWindowTableView->setSelectionMode(QAbstractItemView::SingleSelection);
   //m_VisibilityDelegate = new QmitkVisibilityDelegate(this);
   //m_Controls.renderWindowTableView->setItemDelegateForColumn(0, m_VisibilityDelegate);
 

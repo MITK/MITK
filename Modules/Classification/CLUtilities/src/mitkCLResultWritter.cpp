@@ -14,11 +14,11 @@ mitk::cl::FeatureResultWritter::FeatureResultWritter(std::string file, int mode)
 
 mitk::cl::FeatureResultWritter::~FeatureResultWritter()
 {
-  for (std::size_t i = 0; i < m_List.size(); ++i)
+  for (std::size_t i = 0; i < m_List.size()-1; ++i)
   {
     m_Output << m_List[i] << std::endl;
   }
-  m_Output << "EndOfFile" << std::endl;
+  //m_Output << "EndOfFile" << std::endl;
   m_Output.close();
 }
 

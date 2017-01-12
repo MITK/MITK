@@ -393,17 +393,20 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction*, Interac
         ScalarType averageValue(0);
         AccessFixedDimensionByItk_3(m_ReferenceSlice, GetNeighborhoodAverage, 2, indexInReferenceSlice2D, &averageValue, 1);
         m_SeedValue = averageValue;
-        MITK_DEBUG << "Seed value is " << m_SeedValue;
+        MITK_INFO << "Seed value is " << m_SeedValue;
 
         // Get level window settings
         LevelWindow lw(0, 500); // default window 0 to 500, can we do something smarter here?
         m_ToolManager->GetReferenceData(0)->GetLevelWindow(lw); // will fill lw if levelwindow property is present, otherwise won't touch it.
         ScalarType currentVisibleWindow = lw.GetWindow();
-        MITK_DEBUG << "Level window width is " << currentVisibleWindow;
+        MITK_INFO << "Level window width is " << currentVisibleWindow;
         m_InitialThresholds[0] = m_SeedValue - currentVisibleWindow / 20.0; // 20 is arbitrary (though works reasonably well), is there a better alternative (maybe option in preferences)?
         m_InitialThresholds[1] = m_SeedValue + currentVisibleWindow / 20.0;
         m_Thresholds[0] = m_InitialThresholds[0];
         m_Thresholds[1] = m_InitialThresholds[1];
+        MITK_INFO << "Initial threshold is " << m_InitialThresholds[0] << " and " << m_InitialThresholds[1];
+        
+        thresholdsChanged.Send(m_Thresholds[0], m_Thresholds[1]);
 
         // Perform region growing
         mitk::Image::Pointer resultImage = mitk::Image::New();
@@ -458,7 +461,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent
         // Moving the mouse up and down adjusts the width of the threshold window, moving it left and right shifts the threshold window
         m_Thresholds[0] = std::min<ScalarType>(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
         m_Thresholds[1] = std::max<ScalarType>(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-        MITK_DEBUG << "Screen difference X: " << m_ScreenXDifference;
+        MITK_INFO << "Screen difference : " << m_ScreenXDifference << " , " << m_ScreenYDifference;
 
         thresholdsChanged.Send(m_Thresholds[0], m_Thresholds[1]);
 

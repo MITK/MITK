@@ -322,7 +322,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version:  1.13";
+  MITK_INFO << "Version:  1.14";
 
   //bool useCooc = parsedArgs.count("cooccurence");
 

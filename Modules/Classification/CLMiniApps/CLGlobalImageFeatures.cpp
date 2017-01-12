@@ -43,6 +43,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
 
+#include <itkFileTools.h>
+#include <itksys/SystemTools.hxx>
+
 
 
 typedef itk::Image< double, 3 >                 FloatImageType;
@@ -319,7 +322,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version:  1.12";
+  MITK_INFO << "Version:  1.13";
 
   //bool useCooc = parsedArgs.count("cooccurence");
 
@@ -336,6 +339,13 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer tmpMask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
   image = tmpImage;
   mask = tmpMask;
+
+
+  std::string imageName = itksys::SystemTools::GetFilenameName(parsedArgs["image"].ToString());
+  std::string maskName = itksys::SystemTools::GetFilenameName(parsedArgs["mask"].ToString());
+  std::string folderName = itksys::SystemTools::GetFilenamePath(parsedArgs["image"].ToString());
+
+
 
   if ((image->GetDimension() != mask->GetDimension()))
   {
@@ -520,6 +530,13 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer cMask = mask;
   mitk::Image::Pointer cMaskNoNaN = maskNoNaN;
 
+  if (true)
+  {
+    writer.AddColumn("Patient");
+    writer.AddColumn("Image");
+    writer.AddColumn("Segmentation");
+  }
+
   while (imageToProcess)
   {
     if (sliceWise)
@@ -536,6 +553,7 @@ int main(int argc, char* argv[])
 
 
     mitk::AbstractGlobalImageFeature::FeatureListType stats;
+
     firstOrderCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
     volCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
     coocCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
@@ -546,6 +564,14 @@ int main(int argc, char* argv[])
     for (std::size_t i = 0; i < stats.size(); ++i)
     {
       std::cout << stats[i].first << " - " << stats[i].second << std::endl;
+    }
+
+    writer.AddHeader(description, currentSlice, stats, withHeader, addDescription);
+    if (true)
+    {
+      writer.AddColumn(folderName);
+      writer.AddColumn(imageName);
+      writer.AddColumn(maskName);
     }
     writer.AddResult(description, currentSlice, stats, withHeader, addDescription);
 

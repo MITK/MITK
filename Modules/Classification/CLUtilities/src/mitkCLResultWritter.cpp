@@ -66,22 +66,6 @@ void mitk::cl::FeatureResultWritter::NewRow(std::string endName) {
 
 void mitk::cl::FeatureResultWritter::AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription)
 {
-  if ((withHeader) && (m_CurrentElement == 0))
-  {
-    if (withDescription)
-    {
-      AddColumn("Description");
-    }
-    if (slice >= 0)
-    {
-      AddColumn("SliceNumber");
-    }
-    for (std::size_t i = 0; i < stats.size(); ++i)
-    {
-      AddColumn(stats[i].first);
-    }
-    NewRow("EndOfMeasurement");
-  }
 
   if (withDescription)
   {
@@ -99,4 +83,22 @@ void mitk::cl::FeatureResultWritter::AddResult(std::string desc, int slice, mitk
   ++m_CurrentElement;
 }
 
-
+void mitk::cl::FeatureResultWritter::AddHeader(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription)
+{
+  if ((withHeader) && (m_CurrentElement == 0))
+  {
+    if (withDescription)
+    {
+      AddColumn("Description");
+    }
+    if (slice >= 0)
+    {
+      AddColumn("SliceNumber");
+    }
+    for (std::size_t i = 0; i < stats.size(); ++i)
+    {
+      AddColumn(stats[i].first);
+    }
+    NewRow("EndOfMeasurement");
+  }
+}

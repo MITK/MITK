@@ -24,6 +24,7 @@ namespace mitk
       void NewRow(std::string endName);
 
       void AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription);
+      void AddHeader(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription);
 
     private:
       int m_Mode;

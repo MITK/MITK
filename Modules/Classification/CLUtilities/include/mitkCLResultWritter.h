@@ -23,8 +23,8 @@ namespace mitk
       void AddColumn(double value);
       void NewRow(std::string endName);
 
-      void AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription);
-      void AddHeader(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription);
+      void AddResult(std::string desc, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool , bool withDescription);
+      void AddHeader(std::string, int slice, mitk::AbstractGlobalImageFeature::FeatureListType stats, bool withHeader, bool withDescription);
 
     private:
       int m_Mode;

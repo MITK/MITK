@@ -17,13 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager module
 #include "mitkRenderWindowLayerController.h"
 
-// mitk core
-#include "mitkRenderingManager.h"
-
 mitk::RenderWindowLayerController::RenderWindowLayerController()
   : m_DataStorage(nullptr)
 {
-  SetControlledRenderer(RenderingManager::GetInstance()->GetAllRegisteredRenderWindows());
+  // nothing here
 }
 
 void mitk::RenderWindowLayerController::SetDataStorage(DataStorage::Pointer dataStorage)
@@ -35,20 +32,7 @@ void mitk::RenderWindowLayerController::SetDataStorage(DataStorage::Pointer data
   }
 }
 
-void mitk::RenderWindowLayerController::SetControlledRenderer(const RenderingManager::RenderWindowVector &renderWindows)
-{
-  BaseRenderer* baseRenderer = nullptr;
-  for (const auto &renderWindow : renderWindows)
-  {
-    baseRenderer = BaseRenderer::GetInstance(renderWindow);
-    if (nullptr != baseRenderer)
-    {
-      m_ControlledRenderer.push_back(baseRenderer);
-    }
-  }
-}
-
-void mitk::RenderWindowLayerController::SetControlledRenderer(RendererVector controlledRenderer)
+void mitk::RenderWindowLayerController::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
   if (m_ControlledRenderer != controlledRenderer)
   {

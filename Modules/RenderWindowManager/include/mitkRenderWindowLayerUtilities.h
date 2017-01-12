@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkRenderWindowManagerExports.h"
 
 // mitk core
+#include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
 
@@ -29,6 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 */
 namespace RenderWindowLayerUtilities
 {
+  typedef std::vector<mitk::BaseRenderer::ConstPointer> RendererVector;
   typedef std::map<int, mitk::DataNode::Pointer, std::greater<int>> LayerStack;
 
   /**

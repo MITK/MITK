@@ -1,18 +1,15 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkRenderWindowManagerView.cpp
-	QmitkLayerManagerAddLayerWidget.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkRenderWindowManagerControls.ui
-	src/internal/QmitkLayerManagerAddLayerControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
   src/internal/QmitkRenderWindowManagerView.h
-  src/internal/QmitkLayerManagerAddLayerWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -21,7 +18,6 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES 
-	resources/renderwindowmanager.qrc
 )
 
 foreach(file ${INTERNAL_CPP_FILES})

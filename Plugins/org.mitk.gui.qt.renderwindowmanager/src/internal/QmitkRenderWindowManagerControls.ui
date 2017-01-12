@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QmitkRenderWindowManager</string>
+   <string>Render window manager plugin</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -27,96 +27,8 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Render window overview</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTableView" name="renderWindowTableView"/>
-   </item>
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
-      <widget class="QPushButton" name="pushButtonMoveUp">
-       <property name="text">
-        <string>Move up</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QRadioButton" name="radioButtonAxial">
-       <property name="text">
-        <string>Axial</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QRadioButton" name="radioButtonCoronal">
-       <property name="text">
-        <string>Coronal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QRadioButton" name="radioButtonSagittal">
-       <property name="text">
-        <string>Sagittal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QPushButton" name="pushButtonMoveDown">
-       <property name="text">
-        <string>Move down</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QPushButton" name="pushButtonRemoveLayer">
-       <property name="text">
-        <string>Remove layer</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="pushButtonAddLayer">
-       <property name="text">
-        <string>Add Layer</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QPushButton" name="pushButtonSetAsBaseLayer">
-       <property name="text">
-        <string>Set as base layer</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QPushButton" name="pushButtonResetRenderer">
-       <property name="text">
-        <string>Reset render window</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="pushButtonClearRenderer">
-       <property name="text">
-        <string>Clear render window</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

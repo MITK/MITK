@@ -19,20 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // render window manager plugin
 #include "ui_QmitkRenderWindowManagerControls.h"
-#include "QmitkLayerManagerAddLayerWidget.h"
 
-// render window manager module
-#include <mitkRenderWindowLayerController.h>
-#include <mitkRenderWindowViewDirectionController.h>
-#include <QmitkRenderWindowDataModel.h>
-//#include <QmitkVisibilityDelegate.h>
+// render window manager UI module
+#include <QmitkRenderWindowManipulatorWidget.h>
 
 // blueberry
 #include <berryISelectionListener.h>
 
 // qt
 #include <QmitkAbstractView.h>
-#include <QStandardItemModel.h>
 
 /**
 * @brief RenderWindowManager
@@ -51,28 +46,22 @@ protected:
 
   virtual void CreateQtPartControl(QWidget* parent) override;
 
-  void SetUpConnections();
-
 private Q_SLOTS:
 
   /**
   * @brief called when the user changes the render window selection in the combo box
+  *
+  * @param renderWindowId   the text inside the combo box
   */
   void OnRenderWindowSelectionChanged(const QString &renderWindowId);
-
-  void ShowAddLayerWidget();
-  void AddLayer(mitk::DataNode* dataNode);
-  void RemoveLayer();
-  void SetAsBaseLayer();
-
-  void MoveLayer(const QString &direction);
-
-  void ResetRenderer();
-  void ClearRenderer();
-
-  void ChangeViewDirection(const QString &viewDirection);
+  /**
+  * @brief called when the 'AddLayer'-button of he render window manipulator widget has been pushed
+  */
+  void OnAddLayerButtonClicked();
 
 private:
+
+  void SetControlledRenderer();
 
   /**
   * @brief set each data node invisible in all render windows, as soon as the node is added to the data storage
@@ -83,10 +72,8 @@ private:
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
-  std::unique_ptr<QmitkRenderWindowDataModel> m_RenderWindowDataModel;
-  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
-  std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
-  QmitkLayerManagerAddLayerWidget* m_AddLayerWidget;
+  QmitkRenderWindowManipulatorWidget* m_RenderWindowManipulatorWidget;
+  RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
 };
 
 #endif // QMITKRENDERWINDOWMANAGERVIEW_H

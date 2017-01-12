@@ -29,30 +29,33 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   /**
+  * The RenderWindowLayerController is used to manipulate the 'layer', 'fixedLayer' and 'visible' property of a given data node.
+  * The 'layer' property is used to denote the layer level of a data node. Data from nodes on higher layer level are rendered
+  * on top of data from nodes on lower layer level. It can be changed using the 'MoveNode*'-functions.
   *
-  * Functions with 'const mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr
-  * these functions operate on all base renderer.
+  * To view the data of a data node only in a specific renderer, the "InsertLayerNode'-function should be used. It inserts the
+  * given node into the specified renderer and sets the corresponding properties.
+  * To hide the data in the common renderer view (all renderer), the 'HideDataNodeInAllRenderer'-function can be used.
+  * Inserting and showing a data node in a specific renderer / render window, will overwrite the properties of the common renderer view.
+  *
+  * For more information about the data node properties for specific renderer, see mitk::DataNode- and mitk::PropertyList-classes.
+  *
+  * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr
+  * these functions operate on all base renderer. Giving a specific base renderer will modify the node only for the given renderer.
   */
   class MITKRENDERWINDOWMANAGER_EXPORT RenderWindowLayerController
   {
   public:
-    typedef std::vector<BaseRenderer::ConstPointer> RendererVector;
 
     RenderWindowLayerController();
     /**
     * @brief Set the data storage on which to work.
     */
     void SetDataStorage(DataStorage::Pointer dataStorage);
-    DataStorage::Pointer GetDataStorage() { return m_DataStorage; };
-    /**
-    * @brief Set the controlled base renderer by specifying the corresponding render windows.
-    */
-    void SetControlledRenderer(const RenderingManager::RenderWindowVector &renderWindows);
     /**
     * @brief Set the controlled base renderer.
     */
-    void SetControlledRenderer(RendererVector controlledRenderer);
-    RendererVector GetControlledRenderer() { return m_ControlledRenderer; };
+    void SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
     // wrapper functions to modify the layer order / visibility of render window data
     /**
@@ -158,7 +161,7 @@ namespace mitk
     void InsertLayerNodeInternal(DataNode* dataNode, int layer, const BaseRenderer* renderer = nullptr);
 
     DataStorage::Pointer m_DataStorage;
-    RendererVector m_ControlledRenderer;
+    RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
   };
 
 } // namespace mitk

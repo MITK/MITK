@@ -55,6 +55,7 @@ public:
 
   void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
   void SetCurrentRenderer(std::string rendererName);
+  mitk::BaseRenderer* GetCurrentRenderer() const { return m_BaseRenderer.GetPointer(); }
   void DataChanged(const mitk::DataNode* dataNode);
 
 private:

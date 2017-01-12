@@ -15,21 +15,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRenderWindowViewDirectionController.h"
-#include "mitkRenderWindowLayerUtilities.h"
 
 // mitk
-#include <mitkRenderingManager.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 
 mitk::RenderWindowViewDirectionController::RenderWindowViewDirectionController()
   : m_DataStorage(nullptr)
-{
-  SetControlledRenderer(RenderingManager::GetInstance()->GetAllRegisteredRenderWindows());
-}
-
-mitk::RenderWindowViewDirectionController::~RenderWindowViewDirectionController()
 {
   // nothing here
 }
@@ -43,20 +36,7 @@ void mitk::RenderWindowViewDirectionController::SetDataStorage(DataStorage::Poin
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetControlledRenderer(const RenderingManager::RenderWindowVector &renderWindows)
-{
-  BaseRenderer* baseRenderer = nullptr;
-  for (const auto &renderWindow : renderWindows)
-  {
-    baseRenderer = BaseRenderer::GetInstance(renderWindow);
-    if (nullptr != baseRenderer)
-    {
-      m_ControlledRenderer.push_back(baseRenderer);
-    }
-  }
-}
-
-void mitk::RenderWindowViewDirectionController::SetControlledRenderer(RendererVector controlledRenderer)
+void mitk::RenderWindowViewDirectionController::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
   if (m_ControlledRenderer != controlledRenderer)
   {
@@ -75,7 +55,7 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
     {
       if (renderer.IsNotNull())
       {
-        SetViewDirectionOfRenderer(viewDirection, renderer);
+        //SetViewDirectionOfRenderer(viewDirection, renderer);
       }
     }
   }

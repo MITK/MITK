@@ -23,6 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkIOUtil.h>
 #include "mitkCommandLineParser.h"
 
+#include <mitkSplitParameterToVector.h>
+#include <mitkGlobalImageFeaturesParameter.h>
+
 #include <mitkGIFCooccurenceMatrix.h>
 #include <mitkGIFCooccurenceMatrix2.h>
 #include <mitkGIFGrayLevelRunLength.h>
@@ -50,20 +53,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 typedef itk::Image< double, 3 >                 FloatImageType;
 typedef itk::Image< unsigned char, 3 >          MaskImageType;
-
-static std::vector<double> splitDouble(std::string str, char delimiter) {
-  std::vector<double> internal;
-  std::stringstream ss(str); // Turn the string into a stream.
-  std::string tok;
-  double val;
-  while (std::getline(ss, tok, delimiter)) {
-    std::stringstream s2(tok);
-    s2 >> val;
-    internal.push_back(val);
-  }
-
-  return internal;
-}
 
 template<typename TPixel, unsigned int VImageDimension>
 void
@@ -289,7 +278,7 @@ int main(int argc, char* argv[])
   // required params
   parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input image file", us::Any(), false);
   parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false);
+  parser.addArgument("d ", "o", mitkCommandLineParser::OutputFile, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false);
   parser.addArgument("--","-", mitkCommandLineParser::String, "---", "---", us::Any(),true);
   firstOrderCalculator->AddArguments(parser);   // Does not support single direction
   volCalculator->AddArguments(parser);          // Does not support single direction
@@ -438,7 +427,7 @@ int main(int argc, char* argv[])
   int direction = 0;
   if (parsedArgs.count("direction"))
   {
-    direction = splitDouble(parsedArgs["direction"].ToString(), ';')[0];
+    direction = mitk::cl::splitDouble(parsedArgs["direction"].ToString(), ';')[0];
   }
 
   MITK_INFO << "Start creating Mask without NaN";
@@ -461,7 +450,7 @@ int main(int argc, char* argv[])
   {
     MITK_INFO << "Enabled slice-wise";
     sliceWise = true;
-    sliceDirection = splitDouble(parsedArgs["slice-wise"].ToString(), ';')[0];
+    sliceDirection = mitk::cl::splitDouble(parsedArgs["slice-wise"].ToString(), ';')[0];
     MITK_INFO << sliceDirection;
     ExtractSlicesFromImages(image, mask, maskNoNaN, sliceDirection, floatVector, maskVector, maskNoNaNVector);
     MITK_INFO << "Slice";
@@ -469,7 +458,7 @@ int main(int argc, char* argv[])
 
   if (parsedArgs.count("minimum-intensity"))
   {
-    float minimum = splitDouble(parsedArgs["minimum-intensity"].ToString(), ';')[0];
+    float minimum = mitk::cl::splitDouble(parsedArgs["minimum-intensity"].ToString(), ';')[0];
     firstOrderCalculator->SetMinimumIntensity(minimum);
     firstOrderCalculator->SetUseMinimumIntensity(true);
     volCalculator->SetMinimumIntensity(minimum);
@@ -486,7 +475,7 @@ int main(int argc, char* argv[])
 
   if (parsedArgs.count("maximum-intensity"))
   {
-    float minimum = splitDouble(parsedArgs["maximum-intensity"].ToString(), ';')[0];
+    float minimum = mitk::cl::splitDouble(parsedArgs["maximum-intensity"].ToString(), ';')[0];
     firstOrderCalculator->SetMaximumIntensity(minimum);
     firstOrderCalculator->SetUseMaximumIntensity(true);
     volCalculator->SetMaximumIntensity(minimum);
@@ -503,7 +492,7 @@ int main(int argc, char* argv[])
 
   if (parsedArgs.count("bins"))
   {
-    int minimum = splitDouble(parsedArgs["bins"].ToString(), ';')[0];
+    int minimum = mitk::cl::splitDouble(parsedArgs["bins"].ToString(), ';')[0];
     firstOrderCalculator->SetBins(minimum);
     volCalculator->SetBins(minimum);
     coocCalculator->SetBins(minimum);

@@ -19,6 +19,9 @@ set(CPP_FILES
   GlobalImageFeatures/mitkGIFNeighbouringGreyLevelDependenceFeatures.cpp
   GlobalImageFeatures/mitkGIFNeighbourhoodGreyLevelDifference.cpp
   
+  MiniAppUtils/mitkGlobalImageFeaturesParameter.cpp
+  MiniAppUtils/mitkSplitParameterToVector.cpp
+  
   mitkCLUtil.cpp
 
 )

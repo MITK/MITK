@@ -45,6 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
+#include <mitkNodePredicateProperty.h>
+#include <mitkPlanarFigure.h>
 
 // ITK includes (general)
 #include <itkVectorImage.h>
@@ -704,7 +706,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   this->BusyCursorOn();
 
-  mitk::Image::Pointer newImage;
+  mitk::Image::Pointer newImage = nullptr;
 
   try
   {
@@ -1217,8 +1219,14 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
 
 void QmitkBasicImageProcessing::StartButton2Clicked()
 {
+  mitk::DataNode::Pointer selectedNode = m_SelectedImageNode->GetNode();
+  if (selectedNode == nullptr)
+  {
+    return;
+  }
+
   mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>
-    (m_SelectedImageNode->GetNode()->GetData());
+    (selectedNode->GetData());
   mitk::Image::Pointer newImage2 = dynamic_cast<mitk::Image*>
     (m_Controls->m_ImageSelector2->GetSelectedNode()->GetData());
 
@@ -1406,7 +1414,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   levelwindow.SetAuto( newImage1 );
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   levWinProp->SetLevelWindow( levelwindow );
-  std::string name = m_SelectedImageNode->GetNode()->GetName();
+  std::string name = selectedNode->GetName();
   if (name.find(".pic.gz") == name.size() -7 )
   {
     name = name.substr(0,name.size() -7);
@@ -1414,14 +1422,14 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   // create final result MITK data storage node
   mitk::DataNode::Pointer result = mitk::DataNode::New();
-  result->SetProperty( "levelwindow", levWinProp );
-  result->SetProperty( "name", mitk::StringProperty::New( (name + nameAddition ).c_str() ));
-  result->SetData( newImage1 );
-  GetDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
+  result->SetProperty("levelwindow", levWinProp);
+  result->SetProperty("name", mitk::StringProperty::New((name + nameAddition).c_str()));
+  result->SetData(newImage1);
+  GetDataStorage()->Add(result, selectedNode);
 
   // show only the newly created image
-  m_SelectedImageNode->GetNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
-  m_Controls->m_ImageSelector2->GetSelectedNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
+  selectedNode->SetProperty("visible", mitk::BoolProperty::New(false));
+  m_Controls->m_ImageSelector2->GetSelectedNode()->SetProperty("visible", mitk::BoolProperty::New(false));
 
   // show the newly created image
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1442,5 +1450,39 @@ void QmitkBasicImageProcessing::SelectInterpolator(int interpolator)
       m_SelectedInterpolation = NEAREST;
       break;
     }
+  }
+}
+
+bool QmitkBasicImageProcessing::isLastNode(const mitk::DataNode* node)
+{
+  bool nodeFound = false;
+  int imageNodesCount = 0;
+  
+  auto nodes = GetDataStorage()->GetSubset(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+  for (auto loaded_node : *nodes)
+  {
+    auto data = loaded_node->GetData();
+    /// images remove child planar figures so we should ignore them here
+    if (!data || dynamic_cast<mitk::PlanarFigure*>(data))
+    {
+      // Ignore nodes without data
+      continue;
+    }
+    
+    if (loaded_node == node)
+    {
+      nodeFound = true;
+    }
+    imageNodesCount++;
+  }
+  
+  return (imageNodesCount == 1 && nodeFound);
+}
+
+void QmitkBasicImageProcessing::NodeRemoved(const mitk::DataNode* node)
+{
+  if (isLastNode(node))
+  {
+    m_Controls->leImage1->setText(TR_SELECT_IMAGE);
   }
 }

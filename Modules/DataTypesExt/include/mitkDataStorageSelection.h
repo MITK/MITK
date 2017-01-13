@@ -48,8 +48,7 @@ namespace mitk
 
     protected:
       DataStorageSelection(mitk::DataStorage* _DataStorage, bool _AutoAddNodes);
-      DataStorageSelection(mitk::DataStorage* _DataStorage
-        , mitk::NodePredicateBase* _Predicate, bool _AutoAddNodes);
+      DataStorageSelection(mitk::DataStorage* _DataStorage, mitk::NodePredicateBase* _Predicate, bool _AutoAddNodes);
 
     public:
       virtual ~DataStorageSelection();

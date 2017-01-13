@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkSplitParameterToVector_h
 #define mitkSplitParameterToVector_h
 
+#include "MitkCLUtilitiesExports.h"
 #include <string>
 #include <vector>
 
@@ -24,9 +25,9 @@ namespace mitk
 {
   namespace cl
   {
-    std::vector<double> splitDouble(std::string str, char delimiter);
-    std::vector<int> splitInt(std::string str, char delimiter);
-    std::vector<std::string> splitString(std::string str, char delimiter);
+    std::vector<double> MITKCLUTILITIES_EXPORT splitDouble(std::string str, char delimiter);
+    std::vector<int> MITKCLUTILITIES_EXPORT splitInt(std::string str, char delimiter);
+    std::vector<std::string> MITKCLUTILITIES_EXPORT splitString(std::string str, char delimiter);
   }
 }
 

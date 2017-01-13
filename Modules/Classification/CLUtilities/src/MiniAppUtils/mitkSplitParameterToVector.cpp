@@ -32,7 +32,7 @@ std::vector<double> mitk::cl::splitDouble(std::string str, char delimiter) {
   return internal;
 }
 
-static std::vector<int> mitk::cl::splitInt(std::string str, char delimiter) {
+std::vector<int> mitk::cl::splitInt(std::string str, char delimiter) {
   std::vector<int> internal;
   std::stringstream ss(str); // Turn the string into a stream.
   std::string tok;
@@ -46,7 +46,7 @@ static std::vector<int> mitk::cl::splitInt(std::string str, char delimiter) {
   return internal;
 }
 
-static std::vector<std::string> mitk::cl::splitString(std::string str, char delimiter) {
+std::vector<std::string> mitk::cl::splitString(std::string str, char delimiter) {
   std::vector<std::string> internal;
   std::stringstream ss(str); // Turn the string into a stream.
   std::string tok;

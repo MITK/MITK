@@ -158,6 +158,14 @@ ResampleMask(itk::Image<TPixel, VImageDimension>* itkMoving, mitk::Image::Pointe
   mitk::GrabItkImageMemory(resampler->GetOutput(), newMask);
 }
 
+static bool fileExists(const std::string& filename)
+{
+  ifstream infile(filename.c_str());
+  bool isGood = infile.good();
+  infile.close();
+  return isGood;
+}
+
 
 static void
 ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, mitk::Image::Pointer maskNoNaN,
@@ -292,7 +300,8 @@ int main(int argc, char* argv[])
 
   parser.addArgument("--", "-", mitkCommandLineParser::String, "---", "---", us::Any(), true);
 
-  parser.addArgument("header","head",mitkCommandLineParser::String,"Add Header (Labels) to output","",us::Any());
+  parser.addArgument("header", "head", mitkCommandLineParser::String, "Add Header (Labels) to output", "", us::Any());
+  parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::String, "Add Header (Labels) to first line of output", "", us::Any());
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
   parser.addArgument("same-space", "sp", mitkCommandLineParser::String, "Bool", "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
   parser.addArgument("resample-mask", "rm", mitkCommandLineParser::Bool, "Bool", "Resamples the mask to the resolution of the input image ", us::Any());
@@ -322,7 +331,7 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version:  1.14";
+  MITK_INFO << "Version:  1.15";
 
   //bool useCooc = parsedArgs.count("cooccurence");
 
@@ -517,9 +526,19 @@ int main(int argc, char* argv[])
   rlCalculator->SetDirection(direction);
 
   //std::ofstream output(parsedArgs["output"].ToString(), std::ios::app);
-  mitk::cl::FeatureResultWritter writer(parsedArgs["output"].ToString(), writeDirection);
   bool addDescription = parsedArgs.count("description");
   bool withHeader = parsedArgs.count("header");
+
+  if (parsedArgs.count("first-line-header"))
+  {
+    MITK_INFO << "First line Header";
+    withHeader = !fileExists(parsedArgs["output"].ToString());
+    MITK_INFO << withHeader;
+  }
+  mitk::cl::FeatureResultWritter writer(parsedArgs["output"].ToString(), writeDirection);
+
+
+
   std::string description = "";
   if (addDescription)
   {
@@ -530,7 +549,7 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer cMask = mask;
   mitk::Image::Pointer cMaskNoNaN = maskNoNaN;
 
-  if (true)
+  if (withHeader)
   {
     writer.AddColumn("Patient");
     writer.AddColumn("Image");

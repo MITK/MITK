@@ -119,7 +119,6 @@ void
     if (params.UseMaximumIntensity)
       maxRange = params.MaximumIntensity;
 
-    MITK_INFO << "Min: " << minMaxComputer->GetMinimum() << " Max: " << minMaxComputer->GetMaximum() << " Range: " << rangeOfPixels;
     filter->SetPixelValueMinMax(minRange, maxRange);
     filter->SetNumberOfBinsPerAxis(rangeOfPixels);
   }

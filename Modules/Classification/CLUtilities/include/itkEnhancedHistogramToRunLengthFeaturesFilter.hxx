@@ -128,7 +128,6 @@ namespace itk {
       double mu_i = 0.0;
       double mu_j = 0.0;
 
-      MITK_INFO << "Histogram outputs";
       //Calculate the means.
       for ( HistogramIterator hit = inputHistogram->Begin();
         hit != inputHistogram->End(); ++hit )
@@ -141,7 +140,7 @@ namespace itk {
           continue;
         }
 
-        MITK_INFO << index[0] + 1 << "|" << index[1] + 1 << " " << frequency;
+        // MITK_INFO << index[0] + 1 << "|" << index[1] + 1 << " " << frequency;
 
         MeasurementVectorType measurement = hit.GetMeasurementVector();
 
@@ -154,7 +153,7 @@ namespace itk {
         mu_i += i * p_ij;
         mu_j += j * p_ij;
       }
-      MITK_INFO << "Mu_i " << mu_i << " Mu_j " << mu_j;
+      // MITK_INFO << "Mu_i " << mu_i << " Mu_j " << mu_j;
       //Calculate the other features.
       const double log2 = std::log(2.0);
 

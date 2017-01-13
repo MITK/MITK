@@ -107,6 +107,7 @@ protected slots:
   void DoExtractGradient();
   void DoFlipAxis();
   void OnImageSelectionChanged();
+  void DoFlipGradientDirections();
 
 protected:
 

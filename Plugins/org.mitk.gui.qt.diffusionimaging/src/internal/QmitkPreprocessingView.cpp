@@ -186,6 +186,7 @@ void QmitkPreprocessingView::CreateConnections()
     connect( (QObject*)(m_Controls->m_RemoveGradientButton), SIGNAL(clicked()), this, SLOT(DoRemoveGradient()) );
     connect( (QObject*)(m_Controls->m_ExtractGradientButton), SIGNAL(clicked()), this, SLOT(DoExtractGradient()) );
     connect( (QObject*)(m_Controls->m_FlipAxis), SIGNAL(clicked()), this, SLOT(DoFlipAxis()) );
+    connect( (QObject*)(m_Controls->m_FlipGradientsButton), SIGNAL(clicked()), this, SLOT(DoFlipGradientDirections()) );
     connect( (QObject*)(m_Controls->m_SelctedImageComboBox), SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
              this, SLOT(OnImageSelectionChanged()) );
 
@@ -1682,6 +1683,7 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
   m_Controls->m_RemoveGradientButton->setEnabled(foundDwiVolume);
   m_Controls->m_ExtractGradientButton->setEnabled(foundDwiVolume);
   m_Controls->m_FlipAxis->setEnabled(foundSingleImageVolume);
+  m_Controls->m_FlipGradientsButton->setEnabled(foundSingleImageVolume);
 
   // reset sampling frame to 1 and update all ealted components
   m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);
@@ -1829,6 +1831,42 @@ void QmitkPreprocessingView::Activated()
 void QmitkPreprocessingView::Deactivated()
 {
   QmitkFunctionality::Deactivated();
+}
+
+
+void QmitkPreprocessingView::DoFlipGradientDirections()
+{
+  mitk::DataNode::Pointer node = m_Controls->m_SelctedImageComboBox->GetSelectedNode();
+  if (node.IsNull()) { return; }
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if ( image == nullptr ) { return; }
+
+  mitk::Image::Pointer newDwi = image->Clone();
+  GradientDirectionContainerType::Pointer gradientContainer =
+    static_cast<mitk::GradientDirectionsProperty*>
+      ( newDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+        ->GetGradientDirectionsContainer();
+
+  for (unsigned int j=0; j<gradientContainer->Size(); j++)
+  {
+      if (m_Controls->m_FlipGradBoxX->isChecked()) { gradientContainer->at(j)[0] = -gradientContainer->at(j)[0]; }
+      if (m_Controls->m_FlipGradBoxY->isChecked()) { gradientContainer->at(j)[1] = -gradientContainer->at(j)[1]; }
+      if (m_Controls->m_FlipGradBoxZ->isChecked()) { gradientContainer->at(j)[2] = -gradientContainer->at(j)[2]; }
+  }
+
+  newDwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
+                       mitk::GradientDirectionsProperty::New( gradientContainer ) );
+
+  mitk::DiffusionPropertyHelper propertyHelper( newDwi );
+  propertyHelper.InitializeImage();
+
+  mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
+  imageNode->SetData( newDwi );
+
+  QString name = node->GetName().c_str();
+  imageNode->SetName( (name+"_GradientFlip").toStdString().c_str() );
+  GetDefaultDataStorage()->Add( imageNode, node );
 }
 
 void QmitkPreprocessingView::DoHalfSphereGradientDirections()

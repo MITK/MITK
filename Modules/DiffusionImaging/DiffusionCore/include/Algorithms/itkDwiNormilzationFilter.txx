@@ -82,8 +82,13 @@ void DwiNormilzationFilter< TInPixelType>::BeforeThreadedGenerateData()
     {
       if (mit.Get()>0)
       {
-        m_Mean += git.Get()[m_B0Index];
-        n++;
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        {
+          if (i==m_B0Index)
+            continue;
+          m_Mean += git.Get()[i];
+          n++;
+        }
       }
       ++git;
       ++mit;
@@ -97,8 +102,13 @@ void DwiNormilzationFilter< TInPixelType>::BeforeThreadedGenerateData()
     {
       if (mit.Get()>0)
       {
-        double diff = (double)(git.Get()[m_B0Index]) - m_Mean;
-        m_Stdev += diff*diff;
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        {
+          if (i==m_B0Index)
+            continue;
+          double diff = (double)(git.Get()[i]) - m_Mean;
+          m_Stdev += diff*diff;
+        }
       }
       ++git;
       ++mit;
@@ -131,8 +141,8 @@ void DwiNormilzationFilter< TInPixelType>::ThreadedGenerateData(const OutputImag
         typename OutputImageType::PixelType outPix;
         outPix.SetSize(inputImagePointer->GetVectorLength());
 
-        if (mit.Get()>0)
-        {
+//        if (mit.Get()>0)
+//        {
             for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
             {
                 double val = (double)pix[i] - m_Mean;
@@ -143,9 +153,9 @@ void DwiNormilzationFilter< TInPixelType>::ThreadedGenerateData(const OutputImag
                   val = 0;
                 outPix[i] = (TInPixelType)val;
             }
-        }
-        else
-          outPix.Fill(0);
+//        }
+//        else
+//          outPix.Fill(0);
 
         oit.Set(outPix);
 

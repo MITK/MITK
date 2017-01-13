@@ -55,7 +55,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
@@ -128,12 +128,12 @@
            <number>6</number>
           </property>
           <item row="5" column="0">
-           <widget class="QCommandLinkButton" name="m_MirrorGradientToHalfSphereButton">
+           <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
             <property name="toolTip">
-             <string>Sometimes the gradient directions are not located on one half sphere.</string>
+             <string>Generate pointset displaying the gradient vectors (applied measurement frame).</string>
             </property>
             <property name="statusTip">
              <string/>
@@ -142,36 +142,7 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string>Mirror gradients to half sphere</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Round b-values</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere using an iterative energy repulsion strategy.</string>
-            </property>
-            <property name="statusTip">
-             <string/>
-            </property>
-            <property name="whatsThis">
-             <string notr="true"/>
-            </property>
-            <property name="text">
-             <string>Reduce number of gradients</string>
+             <string>Show gradients</string>
             </property>
            </widget>
           </item>
@@ -211,8 +182,56 @@
             </item>
            </layout>
           </item>
+          <item row="8" column="0">
+           <widget class="QCommandLinkButton" name="m_ReduceGradientsButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Retain only the specified number of gradient directions and according image volumes. The retained directions are spread equally over the half sphere using an iterative energy repulsion strategy.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Reduce number of gradients</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QCommandLinkButton" name="m_MirrorGradientToHalfSphereButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Sometimes the gradient directions are not located on one half sphere.</string>
+            </property>
+            <property name="statusTip">
+             <string/>
+            </property>
+            <property name="whatsThis">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>Mirror gradients to half sphere</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCommandLinkButton" name="m_CreateLengthCorrectedDwi">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Round b-values</string>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="0">
-           <widget class="QCommandLinkButton" name="m_ShowGradientsButton">
+           <widget class="QCommandLinkButton" name="m_FlipGradientsButton">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -226,8 +245,56 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string>Show gradients</string>
+             <string>Flip gradients</string>
             </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QFrame" name="frame_8">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Plain</enum>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_21">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="m_FlipGradBoxX">
+               <property name="text">
+                <string>x</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QCheckBox" name="m_FlipGradBoxY">
+               <property name="text">
+                <string>y</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QCheckBox" name="m_FlipGradBoxZ">
+               <property name="text">
+                <string>z</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>

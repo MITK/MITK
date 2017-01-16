@@ -51,6 +51,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include "usServiceReference.h"
 #include "internal/org_mitk_gui_qt_ultrasound_Activator.h"
+#include "mitkNodePredicateDataType.h"
+#include <mitkRenderingModeProperty.h>
 
 const std::string UltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
@@ -107,9 +109,6 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
   CreateWindows();
 }
 
-
-#include "mitkNodePredicateDataType.h"
-
 void UltrasoundSupport::CreateWindows()
 {
   auto renderingManager = mitk::RenderingManager::GetInstance();
@@ -128,8 +127,6 @@ void UltrasoundSupport::CreateWindows()
   m_USRenderWidget->hide();
   m_USRenderWidget->m_NavigatorWidget->hide();
 }
-
-#include <mitkRenderingModeProperty.h>
 
 void UltrasoundSupport::InitNewNode()
 {

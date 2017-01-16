@@ -46,8 +46,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkResampleImageFilter.h"
 
-#include <itkFileTools.h>
-#include <itksys/SystemTools.hxx>
+#include <QApplication>
+#include <mitkStandaloneDataStorage.h>
+#include "QmitkRegisterClasses.h"
+#include "QmitkRenderWindow.h"
+#include "vtkRenderLargeImage.h"
+#include "vtkPNGWriter.h"
 
 
 
@@ -146,15 +150,6 @@ ResampleMask(itk::Image<TPixel, VImageDimension>* itkMoving, mitk::Image::Pointe
   newMask->InitializeByItk(resampler->GetOutput());
   mitk::GrabItkImageMemory(resampler->GetOutput(), newMask);
 }
-
-static bool fileExists(const std::string& filename)
-{
-  ifstream infile(filename.c_str());
-  bool isGood = infile.good();
-  infile.close();
-  return isGood;
-}
-
 
 static void
 ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, mitk::Image::Pointer maskNoNaN,
@@ -270,37 +265,30 @@ int main(int argc, char* argv[])
   mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer ngldCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
   mitk::GIFGrayLevelRunLength::Pointer rlCalculator = mitk::GIFGrayLevelRunLength::New();
 
-
+  std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;
+  features.push_back(firstOrderCalculator.GetPointer());
+  features.push_back(volCalculator.GetPointer());
+  features.push_back(coocCalculator.GetPointer());
+  features.push_back(cooc2Calculator.GetPointer());
+  features.push_back(ngldCalculator.GetPointer());
+  features.push_back(rlCalculator.GetPointer());
 
 
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
-  // required params
-  parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "Path to the input image file", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Mask", "Path to the mask Image that specifies the area over for the statistic (Values = 1)", us::Any(), false);
-  parser.addArgument("d ", "o", mitkCommandLineParser::OutputFile, "Output text file", "Path to output file. The output statistic is appended to this file.", us::Any(), false);
+  mitk::cl::GlobalImageFeaturesParameter param;
+  param.AddParameter(parser);
+
   parser.addArgument("--","-", mitkCommandLineParser::String, "---", "---", us::Any(),true);
-  firstOrderCalculator->AddArguments(parser);   // Does not support single direction
-  volCalculator->AddArguments(parser);          // Does not support single direction
-  coocCalculator->AddArguments(parser);         //
-  cooc2Calculator->AddArguments(parser);        // Needs parameter fixing
-  ngldCalculator->AddArguments(parser);         // Needs parameter fixing
-  rlCalculator->AddArguments(parser);           // Does not support single direction
+  for (auto cFeature : features)
+  {
+    cFeature->AddArguments(parser);
+  }
 
   parser.addArgument("--", "-", mitkCommandLineParser::String, "---", "---", us::Any(), true);
-
-  parser.addArgument("header", "head", mitkCommandLineParser::String, "Add Header (Labels) to output", "", us::Any());
-  parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::String, "Add Header (Labels) to first line of output", "", us::Any());
   parser.addArgument("description","d",mitkCommandLineParser::String,"Text","Description that is added to the output",us::Any());
-  parser.addArgument("same-space", "sp", mitkCommandLineParser::String, "Bool", "Set the spacing of all images to equal. Otherwise an error will be thrown. ", us::Any());
-  parser.addArgument("resample-mask", "rm", mitkCommandLineParser::Bool, "Bool", "Resamples the mask to the resolution of the input image ", us::Any());
-  parser.addArgument("save-resample-mask", "srm", mitkCommandLineParser::String, "String", "If specified the resampled mask is saved to this path (if -rm is 1)", us::Any());
-  parser.addArgument("fixed-isotropic", "fi", mitkCommandLineParser::Float, "Float", "Input image resampled to fixed isotropic resolution given in mm. Should be used with resample-mask ", us::Any());
   parser.addArgument("direction", "dir", mitkCommandLineParser::String, "Int", "Allows to specify the direction for Cooc and RL. 0: All directions, 1: Only single direction (Test purpose), 2,3,4... Without dimension 0,1,2... ", us::Any());
   parser.addArgument("slice-wise", "slice", mitkCommandLineParser::String, "Int", "Allows to specify if the image is processed slice-wise (number giving direction) ", us::Any());
-  parser.addArgument("minimum-intensity", "minimum", mitkCommandLineParser::String, "Float", "Minimum intensity. If set, it is overwritten by more specific intensity minima", us::Any());
-  parser.addArgument("maximum-intensity", "maximum", mitkCommandLineParser::String, "Float", "Maximum intensity. If set, it is overwritten by more specific intensity maxima", us::Any());
-  parser.addArgument("bins", "bins", mitkCommandLineParser::String, "Int", "Number of bins if bins are used. If set, it is overwritten by more specific bin count", us::Any());
   parser.addArgument("output-mode", "omode", mitkCommandLineParser::Int, "Int", "Defines if the results of an image / slice are written in a single row (0 , default) or column (1).");
 
   // Miniapp Infos
@@ -310,6 +298,7 @@ int main(int argc, char* argv[])
   parser.setContributor("MBI");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
+  param.ParseParameter(parsedArgs);
 
   if (parsedArgs.size()==0)
   {
@@ -320,30 +309,25 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  MITK_INFO << "Version:  1.15";
+  std::string version = "Version: 1.16";
+  MITK_INFO << version;
 
-  //bool useCooc = parsedArgs.count("cooccurence");
-
-  bool resampleMask = false;
-  if (parsedArgs.count("resample-mask"))
+  std::ofstream log;
+  if (param.useLogfile)
   {
-    resampleMask = us::any_cast<bool>(parsedArgs["resample-mask"]);
+    log.open(param.logfilePath, std::ios::app);
+    log << version;
+    log << "Image: " << param.imagePath;
+    log << "Mask: " << param.maskPath;
   }
 
   mitk::Image::Pointer image;
   mitk::Image::Pointer mask;
 
-  mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(parsedArgs["image"].ToString());
-  mitk::Image::Pointer tmpMask = mitk::IOUtil::LoadImage(parsedArgs["mask"].ToString());
+  mitk::Image::Pointer tmpImage = mitk::IOUtil::LoadImage(param.imagePath);
+  mitk::Image::Pointer tmpMask = mitk::IOUtil::LoadImage(param.maskPath);
   image = tmpImage;
   mask = tmpMask;
-
-
-  std::string imageName = itksys::SystemTools::GetFilenameName(parsedArgs["image"].ToString());
-  std::string maskName = itksys::SystemTools::GetFilenameName(parsedArgs["mask"].ToString());
-  std::string folderName = itksys::SystemTools::GetFilenamePath(parsedArgs["image"].ToString());
-
-
 
   if ((image->GetDimension() != mask->GetDimension()))
   {
@@ -372,19 +356,17 @@ int main(int argc, char* argv[])
   }
 
 
-  if (parsedArgs.count("fixed-isotropic"))
+  if (param.resampleToFixIsotropic)
   {
     mitk::Image::Pointer newImage = mitk::Image::New();
-    float resolution = us::any_cast<float>(parsedArgs["fixed-isotropic"]);
-    AccessByItk_2(image, ResampleImage, resolution, newImage);
+    AccessByItk_2(image, ResampleImage, param.resampleResolution, newImage);
     image = newImage;
   }
 
-  bool fixDifferentSpaces = parsedArgs.count("same-space");
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetOrigin(), image->GetGeometry(0)->GetOrigin()))
   {
     MITK_INFO << "Not equal Origins";
-    if (fixDifferentSpaces)
+    if (param.ensureSameSpace)
     {
       MITK_INFO << "Warning!";
       MITK_INFO << "The origin of the input image and the mask do not match. They are";
@@ -396,21 +378,17 @@ int main(int argc, char* argv[])
     }
   }
 
-  if (resampleMask)
+  if (param.resampleMask)
   {
     mitk::Image::Pointer newMaskImage = mitk::Image::New();
     AccessByItk_2(mask, ResampleMask, image, newMaskImage);
     mask = newMaskImage;
-    if (parsedArgs.count("save-resample-mask"))
-    {
-      mitk::IOUtil::SaveImage(mask, parsedArgs["save-resample-mask"].ToString());
-    }
   }
 
   if ( ! mitk::Equal(mask->GetGeometry(0)->GetSpacing(), image->GetGeometry(0)->GetSpacing()))
   {
     MITK_INFO << "Not equal Sapcings";
-    if (fixDifferentSpaces)
+    if (param.ensureSameSpace)
     {
       MITK_INFO << "Warning!";
       MITK_INFO << "The spacing of the mask was set to match the spacing of the input image.";
@@ -456,77 +434,28 @@ int main(int argc, char* argv[])
     MITK_INFO << "Slice";
   }
 
-  if (parsedArgs.count("minimum-intensity"))
+  for (auto cFeature : features)
   {
-    float minimum = mitk::cl::splitDouble(parsedArgs["minimum-intensity"].ToString(), ';')[0];
-    firstOrderCalculator->SetMinimumIntensity(minimum);
-    firstOrderCalculator->SetUseMinimumIntensity(true);
-    volCalculator->SetMinimumIntensity(minimum);
-    volCalculator->SetUseMinimumIntensity(true);
-    coocCalculator->SetMinimumIntensity(minimum);
-    coocCalculator->SetUseMinimumIntensity(true);
-    cooc2Calculator->SetMinimumIntensity(minimum);
-    cooc2Calculator->SetUseMinimumIntensity(true);
-    ngldCalculator->SetMinimumIntensity(minimum);
-    ngldCalculator->SetUseMinimumIntensity(true);
-    rlCalculator->SetMinimumIntensity(minimum);
-    rlCalculator->SetUseMinimumIntensity(true);
+    if (param.defineGlobalMinimumIntensity)
+    {
+      cFeature->SetMinimumIntensity(param.globalMinimumIntensity);
+      cFeature->SetUseMinimumIntensity(true);
+    }
+    if (param.defineGlobalMaximumIntensity)
+    {
+      cFeature->SetMaximumIntensity(param.globalMaximumIntensity);
+      cFeature->SetUseMaximumIntensity(true);
+    }
+    if (param.defineGlobalNumberOfBins)
+    {
+      cFeature->SetBins(param.globalNumberOfBins);
+    }
+    cFeature->SetParameter(parsedArgs);
+    cFeature->SetDirection(direction);
   }
 
-  if (parsedArgs.count("maximum-intensity"))
-  {
-    float minimum = mitk::cl::splitDouble(parsedArgs["maximum-intensity"].ToString(), ';')[0];
-    firstOrderCalculator->SetMaximumIntensity(minimum);
-    firstOrderCalculator->SetUseMaximumIntensity(true);
-    volCalculator->SetMaximumIntensity(minimum);
-    volCalculator->SetUseMaximumIntensity(true);
-    coocCalculator->SetMaximumIntensity(minimum);
-    coocCalculator->SetUseMaximumIntensity(true);
-    cooc2Calculator->SetMaximumIntensity(minimum);
-    cooc2Calculator->SetUseMaximumIntensity(true);
-    ngldCalculator->SetMaximumIntensity(minimum);
-    ngldCalculator->SetUseMaximumIntensity(true);
-    rlCalculator->SetMaximumIntensity(minimum);
-    rlCalculator->SetUseMaximumIntensity(true);
-  }
-
-  if (parsedArgs.count("bins"))
-  {
-    int minimum = mitk::cl::splitDouble(parsedArgs["bins"].ToString(), ';')[0];
-    firstOrderCalculator->SetBins(minimum);
-    volCalculator->SetBins(minimum);
-    coocCalculator->SetBins(minimum);
-    cooc2Calculator->SetBins(minimum);
-    ngldCalculator->SetBins(minimum);
-    rlCalculator->SetBins(minimum);
-  }
-
-  firstOrderCalculator->SetParameter(parsedArgs);
-  firstOrderCalculator->SetDirection(direction);
-  volCalculator->SetParameter(parsedArgs);
-  volCalculator->SetDirection(direction);
-  coocCalculator->SetParameter(parsedArgs);
-  coocCalculator->SetDirection(direction);
-  cooc2Calculator->SetParameter(parsedArgs);
-  cooc2Calculator->SetDirection(direction);
-  ngldCalculator->SetParameter(parsedArgs);
-  ngldCalculator->SetDirection(direction);
-  rlCalculator->SetParameter(parsedArgs);
-  rlCalculator->SetDirection(direction);
-
-  //std::ofstream output(parsedArgs["output"].ToString(), std::ios::app);
   bool addDescription = parsedArgs.count("description");
-  bool withHeader = parsedArgs.count("header");
-
-  if (parsedArgs.count("first-line-header"))
-  {
-    MITK_INFO << "First line Header";
-    withHeader = !fileExists(parsedArgs["output"].ToString());
-    MITK_INFO << withHeader;
-  }
-  mitk::cl::FeatureResultWritter writer(parsedArgs["output"].ToString(), writeDirection);
-
-
+  mitk::cl::FeatureResultWritter writer(param.outputPath, writeDirection);
 
   std::string description = "";
   if (addDescription)
@@ -538,12 +467,19 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer cMask = mask;
   mitk::Image::Pointer cMaskNoNaN = maskNoNaN;
 
-  if (withHeader)
+  if (param.useHeader)
   {
     writer.AddColumn("Patient");
     writer.AddColumn("Image");
     writer.AddColumn("Segmentation");
   }
+
+  QApplication qtapplication(argc, argv);
+  QmitkRegisterClasses();
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+
+  QmitkRenderWindow renderWindow;
+  renderWindow.GetRenderer()->SetDataStorage(ds);
 
   while (imageToProcess)
   {
@@ -559,31 +495,86 @@ int main(int argc, char* argv[])
       imageToProcess = false;
     }
 
+    //
+    //  Start Saving image to folder.
+    //
+    /*
+
+    auto node = mitk::DataNode::New();
+    node->SetData(cImage);
+    auto nodeM = mitk::DataNode::New();
+    nodeM->SetData(cMask);
+    ds->Add(node);
+    ds->Add(nodeM);
+
+    mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+    mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+
+    mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
+    if (sliceNaviController)
+      sliceNaviController->GetSlice()->SetPos(0);
+
+    renderWindow.show();
+    renderWindow.resize(256, 256);
+    renderWindow.GetRenderer()->PrepareRender();
+
+    vtkRenderWindow* renderWindow2 = renderWindow.GetVtkRenderWindow();
+    mitk::BaseRenderer* baserenderer = mitk::BaseRenderer::GetInstance(renderWindow2);
+    auto vtkRender = baserenderer->GetVtkRenderer();
+    vtkRender->GetRenderWindow()->WaitForCompletion();
+
+    vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
+    magnifier->SetInput(vtkRender);
+    magnifier->SetMagnification(3.0);
+
+    auto fileWriter = vtkPNGWriter::New();
+    fileWriter->SetInputConnection(magnifier->GetOutputPort());
+    fileWriter->SetFileName("e:\\tmp\\bonekamp\\test.png");
+    fileWriter->Write();
+    fileWriter->Delete();
+    */
+    //
+    //  End   Saving image to folder.
+    //
+
+
+    if (param.writeAnalysisImage)
+    {
+      mitk::IOUtil::SaveImage(cImage, param.anaylsisImagePath);
+    }
+    if (param.writeAnalysisMask)
+    {
+      mitk::IOUtil::SaveImage(cImage, param.analysisMaskPath);
+    }
 
     mitk::AbstractGlobalImageFeature::FeatureListType stats;
 
-    firstOrderCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
-    volCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
-    coocCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
-    cooc2Calculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
-    ngldCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
-    rlCalculator->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
+    for (auto cFeature : features)
+    {
+      cFeature->CalculateFeaturesUsingParameters(cImage, cMask, cMaskNoNaN, stats);
+    }
 
     for (std::size_t i = 0; i < stats.size(); ++i)
     {
       std::cout << stats[i].first << " - " << stats[i].second << std::endl;
     }
 
-    writer.AddHeader(description, currentSlice, stats, withHeader, addDescription);
+    writer.AddHeader(description, currentSlice, stats, param.useHeader, addDescription);
     if (true)
     {
-      writer.AddColumn(folderName);
-      writer.AddColumn(imageName);
-      writer.AddColumn(maskName);
+      writer.AddColumn(param.imageFolder);
+      writer.AddColumn(param.imageName);
+      writer.AddColumn(param.maskName);
     }
-    writer.AddResult(description, currentSlice, stats, withHeader, addDescription);
+    writer.AddResult(description, currentSlice, stats, param.useHeader, addDescription);
 
     ++currentSlice;
+  }
+
+  if (param.useLogfile)
+  {
+    log << "Finished calculation";
+    log.close();
   }
   return 0;
 }

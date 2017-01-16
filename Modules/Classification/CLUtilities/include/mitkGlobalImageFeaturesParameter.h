@@ -33,8 +33,42 @@ namespace mitk
       void ParseParameter(std::map<std::string, us::Any> parsedArgs);
 
       std::string imagePath;
+      std::string imageName;
+      std::string imageFolder;
       std::string maskPath;
+      std::string maskName;
+      std::string maskFolder;
       std::string outputPath;
+
+      bool useLogfile;
+      std::string logfilePath;
+      bool writeAnalysisImage;
+      std::string anaylsisImagePath;
+      bool writeAnalysisMask;
+      std::string analysisMaskPath;
+
+      bool useHeader;
+      bool useHeaderForFirstLineOnly;
+
+      bool ensureSameSpace;
+      bool resampleMask;
+      bool resampleToFixIsotropic;
+      double resampleResolution;
+
+      bool defineGlobalMinimumIntensity;
+      double globalMinimumIntensity;
+      bool defineGlobalMaximumIntensity;
+      double globalMaximumIntensity;
+      bool defineGlobalNumberOfBins;
+      int globalNumberOfBins;
+
+    private:
+      void ParseFileLocations(std::map<std::string, us::Any> &parsedArgs);
+      void ParseAdditionalOutputs(std::map<std::string, us::Any> &parsedArgs);
+      void ParseHeaderInformation(std::map<std::string, us::Any> &parsedArgs);
+      void ParseMaskAdaptation(std::map<std::string, us::Any> &parsedArgs);
+      void ParseGlobalFeatureParameter(std::map<std::string, us::Any> &parsedArgs);
+
     };
   }
 }

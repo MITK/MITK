@@ -34,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkRenderWindow.h"
 #include <mitkStandaloneDataStorage.h>
 #include <QmitkLevelWindowWidget.h>
+#include <QmitkSliceWidget.h>
 
 #include <QTime>
 
@@ -109,16 +110,8 @@ protected:
 
   void CreateWindows();
 
-  QmitkRenderWindow* m_PARenderWindow; // window for the PA images
-  QmitkRenderWindow* m_USRenderWindow; // window for the US images
-
-  QWidget* m_ToplevelWidget_PA;
-  QHBoxLayout* m_Layout_PA;
-  QmitkLevelWindowWidget* m_LevelWindow_PA;
-
-  QWidget* m_ToplevelWidget_US;
-  QHBoxLayout* m_Layout_US;
-  QmitkLevelWindowWidget* m_LevelWindow_US;
+  QmitkSliceWidget* m_PARenderWidget;
+  QmitkSliceWidget* m_USRenderWidget;
 
   mitk::StandaloneDataStorage::Pointer m_PADataStorage;
   mitk::StandaloneDataStorage::Pointer m_USDataStorage;

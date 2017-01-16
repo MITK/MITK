@@ -84,14 +84,12 @@ void WrapperMessageCallback(const char* message)
 void WrapperImageDataCallback(
 	short* rfDataChannelData, int channelDatalinesPerDataset, int channelDataSamplesPerChannel, int channelDataTotalDatasets,
 	short* rfDataArrayBeamformed, int beamformedLines, int beamformedSamples, int beamformedTotalDatasets,
-	unsigned char* imageData, int imageWidth, int imageHeight, int imagePixelFormat, int imageSetsTotal,
-
-	double timeStamp)
+  unsigned char* imageData, int imageWidth, int imageHeight, int imagePixelFormat, int imageSetsTotal, double timeStamp)
 {
 	 w_ISource->ImageDataCallback(
-		 rfDataChannelData, channelDatalinesPerDataset, channelDataSamplesPerChannel, channelDataTotalDatasets,
-		 rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
-		 imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
+     rfDataChannelData, channelDatalinesPerDataset, channelDataSamplesPerChannel, channelDataTotalDatasets,
+     rfDataArrayBeamformed, beamformedLines, beamformedSamples, beamformedTotalDatasets,
+     imageData, imageWidth, imageHeight, imagePixelFormat, imageSetsTotal, timeStamp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------------

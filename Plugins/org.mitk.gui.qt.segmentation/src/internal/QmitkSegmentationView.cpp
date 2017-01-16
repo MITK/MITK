@@ -1092,32 +1092,10 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
 {
    if ( ! m_MultiWidget ) { return; }
 
-   /*
-   * Here we check whether the geometry of the selected segmentation image if aligned with the worldgeometry
-   * At the moment it is not supported to use a geometry different from the selected image for reslicing.
-   * For further information see Bug 16063
-   */
    mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
-   const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
-
-   if (workingNode && worldGeo)
+   if (workingNode)
    {
-
-      const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
-      const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
-
-      if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
-      {
-         this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
-         this->SetToolSelectionBoxesEnabled(true);
-         this->UpdateWarningLabel("");
-      }
-      else
-      {
-         this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), NULL);
-         this->SetToolSelectionBoxesEnabled(false);
-         this->UpdateWarningLabel(TR_NEED_REINIT_SEGM);
-      }
+     this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
    }
 }
 

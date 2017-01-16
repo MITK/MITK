@@ -123,6 +123,11 @@ void QmitkRenderWindowManipulatorWidget::AddLayer(mitk::DataNode* dataNode)
   m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, m_RenderWindowDataModel->GetCurrentRenderer());
 }
 
+void QmitkRenderWindowManipulatorWidget::AddLayerToAllRenderer(mitk::DataNode* dataNode)
+{
+  m_RenderWindowLayerController->InsertLayerNode(dataNode, -1, nullptr);
+}
+
 void QmitkRenderWindowManipulatorWidget::HideDataNodeInAllRenderer(const mitk::DataNode* dataNode)
 {
   m_RenderWindowLayerController->HideDataNodeInAllRenderer(dataNode);

@@ -66,6 +66,7 @@ public:
   * @brief
   *
   * @param dataNode   k
+  void AddLayerToAllRenderer(mitk::DataNode* dataNode);
   */
   void HideDataNodeInAllRenderer(const mitk::DataNode* dataNode);
 

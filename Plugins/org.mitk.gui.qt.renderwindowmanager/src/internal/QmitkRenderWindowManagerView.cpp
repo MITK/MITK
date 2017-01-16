@@ -96,8 +96,19 @@ void QmitkRenderWindowManagerView::OnAddLayerButtonClicked()
 
 void QmitkRenderWindowManagerView::NodeAdded(const mitk::DataNode* node)
 {
-  // initially set new node as invisible in all render windows
-  // this way, each single renderer overwrites the common render and the node is invisible
-  // until it is inserted in the node list of a render window
-  m_RenderWindowManipulatorWidget->HideDataNodeInAllRenderer(node);
+  bool global = false;
+  node->GetBoolProperty("globalObject_RWM", global);
+  if (global)
+  {
+    // initially insert new point set node into the node list of all render windows
+    // the node object of a new point set won't be visible due to its "helper object" property set to true
+    m_RenderWindowManipulatorWidget->AddLayerToAllRenderer(const_cast<mitk::DataNode*>(node));
+  }
+  else
+  {
+    // initially set new node as invisible in all render windows
+    // this way, each single renderer overwrites the common renderer and the node is invisible
+    // until it is inserted into the node list of a render windows
+    m_RenderWindowManipulatorWidget->HideDataNodeInAllRenderer(node);
+  }
 }

@@ -64,7 +64,10 @@ private:
   void SetControlledRenderer();
 
   /**
-  * @brief set each data node invisible in all render windows, as soon as the node is added to the data storage
+  * @brief Reacts to a node that has been added to the data storage.
+  *     1. Insert new node into the node list of all render windows, if it is an "globalObject_RWM"-node.
+  *  or else
+  *     2. Set data node invisible in all render windows, as soon as the node is added to the data storage.
   */
   void NodeAdded(const mitk::DataNode* node) override;
 

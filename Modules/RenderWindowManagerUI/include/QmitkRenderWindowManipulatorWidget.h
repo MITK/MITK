@@ -57,22 +57,25 @@ public:
   */
   void SetActiveRenderWindow(const QString &renderWindowId);
   /**
-  * @brief 
+  * @brief Use the RenderWindowLayerController to insert the given data node into the currently active render window.
+  *       The new node is placed on top of all existing layer nodes in that render window.
   *
-  * @param dataNode   k
+  * @param dataNode   The data node that should be inserted.
   */
   void AddLayer(mitk::DataNode* dataNode);
   /**
-  * @brief
+  * @brief Use the RenderWindowLayerController to insert the given data node into all controlled render windows.
+  *       The new node is placed on top of all existing layer nodes in the render window.
   *
-  * @param dataNode   k
+  * @param dataNode   The data node that should be inserted.
+  */
   void AddLayerToAllRenderer(mitk::DataNode* dataNode);
+  /**
+  * @brief  Use the RenderWindowLayerController to hide the given data node in the currently active render window.
+  *
+  * @param dataNode   The data node that should be hid.
   */
   void HideDataNodeInAllRenderer(const mitk::DataNode* dataNode);
-
-protected:
-
-  void SetUpConnections();
 
 Q_SIGNALS:
   void AddLayerButtonClicked();
@@ -92,6 +95,7 @@ private Q_SLOTS:
 private:
 
   void Init();
+  void SetUpConnections();
 
   Ui::QmitkRenderWindowManipulatorWidget m_Controls;
 

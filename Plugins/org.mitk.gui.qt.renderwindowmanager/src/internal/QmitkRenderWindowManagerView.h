@@ -49,13 +49,13 @@ protected:
 private Q_SLOTS:
 
   /**
-  * @brief called when the user changes the render window selection in the combo box
+  * @brief Called when the user changes the render window selection in the combo box.
   *
-  * @param renderWindowId   the text inside the combo box
+  * @param renderWindowId   The text inside the combo box.
   */
   void OnRenderWindowSelectionChanged(const QString &renderWindowId);
   /**
-  * @brief called when the 'AddLayer'-button of he render window manipulator widget has been pushed
+  * @brief Called when the 'AddLayer'-button of he render window manipulator widget has been pushed.
   */
   void OnAddLayerButtonClicked();
 

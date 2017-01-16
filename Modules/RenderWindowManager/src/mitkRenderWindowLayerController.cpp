@@ -189,11 +189,11 @@ void mitk::RenderWindowLayerController::RemoveLayerNode(DataNode* dataNode, cons
   }
 }
 
-void mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
+bool mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
 {
   if (nullptr == dataNode)
   {
-    return;
+    return false;
   }
 
   if (nullptr == renderer)
@@ -204,6 +204,8 @@ void mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, cons
       if (renderer.IsNotNull())
       {
         MoveNodeToFront(dataNode, renderer);
+        // we don't store/need the returned boolean value
+        return false;
       }
     }
   }
@@ -222,18 +224,22 @@ void mitk::RenderWindowLayerController::MoveNodeToFront(DataNode* dataNode, cons
       {
         // move the current data node above the current topmost layer
         dataNode->SetIntProperty("layer", topmostLayer+1, renderer);
+        dataNode->Modified();
+        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+        return true;
       }
       // else: data node has no layer information or is already the topmost layer node
     }
     // else: do not work with empty layer stack
   }
+  return false;
 }
 
-void mitk::RenderWindowLayerController::MoveNodeToBack(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
+bool mitk::RenderWindowLayerController::MoveNodeToBack(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
 {
   if (nullptr == dataNode)
   {
-    return;
+    return false;
   }
 
   if (nullptr == renderer)
@@ -244,6 +250,8 @@ void mitk::RenderWindowLayerController::MoveNodeToBack(DataNode* dataNode, const
       if (renderer.IsNotNull())
       {
         MoveNodeToBack(dataNode, renderer);
+        // we don't store/need the returned boolean value
+        return false;
       }
     }
   }
@@ -270,20 +278,25 @@ void mitk::RenderWindowLayerController::MoveNodeToBack(DataNode* dataNode, const
           {
             layer.second->SetIntProperty("layer", layer.first + 1, renderer);
           }
-          // else: current data node has already been moved to the lowermost layer
+          // else: current data node is the selected data node or
+          // was previously already above the selected data node
         }
+        dataNode->Modified();
+        mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+        return true;
       }
       // else: data node has no layer information or is already the lowermost layer node
     }
     // else: do not work with empty layer stack
   }
+  return false;
 }
 
-void mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
+bool mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
 {
   if (nullptr == dataNode)
   {
-    return;
+    return false;
   }
 
   if (nullptr == renderer)
@@ -294,6 +307,8 @@ void mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const Bas
       if (renderer.IsNotNull())
       {
         MoveNodeUp(dataNode, renderer);
+        // we don't store/need the returned boolean value
+        return false;
       }
     }
   }
@@ -318,9 +333,9 @@ void mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const Bas
           RenderWindowLayerUtilities::LayerStack::const_iterator prevLayerStackIterator = std::prev(layerStackIterator);
           dataNode->SetIntProperty("layer", prevLayerStackIterator->first, renderer);
           prevLayerStackIterator->second->SetIntProperty("layer", currentLayer, renderer);
-          //prevLayerStackIterator->second->Modified();
           dataNode->Modified();
           mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+          return true;
         }
         // else: layer stack does not contain a layer with the 'currentLayer'data node or
         //       layer is already the topmost layer node
@@ -329,13 +344,14 @@ void mitk::RenderWindowLayerController::MoveNodeUp(DataNode* dataNode, const Bas
     }
     // else: do not work with empty layer stack
   }
+  return false;
 }
 
-void mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
+bool mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const BaseRenderer* renderer /*= nullptr*/)
 {
   if (nullptr == dataNode)
   {
-    return;
+    return false;
   }
 
   if (nullptr == renderer)
@@ -346,6 +362,8 @@ void mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const B
       if (renderer.IsNotNull())
       {
         MoveNodeDown(dataNode, renderer);
+        // we don't store/need the returned boolean value
+        return false;
       }
     }
   }
@@ -373,9 +391,9 @@ void mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const B
             // swap the layers of the dataNode and the dataNode on the next lower layer (next map element)
             dataNode->SetIntProperty("layer", nextLayerStackIterator->first, renderer);
             nextLayerStackIterator->second->SetIntProperty("layer", currentLayer, renderer);
-            //nextLayerStackIterator->second->Modified();
             dataNode->Modified();
             mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
+            return true;
           }
           // else: data node is already the lowermost layer node
         }
@@ -385,6 +403,7 @@ void mitk::RenderWindowLayerController::MoveNodeDown(DataNode* dataNode, const B
     }
     // else: do not work with empty layer stack
   }
+  return false;
 }
 
 void mitk::RenderWindowLayerController::SetVisibilityOfDataNode(bool visibility, DataNode* dataNode, const BaseRenderer* renderer /*=nullptr*/)

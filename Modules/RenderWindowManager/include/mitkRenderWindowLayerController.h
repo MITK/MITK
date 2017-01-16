@@ -95,7 +95,7 @@ namespace mitk
     * @param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
-    void MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
+    bool MoveNodeToFront(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
     * @brief Set the node in the given renderer as the lowermost layer. This will change only the "layer" property.
     *
@@ -103,7 +103,7 @@ namespace mitk
     * @param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
-    void MoveNodeToBack(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
+    bool MoveNodeToBack(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
     * @brief Move the node in the given renderer one layer down. This will change only the "layer" property.
     *
@@ -111,7 +111,7 @@ namespace mitk
     * @param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
-    void MoveNodeUp(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
+    bool MoveNodeUp(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
     * @brief Move the node in the given renderer one layer up. This will change only the "layer" property.
     *
@@ -119,7 +119,7 @@ namespace mitk
     * @param renderer   Pointer to the renderer instance for which the data node should be moved.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     */
-    void MoveNodeDown(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
+    bool MoveNodeDown(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
     /**
     * @brief Set the visibility of the given data node for the given renderer.
     *

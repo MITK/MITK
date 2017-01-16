@@ -17,25 +17,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 // render window manager UI module
 #include "QmitkRenderWindowManipulatorWidget.h"
 
+#include "QmitkCustomVariants.h"
+
 // mitk core
 #include <mitkBaseRenderer.h>
 
 // qt
-#include <QMessageBox>
 #include <QSignalMapper>
-#include <QStringList>
 
 QmitkRenderWindowManipulatorWidget::QmitkRenderWindowManipulatorWidget(mitk::DataStorage::Pointer dataStorage, QWidget* parent /*=nullptr*/)
   : m_DataStorage(dataStorage)
   , QWidget(parent)
 {
   Init();
-}
-
-void QmitkRenderWindowManipulatorWidget::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
-{
-  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
-  m_RenderWindowViewDirectionController->SetControlledRenderer(controlledRenderer);
 }
 
 void QmitkRenderWindowManipulatorWidget::Init()
@@ -90,6 +84,12 @@ void QmitkRenderWindowManipulatorWidget::SetUpConnections()
   connect(m_Controls.radioButtonSagittal, SIGNAL(clicked()), changeViewDirectionSignalMapper, SLOT(map()));
 }
 
+void QmitkRenderWindowManipulatorWidget::SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer)
+{
+  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
+  m_RenderWindowViewDirectionController->SetControlledRenderer(controlledRenderer);
+}
+
 void QmitkRenderWindowManipulatorWidget::SetActiveRenderWindow(const QString &renderWindowId)
 {
   std::string currentRendererName = renderWindowId.toStdString();
@@ -138,11 +138,14 @@ void QmitkRenderWindowManipulatorWidget::RemoveLayer()
   QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant rowData = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
-    mitk::DataNode* dataNode = m_DataStorage->GetNamedNode(rowData.toString().toStdString());
 
-    m_RenderWindowLayerController->RemoveLayerNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
-    m_Controls.renderWindowTableView->clearSelection();
+    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    if (qvariantDataNode.canConvert<mitk::DataNode*>())
+    {
+      mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
+      m_RenderWindowLayerController->RemoveLayerNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
+      m_Controls.renderWindowTableView->clearSelection();
+    }
   }
 }
 
@@ -151,11 +154,13 @@ void QmitkRenderWindowManipulatorWidget::SetAsBaseLayer()
   QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant rowData = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
-    mitk::DataNode* dataNode = m_DataStorage->GetNamedNode(rowData.toString().toStdString());
-
-    m_RenderWindowLayerController->SetBaseDataNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
-    m_Controls.renderWindowTableView->clearSelection();
+    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    if (qvariantDataNode.canConvert<mitk::DataNode*>())
+    {
+      mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
+      m_RenderWindowLayerController->SetBaseDataNode(dataNode, m_RenderWindowDataModel->GetCurrentRenderer());
+      m_Controls.renderWindowTableView->clearSelection();
+    }
   }
 }
 
@@ -164,19 +169,32 @@ void QmitkRenderWindowManipulatorWidget::MoveLayer(const QString &direction)
   QModelIndex selectedIndex = m_Controls.renderWindowTableView->currentIndex();
   if (selectedIndex.isValid())
   {
-    QVariant rowData = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
-    mitk::DataNode* dataNode = m_DataStorage->GetNamedNode(rowData.toString().toStdString());
-    const mitk::BaseRenderer* selectedRenderer = m_RenderWindowDataModel->GetCurrentRenderer();
+    QVariant qvariantDataNode = m_RenderWindowDataModel->data(selectedIndex, Qt::UserRole);
+    if (qvariantDataNode.canConvert<mitk::DataNode*>())
+    {
+      mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode*>();
+      const mitk::BaseRenderer* selectedRenderer = m_RenderWindowDataModel->GetCurrentRenderer();
 
-    if ("up" == direction)
-    {
-      m_RenderWindowLayerController->MoveNodeUp(dataNode, selectedRenderer);
+      bool success = false;
+      if ("up" == direction)
+      {
+        success = m_RenderWindowLayerController->MoveNodeUp(dataNode, selectedRenderer);
+        if (success)
+        {
+          // node has been successfully moved up
+          m_Controls.renderWindowTableView->selectRow(selectedIndex.row() - 1);
+        }
+      }
+      else
+      {
+        success = m_RenderWindowLayerController->MoveNodeDown(dataNode, selectedRenderer);
+        if (success)
+        {
+          // node has been successfully moved down
+          m_Controls.renderWindowTableView->selectRow(selectedIndex.row() + 1);
+        }
+      }
     }
-    else
-    {
-      m_RenderWindowLayerController->MoveNodeDown(dataNode, selectedRenderer);
-    }
-    m_Controls.renderWindowTableView->clearSelection();
   }
 }
 

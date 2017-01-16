@@ -14,7 +14,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+// render window manager UI module
 #include "QmitkRenderWindowDataModel.h"
+
+#include "QmitkCustomVariants.h"
 
 QmitkRenderWindowDataModel::QmitkRenderWindowDataModel(QObject* parent /*= nullptr*/)
   : QAbstractTableModel(parent)
@@ -93,8 +96,9 @@ QVariant QmitkRenderWindowDataModel::data(const QModelIndex &index, int role) co
     }
     else if (Qt::UserRole == role)
     {
-      // user role always returns the data node name, as the name is needed to manipulate a data node
-      return QVariant(QString::fromStdString(dataNode->GetName()));
+      // user role always returns a reference to the data node,
+      // which can be used to modify the data node in the data storage
+      return QVariant::fromValue(dataNode);
     }
   }
   return QVariant();

@@ -1,5 +1,8 @@
-set(INTERNAL_CPP_FILES
+set(SRC_CPP_FILES
   QmitkPAUSViewerView.cpp
+)
+
+set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_photoacoustics_pausviewer_Activator.cpp
 )
 
@@ -8,7 +11,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/QmitkPAUSViewerView.h
+  src/QmitkPAUSViewerView.h
   src/internal/org_mitk_gui_qt_photoacoustics_pausviewer_Activator.h
 )
 

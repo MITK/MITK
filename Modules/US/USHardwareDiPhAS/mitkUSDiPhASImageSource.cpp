@@ -504,7 +504,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
     itk::Index<3> pixel = { { (image->GetDimension(0) / 2), 22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine, 0 } }; //22/532*2048 = 84
     if (!m_Pyro->IsSyncDelaySet() &&(image->GetPixelValueByIndex(pixel) < -30)) // #MagicNumber
     {
-      MITK_INFO << "Setting SyncDelay";
+      MITK_INFO << "Setting SyncDelay now";
       m_Pyro->SetSyncDelay(m_CurrentImageTimestamp);
     }
 

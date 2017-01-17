@@ -35,6 +35,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 #include <QmitkLevelWindowWidget.h>
 #include <QmitkSliceWidget.h>
+#include <QmitkPAUSViewerView.h>
 
 #include <QTime>
 
@@ -105,21 +106,12 @@ protected:
   void CreateControlWidgets();
   void RemoveControlWidgets();
 
-  void AddOverlays();
-  void RemoveOverlays();
-
   void CreateWindows();
 
-  QmitkSliceWidget* m_PARenderWidget;
-  QmitkSliceWidget* m_USRenderWidget;
+  QmitkPAUSViewerView* m_PausViewerView;
 
   mitk::StandaloneDataStorage::Pointer m_PADataStorage;
   mitk::StandaloneDataStorage::Pointer m_USDataStorage;
-
-  mitk::OverlayManager::Pointer m_PAOverlayManager;
-  mitk::OverlayManager::Pointer m_USOverlayManager;
-  mitk::BaseRenderer::Pointer m_PARenderer;
-  mitk::BaseRenderer::Pointer m_USRenderer;
 
   /** The device that is currently used to aquire images */
   mitk::USDevice::Pointer m_Device;
@@ -157,7 +149,9 @@ protected:
     void UpdateAmountOfOutputs();
 
     /** This function just checks how many nodes there are currently and sets the laser image to a jet transparent colormap. */
-    void UpdateColormaps();
+    void UpdateLevelWindows();
+    bool firstTimeLevelWindowInit;
+
     void SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type);
 
     /** The image that holds all data given by the USDevice.*/

@@ -355,7 +355,7 @@ bool mitk::LabelSetImage::ExistLabelSet(unsigned int layer) const
 
 void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, unsigned int /*layer*/)
 {
-  int targetPixelValue = GetActiveLabel()->GetValue();
+  int targetPixelValue = this->GetActiveLabel(GetActiveLayer())->GetValue();
   try
   {
     AccessByItk_2(this, MergeLabelProcessing, targetPixelValue, pixelValue);
@@ -383,6 +383,7 @@ void mitk::LabelSetImage::MergeLabels(std::vector<PixelType> &VectorOfLablePixel
   {
     mitkThrow() << e.GetDescription();
   }
+  Modified();
 }
 
 void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer)

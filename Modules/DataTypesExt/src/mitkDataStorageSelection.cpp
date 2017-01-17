@@ -75,11 +75,7 @@ namespace mitk
     {
       node = m_Nodes.at(index);
     }
-    catch(const std::out_of_range& exp)
-    {
-      return nullptr;
-    }
-    catch(...)
+    catch(const std::out_of_range&)
     {
       return nullptr;
     }

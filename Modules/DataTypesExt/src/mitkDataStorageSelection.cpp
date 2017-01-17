@@ -64,7 +64,23 @@ namespace mitk
 
   mitk::DataNode::Pointer DataStorageSelection::GetNode(unsigned int index) const
   {
-    return (index < m_Nodes.size())? m_Nodes.at(index): nullptr;
+    if (!m_Nodes.size())
+    {
+      return nullptr;
+    }
+    
+    mitk::DataNode::Pointer node = nullptr;
+    
+    try
+    {
+      node = m_Nodes.at(index);
+    }
+    catch(const std::out_of_range&)
+    {
+      return nullptr;
+    }
+    
+    return node;
   }
 
   std::vector<mitk::DataNode*> DataStorageSelection::GetNodes() const
@@ -365,5 +381,4 @@ namespace mitk
         , ObjectChangedCommand);
     }
   }
-
 }

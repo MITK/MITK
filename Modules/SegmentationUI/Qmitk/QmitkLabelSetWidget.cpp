@@ -610,9 +610,10 @@ void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)
   if (interpolator)
   {
     interpolator->SetActiveLabel(pixelValue);
-    workingImage->Modified();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+
+  workingImage->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnItemClicked(QTableWidgetItem *item)
@@ -649,6 +650,7 @@ void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   }
 
   workingImage->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::SelectLabelByPixelValue(mitk::Label::PixelType pixelValue)

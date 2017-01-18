@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define GPU_ERROR MITK_ERROR("mapper.vr")
 
 #include "mitkGPUVolumeMapper3D.h"
+VTK_MODULE_INIT(vtkRenderingVolumeOpenGL);
 
 #include "mitkDataNode.h"
 

@@ -7,7 +7,7 @@
       id="org.mitk.views.general"
       name="MITK General"/>
     <view id="org.mitk.views.multilabelsegmentation"
-      name="MultiLabelSegmentation"
+      name="MultiLabel Segmentation"
       icon="resources/multilabelsegmentation.png"
       class="QmitkMultiLabelSegmentationView" />
 
@@ -20,7 +20,7 @@
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePage" name="MultiLabelSegmentation" class="QmitkMultiLabelSegmentationPreferencePage">
+    <page id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePage" name="MultiLabel Segmentation" class="QmitkMultiLabelSegmentationPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords"></keywordreference>
     </page>
   </extension>

@@ -122,26 +122,25 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 
   SetVtkMapperImmediateModeRendering(localStorage->m_Mapper);
 
-  mitk::Image *input = const_cast<mitk::Image *>(this->GetInput());
+  mitk::Image *image = const_cast<mitk::Image *>(this->GetInput());
   mitk::DataNode *datanode = this->GetDataNode();
-
-  if (input == NULL || input->IsInitialized() == false)
+  if (nullptr == image || !image->IsInitialized())
   {
     return;
   }
 
   // check if there is a valid worldGeometry
   const PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((worldGeometry == NULL) || (!worldGeometry->IsValid()) || (!worldGeometry->HasReferenceGeometry()))
+  if (nullptr == worldGeometry || !worldGeometry->IsValid() || !worldGeometry->HasReferenceGeometry())
   {
     return;
   }
 
-  input->Update();
+  image->Update();
 
   // early out if there is no intersection of the current rendering geometry
   // and the geometry of the image that is to be rendered.
-  if (!RenderingGeometryIntersectsImage(worldGeometry, input->GetSlicedGeometry()))
+  if (!RenderingGeometryIntersectsImage(worldGeometry, image->GetSlicedGeometry()))
   {
     // set image to NULL, to clear the texture in 3D, because
     // the latest image is used there if the plane is out of the geometry
@@ -152,13 +151,13 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   }
 
   // set main input for ExtractSliceFilter
-  localStorage->m_Reslicer->SetInput(input);
+  localStorage->m_Reslicer->SetInput(image);
   localStorage->m_Reslicer->SetWorldGeometry(worldGeometry);
   localStorage->m_Reslicer->SetTimeStep(this->GetTimestep());
 
   // set the transformation of the image to adapt reslice axis
   localStorage->m_Reslicer->SetResliceTransformByGeometry(
-    input->GetTimeGeometry()->GetGeometryForTimeStep(this->GetTimestep()));
+    image->GetTimeGeometry()->GetGeometryForTimeStep(this->GetTimestep()));
 
   // is the geometry of the slice based on the input image or the worldgeometry?
   bool inPlaneResampleExtentByGeometry = false;
@@ -167,7 +166,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
 
   // Initialize the interpolation mode for resampling; switch to nearest
   // neighbor if the input image is too small.
-  if ((input->GetDimension() >= 3) && (input->GetDimension(2) > 1))
+  if ((image->GetDimension() >= 3) && (image->GetDimension(2) > 1))
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     datanode->GetProperty(resliceInterpolationProperty, "reslice interpolation", renderer);
@@ -204,7 +203,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   int thickSlicesMode = 0;
   int thickSlicesNum = 1;
   // Thick slices parameters
-  if (input->GetPixelType().GetNumberOfComponents() == 1) // for now only single component are allowed
+  if (image->GetPixelType().GetNumberOfComponents() == 1) // for now only single component are allowed
   {
     DataNode *dn = renderer->GetCurrentWorldPlaneGeometryNode();
     if (dn)
@@ -251,7 +250,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     }
     normal.Normalize();
 
-    input->GetTimeGeometry()->GetGeometryForTimeStep(this->GetTimestep())->WorldToIndex(normal, normInIndex);
+    image->GetTimeGeometry()->GetGeometryForTimeStep(this->GetTimestep())->WorldToIndex(normal, normInIndex);
 
     dataZSpacing = 1.0 / normInIndex.GetNorm();
 
@@ -309,7 +308,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     // Calculate the actual bounds of the transformed plane clipped by the
     // dataset bounding box; this is required for drawing the texture at the
     // correct position during 3D mapping.
-    mitk::PlaneClipping::CalculateClippedPlaneBounds(input->GetGeometry(), planeGeometry, textureClippingBounds);
+    mitk::PlaneClipping::CalculateClippedPlaneBounds(image->GetGeometry(), planeGeometry, textureClippingBounds);
 
     textureClippingBounds[0] = static_cast<int>(textureClippingBounds[0] / localStorage->m_mmPerPixel[0] + 0.5);
     textureClippingBounds[1] = static_cast<int>(textureClippingBounds[1] / localStorage->m_mmPerPixel[0] + 0.5);
@@ -331,32 +330,39 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     datanode->GetBoolProperty("outline binary", binaryOutline, renderer);
     if (binaryOutline) // contour rendering
     {
-      if (input->GetPixelType().GetBpe() <= 8)
+      // get pixel type of vtk image
+      itk::ImageIOBase::IOComponentType componentType = static_cast<itk::ImageIOBase::IOComponentType>(image->GetPixelType().GetComponentType());
+      switch (componentType)
       {
+      case itk::ImageIOBase::UCHAR:
         // generate contours/outlines
-        localStorage->m_OutlinePolyData = CreateOutlinePolyData(renderer);
-
-        float binaryOutlineWidth(1.0);
+        localStorage->m_OutlinePolyData = CreateOutlinePolyData<unsigned char>(renderer);
+        break;
+      case itk::ImageIOBase::USHORT:
+        // generate contours/outlines
+        localStorage->m_OutlinePolyData = CreateOutlinePolyData<unsigned short>(renderer);
+        break;
+      default:
+        binaryOutline = false;
+        this->ApplyLookuptable(renderer);
+        MITK_WARN << "Type of all binary images should be unsigned char or unsigned short. Outline does not work on other pixel types!";
+      }
+      if (binaryOutline) // binary outline is still true --> add outline
+      {
+        float binaryOutlineWidth = 1.0;
         if (datanode->GetFloatProperty("outline width", binaryOutlineWidth, renderer))
         {
           if (localStorage->m_Actors->GetNumberOfPaths() > 1)
           {
-            float binaryOutlineShadowWidth(1.5);
+            float binaryOutlineShadowWidth = 1.5;
             datanode->GetFloatProperty("outline shadow width", binaryOutlineShadowWidth, renderer);
 
             dynamic_cast<vtkActor *>(localStorage->m_Actors->GetParts()->GetItemAsObject(0))
               ->GetProperty()
               ->SetLineWidth(binaryOutlineWidth * binaryOutlineShadowWidth);
           }
-
           localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
         }
-      }
-      else
-      {
-        binaryOutline = false;
-        this->ApplyLookuptable(renderer);
-        MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
       }
     }
     else // standard binary image
@@ -407,15 +413,18 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   {
     // We need the contour for the binary outline property as actor
     localStorage->m_Mapper->SetInputData(localStorage->m_OutlinePolyData);
-    localStorage->m_Actor->SetTexture(NULL); // no texture for contours
+    localStorage->m_Actor->SetTexture(nullptr); // no texture for contours
 
-    bool binaryOutlineShadow(false);
+    bool binaryOutlineShadow = false;
     datanode->GetBoolProperty("outline binary shadow", binaryOutlineShadow, renderer);
-
     if (binaryOutlineShadow)
+    {
       contourShadowActor->SetVisibility(true);
+    }
     else
+    {
       contourShadowActor->SetVisibility(false);
+    }
   }
   else
   { // Connect the mapper with the input texture. This is the standard case.
@@ -860,6 +869,7 @@ mitk::ImageVtkMapper2D::LocalStorage *mitk::ImageVtkMapper2D::GetLocalStorage(mi
   return m_LSH.GetLocalStorage(renderer);
 }
 
+template <typename TPixel>
 vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk::BaseRenderer *renderer)
 {
   LocalStorage *localStorage = this->GetLocalStorage(renderer);
@@ -875,7 +885,6 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   int line = dims[0];                                         // how many pixels per line?
   int x = xMin;                                               // pixel index x
   int y = yMin;                                               // pixel index y
-  char *currentPixel;
 
   // get the depth for each contour
   float depth = CalculateLayerDepth(renderer);
@@ -884,7 +893,7 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(mitk:
   vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); // the lines to connect the points
 
   // We take the pointer to the first pixel of the image
-  currentPixel = static_cast<char *>(localStorage->m_ReslicedImage->GetScalarPointer());
+  TPixel* currentPixel = static_cast<TPixel*>(localStorage->m_ReslicedImage->GetScalarPointer());
 
   while (y <= yMax)
   {

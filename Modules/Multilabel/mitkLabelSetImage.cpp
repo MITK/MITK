@@ -451,10 +451,10 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue, unsigned int layer)
 
 mitk::Label *mitk::LabelSetImage::GetActiveLabel(unsigned int layer)
 {
-  if (m_LabelSetContainer.size() > layer)
-    return m_LabelSetContainer[layer]->GetActiveLabel();
-  else
+  if (m_LabelSetContainer.size() <= layer)
     return nullptr;
+  else
+    return m_LabelSetContainer[layer]->GetActiveLabel();;
 }
 
 mitk::Label *mitk::LabelSetImage::GetLabel(PixelType pixelValue, unsigned int layer) const

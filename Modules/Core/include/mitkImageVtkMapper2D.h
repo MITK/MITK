@@ -237,6 +237,7 @@ namespace mitk
         \param renderer: Pointer to the renderer containing the needed information
         \note This code is based on code from the iil library.
         */
+    template <typename TPixel>
     vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(mitk::BaseRenderer *renderer);
 
     /** Default constructor */

@@ -112,9 +112,8 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 {
   // setup the basic GUI of this view
-//  m_Parent = parent;
+  m_Parent = parent;
   m_Controls.setupUi(parent);
-
 
   // *------------------------
   // * DATA SELECTION WIDGETS
@@ -261,6 +260,7 @@ void QmitkMultiLabelSegmentationView::Hidden()
 {
   // Not yet implemented
 }
+
 void QmitkMultiLabelSegmentationView::InitializeListeners()
 {
   if (m_Interactor.IsNull())
@@ -326,9 +326,9 @@ void QmitkMultiLabelSegmentationView::RenderWindowPartActivated(mitk::IRenderWin
     m_Parent->setEnabled(true);
 
     QList<mitk::SliceNavigationController*> controllers;
-    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
-    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
-    controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+    controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    controllers.push_back(m_IRenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls.m_SliceBasedInterpolatorWidget->SetSliceNavigationControllers(controllers);
   }
 }
@@ -417,12 +417,12 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
       m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
       m_Controls.m_cbActiveLayer->blockSignals(false);
 
-      m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers>1);
-      m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers>1);
-      m_Controls.m_btPreviousLayer->setEnabled(activeLayer>0);
-      m_Controls.m_btNextLayer->setEnabled(activeLayer!=numberOfLayers-1);
-      m_Controls.m_btLockExterior->setChecked(workingImage->GetLabel(0)->GetLocked());
+      m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers > 1);
+      m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers > 1);
+      m_Controls.m_btPreviousLayer->setEnabled(activeLayer > 0);
+      m_Controls.m_btNextLayer->setEnabled(activeLayer != numberOfLayers - 1);
 
+      m_Controls.m_btLockExterior->setChecked(workingImage->GetLabel(0, activeLayer)->GetLocked());
       m_Controls.m_pbShowLabelTable->setChecked(workingImage->GetNumberOfLabels() > 1 /*1st is exterior*/);
 
       //MLI TODO
@@ -434,7 +434,7 @@ void QmitkMultiLabelSegmentationView::UpdateControls()
   {
     int layer = -1;
     referenceNode->GetIntProperty("layer", layer);
-    workingNode->SetIntProperty("layer", layer+1);
+    workingNode->SetIntProperty("layer", layer + 1);
   }
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_ALL);
@@ -574,7 +574,7 @@ void QmitkMultiLabelSegmentationView::OnChangeLayer(int layer)
   assert(workingImage);
 
   this->WaitCursorOn();
-  workingImage->SetActiveLayer( layer );
+  workingImage->SetActiveLayer(layer);
   this->WaitCursorOff();
 
   UpdateControls();
@@ -897,6 +897,53 @@ void QmitkMultiLabelSegmentationView::OnManualTool2DSelected(int id)
     us::ModuleResource resource = m_ToolManager->GetToolById(id)->GetCursorIconResource();
     if (resource.IsValid())
       this->SetMouseCursor(resource, 0, 0);
+  }
+}
+
+void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+{
+  if (m_Parent && m_WorkingNode.IsNotNull())
+  {
+    mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(prefs->GetBool("draw outline", true));
+    mitk::BoolProperty::Pointer volumeRendering = mitk::BoolProperty::New(prefs->GetBool("volume rendering", false));
+    mitk::LabelSetImage* labelSetImage;
+    mitk::DataNode* segmentation;
+
+    // iterate all segmentations (binary (single label) and LabelSetImages)
+    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::NodePredicateOr::Pointer allSegmentationsPredicate = mitk::NodePredicateOr::New(isBinaryPredicate, m_SegmentationPredicate);
+    mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(allSegmentationsPredicate);
+
+    for (mitk::DataStorage::SetOfObjects::const_iterator it = allSegmentations->begin(); it != allSegmentations->end(); ++it)
+    {
+      segmentation = *it;
+      labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentation->GetData());
+      if (nullptr != labelSetImage)
+      {
+        // segmentation node is a multi label segmentation
+        segmentation->SetProperty("labelset.contour.active", drawOutline);
+        segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+        segmentation->SetProperty("volumerendering", volumeRendering);
+        // force render window update to show outline
+        segmentation->GetData()->Modified();
+      }
+      else
+      {
+        // node is actually a 'single label' segmentation,
+        // but its outline property can be set in the 'multi label' segmentation preference page as well
+        bool isBinary = false;
+        segmentation->GetBoolProperty("binary", isBinary);
+        if (isBinary)
+        {
+          segmentation->SetProperty("outline binary", drawOutline);
+          segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
+          segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+          segmentation->SetProperty("volumerendering", volumeRendering);
+          // force render window update to show outline
+          segmentation->GetData()->Modified();
+        }
+      }
+    }
   }
 }
 

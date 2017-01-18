@@ -51,7 +51,7 @@ void QmitkMultiLabelSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   berry::IPreferencesService* prefService
     = berry::Platform::GetPreferencesService();
 
-  m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+  m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.multilabelsegmentation");
 
   m_MainControl = new QWidget(parent);
 

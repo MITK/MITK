@@ -44,18 +44,17 @@ class vtkNeverTranslucentTexture;
 
 namespace mitk
 {
+
   /** \brief Mapper to resample and display 2D slices of a 3D labelset image.
    *
    * Properties that can be set for labelset images and influence this mapper are:
    *
-   *   - \b "labelset.contour.all": (BoolProperty) whether to show all labels as contours or not
    *   - \b "labelset.contour.active": (BoolProperty) whether to show only the active label as a contour or not
    *   - \b "labelset.contour.width": (FloatProperty) line width of the contour
 
    * The default properties are:
 
-   *   - \b "labelset.contour.all", mitk::BoolProperty::New( false ), renderer, overwrite )
-   *   - \b "labelset.contour.active", mitk::BoolProperty::New( false ), renderer, overwrite )
+   *   - \b "labelset.contour.active", mitk::BoolProperty::New( true ), renderer, overwrite )
    *   - \b "labelset.contour.width", mitk::FloatProperty::New( 2.0 ), renderer, overwrite )
 
    * \ingroup Mapper
@@ -82,7 +81,7 @@ namespace mitk
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
     /**
-       * To render transveral, coronal, and sagittal, the mapper is called three times.
+       * To render transversal, coronal, and sagittal, the mapper is called three times.
        * For performance reasons, the corresponding data for each view is saved in the
        * internal helper class LocalStorage. This allows rendering n views with just
        * 1 mitkMapper using n vtkMapper.

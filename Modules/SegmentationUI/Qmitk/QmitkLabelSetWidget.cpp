@@ -124,19 +124,19 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint &pos)
     combineAndCreateSurfaceAction->setEnabled(true);
     QObject::connect(
       combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));
-    menu->addAction(combineAndCreateSurfaceAction);
+    // menu->addAction(combineAndCreateSurfaceAction); Not implemented
 
     QAction *createMasksAction =
       new QAction(QIcon(":/Qmitk/CreateMask.png"), "Create a mask for each selected label", this);
     createMasksAction->setEnabled(true);
     QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));
-    menu->addAction(createMasksAction);
+    // menu->addAction(createMasksAction); Not implemented
 
     QAction *combineAndCreateMaskAction =
       new QAction(QIcon(":/Qmitk/CreateMask.png"), "Combine and create a mask", this);
     combineAndCreateMaskAction->setEnabled(true);
     QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));
-    menu->addAction(combineAndCreateMaskAction);
+    // menu->addAction(combineAndCreateMaskAction); Not implemented
   }
   else
   {
@@ -298,7 +298,7 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
     return;
 
   int pixelValue = -1;
-  for (int i = 0; i < m_Controls.m_LabelSetTableWidget->columnCount(); i++)
+  for (int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); i++)
   {
     if (dialog.GetLabelSetWidgetTableCompleteWord() == QString(m_Controls.m_LabelSetTableWidget->item(i, 0)->text()))
       pixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
@@ -311,8 +311,9 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
     return;
   }
 
-  GetWorkingImage()->MergeLabel(pixelValue);
+  GetWorkingImage()->MergeLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
 
+  UpdateAllTableWidgetItems();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -368,11 +369,14 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 
   if (dialog.exec() == QDialog::Rejected)
     return;
-  int pixelValue = GetWorkingImage()->GetActiveLabel()->GetValue();
+  int pixelValue = GetWorkingImage()->GetActiveLabel(GetWorkingImage()->GetActiveLayer())->GetValue();
 
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(dialog.GetColor());
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetName(dialog.GetSegmentationName().toStdString());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
+
+  this->ResetAllTableWidgetItems();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnCombineAndCreateMask(bool /*value*/)
@@ -412,7 +416,7 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
+    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -436,10 +440,11 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
+    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
   }
 
+  ResetAllTableWidgetItems();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -469,7 +474,7 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
                        ->data(Qt::UserRole)
                        .toInt();
 
-    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues, pixelValue);
+    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues, pixelValue, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -567,6 +572,7 @@ void QmitkLabelSetWidget::OnRandomColor(bool /*value*/)
   int pixelValue = GetPixelValueOfSelectedItem();
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(m_ColorSequenceRainbow.GetNextColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
+  UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::SetOrganColors(const QStringList &organColors)
@@ -584,6 +590,9 @@ void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)
   mitk::SurfaceBasedInterpolationController *interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
   if (interpolator)
     interpolator->SetActiveLabel(pixelValue);
+
+  workingImage->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnItemClicked(QTableWidgetItem *item)

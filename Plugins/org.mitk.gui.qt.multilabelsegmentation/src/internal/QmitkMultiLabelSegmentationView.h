@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
+// berry
+#include <berryIBerryPreferences.h>
 
 class QmitkRenderWindow;
 
@@ -107,6 +109,9 @@ protected slots:
   void OnLockExteriorToggled(bool);
 
 protected:
+
+  // invoked when the preferences were changed
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
   void OnEstablishLabelSetConnection();
   void OnLooseLabelSetConnection();

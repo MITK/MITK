@@ -4,19 +4,19 @@ berry--QCTabBar::tab:selected {
 
 berry--QCTabBar QToolButton#TabCloseButton
 {
-    image: url(D:/qdarkstyle/rc/close.png);
+    image: url(:/org.blueberry.ui.qt/dark/close.png);
 	border: none;
     background: red;
 }
 
 berry--QCTabBar QToolButton#TabCloseButton:hover
 {
-    image: url(D:/qdarkstyle/rc/close-hover.png);
+    image: url(:/org.blueberry.ui.qt/dark/close-hover.png);
     background: blue;
 }
 
 berry--QCTabBar QToolButton#TabCloseButton:pressed {
-    image: url(D:/qdarkstyle/rc/close-pressed.png);
+    image: url(:/org.blueberry.ui.qt/dark/close-pressed.png);
     background: black;
 }
 

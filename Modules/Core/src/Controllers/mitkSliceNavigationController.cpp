@@ -182,7 +182,7 @@ namespace mitk
       }
       else if (m_ViewDirection == Axial)
       {
-        this->Update(Axial, false, false, true);
+        this->Update(Axial, true, false, true);
       }
       else
       {

@@ -338,16 +338,3 @@ include(mitkInstallRules)
 #-----------------------------------------------------------------------------
 # Last configuration steps
 #-----------------------------------------------------------------------------
-
-# If we are under Windows, create two batch files which correctly
-# set up the environment for the application and for Visual Studio
-if(WIN32)
-  include(mitkFunctionCreateWindowsBatchScript)
-
-  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
-  foreach(VS_BUILD_TYPE debug release)
-    mitkFunctionCreateWindowsBatchScript("${PROJECT_SOURCE_DIR}/CMake/StartVS.bat.in"
-      ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat
-      ${VS_BUILD_TYPE})
-  endforeach()
-endif(WIN32)

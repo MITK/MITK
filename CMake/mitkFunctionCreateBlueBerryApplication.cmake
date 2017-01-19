@@ -160,6 +160,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_APP_NAME}.ini")
 endif()
 
 # Create batch and VS user files for Windows platforms
+include(mitkFunctionCreateWindowsBatchScript)
+
 if(WIN32)
   set(template_name "start${_APP_NAME}.bat.in")
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${template_name}")

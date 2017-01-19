@@ -150,7 +150,7 @@ protected:
 
     /** This function just checks how many nodes there are currently and sets the laser image to a jet transparent colormap. */
     void UpdateLevelWindows();
-    bool firstTimeLevelWindowInit;
+    bool m_ForceRequestUpdateAll;
 
     void SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type);
 

@@ -51,6 +51,8 @@ public:
   vtkRenderWindow* GetPARenderWindow();
   vtkRenderWindow* GetUSRenderWindow();
 
+  void SetUltrasoundReference(QmitkPAUSViewerView** ultrasoundReference);
+
 protected:
 
   void AddOverlays();
@@ -70,6 +72,7 @@ protected:
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkPAUSViewerViewControls* m_Controls;
+  QmitkPAUSViewerView** m_UltrasoundReference;
 };
 
 #endif // QMITKPAUSVIEWERVIEW_H_INCLUDED

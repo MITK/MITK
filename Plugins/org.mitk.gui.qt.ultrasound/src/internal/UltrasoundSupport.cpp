@@ -108,11 +108,19 @@ void UltrasoundSupport::CreateQtPartControl(QWidget *parent)
 
 void UltrasoundSupport::CreateWindows()
 {
-  m_PausViewerView = dynamic_cast<QmitkPAUSViewerView*>((GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.photoacoustics.pausviewer")).GetPointer());
-  if (m_PausViewerView == nullptr)
-    MITK_INFO << "failed";
-  m_PausViewerView->SetPADataStorage(m_PADataStorage);
-  m_PausViewerView->SetUSDataStorage(m_USDataStorage);
+  auto pausViewer = GetSite()->GetWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.photoacoustics.pausviewer");
+  if (pausViewer != nullptr)
+  {
+    m_PausViewerView = dynamic_cast<QmitkPAUSViewerView*>(pausViewer.GetPointer());
+    m_PausViewerView->SetPADataStorage(m_PADataStorage);
+    m_PausViewerView->SetUSDataStorage(m_USDataStorage);
+
+    m_PausViewerView->InitWindows();
+    m_PausViewerView->SetUltrasoundReference(&m_PausViewerView);
+    UpdateLevelWindows();
+
+    m_ForceRequestUpdateAll = true;
+  }
 }
 
 void UltrasoundSupport::InitNewNode()
@@ -127,7 +135,10 @@ void UltrasoundSupport::InitNewNode()
   Node->SetData(dummyImage);
   m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(dummyImage->GetGeometry());
 
+  // Add to Control Datastorage
   this->GetDataStorage()->Add(Node);
+
+  // Add to Display Datastorage
   if (m_Node.size() > 1)
     m_USDataStorage->Add(Node);
   else if (m_Node.size() == 1)
@@ -137,12 +148,17 @@ void UltrasoundSupport::InitNewNode()
 void UltrasoundSupport::DestroyLastNode()
 {
   auto& Node = m_Node.back();
-  this->GetDataStorage()->Remove(Node);
+
+  // Remove from Control Datastorage
+  this->GetDataStorage()->Remove(Node); 
+
+  // Remove from Display Datastorage
   if (m_Node.size() > 1)
     m_USDataStorage->Remove(Node);
   else if (m_Node.size() == 1)
     m_PADataStorage->Remove(Node);
 
+  // clean up
   Node->ReleaseData();
   m_Node.pop_back();
 }
@@ -170,8 +186,11 @@ void UltrasoundSupport::UpdateLevelWindows()
     m_Node.back()->SetLevelWindow(levelWindow);
   }
 }
+
 void UltrasoundSupport::SetColormap(mitk::DataNode::Pointer node, mitk::LookupTable::LookupTableType type)
 {
+  // consider removing this, unused for now, and probably forever
+
   mitk::LookupTable::Pointer lookupTable = mitk::LookupTable::New();
   mitk::LookupTableProperty::Pointer lookupTableProperty = mitk::LookupTableProperty::New();
   lookupTable->SetType(type);
@@ -282,11 +301,6 @@ void UltrasoundSupport::UpdateImage()
       }
       else
       {
-        if (!firstTimeLevelWindowInit)
-        {
-          UpdateLevelWindows();
-          firstTimeLevelWindowInit = true;
-        }
         char name[30];
         sprintf(name, "US Viewing Stream - Image %d", index);
         m_Node.at(index)->SetName(name);
@@ -299,7 +313,7 @@ void UltrasoundSupport::UpdateImage()
     if ((m_OldGeometry.IsNotNull()) &&
       (m_curOutput.at(0)->GetGeometry() != NULL) &&
       (!mitk::Equal(m_OldGeometry.GetPointer(), m_curOutput.at(0)->GetGeometry(), 0.0001, false))
-      )
+      || m_ForceRequestUpdateAll)
     {
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
       if ((renderWindow != NULL) && (m_curOutput.at(0)->GetTimeGeometry()->IsValid()) && (m_Controls.m_ShowImageStream->isChecked()))
@@ -311,6 +325,8 @@ void UltrasoundSupport::UpdateImage()
       m_CurrentImageWidth = m_curOutput.at(0)->GetDimension(0);
       m_CurrentImageHeight = m_curOutput.at(0)->GetDimension(1);
       m_OldGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(m_curOutput.at(0)->GetGeometry());
+      UpdateLevelWindows();
+      m_ForceRequestUpdateAll = false;
     }
   }
 
@@ -336,20 +352,23 @@ void UltrasoundSupport::RenderImage2d()
 {
   if (!m_Controls.m_Update2DView->isChecked())
     return;
+
+  if (m_PausViewerView != nullptr)
+  {
+    auto renderingManager = mitk::RenderingManager::GetInstance();
+    renderingManager->RequestUpdate(m_PausViewerView->GetPARenderWindow());
+    renderingManager->RequestUpdate(m_PausViewerView->GetUSRenderWindow());
+  }
+  else
+  {
+    CreateWindows(); // try to check whether the PausViwer has been opened by now
+  }
+
   //mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
   //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
-
   // TODO: figure out how to proceed with the standard display
-
-  auto renderingManager = mitk::RenderingManager::GetInstance();
-  renderingManager->RequestUpdate(m_PausViewerView->GetPARenderWindow());
-  renderingManager->RequestUpdate(m_PausViewerView->GetUSRenderWindow());
-
-  if (m_PausViewerView->GetPARenderWindow() == nullptr)
-    MITK_INFO << "nullptr at renderwindow";
-
-
   //this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+
   m_FrameCounter2d++;
   if (m_FrameCounter2d >= 10)
   {
@@ -419,6 +438,7 @@ void UltrasoundSupport::OnChangedActiveDevice()
   }
   m_Node.clear();
 
+  // disconnect from the PausViewer
   m_PausViewerView = nullptr;
 
   //get current device, abort if it is invalid
@@ -448,8 +468,8 @@ void UltrasoundSupport::OnChangedActiveDevice()
     m_Controls.m_TimerWidget->setEnabled(false);
   }
 
+  // connect to PausViewer and Set it up
   CreateWindows();
-  m_PausViewerView->InitWindows();
 }
 
 void UltrasoundSupport::OnNewDeviceWidgetDone()
@@ -589,7 +609,7 @@ UltrasoundSupport::UltrasoundSupport()
   : m_ControlCustomWidget(0), m_ControlBModeWidget(0),
   m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
   m_CurrentImageWidth(0), m_CurrentImageHeight(0), m_AmountOfOutputs(0),
-  m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New()), firstTimeLevelWindowInit(false)
+  m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New()), m_ForceRequestUpdateAll(false)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
 

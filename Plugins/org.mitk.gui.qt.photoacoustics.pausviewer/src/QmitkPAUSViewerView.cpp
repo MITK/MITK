@@ -23,12 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkPAUSViewerView::VIEW_ID = "org.mitk.views.photoacoustics.pausviewer";
 
-QmitkPAUSViewerView::QmitkPAUSViewerView(): m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New())
+QmitkPAUSViewerView::QmitkPAUSViewerView() : m_PADataStorage(mitk::StandaloneDataStorage::New()), m_USDataStorage(mitk::StandaloneDataStorage::New()), m_UltrasoundReference(nullptr)
 {
 }
 
 QmitkPAUSViewerView::~QmitkPAUSViewerView()
 {
+  if(m_UltrasoundReference != nullptr)
+    *m_UltrasoundReference = nullptr;
 }
 
 void QmitkPAUSViewerView::InitWindows()
@@ -120,4 +122,9 @@ void QmitkPAUSViewerView::AddOverlays()
 void QmitkPAUSViewerView::RemoveOverlays()
 {
   m_PAOverlayManager->RemoveAllOverlays();
+}
+
+void QmitkPAUSViewerView::SetUltrasoundReference(QmitkPAUSViewerView** ultrasoundReference)
+{
+  m_UltrasoundReference = ultrasoundReference;
 }

@@ -15,7 +15,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPhotoacousticImage.h"
-#include "mitkUSDiPhASBModeImageFilter.h"
 #include "Algorithms/ITKUltrasound/itkBModeImageFilter.h"
 #include "Algorithms/itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"

@@ -34,13 +34,17 @@ class PAImageProcessing : public QmitkAbstractView
 
     static const std::string VIEW_ID;
 
+    PAImageProcessing();
+
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
     void ApplyBModeFilter();
+    void UseResampling();
+    void UseLogfilter();
+    void SetResampling();
 
   protected:
-
     virtual void CreateQtPartControl(QWidget *parent) override;
 
     virtual void SetFocus() override;
@@ -50,6 +54,9 @@ class PAImageProcessing : public QmitkAbstractView
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
     Ui::PAImageProcessingControls m_Controls;
+
+    float m_ResampleSpacing;
+    bool m_UseLogfilter;
 
 };
 

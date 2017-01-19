@@ -31,6 +31,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string PAImageProcessing::VIEW_ID = "org.mitk.views.paimageprocessing";
 
+PAImageProcessing::PAImageProcessing() : m_ResampleSpacing(0), m_UseLogfilter(false)
+{
+
+}
+
 void PAImageProcessing::SetFocus()
 {
   m_Controls.buttonApplyBModeFilter->setFocus();
@@ -41,6 +46,12 @@ void PAImageProcessing::CreateQtPartControl( QWidget *parent )
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi( parent );
   connect( m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(ApplyBModeFilter()) );
+  connect(m_Controls.DoResampling, SIGNAL(clicked()), this, SLOT(UseResampling()));
+  connect(m_Controls.Logfilter, SIGNAL(clicked()), this, SLOT(UseLogfilter()));
+  connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
+
+  m_Controls.DoResampling->setChecked(false);
+  m_Controls.ResamplingValue->setEnabled(false);
 }
 
 void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -56,11 +67,33 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
       return;
     }
   }
-
   m_Controls.labelWarning->setVisible( true );
   m_Controls.buttonApplyBModeFilter->setEnabled( false );
 }
 
+void PAImageProcessing::UseResampling()
+{
+  if (m_Controls.DoResampling->isChecked())
+  {
+    m_Controls.ResamplingValue->setEnabled(true);
+    m_ResampleSpacing = m_Controls.ResamplingValue->value();
+  }
+  else
+  {
+    m_Controls.ResamplingValue->setEnabled(false);
+    m_ResampleSpacing = 0;
+  }
+}
+
+void PAImageProcessing::UseLogfilter()
+{
+  m_UseLogfilter = m_Controls.Logfilter->isChecked();
+}
+
+void PAImageProcessing::SetResampling()
+{
+  m_ResampleSpacing = m_Controls.ResamplingValue->value();
+}
 
 void PAImageProcessing::ApplyBModeFilter()
 {
@@ -94,7 +127,8 @@ void PAImageProcessing::ApplyBModeFilter()
       message << ".";
       MITK_INFO << message.str();
       mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
-      node->SetData(filterbank->ApplyBmodeFilter(image, false, 0.15));
+      node->SetData(filterbank->ApplyBmodeFilter(image, m_UseLogfilter, m_ResampleSpacing));
+
       // update level window for the current dynamic range
       mitk::LevelWindow levelWindow;
       node->GetLevelWindow(levelWindow);

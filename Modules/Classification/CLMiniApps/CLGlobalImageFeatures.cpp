@@ -253,7 +253,64 @@ ExtractSlicesFromImages(mitk::Image::Pointer image, mitk::Image::Pointer mask, m
   }
 }
 
+static
+void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask, std::string path, int index)
+{
+  // Create a Standalone Datastorage for the single purpose of saving screenshots..
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  QmitkRenderWindow renderWindow;
+  renderWindow.GetRenderer()->SetDataStorage(ds);
 
+  auto nodeI = mitk::DataNode::New();
+  nodeI->SetData(image);
+  auto nodeM = mitk::DataNode::New();
+  nodeM->SetData(mask);
+  ds->Add(nodeI);
+  ds->Add(nodeM);
+
+  mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
+  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+
+  mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
+  unsigned int numberOfSteps = 1;
+  if (sliceNaviController)
+  {
+    numberOfSteps = sliceNaviController->GetSlice()->GetSteps();
+    sliceNaviController->GetSlice()->SetPos(0);
+  }
+
+  renderWindow.show();
+  renderWindow.resize(256, 256);
+
+  for (unsigned int currentStep = 0; currentStep < numberOfSteps; ++currentStep)
+  {
+    if (sliceNaviController)
+    {
+      sliceNaviController->GetSlice()->SetPos(currentStep);
+    }
+
+    renderWindow.GetRenderer()->PrepareRender();
+
+    vtkRenderWindow* renderWindow2 = renderWindow.GetVtkRenderWindow();
+    mitk::BaseRenderer* baserenderer = mitk::BaseRenderer::GetInstance(renderWindow2);
+    auto vtkRender = baserenderer->GetVtkRenderer();
+    vtkRender->GetRenderWindow()->WaitForCompletion();
+
+    vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
+    magnifier->SetInput(vtkRender);
+    magnifier->SetMagnification(3.0);
+
+    std::stringstream ss;
+    ss << path << "_Idx-" << index << "_Step-"<<currentStep<<".png";
+    std::string tmpImageName;
+    ss >> tmpImageName;
+    auto fileWriter = vtkPNGWriter::New();
+    fileWriter->SetInputConnection(magnifier->GetOutputPort());
+    fileWriter->SetFileName(tmpImageName.c_str());
+    fileWriter->Write();
+    fileWriter->Delete();
+  }
+}
 
 int main(int argc, char* argv[])
 {
@@ -309,7 +366,10 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  std::string version = "Version: 1.16";
+  bool savePNGofSlices = true;
+  std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
+
+  std::string version = "Version: 1.18";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -474,12 +534,12 @@ int main(int argc, char* argv[])
     writer.AddColumn("Segmentation");
   }
 
+
+  // Create a QTApplication and a Datastorage
+  // This is necessary in order to save screenshots of
+  // each image / slice.
   QApplication qtapplication(argc, argv);
   QmitkRegisterClasses();
-  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
-
-  QmitkRenderWindow renderWindow;
-  renderWindow.GetRenderer()->SetDataStorage(ds);
 
   while (imageToProcess)
   {
@@ -495,49 +555,10 @@ int main(int argc, char* argv[])
       imageToProcess = false;
     }
 
-    //
-    //  Start Saving image to folder.
-    //
-    /*
-
-    auto node = mitk::DataNode::New();
-    node->SetData(cImage);
-    auto nodeM = mitk::DataNode::New();
-    nodeM->SetData(cMask);
-    ds->Add(node);
-    ds->Add(nodeM);
-
-    mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
-    mitk::RenderingManager::GetInstance()->InitializeViews(geo);
-
-    mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
-    if (sliceNaviController)
-      sliceNaviController->GetSlice()->SetPos(0);
-
-    renderWindow.show();
-    renderWindow.resize(256, 256);
-    renderWindow.GetRenderer()->PrepareRender();
-
-    vtkRenderWindow* renderWindow2 = renderWindow.GetVtkRenderWindow();
-    mitk::BaseRenderer* baserenderer = mitk::BaseRenderer::GetInstance(renderWindow2);
-    auto vtkRender = baserenderer->GetVtkRenderer();
-    vtkRender->GetRenderWindow()->WaitForCompletion();
-
-    vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
-    magnifier->SetInput(vtkRender);
-    magnifier->SetMagnification(3.0);
-
-    auto fileWriter = vtkPNGWriter::New();
-    fileWriter->SetInputConnection(magnifier->GetOutputPort());
-    fileWriter->SetFileName("e:\\tmp\\bonekamp\\test.png");
-    fileWriter->Write();
-    fileWriter->Delete();
-    */
-    //
-    //  End   Saving image to folder.
-    //
-
-
+    if (param.writePNGScreenshots)
+    {
+      SaveSliceOrImageAsPNG(cImage, cMask, param.pngScreenshotsPath, currentSlice);
+    }
     if (param.writeAnalysisImage)
     {
       mitk::IOUtil::SaveImage(cImage, param.anaylsisImagePath);

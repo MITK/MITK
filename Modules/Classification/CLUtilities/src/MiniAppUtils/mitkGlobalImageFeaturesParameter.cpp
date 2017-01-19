@@ -42,6 +42,7 @@ void mitk::cl::GlobalImageFeaturesParameter::AddParameter(mitkCommandLineParser 
   parser.addArgument("logfile",    "log",         mitkCommandLineParser::InputFile, "Text Logfile", "Path to the location of the target log file. ", us::Any());
   parser.addArgument("save-image", "save-image",  mitkCommandLineParser::OutputFile, "Output Image", "If spezified, the image that is used for the analysis is saved to this location.", us::Any());
   parser.addArgument("save-mask", "save-mask",    mitkCommandLineParser::OutputFile, "Output Image", "If spezified, the mask that is used for the analysis is saved to this location. ", us::Any());
+  parser.addArgument("save-image-screenshots", "save-screenshot", mitkCommandLineParser::OutputFile, "Output Image", "If spezified,  a screenshot of each slice is saved. Specify an EXISTING folder with prefix (for example ~/demo/ or ~/demo/image-", us::Any());
 
   parser.addArgument("header",            "head",    mitkCommandLineParser::Bool, "Add Header (Labels) to output", "", us::Any());
   parser.addArgument("first-line-header", "fl-head", mitkCommandLineParser::Bool, "Add Header (Labels) to first line of output", "", us::Any());
@@ -106,6 +107,18 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseAdditionalOutputs(std::map<std
     writeAnalysisMask = true;
     analysisMaskPath = us::any_cast<std::string>(parsedArgs["save-mask"]);
   }
+  writePNGScreenshots = false;
+  if (parsedArgs.count("save-image-screenshots"))
+  {
+    pngScreenshotsPath = us::any_cast<std::string>(parsedArgs["save-image-screenshots"]);
+    std::string pngScrenshotFolderPath = itksys::SystemTools::GetFilenamePath(pngScreenshotsPath);
+    if (pngScreenshotsPath.back() == '/' || pngScreenshotsPath.back() == '\\')
+    {
+      pngScrenshotFolderPath = pngScreenshotsPath;
+    }
+    itk::FileTools::CreateDirectory(pngScrenshotFolderPath.c_str());
+  }
+
 }
 
 void mitk::cl::GlobalImageFeaturesParameter::ParseHeaderInformation(std::map<std::string, us::Any> &parsedArgs)

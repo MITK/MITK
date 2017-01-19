@@ -46,6 +46,8 @@ namespace mitk
       std::string anaylsisImagePath;
       bool writeAnalysisMask;
       std::string analysisMaskPath;
+      bool writePNGScreenshots;
+      std::string pngScreenshotsPath;
 
       bool useHeader;
       bool useHeaderForFirstLineOnly;

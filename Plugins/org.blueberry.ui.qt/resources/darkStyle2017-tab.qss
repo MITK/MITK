@@ -1,4 +1,5 @@
-berry--QCTabBar::tab:selected {
+berry--QCTabBar::tab:selected
+{
     background: #1d1d1c;
     color: #adb1b6;
 }
@@ -8,20 +9,24 @@ berry--QCTabBar::tab:selected:hover
     color: #3399cc;
 }
 
-berry--QCTabBar QToolButton#TabCloseButton
+QFrame#ViewFormContentFrame
 {
-    background-image: url(:/org.blueberry.ui.qt/dark/close.png);
-    border: none;
-    background: green;
-}
-
-
-berry--QCTabBar QToolButton {
-    border: 1px solid green;
-    max-height: 22px;
-    background: white;
-}
-
-QFrame#ViewFormContentFrame {
     border: 1px solid #1d1d1c
 }
+
+berry--QCTabBar QToolButton
+{
+    border: none;
+    max-height: 32px;
+}
+
+berry--QCTabBar QToolButton#TabCloseButton
+{
+    /*background-image: url(:/org.blueberry.ui.qt/dark/close.png);*/
+    border: none;
+    background-color: transparent;
+    width: 10px;
+    height: 10px;
+}
+
+

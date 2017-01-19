@@ -364,7 +364,7 @@ QAbstractScrollArea
 {
     border-radius: 0px;
     border: 1px solid #1d1d1c;
-    background-color: transparent;
+    background-color: #323231;
 }
 
 QScrollBar:horizontal
@@ -715,14 +715,14 @@ QAbstractSpinBox {
 
 QAbstractSpinBox:up-button
 {
-    background-color: transparent;
+    background-color: #323231;
     subcontrol-origin: border;
     subcontrol-position: top right;
 }
 
 QAbstractSpinBox:down-button
 {
-    background-color: transparent;
+    background-color: #323231;
     subcontrol-origin: border;
     subcontrol-position: bottom right;
 }
@@ -843,7 +843,7 @@ QTabBar::tab:bottom:!selected
 }
 
 QTabBar::tab:bottom:!selected:hover {
-    background-color: #3399cc;
+    color: #3399cc;
 }
 
 /* LEFT TABS */
@@ -869,7 +869,7 @@ QTabBar::tab:left:!selected
 }
 
 QTabBar::tab:left:!selected:hover {
-    background-color: #3399cc;
+    color: #3399cc;
 }
 
 
@@ -896,7 +896,7 @@ QTabBar::tab:right:!selected
 }
 
 QTabBar::tab:right:!selected:hover {
-    background-color: #3399cc;
+    color: #3399cc;
 }
 
 QTabBar QToolButton::right-arrow:enabled {
@@ -1027,36 +1027,64 @@ QSlider::handle:vertical {
 }
 
 QToolButton {
-    background-color: transparent;
-    border: 1px transparent #1d1d1c;
+    background-color: #323231;
+    border: 1px solid #323231;
     border-radius: 0px;
-    margin: 3px;
-    padding: 3px;
+
+    min-width: 10px;
+    min-height: 10px;
+    margin: 0px;
+    padding: 0px;
 }
 
 QToolButton[popupMode="1"] { /* only for MenuButtonPopup */
- padding-right: 20px; /* make way for the popup button */
- border: 1px #1d1d1c;
- border-radius: 0px;
+    border: 0px solid #1d1d1c;
 }
 
 QToolButton[popupMode="2"] { /* only for InstantPopup */
- padding-right: 10px; /* make way for the popup button */
- border: 1px #1d1d1c;
+    border: 0px solid #1d1d1c;
 }
 
 
 QToolButton:hover, QToolButton::menu-button:hover {
-    background-color: transparent;
+    background-color: #323231;
     border: 1px solid #3399cc;
-    padding: 3px;
+    min-width: 10px;
+    min-height: 10px;
+    margin: 0px;
+    padding: 0px;
+}
+
+QmitkRenderWindowMenu
+{
+    background-color: transparent;
+}
+
+QmitkRenderWindowMenu QToolButton, QmitkRenderWindowMenu QToolButton::menu-button {
+    background-color: transparent;
+    border: 0px solid #1d1d1c;
+    border-radius: 0px;
+
+    width: 15px;
+    height: 15px;
+    margin: 1px;
+    padding: 0px;
+}
+
+QmitkRenderWindowMenu QToolButton:hover, QmitkRenderWindowMenu QToolButton::menu-button:hover {
+    background-color: #adb1b6;
+    border: 0px solid #3399cc;
+    width: 15px;
+    height: 15px;
+    margin: 1px;
+    padding: 0px;
 }
 
 QToolButton:checked, QToolButton:pressed,
         QToolButton::menu-button:pressed {
-    background-color: #3399cc;
+    color: #3399cc;
     border: 1px solid #3399cc;
-    padding: 3px;
+    padding: 0px;
 }
 
 /* the subcontrol below is used only in the InstantPopup or DelayedPopup mode */
@@ -1194,17 +1222,11 @@ QToolBox::tab {
 QToolBox::tab:selected {
     background-color: #323231;
     border-color: #3399cc;
- }
-
-QStatusBar::item {
-    border: 0px transparent dark;
- }
-
-
-QFrame[height="3"], QFrame[width="3"] {
-    background-color: #1d1d1c;
 }
 
+QStatusBar::item {
+    border: 0px transparent #1d1d1c;
+}
 
 QSplitter::handle {
     border: 1px dashed #1d1d1c;
@@ -1230,7 +1252,7 @@ QProgressBar {
 }
 
 QProgressBar::chunk {
-    background-color: #05B8CC;
+    background-color: #3399cc;
 }
 
 QDateEdit

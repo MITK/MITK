@@ -1,13 +1,13 @@
 $(license)
 
-#ifndef $(activator - file - name) _h
-#define $(activator - file - name) _h
+#ifndef $(activator-file-name)_h
+#define $(activator-file-name)_h
 
 #include <ctkPluginActivator.h>
 
 namespace mitk
 {
-  class $(activator - class - name) : public QObject, public ctkPluginActivator
+  class $(activator-class-name) : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "$(plugin-target)")

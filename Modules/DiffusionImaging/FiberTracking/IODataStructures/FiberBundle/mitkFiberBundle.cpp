@@ -194,11 +194,9 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     vtkSmartPointer<vtkCellArray> vNewLines = vtkSmartPointer<vtkCellArray>::New();
     vtkSmartPointer<vtkPoints> vNewPoints = vtkSmartPointer<vtkPoints>::New();
 
-    // iterate over current fibers
-    boost::progress_display disp(m_NumFibers);
+    std::vector< std::vector< itk::Point<float, 3> > > points1;
     for( int i=0; i<m_NumFibers; i++ )
     {
-        ++disp;
         vtkCell* cell = m_FiberPolyData->GetCell(i);
         int numPoints = cell->GetNumberOfPoints();
         vtkPoints* points = cell->GetPoints();
@@ -206,46 +204,84 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
         if (points==nullptr || numPoints<=0)
             continue;
 
-        int numFibers2 = fib->GetNumFibers();
-        bool contained = false;
-        for( int i2=0; i2<numFibers2; i2++ )
+        itk::Point<float, 3> start = GetItkPoint(points->GetPoint(0));
+        itk::Point<float, 3> end = GetItkPoint(points->GetPoint(numPoints-1));
+
+        points1.push_back( {start, end} );
+    }
+
+    std::vector< std::vector< itk::Point<float, 3> > > points2;
+    for( int i=0; i<fib->GetNumFibers(); i++ )
+    {
+        vtkCell* cell = fib->GetFiberPolyData()->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        if (points==nullptr || numPoints<=0)
+            continue;
+
+        itk::Point<float, 3> start = GetItkPoint(points->GetPoint(0));
+        itk::Point<float, 3> end = GetItkPoint(points->GetPoint(numPoints-1));
+
+        points2.push_back( {start, end} );
+    }
+
+    int progress = 0;
+    std::vector< int > ids;
+#pragma omp parallel for
+    for (unsigned int i=0; i<points1.size(); i++)
+    {
+#pragma omp critical
         {
-            vtkCell* cell2 = fib->GetFiberPolyData()->GetCell(i2);
-            int numPoints2 = cell2->GetNumberOfPoints();
-            vtkPoints* points2 = cell2->GetPoints();
+          progress++;
+          std::cout << (int)(100*(float)progress/points1.size()) << "%" << '\r';
+          cout.flush();
+        }
 
-            if (points2==nullptr)// || numPoints2<=0)
-                continue;
+        bool match = false;
+        for (unsigned int j=0; j<points2.size(); j++)
+        {
+            auto v1 = points1.at(i);
+            auto v2 = points2.at(j);
 
-            // check endpoints
-            if (numPoints2==numPoints)
+            unsigned int matches = 0;
+            unsigned int reverse_matches = 0;
+            for (int c=0; c<v1.size(); c++)
             {
-                itk::Point<float, 3> point_start = GetItkPoint(points->GetPoint(0));
-                itk::Point<float, 3> point_end = GetItkPoint(points->GetPoint(numPoints-1));
-                itk::Point<float, 3> point2_start = GetItkPoint(points2->GetPoint(0));
-                itk::Point<float, 3> point2_end = GetItkPoint(points2->GetPoint(numPoints2-1));
+                if (v1[c].SquaredEuclideanDistanceTo(v2[c])<mitk::eps)
+                    matches++;
+                if (v1[v1.size() - c - 1].SquaredEuclideanDistanceTo(v2[c])<mitk::eps)
+                    reverse_matches++;
+            }
 
-                if ((point_start.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps) ||
-                        (point_start.SquaredEuclideanDistanceTo(point2_end)<=mitk::eps && point_end.SquaredEuclideanDistanceTo(point2_start)<=mitk::eps))
-                {
-                    // further checking ???
-                    contained = true;
-                    break;
-                }
+            if (matches==v1.size() || reverse_matches==v1.size())
+            {
+                match = true;
+                j=points2.size();
             }
         }
 
-        // add to result because fiber is not subtracted
-        if (!contained)
+#pragma omp critical
+        if (!match)
+            ids.push_back(i);
+    }
+
+    for( int i : ids )
+    {
+        vtkCell* cell = m_FiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
+
+        if (points==nullptr || numPoints<=0)
+            continue;
+
+        vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
+        for( int j=0; j<numPoints; j++)
         {
-            vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
-            for( int j=0; j<numPoints; j++)
-            {
-                vtkIdType id = vNewPoints->InsertNextPoint(points->GetPoint(j));
-                container->GetPointIds()->InsertNextId(id);
-            }
-            vNewLines->InsertNextCell(container);
+            vtkIdType id = vNewPoints->InsertNextPoint(points->GetPoint(j));
+            container->GetPointIds()->InsertNextId(id);
         }
+        vNewLines->InsertNextCell(container);
     }
     if(vNewLines->GetNumberOfCells()==0)
         return nullptr;
@@ -642,7 +678,7 @@ void mitk::FiberBundle::GenerateFiberIds()
 
 }
 
-mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds)
+mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType* mask, bool anyPoint, bool invert, bool bothEnds, float fraction)
 {
     vtkSmartPointer<vtkPolyData> polyData = m_FiberPolyData;
     if (anyPoint)
@@ -682,6 +718,8 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
         {
             if (anyPoint)
             {
+                int inside = 0;
+                int outside = 0;
                 if (!invert)
                 {
                     for (int j=0; j<numPoints; j++)
@@ -693,15 +731,27 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
                         itk::Index<3> idx;
                         mask->TransformPhysicalPointToIndex(itkP, idx);
 
-                        if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
+                        if ( mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)>0 )
                         {
-                            for (int k=0; k<numPointsOriginal; k++)
-                            {
-                                double* p = pointsOriginal->GetPoint(k);
-                                vtkIdType id = vtkNewPoints->InsertNextPoint(p);
-                                container->GetPointIds()->InsertNextId(id);
-                            }
-                            break;
+                            inside++;
+                            if (fraction==0)
+                                break;
+                        }
+                        else
+                            outside++;
+                    }
+
+                    float current_fraction = 0.0;
+                    if (inside+outside>0)
+                        current_fraction = (float)inside/(inside+outside);
+
+                    if (current_fraction>fraction)
+                    {
+                        for (int k=0; k<numPoints; k++)
+                        {
+                            double* p = points->GetPoint(k);
+                            vtkIdType id = vtkNewPoints->InsertNextPoint(p);
+                            container->GetPointIds()->InsertNextId(id);
                         }
                     }
                 }
@@ -719,16 +769,19 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::ExtractFiberSubset(ItkUcharImgType
 
                         if ( mask->GetPixel(idx)>0 && mask->GetLargestPossibleRegion().IsInside(idx) )
                         {
+                            inside++;
                             includeFiber = false;
                             break;
                         }
+                        else
+                            outside++;
                     }
                     if (includeFiber)
                     {
 
-                        for (int k=0; k<numPointsOriginal; k++)
+                        for (int k=0; k<numPoints; k++)
                         {
-                            double* p = pointsOriginal->GetPoint(k);
+                            double* p = points->GetPoint(k);
                             vtkIdType id = vtkNewPoints->InsertNextPoint(p);
                             container->GetPointIds()->InsertNextId(id);
                         }

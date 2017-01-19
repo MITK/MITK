@@ -107,6 +107,7 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         connect(m_Controls->m_ExtractionMethodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
         connect(m_Controls->m_RemovalMethodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
         connect(m_Controls->m_ModificationMethodBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()));
+        connect(m_Controls->m_ExtractionBoxMask, SIGNAL(currentIndexChanged(int)), this, SLOT(OnMaskExtractionChanged()));
 
         m_Controls->m_ColorMapBox->SetDataStorage(this->GetDataStorage());
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -118,9 +119,29 @@ void QmitkFiberProcessingView::CreateQtPartControl( QWidget *parent )
         mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
         mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
         m_Controls->m_ColorMapBox->SetPredicate(finalPredicate);
+
+        m_Controls->label_17->setVisible(false);
+        m_Controls->m_FiberExtractionFractionBox->setVisible(false);
     }
 
     UpdateGui();
+}
+
+void QmitkFiberProcessingView::OnMaskExtractionChanged()
+{
+    if (m_Controls->m_ExtractionBoxMask->currentIndex() == 2)
+    {
+        m_Controls->label_17->setVisible(true);
+        m_Controls->m_FiberExtractionFractionBox->setVisible(true);
+        m_Controls->m_BothEnds->setVisible(false);
+    }
+    else
+    {
+        m_Controls->label_17->setVisible(false);
+        m_Controls->m_FiberExtractionFractionBox->setVisible(false);
+        if (m_Controls->m_ExtractionBoxMask->currentIndex() != 3)
+            m_Controls->m_BothEnds->setVisible(true);
+    }
 }
 
 void QmitkFiberProcessingView::Modify()
@@ -335,7 +356,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
 
         itkUCharImageType::Pointer mask = itkUCharImageType::New();
         mitk::CastToItkImage(mitkMask, mask);
-        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked());
+        mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked(), m_Controls->m_FiberExtractionFractionBox->value());
         if (newFib->GetNumFibers()<=0)
         {
             QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");

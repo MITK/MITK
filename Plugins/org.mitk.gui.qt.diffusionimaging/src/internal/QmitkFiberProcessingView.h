@@ -85,6 +85,7 @@ protected slots:
   void Extract();
   void Modify();
   void UpdateGui();     ///< update button activity etc. dpending on current datamanager selection
+  void OnMaskExtractionChanged();
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name, const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 

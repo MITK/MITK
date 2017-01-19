@@ -631,13 +631,13 @@ void QmitkMatchPointFrameCorrection::OnStartRegBtnPushed()
   pJob->setAutoDelete(true);
 
   pJob->m_spTargetData = m_spSelectedTargetData;
-  pJob->m_TargetNodeUID = mitk::EnsureUID(this->m_spSelectedTargetNode);
+  pJob->m_TargetDataUID = mitk::EnsureUID(this->m_spSelectedTargetNode->GetData());
   pJob->m_IgnoreList = this->GenerateIgnoreList();
 
   if (m_spSelectedTargetMaskData.IsNotNull())
   {
     pJob->m_spTargetMask = m_spSelectedTargetMaskData;
-    pJob->m_TargetMaskNodeUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode);
+    pJob->m_TargetMaskDataUID = mitk::EnsureUID(this->m_spSelectedTargetMaskNode->GetData());
   }
 
   pJob->m_MappedName = m_Controls.m_leRegJobName->text().toStdString();
@@ -721,7 +721,7 @@ void QmitkMatchPointFrameCorrection::OnMapResultIsAvailable(mitk::Image::Pointer
                              QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
   mitk::DataNode::Pointer spResultNode = mitk::generateMappedResultNode(job->m_MappedName,
-                                         spMappedData.GetPointer(), "", job->m_TargetNodeUID, false, job->m_InterpolatorLabel);
+                                         spMappedData.GetPointer(), "", job->m_TargetDataUID, false, job->m_InterpolatorLabel);
 
   this->GetDataStorage()->Add(spResultNode, this->m_spSelectedTargetNode);
   this->GetRenderWindowPart()->RequestUpdate();

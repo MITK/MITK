@@ -149,8 +149,8 @@ QmitkRegistrationJob::QmitkRegistrationJob(map::algorithm::RegistrationAlgorithm
   m_ErrorOccured = false;
   m_spLoadedAlgorithm = pAlgorithm;
   m_JobName = "Unnamed RegJob";
-  m_MovingNodeUID = "Missing moving UID";
-  m_TargetNodeUID = "Missing target UID";
+  m_MovingDataUID = "Missing moving UID";
+  m_TargetDataUID = "Missing target UID";
 
   m_spTargetMask = NULL;
   m_spMovingMask = NULL;

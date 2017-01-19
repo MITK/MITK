@@ -74,10 +74,10 @@ public:
   bool m_StoreReg;
   bool m_ErrorOccured;
   std::string m_JobName;
-  mitk::NodeUIDType m_TargetNodeUID;
-  mitk::NodeUIDType m_MovingNodeUID;
-  mitk::NodeUIDType m_TargetMaskNodeUID;
-  mitk::NodeUIDType m_MovingMaskNodeUID;
+  mitk::NodeUIDType m_TargetDataUID;
+  mitk::NodeUIDType m_MovingDataUID;
+  mitk::NodeUIDType m_TargetMaskDataUID;
+  mitk::NodeUIDType m_MovingMaskDataUID;
 
   const map::algorithm::RegistrationAlgorithmBase *GetLoadedAlgorithm() const;
 

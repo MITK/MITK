@@ -78,8 +78,8 @@ public:
 
   // job settings
   mitk::TimeFramesRegistrationHelper::IgnoreListType m_IgnoreList;
-  mitk::NodeUIDType m_TargetNodeUID;
-  mitk::NodeUIDType m_TargetMaskNodeUID;
+  mitk::NodeUIDType m_TargetDataUID;
+  mitk::NodeUIDType m_TargetMaskDataUID;
 
   const map::algorithm::RegistrationAlgorithmBase *GetLoadedAlgorithm() const;
 

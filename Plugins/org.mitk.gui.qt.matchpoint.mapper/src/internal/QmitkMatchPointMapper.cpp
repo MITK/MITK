@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkImageAccessByItk.h>
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 #include "mitkImageMappingHelper.h"
 #include "mitkMAPRegistrationWrapper.h"
 #include "mitkMatchPointPropertyTags.h"
@@ -190,15 +190,15 @@ mitk::DataNode::Pointer QmitkMatchPointMapper::GetAutoRefNodeByReg()
 {
     mitk::DataNode::Pointer spResult = NULL;
 
-    if (this->m_spSelectedRegNode.IsNotNull())
+    if (this->m_spSelectedRegNode.IsNotNull() && this->m_spSelectedRegNode->GetData())
     {
         std::string nodeName;
-        mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetProperty(mitk::nodeProp_RegAlgTargetData);
+        mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
         if (uidProp)
         {
             //search for the target node
-            mitk::NodePredicateProperty::Pointer predicate = mitk::NodePredicateProperty::New(mitk::nodeProp_UID,
+            mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
                 uidProp);
             spResult = this->GetDataStorage()->GetNode(predicate);
         }
@@ -563,7 +563,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
     pJob->setAutoDelete(true);
 
     pJob->m_spInputData = this->m_spSelectedInputNode->GetData();
-    pJob->m_InputNodeUID = mitk::EnsureUID(this->m_spSelectedInputNode);
+    pJob->m_InputDataUID = mitk::EnsureUID(this->m_spSelectedInputNode->GetData());
     pJob->m_doGeometryRefinement = doGeometryRefinement;
 
     pJob->m_spRegNode = m_spSelectedRegNode;
@@ -657,7 +657,7 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
         QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
 
     mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
-        spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputNodeUID,
+        spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
         job->m_doGeometryRefinement, job->m_InterpolatorLabel);
     this->GetDataStorage()->Add(spMappedNode);
     this->GetRenderWindowPart()->RequestUpdate();

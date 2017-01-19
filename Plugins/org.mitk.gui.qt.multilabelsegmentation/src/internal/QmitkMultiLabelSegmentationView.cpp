@@ -104,6 +104,9 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   //m_ToolManager->SetWorkingData(NULL);
 
   //m_ServiceRegistration.Unregister();
+
+  //Loose LabelSetConnections
+  OnLooseLabelSetConnection();
 }
 
 void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
@@ -130,8 +133,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   connect( m_Controls.m_cbWorkingNodeSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ),
            this, SLOT( OnSegmentationSelectionChanged( const mitk::DataNode* ) ) );
-
-  //  this->OnReferenceSelectionChanged( m_Controls.m_cbReferenceNodeSelector->GetSelectedNode() );
 
   // *------------------------
   // * ToolManager
@@ -234,6 +235,10 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_pbNewLabel->setEnabled(false);
   m_Controls.m_btLockExterior->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setEnabled(false);
+
+  // Make sure the GUI notices if appropriate data is already present on creation
+  this->OnReferenceSelectionChanged(m_Controls.m_cbReferenceNodeSelector->GetSelectedNode());
+  this->OnSegmentationSelectionChanged(m_Controls.m_cbWorkingNodeSelector->GetSelectedNode());
 }
 
 void QmitkMultiLabelSegmentationView::Activated()
@@ -769,39 +774,53 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged( const mitk::D
 void QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection()
 {
   MITK_INFO << "Connection Established";
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
-  workingImage->GetActiveLabelSet()->AddLabelEvent
-      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->RemoveLabelEvent
-      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->ModifyLabelEvent
-      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent
-      += mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->ActiveLabelEvent
-      += mitk::MessageDelegate1<QmitkLabelSetWidget,mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
+  workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ActiveLabelEvent +=
+    mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,
+                                                                        &QmitkLabelSetWidget::SelectLabelByPixelValue);
+  workingImage->BeforeChangeLayerEvent += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+    this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
 }
 
 
 void QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection()
 {
   MITK_INFO << "Connection Lost";
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
   mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
   assert(workingImage);
 
   // Reset LabelSetWidget Events
-  workingImage->GetActiveLabelSet()->AddLabelEvent
-      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->RemoveLabelEvent
-      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->ModifyLabelEvent
-      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent
-      -= mitk::MessageDelegate<QmitkLabelSetWidget>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::UpdateAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->ActiveLabelEvent
-      -= mitk::MessageDelegate1<QmitkLabelSetWidget,mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,&QmitkLabelSetWidget::SelectLabelByPixelValue);
+  workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls.m_LabelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ActiveLabelEvent -=
+    mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::Label::PixelType>(m_Controls.m_LabelSetWidget,
+                                                                        &QmitkLabelSetWidget::SelectLabelByPixelValue);
+  workingImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+    this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
 }
 
 void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
@@ -815,11 +834,6 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
     //Loose LabelSetConnections
     OnLooseLabelSetConnection();
-
-    workingImage->BeforeChangeLayerEvent
-        -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
-//    workingImage->AfterchangeLayerEvent
-//        -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
   }
 
   m_WorkingNode = const_cast<mitk::DataNode*>(node);
@@ -831,11 +845,6 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
 
     //Establish LabelSetConnection
     OnEstablishLabelSetConnection();
-
-    workingImage->BeforeChangeLayerEvent
-        += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
-//    workingImage->AfterchangeLayerEvent
-//        += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(this,&QmitkMultiLabelSegmentationView::OnEstablishLabelSetConnection);
   }
 
   m_ToolManager->SetWorkingData(m_WorkingNode);

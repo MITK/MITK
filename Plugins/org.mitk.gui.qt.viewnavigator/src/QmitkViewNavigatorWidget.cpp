@@ -450,6 +450,12 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     emptyItem->setFlags(Qt::ItemIsEnabled);
     treeRootItem->appendRow(emptyItem);
     //QStringList viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
+
+    //There currently is no way to get the list of excluded views at application start
+    QStringList viewExcludeList;
+    // internal view used for the intro screen, will crash when opened directly, see T22352
+    viewExcludeList.append(QString("org.blueberry.ui.internal.introview"));
+
     QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Views");
     viewRootItem->setFont(QFont("", 12, QFont::Normal));
     viewRootItem->setEditable(false);
@@ -463,7 +469,6 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     for (int i = 0; i < viewDescriptors.size(); ++i)
     {
         berry::IViewDescriptor::Pointer v = viewDescriptors[i];
-        /*
         bool skipView = false;
         for(int e=0; e<viewExcludeList.size(); e++)
             if(viewExcludeList.at(e)==v->GetId())
@@ -473,7 +478,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             }
         if (skipView)
             continue;
-*/
+
         QStringList catPath = v->GetCategoryPath();
 
         QIcon icon = v->GetImageDescriptor();

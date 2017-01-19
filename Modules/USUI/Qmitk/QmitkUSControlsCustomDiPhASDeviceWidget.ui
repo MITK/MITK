@@ -401,6 +401,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="CompensateEnergy">
+       <property name="text">
+        <string>Compensate Energy Values</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="VerticalSpacingSubGroup">
        <item>
         <widget class="QDoubleSpinBox" name="VerticalSpacing">

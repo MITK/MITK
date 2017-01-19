@@ -54,6 +54,7 @@ public:
     */
   virtual bool GetIsActive( ) override;
 
+  virtual void SetCompensateEnergy(bool compensate);
   virtual void SetUseBModeFilter(bool isSet);
   virtual void SetVerticalSpacing(float mm);
   virtual void SetRecord(bool record);  
@@ -105,6 +106,7 @@ protected:
 
   /** virtual handlers implemented in Device Controls
     */
+  virtual void OnSetCompensateEnergy(bool compensate);
   virtual void OnSetSavingSettings(SavingSettings settings);
   virtual void OnSetUseBModeFilter(bool isSet);
   virtual void OnSetRecord(bool record);

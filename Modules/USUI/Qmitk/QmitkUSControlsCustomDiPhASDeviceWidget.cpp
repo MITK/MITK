@@ -95,6 +95,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnDeviceSet()
   OnScatteringCoefficientChanged();
   OnCompensateScatteringChanged();
   OnChangedSavingSettings();
+  OnCompensateEnergyChanged();
 
   m_ControlInterface->SetSilentUpdate(false); // on the last update pass the scanmode and geometry!
 
@@ -105,6 +106,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 {
   ui->setupUi(this);
 
+  connect(ui->CompensateEnergy, SIGNAL(stateChanged(int)), this, SLOT(OnCompensateEnergyChanged()));
   connect(ui->UseBModeFilter, SIGNAL(stateChanged(int)), this, SLOT(OnUseBModeFilterChanged()));
   connect(ui->StartStopRecord, SIGNAL(clicked()), this, SLOT(OnRecordChanged()));
   connect(ui->ScatteringCoefficient, SIGNAL(valueChanged(int)), this, SLOT(OnScatteringCoefficientChanged()));
@@ -139,6 +141,13 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::Initialize()
 }
 
 //slots
+
+void QmitkUSControlsCustomDiPhASDeviceWidget::OnCompensateEnergyChanged()
+{
+  if (m_ControlInterface.IsNull()) { return; }
+  bool CompensateEnergy = ui->CompensateEnergy->isChecked();
+  m_ControlInterface->SetCompensateEnergy(CompensateEnergy);
+}
 
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnUseBModeFilterChanged()
 {
@@ -177,6 +186,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
     ui->BandpassEnabled->setEnabled(false);
     ui->LowCut->setEnabled(false);
     ui->HighCut->setEnabled(false);
+    ui->CompensateEnergy->setEnabled(false);
 
     m_ControlInterface->SetRecord(true);
   }
@@ -208,6 +218,7 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnRecordChanged()
     ui->BandpassEnabled->setEnabled(true);
     ui->LowCut->setEnabled(true);
     ui->HighCut->setEnabled(true);
+    ui->CompensateEnergy->setEnabled(true);
 
     m_ControlInterface->SetRecord(false);
   }

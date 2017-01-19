@@ -59,7 +59,10 @@ mitk::USDiPhASImageSource::USDiPhASImageSource(mitk::USDiPhASDevice* device)
   m_CompensateForScatteringModified(false),
   m_VerticalSpacingModified(false),
   m_ScatteringCoefficient(15),
-  m_CompensateForScattering(false)
+  m_CompensateForScattering(false),
+  m_CompensateEnergy(false),
+  m_CompensateEnergyNext(false),
+  m_CompensateEnergyModified(false)
 {
   m_BufferSize = 100;
   m_ImageTimestampBuffer.insert(m_ImageTimestampBuffer.begin(), m_BufferSize, 0);
@@ -118,6 +121,11 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
     m_CompensateForScattering = m_CompensateForScatteringNext;
     m_CompensateForScatteringModified = false;
   }
+  if (m_CompensateEnergyModified)
+  {
+    m_CompensateEnergy = m_CompensateEnergyNext;
+    m_CompensateEnergyModified = false;
+  }
 
   // make sure image is nullptr
   image = nullptr;
@@ -166,7 +174,8 @@ void mitk::USDiPhASImageSource::GetNextRawImage( mitk::Image::Pointer& image)
         // first, seperate  the PA image from the USImages
 
         // then, we compensate the PAImage using our ImageEnergyValue
-        imagePA = MultiplyImage(imagePA, 1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
+        if(m_CompensateEnergy)
+          imagePA = MultiplyImage(imagePA, 1/ImageEnergyValue); // TODO: add the correct prefactor here!!!!
 
         // now we apply the BModeFilter
         if (m_UseBModeFilter)
@@ -585,6 +594,12 @@ void mitk::USDiPhASImageSource::ModifyCompensateForScattering(bool useIt)
 {
   m_CompensateForScatteringNext = useIt;
   m_CompensateForScatteringModified = true;
+}
+
+void mitk::USDiPhASImageSource::ModifyEnergyCompensation(bool compensate)
+{
+  m_CompensateEnergyNext = compensate;
+  m_CompensateEnergyModified = true;
 }
 
 void mitk::USDiPhASImageSource::SetDataType(DataType dataT)

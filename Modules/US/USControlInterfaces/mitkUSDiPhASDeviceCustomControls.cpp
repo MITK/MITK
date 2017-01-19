@@ -49,6 +49,11 @@ bool mitk::USDiPhASDeviceCustomControls::GetSilentUpdate()
 
 //Set Functions
 
+void mitk::USDiPhASDeviceCustomControls::SetCompensateEnergy(bool compensate)
+{
+  this->OnSetCompensateEnergy(compensate);
+}
+
 void mitk::USDiPhASDeviceCustomControls::SetUseBModeFilter(bool isSet)
 {
   this->OnSetUseBModeFilter(isSet);
@@ -169,6 +174,8 @@ void mitk::USDiPhASDeviceCustomControls::SetHighCut(double MHz)
 
 
 //OnSetDummies
+
+void mitk::USDiPhASDeviceCustomControls::OnSetCompensateEnergy(bool compensate) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetUseBModeFilter(bool isSet) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetRecord(bool record) {}
 void mitk::USDiPhASDeviceCustomControls::OnSetVerticalSpacing(float mm) {}

@@ -97,6 +97,7 @@ public:
   void ModifyUseBModeFilter(bool isSet);
   void ModifyScatteringCoefficient(int coeff);
   void ModifyCompensateForScattering(bool useIt);
+  void ModifyEnergyCompensation(bool compensate);
 
   /**
   * Sets the spacing used in the image based on the informations of the ScanMode in USDiPhAS Device
@@ -176,6 +177,10 @@ protected:
   bool                            m_CompensateForScattering;
   bool                            m_CompensateForScatteringNext;
   bool                            m_CompensateForScatteringModified;
+
+  bool                            m_CompensateEnergy;
+  bool                            m_CompensateEnergyNext;
+  bool                            m_CompensateEnergyModified;
 
   DataType                        m_DataType;
 };

@@ -45,6 +45,12 @@ void mitk::USDiPhASCustomControls::passGUIOut(std::function<void(QString)> callb
 
 // OnSet methods
 
+void mitk::USDiPhASCustomControls::OnSetCompensateEnergy(bool compensate)
+{
+  mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());
+  imageSource->ModifyEnergyCompensation(compensate);
+}
+
 void mitk::USDiPhASCustomControls::OnSetUseBModeFilter(bool isSet)
 {
   mitk::USDiPhASImageSource* imageSource = dynamic_cast<mitk::USDiPhASImageSource*>(m_device->GetUSImageSource().GetPointer());

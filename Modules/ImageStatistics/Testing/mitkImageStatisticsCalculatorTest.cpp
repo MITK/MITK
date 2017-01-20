@@ -77,6 +77,7 @@ class mitkImageStatisticsCalculatorTestSuite : public mitk::TestFixture
 public:
 
   void setUp() override;
+  void tearDown() override;
 
   void TestUninitializedImage();
 
@@ -177,6 +178,27 @@ private:
                         vnl_vector<int> minIndex,
                         vnl_vector<int> maxIndex);
 };
+
+void mitkImageStatisticsCalculatorTestSuite::tearDown()
+{
+    m_TestImage = nullptr;
+
+    m_Pic3DImage = nullptr;
+    m_Pic3DImageMask = nullptr;
+    m_Pic3DImageMask2 = nullptr;
+    m_Pic3DPlanarFigureAxial = nullptr;
+    m_Pic3DPlanarFigureSagittal = nullptr;
+    m_Pic3DPlanarFigureCoronal = nullptr;
+
+    m_US4DImage = nullptr;
+    m_US4DImageMask = nullptr;
+    m_US4DImageMask2 = nullptr;
+    m_US4DPlanarFigureAxial = nullptr;
+    m_US4DPlanarFigureSagittal = nullptr;
+    m_US4DPlanarFigureCoronal = nullptr;
+
+    m_Geometry = nullptr;
+}
 
 void mitkImageStatisticsCalculatorTestSuite::setUp()
 {

@@ -234,6 +234,8 @@ bool QtStylePreferencePage::PerformOk()
   }
   m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths);
   m_StylePref->Put(berry::QtPreferences::QT_ICON_THEME, currentTheme);
+  m_StylePref->Put(berry::QtPreferences::QT_FONT_NAME,
+      controls.m_FontComboBox->currentText());
   return true;
 }
 
@@ -256,14 +258,16 @@ void QtStylePreferencePage::Update()
 
   QString iconTheme = m_StylePref->Get(berry::QtPreferences::QT_ICON_THEME, "<<default>>");
   styleManager->SetIconTheme( iconTheme );
-
-  QString name = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
-  styleManager->SetStyle(name);
-  oldStyle = styleManager->GetStyle();
-
-  FillStyleCombo(oldStyle);
   FillIconThemeComboBox( iconTheme );
-  FillFontCombo(styleManager->GetFont()); // TODO // TODO // TODO
+
+  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+  styleManager->SetStyle(styleName);
+  oldStyle = styleManager->GetStyle();
+  FillStyleCombo(oldStyle);
+
+  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "");
+  styleManager->SetFont(fontName);
+  FillFontCombo(styleManager->GetFont());
 }
 
 }

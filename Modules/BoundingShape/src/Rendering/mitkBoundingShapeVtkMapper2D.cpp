@@ -63,15 +63,16 @@ namespace mitk
 
 mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
   : m_Actor(vtkSmartPointer<vtkActor>::New()),
-    m_HandleActor(vtkSmartPointer<vtkActor2D>::New()),
-    m_SelectedHandleActor(vtkSmartPointer<vtkActor2D>::New()),
-    m_Mapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
-    m_HandleMapper(vtkSmartPointer<vtkPolyDataMapper2D>::New()),
-    m_SelectedHandleMapper(vtkSmartPointer<vtkPolyDataMapper2D>::New()),
-    m_Cutter(vtkSmartPointer<vtkCutter>::New()),
-    m_CuttingPlane(vtkSmartPointer<vtkPlane>::New()),
-    m_PropAssembly(vtkSmartPointer<vtkPropAssembly>::New()),
-    m_ZoomFactor(1.0)
+  m_HandleActor(vtkSmartPointer<vtkActor2D>::New()),
+  m_SelectedHandleActor(vtkSmartPointer<vtkActor2D>::New()),
+  m_Mapper(vtkSmartPointer<vtkPolyDataMapper>::New()),
+  m_HandleMapper(vtkSmartPointer<vtkPolyDataMapper2D>::New()),
+  m_SelectedHandleMapper(vtkSmartPointer<vtkPolyDataMapper2D>::New()),
+  m_Cutter(vtkSmartPointer<vtkCutter>::New()),
+  m_CuttingPlane(vtkSmartPointer<vtkPlane>::New()),
+  m_LastSliceNumber(0),
+  m_PropAssembly(vtkSmartPointer<vtkPropAssembly>::New()),
+  m_ZoomFactor(1.0)
 {
   m_Actor->SetMapper(m_Mapper);
   m_Actor->GetProperty()->SetOpacity(0.3);
@@ -100,12 +101,17 @@ mitk::BoundingShapeVtkMapper2D::LocalStorage::LocalStorage()
 }
 
 bool mitk::BoundingShapeVtkMapper2D::LocalStorage::IsUpdateRequired(mitk::BaseRenderer *renderer,
-                                                                    mitk::Mapper *mapper,
-                                                                    mitk::DataNode *dataNode)
+  mitk::Mapper *mapper,
+  mitk::DataNode *dataNode)
 {
   const mitk::PlaneGeometry *worldGeometry = renderer->GetCurrentWorldPlaneGeometry();
 
   if (m_LastGenerateDataTime < worldGeometry->GetMTime())
+    return true;
+
+  unsigned int sliceNumber = renderer->GetSlice();
+ 
+  if (m_LastSliceNumber != sliceNumber)
     return true;
 
   if (mapper && m_LastGenerateDataTime < mapper->GetMTime())
@@ -159,8 +165,8 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
   // either update if GeometryData was modified or if the zooming was performed
   bool needGenerateData = localStorage->IsUpdateRequired(
     renderer, this, GetDataNode()); // true; // localStorage->GetLastGenerateDataTime() < node->GetMTime() ||
-                                    // localStorage->GetLastGenerateDataTime() < node->GetData()->GetMTime();
-                                    // //localStorage->IsGenerateDataRequired(renderer, this, GetDataNode());
+  // localStorage->GetLastGenerateDataTime() < node->GetData()->GetMTime();
+  // //localStorage->IsGenerateDataRequired(renderer, this, GetDataNode());
 
   double scale = renderer->GetScaleFactorMMPerDisplayUnit();
 
@@ -269,8 +275,8 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
     vtkSmartPointer<vtkMatrix4x4> imageTransform = geometry->GetVtkTransform()->GetMatrix();
     auto translation = vtkSmartPointer<vtkTransform>::New();
     translation->Translate(center[0] - imageTransform->GetElement(0, 3),
-                           center[1] - imageTransform->GetElement(1, 3),
-                           center[2] - imageTransform->GetElement(2, 3));
+      center[1] - imageTransform->GetElement(1, 3),
+      center[2] - imageTransform->GetElement(2, 3));
 
     auto transform = vtkSmartPointer<vtkTransform>::New();
     transform->SetMatrix(imageTransform);
@@ -365,8 +371,8 @@ void mitk::BoundingShapeVtkMapper2D::GenerateDataForRenderer(BaseRenderer *rende
 
         // show handles only if the corresponding face is aligned to the render window
         if ((((std::abs(angle - 0) < 0.001) || (std::abs(angle - 180) < 0.001)) && i != 0 && i != 1) ||
-            (((std::abs(angle1 - 0) < 0.001) || (std::abs(angle1 - 180) < 0.001)) && i != 2 && i != 3) ||
-            (((std::abs(angle2 - 0) < 0.001) || (std::abs(angle2 - 180) < 0.001)) && i != 4 && i != 5))
+          (((std::abs(angle1 - 0) < 0.001) || (std::abs(angle1 - 180) < 0.001)) && i != 2 && i != 3) ||
+          (((std::abs(angle2 - 0) < 0.001) || (std::abs(angle2 - 180) < 0.001)) && i != 4 && i != 5))
         {
           if (activeHandleId == nullptr)
           {

@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileInfo>
 #include <QStringList>
 #include <QDirIterator>
+#include <QFont>
+#include <QFontDatabase>
 #include <QIcon>
 
 #include <berryLog.h>
@@ -39,6 +41,7 @@ namespace berry
 QtStyleManager::QtStyleManager()
 {
   AddDefaultStyle();
+  AddDefaultFonts();
   ReadPreferences();
 }
 
@@ -83,6 +86,14 @@ void QtStyleManager::AddDefaultStyle()
 #endif
 }
 
+void QtStyleManager::AddDefaultFonts()
+{
+  m_customFontNames.append(QString("<<system>>"));
+  AddFont(QString(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf"), QString("Fira Sans"));
+  AddFont(QString(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf"), QString("Roboto"));
+  AddFont(QString(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf"), QString("xkcd"));
+}
+
 void QtStyleManager::ClearStyles()
 {
   for (FileNameToStyleMap::iterator i = styles.begin(); i != styles.end(); )
@@ -120,7 +131,7 @@ QString QtStyleManager::GetTabStylesheet() const
 void QtStyleManager::AddStyle(const QString& styleFileName,
     const QString& styleName)
 {
-  auto   newStyle = new ExtStyle();
+  auto newStyle = new ExtStyle();
 
   if (styleName.isEmpty())
   {
@@ -135,6 +146,23 @@ void QtStyleManager::AddStyle(const QString& styleFileName,
   newStyle->fileName = styleFileName;
 
   styles.insert(newStyle->fileName, newStyle);
+}
+
+void QtStyleManager::AddFont(const QString& fontFilePath,
+    const QString& fontName)
+{
+  QFontDatabase::addApplicationFont(fontFilePath);
+  m_customFontNames.push_back(fontName);
+}
+
+void QtStyleManager::GetFonts(QStringList& fontNames) const
+{
+  fontNames = m_customFontNames;
+}
+
+QString QtStyleManager::GetFont() const
+{
+  return currentFont;
 }
 
 void QtStyleManager::AddStyles(const QString& path)
@@ -305,6 +333,22 @@ void QtStyleManager::SetStyle(const QString& fileName, bool update)
     qApp->setStyleSheet(currentStyle->stylesheet);
     PlatformUI::GetWorkbench()->UpdateTheme();
   }
+}
+
+void QtStyleManager::SetFont(const QString& fontName)
+{
+  if( fontName == QString( "<<system>>" ) ||  fontName == QString( "" ))
+  {
+    qApp->setFont(QFontDatabase::systemFont(QFontDatabase::GeneralFont));
+  }
+  else
+  {
+    QFont font(fontName, 11);
+    qApp->setFont(font);
+  }
+  currentFont = fontName;
+  qApp->setStyleSheet(currentStyle->stylesheet);
+  PlatformUI::GetWorkbench()->UpdateTheme();
 }
 
 void QtStyleManager::SetIconTheme(const QString& themeName)

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFileDialog>
 #include <QDirIterator>
+#include <QFontDatabase>
 
 namespace berry
 {
@@ -56,6 +57,7 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
   Update();
 
   connect(controls.m_StylesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged(int)));
+  connect(controls.m_FontComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(FontChanged(int)));
   connect(controls.m_IconThemeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(IconThemeChanged(int)));
   connect(controls.m_PathList, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePathListButtons()));
   connect(controls.m_AddButton, SIGNAL(clicked(bool)), this, SLOT(AddPathClicked(bool)));
@@ -75,6 +77,19 @@ void QtStylePreferencePage::FillStyleCombo(const berry::IQtStyleManager::Style& 
     controls.m_StylesCombo->addItem(styles.at(i).name, QVariant(styles.at(i).fileName));
   }
   controls.m_StylesCombo->setCurrentIndex(styles.indexOf(currentStyle));
+}
+
+void QtStylePreferencePage::FillFontCombo(const QString& currentFont)
+{
+  controls.m_FontComboBox->clear();
+  QStringList fonts;
+  styleManager->GetFonts(fonts);
+
+  for (int i = 0; i < fonts.size(); ++i)
+  {
+    controls.m_FontComboBox->addItem(fonts.at(i));
+  }
+  controls.m_FontComboBox->setCurrentIndex(fonts.indexOf(currentFont));
 }
 
 void QtStylePreferencePage::FillIconThemeComboBox(const QString currentIconTheme)
@@ -115,6 +130,12 @@ void QtStylePreferencePage::StyleChanged(int /*index*/)
 {
   QString fileName = controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString();
   styleManager->SetStyle(fileName);
+}
+
+void QtStylePreferencePage::FontChanged(int /*index*/)
+{
+  QString fontName = controls.m_FontComboBox->currentText();
+  styleManager->SetFont(fontName);
 }
 
 void QtStylePreferencePage::IconThemeChanged(int /*index*/)
@@ -242,6 +263,7 @@ void QtStylePreferencePage::Update()
 
   FillStyleCombo(oldStyle);
   FillIconThemeComboBox( iconTheme );
+  FillFontCombo(styleManager->GetFont()); // TODO // TODO // TODO
 }
 
 }

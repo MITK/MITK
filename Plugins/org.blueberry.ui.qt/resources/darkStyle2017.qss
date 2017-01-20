@@ -346,18 +346,16 @@ QLineEdit
 QGroupBox {
     border:1px solid #1d1d1c;
     border-radius: 0px;
-    margin-top: 6px;
-    margin-left: 0px;
+    padding-top: 24px;
 }
 
 QGroupBox::title {
+    border:1px solid #1d1d1c;
+    border-right:0px;
+    border-bottom:0px;
+    subcontrol-position: top left;
     subcontrol-origin: margin;
-	margin-left: 0px;
-	margin-top: 0px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding: 1px;
 }
 
 QAbstractScrollArea
@@ -708,6 +706,8 @@ QComboBox::down-arrow:focus
 QAbstractSpinBox {
     border: 1px solid #1d1d1c;
     background-color: #1d1d1c;
+    padding-top: 1px;
+    padding-bottom: 1px;
     color: #adb1b6;
     border-radius: 0px;
     min-width: 50px;
@@ -715,16 +715,29 @@ QAbstractSpinBox {
 
 QAbstractSpinBox:up-button
 {
+    border: 1px transparent #1d1d1c;
     background-color: #323231;
     subcontrol-origin: border;
     subcontrol-position: top right;
+
+    padding: 1px;
+    margin-bottom: 1px;
+    margin-top: 1px;
+    margin-right: 1px;
+    margin-left: 1px;
 }
 
 QAbstractSpinBox:down-button
 {
+    border: 1px transparent #1d1d1c;
     background-color: #323231;
     subcontrol-origin: border;
     subcontrol-position: bottom right;
+    padding: 1px;
+    margin-bottom: 1px;
+    margin-top: 0px;
+    margin-right: 1px;
+    margin-left: 1px;
 }
 
 QAbstractSpinBox::up-arrow,QAbstractSpinBox::up-arrow:disabled,QAbstractSpinBox::up-arrow:off {
@@ -1119,7 +1132,7 @@ QPushButton::menu-indicator  {
 
 QTableView
 {
-    border: 0px solid #1d1d1c;
+    border: 1px solid #1d1d1c;
     gridline-color: #323231;
     background-color: #1d1d1c;
 }
@@ -1132,12 +1145,12 @@ QTableView, QHeaderView
 
 QTableView::item:pressed, QListView::item:pressed, QTreeView::item:pressed  {
     background: #3399cc;
-    color: #adb1b6;
+    color: #1d1d1c;
 }
 
 QTableView::item:selected:active, QTreeView::item:selected:active, QListView::item:selected:active  {
     background: #3399cc;
-    color: #adb1b6;
+    color: #1d1d1c;
 }
 
 
@@ -1184,7 +1197,7 @@ QHeaderView::section::horizontal
 QHeaderView::section:checked
  {
     color: #adb1b6;
-    background-color: #334e5e;
+    background-color: #323231;
  }
 
  /* style the sort indicator */

@@ -715,29 +715,29 @@ QAbstractSpinBox {
 
 QAbstractSpinBox:up-button
 {
-    border: 1px transparent #1d1d1c;
+    border: 2px transparent #1d1d1c;
     background-color: #323231;
     subcontrol-origin: border;
     subcontrol-position: top right;
 
-    padding: 1px;
+    padding-top: 1px;
     margin-bottom: 1px;
-    margin-top: 1px;
-    margin-right: 1px;
-    margin-left: 1px;
+    margin-top: 2px;
+    margin-right: 2px;
+    margin-left: 2px;
 }
 
 QAbstractSpinBox:down-button
 {
-    border: 1px transparent #1d1d1c;
+    border: 2px transparent #1d1d1c;
     background-color: #323231;
     subcontrol-origin: border;
     subcontrol-position: bottom right;
-    padding: 1px;
-    margin-bottom: 1px;
-    margin-top: 0px;
-    margin-right: 1px;
-    margin-left: 1px;
+    padding-bottom: 0px;
+    margin-bottom: 2px;
+    margin-top: 1px;
+    margin-right: 2px;
+    margin-left: 2px;
 }
 
 QAbstractSpinBox::up-arrow,QAbstractSpinBox::up-arrow:disabled,QAbstractSpinBox::up-arrow:off {

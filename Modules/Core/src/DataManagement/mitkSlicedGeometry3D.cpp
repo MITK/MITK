@@ -246,7 +246,11 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
       inverseMatrix[2][worldAxis]);
 
   ScalarType viewSpacing = geometry3D->GetSpacing()[dominantAxis];
-  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis));
+
+  /// Although the double value returned by GetExtent() holds a round number,
+  /// you need to add 0.5 to safely convert it to unsigned it. I have seen a
+  /// case when the result was less by one without this.
+  unsigned int slices = static_cast<unsigned int>(geometry3D->GetExtent(dominantAxis) + 0.5);
 
 #ifndef NDEBUG
   int upDirection = itk::Function::Sign(inverseMatrix[dominantAxis][worldAxis]);

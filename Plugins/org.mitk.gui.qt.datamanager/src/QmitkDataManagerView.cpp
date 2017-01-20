@@ -208,7 +208,30 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   auto pointSetNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PointSet");
 
-  QAction* globalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Global Reinit", this);
+  auto planarLineNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarLine");
+  auto planarCircleNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarCircle");
+  auto planarEllipseNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarEllipse");
+  auto planarAngleNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarAngle");
+  auto planarFourPointAngleNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarFourPointAngle");
+  auto planarRectangleNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarRectangle");
+  auto planarPolygonNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarPolygon");
+  auto planarPathNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarPath");
+  auto planarDoubleEllipseNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarDoubleEllipse");
+  auto planarBezierCurveNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarBezierCurve");
+  auto planarSubdivisionPolygonNodeDescriptor =
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("PlanarSubdivisionPolygon");
+
+  QAction* globalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), tr("Global Reinit"), this);
   QObject::connect( globalReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( GlobalReinit(bool) ) );
   unknownDataNodeDescriptor->AddAction(globalReinitAction);
@@ -354,6 +377,83 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       pointSetNodeDescriptor->AddAction(colorAction, false);
       m_DescriptorActionList.push_back(
         std::pair<QmitkNodeDescriptor *, QAction *>(pointSetNodeDescriptor, colorAction));
+    }
+
+    if (planarLineNodeDescriptor != NULL)
+    {
+      planarLineNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarLineNodeDescriptor, colorAction));
+    }
+
+    if (planarCircleNodeDescriptor != NULL)
+    {
+      planarCircleNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarCircleNodeDescriptor, colorAction));
+    }
+
+    if (planarEllipseNodeDescriptor != NULL)
+    {
+      planarEllipseNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarEllipseNodeDescriptor, colorAction));
+    }
+
+    if (planarAngleNodeDescriptor != NULL)
+    {
+      planarAngleNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarAngleNodeDescriptor, colorAction));
+    }
+
+    if (planarFourPointAngleNodeDescriptor != NULL)
+    {
+      planarFourPointAngleNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarFourPointAngleNodeDescriptor, colorAction));
+    }
+
+    if (planarRectangleNodeDescriptor != NULL)
+    {
+      planarRectangleNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarRectangleNodeDescriptor, colorAction));
+    }
+
+    if (planarPolygonNodeDescriptor != NULL)
+    {
+      planarPolygonNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarPolygonNodeDescriptor, colorAction));
+    }
+
+    if (planarPathNodeDescriptor != NULL)
+    {
+      planarPathNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarPathNodeDescriptor, colorAction));
+    }
+
+    if (planarDoubleEllipseNodeDescriptor != NULL)
+    {
+      planarDoubleEllipseNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarDoubleEllipseNodeDescriptor, colorAction));
+    }
+
+    if (planarBezierCurveNodeDescriptor != NULL)
+    {
+      planarBezierCurveNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarBezierCurveNodeDescriptor, colorAction));
+    }
+
+    if (planarSubdivisionPolygonNodeDescriptor != NULL)
+    {
+      planarSubdivisionPolygonNodeDescriptor->AddAction(colorAction, false);
+      m_DescriptorActionList.push_back(
+        std::pair<QmitkNodeDescriptor *, QAction *>(planarSubdivisionPolygonNodeDescriptor, colorAction));
     }
   }
 

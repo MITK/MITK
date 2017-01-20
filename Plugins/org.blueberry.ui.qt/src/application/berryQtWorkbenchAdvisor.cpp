@@ -43,12 +43,14 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
   IPreferencesService* prefService = WorkbenchPlugin::GetDefault()->GetPreferencesService();
   IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node(QtPreferences::QT_STYLES_NODE);
   QString styleName = prefs->Get(QtPreferences::QT_STYLE_NAME, "");
+  QString fontName = prefs->Get(QtPreferences::QT_FONT_NAME, "");
 
   ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
   if (serviceRef)
   {
     IQtStyleManager* styleManager = WorkbenchPlugin::GetDefault()->GetPluginContext()->getService<IQtStyleManager>(serviceRef);
     styleManager->SetStyle(styleName);
+    styleManager->SetFont(fontName);
   }
 
   QObject* eventFilter = new QtGlobalEventFilter(qApp);

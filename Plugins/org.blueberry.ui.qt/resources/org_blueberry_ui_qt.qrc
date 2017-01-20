@@ -55,8 +55,12 @@
     <file>dark/radio_unchecked_focus.png</file>
     <file>dark/radio_unchecked.png</file>
 
-    <file>darkStyle2017.qss</file>
-    <file>darkStyle2017-tab.qss</file>
-    <file>darkStyle2017-activetab.qss</file>
+    <file>darkstyle.qss</file>
+    <file>darkstyle-tab.qss</file>
+    <file>darkstyle-activetab.qss</file>
+
+    <file>fonts/FiraSans/FiraSans.ttf</file>
+    <file>fonts/Roboto/Roboto.ttf</file>
+    <file>fonts/xkcd/xkcd.ttf</file>
   </qresource>
 </RCC>

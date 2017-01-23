@@ -194,7 +194,7 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     bool ok = false;
     QString name = QInputDialog::getText(QApplication::activeWindow()
       , "Add cropping shape...", "Enter name for the new cropping shape", QLineEdit::Normal, "BoundingShape", &ok);
-    if (!ok || name.isEmpty())
+    if (!ok)
       return;
 
     m_Controls.buttonCropping->setEnabled(true);
@@ -296,10 +296,10 @@ void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part
 
         if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR)
         {
-          // TODO: ImageStatistics Plugin? Min/Max Value?
-          int minPixelValue = static_cast<int>(image->GetScalarValueMin());
+          // Might be changed with the upcoming new image statistics plugin
+          int minPixelValue = static_cast<int>(image->GetScalarValueMinNoRecompute());
           //static_cast<int>image->GetStatistics()->GetScalarValueMinNoRecompute();
-          int maxPixelValue = static_cast<int>(image->GetScalarValueMax());
+          int maxPixelValue = static_cast<int>(image->GetScalarValueMaxNoRecompute());
           //static_cast<int>image->GetStatistics()->GetScalarValueMaxNoRecompute();
           m_Controls.spinBox->setEnabled(true);
           m_Controls.spinBox->setMaximum(maxPixelValue);
@@ -498,8 +498,7 @@ void QmitkImageCropper::ProcessImage(bool mask)
         {
           croppedImageNode->SetData(cutter->GetOutput());
           croppedImageNode->SetProperty("name", mitk::StringProperty::New(imageName.toStdString()));
-          croppedImageNode->SetProperty("color", mitk::ColorProperty::New(1.0, 0.0, 0.0));
-          croppedImageNode->SetProperty("opacity", mitk::FloatProperty::New(0.4));
+          croppedImageNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
           croppedImageNode->SetProperty("layer", mitk::IntProperty::New(99)); // arbitrary, copied from segmentation functionality
           if (!this->GetDataStorage()->Exists(croppedImageNode))
           {

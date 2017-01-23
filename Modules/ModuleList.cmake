@@ -52,6 +52,7 @@ set(mitk_modules
   ToFHardware
   ToFProcessing
   ToFUI
+  PhotoacousticsHardware
   US
   USUI
   DicomUI

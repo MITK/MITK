@@ -118,6 +118,11 @@ namespace mitk
     };
 
     /**
+    * \brief Returns m_Connected
+    *
+    */
+    bool IsConnected();
+    /**
     * \brief Opens connection to the COM port with port number m_PortNumber
     * or the device name m_DeviceName and all port settings.
     *

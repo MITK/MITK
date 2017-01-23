@@ -30,6 +30,7 @@ struct BERRY_UI_QT QtPreferences
   static const QString QT_STYLE_NAME; // = "stylename";
   static const QString QT_STYLE_SEARCHPATHS; // = "searchpaths";
   static const QString QT_ICON_THEME; // = "icontheme";
+  static const QString QT_FONT_NAME; // = "fontname";
 };
 }
 

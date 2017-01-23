@@ -1,0 +1,29 @@
+berry--QCTabBar::tab:selected
+{
+    background: #3399cc;
+    color: #1d1d1c;
+}
+
+berry--QCTabBar QToolButton#TabCloseButton
+{
+    /*background-image: url(:/org.blueberry.ui.qt/dark/close.png);*/
+    border: none;
+    background-color: transparent;
+    width: 10px;
+    height: 10px;
+}
+
+berry--QCTabBar QToolButton#TabCloseButton:hover
+{
+    /*image: url(:/org.blueberry.ui.qt/dark/close-hover.png);*/
+}
+
+berry--QCTabBar QToolButton#TabCloseButton:pressed
+{
+    /*image: url(:/org.blueberry.ui.qt/dark/close-pressed.png);*/
+}
+
+QFrame#ViewFormContentFrame
+{
+    border: 1px solid #3399cc
+}

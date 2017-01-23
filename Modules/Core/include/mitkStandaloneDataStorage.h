@@ -65,6 +65,7 @@ namespace mitk {
     //##Documentation
     //## @brief Checks if a node exists in the StandaloneDataStorage
     //##
+    virtual bool Exists(mitk::DataNode::ConstPointer node) const override;
     virtual bool Exists(const mitk::DataNode* node) const override;
 
     //##Documentation

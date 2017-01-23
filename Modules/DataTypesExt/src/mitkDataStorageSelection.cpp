@@ -165,15 +165,21 @@ namespace mitk
   {
     // garantuee no recursions when a new node event is thrown
     if(m_SelfCall)
+    {
       return;
+    }
 
     // if we have a predicate, check node against predicate first
     if(m_Predicate.IsNotNull() && !m_Predicate->CheckNode(node))
+    {
       return;
+    }
 
     // no duplicates
     if(std::find(m_Nodes.begin(), m_Nodes.end(), node) != m_Nodes.end())
+    {
       return;
+    }
 
     mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     // add listener
@@ -182,7 +188,6 @@ namespace mitk
     // add node
     m_Nodes.push_back(nonConstNode);
 
-
     NodeAdded.Send(node);
   }
 
@@ -190,24 +195,28 @@ namespace mitk
   void DataStorageSelection::RemoveNode(const mitk::DataNode* node)
   {
     if(m_SelfCall)
+    {
       return;
+    }
 
     // find corresponding node
-    auto nodeIt
-      = std::find(m_Nodes.begin(), m_Nodes.end(), node);
-
+    auto nodeIt = std::find(m_Nodes.begin(), m_Nodes.end(), node);
     if(nodeIt == m_Nodes.end())
+    {
       return;
+    }
 
-    mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
-    // add listener
-    this->RemoveListener(nonConstNode);
+    if (!node->isEmpty())
+    {
+      mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
+      // add listener
+      this->RemoveListener(nonConstNode);
+    }
 
     // remove node
     m_Nodes.erase(nodeIt);
 
     NodeRemoved.Send(node);
-
   }
 
   void DataStorageSelection::RemoveAllNodes()
@@ -226,7 +235,9 @@ namespace mitk
   void DataStorageSelection::ObjectChanged(const itk::Object *caller, const itk::EventObject &/*event*/)
   {
     if(m_SelfCall)
+    {
       return;
+    }
 
     /*
     const itk::DeleteEvent* delEvent = 0;
@@ -264,14 +275,12 @@ namespace mitk
   }
 
   //# protected
-  mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::BaseProperty* prop) const
+  mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::BaseProperty* prop)
   {
     mitk::DataNode* node = nullptr;
     for(auto it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
     {
-      for(auto it2
-        = (*it)->GetPropertyList()->GetMap()->begin()
-        ; it2 != (*it)->GetPropertyList()->GetMap()->end(); ++it2)
+      for(auto it2 = (*it)->GetPropertyList()->GetMap()->begin(); it2 != (*it)->GetPropertyList()->GetMap()->end(); ++it2)
       {
         if(it2->second == prop)
         {
@@ -283,17 +292,34 @@ namespace mitk
     return node;
   }
 
-  mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::PropertyList* propList) const
+  mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::PropertyList* propList)
   {
-    mitk::DataNode* node = nullptr;
-    for(auto it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
+    if (!propList)
     {
+      return nullptr;
+    }
+
+    mitk::DataNode* node = nullptr;
+    for(auto it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
+    {
+      if (!m_DataStorage->Exists(*it))
+      {
+        it = m_Nodes.erase(it);
+        if (it == m_Nodes.end())
+        {
+          break;
+        }
+        
+        continue;
+      }
+
       if((*it)->GetPropertyList() == propList)
       {
         node = *it;
         break;
       }
     }
+
     return node;
   }
 
@@ -305,18 +331,22 @@ namespace mitk
     {
       mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = nullptr;
       if(m_AutoAddNodes && m_Predicate.IsNotNull())
+      {
         // get subset
         _NodeSet = m_DataStorage->GetSubset(m_Predicate);
+      }
       // if predicate is NULL, select all nodes
       else if(m_AutoAddNodes)
       {
         _NodeSet = m_DataStorage->GetAll();
       }
       else
+      {
         return;
+      }
+
       // finally add all nodes to the model
-      for(auto it=_NodeSet->begin(); it!=_NodeSet->end()
-        ; it++)
+      for(auto it=_NodeSet->begin(); it!=_NodeSet->end(); it++)
       {
         // save node
         this->AddNode(*it);
@@ -339,9 +369,7 @@ namespace mitk
 
     mitk::BaseProperty* prop = nullptr;
     // do the same for each property
-    for(auto it=propList->GetMap()->begin()
-      ; it!=propList->GetMap()->end()
-      ; ++it)
+    for(auto it=propList->GetMap()->begin(); it!=propList->GetMap()->end(); ++it)
     {
       prop = it->second;
       prop->RemoveObserver(m_PropertyModifiedObserverTags[prop]);
@@ -354,31 +382,24 @@ namespace mitk
   void DataStorageSelection::AddListener(mitk::DataNode* node)
   {
     // node listener
-    itk::MemberCommand<DataStorageSelection>::Pointer ObjectChangedCommand
-      = itk::MemberCommand<DataStorageSelection>::New();
+    itk::MemberCommand<DataStorageSelection>::Pointer ObjectChangedCommand =
+      itk::MemberCommand<DataStorageSelection>::New();
     ObjectChangedCommand->SetCallbackFunction(this, &DataStorageSelection::ObjectChanged);
 
-    m_NodeModifiedObserverTags[node] = node->AddObserver(itk::ModifiedEvent()
-      , ObjectChangedCommand);
+    m_NodeModifiedObserverTags[node] = node->AddObserver(itk::ModifiedEvent(), ObjectChangedCommand);
 
     // create propertylist listener
     mitk::PropertyList* propList = node->GetPropertyList();
-    m_PropertyListModifiedObserverTags[propList] = propList
-      ->AddObserver(itk::ModifiedEvent(), ObjectChangedCommand);
-    m_PropertyListDeletedObserverTags[propList] = propList
-      ->AddObserver(itk::DeleteEvent(), ObjectChangedCommand);
+    m_PropertyListModifiedObserverTags[propList] = propList->AddObserver(itk::ModifiedEvent(), ObjectChangedCommand);
+    m_PropertyListDeletedObserverTags[propList] = propList->AddObserver(itk::DeleteEvent(), ObjectChangedCommand);
 
     mitk::BaseProperty* prop = nullptr;
     // do the same for each property
-    for(auto it=propList->GetMap()->begin()
-      ; it!=propList->GetMap()->end()
-      ; ++it)
+    for(auto it=propList->GetMap()->begin(); it!=propList->GetMap()->end(); ++it)
     {
       prop = it->second;
-      m_PropertyModifiedObserverTags[prop] = prop->AddObserver(itk::ModifiedEvent()
-        , ObjectChangedCommand);
-      m_PropertyDeletedObserverTags[prop] = prop->AddObserver(itk::ModifiedEvent()
-        , ObjectChangedCommand);
+      m_PropertyModifiedObserverTags[prop] = prop->AddObserver(itk::ModifiedEvent(), ObjectChangedCommand);
+      m_PropertyDeletedObserverTags[prop] = prop->AddObserver(itk::ModifiedEvent(), ObjectChangedCommand);
     }
   }
 }

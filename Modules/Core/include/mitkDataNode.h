@@ -72,6 +72,8 @@ public:
   typedef std::map<std::string, mitk::PropertyList::Pointer> MapOfPropertyLists;
   typedef std::vector<MapOfPropertyLists::key_type> PropertyListKeyNames;
   typedef std::set<std::string> GroupTagList;
+  
+  bool isEmpty() const;
 
   /**
    * \brief Definition of an itk::Event that is invoked when

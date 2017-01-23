@@ -127,10 +127,26 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode* node)
   }
 }
 
-bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode* node) const
+bool mitk::StandaloneDataStorage::Exists(mitk::DataNode::ConstPointer node) const
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
   return (m_SourceNodes.find(node) != m_SourceNodes.end());
+}
+
+bool mitk::StandaloneDataStorage::Exists(const mitk::DataNode* node) const
+{
+  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
+  
+  AdjacencyList::const_iterator iter = m_SourceNodes.begin();
+  for (; iter != m_SourceNodes.end(); ++iter)
+  {
+    if (iter->first.GetPointer() == node)
+    {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 void mitk::StandaloneDataStorage::RemoveFromRelation(const mitk::DataNode* node, AdjacencyList& relation)

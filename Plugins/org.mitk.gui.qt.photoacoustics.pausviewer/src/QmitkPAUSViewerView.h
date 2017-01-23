@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStandaloneDataStorage.h>
 #include <mitkBaseRenderer.h>
 #include "QmitkRenderWindow.h"
-#include <mitkOverlayManager.h>
 
 #include "ui_QmitkPAUSViewerViewControls.h"
 #include "org_mitk_gui_qt_photoacoustics_pausviewer_Export.h"
@@ -60,9 +59,6 @@ protected:
 
   mitk::StandaloneDataStorage::Pointer m_PADataStorage;
   mitk::StandaloneDataStorage::Pointer m_USDataStorage;
-
-  mitk::OverlayManager::Pointer m_PAOverlayManager;
-  mitk::OverlayManager::Pointer m_USOverlayManager;
   mitk::BaseRenderer::Pointer m_PARenderer;
   mitk::BaseRenderer::Pointer m_USRenderer;
 

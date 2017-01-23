@@ -27,9 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageGenerator.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkRenderingManager.h>
-#include <mitkTextOverlay3D.h>
-#include <mitkOverlay2DLayouter.h>
-#include <mitkTextOverlay2D.h>
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 #include <QApplication>

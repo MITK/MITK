@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>309</width>
-    <height>433</height>
+    <width>343</width>
+    <height>528</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -24,6 +24,11 @@
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
       <widget class="QGroupBox" name="groupBox_3">
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
        <property name="title">
         <string>OPOTEK Phocus Control</string>
        </property>
@@ -32,8 +37,8 @@
          <rect>
           <x>10</x>
           <y>20</y>
-          <width>271</width>
-          <height>332</height>
+          <width>301</width>
+          <height>431</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -41,6 +46,11 @@
           <widget class="QCheckBox" name="checkBoxTriggerExternally">
            <property name="enabled">
             <bool>true</bool>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
            </property>
            <property name="text">
             <string>Trigger Externally</string>
@@ -52,6 +62,11 @@
          </item>
          <item>
           <widget class="QPushButton" name="buttonInitLaser">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>Init Laser</string>
            </property>
@@ -64,6 +79,11 @@
              <property name="enabled">
               <bool>false</bool>
              </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Start Lamp</string>
              </property>
@@ -73,6 +93,11 @@
             <widget class="QPushButton" name="buttonQSwitch">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+              </font>
              </property>
              <property name="text">
               <string>Start Laser</string>
@@ -85,7 +110,7 @@
           <widget class="QLabel" name="labelStatus">
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
+             <pointsize>11</pointsize>
              <weight>75</weight>
              <bold>true</bold>
             </font>
@@ -108,7 +133,7 @@
             <widget class="QLabel" name="labelWavelength">
              <property name="font">
               <font>
-               <pointsize>9</pointsize>
+               <pointsize>10</pointsize>
                <weight>75</weight>
                <bold>true</bold>
                <stylestrategy>PreferDefault</stylestrategy>
@@ -136,9 +161,12 @@
            </item>
            <item>
             <widget class="QLabel" name="labelEnergy">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="font">
               <font>
-               <pointsize>9</pointsize>
+               <pointsize>10</pointsize>
                <weight>75</weight>
                <bold>true</bold>
                <stylestrategy>PreferDefault</stylestrategy>
@@ -227,7 +255,7 @@
           <widget class="QLabel" name="label_2">
            <property name="font">
             <font>
-             <pointsize>8</pointsize>
+             <pointsize>10</pointsize>
              <weight>50</weight>
              <bold>false</bold>
             </font>
@@ -239,11 +267,22 @@
          </item>
          <item>
           <widget class="QTableWidget" name="tableFastTuningWavelengths">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>75</height>
+            </size>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>62</height>
+             <height>75</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
            </property>
            <property name="showGrid">
             <bool>true</bool>
@@ -680,37 +719,42 @@
            </property>
           </widget>
          </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="horizontalLayoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>350</y>
-          <width>191</width>
-          <height>31</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QCheckBox" name="checkBoxCalibration">
-           <property name="text">
-            <string>calibrate OPO</string>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
-          </widget>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBoxPosition">
-           <property name="maximum">
-            <number>50000</number>
-           </property>
-           <property name="singleStep">
-            <number>400</number>
-           </property>
-           <property name="value">
-            <number>24400</number>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QCheckBox" name="checkBoxCalibration">
+             <property name="text">
+              <string>calibrate OPO</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBoxPosition">
+             <property name="maximum">
+              <number>50000</number>
+             </property>
+             <property name="singleStep">
+              <number>400</number>
+             </property>
+             <property name="value">
+              <number>24400</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>

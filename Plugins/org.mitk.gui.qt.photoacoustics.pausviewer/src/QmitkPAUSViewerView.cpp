@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
-#include "mitkScaleLegendOverlay.h"
+#include "mitkScaleLegendAnnotation.h"
+#include "mitkLayoutAnnotationRenderer.h"
 
 #include "QmitkPAUSViewerView.h"
 
@@ -95,33 +96,25 @@ vtkRenderWindow* QmitkPAUSViewerView::GetUSRenderWindow()
 
 void QmitkPAUSViewerView::AddOverlays()
 {
-  if (m_PARenderer == nullptr || m_PAOverlayManager == nullptr || m_USRenderer == nullptr || m_USOverlayManager == nullptr)
+  if (m_PARenderer == nullptr || /*m_PAOverlayController == nullptr||*/ m_USRenderer == nullptr /*|| m_USOverlayController == nullptr*/)
   {
-    //setup an overlay manager
-    mitk::OverlayManager::Pointer OverlayManagerInstancePA = mitk::OverlayManager::New();
     m_PARenderer = mitk::BaseRenderer::GetInstance(GetPARenderWindow());
-    m_PARenderer->SetOverlayManager(OverlayManagerInstancePA);
-    m_PAOverlayManager = m_PARenderer->GetOverlayManager();
-
-    mitk::OverlayManager::Pointer OverlayManagerInstanceUS = mitk::OverlayManager::New();
     m_USRenderer = mitk::BaseRenderer::GetInstance(GetUSRenderWindow());
-    m_USRenderer->SetOverlayManager(OverlayManagerInstanceUS);
-    m_USOverlayManager = m_USRenderer->GetOverlayManager();
   }
 
-  mitk::ScaleLegendOverlay::Pointer scaleOverlay = mitk::ScaleLegendOverlay::New();
-  scaleOverlay->SetLeftAxisVisibility(true);
-  scaleOverlay->SetRightAxisVisibility(false);
-  scaleOverlay->SetRightAxisVisibility(false);
-  scaleOverlay->SetTopAxisVisibility(false);
-  scaleOverlay->SetCornerOffsetFactor(0);
-  m_PAOverlayManager->AddOverlay(scaleOverlay.GetPointer());
-  m_USOverlayManager->AddOverlay(scaleOverlay.GetPointer());
+  mitk::ScaleLegendAnnotation::Pointer scaleAnnotation = mitk::ScaleLegendAnnotation::New();
+  scaleAnnotation->SetLeftAxisVisibility(true);
+  scaleAnnotation->SetRightAxisVisibility(false);
+  scaleAnnotation->SetRightAxisVisibility(false);
+  scaleAnnotation->SetTopAxisVisibility(false);
+  scaleAnnotation->SetCornerOffsetFactor(0);
+  mitk::LayoutAnnotationRenderer::AddAnnotation(scaleAnnotation.GetPointer(), m_PARenderer, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  mitk::LayoutAnnotationRenderer::AddAnnotation(scaleAnnotation.GetPointer(), m_USRenderer, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
 }
 
 void QmitkPAUSViewerView::RemoveOverlays()
 {
-  m_PAOverlayManager->RemoveAllOverlays();
+ // m_PAOverlayManager->RemoveAllOverlays();
 }
 
 void QmitkPAUSViewerView::SetUltrasoundReference(QmitkPAUSViewerView** ultrasoundReference)

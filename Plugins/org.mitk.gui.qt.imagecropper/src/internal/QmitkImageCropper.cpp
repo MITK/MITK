@@ -231,10 +231,10 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
   auto tempDataStorage = mitk::DataStorage::SetOfObjects::New();
   tempDataStorage->InsertElement(0, m_CroppingObjectNode);
 
-  // initialize the views to the bounding geometry
-  mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
-  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //// initialize the views to the bounding geometry
+  //mitk::TimeGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
+  //mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkImageCropper::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/,
@@ -383,6 +383,7 @@ void QmitkImageCropper::ProcessImage(bool mask)
   // to do: check whether stdmultiwidget is valid
   int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
 
+ 
   if (nodes.empty()) return;
 
   mitk::DataNode* node = nodes[0];
@@ -406,6 +407,9 @@ void QmitkImageCropper::ProcessImage(bool mask)
       imageName = QString::fromStdString(node->GetName() + "_masked");
     else
       imageName = QString::fromStdString(node->GetName() + "_cropped");
+
+    if (m_Controls.checkBoxCropTimeStepOnly->isChecked())
+      imageName = imageName + "_T" + QString::number(timeStep);
 
     // image and bounding shape ok, set as input
     auto croppedImageNode = mitk::DataNode::New();

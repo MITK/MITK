@@ -79,6 +79,7 @@ namespace mitk {
     //##Documentation
     //## @brief Checks if a node exists in the DataStorage
     //##
+    virtual bool Exists(mitk::DataNode::ConstPointer node) const = 0;
     virtual bool Exists(const mitk::DataNode* node) const = 0;
 
     //##Documentation

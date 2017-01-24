@@ -118,11 +118,11 @@ namespace mitk
       ///
       /// Find a node in the list by the given prop
       ///
-      mitk::DataNode::Pointer FindNode(const mitk::BaseProperty* prop) const;
+      mitk::DataNode::Pointer FindNode(const mitk::BaseProperty* prop);
       ///
       /// Find a node in the list by the given proplist
       ///
-      mitk::DataNode::Pointer FindNode(const mitk::PropertyList* propList) const;
+      mitk::DataNode::Pointer FindNode(const mitk::PropertyList* propList);
       ///
       /// Removes all nodes and fill the vector again
       ///

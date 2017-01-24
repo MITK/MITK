@@ -50,6 +50,7 @@ namespace mitk
   }
 
   BoundingShapeCropper::~BoundingShapeCropper() {}
+
   template <typename TPixel, unsigned int VImageDimension>
   void BoundingShapeCropper::CutImage(itk::Image<TPixel, VImageDimension> *inputItkImage, int timeStep)
   {
@@ -142,7 +143,6 @@ namespace mitk
                       (p2[1] <= (extent[1] / 2.0)) && (p2[2] >= (-extent[2] / 2.0)) && (p2[2] <= (extent[2] / 2.0));
 
       if ((!this->m_UseCropTimeStepOnly && isInside) ||
-          (this->m_UseCropTimeStepOnly && timeStep != this->m_CurrentTimeStep) ||
           (this->m_UseCropTimeStepOnly && timeStep == this->m_CurrentTimeStep && isInside))
       {
         outputIt.Set((TOutputPixel)inputIt.Value());
@@ -290,24 +290,44 @@ namespace mitk
     // by UseCurrentTimeStepOnly)
     int tstart = outputRegion.GetIndex(3);
     int tmax = tstart + outputRegion.GetSize(3);
-    int t;
-    for (t = tstart; t < tmax; ++t)
-    {
-      mitk::SlicedGeometry3D *slicedGeometry = output->GetSlicedGeometry(t);
-      auto indexToWorldTransform = AffineTransform3D::New();
-      indexToWorldTransform->SetParameters(input->GetSlicedGeometry(t)->GetIndexToWorldTransform()->GetParameters());
-      slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
 
+    if (this->m_UseCropTimeStepOnly)
+    {
+      mitk::SlicedGeometry3D *slicedGeometry = output->GetSlicedGeometry(tstart);
+      auto indexToWorldTransform = AffineTransform3D::New();
+      indexToWorldTransform->SetParameters(input->GetSlicedGeometry(tstart)->GetIndexToWorldTransform()->GetParameters());
+      slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
       const mitk::SlicedData::IndexType &start = m_InputRequestedRegion.GetIndex();
       mitk::Point3D origin;
       vtk2itk(start, origin);
       inputImageGeometry->IndexToWorld(origin, origin);
       slicedGeometry->SetOrigin(origin);
-      m_InputTimeSelector->SetTimeNr(t);
+      m_InputTimeSelector->SetTimeNr(m_CurrentTimeStep);
       m_InputTimeSelector->UpdateLargestPossibleRegion();
-      m_OutputTimeSelector->SetTimeNr(t);
+      m_OutputTimeSelector->SetTimeNr(tstart);
       m_OutputTimeSelector->UpdateLargestPossibleRegion();
-      ComputeData(m_InputTimeSelector->GetOutput(), t);
+      ComputeData(m_InputTimeSelector->GetOutput(), m_CurrentTimeStep);
+    }
+    else
+    {
+      int t;
+      for (t = tstart; t < tmax; ++t)
+      {
+        mitk::SlicedGeometry3D *slicedGeometry = output->GetSlicedGeometry(t);
+        auto indexToWorldTransform = AffineTransform3D::New();
+        indexToWorldTransform->SetParameters(input->GetSlicedGeometry(t)->GetIndexToWorldTransform()->GetParameters());
+        slicedGeometry->SetIndexToWorldTransform(indexToWorldTransform);
+        const mitk::SlicedData::IndexType &start = m_InputRequestedRegion.GetIndex();
+        mitk::Point3D origin;
+        vtk2itk(start, origin);
+        inputImageGeometry->IndexToWorld(origin, origin);
+        slicedGeometry->SetOrigin(origin);
+        m_InputTimeSelector->SetTimeNr(t);
+        m_InputTimeSelector->UpdateLargestPossibleRegion();
+        m_OutputTimeSelector->SetTimeNr(t);
+        m_OutputTimeSelector->UpdateLargestPossibleRegion();
+        ComputeData(m_InputTimeSelector->GetOutput(), t);
+      }
     }
     m_InputTimeSelector->SetInput(nullptr);
     m_OutputTimeSelector->SetInput(nullptr);

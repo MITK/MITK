@@ -15,11 +15,12 @@
  ===================================================================*/
 #pragma warning (disable : 4996)
 
-#include "mitkCollectionReader.h"
+#include "mitkDiffusionCollectionReader.h"
 #include <vtkXMLDataElement.h>
 
 #include <mitkIOUtil.h>
-//#include <mitkBaseDataIOFactory.h>
+#include <mitkFiberBundle.h>
+#include <mitkFiberBundleVtkReader.h>
 
 #include <QDir>
 
@@ -52,7 +53,7 @@ static std::string GetDate(std::string fileName,std::string suffix)
 }
 
 
-mitk::CollectionReader::CollectionReader()
+mitk::DiffusionCollectionReader::DiffusionCollectionReader()
  : m_Collection(NULL),
    m_SubCollection(NULL),
    m_DataItemCollection(NULL),
@@ -60,7 +61,7 @@ mitk::CollectionReader::CollectionReader()
 {
 }
 
-mitk::CollectionReader::~CollectionReader()
+mitk::DiffusionCollectionReader::~DiffusionCollectionReader()
 {
   this->Clear();
 }
@@ -69,7 +70,7 @@ mitk::CollectionReader::~CollectionReader()
 /**
  * @brief Loads the xml file filename and generates the necessary instances.
  **/
-mitk::DataCollection::Pointer mitk::CollectionReader::LoadCollection(const std::string& xmlFileName)
+mitk::DataCollection::Pointer mitk::DiffusionCollectionReader::LoadCollection(const std::string& xmlFileName)
 {
   QDir fileName = QFileInfo(xmlFileName.c_str()).absoluteDir();
   m_BaseDir = fileName.path().toStdString() + QDir::separator().toLatin1();
@@ -80,39 +81,39 @@ mitk::DataCollection::Pointer mitk::CollectionReader::LoadCollection(const std::
   return m_Collection;
 }
 
-void mitk::CollectionReader::AddDataElementIds(std::vector<std::string> dataElemetIds)
+void mitk::DiffusionCollectionReader::AddDataElementIds(std::vector<std::string> dataElemetIds)
 {
   m_SelectedDataItemIds.insert( m_SelectedDataItemIds.end(), dataElemetIds.begin(), dataElemetIds.end() );
 }
 
-void mitk::CollectionReader::AddSubColIds(std::vector<std::string> subColIds)
+void mitk::DiffusionCollectionReader::AddSubColIds(std::vector<std::string> subColIds)
 {
   m_SelectedSubColIds.insert( m_SelectedSubColIds.end(), subColIds.begin(), subColIds.end() );
 }
 
-void mitk::CollectionReader::SetDataItemNames(std::vector<std::string> itemNames)
+void mitk::DiffusionCollectionReader::SetDataItemNames(std::vector<std::string> itemNames)
 {
   m_SelectedDataItemNames = itemNames;
 }
 
-void mitk::CollectionReader::ClearDataElementIds()
+void mitk::DiffusionCollectionReader::ClearDataElementIds()
 {
   m_SelectedDataItemIds.clear();
 }
 
-void mitk::CollectionReader::ClearSubColIds()
+void mitk::DiffusionCollectionReader::ClearSubColIds()
 {
   m_SelectedSubColIds.clear();
 }
 
-void mitk::CollectionReader::Clear()
+void mitk::DiffusionCollectionReader::Clear()
 {
   m_DataItemCollection = NULL;
   m_SubCollection = NULL;
   m_Collection = NULL;
 }
 
-mitk::DataCollection::Pointer mitk::CollectionReader::FolderToCollection(std::string folder, std::vector<std::string> suffixes,std::vector<std::string> seriesNames,  bool allowGaps)
+mitk::DataCollection::Pointer mitk::DiffusionCollectionReader::FolderToCollection(std::string folder, std::vector<std::string> suffixes,std::vector<std::string> seriesNames,  bool allowGaps)
 {
   // Parse folder and look up all data,
   // after sanitation only fully available groups are included (that is all suffixes are found)
@@ -129,8 +130,16 @@ mitk::DataCollection::Pointer mitk::CollectionReader::FolderToCollection(std::st
     DataCollection::Pointer subCollection = DataCollection::New();
     for (unsigned int i=0; i< suffixes.size(); ++i)
     {
-      Image::Pointer image = IOUtil::LoadImage(fileList.at(i).at(k));
-      subCollection->AddData(image.GetPointer(),seriesNames.at(i), fileList.at(i).at(k));
+      std::string fileName = fileList.at(i).at(k);
+      if (fileName.find(".fib") >= fileName.length())
+      {
+        Image::Pointer image = IOUtil::LoadImage(fileList.at(i).at(k));
+        subCollection->AddData(image.GetPointer(),seriesNames.at(i), fileList.at(i).at(k));
+      }
+      else
+      {
+        subCollection->AddData(mitk::IOUtil::Load(fileName).at(0).GetPointer(),seriesNames.at(i), fileList.at(i).at(k));
+      }
     }
     std::string sDate =  GetDate(fileList.at(0).at(k),suffixes.at(0));
     collection->AddData(subCollection.GetPointer(),sDate,"--");
@@ -138,7 +147,7 @@ mitk::DataCollection::Pointer mitk::CollectionReader::FolderToCollection(std::st
   return collection;
 }
 
-void mitk::CollectionReader::StartElement(const char* elementName, const char **atts)
+void mitk::DiffusionCollectionReader::StartElement(const char* elementName, const char **atts)
 {
   std::string name(elementName);
 
@@ -198,17 +207,22 @@ void mitk::CollectionReader::StartElement(const char* elementName, const char **
       return;
 
     // Populate Sub-Collection
-    Image::Pointer image = IOUtil::LoadImage(itemLink);
-    if (image.IsNotNull())
-      m_DataItemCollection->AddData(image.GetPointer(),itemName,relativeItemLink);
+    if (itemLink.find(".fib") >= itemLink.length())
+    {
+      Image::Pointer image = IOUtil::LoadImage(itemLink);
+      if (image.IsNotNull())
+        m_DataItemCollection->AddData(image.GetPointer(),itemName,relativeItemLink);
+      else
+        MITK_ERROR << "File could not be loaded: " << itemLink << ". Wihtin Sub-Collection " << m_SubCollection->GetName() << ", within " <<  m_DataItemCollection->GetName() ;
+    }
     else
-      MITK_ERROR << "File could not be loaded: " << itemLink << ". Wihtin Sub-Collection " << m_SubCollection->GetName() << ", within " <<  m_DataItemCollection->GetName() ;
+      m_DataItemCollection->AddData(mitk::IOUtil::Load(itemLink).at(0).GetPointer(),itemName, relativeItemLink);
   }
   else
     MITK_WARN<< "Malformed description ? --  unknown tag: " << name;
 }
 
-void mitk::CollectionReader::EndElement(const char* elementName)
+void mitk::DiffusionCollectionReader::EndElement(const char* elementName)
 {
   std::string name(elementName);
   if (name == SUBCOLLECTION)
@@ -233,7 +247,7 @@ void mitk::CollectionReader::EndElement(const char* elementName)
   }
 }
 
-std::string mitk::CollectionReader::ReadXMLStringAttribut(std::string name, const char** atts)
+std::string mitk::DiffusionCollectionReader::ReadXMLStringAttribut(std::string name, const char** atts)
 {
   if (atts)
   {
@@ -253,7 +267,7 @@ std::string mitk::CollectionReader::ReadXMLStringAttribut(std::string name, cons
   return std::string();
 }
 
-bool mitk::CollectionReader::ReadXMLBooleanAttribut(std::string name, const char** atts)
+bool mitk::DiffusionCollectionReader::ReadXMLBooleanAttribut(std::string name, const char** atts)
 {
   std::string s = ReadXMLStringAttribut(name, atts);
   std::transform(s.begin(), s.end(), s.begin(), ::toupper);
@@ -264,7 +278,7 @@ bool mitk::CollectionReader::ReadXMLBooleanAttribut(std::string name, const char
 }
 
 
-int mitk::CollectionReader::ReadXMLIntegerAttribut(std::string name, const char** atts)
+int mitk::DiffusionCollectionReader::ReadXMLIntegerAttribut(std::string name, const char** atts)
 {
   std::string s = ReadXMLStringAttribut(name, atts);
   return atoi(s.c_str());
@@ -272,7 +286,7 @@ int mitk::CollectionReader::ReadXMLIntegerAttribut(std::string name, const char*
 
 
 
-mitk::CollectionReader::FileListType mitk::CollectionReader::GenerateFileLists(std::string folder, std::vector<std::string> suffixes, bool allowGaps)
+mitk::DiffusionCollectionReader::FileListType mitk::DiffusionCollectionReader::GenerateFileLists(std::string folder, std::vector<std::string> suffixes, bool allowGaps)
 {
   FileListType fileList;
   QString qFolder = QString::fromStdString(folder);
@@ -353,7 +367,7 @@ mitk::CollectionReader::FileListType mitk::CollectionReader::GenerateFileLists(s
   return fileList;
 }
 
-mitk::CollectionReader::FileListType mitk::CollectionReader::SanitizeFileList(mitk::CollectionReader::FileListType list)
+mitk::DiffusionCollectionReader::FileListType mitk::DiffusionCollectionReader::SanitizeFileList(mitk::DiffusionCollectionReader::FileListType list)
 {
   std::vector<int> indexRemoval;
   // Parse through all items and check for empty strings, if one occurs mark this index

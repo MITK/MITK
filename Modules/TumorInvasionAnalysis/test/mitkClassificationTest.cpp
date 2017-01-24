@@ -21,17 +21,17 @@
 #include "mitkCompareImageDataFilter.h"
 #include "mitkIOUtil.h"
 
-#include "mitkCollectionReader.h"
-#include "mitkCollectionWriter.h"
 #include "mitkDataCollection.h"
-
 #include "mitkTumorInvasionClassification.h"
+#include "mitkDiffusionCollectionReader.h"
+#include "mitkDiffusionCollectionWriter.h"
+
 #include <vtkSmartPointer.h>
 
 /**
  * @brief mitkClassificationTestSuite
  *
- * Tests mitkDecisionForest, mitkClassifyProgression, mitkDataCollection, mitkCollectionReader
+ * Tests mitkDecisionForest, mitkClassifyProgression, mitkDataCollection, mitkDiffusionCollectionReader
  * \warn Reference is compared to results computed based on random forests, which might be a source of random test fails
  * such sporadic fails do represent total fails, as the result is no longer consitently under the provided margin.
  *
@@ -62,7 +62,7 @@ public:
     modalities.push_back("MOD0");
     modalities.push_back("MOD1");
 
-    mitk::CollectionReader colReader;
+    mitk::DiffusionCollectionReader colReader;
     mitk::DataCollection::Pointer collection = colReader.LoadCollection(train);
     colReader.Clear();
     // read evaluation collection

@@ -626,7 +626,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
 
   int progress = 0;
 #pragma omp parallel for
-  for (int i=0; i<seedpoints.size(); i++)
+  for (unsigned int i=0; i<seedpoints.size(); i++)
   {
 #pragma omp critical
     {

@@ -18,10 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDataCollection_H_
 #define mitkDataCollection_H_
 
-#include <itkLightObject.h>
-#include <itkDataObject.h>
-#include "itkObjectFactory.h"
-#include "mitkCommon.h"
+//#include <itkLightObject.h>
+//#include <itkDataObject.h>
+//#include "itkObjectFactory.h"
+//#include "mitkCommon.h"
 #include <mitkImage.h>
 #include <mitkDataNode.h>
 

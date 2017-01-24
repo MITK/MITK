@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingForestHandler.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
+#include <omp.h>
 
 #include "mitkTestFixture.h"
 
@@ -72,6 +73,7 @@ public:
 
     void Track1()
     {
+        omp_set_num_threads(1);
         typedef itk::MLBSTrackingFilter<6,100> TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
@@ -90,7 +92,8 @@ public:
         vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
-//        mitk::IOUtil::Save(outFib, mitk::IOUtil::GetTempPath()+"RefFib.fib");
+        //MITK_INFO << mitk::IOUtil::GetTempPath() << "ReferenceTracts.fib";
+        //mitk::IOUtil::Save(outFib, mitk::IOUtil::GetTempPath()+"ReferenceTracts.fib");
 
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(outFib));
     }

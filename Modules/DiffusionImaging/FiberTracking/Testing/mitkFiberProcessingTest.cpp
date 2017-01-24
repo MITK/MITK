@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
 #include <itkFiberCurvatureFilter.h>
-
+#include <omp.h>
 #include "mitkTestFixture.h"
 
 class mitkFiberProcessingTestSuite : public mitk::TestFixture
@@ -59,6 +59,7 @@ public:
 
     void setUp() override
     {
+        omp_set_num_threads(1);
         original = NULL;
         original = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/original.fib")).front().GetPointer());
 

@@ -39,8 +39,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkThresholdImageFilter.h"
 
 // dcmqi
-#include "ImageSEGConverter.h"
-#include "JSONSegmentationMetaInformationHandler.h"
+#include "dcmqi/ImageSEGConverter.h"
+#include "dcmqi/JSONSegmentationMetaInformationHandler.h"
+
+#include <mitkIOUtil.h>
 
 namespace mitk
 {

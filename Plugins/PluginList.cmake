@@ -60,6 +60,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF
   org.mitk.gui.qt.aicpregistration:OFF
+  org.mitk.gui.qt.renderwindowmanager:OFF
   org.mitk.gui.qt.toftutorial:OFF
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.tubegraph:OFF

@@ -64,6 +64,7 @@ void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* node, mitk::DoseValueAbs refe
           cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2], &hsv[0], &hsv[1], &hsv[2]);
           transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, hsv[0], hsv[1], hsv[2], 1.0, 1.0);
         }
+		delete[] hsv;
       }
 
       mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();

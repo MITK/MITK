@@ -51,7 +51,7 @@ namespace mitk
       std::string GetFilenameIfAvailable() const override;
 
     protected:
-      DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
+      explicit DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo);
       DICOMGDCMImageFrameInfo(const DICOMImageFrameInfo::Pointer& frameinfo, gdcm::Scanner::TagToValue const& tagToValueMapping);
       DICOMGDCMImageFrameInfo(const std::string& filename = "", unsigned int frameNo = 0);
 

@@ -145,6 +145,18 @@ else()
     endforeach()
   endif()
 
+# We need to install Webengineprocess and related files on unix as well
+  if(UNIX)
+      if(MITK_USE_QT_WEBENGINE)
+        get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
+                   PROPERTY IMPORT_LOCATION)
+        get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
+        MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
+        install(DIRECTORY "${_qmake_path}/../resources/"
+            DESTINATION "bin/resources/")
+    endif()
+  endif()
+
 endif()
 
 #install Matchpoint libs that are currently not auto detected

@@ -128,22 +128,18 @@ else()
   set(GCC_VERSION 0)
 endif()
 
-set(MITK_CXX_STANDARD 11)
+set(MITK_CXX_STANDARD 14)
 
 set(CMAKE_CXX_EXTENSIONS 0)
 set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # This is necessary to avoid problems with compile feature checks.
-# CMAKE_CXX_STANDARD seems to only set the -std=c++11 flag for targets.
-# However, compile flag checks also need to be done with -std=c++11.
-# The MITK_CXX11_FLAG variable is also used for external projects
+# CMAKE_CXX_STANDARD seems to only set the -std=c++14 flag for targets.
+# However, compile flag checks also need to be done with -std=c++14.
+# The MITK_CXX14_FLAG variable is also used for external projects
 # build during the MITK super-build.
-mitkFunctionCheckCompilerFlags("-std=c++11" MITK_CXX11_FLAG)
-if(NOT MITK_CXX11_FLAG)
-  # Older gcc compilers use -std=c++0x
-  mitkFunctionCheckCompilerFlags("-std=c++0x" MITK_CXX11_FLAG)
-endif()
+mitkFunctionCheckCompilerFlags("-std=c++14" MITK_CXX14_FLAG)
 
 #-----------------------------------------------------------------------------
 # Warn if source or build path is too long
@@ -569,7 +565,7 @@ include(mitkMacroCreateCTKPlugin)
 # Global CMake variables
 #-----------------------------------------------------------------------------
 
-# Required and enabled C++11 features for all MITK code.
+# Required and enabled C++14 features for all MITK code.
 # These are added as PUBLIC compile features to all MITK modules.
 set(MITK_CXX_FEATURES
   cxx_auto_type
@@ -726,7 +722,7 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX11_FLAG}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX14_FLAG}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 

@@ -277,6 +277,17 @@ mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DO
 mitkFunctionAddExternalProject(NAME VMTK      OFF          DEPENDS ITK VTK)
 mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 
+mitkFunctionAddExternalProject(NAME Coverity  ON  ADVANCED DOC "Enable support Coverity static analysis")
+if(MITK_USE_Coverity)
+  set(MITK_COVERITY_SCAN_PROJECT_ID "5278" CACHE STRING
+    "The Coverity Scan project ID (e.g. 1234 if the project page is https://scan.coverity.com/projects/1234/)")
+  set(MITK_COVERITY_SCAN_TOKEN "" CACHE STRING
+    "The Coverity Scan project token obtained from https://scan.coverity.com/projects/${MITK_COVERITY_SCAN_PROJECT_ID}?tab=project_settings")
+  set(MITK_COVERITY_SCAN_EMAIL "" CACHE STRING
+    "The email address of the Coverity Scan account to be used for submitting new builds")
+  mark_as_advanced(MITK_COVERITY_SCAN_PROJECT_ID)
+endif()
+
 if(MITK_USE_QT)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
 endif()
@@ -714,6 +725,65 @@ if(WITH_COVERAGE)
     set(COVERAGE_C_FLAGS ${coverage_flags})
   endif()
 endif()
+
+#-----------------------------------------------------------------------------
+# Coverity Static Analysis
+#-----------------------------------------------------------------------------
+
+if(MITK_USE_Coverity)
+  find_package(Coverity REQUIRED)
+  set(coverity_idir ${MITK_BINARY_DIR}/cov-int)
+  set(coverity_config_dir ${MITK_BINARY_DIR}/cov-config)
+  set(coverity_config ${coverity_config_dir}/config.xml)
+  add_custom_target(coverity_config
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${coverity_config_dir}
+    # Configure Coverity for our GCC and certain gcc flags we use that Coverity needs to know about.
+    # COMMAND ${Coverity_DIR}/bin/cov-configure --config ${coverity_config} --comptype prefix --compiler ccache
+    COMMAND ${Coverity_DIR}/bin/cov-configure --config ${coverity_config} --comptype gcc --compiler ${CMAKE_CXX_COMPILER} -- -m64
+    COMMAND ${Coverity_DIR}/bin/cov-configure --config ${coverity_config} --comptype gcc --compiler ${CMAKE_CXX_COMPILER} -- -msse2
+    COMMAND ${Coverity_DIR}/bin/cov-configure --config ${coverity_config} --comptype gcc --compiler ${CMAKE_CXX_COMPILER}
+    COMMENT "Generating Coverity configuration"
+    VERBATIM
+    )
+  add_custom_target(coverity_data
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${coverity_idir}
+    COMMAND ${recursive_recipe_prefix}${Coverity_DIR}/bin/cov-build --config ${coverity_config} --dir ${coverity_idir}
+      ${CMAKE_COMMAND} --build ${PROJECT_BINARY_DIR} --clean-first
+    COMMENT "Generating Coverity data"
+    VERBATIM
+    )
+  add_dependencies(coverity_data coverity_config)
+  add_custom_target(coverity_data_archive
+    WORKING_DIRECTORY ${MITK_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E tar cjf cov-int.tar.bz2 cov-int
+    COMMENT "Generating Coverity data archive"
+    VERBATIM
+    )
+  add_dependencies(coverity_data_archive coverity_data)
+
+  if(MITK_COVERITY_SCAN_EMAIL AND MITK_COVERITY_SCAN_TOKEN)
+    add_custom_target(coverity_scan_submission
+      WORKING_DIRECTORY ${MITK_BINARY_DIR}
+      COMMAND curl
+        --form token=${MITK_COVERITY_SCAN_TOKEN}
+        --form email=${MITK_COVERITY_SCAN_EMAIL}
+        --form file=@${MITK_BINARY_DIR}/cov-int.tar.bz2
+        --form version="${MITK_REVISION_NAME}"
+        --form description=git_${MITK_REVISION_ID}
+        https://scan.coverity.com/builds?project=MITK
+      COMMENT "Submitting data to Coverity Scan"
+      VERBATIM
+      )
+    add_dependencies(coverity_scan_submission coverity_data_archive)
+  else()
+    message(WARNING "A Coverity Scan email and token have not been set. The \
+\"coverity_scan_submission\" build target will not be provided. Either set \
+MITK_COVERITY_SCAN_EMAIL and MITK_COVERITY_SCAN_TOKEN CMake variables or use \
+the \"coverity_data_archive\" build target and manually upload the \
+cov-int.tar.bz2 archive that is generated.")
+  endif()
+endif()
+
 
 #-----------------------------------------------------------------------------
 # MITK C/CXX Flags

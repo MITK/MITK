@@ -1,0 +1,354 @@
+From 1f5a096aa5eb0a7ad7e4dfb77de024a3a86d8867 Mon Sep 17 00:00:00 2001
+From: Vladimir Gavrilin <vladimir-serd@yandex.ru>
+Date: Mon, 30 Jan 2017 16:31:13 +0400
+Subject: [PATCH] New algorithm for seach GPU
+
+---
+ .../Core/GPUCommon/include/itkGPUContextManager.h  |   9 +-
+ Modules/Core/GPUCommon/include/itkOpenCLUtil.h     |   5 +
+ .../Core/GPUCommon/src/itkGPUContextManager.cxx    |  74 ++++++------
+ Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx       | 128 ++++++++++++++++++---
+ 4 files changed, 165 insertions(+), 51 deletions(-)
+
+diff --git a/Modules/Core/GPUCommon/include/itkGPUContextManager.h b/Modules/Core/GPUCommon/include/itkGPUContextManager.h
+index def423a..b47e199 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUContextManager.h
++++ b/Modules/Core/GPUCommon/include/itkGPUContextManager.h
+@@ -18,6 +18,8 @@
+ #ifndef itkGPUContextManager_h
+ #define itkGPUContextManager_h
+ 
++#include <vector>
++
+ #include "itkOpenCLUtil.h"
+ #include <itkLightObject.h>
+ 
+@@ -42,7 +44,7 @@ class GPUContextManager : public LightObject
+   cl_command_queue GetCommandQueue(int i);
+ 
+   unsigned int GetNumberOfCommandQueues() {
+-    return m_NumberOfDevices;
++    return m_DevicesList.size();
+   }
+ 
+   cl_context GetCurrentContext() {
+@@ -56,14 +58,11 @@ class GPUContextManager : public LightObject
+   GPUContextManager();
+   ~GPUContextManager();
+ 
+-  cl_platform_id    m_Platform;
+   cl_context        m_Context;
+-  cl_device_id*     m_Devices;
+   cl_command_queue* m_CommandQueue;    // one queue per device
+ 
+-  cl_uint m_NumberOfDevices, m_NumberOfPlatforms;
+-
+   static GPUContextManager* m_Instance;
++  std::vector<cl_device_id> m_DevicesList;
+ };
+ } // namespace itk
+ 
+diff --git a/Modules/Core/GPUCommon/include/itkOpenCLUtil.h b/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
+index 874c8da..2365a8b 100644
+--- a/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
++++ b/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
+@@ -24,6 +24,7 @@
+ 
+ #include <iostream>
+ #include <sstream>
++#include <vector>
+ 
+ #include <itkVector.h>
+ 
+@@ -53,6 +54,8 @@ int OpenCLGetLocalBlockSize(unsigned int ImageDim);
+ /** Get the devices that are available */
+ cl_device_id* OpenCLGetAvailableDevices(cl_platform_id platform, cl_device_type devType, cl_uint* numAvailableDevices);
+ 
++bool OpenCLGetAvailableDevices(cl_platform_id platform, cl_device_type devType, std::vector<cl_device_id>& devicesList);
++
+ /** Get the device that has the maximum FLOPS in the current context */
+ cl_device_id OpenCLGetMaxFlopsDev(cl_context cxGPUContext);
+ 
+@@ -62,6 +65,8 @@ void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose=false);
+ /** Find the OpenCL platform that matches the "name" */
+ cl_platform_id OpenCLSelectPlatform(const char* name);
+ 
++std::vector<cl_platform_id> OpenCLGetPlatformsList();
++
+ /** Check OpenCL error */
+ void OpenCLCheckError(cl_int error, const char* filename="", int lineno=0, const char* location="");
+ 
+diff --git a/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx b/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx
+index 7724d69..27a3faf 100644
+--- a/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx
++++ b/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx
+@@ -43,44 +43,52 @@ GPUContextManager::GPUContextManager()
+ {
+   cl_int errid;
+ 
+-  // Get the platforms
+-  errid = clGetPlatformIDs(0, ITK_NULLPTR, &m_NumberOfPlatforms);
+-  OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
+-
+-  // Get NVIDIA platform by default
+-  m_Platform = OpenCLSelectPlatform("NVIDIA");
+-  assert(m_Platform != ITK_NULLPTR);
+-
+-  cl_device_type devType = CL_DEVICE_TYPE_GPU;//CL_DEVICE_TYPE_CPU;//
+-
+-  // Get the devices
+-  m_Devices = OpenCLGetAvailableDevices(m_Platform, devType, &m_NumberOfDevices);
+-
++  m_DevicesList.clear();
++  
++  std::vector<cl_platform_id> platformsList = OpenCLGetPlatformsList();
++  if (platformsList.size() != 0)
++    {
++    cl_device_type devType = CL_DEVICE_TYPE_GPU;
++    
++    std::vector<cl_platform_id>::iterator iter = platformsList.begin();
++    for (; iter != platformsList.end(); ++iter)
++      {
++      std::vector<cl_device_id> devicesList;
++      bool res = OpenCLGetAvailableDevices(*iter, devType, devicesList);
++      if (res && devicesList.size())
++        {
++          m_DevicesList.insert(m_DevicesList.end(), devicesList.begin(), devicesList.end());
++        }
++      }
++    }
++  
++  if (m_DevicesList.size() == 0)
++    {
++    errid = CL_DEVICE_NOT_AVAILABLE;
++    OpenCLCheckError(errid, __FILE__, __LINE__, ITK_LOCATION);
++    }
++  
+   // create context
+-  m_Context = clCreateContext(ITK_NULLPTR, m_NumberOfDevices, m_Devices, ITK_NULLPTR, ITK_NULLPTR, &errid);
+-//   m_Context = clCreateContext(0, m_NumberOfDevices, m_Devices, clLogMessagesToStdoutAPPLE, ITK_NULLPTR, &errid);
+-
++  m_Context = clCreateContext(ITK_NULLPTR, m_DevicesList.size(), &m_DevicesList[0], ITK_NULLPTR, ITK_NULLPTR, &errid);
+   OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
+ 
+   // create command queues
+-  m_CommandQueue = (cl_command_queue *)malloc(m_NumberOfDevices * sizeof(cl_command_queue) );
+-  for(unsigned int i=0; i<m_NumberOfDevices; i++)
++  m_CommandQueue = (cl_command_queue *)malloc(m_DevicesList.size() * sizeof(cl_command_queue) );
++  for(unsigned int i=0; i<m_DevicesList.size(); i++)
+     {
+-    m_CommandQueue[i] = clCreateCommandQueue(m_Context, m_Devices[i], 0, &errid);
++      m_CommandQueue[i] = clCreateCommandQueue(m_Context, m_DevicesList[i], 0, &errid);
+ 
+-// Debug
+-    OpenCLPrintDeviceInfo(m_Devices[i], true);
++    // Debug
++      OpenCLPrintDeviceInfo(m_DevicesList[i], true);
+     //
+-    OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
++      OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
+     }
+-
+-  //m_current_command_queue_id = 0; // default command queue id
+ }
+ 
+ GPUContextManager::~GPUContextManager()
+ {
+   cl_int errid;
+-  for(unsigned int i=0; i<m_NumberOfDevices; i++)
++  for(unsigned int i=0; i<m_DevicesList.size(); i++)
+     {
+     errid = clReleaseCommandQueue(m_CommandQueue[i]);
+     OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
+@@ -88,33 +96,33 @@ GPUContextManager::~GPUContextManager()
+   free(m_CommandQueue);
+   errid = clReleaseContext(m_Context);
+   OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
+-  if(m_NumberOfDevices > 0)
++  
++  if (m_DevicesList.size())
+     {
+-    free(m_Devices);
++      m_DevicesList.clear();
+     }
+ }
+ 
+ cl_command_queue GPUContextManager::GetCommandQueue(int i)
+ {
+-  if(i < 0 || i >= (int)m_NumberOfDevices)
++  if(i < 0 || i >= (int)m_DevicesList.size())
+     {
+     printf("Error: requested queue id is not available. Default queue will be used (queue id = 0)\n");
+     return m_CommandQueue[0];
+     }
+ 
+-//std::cout << "Command queue " << i << " is requested " << std::endl;
+-
+   return m_CommandQueue[i];
+ }
+ 
+ cl_device_id GPUContextManager::GetDeviceId(int i)
+ {
+-  if(i < 0 || i >= (int)m_NumberOfDevices)
++  if(i < 0 || i >= (int)m_DevicesList.size())
+     {
+     printf("Error: requested queue id is not available. Default queue will be used (queue id = 0)\n");
+-    return m_Devices[0];
++  return m_DevicesList[0];
+     }
+-  return m_Devices[i];
++
++  return m_DevicesList[i];
+ }
+ 
+ } // namespace itk
+diff --git a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
+index 21ebddb..65a5039 100644
+--- a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
++++ b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
+@@ -185,6 +185,50 @@ void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose)
+   }
+ }
+ 
++std::vector<cl_platform_id> OpenCLGetPlatformsList()
++{
++  cl_uint num_platforms;
++  cl_int ciErrNum;
++  std::vector<cl_platform_id> platformsList;
++
++  ciErrNum = clGetPlatformIDs(0, ITK_NULLPTR, &num_platforms);
++  if (ciErrNum != CL_SUCCESS)
++    {
++    printf("clGetPlatformIDs: get number of platforms error. Error code = %i \n\n", ciErrNum);
++    return std::vector<cl_platform_id>();
++    }
++  
++  if(num_platforms == 0)
++    {
++    printf("No OpenCL platform found!\n\n");
++    return std::vector<cl_platform_id>();
++    }
++  
++  platformsList.resize(num_platforms);
++  ciErrNum = clGetPlatformIDs(num_platforms, &platformsList[0], ITK_NULLPTR);
++  if (ciErrNum != CL_SUCCESS)
++    {
++    printf("clGetPlatformIDs: get platforms list error. Error code = %i \n\n", ciErrNum);
++    return std::vector<cl_platform_id>();
++    }
++  
++  std::vector<cl_platform_id>::iterator iter = platformsList.begin();
++  for (; iter != platformsList.end(); ++iter)
++    {
++    std::string platformName;
++    unsigned int platformNameSize = 1024;
++    platformName.resize(platformNameSize);
++    ciErrNum = clGetPlatformInfo(*iter, CL_PLATFORM_NAME, platformName.size(), &platformName[0], &platformNameSize);
++    platformName.resize(platformNameSize);
++
++    // debug
++    std::cout << "Platform " << " : " << platformName << std::endl;
++    //
++    }
++  
++  return platformsList;
++}
++
+ //
+ // Find the OpenCL platform that matches the "name"
+ //
+@@ -344,23 +388,81 @@ void OpenCLCheckError(cl_int error, const char* filename, int lineno, const char
+     }
+ }
+ 
+-/** Check if OpenCL-enabled GPU is present. */
+-bool IsGPUAvailable()
++bool OpenCLGetAvailableDevices(cl_platform_id platform, cl_device_type devType, std::vector<cl_device_id>& devicesList)
+ {
+-  cl_platform_id platformId = OpenCLSelectPlatform("NVIDIA");
+-
+-  if(platformId == ITK_NULLPTR) return false;
++  devicesList.clear();
+ 
+-  cl_device_type devType = CL_DEVICE_TYPE_GPU;
+-
+-  // Get the devices
+-  cl_uint numDevices;
+-  cl_device_id* device_id = OpenCLGetAvailableDevices(platformId, devType, &numDevices);
+-  free( device_id );
++  cl_uint totalNumDevices;
++  
++  // get total # of devices
++  cl_int errid;
++  
++  errid = clGetDeviceIDs(platform, devType, 0, ITK_NULLPTR, &totalNumDevices);
++  if (errid != CL_SUCCESS)
++    {
++    std::string platformName;
++    platformName.resize(1024);
++    clGetPlatformInfo(platform, CL_PLATFORM_NAME, platformName.size(), &platformName[0], ITK_NULLPTR);
+ 
+-  if(numDevices < 1) return false;
++    printf("clGetDeviceIDs: get number of deviceIDs error. Platform name = %s; Device type = CL_DEVICE_TYPE_GPU; Error code = %i \n\n",
++      &platformName[0], errid);
++    return false;
++    }
++  
++  devicesList.resize(totalNumDevices);
++  
++  errid = clGetDeviceIDs(platform, devType, totalNumDevices, &devicesList[0], ITK_NULLPTR);
++  if (errid != CL_SUCCESS)
++    {
++    std::string platformName;
++    platformName.resize(1024);
++    clGetPlatformInfo(platform, CL_PLATFORM_NAME, platformName.size(), &platformName[0], ITK_NULLPTR);
++
++    printf("clGetDeviceIDs: get deviceIDs list error. Platform name = %s; Device type = CL_DEVICE_TYPE_GPU; Error code = %i \n\n",
++      &platformName[0], errid);
++    devicesList.clear();
++    return false;
++    }
++  
++  std::vector<cl_device_id>::iterator iter = devicesList.begin();
++  for (; iter != devicesList.end(); ++iter)
++    {
++    cl_bool isAvailable;
++    clGetDeviceInfo(*iter, CL_DEVICE_AVAILABLE, sizeof(cl_bool), &isAvailable, ITK_NULLPTR);
++    if (!isAvailable)
++      {
++      iter = devicesList.erase(iter);
++      if (iter == devicesList.end())
++        {
++        break;
++        }
++      }
++    }
++  
++  return devicesList.size() != 0;
++}
+ 
+-  return true;
++/** Check if OpenCL-enabled GPU is present. */
++bool IsGPUAvailable()
++{
++  std::vector<cl_platform_id> platformsList = OpenCLGetPlatformsList();
++  if (platformsList.size() == 0)
++    {
++    return false;
++    }
++  
++  cl_device_type devType = CL_DEVICE_TYPE_GPU;
++  
++  std::vector<cl_platform_id>::iterator iter = platformsList.begin();
++  for (; iter != platformsList.end(); ++iter)
++    {
++    std::vector<cl_device_id> devicesList;
++    bool res = OpenCLGetAvailableDevices(*iter, devType, devicesList);
++    if (res && devicesList.size())
++      {
++      return true;
++      }
++    }
+ }
+ 
+ std::string GetTypename(const std::type_info& intype)

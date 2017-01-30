@@ -26,8 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QSignalMapper>
 
 QmitkRenderWindowManipulatorWidget::QmitkRenderWindowManipulatorWidget(mitk::DataStorage::Pointer dataStorage, QWidget* parent /*=nullptr*/)
-  : m_DataStorage(dataStorage)
-  , QWidget(parent)
+  : QWidget(parent)
+  , m_DataStorage(dataStorage)
 {
   Init();
 }

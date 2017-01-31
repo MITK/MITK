@@ -404,7 +404,7 @@ function(mitk_create_module)
       endif()
     endif()
 
-    if(MITK_USE_QT)
+    if(MITK_USE_Qt5)
       if(UI_FILES)
         qt5_wrap_ui(Q${KITNAME}_GENERATED_UI_CPP ${UI_FILES})
       endif()

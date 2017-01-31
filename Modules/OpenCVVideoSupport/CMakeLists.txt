@@ -11,7 +11,7 @@ mitk_create_module(
 )
 
 if(MODULE_IS_ENABLED)
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt5)
     add_subdirectory(UI)
   endif()
 endif()

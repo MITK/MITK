@@ -86,7 +86,7 @@ CMake will present you a couple of options, these are the most important ones:
    will download and build OpenCV 2.4)
  - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
- - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
+ - <tt><b>MITK_USE_Qt5</b></tt> Build MITK code which depends on Qt 5
  - <tt><b>MITK_USE_SOFA</b></tt> Build MITK code which depends on SOFA (this will
    download and build SOFA)
  - <tt><b>CMAKE_PREFIX_PATH</b></tt> If Qt5 is not found automatically, set

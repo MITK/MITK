@@ -11,7 +11,7 @@ mitk_create_plugin(EXPORT_DIRECTIVE org_blueberry_core_runtime_EXPORT
 )
 
 target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
   target_link_libraries(${PLUGIN_TARGET} PRIVATE Qt5::Gui Qt5::Xml)
 endif()
 

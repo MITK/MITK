@@ -15,7 +15,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
 
   # Determine the Qt5 library installation prefix
   set(_qmake_location )
-  if(MITK_USE_QT AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
+  if(MITK_USE_Qt5 AND TARGET ${Qt5Core_QMAKE_EXECUTABLE})
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
                  PROPERTY IMPORT_LOCATION)
   endif()
@@ -36,7 +36,7 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     if(_qt_install_libs)
       list(APPEND _dir_candidates ${_qt_install_libs})
     endif()
-  elseif(MITK_USE_QT)
+  elseif(MITK_USE_Qt5)
     message(WARNING "The qmake executable could not be found.")
   endif()
 

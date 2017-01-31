@@ -1,4 +1,4 @@
-if(MITK_USE_QT_WEBENGINE)
+if(MITK_USE_Qt5_WebEngine)
   project(org_blueberry_ui_qt_help)
 
   set(QT_USE_QTHELP 1)

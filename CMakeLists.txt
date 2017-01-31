@@ -240,7 +240,7 @@ set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
 mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Net Util XML Zip)
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
-mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
+mitkFunctionAddExternalProject(NAME OpenIGTLink ON)
 
 mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)

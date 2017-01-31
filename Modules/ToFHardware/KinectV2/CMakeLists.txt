@@ -1,8 +1,8 @@
-OPTION(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" OFF)
+OPTION(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" ON)
 
 IF(MITK_USE_TOF_KINECTV2)
-  FIND_LIBRARY(MITK_KINECTV2_LIB KinectV20.lib DOC "Kinect V2 access library.")
-  FIND_PATH(MITK_KINECTV2_INCLUDE_DIR Kinect.h DOC  "Include directory of Kinect V2 camera.")
+  FIND_LIBRARY(MITK_KINECTV2_LIB Kinect20.lib HINTS "C:/Program Files/Microsoft SDKs/Kinect/v2.0_1409/Lib/x64" DOC "Kinect V2 access library.")
+  FIND_PATH(MITK_KINECTV2_INCLUDE_DIR Kinect.h HINTS "C:/Program Files/Microsoft SDKs/Kinect/v2.0_1409/inc" DOC  "Include directory of Kinect V2 camera.")
   SET(MITK_TOF_AVAILABLE_CAMERAS ${MITK_TOF_AVAILABLE_CAMERAS},Microsoft Kinect V2)
   SET(INCLUDE_DIRS_INTERNAL ${INCLUDE_DIRS_INTERNAL} ${MITK_KINECTV2_INCLUDE_DIR})
   SET(ADDITIONAL_LIBS ${ADDITIONAL_LIBS} ${MITK_KINECTV2_LIB})

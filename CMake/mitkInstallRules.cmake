@@ -50,7 +50,7 @@ if(MACOSX_BUNDLE_NAMES)
             DESTINATION "${bundle_name}.app/Contents/MacOS/iconengines"
             CONFIGURATIONS Release)
     # related to MITK:T19679-InstallQtWebEnginProcess
-    if(MITK_USE_QT_WEBENGINE)
+    if(MITK_USE_Qt5_WebEngine)
         get_filename_component(ABS_DIR_HELPERS "${_qmake_path}/../lib/QtWebEngineCore.framework/Helpers" REALPATH)
         install(DIRECTORY ${ABS_DIR_HELPERS}
                 DESTINATION "${bundle_name}.app/Contents/Frameworks/QtWebEngineCore.framework/"
@@ -60,7 +60,7 @@ if(MACOSX_BUNDLE_NAMES)
 endif()
 
 if(WIN32)
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt5)
     get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
                  PROPERTY IMPORT_LOCATION)
     get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)
@@ -76,7 +76,7 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/iconengines/qsvgicon.dll"
             DESTINATION "bin/plugins/iconengines"
             CONFIGURATIONS Release)
-    if(MITK_USE_QT_WEBENGINE)
+    if(MITK_USE_Qt5_WebEngine)
       MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
     endif()
     install(DIRECTORY "${_qmake_path}/../resources/"
@@ -147,7 +147,7 @@ else()
 
 # We need to install Webengineprocess and related files on unix as well
   if(UNIX)
-      if(MITK_USE_QT_WEBENGINE)
+      if(MITK_USE_Qt5_WebEngine)
         get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE}
                    PROPERTY IMPORT_LOCATION)
         get_filename_component(_qmake_path "${_qmake_location}" DIRECTORY)

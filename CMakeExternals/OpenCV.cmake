@@ -52,7 +52,7 @@ if(MITK_USE_OpenCV)
 
     # 12-05-02, muellerm, added QT usage by OpenCV if QT is used in MITK
     # 12-09-11, muellerm, removed automatic usage again, since this will struggle with the MITK Qt application object
-    if(MITK_USE_QT)
+    if(MITK_USE_Qt5)
       list(APPEND additional_cmake_args
            -DWITH_QT:BOOL=OFF
            -DWITH_QT_OPENGL:BOOL=OFF

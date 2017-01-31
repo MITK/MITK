@@ -2,7 +2,7 @@ set(MITK_CPACK_PACKAGE_EXECUTABLES "" CACHE INTERNAL "Collecting windows shortcu
 set(MITK_DIR ${PROJECT_BINARY_DIR})
 set(MITK_EXPORTS_FILE_INCLUDED 1)
 
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
 
   if(MITK_USE_CTK)
     add_subdirectory(PluginGenerator)

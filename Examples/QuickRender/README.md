@@ -37,11 +37,10 @@ Code Changes
 Build Instructions
 ------------------
 
- - - install Qt 5.5
+ - - install Qt 5.6 or 5.7.1
  - build MITK superbuild with
    - `MITK_BUILD_EXAMPLES` variable switched to `ON`
-   - `MITK_USE_QT` switched to `ON`
-   - `DESIRED_QT_VERSION` to `5`
+   - `MITK_USE_Qt5` switched to `ON`
    - `MITK_USE_CTK` switched to `ON`
    - `MITK_USE_BLUEBERRY` switched to `ON`
 

@@ -20,7 +20,7 @@ if(NOT MITK_DIR)
   option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
   option(MITK_USE_DCMTK "Use DCMTK in MITK" ON)
-  option(MITK_USE_QT "Use Qt library in MITK" ON)
+  option(MITK_USE_Qt5 "Use Qt 5 library in MITK" ON)
   option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   option(MITK_USE_SOFA "Use Simulation Open Framework Architecture" OFF)
   option(MITK_USE_VMTK "Use the Vascular Modeling Toolkit in MITK" OFF)
@@ -31,9 +31,9 @@ if(NOT MITK_DIR)
     set(MITK_USE_CTK ON CACHE BOOL "Use CTK in MITK" FORCE)
   endif()
 
-  if(MITK_USE_CTK AND NOT MITK_USE_QT)
-    message("Forcing MITK_USE_QT to ON because of MITK_USE_CTK")
-    set(MITK_USE_QT ON CACHE BOOL "Use Qt library in MITK" FORCE)
+  if(MITK_USE_CTK AND NOT MITK_USE_Qt5)
+    message("Forcing MITK_USE_Qt5 to ON because of MITK_USE_CTK")
+    set(MITK_USE_Qt5 ON CACHE BOOL "Use Qt 5 library in MITK" FORCE)
   endif()
 
   set(MITK_USE_CableSwig ${MITK_USE_Python})
@@ -54,14 +54,14 @@ if(NOT MITK_DIR)
     MITK_USE_ACVD
     MITK_USE_CTK
     MITK_USE_DCMTK
-    MITK_USE_QT
+    MITK_USE_Qt5
     MITK_USE_OpenCV
     MITK_USE_SOFA
     MITK_USE_VMTK
     MITK_USE_Python
    )
 
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt5)
     # Look for Qt at the superbuild level, to catch missing Qt libs early
     find_package(Qt5Widgets REQUIRED)
   endif()
@@ -129,7 +129,7 @@ if(NOT MITK_DIR)
   # Additional MITK CMake variables
   #-----------------------------------------------------------------------------
 
-  if(MITK_USE_QT)
+  if(MITK_USE_Qt5)
     list(APPEND additional_mitk_cmakevars "-DCMAKE_PREFIX_PATH:PATH=${CMAKE_PREFIX_PATH}")
   endif()
 

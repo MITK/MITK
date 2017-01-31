@@ -200,13 +200,13 @@ mark_as_advanced(MITK_BUILD_ALL_APPS
 # -----------------------------------------
 # Qt version related variables
 
-env_option(MITK_USE_QT "Use Qt library" ON)
-env_option(MITK_USE_QT_WEBENGINE "Use Qt WebEngine library" ON)
+env_option(MITK_USE_Qt5 "Use Qt 5 library" ON)
+env_option(MITK_USE_Qt5_WebEngine "Use Qt 5 WebEngine library" ON)
 
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
   set(MITK_QT5_MINIMUM_VERSION 5.6.0)
   set(MITK_QT5_COMPONENTS Concurrent OpenGL PrintSupport Script Sql Svg Widgets Xml XmlPatterns UiTools Help LinguistTools)
-  if(MITK_USE_QT_WEBENGINE)
+  if(MITK_USE_Qt5_WebEngine)
     set(MITK_QT5_COMPONENTS ${MITK_QT5_COMPONENTS} WebEngineWidgets)
   endif()
   if(APPLE)
@@ -220,8 +220,8 @@ if(MITK_USE_QT)
       set(CMAKE_PREFIX_PATH "${_Qt5_DIR};${CMAKE_PREFIX_PATH}" CACHE PATH "" FORCE)
     endif()
   endif()
-elseif(MITK_USE_QT_WEBENGINE)
-  set(MITK_USE_QT_WEBENGINE OFF)
+elseif(MITK_USE_Qt5_WebEngine)
+  set(MITK_USE_Qt5_WebEngine OFF)
 endif()
 
 # ------------------------------------------------------------------------
@@ -281,7 +281,7 @@ mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DO
 mitkFunctionAddExternalProject(NAME VMTK      OFF          DEPENDS ITK VTK)
 mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
   mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
 endif()
 
@@ -343,17 +343,6 @@ if(MITK_USE_SOFA)
   # Allow setting external SOFA plugins directory and SOFA plugins
   set(MITK_USE_SOFA_PLUGINS_DIR ${MITK_USE_SOFA_PLUGINS_DIR} CACHE PATH "External SOFA plugins directory" FORCE)
   set(MITK_USE_SOFA_PLUGINS ${MITK_USE_SOFA_PLUGINS} CACHE PATH "List of semicolon-separated plugin names" FORCE)
-endif()
-
-# sanity check for supported Qt version. Only >= 5.3 is supported by CTK/PythonQt
-if(MITK_USE_QT AND MITK_USE_Python)
-  set(minimum_required_python_qt5_version "5.3.0")
-  find_package(Qt5 COMPONENTS Core REQUIRED)
-
-  if(${Qt5Core_VERSION_STRING} VERSION_LESS ${minimum_required_python_qt5_version})
-    message(WARNING "Can't build MITK Python with Qt version < ${minimum_required_python_qt5_version}. Disabling Python support")
-    set(MITK_USE_Python OFF CACHE BOOL "Use python wrapping in MITK" FORCE)
-  endif()
 endif()
 
 # only windows can't build python in debug mode
@@ -893,7 +882,7 @@ if(MITK_USE_OpenCL)
 endif()
 
 # Qt support
-if(MITK_USE_QT)
+if(MITK_USE_Qt5)
   find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required
   get_target_property(_qmake_exec Qt5::qmake LOCATION)
   execute_process(COMMAND ${_qmake_exec} -query QT_INSTALL_BINS
@@ -957,8 +946,8 @@ if(MITK_USE_QT)
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 
-      if(NOT MITK_USE_QT_WEBENGINE)
-        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_QT_WEBENGINE is OFF.")
+      if(NOT MITK_USE_Qt5_WebEngine)
+        message("> Forcing BLUEBERRY_USE_QT_HELP to OFF because MITK_USE_Qt5_WebEngine is OFF.")
         set(_force_blueberry_use_qt_help_to_off 1)
       endif()
 

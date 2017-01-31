@@ -44,7 +44,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF
-  org.mitk.gui.qt.igttracking:ON
   org.mitk.gui.qt.openigtlink:OFF
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
@@ -59,9 +58,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.remeshing:OFF
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.simulation:OFF
-  org.mitk.gui.qt.aicpregistration:ON
   org.mitk.gui.qt.toftutorial:OFF
-  org.mitk.gui.qt.tofutil:ON
   org.mitk.gui.qt.tubegraph:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.ultrasound:OFF
@@ -73,3 +70,17 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF
 )
+
+IF(MITK_USE_TOF_KINECTV2)
+  list(APPEND MITK_PLUGINS
+    org.mitk.gui.qt.igttracking:ON
+    org.mitk.gui.qt.aicpregistration:ON
+    org.mitk.gui.qt.tofutil:ON
+  )
+ELSE(MITK_USE_TOF_KINECTV2)
+  list(APPEND MITK_PLUGINS
+    org.mitk.gui.qt.igttracking:OFF
+    org.mitk.gui.qt.aicpregistration:OFF
+    org.mitk.gui.qt.tofutil:OFF
+  )
+ENDIF(MITK_USE_TOF_KINECTV2)

@@ -185,6 +185,8 @@ endmacro()
 
 # -----------------------------------------
 # General build options
+env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" ON)
+
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
 option(BUILD_TESTING "Test the project" ON)
@@ -240,7 +242,11 @@ set_property(GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS "")
 
 mitkFunctionAddExternalProject(NAME Poco        ON  COMPONENTS Foundation Net Util XML Zip)
 mitkFunctionAddExternalProject(NAME DCMTK       ON  DOC "EXPERIMENTAL, superbuild only: Use DCMTK in MITK")
-mitkFunctionAddExternalProject(NAME OpenIGTLink ON)
+IF(MITK_USE_TOF_KINECTV2)
+  mitkFunctionAddExternalProject(NAME OpenIGTLink ON)
+ELSE(MITK_USE_TOF_KINECTV2)
+  mitkFunctionAddExternalProject(NAME OpenIGTLink OFF)
+ENDIF(MITK_USE_TOF_KINECTV2)
 
 mitkFunctionAddExternalProject(NAME tinyxml     ON  ADVANCED)
 mitkFunctionAddExternalProject(NAME GDCM        ON  ADVANCED)

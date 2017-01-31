@@ -1,4 +1,4 @@
-OPTION(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" ON)
+env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" ON)
 
 IF(MITK_USE_TOF_KINECTV2)
   FIND_LIBRARY(MITK_KINECTV2_LIB Kinect20.lib HINTS "C:/Program Files/Microsoft SDKs/Kinect/v2.0_1409/Lib/x64" DOC "Kinect V2 access library.")

@@ -241,7 +241,7 @@ index 21ebddb..65a5039 100644
 +  for (; iter != platformsList.end(); ++iter)
 +    {
 +    std::string platformName;
-+    unsigned int platformNameSize = 1024;
++    std::size_t platformNameSize = 1024;
 +    platformName.resize(platformNameSize);
 +    ciErrNum = clGetPlatformInfo(*iter, CL_PLATFORM_NAME, platformName.size(), &platformName[0], &platformNameSize);
 +    platformName.resize(platformNameSize);

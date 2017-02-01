@@ -10,7 +10,7 @@ set(MY_OPERATING_SYSTEM )
 if(UNIX)
   # Download a utility script
   if(IS_PHABRICATOR_URL)
-    set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/mitkDetectOS.sh?view=raw")
+    set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/mitkDetectOS.sh?view=raw")
   else()
     set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/mitkDetectOS.sh")
   endif()
@@ -87,7 +87,7 @@ set(ENV{PATH} "${CTEST_PATH}")
 
 # If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
 if(NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
-  set(GIT_REPOSITORY "https://phabricator.mitk.org/diffusion/MITK/mitk.git")
+  set(GIT_REPOSITORY "https://phabricator.mitk.org/source/mitk.git")
 endif()
 
 #
@@ -150,7 +150,7 @@ endif()
 # Download and include dashboard driver script
 #
 if(IS_PHABRICATOR_URL)
-  set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/MITKDashboardDriverScript.cmake?view=raw")
+  set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/MITKDashboardDriverScript.cmake?view=raw")
 else()
   set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardDriverScript.cmake")
 endif()

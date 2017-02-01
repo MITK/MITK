@@ -22,7 +22,7 @@ Supported Platforms
 MITK is a cross-platform C++ toolkit and officially supports:
 
  - Windows
- - MacOS X
+ - macOS
  - Linux
 
 For details, please read the [Supported Platforms][platforms] page.
@@ -41,7 +41,7 @@ The MITK source code and binaries for the *MitkWorkbench* application are releas
 
 The official MITK source code is available in the [MITK Git repository][diffusion]. The Git clone command is
 
-    git clone https://phabricator.mitk.org/diffusion/MITK/mitk.git
+    git clone https://phabricator.mitk.org/source/mitk.git MITK
 
 Active development takes place in the MITK master branch and its usage is advised for advanced users only.
 
@@ -56,7 +56,7 @@ Build Instructions
 
 MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
 
-    git clone https://phabricator.mitk.org/diffusion/MITK/mitk.git MITK
+    git clone https://phabricator.mitk.org/source/mitk.git MITK
     mkdir MITK-build
     cd MITK-build
     cmake ../MITK
@@ -86,9 +86,9 @@ Useful Links
 [license]: http://mitk.org/git/?p=MITK.git;a=blob_plain;f=LICENSE.txt
 [release-cycle]: http://mitk.org/MitkReleaseCycle
 [download]: http://mitk.org/Download
-[diffusion]: https://phabricator.mitk.org/diffusion/MITK/
+[diffusion]: https://phabricator.mitk.org/source/mitk/
 [contribute]: http://mitk.org/How_to_contribute
 [cmake]: http://www.cmake.org
-[build]: http://docs.mitk.org/2016.03/BuildInstructionsPage.html
+[build]: http://docs.mitk.org/2016.11/BuildInstructionsPage.html
 [mailinglist]: http://mitk.org/Mailinglist
 [bugs]: https://phabricator.mitk.org/maniphest/

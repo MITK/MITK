@@ -28,7 +28,7 @@ set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 # The directory containing the Qt binaries
 set(QT5_INSTALL_PREFIX "/home/user/Qt/5.6/gcc_64")
 # For Windows, e.g.
-#set(QT5_INSTALL_PREFIX "C:/Qt/5.6/msvc2013_64_opengl")
+#set(QT5_INSTALL_PREFIX "C:/Qt/5.6/msvc2013_64")
 
 set(QT_BINARY_DIR "${QT5_INSTALL_PREFIX}/bin")
 
@@ -139,7 +139,7 @@ if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(url "https://raw.githubusercontent.com/MITK/MITK/master/CMake/MITKDashboardSetup.cmake")
 else()
   set(IS_PHABRICATOR_URL TRUE)
-  set(url "https://phabricator.mitk.org/diffusion/MITK/browse/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake?view=raw")
+  set(url "https://phabricator.mitk.org/source/mitk/browse/${GIT_BRANCH}/CMake/MITKDashboardSetup.cmake?view=raw")
 endif()
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.setup)
 downloadFile("${url}" "${dest}")

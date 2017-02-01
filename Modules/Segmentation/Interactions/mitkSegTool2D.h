@@ -124,20 +124,27 @@ namespace mitk
     virtual bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
 
     /**
-      \brief Extract the slice of an image that the user just scribbles on.
-      \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem
-      getting the image data at that position.
+    * \brief Extract the slice of an image that the user just scribbles on. The given component denotes the vector component of a dwi-image.
+    *
+    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
+    *
+    * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
+    *         getting the image data at that position.
     */
-    Image::Pointer GetAffectedImageSliceAs2DImage(const InteractionPositionEvent *, const Image *image);
+    Image::Pointer GetAffectedImageSliceAs2DImage(const InteractionPositionEvent *positionEvent, const Image *image, unsigned int component = 0);
 
     /**
-      \brief Extract the slice of an image cut by given plane.
-      \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem
-      getting the image data at that position.
+    * \brief Extract the slice of an image cut by given plane. The given component denotes the vector component of a dwi-image.
+    *
+    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
+    *
+    * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
+    *         getting the image data at that position.
     */
     Image::Pointer GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry,
                                                   const Image *image,
-                                                  unsigned int timeStep);
+                                                  unsigned int timeStep,
+                                                  unsigned int component = 0);
 
     /**
       \brief Extract the slice of the currently selected working image that the user just scribbles on.

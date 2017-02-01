@@ -13,14 +13,17 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+
 #include "mitkExtractSliceFilter.h"
+
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkPlaneClipping.h>
+
 #include <vtkGeneralTransform.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
+#include <vtkImageExtractComponents.h>
 #include <vtkLinearTransform.h>
-#include <vtkSmartPointer.h>
 
 mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice *reslicer)
 {
@@ -45,6 +48,7 @@ mitk::ExtractSliceFilter::ExtractSliceFilter(vtkImageReslice *reslicer)
   m_ZMax = 0;
   m_VtkOutputRequested = false;
   m_BackgroundLevel = -32768.0;
+  m_Component = 0;
 }
 
 mitk::ExtractSliceFilter::~ExtractSliceFilter()
@@ -122,7 +126,7 @@ void mitk::ExtractSliceFilter::GenerateData()
     return;
   }
 
-  /*================#BEGIN setup vtkImageRslice properties================*/
+  /*================#BEGIN setup vtkImageReslice properties================*/
   Point3D origin;
   Vector3D right, bottom, normal;
   double widthInMM, heightInMM;
@@ -178,7 +182,7 @@ void mitk::ExtractSliceFilter::GenerateData()
   {
     if (planeGeometry != nullptr)
     {
-      // if the worldGeomatry is a PlaneGeometry everthing is straight forward
+      // if the worldGeomatry is a PlaneGeometry everything is straight forward
 
       origin = planeGeometry->GetOrigin();
       right = planeGeometry->GetAxisVector(0);
@@ -262,13 +266,13 @@ void mitk::ExtractSliceFilter::GenerateData()
   }
   else
   {
-    // if no tranform is set the image can be used directly
+    // if no transform is set the image can be used directly
     m_Reslicer->SetInputData(input->GetVtkImageData(m_TimeStep));
   }
 
   /*setup the plane where vktImageReslice extracts the slice*/
 
-  // ResliceAxesOrigin is the ancor point of the plane
+  // ResliceAxesOrigin is the anchor point of the plane
   double originInVtk[3];
   itk2vtk(origin, originInVtk);
   m_Reslicer->SetResliceAxesOrigin(originInVtk);
@@ -344,35 +348,49 @@ void mitk::ExtractSliceFilter::GenerateData()
 
   m_Reslicer->SetOutputSpacing(m_OutPutSpacing[0], m_OutPutSpacing[1], m_ZSpacing);
 
-  // TODO check the following lines, they are responsible wether vtk error outputs appear or not
+  // TODO check the following lines, they are responsible whether vtk error outputs appear or not
   m_Reslicer->UpdateWholeExtent(); // this produces a bad allocation error for 2D images
   // m_Reslicer->GetOutput()->UpdateInformation();
   // m_Reslicer->GetOutput()->SetUpdateExtentToWholeExtent();
 
   // start the pipeline
   m_Reslicer->Update();
-
-  /*================ #END setup vtkImageRslice properties================*/
+  /*================ #END setup vtkImageReslice properties================*/
 
   if (m_VtkOutputRequested)
   {
-    return;
-    // no converting to mitk
+    // no conversion to mitk
     // no mitk geometry will be set, as the output is vtkImageData only!!!
+    // no image component will be extracted, as the caller might need the whole multi-component image as vtk output
+    return;
   }
   else
   {
-    /*================ #BEGIN Get the slice from vtkImageReslice and convert it to mit::Image================*/
-    vtkImageData *reslicedImage;
+    auto reslicedImage = vtkSmartPointer<vtkImageData>::New();
     reslicedImage = m_Reslicer->GetOutput();
 
-    if (!reslicedImage)
+    if (nullptr == reslicedImage)
     {
       itkWarningMacro(<< "Reslicer returned empty image");
       return;
     }
 
-    mitk::Image::Pointer resultImage = this->GetOutput();
+    /*================ #BEGIN Extract component from image slice ================*/
+    int numberOfScalarComponent = reslicedImage->GetNumberOfScalarComponents();
+    if (numberOfScalarComponent > 1 && numberOfScalarComponent >= m_Component)
+    {
+      // image has more than one component, extract the correct component information with the given 'component' parameter
+      auto vectorComponentExtractor = vtkSmartPointer<vtkImageExtractComponents>::New();
+      vectorComponentExtractor->SetInputData(reslicedImage);
+      vectorComponentExtractor->SetComponents(m_Component);
+      vectorComponentExtractor->Update();
+
+      reslicedImage = vectorComponentExtractor->GetOutput();
+    }
+    /*================ #END Extract component from image slice ================*/
+
+    /*================ #BEGIN Convert the slice to an mitk::Image ================*/
+    mitk::Image::Pointer resultImage = GetOutput();
 
     // initialize resultimage with the specs of the vtkImageData object returned from vtkImageReslice
     if (reslicedImage->GetDataDimension() == 1)
@@ -410,7 +428,7 @@ void mitk::ExtractSliceFilter::GenerateData()
 
     /*At this point we have to adjust the geometry because the origin isn't correct.
     The wrong origin is related to the rotation of the current world geometry plane.
-    This causes errors on transfering world to index coordinates. We just shift the
+    This causes errors on transferring world to index coordinates. We just shift the
     origin in each direction about the amount of the expanding (needed while rotating
     the plane).
     */
@@ -430,7 +448,7 @@ void mitk::ExtractSliceFilter::GenerateData()
 
     /*the bounds as well as the extent of the worldGeometry are not adapted correctly during crosshair rotation.
     This is only a quick fix and has to be evaluated.
-    The new bounds are set via the max values of the calcuted slice extent. It will look like [ 0, x, 0, y, 0, 1].
+    The new bounds are set via the max values of the calculated slice extent. It will look like [ 0, x, 0, y, 0, 1].
     */
     mitk::BoundingBox::BoundsArrayType boundsCopy;
     boundsCopy[0] = boundsCopy[2] = boundsCopy[4] = 0;
@@ -439,7 +457,7 @@ void mitk::ExtractSliceFilter::GenerateData()
     boundsCopy[3] = yMax - yMin;
     resultImage->GetGeometry()->SetBounds(boundsCopy);
 
-    /*================ #END Get the slice from vtkImageReslice and convert it to mitk Image================*/
+    /*================ #END Convert the slice to an mitk::Image ================*/
   }
 }
 

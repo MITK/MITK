@@ -9,6 +9,11 @@
 
 struct ThrowAwayPattern _ = {};
 
+namespace
+{
+  const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
+}
+
 namespace Logger {
 
   Options::Options()
@@ -105,7 +110,7 @@ namespace Logger {
       sink->set_formatter(
         boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\">%3%</record>")
         % boost::log::expressions::attr< unsigned int >("RecordID")
-        % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp")
+        % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT))
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
         );
 
@@ -145,7 +150,7 @@ namespace Logger {
       boost::shared_ptr< ostream_sink > sink3(new ostream_sink(dataBackend));
       sink3->set_formatter(
         boost::log::expressions::format("%1% > %2%")
-        % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp")
+        % boost::log::expressions::attr< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT))
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
         );
 

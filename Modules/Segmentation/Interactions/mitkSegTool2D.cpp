@@ -45,6 +45,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 
+
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
 #include <mitkDiffSliceOperationApplier.h>
@@ -203,29 +204,27 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const Image *slice,
   }
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const InteractionPositionEvent *positionEvent,
-                                                                     const Image *image)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const InteractionPositionEvent *positionEvent, const Image *image, unsigned int component /*= 0*/)
 {
   if (!positionEvent)
-    return NULL;
+  {
+    return nullptr;
+  }
 
   assert(positionEvent->GetSender()); // sure, right?
-  unsigned int timeStep =
-    positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
+  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
 
-  return this->GetAffectedImageSliceAs2DImage(
-    positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep);
+  return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry,
-                                                                     const Image *image,
-                                                                     unsigned int timeStep)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry, const Image *image, unsigned int timeStep, unsigned int component /*= 0*/)
 {
   if (!image || !planeGeometry)
-    return NULL;
+  {
+    return nullptr;
+  }
 
-  // Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk
-  // reslicer
+  // Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk reslicer
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
   // set to false to extract a slice
   reslice->SetOverwriteMode(false);
@@ -238,6 +237,9 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
   extractor->SetWorldGeometry(planeGeometry);
   extractor->SetVtkOutputRequest(false);
   extractor->SetResliceTransformByGeometry(image->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
+  // additionally extract the given component
+  // default is 0; the extractor checks for multi-component images
+  extractor->SetComponent(component);
 
   extractor->Modified();
   extractor->Update();
@@ -251,11 +253,15 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionP
 {
   DataNode *workingNode(m_ToolManager->GetWorkingData(0));
   if (!workingNode)
-    return NULL;
+  {
+    return nullptr;
+  }
 
   Image *workingImage = dynamic_cast<Image *>(workingNode->GetData());
   if (!workingImage)
-    return NULL;
+  {
+    return nullptr;
+  }
 
   return GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
 }
@@ -264,13 +270,26 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const Interactio
 {
   DataNode *referenceNode(m_ToolManager->GetReferenceData(0));
   if (!referenceNode)
-    return NULL;
+  {
+    return nullptr;
+  }
 
   Image *referenceImage = dynamic_cast<Image *>(referenceNode->GetData());
   if (!referenceImage)
-    return NULL;
+  {
+    return nullptr;
+  }
 
-  return GetAffectedImageSliceAs2DImage(positionEvent, referenceImage);
+  int displayedComponent = 0;
+  if (referenceNode->GetIntProperty("Image.Displayed Component", displayedComponent))
+  {
+    // found the displayed component
+    return GetAffectedImageSliceAs2DImage(positionEvent, referenceImage, displayedComponent);
+  }
+  else
+  {
+    return GetAffectedImageSliceAs2DImage(positionEvent, referenceImage);
+  }
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent *positionEvent, Image *slice)

@@ -51,7 +51,7 @@
   #define AUTOPLAN_WARNING BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::warning) << "Warning: "
   #define AUTOPLAN_FATAL BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::fatal) << "Fatal Error: "
 #else
-  #define AUTOPLAN_LOG_CALLER_NAME << "From: " << Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION) 
+  #define AUTOPLAN_LOG_CALLER_NAME << '(' << Logger::details::formatCallerName(BOOST_CURRENT_FUNCTION) <<") "
   #define AUTOPLAN_INFO BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::info) AUTOPLAN_LOG_CALLER_NAME
   #define AUTOPLAN_ERROR BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::error) AUTOPLAN_LOG_CALLER_NAME << "Error: "
   #define AUTOPLAN_TRACE BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::trace) AUTOPLAN_LOG_CALLER_NAME
@@ -69,7 +69,11 @@ ThrowAwayPattern & operator<<(ThrowAwayPattern&__, T)
 }
 
 #ifdef DEBUG_INFO
-  #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) << "Debug: "
+  #ifdef __APPLE__
+    #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) << "Debug: "
+  #else
+    #define AUTOPLAN_DEBUG BOOST_LOG_STREAM_SEV(Logger::Log::get().lg, boost::log::trivial::debug) AUTOPLAN_LOG_CALLER_NAME << "Debug: "
+  #endif // __APPLE__
 #else
   #define AUTOPLAN_DEBUG _
 #endif
@@ -162,8 +166,7 @@ namespace Logger
       xp::smatch searchResult;
       if (xp::regex_search(formatedTypeName, searchResult, classNameRegex)) {
         formatedTypeName.assign(searchResult[0].first + 1, searchResult[0].second);
-      }
-      else {
+      } else {
         formatedTypeName.resize(std::min(formatedTypeName.size(), formatedTypeName.find(':')));
       }
       std::reverse(formatedTypeName.begin(), formatedTypeName.end());

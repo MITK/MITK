@@ -216,8 +216,4 @@ on the command line, i.e.
 ccmake -DITK_DIR:PATH=/opt/ITK-release ../MITK
 \endcode
 
-See the following link for more information about how to configure third-party
-libraries:
-\subpage BuildToolkits "How to build ITK, VTK and Qt"
-
 */

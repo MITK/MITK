@@ -185,7 +185,7 @@ endmacro()
 
 # -----------------------------------------
 # General build options
-env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" ON)
+env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" OFF)
 
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)
@@ -225,6 +225,16 @@ if(MITK_USE_QT)
 elseif(MITK_USE_QT_WEBENGINE)
   set(MITK_USE_QT_WEBENGINE OFF)
 endif()
+
+# -----------------------------------------
+# Add Kinect SDK v2 if requared
+
+if(MITK_USE_TOF_KINECTV2)
+  find_package( KinectSDK2 REQUIRED )
+  if(NOT KinectSDK2_FOUND)
+    message(FATAL_ERROR "Install Kinect SDK v2 for build woith option MITK_USE_TOF_KINECTV2")
+  endif()
+endif(MITK_USE_TOF_KINECTV2)
 
 # ------------------------------------------------------------------------
 # Register external projects which can be build with the MITK superbuild

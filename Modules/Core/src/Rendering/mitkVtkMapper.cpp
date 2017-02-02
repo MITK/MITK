@@ -88,9 +88,8 @@ void mitk::VtkMapper::MitkRenderTranslucentGeometry(BaseRenderer *renderer)
   }
 }
 
-void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer */*renderer*/)
+void mitk::VtkMapper::ApplyShaderProperties(mitk::BaseRenderer *)
 {
-
 }
 
 void mitk::VtkMapper::MitkRenderVolumetricGeometry(BaseRenderer *renderer)

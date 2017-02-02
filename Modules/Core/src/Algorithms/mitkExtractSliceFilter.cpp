@@ -377,7 +377,7 @@ void mitk::ExtractSliceFilter::GenerateData()
 
     /*================ #BEGIN Extract component from image slice ================*/
     int numberOfScalarComponent = reslicedImage->GetNumberOfScalarComponents();
-    if (numberOfScalarComponent > 1 && numberOfScalarComponent >= m_Component)
+    if (numberOfScalarComponent > 1 && static_cast<unsigned int>(numberOfScalarComponent) >= m_Component)
     {
       // image has more than one component, extract the correct component information with the given 'component' parameter
       auto vectorComponentExtractor = vtkSmartPointer<vtkImageExtractComponents>::New();

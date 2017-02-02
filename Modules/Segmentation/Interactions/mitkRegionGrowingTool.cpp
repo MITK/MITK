@@ -295,7 +295,7 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
 
     // 2. Determine if the user clicked inside or outside of the segmentation/working slice (i.e. the whole volume)
     mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+    workingSliceGeometry = m_WorkingSlice->GetGeometry();
     workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), m_SeedPoint);
     itk::Index<2> indexInWorkingSlice2D;
     indexInWorkingSlice2D[0] = m_SeedPoint[0];
@@ -404,14 +404,14 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
   {
     // Get geometry and indices
     mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+    workingSliceGeometry = m_WorkingSlice->GetGeometry();
     itk::Index<2> indexInWorkingSlice2D;
     indexInWorkingSlice2D[0] = m_SeedPoint[0];
     indexInWorkingSlice2D[1] = m_SeedPoint[1];
 
     mitk::BaseGeometry::Pointer referenceSliceGeometry;
     referenceSliceGeometry =
-      m_ReferenceSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+      m_ReferenceSlice->GetGeometry();
     itk::Index<3> indexInReferenceSlice;
     itk::Index<2> indexInReferenceSlice2D;
     referenceSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), indexInReferenceSlice);
@@ -458,7 +458,25 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
       {
         ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
           workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-        FeedbackContourTool::SetFeedbackContour(resultContourWorld);
+
+        // this is not a beautiful solution, just one that works, check T22412 for details
+        int timestep = positionEvent->GetSender()->GetTimeStep();
+        if (0 != timestep)
+        {
+          int size = resultContourWorld->GetNumberOfVertices(0);
+          auto resultContourTimeWorld = mitk::ContourModel::New();
+          resultContourTimeWorld->Expand(timestep + 1);
+          for (int loop = 0; loop < size; ++loop)
+          {
+            resultContourTimeWorld->AddVertex(resultContourWorld->GetVertexAt(loop, 0), timestep);
+          }
+          FeedbackContourTool::SetFeedbackContour(resultContourTimeWorld);
+        }
+        else
+        {
+          FeedbackContourTool::SetFeedbackContour(resultContourWorld);
+        }
+
         FeedbackContourTool::SetFeedbackContourVisible(true);
         mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
       }
@@ -481,7 +499,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
   {
     // Get geometry and indices
     mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetTimeGeometry()->GetGeometryForTimeStep(m_LastEventSender->GetTimeStep());
+    workingSliceGeometry = m_WorkingSlice->GetGeometry();
     itk::Index<2> indexInWorkingSlice2D;
     indexInWorkingSlice2D[0] = m_SeedPoint[0];
     indexInWorkingSlice2D[1] = m_SeedPoint[1];
@@ -519,7 +537,25 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
       {
         ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
           workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-        FeedbackContourTool::SetFeedbackContour(resultContourWorld);
+
+        // this is not a beautiful solution, just one that works, check T22412 for details
+        int timestep = positionEvent->GetSender()->GetTimeStep();
+        if (0 != timestep)
+        {
+          int size = resultContourWorld->GetNumberOfVertices(0);
+          auto resultContourTimeWorld = mitk::ContourModel::New();
+          resultContourTimeWorld->Expand(timestep + 1);
+          for (int loop = 0; loop < size; ++loop)
+          {
+            resultContourTimeWorld->AddVertex(resultContourWorld->GetVertexAt(loop, 0), timestep);
+          }
+          FeedbackContourTool::SetFeedbackContour(resultContourTimeWorld);
+        }
+        else
+        {
+          FeedbackContourTool::SetFeedbackContour(resultContourWorld);
+        }
+
         FeedbackContourTool::SetFeedbackContourVisible(true);
         mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
       }
@@ -542,8 +578,29 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
   {
     // Project contour into working slice
     ContourModel *feedbackContour(FeedbackContourTool::GetFeedbackContour());
-    ContourModel::Pointer projectedContour =
-      FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, feedbackContour, false, false);
+
+    ContourModel::Pointer projectedContour;
+
+    // this is not a beautiful solution, just one that works, check T22412 for details
+    int timestep = positionEvent->GetSender()->GetTimeStep();
+    if (0 != timestep)
+    {
+      int size = feedbackContour->GetNumberOfVertices(timestep);
+      auto feedbackContourTime = mitk::ContourModel::New();
+      feedbackContourTime->Expand(timestep + 1);
+      for (int loop = 0; loop < size; ++loop)
+      {
+        feedbackContourTime->AddVertex(feedbackContour->GetVertexAt(loop, timestep), 0);
+      }
+
+      projectedContour =
+        FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, feedbackContourTime, false, false);
+    }
+    else
+    {
+      projectedContour =
+        FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, feedbackContour, false, false);
+    }
 
     // If there is a projected contour, fill it
     if (projectedContour.IsNotNull())
@@ -564,7 +621,7 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
         // For LabelSetImages we want to paint with the active label value
         auto activeLabel = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
         mitk::ContourModelUtils::FillContourInSlice(projectedContour,
-                                                    positionEvent->GetSender()->GetTimeStep(),
+                                                    0,
                                                     m_WorkingSlice,
                                                     labelImage,
                                                     m_PaintingPixelValue * activeLabel);
@@ -572,7 +629,7 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
       else
       {
         mitk::ContourModelUtils::FillContourInSlice(projectedContour,
-                                                    positionEvent->GetSender()->GetTimeStep(),
+                                                    0,
                                                     m_WorkingSlice,
                                                     m_WorkingSlice,
                                                     m_PaintingPixelValue);

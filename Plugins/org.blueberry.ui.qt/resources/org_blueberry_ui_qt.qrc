@@ -59,7 +59,8 @@
     <file>darkstyle-tab.qss</file>
     <file>darkstyle-activetab.qss</file>
 
-    <file>fonts/FiraSans/FiraSans.ttf</file>
+    <file>fonts/FiraSans/FiraSans.ttc</file>
+    <file>fonts/LightFiraSans/LightFiraSans.ttc</file>
     <file>fonts/Roboto/Roboto.ttf</file>
     <file>fonts/xkcd/xkcd.ttf</file>
   </qresource>

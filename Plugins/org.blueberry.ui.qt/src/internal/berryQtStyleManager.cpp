@@ -89,7 +89,8 @@ void QtStyleManager::AddDefaultStyle()
 void QtStyleManager::AddDefaultFonts()
 {
   m_customFontNames.append(QString("<<system>>"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttf"), QString("Fira Sans"));
+  AddFont(QString(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttc"), QString("Fira Sans"));
+  AddFont(QString(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttc"), QString("Light Fira Sans"));
   AddFont(QString(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf"), QString("Roboto"));
   AddFont(QString(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf"), QString("xkcd"));
 }
@@ -343,7 +344,7 @@ void QtStyleManager::SetFont(const QString& fontName)
   }
   else
   {
-    QFont font(fontName, 11);
+    QFont font(fontName);
     qApp->setFont(font);
   }
   currentFont = fontName;

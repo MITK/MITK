@@ -15,6 +15,7 @@
       name="MultiLabel Segmentation Utilities"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/MultiLabelSegmentationUtilities_48x48.png" />
+
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

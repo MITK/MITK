@@ -162,6 +162,8 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls.m_cbInterpolation->setCurrentIndex(0);
   m_Controls.m_swInterpolation->hide();
+  // Disabled, see T22330
+  m_Controls.m_gbInterpolation->hide();
 
   // *------------------------
   // * ToolSelection 2D

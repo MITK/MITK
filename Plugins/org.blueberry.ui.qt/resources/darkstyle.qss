@@ -344,13 +344,15 @@ QLineEdit
 }
 
 QGroupBox {
-    border:1px solid #1d1d1c;
+    border:1px solid #323231;
     border-radius: 0px;
     padding-top: 24px;
+
+    font-weight: bold;
 }
 
 QGroupBox::title {
-    border:1px solid #1d1d1c;
+    border:1px solid #323231;
     border-right:0px;
     border-bottom:0px;
     subcontrol-position: top left;
@@ -604,7 +606,7 @@ QPushButton
 {
     color: #adb1b6;
     background-color: #323231;
-	min-width: 68px;
+    width: 68px;
     border-width: 1px;
     border-color: #1d1d1c;
     border-style: solid;

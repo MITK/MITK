@@ -82,6 +82,9 @@ if(WIN32)
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
             CONFIGURATIONS Release)
+    install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+            DESTINATION "bin/translations/qtwebengine_locales/"
+            CONFIGURATIONS Release)
     install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
             DESTINATION "bin/plugins/platforms"
             CONFIGURATIONS Debug)
@@ -96,6 +99,9 @@ if(WIN32)
             CONFIGURATIONS Debug)
     install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/"
+            CONFIGURATIONS Debug)
+    install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+            DESTINATION "bin/translations/qtwebengine_locales/"
             CONFIGURATIONS Debug)
   endif()
 
@@ -154,6 +160,8 @@ else()
         MITK_INSTALL_HELPER_APP( EXECUTABLES "${_qmake_path}/../libexec/QtWebEngineProcess")
         install(DIRECTORY "${_qmake_path}/../resources/"
             DESTINATION "bin/resources/")
+        install(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales/"
+            DESTINATION "bin/translations/qtwebengine_locales/")
     endif()
   endif()
 

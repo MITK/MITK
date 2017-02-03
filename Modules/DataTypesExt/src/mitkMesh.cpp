@@ -204,10 +204,8 @@ int mitk::Mesh::SearchSelectedCell(int t)
 // closed
 bool mitk::Mesh::GetPointIds(unsigned long cellId, unsigned long lineId, int &idA, int &idB, int t)
 {
-  bool ok = false;
-  bool found = false;
   CellAutoPointer cellAutoPointer;
-  ok = m_PointSetSeries[t]->GetCell(cellId, cellAutoPointer);
+  bool ok = m_PointSetSeries[t]->GetCell(cellId, cellAutoPointer);
   if (ok)
   {
     CellType *cell = cellAutoPointer.GetPointer();
@@ -220,6 +218,7 @@ bool mitk::Mesh::GetPointIds(unsigned long cellId, unsigned long lineId, int &id
     PointIdIterator pointIdIt = cell->PointIdsBegin();
     PointIdIterator pointIdEnd = cell->PointIdsEnd();
     unsigned int counter = 0;
+    bool found = false;
     while (pointIdIt != pointIdEnd)
     {
       if (counter == lineId)

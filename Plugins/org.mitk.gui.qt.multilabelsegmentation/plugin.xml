@@ -11,12 +11,11 @@
       icon="resources/multilabelsegmentation.png"
       class="QmitkMultiLabelSegmentationView" />
 
-<!-- Disabled due to most functions not working right now. See T22330
     <view id="org.mitk.views.multilabelsegmentationutilities"
       name="MultiLabel Segmentation Utilities"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/MultiLabelSegmentationUtilities_48x48.png" />
--->
+
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

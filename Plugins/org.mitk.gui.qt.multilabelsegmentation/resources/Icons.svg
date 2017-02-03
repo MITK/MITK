@@ -14,7 +14,7 @@
    height="1052.3622047"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="Icons.svg">
   <sodipodi:namedview
      id="base"
@@ -23,14 +23,14 @@
      borderopacity="0.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="0"
-     inkscape:zoom="8"
-     inkscape:cx="-137.69045"
-     inkscape:cy="-24.220797"
+     inkscape:zoom="1.4142135"
+     inkscape:cx="246.84648"
+     inkscape:cy="-150.51995"
      inkscape:document-units="px"
-     inkscape:current-layer="g4297-7"
+     inkscape:current-layer="g4191"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1018"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1" />
@@ -801,6 +801,70 @@
          d="M 5.77,0.0 L -2.88,5.0 L -2.88,-5.0 L 5.77,0.0 z "
          id="path5653" />
     </marker>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Drop Shadow"
+       id="filter5322">
+      <feFlood
+         flood-opacity="0.247059"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood5324" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite5326" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="1"
+         result="blur"
+         id="feGaussianBlur5328" />
+      <feOffset
+         dx="2"
+         dy="-2"
+         result="offset"
+         id="feOffset5330" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite5332" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Drop Shadow"
+       id="filter5647">
+      <feFlood
+         flood-opacity="0.247059"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood5649" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite5651" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="1"
+         result="blur"
+         id="feGaussianBlur5653" />
+      <feOffset
+         dx="2"
+         dy="2"
+         result="offset"
+         id="feOffset5655" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite5657" />
+    </filter>
   </defs>
   <metadata
      id="metadata2990">
@@ -815,515 +879,747 @@
     </rdf:RDF>
   </metadata>
   <g
-     sodipodi:insensitive="true"
      style="display:inline"
      inkscape:label="Boolean Operations"
      id="layer2"
      inkscape:groupmode="layer">
     <g
-       inkscape:export-ydpi="91.087982"
-       inkscape:export-xdpi="91.087982"
-       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.segmentation\resources\boolean_48x48.png"
-       transform="translate(-922.66699,114.10169)"
-       id="g4197">
+       style="display:inline"
+       id="g3213-9-6-2"
+       transform="translate(-44.937494,-29.374988)"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\BooleanOperations_48x48.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="fill:#999999;fill-opacity:1;stroke:none"
+         id="rect3005-74-4-7-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-0-8-3-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#e991a6;fill-opacity:1;stroke:none"
+         id="rect3005-7-9-8-9-7"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-48-2-7-2"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-9-8-4-2-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#e991a6;fill-opacity:1;stroke:none"
+         id="rect3005-4-4-2-5-9-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-8-4-5-55-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-82-5-1-0-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-45-5-7-0-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-5-1-1-3-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-1-7-1-8-7"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-7-1-5-8-9"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-11-1-2-0-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-52-5-7-1-5"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-76-2-6-5-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-14-7-1-1-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-2-6-4-0-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-3-1-2-6-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-22-4-3-4-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-1-2-2-2-3"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-6-3-2-9-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-2-1-79-5"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-7-2-6-4-7"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-6-1-8-8-9"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#9fcde2;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-1-6-5-6-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-8-7-5-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-2-5-6-8-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-7-7-1-0-9"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-9-6-8-5-5"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-8-5-1-9-4-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#9fcde2;fill-opacity:1;stroke:none"
+         id="rect3005-8-5-3-8-2-6-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#999999;fill-opacity:1;stroke:none"
+         id="rect3005-2-9-7-4-2"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+    </g>
+    <g
+       inkscape:export-ydpi="90"
+       inkscape:export-xdpi="90"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\BooleanOperations_48x48.png"
+       transform="matrix(0.70391111,0,0,0.70391111,-637.47636,396.77122)"
+       id="g4197"
+       style="fill:#00adff;fill-opacity:1">
       <g
-         id="g4126"
-         transform="translate(49.125,0.0625)">
-        <rect
-           y="914.43219"
-           x="873.54199"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005"
-           style="fill:#999999;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="879.58081"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="885.61963"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-7"
-           style="fill:#d499a6;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="891.65845"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="897.69727"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-9"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="879.58081"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-4"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="891.65845"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-8"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="897.69727"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-82"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="903.73608"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-45"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="879.58081"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-5"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="885.61963"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-1"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="897.69727"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-7"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="903.73608"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-11"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="891.65845"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-52"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="897.69727"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-76"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="903.73608"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-14"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="873.54199"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-2"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="915.81372"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-3"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="915.81372"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-22"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="909.7749"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-1"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="909.7749"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-6"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="885.61963"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="891.65845"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-7"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="885.61963"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-6"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="903.73608"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-1"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="873.54199"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="873.54199"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-2"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="926.70343"
-           x="909.7749"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-7"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="914.43219"
-           x="915.81372"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-9"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="879.58081"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-5"
-           style="fill:#cf98a3;fill-opacity:1;stroke:none" />
-        <rect
-           y="932.83905"
-           x="909.7749"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-5-3"
-           style="fill:#cf98a3;fill-opacity:1;stroke:none" />
-        <rect
-           y="920.56781"
-           x="915.81372"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-2"
-           style="fill:#999999;fill-opacity:1;stroke:none" />
-      </g>
-      <g
-         id="g4191">
+         id="g4191"
+         style="fill:#00adff;fill-opacity:1;filter:url(#filter5647)"
+         transform="translate(-12.638594,-5.9299745)">
         <text
            sodipodi:linespacing="125%"
            id="text4160"
-           y="905.98718"
-           x="922.875"
-           style="font-size:22px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00afdc;fill-opacity:1;stroke:none;font-family:Sans"
-           xml:space="preserve"><tspan
+           y="902.84796"
+           x="924.8374"
+           style="font-style:normal;font-weight:normal;font-size:14.94364452px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#00adff;fill-opacity:1;stroke:none"
+           xml:space="preserve"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\BooleanOperations_48x48.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90"><tspan
              dx="0"
-             style="font-size:21px;font-weight:bold;letter-spacing:-0.99000007px;-inkscape-font-specification:Sans Bold"
+             style="font-weight:bold;font-size:14.26438808px;-inkscape-font-specification:'Sans Bold';letter-spacing:-0.67246401px;fill:#00adff;fill-opacity:1"
              id="tspan4164"
-             y="905.98718"
-             x="922.875"
+             y="902.84796"
+             x="924.8374"
              sodipodi:role="line">AND</tspan></text>
         <text
            sodipodi:linespacing="125%"
            id="text4160-3"
-           y="922.48621"
-           x="939.82056"
-           style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#00afdc;fill-opacity:1;stroke:none;font-family:Sans"
-           xml:space="preserve"><tspan
-             style="font-size:21px;font-weight:bold;letter-spacing:-0.99000007px;-inkscape-font-specification:Sans Bold"
+           y="903.00098"
+           x="960.38025"
+           style="font-style:normal;font-weight:normal;font-size:13.49872208px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#bf264a;fill-opacity:1;stroke:none"
+           xml:space="preserve"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\BooleanOperations_48x48.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90"><tspan
+             style="font-weight:bold;font-size:14.17365837px;-inkscape-font-specification:'Sans Bold';letter-spacing:-0.66818678px;fill:#bf264a;fill-opacity:1"
              id="tspan4164-3"
-             y="922.48621"
-             x="939.82056"
+             y="903.00098"
+             x="960.38025"
              sodipodi:role="line">OR</tspan></text>
       </g>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#bf264a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="2.000154"
+       y="1018.2798"
+       id="text4859-4-0"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\BooleanOperations_48x48.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4861-1-0"
+         x="2.000154"
+         y="1018.2798"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.375px;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, Bold';fill:#bf264a;fill-opacity:1">MULTI</tspan></text>
+    <rect
+       style="fill:#00adff;fill-opacity:0;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5677"
+       width="47.875"
+       height="47.875004"
+       x="3.0000005"
+       y="1005.0497"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\BooleanOperations_48x48.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
   <g
-     sodipodi:insensitive="true"
      inkscape:label="Segmentation Utilities"
      id="layer1"
      inkscape:groupmode="layer">
     <g
+       style="display:inline"
+       id="g3213-9-6"
+       transform="translate(-98.45001,-29.221517)"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\MultiLabelSegmentationUtilities_48x48.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
+      <rect
+         style="fill:#999999;fill-opacity:1;stroke:none"
+         id="rect3005-74-4-7"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-0-8-3"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#e991a6;fill-opacity:1;stroke:none"
+         id="rect3005-7-9-8-9"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-48-2-7"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-9-8-4-2"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#e991a6;fill-opacity:1;stroke:none"
+         id="rect3005-4-4-2-5-9"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-8-4-5-55"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-82-5-1-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-45-5-7-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-5-1-1-3"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-1-7-1-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-7-1-5-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-11-1-2-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-4-52-5-7-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-76-2-6-5"
+         width="5.4800777"
+         height="5.4800777"
+         x="72.154366"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#73b6d5;fill-opacity:1;stroke:none"
+         id="rect3005-4-14-7-1-1"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-2-6-4-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-3-1-2-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-22-4-3-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-1-2-2-2"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#b3b3b3;fill-opacity:1;stroke:none"
+         id="rect3005-1-6-3-2-9"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-2-1-79"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-7-2-6-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="66.115547"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-6-1-8-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="60.076729"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#9fcde2;fill-opacity:1;stroke:none"
+         id="rect3005-1-8-1-6-5-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="78.193184"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-8-7-5"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-2-5-6-8"
+         width="5.4800777"
+         height="5.4800777"
+         x="47.999092"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-7-7-1-0"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1070.6899"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none"
+         id="rect3005-8-9-6-8-5"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1058.4187"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#de5a7a;fill-opacity:1;stroke:none"
+         id="rect3005-8-5-1-9-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="54.03791"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#9fcde2;fill-opacity:1;stroke:none"
+         id="rect3005-8-5-3-8-2-6"
+         width="5.4800777"
+         height="5.4800777"
+         x="84.232002"
+         y="1076.8256"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+      <rect
+         style="fill:#999999;fill-opacity:1;stroke:none"
+         id="rect3005-2-9-7-4"
+         width="5.4800777"
+         height="5.4800777"
+         x="90.270821"
+         y="1064.5543"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90" />
+    </g>
+    <g
        inkscape:export-ydpi="90.470001"
        inkscape:export-xdpi="90.470001"
-       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.segmentation\resources\SegmentationUtilities_48x48.png"
-       transform="translate(-57.851365,-13.716184)"
-       id="g4285">
-      <g
-         transform="translate(-43.125,-15.75)"
-         id="g3213"
-         style="display:inline">
-        <rect
-           y="1058.4187"
-           x="47.999092"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-74"
-           style="fill:#999999;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="54.03791"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-0"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="60.076729"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-7-9"
-           style="fill:#d499a6;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="66.115547"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-48"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="72.154366"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-9-8"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="54.03791"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-4-2"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="66.115547"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-8-4"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="72.154366"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-82-5"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="78.193184"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-45-5"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="54.03791"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-5-1"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="60.076729"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-1-7"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="72.154366"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-7-1"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="78.193184"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-11-1"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="66.115547"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-52-5"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="72.154366"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-76-2"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="78.193184"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-4-14-7"
-           style="fill:#bf264b;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="47.999092"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-2-6"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="90.270821"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-3-1"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="90.270821"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-22-4"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="84.232002"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-1-2"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="84.232002"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-6-3"
-           style="fill:#b3b3b3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="60.076729"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-2"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="66.115547"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-7-2"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="60.076729"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-6-1"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="78.193184"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-1-8-1-6"
-           style="fill:#e1d0da;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="47.999092"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-8"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="47.999092"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-2-5"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="1070.6899"
-           x="84.232002"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-7-7"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="1058.4187"
-           x="90.270821"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-9-6"
-           style="fill:#4d4d4d;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="54.03791"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-5-1"
-           style="fill:#cf98a3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1076.8256"
-           x="84.232002"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-8-5-3-8"
-           style="fill:#cf98a3;fill-opacity:1;stroke:none" />
-        <rect
-           y="1064.5543"
-           x="90.270821"
-           height="5.4800777"
-           width="5.4800777"
-           id="rect3005-2-9"
-           style="fill:#999999;fill-opacity:1;stroke:none" />
-      </g>
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\MultiLabelSegmentationUtilities_48x48.png"
+       transform="translate(-58.226365,-3.6536836)"
+       id="g4285"
+       style="filter:url(#filter5322)">
       <g
          transform="translate(-0.23863636,4.2386364)"
          id="g4280">
@@ -1332,31 +1628,41 @@
            inkscape:connector-curvature="0"
            id="path4052"
            d="m 34.24319,1031.4717 8.747098,-8.5733 -0.05204,-2.9235 5.054758,-5.2082 4.085023,3.7843 -5.303659,5.7251 -2.41443,0.092 -8.683803,8.8731 z"
-           style="fill:url(#radialGradient4324);fill-opacity:1;stroke:#797b7b;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+           style="fill:url(#radialGradient4324);fill-opacity:1;stroke:#797b7b;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
         <path
            sodipodi:nodetypes="ssccss"
            inkscape:connector-curvature="0"
            id="path4050"
            d="m 19.70767,1047.6527 c -1.846592,-1.8185 -1.043705,-4.3471 0.596591,-6.2643 1.640296,-1.9172 10.738637,-10.5596 10.738637,-10.5596 l 4.892045,5.1307 c 0,0 -8.378356,9.6654 -9.545454,11.1562 -1.54887,1.9785 -4.835227,2.3555 -6.681819,0.537 z"
-           style="fill:url(#linearGradient4326);fill-opacity:1;stroke:#50718c;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+           style="fill:url(#linearGradient4326);fill-opacity:1;stroke:#50718c;stroke-width:0.69999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
         <path
-           style="fill:url(#radialGradient4328);fill-opacity:1;stroke:#797b7b;stroke-width:0.69999999;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           style="fill:url(#radialGradient4328);fill-opacity:1;stroke:#797b7b;stroke-width:0.69999999;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="m 46.855397,1040.1669 c 4.488776,4.7242 0.778133,8.5155 -4.125,3.5 -4.903132,-5.0155 -13.375,-14.125 -13.375,-14.125 -10.133107,1.6369 -10.676747,-2.9634 -10.541192,-6.8466 0.08814,-2.525 2.091948,-2.329 2.791193,0.2216 1.904554,6.9471 11.320358,-1.2275 4.374999,-4.25 -1.946512,-0.8471 -2.069672,-2.6063 0,-2.625 3.838646,-0.035 7.576804,0.7182 7.75,10 0,0 8.636225,9.4008 13.125,14.125 z"
            id="path3280"
            inkscape:connector-curvature="0"
            sodipodi:nodetypes="zzcsssscz" />
       </g>
     </g>
+    <rect
+       style="fill:#e2dc9f;fill-opacity:0;stroke:none;stroke-width:3;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5382"
+       width="47.84375"
+       height="47.84375"
+       x="-50.500004"
+       y="1005.1122"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\MultiLabelSegmentationUtilities_48x48.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
   <g
-     sodipodi:insensitive="true"
      inkscape:label="Segmentation"
      id="layer4"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     style="display:inline">
     <g
        inkscape:export-ydpi="90.470001"
        inkscape:export-xdpi="90.470001"
-       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.segmentation\resources\segmentation.png"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
        transform="translate(43.909091,9.0681818)"
        id="g4075">
       <g
@@ -1369,269 +1675,396 @@
            width="5.4800777"
            height="5.4800777"
            x="47.999092"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#b3b3b3;fill-opacity:1;stroke:none"
            id="rect3005-1-0-8"
            width="5.4800777"
            height="5.4800777"
            x="54.03791"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#d499a6;fill-opacity:1;stroke:none"
+           style="fill:#e991a6;fill-opacity:1;stroke:none"
            id="rect3005-7-9-8"
            width="5.4800777"
            height="5.4800777"
            x="60.076729"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-4-48-2"
            width="5.4800777"
            height="5.4800777"
            x="66.115547"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-9-8-4"
            width="5.4800777"
            height="5.4800777"
            x="72.154366"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#e991a6;fill-opacity:1;stroke:none"
            id="rect3005-4-4-2-5"
            width="5.4800777"
            height="5.4800777"
            x="54.03791"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-4-8-4-5"
            width="5.4800777"
            height="5.4800777"
            x="66.115547"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-82-5-1"
            width="5.4800777"
            height="5.4800777"
            x="72.154366"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-45-5-7"
            width="5.4800777"
            height="5.4800777"
            x="78.193184"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-4-5-1-1"
            width="5.4800777"
            height="5.4800777"
            x="54.03791"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-4-1-7-1"
            width="5.4800777"
            height="5.4800777"
            x="60.076729"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-7-1-5"
            width="5.4800777"
            height="5.4800777"
            x="72.154366"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-11-1-2"
            width="5.4800777"
            height="5.4800777"
            x="78.193184"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-4-52-5-7"
            width="5.4800777"
            height="5.4800777"
            x="66.115547"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-76-2-6"
            width="5.4800777"
            height="5.4800777"
            x="72.154366"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#bf264b;fill-opacity:1;stroke:none"
+           style="fill:#73b6d5;fill-opacity:1;stroke:none"
            id="rect3005-4-14-7-1"
            width="5.4800777"
            height="5.4800777"
            x="78.193184"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#b3b3b3;fill-opacity:1;stroke:none"
            id="rect3005-1-2-6-4"
            width="5.4800777"
            height="5.4800777"
            x="47.999092"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#b3b3b3;fill-opacity:1;stroke:none"
            id="rect3005-1-3-1-2"
            width="5.4800777"
            height="5.4800777"
            x="90.270821"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#b3b3b3;fill-opacity:1;stroke:none"
            id="rect3005-1-22-4-3"
            width="5.4800777"
            height="5.4800777"
            x="90.270821"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#b3b3b3;fill-opacity:1;stroke:none"
            id="rect3005-1-1-2-2"
            width="5.4800777"
            height="5.4800777"
            x="84.232002"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#b3b3b3;fill-opacity:1;stroke:none"
            id="rect3005-1-6-3-2"
            width="5.4800777"
            height="5.4800777"
            x="84.232002"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#e1d0da;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-1-8-2-1"
            width="5.4800777"
            height="5.4800777"
            x="60.076729"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#e1d0da;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-1-8-7-2-6"
            width="5.4800777"
            height="5.4800777"
            x="66.115547"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#e1d0da;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-1-8-6-1-8"
            width="5.4800777"
            height="5.4800777"
            x="60.076729"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#e1d0da;fill-opacity:1;stroke:none"
+           style="fill:#9fcde2;fill-opacity:1;stroke:none"
            id="rect3005-1-8-1-6-5"
            width="5.4800777"
            height="5.4800777"
            x="78.193184"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#4d4d4d;fill-opacity:1;stroke:none"
            id="rect3005-8-8-7"
            width="5.4800777"
            height="5.4800777"
            x="47.999092"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#4d4d4d;fill-opacity:1;stroke:none"
            id="rect3005-8-2-5-6"
            width="5.4800777"
            height="5.4800777"
            x="47.999092"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#4d4d4d;fill-opacity:1;stroke:none"
            id="rect3005-8-7-7-1"
            width="5.4800777"
            height="5.4800777"
            x="84.232002"
-           y="1070.6899" />
+           y="1070.6899"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#4d4d4d;fill-opacity:1;stroke:none"
            id="rect3005-8-9-6-8"
            width="5.4800777"
            height="5.4800777"
            x="90.270821"
-           y="1058.4187" />
+           y="1058.4187"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#cf98a3;fill-opacity:1;stroke:none"
+           style="fill:#de5a7a;fill-opacity:1;stroke:none"
            id="rect3005-8-5-1-9"
            width="5.4800777"
            height="5.4800777"
            x="54.03791"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
-           style="fill:#cf98a3;fill-opacity:1;stroke:none"
+           style="fill:#9fcde2;fill-opacity:1;stroke:none"
            id="rect3005-8-5-3-8-2"
            width="5.4800777"
            height="5.4800777"
            x="84.232002"
-           y="1076.8256" />
+           y="1076.8256"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
         <rect
            style="fill:#999999;fill-opacity:1;stroke:none"
            id="rect3005-2-9-7"
            width="5.4800777"
            height="5.4800777"
            x="90.270821"
-           y="1064.5543" />
+           y="1064.5543"
+           inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+           inkscape:export-xdpi="90"
+           inkscape:export-ydpi="90" />
       </g>
       <g
          inkscape:label="Add"
          id="layer3"
          transform="matrix(1.7960075,0,0,1.7960075,-176.17936,-805.38135)"
-         style="stroke-width:0.89086491;stroke-miterlimit:4;stroke-dasharray:none">
+         style="stroke:#00adff;stroke-width:0.89086491;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+         inkscape:export-xdpi="90"
+         inkscape:export-ydpi="90">
         <g
            transform="translate(-178.3781,580.55863)"
            id="g4949"
-           style="stroke-width:0.89086491;stroke-miterlimit:4;stroke-dasharray:none">
+           style="stroke:#00adff;stroke-width:0.89086491;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
           <g
              id="g3125"
-             style="stroke-width:0.89086491;stroke-miterlimit:4;stroke-dasharray:none">
+             style="stroke:#00adff;stroke-width:0.89086491;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1">
             <path
                sodipodi:nodetypes="aaaaa"
                inkscape:connector-curvature="0"
                id="path3004"
                d="m 204.375,433.36218 c 2.66059,2.30475 8.06002,1.41215 10.5,-1.125 1.70795,-1.77597 2.30703,-5.69994 0.5,-7.375 -2.77871,-2.57579 -8.82218,-1.28388 -11.25,1.625 -1.4694,1.76055 -1.48328,5.37353 0.25,6.875 z"
-               style="fill:none;stroke:#00adff;stroke-width:1.67037165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+               style="fill:none;stroke:#00adff;stroke-width:1.67037165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
             <path
                sodipodi:nodetypes="cc"
                inkscape:connector-curvature="0"
                id="path3774"
                d="m 199.875,443.36218 c 6.84332,-2.29563 3.78655,-5.82877 5.625,-8.75"
-               style="fill:none;stroke:#00adff;stroke-width:1.67037165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-            <path
+               style="fill:none;stroke:#00adff;stroke-width:1.67037165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+            <circle
                transform="matrix(1.7077889,0.59262847,-0.4791464,1.3807655,-23.440489,-258.11706)"
-               d="m 247,396.11218 c 0,0.89747 -0.72754,1.625 -1.625,1.625 -0.89746,0 -1.625,-0.72753 -1.625,-1.625 0,-0.89746 0.72754,-1.625 1.625,-1.625 0.89746,0 1.625,0.72754 1.625,1.625 z"
-               sodipodi:ry="1.625"
-               sodipodi:rx="1.625"
-               sodipodi:cy="396.11218"
-               sodipodi:cx="245.375"
                id="path3776"
-               style="fill:#00adff;fill-opacity:1;stroke:none"
-               sodipodi:type="arc" />
+               style="fill:#00adff;fill-opacity:1;stroke:#00adff;stroke-opacity:1"
+               cx="245.375"
+               cy="396.11218"
+               r="1.625" />
           </g>
         </g>
       </g>
     </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#bf264a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="-107.10523"
+       y="1021.035"
+       id="text4859"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\multilabelsegmentation.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4861"
+         x="-107.10523"
+         y="1021.035"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.375px;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, Bold';fill:#bf264a;fill-opacity:1">MULTI</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;display:inline;fill:#bf264a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="-51.062347"
+       y="1020.8423"
+       id="text4859-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="D:\MITK\Plugins\org.mitk.gui.qt.multilabelsegmentation\resources\MultiLabelSegmentationUtilities_48x48.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4861-1"
+         x="-51.062347"
+         y="1020.8423"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:19.375px;font-family:'Roboto Condensed';-inkscape-font-specification:'Roboto Condensed, Bold';fill:#bf264a;fill-opacity:1">MULTI</tspan></text>
   </g>
   <g
      inkscape:label="Image Masking"
      id="layer5"
      inkscape:groupmode="layer"
-     sodipodi:insensitive="true">
+     sodipodi:insensitive="true"
+     style="display:inline">
     <g
        transform="translate(-1.1869722,0.39565741)"
        inkscape:export-ydpi="89.07"
@@ -2137,14 +2570,14 @@
              height="25.713068"
              width="25.59375"
              id="rect4533-7"
-             style="fill:none;stroke:#ffffff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+             style="fill:none;stroke:#ffffff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
           <rect
              y="1013.8058"
              x="-143.93018"
              height="25.713068"
              width="25.59375"
              id="rect4533"
-             style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-opacity:1;stroke-dasharray:5, 2.5;stroke-dashoffset:0" />
+             style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:1;stroke-dasharray:5, 2.5;stroke-dashoffset:0;stroke-opacity:1" />
         </g>
       </g>
     </g>
@@ -2152,7 +2585,9 @@
   <g
      inkscape:groupmode="layer"
      id="layer10"
-     inkscape:label="Surface To Image">
+     inkscape:label="Surface To Image"
+     style="display:inline"
+     sodipodi:insensitive="true">
     <g
        transform="translate(-1.185093,57.81894)"
        inkscape:export-ydpi="89.07"
@@ -2682,22 +3117,22 @@
              x="149.19023"
              y="-1053.7833" />
           <g
-             style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
              id="g4869">
             <path
-               style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
                d="m -137.625,1069.3622 12,4.875 5.875,13 -5.75,13.625 -12,4.75 z"
                id="path4863"
                inkscape:connector-curvature="0"
                transform="translate(1.185093,-57.81894)" />
             <path
-               style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
                d="m -125.625,1074.3622 -12.125,13.125"
                id="path4865"
                inkscape:connector-curvature="0"
                transform="translate(1.185093,-57.81894)" />
             <path
-               style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+               style="fill:#000000;fill-opacity:0;stroke:#00adff;stroke-width:2.5;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
                d="m -120.25,1087.2372 -17.25,0.125 12,13.375"
                id="path4867"
                inkscape:connector-curvature="0"
@@ -2985,7 +3420,7 @@
            style="fill:#bf264b;fill-opacity:1;stroke:none" />
         <path
            transform="matrix(0.86040482,0,0,0.86040482,47.623043,174.07452)"
-           d="m -318.89986,985.89172 c 0,10.27023 -8.32567,18.59588 -18.5959,18.59588 -10.27023,0 -18.5959,-8.32565 -18.5959,-18.59588 0,-10.27023 8.32567,-18.59589 18.5959,-18.59589 10.27023,0 18.5959,8.32566 18.5959,18.59589 z"
+           d="m -318.89986,985.89172 a 18.595898,18.595898 0 0 1 -18.5959,18.59588 18.595898,18.595898 0 0 1 -18.5959,-18.59588 18.595898,18.595898 0 0 1 18.5959,-18.59589 18.595898,18.595898 0 0 1 18.5959,18.59589 z"
            sodipodi:ry="18.595898"
            sodipodi:rx="18.595898"
            sodipodi:cy="985.89172"
@@ -3023,7 +3458,7 @@
          sodipodi:cy="985.89172"
          sodipodi:rx="18.595898"
          sodipodi:ry="18.595898"
-         d="m -318.89986,985.89172 c 0,10.27023 -8.32567,18.59588 -18.5959,18.59588 -10.27023,0 -18.5959,-8.32565 -18.5959,-18.59588 0,-10.27023 8.32567,-18.59589 18.5959,-18.59589 10.27023,0 18.5959,8.32566 18.5959,18.59589 z"
+         d="m -318.89986,985.89172 a 18.595898,18.595898 0 0 1 -18.5959,18.59588 18.595898,18.595898 0 0 1 -18.5959,-18.59588 18.595898,18.595898 0 0 1 18.5959,-18.59589 18.595898,18.595898 0 0 1 18.5959,18.59589 z"
          transform="matrix(0.86040482,0,0,0.86040482,47.623043,174.07452)" />
     </g>
   </g>
@@ -3031,7 +3466,8 @@
      sodipodi:insensitive="true"
      inkscape:label="Boolean Intersection"
      id="layer9"
-     inkscape:groupmode="layer">
+     inkscape:groupmode="layer"
+     style="display:inline">
     <g
        transform="translate(-121.4427,-2.9047467)"
        id="g3986-0">
@@ -3048,16 +3484,13 @@
            height="32"
            x="-256.78168"
            y="988.70966" />
-        <path
-           sodipodi:type="arc"
+        <circle
            style="fill:#999999;fill-opacity:1;stroke:none"
            id="path3984-45"
-           sodipodi:cx="-337.49576"
-           sodipodi:cy="985.89172"
-           sodipodi:rx="18.595898"
-           sodipodi:ry="18.595898"
-           d="m -318.89986,985.89172 c 0,10.27023 -8.32567,18.59588 -18.5959,18.59588 -10.27023,0 -18.5959,-8.32565 -18.5959,-18.59588 0,-10.27023 8.32567,-18.59589 18.5959,-18.59589 10.27023,0 18.5959,8.32566 18.5959,18.59589 z"
-           transform="matrix(0.86040482,0,0,0.86040482,65.823282,140.44364)" />
+           transform="matrix(0.86040482,0,0,0.86040482,65.823282,140.44364)"
+           cx="-337.49576"
+           cy="985.89172"
+           r="18.595898" />
         <path
            style="fill:#bf264b;fill-opacity:1;stroke:none"
            d="m -240.53168,988.70966 c 0,8.7535 7.02819,15.86694 15.75,15.99994 l 0,-15.99994 -15.75,0 z"

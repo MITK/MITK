@@ -32,7 +32,7 @@ public:
   ///
   /// Creates a new PropertyDelegate.
   ///
-  QmitkDoseColorDelegate(QObject *parent = 0);
+  explicit QmitkDoseColorDelegate(QObject *parent = 0);
 
   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
     const QModelIndex &index);

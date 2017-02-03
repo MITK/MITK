@@ -34,7 +34,7 @@ class MITKRTUI_EXPORT QmitkDoseVisualStyleDelegate : public QStyledItemDelegate
 
 public:
 
-  QmitkDoseVisualStyleDelegate(QObject *parent = 0);
+  explicit QmitkDoseVisualStyleDelegate(QObject *parent = 0);
 
   void paint(QPainter *painter, const QStyleOptionViewItem &option
     , const QModelIndex &index) const;

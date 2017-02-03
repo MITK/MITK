@@ -56,15 +56,11 @@ void mitk::ConfigureNodeAsDoseNode(mitk::DataNode* node, mitk::DoseValueAbs refe
 
       for (mitk::IsoDoseLevelSet::ConstIterator itIsoDoseLevel = isoDoseLevelPreset->Begin(); itIsoDoseLevel != isoDoseLevelPreset->End(); ++itIsoDoseLevel)
       {
-        float *hsv = new float[3];
-        //used for transfer rgb to hsv
-        vtkSmartPointer<vtkMath> cCalc = vtkSmartPointer<vtkMath>::New();
         if (itIsoDoseLevel->GetVisibleColorWash())
         {
-          cCalc->RGBToHSV(itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2], &hsv[0], &hsv[1], &hsv[2]);
-          transferFunction->AddHSVPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, hsv[0], hsv[1], hsv[2], 1.0, 1.0);
+          double rgbValue[] = { itIsoDoseLevel->GetColor()[0], itIsoDoseLevel->GetColor()[1], itIsoDoseLevel->GetColor()[2] };
+          transferFunction->AddRGBPoint(itIsoDoseLevel->GetDoseValue()*referenceDose, rgbValue[0], rgbValue[1], rgbValue[2]);
         }
-		delete[] hsv;
       }
 
       mitk::TransferFunction::Pointer mitkTransFunc = mitk::TransferFunction::New();

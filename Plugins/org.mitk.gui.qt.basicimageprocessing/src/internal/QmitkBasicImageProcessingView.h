@@ -163,9 +163,8 @@ private:
   */
   Ui::QmitkBasicImageProcessingViewControls *m_Controls;
 
-  //mitk::DataNode*       m_SelectedImageNode;
-  mitk::DataStorageSelection::Pointer m_SelectedImageNode;
-  QmitkStepperAdapter*      m_TimeStepperAdapter;
+  mitk::DataNode::Pointer             m_SelectedImageNode;
+  QScopedPointer<QmitkStepperAdapter> m_TimeStepperAdapter;
 
   enum ActionType {
     NOACTIONSELECTED,

@@ -140,6 +140,14 @@ namespace mitk
         return m_InternalMask;
     }
 
+    void HotspotMaskGenerator::SetTimeStep(unsigned int timeStep)
+    {
+        if (m_TimeStep != timeStep)
+        {
+            m_TimeStep = timeStep;
+        }
+    }
+
     void HotspotMaskGenerator::SetLabel(unsigned short label)
     {
         if (label != m_Label)

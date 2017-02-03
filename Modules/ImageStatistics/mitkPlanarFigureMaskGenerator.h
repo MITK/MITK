@@ -43,12 +43,20 @@ class MITKIMAGESTATISTICS_EXPORT PlanarFigureMaskGenerator: public MaskGenerator
 
     mitk::Image::Pointer GetReferenceImage();
 
+    /**
+     * @brief SetTimeStep is used to set the time step for which the mask is to be generated
+     * @param timeStep
+     */
+    void SetTimeStep(unsigned int timeStep);
+
+
     protected:
     PlanarFigureMaskGenerator():Superclass(){
         m_InternalMaskUpdateTime = 0;
         m_InternalMask = mitk::Image::New();
         m_ReferenceImage = nullptr;
     }
+
 
     private:
     void CalculateMask();

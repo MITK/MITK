@@ -175,7 +175,7 @@ namespace mitk
             }
 
 
-            this->Modified();
+            //this->Modified();
         }
 
         m_StatisticsUpdateTimePerTimeStep[timeStep] = m_StatisticsByTimeStep[timeStep][m_StatisticsByTimeStep[timeStep].size()-1]->GetMTime();

@@ -39,12 +39,6 @@ public:
     virtual mitk::Image::Pointer GetMask();
 
     /**
-     * @brief SetTimeStep is used to set the time step for which the mask is to be generated
-     * @param timeStep
-     */
-    void SetTimeStep(unsigned int timeStep);
-
-    /**
      * @brief GetReferenceImage per default returns the inputImage (as set by SetInputImage). If no input image is set it will return a nullptr.
      */
     virtual mitk::Image::Pointer GetReferenceImage();
@@ -53,6 +47,8 @@ public:
      * @brief SetInputImage is used to set the input image to the mask generator. Some subclasses require an input image, others don't. See the documentation of the specific Mask Generator for more information.
      */
     void SetInputImage(mitk::Image::Pointer inputImg);
+
+    virtual void SetTimeStep(unsigned int timeStep);
 
 protected:
     MaskGenerator();

@@ -45,10 +45,20 @@ struct MITKDICOMRT_EXPORT RTConstants
   static const std::string REFERENCE_DOSE_PROPERTY_NAME;
 
   /**
+  * Name of the property that encodes the reference structure set.
+  */
+  static const std::string REFERENCE_STRUCTURE_SET_PROPERTY_NAME;
+
+  /**
       * Name of the property that encodes the optional string property holding the information from the tag (3004,0004) - Dose Type.
       * This contains useful information for medical doctors
       */
   static const std::string DOSE_TYPE_PROPERTY_NAME;
+
+  /**
+  * Name of the property that encodes the optional string property holding the description information from the tag (300A,0016) - Dose Reference Description.
+  */
+  static const std::string REFERENCE_DESCRIPTION_DOSE_PROPERTY_NAME;
 
   /**
       * Name of the property that encodes the optional string property holding the information from the tag (3004,000A) - Dose Summation Type.
@@ -63,6 +73,17 @@ struct MITKDICOMRT_EXPORT RTConstants
       * For example a given plan consists of 8 fractions. Scaling the fraction dose by 8 gives the complete planned dose.
       */
   static const std::string DOSE_FRACTION_COUNT_PROPERTY_NAME;
+
+  /**
+  * Name of the property that encodes the number of beams.
+  * It is for example in DICOM stored in tag (300A,0080) - Number of Beams (from the RTPLAN file if this file exists).
+  */
+  static const std::string DOSE_FRACTION_NUMBER_OF_BEAMS_PROPERTY_NAME;
+  /**
+  * Name of the property that encodes the radiation type of beams.
+  * It is for example in DICOM stored in tag (300A,00C6) - Radiation Type (from the RTPLAN file if this file exists).
+  */
+  static const std::string DOSE_RADIATION_TYPE_PROPERTY_NAME;
 
   /**
       * Name of the property that encodes if the iso line rendering should be activated for the node.
@@ -83,6 +104,7 @@ struct MITKDICOMRT_EXPORT RTConstants
       * Name of the property that encodes user defined iso values that mark special dose values in the distribution.
       */
   static const std::string DOSE_FREE_ISO_VALUES_PROPERTY_NAME;
+
 };
 }
 

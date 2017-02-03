@@ -87,7 +87,7 @@ void QmitkDicomExternalDataWidget::Initialize()
   {
     m_ExternalDatabase->openDatabase(QString(":memory:"), QString("EXTERNAL-DB"));
   }
-  catch (std::exception e)
+  catch (const std::exception&)
   {
     MITK_ERROR << "Database error: " << m_ExternalDatabase->lastError().toStdString();
     m_ExternalDatabase->closeDatabase();

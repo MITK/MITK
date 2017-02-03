@@ -35,9 +35,9 @@ protected:
 
     IsoDoseLevelVectorProperty();
 
-    IsoDoseLevelVectorProperty(const IsoDoseLevelVectorProperty& other);
+    explicit IsoDoseLevelVectorProperty(const IsoDoseLevelVectorProperty& other);
 
-    IsoDoseLevelVectorProperty(IsoDoseLevelVector* levelVector);
+    explicit IsoDoseLevelVectorProperty(IsoDoseLevelVector* levelVector);
 
 public:
     mitkClassMacro(IsoDoseLevelVectorProperty, BaseProperty);

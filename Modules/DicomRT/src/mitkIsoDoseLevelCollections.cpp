@@ -27,7 +27,7 @@ class EqualDoseFunctor
 public:
   typedef IsoDoseLevel::DoseValueType DoseValueType;
 
-  EqualDoseFunctor(const DoseValueType& refValue) : m_refValue(refValue)
+  explicit EqualDoseFunctor(const DoseValueType& refValue) : m_refValue(refValue)
   {}
 
   bool operator () (const IsoDoseLevel* level)

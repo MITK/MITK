@@ -33,7 +33,6 @@ namespace mitk
     {
 
         public:
-
             RTDoseReader(const RTDoseReader& other);
             RTDoseReader();
 

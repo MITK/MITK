@@ -107,7 +107,7 @@ public:
           {
             mitk::Point3D p1 = cm1->GetVertexAt(i)->Coordinates;
             mitk::Point3D p2 = cm2->GetVertexAt(i)->Coordinates;
-            if(fabs(p1[0]-p2[0]) > ep || fabs(p1[0]-p2[0]) > ep || fabs(p1[0]-p2[0]) > ep)
+            if(fabs(p1[0]-p2[0]) > ep || fabs(p1[1]-p2[1]) > ep || fabs(p1[2]-p2[2]) > ep)
             {
               return false;
             }

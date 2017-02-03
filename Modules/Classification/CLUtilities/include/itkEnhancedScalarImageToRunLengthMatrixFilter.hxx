@@ -201,7 +201,7 @@ namespace itk
         for( neighborIt.GoToBegin(); !neighborIt.IsAtEnd(); ++neighborIt )
         {
           const PixelType centerPixelIntensity = neighborIt.GetCenterPixel();
-          if (centerPixelIntensity != centerPixelIntensity)
+          if (centerPixelIntensity != centerPixelIntensity) // Check for invalid values
           {
             continue;
           }
@@ -263,7 +263,8 @@ namespace itk
             // the bin is left close and right open.
 
             if ( pixelIntensity >= centerBinMin
-              && ( pixelIntensity < centerBinMax || ( pixelIntensity == centerBinMax && centerBinMax == lastBinMax ) ) )
+              && ( pixelIntensity < centerBinMax || ( pixelIntensity == centerBinMax && centerBinMax == lastBinMax ) )
+              && (!this->GetMaskImage() || this->GetMaskImage()->GetPixel(index) == this->m_InsidePixelValue))
             {
               alreadyVisitedImage->SetPixel( index, true );
               lastGoodIndex = index;
@@ -302,7 +303,8 @@ namespace itk
             }
 
             if ( pixelIntensity >= centerBinMin
-              && ( pixelIntensity < centerBinMax || ( pixelIntensity == centerBinMax && centerBinMax == lastBinMax ) ) )
+              && ( pixelIntensity < centerBinMax || ( pixelIntensity == centerBinMax && centerBinMax == lastBinMax ) )
+              && (!this->GetMaskImage() || this->GetMaskImage()->GetPixel(index) == this->m_InsidePixelValue))
             {
               alreadyVisitedImage->SetPixel( index, true );
               lastGoodIndex = index;

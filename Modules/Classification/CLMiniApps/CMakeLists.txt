@@ -29,6 +29,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLMultiForestPrediction^^MitkDataCollection_MitkCLVigraRandomForest
         CLNrrdToPoly^^MitkCore
         CL2Dto3DImage^^MitkCore
+        CLWeighting^^MitkCore_MitkCLImportanceWeighting_MitkCLUtilities
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 

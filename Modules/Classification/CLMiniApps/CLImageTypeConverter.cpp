@@ -91,6 +91,10 @@ int main(int argc, char* argv[])
   {
     CONVERT_IMAGE(double, 3);
   }
+  else if (type.compare("none") == 0)
+  {
+    MITK_INFO << " No conversion performed";
+  }
   else
   {
     CONVERT_IMAGE(double, 3);

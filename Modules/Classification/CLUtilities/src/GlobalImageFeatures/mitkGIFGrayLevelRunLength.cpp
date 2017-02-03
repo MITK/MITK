@@ -42,6 +42,7 @@ void
   mitk::CastToItkImage(mask, maskImage);
 
   typename FilterType::Pointer filter = FilterType::New();
+  typename FilterType::Pointer filter2 = FilterType::New();
 
   typename FilterType::OffsetVector::Pointer newOffset = FilterType::OffsetVector::New();
   auto oldOffsets = filter->GetOffsets();
@@ -72,6 +73,7 @@ void
     newOffset->push_back(offset);
   }
   filter->SetOffsets(newOffset);
+  filter2->SetOffsets(newOffset);
 
 
   // All features are required
@@ -101,6 +103,9 @@ void
   filter->SetInput(itkImage);
   filter->SetMaskImage(maskImage);
   filter->SetRequestedFeatures(requestedFeatures);
+  filter2->SetInput(itkImage);
+  filter2->SetMaskImage(maskImage);
+  filter2->SetRequestedFeatures(requestedFeatures);
   int rangeOfPixels = params.Bins;
   if (rangeOfPixels < 2)
     rangeOfPixels = 256;
@@ -108,7 +113,9 @@ void
   if (params.m_UseCtRange)
   {
     filter->SetPixelValueMinMax((TPixel)(-1024.5),(TPixel)(3096.5));
-    filter->SetNumberOfBinsPerAxis(3096.5+1024.5);
+    filter->SetNumberOfBinsPerAxis(3096.5 + 1024.5);
+    filter2->SetPixelValueMinMax((TPixel)(-1024.5), (TPixel)(3096.5));
+    filter2->SetNumberOfBinsPerAxis(3096.5 + 1024.5);
   } else
   {
     double minRange = minMaxComputer->GetMinimum() - 0.5;
@@ -121,14 +128,21 @@ void
 
     filter->SetPixelValueMinMax(minRange, maxRange);
     filter->SetNumberOfBinsPerAxis(rangeOfPixels);
+    filter2->SetPixelValueMinMax(minRange, maxRange);
+    filter2->SetNumberOfBinsPerAxis(rangeOfPixels);
   }
 
-  filter->SetDistanceValueMinMax(0,rangeOfPixels);
+  filter->SetDistanceValueMinMax(0, rangeOfPixels);
+  filter2->SetDistanceValueMinMax(0, rangeOfPixels);
+
+  filter2->CombinedFeatureCalculationOn();
 
   filter->Update();
+  filter2->Update();
 
   auto featureMeans = filter->GetFeatureMeans ();
   auto featureStd = filter->GetFeatureStandardDeviations();
+  auto featureCombined = filter2->GetFeatureMeans();
 
   std::ostringstream  ss;
   ss << rangeOfPixels;
@@ -139,71 +153,88 @@ void
     {
     case TextureFilterType::ShortRunEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") ShortRunEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") ShortRunEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") ShortRunEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") ShortRunEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LongRunEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelNonuniformity :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformity Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformity Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelNonuniformity Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelNonuniformity Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelNonuniformityNormalized :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformityNormalized Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelNonuniformityNormalized Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelNonuniformityNormalized Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelNonuniformityNormalized Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthNonuniformity :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformity Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformity Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthNonuniformity Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthNonuniformity Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthNonuniformityNormalized :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformityNormalized Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthNonuniformityNormalized Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthNonuniformityNormalized Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthNonuniformityNormalized Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LowGreyLevelRunEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LowGreyLevelRunEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LowGreyLevelRunEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LowGreyLevelRunEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LowGreyLevelRunEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::HighGreyLevelRunEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") HighGreyLevelRunEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") HighGreyLevelRunEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") HighGreyLevelRunEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") HighGreyLevelRunEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::ShortRunLowGreyLevelEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") ShortRunLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") ShortRunLowGreyLevelEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") ShortRunLowGreyLevelEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") ShortRunLowGreyLevelEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::ShortRunHighGreyLevelEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") ShortRunHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") ShortRunHighGreyLevelEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") ShortRunHighGreyLevelEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") ShortRunHighGreyLevelEmphasis Comb.", featureCombined->ElementAt(i)));
       break;
     case TextureFilterType::LongRunLowGreyLevelEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunLowGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunLowGreyLevelEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunLowGreyLevelEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunLowGreyLevelEmphasis Comb.", featureStd->ElementAt(i)));
       break;
     case TextureFilterType::LongRunHighGreyLevelEmphasis :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunHighGreyLevelEmphasis Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") LongRunHighGreyLevelEmphasis Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunHighGreyLevelEmphasis Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") LongRunHighGreyLevelEmphasis Comb.", featureStd->ElementAt(i)));
       break;
     case TextureFilterType::RunPercentage :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunPercentage Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunPercentage Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunPercentage Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunPercentage Comb.", featureStd->ElementAt(i)));
       break;
     case TextureFilterType::NumberOfRuns :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") NumberOfRuns Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") NumberOfRuns Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") NumberOfRuns Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") NumberOfRuns Comb.", featureStd->ElementAt(i)));
       break;
     case TextureFilterType::GreyLevelVariance :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelVariance Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") GreyLevelVariance Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelVariance Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") GreyLevelVariance Comb.", featureStd->ElementAt(i)));
       break;
     case TextureFilterType::RunLengthVariance :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthVariance Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunLengthVariance Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthVariance Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunLengthVariance Comb.", featureStd->ElementAt(i)));
       break;
     case TextureFilterType::RunEntropy :
       featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunEntropy Means",featureMeans->ElementAt(i)));
-      featureList.push_back(std::make_pair("RunLength. ("+ strRange+") RunEntropy Std.",featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunEntropy Std.", featureStd->ElementAt(i)));
+      featureList.push_back(std::make_pair("RunLength. (" + strRange + ") RunEntropy Comb.", featureStd->ElementAt(i)));
       break;
     default:
       break;
@@ -232,6 +263,14 @@ mitk::GIFGrayLevelRunLength::FeatureListType mitk::GIFGrayLevelRunLength::Calcul
   params.UseMinimumIntensity = GetUseMinimumIntensity();
   params.UseMaximumIntensity = GetUseMaximumIntensity();
   params.Bins = GetBins();
+
+  MITK_INFO << params.MinimumIntensity;
+  MITK_INFO << params.MaximumIntensity;
+  MITK_INFO << params.m_UseCtRange;
+  MITK_INFO << params.m_Direction;
+  MITK_INFO << params.Bins;
+  MITK_INFO<<params.m_Range;
+
 
   AccessByItk_3(image, CalculateGrayLevelRunLengthFeatures, mask, featureList,params);
 

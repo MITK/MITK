@@ -218,6 +218,7 @@ mitk::GIFVolumetricStatistics::FeatureListType mitk::GIFVolumetricStatistics::Ca
   vtkSmartPointer<vtkImageMarchingCubes> mesher = vtkSmartPointer<vtkImageMarchingCubes>::New();
   vtkSmartPointer<vtkMassProperties> stats = vtkSmartPointer<vtkMassProperties>::New();
   mesher->SetInputData(mask->GetVtkImageData());
+  mesher->SetValue(0, 0.5);
   stats->SetInputConnection(mesher->GetOutputPort());
   stats->Update();
 

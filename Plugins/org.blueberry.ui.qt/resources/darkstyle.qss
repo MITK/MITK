@@ -817,6 +817,7 @@ QTabBar::tab:top {
     background-color: #1d1d1c;
     padding: 5px;
     min-width: 50px;
+    font-weight: bold;
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
 }
@@ -824,6 +825,7 @@ QTabBar::tab:top {
 QTabBar::tab:top:!selected
 {
     color: #adb1b6;
+    font-weight: normal;
     background-color: #323231;
     border: 0px solid #1d1d1c;
     border-bottom: 0px solid #1d1d1c;
@@ -837,6 +839,7 @@ QTabBar::tab:top:!selected:hover {
 
 /* BOTTOM TABS */
 QTabBar::tab:bottom {
+    font-weight: bold;
     color: #adb1b6;
     border: 0px solid #1d1d1c;
     border-top: 0px transparent #1d1d1c;
@@ -850,6 +853,7 @@ QTabBar::tab:bottom {
 QTabBar::tab:bottom:!selected
 {
     color: #adb1b6;
+    font-weight: normal;
     background-color: #323231;
     border: 0px solid #1d1d1c;
     border-top: 0px transparent #1d1d1c;
@@ -864,6 +868,7 @@ QTabBar::tab:bottom:!selected:hover {
 /* LEFT TABS */
 QTabBar::tab:left {
     color: #adb1b6;
+    font-weight: bold;
     border: 0px solid #1d1d1c;
     border-left: 0px transparent #1d1d1c;
     background-color: #323231;
@@ -876,6 +881,7 @@ QTabBar::tab:left {
 QTabBar::tab:left:!selected
 {
     color: #adb1b6;
+    font-weight: normal;
     background-color: #323231;
     border: 0px solid #1d1d1c;
     border-left: 0px transparent #1d1d1c;
@@ -891,6 +897,7 @@ QTabBar::tab:left:!selected:hover {
 /* RIGHT TABS */
 QTabBar::tab:right {
     color: #adb1b6;
+    font-weight: bold;
     border: 0px solid #1d1d1c;
     border-right: 0px transparent #1d1d1c;
     background-color: #323231;
@@ -903,6 +910,7 @@ QTabBar::tab:right {
 QTabBar::tab:right:!selected
 {
     color: #adb1b6;
+    font-weight: normal;
     background-color: #323231;
     border: 0px solid #1d1d1c;
     border-right: 0px transparent #1d1d1c;

@@ -16,6 +16,14 @@ void IgnorePixelMaskGenerator::SetIgnoredPixelValue(RealType pixelValue)
     }
 }
 
+void IgnorePixelMaskGenerator::SetTimeStep(unsigned int timeStep)
+{
+    if (m_TimeStep != timeStep)
+    {
+        m_TimeStep = timeStep;
+    }
+}
+
 mitk::Image::Pointer IgnorePixelMaskGenerator::GetMask()
 {
     if (IsUpdateRequired())

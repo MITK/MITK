@@ -39,6 +39,12 @@ public:
      */
     mitk::Image::Pointer GetMask();
 
+    /**
+     * @brief SetTimeStep is used to set the time step for which the mask is to be generated
+     * @param timeStep
+     */
+    void SetTimeStep(unsigned int timeStep);
+
 protected:
     IgnorePixelMaskGenerator():
        m_IgnoredPixelValue(std::numeric_limits<RealType>::min())

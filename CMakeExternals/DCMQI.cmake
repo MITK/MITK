@@ -24,9 +24,8 @@ if(MITK_USE_DCMQI)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      #TODO MITK-Data
-      URL https://dl.dropbox.com/s/1rye5oewqxx4zn5/dcmqi-src-org.tar.gz
-      URL_MD5 dbcf44cb0176b2452fd8a3d7b4fba76b
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmqi_3867f503.tar.gz
+      URL_MD5 d535f2c74861a6fd96014c23b7fb6554
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMQI.patch
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""

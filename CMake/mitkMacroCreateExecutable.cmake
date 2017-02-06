@@ -92,6 +92,9 @@ macro(mitk_create_executable)
         set(_batch_file_out_dir "${CMAKE_CURRENT_BINARY_DIR}")
       endif()
       if(NOT EXEC_NO_BATCH_FILE)
+        if(NOT EXEC_NAME)
+          set(EXEC_NAME ${MODULE_TARGET})
+        endif()
         foreach(BUILD_TYPE debug release)
           mitkFunctionCreateWindowsBatchScript(
               ${_batch_file_in} ${_batch_file_out_dir}/${MODULE_TARGET}_${BUILD_TYPE}.bat

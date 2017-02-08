@@ -10,7 +10,7 @@ struct EditorLayoutRec : public Object {
 
   bool isCloseable;
 
-  EditorLayoutRec() : isCloseable(true) {}
+  EditorLayoutRec() : isCloseable(false) {}
 };
 
 }

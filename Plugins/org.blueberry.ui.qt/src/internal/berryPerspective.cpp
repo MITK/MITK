@@ -1434,9 +1434,11 @@ bool Perspective::SaveState(IMemento::Pointer memento, PerspectiveDescriptor::Po
   }
 
   IMemento::Pointer editorLayoutMemento(memento->CreateChild(WorkbenchConstants::TAG_EDITOR_LAYOUT_REC));
-  if (editorLayoutRec && !editorLayoutRec->isCloseable)
+  if (editorLayoutRec)
   {
     editorLayoutMemento->PutString(WorkbenchConstants::TAG_CLOSEABLE, WorkbenchConstants::FALSE_VAL);
+    editorLayoutMemento->PutString(WorkbenchConstants::TAG_STANDALONE, WorkbenchConstants::TRUE_VAL);
+    editorLayoutMemento->PutString(WorkbenchConstants::TAG_SHOW_TITLE, WorkbenchConstants::FALSE_VAL);
   }
 
   // Save the layout.

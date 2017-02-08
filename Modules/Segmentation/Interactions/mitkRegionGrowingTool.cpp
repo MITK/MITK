@@ -637,5 +637,8 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
       this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
       FeedbackContourTool::SetFeedbackContourVisible(false);
     }
+
+    m_ScreenYDifference = 0;
+    m_ScreenXDifference = 0;
   }
 }

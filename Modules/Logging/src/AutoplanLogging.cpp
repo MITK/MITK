@@ -3,19 +3,71 @@
 #include <iostream>
 #include <cstdlib>
 
+// boost
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/join.hpp>
-#include <boost/date_time.hpp>
+#include <boost/move/utility.hpp>
+#include <boost/lambda/lambda.hpp>
+#include <boost/locale/encoding.hpp>
+#include <boost/asio.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+// boost log
+#include <boost/log/expressions.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/common.hpp>
+#include <boost/log/sinks.hpp>
 #include <boost/log/support/date_time.hpp>
+
+// boost log::sources
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sources/severity_feature.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/global_logger_storage.hpp>
+
+// boost log::sinks
+#include <boost/log/sinks/text_file_backend.hpp>
+
+// boost log::utility
+#include <boost/log/utility/setup/console.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
 
 struct ThrowAwayPattern _ = {};
 
 namespace
 {
   const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
+
+  enum class NameType { USER, HOST };
+  std::string getName(NameType type)
+  {
+    const char * envName = nullptr;
+    switch ( type ) {
+    case NameType::USER:
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
+      envName = "USERNAME";
+#else
+      envName = "USER";
+#endif
+      break;
+    case NameType::HOST:
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
+      envName = "COMPUTERNAME";
+#else
+      envName = "HOSTNAME";
+#endif
+      break;
+    }
+    const auto name = std::getenv(envName);
+    return name ? name : std::string();
+  }
 }
 
-namespace Logger {
+namespace Logger
+{
+  typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_file_backend > file_sink;
+  typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > ostream_sink;
 
   Options::Options()
   {
@@ -109,10 +161,12 @@ namespace Logger {
         boost::log::keywords::min_free_space = 100 * 1024 * 1024    /*< minimum free space on the drive, in bytes >*/
         ));
       sink->set_formatter(
-        boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\">%3%</record>")
+        boost::log::expressions::format("\t<record id=\"%1%\" timestamp=\"%2%\" host=\"%4%\" user=\"%5%\">%3%</record>")
         % boost::log::expressions::attr< unsigned int >("RecordID")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+        % boost::log::expressions::attr<std::string>("ComputerName")
+        % boost::log::expressions::attr<std::string>("UserName")
         );
 
       auto write_header = [](boost::log::sinks::text_file_backend::stream_type& file) {
@@ -150,9 +204,11 @@ namespace Logger {
 
       boost::shared_ptr< ostream_sink > sink3(new ostream_sink(dataBackend));
       sink3->set_formatter(
-        boost::log::expressions::format("%1% > %2%")
+        boost::log::expressions::format("%1% [%3% %4%] > %2%")
         % boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT)
         % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+        % boost::log::expressions::attr<std::string>("ComputerName")
+        % boost::log::expressions::attr<std::string>("UserName")
         );
 
       boost::log::core::get()->add_sink(sink3);
@@ -165,6 +221,9 @@ namespace Logger {
 
     boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());
     boost::log::core::get()->add_global_attribute("RecordID", boost::log::attributes::counter< unsigned int >());
+
+    boost::log::core::get()->add_global_attribute("UserName", boost::log::attributes::constant<std::string>(getName(NameType::USER)));
+    boost::log::core::get()->add_global_attribute("ComputerName", boost::log::attributes::constant<std::string>(getName(NameType::HOST)));
 
     boost::log::add_common_attributes();
   }

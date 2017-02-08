@@ -10,35 +10,16 @@
 
 // boost
 #include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/move/utility.hpp>
-#include <boost/asio.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/locale/encoding.hpp>
 #include <boost/current_function.hpp>
 #include <boost/xpressive/xpressive.hpp>
 
 // boost log
 #include <boost/log/trivial.hpp>
-#include <boost/log/common.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/attributes.hpp>
-#include <boost/log/sinks.hpp>
 
 // boost log::sources
 #include <boost/log/sources/logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/sources/severity_feature.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-
-// boost log::utility
-#include <boost/log/utility/setup/console.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
 
 // boost log::sinks
-#include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/sinks/text_ostream_backend.hpp>
 
 #include <MitkLoggingExports.h>
@@ -80,9 +61,6 @@ ThrowAwayPattern & operator<<(ThrowAwayPattern&__, T)
 
 namespace Logger
 {
-  typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_file_backend > file_sink;
-  typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > ostream_sink;
-
   class MITKLOGGING_EXPORT Options
   {
     private:

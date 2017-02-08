@@ -551,7 +551,7 @@ namespace mitk {
 
     virtual void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    mitk::BaseGeometry *m_ReferenceGeometry;
+    mitk::BaseGeometry::Pointer m_ReferenceGeometry;
 
     //##Documentation
     //## @brief PreSetSpacing

@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Util/HelpFormatter.h>
 
-#include <QSplashscreen>
+#include <QSplashScreen>
 #include <QRunnable> 
 #include <QFileInfo>
 
@@ -86,12 +86,16 @@ QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
 class SplashCloserCallback : public QRunnable
 {
 public:
-  SplashCloserCallback(QSplashScreen* splashscreen) {
+  SplashCloserCallback(QSplashScreen* splashscreen)
+  {
     this->m_Splashscreen = splashscreen;
   }
-  void SplashCloserCallback::run() {
+
+  void run()
+  {
     this->m_Splashscreen->close();
   }
+
 private:
   QSplashScreen* m_Splashscreen;
 };

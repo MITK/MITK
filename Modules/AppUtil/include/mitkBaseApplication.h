@@ -107,6 +107,8 @@ public:
   static QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
   static QString ARG_REGISTRY_MULTI_LANGUAGE;
 
+  static QString ARG_SPLASH_IMAGE;
+
   static QString ARG_XARGS;
 
   // BlueBerry specific Plugin Framework properties
@@ -322,6 +324,12 @@ protected:
    * @return The initial CTK Plugin Framework properties.
    */
   QHash<QString, QVariant> getFrameworkProperties() const;
+
+  /*
+  * Initialize and display the splash screen if an image filename is given
+  *
+  */
+  void initializeSplashScreen(QCoreApplication * application) const;
 
 private:
 

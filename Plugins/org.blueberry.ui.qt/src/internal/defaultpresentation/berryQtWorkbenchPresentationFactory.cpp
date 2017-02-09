@@ -45,7 +45,8 @@ QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory(
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentation(
     QWidget* parent, IStackPresentationSite::Pointer site)
 {
-  auto   folder = new NativeTabFolder(parent);
+  auto   folder = new EmptyTabFolder(static_cast<QWidget*> (parent),
+      true);
 
   //    /*
   //     * Set the minimum characters to display, if the preference is something

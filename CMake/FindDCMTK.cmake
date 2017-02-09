@@ -264,6 +264,7 @@ foreach(dir
     dcmsign
     dcmsr
     dcmtls
+    dcmpmap
     ofstd
     oflog)
   if(EXTDCMTK_SOURCE_DIR)

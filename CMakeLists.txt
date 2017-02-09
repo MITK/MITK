@@ -275,6 +275,7 @@ mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE 
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
 mitkFunctionAddExternalProject(NAME VMTK      OFF          DEPENDS ITK VTK)
+mitkFunctionAddExternalProject(NAME DCMQI     ON          DEPENDS DCMTK ITK DOC "Use dcmqi in MITK")
 mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 
 if(MITK_USE_Qt5)
@@ -822,6 +823,15 @@ set(CMAKE_MODULE_PATH
   ${MITK_CMAKE_DIR}
   ${CMAKE_MODULE_PATH}
   )
+
+if(MITK_USE_DCMQI)
+  # Due to the preferred CONFIG mode in find_package calls above,
+  # the DCMQIConfig.cmake file is read, which does not provide useful
+  # package information. We explictly need MODULE mode to find DCMQI.
+    # Help our FindDCMQI.cmake script find our super-build DCMQI
+  set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
+  find_package(DCMQI REQUIRED)
+endif()
 
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)

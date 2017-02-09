@@ -795,6 +795,9 @@ set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
 set(Boost_ADDITIONAL_VERSIONS "1.60" "1.60.0")
 
+# We need this later for a DCMTK workaround
+set(_dcmtk_dir_orig ${DCMTK_DIR})
+
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 foreach(ep ${MITK_EXTERNAL_PROJECTS})

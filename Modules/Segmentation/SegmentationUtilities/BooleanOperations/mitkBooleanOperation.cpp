@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkAndImageFilter.h>
 #include <itkNotImageFilter.h>
 #include <itkOrImageFilter.h>
+#include <itkFloatTypes.h>
 
 typedef itk::Image<mitk::Label::PixelType, 3> ImageType;
 
@@ -58,8 +59,10 @@ mitk::BooleanOperation::~BooleanOperation()
 {
 }
 
-mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetResult() const
+mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetResult()
 {
+  validateInput();
+
   switch (m_Type)
   {
     case Difference:
@@ -73,6 +76,27 @@ mitk::LabelSetImage::Pointer mitk::BooleanOperation::GetResult() const
 
     default:
       mitkThrow() << "Unknown boolean operation type '" << m_Type << "'!";
+  }
+}
+
+void mitk::BooleanOperation::validateInput() {
+  auto inputPtr1 = CastTo3DItkImage(m_SegmentationA, m_Time);
+  auto inputPtrN = CastTo3DItkImage(m_SegmentationB, m_Time);
+
+  const auto coordinateTolerance = itk::ImageToImageFilterCommon::GetGlobalDefaultCoordinateTolerance();
+  const auto directionTolerance = itk::ImageToImageFilterCommon::GetGlobalDefaultDirectionTolerance();
+
+  const itk::SpacePrecisionType coordinateTol
+    = std::abs(coordinateTolerance * inputPtr1->GetSpacing()[0]);
+
+  if ( !inputPtr1->GetOrigin().GetVnlVector().is_equal(inputPtrN->GetOrigin().GetVnlVector(), coordinateTol) ||
+       !inputPtr1->GetSpacing().GetVnlVector().is_equal(inputPtrN->GetSpacing().GetVnlVector(), coordinateTol) ||
+       !inputPtr1->GetDirection().GetVnlMatrix().as_ref().is_equal(inputPtrN->GetDirection().GetVnlMatrix(), directionTolerance)
+     ) {
+    m_SegmentationA->GetGeometry()->SetOrigin(
+          m_SegmentationB->GetGeometry()->GetOrigin());
+    m_SegmentationA->GetGeometry()->SetSpacing(
+          m_SegmentationB->GetGeometry()->GetSpacing());
   }
 }
 

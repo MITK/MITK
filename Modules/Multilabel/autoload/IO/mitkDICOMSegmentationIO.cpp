@@ -282,8 +282,8 @@ namespace mitk
 
         OFString labelName;
 
-        if (segmentAttr->getSegmentedPropertyType() != nullptr)
-          segmentAttr->getSegmentedPropertyType()->getCodeMeaning(labelName);
+        if (segmentAttr->getSegmentedPropertyTypeCodeSequence() != nullptr)
+          segmentAttr->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
         else
         {
           labelName = std::to_string(segmentAttr->getLabelID()).c_str();
@@ -291,7 +291,7 @@ namespace mitk
             labelName = "Unnamed";
         }
 
-        float tmp[3] = {0.0, 0.0, 0.0};
+        float tmp[3] = { 0.0, 0.0, 0.0 };
         if (segmentAttr->getRecommendedDisplayRGBValue() != nullptr)
         {
           tmp[0] = segmentAttr->getRecommendedDisplayRGBValue()[0] / 255.0;
@@ -358,7 +358,7 @@ namespace mitk
     if (seriesDescription.empty())
       seriesDescription = "Segmentation";
     handler.setSeriesDescription(seriesDescription);
-    handler.setSeriesNumber("34"+ std::to_string(layer)); // TODO:Create own series number
+    handler.setSeriesNumber("34" + std::to_string(layer)); // TODO:Create own series number
     handler.setInstanceNumber("1");
     handler.setBodyPartExamined("");
 
@@ -446,23 +446,23 @@ namespace mitk
           segAttr->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
           segAttr->setSegmentAlgorithmName("MITK Segmentation");
           if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
-              segmentCategoryCodeMeaningProp != nullptr)
-            segAttr->setSegmentedPropertyCategoryCode(segmentCategoryCodeValueProp->GetValueAsString(),
-                                                      segmentCategoryCodeSchemeProp->GetValueAsString(),
-                                                      segmentCategoryCodeMeaningProp->GetValueAsString());
+            segmentCategoryCodeMeaningProp != nullptr)
+            segAttr->setSegmentedPropertyCategoryCodeSequence(segmentCategoryCodeValueProp->GetValueAsString(),
+            segmentCategoryCodeSchemeProp->GetValueAsString(),
+            segmentCategoryCodeMeaningProp->GetValueAsString());
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
-              segmentTypeCodeMeaningProp != nullptr)
+            segmentTypeCodeMeaningProp != nullptr)
           {
-            segAttr->setSegmentedPropertyType(segmentTypeCodeValueProp->GetValueAsString(),
-                                              segmentTypeCodeSchemeProp->GetValueAsString(),
-                                              segmentTypeCodeMeaningProp->GetValueAsString());
+            segAttr->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
+              segmentTypeCodeSchemeProp->GetValueAsString(),
+              segmentTypeCodeMeaningProp->GetValueAsString());
             handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
           }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
-              segmentModifierCodeMeaningProp != nullptr)
-            segAttr->setSegmentedPropertyTypeModifier(segmentModifierCodeValueProp->GetValueAsString(),
-                                                      segmentModifierCodeSchemeProp->GetValueAsString(),
-                                                      segmentModifierCodeMeaningProp->GetValueAsString());
+            segmentModifierCodeMeaningProp != nullptr)
+            segAttr->setSegmentedPropertyTypeModifierCodeSequence(segmentModifierCodeValueProp->GetValueAsString(),
+            segmentModifierCodeSchemeProp->GetValueAsString(),
+            segmentModifierCodeMeaningProp->GetValueAsString());
 
           Color color = label->GetColor();
           segAttr->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);

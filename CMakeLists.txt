@@ -270,7 +270,7 @@ mitkFunctionAddExternalProject(NAME Boost     ON           NO_CACHE)
 
 mitkFunctionAddExternalProject(NAME SimpleITK OFF          DEPENDS ITK GDCM SWIG)
 mitkFunctionAddExternalProject(NAME ACVD      OFF          DOC "Use Approximated Centroidal Voronoi Diagrams")
-mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS QT DCMTK DOC "Use CTK in MITK")
+mitkFunctionAddExternalProject(NAME CTK       ON           DEPENDS Qt5 DCMTK DOC "Use CTK in MITK")
 mitkFunctionAddExternalProject(NAME Rasqal    OFF          DEPENDS Raptor2 PCRE ADVANCED)
 mitkFunctionAddExternalProject(NAME Redland   OFF          DEPENDS Rasqal DOC "Use the Redland RDF library")
 mitkFunctionAddExternalProject(NAME SOFA      OFF          DEPENDS GLUT Boost DOC "Use Simulation Open Framework Architecture")
@@ -279,7 +279,7 @@ mitkFunctionAddExternalProject(NAME DCMQI     ON          DEPENDS DCMTK ITK DOC 
 mitkFunctionAddExternalProject(NAME MatchPoint  OFF ADVANCED  DEPENDS ITK DOC "Use the MatchPoint translation image registration library")
 
 if(MITK_USE_Qt5)
-  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS QT)
+  mitkFunctionAddExternalProject(NAME Qwt     ON  ADVANCED DEPENDS Qt5)
 endif()
 
 # -----------------------------------------

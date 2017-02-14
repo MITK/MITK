@@ -54,7 +54,7 @@ namespace mitk
      *
      * \return The resulting segmentation.
      */
-    LabelSetImage::Pointer GetResult() const;
+    LabelSetImage::Pointer GetResult();
 
   private:
     BooleanOperation(const BooleanOperation &);
@@ -66,6 +66,8 @@ namespace mitk
 
     void ValidateSegmentation(Image::Pointer segmentation) const;
     void ValidateSegmentations() const;
+
+    void validateInput();
 
     Type m_Type;
     Image::Pointer m_SegmentationA;

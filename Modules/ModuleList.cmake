@@ -76,6 +76,7 @@ set(mitk_modules
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI
+  CEST
 )
 
 if(MITK_ENABLE_PIC_READER)

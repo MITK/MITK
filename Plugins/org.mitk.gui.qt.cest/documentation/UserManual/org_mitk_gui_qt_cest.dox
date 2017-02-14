@@ -1,0 +1,12 @@
+/**
+\page org_mitk_gui_qt_cest The CEST View
+
+\imageMacro{icon.svg,"Icon of the cest view",2.00}
+
+\tableofcontents
+
+\section org_mitk_gui_qt_cestOverview Overview
+
+This view gives the option to explore and analyze CEST data. You can select a CEST data set together with either a segmentation or a point set in the datamanager. If a segmentation was selected (make sure the segmentation is the same in each time step, you can use the button at the top of the view to copy the first time step to all subsequent ones) a statistic for the selected region is shown. If a point set was selected each points grey value is plotted.
+
+*/

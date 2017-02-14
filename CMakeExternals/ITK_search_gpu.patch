@@ -1,0 +1,198 @@
+From c924434d1c88ea1cdaf8feb0bd8546ac02adf63e Mon Sep 17 00:00:00 2001
+From: sergey-denisov <s.s.denisov@yandex.ru>
+Date: Mon, 13 Feb 2017 17:47:09 +0400
+Subject: [PATCH] Get available OpenCL Platform. Select by vendor name - NVIDIA > AMD > Intel
+
+---
+ Modules/Core/GPUCommon/include/itkOpenCLUtil.h     |   2 +-
+ .../Core/GPUCommon/src/itkGPUContextManager.cxx    |   4 +-
+ Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx       | 119 ++++++++++++---------
+ 3 files changed, 73 insertions(+), 52 deletions(-)
+
+diff --git a/Modules/Core/GPUCommon/include/itkOpenCLUtil.h b/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
+index 874c8da6b0..0b658d5ce8 100644
+--- a/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
++++ b/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
+@@ -60,7 +60,7 @@ cl_device_id OpenCLGetMaxFlopsDev(cl_context cxGPUContext);
+ void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose=false);
+ 
+ /** Find the OpenCL platform that matches the "name" */
+-cl_platform_id OpenCLSelectPlatform(const char* name);
++cl_platform_id OpenCLSelectPlatform();
+ 
+ /** Check OpenCL error */
+ void OpenCLCheckError(cl_int error, const char* filename="", int lineno=0, const char* location="");
+diff --git a/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx b/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx
+index 7724d69b31..b803313b3e 100644
+--- a/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx
++++ b/Modules/Core/GPUCommon/src/itkGPUContextManager.cxx
+@@ -47,8 +47,8 @@ GPUContextManager::GPUContextManager()
+   errid = clGetPlatformIDs(0, ITK_NULLPTR, &m_NumberOfPlatforms);
+   OpenCLCheckError( errid, __FILE__, __LINE__, ITK_LOCATION );
+ 
+-  // Get NVIDIA platform by default
+-  m_Platform = OpenCLSelectPlatform("NVIDIA");
++  // Get platform
++  m_Platform = OpenCLSelectPlatform();
+   assert(m_Platform != ITK_NULLPTR);
+ 
+   cl_device_type devType = CL_DEVICE_TYPE_GPU;//CL_DEVICE_TYPE_CPU;//
+diff --git a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
+index 21ebddb5a6..96daba4032 100644
+--- a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
++++ b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
+@@ -185,73 +185,94 @@ void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose)
+   }
+ }
+ 
++std::string GetPlatformName(cl_platform_id platformID)
++{
++  size_t size = 0;
++  auto ciErrNum = clGetPlatformInfo(platformID, CL_PLATFORM_NAME, ITK_NULLPTR, ITK_NULLPTR, &size);
++  if (CL_SUCCESS != ciErrNum) {
++    printf(" Error %i in clGetPlatformInfo Call !!!\n\n", ciErrNum);
++    return std::string();
++  }
++  std::string chBuffer(size, '\0');
++  ciErrNum = clGetPlatformInfo(platformID, CL_PLATFORM_NAME, size, &chBuffer[0], ITK_NULLPTR);
++  if (CL_SUCCESS != ciErrNum) {
++    printf(" Error %i in clGetPlatformInfo Call !!!\n\n", ciErrNum);
++    return std::string();
++  }
++  return chBuffer;
++}
++
+ //
+ // Find the OpenCL platform that matches the "name"
+ //
+-cl_platform_id OpenCLSelectPlatform(const char* name)
++cl_platform_id OpenCLSelectPlatform()
+ {
+-  char            chBuffer[1024];
+-  cl_uint         num_platforms;
+-  cl_platform_id* clPlatformIDs;
+-  cl_int          ciErrNum;
+   cl_platform_id  clSelectedPlatformID = ITK_NULLPTR;
+ 
+   // Get OpenCL platform count
+-  ciErrNum = clGetPlatformIDs (0, ITK_NULLPTR, &num_platforms);
+-  if (ciErrNum != CL_SUCCESS)
+-    {
++  cl_uint num_platforms = 0;
++  auto ciErrNum = clGetPlatformIDs(0, ITK_NULLPTR, &num_platforms);
++  if (ciErrNum != CL_SUCCESS) {
+     printf(" Error %i in clGetPlatformIDs Call !!!\n\n", ciErrNum);
+-    }
+-  else
+-    {
+-    if(num_platforms == 0)
+-      {
++  } else {
++    if (num_platforms == 0) {
+       printf("No OpenCL platform found!\n\n");
+-      }
+-    else
+-      {
++    } else {
+       // if there's a platform or more, make space for ID's
+-      if ( (clPlatformIDs = (cl_platform_id*)malloc(num_platforms * sizeof(cl_platform_id) ) ) == ITK_NULLPTR)
+-        {
+-        printf("Failed to allocate memory for cl_platform ID's!\n\n");
+-        }
+-      else
+-        {
+-        ciErrNum = clGetPlatformIDs (num_platforms, clPlatformIDs, ITK_NULLPTR);
+-        if(ciErrNum == CL_SUCCESS)
+-          {
+-          clSelectedPlatformID = clPlatformIDs[0];         // default
+-  // debug
+-  ciErrNum = clGetPlatformInfo (clPlatformIDs[0], CL_PLATFORM_NAME, 1024, &chBuffer, ITK_NULLPTR);
+-  std::cout << "Platform " << " : " << chBuffer << std::endl;
+-  //
+-          }
++      std::vector<cl_platform_id> clPlatformIDs(num_platforms);
++      ciErrNum = clGetPlatformIDs(num_platforms, &clPlatformIDs[0], ITK_NULLPTR);
++      if (ciErrNum != CL_SUCCESS) {
++        printf(" Error %i in clGetPlatformIDs Call !!!\n\n", ciErrNum);
++        return clSelectedPlatformID;
++      }
+ 
+-        if(num_platforms > 1)
+-          {
+-          std::cout << "Total # of platform : " << num_platforms << std::endl;
++      if (num_platforms > 1) {
++        std::cout << "Total # of platform : " << num_platforms << std::endl;
+ 
+-          for(cl_uint i = 0; i < num_platforms; ++i)
+-            {
+-            ciErrNum = clGetPlatformInfo (clPlatformIDs[i], CL_PLATFORM_NAME, 1024, &chBuffer, ITK_NULLPTR);
++        std::vector<std::pair<std::string, size_t>> platformNameAndIndex;
++        platformNameAndIndex.reserve(clPlatformIDs.size());
++        for (auto i = 0; i < clPlatformIDs.size(); ++i) {
++          auto chBuffer = GetPlatformName(clPlatformIDs[i]);
+ 
+-// debug
+-            std::cout << "Platform " << i << " : " << chBuffer << std::endl;
+-//
++          cl_uint num_devices = 0;
++          ciErrNum = clGetDeviceIDs(clPlatformIDs[i], CL_DEVICE_TYPE_GPU, 0, ITK_NULLPTR, &num_devices);
++
++          // debug
++          std::cout << "Platform " << i << " : " << chBuffer << " device count: " << num_devices << std::endl;
++          //
+ 
+-            if(ciErrNum == CL_SUCCESS)
+-              {
+-              if(strstr(chBuffer, name) != ITK_NULLPTR)
+-                {
+-                clSelectedPlatformID = clPlatformIDs[i];
+-                }
+-              }
++          if (num_devices) {
++            platformNameAndIndex.push_back(std::make_pair(chBuffer, i));
++          }
++        }
++
++        // Get OpenCL by priority
++        const char* platformNamesByPriority[] = {
++          "NVIDIA", "AMD", "Intel"
++        };
++        for (auto platformName : platformNamesByPriority) {
++          if (clSelectedPlatformID != ITK_NULLPTR)
++            break;
++
++          for (auto& item : platformNameAndIndex) {
++            if (std::string::npos != item.first.find(platformName)) {
++              clSelectedPlatformID = clPlatformIDs[item.second];
++              break;
+             }
+           }
+-        free(clPlatformIDs);
+         }
++        if (clSelectedPlatformID == ITK_NULLPTR) {
++          clSelectedPlatformID = clPlatformIDs[platformNameAndIndex.front().second]; // first platform by default
++        }
++      } else {
++        clSelectedPlatformID = clPlatformIDs[0];
++        const auto chBuffer = GetPlatformName(clPlatformIDs[0]);
++        // debug
++        std::cout << "Platform " << " : " << chBuffer << std::endl;
++        //
+       }
+     }
++  }
+ 
+   return clSelectedPlatformID;
+ }
+@@ -347,7 +368,7 @@ void OpenCLCheckError(cl_int error, const char* filename, int lineno, const char
+ /** Check if OpenCL-enabled GPU is present. */
+ bool IsGPUAvailable()
+ {
+-  cl_platform_id platformId = OpenCLSelectPlatform("NVIDIA");
++  cl_platform_id platformId = OpenCLSelectPlatform();
+ 
+   if(platformId == ITK_NULLPTR) return false;
+ 
+-- 
+2.11.0.windows.3
+

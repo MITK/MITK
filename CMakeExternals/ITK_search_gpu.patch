@@ -48,7 +48,7 @@ index 21ebddb5a6..96daba4032 100644
 +std::string GetPlatformName(cl_platform_id platformID)
 +{
 +  size_t size = 0;
-+  auto ciErrNum = clGetPlatformInfo(platformID, CL_PLATFORM_NAME, ITK_NULLPTR, ITK_NULLPTR, &size);
++  auto ciErrNum = clGetPlatformInfo(platformID, CL_PLATFORM_NAME, 0, ITK_NULLPTR, &size);
 +  if (CL_SUCCESS != ciErrNum) {
 +    printf(" Error %i in clGetPlatformInfo Call !!!\n\n", ciErrNum);
 +    return std::string();

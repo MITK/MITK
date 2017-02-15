@@ -10,6 +10,7 @@ set(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
   Algorithms/mitkClippedSurfaceBoundsCalculator.cpp
   Algorithms/mitkCompareImageDataFilter.cpp
+  Algorithms/mitkCompositePixelValueToString.cpp
   Algorithms/mitkConvert2Dto3DImageFilter.cpp
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkExtractSliceFilter.cpp

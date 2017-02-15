@@ -26,8 +26,6 @@ namespace mitk
 {
   void CESTIOActivator::Load(us::ModuleContext *context)
   {
-    m_CESTDICOMReader.reset(new CESTDICOMReaderService());
-
     us::ServiceProperties props;
     props[us::ServiceConstants::SERVICE_RANKING()] = 10;
 
@@ -39,6 +37,8 @@ namespace mitk
     {
       context->RegisterService(*mimeTypeIter, props);
     }
+
+    m_CESTDICOMReader.reset(new CESTDICOMReaderService());
   }
 
   void CESTIOActivator::Unload(us::ModuleContext *) {}

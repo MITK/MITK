@@ -65,6 +65,7 @@ protected slots:
 
   void OnMillimetreCoordinateValueChanged();
   void OnRefetch();
+  void UpdateStatusBar();
 
 protected:
 

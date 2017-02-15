@@ -304,6 +304,7 @@ public:
   //## @param sDim override z-space dimension in @a vtkimagedata (if >0 and <)
   //## @param pDim override y-space dimension in @a vtkimagedata (if >0 and <)
   virtual void Initialize(vtkImageData* vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1, int pDim = -1);
+  virtual void Initialize(const mitk::PixelType& type, vtkImageData* vtkimagedata, int channels = 1, int tDim = -1, int sDim = -1, int pDim = -1);
 
   //##Documentation
   //## initialize new (or re-initialize) image information by @a itkimage,

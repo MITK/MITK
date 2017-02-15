@@ -44,6 +44,7 @@
 #include "mitkImage.h"
 #include "mitkPixelTypeMultiplex.h"
 #include "mitkImagePixelReadAccessor.h"
+#include <mitkCompositePixelValueToString.h>
 
 void mitk::DisplayInteractor::Notify(InteractionEvent* interactionEvent, bool isHandled)
 {
@@ -789,9 +790,16 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   std::string statusText;
   TNodePredicateDataType<mitk::Image>::Pointer isImageData = TNodePredicateDataType<mitk::Image>::New();
 
+  mitk::DataStorage::SetOfObjects::ConstPointer nodes =
+    posEvent->GetSender()->GetDataStorage()->GetSubset(isImageData).GetPointer();
 
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = posEvent->GetSender()->GetDataStorage()->GetSubset(isImageData).GetPointer();
-  mitk::Point3D worldposition = posEvent->GetPositionInWorld();
+  // posEvent->GetPositionInWorld() would return the world position at the
+  // time of initiating the interaction. However, we need to update the
+  // status bar with the position after changing slice. Therefore, we
+  // translate the same display position with the renderer again to
+  // get the new world position.
+  Point3D worldposition;
+  event->GetSender()->DisplayToWorld(posEvent->GetPointerPositionOnScreen(), worldposition);
 
   mitk::Image::Pointer image3D;
   mitk::DataNode::Pointer node;
@@ -828,47 +836,40 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       node->GetIntProperty("Image.Displayed Component", component);
     }
   }
-  std::stringstream stream;
-  stream.imbue(std::locale::classic());
 
   // get the position and gray value from the image and build up status bar text
-  if(image3D.IsNotNull())
+  auto statusBar = StatusBar::GetInstance();
+
+  if (image3D.IsNotNull() && statusBar != nullptr)
   {
     itk::Index<3> p;
     image3D->GetGeometry()->WorldToIndex(worldposition, p);
-    stream.precision(2);
-    stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
-    stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
 
-    mitk::ScalarType pixelValue;
+    auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
 
-    mitkPixelTypeMultiplex5(
-          mitk::FastSinglePixelAccess,
-          image3D->GetChannelDescriptor().GetPixelType(),
-          image3D,
-          image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
-          p,
-          pixelValue,
-          component);
-
-
-
-    if (fabs(pixelValue)>1000000 || fabs(pixelValue) < 0.01)
+    if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
     {
-      stream<<"; Time: " << posEvent->GetSender()->GetTime() << " ms; Pixelvalue: " << std::scientific<< pixelValue <<"  ";
+      std::string pixelValue = "Pixel RGB(A) value: ";
+      pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
+      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
     }
     else
     {
-      stream<<"; Time: " << posEvent->GetSender()->GetTime() << " ms; Pixelvalue: "<< pixelValue <<"  ";
+      mitk::ScalarType pixelValue;
+      mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
+        image3D->GetChannelDescriptor().GetPixelType(),
+        image3D,
+        image3D->GetVolumeData(posEvent->GetSender()->GetTimeStep()),
+        p,
+        pixelValue,
+        component);
+      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue);
     }
   }
   else
   {
-    stream << "No image information at this position!";
+    statusBar->DisplayImageInfoInvalid();
   }
-
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
 }
 
 /*

@@ -34,9 +34,11 @@ if(MITK_USE_DCMQI)
         ${ep_common_args}
         ${additional_cmake_args}
         #-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
-        -DDCMQI_BUILD_APPS=OFF
+        -DBUILD_SHARED_LIBS:BOOL=ON
+        -DDCMQI_BUILD_APPS:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
         -DITK_DIR:PATH=${ITK_DIR}
+        -DITK_NO_IO_FACTORY_REGISTER_MANAGER:BOOL=ON
         -DDCMQI_SUPERBUILD:BOOL=OFF
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

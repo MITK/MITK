@@ -8,10 +8,6 @@ find_path(DCMQI_INCLUDE_DIR
 
 set(DCMQI_INCLUDE_DIR "${DCMQI_DIR}/include" "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/include" "${MITK_EXTERNAL_PROJECT_PREFIX}/src/DCMQI/jsoncpp" ${DCMQI_DIR})
 
-find_package_handle_standard_args(DCMQI
-  FOUND_VAR DCMQI_FOUND
-  REQUIRED_VARS DCMQI_INCLUDE_DIR
-)
 
 # Find all libraries, store debug and release separately
   # Find Release libraries
@@ -46,3 +42,8 @@ find_package_handle_standard_args(DCMQI
   if(DCMQI_LIBRARY_DEBUG)
     list(APPEND DCMQI_LIBRARIES debug ${DCMQI_LIBRARY_DEBUG})
   endif()
+
+find_package_handle_standard_args(DCMQI
+  FOUND_VAR DCMQI_FOUND
+  REQUIRED_VARS DCMQI_INCLUDE_DIR DCMQI_LIBRARIES
+)

@@ -33,14 +33,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 // qwt
 #include <qwt_scale_engine.h>
 
-//mitk
-#include <mitkImage.h>
-#include <mitkITKImageImport.h>
-#include <mitkImageCast.h>
-#include <mitkImageAccessByItk.h>
-#include <mitkTemporoSpatialStringProperty.h>
-#include <mitkLocaleSwitch.h>
+// mitk
+#include <mitkCESTImageNormalizationFilter.h>
 #include <mitkCustomTagParser.h>
+#include <mitkITKImageImport.h>
+#include <mitkImage.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkLocaleSwitch.h>
+#include <mitkTemporoSpatialStringProperty.h>
 
 // boost
 #include <boost/tokenizer.hpp>
@@ -53,7 +54,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include <clocale>
 
 const std::string QmitkCESTStatisticsView::VIEW_ID = "org.mitk.views.ceststatistics";
 static const int STAT_TABLE_BASE_HEIGHT = 180;
@@ -356,15 +356,14 @@ void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()
       }
       if (image->GetDimension() == 4)
       {
-        auto resultMitkImage = mitk::Image::New();
-        AccessFixedDimensionByItk_n(image, NormalizeTimeSteps, 4, (offsets, resultMitkImage));
+        auto normalizationFilter = mitk::CESTImageNormalizationFilter::New();
+        normalizationFilter->SetInput(image);
+        normalizationFilter->Update();
 
-        resultMitkImage->SetPropertyList(image->GetPropertyList()->Clone());
-
-        resultMitkImage->SetClonedTimeGeometry(image->GetTimeGeometry());
+        auto resultImage = normalizationFilter->GetOutput();
 
         mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
-        dataNode->SetData(resultMitkImage);
+        dataNode->SetData(resultImage);
 
         std::string normalizedName = node->GetName() + "_normalized";
         dataNode->SetName(normalizedName);
@@ -375,106 +374,6 @@ void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()
       this->Clear();
     }
   }
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-void QmitkCESTStatisticsView::NormalizeTimeSteps(itk::Image<TPixel, VImageDimension>* image, std::string offsets, mitk::Image::Pointer resultMitkImage)
-{
-  typedef itk::Image<TPixel, VImageDimension>                       ImageType;
-  typedef itk::Image<double, VImageDimension>                       OutputImageType;
-
-  std::vector<std::string> parts;
-  boost::split(parts, offsets, boost::is_any_of(" "));
-  std::vector<unsigned int> mZeroIndices;
-
-  for (unsigned int index = 0; index < parts.size(); ++index)
-  {
-    if ((std::stod(parts.at(index)) < -299) || (std::stod(parts.at(index)) > 299))
-    {
-      mZeroIndices.push_back(index);
-    }
-  }
-
-  auto resultImage = OutputImageType::New();
-  resultImage->SetRegions(image->GetLargestPossibleRegion());
-  resultImage->Allocate();
-  resultImage->FillBuffer(0);
-
-  unsigned int numberOfTimesteps = image->GetLargestPossibleRegion().GetSize(3);
-
-  typename ImageType::RegionType lowerMZeroRegion = image->GetLargestPossibleRegion();
-  lowerMZeroRegion.SetSize(3, 1);
-  typename ImageType::RegionType upperMZeroRegion = image->GetLargestPossibleRegion();
-  upperMZeroRegion.SetSize(3, 1);
-  typename ImageType::RegionType sourceRegion = image->GetLargestPossibleRegion();
-  sourceRegion.SetSize(3, 1);
-  typename OutputImageType::RegionType targetRegion = resultImage->GetLargestPossibleRegion();
-  targetRegion.SetSize(3, 1);
-
-  for (unsigned int timestep = 0; timestep < numberOfTimesteps; ++timestep)
-  {
-    unsigned int lowerMZeroIndex = mZeroIndices[0];
-    unsigned int upperMZeroIndex = mZeroIndices[0];
-    for (unsigned int loop = 0; loop < mZeroIndices.size(); ++loop)
-    {
-      if (mZeroIndices[loop] <= timestep)
-      {
-        lowerMZeroIndex = mZeroIndices[loop];
-      }
-      if (mZeroIndices[loop] > timestep)
-      {
-        upperMZeroIndex = mZeroIndices[loop];
-        break;
-      }
-    }
-    bool isMZero = (lowerMZeroIndex == timestep);
-
-    double weight = 0.0;
-    if (lowerMZeroIndex == upperMZeroIndex)
-    {
-      weight = 1.0;
-    }
-    else
-    {
-      weight = 1.0 - double(timestep - lowerMZeroIndex) / double(upperMZeroIndex - lowerMZeroIndex);
-    }
-
-    lowerMZeroRegion.SetIndex(3, lowerMZeroIndex);
-    upperMZeroRegion.SetIndex(3, upperMZeroIndex);
-    sourceRegion.SetIndex(3, timestep);
-    targetRegion.SetIndex(3, timestep);
-
-
-    itk::ImageRegionConstIterator<ImageType> lowerMZeroIterator(image, lowerMZeroRegion);
-    itk::ImageRegionConstIterator<ImageType> upperMZeroIterator(image, upperMZeroRegion);
-    itk::ImageRegionConstIterator<ImageType> sourceIterator(image, sourceRegion);
-    itk::ImageRegionIterator<OutputImageType> targetIterator(resultImage.GetPointer(), targetRegion);
-
-    if (isMZero)
-    {
-      while (!sourceIterator.IsAtEnd())
-      {
-        targetIterator.Set(double(sourceIterator.Get()));
-
-        ++sourceIterator;
-        ++targetIterator;
-      }
-    }
-    else
-    {
-      while (!sourceIterator.IsAtEnd())
-      {
-        targetIterator.Set(double(sourceIterator.Get()) /
-                           (weight * lowerMZeroIterator.Get() + (1.0 - weight) * upperMZeroIterator.Get()));
-
-        ++lowerMZeroIterator;
-        ++upperMZeroIterator;
-        ++sourceIterator;
-        ++targetIterator;
-      }
-    }
-  }
-  mitk::CastToMitkImage<OutputImageType>(resultImage, resultMitkImage);
 }
 
 void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector& xValues, QmitkPlotWidget::DataVector& yValues)
@@ -602,7 +501,6 @@ bool QmitkCESTStatisticsView::SetZSpectrum(mitk::StringProperty* zSpectrumProper
   m_zSpectrum.clear();
   m_zSpectrum.resize(0);
 
-  const std::string& currentLocale = std::setlocale(LC_ALL, nullptr);
   for (auto const &spectrumString : zSpectra)
   {
     m_zSpectrum.push_back(std::stod(spectrumString));

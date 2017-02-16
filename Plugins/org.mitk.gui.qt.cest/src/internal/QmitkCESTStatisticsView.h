@@ -114,11 +114,6 @@ class QmitkCESTStatisticsView : public QmitkAbstractView
     template <typename TPixel, unsigned int VImageDimension>
     void CopyTimesteps(itk::Image<TPixel, VImageDimension>* image);
 
-    /** Normalizes timesteps
-    */
-    template <typename TPixel, unsigned int VImageDimension>
-    void NormalizeTimeSteps(itk::Image<TPixel, VImageDimension>* image, std::string offsets, mitk::Image::Pointer resultMitkImage);
-
     Ui::QmitkCESTStatisticsViewControls m_Controls;
     QmitkImageStatisticsCalculationThread* m_CalculatorThread;
     QmitkPlotWidget::DataVector m_zSpectrum;

@@ -1,5 +1,5 @@
 diff --git a/CMake/DCMQIConfig.cmake.in b/CMake/DCMQIConfig.cmake.in
-index 7cf66b2..c0d7827 100644
+index 7cf66b2..c0d7827
 --- a/CMake/DCMQIConfig.cmake.in
 +++ b/CMake/DCMQIConfig.cmake.in
 @@ -1,7 +1,6 @@
@@ -11,10 +11,10 @@ index 7cf66b2..c0d7827 100644
  set_and_check(DCMQI_TARGETS "@PACKAGE_CONFIG_DIR_CONFIG@/DCMQITargets.cmake")
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 91365f5..a8c8744 100644
+index 9c6dcc2..20a90d5
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -304,7 +304,6 @@ if(NOT Slicer_DIR)
+@@ -279,7 +279,6 @@ if(NOT Slicer_DIR)
    # For a build tree
    set(CONFIG_DIR_CONFIG ${CMAKE_BINARY_DIR})
    set(DCMTK_DIR_CONFIG ${DCMTK_DIR})
@@ -22,10 +22,35 @@ index 91365f5..a8c8744 100644
    set(${PROJECT_NAME}_CONFIG_CODE "####### Expanded from \@DCMQI_CONFIG_CODE\@ #######\n")
    set(${PROJECT_NAME}_CONFIG_CODE "find_package(DCMTK NO_MODULE REQUIRED)\n")
    set(${PROJECT_NAME}_CONFIG_CODE "${${PROJECT_NAME}_CONFIG_CODE}##################################################")
-@@ -316,7 +315,6 @@ if(NOT Slicer_DIR)
+@@ -291,7 +290,6 @@ if(NOT Slicer_DIR)
        PATH_VARS
          CONFIG_DIR_CONFIG
          DCMTK_DIR_CONFIG
 -        SlicerExecutionModel_DIR_CONFIG
        NO_CHECK_REQUIRED_COMPONENTS_MACRO
    )
+
+diff --git a/libsrc/CMakeLists.txt b/libsrc/CMakeLists.txt
+index 4d25e05..057326e
+--- a/libsrc/CMakeLists.txt
++++ b/libsrc/CMakeLists.txt
+@@ -2,6 +2,7 @@
+ #-----------------------------------------------------------------------------
+ include(FindGit)
+ include(dcmqiMacroExtractRepositoryInfo)
++include(CheckCXXCompilerFlag)
+
+ dcmqiMacroExtractRepositoryInfo(VAR_PREFIX dcmqi)
+ configure_file(
+@@ -37,6 +38,11 @@ add_library(${lib_name} STATIC
+   ${ADDITIONAL_SRCS}
+   )
+
++CHECK_CXX_COMPILER_FLAG("-fPIC" CXX_HAS_FPIC)
++if(CXX_HAS_FPIC)
++  target_compile_options(${lib_name} PRIVATE "-fPIC")
++endif()
++
+ if(DCMQI_LIBRARY_PROPERTIES)
+   set_target_properties(${lib_name} PROPERTIES ${DCMQI_LIBRARY_PROPERTIES})
+ endif()

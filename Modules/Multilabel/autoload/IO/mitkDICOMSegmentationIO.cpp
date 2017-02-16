@@ -113,9 +113,8 @@ namespace mitk
 
       try
       {
-        const LabelSet *labelSet = input->GetLabelSet(layer);
 
-        for (int label = 1; label < input->GetNumberOfLabels(layer); ++label)
+        for (unsigned int label = 1; label < input->GetNumberOfLabels(layer); ++label)
         {
           typedef itk::CastImageFilter<itkInputImageType, itkInternalImageType> castItkImageFilterType;
           ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
@@ -179,7 +178,7 @@ namespace mitk
     // end image write
     if (readFileFormat)
       delete readFileFormat;
-    for (int i = 0; i < dcmDatasets.size(); i++)
+    for (unsigned int i = 0; i < dcmDatasets.size(); i++)
     {
       delete dcmDatasets[i];
     }
@@ -364,7 +363,7 @@ namespace mitk
 
     const LabelSet *labelSet = image->GetLabelSet(layer);
 
-    for (int i = 1; i < image->GetNumberOfLabels(); ++i)
+    for (unsigned int i = 1; i < image->GetNumberOfLabels(); ++i)
     {
       const Label *label = labelSet->GetLabel(i);
       if (label != nullptr)

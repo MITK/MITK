@@ -215,8 +215,14 @@ namespace Logger
     }
 
     if (Options::get().consolelog) {
-      boost::log::add_console_log(std::cout,
-        boost::log::keywords::format = "[%TimeStamp%] %Message%");
+      boost::log::add_console_log(
+        std::cout,
+        boost::log::keywords::format = (
+          boost::log::expressions::stream
+          << '[' << boost::log::expressions::format_date_time< boost::posix_time::ptime >("TimeStamp", TIME_STAMP_FORMAT) << "] "
+          << boost::log::expressions::smessage
+          )
+        );
     }
 
     boost::log::core::get()->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());

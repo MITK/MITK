@@ -84,6 +84,7 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.threeDimToFourDimPushButton, SIGNAL(clicked()), this, SLOT(OnThreeDimToFourDimPushButtonClicked()));
   connect((QObject*) this->m_CalculatorThread, SIGNAL(finished()), this, SLOT(OnThreadedStatisticsCalculationEnds()), Qt::QueuedConnection);
   connect((QObject*)(this->m_Controls.m_CopyStatisticsToClipboardPushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnCopyStatisticsToClipboardPushButtonClicked()));
+  connect((QObject*)(this->m_Controls.normalizeImagePushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnNormalizeImagePushButtonClicked()));
 }
 
 void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -216,8 +217,12 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
     stdevs[index] = statistics[index]->GetStd();
   }
 
+  QmitkPlotWidget::DataVector xValues = this->m_zSpectrum;
+
+  RemoveMZeros(xValues, means, stdevs);
+
   unsigned int curveId = this->m_Controls.m_DataViewWidget->InsertCurve("Spectrum");
-  this->m_Controls.m_DataViewWidget->SetCurveData(curveId, this->m_zSpectrum, means, stdevs, stdevs);
+  this->m_Controls.m_DataViewWidget->SetCurveData(curveId, xValues, means, stdevs, stdevs);
   this->m_Controls.m_DataViewWidget->SetErrorPen(curveId, QPen(Qt::blue));
   QwtSymbol* blueSymbol = new QwtSymbol(QwtSymbol::Rect, QColor(Qt::blue), QColor(Qt::blue),
     QSize(8, 8));
@@ -289,8 +294,12 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
     // 3 is white and thus not visible
     QColor color(static_cast<Qt::GlobalColor>(number % 17 + 4));
 
+    QmitkPlotWidget::DataVector xValues = this->m_zSpectrum;
+
+    RemoveMZeros(xValues, values);
+
     unsigned int curveId = this->m_Controls.m_DataViewWidget->InsertCurve(name.str().c_str());
-    this->m_Controls.m_DataViewWidget->SetCurveData(curveId, this->m_zSpectrum, values);
+    this->m_Controls.m_DataViewWidget->SetCurveData(curveId, xValues, values);
     this->m_Controls.m_DataViewWidget->SetCurvePen(curveId, QPen(color));
     QwtSymbol* symbol = new QwtSymbol(QwtSymbol::Rect, color, color,
       QSize(8, 8));
@@ -311,6 +320,208 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
 
 }
 
+
+
+void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataNode* node = nodes.front();
+
+  if (!node)
+  {
+    // Nothing selected. Inform the user and return
+    QMessageBox::information(NULL, "CEST View", "Please load and select an image before starting image processing.");
+    return;
+  }
+
+  // here we have a valid mitk::DataNode
+
+  // a node itself is not very useful, we need its data item (the image)
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+
+    if (image)
+    {
+      std::string offsets = "";
+      bool hasOffsets = image->GetPropertyList()->GetStringProperty( mitk::CustomTagParser::m_OffsetsPropertyName.c_str() ,offsets);
+      if (!hasOffsets)
+      {
+        QMessageBox::information(NULL, "CEST View", "Selected image was missing CEST offset information.");
+        return;
+      }
+      if (image->GetDimension() == 4)
+      {
+        auto resultMitkImage = mitk::Image::New();
+        AccessFixedDimensionByItk_n(image, NormalizeTimeSteps, 4, (offsets, resultMitkImage));
+
+        resultMitkImage->SetPropertyList(image->GetPropertyList()->Clone());
+
+        resultMitkImage->SetClonedTimeGeometry(image->GetTimeGeometry());
+
+        mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+        dataNode->SetData(resultMitkImage);
+
+        std::string normalizedName = node->GetName() + "_normalized";
+        dataNode->SetName(normalizedName);
+
+        this->GetDataStorage()->Add(dataNode);
+      }
+
+      this->Clear();
+    }
+  }
+}
+
+template <typename TPixel, unsigned int VImageDimension>
+void QmitkCESTStatisticsView::NormalizeTimeSteps(itk::Image<TPixel, VImageDimension>* image, std::string offsets, mitk::Image::Pointer resultMitkImage)
+{
+  typedef itk::Image<TPixel, VImageDimension>                       ImageType;
+  typedef itk::Image<double, VImageDimension>                       OutputImageType;
+
+  std::vector<std::string> parts;
+  boost::split(parts, offsets, boost::is_any_of(" "));
+  std::vector<unsigned int> mZeroIndices;
+
+  for (unsigned int index = 0; index < parts.size(); ++index)
+  {
+    if ((std::stod(parts.at(index)) < -299) || (std::stod(parts.at(index)) > 299))
+    {
+      mZeroIndices.push_back(index);
+    }
+  }
+
+  auto resultImage = OutputImageType::New();
+  resultImage->SetRegions(image->GetLargestPossibleRegion());
+  resultImage->Allocate();
+  resultImage->FillBuffer(0);
+
+  unsigned int numberOfTimesteps = image->GetLargestPossibleRegion().GetSize(3);
+
+  typename ImageType::RegionType lowerMZeroRegion = image->GetLargestPossibleRegion();
+  lowerMZeroRegion.SetSize(3, 1);
+  typename ImageType::RegionType upperMZeroRegion = image->GetLargestPossibleRegion();
+  upperMZeroRegion.SetSize(3, 1);
+  typename ImageType::RegionType sourceRegion = image->GetLargestPossibleRegion();
+  sourceRegion.SetSize(3, 1);
+  typename OutputImageType::RegionType targetRegion = resultImage->GetLargestPossibleRegion();
+  targetRegion.SetSize(3, 1);
+
+  for (unsigned int timestep = 0; timestep < numberOfTimesteps; ++timestep)
+  {
+    unsigned int lowerMZeroIndex = mZeroIndices[0];
+    unsigned int upperMZeroIndex = mZeroIndices[0];
+    for (unsigned int loop = 0; loop < mZeroIndices.size(); ++loop)
+    {
+      if (mZeroIndices[loop] <= timestep)
+      {
+        lowerMZeroIndex = mZeroIndices[loop];
+      }
+      if (mZeroIndices[loop] > timestep)
+      {
+        upperMZeroIndex = mZeroIndices[loop];
+        break;
+      }
+    }
+    bool isMZero = (lowerMZeroIndex == timestep);
+
+    double weight = 0.0;
+    if (lowerMZeroIndex == upperMZeroIndex)
+    {
+      weight = 1.0;
+    }
+    else
+    {
+      weight = 1.0 - double(timestep - lowerMZeroIndex) / double(upperMZeroIndex - lowerMZeroIndex);
+    }
+
+    lowerMZeroRegion.SetIndex(3, lowerMZeroIndex);
+    upperMZeroRegion.SetIndex(3, upperMZeroIndex);
+    sourceRegion.SetIndex(3, timestep);
+    targetRegion.SetIndex(3, timestep);
+
+
+    itk::ImageRegionConstIterator<ImageType> lowerMZeroIterator(image, lowerMZeroRegion);
+    itk::ImageRegionConstIterator<ImageType> upperMZeroIterator(image, upperMZeroRegion);
+    itk::ImageRegionConstIterator<ImageType> sourceIterator(image, sourceRegion);
+    itk::ImageRegionIterator<OutputImageType> targetIterator(resultImage.GetPointer(), targetRegion);
+
+    if (isMZero)
+    {
+      while (!sourceIterator.IsAtEnd())
+      {
+        targetIterator.Set(double(sourceIterator.Get()));
+
+        ++sourceIterator;
+        ++targetIterator;
+      }
+    }
+    else
+    {
+      while (!sourceIterator.IsAtEnd())
+      {
+        targetIterator.Set(double(sourceIterator.Get()) /
+                           (weight * lowerMZeroIterator.Get() + (1.0 - weight) * upperMZeroIterator.Get()));
+
+        ++lowerMZeroIterator;
+        ++upperMZeroIterator;
+        ++sourceIterator;
+        ++targetIterator;
+      }
+    }
+  }
+  mitk::CastToMitkImage<OutputImageType>(resultImage, resultMitkImage);
+}
+
+void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector& xValues, QmitkPlotWidget::DataVector& yValues)
+{
+  QmitkPlotWidget::DataVector tempX;
+  QmitkPlotWidget::DataVector tempY;
+  for (int index = 0; index < xValues.size(); ++index)
+  {
+    if ((xValues.at(index) < -299) || (xValues.at(index)) > 299)
+    {
+      // do not include
+    }
+    else
+    {
+      tempX.push_back(xValues.at(index));
+      tempY.push_back(yValues.at(index));
+    }
+  }
+
+  xValues = tempX;
+  yValues = tempY;
+}
+
+void QmitkCESTStatisticsView::RemoveMZeros(QmitkPlotWidget::DataVector& xValues, QmitkPlotWidget::DataVector& yValues, QmitkPlotWidget::DataVector& stdDevs)
+{
+  QmitkPlotWidget::DataVector tempX;
+  QmitkPlotWidget::DataVector tempY;
+  QmitkPlotWidget::DataVector tempDevs;
+  for (int index = 0; index < xValues.size(); ++index)
+  {
+    if ((xValues.at(index) < -299) || (xValues.at(index)) > 299)
+    {
+      // do not include
+    }
+    else
+    {
+      tempX.push_back(xValues.at(index));
+      tempY.push_back(yValues.at(index));
+      tempDevs.push_back(stdDevs.at(index));
+    }
+  }
+
+  xValues = tempX;
+  yValues = tempY;
+  stdDevs = tempDevs;
+}
+
 void QmitkCESTStatisticsView::OnThreeDimToFourDimPushButtonClicked()
 {
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
@@ -321,7 +532,7 @@ void QmitkCESTStatisticsView::OnThreeDimToFourDimPushButtonClicked()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
+    QMessageBox::information( NULL, "CEST View", "Please load and select an image before starting image processing.");
     return;
   }
 

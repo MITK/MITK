@@ -63,6 +63,9 @@ class QmitkCESTStatisticsView : public QmitkAbstractView
     /// \brief copy statistics to clipboard
     void OnCopyStatisticsToClipboardPushButtonClicked();
 
+    /// \brief normalize cest image
+    void OnNormalizeImagePushButtonClicked();
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -99,10 +102,22 @@ class QmitkCESTStatisticsView : public QmitkAbstractView
     */
     void Clear();
 
+    /** Remove MZeros
+    *
+    * Will remove the data for the M0 images from the given input
+    */
+    void RemoveMZeros(QmitkPlotWidget::DataVector& xValues, QmitkPlotWidget::DataVector& yValues);
+    void RemoveMZeros(QmitkPlotWidget::DataVector& xValues, QmitkPlotWidget::DataVector& yValues, QmitkPlotWidget::DataVector& stdDevs);
+
     /** Copies the first timestep of a segmentation to all others
     */
     template <typename TPixel, unsigned int VImageDimension>
     void CopyTimesteps(itk::Image<TPixel, VImageDimension>* image);
+
+    /** Normalizes timesteps
+    */
+    template <typename TPixel, unsigned int VImageDimension>
+    void NormalizeTimeSteps(itk::Image<TPixel, VImageDimension>* image, std::string offsets, mitk::Image::Pointer resultMitkImage);
 
     Ui::QmitkCESTStatisticsViewControls m_Controls;
     QmitkImageStatisticsCalculationThread* m_CalculatorThread;

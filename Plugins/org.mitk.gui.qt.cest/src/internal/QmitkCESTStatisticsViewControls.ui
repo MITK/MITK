@@ -41,6 +41,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="normalizeImagePushButton">
+     <property name="text">
+      <string>Normalize CEST image</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_StatisticsGroupBox">
      <property name="enabled">
       <bool>false</bool>

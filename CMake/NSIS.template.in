@@ -235,7 +235,11 @@ Function AddToPath
   StrLen $2 $1
   IntCmp $2 0 CheckPathLength_ShowPathWarning CheckPathLength_Done CheckPathLength_Done
     CheckPathLength_ShowPathWarning:
-    Messagebox MB_OK|MB_ICONEXCLAMATION "Warning! PATH too long installer unable to modify PATH!"
+    DetailPrint "Warning: Could not modify PATH variable - current PATH is too long.\n\
+This does not impact the functionality of MITK itself, but you will not be able to start\
+it from anywhere via command line."
+    ; The message box is probably too much of an escalation, most users won't care or notice
+    ;Messagebox MB_OK|MB_ICONEXCLAMATION "Warning! PATH too long installer unable to modify PATH!"
     Goto AddToPath_done
   CheckPathLength_Done:
   Push "$1;"

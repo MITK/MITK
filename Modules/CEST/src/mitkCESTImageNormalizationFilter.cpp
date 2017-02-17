@@ -50,16 +50,17 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPixel, VImageDimension>* image)
 {
-  typedef itk::Image<TPixel, VImageDimension>                       ImageType;
-  typedef itk::Image<double, VImageDimension>                       OutputImageType;
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<double, VImageDimension> OutputImageType;
 
   std::string offsets = "";
   this->GetInput()->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets);
 
   std::vector<std::string> parts;
   boost::split(parts, offsets, boost::is_any_of(" "));
-  std::vector<unsigned int> mZeroIndices;
 
+  // determine normalization images
+  std::vector<unsigned int> mZeroIndices;
   for (unsigned int index = 0; index < parts.size(); ++index)
   {
     if ((std::stod(parts.at(index)) < -299) || (std::stod(parts.at(index)) > 299))

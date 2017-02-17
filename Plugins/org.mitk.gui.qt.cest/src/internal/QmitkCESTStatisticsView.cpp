@@ -42,6 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 #include <mitkTemporoSpatialStringProperty.h>
+#include <mitkTimeGeometry.h>
 
 // boost
 #include <boost/tokenizer.hpp>
@@ -85,19 +86,27 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
   connect((QObject*) this->m_CalculatorThread, SIGNAL(finished()), this, SLOT(OnThreadedStatisticsCalculationEnds()), Qt::QueuedConnection);
   connect((QObject*)(this->m_Controls.m_CopyStatisticsToClipboardPushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnCopyStatisticsToClipboardPushButtonClicked()));
   connect((QObject*)(this->m_Controls.normalizeImagePushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnNormalizeImagePushButtonClicked()));
+
+  m_Controls.normalizeImagePushButton->setEnabled(false);
+  m_Controls.threeDimToFourDimPushButton->setEnabled(false);
 }
 
 void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
-  // we always need a mask, either image or planar figure as well as an image
-  if (nodes.size() != 2)
+  if (nodes.size() == NULL)
   {
+    std::stringstream message;
+    message << "<font color='red'>Please select an image.</font>";
+    m_Controls.labelWarning->setText(message.str().c_str());
+    m_Controls.labelWarning->show();
+
     this->Clear();
     return;
   }
 
   // iterate all selected objects
+  bool atLeastOneWasCESTImage = false;
   foreach( mitk::DataNode::Pointer node, nodes )
   {
     if (node.IsNull())
@@ -111,6 +120,8 @@ void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
 
       bool zSpectrumSet =
         SetZSpectrum(dynamic_cast<mitk::StringProperty*>(node->GetData()->GetProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str()).GetPointer()));
+
+      atLeastOneWasCESTImage = atLeastOneWasCESTImage || zSpectrumSet;
 
       if (zSpectrumSet)
       {
@@ -130,6 +141,69 @@ void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer
     if (dynamic_cast<mitk::PointSet*>(node->GetData()) != nullptr)
     {
       m_PointSet = dynamic_cast<mitk::PointSet*>(node->GetData());
+    }
+  }
+
+  // We only want to offer normalization or timestep copying if one object is selected
+  if (nodes.size() == 1)
+  {
+    this->Clear();
+
+    if (dynamic_cast<mitk::Image*>(nodes.front()->GetData()) )
+    {
+      m_Controls.normalizeImagePushButton->setEnabled(atLeastOneWasCESTImage);
+      m_Controls.threeDimToFourDimPushButton->setDisabled(atLeastOneWasCESTImage);
+    }
+    else
+    {
+      m_Controls.normalizeImagePushButton->setEnabled(false);
+      m_Controls.threeDimToFourDimPushButton->setEnabled(false);
+
+      std::stringstream message;
+      message << "<font color='red'>The selected node is not an image.</font>";
+      m_Controls.labelWarning->setText(message.str().c_str());
+      m_Controls.labelWarning->show();
+    }
+    this->Clear();
+    return;
+  }
+
+
+
+  // we always need a mask, either image or planar figure as well as an image for further processing
+  if (nodes.size() != 2)
+  {
+    this->Clear();
+    return;
+  }
+
+  m_Controls.normalizeImagePushButton->setEnabled(false);
+  m_Controls.threeDimToFourDimPushButton->setEnabled(false);
+
+  if (!atLeastOneWasCESTImage)
+  {
+    std::stringstream message;
+    message << "<font color='red'>None of the selected data nodes contains required CEST meta information</font>";
+    m_Controls.labelWarning->setText(message.str().c_str());
+    m_Controls.labelWarning->show();
+    this->Clear();
+    return;
+  }
+
+  bool bothAreImages = (m_ZImage.GetPointer() != nullptr) && (m_MaskImage.GetPointer() != nullptr);
+
+  if (bothAreImages)
+  {
+    bool geometriesMatch = mitk::Equal(*(m_ZImage->GetTimeGeometry()), *(m_MaskImage->GetTimeGeometry()), mitk::eps, false);
+
+    if (!geometriesMatch)
+    {
+      std::stringstream message;
+      message << "<font color='red'>The selected images have different geometries.</font>";
+      m_Controls.labelWarning->setText(message.str().c_str());
+      m_Controls.labelWarning->show();
+      this->Clear();
+      return;
     }
   }
 

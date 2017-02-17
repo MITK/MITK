@@ -23,6 +23,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+  /** \brief Normalization filter for CEST images.
+   *
+   * This filter can be used to normalize CEST images, it only works with 4D images and assumes that the input
+   * mitk::Image has a property called mitk::CustomTagParser::m_OffsetsPropertyName, whith offsets separated by
+   * spaces. The number of offsets has to match the number of timesteps.
+   *
+   * Each timestep with a corresponding offset greater than 299 or less than -299 will be interpreted as normalization (M0) image.
+   * If only one M0 image is present normalization will be done by dividing the voxel value by the corresponding
+   * M0 voxel value. If multiple M0 images are present normalization between any two M0 images will be done by
+   * dividing by a linear interpolation between the two.
+   * The M0 images themselves will be transferred to the result without any processing.
+   *
+   * The output image will have the same geometry as the input image and a double pixel type.
+   */
   class MITKCEST_EXPORT CESTImageNormalizationFilter : public ImageToImageFilter
   {
   public:

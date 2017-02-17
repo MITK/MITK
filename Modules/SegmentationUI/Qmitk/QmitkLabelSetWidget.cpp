@@ -300,20 +300,21 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
   if (dialogReturnValue == QDialog::Rejected)
     return;
 
-  int pixelValue = -1;
+  int sourcePixelValue = -1;
   for (int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); i++)
   {
     if (dialog.GetLabelSetWidgetTableCompleteWord() == QString(m_Controls.m_LabelSetTableWidget->item(i, 0)->text()))
-      pixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
+      sourcePixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
   }
 
-  if (pixelValue == -1)
+  if (sourcePixelValue == -1)
   {
     MITK_INFO << "unknown label";
     return;
   }
 
-  GetWorkingImage()->MergeLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
+  int pixelValue = GetPixelValueOfSelectedItem();
+  GetWorkingImage()->MergeLabel(pixelValue, sourcePixelValue, GetWorkingImage()->GetActiveLayer());
 
   UpdateAllTableWidgetItems();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -474,19 +475,17 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
       return;
     }
 
-    std::vector<mitk::Label::PixelType> VectorOfLablePixelValues;
+    std::vector<mitk::Label::PixelType> vectorOfSourcePixelValues;
     foreach(QTableWidgetSelectionRange a, ranges)
     {
       for (int i = a.topRow(); i <= a.bottomRow(); ++i)
       {
-        VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
+        vectorOfSourcePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
       }
     }
 
     this->WaitCursorOn();
-    int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(), 0)->data(Qt::UserRole).toInt();
-
-    GetWorkingImage()->MergeLabels(VectorOfLablePixelValues, pixelValue, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->MergeLabels(pixelValue, vectorOfSourcePixelValues, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

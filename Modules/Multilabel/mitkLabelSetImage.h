@@ -69,18 +69,21 @@ namespace mitk
 
     /**
      * @brief Merges the mitk::Label with a given target value with the active label
-     * @param targetPixelValue the value of the mitk::Label that should be merged with the active one
-     * @param layer the layer in which the merge should be performed
+     *
+     * @param pixelValue          the value of the label that should be the new merged label
+     * @param sourcePixelValue    the value of the label that should be merged into the specified one
+     * @param layer               the layer in which the merge should be performed
      */
-    void MergeLabel(PixelType targetPixelValue, unsigned int layer = 0);
+    void MergeLabel(PixelType pixelValue, PixelType sourcePixelValue, unsigned int layer = 0);
 
     /**
      * @brief Merges a list of mitk::Labels with the mitk::Label that has a specific value
-     * @param VectorOfLablePixelValues the list of labels that should be merge with the specified one
-     * @param index the value of the label into which the other should be merged
-     * @param layer the layer in which the merge should be performed
+     *
+     * @param pixelValue                  the value of the label that should be the new merged label
+     * @param vectorOfSourcePixelValues   the list of label values that should be merge into the specified one
+     * @param layer                       the layer in which the merge should be performed
      */
-    void MergeLabels(std::vector<PixelType> &VectorOfLablePixelValues, PixelType index, unsigned int layer = 0);
+    void MergeLabels(PixelType pixelValue, std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer = 0);
 
     /**
       * \brief  */

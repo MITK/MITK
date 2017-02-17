@@ -310,7 +310,6 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
   if (pixelValue == -1)
   {
     MITK_INFO << "unknown label";
-    ;
     return;
   }
 
@@ -372,7 +371,7 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 
   if (dialog.exec() == QDialog::Rejected)
     return;
-  int pixelValue = GetWorkingImage()->GetActiveLabel(GetWorkingImage()->GetActiveLayer())->GetValue();
+  int pixelValue = GetPixelValueOfSelectedItem();
 
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(dialog.GetColor());
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetName(dialog.GetSegmentationName().toStdString());
@@ -485,9 +484,7 @@ void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
     }
 
     this->WaitCursorOn();
-    int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(), 0)
-                       ->data(Qt::UserRole)
-                       .toInt();
+    int pixelValue = m_Controls.m_LabelSetTableWidget->item(m_Controls.m_LabelSetTableWidget->currentRow(), 0)->data(Qt::UserRole).toInt();
 
     GetWorkingImage()->MergeLabels(VectorOfLablePixelValues, pixelValue, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
@@ -528,11 +525,10 @@ void QmitkLabelSetWidget::OnVisibleButtonClicked()
   if (row >= 0 && row < m_Controls.m_LabelSetTableWidget->rowCount())
   {
     QTableWidgetItem *item = m_Controls.m_LabelSetTableWidget->item(row, 0);
-    OnItemClicked(item);
     int pixelValue = item->data(Qt::UserRole).toInt();
     GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetVisible(!GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetVisible());
     GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    OnItemClicked(item);
   }
 }
 

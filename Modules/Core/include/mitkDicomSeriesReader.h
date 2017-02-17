@@ -407,6 +407,8 @@ public:
       // Contains bad slicing distance or not
       bool IsBadSlicingDistance() const;
 
+      std::string PhotometricInterpretation() const;
+
       ImageBlockDescriptor();
       ~ImageBlockDescriptor();
 
@@ -442,6 +444,8 @@ public:
 
       void SetBadSlicingDistance(bool badSlicingDistance);
       
+      void SetPhotometricInterpretation(std::string interpretation);
+
       StringContainer m_Filenames;
       std::string m_ImageBlockUID;
       std::string m_SeriesInstanceUID;
@@ -454,6 +458,7 @@ public:
       bool m_IsMultiFrameImage;
       std::string m_Orientation;
       bool m_BadSlicingDistance;
+      std::string m_PhotometricInterpretation;
   };
 
   typedef std::map<std::string, ImageBlockDescriptor> FileNamesGrouping;

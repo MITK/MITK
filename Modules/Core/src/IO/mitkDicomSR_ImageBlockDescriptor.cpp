@@ -261,4 +261,14 @@ void DicomSeriesReader::ImageBlockDescriptor::SetBadSlicingDistance(bool badSlic
   m_BadSlicingDistance = badSlicingDistance;
 }
 
+std::string DicomSeriesReader::ImageBlockDescriptor::PhotometricInterpretation() const
+{
+  return m_PhotometricInterpretation;
+}
+
+void DicomSeriesReader::ImageBlockDescriptor::SetPhotometricInterpretation(std::string interpretation)
+{
+  m_PhotometricInterpretation = interpretation;
+}
+
 } // end namespace mitk

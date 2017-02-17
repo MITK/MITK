@@ -774,6 +774,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
     scanner.AddTag( tagImagePositionPatient );
 
+  const gdcm::Tag tagPhotometricInterpretation(0x0028, 0x0004);
+  scanner.AddTag(tagPhotometricInterpretation);
+
   // TODO add further restrictions from arguments (when anybody asks for it)
 
   FileNamesGrouping result;
@@ -876,6 +879,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
       thisBlock.SetHasMultipleTimePoints( false );
       thisBlock.SetOrientation(DicomSeriesReader::ConstCharStarToString(scanner.GetValue(firstFileInBlock.c_str(), tagImageOrientation)));
       thisBlock.SetBadSlicingDistance(analysisResult.ContainsBadSlicingDistance());
+      thisBlock.SetPhotometricInterpretation(DicomSeriesReader::ConstCharStarToString(scanner.GetValue(firstFileInBlock.c_str(), tagPhotometricInterpretation)));
 
       groupsOf3DBlocks[ newGroupUID.str() ] = thisBlock;
 

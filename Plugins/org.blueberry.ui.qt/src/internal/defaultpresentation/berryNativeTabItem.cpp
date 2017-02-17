@@ -99,8 +99,7 @@ QWidget* NativeTabItem::GetCloseButton()
     closeButton = new QToolButton(parent->GetControl());
     closeButton->setObjectName("TabCloseButton");
     closeButton->setContentsMargins(0, 0, 0, 0);
-    closeButton->setFixedSize(12,12);
-    //closeButton->setFlat(true);
+    closeButton->setFixedSize(32,32);
     closeButton->setIcon(iconCloseTab);
     closeButton->setAutoRaise(true);
   }

@@ -6,7 +6,7 @@ berry--QCTabBar::tab:selected
 
 berry--QCTabBar QToolButton#TabCloseButton
 {
-    /*background-image: url(:/org.blueberry.ui.qt/dark/close.png);*/
+    /*background-image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);*/
     border: none;
     background-color: transparent;
     width: 10px;
@@ -15,12 +15,12 @@ berry--QCTabBar QToolButton#TabCloseButton
 
 berry--QCTabBar QToolButton#TabCloseButton:hover
 {
-    /*image: url(:/org.blueberry.ui.qt/dark/close-hover.png);*/
+    /*image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);*/
 }
 
 berry--QCTabBar QToolButton#TabCloseButton:pressed
 {
-    /*image: url(:/org.blueberry.ui.qt/dark/close-pressed.png);*/
+    /*image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);*/
 }
 
 QFrame#ViewFormContentFrame

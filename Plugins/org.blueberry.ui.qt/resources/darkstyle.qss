@@ -794,18 +794,18 @@ QTabBar:focus
 }
 
 QTabBar::close-button  {
-    image: url(:/org.blueberry.ui.qt/dark/close.png);
+    image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
     background: transparent;
 }
 
 QTabBar::close-button:hover
 {
-    image: url(:/org.blueberry.ui.qt/dark/close-hover.png);
+    image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
     background: transparent;
 }
 
 QTabBar::close-button:pressed {
-    image: url(:/org.blueberry.ui.qt/dark/close-pressed.png);
+    image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
     background: transparent;
 }
 
@@ -942,7 +942,7 @@ QTabBar QToolButton::right-arrow:disabled {
 QDockWidget {
     background: #323231;
     border: 1px solid #403F3F;
-    titlebar-close-icon: url(:/org.blueberry.ui.qt/dark/close.png);
+    titlebar-close-icon: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
     titlebar-normal-icon: url(:/org.blueberry.ui.qt/dark/undock.png);
 }
 

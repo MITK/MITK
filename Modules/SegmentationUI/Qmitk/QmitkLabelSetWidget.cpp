@@ -831,7 +831,7 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   while (it != end)
   {
     InsertTableWidgetItem(it->second);
-    if (GetWorkingImage()->GetActiveLabel() == it->second) // get active
+    if (workingImage->GetActiveLabel() == it->second) // get active
       pixelValue = it->first;
     m_LabelStringList.append(QString(it->second->GetName().c_str()));
     it++;
@@ -842,7 +842,7 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   OnLabelListModified(m_LabelStringList);
 
   std::stringstream captionText;
-  captionText << "Number of labels: " << workingImage->GetNumberOfLabels() - 1;
+  captionText << "Number of labels: " << workingImage->GetNumberOfLabels(workingImage->GetActiveLayer()) - 1;
   m_Controls.m_lblCaption->setText(captionText.str().c_str());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

@@ -28,16 +28,20 @@ namespace mitk
   The custom tag parser can be used to parse the custom dicom tag of the siemens private tag
   (0x0029, 0x1020) to extract relevant CEST data.
 
+  An initial parsing determines whether the provided string belongs to CEST data at all.
+  If the "tSequenceFileName" is of the format "{WHATEVER}CEST_Rev####" it is assumed that the
+  data is indeed CEST data and was taken with revision #### (not limited to four digits).
+
   Which custom parameters to save and to which property name can be controlled by a json file.
   This file can be either provided as a resource for the MitkCEST module during compilation or
   placed next to the MitkCEST library in your binary folder.
 
-  The expected format for the file REVISIONNUMBER.json:
-  {
-  "REVISIONNUMBER" : "revision_json",
-  "sWiPMemBlock.alFree[1]" : "AdvancedMode",
-  "sWiPMemBlock.alFree[2]" : "RetreatMode"
-  }
+  The expected format for the file "REVISIONNUMBER.json": <br>
+  { <br>
+  "REVISIONNUMBER" : "revision_json", <br>
+  "sWiPMemBlock.alFree[1]" : "AdvancedMode", <br>
+  "sWiPMemBlock.alFree[2]" : "RetreatMode" <br>
+  } <br>
 
   where :
   <ul>

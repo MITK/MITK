@@ -9,4 +9,58 @@
 
 This view gives the option to explore and analyze CEST data. You can select a CEST data set together with either a segmentation or a point set in the datamanager. If a segmentation was selected (make sure the segmentation is the same in each time step, you can use the button at the top of the view to copy the first time step to all subsequent ones) a statistic for the selected region is shown. If a point set was selected each points grey value is plotted.
 
+\section org_mitk_gui_qt_cestDataLoading Data Loading
+
+CEST dicom data can be loaded either via file open or drag and drop. When a dicom file is loaded via MITK and it contains CEST meta information
+ the CEST Dicom Reader is offered as an option. Selecting it will parse the CEST data as follows:
+
+  An initial parsing determines whether the provided string belongs to CEST data at all.
+  If the "tSequenceFileName" is of the format "{WHATEVER}CEST_Rev####" it is assumed that the
+  data is indeed CEST data and was taken with revision #### (not limited to four digits).
+
+  Which custom parameters to save and to which property name can be controlled by a json file.
+  This file can be either provided as a resource for the MitkCEST module during compilation or
+  placed next to the MitkCEST library in your binary folder.
+
+  The expected format for the file "REVISIONNUMBER.json": <br>
+  { <br>
+  "REVISIONNUMBER" : "revision_json", <br>
+  "sWiPMemBlock.alFree[1]" : "AdvancedMode", <br>
+  "sWiPMemBlock.alFree[2]" : "RetreatMode" <br>
+  } <br>
+
+  where :
+  <ul>
+    <li> REVISIONNUMBER is the revision number of this json parameter mapping (files with non digit characters in their
+  name will be ignored)
+    <li> sWiPMemBlock.alFree[1] is the name of one parameter in the private dicom tag
+    <li> AdvancedMode is the name of the property the content of sWiPMemBlock.alFree[1] should be saved to
+  </ul>
+
+  If the sampling type is list it will try to access LIST.txt at the same location as the dicom files
+  read the offsets.
+
+\section org_mitk_gui_qt_cestCreatingSegmentation Creating a segmentation
+
+You can use the segmentation view to create a segmentation for the CEST data. Drawing a segmentation will by default only add it to
+the first timestep. For more information check the help of the segmentation view.
+
+You can copy the segmentation on the first timestep to all following ones by using the copy timestep button in this view.
+
+\section org_mitk_gui_qt_cestCreatingPointSet Creating a point set
+
+You can use the point set interaction view to create a point set for the CEST data.
+For more information check the help of the point set interaction view.
+
+\section org_mitk_gui_qt_cestNormalizing Normalizing the CEST data
+
+Select the CEST image in the datamanager and hit the normalize button to create a new, normalized image.
+
+\section org_mitk_gui_qt_cestInspectProperties Investigate CEST meta data
+
+You can inspect the CEST meta data with the properties view. You need to enable the developer mode in the "Window->Preferences" Properties menu.
+When selecting a data node in the data manager with the properties view active you can change the Property List from "Data node: common" to "Base data".
+
+The cest meta data is grouped under CEST.
+
 */

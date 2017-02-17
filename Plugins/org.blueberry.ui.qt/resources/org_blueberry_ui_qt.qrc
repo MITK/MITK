@@ -62,6 +62,11 @@
     <file>fonts/FiraSans/FiraSans.ttc</file>
     <file>fonts/LightFiraSans/LightFiraSans.ttc</file>
     <file>fonts/Roboto/Roboto.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Bold.ttf</file>
+    <file>fonts/OpenSans/OpenSans-BoldItalic.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Italic.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Light.ttf</file>
+    <file>fonts/OpenSans/OpenSans-Regular.ttf</file>
     <file>fonts/xkcd/xkcd.ttf</file>
   </qresource>
 </RCC>

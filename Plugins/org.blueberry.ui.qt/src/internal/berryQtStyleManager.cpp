@@ -89,10 +89,25 @@ void QtStyleManager::AddDefaultStyle()
 void QtStyleManager::AddDefaultFonts()
 {
   m_customFontNames.append(QString("<<system>>"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttc"), QString("Fira Sans"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttc"), QString("Light Fira Sans"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf"), QString("Roboto"));
-  AddFont(QString(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf"), QString("xkcd"));
+
+  m_customFontNames.append(QString("Fira Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/FiraSans/FiraSans.ttc");
+
+  m_customFontNames.append(QString("Light Fira Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/LightFiraSans/LightFiraSans.ttc");
+
+  m_customFontNames.append(QString("Roboto"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/Roboto/Roboto.ttf");
+
+  m_customFontNames.push_back(QString("Open Sans"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Bold.ttf");
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-BoldItalic.ttf");
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Italic.ttf");
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Light.ttf");
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/OpenSans/OpenSans-Regular.ttf");
+
+  m_customFontNames.push_back(QString("xkcd"));
+  QFontDatabase::addApplicationFont(":/org.blueberry.ui.qt/fonts/xkcd/xkcd.ttf");
 }
 
 void QtStyleManager::ClearStyles()
@@ -147,13 +162,6 @@ void QtStyleManager::AddStyle(const QString& styleFileName,
   newStyle->fileName = styleFileName;
 
   styles.insert(newStyle->fileName, newStyle);
-}
-
-void QtStyleManager::AddFont(const QString& fontFilePath,
-    const QString& fontName)
-{
-  QFontDatabase::addApplicationFont(fontFilePath);
-  m_customFontNames.push_back(fontName);
 }
 
 void QtStyleManager::GetFonts(QStringList& fontNames) const
@@ -344,7 +352,17 @@ void QtStyleManager::SetFont(const QString& fontName)
   }
   else
   {
-    QFont font(fontName);
+    QFont font;
+    font.setFamily(fontName);
+    font.setPointSize(11);
+    std::cout << "[FONT DEBUG] bold?: " << font.bold() << std::endl;
+
+    QStringList foo = QFontDatabase::applicationFontFamilies(1);
+    for(size_t i = 0; i < foo.size(); ++i)
+    {
+      std::cout << "[FONT DEBUG]applicationFontFamilies?: "  << foo[i] << std::endl;
+    }
+
     qApp->setFont(font);
   }
   currentFont = fontName;

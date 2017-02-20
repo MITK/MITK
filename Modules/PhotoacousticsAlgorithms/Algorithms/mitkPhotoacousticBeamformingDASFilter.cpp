@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticBeamformingDASFilter.h"
 #include "mitkProperties.h"
 #include "mitkImageReadAccessor.h"
-
+#include <algorithm>
 #include <itkImageIOBase.h>
 
 
@@ -80,16 +80,23 @@ void mitk::BeamformingDASFilter::GenerateOutputInformation()
   m_TimeOfHeaderInitialization.Modified();
 }
 
-
 void mitk::BeamformingDASFilter::GenerateData()
 {
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
+  float inputH = input->GetDimension(1);
+  float inputW = input->GetDimension(0);
+
+  float outputH = output->GetDimension(1);
+  float outputW = output->GetDimension(0);
+
   if (!output->IsInitialized())
   {
     return;
   }
+
+  float part = 0.07 * inputW;
 
   for (int i = 0; i < input->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
   {
@@ -97,11 +104,36 @@ void mitk::BeamformingDASFilter::GenerateData()
     m_InputData = (double*)inputReadAccessor.GetData();
     m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
 
-    for (int a = 0; a < m_Conf.ReconstructionLines; ++a)
+    for (int l = 0; l < outputW; ++l)
     {
-      for (int b = 0; b < m_Conf.SamplesPerLine; ++b)
+      for (int s = 0; s < outputH; ++s)
       {
-        m_OutputData[a*m_Conf.SamplesPerLine + b] = 1;
+        m_OutputData[l*(unsigned short)outputH + s] = 0;
+      }
+    }
+
+    int AddSample = 0;
+    unsigned short maxLine = 0;
+    unsigned short minLine = 0;
+    float delayMultiplicator = 0;
+
+    for (unsigned short line = 0; line < outputW; ++line)
+    {
+      float l_i = line / outputW * inputW;
+      for (unsigned short sample = 0; sample < outputH; ++sample)
+      {
+        float s_i = sample / outputH * inputH;
+        delayMultiplicator = ((inputW / 2 - l_i) / s_i);
+
+        maxLine = (unsigned short)std::min((l_i + part)+1, inputW);
+        minLine = (unsigned short)std::max((l_i - part), 0.0f);
+
+        for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
+        {
+          AddSample = delayMultiplicator * l_s + s_i;
+          if(AddSample < inputH && AddSample >=0)
+            m_OutputData[sample*(unsigned short)outputW + line] += m_InputData[l_s+AddSample*(int)inputH];
+        }
       }
     }
 

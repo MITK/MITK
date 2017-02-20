@@ -160,9 +160,12 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     std::vector<std::string> parts;
     boost::split(parts, parameter, boost::is_any_of("="));
 
-    parts[0].erase(std::remove(parts[0].begin(), parts[0].end(), ' '), parts[0].end());
-    parts[1].erase(parts[1].begin(), parts[1].begin() + 1); // first character is a space
-    privateParameters[parts[0]] = parts[1];
+    if (parts.size() == 2)
+    {
+      parts[0].erase(std::remove(parts[0].begin(), parts[0].end(), ' '), parts[0].end());
+      parts[1].erase(parts[1].begin(), parts[1].begin() + 1); // first character is a space
+      privateParameters[parts[0]] = parts[1];
+    }
   }
 
   // determine what revision we are using to handle parameters appropriately

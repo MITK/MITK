@@ -29,12 +29,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkEnums.h"
 
 #include <QList>
+#include <map>
 #include <string>
 #include <vector>
 
 /// \ingroup QmitkModule
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTreeModel : public QAbstractItemModel
 {
+  Q_OBJECT
+
   //# CONSTANTS,TYPEDEFS
 public:
   static const std::string COLUMN_NAME;
@@ -131,6 +134,16 @@ public:
 
   /// Set whether to allow hierarchy changes by dragging and dropping
   void SetAllowHierarchyChange(bool allowHierarchyChange);
+
+signals:
+
+  /// \brief Sent when the 'selected' property of a data node changes.
+  void SelectedPropertyChanged(const mitk::DataNode* node);
+
+public:
+
+  /// \brief Sends signal when the 'selected' property of a data node changes.
+  void OnSelectedPropertyChanged(const mitk::DataNode* node);
 
   //# MISC
 protected:
@@ -264,6 +277,16 @@ private:
   /// Checks if dicom properties patient name, study names and series name exists
   ///
   bool DicomPropertiesExists(const mitk::DataNode &) const;
+
+  /// \brief Registers observers to the given node to get notified about selection changes.
+  void RegisterObservers(const mitk::DataNode* node);
+
+  /// \brief Unregisters observers from the given node.
+  void UnregisterObservers(const mitk::DataNode* node);
+
+  // \brief Stores the observer IDs of the global 'selected' property.
+  std::map<const mitk::DataNode*, unsigned long> m_SelectedPropertyObserverTags;
+
 };
 
 #endif /* QMITKDATASTORAGETREEMODEL_H_ */

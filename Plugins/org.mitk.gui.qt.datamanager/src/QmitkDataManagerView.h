@@ -173,6 +173,9 @@ public slots:
   /// Opens the editor with the given id using the current data storage
   void ShowIn(const QString& editorId);
 
+  /// \brief Selects or unselects the corresponding tree item when the 'selected' property of a data node changes.
+  void OnSelectedPropertyChanged(const mitk::DataNode* node);
+
 protected:
 
   ///
@@ -261,6 +264,9 @@ private:
 
   /// Reopen multi widget editor if it has been closed
   mitk::IRenderWindowPart *OpenRenderWindowPart(bool activatedEditor = true);
+
+  bool m_BlockSelectedPropertyEvents;
+
 };
 
 #endif /*QMITKDATAMANAGERVIEW_H_*/

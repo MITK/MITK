@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Algorithms/itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
+#include "Algorithms/mitkPhotoacousticBeamformingDASFilter.h"
+#include "Algorithms/mitkPhotoacousticBeamformingDMASFilter.h"
 
 // itk dependencies
 #include "itkImage.h"
@@ -150,4 +152,26 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
 
   resampleImageFilter->UpdateLargestPossibleRegion();
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
+}
+
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config)
+{
+  BeamformingDASFilter::Pointer Beamformer = BeamformingDASFilter::New();
+
+  Beamformer->SetInput(inputImage);
+  Beamformer->Configure(config);
+
+  Beamformer->UpdateLargestPossibleRegion();
+  return Beamformer->GetOutput();
+}
+
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config)
+{
+  BeamformingDMASFilter::Pointer Beamformer = BeamformingDMASFilter::New();
+
+  Beamformer->SetInput(inputImage);
+  Beamformer->Configure(config);
+
+  Beamformer->UpdateLargestPossibleRegion();
+  return Beamformer->GetOutput();
 }

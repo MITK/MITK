@@ -24,6 +24,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_PAImageProcessingControls.h"
 
+#include "Algorithms\mitkPhotoacousticBeamformingDASFilter.h"
+#include "Algorithms\mitkPhotoacousticBeamformingDMASFilter.h"
+
 class PAImageProcessing : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -44,6 +47,8 @@ class PAImageProcessing : public QmitkAbstractView
     void UseLogfilter();
     void SetResampling();
 
+    void ApplyBeamforming();
+
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
 
@@ -58,6 +63,14 @@ class PAImageProcessing : public QmitkAbstractView
     float m_ResampleSpacing;
     bool m_UseLogfilter;
 
+    mitk::BeamformingDMASFilter::beamformingSettings DMASconfig;
+    mitk::BeamformingDASFilter::beamformingSettings DASconfig;
+
+    enum BeamformingAlgorithms {DAS, DMAS};
+
+    BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
+
+    void UpdateBFSettings();
 };
 
 #endif // PAImageProcessing_h

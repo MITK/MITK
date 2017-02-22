@@ -157,9 +157,6 @@ void mitk::BeamformingDMASFilter::GenerateData()
         maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
         minLine = (unsigned short)std::max((l_i - part), 0.0f);
 
-        maxLine = inputL;
-        minLine = 0;
-
         l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
 
         for (unsigned short sample = 0; sample < outputS; ++sample)

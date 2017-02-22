@@ -321,6 +321,8 @@ void QmitkSlicesInterpolator::Uninitialize()
   m_ToolManager = NULL;
 
   m_Initialized = false;
+
+  m_LastSNC = nullptr;
 }
 
 QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
@@ -1231,8 +1233,10 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
         // In case the time is not valid use 0 to access the time geometry of the working node
         unsigned int time_position = 0;
-        if( m_LastSNC->GetTime() != NULL )
-          time_position = m_LastSNC->GetTime()->GetPos();
+        if (m_LastSNC->GetTime() != NULL)
+        {
+          time_position = m_TimeStep[m_LastSNC];
+        }
 
         mitk::Vector3D spacing = workingNode->GetData()->GetGeometry( time_position )->GetSpacing();
         double minSpacing (100);

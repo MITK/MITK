@@ -41,6 +41,8 @@ namespace mitk {
       unsigned int ReconstructionLines = 128;
       double RecordTime = 0.00006; // [s]
       unsigned int TransducerElements = 128;
+      enum DelayCalc {Linear, QuadApprox, Spherical};
+      DelayCalc DelayCalculationMethod = QuadApprox;
     };
 
     void Configure(beamformingSettings settings);
@@ -63,6 +65,7 @@ namespace mitk {
 
     double* m_OutputData;
     double* m_InputData;
+    double* m_InputDataPuffer;
 
     beamformingSettings m_Conf;
   };

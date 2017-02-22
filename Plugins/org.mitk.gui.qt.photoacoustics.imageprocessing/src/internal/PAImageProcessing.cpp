@@ -211,17 +211,33 @@ void PAImageProcessing::UpdateBFSettings()
   else if ("Delay, Multiply and Sum" == m_Controls.BFAlgorithm->currentText())
     m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DMAS;
 
-  DASconfig.Pitch = m_Controls.Pitch->value(); // [m]
+  if ("Linear Waves" == m_Controls.DelayCalculation->currentText())
+  {
+    DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear;
+    DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Linear;
+  }
+  else if ("Quadratic Approximation to Spherical Waves" == m_Controls.DelayCalculation->currentText())
+  {
+    DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox;
+    DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::QuadApprox;
+  }
+  else if ("Spherical Waves" == m_Controls.DelayCalculation->currentText())
+  {
+    DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical;
+    DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Spherical;
+  }
+
+  DASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
   DASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
   DASconfig.SamplesPerLine = m_Controls.Samples->value();
   DASconfig.ReconstructionLines = m_Controls.Lines->value();
-  DASconfig.RecordTime = m_Controls.ScanDepth->value() / DASconfig.SpeedOfSound * 2; // [s]
+  DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound * 2; // [s]
   DASconfig.TransducerElements = m_Controls.ElementCount->value();
 
-  DMASconfig.Pitch = m_Controls.Pitch->value(); // [m]
+  DMASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
   DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
   DMASconfig.SamplesPerLine = m_Controls.Samples->value();
   DMASconfig.ReconstructionLines = m_Controls.Lines->value();
-  DMASconfig.RecordTime = m_Controls.ScanDepth->value() / DMASconfig.SpeedOfSound * 2; // [s]
+  DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound * 2; // [s]
   DMASconfig.TransducerElements = m_Controls.ElementCount->value();
 }

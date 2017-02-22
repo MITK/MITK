@@ -222,7 +222,6 @@ void mitk::BeamformingDASFilter::GenerateData()
             );
             if (AddSample < inputS && AddSample >= 0) {
               m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL];
-              //MITK_INFO<< m_InputData[l_s + AddSample*(int)inputL];
             }
           }
         }

@@ -65,6 +65,7 @@ namespace mitk {
 
     double* m_OutputData;
     double* m_InputData;
+    double* m_InputDataPuffer;
 
     beamformingSettings m_Conf;
   };

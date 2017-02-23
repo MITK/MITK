@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkDeformableRegistrationView.h"
 #include "ui_QmitkDeformableRegistrationViewControls.h"
 
-#include "QmitkStdMultiWidget.h"
 #include "qinputdialog.h"
 #include "qmessagebox.h"
 #include "qcursor.h"
@@ -27,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkTransform.h>
 
+#include <mitkILinkedRenderWindowPart.h>
+#include <mitkLevelWindowProperty.h>
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAnd.h"
@@ -161,7 +162,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
 };
 
 QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false),
+: QmitkAbstractView() , m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false),
   m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false)
 {
   this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkDeformableRegistrationView,
@@ -179,6 +180,7 @@ QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
 
 void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
 {
+  m_Parent = parent;
   m_Controls.setupUi(parent);
   m_Parent->setEnabled(false);
   this->CreateConnections();
@@ -210,6 +212,11 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.comboBox->SetPredicate(isMitkImage);
   m_Controls.comboBox_2->SetDataStorage(this->GetDataStorage());
   m_Controls.comboBox_2->SetPredicate(isMitkImage);
+}
+
+void QmitkDeformableRegistrationView::SetFocus()
+{
+  m_Controls.m_SwitchImages->setFocus();
 }
 
 void QmitkDeformableRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
@@ -273,21 +280,22 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
   newNode->SetProperty( "name", mitk::StringProperty::New("warped image") );
 
   // add the new datatree node to the datatree
-  this->GetDefaultDataStorage()->Add(newNode);
+  this->GetDataStorage()->Add(newNode);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkDeformableRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkDeformableRegistrationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   m_Parent->setEnabled(true);
-  m_MultiWidget = &stdMultiWidget;
-  m_MultiWidget->SetWidgetPlanesVisibility(true);
+  if (auto linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(renderWindowPart))
+  {
+    linkedRenderWindowPart->EnableSlicingPlanes(true);
+  }
 }
 
-void QmitkDeformableRegistrationView::StdMultiWidgetNotAvailable()
+void QmitkDeformableRegistrationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   m_Parent->setEnabled(false);
-  m_MultiWidget = NULL;
 }
 
 void QmitkDeformableRegistrationView::CreateConnections()
@@ -305,7 +313,6 @@ void QmitkDeformableRegistrationView::Activated()
 {
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Activated();
   if (m_SelListener.isNull())
   {
     m_SelListener.reset(new SelListenerDeformableRegistration(this));
@@ -324,7 +331,6 @@ void QmitkDeformableRegistrationView::Visible()
   /*
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
     m_SelListener = berry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
@@ -372,7 +378,6 @@ void QmitkDeformableRegistrationView::Hidden()
     s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;*/
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  //QmitkFunctionality::Deactivated();
 }
 
 void QmitkDeformableRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)

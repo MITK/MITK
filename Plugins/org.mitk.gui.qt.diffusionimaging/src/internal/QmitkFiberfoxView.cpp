@@ -433,7 +433,7 @@ void QmitkFiberfoxView::OnFibSelected(int value)
 }
 
 template< class ScalarType >
-FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool all)
+FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool all, bool save)
 {
   FiberfoxParameters< ScalarType > parameters;
   parameters.m_Misc.m_OutputPath = "";
@@ -546,7 +546,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
 
   // signal relaxation
   parameters.m_SignalGen.m_DoSimulateRelaxation = false;
-  if (m_Controls->m_RelaxationBox->isChecked() && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() )
+  if (m_Controls->m_RelaxationBox->isChecked() && (m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() || save) )
   {
     parameters.m_SignalGen.m_DoSimulateRelaxation = true;
     parameters.m_Misc.m_ResultNode->AddProperty("Fiberfox.Relaxation", BoolProperty::New(true));
@@ -650,8 +650,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
   parameters.m_SignalGen.m_MotionVolumes.clear();
   parameters.m_Misc.m_MotionVolumesBox = m_Controls->m_MotionVolumesBox->text().toStdString();
 
-  if ( m_Controls->m_AddMotion->isChecked()
-       && m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() )
+  if ( m_Controls->m_AddMotion->isChecked() && (m_Controls->m_FiberBundleComboBox->GetSelectedNode().IsNotNull() || save) )
   {
     parameters.m_SignalGen.m_DoAddMotion = true;
     parameters.m_Misc.m_ArtifactModelString += "_MOTION";
@@ -1170,7 +1169,7 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
 
 void QmitkFiberfoxView::SaveParameters(QString filename)
 {
-  FiberfoxParameters<> ffParamaters = UpdateImageParameters<double>();
+  FiberfoxParameters<> ffParamaters = UpdateImageParameters<double>(true, true);
   bool ok = true;
   bool first = true;
   bool dosampling = false;

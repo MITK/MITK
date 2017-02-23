@@ -18,9 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkScreenshotMaker.h"
 //#include "QmitkMovieMakerControls.h"
 #include "QmitkStepperAdapter.h"
-#include "QmitkStdMultiWidget.h"
 
 #include "mitkVtkPropRenderer.h"
+#include <QmitkRenderWindow.h>
+
 #include <iostream>
 
 #include <vtkRenderer.h>
@@ -57,15 +58,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPlanarFigure.h"
 
 QmitkScreenshotMaker::QmitkScreenshotMaker(QObject *parent, const char * /*name*/)
-
-    :
-      QmitkFunctionality(), m_Controls(nullptr),
-      m_SelectedNode(0),
-      m_BackgroundColor(QColor(0,0,0))
+  : QmitkAbstractView(),
+    m_Controls(nullptr),
+    m_SelectedNode(0),
+    m_BackgroundColor(QColor(0,0,0))
 {
-
-    parentWidget = parent;
-
+  parentWidget = parent;
 }
 
 QmitkScreenshotMaker::~QmitkScreenshotMaker()
@@ -90,16 +88,6 @@ void QmitkScreenshotMaker::CreateConnections()
     }
 }
 
-void QmitkScreenshotMaker::Activated()
-{
-    QmitkFunctionality::Activated();
-}
-
-void QmitkScreenshotMaker::Deactivated()
-{
-    QmitkFunctionality::Deactivated();
-}
-
 void QmitkScreenshotMaker::GenerateScreenshot()
 {
     if (m_LastFile.size()==0)
@@ -111,19 +99,16 @@ void QmitkScreenshotMaker::GenerateScreenshot()
     if (fileName.size()>0)
         m_LastFile = fileName;
 
-    vtkRenderWindow* renderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
-    mitk::BaseRenderer* baserenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    mitk::BaseRenderer* renderer = renderWindowPart->GetActiveQmitkRenderWindow()->GetRenderer();
 
-    if (baserenderer == nullptr)
+    if (renderer == nullptr)
     {
-       mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(m_MultiWidget->mitkWidget1->GetRenderWindow());
-       vtkRenderWindow* renderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
-       baserenderer = mitk::BaseRenderer::GetInstance(renderWindow);
-
-       if( baserenderer == nullptr )
+       renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer();
+       if (renderer == nullptr)
           return;
     }
-    this->TakeScreenshot(baserenderer->GetVtkRenderer(), 1, fileName, filter);
+    this->TakeScreenshot(renderer->GetVtkRenderer(), 1, fileName, filter);
 }
 
 void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
@@ -140,9 +125,8 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
     }
 
     //emit StartBlockControls();
-    m_MultiWidget->SetCornerAnnotationVisibility(false);
-
-    mitk::DataNode* n;
+    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    renderWindowPart->EnableDecorations(false, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
 
     QString fileName = "/axial.png";
     int c = 1;
@@ -153,7 +137,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
         fileName += ".png";
         c++;
     }
-    vtkRenderer* renderer = m_MultiWidget->mitkWidget1->GetRenderer()->GetVtkRenderer();
+    vtkRenderer* renderer = renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()->GetVtkRenderer();
     if (renderer != nullptr)
         this->TakeScreenshot(renderer, 1, filePath+fileName);
 
@@ -166,7 +150,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
         fileName += ".png";
         c++;
     }
-    renderer = m_MultiWidget->mitkWidget2->GetRenderer()->GetVtkRenderer();
+    renderer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetRenderer()->GetVtkRenderer();
     if (renderer != nullptr)
         this->TakeScreenshot(renderer, 1, filePath+fileName);
 
@@ -179,29 +163,36 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
         fileName += ".png";
         c++;
     }
-    renderer = m_MultiWidget->mitkWidget3->GetRenderer()->GetVtkRenderer();
+    renderer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetRenderer()->GetVtkRenderer();
     if (renderer != nullptr)
         this->TakeScreenshot(renderer, 1, filePath+fileName);
 
-    n = this->m_MultiWidget->GetWidgetPlane1();
-    if(n)
-    {
-        n->SetProperty( "color", mitk::ColorProperty::New( 1,0,0 ) );
-    }
+    /// TODO I do not find a simple way of doing this through the render window part API,
+    /// however, I am also not convinced that this code is needed at all. The colour
+    /// of the crosshair planes is never set to any colour other than these.
+    /// I suggest a new 'mitk::DataNode* mitk::ILinkedRendererPart::GetSlicingPlane(const std::string& name) const'
+    /// function to introduce that could return the individual ("axial", "sagittal" or
+    /// "coronal" crosshair planes.
 
-    n = this->m_MultiWidget->GetWidgetPlane2();
-    if(n)
-    {
-        n->SetProperty( "color", mitk::ColorProperty::New( 0,1,0 ) );
-    }
+//    mitk::DataNode* n = renderWindowPart->GetSlicingPlane("axial");
+//    if (n)
+//    {
+//        n->SetProperty( "color", mitk::ColorProperty::New( 1,0,0 ) );
+//    }
+//
+//    n = renderWindowPart->GetSlicingPlane("sagittal");
+//    if (n)
+//    {
+//        n->SetProperty( "color", mitk::ColorProperty::New( 0,1,0 ) );
+//    }
+//
+//    n = renderWindowPart->GetSlicingPlane("coronal");
+//    if (n)
+//    {
+//        n->SetProperty( "color", mitk::ColorProperty::New( 0,0,1 ) );
+//    }
 
-    n = this->m_MultiWidget->GetWidgetPlane3();
-    if(n)
-    {
-        n->SetProperty( "color", mitk::ColorProperty::New( 0,0,1 ) );
-    }
-
-    m_MultiWidget->SetCornerAnnotationVisibility(true);
+    renderWindowPart->EnableDecorations(true, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
 }
 
 void QmitkScreenshotMaker::Generate3DHighresScreenshot()
@@ -278,17 +269,17 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
 void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QString filter)
 {
     // only works correctly for 3D RenderWindow
-    m_MultiWidget->SetCornerAnnotationVisibility(false);
-    vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
+    this->GetRenderWindowPart()->EnableDecorations(false, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
+    vtkRenderer* renderer = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
     if (renderer == nullptr)
         return;
     this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
-    m_MultiWidget->SetCornerAnnotationVisibility(true);
+    this->GetRenderWindowPart()->EnableDecorations(true, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
 }
 
 vtkCamera* QmitkScreenshotMaker::GetCam()
 {
-    mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(GetActiveStdMultiWidget()->mitkWidget4->GetRenderWindow());
+    mitk::BaseRenderer* renderer = this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
     vtkCamera* cam = 0;
     const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
     if (propRenderer)
@@ -328,7 +319,7 @@ void QmitkScreenshotMaker::View3()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkScreenshotMaker::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkScreenshotMaker::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     if(nodes.size())
         m_SelectedNode = nodes[0];
@@ -338,6 +329,7 @@ void QmitkScreenshotMaker::CreateQtPartControl(QWidget *parent)
 {
     if (!m_Controls)
     {
+        m_Parent = parent;
         m_Controls = new Ui::QmitkScreenshotMakerControls;
         m_Controls->setupUi(parent);
 
@@ -351,15 +343,18 @@ void QmitkScreenshotMaker::CreateQtPartControl(QWidget *parent)
 
 }
 
-void QmitkScreenshotMaker::StdMultiWidgetAvailable(QmitkStdMultiWidget&  stdMultiWidget)
+void QmitkScreenshotMaker::SetFocus()
 {
-    m_MultiWidget = &stdMultiWidget;
+  m_Controls->btnScreenshot->setFocus();
+}
+
+void QmitkScreenshotMaker::RenderWindowPartActivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
     m_Parent->setEnabled(true);
 }
 
-void QmitkScreenshotMaker::StdMultiWidgetNotAvailable()
+void QmitkScreenshotMaker::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
-    m_MultiWidget = nullptr;
     m_Parent->setEnabled(false);
 }
 
@@ -419,28 +414,15 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
     double bgcolor[] = {m_BackgroundColor.red()/255.0, m_BackgroundColor.green()/255.0, m_BackgroundColor.blue()/255.0};
     renderer->SetBackground(bgcolor);
 
-    m_MultiWidget->DisableColoredRectangles();
-    m_MultiWidget->DisableDepartmentLogo();
-    m_MultiWidget->DisableGradientBackground();
-    m_MultiWidget->SetCornerAnnotationVisibility(false);
+    mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
-    m_MultiWidget->mitkWidget1->ActivateMenuWidget( false );
-    m_MultiWidget->mitkWidget2->ActivateMenuWidget( false );
-    m_MultiWidget->mitkWidget3->ActivateMenuWidget( false );
-    m_MultiWidget->mitkWidget4->ActivateMenuWidget( false );
+    renderWindowPart->EnableDecorations(false);
 
     fileWriter->Write();
     fileWriter->Delete();
 
-    m_MultiWidget->mitkWidget1->ActivateMenuWidget( true, m_MultiWidget );
-    m_MultiWidget->mitkWidget2->ActivateMenuWidget( true, m_MultiWidget );
-    m_MultiWidget->mitkWidget3->ActivateMenuWidget( true, m_MultiWidget );
-    m_MultiWidget->mitkWidget4->ActivateMenuWidget( true, m_MultiWidget );
+    renderWindowPart->EnableDecorations(true);
 
-    m_MultiWidget->EnableColoredRectangles();
-    m_MultiWidget->EnableDepartmentLogo();
-    m_MultiWidget->EnableGradientBackground();
-    m_MultiWidget->SetCornerAnnotationVisibility(true);
     renderer->SetBackground(oldBackground);
 
     renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);

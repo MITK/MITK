@@ -250,7 +250,7 @@ mitkFunctionAddExternalProject(NAME CppUnit     ON  ADVANCED DOC "Use CppUnit fo
 mitkFunctionAddExternalProject(NAME PCRE        OFF ADVANCED NO_PACKAGE)
 mitkFunctionAddExternalProject(NAME ZLIB        OFF ADVANCED NO_PACKAGE NO_CACHE)
 
-mitkFunctionAddExternalProject(NAME HDF5        OFF ADVANCED)
+mitkFunctionAddExternalProject(NAME HDF5        ON ADVANCED)
 
 # -----------------------------------------
 # The following external projects must be

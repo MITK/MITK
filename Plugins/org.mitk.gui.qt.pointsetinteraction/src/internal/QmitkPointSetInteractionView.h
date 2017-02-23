@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkPointSetInteraction_H__INCLUDED
 
 #include <berryISelectionListener.h>
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
+#include <mitkIRenderWindowPartListener.h>
 #include <mitkWeakPointer.h>
 #include <mitkDataNode.h>
 
@@ -30,7 +32,7 @@ class QmitkPointSetInteractionControls;
 /*!
 \brief QmitkPointSetInteractionView
 */
-class QmitkPointSetInteractionView : public QmitkFunctionality
+class QmitkPointSetInteractionView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -40,13 +42,20 @@ public:
 
 
   virtual void CreateQtPartControl(QWidget *parent) override;
-  void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
+
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   void Activated() override;
   void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
   void NodeChanged(const mitk::DataNode* node) override;
-  bool IsExclusiveFunctionality() const override;
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
-  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget) override;
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 protected slots:
   void OnAddPointSetClicked();
 protected:

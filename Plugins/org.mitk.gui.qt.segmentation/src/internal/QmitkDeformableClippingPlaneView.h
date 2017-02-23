@@ -20,7 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_QmitkDeformableClippingPlaneViewControls.h"
 #include "mitkImage.h"
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 
 typedef itk::RGBPixel< float > Color;
 
@@ -30,10 +31,8 @@ typedef itk::RGBPixel< float > Color;
 * \brief QmitkDeformableClippingPlaneView
 *
 * Document your class here.
-*
-* \sa QmitkFunctionality
 */
-class QmitkDeformableClippingPlaneView : public QmitkFunctionality
+class QmitkDeformableClippingPlaneView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -51,14 +50,22 @@ public:
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
+
+  /// \brief Called when the view gets activated
   virtual void Activated() override;
 
-  /// \brief Called when the functionality is deactivated
+  /// \brief Called when the view gets deactivated
   virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  /// \brief Called when the view becomes visible
+  virtual void Visible() override;
+
+  /// \brief Called when the view becomes hidden
+  virtual void Hidden() override;
 
 protected slots:
 
@@ -77,13 +84,12 @@ protected:
   \brief Invoked when the DataManager selection changed
   */
   virtual void OnSelectionChanged(mitk::DataNode* node);
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
   virtual void NodeRemoved(const mitk::DataNode* node) override;
   virtual void NodeChanged(const mitk::DataNode* node) override;
 
   void UpdateView();
 
-  QmitkStdMultiWidget* m_MultiWidget;
   Ui::QmitkDeformableClippingPlaneViewControls m_Controls;
 
 private:

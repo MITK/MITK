@@ -9,7 +9,7 @@ if(MITK_USE_SOFA)
   endif()
 
   set(proj SOFA)
-  set(proj_DEPENDENCIES Boost GLEW)
+  set(proj_DEPENDENCIES Boost Eigen GLEW)
   set(SOFA_DEPENDS ${proj})
 
   set(preconfigure_cmake_args
@@ -20,6 +20,7 @@ if(MITK_USE_SOFA)
     -DSOFA-EXTERNAL_BOOST:BOOL=ON
     -DSOFA-EXTERNAL_BOOST_PATH:PATH=${BOOST_LIBRARYDIR}
     -DSOFA-EXTERNAL_CSPARSE:BOOL=ON
+    -DSOFA-EXTERNAL_EIGEN_PATH:PATH=${ep_prefix}/include/eigen3
     -DSOFA-EXTERNAL_GLEW:BOOL=ON
     -DSOFA-EXTERNAL_PNG:BOOL=OFF
     -DSOFA-EXTERNAL_ZLIB:BOOL=OFF

@@ -12,6 +12,10 @@ string(REPLACE "add_subdirectory(\"\${SOFA_A" "#add_subdirectory(\"\${SOFA_A" CO
 # the same name lead to linker or runtime errors in the past
 
 string(REPLACE "\"tinyxml\"" "\"SofaTinyXml\"" CONTENTS ${CONTENTS})
+
+# Use MITK's version of Eigen
+string(REPLACE "RegisterProjects(\"eigen\" PATH \"\${SOFA-EXTERNAL_EIGEN_PATH}\" COMPILE_DEFINITIONS SOFA_HAVE_EIGEN2)" "add_library(eigen INTERFACE IMPORTED GLOBAL)\nset_property(TARGET eigen APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES \${SOFA-EXTERNAL_EIGEN_PATH})\nset(GLOBAL_PROJECT_DEPENDENCIES_COMPLETE_eigen 1 CACHE INTERNAL \"\" FORCE)\nlist(APPEND GLOBAL_INCLUDE_DIRECTORIES \"\${SOFA-EXTERNAL_EIGEN_PATH}\")" CONTENTS ${CONTENTS})
+
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 # Adjust tinyxml references (see above)
@@ -121,6 +125,37 @@ CONTENTS ${CONTENTS})
 
 string(REPLACE "\nendif()" "\nendif()\n\nconfigure_file(SOFAConfig.cmake.in SOFAConfig.cmake @ONLY)" CONTENTS ${CONTENTS})
 
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Do not define snprintf starting with Visual Studio 2015.
+
+set(path "framework/sofa/helper/system/config.h")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "#define snprintf _snprintf" "#if (_MSC_VER < 1900)\n#define snprintf _snprintf\n#endif" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "extlibs/miniFlowVR/src/ftlm/type.cpp")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "#define snprintf _snprintf" "#if (_MSC_VER < 1900)\n#define snprintf _snprintf\n#endif" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Include Eigen/Core in RigidMapping.inl.
+
+set(path "modules/sofa/component/mapping/RigidMapping.inl")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "#include <cassert>" "#include <cassert>\n#include <Eigen/Core>" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+# Use unordered_map instead of hash_map.
+
+set(path "modules/sofa/component/container/SpatialGridContainer.h")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "hash_map" "unordered_map" CONTENTS ${CONTENTS})
+configure_file(${TEMPLATE_FILE} ${path} @ONLY)
+
+set(path "modules/sofa/component/container/SpatialGridContainer.h")
+file(STRINGS ${path} CONTENTS NEWLINE_CONSUME)
+string(REPLACE "stdext" "std" CONTENTS ${CONTENTS})
 configure_file(${TEMPLATE_FILE} ${path} @ONLY)
 
 # Create SOFAConfig.cmake.in file to make SOFA findable through the config mode

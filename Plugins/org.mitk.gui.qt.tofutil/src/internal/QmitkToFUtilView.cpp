@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkToFUtilView.h"
-#include <QmitkStdMultiWidget.h>
 
 // Qt
 #include <QMessageBox>
@@ -55,7 +54,7 @@ const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 //Constructor
 QmitkToFUtilView::QmitkToFUtilView()
   : QmitkAbstractView()
-  , m_Controls(NULL), m_MultiWidget( NULL )
+  , m_Controls(NULL),
   , m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
   , m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_RGBImageNode(NULL), m_SurfaceNode(NULL)
   , m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)
@@ -113,12 +112,12 @@ void QmitkToFUtilView::SetFocus()
 void QmitkToFUtilView::Activated()
 {
   //get the current RenderWindowPart or open a new one if there is none
-  if(this->GetRenderWindowPart(OPEN))
+  if (this->GetRenderWindowPart(OPEN))
   {
     mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
-    if(linkedRenderWindowPart == 0)
+    if (linkedRenderWindowPart == 0)
     {
-      MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+      MITK_ERROR << "No linked render window part avaiable!!!";
     }
     else
     {
@@ -208,7 +207,7 @@ void QmitkToFUtilView::OnToFCameraConnected()
     // initialize measurement widget
     m_Controls->m_ToFMeasurementWidget->InitializeWidget(this->GetRenderWindowPart()->GetQmitkRenderWindows(),this->GetDataStorage(), this->m_ToFDistanceImageToSurfaceFilter->GetCameraIntrinsics());
   else
-    MITK_WARN << "No StdMultiWidget available!!! MeasurementWidget will not work.";
+    MITK_WARN << "No render window part available!!! MeasurementWidget will not work.";
 
   this->m_RealTimeClock = mitk::RealTimeClock::New();
   this->m_2DTimeBefore = this->m_RealTimeClock->GetCurrentStamp();
@@ -223,7 +222,7 @@ void QmitkToFUtilView::ResetGUIToDefault()
     mitk::ILinkedRenderWindowPart* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart());
     if(linkedRenderWindowPart == 0)
     {
-      MITK_ERROR << "No linked StdMultiWidget avaiable!!!";
+      MITK_ERROR << "No linked render window part avaiable!!!";
     }
     else
     {

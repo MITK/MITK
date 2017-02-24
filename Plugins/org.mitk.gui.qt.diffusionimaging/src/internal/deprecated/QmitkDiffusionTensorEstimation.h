@@ -17,10 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if !defined(QmitkDiffusionTensorEstimation_H__INCLUDED)
 #define QmitkDiffusionTensorEstimation_H__INCLUDED
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 #include "mitkDiffusionVolumes.h"
 
-class QmitkStdMultiWidget;
 class QmitkDiffusionTensorEstimationControls;
 
 typedef short DiffusionPixelType;
@@ -29,13 +29,10 @@ typedef short DiffusionPixelType;
 /*!
 \brief QmitkDiffusionTensorEstimation
 
-One needs to reimplement the methods CreateControlWidget(..), CreateMainWidget(..)
-and CreateAction(..) from QmitkFunctionality.
-
-\sa QmitkFunctionality
-\ingroup Functionalities
+One needs to reimplement the methods CreateControlWidget(..),
+and CreateAction(..).
 */
-class QmitkDiffusionTensorEstimation : public QmitkFunctionality
+class QmitkDiffusionTensorEstimation : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   Q_OBJECT
 
@@ -43,7 +40,7 @@ public:
   /*!
   \brief default constructor
   */
-  QmitkDiffusionTensorEstimation(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkDiffusionTensorEstimation(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
 
   /*!
   \brief default destructor
@@ -56,21 +53,24 @@ public:
   virtual QWidget * CreateControlWidget(QWidget *parent);
 
   /*!
-  \brief method for creating the applications main widget
-  */
-  virtual QWidget * CreateMainWidget(QWidget * parent);
-
-  /*!
   \brief method for creating the connections of main and control widget
   */
   virtual void CreateConnections();
+
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   /*!
   \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
   */
   virtual QAction * CreateAction(QActionGroup *parent);
 
-  virtual void Activated();
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
   protected slots:
     void TreeChanged();
@@ -130,11 +130,6 @@ public:
     void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
 protected:
-  /*!
-  * default main widget containing 4 windows showing 3
-  * orthogonal slices of the volume and a 3d render window
-  */
-  QmitkStdMultiWidget * m_MultiWidget;
 
   /*!
   * controls containing sliders for scrolling through the slices

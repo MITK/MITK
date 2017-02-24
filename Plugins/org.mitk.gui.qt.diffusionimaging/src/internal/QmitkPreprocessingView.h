@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKPREPROCESSINGVIEW_H_INCLUDED
 #define _QMITKPREPROCESSINGVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 
 #include "ui_QmitkPreprocessingViewControls.h"
 
@@ -42,9 +43,8 @@ struct PrpSelListener;
  *
  * \brief Viewing and modifying diffusion weighted images (gradient reduction, resampling, b-value projection, ...)
  *
- * \sa QmitkFunctionality
  */
-class QmitkPreprocessingView : public QmitkFunctionality
+class QmitkPreprocessingView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   friend struct PrpSelListener;
@@ -70,15 +70,18 @@ class QmitkPreprocessingView : public QmitkFunctionality
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
   virtual void Activated() override;
 
   virtual void Deactivated() override;
 
   virtual void Visible() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  virtual void Hidden() override;
+
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   static const int nrconvkernels;
 
@@ -144,12 +147,10 @@ protected:
 
   void UpdateBValueTableWidget(int);
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override; // why not?
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkPreprocessingViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
   void CallMultishellToSingleShellFilter( itk::DWIVoxelFunctor * functor,

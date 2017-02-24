@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include "ui_QmitkOdfMaximaExtractionViewControls.h"
 #include <itkVectorImage.h>
 #include <itkVectorContainer.h>
@@ -27,15 +27,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
 \brief View providing several methods to extract peaks from the spherical harmonic representation of ODFs or from tensors
-
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
 
 // Forward Qt class declarations
 
 
-class QmitkOdfMaximaExtractionView : public QmitkFunctionality
+class QmitkOdfMaximaExtractionView : public QmitkAbstractView
 {
 
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -51,8 +48,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   typedef itk::Image<unsigned char, 3>                                  ItkUcharImgType;
   typedef itk::Image< itk::DiffusionTensor3D< float >, 3 >              ItkTensorImage;
@@ -68,11 +67,10 @@ public:
 
 protected:
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkOdfMaximaExtractionViewControls* m_Controls;
-  QmitkStdMultiWidget* m_MultiWidget;
 
   std::vector< mitk::DataNode::Pointer > m_BinaryImageNodes;    ///< mask images
   std::vector< mitk::DataNode::Pointer > m_ImageNodes;

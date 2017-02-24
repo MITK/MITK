@@ -106,10 +106,10 @@ void QmitkRandomParcellationView::OnRadioButtonSmallestParcelChanged(int state)
   }
 }
 
-void QmitkRandomParcellationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes )
+void QmitkRandomParcellationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   // iterate all selected objects, adjust warning visibility
-  foreach( mitk::DataNode::Pointer node, nodes )
+  for (mitk::DataNode::Pointer node: nodes)
   {
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
@@ -146,7 +146,7 @@ void QmitkRandomParcellationView::ShowNumberOfVoxels( itk::Image<TPixel, VImageD
 
 void QmitkRandomParcellationView::SelectRandomNodes()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
   mitk::DataNode* node = nodes.front();
@@ -341,7 +341,7 @@ void QmitkRandomParcellationView::GetRandomParcels( itk::Image<TPixel, VImageDim
     mitk::StringProperty::New(m_NAMEFORRANDOMVOXELIMAGE));
   newRandomVoxelImageNode->SetProperty(PROPERTYOPACITY.c_str(),
     mitk::FloatProperty::New(1.0));
-  this->GetDefaultDataStorage()->Add( newRandomVoxelImageNode );
+  this->GetDataStorage()->Add( newRandomVoxelImageNode );
 
   return;
 }

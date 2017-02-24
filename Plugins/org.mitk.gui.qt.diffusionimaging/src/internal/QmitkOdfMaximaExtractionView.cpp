@@ -49,9 +49,8 @@ const std::string QmitkOdfMaximaExtractionView::VIEW_ID = "org.mitk.views.odfmax
 using namespace mitk;
 
 QmitkOdfMaximaExtractionView::QmitkOdfMaximaExtractionView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
 {
 
 }
@@ -78,6 +77,11 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_ImportPeaks, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaks()));
         connect((QObject*) m_Controls->m_ImportShCoeffs, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertShCoeffs()));
     }
+}
+
+void QmitkOdfMaximaExtractionView::SetFocus()
+{
+  m_Controls->m_GenerateImageButton->setFocus();
 }
 
 void QmitkOdfMaximaExtractionView::UpdateGui()
@@ -734,17 +738,7 @@ void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
     }
 }
 
-void QmitkOdfMaximaExtractionView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-    m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkOdfMaximaExtractionView::StdMultiWidgetNotAvailable()
-{
-    m_MultiWidget = NULL;
-}
-
-void QmitkOdfMaximaExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     m_Controls->m_InputData->setTitle("Please Select Input Data");
     m_Controls->m_DwiFibLabel->setText("<font color='red'>mandatory</font>");
@@ -755,10 +749,8 @@ void QmitkOdfMaximaExtractionView::OnSelectionChanged( std::vector<mitk::DataNod
     m_TensorImageNodes.clear();
 
     // iterate all selected objects, adjust warning visibility
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+    for (mitk::DataNode::Pointer node: nodes)
     {
-        mitk::DataNode::Pointer node = *it;
-
         if ( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
         {
             m_TensorImageNodes.push_back(node);

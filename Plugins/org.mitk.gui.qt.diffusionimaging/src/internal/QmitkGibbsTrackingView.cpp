@@ -20,12 +20,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkGibbsTrackingView.h"
-#include <QmitkStdMultiWidget.h>
 
 // Qt
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDir>
+#include <QTimer>
 
 // MITK
 #include <mitkImageCast.h>
@@ -80,9 +80,8 @@ void QmitkTrackingWorker::run()
 const std::string QmitkGibbsTrackingView::VIEW_ID = "org.mitk.views.gibbstracking";
 
 QmitkGibbsTrackingView::QmitkGibbsTrackingView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget(NULL)
     , m_FiberBundle(NULL)
     , m_MaskImage(NULL)
     , m_TensorImage(NULL)
@@ -218,6 +217,11 @@ void QmitkGibbsTrackingView::CreateQtPartControl( QWidget *parent )
     }
 }
 
+void QmitkGibbsTrackingView::SetFocus()
+{
+  m_Controls->m_TrackingStart->setFocus();
+}
+
 void QmitkGibbsTrackingView::SetInExBalance(int value)
 {
     m_Controls->m_InExBalanceLabel->setText(QString::number((float)value/10));
@@ -275,18 +279,8 @@ void QmitkGibbsTrackingView::SetCurvatureThreshold(int value)
     m_Controls->m_CurvatureThresholdLabel->setText(QString::number(value)+"°");
 }
 
-void QmitkGibbsTrackingView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
-{
-    m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkGibbsTrackingView::StdMultiWidgetNotAvailable()
-{
-    m_MultiWidget = NULL;
-}
-
 // called if datamanager selection changes
-void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkGibbsTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     if (m_ThreadIsRunning)
         return;
@@ -295,10 +289,8 @@ void QmitkGibbsTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> no
     m_MaskImageNode = NULL;
 
     // iterate all selected objects
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+    for (mitk::DataNode::Pointer node: nodes)
     {
-        mitk::DataNode::Pointer node = *it;
-
         if( node.IsNotNull() && dynamic_cast<mitk::QBallImage*>(node->GetData()) )
             m_ImageNode = node;
         else if( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
@@ -410,7 +402,7 @@ void QmitkGibbsTrackingView::AdvancedSettings()
 // set mask image data node
 void QmitkGibbsTrackingView::SetMask()
 {
-    std::vector<mitk::DataNode*> nodes = GetDataManagerSelection();
+    QList<mitk::DataNode::Pointer> nodes = GetDataManagerSelection();
     if (nodes.empty())
     {
         m_MaskImageNode = NULL;
@@ -418,12 +410,8 @@ void QmitkGibbsTrackingView::SetMask()
         return;
     }
 
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-         it != nodes.end();
-         ++it )
+    for (auto node: nodes)
     {
-        mitk::DataNode::Pointer node = *it;
-
         if (node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()))
         {
             m_MaskImageNode = node;
@@ -505,7 +493,7 @@ void QmitkGibbsTrackingView::GenerateFiberBundle()
     m_FiberBundle->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_ImageNode->GetData())->GetGeometry());
 
     if (m_FiberBundleNode.IsNotNull()){
-        GetDefaultDataStorage()->Remove(m_FiberBundleNode);
+        GetDataStorage()->Remove(m_FiberBundleNode);
         m_FiberBundleNode = 0;
     }
     m_FiberBundleNode = mitk::DataNode::New();

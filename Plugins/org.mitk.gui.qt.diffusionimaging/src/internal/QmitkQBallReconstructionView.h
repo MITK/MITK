@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKQBALLRECONSTRUCTIONVIEW_H_INCLUDED
 #define _QMITKQBALLRECONSTRUCTIONVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 
 #include <string>
 
@@ -43,10 +44,8 @@ struct QbrShellSelection;
  * \brief QmitkQBallReconstructionView
  *
  * Document your class here.
- *
- * \sa QmitkFunctionality
  */
-class QmitkQBallReconstructionView : public QmitkFunctionality
+class QmitkQBallReconstructionView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   friend struct QbrSelListener;
@@ -73,13 +72,22 @@ class QmitkQBallReconstructionView : public QmitkFunctionality
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
+
+  /// \brief Called when the view gets activated
   virtual void Activated() override;
 
+  /// \brief Called when the view gets deactivated
   virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  /// \brief Called when the view becomes visible
+  virtual void Visible() override;
+
+  /// \brief Called when the view becomes hidden
+  virtual void Hidden() override;
 
   static const int nrconvkernels;
 
@@ -103,12 +111,10 @@ protected slots:
 
 protected:
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkQBallReconstructionViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   template<int L>
   void TemplatedAnalyticalQBallReconstruction(mitk::DataNode* dataNodePointer, float lambda, int normalization);

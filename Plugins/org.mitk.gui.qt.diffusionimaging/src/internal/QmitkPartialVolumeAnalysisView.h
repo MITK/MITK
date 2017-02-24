@@ -17,7 +17,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if !defined(QmitkPartialVolumeAnalysisView_H__INCLUDED)
 #define QmitkPartialVolumeAnalysisView_H__INCLUDED
 
-//#include "QmitkFunctionality.h"
 #include "ui_QmitkPartialVolumeAnalysisViewControls.h"
 
 #include <QmitkAbstractView.h>
@@ -52,9 +51,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
 \brief QmitkPartialVolumeAnalysis
-
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
 class QmitkPartialVolumeAnalysisView : public QmitkAbstractView, public mitk::IZombieViewPart//, public itk::ProcessObject
 {
@@ -93,11 +89,9 @@ public:
   */
   virtual void CreateConnections();
 
-  bool IsExclusiveFunctionality() const;
-
   virtual bool event( QEvent *event ) override;
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   virtual void Activated() override;
 
@@ -165,8 +159,6 @@ protected slots:
 
 protected:
 
-  //void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
-
   /** \brief Issues a request to update statistics by sending an event to the
   * Qt event processing queue.
   *
@@ -196,8 +188,6 @@ protected:
 
   typedef std::map< mitk::Image *, mitk::PartialVolumeAnalysisHistogramCalculator::Pointer >
     PartialVolumeAnalysisMapType;
-
-//  void OnSelectionChanged(const QList<mitk::DataNode::Pointer> &nodes);
 
   /*!
   * controls containing sliders for scrolling through the slices

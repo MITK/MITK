@@ -142,6 +142,7 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     return false;
 
   Point3D cursorPosition = posEvent->GetPositionInWorld();
+  const auto spacing = ourViewportGeometry->GetSpacing();
   const PlaneGeometry *geometryToBeRotated = NULL; // this one is under the mouse cursor
   const PlaneGeometry *anyOtherGeometry = NULL;    // this is also visible (for calculation of intersection ONLY)
   Line3D intersectionLineWithGeometryToBeRotated;
@@ -173,7 +174,8 @@ bool mitk::DisplayInteractor::CheckRotationPossible(const mitk::InteractionEvent
     }
 
     // check distance from intersection line
-    double distanceFromIntersectionLine = intersectionLine.Distance(cursorPosition);
+    const double distanceFromIntersectionLine =
+      intersectionLine.Distance(cursorPosition) / spacing[snc->GetDefaultViewDirection()];
 
     // far away line, only remember for linked rotation if necessary
     if (distanceFromIntersectionLine > threshholdDistancePixels)

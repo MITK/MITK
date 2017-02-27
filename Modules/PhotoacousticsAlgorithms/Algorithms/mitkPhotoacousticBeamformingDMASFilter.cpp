@@ -13,7 +13,7 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
-
+#define _USE_MATH_DEFINES
 
 #include "mitkPhotoacousticBeamformingDMASFilter.h"
 #include "mitkProperties.h"
@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Algorithms\ITKUltrasound\itkFFT1DComplexConjugateToRealImageFilter.h"
 #include "Algorithms\ITKUltrasound\itkFFT1DRealToComplexConjugateImageFilter.h"
 #include "mitkImageCast.h"
+#include <cmath>
 
 // needed itk image filters
 #include "mitkITKImageImport.h"
@@ -283,7 +284,6 @@ void mitk::BeamformingDMASFilter::GenerateData()
   }
 
   mitk::Image::Pointer BP = BandpassFilter(output);
-
   for (int i = 0; i < output->GetDimension(2); ++i)
   {
     mitk::ImageReadAccessor copy(BP, BP->GetSliceData(i));
@@ -303,6 +303,7 @@ void mitk::BeamformingDMASFilter::Configure(beamformingSettings settings)
 
 mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Pointer data)
 {
+  return data;
   typedef double PixelType;
   typedef itk::Image< PixelType, 3 > RealImageType;
   RealImageType::Pointer image;
@@ -322,9 +323,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   {
     std::cerr << "Error: " << error << std::endl;
   }
-  /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
-  toReal->SetInput(forwardFFTFilter->GetOutput());
-  return GrabItkImageMemory(toReal->GetOutput());*/
+  
 
   // A Gaussian is used here to create a low-pass filter.
   typedef itk::GaussianImageSource< RealImageType > GaussianSourceType;
@@ -336,6 +335,12 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     transformedInput->GetLargestPossibleRegion());
   const ComplexImageType::SizeType inputSize
     = inputRegion.GetSize();
+
+  /*MITK_INFO << "size:" << inputSize[0] << "  " << inputSize[1] << "  " << inputSize[2];
+  itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
+  toReal->SetInput(forwardFFTFilter->GetOutput());
+  return GrabItkImageMemory(toReal->GetOutput());*/ //DEBUG
+
   const ComplexImageType::SpacingType inputSpacing =
     transformedInput->GetSpacing();
   const ComplexImageType::PointType inputOrigin =
@@ -374,6 +379,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
   multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
+  //multiplyFilter->SetInput2(BPFunction(mitk::GrabItkImageMemory(forwardFFTFilter->GetOutput()), 256, 1024));
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();
@@ -381,4 +387,54 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   inverseFFTFilter->SetDirection(1);
 
   return GrabItkImageMemory(inverseFFTFilter->GetOutput());
+}
+
+itk::Image<double,3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
+{
+  mitk::Image::Pointer BPweight = mitk::Image::New();
+  BPweight->Initialize(reference);
+
+  double alpha = 0.5;
+
+  double* imageData = new double[BPweight->GetDimension(0)*BPweight->GetDimension(1)];
+
+  for (int sample = 0; sample < BPweight->GetDimension(1); ++sample)
+  {
+    imageData[BPweight->GetDimension(0)*sample] = 0;
+  }
+
+  for (int n = 0; n < width; ++n)
+  {
+    if (n <= (alpha*(width - 1)) / 2)
+    {
+      imageData[BPweight->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+    }
+    else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
+    {
+      imageData[BPweight->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+    }
+    else
+    {
+      imageData[BPweight->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
+    }
+  }
+
+  for (int line = 1; line < BPweight->GetDimension(0); ++line)
+  {
+    for (int sample = 0; sample < BPweight->GetDimension(1); ++sample)
+    {
+      imageData[BPweight->GetDimension(0)*sample + line] = imageData[BPweight->GetDimension(0)*sample];
+    }
+  }
+
+  for (int slice = 0; slice < BPweight->GetDimension(2); ++slice)
+  {
+    BPweight->SetSlice(imageData, slice);
+  }
+
+  delete[] imageData;
+
+  itk::Image<double,3>::Pointer itkImage;
+  mitk::CastToItkImage(BPweight, itkImage);
+  return itkImage;
 }

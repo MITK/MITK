@@ -63,6 +63,8 @@ namespace mitk {
     //## @brief Time when Header was last initialized
     itk::TimeStamp m_TimeOfHeaderInitialization;
 
+    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
+
     double* m_OutputData;
     double* m_InputData;
     double* m_InputDataPuffer;

@@ -21,7 +21,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <itkImageIOBase.h>
 #include <chrono>
+#include "Algorithms\ITKUltrasound\itkFFT1DComplexConjugateToRealImageFilter.h"
+#include "Algorithms\ITKUltrasound\itkFFT1DRealToComplexConjugateImageFilter.h"
+#include "mitkImageCast.h"
 
+// needed itk image filters
+#include "mitkITKImageImport.h"
+#include "itkForwardFFTImageFilter.h"
+#include "itkGaussianImageSource.h"
+#include "itkInverseFFTImageFilter.h"
+#include "itkFFTShiftImageFilter.h"
+#include "itkMultiplyImageFilter.h"
+#include "itkComplexToModulusImageFilter.h"
 
 mitk::BeamformingDMASFilter::BeamformingDMASFilter() : m_OutputData(nullptr), m_InputData(nullptr)
 {
@@ -185,7 +196,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
           }
         }
       }
-    }/*
+    }
     else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
     {
       //quadratic delay
@@ -201,11 +212,20 @@ void mitk::BeamformingDMASFilter::GenerateData()
           s_i = sample / outputS * inputS;
           delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i;
 
-          for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
+          for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
           {
-            AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
-            if (AddSample < inputS && AddSample >= 0) {
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL];
+            AddSample1 = delayMultiplicator * pow((l_s1 - l_i), 2) + s_i;
+            if (AddSample1 < inputS && AddSample1 >= 0)
+            {
+              for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+              {
+                AddSample2 = delayMultiplicator * pow((l_s2 - l_i), 2) + s_i;
+                if (AddSample2 < inputS && AddSample2 >= 0)
+                {
+                  mult = m_InputData[l_s2 + AddSample2*(unsigned short)inputL] * m_InputData[l_s1 + AddSample1*(unsigned short)inputL];
+                  m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+                }
+              }
             }
           }
         }
@@ -226,21 +246,33 @@ void mitk::BeamformingDMASFilter::GenerateData()
         {
           s_i = sample / outputS * inputS;
 
-          for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
+          for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
           {
-            AddSample = (int)sqrt(
+            AddSample1 = (int)sqrt(
               pow(s_i, 2)
               +
-              pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+              pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s1 - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
             );
-            if (AddSample < inputS && AddSample >= 0) {
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL];
-              //MITK_INFO<< m_InputData[l_s + AddSample*(int)inputL];
+            if (AddSample1 < inputS && AddSample1 >= 0)
+            {
+              for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+              {
+                AddSample2 = (int)sqrt(
+                  pow(s_i, 2)
+                  +
+                  pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s2 - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+                );
+                if (AddSample2 < inputS && AddSample2 >= 0)
+                {
+                  mult = m_InputData[l_s2 + AddSample2*(unsigned short)inputL] * m_InputData[l_s1 + AddSample1*(unsigned short)inputL];
+                  m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+                }
+              }
             }
           }
         }
       }
-    }*/
+    }
 
     output->SetSlice(m_OutputData, i);
 
@@ -249,6 +281,15 @@ void mitk::BeamformingDMASFilter::GenerateData()
     m_OutputData = nullptr;
     m_InputData = nullptr;
   }
+
+  mitk::Image::Pointer BP = BandpassFilter(output);
+
+  for (int i = 0; i < output->GetDimension(2); ++i)
+  {
+    mitk::ImageReadAccessor copy(BP, BP->GetSliceData(i));
+    output->SetSlice(copy.GetData(), i);
+  }
+
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
@@ -258,4 +299,86 @@ void mitk::BeamformingDMASFilter::GenerateData()
 void mitk::BeamformingDMASFilter::Configure(beamformingSettings settings)
 {
   m_Conf = settings;
+}
+
+mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Pointer data)
+{
+  typedef double PixelType;
+  typedef itk::Image< PixelType, 3 > RealImageType;
+  RealImageType::Pointer image;
+
+  mitk::CastToItkImage(data, image);
+
+  typedef itk::FFT1DRealToComplexConjugateImageFilter<RealImageType> ForwardFFTFilterType;
+  typedef ForwardFFTFilterType::OutputImageType ComplexImageType;
+  ForwardFFTFilterType::Pointer forwardFFTFilter = ForwardFFTFilterType::New();
+  forwardFFTFilter->SetInput(image);
+  forwardFFTFilter->SetDirection(1);
+  try
+  {
+    forwardFFTFilter->UpdateOutputInformation();
+  }
+  catch (itk::ExceptionObject & error)
+  {
+    std::cerr << "Error: " << error << std::endl;
+  }
+  /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
+  toReal->SetInput(forwardFFTFilter->GetOutput());
+  return GrabItkImageMemory(toReal->GetOutput());*/
+
+  // A Gaussian is used here to create a low-pass filter.
+  typedef itk::GaussianImageSource< RealImageType > GaussianSourceType;
+  GaussianSourceType::Pointer gaussianSource = GaussianSourceType::New();
+  gaussianSource->SetNormalized(true);
+  ComplexImageType::ConstPointer transformedInput
+    = forwardFFTFilter->GetOutput();
+  const ComplexImageType::RegionType inputRegion(
+    transformedInput->GetLargestPossibleRegion());
+  const ComplexImageType::SizeType inputSize
+    = inputRegion.GetSize();
+  const ComplexImageType::SpacingType inputSpacing =
+    transformedInput->GetSpacing();
+  const ComplexImageType::PointType inputOrigin =
+    transformedInput->GetOrigin();
+  const ComplexImageType::DirectionType inputDirection =
+    transformedInput->GetDirection();
+  gaussianSource->SetSize(inputSize);
+  gaussianSource->SetSpacing(inputSpacing);
+  gaussianSource->SetOrigin(inputOrigin);
+  gaussianSource->SetDirection(inputDirection);
+  GaussianSourceType::ArrayType sigma;
+  GaussianSourceType::PointType mean;
+
+  MITK_INFO<< "spacing " << inputSpacing[0] << " " << inputSpacing[1] << " " << inputSpacing[2];
+
+  double sigmaValue = 0.5;
+  sigma.Fill(sigmaValue);
+  for (unsigned int ii = 0; ii < 3; ++ii)
+  {
+    const double halfLength = inputSize[ii] * inputSpacing[ii] / 2.0;
+    sigma[ii] *= halfLength;
+    mean[ii] = inputOrigin[ii] + halfLength;
+  }
+  mean = inputDirection * mean;
+  gaussianSource->SetSigma(sigma);
+  gaussianSource->SetMean(mean);
+
+  typedef itk::FFTShiftImageFilter< RealImageType, RealImageType > FFTShiftFilterType;
+  FFTShiftFilterType::Pointer fftShiftFilter = FFTShiftFilterType::New();
+  fftShiftFilter->SetInput(gaussianSource->GetOutput());
+
+  typedef itk::MultiplyImageFilter< ComplexImageType,
+    RealImageType,
+    ComplexImageType >
+    MultiplyFilterType;
+  MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
+  multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
+  multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
+
+  typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
+  InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();
+  inverseFFTFilter->SetInput(multiplyFilter->GetOutput());
+  inverseFFTFilter->SetDirection(1);
+
+  return GrabItkImageMemory(inverseFFTFilter->GetOutput());
 }

@@ -229,7 +229,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
     int progress = 0;
     std::vector< int > ids;
 #pragma omp parallel for
-    for (unsigned int i=0; i<points1.size(); i++)
+    for (int i=0; i<points1.size(); i++)
     {
 #pragma omp critical
         {
@@ -239,7 +239,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::SubtractBundle(mitk::FiberBundle* 
         }
 
         bool match = false;
-        for (unsigned int j=0; j<points2.size(); j++)
+        for (int j=0; j<points2.size(); j++)
         {
             auto v1 = points1.at(i);
             auto v2 = points2.at(j);

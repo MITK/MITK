@@ -20,9 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCommon.h"
 #include "mitkDataCollection.h"
 #include "mitkDiffusionCollectionReader.h"
+#include <MitkTumorInvasionAnalysisExports.h>
 
 namespace mitk {
-  class DiffusionCollectionWriter
+  class MITKTUMORINVASIONANALYSIS_EXPORT DiffusionCollectionWriter
   {
   public:
 

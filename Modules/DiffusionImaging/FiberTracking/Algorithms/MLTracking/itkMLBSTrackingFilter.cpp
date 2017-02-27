@@ -626,7 +626,7 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
 
   int progress = 0;
 #pragma omp parallel for
-  for (unsigned int i=0; i<seedpoints.size(); i++)
+  for (int i=0; i<seedpoints.size(); i++)
   {
 #pragma omp critical
     {
@@ -661,45 +661,41 @@ void MLBSTrackingFilter<  ShOrder, NumImageFeatures >::ThreadedGenerateData(cons
 
     if (IsValidPosition(worldPos))
       dir = m_ForestHandler.Classify(worldPos, candidates, olddirs, 0, prob, m_MaskImage);
-    if (dir.magnitude()<0.0001)
-      continue;
 
-    if (!m_GmStubs.empty())
+    if (dir.magnitude()>0.0001)
     {
-      double a = dot_product(gm_start_dir, dir);
-      if (a<0)
-        dir = -dir;
-    }
-
-    // forward tracking
-    tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
-    fib.push_front(worldPos);
-
-    if (!m_GmStubs.empty())
-    {
-      fib.push_front(m_GmStubs[i][0]);
-      CheckFiberForGmEnding(&fib);
-    }
-    else
-    {
-      // backward tracking (only if we don't explicitely start in the GM)
-      tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
-      if (m_FourTTImage.IsNotNull())
+      if (!m_GmStubs.empty())
       {
-        CheckFiberForGmEnding(&fib);
-        std::reverse(fib.begin(),fib.end());
+        double a = dot_product(gm_start_dir, dir);
+        if (a<0)
+          dir = -dir;
+      }
+
+      // forward tracking
+      tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
+      fib.push_front(worldPos);
+
+      if (!m_GmStubs.empty())
+      {
+        fib.push_front(m_GmStubs[i][0]);
         CheckFiberForGmEnding(&fib);
       }
-    }
-
-    counter = fib.size();
-
-    if (tractLength<m_MinTractLength || counter<2)
-      continue;
+      else
+      {
+        // backward tracking (only if we don't explicitely start in the GM)
+        tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
+        if (m_FourTTImage.IsNotNull())
+        {
+          CheckFiberForGmEnding(&fib);
+          std::reverse(fib.begin(),fib.end());
+          CheckFiberForGmEnding(&fib);
+        }
+      }
+      counter = fib.size();
 
 #pragma omp critical
-    {
-      m_Tractogram.push_back(fib);
+      if (tractLength>=m_MinTractLength && counter>=2)
+        m_Tractogram.push_back(fib);
     }
   }
 }

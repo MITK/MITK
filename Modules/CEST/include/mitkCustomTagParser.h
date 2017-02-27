@@ -79,7 +79,7 @@ namespace mitk
   protected:
     std::string GetRevisionAppropriateJSONString(std::string revisionString);
     void GetClosestLowerRevision(std::string revisionString);
-    std::string GetClosestLowerRevision(std::string revisionString, std::vector<int> &availableRevisionsVector);
+    std::string GetClosestLowerRevision(std::string revisionString, std::vector<int> availableRevisionsVector);
 
     /// Get a string filled with the properly formated offsets based on the sampling type and offset
     std::string GetOffsetString(std::string samplingType, std::string offset, std::string measurements);

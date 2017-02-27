@@ -149,6 +149,7 @@ typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingForestHa
   filter->Update();
 
   m_DwiFeatureImages.push_back(filter->GetCoefficientImage());
+  return true;
 }
 
 template< int ShOrder, int NumberOfSignalFeatures>
@@ -194,6 +195,7 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestH
     ++it;
   }
   m_DwiFeatureImages.push_back(dwiFeatureImage);
+  return true;
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >

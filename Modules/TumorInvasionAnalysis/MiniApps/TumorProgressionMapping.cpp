@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImagePixelReadAccessor.h>
 #include <mitkImagePixelWriteAccessor.h>
 #include <mitkImageToItk.h>
-#include <mitkImageWriter.h>
 #include <mitkPixelType.h>
 #include <mitkPlaneGeometry.h>
 

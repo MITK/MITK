@@ -426,7 +426,9 @@ std::string mitk::CustomTagParser::GetRevisionAppropriateJSONString(std::string 
         MITK_INFO << "Found no external json for CEST parameters. Closest internal mapping is for revision "
                   << m_ClosestInternalRevision;
         us::ModuleResourceStream jsonStream(jsonResource);
-        returnValue = std::string(std::istreambuf_iterator<char>(jsonStream), {});
+        std::stringstream buffer;
+        buffer << jsonStream.rdbuf();
+        returnValue = buffer.str();
       }
     }
   }

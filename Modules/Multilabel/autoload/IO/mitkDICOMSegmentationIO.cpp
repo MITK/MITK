@@ -14,29 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef __mitkDICOMSegmentationIOWriter__cpp
-#define __mitkDICOMSegmentationIOWriter__cpp
+#ifndef __mitkDICOMSegmentationIO__cpp
+#define __mitkDICOMSegmentationIO__cpp
 
 #include "mitkDICOMSegmentationIO.h"
-#include "mitkBasePropertySerializer.h"
-#include "mitkDICOMProperty.h"
-#include "mitkIOMimeTypes.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkLabelSetIOHelper.h"
-#include "mitkLabelSetImageConverter.h"
-#include "mitkProperties.h"
-#include "mitkPropertyNameHelper.h"
-#include "mitkStringProperty.h"
+
+#include <mitkDICOMProperty.h>
+#include <mitkIOMimeTypes.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 
 // itk
-#include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
-#include "itkMetaDataDictionary.h"
-#include "itkMetaDataObject.h"
-#include "itkNrrdImageIO.h"
-#include "itkThresholdImageFilter.h"
+#include <itkThresholdImageFilter.h>
 
 // dcmqi
 #include <dcmqi/ImageSEGConverter.h>
@@ -81,57 +71,65 @@ namespace mitk
     DcmFileFormat *readFileFormat = new DcmFileFormat();
     try
     {
-      // TODO: Generate dcmdataset witk DICOM tags from property list
+      // TODO: Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
+      // property list
       mitk::StringLookupTableProperty::Pointer filesProp =
         dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("files").GetPointer());
 
       if (filesProp.IsNull())
       {
-        MITK_ERROR << "No property with dicom file path.";
+        mitkThrow() << "No property with dicom file path.";
         return;
       }
 
       StringLookupTable filesLut = filesProp->GetValue();
-      const StringLookupTable::LookupTableType &map = filesLut.GetLookupTable();
+      const StringLookupTable::LookupTableType &lookUpTableMap = filesLut.GetLookupTable();
 
-      for (auto it = map.begin(); it != map.end(); ++it)
+      for (auto it : lookUpTableMap)
       {
-        const char *fileName = (it->second).c_str();
+        const char *fileName = (it.second).c_str();
         if (readFileFormat->loadFile(fileName, EXS_Unknown).good())
           dcmDatasets.push_back(readFileFormat->getAndRemoveDataset());
       }
     }
     catch (const std::exception &e)
     {
-      mitkThrow() << e.what();
+      MITK_ERROR << "An error occurred while getting the dicom informations: " << e.what() << endl;
+      return;
     }
 
-    //Iterate over all layers. For each adcm file is generated
+    // Iterate over all layers. For each a dcm file will be generated
     for (unsigned int layer = 0; layer < input->GetNumberOfLayers(); ++layer)
     {
       vector<itkInternalImageType::Pointer> segmentations;
 
       try
       {
+        // Cast mitk layer image to itk
+        ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
+        // BUG: It must be the layer image, but there are some errors with it (dcmqi: generate the dcmSeg "No frame data
+        // available") --> input->GetLayerImage(layer)
+        imageToItkFilter->SetInput(input);
+        imageToItkFilter->Update();
 
-        for (unsigned int label = 1; label < input->GetNumberOfLabels(layer); ++label)
+        // Cast from original itk type to dcmqi input itk image type
+        typedef itk::CastImageFilter<itkInputImageType, itkInternalImageType> castItkImageFilterType;
+        castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
+        castFilter->SetInput(imageToItkFilter->GetOutput());
+        castFilter->Update();
+
+        itkInternalImageType::Pointer itkLabelImage = castFilter->GetOutput();
+        itkLabelImage->DisconnectPipeline();
+
+        // Iterate over all labels. For each a segmentation image will be created
+        const LabelSet *labelSet = input->GetLabelSet(layer);
+        for (auto itLabel = labelSet->IteratorConstBegin(); itLabel != labelSet->IteratorConstEnd(); ++itLabel)
         {
-          typedef itk::CastImageFilter<itkInputImageType, itkInternalImageType> castItkImageFilterType;
-          ImageToItk<itkInputImageType>::Pointer imageToItkFilter = ImageToItk<itkInputImageType>::New();
-          // BUG: It must be the layer image, but there are some errors with it (dcmqi: generate the dcmSeg "No frame data available") --> input->GetLayerImage(layer)
-          imageToItkFilter->SetInput(input);
-          imageToItkFilter->Update();
-
-          castItkImageFilterType::Pointer castFilter = castItkImageFilterType::New();
-          castFilter->SetInput(imageToItkFilter->GetOutput());
-          castFilter->Update();
-          itkInternalImageType::Pointer itkLabelImage = castFilter->GetOutput();
-
+          // Thresold over the image with the given label value
           itk::ThresholdImageFilter<itkInternalImageType>::Pointer thresholdFilter =
             itk::ThresholdImageFilter<itkInternalImageType>::New();
-
           thresholdFilter->SetInput(itkLabelImage);
-          thresholdFilter->ThresholdOutside(label, label);
+          thresholdFilter->ThresholdOutside(itLabel->first, itLabel->first);
           thresholdFilter->SetOutsideValue(0);
           thresholdFilter->Update();
           itkInternalImageType::Pointer segmentImage = thresholdFilter->GetOutput();
@@ -149,39 +147,45 @@ namespace mitk
       // Create segmentation meta information
       const std::string &tmpMetaInfoFile = this->CreateMetaDataJsonFile(layer);
 
-
       MITK_INFO << "Writing image: " << path << std::endl;
       try
       {
-        // Convert itk image to dicom image
+        // Convert itk segmentation images to dicom image
         dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
         DcmDataset *result = converter->itkimage2dcmSegmentation(dcmDatasets, segmentations, tmpMetaInfoFile);
-        // Todo for each layer
-        // write dicom file
+
+        // Write dicom file
         DcmFileFormat dcmFileFormat(result);
 
         std::string filePath = path.substr(0, path.find_last_of("."));
-        // if there is more than one layer, we have to write more than 1 dicom file
+        // If there is more than one layer, we have to write more than 1 dicom file
         if (input->GetNumberOfLayers() != 1)
           filePath = filePath + std::to_string(layer) + ".dcm";
         else
           filePath = filePath + ".dcm";
 
         dcmFileFormat.saveFile(filePath.c_str(), EXS_LittleEndianExplicit);
+
+        // Clean up
+        if (converter != nullptr)
+          delete converter;
+        if (result != nullptr)
+          delete result;
       }
       catch (const std::exception &e)
       {
-        mitkThrow() << e.what();
+        MITK_ERROR << "An error occurred during writing the DICOM Seg: " << e.what() << endl;
+        return;
       }
-    }
+    } // Write a dcm file for the next layer
 
-    // end image write
+    // End of image writing; clean up
     if (readFileFormat)
       delete readFileFormat;
-    for (unsigned int i = 0; i < dcmDatasets.size(); i++)
-    {
-      delete dcmDatasets[i];
-    }
+
+    for (auto obj : dcmDatasets)
+      delete obj;
+    dcmDatasets.clear();
   }
 
   IFileIO::ConfidenceLevel DICOMSegmentationIO::GetReaderConfidenceLevel() const
@@ -213,38 +217,34 @@ namespace mitk
     mitk::LocaleSwitch localeSwitch("C");
 
     LabelSetImage::Pointer labelSetImage;
+    std::vector<BaseData::Pointer> result;
+
     const std::string path = this->GetLocalFileName();
 
     MITK_INFO << "loading " << path << std::endl;
 
-    // Check to see if we can read the file given the name or prefix
     if (path.empty())
-    {
       mitkThrow() << "Empty filename in mitk::ItkImageIO ";
-    }
 
     try
     {
+      // Get the dcm data set from file path
       DcmFileFormat dcmFileFormat;
       OFCondition status = dcmFileFormat.loadFile(path.c_str());
       if (status.bad())
-        MITK_ERROR << "Can't read the input file!";
+        mitkThrow() << "Can't read the input file!";
 
       DcmDataset *dataSet = dcmFileFormat.getDataset();
       if (dataSet == nullptr)
-        MITK_ERROR << "Can't read data from input file!";
+        mitkThrow() << "Can't read data from input file!";
 
+      // Read the DICOM SEG images (segItkImages) and DICOM tags (metaInfo)
       dcmqi::ImageSEGConverter *converter = new dcmqi::ImageSEGConverter();
       pair<map<unsigned, ImageType::Pointer>, string> dcmqiOutput = converter->dcmSegmentation2itkimage(dataSet);
 
-      dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
-      metaInfo.read();
-      MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
-
       map<unsigned, ImageType::Pointer> segItkImages = dcmqiOutput.first;
 
-      vector<map<unsigned, dcmqi::SegmentAttributes *>>::const_iterator segmentIter =
-        metaInfo.segmentsAttributesMappingList.begin();
+      // For each itk image add a layer to the LabelSetImage output
       for (auto &element : segItkImages)
       {
         // Get the labeled image and cast it to mitkImage
@@ -259,13 +259,12 @@ namespace mitk
         // Get pixel value of the label
         itkInternalImageType::ValueType segValue = 1;
         typedef itk::ImageRegionIterator<const itkInternalImageType> IteratorType;
-
+        // Iterate over the image to find the pixel value of the label
         IteratorType iter(element.second, element.second->GetLargestPossibleRegion());
         iter.GoToBegin();
         while (!iter.IsAtEnd())
         {
           itkInputImageType::PixelType value = iter.Get();
-
           if (value != 0)
           {
             segValue = value;
@@ -274,7 +273,14 @@ namespace mitk
           ++iter;
         }
 
+        dcmqi::JSONSegmentationMetaInformationHandler metaInfo(dcmqiOutput.second.c_str());
+        metaInfo.read();
+        MITK_INFO << "Input " << metaInfo.getJSONOutputAsString();
+        // TODO: Read all DICOM Tags
+
         // Get the label information from segment attributes
+        vector<map<unsigned, dcmqi::SegmentAttributes *>>::const_iterator segmentIter =
+          metaInfo.segmentsAttributesMappingList.begin();
         map<unsigned, dcmqi::SegmentAttributes *> segmentMap = (*segmentIter);
         map<unsigned, dcmqi::SegmentAttributes *>::const_iterator segmentMapIter = (*segmentIter).begin();
         dcmqi::SegmentAttributes *segmentAttr = (*segmentMapIter).second;
@@ -290,7 +296,7 @@ namespace mitk
             labelName = "Unnamed";
         }
 
-        float tmp[3] = { 0.0, 0.0, 0.0 };
+        float tmp[3] = {0.0, 0.0, 0.0};
         if (segmentAttr->getRecommendedDisplayRGBValue() != nullptr)
         {
           tmp[0] = segmentAttr->getRecommendedDisplayRGBValue()[0] / 255.0;
@@ -298,13 +304,13 @@ namespace mitk
           tmp[2] = segmentAttr->getRecommendedDisplayRGBValue()[2] / 255.0;
         }
 
-        // if labelSetImage do not exists (first image)
+        // If labelSetImage do not exists (first image)
         if (labelSetImage.IsNull())
         {
           // Initialize the labelSetImage with the read image
           labelSetImage = LabelSetImage::New();
           labelSetImage->InitializeByLabeledImage(layerImage);
-          // Already a label generated, so set the information to this
+          // Already a label was generated, so set the information to this
           Label *activeLabel = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer());
           activeLabel->SetName(labelName.c_str());
           activeLabel->SetColor(Color(tmp));
@@ -326,16 +332,20 @@ namespace mitk
 
         ++segmentIter;
       }
+      // Clean up
+      if (converter != nullptr)
+        delete converter;
     }
     catch (const std::exception &e)
     {
-      mitkThrow() << e.what();
+      MITK_ERROR << "An error occurred while reading the DICOM Seg file: " << e.what();
+      return result;
     }
 
+    // Set active layer to th first layer of the labelset image
     if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
       labelSetImage->SetActiveLayer(0);
 
-    std::vector<BaseData::Pointer> result;
     result.push_back(labelSetImage.GetPointer());
 
     return result;
@@ -346,8 +356,9 @@ namespace mitk
     const mitk::LabelSetImage *image = dynamic_cast<const mitk::LabelSetImage *>(this->GetInput());
 
     const std::string output;
-
     dcmqi::JSONSegmentationMetaInformationHandler handler;
+
+    // Default values
     handler.setContentCreatorName("MITK");
     handler.setClinicalTrialSeriesID("Session 1");
     handler.setClinicalTrialTimePointID("0");
@@ -362,10 +373,9 @@ namespace mitk
     handler.setBodyPartExamined("");
 
     const LabelSet *labelSet = image->GetLabelSet(layer);
-
-    for (unsigned int i = 1; i < image->GetNumberOfLabels(); ++i)
+    for (auto it = labelSet->IteratorConstBegin(); it != labelSet->IteratorConstEnd(); ++it)
     {
-      const Label *label = labelSet->GetLabel(i);
+      const Label *label = it->second;
       if (label != nullptr)
       {
         mitk::DICOMTagPath segmentNumberPath;
@@ -445,23 +455,23 @@ namespace mitk
           segAttr->setSegmentAlgorithmType(algorithmTypeProp->GetValueAsString());
           segAttr->setSegmentAlgorithmName("MITK Segmentation");
           if (segmentCategoryCodeValueProp != nullptr && segmentCategoryCodeSchemeProp != nullptr &&
-            segmentCategoryCodeMeaningProp != nullptr)
+              segmentCategoryCodeMeaningProp != nullptr)
             segAttr->setSegmentedPropertyCategoryCodeSequence(segmentCategoryCodeValueProp->GetValueAsString(),
-            segmentCategoryCodeSchemeProp->GetValueAsString(),
-            segmentCategoryCodeMeaningProp->GetValueAsString());
+                                                              segmentCategoryCodeSchemeProp->GetValueAsString(),
+                                                              segmentCategoryCodeMeaningProp->GetValueAsString());
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
-            segmentTypeCodeMeaningProp != nullptr)
+              segmentTypeCodeMeaningProp != nullptr)
           {
             segAttr->setSegmentedPropertyTypeCodeSequence(segmentTypeCodeValueProp->GetValueAsString(),
-              segmentTypeCodeSchemeProp->GetValueAsString(),
-              segmentTypeCodeMeaningProp->GetValueAsString());
+                                                          segmentTypeCodeSchemeProp->GetValueAsString(),
+                                                          segmentTypeCodeMeaningProp->GetValueAsString());
             handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
           }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
-            segmentModifierCodeMeaningProp != nullptr)
+              segmentModifierCodeMeaningProp != nullptr)
             segAttr->setSegmentedPropertyTypeModifierCodeSequence(segmentModifierCodeValueProp->GetValueAsString(),
-            segmentModifierCodeSchemeProp->GetValueAsString(),
-            segmentModifierCodeMeaningProp->GetValueAsString());
+                                                                  segmentModifierCodeSchemeProp->GetValueAsString(),
+                                                                  segmentModifierCodeMeaningProp->GetValueAsString());
 
           Color color = label->GetColor();
           segAttr->setRecommendedDisplayRGBValue(color[0] * 255, color[1] * 255, color[2] * 255);
@@ -474,4 +484,4 @@ namespace mitk
   DICOMSegmentationIO *DICOMSegmentationIO::IOClone() const { return new DICOMSegmentationIO(*this); }
 } // namespace
 
-#endif //__mitkLabelSetImageWriter__cpp
+#endif //__mitkDICOMSegmentationIO__cpp

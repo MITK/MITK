@@ -35,6 +35,11 @@ namespace mitk {
 {
 }
 
+  BaseDICOMReaderService::BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description)
+    : AbstractFileReader(customType, description)
+  {
+  }
+
 std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::Read()
 {
   std::vector<BaseData::Pointer> result;

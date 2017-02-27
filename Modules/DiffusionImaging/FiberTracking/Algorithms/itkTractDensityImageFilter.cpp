@@ -38,6 +38,7 @@ TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
     , m_OutputAbsoluteValues(false)
     , m_UseTrilinearInterpolation(false)
     , m_DoFiberResampling(true)
+    , m_WorkOnFiberCopy(true)
 {
 
 }
@@ -133,8 +134,9 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
     if (m_DoFiberResampling)
     {
+      if (m_WorkOnFiberCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
-        m_FiberBundle->ResampleSpline(minSpacing/10);
+      m_FiberBundle->ResampleSpline(minSpacing/10);
     }
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";

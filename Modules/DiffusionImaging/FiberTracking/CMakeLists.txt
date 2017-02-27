@@ -1,5 +1,5 @@
 
-set(_module_deps MitkDiffusionCore MitkGraphAlgorithms)
+set(_module_deps MitkDiffusionCore MitkGraphAlgorithms MitkCLVigraRandomForest)
 
 mitk_check_module_dependencies(
   MODULES ${_module_deps}

@@ -36,6 +36,7 @@ set(mitk_modules
   C3js
   QmlItems
   SegmentationUI
+  Classification
   DiffusionImaging
   GPGPU
   OpenIGTLink
@@ -69,7 +70,6 @@ set(mitk_modules
   XNAT
   TubeGraph
   BiophotonicsHardware
-  Classification
   TumorInvasionAnalysis
   MatchPointRegistration
   MatchPointRegistrationUI

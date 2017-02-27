@@ -63,24 +63,29 @@ int main(int argc, char* argv[])
     parser.addArgument("minLength", "l", mitkCommandLineParser::Float, "Minimum length:", "Minimum fiber length (in mm)");
     parser.addArgument("maxLength", "m", mitkCommandLineParser::Float, "Maximum length:", "Maximum fiber length (in mm)");
     parser.addArgument("maxAngle", "a", mitkCommandLineParser::Float, "Maximum angle:", "Maximum angular STDEV over 1cm (in degree)");
+    parser.addArgument("remove", "rm", mitkCommandLineParser::Int, "Remove fibers exceeding curvature threshold:", "if 0, only the high curvature parts are removed");
     parser.addArgument("mirror", "p", mitkCommandLineParser::Int, "Invert coordinates:", "Invert fiber coordinates XYZ (e.g. 010 to invert y-coordinate of each fiber point)");
 
-    parser.addArgument("rotate-x", "rx", mitkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (if copy is given the copy is rotated, in deg)");
-    parser.addArgument("rotate-y", "ry", mitkCommandLineParser::Float, "Rotate y-axis:", "Rotate around y-axis (if copy is given the copy is rotated, in deg)");
-    parser.addArgument("rotate-z", "rz", mitkCommandLineParser::Float, "Rotate z-axis:", "Rotate around z-axis (if copy is given the copy is rotated, in deg)");
+    parser.addArgument("rotate-x", "rx", mitkCommandLineParser::Float, "Rotate x-axis:", "Rotate around x-axis (in deg)");
+    parser.addArgument("rotate-y", "ry", mitkCommandLineParser::Float, "Rotate y-axis:", "Rotate around y-axis (in deg)");
+    parser.addArgument("rotate-z", "rz", mitkCommandLineParser::Float, "Rotate z-axis:", "Rotate around z-axis (in deg)");
 
-    parser.addArgument("scale-x", "sx", mitkCommandLineParser::Float, "Scale x-axis:", "Scale in direction of x-axis (if copy is given the copy is scaled)");
-    parser.addArgument("scale-y", "sy", mitkCommandLineParser::Float, "Scale y-axis:", "Scale in direction of y-axis (if copy is given the copy is scaled)");
-    parser.addArgument("scale-z", "sz", mitkCommandLineParser::Float, "Scale z-axis", "Scale in direction of z-axis (if copy is given the copy is scaled)");
+    parser.addArgument("scale-x", "sx", mitkCommandLineParser::Float, "Scale x-axis:", "Scale in direction of x-axis");
+    parser.addArgument("scale-y", "sy", mitkCommandLineParser::Float, "Scale y-axis:", "Scale in direction of y-axis");
+    parser.addArgument("scale-z", "sz", mitkCommandLineParser::Float, "Scale z-axis", "Scale in direction of z-axis");
 
-    parser.addArgument("translate-x", "tx", mitkCommandLineParser::Float, "Translate x-axis:", "Translate in direction of x-axis (if copy is given the copy is translated, in mm)");
-    parser.addArgument("translate-y", "ty", mitkCommandLineParser::Float, "Translate y-axis:", "Translate in direction of y-axis (if copy is given the copy is translated, in mm)");
-    parser.addArgument("translate-z", "tz", mitkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (if copy is given the copy is translated, in mm)");
+    parser.addArgument("translate-x", "tx", mitkCommandLineParser::Float, "Translate x-axis:", "Translate in direction of x-axis (in mm)");
+    parser.addArgument("translate-y", "ty", mitkCommandLineParser::Float, "Translate y-axis:", "Translate in direction of y-axis (in mm)");
+    parser.addArgument("translate-z", "tz", mitkCommandLineParser::Float, "Translate z-axis:", "Translate in direction of z-axis (in mm)");
 
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
+
+    bool remove = true;
+    if (parsedArgs.count("remove"))
+        remove = us::any_cast<int>(parsedArgs["remove"]);
 
     float smoothDist = -1;
     if (parsedArgs.count("smooth"))
@@ -150,22 +155,22 @@ int main(int argc, char* argv[])
     {
         mitk::FiberBundle::Pointer fib = LoadFib(inFileName);
 
-        if (minFiberLength>0)
-            fib->RemoveShortFibers(minFiberLength);
-
-        if (maxFiberLength>0)
-            fib->RemoveLongFibers(maxFiberLength);
-
         if (maxAngularDev>0)
         {
             auto filter = itk::FiberCurvatureFilter::New();
             filter->SetInputFiberBundle(fib);
             filter->SetAngularDeviation(maxAngularDev);
             filter->SetDistance(10);
-            filter->SetRemoveFibers(true);
+            filter->SetRemoveFibers(remove);
             filter->Update();
             fib = filter->GetOutputFiberBundle();
         }
+
+        if (minFiberLength>0)
+            fib->RemoveShortFibers(minFiberLength);
+
+        if (maxFiberLength>0)
+            fib->RemoveLongFibers(maxFiberLength);
 
         if (smoothDist>0)
             fib->ResampleSpline(smoothDist);

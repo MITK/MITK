@@ -27,6 +27,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     FileFormatConverter^^MitkFiberTracking
     DFTraining^^MitkFiberTracking
     DFTracking^^MitkFiberTracking
+    TractDensity^^MitkFiberTracking
     )
 
     foreach(diffusionminiapp ${diffusionminiapps})

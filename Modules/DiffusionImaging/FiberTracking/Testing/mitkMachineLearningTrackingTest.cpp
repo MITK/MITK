@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingForestHandler.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
+#include <omp.h>
 
 #include "mitkTestFixture.h"
 
@@ -40,7 +41,7 @@ private:
 
     /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
     mitk::FiberBundle::Pointer ref;
-    mitk::TrackingForestHandler<> tfh;
+    mitk::TrackingForestHandler<6, 100> tfh;
     mitk::Image::Pointer dwi;
     ItkUcharImgType::Pointer seed;
 
@@ -62,7 +63,7 @@ public:
         mitk::CastToItkImage(img, seed);
 
         tfh.LoadForest(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
-        tfh.AddRawData(dwi);
+        tfh.AddDwi(dwi);
     }
 
     void tearDown() override
@@ -72,7 +73,8 @@ public:
 
     void Track1()
     {
-        typedef itk::MLBSTrackingFilter<> TrackerType;
+        omp_set_num_threads(1);
+        typedef itk::MLBSTrackingFilter<6,100> TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
         tracker->SetDemoMode(false);
@@ -82,9 +84,7 @@ public:
         tracker->SetMinTractLength(20);
         tracker->SetMaxTractLength(400);
         tracker->SetForestHandler(tfh);
-        tracker->SetNumberOfSamples(30);
         tracker->SetAposterioriCurvCheck(false);
-        tracker->SetRemoveWmEndFibers(false);
         tracker->SetAvoidStop(true);
         tracker->SetSamplingDistance(0.5);
         tracker->SetRandomSampling(false);
@@ -92,7 +92,8 @@ public:
         vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
 
-//        mitk::IOUtil::Save(outFib, mitk::IOUtil::GetTempPath()+"RefFib.fib");
+        //MITK_INFO << mitk::IOUtil::GetTempPath() << "ReferenceTracts.fib";
+        //mitk::IOUtil::Save(outFib, mitk::IOUtil::GetTempPath()+"ReferenceTracts.fib");
 
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(outFib));
     }

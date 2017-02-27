@@ -15,11 +15,14 @@
  ===================================================================*/
 #pragma warning (disable : 4996)
 
-#include "mitkCollectionWriter.h"
+#include "mitkDiffusionCollectionWriter.h"
 
 #include <mitkIOUtil.h>
+#include <mitkFiberBundle.h>
+#include <mitkFiberBundleVtkReader.h>
 
 #include "mitkImageCast.h"
+#include "mitkTensorImage.h"
 #include "itkNrrdImageIO.h"
 #include "itkImageFileWriter.h"
 #include "mitkCoreObjectFactory.h"
@@ -70,7 +73,7 @@ static std::string GetDate(std::string fileName,std::string suffix, bool longNam
 
 
 
-bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollection, std::string xmlFile, std::vector<std::string> filter)
+bool mitk::DiffusionCollectionWriter::ExportCollectionToFolder(DataCollection *dataCollection, std::string xmlFile, std::vector<std::string> filter)
 {
   // Quick and Dirty: Assumes three level DataCollection
   QDir fileName = QFileInfo(xmlFile.c_str()).absoluteDir();
@@ -98,7 +101,7 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
     DataCollection* subCollections = dynamic_cast<DataCollection*> (dataCollection->GetData(i).GetPointer());
     if (subCollections == NULL)
     {
-      MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
+      MITK_ERROR<< "mitk::DiffusionCollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
       return false;
     }
 
@@ -112,7 +115,7 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
       DataCollection* itemCollections = dynamic_cast<DataCollection*> (subCollections->GetData(d).GetPointer());
       if (itemCollections == NULL)
       {
-        MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
+        MITK_ERROR<< "mitk::DiffusionCollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
         return false;
       }
 
@@ -136,9 +139,28 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
         QString fileName = dir.path() + dir.separator() + subPath + dir.separator() +  QString::fromStdString(dataCollection->IndexToName(i)) + "_" + QString::fromStdString(subCollections->IndexToName(d)) + "_" + QString::fromStdString(itemCollections->IndexToName(s));
         try
         {
-          fileName += ".nrrd";
-          Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
-          IOUtil::SaveImage(image,fileName.toStdString());
+          if (itemCollections->IndexToName(s) == "DTI" || itemCollections->IndexToName(s) == "DTIFWE")
+          {
+            fileName += ".dti";
+            IOUtil::Save(image,fileName.toStdString());
+          }
+          else if (itemCollections->IndexToName(s) == "FIB")
+          {
+            fileName += ".fib";
+            FiberBundle* fib = dynamic_cast<FiberBundle*> (itemCollections->GetData(s).GetPointer());
+            IOUtil::Save(fib, fileName.toStdString());
+          }
+          else if (itemCollections->IndexToName(s) == "DWI")
+          {
+            fileName += ".dwi";
+            IOUtil::Save(image,fileName.toStdString());
+          }
+          else
+          {
+            fileName += ".nrrd";
+            Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
+            IOUtil::Save(image,fileName.toStdString());
+          }
         }
         catch( const std::exception& e)
         {
@@ -161,13 +183,13 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
   return true;
 }
 
-bool mitk::CollectionWriter::ExportCollectionToFolder(mitk::DataCollection *dataCollection, std::string xmlFile)
+bool mitk::DiffusionCollectionWriter::ExportCollectionToFolder(mitk::DataCollection *dataCollection, std::string xmlFile)
 {
   std::vector<std::string> mods;
   return ExportCollectionToFolder(dataCollection,xmlFile, mods);
 }
 
-bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection, std::vector<std::string> filter, std::string xmlFile)
+bool mitk::DiffusionCollectionWriter::SaveCollection(mitk::DataCollection *dataCollection, std::vector<std::string> filter, std::string xmlFile)
 {
   QDir origFilename = QFileInfo(dataCollection->GetXMLFile().c_str()).absoluteDir();
   QString originalFolder = origFilename.path() + QDir::separator();
@@ -199,7 +221,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
     DataCollection* subCollections = dynamic_cast<DataCollection*> (dataCollection->GetData(i).GetPointer());
     if (subCollections == NULL)
     {
-      MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
+      MITK_ERROR<< "mitk::DiffusionCollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
       return false;
     }
 
@@ -213,7 +235,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
       DataCollection* itemCollections = dynamic_cast<DataCollection*> (subCollections->GetData(d).GetPointer());
       if (itemCollections == NULL)
       {
-        MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
+        MITK_ERROR<< "mitk::DiffusionCollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
         return false;
       }
 
@@ -247,10 +269,32 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
 
         try
         {
-          if (!fullName)
-            fileName += ".nrrd";
-          Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
-          IOUtil::SaveImage(image,fileName.toStdString());
+          if (itemCollections->IndexToName(s) == "DTI" || itemCollections->IndexToName(s) == "DTIFWE")
+          {
+            if (!fullName)
+              fileName += ".dti";
+            IOUtil::Save(image,fileName.toStdString());
+          }
+          else if (itemCollections->IndexToName(s) == "FIB")
+          {
+            if (!fullName)
+              fileName += ".fib";
+            FiberBundle* fib = dynamic_cast<FiberBundle*> (itemCollections->GetData(s).GetPointer());
+            IOUtil::Save(fib, fileName.toStdString());
+          }
+          else if (itemCollections->IndexToName(s) == "DWI")
+          {
+            if (!fullName)
+              fileName += ".dwi";
+            IOUtil::Save(image,fileName.toStdString());
+          }
+          else
+          {
+            if (!fullName)
+              fileName += ".nrrd";
+            Image::Pointer image = itemCollections->GetMitkImage(s).GetPointer();
+            IOUtil::Save(image,fileName.toStdString());
+          }
         }
         catch( const std::exception& e)
         {
@@ -273,7 +317,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
   return true;
 }
 
-bool mitk::CollectionWriter::FolderToXml(std::string folder, std::string collectionType, std::string xmlFile, std::vector<std::string> filter, std::vector<std::string> seriesNames)
+bool mitk::DiffusionCollectionWriter::FolderToXml(std::string folder, std::string collectionType, std::string xmlFile, std::vector<std::string> filter, std::vector<std::string> seriesNames)
 {
   // 1) Parse for folders
 
@@ -308,7 +352,7 @@ bool mitk::CollectionWriter::FolderToXml(std::string folder, std::string collect
     // Parse folder and look up all data,
     // after sanitation only fully available groups are included (that is all suffixes are found)
 
-    CollectionReader::FileListType fileList = CollectionReader::SanitizeFileList(CollectionReader::GenerateFileLists(baseFolder, filter,true));
+    DiffusionCollectionReader::FileListType fileList = DiffusionCollectionReader::SanitizeFileList(DiffusionCollectionReader::GenerateFileLists(baseFolder, filter,true));
     if (fileList.size() <= 0 || fileList.at(0).size() <= 0)
       continue;
 
@@ -340,7 +384,7 @@ bool mitk::CollectionWriter::FolderToXml(std::string folder, std::string collect
   return true;
 }
 
-bool mitk::CollectionWriter::SingleFolderToXml(std::string folder, std::string xmlFile, std::vector<std::string> filter, std::vector<std::string> seriesNames, bool longDate, int skipUntil, float months)
+bool mitk::DiffusionCollectionWriter::SingleFolderToXml(std::string folder, std::string xmlFile, std::vector<std::string> filter, std::vector<std::string> seriesNames, bool longDate, int skipUntil, float months)
 {
   std::ofstream xmlFileStream;
   xmlFileStream.open (xmlFile.c_str());
@@ -353,7 +397,7 @@ bool mitk::CollectionWriter::SingleFolderToXml(std::string folder, std::string x
   // Parse folder and look up all data,
   // after sanitation only fully available groups are included (that is all suffixes are found)
 
-  CollectionReader::FileListType fileList = CollectionReader::SanitizeFileList(CollectionReader::GenerateFileLists(folder, filter,true));
+  DiffusionCollectionReader::FileListType fileList = DiffusionCollectionReader::SanitizeFileList(DiffusionCollectionReader::GenerateFileLists(folder, filter,true));
 
   // Write Subcollection tag
   // try to extract date out of filename
@@ -389,7 +433,7 @@ bool mitk::CollectionWriter::SingleFolderToXml(std::string folder, std::string x
   return true;
 }
 
-size_t mitk::CollectionWriter::GetIndexForinXMonths(mitk::CollectionReader::FileListType fileList,float months, size_t curIndex,std::vector<std::string> filter)
+size_t mitk::DiffusionCollectionWriter::GetIndexForinXMonths(mitk::DiffusionCollectionReader::FileListType fileList,float months, size_t curIndex,std::vector<std::string> filter)
 {
   std::string strDate0 = GetDate(fileList.at(0).at(curIndex),filter.at(0),true);
 

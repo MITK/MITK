@@ -1467,7 +1467,8 @@ namespace itk
         double extraAxonalVolume = m_VoxelVolume-intraAxonalVolume;    // non-fiber volume
         if (extraAxonalVolume<0)
         {
-          MITK_ERROR << "Corrupted intra-axonal signal voxel detected. Fiber volume larger voxel volume!";
+          if (extraAxonalVolume<-0.001)
+            MITK_ERROR << "Corrupted intra-axonal signal voxel detected. Fiber volume larger voxel volume! " << m_VoxelVolume << "<" << intraAxonalVolume;
           extraAxonalVolume = 0;
         }
         double interAxonalVolume = 0;
@@ -1476,7 +1477,8 @@ namespace itk
         double other = extraAxonalVolume - interAxonalVolume;        // rest of compartment
         if (other<0)
         {
-          MITK_ERROR << "Corrupted signal voxel detected. Fiber volume larger voxel volume!";
+          if (other<-0.001)
+            MITK_ERROR << "Corrupted signal voxel detected. Fiber volume larger voxel volume!";
           other = 0;
         }
 

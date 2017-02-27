@@ -240,11 +240,21 @@ void QmitkODFDetailsView::UpdateOdf()
         }
         float mean = sum/QBALL_ODFSIZE;
 
+        float stdev = 0;
+        for (int i=0; i<QBALL_ODFSIZE; i++)
+        {
+          float val = pixel_data[i];
+          float diff = val - mean;
+          stdev += diff*diff;
+        }
+        stdev = std::sqrt(stdev/(QBALL_ODFSIZE-1));
+
         QString pos = QString::number(ind[0])+", "+QString::number(ind[1])+", "+QString::number(ind[2]);
         overviewText += "Coordinates: "+pos+"\n";
         overviewText += "GFA: "+QString::number(odf.GetGeneralizedFractionalAnisotropy())+"\n";
         overviewText += "Sum: "+QString::number(sum)+"\n";
         overviewText += "Mean: "+QString::number(mean)+"\n";
+        overviewText += "Stdev: "+QString::number(stdev)+"\n";
         overviewText += "Min: "+QString::number(min)+"\n";
         overviewText += "Max: "+QString::number(max)+"\n";
         vnl_vector_fixed<double, 3> pd = odf.GetDirection(odf.GetPrincipleDiffusionDirection());

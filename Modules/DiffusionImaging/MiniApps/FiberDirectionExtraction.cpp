@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
     parser.addArgument("verbose", "v", mitkCommandLineParser::Bool, "Verbose:", "output optional and intermediate calculation results");
     parser.addArgument("numdirs", "d", mitkCommandLineParser::Int, "Max. num. directions:", "maximum number of fibers per voxel", 3, true);
     parser.addArgument("normalize", "n", mitkCommandLineParser::Bool, "Normalize:", "normalize vectors");
+    parser.addArgument("file_ending", "f", mitkCommandLineParser::String, "Image type:", ".nrrd, .nii, .nii.gz");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
@@ -85,6 +86,11 @@ int main(int argc, char* argv[])
     bool normalize = false;
     if (parsedArgs.count("normalize"))
         normalize = us::any_cast<bool>(parsedArgs["normalize"]);
+
+    std::string file_ending = ".nrrd";
+    if (parsedArgs.count("file_ending"))
+        file_ending = us::any_cast<std::string>(parsedArgs["file_ending"]);
+
 
     try
     {
@@ -125,9 +131,9 @@ int main(int argc, char* argv[])
             WriterType::Pointer writer = WriterType::New();
 
             string outfilename = outRoot;
-            outfilename.append("_DIRECTION_");
+            outfilename.append("_direction_");
             outfilename.append(boost::lexical_cast<string>(i));
-            outfilename.append(".nrrd");
+            outfilename.append(file_ending);
 
             writer->SetFileName(outfilename.c_str());
             writer->SetInput(itkImg);
@@ -140,7 +146,7 @@ int main(int argc, char* argv[])
             mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
 
             string outfilename = outRoot;
-            outfilename.append("_VECTOR_FIELD.fib");
+            outfilename.append("_vectorfield.fib");
 
             mitk::IOUtil::SaveBaseData(directions.GetPointer(), outfilename );
 
@@ -151,7 +157,8 @@ int main(int argc, char* argv[])
                 WriterType::Pointer writer = WriterType::New();
 
                 string outfilename = outRoot;
-                outfilename.append("_NUM_DIRECTIONS.nrrd");
+                outfilename.append("_numdirections");
+                outfilename.append(file_ending);
 
                 writer->SetFileName(outfilename.c_str());
                 writer->SetInput(numDirImage);

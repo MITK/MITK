@@ -1,12 +1,12 @@
 MITK_CREATE_MODULE(
-  INCLUDE_DIRS PRIVATE src/Classification src/ImageFilters
-  DEPENDS MitkCore MitkDiffusionCore MitkDataCollection MitkSegmentation MitkCLVigraRandomForest #<-- modules on which your module depends on
-  PACKAGE_DEPENDS PUBLIC ITK|ITKDiffusionTensorImage+ITKLevelSets
+  INCLUDE_DIRS PRIVATE src/Classification src/ImageFilters src/ReaderWriter
+  DEPENDS MitkCore MitkDiffusionCore MitkFiberTracking MitkDiffusionIO MitkDataCollection MitkSegmentation MitkCLVigraRandomForest #<-- modules on which your module depends
+  PACKAGE_DEPENDS PUBLIC ITK|ITKDiffusionTensorImage+ITKLevelSets Qt5|Core
   WARNINGS_AS_ERRORS
 )
 
-add_subdirectory(test)
 
 if (MODULE_IS_ENABLED)
- ADD_SUBDIRECTORY(MiniApps)
+  add_subdirectory(test)
+  ADD_SUBDIRECTORY(MiniApps)
 endif()

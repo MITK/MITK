@@ -14,16 +14,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITK_COLLECTION_WRITER_H
-#define MITK_COLLECTION_WRITER_H
+#ifndef MITK_DIFFUSIONCOLLECTION_WRITER_H
+#define MITK_DIFFUSIONCOLLECTION_WRITER_H
 
-//#include "mitkCommon.h"
+#include "mitkCommon.h"
 #include "mitkDataCollection.h"
-#include "mitkCollectionReader.h"
-#include <MitkDataCollectionExports.h>
+#include "mitkDiffusionCollectionReader.h"
 
 namespace mitk {
-  class MITKDATACOLLECTION_EXPORT CollectionWriter
+  class DiffusionCollectionWriter
   {
   public:
 
@@ -74,7 +73,7 @@ namespace mitk {
 
   private:
 
-    static size_t GetIndexForinXMonths(CollectionReader::FileListType fileList, float months, size_t curIndex, std::vector<std::string> filter);
+    static size_t GetIndexForinXMonths(DiffusionCollectionReader::FileListType fileList, float months, size_t curIndex, std::vector<std::string> filter);
   };
 } // namespace mitk
 

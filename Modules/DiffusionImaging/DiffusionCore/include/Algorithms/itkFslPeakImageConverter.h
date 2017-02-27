@@ -64,6 +64,10 @@ public:
   itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                  ///< vector field (peak sizes rescaled for visualization purposes)
   itkGetMacro( DirectionImageContainer, DirectionImageContainerType::Pointer)   ///< container for output peaks
 
+  itkSetMacro( InvertX, bool )
+  itkSetMacro( InvertY, bool )
+  itkSetMacro( InvertZ, bool )
+
   void GenerateData() override;
 
 protected:
@@ -74,6 +78,9 @@ protected:
   mitk::FiberBundle::Pointer           m_OutputFiberBundle;        ///< vector field (peak sizes rescaled for visualization purposes)
   InputType::Pointer                    m_InputImages;              ///< MRtrix peak image of type itk::Image< float, 4 >
   DirectionImageContainerType::Pointer  m_DirectionImageContainer;  ///< container for output peaks
+  bool                                  m_InvertX;
+  bool                                  m_InvertY;
+  bool                                  m_InvertZ;
 
 private:
 

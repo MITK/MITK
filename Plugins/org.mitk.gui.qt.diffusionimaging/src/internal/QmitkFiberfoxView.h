@@ -163,7 +163,7 @@ protected:
 
     void SimulateForExistingDwi(mitk::DataNode* imageNode);     ///< add artifacts to existing diffusion weighted image
     void SimulateImageFromFibers(mitk::DataNode* fiberNode);    ///< simulate new diffusion weighted image
-    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters(bool all=true);  ///< update fiberfox paramater object (template parameter defines noise model type)
+    template< class ScalarType > FiberfoxParameters< ScalarType > UpdateImageParameters(bool all=true, bool save=false);  ///< update fiberfox paramater object (template parameter defines noise model type)
     void UpdateGui();                                           ///< enable/disbale buttons etc. according to current datamanager selection
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
     void EnableCrosshairNavigation();               ///< enable crosshair navigation if planar figure interaction ends

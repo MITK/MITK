@@ -87,12 +87,14 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TrackingSeedImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TrackingStopImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_TrackingRawImageBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_FourTTImageBox->SetDataStorage(this->GetDataStorage());
 
         mitk::NodePredicateIsDWI::Pointer isDiffusionImage = mitk::NodePredicateIsDWI::New();
 
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
         mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
         mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
+        m_Controls->m_FourTTImageBox->SetPredicate(finalPredicate);
         mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
         finalPredicate = mitk::NodePredicateAnd::New(finalPredicate, isBinaryPredicate);
         m_Controls->m_TrackingMaskImageBox->SetPredicate(finalPredicate);
@@ -103,6 +105,7 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TrackingMaskImageBox->SetZeroEntryText("--");
         m_Controls->m_TrackingSeedImageBox->SetZeroEntryText("--");
         m_Controls->m_TrackingStopImageBox->SetZeroEntryText("--");
+        m_Controls->m_FourTTImageBox->SetZeroEntryText("--");
         AddTrainingWidget();
 
         UpdateGui();
@@ -210,10 +213,10 @@ void QmitkMLBTView::StartTrackingThread()
 {
     m_TractogramNode = mitk::DataNode::New();
     m_TractogramNode->SetName("MLBT Result");
-    m_TractogramNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(20));
-    m_TractogramNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    m_TractogramNode->SetProperty("LineWidth", mitk::IntProperty::New(2));
-    m_TractogramNode->SetProperty("color",mitk::ColorProperty::New(0, 1, 1));
+    //m_TractogramNode->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(20));
+    m_TractogramNode->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(true));
+    m_TractogramNode->SetProperty("LineWidth", mitk::IntProperty::New(1));
+    //m_TractogramNode->SetProperty("color",mitk::ColorProperty::New(0, 1, 1));
     this->GetDataStorage()->Add(m_TractogramNode);
 
     m_SamplingPointsNode = mitk::DataNode::New();
@@ -271,7 +274,7 @@ void QmitkMLBTView::StartTracking()
         return;
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
-    m_ForestHandler.AddRawData(dwi);
+    m_ForestHandler.AddDwi(dwi);
 
 //    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 
@@ -301,17 +304,29 @@ void QmitkMLBTView::StartTracking()
         mitk::CastToItkImage(img, itkImg);
         tracker->SetStoppingRegions(itkImg);
     }
+    if (m_Controls->m_FourTTImageBox->GetSelectedNode().IsNotNull())
+    {
+        mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(m_Controls->m_FourTTImageBox->GetSelectedNode()->GetData());
+        ItkUcharImgType::Pointer itkImg = ItkUcharImgType::New();
+        mitk::CastToItkImage(img, itkImg);
+        tracker->SetFourTTImage(itkImg);
+    }
+
     tracker->SetSeedsPerVoxel(m_Controls->m_NumberOfSeedsBox->value());
     tracker->SetStepSize(m_Controls->m_TrackingStepSizeBox->value());
     tracker->SetMinTractLength(m_Controls->m_MinLengthBox->value());
     tracker->SetMaxTractLength(m_Controls->m_MaxLengthBox->value());
     tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
-    tracker->SetRemoveWmEndFibers(false);
+    tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
     tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
     tracker->SetForestHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
-    tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
+    tracker->SetDeflectionMod(m_Controls->m_DeflectionModBox->value());
     tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
+    tracker->SetUseStopVotes(m_Controls->m_UseStopVotes->isChecked());
+    tracker->SetOnlyForwardSamples(m_Controls->m_OnlyForwardSamples->isChecked());
+    tracker->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
+    tracker->SetSeedOnlyGm(m_Controls->m_SeedGm->isChecked());
     tracker->Update();
 }
 
@@ -388,7 +403,7 @@ void QmitkMLBTView::StartTraining()
             m_WhiteMatterImages.push_back(nullptr);
     }
 
-    m_ForestHandler.SetRawData(m_SelectedDiffImages);
+    m_ForestHandler.SetDwis(m_SelectedDiffImages);
     m_ForestHandler.SetTractograms(m_SelectedFB);
     m_ForestHandler.SetMaskImages(m_MaskImages);
     m_ForestHandler.SetWhiteMatterImages(m_WhiteMatterImages);
@@ -397,6 +412,9 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler.SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
     m_ForestHandler.SetSampleFraction(m_Controls->m_SampleFractionBox->value());
     m_ForestHandler.SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
+    m_ForestHandler.SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
+    m_ForestHandler.SetBidirectionalFiberSampling(m_Controls->m_BidirectionalSampling->isChecked());
+    m_ForestHandler.SetZeroDirWmFeatures(m_Controls->m_ZeroDirBox->isChecked());
     m_ForestHandler.StartTraining();
 }
 

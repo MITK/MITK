@@ -80,6 +80,16 @@ void QmitkFreeSurferParcellationHandler::Notify(InteractionEvent *interactionEve
               ImagePixelReadAccessor<unsigned char, 3> readAccess( image );
               value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
             }
+            else if( typeStr == "short" )
+            {
+              ImagePixelReadAccessor<short, 3> readAccess( image );
+              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+            }
+            else if( typeStr == "float" )
+            {
+              ImagePixelReadAccessor<float, 3> readAccess( image );
+              value = static_cast<int>( readAccess.GetPixelByWorldCoordinates( worldposition ) );
+            }
             else
             {
               MITK_WARN("QmitkFreeSurferParcellationHandler") << "Pixeltype '" << typeStr << "' is not implemented yet.";

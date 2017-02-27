@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingMacros.h>
 #include <mitkCompareImageDataFilter.h>
 #include <mitkCoreObjectFactory.h>
+#include <omp.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -37,6 +38,7 @@ using namespace std;
 
 int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 {
+    omp_set_num_threads(1);
     MITK_TEST_BEGIN("mitkLocalFiberPlausibilityTest");
     MITK_TEST_CONDITION_REQUIRED(argc==8,"check for input data")
 

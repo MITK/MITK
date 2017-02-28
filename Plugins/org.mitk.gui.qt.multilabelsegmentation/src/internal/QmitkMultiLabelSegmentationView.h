@@ -144,9 +144,9 @@ protected:
 
   void SetLastFileOpenPath(const QString &path);
 
-  void AddDICOMSegmentationProperties(mitk::LabelSetImage::Pointer image, mitk::Image::Pointer reference);
+  void AddDICOMSegmentationProperties(mitk::LabelSetImage *image, mitk::Image *reference);
 
-  void AddDICOMSegmentProperties(mitk::Label::Pointer label);
+  void AddDICOMSegmentProperties(mitk::Label *label);
 
   void SetReferenceDICOMProperty(mitk::Image *original,
                                  mitk::Image *segmentation,

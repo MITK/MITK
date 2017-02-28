@@ -74,7 +74,7 @@ namespace mitk
       // TODO: Generate dcmdataset witk DICOM tags from property list; ATM the source are the filepaths from the
       // property list
       mitk::StringLookupTableProperty::Pointer filesProp =
-        dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("files").GetPointer());
+        dynamic_cast<mitk::StringLookupTableProperty *>(input->GetProperty("referenceFiles").GetPointer());
 
       if (filesProp.IsNull())
       {
@@ -346,7 +346,7 @@ namespace mitk
       return result;
     }
 
-    // Set active layer to th first layer of the labelset image
+    // Set active layer to the first layer of the labelset image
     if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)
       labelSetImage->SetActiveLayer(0);
 

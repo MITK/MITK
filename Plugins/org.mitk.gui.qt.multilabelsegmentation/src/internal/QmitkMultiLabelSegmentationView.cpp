@@ -552,7 +552,7 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   if (segName.isEmpty())
     segName = "Unnamed";
   workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
-  this->AddDICOMSegmentProperties(workingImage->GetActiveLabel());
+  this->AddDICOMSegmentProperties(workingImage->GetActiveLabel(workingImage->GetActiveLayer()));
 
   UpdateControls();
 
@@ -1031,8 +1031,7 @@ void QmitkMultiLabelSegmentationView::SetLastFileOpenPath(const QString &path)
   this->GetPreferences()->Flush();
 }
 
-void QmitkMultiLabelSegmentationView::AddDICOMSegmentationProperties(mitk::LabelSetImage::Pointer image,
-                                                                     mitk::Image::Pointer reference)
+void QmitkMultiLabelSegmentationView::AddDICOMSegmentationProperties(mitk::LabelSetImage *image, mitk::Image *reference)
 {
   // Add DICOM Tag (0008, 0060) Modality "SEG"
   image->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), mitk::StringProperty::New("SEG"));
@@ -1083,10 +1082,10 @@ void QmitkMultiLabelSegmentationView::AddDICOMSegmentationProperties(mitk::Label
   // Add reference file paths to referenced DICOM data
   mitk::BaseProperty::Pointer dcmFilesProp = reference->GetProperty("files");
   if (dcmFilesProp.IsNotNull())
-    image->SetProperty("files", dcmFilesProp);
+    image->SetProperty("referenceFiles", dcmFilesProp);
 }
 
-void QmitkMultiLabelSegmentationView::AddDICOMSegmentProperties(mitk::Label::Pointer label)
+void QmitkMultiLabelSegmentationView::AddDICOMSegmentProperties(mitk::Label *label)
 {
   mitk::AnatomicalStructureColorPresets::Category category;
   mitk::AnatomicalStructureColorPresets::Type type;

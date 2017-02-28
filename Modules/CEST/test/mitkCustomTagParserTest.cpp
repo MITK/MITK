@@ -187,8 +187,13 @@ public:
       "  \"sWiPMemBlock.alFree[1]\" : \"AdvancedMode\"\n"
       "}";
 
-    // we assume the test library will be in the same location as the MitkCEST library
+    // we assume the test library will be in the same location as the MitkCEST library on windows
+    // on linux the test driver should have a relative path of ../bin/
+#ifdef _WIN32
     std::string filename = m_PathToModule + "/" + "118.json";
+#else
+    std::string filename = m_PathToModule + "/..lib/" + "118.json";
+#endif
     std::ofstream externalFile(filename.c_str());
 
     if (externalFile.is_open())

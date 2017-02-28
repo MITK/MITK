@@ -341,10 +341,16 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
     }
   }
 
+  mitk::LabelSetImage *labelSetSeg = dynamic_cast<mitk::LabelSetImage *>(segmentation);
+
+  mitk::Label::Pointer label = labelSetSeg->GetActiveLabel(labelSetSeg->GetActiveLayer());
+  if (label == nullptr)
+    return;
+
   // Add DICOM Tag (0008, 0060) Modality "SEG"
-  segmentation->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), StringProperty::New("SEG"));
+  label->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x0060).c_str(), StringProperty::New("SEG"));
   // Add DICOM Tag (0008,103E) Series Description
-  segmentation->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str(),
+  label->SetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str(),
                             StringProperty::New("MITK Segmentation"));
   //------------------------------------------------------------
   // Add Segment Sequence tags (0062, 0002)
@@ -355,17 +361,17 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
   // the Segmentation instance in which it is created
   mitk::DICOMTagPath segmentNumberPath;
   segmentNumberPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0004);
-  segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentNumberPath).c_str(), StringProperty::New("1"));
+  label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentNumberPath).c_str(), StringProperty::New(std::to_string(label->GetValue())));
 
   // Segment Label: User-defined label identifying this segment.
   mitk::DICOMTagPath segmentLabelPath;
   segmentLabelPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0005);
-  segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentLabelPath).c_str(), StringProperty::New(organName));
+  label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentLabelPath).c_str(), StringProperty::New(organName));
 
   // Segment Algorithm Type: Type of algorithm used to generate the segment. AUTOMATIC SEMIAUTOMATIC MANUAL
   mitk::DICOMTagPath segmentAlgorithmTypePath;
   segmentAlgorithmTypePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0008);
-  segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentAlgorithmTypePath).c_str(),
+  label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentAlgorithmTypePath).c_str(),
                             StringProperty::New("SEMIAUTOMATIC"));
   //------------------------------------------------------------
   // Add Segmented Property Category Code Sequence tags (0062, 0003): Sequence defining the general category of this
@@ -376,21 +382,21 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
   mitk::DICOMTagPath segmentCategoryCodeValuePath;
   segmentCategoryCodeValuePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0100);
   if (!category.codeValue.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeValuePath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeValuePath).c_str(),
                               StringProperty::New(category.codeValue));
 
   // (0008,0102) Coding Scheme Designator
   mitk::DICOMTagPath segmentCategoryCodeSchemePath;
   segmentCategoryCodeSchemePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0102);
   if (!category.codeScheme.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeSchemePath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeSchemePath).c_str(),
                               StringProperty::New(category.codeScheme));
 
   // (0008,0104) Code Meaning
   mitk::DICOMTagPath segmentCategoryCodeMeaningPath;
   segmentCategoryCodeMeaningPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0104);
   if (!category.codeName.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeMeaningPath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeMeaningPath).c_str(),
                               StringProperty::New(category.codeName));
   //------------------------------------------------------------
   // Add Segmented Property Type Code Sequence (0062, 000F): Sequence defining the specific property type of this
@@ -402,21 +408,21 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
   mitk::DICOMTagPath segmentTypeCodeValuePath;
   segmentTypeCodeValuePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0100);
   if (!type.codeValue.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeValuePath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeValuePath).c_str(),
                               StringProperty::New(type.codeValue));
 
   // (0008,0102) Coding Scheme Designator
   mitk::DICOMTagPath segmentTypeCodeSchemePath;
   segmentTypeCodeSchemePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0102);
   if (!type.codeScheme.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeSchemePath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeSchemePath).c_str(),
                               StringProperty::New(type.codeScheme));
 
   // (0008,0104) Code Meaning
   mitk::DICOMTagPath segmentTypeCodeMeaningPath;
   segmentTypeCodeMeaningPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0104);
   if (!type.codeName.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeMeaningPath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeMeaningPath).c_str(),
                               StringProperty::New(type.codeName));
   //------------------------------------------------------------
   // Add Segmented Property Type Modifier Code Sequence (0062,0011): Sequence defining the modifier of the property type
@@ -432,7 +438,7 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
     .AddElement(0x0062, 0x0011)
     .AddElement(0x008, 0x0100);
   if (!type.modifier.codeValue.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeValuePath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeValuePath).c_str(),
                               StringProperty::New(type.modifier.codeValue));
 
   // (0008,0102) Coding Scheme Designator
@@ -442,7 +448,7 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
     .AddElement(0x0062, 0x0011)
     .AddElement(0x008, 0x0102);
   if (!type.modifier.codeScheme.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeSchemePath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeSchemePath).c_str(),
                               StringProperty::New(type.modifier.codeScheme));
 
   // (0008,0104) Code Meaning
@@ -452,7 +458,7 @@ void mitk::Tool::AddDICOMTagsToSegmentation(Image *original,
     .AddElement(0x0062, 0x0011)
     .AddElement(0x008, 0x0104);
   if (!type.modifier.codeName.empty())
-    segmentation->SetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeMeaningPath).c_str(),
+    label->SetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeMeaningPath).c_str(),
                               StringProperty::New(type.modifier.codeName));
 
   //============================TODO: Not here:-)

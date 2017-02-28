@@ -121,15 +121,19 @@ namespace mitk
         itkInternalImageType::Pointer itkLabelImage = castFilter->GetOutput();
         itkLabelImage->DisconnectPipeline();
 
-        // Iterate over all labels. For each a segmentation image will be created
+        // Iterate over all labels. For each label a segmentation image will be created
         const LabelSet *labelSet = input->GetLabelSet(layer);
-        for (auto itLabel = labelSet->IteratorConstBegin(); itLabel != labelSet->IteratorConstEnd(); ++itLabel)
+        auto labelIter = labelSet->IteratorConstBegin();
+        // Ignore background label
+        ++labelIter;
+
+        for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
         {
           // Thresold over the image with the given label value
           itk::ThresholdImageFilter<itkInternalImageType>::Pointer thresholdFilter =
             itk::ThresholdImageFilter<itkInternalImageType>::New();
           thresholdFilter->SetInput(itkLabelImage);
-          thresholdFilter->ThresholdOutside(itLabel->first, itLabel->first);
+          thresholdFilter->ThresholdOutside(labelIter->first, labelIter->first);
           thresholdFilter->SetOutsideValue(0);
           thresholdFilter->Update();
           itkInternalImageType::Pointer segmentImage = thresholdFilter->GetOutput();
@@ -374,9 +378,14 @@ namespace mitk
     handler.setBodyPartExamined("");
 
     const LabelSet *labelSet = image->GetLabelSet(layer);
-    for (auto it = labelSet->IteratorConstBegin(); it != labelSet->IteratorConstEnd(); ++it)
+    auto labelIter = labelSet->IteratorConstBegin();
+    // Ignore background label
+    ++labelIter;
+
+    for (; labelIter != labelSet->IteratorConstEnd(); ++labelIter)
     {
-      const Label *label = it->second;
+      const Label *label = labelIter->second;
+
       if (label != nullptr)
       {
         mitk::DICOMTagPath segmentNumberPath;
@@ -448,8 +457,17 @@ namespace mitk
         StringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeMeaningPath).c_str()));
 
-        int labelId = std::stoi(segmentNumberProp->GetValue());
-        dcmqi::SegmentAttributes *segAttr = handler.createAndGetNewSegment(labelId);
+        dcmqi::SegmentAttributes *segAttr;
+
+        if (segmentNumberProp->GetValue() == nullptr)
+        {
+          MITK_ERROR << "Something went wrong with the label ID.";
+        }
+        else
+        {
+          int labelId = std::stoi(segmentNumberProp->GetValue());
+          segAttr = handler.createAndGetNewSegment(labelId);
+        }
         if (segAttr != nullptr)
         {
           segAttr->setSegmentDescription(segmentLabelProp->GetValueAsString());
@@ -460,6 +478,10 @@ namespace mitk
             segAttr->setSegmentedPropertyCategoryCodeSequence(segmentCategoryCodeValueProp->GetValueAsString(),
                                                               segmentCategoryCodeSchemeProp->GetValueAsString(),
                                                               segmentCategoryCodeMeaningProp->GetValueAsString());
+          else
+            // some default values
+            segAttr->setSegmentedPropertyCategoryCodeSequence("M-01000", "SRT", "Morphologically Altered Structure");
+
           if (segmentTypeCodeValueProp != nullptr && segmentTypeCodeSchemeProp != nullptr &&
               segmentTypeCodeMeaningProp != nullptr)
           {
@@ -467,6 +489,12 @@ namespace mitk
                                                           segmentTypeCodeSchemeProp->GetValueAsString(),
                                                           segmentTypeCodeMeaningProp->GetValueAsString());
             handler.setBodyPartExamined(segmentTypeCodeMeaningProp->GetValueAsString());
+          }
+          else
+          {
+            // some default values
+            segAttr->setSegmentedPropertyTypeCodeSequence("M-03000", "SRT", "Mass");
+            handler.setBodyPartExamined("Mass");
           }
           if (segmentModifierCodeValueProp != nullptr && segmentModifierCodeSchemeProp != nullptr &&
               segmentModifierCodeMeaningProp != nullptr)

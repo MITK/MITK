@@ -20,6 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"
 #include "mitkCommon.h"
+#include "mitkDICOMTag.h"
 #include "mitkDataNode.h"
 #include "mitkMessage.h"
 #include "mitkNodePredicateAnd.h"
@@ -234,6 +235,15 @@ namespace mitk
     ToolManager *m_ToolManager;
 
   private:
+    void AddDICOMTagsToSegmentation(Image *original,
+                                    Image *segmentation,
+                                    const std::string &organName,
+                                    const mitk::Color &color);
+    void SetReferenceDICOMProperty(Image *original,
+                                   Image *segmentation,
+                                   const DICOMTag &tag,
+                                   const std::string &defaultString = "");
+
     // for reference data
     NodePredicateDataType::Pointer m_PredicateImages;
     NodePredicateDimension::Pointer m_PredicateDim3;

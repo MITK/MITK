@@ -19,14 +19,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
+
 #include "MitkMultilabelIOExports.h"
 
 namespace mitk
 {
   /**
-  * Writes a LabelSetImage to a dcm file
-  * @ingroup Process
-  */
+   * Read and Writes a LabelSetImage to a dcm file
+   * @ingroup Process
+   */
   class MITKMULTILABELIO_EXPORT DICOMSegmentationIO : public mitk::AbstractFileIO
   {
   public:
@@ -40,10 +41,10 @@ namespace mitk
 
     using AbstractFileReader::Read;
     /**
-    * @brief Reads a number of DICOM segmentation from the file system
-    * @return a vector of mitk::LabelSetImages
-    * @throws throws an mitk::Exception if an error ocurrs
-    */
+     * @brief Reads a number of DICOM segmentation from the file system
+     * @return a vector of mitk::LabelSetImages
+     * @throws throws an mitk::Exception if an error ocurrs
+     */
     virtual std::vector<BaseData::Pointer> Read() override;
     virtual ConfidenceLevel GetReaderConfidenceLevel() const override;
 
@@ -52,13 +53,11 @@ namespace mitk
     virtual void Write() override;
     virtual ConfidenceLevel GetWriterConfidenceLevel() const override;
 
-    // -------------- DICOMSegmentationIO specific functions -------------
-
-    const std::string CreateMetaDataJsonFile(int layer);
-    //const  std::map<itkInternalImageType::PixelType, itkInternalImageType::Pointer> GetImagesFromLayer(Image::Pointer layerImage);
-
   private:
     DICOMSegmentationIO *IOClone() const override;
+
+    // -------------- DICOMSegmentationIO specific functions -------------
+    const std::string CreateMetaDataJsonFile(int layer);
   };
 } // end of namespace mitk
 

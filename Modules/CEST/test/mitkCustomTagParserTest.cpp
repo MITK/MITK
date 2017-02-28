@@ -192,7 +192,7 @@ public:
 #ifdef _WIN32
     std::string filename = m_PathToModule + "/" + "118.json";
 #else
-    std::string filename = m_PathToModule + "/..lib/" + "118.json";
+    std::string filename = m_PathToModule + "/../lib/" + "118.json";
 #endif
     std::ofstream externalFile(filename.c_str());
 

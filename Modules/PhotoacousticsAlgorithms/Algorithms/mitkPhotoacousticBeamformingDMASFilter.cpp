@@ -177,22 +177,29 @@ void mitk::BeamformingDMASFilter::GenerateData()
           root = l / sqrt(pow(l, 2) + pow(m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound, 2));
           delayMultiplicator = root / (m_Conf.RecordTime*m_Conf.SpeedOfSound) *m_Conf.Pitch*m_Conf.TransducerElements / inputL;
 
-          for (unsigned short l_s1 = minLine; l_s1 < maxLine-1; ++l_s1)
+          //calculate the AddSamples beforehand to save some time
+          unsigned short* AddSample = new unsigned short[maxLine - minLine];
+          for (unsigned short l_s = 0; l_s < maxLine - minLine; ++l_s)
           {
-            AddSample1 = delayMultiplicator * (l_s1 - l_i) + s_i;
-            if (AddSample1 < inputS && AddSample1 >= 0)
+            AddSample[l_s] = (unsigned short)(delayMultiplicator * (minLine + l_s - l_i) + s_i);
+          }
+
+          for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+          {
+            if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
             {
               for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
               {
-                AddSample2 = delayMultiplicator * (l_s2 - l_i) + s_i;
-                if (AddSample2 < inputS && AddSample2 >= 0)
+                if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
                 {
-                  mult = m_InputData[l_s2 + AddSample2*(unsigned short)inputL] * m_InputData[l_s1 + AddSample1*(unsigned short)inputL];
+                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL];
                   m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
                 }
               }
             }
           }
+
+          delete[] AddSample;
         }
       }
     }
@@ -211,22 +218,29 @@ void mitk::BeamformingDMASFilter::GenerateData()
           s_i = sample / outputS * inputS;
           delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i;
 
+          //calculate the AddSamples beforehand to save some time
+          unsigned short* AddSample = new unsigned short[maxLine - minLine];
+          for (unsigned short l_s = 0; l_s < maxLine - minLine; ++l_s)
+          {
+            AddSample[l_s] = (unsigned short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i);
+          }
+
           for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
           {
-            AddSample1 = delayMultiplicator * pow((l_s1 - l_i), 2) + s_i;
-            if (AddSample1 < inputS && AddSample1 >= 0)
+            if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
             {
               for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
               {
-                AddSample2 = delayMultiplicator * pow((l_s2 - l_i), 2) + s_i;
-                if (AddSample2 < inputS && AddSample2 >= 0)
+                if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
                 {
-                  mult = m_InputData[l_s2 + AddSample2*(unsigned short)inputL] * m_InputData[l_s1 + AddSample1*(unsigned short)inputL];
+                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine]*(unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine]*(unsigned short)inputL];
                   m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
                 }
               }
             }
           }
+
+          delete[] AddSample;
         }
       }
     }
@@ -245,30 +259,33 @@ void mitk::BeamformingDMASFilter::GenerateData()
         {
           s_i = sample / outputS * inputS;
 
-          for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+          //calculate the AddSamples beforehand to save some time
+          unsigned short* AddSample = new unsigned short[maxLine - minLine];
+          for (unsigned short l_s = 0; l_s < maxLine - minLine; ++l_s)
           {
-            AddSample1 = (int)sqrt(
+            AddSample[l_s] = (unsigned short)sqrt(
               pow(s_i, 2)
               +
-              pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s1 - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
+              pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
             );
-            if (AddSample1 < inputS && AddSample1 >= 0)
+          }
+
+          for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+          {
+            if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
             {
               for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
               {
-                AddSample2 = (int)sqrt(
-                  pow(s_i, 2)
-                  +
-                  pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s2 - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-                );
-                if (AddSample2 < inputS && AddSample2 >= 0)
+                if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
                 {
-                  mult = m_InputData[l_s2 + AddSample2*(unsigned short)inputL] * m_InputData[l_s1 + AddSample1*(unsigned short)inputL];
+                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] *(unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine] *(unsigned short)inputL];
                   m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
                 }
               }
             }
           }
+
+          delete[] AddSample;
         }
       }
     }

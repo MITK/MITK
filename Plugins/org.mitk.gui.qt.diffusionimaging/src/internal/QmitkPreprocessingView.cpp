@@ -33,6 +33,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkMergeDiffusionImagesFilter.h>
 #include <itkDwiGradientLengthCorrectionFilter.h>
 #include <itkDwiNormilzationFilter.h>
+#include <mitkTensorImage.h>
+#include <mitkQBallImage.h>
 
 // Multishell includes
 #include <itkRadialMultishellToSingleshellImageFilter.h>
@@ -139,27 +141,21 @@ void QmitkPreprocessingView::CreateConnections()
   if ( m_Controls )
   {
     m_Controls->m_NormalizationMaskBox->SetDataStorage(this->GetDataStorage());
-
     m_Controls->m_SelctedImageComboBox->SetDataStorage(this->GetDataStorage());
     m_Controls->m_MergeDwiBox->SetDataStorage(this->GetDataStorage());
 
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage
-        = mitk::TNodePredicateDataType<mitk::Image>::New();
+    mitk::TNodePredicateDataType<mitk::Image>::Pointer isMitkImage = mitk::TNodePredicateDataType<mitk::Image>::New();
 
-    mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
     mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
     mitk::NodePredicateDataType::Pointer isQbi = mitk::NodePredicateDataType::New("QBallImage");
-    mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isDwi, isDti);
-    isDiffusionImage = mitk::NodePredicateOr::New(isDiffusionImage, isQbi);
+    mitk::NodePredicateOr::Pointer isDiffusionImage = mitk::NodePredicateOr::New(isQbi, isDti);
 
-    mitk::NodePredicateNot::Pointer noDiffusionImage = mitk::NodePredicateNot::New(isDiffusionImage);
-    mitk::NodePredicateAnd::Pointer finalPredicate = mitk::NodePredicateAnd::New(isMitkImage, noDiffusionImage);
-    mitk::NodePredicateProperty::Pointer isBinaryPredicate
-        = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::NodePredicateAnd::Pointer noDiffusionImage = mitk::NodePredicateAnd::New(isMitkImage, mitk::NodePredicateNot::New(isDiffusionImage));
+    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+    mitk::NodePredicateAnd::Pointer binaryNoDiffusionImage = mitk::NodePredicateAnd::New(noDiffusionImage, isBinaryPredicate);
 
-    finalPredicate = mitk::NodePredicateAnd::New(finalPredicate, isBinaryPredicate);
-    m_Controls->m_NormalizationMaskBox->SetPredicate(finalPredicate);
-    m_Controls->m_SelctedImageComboBox->SetPredicate(isMitkImage);
+    m_Controls->m_NormalizationMaskBox->SetPredicate(binaryNoDiffusionImage);
+    m_Controls->m_SelctedImageComboBox->SetPredicate(noDiffusionImage);
     m_Controls->m_MergeDwiBox->SetPredicate(isMitkImage);
 
     m_Controls->m_ExtractBrainMask->setVisible(false);
@@ -1683,7 +1679,7 @@ void QmitkPreprocessingView::OnImageSelectionChanged()
   m_Controls->m_RemoveGradientButton->setEnabled(foundDwiVolume);
   m_Controls->m_ExtractGradientButton->setEnabled(foundDwiVolume);
   m_Controls->m_FlipAxis->setEnabled(foundSingleImageVolume);
-  m_Controls->m_FlipGradientsButton->setEnabled(foundSingleImageVolume);
+  m_Controls->m_FlipGradientsButton->setEnabled(foundDwiVolume);
 
   // reset sampling frame to 1 and update all ealted components
   m_Controls->m_B_ValueMap_Rounder_SpinBox->setValue(1);

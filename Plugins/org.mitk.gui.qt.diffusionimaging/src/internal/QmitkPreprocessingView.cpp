@@ -1845,21 +1845,21 @@ void QmitkPreprocessingView::DoFlipGradientDirections()
   mitk::Image::Pointer newDwi = image->Clone();
   GradientDirectionContainerType::Pointer gradientContainer =
     static_cast<mitk::GradientDirectionsProperty*>
-      ( newDwi->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+      ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
         ->GetGradientDirectionsContainer();
 
+  GradientDirectionContainerType::Pointer new_gradientContainer = GradientDirectionContainerType::New();
   for (unsigned int j=0; j<gradientContainer->Size(); j++)
   {
-      if (m_Controls->m_FlipGradBoxX->isChecked()) { gradientContainer->at(j)[0] = -gradientContainer->at(j)[0]; }
-      if (m_Controls->m_FlipGradBoxY->isChecked()) { gradientContainer->at(j)[1] = -gradientContainer->at(j)[1]; }
-      if (m_Controls->m_FlipGradBoxZ->isChecked()) { gradientContainer->at(j)[2] = -gradientContainer->at(j)[2]; }
+      GradientDirectionType g = gradientContainer->at(j);
+      if (m_Controls->m_FlipGradBoxX->isChecked()) { g[0] *= -1; }
+      if (m_Controls->m_FlipGradBoxY->isChecked()) { g[1] *= -1; }
+      if (m_Controls->m_FlipGradBoxZ->isChecked()) { g[2] *= -1; }
+      new_gradientContainer->push_back(g);
   }
 
-  newDwi->SetProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
-                       mitk::GradientDirectionsProperty::New( gradientContainer ) );
-
-  mitk::DiffusionPropertyHelper propertyHelper( newDwi );
-  propertyHelper.InitializeImage();
+  newDwi->GetPropertyList()->ReplaceProperty( mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str(),
+                       mitk::GradientDirectionsProperty::New( new_gradientContainer ) );
 
   mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
   imageNode->SetData( newDwi );

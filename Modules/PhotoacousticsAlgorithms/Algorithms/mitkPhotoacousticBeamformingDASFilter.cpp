@@ -238,7 +238,7 @@ void mitk::BeamformingDASFilter::GenerateData()
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
-  MITK_INFO << "Beamforming completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count())/1000000 << "ms" << std::endl;
+  MITK_INFO << "DAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 }
 
 void mitk::BeamformingDASFilter::Configure(beamformingSettings settings)

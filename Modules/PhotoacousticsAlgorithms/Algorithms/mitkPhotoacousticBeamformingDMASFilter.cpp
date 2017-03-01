@@ -28,12 +28,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // needed itk image filters
 #include "mitkITKImageImport.h"
-#include "itkForwardFFTImageFilter.h"
-#include "itkGaussianImageSource.h"
-#include "itkInverseFFTImageFilter.h"
 #include "itkFFTShiftImageFilter.h"
 #include "itkMultiplyImageFilter.h"
 #include "itkComplexToModulusImageFilter.h"
+#include <itkAddImageFilter.h>
 
 mitk::BeamformingDMASFilter::BeamformingDMASFilter() : m_OutputData(nullptr), m_InputData(nullptr)
 {
@@ -294,7 +292,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
-  MITK_INFO << "Beamforming completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+  MITK_INFO << "DMAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 }
 
 void mitk::BeamformingDMASFilter::Configure(beamformingSettings settings)
@@ -322,51 +320,33 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   catch (itk::ExceptionObject & error)
   {
     std::cerr << "Error: " << error << std::endl;
+    MITK_WARN << "Bandpass can not be applied after beamforming";
+    return data;
   }
-  /*
-  // A Gaussian is used here to create a low-pass filter.
-  typedef itk::GaussianImageSource< RealImageType > GaussianSourceType;
-  GaussianSourceType::Pointer gaussianSource = GaussianSourceType::New();
-  gaussianSource->SetNormalized(true);
-  ComplexImageType::ConstPointer transformedInput
-    = forwardFFTFilter->GetOutput();
-  const ComplexImageType::RegionType inputRegion(
-    transformedInput->GetLargestPossibleRegion());
-  const ComplexImageType::SizeType inputSize
-    = inputRegion.GetSize();
 
-  const ComplexImageType::SpacingType inputSpacing =
-    transformedInput->GetSpacing();
-  const ComplexImageType::PointType inputOrigin =
-    transformedInput->GetOrigin();
-  const ComplexImageType::DirectionType inputDirection =
-    transformedInput->GetDirection();
-  gaussianSource->SetSize(inputSize);
-  gaussianSource->SetSpacing(inputSpacing);
-  gaussianSource->SetOrigin(inputOrigin);
-  gaussianSource->SetDirection(inputDirection);
-  GaussianSourceType::ArrayType sigma;
-  GaussianSourceType::PointType mean;
-  
-  MITK_INFO<< "spacing " << inputSpacing[0] << " " << inputSpacing[1] << " " << inputSpacing[2];
+  int lowerBound = -100 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
+  int upperBound = 100 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
 
-  double sigmaValue = 0.5;
-  sigma.Fill(sigmaValue);
-  for (unsigned int ii = 0; ii < 3; ++ii)
-  {
-    const double halfLength = inputSize[ii] * inputSpacing[ii] / 2.0;
-    sigma[ii] *= halfLength;
-    mean[ii] = inputOrigin[ii] + halfLength;
-  }
-  mean = inputDirection * mean;
-  gaussianSource->SetSigma(sigma);
-  gaussianSource->SetMean(mean);
+  int center1 = (int)(((double)lowerBound + data->GetDimension(1)/2) / 2);
+  int center2 = (int)(-(-(double)upperBound + data->GetDimension(1)/2) / 2 + data->GetDimension(1));
+
+  int width1 = (int)((double)lowerBound + data->GetDimension(1) / 2);
+  int width2 = (int)(-(double)upperBound + data->GetDimension(1) / 2);
+
+  MITK_INFO << "center1 " << center1 << " width1 " << width1;
+  MITK_INFO << "center2 " << center2 << " width2 " << width2;
+
+  RealImageType::Pointer fftMultiplicator1 = BPFunction(data, width1, center1);
+  RealImageType::Pointer fftMultiplicator2 = BPFunction(data, width2, center2);
+
+  typedef itk::AddImageFilter<RealImageType, RealImageType> AddImageFilterType;
+  AddImageFilterType::Pointer addImageFilter = AddImageFilterType::New();
+  addImageFilter->SetInput1(fftMultiplicator1);
+  addImageFilter->SetInput2(fftMultiplicator2);
 
   typedef itk::FFTShiftImageFilter< RealImageType, RealImageType > FFTShiftFilterType;
   FFTShiftFilterType::Pointer fftShiftFilter = FFTShiftFilterType::New();
-  fftShiftFilter->SetInput(gaussianSource->GetOutput());*/
-
-  RealImageType::Pointer fftMultiplicator = BPFunction(data, 256, 1024);
+  fftShiftFilter->SetInput(addImageFilter->GetOutput());
 
   typedef itk::MultiplyImageFilter< ComplexImageType,
     RealImageType,
@@ -374,12 +354,11 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     MultiplyFilterType;
   MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
-  //multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
-  multiplyFilter->SetInput2(fftMultiplicator);
+  multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
 
   /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
-  toReal->SetInput(multiplyFilter->GetOutput());
-  return GrabItkImageMemory(toReal->GetOutput());*/ //DEBUG
+  toReal->SetInput(forwardFFTFilter->GetOutput());
+  return GrabItkImageMemory(addImageFilter->GetOutput()); //toReal->GetOutput());*/  //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();
@@ -391,7 +370,8 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 
 itk::Image<double,3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
-  double alpha = 0.5;
+  // tukey window
+  double alpha = 0.5 * reference->GetGeometry()->GetSpacing()[1] / 0.0244141;
 
   double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
 

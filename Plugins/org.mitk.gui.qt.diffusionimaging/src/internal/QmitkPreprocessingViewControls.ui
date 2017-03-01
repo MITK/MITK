@@ -447,7 +447,7 @@
              <bool>false</bool>
             </property>
             <property name="toolTip">
-             <string/>
+             <string>Normalizes the diffusion-weighted image values across all weighted volumes to the given mean and standard deviation.</string>
             </property>
             <property name="statusTip">
              <string/>
@@ -590,7 +590,7 @@
                 <bool>true</bool>
                </property>
                <property name="toolTip">
-                <string>New b-0 stdev</string>
+                <string>New stdev</string>
                </property>
                <property name="maximum">
                 <number>100000</number>
@@ -606,7 +606,7 @@
              <item row="0" column="2">
               <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_NormalizationMaskBox">
                <property name="toolTip">
-                <string>Select binary mask image.</string>
+                <string>Select binary mask image. The mask is used to calculate the old mean and standard deviation. </string>
                </property>
                <property name="sizeAdjustPolicy">
                 <enum>QComboBox::AdjustToMinimumContentsLength</enum>
@@ -619,7 +619,7 @@
                 <bool>true</bool>
                </property>
                <property name="toolTip">
-                <string>New mean b-0 value</string>
+                <string>New mean value</string>
                </property>
                <property name="maximum">
                 <number>100000</number>

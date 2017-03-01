@@ -17,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleContext.h>
 
 #include <mitkFiberBundleVtkReader.h>
+#include <mitkFiberBundleTckReader.h>
 #include <mitkFiberBundleTrackVisReader.h>
 #include <mitkConnectomicsNetworkReader.h>
 #include <mitkPlanarFigureCompositeReader.h>
@@ -57,6 +58,7 @@ namespace mitk
 
       m_FiberBundleVtkReader = new FiberBundleVtkReader();
       m_FiberBundleTrackVisReader = new FiberBundleTrackVisReader();
+      m_FiberBundleTckReader = new FiberBundleTckReader();
       m_ConnectomicsNetworkReader = new ConnectomicsNetworkReader();
       m_PlanarFigureCompositeReader = new PlanarFigureCompositeReader();
 
@@ -76,6 +78,7 @@ namespace mitk
       }
 
       delete m_FiberBundleVtkReader;
+      delete m_FiberBundleTckReader;
       delete m_FiberBundleTrackVisReader;
       delete m_ConnectomicsNetworkReader;
       delete m_PlanarFigureCompositeReader;
@@ -91,6 +94,7 @@ namespace mitk
   private:
 
     FiberBundleVtkReader * m_FiberBundleVtkReader;
+    FiberBundleTckReader * m_FiberBundleTckReader;
     FiberBundleTrackVisReader * m_FiberBundleTrackVisReader;
     ConnectomicsNetworkReader * m_ConnectomicsNetworkReader;
     PlanarFigureCompositeReader* m_PlanarFigureCompositeReader;

@@ -154,6 +154,7 @@ namespace mitk
     inline unsigned int GetNumVolumes();                            ///< Get number of baseline and diffusion-weighted image volumes
     inline GradientListType GetGradientDirections();                ///< Return gradient direction container
     inline GradientType GetGradientDirection(unsigned int i);
+    inline std::vector< int > GetBvalues();                         ///< Returns a vector with all unique b-values (determined by the gradient magnitudes)
 
     inline void SetNumWeightedVolumes(int numGradients);            ///< Automaticall calls GenerateGradientHalfShell() afterwards.
     inline void SetGradienDirections(GradientListType gradientList);

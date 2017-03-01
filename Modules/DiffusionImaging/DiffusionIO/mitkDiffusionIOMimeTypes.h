@@ -52,6 +52,11 @@ public:
 
   static std::string FIBERBUNDLE_MIMETYPE_DESCRIPTION();
 
+  // ------------------------------ MRtrix formats ----------------------------------
+
+  static CustomMimeType FIBERBUNDLE_TCK_MIMETYPE();
+  static std::string FIBERBUNDLE_TCK_MIMETYPE_NAME();
+
   // ------------------------------ TrackVis formats ----------------------------------
 
   static CustomMimeType FIBERBUNDLE_TRK_MIMETYPE();

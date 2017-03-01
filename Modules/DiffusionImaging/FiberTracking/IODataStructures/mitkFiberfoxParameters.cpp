@@ -134,14 +134,29 @@ void mitk::SignalGenerationParameters::SetNumWeightedVolumes(int numGradients)
   GenerateGradientHalfShell();
 }
 
+std::vector< int > mitk::SignalGenerationParameters::GetBvalues()
+{
+  std::vector< int > bVals;
+  for( GradientType g : m_GradientDirections)
+  {
+    float norm = g.GetNorm();
+    int bVal = std::round(norm*norm*m_Bvalue);
+    if ( std::find(bVals.begin(), bVals.end(), bVal) == bVals.end() )
+      bVals.push_back(bVal);
+  }
+  return bVals;
+}
+
 void mitk::SignalGenerationParameters::SetGradienDirections(GradientListType gradientList)
 {
   m_GradientDirections = gradientList;
   m_NumGradients = 0;
   m_NumBaseline = 0;
+
   for( unsigned int i=0; i<this->m_GradientDirections.size(); i++)
   {
-    if (m_GradientDirections.at(i).GetNorm()>0.0001)
+    float norm = m_GradientDirections.at(i).GetNorm();
+    if (norm>0.0001)
       m_NumGradients++;
     else
       m_NumBaseline++;
@@ -162,7 +177,8 @@ void mitk::SignalGenerationParameters::SetGradienDirections(mitk::DiffusionPrope
     g[2] = gradientList->at(i)[2];
     m_GradientDirections.push_back(g);
 
-    if (m_GradientDirections.at(i).GetNorm()>0.0001)
+    float norm = m_GradientDirections.at(i).GetNorm();
+    if (norm>0.0001)
       m_NumGradients++;
     else
       m_NumBaseline++;

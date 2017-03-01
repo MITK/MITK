@@ -64,7 +64,7 @@ namespace mitk {
     itk::TimeStamp m_TimeOfHeaderInitialization;
 
     mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
-    itk::Image<double,3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
+    itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
 
     double* m_OutputData;
     double* m_InputData;

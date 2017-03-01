@@ -284,6 +284,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
   }
 
   mitk::Image::Pointer BP = BandpassFilter(output);
+
   for (int i = 0; i < output->GetDimension(2); ++i)
   {
     mitk::ImageReadAccessor copy(BP, BP->GetSliceData(i));
@@ -303,7 +304,6 @@ void mitk::BeamformingDMASFilter::Configure(beamformingSettings settings)
 
 mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Pointer data)
 {
-  return data;
   typedef double PixelType;
   typedef itk::Image< PixelType, 3 > RealImageType;
   RealImageType::Pointer image;
@@ -323,8 +323,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   {
     std::cerr << "Error: " << error << std::endl;
   }
-  
-
+  /*
   // A Gaussian is used here to create a low-pass filter.
   typedef itk::GaussianImageSource< RealImageType > GaussianSourceType;
   GaussianSourceType::Pointer gaussianSource = GaussianSourceType::New();
@@ -335,11 +334,6 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     transformedInput->GetLargestPossibleRegion());
   const ComplexImageType::SizeType inputSize
     = inputRegion.GetSize();
-
-  /*MITK_INFO << "size:" << inputSize[0] << "  " << inputSize[1] << "  " << inputSize[2];
-  itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
-  toReal->SetInput(forwardFFTFilter->GetOutput());
-  return GrabItkImageMemory(toReal->GetOutput());*/ //DEBUG
 
   const ComplexImageType::SpacingType inputSpacing =
     transformedInput->GetSpacing();
@@ -353,7 +347,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   gaussianSource->SetDirection(inputDirection);
   GaussianSourceType::ArrayType sigma;
   GaussianSourceType::PointType mean;
-
+  
   MITK_INFO<< "spacing " << inputSpacing[0] << " " << inputSpacing[1] << " " << inputSpacing[2];
 
   double sigmaValue = 0.5;
@@ -370,7 +364,9 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 
   typedef itk::FFTShiftImageFilter< RealImageType, RealImageType > FFTShiftFilterType;
   FFTShiftFilterType::Pointer fftShiftFilter = FFTShiftFilterType::New();
-  fftShiftFilter->SetInput(gaussianSource->GetOutput());
+  fftShiftFilter->SetInput(gaussianSource->GetOutput());*/
+
+  RealImageType::Pointer fftMultiplicator = BPFunction(data, 256, 1024);
 
   typedef itk::MultiplyImageFilter< ComplexImageType,
     RealImageType,
@@ -378,8 +374,12 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     MultiplyFilterType;
   MultiplyFilterType::Pointer multiplyFilter = MultiplyFilterType::New();
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
-  multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
-  //multiplyFilter->SetInput2(BPFunction(mitk::GrabItkImageMemory(forwardFFTFilter->GetOutput()), 256, 1024));
+  //multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
+  multiplyFilter->SetInput2(fftMultiplicator);
+
+  /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
+  toReal->SetInput(multiplyFilter->GetOutput());
+  return GrabItkImageMemory(toReal->GetOutput());*/ //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();
@@ -391,50 +391,82 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 
 itk::Image<double,3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
-  mitk::Image::Pointer BPweight = mitk::Image::New();
-  BPweight->Initialize(reference);
-
   double alpha = 0.5;
 
-  double* imageData = new double[BPweight->GetDimension(0)*BPweight->GetDimension(1)];
+  double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
 
-  for (int sample = 0; sample < BPweight->GetDimension(1); ++sample)
+  for (int sample = 0; sample < reference->GetDimension(1); ++sample)
   {
-    imageData[BPweight->GetDimension(0)*sample] = 0;
+    imageData[reference->GetDimension(0)*sample] = 0;
   }
 
   for (int n = 0; n < width; ++n)
   {
     if (n <= (alpha*(width - 1)) / 2)
     {
-      imageData[BPweight->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+      imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
     }
     else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
     {
-      imageData[BPweight->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+      imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
     }
     else
     {
-      imageData[BPweight->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
+      imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
     }
   }
 
-  for (int line = 1; line < BPweight->GetDimension(0); ++line)
+  for (int line = 1; line < reference->GetDimension(0); ++line)
   {
-    for (int sample = 0; sample < BPweight->GetDimension(1); ++sample)
+    for (int sample = 0; sample < reference->GetDimension(1); ++sample)
     {
-      imageData[BPweight->GetDimension(0)*sample + line] = imageData[BPweight->GetDimension(0)*sample];
+      imageData[reference->GetDimension(0)*sample + line] = imageData[reference->GetDimension(0)*sample];
     }
   }
 
-  for (int slice = 0; slice < BPweight->GetDimension(2); ++slice)
+  typedef itk::Image< double, 3U >  ImageType;
+  ImageType::RegionType region;
+  ImageType::IndexType start;
+  start.Fill(0);
+
+  region.SetIndex(start);
+
+  ImageType::SizeType size;
+  size[0] = reference->GetDimension(0);
+  size[1] = reference->GetDimension(1);
+  size[2] = reference->GetDimension(2);
+
+  region.SetSize(size);
+
+  ImageType::SpacingType SpacingItk;
+  SpacingItk[0] = reference->GetGeometry()->GetSpacing()[0];
+  SpacingItk[1] = reference->GetGeometry()->GetSpacing()[1];
+  SpacingItk[2] = reference->GetGeometry()->GetSpacing()[2];
+
+  ImageType::Pointer image = ImageType::New();
+  image->SetRegions(region);
+  image->Allocate();
+  image->FillBuffer(itk::NumericTraits<double>::Zero);
+  image->SetSpacing(SpacingItk);
+
+  ImageType::IndexType pixelIndex;
+
+  for (ImageType::IndexValueType slice = 0; slice < reference->GetDimension(2); ++slice)
   {
-    BPweight->SetSlice(imageData, slice);
+    for (ImageType::IndexValueType line = 0; line < reference->GetDimension(0); ++line)
+    {
+      for (ImageType::IndexValueType sample = 0; sample < reference->GetDimension(1); ++sample)
+      {
+        pixelIndex[0] = line;
+        pixelIndex[1] = sample;
+        pixelIndex[2] = slice;
+
+        image->SetPixel(pixelIndex, imageData[line + sample*reference->GetDimension(0)]);
+      }
+    }
   }
 
   delete[] imageData;
 
-  itk::Image<double,3>::Pointer itkImage;
-  mitk::CastToItkImage(BPweight, itkImage);
-  return itkImage;
+  return image;
 }

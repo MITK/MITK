@@ -106,7 +106,7 @@ void mitk::DiffusionImageNrrdWriterService::Write()
   std::string ext = this->GetMimeType()->GetExtension(this->GetOutputLocation());
   ext = itksys::SystemTools::LowerCase(ext);
 
-  // default extension is .dwi
+  // default extension is .nrrd
   if( ext == "")
   {
     ext = ".nrrd";

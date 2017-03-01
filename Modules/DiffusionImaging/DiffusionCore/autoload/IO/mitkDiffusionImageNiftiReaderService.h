@@ -42,7 +42,8 @@ namespace mitk
   public:
 
     DiffusionImageNiftiReaderService(const DiffusionImageNiftiReaderService & other);
-    DiffusionImageNiftiReaderService();
+    //DiffusionImageNiftiReaderService();
+    DiffusionImageNiftiReaderService(CustomMimeType mime_type, std::string mime_type_description );
     virtual ~DiffusionImageNiftiReaderService();
 
     using AbstractFileReader::Read;

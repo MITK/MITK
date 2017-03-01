@@ -68,11 +68,16 @@ DiffusionImageNiftiReaderService::
 {}
 
 DiffusionImageNiftiReaderService::
-DiffusionImageNiftiReaderService()
-  : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() )
+DiffusionImageNiftiReaderService(CustomMimeType mime_type, std::string mime_type_description ) : mitk::AbstractFileReader( mime_type, mime_type_description )
 {
   m_ServiceReg = this->RegisterService();
 }
+
+//DiffusionImageNiftiReaderService::
+//DiffusionImageNiftiReaderService() : mitk::AbstractFileReader( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() )
+//{
+//  m_ServiceReg = this->RegisterService();
+//}
 
 std::vector<itk::SmartPointer<mitk::BaseData> >
 DiffusionImageNiftiReaderService::

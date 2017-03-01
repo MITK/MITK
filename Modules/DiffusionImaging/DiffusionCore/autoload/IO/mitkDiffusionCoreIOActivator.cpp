@@ -56,7 +56,9 @@ namespace mitk
       }
 
       m_DiffusionImageNrrdReaderService = new DiffusionImageNrrdReaderService();
-      m_DiffusionImageNiftiReaderService = new DiffusionImageNiftiReaderService();
+      m_DiffusionImageNiftiReaderService = new DiffusionImageNiftiReaderService( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_NIFTI_MIMETYPE_DESCRIPTION() );
+      m_DiffusionImageFslNiftiReaderService = new DiffusionImageNiftiReaderService( CustomMimeType( mitk::DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE() ), mitk::DiffusionCoreIOMimeTypes::DWI_FSL_MIMETYPE_DESCRIPTION() );
+
       m_NrrdTensorImageReader = new NrrdTensorImageReader();
       m_NrrdQBallImageReader = new NrrdQBallImageReader();
 
@@ -99,6 +101,7 @@ namespace mitk
 
       delete m_DiffusionImageNrrdReaderService;
       delete m_DiffusionImageNiftiReaderService;
+      delete m_DiffusionImageFslNiftiReaderService;
       delete m_NrrdTensorImageReader;
       delete m_NrrdQBallImageReader;
 
@@ -112,6 +115,7 @@ namespace mitk
 
     DiffusionImageNrrdReaderService * m_DiffusionImageNrrdReaderService;
     DiffusionImageNiftiReaderService * m_DiffusionImageNiftiReaderService;
+    DiffusionImageNiftiReaderService * m_DiffusionImageFslNiftiReaderService;
     NrrdTensorImageReader * m_NrrdTensorImageReader;
     NrrdQBallImageReader * m_NrrdQBallImageReader;
 

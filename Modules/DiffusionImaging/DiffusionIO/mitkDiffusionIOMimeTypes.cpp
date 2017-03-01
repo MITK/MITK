@@ -33,6 +33,7 @@ std::vector<CustomMimeType*> DiffusionIOMimeTypes::Get()
 
   mimeTypes.push_back(FIBERBUNDLE_VTK_MIMETYPE().Clone());
   mimeTypes.push_back(FIBERBUNDLE_TRK_MIMETYPE().Clone());
+  mimeTypes.push_back(FIBERBUNDLE_TCK_MIMETYPE().Clone());
 
   mimeTypes.push_back(CONNECTOMICS_MIMETYPE().Clone());
 
@@ -60,6 +61,16 @@ CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE()
   mimeType.SetCategory(category);
   mimeType.AddExtension("fib");
 //  mimeType.AddExtension("vtk");
+  return mimeType;
+}
+
+CustomMimeType DiffusionIOMimeTypes::FIBERBUNDLE_TCK_MIMETYPE()
+{
+  CustomMimeType mimeType(FIBERBUNDLE_TCK_MIMETYPE_NAME());
+  std::string category = "MRtrix Fibers";
+  mimeType.SetComment("MRtrix Fibers");
+  mimeType.SetCategory(category);
+  mimeType.AddExtension("tck");
   return mimeType;
 }
 
@@ -107,6 +118,12 @@ CustomMimeType DiffusionIOMimeTypes::CONNECTOMICS_LIST_MIMETYPE()
 std::string DiffusionIOMimeTypes::FIBERBUNDLE_VTK_MIMETYPE_NAME()
 {
   static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.vtk";
+  return name;
+}
+
+std::string DiffusionIOMimeTypes::FIBERBUNDLE_TCK_MIMETYPE_NAME()
+{
+  static std::string name = IOMimeTypes::DEFAULT_BASE_NAME() + ".FiberBundle.tck";
   return name;
 }
 

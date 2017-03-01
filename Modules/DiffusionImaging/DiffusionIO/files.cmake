@@ -18,6 +18,7 @@ set(CPP_FILES
 
   mitkDiffusionIOMimeTypes.cpp
 
+  mitkFiberBundleTckReader.cpp
   mitkFiberBundleTrackVisReader.cpp
   mitkFiberBundleTrackVisWriter.cpp
   mitkFiberBundleVtkReader.cpp
@@ -29,6 +30,5 @@ set(CPP_FILES
   mitkPlanarFigureCompositeWriter.cpp
   mitkPlanarFigureCompositeReader.cpp
   mitkPlanarFigureCompositeSerializer.cpp
-
 )
 

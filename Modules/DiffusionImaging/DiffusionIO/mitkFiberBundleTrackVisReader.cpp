@@ -67,11 +67,11 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleTrackVisReader:
 
         if (ext==".trk")
         {
-            FiberBundle::Pointer image = FiberBundle::New();
+            FiberBundle::Pointer mitk_fib = FiberBundle::New();
             TrackVisFiberReader reader;
             reader.open(this->GetInputLocation().c_str());
-            reader.read(image.GetPointer());
-            result.push_back(image.GetPointer());
+            reader.read(mitk_fib.GetPointer());
+            result.push_back(mitk_fib.GetPointer());
             return result;
         }
 

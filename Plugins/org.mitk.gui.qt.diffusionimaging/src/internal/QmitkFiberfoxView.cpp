@@ -1170,6 +1170,11 @@ FiberfoxParameters< ScalarType > QmitkFiberfoxView::UpdateImageParameters(bool a
 void QmitkFiberfoxView::SaveParameters(QString filename)
 {
   FiberfoxParameters<> ffParamaters = UpdateImageParameters<double>(true, true);
+  std::vector< int > bVals = ffParamaters.m_SignalGen.GetBvalues();
+  std::cout << "b-values: ";
+  for (auto v : bVals)
+      std::cout << v << " ";
+  std::cout << std::endl;
   bool ok = true;
   bool first = true;
   bool dosampling = false;

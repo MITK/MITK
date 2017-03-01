@@ -96,13 +96,13 @@ void mitk::BeamformingDMASFilter::GenerateData()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  float inputS = input->GetDimension(1);
-  float inputL = input->GetDimension(0);
+  double inputS = input->GetDimension(1);
+  double inputL = input->GetDimension(0);
 
-  float outputS = output->GetDimension(1);
-  float outputL = output->GetDimension(0);
+  double outputS = output->GetDimension(1);
+  double outputL = output->GetDimension(0);
 
-  float part = 0.07 * inputL;
+  double part = 0.07 * inputL;
 
   if (!output->IsInitialized())
   {
@@ -134,6 +134,23 @@ void mitk::BeamformingDMASFilter::GenerateData()
       }
       m_InputData = m_InputDataPuffer;
     }
+    else if (input->GetPixelType().GetTypeAsString() == "scalar (float)")
+    {
+      float* InputPuffer = (float*)inputReadAccessor.GetData();
+      for (int l = 0; l < inputL; ++l)
+      {
+        for (int s = 0; s < inputS; ++s)
+        {
+          m_InputDataPuffer[l*(unsigned short)inputS + s] = (double)InputPuffer[l*(unsigned short)inputS + s];
+        }
+      }
+      m_InputData = m_InputDataPuffer;
+    }
+    else
+    {
+      MITK_INFO << "Could not determine pixel type";
+      return;
+    }
 
     for (int l = 0; l < outputL; ++l)
     {
@@ -147,15 +164,15 @@ void mitk::BeamformingDMASFilter::GenerateData()
     unsigned short AddSample2 = 0;
     unsigned short maxLine = 0;
     unsigned short minLine = 0;
-    float delayMultiplicator = 0;
-    float l_i = 0;
-    float s_i = 0;
+    double delayMultiplicator = 0;
+    double l_i = 0;
+    double s_i = 0;
 
-    float l = 0;
-    float x = 0;
-    float root = 0;
+    double l = 0;
+    double x = 0;
+    double root = 0;
 
-    float mult = 0;
+    double mult = 0;
 
     if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
     {
@@ -165,7 +182,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
         l_i = line / outputL * inputL;
 
         maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0f);
+        minLine = (unsigned short)std::max((l_i - part), 0.0);
 
         l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
 
@@ -211,7 +228,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
         l_i = line / outputL * inputL;
 
         maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0f);
+        minLine = (unsigned short)std::max((l_i - part), 0.0);
 
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
@@ -253,7 +270,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
         l_i = line / outputL * inputL;
 
         maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0f);
+        minLine = (unsigned short)std::max((l_i - part), 0.0);
 
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
@@ -309,7 +326,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
-  MITK_INFO << "DMAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+  MITK_INFO << "DMAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 }
 
 void mitk::BeamformingDMASFilter::Configure(beamformingSettings settings)

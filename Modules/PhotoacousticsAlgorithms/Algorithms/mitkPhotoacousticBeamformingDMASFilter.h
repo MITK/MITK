@@ -36,7 +36,7 @@ namespace mitk {
     struct beamformingSettings
     {
       double Pitch = 0.0003; // [m]
-      float SpeedOfSound = 1540; // [m/s]
+      double SpeedOfSound = 1540; // [m/s]
       unsigned int SamplesPerLine = 2048;
       unsigned int ReconstructionLines = 128;
       double RecordTime = 0.00006; // [s]

@@ -144,15 +144,6 @@ protected:
 
   void SetLastFileOpenPath(const QString &path);
 
-  void AddDICOMSegmentationProperties(mitk::LabelSetImage *image, mitk::Image *reference);
-
-  void AddDICOMSegmentProperties(mitk::Label *label);
-
-  void SetReferenceDICOMProperty(mitk::Image *original,
-                                 mitk::Image *segmentation,
-                                 const mitk::DICOMTag &tag,
-                                 const std::string &defaultString = "");
-
   /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget *m_Parent;
 

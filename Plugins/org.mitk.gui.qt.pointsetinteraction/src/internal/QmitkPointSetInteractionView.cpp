@@ -133,7 +133,7 @@ void QmitkPointSetInteractionView::OnSelectionChanged(berry::IWorkbenchPart::Poi
   {
     m_Controls->m_CurrentPointSetLabel->setText(tr("None"));
     m_Controls->m_PointListWidget->SetPointSetNode(nullptr);
-    std::vector<mitk::DataNode*> emptyList;
+    QList<mitk::DataNode::Pointer> emptyList;
     emptyList.push_back(nullptr);
     this->FireNodesSelected( emptyList );
   }

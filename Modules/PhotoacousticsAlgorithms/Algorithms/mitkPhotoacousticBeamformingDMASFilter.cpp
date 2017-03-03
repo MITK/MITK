@@ -102,7 +102,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
   double outputS = output->GetDimension(1);
   double outputL = output->GetDimension(0);
 
-  double part = 0.07 * inputL;
+  double* VonHannWindow = VonHannFunction(m_Conf.TransducerElements*2);
 
   if (!output->IsInitialized())
   {
@@ -172,6 +172,11 @@ void mitk::BeamformingDMASFilter::GenerateData()
     double x = 0;
     double root = 0;
 
+    double part = 0.07 * inputL;
+    double tan_phi = std::tan(m_Conf.Angle/360*2*M_PI);
+    double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+    double VH_mult = 1;
+
     double mult = 0;
 
     if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
@@ -179,16 +184,18 @@ void mitk::BeamformingDMASFilter::GenerateData()
       //linear delay
       for (unsigned short line = 0; line < outputL; ++line)
       {
-        l_i = line / outputL * inputL;
-
-        maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0);
+        l_i = line / outputL * inputL;        
 
         l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
 
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
           s_i = sample / outputS * inputS;
+
+          part = part_multiplicator*s_i;
+          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
+          minLine = (unsigned short)std::max((l_i - part), 0.0);
+          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
 
           x = m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound;
           root = l / sqrt(pow(l, 2) + pow(m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound, 2));
@@ -209,12 +216,14 @@ void mitk::BeamformingDMASFilter::GenerateData()
               {
                 if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
                 {
-                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL];
+                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s1 - minLine)*VH_mult)] * VonHannWindow[(unsigned short)((l_s2 - minLine)*VH_mult)];
                   m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
                 }
               }
             }
           }
+
+          m_OutputData[sample*(unsigned short)outputL + line] = 10 * m_OutputData[sample*(unsigned short)outputL + line] / (pow(maxLine - minLine, 2) - (maxLine - minLine - 1));
 
           delete[] AddSample;
         }
@@ -227,12 +236,14 @@ void mitk::BeamformingDMASFilter::GenerateData()
       {
         l_i = line / outputL * inputL;
 
-        maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0);
-
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
           s_i = sample / outputS * inputS;
+
+          part = part_multiplicator*s_i;
+          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
+          minLine = (unsigned short)std::max((l_i - part), 0.0);
+
           delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i;
 
           //calculate the AddSamples beforehand to save some time
@@ -250,12 +261,15 @@ void mitk::BeamformingDMASFilter::GenerateData()
               {
                 if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
                 {
-                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine]*(unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine]*(unsigned short)inputL];
+                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s2 - minLine)*VH_mult)] * m_InputData[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s1 - minLine)*VH_mult)];
                   m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
                 }
               }
             }
           }
+
+          m_OutputData[sample*(unsigned short)outputL + line] = 10 * m_OutputData[sample*(unsigned short)outputL + line] / (pow(maxLine-minLine,2) - (maxLine-minLine-1));
+
 
           delete[] AddSample;
         }
@@ -269,12 +283,13 @@ void mitk::BeamformingDMASFilter::GenerateData()
 
         l_i = line / outputL * inputL;
 
-        maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0);
-
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
           s_i = sample / outputS * inputS;
+
+          part = part_multiplicator*s_i;
+          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
+          minLine = (unsigned short)std::max((l_i - part), 0.0);
 
           //calculate the AddSamples beforehand to save some time
           unsigned short* AddSample = new unsigned short[maxLine - minLine];
@@ -295,12 +310,14 @@ void mitk::BeamformingDMASFilter::GenerateData()
               {
                 if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
                 {
-                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] *(unsigned short)inputL] * m_InputData[l_s1 + AddSample[l_s1 - minLine] *(unsigned short)inputL];
+                  mult = m_InputData[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s2 - minLine)*VH_mult)] * m_InputData[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s1 - minLine)*VH_mult)];
                   m_OutputData[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
                 }
               }
             }
           }
+
+          m_OutputData[sample*(unsigned short)outputL + line] = 10 * m_OutputData[sample*(unsigned short)outputL + line] / (pow(maxLine - minLine, 2) - (maxLine - minLine - 1));
 
           delete[] AddSample;
         }
@@ -324,6 +341,8 @@ void mitk::BeamformingDMASFilter::GenerateData()
   }
 
   m_TimeOfHeaderInitialization.Modified();
+
+  delete[] VonHannWindow;
 
   auto end = std::chrono::high_resolution_clock::now();
   MITK_INFO << "DMAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
@@ -483,4 +502,16 @@ itk::Image<double,3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Ima
   delete[] imageData;
 
   return image;
+}
+
+double* mitk::BeamformingDMASFilter::VonHannFunction(int samples)
+{
+  double* VonHannWindow = new double[samples];
+
+  for (int n = 0; n < samples; ++n)
+  {
+    VonHannWindow[n] = (1 - cos(2 * M_PI * n / (samples - 1))) / 2;
+  }
+
+  return VonHannWindow;
 }

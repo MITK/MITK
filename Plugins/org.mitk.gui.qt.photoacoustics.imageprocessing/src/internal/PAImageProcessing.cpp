@@ -233,6 +233,7 @@ void PAImageProcessing::UpdateBFSettings()
   DASconfig.ReconstructionLines = m_Controls.Lines->value();
   DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound * 2; // [s]
   DASconfig.TransducerElements = m_Controls.ElementCount->value();
+  DASconfig.Angle = m_Controls.Angle->value();
 
   DMASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
   DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
@@ -240,4 +241,5 @@ void PAImageProcessing::UpdateBFSettings()
   DMASconfig.ReconstructionLines = m_Controls.Lines->value();
   DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound * 2; // [s]
   DMASconfig.TransducerElements = m_Controls.ElementCount->value();
+  DMASconfig.Angle = m_Controls.Angle->value();
 }

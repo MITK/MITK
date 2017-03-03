@@ -43,6 +43,7 @@ namespace mitk {
       unsigned int TransducerElements = 128;
       enum DelayCalc { Linear, QuadApprox, Spherical };
       DelayCalc DelayCalculationMethod = QuadApprox;
+      double Angle = 10.0;
     };
 
     void Configure(beamformingSettings settings);
@@ -65,6 +66,7 @@ namespace mitk {
 
     mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
     itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
+    double* VonHannFunction(int samples);
 
     double* m_OutputData;
     double* m_InputData;

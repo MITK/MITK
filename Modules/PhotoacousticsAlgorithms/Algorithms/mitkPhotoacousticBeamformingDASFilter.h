@@ -43,6 +43,7 @@ namespace mitk {
       unsigned int TransducerElements = 128;
       enum DelayCalc {Linear, QuadApprox, Spherical};
       DelayCalc DelayCalculationMethod = QuadApprox;
+      double Angle = 10;
     };
 
     void Configure(beamformingSettings settings);
@@ -62,6 +63,8 @@ namespace mitk {
     //##Description
     //## @brief Time when Header was last initialized
     itk::TimeStamp m_TimeOfHeaderInitialization;
+
+    double* VonHannFunction(int samples);
 
     double* m_OutputData;
     double* m_InputData;

@@ -14,6 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#define _USE_MATH_DEFINES
 
 #include "mitkPhotoacousticBeamformingDASFilter.h"
 #include "mitkProperties.h"
@@ -21,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <itkImageIOBase.h>
 #include <chrono>
+#include <cmath>
 
 
 mitk::BeamformingDASFilter::BeamformingDASFilter() : m_OutputData(nullptr), m_InputData(nullptr)
@@ -86,13 +88,13 @@ void mitk::BeamformingDASFilter::GenerateData()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  float inputS = input->GetDimension(1);
-  float inputL = input->GetDimension(0);
+  double inputS = input->GetDimension(1);
+  double inputL = input->GetDimension(0);
 
-  float outputS = output->GetDimension(1);
-  float outputL = output->GetDimension(0);
+  double outputS = output->GetDimension(1);
+  double outputL = output->GetDimension(0);
 
-  float part = 0.07 * inputL;
+  double* VonHannWindow = VonHannFunction(m_Conf.TransducerElements * 2);
 
   if (!output->IsInitialized())
   {
@@ -124,6 +126,23 @@ void mitk::BeamformingDASFilter::GenerateData()
       }
       m_InputData = m_InputDataPuffer;
     }
+    else if (input->GetPixelType().GetTypeAsString() == "scalar (float)")
+    {
+      float* InputPuffer = (float*)inputReadAccessor.GetData();
+      for (int l = 0; l < inputL; ++l)
+      {
+        for (int s = 0; s < inputS; ++s)
+        {
+          m_InputDataPuffer[l*(unsigned short)inputS + s] = (double)InputPuffer[l*(unsigned short)inputS + s];
+        }
+      }
+      m_InputData = m_InputDataPuffer;
+    }
+    else
+    {
+      MITK_INFO << "Could not determine pixel type";
+      return;
+    }
 
     for (int l = 0; l < outputL; ++l)
     {
@@ -136,13 +155,19 @@ void mitk::BeamformingDASFilter::GenerateData()
     unsigned short AddSample = 0;
     unsigned short maxLine = 0;
     unsigned short minLine = 0;
-    float delayMultiplicator = 0;
-    float l_i = 0;
-    float s_i = 0;
+    double delayMultiplicator = 0;
+    double l_i = 0;
+    double s_i = 0;
 
-    float l = 0;
-    float x = 0;
-    float root = 0;
+    double part = 0.07 * inputL;
+    double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+    double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+
+    double VH_mult = 1;
+
+    double l = 0;
+    double x = 0;
+    double root = 0;
 
     if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
     {
@@ -151,14 +176,16 @@ void mitk::BeamformingDASFilter::GenerateData()
       {
         l_i = line / outputL * inputL;
 
-        maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0f);
-
         l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
 
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
           s_i = sample / outputS * inputS;
+
+          part = part_multiplicator*s_i;
+          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
+          minLine = (unsigned short)std::max((l_i - part), 0.0);
+          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
 
           x = m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound;
           root = l / sqrt(pow(l, 2) + pow(m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound, 2));
@@ -168,8 +195,9 @@ void mitk::BeamformingDASFilter::GenerateData()
           {
             AddSample = delayMultiplicator * (l_s - l_i) + s_i;
             if (AddSample < inputS && AddSample >= 0)
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL];
+              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s - minLine)*VH_mult)];
           }
+          m_OutputData[sample*(unsigned short)outputL + line] = m_OutputData[sample*(unsigned short)outputL + line] / (maxLine - minLine);
         }
       }
     }
@@ -180,21 +208,25 @@ void mitk::BeamformingDASFilter::GenerateData()
       {
         l_i = line / outputL * inputL;
 
-        maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0f);
-
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
           s_i = sample / outputS * inputS;
+
+          part = part_multiplicator*s_i;
+          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
+          minLine = (unsigned short)std::max((l_i - part), 0.0);
+          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
+
           delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i;
 
           for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
           {
             AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
             if (AddSample < inputS && AddSample >= 0) {
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL];
+              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s-minLine)*VH_mult)];
             }
           }
+          m_OutputData[sample*(unsigned short)outputL + line] = m_OutputData[sample*(unsigned short)outputL + line] / (maxLine - minLine);
         }
       }
     }
@@ -206,12 +238,14 @@ void mitk::BeamformingDASFilter::GenerateData()
 
         l_i = line / outputL * inputL;
 
-        maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-        minLine = (unsigned short)std::max((l_i - part), 0.0f);
-
         for (unsigned short sample = 0; sample < outputS; ++sample)
         {
           s_i = sample / outputS * inputS;
+
+          part = part_multiplicator*s_i;
+          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
+          minLine = (unsigned short)std::max((l_i - part), 0.0);
+          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
 
           for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
           {
@@ -221,9 +255,10 @@ void mitk::BeamformingDASFilter::GenerateData()
               pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
             );
             if (AddSample < inputS && AddSample >= 0) {
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL];
+              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL]*VonHannWindow[(unsigned short)((l_s - minLine)*VH_mult)];
             }
           }
+          m_OutputData[sample*(unsigned short)outputL + line] = m_OutputData[sample*(unsigned short)outputL + line] / (maxLine - minLine);
         }
       }
     }
@@ -238,10 +273,22 @@ void mitk::BeamformingDASFilter::GenerateData()
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
-  MITK_INFO << "DAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+  MITK_INFO << "DAS Beamforming of " << output->GetDimension(2) << " Images completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 }
 
 void mitk::BeamformingDASFilter::Configure(beamformingSettings settings)
 {
   m_Conf = settings;
+}
+
+double* mitk::BeamformingDASFilter::VonHannFunction(int samples)
+{
+  double* VonHannWindow = new double[samples];
+
+  for (int n = 0; n < samples; ++n)
+  {
+    VonHannWindow[n] = (1 - cos(2 * M_PI * n / (samples - 1))) / 2;
+  }
+
+  return VonHannWindow;
 }

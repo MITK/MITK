@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkGibbsTrackingViewControls.h"
 
@@ -54,9 +54,6 @@ private:
 
 /*!
   \brief View for global fiber tracking (Gibbs tracking)
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
 typedef itk::Image< float, 3 >            FloatImageType;
 
@@ -66,7 +63,7 @@ template<class X>
 class GibbsTrackingFilter;
 }
 
-class QmitkGibbsTrackingView : public QmitkFunctionality
+class QmitkGibbsTrackingView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -87,8 +84,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
 signals:
 
@@ -123,15 +122,15 @@ private:
   void UpdateGUI();             ///< update button activity etc. dpending on current datamanager selection
   void UpdateTrackingStatus();  ///< update textual status display of the tracking process
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+
   /// \brief called when DataNode is removed to stop gibbs tracking after node is removed
   virtual void NodeRemoved(const mitk::DataNode * node) override;
 
   void UpdateIteraionsGUI(unsigned long iterations);    ///< update iterations label text
 
   Ui::QmitkGibbsTrackingViewControls* m_Controls;
-  QmitkStdMultiWidget* m_MultiWidget;
 
   /** data objects */
   mitk::DataNode::Pointer       m_TrackingNode;     ///< actual node that is tracked

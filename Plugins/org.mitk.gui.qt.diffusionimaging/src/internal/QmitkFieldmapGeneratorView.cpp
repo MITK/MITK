@@ -20,18 +20,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK
 #include "QmitkFieldmapGeneratorView.h"
-#include <QmitkStdMultiWidget.h>
 #include <QmitkDataStorageComboBox.h>
 #include <mitkNodePredicateDataType.h>
 #include <itkFieldmapGeneratorFilter.h>
 #include <mitkImage.h>
+#include <mitkSliceNavigationController.h>
+#include <QmitkRenderWindow.h>
 
 const std::string QmitkFieldmapGeneratorView::VIEW_ID = "org.mitk.views.fieldmapgenerator";
 
 QmitkFieldmapGeneratorView::QmitkFieldmapGeneratorView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
 {
 
 }
@@ -62,6 +62,11 @@ void QmitkFieldmapGeneratorView::CreateQtPartControl( QWidget *parent )
     }
 }
 
+void QmitkFieldmapGeneratorView::SetFocus()
+{
+  m_Controls->m_SelectedImageBox->setFocus();
+}
+
 void QmitkFieldmapGeneratorView::OnVarianceChanged(double value)
 {
     if (m_SelectedSource.IsNotNull())
@@ -82,7 +87,7 @@ void QmitkFieldmapGeneratorView::OnHeightChanged(double value)
 
 void QmitkFieldmapGeneratorView::PlaceFieldSource()
 {
-    if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNull() || !m_MultiWidget)
+    if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNull() || !this->GetRenderWindowPart())
     {
         m_Controls->m_WorldPosLabel->setText("-");
         m_Controls->m_IndexLabel->setText("-");
@@ -192,54 +197,50 @@ void QmitkFieldmapGeneratorView::GenerateFieldmap()
     GetDataStorage()->Add(resultNode);
 }
 
-void QmitkFieldmapGeneratorView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkFieldmapGeneratorView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-    m_MultiWidget = &stdMultiWidget;
-
     {
-        mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
         command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
         m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
     }
 
     {
-        mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
         command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
         m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
     }
 
     {
-        mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::Pointer command = itk::ReceptorMemberCommand<QmitkFieldmapGeneratorView>::New();
         command->SetCallbackFunction( this, &QmitkFieldmapGeneratorView::OnSliceChanged );
         m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
     }
 }
 
-void QmitkFieldmapGeneratorView::StdMultiWidgetNotAvailable()
+void QmitkFieldmapGeneratorView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
 
     {
-        mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
         slicer->RemoveObserver( m_SliceObserverTag1 );
     }
 
     {
-        mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
         slicer->RemoveObserver( m_SliceObserverTag2 );
     }
 
     {
-        mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
         slicer->RemoveObserver( m_SliceObserverTag3 );
     }
-
-    m_MultiWidget = NULL;
 }
 
-void QmitkFieldmapGeneratorView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkFieldmapGeneratorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNotNull())
         m_Controls->m_SelectedImageBox->GetSelectedNode()->RemoveObserver( m_PropertyObserverTag );
@@ -248,10 +249,8 @@ void QmitkFieldmapGeneratorView::OnSelectionChanged( std::vector<mitk::DataNode*
     m_SelectedSource = NULL;
 
     // iterate selection
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+    for (mitk::DataNode::Pointer node: nodes)
     {
-        mitk::DataNode::Pointer node = *it;
-
         if ( node.IsNotNull() && (dynamic_cast<mitk::PointSet*>(node->GetData())) )
         {
             m_Controls->m_SourceNameLabel->setText(node->GetName().c_str());
@@ -276,14 +275,14 @@ void QmitkFieldmapGeneratorView::OnSelectionChanged( std::vector<mitk::DataNode*
 
 void QmitkFieldmapGeneratorView::OnSliceChanged(const itk::EventObject& /*e*/)
 {
-    if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNull() || !m_MultiWidget)
+    if (m_Controls->m_SelectedImageBox->GetSelectedNode().IsNull() || !this->GetRenderWindowPart())
     {
         m_Controls->m_WorldPosLabel->setText("-");
         m_Controls->m_IndexLabel->setText("-");
         return;
     }
 
-    m_WorldPoint = m_MultiWidget->GetCrossPosition();
+    m_WorldPoint = this->GetRenderWindowPart()->GetSelectedPosition();
     QString posSting = QString::number(m_WorldPoint[0]); posSting += ", "; posSting += QString::number(m_WorldPoint[1]); posSting += ", "; posSting += QString::number(m_WorldPoint[2]);
     m_Controls->m_WorldPosLabel->setText(posSting.toStdString().c_str());
 

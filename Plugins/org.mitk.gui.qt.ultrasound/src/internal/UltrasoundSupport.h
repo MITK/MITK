@@ -35,7 +35,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 \brief UltrasoundSupport
 This plugin provides functionality to manage Ultrasound devices, create video devices and to view device images.
 
-\sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
 class UltrasoundSupport : public QmitkAbstractView

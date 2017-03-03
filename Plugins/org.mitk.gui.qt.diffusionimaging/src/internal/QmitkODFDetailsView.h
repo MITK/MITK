@@ -40,9 +40,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
   \brief View displaying details of the orientation distribution function in the voxel at the current crosshair position.
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
 
 class QmitkODFDetailsView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
@@ -73,15 +70,15 @@ protected slots:
 
 protected:
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   virtual void SetFocus() override;
-  void Visible() override;
-  void Hidden() override;
-  void Activated() override;
-  void Deactivated() override;
+
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
 
   void UpdateOdf(); ///< called if slice position or datamanager selection has changed
 

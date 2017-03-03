@@ -138,7 +138,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
 
   mitk::DataNode::Pointer node;
 
-  foreach (mitk::DataNode::Pointer currentNode, nodes)
+  for (mitk::DataNode::Pointer currentNode: nodes)
   {
     if( currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()) )
     {

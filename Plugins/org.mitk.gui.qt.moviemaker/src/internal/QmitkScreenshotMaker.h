@@ -17,7 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if !defined(QMITK_ScreenshotMaker_H__INCLUDED)
 #define QMITK_ScreenshotMaker_H__INCLUDED
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
+
 #include "mitkCameraRotationController.h"
 #include "mitkStepper.h"
 #include "mitkMultiStepper.h"
@@ -32,7 +34,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkScreenshotMakerControls.h"
 //#include "../MovieMakerDll.h"
 
-//class QmitkStdMultiWidget;
 //class QmitkMovieMakerControls;
 class QmitkStepperAdapter;
 class vtkCamera;
@@ -40,10 +41,9 @@ class QTimer;
 class QTime;
 
 /**
- * \brief Functionality for creating movies (AVIs)
- * \ingroup Functionalities
+ * \brief View for creating movies (AVIs)
  */
-class QmitkScreenshotMaker: public QmitkFunctionality
+class QmitkScreenshotMaker: public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -57,8 +57,13 @@ public:
   /** \brief Method for creating the widget containing the application
    * controls, like sliders, buttons etc.
    */
-  void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateQtPartControl(QWidget *parent) override;
   //  virtual QWidget * CreateControlWidget(QWidget *parent);
+
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   /** \brief Method for creating the connections of main and control widget.
    */
@@ -69,18 +74,14 @@ public:
    */
   //  virtual QAction * CreateAction(QActionGroup *parent);
 
-  virtual void Activated() override;
-
-  virtual void Deactivated() override;
-
   ///
-  /// Called when a StdMultiWidget is available.
+  /// Called when a RenderWindowPart becomes available.
   ///
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   ///
-  /// Called when no StdMultiWidget is available.
+  /// Called when a RenderWindowPart becomes unavailable.
   ///
-  virtual void StdMultiWidgetNotAvailable() override;
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   signals:
 
@@ -98,8 +99,8 @@ protected slots:
 protected:
 
   QObject *parentWidget;
+  QWidget* m_Parent;
   QVTKWidget * widget;
-  QmitkStdMultiWidget* m_MultiWidget;
   vtkEventQtSlotConnect * connections;
   vtkRenderWindow * renderWindow;
   mitk::VtkPropRenderer::Pointer m_PropRenderer;
@@ -108,7 +109,7 @@ protected:
 
 private:
 
-  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   vtkCamera* GetCam();
   void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");

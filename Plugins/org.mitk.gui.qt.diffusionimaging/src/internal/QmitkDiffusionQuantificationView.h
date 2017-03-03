@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKDIFFUSIONQUANTIFICATIONVIEW_H_INCLUDED
 #define _QMITKDIFFUSIONQUANTIFICATIONVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include <string>
 
@@ -28,10 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief QmitkDiffusionQuantificationView
  *
  * Document your class here.
- *
- * \sa QmitkFunctionality
  */
-class QmitkDiffusionQuantificationView : public QmitkFunctionality
+class QmitkDiffusionQuantificationView : public QmitkAbstractView
 {
 
   friend struct DqSelListener;
@@ -52,13 +50,10 @@ class QmitkDiffusionQuantificationView : public QmitkFunctionality
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
-  virtual void Activated() override;
-
-  virtual void Deactivated() override;
-
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
 protected slots:
 
@@ -83,12 +78,11 @@ protected slots:
 
 protected:
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkDiffusionQuantificationViewControls* m_Controls;
 
-  QmitkStdMultiWidget* m_MultiWidget;
   mitk::DataStorage::SetOfObjects::Pointer m_QBallImages;
   mitk::DataStorage::SetOfObjects::Pointer m_TensorImages;
 

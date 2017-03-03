@@ -49,8 +49,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
 \brief View for fiber based diffusion software phantoms (Fiberfox). See "Fiberfox: Facilitating the creation of realistic white matter software phantoms" (DOI: 10.1002/mrm.25045) for details.
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
 
 // Forward Qt class declarations
@@ -154,8 +152,8 @@ protected slots:
 
 protected:
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>&) override;
+    /// \brief called by QmitkAbstractView when DataManager's selection has changed
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     GradientListType GenerateHalfShell(int NPoints);    ///< generate vectors distributed over the halfsphere
 

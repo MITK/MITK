@@ -16,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkTractbasedSpatialStatisticsView.h"
-#include "QmitkStdMultiWidget.h"
 
 #include "mitkDataNodeObject.h"
 #include <itkCastImageFilter.h>
@@ -45,9 +44,9 @@ using namespace berry;
 
 
 QmitkTractbasedSpatialStatisticsView::QmitkTractbasedSpatialStatisticsView()
-: QmitkFunctionality()
+: QmitkAbstractView()
 , m_Controls( 0 )
-, m_MultiWidget( NULL )
+, m_Activated(false)
 {
 
 }
@@ -62,7 +61,7 @@ void QmitkTractbasedSpatialStatisticsView::PerformChange()
   m_Controls->m_RoiPlotWidget->ModifyPlot(m_Controls->m_Segments->value(), m_Controls->m_Average->isChecked());
 }
 
-void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   //datamanager selection changed
   if (!this->IsActivated())
@@ -91,12 +90,11 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
 
 
 
-  for ( int i=0; i<nodes.size(); i++ )
+  for (mitk::DataNode::Pointer node: nodes)
   {
-
     // only look at interesting types
     // check for valid data
-    mitk::BaseData* nodeData = nodes[i]->GetData();
+    mitk::BaseData* nodeData = node->GetData();
     if( nodeData )
     {
       if(QString("TbssRoiImage").compare(nodeData->GetNameOfClass())==0)
@@ -126,7 +124,7 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
       {
         foundFiberBundle = true;
         fib = static_cast<mitk::FiberBundle*>(nodeData);
-        this->m_CurrentFiberNode = nodes[i];
+        this->m_CurrentFiberNode = node;
       }
 
 
@@ -134,14 +132,14 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
       {
         if(!foundStartRoi)
         {
-          start = nodes[i];
-          this->m_CurrentStartRoi = nodes[i];
+          start = node;
+          this->m_CurrentStartRoi = node;
           foundStartRoi =  true;
         }
         else
         {
-          end = nodes[i];
-          this->m_CurrentEndRoi = nodes[i];
+          end = node;
+          this->m_CurrentEndRoi = node;
           foundEndRoi = true;
         }
       }
@@ -189,7 +187,7 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(std::vector<mitk::
 void QmitkTractbasedSpatialStatisticsView::InitPointsets()
 {
   // Check if PointSetStart exsits, if not create it.
-  m_P1 = this->GetDefaultDataStorage()->GetNamedNode("PointSetNode");
+  m_P1 = this->GetDataStorage()->GetNamedNode("PointSetNode");
 
   if (m_PointSetNode)
   {
@@ -208,9 +206,15 @@ void QmitkTractbasedSpatialStatisticsView::InitPointsets()
     m_P1->SetProperty( "helper object", mitk::BoolProperty::New(true) ); // CHANGE if wanted
     m_P1->SetProperty( "pointsize", mitk::FloatProperty::New( 0.1 ) );
     m_P1->SetColor( 1.0, 0.0, 0.0 );
-    this->GetDefaultDataStorage()->Add(m_P1);
+    this->GetDataStorage()->Add(m_P1);
     m_Controls->m_PointWidget->SetPointSetNode(m_P1);
-    m_Controls->m_PointWidget->SetMultiWidget(GetActiveStdMultiWidget());
+    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    auto axialSnc = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
+    auto sagittalSnc = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
+    auto coronalSnc = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
+    m_Controls->m_PointWidget->AddSliceNavigationController(axialSnc);
+    m_Controls->m_PointWidget->AddSliceNavigationController(sagittalSnc);
+    m_Controls->m_PointWidget->AddSliceNavigationController(coronalSnc);
   }
 }
 
@@ -233,15 +237,32 @@ void QmitkTractbasedSpatialStatisticsView::CreateQtPartControl( QWidget *parent 
 
 }
 
+void QmitkTractbasedSpatialStatisticsView::SetFocus()
+{
+  m_Controls->m_AddGroup->setFocus();
+}
+
 void QmitkTractbasedSpatialStatisticsView::Activated()
 {
-  QmitkFunctionality::Activated();
-
+  m_Activated = true;
 }
 
 void QmitkTractbasedSpatialStatisticsView::Deactivated()
 {
-  QmitkFunctionality::Deactivated();
+  m_Activated = false;
+}
+
+bool QmitkTractbasedSpatialStatisticsView::IsActivated() const
+{
+  return m_Activated;
+}
+
+void QmitkTractbasedSpatialStatisticsView::Visible()
+{
+}
+
+void QmitkTractbasedSpatialStatisticsView::Hidden()
+{
 }
 
 void QmitkTractbasedSpatialStatisticsView::CreateConnections()
@@ -433,17 +454,17 @@ void QmitkTractbasedSpatialStatisticsView::TbssImport()
 
   std::string name = "";
 
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
-  for ( int i=0; i<nodes.size(); i++ )
+  for (auto node: nodes)
   {
-    if(QString("Image").compare(nodes[i]->GetData()->GetNameOfClass())==0)
+    if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
     {
-      mitk::Image* img = static_cast<mitk::Image*>(nodes[i]->GetData());
+      mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
       if(img->GetDimension() == 4)
       {
         importer->SetImportVolume(img);
-        name = nodes[i]->GetName();
+        name = node->GetName();
       }
     }
   }
@@ -473,7 +494,7 @@ void QmitkTractbasedSpatialStatisticsView::AddTbssToDataStorage(mitk::Image* ima
 
 
   // add new image to data storage and set as active to ease further processing
-  GetDefaultDataStorage()->Add( result );
+  GetDataStorage()->Add( result );
 
   // show the results
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -506,7 +527,7 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
     p[1] = w[1] + origin[1];
     p[2] = w[2] + origin[2];
 
-    m_MultiWidget->MoveCrossToPosition(p);
+    this->GetRenderWindowPart()->SetSelectedPosition(p);
     m_Controls->m_RoiPlotWidget->drawBar(index);
   }
 
@@ -514,7 +535,7 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
   {
 
     mitk::Point3D point = m_Controls->m_RoiPlotWidget->GetPositionInWorld(index);
-    m_MultiWidget->MoveCrossToPosition(point);
+    this->GetRenderWindowPart()->SetSelectedPosition(point);
 
 
   }
@@ -995,18 +1016,6 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
 }
 
 
-void QmitkTractbasedSpatialStatisticsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkTractbasedSpatialStatisticsView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
-
-
 void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 {
   bool ok;
@@ -1018,13 +1027,13 @@ void QmitkTractbasedSpatialStatisticsView::CreateRoi()
 
   mitk::Image::Pointer image;
 
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
-  for ( int i=0; i<nodes.size(); i++ )
+  for (auto node: nodes)
   {
-    if(QString("Image").compare(nodes[i]->GetData()->GetNameOfClass())==0)
+    if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
     {
-        mitk::Image* img = static_cast<mitk::Image*>(nodes[i]->GetData());
+        mitk::Image* img = static_cast<mitk::Image*>(node->GetData());
         if(img->GetDimension() == 3)
         {
           image = img;

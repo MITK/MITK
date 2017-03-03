@@ -2720,7 +2720,7 @@ void QmitkFiberfoxView::UpdateGui()
   }
 }
 
-void QmitkFiberfoxView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes )
+void QmitkFiberfoxView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
   m_SelectedBundles2.clear();
   m_SelectedImages.clear();

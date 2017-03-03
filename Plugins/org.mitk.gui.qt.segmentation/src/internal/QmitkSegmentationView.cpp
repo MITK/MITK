@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkSegTool2D.h"
 #include "mitkStatusBar.h"
 
-#include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
 #include <QmitkSegmentationOrganNamesHandling.cpp>
 
@@ -40,6 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCameraController.h"
 #include "mitkLabelSetImage.h"
 
+#include <QmitkRenderWindow.h>
+
 #include "usModuleResource.h"
 #include "usModuleResourceStream.h"
 
@@ -54,8 +55,8 @@ QmitkSegmentationView::QmitkSegmentationView()
    :m_MouseCursorSet(false)
    ,m_Parent(NULL)
    ,m_Controls(NULL)
-   ,m_MultiWidget(NULL)
    ,m_DataSelectionChanged(false)
+   ,m_Activated(false)
 {
    mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
    mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
@@ -101,12 +102,19 @@ void QmitkSegmentationView::Visible()
 {
    if (m_DataSelectionChanged)
    {
-      this->OnSelectionChanged(this->GetDataManagerSelection());
+      berry::IWorkbenchPart::Pointer nullPart;
+      this->OnSelectionChanged(nullPart, this->GetDataManagerSelection());
    }
+}
+
+void QmitkSegmentationView::Hidden()
+{
 }
 
 void QmitkSegmentationView::Activated()
 {
+   m_Activated = true;
+
    // should be moved to ::BecomesVisible() or similar
    if( m_Controls )
    {
@@ -117,9 +125,9 @@ void QmitkSegmentationView::Activated()
 
       //    m_Controls->m_SlicesInterpolator->Enable3DInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
 
-      mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDefaultDataStorage()->GetSubset( m_IsABinaryImagePredicate );
+      mitk::DataStorage::SetOfObjects::ConstPointer segmentations = this->GetDataStorage()->GetSubset( m_IsABinaryImagePredicate );
 
-      mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDefaultDataStorage()->GetSubset(m_IsAPatientImagePredicate);
+      mitk::DataStorage::SetOfObjects::ConstPointer image = this->GetDataStorage()->GetSubset(m_IsAPatientImagePredicate);
       if (!image->empty()) {
          OnSelectionChanged(*image->begin());
       }
@@ -176,43 +184,40 @@ void QmitkSegmentationView::Deactivated()
       context->ungetService(ppmRef);
       this->SetToolManagerSelection(0,0);
    }
+
+   m_Activated = false;
 }
 
-void QmitkSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+bool QmitkSegmentationView::IsActivated() const
 {
-   SetMultiWidget(&stdMultiWidget);
+   return m_Activated;
 }
 
-void QmitkSegmentationView::StdMultiWidgetNotAvailable()
+void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-   SetMultiWidget(NULL);
-}
-
-void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMultiWidget*/ )
-{
-   SetMultiWidget(NULL);
-}
-
-void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
-{
-   // save the current multiwidget as the working widget
-   m_MultiWidget = multiWidget;
-
    if (m_Parent)
    {
-      m_Parent->setEnabled(m_MultiWidget);
+      m_Parent->setEnabled(true);
    }
 
-   // tell the interpolation about toolmanager and multiwidget (and data storage)
-   if (m_Controls && m_MultiWidget)
+   // tell the interpolation about toolmanager and render window part (and data storage)
+   if (m_Controls)
    {
       mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-      m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDefaultDataStorage());
+      m_Controls->m_SlicesInterpolator->SetDataStorage( this->GetDataStorage());
       QList<mitk::SliceNavigationController*> controllers;
-      controllers.push_back(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
-      controllers.push_back(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
-      controllers.push_back(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
+      controllers.push_back(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+      controllers.push_back(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+      controllers.push_back(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
       m_Controls->m_SlicesInterpolator->Initialize( toolManager, controllers );
+   }
+}
+
+void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+   if (m_Parent)
+   {
+      m_Parent->setEnabled(false);
    }
 }
 
@@ -333,7 +338,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
                      mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
                   }
                   emptySegmentation->SetSelected(true);
-                  this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+                  this->GetDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
                   this->ApplyDisplayOptions( emptySegmentation );
                   this->FireNodeSelected( emptySegmentation );
@@ -369,8 +374,9 @@ void QmitkSegmentationView::OnWorkingNodeVisibilityChanged()
      return;
    }
 
-   bool selectedNodeIsVisible = selectedNode->IsVisible(mitk::BaseRenderer::GetInstance(
-      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+   bool selectedNodeIsVisible = renderWindowPart
+     && selectedNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer());
 
    if (!selectedNodeIsVisible)
    {
@@ -614,7 +620,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
       mitk::DataNode* segNode = m_Controls->segImageSelector->GetSelectedNode();
       if (segNode)
       {
-        mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources(segNode, m_IsAPatientImagePredicate);
+        mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDataStorage()->GetSources(segNode, m_IsAPatientImagePredicate);
          bool isSourceNode(false);
 
          for (mitk::DataStorage::SetOfObjects::ConstIterator it = possibleParents->Begin(); it != possibleParents->End(); it++)
@@ -677,7 +683,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
    }
    else
    {
-     mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources(node, m_IsAPatientImagePredicate);
+     mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDataStorage()->GetSources(node, m_IsAPatientImagePredicate);
 
       if ( possibleParents->Size() == 1 )
       {
@@ -705,7 +711,9 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
          this->UpdateWarningLabel(tr("Please select or load the according patient image!"));
       }
    }
-   if (!node->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
+
+   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+   if (!renderWindowPart || !node->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
    {
      this->UpdateWarningLabel(tr("The selected segmentation is currently not visible!"));
      this->SetToolSelectionBoxesEnabled( false );
@@ -738,12 +746,13 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
 
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
-   std::vector<mitk::DataNode*> nodes;
-   nodes.push_back( node );
-   this->OnSelectionChanged( nodes );
+   berry::IWorkbenchPart::Pointer nullPart;
+   QList<mitk::DataNode::Pointer> nodes;
+   nodes.push_back(node);
+   this->OnSelectionChanged(nullPart, nodes);
 }
 
-void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
    if (nodes.size() != 0)
    {
@@ -861,7 +870,8 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
                {
                   SetToolManagerSelection(selectedNode, NULL);
                   //May be a bug in the selection services. A node which is deselected will be passed as selected node to the OnSelectionChanged function
-                  if (!selectedNode->IsVisible(mitk::BaseRenderer::GetInstance( mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))))
+                  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+                  if (renderWindowPart && !selectedNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
                      selectedNode->SetVisibility(true);
                   this->UpdateWarningLabel(tr("The selected patient image does not\nmatchwith the selected segmentation!"));
                   this->SetToolSelectionBoxesEnabled( false );
@@ -879,39 +889,39 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
    QmitkRenderWindow* selectedRenderWindow = 0;
-   QmitkRenderWindow* RenderWindow1 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow1();
-   QmitkRenderWindow* RenderWindow2 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow2();
-   QmitkRenderWindow* RenderWindow3 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow3();
-   QmitkRenderWindow* RenderWindow4 =
-      this->GetActiveStdMultiWidget()->GetRenderWindow4();
+   QmitkRenderWindow* axialRenderWindow =
+      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("axial");
+   QmitkRenderWindow* sagittalRenderWindow =
+      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("sagittal");
+   QmitkRenderWindow* coronalRenderWindow =
+      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("coronal");
+   QmitkRenderWindow* _3DRenderWindow =
+      this->GetRenderWindowPart(OPEN)->GetQmitkRenderWindow("3d");
    bool PlanarFigureInitializedWindow = false;
 
    // find initialized renderwindow
    if (node->GetBoolProperty("PlanarFigureInitializedWindow",
-      PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+      PlanarFigureInitializedWindow, axialRenderWindow->GetRenderer()))
    {
-      selectedRenderWindow = RenderWindow1;
+      selectedRenderWindow = axialRenderWindow;
    }
    if (!selectedRenderWindow && node->GetBoolProperty(
       "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-      RenderWindow2->GetRenderer()))
+      sagittalRenderWindow->GetRenderer()))
    {
-      selectedRenderWindow = RenderWindow2;
+      selectedRenderWindow = sagittalRenderWindow;
    }
    if (!selectedRenderWindow && node->GetBoolProperty(
       "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-      RenderWindow3->GetRenderer()))
+      coronalRenderWindow->GetRenderer()))
    {
-      selectedRenderWindow = RenderWindow3;
+      selectedRenderWindow = coronalRenderWindow;
    }
    if (!selectedRenderWindow && node->GetBoolProperty(
       "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
-      RenderWindow4->GetRenderer()))
+      _3DRenderWindow->GetRenderer()))
    {
-      selectedRenderWindow = RenderWindow4;
+      selectedRenderWindow = _3DRenderWindow;
    }
 
    // make node visible
@@ -1039,7 +1049,7 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
    if (referenceData.IsNotNull())
    {
       // iterate all images
-     mitk::DataStorage::SetOfObjects::ConstPointer allImages = this->GetDefaultDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
+     mitk::DataStorage::SetOfObjects::ConstPointer allImages = this->GetDataStorage()->GetSubset(m_IsASegmentationImagePredicate);
 
       for ( mitk::DataStorage::SetOfObjects::const_iterator iter = allImages->begin(); iter != allImages->end(); ++iter)
 
@@ -1099,7 +1109,10 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
 
 void QmitkSegmentationView::RenderingManagerReinitialized()
 {
-   if ( ! m_MultiWidget ) { return; }
+   if (!this->GetRenderWindowPart())
+   {
+     return;
+   }
 
    /*
    * Here we check whether the geometry of the selected segmentation image if aligned with the worldgeometry
@@ -1107,13 +1120,13 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
    * For further information see Bug 16063
    */
    mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
-   const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+   const mitk::BaseGeometry* worldGeo = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
 
    if (workingNode && worldGeo)
    {
 
       const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
-      const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+      const mitk::BaseGeometry* worldGeo = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
 
       if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
       {
@@ -1173,7 +1186,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls = new Ui::QmitkSegmentationControls;
    m_Controls->setupUi(parent);
 
-   m_Controls->patImageSelector->SetDataStorage(this->GetDefaultDataStorage());
+   m_Controls->patImageSelector->SetDataStorage(this->GetDataStorage());
    m_Controls->patImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsAPatientImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
 
    this->UpdateWarningLabel(tr("Please load an image"));
@@ -1181,7 +1194,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    if( m_Controls->patImageSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel(tr("Select or create a new segmentation"));
 
-   m_Controls->segImageSelector->SetDataStorage(this->GetDefaultDataStorage());
+   m_Controls->segImageSelector->SetDataStorage(this->GetDataStorage());
    m_Controls->segImageSelector->SetPredicate(mitk::NodePredicateAnd::New(m_IsASegmentationImagePredicate, mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))).GetPointer());
    if( m_Controls->segImageSelector->GetSelectedNode().IsNotNull() )
       this->UpdateWarningLabel("");
@@ -1189,7 +1202,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
    assert ( toolManager );
 
-   toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
+   toolManager->SetDataStorage( *(this->GetDataStorage()) );
    toolManager->InitializeTools();
 
    // all part of open source MITK
@@ -1233,8 +1246,13 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    connect(m_Controls->m_SlicesInterpolator, SIGNAL(SignalShowMarkerNodes(bool)), this, SLOT(OnShowMarkerNodes(bool)));
 
-   //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
+   //  m_Controls->MaskSurfaces->SetDataStorage(this->GetDataStorage());
    //  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
+}
+
+void QmitkSegmentationView::SetFocus()
+{
+  m_Controls->btnNewSegmentation->setFocus();
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)

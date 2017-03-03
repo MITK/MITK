@@ -47,7 +47,7 @@ QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationContro
   if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
     m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
   {
-    this->OnSelectionChanged( 0, m_Controls.dataSelectionWidget->GetSelection(0));
+    this->OnSelectionChanged(0, m_Controls.dataSelectionWidget->GetSelection(0));
   }
 }
 

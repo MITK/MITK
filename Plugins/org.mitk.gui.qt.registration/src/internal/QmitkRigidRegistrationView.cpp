@@ -16,13 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk includes
 #include "QmitkRigidRegistrationView.h"
-#include "QmitkStdMultiWidget.h"
 
 // MITK includes
 #include "mitkDataNodeObject.h"
 #include <mitkImageCast.h>
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include <mitkSegmentationSink.h>
+#include <mitkILinkedRenderWindowPart.h>
 #include <mitkImageStatisticsHolder.h>
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateAnd.h"
@@ -165,8 +165,7 @@ struct SelListenerRigidRegistration : ISelectionListener
 };
 
 QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(),
-  m_MultiWidget(NULL),
+: QmitkAbstractView(),
   m_MovingNode(NULL),
   m_MovingMaskNode(NULL),
   m_FixedNode(NULL),
@@ -218,6 +217,7 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
 {
+  m_Parent = parent;
   m_Controls.setupUi(parent);
   m_Controls.m_ManualFrame->hide();
   m_Controls.timeSlider->hide();
@@ -267,6 +267,11 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
 
   this->FillPresetComboBox( preset->getAvailablePresets() );
   this->m_Controls.m_LoadRigidRegistrationParameter->setEnabled(false);
+}
+
+void QmitkRigidRegistrationView::SetFocus()
+{
+  m_Controls.m_SwitchImages->setFocus();
 }
 
 void QmitkRigidRegistrationView::FillPresetComboBox( const std::list< std::string>& presets)
@@ -320,17 +325,18 @@ void QmitkRigidRegistrationView::LoadSelectedPreset()
   this->CheckCalculateEnabled();
 }
 
-void QmitkRigidRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkRigidRegistrationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   m_Parent->setEnabled(true);
-  m_MultiWidget = &stdMultiWidget;
-  m_MultiWidget->SetWidgetPlanesVisibility(true);
+  if (auto linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(renderWindowPart))
+  {
+    linkedRenderWindowPart->EnableSlicingPlanes(true);
+  }
 }
 
-void QmitkRigidRegistrationView::StdMultiWidgetNotAvailable()
+void QmitkRigidRegistrationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   m_Parent->setEnabled(false);
-  m_MultiWidget = NULL;
 }
 
 void QmitkRigidRegistrationView::CreateConnections()
@@ -381,7 +387,7 @@ void QmitkRigidRegistrationView::Activated()
 {
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Activated();
+
   if (m_SelListener.isNull())
   {
     m_SelListener.reset(new SelListenerRigidRegistration(this));
@@ -398,7 +404,6 @@ void QmitkRigidRegistrationView::Activated()
   /*
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
   m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
@@ -419,7 +424,6 @@ void QmitkRigidRegistrationView::Visible()
   /*
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
   m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
@@ -458,7 +462,7 @@ void QmitkRigidRegistrationView::Deactivated()
   s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Deactivated();*/
+  */
 }
 
 void QmitkRigidRegistrationView::Hidden()
@@ -473,7 +477,7 @@ void QmitkRigidRegistrationView::Hidden()
   s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  //QmitkFunctionality::Deactivated();*/
+  */
 }
 
 void QmitkRigidRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
@@ -552,9 +556,9 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImag
     m_Controls.m_SwitchImages->hide();
   }
   this->CheckCalculateEnabled();
-  if(this->GetActiveStdMultiWidget())
+  if (auto renderWindowPart = this->GetRenderWindowPart(OPEN))
   {
-    m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls.timeSlider, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromRigidRegistration");
+    m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls.timeSlider, renderWindowPart->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromRigidRegistration");
     connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
   }
 }

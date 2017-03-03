@@ -18,7 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkTbssSkeletonizationView_h
 
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
+
 #include "ui_QmitkTbssSkeletonizationViewControls.h"
 #include "itkImage.h"
 #include "mitkPixelType.h"
@@ -41,7 +43,7 @@ typedef itk::Image<VectorType, 3> DirectionImageType;
   * It can skeletonize a mean FA image and calculate the projection of all individual subjects to this skeleton.
 */
 
-class QmitkTbssSkeletonizationView : public QmitkFunctionality
+class QmitkTbssSkeletonizationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   Q_OBJECT
@@ -58,14 +60,24 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
     //Creation of the connections of main and control widget
     virtual void CreateConnections();
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-    virtual void StdMultiWidgetNotAvailable() override;
+    ///
+    /// Sets the focus to an internal widget.
+    ///
+    virtual void SetFocus() override;
 
-    /// \brief Called when the functionality is activated
+    /// \brief Called when the view gets activated
     virtual void Activated() override;
 
+    /// \brief Called when the view gets deactivated
     virtual void Deactivated() override;
 
+    bool IsActivated() const;
+
+    /// \brief Called when the view gets visible
+    virtual void Visible() override;
+
+    /// \brief Called when the view gets hidden
+    virtual void Hidden() override;
 
   protected slots:
 
@@ -80,17 +92,19 @@ class QmitkTbssSkeletonizationView : public QmitkFunctionality
 
   protected:
 
-    //brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+    //brief called by QmitkAbstractView when DataManager's selection has changed
+    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     Ui::QmitkTbssSkeletonizationViewControls* m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
     void AddToDataStorage(mitk::Image* img, std::string name);
 
     template <class TPixel>
     void ConvertToItk(mitk::PixelType, mitk::Image* image, Float4DImageType::Pointer);
+
+  private:
+
+    bool m_Activated;
 
 };
 

@@ -46,19 +46,34 @@ void QmitkPointSetInteractionView::CreateQtPartControl( QWidget *parent )
     , this, SLOT( OnAddPointSetClicked() ) );
 }
 
+void QmitkPointSetInteractionView::SetFocus()
+{
+  m_Controls->m_PbAddPointSet->setFocus();
+}
+
 void QmitkPointSetInteractionView::Activated()
 {
   // emulate datamanager selection
-  std::vector<mitk::DataNode*> selection = this->GetDataManagerSelection();
-  this->OnSelectionChanged( selection );
+  berry::IWorkbenchPart::Pointer nullPart;
+  QList<mitk::DataNode::Pointer> selection = this->GetDataManagerSelection();
+  this->OnSelectionChanged(nullPart, selection);
 }
 
 void QmitkPointSetInteractionView::Deactivated()
 {
   // emulate empty selection
-  std::vector<mitk::DataNode*> selection;
-  this->OnSelectionChanged( selection );
+  berry::IWorkbenchPart::Pointer nullPart;
+  QList<mitk::DataNode::Pointer> selection;
+  this->OnSelectionChanged(nullPart, selection);
   m_Controls->m_PointListWidget->DeactivateInteractor(true);
+}
+
+void QmitkPointSetInteractionView::Visible()
+{
+}
+
+void QmitkPointSetInteractionView::Hidden()
+{
 }
 
 void QmitkPointSetInteractionView::OnAddPointSetClicked()
@@ -88,16 +103,17 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   //
   // add the node to the ds
   //
-  this->GetDefaultDataStorage()->Add(pointSetNode);
+  this->GetDataStorage()->Add(pointSetNode);
 
   // make new selection and emulate selection for this
-  std::vector<mitk::DataNode*> selection;
-  selection.push_back( pointSetNode );
-  this->FireNodesSelected( selection );
-  this->OnSelectionChanged( selection );
+  berry::IWorkbenchPart::Pointer nullPart;
+  QList<mitk::DataNode::Pointer> selection;
+  selection.push_back(pointSetNode);
+  this->FireNodesSelected(selection);
+  this->OnSelectionChanged(nullPart, selection);
 }
 
-void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkPointSetInteractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   mitk::DataNode* selectedNode = 0;
   if(nodes.size() > 0)
@@ -124,11 +140,6 @@ void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode
 
 }
 
-bool QmitkPointSetInteractionView::IsExclusiveFunctionality() const
-{
-  return true;
-}
-
 void QmitkPointSetInteractionView::NodeChanged( const mitk::DataNode* node )
 {
   if(node == m_SelectedPointSetNode && m_Controls->m_CurrentPointSetLabel->text().toStdString() != node->GetName())
@@ -137,14 +148,22 @@ void QmitkPointSetInteractionView::NodeChanged( const mitk::DataNode* node )
   }
 }
 
-void QmitkPointSetInteractionView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkPointSetInteractionView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-    if(m_Controls)
-      m_Controls->m_PointListWidget->SetMultiWidget( &stdMultiWidget );
+  if(m_Controls)
+  {
+    m_Controls->m_PointListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    m_Controls->m_PointListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    m_Controls->m_PointListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+  }
 }
 
-void QmitkPointSetInteractionView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMultiWidget*/ )
+void QmitkPointSetInteractionView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-   if(m_Controls)
-      m_Controls->m_PointListWidget->SetMultiWidget( 0 );
+  if(m_Controls)
+  {
+    m_Controls->m_PointListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    m_Controls->m_PointListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    m_Controls->m_PointListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+  }
 }

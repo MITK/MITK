@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkUGVisualizationView.h"
-#include "QmitkStdMultiWidget.h"
 
 #include <mitkUnstructuredGrid.h>
 #include <mitkGridRepresentationProperty.h>
@@ -68,7 +67,7 @@ const std::string QmitkUGVisualizationView::VIEW_ID = "org.mitk.views.ugvisualiz
 
 
 QmitkUGVisualizationView::QmitkUGVisualizationView()
-: QmitkFunctionality(), m_MultiWidget(0), m_Outline2DAction(0), m_Outline2DWidget(0),
+: QmitkAbstractView(), m_Outline2DAction(0), m_Outline2DWidget(0),
   m_LODAction(0), m_ScalarVisibilityAction(0), m_ScalarVisibilityWidget(0),
   m_FirstVolumeRepId(-1), m_ShowTFGeneratorWidget(true), m_ShowScalarOpacityWidget(false),
   m_ShowColorWidget(true), m_ShowGradientOpacityWidget(false), m_ShowTFGeneratorAction(0),
@@ -151,6 +150,11 @@ void QmitkUGVisualizationView::CreateConnections()
   connect(m_ShowGradientOpacityAction, SIGNAL(triggered(bool)), this, SLOT(ShowGradientOpacityWidget(bool)));
   connect(m_ShowScalarOpacityAction, SIGNAL(triggered(bool)), this, SLOT(ShowScalarOpacityWidget(bool)));
   connect(m_ShowTFGeneratorAction, SIGNAL(triggered(bool)), this, SLOT(ShowTFGeneratorWidget(bool)));
+}
+
+void ::SetFocus()
+{
+  m_Controls.m_OptionsButton->setFocus();
 }
 
 void QmitkUGVisualizationView::UpdateRenderWindow()
@@ -273,19 +277,7 @@ void QmitkUGVisualizationView::UpdateGUI()
 }
 
 
-void QmitkUGVisualizationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkUGVisualizationView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = 0;
-}
-
-
-void QmitkUGVisualizationView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkUGVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& /*nodes*/)
 {
   UpdateGUI();
 }

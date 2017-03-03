@@ -37,8 +37,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateProperty.h"
 
 
-//#include <QmitkStdMultiWidgetEditor.h>
-
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
@@ -77,35 +75,7 @@ void QmitkOpenDicomEditorAction::Run()
     m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
   }
 
-    //mitk::DataStorageEditorInput::Pointer editorInput;
-    //mitk::DataStorage::Pointer dataStorage;
-    //QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-    //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
-
-
-
-    //if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
-    //{
-    //    editorInput = new mitk::DataStorageEditorInput();
-    //    dataStorage = editorInput->GetDataStorageReference()->GetDataStorage();
-    //}
-    //else
-    //{
-    //    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-    //    dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
-    //}
-
-    //if (multiWidgetEditor.IsNull())
-    //{
-    //    //berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-    //    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-    //}
-    //else
-    //{
-    //    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
-    //}
-
-    berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(QString()));
-    m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicomeditor");
+  berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(QString()));
+  m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicomeditor");
 }
 

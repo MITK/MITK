@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkMLBTView.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -46,9 +45,8 @@ const std::string QmitkMLBTView::VIEW_ID = "org.mitk.views.mlbtview";
 using namespace berry;
 
 QmitkMLBTView::QmitkMLBTView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
 {
     m_TrackingTimer = std::make_shared<QTimer>(this);
     m_LastLoadedForestName = "(none)";
@@ -144,6 +142,11 @@ void QmitkMLBTView::UpdateGui()
         m_Controls->m_SaveForestButton->setEnabled(false);
         m_Controls->m_StartTrackingButton->setEnabled(false);
     }
+}
+
+void QmitkMLBTView::SetFocus()
+{
+  m_Controls->toolBox->setFocus();
 }
 
 void QmitkMLBTView::AbortTracking()
@@ -416,22 +419,6 @@ void QmitkMLBTView::StartTraining()
     m_ForestHandler.SetBidirectionalFiberSampling(m_Controls->m_BidirectionalSampling->isChecked());
     m_ForestHandler.SetZeroDirWmFeatures(m_Controls->m_ZeroDirBox->isChecked());
     m_ForestHandler.StartTraining();
-}
-
-void QmitkMLBTView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-    m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkMLBTView::StdMultiWidgetNotAvailable()
-{
-    m_MultiWidget = NULL;
-}
-
-void QmitkMLBTView::Activated()
-{
-
 }
 
 bool QmitkMLBTView::IsTrainingInputValid(void) const

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkFiberProcessingView_h
 #define QmitkFiberProcessingView_h
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include "ui_QmitkFiberProcessingViewControls.h"
 
 #include <mitkPlanarFigureComposite.h>
@@ -43,11 +43,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 /*!
 \brief View to process fiber bundles. Supplies methods to extract fibers from the bundle, fiber resampling, mirroring, join and subtract bundles and much more.
-
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
-class QmitkFiberProcessingView : public QmitkFunctionality
+class QmitkFiberProcessingView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -64,9 +61,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
-  virtual void Activated() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
 protected slots:
 
@@ -106,11 +104,10 @@ protected:
   void ExtractWithMask(bool onlyEnds, bool invert);
   void ExtractWithPlanarFigure();
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkFiberProcessingViewControls* m_Controls;
-  QmitkStdMultiWidget* m_MultiWidget;
 
   /** Connection from VTK to ITK */
   template <typename VTK_Exporter, typename ITK_Importer>

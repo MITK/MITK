@@ -21,7 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qmitk
 #include "QmitkMITKIGTTrackingToolboxView.h"
 #include "QmitkTrackingDeviceConfigurationWidget.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -60,9 +59,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
 
 QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
-  : QmitkFunctionality()
+  : QmitkAbstractView()
   , m_Controls(nullptr)
-  , m_MultiWidget(nullptr)
   , m_DeviceTypeCollection(nullptr)
 {
   m_TrackingLoggingTimer = new QTimer(this);
@@ -267,14 +265,9 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
   }
 }
 
-void QmitkMITKIGTTrackingToolboxView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
+void QmitkMITKIGTTrackingToolboxView::SetFocus()
 {
-  m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkMITKIGTTrackingToolboxView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
+  m_Controls->m_configurationWidget->setFocus();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnLoadTools()

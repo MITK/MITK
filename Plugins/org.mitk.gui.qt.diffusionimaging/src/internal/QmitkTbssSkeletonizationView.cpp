@@ -50,9 +50,9 @@ using namespace berry;
 
 
 QmitkTbssSkeletonizationView::QmitkTbssSkeletonizationView()
-  : QmitkFunctionality()
+  : QmitkAbstractView()
   , m_Controls( 0 )
-  , m_MultiWidget( NULL )
+  , m_Activated(false)
 {
 
 }
@@ -61,7 +61,7 @@ QmitkTbssSkeletonizationView::~QmitkTbssSkeletonizationView()
 {
 }
 
-void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkTbssSkeletonizationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
 
 
@@ -81,14 +81,12 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
 
 
   // iterate selection
-  for ( int i=0; i<nodes.size(); i++ )
+  for (mitk::DataNode::Pointer node: nodes)
   {
-
-
     // only look at interesting types from valid nodes
-    mitk::BaseData* nodeData = nodes[i]->GetData();
+    mitk::BaseData* nodeData = node->GetData();
     std::string name = "";
-    nodes[i]->GetStringProperty("name", name);
+    node->GetStringProperty("name", name);
 
 
     if(nodeData)
@@ -100,7 +98,7 @@ void QmitkTbssSkeletonizationView::OnSelectionChanged(std::vector<mitk::DataNode
         if(img->GetDimension() == 3)
         {
           bool isBinary(false);
-          nodes[i]->GetBoolProperty("binary", isBinary);
+          node->GetBoolProperty("binary", isBinary);
 
 
           if(isBinary)
@@ -154,14 +152,32 @@ void QmitkTbssSkeletonizationView::CreateQtPartControl( QWidget *parent )
 
 }
 
+void QmitkTbssSkeletonizationView::SetFocus()
+{
+  m_Controls->m_Skeletonize->setFocus();
+}
+
 void QmitkTbssSkeletonizationView::Activated()
 {
-  QmitkFunctionality::Activated();
+  m_Activated = true;
 }
 
 void QmitkTbssSkeletonizationView::Deactivated()
 {
-  QmitkFunctionality::Deactivated();
+  m_Activated = false;
+}
+
+bool QmitkTbssSkeletonizationView::IsActivated() const
+{
+  return m_Activated;
+}
+
+void QmitkTbssSkeletonizationView::Visible()
+{
+}
+
+void QmitkTbssSkeletonizationView::Hidden()
+{
 }
 
 void QmitkTbssSkeletonizationView::CreateConnections()
@@ -175,18 +191,6 @@ void QmitkTbssSkeletonizationView::CreateConnections()
 
 
 
-void QmitkTbssSkeletonizationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkTbssSkeletonizationView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
-
-
 void QmitkTbssSkeletonizationView::Skeletonize()
 {
 
@@ -197,16 +201,16 @@ void QmitkTbssSkeletonizationView::Skeletonize()
   SkeletonisationFilterType::Pointer skeletonizer = SkeletonisationFilterType::New();
 
 
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
 
   mitk::Image::Pointer meanImage = mitk::Image::New();
   std::string name = "";
 
-  for ( int i=0; i<nodes.size(); i++ )
+  for (auto node: nodes)
   {
     // process only on valid nodes
-    mitk::BaseData* nodeData = nodes[i]->GetData();
+    mitk::BaseData* nodeData = node->GetData();
 
     if(nodeData)
     {
@@ -214,13 +218,13 @@ void QmitkTbssSkeletonizationView::Skeletonize()
       {
 
         bool isBinary(false);
-        nodes[i]->GetBoolProperty("binary", isBinary);
+        node->GetBoolProperty("binary", isBinary);
 
         mitk::Image* img = static_cast<mitk::Image*>(nodeData);
         if(img->GetDimension() == 3 && !isBinary)
         {
           meanImage = img;
-          name = nodes[i]->GetName();
+          name = node->GetName();
         }
       }
     }
@@ -255,17 +259,17 @@ void QmitkTbssSkeletonizationView::Project()
 
 
 
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
 
   mitk::Image::Pointer meanImage = mitk::Image::New();
   mitk::Image::Pointer subjects = mitk::Image::New();
   mitk::Image::Pointer tubular = mitk::Image::New();
 
-  for ( int i=0; i<nodes.size(); i++ )
+  for (auto node: nodes)
   {
     // process only on valid nodes
-    mitk::BaseData* nodeData = nodes[i]->GetData();
+    mitk::BaseData* nodeData = node->GetData();
 
     if(nodeData)
     {
@@ -276,7 +280,7 @@ void QmitkTbssSkeletonizationView::Project()
         {
 
           bool isBinary(false);
-          nodes[i]->GetBoolProperty("binary", isBinary);
+          node->GetBoolProperty("binary", isBinary);
 
 
           if(isBinary)
@@ -405,7 +409,7 @@ void QmitkTbssSkeletonizationView::AddToDataStorage(mitk::Image* img, std::strin
   result->SetData( img );
 
   // add new image to data storage and set as active to ease further processing
-  GetDefaultDataStorage()->Add( result );
+  GetDataStorage()->Add( result );
 }
 
 

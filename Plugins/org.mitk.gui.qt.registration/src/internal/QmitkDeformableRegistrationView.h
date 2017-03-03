@@ -18,7 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QMITKDEFORMABLEREGISTRATION_H
 #define QMITKDEFORMABLEREGISTRATION_H
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
+#include <mitkIRenderWindowPartListener.h>
+
 #include "ui_QmitkDeformableRegistrationViewControls.h"
 
 #include <org_mitk_gui_qt_registration_Export.h>
@@ -29,21 +32,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkImageFileReader.h"
 
 /*!
-\brief The DeformableRegistration functionality is used to perform deformable registration.
+\brief The DeformableRegistration view is used to perform deformable registration.
 
-This functionality allows you to register two 2D as well as two 3D images in a non rigid manner.
+This view allows you to register two 2D as well as two 3D images in a non rigid manner.
 Register means to align two images, so that they become as similar as possible.
 Therefore you can select from different deformable registration methods.
 Registration results will directly be applied to the Moving Image. The result is shown in the multi-widget.
 
 For more informations see: \ref QmitkDeformableRegistrationUserManual
 
-\sa QmitkFunctionality
-\ingroup Functionalities
 \ingroup DeformableRegistration
 */
 
-class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunctionality
+class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public mitk::IRenderWindowPartListener
 {
 
   friend struct SelListenerDeformableRegistration;
@@ -73,29 +74,22 @@ class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunction
     */
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    /*!
-    \brief Sets the StdMultiWidget and connects it to the functionality.
-    */
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+    ///
+    /// Sets the focus to an internal widget.
+    ///
+    virtual void SetFocus() override;
 
-    /*!
-    \brief Removes the StdMultiWidget and disconnects it from the functionality.
-    */
-    virtual void StdMultiWidgetNotAvailable() override;
+    virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
+    virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
     /*!
     \brief method for creating the connections of main and control widget
     */
     virtual void CreateConnections();
 
-    /*!
-    \brief Method which is called when this functionality is selected in MITK
-    */
     virtual void Activated() override;
 
-    /*!
-    \brief Method which is called whenever the functionality is deselected in MITK
-    */
     virtual void Deactivated() override;
 
     virtual void Visible() override;
@@ -188,14 +182,10 @@ class REGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunction
 
   protected:
 
+    QWidget* m_Parent;
+
     QScopedPointer<berry::ISelectionListener> m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
-    /*!
-    * default main widget containing 4 windows showing 3
-    * orthogonal slices of the volume and a 3d render window
-    */
-    QmitkStdMultiWidget * m_MultiWidget;
 
     /*!
     * control widget to make all changes for Deformable registration

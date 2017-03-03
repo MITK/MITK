@@ -17,7 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if !defined(QMITK_POINTBASEDREGISTRATION_H__INCLUDED)
 #define QMITK_POINTBASEDREGISTRATION_H__INCLUDED
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
+#include <mitkIRenderWindowPartListener.h>
 
 #include "berryISelectionListener.h"
 #include "berryIStructuredSelection.h"
@@ -33,21 +35,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <org_mitk_gui_qt_registration_Export.h>
 
 /*!
-\brief The PointBasedRegistration functionality is used to perform point based registration.
+\brief The PointBasedRegistration view is used to perform point based registration.
 
-This functionality allows you to register 2D as well as 3D images in a rigid and deformable manner via corresponding
+This view allows you to register 2D as well as 3D images in a rigid and deformable manner via corresponding
 PointSets. Register means to align two images, so that they become as similar as possible.
 Therefore you have to set corresponding points in both images, which will be matched. The movement, which has to be
 performed on the points to align them will be performed on the moving image as well. The result is shown in the multi-widget.
 
 For more informations see: \ref QmitkPointBasedRegistrationUserManual
 
-\sa QmitkFunctionality
-\ingroup Functionalities
 \ingroup PointBasedRegistration
 */
 
-class REGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QmitkFunctionality
+class REGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public mitk::IRenderWindowPartListener
 {
 
   friend struct SelListenerPointBasedRegistration;
@@ -73,15 +73,14 @@ public:
   */
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  /*!
-  \brief Sets the StdMultiWidget and connects it to the functionality.
-  */
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
-  /*!
-  \brief Removes the StdMultiWidget and disconnects it from the functionality.
-  */
-  virtual void StdMultiWidgetNotAvailable() override;
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   /*!
   \brief Method for creating the connections of main and control widget
@@ -216,14 +215,10 @@ public:
 
 protected:
 
+  QWidget* m_Parent;
+
   QScopedPointer<berry::ISelectionListener> m_SelListener;
   berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-
-  /*!
-  * default main widget containing 4 windows showing 3
-  * orthogonal slices of the volume and a 3d render window
-  */
-  QmitkStdMultiWidget * m_MultiWidget;
 
   /*!
   * control widget to make all changes for point based registration

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
 #define _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include <berryIStructuredSelection.h>
 #include <string>
 
@@ -45,11 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
 
   \brief QmitkMITKSurfaceMaterialEditorView
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
-class QmitkMITKSurfaceMaterialEditorView : public QmitkFunctionality
+class QmitkMITKSurfaceMaterialEditorView : public QmitkAbstractView
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -67,14 +64,12 @@ class QmitkMITKSurfaceMaterialEditorView : public QmitkFunctionality
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
-  virtual void Activated() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
-  virtual void Deactivated() override;
-
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
 protected slots:
 
@@ -83,8 +78,6 @@ protected slots:
 protected:
 
   Ui::QmitkMITKSurfaceMaterialEditorViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
 private:
 

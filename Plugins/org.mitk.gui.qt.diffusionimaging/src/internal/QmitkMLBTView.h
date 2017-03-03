@@ -14,7 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include "ui_QmitkMLBTViewControls.h"
 
 #ifndef Q_MOC_RUN
@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Forward Qt class declarations
 
 
-class QmitkMLBTView : public QmitkFunctionality
+class QmitkMLBTView : public QmitkAbstractView
 {
 
 
@@ -58,9 +58,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
-  virtual void Activated() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   protected slots:
 
@@ -85,7 +86,6 @@ protected:
   void UpdateGui();
 
   Ui::QmitkMLBTViewControls* m_Controls;
-  QmitkStdMultiWidget* m_MultiWidget;
 
   mitk::TrackingForestHandler<6,100> m_ForestHandler;
 

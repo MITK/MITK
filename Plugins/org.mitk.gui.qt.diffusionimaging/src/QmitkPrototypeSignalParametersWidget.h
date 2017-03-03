@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkPrototypeSignalParametersWidgetControls.h"
 #include <org_mitk_gui_qt_diffusionimaging_Export.h>
 
-class QmitkStdMultiWidget;
-
 /** @brief
   */
 class DIFFUSIONIMAGING_EXPORT QmitkPrototypeSignalParametersWidget : public QWidget

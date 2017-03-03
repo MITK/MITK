@@ -192,7 +192,7 @@ void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* /*dataStorage*/)
   //not needed
 }
 
-void QmitkAutocropAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkAutocropAction::SetFunctionality(berry::QtViewPart* /*view*/)
 {
   //not needed
 }

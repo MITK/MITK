@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkMITKIGTTrackingToolboxViewControls.h"
 
@@ -41,11 +41,8 @@ class QmitkMITKIGTTrackingToolboxViewWorker;
   \brief QmitkMITKIGTTrackingToolboxView
 
    This is the view of the bundle IGT Tracking Toolbox. The IGT Tracking Toolbox can be used to access tracking devices with MITK-IGT. The Tracking Toolbox can be used to log tracking data in     XML or CSV format for measurement purposes. The Tracking Toolbox further allows for visualization of tools with given surfaces in combination with the NaviagtionToolManager.
-
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
-class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
+class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -60,9 +57,10 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     virtual void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-
-    virtual void StdMultiWidgetNotAvailable() override;
+    ///
+    /// Sets the focus to an internal widget.
+    ///
+    virtual void SetFocus() override;
 
   protected slots:
 
@@ -164,8 +162,6 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
   protected:
 
     Ui::QmitkMITKIGTTrackingToolboxViewControls* m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
     bool m_tracking;    ///> bool which is true if tracking is running, false if not
     bool m_connected;   ///> bool that is true when a tracking device is connected

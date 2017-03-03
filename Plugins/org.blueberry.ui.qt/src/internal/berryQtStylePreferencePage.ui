@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>499</width>
     <height>348</height>
    </rect>
   </property>
@@ -101,6 +101,19 @@
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="m_FontSizeSpinBox">
+        <property name="minimum">
+         <number>7</number>
+        </property>
+        <property name="maximum">
+         <number>40</number>
+        </property>
+        <property name="value">
+         <number>10</number>
         </property>
        </widget>
       </item>

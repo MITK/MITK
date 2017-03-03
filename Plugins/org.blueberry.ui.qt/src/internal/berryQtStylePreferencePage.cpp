@@ -58,6 +58,7 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
 
   connect(controls.m_StylesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(StyleChanged(int)));
   connect(controls.m_FontComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(FontChanged(int)));
+  connect(controls.m_FontSizeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(FontChanged(int)));
   connect(controls.m_IconThemeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(IconThemeChanged(int)));
   connect(controls.m_PathList, SIGNAL(itemSelectionChanged()), this, SLOT(UpdatePathListButtons()));
   connect(controls.m_AddButton, SIGNAL(clicked(bool)), this, SLOT(AddPathClicked(bool)));
@@ -90,6 +91,14 @@ void QtStylePreferencePage::FillFontCombo(const QString& currentFont)
     controls.m_FontComboBox->addItem(fonts.at(i));
   }
   controls.m_FontComboBox->setCurrentIndex(fonts.indexOf(currentFont));
+  if (currentFont == QString("<<system>>"))
+  {
+    controls.m_FontSizeSpinBox->setEnabled(false);
+  }
+  else
+  {
+    controls.m_FontSizeSpinBox->setEnabled(true);
+  }
 }
 
 void QtStylePreferencePage::FillIconThemeComboBox(const QString currentIconTheme)
@@ -135,7 +144,20 @@ void QtStylePreferencePage::StyleChanged(int /*index*/)
 void QtStylePreferencePage::FontChanged(int /*index*/)
 {
   QString fontName = controls.m_FontComboBox->currentText();
+  int fontSize = controls.m_FontSizeSpinBox->value();
+
+  if (fontName == QString("<<system>>"))
+  {
+    controls.m_FontSizeSpinBox->setEnabled(false);
+  }
+  else
+  {
+    controls.m_FontSizeSpinBox->setEnabled(true);
+  }
+
   styleManager->SetFont(fontName);
+  styleManager->SetFontSize(fontSize);
+  styleManager->UpdateWorkbenchFont();
 }
 
 void QtStylePreferencePage::IconThemeChanged(int /*index*/)
@@ -236,6 +258,8 @@ bool QtStylePreferencePage::PerformOk()
   m_StylePref->Put(berry::QtPreferences::QT_ICON_THEME, currentTheme);
   m_StylePref->Put(berry::QtPreferences::QT_FONT_NAME,
       controls.m_FontComboBox->currentText());
+  m_StylePref->Put(berry::QtPreferences::QT_FONT_SIZE,
+      QString::number(controls.m_FontSizeSpinBox->value()));
   return true;
 }
 
@@ -267,6 +291,12 @@ void QtStylePreferencePage::Update()
 
   QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "");
   styleManager->SetFont(fontName);
+
+  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "").toInt();
+  styleManager->SetFontSize(fontSize);
+  controls.m_FontSizeSpinBox->setValue(fontSize);
+  styleManager->UpdateWorkbenchFont();
+
   FillFontCombo(styleManager->GetFont());
 }
 

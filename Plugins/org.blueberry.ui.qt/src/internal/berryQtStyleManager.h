@@ -49,11 +49,11 @@ public:
   void GetStyles(StyleList& styles) const override;
   void SetStyle(const QString& fileName) override;
 
-  void AddFont(const QString& fontFilePath,
-               const QString& fontName);
-
   void GetFonts(QStringList& fontNames) const override;
+
   void SetFont(const QString& fontName) override;
+  void SetFontSize(const int fontSize) override;
+  void UpdateWorkbenchFont() override;
 
   Style GetDefaultStyle() const override;
   void SetDefaultStyle() override;
@@ -92,7 +92,8 @@ private:
   typedef QHash<QString, ExtStyle*> FileNameToStyleMap;
   FileNameToStyleMap styles;
 
-  QString currentFont;
+  QString m_currentFont;
+  int m_currentFontSize;
   ExtStyle const* currentStyle;
   ExtStyle* defaultStyle;
 

@@ -353,18 +353,24 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
 
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 {
+  int pixelValue = GetPixelValueOfSelectedItem();
   QmitkNewSegmentationDialog dialog(this);
   dialog.setWindowTitle("Rename Label");
   dialog.SetSuggestionList(m_OrganColors);
-  // MLI TODO
-  // dialog.SetColor(GetWorkingImage()->GetActiveLabel()->GetColor());
-  // dialog.SetSegmentationName(GetWorkingImage()->GetActiveLabel()->GetName());
+  dialog.SetColor(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetColor());
+  dialog.SetSegmentationName(QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
 
   if (dialog.exec() == QDialog::Rejected)
+  {
     return;
-  int pixelValue = GetPixelValueOfSelectedItem();
+  }
+  QString segmentationName = dialog.GetSegmentationName();
+  if (segmentationName.isEmpty())
+  {
+    segmentationName = "Unnamed";
+  }
 
-  GetWorkingImage()->GetActiveLabelSet()->RenameLabel(pixelValue, dialog.GetSegmentationName().toStdString(), dialog.GetColor());
+  GetWorkingImage()->GetActiveLabelSet()->RenameLabel(pixelValue, segmentationName.toStdString(), dialog.GetColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 
   UpdateAllTableWidgetItems();

@@ -131,15 +131,31 @@ void PAImageProcessing::ApplyBModeFilter()
       }
       message << ".";
       MITK_INFO << message.str();
+
+      auto newNode = mitk::DataNode::New();
+
       mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
-      node->SetData(filterbank->ApplyBmodeFilter(image, m_UseLogfilter, m_ResampleSpacing));
+      newNode->SetData(filterbank->ApplyBmodeFilter(image, m_UseLogfilter, m_ResampleSpacing));
 
       // update level window for the current dynamic range
       mitk::LevelWindow levelWindow;
-      node->GetLevelWindow(levelWindow);
-      data = node->GetData();
+      newNode->GetLevelWindow(levelWindow);
+      data = newNode->GetData();
       levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data),true,true);
-      node->SetLevelWindow(levelWindow);
+      newNode->SetLevelWindow(levelWindow);
+
+      // name the new Data node
+      std::stringstream newNodeName;
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataNode
+        newNodeName << name << ", ";
+      }
+      newNodeName << "B-Mode";
+      newNode->SetName(newNodeName.str());
+
+      // add new node to data storage
+      this->GetDataStorage()->Add(newNode);
 
       // update rendering
       mitk::RenderingManager::GetInstance()->InitializeViews(
@@ -155,6 +171,8 @@ void PAImageProcessing::ApplyBeamforming()
 
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
+
+  mitk::DataStorage::Pointer storage = this->GetDataStorage();
 
   mitk::DataNode::Pointer node = nodes.front();
 
@@ -184,17 +202,44 @@ void PAImageProcessing::ApplyBeamforming()
       MITK_INFO << message.str();
       mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
+      auto newNode = mitk::DataNode::New();
+
       if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-        node->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig));
+        newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig));
       else if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-        node->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig));
+        newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig));
+
+      // name the new Data node
+      std::stringstream newNodeName;
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataNode
+        newNodeName << name << ", ";
+      }
+
+      if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
+        newNodeName << "DAS beamformed, ";
+      else if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
+        newNodeName << "DMAS beamformed, ";
+      
+      if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear)
+        newNodeName << "linear delay";
+      if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox)
+        newNodeName << "quadratic delay";
+      if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical)
+        newNodeName << "spherical delay";
+
+      newNode->SetName(newNodeName.str());
 
       // update level window for the current dynamic range
       mitk::LevelWindow levelWindow;
-      node->GetLevelWindow(levelWindow);
-      data = node->GetData();
+      newNode->GetLevelWindow(levelWindow);
+      data = newNode->GetData();
       levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
-      node->SetLevelWindow(levelWindow);
+      newNode->SetLevelWindow(levelWindow);
+
+      // add new node to data storage
+      this->GetDataStorage()->Add(newNode);
 
       // update rendering
       mitk::RenderingManager::GetInstance()->InitializeViews(

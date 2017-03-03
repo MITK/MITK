@@ -193,6 +193,10 @@ void mitk::BeamformingDMASFilter::GenerateData()
           s_i = sample / outputS * inputS;
 
           part = part_multiplicator*s_i;
+
+          if (part < 1)
+            part = 1;
+
           maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
           minLine = (unsigned short)std::max((l_i - part), 0.0);
           VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
@@ -223,7 +227,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
             }
           }
 
-          m_OutputData[sample*(unsigned short)outputL + line] = 10 * m_OutputData[sample*(unsigned short)outputL + line] / (pow(maxLine - minLine, 2) - (maxLine - minLine - 1));
+          m_OutputData[sample*(unsigned short)outputL + line] = 10 * m_OutputData[sample*(unsigned short)outputL + line] / (pow(maxLine - minLine, 2) - (maxLine - minLine));
 
           delete[] AddSample;
         }
@@ -241,6 +245,10 @@ void mitk::BeamformingDMASFilter::GenerateData()
           s_i = sample / outputS * inputS;
 
           part = part_multiplicator*s_i;
+
+          if (part < 1)
+            part = 1;
+
           maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
           minLine = (unsigned short)std::max((l_i - part), 0.0);
 
@@ -288,6 +296,10 @@ void mitk::BeamformingDMASFilter::GenerateData()
           s_i = sample / outputS * inputS;
 
           part = part_multiplicator*s_i;
+
+          if (part < 1)
+            part = 1;
+
           maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
           minLine = (unsigned short)std::max((l_i - part), 0.0);
 
@@ -377,8 +389,8 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     return data;
   }
 
-  int lowerBound = -100 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
-  int upperBound = 100 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
+  int lowerBound = -70 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
+  int upperBound = 70 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
 
   int center1 = (int)(((double)lowerBound + data->GetDimension(1)/2) / 2);
   int center2 = (int)(-(-(double)upperBound + data->GetDimension(1)/2) / 2 + data->GetDimension(1));
@@ -424,7 +436,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 itk::Image<double,3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
   // tukey window
-  double alpha = 0.5 * reference->GetGeometry()->GetSpacing()[1] / 0.0244141;
+  double alpha = 0.2 * reference->GetGeometry()->GetSpacing()[1] / 0.0244141;
 
   double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
 

@@ -36,6 +36,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <limits>
 
+//blueberry includes
+#include <berryWorkbenchPlugin.h>
+#include <berryQtPreferences.h>
+
 const std::string QmitkImageStatisticsView::VIEW_ID = "org.mitk.views.imagestatistics";
 const int QmitkImageStatisticsView::STAT_TABLE_BASE_HEIGHT = 180;
 
@@ -73,6 +77,7 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
   delete this->m_CalculationThread;
 }
 
+
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   if (m_Controls == NULL)
@@ -82,9 +87,15 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
     CreateConnections();
 
     m_Controls->m_ErrorMessageLabel->hide();
-    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
     m_Controls->m_BinSizeFrame->setVisible(false);
   }
+}
+
+void QmitkImageStatisticsView::OnPreferencesChanged()
+{
+  berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
 }
 
 void QmitkImageStatisticsView::CreateConnections()
@@ -133,12 +144,38 @@ void QmitkImageStatisticsView::OnShowSubchartBoxChanged()
 
   this->m_Controls->m_JSHistogram->SendCommand(
     "ReloadChart(" + useLineChart + "," + showSubchart + ")");
+
+  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+
+  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
+  {
+    this->m_Controls->m_JSHistogram->SendCommand(
+      "changeTheme('dark')");
+  }
+  else
+  {
+    this->m_Controls->m_JSHistogram->SendCommand(
+      "changeTheme(default)");
+  }
 }
 
 
 void QmitkImageStatisticsView::OnBarRadioButtonSelected()
 {
   this->m_Controls->m_JSHistogram->TransformView("bar");
+
+  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+
+  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
+  {
+    this->m_Controls->m_JSHistogram->SendCommand(
+      "changeTheme('dark')");
+  }
+  else
+  {
+    this->m_Controls->m_JSHistogram->SendCommand(
+      "changeTheme(default)");
+  }
 }
 
 void QmitkImageStatisticsView::OnLineRadioButtonSelected()
@@ -926,6 +963,9 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       }
     }
   }
+  berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+
   this->m_StatisticsUpdatePending = false;
 }
 

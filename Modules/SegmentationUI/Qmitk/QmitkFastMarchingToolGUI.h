@@ -79,6 +79,9 @@ protected:
   mitk::Stepper::Pointer m_TimeStepper;
 
   void OnFastMarchingToolReady();
+
+private:
+  void EnableWidgets(bool);
 };
 
 #endif

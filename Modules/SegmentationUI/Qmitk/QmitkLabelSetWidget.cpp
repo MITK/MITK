@@ -91,15 +91,9 @@ QmitkLabelSetWidget::~QmitkLabelSetWidget()
 {
 }
 
-void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint &pos)
+void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint& /*pos*/)
 {
-  QTableWidgetItem *itemAt = m_Controls.m_LabelSetTableWidget->itemAt(pos);
-
-  // OnItemClicked(itemAt);
-
-  if (!itemAt)
-    return;
-  int pixelValue = itemAt->data(Qt::UserRole).toInt();
+  int pixelValue = GetPixelValueOfSelectedItem();
   QMenu *menu = new QMenu(m_Controls.m_LabelSetTableWidget);
 
   if (m_Controls.m_LabelSetTableWidget->selectedItems().size() > 1)
@@ -258,14 +252,12 @@ void QmitkLabelSetWidget::OnLockAllLabels(bool /*value*/)
 void QmitkLabelSetWidget::OnSetAllLabelsVisible(bool /*value*/)
 {
   GetWorkingImage()->GetActiveLabelSet()->SetAllLabelsVisible(true);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnSetAllLabelsInvisible(bool /*value*/)
 {
   GetWorkingImage()->GetActiveLabelSet()->SetAllLabelsVisible(false);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   UpdateAllTableWidgetItems();
 }
 
@@ -317,7 +309,6 @@ void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
   GetWorkingImage()->MergeLabel(pixelValue, sourcePixelValue, GetWorkingImage()->GetActiveLayer());
 
   UpdateAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnEraseLabel(bool /*value*/)
@@ -357,8 +348,7 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
     this->WaitCursorOff();
   }
 
-  this->ResetAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  ResetAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
@@ -374,12 +364,10 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
     return;
   int pixelValue = GetPixelValueOfSelectedItem();
 
-  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetColor(dialog.GetColor());
-  GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetName(dialog.GetSegmentationName().toStdString());
+  GetWorkingImage()->GetActiveLabelSet()->RenameLabel(pixelValue, dialog.GetSegmentationName().toStdString(), dialog.GetColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 
-  this->ResetAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  UpdateAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::OnCombineAndCreateMask(bool /*value*/)
@@ -454,7 +442,6 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
   }
 
   ResetAllTableWidgetItems();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnMergeLabels(bool /*value*/)
@@ -527,7 +514,6 @@ void QmitkLabelSetWidget::OnVisibleButtonClicked()
     int pixelValue = item->data(Qt::UserRole).toInt();
     GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetVisible(!GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetVisible());
     GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
-    OnItemClicked(item);
   }
 }
 
@@ -915,7 +901,7 @@ void QmitkLabelSetWidget::InitializeTableWidget()
 
 void QmitkLabelSetWidget::OnOpacityChanged(int value)
 {
-  int pixelValue = m_Controls.m_LabelSetTableWidget->currentItem()->data(Qt::UserRole).toInt();
+  int pixelValue = GetPixelValueOfSelectedItem();
   float opacity = static_cast<float>(value) / 100.0f;
   GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->SetOpacity(opacity);
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);

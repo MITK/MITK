@@ -1,5 +1,3 @@
-document.body.style.backgroundColor = 'rgb(240, 240, 240)';
-
 var greyvalue; //needed to display the tooltip in the right format
 var binSize = 10;
 var min;

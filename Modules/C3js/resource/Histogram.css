@@ -1,7 +1,6 @@
-/*--body {
-    background-color: darkgrey !important;
-}--*/
-
+body {
+    background-color: rgb(240, 240, 240) !important;
+}
 /*-- Bar --*/
 .c3-bar {
   fill-opacity: 1; 

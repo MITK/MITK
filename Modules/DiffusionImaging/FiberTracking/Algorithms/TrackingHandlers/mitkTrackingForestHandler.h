@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _TrackingForestHandler
 #define _TrackingForestHandler
 
-#include "mitkBaseData.h"
+#include <mitkTrackingDataHandler.h>
 
 #include <mitkFiberBundle.h>
 #include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
@@ -31,8 +31,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vigra/random_forest.hxx>
 #include <vigra/multi_array.hxx>
 #include <vigra/random_forest_hdf5_impex.hxx>
-
-//#include <mitkVigraRandomForestClassifier.h>
 #include <mitkLinearSplitting.h>
 #include <mitkThresholdSplit.h>
 #include <mitkImpurityLoss.h>
@@ -47,7 +45,7 @@ namespace mitk
 * \brief  Manages random forests for fiber tractography. The preparation of the features from the inputa data and the training process are handled here. The data preprocessing and actual prediction for the tracking process is also performed here. The tracking itself is performed in MLBSTrackingFilter. */
 
 template< int ShOrder, int NumberOfSignalFeatures >
-class TrackingForestHandler
+class TrackingForestHandler : public TrackingDataHandler
 {
 
 public:
@@ -55,9 +53,6 @@ public:
     TrackingForestHandler();
     ~TrackingForestHandler();
 
-    typedef itk::Image<short, 3>                                                ItkShortImgType;
-    typedef itk::Image<float, 3>                                                ItkFloatImgType;
-    typedef itk::Image<unsigned char, 3>                                        ItkUcharImgType;
     typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures > , 3 >      DwiFeatureImageType;
 
     typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::ImpurityLoss<> >,int,vigra::ClassificationTag> DefaultSplitType;
@@ -91,16 +86,19 @@ public:
     std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<double,3> Classify(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double angularThreshold, double& w, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double angularThreshold, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
 
     bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
+
+
+    ItkUcharImgType::SpacingType GetSpacing(){ return m_DwiFeatureImages.at(0)->GetSpacing(); }
+    itk::Point<float,3> GetOrigin(){ return m_DwiFeatureImages.at(0)->GetOrigin(); }
+    ItkUcharImgType::DirectionType GetDirection(){ return m_DwiFeatureImages.at(0)->GetDirection(); }
+    ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_DwiFeatureImages.at(0)->GetLargestPossibleRegion(); }
 
 protected:
 
     void InputDataValidForTracking();                                                   ///< check if raw data is set and tracking forest is valid
-
-    template< class TPixelType >
-    TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate);
 
     template<typename T=bool>
     typename std::enable_if<NumberOfSignalFeatures <= 99, T>::type InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi);

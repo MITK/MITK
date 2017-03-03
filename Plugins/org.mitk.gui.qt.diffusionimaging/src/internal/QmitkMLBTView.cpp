@@ -52,12 +52,13 @@ QmitkMLBTView::QmitkMLBTView()
 {
     m_TrackingTimer = std::make_shared<QTimer>(this);
     m_LastLoadedForestName = "(none)";
+    m_ForestHandler = new mitk::TrackingForestHandler<6,100>();
 }
 
 // Destructor
 QmitkMLBTView::~QmitkMLBTView()
 {
-
+    delete m_ForestHandler;
 }
 
 void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
@@ -110,6 +111,7 @@ void QmitkMLBTView::CreateQtPartControl( QWidget *parent )
 
         UpdateGui();
     }
+
 }
 
 void QmitkMLBTView::AddTrainingWidget()
@@ -131,7 +133,7 @@ void QmitkMLBTView::RemoveTrainingWidget()
 
 void QmitkMLBTView::UpdateGui()
 {
-    if (m_ForestHandler.IsForestValid())
+    if (m_ForestHandler->IsForestValid())
     {
         std::string label_text="Random forest available: "+m_LastLoadedForestName;
         m_Controls->statusLabel->setText( QString(label_text.c_str()) );
@@ -202,7 +204,7 @@ void QmitkMLBTView::LoadForest()
     if(filename.isEmpty() || filename.isNull())
         return;
 
-    m_ForestHandler.LoadForest( filename.toStdString() );
+    m_ForestHandler->LoadForest( filename.toStdString() );
     QFileInfo fi( filename );
     m_LastLoadedForestName = QString( fi.baseName() + "." + fi.completeSuffix() ).toStdString();
 
@@ -270,11 +272,11 @@ void QmitkMLBTView::OnTrackingThreadStop()
 
 void QmitkMLBTView::StartTracking()
 {
-    if ( m_Controls->m_TrackingRawImageBox->GetSelectedNode().IsNull() || !m_ForestHandler.IsForestValid())
+    if ( m_Controls->m_TrackingRawImageBox->GetSelectedNode().IsNull() || !m_ForestHandler->IsForestValid())
         return;
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
-    m_ForestHandler.AddDwi(dwi);
+    m_ForestHandler->AddDwi(dwi);
 
 //    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 
@@ -319,7 +321,7 @@ void QmitkMLBTView::StartTracking()
     tracker->SetAposterioriCurvCheck(m_Controls->m_Curvcheck2->isChecked());
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
     tracker->SetAvoidStop(m_Controls->m_AvoidStop->isChecked());
-    tracker->SetForestHandler(m_ForestHandler);
+    tracker->SetTrackingHandler(m_ForestHandler);
     tracker->SetSamplingDistance(m_Controls->m_SamplingDistanceBox->value());
     tracker->SetDeflectionMod(m_Controls->m_DeflectionModBox->value());
     tracker->SetRandomSampling(m_Controls->m_RandomSampling->isChecked());
@@ -332,7 +334,7 @@ void QmitkMLBTView::StartTracking()
 
 void QmitkMLBTView::SaveForest()
 {
-    if (!m_ForestHandler.IsForestValid())
+    if (!m_ForestHandler->IsForestValid())
     {
         UpdateGui();
         return;
@@ -344,7 +346,7 @@ void QmitkMLBTView::SaveForest()
     if(!filename.endsWith(".rf"))
         filename += ".rf";
 
-    m_ForestHandler.SaveForest( filename.toStdString() );
+    m_ForestHandler->SaveForest( filename.toStdString() );
 }
 
 void QmitkMLBTView::StartTrainingThread()
@@ -403,19 +405,19 @@ void QmitkMLBTView::StartTraining()
             m_WhiteMatterImages.push_back(nullptr);
     }
 
-    m_ForestHandler.SetDwis(m_SelectedDiffImages);
-    m_ForestHandler.SetTractograms(m_SelectedFB);
-    m_ForestHandler.SetMaskImages(m_MaskImages);
-    m_ForestHandler.SetWhiteMatterImages(m_WhiteMatterImages);
-    m_ForestHandler.SetNumTrees(m_Controls->m_NumTreesBox->value());
-    m_ForestHandler.SetMaxTreeDepth(m_Controls->m_MaxDepthBox->value());
-    m_ForestHandler.SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
-    m_ForestHandler.SetSampleFraction(m_Controls->m_SampleFractionBox->value());
-    m_ForestHandler.SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
-    m_ForestHandler.SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
-    m_ForestHandler.SetBidirectionalFiberSampling(m_Controls->m_BidirectionalSampling->isChecked());
-    m_ForestHandler.SetZeroDirWmFeatures(m_Controls->m_ZeroDirBox->isChecked());
-    m_ForestHandler.StartTraining();
+    m_ForestHandler->SetDwis(m_SelectedDiffImages);
+    m_ForestHandler->SetTractograms(m_SelectedFB);
+    m_ForestHandler->SetMaskImages(m_MaskImages);
+    m_ForestHandler->SetWhiteMatterImages(m_WhiteMatterImages);
+    m_ForestHandler->SetNumTrees(m_Controls->m_NumTreesBox->value());
+    m_ForestHandler->SetMaxTreeDepth(m_Controls->m_MaxDepthBox->value());
+    m_ForestHandler->SetGrayMatterSamplesPerVoxel(m_Controls->m_GmSamplingBox->value());
+    m_ForestHandler->SetSampleFraction(m_Controls->m_SampleFractionBox->value());
+    m_ForestHandler->SetStepSize(m_Controls->m_TrainingStepSizeBox->value());
+    m_ForestHandler->SetNumPreviousDirections(m_Controls->m_NumPrevDirs->value());
+    m_ForestHandler->SetBidirectionalFiberSampling(m_Controls->m_BidirectionalSampling->isChecked());
+    m_ForestHandler->SetZeroDirWmFeatures(m_Controls->m_ZeroDirBox->isChecked());
+    m_ForestHandler->StartTraining();
 }
 
 void QmitkMLBTView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)

@@ -25,7 +25,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
 #include <itkImage.h>
-#include <itkStreamlineTrackingFilter.h>
+#include <itkMLBSTrackingFilter.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 
 
 /*!
@@ -71,7 +72,7 @@ protected slots:
     void OnSeedsPerVoxelChanged(int value);
     void OnMinTractLengthChanged(int value);
     void OnFaThresholdChanged(double value);
-    void OnAngularThresholdChanged(int value);
+    void OnAngularThresholdChanged(double value);
     void OnfChanged(int value);
     void OngChanged(int value);
     void OnStepsizeChanged(int value);

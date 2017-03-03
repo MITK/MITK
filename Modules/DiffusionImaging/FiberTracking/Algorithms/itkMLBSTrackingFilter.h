@@ -33,20 +33,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDiffusionPropertyHelper.h>
 #include <mitkPointSet.h>
 #include <chrono>
-#include <mitkTrackingForestHandler.h>
-
-// classification includes
-#include <vigra/random_forest.hxx>
-#include <vigra/multi_array.hxx>
-#include <vigra/random_forest_hdf5_impex.hxx>
+#include <TrackingHandlers/mitkTrackingDataHandler.h>
+#include <MitkFiberTrackingExports.h>
 
 namespace itk{
 
 /**
 * \brief Performes deterministic streamline tracking on the input tensor image.   */
 
-template<  int ShOrder, int NumImageFeatures >
-class MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
+class MITKFIBERTRACKING_EXPORT MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
 {
 
 public:
@@ -58,7 +53,6 @@ public:
 
     typedef typename Superclass::InputImageType             InputImageType;
     typedef typename Superclass::InputImageRegionType       InputImageRegionType;
-    typedef Image< Vector< float, NumImageFeatures > , 3 >  FeatureImageType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -105,9 +99,9 @@ public:
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
     itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
 
-    void SetForestHandler( mitk::TrackingForestHandler<ShOrder, NumImageFeatures> fh )   ///< Stores random forest classifier and performs actual classification
+    void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
     {
-        m_ForestHandler = fh;
+        m_TrackingHandler = h;
     }
 
     protected:
@@ -120,7 +114,7 @@ public:
     void CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& dir);    ///< Calculate next integration step.
     double FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front);       ///< Start streamline in one direction.
     bool IsValidPosition(itk::Point<double, 3>& pos);   ///< Are we outside of the mask image?
-    vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
+    vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
     double GetRandDouble(double min=-1, double max=1);
     std::vector< vnl_vector_fixed<double,3> > CreateDirections(int NPoints);
@@ -164,10 +158,7 @@ public:
     int CheckCurvature(FiberType* fib, bool front);
 
     // decision forest
-    mitk::TrackingForestHandler<ShOrder, NumImageFeatures>       m_ForestHandler;
-    typename InputImageType::Pointer    m_InputImage;
-
-
+    mitk::TrackingDataHandler*          m_TrackingHandler;
     std::vector< PolyDataType >         m_PolyDataContainer;
 
     std::chrono::time_point<std::chrono::system_clock> m_StartTime;
@@ -179,9 +170,9 @@ private:
 
 }
 
-#ifndef ITK_MANUAL_INSTANTIATION
-#include "itkMLBSTrackingFilter.cpp"
-#endif
+//#ifndef ITK_MANUAL_INSTANTIATION
+//#include "itkMLBSTrackingFilter.cpp"
+//#endif
 
 #endif //__itkMLBSTrackingFilter_h_
 

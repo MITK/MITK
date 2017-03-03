@@ -87,7 +87,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
         connect( m_Controls->m_MinTractLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(OnMinTractLengthChanged(int)) );
         connect( m_Controls->m_ScalarThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnFaThresholdChanged(double)) );
-        connect( m_Controls->m_AngularThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAngularThresholdChanged(int)) );
+        connect( m_Controls->m_AngularThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnAngularThresholdChanged(double)) );
         connect( m_Controls->m_StepsizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStepsizeChanged(int)) );
         connect( m_Controls->m_fSlider, SIGNAL(valueChanged(int)), this, SLOT(OnfChanged(int)) );
         connect( m_Controls->m_gSlider, SIGNAL(valueChanged(int)), this, SLOT(OngChanged(int)) );
@@ -104,12 +104,12 @@ void QmitkStreamlineTrackingView::OngChanged(int value)
     m_Controls->m_gLabel->setText(QString("g: ")+QString::number((float)value/100));
 }
 
-void QmitkStreamlineTrackingView::OnAngularThresholdChanged(int value)
+void QmitkStreamlineTrackingView::OnAngularThresholdChanged(double value)
 {
     if (value<0)
-        m_Controls->m_AngularThresholdLabel->setText(QString("Min. Curvature Radius: auto"));
+        m_Controls->m_AngularThresholdLabel->setText(QString("Angular Threshold: auto"));
     else
-        m_Controls->m_AngularThresholdLabel->setText(QString("Min. Curvature Radius: ")+QString::number((float)value/10)+QString("mm"));
+        m_Controls->m_AngularThresholdLabel->setText(QString("Angular Threshold: ")+QString::number(value)+QString("mm"));
 }
 
 void QmitkStreamlineTrackingView::OnSeedsPerVoxelChanged(int value)
@@ -208,19 +208,18 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     if (m_TensorImages.empty())
         return;
 
+    mitk::TrackingHandlerTensor* trackingHandler = new mitk::TrackingHandlerTensor();
+
     typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
     typedef mitk::ImageToItk<TensorImageType> CastType;
     typedef mitk::ImageToItk<ItkUCharImageType> CastType2;
-
-    typedef itk::StreamlineTrackingFilter< float > FilterType;
-    FilterType::Pointer filter = FilterType::New();
 
     for (int i=0; i<(int)m_TensorImages.size(); i++)
     {
         CastType::Pointer caster = CastType::New();
         caster->SetInput(m_TensorImages.at(i));
         caster->Update();
-        filter->SetInput(i, caster->GetOutput());
+        trackingHandler->AddTensorImage(caster->GetOutput());
     }
 
     if (m_Controls->m_UseFaImage->isChecked())
@@ -228,36 +227,48 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         mitk::ImageToItk<ItkFloatImageType>::Pointer floatCast = mitk::ImageToItk<ItkFloatImageType>::New();
         floatCast->SetInput(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()));
         floatCast->Update();
-        filter->SetFaImage(floatCast->GetOutput());
+        trackingHandler->SetFaImage(floatCast->GetOutput());
     }
 
-    //filter->SetNumberOfThreads(1);
-    filter->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
-    filter->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
-    filter->SetMinCurvatureRadius((float)m_Controls->m_AngularThresholdSlider->value()/10);
-    filter->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
-    filter->SetF((float)m_Controls->m_fSlider->value()/100);
-    filter->SetG((float)m_Controls->m_gSlider->value()/100);
-    filter->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
-    filter->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
+    trackingHandler->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
+    trackingHandler->SetF((float)m_Controls->m_fSlider->value()/100);
+    trackingHandler->SetG((float)m_Controls->m_gSlider->value()/100);
+    trackingHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+
+    typedef itk::MLBSTrackingFilter TrackerType;
+    TrackerType::Pointer tracker = TrackerType::New();
 
     if (m_SeedRoi.IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
         mitk::CastToItkImage(m_SeedRoi, mask);
-        filter->SetSeedImage(mask);
+        tracker->SetSeedImage(mask);
     }
 
     if (m_MaskImage.IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
         mitk::CastToItkImage(m_MaskImage, mask);
-        filter->SetMaskImage(mask);
+        tracker->SetMaskImage(mask);
     }
 
-    filter->Update();
+    //tracker->SetStoppingRegions(stop);
+    tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
+    tracker->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
+    //tracker->SetSamplingDistance(samplingdist);
+    tracker->SetUseStopVotes(true);
+    tracker->SetOnlyForwardSamples(true);
+    tracker->SetAposterioriCurvCheck(false);
+    //tracker->SetFourTTImage(tissue);
+    tracker->SetNumberOfSamples(0);
+    tracker->SetSeedOnlyGm(false);
+    tracker->SetTrackingHandler(trackingHandler);
+    tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
+    tracker->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
+    tracker->Update();
+    delete trackingHandler;
 
-    vtkSmartPointer<vtkPolyData> fiberBundle = filter->GetFiberPolyData();
+    vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
     if ( fiberBundle->GetNumberOfLines()==0 )
     {
         QMessageBox warnBox;

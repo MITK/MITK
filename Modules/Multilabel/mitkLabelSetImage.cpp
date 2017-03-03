@@ -386,36 +386,34 @@ bool mitk::LabelSetImage::ExistLabelSet(unsigned int layer) const
   return layer < m_LabelSetContainer.size();
 }
 
-void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, unsigned int /*layer*/)
+void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixelValue, unsigned int layer)
 {
-  int targetPixelValue = this->GetActiveLabel(GetActiveLayer())->GetValue();
   try
   {
-    AccessByItk_2(this, MergeLabelProcessing, targetPixelValue, pixelValue);
+    AccessByItk_2(this, MergeLabelProcessing, pixelValue, sourcePixelValue);
   }
   catch (itk::ExceptionObject &e)
   {
     mitkThrow() << e.GetDescription();
   }
+  GetLabelSet(layer)->SetActiveLabel(pixelValue);
   Modified();
 }
 
-void mitk::LabelSetImage::MergeLabels(std::vector<PixelType> &VectorOfLablePixelValues,
-                                      PixelType pixelValue,
-                                      unsigned int layer)
+void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer)
 {
-  GetLabelSet(layer)->SetActiveLabel(pixelValue);
   try
   {
-    for (unsigned int idx = 0; idx < VectorOfLablePixelValues.size(); idx++)
+    for (unsigned int idx = 0; idx < vectorOfSourcePixelValues.size(); idx++)
     {
-      AccessByItk_2(this, MergeLabelProcessing, pixelValue, VectorOfLablePixelValues[idx]);
+      AccessByItk_2(this, MergeLabelProcessing, pixelValue, vectorOfSourcePixelValues[idx]);
     }
   }
   catch (itk::ExceptionObject &e)
   {
     mitkThrow() << e.GetDescription();
   }
+  GetLabelSet(layer)->SetActiveLabel(pixelValue);
   Modified();
 }
 

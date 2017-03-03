@@ -421,8 +421,7 @@ public:
 
   void TestMergeLabel()
   {
-    mitk::Image::Pointer image =
-      mitk::IOUtil::LoadImage(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+    mitk::Image::Pointer image = mitk::IOUtil::LoadImage(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
     m_LabelSetImage = 0;
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
@@ -435,16 +434,14 @@ public:
 
     m_LabelSetImage->GetActiveLabelSet()->SetActiveLabel(6);
     // Merge label 7 with label 0. Result should be that label 7 is not present any more
-    m_LabelSetImage->MergeLabel(7);
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+    m_LabelSetImage->MergeLabel(6, 7);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
     m_LabelSetImage->GetStatistics()->GetScalarValue2ndMax();
 
     // Count all pixels with value 7 = 823
     // Count all pixels with value 6 = 507
     // Check if merge label has 507 + 823 = 1330 pixels
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image",
-                           m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
   }
 };
 

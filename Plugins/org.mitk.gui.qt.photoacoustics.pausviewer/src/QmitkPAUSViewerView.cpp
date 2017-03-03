@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchWindow.h>
 #include "mitkScaleLegendAnnotation.h"
 #include "mitkLayoutAnnotationRenderer.h"
+#include "mitkManualPlacementAnnotationRenderer.h"
+#include "mitkTextAnnotation2D.h"
 
 #include "QmitkPAUSViewerView.h"
 
@@ -96,20 +98,54 @@ vtkRenderWindow* QmitkPAUSViewerView::GetUSRenderWindow()
 
 void QmitkPAUSViewerView::AddOverlays()
 {
-  if (m_PARenderer == nullptr || /*m_PAOverlayController == nullptr||*/ m_USRenderer == nullptr /*|| m_USOverlayController == nullptr*/)
-  {
+  //if (m_PARenderer == nullptr || /*m_PAOverlayController == nullptr||*/ m_USRenderer == nullptr /*|| m_USOverlayController == nullptr*/)
+  //{
     m_PARenderer = mitk::BaseRenderer::GetInstance(GetPARenderWindow());
     m_USRenderer = mitk::BaseRenderer::GetInstance(GetUSRenderWindow());
-  }
-
+  //}
+    MITK_INFO << "1111111111111111111111";
   mitk::ScaleLegendAnnotation::Pointer scaleAnnotation = mitk::ScaleLegendAnnotation::New();
-  scaleAnnotation->SetLeftAxisVisibility(true);
-  scaleAnnotation->SetRightAxisVisibility(false);
-  scaleAnnotation->SetRightAxisVisibility(false);
-  scaleAnnotation->SetTopAxisVisibility(false);
-  scaleAnnotation->SetCornerOffsetFactor(0);
-  mitk::LayoutAnnotationRenderer::AddAnnotation(scaleAnnotation.GetPointer(), m_PARenderer, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  //scaleAnnotation->SetLeftAxisVisibility(true);
+  //scaleAnnotation->SetRightAxisVisibility(false);
+  //scaleAnnotation->SetRightAxisVisibility(false);
+  //scaleAnnotation->SetTopAxisVisibility(false);
+  //scaleAnnotation->SetCornerOffsetFactor(0);
+  MITK_INFO << "1111111111111111111111";
+
+  // Add Overlays
+  //![TextAnnotation2D]
+  // Create a textAnnotation2D
+  mitk::TextAnnotation2D::Pointer textAnnotation = mitk::TextAnnotation2D::New();
+
+  textAnnotation->SetText("Test!"); // set UTF-8 encoded text to render
+  textAnnotation->SetFontSize(40);
+  textAnnotation->SetColor(1, 0, 0); // Set text color to red
+  textAnnotation->SetOpacity(0.5);
+  MITK_INFO << "1111111111111111111111";
+
+  // The position of the Annotation can be set to a fixed coordinate on the display.
+  mitk::Point2D pos;
+  pos[0] = 10;
+  pos[1] = 20;
+  textAnnotation->SetPosition2D(pos);
+  MITK_INFO << "1111111111111111111111";
+
+  std::string rendererID = m_PARenderer->GetName();
+
+  // The LayoutAnnotationRenderer can place the TextAnnotation2D at some defined corner positions
+  mitk::LayoutAnnotationRenderer::AddAnnotation(
+    textAnnotation, rendererID, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  mitk::LayoutAnnotationRenderer::AddAnnotation(
+    textAnnotation, m_PARenderer.GetPointer(), mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  mitk::ManualPlacementAnnotationRenderer::AddAnnotation(
+    textAnnotation, m_PARenderer.GetPointer());
+  MITK_INFO << "1111111111111111111111";
+
+
+  mitk::LayoutAnnotationRenderer::AddAnnotation(scaleAnnotation.GetPointer(), m_PARenderer->GetName(), mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
   mitk::LayoutAnnotationRenderer::AddAnnotation(scaleAnnotation.GetPointer(), m_USRenderer, mitk::LayoutAnnotationRenderer::TopLeft, 5, 5, 1);
+  MITK_INFO << "1111111111111111111111";
+
 }
 
 void QmitkPAUSViewerView::RemoveOverlays()

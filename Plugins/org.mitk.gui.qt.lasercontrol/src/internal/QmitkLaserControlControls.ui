@@ -16,6 +16,11 @@
     <height>0</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
@@ -297,10 +302,10 @@
             <number>50</number>
            </attribute>
            <attribute name="verticalHeaderDefaultSectionSize">
-            <number>20</number>
+            <number>30</number>
            </attribute>
            <attribute name="verticalHeaderMinimumSectionSize">
-            <number>20</number>
+            <number>30</number>
            </attribute>
            <row>
             <property name="text">

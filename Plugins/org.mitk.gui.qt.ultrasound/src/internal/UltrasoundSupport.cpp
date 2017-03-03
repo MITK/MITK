@@ -170,8 +170,8 @@ void UltrasoundSupport::UpdateLevelWindows()
     {
       m_Node.at(index)->GetLevelWindow(levelWindow);
       if (!m_curOutput.at(index)->IsEmpty())
-        levelWindow.SetWindowBounds(0, 4 * (index+1));
-        //levelWindow.SetAuto(m_curOutput.at(index), true, true);
+        //levelWindow.SetWindowBounds(0, 4 * (index+1));
+        levelWindow.SetToImageRange(m_curOutput.at(index));
       m_Node.at(index)->SetLevelWindow(levelWindow);
     }
   }
@@ -179,7 +179,7 @@ void UltrasoundSupport::UpdateLevelWindows()
   {
     m_Node.back()->GetLevelWindow(levelWindow);
     if (!m_curOutput.at(0)->IsEmpty())
-      levelWindow.SetAuto(m_curOutput.at(0), true, true);
+      levelWindow.SetToImageRange(m_curOutput.at(0));
     m_Node.back()->SetLevelWindow(levelWindow);
   }
 }

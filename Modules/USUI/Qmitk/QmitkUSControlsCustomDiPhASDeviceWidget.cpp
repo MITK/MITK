@@ -321,7 +321,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMinChanged()
     ui->TimeGainCompensationMinSlider->setValue(tgcMax);
     MITK_INFO << "User tried to set tgcMin>tgcMax.";
   }
-  
+  QString text("TGC min = " + QString::fromStdString(std::to_string(ui->TimeGainCompensationMinSlider->value())));
+  ui->TimeGainCompensationMinLabel->setText(text);
   m_ControlInterface->SetTGCMin(ui->TimeGainCompensationMinSlider->value());
 }
 void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
@@ -334,7 +335,8 @@ void QmitkUSControlsCustomDiPhASDeviceWidget::OnTGCMaxChanged()
     ui->TimeGainCompensationMaxSlider->setValue(tgcMin);
     MITK_INFO << "User tried to set tgcMin>tgcMax.";
   }
-  
+  QString text("TGC max = "+QString::fromStdString(std::to_string(ui->TimeGainCompensationMaxSlider->value())));
+  ui->TimeGainCompensationMaxLabel->setText(text);
   m_ControlInterface->SetTGCMax(ui->TimeGainCompensationMaxSlider->value());
 }
 

@@ -128,6 +128,7 @@ void mitk::USDiPhASDeviceCustomControls::SetTGCMin(int min)
 void mitk::USDiPhASDeviceCustomControls::SetTGCMax(int max)
 {
   this->OnSetTGCMax(max);
+  
 }
 
 void mitk::USDiPhASDeviceCustomControls::SetDataType(DataType type)

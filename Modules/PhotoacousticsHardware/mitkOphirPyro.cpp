@@ -81,10 +81,8 @@ void mitk::OphirPyro::SaveCsvData()
   std::string currentDate = std::ctime(timeptr);
   replaceAll(currentDate, ":", "-");
   currentDate.pop_back();
-  std::string MakeFolder = "mkdir \"c:/DiPhASTimeStamps/" + currentDate + "\"";
-  system(MakeFolder.c_str());
 
-  std::string pathTS = "c:\\DiPhASTimeStamps\\" + currentDate + " Timestamps" + ".csv";
+  std::string pathTS = "c:\\ImageData\\" + currentDate + " pyro-ts" + ".csv";
 
   std::ofstream timestampFile;
   timestampFile.open(pathTS);

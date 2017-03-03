@@ -498,7 +498,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
         mitk::Vector3D rawSpacing;
         rawSpacing[0] = m_Device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
-        rawSpacing[1] = recordTime * speedOfSound / 2 * 1000 / channelDataSamplesPerChannel;
+        rawSpacing[1] = recordTime / channelDataSamplesPerChannel / 2;
         rawSpacing[2] = 0.6;
 
         rawImage->GetGeometry()->SetSpacing(rawSpacing);
@@ -688,21 +688,21 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string currentDate = std::ctime(timeptr);
     replaceAll(currentDate, ":", "-");
     currentDate.pop_back();
-    std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
-    system(MakeFolder.c_str());
+    //std::string MakeFolder = "mkdir \"c:/DiPhASImageData/" + currentDate + "\"";
+    //system(MakeFolder.c_str());
 
     // initialize file paths and the images
     Image::Pointer PAImage = Image::New();
     Image::Pointer USImage = Image::New();
-    std::string pathPA = "c:\\DiPhASImageData\\" + currentDate + "\\" + "PAImages" + ".nrrd";
-    std::string pathUS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
-    std::string pathTS = "c:\\DiPhASImageData\\" + currentDate + "\\" + "TimestampsImages" + ".csv";
+    std::string pathPA = "c:\\ImageData\\" + currentDate + "-" + "PAbeamformed" + ".nrrd";
+    std::string pathUS = "c:\\ImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    std::string pathTS = "c:\\ImageData\\" + currentDate + "-" + "ts" + ".csv";
 
     // idon't forget the raw Images (if chosen to be saved)
     Image::Pointer PAImageRaw = Image::New();
     Image::Pointer USImageRaw = Image::New();
-    std::string pathPARaw = "c:\\DiPhASImageData\\" + currentDate + "\\" + "PAImagesRaw" + ".nrrd";
-    std::string pathUSRaw = "c:\\DiPhASImageData\\" + currentDate + "\\" + "USImagesRaw" + ".nrrd";
+    std::string pathPARaw = "c:\\ImageData\\" + currentDate + "-" + "PAraw" + ".nrrd";
+    std::string pathUSRaw = "c:\\ImageData\\" + currentDate + "\\" + "USImagesRaw" + ".nrrd";
 
     if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
@@ -714,7 +714,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       if (m_SavingSettings.saveBeamformed)
       {
         OrderImagesInterleaved(PAImage, USImage, m_RecordedImages, false);
-        mitk::IOUtil::Save(USImage, pathUS);
+        //mitk::IOUtil::Save(USImage, pathUS);
         mitk::IOUtil::Save(PAImage, pathPA);
       }
 
@@ -722,7 +722,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       if (m_SavingSettings.saveRaw)
       {
         OrderImagesInterleaved(PAImageRaw, USImageRaw, m_RawRecordedImages, true);
-        mitk::IOUtil::Save(USImageRaw, pathUSRaw);
+        //mitk::IOUtil::Save(USImageRaw, pathUSRaw);
         mitk::IOUtil::Save(PAImageRaw, pathPARaw);
       }
 

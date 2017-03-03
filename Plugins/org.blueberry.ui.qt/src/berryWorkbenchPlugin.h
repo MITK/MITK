@@ -29,10 +29,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "presentations/berryIPresentationFactory.h"
 
 
-#include "berryViewRegistry.h"
-#include "berryEditorRegistry.h"
-#include "berryPerspectiveRegistry.h"
-#include "intro/berryIntroRegistry.h"
+#include "internal/berryViewRegistry.h"
+#include "internal/berryEditorRegistry.h"
+#include "internal/berryPerspectiveRegistry.h"
+#include "internal/intro/berryIntroRegistry.h"
 
 namespace berry {
 
@@ -59,7 +59,7 @@ class QtStyleManager;
  *      calls createExecutableExtension to create an executable
  *      instance of our workbench class.
  */
-class WorkbenchPlugin : public AbstractUICTKPlugin
+class BERRY_UI_QT WorkbenchPlugin : public AbstractUICTKPlugin
 {
 
   Q_OBJECT

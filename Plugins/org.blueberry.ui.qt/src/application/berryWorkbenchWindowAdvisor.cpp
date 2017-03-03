@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPreferencesService.h>
 
 #include "internal/berryWorkbenchWindowConfigurer.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 namespace berry
 {

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berrySafeRunner.h>
 #include <util/berrySafeRunnable.h>
 
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include <berryObjectString.h>
 #include <berryObjects.h>

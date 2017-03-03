@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIntroPartAdapterSite.h"
 
 #include "internal/berryWorkbench.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 namespace berry
 {

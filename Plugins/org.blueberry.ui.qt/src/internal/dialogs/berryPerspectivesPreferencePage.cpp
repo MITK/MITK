@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "internal/berryPerspectiveRegistry.h"
 #include "internal/berryPreferenceConstants.h"
 #include "internal/berryWorkbenchPage.h"
-#include "internal/berryWorkbenchPlugin.h"
+#include "berryWorkbenchPlugin.h"
 
 #include <QListWidgetItem>
 #include <QMessageBox>

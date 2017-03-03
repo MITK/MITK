@@ -779,6 +779,11 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
       pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
       statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
     }
+    else if ( pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR )
+    {
+      std::string pixelValue = "See ODF Details view. ";
+      statusBar->DisplayImageInfo(worldposition, p, posEvent->GetSender()->GetTime(), pixelValue.c_str());
+    }
     else
     {
       mitk::ScalarType pixelValue;

@@ -1627,15 +1627,11 @@ void QmitkPreprocessingView::TemplatedUpdateGui( itk::VectorImage<TPixel, VImage
   }
 }
 
-
-//todo/mdh
 void QmitkPreprocessingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   (void) nodes;
-  //maybe?
   this->OnImageSelectionChanged();
-}//todo/mdh/why not?
-
+}
 
 void QmitkPreprocessingView::OnImageSelectionChanged()
 {

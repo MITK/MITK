@@ -1225,9 +1225,8 @@ namespace itk
       PrintToLog(m_SpikeLog, false, false);
     }
 
-    if (m_Logfile.is_open())
-      m_Logfile.close();
-  } // Heilliger Spaghetti-Code, Batman! todo/mdh
+    if (m_Logfile.is_open()) m_Logfile.close();
+  }
 
 
   template< class PixelType >

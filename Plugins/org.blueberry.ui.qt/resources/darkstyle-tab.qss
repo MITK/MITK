@@ -25,8 +25,6 @@ berry--QCTabBar QToolButton#TabCloseButton
     /*background-image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);*/
     border: none;
     background-color: transparent;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
 }
-
-

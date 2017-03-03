@@ -601,6 +601,17 @@ QToolBar {
     font-weight: bold;
 }
 
+QToolBar QToolButton {
+     background-color: #323231;
+     border: 1px solid #323231;
+     border-radius: 0px;
+
+     min-width: 30px;
+     min-height: 30px;
+     margin: 0px;
+     padding: 0px;
+}
+
 QToolBar::handle:horizontal {
     image: url(:/org.blueberry.ui.qt/dark/Hmovetoolbar.png);
 }
@@ -621,7 +632,7 @@ QPushButton
 {
     color: #adb1b6;
     background-color: #323231;
-    width: 68px;
+    min-width: 68px;
     border-width: 1px;
     border-color: #1d1d1c;
     border-style: solid;
@@ -703,7 +714,7 @@ QComboBox::drop-down
 {
     subcontrol-origin: padding;
     subcontrol-position: top right;
-    width: 15px;
+    min-width: 15px;
 
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -811,6 +822,9 @@ QTabBar:focus
 QTabBar::close-button  {
     image: url(:/org.blueberry.ui.qt/dark/tab_close_grey.svg);
     background: transparent;
+
+  /*  min-width: 16px;
+    min-height: 16px;*/
 }
 
 QTabBar::close-button:hover
@@ -938,21 +952,26 @@ QTabBar::tab:right:!selected:hover {
 }
 
 QTabBar QToolButton::right-arrow:enabled {
-     image: url(:/org.blueberry.ui.qt/dark/right_arrow.png);
- }
+    image: url(:/org.blueberry.ui.qt/dark/right_arrow.png);
+}
 
- QTabBar QToolButton::left-arrow:enabled {
-     image: url(:/org.blueberry.ui.qt/dark/left_arrow.png);
- }
+QTabBar QToolButton::left-arrow:enabled {
+    image: url(:/org.blueberry.ui.qt/dark/left_arrow.png);
+}
 
 QTabBar QToolButton::right-arrow:disabled {
-     image: url(:/org.blueberry.ui.qt/dark/right_arrow_disabled.png);
- }
+    image: url(:/org.blueberry.ui.qt/dark/right_arrow_disabled.png);
+}
 
- QTabBar QToolButton::left-arrow:disabled {
-     image: url(:/org.blueberry.ui.qt/dark/left_arrow_disabled.png);
- }
+QTabBar QToolButton::left-arrow:disabled {
+    image: url(:/org.blueberry.ui.qt/dark/left_arrow_disabled.png);
+}
 
+QTabBar::scroller
+{
+    margin: 0px;
+    padding: 0px;
+}
 
 QDockWidget {
     background: #323231;
@@ -1039,7 +1058,7 @@ QSlider::groove:horizontal {
 }
 
 QSlider::handle:horizontal {
-    background: #323231;
+    background: #adb1b6;
     border: 1px solid #1d1d1c;
     width: 7px;
     height: 16px;
@@ -1056,7 +1075,7 @@ QSlider::groove:vertical {
 }
 
 QSlider::handle:vertical {
-    background: #323231;
+    background: #adb1b6;
     border: 1px solid #1d1d1c;
     width: 16px;
     height: 7px;
@@ -1069,8 +1088,8 @@ QToolButton {
     border: 1px solid #323231;
     border-radius: 0px;
 
-    min-width: 10px;
-    min-height: 10px;
+    min-width: 12px;
+    min-height: 12px;
     margin: 0px;
     padding: 0px;
 }
@@ -1087,8 +1106,8 @@ QToolButton[popupMode="2"] { /* only for InstantPopup */
 QToolButton:hover, QToolButton::menu-button:hover {
     background-color: #323231;
     border: 1px solid #3399cc;
-    min-width: 10px;
-    min-height: 10px;
+    min-width: 30px;
+    min-height: 30px;
     margin: 0px;
     padding: 0px;
 }

@@ -82,7 +82,7 @@ void mitk::BeamformingDMASFilter::GenerateOutputInformation()
 
   mitk::Vector3D spacing;
   spacing[0] = m_Conf.Pitch * m_Conf.TransducerElements * 1000 / m_Conf.ReconstructionLines;
-  spacing[1] = m_Conf.RecordTime * m_Conf.SpeedOfSound / 2 * 1000 / m_Conf.SamplesPerLine;
+  spacing[1] = m_Conf.RecordTime * m_Conf.SpeedOfSound * 1000 / m_Conf.SamplesPerLine;
   spacing[2] = 1;
 
   output->GetGeometry()->SetSpacing(spacing);
@@ -97,7 +97,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
-  double inputDim[2] = { input->GetDimension(0), input->GetDimension(1) };
+  double inputDim[2] = { input->GetDimension(0), input->GetDimension(1) / ((int)m_Conf.Photoacoustic + 1) };
   double outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
 
   double* VonHannWindow = VonHannFunction(m_Conf.TransducerElements * 2);
@@ -383,6 +383,9 @@ void mitk::BeamformingDMASFilter::GenerateData()
     }
     */
     output->SetSlice(m_OutputData, i);
+
+    if (i % 50 == 0)
+      MITK_INFO << "slice " << i + 1 << " of " << output->GetDimension(2) << " computed";
 
     delete[] m_OutputData;
     delete[] m_InputDataPuffer;
@@ -695,7 +698,7 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
     minLine = (unsigned short)std::max((l_i - part), 0.0);
     VH_mult = apodArraySize / (maxLine - minLine);
 
-    delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i;
+    delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
     //calculate the AddSamples beforehand to save some time
     unsigned short* AddSample = new unsigned short[maxLine - minLine];

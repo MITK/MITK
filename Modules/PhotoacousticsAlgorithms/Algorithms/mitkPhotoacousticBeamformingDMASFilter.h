@@ -44,6 +44,7 @@ namespace mitk {
       enum DelayCalc { Linear, QuadApprox, Spherical };
       DelayCalc DelayCalculationMethod = QuadApprox;
       double Angle = 10.0;
+      bool Photoacoustic = true;
     };
 
     void Configure(beamformingSettings settings);

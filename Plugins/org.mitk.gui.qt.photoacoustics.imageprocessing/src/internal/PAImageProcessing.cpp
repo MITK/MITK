@@ -288,14 +288,31 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 
   if (m_Controls.UseImageSpacing->isChecked())
   {
-    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]; // [s]
-    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]; // [s]
-    MITK_INFO << "Calculated Scan Depth of " << image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] * DASconfig.SpeedOfSound * 100 << "cm";
+    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]/1000000; // [s]
+    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]/1000000; // [s]
+    MITK_INFO << "Calculated Scan Depth of " << DASconfig.RecordTime * DASconfig.SpeedOfSound * 100 << "cm";
   }
   else
   {
-    DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound * 2; // [s]
-    DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound * 2; // [s]
+    DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound; // [s]
+    DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound; // [s]
+  }
+
+  if ("Ultrasound Image" == m_Controls.ImageType->currentText())
+  {
+    if (m_Controls.UseImageSpacing->isChecked())
+    {
+      DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
+      DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
+    }
+    
+    DASconfig.Photoacoustic = false;
+    DMASconfig.Photoacoustic = false;
+  }
+  else
+  {
+    DASconfig.Photoacoustic = true;
+    DMASconfig.Photoacoustic = true;
   }
 }
 

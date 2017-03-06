@@ -52,11 +52,11 @@ void PAImageProcessing::CreateQtPartControl( QWidget *parent )
   connect(m_Controls.Logfilter, SIGNAL(clicked()), this, SLOT(UseLogfilter()));
   connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
   connect(m_Controls.buttonApplyBeamforming, SIGNAL(clicked()), this, SLOT(ApplyBeamforming()));
+  connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
 
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
-
-  UpdateBFSettings();
+  UseImageSpacing();
 }
 
 void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -167,8 +167,6 @@ void PAImageProcessing::ApplyBModeFilter()
 
 void PAImageProcessing::ApplyBeamforming()
 {
-  UpdateBFSettings();
-
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
@@ -190,6 +188,7 @@ void PAImageProcessing::ApplyBeamforming()
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
     if (image)
     {
+      UpdateBFSettings(image);
       std::stringstream message;
       std::string name;
       message << "Performing beamforming for image ";
@@ -249,7 +248,7 @@ void PAImageProcessing::ApplyBeamforming()
   }
 }
 
-void PAImageProcessing::UpdateBFSettings()
+void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 {
   if ("Delay and Sum" == m_Controls.BFAlgorithm->currentText())
     m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DAS;
@@ -276,7 +275,6 @@ void PAImageProcessing::UpdateBFSettings()
   DASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
   DASconfig.SamplesPerLine = m_Controls.Samples->value();
   DASconfig.ReconstructionLines = m_Controls.Lines->value();
-  DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound * 2; // [s]
   DASconfig.TransducerElements = m_Controls.ElementCount->value();
   DASconfig.Angle = m_Controls.Angle->value();
 
@@ -284,7 +282,31 @@ void PAImageProcessing::UpdateBFSettings()
   DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
   DMASconfig.SamplesPerLine = m_Controls.Samples->value();
   DMASconfig.ReconstructionLines = m_Controls.Lines->value();
-  DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound * 2; // [s]
   DMASconfig.TransducerElements = m_Controls.ElementCount->value();
   DMASconfig.Angle = m_Controls.Angle->value();
+
+
+  if (m_Controls.UseImageSpacing->isChecked())
+  {
+    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]; // [s]
+    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]; // [s]
+    MITK_INFO << "Calculated Scan Depth of " << image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] * DASconfig.SpeedOfSound * 100 << "cm";
+  }
+  else
+  {
+    DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound * 2; // [s]
+    DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound * 2; // [s]
+  }
+}
+
+void PAImageProcessing::UseImageSpacing()
+{
+  if (m_Controls.UseImageSpacing->isChecked())
+  {
+    m_Controls.ScanDepth->setDisabled(true);
+  }
+  else
+  {
+    m_Controls.ScanDepth->setEnabled(true);
+  }
 }

@@ -68,6 +68,10 @@ namespace mitk {
     itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
     double* VonHannFunction(int samples);
 
+    void DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+    void DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+    void DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+
     double* m_OutputData;
     double* m_InputData;
     double* m_InputDataPuffer;

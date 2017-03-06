@@ -46,6 +46,7 @@ class PAImageProcessing : public QmitkAbstractView
     void UseResampling();
     void UseLogfilter();
     void SetResampling();
+    void UseImageSpacing();
 
     void ApplyBeamforming();
 
@@ -70,7 +71,7 @@ class PAImageProcessing : public QmitkAbstractView
 
     BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
 
-    void UpdateBFSettings();
+    void UpdateBFSettings(mitk::Image::Pointer image);
 };
 
 #endif // PAImageProcessing_h

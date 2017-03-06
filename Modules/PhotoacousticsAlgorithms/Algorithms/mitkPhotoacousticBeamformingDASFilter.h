@@ -66,6 +66,10 @@ namespace mitk {
 
     double* VonHannFunction(int samples);
 
+    void DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+    void DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+    void DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+
     double* m_OutputData;
     double* m_InputData;
     double* m_InputDataPuffer;

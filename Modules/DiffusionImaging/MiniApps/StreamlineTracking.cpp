@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 
 #include <mitkFiberBundle.h>
-#include <itkMLBSTrackingFilter.h>
+#include <itkStreamlineTrackingFilter.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingDataHandler.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingForestHandler.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
     }
 
 
-    typedef itk::MLBSTrackingFilter TrackerType;
+    typedef itk::StreamlineTrackingFilter TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
 
     mitk::TrackingDataHandler* handler;

@@ -17,7 +17,7 @@ set(CPP_FILES
   Algorithms/GibbsTracking/mitkFiberBuilder.cpp
   Algorithms/GibbsTracking/mitkSphereInterpolator.cpp
 
-  Algorithms/itkMLBSTrackingFilter.cpp
+  Algorithms/itkStreamlineTrackingFilter.cpp
   Algorithms/TrackingHandlers/mitkTrackingDataHandler.cpp
   Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.cpp
   Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.cpp
@@ -55,7 +55,7 @@ set(H_FILES
   Algorithms/GibbsTracking/mitkSphereInterpolator.h
   Algorithms/GibbsTracking/mitkFiberBuilder.h
 
-  Algorithms/itkMLBSTrackingFilter.h
+  Algorithms/itkStreamlineTrackingFilter.h
 
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h

@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDataStorage.h"
 #include "mitkDataStorageSelection.h"
 #include <mitkTrackingForestHandler.h>
-#include <itkMLBSTrackingFilter.h>
+#include <itkStreamlineTrackingFilter.h>
 #endif
 
 #include <QtConcurrentRun>
@@ -51,7 +51,7 @@ public:
   static const std::string VIEW_ID;
 
   typedef itk::Image<unsigned char, 3>      ItkUcharImgType;
-  typedef itk::MLBSTrackingFilter         TrackerType;
+  typedef itk::StreamlineTrackingFilter         TrackerType;
 
   QmitkMLBTView();
   virtual ~QmitkMLBTView();

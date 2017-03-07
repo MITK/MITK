@@ -25,8 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkImage.h>
 #include <itkImage.h>
-#include <itkMLBSTrackingFilter.h>
+#include <itkStreamlineTrackingFilter.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 
 
 /*!
@@ -71,18 +72,15 @@ protected slots:
     /** update labels if parameters have changed */
     void OnSeedsPerVoxelChanged(int value);
     void OnMinTractLengthChanged(int value);
-    void OnFaThresholdChanged(double value);
-    void OnAngularThresholdChanged(double value);
     void OnfChanged(int value);
     void OngChanged(int value);
-    void OnStepsizeChanged(int value);
 
 private:
 
     mitk::Image::Pointer          m_MaskImage;        ///< abort tracking if leaving mask
     mitk::Image::Pointer          m_SeedRoi;          ///< binary image defining seed voxels for tracking process
-    std::vector< mitk::DataNode::Pointer > m_TensorImageNodes; ///< input images
-    std::vector< mitk::TensorImage::Pointer > m_TensorImages; ///< input image datanode
+    std::vector< mitk::DataNode::Pointer > m_InputImageNodes; ///< input images
+    std::vector< mitk::Image::Pointer > m_InputImages; ///< input image datanode
 };
 
 

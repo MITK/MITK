@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
-#include <itkMLBSTrackingFilter.h>
+#include <itkStreamlineTrackingFilter.h>
 #include <mitkTrackingForestHandler.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
@@ -75,7 +75,7 @@ public:
     void Track1()
     {
         omp_set_num_threads(1);
-        typedef itk::MLBSTrackingFilter TrackerType;
+        typedef itk::StreamlineTrackingFilter TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetDemoMode(false);
         tracker->SetSeedImage(seed);

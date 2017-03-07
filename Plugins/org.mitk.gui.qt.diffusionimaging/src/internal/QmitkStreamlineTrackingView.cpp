@@ -86,9 +86,6 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
         connect( m_Controls->m_MinTractLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(OnMinTractLengthChanged(int)) );
-        connect( m_Controls->m_ScalarThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnFaThresholdChanged(double)) );
-        connect( m_Controls->m_AngularThresholdBox, SIGNAL(valueChanged(double)), this, SLOT(OnAngularThresholdChanged(double)) );
-        connect( m_Controls->m_StepsizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnStepsizeChanged(int)) );
         connect( m_Controls->m_fSlider, SIGNAL(valueChanged(int)), this, SLOT(OnfChanged(int)) );
         connect( m_Controls->m_gSlider, SIGNAL(valueChanged(int)), this, SLOT(OngChanged(int)) );
     }
@@ -104,14 +101,6 @@ void QmitkStreamlineTrackingView::OngChanged(int value)
     m_Controls->m_gLabel->setText(QString("g: ")+QString::number((float)value/100));
 }
 
-void QmitkStreamlineTrackingView::OnAngularThresholdChanged(double value)
-{
-    if (value<0)
-        m_Controls->m_AngularThresholdLabel->setText(QString("Angular Threshold: auto"));
-    else
-        m_Controls->m_AngularThresholdLabel->setText(QString("Angular Threshold: ")+QString::number(value)+QString("mm"));
-}
-
 void QmitkStreamlineTrackingView::OnSeedsPerVoxelChanged(int value)
 {
     m_Controls->m_SeedsPerVoxelLabel->setText(QString("Seeds per Voxel: ")+QString::number(value));
@@ -120,19 +109,6 @@ void QmitkStreamlineTrackingView::OnSeedsPerVoxelChanged(int value)
 void QmitkStreamlineTrackingView::OnMinTractLengthChanged(int value)
 {
     m_Controls->m_MinTractLengthLabel->setText(QString("Min. Tract Length: ")+QString::number(value)+QString("mm"));
-}
-
-void QmitkStreamlineTrackingView::OnFaThresholdChanged(double value)
-{
-    m_Controls->m_FaThresholdLabel->setText(QString("FA Threshold: ")+QString::number(value));
-}
-
-void QmitkStreamlineTrackingView::OnStepsizeChanged(int value)
-{
-    if (value==0)
-        m_Controls->m_StepsizeLabel->setText(QString("Stepsize: auto"));
-    else
-        m_Controls->m_StepsizeLabel->setText(QString("Stepsize: ")+QString::number((float)value/10)+QString("mm"));
 }
 
 void QmitkStreamlineTrackingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -148,8 +124,8 @@ void QmitkStreamlineTrackingView::StdMultiWidgetNotAvailable()
 
 void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-    m_TensorImageNodes.clear();
-    m_TensorImages.clear();
+    m_InputImageNodes.clear();
+    m_InputImages.clear();
     m_SeedRoi = NULL;
     m_MaskImage = NULL;
     m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
@@ -162,15 +138,11 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
-            if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
+            bool isBinary = false;
+            node->GetPropertyValue<bool>("binary", isBinary);
+
+            if (isBinary)
             {
-                m_TensorImageNodes.push_back(node);
-                m_TensorImages.push_back(dynamic_cast<mitk::TensorImage*>(node->GetData()));
-            }
-            else
-            {
-                bool isBinary = false;
-                node->GetPropertyValue<bool>("binary", isBinary);
                 if (isBinary && m_SeedRoi.IsNull())
                 {
                     m_SeedRoi = dynamic_cast<mitk::Image*>(node->GetData());
@@ -182,15 +154,34 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
                     m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
                 }
             }
+            else if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
+            {
+                m_InputImageNodes.push_back(node);
+                m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
+            }
+            else
+            {
+                mitk::Image* img = dynamic_cast<mitk::Image*>(node->GetData());
+                if (img!=nullptr)
+                {
+                    int dim = img->GetDimension();
+                    unsigned int* dimensions = img->GetDimensions();
+                    if (dim==4 && dimensions[3]%3==0)
+                    {
+                        m_InputImageNodes.push_back(node);
+                        m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
+                    }
+                }
+            }
         }
     }
 
-    if(!m_TensorImageNodes.empty())
+    if(!m_InputImageNodes.empty())
     {
-        if (m_TensorImageNodes.size()>1)
-            m_Controls->m_TensorImageLabel->setText(m_TensorImageNodes.size()+" tensor images selected");
+        if (m_InputImageNodes.size()>1)
+            m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.size()+" images selected");
         else
-            m_Controls->m_TensorImageLabel->setText(m_TensorImageNodes.at(0)->GetName().c_str());
+            m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.at(0)->GetName().c_str());
         m_Controls->m_InputData->setTitle("Input Data");
         m_Controls->commandLinkButton->setEnabled(true);
     }
@@ -205,37 +196,58 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
-    if (m_TensorImages.empty())
+    if (m_InputImages.empty())
         return;
 
-    mitk::TrackingHandlerTensor* trackingHandler = new mitk::TrackingHandlerTensor();
+    mitk::TrackingDataHandler* trackingHandler;
 
     typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
     typedef mitk::ImageToItk<TensorImageType> CastType;
     typedef mitk::ImageToItk<ItkUCharImageType> CastType2;
 
-    for (int i=0; i<(int)m_TensorImages.size(); i++)
-    {
-        CastType::Pointer caster = CastType::New();
-        caster->SetInput(m_TensorImages.at(i));
+
+    try {
+        typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType3;
+        CasterType3::Pointer caster = CasterType3::New();
+        caster->SetInput(m_InputImages.at(0));
         caster->Update();
-        trackingHandler->AddTensorImage(caster->GetOutput());
-    }
+        mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
 
-    if (m_Controls->m_UseFaImage->isChecked())
+        trackingHandler = new mitk::TrackingHandlerPeaks();
+
+        dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingHandler)->SetPeakImage(itkImg);
+        dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingHandler)->SetPeakThreshold(m_Controls->m_ScalarThresholdBox->value());
+    }
+    catch(...)
     {
-        mitk::ImageToItk<ItkFloatImageType>::Pointer floatCast = mitk::ImageToItk<ItkFloatImageType>::New();
-        floatCast->SetInput(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()));
-        floatCast->Update();
-        trackingHandler->SetFaImage(floatCast->GetOutput());
+        trackingHandler = new mitk::TrackingHandlerTensor();
+        for (int i=0; i<(int)m_InputImages.size(); i++)
+        {
+            CastType::Pointer caster = CastType::New();
+            caster->SetInput(m_InputImages.at(i));
+            caster->Update();
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->AddTensorImage(caster->GetOutput());
+        }
+
+        if (m_Controls->m_UseFaImage->isChecked())
+        {
+            mitk::ImageToItk<ItkFloatImageType>::Pointer floatCast = mitk::ImageToItk<ItkFloatImageType>::New();
+            floatCast->SetInput(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()));
+            floatCast->Update();
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaImage(floatCast->GetOutput());
+        }
+
+        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
+        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetF((float)m_Controls->m_fSlider->value()/100);
+        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetG((float)m_Controls->m_gSlider->value()/100);
     }
 
-    trackingHandler->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
-    trackingHandler->SetF((float)m_Controls->m_fSlider->value()/100);
-    trackingHandler->SetG((float)m_Controls->m_gSlider->value()/100);
+    trackingHandler->SetFlipX(m_Controls->m_FlipXBox->isChecked());
+    trackingHandler->SetFlipY(m_Controls->m_FlipYBox->isChecked());
+    trackingHandler->SetFlipZ(m_Controls->m_FlipZBox->isChecked());
     trackingHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
 
-    typedef itk::MLBSTrackingFilter TrackerType;
+    typedef itk::StreamlineTrackingFilter TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
 
     if (m_SeedRoi.IsNotNull())
@@ -254,7 +266,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     //tracker->SetStoppingRegions(stop);
     tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
-    tracker->SetStepSize((float)m_Controls->m_StepsizeSlider->value()/10);
+    tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
     //tracker->SetSamplingDistance(samplingdist);
     tracker->SetUseStopVotes(true);
     tracker->SetOnlyForwardSamples(true);
@@ -280,18 +292,18 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         return;
     }
     mitk::FiberBundle::Pointer fib = mitk::FiberBundle::New(fiberBundle);
-    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_TensorImageNodes.at(0)->GetData())->GetGeometry());
+    fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
     if (m_Controls->m_ResampleFibersBox->isChecked())
         fib->Compress(m_Controls->m_FiberErrorBox->value());
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(fib);
     QString name("FiberBundle_");
-    name += m_TensorImageNodes.at(0)->GetName().c_str();
+    name += m_InputImageNodes.at(0)->GetName().c_str();
     name += "_Streamline";
     node->SetName(name.toStdString());
     node->SetVisibility(true);
-    GetDataStorage()->Add(node, m_TensorImageNodes.at(0));
+    GetDataStorage()->Add(node, m_InputImageNodes.at(0));
 }
 
 

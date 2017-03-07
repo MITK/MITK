@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundle.h>
-#include <itkMLBSTrackingFilter.h>
+#include <itkStreamlineTrackingFilter.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <itkDiffusionTensor3D.h>
 #include <mitkTestingMacros.h>
@@ -75,7 +75,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         handler->AddTensorImage(itk_dti);
 
         // tracker
-        typedef itk::MLBSTrackingFilter TrackerType;
+        typedef itk::StreamlineTrackingFilter TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetSeedsPerVoxel(numSeeds);
         tracker->SetNumberOfSamples(0);

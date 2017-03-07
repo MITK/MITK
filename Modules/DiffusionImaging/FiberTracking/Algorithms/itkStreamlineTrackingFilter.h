@@ -39,14 +39,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk{
 
 /**
-* \brief Performes deterministic streamline tracking on the input tensor image.   */
+* \brief Performs streamline tracking on the input image. Depending on the tracking handler this can be a tensor, peak or machine learning based tracking. */
 
-class MITKFIBERTRACKING_EXPORT MLBSTrackingFilter : public ProcessObject
+class MITKFIBERTRACKING_EXPORT StreamlineTrackingFilter : public ProcessObject
 {
 
 public:
 
-    typedef MLBSTrackingFilter Self;
+    typedef StreamlineTrackingFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ProcessObject Superclass;
@@ -109,8 +109,8 @@ protected:
 
     void GenerateData() override;
 
-        MLBSTrackingFilter();
-    ~MLBSTrackingFilter() {}
+        StreamlineTrackingFilter();
+    ~StreamlineTrackingFilter() {}
 
     void InitGrayMatterEndings();
     void CheckFiberForGmEnding(FiberType* fib);

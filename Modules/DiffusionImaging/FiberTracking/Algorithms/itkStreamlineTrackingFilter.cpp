@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <stdlib.h>
 
 #include <omp.h>
-#include "itkMLBSTrackingFilter.h"
+#include "itkStreamlineTrackingFilter.h"
 #include <itkImageRegionConstIterator.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionIterator.h>
@@ -32,8 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk {
 
 
-MLBSTrackingFilter
-::MLBSTrackingFilter()
+StreamlineTrackingFilter
+::StreamlineTrackingFilter()
     : m_PauseTracking(false)
     , m_AbortTracking(false)
     , m_FiberPolyData(NULL)
@@ -66,7 +66,7 @@ MLBSTrackingFilter
 }
 
 
-void MLBSTrackingFilter::BeforeTracking()
+void StreamlineTrackingFilter::BeforeTracking()
 {
     m_TrackingHandler->InitForTracking();
 
@@ -163,7 +163,7 @@ void MLBSTrackingFilter::BeforeTracking()
 }
 
 
-void MLBSTrackingFilter::InitGrayMatterEndings()
+void StreamlineTrackingFilter::InitGrayMatterEndings()
 {
     m_GmStubs.clear();
     if (m_FourTTImage.IsNotNull())
@@ -239,7 +239,7 @@ void MLBSTrackingFilter::InitGrayMatterEndings()
 }
 
 
-void MLBSTrackingFilter::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
+void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
 {
     pos[0] += dir[0]*m_StepSize;
     pos[1] += dir[1]*m_StepSize;
@@ -247,7 +247,7 @@ void MLBSTrackingFilter::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_ve
 }
 
 
-bool MLBSTrackingFilter
+bool StreamlineTrackingFilter
 ::IsValidPosition(itk::Point<double, 3> &pos)
 {
     typename ItkUcharImgType::IndexType idx;
@@ -259,13 +259,13 @@ bool MLBSTrackingFilter
 }
 
 
-double MLBSTrackingFilter::GetRandDouble(double min, double max)
+double StreamlineTrackingFilter::GetRandDouble(double min, double max)
 {
     return (double)(rand()%((int)(10000*(max-min))) + 10000*min)/10000;
 }
 
 
-std::vector< vnl_vector_fixed<double,3> > MLBSTrackingFilter::CreateDirections(int NPoints)
+std::vector< vnl_vector_fixed<double,3> > StreamlineTrackingFilter::CreateDirections(int NPoints)
 {
     std::vector< vnl_vector_fixed<double,3> > pointshell;
 
@@ -305,7 +305,7 @@ std::vector< vnl_vector_fixed<double,3> > MLBSTrackingFilter::CreateDirections(i
 }
 
 
-vnl_vector_fixed<double,3> MLBSTrackingFilter::GetNewDirection(itk::Point<double, 3> &pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3> &oldIndex)
+vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<double, 3> &pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3> &oldIndex)
 {
     if (m_DemoMode)
     {
@@ -418,7 +418,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter::GetNewDirection(itk::Point<double
 }
 
 
-double MLBSTrackingFilter::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
+double StreamlineTrackingFilter::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
 {
     vnl_vector_fixed<double,3> zero_dir; zero_dir.fill(0.0);
     std::deque< vnl_vector_fixed<double,3> > last_dirs;
@@ -495,7 +495,7 @@ double MLBSTrackingFilter::FollowStreamline(itk::Point<double, 3> pos, vnl_vecto
 }
 
 
-int MLBSTrackingFilter::CheckCurvature(FiberType* fib, bool front)
+int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 {
     double m_Distance = 5;
     if (fib->size()<3)
@@ -567,7 +567,7 @@ int MLBSTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 }
 
 
-void MLBSTrackingFilter::GenerateData()
+void StreamlineTrackingFilter::GenerateData()
 {
     this->BeforeTracking();
 
@@ -704,7 +704,7 @@ void MLBSTrackingFilter::GenerateData()
 
 
 
-void MLBSTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
+void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
 {
     if (m_FourTTImage.IsNull())
         return;
@@ -777,7 +777,7 @@ void MLBSTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
 }
 
 
-void MLBSTrackingFilter::BuildFibers(bool check)
+void StreamlineTrackingFilter::BuildFibers(bool check)
 {
     if (m_BuildFibersReady<omp_get_num_threads() && check)
         return;
@@ -809,7 +809,7 @@ void MLBSTrackingFilter::BuildFibers(bool check)
 }
 
 
-void MLBSTrackingFilter::AfterTracking()
+void StreamlineTrackingFilter::AfterTracking()
 {
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);

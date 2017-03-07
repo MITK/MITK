@@ -66,7 +66,7 @@ MLBSTrackingFilter
 }
 
 
-void MLBSTrackingFilter::BeforeThreadedGenerateData()
+void MLBSTrackingFilter::BeforeTracking()
 {
     m_TrackingHandler->InitForTracking();
 
@@ -84,15 +84,13 @@ void MLBSTrackingFilter::BeforeThreadedGenerateData()
     else
         minSpacing = imageSpacing[2];
 
-    MITK_INFO << minSpacing;
-
     m_StepSize *= minSpacing;
     if (m_StepSize<mitk::eps)
         m_StepSize = 0.5*minSpacing;
 
     m_SamplingDistance *= minSpacing;
     if (m_SamplingDistance<mitk::eps)
-        m_SamplingDistance = minSpacing*0.5;
+        m_SamplingDistance = minSpacing*0.25;
 
     m_PolyDataContainer.clear();
     for (unsigned int i=0; i<this->GetNumberOfThreads(); i++)
@@ -150,10 +148,8 @@ void MLBSTrackingFilter::BeforeThreadedGenerateData()
         InitGrayMatterEndings();
 
     if (m_DemoMode)
-    {
         omp_set_num_threads(1);
-        this->SetNumberOfThreads(1);
-    }
+
     std::cout << "MLBSTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
     std::cout << "MLBSTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
     std::cout << "MLBSTrackingFilter: Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
@@ -163,8 +159,7 @@ void MLBSTrackingFilter::BeforeThreadedGenerateData()
     std::cout << "MLBSTrackingFilter: Min. tract length: " << m_MinTractLength << " mm" << std::endl;
     std::cout << "MLBSTrackingFilter: Use stop votes: " << m_UseStopVotes << std::endl;
     std::cout << "MLBSTrackingFilter: Only frontal samples: " << m_OnlyForwardSamples << std::endl;
-    std::cout << "MLBSTrackingFilter: Starting streamline tracking using " << this->GetNumberOfThreads() << " threads." << std::endl;
-    this->SetNumberOfThreads(1);
+    std::cout << "MLBSTrackingFilter: Starting streamline tracking" << std::endl;
 }
 
 
@@ -255,7 +250,7 @@ void MLBSTrackingFilter::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_ve
 bool MLBSTrackingFilter
 ::IsValidPosition(itk::Point<double, 3> &pos)
 {
-    typename InputImageType::IndexType idx;
+    typename ItkUcharImgType::IndexType idx;
     m_MaskImage->TransformPhysicalPointToIndex(pos, idx);
     if (!m_MaskImage->GetLargestPossibleRegion().IsInside(idx) || m_MaskImage->GetPixel(idx)==0)
         return false;
@@ -332,7 +327,7 @@ vnl_vector_fixed<double,3> MLBSTrackingFilter::GetNewDirection(itk::Point<double
     if (IsValidPosition(pos))
     {
         direction = m_TrackingHandler->ProposeDirection(pos, candidates, olddirs, m_AngularThreshold, w, oldIndex, m_MaskImage); // get direction proposal at current streamline position
-        direction *= w;  // HERE WE ARE WEIGHTING AGAIN EVEN THOUGH THE OUTPUT DIRECTIONS ARE ALREADY WEIGHTED!!! THE EFFECT OF THIS HAS YET TO BE EVALUATED.
+        direction *= w;
     }
 
     vnl_vector_fixed<double,3> olddir = olddirs.back();
@@ -572,8 +567,10 @@ int MLBSTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 }
 
 
-void MLBSTrackingFilter::ThreadedGenerateData(const InputImageRegionType &regionForThread, ThreadIdType )
+void MLBSTrackingFilter::GenerateData()
 {
+    this->BeforeTracking();
+
     std::vector< itk::Point<double> > seedpoints;
 
     if (m_GmStubs.empty())
@@ -701,6 +698,8 @@ void MLBSTrackingFilter::ThreadedGenerateData(const InputImageRegionType &region
                 m_Tractogram.push_back(fib);
         }
     }
+
+    this->AfterTracking();
 }
 
 
@@ -810,7 +809,7 @@ void MLBSTrackingFilter::BuildFibers(bool check)
 }
 
 
-void MLBSTrackingFilter::AfterThreadedGenerateData()
+void MLBSTrackingFilter::AfterTracking()
 {
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);

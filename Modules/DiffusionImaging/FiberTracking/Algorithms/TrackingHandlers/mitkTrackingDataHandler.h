@@ -34,7 +34,7 @@ class MITKFIBERTRACKING_EXPORT TrackingDataHandler
 
 public:
 
-    TrackingDataHandler(){}
+    TrackingDataHandler();
     ~TrackingDataHandler(){}
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
@@ -45,12 +45,22 @@ public:
     virtual vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double angularThreshold, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr) = 0;  ///< predicts next progression direction at the given position
 
     virtual void InitForTracking() = 0;
-    virtual ItkUcharImgType::SpacingType GetSpacing() = 0;
+    virtual itk::Vector<double, 3> GetSpacing() = 0;
     virtual itk::Point<float,3> GetOrigin() = 0;
-    virtual ItkUcharImgType::DirectionType GetDirection() = 0;
-    virtual ItkUcharImgType::RegionType GetLargestPossibleRegion() = 0;
+    virtual itk::Matrix<double, 3, 3> GetDirection() = 0;
+    virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
+
+    void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
+    void SetFlipX( bool f ){ m_FlipX = f; }
+    void SetFlipY( bool f ){ m_FlipY = f; }
+    void SetFlipZ( bool f ){ m_FlipZ = f; }
 
 protected:
+
+    bool    m_Interpolate;
+    bool    m_FlipX;
+    bool    m_FlipY;
+    bool    m_FlipZ;
 
     template< class TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<double, 8>& interpWeights){

@@ -49,7 +49,7 @@ public:
     void AddTensorImage( ItkTensorImageType::Pointer img ){ m_TensorImages.push_back(img); }
     void ClearTensorImages(){ m_TensorImages.clear(); }
     void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; }
-    void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
+    void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
 
 
     ItkUcharImgType::SpacingType GetSpacing(){ return m_FaImage->GetSpacing(); }
@@ -59,6 +59,8 @@ public:
 
 protected:
 
+    vnl_vector_fixed<double,3> GetDirection(itk::Point<float, 3> itkP, itk::Image<vnl_vector_fixed<double,3>, 3>* image, bool interpolate);    
+    vnl_vector_fixed<double,3> GetLargestEigenvector(TensorType& tensor);
 
     float   m_FaThreshold;
     float   m_F;
@@ -68,7 +70,7 @@ protected:
     ItkFloatImgType::Pointer                        m_FaImage;      ///< FA image used to determine streamline termination.
     std::vector< ItkPDImgType::Pointer >            m_PdImage;      ///< Stores principal direction of each tensor in each voxel.
     std::vector< ItkTensorImageType::Pointer >      m_TensorImages;   ///< Input tensor images. For multi tensor tracking provide multiple tensor images.
-    bool                                            m_Interpolate;
+    bool                                            m_InterpolateTensors;   ///< If false, then the peaks are interpolated. Otherwiese, The tensors are interpolated.
     int                                             m_NumberOfInputs;
 };
 

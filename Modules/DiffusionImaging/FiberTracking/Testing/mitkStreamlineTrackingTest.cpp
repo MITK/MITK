@@ -18,9 +18,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTensorImage.h>
 #include <mitkIOUtil.h>
 #include <mitkFiberBundle.h>
-#include <itkStreamlineTrackingFilter.h>
+#include <itkMLBSTrackingFilter.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <itkDiffusionTensor3D.h>
 #include <mitkTestingMacros.h>
+#include <omp.h>
 
 using namespace std;
 
@@ -62,37 +64,45 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         MITK_INFO << "Loading mask image ...";
         mitk::Image::Pointer mitkMaskImage = mitk::IOUtil::LoadImage(maskFileName);
 
-        // instantiate tracker
-        typedef itk::StreamlineTrackingFilter< float > FilterType;
-        FilterType::Pointer filter = FilterType::New();
-        filter->SetInput(itk_dti);
-        filter->SetSeedsPerVoxel(numSeeds);
-        filter->SetFaThreshold(minFA);
-        filter->SetMinCurvatureRadius(minCurv);
-        filter->SetStepSize(stepSize);
-        filter->SetF(tendf);
-        filter->SetG(tendg);
-        filter->SetInterpolate(interpolate);
-        filter->SetMinTractLength(minLength);
-        filter->SetNumberOfThreads(1);
+        omp_set_num_threads(1);
+
+        // tensor tracking handler
+        mitk::TrackingHandlerTensor* handler = new mitk::TrackingHandlerTensor();
+        handler->SetF(tendf);
+        handler->SetG(tendg);
+        handler->SetInterpolate(interpolate);
+        handler->SetFaThreshold(minFA);
+        handler->AddTensorImage(itk_dti);
+
+        // tracker
+        typedef itk::MLBSTrackingFilter TrackerType;
+        TrackerType::Pointer tracker = TrackerType::New();
+        tracker->SetSeedsPerVoxel(numSeeds);
+        tracker->SetNumberOfSamples(0);
+        tracker->SetAngularThreshold(0.7);  // direct angular threshold for each estimated direction
+        tracker->SetStepSize(stepSize);
+        tracker->SetAposterioriCurvCheck(false);
+        tracker->SetSeedOnlyGm(false);
+        tracker->SetTrackingHandler(handler);
+        tracker->SetMinTractLength(minLength);
 
         if (mitkSeedImage.IsNotNull())
         {
             ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
             mitk::CastToItkImage(mitkSeedImage, mask);
-            filter->SetSeedImage(mask);
+            tracker->SetSeedImage(mask);
         }
 
         if (mitkMaskImage.IsNotNull())
         {
             ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
             mitk::CastToItkImage(mitkMaskImage, mask);
-            filter->SetMaskImage(mask);
+            tracker->SetMaskImage(mask);
         }
 
-        filter->Update();
+        tracker->Update();
 
-        vtkSmartPointer<vtkPolyData> fiberBundle = filter->GetFiberPolyData();
+        vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
         mitk::FiberBundle::Pointer fib1 = mitk::FiberBundle::New(fiberBundle);
 
         mitk::FiberBundle::Pointer fib2 = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(referenceFileName)->GetData());
@@ -106,6 +116,8 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
             MITK_INFO << "OUTPUT: " << mitk::IOUtil::GetTempPath();
         }
         MITK_TEST_CONDITION_REQUIRED(ok, "Check if tractograms are equal.");
+
+        delete handler;
     }
     catch (itk::ExceptionObject e)
     {

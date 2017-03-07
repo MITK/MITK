@@ -166,7 +166,6 @@ private:
     float   m_MeanFiberLength;
     float   m_MedianFiberLength;
     float   m_LengthStDev;
-    int     m_FiberSampling;
     itk::TimeStamp m_UpdateTime2D;
     itk::TimeStamp m_UpdateTime3D;
     mitk::BaseGeometry::Pointer m_ReferenceGeometry;

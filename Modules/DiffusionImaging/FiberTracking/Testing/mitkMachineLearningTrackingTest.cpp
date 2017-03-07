@@ -77,7 +77,6 @@ public:
         omp_set_num_threads(1);
         typedef itk::MLBSTrackingFilter TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
-        tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
         tracker->SetDemoMode(false);
         tracker->SetSeedImage(seed);
         tracker->SetSeedsPerVoxel(1);

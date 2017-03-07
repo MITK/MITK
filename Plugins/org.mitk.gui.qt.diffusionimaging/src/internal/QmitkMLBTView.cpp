@@ -281,7 +281,6 @@ void QmitkMLBTView::StartTracking()
 //    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 
     tracker = TrackerType::New();
-    tracker->SetInput(0,  mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi) );
     tracker->SetDemoMode(m_Controls->m_DemoModeBox->isChecked());
     if (m_Controls->m_DemoModeBox->isChecked())
         tracker->SetNumberOfThreads(1);

@@ -41,7 +41,7 @@ namespace itk{
 /**
 * \brief Performes deterministic streamline tracking on the input tensor image.   */
 
-class MITKFIBERTRACKING_EXPORT MLBSTrackingFilter : public ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > >
+class MITKFIBERTRACKING_EXPORT MLBSTrackingFilter : public ProcessObject
 {
 
 public:
@@ -49,10 +49,7 @@ public:
     typedef MLBSTrackingFilter Self;
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
-    typedef ImageToImageFilter< VectorImage< short, 3 >, Image< double, 3 > > Superclass;
-
-    typedef typename Superclass::InputImageType             InputImageType;
-    typedef typename Superclass::InputImageRegionType       InputImageRegionType;
+    typedef ProcessObject Superclass;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -104,7 +101,14 @@ public:
         m_TrackingHandler = h;
     }
 
-    protected:
+    virtual void Update() override{
+        this->GenerateData();
+    }
+
+protected:
+
+    void GenerateData() override;
+
         MLBSTrackingFilter();
     ~MLBSTrackingFilter() {}
 
@@ -119,9 +123,8 @@ public:
     double GetRandDouble(double min=-1, double max=1);
     std::vector< vnl_vector_fixed<double,3> > CreateDirections(int NPoints);
 
-    void BeforeThreadedGenerateData() override;
-    void ThreadedGenerateData( const InputImageRegionType &outputRegionForThread, ThreadIdType threadId) override;
-    void AfterThreadedGenerateData() override;
+    void BeforeTracking();
+    void AfterTracking();
 
     PolyDataType                        m_FiberPolyData;
     vtkSmartPointer<vtkPoints>          m_Points;

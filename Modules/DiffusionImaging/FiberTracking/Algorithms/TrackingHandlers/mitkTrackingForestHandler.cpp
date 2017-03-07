@@ -53,7 +53,7 @@ TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::~TrackingForestHandler
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image)
+typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate)
 {
   // transform physical point to index coordinates
   itk::Index<3> idx;
@@ -63,7 +63,11 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureIma
 
   typename DwiFeatureImageType::PixelType pix; pix.Fill(0.0);
   if ( image->GetLargestPossibleRegion().IsInside(idx) )
+  {
     pix = image->GetPixel(idx);
+    if (!interpolate)
+      return pix;
+  }
   else
     return pix;
 
@@ -212,14 +216,26 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
 
   vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
 
+
   itk::Index<3> idx;
   m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, idx);
   if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
     return output_direction;
 
+  vnl_vector_fixed<double,3> last_dir;
+  if (!olddirs.empty())
+    last_dir = olddirs.back();
+
+  if (!m_Interpolate && oldIndex==idx)
+  {
+    w = 1;
+    candidates = 1;
+    return last_dir;
+  }
+
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,m_Forest->feature_count()) );
-  typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0));
+  typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0), m_Interpolate);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
@@ -255,11 +271,6 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
   // perform classification
   vigra::MultiArray<2, double> probs(vigra::Shape2(1, m_Forest->class_count()));
   m_Forest->predictProbabilities(featureData, probs);
-
-  vnl_vector_fixed<double,3> last_dir;
-  if (!olddirs.empty())
-    last_dir = olddirs.back();
-
 
   double pNonFib = 0;     // probability that we left the white matter
   w = 0;                  // weight of the predicted direction
@@ -310,6 +321,15 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
     candidates = 0;
     w = 0;
     output_direction.fill(0.0);
+  }
+  else
+  {
+    if (m_FlipX)
+      output_direction[0] *= -1;
+    if (m_FlipY)
+      output_direction[1] *= -1;
+    if (m_FlipZ)
+      output_direction[2] *= -1;
   }
 
   return output_direction;
@@ -781,7 +801,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
             float volume_mod = GetImageValue<float>(itkP1, fiber_folume, false);
 
             // diffusion signal features
-            typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image);
+            typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image, m_Interpolate);
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
               m_FeatureData(sampleCounter,f) = pix[f];
 

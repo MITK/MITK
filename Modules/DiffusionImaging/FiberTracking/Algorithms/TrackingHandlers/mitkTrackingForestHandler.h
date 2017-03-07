@@ -109,7 +109,7 @@ protected:
     void InputDataValidForTraining();       ///< Check if everything is tehere for training (raw datasets, fiber tracts)
     void InitForTraining();  ///< Generate masks if necessary, resample fibers, spherically interpolate raw DWIs
     void CalculateTrainingSamples();    ///< Calculate GM and WM features using the interpolated raw data, the WM masks and the fibers
-    typename DwiFeatureImageType::PixelType GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image);   ///< get trilinearly interpolated raw image values at given world position
+    typename DwiFeatureImageType::PixelType GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate);   ///< get trilinearly interpolated raw image values at given world position
 
 
     std::vector< Image::Pointer >                               m_InputDwis;                ///< original input DWI data

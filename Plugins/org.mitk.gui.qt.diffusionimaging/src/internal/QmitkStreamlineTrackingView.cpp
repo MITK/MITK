@@ -260,7 +260,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     tracker->SetOnlyForwardSamples(true);
     tracker->SetAposterioriCurvCheck(false);
     //tracker->SetFourTTImage(tissue);
-    tracker->SetNumberOfSamples(0);
+    tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
     tracker->SetSeedOnlyGm(false);
     tracker->SetTrackingHandler(trackingHandler);
     tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());

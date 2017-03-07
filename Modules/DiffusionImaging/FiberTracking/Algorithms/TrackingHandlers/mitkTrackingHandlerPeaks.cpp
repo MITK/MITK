@@ -59,6 +59,49 @@ void TrackingHandlerPeaks::InitForTracking()
   m_NumDirs = imageRegion4.GetSize(3)/3;
 }
 
+vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<double,3>& oldDir)
+{
+  vnl_vector_fixed<double,3> out_dir; out_dir.fill(0);
+  float angle = 0;
+  float mag = oldDir.magnitude();
+  if (mag<mitk::eps)
+  {
+    for (int i=0; i<m_NumDirs; i++)
+    {
+      out_dir = GetDirection(idx3, i);
+      if (out_dir.magnitude()>mitk::eps)
+      {
+        oldDir[0] = out_dir[0];
+        oldDir[1] = out_dir[1];
+        oldDir[2] = out_dir[2];
+        break;
+      }
+    }
+  }
+  else
+  {
+    for (int i=0; i<m_NumDirs; i++)
+    {
+      vnl_vector_fixed<double,3> dir = GetDirection(idx3, i);
+      mag = dir.magnitude();
+      if (mag>mitk::eps)
+        dir.normalize();
+      float a = dot_product(dir, oldDir);
+      if (fabs(a)>angle)
+      {
+        angle = fabs(a);
+        if (a<0)
+          out_dir = -dir;
+        else
+          out_dir = dir;
+        out_dir *= mag;
+      }
+    }
+  }
+
+  return out_dir;
+}
+
 vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3, int dirIdx)
 {
   vnl_vector_fixed<double,3> dir; dir.fill(0.0);
@@ -76,16 +119,6 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3
     dir[k] = m_PeakImage->GetPixel(idx4);
   }
 
-  vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0] = 1;
-  vnl_vector_fixed<double,3> ref2; ref2.fill(0); ref2[1] = 1;
-  vnl_vector_fixed<double,3> ref3; ref3.fill(0); ref3[2] = 1;
-  if (dot_product(ref,dir)<0)
-    dir *= -1;
-  if (dot_product(ref2,dir)<0)
-    dir *= -1;
-  if (dot_product(ref3,dir)<0)
-    dir *= -1;
-
   if (m_FlipX)
     dir[0] *= -1;
   if (m_FlipY)
@@ -96,7 +129,7 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3
   return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(int dirIdx, itk::Point<float, 3> itkP, bool interpolate){
+vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3> itkP, bool interpolate, vnl_vector_fixed<double,3> oldDir){
   // transform physical point to index coordinates
   itk::Index<3> idx3;
   itk::ContinuousIndex< double, 3> cIdx;
@@ -104,15 +137,10 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(int dirIdx, itk::P
   m_DummyImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
   vnl_vector_fixed<double,3> dir; dir.fill(0.0);
-
   if ( !m_DummyImage->GetLargestPossibleRegion().IsInside(idx3) )
     return dir;
-  else
-    dir = GetDirection(idx3, dirIdx);
 
-  if (!interpolate)
-    return dir;
-  else
+  if (interpolate)
   {
     double frac_x = cIdx[0] - idx3[0];
     double frac_y = cIdx[1] - idx3[1];
@@ -152,30 +180,33 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(int dirIdx, itk::P
       interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
       interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
 
-      dir = GetDirection(idx3, dirIdx) * interpWeights[0];
+      dir = GetMatchingDirection(idx3, oldDir) * interpWeights[0];
 
       itk::Index<3> tmpIdx = idx3; tmpIdx[0]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[1];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[1];
 
       tmpIdx = idx3; tmpIdx[1]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[2];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[2];
 
       tmpIdx = idx3; tmpIdx[2]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[3];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[3];
 
       tmpIdx = idx3; tmpIdx[0]++; tmpIdx[1]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[4];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[4];
 
       tmpIdx = idx3; tmpIdx[1]++; tmpIdx[2]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[5];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[5];
 
       tmpIdx = idx3; tmpIdx[2]++; tmpIdx[0]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[6];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[6];
 
       tmpIdx = idx3; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-      dir +=  GetDirection(tmpIdx, dirIdx) * interpWeights[7];
+      dir +=  GetMatchingDirection(tmpIdx, oldDir) * interpWeights[7];
     }
   }
+  else
+      dir = GetMatchingDirection(idx3, oldDir);
+
   return dir;
 }
 
@@ -186,28 +217,18 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<dou
   itk::Index<3> index;
   m_DummyImage->TransformPhysicalPointToIndex(pos, index);
 
-  vnl_vector_fixed<double,3> oldDir;
-  if (olddirs.size()>0 && olddirs.back().magnitude()>mitk::eps)
-    oldDir = olddirs.at(0);
+  vnl_vector_fixed<double,3> oldDir; oldDir.fill(0);
+  if (olddirs.size()>0 && olddirs.back().magnitude()>0.5)
+    oldDir = olddirs.back();
   else
   {
-    float mag_max = 0;
-    float mag = 0;
-    for (int i=0; i<m_NumDirs; i++)
-    {
-        vnl_vector_fixed<double,3> temp_dir = GetDirection(i, pos, m_Interpolate);
-        mag = temp_dir.magnitude();
-        if (mag>mag_max)
-        {
-          mag_max = mag;
-          output_direction = temp_dir;
-        }
-    }
+    output_direction = GetDirection(pos, m_Interpolate, oldDir);
+    float mag = output_direction.magnitude();
 
-    if (mag_max>m_PeakThreshold)
+    if (mag>m_PeakThreshold)
     {
       candidates = 1;
-      w = mag_max;
+      w = mag;
       output_direction.normalize();
     }
     else
@@ -223,40 +244,23 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<dou
     return oldDir;
   }
 
-  float max_angle = 0;
-  for (int i=0; i<m_NumDirs; i++)
+  output_direction = GetDirection(pos, m_Interpolate, oldDir);
+  float mag = output_direction.magnitude();
+
+  if (mag>=m_PeakThreshold)
   {
-    vnl_vector_fixed<double,3> newDir = GetDirection(i, pos, m_Interpolate);
-    float mag = newDir.magnitude();
-
-    if (mag<m_PeakThreshold)
-      continue;
-    else
-      newDir.normalize();
-
-    double angle = dot_product(oldDir, newDir);
-    if (angle<0)
+    output_direction.normalize();
+    float a = dot_product(output_direction, oldDir);
+    if (a>angularThreshold)
     {
-      newDir *= -1;
-      angle *= -1;
-    }
-
-    if (angle>max_angle)
-    {
+      candidates = 1;
       w = mag;
-      max_angle = angle;
-      output_direction = newDir;
     }
+    else
+      output_direction.fill(0);
   }
-
-  if (max_angle<angularThreshold)
-  {
+  else
     output_direction.fill(0);
-    return output_direction;
-  }
-
-  if (output_direction.magnitude()>mitk::eps)
-    candidates = 1;
 
   return output_direction;
 }

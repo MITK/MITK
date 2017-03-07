@@ -71,9 +71,6 @@ void TrackingHandlerTensor::InitForTracking()
     typedef itk::DiffusionTensor3D<float>    TensorType;
     typename TensorType::EigenValuesArrayType eigenvalues;
     typename TensorType::EigenVectorsMatrixType eigenvectors;
-    vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0] = 1;
-    vnl_vector_fixed<double,3> ref2; ref2.fill(0); ref2[1] = 1;
-    vnl_vector_fixed<double,3> ref3; ref3.fill(0); ref3[2] = 1;
 
     for (unsigned int x=0; x<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
         for (unsigned int y=0; y<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
@@ -90,15 +87,7 @@ void TrackingHandlerTensor::InitForTracking()
                     dir[1] = eigenvectors(2, 1);
                     dir[2] = eigenvectors(2, 2);
                     if (dir.magnitude()>mitk::eps)
-                    {
                         dir.normalize();
-                        if (dot_product(ref,dir)<0)
-                            dir *= -1;
-                        if (dot_product(ref2,dir)<0)
-                            dir *= -1;
-                        if (dot_product(ref3,dir)<0)
-                            dir *= -1;
-                    }
                     else
                         dir.fill(0.0);
                     m_PdImage.at(i)->SetPixel(index, dir);
@@ -111,99 +100,151 @@ void TrackingHandlerTensor::InitForTracking()
             }
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 3> itkP, itk::Image<vnl_vector_fixed<double,3>, 3>* image, bool interpolate){
+vnl_vector_fixed<double,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<double,3>& oldDir, int& image_num)
+{
+  vnl_vector_fixed<double,3> out_dir; out_dir.fill(0);
+  float angle = 0;
+  float mag = oldDir.magnitude();
+  if (mag<mitk::eps)
+  {
+    for (int i=0; i<m_PdImage.size(); i++)
+    {
+      out_dir = m_PdImage.at(i)->GetPixel(idx);
+      if (m_FlipX)
+          out_dir[0] *= -1;
+      if (m_FlipY)
+          out_dir[1] *= -1;
+      if (m_FlipZ)
+          out_dir[2] *= -1;
+
+      if (out_dir.magnitude()>0.5)
+      {
+        image_num = i;
+        oldDir[0] = out_dir[0];
+        oldDir[1] = out_dir[1];
+        oldDir[2] = out_dir[2];
+        break;
+      }
+    }
+  }
+  else
+  {
+    for (int i=0; i<m_PdImage.size(); i++)
+    {
+      vnl_vector_fixed<double,3> dir = m_PdImage.at(i)->GetPixel(idx);
+      if (m_FlipX)
+          out_dir[0] *= -1;
+      if (m_FlipY)
+          out_dir[1] *= -1;
+      if (m_FlipZ)
+          out_dir[2] *= -1;
+
+      float a = dot_product(dir, oldDir);
+      if (fabs(a)>angle)
+      {
+        image_num = i;
+        angle = fabs(a);
+        if (a<0)
+          out_dir = -dir;
+        else
+          out_dir = dir;
+      }
+    }
+  }
+
+  return out_dir;
+}
+
+vnl_vector_fixed<double,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<double,3> oldDir, TensorType& tensor)
+{
     // transform physical point to index coordinates
     itk::Index<3> idx;
     itk::ContinuousIndex< double, 3> cIdx;
-    image->TransformPhysicalPointToIndex(itkP, idx);
-    image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
+    m_FaImage->TransformPhysicalPointToIndex(itkP, idx);
+    m_FaImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
     vnl_vector_fixed<double,3> dir; dir.fill(0.0);
-    if ( image->GetLargestPossibleRegion().IsInside(idx) )
-    {
-        dir = image->GetPixel(idx);
-        if (!interpolate)
-        {
-            if (m_FlipX)
-              dir[0] *= -1;
-            if (m_FlipY)
-              dir[1] *= -1;
-            if (m_FlipZ)
-              dir[2] *= -1;
-            return dir;
-        }
-    }
-    else
+    if ( !m_FaImage->GetLargestPossibleRegion().IsInside(idx) )
         return dir;
 
-    double frac_x = cIdx[0] - idx[0];
-    double frac_y = cIdx[1] - idx[1];
-    double frac_z = cIdx[2] - idx[2];
-    if (frac_x<0)
+    int image_num = -1;
+    if (!m_Interpolate)
     {
-        idx[0] -= 1;
-        frac_x += 1;
+        dir = GetMatchingDirection(idx, oldDir, image_num);
+        tensor = m_TensorImages[image_num]->GetPixel(idx) * m_EmaxImage[image_num]->GetPixel(idx);
     }
-    if (frac_y<0)
+    else
     {
-        idx[1] -= 1;
-        frac_y += 1;
+        double frac_x = cIdx[0] - idx[0];
+        double frac_y = cIdx[1] - idx[1];
+        double frac_z = cIdx[2] - idx[2];
+        if (frac_x<0)
+        {
+            idx[0] -= 1;
+            frac_x += 1;
+        }
+        if (frac_y<0)
+        {
+            idx[1] -= 1;
+            frac_y += 1;
+        }
+        if (frac_z<0)
+        {
+            idx[2] -= 1;
+            frac_z += 1;
+        }
+        frac_x = 1-frac_x;
+        frac_y = 1-frac_y;
+        frac_z = 1-frac_z;
+
+        // int coordinates inside image?
+        if (idx[0] >= 0 && idx[0] < m_FaImage->GetLargestPossibleRegion().GetSize(0)-1 &&
+                idx[1] >= 0 && idx[1] < m_FaImage->GetLargestPossibleRegion().GetSize(1)-1 &&
+                idx[2] >= 0 && idx[2] < m_FaImage->GetLargestPossibleRegion().GetSize(2)-1)
+        {
+            // trilinear interpolation
+            vnl_vector_fixed<double, 8> interpWeights;
+            interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
+            interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
+            interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
+            interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
+            interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
+            interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
+            interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
+            interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
+
+            dir = GetMatchingDirection(idx, oldDir, image_num) * interpWeights[0];
+            tensor = m_TensorImages[image_num]->GetPixel(idx) * m_EmaxImage[image_num]->GetPixel(idx) * interpWeights[0];
+
+            itk::Index<3> tmpIdx = idx; tmpIdx[0]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[1];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[1];
+
+            tmpIdx = idx; tmpIdx[1]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[2];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[2];
+
+            tmpIdx = idx; tmpIdx[2]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[3];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[3];
+
+            tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[4];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[4];
+
+            tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[5];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[5];
+
+            tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[6];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[6];
+
+            tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
+            dir +=  GetMatchingDirection(tmpIdx, oldDir, image_num) * interpWeights[7];
+            tensor += m_TensorImages[image_num]->GetPixel(tmpIdx) * m_EmaxImage[image_num]->GetPixel(tmpIdx) * interpWeights[7];
+        }
     }
-    if (frac_z<0)
-    {
-        idx[2] -= 1;
-        frac_z += 1;
-    }
-    frac_x = 1-frac_x;
-    frac_y = 1-frac_y;
-    frac_z = 1-frac_z;
-
-    // int coordinates inside image?
-    if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
-            idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
-            idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
-    {
-        // trilinear interpolation
-        vnl_vector_fixed<double, 8> interpWeights;
-        interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
-        interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
-        interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
-        interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
-        interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
-        interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
-        interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
-        interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
-
-        dir = image->GetPixel(idx) * interpWeights[0];
-
-        typename itk::Image<vnl_vector_fixed<double,3>, 3>::IndexType tmpIdx = idx; tmpIdx[0]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[1];
-
-        tmpIdx = idx; tmpIdx[1]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[2];
-
-        tmpIdx = idx; tmpIdx[2]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[3];
-
-        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[4];
-
-        tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[5];
-
-        tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[6];
-
-        tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-        dir +=  image->GetPixel(tmpIdx) * interpWeights[7];
-    }
-
-    if (m_FlipX)
-      dir[0] *= -1;
-    if (m_FlipY)
-      dir[1] *= -1;
-    if (m_FlipZ)
-      dir[2] *= -1;
 
     return dir;
 }
@@ -222,11 +263,11 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetLargestEigenvector(TensorTy
     else
     {
         if (m_FlipX)
-          dir[0] *= -1;
+            dir[0] *= -1;
         if (m_FlipY)
-          dir[1] *= -1;
+            dir[1] *= -1;
         if (m_FlipZ)
-          dir[2] *= -1;
+            dir[2] *= -1;
     }
     return dir;
 }
@@ -234,127 +275,71 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetLargestEigenvector(TensorTy
 vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double angularThreshold, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
 {
     vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
+    TensorType tensor; tensor.Fill(0);
 
     try
     {
-        w = 1;
         itk::Index<3> index;
         m_TensorImages.at(0)->TransformPhysicalPointToIndex(pos, index);
 
         float fa = GetImageValue<float>(pos, m_FaImage, m_Interpolate);
-
-        vnl_vector_fixed<double,3> oldDir;
-        if (olddirs.size()>0 && olddirs.back().magnitude()>mitk::eps)
-            oldDir = olddirs.at(0);
-        else
-        {
-            if (fa<m_FaThreshold)
-                return output_direction;
-
-            float e_max = 0;
-            float mag = 0;
-            for (int i=0; i<m_NumberOfInputs; i++)
-            {
-                double e = GetImageValue<double>(pos, m_EmaxImage[i], m_Interpolate);
-                if (e>e_max)
-                {
-                    if (m_InterpolateTensors && m_Interpolate)
-                    {
-                        TensorType tensor = GetImageValue<TensorType>(pos, m_TensorImages[i], m_Interpolate);
-                        output_direction = GetLargestEigenvector(tensor);
-                    }
-                    else
-                        output_direction = GetDirection(pos, m_PdImage[i], m_Interpolate);
-
-                    mag = output_direction.magnitude();
-                    e_max = e;
-                }
-            }
-
-            if (mag>mitk::eps)
-            {
-                candidates = 1;
-                output_direction.normalize();
-            }
-            else
-                output_direction.fill(0);
-
-            return output_direction;
-        }
-
         if (fa<m_FaThreshold)
             return output_direction;
 
+        vnl_vector_fixed<double,3> oldDir; oldDir.fill(0);
+        if (olddirs.size()>0 && olddirs.back().magnitude()>0.5)
+          oldDir = olddirs.back();
+        else
+        {
+          output_direction = GetDirection(pos, oldDir, tensor);
+          float mag = output_direction.magnitude();
+
+          if (mag>mitk::eps)
+          {
+            candidates = 1;
+            w = mag;
+            output_direction.normalize();
+          }
+          else
+            output_direction.fill(0);
+
+          return output_direction;
+        }
+
         if (!m_Interpolate && oldIndex==index)
         {
+          w = 1;
+          candidates = 1;
+          return oldDir;
+        }
+
+        output_direction = GetDirection(pos, oldDir, tensor);
+        float mag = output_direction.magnitude();
+
+        if (mag>=mitk::eps)
+        {
+          output_direction.normalize();
+
+          if (m_G>mitk::eps)  // TEND tracking
+          {
+              output_direction[0] = m_F*output_direction[0] + (1-m_F)*( (1-m_G)*oldDir[0] + m_G*(tensor[0]*oldDir[0] + tensor[1]*oldDir[1] + tensor[2]*oldDir[2]));
+              output_direction[1] = m_F*output_direction[1] + (1-m_F)*( (1-m_G)*oldDir[1] + m_G*(tensor[1]*oldDir[0] + tensor[3]*oldDir[1] + tensor[4]*oldDir[2]));
+              output_direction[2] = m_F*output_direction[2] + (1-m_F)*( (1-m_G)*oldDir[2] + m_G*(tensor[2]*oldDir[0] + tensor[4]*oldDir[1] + tensor[5]*oldDir[2]));
+              output_direction.normalize();
+          }
+
+          float a = dot_product(output_direction, oldDir);
+          if (a>angularThreshold)
+          {
             candidates = 1;
-            return oldDir;
-        }
-
-
-        float max_angle = 0;
-        TensorType tensor; tensor.Fill(0.0);
-
-        for (int i=0; i<m_NumberOfInputs; i++)
-        {
-            vnl_vector_fixed<double,3> newDir;
-            if (m_InterpolateTensors && m_Interpolate)
-            {
-                tensor = GetImageValue<TensorType>(pos, m_TensorImages[i], m_Interpolate);
-                newDir = GetLargestEigenvector(tensor);
-            }
-            else
-                newDir = GetDirection(pos, m_PdImage[i], m_Interpolate);
-
-            float mag = newDir.magnitude();
-
-            if (mag<mitk::eps)
-                continue;
-            else
-                newDir.normalize();
-
-            double angle = dot_product(oldDir, newDir);
-            if (angle<0)
-            {
-                newDir *= -1;
-                angle *= -1;
-            }
-
-            if (m_G>mitk::eps)  // TEND tracking
-            {
-                if (!m_InterpolateTensors || !m_Interpolate)
-                    tensor = GetImageValue<TensorType>(pos, m_TensorImages[i], m_Interpolate);
-                double scale = GetImageValue<double>(pos, m_EmaxImage[i], m_Interpolate);
-
-                newDir[0] = m_F*newDir[0] + (1-m_F)*( (1-m_G)*oldDir[0] + scale*m_G*(tensor[0]*oldDir[0] + tensor[1]*oldDir[1] + tensor[2]*oldDir[2]));
-                newDir[1] = m_F*newDir[1] + (1-m_F)*( (1-m_G)*oldDir[1] + scale*m_G*(tensor[1]*oldDir[0] + tensor[3]*oldDir[1] + tensor[4]*oldDir[2]));
-                newDir[2] = m_F*newDir[2] + (1-m_F)*( (1-m_G)*oldDir[2] + scale*m_G*(tensor[2]*oldDir[0] + tensor[4]*oldDir[1] + tensor[5]*oldDir[2]));
-
-                newDir.normalize();
-
-                angle = dot_product(oldDir, newDir);
-                if (angle<0)
-                {
-                    newDir *= -1;
-                    angle *= -1;
-                }
-            }
-
-            if (angle>max_angle)
-            {
-                max_angle = angle;
-                output_direction = newDir;
-            }
-        }
-
-        if (max_angle<angularThreshold)
-        {
+            w = mag;
+          }
+          else
             output_direction.fill(0);
-            return output_direction;
         }
+        else
+          output_direction.fill(0);
 
-        if (output_direction.magnitude()>mitk::eps)
-            candidates = 1;
     }
     catch(...)
     {

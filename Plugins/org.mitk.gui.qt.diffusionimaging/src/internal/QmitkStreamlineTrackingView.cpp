@@ -45,6 +45,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellData.h>
 
+#include <omp.h>
+
 
 const std::string QmitkStreamlineTrackingView::VIEW_ID = "org.mitk.views.streamlinetracking";
 const std::string id_DataManager = "org.mitk.views.datamanager";
@@ -278,7 +280,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
     tracker->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
     tracker->Update();
-    delete trackingHandler;
 
     vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
     if ( fiberBundle->GetNumberOfLines()==0 )
@@ -304,6 +305,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     node->SetName(name.toStdString());
     node->SetVisibility(true);
     GetDataStorage()->Add(node, m_InputImageNodes.at(0));
+
+    delete trackingHandler;
 }
 
 

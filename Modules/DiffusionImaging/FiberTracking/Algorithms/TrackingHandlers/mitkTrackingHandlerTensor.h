@@ -59,7 +59,8 @@ public:
 
 protected:
 
-    vnl_vector_fixed<double,3> GetDirection(itk::Point<float, 3> itkP, itk::Image<vnl_vector_fixed<double,3>, 3>* image, bool interpolate);    
+    vnl_vector_fixed<double,3> GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<double,3>& oldDir, int& image_num);
+    vnl_vector_fixed<double,3> GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<double,3> oldDir, TensorType& tensor);
     vnl_vector_fixed<double,3> GetLargestEigenvector(TensorType& tensor);
 
     float   m_FaThreshold;

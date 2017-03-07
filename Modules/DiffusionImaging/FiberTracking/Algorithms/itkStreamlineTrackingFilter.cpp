@@ -448,7 +448,7 @@ double StreamlineTrackingFilter::FollowStreamline(itk::Point<double, 3> pos, vnl
 
             if (m_AposterioriCurvCheck)
             {
-                int curv = CheckCurvature(fib, front);  // TODO: Move into classification ???
+                int curv = CheckCurvature(fib, front);
                 if (curv>0)
                 {
                     tractLength -= m_StepSize*curv;

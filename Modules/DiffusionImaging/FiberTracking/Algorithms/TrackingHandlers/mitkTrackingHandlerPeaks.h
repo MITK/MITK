@@ -51,7 +51,8 @@ public:
 
 protected:
 
-    vnl_vector_fixed<double,3> GetDirection(int dirIdx, itk::Point<float, 3> itkP, bool interpolate);
+    vnl_vector_fixed<double,3> GetDirection(itk::Point<float, 3> itkP, bool interpolate, vnl_vector_fixed<double,3> oldDir);
+    vnl_vector_fixed<double,3> GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<double,3>& oldDir);
     vnl_vector_fixed<double,3> GetDirection(itk::Index<3> idx3, int dirIdx);
 
     PeakImgType::Pointer m_PeakImage;

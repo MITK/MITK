@@ -92,7 +92,8 @@ void mitk::BeamformingDASFilter::GenerateData()
   double inputDim[2] = { input->GetDimension(0), input->GetDimension(1) / ((int)m_Conf.Photoacoustic + 1) };
   double outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
 
-  double* VonHannWindow = VonHannFunction(m_Conf.TransducerElements * 2);
+  const int apodArraySize = m_Conf.TransducerElements * 4;
+  double* VonHannWindow = VonHannFunction(apodArraySize);
 
   if (!output->IsInitialized())
   {
@@ -157,12 +158,11 @@ void mitk::BeamformingDASFilter::GenerateData()
       //linear delay
       for (unsigned short line = 0; line < outputDim[0]; ++line)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements *2)
-        threads[line] = std::thread(&BeamformingDASFilter::DASLinearLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements * 2);
+        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
+        threads[line] = std::thread(&BeamformingDASFilter::DASLinearLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
       for (unsigned short line = 0; line < outputDim[0]; ++line)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements *2)
         threads[line].join();
       }
     }
@@ -171,12 +171,11 @@ void mitk::BeamformingDASFilter::GenerateData()
       //quadratic delay
       for (unsigned short line = 0; line < outputDim[0]; ++line)
       {
-        //DMASQuadraticLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements *2)
-        threads[line] = std::thread(&BeamformingDASFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements * 2);
+        //DMASQuadraticLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
+        threads[line] = std::thread(&BeamformingDASFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
       for (unsigned short line = 0; line < outputDim[0]; ++line)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements *2)
         threads[line].join();
       }
     }
@@ -185,127 +184,14 @@ void mitk::BeamformingDASFilter::GenerateData()
       //exact delay
       for (unsigned short line = 0; line < outputDim[0]; ++line)
       {
-        //DMASSphericalLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements *2)
-        threads[line] = std::thread(&BeamformingDASFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements * 2);
+        threads[line] = std::thread(&BeamformingDASFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
       for (unsigned short line = 0; line < outputDim[0]; ++line)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, m_Conf.TransducerElements *2)
         threads[line].join();
       }
     }
 
-    /*
-    unsigned short AddSample = 0;
-    unsigned short maxLine = 0;
-    unsigned short minLine = 0;
-    double delayMultiplicator = 0;
-    double l_i = 0;
-    double s_i = 0;
-
-    double part = 0.07 * inputL;
-    double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-    double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
-
-    double VH_mult = 1;
-
-    double l = 0;
-    double x = 0;
-    double root = 0;
-
-    if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
-    {
-      //linear delay
-      for (unsigned short line = 0; line < outputL; ++line)
-      {
-        l_i = line / outputL * inputL;
-
-        l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
-
-        for (unsigned short sample = 0; sample < outputS; ++sample)
-        {
-          s_i = sample / outputS * inputS;
-
-          part = part_multiplicator*s_i;
-          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-          minLine = (unsigned short)std::max((l_i - part), 0.0);
-          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
-
-          x = m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound;
-          root = l / sqrt(pow(l, 2) + pow(m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound, 2));
-          delayMultiplicator = root / (m_Conf.RecordTime*m_Conf.SpeedOfSound) *m_Conf.Pitch*m_Conf.TransducerElements / inputL;
-
-          for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
-          {
-            AddSample = delayMultiplicator * (l_s - l_i) + s_i;
-            if (AddSample < inputS && AddSample >= 0)
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s - minLine)*VH_mult)];
-          }
-          m_OutputData[sample*(unsigned short)outputL + line] = m_OutputData[sample*(unsigned short)outputL + line] / (maxLine - minLine);
-        }
-      }
-    }
-    else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-    {
-      //quadratic delay
-      for (unsigned short line = 0; line < outputL; ++line)
-      {
-        l_i = line / outputL * inputL;
-
-        for (unsigned short sample = 0; sample < outputS; ++sample)
-        {
-          s_i = sample / outputS * inputS;
-
-          part = part_multiplicator*s_i;
-          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-          minLine = (unsigned short)std::max((l_i - part), 0.0);
-          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
-
-          delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i;
-
-          for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
-          {
-            AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
-            if (AddSample < inputS && AddSample >= 0) {
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL] * VonHannWindow[(unsigned short)((l_s-minLine)*VH_mult)];
-            }
-          }
-          m_OutputData[sample*(unsigned short)outputL + line] = m_OutputData[sample*(unsigned short)outputL + line] / (maxLine - minLine);
-        }
-      }
-    }
-    else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-    {
-      //exact delay
-      for (unsigned short line = 0; line < outputL; ++line)
-      {
-        l_i = line / outputL * inputL;
-
-        for (unsigned short sample = 0; sample < outputS; ++sample)
-        {
-          s_i = sample / outputS * inputS;
-
-          part = part_multiplicator*s_i;
-          maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-          minLine = (unsigned short)std::max((l_i - part), 0.0);
-          VH_mult = m_Conf.TransducerElements * 2 / (maxLine - minLine);
-
-          for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
-          {
-            AddSample = (int)sqrt(
-              pow(s_i, 2)
-              +
-              pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
-            );
-            if (AddSample < inputS && AddSample >= 0) {
-              m_OutputData[sample*(unsigned short)outputL + line] += m_InputData[l_s + AddSample*(unsigned short)inputL]*VonHannWindow[(unsigned short)((l_s - minLine)*VH_mult)];
-            }
-          }
-          m_OutputData[sample*(unsigned short)outputL + line] = m_OutputData[sample*(unsigned short)outputL + line] / (maxLine - minLine);
-        }
-      }
-    }
-    */
     output->SetSlice(m_OutputData, i);
 
     if (i % 50 == 0)
@@ -376,6 +262,10 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
     s_i = sample / outputS * inputS;
 
     part = part_multiplicator*s_i;
+
+    if (part < 1)
+      part = 1;
+
     maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
     minLine = (unsigned short)std::max((l_i - part), 0.0);
     VH_mult = apodArraySize / (maxLine - minLine);
@@ -428,6 +318,10 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
     s_i = sample / outputS * inputS;
 
     part = part_multiplicator*s_i;
+
+    if (part < 1)
+      part = 1;
+
     maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
     minLine = (unsigned short)std::max((l_i - part), 0.0);
     VH_mult = apodArraySize / (maxLine - minLine);
@@ -473,13 +367,17 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
 
   //exact delay
 
-  l_i = line / outputL * inputL;
+  l_i = (double)line / outputL * inputL;
 
   for (unsigned short sample = 0; sample < outputS; ++sample)
   {
-    s_i = sample / outputS * inputS;
+    s_i = (double)sample / outputS * inputS;
 
     part = part_multiplicator*s_i;
+
+    if (part < 1)
+      part = 1;
+
     maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
     minLine = (unsigned short)std::max((l_i - part), 0.0);
     VH_mult = apodArraySize / (maxLine - minLine);

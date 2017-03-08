@@ -302,8 +302,8 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   {
     if (m_Controls.UseImageSpacing->isChecked())
     {
-      DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
-      DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
+      //DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
+      //DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
     }
     
     DASconfig.Photoacoustic = false;

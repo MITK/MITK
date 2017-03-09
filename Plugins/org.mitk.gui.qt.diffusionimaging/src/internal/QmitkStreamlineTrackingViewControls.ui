@@ -420,7 +420,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_FaImageBox">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
         </property>
@@ -482,15 +482,12 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QCheckBox" name="m_UseFaImage">
+       <widget class="QLabel" name="label_8">
         <property name="toolTip">
-         <string>Check to use selected FA image instead of internally calculated one. Recommended for multi-tensor tractography.</string>
+         <string>Only track insida mask area.</string>
         </property>
         <property name="text">
-         <string>FA image</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
+         <string>FA Image:</string>
         </property>
        </widget>
       </item>
@@ -502,9 +499,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
+   <class>QmitkDataStorageComboBoxWithSelectNone</class>
    <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
+   <header location="global">QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

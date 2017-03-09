@@ -282,7 +282,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetLargestEigenvector(TensorTy
     return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
     vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
     TensorType tensor; tensor.Fill(0);

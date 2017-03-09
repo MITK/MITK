@@ -216,7 +216,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
                             itk::ContinuousIndex<double, 3> end;
                             m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
 
-                            d1 = m_TrackingHandler->ProposeDirection(end, olddirs, s_idx, m_MaskImage);
+                            d1 = m_TrackingHandler->ProposeDirection(end, olddirs, s_idx);
                             if (d1.magnitude()<0.0001)
                                 continue;
                             d1.normalize();
@@ -324,15 +324,16 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
     vnl_vector_fixed<double,3> direction; direction.fill(0);
 
     ItkUcharImgType::IndexType idx;
-    m_StoppingRegions->TransformPhysicalPointToIndex(pos, idx);
-    if (m_StoppingRegions->GetLargestPossibleRegion().IsInside(idx) && m_StoppingRegions->GetPixel(idx)>0)
-        return direction;
-
-    if ( (m_MaskImage->GetLargestPossibleRegion().IsInside(idx) && m_MaskImage->GetPixel(idx)<=0) || !m_MaskImage->GetLargestPossibleRegion().IsInside(idx) )
-        return direction;
+    m_MaskImage->TransformPhysicalPointToIndex(pos, idx);
 
     if (IsValidPosition(pos))
-        direction = m_TrackingHandler->ProposeDirection(pos, olddirs, oldIndex, m_MaskImage); // get direction proposal at current streamline position
+    {
+        if (m_StoppingRegions->GetPixel(idx)>0)
+            return direction;
+        direction = m_TrackingHandler->ProposeDirection(pos, olddirs, oldIndex); // get direction proposal at current streamline position
+    }
+    else
+        return direction;
 
     vnl_vector_fixed<double,3> olddir = olddirs.back();
     std::vector< vnl_vector_fixed<double,3> > probeVecs = CreateDirections(m_NumberOfSamples);
@@ -374,7 +375,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
 
         vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
-            tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex, m_MaskImage); // sample neighborhood
+            tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
         if (tempDir.magnitude()>mitk::eps)
         {
             direction += tempDir;
@@ -399,7 +400,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
             alternatives++;
             vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
-                tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex, m_MaskImage); // sample neighborhood
+                tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
 
             if (tempDir.magnitude()>mitk::eps)  // are we back in the white matter?
             {
@@ -659,7 +660,7 @@ void StreamlineTrackingFilter::GenerateData()
         }
 
         if (IsValidPosition(worldPos))
-            dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex, m_MaskImage);
+            dir = m_TrackingHandler->ProposeDirection(worldPos, olddirs, zeroIndex);
 
         if (dir.magnitude()>0.0001)
         {

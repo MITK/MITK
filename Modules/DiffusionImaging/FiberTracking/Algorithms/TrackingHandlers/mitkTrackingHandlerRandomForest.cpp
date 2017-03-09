@@ -211,16 +211,13 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrac
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<double,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<double,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
 
   vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
 
-
   itk::Index<3> idx;
   m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, idx);
-  if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
-    return output_direction;
 
   vnl_vector_fixed<double,3> last_dir;
   if (!olddirs.empty())

@@ -35,14 +35,14 @@ class MITKFIBERTRACKING_EXPORT TrackingDataHandler
 public:
 
     TrackingDataHandler();
-    ~TrackingDataHandler(){}
+    virtual ~TrackingDataHandler(){}
 
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
     typedef itk::Image<short, 3>          ItkShortImgType;
     typedef itk::Image<float, 3>          ItkFloatImgType;
     typedef itk::Image<double, 3>         ItkDoubleImgType;
 
-    virtual vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr) = 0;  ///< predicts next progression direction at the given position
+    virtual vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
 
     virtual void InitForTracking() = 0;
     virtual itk::Vector<double, 3> GetSpacing() = 0;

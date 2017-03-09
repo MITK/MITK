@@ -84,6 +84,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         mitk::NodePredicateDimension::Pointer dimensionPredicate = mitk::NodePredicateDimension::New(3);
 
         m_Controls->m_FaImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
+        m_Controls->m_FaImageBox->SetZeroEntryText("--");
 
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
@@ -203,14 +204,9 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     mitk::TrackingDataHandler* trackingHandler;
 
-    typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
-    typedef mitk::ImageToItk<TensorImageType> CastType;
-    typedef mitk::ImageToItk<ItkUCharImageType> CastType2;
-
-
     try {
-        typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType3;
-        CasterType3::Pointer caster = CasterType3::New();
+        typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
+        CasterType::Pointer caster = CasterType::New();
         caster->SetInput(m_InputImages.at(0));
         caster->Update();
         mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
@@ -222,21 +218,24 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
     catch(...)
     {
+        typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
+        typedef mitk::ImageToItk<TensorImageType> CasterType;
+
         trackingHandler = new mitk::TrackingHandlerTensor();
         for (int i=0; i<(int)m_InputImages.size(); i++)
         {
-            CastType::Pointer caster = CastType::New();
-            caster->SetInput(m_InputImages.at(i));
-            caster->Update();
-            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->AddTensorImage(caster->GetOutput());
+            TensorImageType::Pointer itkImg = TensorImageType::New();
+            mitk::CastToItkImage(m_InputImages.at(i), itkImg);
+
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->AddTensorImage(itkImg);
         }
 
-        if (m_Controls->m_UseFaImage->isChecked())
+        if (m_Controls->m_FaImageBox->GetSelectedNode().IsNotNull())
         {
-            mitk::ImageToItk<ItkFloatImageType>::Pointer floatCast = mitk::ImageToItk<ItkFloatImageType>::New();
-            floatCast->SetInput(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()));
-            floatCast->Update();
-            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaImage(floatCast->GetOutput());
+            ItkFloatImageType::Pointer itkImg = ItkFloatImageType::New();
+            mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()), itkImg);
+
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaImage(itkImg);
         }
 
         dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
@@ -269,7 +268,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     //tracker->SetStoppingRegions(stop);
     tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
-    //tracker->SetSamplingDistance(samplingdist);
+    tracker->SetSamplingDistance(0.7);
     tracker->SetUseStopVotes(true);
     tracker->SetOnlyForwardSamples(true);
     tracker->SetAposterioriCurvCheck(false);
@@ -296,6 +295,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     fib->SetReferenceGeometry(dynamic_cast<mitk::Image*>(m_InputImageNodes.at(0)->GetData())->GetGeometry());
     if (m_Controls->m_ResampleFibersBox->isChecked())
         fib->Compress(m_Controls->m_FiberErrorBox->value());
+    fib->ColorFibersByOrientation();
 
     mitk::DataNode::Pointer node = mitk::DataNode::New();
     node->SetData(fib);

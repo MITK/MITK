@@ -81,6 +81,7 @@ public:
         tracker->SetSeedImage(seed);
         tracker->SetSeedsPerVoxel(1);
         tracker->SetStepSize(-1);
+        tracker->SetAngularThreshold(45);
         tracker->SetMinTractLength(20);
         tracker->SetMaxTractLength(400);
         tracker->SetTrackingHandler(tfh);

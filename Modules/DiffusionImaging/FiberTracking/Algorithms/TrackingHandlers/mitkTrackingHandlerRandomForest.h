@@ -45,13 +45,13 @@ namespace mitk
 * \brief  Manages random forests for fiber tractography. The preparation of the features from the inputa data and the training process are handled here. The data preprocessing and actual prediction for the tracking process is also performed here. The tracking itself is performed in MLBSTrackingFilter. */
 
 template< int ShOrder, int NumberOfSignalFeatures >
-class TrackingForestHandler : public TrackingDataHandler
+class TrackingHandlerRandomForest : public TrackingDataHandler
 {
 
 public:
 
-    TrackingForestHandler();
-    ~TrackingForestHandler();
+    TrackingHandlerRandomForest();
+    ~TrackingHandlerRandomForest();
 
     typedef itk::Image< itk::Vector< float, NumberOfSignalFeatures > , 3 >      DwiFeatureImageType;
 
@@ -86,7 +86,7 @@ public:
     std::shared_ptr< vigra::RandomForest<int> > GetForest(){ return m_Forest; }
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
 
     bool IsForestValid();   ///< true is forest is not null, has more than 0 trees and the correct number of features (NumberOfSignalFeatures + 3)
 
@@ -149,6 +149,6 @@ protected:
 
 }
 
-#include "mitkTrackingForestHandler.cpp"
+#include "mitkTrackingHandlerRandomForest.cpp"
 
 #endif

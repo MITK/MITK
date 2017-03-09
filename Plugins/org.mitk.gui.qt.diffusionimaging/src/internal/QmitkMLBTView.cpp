@@ -52,7 +52,7 @@ QmitkMLBTView::QmitkMLBTView()
 {
     m_TrackingTimer = std::make_shared<QTimer>(this);
     m_LastLoadedForestName = "(none)";
-    m_ForestHandler = new mitk::TrackingForestHandler<6,100>();
+    m_ForestHandler = new mitk::TrackingHandlerRandomForest<6,100>();
 }
 
 // Destructor

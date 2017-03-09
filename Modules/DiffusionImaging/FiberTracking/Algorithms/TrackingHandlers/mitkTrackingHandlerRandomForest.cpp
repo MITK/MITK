@@ -17,20 +17,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _TrackingForestHandler_cpp
 #define _TrackingForestHandler_cpp
 
-#include "mitkTrackingForestHandler.h"
+#include "mitkTrackingHandlerRandomForest.h"
 #include <itkTractDensityImageFilter.h>
 #include <mitkDiffusionPropertyHelper.h>
 
 namespace mitk
 {
 template< int ShOrder, int NumberOfSignalFeatures >
-TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrackingForestHandler()
+TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::TrackingHandlerRandomForest()
   : m_WmSampleDistance(-1)
   , m_NumTrees(30)
-  , m_MaxTreeDepth(50)
+  , m_MaxTreeDepth(25)
   , m_SampleFraction(1.0)
   , m_NumberOfSamples(0)
-  , m_GmSamplesPerVoxel(50)
+  , m_GmSamplesPerVoxel(-1)
   , m_NumPreviousDirections(1)
   , m_ZeroDirWmFeatures(true)
   , m_BidirectionalFiberSampling(false)
@@ -48,12 +48,12 @@ TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrackingForestHandler(
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::~TrackingForestHandler()
+TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::~TrackingHandlerRandomForest()
 {
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate)
+typename TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate)
 {
   // transform physical point to index coordinates
   itk::Index<3> idx;
@@ -130,7 +130,7 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureIma
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
 {
   if (m_InputDwis.empty())
     mitkThrow() << "No diffusion-weighted images set!";
@@ -140,7 +140,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidFor
 
 template< int ShOrder, int NumberOfSignalFeatures>
 template<typename T>
-typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
+typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
 {
   MITK_INFO << "Calculating spherical harmonics features";
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
@@ -158,7 +158,7 @@ typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingForestHa
 
 template< int ShOrder, int NumberOfSignalFeatures>
 template<typename T>
-typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
+typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
 {
   MITK_INFO << "Interpolating raw dwi signal features";
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
@@ -203,7 +203,7 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestH
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 {
   InputDataValidForTracking();
   m_DwiFeatureImages.clear();
@@ -211,7 +211,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<double,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
 {
 
   vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
@@ -227,11 +227,7 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
     last_dir = olddirs.back();
 
   if (!m_Interpolate && oldIndex==idx)
-  {
-    w = 1;
-    candidates = 1;
     return last_dir;
-  }
 
   // store feature pixel values in a vigra data type
   vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,m_Forest->feature_count()) );
@@ -273,8 +269,7 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
   m_Forest->predictProbabilities(featureData, probs);
 
   double pNonFib = 0;     // probability that we left the white matter
-  w = 0;                  // weight of the predicted direction
-  candidates = 0;         // directions with probability > 0
+  double w = 0;           // weight of the predicted direction
   for (int i=0; i<m_Forest->class_count(); i++)   // for each class (number of possible directions + out-of-wm class)
   {
     if (probs(0,i)>0)   // if probability of respective class is 0, do nothing
@@ -285,10 +280,9 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
-        candidates++;   // now we have one direction more with probability > 0 (DO WE NEED THIS???)
         vnl_vector_fixed<double,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
 
-        if (!olddirs.empty() && last_dir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
+        if (!olddirs.empty() && last_dir.magnitude()>0.5)   // do we have a previous streamline direction or did we just start?
         {
           // TODO: check if hard curvature threshold is necessary.
           // alternatively try square of dot pruduct as weight.
@@ -317,11 +311,7 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
 
   // if we did not find a suitable direction, make sure that we return (0,0,0)
   if (pNonFib>w && w>0)
-  {
-    candidates = 0;
-    w = 0;
     output_direction.fill(0.0);
-  }
   else
   {
     if (m_FlipX)
@@ -332,11 +322,11 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
       output_direction[2] *= -1;
   }
 
-  return output_direction;
+  return output_direction * w;
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::StartTraining()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::StartTraining()
 {
   m_StartTime = std::chrono::system_clock::now();
   InputDataValidForTraining();
@@ -391,7 +381,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::StartTraining()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTraining()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InputDataValidForTraining()
 {
   if (m_InputDwis.empty())
     mitkThrow() << "No diffusion-weighted images set!";
@@ -402,7 +392,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidFor
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-bool TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::IsForestValid()
+bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestValid()
 {
   int additional_features = 0;
   if (m_AdditionalFeatureImages.size()>0)
@@ -413,7 +403,7 @@ bool TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::IsForestValid()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTraining()
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
@@ -601,7 +591,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTrainingSamples()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTrainingSamples()
 {
   vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
@@ -845,7 +835,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
 {
   MITK_INFO << "Saving forest to " << forestFile;
   if (IsForestValid())
@@ -858,7 +848,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::SaveForest(std::s
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
 {
   MITK_INFO << "Loading forest from " << forestFile;
   m_Forest = std::make_shared< vigra::RandomForest<int> >();

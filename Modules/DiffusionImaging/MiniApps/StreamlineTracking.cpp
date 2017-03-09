@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkFiberBundle.h>
 #include <itkStreamlineTrackingFilter.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingDataHandler.h>
-#include <Algorithms/TrackingHandlers/mitkTrackingForestHandler.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 
@@ -257,17 +257,17 @@ int main(int argc, char* argv[])
     {
         if (use_sh_features)
         {
-            handler = new mitk::TrackingForestHandler<6,28>();
-            dynamic_cast<mitk::TrackingForestHandler<6,28>*>(handler)->LoadForest(forestFile);
-            dynamic_cast<mitk::TrackingForestHandler<6,28>*>(handler)->AddDwi(input_images.at(0));
-            dynamic_cast<mitk::TrackingForestHandler<6,28>*>(handler)->SetAdditionalFeatureImages(addFeatImages);
+            handler = new mitk::TrackingHandlerRandomForest<6,28>();
+            dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->LoadForest(forestFile);
+            dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->AddDwi(input_images.at(0));
+            dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->SetAdditionalFeatureImages(addFeatImages);
         }
         else
         {
-            handler = new mitk::TrackingForestHandler<6,100>();
-            dynamic_cast<mitk::TrackingForestHandler<6,100>*>(handler)->LoadForest(forestFile);
-            dynamic_cast<mitk::TrackingForestHandler<6,100>*>(handler)->AddDwi(input_images.at(0));
-            dynamic_cast<mitk::TrackingForestHandler<6,100>*>(handler)->SetAdditionalFeatureImages(addFeatImages);
+            handler = new mitk::TrackingHandlerRandomForest<6,100>();
+            dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->LoadForest(forestFile);
+            dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input_images.at(0));
+            dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addFeatImages);
         }
     }
     else if (algorithm == "Peaks")

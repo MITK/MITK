@@ -39,7 +39,7 @@ public:
 
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr);  ///< predicts next progression direction at the given position
 
     void SetPeakThreshold(float thr){ m_PeakThreshold = thr; }
     void SetPeakImage( PeakImgType::Pointer image ){ m_PeakImage = image; }

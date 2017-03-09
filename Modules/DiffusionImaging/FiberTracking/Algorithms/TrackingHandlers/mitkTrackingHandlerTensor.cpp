@@ -282,7 +282,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetLargestEigenvector(TensorTy
     return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
 {
     vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
     TensorType tensor; tensor.Fill(0);
@@ -300,11 +300,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<do
         float old_mag = oldDir.magnitude();
 
         if (!m_Interpolate && oldIndex==index)
-        {
-          w = 1;
-          candidates = 1;
           return oldDir;
-        }
 
         output_direction = GetDirection(pos, oldDir, tensor);
         float mag = output_direction.magnitude();
@@ -325,10 +321,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<do
           if (old_mag>0.5)
             a = dot_product(output_direction, oldDir);
           if (a>m_AngularThreshold)
-          {
-            candidates = 1;
-            w = mag;
-          }
+            output_direction *= mag;
           else
             output_direction.fill(0);
         }

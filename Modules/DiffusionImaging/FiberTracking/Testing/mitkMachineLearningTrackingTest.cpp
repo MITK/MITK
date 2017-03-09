@@ -21,7 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
 #include <itkStreamlineTrackingFilter.h>
-#include <mitkTrackingForestHandler.h>
+#include <mitkTrackingHandlerRandomForest.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <omp.h>
@@ -41,7 +41,7 @@ private:
 
     /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
     mitk::FiberBundle::Pointer ref;
-    mitk::TrackingForestHandler<6, 100>* tfh;
+    mitk::TrackingHandlerRandomForest<6, 100>* tfh;
     mitk::Image::Pointer dwi;
     ItkUcharImgType::Pointer seed;
 
@@ -50,7 +50,7 @@ public:
     void setUp() override
     {
         ref = NULL;
-        tfh = new mitk::TrackingForestHandler<6,100>();
+        tfh = new mitk::TrackingHandlerRandomForest<6,100>();
 
         std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/ReferenceTracts.fib"));
         mitk::BaseData::Pointer baseData = fibInfile.at(0);

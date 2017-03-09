@@ -42,7 +42,7 @@ public:
     typedef itk::Image<float, 3>          ItkFloatImgType;
     typedef itk::Image<double, 3>         ItkDoubleImgType;
 
-    virtual vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double angularThreshold, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr) = 0;  ///< predicts next progression direction at the given position
+    virtual vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque< vnl_vector_fixed<double,3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask=nullptr) = 0;  ///< predicts next progression direction at the given position
 
     virtual void InitForTracking() = 0;
     virtual itk::Vector<double, 3> GetSpacing() = 0;
@@ -50,6 +50,7 @@ public:
     virtual itk::Matrix<double, 3, 3> GetDirection() = 0;
     virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
 
+    void SetAngularThreshold( float a ){ m_AngularThreshold = a; }
     void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
     void SetFlipX( bool f ){ m_FlipX = f; }
     void SetFlipY( bool f ){ m_FlipY = f; }
@@ -57,6 +58,7 @@ public:
 
 protected:
 
+    float   m_AngularThreshold;
     bool    m_Interpolate;
     bool    m_FlipX;
     bool    m_FlipY;

@@ -95,6 +95,7 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index
         else
           out_dir = dir;
         out_dir *= mag;
+        out_dir *= angle; // shrink contribution of direction if is less parallel to previous direction
       }
     }
   }
@@ -210,32 +211,16 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 
   return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double angularThreshold, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<double,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
 {
+    // CHECK: wann wird wo normalisiert
   vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
 
   itk::Index<3> index;
   m_DummyImage->TransformPhysicalPointToIndex(pos, index);
 
-  vnl_vector_fixed<double,3> oldDir; oldDir.fill(0);
-  if (olddirs.size()>0 && olddirs.back().magnitude()>0.5)
-    oldDir = olddirs.back();
-  else
-  {
-    output_direction = GetDirection(pos, m_Interpolate, oldDir);
-    float mag = output_direction.magnitude();
-
-    if (mag>m_PeakThreshold)
-    {
-      candidates = 1;
-      w = mag;
-      output_direction.normalize();
-    }
-    else
-      output_direction.fill(0);
-
-    return output_direction;
-  }
+  vnl_vector_fixed<double,3> oldDir = olddirs.back();
+  float old_mag = oldDir.magnitude();
 
   if (!m_Interpolate && oldIndex==index)
   {
@@ -250,8 +235,10 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<dou
   if (mag>=m_PeakThreshold)
   {
     output_direction.normalize();
-    float a = dot_product(output_direction, oldDir);
-    if (a>angularThreshold)
+    float a = 1;
+    if (old_mag>0.5)
+        a = dot_product(output_direction, oldDir);
+    if (a>m_AngularThreshold)
     {
       candidates = 1;
       w = mag;

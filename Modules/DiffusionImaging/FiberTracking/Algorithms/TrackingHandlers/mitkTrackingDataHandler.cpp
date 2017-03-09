@@ -19,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
     TrackingDataHandler::TrackingDataHandler()
-        : m_Interpolate(true)
+        : m_AngularThreshold(0.7)
+        , m_Interpolate(true)
         , m_FlipX(false)
         , m_FlipY(false)
         , m_FlipZ(false)

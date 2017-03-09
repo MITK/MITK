@@ -310,7 +310,7 @@ int main(int argc, char* argv[])
     handler->SetFlipZ(flip_z);
 
     tracker->SetNumberOfSamples(num_samples);
-    tracker->SetAngularThreshold(0.7);  // direct angular threshold for each estimated direction
+    tracker->SetAngularThreshold(45);  // direct angular threshold for each estimated direction
     tracker->SetMaskImage(mask);
     tracker->SetSeedImage(seed);
     tracker->SetStoppingRegions(stop);

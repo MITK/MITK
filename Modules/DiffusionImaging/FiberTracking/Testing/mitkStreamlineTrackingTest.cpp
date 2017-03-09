@@ -79,7 +79,6 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         TrackerType::Pointer tracker = TrackerType::New();
         tracker->SetSeedsPerVoxel(numSeeds);
         tracker->SetNumberOfSamples(0);
-        tracker->SetAngularThreshold(0.7);  // direct angular threshold for each estimated direction
         tracker->SetStepSize(stepSize);
         tracker->SetAposterioriCurvCheck(false);
         tracker->SetSeedOnlyGm(false);

@@ -211,7 +211,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double angularThreshold, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double& w, itk::Index<3>& oldIndex, ItkUcharImgType::Pointer mask)
 {
 
   vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
@@ -295,7 +295,7 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
           // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
 
           double dot = dot_product(d, last_dir);    // claculate angle between the candidate direction vector and the previous streamline direction
-          if (fabs(dot)>angularThreshold)         // is angle between the directions smaller than our hard threshold?
+          if (fabs(dot)>m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
           {
             if (dot<0)                          // make sure we don't walk backwards
               d *= -1;

@@ -39,7 +39,7 @@ StreamlineTrackingFilter
     , m_FiberPolyData(NULL)
     , m_Points(NULL)
     , m_Cells(NULL)
-    , m_AngularThreshold(0.7)
+    , m_AngularThreshold(-1)
     , m_StepSize(0)
     , m_MaxLength(10000)
     , m_MinTractLength(20.0)
@@ -61,6 +61,9 @@ StreamlineTrackingFilter
     , m_SeedOnlyGm(false)
     , m_WmLabel(3) // mrtrix 5ttseg labels
     , m_GmLabel(1) // mrtrix 5ttseg labels
+    , m_StepSizeVox(-1)
+    , m_SamplingDistanceVox(-1)
+    , m_AngularThresholdDeg(-1)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -84,13 +87,21 @@ void StreamlineTrackingFilter::BeforeTracking()
     else
         minSpacing = imageSpacing[2];
 
-    m_StepSize *= minSpacing;
-    if (m_StepSize<mitk::eps)
+    if (m_StepSizeVox<mitk::eps)
         m_StepSize = 0.5*minSpacing;
+    else
+        m_StepSize = m_StepSizeVox*minSpacing;
 
-    m_SamplingDistance *= minSpacing;
-    if (m_SamplingDistance<mitk::eps)
+    if (m_AngularThresholdDeg<0)
+        m_AngularThreshold = std::cos(m_StepSize/minSpacing);
+    else
+        m_AngularThreshold = std::cos( m_AngularThresholdDeg*M_PI/180.0 );
+    m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
+
+    if (m_SamplingDistanceVox<mitk::eps)
         m_SamplingDistance = minSpacing*0.25;
+    else
+        m_SamplingDistance = m_SamplingDistanceVox * minSpacing;
 
     m_PolyDataContainer.clear();
     for (unsigned int i=0; i<this->GetNumberOfThreads(); i++)
@@ -133,10 +144,8 @@ void StreamlineTrackingFilter::BeforeTracking()
         m_MaskImage->FillBuffer(1);
     }
     else
-        std::cout << "MLBSTrackingFilter: using mask image" << std::endl;
+        std::cout << "StreamlineTrackingFilter: using mask image" << std::endl;
 
-    if (m_AngularThreshold<0.0)
-        m_AngularThreshold = 0.5*minSpacing;
     m_BuildFibersReady = 0;
     m_BuildFibersFinished = false;
     m_Tractogram.clear();
@@ -150,25 +159,26 @@ void StreamlineTrackingFilter::BeforeTracking()
     if (m_DemoMode)
         omp_set_num_threads(1);
 
-    std::cout << "MLBSTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
-    std::cout << "MLBSTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
-    std::cout << "MLBSTrackingFilter: Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
-    std::cout << "MLBSTrackingFilter: Max. sampling distance: " << m_SamplingDistance << " mm" << std::endl;
-    std::cout << "MLBSTrackingFilter: Deflection modifier: " << m_DeflectionMod << std::endl;
-    std::cout << "MLBSTrackingFilter: Max. tract length: " << m_MaxTractLength << " mm" << std::endl;
-    std::cout << "MLBSTrackingFilter: Min. tract length: " << m_MinTractLength << " mm" << std::endl;
-    std::cout << "MLBSTrackingFilter: Use stop votes: " << m_UseStopVotes << std::endl;
-    std::cout << "MLBSTrackingFilter: Only frontal samples: " << m_OnlyForwardSamples << std::endl;
-    std::cout << "MLBSTrackingFilter: Starting streamline tracking" << std::endl;
+    std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
+    std::cout << "StreamlineTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
+    std::cout << "StreamlineTrackingFilter: Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
+    std::cout << "StreamlineTrackingFilter: Max. sampling distance: " << m_SamplingDistance << " mm" << std::endl;
+    std::cout << "StreamlineTrackingFilter: Deflection modifier: " << m_DeflectionMod << std::endl;
+    std::cout << "StreamlineTrackingFilter: Max. tract length: " << m_MaxTractLength << " mm" << std::endl;
+    std::cout << "StreamlineTrackingFilter: Min. tract length: " << m_MinTractLength << " mm" << std::endl;
+    std::cout << "StreamlineTrackingFilter: Use stop votes: " << m_UseStopVotes << std::endl;
+    std::cout << "StreamlineTrackingFilter: Only frontal samples: " << m_OnlyForwardSamples << std::endl;
+    std::cout << "StreamlineTrackingFilter: Starting streamline tracking" << std::endl;
 }
 
 
 void StreamlineTrackingFilter::InitGrayMatterEndings()
 {
+    m_TrackingHandler->SetAngularThreshold(0);
     m_GmStubs.clear();
     if (m_FourTTImage.IsNotNull())
     {
-        std::cout << "MLBSTrackingFilter: initializing GM endings" << std::endl;
+        std::cout << "StreamlineTrackingFilter: initializing GM endings" << std::endl;
         ImageRegionConstIterator< ItkUcharImgType > it(m_FourTTImage, m_FourTTImage->GetLargestPossibleRegion() );
         it.GoToBegin();
 
@@ -208,7 +218,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
                             itk::ContinuousIndex<double, 3> end;
                             m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
 
-                            d1 = m_TrackingHandler->ProposeDirection(end, candidates, olddirs, 0, prob, s_idx, m_MaskImage);
+                            d1 = m_TrackingHandler->ProposeDirection(end, candidates, olddirs, prob, s_idx, m_MaskImage);
                             if (d1.magnitude()<0.0001)
                                 continue;
                             d1.normalize();
@@ -236,6 +246,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
             ++it;
         }
     }
+    m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
 }
 
 
@@ -326,7 +337,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
     double w = 0;       // weight of the direction predicted at each sampling point
     if (IsValidPosition(pos))
     {
-        direction = m_TrackingHandler->ProposeDirection(pos, candidates, olddirs, m_AngularThreshold, w, oldIndex, m_MaskImage); // get direction proposal at current streamline position
+        direction = m_TrackingHandler->ProposeDirection(pos, candidates, olddirs, w, oldIndex, m_MaskImage); // get direction proposal at current streamline position
         direction *= w;
     }
 
@@ -371,7 +382,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
         candidates = 0;
         vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
-            tempDir = m_TrackingHandler->ProposeDirection(sample_pos, candidates, olddirs, m_AngularThreshold, w, oldIndex, m_MaskImage); // sample neighborhood
+            tempDir = m_TrackingHandler->ProposeDirection(sample_pos, candidates, olddirs, w, oldIndex, m_MaskImage); // sample neighborhood
         if (candidates>0 && tempDir.magnitude()>0.001)
         {
             direction += tempDir*w;
@@ -397,7 +408,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
             candidates = 0;
             vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
-                tempDir = m_TrackingHandler->ProposeDirection(sample_pos, candidates, olddirs, m_AngularThreshold, w, oldIndex, m_MaskImage); // sample neighborhood
+                tempDir = m_TrackingHandler->ProposeDirection(sample_pos, candidates, olddirs, w, oldIndex, m_MaskImage); // sample neighborhood
 
             if (candidates>0 && tempDir.magnitude()>0.001)  // are we back in the white matter?
             {
@@ -647,7 +658,6 @@ void StreamlineTrackingFilter::GenerateData()
         while (olddirs.size()<m_NumPreviousDirections)
             olddirs.push_back(dir); // start without old directions (only zero directions)
 
-
         vnl_vector_fixed< double, 3 > gm_start_dir;
         if (!m_GmStubs.empty())
         {
@@ -660,7 +670,9 @@ void StreamlineTrackingFilter::GenerateData()
         }
 
         if (IsValidPosition(worldPos))
-            dir = m_TrackingHandler->ProposeDirection(worldPos, candidates, olddirs, 0, prob, zeroIndex, m_MaskImage);
+        {
+            dir = m_TrackingHandler->ProposeDirection(worldPos, candidates, olddirs, prob, zeroIndex, m_MaskImage);
+        }
 
         if (dir.magnitude()>0.0001)
         {

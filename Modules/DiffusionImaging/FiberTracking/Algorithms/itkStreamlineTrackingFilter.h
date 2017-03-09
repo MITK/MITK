@@ -74,19 +74,24 @@ public:
     mitk::PointSet::Pointer             m_SamplingPointset;
     mitk::PointSet::Pointer             m_AlternativePointset;
 
+    void SetStepSize(float v)           ///< Integration step size in voxels, default is 0.5 * voxel
+    { m_StepSizeVox = v; }
+    void SetAngularThreshold(float v)   ///< Angular threshold per step (in degree), default is 90deg x stepsize
+    { m_AngularThresholdDeg = v; }
+    void SetSamplingDistance(float v)   ///< Maximum distance of sampling points in voxels, default is 0.25 * voxel
+    { m_SamplingDistanceVox = v; }
+
     itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
     itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
     itkSetMacro( FourTTImage, ItkUcharImgType::Pointer) ///<
     itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
-    itkSetMacro( StepSize, double)                      ///< Integration step size in mm
-    itkSetMacro( MinTractLength, double )               ///< Shorter tracts are discarded.
-    itkSetMacro( MaxTractLength, double )               ///< Streamline progression stops if tract is longer than specified.
-    itkSetMacro( AngularThreshold, double )             ///< Probabilities for directions with larger angular deviation from previous direction is set to 0
-    itkSetMacro( SamplingDistance, double )             ///< Maximum distance of sampling points in mm
+    itkSetMacro( MinTractLength, float )                ///< Shorter tracts are discarded.
+    itkSetMacro( MaxTractLength, float )                ///< Streamline progression stops if tract is longer than specified.
+
     itkSetMacro( UseStopVotes, bool )                   ///< Frontal sampling points can vote for stopping the streamline even if the remaining sampling points keep pushing
     itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
-    itkSetMacro( DeflectionMod, double )                 ///< Deflection distance modifier
+    itkSetMacro( DeflectionMod, double )                ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
     itkSetMacro( SeedOnlyGm, bool )
@@ -132,14 +137,18 @@ protected:
     BundleType                          m_Tractogram;
     BundleType                          m_GmStubs;
 
-    double                              m_AngularThreshold;
-    double                              m_StepSize;
+    float                               m_AngularThresholdDeg;
+    float                               m_StepSizeVox;
+    float                               m_SamplingDistanceVox;
+
+    float                               m_AngularThreshold;
+    float                               m_StepSize;
     int                                 m_MaxLength;
-    double                              m_MinTractLength;
-    double                              m_MaxTractLength;
+    float                               m_MinTractLength;
+    float                               m_MaxTractLength;
     int                                 m_SeedsPerVoxel;
     bool                                m_RandomSampling;
-    double                              m_SamplingDistance;
+    float                               m_SamplingDistance;
     double                              m_DeflectionMod;
     bool                                m_OnlyForwardSamples;
     bool                                m_UseStopVotes;

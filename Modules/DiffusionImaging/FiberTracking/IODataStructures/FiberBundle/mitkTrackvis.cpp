@@ -71,7 +71,7 @@ short TrackVisFiberReader::create(string filename , const mitk::FiberBundle *fib
 // -------------------------------------------------------------
 short TrackVisFiberReader::open( string filename )
 {
-    m_FilePointer = fopen(filename.c_str(),"r+b");
+    m_FilePointer = fopen(filename.c_str(), "rb");
     if (m_FilePointer == nullptr)
     {
         printf("[ERROR] Unable to open file '%s'\n",filename.c_str());

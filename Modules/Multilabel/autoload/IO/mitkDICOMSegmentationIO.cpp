@@ -388,72 +388,74 @@ namespace mitk
 
       if (label != nullptr)
       {
-        mitk::DICOMTagPath segmentNumberPath;
-        segmentNumberPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0004);
+        // Segment sequence path
+        DICOMTagPath segmentSequencePath = DICOMTagPath().AddElement(0x0062, 0x0002);
+
+        DICOMTagPath segmentNumberPath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0004);
         StringProperty *segmentNumberProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentNumberPath).c_str()));
 
-        mitk::DICOMTagPath segmentLabelPath;
-        segmentLabelPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0005);
+        DICOMTagPath segmentLabelPath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0005);
         StringProperty *segmentLabelProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentLabelPath).c_str()));
 
-        mitk::DICOMTagPath segmentAlgorithmTypePath;
-        segmentAlgorithmTypePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0008);
+        DICOMTagPath segmentAlgorithmTypePath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0008);
         StringProperty *algorithmTypeProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentAlgorithmTypePath).c_str()));
 
-        mitk::DICOMTagPath segmentCategoryCodeValuePath;
-        segmentCategoryCodeValuePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0100);
+        // Segmented Property Category Code Sequence path
+        DICOMTagPath segmentedPropertyCategorySequencePath =
+          DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0003);
+
+        DICOMTagPath segmentCategoryCodeValuePath =
+          DICOMTagPath(segmentedPropertyCategorySequencePath).AddElement(0x008, 0x0100);
         StringProperty *segmentCategoryCodeValueProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeValuePath).c_str()));
 
-        mitk::DICOMTagPath segmentCategoryCodeSchemePath;
-        segmentCategoryCodeSchemePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0102);
+        DICOMTagPath segmentCategoryCodeSchemePath =
+          DICOMTagPath(segmentedPropertyCategorySequencePath).AddElement(0x008, 0x0102);
         StringProperty *segmentCategoryCodeSchemeProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeSchemePath).c_str()));
 
-        mitk::DICOMTagPath segmentCategoryCodeMeaningPath;
-        segmentCategoryCodeMeaningPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0104);
+        DICOMTagPath segmentCategoryCodeMeaningPath =
+          DICOMTagPath(segmentedPropertyCategorySequencePath).AddElement(0x008, 0x0104);
         StringProperty *segmentCategoryCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentCategoryCodeMeaningPath).c_str()));
 
-        mitk::DICOMTagPath segmentTypeCodeValuePath;
-        segmentTypeCodeValuePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0100);
+        // Segmented Property Type Code Sequence path
+        DICOMTagPath segmentedPropertyTypeSequencePath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x000F);
+
+        DICOMTagPath segmentTypeCodeValuePath =
+          DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x008, 0x0100);
         StringProperty *segmentTypeCodeValueProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeValuePath).c_str()));
 
-        mitk::DICOMTagPath segmentTypeCodeSchemePath;
-        segmentTypeCodeSchemePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0102);
+        DICOMTagPath segmentTypeCodeSchemePath =
+          DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x008, 0x0102);
         StringProperty *segmentTypeCodeSchemeProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeSchemePath).c_str()));
 
-        mitk::DICOMTagPath segmentTypeCodeMeaningPath;
-        segmentTypeCodeMeaningPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0104);
+        DICOMTagPath segmentTypeCodeMeaningPath =
+          DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x008, 0x0104);
         StringProperty *segmentTypeCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentTypeCodeMeaningPath).c_str()));
 
-        mitk::DICOMTagPath segmentModifierCodeValuePath;
-        segmentModifierCodeValuePath.AddElement(0x0062, 0x0002)
-          .AddElement(0x0062, 0x000F)
-          .AddElement(0x0062, 0x0011)
-          .AddElement(0x008, 0x0100);
+        // Segmented Property Type Modifier Code Sequence path
+        DICOMTagPath segmentedPropertyModifierSequencePath =
+          DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x0062, 0x0011);
+
+        DICOMTagPath segmentModifierCodeValuePath =
+          DICOMTagPath(segmentedPropertyModifierSequencePath).AddElement(0x008, 0x0100);
         StringProperty *segmentModifierCodeValueProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeValuePath).c_str()));
 
-        mitk::DICOMTagPath segmentModifierCodeSchemePath;
-        segmentModifierCodeSchemePath.AddElement(0x0062, 0x0002)
-          .AddElement(0x0062, 0x000F)
-          .AddElement(0x0062, 0x0011)
-          .AddElement(0x008, 0x0102);
+        DICOMTagPath segmentModifierCodeSchemePath =
+          DICOMTagPath(segmentedPropertyModifierSequencePath).AddElement(0x008, 0x0102);
         StringProperty *segmentModifierCodeSchemeProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeSchemePath).c_str()));
 
-        mitk::DICOMTagPath segmentModifierCodeMeaningPath;
-        segmentModifierCodeMeaningPath.AddElement(0x0062, 0x0002)
-          .AddElement(0x0062, 0x000F)
-          .AddElement(0x0062, 0x0011)
-          .AddElement(0x008, 0x0104);
+        DICOMTagPath segmentModifierCodeMeaningPath =
+          DICOMTagPath(segmentedPropertyModifierSequencePath).AddElement(0x008, 0x0104);
         StringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(
           label->GetProperty(mitk::DICOMTagPathToPropertyName(segmentModifierCodeMeaningPath).c_str()));
 

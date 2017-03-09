@@ -16,14 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 
-#include "mitkAnatomicalStructureColorPresets.h"
+#include <mitkAnatomicalStructureColorPresets.h>
 #include "mitkDisplayInteractor.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
-#include "mitkPropertyNameHelper.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include <mitkDICOMSegmentationPropertyHelper.cpp>
 

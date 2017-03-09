@@ -122,110 +122,92 @@ namespace mitk
 
       //------------------------------------------------------------
       // Add Segment Sequence tags (0062, 0002)
-      DICOMTagPath segmentSequencePath;
-      segmentSequencePath.AddElement(0x0062, 0x0002);
+      DICOMTagPath segmentSequencePath = DICOMTagPath().AddElement(0x0062, 0x0002);
 
       // Segment Number:Identification number of the segment.The value of Segment Number(0062, 0004) shall be unique
       // within the Segmentation instance in which it is created
-      DICOMTagPath segmentNumberPath;
-      segmentNumberPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0004);
+      DICOMTagPath segmentNumberPath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0004);
       label->SetProperty(DICOMTagPathToPropertyName(segmentNumberPath).c_str(),
                          StringProperty::New(std::to_string(label->GetValue())));
 
       // Segment Label: User-defined label identifying this segment.
-      DICOMTagPath segmentLabelPath;
-      segmentLabelPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0005);
+      DICOMTagPath segmentLabelPath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0005);
       label->SetProperty(DICOMTagPathToPropertyName(segmentLabelPath).c_str(), StringProperty::New(label->GetName()));
 
       // Segment Algorithm Type: Type of algorithm used to generate the segment. AUTOMATIC SEMIAUTOMATIC MANUAL
-      DICOMTagPath segmentAlgorithmTypePath;
-      segmentAlgorithmTypePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0008);
+      DICOMTagPath segmentAlgorithmTypePath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0008);
       label->SetProperty(DICOMTagPathToPropertyName(segmentAlgorithmTypePath).c_str(),
                          StringProperty::New("SEMIAUTOMATIC"));
       //------------------------------------------------------------
       // Add Segmented Property Category Code Sequence tags (0062, 0003): Sequence defining the general category of this
       // segment.
-      DICOMTagPath segmentSegmentedPropertyCategorySequencePath;
-      segmentSegmentedPropertyCategorySequencePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003);
+      DICOMTagPath segmentedPropertyCategorySequencePath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x0003);
       // (0008,0100) Code Value
-      DICOMTagPath segmentCategoryCodeValuePath;
-      segmentCategoryCodeValuePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0100);
+      DICOMTagPath segmentCategoryCodeValuePath =
+        DICOMTagPath(segmentedPropertyCategorySequencePath).AddElement(0x008, 0x0100);
       if (!category.codeValue.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentCategoryCodeValuePath).c_str(),
                            StringProperty::New(category.codeValue));
 
       // (0008,0102) Coding Scheme Designator
-      DICOMTagPath segmentCategoryCodeSchemePath;
-      segmentCategoryCodeSchemePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0102);
+      DICOMTagPath segmentCategoryCodeSchemePath =
+        DICOMTagPath(segmentedPropertyCategorySequencePath).AddElement(0x008, 0x0102);
       if (!category.codeScheme.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentCategoryCodeSchemePath).c_str(),
                            StringProperty::New(category.codeScheme));
 
       // (0008,0104) Code Meaning
-      DICOMTagPath segmentCategoryCodeMeaningPath;
-      segmentCategoryCodeMeaningPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x0003).AddElement(0x008, 0x0104);
+      DICOMTagPath segmentCategoryCodeMeaningPath =
+        DICOMTagPath(segmentedPropertyCategorySequencePath).AddElement(0x008, 0x0104);
       if (!category.codeName.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentCategoryCodeMeaningPath).c_str(),
                            StringProperty::New(category.codeName));
       //------------------------------------------------------------
       // Add Segmented Property Type Code Sequence (0062, 000F): Sequence defining the specific property type of this
       // segment.
-      DICOMTagPath segmentSegmentedPropertyTypeSequencePath;
-      segmentSegmentedPropertyTypeSequencePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F);
+      DICOMTagPath segmentedPropertyTypeSequencePath = DICOMTagPath(segmentSequencePath).AddElement(0x0062, 0x000F);
 
       // (0008,0100) Code Value
-      DICOMTagPath segmentTypeCodeValuePath;
-      segmentTypeCodeValuePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0100);
+      DICOMTagPath segmentTypeCodeValuePath = DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x008, 0x0100);
       if (!type.codeValue.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentTypeCodeValuePath).c_str(),
                            StringProperty::New(type.codeValue));
 
       // (0008,0102) Coding Scheme Designator
-      DICOMTagPath segmentTypeCodeSchemePath;
-      segmentTypeCodeSchemePath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0102);
+      DICOMTagPath segmentTypeCodeSchemePath =
+        DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x008, 0x0102);
       if (!type.codeScheme.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentTypeCodeSchemePath).c_str(),
                            StringProperty::New(type.codeScheme));
 
       // (0008,0104) Code Meaning
-      DICOMTagPath segmentTypeCodeMeaningPath;
-      segmentTypeCodeMeaningPath.AddElement(0x0062, 0x0002).AddElement(0x0062, 0x000F).AddElement(0x008, 0x0104);
+      DICOMTagPath segmentTypeCodeMeaningPath =
+        DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x008, 0x0104);
       if (!type.codeName.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentTypeCodeMeaningPath).c_str(),
                            StringProperty::New(type.codeName));
       //------------------------------------------------------------
       // Add Segmented Property Type Modifier Code Sequence (0062,0011): Sequence defining the modifier of the property
       // type of this segment.
-      DICOMTagPath segmentSegmentedPropertyModifierSequencePath;
-      segmentSegmentedPropertyModifierSequencePath.AddElement(0x0062, 0x0002)
-        .AddElement(0x0062, 0x000F)
-        .AddElement(0x0062, 0x0011);
+      DICOMTagPath segmentedPropertyModifierSequencePath =
+        DICOMTagPath(segmentedPropertyTypeSequencePath).AddElement(0x0062, 0x0011);
       // (0008,0100) Code Value
-      DICOMTagPath segmentModifierCodeValuePath;
-      segmentModifierCodeValuePath.AddElement(0x0062, 0x0002)
-        .AddElement(0x0062, 0x000F)
-        .AddElement(0x0062, 0x0011)
-        .AddElement(0x008, 0x0100);
+      DICOMTagPath segmentModifierCodeValuePath =
+        DICOMTagPath(segmentedPropertyModifierSequencePath).AddElement(0x008, 0x0100);
       if (!type.modifier.codeValue.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentModifierCodeValuePath).c_str(),
                            StringProperty::New(type.modifier.codeValue));
 
       // (0008,0102) Coding Scheme Designator
-      DICOMTagPath segmentModifierCodeSchemePath;
-      segmentModifierCodeSchemePath.AddElement(0x0062, 0x0002)
-        .AddElement(0x0062, 0x000F)
-        .AddElement(0x0062, 0x0011)
-        .AddElement(0x008, 0x0102);
+      DICOMTagPath segmentModifierCodeSchemePath =
+        DICOMTagPath(segmentedPropertyModifierSequencePath).AddElement(0x008, 0x0102);
       if (!type.modifier.codeScheme.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentModifierCodeSchemePath).c_str(),
                            StringProperty::New(type.modifier.codeScheme));
 
       // (0008,0104) Code Meaning
-      DICOMTagPath segmentModifierCodeMeaningPath;
-      segmentModifierCodeMeaningPath.AddElement(0x0062, 0x0002)
-        .AddElement(0x0062, 0x000F)
-        .AddElement(0x0062, 0x0011)
-        .AddElement(0x008, 0x0104);
+      DICOMTagPath segmentModifierCodeMeaningPath =
+        DICOMTagPath(segmentedPropertyModifierSequencePath).AddElement(0x008, 0x0104);
       if (!type.modifier.codeName.empty())
         label->SetProperty(DICOMTagPathToPropertyName(segmentModifierCodeMeaningPath).c_str(),
                            StringProperty::New(type.modifier.codeName));
@@ -250,17 +232,17 @@ namespace mitk
         toiService->AddTagOfInterest(segmentLabelPath);
         toiService->AddTagOfInterest(segmentAlgorithmTypePath);
 
-        toiService->AddTagOfInterest(segmentSegmentedPropertyCategorySequencePath);
+        toiService->AddTagOfInterest(segmentedPropertyCategorySequencePath);
         toiService->AddTagOfInterest(segmentCategoryCodeValuePath);
         toiService->AddTagOfInterest(segmentCategoryCodeSchemePath);
         toiService->AddTagOfInterest(segmentCategoryCodeMeaningPath);
 
-        toiService->AddTagOfInterest(segmentSegmentedPropertyTypeSequencePath);
+        toiService->AddTagOfInterest(segmentedPropertyTypeSequencePath);
         toiService->AddTagOfInterest(segmentTypeCodeValuePath);
         toiService->AddTagOfInterest(segmentTypeCodeSchemePath);
         toiService->AddTagOfInterest(segmentTypeCodeMeaningPath);
 
-        toiService->AddTagOfInterest(segmentSegmentedPropertyModifierSequencePath);
+        toiService->AddTagOfInterest(segmentedPropertyModifierSequencePath);
         toiService->AddTagOfInterest(segmentModifierCodeValuePath);
         toiService->AddTagOfInterest(segmentModifierCodeSchemePath);
         toiService->AddTagOfInterest(segmentModifierCodeMeaningPath);

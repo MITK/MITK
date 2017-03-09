@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"
 #include "mitkCommon.h"
-#include "mitkDICOMTag.h"
 #include "mitkDataNode.h"
 #include "mitkEventStateMachine.h"
 #include "mitkInteractionEventObserver.h"
@@ -235,15 +234,6 @@ namespace mitk
     ToolManager *m_ToolManager;
 
   private:
-    void AddDICOMSegmentationProperties(mitk::LabelSetImage *image, mitk::Image *reference);
-
-    void AddDICOMSegmentProperties(mitk::Label *label);
-
-    void SetReferenceDICOMProperty(mitk::Image *original,
-                                   mitk::Image *segmentation,
-                                   const mitk::DICOMTag &tag,
-                                   const std::string &defaultString = "");
-
     // for reference data
     NodePredicateDataType::Pointer m_PredicateImages;
     NodePredicateDimension::Pointer m_PredicateDim3;

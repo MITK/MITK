@@ -465,7 +465,6 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-IGT
   MITK-ToF
   MITK-DTI
-  MITK-Registration
   MITK-Modules # all modules not contained in a specific subproject
   MITK-Plugins # all plugins not contained in a specific subproject
   MITK-Examples

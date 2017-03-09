@@ -56,8 +56,6 @@ QmitkStreamlineTrackingView::QmitkStreamlineTrackingView()
     : QmitkFunctionality()
     , m_Controls( 0 )
     , m_MultiWidget( NULL )
-    , m_MaskImage( NULL )
-    , m_SeedRoi( NULL )
 {
 }
 
@@ -75,6 +73,9 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         m_Controls = new Ui::QmitkStreamlineTrackingViewControls;
         m_Controls->setupUi( parent );
         m_Controls->m_FaImageBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_SeedImageBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
 
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
 
@@ -85,6 +86,12 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
 
         m_Controls->m_FaImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
         m_Controls->m_FaImageBox->SetZeroEntryText("--");
+        m_Controls->m_SeedImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
+        m_Controls->m_SeedImageBox->SetZeroEntryText("--");
+        m_Controls->m_MaskImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
+        m_Controls->m_MaskImageBox->SetZeroEntryText("--");
+        m_Controls->m_StopImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
+        m_Controls->m_StopImageBox->SetZeroEntryText("--");
 
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
         connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
@@ -129,35 +136,14 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
 {
     m_InputImageNodes.clear();
     m_InputImages.clear();
-    m_SeedRoi = NULL;
-    m_MaskImage = NULL;
     m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
-    m_Controls->m_RoiImageLabel->setText("<font color='grey'>optional</font>");
-    m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
 
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
         mitk::DataNode::Pointer node = *it;
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-        {
-            bool isBinary = false;
-            node->GetPropertyValue<bool>("binary", isBinary);
-
-            if (isBinary)
-            {
-                if (isBinary && m_SeedRoi.IsNull())
-                {
-                    m_SeedRoi = dynamic_cast<mitk::Image*>(node->GetData());
-                    m_Controls->m_RoiImageLabel->setText(node->GetName().c_str());
-                }
-                else if (isBinary)
-                {
-                    m_MaskImage = dynamic_cast<mitk::Image*>(node->GetData());
-                    m_Controls->m_MaskImageLabel->setText(node->GetName().c_str());
-                }
-            }
-            else if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
+        {            if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
             {
                 m_InputImageNodes.push_back(node);
                 m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
@@ -251,21 +237,27 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     typedef itk::StreamlineTrackingFilter TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
 
-    if (m_SeedRoi.IsNotNull())
+    if (m_Controls->m_SeedImageBox->GetSelectedNode().IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-        mitk::CastToItkImage(m_SeedRoi, mask);
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_SeedImageBox->GetSelectedNode()->GetData()), mask);
         tracker->SetSeedImage(mask);
     }
 
-    if (m_MaskImage.IsNotNull())
+    if (m_Controls->m_MaskImageBox->GetSelectedNode().IsNotNull())
     {
         ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
-        mitk::CastToItkImage(m_MaskImage, mask);
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_MaskImageBox->GetSelectedNode()->GetData()), mask);
         tracker->SetMaskImage(mask);
     }
 
-    //tracker->SetStoppingRegions(stop);
+    if (m_Controls->m_StopImageBox->GetSelectedNode().IsNotNull())
+    {
+        ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_StopImageBox->GetSelectedNode()->GetData()), mask);
+        tracker->SetStoppingRegions(mask);
+    }
+
     tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
     tracker->SetSamplingDistance(0.7);

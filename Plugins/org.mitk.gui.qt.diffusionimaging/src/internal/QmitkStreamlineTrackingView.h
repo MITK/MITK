@@ -77,8 +77,6 @@ protected slots:
 
 private:
 
-    mitk::Image::Pointer          m_MaskImage;        ///< abort tracking if leaving mask
-    mitk::Image::Pointer          m_SeedRoi;          ///< binary image defining seed voxels for tracking process
     std::vector< mitk::DataNode::Pointer > m_InputImageNodes; ///< input images
     std::vector< mitk::Image::Pointer > m_InputImages; ///< input image datanode
 };

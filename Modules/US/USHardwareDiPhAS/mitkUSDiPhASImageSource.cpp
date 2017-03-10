@@ -498,7 +498,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
 
         mitk::Vector3D rawSpacing;
         rawSpacing[0] = m_Device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
-        rawSpacing[1] = recordTime / channelDataSamplesPerChannel / 2;
+        rawSpacing[1] = recordTime / channelDataSamplesPerChannel / 2 / 1000000;  // save in us
         rawSpacing[2] = 0.6;
 
         rawImage->GetGeometry()->SetSpacing(rawSpacing);

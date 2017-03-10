@@ -48,7 +48,7 @@ void mitk::BeamformingDASFilter::GenerateInputRequestedRegion()
   Superclass::GenerateInputRequestedRegion();
 
   mitk::Image* output = this->GetOutput();
-  mitk::Image* input = const_cast< mitk::Image * > (this->GetInput());
+  mitk::Image* input = const_cast<mitk::Image *> (this->GetInput());
   if (!output->IsInitialized())
   {
     return;
@@ -68,8 +68,8 @@ void mitk::BeamformingDASFilter::GenerateOutputInformation()
     return;
 
   itkDebugMacro(<< "GenerateOutputInformation()");
-  
-  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2)};
+
+  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) };
   output->Initialize(mitk::MakeScalarPixelType<double>(), 3, dim);
 
   mitk::Vector3D spacing;
@@ -109,7 +109,7 @@ void mitk::BeamformingDASFilter::GenerateData()
     m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
     m_InputDataPuffer = new double[input->GetDimension(0)*input->GetDimension(1)];
 
-    if (input->GetPixelType().GetTypeAsString() == "scalar (double)")
+    if (input->GetPixelType().GetTypeAsString() == "scalar (double)" || input->GetPixelType().GetTypeAsString() == " (double)")
     {
       m_InputData = (double*)inputReadAccessor.GetData();
     }
@@ -153,43 +153,24 @@ void mitk::BeamformingDASFilter::GenerateData()
 
     std::thread *threads = new std::thread[(unsigned short)outputDim[0]];
 
-    if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
+    for (unsigned short line = 0; line < outputDim[0]; ++line)
     {
-      //linear delay
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
+      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
         threads[line] = std::thread(&BeamformingDASFilter::DASLinearLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
+      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
       {
-        threads[line].join();
-      }
-    }
-    else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-    {
-      //quadratic delay
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
-      {
-        //DMASQuadraticLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
         threads[line] = std::thread(&BeamformingDASFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
-      {
-        threads[line].join();
-      }
-    }
-    else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-    {
-      //exact delay
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
+      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
       {
         threads[line] = std::thread(&BeamformingDASFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
-      {
-        threads[line].join();
-      }
+    }
+    for (unsigned short line = 0; line < outputDim[0]; ++line)
+    {
+      threads[line].join();
     }
 
     output->SetSlice(m_OutputData, i);

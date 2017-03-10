@@ -47,6 +47,8 @@ class PAImageProcessing : public QmitkAbstractView
     void UseLogfilter();
     void SetResampling();
     void UseImageSpacing();
+    void UpdateFrequency();
+    void UpdateRecordTime(mitk::Image::Pointer image);
 
     void ApplyBeamforming();
 

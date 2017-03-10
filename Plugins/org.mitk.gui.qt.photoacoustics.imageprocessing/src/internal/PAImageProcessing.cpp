@@ -43,20 +43,57 @@ void PAImageProcessing::SetFocus()
   m_Controls.buttonApplyBModeFilter->setFocus();
 }
 
-void PAImageProcessing::CreateQtPartControl( QWidget *parent )
+void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi( parent );
-  connect( m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(ApplyBModeFilter()) );
+  m_Controls.setupUi(parent);
+  connect(m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(ApplyBModeFilter()));
   connect(m_Controls.DoResampling, SIGNAL(clicked()), this, SLOT(UseResampling()));
   connect(m_Controls.Logfilter, SIGNAL(clicked()), this, SLOT(UseLogfilter()));
   connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
   connect(m_Controls.buttonApplyBeamforming, SIGNAL(clicked()), this, SLOT(ApplyBeamforming()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
+  connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.Samples, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.UseImageSpacing, SIGNAL(clicked), this, SLOT(UpdateFrequency()));
 
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
   UseImageSpacing();
+}
+
+void PAImageProcessing::UpdateFrequency()
+{
+  DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
+  DMASconfig.SamplesPerLine = m_Controls.Samples->value();
+
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataNode::Pointer node = nodes.front();
+
+  if (!node)
+  {
+    // Nothing selected
+    if (!m_Controls.UseImageSpacing->isChecked())
+      UpdateRecordTime(mitk::Image::New());
+    return;
+  }
+
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+    if (image)
+      UpdateRecordTime(image);
+  }
+
+  std::stringstream frequency;
+  frequency << 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2;
+  frequency << "Hz";
+  m_Controls.BPInfoDisplay->setText(frequency.str().c_str());
 }
 
 void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -69,6 +106,7 @@ void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sou
     {
       m_Controls.labelWarning->setVisible( false );
       m_Controls.buttonApplyBModeFilter->setEnabled( true );
+      UpdateFrequency();
       return;
     }
   }
@@ -284,12 +322,19 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DMASconfig.ReconstructionLines = m_Controls.Lines->value();
   DMASconfig.TransducerElements = m_Controls.ElementCount->value();
   DMASconfig.Angle = m_Controls.Angle->value();
+  DMASconfig.BPHighPass = m_Controls.BPhigh->value();
+  DMASconfig.BPLowPass = m_Controls.BPlow->value();
+  DMASconfig.BPFalloff = m_Controls.BPFalloff->value();
 
+  UpdateRecordTime(image);
+}
 
+void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
+{
   if (m_Controls.UseImageSpacing->isChecked())
   {
-    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]/1000000; // [s]
-    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1]/1000000; // [s]
+    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
+    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
     MITK_INFO << "Calculated Scan Depth of " << DASconfig.RecordTime * DASconfig.SpeedOfSound * 100 << "cm";
   }
   else
@@ -305,7 +350,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
       //DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
       //DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
     }
-    
+
     DASconfig.Photoacoustic = false;
     DMASconfig.Photoacoustic = false;
   }

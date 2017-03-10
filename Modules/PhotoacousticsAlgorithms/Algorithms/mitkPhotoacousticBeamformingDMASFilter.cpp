@@ -117,7 +117,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
     m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
     m_InputDataPuffer = new double[input->GetDimension(0)*input->GetDimension(1)];
 
-    if (input->GetPixelType().GetTypeAsString() == "scalar (double)")
+    if (input->GetPixelType().GetTypeAsString() == "scalar (double)" || input->GetPixelType().GetTypeAsString() == " (double)")
     {
       m_InputData = (double*)inputReadAccessor.GetData();
     }
@@ -163,86 +163,66 @@ void mitk::BeamformingDMASFilter::GenerateData()
 
     std::thread *threads = new std::thread[(unsigned short)outputDim[0]];
 
-    if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
+    for (unsigned short line = 0; line < outputDim[0]; ++line)
     {
-      //linear delay
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
+      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
         threads[line] = std::thread(&BeamformingDMASFilter::DMASLinearLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
+      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
       {
-        //DMASLinearLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
-        threads[line].join();
-      }
-    }
-    else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
-    {
-      //quadratic delay
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
-      {
-        //DMASQuadraticLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
         threads[line] = std::thread(&BeamformingDMASFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
+      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
       {
-        threads[line].join();
-      }
-    }
-    else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
-    {
-      //exact delay
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
-      {
-        //DMASQuadraticLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
         threads[line] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       }
-      for (unsigned short line = 0; line < outputDim[0]; ++line)
-      {
-        threads[line].join();
-      }
-      /*
-      bool *threadfinished = new bool[max_threads];
-      for (unsigned short r = 0; r < max_threads; ++r)
-      {
-        threadfinished[r] = false;
-      }
+    }
+    for (unsigned short line = 0; line < outputDim[0]; ++line)
+    {
+      threads[line].join();
+    }
 
-      unsigned short line = 0;
-      while(line < outputDim[0])
-      {
-        //DMASSphericalLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
-        //threads[line] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
-        for (unsigned short n = 0; n < max_threads; ++n)
-        {
-          if (threadfinished[n])
-          {
-            threads[n].join();
-            threadfinished[n] = false;
-            //MITK_INFO << "thread " << n << " joined";
-          }
-          if (!threads[n].joinable())
-          {
-            threads[n] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize, &threadfinished[n]);
-            ++line;
-            //MITK_INFO << "thread " << n << " created for line " << line - 1;
-            break;
-          }
-        }
-      }
+    /*
+    bool *threadfinished = new bool[max_threads];
+    for (unsigned short r = 0; r < max_threads; ++r)
+    {
+      threadfinished[r] = false;
+    }
+
+    unsigned short line = 0;
+    while(line < outputDim[0])
+    {
+      //DMASSphericalLine(m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize)
+      //threads[line] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize);
       for (unsigned short n = 0; n < max_threads; ++n)
       {
-        if (threads[n].joinable())
+        if (threadfinished[n])
         {
           threads[n].join();
           threadfinished[n] = false;
           //MITK_INFO << "thread " << n << " joined";
         }
+        if (!threads[n].joinable())
+        {
+          threads[n] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, VonHannWindow, apodArraySize, &threadfinished[n]);
+          ++line;
+          //MITK_INFO << "thread " << n << " created for line " << line - 1;
+          break;
+        }
       }
-      delete[] threadfinished;*/
-      //threadpool... seems slower
     }
+    for (unsigned short n = 0; n < max_threads; ++n)
+    {
+      if (threads[n].joinable())
+      {
+        threads[n].join();
+        threadfinished[n] = false;
+        //MITK_INFO << "thread " << n << " joined";
+      }
+    }
+    delete[] threadfinished;*/
+    //threadpool... seems slower
 
     output->SetSlice(m_OutputData, i);
 
@@ -301,16 +281,20 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     return data;
   }
 
-  int lowerBound = -50 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
-  int upperBound = 50 * data->GetGeometry()->GetSpacing()[1] / 0.0244141;
+  double singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1));
+  double BoundHighPass = std::min(m_Conf.BPHighPass / singleVoxel, (double)data->GetDimension(1) / 2);
+  double BoundLowPass = std::min(m_Conf.BPLowPass / singleVoxel, (double)data->GetDimension(1) / 2 - BoundHighPass);
 
-  int center1 = (int)(((double)lowerBound + data->GetDimension(1) / 2) / 2);
-  int center2 = (int)(-(-(double)upperBound + data->GetDimension(1) / 2) / 2 + data->GetDimension(1));
 
-  int width1 = (int)((double)lowerBound + data->GetDimension(1) / 2);
-  int width2 = (int)(-(double)upperBound + data->GetDimension(1) / 2);
+  int center1 = ((- BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundLowPass;
+  int center2 = ((- BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundHighPass + data->GetDimension(1) / 2;
 
-  /*MITK_INFO << "center1 " << center1 << " width1 " << width1;
+  int width1 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
+  int width2 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
+
+  /*
+  MITK_INFO << "frequency " << singleVoxel * data->GetDimension(1) / 2;
+  MITK_INFO << "center1 " << center1 << " width1 " << width1;
   MITK_INFO << "center2 " << center2 << " width2 " << width2;*/ //debugging
 
   RealImageType::Pointer fftMultiplicator1 = BPFunction(data, width1, center1);
@@ -348,7 +332,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 itk::Image<double, 3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
   // tukey window
-  double alpha = 0.2 * reference->GetGeometry()->GetSpacing()[1] / 0.0244141;
+  double alpha = m_Conf.BPFalloff;
 
   double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
 
@@ -594,11 +578,11 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
 
 void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
 {
-  double inputS = inputDim[1];
-  double inputL = inputDim[0];
+  double& inputS = inputDim[1];
+  double& inputL = inputDim[0];
 
-  double outputS = outputDim[1];
-  double outputL = outputDim[0];
+  double& outputS = outputDim[1];
+  double& outputL = outputDim[0];
 
   unsigned short AddSample1 = 0;
   unsigned short AddSample2 = 0;

@@ -45,6 +45,9 @@ namespace mitk {
       DelayCalc DelayCalculationMethod = QuadApprox;
       double Angle = 10.0;
       bool Photoacoustic = true;
+      double BPHighPass = 50;
+      double BPLowPass = 50;
+      double BPFalloff = 0.2;
     };
 
     void Configure(beamformingSettings settings);

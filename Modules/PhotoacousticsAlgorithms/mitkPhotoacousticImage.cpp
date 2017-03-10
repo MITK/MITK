@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkITKImageImport.h"
 #include "Algorithms/mitkPhotoacousticBeamformingDASFilter.h"
 #include "Algorithms/mitkPhotoacousticBeamformingDMASFilter.h"
+#include <chrono>
 
 // itk dependencies
 #include "itkImage.h"
@@ -31,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkIntensityWindowingImageFilter.h"
 #include <itkIndex.h>
 #include "itkMultiplyImageFilter.h"
+#include "itkBSplineInterpolateImageFunction.h"
 
 mitk::PhotoacousticImage::PhotoacousticImage()
 {
@@ -119,36 +121,38 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
 //  return mitk::GrabItkImageMemory(multiplyFilter->GetOutput());
 //}
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3])
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[3])
 {
   typedef itk::Image< double, 3 > itkFloatImageType;
 
   typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
   ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
-
+  typedef itk::BSplineInterpolateImageFunction<itkFloatImageType, double, double> T_Interpolator;
   itkFloatImageType::Pointer itkImage;
 
   mitk::CastToItkImage(inputImage, itkImage);
 
-
+  itkFloatImageType::SpacingType inputSpacing = itkImage->GetSpacing();
   itkFloatImageType::SpacingType outputSpacingItk;
   itkFloatImageType::SizeType inputSizeItk = itkImage->GetLargestPossibleRegion().GetSize();
   itkFloatImageType::SizeType outputSizeItk = inputSizeItk;
-  itkFloatImageType::SpacingType inputSpacing = itkImage->GetSpacing();
 
   outputSizeItk[0] = outputSize[0];
-  outputSizeItk[1] = (inputSizeItk[1] * outputSize[0] / inputSizeItk[1]);
-  outputSizeItk[2] = 1;
+  outputSizeItk[1] = outputSize[1];
+  outputSizeItk[2] = outputSize[2];
 
-  outputSpacingItk[0] = inputSpacing[0] * (double)inputSizeItk[0] / (double)outputSize[0];
-  outputSpacingItk[1] = inputSpacing[1] * (double)inputSizeItk[1] / (double)outputSize[1];
-  outputSpacingItk[2] = outputSpacing[2];
+  outputSpacingItk[0] = itkImage->GetSpacing()[0] * (static_cast<double>(inputSizeItk[0]) / static_cast<double>(outputSizeItk[0]));
+  outputSpacingItk[1] = itkImage->GetSpacing()[1] * (static_cast<double>(inputSizeItk[1]) / static_cast<double>(outputSizeItk[1]));
+  outputSpacingItk[2] = itkImage->GetSpacing()[2] * (static_cast<double>(inputSizeItk[2]) / static_cast<double>(outputSizeItk[2]));
 
   typedef itk::IdentityTransform<double, 3> TransformType;
+  T_Interpolator::Pointer _pInterpolator = T_Interpolator::New();
   resampleImageFilter->SetInput(itkImage);
   resampleImageFilter->SetSize(outputSizeItk);
   resampleImageFilter->SetOutputSpacing(outputSpacingItk);
   resampleImageFilter->SetTransform(TransformType::New());
+  _pInterpolator->SetSplineOrder(3);
+  resampleImageFilter->SetInterpolator(_pInterpolator);
 
   resampleImageFilter->UpdateLargestPossibleRegion();
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
@@ -158,7 +162,18 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
 {
   BeamformingDASFilter::Pointer Beamformer = BeamformingDASFilter::New();
 
-  Beamformer->SetInput(inputImage);
+  Image::Pointer resizedImage = inputImage;
+
+  if (inputImage->GetDimension(0) != config.ReconstructionLines)
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    unsigned int dim[3] = { config.ReconstructionLines, inputImage->GetDimension(1), inputImage->GetDimension(2) };
+    resizedImage = ApplyResampling(inputImage, dim);
+    auto end = std::chrono::high_resolution_clock::now();
+    MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+  }
+
+  Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
 
   Beamformer->UpdateLargestPossibleRegion();
@@ -169,7 +184,18 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image:
 {
   BeamformingDMASFilter::Pointer Beamformer = BeamformingDMASFilter::New();
 
-  Beamformer->SetInput(inputImage);
+  Image::Pointer resizedImage = inputImage;
+
+  if(inputImage->GetDimension(0) != config.ReconstructionLines)
+  {
+    auto begin = std::chrono::high_resolution_clock::now();
+    unsigned int dim[3] = { config.ReconstructionLines, inputImage->GetDimension(1), inputImage->GetDimension(2) };
+    resizedImage = ApplyResampling(inputImage, dim);
+    auto end = std::chrono::high_resolution_clock::now();
+    MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+  }
+
+  Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
 
   Beamformer->UpdateLargestPossibleRegion();

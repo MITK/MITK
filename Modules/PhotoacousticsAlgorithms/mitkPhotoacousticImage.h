@@ -36,7 +36,7 @@ namespace mitk {
       itkFactorylessNewMacro(Self);
       mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, float resampleSpacing = 0.15);
 //      mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
-      mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, mitk::Vector3D outputSpacing, unsigned int outputSize[3]);
+      mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[3]);
       mitk::Image::Pointer ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config);
       mitk::Image::Pointer ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config);
 

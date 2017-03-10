@@ -65,7 +65,7 @@ void QtShell::SetBounds(const QRect& bounds)
 
 QRect QtShell::GetBounds() const
 {
-  return widget->frameGeometry();
+  return widget->geometry();
 }
 
 void QtShell::SetLocation(int x, int y)

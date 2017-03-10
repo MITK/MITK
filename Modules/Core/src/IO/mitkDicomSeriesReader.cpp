@@ -105,6 +105,7 @@ const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsTo
     dictionary["0020|000e"] = "dicom.series.SeriesInstanceUID";
     dictionary["0020|0011"] = "dicom.series.SeriesNumber";
     dictionary["0020|0060"] = "dicom.series.Laterality";
+    dictionary["0020|4000"] = "dicom.series.ImageComments";
     dictionary["0008|0021"] = "dicom.series.SeriesDate";
     dictionary["0008|0031"] = "dicom.series.SeriesTime";
     dictionary["0008|1050"] = "dicom.series.PerformingPhysiciansName";

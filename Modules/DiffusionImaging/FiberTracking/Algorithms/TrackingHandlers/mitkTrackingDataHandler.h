@@ -27,7 +27,7 @@ namespace mitk
 {
 
 /**
-* \brief  . */
+* \brief  Abstract class for tracking handler. A tracking handler deals with determining the next progression direction of a streamline fiber. There are different handlers for tensor images, peak images, ... */
 
 class MITKFIBERTRACKING_EXPORT TrackingDataHandler
 {
@@ -41,8 +41,9 @@ public:
     typedef itk::Image<short, 3>          ItkShortImgType;
     typedef itk::Image<float, 3>          ItkFloatImgType;
     typedef itk::Image<double, 3>         ItkDoubleImgType;
+    typedef vnl_vector_fixed< float, 3 >  TrackingDirectionType;
 
-    virtual vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
+    virtual vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
 
     virtual void InitForTracking() = 0;
     virtual itk::Vector<double, 3> GetSpacing() = 0;
@@ -65,10 +66,10 @@ protected:
     bool    m_FlipZ;
 
     template< class TPixelType >
-    TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<double, 8>& interpWeights){
+    TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){
       // transform physical point to index coordinates
       itk::Index<3> idx;
-      itk::ContinuousIndex< double, 3> cIdx;
+      itk::ContinuousIndex< float, 3> cIdx;
       image->TransformPhysicalPointToIndex(itkP, idx);
       image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
@@ -80,9 +81,9 @@ protected:
       else
         return pix;
 
-      double frac_x = cIdx[0] - idx[0];
-      double frac_y = cIdx[1] - idx[1];
-      double frac_z = cIdx[2] - idx[2];
+      float frac_x = cIdx[0] - idx[0];
+      float frac_y = cIdx[1] - idx[1];
+      float frac_z = cIdx[2] - idx[2];
       if (frac_x<0)
       {
         idx[0] -= 1;
@@ -151,7 +152,7 @@ protected:
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate){
       // transform physical point to index coordinates
       itk::Index<3> idx;
-      itk::ContinuousIndex< double, 3> cIdx;
+      itk::ContinuousIndex< float, 3> cIdx;
       image->TransformPhysicalPointToIndex(itkP, idx);
       image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
@@ -165,9 +166,9 @@ protected:
       else
         return pix;
 
-      double frac_x = cIdx[0] - idx[0];
-      double frac_y = cIdx[1] - idx[1];
-      double frac_z = cIdx[2] - idx[2];
+      float frac_x = cIdx[0] - idx[0];
+      float frac_y = cIdx[1] - idx[1];
+      float frac_z = cIdx[2] - idx[2];
       if (frac_x<0)
       {
         idx[0] -= 1;
@@ -193,7 +194,7 @@ protected:
           idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
       {
         // trilinear interpolation
-        vnl_vector_fixed<double, 8> interpWeights;
+        vnl_vector_fixed<float, 8> interpWeights;
         interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
         interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
         interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);

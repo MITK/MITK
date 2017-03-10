@@ -133,7 +133,7 @@ public:
     mitk::FiberBundle::Pointer GetDeepCopy();
 
     // compare fiber bundles
-    bool Equals(FiberBundle* fib, double eps=0.0001);
+    bool Equals(FiberBundle* fib, double eps=0.01);
 
     itkSetMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )
     itkGetConstMacro( ReferenceGeometry, mitk::BaseGeometry::Pointer )

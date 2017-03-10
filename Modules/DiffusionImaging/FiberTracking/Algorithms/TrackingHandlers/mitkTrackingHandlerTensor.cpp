@@ -81,7 +81,7 @@ void TrackingHandlerTensor::InitForTracking()
                 for (int i=0; i<m_NumberOfInputs; i++)
                 {
                     typename ItkTensorImageType::PixelType tensor = m_TensorImages.at(i)->GetPixel(index);
-                    vnl_vector_fixed<double,3> dir;
+                    vnl_vector_fixed<float,3> dir;
                     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
                     dir[0] = eigenvectors(2, 0);
                     dir[1] = eigenvectors(2, 1);
@@ -100,9 +100,9 @@ void TrackingHandlerTensor::InitForTracking()
             }
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<double,3>& oldDir, int& image_num)
+vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num)
 {
-  vnl_vector_fixed<double,3> out_dir; out_dir.fill(0);
+  vnl_vector_fixed<float,3> out_dir; out_dir.fill(0);
   float angle = 0;
   float mag = oldDir.magnitude();
   if (mag<mitk::eps)
@@ -131,7 +131,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetMatchingDirection(itk::Inde
   {
     for (int i=0; i<m_PdImage.size(); i++)
     {
-      vnl_vector_fixed<double,3> dir = m_PdImage.at(i)->GetPixel(idx);
+      vnl_vector_fixed<float,3> dir = m_PdImage.at(i)->GetPixel(idx);
       if (m_FlipX)
           out_dir[0] *= -1;
       if (m_FlipY)
@@ -156,15 +156,15 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetMatchingDirection(itk::Inde
   return out_dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<double,3> oldDir, TensorType& tensor)
+vnl_vector_fixed<float,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<float,3> oldDir, TensorType& tensor)
 {
     // transform physical point to index coordinates
     itk::Index<3> idx;
-    itk::ContinuousIndex< double, 3> cIdx;
+    itk::ContinuousIndex< float, 3> cIdx;
     m_FaImage->TransformPhysicalPointToIndex(itkP, idx);
     m_FaImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
-    vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+    vnl_vector_fixed<float,3> dir; dir.fill(0.0);
     if ( !m_FaImage->GetLargestPossibleRegion().IsInside(idx) )
         return dir;
 
@@ -177,9 +177,9 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetDirection(itk::Point<float,
     }
     else
     {
-        double frac_x = cIdx[0] - idx[0];
-        double frac_y = cIdx[1] - idx[1];
-        double frac_z = cIdx[2] - idx[2];
+        float frac_x = cIdx[0] - idx[0];
+        float frac_y = cIdx[1] - idx[1];
+        float frac_z = cIdx[2] - idx[2];
         if (frac_x<0)
         {
             idx[0] -= 1;
@@ -205,7 +205,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetDirection(itk::Point<float,
                 idx[2] >= 0 && idx[2] < m_FaImage->GetLargestPossibleRegion().GetSize(2)-1)
         {
             // trilinear interpolation
-            vnl_vector_fixed<double, 8> interpWeights;
+            vnl_vector_fixed<float, 8> interpWeights;
             interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
             interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
             interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
@@ -259,9 +259,9 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetDirection(itk::Point<float,
     return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::GetLargestEigenvector(TensorType& tensor)
+vnl_vector_fixed<float,3> TrackingHandlerTensor::GetLargestEigenvector(TensorType& tensor)
 {
-    vnl_vector_fixed<double,3> dir;
+    vnl_vector_fixed<float,3> dir;
     typename TensorType::EigenValuesArrayType eigenvalues;
     typename TensorType::EigenVectorsMatrixType eigenvectors;
     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
@@ -282,9 +282,9 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::GetLargestEigenvector(TensorTy
     return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex)
+vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
-    vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
+    vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);
     TensorType tensor; tensor.Fill(0);
 
     try
@@ -296,7 +296,7 @@ vnl_vector_fixed<double,3> TrackingHandlerTensor::ProposeDirection(itk::Point<do
         if (fa<m_FaThreshold)
             return output_direction;
 
-        vnl_vector_fixed<double,3> oldDir = olddirs.back();
+        vnl_vector_fixed<float,3> oldDir = olddirs.back();
         float old_mag = oldDir.magnitude();
 
         if (!m_Interpolate && oldIndex==index)

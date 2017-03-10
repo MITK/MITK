@@ -25,7 +25,7 @@ namespace mitk
 {
 
 /**
-* \brief  */
+* \brief Enables deterministic streamline tracking on MRtrix style peak images (4D float images) */
 
 class MITKFIBERTRACKING_EXPORT TrackingHandlerPeaks : public TrackingDataHandler
 {
@@ -39,7 +39,7 @@ public:
 
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
     void SetPeakThreshold(float thr){ m_PeakThreshold = thr; }
     void SetPeakImage( PeakImgType::Pointer image ){ m_PeakImage = image; }
@@ -51,9 +51,9 @@ public:
 
 protected:
 
-    vnl_vector_fixed<double,3> GetDirection(itk::Point<float, 3> itkP, bool interpolate, vnl_vector_fixed<double,3> oldDir);
-    vnl_vector_fixed<double,3> GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<double,3>& oldDir);
-    vnl_vector_fixed<double,3> GetDirection(itk::Index<3> idx3, int dirIdx);
+    vnl_vector_fixed<float,3> GetDirection(itk::Point<float, 3> itkP, bool interpolate, vnl_vector_fixed<float,3> oldDir);
+    vnl_vector_fixed<float,3> GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir);
+    vnl_vector_fixed<float,3> GetDirection(itk::Index<3> idx3, int dirIdx);
 
     PeakImgType::Pointer m_PeakImage;
     float m_PeakThreshold;

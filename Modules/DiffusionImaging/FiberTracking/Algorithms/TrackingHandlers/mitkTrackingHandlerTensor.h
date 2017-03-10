@@ -25,7 +25,7 @@ namespace mitk
 {
 
 /**
-* \brief  */
+* \brief Enables streamline tracking on tensor images. Supports multi tensor tracking by adding multiple tensor images. */
 
 class MITKFIBERTRACKING_EXPORT TrackingHandlerTensor : public TrackingDataHandler
 {
@@ -37,11 +37,11 @@ public:
 
     typedef itk::DiffusionTensor3D<float>    TensorType;
     typedef itk::Image< TensorType, 3 > ItkTensorImageType;
-    typedef itk::Image< vnl_vector_fixed<double,3>, 3>  ItkPDImgType;
+    typedef itk::Image< vnl_vector_fixed<float,3>, 3>  ItkPDImgType;
 
 
     void InitForTracking();     ///< calls InputDataValidForTracking() and creates feature images
-    vnl_vector_fixed<double,3> ProposeDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
+    vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex);  ///< predicts next progression direction at the given position
 
     void SetF(float f){ m_F = f; }
     void SetG(float g){ m_G = g; }
@@ -59,9 +59,9 @@ public:
 
 protected:
 
-    vnl_vector_fixed<double,3> GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<double,3>& oldDir, int& image_num);
-    vnl_vector_fixed<double,3> GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<double,3> oldDir, TensorType& tensor);
-    vnl_vector_fixed<double,3> GetLargestEigenvector(TensorType& tensor);
+    vnl_vector_fixed<float,3> GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num);
+    vnl_vector_fixed<float,3> GetDirection(itk::Point<float, 3> itkP, vnl_vector_fixed<float,3> oldDir, TensorType& tensor);
+    vnl_vector_fixed<float,3> GetLargestEigenvector(TensorType& tensor);
 
     float   m_FaThreshold;
     float   m_F;

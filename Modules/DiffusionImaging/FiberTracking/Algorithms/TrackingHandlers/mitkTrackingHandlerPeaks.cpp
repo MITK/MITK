@@ -33,7 +33,7 @@ void TrackingHandlerPeaks::InitForTracking()
 {
   MITK_INFO << "Initializing peak tracker.";
 
-  itk::Vector<float, 4> spacing4 = m_PeakImage->GetSpacing();
+  itk::Vector<double, 4> spacing4 = m_PeakImage->GetSpacing();
   itk::Point<float, 4> origin4 = m_PeakImage->GetOrigin();
   itk::Matrix<double, 4, 4> direction4 = m_PeakImage->GetDirection();
   itk::ImageRegion<4> imageRegion4 = m_PeakImage->GetLargestPossibleRegion();
@@ -59,9 +59,9 @@ void TrackingHandlerPeaks::InitForTracking()
   m_NumDirs = imageRegion4.GetSize(3)/3;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<double,3>& oldDir)
+vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<3> idx3, vnl_vector_fixed<float,3>& oldDir)
 {
-  vnl_vector_fixed<double,3> out_dir; out_dir.fill(0);
+  vnl_vector_fixed<float,3> out_dir; out_dir.fill(0);
   float angle = 0;
   float mag = oldDir.magnitude();
   if (mag<mitk::eps)
@@ -82,7 +82,7 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index
   {
     for (int i=0; i<m_NumDirs; i++)
     {
-      vnl_vector_fixed<double,3> dir = GetDirection(idx3, i);
+      vnl_vector_fixed<float,3> dir = GetDirection(idx3, i);
       mag = dir.magnitude();
       if (mag>mitk::eps)
         dir.normalize();
@@ -103,9 +103,9 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index
   return out_dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3, int dirIdx)
+vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3, int dirIdx)
 {
-  vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+  vnl_vector_fixed<float,3> dir; dir.fill(0.0);
   if ( !m_DummyImage->GetLargestPossibleRegion().IsInside(idx3) )
     return dir;
 
@@ -130,22 +130,22 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3
   return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3> itkP, bool interpolate, vnl_vector_fixed<double,3> oldDir){
+vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3> itkP, bool interpolate, vnl_vector_fixed<float,3> oldDir){
   // transform physical point to index coordinates
   itk::Index<3> idx3;
-  itk::ContinuousIndex< double, 3> cIdx;
+  itk::ContinuousIndex< float, 3> cIdx;
   m_DummyImage->TransformPhysicalPointToIndex(itkP, idx3);
   m_DummyImage->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
-  vnl_vector_fixed<double,3> dir; dir.fill(0.0);
+  vnl_vector_fixed<float,3> dir; dir.fill(0.0);
   if ( !m_DummyImage->GetLargestPossibleRegion().IsInside(idx3) )
     return dir;
 
   if (interpolate)
   {
-    double frac_x = cIdx[0] - idx3[0];
-    double frac_y = cIdx[1] - idx3[1];
-    double frac_z = cIdx[2] - idx3[2];
+    float frac_x = cIdx[0] - idx3[0];
+    float frac_y = cIdx[1] - idx3[1];
+    float frac_z = cIdx[2] - idx3[2];
     if (frac_x<0)
     {
       idx3[0] -= 1;
@@ -171,7 +171,7 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 
         idx3[2] >= 0 && idx3[2] < m_DummyImage->GetLargestPossibleRegion().GetSize(2)-1)
     {
       // trilinear interpolation
-      vnl_vector_fixed<double, 8> interpWeights;
+      vnl_vector_fixed<float, 8> interpWeights;
       interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
       interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
       interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
@@ -211,15 +211,15 @@ vnl_vector_fixed<double,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 
   return dir;
 }
 
-vnl_vector_fixed<double,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<double, 3>& pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3>& oldIndex)
+vnl_vector_fixed<float,3> TrackingHandlerPeaks::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
     // CHECK: wann wird wo normalisiert
-  vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
+  vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);
 
   itk::Index<3> index;
   m_DummyImage->TransformPhysicalPointToIndex(pos, index);
 
-  vnl_vector_fixed<double,3> oldDir = olddirs.back();
+  vnl_vector_fixed<float,3> oldDir = olddirs.back();
   float old_mag = oldDir.magnitude();
 
   if (!m_Interpolate && oldIndex==index)

@@ -79,7 +79,7 @@ void StreamlineTrackingFilter::BeforeTracking()
 
     itk::Vector< float, 3 > imageSpacing = m_TrackingHandler->GetSpacing();
 
-    double minSpacing;
+    float minSpacing;
     if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
         minSpacing = imageSpacing[0];
     else if (imageSpacing[1] < imageSpacing[2])
@@ -182,8 +182,8 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
         ImageRegionConstIterator< ItkUcharImgType > it(m_FourTTImage, m_FourTTImage->GetLargestPossibleRegion() );
         it.GoToBegin();
 
-        vnl_vector_fixed<double,3> d1; d1.fill(0.0);
-        std::deque< vnl_vector_fixed<double,3> > olddirs;
+        vnl_vector_fixed<float,3> d1; d1.fill(0.0);
+        std::deque< vnl_vector_fixed<float,3> > olddirs;
         while (olddirs.size()<m_NumPreviousDirections)
             olddirs.push_back(d1);
 
@@ -192,10 +192,10 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
             if (it.Value()==m_GmLabel)
             {
                 typename ItkUcharImgType::IndexType s_idx = it.GetIndex();
-                itk::ContinuousIndex<double, 3> start;
+                itk::ContinuousIndex<float, 3> start;
                 m_FourTTImage->TransformIndexToPhysicalPoint(s_idx, start);
-                itk::Point<double, 3> wm_p;
-                double max = -1;
+                itk::Point<float, 3> wm_p;
+                float max = -1;
                 FiberType fib;
 
                 for (int x : {-1,0,1})
@@ -213,7 +213,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
                             if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=m_WmLabel )
                                 continue;
 
-                            itk::ContinuousIndex<double, 3> end;
+                            itk::ContinuousIndex<float, 3> end;
                             m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
 
                             d1 = m_TrackingHandler->ProposeDirection(end, olddirs, s_idx);
@@ -221,12 +221,12 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
                                 continue;
                             d1.normalize();
 
-                            vnl_vector_fixed< double, 3 > d2;
+                            vnl_vector_fixed< float, 3 > d2;
                             d2[0] = end[0] - start[0];
                             d2[1] = end[1] - start[1];
                             d2[2] = end[2] - start[2];
                             d2.normalize();
-                            double a = fabs(dot_product(d1,d2));
+                            float a = fabs(dot_product(d1,d2));
                             if (a>max)
                             {
                                 max = a;
@@ -248,7 +248,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
 }
 
 
-void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double, 3>& dir)
+void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float, 3>& dir)
 {
     pos[0] += dir[0]*m_StepSize;
     pos[1] += dir[1]*m_StepSize;
@@ -257,7 +257,7 @@ void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<double, 3>& pos, 
 
 
 bool StreamlineTrackingFilter
-::IsValidPosition(itk::Point<double, 3> &pos)
+::IsValidPosition(itk::Point<float, 3> &pos)
 {
     typename ItkUcharImgType::IndexType idx;
     m_MaskImage->TransformPhysicalPointToIndex(pos, idx);
@@ -268,24 +268,24 @@ bool StreamlineTrackingFilter
 }
 
 
-double StreamlineTrackingFilter::GetRandDouble(double min, double max)
+float StreamlineTrackingFilter::GetRandDouble(float min, float max)
 {
-    return (double)(rand()%((int)(10000*(max-min))) + 10000*min)/10000;
+    return (float)(rand()%((int)(10000*(max-min))) + 10000*min)/10000;
 }
 
 
-std::vector< vnl_vector_fixed<double,3> > StreamlineTrackingFilter::CreateDirections(int NPoints)
+std::vector< vnl_vector_fixed<float,3> > StreamlineTrackingFilter::CreateDirections(int NPoints)
 {
-    std::vector< vnl_vector_fixed<double,3> > pointshell;
+    std::vector< vnl_vector_fixed<float,3> > pointshell;
 
     if (NPoints<2)
         return pointshell;
 
-    std::vector< double > theta; theta.resize(NPoints);
+    std::vector< float > theta; theta.resize(NPoints);
 
-    std::vector< double > phi; phi.resize(NPoints);
+    std::vector< float > phi; phi.resize(NPoints);
 
-    double C = sqrt(4*M_PI);
+    float C = sqrt(4*M_PI);
 
     phi[0] = 0.0;
     phi[NPoints-1] = 0.0;
@@ -303,7 +303,7 @@ std::vector< vnl_vector_fixed<double,3> > StreamlineTrackingFilter::CreateDirect
 
     for(int i=0; i<NPoints; i++)
     {
-        vnl_vector_fixed<double,3> d;
+        vnl_vector_fixed<float,3> d;
         d[0] = cos(theta[i]) * cos(phi[i]);
         d[1] = cos(theta[i]) * sin(phi[i]);
         d[2] = sin(theta[i]);
@@ -314,14 +314,14 @@ std::vector< vnl_vector_fixed<double,3> > StreamlineTrackingFilter::CreateDirect
 }
 
 
-vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<double, 3> &pos, std::deque<vnl_vector_fixed<double, 3> >& olddirs, itk::Index<3> &oldIndex)
+vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<float, 3> &pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3> &oldIndex)
 {
     if (m_DemoMode)
     {
         m_SamplingPointset->Clear();
         m_AlternativePointset->Clear();
     }
-    vnl_vector_fixed<double,3> direction; direction.fill(0);
+    vnl_vector_fixed<float,3> direction; direction.fill(0);
 
     ItkUcharImgType::IndexType idx;
     m_MaskImage->TransformPhysicalPointToIndex(pos, idx);
@@ -335,15 +335,15 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
     else
         return direction;
 
-    vnl_vector_fixed<double,3> olddir = olddirs.back();
-    std::vector< vnl_vector_fixed<double,3> > probeVecs = CreateDirections(m_NumberOfSamples);
-    itk::Point<double, 3> sample_pos;
+    vnl_vector_fixed<float,3> olddir = olddirs.back();
+    std::vector< vnl_vector_fixed<float,3> > probeVecs = CreateDirections(m_NumberOfSamples);
+    itk::Point<float, 3> sample_pos;
     int alternatives = 1;
     int stop_votes = 0;
     int possible_stop_votes = 0;
     for (int i=0; i<probeVecs.size(); i++)
     {
-        vnl_vector_fixed<double,3> d;
+        vnl_vector_fixed<float,3> d;
         bool is_stop_voter = false;
         if (m_RandomSampling)
         {
@@ -356,7 +356,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
         else
         {
             d = probeVecs.at(i);
-            double dot = dot_product(d, olddir);
+            float dot = dot_product(d, olddir);
             if (m_UseStopVotes && dot>0.7)
             {
                 is_stop_voter = true;
@@ -373,7 +373,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
         if(m_DemoMode)
             m_SamplingPointset->InsertPoint(i, sample_pos);
 
-        vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
+        vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
             tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
         if (tempDir.magnitude()>mitk::eps)
@@ -385,7 +385,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
             if (is_stop_voter)
                 stop_votes++;
 
-            double dot = dot_product(d, olddir);
+            float dot = dot_product(d, olddir);
             if (dot >= 0.0) // in front of plane defined by pos and olddir
                 d = -d + 2*dot*olddir; // reflect
             else
@@ -398,7 +398,7 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
             if(m_DemoMode)
                 m_AlternativePointset->InsertPoint(alternatives, sample_pos);
             alternatives++;
-            vnl_vector_fixed<double,3> tempDir; tempDir.fill(0.0);
+            vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
                 tempDir = m_TrackingHandler->ProposeDirection(sample_pos, olddirs, oldIndex); // sample neighborhood
 
@@ -421,10 +421,10 @@ vnl_vector_fixed<double,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<
 }
 
 
-double StreamlineTrackingFilter::FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front)
+float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front)
 {
-    vnl_vector_fixed<double,3> zero_dir; zero_dir.fill(0.0);
-    std::deque< vnl_vector_fixed<double,3> > last_dirs;
+    vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
+    std::deque< vnl_vector_fixed<float,3> > last_dirs;
     for (int i=0; i<m_NumPreviousDirections-1; i++)
         last_dirs.push_back(zero_dir);
 
@@ -500,22 +500,22 @@ double StreamlineTrackingFilter::FollowStreamline(itk::Point<double, 3> pos, vnl
 
 int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 {
-    double m_Distance = 5;
+    float m_Distance = 5;
     if (fib->size()<3)
         return 0;
 
-    double dist = 0;
+    float dist = 0;
     std::vector< vnl_vector_fixed< float, 3 > > vectors;
     vnl_vector_fixed< float, 3 > meanV; meanV.fill(0);
-    double dev = 0;
+    float dev = 0;
 
     if (front)
     {
         int c=0;
         while(dist<m_Distance && c<fib->size()-1)
         {
-            itk::Point<double> p1 = fib->at(c);
-            itk::Point<double> p2 = fib->at(c+1);
+            itk::Point<float> p1 = fib->at(c);
+            itk::Point<float> p2 = fib->at(c+1);
 
             vnl_vector_fixed< float, 3 > v;
             v[0] = p2[0]-p1[0];
@@ -534,8 +534,8 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
         int c=fib->size()-1;
         while(dist<m_Distance && c>0)
         {
-            itk::Point<double> p1 = fib->at(c);
-            itk::Point<double> p2 = fib->at(c-1);
+            itk::Point<float> p1 = fib->at(c);
+            itk::Point<float> p2 = fib->at(c-1);
 
             vnl_vector_fixed< float, 3 > v;
             v[0] = p2[0]-p1[0];
@@ -553,7 +553,7 @@ int StreamlineTrackingFilter::CheckCurvature(FiberType* fib, bool front)
 
     for (int c=0; c<vectors.size(); c++)
     {
-        double angle = dot_product(meanV, vectors.at(c));
+        float angle = dot_product(meanV, vectors.at(c));
         if (angle>1.0)
             angle = 1.0;
         if (angle<-1.0)
@@ -574,7 +574,7 @@ void StreamlineTrackingFilter::GenerateData()
 {
     this->BeforeTracking();
 
-    std::vector< itk::Point<double> > seedpoints;
+    std::vector< itk::Point<float> > seedpoints;
 
     if (m_GmStubs.empty())
     {
@@ -596,7 +596,7 @@ void StreamlineTrackingFilter::GenerateData()
             for (int s=0; s<m_SeedsPerVoxel; s++)
             {
                 typename ItkUcharImgType::IndexType index = sit.GetIndex();
-                itk::ContinuousIndex<double, 3> start;
+                itk::ContinuousIndex<float, 3> start;
 
                 if (m_SeedsPerVoxel>1)
                 {
@@ -611,7 +611,7 @@ void StreamlineTrackingFilter::GenerateData()
                     start[2] = index[2];
                 }
 
-                itk::Point<double> worldPos;
+                itk::Point<float> worldPos;
                 m_SeedImage->TransformContinuousIndexToPhysicalPoint( start, worldPos );
                 seedpoints.push_back(worldPos);
             }
@@ -637,18 +637,18 @@ void StreamlineTrackingFilter::GenerateData()
             std::cout << progress << '/' << num_seeds << '\r';
             cout.flush();
         }
-        itk::Point<double> worldPos = seedpoints.at(i);
+        itk::Point<float> worldPos = seedpoints.at(i);
         FiberType fib;
-        double tractLength = 0;
+        float tractLength = 0;
         unsigned int counter = 0;
 
         // get starting direction
-        vnl_vector_fixed<double,3> dir; dir.fill(0.0);
-        std::deque< vnl_vector_fixed<double,3> > olddirs;
+        vnl_vector_fixed<float,3> dir; dir.fill(0.0);
+        std::deque< vnl_vector_fixed<float,3> > olddirs;
         while (olddirs.size()<m_NumPreviousDirections)
             olddirs.push_back(dir); // start without old directions (only zero directions)
 
-        vnl_vector_fixed< double, 3 > gm_start_dir;
+        vnl_vector_fixed< float, 3 > gm_start_dir;
         if (!m_GmStubs.empty())
         {
             gm_start_dir[0] = m_GmStubs[i][1][0] - m_GmStubs[i][0][0];
@@ -666,7 +666,7 @@ void StreamlineTrackingFilter::GenerateData()
         {
             if (!m_GmStubs.empty())
             {
-                double a = dot_product(gm_start_dir, dir);
+                float a = dot_product(gm_start_dir, dir);
                 if (a<0)
                     dir = -dir;
             }
@@ -728,7 +728,7 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
     }
 
     // get fiber direction at end point
-    vnl_vector_fixed< double, 3 > d1;
+    vnl_vector_fixed< float, 3 > d1;
     d1[0] = fib->back()[0] - fib->at(fib->size()-2)[0];
     d1[1] = fib->back()[1] - fib->at(fib->size()-2)[1];
     d1[2] = fib->back()[2] - fib->at(fib->size()-2)[2];
@@ -737,8 +737,8 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
     // find closest gray matter voxel
     typename ItkUcharImgType::IndexType s_idx;
     m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), s_idx);
-    itk::Point<double> gm_endp;
-    double max = -1;
+    itk::Point<float> gm_endp;
+    float max = -1;
 
     for (int x : {-1,0,1})
         for (int y : {-1,0,1})
@@ -755,14 +755,14 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
                 if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=m_GmLabel )
                     continue;
 
-                itk::ContinuousIndex<double, 3> end;
+                itk::ContinuousIndex<float, 3> end;
                 m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
-                vnl_vector_fixed< double, 3 > d2;
+                vnl_vector_fixed< float, 3 > d2;
                 d2[0] = end[0] - fib->back()[0];
                 d2[1] = end[1] - fib->back()[1];
                 d2[2] = end[2] - fib->back()[2];
                 d2.normalize();
-                double a = dot_product(d1,d2);
+                float a = dot_product(d1,d2);
                 if (a>max)
                 {
                     max = a;

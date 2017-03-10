@@ -63,7 +63,7 @@ public:
     typedef itk::Image<float, 3>                        ItkFloatImgType;
     typedef vtkSmartPointer< vtkPolyData >              PolyDataType;
 
-    typedef std::deque< itk::Point<double> > FiberType;
+    typedef std::deque< itk::Point<float> > FiberType;
     typedef std::vector< FiberType > BundleType;
 
     volatile bool    m_PauseTracking;
@@ -91,7 +91,7 @@ public:
 
     itkSetMacro( UseStopVotes, bool )                   ///< Frontal sampling points can vote for stopping the streamline even if the remaining sampling points keep pushing
     itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
-    itkSetMacro( DeflectionMod, double )                ///< Deflection distance modifier
+    itkSetMacro( DeflectionMod, float )                ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
     itkSetMacro( SeedOnlyGm, bool )
@@ -120,13 +120,13 @@ protected:
     void InitGrayMatterEndings();
     void CheckFiberForGmEnding(FiberType* fib);
 
-    void CalculateNewPosition(itk::Point<double, 3>& pos, vnl_vector_fixed<double,3>& dir);    ///< Calculate next integration step.
-    double FollowStreamline(itk::Point<double, 3> pos, vnl_vector_fixed<double,3> dir, FiberType* fib, double tractLength, bool front);       ///< Start streamline in one direction.
-    bool IsValidPosition(itk::Point<double, 3>& pos);   ///< Are we outside of the mask image?
-    vnl_vector_fixed<double,3> GetNewDirection(itk::Point<double, 3>& pos, std::deque< vnl_vector_fixed<double,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
+    void CalculateNewPosition(itk::Point<float, 3>& pos, vnl_vector_fixed<float,3>& dir);    ///< Calculate next integration step.
+    float FollowStreamline(itk::Point<float, 3> pos, vnl_vector_fixed<float,3> dir, FiberType* fib, float tractLength, bool front);       ///< Start streamline in one direction.
+    bool IsValidPosition(itk::Point<float, 3>& pos);   ///< Are we outside of the mask image?
+    vnl_vector_fixed<float,3> GetNewDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex); ///< Determine new direction by sample voting at the current position taking the last progression direction into account.
 
-    double GetRandDouble(double min=-1, double max=1);
-    std::vector< vnl_vector_fixed<double,3> > CreateDirections(int NPoints);
+    float GetRandDouble(float min=-1, float max=1);
+    std::vector< vnl_vector_fixed<float,3> > CreateDirections(int NPoints);
 
     void BeforeTracking();
     void AfterTracking();
@@ -149,7 +149,7 @@ protected:
     int                                 m_SeedsPerVoxel;
     bool                                m_RandomSampling;
     float                               m_SamplingDistance;
-    double                              m_DeflectionMod;
+    float                              m_DeflectionMod;
     bool                                m_OnlyForwardSamples;
     bool                                m_UseStopVotes;
     unsigned int                        m_NumberOfSamples;

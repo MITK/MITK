@@ -142,7 +142,7 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
         mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(directions);
-        node->SetName((name+"_vectorfield").toStdString().c_str());
+        node->SetName((name+"_VECTOR_FIELD").toStdString().c_str());
         node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
         node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
         node->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 1.0f));
@@ -158,30 +158,25 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
 
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(mitkImage);
-        node->SetName((name+"_numdirections").toStdString().c_str());
+        node->SetName((name+"_NUM_DIRECTIONS").toStdString().c_str());
         GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
     }
 
     if (m_Controls->m_DirectionImagesBox->isChecked())
     {
-        ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
-        for (unsigned int i=0; i<directionImageContainer->Size(); i++)
-        {
-            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+        itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
 
-            if (itkImg.IsNull())
-                return;
+        if (itkImg.IsNull())
+            return;
 
-            mitk::Image::Pointer mitkImage = mitk::Image::New();
-            mitkImage->InitializeByItk( itkImg.GetPointer() );
-            mitkImage->SetVolume( itkImg->GetBufferPointer() );
+        mitk::Image::Pointer mitkImage = mitk::Image::New();
+        mitkImage->InitializeByItk( itkImg.GetPointer() );
+        mitkImage->SetVolume( itkImg->GetBufferPointer() );
 
-            mitk::DataNode::Pointer node = mitk::DataNode::New();
-            node->SetData(mitkImage);
-            node->SetName( (name+"_direction_"+boost::lexical_cast<std::string>(i).c_str()).toStdString().c_str());
-            node->SetVisibility(false);
-            GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
-        }
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
+        node->SetData(mitkImage);
+        node->SetName( (name+"_DIRECTIONS").toStdString().c_str());
+        GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
     }
 }
 

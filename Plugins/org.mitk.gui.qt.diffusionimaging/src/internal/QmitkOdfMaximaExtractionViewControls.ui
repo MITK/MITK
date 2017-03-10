@@ -15,229 +15,6 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="5" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Output</string>
-     </property>
-     <layout class="QFormLayout" name="formLayout_2">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
-        <property name="toolTip">
-         <string>Only for visualization purposes! The vectors are automatically corrected for image spacing and for the largest eigenvalue in case of the tensor peak extraction.</string>
-        </property>
-        <property name="text">
-         <string>Vector Field</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
-        <property name="toolTip">
-         <string>Output unsigned char image containing the number of directions per voxel.</string>
-        </property>
-        <property name="text">
-         <string>#Directions per Voxel</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
-        <property name="toolTip">
-         <string>4D image cotaining peak information</string>
-        </property>
-        <property name="text">
-         <string>Direction Image</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="15" column="0">
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="title">
-      <string>Import From Other Tools</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_7">
-      <item row="4" column="0">
-       <widget class="QCommandLinkButton" name="m_ImportShCoeffs">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate Q-Ball image and MITK compatible SH coefficient from other toolkits.</string>
-        </property>
-        <property name="text">
-         <string>Import SH - Coefficients</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="m_InvertX">
-        <property name="toolTip">
-         <string>Only for peak import!</string>
-        </property>
-        <property name="statusTip">
-         <string>Only for peak import!</string>
-        </property>
-        <property name="text">
-         <string>invert x coordinate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCommandLinkButton" name="m_ImportPeaks">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Generate vector field and direction images from the FSL qboot peak extraction output.</string>
-        </property>
-        <property name="text">
-         <string>Import Peak Image</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="m_InvertZ">
-        <property name="toolTip">
-         <string>Only for peak import!</string>
-        </property>
-        <property name="statusTip">
-         <string>Only for peak import!</string>
-        </property>
-        <property name="text">
-         <string>invert z coordinate</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="m_InvertY">
-        <property name="toolTip">
-         <string>Only for peak import!</string>
-        </property>
-        <property name="statusTip">
-         <string>Only for peak import!</string>
-        </property>
-        <property name="text">
-         <string>invert y coordinate</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QCommandLinkButton" name="m_StartTensor">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="toolTip">
-      <string>Extract principal eigenvectors of input tensors.</string>
-     </property>
-     <property name="text">
-      <string>Start Tensor Principal Direction Extraction</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QCommandLinkButton" name="m_GenerateImageButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="toolTip">
-      <string>Extract ODF peaks using a semicontinuous method (Aganj et al. 2010). EXPERIMENTAL!</string>
-     </property>
-     <property name="text">
-      <string>Start Analytical Extraction (only SH order 4)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="m_InputData">
-     <property name="title">
-      <string>Please Select Input Data</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="toolTip">
-         <string>Select a tensor image or a SH coefficient image (generate using Q-Ball reconstruction view).</string>
-        </property>
-        <property name="text">
-         <string>ShCoeff/DTI:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Mask Image:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="m_DwiFibLabel">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="m_MaskLabel">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="16" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>259</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="0">
-    <widget class="QCommandLinkButton" name="m_StartFiniteDiff">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="toolTip">
-      <string>Extract ODF peaks using finite differences on the densely sampled ODF surface.</string>
-     </property>
-     <property name="text">
-      <string>Start Finite Differences Extraction</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Parameters</string>
@@ -513,6 +290,144 @@
     </widget>
    </item>
    <item row="4" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Output</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_OutputVectorFieldBox">
+        <property name="toolTip">
+         <string>Only for visualization purposes! The vectors are automatically corrected for image spacing and for the largest eigenvalue in case of the tensor peak extraction.</string>
+        </property>
+        <property name="text">
+         <string>Vector Field</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="m_OutputNumDirectionsBox">
+        <property name="toolTip">
+         <string>Output unsigned char image containing the number of directions per voxel.</string>
+        </property>
+        <property name="text">
+         <string>#Directions per Voxel</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="m_OutputDirectionImagesBox">
+        <property name="toolTip">
+         <string>4D image cotaining peak information</string>
+        </property>
+        <property name="text">
+         <string>Direction Image</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCommandLinkButton" name="m_StartFiniteDiff">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Extract ODF peaks using finite differences on the densely sampled ODF surface.</string>
+     </property>
+     <property name="text">
+      <string>Start SH Peak Extraction</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0">
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Import From Other Tools</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="4" column="0">
+       <widget class="QCommandLinkButton" name="m_ImportShCoeffs">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate Q-Ball image and MITK compatible SH coefficient from other toolkits.</string>
+        </property>
+        <property name="text">
+         <string>Import SH - Coefficients</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="m_InvertX">
+        <property name="toolTip">
+         <string>Only for peak import!</string>
+        </property>
+        <property name="statusTip">
+         <string>Only for peak import!</string>
+        </property>
+        <property name="text">
+         <string>invert x coordinate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCommandLinkButton" name="m_ImportPeaks">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string>Generate vector field and direction images from the FSL qboot peak extraction output.</string>
+        </property>
+        <property name="text">
+         <string>Import Peak Image</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="m_InvertZ">
+        <property name="toolTip">
+         <string>Only for peak import!</string>
+        </property>
+        <property name="statusTip">
+         <string>Only for peak import!</string>
+        </property>
+        <property name="text">
+         <string>invert z coordinate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="m_InvertY">
+        <property name="toolTip">
+         <string>Only for peak import!</string>
+        </property>
+        <property name="statusTip">
+         <string>Only for peak import!</string>
+        </property>
+        <property name="text">
+         <string>invert y coordinate</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
       <string>Spherical Harmonic Convention</string>
@@ -536,6 +451,78 @@
           <string>MRtrix</string>
          </property>
         </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="15" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>259</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="m_StartTensor">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="toolTip">
+      <string>Extract principal eigenvectors of input tensors.</string>
+     </property>
+     <property name="text">
+      <string>Start Tensor Principal Direction Extraction</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="m_InputData">
+     <property name="title">
+      <string>Please Select Input Data</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="toolTip">
+         <string>Select a tensor image or a SH coefficient image (generate using Q-Ball reconstruction view).</string>
+        </property>
+        <property name="text">
+         <string>ShCoeff/DTI:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Mask Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="m_DwiFibLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;mandatory&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="m_MaskLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#969696;&quot;&gt;optional&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>

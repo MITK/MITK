@@ -540,35 +540,29 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction()
         break;
     }
 
+    //filter->SetNumberOfThreads(1);
     filter->Update();
 
     if (m_Controls->m_OutputDirectionImagesBox->isChecked())
     {
-        typedef typename MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
-        typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
-        for (int i=0; i<container->Size(); i++)
-        {
-            typename MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
-            mitk::Image::Pointer img = mitk::Image::New();
-            img->InitializeByItk( itkImg.GetPointer() );
-            img->SetVolume( itkImg->GetBufferPointer() );
-            DataNode::Pointer node = DataNode::New();
-            node->SetData(img);
-            QString name(m_ImageNodes.at(0)->GetName().c_str());
-            name += "_Direction";
-            name += QString::number(i+1);
-            node->SetName(name.toStdString().c_str());
-            node->SetVisibility(false);
-            GetDataStorage()->Add(node);
-        }
+        typename MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
+        mitk::Image::Pointer img = mitk::Image::New();
+        CastToMitkImage(itkImg, img);
+
+        DataNode::Pointer node = DataNode::New();
+        node->SetData(img);
+        QString name(m_ImageNodes.at(0)->GetName().c_str());
+        name += "_PEAKS";
+        node->SetName(name.toStdString().c_str());
+        GetDataStorage()->Add(node);
     }
 
     if (m_Controls->m_OutputNumDirectionsBox->isChecked())
     {
         ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
         mitk::Image::Pointer image2 = mitk::Image::New();
-        image2->InitializeByItk( numDirImage.GetPointer() );
-        image2->SetVolume( numDirImage->GetBufferPointer() );
+        CastToMitkImage(numDirImage, image2);
+
         DataNode::Pointer node2 = DataNode::New();
         node2->SetData(image2);
         QString name(m_ImageNodes.at(0)->GetName().c_str());

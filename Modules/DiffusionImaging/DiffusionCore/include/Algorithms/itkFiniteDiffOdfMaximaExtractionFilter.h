@@ -34,9 +34,8 @@ namespace itk{
 */
 
 template< class PixelType, int ShOrder, int NrOdfDirections >
-class FiniteDiffOdfMaximaExtractionFilter :
-        public ImageToImageFilter< Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 >,
-Image< Vector< PixelType, 3 >, 3 > >
+class FiniteDiffOdfMaximaExtractionFilter : public ImageToImageFilter< Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 >,
+Image< unsigned char, 3 > >
 {
 
     public:
@@ -56,7 +55,7 @@ Image< Vector< PixelType, 3 >, 3 > >
     typedef SmartPointer<Self>                      Pointer;
     typedef SmartPointer<const Self>                ConstPointer;
     typedef ImageToImageFilter< Image< Vector< PixelType, (ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder >, 3 >,
-            Image< Vector< PixelType, 3 >, 3 > > Superclass;
+            Image< unsigned char, 3 > > Superclass;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -65,19 +64,21 @@ Image< Vector< PixelType, 3 >, 3 > >
     /** Runtime information support. */
     itkTypeMacro(FiniteDiffOdfMaximaExtractionFilter, ImageToImageFilter)
 
-            typedef typename Superclass::InputImageType           CoefficientImageType;
+    typedef typename Superclass::InputImageType           CoefficientImageType;
     typedef typename CoefficientImageType::RegionType     CoefficientImageRegionType;
     typedef typename CoefficientImageType::PixelType      CoefficientPixelType;
 
     typedef typename Superclass::OutputImageType          OutputImageType;
     typedef typename Superclass::OutputImageRegionType    OutputImageRegionType;
 
+    typedef typename Superclass::InputImageRegionType     InputImageRegionType;
+
+    typedef Image< float, 4 >                             PeakImageType;
+
     typedef OrientationDistributionFunction<PixelType, NrOdfDirections>   OdfType;
     typedef itk::Image<unsigned char, 3>                                  ItkUcharImgType;
 
-    typedef vnl_vector_fixed< double, 3 >                                 DirectionType;
-    typedef Image< Vector< float, 3 >, 3>                                 ItkDirectionImage;
-    typedef VectorContainer< unsigned int, ItkDirectionImage::Pointer >   ItkDirectionImageContainer;
+    typedef vnl_vector_fixed< double, 3 >                                  DirectionType;
 
     // input
     itkSetMacro( MaxNumPeaks, unsigned int)                 ///< maximum number of peaks per voxel. if more peaks are detected, only the largest are kept.
@@ -92,9 +93,9 @@ Image< Vector< PixelType, 3 >, 3 > >
     itkSetMacro( FlipZ, bool)                               ///< flip peaks in z direction
 
     // output
+    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer )
+    itkGetMacro( PeakImage, PeakImageType::Pointer )
     itkGetMacro( OutputFiberBundle, mitk::FiberBundle::Pointer)                ///< vector field (peak sizes rescaled for visualization purposes)
-    itkGetMacro( DirectionImageContainer, ItkDirectionImageContainer::Pointer)  ///< container for output peaks
-    itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer)                  ///< number of peaks per voxel
 
     itkSetMacro( Toolkit, Toolkit)  ///< define SH coefficient convention (depends on toolkit)
     itkGetMacro( Toolkit, Toolkit)  ///< SH coefficient convention (depends on toolkit)
@@ -130,12 +131,12 @@ Image< Vector< PixelType, 3 >, 3 > >
     double                                      m_AngularThreshold;     ///< directions closer together than the specified threshold that remain after clustering are discarded (largest is kept) (in rad)
     const int                                   m_NumCoeffs;            ///< number of spherical harmonics coefficients
 
-    mitk::FiberBundle::Pointer                m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
-    ItkDirectionImageContainer::Pointer       m_DirectionImageContainer;///< container for output peaks
-    ItkUcharImgType::Pointer                  m_NumDirectionsImage;     ///< number of peaks per voxel
-    ItkUcharImgType::Pointer                  m_MaskImage;              ///< only voxels inside the binary mask are processed
+    mitk::FiberBundle::Pointer                  m_OutputFiberBundle;      ///< vector field (peak sizes rescaled for visualization purposes)
+    PeakImageType::Pointer                      m_PeakImage;
+    ItkUcharImgType::Pointer                    m_NumDirectionsImage;     ///< number of peaks per voxel
+    ItkUcharImgType::Pointer                    m_MaskImage;              ///< only voxels inside the binary mask are processed
 
-    Toolkit                                   m_Toolkit;
+    Toolkit                                     m_Toolkit;
     bool                                        m_FlipX;
     bool                                        m_FlipY;
     bool                                        m_FlipZ;

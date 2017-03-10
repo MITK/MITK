@@ -43,7 +43,7 @@ public:
     typedef itk::Image<double, 3>         ItkDoubleImgType;
     typedef vnl_vector_fixed< float, 3 >  TrackingDirectionType;
 
-    virtual vnl_vector_fixed<float,3> ProposeDirection(itk::Point<float, 3>& pos, std::deque< vnl_vector_fixed<float,3> >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
+    virtual TrackingDirectionType ProposeDirection(itk::Point<float, 3>& pos, std::deque< TrackingDirectionType >& olddirs, itk::Index<3>& oldIndex) = 0;  ///< predicts next progression direction at the given position
 
     virtual void InitForTracking() = 0;
     virtual itk::Vector<double, 3> GetSpacing() = 0;

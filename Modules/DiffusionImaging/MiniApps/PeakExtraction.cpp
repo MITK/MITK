@@ -263,31 +263,17 @@ int StartPeakExtraction(int argc, char* argv[])
         std::cout << "Starting extraction";
         filter->Update();
 
-        // write direction images
+        // write direction image
         {
-            typedef typename MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
-            typename ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
-            for (unsigned int i=0; i<container->Size(); i++)
-            {
-                typename MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
+            typename MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
+            string outfilename = outRoot;
+            outfilename.append("_PEAKS.nrrd");
 
-                if (itkMaskImage.IsNotNull())
-                {
-                    itkImg->SetDirection(itkMaskImage->GetDirection());
-                    itkImg->SetOrigin(itkMaskImage->GetOrigin());
-                }
-
-                string outfilename = outRoot;
-                outfilename.append("_DIRECTION_");
-                outfilename.append(boost::lexical_cast<string>(i));
-                outfilename.append(".nrrd");
-
-                typedef itk::ImageFileWriter< typename MaximaExtractionFilterType::ItkDirectionImage > WriterType;
-                typename WriterType::Pointer writer = WriterType::New();
-                writer->SetFileName(outfilename);
-                writer->SetInput(itkImg);
-                writer->Update();
-            }
+            typedef itk::ImageFileWriter< typename MaximaExtractionFilterType::PeakImageType > WriterType;
+            typename WriterType::Pointer writer = WriterType::New();
+            writer->SetFileName(outfilename);
+            writer->SetInput(itkImg);
+            writer->Update();
         }
 
         // write num directions image
@@ -301,7 +287,7 @@ int StartPeakExtraction(int argc, char* argv[])
             }
 
             string outfilename = outRoot.c_str();
-            outfilename.append("_NUM_DIRECTIONS.nrrd");
+            outfilename.append("_NUM_PEAKS.nrrd");
             typedef itk::ImageFileWriter< ItkUcharImgType > WriterType;
             WriterType::Pointer writer = WriterType::New();
             writer->SetFileName(outfilename);

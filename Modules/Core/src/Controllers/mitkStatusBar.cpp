@@ -79,9 +79,9 @@ namespace mitk
                             << std::fixed << point[1] << ", "
                             << std::fixed << point[2] << "> mm; ";
 
-    stream << "Index: <" << index[0] << ", "
-                         << index[1] << ", "
-                         << index[2] << "> ; ";
+    stream << "Index: <" << index[0] + 1 << ", "
+                         << index[1] + 1 << ", "
+                         << index[2] + 1 << "> ; ";
 
     stream << "Time: " << time << " ms";
   }

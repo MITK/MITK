@@ -333,7 +333,7 @@ bool HelpWebView::handleForwardBackwardMouseButtons(QMouseEvent *e)
 void HelpWebView::setSource(const QUrl &url)
 {
   if (url.toString().trimmed().isEmpty()) {
-    setHtml(m_MissingContextMessage.arg(url.toString()));
+    setHtml(m_MissingContextMessage);
   }
   else if (m_HelpEngine.findFile(url).isValid())
   {

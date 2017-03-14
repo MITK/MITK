@@ -35,6 +35,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
 { _arr[i] = _value; }
 
+mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
+{
+  return m_MetaDataDictionaryArray;
+}
+
+void mitk::Image::SetMetaDataDictionaryArray(mitk::ReaderType::DictionaryArrayType& array)
+{
+  m_MetaDataDictionaryArray = array;
+}
 
 mitk::Image::Image() :
   m_Dimension(0), m_Dimensions(nullptr), m_ImageDescriptor(nullptr), m_OffsetTable(nullptr), m_CompleteData(nullptr),

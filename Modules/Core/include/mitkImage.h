@@ -36,6 +36,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkHistogram.h>
 #endif
 
+#include <itkImage.h>
+#include <itkImageSeriesReader.h>
 
 class vtkImageData;
 
@@ -45,6 +47,9 @@ template<class T> class MutexLockHolder;
 
 namespace mitk {
 
+typedef itk::Image<PixelType, 3> ImageTypeForReader;
+typedef itk::ImageSeriesReader<ImageTypeForReader> ReaderType;
+  
 class SubImageSelector;
 class ImageTimeSelector;
 
@@ -108,6 +113,9 @@ public:
   //## Class is only for internal usage to allow convenient access to all slices over iterators;
   //## See documentation of ImageDataItem for details.
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
+  
+  ReaderType::DictionaryArrayType GetMetaDataDictionaryArray();
+  void SetMetaDataDictionaryArray(ReaderType::DictionaryArrayType& array);
 
 public:
   //##Documentation
@@ -633,6 +641,8 @@ protected:
   mutable ImageDataItemPointerArray m_Volumes;
   mutable ImageDataItemPointerArray m_Slices;
   mutable itk::SimpleFastMutexLock m_ImageDataArraysLock;
+  
+  ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 
   unsigned int m_Dimension;
 

@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkAffineTransform.h>
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkTimeProbesCollectorBase.h>
+#include <itkMetaDataDictionary.h>
 
 #include <limits>
 
@@ -115,6 +116,30 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
   return image;
 }
 
+inline void CopyDictionary(itk::MetaDataDictionary& fromDict, itk::MetaDataDictionary& toDict)
+{
+  typedef itk::MetaDataDictionary DictionaryType;
+  typedef itk::MetaDataObject<std::string> MetaDataStringType;
+
+  DictionaryType::ConstIterator itr = fromDict.Begin();
+  DictionaryType::ConstIterator end = fromDict.End();
+
+  while (itr != end)
+  {
+    itk::MetaDataObjectBase::Pointer  entry = itr->second;
+
+    MetaDataStringType::Pointer entryvalue = dynamic_cast<MetaDataStringType*>(entry.GetPointer());
+    if (entryvalue)
+    {
+      std::string tagkey   = itr->first;
+      std::string tagvalue = entryvalue->GetMetaDataObjectValue();
+      itk::EncapsulateMetaData<std::string>(toDict, tagkey, tagvalue);
+    }
+
+    ++itr;
+  }
+}
+
 template <typename PixelType>
 Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenames, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, Image::Pointer preLoadedImageBlock )
 {
@@ -166,6 +191,24 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", "
                                     << image->GetGeometry()->GetSpacing()[1] << ", "
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
+
+  // Get MetaDataDictionary and copy him to MITK Image
+  mitk::ReaderType::DictionaryArrayRawPointer inputDict = reader->GetMetaDataDictionaryArray();
+  mitk::ReaderType::DictionaryArrayType outputArray;
+
+  outputArray.resize(inputDict->size());
+
+  mitk::ReaderType::DictionaryArrayType::const_iterator iter = inputDict->begin();
+  for (; iter != inputDict->end(); ++iter)
+  {
+    mitk::ReaderType::DictionaryRawPointer dict = new mitk::ReaderType::DictionaryType;
+
+    CopyDictionary(*(*(iter)), *dict);
+
+    outputArray.push_back(dict);
+  }
+
+  image->SetMetaDataDictionaryArray(outputArray);
 
   return image;
 }

@@ -69,18 +69,18 @@ void TrackingHandlerTensor::InitForTracking()
     }
 
     typedef itk::DiffusionTensor3D<float>    TensorType;
-    typename TensorType::EigenValuesArrayType eigenvalues;
-    typename TensorType::EigenVectorsMatrixType eigenvectors;
+    TensorType::EigenValuesArrayType eigenvalues;
+    TensorType::EigenVectorsMatrixType eigenvectors;
 
     for (unsigned int x=0; x<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[0]; x++)
         for (unsigned int y=0; y<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[1]; y++)
             for (unsigned int z=0; z<m_TensorImages.at(0)->GetLargestPossibleRegion().GetSize()[2]; z++)
             {
-                typename ItkTensorImageType::IndexType index;
+                ItkTensorImageType::IndexType index;
                 index[0] = x; index[1] = y; index[2] = z;
                 for (int i=0; i<m_NumberOfInputs; i++)
                 {
-                    typename ItkTensorImageType::PixelType tensor = m_TensorImages.at(i)->GetPixel(index);
+                    ItkTensorImageType::PixelType tensor = m_TensorImages.at(i)->GetPixel(index);
                     vnl_vector_fixed<float,3> dir;
                     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
                     dir[0] = eigenvectors(2, 0);
@@ -262,8 +262,8 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 
 vnl_vector_fixed<float,3> TrackingHandlerTensor::GetLargestEigenvector(TensorType& tensor)
 {
     vnl_vector_fixed<float,3> dir;
-    typename TensorType::EigenValuesArrayType eigenvalues;
-    typename TensorType::EigenVectorsMatrixType eigenvectors;
+    TensorType::EigenValuesArrayType eigenvalues;
+    TensorType::EigenVectorsMatrixType eigenvectors;
     tensor.ComputeEigenAnalysis(eigenvalues, eigenvectors);
     dir[0] = eigenvectors(2, 0);
     dir[1] = eigenvectors(2, 1);

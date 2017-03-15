@@ -77,7 +77,7 @@ void StreamlineTrackingFilter::BeforeTracking()
     m_Points = vtkSmartPointer< vtkPoints >::New();
     m_Cells = vtkSmartPointer< vtkCellArray >::New();
 
-    itk::Vector< float, 3 > imageSpacing = m_TrackingHandler->GetSpacing();
+    itk::Vector< double, 3 > imageSpacing = m_TrackingHandler->GetSpacing();
 
     float minSpacing;
     if(imageSpacing[0]<imageSpacing[1] && imageSpacing[0]<imageSpacing[2])
@@ -191,7 +191,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
         {
             if (it.Value()==m_GmLabel)
             {
-                typename ItkUcharImgType::IndexType s_idx = it.GetIndex();
+                ItkUcharImgType::IndexType s_idx = it.GetIndex();
                 itk::ContinuousIndex<float, 3> start;
                 m_FourTTImage->TransformIndexToPhysicalPoint(s_idx, start);
                 itk::Point<float, 3> wm_p;
@@ -205,7 +205,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
                             if (x==y && y==z)
                                 continue;
 
-                            typename ItkUcharImgType::IndexType e_idx;
+                            ItkUcharImgType::IndexType e_idx;
                             e_idx[0] = s_idx[0] + x;
                             e_idx[1] = s_idx[1] + y;
                             e_idx[2] = s_idx[2] + z;
@@ -259,7 +259,7 @@ void StreamlineTrackingFilter::CalculateNewPosition(itk::Point<float, 3>& pos, v
 bool StreamlineTrackingFilter
 ::IsValidPosition(itk::Point<float, 3> &pos)
 {
-    typename ItkUcharImgType::IndexType idx;
+    ItkUcharImgType::IndexType idx;
     m_MaskImage->TransformPhysicalPointToIndex(pos, idx);
     if (!m_MaskImage->GetLargestPossibleRegion().IsInside(idx) || m_MaskImage->GetPixel(idx)==0)
         return false;
@@ -595,7 +595,7 @@ void StreamlineTrackingFilter::GenerateData()
 
             for (int s=0; s<m_SeedsPerVoxel; s++)
             {
-                typename ItkUcharImgType::IndexType index = sit.GetIndex();
+                ItkUcharImgType::IndexType index = sit.GetIndex();
                 itk::ContinuousIndex<float, 3> start;
 
                 if (m_SeedsPerVoxel>1)
@@ -714,7 +714,7 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
     bool in_wm = false;
     while (!in_wm && fib->size()>2)
     {
-        typename ItkUcharImgType::IndexType idx;
+        ItkUcharImgType::IndexType idx;
         m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), idx);
         if (m_FourTTImage->GetPixel(idx)==m_WmLabel)
             in_wm = true;
@@ -735,7 +735,7 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
     d1.normalize();
 
     // find closest gray matter voxel
-    typename ItkUcharImgType::IndexType s_idx;
+    ItkUcharImgType::IndexType s_idx;
     m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), s_idx);
     itk::Point<float> gm_endp;
     float max = -1;
@@ -747,7 +747,7 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
                 if (x==y && y==z)
                     continue;
 
-                typename ItkUcharImgType::IndexType e_idx;
+                ItkUcharImgType::IndexType e_idx;
                 e_idx[0] = s_idx[0] + x;
                 e_idx[1] = s_idx[1] + y;
                 e_idx[2] = s_idx[2] + z;

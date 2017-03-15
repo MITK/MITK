@@ -21,8 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <algorithm>
 #include <itkImageIOBase.h>
 #include <chrono>
-#include "Algorithms\ITKUltrasound\itkFFT1DComplexConjugateToRealImageFilter.h"
-#include "Algorithms\ITKUltrasound\itkFFT1DRealToComplexConjugateImageFilter.h"
+#include "itkFFT1DComplexConjugateToRealImageFilter.h"
+#include "itkFFT1DRealToComplexConjugateImageFilter.h"
 #include "mitkImageCast.h"
 #include <cmath>
 #include <thread>
@@ -281,10 +281,9 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     return data;
   }
 
-  double singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1));
+  double singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1)) ;
   double BoundHighPass = std::min(m_Conf.BPHighPass / singleVoxel, (double)data->GetDimension(1) / 2);
   double BoundLowPass = std::min(m_Conf.BPLowPass / singleVoxel, (double)data->GetDimension(1) / 2 - BoundHighPass);
-
 
   int center1 = ((- BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundLowPass;
   int center2 = ((- BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundHighPass + data->GetDimension(1) / 2;
@@ -317,9 +316,9 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
   multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
 
-  /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
+  itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
   toReal->SetInput(forwardFFTFilter->GetOutput());
-  return GrabItkImageMemory(addImageFilter->GetOutput()); //toReal->GetOutput());*/  //DEBUG
+  return GrabItkImageMemory(toReal->GetOutput());  //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();

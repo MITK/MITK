@@ -127,7 +127,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
 
   typedef itk::ResampleImageFilter < itkFloatImageType, itkFloatImageType > ResampleImageFilter;
   ResampleImageFilter::Pointer resampleImageFilter = ResampleImageFilter::New();
-  typedef itk::BSplineInterpolateImageFunction<itkFloatImageType, double, double> T_Interpolator;
+  typedef itk::LinearInterpolateImageFunction<itkFloatImageType, double> T_Interpolator;
   itkFloatImageType::Pointer itkImage;
 
   mitk::CastToItkImage(inputImage, itkImage);
@@ -151,7 +151,6 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
   resampleImageFilter->SetSize(outputSizeItk);
   resampleImageFilter->SetOutputSpacing(outputSpacingItk);
   resampleImageFilter->SetTransform(TransformType::New());
-  _pInterpolator->SetSplineOrder(3);
   resampleImageFilter->SetInterpolator(_pInterpolator);
 
   resampleImageFilter->UpdateLargestPossibleRegion();

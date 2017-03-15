@@ -388,21 +388,33 @@
          <item row="3" column="0">
           <widget class="QDoubleSpinBox" name="BPhigh">
            <property name="decimals">
-            <number>3</number>
+            <number>2</number>
+           </property>
+           <property name="maximum">
+            <double>20.000000000000000</double>
            </property>
           </widget>
          </item>
          <item row="4" column="0">
           <widget class="QDoubleSpinBox" name="BPlow">
            <property name="decimals">
-            <number>3</number>
+            <number>2</number>
+           </property>
+           <property name="minimum">
+            <double>10.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>200.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>50.000000000000000</double>
            </property>
           </widget>
          </item>
          <item row="3" column="1">
           <widget class="QLabel" name="BPHighLabel">
            <property name="text">
-            <string>High Pass DMAS BP Frequency [GHz]</string>
+            <string>High Pass DMAS BP Frequency [MHz]</string>
            </property>
           </widget>
          </item>
@@ -416,7 +428,7 @@
          <item row="4" column="1">
           <widget class="QLabel" name="BPLowLabel">
            <property name="text">
-            <string>Low Pass DMAS BP Frequency [GHz]</string>
+            <string>Low Pass DMAS BP Frequency [MHz]</string>
            </property>
           </widget>
          </item>

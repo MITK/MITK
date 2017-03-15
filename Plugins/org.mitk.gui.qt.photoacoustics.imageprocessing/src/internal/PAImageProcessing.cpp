@@ -91,7 +91,7 @@ void PAImageProcessing::UpdateFrequency()
   }
 
   std::stringstream frequency;
-  frequency << 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2;
+  frequency << 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000;
   frequency << "Hz";
   m_Controls.BPInfoDisplay->setText(frequency.str().c_str());
 }
@@ -322,8 +322,8 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DMASconfig.ReconstructionLines = m_Controls.Lines->value();
   DMASconfig.TransducerElements = m_Controls.ElementCount->value();
   DMASconfig.Angle = m_Controls.Angle->value();
-  DMASconfig.BPHighPass = m_Controls.BPhigh->value();
-  DMASconfig.BPLowPass = m_Controls.BPlow->value();
+  DMASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value();
+  DMASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 /1000000 - m_Controls.BPlow->value());
   DMASconfig.BPFalloff = m_Controls.BPFalloff->value();
 
   UpdateRecordTime(image);

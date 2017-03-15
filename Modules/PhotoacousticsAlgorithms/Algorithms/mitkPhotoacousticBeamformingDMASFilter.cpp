@@ -281,7 +281,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
     return data;
   }
 
-  double singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1)) ;
+  double singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1)) / 2 / 1000;
   double BoundHighPass = std::min(m_Conf.BPHighPass / singleVoxel, (double)data->GetDimension(1) / 2);
   double BoundLowPass = std::min(m_Conf.BPLowPass / singleVoxel, (double)data->GetDimension(1) / 2 - BoundHighPass);
 
@@ -291,10 +291,10 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   int width1 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
   int width2 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
 
-  /*
-  MITK_INFO << "frequency " << singleVoxel * data->GetDimension(1) / 2;
+  
+  MITK_INFO << "BHP " << BoundHighPass << " BLP " << BoundLowPass << "BPLP" << m_Conf.BPLowPass;
   MITK_INFO << "center1 " << center1 << " width1 " << width1;
-  MITK_INFO << "center2 " << center2 << " width2 " << width2;*/ //debugging
+  MITK_INFO << "center2 " << center2 << " width2 " << width2; //debugging
 
   RealImageType::Pointer fftMultiplicator1 = BPFunction(data, width1, center1);
   RealImageType::Pointer fftMultiplicator2 = BPFunction(data, width2, center2);
@@ -316,9 +316,9 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   multiplyFilter->SetInput1(forwardFFTFilter->GetOutput());
   multiplyFilter->SetInput2(fftShiftFilter->GetOutput());
 
-  itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
-  toReal->SetInput(forwardFFTFilter->GetOutput());
-  return GrabItkImageMemory(toReal->GetOutput());  //DEBUG
+  /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
+  toReal->SetInput(multiplyFilter->GetOutput());
+  return GrabItkImageMemory(toReal->GetOutput()); */ //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();

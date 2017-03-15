@@ -220,5 +220,7 @@ int main(int argc, char* argv[])
     mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
     mitk::IOUtil::Save(outFib, outFile);
 
+    delete handler;
+
     return EXIT_SUCCESS;
 }

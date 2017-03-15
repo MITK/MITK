@@ -69,6 +69,7 @@ public:
 
     void tearDown() override
     {
+        delete tfh;
         ref = NULL;
     }
 

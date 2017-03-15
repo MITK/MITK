@@ -448,6 +448,9 @@ private:
 
   struct Impl;
 
+  static std::map<std::string, mitk::IFileIO::Options> usedOptions;
+  static std::map<std::string, FileReaderSelector::Item> usedReaderItems;
+  static std::set<SaveInfo> usedSaveInfos;
 };
 
 }

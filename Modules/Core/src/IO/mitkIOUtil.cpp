@@ -659,8 +659,6 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
 
   std::string errMsg;
 
-  std::map<std::string, FileReaderSelector::Item> usedReaderItems;
-
   for(auto & loadInfo : loadInfos)
   {
     std::vector<FileReaderSelector::Item> readers = loadInfo.m_ReaderSelector.Get();
@@ -707,7 +705,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
             callOptionsCallback = false;
             loadInfo.m_ReaderSelector.Select(oldSelectedItemIter->second.GetServiceId());
             loadInfo.m_ReaderSelector.GetSelected().GetReader()->SetOptions(
-                  oldSelectedItemIter->second.GetReader()->GetOptions());
+              usedOptions.at(oldSelectedItemIter->first));
             break;
           }
         }
@@ -724,6 +722,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
         FileReaderSelector::Item selectedItem = loadInfo.m_ReaderSelector.GetSelected();
         usedReaderItems.insert(std::make_pair(selectedItem.GetMimeType().GetName(),
                                               selectedItem));
+        usedOptions.insert(std::make_pair(selectedItem.GetMimeType().GetName(), selectedItem.GetReader()->GetOptions()));
       }
     }
 
@@ -954,8 +953,6 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
   std::string errMsg;
 
-  std::set<SaveInfo> usedSaveInfos;
-
   for (auto & saveInfo : saveInfos)
   {
     const std::string baseDataType = saveInfo.m_BaseData->GetNameOfClass();
@@ -1123,4 +1120,7 @@ IOUtil::LoadInfo::LoadInfo(const std::string& path)
 {
 }
 
+std::map<std::string, mitk::IFileIO::Options> IOUtil::usedOptions;
+std::map<std::string, FileReaderSelector::Item> IOUtil::usedReaderItems;
+std::set<IOUtil::SaveInfo> IOUtil::usedSaveInfos;
 }

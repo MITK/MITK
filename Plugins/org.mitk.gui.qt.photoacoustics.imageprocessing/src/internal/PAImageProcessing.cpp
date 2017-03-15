@@ -315,6 +315,10 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DASconfig.ReconstructionLines = m_Controls.Lines->value();
   DASconfig.TransducerElements = m_Controls.ElementCount->value();
   DASconfig.Angle = m_Controls.Angle->value();
+  DASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value();
+  DASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value());
+  DASconfig.BPFalloff = m_Controls.BPFalloff->value();
+  DASconfig.UseBP = m_Controls.UseBP->isChecked();
 
   DMASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
   DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
@@ -325,6 +329,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DMASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value();
   DMASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 /1000000 - m_Controls.BPlow->value());
   DMASconfig.BPFalloff = m_Controls.BPFalloff->value();
+  DMASconfig.UseBP = m_Controls.UseBP->isChecked();
 
   UpdateRecordTime(image);
 }

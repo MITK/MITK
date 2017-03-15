@@ -45,6 +45,10 @@ namespace mitk {
       DelayCalc DelayCalculationMethod = QuadApprox;
       double Angle = 10;
       bool Photoacoustic = true;
+      double BPHighPass = 50;
+      double BPLowPass = 50;
+      double BPFalloff = 0.2;
+      bool UseBP = false;
     };
 
     void Configure(beamformingSettings settings);
@@ -70,6 +74,9 @@ namespace mitk {
     void DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
     void DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
     void DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+
+    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
+    itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
 
     double* m_OutputData;
     double* m_InputData;

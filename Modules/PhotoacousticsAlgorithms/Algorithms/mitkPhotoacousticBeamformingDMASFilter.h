@@ -48,6 +48,7 @@ namespace mitk {
       double BPHighPass = 50;
       double BPLowPass = 50;
       double BPFalloff = 0.2;
+      bool UseBP = true;
     };
 
     void Configure(beamformingSettings settings);

@@ -236,12 +236,15 @@ void mitk::BeamformingDMASFilter::GenerateData()
     m_InputData = nullptr;
   }
 
-  mitk::Image::Pointer BP = BandpassFilter(output);
-
-  for (int i = 0; i < output->GetDimension(2); ++i)
+  if (m_Conf.UseBP)
   {
-    mitk::ImageReadAccessor copy(BP, BP->GetSliceData(i));
-    output->SetSlice(copy.GetData(), i);
+    mitk::Image::Pointer BP = BandpassFilter(output);
+
+    for (int i = 0; i < output->GetDimension(2); ++i)
+    {
+      mitk::ImageReadAccessor copy(BP, BP->GetSliceData(i));
+      output->SetSlice(copy.GetData(), i);
+    }
   }
 
   m_TimeOfHeaderInitialization.Modified();
@@ -292,9 +295,9 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
   int width2 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
 
   
-  MITK_INFO << "BHP " << BoundHighPass << " BLP " << BoundLowPass << "BPLP" << m_Conf.BPLowPass;
+  /*MITK_INFO << "BHP " << BoundHighPass << " BLP " << BoundLowPass << "BPLP" << m_Conf.BPLowPass;
   MITK_INFO << "center1 " << center1 << " width1 " << width1;
-  MITK_INFO << "center2 " << center2 << " width2 " << width2; //debugging
+  MITK_INFO << "center2 " << center2 << " width2 " << width2;*/ //debugging
 
   RealImageType::Pointer fftMultiplicator1 = BPFunction(data, width1, center1);
   RealImageType::Pointer fftMultiplicator2 = BPFunction(data, width2, center2);

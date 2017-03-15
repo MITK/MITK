@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 
 #include <mitkFiberBundle.h>
-#include <mitkTrackingForestHandler.h>
+#include <mitkTrackingHandlerRandomForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 
     if (shfeatures)
     {
-        mitk::TrackingForestHandler<6,28> forestHandler;
+        mitk::TrackingHandlerRandomForest<6,28> forestHandler;
         forestHandler.SetDwis(rawData);
         forestHandler.SetMaskImages(maskImageVector);
         forestHandler.SetWhiteMatterImages(wmMaskImageVector);
@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        mitk::TrackingForestHandler<6,100> forestHandler;
+        mitk::TrackingHandlerRandomForest<6,100> forestHandler;
         forestHandler.SetDwis(rawData);
         forestHandler.SetMaskImages(maskImageVector);
         forestHandler.SetWhiteMatterImages(wmMaskImageVector);

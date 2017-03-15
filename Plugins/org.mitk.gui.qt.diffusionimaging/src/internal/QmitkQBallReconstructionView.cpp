@@ -467,12 +467,15 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
     break;
   case 3:
     m_Controls->m_Description->setText("SH solid angle with non-neg. constraint (Goh 2009)");
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 4:
     m_Controls->m_Description->setText("SH recon. of the plain ADC-profiles");
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 5:
     m_Controls->m_Description->setText("SH recon. of the raw diffusion signal");
+    m_Controls->m_OutputCoeffsImage->setHidden(false);
     break;
   case 6:
     m_Controls->m_Description->setText("SH recon. of the multi shell diffusion signal (Aganj 2010)");
@@ -775,25 +778,25 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   case 0:
   {
     filter->SetNormalizationMethod(FilterType::QBAR_STANDARD);
-    nodePostfix = "_SphericalHarmonics_Qball";
+    nodePostfix = "_SH_Qball";
     break;
   }
   case 1:
   {
     filter->SetNormalizationMethod(FilterType::QBAR_B_ZERO_B_VALUE);
-    nodePostfix = "_SphericalHarmonics_1_Qball";
+    nodePostfix = "_SH_1_Qball";
     break;
   }
   case 2:
   {
     filter->SetNormalizationMethod(FilterType::QBAR_B_ZERO);
-    nodePostfix = "_SphericalHarmonics_2_Qball";
+    nodePostfix = "_SH_2_Qball";
     break;
   }
   case 3:
   {
     filter->SetNormalizationMethod(FilterType::QBAR_NONE);
-    nodePostfix = "_SphericalHarmonics_3_Qball";
+    nodePostfix = "_SH_3_Qball";
     break;
   }
   case 4:
@@ -811,13 +814,13 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   case 6:
   {
     filter->SetNormalizationMethod(FilterType::QBAR_SOLID_ANGLE);
-    nodePostfix = "_SphericalHarmonics_CSA_Qball";
+    nodePostfix = "_SH_CSA_Qball";
     break;
   }
   case 7:
   {
     filter->SetNormalizationMethod(FilterType::QBAR_NONNEG_SOLID_ANGLE);
-    nodePostfix = "_SphericalHarmonics_NonNegCSA_Qball";
+    nodePostfix = "_SH_NonNegCSA_Qball";
     break;
   }
   default:
@@ -828,6 +831,17 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
 
   filter->Update();
 
+  if(m_Controls->m_OutputCoeffsImage->isChecked())
+  {
+    mitk::Image::Pointer coeffsImage = mitk::Image::New();
+    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
+    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
+    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
+    coeffsNode->SetData( coeffsImage );
+    coeffsNode->SetProperty( "name", mitk::StringProperty::New(dataNodePointer->GetName()+"_SH-Coefficients") );
+    GetDefaultDataStorage()->Add(coeffsNode, dataNodePointer);
+  }
+
   // ODFs TO DATATREE
   mitk::QBallImage::Pointer image = mitk::QBallImage::New();
   image->InitializeByItk( filter->GetOutput() );
@@ -837,18 +851,6 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   SetDefaultNodeProperties(node, dataNodePointer->GetName()+nodePostfix);
 
   GetDefaultDataStorage()->Add(node, dataNodePointer);
-
-  if(m_Controls->m_OutputCoeffsImage->isChecked())
-  {
-    mitk::Image::Pointer coeffsImage = mitk::Image::New();
-    coeffsImage->InitializeByItk( filter->GetCoefficientImage().GetPointer() );
-    coeffsImage->SetVolume( filter->GetCoefficientImage()->GetBufferPointer() );
-    mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
-    coeffsNode->SetData( coeffsImage );
-    coeffsNode->SetProperty( "name", mitk::StringProperty::New(dataNodePointer->GetName()+"_SH-Coeffs") );
-    coeffsNode->SetVisibility(false);
-    GetDefaultDataStorage()->Add(coeffsNode, node);
-  }
 }
 
 void QmitkQBallReconstructionView::MultiQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages)
@@ -988,17 +990,6 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
     filter->SetLambda(lambda);
     filter->Update();
 
-
-    // ODFs TO DATATREE
-    mitk::QBallImage::Pointer image = mitk::QBallImage::New();
-    image->InitializeByItk( filter->GetOutput() );
-    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
-    node->SetData( image );
-    SetDefaultNodeProperties(node, nodename+"_SphericalHarmonics_MultiShell_Qball");
-
-    GetDefaultDataStorage()->Add(node, dataNodePointer);
-
     if(m_Controls->m_OutputCoeffsImage->isChecked())
     {
       mitk::Image::Pointer coeffsImage = mitk::Image::New();
@@ -1008,10 +999,18 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
       coeffsNode->SetData( coeffsImage );
       coeffsNode->SetProperty( "name", mitk::StringProperty::New(
         QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
-      coeffsNode->SetVisibility(false);
-      GetDefaultDataStorage()->Add(coeffsNode, node);
+      GetDefaultDataStorage()->Add(coeffsNode, dataNodePointer);
     }
 
+    // ODFs TO DATATREE
+    mitk::QBallImage::Pointer image = mitk::QBallImage::New();
+    image->InitializeByItk( filter->GetOutput() );
+    image->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    mitk::DataNode::Pointer node=mitk::DataNode::New();
+    node->SetData( image );
+    SetDefaultNodeProperties(node, nodename+"_SH_MultiShell_Qball");
+
+    GetDefaultDataStorage()->Add(node, dataNodePointer);
 }
 
 void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name)

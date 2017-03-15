@@ -141,21 +141,24 @@ void DwiNormilzationFilter< TInPixelType>::ThreadedGenerateData(const OutputImag
         typename OutputImageType::PixelType outPix;
         outPix.SetSize(inputImagePointer->GetVectorLength());
 
-//        if (mit.Get()>0)
-//        {
-            for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        for (unsigned int i=0; i<inputImagePointer->GetVectorLength(); i++)
+        {
+            double val = (double)pix[i] - m_Mean;
+            val /= m_Stdev;
+            val *= m_NewStdev;
+            val += m_NewMean;
+            if (val<0)
             {
-                double val = (double)pix[i] - m_Mean;
-                val /= m_Stdev;
-                val *= m_NewStdev;
-                val += m_NewMean;
-                if (val<0)
-                  val = 0;
-                outPix[i] = (TInPixelType)val;
+              val = 0;
+              MITK_INFO << "Negative value.";
             }
-//        }
-//        else
-//          outPix.Fill(0);
+            if (val>32767)
+            {
+              val = 32767;
+              MITK_INFO << "Range overflow. Value is too large for datatype short.";
+            }
+            outPix[i] = (TInPixelType)val;
+        }
 
         oit.Set(outPix);
 

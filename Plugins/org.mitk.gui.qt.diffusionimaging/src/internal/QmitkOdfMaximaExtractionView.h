@@ -62,7 +62,6 @@ public:
 
   void ConvertShCoeffs();           ///< convert spherical harmonic coefficients to the according mitk datatype
   void ConvertPeaks();              ///< convert peak files from other toolkits to the according mitk datatype
-  void GenerateImage();             ///< semicontinuous ODF maxima extraction
   void StartFiniteDiff();           ///< ODF maxima extraction using finite differences on the densely sampled sphere
   void StartTensor();               ///< extract principal eigenvectors from tensor image
 
@@ -80,7 +79,6 @@ protected:
   std::vector< mitk::DataNode::Pointer > m_TensorImageNodes;
 
   void UpdateGui();             ///< update button activity etc. dpending on current datamanager selection
-  void GenerateDataFromDwi();   ///< semicontinuous ODF maxima extraction
   template<int shOrder> void TemplatedConvertShCoeffs(mitk::Image* mitkImg);
   template<int shOrder> void StartMaximaExtraction();   ///< ODF maxima extraction using finite differences on the densely sampled sphere
 

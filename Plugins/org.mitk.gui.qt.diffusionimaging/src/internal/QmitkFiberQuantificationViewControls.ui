@@ -321,10 +321,13 @@
       <item row="6" column="0">
        <widget class="QCheckBox" name="m_DirectionImagesBox">
         <property name="toolTip">
-         <string>One image per extracted direction. Each voxel contains a direction vector.</string>
+         <string>4D image containing the principal fiber directions.</string>
         </property>
         <property name="text">
-         <string>Output Direction images</string>
+         <string>Output Direction image</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -335,6 +338,9 @@
         </property>
         <property name="text">
          <string>Output #Directions per Voxel</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

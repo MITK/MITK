@@ -52,7 +52,6 @@ using namespace std;
 
 mitk::FiberBundle::FiberBundle( vtkPolyData* fiberPolyData )
     : m_NumFibers(0)
-    , m_FiberSampling(0)
 {
     m_FiberWeights = vtkSmartPointer<vtkFloatArray>::New();
     m_FiberWeights->SetName("FIBER_WEIGHTS");
@@ -1882,7 +1881,6 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance, double tension, doub
     m_FiberPolyData->SetPoints(vtkSmoothPoints);
     m_FiberPolyData->SetLines(vtkSmoothCells);
     this->SetFiberPolyData(m_FiberPolyData, true);
-    m_FiberSampling = 10/pointDistance;
 }
 
 void mitk::FiberBundle::ResampleSpline(float pointDistance)

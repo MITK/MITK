@@ -96,7 +96,6 @@ int main(int argc, char* argv[])
     {
         typedef itk::Image<unsigned char, 3>                                    ItkUcharImgType;
         typedef itk::Image< itk::Vector< float, 3>, 3 >                         ItkDirectionImage3DType;
-        typedef itk::VectorContainer< unsigned int, ItkDirectionImage3DType::Pointer >   ItkDirectionImageContainerType;
 
         // load fiber bundle
         mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
@@ -121,18 +120,14 @@ int main(int argc, char* argv[])
         fOdfFilter->SetSizeThreshold(peakThreshold);
         fOdfFilter->SetMaxNumDirections(maxNumDirs);
         fOdfFilter->Update();
-        ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 
-        // write direction images
-        for (unsigned int i=0; i<directionImageContainer->Size(); i++)
         {
-            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+            itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
             typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
             WriterType::Pointer writer = WriterType::New();
 
             string outfilename = outRoot;
-            outfilename.append("_direction_");
-            outfilename.append(boost::lexical_cast<string>(i));
+            outfilename.append("_DIRECTIONS");
             outfilename.append(file_ending);
 
             writer->SetFileName(outfilename.c_str());
@@ -146,7 +141,7 @@ int main(int argc, char* argv[])
             mitk::FiberBundle::Pointer directions = fOdfFilter->GetOutputFiberBundle();
 
             string outfilename = outRoot;
-            outfilename.append("_vectorfield.fib");
+            outfilename.append("_VECTOR_FIELD.fib");
 
             mitk::IOUtil::SaveBaseData(directions.GetPointer(), outfilename );
 
@@ -157,7 +152,7 @@ int main(int argc, char* argv[])
                 WriterType::Pointer writer = WriterType::New();
 
                 string outfilename = outRoot;
-                outfilename.append("_numdirections");
+                outfilename.append("_NUM_DIRECTIONS");
                 outfilename.append(file_ending);
 
                 writer->SetFileName(outfilename.c_str());

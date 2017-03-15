@@ -82,6 +82,7 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleTckReader::Read
               if (header.size() >= 3 && header.compare(header.size() - 3, 3, "END") == 0)
                 header_end = true;
             }
+            MITK_INFO << "Header:";
             MITK_INFO << header;
 
             int header_size = -1;
@@ -91,18 +92,19 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleTckReader::Read
             bool next = false;
             while ((pos = header.find(delimiter)) != std::string::npos) {
                 token = header.substr(0, pos);
-                if (next)
-                {
-                  int linebr = token.find("\n");
-                  token = header.substr(0, linebr);
-                  header_size = boost::lexical_cast<int>(token);
-                  MITK_INFO << "Parsed header size: " << header_size;
-                  break;
-                }
                 if (token==".")
                   next = true;
                 header.erase(0, pos + delimiter.length());
+                if (next)
+                {
+                  int linebr = header.find("\n");
+                  token = header.substr(0, linebr);
+                  header_size = boost::lexical_cast<int>(token);
+                  MITK_INFO << "Parsed header size: " << header_size;
+                }
             }
+            if (header_size==-1)
+                mitkThrow() << "Could not parse header size from " << filename;
             std::fseek ( filePointer , header_size , SEEK_SET );
 
             vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();

@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef Q_MOC_RUN
 #include "mitkDataStorage.h"
 #include "mitkDataStorageSelection.h"
-#include <mitkTrackingForestHandler.h>
-#include <itkMLBSTrackingFilter.h>
+#include <mitkTrackingHandlerRandomForest.h>
+#include <itkStreamlineTrackingFilter.h>
 #endif
 
 #include <QtConcurrentRun>
@@ -51,7 +51,7 @@ public:
   static const std::string VIEW_ID;
 
   typedef itk::Image<unsigned char, 3>      ItkUcharImgType;
-  typedef itk::MLBSTrackingFilter<6,100>         TrackerType;
+  typedef itk::StreamlineTrackingFilter         TrackerType;
 
   QmitkMLBTView();
   virtual ~QmitkMLBTView();
@@ -87,7 +87,7 @@ protected:
   Ui::QmitkMLBTViewControls* m_Controls;
   QmitkStdMultiWidget* m_MultiWidget;
 
-  mitk::TrackingForestHandler<6,100> m_ForestHandler;
+  mitk::TrackingHandlerRandomForest<6,100>* m_ForestHandler;
 
   QFutureWatcher<void> m_TrainingWatcher;
   QFutureWatcher<void> m_TrackingWatcher;

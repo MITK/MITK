@@ -103,7 +103,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
         fOdfFilter->SetUseWorkingCopy(false);
         fOdfFilter->SetNumberOfThreads(1);
         fOdfFilter->Update();
-        ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
+        itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer direction_image = fOdfFilter->GetDirectionImage();
 
         // Get directions and num directions image
         ItkUcharImgType::Pointer numDirImage = fOdfFilter->GetNumDirectionsImage();
@@ -114,7 +114,7 @@ int mitkLocalFiberPlausibilityTest(int argc, char* argv[])
 
         // evaluate directions with missing directions
         EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
-        evaluationFilter->SetImageSet(directionImageContainer);
+        // evaluationFilter->SetImageSet(directionImageContainer);
         evaluationFilter->SetReferenceImageSet(referenceImageContainer);
         evaluationFilter->SetMaskImage(itkMaskImage);
         evaluationFilter->SetIgnoreMissingDirections(false);

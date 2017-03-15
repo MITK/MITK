@@ -17,59 +17,67 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _TrackingForestHandler_cpp
 #define _TrackingForestHandler_cpp
 
-#include "mitkTrackingForestHandler.h"
+#include "mitkTrackingHandlerRandomForest.h"
 #include <itkTractDensityImageFilter.h>
 #include <mitkDiffusionPropertyHelper.h>
 
 namespace mitk
 {
 template< int ShOrder, int NumberOfSignalFeatures >
-TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::TrackingForestHandler()
+TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::TrackingHandlerRandomForest()
   : m_WmSampleDistance(-1)
   , m_NumTrees(30)
-  , m_MaxTreeDepth(50)
+  , m_MaxTreeDepth(25)
   , m_SampleFraction(1.0)
   , m_NumberOfSamples(0)
-  , m_GmSamplesPerVoxel(50)
+  , m_GmSamplesPerVoxel(-1)
   , m_NumPreviousDirections(1)
   , m_ZeroDirWmFeatures(true)
   , m_BidirectionalFiberSampling(false)
   , m_MaxNumWmSamples(-1)
 {
-  vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+  vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
 
-  itk::OrientationDistributionFunction< double, 200 > odf;
+  itk::OrientationDistributionFunction< float, 200 > odf;
   m_DirectionContainer.clear();
   for (unsigned int i = 0; i<odf.GetNumberOfComponents(); i++)
   {
-    if (dot_product(ref, odf.GetDirection(i))>0)            // only used directions on one hemisphere
-      m_DirectionContainer.push_back(odf.GetDirection(i));  // store indices for later mapping the classifier output to the actual direction
+    vnl_vector_fixed<float,3> odf_dir;
+    odf_dir[0] = odf.GetDirection(i)[0];
+    odf_dir[1] = odf.GetDirection(i)[1];
+    odf_dir[2] = odf.GetDirection(i)[2];
+    if (dot_product(ref, odf_dir)>0)            // only used directions on one hemisphere
+      m_DirectionContainer.push_back(odf_dir);  // store indices for later mapping the classifier output to the actual direction
   }
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::~TrackingForestHandler()
+TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::~TrackingHandlerRandomForest()
 {
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image)
+typename TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::DwiFeatureImageType::PixelType TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::GetDwiFeaturesAtPosition(itk::Point<float, 3> itkP, typename DwiFeatureImageType::Pointer image, bool interpolate)
 {
   // transform physical point to index coordinates
   itk::Index<3> idx;
-  itk::ContinuousIndex< double, 3> cIdx;
+  itk::ContinuousIndex< float, 3> cIdx;
   image->TransformPhysicalPointToIndex(itkP, idx);
   image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
   typename DwiFeatureImageType::PixelType pix; pix.Fill(0.0);
   if ( image->GetLargestPossibleRegion().IsInside(idx) )
+  {
     pix = image->GetPixel(idx);
+    if (!interpolate)
+      return pix;
+  }
   else
     return pix;
 
-  double frac_x = cIdx[0] - idx[0];
-  double frac_y = cIdx[1] - idx[1];
-  double frac_z = cIdx[2] - idx[2];
+  float frac_x = cIdx[0] - idx[0];
+  float frac_y = cIdx[1] - idx[1];
+  float frac_z = cIdx[2] - idx[2];
   if (frac_x<0)
   {
     idx[0] -= 1;
@@ -95,7 +103,7 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureIma
       idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
   {
     // trilinear interpolation
-    vnl_vector_fixed<double, 8> interpWeights;
+    vnl_vector_fixed<float, 8> interpWeights;
     interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
     interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
     interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
@@ -126,7 +134,7 @@ typename TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::DwiFeatureIma
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InputDataValidForTracking()
 {
   if (m_InputDwis.empty())
     mitkThrow() << "No diffusion-weighted images set!";
@@ -136,7 +144,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidFor
 
 template< int ShOrder, int NumberOfSignalFeatures>
 template<typename T>
-typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
+typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
 {
   MITK_INFO << "Calculating spherical harmonics features";
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
@@ -154,7 +162,7 @@ typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingForestHa
 
 template< int ShOrder, int NumberOfSignalFeatures>
 template<typename T>
-typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
+typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitDwiImageFeatures(mitk::Image::Pointer mitk_dwi)
 {
   MITK_INFO << "Interpolating raw dwi signal features";
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
@@ -177,7 +185,7 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestH
 
   // get signal values and store them in the feature image
   vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
-  itk::OrientationDistributionFunction< double, 2*NumberOfSignalFeatures > odf;
+  itk::OrientationDistributionFunction< float, 2*NumberOfSignalFeatures > odf;
   itk::ImageRegionIterator< typename InterpolationFilterType::OutputImageType > it(filter->GetOutput(), filter->GetOutput()->GetLargestPossibleRegion());
   while(!it.IsAtEnd())
   {
@@ -199,7 +207,7 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingForestH
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 {
   InputDataValidForTracking();
   m_DwiFeatureImages.clear();
@@ -207,113 +215,30 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-template< class TPixelType >
-TPixelType TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, bool interpolate)
-{
-  // transform physical point to index coordinates
-  itk::Index<3> idx;
-  itk::ContinuousIndex< double, 3> cIdx;
-  image->TransformPhysicalPointToIndex(itkP, idx);
-  image->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
-
-  TPixelType pix = 0.0;
-  if ( image->GetLargestPossibleRegion().IsInside(idx) )
-  {
-    pix = image->GetPixel(idx);
-    if (!interpolate)
-      return pix;
-  }
-  else
-    return pix;
-
-  double frac_x = cIdx[0] - idx[0];
-  double frac_y = cIdx[1] - idx[1];
-  double frac_z = cIdx[2] - idx[2];
-  if (frac_x<0)
-  {
-    idx[0] -= 1;
-    frac_x += 1;
-  }
-  if (frac_y<0)
-  {
-    idx[1] -= 1;
-    frac_y += 1;
-  }
-  if (frac_z<0)
-  {
-    idx[2] -= 1;
-    frac_z += 1;
-  }
-  frac_x = 1-frac_x;
-  frac_y = 1-frac_y;
-  frac_z = 1-frac_z;
-
-  // int coordinates inside image?
-  if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
-      idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
-      idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
-  {
-    // trilinear interpolation
-    vnl_vector_fixed<double, 8> interpWeights;
-    interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);
-    interpWeights[1] = (1-frac_x)*(  frac_y)*(  frac_z);
-    interpWeights[2] = (  frac_x)*(1-frac_y)*(  frac_z);
-    interpWeights[3] = (  frac_x)*(  frac_y)*(1-frac_z);
-    interpWeights[4] = (1-frac_x)*(1-frac_y)*(  frac_z);
-    interpWeights[5] = (  frac_x)*(1-frac_y)*(1-frac_z);
-    interpWeights[6] = (1-frac_x)*(  frac_y)*(1-frac_z);
-    interpWeights[7] = (1-frac_x)*(1-frac_y)*(1-frac_z);
-
-    pix = image->GetPixel(idx) * interpWeights[0];
-
-    typename itk::Image<TPixelType, 3>::IndexType tmpIdx = idx; tmpIdx[0]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[1];
-
-    tmpIdx = idx; tmpIdx[1]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[2];
-
-    tmpIdx = idx; tmpIdx[2]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[3];
-
-    tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[4];
-
-    tmpIdx = idx; tmpIdx[1]++; tmpIdx[2]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[5];
-
-    tmpIdx = idx; tmpIdx[2]++; tmpIdx[0]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[6];
-
-    tmpIdx = idx; tmpIdx[0]++; tmpIdx[1]++; tmpIdx[2]++;
-    pix +=  image->GetPixel(tmpIdx) * interpWeights[7];
-  }
-
-  if (pix!=pix)
-    mitkThrow() << "nan values in volume modification image!";
-
-  return pix;
-}
-
-template< int ShOrder, int NumberOfSignalFeatures >
-vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::Classify(itk::Point<double, 3>& pos, int& candidates, std::deque<vnl_vector_fixed<double, 3> >& olddirs, double angularThreshold, double& w, ItkUcharImgType::Pointer mask)
+vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::ProposeDirection(itk::Point<float, 3>& pos, std::deque<vnl_vector_fixed<float, 3> >& olddirs, itk::Index<3>& oldIndex)
 {
 
-  vnl_vector_fixed<double,3> output_direction; output_direction.fill(0);
+  vnl_vector_fixed<float,3> output_direction; output_direction.fill(0);
 
   itk::Index<3> idx;
   m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, idx);
-  if (mask.IsNotNull() && ((mask->GetLargestPossibleRegion().IsInside(idx) && mask->GetPixel(idx)<=0) || !mask->GetLargestPossibleRegion().IsInside(idx)) )
-    return output_direction;
+
+  vnl_vector_fixed<float,3> last_dir;
+  if (!olddirs.empty())
+    last_dir = olddirs.back();
+
+  if (!m_Interpolate && oldIndex==idx)
+    return last_dir;
 
   // store feature pixel values in a vigra data type
-  vigra::MultiArray<2, double> featureData = vigra::MultiArray<2, double>( vigra::Shape2(1,m_Forest->feature_count()) );
-  typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0));
+  vigra::MultiArray<2, float> featureData = vigra::MultiArray<2, float>( vigra::Shape2(1,m_Forest->feature_count()) );
+  typename DwiFeatureImageType::PixelType dwiFeaturePixel = GetDwiFeaturesAtPosition(pos, m_DwiFeatureImages.at(0), m_Interpolate);
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
   // append normalized previous direction(s) to feature vector
   int i = 0;
-  vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+  vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
   for (auto d : olddirs)
   {
     int c = 0;
@@ -341,17 +266,11 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
   }
 
   // perform classification
-  vigra::MultiArray<2, double> probs(vigra::Shape2(1, m_Forest->class_count()));
+  vigra::MultiArray<2, float> probs(vigra::Shape2(1, m_Forest->class_count()));
   m_Forest->predictProbabilities(featureData, probs);
 
-  vnl_vector_fixed<double,3> last_dir;
-  if (!olddirs.empty())
-    last_dir = olddirs.back();
-
-
-  double pNonFib = 0;     // probability that we left the white matter
-  w = 0;                  // weight of the predicted direction
-  candidates = 0;         // directions with probability > 0
+  float pNonFib = 0;     // probability that we left the white matter
+  float w = 0;           // weight of the predicted direction
   for (int i=0; i<m_Forest->class_count(); i++)   // for each class (number of possible directions + out-of-wm class)
   {
     if (probs(0,i)>0)   // if probability of respective class is 0, do nothing
@@ -362,21 +281,20 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
-        candidates++;   // now we have one direction more with probability > 0 (DO WE NEED THIS???)
-        vnl_vector_fixed<double,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
+        vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
 
-        if (!olddirs.empty() && last_dir.magnitude()>0)   // do we have a previous streamline direction or did we just start?
+        if (!olddirs.empty() && last_dir.magnitude()>0.5)   // do we have a previous streamline direction or did we just start?
         {
           // TODO: check if hard curvature threshold is necessary.
           // alternatively try square of dot pruduct as weight.
           // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
 
-          double dot = dot_product(d, last_dir);    // claculate angle between the candidate direction vector and the previous streamline direction
-          if (fabs(dot)>angularThreshold)         // is angle between the directions smaller than our hard threshold?
+          float dot = dot_product(d, last_dir);    // claculate angle between the candidate direction vector and the previous streamline direction
+          if (fabs(dot)>m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
           {
             if (dot<0)                          // make sure we don't walk backwards
               d *= -1;
-            double w_i = probs(0,i)*fabs(dot);
+            float w_i = probs(0,i)*fabs(dot);
             output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
             w += w_i;           // increase output weight of the final direction
           }
@@ -394,17 +312,22 @@ vnl_vector_fixed<double,3> TrackingForestHandler< ShOrder, NumberOfSignalFeature
 
   // if we did not find a suitable direction, make sure that we return (0,0,0)
   if (pNonFib>w && w>0)
-  {
-    candidates = 0;
-    w = 0;
     output_direction.fill(0.0);
+  else
+  {
+    if (m_FlipX)
+      output_direction[0] *= -1;
+    if (m_FlipY)
+      output_direction[1] *= -1;
+    if (m_FlipZ)
+      output_direction[2] *= -1;
   }
 
-  return output_direction;
+  return output_direction * w;
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::StartTraining()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::StartTraining()
 {
   m_StartTime = std::chrono::system_clock::now();
   InputDataValidForTraining();
@@ -459,7 +382,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::StartTraining()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidForTraining()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InputDataValidForTraining()
 {
   if (m_InputDwis.empty())
     mitkThrow() << "No diffusion-weighted images set!";
@@ -470,7 +393,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InputDataValidFor
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-bool TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::IsForestValid()
+bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestValid()
 {
   int additional_features = 0;
   if (m_AdditionalFeatureImages.size()>0)
@@ -481,7 +404,7 @@ bool TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::IsForestValid()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTraining()
 {
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
@@ -602,7 +525,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
     // upper limit for samples
     if (m_MaxNumWmSamples>0 && wmSamples>m_MaxNumWmSamples)
     {
-      if ((double)m_MaxNumWmSamples/wmSamples > 0.8)
+      if ((float)m_MaxNumWmSamples/wmSamples > 0.8)
       {
         m_SampleUsage.push_back(std::vector<bool>(wmSamples, true));
         m_NumberOfSamples += wmSamples;
@@ -652,7 +575,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
     }
     else if (OUTOFWM>0)
     {
-      int gm_per_voxel = 0.5+(double)wmSamples/(double)OUTOFWM;
+      int gm_per_voxel = 0.5+(float)wmSamples/(float)OUTOFWM;
       if (gm_per_voxel<=0)
         gm_per_voxel = 1;
       m_GmSamples.push_back(gm_per_voxel);
@@ -669,9 +592,9 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::InitForTraining()
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTrainingSamples()
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTrainingSamples()
 {
-  vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+  vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
 
   m_FeatureData.reshape( vigra::Shape2(m_NumberOfSamples, NumberOfSignalFeatures+m_NumPreviousDirections*3+m_AdditionalFeatureImages.at(0).size()) );
   m_LabelData.reshape( vigra::Shape2(m_NumberOfSamples,1) );
@@ -715,7 +638,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
           for (unsigned int i=0; i<m_NumPreviousDirections; i++)
           {
             int c=0;
-            vnl_vector_fixed<double,3> probe;
+            vnl_vector_fixed<float,3> probe;
             if (i<num_zero_dirs)
               probe.fill(0.0);
             else
@@ -759,13 +682,13 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
     // white matter samples
     mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
     vtkSmartPointer< vtkPolyData > polyData = fib->GetFiberPolyData();
-    vnl_vector_fixed<double,3> zero_dir; zero_dir.fill(0.0);
+    vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
     for (int i=0; i<fib->GetNumFibers(); i++)
     {
       vtkCell* cell = polyData->GetCell(i);
       int numPoints = cell->GetNumberOfPoints();
       vtkPoints* points = cell->GetPoints();
-      double fiber_weight = fib->GetFiberWeight(i);
+      float fiber_weight = fib->GetFiberWeight(i);
 
       for (int n = 0; n<=m_NumPreviousDirections; n++)
       {
@@ -786,7 +709,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
             else
               num_nonzero_dirs = std::min(n, numPoints-j-1);
 
-            vnl_vector_fixed<double,3> dir;
+            vnl_vector_fixed<float,3> dir;
             // zero directions
             for (unsigned int k=0; k<m_NumPreviousDirections-num_nonzero_dirs; k++)
             {
@@ -869,7 +792,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
             float volume_mod = GetImageValue<float>(itkP1, fiber_folume, false);
 
             // diffusion signal features
-            typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image);
+            typename DwiFeatureImageType::PixelType pix = GetDwiFeaturesAtPosition(itkP1, image, m_Interpolate);
             for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
               m_FeatureData(sampleCounter,f) = pix[f];
 
@@ -883,14 +806,14 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
             }
 
             // set label values
-            double angle = 0;
-            double m = dir.magnitude();
+            float angle = 0;
+            float m = dir.magnitude();
             if (m>0.0001)
             {
               int l = 0;
               for (auto d : m_DirectionContainer)
               {
-                double a = fabs(dot_product(dir, d));
+                float a = fabs(dot_product(dir, d));
                 if (a>angle)
                 {
                   m_LabelData(sampleCounter,0) = l;
@@ -913,7 +836,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::CalculateTraining
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::SaveForest(std::string forestFile)
 {
   MITK_INFO << "Saving forest to " << forestFile;
   if (IsForestValid())
@@ -926,7 +849,7 @@ void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::SaveForest(std::s
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
-void TrackingForestHandler< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
+void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::LoadForest(std::string forestFile)
 {
   MITK_INFO << "Loading forest from " << forestFile;
   m_Forest = std::make_shared< vigra::RandomForest<int> >();

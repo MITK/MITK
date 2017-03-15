@@ -150,7 +150,6 @@ int main(int argc, char* argv[])
         fOdfFilter->SetSizeThreshold(sizeThreshold);
         fOdfFilter->SetMaxNumDirections(maxDirs);
         fOdfFilter->Update();
-        ItkDirectionImageContainerType::Pointer directionImageContainer = fOdfFilter->GetDirectionImageContainer();
 
         if (verbose)
         {
@@ -163,16 +162,13 @@ int main(int argc, char* argv[])
             mitk::IOUtil::SaveBaseData(directions.GetPointer(), outfilename );
 
             // write direction images
-            for (unsigned int i=0; i<directionImageContainer->Size(); i++)
             {
-                itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = directionImageContainer->GetElement(i);
+                itk::TractsToVectorImageFilter<float>::ItkDirectionImageType::Pointer itkImg = fOdfFilter->GetDirectionImage();
                 typedef itk::ImageFileWriter< itk::TractsToVectorImageFilter<float>::ItkDirectionImageType > WriterType;
                 WriterType::Pointer writer = WriterType::New();
 
                 string outfilename = outRoot;
-                outfilename.append("_DIRECTION_");
-                outfilename.append(boost::lexical_cast<string>(i));
-                outfilename.append(".nrrd");
+                outfilename.append("_DIRECTIONS.nrrd");
 
                 writer->SetFileName(outfilename.c_str());
                 writer->SetInput(itkImg);
@@ -208,7 +204,7 @@ int main(int argc, char* argv[])
 
                 // evaluate directions
                 EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
-                evaluationFilter->SetImageSet(directionImageContainer);
+                //evaluationFilter->SetImageSet(directionImageContainer);
                 evaluationFilter->SetReferenceImageSet(referenceImageContainer);
                 evaluationFilter->SetMaskImage(itkMaskImage);
                 evaluationFilter->SetIgnoreMissingDirections(ignoreMissing);
@@ -261,7 +257,7 @@ int main(int argc, char* argv[])
         {
             // evaluate directions
             EvaluationFilterType::Pointer evaluationFilter = EvaluationFilterType::New();
-            evaluationFilter->SetImageSet(directionImageContainer);
+            //evaluationFilter->SetImageSet(directionImageContainer);
             evaluationFilter->SetReferenceImageSet(referenceImageContainer);
             evaluationFilter->SetMaskImage(itkMaskImage);
             evaluationFilter->SetIgnoreMissingDirections(ignoreMissing);

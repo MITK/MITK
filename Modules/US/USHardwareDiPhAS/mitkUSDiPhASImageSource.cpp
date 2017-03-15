@@ -697,6 +697,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     std::string pathPA = "c:\\ImageData\\" + currentDate + "-" + "PAbeamformed" + ".nrrd";
     std::string pathUS = "c:\\ImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
     std::string pathTS = "c:\\ImageData\\" + currentDate + "-" + "ts" + ".csv";
+    std::string pathS  = "c:\\ImageData\\" + currentDate + "-" + "Settings" + ".txt";
 
     // idon't forget the raw Images (if chosen to be saved)
     Image::Pointer PAImageRaw = Image::New();
@@ -714,7 +715,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
       if (m_SavingSettings.saveBeamformed)
       {
         OrderImagesInterleaved(PAImage, USImage, m_RecordedImages, false);
-        //mitk::IOUtil::Save(USImage, pathUS);
+        mitk::IOUtil::Save(USImage, pathUS);
         mitk::IOUtil::Save(PAImage, pathPA);
       }
 
@@ -741,6 +742,26 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
         timestampFile << "\n" << index << "," << m_ImageTimestampRecord.at(index) << "," << m_PixelValues.at(index);
       }
       timestampFile.close();
+
+      //save the settings!
+
+      ofstream settingsFile;
+
+      settingsFile.open(pathS);
+      auto& sM = m_Device->GetScanMode();
+
+      settingsFile << "[General Parameters]\n";
+      settingsFile << "Scan Depth [mm] = " << sM.receivePhaseLengthSeconds * sM.averageSpeedOfSound / 2 * 1000 << "\n";
+      settingsFile << "Speed of Sound [m/s] = " << sM.averageSpeedOfSound << "\n";
+      settingsFile << "Excitation Frequency [MHz] = " << sM.transducerFrequencyHz/1000000 << "\n";
+      settingsFile << "Voltage [V] = " << sM.voltageV << "\n";
+      settingsFile << "TGC min = " << (int)sM.tgcdB[0] << " max = " << (int)sM.tgcdB[6] << "\n";
+
+      settingsFile << "[Beamforming Parameters]\n";
+      settingsFile << "Reconstructed Lines = " << sM.reconstructionLines << "\n";
+      settingsFile << "Samples per Line = " << sM.reconstructionSamplesPerLine << "\n";
+
+      settingsFile.close();
     }
     else if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::PlaneWaveCompound) // save no PAImage if we used US only mode
     {

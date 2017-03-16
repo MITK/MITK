@@ -375,6 +375,10 @@ std::string IOUtil::GetProgramPath()
 }
 #endif
 
+std::map<std::string, mitk::IFileIO::Options> IOUtil::m_usedOptions;
+std::map<std::string, FileReaderSelector::Item> IOUtil::m_usedReaderItems;
+std::set<IOUtil::SaveInfo> IOUtil::m_usedSaveInfos;
+
 char IOUtil::GetDirectorySeparator()
 {
 #ifdef US_PLATFORM_WINDOWS
@@ -687,8 +691,8 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
          mimeTypeIterEnd = currMimeTypes.end(); mimeTypeIter != mimeTypeIterEnd; ++mimeTypeIter)
     {
       std::map<std::string, FileReaderSelector::Item>::const_iterator oldSelectedItemIter =
-          usedReaderItems.find(mimeTypeIter->GetName());
-      if (oldSelectedItemIter != usedReaderItems.end())
+         m_usedReaderItems.find(mimeTypeIter->GetName());
+      if (oldSelectedItemIter != m_usedReaderItems.end())
       {
         // we found an already used item for a mime-type which is contained
         // in the current reader set, check all current readers if there service
@@ -705,7 +709,7 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
             callOptionsCallback = false;
             loadInfo.m_ReaderSelector.Select(oldSelectedItemIter->second.GetServiceId());
             loadInfo.m_ReaderSelector.GetSelected().GetReader()->SetOptions(
-              usedOptions.at(oldSelectedItemIter->first));
+              m_usedOptions.at(oldSelectedItemIter->first));
             break;
           }
         }
@@ -718,11 +722,11 @@ std::string IOUtil::Load(std::vector<LoadInfo>& loadInfos,
       callOptionsCallback = (*optionsCallback)(loadInfo);
       if (!callOptionsCallback && !loadInfo.m_Cancel)
       {
-        usedReaderItems.erase(selectedMimeType);
+        m_usedReaderItems.erase(selectedMimeType);
         FileReaderSelector::Item selectedItem = loadInfo.m_ReaderSelector.GetSelected();
-        usedReaderItems.insert(std::make_pair(selectedItem.GetMimeType().GetName(),
+        m_usedReaderItems.insert(std::make_pair(selectedItem.GetMimeType().GetName(),
                                               selectedItem));
-        usedOptions.insert(std::make_pair(selectedItem.GetMimeType().GetName(), selectedItem.GetReader()->GetOptions()));
+        m_usedOptions.insert(std::make_pair(selectedItem.GetMimeType().GetName(), selectedItem.GetReader()->GetOptions()));
       }
     }
 
@@ -970,8 +974,8 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
 
     // check if we already used a writer for this base data type
     // which should be re-used
-    std::set<SaveInfo>::const_iterator oldSaveInfoIter = usedSaveInfos.find(saveInfo);
-    if (oldSaveInfoIter != usedSaveInfos.end())
+    std::set<SaveInfo>::const_iterator oldSaveInfoIter = m_usedSaveInfos.find(saveInfo);
+    if (oldSaveInfoIter != m_usedSaveInfos.end())
     {
       // we previously saved a base data object of the same data with the same mime-type,
       // check if the same writer is contained in the current writer set and if the
@@ -999,8 +1003,8 @@ std::string IOUtil::Save(std::vector<SaveInfo>& saveInfos, WriterOptionsFunctorB
       callOptionsCallback = (*optionsCallback)(saveInfo);
       if (!callOptionsCallback && !saveInfo.m_Cancel)
       {
-        usedSaveInfos.erase(saveInfo);
-        usedSaveInfos.insert(saveInfo);
+        m_usedSaveInfos.erase(saveInfo);
+        m_usedSaveInfos.insert(saveInfo);
       }
     }
 
@@ -1120,7 +1124,4 @@ IOUtil::LoadInfo::LoadInfo(const std::string& path)
 {
 }
 
-std::map<std::string, mitk::IFileIO::Options> IOUtil::usedOptions;
-std::map<std::string, FileReaderSelector::Item> IOUtil::usedReaderItems;
-std::set<IOUtil::SaveInfo> IOUtil::usedSaveInfos;
 }

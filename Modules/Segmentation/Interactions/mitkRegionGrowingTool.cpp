@@ -42,6 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkNeighborhoodIterator.h>
 
+#include <itkImageDuplicator.h>
+
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, RegionGrowingTool, "Region growing tool");
@@ -225,7 +227,14 @@ void mitk::RegionGrowingTool::StartRegionGrowing(itk::Image<TPixel, imageDimensi
   typename NeighborhoodIteratorType::RadiusType radius;
   radius.Fill(2); // for now, maybe make this something the user can adjust in the preferences?
 
-  NeighborhoodIteratorType neighborhoodIterator(radius, resultImage, resultImage->GetRequestedRegion());
+  typedef itk::ImageDuplicator< OutputImageType > DuplicatorType;
+  DuplicatorType::Pointer duplicator = DuplicatorType::New();
+  duplicator->SetInputImage(resultImage);
+  duplicator->Update();
+
+  OutputImageType::Pointer resultDup = duplicator->GetOutput();
+
+  NeighborhoodIteratorType neighborhoodIterator(radius, resultDup, resultDup->GetRequestedRegion());
   ImageIteratorType imageIterator(resultImage, resultImage->GetRequestedRegion());
 
   for (neighborhoodIterator.GoToBegin(), imageIterator.GoToBegin(); !neighborhoodIterator.IsAtEnd();

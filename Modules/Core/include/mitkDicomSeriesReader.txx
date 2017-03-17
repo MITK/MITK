@@ -17,10 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDICOMSERIESREADER_TXX_
 #define MITKDICOMSERIESREADER_TXX_
 
-#include <mitkDicomSeriesReader.h>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <limits>
+
+#include <boost/filesystem.hpp>
 
 #include <itkImageSeriesReader.h>
-#include <mitkProperties.h>
 
 #include <itkResampleImageFilter.h>
 #include <itkAffineTransform.h>
@@ -28,9 +32,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkTimeProbesCollectorBase.h>
 #include <itkMetaDataDictionary.h>
 
-#include <limits>
+#include <itkGDCMImageIO.h>
+#include <itkImage.h>
+#include <itkMetaDataObject.h>
+#include <itkImageSeriesWriter.h>
+#include <itkNumericSeriesFileNames.h>
 
 #include <mitkImage.h>
+#include <mitkProperties.h>
+#include <mitkDicomSeriesReader.h>
 
 namespace mitk
 {
@@ -126,17 +136,68 @@ inline void CopyDictionary(itk::MetaDataDictionary& fromDict, itk::MetaDataDicti
 
   while (itr != end)
   {
-    itk::MetaDataObjectBase::Pointer  entry = itr->second;
+    itk::MetaDataObjectBase::Pointer entry = itr->second;
 
     MetaDataStringType::Pointer entryvalue = dynamic_cast<MetaDataStringType*>(entry.GetPointer());
     if (entryvalue)
     {
-      std::string tagkey   = itr->first;
+      std::string tagkey = itr->first;
       std::string tagvalue = entryvalue->GetMetaDataObjectValue();
       itk::EncapsulateMetaData<std::string>(toDict, tagkey, tagvalue);
     }
 
     ++itr;
+  }
+}
+
+// TODO This function is for debugging purposes. It allows you to save itkImage in the DICOM file set.
+// dumpFilePath - The path to which the received DICOM files.
+template <typename ImageType>
+void DicomSeriesReader::dumpITKImageToDICOM(ImageType* itkImage, const std::vector<itk::MetaDataDictionary*>& dictionary,
+  const std::string dumpFilePath)
+{
+  const unsigned int InputDimension = 3;
+  const unsigned int OutputDimension = 2;
+
+  typedef itk::Image<typename ImageType::PixelType, InputDimension> InputImageType;
+  typedef itk::Image<typename ImageType::PixelType, OutputDimension> OutputImageType;
+  typedef itk::NumericSeriesFileNames OutputNamesGeneratorType;
+  
+  typedef itk::ImageSeriesWriter<InputImageType, OutputImageType> SeriesWriterType;
+  
+  typename SeriesWriterType::Pointer seriesWriter = SeriesWriterType::New();
+  
+  seriesWriter->SetInput(itkImage);
+  
+  typedef itk::GDCMImageIO ImageIOType;
+  
+  ImageIOType::Pointer gdcmIO = ImageIOType::New();
+  
+  seriesWriter->SetImageIO(gdcmIO);
+
+  boost::filesystem::path currentPath = dumpFilePath;
+  boost::filesystem::create_directories(currentPath);
+  
+  OutputNamesGeneratorType::Pointer outputNames = OutputNamesGeneratorType::New();
+  std::string seriesFormat(currentPath.string());
+  seriesFormat = seriesFormat + "IM%06d.dcm";
+  outputNames->SetSeriesFormat (seriesFormat.c_str());
+  outputNames->SetStartIndex (1);
+  const int array_size = dictionary.size();
+  outputNames->SetEndIndex(array_size);
+  seriesWriter->SetFileNames(outputNames->GetFileNames());
+  
+  seriesWriter->SetMetaDataDictionaryArray(&dictionary);
+  
+  try
+  {
+    seriesWriter->Update();
+  }
+  catch(itk::ExceptionObject & excp)
+  {
+    std::cerr << "Exception thrown while writing the series " << std::endl;
+    std::cerr << excp << std::endl;
+    return;
   }
 }
 
@@ -164,6 +225,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   {
     reader->SetFileNames(filenames);
     reader->Update();
+
     typename ImageType::Pointer readVolume = reader->GetOutput();
 
     // if we detected that the images are from a tilted gantry acquisition, we need to push some pixels into the right position

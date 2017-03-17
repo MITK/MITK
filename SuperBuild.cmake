@@ -323,6 +323,12 @@ if(MITK_USE_Python)
       )
 endif()
 
+if(Eigen_INCLUDE_DIR)
+    list(APPEND mitk_optional_cache_args
+      -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
+    )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
@@ -387,7 +393,6 @@ ExternalProject_Add(${proj}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR}
     -DMITK_USE_Boost_LIBRARIES:STRING=${MITK_USE_Boost_LIBRARIES}
-    -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
   CMAKE_ARGS
     ${mitk_initial_cache_arg}
     ${MAC_OSX_ARCHITECTURE_ARGS}

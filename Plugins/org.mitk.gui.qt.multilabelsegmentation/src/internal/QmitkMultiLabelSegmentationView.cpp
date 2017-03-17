@@ -482,13 +482,13 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
   workingNode->SetData(workingImage);
   workingNode->SetName(newName.toStdString());
-  workingImage->GetExteriorLabel()->SetProperty("name.parent",mitk::StringProperty::New(referenceNode->GetName().c_str()));
-  workingImage->GetExteriorLabel()->SetProperty("name.image",mitk::StringProperty::New(newName.toStdString().c_str()));
+  workingImage->GetExteriorLabel()->SetProperty("name.parent", mitk::StringProperty::New(referenceNode->GetName().c_str()));
+  workingImage->GetExteriorLabel()->SetProperty("name.image", mitk::StringProperty::New(newName.toStdString().c_str()));
 
-  if (!this->GetDataStorage()->Exists(workingNode))
-    this->GetDataStorage()->Add(workingNode, referenceNode);
-
-  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+  if (!GetDataStorage()->Exists(workingNode))
+  {
+    GetDataStorage()->Add(workingNode, referenceNode);
+  }
 
   OnNewLabel();
 }
@@ -511,21 +511,27 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
     return;
   }
 
-  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent );
-  dialog->SetSuggestionList( mitk::OrganNamesHandling::GetDefaultOrganColorString() );
+  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent);
+  dialog->SetSuggestionList(mitk::OrganNamesHandling::GetDefaultOrganColorString());
   dialog->setWindowTitle("New Label");
 
   int dialogReturnValue = dialog->exec();
-
-  if ( dialogReturnValue == QDialog::Rejected ) return;
+  if (dialogReturnValue == QDialog::Rejected)
+  {
+    return;
+  }
 
   QString segName = dialog->GetSegmentationName();
-  if(segName.isEmpty()) segName = "Unnamed";
+  if (segName.isEmpty())
+  {
+    segName = "Unnamed";
+  }
   workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
 
   UpdateControls();
-
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(workingNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 }
 
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)
@@ -559,7 +565,6 @@ void QmitkMultiLabelSegmentationView::OnPreviousLayer()
 
   OnChangeLayer(workingImage->GetActiveLayer() - 1 );
 }
-
 
 void QmitkMultiLabelSegmentationView::OnChangeLayer(int layer)
 {
@@ -648,10 +653,7 @@ void QmitkMultiLabelSegmentationView::OnAddLayer()
     return;
   }
 
-  // Update controls and label set list for direct response
-  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
   OnNewLabel();
-  UpdateControls();
 }
 
 void QmitkMultiLabelSegmentationView::OnDeactivateActiveTool()

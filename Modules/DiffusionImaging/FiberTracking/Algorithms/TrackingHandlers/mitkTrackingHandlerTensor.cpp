@@ -133,11 +133,11 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index
     {
       vnl_vector_fixed<float,3> dir = m_PdImage.at(i)->GetPixel(idx);
       if (m_FlipX)
-          out_dir[0] *= -1;
+          dir[0] *= -1;
       if (m_FlipY)
-          out_dir[1] *= -1;
+          dir[1] *= -1;
       if (m_FlipZ)
-          out_dir[2] *= -1;
+          dir[2] *= -1;
 
       float a = dot_product(dir, oldDir);
       if (fabs(a)>angle)

@@ -92,10 +92,23 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   }
 }
 
-void QmitkImageStatisticsView::OnPreferencesChanged()
+void QmitkImageStatisticsView::OnPageSuccessfullyLoaded()
 {
   berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
   m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+
+  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+
+  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
+  {
+    this->m_Controls->m_JSHistogram->SendCommand(
+      "changeTheme('dark')");
+  }
+  else
+  {
+    this->m_Controls->m_JSHistogram->SendCommand(
+      "changeTheme(default)");
+  }
 }
 
 void QmitkImageStatisticsView::CreateConnections()
@@ -113,6 +126,7 @@ void QmitkImageStatisticsView::CreateConnections()
     connect( (QObject*) (this->m_Controls->m_HistogramBinSizeSpinbox), SIGNAL(editingFinished()), this, SLOT(OnHistogramBinSizeBoxValueChanged()));
     connect((QObject*)(this->m_Controls->m_UseDefaultBinSizeBox), SIGNAL(clicked()), (QObject*) this, SLOT(OnDefaultBinSizeBoxChanged()));
     connect((QObject*)(this->m_Controls->m_ShowSubchartCheckBox), SIGNAL(clicked()), (QObject*) this, SLOT(OnShowSubchartBoxChanged()));
+    connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnPageSuccessfullyLoaded()));
   }
 }
 
@@ -144,38 +158,12 @@ void QmitkImageStatisticsView::OnShowSubchartBoxChanged()
 
   this->m_Controls->m_JSHistogram->SendCommand(
     "ReloadChart(" + useLineChart + "," + showSubchart + ")");
-
-  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
-
-  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
-  {
-    this->m_Controls->m_JSHistogram->SendCommand(
-      "changeTheme('dark')");
-  }
-  else
-  {
-    this->m_Controls->m_JSHistogram->SendCommand(
-      "changeTheme(default)");
-  }
 }
 
 
 void QmitkImageStatisticsView::OnBarRadioButtonSelected()
 {
   this->m_Controls->m_JSHistogram->TransformView("bar");
-
-  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
-
-  if (styleName == ":/org.blueberry.ui.qt/darkstyle.qss")
-  {
-    this->m_Controls->m_JSHistogram->SendCommand(
-      "changeTheme('dark')");
-  }
-  else
-  {
-    this->m_Controls->m_JSHistogram->SendCommand(
-      "changeTheme(default)");
-  }
 }
 
 void QmitkImageStatisticsView::OnLineRadioButtonSelected()
@@ -239,7 +227,7 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
       if ( closedFigure )
       {
         this->m_Controls->m_JSHistogram->ComputeHistogram(
-          histogram.GetPointer(), this->m_Controls->m_lineRadioButton->isChecked(), this->m_Controls->m_ShowSubchartCheckBox->isChecked() );
+          histogram.GetPointer(), this->m_Controls->m_lineRadioButton->isChecked(), this->m_Controls->m_ShowSubchartCheckBox->isChecked());
       }
       //this->m_Controls->m_JSHistogram->ComputeHistogram(histogram.GetPointer());
       /*else
@@ -857,6 +845,7 @@ void QmitkImageStatisticsView::OnHistogramBinSizeBoxValueChanged()
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
   disconnect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), 0, 0);
+  connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnPageSuccessfullyLoaded()));
   m_Controls->m_lineRadioButton->setEnabled(true);
   m_Controls->m_barRadioButton->setEnabled(true);
   m_Controls->m_HistogramBinSizeSpinbox->setEnabled(true);

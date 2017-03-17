@@ -106,7 +106,7 @@ public:
 
       void OnLineRadioButtonSelected();
 
-      void OnPreferencesChanged();
+      void OnPageSuccessfullyLoaded();
 
 signals:
       /** \brief Method to set the data to the member and start the threaded statistics update */

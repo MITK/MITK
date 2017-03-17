@@ -114,7 +114,7 @@ void QmitkC3jsWidget::Impl::callJavaScriptFuntion(QString command)
 
 void QmitkC3jsWidget::Impl::ClearJavaScriptChart()
 {
-  m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
+    m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
 }
 
 void QmitkC3jsWidget::Impl::initializeJavaScriptChart()

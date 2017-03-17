@@ -446,20 +446,20 @@ QVariant QmitkDataStorageTreeModel::data(const QModelIndex &index, int role) con
 
     if (patientsName)
     {
-      nodeName += QFile::encodeName(patientsName->GetValueAsString().c_str()) + "\n";
-      nodeName += QFile::encodeName(studyDescription->GetValueAsString().c_str()) + "\n";
-      nodeName += QFile::encodeName(seriesDescription->GetValueAsString().c_str());
+      nodeName += QString::fromStdString(patientsName->GetValueAsString()) + "\n";
+      nodeName += QString::fromStdString(studyDescription->GetValueAsString()) + "\n";
+      nodeName += QString::fromStdString(seriesDescription->GetValueAsString());
     }
     else
     { /** Code coveres the deprecated property naming for backwards compatibility */
-      nodeName += QFile::encodeName(patientsName_deprecated->GetValueAsString().c_str()) + "\n";
-      nodeName += QFile::encodeName(studyDescription_deprecated->GetValueAsString().c_str()) + "\n";
-      nodeName += QFile::encodeName(seriesDescription_deprecated->GetValueAsString().c_str());
+      nodeName += QString::fromStdString(patientsName_deprecated->GetValueAsString()) + "\n";
+      nodeName += QString::fromStdString(studyDescription_deprecated->GetValueAsString()) + "\n";
+      nodeName += QString::fromStdString(seriesDescription_deprecated->GetValueAsString());
     }
   }
   else
   {
-    nodeName = QFile::encodeName(dataNode->GetName().c_str());
+    nodeName = QString::fromStdString(dataNode->GetName());
   }
   if (nodeName.isEmpty())
   {

@@ -355,12 +355,20 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
 void QmitkPointListWidget::OnBtnAddPointManually()
 {
   mitk::PointSet *pointSet = this->GetPointSet();
-
-  mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
-  mitk::PointSet::PointIdentifier maxId = maxIt->Index();
-
   QmitkEditPointDialog editPointDialog(this);
-  editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
+
+  if (this->GetPointSet()->IsEmpty())
+  {
+	  editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
+  }
+
+  else
+  {
+	  mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
+	  mitk::PointSet::PointIdentifier maxId = maxIt->Index();
+	  editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
+  }
+
   editPointDialog.exec();
 }
 

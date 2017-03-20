@@ -36,14 +36,14 @@ void mitk::ContourModelSetGLMapper2D::Paint(mitk::BaseRenderer *renderer)
 {
     BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-    mitk::DataNode *dataNode = this->GetDataNode();
+    mitk::DataNode::Pointer dataNode = this->GetDataNode();
     bool visible = true;
     dataNode->GetVisibility(visible, nullptr);
 
     if (!visible)
         return;
 
-    mitk::ContourModelSet *input = this->GetInput();
+    mitk::ContourModelSet::Pointer input = this->GetInput();
 
     auto centerOfViewPointZ = renderer->GetCurrentWorldPlaneGeometry()->GetCenter()[2];
     mitk::ContourModelSet::ContourModelSetIterator it = input->Begin();
@@ -79,7 +79,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel *re
   if (!renderingContour)
     return;
 
-  mitk::DataNode *dataNode = this->GetDataNode();
+  mitk::DataNode::Pointer dataNode = this->GetDataNode();
 
   renderingContour->UpdateOutputInformation();
 

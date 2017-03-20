@@ -204,7 +204,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel *re
 
         if (showControlPoints)
         {
-          // draw ontrol points
+          // draw control points
           if ((*pointsIt)->IsControlPoint)
           {
             float pointsize = 4;

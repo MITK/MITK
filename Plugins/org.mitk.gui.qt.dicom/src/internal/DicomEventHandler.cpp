@@ -263,7 +263,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
               mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
 
               for (const auto& aStruct : readerOutput){
-                  std::cout << aStruct->GetProperty("name")->GetValueAsString() << std::endl;
                   mitk::ContourModelSet::Pointer countourModelSet = dynamic_cast<mitk::ContourModelSet*>(aStruct.GetPointer());
 
                   mitk::DataNode::Pointer structNode = mitk::DataNode::New();
@@ -273,7 +272,7 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                   structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
                   structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
                   structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+                          mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
                   structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
                       mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
                   structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
@@ -284,7 +283,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                   dataStorage->Add(structNode);
               }
               mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
-              std::cout << "done" << std::endl;
           }
       }
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)

@@ -248,29 +248,45 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
       }
       else if(modality.compare("RTSTRUCT",Qt::CaseInsensitive) == 0)
       {
-        mitk::RTStructureSetReader::Pointer structreader = mitk::RTStructureSetReader::New();
-        std::deque<mitk::DataNode::Pointer> modelVector = structreader->ReadStructureSet(listOfFilesForSeries.at(0).toStdString().c_str());
+          auto structReader = mitk::RTStructureSetReader();
+          structReader.SetInput(listOfFilesForSeries.front().toStdString());
+          std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = structReader.Read();
 
-        if(modelVector.empty())
-        {
-          MITK_ERROR << "No structuresets were created" << endl;
-        }
-        else
-        {
-          ctkServiceReference serviceReference =mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-          mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
-          mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
-
-          for(int i=0; i<modelVector.size();i++)
-          {
-            dataStorage->Add(modelVector.at(i));
+          if (readerOutput.empty()){
+              MITK_ERROR << "No structure sets were created" << endl;
           }
-          mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
-        }
+          else {
+              std::vector<mitk::DataNode::Pointer> modelVector;
+
+              ctkServiceReference serviceReference = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
+              mitk::IDataStorageService* storageService = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(serviceReference);
+              mitk::DataStorage* dataStorage = storageService->GetDefaultDataStorage().GetPointer()->GetDataStorage();
+
+              for (const auto& aStruct : readerOutput){
+                  mitk::ContourModelSet::Pointer countourModelSet = dynamic_cast<mitk::ContourModelSet*>(aStruct.GetPointer());
+
+                  mitk::DataNode::Pointer structNode = mitk::DataNode::New();
+                  structNode->SetData(countourModelSet);
+                  structNode->SetProperty("name", aStruct->GetProperty("name"));
+                  structNode->SetProperty("color", aStruct->GetProperty("contour.color"));
+                  structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
+                  structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
+                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
+                          mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
+                  structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
+                  structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
+                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+
+                  dataStorage->Add(structNode);
+              }
+              mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+          }
       }
       else if (modality.compare("RTPLAN", Qt::CaseInsensitive) == 0)
       {
-          std::cout << "RTPLAN" << std::endl;
           auto planReader = mitk::RTPlanReader();
           planReader.SetInput(listOfFilesForSeries.front().toStdString());
           std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput = planReader.Read();

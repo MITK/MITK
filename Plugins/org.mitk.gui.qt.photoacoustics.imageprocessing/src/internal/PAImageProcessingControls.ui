@@ -130,21 +130,21 @@
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="13" column="1">
+         <item row="14" column="1">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Speed of Sound [m/s]</string>
            </property>
           </widget>
          </item>
-         <item row="12" column="1">
+         <item row="13" column="1">
           <widget class="QLabel" name="label">
            <property name="text">
             <string>Scan Depth [mm]</string>
            </property>
           </widget>
          </item>
-         <item row="14" column="0">
+         <item row="15" column="0">
           <widget class="QDoubleSpinBox" name="Pitch">
            <property name="decimals">
             <number>1</number>
@@ -163,7 +163,7 @@
            </property>
           </widget>
          </item>
-         <item row="13" column="0">
+         <item row="14" column="0">
           <widget class="QDoubleSpinBox" name="SpeedOfSound">
            <property name="decimals">
             <number>1</number>
@@ -182,21 +182,21 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Beamforming Method</string>
            </property>
           </widget>
          </item>
-         <item row="15" column="1">
+         <item row="16" column="1">
           <widget class="QLabel" name="label_5">
            <property name="text">
             <string>Transducer Element Count</string>
            </property>
           </widget>
          </item>
-         <item row="12" column="0">
+         <item row="13" column="0">
           <widget class="QDoubleSpinBox" name="ScanDepth">
            <property name="decimals">
             <number>1</number>
@@ -209,7 +209,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QComboBox" name="BFAlgorithm">
            <item>
             <property name="text">
@@ -223,14 +223,14 @@
            </item>
           </widget>
          </item>
-         <item row="14" column="1">
+         <item row="15" column="1">
           <widget class="QLabel" name="label_3">
            <property name="text">
             <string>Transducer Pitch [mm]</string>
            </property>
           </widget>
          </item>
-         <item row="15" column="0">
+         <item row="16" column="0">
           <widget class="QSpinBox" name="ElementCount">
            <property name="minimum">
             <number>1</number>
@@ -246,7 +246,7 @@
            </property>
           </widget>
          </item>
-         <item row="16" column="0">
+         <item row="17" column="0">
           <widget class="QSpinBox" name="Samples">
            <property name="minimum">
             <number>256</number>
@@ -262,7 +262,7 @@
            </property>
           </widget>
          </item>
-         <item row="17" column="0">
+         <item row="18" column="0">
           <widget class="QSpinBox" name="Lines">
            <property name="minimum">
             <number>128</number>
@@ -278,21 +278,21 @@
            </property>
           </widget>
          </item>
-         <item row="16" column="1">
+         <item row="17" column="1">
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>Samples</string>
            </property>
           </widget>
          </item>
-         <item row="17" column="1">
+         <item row="18" column="1">
           <widget class="QLabel" name="label_7">
            <property name="text">
             <string>Reconstruction Lines</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="8" column="0">
           <widget class="QComboBox" name="DelayCalculation">
            <item>
             <property name="text">
@@ -311,14 +311,14 @@
            </item>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string>Delay Calculation Method</string>
            </property>
           </widget>
          </item>
-         <item row="18" column="0">
+         <item row="19" column="0">
           <widget class="QDoubleSpinBox" name="Angle">
            <property name="decimals">
             <number>1</number>
@@ -331,7 +331,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="0">
+         <item row="12" column="0">
           <widget class="QCheckBox" name="UseImageSpacing">
            <property name="text">
             <string>Compute ScanDepth from Image Data</string>
@@ -341,14 +341,14 @@
            </property>
           </widget>
          </item>
-         <item row="18" column="1">
+         <item row="19" column="1">
           <widget class="QLabel" name="label_9">
            <property name="text">
             <string>Element Angle [°]</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="9" column="0">
           <widget class="QComboBox" name="ImageType">
            <item>
             <property name="text">
@@ -362,14 +362,14 @@
            </item>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="9" column="1">
           <widget class="QLabel" name="label_10">
            <property name="text">
             <string>Image Type</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <widget class="QDoubleSpinBox" name="BPFalloff">
            <property name="decimals">
             <number>2</number>
@@ -388,7 +388,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QDoubleSpinBox" name="BPhigh">
            <property name="decimals">
             <number>2</number>
@@ -398,7 +398,7 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QDoubleSpinBox" name="BPlow">
            <property name="decimals">
             <number>2</number>
@@ -410,52 +410,72 @@
             <double>200.000000000000000</double>
            </property>
            <property name="value">
-            <double>50.000000000000000</double>
+            <double>20.000000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QLabel" name="BPHighLabel">
            <property name="text">
             <string>High Pass BP Frequency [MHz]</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="7" column="1">
           <widget class="QLabel" name="label_13">
            <property name="text">
             <string>BP Falloff (0: rectangular, 1: smooth)</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QLabel" name="BPLowLabel">
            <property name="text">
             <string>Low Pass BP Frequency [MHz]</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_11">
            <property name="text">
             <string>Frequency Range:</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QLabel" name="BPInfoDisplay">
            <property name="text">
             <string>-</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QCheckBox" name="UseBP">
            <property name="text">
             <string>Use Bandpass After Beamforming</string>
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QSpinBox" name="Cutoff">
+           <property name="maximum">
+            <number>500</number>
+           </property>
+           <property name="singleStep">
+            <number>10</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Cutoff Upper Voxels</string>
            </property>
           </widget>
          </item>

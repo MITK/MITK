@@ -448,7 +448,7 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
 
   double part = 0.07 * inputL;
   double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double VH_mult = 1;
 
   double mult = 0;
@@ -526,7 +526,7 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
 
   double part = 0.07 * inputL;
   double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double VH_mult = 1;
 
   double mult = 0;
@@ -600,7 +600,7 @@ void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* outpu
 
   double part = 0.07 * inputL;
   double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double VH_mult = 1;
 
   double mult = 0;

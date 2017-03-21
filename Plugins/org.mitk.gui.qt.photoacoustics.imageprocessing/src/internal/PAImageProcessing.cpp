@@ -242,9 +242,9 @@ void PAImageProcessing::ApplyBeamforming()
       auto newNode = mitk::DataNode::New();
 
       if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-        newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig));
+        newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig, m_Controls.Cutoff->value()));
       else if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-        newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig));
+        newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig, m_Controls.Cutoff->value()));
 
       // name the new Data node
       std::stringstream newNodeName;
@@ -352,8 +352,8 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
   {
     if (m_Controls.UseImageSpacing->isChecked())
     {
-      //DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
-      //DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
+      DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
+      DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
     }
 
     DASconfig.Photoacoustic = false;

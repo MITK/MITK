@@ -97,6 +97,7 @@ void mitk::BeamformingDASFilter::GenerateOutputInformation()
 
 void mitk::BeamformingDASFilter::GenerateData()
 {
+  GenerateOutputInformation();
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
@@ -251,7 +252,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
 
   double part = 0.07 * inputL;
   double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double VH_mult = 1;
 
   double mult = 0;
@@ -309,7 +310,7 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
 
   double part = 0.07 * inputL;
   double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double VH_mult = 1;
 
   double mult = 0;
@@ -364,7 +365,7 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
 
   double part = 0.07 * inputL;
   double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch;
+  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double VH_mult = 1;
 
   double mult = 0;

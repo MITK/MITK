@@ -22,6 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Algorithms/mitkPhotoacousticBeamformingDASFilter.h"
 #include "Algorithms/mitkPhotoacousticBeamformingDMASFilter.h"
 #include <chrono>
+#include <mitkAutoCropImageFilter.h>
 
 // itk dependencies
 #include "itkImage.h"
@@ -157,11 +158,28 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left)
 {
-  BeamformingDASFilter::Pointer Beamformer = BeamformingDASFilter::New();
+  mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
 
-  Image::Pointer resizedImage = inputImage;
+  itk::ImageRegion<3> cropRegion;
+  itk::Index<3> index = { left, above, 0 };
+  itk::Size<3> size = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - above - below, inputImage->GetDimension(2) };
+  cropRegion.SetIndex(index);
+  cropRegion.SetSize(size);
+
+  cropFilter->SetInput(inputImage);
+  cropFilter->SetCroppingRegion(cropRegion);
+  cropFilter->Update();
+
+  return cropFilter->GetOutput();
+}
+
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff)
+{
+  config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
+  Image::Pointer resizedImage = croppedImage;
 
   if (inputImage->GetDimension(0) != config.ReconstructionLines)
   {
@@ -172,6 +190,8 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
     MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
   }
 
+  BeamformingDASFilter::Pointer Beamformer = BeamformingDASFilter::New();
+
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
 
@@ -179,11 +199,11 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
   return Beamformer->GetOutput();
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff)
 {
-  BeamformingDMASFilter::Pointer Beamformer = BeamformingDMASFilter::New();
-
-  Image::Pointer resizedImage = inputImage;
+  config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
+  Image::Pointer resizedImage = croppedImage;
 
   if(inputImage->GetDimension(0) != config.ReconstructionLines)
   {
@@ -193,6 +213,8 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image:
     auto end = std::chrono::high_resolution_clock::now();
     MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
   }
+
+  BeamformingDMASFilter::Pointer Beamformer = BeamformingDMASFilter::New();
 
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);

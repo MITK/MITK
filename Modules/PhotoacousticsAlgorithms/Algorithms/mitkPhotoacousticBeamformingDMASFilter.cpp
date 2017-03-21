@@ -45,6 +45,13 @@ mitk::BeamformingDMASFilter::BeamformingDMASFilter() : m_OutputData(nullptr), m_
   m_Conf.ReconstructionLines = 128;
   m_Conf.RecordTime = 0.00006;
   m_Conf.TransducerElements = 128;
+
+  m_ProgressHandle = [](int) {};
+}
+
+void mitk::BeamformingDMASFilter::SetProgressHandle(std::function<void(int)> progressHandle)
+{
+  m_ProgressHandle = progressHandle;
 }
 
 mitk::BeamformingDMASFilter::~BeamformingDMASFilter()
@@ -234,6 +241,8 @@ void mitk::BeamformingDMASFilter::GenerateData()
     delete[] threads;
     m_OutputData = nullptr;
     m_InputData = nullptr;
+
+    m_ProgressHandle((int)((i + 1) / (double)output->GetDimension(2) * 100));
   }
 
   if (m_Conf.UseBP)

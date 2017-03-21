@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>615</width>
-    <height>678</height>
+    <height>766</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -485,6 +485,16 @@
         <widget class="QPushButton" name="buttonApplyBeamforming">
          <property name="text">
           <string>Apply Beamforming</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="progressBar">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="value">
+          <number>0</number>
          </property>
         </widget>
        </item>

@@ -42,7 +42,7 @@ class PAImageProcessing : public QmitkAbstractView
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
-    void ApplyBModeFilter();
+    
     void UseResampling();
     void UseLogfilter();
     void SetResampling();
@@ -50,6 +50,7 @@ class PAImageProcessing : public QmitkAbstractView
     void UpdateFrequency();
     void UpdateRecordTime(mitk::Image::Pointer image);
 
+    void ApplyBModeFilter();
     void ApplyBeamforming();
 
   protected:

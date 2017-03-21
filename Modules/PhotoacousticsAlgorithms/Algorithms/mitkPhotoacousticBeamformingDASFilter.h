@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define MITK_PHOTOACOUSTICS_BEAMFORMING_DAS_FILTER
 
 #include "mitkImageToImageFilter.h"
+#include <functional>
 
 namespace mitk {
 
@@ -53,6 +54,8 @@ namespace mitk {
 
     void Configure(beamformingSettings settings);
 
+    void SetProgressHandle(std::function<void(int)> progressHandle);
+
   protected:
 
     BeamformingDASFilter();
@@ -68,6 +71,8 @@ namespace mitk {
     //##Description
     //## @brief Time when Header was last initialized
     itk::TimeStamp m_TimeOfHeaderInitialization;
+
+    std::function<void(int)> m_ProgressHandle;
 
     double* VonHannFunction(int samples);
 

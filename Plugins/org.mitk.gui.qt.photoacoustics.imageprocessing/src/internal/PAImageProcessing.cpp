@@ -31,6 +31,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "Algorithms\mitkPhotoacousticBeamformingDASFilter.h"
 #include "Algorithms\mitkPhotoacousticBeamformingDMASFilter.h"
 
+//other
+#include <thread>
+#include <functional>
+
 const std::string PAImageProcessing::VIEW_ID = "org.mitk.views.paimageprocessing";
 
 PAImageProcessing::PAImageProcessing() : m_ResampleSpacing(0), m_UseLogfilter(false)
@@ -60,6 +64,10 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
+  m_Controls.progressBar->setMinimum(0);
+  m_Controls.progressBar->setMaximum(100);
+  m_Controls.progressBar->setVisible(false);
+
   UseImageSpacing();
 }
 
@@ -237,14 +245,27 @@ void PAImageProcessing::ApplyBeamforming()
       }
       message << ".";
       MITK_INFO << message.str();
+
       mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
 
       auto newNode = mitk::DataNode::New();
 
+      m_Controls.progressBar->setValue(0);
+      m_Controls.progressBar->setVisible(true);
+
+      std::function<void(int)> progressHandle = [&m_Controls = m_Controls](int progress) {
+        if(progress < 100) 
+          m_Controls.progressBar->setValue(progress); 
+        else
+          m_Controls.progressBar->setValue(100); 
+       };
+
+
       if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-        newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig, m_Controls.Cutoff->value()));
+        newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig, m_Controls.Cutoff->value(), progressHandle));
       else if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-        newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig, m_Controls.Cutoff->value()));
+        newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig, m_Controls.Cutoff->value(), progressHandle));
+
 
       // name the new Data node
       std::stringstream newNodeName;
@@ -277,6 +298,9 @@ void PAImageProcessing::ApplyBeamforming()
 
       // add new node to data storage
       this->GetDataStorage()->Add(newNode);
+
+      // disable progress bar
+      m_Controls.progressBar->setVisible(false);
 
       // update rendering
       mitk::RenderingManager::GetInstance()->InitializeViews(

@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
 
+
 // itk dependencies
 #include "itkImage.h"
 #include "itkResampleImageFilter.h"
@@ -175,7 +176,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   return cropFilter->GetOutput();
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int)> progressHandle)
 {
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
@@ -194,12 +195,13 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
 
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
+  Beamformer->SetProgressHandle(progressHandle);
 
   Beamformer->UpdateLargestPossibleRegion();
   return Beamformer->GetOutput();
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff, std::function<void(int)> progressHandle)
 {
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
@@ -218,6 +220,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image:
 
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
+  Beamformer->SetProgressHandle(progressHandle);
 
   Beamformer->UpdateLargestPossibleRegion();
   return Beamformer->GetOutput();

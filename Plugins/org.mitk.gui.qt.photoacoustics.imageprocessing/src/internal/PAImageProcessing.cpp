@@ -24,6 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qt
 #include <QMessageBox>
+#include <QApplication>
 
 //mitk image
 #include <mitkImage.h>
@@ -253,19 +254,20 @@ void PAImageProcessing::ApplyBeamforming()
       m_Controls.progressBar->setValue(0);
       m_Controls.progressBar->setVisible(true);
 
-      std::function<void(int)> progressHandle = [&m_Controls = m_Controls](int progress) {
+      auto q_app = qApp;
+
+      std::function<void(int)> progressHandle = [&q_app = q_app, &m_Controls = m_Controls](int progress) {
         if(progress < 100) 
           m_Controls.progressBar->setValue(progress); 
         else
           m_Controls.progressBar->setValue(100); 
+        q_app->processEvents();
        };
-
 
       if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
         newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig, m_Controls.Cutoff->value(), progressHandle));
       else if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
         newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig, m_Controls.Cutoff->value(), progressHandle));
-
 
       // name the new Data node
       std::stringstream newNodeName;

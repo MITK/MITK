@@ -650,7 +650,7 @@ void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* outpu
         {
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * apodisation[(unsigned short)((l_s2 - minLine)*VH_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * apodisation[(unsigned short)((l_s1 - minLine)*VH_mult)];
+            mult = input[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * apodisation[(int)((l_s2 - minLine)*VH_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * apodisation[(int)((l_s1 - minLine)*VH_mult)];
             output[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
           }
         }

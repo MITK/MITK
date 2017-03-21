@@ -15,12 +15,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkPhotoacousticImage.h"
-#include "Algorithms/ITKUltrasound/itkBModeImageFilter.h"
-#include "Algorithms/itkPhotoacousticBModeImageFilter.h"
+#include "itkBModeImageFilter.h"
+#include "itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
-#include "Algorithms/mitkPhotoacousticBeamformingDASFilter.h"
-#include "Algorithms/mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingDASFilter.h"
+#include "mitkPhotoacousticBeamformingDMASFilter.h"
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
 

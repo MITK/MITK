@@ -29,8 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 #include "mitkPhotoacousticImage.h"
-#include "Algorithms\mitkPhotoacousticBeamformingDASFilter.h"
-#include "Algorithms\mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingDASFilter.h"
+#include "mitkPhotoacousticBeamformingDMASFilter.h"
 
 //other
 #include <thread>

@@ -24,8 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_PAImageProcessingControls.h"
 
-#include "Algorithms\mitkPhotoacousticBeamformingDASFilter.h"
-#include "Algorithms\mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingDASFilter.h"
+#include "mitkPhotoacousticBeamformingDMASFilter.h"
 
 class PAImageProcessing : public QmitkAbstractView
 {

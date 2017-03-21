@@ -114,6 +114,8 @@ void mitk::BeamformingDASFilter::GenerateData()
   const int apodArraySize = m_Conf.TransducerElements * 4;
   double* VonHannWindow = VonHannFunction(apodArraySize);
 
+  int progInterval = output->GetDimension(2) / 20 > 1 ? output->GetDimension(2) / 20 : 1;
+
   if (!output->IsInitialized())
   {
     return;
@@ -194,15 +196,13 @@ void mitk::BeamformingDASFilter::GenerateData()
 
     output->SetSlice(m_OutputData, i);
 
-    if (i % 50 == 0)
-      MITK_INFO << "slice " << i + 1 << " of " << output->GetDimension(2) << " computed";
+    if (i % progInterval == 0)
+      m_ProgressHandle((int)((i + 1) / (double)output->GetDimension(2) * 100));
 
     delete[] m_OutputData;
     delete[] m_InputDataPuffer;
     m_OutputData = nullptr;
     m_InputData = nullptr;
-
-    m_ProgressHandle((int)((i + 1) / (double)output->GetDimension(2) * 100));
   }
 
   if (m_Conf.UseBP)
@@ -290,7 +290,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
 
     for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = delayMultiplicator * (l_s - l_i) + s_i;
+      AddSample = abs(delayMultiplicator * (l_s - l_i) + s_i);
       if (AddSample < inputS && AddSample >= 0)
         output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*VH_mult)];
     }

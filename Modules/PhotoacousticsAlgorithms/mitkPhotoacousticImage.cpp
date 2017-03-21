@@ -161,7 +161,72 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Poin
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left)
 {
-  mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
+  double* inputData = new double[inputImage->GetDimension(0)*inputImage->GetDimension(1)*inputImage->GetDimension(2)];
+  double* outputData = new double[(inputImage->GetDimension(0) - left - right)*(inputImage->GetDimension(1) - above - below)*inputImage->GetDimension(2)];
+
+  unsigned int inputDim[3] = { inputImage->GetDimension(0), inputImage->GetDimension(1), inputImage->GetDimension(2) };
+  unsigned int outputDim[3] = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - above - below, inputImage->GetDimension(2) };
+
+  ImageReadAccessor acc(inputImage);
+
+  if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
+  {
+    inputData = (double*)acc.GetData();
+  }
+  else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (short)" || inputImage->GetPixelType().GetTypeAsString() == " (short)")
+  {
+    short* inputPuffer = (short*)acc.GetData();
+    for (int sl = 0; sl < inputDim[2]; ++sl)
+    {
+      for (int l = 0; l < inputDim[0]; ++l)
+      {
+        for (int s = 0; s < inputDim[1]; ++s)
+        {
+          inputData[l*inputDim[1] + s + sl*inputDim[0]*inputDim[1]] = (double)inputPuffer[l*inputDim[1] + s + sl*inputDim[0]*inputDim[1]];
+        }
+      }
+    }
+  }
+  else if (inputImage->GetPixelType().GetTypeAsString() == "scalar (float)" || inputImage->GetPixelType().GetTypeAsString() == " (float)")
+  {
+    float* inputPuffer = (float*)acc.GetData();
+    for (int sl = 0; sl < inputDim[2]; ++sl)
+    {
+      for (int l = 0; l < inputDim[0]; ++l)
+      {
+        for (int s = 0; s < inputDim[1]; ++s)
+        {
+          inputData[l*inputDim[1] + s + sl*inputDim[0]*inputDim[1]] = (double)inputPuffer[l*inputDim[1] + s + sl*inputDim[0]*inputDim[1]];
+        }
+      }
+    }
+  }
+  else
+  {
+    MITK_INFO << "Could not determine pixel type";
+  }
+
+  for (int sl = 0; sl < outputDim[2]; ++sl)
+  {
+    for (int l = 0; l < outputDim[0]; ++l)
+    {
+      for (int s = 0; s < outputDim[1]; ++s)
+      {
+        outputData[l + s*(unsigned short)outputDim[0] +sl*outputDim[0]*outputDim[1]] = inputData[(l + left) + (s + above)*(unsigned short)inputDim[0] + sl*inputDim[0]*inputDim[1]];
+      }
+    }
+  }
+  mitk::Image::Pointer output = mitk::Image::New();
+  output->Initialize(mitk::MakeScalarPixelType<double>(), 3, outputDim);
+  output->SetSpacing(inputImage->GetGeometry()->GetSpacing());
+  for (int slice = 0; slice < outputDim[2]; ++slice)
+  {
+    output->SetSlice(&outputData[slice*outputDim[0] * outputDim[1]], slice);
+  }
+
+  return output;
+
+  /*mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
 
   itk::ImageRegion<3> cropRegion;
   itk::Index<3> index = { left, above, 0 };
@@ -173,7 +238,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   cropFilter->SetCroppingRegion(cropRegion);
   cropFilter->Update();
 
-  return cropFilter->GetOutput();
+  return cropFilter->GetOutput();*/
 }
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int)> progressHandle)
@@ -185,8 +250,8 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
   if (inputImage->GetDimension(0) != config.ReconstructionLines)
   {
     auto begin = std::chrono::high_resolution_clock::now();
-    unsigned int dim[3] = { config.ReconstructionLines, inputImage->GetDimension(1), inputImage->GetDimension(2) };
-    resizedImage = ApplyResampling(inputImage, dim);
+    unsigned int dim[3] = { config.ReconstructionLines, croppedImage->GetDimension(1), croppedImage->GetDimension(2) };
+    resizedImage = ApplyResampling(croppedImage, dim);
     auto end = std::chrono::high_resolution_clock::now();
     MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
   }
@@ -210,8 +275,8 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image:
   if(inputImage->GetDimension(0) != config.ReconstructionLines)
   {
     auto begin = std::chrono::high_resolution_clock::now();
-    unsigned int dim[3] = { config.ReconstructionLines, inputImage->GetDimension(1), inputImage->GetDimension(2) };
-    resizedImage = ApplyResampling(inputImage, dim);
+    unsigned int dim[3] = { config.ReconstructionLines, croppedImage->GetDimension(1), croppedImage->GetDimension(2) };
+    resizedImage = ApplyResampling(croppedImage, dim);
     auto end = std::chrono::high_resolution_clock::now();
     MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
   }

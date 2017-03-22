@@ -67,20 +67,20 @@ CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<unsigned char, VImageDimension> MaskImageType;
-  typedef ImageType::IndexType IndexType;
+  typedef typename ImageType::IndexType IndexType;
 
   typedef itk::ImageRegionIteratorWithIndex<ImageType> ConstIterType;
   typedef itk::ImageRegionIteratorWithIndex<MaskImageType> ConstMaskIterType;
 
   auto region = mask->GetLargestPossibleRegion();
-  MaskImageType::RegionType newRegion;
+  typename MaskImageType::RegionType newRegion;
   newRegion.SetSize(region.GetSize());
   newRegion.SetIndex(region.GetIndex());
 
   ConstIterType imageIter(itkImage, itkImage->GetLargestPossibleRegion());
   ConstMaskIterType maskIter(mask, mask->GetLargestPossibleRegion());
 
-  MaskImageType::Pointer visitedImage = MaskImageType::New();
+  typename MaskImageType::Pointer visitedImage = MaskImageType::New();
   visitedImage->SetRegions(newRegion);
   visitedImage->Allocate();
   visitedImage->FillBuffer(0);

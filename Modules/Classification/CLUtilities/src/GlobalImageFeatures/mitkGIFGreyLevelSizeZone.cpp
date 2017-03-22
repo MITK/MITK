@@ -14,7 +14,7 @@
 #include <sstream>
 
 static
-void MatrixFeaturesTo(mitk::GreyLevelSizeZoneMatrixHolder features,
+void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
                       std::string prefix,
                       mitk::GIFGreyLevelSizeZone::FeatureListType &featureList);
 static
@@ -62,7 +62,7 @@ void
 CalculateGlSZMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
                     itk::Image<unsigned char, VImageDimension>* mask,
                     std::vector<itk::Offset<VImageDimension> > offsets,
-                    int range,
+                    int,
                     mitk::GreyLevelSizeZoneMatrixHolder &holder)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;

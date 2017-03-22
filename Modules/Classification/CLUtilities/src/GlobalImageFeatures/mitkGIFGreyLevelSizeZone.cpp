@@ -18,11 +18,6 @@ void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
                       std::string prefix,
                       mitk::GIFGreyLevelSizeZone::FeatureListType &featureList);
 
-static
-void NormalizeMatrixFeature(mitk::GreyLevelSizeZoneFeatures &features,
-                            std::size_t number);
-
-
 
 
 mitk::GreyLevelSizeZoneMatrixHolder::GreyLevelSizeZoneMatrixHolder(double min, double max, int number, int maxSize) :
@@ -319,28 +314,6 @@ void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
   featureList.push_back(std::make_pair(prefix + " Zone Size Mean", features.ZoneSizeMean));
   featureList.push_back(std::make_pair(prefix + " Zone Size Variance", features.ZoneSizeVariance));
   featureList.push_back(std::make_pair(prefix + " Zone Size Entropy", features.ZoneSizeEntropy));
-}
-
-static
-void NormalizeMatrixFeature(mitk::GreyLevelSizeZoneFeatures &features,
-std::size_t number)
-{
-  features.SmallZoneEmphasis = features.SmallZoneEmphasis / number;
-  features.LargeZoneEmphasis = features.LargeZoneEmphasis / number;
-  features.LowGreyLevelEmphasis = features.LowGreyLevelEmphasis / number;
-  features.HighGreyLevelEmphasis = features.HighGreyLevelEmphasis / number;
-  features.SmallZoneLowGreyLevelEmphasis = features.SmallZoneLowGreyLevelEmphasis / number;
-  features.SmallZoneHighGreyLevelEmphasis = features.SmallZoneHighGreyLevelEmphasis / number;
-  features.LargeZoneLowGreyLevelEmphasis = features.LargeZoneLowGreyLevelEmphasis / number;
-  features.LargeZoneHighGreyLevelEmphasis = features.LargeZoneHighGreyLevelEmphasis / number;
-  features.GreyLevelNonUniformity = features.GreyLevelNonUniformity / number;
-  features.GreyLevelNonUniformityNormalized = features.GreyLevelNonUniformityNormalized / number;
-  features.ZoneSizeNonUniformity = features.ZoneSizeNonUniformity / number;
-  features.ZoneSizeNoneUniformityNormalized = features.ZoneSizeNoneUniformityNormalized / number;
-  features.ZonePercentage = features.ZonePercentage / number;
-  features.GreyLevelVariance = features.GreyLevelVariance / number;
-  features.ZoneSizeVariance = features.ZoneSizeVariance / number;
-  features.ZoneSizeEntropy = features.ZoneSizeEntropy / number;
 }
 
   mitk::GIFGreyLevelSizeZone::GIFGreyLevelSizeZone() :

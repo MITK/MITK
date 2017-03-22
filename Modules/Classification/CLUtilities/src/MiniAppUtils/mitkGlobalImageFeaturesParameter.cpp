@@ -110,6 +110,7 @@ void mitk::cl::GlobalImageFeaturesParameter::ParseAdditionalOutputs(std::map<std
   writePNGScreenshots = false;
   if (parsedArgs.count("save-image-screenshots"))
   {
+    writePNGScreenshots = true;
     pngScreenshotsPath = us::any_cast<std::string>(parsedArgs["save-image-screenshots"]);
     std::string pngScrenshotFolderPath = itksys::SystemTools::GetFilenamePath(pngScreenshotsPath);
     if (pngScreenshotsPath.back() == '/' || pngScreenshotsPath.back() == '\\')

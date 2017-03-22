@@ -45,7 +45,9 @@ template<typename TPixel, unsigned int VImageDimension>
 static void
 FindMostSampleSlice(itk::Image<TPixel, VImageDimension>* mask, int & selectedSlice)
 {
-  int size = mask->GetLargestPossibleRegion().GetSize()[0];
+  int idx = VImageDimension - 1;
+
+  int size = mask->GetLargestPossibleRegion().GetSize()[idx];
   std::vector<int> numberOfSamples;
   numberOfSamples.resize(size,0);
 
@@ -54,7 +56,7 @@ FindMostSampleSlice(itk::Image<TPixel, VImageDimension>* mask, int & selectedSli
   {
     if (mask1Iter.Value() > 0)
     {
-      numberOfSamples[mask1Iter.GetIndex()[0]]+=1;
+      numberOfSamples[mask1Iter.GetIndex()[idx]]+=1;
     }
     ++mask1Iter;
   }
@@ -82,23 +84,25 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
   ds->Add(nodeM);
 
   mitk::TimeGeometry::Pointer geo = ds->ComputeBoundingGeometry3D(ds->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    mask->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
+  sliceNaviController->SetViewDirection(mitk::SliceNavigationController::Axial);
   unsigned int numberOfSteps = 1;
   if (sliceNaviController)
   {
     numberOfSteps = sliceNaviController->GetSlice()->GetSteps();
-    sliceNaviController->GetSlice()->SetPos(0);
+    sliceNaviController->GetSlice()->SetPos(numberOfSteps-index);
   }
 
   renderWindow.show();
   renderWindow.resize(256, 256);
 
-  if (sliceNaviController)
-  {
-    sliceNaviController->GetSlice()->SetPos(index);
-  }
+  //if (sliceNaviController)
+  //{
+  //  sliceNaviController->GetSlice()->SetPos(index);
+  //}
   renderWindow.GetRenderer()->PrepareRender();
 
   vtkRenderWindow* renderWindow2 = renderWindow.GetVtkRenderWindow();

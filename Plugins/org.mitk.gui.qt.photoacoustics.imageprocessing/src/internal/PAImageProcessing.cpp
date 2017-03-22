@@ -278,16 +278,16 @@ void PAImageProcessing::ApplyBeamforming()
       }
 
       if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-        newNodeName << "DAS beamformed, ";
+        newNodeName << "DAS bf, ";
       else if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-        newNodeName << "DMAS beamformed, ";
+        newNodeName << "DMAS bf, ";
       
       if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear)
-        newNodeName << "linear delay";
+        newNodeName << "l. delay";
       if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox)
-        newNodeName << "quadratic delay";
+        newNodeName << "q. delay";
       if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical)
-        newNodeName << "spherical delay";
+        newNodeName << "s. delay";
 
       newNode->SetName(newNodeName.str());
 
@@ -314,22 +314,22 @@ void PAImageProcessing::ApplyBeamforming()
 
 void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 {
-  if ("Delay and Sum" == m_Controls.BFAlgorithm->currentText())
+  if ("DAS" == m_Controls.BFAlgorithm->currentText())
     m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DAS;
-  else if ("Delay, Multiply and Sum" == m_Controls.BFAlgorithm->currentText())
+  else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
     m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DMAS;
 
-  if ("Linear Waves" == m_Controls.DelayCalculation->currentText())
+  if ("Plane Wave" == m_Controls.DelayCalculation->currentText())
   {
     DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear;
     DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Linear;
   }
-  else if ("Quadratic Approximation to Spherical Waves" == m_Controls.DelayCalculation->currentText())
+  else if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
     DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox;
     DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::QuadApprox;
   }
-  else if ("Spherical Waves" == m_Controls.DelayCalculation->currentText())
+  else if ("Spherical Wave" == m_Controls.DelayCalculation->currentText())
   {
     DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical;
     DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Spherical;
@@ -374,7 +374,7 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
     DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound; // [s]
   }
 
-  if ("Ultrasound Image" == m_Controls.ImageType->currentText())
+  if ("US Image" == m_Controls.ImageType->currentText())
   {
     if (m_Controls.UseImageSpacing->isChecked())
     {
@@ -385,7 +385,7 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
     DASconfig.Photoacoustic = false;
     DMASconfig.Photoacoustic = false;
   }
-  else
+  else if ("PA Image" == m_Controls.ImageType->currentText())
   {
     DASconfig.Photoacoustic = true;
     DMASconfig.Photoacoustic = true;

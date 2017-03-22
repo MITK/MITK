@@ -17,10 +17,7 @@ static
 void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
                       std::string prefix,
                       mitk::GIFGreyLevelSizeZone::FeatureListType &featureList);
-static
-void CalculateMeanAndStdDevFeatures(std::vector<mitk::GreyLevelSizeZoneFeatures> featureList,
-                                  mitk::GreyLevelSizeZoneFeatures &meanFeature,
-                                  mitk::GreyLevelSizeZoneFeatures  &stdFeature);
+
 static
 void NormalizeMatrixFeature(mitk::GreyLevelSizeZoneFeatures &features,
                             std::size_t number);
@@ -322,54 +319,6 @@ void MatrixFeaturesTo(mitk::GreyLevelSizeZoneFeatures features,
   featureList.push_back(std::make_pair(prefix + " Zone Size Mean", features.ZoneSizeMean));
   featureList.push_back(std::make_pair(prefix + " Zone Size Variance", features.ZoneSizeVariance));
   featureList.push_back(std::make_pair(prefix + " Zone Size Entropy", features.ZoneSizeEntropy));
-}
-
-static
-void CalculateMeanAndStdDevFeatures(std::vector<mitk::GreyLevelSizeZoneFeatures> featureList,
-                                    mitk::GreyLevelSizeZoneFeatures &meanFeature,
-                                    mitk::GreyLevelSizeZoneFeatures  &stdFeature)
-{
-#define ADDFEATURE(a) meanFeature.a += featureList[i].a;stdFeature.a += featureList[i].a*featureList[i].a
-#define CALCVARIANCE(a) stdFeature.a =sqrt(stdFeature.a - meanFeature.a*meanFeature.a)
-
-  for (std::size_t i = 0; i < featureList.size(); ++i)
-  {
-    ADDFEATURE(SmallZoneEmphasis);
-    ADDFEATURE(LargeZoneEmphasis);
-    ADDFEATURE(LowGreyLevelEmphasis);
-    ADDFEATURE(HighGreyLevelEmphasis);
-    ADDFEATURE(SmallZoneLowGreyLevelEmphasis);
-    ADDFEATURE(SmallZoneHighGreyLevelEmphasis);
-    ADDFEATURE(LargeZoneHighGreyLevelEmphasis);
-    ADDFEATURE(GreyLevelNonUniformity);
-    ADDFEATURE(GreyLevelNonUniformityNormalized);
-    ADDFEATURE(ZoneSizeNoneUniformityNormalized);
-    ADDFEATURE(ZonePercentage);
-    ADDFEATURE(GreyLevelVariance);
-    ADDFEATURE(ZoneSizeVariance);
-    ADDFEATURE(ZoneSizeEntropy);
-  }
-  NormalizeMatrixFeature(meanFeature, featureList.size());
-  NormalizeMatrixFeature(stdFeature, featureList.size());
-
-  CALCVARIANCE(SmallZoneEmphasis);
-  CALCVARIANCE(LargeZoneEmphasis);
-  CALCVARIANCE(LowGreyLevelEmphasis);
-  CALCVARIANCE(HighGreyLevelEmphasis);
-  CALCVARIANCE(SmallZoneLowGreyLevelEmphasis);
-  CALCVARIANCE(SmallZoneHighGreyLevelEmphasis);
-  CALCVARIANCE(LargeZoneHighGreyLevelEmphasis);
-  CALCVARIANCE(GreyLevelNonUniformity);
-  CALCVARIANCE(GreyLevelNonUniformityNormalized);
-  CALCVARIANCE(ZoneSizeNonUniformity);
-  CALCVARIANCE(ZoneSizeNoneUniformityNormalized);
-  CALCVARIANCE(ZonePercentage);
-  CALCVARIANCE(GreyLevelVariance);
-  CALCVARIANCE(ZoneSizeVariance);
-  CALCVARIANCE(ZoneSizeEntropy);
-
-#undef ADDFEATURE
-#undef CALCVARIANCE
 }
 
 static

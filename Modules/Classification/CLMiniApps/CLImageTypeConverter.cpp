@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
   else if (type.compare("none") == 0)
   {
     MITK_INFO << " No conversion performed";
+    outputImage = image;
   }
   else
   {

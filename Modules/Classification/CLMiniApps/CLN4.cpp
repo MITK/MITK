@@ -46,7 +46,8 @@ int main(int argc, char* argv[])
   parser.addArgument("number-of-histogram-bins", "nofl", mitkCommandLineParser::Int, "Parameter", "number of bins defining the log input intensity histogram (default 200)", us::Any(), true);
   parser.addArgument("spline-order", "so", mitkCommandLineParser::Int, "Parameter", "Define the spline order (default 3)", us::Any(), true);
   parser.addArgument("winer-filter-noise", "wfn", mitkCommandLineParser::Float, "Parameter", "Noise estimate defining the Wiener filter (default 0.01)", us::Any(), true);
-
+  parser.addArgument("number-of-maximum-iterations", "nomi", mitkCommandLineParser::Int, "Parameter", "Spezifies the maximum number of iterations per run", us::Any(), true);
+  // ToDo: Number Of Maximum Iterations durchschleifen
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 
@@ -100,6 +101,14 @@ int main(int argc, char* argv[])
     float variable = us::any_cast<float>(parsedArgs["winer-filter-noise"]);
     MITK_INFO << "Number of histogram bins: " << variable;
     filter->SetWienerFilterNoise(variable);
+  }
+  if (parsedArgs.count("number-of-maximum-iterations") > 0)
+  {
+    int variable = us::any_cast<int>(parsedArgs["number-of-maximum-iterations"]);
+    MITK_INFO << "Number of Maximum Iterations: " << variable;
+    auto list = filter->GetMaximumNumberOfIterations();
+    list.Fill(variable);
+    filter->SetMaximumNumberOfIterations(list);
   }
 
   filter->Update();

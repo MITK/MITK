@@ -30,6 +30,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLNrrdToPoly^^MitkCore
         CL2Dto3DImage^^MitkCore
         CLWeighting^^MitkCore_MitkCLImportanceWeighting_MitkCLUtilities
+        CLOverlayRoiCenterOfMass^^MitkCore_MitkCLUtilities_MitkQtWidgetsExt
     #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 

@@ -77,7 +77,7 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
   itk::Size<VImageDimension> radius;
   radius.Fill(range);
 
-  if ((direction > 1) && (direction +2 <VImageDimension))
+  if ((direction > 1) && (direction - 2 <VImageDimension))
   {
     radius[direction - 2] = 0;
   }
@@ -97,7 +97,8 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
 
     int i = holder.IntensityToIndex(imageIter.GetCenterPixel());
 
-    if (imageIter.GetCenterPixel() != imageIter.GetCenterPixel())
+    if ((imageIter.GetCenterPixel() != imageIter.GetCenterPixel()) ||
+      (maskIter.GetCenterPixel() < 1))
     {
       ++imageIter;
       ++maskIter;
@@ -106,8 +107,11 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
 
     for (unsigned int position = 0; position < iterSize; ++position)
     {
-      if ((position == center) ||
-         ( ! region.IsInside(maskIter.GetIndex(position))))
+      if (position == center)
+      {
+        continue;
+      }
+      if ( ! region.IsInside(maskIter.GetIndex(position)))
       {
         completeNeighbourhood = false;
         continue;
@@ -115,7 +119,7 @@ CalculateNGLDMMatrix(itk::Image<TPixel, VImageDimension>* itkImage,
       bool isInBounds;
       auto jIntensity = imageIter.GetPixel(position, isInBounds);
       auto jMask = maskIter.GetPixel(position, isInBounds);
-      if (jMask < 0 || (jIntensity != jIntensity) || ( ! isInBounds))
+      if (jMask < 1 || (jIntensity != jIntensity) || ( ! isInBounds))
       {
         completeNeighbourhood = false;
         continue;
@@ -191,6 +195,7 @@ void LocalCalculateFeatures(
       {
         results.DependenceCountEntropy -= pij * std::log(pij) / std::log(2);
       }
+      results.DependenceCountEnergy += pij*pij;
       sj += sij;
     }
     results.GreyLevelNonUniformity += sj*sj;
@@ -240,7 +245,7 @@ void LocalCalculateFeatures(
   results.ExpectedNeighbourhoodSize = holder.m_NeighbourhoodSize;
   results.AverageNeighbourhoodSize = holder.m_NumberOfNeighbourVoxels / (1.0 * holder.m_NumberOfNeighbourhoods);
   results.AverageIncompleteNeighbourhoodSize = (holder.m_NumberOfNeighbourVoxels - holder.m_NumberOfCompleteNeighbourhoods* holder.m_NeighbourhoodSize) / (1.0 * (holder.m_NumberOfNeighbourhoods - holder.m_NumberOfCompleteNeighbourhoods));
-  results.PercentageOfCompleteNeighbourhoods = holder.m_NumberOfCompleteNeighbourhoods / (1.0 * holder.m_NumberOfNeighbourhoods);
+  results.PercentageOfCompleteNeighbourhoods = (1.0*holder.m_NumberOfCompleteNeighbourhoods) / (1.0 * holder.m_NumberOfNeighbourhoods);
   results.PercentageOfDependenceNeighbours = holder.m_NumberOfDependenceNeighbourVoxels / (1.0 * holder.m_NumberOfNeighbourVoxels);
 }
 
@@ -312,6 +317,7 @@ void MatrixFeaturesTo(mitk::NGLDMMatrixFeatures features,
   featureList.push_back(std::make_pair(prefix + " Dependence Count Mean", features.MeanDependenceCount));
   featureList.push_back(std::make_pair(prefix + " Dependence Count Variance", features.DependenceCountVariance));
   featureList.push_back(std::make_pair(prefix + " Dependence Count Entropy", features.DependenceCountEntropy));
+  featureList.push_back(std::make_pair(prefix + " Dependence Count Energy", features.DependenceCountEnergy));
 
   featureList.push_back(std::make_pair(prefix + " Expected Neighbourhood Size", features.ExpectedNeighbourhoodSize));
   featureList.push_back(std::make_pair(prefix + " Average Neighbourhood Size", features.AverageNeighbourhoodSize));
@@ -351,8 +357,6 @@ mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureListType mitk::GIFNeighb
 mitk::GIFNeighbouringGreyLevelDependenceFeature::FeatureNameListType mitk::GIFNeighbouringGreyLevelDependenceFeature::GetFeatureNames()
 {
   FeatureNameListType featureList;
-  featureList.push_back("co-occ. Energy Means");
-  featureList.push_back("co-occ. Energy Std.");
 
   return featureList;
 }
@@ -393,11 +397,11 @@ mitk::GIFNeighbouringGreyLevelDependenceFeature::CalculateFeaturesUsingParameter
 
     for (std::size_t i = 0; i < ranges.size(); ++i)
     {
-      MITK_INFO << "Start calculating coocurence with range " << ranges[i] << "....";
+      MITK_INFO << "Start calculating NGLDM with range " << ranges[i] << "....";
       this->SetRange(ranges[i]);
       auto localResults = this->CalculateFeatures(feature, maskNoNAN);
       featureList.insert(featureList.end(), localResults.begin(), localResults.end());
-      MITK_INFO << "Finished calculating coocurence with range " << ranges[i] << "....";
+      MITK_INFO << "Finished calculating NGLDM with range " << ranges[i] << "....";
     }
   }
 }

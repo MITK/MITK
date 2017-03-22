@@ -52,6 +52,7 @@ namespace mitk
       GreyLevelVariance(0),
       DependenceCountVariance(0),
       DependenceCountEntropy(0),
+      DependenceCountEnergy(0),
       MeanGreyLevelCount(0),
       MeanDependenceCount(0),
       ExpectedNeighbourhoodSize(0),
@@ -81,6 +82,7 @@ namespace mitk
     double GreyLevelVariance;
     double DependenceCountVariance;
     double DependenceCountEntropy;
+    double DependenceCountEnergy;
     double MeanGreyLevelCount;
     double MeanDependenceCount;
 

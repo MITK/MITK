@@ -31,6 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkGIFGrayLevelRunLength.h>
 #include <mitkGIFFirstOrderStatistics.h>
 #include <mitkGIFVolumetricStatistics.h>
+#include <mitkGIFGreyLevelSizeZone.h>
 #include <mitkGIFNeighbouringGreyLevelDependenceFeatures.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -321,6 +322,7 @@ int main(int argc, char* argv[])
   mitk::GIFCooccurenceMatrix2::Pointer cooc2Calculator = mitk::GIFCooccurenceMatrix2::New();
   mitk::GIFNeighbouringGreyLevelDependenceFeature::Pointer ngldCalculator = mitk::GIFNeighbouringGreyLevelDependenceFeature::New();
   mitk::GIFGrayLevelRunLength::Pointer rlCalculator = mitk::GIFGrayLevelRunLength::New();
+  mitk::GIFGreyLevelSizeZone::Pointer glszCalculator = mitk::GIFGreyLevelSizeZone::New();
 
   std::vector<mitk::AbstractGlobalImageFeature::Pointer> features;
   features.push_back(firstOrderCalculator.GetPointer());
@@ -329,7 +331,7 @@ int main(int argc, char* argv[])
   features.push_back(cooc2Calculator.GetPointer());
   features.push_back(ngldCalculator.GetPointer());
   features.push_back(rlCalculator.GetPointer());
-
+  features.push_back(glszCalculator.GetPointer());
 
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
@@ -369,7 +371,7 @@ int main(int argc, char* argv[])
   bool savePNGofSlices = true;
   std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
 
-  std::string version = "Version: 1.18";
+  std::string version = "Version: 1.19";
   MITK_INFO << version;
 
   std::ofstream log;
@@ -541,6 +543,8 @@ int main(int argc, char* argv[])
   QApplication qtapplication(argc, argv);
   QmitkRegisterClasses();
 
+  std::vector<mitk::AbstractGlobalImageFeature::FeatureListType> allStats;
+
   while (imageToProcess)
   {
     if (sliceWise)
@@ -589,7 +593,60 @@ int main(int argc, char* argv[])
     }
     writer.AddResult(description, currentSlice, stats, param.useHeader, addDescription);
 
+    allStats.push_back(stats);
     ++currentSlice;
+  }
+
+  if (sliceWise)
+  {
+    mitk::AbstractGlobalImageFeature::FeatureListType statMean, statStd;
+    for (std::size_t i = 0; i < allStats[0].size(); ++i)
+    {
+      auto cElement1 = allStats[0][i];
+      cElement1.first = "SliceWise Mean " + cElement1.first;
+      cElement1.second = 0.0;
+      auto cElement2 = allStats[0][i];
+      cElement2.first = "SliceWise Var. " + cElement2.first;
+      cElement2.second = 0.0;
+      statMean.push_back(cElement1);
+      statStd.push_back(cElement2);
+    }
+
+    for (auto cStat : allStats)
+    {
+      for (std::size_t i = 0; i < cStat.size(); ++i)
+      {
+        statMean[i].second += cStat[i].second / (1.0*allStats.size());
+      }
+    }
+
+    for (auto cStat : allStats)
+    {
+      for (std::size_t i = 0; i < cStat.size(); ++i)
+      {
+        statStd[i].second += (cStat[i].second - statMean[i].second)*(cStat[i].second - statMean[i].second) / (1.0*allStats.size());
+      }
+    }
+
+    for (std::size_t i = 0; i < statMean.size(); ++i)
+    {
+      std::cout << statMean[i].first << " - " << statMean[i].second << std::endl;
+      std::cout << statStd[i].first << " - " << statStd[i].second << std::endl;
+    }
+    if (true)
+    {
+      writer.AddColumn(param.imageFolder);
+      writer.AddColumn(param.imageName);
+      writer.AddColumn(param.maskName + " - Mean");
+    }
+    writer.AddResult(description, currentSlice, statMean, param.useHeader, addDescription);
+    if (true)
+    {
+      writer.AddColumn(param.imageFolder);
+      writer.AddColumn(param.imageName);
+      writer.AddColumn(param.maskName + " - Var.");
+    }
+    writer.AddResult(description, currentSlice, statStd, param.useHeader, addDescription);
   }
 
   if (param.useLogfile)

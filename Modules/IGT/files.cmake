@@ -98,3 +98,7 @@ endif(MITK_USE_MICRON_TRACKER)
 if(MITK_USE_MICROBIRD_TRACKER)
   set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkMicroBirdTrackingDevice.cpp)
 endif(MITK_USE_MICROBIRD_TRACKER)
+
+if(MITK_USE_POLHEMUS_TRACKER)
+  set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkPolhemusInterface.cpp)
+endif(MITK_USE_POLHEMUS_TRACKER)

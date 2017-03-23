@@ -46,8 +46,7 @@ template<class T> class MutexLockHolder;
 }
 
 namespace mitk {
-
-typedef itk::Image<PixelType, 3> ImageTypeForReader;
+typedef itk::Image<signed short, 3> ImageTypeForReader;
 typedef itk::ImageSeriesReader<ImageTypeForReader> ReaderType;
   
 class SubImageSelector;

@@ -30,8 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Util/HelpFormatter.h>
 
-#include <QSplashScreen>
-#include <QRunnable> 
+#include <QPainter>
 #include <QFileInfo>
 
 #include <QTime>
@@ -63,13 +62,13 @@ QString BaseApplication::ARG_TESTPLUGIN = "BlueBerry.testplugin";
 QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 
 QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
+QString BaseApplication::ARG_AUTOPLAN_VERSION = "BlueBerry.autoplanversion";
 
 QString BaseApplication::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
 QString BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
 QString BaseApplication::ARG_REGISTRY_MULTI_LANGUAGE = "BlueBerry.registryMultiLanguage";
 
 QString BaseApplication::ARG_XARGS = "xargs";
-
 
 QString BaseApplication::PROP_NEWINSTANCE = BaseApplication::ARG_NEWINSTANCE;
 QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -81,24 +80,6 @@ QString BaseApplication::PROP_PRODUCT = "blueberry.product";
 QString BaseApplication::PROP_APPLICATION = "blueberry.application";
 QString BaseApplication::PROP_TESTPLUGIN = "BlueBerry.testplugin";
 QString BaseApplication::PROP_TESTAPPLICATION = "BlueBerry.testapplication";
-
-
-class SplashCloserCallback : public QRunnable
-{
-public:
-  SplashCloserCallback(QSplashScreen* splashscreen)
-  {
-    this->m_Splashscreen = splashscreen;
-  }
-
-  void run()
-  {
-    this->m_Splashscreen->close();
-  }
-
-private:
-  QSplashScreen* m_Splashscreen;
-};
 
 struct BaseApplication::Impl
 {
@@ -127,7 +108,7 @@ struct BaseApplication::Impl
     , m_Argv(argv)
     , m_SingleMode(false)
     , m_SafeMode(true)
-    ,m_Splashscreen(0)
+    , m_Splashscreen(0)
     , m_SplashscreenClosingCallback(NULL)
   {
 #ifdef Q_OS_MAC
@@ -734,13 +715,6 @@ int BaseApplication::main(const std::vector<std::string>& args)
     arguments.push_back(QString::fromStdString(arg));
   }
 
-  if (d->m_Splashscreen != 0)
-  {
-    // a splash screen is displayed,
-    // creating the closing callback
-    d->m_SplashscreenClosingCallback = new SplashCloserCallback(d->m_Splashscreen);
-  }
-
   return ctkPluginFrameworkLauncher::run(d->m_SplashscreenClosingCallback, QVariant::fromValue(arguments)).toInt();
 }
 
@@ -839,17 +813,43 @@ QHash<QString, QVariant> BaseApplication::getFrameworkProperties() const
   return d->m_FWProps;
 }
 
-void BaseApplication::initializeSplashScreen(QCoreApplication * application) const
+static const int PROGRESS_X_PX = 200;
+static const int PROGRESS_Y_PX = 650;
+static const int PROGRESS_WIDTH_PX = 870;
+static const int PROGRESS_HEIGHT_PX = 30;
+
+void BaseApplication::initializeSplashScreen(QCoreApplication * application)
 {
   QVariant pixmapFileNameProp = d->getProperty(ARG_SPLASH_IMAGE);
-  if (!pixmapFileNameProp.isNull()) {
+  QVariant autoplanVersion = d->getProperty(ARG_AUTOPLAN_VERSION);
+  if (!pixmapFileNameProp.isNull())
+  {
     QString pixmapFileName = pixmapFileNameProp.toString();
     QFileInfo checkFile(pixmapFileName);
-    if (checkFile.exists() && checkFile.isFile()) {
+    if (checkFile.exists() && checkFile.isFile())
+    {
       QPixmap pixmap(checkFile.absoluteFilePath());
       d->m_Splashscreen = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+      if (!autoplanVersion.isNull())
+      {
+        QString autoplanVersionString = autoplanVersion.toString();
+        d->m_Splashscreen->showMessage( autoplanVersionString, Qt::AlignBottom | Qt::AlignRight, Qt::white);
+      }
+      m_drawProgress = [this, pixmap, application] (float progress) mutable
+      {
+        QPainter splashPainter;
+        splashPainter.begin(&pixmap);
+        splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, progress * PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
+        d->m_Splashscreen->setPixmap(d->m_Splashscreen->pixmap());
+        splashPainter.end();
+        d->m_Splashscreen->setPixmap(pixmap);
+        application->processEvents();
+      };
       d->m_Splashscreen->show();
-      application->processEvents();
+      m_drawProgress(0.1);
+      ///Closing callback for splashscreen
+      d->m_SplashscreenClosingCallback =
+          new SplashCloserCallback(d->m_Splashscreen, m_drawProgress);
     }
   }
 }

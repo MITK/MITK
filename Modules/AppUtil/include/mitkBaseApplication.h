@@ -17,6 +17,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKBASEAPPLICATION_H
 #define MITKBASEAPPLICATION_H
 
+#include <functional>
+
+#include <boost/thread.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include <MitkAppUtilExports.h>
 
 #include <Poco/Util/Application.h>
@@ -26,6 +31,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <QTranslator>
+#include <QRunnable>
+#include <QSplashScreen>
 
 class QCoreApplication;
 
@@ -33,6 +40,48 @@ class ctkPluginContext;
 class ctkPluginFramework;
 
 namespace mitk {
+
+class SplashCloserCallback : public QRunnable
+{
+public:
+  SplashCloserCallback(QSplashScreen* splashscreen, std::function<void(float)> drawProgress)
+    : m_working(true)
+  {
+    this->m_Splashscreen = splashscreen;
+    this->m_drawProgress = drawProgress;
+    m_workThread = boost::thread(boost::bind(&SplashCloserCallback::update, this));
+  }
+
+  void update()
+  {
+    while (m_working)
+    {
+      boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+      if (m_progress >= 1.f)
+      {
+        m_progress = 0.f;
+      }
+      else
+      {
+        m_progress += .1f;
+      }
+      m_drawProgress(m_progress);
+    }
+  }
+
+  void run()
+  {
+    m_working = false;
+    this->m_Splashscreen->close();
+  }
+
+private:
+  bool m_working;
+  float m_progress = 0.f;
+  boost::thread m_workThread;
+  QSplashScreen* m_Splashscreen;
+  std::function<void(float)> m_drawProgress;
+};
 
 /**
  * A utility classes for starting up BlueBerry applications.
@@ -108,6 +157,7 @@ public:
   static QString ARG_REGISTRY_MULTI_LANGUAGE;
 
   static QString ARG_SPLASH_IMAGE;
+  static QString ARG_AUTOPLAN_VERSION;
 
   static QString ARG_XARGS;
 
@@ -329,7 +379,9 @@ protected:
   * Initialize and display the splash screen if an image filename is given
   *
   */
-  void initializeSplashScreen(QCoreApplication * application) const;
+  void initializeSplashScreen(QCoreApplication * application);
+
+  std::function<void(float)> m_drawProgress;
 
 private:
 

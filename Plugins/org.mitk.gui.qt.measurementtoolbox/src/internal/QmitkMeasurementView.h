@@ -77,7 +77,7 @@ class QmitkMeasurementView : public QmitkAbstractView
     void OnCopyToClipboard( bool checked = false );
 
     void CommentDoneTriggered( bool checked = false );
-    void CommentCanselTriggered( bool checked = false );
+    void CommentCancelTriggered( bool checked = false );
 
   private:
 

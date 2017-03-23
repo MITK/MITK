@@ -154,7 +154,7 @@ struct QmitkMeasurementViewData
   QTextBrowser* m_comment;
   QPushButton* m_CopyToClipboard;
   QPushButton* m_CommentDone;
-  QPushButton* m_CommentCansel;
+  QPushButton* m_CommentCancel;
   QLabel* m_CommentText;
   QGridLayout* m_Layout;
 };
@@ -259,7 +259,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_CopyToClipboard = new QPushButton(TR_CLIPBOARD_COPY);
 
   d->m_CommentDone = new QPushButton(QString(TR_COMMENT_DONE));
-  d->m_CommentCansel = new QPushButton(QString(TR_COMMENT_CANCEL));
+  d->m_CommentCancel = new QPushButton(QString(TR_COMMENT_CANCEL));
 
   d->m_Layout = new QGridLayout;
   d->m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
@@ -270,7 +270,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_Layout->addWidget(d->m_CommentText, 3, 0, 1, 2);
   d->m_Layout->addWidget(d->m_comment, 4, 0, 1, 2);
   d->m_Layout->addWidget(d->m_CommentDone, 5, 0, 1, 1);
-  d->m_Layout->addWidget(d->m_CommentCansel, 5, 1, 1, 1);
+  d->m_Layout->addWidget(d->m_CommentCancel, 5, 1, 1, 1);
 
   d->m_Layout->addWidget(d->m_CopyToClipboard, 6, 0, 1, 2);
 
@@ -299,7 +299,7 @@ void QmitkMeasurementView::CreateConnections()
   connect(d->m_CopyToClipboard, SIGNAL(clicked(bool)), this, SLOT(OnCopyToClipboard(bool)));
 
   connect(d->m_CommentDone, SIGNAL(clicked(bool)), this, SLOT(CommentDoneTriggered(bool)));
-  connect(d->m_CommentCansel, SIGNAL(clicked(bool)), this, SLOT(CommentCanselTriggered(bool)));
+  connect(d->m_CommentCancel, SIGNAL(clicked(bool)), this, SLOT(CommentCancelTriggered(bool)));
 }
 
 void QmitkMeasurementView::CommentDoneTriggered(bool checked)
@@ -321,7 +321,7 @@ void QmitkMeasurementView::CommentDoneTriggered(bool checked)
   PlanarFigureInitialized();
 }
 
-void QmitkMeasurementView::CommentCanselTriggered(bool checked)
+void QmitkMeasurementView::CommentCancelTriggered(bool checked)
 {
   hideCommentTextView();
 
@@ -507,7 +507,7 @@ void QmitkMeasurementView::hideCommentTextView()
 {
   d->m_comment->setHidden(true);
   d->m_CommentDone->setHidden(true);
-  d->m_CommentCansel->setHidden(true);
+  d->m_CommentCancel->setHidden(true);
   d->m_CommentText->setHidden(true);
 }
 
@@ -518,7 +518,7 @@ void QmitkMeasurementView::showCommentTextView(const std::string& text)
   d->m_comment->setHidden(false);
   d->m_comment->setReadOnly(false);
   d->m_CommentDone->setHidden(false);
-  d->m_CommentCansel->setHidden(false);
+  d->m_CommentCancel->setHidden(false);
   d->m_CommentText->setHidden(false);
 }
 

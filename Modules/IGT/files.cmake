@@ -100,5 +100,9 @@ if(MITK_USE_MICROBIRD_TRACKER)
 endif(MITK_USE_MICROBIRD_TRACKER)
 
 if(MITK_USE_POLHEMUS_TRACKER)
-  set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkPolhemusInterface.cpp)
+  set(CPP_FILES ${CPP_FILES}
+  TrackingDevices/mitkPolhemusInterface.cpp
+  TrackingDevices/mitkPolhemusTrackingDevice.cpp
+  TrackingDevices/mitkPolhemusTool.cpp
+  TrackingDevices/mitkPolhemusTrackerTypeInformation.cpp)
 endif(MITK_USE_POLHEMUS_TRACKER)

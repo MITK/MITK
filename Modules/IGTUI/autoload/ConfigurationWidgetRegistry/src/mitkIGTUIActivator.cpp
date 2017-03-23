@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkMicronTrackerTypeInformation.h"
 #include "mitkNPOptitrackTrackingTypeInformation.h"
 #include "mitkOpenIGTLinkTypeInformation.h"
+#include "mitkPolhemusTrackerTypeInformation.h"
 
 //standard tracking devices, which always should be avaiable
 #include "QmitkNDIAuroraWidget.h"
@@ -31,6 +32,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkNPOptitrackWidget.h"
 #include "QmitkVirtualTrackerWidget.h"
 #include "QmitkOpenIGTLinkWidget.h"
+#include "QmitkPolhemusTrackerWidget.h"
 
 namespace mitk
 {
@@ -52,6 +54,7 @@ namespace mitk
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::NPOptitrackTrackingTypeInformation::GetTrackingDeviceName(), new QmitkNPOptitrackWidget);
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::VirtualTrackerTypeInformation::GetTrackingDeviceName(), new QmitkVirtualTrackerWidget);
     m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::OpenIGTLinkTypeInformation::GetTrackingDeviceName(), new QmitkOpenIGTLinkWidget);
+    m_DeviceWidgetCollection.RegisterTrackingDeviceWidget(mitk::PolhemusTrackerTypeInformation::GetTrackingDeviceName(), new QmitkPolhemusTrackerWidget);
   }
 
   void IGTUIActivator::Unload(us::ModuleContext*)

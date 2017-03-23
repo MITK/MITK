@@ -20,7 +20,17 @@ BYTE  MotionBuf[0x1FA400];
 
 mitk::PolhemusInterface::PolhemusInterface()
 {
+  m_pdiDev.Trace(TRUE, 7);
   m_pdiDev.SetPnoBuffer(MotionBuf, 0x1FA400);
+  m_pdiDev.SetMetric(true); //use cm instead of inches
+  CPDImdat pdiMDat;
+  pdiMDat.Empty();
+  pdiMDat.Append(PDI_MODATA_FRAMECOUNT);
+  pdiMDat.Append(PDI_MODATA_POS);
+  pdiMDat.Append(PDI_MODATA_ORI);
+  m_pdiDev.SetSDataList(-1, pdiMDat);
+
+  DWORD dwFrameSize = 8 + 12 + 12 + 4;
 }
 
 mitk::PolhemusInterface::~PolhemusInterface()
@@ -94,13 +104,13 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
 
     mitk::PolhemusInterface::trackingData currentTrackingData;
 
-    currentTrackingData.pos[0] = pPno[0];
-    currentTrackingData.pos[1] = pPno[1];
-    currentTrackingData.pos[2] = pPno[2];
+    currentTrackingData.pos[0] = pPno[0] *10;
+    currentTrackingData.pos[1] = pPno[1] *10;
+    currentTrackingData.pos[2] = pPno[2] *10;
 
-    double azimuthAngle = pPno[3];
-    double elevationAngle = pPno[4];
-    double rollAngle = pPno[5];
+    double azimuthAngle = pPno[3] / 180 * 3.14;
+    double elevationAngle = pPno[4] / 180 * 3.14;
+    double rollAngle = pPno[5] / 180 * 3.14;
     vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
         currentTrackingData.rot = eulerQuat;
 

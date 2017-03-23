@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageCast.h>
 #include <mitkLocaleSwitch.h>
 
+#include <boost/tokenizer.hpp>
+
 #include <itkGDCMSeriesFileNames.h>
 
 #include <gdcmSorter.h>
@@ -827,7 +829,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   {
     try
     {
-      result[ groupIter->first ] = ImageBlockDescriptor( SortSeriesSlices( groupIter->second.GetFilenames() ) ); // sort each slice group spatially
+      result[ groupIter->first ] = ImageBlockDescriptor( SortSeriesSlices( groupIter->second.GetFilenames(), scanner.GetMappings() ) ); // sort each slice group spatially
     } catch(...)
     {
        MITK_ERROR << "Caught something.";
@@ -1133,7 +1135,7 @@ DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_u
 }
 
 DicomSeriesReader::StringContainer
-DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
+DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames, const gdcm::Scanner::MappingType& tags)
 {
   /* we CAN expect a group of equal
      - series instance uid
@@ -1149,30 +1151,37 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
      and more hints (acquisition number, acquisition time, trigger time) but will
      always produce a sorting by falling back to SOP Instance UID.
   */
-  gdcm::Sorter sorter;
 
-  sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
-  try
-  {
-    if (sorter.Sort(unsortedFilenames))
-    {
-      return sorter.GetFilenames();
-    }
-    else
-    {
-      MITK_WARN << "Sorting error. Leaving series unsorted.";
-      return unsortedFilenames;
-    }
+  std::vector<std::pair<std::string, std::map<gdcm::Tag, const char*>>> unsortedFilenamesWithTags;
+  for (const auto& filename : unsortedFilenames) {
+    unsortedFilenamesWithTags.push_back({ filename, tags.at(filename.c_str()) });
   }
-  catch(std::logic_error&)
-  {
-    MITK_WARN << "Sorting error. Leaving series unsorted.";
-    return unsortedFilenames;
+
+  std::sort(unsortedFilenamesWithTags.begin(), unsortedFilenamesWithTags.end(), DicomSeriesReader::GdcmSortFunction);
+
+  std::vector<std::string> retval;
+  for (const auto& filenameWithTag : unsortedFilenamesWithTags) {
+    retval.push_back(filenameWithTag.first);
+  }
+
+  return retval;
+}
+
+void DicomSeriesReader::parseStringToDoubleVector(std::string input, std::vector<double>& output)
+{
+  typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+  boost::char_separator<char> sep{"\\"};
+  tokenizer tok{ input, sep };
+  for (auto token : tok) {
+    output.push_back(std::stod(token));
   }
 }
 
 bool
-DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
+DicomSeriesReader::GdcmSortFunction(
+  const std::pair<std::string, std::map<gdcm::Tag, const char*>> &ds1,
+  const std::pair<std::string, std::map<gdcm::Tag, const char*>> &ds2
+)
 {
   // This method MUST accept missing location and position information (and all else, too)
   // because we cannot rely on anything
@@ -1188,23 +1197,26 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
      - number of rows/columns
   */
   static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
-  static const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
+  static const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
   // see if we have Image Position and Orientation
-  if ( ds1.FindDataElement(tagImagePositionPatient) && ds1.FindDataElement(tagImageOrientation) &&
-       ds2.FindDataElement(tagImagePositionPatient) && ds2.FindDataElement(tagImageOrientation) )
+  if ( ds1.second.find(tagImagePositionPatient) != ds1.second.end() && ds1.second.find(tagImageOrientation) != ds1.second.end() &&
+       ds2.second.find(tagImagePositionPatient) != ds2.second.end() && ds2.second.find(tagImageOrientation) != ds2.second.end())
   {
-    gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
-    gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
+    std::string image_pos1_str = ds1.second.at(tagImagePositionPatient);
+    std::string image_orientation1_str = ds1.second.at(tagImageOrientation);
 
-    image_pos1.Set(ds1);
-    image_orientation1.Set(ds1);
+    std::string image_pos2_str = ds2.second.at(tagImagePositionPatient);
+    std::string image_orientation2_str = ds2.second.at(tagImageOrientation);
 
-    gdcm::Attribute<0x0020,0x0032> image_pos2;
-    gdcm::Attribute<0x0020,0x0037> image_orientation2;
-
-    image_pos2.Set(ds2);
-    image_orientation2.Set(ds2);
+    std::vector<double> image_pos1;
+    std::vector<double> image_orientation1;
+    std::vector<double> image_pos2;
+    std::vector<double> image_orientation2;
+    parseStringToDoubleVector(image_pos1_str, image_pos1);
+    parseStringToDoubleVector(image_pos2_str, image_pos2);
+    parseStringToDoubleVector(image_orientation1_str, image_orientation1);
+    parseStringToDoubleVector(image_orientation2_str, image_orientation2);
 
     /*
        we tolerate very small differences in image orientation, since we got to know about
@@ -1249,13 +1261,10 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     {
       // try to sort by Acquisition Number
       static const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
-      if (ds1.FindDataElement(tagAcquisitionNumber) && ds2.FindDataElement(tagAcquisitionNumber))
+      if (ds1.second.find(tagAcquisitionNumber) != ds1.second.end() && ds2.second.find(tagAcquisitionNumber) != ds2.second.end())
       {
-        gdcm::Attribute<0x0020,0x0012> acquisition_number1; // Acquisition number
-        gdcm::Attribute<0x0020,0x0012> acquisition_number2;
-
-        acquisition_number1.Set(ds1);
-        acquisition_number2.Set(ds2);
+        std::string acquisition_number1 = ds1.second.at(tagAcquisitionNumber); // Acquisition number
+        std::string acquisition_number2 = ds2.second.at(tagAcquisitionNumber);
 
         if (acquisition_number1 != acquisition_number2)
         {
@@ -1265,13 +1274,10 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
         {
           // try to sort by Acquisition Time
           static const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
-          if (ds1.FindDataElement(tagAcquisitionTime) && ds2.FindDataElement(tagAcquisitionTime))
+          if (ds1.second.find(tagAcquisitionTime) != ds1.second.end() && ds2.second.find(tagAcquisitionTime) != ds2.second.end())
           {
-            gdcm::Attribute<0x0008,0x0032> acquisition_time1; // Acquisition time
-            gdcm::Attribute<0x0008,0x0032> acquisition_time2;
-
-            acquisition_time1.Set(ds1);
-            acquisition_time2.Set(ds2);
+            std::string acquisition_time1 = ds1.second.at(tagAcquisitionTime); // Acquisition time
+            std::string acquisition_time2 = ds2.second.at(tagAcquisitionTime);
 
             if (acquisition_time1 != acquisition_time2)
             {
@@ -1281,13 +1287,10 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
             {
               // let's try trigger time
               static const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
-              if (ds1.FindDataElement(tagTriggerTime) && ds2.FindDataElement(tagTriggerTime))
+              if (ds1.second.find(tagTriggerTime) != ds1.second.end() && ds2.second.find(tagTriggerTime) != ds2.second.end())
               {
-                gdcm::Attribute<0x0018,0x1060> trigger_time1; // Trigger time
-                gdcm::Attribute<0x0018,0x1060> trigger_time2;
-
-                trigger_time1.Set(ds1);
-                trigger_time2.Set(ds2);
+                std::string trigger_time1 = ds1.second.at(tagTriggerTime); // Trigger time
+                std::string trigger_time2 = ds2.second.at(tagTriggerTime);
 
                 if (trigger_time1 != trigger_time2)
                 {
@@ -1306,14 +1309,11 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
   // LAST RESORT: all valuable information for sorting is missing.
   // Sort by some meaningless but unique identifiers to satisfy the sort function
   static const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
-  if (ds1.FindDataElement(tagSOPInstanceUID) && ds2.FindDataElement(tagSOPInstanceUID))
+  if (ds1.second.find(tagSOPInstanceUID) != ds1.second.end() && ds2.second.find(tagSOPInstanceUID) != ds2.second.end())
   {
     MITK_DEBUG << "Dicom images are missing attributes for a meaningful sorting, falling back to SOP instance UID comparison.";
-    gdcm::Attribute<0x0008,0x0018> SOPInstanceUID1;   // SOP instance UID is mandatory and unique
-    gdcm::Attribute<0x0008,0x0018> SOPInstanceUID2;
-
-    SOPInstanceUID1.Set(ds1);
-    SOPInstanceUID2.Set(ds2);
+    std::string SOPInstanceUID1 = ds1.second.at(tagSOPInstanceUID);   // SOP instance UID is mandatory and unique
+    std::string SOPInstanceUID2 = ds2.second.at(tagSOPInstanceUID);
 
     return SOPInstanceUID1 < SOPInstanceUID2;
   }
@@ -1518,10 +1518,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       // need non-const access for map
       gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
 
-      //switch off sorting
-      // TODO this is need for correct Time working
-      //std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, sort, canLoadAs4D );
-
       std::list<StringContainer> imageBlocks;
       imageBlocks.push_back(slicesFileNameForScan);
 
@@ -1667,114 +1663,6 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
     scanner.AddTag( tagNumberOfFrames );
 
   scanner.Scan(filenames); // make available image information for each file
-}
-
-std::list<DicomSeriesReader::StringContainer>
-DicomSeriesReader::SortIntoBlocksFor3DplusT(
-    const StringContainer& presortedFilenames,
-    const gdcm::Scanner::MappingType& tagValueMappings,
-    bool /*sort*/,
-    bool& canLoadAs4D )
-{
-  std::list<StringContainer> imageBlocks;
-
-  // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
-  StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
-
-  std::string firstPosition;
-  unsigned int numberOfBlocks(0); // number of 3D image blocks
-
-  static const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); //Image position (Patient)
-  const gdcm::Tag tagModality(0x0008,0x0060);
-
-  // loop files to determine number of image blocks
-  for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
-       fileIter != sorted_filenames.end();
-       ++fileIter)
-  {
-    gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find( fileIter->c_str() )->second;
-
-    if(tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
-    {
-      const std::string& modality = tagToValueMap.find(tagModality)->second;
-      if ( modality.compare("RTIMAGE ") == 0 || modality.compare("RTIMAGE") == 0 )
-      {
-        MITK_WARN << "Modality "<< modality <<" is not fully supported yet.";
-        numberOfBlocks = 1;
-        break;
-      } else {
-        // we expect to get images w/ missing position information ONLY as separated blocks.
-        assert( presortedFilenames.size() == 1 );
-        numberOfBlocks = 1;
-        break;
-      }
-    }
-
-    std::string position = tagToValueMap.find(tagImagePositionPatient)->second;
-    MITK_DEBUG << "  " << *fileIter << " at " << position;
-    if (firstPosition.empty())
-    {
-      firstPosition = position;
-    }
-
-    if ( position == firstPosition )
-    {
-      ++numberOfBlocks;
-    }
-    else
-    {
-      break; // enough information to know the number of image blocks
-    }
-  }
-
-  MITK_DEBUG << "  ==> Assuming " << numberOfBlocks << " time steps";
-
-  if (numberOfBlocks == 0) return imageBlocks; // only possible if called with no files
-
-
-  // loop files to sort them into image blocks
-  unsigned int numberOfExpectedSlices(0);
-  for (unsigned int block = 0; block < numberOfBlocks; ++block)
-  {
-    StringContainer filesOfCurrentBlock;
-
-    for ( StringContainer::const_iterator fileIter = sorted_filenames.begin() + block;
-         fileIter != sorted_filenames.end();
-         //fileIter += numberOfBlocks) // TODO shouldn't this work? give invalid iterators on first attempts
-         )
-    {
-      filesOfCurrentBlock.push_back( *fileIter );
-      for (unsigned int b = 0; b < numberOfBlocks; ++b)
-      {
-        if (fileIter != sorted_filenames.end())
-          ++fileIter;
-      }
-    }
-
-    imageBlocks.push_back(filesOfCurrentBlock);
-
-    if (block == 0)
-    {
-      numberOfExpectedSlices = filesOfCurrentBlock.size();
-    }
-    else
-    {
-      if (filesOfCurrentBlock.size() != numberOfExpectedSlices)
-      {
-        MITK_WARN << "DicomSeriesReader expected " << numberOfBlocks
-                  << " image blocks of "
-                  << numberOfExpectedSlices
-                  << " images each. Block "
-                  << block
-                  << " got "
-                  << filesOfCurrentBlock.size()
-                  << " instead. Cannot load this as 3D+t"; // TODO implement recovery (load as many slices 3D+t as much as possible)
-        canLoadAs4D = false;
-      }
-    }
-  }
-
-  return imageBlocks;
 }
 
 Image::Pointer

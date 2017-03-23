@@ -831,7 +831,7 @@ protected:
 \endverbatim
 
    */
-  static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames);
+  static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames, const gdcm::Scanner::MappingType& tags);
 
 public:
   /**
@@ -942,25 +942,6 @@ protected:
   itk::SmartPointer<Image>
   MultiplexLoadDICOMByITK4DRGBPixel( std::list<StringContainer>& imageBlocks, ImageBlockDescriptor imageBlockDescriptor, bool correctTilt, const GantryTiltInformation& tiltInfo, DcmIoType::Pointer& io, CallbackCommand* command, itk::SmartPointer<Image> preLoadedImageBlock);
 
-
-
-  /**
-    \brief Sort files into time step blocks of a 3D+t image.
-
-    Called by LoadDicom. Expects to be fed a single list of filenames that have been sorted by
-    GetSeries previously (one map entry). This method will check how many timestep can be filled
-    with given files.
-
-    Assumption is that the number of time steps is determined by how often the first position in
-    space repeats. I.e. if the first three files in the input parameter all describe the same
-    location in space, we'll construct three lists of files. and sort the remaining files into them.
-
-    \todo We can probably remove this method if we somehow transfer 3D+t information from GetSeries to LoadDicomSeries.
-  */
-  static
-  std::list<StringContainer>
-  SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, const gdcm::Scanner::MappingType& tagValueMappings_, bool sort, bool& canLoadAs4D);
-
   /**
    \brief Defines spatial sorting for sorting by GDCM 2.
 
@@ -969,7 +950,10 @@ protected:
   */
   static
   bool
-  GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
+  GdcmSortFunction(
+    const std::pair<std::string, std::map<gdcm::Tag, const char*>> &ds1, 
+    const std::pair<std::string, std::map<gdcm::Tag, const char*>> &ds2
+  );
 
 
   /**
@@ -989,6 +973,8 @@ protected:
     which we want to sort as dicom.series.largest_pixel_in_series".
   */
   static const TagToPropertyMapType& GetDICOMTagsToMITKPropertyMap();
+
+  static void parseStringToDoubleVector(std::string input, std::vector<double>& output);
 };
 
 }

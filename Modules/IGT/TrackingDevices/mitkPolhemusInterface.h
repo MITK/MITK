@@ -27,6 +27,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
+#include <windows.h>
+#include <tchar.h>
+#include <string>
+#include <PDI.h>
+
+#include <mitkNavigationData.h>
+
 
 
 namespace mitk
@@ -41,9 +48,14 @@ namespace mitk
   public:
 
     mitkClassMacroItkParent(PolhemusInterface,itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
+    struct trackingData
+    {
+      mitk::Point3D pos;
+      mitk::Quaternion rot;
+    };
 
     /**
     * \brief Opens the connection to the device and makes it ready to track tools.
@@ -57,6 +69,15 @@ namespace mitk
     */
     bool StopTracking();
 
+    bool Connect();
+
+    bool Disconnect();
+
+
+    std::vector<trackingData> GetLastFrame();
+
+    unsigned int GetNumberOfTools();
+
   protected:
     /**
     * \brief standard constructor
@@ -66,6 +87,12 @@ namespace mitk
     * \brief standard destructor
     */
     ~PolhemusInterface();
+
+    /** Polhemus liberty/patriot tracker object*/
+    CPDIdev m_pdiDev;
+
+    unsigned int m_numberOfTools;
+
 
   };
 }//mitk

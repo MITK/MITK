@@ -19,18 +19,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandardFileLocations.h"
 #include <mitkIGTConfig.h>
 
-class mitkPolhemusTrackingDeviceHardwareTestClass
+// Testing
+#include "mitkTestingMacros.h"
+#include "mitkTestFixture.h"
+
+class mitkPolhemusTrackingDeviceHardwareTestSuite : public mitk::TestFixture
 {
+  CPPUNIT_TEST_SUITE(mitkPolhemusTrackingDeviceHardwareTestSuite);
+  // Test the append method
+  MITK_TEST(testInterface);
+  CPPUNIT_TEST_SUITE_END();
+
+
 public:
+  void setUp() override
+  {
+
+  }
+  void tearDown() override
+  {
+
+  }
+
+  void testInterface()
+  {
+    mitk::PolhemusInterface::Pointer myInterface = mitk::PolhemusInterface::New();
+    CPPUNIT_ASSERT_MESSAGE("Testing connection.", myInterface->Connect());
+    CPPUNIT_ASSERT_MESSAGE("Start tracking.", myInterface->StartTracking());
+
+    CPPUNIT_ASSERT_MESSAGE("Tracking 20 frames ...", true);
+    for (int i = 0; i < 20; i++)
+    {
+      std::vector<mitk::PolhemusInterface::trackingData> lastFrame = myInterface->GetLastFrame();
+      MITK_INFO << "Frame " << i;
+      for (int j = 0; j < lastFrame.size(); j++)
+      {
+        MITK_INFO << "[" << j << "]" << " Pos:" << lastFrame.at(j).pos << " Rot:" << lastFrame.at(j).rot;
+      }
+    }
+
+  }
+
 };
 
-/** This function is testing the Class PolhemusTrackingDevice in interaction with the hardware.
-  * So a MicronTracker Tracking System has to be installed and connected to run this test.
-  * The test needs the filenames of three toolfiles as arguments.
-  */
-int mitkPolhemusTrackingDeviceHardwareTest(int argc, char* argv[])
-{
-  MITK_TEST_BEGIN("PolhemusTrackingDeviceHardware");
-
-  MITK_TEST_END();
-}
+MITK_TEST_SUITE_REGISTRATION(mitkPolhemusTrackingDeviceHardware)

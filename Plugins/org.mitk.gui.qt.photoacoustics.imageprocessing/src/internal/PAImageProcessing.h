@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryISelectionListener.h>
 
 #include <QmitkAbstractView.h>
+#include <qthread.h>
 
 #include "ui_PAImageProcessingControls.h"
 
@@ -39,6 +40,8 @@ class PAImageProcessing : public QmitkAbstractView
 
     PAImageProcessing();
 
+    enum BeamformingAlgorithms { DAS, DMAS };
+
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
@@ -53,6 +56,11 @@ class PAImageProcessing : public QmitkAbstractView
 
     void ApplyBModeFilter();
     void ApplyBeamforming();
+
+    void HandleBeamformingResults(mitk::Image::Pointer image);
+    void StartBeamformingThread();
+
+    void UpdateProgress(int progress);
 
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -71,11 +79,33 @@ class PAImageProcessing : public QmitkAbstractView
     mitk::BeamformingDMASFilter::beamformingSettings DMASconfig;
     mitk::BeamformingDASFilter::beamformingSettings DASconfig;
 
-    enum BeamformingAlgorithms {DAS, DMAS};
-
     BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
 
     void UpdateBFSettings(mitk::Image::Pointer image);
+};
+
+class BeamformingThread : public QThread
+{
+  Q_OBJECT
+    void run() Q_DECL_OVERRIDE;
+
+  signals:
+    void result(mitk::Image::Pointer);
+    void updateProgress(int);
+
+  public:
+    void setConfigs(mitk::BeamformingDMASFilter::beamformingSettings DMASconfig, mitk::BeamformingDASFilter::beamformingSettings DASconfig);
+    void setBeamformingAlgorithm(PAImageProcessing::BeamformingAlgorithms beamformingAlgorithm);
+    void setInputImage(mitk::Image::Pointer image);
+    void setCutoff(int cutoff);
+
+  protected:
+    mitk::BeamformingDMASFilter::beamformingSettings m_DMASconfig;
+    mitk::BeamformingDASFilter::beamformingSettings m_DASconfig;
+
+    PAImageProcessing::BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
+    mitk::Image::Pointer m_InputImage;
+    int m_Cutoff;
 };
 
 #endif // PAImageProcessing_h

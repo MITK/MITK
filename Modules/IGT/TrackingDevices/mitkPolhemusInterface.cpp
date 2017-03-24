@@ -20,17 +20,18 @@ BYTE  MotionBuf[0x1FA400];
 
 mitk::PolhemusInterface::PolhemusInterface()
 {
-  m_pdiDev.Trace(TRUE, 7);
+
   m_pdiDev.SetPnoBuffer(MotionBuf, 0x1FA400);
   m_pdiDev.SetMetric(true); //use cm instead of inches
+  /* some settings, not sure if we need them
+  m_pdiDev.Trace(TRUE, 7);
   CPDImdat pdiMDat;
   pdiMDat.Empty();
   pdiMDat.Append(PDI_MODATA_FRAMECOUNT);
   pdiMDat.Append(PDI_MODATA_POS);
   pdiMDat.Append(PDI_MODATA_ORI);
   m_pdiDev.SetSDataList(-1, pdiMDat);
-
-  DWORD dwFrameSize = 8 + 12 + 12 + 4;
+  */
 }
 
 mitk::PolhemusInterface::~PolhemusInterface()
@@ -40,6 +41,7 @@ mitk::PolhemusInterface::~PolhemusInterface()
 
 bool mitk::PolhemusInterface::StartTracking()
 {
+  /* some setting / not sure if we need them
   LPCTSTR	szWindowClass = _T("PDIconsoleWinClass");
   HINSTANCE hInst = GetModuleHandle(0);
   HWND	hwnd = CreateWindowEx(
@@ -52,8 +54,9 @@ bool mitk::PolhemusInterface::StartTracking()
     0,
     hInst,
     0);
+  */
   m_continousTracking = true;
-  return m_pdiDev.StartContPno(hwnd);
+  return m_pdiDev.StartContPno(0);
 }
 
 bool mitk::PolhemusInterface::StopTracking()
@@ -64,7 +67,6 @@ bool mitk::PolhemusInterface::StopTracking()
 
 bool mitk::PolhemusInterface::Connect()
 {
-  m_pdiDev.Trace(TRUE, 7);
   if (m_pdiDev.CnxReady()) { return true; }
 
   ePiCommType eType = m_pdiDev.DiscoverCnx();

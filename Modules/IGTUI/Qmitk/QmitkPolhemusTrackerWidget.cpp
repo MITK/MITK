@@ -34,7 +34,8 @@ QmitkPolhemusTrackerWidget::QmitkPolhemusTrackerWidget(QWidget* parent, Qt::Wind
 }
 void QmitkPolhemusTrackerWidget::Initialize()
 {
-
+  InitializeSuperclassWidget();
+  CreateQtPartControl(this);
 }
 
 QmitkPolhemusTrackerWidget::~QmitkPolhemusTrackerWidget()
@@ -78,6 +79,6 @@ mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::ConstructTrackingDevic
 QmitkPolhemusTrackerWidget* QmitkPolhemusTrackerWidget::Clone(QWidget* parent) const
 {
   QmitkPolhemusTrackerWidget* clonedWidget = new QmitkPolhemusTrackerWidget(parent);
-
+  clonedWidget->Initialize();
   return clonedWidget;
 }

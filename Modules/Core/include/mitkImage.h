@@ -726,3 +726,4 @@ MITKCORE_EXPORT bool Equal( const mitk::Image& leftHandSide, const mitk::Image& 
 } // namespace mitk
 
 #endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */
+

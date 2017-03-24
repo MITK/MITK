@@ -32,6 +32,8 @@ mitk::PolhemusInterface::~PolhemusInterface()
 }
 bool mitk::PolhemusInterface::InitializeDevice()
 {
+  m_pdiDev.ResetTracker();
+  m_pdiDev.ResetSAlignment(-1);
   m_pdiDev.Trace(TRUE, 7);
   return true;
 }
@@ -53,10 +55,10 @@ bool mitk::PolhemusInterface::SetupDevice()
   CPDIbiterr cBE;
   m_pdiDev.GetBITErrs(cBE);
 
-  TCHAR sz[100];
-  cBE.Parse(sz, 100);
-
   if (!(cBE.IsClear())) {m_pdiDev.ClearBITErrs();}
+
+  if (this->m_HemisphereTrackingEnabled) { m_pdiDev.SetSHemiTrack(-1); }
+  else { m_pdiDev.SetSHemisphere(-1, { (float)2.54,0,0 }); }
 
   return true;
 }

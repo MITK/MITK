@@ -63,7 +63,7 @@ void QmitkPolhemusTrackerWidget::CreateConnections()
 
 mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::GetTrackingDevice()
 {
-  if (m_TrackingDevice.IsNull()) m_TrackingDevice = mitk::PolhemusTrackingDevice::New();
+  if (m_TrackingDevice.IsNull()) m_TrackingDevice = ConstructTrackingDevice();
   return m_TrackingDevice;
 }
 
@@ -71,6 +71,7 @@ mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::GetTrackingDevice()
 mitk::TrackingDevice::Pointer QmitkPolhemusTrackerWidget::ConstructTrackingDevice()
 {
   mitk::PolhemusTrackingDevice::Pointer newDevice = mitk::PolhemusTrackingDevice::New();
+  newDevice->SetHemisphereTrackingEnabled(m_Controls->m_hemisphereTracking->isChecked());
   return static_cast<mitk::TrackingDevice::Pointer>(newDevice);
 }
 

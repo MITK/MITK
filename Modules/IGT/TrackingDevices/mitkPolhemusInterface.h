@@ -83,6 +83,9 @@ namespace mitk
     /** @return Returns the number of tools. Returns 0 if no information is avialable.*/
     unsigned int GetNumberOfTools();
 
+    /** Enables/disables hemisphere tracking for all sensors. */
+    itkSetMacro(HemisphereTrackingEnabled, bool);
+
   protected:
     /**
     * \brief standard constructor
@@ -106,6 +109,8 @@ namespace mitk
     bool InitializeDevice();
 
     bool SetupDevice();
+
+    bool m_HemisphereTrackingEnabled;
 
 
   };

@@ -106,6 +106,7 @@ bool mitk::PolhemusTrackingDevice::OpenConnection()
 {
   //reset everything
   if (m_Device.IsNull()) {m_Device = mitk::PolhemusInterface::New();}
+  m_Device->SetHemisphereTrackingEnabled(m_HemisphereTrackingEnabled);
   m_Device->Connect();
   this->SetState(Ready);
   return true;

@@ -82,9 +82,7 @@ bool mitk::PolhemusTrackingDevice::StartTracking()
 
 bool mitk::PolhemusTrackingDevice::StopTracking()
 {
-  Superclass::StopTracking();
-  this->SetState(Ready);
-  return true;
+  return Superclass::StopTracking();
 }
 
 
@@ -148,6 +146,7 @@ void mitk::PolhemusTrackingDevice::TrackTools()
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
+    Sleep(100);//Wait a bit until the tracker is ready...
 
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
@@ -156,17 +155,18 @@ void mitk::PolhemusTrackingDevice::TrackTools()
       if (lastData.size() != m_AllTools.size())
       {
         MITK_WARN << "Tool count is corrupt. Aborting!";
-        return;
       }
-
-      std::vector<mitk::PolhemusTool::Pointer> allTools = this->GetAllTools();
-      for(int i=0; i<allTools.size(); i++)
+      else
       {
-        mitk::PolhemusTool::Pointer currentTool = allTools.at(i);
-        currentTool->SetDataValid(true);
-        currentTool->SetPosition(lastData.at(i).pos);
-        currentTool->SetOrientation(lastData.at(i).rot);
-        currentTool->SetIGTTimeStamp(mitk::IGTTimeStamp::GetInstance()->GetElapsed());
+        std::vector<mitk::PolhemusTool::Pointer> allTools = this->GetAllTools();
+        for (int i = 0; i < allTools.size(); i++)
+        {
+          mitk::PolhemusTool::Pointer currentTool = allTools.at(i);
+          currentTool->SetDataValid(true);
+          currentTool->SetPosition(lastData.at(i).pos);
+          currentTool->SetOrientation(lastData.at(i).rot);
+          currentTool->SetIGTTimeStamp(mitk::IGTTimeStamp::GetInstance()->GetElapsed());
+        }
       }
       /* Update the local copy of m_StopTracking */
       this->m_StopTrackingMutex->Lock();

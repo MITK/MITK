@@ -88,8 +88,8 @@ bool mitk::PolhemusInterface::Disconnect()
 {
   if (m_continousTracking)
   {
-    if (!m_pdiDev.Disconnect()) return false;
     m_continousTracking = false;
+    if (!m_pdiDev.Disconnect()) return false;
   }
   return true;
 }

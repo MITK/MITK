@@ -14,6 +14,7 @@ set(CPP_FILES
   Algorithms/mitkNavigationDataTransformFilter.cpp
   Algorithms/mitkNavigationDataToIGTLMessageFilter.cpp
   Algorithms/mitkIGTLMessageToNavigationDataFilter.cpp
+  Algorithms/mitkPivotCalibration.cpp
 
   Common/mitkIGTTimeStamp.cpp
   Common/mitkSerialCommunication.cpp

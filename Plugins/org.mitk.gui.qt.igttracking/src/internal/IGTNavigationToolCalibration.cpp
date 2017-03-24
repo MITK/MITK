@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkTrackingDevice.h>
 #include <mitkTrackingTool.h>
 #include <mitkQuaternionAveraging.h>
+#include <mitkPivotCalibration.h>
 
 // Qt
 #include <QMessageBox>
@@ -256,7 +257,7 @@ void IGTNavigationToolCalibration::OnAddPivotPose()
 void IGTNavigationToolCalibration::OnComutePivot()
 {
   MITK_WARN << "Not implemented yet!";
-  /*
+
   mitk::PivotCalibration::Pointer myPivotCalibration = mitk::PivotCalibration::New();
   for (int i=0; i<this->m_PivotPoses.size(); i++)
   {
@@ -302,7 +303,7 @@ void IGTNavigationToolCalibration::OnComutePivot()
   }
   MITK_INFO << resultString.toStdString().c_str();
   m_Controls.m_ResultText->setText(resultString);
-  */
+
 }
 
 void IGTNavigationToolCalibration::OnUseComutedPivotPoint()

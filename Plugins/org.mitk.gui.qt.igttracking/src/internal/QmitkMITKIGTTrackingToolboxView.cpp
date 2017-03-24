@@ -604,16 +604,15 @@ void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
   }
 
   // Code to enable/disable device specific buttons
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
+    { m_Controls->m_AutoDetectTools->setVisible(true); }
+  else
+    { m_Controls->m_AutoDetectTools->setVisible(false); }
+
   if (Type == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName()) //Aurora
-  {
-    m_Controls->m_AutoDetectTools->setVisible(true);
-    m_Controls->m_AddSingleTool->setEnabled(false);
-  }
-  else //Polaris or Microntracker
-  {
-    m_Controls->m_AutoDetectTools->setVisible(false);
-    m_Controls->m_AddSingleTool->setEnabled(true);
-  }
+    { m_Controls->m_AddSingleTool->setEnabled(false);}
+  else //other trackers
+    { m_Controls->m_AddSingleTool->setEnabled(true); }
 
   // Code to select appropriate tracking volume for current type
   std::vector<mitk::TrackingDeviceData> Compatibles = m_DeviceTypeCollection->GetDeviceDataForLine(Type);

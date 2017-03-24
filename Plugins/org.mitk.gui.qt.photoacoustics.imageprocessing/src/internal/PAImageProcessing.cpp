@@ -335,6 +335,22 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
     DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Spherical;
   }
 
+  if ("Von Hann" == m_Controls.Apodization->currentText())
+  {
+    DASconfig.Apod = mitk::BeamformingDASFilter::beamformingSettings::Apodization::Hann;
+    DMASconfig.Apod = mitk::BeamformingDMASFilter::beamformingSettings::Apodization::Hann;
+  }
+  else if ("Hamming" == m_Controls.Apodization->currentText())
+  {
+    DASconfig.Apod = mitk::BeamformingDASFilter::beamformingSettings::Apodization::Hamm;
+    DMASconfig.Apod = mitk::BeamformingDMASFilter::beamformingSettings::Apodization::Hamm;
+  }
+  else if ("Box" == m_Controls.Apodization->currentText())
+  {
+    DASconfig.Apod = mitk::BeamformingDASFilter::beamformingSettings::Apodization::Box;
+    DMASconfig.Apod = mitk::BeamformingDMASFilter::beamformingSettings::Apodization::Box;
+  }
+
   DASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
   DASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
   DASconfig.SamplesPerLine = m_Controls.Samples->value();

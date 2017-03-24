@@ -42,8 +42,13 @@ namespace mitk {
       unsigned int ReconstructionLines = 128;
       double RecordTime = 0.00006; // [s]
       unsigned int TransducerElements = 128;
+
       enum DelayCalc { Linear, QuadApprox, Spherical };
       DelayCalc DelayCalculationMethod = QuadApprox;
+
+      enum Apodization { Hamm, Hann, Box };
+      Apodization Apod = Hann;
+
       double Angle = 10.0;
       bool Photoacoustic = true;
       double BPHighPass = 50;
@@ -74,13 +79,16 @@ namespace mitk {
 
     std::function<void(int)> m_ProgressHandle;
 
-    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
-    itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
     double* VonHannFunction(int samples);
+    double* HammFunction(int samples);
+    double* BoxFunction(int samples);
 
     void DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
     void DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
     void DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+
+    mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
+    itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
 
     double* m_OutputData;
     double* m_InputData;

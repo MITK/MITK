@@ -42,8 +42,13 @@ namespace mitk {
       unsigned int ReconstructionLines = 128;
       double RecordTime = 0.00006; // [s]
       unsigned int TransducerElements = 128;
+
       enum DelayCalc {Linear, QuadApprox, Spherical};
       DelayCalc DelayCalculationMethod = QuadApprox;
+
+      enum Apodization {Hamm, Hann, Box};
+      Apodization Apod = Hann;
+
       double Angle = 10;
       bool Photoacoustic = true;
       double BPHighPass = 50;
@@ -75,6 +80,8 @@ namespace mitk {
     std::function<void(int)> m_ProgressHandle;
 
     double* VonHannFunction(int samples);
+    double* HammFunction(int samples);
+    double* BoxFunction(int samples);
 
     void DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
     void DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);

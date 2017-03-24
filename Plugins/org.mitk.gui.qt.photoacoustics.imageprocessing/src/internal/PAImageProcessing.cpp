@@ -62,14 +62,18 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
   connect(m_Controls.Samples, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.UseBP, SIGNAL(clicked()), this, SLOT(UseBandpass()));
 
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
   m_Controls.progressBar->setMinimum(0);
   m_Controls.progressBar->setMaximum(100);
   m_Controls.progressBar->setVisible(false);
+  m_Controls.UseImageSpacing->setToolTip("Image spacing of y-Axis must be in us, x-Axis in mm.");
+  m_Controls.UseImageSpacing->setToolTipDuration(5000);
 
   UseImageSpacing();
+  UseBandpass();
 }
 
 void PAImageProcessing::UpdateFrequency()
@@ -95,6 +99,11 @@ void PAImageProcessing::UpdateFrequency()
   {
     // test if this data item is an image or not (could also be a surface or something totally different)
     mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+    if(m_Controls.UseImageSpacing->isChecked())
+    {
+      m_Controls.ElementCount->setValue(image->GetDimension(0));
+      m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
+    }
     if (image)
       UpdateRecordTime(image);
   }
@@ -465,6 +474,23 @@ void PAImageProcessing::UseImageSpacing()
   else
   {
     m_Controls.ScanDepth->setEnabled(true);
+  }
+  UpdateFrequency();
+}
+
+void PAImageProcessing::UseBandpass()
+{
+  if (m_Controls.UseBP->isChecked())
+  {
+    m_Controls.BPhigh->setEnabled(true);
+    m_Controls.BPlow->setEnabled(true);
+    m_Controls.BPFalloff->setEnabled(true);
+  }
+  else
+  {
+    m_Controls.BPhigh->setDisabled(true);
+    m_Controls.BPlow->setDisabled(true);
+    m_Controls.BPFalloff->setDisabled(true);
   }
   UpdateFrequency();
 }

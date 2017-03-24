@@ -15,6 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include <mitkPolhemusInterface.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 BYTE  MotionBuf[0x1FA400];
 
@@ -149,13 +151,13 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
 
     mitk::PolhemusInterface::trackingData currentTrackingData;
 
-    currentTrackingData.pos[0] = pPno[0] * 10;
+    currentTrackingData.pos[0] = pPno[0] * 10; //from cm to mm
     currentTrackingData.pos[1] = pPno[1] * 10;
     currentTrackingData.pos[2] = pPno[2] * 10;
 
-    double azimuthAngle = pPno[3] / 180 * 3.14;
-    double elevationAngle = pPno[4] / 180 * 3.14;
-    double rollAngle = pPno[5] / 180 * 3.14;
+    double azimuthAngle = pPno[3] / 180 * M_PI; //from degree to rad
+    double elevationAngle = pPno[4] / 180 * M_PI;
+    double rollAngle = pPno[5] / 180 * M_PI;
     vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
     currentTrackingData.rot = eulerQuat;
 

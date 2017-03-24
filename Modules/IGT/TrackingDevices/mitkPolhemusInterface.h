@@ -55,6 +55,7 @@ namespace mitk
     {
       mitk::Point3D pos;
       mitk::Quaternion rot;
+      BYTE id;
     };
 
     /**
@@ -101,6 +102,10 @@ namespace mitk
     unsigned int m_numberOfTools;
 
     bool m_continousTracking;
+
+    bool InitializeDevice();
+
+    bool SetupDevice();
 
 
   };

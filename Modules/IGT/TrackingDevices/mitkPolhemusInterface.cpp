@@ -23,27 +23,46 @@ BYTE  MotionBuf[0x1FA400];
 mitk::PolhemusInterface::PolhemusInterface()
 {
 
-  m_pdiDev.SetPnoBuffer(MotionBuf, 0x1FA400);
-  m_pdiDev.SetMetric(true); //use cm instead of inches
-  /* some settings, not sure if we need them
-  m_pdiDev.Trace(TRUE, 7);
-  CPDImdat pdiMDat;
-  pdiMDat.Empty();
-  pdiMDat.Append(PDI_MODATA_FRAMECOUNT);
-  pdiMDat.Append(PDI_MODATA_POS);
-  pdiMDat.Append(PDI_MODATA_ORI);
-  m_pdiDev.SetSDataList(-1, pdiMDat);
-  */
+
 }
 
 mitk::PolhemusInterface::~PolhemusInterface()
 {
 
 }
+bool mitk::PolhemusInterface::InitializeDevice()
+{
+  m_pdiDev.Trace(TRUE, 7);
+  return true;
+}
+
+bool mitk::PolhemusInterface::SetupDevice()
+{
+  m_pdiDev.SetPnoBuffer(MotionBuf, 0x1FA400);
+  m_pdiDev.SetMetric(true); //use cm instead of inches
+
+  m_pdiDev.StartPipeExport();
+
+  CPDImdat pdiMDat;
+  pdiMDat.Empty();
+  pdiMDat.Append(PDI_MODATA_FRAMECOUNT);
+  pdiMDat.Append(PDI_MODATA_POS);
+  pdiMDat.Append(PDI_MODATA_ORI);
+  m_pdiDev.SetSDataList(-1, pdiMDat);
+
+  CPDIbiterr cBE;
+  m_pdiDev.GetBITErrs(cBE);
+
+  TCHAR sz[100];
+  cBE.Parse(sz, 100);
+
+  if (!(cBE.IsClear())) {m_pdiDev.ClearBITErrs();}
+
+  return true;
+}
 
 bool mitk::PolhemusInterface::StartTracking()
 {
-  /* some setting / not sure if we need them
   LPCTSTR	szWindowClass = _T("PDIconsoleWinClass");
   HINSTANCE hInst = GetModuleHandle(0);
   HWND	hwnd = CreateWindowEx(
@@ -56,9 +75,9 @@ bool mitk::PolhemusInterface::StartTracking()
     0,
     hInst,
     0);
-  */
+
   m_continousTracking = true;
-  return m_pdiDev.StartContPno(0);
+  return m_pdiDev.StartContPno(hwnd);
 }
 
 bool mitk::PolhemusInterface::StopTracking()
@@ -69,7 +88,11 @@ bool mitk::PolhemusInterface::StopTracking()
 
 bool mitk::PolhemusInterface::Connect()
 {
+  if (!InitializeDevice()) { return false; }
+
   if (m_pdiDev.CnxReady()) { return true; }
+  CPDIser	pdiSer;
+  m_pdiDev.SetSerialIF(&pdiSer);
 
   ePiCommType eType = m_pdiDev.DiscoverCnx();
   switch (eType)
@@ -84,6 +107,8 @@ bool mitk::PolhemusInterface::Connect()
     MITK_INFO << "DiscoverCnx result: " << m_pdiDev.GetLastResultStr();
     break;
   }
+
+  if (!SetupDevice()) { return false; }
 
   return m_pdiDev.CnxReady();
 }
@@ -150,6 +175,8 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::Pars
     PFLOAT pPno = (PFLOAT)(&pBuf[i + 4]);
 
     mitk::PolhemusInterface::trackingData currentTrackingData;
+
+    currentTrackingData.id = ucSensor;
 
     currentTrackingData.pos[0] = pPno[0] * 10; //from cm to mm
     currentTrackingData.pos[1] = pPno[1] * 10;

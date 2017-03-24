@@ -663,7 +663,7 @@ void QmitkMITKIGTTrackingToolboxView::OnShowTrackingVolumeChanged()
 
 void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
 {
-  if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAuroraTypeInformation::GetTrackingDeviceName())
+  if (m_Controls->m_configurationWidget->GetTrackingDevice()->AutoDetectToolsAvailable())
   {
     DisableTrackingConfigurationButtons();
     m_Worker->SetWorkerMethod(QmitkMITKIGTTrackingToolboxViewWorker::eAutoDetectTools);
@@ -671,7 +671,6 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
     m_Worker->SetDataStorage(this->GetDataStorage());
     m_WorkerThread->start();
     m_TimeoutTimer->start(5000);
-    MITK_INFO << "Timeout Timer started";
     //disable controls until worker thread is finished
     this->m_Controls->m_MainWidget->setEnabled(false);
   }
@@ -710,50 +709,6 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
 
   EnableTrackingConfigurationButtons();
 
-  if (m_toolStorage->GetToolCount() > 0)
-  {
-    //ask the user if he wants to save the detected tools
-    QMessageBox msgBox;
-    switch (m_toolStorage->GetToolCount())
-    {
-    case 1:
-      msgBox.setText("Found one tool!");
-      break;
-    default:
-      msgBox.setText("Found " + QString::number(m_toolStorage->GetToolCount()) + " tools!");
-    }
-    msgBox.setInformativeText("Do you want to save this tools as tool storage, so you can load them again?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
-    int ret = msgBox.exec();
-
-    if (ret == 16384) //yes
-    {
-      //ask the user for a filename
-      QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"), "/", tr("*.IGTToolStorage"));
-      //check for empty filename
-      if (fileName == "") { return; }
-      mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-
-      //when Serialize method is used exceptions are thrown, need to be adapted
-      //try-catch block for exception handling in Serializer
-      try
-      {
-        mySerializer->Serialize(fileName.toStdString(), m_toolStorage);
-      }
-      catch (mitk::IGTException)
-      {
-        std::string errormessage = "Error during serialization. Please check the Zip file.";
-        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
-      }
-
-      return;
-    }
-    else if (ret == 65536) //no
-    {
-      return;
-    }
-  }
   //print a logging message about the detected tools
   switch (m_toolStorage->GetToolCount())
   {
@@ -1162,10 +1117,8 @@ void QmitkMITKIGTTrackingToolboxView::ReplaceCurrentToolStorage(mitk::Navigation
 
 void QmitkMITKIGTTrackingToolboxView::OnTimeOut()
 {
-  MITK_INFO << "Time Out";
   m_WorkerThread->terminate();
   m_WorkerThread->wait();
-
   m_TimeoutTimer->stop();
 }
 
@@ -1310,57 +1263,25 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
   mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(m_DataStorage);
-  mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_TrackingDevice.GetPointer());
   try
   {
-    currentDevice->OpenConnection();
+    mitk::NavigationToolStorage::Pointer tempStorage = m_TrackingDevice->AutoDetectTools();
     mitk::ProgressBar::GetInstance()->Progress();
-    currentDevice->StartTracking();
+    for (int i = 0; i < tempStorage->GetToolCount(); i++) { autoDetectedStorage->AddTool(tempStorage->GetTool(i)); }
   }
   catch (mitk::Exception& e)
   {
-    QString message = QString("Warning, can not auto-detect tools! (") + QString(e.GetDescription()) + QString(")");
-    //MessageBox(message.toStdString()); //TODO: give message to the user here!
-
-    MITK_WARN << message.toStdString();
-    mitk::ProgressBar::GetInstance()->Progress(4);
-    emit AutoDetectToolsFinished(false, message.toStdString().c_str());
+    MITK_WARN << e.GetDescription();
+    mitk::ProgressBar::GetInstance()->Progress(2);
+    emit AutoDetectToolsFinished(false, e.GetDescription());
     return;
   }
-
-  for (unsigned int i = 0; i < currentDevice->GetToolCount(); i++)
-  {
-    //create a navigation tool with sphere as surface
-    std::stringstream toolname;
-    toolname << "AutoDetectedTool" << i;
-    mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
-    newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(currentDevice->GetTool(i))->GetSerialNumber());
-    newTool->SetIdentifier(toolname.str());
-    newTool->SetTrackingDeviceType(mitk::NDIAuroraTypeInformation::GetTrackingDeviceName());
-    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-    mitk::Surface::Pointer mySphere = mitk::Surface::New();
-    vtkSphereSource *vtkData = vtkSphereSource::New();
-    vtkData->SetRadius(3.0f);
-    vtkData->SetCenter(0.0, 0.0, 0.0);
-    vtkData->Update();
-    mySphere->SetVtkPolyData(vtkData->GetOutput());
-    vtkData->Delete();
-    newNode->SetData(mySphere);
-    newNode->SetName(toolname.str());
-    newTool->SetDataNode(newNode);
-    autoDetectedStorage->AddTool(newTool);
-  }
-
   m_NavigationToolStorage = autoDetectedStorage;
-
-  currentDevice->StopTracking();
   mitk::ProgressBar::GetInstance()->Progress();
-  currentDevice->CloseConnection();
-
   emit AutoDetectToolsFinished(true, "");
-  mitk::ProgressBar::GetInstance()->Progress(4);
+  mitk::ProgressBar::GetInstance()->Progress(2);
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()

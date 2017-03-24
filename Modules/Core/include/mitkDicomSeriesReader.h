@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef mitkDicomSeriesReader_h
 #define mitkDicomSeriesReader_h
 
+#include <string>
+
 #include "mitkDataNode.h"
 #include "mitkConfig.h"
 
@@ -310,6 +312,11 @@ class Image;
 class MITKCORE_EXPORT DicomSeriesReader
 {
 public:
+  
+  // TODO This function is for debugging purposes. It allows you to save itkImage in the DICOM file set.
+  template <typename ImageType>
+  static
+  void dumpITKImageToDICOM(ImageType* itkImage, const std::vector<itk::MetaDataDictionary*>& dictionary, const std::string dumpFilePath);
 
   /**
     \brief Lists of filenames.

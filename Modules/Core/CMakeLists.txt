@@ -14,7 +14,7 @@ MITK_CREATE_MODULE(
     PRIVATE tinyxml OpenGL
     # Remove public GDCM and ITKIOGDCM+... dependencies after mitkDicomSeriesReader was removed
     PUBLIC  GDCM
-    PUBLIC  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKIOImageBase+ITKIOGDCM+ITKIOHDF5+ITKIOLSM+ITKIOMRC+ITKIOBioRad+ITKIOGE+ITKIOStimulate
+    PUBLIC  ITK
     # We privately use/link all ITK modules in order to support all IO, Transform, etc.
     # factories from ITK which are registered "automatically" via a factory manager.
     PRIVATE ITK

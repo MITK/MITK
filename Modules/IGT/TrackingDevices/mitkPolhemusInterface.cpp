@@ -86,9 +86,12 @@ bool mitk::PolhemusInterface::Connect()
 
 bool mitk::PolhemusInterface::Disconnect()
 {
-  m_continousTracking = false;
-  m_pdiDev.Disconnect();
-  return false;
+  if (m_continousTracking)
+  {
+    if (!m_pdiDev.Disconnect()) return false;
+    m_continousTracking = false;
+  }
+  return true;
 }
 
 std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetLastFrame()

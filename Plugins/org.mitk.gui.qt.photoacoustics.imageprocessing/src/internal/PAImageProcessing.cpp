@@ -100,9 +100,14 @@ void PAImageProcessing::UpdateFrequency()
   }
 
   std::stringstream frequency;
-  frequency << 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000;
-  frequency << "Hz";
-  m_Controls.BPInfoDisplay->setText(frequency.str().c_str());
+  frequency << 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000; //[MHz]
+  frequency << "MHz";
+
+  frequency << " is the maximal allowed frequency for the selected image.";
+  m_Controls.BPhigh->setToolTip(frequency.str().c_str());
+  m_Controls.BPlow->setToolTip(frequency.str().c_str());
+  m_Controls.BPhigh->setToolTipDuration(5000);
+  m_Controls.BPlow->setToolTipDuration(5000);
 }
 
 void PAImageProcessing::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
@@ -406,6 +411,49 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
     DASconfig.Photoacoustic = true;
     DMASconfig.Photoacoustic = true;
   }
+
+  // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
+
+  double maxFrequency = 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000; // [Hz]
+
+  if (DMASconfig.BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+  {
+    QMessageBox Msgbox;
+    Msgbox.setText("LowPass too low, disabled it.");
+    Msgbox.exec();
+
+    DMASconfig.BPLowPass = 0;
+    DASconfig.BPLowPass = 0;
+  }
+  if (DMASconfig.BPLowPass < 0 && m_Controls.UseBP->isChecked())
+  {
+    QMessageBox Msgbox;
+    Msgbox.setText("LowPass too high, disabled it.");
+    Msgbox.exec();
+
+    DMASconfig.BPLowPass = 0;
+    DASconfig.BPLowPass = 0;
+  }
+  if (DMASconfig.BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
+  {
+    QMessageBox Msgbox;
+    Msgbox.setText("HighPass too high, disabled it.");
+    Msgbox.exec();
+
+    DMASconfig.BPHighPass = 0;
+    DASconfig.BPHighPass = 0;
+  }
+  if(DMASconfig.BPHighPass > DMASconfig.BPLowPass)
+  {
+    QMessageBox Msgbox;
+    Msgbox.setText("HighPass higher than LowPass, disabled both.");
+    Msgbox.exec();
+
+    DMASconfig.BPHighPass = 0;
+    DASconfig.BPHighPass = 0;
+    DMASconfig.BPLowPass = 0;
+    DASconfig.BPLowPass = 0;
+  }
 }
 
 void PAImageProcessing::UseImageSpacing()
@@ -418,4 +466,5 @@ void PAImageProcessing::UseImageSpacing()
   {
     m_Controls.ScanDepth->setEnabled(true);
   }
+  UpdateFrequency();
 }

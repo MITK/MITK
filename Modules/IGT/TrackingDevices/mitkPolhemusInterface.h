@@ -73,9 +73,13 @@ namespace mitk
 
     bool Disconnect();
 
+    /** @return Returns a single frame. Only works if the tracking device is not in continous tracking mode. Returns an empty vector in case of an error.*/
+    std::vector<trackingData> GetSingleFrame();
 
+    /** @return Returns the last frame when the tracking device is in continous tracking mode. Returns an empty vector in case of an error.*/
     std::vector<trackingData> GetLastFrame();
 
+    /** @return Returns the number of tools. Returns 0 if no information is avialable.*/
     unsigned int GetNumberOfTools();
 
   protected:
@@ -91,7 +95,12 @@ namespace mitk
     /** Polhemus liberty/patriot tracker object*/
     CPDIdev m_pdiDev;
 
+    /** Parses polhemus raw data to a collection of tracking data of single tools. */
+    std::vector<mitk::PolhemusInterface::trackingData> ParsePolhemusRawData(PBYTE pBuf, DWORD dwSize);
+
     unsigned int m_numberOfTools;
+
+    bool m_continousTracking;
 
 
   };

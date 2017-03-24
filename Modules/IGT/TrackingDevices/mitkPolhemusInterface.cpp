@@ -40,15 +40,26 @@ mitk::PolhemusInterface::~PolhemusInterface()
 
 bool mitk::PolhemusInterface::StartTracking()
 {
-    //return m_pdiDev.StartContPno(0);
-  return true;
+  LPCTSTR	szWindowClass = _T("PDIconsoleWinClass");
+  HINSTANCE hInst = GetModuleHandle(0);
+  HWND	hwnd = CreateWindowEx(
+    WS_EX_NOACTIVATE,//WS_EX_STATICEDGE, //
+    szWindowClass,
+    _T("MyWindowName"),
+    WS_POPUP,
+    0, 0, 1, 1,
+    HWND_MESSAGE,
+    0,
+    hInst,
+    0);
+  m_continousTracking = true;
+  return m_pdiDev.StartContPno(hwnd);
 }
 
 bool mitk::PolhemusInterface::StopTracking()
 {
-
+  m_continousTracking = false;
   return true;
-
 }
 
 bool mitk::PolhemusInterface::Connect()
@@ -75,6 +86,7 @@ bool mitk::PolhemusInterface::Connect()
 
 bool mitk::PolhemusInterface::Disconnect()
 {
+  m_continousTracking = false;
   m_pdiDev.Disconnect();
   return false;
 }
@@ -85,8 +97,36 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
   DWORD dwSize;
 
   //read one frame
-  if (!m_pdiDev.ReadSinglePnoBuf(pBuf, dwSize)) {MITK_WARN << m_pdiDev.GetLastResultStr();}
+  if (!m_pdiDev.LastPnoPtr(pBuf, dwSize)) {MITK_WARN << m_pdiDev.GetLastResultStr();}
 
+  std::vector<mitk::PolhemusInterface::trackingData> returnValue = ParsePolhemusRawData(pBuf, dwSize);
+
+  if (returnValue.empty()) { MITK_WARN << "Cannot parse data / no tools present"; }
+
+  return returnValue;
+}
+
+unsigned int mitk::PolhemusInterface::GetNumberOfTools()
+{
+  if (m_continousTracking) return GetLastFrame().size();
+  else return GetSingleFrame().size();
+}
+
+std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetSingleFrame()
+{
+  if (m_continousTracking) return std::vector<mitk::PolhemusInterface::trackingData>();
+
+  PBYTE pBuf;
+  DWORD dwSize;
+
+  //read one frame
+  if (!m_pdiDev.ReadSinglePnoBuf(pBuf, dwSize)) { MITK_WARN << m_pdiDev.GetLastResultStr(); }
+
+  return ParsePolhemusRawData(pBuf, dwSize);
+}
+
+std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::ParsePolhemusRawData(PBYTE pBuf, DWORD dwSize)
+{
   std::vector<mitk::PolhemusInterface::trackingData> returnValue;
 
   DWORD i = 0;
@@ -104,15 +144,15 @@ std::vector<mitk::PolhemusInterface::trackingData> mitk::PolhemusInterface::GetL
 
     mitk::PolhemusInterface::trackingData currentTrackingData;
 
-    currentTrackingData.pos[0] = pPno[0] *10;
-    currentTrackingData.pos[1] = pPno[1] *10;
-    currentTrackingData.pos[2] = pPno[2] *10;
+    currentTrackingData.pos[0] = pPno[0] * 10;
+    currentTrackingData.pos[1] = pPno[1] * 10;
+    currentTrackingData.pos[2] = pPno[2] * 10;
 
     double azimuthAngle = pPno[3] / 180 * 3.14;
     double elevationAngle = pPno[4] / 180 * 3.14;
     double rollAngle = pPno[5] / 180 * 3.14;
     vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
-        currentTrackingData.rot = eulerQuat;
+    currentTrackingData.rot = eulerQuat;
 
     returnValue.push_back(currentTrackingData);
     i += shSize;

@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <iostream>
 #include <itkMutexLockHolder.h>
 #include "mitkPolhemusTrackerTypeInformation.h"
+#include <vtkConeSource.h>
 
 typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
@@ -199,4 +200,50 @@ ITK_THREAD_RETURN_TYPE mitk::PolhemusTrackingDevice::ThreadStartTracking(void* p
     trackingDevice->TrackTools();
 
   return ITK_THREAD_RETURN_VALUE;
+}
+
+bool mitk::PolhemusTrackingDevice::AutoDetectToolsAvailable()
+{
+  return true;
+}
+
+mitk::NavigationToolStorage::Pointer mitk::PolhemusTrackingDevice::AutoDetectTools()
+{
+  this->OpenConnection();
+  std::vector<mitk::PolhemusInterface::trackingData> singeFrameData = this->m_Device->GetSingleFrame();
+  MITK_INFO << "Found " << singeFrameData.size() << " tools.";
+  this->CloseConnection();
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+  for each (mitk::PolhemusInterface::trackingData t in singeFrameData)
+  {
+
+    mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+    std::stringstream name;
+    name << "Sensor-" << ((int)t.id);
+    newNode->SetName(name.str());
+
+    mitk::Surface::Pointer myCone = mitk::Surface::New();
+    vtkConeSource *vtkData = vtkConeSource::New();
+    vtkData->SetAngle(5.0);
+    vtkData->SetResolution(50);
+    vtkData->SetHeight(6.0f);
+    vtkData->SetRadius(2.0f);
+    vtkData->SetCenter(0.0, 0.0, 0.0);
+    vtkData->Update();
+    myCone->SetVtkPolyData(vtkData->GetOutput());
+    vtkData->Delete();
+    newNode->SetData(myCone);
+
+    mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
+    newTool->SetDataNode(newNode);
+
+    std::stringstream identifier;
+    identifier << "AutoDetectedTool-" << ((int)t.id);
+    newTool->SetIdentifier(identifier.str());
+
+    newTool->SetTrackingDeviceType(mitk::PolhemusTrackerTypeInformation::GetDeviceDataPolhemusTrackerLiberty().Line);
+    returnValue->AddTool(newTool);
+  }
+  return returnValue;
+
 }

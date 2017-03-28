@@ -103,7 +103,7 @@ void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference:
   
   // Check for a render window part and if it is the currently active on.
   // Inform IRenderWindowPartListener views that it has been deactivated.
-  if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part)) {
+  if (dynamic_cast<mitk::IRenderWindowPart*>(part)) {
     m_ActiveRenderWindowPart = nullptr;
   }
 

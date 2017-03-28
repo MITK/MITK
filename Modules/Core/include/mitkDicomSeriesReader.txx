@@ -257,6 +257,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   // Get MetaDataDictionary and copy him to MITK Image
   mitk::ReaderType::DictionaryArrayRawPointer inputDict = reader->GetMetaDataDictionaryArray();
   mitk::ReaderType::DictionaryArrayType outputArray;
+  
+  outputArray.reserve(inputDict->size());
 
   mitk::ReaderType::DictionaryArrayType::const_iterator iter = inputDict->begin();
   for (; iter != inputDict->end(); ++iter)

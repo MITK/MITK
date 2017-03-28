@@ -58,6 +58,7 @@ namespace mitk
 
     // -------------- DICOMSegmentationIO specific functions -------------
     const std::string CreateMetaDataJsonFile(int layer);
+    void AddDICOMTagsToService();
   };
 } // end of namespace mitk
 

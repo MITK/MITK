@@ -7,5 +7,7 @@ set(CPP_FILES
   mitkLabelSetImageSerializer.h
   mitkMultilabelActivator.cpp
   mitkDICOMSegmentationPropertyHelper.cpp
+  mitkDICOMSegmentationConstants.h
+  mitkDICOMSegmentationConstants.cpp
 )
 

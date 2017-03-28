@@ -75,12 +75,7 @@ void QmitkViewCoordinator::PartActivated(const berry::IWorkbenchPartReference::P
   // that it was activated
   if ( mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part) )
   {
-    if (m_VisibleRenderWindowPart != renderPart)
-    {
-      RenderWindowPartActivated(renderPart);
-      m_ActiveRenderWindowPart = renderPart;
-      m_VisibleRenderWindowPart = renderPart;
-    }
+    m_ActiveRenderWindowPart = renderPart;
   }
 
   // Check if the activated part wants to be notified
@@ -105,15 +100,11 @@ void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference:
 {
   //MITK_INFO << "*** PartDeactivated (" << partRef->GetPart(false)->GetPartName() << ")";
   berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
-
+  
   // Check for a render window part and if it is the currently active on.
   // Inform IRenderWindowPartListener views that it has been deactivated.
   if (mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part)) {
-    if (m_VisibleRenderWindowPart == renderPart) {
-      RenderWindowPartDeactivated(renderPart);
-      m_VisibleRenderWindowPart = nullptr;
-      m_ActiveRenderWindowPart = nullptr;
-    }
+    m_ActiveRenderWindowPart = nullptr;
   }
 
   if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
@@ -153,11 +144,10 @@ void QmitkViewCoordinator::PartHidden(const berry::IWorkbenchPartReference::Poin
   // Inform IRenderWindowPartListener views that it has been hidden.
   if ( mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part) )
   {
-    if (m_VisibleRenderWindowPart == renderPart)
+    if (!m_ActiveRenderWindowPart && m_VisibleRenderWindowPart == renderPart)
     {
       RenderWindowPartDeactivated(renderPart);
       m_VisibleRenderWindowPart = nullptr;
-      m_ActiveRenderWindowPart = nullptr;
     }
   }
 
@@ -180,7 +170,6 @@ void QmitkViewCoordinator::PartVisible(const berry::IWorkbenchPartReference::Poi
     {
       RenderWindowPartActivated(renderPart);
       m_VisibleRenderWindowPart = renderPart;
-      m_ActiveRenderWindowPart = renderPart;
     }
   }
 

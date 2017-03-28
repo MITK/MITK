@@ -258,8 +258,6 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   mitk::ReaderType::DictionaryArrayRawPointer inputDict = reader->GetMetaDataDictionaryArray();
   mitk::ReaderType::DictionaryArrayType outputArray;
 
-  outputArray.resize(inputDict->size());
-
   mitk::ReaderType::DictionaryArrayType::const_iterator iter = inputDict->begin();
   for (; iter != inputDict->end(); ++iter)
   {

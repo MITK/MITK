@@ -111,11 +111,18 @@ namespace mitk
     DiffusionPropertyHelper();
 
     /**
-    * \brief Apply the previouse set MeasurementFrame to all gradients in the GradientsDirectionContainer (m_Directions)
+    * \brief Apply the previously set MeasurementFrame and the image rotation matrix to all gradients
     *
     * \warning first set the MeasurementFrame
     */
-    void ApplyMeasurementFrame();
+    void ApplyMeasurementFrameAndRotationMatrix();
+
+    /**
+    * \brief Apply the inverse of the previously set MeasurementFrame and the image rotation matrix to all gradients
+    *
+    * \warning first set the MeasurementFrame
+    */
+    void UnApplyMeasurementFrameAndRotationMatrix();
 
     /**
     * \brief Update the BValueMap (m_B_ValueMap) using the current gradient directions (m_Directions)

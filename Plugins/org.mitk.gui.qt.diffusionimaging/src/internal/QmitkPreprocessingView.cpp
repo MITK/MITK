@@ -1050,11 +1050,11 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
     duplicator->Update();
     itkDwi = duplicator->GetOutput();
 
-    vnl_matrix_fixed< double,3,3 > oldInverseDirection = itkDwi->GetDirection().GetInverse();
+    //vnl_matrix_fixed< double,3,3 > oldInverseDirection = itkDwi->GetDirection().GetInverse();
 
     mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer oldGradients
         = static_cast<mitk::GradientDirectionsProperty*>
-          ( image->GetProperty(mitk::DiffusionPropertyHelper::GRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
+          ( image->GetProperty(mitk::DiffusionPropertyHelper::ORIGINALGRADIENTCONTAINERPROPERTYNAME.c_str()).GetPointer() )
             ->GetGradientDirectionsContainer();
 
     mitk::GradientDirectionsProperty::GradientDirectionsContainerType::Pointer newGradients
@@ -1063,12 +1063,12 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
     for (unsigned int i=0; i<oldGradients->Size(); i++)
     {
       mitk::GradientDirectionsProperty::GradientDirectionType g = oldGradients->GetElement(i);
-      double mag = g.magnitude();
-      g.normalize();
-      mitk::GradientDirectionsProperty::GradientDirectionType newG = oldInverseDirection*g;
-      newG = newDirection.GetVnlMatrix()*newG;
-      newG.normalize();
-      newGradients->InsertElement(i, newG*mag);
+//      double mag = g.magnitude();
+//      g.normalize();
+//      mitk::GradientDirectionsProperty::GradientDirectionType newG = oldInverseDirection*g;
+//      newG = newDirection.GetVnlMatrix()*newG;
+//      newG.normalize();
+      newGradients->InsertElement(i, g);
     }
 
     itkDwi->SetDirection(newDirection);

@@ -157,6 +157,7 @@ void QmitkSegmentationView::Activated()
    m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command3 );
 
    this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
+   OnSegmentationComboBoxSelectionChanged(m_Controls->segImageSelector->GetSelectedNode());
 }
 
 void QmitkSegmentationView::Deactivated()
@@ -1090,13 +1091,34 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
 
 void QmitkSegmentationView::RenderingManagerReinitialized()
 {
-   if ( ! m_MultiWidget ) { return; }
+  if (!m_MultiWidget) { return; }
 
-   mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
-   if (workingNode)
-   {
-     this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
-   }
+  /*
+  * Here we check whether the geometry of the selected segmentation image if aligned with the worldgeometry
+  * At the moment it is not supported to use a geometry different from the selected image for reslicing.
+  * For further information see Bug 16063
+  */
+  mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
+  const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+
+  if (workingNode && worldGeo)
+  {
+
+    const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
+    const mitk::BaseGeometry* worldGeo = m_MultiWidget->GetRenderWindow4()->GetSliceNavigationController()->GetCurrentGeometry3D();
+
+    if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
+    {
+      this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
+      this->SetToolSelectionBoxesEnabled(true);
+      this->UpdateWarningLabel("");
+    } else
+    {
+      this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), NULL);
+      this->SetToolSelectionBoxesEnabled(false);
+      this->UpdateWarningLabel(TR_NEED_REINIT_SEGM);
+    }
+  }
 }
 
 bool QmitkSegmentationView::CheckForSameGeometry(const mitk::DataNode *node1, const mitk::DataNode *node2) const

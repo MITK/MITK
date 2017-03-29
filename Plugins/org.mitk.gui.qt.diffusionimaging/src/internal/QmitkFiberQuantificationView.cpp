@@ -240,22 +240,23 @@ void QmitkFiberQuantificationView::GenerateStats()
             stats += "Median length:       "+ QString::number(fib->GetMedianFiberLength(),'f',1) + " mm\n";
             stats += "Standard deviation:  "+ QString::number(fib->GetLengthStDev(),'f',1) + " mm\n";
 
-            vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fib->GetFiberPolyData()->GetCellData()->GetArray("FIBER_WEIGHTS"));
+            vtkSmartPointer<vtkFloatArray> weights = fib->GetFiberWeights();
             if (weights!=NULL)
             {
-                stats += "Detected fiber weights:\n";
-                float weight=-1;
-                int c = 0;
-                for (int i=0; i<weights->GetSize(); i++)
-                    if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
-                    {
-                        c++;
-                        if (weight>0)
-                            stats += QString::number(i) + ":  "+ QString::number(weights->GetValue(i)) + "\n";
-                        stats += QString::number(c) + ". Fibers " + QString::number(i+1) + "-";
-                        weight = weights->GetValue(i);
-                    }
-                stats += QString::number(weights->GetSize()) + ":  "+ QString::number(weight) + "\n";
+                stats += "Detected fiber weights\n";
+//                    stats += "Detected fiber weights:\n";
+//                    float weight=-1;
+//                    int c = 0;
+//                    for (int i=0; i<weights->GetSize(); i++)
+//                        if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
+//                        {
+//                            c++;
+//                            if (weight>0)
+//                                stats += QString::number(i) + ":  "+ QString::number(weights->GetValue(i)) + "\n";
+//                            stats += QString::number(c) + ". Fibers " + QString::number(i+1) + "-";
+//                            weight = weights->GetValue(i);
+//                        }
+//                    stats += QString::number(weights->GetSize()) + ":  "+ QString::number(weight) + "\n";
             }
             else
                 stats += "No fiber weight array found.\n";
@@ -473,6 +474,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateTractDensityImage(
             generator->SetUseImageGeometry(true);
 
         }
+        //generator->SetDoFiberResampling(false);
         generator->Update();
 
         // get output image

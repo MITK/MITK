@@ -42,6 +42,17 @@ namespace mitk
       // Add DICOM Tag (0008,103E) Series Description
       propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0008, 0x103E).c_str(),
                                 StringProperty::New("MITK Segmentation"));
+      // Add DICOM Tag (0070,0084) Content Creator Name
+      propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0070, 0x0084).c_str(), StringProperty::New("MITK"));
+      // Add DICOM Tag (0012, 0071) Clinical Trial Series ID
+      propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0071).c_str(),
+                                StringProperty::New("Session 1"));
+      // Add DICOM Tag (0012,0050) Clinical Trial Time Point ID
+      propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0050).c_str(),
+        StringProperty::New("0"));
+      // Add DICOM Tag (0012, 0060) Clinical Trial Coordinating Center Name
+      propertyList->SetProperty(GeneratePropertyNameForDICOMTag(0x0012, 0x0060).c_str(),
+        StringProperty::New("Unknown"));
 
       // Check if original image is a DICOM image; if so, store relevant DICOM Tags into the PropertyList of new
       // segmentation image

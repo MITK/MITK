@@ -92,7 +92,8 @@ protected slots:
 protected:
 
   void MirrorFibers();              ///< mirror bundle on the specified plane
-  void ResampleSelectedBundles();   ///< smooth fiber bundle using the specified number of sampling points per cm.
+  void ResampleSelectedBundlesSpline();   ///<
+  void ResampleSelectedBundlesLinear();   ///<
   void DoImageColorCoding();        ///< color fibers by selected scalar image
   void DoCurvatureColorCoding();    ///< color fibers by curvature
   void CompressSelectedBundles();   ///< remove points below certain error threshold

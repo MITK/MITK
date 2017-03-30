@@ -345,7 +345,15 @@ namespace mitk
         OFString labelName;
 
         if (segmentAttr->getSegmentedPropertyTypeCodeSequence() != nullptr)
+        {
           segmentAttr->getSegmentedPropertyTypeCodeSequence()->getCodeMeaning(labelName);
+          if (segmentAttr->getSegmentedPropertyTypeModifierCodeSequence() != nullptr)
+          {
+            OFString modifier;
+            segmentAttr->getSegmentedPropertyTypeModifierCodeSequence()->getCodeMeaning(modifier);
+            labelName.append(" (").append(modifier).append(")");
+          }
+        }
         else
         {
           labelName = std::to_string(segmentAttr->getLabelID()).c_str();

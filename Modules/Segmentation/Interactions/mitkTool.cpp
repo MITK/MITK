@@ -16,15 +16,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTool.h"
 
+#include <mitkAnatomicalStructureColorPresets.h>
 #include "mitkDisplayInteractor.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
-#include "mitkLabelSetImage.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
-#include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
+#include <mitkDICOMSegmentationPropertyHelper.cpp>
 
 // us
 #include <usGetModuleContext.h>
@@ -264,6 +264,11 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(Image *original,
     Tool::ErrorMessage("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.");
     return nullptr;
   }
+
+  // Add some DICOM Tags as properties to segmentation image
+  PropertyList::Pointer dicomSegPropertyList = mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(original->GetPropertyList());
+  segmentation->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
+  mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(segmentation->GetActiveLabel(segmentation->GetActiveLayer()));
 
   return CreateSegmentationNode(segmentation, organName, color);
 }

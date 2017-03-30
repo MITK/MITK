@@ -43,7 +43,7 @@ class vtkCornerAnnotation;
 class vtkMitkRectangleProp;
 
 namespace mitk {
-class RenderingManager;
+  class RenderingManager;
 }
 
 /// \ingroup QmitkModule

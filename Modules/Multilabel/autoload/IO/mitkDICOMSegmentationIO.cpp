@@ -651,7 +651,7 @@ namespace mitk
         StringProperty *segmentModifierCodeMeaningProp = dynamic_cast<mitk::StringProperty *>(label->GetProperty(
           mitk::DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str()));
 
-        dcmqi::SegmentAttributes *segAttr;
+        dcmqi::SegmentAttributes *segAttr = nullptr;
 
         if (segmentNumberProp->GetValue() == nullptr)
         {

@@ -70,8 +70,8 @@ m_Parent(parent)
 
   //Create Menu Widget
   this->CreateMenuWidget();
-  this->setMinimumWidth(61); //DIRTY.. If you add or remove a button, you need to change the size.
-  this->setMaximumWidth(61);
+  this->setMinimumWidth(62); //DIRTY.. If you add or remove a button, you need to change the size.
+  this->setMaximumWidth(62);
   this->setAutoFillBackground( true );
 
   //Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
@@ -119,7 +119,7 @@ QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
 void QmitkRenderWindowMenu::CreateMenuWidget()
 {
   QHBoxLayout* layout = new QHBoxLayout(this);
-  layout->setAlignment( Qt::AlignRight );
+  layout->setAlignment( Qt::AlignHCenter );
   layout->setContentsMargins(1,1,1,1);
 
   QSize size( 13, 13 );
@@ -129,7 +129,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
 
   // button for changing rotation mode
   m_CrosshairModeButton = new QToolButton(this);
-  m_CrosshairModeButton->setMaximumSize(15, 15);
+  m_CrosshairModeButton->setMaximumSize(16, 16);
   m_CrosshairModeButton->setIconSize(size);
   m_CrosshairModeButton->setMenu( m_CrosshairMenu );
   m_CrosshairModeButton->setIcon(QIcon(QPixmap(iconCrosshairMode_xpm)));
@@ -140,7 +140,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
 
   //fullScreenButton
   m_FullScreenButton = new QToolButton(this);
-  m_FullScreenButton->setMaximumSize(15, 15);
+  m_FullScreenButton->setMaximumSize(16, 16);
   m_FullScreenButton->setIconSize(size);
   m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
   m_FullScreenButton->setAutoRaise(true);
@@ -148,7 +148,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
 
   //settingsButton
   m_SettingsButton = new QToolButton(this);
-  m_SettingsButton->setMaximumSize(15, 15);
+  m_SettingsButton->setMaximumSize(16, 16);
   m_SettingsButton->setIconSize(size);
   m_SettingsButton->setIcon(QIcon(QPixmap(iconSettings_xpm)));
   m_SettingsButton->setAutoRaise(true);
@@ -742,7 +742,7 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 #endif
 {
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-  int X=floor( double(this->m_Parent->width() - this->width() - 8.0) );
+  int X=floor( double(this->m_Parent->width()/2 - this->width()/2) );
   int Y=7;
 
   QPoint pos = this->m_Parent->mapToGlobal( QPoint(0,0) );
@@ -754,7 +754,7 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 
   this->setWindowOpacity(opacity);
 #else
-  int moveX= floor( double(this->m_Parent->width() - this->width() - 4.0) );
+  int moveX= floor( double(this->m_Parent->width()/2 - this->width()/2) );
   this->move( moveX, 3 );
   this->show();
 #endif

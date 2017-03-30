@@ -1564,7 +1564,7 @@ mitk::DataNode::Pointer QmitkStdMultiWidget::GetTopLayerNode(mitk::DataStorage::
   return node;
 }
 
-void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* text) 
+void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* text)
 {
   // empty or NULL string breaks renderer
   // and white square appears
@@ -1572,8 +1572,8 @@ void QmitkStdMultiWidget::setCornerAnnotation(int corner, int i, const char* tex
     text = " ";
   }
   cornerText[i]->SetText(corner, text);
-  cornerText[i]->SetMaximumFontSize(14);
-  textProp[i]->SetColor(1.0, 1.0, 1.0);
+  cornerText[i]->SetMaximumFontSize(13);
+  textProp[i]->SetColor(1.0, 1.0, 7.0);
   textProp[i]->SetFontFamilyToArial();
   cornerText[i]->SetTextProperty(textProp[i]);
 }
@@ -1622,8 +1622,16 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     mitk::BoundingBox::BoundsArrayType bounds = image->GetGeometry()->GetBounds();
     std::stringstream _infoStringStream[3];
     std::string cornerimgtext[3];
+
+    imageProperties = image->GetPropertyList();
+    std::string seriesNumber;
+    imageProperties->GetStringProperty("dicom.series.SeriesNumber", seriesNumber);
+
     for(int i = 0; i < 3; i++) {
       _infoStringStream[i] << "Im: " << (p[i] + 1) << "/" << bounds[(i*2 + 1)];
+      if (seriesNumber != "") {
+        _infoStringStream[i] << "\nSe: " << seriesNumber;
+      }
       cornerimgtext[i] = _infoStringStream[i].str();
       setCornerAnnotation(2, i, cornerimgtext[i].c_str());
     }
@@ -1634,7 +1642,6 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       std::string patient, patientId,
         birthday, sex, institution, studyDate, studyTime;
 
-      imageProperties = image->GetPropertyList();
       imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
       imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
       imageProperties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
@@ -1652,13 +1659,15 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
       char mi[3]; mi[2] = 0;
       char ss[3]; ss[2] = 0;
 
-      if (m_displayMetaInfo && (birthday != "")) {
-        sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
-        infoStringStream[0] 
-          << "\n\n" << patient.c_str()
-          << "\n" << patientId.c_str()
-          << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str()
-          << "\n" << institution.c_str();
+      if (m_displayMetaInfo) {
+        infoStringStream[0]
+          << patient.c_str()
+          << "\n" << patientId.c_str();
+        if (birthday != "") {
+          sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
+          infoStringStream[0] << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str();
+        }
+        infoStringStream[0] << "\n" << institution.c_str();
       } else {
         infoStringStream[0].clear();
       }
@@ -1675,7 +1684,9 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
 
       auto render_annotation = [&] (int j, int corner) {
         const std::string infoString = infoStringStream[j].str();
-        setCornerAnnotation(corner, 3, infoString.c_str());
+        for(int i = 0; i < 4; i++) {
+          setCornerAnnotation(corner, i, infoString.c_str());
+        }
       };
       render_annotation(0, 3);
       render_annotation(1, 1);

@@ -48,6 +48,7 @@ MITK provides a <b>ball</b> and a <b>cross</b> as structuring elements. The foll
 <li> <b>Opening:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects
 <li> <b>Closing</b> An erosion followed by an dilation, used for filling small holes
 <li> <b>Fill Holes</b> Fills bigger holes within a segmentation
+<li> <b>Pruning</b> Removes spurs that branch off the segmentation. The radius determines the number of pruning iterations.
 </ul>
 
 \imageMacro{QmitkSegmentationUtilities_IMGMorphologicalOperators.png,"Morphological operators widget of the Segmentation Utilities View",6.00}

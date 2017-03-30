@@ -228,7 +228,7 @@ Interpolated suggestions are displayed in a different way than manual segmentati
 To accept single slices, click the "Accept" button below the toolbox.
 If you have segmented a whole organ in every-x-slice, you may also review the interpolations and then accept all of them at once by clicking "... all slices".
 
-\section org_mitk_gui_qt_segmentationUserManual3DSegmentationTools 3D Segmenation tools
+\section org_mitk_gui_qt_segmentationUserManual3DSegmentationTools 3D Segmentation tools
 
 The 3D tools operate on the hole image and require usually a small amount of interaction like placing seed-points or specifying certain parameters. All 3D tools provide
 an immediate segmentation feedback, which is displayed as a transparent green overlay. For accepting a preview you have to press the "Comfirm" button of the selected tool.
@@ -244,7 +244,7 @@ You can change the threshold by either moving the slider of setting a certain va
 \subsection org_mitk_gui_qt_segmentationUserManual3DULTool 3D Upper/Lower Threshold tool
 
 The Upper/Lower Thresholding tool works similar to the simple 3D threshold tool but allows you to define an upper and lower threshold. All pixels with
-values within this threshold intervall will be labeled
+values within this threshold interval will be labeled.
 
 \imageMacro{QmitkSegmentation_3DULThresholdTool.png,"3D Upper/Lower Threshold tool",10.00}
 
@@ -282,6 +282,12 @@ The Picking tool allows you to select islands within your segmentation. This is 
 your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
+
+\subsection org_mitk_gui_qt_segmentationUserManualThresholdComponentsTool 3D Threshold Components tool
+
+The Threshold Components tool works similar to the 3D Upper/Lower threshold tool but allows you to place multiple seed points in the image. All pixels with intensity between the threshold values that are morphologically connected to a seed point will be included in the volume. The segmentation automatically refreshes and saves with adjustment of threshold or seed point.
+
+\imageMacro{QmitkSegmentation_3DThresholdComponentsTool.png,"3D Threshold Components tool",10.00}
 
 \section org_mitk_gui_qt_segmentationUserManualPostprocessing Things you can do with segmentations
 

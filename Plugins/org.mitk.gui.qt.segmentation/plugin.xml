@@ -88,6 +88,7 @@
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Closing" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Opening" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Fill Holes" />
+    <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Pruning" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Morphological Operations" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Boolean Operations" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Surface to Image" />

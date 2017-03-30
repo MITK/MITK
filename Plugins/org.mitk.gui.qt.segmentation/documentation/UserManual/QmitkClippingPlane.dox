@@ -10,7 +10,7 @@
 
 \section org_mitk_views_clippingPlaneManualOverview Overview
 
-The <b>Clipping Plane view</b> allows you to create clipping planes and calculate the volumina of the devided parts.
+The <b>Clipping Plane view</b> allows you to create clipping planes, calculate the volumina of the divided parts, and crop your segmentation in 3D.
 
 
 \section org_mitk_views_clippingPlaneTechnicalIssue Technical Issue
@@ -69,5 +69,6 @@ Calculating the volumina of the segmentation parts, which are devided by the cli
  - (You can decide which planes shouldnt be included for the calculation by changing their visibility to invisible)
  - Click button "Update Volumina" button
  - The intersected parts are displayed in different colors and their volumina are shown beneath the "Update Volumina" button
+ - To save a specific colored part as a new segmentation, double click its corresponding item in the volumina list
 
 **/

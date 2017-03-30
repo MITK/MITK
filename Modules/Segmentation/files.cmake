@@ -30,6 +30,7 @@ set(CPP_FILES
   #DataManagement/mitkContourModel.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
+  Interactions/mitkThresholdComponentsTool.cpp
   Interactions/mitkAdaptiveRegionGrowingTool.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
@@ -105,6 +106,7 @@ set(RESOURCE_FILES
   Subtract_Cursor_32x32.png
   Threshold_48x48.png
   TwoThresholds_48x48.png
+  ThresholdComponents_48x48.png
   Watershed_48x48.png
   Watershed_Cursor_32x32.png
   Wipe_48x48.png

@@ -66,6 +66,7 @@ protected slots:
     void OnComboBoxSelectionChanged(const mitk::DataNode* node);
     void OnCreateNewClippingPlane();
     void OnCalculateClippingVolume();
+    void OnSelectClippedSegment(QListWidgetItem* item);
 
     void OnTranslationMode(bool check);
     void OnRotationMode(bool check);
@@ -85,6 +86,13 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
   Ui::QmitkDeformableClippingPlaneViewControls m_Controls;
+  
+  /// \brief Called when creating a new segmentation from a clipping
+  template <typename TPixel, unsigned int VImageDimension>
+  void ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+                            mitk::Image *segmentation,
+                            double lower,
+                            double upper);
 
 private:
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllClippingPlanes();

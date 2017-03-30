@@ -38,6 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "vtkProperty.h"
 #include <vtkPlaneSource.h>
 
+#include "mitkImageAccessByItk.h"
+#include <itkBinaryThresholdImageFilter.h>
+#include "mitkToolManagerProvider.h"
 
 const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.deformableclippingplane";
 
@@ -91,6 +94,7 @@ void QmitkDeformableClippingPlaneView::CreateConnections()
   connect (m_Controls.updateVolumePushButton, SIGNAL(clicked()), this, SLOT(OnCalculateClippingVolume()));
   connect (m_Controls.clippingPlaneSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnComboBoxSelectionChanged(const mitk::DataNode*)));
+  connect (m_Controls.volumeList, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(OnSelectClippedSegment(QListWidgetItem *)));
 }
 
 void QmitkDeformableClippingPlaneView::Activated()
@@ -528,6 +532,66 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
   // the LUT generator, otherwise, it is not guaranteed, that colors show
   // up correctly.
   clippedNode->SetProperty("levelwindow", mitk::LevelWindowProperty::New(lut->GetLevelWindow()));
+}
+
+void QmitkDeformableClippingPlaneView::OnSelectClippedSegment(QListWidgetItem* item)
+{
+  int itemNumber = item->listWidget()->row(item); //Get row of clicked item
+  int labelNumber = 2*itemNumber+1; //Convert to label number
+  
+  //Get underlying clipped image 
+  mitk::DataNode::Pointer clippedNode = this->GetDataStorage()->GetNamedNode("Clipped Image"); 
+  mitk::Image::Pointer writeImage = dynamic_cast<mitk::Image *>(clippedNode->GetData()); 
+  
+  //Get reference node and generate tool for creating segmentation
+  mitk::DataNode::Pointer node = m_ReferenceNode; 
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );  
+  mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); 
+  mitk::Tool* firstTool = toolManager->GetToolById(0);
+  
+  //Name and color of new segmentation (default red)
+  mitk::Color color;
+  color.SetRed(1);
+  color.SetBlue(0);
+  color.SetGreen(0);
+  std::string nodename = "clippedSegment_"+std::to_string(itemNumber+1);
+  
+  //Create new node
+  mitk::DataNode::Pointer emptySegmentation = firstTool->CreateEmptySegmentationNode(image, nodename, color); 
+  emptySegmentation->SetProperty( "showVolume", mitk::BoolProperty::New( false ) ); 
+  if(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
+  {
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
+  }
+  emptySegmentation->SetSelected(true); 
+  this->GetDefaultDataStorage()->Add( emptySegmentation, node ); 
+  this->FireNodeSelected( emptySegmentation );
+  mitk::RenderingManager::GetInstance()->InitializeViews(emptySegmentation->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  
+  mitk::Image::Pointer saveImage = dynamic_cast<mitk::Image *>(emptySegmentation->GetData());
+  
+  AccessByItk_3(writeImage, ITKThresholding, saveImage, labelNumber, labelNumber); //Use Thresholding to isolate the label number
+
+}
+
+template <typename TPixel, unsigned int VImageDimension>
+void QmitkDeformableClippingPlaneView::ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+                            mitk::Image *segmentation,
+                            double lower,
+                            double upper)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::BinaryThresholdImageFilter<ImageType, ImageType> ThresholdFilterType;
+
+  typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
+  filter->SetInput(originalImage);
+  filter->SetLowerThreshold(lower);
+  filter->SetUpperThreshold(upper);
+  filter->SetInsideValue(1);
+  filter->SetOutsideValue(0);
+  filter->Update();
+
+  segmentation->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()));
 }
 
 mitk::DataStorage::SetOfObjects::ConstPointer QmitkDeformableClippingPlaneView::GetAllClippingPlanes()

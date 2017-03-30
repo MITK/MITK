@@ -254,6 +254,38 @@
        </property>
       </widget>
      </item>
+     <item row="2" column="1">
+      <widget class="QToolButton" name="btnPruning">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string>Prunes spurs for a given number of iterations (use radius slider)</string>
+       </property>
+       <property name="text">
+        <string>Pruning</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
+         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Pruning_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Pruning_48x48.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextUnderIcon</enum>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

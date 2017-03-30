@@ -74,6 +74,7 @@ set(mitk_modules
   MatchPointRegistration
   MatchPointRegistrationUI
   BoundingShape
+  CEST
 )
 
 if(MITK_ENABLE_PIC_READER)

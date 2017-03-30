@@ -20,16 +20,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileReader.h>
 #include <mitkDICOMFileReader.h>
 
+#include "MitkDICOMReaderExports.h"
+
 namespace mitk {
 
   /**
   Base class for service wrappers that make DICOMFileReader from
   the DICOMReader module usable.
   */
-class BaseDICOMReaderService : public AbstractFileReader
+class MITKDICOMREADER_EXPORT BaseDICOMReaderService : public AbstractFileReader
 {
 public:
   BaseDICOMReaderService(const std::string& description);
+  BaseDICOMReaderService(const mitk::CustomMimeType& customType, const std::string& description);
 
   using AbstractFileReader::Read;
 

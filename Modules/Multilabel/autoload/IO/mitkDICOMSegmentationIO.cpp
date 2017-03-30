@@ -72,6 +72,11 @@ namespace mitk
       toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_LABEL_PATH());
       toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_ALGORITHM_TYPE_PATH());
 
+      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH());
+      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH());
+      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH());
+      toiService->AddTagOfInterest(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH());
+
       toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENTED_PROPERTY_CATEGORY_SEQUENCE_PATH());
       toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_VALUE_PATH());
       toiService->AddTagOfInterest(DICOMSegmentationConstants::SEGMENT_CATEGORY_CODE_SCHEME_PATH());
@@ -462,7 +467,28 @@ namespace mitk
             DICOMTagPathToPropertyName(DICOMSegmentationConstants::SEGMENT_MODIFIER_CODE_MEANING_PATH()).c_str(),
             StringProperty::New(codeMeaning.c_str()));
         }
-        // TODO: AnatomicRegion
+        // Add Atomic RegionSequence tags
+          auto atomicRegionSequence = segmentAttr->getAnatomicRegionSequence();
+          if (atomicRegionSequence != nullptr)
+          {
+            OFString codeValue; // (0008,0100) Code Value
+            atomicRegionSequence->getCodeValue(codeValue);
+            newLabel->SetProperty(
+              DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH()).c_str(),
+              StringProperty::New(codeValue.c_str()));
+
+            OFString codeScheme; // (0008,0102) Coding Scheme Designator
+            atomicRegionSequence->getCodingSchemeDesignator(codeScheme);
+            newLabel->SetProperty(
+              DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH()).c_str(),
+              StringProperty::New(codeScheme.c_str()));
+
+            OFString codeMeaning; // (0008,0104) Code Meaning
+            atomicRegionSequence->getCodeMeaning(codeMeaning);
+            newLabel->SetProperty(
+              DICOMTagPathToPropertyName(DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH()).c_str(),
+              StringProperty::New(codeMeaning.c_str()));
+          }
         ++segmentIter;
       }
 

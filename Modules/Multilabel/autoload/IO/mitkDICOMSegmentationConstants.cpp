@@ -46,6 +46,34 @@ namespace mitk
     return path;
   }
 
+  DICOMTagPath DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH()
+  {
+    static DICOMTagPath path =
+      DICOMTagPath(DICOMSegmentationConstants::SEGMENT_SEQUENCE_PATH()).AddElement(0x0008, 0x2218);
+    return path;
+  }
+
+  DICOMTagPath DICOMSegmentationConstants::ANATOMIC_REGION_CODE_VALUE_PATH()
+  {
+    static DICOMTagPath path =
+      DICOMTagPath(DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH()).AddElement(0x008, 0x0100);
+    return path;
+  }
+
+  DICOMTagPath DICOMSegmentationConstants::ANATOMIC_REGION_CODE_SCHEME_PATH()
+  {
+    static DICOMTagPath path =
+      DICOMTagPath(DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH()).AddElement(0x008, 0x0102);
+    return path;
+  }
+
+  DICOMTagPath DICOMSegmentationConstants::ANATOMIC_REGION_CODE_MEANING_PATH()
+  {
+    static DICOMTagPath path =
+      DICOMTagPath(DICOMSegmentationConstants::ANATOMIC_REGION_SEQUENCE_PATH()).AddElement(0x008, 0x0104);
+    return path;
+  }
+
   DICOMTagPath DICOMSegmentationConstants::SEGMENTED_PROPERTY_CATEGORY_SEQUENCE_PATH()
   {
     static DICOMTagPath path =

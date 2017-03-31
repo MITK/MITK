@@ -160,6 +160,7 @@ protected:
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 
   bool m_MouseCursorSet;
+  bool m_AutoSelectionEnabled;
 
   mitk::SegmentationInteractor::Pointer m_Interactor;
 

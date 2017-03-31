@@ -523,29 +523,27 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
     if (thisOriginString.empty())
     {
-      // don't let such files be in a common group. Everything without position information will be loaded as a single slice:
-      // with standard DICOM files this can happen to: CR, DX, SC
-      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for later analysis (no position information)"; // we already have one occupying this position
-
-      if ( result.GetBlockFilenames().empty() ) // nothing WITH position information yet
+      if (!lastOriginInitialized) // nothing WITH position information yet
       {
-        // ==> this is a group of its own, stop processing, come back later
+        // ==> this is a group of its own
         result.AddFileToSortedBlock( *fileIter );
-
-        StringContainer remainingFiles;
-        remainingFiles.insert( remainingFiles.end(), fileIter+1, files.end() );
-        result.AddFilesToUnsortedBlock( remainingFiles );
-
-        fileFitsIntoPattern = false;
-        break; // no files anymore
       }
       else
       {
         // ==> this does not match, consider later
         result.AddFileToUnsortedBlock( *fileIter );
-        fileFitsIntoPattern = false;
-        continue; // next file
       }
+      fileFitsIntoPattern = false;
+      continue; // no files anymore
+
+    } 
+    else if (!lastOriginInitialized && !result.GetBlockFilenames().empty())
+    {
+      // We have a file with position but result already contains files without it
+      // Sort it away
+      result.AddFileToUnsortedBlock(*fileIter);
+      fileFitsIntoPattern = false;
+      continue; // next file
     }
 
     bool ignoredConversionError(-42); // hard to get here, no graceful way to react

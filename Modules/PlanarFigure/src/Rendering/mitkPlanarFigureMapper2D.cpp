@@ -445,6 +445,11 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
 
   m_ControlPointShape = PlanarFigureControlPointStyleProperty::Square;
 
+  m_AnnotationSize = 12;
+  m_AnnotationFontFamily = "Arial";
+  m_DrawAnnotationBold = false;
+  m_DrawAnnotationItalic = false;
+
   this->SetColorProperty( m_LineColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
   this->SetFloatProperty( m_LineOpacity, PF_DEFAULT, 1.0 );
   this->SetColorProperty( m_OutlineColor, PF_DEFAULT, 0.0, 0.0, 1.0 );
@@ -529,10 +534,22 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetFloatProperty( "planarfigure.helperline.width", m_HelperlineWidth );
 
   node->GetFloatProperty( "planarfigure.devicepixelratio", m_DevicePixelRatio );
-  node->GetStringProperty( "planarfigure.annotations.font.family", m_AnnotationFontFamily );
-  node->GetBoolProperty("planarfigure.annotations.font.bold", m_DrawAnnotationBold );
-  node->GetBoolProperty("planarfigure.annotations.font.italic", m_DrawAnnotationItalic );
-  node->GetIntProperty("planarfigure.annotations.font.size", m_AnnotationSize );
+  if (!node->GetStringProperty("planarfigure.annotations.font.family", m_AnnotationFontFamily) || m_AnnotationFontFamily.empty())
+  {
+    m_AnnotationFontFamily = "Arial";
+  }
+  if (!node->GetBoolProperty("planarfigure.annotations.font.bold", m_DrawAnnotationBold))
+  {
+    m_DrawAnnotationBold = false;
+  }
+  if (!node->GetBoolProperty("planarfigure.annotations.font.italic", m_DrawAnnotationItalic))
+  {
+    m_DrawAnnotationItalic = false;
+  }
+  if (!node->GetIntProperty("planarfigure.annotations.font.size", m_AnnotationSize) || !m_AnnotationSize)
+  {
+    m_AnnotationSize = 12;
+  }
   if( !node->GetBoolProperty("planarfigure.annotations.shadow", m_AnnotationsShadow ) )
   {
     node->GetBoolProperty("planarfigure.drawshadow", m_AnnotationsShadow );

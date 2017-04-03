@@ -65,16 +65,6 @@ public:
   berry::IPartListener::Events::Types GetPartEventTypes() const override;
 
   /**
-   * \see IPartListener::PartActivated()
-   */
-  virtual void PartActivated (const berry::IWorkbenchPartReference::Pointer& partRef) override;
-
-  /**
-   * \see IPartListener::PartDeactivated()
-   */
-  virtual void PartDeactivated(const berry::IWorkbenchPartReference::Pointer& /*partRef*/) override;
-
-  /**
    * \see IPartListener::PartOpened()
    */
   virtual void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
@@ -111,9 +101,7 @@ private:
 
 private:
 
-  mitk::IZombieViewPart* m_ActiveZombieView;
   mitk::IRenderWindowPart* m_ActiveRenderWindowPart;
-  mitk::IRenderWindowPart* m_VisibleRenderWindowPart;
 
   QSet<mitk::IRenderWindowPartListener*> m_RenderWindowListeners;
 

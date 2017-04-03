@@ -25,9 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 
 QmitkViewCoordinator::QmitkViewCoordinator()
-  : m_ActiveZombieView(nullptr)
-  , m_ActiveRenderWindowPart(nullptr)
-  , m_VisibleRenderWindowPart(nullptr)
+  : m_ActiveRenderWindowPart(nullptr)
 {
 }
 
@@ -66,53 +64,6 @@ berry::IPartListener::Events::Types QmitkViewCoordinator::GetPartEventTypes() co
     | berry::IPartListener::Events::VISIBLE | berry::IPartListener::Events::OPENED;
 }
 
-void QmitkViewCoordinator::PartActivated(const berry::IWorkbenchPartReference::Pointer& partRef )
-{
-  //MITK_INFO << "*** PartActivated (" << partRef->GetPart(false)->GetPartName() << ")";
-  berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
-
-  // Check for a render window part and inform IRenderWindowPartListener views
-  // that it was activated
-  if ( mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part) )
-  {
-    m_ActiveRenderWindowPart = renderPart;
-  }
-
-  // Check if the activated part wants to be notified
-  if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
-  {
-    lifecycleAwarePart->Activated();
-  }
-
-  // Check if a zombie view has been activated.
-  if (mitk::IZombieViewPart* zombieView = dynamic_cast<mitk::IZombieViewPart*>(part))
-  {
-    if (m_ActiveZombieView && (m_ActiveZombieView != zombieView))
-    {
-      // Another zombie view has been activated. Tell the old one about it.
-      m_ActiveZombieView->ActivatedZombieView(partRef);
-      m_ActiveZombieView = zombieView;
-    }
-  }
-}
-
-void QmitkViewCoordinator::PartDeactivated(const berry::IWorkbenchPartReference::Pointer& partRef )
-{
-  //MITK_INFO << "*** PartDeactivated (" << partRef->GetPart(false)->GetPartName() << ")";
-  berry::IWorkbenchPart* part = partRef->GetPart(false).GetPointer();
-  
-  // Check for a render window part and if it is the currently active on.
-  // Inform IRenderWindowPartListener views that it has been deactivated.
-  if (dynamic_cast<mitk::IRenderWindowPart*>(part)) {
-    m_ActiveRenderWindowPart = nullptr;
-  }
-
-  if (mitk::ILifecycleAwarePart* lifecycleAwarePart = dynamic_cast<mitk::ILifecycleAwarePart*>(part))
-  {
-    lifecycleAwarePart->Deactivated();
-  }
-}
-
 void QmitkViewCoordinator::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef )
 {
   //MITK_INFO << "*** PartOpened (" << partRef->GetPart(false)->GetPartName() << ")";
@@ -144,10 +95,9 @@ void QmitkViewCoordinator::PartHidden(const berry::IWorkbenchPartReference::Poin
   // Inform IRenderWindowPartListener views that it has been hidden.
   if ( mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part) )
   {
-    if (!m_ActiveRenderWindowPart && m_VisibleRenderWindowPart == renderPart)
-    {
+    if (m_ActiveRenderWindowPart == renderPart) {
       RenderWindowPartDeactivated(renderPart);
-      m_VisibleRenderWindowPart = nullptr;
+      m_ActiveRenderWindowPart = nullptr;
     }
   }
 
@@ -166,10 +116,9 @@ void QmitkViewCoordinator::PartVisible(const berry::IWorkbenchPartReference::Poi
   // that it was activated
   if ( mitk::IRenderWindowPart* renderPart = dynamic_cast<mitk::IRenderWindowPart*>(part) )
   {
-    if (!m_ActiveRenderWindowPart)
-    {
+    if (!m_ActiveRenderWindowPart) {
       RenderWindowPartActivated(renderPart);
-      m_VisibleRenderWindowPart = renderPart;
+      m_ActiveRenderWindowPart = renderPart;
     }
   }
 

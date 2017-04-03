@@ -835,18 +835,27 @@ void BaseApplication::initializeSplashScreen(QCoreApplication * application)
         QString autoplanVersionString = autoplanVersion.toString();
         d->m_Splashscreen->showMessage( autoplanVersionString, Qt::AlignBottom | Qt::AlignRight, Qt::white);
       }
-      m_drawProgress = [this, pixmap, application] (float progress) mutable
+      m_drawProgress = [this, pixmap, application] (float progress, bool invert) mutable
       {
         QPainter splashPainter;
         splashPainter.begin(&pixmap);
-        splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, progress * PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
+        if (invert)
+        {
+          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
+          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, progress * PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::darkCyan);
+        }
+        else
+        {
+          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::darkCyan );
+          splashPainter.fillRect( PROGRESS_X_PX, PROGRESS_Y_PX, progress * PROGRESS_WIDTH_PX, PROGRESS_HEIGHT_PX, Qt::gray );
+        }
         d->m_Splashscreen->setPixmap(d->m_Splashscreen->pixmap());
         splashPainter.end();
         d->m_Splashscreen->setPixmap(pixmap);
         application->processEvents();
       };
       d->m_Splashscreen->show();
-      m_drawProgress(0.1);
+      m_drawProgress(.05f, false);
       ///Closing callback for splashscreen
       d->m_SplashscreenClosingCallback =
           new SplashCloserCallback(d->m_Splashscreen, m_drawProgress);

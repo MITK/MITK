@@ -44,8 +44,9 @@ namespace mitk {
 class SplashCloserCallback : public QRunnable
 {
 public:
-  SplashCloserCallback(QSplashScreen* splashscreen, std::function<void(float)> drawProgress)
+  SplashCloserCallback(QSplashScreen* splashscreen, std::function<void(float, bool)> drawProgress)
     : m_working(true)
+    , m_invert(false)
   {
     this->m_Splashscreen = splashscreen;
     this->m_drawProgress = drawProgress;
@@ -60,12 +61,13 @@ public:
       if (m_progress >= 1.f)
       {
         m_progress = 0.f;
+        m_invert ^= m_invert;
       }
       else
       {
-        m_progress += .1f;
+        m_progress += .05f;
       }
-      m_drawProgress(m_progress);
+      m_drawProgress(m_progress, m_invert);
     }
   }
 
@@ -77,10 +79,11 @@ public:
 
 private:
   bool m_working;
+  bool m_invert;
   float m_progress = 0.f;
   boost::thread m_workThread;
   QSplashScreen* m_Splashscreen;
-  std::function<void(float)> m_drawProgress;
+  std::function<void(float, bool)> m_drawProgress;
 };
 
 /**
@@ -381,7 +384,7 @@ protected:
   */
   void initializeSplashScreen(QCoreApplication * application);
 
-  std::function<void(float)> m_drawProgress;
+  std::function<void(float, bool)> m_drawProgress;
 
 private:
 

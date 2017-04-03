@@ -91,8 +91,8 @@ protected:
   template <typename TPixel, unsigned int VImageDimension>
   void ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
                             mitk::Image *segmentation,
-                            double lower,
-                            double upper);
+                            int labelNumber,
+                            int maxLabelValue);
 
 private:
   mitk::DataStorage::SetOfObjects::ConstPointer GetAllClippingPlanes();

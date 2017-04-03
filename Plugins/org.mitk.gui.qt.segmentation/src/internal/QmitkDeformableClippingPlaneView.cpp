@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageAccessByItk.h"
 #include <itkBinaryThresholdImageFilter.h>
 #include "mitkToolManagerProvider.h"
+#include "mitkImageStatisticsHolder.h"
+#include <itkImageToHistogramFilter.h>
 
 const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.deformableclippingplane";
 
@@ -536,8 +538,7 @@ void QmitkDeformableClippingPlaneView::OnCalculateClippingVolume()
 
 void QmitkDeformableClippingPlaneView::OnSelectClippedSegment(QListWidgetItem* item)
 {
-  int itemNumber = item->listWidget()->row(item); //Get row of clicked item
-  int labelNumber = 2*itemNumber+1; //Convert to label number
+  int itemNumber = item->listWidget()->row(item); //Get row of clicked item, 0 indexed
   
   //Get underlying clipped image 
   mitk::DataNode::Pointer clippedNode = this->GetDataStorage()->GetNamedNode("Clipped Image"); 
@@ -570,23 +571,48 @@ void QmitkDeformableClippingPlaneView::OnSelectClippedSegment(QListWidgetItem* i
   
   mitk::Image::Pointer saveImage = dynamic_cast<mitk::Image *>(emptySegmentation->GetData());
   
-  AccessByItk_3(writeImage, ITKThresholding, saveImage, labelNumber, labelNumber); //Use Thresholding to isolate the label number
+  int maxLabelValue = writeImage->GetStatistics()->GetScalarValueMax();
+  
+  AccessByItk_3(writeImage, ITKThresholding, saveImage, itemNumber, maxLabelValue); //Use Thresholding to isolate the label number
 
 }
 
 template <typename TPixel, unsigned int VImageDimension>
 void QmitkDeformableClippingPlaneView::ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
                             mitk::Image *segmentation,
-                            double lower,
-                            double upper)
+                            int labelNumber,
+                            int maxLabelValue)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::BinaryThresholdImageFilter<ImageType, ImageType> ThresholdFilterType;
+  typedef itk::Statistics::ImageToHistogramFilter< ImageType > ImageToHistogramFilterType;
+  
+  typename ImageToHistogramFilterType::Pointer imageToHistogramFilter = ImageToHistogramFilterType::New();
+  
+  typename ImageToHistogramFilterType::HistogramType::SizeType size(1);
+  size.Fill(maxLabelValue+1);
+  
+  imageToHistogramFilter->SetInput( originalImage );
+  imageToHistogramFilter->SetHistogramSize( size );
+  imageToHistogramFilter->Update();
+  
+  typename ImageToHistogramFilterType::HistogramType* histogram = imageToHistogramFilter->GetOutput();
+  
+  int threshold = 0;
+  int i = 0;
+  while(i < labelNumber+1)
+    {
+    threshold++;    
+    if( histogram->GetFrequency(threshold) != 0)
+      {
+      i++;
+      }
+    }
 
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
   filter->SetInput(originalImage);
-  filter->SetLowerThreshold(lower);
-  filter->SetUpperThreshold(upper);
+  filter->SetLowerThreshold(threshold);
+  filter->SetUpperThreshold(threshold);
   filter->SetInsideValue(1);
   filter->SetOutsideValue(0);
   filter->Update();

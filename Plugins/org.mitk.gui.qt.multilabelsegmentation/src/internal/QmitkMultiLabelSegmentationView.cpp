@@ -927,7 +927,7 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
         // force render window update to show outline
         segmentation->GetData()->Modified();
       }
-      else
+      else if (nullptr != segmentation->GetData())
       {
         // node is actually a 'single label' segmentation,
         // but its outline property can be set in the 'multi label' segmentation preference page as well
@@ -942,6 +942,11 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
           // force render window update to show outline
           segmentation->GetData()->Modified();
         }
+      } 
+      else
+      {
+          // "interpolation feedback" data nodes have binary flag but don't have a data set. So skip them for now.
+          MITK_INFO << "DataNode " << segmentation->GetName() << " doesn't contain a base data.";
       }
     }
   }

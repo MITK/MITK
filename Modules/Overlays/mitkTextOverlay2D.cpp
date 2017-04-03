@@ -134,7 +134,7 @@ void mitk::TextOverlay2D::UpdateVtkOverlay2D(mitk::BaseRenderer *renderer)
     ls->m_STextProp->SetOpacity(opacity);
 
     std::string fontFamilyAsString;
-    if ( GetStringProperty( "font.family", fontFamilyAsString ) == false )
+    if ( GetStringProperty( "font.family", fontFamilyAsString ) == false || fontFamilyAsString.empty())
     {
       fontFamilyAsString = "Arial";
     }

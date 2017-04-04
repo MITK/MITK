@@ -58,7 +58,8 @@ enum RenderMode
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkAbstractView(),
-  m_Controls(NULL)
+  m_Controls(NULL),
+  m_NodeListenerTag(0)
 {
 }
 
@@ -108,6 +109,8 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
 
+    m_ModifiedCommand = itk::MemberCommand<QmitkVolumeVisualizationView>::New();
+    m_ModifiedCommand->SetCallbackFunction(this, &QmitkVolumeVisualizationView::onPropertyChanged);
   }
 }
 
@@ -142,7 +145,8 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
   {
     if( currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()) )
     {
-      if( dynamic_cast<mitk::Image*>(currentNode->GetData())->GetDimension()>=3 )
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(currentNode->GetData());
+      if(image.IsNotNull() && image->GetDimension()>=3 )
       {
         if (node.IsNull())
         {
@@ -171,7 +175,17 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
 
     m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
 
+    if (m_SelectedNode.IsNotNull() && m_NodeListenerTag != 0) {
+      mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
+      if (property.IsNotNull()){
+        property->RemoveObserver(m_NodeListenerTag);
+      }
+    }
     m_SelectedNode = node;
+    mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
+    if (property.IsNotNull()) {
+      m_NodeListenerTag = property->AddObserver(itk::ModifiedEvent(), m_ModifiedCommand);
+    }
   }
   else
   {
@@ -190,7 +204,14 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
       m_Controls->m_NoSelectedImageLabel->show();
     }
 
+    if (m_SelectedNode.IsNotNull() && m_NodeListenerTag != 0) {
+      mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
+      if (property.IsNotNull()) {
+        m_SelectedNode->GetProperty("volumerendering")->RemoveObserver(m_NodeListenerTag);
+      }
+    }
     m_SelectedNode = 0;
+    m_NodeListenerTag = 0;
   }
 
   UpdateInterface();
@@ -297,7 +318,6 @@ void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
     return;
 
   m_SelectedNode->SetProperty("volumerendering",mitk::BoolProperty::New(state));
-  UpdateInterface();
   RequestRenderWindowUpdate();
 }
 
@@ -342,9 +362,15 @@ void QmitkVolumeVisualizationView::NodeRemoved(const mitk::DataNode* node)
   if(m_SelectedNode == node)
   {
     m_SelectedNode=0;
+    m_NodeListenerTag = 0;
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
     m_Controls->m_NoSelectedImageLabel->show();
     UpdateInterface();
   }
+}
+
+void QmitkVolumeVisualizationView::onPropertyChanged(const itk::Object *caller, const itk::EventObject & event)
+{
+  UpdateInterface();
 }

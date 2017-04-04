@@ -74,9 +74,12 @@ protected:
 private:
 
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+  unsigned long m_NodeListenerTag;
+  itk::MemberCommand<QmitkVolumeVisualizationView>::Pointer m_ModifiedCommand;
 
   void UpdateInterface();
   void NodeRemoved(const mitk::DataNode* node) override;
+  void onPropertyChanged(const itk::Object* caller, const itk::EventObject& event);
 
 };
 

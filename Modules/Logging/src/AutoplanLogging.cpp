@@ -196,6 +196,12 @@ namespace Logger
       backend->auto_flush(true);
 
       boost::shared_ptr< ostream_sink > sink2(new ostream_sink(backend));
+      sink2->set_formatter(
+        boost::log::expressions::format("{\"user\": \"%3%@%2%\", \"message\": \"%1%\"}")
+        % boost::log::expressions::xml_decor[boost::log::expressions::stream << boost::log::expressions::smessage]
+        % boost::log::expressions::attr<std::string>("ComputerName")
+        % boost::log::expressions::attr<std::string>("UserName")
+      );
       boost::log::core::get()->add_sink(sink2);
     }
 

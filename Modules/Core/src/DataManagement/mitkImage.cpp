@@ -91,6 +91,11 @@ mitk::Image::~Image()
 {
   this->Clear();
 
+  for (auto dict : m_MetaDataDictionaryArray) {
+    delete dict;
+    dict = nullptr;
+  }
+
   m_ReferenceCount = 3;
   m_ReferenceCount = 0;
 

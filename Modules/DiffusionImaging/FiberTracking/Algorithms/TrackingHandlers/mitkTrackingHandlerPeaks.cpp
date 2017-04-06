@@ -66,6 +66,22 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetMatchingDirection(itk::Index<
   float mag = oldDir.magnitude();
   if (mag<mitk::eps)
   {
+    // try m_NumDirs times to get a non-zero random direction
+    for (int j=0; j<m_NumDirs; j++)
+    {
+      int i = std::rand()%m_NumDirs;
+      out_dir = GetDirection(idx3, i);
+
+      if (out_dir.magnitude()>mitk::eps)
+      {
+        oldDir[0] = out_dir[0];
+        oldDir[1] = out_dir[1];
+        oldDir[2] = out_dir[2];
+        break;
+      }
+    }
+
+    // if you didn't find a non-zero random direction, take first non-zero direction you find
     for (int i=0; i<m_NumDirs; i++)
     {
       out_dir = GetDirection(idx3, i);

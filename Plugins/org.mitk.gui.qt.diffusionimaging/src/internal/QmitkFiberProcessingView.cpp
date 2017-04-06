@@ -150,30 +150,35 @@ void QmitkFiberProcessingView::Modify()
     {
     case 0:
     {
-        ResampleSelectedBundles();
+        ResampleSelectedBundlesSpline();
         break;
     }
     case 1:
     {
-        CompressSelectedBundles();
+        ResampleSelectedBundlesLinear();
         break;
     }
     case 2:
     {
-        DoImageColorCoding();
+        CompressSelectedBundles();
         break;
     }
     case 3:
     {
-        MirrorFibers();
+        DoImageColorCoding();
         break;
     }
     case 4:
     {
-        WeightFibers();
+        MirrorFibers();
         break;
     }
     case 5:
+    {
+        WeightFibers();
+        break;
+    }
+    case 6:
     {
         DoCurvatureColorCoding();
         break;
@@ -1327,13 +1332,24 @@ void QmitkFiberProcessingView::SubstractBundles()
     UpdateGui();
 }
 
-void QmitkFiberProcessingView::ResampleSelectedBundles()
+void QmitkFiberProcessingView::ResampleSelectedBundlesSpline()
 {
     double factor = this->m_Controls->m_SmoothFibersBox->value();
     for (auto node : m_SelectedFB)
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         fib->ResampleSpline(factor);
+    }
+    RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkFiberProcessingView::ResampleSelectedBundlesLinear()
+{
+    double factor = this->m_Controls->m_SmoothFibersBox->value();
+    for (auto node : m_SelectedFB)
+    {
+        mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+        fib->ResampleLinear(factor);
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
 }

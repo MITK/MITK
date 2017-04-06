@@ -512,7 +512,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTrai
       m_WmSampleDistance = minSpacing*0.5;
     }
 
-    m_Tractograms.at(t)->ResampleSpline(m_WmSampleDistance);
+    m_Tractograms.at(t)->ResampleLinear(m_WmSampleDistance);
 
     unsigned int wmSamples = m_Tractograms.at(t)->GetNumberOfPoints()-2*m_Tractograms.at(t)->GetNumFibers();
     if (m_BidirectionalFiberSampling)

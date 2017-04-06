@@ -761,7 +761,7 @@ namespace itk
     // working copy is needed because we need to resample the fibers but do not want to change the original bundle
     m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();
     double volumeAccuracy = 10;
-    m_FiberBundleWorkingCopy->ResampleSpline(minSpacing/volumeAccuracy);
+    m_FiberBundleWorkingCopy->ResampleLinear(minSpacing/volumeAccuracy);
     m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
     
     auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();

@@ -79,6 +79,7 @@ public:
     // fiber resampling
     void ResampleSpline(float pointDistance=1);
     void ResampleSpline(float pointDistance, double tension, double continuity, double bias );
+    void ResampleLinear(double pointDistance=1);
 
     bool RemoveShortFibers(float lengthInMM);
     bool RemoveLongFibers(float lengthInMM);

@@ -110,12 +110,6 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index
     for (int i=0; i<m_PdImage.size(); i++)
     {
       out_dir = m_PdImage.at(i)->GetPixel(idx);
-      if (m_FlipX)
-          out_dir[0] *= -1;
-      if (m_FlipY)
-          out_dir[1] *= -1;
-      if (m_FlipZ)
-          out_dir[2] *= -1;
 
       if (out_dir.magnitude()>0.5)
       {
@@ -132,12 +126,6 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index
     for (int i=0; i<m_PdImage.size(); i++)
     {
       vnl_vector_fixed<float,3> dir = m_PdImage.at(i)->GetPixel(idx);
-      if (m_FlipX)
-          dir[0] *= -1;
-      if (m_FlipY)
-          dir[1] *= -1;
-      if (m_FlipZ)
-          dir[2] *= -1;
 
       float a = dot_product(dir, oldDir);
       if (fabs(a)>angle)
@@ -270,15 +258,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetLargestEigenvector(TensorTyp
     dir[2] = eigenvectors(2, 2);
     if (dir.magnitude()<mitk::eps)
         dir.fill(0.0);
-    else
-    {
-        if (m_FlipX)
-            dir[0] *= -1;
-        if (m_FlipY)
-            dir[1] *= -1;
-        if (m_FlipZ)
-            dir[2] *= -1;
-    }
+
     return dir;
 }
 
@@ -297,6 +277,14 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(itk::Point<flo
             return output_direction;
 
         vnl_vector_fixed<float,3> oldDir = olddirs.back();
+
+        if (m_FlipX)
+            oldDir[0] *= -1;
+        if (m_FlipY)
+            oldDir[1] *= -1;
+        if (m_FlipZ)
+            oldDir[2] *= -1;
+
         float old_mag = oldDir.magnitude();
 
         if (!m_Interpolate && oldIndex==index)
@@ -311,6 +299,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(itk::Point<flo
 
           if (old_mag>0.5 && m_G>mitk::eps)  // TEND tracking
           {
+
               output_direction[0] = m_F*output_direction[0] + (1-m_F)*( (1-m_G)*oldDir[0] + m_G*(tensor[0]*oldDir[0] + tensor[1]*oldDir[1] + tensor[2]*oldDir[2]));
               output_direction[1] = m_F*output_direction[1] + (1-m_F)*( (1-m_G)*oldDir[1] + m_G*(tensor[1]*oldDir[0] + tensor[3]*oldDir[1] + tensor[4]*oldDir[2]));
               output_direction[2] = m_F*output_direction[2] + (1-m_F)*( (1-m_G)*oldDir[2] + m_G*(tensor[2]*oldDir[0] + tensor[4]*oldDir[1] + tensor[5]*oldDir[2]));
@@ -333,6 +322,13 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::ProposeDirection(itk::Point<flo
     {
 
     }
+
+    if (m_FlipX)
+        output_direction[0] *= -1;
+    if (m_FlipY)
+        output_direction[1] *= -1;
+    if (m_FlipZ)
+        output_direction[2] *= -1;
 
     return output_direction;
 }

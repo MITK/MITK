@@ -137,7 +137,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     {
       if (m_WorkOnFiberCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
-      m_FiberBundle->ResampleSpline(minSpacing/10);
+      m_FiberBundle->ResampleLinear(minSpacing/10);
     }
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";

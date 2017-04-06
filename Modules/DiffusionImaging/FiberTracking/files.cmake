@@ -21,6 +21,7 @@ set(CPP_FILES
   Algorithms/TrackingHandlers/mitkTrackingDataHandler.cpp
   Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.cpp
   Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.cpp
 )
 
 set(H_FILES
@@ -43,6 +44,7 @@ set(H_FILES
   Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h
   Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h
   Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h
 
   Algorithms/itkGibbsTrackingFilter.h
   Algorithms/itkStochasticTractographyFilter.h

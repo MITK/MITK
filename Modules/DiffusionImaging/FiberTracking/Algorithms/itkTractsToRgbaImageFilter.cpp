@@ -122,7 +122,7 @@ namespace itk{
         minSpacing = newSpacing[2];
 
     m_FiberBundle = m_FiberBundle->GetDeepCopy();
-    m_FiberBundle->ResampleSpline(minSpacing);
+    m_FiberBundle->ResampleLinear(minSpacing);
 
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
     vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();

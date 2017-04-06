@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStreamlineTrackingFilter.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
 
 
 /*!

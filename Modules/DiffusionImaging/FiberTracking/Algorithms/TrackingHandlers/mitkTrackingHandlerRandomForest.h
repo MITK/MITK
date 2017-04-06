@@ -145,6 +145,9 @@ protected:
     bool                                                        m_ZeroDirWmFeatures;
     int                                                         m_MaxNumWmSamples;
     std::vector< std::vector< bool > >                          m_SampleUsage;
+
+    vnl_matrix_fixed<float,3,3>                                 m_ImageDirection;
+    vnl_matrix_fixed<float,3,3>                                 m_ImageDirectionInverse;
 };
 
 }

@@ -1040,7 +1040,12 @@
          </property>
          <item>
           <property name="text">
-           <string>Resample fibers</string>
+           <string>Resample fibers (spline)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Resample fibers (linear)</string>
           </property>
          </item>
          <item>

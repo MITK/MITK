@@ -66,7 +66,7 @@ private:
 public:
     TrackVis_header     m_Header;
 
-    short   create(string m_Filename, const mitk::FiberBundle* fib);
+    short   create(string m_Filename, const mitk::FiberBundle* fib, bool lps);
     short   open( string m_Filename );
     short   read( mitk::FiberBundle* fib );
     short   append(const mitk::FiberBundle* fib );

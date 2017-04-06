@@ -103,6 +103,11 @@ void mitk::FiberBundleVtkWriter::Write()
         else if (fibPoly->GetPointData()->HasArray("FIBER_COLORS"))
             fibPoly->GetPointData()->RemoveArray("FIBER_COLORS");
 
+        vtkSmartPointer<vtkUnsignedCharArray> mitk_flag = vtkSmartPointer<vtkUnsignedCharArray>::New();
+        mitk_flag->SetName("SAVED_WITH_MITK");
+        mitk_flag->InsertNextValue(true);
+        fibPoly->GetPointData()->AddArray(mitk_flag);
+
         // default extension is .fib
         if(ext == "")
         {

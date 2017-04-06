@@ -75,6 +75,7 @@ private:
 
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   unsigned long m_NodeListenerTag;
+  bool m_ListeningNode;
   itk::MemberCommand<QmitkVolumeVisualizationView>::Pointer m_ModifiedCommand;
 
   void UpdateInterface();

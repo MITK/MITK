@@ -59,12 +59,22 @@ enum RenderMode
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkAbstractView(),
   m_Controls(NULL),
-  m_NodeListenerTag(0)
+  m_NodeListenerTag(0),
+  m_ListeningNode(false)
 {
 }
 
 QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 {
+  // Delete listeners
+  if (m_SelectedNode.IsNotNull() && m_ListeningNode) {
+    mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
+    if (property.IsNotNull()) {
+      property->RemoveObserver(m_NodeListenerTag);
+      m_ListeningNode = false;
+    }
+  }
+
 }
 
 void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
@@ -175,16 +185,18 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
 
     m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
 
-    if (m_SelectedNode.IsNotNull() && m_NodeListenerTag != 0) {
+    if (m_SelectedNode.IsNotNull() && m_ListeningNode) {
       mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
       if (property.IsNotNull()){
         property->RemoveObserver(m_NodeListenerTag);
+        m_ListeningNode = false;
       }
     }
     m_SelectedNode = node;
     mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
     if (property.IsNotNull()) {
       m_NodeListenerTag = property->AddObserver(itk::ModifiedEvent(), m_ModifiedCommand);
+      m_ListeningNode = true;
     }
   }
   else
@@ -204,7 +216,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
       m_Controls->m_NoSelectedImageLabel->show();
     }
 
-    if (m_SelectedNode.IsNotNull() && m_NodeListenerTag != 0) {
+    if (m_SelectedNode.IsNotNull() && m_ListeningNode) {
       mitk::BaseProperty::Pointer property = m_SelectedNode->GetProperty("volumerendering");
       if (property.IsNotNull()) {
         m_SelectedNode->GetProperty("volumerendering")->RemoveObserver(m_NodeListenerTag);
@@ -212,6 +224,7 @@ void QmitkVolumeVisualizationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
     }
     m_SelectedNode = 0;
     m_NodeListenerTag = 0;
+    m_ListeningNode = false;
   }
 
   UpdateInterface();
@@ -363,6 +376,7 @@ void QmitkVolumeVisualizationView::NodeRemoved(const mitk::DataNode* node)
   {
     m_SelectedNode=0;
     m_NodeListenerTag = 0;
+    m_ListeningNode = false;
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
     m_Controls->m_NoSelectedImageLabel->show();

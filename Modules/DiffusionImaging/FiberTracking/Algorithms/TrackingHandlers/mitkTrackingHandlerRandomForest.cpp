@@ -150,7 +150,7 @@ typename std::enable_if< NumberOfSignalFeatures <=99, T >::type TrackingHandlerR
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
   typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
+  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(mitk_dwi));
   filter->SetLambda(0.006);
   filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
@@ -168,7 +168,7 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingHandler
   typedef itk::AnalyticalDiffusionQballReconstructionImageFilter<short,short,float,ShOrder, 2*NumberOfSignalFeatures> InterpolationFilterType;
 
   typename InterpolationFilterType::Pointer filter = InterpolationFilterType::New();
-  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
+  filter->SetGradientImage( mitk::DiffusionPropertyHelper::GetOriginalGradientContainer(mitk_dwi), mitk::DiffusionPropertyHelper::GetItkVectorImage(mitk_dwi) );
   filter->SetBValue(mitk::DiffusionPropertyHelper::GetReferenceBValue(mitk_dwi));
   filter->SetLambda(0.006);
   filter->SetNormalizationMethod(InterpolationFilterType::QBAR_RAW_SIGNAL);
@@ -209,6 +209,7 @@ typename std::enable_if< NumberOfSignalFeatures >=100, T >::type TrackingHandler
 template< int ShOrder, int NumberOfSignalFeatures >
 void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::InitForTracking()
 {
+  MITK_INFO << "Initializing random forest tracker.";
   InputDataValidForTracking();
   m_DwiFeatureImages.clear();
   InitDwiImageFeatures<>(m_InputDwis.at(0));
@@ -236,18 +237,36 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   for (unsigned int f=0; f<NumberOfSignalFeatures; f++)
     featureData(0,f) = dwiFeaturePixel[f];
 
+  vnl_matrix_fixed<double,3,3> direction_matrix = m_DwiFeatureImages.at(0)->GetDirection().GetVnlMatrix();
+  vnl_matrix_fixed<double,3,3> inverse_direction_matrix = m_DwiFeatureImages.at(0)->GetInverseDirection().GetVnlMatrix();
+
   // append normalized previous direction(s) to feature vector
   int i = 0;
-  vnl_vector_fixed<float,3> ref; ref.fill(0); ref[0]=1;
+  vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
+
+  if (m_FlipX)
+      last_dir[0] *= -1;
+  if (m_FlipY)
+      last_dir[1] *= -1;
+  if (m_FlipZ)
+      last_dir[2] *= -1;
+
   for (auto d : olddirs)
   {
+    vnl_vector_fixed<double,3> tempD;
+    tempD[0] = d[0]; tempD[1] = d[1]; tempD[2] = d[2];
+    tempD = inverse_direction_matrix * tempD;
+    last_dir[0] = tempD[0];
+    last_dir[1] = tempD[1];
+    last_dir[2] = tempD[2];
+
     int c = 0;
     for (unsigned int f=NumberOfSignalFeatures+3*i; f<NumberOfSignalFeatures+3*(i+1); f++)
     {
-      if (dot_product(ref, d)<0)
-        featureData(0,f) = -d[c];
+      if (dot_product(ref, tempD)<0)
+        featureData(0,f) = -tempD[c];
       else
-        featureData(0,f) = d[c];
+        featureData(0,f) = tempD[c];
       c++;
     }
     i++;
@@ -315,6 +334,13 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
     output_direction.fill(0.0);
   else
   {
+    vnl_vector_fixed<double,3> tempD;
+    tempD[0] = output_direction[0]; tempD[1] = output_direction[1]; tempD[2] = output_direction[2];
+    tempD = direction_matrix * tempD;
+    output_direction[0] = tempD[0];
+    output_direction[1] = tempD[1];
+    output_direction[2] = tempD[2];
+
     if (m_FlipX)
       output_direction[0] *= -1;
     if (m_FlipY)

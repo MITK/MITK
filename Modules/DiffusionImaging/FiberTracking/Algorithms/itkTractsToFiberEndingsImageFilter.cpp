@@ -135,21 +135,23 @@ namespace itk{
         itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[0]));
         itk::Index<3> index;
         outImage->TransformPhysicalPointToIndex(vertex, index);
-        if (m_BinaryOutput)
-            outImage->SetPixel(index, 1);
-        else
-            outImage->SetPixel(index, outImage->GetPixel(index)+1);
+        if (upsampledRegion.IsInside(index))
+          if (m_BinaryOutput)
+              outImage->SetPixel(index, 1);
+          else
+              outImage->SetPixel(index, outImage->GetPixel(index)+1);
       }
 
-      if (numPoints>2)
+      if (numPoints>=2)
       {
         itk::Point<float, 3> vertex = GetItkPoint(fiberPolyData->GetPoint(points[numPoints-1]));
         itk::Index<3> index;
         outImage->TransformPhysicalPointToIndex(vertex, index);
-        if (m_BinaryOutput)
-            outImage->SetPixel(index, 1);
-        else
-            outImage->SetPixel(index, outImage->GetPixel(index)+1);
+        if (upsampledRegion.IsInside(index))
+          if (m_BinaryOutput)
+              outImage->SetPixel(index, 1);
+          else
+              outImage->SetPixel(index, outImage->GetPixel(index)+1);
       }
     }
 

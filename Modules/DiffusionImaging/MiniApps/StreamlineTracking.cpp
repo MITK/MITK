@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <mitkCoreObjectFactory.h>
+#include <omp.h>
 
 #include <mitkFiberBundle.h>
 #include <itkStreamlineTrackingFilter.h>
@@ -33,6 +34,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h>
 #include <Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -57,7 +59,7 @@ int main(int argc, char* argv[])
     // parameters fo all methods
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'Tensor' algorithm)", us::Any(), false);
-    parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, RandomForest)", us::Any(), false);
+    parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DiscODF, RandomForest)", us::Any(), false);
     parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle", us::Any(), false);
 
     parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
@@ -69,6 +71,7 @@ int main(int argc, char* argv[])
     parser.addArgument("step_size", "", mitkCommandLineParser::Float, "Step size:", "step size (in voxels)", 0.5);
     parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
     parser.addArgument("seed_gm", "", mitkCommandLineParser::Int, "Seed only GM:", "Seed only in gray matter (requires tissue type image -t)", 0);
+    parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded.", -1);
 
     parser.addArgument("num_samples", "", mitkCommandLineParser::Int, "Num. neighborhood samples:", "number of neighborhood samples that are use to determine the next progression direction", 0);
     parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", 0.25);
@@ -183,6 +186,11 @@ int main(int argc, char* argv[])
         tend_g = us::any_cast<float>(parsedArgs["tend_g"]);
 
 
+    unsigned int max_tracts = -1;
+    if (parsedArgs.count("max_tracts"))
+        max_tracts = us::any_cast<int>(parsedArgs["max_tracts"]);
+
+
     // LOAD DATASETS
 
     mitkCommandLineParser::StringContainerType addFeatFiles;
@@ -248,6 +256,8 @@ int main(int argc, char* argv[])
         addFeatImages.at(0).push_back(itkimg);
     }
 
+//    //////////////////////////////////////////////////////////////////
+//    omp_set_num_threads(1);
 
     typedef itk::StreamlineTrackingFilter TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();
@@ -304,6 +314,25 @@ int main(int argc, char* argv[])
         if (addFeatImages.size()>0)
             dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaImage(addFeatImages.at(0).at(0));
     }
+    else if (algorithm == "DiscODF")
+    {
+        handler = new mitk::TrackingHandlerOdf();
+
+        for (auto input_image : input_images)
+        {
+            typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
+            CasterType::Pointer caster = CasterType::New();
+            caster->SetInput(input_image);
+            caster->Update();
+            mitk::TrackingHandlerOdf::ItkOdfImageType::Pointer itkImg = caster->GetOutput();
+            dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetOdfImage(itkImg);
+        }
+
+        dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
+
+        if (addFeatImages.size()>0)
+            dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addFeatImages.at(0).at(0));
+    }
     handler->SetInterpolate(interpolate);
     handler->SetFlipX(flip_x);
     handler->SetFlipY(flip_y);
@@ -322,6 +351,7 @@ int main(int argc, char* argv[])
     tracker->SetAposterioriCurvCheck(false);
     tracker->SetFourTTImage(tissue);
     tracker->SetSeedOnlyGm(seed_gm);
+    tracker->SetMaxNumTracts(max_tracts);
     tracker->SetTrackingHandler(handler);
     tracker->Update();
     vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();

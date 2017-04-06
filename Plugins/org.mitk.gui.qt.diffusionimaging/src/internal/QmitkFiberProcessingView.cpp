@@ -907,17 +907,20 @@ void QmitkFiberProcessingView::UpdateGui()
         m_Controls->m_SmoothFibersFrame->setVisible(true);
         break;
     case 1:
-        m_Controls->m_CompressFibersFrame->setVisible(true);
+        m_Controls->m_SmoothFibersFrame->setVisible(true);
         break;
     case 2:
-        m_Controls->m_ColorFibersFrame->setVisible(true);
+        m_Controls->m_CompressFibersFrame->setVisible(true);
         break;
     case 3:
+        m_Controls->m_ColorFibersFrame->setVisible(true);
+        break;
+    case 4:
         m_Controls->m_MirrorFibersFrame->setVisible(true);
         if (m_SelectedSurfaces.size()>0)
             m_Controls->m_ModifyButton->setEnabled(true);
         break;
-    case 4:
+    case 5:
         m_Controls->m_BundleWeightFrame->setVisible(true);
     }
 

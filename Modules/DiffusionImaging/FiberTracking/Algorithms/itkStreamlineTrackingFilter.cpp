@@ -64,6 +64,7 @@ StreamlineTrackingFilter
     , m_StepSizeVox(-1)
     , m_SamplingDistanceVox(-1)
     , m_AngularThresholdDeg(-1)
+    , m_MaxNumTracts(-1)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -625,6 +626,11 @@ void StreamlineTrackingFilter::GenerateData()
             seedpoints.push_back(s[1]);
     }
 
+    std::srand(std::time(0));
+    std::random_shuffle ( seedpoints.begin(), seedpoints.end() );
+
+    bool stop = false;
+    unsigned int current_tracts = 0;
     int num_seeds = seedpoints.size();
     itk::Index<3> zeroIndex; zeroIndex.Fill(0);
     int progress = 0;
@@ -695,7 +701,20 @@ void StreamlineTrackingFilter::GenerateData()
 
 #pragma omp critical
             if (tractLength>=m_MinTractLength && counter>=2)
-                m_Tractogram.push_back(fib);
+            {
+                if (!stop)
+                {
+                    m_Tractogram.push_back(fib);
+                    current_tracts++;
+                }
+                if (m_MaxNumTracts>0 && current_tracts>=m_MaxNumTracts)
+                {
+                    i = num_seeds;
+                    if (!stop)
+                        MITK_INFO << "Reconstructed maximum number of tracts (" << current_tracts << "). Stopping tractography.";
+                    stop = true;
+                }
+            }
         }
     }
 

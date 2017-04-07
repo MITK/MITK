@@ -285,9 +285,13 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float,
             probs = GetSecondOrderProbabilities(pos, angles, probs);
 
         boost::random::discrete_distribution<int, float> dist(probs.begin(), probs.end());
-        boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
 
-        int sampled_idx = sampler();
+        int sampled_idx = 0;
+#pragma omp critical
+        {
+            boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
+            sampled_idx = sampler();
+        }
         output_direction = m_OdfFloatDirs.get_row(sampled_idx);
         if (angles[sampled_idx]<0)                          // make sure we don't walk backwards
             output_direction *= -1;

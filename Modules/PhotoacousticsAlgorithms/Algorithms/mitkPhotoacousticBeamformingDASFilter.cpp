@@ -299,7 +299,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
   double root = 0;
 
   double part = 0.07 * inputL;
-  double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  double tan_phi = abs(std::tan(m_Conf.Angle / 360 * 2 * M_PI));
   double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
   double apod_mult = 1;
 
@@ -308,7 +308,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
   //linear delay
   l_i = line / outputL * inputL;
 
-  l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
+  l = (inputL / 2 - l_i) / inputL * m_Conf.Pitch * m_Conf.TransducerElements;
 
   for (unsigned short sample = 0; sample < outputS; ++sample)
   {
@@ -330,7 +330,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
 
     for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
     {
-      AddSample = abs(delayMultiplicator * (l_s - l_i) + s_i);
+      AddSample = abs(delayMultiplicator * ((double)l_s - l_i)) + s_i;
 
       if (AddSample < inputS && AddSample >= 0)
         output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];

@@ -430,16 +430,15 @@ void QmitkThresholdComponentsToolGUI::StartSegmentation(itk::Image<TPixel, VImag
     return;
   }
   
-  //Create and write segmentation
-  mitk::Image::Pointer resultImage = dynamic_cast<mitk::Image *>(this->m_ThresholdComponentsTool->GetTargetSegmentationNode()->GetData());
-  int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
-  resultImage->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
-  
+  //Create segmentation
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage(filter->GetOutput())->Clone();
+ 
   // create new node and then delete the old one if there is one
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetData(resultImage);
 
   // set some properties
+  newNode->SetVisibility(false);
   newNode->SetProperty("name", mitk::StringProperty::New(m_NAMEFORLABLEDSEGMENTATIONIMAGE));
   newNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   newNode->SetProperty("color", mitk::ColorProperty::New(0.0, 1.0, 0.0));
@@ -452,6 +451,18 @@ void QmitkThresholdComponentsToolGUI::StartSegmentation(itk::Image<TPixel, VImag
 
   // now add result to data tree
   m_DataStorage->Add(newNode, m_InputImageNode);
+  
+
+  // Save segmentation  
+  mitk::Image::Pointer originalSegmentation = dynamic_cast<mitk::Image *>(this->m_ThresholdComponentsTool->GetTargetSegmentationNode()->GetData());
+  
+  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
+  typename SegmentationType::Pointer originalSegmentationInITK = SegmentationType::New();
+  mitk::CastToItkImage(resultImage, originalSegmentationInITK);
+    
+  int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+  originalSegmentation->SetVolume((void *)(originalSegmentationInITK->GetPixelContainer()->GetBufferPointer()), timeStep);
+  originalSegmentation->Modified();
   
   //Create mask for 3D visualization
   typename InputImageType::Pointer inputImageItk;

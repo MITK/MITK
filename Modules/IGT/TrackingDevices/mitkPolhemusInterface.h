@@ -30,11 +30,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <windows.h>
 #include <tchar.h>
 #include <string>
-#include <PDI.h>
 
 #include <mitkNavigationData.h>
 
-
+class CPDIdev;
 
 namespace mitk
 {
@@ -96,10 +95,10 @@ namespace mitk
     */
     ~PolhemusInterface();
 
-    /** Polhemus liberty/patriot tracker object*/
-    CPDIdev m_pdiDev;
-
-    /** Parses polhemus raw data to a collection of tracking data of single tools. */
+	/** Polhemus liberty/patriot tracker object*/
+    CPDIdev* m_pdiDev;
+	
+	/** Parses polhemus raw data to a collection of tracking data of single tools. */
     std::vector<mitk::PolhemusInterface::trackingData> ParsePolhemusRawData(PBYTE pBuf, DWORD dwSize);
 
     unsigned int m_numberOfTools;

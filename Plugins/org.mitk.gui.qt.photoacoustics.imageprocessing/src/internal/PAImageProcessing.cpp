@@ -311,6 +311,8 @@ void PAImageProcessing::UpdateFrequency()
     {
       m_Controls.ElementCount->setValue(image->GetDimension(0));
       m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
+      MITK_INFO << image->GetGeometry()->GetSpacing()[0];
+      MITK_INFO << (double)image->GetGeometry()->GetSpacing()[0];
     }
     if (image)
       UpdateRecordTime(image);
@@ -431,38 +433,6 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DMASconfig.UseBP = m_Controls.UseBP->isChecked();
 
   UpdateRecordTime(image);
-}
-
-void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
-{
-  if (m_Controls.UseImageSpacing->isChecked())
-  {
-    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
-    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
-    MITK_INFO << "Calculated Scan Depth of " << DASconfig.RecordTime * DASconfig.SpeedOfSound * 100 << "cm";
-  }
-  else
-  {
-    DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound; // [s]
-    DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound; // [s]
-  }
-
-  if ("US Image" == m_Controls.ImageType->currentText())
-  {
-    if (m_Controls.UseImageSpacing->isChecked())
-    {
-      DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
-      DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
-    }
-
-    DASconfig.Photoacoustic = false;
-    DMASconfig.Photoacoustic = false;
-  }
-  else if ("PA Image" == m_Controls.ImageType->currentText())
-  {
-    DASconfig.Photoacoustic = true;
-    DMASconfig.Photoacoustic = true;
-  }
 
   // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
 
@@ -495,7 +465,7 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
     DMASconfig.BPHighPass = 0;
     DASconfig.BPHighPass = 0;
   }
-  if(DMASconfig.BPHighPass > DMASconfig.BPLowPass)
+  if (DMASconfig.BPHighPass > DMASconfig.BPLowPass)
   {
     QMessageBox Msgbox;
     Msgbox.setText("HighPass higher than LowPass, disabled both.");
@@ -505,6 +475,38 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
     DASconfig.BPHighPass = 0;
     DMASconfig.BPLowPass = 0;
     DASconfig.BPLowPass = 0;
+  }
+}
+
+void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
+{
+  if (m_Controls.UseImageSpacing->isChecked())
+  {
+    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
+    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
+    MITK_INFO << "Calculated Scan Depth of " << DASconfig.RecordTime * DASconfig.SpeedOfSound * 100 << "cm";
+  }
+  else
+  {
+    DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound; // [s]
+    DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound; // [s]
+  }
+
+  if ("US Image" == m_Controls.ImageType->currentText())
+  {
+    if (m_Controls.UseImageSpacing->isChecked())
+    {
+      DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
+      DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
+    }
+
+    DASconfig.Photoacoustic = false;
+    DMASconfig.Photoacoustic = false;
+  }
+  else if ("PA Image" == m_Controls.ImageType->currentText())
+  {
+    DASconfig.Photoacoustic = true;
+    DMASconfig.Photoacoustic = true;
   }
 }
 

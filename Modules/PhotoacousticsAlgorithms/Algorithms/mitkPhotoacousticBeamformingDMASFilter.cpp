@@ -519,9 +519,9 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
     minLine = (unsigned short)std::max((l_i - part), 0.0);
     apod_mult = apodArraySize / (maxLine - minLine);
 
-    x = m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound;
-    root = l / sqrt(pow(l, 2) + pow(m_Conf.RecordTime / inputS * s_i * m_Conf.SpeedOfSound, 2));
-    delayMultiplicator = root / (m_Conf.RecordTime*m_Conf.SpeedOfSound) *m_Conf.Pitch*m_Conf.TransducerElements / inputL;
+    x = m_Conf.RecordTime * m_Conf.SpeedOfSound * s_i / inputS;
+    root = l / sqrt(pow(l, 2) + pow(x, 2));
+    delayMultiplicator = inputS * root / (m_Conf.RecordTime * m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / inputL;
 
     //calculate the AddSamples beforehand to save some time
     unsigned short* AddSample = new unsigned short[maxLine - minLine];

@@ -25,6 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Qt
 #include <QMessageBox>
 #include <QApplication>
+#include <QMetaType>
 
 //mitk image
 #include <mitkImage.h>
@@ -40,7 +41,8 @@ const std::string PAImageProcessing::VIEW_ID = "org.mitk.views.paimageprocessing
 
 PAImageProcessing::PAImageProcessing() : m_ResampleSpacing(0), m_UseLogfilter(false)
 {
-
+  qRegisterMetaType<mitk::Image::Pointer>();
+  qRegisterMetaType<std::string>();
 }
 
 void PAImageProcessing::SetFocus()
@@ -52,11 +54,11 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(ApplyBModeFilter()));
+  connect(m_Controls.buttonApplyBModeFilter, SIGNAL(clicked()), this, SLOT(StartBmodeThread()));
   connect(m_Controls.DoResampling, SIGNAL(clicked()), this, SLOT(UseResampling()));
   connect(m_Controls.Logfilter, SIGNAL(clicked()), this, SLOT(UseLogfilter()));
   connect(m_Controls.ResamplingValue, SIGNAL(valueChanged(double)), this, SLOT(SetResampling()));
-  connect(m_Controls.buttonApplyBeamforming, SIGNAL(clicked()), this, SLOT(ApplyBeamforming()));
+  connect(m_Controls.buttonApplyBeamforming, SIGNAL(clicked()), this, SLOT(StartBeamformingThread()));
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
   connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
   connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
@@ -71,6 +73,7 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   m_Controls.progressBar->setVisible(false);
   m_Controls.UseImageSpacing->setToolTip("Image spacing of y-Axis must be in us, x-Axis in mm.");
   m_Controls.UseImageSpacing->setToolTipDuration(5000);
+  m_Controls.ProgressInfo->setVisible(false);
 
   UseImageSpacing();
   UseBandpass();
@@ -107,21 +110,31 @@ void PAImageProcessing::StartBeamformingThread()
       {
         // a property called "name" was found for this DataNode
         message << "'" << name << "'";
+        m_OldNodeName = name;
       }
+      else
+        m_OldNodeName = " ";
+
       message << ".";
       MITK_INFO << message.str();
 
       m_Controls.progressBar->setValue(0);
       m_Controls.progressBar->setVisible(true);
+      m_Controls.ProgressInfo->setVisible(true);
+      m_Controls.ProgressInfo->setText("started");
+      m_Controls.buttonApplyBeamforming->setText("working...");
+      DisableControls();
 
       BeamformingThread *thread = new BeamformingThread();
       connect(thread, &BeamformingThread::result, this, &PAImageProcessing::HandleBeamformingResults);
+      connect(thread, &BeamformingThread::updateProgress, this, &PAImageProcessing::UpdateProgress);
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
       thread->setBeamformingAlgorithm(m_CurrentBeamformingAlgorithm);
       thread->setConfigs(DMASconfig, DASconfig);
       thread->setInputImage(image);
 
+      MITK_INFO << "Started new thread for Beamforming";
       thread->start();
     }
   }
@@ -130,14 +143,12 @@ void PAImageProcessing::StartBeamformingThread()
 void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
 {
   auto newNode = mitk::DataNode::New();
-
-  if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-    newNode->SetData(image);
-  else if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-    newNode->SetData(image);
+  newNode->SetData(image);
 
   // name the new Data node
   std::stringstream newNodeName;
+
+  newNodeName << m_OldNodeName << " ";
 
   if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
     newNodeName << "DAS bf, ";
@@ -165,6 +176,9 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
 
   // disable progress bar
   m_Controls.progressBar->setVisible(false);
+  m_Controls.ProgressInfo->setVisible(false);
+  m_Controls.buttonApplyBeamforming->setText("Apply Beamforming");
+  EnableControls();
 
   // update rendering
   mitk::RenderingManager::GetInstance()->InitializeViews(
@@ -172,12 +186,101 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void PAImageProcessing::UpdateProgress(int progress)
+void PAImageProcessing::StartBmodeThread()
+{
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataStorage::Pointer storage = this->GetDataStorage();
+
+  mitk::DataNode::Pointer node = nodes.front();
+
+  if (!node)
+  {
+    // Nothing selected. Inform the user and return
+    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image processing.");
+    return;
+  }
+
+  mitk::BaseData* data = node->GetData();
+  if (data)
+  {
+    // test if this data item is an image or not (could also be a surface or something totally different)
+    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
+    if (image)
+    {
+      UpdateBFSettings(image);
+      std::stringstream message;
+      std::string name;
+      message << "Performing image processing for image ";
+      if (node->GetName(name))
+      {
+        // a property called "name" was found for this DataNode
+        message << "'" << name << "'";
+        m_OldNodeName = name;
+      }
+      else
+        m_OldNodeName = " ";
+
+      message << ".";
+      MITK_INFO << message.str();
+
+      m_Controls.buttonApplyBModeFilter->setText("working...");
+      DisableControls();
+
+      BmodeThread *thread = new BmodeThread();
+      connect(thread, &BmodeThread::result, this, &PAImageProcessing::HandleBmodeResults);
+      connect(thread, &BmodeThread::finished, thread, &QObject::deleteLater);
+
+      thread->setConfig(m_UseLogfilter, m_ResampleSpacing);
+      thread->setInputImage(image);
+
+      MITK_INFO << "Started new thread for Image Processing";
+      thread->start();
+    }
+  }
+}
+
+void PAImageProcessing::HandleBmodeResults(mitk::Image::Pointer image)
+{
+  auto newNode = mitk::DataNode::New();
+  newNode->SetData(image);
+
+  // name the new Data node
+  std::stringstream newNodeName;
+  newNodeName << m_OldNodeName << " ";
+  newNodeName << "B-Mode";
+
+  newNode->SetName(newNodeName.str());
+
+  // update level window for the current dynamic range
+  mitk::LevelWindow levelWindow;
+  newNode->GetLevelWindow(levelWindow);
+  auto data = newNode->GetData();
+  levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
+  newNode->SetLevelWindow(levelWindow);
+
+  // add new node to data storage
+  this->GetDataStorage()->Add(newNode);
+
+  // disable progress bar
+  m_Controls.progressBar->setVisible(false);
+  m_Controls.buttonApplyBModeFilter->setText("Apply B-mode Filter");
+  EnableControls();
+
+  // update rendering
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void PAImageProcessing::UpdateProgress(int progress, std::string progressInfo)
 {
   if (progress < 100)
     m_Controls.progressBar->setValue(progress);
   else
     m_Controls.progressBar->setValue(100);
+  m_Controls.ProgressInfo->setText(progressInfo.c_str());
   qApp->processEvents();
 }
 
@@ -264,171 +367,6 @@ void PAImageProcessing::UseLogfilter()
 void PAImageProcessing::SetResampling()
 {
   m_ResampleSpacing = m_Controls.ResamplingValue->value();
-}
-
-void PAImageProcessing::ApplyBModeFilter()
-{
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  mitk::DataNode::Pointer node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      auto newNode = mitk::DataNode::New();
-
-      mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
-      newNode->SetData(filterbank->ApplyBmodeFilter(image, m_UseLogfilter, m_ResampleSpacing));
-
-      // update level window for the current dynamic range
-      mitk::LevelWindow levelWindow;
-      newNode->GetLevelWindow(levelWindow);
-      data = newNode->GetData();
-      levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data),true,true);
-      newNode->SetLevelWindow(levelWindow);
-
-      // name the new Data node
-      std::stringstream newNodeName;
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        newNodeName << name << ", ";
-      }
-      newNodeName << "B-Mode";
-      newNode->SetName(newNodeName.str());
-
-      // add new node to data storage
-      this->GetDataStorage()->Add(newNode);
-
-      // update rendering
-      mitk::RenderingManager::GetInstance()->InitializeViews(
-        dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
-}
-
-void PAImageProcessing::ApplyBeamforming()
-{
-  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  mitk::DataStorage::Pointer storage = this->GetDataStorage();
-
-  mitk::DataNode::Pointer node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>(data);
-    if (image)
-    {
-      UpdateBFSettings(image);
-      std::stringstream message;
-      std::string name;
-      message << "Performing beamforming for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
-
-      auto newNode = mitk::DataNode::New();
-
-      m_Controls.progressBar->setValue(0);
-      m_Controls.progressBar->setVisible(true);
-
-      auto q_app = qApp;
-
-      std::function<void(int)> progressHandle = [&q_app = q_app, &m_Controls = m_Controls](int progress) {
-        if(progress < 100) 
-          m_Controls.progressBar->setValue(progress); 
-        else
-          m_Controls.progressBar->setValue(100); 
-        q_app->processEvents();
-       };
-
-      if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-        newNode->SetData(filterbank->ApplyBeamformingDAS(image, DASconfig, m_Controls.Cutoff->value(), progressHandle));
-      else if(m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-        newNode->SetData(filterbank->ApplyBeamformingDMAS(image, DMASconfig, m_Controls.Cutoff->value(), progressHandle));
-
-      // name the new Data node
-      std::stringstream newNodeName;
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        newNodeName << name << ", ";
-      }
-
-      if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
-        newNodeName << "DAS bf, ";
-      else if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
-        newNodeName << "DMAS bf, ";
-      
-      if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear)
-        newNodeName << "l. delay";
-      if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox)
-        newNodeName << "q. delay";
-      if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical)
-        newNodeName << "s. delay";
-
-      newNode->SetName(newNodeName.str());
-
-      // update level window for the current dynamic range
-      mitk::LevelWindow levelWindow;
-      newNode->GetLevelWindow(levelWindow);
-      data = newNode->GetData();
-      levelWindow.SetAuto(dynamic_cast<mitk::Image*>(data), true, true);
-      newNode->SetLevelWindow(levelWindow);
-
-      // add new node to data storage
-      this->GetDataStorage()->Add(newNode);
-
-      // disable progress bar
-      m_Controls.progressBar->setVisible(false);
-
-      // update rendering
-      mitk::RenderingManager::GetInstance()->InitializeViews(
-        dynamic_cast<mitk::Image*>(data)->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-  }
 }
 
 void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
@@ -570,6 +508,56 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
   }
 }
 
+void PAImageProcessing::EnableControls()
+{
+  m_Controls.DoResampling->setEnabled(true);
+  UseResampling();
+  m_Controls.Logfilter->setEnabled(true);
+  m_Controls.buttonApplyBModeFilter->setEnabled(true);
+  m_Controls.Cutoff->setEnabled(true);
+  m_Controls.BFAlgorithm->setEnabled(true);
+  m_Controls.DelayCalculation->setEnabled(true);
+  m_Controls.ImageType->setEnabled(true);
+  m_Controls.Apodization->setEnabled(true);
+  m_Controls.UseBP->setEnabled(true);
+  UseBandpass();
+  m_Controls.UseImageSpacing->setEnabled(true);
+  UseImageSpacing();
+  m_Controls.Pitch->setEnabled(true);
+  m_Controls.ElementCount->setEnabled(true);
+  m_Controls.SpeedOfSound->setEnabled(true);
+  m_Controls.Samples->setEnabled(true);
+  m_Controls.Lines->setEnabled(true);
+  m_Controls.Angle->setEnabled(true);
+  m_Controls.buttonApplyBeamforming->setEnabled(true);
+}
+
+void PAImageProcessing::DisableControls()
+{
+  m_Controls.DoResampling->setEnabled(false);
+  m_Controls.ResamplingValue->setEnabled(false);
+  m_Controls.Logfilter->setEnabled(false);
+  m_Controls.buttonApplyBModeFilter->setEnabled(false);
+  m_Controls.Cutoff->setEnabled(false);
+  m_Controls.BFAlgorithm->setEnabled(false);
+  m_Controls.DelayCalculation->setEnabled(false);
+  m_Controls.ImageType->setEnabled(false);
+  m_Controls.Apodization->setEnabled(false);
+  m_Controls.UseBP->setEnabled(false);
+  m_Controls.BPhigh->setEnabled(false);
+  m_Controls.BPlow->setEnabled(false);
+  m_Controls.BPFalloff->setEnabled(false);
+  m_Controls.UseImageSpacing->setEnabled(false);
+  m_Controls.ScanDepth->setEnabled(false);
+  m_Controls.Pitch->setEnabled(false);
+  m_Controls.ElementCount->setEnabled(false);
+  m_Controls.SpeedOfSound->setEnabled(false);
+  m_Controls.Samples->setEnabled(false);
+  m_Controls.Lines->setEnabled(false);
+  m_Controls.Angle->setEnabled(false);
+  m_Controls.buttonApplyBeamforming->setEnabled(false);
+}
+
 void PAImageProcessing::UseImageSpacing()
 {
   if (m_Controls.UseImageSpacing->isChecked())
@@ -602,13 +590,11 @@ void PAImageProcessing::UseBandpass()
 
 void BeamformingThread::run()
 {
-  mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
-
-  std::function<void(int)> progressHandle = [this](int progress) {
-    emit updateProgress(progress);
-  };
-
   mitk::Image::Pointer resultImage;
+  mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
+  std::function<void(int, std::string)> progressHandle = [this](int progress, std::string progressInfo) {
+      emit updateProgress(progress, progressInfo);
+    };
 
   if (m_CurrentBeamformingAlgorithm == PAImageProcessing::BeamformingAlgorithms::DAS)
     resultImage = filterbank->ApplyBeamformingDAS(m_InputImage, m_DASconfig, m_Cutoff, progressHandle);
@@ -637,4 +623,25 @@ void BeamformingThread::setInputImage(mitk::Image::Pointer image)
 void BeamformingThread::setCutoff(int cutoff)
 {
   m_Cutoff = cutoff;
+}
+
+void BmodeThread::run()
+{
+  mitk::Image::Pointer resultImage;
+  mitk::PhotoacousticImage::Pointer filterbank = mitk::PhotoacousticImage::New();
+
+  resultImage = filterbank->ApplyBmodeFilter(m_InputImage, m_UseLogfilter, m_ResampleSpacing);
+
+  emit result(resultImage);
+}
+
+void BmodeThread::setConfig(bool useLogfilter, double resampleSpacing)
+{
+  m_UseLogfilter = useLogfilter;
+  m_ResampleSpacing = resampleSpacing;
+}
+
+void BmodeThread::setInputImage(mitk::Image::Pointer image)
+{
+  m_InputImage = image;
 }

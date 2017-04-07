@@ -169,6 +169,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 
   ImageReadAccessor acc(inputImage);
 
+  // as of now only those double, short, float are used at all... though it's easy to add other ones
   if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
   {
     inputData = (double*)acc.GetData();
@@ -225,30 +226,18 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   }
 
   return output;
-
-  /*mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
-
-  itk::ImageRegion<3> cropRegion;
-  itk::Index<3> index = { left, above, 0 };
-  itk::Size<3> size = { inputImage->GetDimension(0) - left - right, inputImage->GetDimension(1) - above - below, inputImage->GetDimension(2) };
-  cropRegion.SetIndex(index);
-  cropRegion.SetSize(size);
-
-  cropFilter->SetInput(inputImage);
-  cropFilter->SetCroppingRegion(cropRegion);
-  cropFilter->Update();
-
-  return cropFilter->GetOutput();*/
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int)> progressHandle)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  progressHandle(0, "cropping image");
   Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
   Image::Pointer resizedImage = croppedImage;
 
   if (inputImage->GetDimension(0) != config.ReconstructionLines)
   {
+    progressHandle(0, "resampling image");
     auto begin = std::chrono::high_resolution_clock::now();
     unsigned int dim[3] = { config.ReconstructionLines, croppedImage->GetDimension(1), croppedImage->GetDimension(2) };
     resizedImage = ApplyResampling(croppedImage, dim);
@@ -266,14 +255,16 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
   return Beamformer->GetOutput();
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff, std::function<void(int)> progressHandle)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
+  progressHandle(0, "cropping image");
   Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
   Image::Pointer resizedImage = croppedImage;
 
   if(inputImage->GetDimension(0) != config.ReconstructionLines)
   {
+    progressHandle(0, "resampling image");
     auto begin = std::chrono::high_resolution_clock::now();
     unsigned int dim[3] = { config.ReconstructionLines, croppedImage->GetDimension(1), croppedImage->GetDimension(2) };
     resizedImage = ApplyResampling(croppedImage, dim);

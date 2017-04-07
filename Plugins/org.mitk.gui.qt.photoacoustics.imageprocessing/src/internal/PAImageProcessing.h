@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPhotoacousticBeamformingDASFilter.h"
 #include "mitkPhotoacousticBeamformingDMASFilter.h"
 
+Q_DECLARE_METATYPE(mitk::Image::Pointer)
+Q_DECLARE_METATYPE(std::string)
+
 class PAImageProcessing : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
@@ -54,13 +57,13 @@ class PAImageProcessing : public QmitkAbstractView
     void UpdateRecordTime(mitk::Image::Pointer image);
     void UseBandpass();
 
-    void ApplyBModeFilter();
-    void ApplyBeamforming();
-
     void HandleBeamformingResults(mitk::Image::Pointer image);
     void StartBeamformingThread();
 
-    void UpdateProgress(int progress);
+    void HandleBmodeResults(mitk::Image::Pointer image);
+    void StartBmodeThread();
+
+    void UpdateProgress(int progress, std::string progressInfo);
 
   protected:
     virtual void CreateQtPartControl(QWidget *parent) override;
@@ -75,6 +78,7 @@ class PAImageProcessing : public QmitkAbstractView
 
     float m_ResampleSpacing;
     bool m_UseLogfilter;
+    std::string m_OldNodeName;
 
     mitk::BeamformingDMASFilter::beamformingSettings DMASconfig;
     mitk::BeamformingDASFilter::beamformingSettings DASconfig;
@@ -82,6 +86,9 @@ class PAImageProcessing : public QmitkAbstractView
     BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
 
     void UpdateBFSettings(mitk::Image::Pointer image);
+
+    void EnableControls();
+    void DisableControls();
 };
 
 class BeamformingThread : public QThread
@@ -91,7 +98,7 @@ class BeamformingThread : public QThread
 
   signals:
     void result(mitk::Image::Pointer);
-    void updateProgress(int);
+    void updateProgress(int, std::string);
 
   public:
     void setConfigs(mitk::BeamformingDMASFilter::beamformingSettings DMASconfig, mitk::BeamformingDASFilter::beamformingSettings DASconfig);
@@ -106,6 +113,25 @@ class BeamformingThread : public QThread
     PAImageProcessing::BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
     mitk::Image::Pointer m_InputImage;
     int m_Cutoff;
+};
+
+class BmodeThread : public QThread
+{
+  Q_OBJECT
+    void run() Q_DECL_OVERRIDE;
+
+signals:
+  void result(mitk::Image::Pointer);
+
+public:
+  void setConfig(bool useLogfilter, double resampleSpacing);
+  void setInputImage(mitk::Image::Pointer image);
+
+protected:
+  mitk::Image::Pointer m_InputImage;
+
+  bool m_UseLogfilter;
+  double m_ResampleSpacing;
 };
 
 #endif // PAImageProcessing_h

@@ -59,7 +59,7 @@ namespace mitk {
 
     void Configure(beamformingSettings settings);
 
-    void SetProgressHandle(std::function<void(int)> progressHandle);
+    void SetProgressHandle(std::function<void(int, std::string)> progressHandle);
 
   protected:
 
@@ -77,7 +77,7 @@ namespace mitk {
     //## @brief Time when Header was last initialized
     itk::TimeStamp m_TimeOfHeaderInitialization;
 
-    std::function<void(int)> m_ProgressHandle;
+    std::function<void(int, std::string)> m_ProgressHandle;
 
     double* VonHannFunction(int samples);
     double* HammFunction(int samples);

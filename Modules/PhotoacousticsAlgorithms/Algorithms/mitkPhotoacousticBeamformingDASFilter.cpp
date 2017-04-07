@@ -49,10 +49,10 @@ mitk::BeamformingDASFilter::BeamformingDASFilter() : m_OutputData(nullptr), m_In
   m_Conf.RecordTime = 0.00006;
   m_Conf.TransducerElements = 128;
 
-  m_ProgressHandle = [](int) {};
+  m_ProgressHandle = [](int, std::string) {};
 }
 
-void mitk::BeamformingDASFilter::SetProgressHandle(std::function<void(int)> progressHandle)
+void mitk::BeamformingDASFilter::SetProgressHandle(std::function<void(int, std::string)> progressHandle)
 {
   m_ProgressHandle = progressHandle;
 }
@@ -211,7 +211,7 @@ void mitk::BeamformingDASFilter::GenerateData()
     output->SetSlice(m_OutputData, i);
 
     if (i % progInterval == 0)
-      m_ProgressHandle((int)((i + 1) / (double)output->GetDimension(2) * 100));
+      m_ProgressHandle((int)((i + 1) / (double)output->GetDimension(2) * 100), "performing reconstruction");
 
     delete[] m_OutputData;
     delete[] m_InputDataPuffer;
@@ -221,6 +221,7 @@ void mitk::BeamformingDASFilter::GenerateData()
 
   if (m_Conf.UseBP)
   {
+    m_ProgressHandle(100, "applying bandpass");
     mitk::Image::Pointer BP = BandpassFilter(output);
 
     for (int i = 0; i < output->GetDimension(2); ++i)

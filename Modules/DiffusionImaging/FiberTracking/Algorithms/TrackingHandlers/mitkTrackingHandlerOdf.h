@@ -59,15 +59,23 @@ public:
     int OdfPower() const;
     void SetOdfPower(int OdfPower);
 
+    void SetSecondOrder(bool SecondOrder);
+
 protected:
+
+    vnl_vector< float > GetSecondOrderProbabilities(itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs);
 
     float   m_GfaThreshold;
     ItkFloatImgType::Pointer        m_GfaImage;     ///< GFA image used to determine streamline termination.
     ItkOdfImageType::Pointer        m_OdfImage;     ///< Input odf image.
+    ItkOdfImageType::Pointer        m_WorkingOdfImage;     ///< Modified odf image.
     std::vector< int >              m_OdfHemisphereIndices;
     vnl_matrix< float >             m_OdfFloatDirs;
     BoostRngType                    m_Rng;
     int                             m_OdfPower;
+    bool                            m_SecondOrder;
+
+    std::vector< int >              m_OdfReducedIndices;
 };
 
 }

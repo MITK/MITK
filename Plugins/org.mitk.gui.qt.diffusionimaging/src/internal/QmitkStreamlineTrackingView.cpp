@@ -231,7 +231,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetOdfImage(itkImg);
         dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
 
-
         if (m_Controls->m_FaImageBox->GetSelectedNode().IsNotNull())
         {
             ItkFloatImageType::Pointer itkImg = ItkFloatImageType::New();

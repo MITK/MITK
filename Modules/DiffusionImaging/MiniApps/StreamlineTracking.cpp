@@ -340,6 +340,8 @@ int main(int argc, char* argv[])
     handler->SetFlipY(flip_y);
     handler->SetFlipZ(flip_z);
 
+    MITK_INFO << "Tractography algorithm: " << algorithm;
+
     tracker->SetNumberOfSamples(num_samples);
     tracker->SetAngularThreshold(45);  // direct angular threshold for each estimated direction
     tracker->SetMaskImage(mask);

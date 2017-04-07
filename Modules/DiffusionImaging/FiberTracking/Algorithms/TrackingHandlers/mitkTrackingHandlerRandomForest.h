@@ -74,6 +74,14 @@ public:
     void SaveForest(std::string forestFile);
     void LoadForest(std::string forestFile);
 
+    void SetMode( MODE m )
+    {
+        if (m==MODE::DETERMINISTIC)
+            m_Mode = m;
+        else
+            mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
+    }
+
     void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
     void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
     void SetNumTrees(int num){ m_NumTrees = num; }

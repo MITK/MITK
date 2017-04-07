@@ -48,6 +48,13 @@ public:
     itk::Point<float,3> GetOrigin(){ return origin3; }
     itk::Matrix<double, 3, 3> GetDirection(){ return direction3; }
     itk::ImageRegion<3> GetLargestPossibleRegion(){ return imageRegion3; }
+    void SetMode( MODE m )
+    {
+        if (m==MODE::DETERMINISTIC)
+            m_Mode = m;
+        else
+            mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
+    }
 
 protected:
 

@@ -15,14 +15,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkTrackingHandlerOdf.h"
-#include <itkOrientationDistributionFunction.h>
 #include <itkDiffusionQballGeneralizedFaImageFilter.h>
+#include <itkImageRegionIterator.h>
 
 namespace mitk
 {
 
 TrackingHandlerOdf::TrackingHandlerOdf()
     : m_GfaThreshold(0.1)
+    , m_OdfPower(4)
 {
 
 }
@@ -41,6 +42,13 @@ void TrackingHandlerOdf::InitForTracking()
     for (int i=0; i<QBALL_ODFSIZE; i++)
         if (dot_product(ref, odf.GetDirection(i))>0)
             m_OdfHemisphereIndices.push_back(i);
+    m_OdfFloatDirs.set_size(m_OdfHemisphereIndices.size(), 3);
+    for (int i=0; i<m_OdfHemisphereIndices.size(); i++)
+    {
+        m_OdfFloatDirs[i][0] = odf.GetDirection(m_OdfHemisphereIndices[i])[0];
+        m_OdfFloatDirs[i][1] = odf.GetDirection(m_OdfHemisphereIndices[i])[1];
+        m_OdfFloatDirs[i][2] = odf.GetDirection(m_OdfHemisphereIndices[i])[2];
+    }
 
 
     if (m_GfaImage.IsNull())
@@ -52,6 +60,40 @@ void TrackingHandlerOdf::InitForTracking()
         gfaFilter->SetComputationMethod(GfaFilterType::GFA_STANDARD);
         gfaFilter->Update();
         m_GfaImage = gfaFilter->GetOutput();
+    }
+
+    MITK_INFO << "Rescaling ODFs.";
+    typedef itk::ImageRegionIterator< ItkOdfImageType > OdfIteratorType;
+    OdfIteratorType it(m_OdfImage, m_OdfImage->GetLargestPossibleRegion() );
+    it.GoToBegin();
+    while( !it.IsAtEnd() )
+    {
+        typename ItkOdfImageType::PixelType odf_values = it.Get();
+
+        float max = 0;
+        float min = 99999;
+        for (int i=0; i<QBALL_ODFSIZE; i++)
+        {
+            if (odf_values[i]<0)
+                odf_values[i] = 0;
+            if (odf_values[i]>=max)
+                max = odf_values[i];
+            else if (odf_values[i]<min)
+                min = odf_values[i];
+        }
+
+        max -= min;
+        if (max>0.0)
+        {
+            odf_values -= min;
+            odf_values /= max;
+        }
+
+        for (int i=0; i<QBALL_ODFSIZE; i++)
+            odf_values[i] = std::pow(odf_values[i], m_OdfPower);
+
+        it.Set(odf_values);
+        ++it;
     }
 }
 
@@ -77,30 +119,33 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float,
     if (!m_Interpolate && oldIndex==idx)
         return last_dir;
 
-    itk::OrientationDistributionFunction< float, QBALL_ODFSIZE > odf;
     typename ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_OdfImage, m_Interpolate);
+
     float max = 0;
-    for (int i=0; i<QBALL_ODFSIZE; i++)
+    int max_idx_v = -1;
+    int max_idx_d = -1;
+    int c = 0;
+    for (int i : m_OdfHemisphereIndices)
     {
-        odf[i] = odf_values[i];
-        if (odf[i]<0)
-            odf[i] = 0;
-        if (odf[i]>max)
-            max = odf[i];
+        if (odf_values[i]<0)
+            odf_values[i] = 0;
+        if (odf_values[i]>=max)
+        {
+            max = odf_values[i];
+            max_idx_v = i;
+            max_idx_d = c;
+        }
+        c++;
     }
 
-    if (max>0.0001)
-        odf = odf.MinMaxNormalize();
-
-    if (olddirs.empty() || last_dir.magnitude()<=0.5)    // no previous direction, so return principal diffusion direction
+    if (max_idx_v>=0 && (olddirs.empty() || last_dir.magnitude()<=0.5) )    // no previous direction, so return principal diffusion direction
     {
-        int pd = odf.GetPrincipleDiffusionDirection();
-        vnl_vector_fixed<double,3> odf_d = odf.GetDirection(pd);
-        output_direction[0] = odf_d[0];
-        output_direction[1] = odf_d[1];
-        output_direction[2] = odf_d[2];
-        return output_direction * odf[pd];
+        output_direction = m_OdfFloatDirs.get_row(max_idx_d);
+        float odf_val = odf_values[max_idx_v];
+        return output_direction * odf_val;
     }
+    else if (max_idx_v<0.0001)
+        return output_direction;
 
     if (m_FlipX)
         last_dir[0] *= -1;
@@ -109,23 +154,42 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float,
     if (m_FlipZ)
         last_dir[2] *= -1;
 
-    for (int i : m_OdfHemisphereIndices)
+    vnl_vector< float > angles = m_OdfFloatDirs*last_dir;
+    vnl_vector< float > probs; probs.set_size(m_OdfHemisphereIndices.size());
+    float probs_sum = 0;
+    for (unsigned int i=0; i<m_OdfHemisphereIndices.size(); i++)
     {
-        if (odf[i]>0)   // if probability of respective class is 0, do nothing
-        {
-            vnl_vector_fixed<float,3> d;
-            vnl_vector_fixed<double,3> odf_d = odf.GetDirection(i);
-            d[0] = odf_d[0];
-            d[1] = odf_d[1];
-            d[2] = odf_d[2];
+        float odf_val = odf_values[m_OdfHemisphereIndices[i]];
+        float angle = angles[i];
+        float abs_angle = fabs(angle);
 
-            float dot = dot_product(d, last_dir);    // claculate angle between the candidate direction vector and the previous streamline direction
-            if (dot<0)                          // make sure we don't walk backwards
+        if (abs_angle<m_AngularThreshold)
+            odf_val = 0;
+
+        if (m_Mode==MODE::DETERMINISTIC)
+        {
+            vnl_vector_fixed<float,3> d = m_OdfFloatDirs.get_row(i);
+            if (angle<0)                          // make sure we don't walk backwards
                 d *= -1;
-            dot = fabs(dot);
-            float w_i = odf[i]*dot*dot*dot;
-            output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
+            output_direction += odf_val*d;
         }
+        else if (m_Mode==MODE::PROBABILISTIC)
+        {
+            probs[i] = odf_val;
+            probs_sum += probs[i];
+        }
+    }
+    if (m_Mode==MODE::PROBABILISTIC && probs_sum>0.0001)
+    {
+        probs /= probs_sum;
+        boost::random::discrete_distribution<int, float> dist(probs.begin(), probs.end());
+        boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
+
+        int sampled_idx = sampler();
+        output_direction = m_OdfFloatDirs.get_row(sampled_idx);
+        if (angles[sampled_idx]<0)                          // make sure we don't walk backwards
+            output_direction *= -1;
+        output_direction *= probs[sampled_idx];
     }
 
     if (m_FlipX)
@@ -136,6 +200,16 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float,
         output_direction[2] *= -1;
 
     return output_direction;
+}
+
+int TrackingHandlerOdf::OdfPower() const
+{
+    return m_OdfPower;
+}
+
+void TrackingHandlerOdf::SetOdfPower(int OdfPower)
+{
+    m_OdfPower = OdfPower;
 }
 
 }

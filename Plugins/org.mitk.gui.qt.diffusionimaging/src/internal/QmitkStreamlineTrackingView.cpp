@@ -265,6 +265,17 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     trackingHandler->SetFlipY(m_Controls->m_FlipYBox->isChecked());
     trackingHandler->SetFlipZ(m_Controls->m_FlipZBox->isChecked());
     trackingHandler->SetInterpolate(m_Controls->m_InterpolationBox->isChecked());
+    switch (m_Controls->m_ModeBox->currentIndex())
+    {
+    case 0:
+        trackingHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+        break;
+    case 1:
+        trackingHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+        break;
+    default:
+        trackingHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
+    }
 
     typedef itk::StreamlineTrackingFilter TrackerType;
     TrackerType::Pointer tracker = TrackerType::New();

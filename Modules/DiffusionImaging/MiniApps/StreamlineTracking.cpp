@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     // parameters fo all methods
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'Tensor' algorithm)", us::Any(), false);
-    parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DiscODF, RandomForest)", us::Any(), false);
+    parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DetODF, ProbODF, RandomForest)", us::Any(), false);
     parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle", us::Any(), false);
 
     parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
         if (addFeatImages.size()>0)
             dynamic_cast<mitk::TrackingHandlerTensor*>(handler)->SetFaImage(addFeatImages.at(0).at(0));
     }
-    else if (algorithm == "DiscODF")
+    else if (algorithm == "DetODF" || algorithm == "ProbODF")
     {
         handler = new mitk::TrackingHandlerOdf();
 
@@ -329,6 +329,8 @@ int main(int argc, char* argv[])
         }
 
         dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaThreshold(cutoff);
+        if (algorithm == "ProbODF")
+            dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMode(mitk::TrackingHandlerOdf::MODE::PROBABILISTIC);
 
         if (addFeatImages.size()>0)
             dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addFeatImages.at(0).at(0));

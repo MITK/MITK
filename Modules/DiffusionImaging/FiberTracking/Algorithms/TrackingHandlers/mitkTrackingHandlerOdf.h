@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkTrackingDataHandler.h"
 #include <mitkQBallImage.h>
+#include <itkOrientationDistributionFunction.h>
 #include <MitkFiberTrackingExports.h>
 
 namespace mitk
@@ -47,6 +48,7 @@ public:
     void SetGfaThreshold(float gfaThreshold){ m_GfaThreshold = gfaThreshold; }
     void SetOdfImage( ItkOdfImageType::Pointer img ){ m_OdfImage = img; }
     void SetGfaImage( ItkFloatImgType::Pointer img ){ m_GfaImage = img; }
+    void SetMode( MODE m ){ m_Mode = m; }
 
 
     ItkUcharImgType::SpacingType GetSpacing(){ return m_OdfImage->GetSpacing(); }
@@ -54,12 +56,18 @@ public:
     ItkUcharImgType::DirectionType GetDirection(){ return m_OdfImage->GetDirection(); }
     ItkUcharImgType::RegionType GetLargestPossibleRegion(){ return m_OdfImage->GetLargestPossibleRegion(); }
 
+    int OdfPower() const;
+    void SetOdfPower(int OdfPower);
+
 protected:
 
     float   m_GfaThreshold;
     ItkFloatImgType::Pointer        m_GfaImage;     ///< GFA image used to determine streamline termination.
     ItkOdfImageType::Pointer        m_OdfImage;     ///< Input odf image.
     std::vector< int >              m_OdfHemisphereIndices;
+    vnl_matrix< float >             m_OdfFloatDirs;
+    BoostRngType                    m_Rng;
+    int                             m_OdfPower;
 };
 
 }

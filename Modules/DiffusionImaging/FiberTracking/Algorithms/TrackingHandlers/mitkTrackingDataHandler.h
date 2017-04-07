@@ -22,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkImage.h>
 #include <deque>
 #include <MitkFiberTrackingExports.h>
+#include <boost/random/discrete_distribution.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
 namespace mitk
 {
@@ -34,9 +37,15 @@ class MITKFIBERTRACKING_EXPORT TrackingDataHandler
 
 public:
 
+    enum MODE {
+        DETERMINISTIC,
+        PROBABILISTIC
+    };
+
     TrackingDataHandler();
     virtual ~TrackingDataHandler(){}
 
+    typedef boost::mt19937 BoostRngType;
     typedef itk::Image<unsigned char, 3>  ItkUcharImgType;
     typedef itk::Image<short, 3>          ItkShortImgType;
     typedef itk::Image<float, 3>          ItkFloatImgType;
@@ -50,6 +59,7 @@ public:
     virtual itk::Point<float,3> GetOrigin() = 0;
     virtual itk::Matrix<double, 3, 3> GetDirection() = 0;
     virtual itk::ImageRegion<3> GetLargestPossibleRegion() = 0;
+    virtual void SetMode(MODE m) = 0;
 
     void SetAngularThreshold( float a ){ m_AngularThreshold = a; }
     void SetInterpolate( bool interpolate ){ m_Interpolate = interpolate; }
@@ -64,6 +74,7 @@ protected:
     bool    m_FlipX;
     bool    m_FlipY;
     bool    m_FlipZ;
+    MODE    m_Mode;
 
     template< class TPixelType >
     TPixelType GetImageValue(itk::Point<float, 3> itkP, itk::Image<TPixelType, 3>* image, vnl_vector_fixed<float, 8>& interpWeights){

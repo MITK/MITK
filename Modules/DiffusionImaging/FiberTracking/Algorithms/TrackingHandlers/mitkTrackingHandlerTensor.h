@@ -50,6 +50,13 @@ public:
     void ClearTensorImages(){ m_TensorImages.clear(); }
     void SetFaImage( ItkFloatImgType::Pointer img ){ m_FaImage = img; }
     void SetInterpolateTensors( bool interpolateTensors ){ m_InterpolateTensors = interpolateTensors; }
+    void SetMode( MODE m )
+    {
+        if (m==MODE::DETERMINISTIC)
+            m_Mode = m;
+        else
+            mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
+    }
 
 
     ItkUcharImgType::SpacingType GetSpacing(){ return m_FaImage->GetSpacing(); }

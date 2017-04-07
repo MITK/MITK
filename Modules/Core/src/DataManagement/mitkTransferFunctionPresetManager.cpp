@@ -257,10 +257,10 @@ int TransferFunctionPresetManager::SavePreset(mitk::TransferFunction& transferFu
       colorTransferFunction->GetBlueValue(colorTransferPoints[i])));
   }
 
-  return AddPresets(preset, name);
+  return AddPreset(preset, name);
 }
 
-int TransferFunctionPresetManager::AddPresets(const TransferFunctionPreset& preset, const std::string& name)
+int TransferFunctionPresetManager::AddPreset(const TransferFunctionPreset& preset, const std::string& name)
 {
   const auto index = m_presetPoints.size();
   if (name.empty()) {
@@ -295,8 +295,8 @@ void TransferFunctionPresetManager::RemoveUserPresets()
 std::vector<std::pair<std::string, TransferFunctionPreset>> TransferFunctionPresetManager::GetUserPresets() const
 {
   std::vector<std::pair<std::string, TransferFunctionPreset>> result;
-  for (size_t i = TF_MODE_COUNT; i < m_presetNames.size(); ++i) {
-    result.push_back(std::make_pair(m_presetNames[i], m_presetPoints[i]));
+  for (size_t i = TF_MODE_COUNT; i < m_presetPoints.size(); ++i) {
+    result.push_back(std::make_pair(m_presetNames[i + 1], m_presetPoints[i]));
   }
   return result;
 }

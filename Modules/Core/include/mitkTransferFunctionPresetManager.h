@@ -47,7 +47,7 @@ public:
   bool ApplyPreset(int mode, mitk::TransferFunction& transferFunction) const;
 
   int SavePreset(mitk::TransferFunction& transferFunction, const std::string& name = std::string());
-  int AddPresets(const TransferFunctionPreset& preset, const std::string& name = std::string());
+  int AddPreset(const TransferFunctionPreset& preset, const std::string& name = std::string());
 
   bool RemovePreset(int mode);
   void RemoveUserPresets();

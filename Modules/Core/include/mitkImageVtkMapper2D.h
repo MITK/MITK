@@ -180,6 +180,12 @@ public:
           This container is used to save a computed contour for the next rendering execution.
           For instance, if you zoom or pann, there is no need to recompute the contour. */
     vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
+    /** \brief An actor for the outline */
+    vtkSmartPointer<vtkActor> m_OutlineActor;
+    /** \brief An actor for the outline shadow*/
+    vtkSmartPointer<vtkActor> m_OutlineShadowActor;
+    /** \brief A mapper for the outline */
+    vtkSmartPointer<vtkPolyDataMapper> m_OutlineMapper;
 
     /** \brief Timestamp of last update of stored data. */
     itk::TimeStamp m_LastUpdateTime;

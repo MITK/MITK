@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_connectomics org.mitk.gui.qt.diffusionimaging.connectomics
+  \ingroup MITKPlugins
+
+  \brief This is the diffusionimaging.connectomics plugin. 
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_diffusionimaging_connectomics_internal Internal
+  \ingroup org_mitk_gui_qt_diffusionimaging_connectomics
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.diffusionimaging.connectomics plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

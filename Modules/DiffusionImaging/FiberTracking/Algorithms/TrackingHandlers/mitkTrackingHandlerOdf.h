@@ -61,6 +61,9 @@ public:
 
     void SetSecondOrder(bool SecondOrder);
 
+    bool MinMaxNormalize() const;
+    void setMinMaxNormalize(bool MinMaxNormalize);
+
 protected:
 
     vnl_vector< float > GetSecondOrderProbabilities(itk::Point<float, 3>& itkP, vnl_vector< float >& angles, vnl_vector< float >& probs);
@@ -74,6 +77,7 @@ protected:
     BoostRngType                    m_Rng;
     int                             m_OdfPower;
     bool                            m_SecondOrder;
+    bool                            m_MinMaxNormalize;
 
     std::vector< int >              m_OdfReducedIndices;
 };

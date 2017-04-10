@@ -26,6 +26,7 @@ TrackingHandlerOdf::TrackingHandlerOdf()
     : m_GfaThreshold(0.1)
     , m_OdfPower(4)
     , m_SecondOrder(false)
+    , m_MinMaxNormalize(true)
 {
 
 }
@@ -109,24 +110,27 @@ void TrackingHandlerOdf::InitForTracking()
         typename ItkOdfImageType::PixelType odf_values = it.Get();
         typename ItkOdfImageType::PixelType wodf_values = wit.Get();
 
-        float max = 0;
-        float min = 99999;
-        for (int i=0; i<QBALL_ODFSIZE; i++)
+        if (m_MinMaxNormalize)
         {
-            wodf_values[i] = odf_values[i];
-            if (wodf_values[i]<0)
-                wodf_values[i] = 0;
-            if (wodf_values[i]>=max)
-                max = wodf_values[i];
-            else if (wodf_values[i]<min)
-                min = wodf_values[i];
-        }
+            float max = 0;
+            float min = 99999;
+            for (int i=0; i<QBALL_ODFSIZE; i++)
+            {
+                wodf_values[i] = odf_values[i];
+                if (wodf_values[i]<0)
+                    wodf_values[i] = 0;
+                if (wodf_values[i]>=max)
+                    max = wodf_values[i];
+                else if (wodf_values[i]<min)
+                    min = wodf_values[i];
+            }
 
-        max -= min;
-        if (max>0.0)
-        {
-            wodf_values -= min;
-            wodf_values /= max;
+            max -= min;
+            if (max>0.0)
+            {
+                wodf_values -= min;
+                wodf_values /= max;
+            }
         }
 
         for (int i=0; i<QBALL_ODFSIZE; i++)
@@ -187,6 +191,16 @@ vnl_vector< float > TrackingHandlerOdf::GetSecondOrderProbabilities(itk::Point<f
         out_probs /= out_probs_sum;
 
     return out_probs;
+}
+
+bool TrackingHandlerOdf::MinMaxNormalize() const
+{
+    return m_MinMaxNormalize;
+}
+
+void TrackingHandlerOdf::setMinMaxNormalize(bool MinMaxNormalize)
+{
+    m_MinMaxNormalize = MinMaxNormalize;
 }
 
 void TrackingHandlerOdf::SetSecondOrder(bool SecondOrder)

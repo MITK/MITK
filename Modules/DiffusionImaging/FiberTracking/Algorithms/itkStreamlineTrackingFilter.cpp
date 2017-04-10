@@ -94,7 +94,12 @@ void StreamlineTrackingFilter::BeforeTracking()
         m_StepSize = m_StepSizeVox*minSpacing;
 
     if (m_AngularThresholdDeg<0)
-        m_AngularThreshold = std::cos(m_StepSize/minSpacing);
+    {
+        if  (m_StepSize/minSpacing<=1.0)
+            m_AngularThreshold = std::cos( 0.5 * M_PI * m_StepSize/minSpacing );
+        else
+            m_AngularThreshold = std::cos( 0.5 * M_PI );
+    }
     else
         m_AngularThreshold = std::cos( m_AngularThresholdDeg*M_PI/180.0 );
     m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);

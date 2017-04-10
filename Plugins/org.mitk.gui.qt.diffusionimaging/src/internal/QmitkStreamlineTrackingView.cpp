@@ -302,7 +302,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
 
     tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
     tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
-    tracker->SetSamplingDistance(0.7);
+    //tracker->SetSamplingDistance(0.7);
     tracker->SetUseStopVotes(true);
     tracker->SetOnlyForwardSamples(true);
     tracker->SetAposterioriCurvCheck(false);

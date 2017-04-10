@@ -16,6 +16,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkPluginActivator.h"
 
+#include "src/internal/QmitkQBallReconstructionView.h"
+#include "src/internal/QmitkTensorReconstructionView.h"
+#include "src/internal/QmitkDiffusionQuantificationView.h"
+#include "src/internal/QmitkODFDetailsView.h"
+#include "src/internal/QmitkOdfMaximaExtractionView.h"
+
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 
 ctkPluginContext* mitk::PluginActivator::GetContext()
@@ -25,7 +31,10 @@ ctkPluginContext* mitk::PluginActivator::GetContext()
 
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {
-  //BERRY_REGISTER_EXTENSION_CLASS(QmitkMeasurementView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkQBallReconstructionView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionQuantificationView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkTensorReconstructionView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkODFDetailsView, context)
   m_Context = context;
 }
 

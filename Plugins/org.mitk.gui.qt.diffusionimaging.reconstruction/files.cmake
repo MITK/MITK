@@ -1,27 +1,55 @@
 set(SRC_CPP_FILES
-
+  QmitkODFDetailsWidget.cpp
+  QmitkODFRenderWidget.cpp
+  QmitkResidualAnalysisWidget.cpp
+  QmitkResidualViewWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  #QmitkImageStatisticsCalculationThread.cpp
   mitkPluginActivator.cpp
+  
+  QmitkQBallReconstructionView.cpp
+  QmitkDiffusionQuantificationView.cpp
+  QmitkTensorReconstructionView.cpp
+  QmitkODFDetailsView.cpp
 )
 
 set(UI_FILES
-  #src/internal/QmitkImageStatisticsViewControls.ui
+  src/internal/QmitkQBallReconstructionViewControls.ui
+  src/internal/QmitkDiffusionQuantificationViewControls.ui
+  src/internal/QmitkTensorReconstructionViewControls.ui
+  src/internal/QmitkODFDetailsViewControls.ui
 )
 
 set(MOC_H_FILES
-  #src/internal/QmitkMeasurementView.h
+  src/internal/mitkPluginActivator.h
+  
+  src/internal/QmitkQBallReconstructionView.h
+  src/internal/QmitkDiffusionQuantificationView.h
+  src/internal/QmitkTensorReconstructionView.h
+  src/internal/QmitkODFDetailsView.h
+  
+  src/QmitkODFRenderWidget.h
+  src/QmitkODFDetailsWidget.h
+  src/QmitkResidualAnalysisWidget.h
+  src/QmitkResidualViewWidget.h
+  src/QmitkTensorModelParametersWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  
+  resources/quantification.png
+  resources/OdfDetails.png
+  resources/reconodf.png
+  resources/recontensor.png
+  resources/tensor.png
+  resources/qball.png
+  resources/odf.png
 )
 
 set(QRC_FILES
-  #resources/measurement.qrc
-  #resources/QmitkImageStatisticsView.qrc
+
 )
 
 

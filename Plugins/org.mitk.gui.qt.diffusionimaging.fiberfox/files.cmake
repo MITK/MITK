@@ -1,22 +1,54 @@
 set(SRC_CPP_FILES
-
+  QmitkTensorModelParametersWidget.cpp
+  QmitkZeppelinModelParametersWidget.cpp
+  QmitkStickModelParametersWidget.cpp
+  QmitkDotModelParametersWidget.cpp
+  QmitkBallModelParametersWidget.cpp
+  QmitkAstrosticksModelParametersWidget.cpp
+  QmitkPrototypeSignalParametersWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  #QmitkImageStatisticsCalculationThread.cpp
+  QmitkFiberfoxView.cpp
+  QmitkFieldmapGeneratorView.cpp
   mitkPluginActivator.cpp
+  
+  Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
 )
 
 set(UI_FILES
-  #src/internal/QmitkImageStatisticsViewControls.ui
+  src/internal/QmitkFiberfoxViewControls.ui
+  src/internal/QmitkFieldmapGeneratorViewControls.ui
+  
+  src/QmitkTensorModelParametersWidgetControls.ui
+  src/QmitkZeppelinModelParametersWidgetControls.ui
+  src/QmitkStickModelParametersWidgetControls.ui
+  src/QmitkDotModelParametersWidgetControls.ui
+  src/QmitkBallModelParametersWidgetControls.ui
+  src/QmitkAstrosticksModelParametersWidgetControls.ui
+  src/QmitkPrototypeSignalParametersWidgetControls.ui
 )
 
 set(MOC_H_FILES
-  #src/internal/QmitkMeasurementView.h
+  src/internal/mitkPluginActivator.h
+  src/internal/QmitkFiberfoxView.h
+  src/internal/QmitkFieldmapGeneratorView.h
+  
+  src/QmitkZeppelinModelParametersWidget.h
+  src/QmitkStickModelParametersWidget.h
+  src/QmitkDotModelParametersWidget.h
+  src/QmitkBallModelParametersWidget.h
+  src/QmitkAstrosticksModelParametersWidget.h
+  src/QmitkPrototypeSignalParametersWidget.h
+  
+  src/internal/Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  
+  resources/phantom.png
+  resources/syntheticdata.png
 )
 
 set(QRC_FILES

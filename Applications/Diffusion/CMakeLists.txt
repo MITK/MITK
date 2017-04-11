@@ -27,7 +27,6 @@ set(_plugins
   org.mitk.gui.common
   org.mitk.planarfigure
   org.mitk.core.ext
-  org.mitk.diffusionimaging
   org.mitk.gui.qt.application
   org.mitk.gui.qt.ext
   org.mitk.gui.qt.diffusionimagingapp

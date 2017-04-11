@@ -101,6 +101,7 @@ public:
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
     itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
     itkSetMacro( MaxNumTracts, unsigned int )           ///< Tracking is stopped if the maximum number of tracts is exceeded
+    itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
 
     void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
     {
@@ -168,6 +169,7 @@ protected:
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;
     bool                                m_DemoMode;
+    bool                                m_Random;
     void BuildFibers(bool check);
     int CheckCurvature(FiberType* fib, bool front);
 

@@ -98,9 +98,9 @@ int mitkFiberExtractionTest(int argc, char* argv[])
         //        mitk::IOUtil::SaveBaseData(outside, mitk::IOUtil::GetTempPath()+"outside.fib");
 
         mitk::FiberBundle::Pointer passing = groundTruthFibs->ExtractFiberSubset(itkRoiImage, true);
-        mitk::IOUtil::SaveBaseData(passing, mitk::IOUtil::GetTempPath()+"passing.fib");
+//        mitk::IOUtil::SaveBaseData(passing, mitk::IOUtil::GetTempPath()+"fiberBundleX_passing-mask.fib");
         mitk::FiberBundle::Pointer ending = groundTruthFibs->ExtractFiberSubset(itkRoiImage, false);
-        //        mitk::IOUtil::SaveBaseData(ending, mitk::IOUtil::GetTempPath()+"ending.fib");
+        //        mitk::IOUtil::SaveBaseData(ending, mitk::IOUtil::GetTempPath()+"fiberBundleX_ending-in-mask.fib");
 
         //        testFibs = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(argv[7])->GetData());
         //        MITK_TEST_CONDITION_REQUIRED(inside->Equals(testFibs),"check inside mask extraction")

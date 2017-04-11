@@ -65,6 +65,7 @@ StreamlineTrackingFilter
     , m_SamplingDistanceVox(-1)
     , m_AngularThresholdDeg(-1)
     , m_MaxNumTracts(-1)
+    , m_Random(true)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -631,8 +632,11 @@ void StreamlineTrackingFilter::GenerateData()
             seedpoints.push_back(s[1]);
     }
 
-    std::srand(std::time(0));
-    std::random_shuffle ( seedpoints.begin(), seedpoints.end() );
+    if (m_Random)
+    {
+        std::srand(std::time(0));
+        std::random_shuffle ( seedpoints.begin(), seedpoints.end() );
+    }
 
     bool stop = false;
     unsigned int current_tracts = 0;

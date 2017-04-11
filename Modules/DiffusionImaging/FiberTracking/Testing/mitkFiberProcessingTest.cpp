@@ -32,7 +32,7 @@ class mitkFiberProcessingTestSuite : public mitk::TestFixture
     MITK_TEST(Test2);
     MITK_TEST(Test3);
     MITK_TEST(Test4);
-//    MITK_TEST(Test5); - disabled as a temporary fix for bug 19770, should be fixed properly
+    MITK_TEST(Test5);
     MITK_TEST(Test6);
     MITK_TEST(Test7);
     MITK_TEST(Test8);
@@ -45,6 +45,7 @@ class mitkFiberProcessingTestSuite : public mitk::TestFixture
     MITK_TEST(Test15);
     MITK_TEST(Test16);
     MITK_TEST(Test17);
+    MITK_TEST(Test18);
     CPPUNIT_TEST_SUITE_END();
 
     typedef itk::Image<unsigned char, 3> ItkUcharImgType;
@@ -139,6 +140,7 @@ public:
         mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
         fib = fib->RemoveFibersOutside(mask);
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/remove_outside.fib")).front().GetPointer());
+        mitk::IOUtil::SaveBaseData(fib, mitk::IOUtil::GetTempPath()+"remove_outside.fib");
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(fib));
     }
 
@@ -154,7 +156,7 @@ public:
 
     void Test7()
     {
-        MITK_INFO << "TEST 7: Modify resample";
+        MITK_INFO << "TEST 7: Modify resample spline";
 
         mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
         fib->ResampleSpline(5);
@@ -281,6 +283,17 @@ public:
 
         mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/transform_scale2.fib")).front().GetPointer());
 
+        CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(fib));
+    }
+
+    void Test18()
+    {
+        MITK_INFO << "TEST 18: Modify resample linear";
+
+        mitk::FiberBundle::Pointer fib = original->GetDeepCopy();
+        fib->ResampleLinear();
+        mitk::FiberBundle::Pointer ref = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/modify_resample_linear.fib")).front().GetPointer());
+        mitk::IOUtil::SaveBaseData(fib, mitk::IOUtil::GetTempPath()+"modify_resample_linear.fib");
         CPPUNIT_ASSERT_MESSAGE("Should be equal", ref->Equals(fib));
     }
 

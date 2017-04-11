@@ -643,8 +643,9 @@ void StreamlineTrackingFilter::GenerateData()
     int num_seeds = seedpoints.size();
     itk::Index<3> zeroIndex; zeroIndex.Fill(0);
     int progress = 0;
-#pragma omp parallel for
-    for (int i=0; i<num_seeds; i++)
+    int i = 0;
+#pragma omp parallel
+    while (i<num_seeds && !stop)
     {
 #pragma omp critical
         {
@@ -718,13 +719,14 @@ void StreamlineTrackingFilter::GenerateData()
                 }
                 if (m_MaxNumTracts>0 && current_tracts>=m_MaxNumTracts)
                 {
-                    i = num_seeds;
                     if (!stop)
                         MITK_INFO << "Reconstructed maximum number of tracts (" << current_tracts << "). Stopping tractography.";
                     stop = true;
                 }
             }
         }
+#pragma omp critical
+        i++;
     }
 
     this->AfterTracking();

@@ -107,8 +107,8 @@ void TrackingHandlerOdf::InitForTracking()
     wit.GoToBegin();
     while( !it.IsAtEnd() )
     {
-        typename ItkOdfImageType::PixelType odf_values = it.Get();
-        typename ItkOdfImageType::PixelType wodf_values = wit.Get();
+        ItkOdfImageType::PixelType odf_values = it.Get();
+        ItkOdfImageType::PixelType wodf_values = wit.Get();
 
         if (m_MinMaxNormalize)
         {
@@ -160,7 +160,7 @@ vnl_vector< float > TrackingHandlerOdf::GetSecondOrderProbabilities(itk::Point<f
         pos[0] = itkP[0] + d[0];
         pos[1] = itkP[1] + d[1];
         pos[2] = itkP[2] + d[2];
-        typename ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_WorkingOdfImage, m_Interpolate);
+        ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_WorkingOdfImage, m_Interpolate);
         vnl_vector< float > new_angles = m_OdfFloatDirs*d;
 
         float probs_sum = 0;
@@ -230,7 +230,7 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float,
     if (!m_Interpolate && oldIndex==idx)
         return last_dir;
 
-    typename ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_WorkingOdfImage, m_Interpolate);
+    ItkOdfImageType::PixelType odf_values = GetImageValue<float, QBALL_ODFSIZE>(pos, m_WorkingOdfImage, m_Interpolate);
 
     float max = 0;
     int max_idx_v = -1;

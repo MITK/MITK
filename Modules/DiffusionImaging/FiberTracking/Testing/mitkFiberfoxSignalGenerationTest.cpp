@@ -70,7 +70,7 @@ public:
     {
         m_FiberBundle = dynamic_cast<FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/Fiberfox/Signalgen.fib"))[0].GetPointer());
 
-        /*{
+        {
         FiberfoxParameters<double> parameters;
         parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/param1.ffp"));
         m_Parameters.push_back(parameters);
@@ -82,7 +82,7 @@ public:
         parameters.LoadParameters(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/param2.ffp"));
         m_Parameters.push_back(parameters);
         m_RefImages.push_back(mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/Fiberfox/params/param2.dwi")));
-        }*/
+        }
 
         {
         FiberfoxParameters<double> parameters;

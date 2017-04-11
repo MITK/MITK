@@ -1,0 +1,16 @@
+/**
+\page QmitkDiffusionImagingDataImportPage Importing Data
+
+\section QmitkDiffusionImagingUserManualDicomImport Dicom Import
+
+The dicom import does not cover all hardware manufacturers but only Siemens dicom images. MITK-DI is also capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
+
+In case your dicom images are readable by MITK-DI, select one or more input dicom folders and click import. Each input folder must only contain DICOM-images that can be combined into one vector-valued 3D output volume. Different patients must be loaded from different input-folders. The folders must not contain other acquisitions (e.g. T1,T2,localizer).
+
+In case many imports are performed at once, it is recommended to set the the optional output folder argument. This prevents the images from being kept in memory.
+
+\imageMacro{dicom1.png,"Dicom import",9.59}
+
+The option "Average duplicate gradients" accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "blur radius" > 0 is configured.
+
+*/

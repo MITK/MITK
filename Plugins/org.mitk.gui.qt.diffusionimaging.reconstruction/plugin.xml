@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+  
+    <view id="org.mitk.views.qballreconstruction"
+    name="Q-Balls"
+    category="Signal modeling"
+    icon="resources/qball.png"
+    class="QmitkQBallReconstructionView">
+    <description>Q-Ball reconstruction view</description>
+    <keywordReference id="org.mitk.views.qballreconstruction.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.diffusionquantification"
+    name="Scalar Indices"
+    category="Quantification"
+    class="QmitkDiffusionQuantificationView"
+    icon="resources/quantification.png">
+    <description>Calculation of tensor and Q-ball derived measures.</description>
+    <keywordReference id="org.mitk.views.diffusionquantification.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.tensorreconstruction"
+    name="Tensors"
+    category="Signal modeling"
+    icon="resources/tensor.png"
+    class="QmitkTensorReconstructionView">
+    <keywordReference id="org.mitk.views.tensorreconstruction.Keyword"/>
+    </view>
+
+    <view id="org.mitk.views.odfdetails"
+    name="ODF Details"
+    category="Quantification"
+    class="QmitkODFDetailsView"
+    icon="resources/OdfDetails.png">
+    <keywordReference id="org.mitk.views.odfdetails.Keyword"/>
+    </view>
+	
+  </extension>
+
+  <extension point="org.blueberry.ui.keywords">
+	
+	<keyword label="signal" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="reconstruction" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="ball" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="diffusion" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="qball" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="q-ball" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="propagator" id="org.mitk.views.qballreconstruction.Keyword"/>
+	<keyword label="modeling" id="org.mitk.views.qballreconstruction.Keyword"/>
+
+	<keyword label="signal" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="reconstruction" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="tensor" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="diffusion" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="second order" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="propagator" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="modeling" id="org.mitk.views.tensorreconstruction.Keyword"/>
+	<keyword label="DTI" id="org.mitk.views.tensorreconstruction.Keyword"/>	
+
+	<keyword label="GFA" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="RA" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="AD" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="RD" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="MD" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="anisotropy" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="fractional" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="radial" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="axial" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="diffusivity" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="mean" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="generalized" id="org.mitk.views.diffusionquantification.Keyword"/>
+	<keyword label="derived" id="org.mitk.views.diffusionquantification.Keyword"/>
+  
+	<keyword label="ODF" id="org.mitk.views.odfdetails.Keyword"/>
+	<keyword label="dODF" id="org.mitk.views.odfdetails.Keyword"/>
+	<keyword label="fODF" id="org.mitk.views.odfdetails.Keyword"/>
+	<keyword label="FOD" id="org.mitk.views.odfdetails.Keyword"/>
+	<keyword label="statistics" id="org.mitk.views.odfdetails.Keyword"/>
+	<keyword label="values" id="org.mitk.views.odfdetails.Keyword"/>
+	<keyword label="shape" id="org.mitk.views.odfdetails.Keyword"/>
+  
+  </extension>  
+  
+</plugin>

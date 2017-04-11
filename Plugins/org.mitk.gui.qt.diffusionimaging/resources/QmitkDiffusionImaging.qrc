@@ -21,5 +21,9 @@
         <file>reset.png</file>
         <file>MapperEfx2D.png</file>
         <file>refresh.xpm</file>
+        <file>qball.png</file>
+        <file>tensor.png</file>
+        <file>tractogram.png</file>
+        <file>ConnectomicsNetwork.png</file>
     </qresource>
 </RCC>

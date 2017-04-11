@@ -91,7 +91,7 @@ public:
 
     itkSetMacro( UseStopVotes, bool )                   ///< Frontal sampling points can vote for stopping the streamline even if the remaining sampling points keep pushing
     itkSetMacro( OnlyForwardSamples, bool )             ///< Don't use sampling points behind the current position in progression direction
-    itkSetMacro( DeflectionMod, float )                ///< Deflection distance modifier
+    itkSetMacro( DeflectionMod, float )                 ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
     itkSetMacro( SeedOnlyGm, bool )
@@ -100,6 +100,8 @@ public:
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
     itkSetMacro( RandomSampling, bool )                 ///< If true, the sampling points are distributed randomly around the current position, not sphericall in the specified sampling distance.
     itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
+    itkSetMacro( MaxNumTracts, unsigned int )           ///< Tracking is stopped if the maximum number of tracts is exceeded
+    itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
 
     void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
     {
@@ -149,7 +151,7 @@ protected:
     int                                 m_SeedsPerVoxel;
     bool                                m_RandomSampling;
     float                               m_SamplingDistance;
-    float                              m_DeflectionMod;
+    float                               m_DeflectionMod;
     bool                                m_OnlyForwardSamples;
     bool                                m_UseStopVotes;
     unsigned int                        m_NumberOfSamples;
@@ -157,6 +159,7 @@ protected:
     int                                 m_WmLabel;
     int                                 m_GmLabel;
     bool                                m_SeedOnlyGm;
+    unsigned int                        m_MaxNumTracts;
 
     ItkUcharImgType::Pointer            m_StoppingRegions;
     ItkUcharImgType::Pointer            m_SeedImage;
@@ -166,6 +169,7 @@ protected:
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;
     bool                                m_DemoMode;
+    bool                                m_Random;
     void BuildFibers(bool check);
     int CheckCurvature(FiberType* fib, bool front);
 

@@ -64,6 +64,8 @@ StreamlineTrackingFilter
     , m_StepSizeVox(-1)
     , m_SamplingDistanceVox(-1)
     , m_AngularThresholdDeg(-1)
+    , m_MaxNumTracts(-1)
+    , m_Random(true)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -93,7 +95,12 @@ void StreamlineTrackingFilter::BeforeTracking()
         m_StepSize = m_StepSizeVox*minSpacing;
 
     if (m_AngularThresholdDeg<0)
-        m_AngularThreshold = std::cos(m_StepSize/minSpacing);
+    {
+        if  (m_StepSize/minSpacing<=1.0)
+            m_AngularThreshold = std::cos( 0.5 * M_PI * m_StepSize/minSpacing );
+        else
+            m_AngularThreshold = std::cos( 0.5 * M_PI );
+    }
     else
         m_AngularThreshold = std::cos( m_AngularThresholdDeg*M_PI/180.0 );
     m_TrackingHandler->SetAngularThreshold(m_AngularThreshold);
@@ -625,6 +632,14 @@ void StreamlineTrackingFilter::GenerateData()
             seedpoints.push_back(s[1]);
     }
 
+    if (m_Random)
+    {
+        std::srand(std::time(0));
+        std::random_shuffle ( seedpoints.begin(), seedpoints.end() );
+    }
+
+    bool stop = false;
+    unsigned int current_tracts = 0;
     int num_seeds = seedpoints.size();
     itk::Index<3> zeroIndex; zeroIndex.Fill(0);
     int progress = 0;
@@ -695,7 +710,20 @@ void StreamlineTrackingFilter::GenerateData()
 
 #pragma omp critical
             if (tractLength>=m_MinTractLength && counter>=2)
-                m_Tractogram.push_back(fib);
+            {
+                if (!stop)
+                {
+                    m_Tractogram.push_back(fib);
+                    current_tracts++;
+                }
+                if (m_MaxNumTracts>0 && current_tracts>=m_MaxNumTracts)
+                {
+                    i = num_seeds;
+                    if (!stop)
+                        MITK_INFO << "Reconstructed maximum number of tracts (" << current_tracts << "). Stopping tractography.";
+                    stop = true;
+                }
+            }
         }
     }
 

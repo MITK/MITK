@@ -24,6 +24,7 @@ namespace mitk
         , m_FlipX(false)
         , m_FlipY(false)
         , m_FlipZ(false)
+        , m_Mode(MODE::DETERMINISTIC)
     {
 
     }

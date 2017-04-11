@@ -84,6 +84,7 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         tracker->SetSeedOnlyGm(false);
         tracker->SetTrackingHandler(handler);
         tracker->SetMinTractLength(minLength);
+        tracker->SetRandom(false);
 
         if (mitkSeedImage.IsNotNull())
         {
@@ -111,7 +112,6 @@ int mitkStreamlineTrackingTest(int argc, char* argv[])
         {
             MITK_WARN << "TEST FAILED. TRACTOGRAMS ARE NOT EQUAL!";
             mitk::IOUtil::SaveBaseData(fib1, mitk::IOUtil::GetTempPath()+"testBundle.fib");
-            mitk::IOUtil::SaveBaseData(fib2, mitk::IOUtil::GetTempPath()+"refBundle.fib");
             MITK_INFO << "OUTPUT: " << mitk::IOUtil::GetTempPath();
         }
         MITK_TEST_CONDITION_REQUIRED(ok, "Check if tractograms are equal.");

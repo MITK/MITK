@@ -745,10 +745,10 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     centralSliceImage = sliceSelector->GetOutput();
     if ( centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized() )
     {
-      minValue    = centralSliceImage->GetStatistics()->GetScalarValueMin();
-      maxValue    = centralSliceImage->GetStatistics()->GetScalarValueMax();
       min2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMin();
       max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
+      minValue = centralSliceImage->GetStatistics()->GetScalarValueMin();
+      maxValue = centralSliceImage->GetStatistics()->GetScalarValueMax();
     }
 
     bool skipCheck = false;
@@ -757,10 +757,10 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
       {
         // centralSlice is strange, lets look at all data
-        minValue    = image->GetStatistics()->GetScalarValueMin();
-        maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
         min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
         max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
+        minValue = image->GetStatistics()->GetScalarValueMin();
+        maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
       }
       isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
     }

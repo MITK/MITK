@@ -86,6 +86,9 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
   connect((QObject*) this->m_CalculatorThread, SIGNAL(finished()), this, SLOT(OnThreadedStatisticsCalculationEnds()), Qt::QueuedConnection);
   connect((QObject*)(this->m_Controls.m_CopyStatisticsToClipboardPushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnCopyStatisticsToClipboardPushButtonClicked()));
   connect((QObject*)(this->m_Controls.normalizeImagePushButton), SIGNAL(clicked()), (QObject*) this, SLOT(OnNormalizeImagePushButtonClicked()));
+  connect((QObject*)(this->m_Controls.fixedRangeCheckBox), SIGNAL(toggled(bool)), (QObject*) this, SLOT(OnFixedRangeCheckBoxToggled(bool)));
+  connect((QObject*)(this->m_Controls.fixedRangeLowerDoubleSpinBox), SIGNAL(editingFinished()), (QObject*) this, SLOT(OnFixedRangeDoubleSpinBoxChanged()));
+  connect((QObject*)(this->m_Controls.fixedRangeUpperDoubleSpinBox), SIGNAL(editingFinished()), (QObject*) this, SLOT(OnFixedRangeDoubleSpinBoxChanged()));
 
   m_Controls.normalizeImagePushButton->setEnabled(false);
   m_Controls.threeDimToFourDimPushButton->setEnabled(false);
@@ -314,6 +317,16 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
   this->m_Controls.m_DataViewWidget->Replot();
   m_Controls.labelWarning->setVisible(false);
 
+  if (this->m_Controls.fixedRangeCheckBox->isChecked())
+  {
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisScale(2, this->m_Controls.fixedRangeLowerDoubleSpinBox->value(), this->m_Controls.fixedRangeUpperDoubleSpinBox->value());
+  }
+  else
+  {
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, true);
+  }
+
   if(this->DataSanityCheck())
   {
     this->FillStatisticsTableView(this->m_CalculatorThread->GetStatisticsData(), this->m_CalculatorThread->GetStatisticsImage());
@@ -322,6 +335,17 @@ void QmitkCESTStatisticsView::OnThreadedStatisticsCalculationEnds()
   {
     this->Clear();
   }
+}
+
+void QmitkCESTStatisticsView::OnFixedRangeDoubleSpinBoxChanged()
+{
+  if (this->m_Controls.fixedRangeCheckBox->isChecked())
+  {
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisScale(2, this->m_Controls.fixedRangeLowerDoubleSpinBox->value(), this->m_Controls.fixedRangeUpperDoubleSpinBox->value());
+  }
+
+  this->m_Controls.m_DataViewWidget->Replot();
 }
 
 template <typename TPixel, unsigned int VImageDimension>
@@ -381,6 +405,16 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
     this->m_Controls.m_DataViewWidget->SetLegendAttribute(curveId, QwtPlotCurve::LegendShowSymbol);
   }
 
+  if (this->m_Controls.fixedRangeCheckBox->isChecked())
+  {
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, false);
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisScale(2, this->m_Controls.fixedRangeLowerDoubleSpinBox->value(), this->m_Controls.fixedRangeUpperDoubleSpinBox->value());
+  }
+  else
+  {
+    this->m_Controls.m_DataViewWidget->GetPlot()->setAxisAutoScale(2, true);
+  }
+
   QwtLegend* legend = new QwtLegend();
   legend->setFrameShape(QFrame::Box);
   legend->setFrameShadow(QFrame::Sunken);
@@ -394,6 +428,11 @@ void QmitkCESTStatisticsView::PlotPointSet(itk::Image<TPixel, VImageDimension>* 
 
 }
 
+void QmitkCESTStatisticsView::OnFixedRangeCheckBoxToggled(bool state)
+{
+  this->m_Controls.fixedRangeLowerDoubleSpinBox->setEnabled(state);
+  this->m_Controls.fixedRangeUpperDoubleSpinBox->setEnabled(state);
+}
 
 
 void QmitkCESTStatisticsView::OnNormalizeImagePushButtonClicked()

@@ -235,6 +235,95 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="fixedRangeCheckBox">
+       <property name="text">
+        <string>Define manual range</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="fixedRangeLowerLabel">
+       <property name="text">
+        <string>Lower limit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="fixedRangeLowerDoubleSpinBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="minimum">
+        <double>-299.899999999999977</double>
+       </property>
+       <property name="maximum">
+        <double>299.990000000000009</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="fixedRangeUpperLabel">
+       <property name="text">
+        <string>Upper limit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="fixedRangeUpperDoubleSpinBox">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="minimum">
+        <double>-299.899999999999977</double>
+       </property>
+       <property name="maximum">
+        <double>299.990000000000009</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_PlotGroupBox">
      <property name="title">
       <string>Plot</string>

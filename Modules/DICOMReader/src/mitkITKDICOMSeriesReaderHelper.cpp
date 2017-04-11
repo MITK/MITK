@@ -378,11 +378,13 @@ mitk::TimeGeometry::Pointer
     {
       TimeBounds bounds = boundsList[pos];
       if ( pos + 1 < boundListSize )
-      {
+      { //Currently we do not explicitly support "gaps" in the time coverage
+        //thus we set the max time bound of a time step to the min time bound
+        //of its successor.
         bounds[1] = boundsList[pos + 1][0];
       }
 
-      newTimeGeometry->AppendTimeStepClone( templateGeometry, bounds[1], bounds[0] );
+      newTimeGeometry->AppendNewTimeStepClone(templateGeometry, bounds[0], bounds[1]);
     }
     timeGeometry = newTimeGeometry.GetPointer();
   }

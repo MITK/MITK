@@ -16,7 +16,7 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkDIAppSyntheticDataGenerationPerspective.cpp
 )
 
-set(UI_FILES
+set(UI_FILES  
   src/internal/QmitkFiberfoxViewControls.ui
   src/internal/QmitkFieldmapGeneratorViewControls.ui
   
@@ -34,6 +34,7 @@ set(MOC_H_FILES
   src/internal/QmitkFiberfoxView.h
   src/internal/QmitkFieldmapGeneratorView.h
   
+  src/QmitkTensorModelParametersWidget.h
   src/QmitkZeppelinModelParametersWidget.h
   src/QmitkStickModelParametersWidget.h
   src/QmitkDotModelParametersWidget.h
@@ -49,11 +50,11 @@ set(CACHED_RESOURCE_FILES
   
   resources/phantom.png
   resources/syntheticdata.png
+  resources/fieldmap.png
 )
 
 set(QRC_FILES
-  #resources/measurement.qrc
-  #resources/QmitkImageStatisticsView.qrc
+  resources/QmitkDiffusionImaging.qrc
 )
 
 

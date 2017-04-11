@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkODFDetailsWidget_H_
 
 #include "QmitkPlotWidget.h"
-#include <org_mitk_gui_qt_diffusionimaging_Export.h>
+#include <org_mitk_gui_qt_diffusionimaging_reconstruction_Export.h>
 #include <itkOrientationDistributionFunction.h>
 
 
@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class DIFFUSIONIMAGING_EXPORT QmitkODFDetailsWidget : public QmitkPlotWidget
+class DIFFUSIONIMAGING_RECONSTRUCTION_EXPORT QmitkODFDetailsWidget : public QmitkPlotWidget
 {
 Q_OBJECT
 

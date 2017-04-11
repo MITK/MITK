@@ -33,7 +33,6 @@ set(MOC_H_FILES
   src/QmitkODFDetailsWidget.h
   src/QmitkResidualAnalysisWidget.h
   src/QmitkResidualViewWidget.h
-  src/QmitkTensorModelParametersWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -45,7 +44,6 @@ set(CACHED_RESOURCE_FILES
   resources/recontensor.png
   resources/tensor.png
   resources/qball.png
-  resources/odf.png
 )
 
 set(QRC_FILES

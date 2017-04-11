@@ -23,7 +23,6 @@ set(MITK_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.core.ext:OFF
   org.mitk.core.jobs:OFF
-  org.mitk.diffusionimaging:OFF
   org.mitk.simulation:OFF
   org.mitk.gui.qt.application:ON
   org.mitk.gui.qt.coreapplication:OFF
@@ -42,10 +41,17 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.dicominspector:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.diffusionimaging.connectomics:OFF
+  org.mitk.gui.qt.diffusionimaging.denoising:OFF
+  org.mitk.gui.qt.diffusionimaging.fiberfox:OFF
+  org.mitk.gui.qt.diffusionimaging.fiberprocessing:OFF
+  org.mitk.gui.qt.diffusionimaging.ivim:OFF
+  org.mitk.gui.qt.diffusionimaging.odfpeaks:OFF
+  org.mitk.gui.qt.diffusionimaging.partialvolume:OFF
+  org.mitk.gui.qt.diffusionimaging.preprocessing:OFF
+  org.mitk.gui.qt.diffusionimaging.reconstruction:OFF
+  org.mitk.gui.qt.diffusionimaging.registration:OFF
   org.mitk.gui.qt.diffusionimaging.tbss:OFF
   org.mitk.gui.qt.diffusionimaging.tractography:OFF
-  org.mitk.gui.qt.diffusionimaging.fiberfox:OFF
-  org.mitk.gui.qt.diffusionimaging.reconstruction:OFF
   org.mitk.gui.qt.dosevisualization:OFF
   org.mitk.gui.qt.geometrytools:OFF
   org.mitk.gui.qt.igtexamples:OFF

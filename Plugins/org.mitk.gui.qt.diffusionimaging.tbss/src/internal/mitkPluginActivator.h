@@ -23,7 +23,7 @@ namespace mitk
   class PluginActivator : public QObject, public ctkPluginActivator
   {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.mitk.gui.qt.measurementtoolbox")
+    Q_PLUGIN_METADATA(IID "org.mitk.gui.qt.diffusionimaging.tbss")
     Q_INTERFACES(ctkPluginActivator)
 
   public:

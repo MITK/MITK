@@ -16,68 +16,20 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPluginActivator.h"
 
 #include "src/internal/Perspectives/QmitkDiffusionImagingAppPerspective.h"
-
-#include "src/internal/Perspectives/QmitkDIAppIVIMPerspective.h"
-#include "src/internal/Perspectives/QmitkGibbsTractographyPerspective.h"
-#include "src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h"
-#include "src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h"
-#include "src/internal/Perspectives/QmitkFiberProcessingPerspective.h"
 #include "src/internal/Perspectives/QmitkDiffusionDefaultPerspective.h"
-#include "src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h"
 
-#include "src/internal/QmitkPreprocessingView.h"
 #include "src/internal/QmitkDiffusionDicomImportView.h"
 #include "src/internal/QmitkControlVisualizationPropertiesView.h"
-#include "src/internal/QmitkGibbsTrackingView.h"
-#include "src/internal/QmitkStochasticFiberTrackingView.h"
-#include "src/internal/QmitkFiberQuantificationView.h"
-#include "src/internal/QmitkPartialVolumeAnalysisView.h"
-#include "src/internal/QmitkIVIMView.h"
-#include "src/internal/QmitkTractbasedSpatialStatisticsView.h"
-#include "src/internal/QmitkTbssSkeletonizationView.h"
-#include "src/internal/QmitkStreamlineTrackingView.h"
-#include "src/internal/Connectomics/QmitkConnectomicsDataView.h"
-#include "src/internal/Connectomics/QmitkConnectomicsNetworkOperationsView.h"
-#include "src/internal/Connectomics/QmitkConnectomicsStatisticsView.h"
-#include "src/internal/Connectomics/QmitkRandomParcellationView.h"
-#include "src/internal/QmitkFiberProcessingView.h"
-#include "src/internal/QmitkDiffusionRegistrationView.h"
-#include "src/internal/QmitkDenoisingView.h"
-#include "src/internal/QmitkMLBTView.h"
 
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionImagingAppPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTractographyPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTractographyPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMachineLearningTractographyPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkProbabilisticTractographyPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDIAppIVIMPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionDefaultPerspective, context)
 
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPreprocessingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionDicomImport, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkControlVisualizationPropertiesView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTrackingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStochasticFiberTrackingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberQuantificationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPartialVolumeAnalysisView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkIVIMView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkTractbasedSpatialStatisticsView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkTbssSkeletonizationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsDataView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsNetworkOperationsView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkConnectomicsStatisticsView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTrackingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkOdfMaximaExtractionView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkFiberProcessingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDiffusionRegistrationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkDenoisingView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkRandomParcellationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMLBTView, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

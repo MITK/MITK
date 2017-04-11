@@ -1,27 +1,37 @@
 set(SRC_CPP_FILES
-
+  QmitkTbssRoiAnalysisWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  #QmitkImageStatisticsCalculationThread.cpp
+  QmitkTractbasedSpatialStatisticsView.cpp
+  QmitkTbssTableModel.cpp
+  QmitkTbssMetaTableModel.cpp
+  QmitkTbssSkeletonizationView.cpp
+  
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
-  #src/internal/QmitkImageStatisticsViewControls.ui
+  src/internal/QmitkTractbasedSpatialStatisticsViewControls.ui
+  src/internal/QmitkTbssSkeletonizationViewControls.ui
 )
 
 set(MOC_H_FILES
-  #src/internal/QmitkMeasurementView.h
+  src/internal/mitkPluginActivator.h
+  
+  src/internal/QmitkTractbasedSpatialStatisticsView.h
+  src/internal/QmitkTbssSkeletonizationView.h
+  src/QmitkTbssRoiAnalysisWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  
+  resources/tbss.png
 )
 
 set(QRC_FILES
-  #resources/measurement.qrc
-  #resources/QmitkImageStatisticsView.qrc
+
 )
 
 

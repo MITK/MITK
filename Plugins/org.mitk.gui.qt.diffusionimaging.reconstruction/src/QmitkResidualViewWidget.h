@@ -23,14 +23,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMouseEvent>
 #include <QGraphicsPixmapItem>
 
-#include <org_mitk_gui_qt_diffusionimaging_Export.h>
+#include <org_mitk_gui_qt_diffusionimaging_reconstruction_Export.h>
 
 
 /**
  * \brief Widget for displaying the residual between an original dwi image and the dwi estimated from a tensor image
  *
  */
-class DIFFUSIONIMAGING_EXPORT QmitkResidualViewWidget : public QGraphicsView
+class DIFFUSIONIMAGING_RECONSTRUCTION_EXPORT QmitkResidualViewWidget : public QGraphicsView
 {
 
 Q_OBJECT

@@ -996,7 +996,7 @@
             </property>
             <property name="icon">
              <iconset resource="../../resources/QmitkDiffusionImaging.qrc">
-              <normaloff>:/QmitkDiffusionImaging/refresh.xpm</normaloff>:/QmitkDiffusionImaging/refresh.xpm</iconset>
+              <normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</normaloff>:/QmitkDiffusionImaging/general_icons/refresh.ico</iconset>
             </property>
             <property name="iconSize">
              <size>

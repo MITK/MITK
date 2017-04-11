@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkPlotWidget.h"
 
-#include <org_mitk_gui_qt_diffusionimaging_Export.h>
+#include <org_mitk_gui_qt_diffusionimaging_reconstruction_Export.h>
 
 class QwtPlotPicker;
 
@@ -27,7 +27,7 @@ class QwtPlotPicker;
  * \brief Widget for displaying boxplots
  * framework
  */
-class DIFFUSIONIMAGING_EXPORT QmitkResidualAnalysisWidget : public QmitkPlotWidget
+class DIFFUSIONIMAGING_RECONSTRUCTION_EXPORT QmitkResidualAnalysisWidget : public QmitkPlotWidget
 {
 
 Q_OBJECT

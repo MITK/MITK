@@ -17,7 +17,7 @@
     name="Fieldmap Generator"
     category="Simulated data"
     class="QmitkFieldmapGeneratorView"
-    icon="resources/odf.png">
+    icon="resources/fieldmap.png">
     <keywordReference id="org.mitk.views.fiberfoxview.Keyword"/>
     </view>
 	

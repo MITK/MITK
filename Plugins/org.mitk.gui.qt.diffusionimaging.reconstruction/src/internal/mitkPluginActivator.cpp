@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkTensorReconstructionView.h"
 #include "src/internal/QmitkDiffusionQuantificationView.h"
 #include "src/internal/QmitkODFDetailsView.h"
-#include "src/internal/QmitkOdfMaximaExtractionView.h"
 
 ctkPluginContext* mitk::PluginActivator::m_Context = nullptr;
 

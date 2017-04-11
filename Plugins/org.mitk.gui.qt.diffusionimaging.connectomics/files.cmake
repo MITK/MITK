@@ -1,27 +1,51 @@
 set(SRC_CPP_FILES
-
+  QmitkFreeSurferParcellationHandler.cpp
+  QmitkFreeSurferParcellationWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
-  #QmitkImageStatisticsCalculationThread.cpp
+  QmitkConnectomicsDataView.cpp
+  QmitkConnectomicsNetworkOperationsView.cpp
+  QmitkConnectomicsStatisticsView.cpp
+  QmitkNetworkHistogramCanvas.cpp
+  QmitkRandomParcellationView.cpp
+  
   mitkPluginActivator.cpp
 )
 
 set(UI_FILES
-  #src/internal/QmitkImageStatisticsViewControls.ui
+  src/internal/QmitkConnectomicsDataViewControls.ui
+  src/internal/QmitkConnectomicsNetworkOperationsViewControls.ui
+  src/internal/QmitkConnectomicsStatisticsViewControls.ui
+  src/internal/QmitkRandomParcellationViewControls.ui
+  
+  src/QmitkFreeSurferParcellationWidgetControls.ui
 )
 
 set(MOC_H_FILES
-  #src/internal/QmitkMeasurementView.h
+  src/internal/mitkPluginActivator.h
+  
+  src/internal/QmitkConnectomicsDataView.h
+  src/internal/QmitkConnectomicsNetworkOperationsView.h
+  src/internal/QmitkConnectomicsStatisticsView.h
+  src/internal/QmitkNetworkHistogramCanvas.h
+  src/internal/QmitkRandomParcellationView.h
+  
+  src/QmitkFreeSurferParcellationHandler.h
+  src/QmitkFreeSurferParcellationWidget.h
 )
 
 set(CACHED_RESOURCE_FILES
   plugin.xml
+  
+  resources/QmitkConnectomicsDataViewIcon_48.png
+  resources/QmitkConnectomicsNetworkOperationsViewIcon_48.png
+  resources/QmitkConnectomicsStatisticsViewIcon_48.png
+  resources/QmitkRandomParcellationIcon.png
 )
 
 set(QRC_FILES
-  #resources/measurement.qrc
-  #resources/QmitkImageStatisticsView.qrc
+  resources/QmitkDiffusionImaging.qrc
 )
 
 

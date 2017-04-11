@@ -20,13 +20,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QWidget>
 #include <QString>
 #include "ui_QmitkZeppelinModelParametersWidgetControls.h"
-#include <org_mitk_gui_qt_diffusionimaging_Export.h>
+#include <org_mitk_gui_qt_diffusionimaging_fiberfox_Export.h>
 
 class QmitkStdMultiWidget;
 
 /** @brief
   */
-class DIFFUSIONIMAGING_EXPORT QmitkZeppelinModelParametersWidget : public QWidget
+class DIFFUSIONIMAGING_FIBERFOX_EXPORT QmitkZeppelinModelParametersWidget : public QWidget
 {
     //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
     Q_OBJECT

@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkODFRenderWidget_H_
 
 
-#include <org_mitk_gui_qt_diffusionimaging_Export.h>
+#include <org_mitk_gui_qt_diffusionimaging_reconstruction_Export.h>
 
 #include <QWidget>
 #include <QmitkRenderWindow.h>
@@ -37,7 +37,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyDataMapper.h>
 #include <vtkCamera.h>
 
-class DIFFUSIONIMAGING_EXPORT QmitkODFRenderWidget : public QWidget
+class DIFFUSIONIMAGING_RECONSTRUCTION_EXPORT QmitkODFRenderWidget : public QWidget
 {
   Q_OBJECT
 

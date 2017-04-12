@@ -870,6 +870,7 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
     segSurface->SetVisibility(false);
     m_DataStorage->Add(segSurface, segmentationNode);
     this->Show3DInterpolationResult(false);
+    emit SignalCreated3dInterpolation();
   }
 }
 

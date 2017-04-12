@@ -151,6 +151,7 @@ const static QString TR_INTERPOLATION_REINIT;
 
     void SignalRememberContourPositions(bool);
     void SignalShowMarkerNodes(bool);
+    void SignalCreated3dInterpolation();
 
   public slots:
 

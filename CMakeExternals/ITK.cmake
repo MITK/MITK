@@ -56,10 +56,11 @@ if(NOT DEFINED ITK_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.9.0.tar.xz
-     URL_MD5 0ce83c0f3c08f8ee992675fca4401572
+     URL /media/neher/Rumpelkammer/toolkits/InsightToolkit-4.11.0.tar.gz
+     #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.9.0.tar.xz
+     #URL_MD5 0ce83c0f3c08f8ee992675fca4401572
      # work with external GDCM
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9.0.patch
+     #PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.9.0.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
@@ -67,6 +68,11 @@ if(NOT DEFINED ITK_DIR)
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
        -DITK_USE_SYSTEM_HDF5:BOOL=ON
+       -DHDF5_DIR=${ep_prefix}
+       -DHDF5_hdf5_LIBRARY_DEBUG=${ep_prefix}/lib
+       -DHDF5_hdf5_LIBRARY_RELEASE=${ep_prefix}/lib
+       -DHDF5_hdf5_cpp_LIBRARY_DEBUG=${ep_prefix}/lib
+       -DHDF5_hdf5_cpp_LIBRARY_RELEASE=${ep_prefix}/lib
        -DGDCM_DIR:PATH=${GDCM_DIR}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}

@@ -154,6 +154,7 @@ set(CPP_FILES
   DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
   DataManagement/mitkTransferFunctionInitializer.cpp
+  DataManagement/mitkTransferFunctionPresetManager.cpp
   DataManagement/mitkTransferFunctionProperty.cpp
   DataManagement/mitkTemporoSpatialStringProperty.cpp
   DataManagement/mitkVector.cpp

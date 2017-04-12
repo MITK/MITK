@@ -67,33 +67,9 @@ protected:
 private:
   int m_Mode;
   mitk::TransferFunction::Pointer m_transferFunction;
-
-  //Define Transfer Function
-  enum TransferFunctionMode{
-   TF_CT_DEFAULT,
-   TF_CT_BLACK_WHITE,
-   TF_CT_THORAX_LARGE,
-   TF_CT_THORAX_SMALL,
-   TF_CT_BONE,
-   TF_CT_BONE_GRADIENT,
-   TF_CT_CARDIAC,
-   TF_MR_GENERIC
-  };
-
-  //remove all old points
-  void RemoveAllPoints();
-  void SetModified();
-  void SetCtDefaultMode();
-  void SetCtBlackWhiteMode();
-  void SetCtThoraxLargeMode();
-  void SetCtThoraxSmallMode();
-  void SetCtBoneMode();
-  void SetCtBoneGradientMode();
-  void SetCtCardiacMode();
-  void SetMrGenericMode();
-
 };
 
 }
 
 #endif /* MITK_TRANSFER_FUNCTION_MODE_CREATOR_H_HEADER_INCLUDED */
+

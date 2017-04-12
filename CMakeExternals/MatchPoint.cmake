@@ -35,6 +35,7 @@ if(MITK_USE_MatchPoint)
        ${download_step}
        # INSTALL_COMMAND "${CMAKE_COMMAND} -P cmake_install.cmake"
        CMAKE_GENERATOR ${gen}
+       PATCH_COMMAND ${PATCH_COMMAND} --binary -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/MatchPoint.patch
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_cmake_args}
@@ -44,6 +45,7 @@ if(MITK_USE_MatchPoint)
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
          -DGDCM_DIR:PATH=${GDCM_DIR}
+         -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS

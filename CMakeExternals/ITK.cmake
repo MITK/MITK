@@ -67,13 +67,9 @@ if(NOT DEFINED ITK_DIR)
        ${additional_cmake_args}
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
-       -DITK_USE_SYSTEM_HDF5:BOOL=ON
-       -DHDF5_DIR=${ep_prefix}
-       -DHDF5_hdf5_LIBRARY_DEBUG=${ep_prefix}/lib
-       -DHDF5_hdf5_LIBRARY_RELEASE=${ep_prefix}/lib
-       -DHDF5_hdf5_cpp_LIBRARY_DEBUG=${ep_prefix}/lib
-       -DHDF5_hdf5_cpp_LIBRARY_RELEASE=${ep_prefix}/lib
        -DGDCM_DIR:PATH=${GDCM_DIR}
+       -DITK_USE_SYSTEM_HDF5:BOOL=ON
+       -DHDF5_DIR:PATH=${HDF5_DIR}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}
      CMAKE_CACHE_DEFAULT_ARGS

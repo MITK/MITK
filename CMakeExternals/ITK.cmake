@@ -66,6 +66,7 @@ if(NOT DEFINED ITK_DIR)
        ${additional_cmake_args}
        -DBUILD_EXAMPLES:BOOL=OFF
        -DITK_USE_SYSTEM_GDCM:BOOL=ON
+       -DITK_USE_SYSTEM_HDF5:BOOL=ON
        -DGDCM_DIR:PATH=${GDCM_DIR}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}

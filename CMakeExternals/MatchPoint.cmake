@@ -26,9 +26,8 @@ if(MITK_USE_MatchPoint)
       set(download_step SOURCE_DIR ${MatchPoint_SOURCE_DIR})
     else()
       set(download_step
-          URL /home/neher/Downloads/MatchPoint_rev1681_unix-lineendings-cmakelists.tar.gz
-          #URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev1681.tar.gz
-          #URL_MD5 fa18c890751a192ac72803d115a1c702
+          URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev1681_unix-lineendings-cmakelists.tar.gz
+          URL_MD5 00c7fb2734ba53b9746d7a695d35eb4b
          )
     endif()
 

@@ -21,6 +21,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vector>
 #include <iostream>
 #include <limits>
+#include <map>
 
 #include <boost/filesystem.hpp>
 
@@ -173,6 +174,36 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
   return image;
 }
 
+namespace
+{
+  typedef std::map<std::string, std::vector<std::string>> DicomTagToValueList;
+}
+
+inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagToValueList& list)
+{
+  typedef itk::MetaDataDictionary DictionaryType;
+  typedef itk::MetaDataObject<std::string> MetaDataStringType;
+  
+  DictionaryType::ConstIterator itr = fromDict.Begin();
+  DictionaryType::ConstIterator end = fromDict.End();
+  
+  while (itr != end)
+  {
+    itk::MetaDataObjectBase::Pointer entry = itr->second;
+    
+    MetaDataStringType::Pointer entryvalue = dynamic_cast<MetaDataStringType*>(entry.GetPointer());
+    if (entryvalue)
+    {
+      std::string tagkey = itr->first;
+      std::string tagvalue = entryvalue->GetMetaDataObjectValue();
+      
+      list[tagkey].push_back(tagvalue);
+    }
+
+    ++itr;
+  }
+}
+
 // TODO This function is for debugging purposes. It allows you to save itkImage in the DICOM file set.
 // dumpFilePath - The path to which the received DICOM files.
 template <typename ImageType>
@@ -278,9 +309,21 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
 
   // Get MetaDataDictionary and copy him to MITK Image
-  mitk::ReaderType::DictionaryArrayType outputArray;
+  /*mitk::ReaderType::DictionaryArrayType outputArray;
   CopyDictionaryFromReader<ReaderType>(reader, outputArray);
-  image->SetMetaDataDictionaryArray(outputArray);
+  image->SetMetaDataDictionaryArray(outputArray);*/
+
+  mitk::ReaderType::DictionaryArrayRawPointer inputDict = reader->GetMetaDataDictionaryArray();
+
+  DicomTagToValueList list;
+  mitk::ReaderType::DictionaryArrayType::const_iterator iter = inputDict->begin();
+  for (; iter != inputDict->end(); ++iter)
+  {
+    AddMetaDataToDictionary(*(*(iter)), list);
+  }
+
+  image->SaveMetaDataDictionaryArraySize(inputDict->size());
+  image->SetMetaDataDictionary(list);
 
   return image;
 }

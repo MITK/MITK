@@ -14,6 +14,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <string>
+#include <vector>
+
 //MITK
 #include "mitkImage.h"
 #include "mitkImageStatisticsHolder.h"
@@ -22,6 +25,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCompareImageDataFilter.h"
 #include "mitkImageVtkReadAccessor.h"
 #include "mitkImageVtkWriteAccessor.h"
+
+#include "mitkDicomTagsList.h"
+#include "mitkSliceNavigationController.h"
 
 //VTK
 #include <vtkImageData.h>
@@ -35,14 +41,128 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
 { _arr[i] = _value; }
 
-mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
+void mitk::Image::SaveMetaDataDictionaryArraySize(const unsigned int size)
 {
-  return m_MetaDataDictionaryArray;
+  m_MetaDataDictionaryArraySize = size;
 }
 
-void mitk::Image::SetMetaDataDictionaryArray(mitk::ReaderType::DictionaryArrayType& array)
+int indexFromMatrixRow(mitk::Matrix3D matrix, int row)
 {
-  m_MetaDataDictionaryArray = array;
+  int index = 0;
+  if (matrix[row][0] != 0) {
+    index = 0;
+  } else if (matrix[row][1] != 0) {
+    index = 1;
+  } else {
+    index = 2;
+  }
+  
+  return index;
+}
+
+mitk::Matrix3D getNearestStandardMatrix(mitk::Matrix3D imageMatrix, mitk::Vector3D spacing)
+{
+  mitk::Matrix3D result;
+  result.Fill(0.0);
+
+  for (int row = 0; row < 3; ++row) {
+    int maxAxisIndex = 0;
+    double maxAxisVal = abs(imageMatrix[row][0] / spacing[0]);
+    for (int column = 1; column < 3; ++column) {
+      double normalizedVal = abs(imageMatrix[row][column] / spacing[column]);
+      if (normalizedVal > maxAxisVal) {
+        maxAxisVal = normalizedVal;
+        maxAxisIndex = column;
+      }
+    }
+    
+    if (imageMatrix[row][maxAxisIndex] > 0) {
+      result[row][maxAxisIndex] = 1.0;
+    } else {
+      result[row][maxAxisIndex] = -1.0;
+    }
+    
+  }
+
+  return result;
+}
+
+mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
+{
+  mitk::Matrix3D imageMatrix = GetSlicedGeometry()->GetIndexToWorldTransform()->GetMatrix();
+  mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+  mitk::Vector3D spacingVector = slicedGeometry->GetSpacing();
+  
+  mitk::Matrix3D matrix = getNearestStandardMatrix(imageMatrix, spacingVector);
+  mitk::Matrix3D transposedMatrix = static_cast<mitk::Matrix3D>(matrix.GetTranspose());
+  
+  int mainAxisIndex = indexFromMatrixRow(transposedMatrix, 2);
+  
+  int direction;
+  switch (mainAxisIndex) {
+    case 0:
+      direction = mitk::SliceNavigationController::Sagittal;
+      break;
+      
+    case 1:
+      direction = mitk::SliceNavigationController::Frontal;
+      break;
+      
+    case 2:
+      direction = mitk::SliceNavigationController::Axial;
+      break;
+  }
+
+  int workIndex = 0;
+  if (direction == mitk::SliceNavigationController::Axial) {
+    workIndex = 2;
+  } else if (direction == mitk::SliceNavigationController::Sagittal) {
+    workIndex = 0;
+  } else if (direction == mitk::SliceNavigationController::Frontal) {
+    workIndex = 1;
+  }
+  
+  int numberSlices = GetLargestPossibleRegion().GetSize()[workIndex];
+  
+  mitk::ReaderType::DictionaryArrayType outputArray;
+  outputArray.resize(numberSlices);
+
+  for (unsigned int i = 0; i < dicomTagsList.size(); ++i)
+  {
+    mitk::StringLookupTableProperty* tagsValueList =
+    dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(dicomTagsList[i].c_str()).GetPointer());
+    if (tagsValueList == nullptr)
+    {
+      // TODO: add generate tags value list.
+      continue;
+    }
+
+    for (unsigned int j = 0; j < tagsValueList->GetValue().GetLookupTable().size(); ++j)
+    {
+      std::string tagkey = dicomTagsList[i];
+      std::string tagvalue = tagsValueList->GetValue().GetTableValue(j);
+      itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, tagvalue);
+    }
+  }
+  
+  return outputArray;
+}
+
+void mitk::Image::SetMetaDataDictionary(DicomTagToValueList& array)
+{
+  DicomTagToValueList::iterator iter = array.begin();
+  for (; iter != array.end(); ++iter)
+  {
+    StringLookupTable valueList;
+    
+    std::vector<std::string>::iterator iterString = iter->second.begin();
+    for (unsigned int i = 0; iterString != iter->second.end(); ++iter, ++i)
+    {
+      valueList.SetTableValue(i, *iterString);
+    }
+
+    SetProperty(iter->first.c_str(), StringLookupTableProperty::New(valueList));
+  }
 }
 
 mitk::Image::Image() :
@@ -53,6 +173,7 @@ mitk::Image::Image() :
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
 
   m_Initialized = false;
+  m_MetaDataDictionaryArraySize = 0;
 }
 
 mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Dimensions(nullptr),
@@ -90,11 +211,6 @@ mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Di
 mitk::Image::~Image()
 {
   this->Clear();
-
-  for (auto dict : m_MetaDataDictionaryArray) {
-    delete dict;
-    dict = nullptr;
-  }
 
   m_ReferenceCount = 3;
   m_ReferenceCount = 0;

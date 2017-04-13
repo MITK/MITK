@@ -77,6 +77,7 @@ set(mitk_modules
   RenderWindowManager
   RenderWindowManagerUI
   CEST
+  DICOMQI
 )
 
 if(MITK_ENABLE_PIC_READER)

@@ -14,8 +14,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkIOConstants.h"
-#include <mitkDICOMSegmentationConstants.h>
+#include "mitkDICOMSegmentationConstants.h"
 
 namespace mitk
 {

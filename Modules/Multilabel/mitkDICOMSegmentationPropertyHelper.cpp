@@ -23,7 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkPropertyNameHelper.h>
 #include <mitkStringProperty.h>
 
-#include "MitkMultilabelIOExports.h"
+#include <MitkMultilabelExports.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  struct MITKMULTILABELIO_EXPORT DICOMSegmentationPropertyHandler
+  struct MITKMULTILABEL_EXPORT DICOMSegmentationPropertyHandler
   {
     static PropertyList::Pointer GetDICOMSegmentationProperties(PropertyList *referencedPropertyList)
     {

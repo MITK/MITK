@@ -17,13 +17,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKDICOMSEGMENTATIONCONSTANTS_H_
 #define MITKDICOMSEGMENTATIONCONSTANTS_H_
 
-#include "MitkMultilabelIOExports.h"
-
 #include <mitkDICOMTagPath.h>
+
+#include <MitkMultilabelExports.h>
+
 
 namespace mitk
 {
-  struct MITKMULTILABELIO_EXPORT DICOMSegmentationConstants
+  struct MITKMULTILABEL_EXPORT DICOMSegmentationConstants
   {
     static DICOMTagPath SEGMENT_SEQUENCE_PATH();
     static DICOMTagPath SEGMENT_NUMBER_PATH();

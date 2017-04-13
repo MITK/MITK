@@ -19,21 +19,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usModuleActivator.h>
 #include <usModuleContext.h>
 
-#include "mitkLabelSetImageIO.h"
+#include "mitkDICOMSegmentationIO.h"
 
 namespace mitk
 {
   /**
-  \brief Registers services for multilabel module.
+  \brief Registers services for multilabel dicom module.
   */
-  class MultilabelIOModuleActivator : public us::ModuleActivator
+  class DICOMQIIOModulActivator : public us::ModuleActivator
   {
     std::vector<AbstractFileIO *> m_FileIOs;
 
   public:
     void Load(us::ModuleContext * /*context*/) override
     {
-      m_FileIOs.push_back(new LabelSetImageIO());
+      m_FileIOs.push_back(new DICOMSegmentationIO());
     }
     void Unload(us::ModuleContext *) override
     {
@@ -45,4 +45,4 @@ namespace mitk
   };
 }
 
-US_EXPORT_MODULE_ACTIVATOR(mitk::MultilabelIOModuleActivator)
+US_EXPORT_MODULE_ACTIVATOR(mitk::DICOMQIIOModulActivator)

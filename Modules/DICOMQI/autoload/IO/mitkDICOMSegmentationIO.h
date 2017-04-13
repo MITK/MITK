@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
 
-#include "MitkMultilabelIOExports.h"
+#include "MitkDICOMQIIOExports.h"
 
 namespace mitk
 {
@@ -28,7 +28,7 @@ namespace mitk
    * Read and Writes a LabelSetImage to a dcm file
    * @ingroup Process
    */
-  class MITKMULTILABELIO_EXPORT DICOMSegmentationIO : public mitk::AbstractFileIO
+  class MITKDICOMQIIO_EXPORT DICOMSegmentationIO : public mitk::AbstractFileIO
   {
   public:
     typedef mitk::LabelSetImage InputType;

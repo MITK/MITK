@@ -131,15 +131,19 @@ public:
 
     template < typename ItkImageType >
       friend void _ComputeExtremaInItkImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t);
+    template < typename ItkImageType >
+      friend void _SimpleComputeExtremaInItkImage(const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t);
 
     template < typename ItkImageType >
-      friend void _ComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t, unsigned int component);
+      friend void _ComputeExtremaInItkVectorImage(const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t, unsigned int component);
+    template < typename ItkImageType >
+      friend void _SimpleComputeExtremaInItkVectorImage( const ItkImageType* itkImage, mitk::ImageStatisticsHolder* statisticsHolder, int t, unsigned int component);
 
 protected:
 
       virtual void ResetImageStatistics();
 
-      virtual void ComputeImageStatistics(int t=0, unsigned int component=0);
+      virtual void ComputeImageStatistics(int t=0, unsigned int component=0, bool simple = false);
 
       virtual void Expand( unsigned int timeSteps );
 

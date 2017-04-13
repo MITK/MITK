@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1ba19d9..34ed119 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,6 +28,8 @@ SET(MatchPoint_DLL_INTERFACE_VERSION_STRING "${MatchPoint_DLL_INTERFACE_VERSION_
+ # CMake Function(s) and Macro(s)
+ #-----------------------------------------------------------------------------
+ 
++FIND_PACKAGE(HDF5)
++
+ include(CMake/MacroParseArguments.cmake)
+ include(CMake/mapMacroCreateModuleConf.cmake)
+ include(CMake/mapMacroCreateModule.cmake)

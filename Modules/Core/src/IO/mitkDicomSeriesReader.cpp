@@ -778,6 +778,18 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   const gdcm::Tag tagPhotometricInterpretation(0x0028, 0x0004);
   scanner.AddTag(tagPhotometricInterpretation);
 
+  const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
+  scanner.AddTag(tagAcquisitionNumber);
+
+  const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
+  scanner.AddTag(tagAcquisitionTime);
+
+  const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
+  scanner.AddTag(tagTriggerTime);
+
+  const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
+  scanner.AddTag(tagSOPInstanceUID);
+
   // TODO add further restrictions from arguments (when anybody asks for it)
 
   FileNamesGrouping result;
@@ -967,7 +979,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
             identicalOrigins = false;
           }
 
-          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock) && numberOfFilesInThisBlock == 1)
+          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock) && numberOfFilesInPreviousBlock == 1)
           {
             // group with previous block
             groupsOf3DPlusTBlocks[previousBlockKey].AddFiles( block3DIter->second.GetFilenames() );

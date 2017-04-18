@@ -42,6 +42,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImage.h>
 #include <mitkProperties.h>
 #include <mitkDicomSeriesReader.h>
+#include <mitkLookupTables.h>
+#include <mitkLookupTableProperty.h>
 
 namespace mitk
 {
@@ -176,7 +178,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
 
 namespace
 {
-  typedef std::map<std::string, std::vector<std::string>> DicomTagToValueList;
+  typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
 }
 
 inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagToValueList& list)
@@ -187,6 +189,8 @@ inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagT
   DictionaryType::ConstIterator itr = fromDict.Begin();
   DictionaryType::ConstIterator end = fromDict.End();
   
+  StringLookupTable valueList;
+  unsigned int i = 0;
   while (itr != end)
   {
     itk::MetaDataObjectBase::Pointer entry = itr->second;
@@ -197,10 +201,11 @@ inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagT
       std::string tagkey = itr->first;
       std::string tagvalue = entryvalue->GetMetaDataObjectValue();
       
-      list[tagkey].push_back(tagvalue);
+      list[tagkey].SetTableValue(i, tagvalue);
     }
 
     ++itr;
+    ++i;
   }
 }
 

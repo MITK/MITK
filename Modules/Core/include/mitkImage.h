@@ -32,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDescriptor.h"
 #include "mitkImageAccessorBase.h"
 #include "mitkImageVtkAccessor.h"
+#include <mitkProperties.h>
+#include <mitkLookupTables.h>
+#include <mitkLookupTableProperty.h>
 
 //DEPRECATED
 #include <mitkTimeSlicedGeometry.h>
@@ -52,7 +55,7 @@ template<class T> class MutexLockHolder;
 namespace mitk {
 typedef itk::Image<signed short, 3> ImageTypeForReader;
 typedef itk::ImageSeriesReader<ImageTypeForReader> ReaderType;
-typedef std::map<std::string, std::vector<std::string>> DicomTagToValueList;
+typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
 
 class SubImageSelector;
 class ImageTimeSelector;

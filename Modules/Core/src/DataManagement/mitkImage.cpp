@@ -13,7 +13,9 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#include <boost/format.hpp>
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -127,24 +129,88 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
   mitk::ReaderType::DictionaryArrayType outputArray;
   outputArray.resize(numberSlices);
 
+  for (unsigned int i = 0; i < outputArray.size(); ++i)
+  {
+    outputArray[i] = new mitk::ReaderType::DictionaryType;
+  }
+
   for (unsigned int i = 0; i < dicomTagsList.size(); ++i)
   {
+    std::string tagkey = dicomTagsList[i];
     mitk::StringLookupTableProperty* tagsValueList =
-    dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(dicomTagsList[i].c_str()).GetPointer());
-    if (tagsValueList == nullptr)
-    {
-      // TODO: add generate tags value list.
-      continue;
-    }
+    dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(tagkey.c_str()).GetPointer());
 
-    for (unsigned int j = 0; j < tagsValueList->GetValue().GetLookupTable().size(); ++j)
+    for (unsigned int j = 0; j < outputArray.size(); ++j)
     {
-      std::string tagkey = dicomTagsList[i];
-      std::string tagvalue = tagsValueList->GetValue().GetTableValue(j);
-      itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, tagvalue);
+      std::string tagvalue = std::string();
+
+      if (tagsValueList != nullptr)
+      {
+        tagvalue = tagsValueList->GetValue().GetTableValue(j);
+      }
+      else
+      {
+        if (tagkey == std::string("0008|0016") || tagkey == std::string("0008|0018"))
+        {
+          continue;
+        }
+        
+        auto iter = tagToPropertyMap.find(tagkey);
+        if (iter != tagToPropertyMap.end())
+        {
+          mitk::BaseProperty* modalityProp = GetProperty(iter->second.c_str());
+          tagvalue = (modalityProp) ? modalityProp->GetValueAsString() : "";
+          std::cout << "tagkey = " << tagkey << ", tagvalue = " << tagvalue << ";" << std::endl;
+        }
+
+        mitk::PlaneGeometry* planegeometry = slicedGeometry->GetPlaneGeometry(j);
+        if (planegeometry != nullptr)
+        {
+          mitk::Vector3D spacingVector = planegeometry->GetSpacing();
+          mitk::Point3D originVector = planegeometry->GetOrigin();
+          mitk::Matrix3D imageMatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix();
+
+          imageMatrix[0][0] = imageMatrix[0][0] / spacingVector[0];
+          imageMatrix[1][1] = imageMatrix[1][1] / spacingVector[1];
+
+          std::string imageOrientation = boost::str(boost::format("%d\\%d\\%d\\%d\\%d\\%d")
+          %imageMatrix[0][0] %imageMatrix[0][1] %imageMatrix[0][2]
+          %imageMatrix[1][0] %imageMatrix[1][1] %imageMatrix[1][2]
+          );
+
+          std::string imagePosition = boost::str(boost::format("%d\\%d\\%d")
+          %originVector[0] %originVector[1] %originVector[2]
+          );
+
+          std::string spacing = boost::str(boost::format("%d\\%d\\%d")
+          %spacingVector[0] %spacingVector[1] %spacingVector[2]
+          );
+          
+          if (tagkey == std::string("0020|0037"))
+          {
+            itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, imageOrientation);
+            continue;
+          }
+          else if (tagkey == std::string("0020|0032"))
+          {
+            itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, imagePosition);
+            continue;
+          }
+          else if (tagkey == std::string("0028|0030"))
+          {
+            itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, spacing);
+            continue;
+          }
+        }
+      }
+
+      if (!tagvalue.empty())
+      {
+        itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, tagvalue);
+      }
     }
   }
-  
+
   return outputArray;
 }
 
@@ -153,15 +219,7 @@ void mitk::Image::SetMetaDataDictionary(DicomTagToValueList& array)
   DicomTagToValueList::iterator iter = array.begin();
   for (; iter != array.end(); ++iter)
   {
-    StringLookupTable valueList;
-    
-    std::vector<std::string>::iterator iterString = iter->second.begin();
-    for (unsigned int i = 0; iterString != iter->second.end(); ++iter, ++i)
-    {
-      valueList.SetTableValue(i, *iterString);
-    }
-
-    SetProperty(iter->first.c_str(), StringLookupTableProperty::New(valueList));
+    SetProperty(iter->first.c_str(), StringLookupTableProperty::New(iter->second));
   }
 }
 

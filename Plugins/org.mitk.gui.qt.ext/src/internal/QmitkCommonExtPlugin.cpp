@@ -61,9 +61,6 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
   {
     connect(qApp, SIGNAL(messageReceived(QByteArray)), this, SLOT(handleIPCMessage(QByteArray)));
   }
-
-  // This is a potentially long running operation.
-  loadDataFromDisk(berry::Platform::GetApplicationArgs(), true);
 }
 
 void QmitkCommonExtPlugin::stop(ctkPluginContext* context)

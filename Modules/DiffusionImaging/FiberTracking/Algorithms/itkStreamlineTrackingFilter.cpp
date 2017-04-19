@@ -59,6 +59,7 @@ StreamlineTrackingFilter
     , m_AvoidStop(true)
     , m_DemoMode(false)
     , m_SeedOnlyGm(false)
+    , m_ControlGmEndings(false)
     , m_WmLabel(3) // mrtrix 5ttseg labels
     , m_GmLabel(1) // mrtrix 5ttseg labels
     , m_StepSizeVox(-1)
@@ -73,6 +74,8 @@ StreamlineTrackingFilter
 
 void StreamlineTrackingFilter::BeforeTracking()
 {
+    std::cout.setf(std::ios::boolalpha);
+
     m_TrackingHandler->InitForTracking();
 
     m_FiberPolyData = PolyDataType::New();
@@ -127,6 +130,8 @@ void StreamlineTrackingFilter::BeforeTracking()
         m_StoppingRegions->Allocate();
         m_StoppingRegions->FillBuffer(0);
     }
+    else
+        std::cout << "StreamlineTracking - Using stopping region image" << std::endl;
 
     if (m_SeedImage.IsNull())
     {
@@ -138,6 +143,8 @@ void StreamlineTrackingFilter::BeforeTracking()
         m_SeedImage->Allocate();
         m_SeedImage->FillBuffer(1);
     }
+    else
+        std::cout << "StreamlineTracking - Using seed image" << std::endl;
 
     if (m_MaskImage.IsNull())
     {
@@ -151,7 +158,31 @@ void StreamlineTrackingFilter::BeforeTracking()
         m_MaskImage->FillBuffer(1);
     }
     else
-        std::cout << "StreamlineTrackingFilter: using mask image" << std::endl;
+        std::cout << "StreamlineTracking - Using mask image" << std::endl;
+
+    if (m_TissueImage.IsNull())
+    {
+        if (m_SeedOnlyGm)
+        {
+            MITK_WARN << "StreamlineTracking - Cannot seed in gray matter. No tissue type image set.";
+            m_SeedOnlyGm = false;
+        }
+
+        if (m_ControlGmEndings)
+        {
+            MITK_WARN << "StreamlineTracking - Cannot control gray matter endings. No tissue type image set.";
+            m_ControlGmEndings = false;
+        }
+    }
+    else
+    {
+        if (m_ControlGmEndings)
+            m_SeedOnlyGm = true;
+        if (m_ControlGmEndings || m_SeedOnlyGm)
+            std::cout << "StreamlineTracking - Using tissue image" << std::endl;
+        else
+            MITK_WARN << "StreamlineTracking - Tissue image set but no gray matter seeding or fiber endpoint-control enabled" << std::endl;
+    }
 
     m_BuildFibersReady = 0;
     m_BuildFibersFinished = false;
@@ -160,22 +191,40 @@ void StreamlineTrackingFilter::BeforeTracking()
     m_AlternativePointset = mitk::PointSet::New();
     m_StartTime = std::chrono::system_clock::now();
 
-    if (m_SeedOnlyGm)
+    if (m_SeedOnlyGm && m_ControlGmEndings)
         InitGrayMatterEndings();
 
     if (m_DemoMode)
         omp_set_num_threads(1);
 
-    std::cout << "StreamlineTrackingFilter: Angular threshold: " << m_AngularThreshold << std::endl;
-    std::cout << "StreamlineTrackingFilter: Stepsize: " << m_StepSize << " mm" << std::endl;
-    std::cout << "StreamlineTrackingFilter: Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
-    std::cout << "StreamlineTrackingFilter: Max. sampling distance: " << m_SamplingDistance << " mm" << std::endl;
-    std::cout << "StreamlineTrackingFilter: Deflection modifier: " << m_DeflectionMod << std::endl;
-    std::cout << "StreamlineTrackingFilter: Max. tract length: " << m_MaxTractLength << " mm" << std::endl;
-    std::cout << "StreamlineTrackingFilter: Min. tract length: " << m_MinTractLength << " mm" << std::endl;
-    std::cout << "StreamlineTrackingFilter: Use stop votes: " << m_UseStopVotes << std::endl;
-    std::cout << "StreamlineTrackingFilter: Only frontal samples: " << m_OnlyForwardSamples << std::endl;
-    std::cout << "StreamlineTrackingFilter: Starting streamline tracking" << std::endl;
+    if (m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::DETERMINISTIC)
+        std::cout << "StreamlineTracking - Mode: deterministic" << std::endl;
+    else if(m_TrackingHandler->GetMode()==mitk::TrackingDataHandler::MODE::PROBABILISTIC)
+        std::cout << "StreamlineTracking - Mode: probabilistic" << std::endl;
+    else
+        std::cout << "StreamlineTracking - Mode: ???" << std::endl;
+
+    std::cout << "StreamlineTracking - Angular threshold: " << m_AngularThreshold << " (" << 180*std::acos( m_AngularThreshold )/M_PI << "°)" << std::endl;
+    std::cout << "StreamlineTracking - Stepsize: " << m_StepSize << "mm (" << m_StepSize/minSpacing << "*vox)" << std::endl;
+    std::cout << "StreamlineTracking - Seeds per voxel: " << m_SeedsPerVoxel << std::endl;
+    std::cout << "StreamlineTracking - Max. tract length: " << m_MaxTractLength << "mm" << std::endl;
+    std::cout << "StreamlineTracking - Min. tract length: " << m_MinTractLength << "mm" << std::endl;
+    std::cout << "StreamlineTracking - Max. num. tracts: " << m_MaxNumTracts << std::endl;
+
+    std::cout << "StreamlineTracking - Num. neighborhood samples: " << m_NumberOfSamples << std::endl;
+    std::cout << "StreamlineTracking - Max. sampling distance: " << m_SamplingDistance << "mm (" << m_SamplingDistance/minSpacing << "*vox)" << std::endl;
+    std::cout << "StreamlineTracking - Deflection modifier: " << m_DeflectionMod << std::endl;
+
+    std::cout << "StreamlineTracking - Use stop votes: " << m_UseStopVotes << std::endl;
+    std::cout << "StreamlineTracking - Only frontal samples: " << m_OnlyForwardSamples << std::endl;
+
+    if (m_DemoMode)
+    {
+        std::cout << "StreamlineTracking - Running in demo mode";
+        std::cout << "StreamlineTracking - Starting streamline tracking using 1 thread" << std::endl;
+    }
+    else
+        std::cout << "StreamlineTracking - Starting streamline tracking using " << omp_get_max_threads() << " threads" << std::endl;
 }
 
 
@@ -183,10 +232,10 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
 {
     m_TrackingHandler->SetAngularThreshold(0);
     m_GmStubs.clear();
-    if (m_FourTTImage.IsNotNull())
+    if (m_TissueImage.IsNotNull())
     {
-        std::cout << "StreamlineTrackingFilter: initializing GM endings" << std::endl;
-        ImageRegionConstIterator< ItkUcharImgType > it(m_FourTTImage, m_FourTTImage->GetLargestPossibleRegion() );
+        std::cout << "StreamlineTracking - initializing GM endings" << std::endl;
+        ImageRegionConstIterator< ItkUcharImgType > it(m_TissueImage, m_TissueImage->GetLargestPossibleRegion() );
         it.GoToBegin();
 
         vnl_vector_fixed<float,3> d1; d1.fill(0.0);
@@ -200,7 +249,7 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
             {
                 ItkUcharImgType::IndexType s_idx = it.GetIndex();
                 itk::ContinuousIndex<float, 3> start;
-                m_FourTTImage->TransformIndexToPhysicalPoint(s_idx, start);
+                m_TissueImage->TransformIndexToPhysicalPoint(s_idx, start);
                 itk::Point<float, 3> wm_p;
                 float max = -1;
                 FiberType fib;
@@ -217,11 +266,11 @@ void StreamlineTrackingFilter::InitGrayMatterEndings()
                             e_idx[1] = s_idx[1] + y;
                             e_idx[2] = s_idx[2] + z;
 
-                            if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=m_WmLabel )
+                            if ( !m_TissueImage->GetLargestPossibleRegion().IsInside(e_idx) || m_TissueImage->GetPixel(e_idx)!=m_WmLabel )
                                 continue;
 
                             itk::ContinuousIndex<float, 3> end;
-                            m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
+                            m_TissueImage->TransformIndexToPhysicalPoint(e_idx, end);
 
                             d1 = m_TrackingHandler->ProposeDirection(end, olddirs, s_idx);
                             if (d1.magnitude()<0.0001)
@@ -583,7 +632,7 @@ void StreamlineTrackingFilter::GenerateData()
 
     std::vector< itk::Point<float> > seedpoints;
 
-    if (m_GmStubs.empty())
+    if (!m_ControlGmEndings)
     {
         typedef ImageRegionConstIterator< ItkUcharImgType >     MaskIteratorType;
         MaskIteratorType    sit(m_SeedImage, m_SeedImage->GetLargestPossibleRegion() );
@@ -593,7 +642,7 @@ void StreamlineTrackingFilter::GenerateData()
 
         while( !sit.IsAtEnd() )
         {
-            if (sit.Value()==0 || mit.Value()==0)
+            if (sit.Value()==0 || mit.Value()==0 || (m_SeedOnlyGm && m_TissueImage->GetPixel(sit.GetIndex())!=m_GmLabel))
             {
                 ++sit;
                 ++mit;
@@ -650,7 +699,11 @@ void StreamlineTrackingFilter::GenerateData()
 #pragma omp critical
         {
             progress++;
-            std::cout << progress << '/' << num_seeds << '\r';
+            std::cout << "                                                                                    \r";
+            if (m_MaxNumTracts>0)
+                std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << "/" << m_MaxNumTracts << '\r';
+            else
+                std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << '\r';
             cout.flush();
         }
         itk::Point<float> worldPos = seedpoints.at(i);
@@ -665,7 +718,7 @@ void StreamlineTrackingFilter::GenerateData()
             olddirs.push_back(dir); // start without old directions (only zero directions)
 
         vnl_vector_fixed< float, 3 > gm_start_dir;
-        if (!m_GmStubs.empty())
+        if (m_ControlGmEndings)
         {
             gm_start_dir[0] = m_GmStubs[i][1][0] - m_GmStubs[i][0][0];
             gm_start_dir[1] = m_GmStubs[i][1][1] - m_GmStubs[i][0][1];
@@ -680,7 +733,7 @@ void StreamlineTrackingFilter::GenerateData()
 
         if (dir.magnitude()>0.0001)
         {
-            if (!m_GmStubs.empty())
+            if (m_ControlGmEndings)
             {
                 float a = dot_product(gm_start_dir, dir);
                 if (a<0)
@@ -691,7 +744,7 @@ void StreamlineTrackingFilter::GenerateData()
             tractLength = FollowStreamline(worldPos, dir, &fib, 0, false);
             fib.push_front(worldPos);
 
-            if (!m_GmStubs.empty())
+            if (m_ControlGmEndings)
             {
                 fib.push_front(m_GmStubs[i][0]);
                 CheckFiberForGmEnding(&fib);
@@ -700,7 +753,7 @@ void StreamlineTrackingFilter::GenerateData()
             {
                 // backward tracking (only if we don't explicitely start in the GM)
                 tractLength = FollowStreamline(worldPos, -dir, &fib, tractLength, true);
-                if (m_FourTTImage.IsNotNull())
+                if (m_ControlGmEndings)
                 {
                     CheckFiberForGmEnding(&fib);
                     std::reverse(fib.begin(),fib.end());
@@ -736,7 +789,7 @@ void StreamlineTrackingFilter::GenerateData()
 
 void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
 {
-    if (m_FourTTImage.IsNull())
+    if (m_TissueImage.IsNull())
         return;
 
     // first check if the current fibe rendpoint is located inside of the white matter
@@ -745,8 +798,8 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
     while (!in_wm && fib->size()>2)
     {
         ItkUcharImgType::IndexType idx;
-        m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), idx);
-        if (m_FourTTImage->GetPixel(idx)==m_WmLabel)
+        m_TissueImage->TransformPhysicalPointToIndex(fib->back(), idx);
+        if (m_TissueImage->GetPixel(idx)==m_WmLabel)
             in_wm = true;
         else
             fib->pop_back();
@@ -766,7 +819,7 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
 
     // find closest gray matter voxel
     ItkUcharImgType::IndexType s_idx;
-    m_FourTTImage->TransformPhysicalPointToIndex(fib->back(), s_idx);
+    m_TissueImage->TransformPhysicalPointToIndex(fib->back(), s_idx);
     itk::Point<float> gm_endp;
     float max = -1;
 
@@ -782,11 +835,11 @@ void StreamlineTrackingFilter::CheckFiberForGmEnding(FiberType* fib)
                 e_idx[1] = s_idx[1] + y;
                 e_idx[2] = s_idx[2] + z;
 
-                if ( !m_FourTTImage->GetLargestPossibleRegion().IsInside(e_idx) || m_FourTTImage->GetPixel(e_idx)!=m_GmLabel )
+                if ( !m_TissueImage->GetLargestPossibleRegion().IsInside(e_idx) || m_TissueImage->GetPixel(e_idx)!=m_GmLabel )
                     continue;
 
                 itk::ContinuousIndex<float, 3> end;
-                m_FourTTImage->TransformIndexToPhysicalPoint(e_idx, end);
+                m_TissueImage->TransformIndexToPhysicalPoint(e_idx, end);
                 vnl_vector_fixed< float, 3 > d2;
                 d2[0] = end[0] - fib->back()[0];
                 d2[1] = end[1] - fib->back()[1];
@@ -841,6 +894,7 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
 
 void StreamlineTrackingFilter::AfterTracking()
 {
+    MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);
     MITK_INFO << "done";

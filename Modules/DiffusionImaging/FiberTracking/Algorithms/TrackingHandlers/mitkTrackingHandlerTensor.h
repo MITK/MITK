@@ -55,7 +55,7 @@ public:
         if (m==MODE::DETERMINISTIC)
             m_Mode = m;
         else
-            mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
+            mitkThrow() << "Tensor tracker is only implemented for deterministic mode.";
     }
 
 

@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::String, "Input:", "input fiber bundle (.fib)", us::Any(), false);
     parser.addArgument("output", "o", mitkCommandLineParser::String, "Output:", "output image", us::Any(), false);
-    parser.addArgument("binary", "", mitkCommandLineParser::Int, "Binary output:", "calculate binary tract envelope", us::Any());
-    parser.addArgument("endpoints", "", mitkCommandLineParser::Int, "Output endpoints image:", "calculate image of fiber endpoints instead of mask", us::Any());
+    parser.addArgument("binary", "", mitkCommandLineParser::Bool, "Binary output:", "calculate binary tract envelope", us::Any());
+    parser.addArgument("endpoints", "", mitkCommandLineParser::Bool, "Output endpoints image:", "calculate image of fiber endpoints instead of mask", us::Any());
     parser.addArgument("reference_image", "", mitkCommandLineParser::String, "Reference image:", "output image will have geometry of this reference image", us::Any());
 
 
@@ -70,11 +70,11 @@ int main(int argc, char* argv[])
 
     bool binary = false;
     if (parsedArgs.count("binary"))
-        binary = us::any_cast<int>(parsedArgs["binary"]);
+        binary = us::any_cast<bool>(parsedArgs["binary"]);
 
     bool endpoints = false;
     if (parsedArgs.count("endpoints"))
-        endpoints = us::any_cast<int>(parsedArgs["endpoints"]);
+        endpoints = us::any_cast<bool>(parsedArgs["endpoints"]);
 
     std::string reference_image = "";
     if (parsedArgs.count("reference_image"))
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
         if (endpoints)
         {
-            typedef unsigned char OutPixType;
+            typedef unsigned int OutPixType;
             typedef itk::Image<OutPixType, 3> OutImageType;
 
             typedef itk::TractsToFiberEndingsImageFilter< OutImageType > ImageGeneratorType;

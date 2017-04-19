@@ -151,7 +151,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    void EnableTrackingControls();
    void DisableTrackingControls();
    void EnableDisableTimerButtons(int enable);
-
+   void OnToggleAdvancedSimpleMode();
    void OnToggleDifferentUpdateRates();
 
    //slots for worker thread

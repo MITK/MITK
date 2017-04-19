@@ -163,6 +163,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()));
     connect(m_Controls->m_ConnectDisconnectButton, SIGNAL(clicked()), this, SLOT(OnConnectDisconnect()));
     connect(m_Controls->m_StartStopTrackingButton, SIGNAL(clicked()), this, SLOT(OnStartStopTracking()));
+    connect(m_Controls->m_ConnectSimpleMode, SIGNAL(clicked()), this, SLOT(OnConnectDisconnect()));
+    connect(m_Controls->m_StartTrackingSimpleMode, SIGNAL(clicked()), this, SLOT(OnStartStopTracking()));
     connect(m_Controls->m_FreezeUnfreezeTrackingButton, SIGNAL(clicked()), this, SLOT(OnFreezeUnfreezeTracking()));
     connect(m_TrackingLoggingTimer, SIGNAL(timeout()), this, SLOT(UpdateLoggingTrackingTimer()));
     connect(m_TrackingRenderTimer, SIGNAL(timeout()), this, SLOT(UpdateRenderTrackingTimer()));
@@ -182,6 +184,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_UseDifferentUpdateRates, SIGNAL(clicked()), this, SLOT(OnToggleDifferentUpdateRates()));
     connect(m_Controls->m_RenderUpdateRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangeRenderUpdateRate()));
     connect(m_Controls->m_DisableAllTimers, SIGNAL(stateChanged(int)), this, SLOT(EnableDisableTimerButtons(int)));
+    connect(m_Controls->m_advancedUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
+    connect(m_Controls->m_simpleUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
 
     //connections for the tracking device configuration widget
     connect(m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
@@ -202,6 +206,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //initialize widgets
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
     m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
+    m_Controls->m_simpleWidget->setVisible(false);
 
     //initialize tracking volume node
     m_TrackingVolumeNode = mitk::DataNode::New();
@@ -852,6 +857,21 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
     {
       this->m_Controls->m_LoggingFileName->setText(QDir::toNativeSeparators(currentPath.absolutePath()) + QDir::separator() + currentFile + ".xml");
     }
+  }
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnToggleAdvancedSimpleMode()
+{
+  if (m_Controls->m_simpleWidget->isVisible())
+  {
+    m_Controls->m_simpleWidget->setVisible(false);
+    m_Controls->m_MainWidget->setVisible(true);
+    m_Controls->m_simpleUI->setChecked(false);
+  }
+  else
+  {
+    m_Controls->m_simpleWidget->setVisible(true);
+    m_Controls->m_MainWidget->setVisible(false);
   }
 }
 

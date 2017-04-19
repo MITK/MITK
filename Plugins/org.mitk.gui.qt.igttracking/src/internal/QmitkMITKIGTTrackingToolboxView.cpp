@@ -219,6 +219,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //initialize buttons
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
     m_Controls->m_StartStopTrackingButton->setEnabled(false);
+    m_Controls->m_StartTrackingSimpleMode->setEnabled(false);
     m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 
     //initialize warning labels
@@ -436,7 +437,9 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
 
   m_Controls->m_TrackingControlLabel->setText("Status: connected");
   m_Controls->m_ConnectDisconnectButton->setText("Disconnect");
+  m_Controls->m_ConnectSimpleMode->setText("Disconnect");
   m_Controls->m_StartStopTrackingButton->setEnabled(true);
+  m_Controls->m_StartTrackingSimpleMode->setEnabled(true);
   m_connected = true;
 }
 
@@ -462,10 +465,12 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
 
   //enable/disable Buttons
   m_Controls->m_StartStopTrackingButton->setEnabled(false);
+  m_Controls->m_StartTrackingSimpleMode->setEnabled(false);
   EnableOptionsButtons();
   EnableTrackingConfigurationButtons();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
   m_Controls->m_ConnectDisconnectButton->setText("Connect");
+  m_Controls->m_ConnectSimpleMode->setText("Connect");
   m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
   m_Controls->m_TrackingFrozenLabel->setVisible(false);
   m_connected = false;
@@ -544,6 +549,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_tracking = true;
   m_Controls->m_ConnectDisconnectButton->setEnabled(false);
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
+  m_Controls->m_StartTrackingSimpleMode->setText("Stop\nTracking");
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(true);
 
 }
@@ -577,6 +583,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_tracking = false;
   m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
+  m_Controls->m_StartTrackingSimpleMode->setText("Start\nTracking");
   m_Controls->m_ConnectDisconnectButton->setEnabled(true);
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 

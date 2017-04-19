@@ -99,7 +99,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
   mitk::Matrix3D transposedMatrix = static_cast<mitk::Matrix3D>(matrix.GetTranspose());
   
   int mainAxisIndex = indexFromMatrixRow(transposedMatrix, 2);
-  
+
   int direction;
   switch (mainAxisIndex) {
     case 0:
@@ -123,7 +123,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
   } else if (direction == mitk::SliceNavigationController::Frontal) {
     workIndex = 1;
   }
-  
+
   int numberSlices = GetLargestPossibleRegion().GetSize()[workIndex];
   
   mitk::ReaderType::DictionaryArrayType outputArray;
@@ -150,17 +150,17 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
       }
       else
       {
+        // TODO: To skip these tags is necessary in order for the gdcm to generate them correctly.
         if (tagkey == std::string("0008|0016") || tagkey == std::string("0008|0018"))
         {
           continue;
         }
-        
+
         auto iter = tagToPropertyMap.find(tagkey);
         if (iter != tagToPropertyMap.end())
         {
           mitk::BaseProperty* modalityProp = GetProperty(iter->second.c_str());
           tagvalue = (modalityProp) ? modalityProp->GetValueAsString() : "";
-          std::cout << "tagkey = " << tagkey << ", tagvalue = " << tagvalue << ";" << std::endl;
         }
 
         mitk::PlaneGeometry* planegeometry = slicedGeometry->GetPlaneGeometry(j);

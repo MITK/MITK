@@ -190,7 +190,6 @@ inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagT
   DictionaryType::ConstIterator end = fromDict.End();
   
   StringLookupTable valueList;
-  unsigned int i = 0;
   while (itr != end)
   {
     itk::MetaDataObjectBase::Pointer entry = itr->second;
@@ -201,11 +200,10 @@ inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagT
       std::string tagkey = itr->first;
       std::string tagvalue = entryvalue->GetMetaDataObjectValue();
       
-      list[tagkey].SetTableValue(i, tagvalue);
+      list[tagkey].SetTableValue(list[tagkey].GetLookupTable().size(), tagvalue);
     }
 
     ++itr;
-    ++i;
   }
 }
 

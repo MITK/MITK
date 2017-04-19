@@ -110,7 +110,7 @@ void QmitkIGTTrackingDataEvaluationView::OnComputeRotation()
   itk::Vector<double> rotationVec;
   //adapt for Aurora 5D tools: [0,0,1000]
   rotationVec[0] = 0; //X
-  rotationVec[1] = 10000; //Y
+  rotationVec[1] = 0; //Y
   rotationVec[2] = 10000; //Z
 
 

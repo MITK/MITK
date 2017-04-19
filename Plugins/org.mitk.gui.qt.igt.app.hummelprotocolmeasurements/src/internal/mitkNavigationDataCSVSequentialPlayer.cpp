@@ -134,6 +134,8 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
       std::string buffer;
       std::getline(file, buffer);    // read out file line by line
 
+      readData.push_back(buffer);
+      /*
       //for Polhemus tracker: just take every 24th sample
       if (count == 0) if (buffer.size() > 0)
       {
@@ -141,6 +143,7 @@ std::vector<std::string> mitk::NavigationDataCSVSequentialPlayer::GetFileContent
         //count2++;
         readData.push_back(buffer);
       }
+      */
 
       count++; if (count == 24) count = 0;
     }
@@ -160,7 +163,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
   QString myLine = QString(line.c_str());
 
-  QStringList myLineList = myLine.split(',');
+  QStringList myLineList = myLine.split(';');
 
   mitk::Point3D position;
   mitk::Quaternion orientation;
@@ -183,7 +186,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
 
     //############# Variant for the Aurora measurements ###############
     //#############   (CUSTOM .csv files from MITK)     ###############
-    /*
+
     position[0] = myLineList.at(3).toDouble();
     position[1] = myLineList.at(4).toDouble();
     position[2] = myLineList.at(5).toDouble();
@@ -192,7 +195,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     orientation[1] = myLineList.at(7).toDouble(); //qy
     orientation[2] = myLineList.at(8).toDouble(); //qz
     orientation[3] = myLineList.at(9).toDouble(); //qr
-    */
+
 
     //Variant for the polhemus measurements in August 2016
     //(.csv files from the polhemus software)
@@ -205,10 +208,11 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     //if it turns 11.25 degree to left or right). For
     //other usage this might be important to adapt!
 
-
+    /*
     position[0] = myLineList.at(4).toDouble();
     position[1] = myLineList.at(5).toDouble();
     position[2] = myLineList.at(6).toDouble();
+    */
 
 
     //Doesn't work... don't know how to interpret the
@@ -237,7 +241,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     */
 
 
-
+    /*
     //Using Euler angles instead does work
     //azimuth: rotation about Z axis of reference frame
     double azimuthAngle = (myLineList.at(11).toDouble() / 180 * M_PI);
@@ -247,7 +251,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataCSVSequentialPlayer::GetNaviga
     double rollAngle = (myLineList.at(13).toDouble() / 180 * M_PI);
     vnl_quaternion<double> eulerQuat(rollAngle, elevationAngle, azimuthAngle);
     orientation = eulerQuat;
-
+    */
 
     /*
     //code block for conversion from axis-angular representation

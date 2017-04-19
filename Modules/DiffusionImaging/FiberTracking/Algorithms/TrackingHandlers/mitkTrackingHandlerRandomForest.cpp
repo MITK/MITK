@@ -763,7 +763,6 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
     }
 
     unsigned int num_gm_samples = sampleCounter;
-    MITK_INFO << "WM samples...";
     // white matter samples
     mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
     vtkSmartPointer< vtkPolyData > polyData = fib->GetFiberPolyData();
@@ -918,6 +917,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
     }
   }
   m_Tractograms.clear();
+  MITK_INFO << "done";
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >

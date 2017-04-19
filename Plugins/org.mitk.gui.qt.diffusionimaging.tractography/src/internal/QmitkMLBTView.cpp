@@ -277,6 +277,7 @@ void QmitkMLBTView::StartTracking()
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
     m_ForestHandler->AddDwi(dwi);
+    m_ForestHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
 
 //    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 

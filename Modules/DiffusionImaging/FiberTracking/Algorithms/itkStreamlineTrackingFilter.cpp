@@ -696,17 +696,25 @@ void StreamlineTrackingFilter::GenerateData()
 #pragma omp parallel
     while (i<num_seeds && !stop)
     {
+        int temp_i = i;
+#pragma omp critical
+            i++;
+
+        if (temp_i>=num_seeds || stop)
+            continue;
+
 #pragma omp critical
         {
             progress++;
-            std::cout << "                                                                                    \r";
+            std::cout << "                                                                                                     \r";
             if (m_MaxNumTracts>0)
                 std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << "/" << m_MaxNumTracts << '\r';
             else
                 std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << '\r';
             cout.flush();
         }
-        itk::Point<float> worldPos = seedpoints.at(i);
+
+        itk::Point<float> worldPos = seedpoints.at(temp_i);
         FiberType fib;
         float tractLength = 0;
         unsigned int counter = 0;
@@ -720,9 +728,9 @@ void StreamlineTrackingFilter::GenerateData()
         vnl_vector_fixed< float, 3 > gm_start_dir;
         if (m_ControlGmEndings)
         {
-            gm_start_dir[0] = m_GmStubs[i][1][0] - m_GmStubs[i][0][0];
-            gm_start_dir[1] = m_GmStubs[i][1][1] - m_GmStubs[i][0][1];
-            gm_start_dir[2] = m_GmStubs[i][1][2] - m_GmStubs[i][0][2];
+            gm_start_dir[0] = m_GmStubs[temp_i][1][0] - m_GmStubs[temp_i][0][0];
+            gm_start_dir[1] = m_GmStubs[temp_i][1][1] - m_GmStubs[temp_i][0][1];
+            gm_start_dir[2] = m_GmStubs[temp_i][1][2] - m_GmStubs[temp_i][0][2];
             gm_start_dir.normalize();
             olddirs.pop_back();
             olddirs.push_back(gm_start_dir);
@@ -746,7 +754,7 @@ void StreamlineTrackingFilter::GenerateData()
 
             if (m_ControlGmEndings)
             {
-                fib.push_front(m_GmStubs[i][0]);
+                fib.push_front(m_GmStubs[temp_i][0]);
                 CheckFiberForGmEnding(&fib);
             }
             else
@@ -773,13 +781,14 @@ void StreamlineTrackingFilter::GenerateData()
                 if (m_MaxNumTracts>0 && current_tracts>=m_MaxNumTracts)
                 {
                     if (!stop)
+                    {
+                        std::cout << "                                                                                                     \r";
                         MITK_INFO << "Reconstructed maximum number of tracts (" << current_tracts << "). Stopping tractography.";
+                    }
                     stop = true;
                 }
             }
         }
-#pragma omp critical
-        i++;
     }
 
     this->AfterTracking();
@@ -894,6 +903,7 @@ void StreamlineTrackingFilter::BuildFibers(bool check)
 
 void StreamlineTrackingFilter::AfterTracking()
 {
+    std::cout << "                                                                                                     \r";
     MITK_INFO << "Reconstructed " << m_Tractogram.size() << " fibers.";
     MITK_INFO << "Generating polydata ";
     BuildFibers(false);

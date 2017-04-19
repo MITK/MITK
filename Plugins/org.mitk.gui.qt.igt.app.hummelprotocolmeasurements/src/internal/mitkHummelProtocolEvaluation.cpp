@@ -261,11 +261,11 @@ case medium:
 
   //evaluation of rows
   for (int row = 0; row < 5; row++) //rows
-    for (int distance = 0; distance < 5; distance++)
+    for (int distance = 0; distance < 4; distance++)
     {
       distanceCounter++;
-      mitk::Point3D point1 = p->GetPoint(row * 10 + distance);
-      mitk::Point3D point2 = p->GetPoint(row * 10 + distance + 1);
+      mitk::Point3D point1 = p->GetPoint(row * 5 + distance);
+      mitk::Point3D point2 = p->GetPoint(row * 5 + distance + 1);
       distances.push_back(point1.EuclideanDistanceTo(point2));
       std::stringstream description;
       description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (distance + 1) << " to " << (row + 1) << "/" << (distance + 2);
@@ -274,11 +274,12 @@ case medium:
 
   //evaluation of columns
   for (int column = 0; column < 5; column++)
-    for (int row = 0; row < 5; row++)
+    for (int row = 0; row < 4; row++)
     {
       distanceCounter++;
       mitk::Point3D point1 = matrix[row][column];
       mitk::Point3D point2 = matrix[row + 1][column];
+      MITK_INFO << "Point 1:" << point1 << "/Point 2:" << point2 << "/Distance:" << point1.EuclideanDistanceTo(point2);
       distances.push_back(point1.EuclideanDistanceTo(point2));
       std::stringstream description;
       description << "Distance(" << distanceCounter << ") " << (row + 1) << "/" << (column + 1) << " to " << (row + 2) << "/" << (column + 1);
@@ -365,7 +366,7 @@ std::array<std::array<mitk::Point3D, 10>, 9> mitk::HummelProtocolEvaluation::Par
   for (int row = 0; row < 9; row++)
     for (int column = 0; column < 10; column++)
       returnValue[row][column] = p->GetPoint(row * 10 + column);
-
+  return returnValue;
 }
 
 std::array<std::array<mitk::Point3D, 5>, 5> mitk::HummelProtocolEvaluation::ParseMatrixMediumVolume(mitk::PointSet::Pointer p)
@@ -380,7 +381,12 @@ std::array<std::array<mitk::Point3D, 5>, 5> mitk::HummelProtocolEvaluation::Pars
   }
   for (int row = 0; row < 5; row++)
     for (int column = 0; column < 5; column++)
+    {
       returnValue[row][column] = p->GetPoint(row * 5 + column);
+      //MITK_INFO << "m " << row << "/" << column << ":" << p->GetPoint(row * 5 + column);
+    }
+
+  return returnValue;
 
 }
 

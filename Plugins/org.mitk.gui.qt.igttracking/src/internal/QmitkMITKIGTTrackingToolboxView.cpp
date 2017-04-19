@@ -72,6 +72,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_connected = false;
   m_logging = false;
   m_loggedFrames = 0;
+  m_SimpleModeEnabled = false;
 
   //create filename for autosaving of tool storage
   QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
@@ -869,16 +870,18 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
 
 void QmitkMITKIGTTrackingToolboxView::OnToggleAdvancedSimpleMode()
 {
-  if (m_Controls->m_simpleWidget->isVisible())
+  if (m_SimpleModeEnabled)
   {
     m_Controls->m_simpleWidget->setVisible(false);
     m_Controls->m_MainWidget->setVisible(true);
     m_Controls->m_simpleUI->setChecked(false);
+    m_SimpleModeEnabled = false;
   }
   else
   {
     m_Controls->m_simpleWidget->setVisible(true);
     m_Controls->m_MainWidget->setVisible(false);
+    m_SimpleModeEnabled = true;
   }
 }
 
@@ -1157,11 +1160,12 @@ void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
   QSettings settings;
 
   settings.beginGroup(QString::fromStdString(VIEW_ID));
-
+  MITK_INFO << "Store UI settings";
   // set the values of some widgets and attrbutes to the QSettings
   settings.setValue("ShowTrackingVolume", QVariant(m_Controls->m_ShowTrackingVolume->isChecked()));
   settings.setValue("toolStorageFilename", QVariant(m_ToolStorageFilename));
   settings.setValue("VolumeSelectionBox", QVariant(m_Controls->m_VolumeSelectionBox->currentIndex()));
+  settings.setValue("SimpleModeEnabled", QVariant(m_SimpleModeEnabled));
 
   settings.endGroup();
 }
@@ -1180,7 +1184,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
   m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", true).toBool());
   m_Controls->m_VolumeSelectionBox->setCurrentIndex(settings.value("VolumeSelectionBox", 0).toInt());
   m_ToolStorageFilename = settings.value("toolStorageFilename", QVariant("")).toString();
-
+  if (settings.value("SimpleModeEnabled", false).toBool()) { this->OnToggleAdvancedSimpleMode(); }
   settings.endGroup();
   //! [LoadUISettings]
 

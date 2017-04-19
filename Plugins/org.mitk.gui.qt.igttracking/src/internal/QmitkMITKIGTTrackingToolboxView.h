@@ -201,6 +201,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
    QTimer* m_TrackingLoggingTimer;
    QTimer* m_TimeoutTimer;
 
+   bool m_SimpleModeEnabled; ///>Stores if simple UI mode is enabled
+
    /** Replaces the current navigation tool storage which is stored in m_toolStorage.
     *  Basically handles the microservice stuff: unregisteres the old storage, then
     *  replaces the storage and registers the new one.

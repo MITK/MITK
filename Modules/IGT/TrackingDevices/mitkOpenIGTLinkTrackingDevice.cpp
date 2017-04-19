@@ -284,7 +284,7 @@ void mitk::OpenIGTLinkTrackingDevice::UpdateTools()
 
   mitk::NavigationData::Pointer currentNavData = m_IGTLMsgToNavDataFilter->GetOutput();
   const char* name = currentNavData->GetName();
-  MITK_WARN << name;
+  //MITK_WARN << name;
 
   for (int i = 0; i < m_AllTools.size(); i++)
   {

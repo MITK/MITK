@@ -304,6 +304,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
   double apod_mult = 1;
 
   double mult = 0;
+  unsigned short usedLines = (maxLine - minLine);
 
   //linear delay
   l_i = line / outputL * inputL;
@@ -321,6 +322,7 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
 
     maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
     minLine = (unsigned short)std::max((l_i - part), 0.0);
+    usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
 
@@ -334,8 +336,10 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
 
       if (AddSample < inputS && AddSample >= 0)
         output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];
+      else
+        --usedLines;
     }
-    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / (maxLine - minLine);
+    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / usedLines;
   }
 }
 
@@ -364,6 +368,7 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
   double apod_mult = 1;
 
   double mult = 0;
+  unsigned short usedLines = (maxLine - minLine);
 
   //quadratic delay
   l_i = line / outputL * inputL;
@@ -379,6 +384,8 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
 
     maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
     minLine = (unsigned short)std::max((l_i - part), 0.0);
+    usedLines = (maxLine - minLine);
+
     apod_mult = apodArraySize / (maxLine - minLine);
 
     delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
@@ -386,11 +393,12 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
     for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
     {
       AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
-      if (AddSample < inputS && AddSample >= 0) {
+      if (AddSample < inputS && AddSample >= 0) 
         output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];
-      }
+      else
+        --usedLines;
     }
-    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / (maxLine - minLine);
+    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / usedLines;
   }
 }
 
@@ -419,6 +427,7 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
   double apod_mult = 1;
 
   double mult = 0;
+  unsigned short usedLines = (maxLine - minLine);
 
   //exact delay
 
@@ -435,6 +444,8 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
 
     maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
     minLine = (unsigned short)std::max((l_i - part), 0.0);
+    usedLines = (maxLine - minLine);
+
     apod_mult = apodArraySize / (maxLine - minLine);
 
     for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
@@ -444,11 +455,12 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
         +
         pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
       );
-      if (AddSample < inputS && AddSample >= 0) {
+      if (AddSample < inputS && AddSample >= 0) 
         output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];
-      }
+      else
+        --usedLines;
     }
-    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / (maxLine - minLine);
+    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / usedLines;
   }
 }
 

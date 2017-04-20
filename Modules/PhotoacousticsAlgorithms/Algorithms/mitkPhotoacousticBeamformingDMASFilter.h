@@ -53,8 +53,8 @@ namespace mitk {
       bool Photoacoustic = true;
       double BPHighPass = 50;
       double BPLowPass = 50;
-      double BPFalloff = 0.2;
       bool UseBP = true;
+      unsigned int ButterworthOrder = 8;
     };
 
     void Configure(beamformingSettings settings);

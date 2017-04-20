@@ -538,9 +538,6 @@ mitk::Image::Pointer mitk::BeamformingDASFilter::BandpassFilter(mitk::Image::Poi
 
 itk::Image<double, 3U>::Pointer mitk::BeamformingDASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
-  // tukey window
-  double alpha = m_Conf.BPFalloff;
-
   double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
 
   for (int sample = 0; sample < reference->GetDimension(1); ++sample)
@@ -548,22 +545,35 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingDASFilter::BPFunction(mitk::Ima
     imageData[reference->GetDimension(0)*sample] = 0;
   }
 
+  /* // tukey window
+  double alpha = m_Conf.BPFalloff;
+
   for (int n = 0; n < width; ++n)
   {
-    if (n <= (alpha*(width - 1)) / 2)
-    {
-      imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
-    }
-    else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
-    {
-      imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
-    }
-    else
-    {
-      imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
-    }
+  if (n <= (alpha*(width - 1)) / 2)
+  {
+  imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) - 1))) / 2;
+  }
+  else if (n >= (width - 1)*(1 - alpha / 2) && n <= (width - 1))
+  {
+  imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = (1 + cos(M_PI*(2 * n / (alpha*(width - 1)) + 1 - 2 / alpha))) / 2;
+  }
+  else
+  {
+  imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
+  }
+  }*/
+
+  // Butterworth-Filter
+  double d = center - width / 2;
+  double l = center + width / 2;
+
+  for (int n = 0; n < reference->GetDimension(1); ++n)
+  {
+    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((double)center - (double)n) / ((double)width / 2), 2 * m_Conf.ButterworthOrder));
   }
 
+  // copy and paste to all lines
   for (int line = 1; line < reference->GetDimension(0); ++line)
   {
     for (int sample = 0; sample < reference->GetDimension(1); ++sample)

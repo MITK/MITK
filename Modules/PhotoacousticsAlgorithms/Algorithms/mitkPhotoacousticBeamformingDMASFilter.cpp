@@ -345,7 +345,7 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 
   /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
   toReal->SetInput(multiplyFilter->GetOutput());
-  return GrabItkImageMemory(toReal->GetOutput()); */ //DEBUG
+  return GrabItkImageMemory(addImageFilter->GetOutput());*/  //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();
@@ -357,8 +357,6 @@ mitk::Image::Pointer mitk::BeamformingDMASFilter::BandpassFilter(mitk::Image::Po
 
 itk::Image<double, 3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
-  // tukey window
-  double alpha = m_Conf.BPFalloff;
 
   double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
 
@@ -366,6 +364,9 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Im
   {
     imageData[reference->GetDimension(0)*sample] = 0;
   }
+
+  /* // tukey window
+  double alpha = m_Conf.BPFalloff;
 
   for (int n = 0; n < width; ++n)
   {
@@ -381,8 +382,18 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Im
     {
       imageData[reference->GetDimension(0)*(n + center - (int)(width / 2))] = 1;
     }
+  }*/
+
+  // Butterworth-Filter
+  double d = center - width / 2;
+  double l = center + width / 2;
+
+  for (int n = 0; n < reference->GetDimension(1); ++n)
+  {
+    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((double)center - (double)n) / ((double)width / 2), 2*m_Conf.ButterworthOrder));
   }
 
+  // copy and paste to all lines
   for (int line = 1; line < reference->GetDimension(0); ++line)
   {
     for (int sample = 0; sample < reference->GetDimension(1); ++sample)

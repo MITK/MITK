@@ -133,6 +133,7 @@ set(SRC_CPP_FILES
   application/berryIWorkbenchWindowConfigurer.cpp
   application/berryWorkbenchAdvisor.cpp
   application/berryWorkbenchWindowAdvisor.cpp
+  application/berryMitkConfig.cpp
 
   #commands
   commands/berryICommandImageService.cpp

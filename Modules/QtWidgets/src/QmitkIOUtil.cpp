@@ -16,6 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkIOUtil.h"
 
+#include <map>
+#include <string>
+
+#include <boost/format.hpp>
+#include <boost/thread/once.hpp>
+#include <boost/numeric/conversion/cast.hpp>
+
 #include <mitkIOUtil.h>
 #include <mitkCoreObjectFactory.h>
 #include "mitkCoreServices.h"
@@ -28,6 +35,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkFileReaderOptionsDialog.h"
 #include "QmitkFileWriterOptionsDialog.h"
 
+#include "ConfigManager.h"
+
 // QT
 #include <QFileDialog>
 #include <QMessageBox>
@@ -39,6 +48,257 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <algorithm>
 
+#define MODULE_PREFIX "QmitkIOUtil/"
+
+namespace
+{
+  const char REUSE_READER_COUNT[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "reader_count";
+  const char REUSE_WRITER_COUNT[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "writer_count";
+
+  const char REUSE_MIME_NAME[] = MODULE_PREFIX "mime_%s_%d";
+  const char REUSE_MIME_READER[] = "reader";
+  const char REUSE_MIME_WRITER[] = "writer";
+
+  const char REUSE_REUSED_DESCRIPTION[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "description_%d";
+
+  const char REUSE_OPTIONS_COUNT[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "options_count_%d";
+  const char REUSE_OPTIONS_KEY[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "options_key_%d_%d";
+  const char REUSE_OPTIONS_TYPE[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "options_type_%d_%d";
+  const char REUSE_OPTIONS_VALUE[] = INTERNAL_PARAM_PREFIX MODULE_PREFIX "options_value_%d_%d";
+
+  std::map<std::string, std::string> m_reusedReaders;
+  std::map<std::string, std::string> m_reusedWriters;
+  std::map<std::string, mitk::IFileIO::Options> m_reusedReadersOptions;
+  std::map<std::string, mitk::IFileIO::Options> m_reusedWritersOptions;
+
+  enum AnyType
+  {
+    ANY_UNKNOWN,
+    ANY_STRING,
+    ANY_BOOL,
+    ANY_SHORT,
+    ANY_INT,
+    ANY_USHORT,
+    ANY_UINT,
+    ANY_FLOAT,
+    ANY_DOUBLE
+  };
+
+  void LoadReusedImpl(int count, std::map<std::string, std::string>& reused, std::map<std::string, mitk::IFileIO::Options>& reusedOptions)
+  {
+    auto& configManager = config::ConfigManager::GetInstance();
+    for (auto index = 1; index <= count; ++index) {
+      const auto mime = configManager.GetString(boost::str(boost::format(REUSE_MIME_NAME) % (index > 0 ? REUSE_MIME_READER : REUSE_MIME_WRITER) % abs(index)).c_str(), QString()).toStdString();
+      if (mime.empty()) {
+        continue;
+      }
+      reused.emplace(mime, configManager.GetString(boost::str(boost::format(REUSE_REUSED_DESCRIPTION) % index).c_str(), QString()).toStdString());
+      const auto count = configManager.GetInt(boost::str(boost::format(REUSE_OPTIONS_COUNT) % index).c_str(), 0);
+      auto& options = reusedOptions[mime];
+      for (auto i = 0; i < count; ++i) {
+        const auto key = configManager.GetString(boost::str(boost::format(REUSE_OPTIONS_KEY) % index % i).c_str(), QString()).toStdString();
+        if (key.empty()) {
+          continue;
+        }
+        const auto type = configManager.GetEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_UNKNOWN);
+        switch (type) {
+        case ANY_STRING:
+          options.emplace(key, configManager.GetString(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), QString()).toStdString());
+          break;
+        case ANY_BOOL:
+          options.emplace(key, configManager.GetBool(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), false));
+          break;
+        case ANY_SHORT:
+          options.emplace(key, static_cast<short>(configManager.GetInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), 0)));
+          break;
+        case ANY_INT:
+          options.emplace(key, configManager.GetInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), 0));
+          break;
+        case ANY_USHORT:
+          options.emplace(key, static_cast<unsigned short>(configManager.GetInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), 0)));
+          break;
+        case ANY_UINT:
+          options.emplace(key, static_cast<unsigned int>(configManager.GetInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), 0)));
+          break;
+        case ANY_FLOAT:
+          options.emplace(key, static_cast<float>(configManager.GetDouble(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), 0)));
+          break;
+        case ANY_DOUBLE:
+          options.emplace(key, configManager.GetDouble(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), 0));
+          break;
+        }
+      }
+    }
+  }
+
+  boost::once_flag onceLoadReused = BOOST_ONCE_INIT;
+  void LoadReused()
+  {
+    auto& configManager = config::ConfigManager::GetInstance();
+    LoadReusedImpl(configManager.GetInt(REUSE_READER_COUNT, 0), m_reusedReaders, m_reusedReadersOptions);
+    LoadReusedImpl(configManager.GetInt(REUSE_WRITER_COUNT, 0), m_reusedWriters, m_reusedWritersOptions);
+  }
+
+  int GetReused(const mitk::IOUtil::LoadInfo&, std::map<std::string, std::string>* *reused,
+    std::map<std::string, mitk::IFileIO::Options>** reusedOptions)
+  {
+    *reused = &m_reusedReaders;
+    *reusedOptions = &m_reusedReadersOptions;
+    return boost::numeric_cast<int>(m_reusedReaders.size()) + 1;
+  }
+
+  int GetReused(const mitk::IOUtil::SaveInfo&, std::map<std::string, std::string>** reused,
+    std::map<std::string, mitk::IFileIO::Options>** reusedOptions)
+  {
+    *reused = &m_reusedWriters;
+    *reusedOptions = &m_reusedWritersOptions;
+    return -boost::numeric_cast<int>(m_reusedWriters.size()) - 1;
+  }
+
+  mitk::FileReaderSelector::Item GetSelected(mitk::IOUtil::LoadInfo& loadInfo)
+  {
+    return loadInfo.m_ReaderSelector.GetSelected();
+  }
+
+  mitk::FileWriterSelector::Item GetSelected(mitk::IOUtil::SaveInfo& saveInfo)
+  {
+    return saveInfo.m_WriterSelector.GetSelected();
+  }
+
+  mitk::IFileIO::Options GetOptions(mitk::FileReaderSelector::Item& item)
+  {
+    return item.GetReader()->GetOptions();
+  }
+
+  mitk::IFileIO::Options GetOptions(mitk::FileWriterSelector::Item& item)
+  {
+    return item.GetWriter()->GetOptions();
+  }
+
+  std::vector<mitk::MimeType> GetMimeTypes(mitk::IOUtil::LoadInfo& loadInfo)
+  {
+    return loadInfo.m_ReaderSelector.GetMimeTypes();
+  }
+
+  std::vector<mitk::MimeType> GetMimeTypes(mitk::IOUtil::SaveInfo& saveInfo)
+  {
+    return { saveInfo.m_WriterSelector.GetSelected().GetMimeType() };
+  }
+
+  std::vector<mitk::FileReaderSelector::Item> GetItems(mitk::IOUtil::LoadInfo& loadInfo)
+  {
+    return loadInfo.m_ReaderSelector.Get();
+  }
+
+  std::vector<mitk::FileWriterSelector::Item> GetItems(mitk::IOUtil::SaveInfo& saveInfo)
+  {
+    return saveInfo.m_WriterSelector.Get();
+  }
+
+  void SelectItem(mitk::IOUtil::LoadInfo& loadInfo,
+    const mitk::FileReaderSelector::Item& reader, const mitk::IFileIO::Options& options)
+  {
+    loadInfo.m_ReaderSelector.Select(reader);
+    loadInfo.m_ReaderSelector.GetSelected().GetReader()->SetOptions(options);
+  }
+
+  void SelectItem(mitk::IOUtil::SaveInfo& saveInfo,
+    const mitk::FileWriterSelector::Item& writer, const mitk::IFileIO::Options& options)
+  {
+    saveInfo.m_WriterSelector.Select(writer);
+    saveInfo.m_WriterSelector.GetSelected().GetWriter()->SetOptions(options);
+  }
+
+  template <typename TDialog, typename TInfo>
+  bool OptionsDialogFunctor(TInfo& info)
+  {
+    boost::call_once(&LoadReused, onceLoadReused);
+
+    std::map<std::string, std::string>* reused = nullptr;
+    std::map<std::string, mitk::IFileIO::Options>* reusedOptions = nullptr;
+    const auto index = GetReused(info, &reused, &reusedOptions);
+
+    const auto items = GetItems(info);
+    const auto mimeTypes = GetMimeTypes(info);
+    for (auto type : mimeTypes) {
+      auto iter = reused->find(type.GetName());
+      if (reused->end() == iter) {
+        continue;
+      }
+      for (auto it = items.begin(); it != items.end(); ++it) {
+        if (it->GetMimeType().GetName() != type.GetName()) {
+          continue;
+        }
+        if (it->GetDescription() == iter->second) {
+          SelectItem(info, *it, (*reusedOptions)[type.GetName()]);
+          return false;
+        }
+      }
+    }
+
+    TDialog dialog(info);
+    if (dialog.exec() == QDialog::Accepted) {
+      if (!dialog.ReuseOptions()) {
+        return true;
+      }
+
+      auto selected = GetSelected(info);
+      const auto mime = selected.GetMimeType().GetName();
+      const auto description = selected.GetDescription();
+      const auto options = GetOptions(selected);
+
+      (*reused)[mime] = description;
+      (*reusedOptions)[mime] = options;
+
+      auto& configManager = config::ConfigManager::GetInstance();
+      if (index > 0) {
+        configManager.PutInt(REUSE_READER_COUNT, index);
+      } else if (index < 0) {
+        configManager.PutInt(REUSE_WRITER_COUNT, -index);
+      } else {
+        return false;
+      }
+      configManager.PutString(boost::str(boost::format(REUSE_MIME_NAME) % (index > 0 ? REUSE_MIME_READER : REUSE_MIME_WRITER) % abs(index)).c_str(), mime.c_str());
+      configManager.PutString(boost::str(boost::format(REUSE_REUSED_DESCRIPTION) % index).c_str(), description.c_str());
+      configManager.PutInt(boost::str(boost::format(REUSE_OPTIONS_COUNT) % index).c_str(), options.size());
+      auto iter = options.begin();
+      for (auto i = 0; i < options.size(); ++i, ++iter) {
+        configManager.PutString(boost::str(boost::format(REUSE_OPTIONS_KEY) % index % i).c_str(), iter->first.c_str());
+        const std::type_info& anyType = iter->second.Type();
+        if (anyType == typeid(std::string)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_STRING);
+          configManager.PutString(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<std::string>(iter->second).c_str());
+        } else if (anyType == typeid(bool)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_BOOL);
+          configManager.PutBool(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<bool>(iter->second));
+        } else if (anyType == typeid(short)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_SHORT);
+          configManager.PutInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<short>(iter->second));
+        } else if (anyType == typeid(int)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_INT);
+          configManager.PutInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<int>(iter->second));
+        } else if (anyType == typeid(unsigned short)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_USHORT);
+          configManager.PutInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<unsigned short>(iter->second));
+        } else if (anyType == typeid(unsigned int)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_UINT);
+          configManager.PutInt(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), static_cast<int>(us::any_cast<unsigned int>(iter->second)));
+        } else if (anyType == typeid(float)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_FLOAT);
+          configManager.PutDouble(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<float>(iter->second));
+        } else if (anyType == typeid(double)) {
+          configManager.PutEnum(boost::str(boost::format(REUSE_OPTIONS_TYPE) % index % i).c_str(), ANY_DOUBLE);
+          configManager.PutDouble(boost::str(boost::format(REUSE_OPTIONS_VALUE) % index % i).c_str(), us::any_cast<double>(iter->second));
+        }
+      }
+      return false;
+    } else {
+      info.m_Cancel = true;
+      return true;
+    }
+  }
+}
+
 struct QmitkIOUtil::Impl
 {
   struct ReaderOptionsDialogFunctor : public ReaderOptionsFunctorBase
@@ -46,16 +306,7 @@ struct QmitkIOUtil::Impl
 
     virtual bool operator()(LoadInfo& loadInfo) override
     {
-      QmitkFileReaderOptionsDialog dialog(loadInfo);
-      if (dialog.exec() == QDialog::Accepted)
-      {
-        return !dialog.ReuseOptions();
-      }
-      else
-      {
-        loadInfo.m_Cancel = true;
-        return true;
-      }
+      return OptionsDialogFunctor<QmitkFileReaderOptionsDialog>(loadInfo);
     }
   };
 
@@ -64,16 +315,7 @@ struct QmitkIOUtil::Impl
 
     virtual bool operator()(SaveInfo& saveInfo) override
     {
-      QmitkFileWriterOptionsDialog dialog(saveInfo);
-      if (dialog.exec() == QDialog::Accepted)
-      {
-        return !dialog.ReuseOptions();
-      }
-      else
-      {
-        saveInfo.m_Cancel = true;
-        return true;
-      }
+      return OptionsDialogFunctor<QmitkFileWriterOptionsDialog>(saveInfo);
     }
   };
 

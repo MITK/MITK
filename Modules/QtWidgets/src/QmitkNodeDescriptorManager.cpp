@@ -35,27 +35,27 @@ QmitkNodeDescriptorManager* QmitkNodeDescriptorManager::GetInstance()
 void QmitkNodeDescriptorManager::Initialize()
 {
   auto isImage = mitk::NodePredicateDataType::New("Image");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("Image"), QString(":/Qmitk/Images_48.png"), isImage, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("Image", QString(":/Qmitk/Images_48.png"), isImage, this));
 
   auto isMultiComponentImage = mitk::NodePredicateAnd::New(isImage, mitk::NodePredicateProperty::New("Image.Displayed Component"));
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("MultiComponentImage"), QString(": / Qmitk / Images_48.png"), isMultiComponentImage, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("MultiComponentImage", QString(": / Qmitk / Images_48.png"), isMultiComponentImage, this));
 
   auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   auto isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("ImageMask"), QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("ImageMask", QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
 
   auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("LabelSetImage"), QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("LabelSetImage", QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this));
 
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("PointSet", QString(":/Qmitk/PointSet_48.png"), isPointSet, this));
 
   auto isSurface = mitk::NodePredicateDataType::New("Surface");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png"), isSurface, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("Surface", QString(":/Qmitk/Surface_48.png"), isSurface, this));
 
   auto isNotBinary = mitk::NodePredicateNot::New(isBinary);
   auto isNoneBinaryImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
+  this->AddDescriptor(new QmitkNodeDescriptor("NoneBinaryImage", QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
 
 }
 

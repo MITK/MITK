@@ -189,6 +189,7 @@ void QmitkMLBTView::BuildFibers()
 
         m_SamplingPointsNode->SetData(tracker->m_SamplingPointset);
         m_AlternativePointsNode->SetData(tracker->m_AlternativePointset);
+        m_StopVotePointsNode->SetData(tracker->m_StopVotePointset);
 
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         tracker->m_BuildFibersFinished = false;
@@ -235,12 +236,22 @@ void QmitkMLBTView::StartTrackingThread()
     m_AlternativePointsNode = mitk::DataNode::New();
     m_AlternativePointsNode->SetName("AlternativePoints");
     m_AlternativePointsNode->SetProperty("pointsize", mitk::FloatProperty::New(0.2));
-    m_AlternativePointsNode->SetProperty("color", mitk::ColorProperty::New(1,0,0));
+    m_AlternativePointsNode->SetProperty("color", mitk::ColorProperty::New(0,1,0));
     m_AlternativePointsNode->SetProperty("Pointset.2D.shape", bla);
     m_AlternativePointsNode->SetProperty("Pointset.2D.distance to plane", mitk::FloatProperty::New(1.5));
     m_AlternativePointsNode->SetProperty("point 2D size", mitk::FloatProperty::New(0.1));
     m_AlternativePointsNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
     this->GetDataStorage()->Add(m_AlternativePointsNode);
+
+    m_StopVotePointsNode = mitk::DataNode::New();
+    m_StopVotePointsNode->SetName("StopVotes");
+    m_StopVotePointsNode->SetProperty("pointsize", mitk::FloatProperty::New(0.2));
+    m_StopVotePointsNode->SetProperty("color", mitk::ColorProperty::New(1,0,0));
+    m_StopVotePointsNode->SetProperty("Pointset.2D.shape", bla);
+    m_StopVotePointsNode->SetProperty("Pointset.2D.distance to plane", mitk::FloatProperty::New(1.5));
+    m_StopVotePointsNode->SetProperty("point 2D size", mitk::FloatProperty::New(0.1));
+    m_StopVotePointsNode->SetProperty("Pointset.2D.fill shape", mitk::BoolProperty::New(true));
+    this->GetDataStorage()->Add(m_StopVotePointsNode);
 
     QFuture<void> future = QtConcurrent::run( this, &QmitkMLBTView::StartTracking );
     m_TrackingWatcher.setFuture(future);
@@ -277,7 +288,7 @@ void QmitkMLBTView::StartTracking()
 
     mitk::Image::Pointer dwi = dynamic_cast<mitk::Image*>(m_Controls->m_TrackingRawImageBox->GetSelectedNode()->GetData());
     m_ForestHandler->AddDwi(dwi);
-    m_ForestHandler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
+    m_ForestHandler->SetMode(mitk::TrackingDataHandler::MODE::DETERMINISTIC);
 
 //    int numThread = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 

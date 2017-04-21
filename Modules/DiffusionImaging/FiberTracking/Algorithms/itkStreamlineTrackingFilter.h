@@ -72,6 +72,7 @@ public:
     int     m_BuildFibersReady;
     volatile bool m_Stop;
     mitk::PointSet::Pointer             m_SamplingPointset;
+    mitk::PointSet::Pointer             m_StopVotePointset;
     mitk::PointSet::Pointer             m_AlternativePointset;
 
     void SetStepSize(float v)           ///< Integration step size in voxels, default is 0.5 * voxel

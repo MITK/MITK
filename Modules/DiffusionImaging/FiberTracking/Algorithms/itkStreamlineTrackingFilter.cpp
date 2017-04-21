@@ -189,6 +189,7 @@ void StreamlineTrackingFilter::BeforeTracking()
     m_Tractogram.clear();
     m_SamplingPointset = mitk::PointSet::New();
     m_AlternativePointset = mitk::PointSet::New();
+    m_StopVotePointset = mitk::PointSet::New();
     m_StartTime = std::chrono::system_clock::now();
 
     if (m_SeedOnlyGm && m_ControlGmEndings)
@@ -376,6 +377,7 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
     {
         m_SamplingPointset->Clear();
         m_AlternativePointset->Clear();
+        m_StopVotePointset->Clear();
     }
     vnl_vector_fixed<float,3> direction; direction.fill(0);
 
@@ -426,8 +428,6 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
         sample_pos[0] = pos[0] + d[0];
         sample_pos[1] = pos[1] + d[1];
         sample_pos[2] = pos[2] + d[2];
-        if(m_DemoMode)
-            m_SamplingPointset->InsertPoint(i, sample_pos);
 
         vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
         if (IsValidPosition(sample_pos))
@@ -435,11 +435,14 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
         if (tempDir.magnitude()>mitk::eps)
         {
             direction += tempDir;
+
+            if(m_DemoMode)
+                m_SamplingPointset->InsertPoint(i, sample_pos);
         }
         else if (m_AvoidStop && olddir.magnitude()>0.5) // out of white matter
         {
-            if (is_stop_voter)
-                stop_votes++;
+            if (m_DemoMode)
+                m_StopVotePointset->InsertPoint(i, sample_pos);
 
             float dot = dot_product(d, olddir);
             if (dot >= 0.0) // in front of plane defined by pos and olddir
@@ -451,8 +454,6 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
             sample_pos[0] = pos[0] + d[0];
             sample_pos[1] = pos[1] + d[1];
             sample_pos[2] = pos[2] + d[2];
-            if(m_DemoMode)
-                m_AlternativePointset->InsertPoint(alternatives, sample_pos);
             alternatives++;
             vnl_vector_fixed<float,3> tempDir; tempDir.fill(0.0);
             if (IsValidPosition(sample_pos))
@@ -462,10 +463,27 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
             {
                 direction += d * m_DeflectionMod;         // go into the direction of the white matter
                 direction += tempDir;  // go into the direction of the white matter direction at this location
+
+                if(m_DemoMode)
+                    m_AlternativePointset->InsertPoint(alternatives, sample_pos);
+            }
+            else
+            {
+                if (is_stop_voter)
+                    stop_votes++;
+
+                if (m_DemoMode)
+                    m_StopVotePointset->InsertPoint(i, sample_pos);
             }
         }
-        else if (is_stop_voter)
-            stop_votes++;
+        else
+        {
+            if (m_DemoMode)
+                m_StopVotePointset->InsertPoint(i, sample_pos);
+
+            if (is_stop_voter)
+                stop_votes++;
+        }
     }
 
     if (direction.magnitude()>0.001 && (possible_stop_votes==0 || (float)stop_votes/possible_stop_votes<0.5) )

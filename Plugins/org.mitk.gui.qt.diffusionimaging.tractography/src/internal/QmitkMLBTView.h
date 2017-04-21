@@ -97,6 +97,7 @@ protected:
   mitk::DataNode::Pointer m_TractogramNode;
   mitk::DataNode::Pointer m_SamplingPointsNode;
   mitk::DataNode::Pointer m_AlternativePointsNode;
+  mitk::DataNode::Pointer m_StopVotePointsNode;
 
   std::vector< std::shared_ptr<QmitkMlbstTrainingDataWidget> > m_TrainingWidgets;
 

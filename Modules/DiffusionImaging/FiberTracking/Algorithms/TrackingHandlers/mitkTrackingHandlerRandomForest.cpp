@@ -259,17 +259,18 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   int i = 0;
   vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
-  if (m_FlipX)
-      last_dir[0] *= -1;
-  if (m_FlipY)
-      last_dir[1] *= -1;
-  if (m_FlipZ)
-      last_dir[2] *= -1;
-
   for (auto d : olddirs)
   {
     vnl_vector_fixed<double,3> tempD;
     tempD[0] = d[0]; tempD[1] = d[1]; tempD[2] = d[2];
+
+    if (m_FlipX)
+        tempD[0] *= -1;
+    if (m_FlipY)
+        tempD[1] *= -1;
+    if (m_FlipZ)
+        tempD[2] *= -1;
+
     tempD = inverse_direction_matrix * tempD;
     last_dir[0] = tempD[0];
     last_dir[1] = tempD[1];

@@ -69,11 +69,14 @@ namespace config
   template <typename TValue>
   TValue ConfigManager::Impl::Get(const char* key, TValue&& value) const
   {
-    if (!key) {
+    if (!key || m_deleted.end() != m_deleted.find(key)) {
       return value;
     }
     const auto iter = m_data.find(key);
-    return m_deleted.end() != m_deleted.find(key) || m_data.end() == iter ? value : boost::get<std::remove_reference<TValue>::type>(iter->second);
+    if (m_data.end() == iter) {
+      return value;
+    }
+    return boost::get<TValue>(iter->second);
   }
 
   void ConfigManager::Impl::Enumirate(IParamSaver& visitor) const

@@ -14,11 +14,10 @@
 
  ===================================================================*/
 
-
 #include "QmlAxisOverlay.h"
-#include <vtkProperty.h>
 #include <vtkActor2D.h>
 #include <vtkPropCollection.h>
+#include <vtkProperty.h>
 //#include "Util_Debug.h"
 #include "mitkPoint.h"
 
@@ -47,9 +46,9 @@ mitk::AxisOverlay::LocalStorage::LocalStorage()
   this->m_dummyActor->GetProperty()->SetOpacity(0.0);
 }
 
-void mitk::AxisOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
+void mitk::AxisOverlay::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   if (ls->IsGenerateDataRequired(renderer, this))
   {
     ls->m_widget->SetOrientationMarker(ls->m_axesActor);
@@ -61,8 +60,8 @@ void mitk::AxisOverlay::UpdateVtkOverlay(mitk::BaseRenderer *renderer)
   }
 }
 
-vtkProp* mitk::AxisOverlay::GetVtkProp(BaseRenderer *renderer) const
+vtkProp *mitk::AxisOverlay::GetVtkProp(BaseRenderer *renderer) const
 {
-  LocalStorage* ls = this->m_LSH.GetLocalStorage(renderer);
+  LocalStorage *ls = this->m_LSH.GetLocalStorage(renderer);
   return ls->m_dummyActor;
 }

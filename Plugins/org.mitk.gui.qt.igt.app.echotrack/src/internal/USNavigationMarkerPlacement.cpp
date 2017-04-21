@@ -18,72 +18,73 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_USNavigationMarkerPlacement.h"
 
 #include "NavigationStepWidgets/QmitkUSNavigationStepCombinedModality.h"
+#include "NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.h"
+#include "NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.h"
+#include "NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.h"
 #include "NavigationStepWidgets/QmitkUSNavigationStepTumourSelection.h"
 #include "NavigationStepWidgets/QmitkUSNavigationStepZoneMarking.h"
-#include "NavigationStepWidgets/QmitkUSNavigationStepPlacementPlanning.h"
-#include "NavigationStepWidgets/QmitkUSNavigationStepMarkerIntervention.h"
-#include "NavigationStepWidgets/QmitkUSNavigationStepPunctuationIntervention.h"
 
 #include "SettingsWidgets/QmitkUSNavigationCombinedSettingsWidget.h"
 
 #include "mitkIRenderingManager.h"
 #include "mitkNodeDisplacementFilter.h"
 #include "mitkUSCombinedModality.h"
-#include "mitkOverlay2DLayouter.h"
 #include <mitkIOUtil.h>
 
-#include "IO/mitkUSNavigationStepTimer.h"
 #include "IO/mitkUSNavigationExperimentLogging.h"
+#include "IO/mitkUSNavigationStepTimer.h"
 
-#include <QTimer>
-#include <QSignalMapper>
-#include <QInputDialog>
-#include <QDir>
-#include <QMessageBox>
 #include <QDateTime>
+#include <QDir>
+#include <QInputDialog>
+#include <QMessageBox>
+#include <QSignalMapper>
+#include <QTimer>
 
 #include "QmitkRenderWindow.h"
-#include "QmitkStdMultiWidgetEditor.h"
 #include "QmitkStdMultiWidget.h"
+#include "QmitkStdMultiWidgetEditor.h"
+#include "mitkLayoutAnnotationRenderer.h"
 
 // scene serialization
-#include <mitkSceneIO.h>
-#include <mitkSurface.h>
+#include <mitkConvert2Dto3DImageFilter.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
-#include <mitkConvert2Dto3DImageFilter.h>
+#include <mitkSceneIO.h>
+#include <mitkSurface.h>
 
 const std::string USNavigationMarkerPlacement::VIEW_ID = "org.mitk.views.usmarkerplacement";
 
-const char* USNavigationMarkerPlacement::DATANAME_TUMOUR = "Tumour";
-const char* USNavigationMarkerPlacement::DATANAME_TARGETSURFACE = "Target Surface";
-const char* USNavigationMarkerPlacement::DATANAME_ZONES = "Zones";
-const char* USNavigationMarkerPlacement::DATANAME_TARGETS = "Targets";
-const char* USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS = "Target Paths";
-const char* USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS = "Reached Targets";
+const char *USNavigationMarkerPlacement::DATANAME_TUMOUR = "Tumour";
+const char *USNavigationMarkerPlacement::DATANAME_TARGETSURFACE = "Target Surface";
+const char *USNavigationMarkerPlacement::DATANAME_ZONES = "Zones";
+const char *USNavigationMarkerPlacement::DATANAME_TARGETS = "Targets";
+const char *USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS = "Target Paths";
+const char *USNavigationMarkerPlacement::DATANAME_REACHED_TARGETS = "Reached Targets";
 
-USNavigationMarkerPlacement::USNavigationMarkerPlacement() :
-m_UpdateTimer(new QTimer(this)),
-m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
-m_StdMultiWidget(0),
-m_ReinitAlreadyDone(false),
-m_IsExperimentRunning(false),
-m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
-m_ExperimentLogging(mitk::USNavigationExperimentLogging::New()),
-m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
-m_IconRunning(QPixmap(":/USNavigation/record.png")),
-m_IconNotRunning(QPixmap(":/USNavigation/record-gray.png")),
-m_USImageLoggingFilter(mitk::USImageLoggingFilter::New()),
-m_NavigationDataRecorder(mitk::NavigationDataRecorder::New()),
-m_SceneNumber(1),
-m_WarnOverlay(mitk::TextOverlay2D::New()),
-m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
-m_NeedleIndex(0),
-m_MarkerIndex(1),
-ui(new Ui::USNavigationMarkerPlacement)
+USNavigationMarkerPlacement::USNavigationMarkerPlacement()
+  : m_UpdateTimer(new QTimer(this)),
+    m_ImageAndNavigationDataLoggingTimer(new QTimer(this)),
+    m_StdMultiWidget(0),
+    m_ReinitAlreadyDone(false),
+    m_IsExperimentRunning(false),
+    m_NavigationStepTimer(mitk::USNavigationStepTimer::New()),
+    m_ExperimentLogging(mitk::USNavigationExperimentLogging::New()),
+    m_AblationZonesDisplacementFilter(mitk::NodeDisplacementFilter::New()),
+    m_IconRunning(QPixmap(":/USNavigation/record.png")),
+    m_IconNotRunning(QPixmap(":/USNavigation/record-gray.png")),
+    m_USImageLoggingFilter(mitk::USImageLoggingFilter::New()),
+    m_NavigationDataRecorder(mitk::NavigationDataRecorder::New()),
+    m_SceneNumber(1),
+    m_WarnOverlay(mitk::TextAnnotation2D::New()),
+    m_ListenerDeviceChanged(this, &USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged),
+    m_NeedleIndex(0),
+    m_MarkerIndex(1),
+    ui(new Ui::USNavigationMarkerPlacement)
 {
   connect(m_UpdateTimer, SIGNAL(timeout()), this, SLOT(OnTimeout()));
-  connect(m_ImageAndNavigationDataLoggingTimer, SIGNAL(timeout()), this, SLOT(OnImageAndNavigationDataLoggingTimeout()));
+  connect(
+    m_ImageAndNavigationDataLoggingTimer, SIGNAL(timeout()), this, SLOT(OnImageAndNavigationDataLoggingTimeout()));
 
   // scale running (and not running) icon the specific height
   m_IconRunning = m_IconRunning.scaledToHeight(20, Qt::SmoothTransformation);
@@ -93,13 +94,16 @@ ui(new Ui::USNavigationMarkerPlacement)
   // into consideration
   m_ExperimentLogging->SetKeyPrefix("USNavigation::");
 
-  m_UpdateTimer->start(33); //every 33 Milliseconds = 30 Frames/Second
+  m_UpdateTimer->start(33); // every 33 Milliseconds = 30 Frames/Second
 }
 
 USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 {
   // make sure that the experiment got finished before destructing the object
-  if (m_IsExperimentRunning) { this->OnFinishExperiment(); }
+  if (m_IsExperimentRunning)
+  {
+    this->OnFinishExperiment();
+  }
 
   // remove listener for ultrasound device changes
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
@@ -112,7 +116,10 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 
 void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
 {
-  if ((m_AblationZonesVector.size() < id) || (id < 0)) { return; }
+  if ((m_AblationZonesVector.size() < id) || (id < 0))
+  {
+    return;
+  }
 
   MITK_INFO << "Ablation Zone " << id << " changed, new size: " << newSize;
 
@@ -124,14 +131,15 @@ void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
   vtkData->SetThetaResolution(20);
   vtkData->Update();
 
-  mitk::Surface::Pointer zoneSurface = dynamic_cast<mitk::Surface*>(m_AblationZonesVector.at(id)->GetData());
+  mitk::Surface::Pointer zoneSurface = dynamic_cast<mitk::Surface *>(m_AblationZonesVector.at(id)->GetData());
   zoneSurface->SetVtkPolyData(vtkData->GetOutput());
   vtkData->Delete();
 }
 
 void USNavigationMarkerPlacement::OnAddAblationZone(int size)
 {
-  m_AblationZonesDisplacementFilter->SetInitialReferencePose(m_CombinedModality->GetNavigationDataSource()->GetOutput(m_MarkerIndex));
+  m_AblationZonesDisplacementFilter->SetInitialReferencePose(
+    m_CombinedModality->GetNavigationDataSource()->GetOutput(m_MarkerIndex));
   mitk::DataNode::Pointer NewAblationZone = mitk::DataNode::New();
 
   mitk::Point3D origin = m_CombinedModality->GetNavigationDataSource()->GetOutput(m_NeedleIndex)->GetPosition();
@@ -155,7 +163,7 @@ void USNavigationMarkerPlacement::OnAddAblationZone(int size)
   NewAblationZone->SetData(zone);
   NewAblationZone->GetData()->GetGeometry()->SetOrigin(origin);
   mitk::Color SphereColor = mitk::Color();
-  //default color
+  // default color
   SphereColor[0] = 102;
   SphereColor[1] = 0;
   SphereColor[2] = 204;
@@ -179,21 +187,27 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   ui->setupUi(parent);
 
   connect(ui->navigationProcessWidget,
-    SIGNAL(SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>)),
-    this, SLOT(OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>)));
+          SIGNAL(SignalCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>)),
+          this,
+          SLOT(OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality>)));
 
   connect(ui->navigationProcessWidget,
-    SIGNAL(SignalSettingsChanged(itk::SmartPointer<mitk::DataNode>)),
-    this, SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
+          SIGNAL(SignalSettingsChanged(itk::SmartPointer<mitk::DataNode>)),
+          this,
+          SLOT(OnSettingsChanged(itk::SmartPointer<mitk::DataNode>)));
 
-  connect(ui->navigationProcessWidget, SIGNAL(SignalActiveNavigationStepChanged(int)),
-    this, SLOT(OnActiveNavigationStepChanged(int)));
+  connect(ui->navigationProcessWidget,
+          SIGNAL(SignalActiveNavigationStepChanged(int)),
+          this,
+          SLOT(OnActiveNavigationStepChanged(int)));
 
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
 
-  connect(ui->navigationProcessWidget, SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
-    this, SLOT(OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>)));
+  connect(ui->navigationProcessWidget,
+          SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
+          this,
+          SLOT(OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>)));
 
   ui->navigationProcessWidget->SetDataStorage(this->GetDataStorage());
 
@@ -203,19 +217,17 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
   ui->navigationProcessWidget->SetSettingsWidget(new QmitkUSNavigationCombinedSettingsWidget(m_Parent));
 }
 
-void USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::string& key, const std::string&)
+void USNavigationMarkerPlacement::OnCombinedModalityPropertyChanged(const std::string &key, const std::string &)
 {
   if (key == mitk::USDevice::GetPropertyKeys().US_PROPKEY_BMODE_DEPTH)
   {
     m_ReinitAlreadyDone = false;
     this->ReinitOnImage();
 
-    // make sure that the overlay is not added twice
-    if (m_OverlayManager.IsNotNull()) { m_OverlayManager->RemoveOverlay(m_WarnOverlay.GetPointer()); }
-
     if (m_CombinedModality.IsNotNull() && !m_CombinedModality->GetIsCalibratedForCurrentStatus())
     {
-      if (m_OverlayManager.IsNotNull()) { m_OverlayManager->AddOverlay(m_WarnOverlay.GetPointer()); }
+      mitk::LayoutAnnotationRenderer::AddAnnotation(
+        m_WarnOverlay.GetPointer(), "stdmulti.widget1", mitk::LayoutAnnotationRenderer::TopLeft);
       MITK_WARN << "No calibration available for the selected ultrasound image depth.";
     }
   }
@@ -231,10 +243,9 @@ void USNavigationMarkerPlacement::OnTimeout()
   if (!m_StdMultiWidget)
   {
     // try to get the standard multi widget if it couldn't be got before
-    mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+    mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
 
-    QmitkStdMultiWidgetEditor* multiWidgetEditor
-      = dynamic_cast<QmitkStdMultiWidgetEditor*>(renderWindow);
+    QmitkStdMultiWidgetEditor *multiWidgetEditor = dynamic_cast<QmitkStdMultiWidgetEditor *>(renderWindow);
 
     // if there is a standard multi widget now, disable the level window and
     // change the layout to 2D up and 3d down
@@ -248,15 +259,16 @@ void USNavigationMarkerPlacement::OnTimeout()
       }
     }
 
-    if (m_OverlayManager.IsNull()) { this->CreateOverlays(); }
+    this->CreateOverlays();
   }
 
-  if (m_CombinedModality.IsNotNull() && !this->m_CombinedModality->GetIsFreezed()) //if the combined modality is freezed: do nothing
+  if (m_CombinedModality.IsNotNull() &&
+      !this->m_CombinedModality->GetIsFreezed()) // if the combined modality is freezed: do nothing
   {
     ui->navigationProcessWidget->UpdateNavigationProgress();
     m_AblationZonesDisplacementFilter->Update();
 
-    //update the 3D window only every fourth time to speed up the rendering (at least in 2D)
+    // update the 3D window only every fourth time to speed up the rendering (at least in 2D)
     this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 
     // make sure that a reinit was performed on the image
@@ -270,13 +282,16 @@ void USNavigationMarkerPlacement::OnImageAndNavigationDataLoggingTimeout()
   if (m_CombinedModality.IsNotNull())
   {
     m_NavigationDataRecorder->Update();
-    //get last messages for logging filer and store them
+    // get last messages for logging filer and store them
     std::vector<std::string> messages = m_LoggingBackend.GetNavigationMessages();
     std::string composedMessage = "";
-    for (int i = 0; i < messages.size(); i++) { composedMessage += messages.at(i); }
+    for (int i = 0; i < messages.size(); i++)
+    {
+      composedMessage += messages.at(i);
+    }
     m_USImageLoggingFilter->AddMessageToCurrentImage(composedMessage);
     m_LoggingBackend.ClearNavigationMessages();
-    //update logging filter
+    // update logging filter
     m_USImageLoggingFilter->Update();
   }
 }
@@ -286,14 +301,15 @@ void USNavigationMarkerPlacement::OnStartExperiment()
   // get name for the experiment by a QInputDialog
   bool ok;
   if (m_ExperimentName.isEmpty())
-  { //default: current date
-    m_ExperimentName = QString::number(QDateTime::currentDateTime().date().year()) + "_"
-      + QString::number(QDateTime::currentDateTime().date().month()) + "_"
-      + QString::number(QDateTime::currentDateTime().date().day()) + "_experiment_"
-      + QString::number(QDateTime::currentDateTime().time().hour()) + "."
-      + QString::number(QDateTime::currentDateTime().time().minute());
+  { // default: current date
+    m_ExperimentName = QString::number(QDateTime::currentDateTime().date().year()) + "_" +
+                       QString::number(QDateTime::currentDateTime().date().month()) + "_" +
+                       QString::number(QDateTime::currentDateTime().date().day()) + "_experiment_" +
+                       QString::number(QDateTime::currentDateTime().time().hour()) + "." +
+                       QString::number(QDateTime::currentDateTime().time().minute());
   }
-  m_ExperimentName = QInputDialog::getText(m_Parent, QString("Experiment Name"), QString("Name of the Experiment"), QLineEdit::Normal, m_ExperimentName, &ok);
+  m_ExperimentName = QInputDialog::getText(
+    m_Parent, QString("Experiment Name"), QString("Name of the Experiment"), QLineEdit::Normal, m_ExperimentName, &ok);
   MITK_INFO("USNavigationLogging") << "Experiment started: " << m_ExperimentName.toStdString();
   if (ok && !m_ExperimentName.isEmpty())
   {
@@ -302,7 +318,8 @@ void USNavigationMarkerPlacement::OnStartExperiment()
     QDir experimentResultsDir(m_ResultsDirectory + QDir::separator() + m_ExperimentName);
     if (experimentResultsDir.exists())
     {
-      QMessageBox::critical(m_Parent, "Results Directory Exists", "The result directory already exists.\nPlease choose an other name.");
+      QMessageBox::critical(
+        m_Parent, "Results Directory Exists", "The result directory already exists.\nPlease choose an other name.");
       this->OnStartExperiment();
     }
     else
@@ -316,8 +333,8 @@ void USNavigationMarkerPlacement::OnStartExperiment()
 
       // (re)start timer for navigation step durations
       m_NavigationStepTimer->Reset();
-      m_NavigationStepTimer->SetOutputFileName(QString(m_ExperimentResultsSubDirectory + QDir::separator()
-        + QString("durations.cvs")).toStdString());
+      m_NavigationStepTimer->SetOutputFileName(
+        QString(m_ExperimentResultsSubDirectory + QDir::separator() + QString("durations.cvs")).toStdString());
       m_NavigationStepTimer->SetActiveIndex(0, m_NavigationSteps.at(0)->GetTitle().toStdString());
 
       ui->finishExperimentButton->setEnabled(true);
@@ -337,7 +354,8 @@ void USNavigationMarkerPlacement::OnStartExperiment()
 
       // (re)start experiment logging and set output file name
       m_ExperimentLogging->Reset();
-      m_ExperimentLogging->SetFileName(QString(m_ExperimentResultsSubDirectory + QDir::separator() + "experiment-logging.xml").toStdString());
+      m_ExperimentLogging->SetFileName(
+        QString(m_ExperimentResultsSubDirectory + QDir::separator() + "experiment-logging.xml").toStdString());
     }
   }
 }
@@ -347,8 +365,11 @@ void USNavigationMarkerPlacement::OnFinishExperiment()
   this->WaitCursorOn();
 
   MITK_INFO("USNavigationLogging") << "Experiment finished!";
-  MITK_INFO("USNavigationLogging") << "Position/Orientation of needle tip: " << (dynamic_cast<mitk::NavigationData*>(m_CombinedModality->GetTrackingDevice()->GetOutput(0)))->GetPosition();
-  MITK_INFO("USNavigationLogging") << "Position of target: " << m_TargetNodeDisplacementFilter->GetRawDisplacementNavigationData(0)->GetPosition();
+  MITK_INFO("USNavigationLogging")
+    << "Position/Orientation of needle tip: "
+    << (dynamic_cast<mitk::NavigationData *>(m_CombinedModality->GetTrackingDevice()->GetOutput(0)))->GetPosition();
+  MITK_INFO("USNavigationLogging")
+    << "Position of target: " << m_TargetNodeDisplacementFilter->GetRawDisplacementNavigationData(0)->GetPosition();
   MITK_INFO("USNavigationLogging") << "Total duration: " << m_NavigationStepTimer->GetTotalDuration();
 
   ui->navigationProcessWidget->FinishCurrentNavigationStep();
@@ -371,19 +392,26 @@ void USNavigationMarkerPlacement::OnFinishExperiment()
   QDir(m_ExperimentResultsSubDirectory).mkdir("ImageStream");
   m_USImageLoggingFilter->Update();
   m_USImageLoggingFilter->SetImageFilesExtension(".jpg");
-  m_USImageLoggingFilter->SaveImages(QString(m_ExperimentResultsSubDirectory + QDir::separator() + "ImageStream" + QDir::separator()).toStdString());
+  m_USImageLoggingFilter->SaveImages(
+    QString(m_ExperimentResultsSubDirectory + QDir::separator() + "ImageStream" + QDir::separator()).toStdString());
   m_USImageLoggingFilter = mitk::USImageLoggingFilter::New();
 
   m_NavigationDataRecorder->StopRecording();
 
   // Write data to csv and xml file
-  mitk::IOUtil::SaveBaseData(m_NavigationDataRecorder->GetNavigationDataSet(), (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.xml").toStdString().c_str()));
-  mitk::IOUtil::SaveBaseData(m_NavigationDataRecorder->GetNavigationDataSet(), (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.csv").toStdString().c_str()));
+  mitk::IOUtil::SaveBaseData(
+    m_NavigationDataRecorder->GetNavigationDataSet(),
+    (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.xml").toStdString().c_str()));
+  mitk::IOUtil::SaveBaseData(
+    m_NavigationDataRecorder->GetNavigationDataSet(),
+    (QString(m_ExperimentResultsSubDirectory + QDir::separator() + "navigation-data.csv").toStdString().c_str()));
 
-  //write logged navigation data messages to separate file
+  // write logged navigation data messages to separate file
   std::stringstream csvNavigationMessagesFilename;
-  csvNavigationMessagesFilename << m_ExperimentResultsSubDirectory.toStdString() << QDir::separator().toLatin1() << "CSVNavigationMessagesLogFile.csv";
-  MITK_INFO("USNavigationLogging") << "Writing logged navigation messages to separate csv file: " << csvNavigationMessagesFilename.str();
+  csvNavigationMessagesFilename << m_ExperimentResultsSubDirectory.toStdString() << QDir::separator().toLatin1()
+                                << "CSVNavigationMessagesLogFile.csv";
+  MITK_INFO("USNavigationLogging") << "Writing logged navigation messages to separate csv file: "
+                                   << csvNavigationMessagesFilename.str();
   m_LoggingBackend.WriteCSVFileWithNavigationMessages(csvNavigationMessagesFilename.str());
 
   mbilog::UnregisterBackend(&m_LoggingBackend);
@@ -400,7 +428,8 @@ void USNavigationMarkerPlacement::OnFinishExperiment()
   MITK_INFO("USNavigationLogging") << "Finished!";
 }
 
-void USNavigationMarkerPlacement::OnCombinedModalityChanged(itk::SmartPointer<mitk::USCombinedModality> combinedModality)
+void USNavigationMarkerPlacement::OnCombinedModalityChanged(
+  itk::SmartPointer<mitk::USCombinedModality> combinedModality)
 {
   // remove old listener for ultrasound device changes
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
@@ -463,15 +492,12 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
     QmitkUSNavigationProcessWidget::NavigationStepVector navigationSteps;
     if (applicationName == "Punction")
     {
-      QmitkUSNavigationStepCombinedModality* stepCombinedModality =
-        new QmitkUSNavigationStepCombinedModality(m_Parent);
-      QmitkUSNavigationStepTumourSelection* stepTumourSelection =
-        new QmitkUSNavigationStepTumourSelection(m_Parent);
+      QmitkUSNavigationStepCombinedModality *stepCombinedModality = new QmitkUSNavigationStepCombinedModality(m_Parent);
+      QmitkUSNavigationStepTumourSelection *stepTumourSelection = new QmitkUSNavigationStepTumourSelection(m_Parent);
       stepTumourSelection->SetTargetSelectionOptional(true);
       m_TargetNodeDisplacementFilter = stepTumourSelection->GetTumourNodeDisplacementFilter();
-      QmitkUSNavigationStepZoneMarking* stepZoneMarking =
-        new QmitkUSNavigationStepZoneMarking(m_Parent);
-      QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
+      QmitkUSNavigationStepZoneMarking *stepZoneMarking = new QmitkUSNavigationStepZoneMarking(m_Parent);
+      QmitkUSNavigationStepPunctuationIntervention *stepIntervention =
         new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
 
       connect(stepIntervention, SIGNAL(AddAblationZoneClicked(int)), this, SLOT(OnAddAblationZone(int)));
@@ -489,16 +515,13 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
     }
     else if (applicationName == "Marker Placement")
     {
-      QmitkUSNavigationStepCombinedModality* stepCombinedModality =
-        new QmitkUSNavigationStepCombinedModality(m_Parent);
-      QmitkUSNavigationStepTumourSelection* stepTumourSelection =
-        new QmitkUSNavigationStepTumourSelection(m_Parent);
+      QmitkUSNavigationStepCombinedModality *stepCombinedModality = new QmitkUSNavigationStepCombinedModality(m_Parent);
+      QmitkUSNavigationStepTumourSelection *stepTumourSelection = new QmitkUSNavigationStepTumourSelection(m_Parent);
       m_TargetNodeDisplacementFilter = stepTumourSelection->GetTumourNodeDisplacementFilter();
-      QmitkUSNavigationStepZoneMarking* stepZoneMarking =
-        new QmitkUSNavigationStepZoneMarking(m_Parent);
-      QmitkUSNavigationStepPlacementPlanning* stepPlacementPlanning =
+      QmitkUSNavigationStepZoneMarking *stepZoneMarking = new QmitkUSNavigationStepZoneMarking(m_Parent);
+      QmitkUSNavigationStepPlacementPlanning *stepPlacementPlanning =
         new QmitkUSNavigationStepPlacementPlanning(m_Parent);
-      QmitkUSNavigationStepMarkerIntervention* stepMarkerIntervention =
+      QmitkUSNavigationStepMarkerIntervention *stepMarkerIntervention =
         new QmitkUSNavigationStepMarkerIntervention(m_Parent);
 
       m_NavigationStepNames = std::vector<QString>();
@@ -518,7 +541,8 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
     ui->navigationProcessWidget->SetNavigationSteps(navigationSteps);
 
     for (QmitkUSNavigationProcessWidget::NavigationStepIterator it = m_NavigationSteps.begin();
-      it != m_NavigationSteps.end(); ++it)
+         it != m_NavigationSteps.end();
+         ++it)
     {
       delete *it;
     }
@@ -540,7 +564,10 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
   }
   else if (!experimentMode)
   {
-    if (m_IsExperimentRunning) { this->OnFinishExperiment(); }
+    if (m_IsExperimentRunning)
+    {
+      this->OnFinishExperiment();
+    }
     ui->navigationProcessWidget->EnableInteraction(true);
   }
 
@@ -570,14 +597,25 @@ void USNavigationMarkerPlacement::OnActiveNavigationStepChanged(int index)
 {
   // update navigation step timer each time the active navigation step changes
   m_NavigationStepTimer->SetActiveIndex(index, m_NavigationSteps.at(index)->GetTitle().toStdString());
-  if (m_NavigationStepNames.size() <= index) { MITK_INFO("USNavigationLogging") << "Someting went wrong: unknown navigation step!"; }
-  else { MITK_INFO("USNavigationLogging") << "Navigation step finished/changed, next step: " << this->m_NavigationStepNames.at(index).toStdString() << "; duration until now: " << m_NavigationStepTimer->GetTotalDuration(); }
+  if (m_NavigationStepNames.size() <= index)
+  {
+    MITK_INFO("USNavigationLogging") << "Someting went wrong: unknown navigation step!";
+  }
+  else
+  {
+    MITK_INFO("USNavigationLogging") << "Navigation step finished/changed, next step: "
+                                     << this->m_NavigationStepNames.at(index).toStdString()
+                                     << "; duration until now: " << m_NavigationStepTimer->GetTotalDuration();
+  }
 }
 
 void USNavigationMarkerPlacement::OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode> resultsNode)
 {
   // intermediate results only matter during an experiment
-  if (!m_IsExperimentRunning) { return; }
+  if (!m_IsExperimentRunning)
+  {
+    return;
+  }
 
   this->WaitCursorOn();
 
@@ -593,9 +631,10 @@ void USNavigationMarkerPlacement::OnIntermediateResultProduced(const itk::SmartP
   }
 
   // save the mitk scene
-  std::string scenefile = QString(m_ExperimentResultsSubDirectory + QDir::separator()
-    + QString("Scene %1 - ").arg(m_SceneNumber++, 2, 10, QChar('0'))
-    + QString::fromStdString(resultsName).replace(":", "_") + ".mitk").toStdString();
+  std::string scenefile = QString(m_ExperimentResultsSubDirectory + QDir::separator() +
+                                  QString("Scene %1 - ").arg(m_SceneNumber++, 2, 10, QChar('0')) +
+                                  QString::fromStdString(resultsName).replace(":", "_") + ".mitk")
+                            .toStdString();
   MITK_INFO << "Saving Scene File: " << scenefile;
 
   mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
@@ -623,7 +662,7 @@ void USNavigationMarkerPlacement::ReinitOnImage()
     if (image.IsNotNull() && image->IsInitialized())
     {
       // make a reinit on the ultrasound image
-      mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
+      mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
       if (renderWindow != NULL && image->GetTimeGeometry()->IsValid())
       {
         renderWindow->GetRenderingManager()->InitializeViews(
@@ -640,15 +679,13 @@ void USNavigationMarkerPlacement::ReinitOnImage()
 
 void USNavigationMarkerPlacement::Convert2DImagesTo3D(mitk::DataStorage::SetOfObjects::ConstPointer nodes)
 {
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin();
-    it != nodes->End(); ++it)
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = nodes->Begin(); it != nodes->End(); ++it)
   {
     if (it->Value()->GetData() && strcmp(it->Value()->GetData()->GetNameOfClass(), "Image") == 0)
     {
       // convert image to 3d image if it is 2d at the moment
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(it->Value()->GetData());
-      if (image.IsNotNull() && image->GetDimension() == 2
-        && !image->GetGeometry()->Is2DConvertable())
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(it->Value()->GetData());
+      if (image.IsNotNull() && image->GetDimension() == 2 && !image->GetGeometry()->Is2DConvertable())
       {
         mitk::Convert2Dto3DImageFilter::Pointer convert2DTo3DImageFilter = mitk::Convert2Dto3DImageFilter::New();
         convert2DTo3DImageFilter->SetInput(image);
@@ -673,21 +710,4 @@ void USNavigationMarkerPlacement::CreateOverlays()
   m_WarnOverlay->SetPosition2D(overlayPosition);
   m_WarnOverlay->SetFontSize(22);
   m_WarnOverlay->SetColor(1, 0, 0); // overlay should be red
-
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
-  if (renderer)
-  {
-    m_OverlayManager = renderer->GetOverlayManager();
-
-    //add layouter if it doesn't exist yet
-    if (!m_OverlayManager->GetLayouter(renderer, mitk::Overlay2DLayouter::STANDARD_2D_TOP()))
-    {
-      m_OverlayManager->AddLayouter(mitk::Overlay2DLayouter::CreateLayouter(mitk::Overlay2DLayouter::STANDARD_2D_TOP(), renderer).GetPointer());
-    }
-
-    /* causes a crash when closing the view and opening it again, so deactivated at the moment TODO!!
-    //set layouter to warn overlay
-    m_OverlayManager->SetLayouter(m_WarnOverlay.GetPointer(), mitk::Overlay2DLayouter::STANDARD_2D_TOP(), renderer);
-    */
-  }
 }

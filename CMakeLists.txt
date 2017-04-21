@@ -802,9 +802,6 @@ set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
 set(Boost_ADDITIONAL_VERSIONS "1.60" "1.60.0")
 
-# We need this later for a DCMTK workaround
-set(_dcmtk_dir_orig ${DCMTK_DIR})
-
 # This property is populated at the top half of this file
 get_property(MITK_EXTERNAL_PROJECTS GLOBAL PROPERTY MITK_EXTERNAL_PROJECTS)
 foreach(ep ${MITK_EXTERNAL_PROJECTS})
@@ -833,20 +830,6 @@ set(CMAKE_MODULE_PATH
   ${MITK_CMAKE_DIR}
   ${CMAKE_MODULE_PATH}
   )
-
-if(MITK_USE_DCMTK)
-  # Due to the preferred CONFIG mode in find_package calls above,
-  # the DCMTKConfig.cmake file is read, which does not provide useful
-  # package information. We explictly need MODULE mode to find DCMTK.
-  if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
-    # Help our FindDCMTK.cmake script find our super-build DCMTK
-    set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
-  else()
-    # Use the original value
-    set(DCMTK_DIR ${_dcmtk_dir_orig})
-  endif()
-  find_package(DCMTK REQUIRED MODULE)
-endif()
 
 if(MITK_USE_Python)
   find_package(PythonLibs REQUIRED)

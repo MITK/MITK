@@ -13,7 +13,7 @@ The modules are shared libraries that provide functionality that can be used by 
   \li \subpage GeneratingDeviceModulesPage
   \li \subpage mitkPython_Overview
   \li \subpage USModulePage
-  \li \subpage OverlaysModulePage
+  \li \subpage AnnotationModulePage
 
 \section MITKModuleManualsListPageAdditionalInformation Additional Information on Certain Modules
 
@@ -25,4 +25,5 @@ The modules are shared libraries that provide functionality that can be used by 
 
   \li \subpage InteractionMigration
   \li \subpage GeometryMigration
+  \li \subpage OverlayMigration
 */

@@ -39,7 +39,7 @@ set(_example_dirs
   Tutorial
   FirstSteps
   QuickRender
-#  Overlays# depends on MitkQtWidgetsExt..
+  Annotation
 )
 
 if(MITK_USE_BLUEBERRY)

@@ -17,18 +17,20 @@
 #ifndef __mitkAxisOverlay_h
 #define __mitkAxisOverlay_h
 
-#include <mitkVtkOverlay.h>
 #include <mitkLocalStorageHandler.h>
+#include <mitkVtkAnnotation.h>
 
 #include <vtkAxesActor.h>
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkSphereSource.h>
 
-namespace mitk {
-  class  AxisOverlay : public mitk::VtkOverlay {
+namespace mitk
+{
+  class AxisOverlay : public mitk::VtkAnnotation
+  {
   public:
-    class LocalStorage : public mitk::VtkOverlay::BaseLocalStorage
+    class LocalStorage : public mitk::VtkAnnotation::BaseLocalStorage
     {
     public:
       /** \brief Actor of a 2D render window. */
@@ -47,20 +49,18 @@ namespace mitk {
       LocalStorage();
       /** \brief Default deconstructor of the local storage. */
       ~LocalStorage();
-
     };
 
-    mitkClassMacro(AxisOverlay, mitk::VtkOverlay);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(AxisOverlay, mitk::VtkAnnotation);
+    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
 
-  protected:
+      protected :
 
-    /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
-    mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
+      /** \brief The LocalStorageHandler holds all LocalStorages for the render windows. */
+      mutable mitk::LocalStorageHandler<LocalStorage> m_LSH;
 
-    virtual vtkProp* GetVtkProp(BaseRenderer *renderer) const;
-    void UpdateVtkOverlay(mitk::BaseRenderer *renderer);
+    virtual vtkProp *GetVtkProp(BaseRenderer *renderer) const;
+    void UpdateVtkAnnotation(mitk::BaseRenderer *renderer);
 
     /** \brief explicit constructor which disallows implicit conversions */
     explicit AxisOverlay();
@@ -69,15 +69,12 @@ namespace mitk {
     virtual ~AxisOverlay();
 
   private:
-
     /** \brief copy constructor */
     AxisOverlay(const AxisOverlay &);
 
     /** \brief assignment operator */
     AxisOverlay &operator=(const AxisOverlay &);
-
   };
-
 }
 
 #endif

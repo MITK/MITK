@@ -257,16 +257,15 @@ set(CPP_FILES
   IO/mitkSurfaceVtkXmlIO.cpp
   IO/mitkVtkLoggingAdapter.cpp
 
-  Rendering/mitkAbstractOverlayLayouter.cpp
+  Rendering/mitkAbstractAnnotationRenderer.cpp
+  Rendering/mitkAnnotationUtils.cpp
   Rendering/mitkBaseRenderer.cpp
   #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkIShaderRepository.cpp
-  Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper.cpp
-  Rendering/mitkOverlay.cpp
-  Rendering/mitkOverlayManager.cpp
+  Rendering/mitkAnnotation.cpp
   Rendering/mitkPlaneGeometryDataMapper2D.cpp
   Rendering/mitkPlaneGeometryDataVtkMapper3D.cpp
   Rendering/mitkPointSetVtkMapper2D.cpp
@@ -279,9 +278,6 @@ set(CPP_FILES
   Rendering/mitkSurfaceVtkMapper3D.cpp
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkVtkMapper.cpp
-  Rendering/mitkVtkOverlay2D.cpp
-  Rendering/mitkVtkOverlay3D.cpp
-  Rendering/mitkVtkOverlay.cpp
   Rendering/mitkVtkPropRenderer.cpp
   Rendering/mitkVtkWidgetRendering.cpp
   Rendering/vtkMitkLevelWindowFilter.cpp

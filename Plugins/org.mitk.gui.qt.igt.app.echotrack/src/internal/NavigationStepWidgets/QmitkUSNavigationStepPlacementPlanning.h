@@ -19,22 +19,23 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkUSAbstractNavigationStep.h"
 
-namespace Ui {
-class QmitkUSNavigationStepPlacementPlanning;
+namespace Ui
+{
+  class QmitkUSNavigationStepPlacementPlanning;
 }
 
-namespace mitk {
-class USNavigationTargetUpdateFilter;
-class USNavigationTargetIntersectionFilter;
-class USPointMarkInteractor;
-class NodeDisplacementFilter;
-class NeedleProjectionFilter;
-class LookupTableProperty;
-class OverlayManager;
-class TextOverlay3D;
-class Surface;
-class PointSet;
-class USTargetPlacementQualityCalculator;
+namespace mitk
+{
+  class USNavigationTargetUpdateFilter;
+  class USNavigationTargetIntersectionFilter;
+  class USPointMarkInteractor;
+  class NodeDisplacementFilter;
+  class NeedleProjectionFilter;
+  class LookupTableProperty;
+  class TextAnnotation3D;
+  class Surface;
+  class PointSet;
+  class USTargetPlacementQualityCalculator;
 }
 
 /**
@@ -101,45 +102,45 @@ protected:
   virtual void OnSetCombinedModality();
 
   void CreateTargetNodesIfNecessary();
-  void UpdateTargetCoordinates(mitk::DataNode*);
+  void UpdateTargetCoordinates(mitk::DataNode *);
   void UpdateTargetColors();
   void UpdateTargetDescriptions();
   void GenerateTargetColorLookupTable();
   void ReinitNodeDisplacementFilter();
   void CalculatePlanningQuality();
-  itk::SmartPointer<mitk::DataNode> CalculatePlanningQuality(itk::SmartPointer<mitk::Surface> targetSurface, itk::SmartPointer<mitk::PointSet>);
+  itk::SmartPointer<mitk::DataNode> CalculatePlanningQuality(itk::SmartPointer<mitk::Surface> targetSurface,
+                                                             itk::SmartPointer<mitk::PointSet>);
   itk::SmartPointer<mitk::Surface> CreateSphere(float radius);
   void UpdateBodyMarkerStatus(mitk::NavigationData::Pointer bodyMarker);
   void UpdateSensorsNames();
 
-  int                                                                  m_NumberOfTargets;
-  int                                                                  m_CurrentTargetIndex;
-  bool                                                                 m_BodyMarkerValid;
+  int m_NumberOfTargets;
+  int m_CurrentTargetIndex;
+  bool m_BodyMarkerValid;
 
-  itk::SmartPointer<mitk::USPointMarkInteractor>                       m_PointMarkInteractor;
-  itk::SmartPointer<mitk::USNavigationTargetUpdateFilter>              m_TargetUpdateFilter;
-  itk::SmartPointer<mitk::NodeDisplacementFilter>                      m_NodeDisplacementFilter;
-  itk::SmartPointer<mitk::NeedleProjectionFilter>                      m_NeedleProjectionFilter;
-  itk::SmartPointer<mitk::USNavigationTargetIntersectionFilter>        m_TargetIntersectionFilter;
-  itk::SmartPointer<mitk::USTargetPlacementQualityCalculator>          m_PlacementQualityCalculator;
+  itk::SmartPointer<mitk::USPointMarkInteractor> m_PointMarkInteractor;
+  itk::SmartPointer<mitk::USNavigationTargetUpdateFilter> m_TargetUpdateFilter;
+  itk::SmartPointer<mitk::NodeDisplacementFilter> m_NodeDisplacementFilter;
+  itk::SmartPointer<mitk::NeedleProjectionFilter> m_NeedleProjectionFilter;
+  itk::SmartPointer<mitk::USNavigationTargetIntersectionFilter> m_TargetIntersectionFilter;
+  itk::SmartPointer<mitk::USTargetPlacementQualityCalculator> m_PlacementQualityCalculator;
 
-  itk::SmartPointer<mitk::LookupTableProperty>                         m_TargetColorLookupTableProperty;
+  itk::SmartPointer<mitk::LookupTableProperty> m_TargetColorLookupTableProperty;
 
-  itk::SmartPointer<mitk::DataNode>                                    m_TargetNode;
-  QVector<itk::SmartPointer<mitk::DataNode> >                          m_PlannedTargetNodes;
-  QVector<itk::SmartPointer<mitk::DataNode> >                          m_PlannedNeedlePaths;
+  itk::SmartPointer<mitk::DataNode> m_TargetNode;
+  QVector<itk::SmartPointer<mitk::DataNode>> m_PlannedTargetNodes;
+  QVector<itk::SmartPointer<mitk::DataNode>> m_PlannedNeedlePaths;
 
-  itk::SmartPointer<mitk::OverlayManager>                              m_OverlayManager;
-  itk::SmartPointer<mitk::TextOverlay3D>                               m_CurrentTargetNodeOverlay;
+  itk::SmartPointer<mitk::TextAnnotation3D> m_CurrentTargetNodeOverlay;
 
-  std::string                                                          m_ReferenceSensorName;
-  std::string                                                          m_NeedleSensorName;
+  std::string m_ReferenceSensorName;
+  std::string m_NeedleSensorName;
 
-  unsigned int                                                         m_ReferenceSensorIndex;
-  unsigned int                                                         m_NeedleSensorIndex;
+  unsigned int m_ReferenceSensorIndex;
+  unsigned int m_NeedleSensorIndex;
 
 private:
-  mitk::MessageDelegate1<QmitkUSNavigationStepPlacementPlanning, mitk::DataNode*> m_ListenerTargetCoordinatesChanged;
+  mitk::MessageDelegate1<QmitkUSNavigationStepPlacementPlanning, mitk::DataNode *> m_ListenerTargetCoordinatesChanged;
 
   Ui::QmitkUSNavigationStepPlacementPlanning *ui;
 };

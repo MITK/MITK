@@ -98,6 +98,8 @@ ui(new Ui::USNavigationMarkerPlacement)
 
 USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 {
+  this->OnResetStandardLayout();
+
   // make sure that the experiment got finished before destructing the object
   if (m_IsExperimentRunning) { this->OnFinishExperiment(); }
 
@@ -191,6 +193,7 @@ void USNavigationMarkerPlacement::CreateQtPartControl(QWidget *parent)
 
   connect(ui->startExperimentButton, SIGNAL(clicked()), this, SLOT(OnStartExperiment()));
   connect(ui->finishExperimentButton, SIGNAL(clicked()), this, SLOT(OnFinishExperiment()));
+  connect(ui->m_enableNavigationLayout, SIGNAL(clicked()), this, SLOT(OnChangeLayoutClicked()));
 
   connect(ui->navigationProcessWidget, SIGNAL(SignalIntermediateResult(const itk::SmartPointer<mitk::DataNode>)),
     this, SLOT(OnIntermediateResultProduced(const itk::SmartPointer<mitk::DataNode>)));
@@ -230,6 +233,27 @@ void USNavigationMarkerPlacement::OnTimeout()
 {
   if (!m_StdMultiWidget)
   {
+    OnEnableNavigationLayout();
+    this->CreateOverlays();
+  }
+
+  if (m_CombinedModality.IsNotNull() &&
+      !this->m_CombinedModality->GetIsFreezed()) // if the combined modality is freezed: do nothing
+  {
+    ui->navigationProcessWidget->UpdateNavigationProgress();
+    m_AblationZonesDisplacementFilter->Update();
+
+    // update the 3D window only every fourth time to speed up the rendering (at least in 2D)
+    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
+
+    // make sure that a reinit was performed on the image
+    this->ReinitOnImage();
+  }
+}
+
+void USNavigationMarkerPlacement::OnEnableNavigationLayout()
+{
+  MITK_INFO << "Navigation Layout";
     // try to get the standard multi widget if it couldn't be got before
     mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
@@ -245,23 +269,25 @@ void USNavigationMarkerPlacement::OnTimeout()
       {
         m_StdMultiWidget->DisableStandardLevelWindow();
         m_StdMultiWidget->changeLayoutTo2DUpAnd3DDown();
+        this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane")->SetVisibility(false);
+        this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->SetVisibility(false);
       }
     }
+}
 
-    if (m_OverlayManager.IsNull()) { this->CreateOverlays(); }
-  }
+void USNavigationMarkerPlacement::OnResetStandardLayout()
+{
+  MITK_INFO << "Resetting Layout";
+  //reset render windows
+  this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane")->SetVisibility(true);
+  this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->SetVisibility(true);
+  m_StdMultiWidget->changeLayoutToDefault();
+}
 
-  if (m_CombinedModality.IsNotNull() && !this->m_CombinedModality->GetIsFreezed()) //if the combined modality is freezed: do nothing
-  {
-    ui->navigationProcessWidget->UpdateNavigationProgress();
-    m_AblationZonesDisplacementFilter->Update();
-
-    //update the 3D window only every fourth time to speed up the rendering (at least in 2D)
-    this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
-
-    // make sure that a reinit was performed on the image
-    this->ReinitOnImage();
-  }
+void USNavigationMarkerPlacement::OnChangeLayoutClicked()
+{
+  if (ui->m_enableNavigationLayout->isChecked()) OnEnableNavigationLayout();
+  else OnResetStandardLayout();
 }
 
 void USNavigationMarkerPlacement::OnImageAndNavigationDataLoggingTimeout()

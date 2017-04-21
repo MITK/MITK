@@ -79,7 +79,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
       else
       {
         // TODO: To skip these tags is necessary in order for the gdcm to generate them correctly.
-        if (tagkey == std::string("0008|0016") || tagkey == std::string("0008|0018"))
+        if (tagkey == "0008|0016" || tagkey == "0008|0018")
         {
           continue;
         }
@@ -114,17 +114,17 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
           %spacingVector[0] %spacingVector[1] %spacingVector[2]
           );
           
-          if (tagkey == std::string("0020|0037"))
+          if (tagkey == "0020|0037")
           {
             itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, imageOrientation);
             continue;
           }
-          else if (tagkey == std::string("0020|0032"))
+          else if (tagkey == "0020|0032")
           {
             itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, imagePosition);
             continue;
           }
-          else if (tagkey == std::string("0028|0030"))
+          else if (tagkey == "0028|0030")
           {
             itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, spacing);
             continue;

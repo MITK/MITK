@@ -108,6 +108,12 @@ protected slots:
 
   void OnAddAblationZone(int size);
 
+  void OnEnableNavigationLayout();
+
+  void OnResetStandardLayout();
+
+  void OnChangeLayoutClicked();
+
   void OnChangeAblationZone(int id, int newSize);
 
 public:
@@ -119,7 +125,7 @@ public:
   static const char *DATANAME_REACHED_TARGETS;
 
   explicit USNavigationMarkerPlacement();
-  ~USNavigationMarkerPlacement();
+  virtual ~USNavigationMarkerPlacement();
 
   virtual void CreateQtPartControl(QWidget *parent);
 

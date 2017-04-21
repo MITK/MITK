@@ -72,6 +72,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_connected = false;
   m_logging = false;
   m_loggedFrames = 0;
+  m_SimpleModeEnabled = false;
 
   //create filename for autosaving of tool storage
   QString loggingPathWithoutFilename = QString(mitk::LoggingBackend::GetLogFile().c_str());
@@ -163,6 +164,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()));
     connect(m_Controls->m_ConnectDisconnectButton, SIGNAL(clicked()), this, SLOT(OnConnectDisconnect()));
     connect(m_Controls->m_StartStopTrackingButton, SIGNAL(clicked()), this, SLOT(OnStartStopTracking()));
+    connect(m_Controls->m_ConnectSimpleMode, SIGNAL(clicked()), this, SLOT(OnConnectDisconnect()));
+    connect(m_Controls->m_StartTrackingSimpleMode, SIGNAL(clicked()), this, SLOT(OnStartStopTracking()));
     connect(m_Controls->m_FreezeUnfreezeTrackingButton, SIGNAL(clicked()), this, SLOT(OnFreezeUnfreezeTracking()));
     connect(m_TrackingLoggingTimer, SIGNAL(timeout()), this, SLOT(UpdateLoggingTrackingTimer()));
     connect(m_TrackingRenderTimer, SIGNAL(timeout()), this, SLOT(UpdateRenderTrackingTimer()));
@@ -182,6 +185,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_UseDifferentUpdateRates, SIGNAL(clicked()), this, SLOT(OnToggleDifferentUpdateRates()));
     connect(m_Controls->m_RenderUpdateRate, SIGNAL(valueChanged(int)), this, SLOT(OnChangeRenderUpdateRate()));
     connect(m_Controls->m_DisableAllTimers, SIGNAL(stateChanged(int)), this, SLOT(EnableDisableTimerButtons(int)));
+    connect(m_Controls->m_advancedUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
+    connect(m_Controls->m_simpleUI, SIGNAL(clicked()), this, SLOT(OnToggleAdvancedSimpleMode()));
 
     //connections for the tracking device configuration widget
     connect(m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
@@ -202,6 +207,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //initialize widgets
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
     m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
+    m_Controls->m_simpleWidget->setVisible(false);
 
     //initialize tracking volume node
     m_TrackingVolumeNode = mitk::DataNode::New();
@@ -214,6 +220,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
     //initialize buttons
     m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
     m_Controls->m_StartStopTrackingButton->setEnabled(false);
+    m_Controls->m_StartTrackingSimpleMode->setEnabled(false);
     m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 
     //initialize warning labels
@@ -431,7 +438,9 @@ void QmitkMITKIGTTrackingToolboxView::OnConnectFinished(bool success, QString er
 
   m_Controls->m_TrackingControlLabel->setText("Status: connected");
   m_Controls->m_ConnectDisconnectButton->setText("Disconnect");
+  m_Controls->m_ConnectSimpleMode->setText("Disconnect");
   m_Controls->m_StartStopTrackingButton->setEnabled(true);
+  m_Controls->m_StartTrackingSimpleMode->setEnabled(true);
   m_connected = true;
 }
 
@@ -457,10 +466,12 @@ void QmitkMITKIGTTrackingToolboxView::OnDisconnectFinished(bool success, QString
 
   //enable/disable Buttons
   m_Controls->m_StartStopTrackingButton->setEnabled(false);
+  m_Controls->m_StartTrackingSimpleMode->setEnabled(false);
   EnableOptionsButtons();
   EnableTrackingConfigurationButtons();
   m_Controls->m_TrackingControlLabel->setText("Status: disconnected");
   m_Controls->m_ConnectDisconnectButton->setText("Connect");
+  m_Controls->m_ConnectSimpleMode->setText("Connect");
   m_Controls->m_FreezeUnfreezeTrackingButton->setText("Freeze Tracking");
   m_Controls->m_TrackingFrozenLabel->setVisible(false);
   m_connected = false;
@@ -539,6 +550,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStartTrackingFinished(bool success, QStr
   m_tracking = true;
   m_Controls->m_ConnectDisconnectButton->setEnabled(false);
   m_Controls->m_StartStopTrackingButton->setText("Stop Tracking");
+  m_Controls->m_StartTrackingSimpleMode->setText("Stop\nTracking");
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(true);
 
 }
@@ -572,6 +584,7 @@ void QmitkMITKIGTTrackingToolboxView::OnStopTrackingFinished(bool success, QStri
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
   m_tracking = false;
   m_Controls->m_StartStopTrackingButton->setText("Start Tracking");
+  m_Controls->m_StartTrackingSimpleMode->setText("Start\nTracking");
   m_Controls->m_ConnectDisconnectButton->setEnabled(true);
   m_Controls->m_FreezeUnfreezeTrackingButton->setEnabled(false);
 
@@ -855,6 +868,23 @@ void QmitkMITKIGTTrackingToolboxView::OnToggleFileExtension()
   }
 }
 
+void QmitkMITKIGTTrackingToolboxView::OnToggleAdvancedSimpleMode()
+{
+  if (m_SimpleModeEnabled)
+  {
+    m_Controls->m_simpleWidget->setVisible(false);
+    m_Controls->m_MainWidget->setVisible(true);
+    m_Controls->m_simpleUI->setChecked(false);
+    m_SimpleModeEnabled = false;
+  }
+  else
+  {
+    m_Controls->m_simpleWidget->setVisible(true);
+    m_Controls->m_MainWidget->setVisible(false);
+    m_SimpleModeEnabled = true;
+  }
+}
+
 void QmitkMITKIGTTrackingToolboxView::OnToggleDifferentUpdateRates()
 {
   if (m_Controls->m_UseDifferentUpdateRates->isChecked())
@@ -1130,11 +1160,12 @@ void QmitkMITKIGTTrackingToolboxView::StoreUISettings()
   QSettings settings;
 
   settings.beginGroup(QString::fromStdString(VIEW_ID));
-
+  MITK_INFO << "Store UI settings";
   // set the values of some widgets and attrbutes to the QSettings
   settings.setValue("ShowTrackingVolume", QVariant(m_Controls->m_ShowTrackingVolume->isChecked()));
   settings.setValue("toolStorageFilename", QVariant(m_ToolStorageFilename));
   settings.setValue("VolumeSelectionBox", QVariant(m_Controls->m_VolumeSelectionBox->currentIndex()));
+  settings.setValue("SimpleModeEnabled", QVariant(m_SimpleModeEnabled));
 
   settings.endGroup();
 }
@@ -1153,7 +1184,7 @@ void QmitkMITKIGTTrackingToolboxView::LoadUISettings()
   m_Controls->m_ShowTrackingVolume->setChecked(settings.value("ShowTrackingVolume", true).toBool());
   m_Controls->m_VolumeSelectionBox->setCurrentIndex(settings.value("VolumeSelectionBox", 0).toInt());
   m_ToolStorageFilename = settings.value("toolStorageFilename", QVariant("")).toString();
-
+  if (settings.value("SimpleModeEnabled", false).toBool()) { this->OnToggleAdvancedSimpleMode(); }
   settings.endGroup();
   //! [LoadUISettings]
 

@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <Poco/Exception.h>
 
+#include "berryMitkConfig.h"
+
 namespace berry
 {
 
@@ -52,7 +54,7 @@ IWorkbenchConfigurer::Pointer WorkbenchAdvisor::GetWorkbenchConfigurer()
 
 void WorkbenchAdvisor::PreStartup()
 {
-  // do nothing
+  m_mitkConfig.reset(new MitkConfig());
 }
 
 void WorkbenchAdvisor::PostStartup()
@@ -67,7 +69,7 @@ bool WorkbenchAdvisor::PreShutdown()
 
 void WorkbenchAdvisor::PostShutdown()
 {
-  // do nothing
+  m_mitkConfig.reset();
 }
 
 IAdaptable* WorkbenchAdvisor::GetDefaultPageInput()

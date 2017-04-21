@@ -7,6 +7,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   QmitkAboutHandler.cpp
+  QmitkConfigPreferencePage.cpp
   QmitkAppInstancesPreferencePage.cpp
   QmitkExternalProgramsPreferencePage.cpp
   QmitkCommonExtPlugin.cpp
@@ -15,6 +16,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
+  src/internal/QmitkConfigPreferencePage.ui
   src/internal/QmitkAppInstancesPreferencePage.ui
   src/internal/QmitkExternalProgramsPreferencePage.ui
 )
@@ -24,6 +26,7 @@ set(MOC_H_FILES
   src/QmitkExtWorkbenchWindowAdvisor.h
 
   src/internal/QmitkAboutHandler.h
+  src/internal/QmitkConfigPreferencePage.h
   src/internal/QmitkAppInstancesPreferencePage.h
   src/internal/QmitkExternalProgramsPreferencePage.h
   src/internal/QmitkCommonExtPlugin.h

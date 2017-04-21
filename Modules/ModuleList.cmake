@@ -3,6 +3,7 @@
 
 set(mitk_modules
   Logging
+  Config
   Core
   CommandLine
   AppUtil

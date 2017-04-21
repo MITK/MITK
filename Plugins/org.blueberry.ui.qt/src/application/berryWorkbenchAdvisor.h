@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef BERRYWORKBENCHADVISOR_H_
 #define BERRYWORKBENCHADVISOR_H_
 
+#include <memory>
+
 #include <org_blueberry_ui_qt_Export.h>
 
 #include "berryIMemento.h"
@@ -26,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "berryIWorkbenchConfigurer.h"
 
 namespace berry {
+  struct MitkConfig;
 
 /**
  * public: base class for configuring the workbench.
@@ -99,6 +102,7 @@ class BERRY_UI_QT WorkbenchAdvisor {
    * The workbench configurer.
    */
   private: IWorkbenchConfigurer::Pointer workbenchConfigurer;
+           std::unique_ptr<MitkConfig> m_mitkConfig;
 
   /*
    * The workbench error handler.

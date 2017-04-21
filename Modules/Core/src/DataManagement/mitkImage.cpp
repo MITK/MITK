@@ -48,83 +48,11 @@ void mitk::Image::SaveMetaDataDictionaryArraySize(const unsigned int size)
   m_MetaDataDictionaryArraySize = size;
 }
 
-int indexFromMatrixRow(mitk::Matrix3D matrix, int row)
-{
-  int index = 0;
-  if (matrix[row][0] != 0) {
-    index = 0;
-  } else if (matrix[row][1] != 0) {
-    index = 1;
-  } else {
-    index = 2;
-  }
-  
-  return index;
-}
-
-mitk::Matrix3D getNearestStandardMatrix(mitk::Matrix3D imageMatrix, mitk::Vector3D spacing)
-{
-  mitk::Matrix3D result;
-  result.Fill(0.0);
-
-  for (int row = 0; row < 3; ++row) {
-    int maxAxisIndex = 0;
-    double maxAxisVal = abs(imageMatrix[row][0] / spacing[0]);
-    for (int column = 1; column < 3; ++column) {
-      double normalizedVal = abs(imageMatrix[row][column] / spacing[column]);
-      if (normalizedVal > maxAxisVal) {
-        maxAxisVal = normalizedVal;
-        maxAxisIndex = column;
-      }
-    }
-    
-    if (imageMatrix[row][maxAxisIndex] > 0) {
-      result[row][maxAxisIndex] = 1.0;
-    } else {
-      result[row][maxAxisIndex] = -1.0;
-    }
-    
-  }
-
-  return result;
-}
-
 mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 {
-  mitk::Matrix3D imageMatrix = GetSlicedGeometry()->GetIndexToWorldTransform()->GetMatrix();
-  mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
-  mitk::Vector3D spacingVector = slicedGeometry->GetSpacing();
-  
-  mitk::Matrix3D matrix = getNearestStandardMatrix(imageMatrix, spacingVector);
-  mitk::Matrix3D transposedMatrix = static_cast<mitk::Matrix3D>(matrix.GetTranspose());
-  
-  int mainAxisIndex = indexFromMatrixRow(transposedMatrix, 2);
-
-  int direction;
-  switch (mainAxisIndex) {
-    case 0:
-      direction = mitk::SliceNavigationController::Sagittal;
-      break;
-      
-    case 1:
-      direction = mitk::SliceNavigationController::Frontal;
-      break;
-      
-    case 2:
-      direction = mitk::SliceNavigationController::Axial;
-      break;
-  }
-
-  int workIndex = 0;
-  if (direction == mitk::SliceNavigationController::Axial) {
-    workIndex = 2;
-  } else if (direction == mitk::SliceNavigationController::Sagittal) {
-    workIndex = 0;
-  } else if (direction == mitk::SliceNavigationController::Frontal) {
-    workIndex = 1;
-  }
-
-  int numberSlices = GetLargestPossibleRegion().GetSize()[workIndex];
+  mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(GetProperty("autoplan.mainAxisIndex")));
+  int mainAxisIndex = prop ? prop->GetValue() : 2;
+  int numberSlices = GetLargestPossibleRegion().GetSize()[mainAxisIndex];
   
   mitk::ReaderType::DictionaryArrayType outputArray;
   outputArray.resize(numberSlices);

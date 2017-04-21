@@ -176,10 +176,7 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
   return image;
 }
 
-namespace
-{
-  typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
-}
+typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
 
 inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagToValueList& list)
 {

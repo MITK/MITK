@@ -157,6 +157,9 @@ namespace mitk
     virtual void Swivel(StateMachineAction*, InteractionEvent* event);
 
 
+    virtual void ScrollTimeOneDown(StateMachineAction*, InteractionEvent*);
+    virtual void ScrollTimeOneUp(StateMachineAction*, InteractionEvent*);
+
     /**
      * \brief Updates the Statusbar information with the information about the clicked position
      */

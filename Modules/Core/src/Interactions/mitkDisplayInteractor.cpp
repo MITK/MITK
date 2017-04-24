@@ -69,6 +69,9 @@ void mitk::DisplayInteractor::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("scroll", Scroll);
   CONNECT_FUNCTION("ScrollOneDown", ScrollOneDown);
   CONNECT_FUNCTION("ScrollOneUp", ScrollOneUp);
+  CONNECT_FUNCTION("ScrollTimeOneDown", ScrollTimeOneDown);
+  CONNECT_FUNCTION("ScrollTimeOneUp", ScrollTimeOneUp);
+
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
   CONNECT_FUNCTION("setCrosshair", SetCrosshair);
 
@@ -597,6 +600,29 @@ void mitk::DisplayInteractor::ScrollOneUp(StateMachineAction*, InteractionEvent*
     {
       stepper = sliceNaviController->GetTime();
     }
+    stepper->Previous();
+    interactionEvent->GetSender()->RequestUpdate();
+  }
+}
+
+void mitk::DisplayInteractor::ScrollTimeOneDown(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
+  if (!sliceNaviController->GetSliceLocked())
+  {
+    mitk::Stepper* stepper = sliceNaviController->GetTime();
+    stepper->Next();
+    interactionEvent->GetSender()->RequestUpdate();
+  }
+
+}
+
+void mitk::DisplayInteractor::ScrollTimeOneUp(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  mitk::SliceNavigationController::Pointer sliceNaviController = interactionEvent->GetSender()->GetSliceNavigationController();
+  if (!sliceNaviController->GetSliceLocked())
+  {
+    mitk::Stepper* stepper = sliceNaviController->GetTime();
     stepper->Previous();
     interactionEvent->GetSender()->RequestUpdate();
   }

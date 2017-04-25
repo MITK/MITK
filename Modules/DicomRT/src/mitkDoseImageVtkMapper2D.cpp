@@ -720,10 +720,10 @@ void mitk::DoseImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk
     if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
     {
       // centralSlice is strange, lets look at all data
-      min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
-      max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
+      min2ndValue = image->GetStatistics()->GetScalarValue2ndMin();
+      max2ndValue = image->GetStatistics()->GetScalarValue2ndMax();
       minValue = image->GetStatistics()->GetScalarValueMin();
-      maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+      maxValue = image->GetStatistics()->GetScalarValueMax();
     }
     isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
   }

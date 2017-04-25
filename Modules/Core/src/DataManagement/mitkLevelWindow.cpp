@@ -281,27 +281,27 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool /*tryPicTags*/, b
     image = sliceSelector->GetOutput();
     if ( image == nullptr || !image->IsInitialized() ) return;
 
-    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
-    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
+    min2ndValue = image->GetStatistics()->GetScalarValue2ndMin();
+    max2ndValue = image->GetStatistics()->GetScalarValue2ndMax();
     minValue    = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
-    maxValue    = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+    maxValue = image->GetStatistics()->GetScalarValueMax();
     if ( minValue == maxValue )
     {
       // guessByCentralSlice seems to have failed, lets look at all data
       image       = wholeImage;
-      min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
-      max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
+      min2ndValue = image->GetStatistics()->GetScalarValue2ndMin();
+      max2ndValue = image->GetStatistics()->GetScalarValue2ndMax();
       minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
-      maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute();
+      maxValue = image->GetStatistics()->GetScalarValueMax();
     }
   }
   else
   {
     const_cast<Image*>(image)->Update();
-    min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute(0);
-    max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute(0);
+    min2ndValue = image->GetStatistics()->GetScalarValue2ndMin();
+    max2ndValue = image->GetStatistics()->GetScalarValue2ndMax();
     minValue = image->GetStatistics()->GetScalarValueMin(0, selectedComponent);
-    maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute(0);
+    maxValue = image->GetStatistics()->GetScalarValueMax();
     for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
       ScalarType minValueTemp = image->GetStatistics()->GetScalarValueMin(i, selectedComponent);

@@ -576,6 +576,29 @@ public:
                               UpdateCallBackMethod callback = nullptr,
                               itk::SmartPointer<Image> preLoadedImageBlock = nullptr);
 
+  /**
+  \brief Scan for slice image information
+  */
+  static void ScanForSliceInformation(const StringContainer &filenames, gdcm::Scanner& scanner);
+
+  /**
+  \brief Sort files into time step blocks of a 3D+t image.
+
+  Called by LoadDicom. Expects to be fed a single list of filenames that have been sorted by
+  GetSeries previously (one map entry). This method will check how many timestep can be filled
+  with given files.
+
+  Assumption is that the number of time steps is determined by how often the first position in
+  space repeats. I.e. if the first three files in the input parameter all describe the same
+  location in space, we'll construct three lists of files. and sort the remaining files into them.
+
+  \todo We can probably remove this method if we somehow transfer 3D+t information from GetSeries to LoadDicomSeries.
+  */
+  static
+    std::list<StringContainer>
+    SortIntoBlocksFor3DplusT(const StringContainer& presortedFilenames, const gdcm::Scanner::MappingType& tagValueMappings_, bool& canLoadAs4D);
+
+
 protected:
 
   /**
@@ -899,11 +922,6 @@ protected:
   };
 
   static void FixSpacingInformation( Image* image, const ImageBlockDescriptor& imageBlockDescriptor );
-
-  /**
-   \brief Scan for slice image information
-  */
-  static void ScanForSliceInformation( const StringContainer &filenames, gdcm::Scanner& scanner );
 
   /**
    \brief Performs actual loading of a series and creates an image having the specified pixel type.

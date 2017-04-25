@@ -979,7 +979,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
             identicalOrigins = false;
           }
 
-          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock) && numberOfFilesInPreviousBlock == 1)
+          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
           {
             // group with previous block
             groupsOf3DPlusTBlocks[previousBlockKey].AddFiles( block3DIter->second.GetFilenames() );
@@ -1519,17 +1519,11 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       bool canLoadAs4D(true);
       gdcm::Scanner scanner;
 
-      StringContainer slicesFileNameForScan;
-      // we checked series id for all slice, so we expect infos for another file be the same 
-      slicesFileNameForScan.push_back(filenames.at(0));
-
-      ScanForSliceInformation(slicesFileNameForScan, scanner);
+      ScanForSliceInformation(filenames, scanner);
 
       // need non-const access for map
       gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(scanner.GetMappings());
-
-      std::list<StringContainer> imageBlocks;
-      imageBlocks.push_back(slicesFileNameForScan);
+      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, tagValueMappings, canLoadAs4D );
 
       unsigned int volume_count = imageBlocks.size();
 
@@ -1673,6 +1667,108 @@ DicomSeriesReader::ScanForSliceInformation(const StringContainer &filenames, gdc
     scanner.AddTag( tagNumberOfFrames );
 
   scanner.Scan(filenames); // make available image information for each file
+}
+
+std::list<DicomSeriesReader::StringContainer>
+DicomSeriesReader::SortIntoBlocksFor3DplusT(
+  const StringContainer& presortedFilenames,
+  const gdcm::Scanner::MappingType& tagValueMappings,
+  bool& canLoadAs4D)
+{
+  std::list<StringContainer> imageBlocks;
+  StringContainer sorted_filenames = presortedFilenames;
+
+  // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
+  try
+  {
+    sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames, tagValueMappings);
+  } catch (...)
+  {
+    MITK_ERROR << "Caught something.";
+  }
+
+  std::string firstPosition;
+  unsigned int numberOfBlocks(0); // number of 3D image blocks
+
+  static const gdcm::Tag tagImagePositionPatient(0x0020, 0x0032); //Image position (Patient)
+  const gdcm::Tag tagModality(0x0008, 0x0060);
+
+  // loop files to determine number of image blocks
+  for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
+    fileIter != sorted_filenames.end();
+    ++fileIter)
+  {
+    gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find(fileIter->c_str())->second;
+
+    if (tagToValueMap.find(tagImagePositionPatient) == tagToValueMap.end())
+    {
+      numberOfBlocks = 1;
+      break;
+    }
+
+    std::string position = tagToValueMap.find(tagImagePositionPatient)->second;
+    MITK_DEBUG << "  " << *fileIter << " at " << position;
+    if (firstPosition.empty())
+    {
+      firstPosition = position;
+    }
+
+    if (position == firstPosition)
+    {
+      ++numberOfBlocks;
+    } else
+    {
+      break; // enough information to know the number of image blocks
+    }
+  }
+
+  MITK_DEBUG << "  ==> Assuming " << numberOfBlocks << " time steps";
+
+  if (numberOfBlocks == 0) return imageBlocks; // only possible if called with no files
+
+
+                                               // loop files to sort them into image blocks
+  unsigned int numberOfExpectedSlices(0);
+  for (unsigned int block = 0; block < numberOfBlocks; ++block)
+  {
+    StringContainer filesOfCurrentBlock;
+
+    for (StringContainer::const_iterator fileIter = sorted_filenames.begin() + block;
+      fileIter != sorted_filenames.end();
+      //fileIter += numberOfBlocks) // TODO shouldn't this work? give invalid iterators on first attempts
+      )
+    {
+      filesOfCurrentBlock.push_back(*fileIter);
+      for (unsigned int b = 0; b < numberOfBlocks; ++b)
+      {
+        if (fileIter != sorted_filenames.end())
+          ++fileIter;
+      }
+    }
+
+    imageBlocks.push_back(filesOfCurrentBlock);
+
+    if (block == 0)
+    {
+      numberOfExpectedSlices = filesOfCurrentBlock.size();
+    } else
+    {
+      if (filesOfCurrentBlock.size() != numberOfExpectedSlices)
+      {
+        MITK_WARN << "DicomSeriesReader expected " << numberOfBlocks
+          << " image blocks of "
+          << numberOfExpectedSlices
+          << " images each. Block "
+          << block
+          << " got "
+          << filesOfCurrentBlock.size()
+          << " instead. Cannot load this as 3D+t"; // TODO implement recovery (load as many slices 3D+t as much as possible)
+        canLoadAs4D = false;
+      }
+    }
+  }
+
+  return imageBlocks;
 }
 
 Image::Pointer

@@ -702,11 +702,7 @@ bool mitk::Image::SetImportVolume(void *data, int t, int n, ImportMemoryManageme
     if(vol.GetPointer()==nullptr) return false;
     if ( vol->GetData() != data )
     {
-      if (importMemoryManagement == AsyncCopyMemory) { 
-        std::memcpy(vol->GetData(), data, m_OffsetTable[2]*(ptypeSize));
-      } else {
-        std::memcpy(vol->GetData(), data, m_OffsetTable[4]*(ptypeSize));
-      }
+      std::memcpy(vol->GetData(), data, m_OffsetTable[3] * (ptypeSize));
     }
     vol->SetComplete(true);
     this->m_ImageDescriptor->GetChannelDescriptor(n).SetData( vol->GetData() );
@@ -1167,15 +1163,9 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateVolumeData_unlocked(int t
   // allocate new volume
   if(importMemoryManagement == CopyMemory)
   {
-    vol=new ImageDataItem( chPixelType, t, 3, m_Dimensions, NULL, true);
+    vol = new ImageDataItem(chPixelType, t, 3, m_Dimensions, nullptr, true);
     if (data != nullptr)
-      std::memcpy(vol->GetData(), data, m_OffsetTable[4]*(ptypeSize));
-  }
-  else if (importMemoryManagement == AsyncCopyMemory)
-  {
-    vol=new ImageDataItem( chPixelType, t, 3, m_Dimensions, NULL, true);
-    if (data != nullptr)
-      std::memcpy(vol->GetData(), data, m_OffsetTable[2]*(ptypeSize));
+      std::memcpy(vol->GetData(), data, m_OffsetTable[3] * (ptypeSize));
   }
   else
   {
@@ -1200,7 +1190,7 @@ mitk::Image::ImageDataItemPointer mitk::Image::AllocateChannelData_unlocked(int 
     const size_t ptypeSize = this->m_ImageDescriptor->GetChannelTypeById(n).GetSize();
     ch = new ImageDataItem(this->m_ImageDescriptor, -1, nullptr, true);
     if (data != nullptr)
-      std::memcpy(ch->GetData(), data, m_OffsetTable[2]*(ptypeSize));
+      std::memcpy(ch->GetData(), data, m_OffsetTable[4] * (ptypeSize));
   }
   else
   {

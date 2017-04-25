@@ -92,6 +92,15 @@
   <event_variant class="MouseWheelEvent" name="PlaneDown">
     <attribute name="ScrollDirection" value="down"/>
   </event_variant>
+  <!-- Scrolling through times -->
+  <event_variant class="MouseWheelEvent" name="TimeUp">
+    <attribute name="Modifiers" value="ctrl"/>
+    <attribute name="ScrollDirection" value="up"/>
+  </event_variant>
+  <event_variant class="MouseWheelEvent" name="TimeDown">
+    <attribute name="Modifiers" value="ctrl"/>
+    <attribute name="ScrollDirection" value="down"/>
+  </event_variant>
   <!-- Rotation -->
   <event_variant class="InteractionKeyEvent" name="RotateClock">
     <attribute name="Modifiers" value="ctrl"/>

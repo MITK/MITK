@@ -1,0 +1,26 @@
+From d80b79177041d884bdf243403c4d7c5464dd1069 Mon Sep 17 00:00:00 2001
+From: KuznetsovAlexander <KuznetsovAlexander@rambler.ru>
+Date: Fri, 21 Apr 2017 15:54:11 +0400
+Subject: [PATCH] Fixed progress for 4D images.
+
+Signed-off-by: KuznetsovAlexander <KuznetsovAlexander@rambler.ru>
+---
+ Modules/IO/ImageBase/include/itkImageSeriesReader.hxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Modules/IO/ImageBase/include/itkImageSeriesReader.hxx b/Modules/IO/ImageBase/include/itkImageSeriesReader.hxx
+index 7f1af14..ec20c1c 100644
+--- a/Modules/IO/ImageBase/include/itkImageSeriesReader.hxx
++++ b/Modules/IO/ImageBase/include/itkImageSeriesReader.hxx
+@@ -298,7 +298,7 @@ void ImageSeriesReader< TOutputImage >
+ 
+   // progress reported on a per slice basis
+   ProgressReporter progress(this, 0,
+-                            requestedRegion.GetSize(TOutputImage::ImageDimension-1),
++                            requestedRegion.GetSize(TOutputImage::ImageDimension-1 < 2 ? TOutputImage::ImageDimension - 1 : 2),
+                             100);
+ 
+   // We utilize the modified time of the output information to
+-- 
+2.9.0.windows.1
+

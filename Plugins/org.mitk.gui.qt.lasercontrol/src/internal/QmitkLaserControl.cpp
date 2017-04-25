@@ -35,7 +35,7 @@ void OPOLaserControl::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-  connect(m_Controls.buttonInitLaser, SIGNAL(clicked()), this, SLOT(InitLaser()));
+  connect(m_Controls.buttonInitLaser, SIGNAL(clicked()), this, SLOT(InitResetLaser()));
   connect(m_Controls.buttonTune, SIGNAL(clicked()), this, SLOT(TuneWavelength()));
   connect(m_Controls.buttonFastTuning, SIGNAL(clicked()), this, SLOT(StartFastTuning()));
   connect(m_Controls.buttonFlashlamp, SIGNAL(clicked()), this, SLOT(ToggleFlashlamp()));
@@ -81,106 +81,33 @@ void OPOLaserControl::SyncWavelengthSetBySpinBox()
     m_SyncFromSpinBox = true;
 }
 
-void OPOLaserControl::InitLaser()
+void OPOLaserControl::InitResetLaser()
 {
   m_Controls.buttonInitLaser->setEnabled(false);
   m_Controls.buttonInitLaser->setText("working ...");
 
-  if (!m_PumpLaserConnected)
+  if (!m_PumpLaserConnected && !m_OPOConnected)
   {
     m_PumpLaserController = mitk::QuantelLaser::New();
-
-    if (m_PumpLaserController->OpenConnection("OpotekPhocusMobile"))
-    {
-      m_Controls.buttonFlashlamp->setEnabled(true);
-      m_Controls.buttonQSwitch->setEnabled(false);
-      m_Controls.buttonInitLaser->setText("Reset and Release Laser");
-
-      std::string answer("");
-      std::string triggerCommand("TRIG ");
-      if (m_Controls.checkBoxTriggerExternally->isChecked())
-      {
-        triggerCommand.append("EE"); // set both Triggers external
-        m_PumpLaserController->SendAndReceiveLine(&triggerCommand, &answer);
-        MITK_INFO << answer;
-      }
-      else
-      {
-        triggerCommand.append("II"); // set both Triggers internal
-        m_PumpLaserController->SendAndReceiveLine(&triggerCommand, &answer);
-        MITK_INFO << answer;
-        std::string energyCommand("QDLY 30");
-        m_PumpLaserController->SendAndReceiveLine(&energyCommand, &answer);
-        MITK_INFO << answer;
-      }
-
-      m_PumpLaserConnected = true;
-      this->GetState();
-    }
-    else
-    {
-      QMessageBox::warning(NULL, "Laser Control", "Opotek Pump Laser Initialization Failed.");
-      m_Controls.buttonInitLaser->setText("Init Laser");
-      m_Controls.buttonInitLaser->setEnabled(true);
-      return;
-    }
-  }
-  else
-  {
-    // destroy and free
-    if (m_PumpLaserController->CloseConnection())
-    {
-      m_Controls.buttonFlashlamp->setEnabled(false);
-      m_Controls.buttonQSwitch->setEnabled(false);
-      m_Controls.buttonInitLaser->setText("Init Laser");
-      m_PumpLaserConnected = false;
-    }
-    else
-    {
-      QMessageBox::warning(NULL, "Laser Control", "Opotek Pump Laser Release Failed.");
-      m_Controls.buttonInitLaser->setText("Reset and Release Laser");
-    }
-  }
-
-  if (!m_OPOConnected)
-  {
     m_OPOMotor = mitk::GalilMotor::New();
-    if (m_OPOMotor->OpenConnection("OpotekPhocusMobile"))
-    {
-      m_Controls.buttonTune->setEnabled(true);
-      m_Controls.buttonFastTuning->setEnabled(true);
-      m_Controls.sliderWavelength->setMinimum(m_OPOMotor->GetMinWavelength() * 10);
-      m_Controls.sliderWavelength->setMaximum(m_OPOMotor->GetMaxWavelength() * 10);
-      m_Controls.spinBoxWavelength->setMinimum(m_OPOMotor->GetMinWavelength());
-      m_Controls.spinBoxWavelength->setMaximum(m_OPOMotor->GetMaxWavelength());
-      m_Controls.sliderWavelength->setValue(m_OPOMotor->GetCurrentWavelength() * 10);
-      m_Controls.spinBoxWavelength->setValue(m_OPOMotor->GetCurrentWavelength());
-      m_OPOConnected = true; // not always right FIXME
-    }
-    else
-    {
-      QMessageBox::warning(NULL, "Laser Control", "OPO Initialization Failed.");
-      m_Controls.buttonInitLaser->setText("Init Laser");
-    }
+    InitThread *initThread = new InitThread(m_PumpLaserController, m_OPOMotor);
+    connect(initThread, SIGNAL(result(bool, bool)), this, SLOT(InitLaser(bool, bool)));
+    connect(initThread, SIGNAL(finished()), initThread, SLOT(deleteLater()));
+    initThread->start();
   }
   else
   {
     // destroy and free
-    if (m_OPOMotor->CloseConnection())
-    {
-      m_Controls.buttonTune->setEnabled(false);
-      m_Controls.buttonFastTuning->setEnabled(false);
-      m_Controls.buttonInitLaser->setText("Init Laser");
-      m_OPOConnected = false;
-    }
-    else
-    {
-      QMessageBox::warning(NULL, "Laser Control", "OPO Release Failed.");
-      m_Controls.buttonInitLaser->setText("Reset and Release Laser");
-    }
+    m_Controls.buttonFlashlamp->setEnabled(false);
+    m_Controls.buttonQSwitch->setEnabled(false);
+    m_Controls.buttonTune->setEnabled(false);
+    m_Controls.buttonFastTuning->setEnabled(false);
+
+    ResetThread *resetThread = new ResetThread(m_PumpLaserController, m_OPOMotor);
+    connect(resetThread, SIGNAL(result(bool, bool)), this, SLOT(ResetLaser(bool, bool)));
+    connect(resetThread, SIGNAL(finished()), resetThread, SLOT(deleteLater()));
+    resetThread->start();
   }
-  m_Controls.buttonInitLaser->setEnabled(true);
-  this->GetState();
   /*
   try
   {
@@ -202,6 +129,90 @@ void OPOLaserControl::InitLaser()
     MITK_INFO << " While trying to connect to the Pyro an exception was caught (this almost always happens on the first try after reboot - try again!)";
     m_PyroConnected = false;
   }*/
+}
+
+void OPOLaserControl::InitLaser(bool successLaser, bool successMotor)
+{
+  if (successLaser && successMotor)
+  {
+    m_Controls.buttonFlashlamp->setEnabled(true);
+    m_Controls.buttonQSwitch->setEnabled(false);
+    m_Controls.buttonInitLaser->setText("Reset and Release Laser");
+
+    std::string answer("");
+    std::string triggerCommand("TRIG ");
+    if (m_Controls.checkBoxTriggerExternally->isChecked())
+    {
+      triggerCommand.append("EE"); // set both Triggers external
+      m_PumpLaserController->SendAndReceiveLine(&triggerCommand, &answer);
+      MITK_INFO << answer;
+    }
+    else
+    {
+      triggerCommand.append("II"); // set both Triggers internal
+      m_PumpLaserController->SendAndReceiveLine(&triggerCommand, &answer);
+      MITK_INFO << answer;
+      std::string energyCommand("QDLY 30");
+      m_PumpLaserController->SendAndReceiveLine(&energyCommand, &answer);
+      MITK_INFO << answer;
+    }
+
+    m_PumpLaserConnected = true;
+
+    m_Controls.buttonTune->setEnabled(true);
+    m_Controls.buttonFastTuning->setEnabled(true);
+    m_Controls.sliderWavelength->setMinimum(m_OPOMotor->GetMinWavelength() * 10);
+    m_Controls.sliderWavelength->setMaximum(m_OPOMotor->GetMaxWavelength() * 10);
+    m_Controls.spinBoxWavelength->setMinimum(m_OPOMotor->GetMinWavelength());
+    m_Controls.spinBoxWavelength->setMaximum(m_OPOMotor->GetMaxWavelength());
+    m_Controls.sliderWavelength->setValue(m_OPOMotor->GetCurrentWavelength() * 10);
+    m_Controls.spinBoxWavelength->setValue(m_OPOMotor->GetCurrentWavelength());
+
+    m_OPOConnected = true; // not always right FIXME
+
+    this->GetState();
+  }
+  else
+  {
+    if(!successLaser)
+      QMessageBox::warning(NULL, "Laser Control", "Opotek Pump Laser Initialization Failed.");
+    if(!successMotor)
+      QMessageBox::warning(NULL, "Laser Control", "OPO Initialization Failed.");
+
+    m_Controls.buttonInitLaser->setText("Init Laser");
+    return;
+  }
+
+  m_Controls.buttonInitLaser->setEnabled(true);
+  this->GetState();
+}
+
+void OPOLaserControl::ResetLaser(bool successLaser, bool successMotor)
+{
+  if (successLaser && successMotor)
+  {
+    m_Controls.buttonFlashlamp->setEnabled(false);
+    m_Controls.buttonQSwitch->setEnabled(false);
+    m_Controls.buttonInitLaser->setText("Init Laser");
+    m_PumpLaserConnected = false;
+
+    m_Controls.buttonTune->setEnabled(false);
+    m_Controls.buttonFastTuning->setEnabled(false);
+    m_Controls.buttonInitLaser->setText("Init Laser");
+    m_OPOConnected = false;
+  }
+  else
+  {
+    if(!successMotor)
+      QMessageBox::warning(NULL, "Laser Control", "OPO Release Failed.");
+    if(!successLaser)
+      QMessageBox::warning(NULL, "Laser Control", "Opotek Pump Laser Release Failed.");
+
+    m_Controls.buttonInitLaser->setText("Reset and Release Laser");
+  }
+
+  m_Controls.buttonInitLaser->setEnabled(true);
+  this->GetState();
 }
 
 void OPOLaserControl::TuneWavelength()

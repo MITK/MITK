@@ -140,7 +140,7 @@ protected:
   void OrderImagesInterleaved(Image::Pointer PAImage, Image::Pointer USImage, std::vector<Image::Pointer> recordedList, bool raw);
   void OrderImagesUltrasound(Image::Pointer USImage, std::vector<Image::Pointer> recordedList);
 
-  void GetPixelValues(itk::Index<3> pixel);
+  void GetPixelValues(itk::Index<3> pixel, std::vector<float>& values);
   float GetPixelValue(itk::Index<3> pixel);
   std::vector<float>                    m_PixelValues;
 

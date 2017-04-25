@@ -26,6 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QFuture>
 #include <QFutureWatcher>
+#include <qthread.h>
 
 // Photoacoustics Hardware
 #include <mitkQuantelLaser.h>
@@ -57,7 +58,9 @@ public:
   /// \brief Called when the user clicks the GUI button
     void GetState();
 
-    void InitLaser();
+    void InitLaser(bool successLaser, bool successMotor);
+    void ResetLaser(bool successLaser, bool successMotor);
+    void InitResetLaser();
     void TuneWavelength();
     void StartFastTuning();
 
@@ -97,4 +100,43 @@ public:
 
 };
 
+class InitThread : public QThread
+{
+  Q_OBJECT
+    void run() Q_DECL_OVERRIDE
+    {
+      emit result(m_PumpLaserController->OpenConnection("OpotekPhocusMobile"), m_OPOMotor->OpenConnection("OpotekPhocusMobile"));
+    }
+  signals:
+    void result(bool, bool);
+  public:
+    InitThread(mitk::QuantelLaser::Pointer ql, mitk::GalilMotor::Pointer gm)
+    {
+      m_PumpLaserController = ql;
+      m_OPOMotor = gm;
+    }
+    mitk::QuantelLaser::Pointer m_PumpLaserController;
+    mitk::GalilMotor::Pointer m_OPOMotor;
+};
+
+class ResetThread : public QThread
+{
+  Q_OBJECT
+    void run() Q_DECL_OVERRIDE
+  {
+    emit result(m_PumpLaserController->CloseConnection(), m_OPOMotor->CloseConnection());
+  }
+signals:
+  void result(bool, bool);
+public:
+  ResetThread(mitk::QuantelLaser::Pointer ql, mitk::GalilMotor::Pointer gm)
+  {
+    m_PumpLaserController = ql;
+    m_OPOMotor = gm;
+  }
+  mitk::QuantelLaser::Pointer m_PumpLaserController;
+  mitk::GalilMotor::Pointer m_OPOMotor;
+};
+
 #endif // OPOLaserControl_h
+

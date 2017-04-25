@@ -337,7 +337,6 @@ mitk::Image::Pointer mitk::USDiPhASImageSource::ApplyResampling(mitk::Image::Poi
 
   outputSizeItk[0] = outputSize[0];
   outputSizeItk[1] = 10*(inputSpacing[1] * inputSizeItk[1]) / (outputSpacing[1]);
-  
   outputSizeItk[2] = 1;
 
   outputSpacingItk[0] = 0.996 * inputSpacing[0] * (static_cast<double>(inputSizeItk[0]) / static_cast<double>(outputSizeItk[0])); // TODO: find out why the spacing is not correct, so we need that factor; ?!?!
@@ -499,7 +498,7 @@ void mitk::USDiPhASImageSource::ImageDataCallback(
         mitk::Vector3D rawSpacing;
         rawSpacing[0] = m_Device->GetScanMode().reconstructedLinePitchMmOrAngleDegree;
         rawSpacing[1] = recordTime / channelDataSamplesPerChannel / 2 / 1000000;  // save in us
-        rawSpacing[2] = 0.6;
+        rawSpacing[2] = 1;
 
         rawImage->GetGeometry()->SetSpacing(rawSpacing);
         rawImage->GetGeometry()->Modified();
@@ -567,7 +566,7 @@ void mitk::USDiPhASImageSource::UpdateImageGeometry()
       break;
     }
   }
-  m_ImageSpacing[2] = 0.6;
+  m_ImageSpacing[2] = 1;
 
   MITK_INFO << "Retreaving Image Geometry Information for Spacing " << m_ImageSpacing[0] << " ... " << m_ImageSpacing[1] << " ... " << m_ImageSpacing[2] << " ...[DONE]";
 }
@@ -695,7 +694,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     Image::Pointer PAImage = Image::New();
     Image::Pointer USImage = Image::New();
     std::string pathPA = "c:\\ImageData\\" + currentDate + "-" + "PAbeamformed" + ".nrrd";
-    std::string pathUS = "c:\\ImageData\\" + currentDate + "\\" + "USImages" + ".nrrd";
+    std::string pathUS = "c:\\ImageData\\" + currentDate + "-" + "USImages" + ".nrrd";
     std::string pathTS = "c:\\ImageData\\" + currentDate + "-" + "ts" + ".csv";
     std::string pathS  = "c:\\ImageData\\" + currentDate + "-" + "Settings" + ".txt";
 
@@ -703,7 +702,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
     Image::Pointer PAImageRaw = Image::New();
     Image::Pointer USImageRaw = Image::New();
     std::string pathPARaw = "c:\\ImageData\\" + currentDate + "-" + "PAraw" + ".nrrd";
-    std::string pathUSRaw = "c:\\ImageData\\" + currentDate + "\\" + "USImagesRaw" + ".nrrd";
+    std::string pathUSRaw = "c:\\ImageData\\" + currentDate + "-" + "USImagesRaw" + ".nrrd";
 
     if (m_Device->GetScanMode().beamformingAlgorithm == (int)Beamforming::Interleaved_OA_US) // save a PAImage if we used interleaved mode
     {
@@ -729,7 +728,7 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
 
       // read the pixelvalues of the enveloped images at this position
       itk::Index<3> pixel = { { m_RecordedImages.at(1)->GetDimension(0) / 2, 22.0/532.0*m_Device->GetScanMode().reconstructionSamplesPerLine, 0 } }; //22/532*2048 = 84
-      GetPixelValues(pixel);
+      GetPixelValues(pixel, m_PixelValues); // write the Pixelvalues to m_PixelValues
 
       // save the timestamps!
       ofstream timestampFile;
@@ -776,13 +775,13 @@ void mitk::USDiPhASImageSource::SetRecordingStatus(bool record)
   }
 }
 
-void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel)
+void mitk::USDiPhASImageSource::GetPixelValues(itk::Index<3> pixel, std::vector<float>& values)
 {
   unsigned int events = m_Device->GetScanMode().transmitEventsCount + 1; // the PA event is not included in the transmitEvents, so we add 1 here
   for (int index = 0; index < m_RecordedImages.size(); index += events)  // omit sound images
   {
     Image::Pointer image = ApplyBmodeFilter(m_RecordedImages.at(index));
-    m_PixelValues.push_back(image.GetPointer()->GetPixelValueByIndex(pixel));
+    values.push_back(image.GetPointer()->GetPixelValueByIndex(pixel));
   }
 }
 

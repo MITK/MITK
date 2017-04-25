@@ -62,6 +62,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
     outputArray[i] = new mitk::ReaderType::DictionaryType;
   }
 
+  mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
   for (unsigned int i = 0; i < dicomTagsList.size(); ++i)
   {
     std::string tagkey = dicomTagsList[i];
@@ -91,7 +92,12 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
           tagvalue = (modalityProp) ? modalityProp->GetValueAsString() : "";
         }
 
-        mitk::PlaneGeometry* planegeometry = slicedGeometry->GetPlaneGeometry(j);
+        mitk::PlaneGeometry* planegeometry = nullptr;
+        if (slicedGeometry != nullptr)
+        {
+          planegeometry = slicedGeometry->GetPlaneGeometry(j);
+        }
+
         if (planegeometry != nullptr)
         {
           mitk::Vector3D spacingVector = planegeometry->GetSpacing();

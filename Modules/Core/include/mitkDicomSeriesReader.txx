@@ -47,25 +47,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
 
-inline void CopyDictionary(itk::MetaDataDictionary& fromDict, itk::MetaDataDictionary& toDict)
+inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagToValueList& list)
 {
   typedef itk::MetaDataDictionary DictionaryType;
   typedef itk::MetaDataObject<std::string> MetaDataStringType;
-
+  
   DictionaryType::ConstIterator itr = fromDict.Begin();
   DictionaryType::ConstIterator end = fromDict.End();
-
+  
+  StringLookupTable valueList;
   while (itr != end)
   {
     itk::MetaDataObjectBase::Pointer entry = itr->second;
-
+    
     MetaDataStringType::Pointer entryvalue = dynamic_cast<MetaDataStringType*>(entry.GetPointer());
     if (entryvalue)
     {
       std::string tagkey = itr->first;
       std::string tagvalue = entryvalue->GetMetaDataObjectValue();
-      itk::EncapsulateMetaData<std::string>(toDict, tagkey, tagvalue);
+      
+      list[tagkey].SetTableValue(list[tagkey].GetLookupTable().size(), tagvalue);
     }
 
     ++itr;
@@ -73,18 +76,19 @@ inline void CopyDictionary(itk::MetaDataDictionary& fromDict, itk::MetaDataDicti
 }
 
 template <typename ReaderType>
-void CopyDictionaryFromReader(ReaderType* reader, mitk::ReaderType::DictionaryArrayType& outputArray)
+void CopyDictionaryFromReader(ReaderType* reader, DicomTagToValueList& list)
 {
+  if (reader == nullptr)
+  {
+    return;
+  }
+
   // Get MetaDataDictionary and copy him to MITK Image
   mitk::ReaderType::DictionaryArrayRawPointer inputDict = reader->GetMetaDataDictionaryArray();
   mitk::ReaderType::DictionaryArrayType::const_iterator iter = inputDict->begin();
   for (; iter != inputDict->end(); ++iter)
   {
-    mitk::ReaderType::DictionaryRawPointer dict = new mitk::ReaderType::DictionaryType;
-
-    CopyDictionary(*(*(iter)), *dict);
-
-    outputArray.push_back(dict);
+    AddMetaDataToDictionary(*(*(iter)), list);
   }
 }
 
@@ -149,8 +153,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
     << image->GetGeometry()->GetSpacing()[2] << "]";
 
   // Get MetaDataDictionary and copy him to MITK Image
-  mitk::ReaderType::DictionaryArrayType outputArray;
-  CopyDictionaryFromReader<ReaderType>(reader, outputArray);
+  DicomTagToValueList list;
+  CopyDictionaryFromReader<ReaderType>(reader, list);
 
   if ( preLoadedImageBlock.IsNull() )
   {
@@ -167,41 +171,13 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK4D( std::list<StringContainer>& 
       }
 
       image->SetImportVolume(readVolume->GetBufferPointer(), act_volume++);
-      CopyDictionaryFromReader<ReaderType>(reader, outputArray);
+      CopyDictionaryFromReader<ReaderType>(reader, list);
     }
   }
 
-  image->SetMetaDataDictionaryArray(outputArray);
+  image->SetMetaDataDictionary(list);
 
   return image;
-}
-
-typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
-
-inline void AddMetaDataToDictionary(itk::MetaDataDictionary& fromDict, DicomTagToValueList& list)
-{
-  typedef itk::MetaDataDictionary DictionaryType;
-  typedef itk::MetaDataObject<std::string> MetaDataStringType;
-  
-  DictionaryType::ConstIterator itr = fromDict.Begin();
-  DictionaryType::ConstIterator end = fromDict.End();
-  
-  StringLookupTable valueList;
-  while (itr != end)
-  {
-    itk::MetaDataObjectBase::Pointer entry = itr->second;
-    
-    MetaDataStringType::Pointer entryvalue = dynamic_cast<MetaDataStringType*>(entry.GetPointer());
-    if (entryvalue)
-    {
-      std::string tagkey = itr->first;
-      std::string tagvalue = entryvalue->GetMetaDataObjectValue();
-      
-      list[tagkey].SetTableValue(list[tagkey].GetLookupTable().size(), tagvalue);
-    }
-
-    ++itr;
-  }
 }
 
 // TODO This function is for debugging purposes. It allows you to save itkImage in the DICOM file set.
@@ -309,20 +285,9 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
                                     << image->GetGeometry()->GetSpacing()[2] << "]";
 
   // Get MetaDataDictionary and copy him to MITK Image
-  /*mitk::ReaderType::DictionaryArrayType outputArray;
-  CopyDictionaryFromReader<ReaderType>(reader, outputArray);
-  image->SetMetaDataDictionaryArray(outputArray);*/
-
-  mitk::ReaderType::DictionaryArrayRawPointer inputDict = reader->GetMetaDataDictionaryArray();
-
   DicomTagToValueList list;
-  mitk::ReaderType::DictionaryArrayType::const_iterator iter = inputDict->begin();
-  for (; iter != inputDict->end(); ++iter)
-  {
-    AddMetaDataToDictionary(*(*(iter)), list);
-  }
+  CopyDictionaryFromReader<ReaderType>(reader, list);
 
-  image->SaveMetaDataDictionaryArraySize(inputDict->size());
   image->SetMetaDataDictionary(list);
 
   return image;

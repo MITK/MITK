@@ -43,11 +43,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define FILL_C_ARRAY( _arr, _size, _value) for(unsigned int i=0u; i<_size; i++) \
 { _arr[i] = _value; }
 
-void mitk::Image::SaveMetaDataDictionaryArraySize(const unsigned int size)
-{
-  m_MetaDataDictionaryArraySize = size;
-}
-
 mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 {
   if (m_MetaDataDictionaryArray.size()) {
@@ -169,7 +164,6 @@ mitk::Image::Image() :
   FILL_C_ARRAY( m_Dimensions, MAX_IMAGE_DIMENSIONS, 0u);
 
   m_Initialized = false;
-  m_MetaDataDictionaryArraySize = 0;
 }
 
 mitk::Image::Image(const Image &other) : SlicedData(other), m_Dimension(0), m_Dimensions(nullptr),

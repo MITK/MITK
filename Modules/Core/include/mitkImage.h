@@ -123,8 +123,6 @@ public:
   
   ReaderType::DictionaryArrayType GetMetaDataDictionaryArray();
   void SetMetaDataDictionary(DicomTagToValueList& array);
-  
-  void SaveMetaDataDictionaryArraySize(const unsigned int size);
 
 public:
   //##Documentation
@@ -690,7 +688,6 @@ private:
   /** A mutex, which needs to be locked to manage m_VtkReaders */
   itk::SimpleFastMutexLock m_VtkReadersLock;
 
-  unsigned int m_MetaDataDictionaryArraySize;
   mitk::ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 };
 

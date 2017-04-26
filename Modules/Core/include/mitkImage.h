@@ -691,6 +691,7 @@ private:
   itk::SimpleFastMutexLock m_VtkReadersLock;
 
   unsigned int m_MetaDataDictionaryArraySize;
+  mitk::ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 };
 
  /**

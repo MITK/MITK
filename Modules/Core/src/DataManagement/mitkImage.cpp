@@ -50,16 +50,20 @@ void mitk::Image::SaveMetaDataDictionaryArraySize(const unsigned int size)
 
 mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 {
+  if (m_MetaDataDictionaryArray.size()) {
+    return m_MetaDataDictionaryArray;
+  }
+
   mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(GetProperty("autoplan.mainAxisIndex")));
   int mainAxisIndex = prop ? prop->GetValue() : 2;
   int numberSlices = GetLargestPossibleRegion().GetSize()[mainAxisIndex];
   
-  mitk::ReaderType::DictionaryArrayType outputArray;
-  outputArray.resize(numberSlices);
+  //mitk::ReaderType::DictionaryArrayType outputArray;
+  m_MetaDataDictionaryArray.resize(numberSlices);
 
-  for (unsigned int i = 0; i < outputArray.size(); ++i)
+  for (unsigned int i = 0; i < m_MetaDataDictionaryArray.size(); ++i)
   {
-    outputArray[i] = new mitk::ReaderType::DictionaryType;
+    m_MetaDataDictionaryArray[i] = new mitk::ReaderType::DictionaryType;
   }
 
   mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
@@ -69,7 +73,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
     mitk::StringLookupTableProperty* tagsValueList =
     dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(tagkey.c_str()).GetPointer());
 
-    for (unsigned int j = 0; j < outputArray.size(); ++j)
+    for (unsigned int j = 0; j < m_MetaDataDictionaryArray.size(); ++j)
     {
       std::string tagvalue = std::string();
 
@@ -122,17 +126,17 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
           
           if (tagkey == "0020|0037")
           {
-            itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, imageOrientation);
+            itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imageOrientation);
             continue;
           }
           else if (tagkey == "0020|0032")
           {
-            itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, imagePosition);
+            itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imagePosition);
             continue;
           }
           else if (tagkey == "0028|0030")
           {
-            itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, spacing);
+            itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, spacing);
             continue;
           }
         }
@@ -140,12 +144,12 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 
       if (!tagvalue.empty())
       {
-        itk::EncapsulateMetaData<std::string>(*(outputArray[j]), tagkey, tagvalue);
+        itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, tagvalue);
       }
     }
   }
 
-  return outputArray;
+  return m_MetaDataDictionaryArray;
 }
 
 void mitk::Image::SetMetaDataDictionary(DicomTagToValueList& array)
@@ -209,6 +213,12 @@ mitk::Image::~Image()
 
   delete [] m_OffsetTable;
   delete m_ImageStatistics;
+
+  for (unsigned int i = 0; i < m_MetaDataDictionaryArray.size(); ++i) {
+    delete m_MetaDataDictionaryArray[i];
+  }
+
+  m_MetaDataDictionaryArray.clear();
 }
 
 const mitk::PixelType mitk::Image::GetPixelType(int n) const

@@ -97,7 +97,6 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_ToolManager(NULL),
     m_Initialized(false),
     m_LastSNC(0),
-    m_LastSliceIndex(0),
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false),
     m_FirstRun(true)
@@ -556,7 +555,6 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
       if (slicedGeometry)
       {
-        m_LastSNC = slicer;
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetPlaneGeometry( event.GetPos() ));
         if (plane)
           Interpolate( plane, m_TimeStep[slicer], slicer );
@@ -589,10 +587,10 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
         mitk::SegTool2D::DetermineAffectedImageSlice( m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex );
 
         mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( clickedSliceDimension, clickedSliceIndex, plane, timeStep );
-        m_FeedbackNode->SetData(interpolation);
-
-        m_LastSNC = slicer;
-        m_LastSliceIndex = clickedSliceIndex;
+        if (interpolation) {
+          m_FeedbackNode->SetData(interpolation);
+          m_LastSNC = slicer;
+        }
       }
     }
   }

@@ -297,7 +297,6 @@ private:
     mitk::Image* m_Segmentation;
 
     mitk::SliceNavigationController* m_LastSNC;
-    unsigned int m_LastSliceIndex;
 
     QHash<mitk::SliceNavigationController*, unsigned int> m_TimeStep;
 

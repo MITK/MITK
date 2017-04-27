@@ -15,7 +15,7 @@ namespace config
     void Add(const char* key, TValue&& value);
 
     template <typename TValue>
-    TValue Get(const char* key, TValue&& value) const;
+    const TValue& Get(const char* key, const TValue& value) const;
 
     void Delete(const char* key);
 
@@ -67,7 +67,7 @@ namespace config
   }
 
   template <typename TValue>
-  TValue ConfigManager::Impl::Get(const char* key, TValue&& value) const
+  const TValue& ConfigManager::Impl::Get(const char* key, const TValue& value) const
   {
     if (!key || m_deleted.end() != m_deleted.find(key)) {
       return value;

@@ -222,7 +222,13 @@ void DicomSeriesReader::ImageBlockDescriptor::SetModality(const std::string& mod
 
 void DicomSeriesReader::ImageBlockDescriptor::SetNumberOfFrames(const std::string& numberOfFrames)
 {
-  m_IsMultiFrameImage = !numberOfFrames.empty();
+  int numberOfFramesInt = 0;
+  try {
+    numberOfFramesInt = numberOfFrames.empty() ? 0 : std::stoi(numberOfFrames);
+  } catch (...) {
+  }
+
+  m_IsMultiFrameImage = (numberOfFramesInt > 1);
 }
 
 void DicomSeriesReader::ImageBlockDescriptor::SetSOPClassUID(const std::string& sopClassUID)

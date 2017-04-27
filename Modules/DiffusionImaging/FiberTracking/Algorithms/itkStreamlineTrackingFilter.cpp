@@ -441,6 +441,8 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
         }
         else if (m_AvoidStop && olddir.magnitude()>0.5) // out of white matter
         {
+            if (is_stop_voter)
+                stop_votes++;
             if (m_DemoMode)
                 m_StopVotePointset->InsertPoint(i, sample_pos);
 
@@ -469,9 +471,6 @@ vnl_vector_fixed<float,3> StreamlineTrackingFilter::GetNewDirection(itk::Point<f
             }
             else
             {
-                if (is_stop_voter)
-                    stop_votes++;
-
                 if (m_DemoMode)
                     m_StopVotePointset->InsertPoint(i, sample_pos);
             }

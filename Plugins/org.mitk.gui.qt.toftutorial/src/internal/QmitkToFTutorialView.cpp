@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkToFTutorialView.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -38,9 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkToFTutorialView::VIEW_ID = "org.mitk.views.toftutorial";
 
 QmitkToFTutorialView::QmitkToFTutorialView()
-: QmitkFunctionality()
+: QmitkAbstractView()
 , m_Controls( 0 )
-, m_MultiWidget( NULL )
 {
 }
 
@@ -62,15 +60,9 @@ void QmitkToFTutorialView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-
-void QmitkToFTutorialView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkToFTutorialView::SetFocus()
 {
-  m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkToFTutorialView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
+  m_Controls->step1Button->setFocus();
 }
 
 void QmitkToFTutorialView::OnStep1()
@@ -108,17 +100,17 @@ void QmitkToFTutorialView::OnStep1()
     mitk::DataNode::Pointer distanceNode = mitk::DataNode::New();
     distanceNode->SetName("Distance Image");
     distanceNode->SetData(distanceImage);
-    this->GetDefaultDataStorage()->Add(distanceNode);
+    this->GetDataStorage()->Add(distanceNode);
     //add amplitude image to data storage
     mitk::DataNode::Pointer amplitudeNode = mitk::DataNode::New();
     amplitudeNode->SetName("Amplitude Image");
     amplitudeNode->SetData(amplitudeImage);
-    this->GetDefaultDataStorage()->Add(amplitudeNode);
+    this->GetDataStorage()->Add(amplitudeNode);
     //add intensity image to data storage
     mitk::DataNode::Pointer intensityNode = mitk::DataNode::New();
     intensityNode->SetName("Intensity Image");
     intensityNode->SetData(intensityImage);
-    this->GetDefaultDataStorage()->Add(intensityNode);
+    this->GetDataStorage()->Add(intensityNode);
     // stop camera (terminate internally used thread)
     tofImageGrabber->StopCamera();
     //// disconnect from camera
@@ -135,7 +127,7 @@ void QmitkToFTutorialView::OnStep1()
 void QmitkToFTutorialView::OnStep2()
 {
   // Check if distance image is available
-  mitk::DataNode::Pointer distanceNode = this->GetDefaultDataStorage()->GetNamedNode("Distance Image");
+  mitk::DataNode::Pointer distanceNode = this->GetDataStorage()->GetNamedNode("Distance Image");
   if (distanceNode.IsNotNull())
   {
     // get distance image from node and check if node contains image
@@ -167,7 +159,7 @@ void QmitkToFTutorialView::OnStep2()
       mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
       surfaceNode->SetName("ToF surface");
       surfaceNode->SetData(surface);
-      this->GetDefaultDataStorage()->Add(surfaceNode);
+      this->GetDataStorage()->Add(surfaceNode);
       // adjust views to new data in DataStorage
       mitk::RenderingManager::GetInstance()->InitializeViews(surface->GetGeometry());
       mitk::RenderingManager::GetInstance()->InitializeViews(surface->GetGeometry());
@@ -185,8 +177,8 @@ void QmitkToFTutorialView::OnStep2()
 
 void QmitkToFTutorialView::RemoveAllNodesFromDataStorage()
 {
-  mitk::DataStorage::SetOfObjects::ConstPointer allNodes = this->GetDefaultDataStorage()->GetAll();
-  this->GetDefaultDataStorage()->Remove(allNodes);
+  mitk::DataStorage::SetOfObjects::ConstPointer allNodes = this->GetDataStorage()->GetAll();
+  this->GetDataStorage()->Remove(allNodes);
 }
 
 

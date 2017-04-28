@@ -43,10 +43,6 @@ set(mitk_modules
   IGTBase
   IGT
   CameraCalibration
-  RigidRegistration
-  RigidRegistrationUI
-  DeformableRegistration
-  DeformableRegistrationUI
   OpenCL
   OpenCVVideoSupport
   QtOverlays

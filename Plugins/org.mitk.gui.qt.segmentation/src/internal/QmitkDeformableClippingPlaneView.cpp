@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkClippingPlaneInteractor3D.h"
 #include "mitkHeightFieldSurfaceClipImageFilter.h"
+#include <mitkILinkedRenderWindowPart.h>
 #include "mitkImageToSurfaceFilter.h"
 #include "mitkInteractionConst.h"
 #include "mitkLabeledImageLookupTable.h"
@@ -42,119 +43,105 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkDeformableClippingPlaneView::VIEW_ID = "org.mitk.views.deformableclippingplane";
 
 QmitkDeformableClippingPlaneView::QmitkDeformableClippingPlaneView()
-  : QmitkFunctionality()
-  , m_MultiWidget(NULL)
-  , m_ReferenceNode(NULL)
-  , m_WorkingNode(NULL)
+  : QmitkAbstractView()
+  , m_ReferenceNode(nullptr)
+  , m_WorkingNode(nullptr)
 {
 }
 
 QmitkDeformableClippingPlaneView::~QmitkDeformableClippingPlaneView()
 {
+  if (m_WorkingNode.IsNotNull())
+    m_WorkingNode->SetDataInteractor(nullptr);
 }
 
 void QmitkDeformableClippingPlaneView::CreateQtPartControl(QWidget *parent)
 {
-  // create GUI widgets
   m_Controls.setupUi(parent);
-  this->CreateConnections();
-}
 
-void QmitkDeformableClippingPlaneView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
-}
+  auto isClippingPlane = mitk::NodePredicateProperty::New("clippingPlane", mitk::BoolProperty::New(true));
 
-void QmitkDeformableClippingPlaneView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
-}
+  m_Controls.clippingPlaneSelector->SetDataStorage(this->GetDataStorage());
+  m_Controls.clippingPlaneSelector->SetPredicate(isClippingPlane);
 
-void QmitkDeformableClippingPlaneView::CreateConnections()
-{
-  mitk::NodePredicateProperty::Pointer clipPredicate = mitk::NodePredicateProperty::New("clippingPlane",mitk::BoolProperty::New(true));
-  //set only clipping planes in the list of the selector
-  m_Controls.clippingPlaneSelector->SetDataStorage(this->GetDefaultDataStorage());
-  m_Controls.clippingPlaneSelector->SetPredicate(clipPredicate);
-
-
-  //No working data set, yet
   m_Controls.volumeGroupBox->setEnabled(false);
   m_Controls.interactionSelectionBox->setEnabled(false);
   m_Controls.noSelectedImageLabel->show();
   m_Controls.planesWarningLabel->hide();
 
-  connect (m_Controls.translationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnTranslationMode(bool)));
-  connect (m_Controls.rotationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnRotationMode(bool)));
-  connect (m_Controls.deformationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnDeformationMode(bool)));
-  connect (m_Controls.createNewPlanePushButton, SIGNAL(clicked()), this, SLOT(OnCreateNewClippingPlane()));
-  connect (m_Controls.updateVolumePushButton, SIGNAL(clicked()), this, SLOT(OnCalculateClippingVolume()));
-  connect (m_Controls.clippingPlaneSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
+  this->CreateConnections();
+}
+
+void QmitkDeformableClippingPlaneView::SetFocus()
+{
+  m_Controls.createNewPlanePushButton->setFocus();
+}
+
+void QmitkDeformableClippingPlaneView::CreateConnections()
+{
+  connect(m_Controls.translationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnTranslationMode(bool)));
+  connect(m_Controls.rotationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnRotationMode(bool)));
+  connect(m_Controls.deformationPushButton, SIGNAL(toggled(bool)), this, SLOT(OnDeformationMode(bool)));
+  connect(m_Controls.createNewPlanePushButton, SIGNAL(clicked()), this, SLOT(OnCreateNewClippingPlane()));
+  connect(m_Controls.updateVolumePushButton, SIGNAL(clicked()), this, SLOT(OnCalculateClippingVolume()));
+  connect(m_Controls.clippingPlaneSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
     this, SLOT(OnComboBoxSelectionChanged(const mitk::DataNode*)));
 }
 
-void QmitkDeformableClippingPlaneView::Activated()
-{
-  QmitkFunctionality::Activated();
-  //If a tube graph already exist in the data storage, set the working node correctly
-  m_WorkingNode = m_Controls.clippingPlaneSelector->GetSelectedNode();
-  this->UpdateView();
-}
-
-void QmitkDeformableClippingPlaneView::Deactivated()
-{
-  if(m_WorkingNode.IsNotNull())
-  {
-    if(m_WorkingNode->GetDataInteractor().IsNotNull())
-      m_WorkingNode->SetDataInteractor(NULL);
-  }
-  QmitkFunctionality::Deactivated();
-}
-
-void QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged( const mitk::DataNode* node )
+void QmitkDeformableClippingPlaneView::OnComboBoxSelectionChanged(const mitk::DataNode* node)
 {
   this->DeactivateInteractionButtons();
-  mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
-  if( selectedNode != NULL )
+
+  auto selectedNode = const_cast<mitk::DataNode*>(node);
+
+  if(selectedNode != nullptr)
   {
     if(m_WorkingNode.IsNotNull())
       selectedNode->SetDataInteractor(m_WorkingNode->GetDataInteractor());
 
     m_WorkingNode = selectedNode;
   }
+
   this->UpdateView();
 }
 
 void QmitkDeformableClippingPlaneView::OnSelectionChanged(mitk::DataNode* node)
 {
-  std::vector<mitk::DataNode*> nodes;
+  berry::IWorkbenchPart::Pointer nullPart;
+  QList<mitk::DataNode::Pointer> nodes;
   nodes.push_back(node);
-  this->OnSelectionChanged(nodes);
+
+  this->OnSelectionChanged(nullPart, nodes);
 }
 
-void QmitkDeformableClippingPlaneView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkDeformableClippingPlaneView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
-  bool isClippingPlane(false);
-  for(unsigned int i = 0; i < nodes.size(); ++i)
-  {
-    if(nodes.at(i)->GetBoolProperty("clippingPlane", isClippingPlane))
-      m_Controls.clippingPlaneSelector->setCurrentIndex( m_Controls.clippingPlaneSelector->Find(nodes.at(i)) );
+  bool isClippingPlane = false;
 
+  for (auto node : nodes)
+  {
+    node->GetBoolProperty("clippingPlane", isClippingPlane);
+
+    if (isClippingPlane)
+    {
+      m_Controls.clippingPlaneSelector->setCurrentIndex(m_Controls.clippingPlaneSelector->Find(node));
+    }
     else
     {
-      if(dynamic_cast<mitk::Image*> (nodes.at(i)->GetData())&& nodes.at(i))
+      if(node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) != nullptr)
       {
-        if(m_ReferenceNode.IsNotNull() && nodes.at(i)->GetData() == m_ReferenceNode->GetData())
+        if(m_ReferenceNode.IsNotNull() && node->GetData() == m_ReferenceNode->GetData())
           return;
 
-        m_ReferenceNode =nodes.at(i);
+        m_ReferenceNode = node;
       }
     }
   }
+
   this->UpdateView();
 }
 
-void::QmitkDeformableClippingPlaneView::NodeChanged(const mitk::DataNode* /*node*/)
+void::QmitkDeformableClippingPlaneView::NodeChanged(const mitk::DataNode*)
 {
   this->UpdateView();
 }
@@ -162,20 +149,20 @@ void::QmitkDeformableClippingPlaneView::NodeChanged(const mitk::DataNode* /*node
 void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
 {
   bool isClippingPlane(false);
+  node->GetBoolProperty("clippingPlane", isClippingPlane);
 
-  if (node->GetBoolProperty("clippingPlane", isClippingPlane))
+  if (isClippingPlane)
   {
-    if(this->GetAllClippingPlanes()->Size()<=1)
+    if (this->GetAllClippingPlanes()->Size() <= 1)
     {
-      m_WorkingNode = NULL;
+      m_WorkingNode = nullptr;
       this->UpdateView();
     }
     else
     {
-      if (GetAllClippingPlanes()->front()!= node)
-        this->OnSelectionChanged(GetAllClippingPlanes()->front());
-      else
-        this->OnSelectionChanged(GetAllClippingPlanes()->ElementAt(1));
+      this->OnSelectionChanged(this->GetAllClippingPlanes()->front() == node
+        ? this->GetAllClippingPlanes()->ElementAt(1)
+        : this->GetAllClippingPlanes()->front());
     }
   }
   else
@@ -184,9 +171,10 @@ void QmitkDeformableClippingPlaneView::NodeRemoved(const mitk::DataNode* node)
     {
       if(node->GetData() == m_ReferenceNode->GetData())
       {
-        m_ReferenceNode = NULL;
+        m_ReferenceNode = nullptr;
         m_Controls.volumeList->clear();
       }
+
       this->UpdateView();
     }
   }
@@ -202,7 +190,7 @@ void QmitkDeformableClippingPlaneView::UpdateView()
 
     if (m_WorkingNode.IsNotNull())
     {
-      bool isSegmentation(false);
+      bool isSegmentation = false;
       m_ReferenceNode->GetBoolProperty("binary", isSegmentation);
       m_Controls.interactionSelectionBox->setEnabled(true);
 
@@ -216,13 +204,13 @@ void QmitkDeformableClippingPlaneView::UpdateView()
       mitk::DataStorage::SetOfObjects::ConstPointer allClippingPlanes = this->GetAllClippingPlanes();
       for (mitk::DataStorage::SetOfObjects::ConstIterator itPlanes = allClippingPlanes->Begin(); itPlanes != allClippingPlanes->End(); itPlanes++)
       {
-        bool isVisible(false);
-        itPlanes.Value()->GetBoolProperty("visible",isVisible);
+        bool isVisible = false;
+        itPlanes.Value()->GetBoolProperty("visible", isVisible);
         if (isVisible)
         {
-          if (volumePlanes<7)
+          if (volumePlanes < 7)
           {
-            volumePlanes ++;
+            ++volumePlanes;
             m_Controls.selectedVolumePlanesLabel->setText(m_Controls.selectedVolumePlanesLabel->text().append(QString::fromStdString(itPlanes.Value()->GetName()+"\n")));
           }
           else
@@ -241,7 +229,6 @@ void QmitkDeformableClippingPlaneView::UpdateView()
       m_Controls.volumeList->clear();
     }
   }
-
   else
   {
     m_Controls.volumeGroupBox->setEnabled(false);
@@ -249,36 +236,39 @@ void QmitkDeformableClippingPlaneView::UpdateView()
     m_Controls.selectedImageLabel->setText("");
     m_Controls.selectedVolumePlanesLabel->setText("");
     m_Controls.planesWarningLabel->hide();
-    if(m_WorkingNode.IsNull())
+
+    if (m_WorkingNode.IsNull())
+    {
       m_Controls.interactionSelectionBox->setEnabled(false);
+    }
     else
+    {
       m_Controls.interactionSelectionBox->setEnabled(true);
+    }
   }
 }
 
 void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 {
- this->DeactivateInteractionButtons();
-  //the new clipping plane
-  mitk::Surface::Pointer plane = mitk::Surface::New();
-  mitk::Image::Pointer referenceImage = mitk::Image::New();
-  vtkSmartPointer<vtkPlaneSource> planeSource = vtkSmartPointer<vtkPlaneSource>::New();
+  this->DeactivateInteractionButtons();
 
-  // default initialization of the clipping plane
-  planeSource->SetOrigin( -32.0, -32.0, 0.0 );
-  planeSource->SetPoint1(  32.0, -32.0, 0.0 );
-  planeSource->SetPoint2( -32.0,  32.0, 0.0 );
-  planeSource->SetResolution( 128, 128 );
+  auto plane = mitk::Surface::New();
+  auto referenceImage = mitk::Image::New();
+  auto planeSource = vtkSmartPointer<vtkPlaneSource>::New();
+
+  planeSource->SetOrigin(-32.0, -32.0, 0.0);
+  planeSource->SetPoint1( 32.0, -32.0, 0.0);
+  planeSource->SetPoint2(-32.0,  32.0, 0.0);
+  planeSource->SetResolution(128, 128);
   planeSource->Update();
 
   plane->SetVtkPolyData(planeSource->GetOutput());
-
 
   double imageDiagonal = 200;
 
   if (m_ReferenceNode.IsNotNull())
   {
-    referenceImage = dynamic_cast<mitk::Image*> (m_ReferenceNode->GetData());
+    referenceImage = dynamic_cast<mitk::Image*>(m_ReferenceNode->GetData());
 
     if (referenceImage.IsNotNull())
     {
@@ -413,15 +403,10 @@ void QmitkDeformableClippingPlaneView::OnCreateNewClippingPlane()
 
   m_Controls.interactionSelectionBox->setEnabled(true);
 
-  // set crosshair invisible
-  mitk::DataNode* dataNode;
-
-  dataNode = this->m_MultiWidget->GetWidgetPlane1();
-  if(dataNode) dataNode->SetVisibility(false);
-  dataNode = this->m_MultiWidget->GetWidgetPlane2();
-  if(dataNode) dataNode->SetVisibility(false);
-  dataNode = this->m_MultiWidget->GetWidgetPlane3();
-  if(dataNode) dataNode->SetVisibility(false);
+  if (auto renderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(this->GetRenderWindowPart()))
+  {
+    renderWindowPart->EnableSlicingPlanes(false);
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -593,7 +578,7 @@ void QmitkDeformableClippingPlaneView::OnTranslationMode(bool check)
     affineDataInteractor->SetDataNode(m_WorkingNode);
   }
   else
-    m_WorkingNode->SetDataInteractor(NULL);
+    m_WorkingNode->SetDataInteractor(nullptr);
 }
 
 void QmitkDeformableClippingPlaneView::OnRotationMode(bool check)
@@ -609,7 +594,7 @@ void QmitkDeformableClippingPlaneView::OnRotationMode(bool check)
     affineDataInteractor->SetDataNode(m_WorkingNode);
   }
   else
-    m_WorkingNode->SetDataInteractor(NULL);
+    m_WorkingNode->SetDataInteractor(nullptr);
 }
 
 void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
@@ -625,7 +610,7 @@ void QmitkDeformableClippingPlaneView::OnDeformationMode(bool check)
     surfaceDataInteractor->SetDataNode(m_WorkingNode);
   }
   else
-    m_WorkingNode->SetDataInteractor(NULL);
+    m_WorkingNode->SetDataInteractor(nullptr);
 }
 
 void QmitkDeformableClippingPlaneView::DeactivateInteractionButtons()

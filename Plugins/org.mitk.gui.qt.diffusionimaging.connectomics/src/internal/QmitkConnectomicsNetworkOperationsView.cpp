@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // ####### Qmitk includes #######
 #include "QmitkConnectomicsNetworkOperationsView.h"
-#include "QmitkStdMultiWidget.h"
 
 // ####### Qt includes #######
 #include <QMessageBox>
@@ -47,9 +46,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkConnectomicsNetworkOperationsView::VIEW_ID = "org.mitk.views.connectomicsnetworkoperations";
 
 QmitkConnectomicsNetworkOperationsView::QmitkConnectomicsNetworkOperationsView()
-: QmitkFunctionality()
+: QmitkAbstractView()
 , m_Controls( 0 )
-, m_MultiWidget( NULL )
 , m_demomode( false )
 , m_currentIndex( 0 )
 {
@@ -97,15 +95,9 @@ void QmitkConnectomicsNetworkOperationsView::CreateQtPartControl( QWidget *paren
 }
 
 
-void QmitkConnectomicsNetworkOperationsView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkConnectomicsNetworkOperationsView::SetFocus()
 {
-  m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkConnectomicsNetworkOperationsView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
+  m_Controls->convertToRGBAImagePushButton->setFocus();
 }
 
 void QmitkConnectomicsNetworkOperationsView::WipeDisplay()
@@ -116,7 +108,7 @@ void QmitkConnectomicsNetworkOperationsView::WipeDisplay()
   m_Controls->inputImageOneLabel->setVisible( false );
 }
 
-void QmitkConnectomicsNetworkOperationsView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkConnectomicsNetworkOperationsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   this->WipeDisplay();
 
@@ -129,11 +121,8 @@ void QmitkConnectomicsNetworkOperationsView::OnSelectionChanged( std::vector<mit
   bool currentFormatUnknown(true), alreadyImageSelected(false);
 
   // iterate all selected objects, adjust warning visibility
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-       it != nodes.end();
-       ++it )
+  for (mitk::DataNode::Pointer node: nodes)
   {
-    mitk::DataNode::Pointer node = *it;
     currentFormatUnknown = true;
 
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
@@ -181,7 +170,7 @@ void QmitkConnectomicsNetworkOperationsView::OnSelectionChanged( std::vector<mit
 
 void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClicked()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
   mitk::DataNode* node = nodes.front();
@@ -216,7 +205,7 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
 
       // Convert to RGBA
       AccessByItk( image, TurnIntoRGBA );
-      this->GetDefaultDataStorage()->GetNamedNode( mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_DEFAULT_RGBA_NAME )->GetData()->SetGeometry( node->GetData()->GetGeometry() );
+      this->GetDataStorage()->GetNamedNode( mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_DEFAULT_RGBA_NAME )->GetData()->SetGeometry( node->GetData()->GetGeometry() );
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -235,7 +224,7 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
 
 void QmitkConnectomicsNetworkOperationsView::OnAssignFreeSurferColorsPushButtonClicked()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
   mitk::DataNode* node = nodes.front();
@@ -409,24 +398,20 @@ void QmitkConnectomicsNetworkOperationsView::TurnIntoRGBA( itk::Image<TPixel, VI
   rgbaImageNode->SetData(mitkRGBAImage);
   rgbaImageNode->SetProperty(mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_NAME, mitk::StringProperty::New(mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_DEFAULT_RGBA_NAME));
   rgbaImageNode->SetBoolProperty( mitk::ConnectomicsConstantsManager::CONNECTOMICS_PROPERTY_VOLUMERENDERING, true);
-  this->GetDefaultDataStorage()->Add( rgbaImageNode );
+  this->GetDataStorage()->Add( rgbaImageNode );
 }
 
 void QmitkConnectomicsNetworkOperationsView::OnModularizePushButtonClicked()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
     QMessageBox::information( NULL, "Modularization calculation", "Please select exactly one network.");
     return;
   }
 
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-    it != nodes.end();
-    ++it )
+  for (auto node: nodes)
   {
-    mitk::DataNode::Pointer node = *it;
-
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       return;
@@ -483,19 +468,15 @@ void QmitkConnectomicsNetworkOperationsView::OnModularizePushButtonClicked()
 
 void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
     QMessageBox::information( NULL, "Network pruning", "Please select one or more networks.");
     return;
   }
 
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-    it != nodes.end();
-    ++it )
+  for (auto node: nodes)
   {
-    mitk::DataNode::Pointer node = *it;
-
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       return;
@@ -518,7 +499,7 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
           mitk::DataNode::Pointer thresholdBasedNode = mitk::DataNode::New();
           thresholdBasedNode->SetData ( thresholder->GetThresholdedNetwork() );
           thresholdBasedNode->SetName( "Threshold based" );
-          this->GetDefaultDataStorage()->Add(thresholdBasedNode, node );
+          this->GetDataStorage()->Add(thresholdBasedNode, node );
         }
 
         if( this->m_Controls->largestDensityLowerThanCheckBox->isChecked() )
@@ -528,7 +509,7 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
           mitk::DataNode::Pointer thresholdBasedNode = mitk::DataNode::New();
           thresholdBasedNode->SetData ( thresholder->GetThresholdedNetwork() );
           thresholdBasedNode->SetName( "Largest density below threshold" );
-          this->GetDefaultDataStorage()->Add(thresholdBasedNode, node );
+          this->GetDataStorage()->Add(thresholdBasedNode, node );
         }
 
         if( this->m_Controls->RandomRemovalThresholdingCheckBox->isChecked() )
@@ -538,7 +519,7 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
           mitk::DataNode::Pointer thresholdBasedNode = mitk::DataNode::New();
           thresholdBasedNode->SetData ( thresholder->GetThresholdedNetwork() );
           thresholdBasedNode->SetName( "Random removal threshold" );
-          this->GetDefaultDataStorage()->Add(thresholdBasedNode, node );
+          this->GetDataStorage()->Add(thresholdBasedNode, node );
         }
       }
     }
@@ -548,19 +529,15 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
 
 void QmitkConnectomicsNetworkOperationsView::OnCreateConnectivityMatrixImagePushButtonClicked()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
     QMessageBox::information( NULL, "Connectivity Matrix Image creation", "Please select one or more networks.");
     return;
   }
 
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-    it != nodes.end();
-    ++it )
+  for (auto node: nodes)
   {
-    mitk::DataNode::Pointer node = *it;
-
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
       return;
@@ -580,7 +557,7 @@ void QmitkConnectomicsNetworkOperationsView::OnCreateConnectivityMatrixImagePush
         mitk::DataNode::Pointer connectivityMatrixImageNode = mitk::DataNode::New();
         connectivityMatrixImageNode->SetData ( connectivityMatrixImage );
         connectivityMatrixImageNode->SetName( "Connectivity matrix" );
-        this->GetDefaultDataStorage()->Add(connectivityMatrixImageNode, node );
+        this->GetDataStorage()->Add(connectivityMatrixImageNode, node );
       }
     }
   }

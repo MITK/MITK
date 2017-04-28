@@ -59,6 +59,14 @@ QmitkODFDetailsView::~QmitkODFDetailsView()
     m_ImageNode->RemoveObserver( m_PropertyObserverTag );
 }
 
+void QmitkODFDetailsView::Activated()
+{
+}
+
+void QmitkODFDetailsView::Deactivated()
+{
+}
+
 void QmitkODFDetailsView::Visible()
 {
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
@@ -103,17 +111,9 @@ void QmitkODFDetailsView::Hidden()
   }
 }
 
-void QmitkODFDetailsView::Activated()
-{
-}
-
-void QmitkODFDetailsView::Deactivated()
-{
-}
-
 void QmitkODFDetailsView::SetFocus()
 {
-  this->m_Controls->m_ODFRenderWidget->setFocus();
+  this->m_Controls->m_OverviewTextEdit->setFocus();
 }
 
 void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
@@ -129,8 +129,7 @@ void QmitkODFDetailsView::CreateQtPartControl( QWidget *parent )
   }
 }
 
-void QmitkODFDetailsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes )
+void QmitkODFDetailsView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   if (m_ImageNode.IsNotNull())
     m_ImageNode->RemoveObserver( m_PropertyObserverTag );
@@ -141,9 +140,8 @@ void QmitkODFDetailsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer sou
   m_ImageNode = NULL;
 
   // iterate selection
-  foreach( mitk::DataNode::Pointer node, nodes )
+  for (mitk::DataNode::Pointer node: nodes)
   {
-
     if( node.IsNotNull() && (dynamic_cast<mitk::QBallImage*>(node->GetData()) || dynamic_cast<mitk::TensorImage*>(node->GetData())) )
     {
       m_Controls->m_InputImageLabel->setText(node->GetName().c_str());

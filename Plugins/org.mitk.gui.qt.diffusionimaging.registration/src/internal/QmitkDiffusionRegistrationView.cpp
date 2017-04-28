@@ -24,7 +24,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkDiffusionRegistrationView.h"
-#include <QmitkStdMultiWidget.h>
 
 // MITK
 #include <mitkImageCast.h>
@@ -39,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFileDialog>
 #include <QDir>
 #include <QDirIterator>
-
+#include <QTimer>
 
 #include <mitkDWIHeadMotionCorrectionFilter.h>
 
@@ -259,7 +258,7 @@ void QmitkDiffusionRegistrationView::AdvancedSettings()
 }
 
 
-void QmitkDiffusionRegistrationView::OnSelectionChanged( berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes )
+void QmitkDiffusionRegistrationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
 {
 
   if (m_ThreadIsRunning)
@@ -271,10 +270,8 @@ void QmitkDiffusionRegistrationView::OnSelectionChanged( berry::IWorkbenchPart::
   m_SelectedDiffusionNodes.clear();
 
   // iterate selection
-  for( int i=0; i<nodes.size(); i++)
+  for (mitk::DataNode::Pointer node: nodes)
   {
-    mitk::DataNode::Pointer node = nodes.at(i);
-
     bool isDiffusionImage(false);
     if( node.IsNotNull() )
     {

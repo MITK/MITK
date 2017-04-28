@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkMITKIGTNavigationToolManagerView.h"
-#include "QmitkStdMultiWidget.h"
 
 // MITK
 #include <usGetModuleContext.h>

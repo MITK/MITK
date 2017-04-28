@@ -201,9 +201,9 @@ void QmitkImageCropper::DoCreateNewBoundingObject()
     m_Controls.buttonMasking->setEnabled(true);
     m_Controls.boundingShapeSelector->setEnabled(true);
 
-    // to do: check whether stdmulti.widget is valid
-    // get current timestep to support 3d+t images //to do: check if stdmultiwidget is valid
-    int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+    // get current timestep to support 3d+t images
+    auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+    int timeStep = renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
     mitk::BaseGeometry::Pointer imageGeometry = static_cast<mitk::BaseGeometry*>(m_ImageNode->GetData()->GetGeometry(timeStep));
 
     m_CroppingObject = mitk::GeometryData::New();
@@ -380,8 +380,8 @@ void QmitkImageCropper::ProcessImage(bool mask)
   // cropping only possible if valid bounding shape as well as a valid image are loaded
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
-  // to do: check whether stdmultiwidget is valid
-  int timeStep = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetTimeStep();
+  auto renderWindowPart = this->GetRenderWindowPart(OPEN);
+  int timeStep = renderWindowPart->GetTimeNavigationController()->GetTime()->GetPos();
 
  
   if (nodes.empty()) return;

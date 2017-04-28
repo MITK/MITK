@@ -28,7 +28,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkShaderProperty.h"
 
 #include "QmitkDataStorageComboBox.h"
-#include "QmitkStdMultiWidget.h"
 
 #include <vtkSphereSource.h>
 #include <vtkPolyData.h>
@@ -53,9 +52,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMITKSurfaceMaterialEditorView::VIEW_ID = "org.mitk.views.mitksurfacematerialeditor";
 
 QmitkMITKSurfaceMaterialEditorView::QmitkMITKSurfaceMaterialEditorView()
-: QmitkFunctionality(),
-  m_Controls(NULL),
-  m_MultiWidget(NULL)
+: QmitkAbstractView(),
+  m_Controls(NULL)
 {
   fixedProperties.push_back( "shader" );
   fixedProperties.push_back( "material.representation" );
@@ -197,32 +195,16 @@ void QmitkMITKSurfaceMaterialEditorView::CreateQtPartControl(QWidget *parent)
   }
 }
 
-void QmitkMITKSurfaceMaterialEditorView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
+void QmitkMITKSurfaceMaterialEditorView::SetFocus()
 {
-  m_MultiWidget = &stdMultiWidget;
-}
-
-void QmitkMITKSurfaceMaterialEditorView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = NULL;
+  m_Controls->m_ShaderPropertyList->setFocus();
 }
 
 void QmitkMITKSurfaceMaterialEditorView::CreateConnections()
 {
 }
 
-void QmitkMITKSurfaceMaterialEditorView::Activated()
-{
-  QmitkFunctionality::Activated();
-}
-
-void QmitkMITKSurfaceMaterialEditorView::Deactivated()
-{
-  QmitkFunctionality::Deactivated();
-}
-
-
-void QmitkMITKSurfaceMaterialEditorView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkMITKSurfaceMaterialEditorView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   if(!nodes.empty())
   {

@@ -17,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef _QMITKTENSORRECONSTRUCTIONVIEW_H_INCLUDED
 #define _QMITKTENSORRECONSTRUCTIONVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
 
 #include <string>
 
@@ -38,10 +39,8 @@ struct TrSelListener;
  * \brief QmitkTensorReconstructionView
  *
  * Document your class here.
- *
- * \sa QmitkFunctionality
  */
-class QmitkTensorReconstructionView : public QmitkFunctionality
+class QmitkTensorReconstructionView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
 
   friend struct TrSelListener;
@@ -66,13 +65,22 @@ class QmitkTensorReconstructionView : public QmitkFunctionality
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  /// \brief Called when the functionality is activated
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
+
+  /// \brief Called when the view gets activated
   virtual void Activated() override;
 
+  /// \brief Called when the view gets deactivated
   virtual void Deactivated() override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  /// \brief Called when the view becomes visible
+  virtual void Visible() override;
+
+  /// \brief Called when the view becomes hidden
+  virtual void Hidden() override;
 
   static const int nrconvkernels;
 
@@ -97,11 +105,9 @@ protected:
   void TeemTensorReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages);
   void TensorReconstructionWithCorr(mitk::DataStorage::SetOfObjects::Pointer inImages);
 
-  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkTensorReconstructionViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   template<int ndirs> itk::VectorContainer<unsigned int, vnl_vector_fixed<double,3> >::Pointer MakeGradientList();
 

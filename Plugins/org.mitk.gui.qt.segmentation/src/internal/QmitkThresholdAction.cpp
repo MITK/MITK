@@ -112,6 +112,6 @@ void QmitkThresholdAction::SetDecimated(bool)
 {
 }
 
-void QmitkThresholdAction::SetFunctionality(QtViewPart* /*functionality*/)
+void QmitkThresholdAction::SetFunctionality(QtViewPart* /*view*/)
 {
 }

@@ -26,9 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIPartListener.h>
 
 // mitk includes
-#include "mitkImageStatisticsCalculator.h"
-#include "mitkILifecycleAwarePart.h"
-#include "mitkPlanarLine.h"
+#include <mitkImageStatisticsCalculator.h>
+#include <mitkILifecycleAwarePart.h>
+#include <mitkPlanarLine.h>
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
@@ -68,11 +68,8 @@ public:
   \brief method for creating the connections of main and control widget */
   virtual void CreateConnections();
   /*!
-  \brief  not implemented*/
-  //bool IsExclusiveFunctionality() const;
-  /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
-  void OnSelectionChanged( berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes ) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   static const std::string VIEW_ID;
   static const int STAT_TABLE_BASE_HEIGHT;
@@ -136,11 +133,12 @@ protected:
   /** \brief Removes all Observers to images, masks and planar figures and sets corresponding members to zero */
   void ClearObservers();
 
-  void Activated() override;
-  void Deactivated() override;
-  void Visible() override;
-  void Hidden() override;
-  void SetFocus() override;
+  virtual void Activated() override;
+  virtual void Deactivated() override;
+  virtual void Visible() override;
+  virtual void Hidden() override;
+
+  virtual void SetFocus() override;
 
   /** \brief Method called when itkModifiedEvent is called by selected data. */
   void SelectedDataModified();

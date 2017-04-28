@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkFiberQuantificationView_h
 #define QmitkFiberQuantificationView_h
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 #include "ui_QmitkFiberQuantificationViewControls.h"
 
 #include <mitkPlanarFigureComposite.h>
@@ -44,10 +44,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 /*!
 \brief Generation of images from fiber bundles (TDI, envelopes, endpoint distribution) and extraction of principal fiber directions from tractograms.
 
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
-class QmitkFiberQuantificationView : public QmitkFunctionality
+class QmitkFiberQuantificationView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -64,9 +62,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
-  virtual void Activated() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
 protected slots:
 
@@ -75,11 +74,10 @@ protected slots:
 
 protected:
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkFiberQuantificationViewControls* m_Controls;
-  QmitkStdMultiWidget* m_MultiWidget;
 
   /** Connection from VTK to ITK */
   template <typename VTK_Exporter, typename ITK_Importer>

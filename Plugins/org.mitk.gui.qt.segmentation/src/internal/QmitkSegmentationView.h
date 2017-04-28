@@ -17,7 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef QmitkSegmentationView_h
 #define QmitkSegmentationView_h
 
-#include "QmitkFunctionality.h"
+#include <QmitkAbstractView.h>
+#include <mitkILifecycleAwarePart.h>
+#include <mitkIRenderWindowPartListener.h>
 
 #include <berryIBerryPreferences.h>
 
@@ -30,7 +32,7 @@ class QmitkRenderWindow;
 * \ingroup org_mitk_gui_qt_segmentation_internal
 * \warning Implementation of this class is split up into two .cpp files to make things more compact. Check both this file and QmitkSegmentationOrganNamesHandling.cpp
 */
-class QmitkSegmentationView : public QmitkFunctionality
+class QmitkSegmentationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -46,21 +48,26 @@ public:
   \brief Invoked when the DataManager selection changed
   */
   virtual void OnSelectionChanged(mitk::DataNode* node);
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes) override;
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   // reaction to new segmentations being created by segmentation tools
   void NewNodesGenerated();
   void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
-  // QmitkFunctionality's activate/deactivate
   virtual void Activated() override;
   virtual void Deactivated() override;
+  bool IsActivated() const;
   virtual void Visible() override;
+  virtual void Hidden() override;
 
-  // QmitkFunctionality's changes regarding THE QmitkStdMultiWidget
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
-  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget) override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
+
+  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
+  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   // BlueBerry's notification about preference changes (e.g. from a dialog)
   virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
@@ -96,9 +103,6 @@ protected:
 
   // a type for handling lists of DataNodes
   typedef std::vector<mitk::DataNode*> NodeList;
-
-  // set available multiwidget
-  void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
   // actively query the current selection of data manager
   //void PullCurrentDataManagerSelection();
@@ -148,9 +152,6 @@ protected:
   // our GUI
   Ui::QmitkSegmentationControls * m_Controls;
 
-  // THE currently existing QmitkStdMultiWidget
-  QmitkStdMultiWidget * m_MultiWidget;
-
   unsigned long m_VisibilityChangedObserverTag;
 
   bool m_DataSelectionChanged;
@@ -171,6 +172,9 @@ protected:
 
   mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
   mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
+
+  bool m_Activated;
+
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

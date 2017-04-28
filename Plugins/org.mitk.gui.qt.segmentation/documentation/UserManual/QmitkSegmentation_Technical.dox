@@ -92,7 +92,7 @@ since this is the central place where all image modifications are made. The filt
 to the undo stack as a mitk::ApplyDiffImageOperation. When the user requests undo, this ApplyDiffImageOperation
 will be executed by a singleton class DiffImageApplier. The operation itself observes the image, which it refers to,
 for itk::DeleteEvent, so no undo operation will be executed on/for images that have already been destroyed.
-<li> <b>GUI</b>: The top-level GUI is the functionality
+<li> <b>GUI</b>: The top-level GUI is the view
 QmitkSegmentation, which is very thin in comparison to ERIS. There are
 separate widgets for image and tool selection, for interpolation. Additionaly,
 there are some methods to create, delete, crop, load and save segmentations.

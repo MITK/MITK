@@ -49,9 +49,8 @@ const std::string QmitkOdfMaximaExtractionView::VIEW_ID = "org.mitk.views.odfmax
 using namespace mitk;
 
 QmitkOdfMaximaExtractionView::QmitkOdfMaximaExtractionView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
 {
 
 }
@@ -77,6 +76,11 @@ void QmitkOdfMaximaExtractionView::CreateQtPartControl( QWidget *parent )
         connect((QObject*) m_Controls->m_ImportPeaks, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertPeaks()));
         connect((QObject*) m_Controls->m_ImportShCoeffs, SIGNAL(clicked()), (QObject*) this, SLOT(ConvertShCoeffs()));
     }
+}
+
+void QmitkOdfMaximaExtractionView::SetFocus()
+{
+  m_Controls->m_GenerateImageButton->setFocus();
 }
 
 void QmitkOdfMaximaExtractionView::UpdateGui()
@@ -624,7 +628,118 @@ void QmitkOdfMaximaExtractionView::StdMultiWidgetNotAvailable()
     m_MultiWidget = NULL;
 }
 
-void QmitkOdfMaximaExtractionView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkOdfMaximaExtractionView::GenerateDataFromDwi()
+{
+    typedef itk::OdfMaximaExtractionFilter< float > MaximaExtractionFilterType;
+    MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
+
+    mitk::BaseGeometry::Pointer geometry;
+    if (!m_ImageNodes.empty())
+    {
+        try{
+            Image::Pointer img = dynamic_cast<Image*>(m_ImageNodes.at(0)->GetData());
+            typedef ImageToItk< MaximaExtractionFilterType::CoefficientImageType > CasterType;
+            CasterType::Pointer caster = CasterType::New();
+            caster->SetInput(img);
+            caster->Update();
+            filter->SetShCoeffImage(caster->GetOutput());
+            geometry = img->GetGeometry();
+        }
+        catch(itk::ExceptionObject &e)
+        {
+            MITK_INFO << "wrong image type: " << e.what();
+            return;
+        }
+    }
+    else
+        return;
+
+    filter->SetMaxNumPeaks(m_Controls->m_MaxNumPeaksBox->value());
+    filter->SetPeakThreshold(m_Controls->m_PeakThresholdBox->value());
+
+    if (!m_BinaryImageNodes.empty())
+    {
+        ItkUcharImgType::Pointer itkMaskImage = ItkUcharImgType::New();
+        Image::Pointer mitkMaskImg = dynamic_cast<Image*>(m_BinaryImageNodes.at(0)->GetData());
+        CastToItkImage(mitkMaskImg, itkMaskImage);
+        filter->SetMaskImage(itkMaskImage);
+    }
+
+    switch (m_Controls->m_NormalizationBox->currentIndex())
+    {
+    case 0:
+        filter->SetNormalizationMethod(MaximaExtractionFilterType::NO_NORM);
+        break;
+    case 1:
+        filter->SetNormalizationMethod(MaximaExtractionFilterType::MAX_VEC_NORM);
+        break;
+    case 2:
+        filter->SetNormalizationMethod(MaximaExtractionFilterType::SINGLE_VEC_NORM);
+        break;
+    }
+
+    filter->GenerateData();
+
+    ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
+
+    if (m_Controls->m_OutputDirectionImagesBox->isChecked())
+    {
+        typedef MaximaExtractionFilterType::ItkDirectionImageContainer ItkDirectionImageContainer;
+        ItkDirectionImageContainer::Pointer container = filter->GetDirectionImageContainer();
+        for (int i=0; i<container->Size(); i++)
+        {
+            MaximaExtractionFilterType::ItkDirectionImage::Pointer itkImg = container->GetElement(i);
+            mitk::Image::Pointer img = mitk::Image::New();
+            img->InitializeByItk( itkImg.GetPointer() );
+            img->SetVolume( itkImg->GetBufferPointer() );
+            DataNode::Pointer node = DataNode::New();
+            node->SetData(img);
+            QString name(m_ImageNodes.at(0)->GetName().c_str());
+            name += "_Direction";
+            name += QString::number(i+1);
+            node->SetName(name.toStdString().c_str());
+            GetDataStorage()->Add(node);
+        }
+    }
+
+    if (m_Controls->m_OutputNumDirectionsBox->isChecked())
+    {
+        mitk::Image::Pointer image2 = mitk::Image::New();
+        image2->InitializeByItk( numDirImage.GetPointer() );
+        image2->SetVolume( numDirImage->GetBufferPointer() );
+        DataNode::Pointer node = DataNode::New();
+        node->SetData(image2);
+        QString name(m_ImageNodes.at(0)->GetName().c_str());
+        name += "_NumDirections";
+        node->SetName(name.toStdString().c_str());
+        GetDataStorage()->Add(node);
+    }
+
+    if (m_Controls->m_OutputVectorFieldBox->isChecked())
+    {
+        mitk::Vector3D outImageSpacing = geometry->GetSpacing();
+        float minSpacing = 1;
+        if(outImageSpacing[0]<outImageSpacing[1] && outImageSpacing[0]<outImageSpacing[2])
+            minSpacing = outImageSpacing[0];
+        else if (outImageSpacing[1] < outImageSpacing[2])
+            minSpacing = outImageSpacing[1];
+        else
+            minSpacing = outImageSpacing[2];
+
+        mitk::FiberBundle::Pointer directions = filter->GetOutputFiberBundle();
+        // directions->SetGeometry(geometry);
+        DataNode::Pointer node = DataNode::New();
+        node->SetData(directions);
+        QString name(m_ImageNodes.at(0)->GetName().c_str());
+        name += "_VectorField";
+        node->SetName(name.toStdString().c_str());
+        node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
+        node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
+        GetDataStorage()->Add(node);
+    }
+}
+
+void QmitkOdfMaximaExtractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     m_Controls->m_InputData->setTitle("Please Select Input Data");
     m_Controls->m_DwiFibLabel->setText("<font color='red'>mandatory</font>");
@@ -635,10 +750,8 @@ void QmitkOdfMaximaExtractionView::OnSelectionChanged( std::vector<mitk::DataNod
     m_TensorImageNodes.clear();
 
     // iterate all selected objects, adjust warning visibility
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+    for (mitk::DataNode::Pointer node: nodes)
     {
-        mitk::DataNode::Pointer node = *it;
-
         if ( node.IsNotNull() && dynamic_cast<mitk::TensorImage*>(node->GetData()) )
         {
             m_TensorImageNodes.push_back(node);

@@ -22,7 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkStochasticFiberTrackingView.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -46,9 +45,8 @@ const std::string id_DataManager = "org.mitk.views.datamanager";
 using namespace berry;
 
 QmitkStochasticFiberTrackingView::QmitkStochasticFiberTrackingView()
-    : QmitkFunctionality()
+    : QmitkAbstractView()
     , m_Controls( 0 )
-    , m_MultiWidget( NULL )
     , m_SeedRoi( NULL )
     , m_DiffusionImage( NULL )
 {
@@ -75,6 +73,11 @@ void QmitkStochasticFiberTrackingView::CreateQtPartControl( QWidget *parent )
     }
 }
 
+void QmitkStochasticFiberTrackingView::SetFocus()
+{
+  m_Controls->commandLinkButton->setFocus();
+}
+
 void QmitkStochasticFiberTrackingView::OnSeedsPerVoxelChanged(int value)
 {
     m_Controls->m_SeedsPerVoxelLabel->setText(QString("Seeds per Voxel: ")+QString::number(value));
@@ -90,18 +93,7 @@ void QmitkStochasticFiberTrackingView::OnMaxCacheSizeChanged(int value)
     m_Controls->m_MaxCacheSizeLabel->setText(QString("Max. Cache Size: ")+QString::number(value)+"GB");
 }
 
-void QmitkStochasticFiberTrackingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-    m_MultiWidget = &stdMultiWidget;
-}
-
-
-void QmitkStochasticFiberTrackingView::StdMultiWidgetNotAvailable()
-{
-    m_MultiWidget = NULL;
-}
-
-void QmitkStochasticFiberTrackingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkStochasticFiberTrackingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     m_DiffusionImageNode = NULL;
     m_DiffusionImage = NULL;
@@ -109,10 +101,8 @@ void QmitkStochasticFiberTrackingView::OnSelectionChanged( std::vector<mitk::Dat
     m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_RoiImageLabel->setText("<font color='red'>mandatory</font>");
 
-    for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+    for (mitk::DataNode::Pointer node: nodes)
     {
-        mitk::DataNode::Pointer node = *it;
-
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
           bool isDiffusionImage( mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage( dynamic_cast<mitk::Image *>(node->GetData())) );

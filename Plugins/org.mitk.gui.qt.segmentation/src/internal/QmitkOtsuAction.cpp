@@ -106,7 +106,7 @@ void QmitkOtsuAction::SetDataStorage(DataStorage *dataStorage)
   m_DataStorage = dataStorage;
 }
 
-void QmitkOtsuAction::SetFunctionality(QtViewPart* /*functionality*/)
+void QmitkOtsuAction::SetFunctionality(QtViewPart* /*view*/)
 {
 }
 

@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkConnectomicsNetworkOperationsViewControls.h"
 
@@ -32,11 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 \brief QmitkConnectomicsNetworkOperationsView
 
 This bundle provides GUI for the brain network analysis algorithms.
-
-\sa QmitkFunctionality
-\ingroup Functionalities
 */
-class QmitkConnectomicsNetworkOperationsView : public QmitkFunctionality
+class QmitkConnectomicsNetworkOperationsView : public QmitkAbstractView
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -51,8 +48,10 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget) override;
-  virtual void StdMultiWidgetNotAvailable() override;
+  ///
+  /// Sets the focus to an internal widget.
+  ///
+  virtual void SetFocus() override;
 
   protected slots:
 
@@ -74,8 +73,8 @@ public:
 protected:
 
   // ####### Functions #######
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes ) override;
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
+  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
   /// \brief Converts an image into a RGBA image
   template < typename TPixel, unsigned int VImageDimension >
@@ -92,8 +91,6 @@ protected:
 
 
   Ui::QmitkConnectomicsNetworkOperationsViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   mitk::ConnectomicsNetworkMapper3D::Pointer m_NetworkMapper;
 

@@ -63,7 +63,7 @@ void QmitkDenoisingWorker::run()
 const std::string QmitkDenoisingView::VIEW_ID = "org.mitk.views.denoisingview";
 
 QmitkDenoisingView::QmitkDenoisingView()
-  : QmitkFunctionality()
+  : QmitkAbstractView()
   , m_Controls( 0 )
   , m_ImageNode(NULL)
   , m_BrainMaskNode(NULL)
@@ -96,6 +96,12 @@ void QmitkDenoisingView::CreateQtPartControl( QWidget *parent )
     // create GUI widgets from the Qt Designer's .ui file
     m_Controls = new Ui::QmitkDenoisingViewControls;
     m_Controls->setupUi( parent );
+
+    m_Controls->m_SelectFilterComboBox->clear();
+    m_Controls->m_SelectFilterComboBox->insertItem(NOFILTERSELECTED, "Please select a filter");
+    m_Controls->m_SelectFilterComboBox->insertItem(NLM, "Non-local means filter");
+    m_Controls->m_SelectFilterComboBox->insertItem(GAUSS, "Discrete gaussian filter");
+
     CreateConnections();
     ResetParameterPanel();
   }
@@ -111,17 +117,12 @@ void QmitkDenoisingView::CreateConnections()
   }
 }
 
-void QmitkDenoisingView::Activated()
+void QmitkDenoisingView::SetFocus()
 {
-  QmitkFunctionality::Activated();
-
-  m_Controls->m_SelectFilterComboBox->clear();
-  m_Controls->m_SelectFilterComboBox->insertItem(NOFILTERSELECTED, "Please select a filter");
-  m_Controls->m_SelectFilterComboBox->insertItem(NLM, "Non-local means filter");
-  m_Controls->m_SelectFilterComboBox->insertItem(GAUSS, "Discrete gaussian filter");
+  m_Controls->m_SelectFilterComboBox->setFocus();
 }
 
-void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+void QmitkDenoisingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
   if (m_ThreadIsRunning)
     return;
@@ -141,10 +142,8 @@ void QmitkDenoisingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes 
   m_BrainMaskNode = NULL;
 
   // iterate selection
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
+  for (mitk::DataNode::Pointer node: nodes)
   {
-    mitk::DataNode::Pointer node = *it;
-
     bool isDiffusionImage(false);
     if(node.IsNotNull())
     {
@@ -313,7 +312,7 @@ void QmitkDenoisingView::StartDenoising()
           QString name = m_ImageNode->GetName().c_str();
 
           imageNode->SetName((name+"_gauss_"+QString::number(m_Controls->m_SpinBoxParameter1->value())).toStdString().c_str());
-          GetDefaultDataStorage()->Add(imageNode);
+          GetDataStorage()->Add(imageNode);
 
           break;
         }
@@ -495,7 +494,7 @@ void QmitkDenoisingView::AfterThread()
         {
           imageNode->SetName((name+"_NLM_"+QString::number(m_Controls->m_SpinBoxParameter1->value())+"-"+QString::number(m_Controls->m_SpinBoxParameter2->value())).toStdString().c_str());
         }
-        GetDefaultDataStorage()->Add(imageNode);
+        GetDataStorage()->Add(imageNode);
         break;
       }
     }

@@ -77,6 +77,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_SeedImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_MaskImageBox->SetDataStorage(this->GetDataStorage());
         m_Controls->m_StopImageBox->SetDataStorage(this->GetDataStorage());
+        m_Controls->m_TissueImageBox->SetDataStorage(this->GetDataStorage());
 
         mitk::TNodePredicateDataType<mitk::Image>::Pointer isImagePredicate = mitk::TNodePredicateDataType<mitk::Image>::New();
 
@@ -93,6 +94,8 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_MaskImageBox->SetZeroEntryText("--");
         m_Controls->m_StopImageBox->SetPredicate( mitk::NodePredicateAnd::New(isBinaryPredicate, dimensionPredicate) );
         m_Controls->m_StopImageBox->SetZeroEntryText("--");
+        m_Controls->m_TissueImageBox->SetPredicate( mitk::NodePredicateAnd::New(isNotABinaryImagePredicate, dimensionPredicate) );
+        m_Controls->m_TissueImageBox->SetZeroEntryText("--");
 
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
     }
@@ -160,6 +163,11 @@ void QmitkStreamlineTrackingView::UpdateGui()
     m_Controls->m_gLabel->setVisible(false);
     m_Controls->m_FaImageBox->setVisible(false);
     m_Controls->m_NormalizeODFsBox->setVisible(false);
+
+    if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
+        m_Controls->m_SeedGmBox->setVisible(true);
+    else
+        m_Controls->m_SeedGmBox->setVisible(false);
 
     if(!m_InputImageNodes.empty())
     {
@@ -308,6 +316,14 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         tracker->SetStoppingRegions(mask);
     }
 
+    if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
+    {
+        ItkUCharImageType::Pointer mask = ItkUCharImageType::New();
+        mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_TissueImageBox->GetSelectedNode()->GetData()), mask);
+        tracker->SetTissueImage(mask);
+        tracker->SetSeedOnlyGm(m_Controls->m_SeedGmBox->isChecked());
+    }
+
     tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
     tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
     //tracker->SetSamplingDistance(0.7);
@@ -315,9 +331,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     tracker->SetOnlyForwardSamples(true);
     tracker->SetAposterioriCurvCheck(false);
     tracker->SetMaxNumTracts(m_Controls->m_NumFibersBox->value());
-    //tracker->SetFourTTImage(tissue);
     tracker->SetNumberOfSamples(m_Controls->m_NumSamplesBox->value());
-    tracker->SetSeedOnlyGm(false);
     tracker->SetTrackingHandler(trackingHandler);
     tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
     tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());

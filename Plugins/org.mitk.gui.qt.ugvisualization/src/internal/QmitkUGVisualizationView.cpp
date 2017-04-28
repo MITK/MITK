@@ -32,6 +32,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QWidgetAction>
 
+#include <QMenu>
+
 
 class UGVisVolumeObserver : public mitk::PropertyView
 {
@@ -152,7 +154,7 @@ void QmitkUGVisualizationView::CreateConnections()
   connect(m_ShowTFGeneratorAction, SIGNAL(triggered(bool)), this, SLOT(ShowTFGeneratorWidget(bool)));
 }
 
-void ::SetFocus()
+void QmitkUGVisualizationView::SetFocus()
 {
   m_Controls.m_OptionsButton->setFocus();
 }
@@ -204,7 +206,7 @@ void QmitkUGVisualizationView::UpdateGUI()
   bool enable = false;
 
   mitk::DataNode* node = 0;
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
+  auto nodes = this->GetDataManagerSelection();
   if (!nodes.empty())
   {
     node = nodes.front();

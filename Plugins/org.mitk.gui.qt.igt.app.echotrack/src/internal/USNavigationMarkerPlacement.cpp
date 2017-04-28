@@ -98,10 +98,11 @@ ui(new Ui::USNavigationMarkerPlacement)
 
 USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 {
-  this->OnResetStandardLayout();
+  //this->OnResetStandardLayout();
 
   // make sure that the experiment got finished before destructing the object
   if (m_IsExperimentRunning) { this->OnFinishExperiment(); }
+
 
   // remove listener for ultrasound device changes
   if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
@@ -110,6 +111,8 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
   }
 
   delete ui;
+
+
 }
 
 void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
@@ -279,8 +282,10 @@ void USNavigationMarkerPlacement::OnResetStandardLayout()
 {
   MITK_INFO << "Resetting Layout";
   //reset render windows
-  this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane")->SetVisibility(true);
-  this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane")->SetVisibility(true);
+  mitk::DataNode::Pointer widget1 = this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane");
+  if (widget1.IsNotNull()) { widget1->SetVisibility(true); }
+  mitk::DataNode::Pointer widget3 = this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane");
+  if (widget3.IsNotNull()) { widget3->SetVisibility(true); }
   m_StdMultiWidget->changeLayoutToDefault();
 }
 

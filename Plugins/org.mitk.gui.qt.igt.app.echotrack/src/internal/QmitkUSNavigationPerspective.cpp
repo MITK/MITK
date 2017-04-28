@@ -28,15 +28,4 @@ void QmitkUSNavigationPerspective::CreateInitialLayout (berry::IPageLayout::Poin
   // layout (closeable)
   layout->AddStandaloneView("org.mitk.views.ultrasoundsupport", false, berry::IPageLayout::LEFT, 0.3f, layout->GetEditorArea());
   layout->AddStandaloneView("org.mitk.views.mitkigttrackingtoolbox", false, berry::IPageLayout::BOTTOM, 0.9f, "org.mitk.views.ultrasoundsupport");
-
-  /*
-  berry::IFolderLayout::Pointer leftFolder = layout->CreateFolder("left", berry::IPageLayout::LEFT, 0.3f, layout->GetEditorArea());
-
-  leftFolder->AddStandaloneView("org.mitk.views.ultrasoundsupport", false, berry::IPageLayout::LEFT, 0.8f, layout->GetEditorArea());
-  leftFolder->AddView("org.mitk.views.mitkigttrackingtoolbox");
-  leftFolder->AddView("org.mitk.views.ultrasoundsupport");
-
-  layout->GetViewLayout("org.mitk.views.mitkigttrackingtoolbox")->SetCloseable(false);
-  layout->GetViewLayout("org.mitk.views.ultrasoundsupport")->SetCloseable(false);
-  */
 }

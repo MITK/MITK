@@ -113,7 +113,7 @@ void QmitkSegmentationView::Hidden()
 
 void QmitkSegmentationView::Activated()
 {
-   m_Activated = true;
+   /*m_Activated = true;
 
    // should be moved to ::BecomesVisible() or similar
    if( m_Controls )
@@ -151,12 +151,12 @@ void QmitkSegmentationView::Activated()
    command3->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
    m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command3 );
 
-   this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
+   this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());*/
 }
 
 void QmitkSegmentationView::Deactivated()
 {
-   if( m_Controls )
+   /*if( m_Controls )
    {
       this->SetToolSelectionBoxesEnabled( false );
       //deactivate all tools
@@ -185,7 +185,7 @@ void QmitkSegmentationView::Deactivated()
       this->SetToolManagerSelection(0,0);
    }
 
-   m_Activated = false;
+   m_Activated = false;*/
 }
 
 bool QmitkSegmentationView::IsActivated() const

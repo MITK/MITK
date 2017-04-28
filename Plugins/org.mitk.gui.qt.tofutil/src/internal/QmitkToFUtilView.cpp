@@ -54,7 +54,7 @@ const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 //Constructor
 QmitkToFUtilView::QmitkToFUtilView()
   : QmitkAbstractView()
-  , m_Controls(NULL),
+  , m_Controls(NULL)
   , m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
   , m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_RGBImageNode(NULL), m_SurfaceNode(NULL)
   , m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)

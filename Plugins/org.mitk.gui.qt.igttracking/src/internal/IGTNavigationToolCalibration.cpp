@@ -460,6 +460,11 @@ void IGTNavigationToolCalibration::SetCalibrationPointer()
 
 void IGTNavigationToolCalibration::UpdateOffsetCoordinates()
 {
+  if (m_NavigationDataSourceOfCalibrationPointer.IsNull() || m_NavigationDataSourceOfToolToCalibrate.IsNull())
+  {
+    return;
+  }
+
   mitk::NavigationData::Pointer referenceToolND = m_NavigationDataSourceOfCalibrationPointer->GetOutput(m_IDCalibrationPointer);
   mitk::NavigationData::Pointer toolToCalibrateND = m_NavigationDataSourceOfToolToCalibrate->GetOutput(m_IDToolToCalibrate);
 

@@ -68,13 +68,9 @@ protected:
     Ui::QmitkStreamlineTrackingViewControls* m_Controls;
     QmitkStdMultiWidget* m_MultiWidget;
 
-protected slots:
+    void UpdateGui();
 
-    /** update labels if parameters have changed */
-    void OnSeedsPerVoxelChanged(int value);
-    void OnMinTractLengthChanged(int value);
-    void OnfChanged(int value);
-    void OngChanged(int value);
+protected slots:
 
 private:
 

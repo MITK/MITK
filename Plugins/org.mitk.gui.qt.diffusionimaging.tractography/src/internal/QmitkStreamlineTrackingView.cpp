@@ -95,31 +95,7 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_StopImageBox->SetZeroEntryText("--");
 
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
-        connect( m_Controls->m_SeedsPerVoxelSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSeedsPerVoxelChanged(int)) );
-        connect( m_Controls->m_MinTractLengthSlider, SIGNAL(valueChanged(int)), this, SLOT(OnMinTractLengthChanged(int)) );
-        connect( m_Controls->m_fSlider, SIGNAL(valueChanged(int)), this, SLOT(OnfChanged(int)) );
-        connect( m_Controls->m_gSlider, SIGNAL(valueChanged(int)), this, SLOT(OngChanged(int)) );
     }
-}
-
-void QmitkStreamlineTrackingView::OnfChanged(int value)
-{
-    m_Controls->m_fLabel->setText(QString("f: ")+QString::number((float)value/100));
-}
-
-void QmitkStreamlineTrackingView::OngChanged(int value)
-{
-    m_Controls->m_gLabel->setText(QString("g: ")+QString::number((float)value/100));
-}
-
-void QmitkStreamlineTrackingView::OnSeedsPerVoxelChanged(int value)
-{
-    m_Controls->m_SeedsPerVoxelLabel->setText(QString("Seeds per Voxel: ")+QString::number(value));
-}
-
-void QmitkStreamlineTrackingView::OnMinTractLengthChanged(int value)
-{
-    m_Controls->m_MinTractLengthLabel->setText(QString("Min. Tract Length: ")+QString::number(value)+QString("mm"));
 }
 
 void QmitkStreamlineTrackingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -137,14 +113,14 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
 {
     m_InputImageNodes.clear();
     m_InputImages.clear();
-    m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
 
     for( std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it )
     {
         mitk::DataNode::Pointer node = *it;
 
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-        {   if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
+        {
+            if( dynamic_cast<mitk::TensorImage*>(node->GetData()) )
             {
                 m_InputImageNodes.push_back(node);
                 m_InputImages.push_back(dynamic_cast<mitk::Image*>(node->GetData()));
@@ -171,6 +147,20 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
         }
     }
 
+    UpdateGui();
+}
+
+void QmitkStreamlineTrackingView::UpdateGui()
+{
+    m_Controls->m_TensorImageLabel->setText("<font color='red'>mandatory</font>");
+
+    m_Controls->m_fBox->setVisible(false);
+    m_Controls->m_fLabel->setVisible(false);
+    m_Controls->m_gBox->setVisible(false);
+    m_Controls->m_gLabel->setVisible(false);
+    m_Controls->m_FaImageBox->setVisible(false);
+    m_Controls->m_NormalizeODFsBox->setVisible(false);
+
     if(!m_InputImageNodes.empty())
     {
         if (m_InputImageNodes.size()>1)
@@ -179,15 +169,32 @@ void QmitkStreamlineTrackingView::OnSelectionChanged( std::vector<mitk::DataNode
             m_Controls->m_TensorImageLabel->setText(m_InputImageNodes.at(0)->GetName().c_str());
         m_Controls->m_InputData->setTitle("Input Data");
         m_Controls->commandLinkButton->setEnabled(true);
+
+        if ( dynamic_cast<mitk::TensorImage*>(m_InputImageNodes.at(0)->GetData()) )
+        {
+            m_Controls->m_fBox->setVisible(true);
+            m_Controls->m_fLabel->setVisible(true);
+            m_Controls->m_gBox->setVisible(true);
+            m_Controls->m_gLabel->setVisible(true);
+            m_Controls->m_FaImageBox->setVisible(true);
+        }
+        else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
+        {
+            m_Controls->m_FaImageBox->setVisible(true);
+            m_Controls->m_NormalizeODFsBox->setVisible(true);
+        }
+        else
+        {
+
+        }
     }
     else
     {
         m_Controls->m_InputData->setTitle("Please Select Input Data");
         m_Controls->commandLinkButton->setEnabled(false);
     }
+
 }
-
-
 
 void QmitkStreamlineTrackingView::DoFiberTracking()
 {
@@ -219,8 +226,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         }
 
         dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
-        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetF((float)m_Controls->m_fSlider->value()/100);
-        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetG((float)m_Controls->m_gSlider->value()/100);
+        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetF((float)m_Controls->m_fBox->value());
+        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetG((float)m_Controls->m_gBox->value());
     }
     else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
@@ -230,6 +237,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         mitk::CastToItkImage(m_InputImages.at(0), itkImg);
         dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetOdfImage(itkImg);
         dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
+        dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetMinMaxNormalize(m_Controls->m_NormalizeODFsBox->isChecked());
 
         if (m_Controls->m_FaImageBox->GetSelectedNode().IsNotNull())
         {
@@ -300,7 +308,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         tracker->SetStoppingRegions(mask);
     }
 
-    tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelSlider->value());
+    tracker->SetSeedsPerVoxel(m_Controls->m_SeedsPerVoxelBox->value());
     tracker->SetStepSize(m_Controls->m_StepSizeBox->value());
     //tracker->SetSamplingDistance(0.7);
     tracker->SetUseStopVotes(true);
@@ -312,7 +320,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     tracker->SetSeedOnlyGm(false);
     tracker->SetTrackingHandler(trackingHandler);
     tracker->SetAngularThreshold(m_Controls->m_AngularThresholdBox->value());
-    tracker->SetMinTractLength(m_Controls->m_MinTractLengthSlider->value());
+    tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
     tracker->Update();
 
     vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();

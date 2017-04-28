@@ -837,7 +837,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
     mitk::DataNode::Pointer coeffsNode=mitk::DataNode::New();
     coeffsNode->SetData( coeffsImage );
     coeffsNode->SetProperty( "name", mitk::StringProperty::New(dataNodePointer->GetName()+"_SH-Coefficients") );
-    GetDefaultDataStorage()->Add(coeffsNode, dataNodePointer);
+    GetDataStorage()->Add(coeffsNode, dataNodePointer);
   }
 
   // ODFs TO DATATREE
@@ -848,7 +848,7 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(mitk::
   node->SetData( image );
   SetDefaultNodeProperties(node, dataNodePointer->GetName()+nodePostfix);
 
-  GetDefaultDataStorage()->Add(node, dataNodePointer);
+  GetDataStorage()->Add(node, dataNodePointer);
 
   if(m_Controls->m_OutputCoeffsImage->isChecked())
   {
@@ -1009,7 +1009,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
       coeffsNode->SetData( coeffsImage );
       coeffsNode->SetProperty( "name", mitk::StringProperty::New(
         QString(nodename.c_str()).append("_SH-Coefficients").toStdString()) );
-      GetDefaultDataStorage()->Add(coeffsNode, dataNodePointer);
+      GetDataStorage()->Add(coeffsNode, dataNodePointer);
     }
 
     // ODFs TO DATATREE
@@ -1020,7 +1020,7 @@ void QmitkQBallReconstructionView::TemplatedMultiQBallReconstruction(float lambd
     node->SetData( image );
     SetDefaultNodeProperties(node, nodename+"_SH_MultiShell_Qball");
 
-    GetDefaultDataStorage()->Add(node, dataNodePointer);
+    GetDataStorage()->Add(node, dataNodePointer);
 }
 
 void QmitkQBallReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name)

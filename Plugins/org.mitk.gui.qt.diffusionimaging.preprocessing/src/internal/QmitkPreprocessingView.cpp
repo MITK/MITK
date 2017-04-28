@@ -1853,7 +1853,7 @@ void QmitkPreprocessingView::DoFlipGradientDirections()
 
   QString name = node->GetName().c_str();
   imageNode->SetName( (name+"_GradientFlip").toStdString().c_str() );
-  GetDefaultDataStorage()->Add( imageNode, node );
+  GetDataStorage()->Add( imageNode, node );
 }
 
 void QmitkPreprocessingView::DoHalfSphereGradientDirections()

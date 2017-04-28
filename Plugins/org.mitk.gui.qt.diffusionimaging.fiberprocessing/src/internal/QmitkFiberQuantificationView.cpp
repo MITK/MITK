@@ -151,7 +151,7 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(mitkImage);
         node->SetName((name+"_NUM_DIRECTIONS").toStdString().c_str());
-        GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
+        GetDataStorage()->Add(node, m_SelectedFB.back());
     }
 
     if (m_Controls->m_DirectionImagesBox->isChecked())
@@ -168,7 +168,7 @@ void QmitkFiberQuantificationView::CalculateFiberDirections()
         mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(mitkImage);
         node->SetName( (name+"_DIRECTIONS").toStdString().c_str());
-        GetDefaultDataStorage()->Add(node, m_SelectedFB.back());
+        GetDataStorage()->Add(node, m_SelectedFB.back());
     }
 }
 

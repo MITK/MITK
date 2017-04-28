@@ -17,6 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
 #define MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
 
+#include <MitkIGTIOExports.h>
+
 #include <mitkAbstractFileReader.h>
 #include <mitkNavigationDataSet.h>
 
@@ -27,7 +29,7 @@ namespace mitk {
    *  Caution: at the moment only one navigation data is supported which means that only
    *  the data of the first navigation tool in the file is read!
    */
-  class NavigationDataReaderCSV : public AbstractFileReader
+  class MITKIGTIO_EXPORT NavigationDataReaderCSV : public AbstractFileReader
   {
   public:
 

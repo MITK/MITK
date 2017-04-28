@@ -17,11 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataSetWriterXML_H_HEADER_INCLUDED_
 #define MITKNavigationDataSetWriterXML_H_HEADER_INCLUDED_
 
+#include <MitkIGTIOExports.h>
+
 #include <mitkNavigationDataSet.h>
 #include <mitkAbstractFileWriter.h>
 
 namespace mitk {
-  class NavigationDataSetWriterXML : public AbstractFileWriter
+  class MITKIGTIO_EXPORT NavigationDataSetWriterXML : public AbstractFileWriter
   {
   public:
 

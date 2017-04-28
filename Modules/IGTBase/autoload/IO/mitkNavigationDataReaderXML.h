@@ -18,6 +18,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
 #define MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
 
+#include <MitkIGTIOExports.h>
+
 #include <mitkAbstractFileReader.h>
 #include <mitkNavigationDataSet.h>
 // includes for exceptions
@@ -29,7 +31,7 @@ class TiXmlNode;
 
 namespace mitk {
 
-  class NavigationDataReaderXML : public AbstractFileReader
+  class MITKIGTIO_EXPORT NavigationDataReaderXML : public AbstractFileReader
   {
   public:
     NavigationDataReaderXML();

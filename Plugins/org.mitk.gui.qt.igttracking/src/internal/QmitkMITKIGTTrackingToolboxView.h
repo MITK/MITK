@@ -18,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #define QmitkMITKIGTTrackingToolboxView_h
 
 #include <berryISelectionListener.h>
+#include <ctkServiceReference.h>
 
 #include <QmitkAbstractView.h>
 

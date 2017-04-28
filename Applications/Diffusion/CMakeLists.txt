@@ -41,7 +41,6 @@ set(_plugins
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.moviemaker
   org.mitk.gui.qt.basicimageprocessing
-  org.mitk.gui.qt.registration
   org.mitk.gui.qt.properties
   org.mitk.gui.qt.viewnavigator
   org.mitk.gui.qt.cmdlinemodules

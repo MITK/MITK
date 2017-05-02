@@ -36,6 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <gdcmUIDs.h>
 
 #include "mitkProperties.h"
+#include "mitkDicomTagsList.h"
 
 namespace mitk
 {
@@ -61,87 +62,6 @@ std::string DicomSeriesReader::PixelSpacingInterpretationToString( const PixelSp
     default: return "<unknown value of enum PixelSpacingInterpretation>";
   };
 }
-
-const DicomSeriesReader::TagToPropertyMapType& DicomSeriesReader::GetDICOMTagsToMITKPropertyMap()
-{
-  static bool initialized = false;
-  static TagToPropertyMapType dictionary;
-  if (!initialized)
-  {
-    /*
-       Selection criteria:
-       - no sequences because we cannot represent that
-       - nothing animal related (specied, breed registration number), MITK focusses on human medical image processing.
-       - only general attributes so far
-
-       When extending this, we should make use of a real dictionary (GDCM/DCMTK and lookup the tag names there)
-    */
-
-    // Patient module
-    dictionary["0010|0010"] = "dicom.patient.PatientsName";
-    dictionary["0010|0020"] = "dicom.patient.PatientID";
-    dictionary["0010|0030"] = "dicom.patient.PatientsBirthDate";
-    dictionary["0010|0040"] = "dicom.patient.PatientsSex";
-    dictionary["0010|0032"] = "dicom.patient.PatientsBirthTime";
-    dictionary["0010|1000"] = "dicom.patient.OtherPatientIDs";
-    dictionary["0010|1001"] = "dicom.patient.OtherPatientNames";
-    dictionary["0010|2160"] = "dicom.patient.EthnicGroup";
-    dictionary["0010|4000"] = "dicom.patient.PatientComments";
-    dictionary["0012|0062"] = "dicom.patient.PatientIdentityRemoved";
-    dictionary["0012|0063"] = "dicom.patient.DeIdentificationMethod";
-
-    // General Study module
-    dictionary["0020|000d"] = "dicom.study.StudyInstanceUID";
-    dictionary["0008|0020"] = "dicom.study.StudyDate";
-    dictionary["0008|0030"] = "dicom.study.StudyTime";
-    dictionary["0008|0080"] = "dicom.study.InstitutionName";
-    dictionary["0008|0090"] = "dicom.study.ReferringPhysiciansName";
-    dictionary["0020|0010"] = "dicom.study.StudyID";
-    dictionary["0008|0050"] = "dicom.study.AccessionNumber";
-    dictionary["0008|1030"] = "dicom.study.StudyDescription";
-    dictionary["0008|1048"] = "dicom.study.PhysiciansOfRecord";
-    dictionary["0008|1060"] = "dicom.study.NameOfPhysicianReadingStudy";
-
-    // General Series module
-    dictionary["0008|0060"] = "dicom.series.Modality";
-    dictionary["0020|000e"] = "dicom.series.SeriesInstanceUID";
-    dictionary["0020|0011"] = "dicom.series.SeriesNumber";
-    dictionary["0020|0060"] = "dicom.series.Laterality";
-    dictionary["0020|4000"] = "dicom.series.ImageComments";
-    dictionary["0008|0021"] = "dicom.series.SeriesDate";
-    dictionary["0008|0031"] = "dicom.series.SeriesTime";
-    dictionary["0008|1050"] = "dicom.series.PerformingPhysiciansName";
-    dictionary["0018|1030"] = "dicom.series.ProtocolName";
-    dictionary["0008|103e"] = "dicom.series.SeriesDescription";
-    dictionary["0008|1070"] = "dicom.series.OperatorsName";
-    dictionary["0018|0015"] = "dicom.series.BodyPartExamined";
-    dictionary["0018|5100"] = "dicom.series.PatientPosition";
-    dictionary["0028|0108"] = "dicom.series.SmallestPixelValueInSeries";
-    dictionary["0028|0109"] = "dicom.series.LargestPixelValueInSeries";
-
-    // VOI LUT module
-    dictionary["0028|1050"] = "dicom.voilut.WindowCenter";
-    dictionary["0028|1051"] = "dicom.voilut.WindowWidth";
-    dictionary["0028|1055"] = "dicom.voilut.WindowCenterAndWidthExplanation";
-
-    // Image Pixel module
-    dictionary["0028|0004"] = "dicom.pixel.PhotometricInterpretation";
-    dictionary["0028|0010"] = "dicom.pixel.Rows";
-    dictionary["0028|0011"] = "dicom.pixel.Columns";
-
-    // Image Plane module
-    dictionary["0028|0030"] = "dicom.PixelSpacing";
-    dictionary["0018|1164"] = "dicom.ImagerPixelSpacing";
-
-    // Misc 
-    dictionary["0008|0005"] = "dicom.SpecificCharacterSet";
-
-    initialized = true;
-  }
-
-  return dictionary;
-}
-
 
 DataNode::Pointer
 DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, bool correctTilt, UpdateCallBackMethod callback, Image::Pointer preLoadedImageBlock)
@@ -1423,7 +1343,6 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
 
   // tags for the series (we just use the one that ITK copied to its dictionary (proably that of the last slice)
   const itk::MetaDataDictionary& dict = io->GetMetaDataDictionary();
-  const TagToPropertyMapType& propertyLookup = DicomSeriesReader::GetDICOMTagsToMITKPropertyMap();
 
   auto dictIter = dict.Begin();
   while ( dictIter != dict.End() )
@@ -1434,8 +1353,8 @@ void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer
     {
       //MITK_DEBUG << "Value " << value;
 
-      auto valuePosition = propertyLookup.find( dictIter->first );
-      if ( valuePosition != propertyLookup.end() )
+      auto valuePosition = tagToPropertyMap.find( dictIter->first );
+      if ( valuePosition != tagToPropertyMap.end() )
       {
         std::string propertyKey = valuePosition->second;
         //MITK_DEBUG << "--> " << propertyKey;

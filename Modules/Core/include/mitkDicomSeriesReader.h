@@ -989,16 +989,6 @@ protected:
   static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
   static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, const ImageBlockDescriptor& blockInfo, Image* image);
 
-  /**
-    \brief Map between DICOM tags and MITK properties.
-
-    Uses as a positive list for copying specified DICOM tags (from ITK's ImageIO)
-    to MITK properties. ITK provides MetaDataDictionary entries of form
-    "gggg|eeee" (g = group, e = element), e.g. "0028,0109" (Largest Pixel in Series),
-    which we want to sort as dicom.series.largest_pixel_in_series".
-  */
-  static const TagToPropertyMapType& GetDICOMTagsToMITKPropertyMap();
-
   static void parseStringToDoubleVector(std::string input, std::vector<double>& output);
 };
 

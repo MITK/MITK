@@ -18,6 +18,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 #define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
+#include <string>
+#include <vector>
+#include <map>
+
 #include <MitkCoreExports.h>
 #include "mitkSlicedData.h"
 #include "mitkBaseData.h"
@@ -28,6 +32,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageDescriptor.h"
 #include "mitkImageAccessorBase.h"
 #include "mitkImageVtkAccessor.h"
+#include <mitkProperties.h>
+#include <mitkLookupTables.h>
+#include <mitkLookupTableProperty.h>
 
 //DEPRECATED
 #include <mitkTimeSlicedGeometry.h>
@@ -48,7 +55,8 @@ template<class T> class MutexLockHolder;
 namespace mitk {
 typedef itk::Image<signed short, 3> ImageTypeForReader;
 typedef itk::ImageSeriesReader<ImageTypeForReader> ReaderType;
-  
+typedef std::map<std::string, StringLookupTable> DicomTagToValueList;
+
 class SubImageSelector;
 class ImageTimeSelector;
 
@@ -114,7 +122,7 @@ public:
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
   
   ReaderType::DictionaryArrayType GetMetaDataDictionaryArray();
-  void SetMetaDataDictionaryArray(ReaderType::DictionaryArrayType& array);
+  void SetMetaDataDictionary(DicomTagToValueList& array);
 
 public:
   //##Documentation
@@ -640,8 +648,6 @@ protected:
   mutable ImageDataItemPointerArray m_Volumes;
   mutable ImageDataItemPointerArray m_Slices;
   mutable itk::SimpleFastMutexLock m_ImageDataArraysLock;
-  
-  ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 
   unsigned int m_Dimension;
 
@@ -682,6 +688,7 @@ private:
   /** A mutex, which needs to be locked to manage m_VtkReaders */
   itk::SimpleFastMutexLock m_VtkReadersLock;
 
+  mitk::ReaderType::DictionaryArrayType m_MetaDataDictionaryArray;
 };
 
  /**

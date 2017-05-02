@@ -13,6 +13,11 @@ A PARTICULAR PURPOSE.
 See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
+#include <boost/format.hpp>
+
+#include <iostream>
+#include <string>
+#include <vector>
 
 //MITK
 #include "mitkImage.h"
@@ -22,6 +27,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkCompareImageDataFilter.h"
 #include "mitkImageVtkReadAccessor.h"
 #include "mitkImageVtkWriteAccessor.h"
+
+#include "mitkDicomTagsList.h"
+#include "mitkSliceNavigationController.h"
 
 //VTK
 #include <vtkImageData.h>
@@ -37,12 +45,115 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
 {
+  if (m_MetaDataDictionaryArray.size()) {
+    return m_MetaDataDictionaryArray;
+  }
+
+  mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(GetProperty("autoplan.mainAxisIndex")));
+  int mainAxisIndex = prop ? prop->GetValue() : 2;
+  int numberSlices = GetLargestPossibleRegion().GetSize()[mainAxisIndex];
+  
+  //mitk::ReaderType::DictionaryArrayType outputArray;
+  m_MetaDataDictionaryArray.resize(numberSlices);
+
+  for (unsigned int i = 0; i < m_MetaDataDictionaryArray.size(); ++i)
+  {
+    m_MetaDataDictionaryArray[i] = new mitk::ReaderType::DictionaryType;
+  }
+
+  mitk::SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
+  for (unsigned int i = 0; i < dicomTagsList.size(); ++i)
+  {
+    std::string tagkey = dicomTagsList[i];
+    mitk::StringLookupTableProperty* tagsValueList =
+    dynamic_cast<mitk::StringLookupTableProperty*>(GetProperty(tagkey.c_str()).GetPointer());
+
+    for (unsigned int j = 0; j < m_MetaDataDictionaryArray.size(); ++j)
+    {
+      std::string tagvalue = std::string();
+
+      if (tagsValueList != nullptr)
+      {
+        tagvalue = tagsValueList->GetValue().GetTableValue(j);
+      }
+      else
+      {
+        // TODO: To skip these tags is necessary in order for the gdcm to generate them correctly.
+        if (tagkey == "0008|0016" || tagkey == "0008|0018")
+        {
+          continue;
+        }
+
+        auto iter = tagToPropertyMap.find(tagkey);
+        if (iter != tagToPropertyMap.end())
+        {
+          mitk::BaseProperty* modalityProp = GetProperty(iter->second.c_str());
+          tagvalue = (modalityProp) ? modalityProp->GetValueAsString() : "";
+        }
+
+        mitk::PlaneGeometry* planegeometry = nullptr;
+        if (slicedGeometry != nullptr)
+        {
+          planegeometry = slicedGeometry->GetPlaneGeometry(j);
+        }
+
+        if (planegeometry != nullptr)
+        {
+          mitk::Vector3D spacingVector = planegeometry->GetSpacing();
+          mitk::Point3D originVector = planegeometry->GetOrigin();
+          mitk::Matrix3D imageMatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix();
+
+          imageMatrix[0][0] = imageMatrix[0][0] / spacingVector[0];
+          imageMatrix[1][1] = imageMatrix[1][1] / spacingVector[1];
+
+          std::string imageOrientation = boost::str(boost::format("%d\\%d\\%d\\%d\\%d\\%d")
+          %imageMatrix[0][0] %imageMatrix[0][1] %imageMatrix[0][2]
+          %imageMatrix[1][0] %imageMatrix[1][1] %imageMatrix[1][2]
+          );
+
+          std::string imagePosition = boost::str(boost::format("%d\\%d\\%d")
+          %originVector[0] %originVector[1] %originVector[2]
+          );
+
+          std::string spacing = boost::str(boost::format("%d\\%d\\%d")
+          %spacingVector[0] %spacingVector[1] %spacingVector[2]
+          );
+          
+          if (tagkey == "0020|0037")
+          {
+            itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imageOrientation);
+            continue;
+          }
+          else if (tagkey == "0020|0032")
+          {
+            itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imagePosition);
+            continue;
+          }
+          else if (tagkey == "0028|0030")
+          {
+            itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, spacing);
+            continue;
+          }
+        }
+      }
+
+      if (!tagvalue.empty())
+      {
+        itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, tagvalue);
+      }
+    }
+  }
+
   return m_MetaDataDictionaryArray;
 }
 
-void mitk::Image::SetMetaDataDictionaryArray(mitk::ReaderType::DictionaryArrayType& array)
+void mitk::Image::SetMetaDataDictionary(DicomTagToValueList& array)
 {
-  m_MetaDataDictionaryArray = array;
+  DicomTagToValueList::iterator iter = array.begin();
+  for (; iter != array.end(); ++iter)
+  {
+    SetProperty(iter->first.c_str(), StringLookupTableProperty::New(iter->second));
+  }
 }
 
 mitk::Image::Image() :
@@ -91,16 +202,17 @@ mitk::Image::~Image()
 {
   this->Clear();
 
-  for (auto dict : m_MetaDataDictionaryArray) {
-    delete dict;
-    dict = nullptr;
-  }
-
   m_ReferenceCount = 3;
   m_ReferenceCount = 0;
 
   delete [] m_OffsetTable;
   delete m_ImageStatistics;
+
+  for (unsigned int i = 0; i < m_MetaDataDictionaryArray.size(); ++i) {
+    delete m_MetaDataDictionaryArray[i];
+  }
+
+  m_MetaDataDictionaryArray.clear();
 }
 
 const mitk::PixelType mitk::Image::GetPixelType(int n) const

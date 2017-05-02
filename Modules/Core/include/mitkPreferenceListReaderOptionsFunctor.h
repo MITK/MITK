@@ -14,8 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#ifndef MITKWHITELISTREADEROPTIONSFUNCTOR_H
-#define MITKWHITELISTREADEROPTIONSFUNCTOR_H
+#ifndef MITKPREFERENCELISTREADEROPTIONSFUNCTOR_H
+#define MITKPREFERENCELISTREADEROPTIONSFUNCTOR_H
 
 #include <MitkCoreExports.h>
 #include <mitkIOUtil.h>
@@ -29,26 +29,31 @@ namespace mitk
   /**
    * \ingroup IO
    *
-   * \brief Option callback functor with a white list/ black list option selection strategy.
+   * \brief Option callback functor with a preference list/ black list option selection strategy.
    *
    * This functor can be used if a option selection should be done without user interaction.
-   * Setting up the functor one can specify a white and black lists of controller descriptions.
+   * Setting up the functor one can specify a preference and black lists of controller descriptions.
    * Any controller description on the black list will be ignored and never selected.
-   * The first controller description found on the white list will be selected.
+   * The first controller description found on the preference list will be selected.
+   * Any controller listed on the black list is always ignored. Even if it is also
+   * listed on the preference list.
+   * If no preference listed controller is available, the functor will use the pre selected reader.
+   * If no pre selected controller is available, the functor will use the first not black
+   * listed reader.
    *
    * \see IOUtil
    */
-  struct MITKCORE_EXPORT WhiteListReaderOptionsFunctor : public IOUtil::ReaderOptionsFunctorBase
+  struct MITKCORE_EXPORT PreferenceListReaderOptionsFunctor : public IOUtil::ReaderOptionsFunctorBase
   {
     using ListType = std::vector<std::string>;
 
     virtual bool operator()(IOUtil::LoadInfo &loadInfo) const override;
 
-    WhiteListReaderOptionsFunctor();
-    WhiteListReaderOptionsFunctor(const ListType& white, const ListType& black);
+    PreferenceListReaderOptionsFunctor();
+    PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black);
 
   protected:
-    ListType m_WhiteList;
+    ListType m_PreferenceList;
     ListType m_BlackList;
   };
 }

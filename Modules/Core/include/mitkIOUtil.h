@@ -249,7 +249,8 @@ namespace mitk
     * @throws mitk::Exception if \c path could not be loaded.
     *
     * @sa Load(const std::vector<std::string>&, DataStorage&)
-    */    static DataStorage::SetOfObjects::Pointer Load(const std::string &path,
+    */
+    static DataStorage::SetOfObjects::Pointer Load(const std::string &path,
                                                    const IFileReader::Options &options,
                                                    DataStorage &storage);
 

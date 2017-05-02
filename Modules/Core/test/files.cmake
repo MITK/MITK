@@ -113,7 +113,7 @@ set(MODULE_TESTS
   mitkVectorPropertyTest.cpp
   mitkTemporoSpatialStringPropertyTest.cpp
   mitkPropertyNameHelperTest.cpp
-  mitkWhiteListReaderOptionsFunctorTest.cpp
+  mitkPreferenceListReaderOptionsFunctorTest.cpp
 )
 
 if(MITK_ENABLE_RENDERING_TESTING)

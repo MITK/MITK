@@ -14,19 +14,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkWhiteListReaderOptionsFunctor.h"
+#include "mitkPreferenceListReaderOptionsFunctor.h"
 
-mitk::WhiteListReaderOptionsFunctor::WhiteListReaderOptionsFunctor()
+mitk::PreferenceListReaderOptionsFunctor::PreferenceListReaderOptionsFunctor()
 {
 
 }
 
-mitk::WhiteListReaderOptionsFunctor::WhiteListReaderOptionsFunctor(const ListType& white, const ListType& black) : m_WhiteList(white), m_BlackList(black)
+mitk::PreferenceListReaderOptionsFunctor::PreferenceListReaderOptionsFunctor(const ListType& preference, const ListType& black) : m_PreferenceList(preference), m_BlackList(black)
 {
 
 }
 
-bool mitk::WhiteListReaderOptionsFunctor::operator()(IOUtil::LoadInfo &loadInfo) const
+bool mitk::PreferenceListReaderOptionsFunctor::operator()(IOUtil::LoadInfo &loadInfo) const
 {
   auto readerItems = loadInfo.m_ReaderSelector.Get();
 
@@ -48,9 +48,9 @@ bool mitk::WhiteListReaderOptionsFunctor::operator()(IOUtil::LoadInfo &loadInfo)
       continue;
     }
 
-    finding = std::find(m_WhiteList.begin(), m_WhiteList.end(), reader.GetDescription());
+    finding = std::find(m_PreferenceList.begin(), m_PreferenceList.end(), reader.GetDescription());
 
-    if (finding != m_WhiteList.end())
+    if (finding != m_PreferenceList.end())
     {
       selectedID = reader.GetServiceId();
       break;
@@ -62,7 +62,15 @@ bool mitk::WhiteListReaderOptionsFunctor::operator()(IOUtil::LoadInfo &loadInfo)
     }
   }
 
-  loadInfo.m_ReaderSelector.Select(selectedID);
+  if (selectedID == -1)
+  {
+    mitkThrow() << "No valid reader found. All available readers are black listed.";
+  }
+
+  if (!loadInfo.m_ReaderSelector.Select(selectedID))
+  {
+    MITK_DEBUG << "Was not able to select reader found by the PreferenceListReaderOptionsFunctor";
+  }
 
   return true;
 }

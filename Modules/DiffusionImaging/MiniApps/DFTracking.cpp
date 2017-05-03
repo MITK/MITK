@@ -28,8 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 
 #include <mitkFiberBundle.h>
-#include <itkMLBSTrackingFilter.h>
-#include <mitkTrackingForestHandler.h>
+#include <itkStreamlineTrackingFilter.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingDataHandler.h>
+#include <Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -183,59 +184,43 @@ int main(int argc, char* argv[])
         addFeatImages.at(0).push_back(itkimg);
     }
 
+    mitk::TrackingDataHandler* handler;
     if (shfeatures)
     {
-        mitk::TrackingForestHandler<6,28> tfh;
-        tfh.LoadForest(forestFile);
-        tfh.AddDwi(dwi);
-        tfh.SetAdditionalFeatureImages(addFeatImages);
-        typedef itk::MLBSTrackingFilter<6,28> TrackerType;
-        TrackerType::Pointer tracker = TrackerType::New();
-        tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
-        tracker->SetMaskImage(mask);
-        tracker->SetSeedImage(seed);
-        tracker->SetStoppingRegions(stop);
-        tracker->SetSeedsPerVoxel(seeds);
-        tracker->SetStepSize(stepsize);
-        tracker->SetForestHandler(tfh);
-        tracker->SetSamplingDistance(samplingdist);
-        tracker->SetUseStopVotes(stopvotes);
-        tracker->SetOnlyForwardSamples(forward);
-        tracker->SetAposterioriCurvCheck(false);
-        tracker->SetFourTTImage(tissue);
-        tracker->SetSeedOnlyGm(seed_gm);
-        tracker->Update();
-        vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
-        mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-        mitk::IOUtil::Save(outFib, outFile);
+        handler = new mitk::TrackingHandlerRandomForest<6,28>();
+        dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->LoadForest(forestFile);
+        dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->AddDwi(dwi);
+        dynamic_cast<mitk::TrackingHandlerRandomForest<6,28>*>(handler)->SetAdditionalFeatureImages(addFeatImages);
     }
     else
     {
-        mitk::TrackingForestHandler<6,100> tfh;
-        tfh.LoadForest(forestFile);
-        tfh.AddDwi(dwi);
-        tfh.SetAdditionalFeatureImages(addFeatImages);
-
-        typedef itk::MLBSTrackingFilter<6,100> TrackerType;
-        TrackerType::Pointer tracker = TrackerType::New();
-        tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
-        tracker->SetMaskImage(mask);
-        tracker->SetSeedImage(seed);
-        tracker->SetStoppingRegions(stop);
-        tracker->SetSeedsPerVoxel(seeds);
-        tracker->SetStepSize(stepsize);
-        tracker->SetForestHandler(tfh);
-        tracker->SetSamplingDistance(samplingdist);
-        tracker->SetUseStopVotes(stopvotes);
-        tracker->SetOnlyForwardSamples(forward);
-        tracker->SetAposterioriCurvCheck(false);
-        tracker->SetFourTTImage(tissue);
-        tracker->SetSeedOnlyGm(seed_gm);
-        tracker->Update();
-        vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
-        mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
-        mitk::IOUtil::Save(outFib, outFile);
+        handler = new mitk::TrackingHandlerRandomForest<6,100>();
+        dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->LoadForest(forestFile);
+        dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(dwi);
+        dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addFeatImages);
     }
+
+
+    typedef itk::StreamlineTrackingFilter TrackerType;
+    TrackerType::Pointer tracker = TrackerType::New();
+    tracker->SetMaskImage(mask);
+    tracker->SetSeedImage(seed);
+    tracker->SetStoppingRegions(stop);
+    tracker->SetSeedsPerVoxel(seeds);
+    tracker->SetStepSize(stepsize);
+    tracker->SetSamplingDistance(samplingdist);
+    tracker->SetUseStopVotes(stopvotes);
+    tracker->SetOnlyForwardSamples(forward);
+    tracker->SetAposterioriCurvCheck(false);
+    tracker->SetFourTTImage(tissue);
+    tracker->SetSeedOnlyGm(seed_gm);
+    tracker->SetTrackingHandler(handler);
+    tracker->Update();
+    vtkSmartPointer< vtkPolyData > poly = tracker->GetFiberPolyData();
+    mitk::FiberBundle::Pointer outFib = mitk::FiberBundle::New(poly);
+    mitk::IOUtil::Save(outFib, outFile);
+
+    delete handler;
 
     return EXIT_SUCCESS;
 }

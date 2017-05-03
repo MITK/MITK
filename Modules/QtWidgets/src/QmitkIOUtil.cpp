@@ -43,7 +43,7 @@ struct QmitkIOUtil::Impl
 {
   struct ReaderOptionsDialogFunctor : public ReaderOptionsFunctorBase
   {
-    virtual bool operator()(LoadInfo &loadInfo) override
+    virtual bool operator()(LoadInfo &loadInfo) const override
     {
       QmitkFileReaderOptionsDialog dialog(loadInfo);
       if (dialog.exec() == QDialog::Accepted)
@@ -60,7 +60,7 @@ struct QmitkIOUtil::Impl
 
   struct WriterOptionsDialogFunctor : public WriterOptionsFunctorBase
   {
-    virtual bool operator()(SaveInfo &saveInfo) override
+    virtual bool operator()(SaveInfo &saveInfo) const override
     {
       QmitkFileWriterOptionsDialog dialog(saveInfo);
       if (dialog.exec() == QDialog::Accepted)
@@ -119,7 +119,7 @@ QList<mitk::BaseData::Pointer> QmitkIOUtil::Load(const QStringList &paths, QWidg
   std::vector<LoadInfo> loadInfos;
   foreach (const QString &file, paths)
   {
-    loadInfos.push_back(LoadInfo(file.toStdString()));
+    loadInfos.push_back(LoadInfo(file.toLocal8Bit().constData()));
   }
 
   Impl::ReaderOptionsDialogFunctor optionsCallback;
@@ -149,7 +149,7 @@ mitk::DataStorage::SetOfObjects::Pointer QmitkIOUtil::Load(const QStringList &pa
   std::vector<LoadInfo> loadInfos;
   foreach (const QString &file, paths)
   {
-    loadInfos.push_back(LoadInfo(QFile::encodeName(file).constData()));
+    loadInfos.push_back(LoadInfo(file.toLocal8Bit().constData()));
   }
 
   mitk::DataStorage::SetOfObjects::Pointer nodeResult = mitk::DataStorage::SetOfObjects::New();
@@ -251,7 +251,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
     }
 
     fileName = nextName;
-    std::string stdFileName = QFile::encodeName(fileName).constData();
+    std::string stdFileName = fileName.toLocal8Bit().constData();
     QFileInfo fileInfo(fileName);
     currentPath = fileInfo.absolutePath();
     QString suffix = fileInfo.completeSuffix();
@@ -310,7 +310,7 @@ QStringList QmitkIOUtil::Save(const std::vector<const mitk::BaseData *> &data,
         {
           suffix = QString::fromStdString(selectedMimeType.GetExtensions().front());
           fileName += "." + suffix;
-          stdFileName = QFile::encodeName(fileName).constData();
+          stdFileName = fileName.toLocal8Bit().constData();
           // We changed the file name (added a suffix) so ask in case
           // the file aready exists.
           fileInfo = QFileInfo(fileName);

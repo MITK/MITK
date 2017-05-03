@@ -29,21 +29,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
   : QWidget(parent),
-    m_PointListView(NULL),
-    m_MultiWidget(NULL),
-    m_PointSetNode(NULL),
+    m_PointListView(nullptr),
+    m_PointSetNode(nullptr),
     m_Orientation(0),
-    m_MovePointUpBtn(NULL),
-    m_MovePointDownBtn(NULL),
-    m_RemovePointBtn(NULL),
-    m_SavePointsBtn(NULL),
-    m_LoadPointsBtn(NULL),
-    m_ToggleAddPoint(NULL),
-    m_AddPoint(NULL),
-    m_Snc1(NULL),
-    m_Snc2(NULL),
-    m_Snc3(NULL),
-    m_DataInteractor(NULL),
+    m_MovePointUpBtn(nullptr),
+    m_MovePointDownBtn(nullptr),
+    m_RemovePointBtn(nullptr),
+    m_SavePointsBtn(nullptr),
+    m_LoadPointsBtn(nullptr),
+    m_ToggleAddPoint(nullptr),
+    m_AddPoint(nullptr),
+    m_DataInteractor(nullptr),
     m_TimeStep(0),
     m_EditAllowed(true),
     m_NodeObserverTag(0)
@@ -55,12 +51,12 @@ QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
 
   SetupUi();
   SetupConnections();
-  ObserveNewNode(NULL);
+  ObserveNewNode(nullptr);
 }
 
 QmitkPointListWidget::~QmitkPointListWidget()
 {
-  m_DataInteractor = NULL;
+  m_DataInteractor = nullptr;
 
   if (m_PointSetNode && m_NodeObserverTag)
   {
@@ -68,7 +64,6 @@ QmitkPointListWidget::~QmitkPointListWidget()
     m_NodeObserverTag = 0;
   }
 
-  m_MultiWidget = NULL;
   delete m_PointListView;
 }
 
@@ -184,7 +179,7 @@ void QmitkPointListWidget::SetupUi()
 
 void QmitkPointListWidget::SetPointSet(mitk::PointSet *newPs)
 {
-  if (newPs == NULL)
+  if (newPs == nullptr)
     return;
 
   this->m_PointSetNode->SetData(newPs);
@@ -203,7 +198,7 @@ void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 
 void QmitkPointListWidget::OnBtnSavePoints()
 {
-  if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData())) == NULL)
+  if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData())) == nullptr)
     return; // don't write empty point sets. If application logic requires something else then do something else.
   if ((dynamic_cast<mitk::PointSet *>(m_PointSetNode->GetData()))->GetSize() == 0)
     return;
@@ -215,7 +210,7 @@ void QmitkPointListWidget::OnBtnSavePoints()
   fileNameProposal.append(nodeName.c_str());
 
   QString aFilename = QFileDialog::getSaveFileName(
-    NULL, "Save point set", QDir::currentPath() + fileNameProposal, "MITK Pointset (*.mps)");
+    nullptr, "Save point set", QDir::currentPath() + fileNameProposal, "MITK Pointset (*.mps)");
   if (aFilename.isEmpty())
     return;
 
@@ -236,7 +231,7 @@ void QmitkPointListWidget::OnBtnSavePoints()
 void QmitkPointListWidget::OnBtnLoadPoints()
 {
   // get the name of the file to load
-  QString filename = QFileDialog::getOpenFileName(NULL, "Open MITK Pointset", "", "MITK Point Sets (*.mps)");
+  QString filename = QFileDialog::getOpenFileName(nullptr, "Open MITK Pointset", "", "MITK Point Sets (*.mps)");
   if (filename.isEmpty())
     return;
 
@@ -274,7 +269,6 @@ mitk::DataNode *QmitkPointListWidget::GetPointSetNode()
 
 void QmitkPointListWidget::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
 {
-  this->m_MultiWidget = multiWidget;
   m_PointListView->SetMultiWidget(multiWidget);
 }
 
@@ -345,8 +339,8 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
     }
     else
     {
-      m_PointSetNode->SetDataInteractor(NULL);
-      m_DataInteractor = NULL;
+      m_PointSetNode->SetDataInteractor(nullptr);
+      m_DataInteractor = nullptr;
     }
     emit EditPointSets(checked);
   }
@@ -355,12 +349,20 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
 void QmitkPointListWidget::OnBtnAddPointManually()
 {
   mitk::PointSet *pointSet = this->GetPointSet();
-
-  mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
-  mitk::PointSet::PointIdentifier maxId = maxIt->Index();
-
   QmitkEditPointDialog editPointDialog(this);
-  editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
+
+  if (this->GetPointSet()->IsEmpty())
+  {
+	  editPointDialog.SetPoint(pointSet, 0, m_TimeStep);
+  }
+
+  else
+  {
+	  mitk::PointSet::PointsIterator maxIt = pointSet->GetMaxId();
+	  mitk::PointSet::PointIdentifier maxId = maxIt->Index();
+	  editPointDialog.SetPoint(pointSet, maxId + 1, m_TimeStep);
+  }
+
   editPointDialog.exec();
 }
 
@@ -397,7 +399,7 @@ void QmitkPointListWidget::ObserveNewNode(mitk::DataNode *node)
   {
     if (m_DataInteractor)
     {
-      m_DataInteractor = NULL;
+      m_DataInteractor = nullptr;
       m_ToggleAddPoint->setChecked(false);
     }
 
@@ -435,53 +437,14 @@ void QmitkPointListWidget::OnNodeDeleted(const itk::EventObject &)
   if (m_PointSetNode.IsNotNull() && !m_NodeObserverTag)
     m_PointSetNode->RemoveObserver(m_NodeObserverTag);
   m_NodeObserverTag = 0;
-  m_PointSetNode = NULL;
-  m_PointListView->SetPointSetNode(NULL);
+  m_PointSetNode = nullptr;
+  m_PointListView->SetPointSetNode(nullptr);
   m_ToggleAddPoint->setEnabled(false);
 
   m_RemovePointBtn->setEnabled(false);
   m_LoadPointsBtn->setEnabled(false);
   m_SavePointsBtn->setEnabled(false);
   m_AddPoint->setEnabled(false);
-}
-
-void QmitkPointListWidget::SetSnc1(mitk::SliceNavigationController *snc)
-{
-  if (snc == NULL)
-  {
-    m_PointListView->RemoveSliceNavigationController(m_Snc1);
-  }
-  else
-  {
-    m_PointListView->AddSliceNavigationController(snc);
-  }
-  m_Snc1 = snc;
-}
-
-void QmitkPointListWidget::SetSnc2(mitk::SliceNavigationController *snc)
-{
-  if (snc == NULL)
-  {
-    m_PointListView->RemoveSliceNavigationController(m_Snc2);
-  }
-  else
-  {
-    m_PointListView->AddSliceNavigationController(snc);
-  }
-  m_Snc2 = snc;
-}
-
-void QmitkPointListWidget::SetSnc3(mitk::SliceNavigationController *snc)
-{
-  if (snc == NULL)
-  {
-    m_PointListView->RemoveSliceNavigationController(m_Snc3);
-  }
-  else
-  {
-    m_PointListView->AddSliceNavigationController(snc);
-  }
-  m_Snc3 = snc;
 }
 
 void QmitkPointListWidget::AddSliceNavigationController(mitk::SliceNavigationController *snc)

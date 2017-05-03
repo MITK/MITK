@@ -71,57 +71,78 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     mitk::BaseGeometry::Pointer geometry = m_FiberBundle->GetGeometry();
 
     // calculate new image parameters
-    itk::Vector<double> spacing;
-    itk::Point<double> origin;
-    itk::Matrix<double, 3, 3> direction;
-    ImageRegion<3> imageRegion;
+    itk::Vector<double> spacing3;
+    itk::Point<double> origin3;
+    itk::Matrix<double, 3, 3> direction3;
+    ImageRegion<3> imageRegion3;
     if (!m_MaskImage.IsNull())
     {
-        spacing = m_MaskImage->GetSpacing();
-        imageRegion = m_MaskImage->GetLargestPossibleRegion();
-        origin = m_MaskImage->GetOrigin();
-        direction = m_MaskImage->GetDirection();
+        spacing3 = m_MaskImage->GetSpacing();
+        imageRegion3 = m_MaskImage->GetLargestPossibleRegion();
+        origin3 = m_MaskImage->GetOrigin();
+        direction3 = m_MaskImage->GetDirection();
     }
     else
     {
-        spacing = geometry->GetSpacing();
-        origin = geometry->GetOrigin();
+        spacing3 = geometry->GetSpacing();
+        origin3 = geometry->GetOrigin();
         mitk::BaseGeometry::BoundsArrayType bounds = geometry->GetBounds();
-        origin[0] += bounds.GetElement(0);
-        origin[1] += bounds.GetElement(2);
-        origin[2] += bounds.GetElement(4);
+        origin3[0] += bounds.GetElement(0);
+        origin3[1] += bounds.GetElement(2);
+        origin3[2] += bounds.GetElement(4);
 
         for (int i=0; i<3; i++)
             for (int j=0; j<3; j++)
-                direction[j][i] = geometry->GetMatrixColumn(i)[j];
-        imageRegion.SetSize(0, geometry->GetExtent(0));
-        imageRegion.SetSize(1, geometry->GetExtent(1));
-        imageRegion.SetSize(2, geometry->GetExtent(2));
+                direction3[j][i] = geometry->GetMatrixColumn(i)[j];
+        imageRegion3.SetSize(0, geometry->GetExtent(0)+1);
+        imageRegion3.SetSize(1, geometry->GetExtent(1)+1);
+        imageRegion3.SetSize(2, geometry->GetExtent(2)+1);
 
 
         m_MaskImage = ItkUcharImgType::New();
-        m_MaskImage->SetSpacing( spacing );
-        m_MaskImage->SetOrigin( origin );
-        m_MaskImage->SetDirection( direction );
-        m_MaskImage->SetRegions( imageRegion );
+        m_MaskImage->SetSpacing( spacing3 );
+        m_MaskImage->SetOrigin( origin3 );
+        m_MaskImage->SetDirection( direction3 );
+        m_MaskImage->SetRegions( imageRegion3 );
         m_MaskImage->Allocate();
         m_MaskImage->FillBuffer(1);
     }
-    OutputImageType::RegionType::SizeType outImageSize = imageRegion.GetSize();
+    OutputImageType::RegionType::SizeType outImageSize = imageRegion3.GetSize();
     m_OutImageSpacing = m_MaskImage->GetSpacing();
     m_ClusteredDirectionsContainer = ContainerType::New();
 
     // initialize num directions image
     m_NumDirectionsImage = ItkUcharImgType::New();
-    m_NumDirectionsImage->SetSpacing( spacing );
-    m_NumDirectionsImage->SetOrigin( origin );
-    m_NumDirectionsImage->SetDirection( direction );
-    m_NumDirectionsImage->SetRegions( imageRegion );
+    m_NumDirectionsImage->SetSpacing( spacing3 );
+    m_NumDirectionsImage->SetOrigin( origin3 );
+    m_NumDirectionsImage->SetDirection( direction3 );
+    m_NumDirectionsImage->SetRegions( imageRegion3 );
     m_NumDirectionsImage->Allocate();
     m_NumDirectionsImage->FillBuffer(0);
 
-    // initialize direction images
-    m_DirectionImageContainer = DirectionImageContainerType::New();
+    itk::Vector<double, 4> spacing4;
+    itk::Point<float, 4> origin4;
+    itk::Matrix<double, 4, 4> direction4;
+    itk::ImageRegion<4> imageRegion4;
+
+    spacing4[0] = spacing3[0]; spacing4[1] = spacing3[1]; spacing4[2] = spacing3[2]; spacing4[3] = 1;
+    origin4[0] = origin3[0]; origin4[1] = origin3[1]; origin4[2] = origin3[2]; origin3[3] = 0;
+    for (int r=0; r<3; r++)
+      for (int c=0; c<3; c++)
+        direction4[r][c] = direction3[r][c];
+    direction4[3][3] = 1;
+    imageRegion4.SetSize(0, imageRegion3.GetSize()[0]);
+    imageRegion4.SetSize(1, imageRegion3.GetSize()[1]);
+    imageRegion4.SetSize(2, imageRegion3.GetSize()[2]);
+    imageRegion4.SetSize(3, m_MaxNumDirections*3);
+
+    m_DirectionImage = ItkDirectionImageType::New();
+    m_DirectionImage->SetSpacing( spacing4 );
+    m_DirectionImage->SetOrigin( origin4 );
+    m_DirectionImage->SetDirection( direction4 );
+    m_DirectionImage->SetRegions( imageRegion4 );
+    m_DirectionImage->Allocate();
+    m_DirectionImage->FillBuffer(0.0);
 
     // resample fiber bundle
     double minSpacing = 1;
@@ -136,7 +157,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
 
     // resample fiber bundle for sufficient voxel coverage
-    m_FiberBundle->ResampleSpline(minSpacing/10);
+    m_FiberBundle->ResampleLinear(minSpacing/10);
 
     // iterate over all fibers
     vtkSmartPointer<vtkPolyData> fiberPolyData = m_FiberBundle->GetFiberPolyData();
@@ -219,15 +240,17 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
     while(!dirIt.IsAtEnd())
     {
         ++disp2;
-        OutputImageType::IndexType index = dirIt.GetIndex();
-        int idx = index[0]+(index[1]+index[2]*outImageSize[1])*outImageSize[0];
+        OutputImageType::IndexType idx3 = dirIt.GetIndex();
+        int idx_lin = idx3[0]+(idx3[1]+idx3[2]*outImageSize[1])*outImageSize[0];
 
-        if (!m_DirectionsContainer->IndexExists(idx))
+        itk::Index<4> idx4; idx4[0] = idx3[0]; idx4[1] = idx3[1]; idx4[2] = idx3[2];
+
+        if (!m_DirectionsContainer->IndexExists(idx_lin))
         {
             ++dirIt;
             continue;
         }
-        DirectionContainerType::Pointer dirCont = m_DirectionsContainer->GetElement(idx);
+        DirectionContainerType::Pointer dirCont = m_DirectionsContainer->GetElement(idx_lin);
         if (dirCont.IsNull() || dirCont->empty())
         {
             ++dirIt;
@@ -238,7 +261,7 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         DirectionContainerType::Pointer directions;
         if (m_MaxNumDirections>0)
         {
-            directions = FastClustering(dirCont, peakLengths->GetElement(idx));
+            directions = FastClustering(dirCont, peakLengths->GetElement(idx_lin));
             std::sort( directions->begin(), directions->end(), CompareVectorLengths );
         }
         else
@@ -253,9 +276,9 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
         {
             vtkSmartPointer<vtkPolyLine> container = vtkSmartPointer<vtkPolyLine>::New();
             itk::ContinuousIndex<double, 3> center;
-            center[0] = index[0];
-            center[1] = index[1];
-            center[2] = index[2];
+            center[0] = idx3[0];
+            center[1] = idx3[1];
+            center[2] = idx3[2];
             itk::Point<double> worldCenter;
             m_MaskImage->TransformContinuousIndexToPhysicalPoint( center, worldCenter );
             DirectionType dir = directions->at(i);
@@ -266,28 +289,10 @@ void TractsToVectorImageFilter< PixelType >::GenerateData()
                 dir.normalize();
             count++;
 
-            if (m_CreateDirectionImages && i<10)
+            for (unsigned int j = 0; j<3; j++)
             {
-                if (i==m_DirectionImageContainer->size())
-                {
-                    ItkDirectionImageType::Pointer directionImage = ItkDirectionImageType::New();
-                    directionImage->SetSpacing( spacing );
-                    directionImage->SetOrigin( origin );
-                    directionImage->SetDirection( direction );
-                    directionImage->SetRegions( imageRegion );
-                    directionImage->Allocate();
-                    Vector< float, 3 > nullVec; nullVec.Fill(0.0);
-                    directionImage->FillBuffer(nullVec);
-                    m_DirectionImageContainer->InsertElement(i, directionImage);
-                }
-
-                // set direction image pixel
-                ItkDirectionImageType::Pointer directionImage = m_DirectionImageContainer->GetElement(i);
-                Vector< float, 3 > pixel;
-                pixel.SetElement(0, dir[0]);
-                pixel.SetElement(1, dir[1]);
-                pixel.SetElement(2, dir[2]);
-                directionImage->SetPixel(index, pixel);
+              idx4[3] = i*3 + j;
+              m_DirectionImage->SetPixel(idx4, dir[j]);
             }
 
             // add direction to vector field (with spacing compensation)
@@ -405,170 +410,6 @@ TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsTo
         return FastClustering(outDirs, newLengths);
 }
 
-
-//template< class PixelType >
-//std::vector< DirectionType > TractsToVectorImageFilter< PixelType >::Clustering(std::vector< DirectionType >& inDirs)
-//{
-//    std::vector< DirectionType > outDirs;
-//    if (inDirs.empty())
-//        return outDirs;
-//    DirectionType oldMean, currentMean, workingMean;
-
-//    std::vector< DirectionType > normalizedDirs;
-//    std::vector< int > touched;
-//    for (std::size_t i=0; i<inDirs.size(); i++)
-//    {
-//        normalizedDirs.push_back(inDirs[i]);
-//        normalizedDirs.back().normalize();
-//    }
-
-//    // initialize
-//    double max = 0.0;
-//    touched.resize(inDirs.size(), 0);
-//    for (std::size_t j=0; j<inDirs.size(); j++)
-//    {
-//        currentMean = inDirs[j];
-//        oldMean.fill(0.0);
-
-//        // start mean-shift clustering
-//        double angle = 0.0;
-//        int counter = 0;
-//        while ((currentMean-oldMean).magnitude()>0.0001)
-//        {
-//            counter = 0;
-//            oldMean = currentMean;
-//            workingMean = oldMean;
-//            workingMean.normalize();
-//            currentMean.fill(0.0);
-//            for (std::size_t i=0; i<normalizedDirs.size(); i++)
-//            {
-//                angle = dot_product(workingMean, normalizedDirs[i]);
-//                if (angle>=m_AngularThreshold)
-//                {
-//                    currentMean += inDirs[i];
-//                    counter++;
-//                }
-//                else if (-angle>=m_AngularThreshold)
-//                {
-//                    currentMean -= inDirs[i];
-//                    counter++;
-//                }
-//            }
-//        }
-
-//        // found stable mean
-//        if (counter>0)
-//        {
-//            bool add = true;
-//            DirectionType normMean = currentMean;
-//            normMean.normalize();
-//            for (std::size_t i=0; i<outDirs.size(); i++)
-//            {
-//                DirectionType dir = outDirs[i];
-//                dir.normalize();
-//                if ((normMean-dir).magnitude()<=0.0001)
-//                {
-//                    add = false;
-//                    break;
-//                }
-//            }
-
-//            currentMean /= counter;
-//            if (add)
-//            {
-//                double mag = currentMean.magnitude();
-//                if (mag>0)
-//                {
-//                    if (mag>max)
-//                        max = mag;
-
-//                    outDirs.push_back(currentMean);
-//                }
-//            }
-//        }
-//    }
-
-//    if (m_NormalizeVectors)
-//        for (std::size_t i=0; i<outDirs.size(); i++)
-//            outDirs[i].normalize();
-//    else if (max>0)
-//        for (std::size_t i=0; i<outDirs.size(); i++)
-//            outDirs[i] /= max;
-
-//    if (inDirs.size()==outDirs.size())
-//        return outDirs;
-//    else
-//        return FastClustering(outDirs);
-//}
-
-
-//template< class PixelType >
-//TractsToVectorImageFilter< PixelType >::DirectionContainerType::Pointer TractsToVectorImageFilter< PixelType >::MeanShiftClustering(DirectionContainerType::Pointer dirCont)
-//{
-//    DirectionContainerType::Pointer container = DirectionContainerType::New();
-
-//    double max = 0;
-//    for (DirectionContainerType::ConstIterator it = dirCont->Begin(); it!=dirCont->End(); ++it)
-//    {
-//        vnl_vector_fixed<double, 3> mean = ClusterStep(dirCont, it.Value());
-
-//        if (mean.is_zero())
-//            continue;
-//        bool addMean = true;
-
-//        for (DirectionContainerType::ConstIterator it2 = container->Begin(); it2!=container->End(); ++it2)
-//        {
-//            vnl_vector_fixed<double, 3> dir = it2.Value();
-//            double angle = fabs(dot_product(mean, dir)/(mean.magnitude()*dir.magnitude()));
-//            if (angle>=m_Epsilon)
-//            {
-//                addMean = false;
-//                break;
-//            }
-//        }
-
-//        if (addMean)
-//        {
-//            if (m_NormalizeVectors)
-//                mean.normalize();
-//            else if (mean.magnitude()>max)
-//                max = mean.magnitude();
-//            container->InsertElement(container->Size(), mean);
-//        }
-//    }
-
-//    // max normalize voxel directions
-//    if (max>0 && !m_NormalizeVectors)
-//        for (std::size_t i=0; i<container->Size(); i++)
-//            container->ElementAt(i) /= max;
-
-//    if (container->Size()<dirCont->Size())
-//        return MeanShiftClustering(container);
-//    else
-//        return container;
-//}
-
-
-//template< class PixelType >
-//vnl_vector_fixed<double, 3> TractsToVectorImageFilter< PixelType >::ClusterStep(DirectionContainerType::Pointer dirCont, vnl_vector_fixed<double, 3> currentMean)
-//{
-//    vnl_vector_fixed<double, 3> newMean; newMean.fill(0);
-
-//    for (DirectionContainerType::ConstIterator it = dirCont->Begin(); it!=dirCont->End(); ++it)
-//    {
-//        vnl_vector_fixed<double, 3> dir = it.Value();
-//        double angle = dot_product(currentMean, dir)/(currentMean.magnitude()*dir.magnitude());
-//        if (angle>=m_AngularThreshold)
-//            newMean += dir;
-//        else if (-angle>=m_AngularThreshold)
-//            newMean -= dir;
-//    }
-
-//    if (fabs(dot_product(currentMean, newMean)/(currentMean.magnitude()*newMean.magnitude()))>=m_Epsilon || newMean.is_zero())
-//        return newMean;
-//    else
-//        return ClusterStep(dirCont, newMean);
-//}
 }
 
 

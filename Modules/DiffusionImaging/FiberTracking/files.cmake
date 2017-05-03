@@ -16,6 +16,12 @@ set(CPP_FILES
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.cpp
   Algorithms/GibbsTracking/mitkFiberBuilder.cpp
   Algorithms/GibbsTracking/mitkSphereInterpolator.cpp
+
+  Algorithms/itkStreamlineTrackingFilter.cpp
+  Algorithms/TrackingHandlers/mitkTrackingDataHandler.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.cpp
+  Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.cpp
 )
 
 set(H_FILES
@@ -34,9 +40,14 @@ set(H_FILES
   Algorithms/itkFiberCurvatureFilter.h
 
   # Tractography
+  Algorithms/TrackingHandlers/mitkTrackingDataHandler.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerRandomForest.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerTensor.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerPeaks.h
+  Algorithms/TrackingHandlers/mitkTrackingHandlerOdf.h
+
   Algorithms/itkGibbsTrackingFilter.h
   Algorithms/itkStochasticTractographyFilter.h
-  Algorithms/itkStreamlineTrackingFilter.h
   Algorithms/GibbsTracking/mitkParticle.h
   Algorithms/GibbsTracking/mitkParticleGrid.h
   Algorithms/GibbsTracking/mitkMetropolisHastingsSampler.h
@@ -45,8 +56,8 @@ set(H_FILES
   Algorithms/GibbsTracking/mitkGibbsEnergyComputer.h
   Algorithms/GibbsTracking/mitkSphereInterpolator.h
   Algorithms/GibbsTracking/mitkFiberBuilder.h
-  Algorithms/MLTracking/mitkTrackingForestHandler.h
-  Algorithms/MLTracking/itkMLBSTrackingFilter.h
+
+  Algorithms/itkStreamlineTrackingFilter.h
 
   # Fiberfox
   Fiberfox/itkFibersFromPlanarFiguresFilter.h

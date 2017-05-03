@@ -75,7 +75,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineActi
 
     // Insert a Point to the PointSet
     // 2) Create the Operation inserting the point
-
+	if (m_PointSet->IsEmpty()) { lastPosition = 0; }
     PointOperation *doOp = new mitk::PointOperation(OpINSERT, timeInMs, itkPoint, lastPosition);
 
     // 3) If Undo is enabled, also create the inverse Operation

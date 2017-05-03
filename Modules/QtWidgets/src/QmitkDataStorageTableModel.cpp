@@ -146,7 +146,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       // get name of node (may also be edited)
       if (role == Qt::DisplayRole || role == Qt::EditRole)
       {
-        data = QFile::encodeName(nodeName.c_str());
+        data = QString::fromStdString(nodeName);
       }
       else if (role == QmitkDataNodeRole)
       {

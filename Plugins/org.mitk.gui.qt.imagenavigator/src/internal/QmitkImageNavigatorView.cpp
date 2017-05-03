@@ -38,32 +38,32 @@ const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenaviga
 
 static mitk::DataNode::Pointer GetTopLayerNode(const mitk::DataStorage::SetOfObjects::ConstPointer nodes, const mitk::Point3D &position, mitk::BaseRenderer* renderer)
 {
-    mitk::DataNode::Pointer node;
-    int  maxlayer = -32768;
+  mitk::DataNode::Pointer node;
+  int  maxlayer = -32768;
 
-    if(nodes.IsNotNull())
+  if(nodes.IsNotNull())
+  {
+    // find node with largest layer, that is the node shown on top in the render window
+    for (unsigned int x = 0; x < nodes->size(); x++)
     {
-        // find node with largest layer, that is the node shown on top in the render window
-        for (unsigned int x = 0; x < nodes->size(); x++)
+      if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
+           nodes->at(x)->GetData()->GetGeometry()->IsInside(position) )
+      {
+        int layer = 0;
+        if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
+        if(layer > maxlayer)
         {
-            if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
-                 nodes->at(x)->GetData()->GetGeometry()->IsInside(position) )
-            {
-                int layer = 0;
-                if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
-                if(layer > maxlayer)
-                {
-                    if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(renderer) )
-                    {
-                        node = nodes->at(x);
-                        maxlayer = layer;
-                    }
-                }
-            }
+          if( static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(renderer) )
+          {
+            node = nodes->at(x);
+            maxlayer = layer;
+          }
         }
+      }
     }
+  }
 
-    return node;
+  return node;
 }
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
@@ -253,6 +253,11 @@ void QmitkImageNavigatorView::UpdateStatusBar()
         {
           std::string pixelValue = "Pixel RGB(A) value: ";
           pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
+          statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue.c_str());
+        }
+        else if ( pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR )
+        {
+          std::string pixelValue = "See ODF Details view. ";
           statusBar->DisplayImageInfo(position, p, renderer->GetTime(), pixelValue.c_str());
         }
         else

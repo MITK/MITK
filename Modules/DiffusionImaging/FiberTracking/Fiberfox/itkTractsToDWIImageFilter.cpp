@@ -761,10 +761,47 @@ namespace itk
     // working copy is needed because we need to resample the fibers but do not want to change the original bundle
     m_FiberBundleWorkingCopy = m_FiberBundle->GetDeepCopy();
     double volumeAccuracy = 10;
-    m_FiberBundleWorkingCopy->ResampleSpline(minSpacing/volumeAccuracy);
+    m_FiberBundleWorkingCopy->ResampleLinear(minSpacing/volumeAccuracy);
     m_mmRadius = m_Parameters.m_SignalGen.m_AxonRadius/1000;
-
-    if (m_mmRadius>0) { m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy; }
+    
+    auto caster = itk::CastImageFilter< itk::Image<unsigned char, 3>, itk::Image<float, 3> >::New();
+    caster->SetInput(m_TransformedMaskImage);
+    caster->Update();
+      
+    auto density_calculator = itk::TractDensityImageFilter< itk::Image<float, 3> >::New();
+    density_calculator->SetFiberBundle(m_FiberBundleWorkingCopy);
+    density_calculator->SetInputImage(caster->GetOutput());
+    density_calculator->SetBinaryOutput(false);
+    density_calculator->SetUseImageGeometry(true);
+    density_calculator->SetDoFiberResampling(false);
+    density_calculator->SetOutputAbsoluteValues(true);
+    density_calculator->SetWorkOnFiberCopy(false);
+    density_calculator->Update();
+    float max_density = density_calculator->GetMaxDensity();
+    
+    if (m_mmRadius>0) 
+    { 
+      m_SegmentVolume = M_PI*m_mmRadius*m_mmRadius*minSpacing/volumeAccuracy; 
+      stringstream stream;
+      stream << fixed << setprecision(2) << max_density * 100 * m_SegmentVolume;
+      string s = stream.str();
+      PrintToLog("\nMax. fiber volume: " + s + "mm².", false, true, true);
+    }
+    else
+    {
+      stringstream stream;
+      stream << fixed << setprecision(2) << max_density * 100 * m_SegmentVolume;
+      string s = stream.str();
+      PrintToLog("\nMax. fiber volume: " + s + "mm² (before rescaling to voxel volume).", false, true, true);
+    }
+    float voxel_volume = m_WorkingSpacing[0]*m_WorkingSpacing[1]*m_WorkingSpacing[2];
+    float new_seg_vol = voxel_volume/(max_density * 100.0);
+    float new_fib_radius = 1000*std::sqrt(new_seg_vol*volumeAccuracy/(minSpacing*M_PI));
+    stringstream stream;
+    stream << fixed << setprecision(2) << new_fib_radius;
+    string s = stream.str();
+    PrintToLog("\nA full fiber voxel corresponds to a fiber radius of ~" + s + "µm, given the current fiber configuration.", false, true, true);
+    
     // a second fiber bundle is needed to store the transformed version of the m_FiberBundleWorkingCopy
     m_FiberBundleTransformed = m_FiberBundleWorkingCopy;
   }
@@ -1026,6 +1063,7 @@ namespace itk
         double fact = 1;    // density correction factor in mm³
         if (m_Parameters.m_SignalGen.m_AxonRadius<0.0001 || maxVolume>m_VoxelVolume)    // the fullest voxel is always completely full
           fact = m_VoxelVolume/maxVolume;
+        
         while(!it3.IsAtEnd())
         {
           if (it3.Get()>0)
@@ -1225,9 +1263,8 @@ namespace itk
       PrintToLog(m_SpikeLog, false, false);
     }
 
-    if (m_Logfile.is_open())
-      m_Logfile.close();
-  } // Heilliger Spaghetti-Code, Batman! todo/mdh
+    if (m_Logfile.is_open()) m_Logfile.close();
+  }
 
 
   template< class PixelType >

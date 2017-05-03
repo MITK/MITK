@@ -16,8 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "QmitkIGTTutorialView.h"
 
-#include "QmitkStdMultiWidget.h"
-
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
 #include "mitkVirtualTrackingDevice.h"

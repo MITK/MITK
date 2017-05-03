@@ -85,13 +85,13 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleVtkReader::Read
                 vtkSmartPointer<vtkFloatArray> weights = vtkFloatArray::SafeDownCast(fiberPolyData->GetCellData()->GetArray("FIBER_WEIGHTS"));
                 if (weights!=NULL)
                 {
-                    float weight=0;
-                    for (int i=0; i<weights->GetSize(); i++)
-                        if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
-                        {
-                            MITK_INFO << "Weight: " << weights->GetValue(i);
-                            weight = weights->GetValue(i);
-                        }
+//                    float weight=0;
+//                    for (int i=0; i<weights->GetSize(); i++)
+//                        if (!mitk::Equal(weights->GetValue(i),weight,0.00001))
+//                        {
+//                            MITK_INFO << "Weight: " << weights->GetValue(i);
+//                            weight = weights->GetValue(i);
+//                        }
                     fiberBundle->SetFiberWeights(weights);
                 }
 

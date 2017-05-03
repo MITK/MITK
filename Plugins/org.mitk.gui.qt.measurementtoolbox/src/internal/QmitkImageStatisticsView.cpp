@@ -415,11 +415,11 @@ void QmitkImageStatisticsView::OnClipboardStatisticsButtonClicked()
 }
 
 void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*part*/,
-    const QList<mitk::DataNode::Pointer> &selectedNodes )
+    const QList<mitk::DataNode::Pointer> &nodes )
 {
   if (this->m_Visible)
   {
-    this->SelectionChanged( selectedNodes );
+    this->SelectionChanged( nodes );
   }
   else
   {

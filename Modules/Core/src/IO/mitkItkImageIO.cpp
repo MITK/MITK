@@ -360,7 +360,7 @@ namespace mitk
 
           for (; pos != timePoints.end(); ++prePos, ++pos)
           {
-            arbitraryTimeGeometry->AppendTimeStepClone(slicedGeometry, *pos, *prePos);
+            arbitraryTimeGeometry->AppendNewTimeStepClone(slicedGeometry, *prePos, *pos);
           }
 
           timeGeometry = arbitraryTimeGeometry;

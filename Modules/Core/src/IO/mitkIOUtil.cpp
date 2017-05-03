@@ -284,7 +284,7 @@ namespace mitk
     struct FixedReaderOptionsFunctor : public ReaderOptionsFunctorBase
     {
       FixedReaderOptionsFunctor(const IFileReader::Options &options) : m_Options(options) {}
-      virtual bool operator()(LoadInfo &loadInfo) override
+      virtual bool operator()(LoadInfo &loadInfo) const override
       {
         IFileReader *reader = loadInfo.m_ReaderSelector.GetSelected().GetReader();
         if (reader)
@@ -301,7 +301,7 @@ namespace mitk
     struct FixedWriterOptionsFunctor : public WriterOptionsFunctorBase
     {
       FixedWriterOptionsFunctor(const IFileReader::Options &options) : m_Options(options) {}
-      virtual bool operator()(SaveInfo &saveInfo) override
+      virtual bool operator()(SaveInfo &saveInfo) const override
       {
         IFileWriter *writer = saveInfo.m_WriterSelector.GetSelected().GetWriter();
         if (writer)
@@ -315,7 +315,7 @@ namespace mitk
       const IFileWriter::Options &m_Options;
     };
 
-    static BaseData::Pointer LoadBaseDataFromFile(const std::string &path);
+    static BaseData::Pointer LoadBaseDataFromFile(const std::string &path, const ReaderOptionsFunctorBase* optionsCallback = nullptr);
 
     static void SetDefaultDataNodeProperties(mitk::DataNode *node, const std::string &filePath = std::string());
   };
@@ -480,11 +480,11 @@ namespace mitk
     return path;
   }
 
-  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string &path, DataStorage &storage)
+  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string &path, DataStorage &storage, const ReaderOptionsFunctorBase *optionsCallback)
   {
     std::vector<std::string> paths;
     paths.push_back(path);
-    return Load(paths, storage);
+    return Load(paths, storage, optionsCallback);
   }
 
   DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::string &path,
@@ -503,11 +503,11 @@ namespace mitk
     return nodeResult;
   }
 
-  std::vector<BaseData::Pointer> IOUtil::Load(const std::string &path)
+  std::vector<BaseData::Pointer> IOUtil::Load(const std::string &path, const ReaderOptionsFunctorBase *optionsCallback)
   {
     std::vector<std::string> paths;
     paths.push_back(path);
-    return Load(paths);
+    return Load(paths, optionsCallback);
   }
 
   std::vector<BaseData::Pointer> IOUtil::Load(const std::string &path, const IFileReader::Options &options)
@@ -523,7 +523,7 @@ namespace mitk
     return loadInfos.front().m_Output;
   }
 
-  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string> &paths, DataStorage &storage)
+  DataStorage::SetOfObjects::Pointer IOUtil::Load(const std::vector<std::string> &paths, DataStorage &storage, const ReaderOptionsFunctorBase *optionsCallback)
   {
     DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
     std::vector<LoadInfo> loadInfos;
@@ -531,7 +531,7 @@ namespace mitk
     {
       loadInfos.push_back(loadInfo);
     }
-    std::string errMsg = Load(loadInfos, nodeResult, &storage, NULL);
+    std::string errMsg = Load(loadInfos, nodeResult, &storage, optionsCallback);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
@@ -539,7 +539,7 @@ namespace mitk
     return nodeResult;
   }
 
-  std::vector<BaseData::Pointer> IOUtil::Load(const std::vector<std::string> &paths)
+  std::vector<BaseData::Pointer> IOUtil::Load(const std::vector<std::string> &paths, const ReaderOptionsFunctorBase *optionsCallback)
   {
     std::vector<BaseData::Pointer> result;
     std::vector<LoadInfo> loadInfos;
@@ -547,7 +547,7 @@ namespace mitk
     {
       loadInfos.push_back(loadInfo);
     }
-    std::string errMsg = Load(loadInfos, NULL, NULL, NULL);
+    std::string errMsg = Load(loadInfos, NULL, NULL, optionsCallback);
     if (!errMsg.empty())
     {
       mitkThrow() << errMsg;
@@ -574,9 +574,10 @@ namespace mitk
   }
 
   BaseData::Pointer IOUtil::LoadBaseData(const std::string &path) { return Impl::LoadBaseDataFromFile(path); }
-  BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path)
+  BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path,
+                                                       const ReaderOptionsFunctorBase *optionsCallback)
   {
-    std::vector<BaseData::Pointer> baseDataList = Load(path);
+    std::vector<BaseData::Pointer> baseDataList = Load(path, optionsCallback);
 
     // The Load(path) call above should throw an exception if nothing could be loaded
     assert(!baseDataList.empty());
@@ -594,9 +595,10 @@ namespace mitk
     return node;
   }
 
-  Image::Pointer IOUtil::LoadImage(const std::string &path)
+  Image::Pointer IOUtil::LoadImage(const std::string &path,
+    const ReaderOptionsFunctorBase *optionsCallback)
   {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
+    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
     mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(baseData.GetPointer());
     if (image.IsNull())
     {
@@ -605,9 +607,10 @@ namespace mitk
     return image;
   }
 
-  Surface::Pointer IOUtil::LoadSurface(const std::string &path)
+  Surface::Pointer IOUtil::LoadSurface(const std::string &path,
+    const ReaderOptionsFunctorBase *optionsCallback)
   {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
+    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
     mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface *>(baseData.GetPointer());
     if (surface.IsNull())
     {
@@ -616,9 +619,10 @@ namespace mitk
     return surface;
   }
 
-  PointSet::Pointer IOUtil::LoadPointSet(const std::string &path)
+  PointSet::Pointer IOUtil::LoadPointSet(const std::string &path,
+    const ReaderOptionsFunctorBase *optionsCallback)
   {
-    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path);
+    BaseData::Pointer baseData = Impl::LoadBaseDataFromFile(path, optionsCallback);
     mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet *>(baseData.GetPointer());
     if (pointset.IsNull())
     {
@@ -630,7 +634,7 @@ namespace mitk
   std::string IOUtil::Load(std::vector<LoadInfo> &loadInfos,
                            DataStorage::SetOfObjects *nodeResult,
                            DataStorage *ds,
-                           ReaderOptionsFunctorBase *optionsCallback)
+                           const ReaderOptionsFunctorBase *optionsCallback)
   {
     if (loadInfos.empty())
     {

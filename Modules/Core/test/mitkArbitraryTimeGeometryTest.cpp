@@ -39,7 +39,7 @@ class mitkArbitraryTimeGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(Expand);
   MITK_TEST(ReplaceTimeStepGeometries);
   MITK_TEST(ClearAllGeometries);
-  MITK_TEST(AppendTimeStep);
+  MITK_TEST(AppendNewTimeStep);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -114,17 +114,17 @@ public:
 
     m_12345TimeGeometry = mitk::ArbitraryTimeGeometry::New();
     m_12345TimeGeometry->ClearAllGeometries();
-    m_12345TimeGeometry->AppendTimeStep(m_Geometry1, m_Geometry1MaxTP, m_Geometry1MinTP);
-    m_12345TimeGeometry->AppendTimeStep(m_Geometry2, m_Geometry2MaxTP, m_Geometry2MinTP);
-    m_12345TimeGeometry->AppendTimeStep(m_Geometry3, m_Geometry3MaxTP, m_Geometry3MinTP);
-    m_12345TimeGeometry->AppendTimeStep(m_Geometry4, m_Geometry4MaxTP, m_Geometry4MinTP);
-    m_12345TimeGeometry->AppendTimeStep(m_Geometry5, m_Geometry5MaxTP, m_Geometry5MinTP);
+    m_12345TimeGeometry->AppendNewTimeStep(m_Geometry1, m_Geometry1MinTP, m_Geometry1MaxTP);
+    m_12345TimeGeometry->AppendNewTimeStep(m_Geometry2, m_Geometry2MinTP, m_Geometry2MaxTP);
+    m_12345TimeGeometry->AppendNewTimeStep(m_Geometry3, m_Geometry3MinTP, m_Geometry3MaxTP);
+    m_12345TimeGeometry->AppendNewTimeStep(m_Geometry4, m_Geometry4MinTP, m_Geometry4MaxTP);
+    m_12345TimeGeometry->AppendNewTimeStep(m_Geometry5, m_Geometry5MinTP, m_Geometry5MaxTP);
 
     m_123TimeGeometry = mitk::ArbitraryTimeGeometry::New();
     m_123TimeGeometry->ClearAllGeometries();
-    m_123TimeGeometry->AppendTimeStep(m_Geometry1, m_Geometry1MaxTP, m_Geometry1MinTP);
-    m_123TimeGeometry->AppendTimeStep(m_Geometry2, m_Geometry2MaxTP, m_Geometry2MinTP);
-    m_123TimeGeometry->AppendTimeStep(m_Geometry3, m_Geometry3MaxTP, m_Geometry3MinTP);
+    m_123TimeGeometry->AppendNewTimeStep(m_Geometry1, m_Geometry1MinTP, m_Geometry1MaxTP);
+    m_123TimeGeometry->AppendNewTimeStep(m_Geometry2, m_Geometry2MinTP, m_Geometry2MaxTP);
+    m_123TimeGeometry->AppendNewTimeStep(m_Geometry3, m_Geometry3MinTP, m_Geometry3MaxTP);
   }
 
   void tearDown() override {}
@@ -289,7 +289,7 @@ public:
                                  "Testing TimeStepToTimePoint(1) with m_emptyTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimeStepToTimePoint(1) == 0.0,
                                  "Testing TimeStepToTimePoint(1) with m_initTimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimeStepToTimePoint(1) == 1.9,
+    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimeStepToTimePoint(1) == 2.0,
                                  "Testing TimeStepToTimePoint(1) with m_12345TimeGeometry");
 
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->TimeStepToTimePoint(6) == 0.0,
@@ -433,35 +433,36 @@ public:
                                  "Testing ClearAllGeometries() with m_12345TimeGeometry");
   }
 
-  void AppendTimeStep()
+  void AppendNewTimeStep()
   {
     // Test append
-    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendTimeStep(NULL, 0, 1));
-    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendTimeStep(m_Geometry2, m_Geometry2MaxTP));
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(NULL, 0, 1));
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(m_Geometry3_5,m_Geometry3_5MinTP,m_Geometry3_5MaxTP));
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(m_Geometry4, m_Geometry4MaxTP, m_Geometry4MinTP)); //valid but inverted bounds
 
-    m_emptyTimeGeometry->AppendTimeStep(m_Geometry4, m_Geometry4MaxTP, m_Geometry4MinTP);
+    m_emptyTimeGeometry->AppendNewTimeStep(m_Geometry4, m_Geometry4MinTP, m_Geometry4MaxTP);
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->CountTimeSteps() == 1,
-                                 "Testing AppendTimeStep() with m_emptyTimeGeometry");
+                                 "Testing AppendNewTimeStep() with m_emptyTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->GetMinimumTimePoint() == 4,
                                  "Testing ClearAllGeometries() with m_emptyTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->GetMaximumTimePoint() == 4.9,
                                  "Testing ClearAllGeometries() with m_emptyTimeGeometry");
 
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->CountTimeSteps() == 3,
-                                 "Testing AppendTimeStep() with m_emptyTimeGeometry");
+                                 "Testing AppendNewTimeStep() with m_emptyTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMinimumTimePoint() == 1,
                                  "Testing ClearAllGeometries() with m_emptyTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMaximumTimePoint() == 3.9,
                                  "Testing ClearAllGeometries() with m_emptyTimeGeometry");
-    m_123TimeGeometry->AppendTimeStep(m_Geometry4, m_Geometry4MaxTP, m_Geometry4MinTP);
+    m_123TimeGeometry->AppendNewTimeStep(m_Geometry4, m_Geometry4MinTP, m_Geometry4MaxTP);
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->CountTimeSteps() == 4,
-                                 "Testing AppendTimeStep() with m_123TimeGeometry");
+                                 "Testing AppendNewTimeStep() with m_123TimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMinimumTimePoint() == 1,
-                                 "Testing AppendTimeStep() with m_123TimeGeometry");
+                                 "Testing AppendNewTimeStep() with m_123TimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMaximumTimePoint() == 4.9,
-                                 "Testing AppendTimeStep() with m_123TimeGeometry");
+                                 "Testing AppendNewTimeStep() with m_123TimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMinimumTimePoint(3) == 3.9,
-                                 "Testing AppendTimeStep() with m_123TimeGeometry");
+                                 "Testing AppendNewTimeStep() with m_123TimeGeometry");
   }
 };
 

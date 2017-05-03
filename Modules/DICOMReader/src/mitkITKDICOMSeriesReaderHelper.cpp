@@ -33,6 +33,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkDICOMGDCMTagScanner.h"
 #include "mitkArbitraryTimeGeometry.h"
 
+#include "dcvrda.h"
+
+
+const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionDateTag = mitk::DICOMTag( 0x0008, 0x0022 );
+const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::AcquisitionTimeTag = mitk::DICOMTag( 0x0008, 0x0032 );
+const mitk::DICOMTag mitk::ITKDICOMSeriesReaderHelper::TriggerTimeTag = mitk::DICOMTag( 0x0018, 0x1060 );
+
 #define switch3DCase( IOType, T ) \
   case IOType:                    \
     return LoadDICOMByITK<T>( filenames, correctTilt, tiltInfo, io );
@@ -208,6 +215,15 @@ bool ConvertDICOMDateTimeString( const std::string& dateString,
   {
     content = OFString( dateString.c_str() ).append( content );
   }
+  else
+  {
+    // This is a workaround for DICOM data that has an AquisitionTime but no AquisitionDate.
+    // In this case, we use the current date. That's not really nice, but is absolutely OK
+    // as we're only interested in the time anyways...
+    OFString currentDate;
+    DcmDate::getCurrentDate( currentDate );
+    content = currentDate.append( content );
+  }
 
   const OFCondition result = DcmDateTime::getOFDateTimeFromString( content, time );
 
@@ -263,52 +279,93 @@ double ComputeMiliSecDuration( const OFDateTime& start, const OFDateTime& stop )
 
   ::boost::posix_time::time_duration duration = stopTime - startTime;
 
-  double result = duration.total_milliseconds();
-
-  return result;
+  return duration.total_milliseconds();
 }
 
-bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
-  const StringContainer& filenamesOfTimeStep, DateTimeBounds& bounds )
+bool mitk::ITKDICOMSeriesReaderHelper::ExtractDateTimeBoundsAndTriggerOfTimeStep(
+  const StringContainer& filenamesOfTimeStep, DateTimeBounds& bounds, TimeBounds& triggerBounds)
 {
-  const DICOMTag acquisitionDateTag( 0x0008, 0x0022 );
-  const DICOMTag acquisitionTimeTag( 0x0008, 0x0032 );
-
   DICOMGDCMTagScanner::Pointer filescanner = DICOMGDCMTagScanner::New();
-  filescanner->SetInputFiles( filenamesOfTimeStep );
-  filescanner->AddTag( acquisitionDateTag );
-  filescanner->AddTag( acquisitionTimeTag );
+  filescanner->SetInputFiles(filenamesOfTimeStep);
+  filescanner->AddTag(AcquisitionDateTag);
+  filescanner->AddTag(AcquisitionTimeTag);
+  filescanner->AddTag(TriggerTimeTag);
   filescanner->Scan();
 
   const DICOMDatasetAccessingImageFrameList frameList = filescanner->GetFrameInfoList();
 
   bool result = false;
-  bool first  = true;
+  bool firstAq = true;
+  bool firstTr = true;
+
+  triggerBounds = TimeBounds(0.0);
 
   for (DICOMDatasetAccessingImageFrameList::const_iterator pos = frameList.cbegin(); pos != frameList.cend(); ++pos)
   {
-    const std::string dateStr = ( *pos )->GetTagValueAsString( acquisitionDateTag ).value;
-    const std::string timeStr = ( *pos )->GetTagValueAsString( acquisitionTimeTag ).value;
+    const std::string aqDateStr = (*pos)->GetTagValueAsString(AcquisitionDateTag).value;
+    const std::string aqTimeStr = (*pos)->GetTagValueAsString(AcquisitionTimeTag).value;
+    const std::string triggerTimeStr = (*pos)->GetTagValueAsString(TriggerTimeTag).value;
 
-    OFDateTime time;
-    const bool convertResult = ConvertDICOMDateTimeString( dateStr, timeStr, time );
+    OFDateTime aqDateTime;
+    const bool convertAqResult = ConvertDICOMDateTimeString(aqDateStr, aqTimeStr, aqDateTime);
 
-    if ( convertResult )
+    OFBool convertTriggerResult;
+    mitk::ScalarType triggerTime = OFStandard::atof(triggerTimeStr.c_str(), &convertTriggerResult);
+
+    if (convertAqResult)
     {
-      if ( first )
+      if (firstAq)
       {
-        bounds[0] = time;
-        bounds[1] = time;
-        first     = false;
+        bounds[0] = aqDateTime;
+        bounds[1] = aqDateTime;
+        firstAq = false;
       }
       else
       {
-        bounds[0] = GetLowerDateTime( bounds[0], time );
-        bounds[1] = GetUpperDateTime( bounds[1], time );
+        bounds[0] = GetLowerDateTime(bounds[0], aqDateTime);
+        bounds[1] = GetUpperDateTime(bounds[1], aqDateTime);
+      }
+      result = true;
+    }
+
+    if (convertTriggerResult)
+    {
+      if (firstTr)
+      {
+        triggerBounds[0] = triggerTime;
+        triggerBounds[1] = triggerTime;
+        firstTr = false;
+      }
+      else
+      {
+        triggerBounds[0] = std::min(triggerBounds[0], triggerTime);
+        triggerBounds[1] = std::max(triggerBounds[1], triggerTime);
       }
       result = true;
     }
   }
+
+  return result;
+};
+
+bool mitk::ITKDICOMSeriesReaderHelper::ExtractTimeBoundsOfTimeStep(
+  const StringContainer& filenamesOfTimeStep, TimeBounds& bounds, const OFDateTime& baselineDateTime )
+{
+  DateTimeBounds aqDTBounds;
+  TimeBounds triggerBounds;
+
+  bool result = ExtractDateTimeBoundsAndTriggerOfTimeStep(filenamesOfTimeStep, aqDTBounds, triggerBounds);
+
+  mitk::ScalarType lowerBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[0] );
+  mitk::ScalarType upperBound = ComputeMiliSecDuration( baselineDateTime, aqDTBounds[1] );
+  if ( lowerBound < mitk::eps || upperBound < mitk::eps )
+  {
+    lowerBound = triggerBounds[0];
+    upperBound = triggerBounds[1];
+  }
+
+  bounds[0] = lowerBound;
+  bounds[1] = upperBound;
 
   return result;
 };
@@ -322,23 +379,33 @@ mitk::ITKDICOMSeriesReaderHelper::TimeBoundsList
   OFDateTime baseLine;
   bool baseLineSet = false;
 
-  for ( StringContainerList::const_iterator pos = filenamesOfTimeSteps.cbegin();
+  // extract the timebounds
+  DateTimeBounds baselineDateTimeBounds;
+  TimeBounds triggerBounds;
+  StringContainerList::const_iterator pos = filenamesOfTimeSteps.cbegin();
+  ExtractDateTimeBoundsAndTriggerOfTimeStep(*pos, baselineDateTimeBounds, triggerBounds);
+  baseLine = baselineDateTimeBounds[0];
+  baseLineSet = true;
+
+  // timebounds for baseline is 0
+  TimeBounds bounds( 0.0 );
+  result.push_back( bounds );
+
+
+  // iterate over the remaining timesteps
+  for ( ++pos;
         pos != filenamesOfTimeSteps.cend();
         ++pos )
   {
     TimeBounds bounds( 0.0 );
-    DateTimeBounds dateTimeBounds;
+    TimeBounds dateTimeBounds;
 
-    if ( ExtractTimeBoundsOfTimeStep( *pos, dateTimeBounds ) )
+    // extract the timebounds relative to the baseline
+    if ( ExtractTimeBoundsOfTimeStep( *pos, dateTimeBounds, baseLine ) )
     {
-      if ( !baseLineSet )
-      {
-        baseLineSet = true;
-        baseLine    = dateTimeBounds[0];
-      }
 
-      bounds[0] = ComputeMiliSecDuration( baseLine, dateTimeBounds[0] );
-      bounds[1] = ComputeMiliSecDuration( baseLine, dateTimeBounds[1] );
+      bounds[0] = dateTimeBounds[0];
+      bounds[1] = dateTimeBounds[1];
     }
 
     result.push_back( bounds );
@@ -378,11 +445,13 @@ mitk::TimeGeometry::Pointer
     {
       TimeBounds bounds = boundsList[pos];
       if ( pos + 1 < boundListSize )
-      {
+      { //Currently we do not explicitly support "gaps" in the time coverage
+        //thus we set the max time bound of a time step to the min time bound
+        //of its successor.
         bounds[1] = boundsList[pos + 1][0];
       }
 
-      newTimeGeometry->AppendTimeStepClone( templateGeometry, bounds[1], bounds[0] );
+      newTimeGeometry->AppendNewTimeStepClone(templateGeometry, bounds[0], bounds[1]);
     }
     timeGeometry = newTimeGeometry.GetPointer();
   }

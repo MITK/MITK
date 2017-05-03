@@ -66,6 +66,12 @@ class QmitkCESTStatisticsView : public QmitkAbstractView
     /// \brief normalize cest image
     void OnNormalizeImagePushButtonClicked();
 
+    /// \brief Toggle whether or not the plot uses a fixed x range
+    void OnFixedRangeCheckBoxToggled(bool state);
+
+    /// \brief Adapt axis scale when manual ranges are set
+    void OnFixedRangeDoubleSpinBoxChanged();
+
   protected:
 
     virtual void CreateQtPartControl(QWidget *parent) override;

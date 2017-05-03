@@ -77,6 +77,8 @@ public:
 
   virtual void CreateQtPartControl(QWidget *parent);
 
+  virtual void SetFocus() override;
+
   /*!
   @brief Creates the Qt connections needed
   */
@@ -112,7 +114,6 @@ public:
 
 protected:
 
-  virtual void SetFocus();
   /*!
  @brief called by QmitkFunctionality when DataManager's selection has changed
   */

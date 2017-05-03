@@ -60,7 +60,7 @@ namespace mitk
 
   private:
     /**
-    * return a refernce of the rendered data object
+    * return a reference of the rendered data object
     */
     ContourModelSet *GetInput(void);
   };

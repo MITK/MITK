@@ -43,10 +43,6 @@ set(mitk_modules
   IGTBase
   IGT
   CameraCalibration
-  RigidRegistration
-  RigidRegistrationUI
-  DeformableRegistration
-  DeformableRegistrationUI
   OpenCL
   OpenCVVideoSupport
   QtOverlays
@@ -77,6 +73,7 @@ set(mitk_modules
   RenderWindowManager
   RenderWindowManagerUI
   CEST
+  DICOMQI
 )
 
 if(MITK_ENABLE_PIC_READER)

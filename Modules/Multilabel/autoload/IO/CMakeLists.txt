@@ -1,9 +1,9 @@
 MITK_CREATE_MODULE( MultilabelIO
   INCLUDE_DIRS
     PRIVATE src/IO
-  DEPENDS PUBLIC MitkMultilabel MitkSceneSerialization MitkDICOMReader
+  DEPENDS PUBLIC MitkMultilabel MitkSceneSerialization
   PACKAGE_DEPENDS
-    PRIVATE  DCMQI DCMTK ITK|ITKQuadEdgeMesh+ITKAntiAlias+ITKIONRRD
+    PRIVATE ITK|ITKQuadEdgeMesh+ITKAntiAlias+ITKIONRRD
   AUTOLOAD_WITH MitkCore
   WARNINGS_AS_ERRORS
 )

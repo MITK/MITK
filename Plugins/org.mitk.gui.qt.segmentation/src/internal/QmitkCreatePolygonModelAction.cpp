@@ -20,7 +20,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkShowSegmentationAsSurface.h>
 #include <mitkProgressBar.h>
 #include <mitkStatusBar.h>
-#include <QmitkStdMultiWidget.h>
 
 #include <mitkIRenderWindowPart.h>
 #include <mitkIRenderingManager.h>

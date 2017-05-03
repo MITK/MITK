@@ -15,14 +15,25 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 #include "mitkRTStructureSetReader.h"
-#include <mitkIOUtil.h>
 
-#include <mitkBaseRenderer.h>
-#include "mitkDICOMTagPath.h"
+#include <mitkIOMimeTypes.h>
+#include <mitkDICOMTagPath.h>
+#include <mitkDICOMDCMTKTagScanner.h>
+#include <mitkTemporoSpatialStringProperty.h>
+
+#include "dcmtk/dcmrt/drtstrct.h"
 
 namespace mitk
 {
-    RTStructureSetReader::RTStructureSetReader() {}
+    RTStructureSetReader::RTStructureSetReader() : AbstractFileReader(IOMimeTypes::DICOM_MIMETYPE_NAME(), "DICOM RTSTRUCT File Reader") {
+        m_ServiceReg = RegisterService();
+        m_DICOMTagsOfInterestService = GetDicomTagsOfInterestService();
+    }
+
+    RTStructureSetReader::RTStructureSetReader(const RTStructureSetReader& other) : mitk::AbstractFileReader(other)
+    {
+
+    }
 
     RTStructureSetReader::~RTStructureSetReader() {}
 
@@ -92,15 +103,39 @@ namespace mitk
         return NULL;
     }
 
-    RTStructureSetReader::ContourModelSetNodes RTStructureSetReader::
-        ReadStructureSet(const char* filepath)
+    std::vector<itk::SmartPointer<BaseData> > RTStructureSetReader::Read()
     {
+        std::vector<itk::SmartPointer<mitk::BaseData> > result;
+
+        std::string location = GetInputLocation();
+
+        auto tagsOfInterest = m_DICOMTagsOfInterestService->GetTagsOfInterest();
+        DICOMTagPathList tagsOfInterestList;
+        for (const auto& tag : tagsOfInterest){
+            tagsOfInterestList.push_back(tag.first);
+        }
+
+
+        mitk::DICOMDCMTKTagScanner::Pointer scanner = mitk::DICOMDCMTKTagScanner::New();
+        scanner->SetInputFiles({ location });
+        scanner->AddTagPaths(tagsOfInterestList);
+        scanner->Scan();
+
+        mitk::DICOMDatasetAccessingImageFrameList frames = scanner->GetFrameInfoList();
+        if (frames.empty()){
+            MITK_ERROR << "Error reading the RTSTRUCT file" << std::endl;
+            return result;
+        }
+
+        auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
+
         DcmFileFormat file;
-        OFCondition output = file.loadFile(filepath, EXS_Unknown);
+        OFCondition output = file.loadFile(location.c_str(), EXS_Unknown);
 
         if (output.bad())
         {
-            MITK_ERROR << "Cant read the file" << std::endl;
+            MITK_ERROR << "Can't read the file" << std::endl;
+            return result;
         }
 
         DcmDataset* dataset = file.getDataset();
@@ -111,8 +146,7 @@ namespace mitk
         if (!outp.good())
         {
             MITK_ERROR << "Error reading the file" << std::endl;
-            RTStructureSetReader::ContourModelSetNodes x;
-            return x;
+            return result;
         }
 
         DRTStructureSetROISequence& roiSequence =
@@ -121,8 +155,7 @@ namespace mitk
         if (!roiSequence.gotoFirstItem().good())
         {
             MITK_ERROR << "Error reading the structure sequence" << std::endl;
-            RTStructureSetReader::ContourModelSetNodes x;
-            return x;
+            return result;
         }
 
         do
@@ -158,8 +191,7 @@ namespace mitk
         if (!roiContourSeqObject.gotoFirstItem().good())
         {
             MITK_ERROR << "Error reading the contour sequence" << std::endl;
-            RTStructureSetReader::ContourModelSetNodes x;
-            return x;
+            return result;
         }
 
         do
@@ -177,7 +209,7 @@ namespace mitk
             DRTContourSequence& contourSeqObject =
                 currentRoiObject.getContourSequence();
 
-            if (contourSeqObject.gotoFirstItem().good())
+            if (contourSeqObject.getNumberOfItems()>0 && contourSeqObject.gotoFirstItem().good())
             {
                 do
                 {
@@ -214,7 +246,7 @@ namespace mitk
             }
             else
             {
-                MITK_ERROR << "Error reading contourSeqObject" << std::endl;
+                MITK_WARN << "contourSeqObject has no items in sequence. Object is neglected and not read. Struct name: " << this->FindRoiByNumber(refRoiNumber)->Name << std::endl;
             }
 
             RoiEntry* refROI = this->FindRoiByNumber(refRoiNumber);
@@ -227,7 +259,7 @@ namespace mitk
 
             Sint32 roiColor;
 
-            for (int j = 0; j < 3; j++)
+            for (unsigned int j = 0; j < 3; j++)
             {
                 currentRoiObject.getROIDisplayColor(roiColor, j);
                 refROI->DisplayColor[j] = roiColor / 255.0;
@@ -240,44 +272,61 @@ namespace mitk
                 refROI->DisplayColor[1],
                 refROI->DisplayColor[2]));
 
-            //add uid and patient uid to property
-            OFString uid;
-            structureSetObject.getSeriesInstanceUID(uid);
-            std::string uidPropertyName = mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0020, 0x000e));
-            contourSet->SetProperty(uidPropertyName.c_str(), mitk::StringProperty::New(uid.c_str()));
-
-            OFString patientUid;
-            structureSetObject.getPatientID(patientUid);
-            std::string patientUidPropertyName = mitk::DICOMTagPathToPropertyName(mitk::DICOMTagPath(0x0010,
-                0x0020));
-            contourSet->SetProperty(patientUidPropertyName.c_str(),
-                mitk::StringProperty::New(patientUid.c_str()));
-
         } while (roiContourSeqObject.gotoNextItem().good());
 
-        std::deque<mitk::DataNode::Pointer> nodes;
-
-        for (unsigned int i = 0; i < ROISequenceVector.size(); i++)
+        for (auto const& aROI : ROISequenceVector)
         {
-            mitk::DataNode::Pointer node = mitk::DataNode::New();
-            node->SetData(ROISequenceVector.at(i).ContourModelSet);
-            node->SetProperty("name", ROISequenceVector.at(i).ContourModelSet->GetProperty("name"));
-            node->SetProperty("color", ROISequenceVector.at(i).ContourModelSet->GetProperty("contour.color"));
-            node->SetProperty("contour.color",
-                ROISequenceVector.at(i).ContourModelSet->GetProperty("contour.color"));
-            node->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-            node->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-            node->SetVisibility(false, mitk::BaseRenderer::GetInstance(
-                mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-            node->SetVisibility(false, mitk::BaseRenderer::GetInstance(
-                mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-            node->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
-
-            nodes.push_back(node);
+            result.push_back(aROI.ContourModelSet.GetPointer());
+            result.at(result.size() - 1)->SetProperty("name", aROI.ContourModelSet->GetProperty("name"));
+            result.at(result.size() - 1)->SetProperty("color", aROI.ContourModelSet->GetProperty("contour.color"));
+            result.at(result.size() - 1)->SetProperty("contour.color", aROI.ContourModelSet->GetProperty("contour.color"));
+            SetProperties(result.at(result.size() - 1).GetPointer(), findings);
         }
 
-        return nodes;
+        return result;
     }
+
+    RTStructureSetReader* RTStructureSetReader::Clone() const
+    {
+        return new RTStructureSetReader(*this);
+    }
+
+    RTStructureSetReader::FindingsListVectorType RTStructureSetReader::ExtractPathsOfInterest(const DICOMTagPathList& pathsOfInterest, const mitk::DICOMDatasetAccessingImageFrameList& frames) const
+    {
+        std::vector<mitk::DICOMDatasetAccess::FindingsListType > findings;
+        for (const auto& entry : pathsOfInterest){
+            findings.push_back(frames.front()->GetTagValueAsString(entry));
+        }
+        return findings;
+    }
+
+    void RTStructureSetReader::SetProperties(BaseData::Pointer data, const FindingsListVectorType& findings) const
+    {
+        for (const auto& finding : findings){
+            for (const auto& entry : finding){
+                const std::string propertyName = mitk::DICOMTagPathToPropertyName(entry.path);
+                auto property = mitk::TemporoSpatialStringProperty::New();
+                property->SetValue(entry.value);
+                data->SetProperty(propertyName.c_str(), property);
+            }
+        }
+    }
+
+    mitk::IDICOMTagsOfInterest* RTStructureSetReader::GetDicomTagsOfInterestService() const
+    {
+        mitk::IDICOMTagsOfInterest* result = nullptr;
+
+        std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest> > toiRegisters = us::GetModuleContext()->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+        if (!toiRegisters.empty())
+        {
+            if (toiRegisters.size() > 1)
+            {
+                MITK_WARN << "Multiple DICOM tags of interest services found. Using just one.";
+            }
+            result = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
+        }
+
+        return result;
+    }
+
 }

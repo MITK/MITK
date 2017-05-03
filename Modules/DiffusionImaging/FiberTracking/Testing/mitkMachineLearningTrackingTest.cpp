@@ -20,8 +20,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingConfig.h>
 #include <mitkIOUtil.h>
-#include <itkMLBSTrackingFilter.h>
-#include <mitkTrackingForestHandler.h>
+#include <itkStreamlineTrackingFilter.h>
+#include <mitkTrackingHandlerRandomForest.h>
 #include <mitkImageCast.h>
 #include <mitkImageToItk.h>
 #include <omp.h>
@@ -41,7 +41,7 @@ private:
 
     /** Members used inside the different (sub-)tests. All members are initialized via setUp().*/
     mitk::FiberBundle::Pointer ref;
-    mitk::TrackingForestHandler<6, 100> tfh;
+    mitk::TrackingHandlerRandomForest<6, 100>* tfh;
     mitk::Image::Pointer dwi;
     ItkUcharImgType::Pointer seed;
 
@@ -50,6 +50,7 @@ public:
     void setUp() override
     {
         ref = NULL;
+        tfh = new mitk::TrackingHandlerRandomForest<6,100>();
 
         std::vector<mitk::BaseData::Pointer> fibInfile = mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/ReferenceTracts.fib"));
         mitk::BaseData::Pointer baseData = fibInfile.at(0);
@@ -62,28 +63,29 @@ public:
         seed = ItkUcharImgType::New();
         mitk::CastToItkImage(img, seed);
 
-        tfh.LoadForest(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
-        tfh.AddDwi(dwi);
+        tfh->LoadForest(GetTestDataFilePath("DiffusionImaging/MachineLearningTracking/forest.rf"));
+        tfh->AddDwi(dwi);
     }
 
     void tearDown() override
     {
+        delete tfh;
         ref = NULL;
     }
 
     void Track1()
     {
         omp_set_num_threads(1);
-        typedef itk::MLBSTrackingFilter<6,100> TrackerType;
+        typedef itk::StreamlineTrackingFilter TrackerType;
         TrackerType::Pointer tracker = TrackerType::New();
-        tracker->SetInput(0, mitk::DiffusionPropertyHelper::GetItkVectorImage(dwi));
         tracker->SetDemoMode(false);
         tracker->SetSeedImage(seed);
         tracker->SetSeedsPerVoxel(1);
         tracker->SetStepSize(-1);
+        tracker->SetAngularThreshold(45);
         tracker->SetMinTractLength(20);
         tracker->SetMaxTractLength(400);
-        tracker->SetForestHandler(tfh);
+        tracker->SetTrackingHandler(tfh);
         tracker->SetAposterioriCurvCheck(false);
         tracker->SetAvoidStop(true);
         tracker->SetSamplingDistance(0.5);

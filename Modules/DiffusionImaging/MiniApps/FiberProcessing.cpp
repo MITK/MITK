@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
     parser.setContributor("MBI");
 
     parser.setArgumentPrefix("--", "-");
-    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib)", us::Any(), false);
-    parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib)", us::Any(), false);
+    parser.addArgument("input", "i", mitkCommandLineParser::InputFile, "Input:", "input fiber bundle (.fib, .trk, .tck)", us::Any(), false);
+    parser.addArgument("outFile", "o", mitkCommandLineParser::OutputFile, "Output:", "output fiber bundle (.fib, .trk)", us::Any(), false);
 
     parser.addArgument("smooth", "s", mitkCommandLineParser::Float, "Spline resampling:", "Resample fiber using splines with the given point distance (in mm)");
     parser.addArgument("compress", "c", mitkCommandLineParser::Float, "Compress:", "Compress fiber using the given error threshold (in mm)");

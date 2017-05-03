@@ -20,13 +20,13 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     FiberExtraction^^MitkFiberTracking
     FiberProcessing^^MitkFiberTracking
     FiberDirectionExtraction^^MitkFiberTracking
-    LocalDirectionalFiberPlausibility^^MitkFiberTracking
+    # LocalDirectionalFiberPlausibility^^MitkFiberTracking # HAS TO USE NEW PEAK IMAGE FORMAT
     StreamlineTracking^^MitkFiberTracking
     GibbsTracking^^MitkFiberTracking
     TractometerMetrics^^MitkFiberTracking
     FileFormatConverter^^MitkFiberTracking
     DFTraining^^MitkFiberTracking
-    DFTracking^^MitkFiberTracking
+    # DFTracking^^MitkFiberTracking
     TractDensity^^MitkFiberTracking
     )
 

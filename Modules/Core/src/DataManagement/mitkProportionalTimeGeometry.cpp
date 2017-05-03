@@ -124,7 +124,7 @@ mitk::BaseGeometry::Pointer mitk::ProportionalTimeGeometry::GetGeometryForTimeSt
 {
   if (IsValidTimeStep(timeStep))
   {
-    return dynamic_cast<BaseGeometry *>(m_GeometryVector[timeStep].GetPointer());
+    return m_GeometryVector[timeStep];
   }
   else
   {
@@ -178,14 +178,14 @@ void mitk::ProportionalTimeGeometry::Expand(mitk::TimeStepType size)
     while (m_GeometryVector.size() < size)
     {
       Geometry3D::Pointer geo3D = Geometry3D::New();
-      m_GeometryVector.push_back(dynamic_cast<BaseGeometry *>(geo3D.GetPointer()));
+      m_GeometryVector.push_back(geo3D.GetPointer());
     }
   }
   else
   {
     while (m_GeometryVector.size() < size)
     {
-      BaseGeometry::Pointer clone = dynamic_cast<BaseGeometry *>(m_GeometryVector[0]->Clone().GetPointer());
+      BaseGeometry::Pointer clone = m_GeometryVector[0]->Clone();
       m_GeometryVector.push_back(clone);
     }
   }
@@ -205,6 +205,7 @@ itk::LightObject::Pointer mitk::ProportionalTimeGeometry::InternalClone() const
 {
   itk::LightObject::Pointer parent = Superclass::InternalClone();
   ProportionalTimeGeometry::Pointer newTimeGeometry = dynamic_cast<ProportionalTimeGeometry *>(parent.GetPointer());
+
   newTimeGeometry->m_FirstTimePoint = this->m_FirstTimePoint;
   newTimeGeometry->m_StepDuration = this->m_StepDuration;
   newTimeGeometry->m_GeometryVector.clear();

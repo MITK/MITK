@@ -14,73 +14,59 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include "mitkTestingMacros.h"
+#include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
 
 #include "mitkRTStructureSetReader.h"
 #include <mitkIOUtil.h>
-#include <mitkStringProperty.h>
 
 class mitkRTStructureSetReaderTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkRTStructureSetReaderTestSuite);
-//  MITK_TEST(TestBody);
   MITK_TEST(TestStructureSets);
   CPPUNIT_TEST_SUITE_END();
-
-private:
-
-  mitk::RTStructureSetReader::Pointer m_rtStructureReader;
 
 public:
 
   void setUp() override
   {
-    m_rtStructureReader = mitk::RTStructureSetReader::New();
-    CPPUNIT_ASSERT_MESSAGE("Failed to initialize RTStructureSetReader", m_rtStructureReader.IsNotNull());
   }
 
   void TestStructureSets()
   {
-    std::deque<mitk::ContourModelSet::Pointer> contourModelVectorCorrect;
-    std::deque<mitk::ContourModelSet::Pointer> contourModelVectorCorrectSequ;
-    std::deque<mitk::DataNode::Pointer> contourModelVectorTest;
-    std::deque<mitk::ContourModelSet::Pointer> contourModelVectorTestDel;
+    auto structureSetReader = mitk::RTStructureSetReader();
+    structureSetReader.SetInput(GetTestDataFilePath("RT/StructureSet/RS.dcm"));
+    auto readerOutput = structureSetReader.Read();
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("reader output should have one entry.", static_cast<unsigned int>(16), static_cast<unsigned int>(readerOutput.size()));
 
-    LoadData(contourModelVectorCorrect);
+    auto contourModelVectorCorrect = LoadGroundTruthData();
 
-     contourModelVectorTest = m_rtStructureReader->ReadStructureSet(GetTestDataFilePath("RT/StructureSet/RS.dcm").c_str());
+    std::vector<mitk::ContourModelSet::Pointer> contourModelVectorTest;
+    for (const auto& aStruct : readerOutput){
+        mitk::ContourModelSet::Pointer contourModelSet = dynamic_cast<mitk::ContourModelSet*>(aStruct.GetPointer());
+        //only compare structs with content
+        if (contourModelSet->GetSize() > 0){
+            contourModelVectorTest.push_back(contourModelSet);
+        }
+    }
 
-     //Deleting all empty contourmodelsets - empty contourmodelsets cant be
-     //saved so we have reference for the comparison
-     for(unsigned int i=0; i<contourModelVectorTest.size();++i)
-     {
-       if(dynamic_cast<mitk::ContourModelSet*>(contourModelVectorTest.at(i)->GetData())->GetSize()>0){
-         contourModelVectorTestDel.push_back(dynamic_cast<mitk::ContourModelSet*>(contourModelVectorTest.at(i)->GetData()));
-       }
-     }
+    bool equal = true;
+    for (const auto& aStructTest : contourModelVectorTest)
+    {
+        const std::string nameTest = aStructTest->GetProperty("name")->GetValueAsString();
+        for (const auto& aStructCorrect : contourModelVectorCorrect)
+        {
+            const std::string nameCorrect = aStructCorrect->GetProperty("name")->GetValueAsString();
+            if (nameTest == nameCorrect){
+                if (!Compare(aStructTest, aStructCorrect)){
+                    equal = false;
+                }
+            }
+        }
+    }
 
-     //Loop for ordering the loaded contourmodelsets(contourModelVectorCorrect)
-     for(unsigned int i=0; i<contourModelVectorTestDel.size();++i)
-     {
-       mitk::BaseProperty::Pointer name = contourModelVectorTestDel.at(i)->GetProperty("name");
-       for(unsigned int j=0; j<contourModelVectorCorrect.size();++j)
-       {
-         mitk::BaseProperty::Pointer tmp = contourModelVectorCorrect.at(j)->GetProperty("name");
-         if(tmp->GetValueAsString().compare(name->GetValueAsString()) == 0)
-           contourModelVectorCorrectSequ.push_back(contourModelVectorCorrect.at(j));
-       }
-     }
+    CPPUNIT_ASSERT(equal);
 
-     //Testing wheather the two deques are equal
-     bool equal = true;
-     for(unsigned int i=0;i<contourModelVectorCorrectSequ.size();++i)
-     {
-       if(!Compare(contourModelVectorCorrectSequ.at(i),contourModelVectorTestDel.at(i)))
-         equal = false;
-     }
-
-     CPPUNIT_ASSERT(equal);
   }
 
   bool Compare(mitk::ContourModelSet::Pointer c1, mitk::ContourModelSet::Pointer c2){
@@ -95,6 +81,7 @@ public:
       {
         mitk::ContourModel::Pointer cm1 = c1->GetContourModelAt(i);
         mitk::ContourModel::Pointer cm2 = c2->GetContourModelAt(i);
+
         if(cm1->GetNumberOfVertices()!=cm2->GetNumberOfVertices())
         {
           MITK_INFO << "Number of Vertices different" << std::endl;
@@ -102,14 +89,12 @@ public:
         }
         else
         {
-          float ep = 0.001;
-          for(int j=0;j<cm1->GetNumberOfVertices();++j)
+          for(unsigned int j=0;j<cm1->GetNumberOfVertices();++j)
           {
             mitk::Point3D p1 = cm1->GetVertexAt(i)->Coordinates;
             mitk::Point3D p2 = cm2->GetVertexAt(i)->Coordinates;
-            if(fabs(p1[0]-p2[0]) > ep || fabs(p1[1]-p2[1]) > ep || fabs(p1[2]-p2[2]) > ep)
-            {
-              return false;
+            if (!Equal(p1, p2, 0.001)){
+                return false;
             }
           }
         }
@@ -118,39 +103,25 @@ public:
     return true;
   }
 
-  void LoadData(std::deque<mitk::ContourModelSet::Pointer> &r)
+  mitk::ContourModelSet::Pointer LoadFileWithNameProperty(const std::string& filename, const std::string& propertyName){
+      auto readerOutput = mitk::IOUtil::Load(GetTestDataFilePath(filename));
+      mitk::ContourModelSet::Pointer contourSet = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
+      contourSet->SetProperty("name", mitk::StringProperty::New(propertyName));
+      return contourSet;
+  }
+
+  std::vector<mitk::ContourModelSet::Pointer> LoadGroundTruthData()
   {
-    std::vector<itk::SmartPointer<mitk::BaseData> > readerOutput;
+    std::vector<mitk::ContourModelSet::Pointer> allStructs;
 
-    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/BODY.cnt_set"));
-    mitk::ContourModelSet::Pointer cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
-    cnt_set->SetProperty("name", mitk::StringProperty::New("BODY"));
-    r.push_back(cnt_set);
+    allStructs.push_back(LoadFileWithNameProperty("RT/StructureSet/BODY.cnt_set", "BODY"));
+    allStructs.push_back(LoadFileWithNameProperty("RT/StructureSet/Bladder.cnt_set", "Bladder"));
+    allStructs.push_back(LoadFileWithNameProperty("RT/StructureSet/Femoral Head Lt.cnt_set", "Femoral Head Lt"));
+    allStructs.push_back(LoadFileWithNameProperty("RT/StructureSet/Femoral Head RT.cnt_set", "Femoral Head RT"));
+    allStructs.push_back(LoadFileWithNameProperty("RT/StructureSet/PTV.cnt_set", "PTV"));
+    allStructs.push_back(LoadFileWithNameProperty("RT/StructureSet/Rectum.cnt_set", "Rectum"));
 
-    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Bladder.cnt_set"));
-    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
-    cnt_set->SetProperty("name", mitk::StringProperty::New("Bladder"));
-    r.push_back(cnt_set);
-
-    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Femoral Head Lt.cnt_set"));
-    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
-    cnt_set->SetProperty("name", mitk::StringProperty::New("Femoral Head Lt"));
-    r.push_back(cnt_set);
-
-    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Femoral Head RT.cnt_set"));
-    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
-    cnt_set->SetProperty("name", mitk::StringProperty::New("Femoral Head RT"));
-    r.push_back(cnt_set);
-
-    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/PTV.cnt_set"));
-    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
-    cnt_set->SetProperty("name", mitk::StringProperty::New("PTV"));
-    r.push_back(cnt_set);
-
-    readerOutput = mitk::IOUtil::Load(GetTestDataFilePath("RT/StructureSet/Rectum.cnt_set"));
-    cnt_set = dynamic_cast<mitk::ContourModelSet*>(readerOutput.at(0).GetPointer());
-    cnt_set->SetProperty("name", mitk::StringProperty::New("Rectum"));
-    r.push_back(cnt_set);
+    return allStructs;
   }
 
 };

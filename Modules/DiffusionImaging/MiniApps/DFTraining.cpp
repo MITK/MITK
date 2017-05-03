@@ -28,7 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCoreObjectFactory.h>
 
 #include <mitkFiberBundle.h>
-#include <mitkTrackingForestHandler.h>
+#include <mitkTrackingHandlerRandomForest.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -53,40 +53,40 @@ int main(int argc, char* argv[])
     parser.addArgument("tractograms", "t", mitkCommandLineParser::StringList, "Tractograms:", "input training tractograms (.fib, vtk ascii file format)", us::Any(), false);
     parser.addArgument("forest", "f", mitkCommandLineParser::OutputFile, "Forest:", "output random forest (HDF5)", us::Any(), false);
 
-    parser.addArgument("masks", "m", mitkCommandLineParser::StringList, "Masks:", "restrict trining using a binary mask image", us::Any());
-    parser.addArgument("wmmasks", "w", mitkCommandLineParser::StringList, "WM-Masks:", "if no binary white matter mask is specified, the envelope of the input tractogram is used", us::Any());
-    parser.addArgument("volmod", "v", mitkCommandLineParser::StringList, "Volume modification images:", "specify a list of float images that modify the fiber density", us::Any());
-    parser.addArgument("addfeatures", "a", mitkCommandLineParser::StringList, "Additional feature images:", "specify a list of float images that hold additional features (float)", us::Any());
+    parser.addArgument("masks", "", mitkCommandLineParser::StringList, "Masks:", "restrict training using a binary mask image", us::Any());
+    parser.addArgument("wm_masks", "", mitkCommandLineParser::StringList, "WM-Masks:", "if no binary white matter mask is specified, the envelope of the input tractogram is used", us::Any());
+    parser.addArgument("volume_modification_images", "", mitkCommandLineParser::StringList, "Volume modification images:", "specify a list of float images that modify the fiber density", us::Any());
+    parser.addArgument("additional_feature_images", "", mitkCommandLineParser::StringList, "Additional feature images:", "specify a list of float images that hold additional features (float)", us::Any());
 
-    parser.addArgument("stepsize", "s", mitkCommandLineParser::Float, "Stepsize:", "resampling parameter for the input tractogram in mm (determines number of white-matter samples)", us::Any());
-    parser.addArgument("gmsamples", "g", mitkCommandLineParser::Int, "Number of gray matter samples per voxel:", "Number of gray matter samples per voxel", us::Any());
-    parser.addArgument("numtrees", "n", mitkCommandLineParser::Int, "Number of trees:", "number of trees", us::Any());
-    parser.addArgument("max_tree_depth", "d", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());
-    parser.addArgument("sample_fraction", "sf", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", us::Any());
+    parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "resampling parameter for the input tractogram in mm (determines number of white-matter samples)", us::Any());
+    parser.addArgument("num_gm_samples", "", mitkCommandLineParser::Int, "Number of gray matter samples per voxel:", "Number of gray matter samples per voxel", us::Any());
+    parser.addArgument("num_trees", "", mitkCommandLineParser::Int, "Number of trees:", "number of trees", us::Any());
+    parser.addArgument("max_tree_depth", "", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());
+    parser.addArgument("sample_fraction", "", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", us::Any());
 
-    parser.addArgument("shfeatures", "shf", mitkCommandLineParser::Int, "Use SH features:", "use SH features", us::Any());
-    parser.addArgument("max_wm_samples", "mws", mitkCommandLineParser::Int, "Max. num. WM samples:", "upper limit for the number of WM samples", us::Any());
+    parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features", false);
+    parser.addArgument("max_wm_samples", "", mitkCommandLineParser::Int, "Max. num. WM samples:", "upper limit for the number of WM samples");
 
     map<string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
     if (parsedArgs.size()==0)
         return EXIT_FAILURE;
 
     bool shfeatures = false;
-    if (parsedArgs.count("shfeatures"))
-        shfeatures = us::any_cast<int>(parsedArgs["shfeatures"]);
+    if (parsedArgs.count("use_sh_features"))
+        shfeatures = us::any_cast<bool>(parsedArgs["use_sh_features"]);
 
     mitkCommandLineParser::StringContainerType imageFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["images"]);
     mitkCommandLineParser::StringContainerType wmMaskFiles;
-    if (parsedArgs.count("wmmasks"))
-        wmMaskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["wmmasks"]);
+    if (parsedArgs.count("wm_masks"))
+        wmMaskFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["wm_masks"]);
 
     mitkCommandLineParser::StringContainerType volModFiles;
-    if (parsedArgs.count("volmod"))
-        volModFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["volmod"]);
+    if (parsedArgs.count("volume_modification_images"))
+        volModFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["volume_modification_images"]);
 
     mitkCommandLineParser::StringContainerType addFeatFiles;
-    if (parsedArgs.count("addfeatures"))
-        addFeatFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["addfeatures"]);
+    if (parsedArgs.count("additional_feature_images"))
+        addFeatFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["additional_feature_images"]);
 
     mitkCommandLineParser::StringContainerType maskFiles;
     if (parsedArgs.count("masks"))
@@ -98,17 +98,17 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("tractograms"))
         tractogramFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["tractograms"]);
 
-    int numTrees = 50;
-    if (parsedArgs.count("numtrees"))
-        numTrees = us::any_cast<int>(parsedArgs["numtrees"]);
+    int num_trees = 50;
+    if (parsedArgs.count("num_trees"))
+        num_trees = us::any_cast<int>(parsedArgs["num_trees"]);
 
-    int gmsamples = -1;
-    if (parsedArgs.count("gmsamples"))
-        gmsamples = us::any_cast<int>(parsedArgs["gmsamples"]);
+    int gm_samples = -1;
+    if (parsedArgs.count("num_gm_samples"))
+        gm_samples = us::any_cast<int>(parsedArgs["num_gm_samples"]);
 
-    float stepsize = -1;
-    if (parsedArgs.count("stepsize"))
-        stepsize = us::any_cast<float>(parsedArgs["stepsize"]);
+    float sampling_distance = -1;
+    if (parsedArgs.count("sampling_distance"))
+        sampling_distance = us::any_cast<float>(parsedArgs["sampling_distance"]);
 
     int max_tree_depth = 25;
     if (parsedArgs.count("max_tree_depth"))
@@ -188,36 +188,36 @@ int main(int argc, char* argv[])
 
     if (shfeatures)
     {
-        mitk::TrackingForestHandler<6,28> forestHandler;
+        mitk::TrackingHandlerRandomForest<6,28> forestHandler;
         forestHandler.SetDwis(rawData);
         forestHandler.SetMaskImages(maskImageVector);
         forestHandler.SetWhiteMatterImages(wmMaskImageVector);
         forestHandler.SetFiberVolumeModImages(volumeModImages);
         forestHandler.SetAdditionalFeatureImages(addFeatImages);
         forestHandler.SetTractograms(tractograms);
-        forestHandler.SetNumTrees(numTrees);
+        forestHandler.SetNumTrees(num_trees);
         forestHandler.SetMaxTreeDepth(max_tree_depth);
-        forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
+        forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(stepsize);
+        forestHandler.SetStepSize(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
         forestHandler.SaveForest(forestFile);
     }
     else
     {
-        mitk::TrackingForestHandler<6,100> forestHandler;
+        mitk::TrackingHandlerRandomForest<6,100> forestHandler;
         forestHandler.SetDwis(rawData);
         forestHandler.SetMaskImages(maskImageVector);
         forestHandler.SetWhiteMatterImages(wmMaskImageVector);
         forestHandler.SetFiberVolumeModImages(volumeModImages);
         forestHandler.SetAdditionalFeatureImages(addFeatImages);
         forestHandler.SetTractograms(tractograms);
-        forestHandler.SetNumTrees(numTrees);
+        forestHandler.SetNumTrees(num_trees);
         forestHandler.SetMaxTreeDepth(max_tree_depth);
-        forestHandler.SetGrayMatterSamplesPerVoxel(gmsamples);
+        forestHandler.SetGrayMatterSamplesPerVoxel(gm_samples);
         forestHandler.SetSampleFraction(sample_fraction);
-        forestHandler.SetStepSize(stepsize);
+        forestHandler.SetStepSize(sampling_distance);
         forestHandler.SetMaxNumWmSamples(maxWmSamples);
         forestHandler.StartTraining();
         forestHandler.SaveForest(forestFile);

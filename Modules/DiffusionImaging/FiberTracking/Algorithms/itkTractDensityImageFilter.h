@@ -58,6 +58,7 @@ public:
   itkSetMacro( UseTrilinearInterpolation, bool )
   itkSetMacro( DoFiberResampling, bool )
   itkSetMacro( WorkOnFiberCopy, bool )
+  itkGetMacro( MaxDensity, OutPixelType)
 
   void GenerateData();
 
@@ -78,6 +79,7 @@ protected:
   bool                              m_UseTrilinearInterpolation;
   bool                              m_DoFiberResampling;
   bool                              m_WorkOnFiberCopy;
+  OutPixelType                      m_MaxDensity;
 };
 
 }

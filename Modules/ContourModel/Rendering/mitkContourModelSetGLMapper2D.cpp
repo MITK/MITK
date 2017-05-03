@@ -34,31 +34,38 @@ mitk::ContourModelSetGLMapper2D::~ContourModelSetGLMapper2D()
 
 void mitk::ContourModelSetGLMapper2D::Paint(mitk::BaseRenderer *renderer)
 {
-  BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+    BaseLocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  mitk::DataNode *dataNode = this->GetDataNode();
-  bool visible = true;
-  dataNode->GetVisibility(visible, renderer, "visible");
+    mitk::DataNode::Pointer dataNode = this->GetDataNode();
+    bool visible = true;
+    dataNode->GetVisibility(visible, nullptr);
 
-  if (!visible)
-    return;
+    if (!visible)
+        return;
 
-  mitk::ContourModelSet *input = this->GetInput();
+    mitk::ContourModelSet::Pointer input = this->GetInput();
 
-  mitk::ContourModelSet::ContourModelSetIterator it = input->Begin();
+    auto centerOfViewPointZ = renderer->GetCurrentWorldPlaneGeometry()->GetCenter()[2];
+    mitk::ContourModelSet::ContourModelSetIterator it = input->Begin();
 
-  mitk::ContourModelSet::ContourModelSetIterator end = input->End();
+    mitk::ContourModelSet::ContourModelSetIterator end = input->End();
 
-  while (it != end)
-  {
-    this->DrawContour(it->GetPointer(), renderer);
-    ++it;
-  }
+    while (it != end)
+    {
+        //we have the assumption that each contour model vertex has the same z coordinate
+        auto currentZValue = (*it)->GetVertexAt(0)->Coordinates[2];
+        double acceptedDeviationInMM = 5.0;
+        //only draw contour if it is visible
+        if (currentZValue - acceptedDeviationInMM < centerOfViewPointZ && currentZValue + acceptedDeviationInMM > centerOfViewPointZ){
+            this->DrawContour(it->GetPointer(), renderer);
+        }
+        ++it;
+    }
 
-  if (input->GetSize() < 1)
-    return;
+    if (input->GetSize() < 1)
+        return;
 
-  ls->UpdateGenerateDataTime();
+    ls->UpdateGenerateDataTime();
 }
 
 mitk::ContourModelSet *mitk::ContourModelSetGLMapper2D::GetInput(void)
@@ -72,7 +79,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel *re
   if (!renderingContour)
     return;
 
-  mitk::DataNode *dataNode = this->GetDataNode();
+  mitk::DataNode::Pointer dataNode = this->GetDataNode();
 
   renderingContour->UpdateOutputInformation();
 
@@ -197,7 +204,7 @@ void mitk::ContourModelSetGLMapper2D::InternalDrawContour(mitk::ContourModel *re
 
         if (showControlPoints)
         {
-          // draw ontrol points
+          // draw control points
           if ((*pointsIt)->IsControlPoint)
           {
             float pointsize = 4;

@@ -39,6 +39,7 @@ TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
     , m_UseTrilinearInterpolation(false)
     , m_DoFiberResampling(true)
     , m_WorkOnFiberCopy(true)
+    , m_MaxDensity(0)
 {
 
 }
@@ -136,7 +137,7 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     {
       if (m_WorkOnFiberCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
-      m_FiberBundle->ResampleSpline(minSpacing/10);
+      m_FiberBundle->ResampleLinear(minSpacing/10);
     }
 
     MITK_INFO << "TractDensityImageFilter: starting image generation";
@@ -229,17 +230,17 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
         }
     }
 
+    m_MaxDensity = 0;
+    for (int i=0; i<w*h*d; i++)
+        if (m_MaxDensity < outImageBufferPointer[i])
+            m_MaxDensity = outImageBufferPointer[i];
     if (!m_OutputAbsoluteValues && !m_BinaryOutput)
     {
         MITK_INFO << "TractDensityImageFilter: max-normalizing output image";
-        OutPixelType max = 0;
-        for (int i=0; i<w*h*d; i++)
-            if (max < outImageBufferPointer[i])
-                max = outImageBufferPointer[i];
-        if (max>0)
+        if (m_MaxDensity>0)
             for (int i=0; i<w*h*d; i++)
             {
-                outImageBufferPointer[i] /= max;
+                outImageBufferPointer[i] /= m_MaxDensity;
             }
     }
     if (m_InvertImage)

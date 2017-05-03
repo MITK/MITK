@@ -323,6 +323,12 @@ if(MITK_USE_Python)
       )
 endif()
 
+if(Eigen_INCLUDE_DIR)
+    list(APPEND mitk_optional_cache_args
+      -DEigen_INCLUDE_DIR:PATH=${Eigen_INCLUDE_DIR}
+    )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}

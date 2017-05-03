@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/QmitkDiffusionImaging">
+        <file>qball.png</file>
+        <file>tensor.png</file>
+        <file>quantification.png</file>
+        <file>reconodf.png</file>
+        <file>recontensor.png</file>
+    </qresource>
+</RCC>

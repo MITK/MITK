@@ -25,6 +25,7 @@
 
 class vtkInternalOpenGLRenderWindow;
 
+//! Part of Qml rendering prototype, see QmlMitkRenderWindowItem.
 class MITKOPENVIEWCORE_EXPORT QVTKFramebufferObjectRenderer : public QQuickFramebufferObject::Renderer
 {
 public:

@@ -28,6 +28,38 @@
 
 class QmlMitkStdMultiItem;
 
+//! PROTOTYPE Qml item to integrate MITK render window into Qml application.
+//!
+//! See diagram qml-classes-mitk.jpg for an overall picture of involved classes.
+//!
+//! The structure implemented in these classes follows the framebuffer approach
+//! described in
+//! http://doc.qt.io/qt-5/qtquick-visualcanvas-scenegraph.html#mixing-scene-graph-and-opengl
+//!
+//! That is, MITK/VTK rendering is happening inside Qml's rendering thread and
+//! in parallel to Qt's main thread. The rendering outputs to a GL framebuffer
+//! that is used as a texture within the Qml scene.
+//! Both Qt and VTK impose their structure on how rendering should be called,
+//! see the two classes QVTKFramebufferObjectRenderer and vtkInternalOpenglRenderWindow.
+//!
+//! As in Qt widget based render windows, QmlMitkRenderWindowItem derives from
+//! a Qt/VTK-integrating render window and adds its VtkPropRenderer to the VTK
+//! scene. This VtkPropRenderer collects and organizes all MITK mappers and
+//! makes them render when VTK asks to.
+//!
+//! Challenges for future development
+//! * cleanup: example grew historically, structure could perhaps be simplified,
+//!            responsibilities could be clearer.
+//! * thread-safety: this example manages execution of MITK events within
+//!            the Qt rendering thread. This allows access to VTK's GL context (e.g. for picking).
+//!            An inherent risk are collisions on data structures around
+//!            DataStorage: when rendering is threaded, the application
+//!            could modify data storage elements that are currently being
+//!            accessed by rendering. Working this out would probably
+//!            require thread-safety on multiple levels: DataStorage hierarchy,
+//!            DataNode methods, property (lists), and finally BaseData
+//!            and all its derived classes.
+//!
 class MITKQMLITEMS_EXPORT QmlMitkRenderWindowItem : public QVTKQuickItem, public mitk::RenderWindowBase
 {
     Q_OBJECT

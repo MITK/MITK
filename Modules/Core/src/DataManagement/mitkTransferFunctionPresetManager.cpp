@@ -239,22 +239,23 @@ int TransferFunctionPresetManager::SavePreset(mitk::TransferFunction& transferFu
   const auto* scalarOpacityPoints = scalarOpacityFunction->GetDataPointer();
   const auto scalarOpacityPointsCount = scalarOpacityFunction->GetSize();
   for (auto i = 0; i < scalarOpacityPointsCount; ++i) {
-    preset.m_scalarOpacityPoints.push_back(std::make_tuple(scalarOpacityPoints[i], scalarOpacityFunction->GetValue(scalarOpacityPoints[i])));
+    const auto j = i * 2;
+    preset.m_scalarOpacityPoints.push_back(std::make_tuple(scalarOpacityPoints[j], scalarOpacityPoints[j + 1]));
   }
 
   const auto* gradientOpacityPoints = gradientOpacityFunction->GetDataPointer();
   const auto gradientOpacityPointsCount = gradientOpacityFunction->GetSize();
   for (auto i = 0; i < gradientOpacityPointsCount; ++i) {
-    preset.m_gradientOpacityPoints.push_back(std::make_tuple(gradientOpacityPoints[i], gradientOpacityFunction->GetValue(gradientOpacityPoints[i])));
+    const auto j = i * 2;
+    preset.m_gradientOpacityPoints.push_back(std::make_tuple(gradientOpacityPoints[j], gradientOpacityPoints[j + 1]));
   }
 
   const auto* colorTransferPoints = colorTransferFunction->GetDataPointer();
   const auto colorTransferPointsCount = colorTransferFunction->GetSize();
   for (auto i = 0; i < colorTransferPointsCount; ++i) {
-    preset.m_colorTransferPoints.push_back(std::make_tuple(colorTransferPoints[i],
-      colorTransferFunction->GetRedValue(colorTransferPoints[i]),
-      colorTransferFunction->GetGreenValue(colorTransferPoints[i]),
-      colorTransferFunction->GetBlueValue(colorTransferPoints[i])));
+    const auto j = i * 4;
+    preset.m_colorTransferPoints.push_back(std::make_tuple(colorTransferPoints[j],
+      colorTransferPoints[j + 1], colorTransferPoints[j + 2], colorTransferPoints[j + 3]));
   }
 
   return AddPreset(preset, name);

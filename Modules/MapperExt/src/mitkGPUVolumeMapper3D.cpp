@@ -374,7 +374,8 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
   GetDataNode()->GetBoolProperty("volumerendering.gpu.usetexturecompression",useCompression,renderer);
   ls->m_MapperGPU->SetUseCompressedTexture(useCompression);
 
-  if( IsLODEnabled(renderer) && mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) == 0 )
+  mitk::RenderingManager* rm = renderer->GetRenderingManager();
+  if( IsLODEnabled(renderer) && rm != nullptr && rm->GetNextLOD( renderer ) == 0 )
     ls->m_MapperGPU->SetSampleDistance(2.0);
   else
     ls->m_MapperGPU->SetSampleDistance(1.0);
@@ -397,7 +398,8 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  int nextLod = mitk::RenderingManager::GetInstance()->GetNextLOD( renderer );
+  mitk::RenderingManager* rm = renderer->GetRenderingManager();
+  int nextLod = rm != nullptr ? rm->GetNextLOD( renderer ) : 0;
 
   if( IsLODEnabled(renderer) && nextLod == 0 )
   {
@@ -678,7 +680,8 @@ void mitk::GPUVolumeMapper3D::GenerateDataRAY( mitk::BaseRenderer *renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  if( IsLODEnabled(renderer) && mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) == 0 )
+  mitk::RenderingManager* rm = renderer->GetRenderingManager();
+  if( IsLODEnabled(renderer) && rm != nullptr && rm->GetNextLOD( renderer ) == 0 )
     ls->m_MapperRAY->SetImageSampleDistance(4.0);
   else
     ls->m_MapperRAY->SetImageSampleDistance(1.0);

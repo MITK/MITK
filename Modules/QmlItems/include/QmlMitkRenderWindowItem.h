@@ -73,7 +73,9 @@ public:
     virtual void wheelEvent(QWheelEvent* e);
 
     mitk::Point2D GetMousePosition(QMouseEvent* me) const;
+    mitk::Point2D GetMousePositionFlipY(QMouseEvent* me) const;
     mitk::Point2D GetMousePosition(QWheelEvent* we) const;
+    mitk::Point2D GetMousePositionFlipY(QWheelEvent* we) const;
     mitk::InteractionEvent::MouseButtons GetEventButton(QMouseEvent* me) const;
     mitk::InteractionEvent::MouseButtons GetButtonState(QMouseEvent* me) const;
     mitk::InteractionEvent::ModifierKeys GetModifiers(QInputEvent* me) const;
@@ -87,6 +89,20 @@ public slots:
 signals:
     void multiItemChanged();
     void viewTypeChanged();
+
+protected:
+
+    //! Add an event to the event queue to be executed in rendering.
+    //!
+    //! Avoids collisions between rendering and event handling,
+    //! both of which might act on GL buffers (e.g. picking)
+    void QueueEvent(mitk::InteractionEvent::Pointer e);
+
+    //! List of events that should be treated during next rendering.
+    std::vector<mitk::InteractionEvent::Pointer> m_PendingEvents;
+
+    //! Executes (then clears) the list of unhandled UI events (m_PendingEvents).
+    void processPendingEvents() override;
 };
 
 #endif

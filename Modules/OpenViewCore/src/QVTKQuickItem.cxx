@@ -47,7 +47,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <vtkFrameBufferObject2.h>
 
-#include "QVTKInternalOpenglRenderWindow.h"
+#include "vtkInternalOpenglRenderWindow.h"
 #include "QVTKFramebufferObjectRenderer.h"
 
 QVTKQuickItem::QVTKQuickItem(QQuickItem* parent)

@@ -14,7 +14,8 @@
 
  ===================================================================*/
 
-#include "QVTKInternalOpenglRenderWindow.h"
+#include "vtkInternalOpenglRenderWindow.h"
+
 #include "QVTKFramebufferObjectRenderer.h"
 
 #include <vtkgl.h>

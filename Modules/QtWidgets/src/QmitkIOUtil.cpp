@@ -84,14 +84,15 @@ namespace
     ANY_DOUBLE
   };
 
-  void LoadReusedImpl(int count, std::map<std::string, std::string>& reused, std::map<std::string, mitk::IFileIO::Options>& reusedOptions)
+  void LoadReusedImpl(int count, std::map<std::string, std::string>& reused, std::map<std::string, mitk::IFileIO::Options>& reusedOptions, bool isReader)
   {
     auto& configManager = config::ConfigManager::GetInstance();
-    for (auto index = 1; index <= count; ++index) {
-      const auto mime = configManager.GetString(boost::str(boost::format(REUSE_MIME_NAME) % (index > 0 ? REUSE_MIME_READER : REUSE_MIME_WRITER) % abs(index)).c_str(), QString()).toStdString();
+    for (auto i = 1; i <= count; ++i) {
+      const auto mime = configManager.GetString(boost::str(boost::format(REUSE_MIME_NAME) % (isReader ? REUSE_MIME_READER : REUSE_MIME_WRITER) % i).c_str(), QString()).toStdString();
       if (mime.empty()) {
         continue;
       }
+      const auto index = isReader ? i : -i;
       reused.emplace(mime, configManager.GetString(boost::str(boost::format(REUSE_REUSED_DESCRIPTION) % index).c_str(), QString()).toStdString());
       const auto count = configManager.GetInt(boost::str(boost::format(REUSE_OPTIONS_COUNT) % index).c_str(), 0);
       auto& options = reusedOptions[mime];
@@ -135,8 +136,8 @@ namespace
   void LoadReused()
   {
     auto& configManager = config::ConfigManager::GetInstance();
-    LoadReusedImpl(configManager.GetInt(REUSE_READER_COUNT, 0), m_reusedReaders, m_reusedReadersOptions);
-    LoadReusedImpl(configManager.GetInt(REUSE_WRITER_COUNT, 0), m_reusedWriters, m_reusedWritersOptions);
+    LoadReusedImpl(configManager.GetInt(REUSE_READER_COUNT, 0), m_reusedReaders, m_reusedReadersOptions, true);
+    LoadReusedImpl(configManager.GetInt(REUSE_WRITER_COUNT, 0), m_reusedWriters, m_reusedWritersOptions, false);
   }
 
   int GetReused(const mitk::IOUtil::LoadInfo&, std::map<std::string, std::string>* *reused,

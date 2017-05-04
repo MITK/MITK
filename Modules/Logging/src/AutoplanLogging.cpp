@@ -2,6 +2,10 @@
 
 #include <iostream>
 #include <cstdlib>
+#ifndef _WIN32
+///gethostname
+#include <unistd.h>
+#endif
 
 // boost
 #include <boost/algorithm/string.hpp>
@@ -43,24 +47,37 @@ namespace
   std::string getName(NameType type)
   {
     const char * envName = nullptr;
+    std::string name_string = std::string();
     switch ( type ) {
     case NameType::USER:
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
       envName = "USERNAME";
 #else
       envName = "USER";
 #endif
       break;
     case NameType::HOST:
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
       envName = "COMPUTERNAME";
 #else
       envName = "HOSTNAME";
 #endif
       break;
     }
-    const auto name = std::getenv(envName);
-    return name ? name : std::string();
+    auto name = std::getenv(envName);
+    if (name) {
+      name_string = name;
+    }
+#ifndef _WIN32
+    else {
+      char* temp = new char[512];
+      if (gethostname(temp, 512) == 0) {
+        name_string = temp;
+      }
+      delete []temp;
+    }
+#endif
+    return name_string;
   }
 }
 

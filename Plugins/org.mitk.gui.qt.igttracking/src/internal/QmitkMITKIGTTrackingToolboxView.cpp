@@ -36,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNavigationToolStorageSerializer.h>
-#include <mitkProgressBar.h>
+//#include <mitkProgressBar.h>
 #include <mitkIOUtil.h>
 #include <mitkLog.h>
 #include <usModule.h>
@@ -1294,31 +1294,30 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ThreadFunc()
 
 void QmitkMITKIGTTrackingToolboxViewWorker::AutoDetectTools()
 {
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+  //mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
   mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New(m_DataStorage);
   try
   {
     mitk::NavigationToolStorage::Pointer tempStorage = m_TrackingDevice->AutoDetectTools();
-    mitk::ProgressBar::GetInstance()->Progress();
+    //mitk::ProgressBar::GetInstance()->Progress();
     for (int i = 0; i < tempStorage->GetToolCount(); i++) { autoDetectedStorage->AddTool(tempStorage->GetTool(i)); }
   }
   catch (mitk::Exception& e)
   {
     MITK_WARN << e.GetDescription();
-    mitk::ProgressBar::GetInstance()->Progress(2);
+    //mitk::ProgressBar::GetInstance()->Reset();
     emit AutoDetectToolsFinished(false, e.GetDescription());
     return;
   }
   m_NavigationToolStorage = autoDetectedStorage;
-  mitk::ProgressBar::GetInstance()->Progress();
+  //::ProgressBar::GetInstance()->Progress();
   emit AutoDetectToolsFinished(true, "");
-  mitk::ProgressBar::GetInstance()->Progress(2);
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 {
   std::string message = "";
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
+  //mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
 
   //build the IGT pipeline
   mitk::TrackingDevice::Pointer trackingDevice = m_TrackingDevice;
@@ -1332,12 +1331,12 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
 
   //Get Tracking Volume Data
   mitk::TrackingDeviceData data = m_TrackingDeviceData;
-  mitk::ProgressBar::GetInstance()->Progress();
+  //mitk::ProgressBar::GetInstance()->Progress();
 
   //Create Navigation Data Source with the factory class
   mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(m_NavigationToolStorage, trackingDevice);
   m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(m_ToolVisualizationFilter);
-  mitk::ProgressBar::GetInstance()->Progress();
+  //mitk::ProgressBar::GetInstance()->Progress();
 
   if (m_TrackingDeviceSource.IsNull())
   {
@@ -1359,7 +1358,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
   }
 
   MITK_INFO << "Number of tools: " << m_TrackingDeviceSource->GetNumberOfOutputs();
-  mitk::ProgressBar::GetInstance()->Progress();
+  //mitk::ProgressBar::GetInstance()->Progress();
 
   //The tools are maybe reordered after initialization, e.g. in case of auto-detected tools of NDI Aurora
   mitk::NavigationToolStorage::Pointer toolsInNewOrder = myTrackingDeviceSourceFactory->GetUpdatedNavigationToolStorage();
@@ -1382,13 +1381,13 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     }
   }
 
-  mitk::ProgressBar::GetInstance()->Progress();
+  //mitk::ProgressBar::GetInstance()->Progress();
 
   //connect to device
   try
   {
     m_TrackingDeviceSource->Connect();
-    mitk::ProgressBar::GetInstance()->Progress();
+    //mitk::ProgressBar::GetInstance()->Reset();
     //Microservice registration:
     m_TrackingDeviceSource->RegisterAsMicroservice();
     m_NavigationToolStorage->UnRegisterMicroservice();
@@ -1402,7 +1401,7 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
     return;
   }
   emit ConnectDeviceFinished(true, QString(message.c_str()));
-  mitk::ProgressBar::GetInstance()->Progress(10);
+  //mitk::ProgressBar::GetInstance()->Reset();
 }
 
 void QmitkMITKIGTTrackingToolboxViewWorker::StartTracking()

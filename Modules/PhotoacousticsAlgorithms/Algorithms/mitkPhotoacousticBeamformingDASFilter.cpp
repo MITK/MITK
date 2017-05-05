@@ -155,7 +155,7 @@ void mitk::BeamformingDASFilter::GenerateData()
       {
         for (int s = 0; s < inputDim[1]; ++s)
         {
-          m_InputDataPuffer[l*(unsigned short)inputDim[1] + s] = (double)InputPuffer[l*(unsigned short)inputDim[1] + s];
+          m_InputDataPuffer[l*(short)inputDim[1] + s] = (double)InputPuffer[l*(short)inputDim[1] + s];
         }
       }
       m_InputData = m_InputDataPuffer;
@@ -167,7 +167,7 @@ void mitk::BeamformingDASFilter::GenerateData()
       {
         for (int s = 0; s < inputDim[1]; ++s)
         {
-          m_InputDataPuffer[l*(unsigned short)inputDim[1] + s] = (double)InputPuffer[l*(unsigned short)inputDim[1] + s];
+          m_InputDataPuffer[l*(short)inputDim[1] + s] = (double)InputPuffer[l*(short)inputDim[1] + s];
         }
       }
       m_InputData = m_InputDataPuffer;
@@ -182,13 +182,13 @@ void mitk::BeamformingDASFilter::GenerateData()
     {
       for (int s = 0; s < outputDim[1]; ++s)
       {
-        m_OutputData[l*(unsigned short)outputDim[1] + s] = 0;
+        m_OutputData[l*(short)outputDim[1] + s] = 0;
       }
     }
 
-    std::thread *threads = new std::thread[(unsigned short)outputDim[0]];
+    std::thread *threads = new std::thread[(short)outputDim[0]];
 
-    for (unsigned short line = 0; line < outputDim[0]; ++line)
+    for (short line = 0; line < outputDim[0]; ++line)
     {
       if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
       {
@@ -203,7 +203,7 @@ void mitk::BeamformingDASFilter::GenerateData()
         threads[line] = std::thread(&BeamformingDASFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
       }
     }
-    for (unsigned short line = 0; line < outputDim[0]; ++line)
+    for (short line = 0; line < outputDim[0]; ++line)
     {
       threads[line].join();
     }
@@ -279,7 +279,7 @@ double* mitk::BeamformingDASFilter::BoxFunction(int samples)
 }
 
 
-void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
+void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
 {
   double& inputS = inputDim[1];
   double& inputL = inputDim[0];
@@ -287,9 +287,9 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
   double& outputS = outputDim[1];
   double& outputL = outputDim[0];
 
-  unsigned short AddSample = 0;
-  unsigned short maxLine = 0;
-  unsigned short minLine = 0;
+  short AddSample = 0;
+  short maxLine = 0;
+  short minLine = 0;
   double delayMultiplicator = 0;
   double l_i = 0;
   double s_i = 0;
@@ -304,14 +304,14 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
   double apod_mult = 1;
 
   double mult = 0;
-  unsigned short usedLines = (maxLine - minLine);
+  short usedLines = (maxLine - minLine);
 
   //linear delay
   l_i = line / outputL * inputL;
 
   l = (inputL / 2 - l_i) / inputL * m_Conf.Pitch * m_Conf.TransducerElements;
 
-  for (unsigned short sample = 0; sample < outputS; ++sample)
+  for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = sample / outputS * inputS;
 
@@ -320,8 +320,8 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
     if (part < 1)
       part = 1;
 
-    maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-    minLine = (unsigned short)std::max((l_i - part), 0.0);
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
@@ -330,20 +330,20 @@ void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, do
     root = l / sqrt(pow(l, 2) + pow(x, 2));
     delayMultiplicator = inputS * root / (m_Conf.RecordTime * m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / inputL;
 
-    for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
+    for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
       AddSample = abs(delayMultiplicator * ((double)l_s - l_i)) + s_i;
 
       if (AddSample < inputS && AddSample >= 0)
-        output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];
+        output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
         --usedLines;
     }
-    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / usedLines;
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / usedLines;
   }
 }
 
-void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
+void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
 {
   double& inputS = inputDim[1];
   double& inputL = inputDim[0];
@@ -351,9 +351,9 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
   double& outputS = outputDim[1];
   double& outputL = outputDim[0];
 
-  unsigned short AddSample = 0;
-  unsigned short maxLine = 0;
-  unsigned short minLine = 0;
+  short AddSample = 0;
+  short maxLine = 0;
+  short minLine = 0;
   double delayMultiplicator = 0;
   double l_i = 0;
   double s_i = 0;
@@ -368,12 +368,12 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
   double apod_mult = 1;
 
   double mult = 0;
-  unsigned short usedLines = (maxLine - minLine);
+  short usedLines = (maxLine - minLine);
 
   //quadratic delay
   l_i = line / outputL * inputL;
 
-  for (unsigned short sample = 0; sample < outputS; ++sample)
+  for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = sample / outputS * inputS;
 
@@ -382,27 +382,27 @@ void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output,
     if (part < 1)
       part = 1;
 
-    maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-    minLine = (unsigned short)std::max((l_i - part), 0.0);
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
 
     delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
-    for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
+    for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
       AddSample = delayMultiplicator * pow((l_s - l_i), 2) + s_i;
       if (AddSample < inputS && AddSample >= 0) 
-        output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];
+        output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
         --usedLines;
     }
-    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / usedLines;
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / usedLines;
   }
 }
 
-void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
+void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
 {
   double& inputS = inputDim[1];
   double& inputL = inputDim[0];
@@ -410,9 +410,9 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
   double& outputS = outputDim[1];
   double& outputL = outputDim[0];
 
-  unsigned short AddSample = 0;
-  unsigned short maxLine = 0;
-  unsigned short minLine = 0;
+  short AddSample = 0;
+  short maxLine = 0;
+  short minLine = 0;
   double delayMultiplicator = 0;
   double l_i = 0;
   double s_i = 0;
@@ -427,13 +427,13 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
   double apod_mult = 1;
 
   double mult = 0;
-  unsigned short usedLines = (maxLine - minLine);
+  short usedLines = (maxLine - minLine);
 
   //exact delay
 
   l_i = (double)line / outputL * inputL;
 
-  for (unsigned short sample = 0; sample < outputS; ++sample)
+  for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = (double)sample / outputS * inputS;
 
@@ -442,13 +442,13 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
     if (part < 1)
       part = 1;
 
-    maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-    minLine = (unsigned short)std::max((l_i - part), 0.0);
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
 
-    for (unsigned short l_s = minLine; l_s < maxLine; ++l_s)
+    for (short l_s = minLine; l_s < maxLine; ++l_s)
     {
       AddSample = (int)sqrt(
         pow(s_i, 2)
@@ -456,11 +456,11 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
         pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
       );
       if (AddSample < inputS && AddSample >= 0) 
-        output[sample*(unsigned short)outputL + line] += input[l_s + AddSample*(unsigned short)inputL] * apodisation[(unsigned short)((l_s - minLine)*apod_mult)];
+        output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
       else
         --usedLines;
     }
-    output[sample*(unsigned short)outputL + line] = output[sample*(unsigned short)outputL + line] / usedLines;
+    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / usedLines;
   }
 }
 

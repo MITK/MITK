@@ -151,7 +151,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
       {
         for (int s = 0; s < inputDim[1]; ++s)
         {
-          m_InputDataPuffer[l*(unsigned short)inputDim[1] + s] = (double)InputPuffer[l*(unsigned short)inputDim[1] + s];
+          m_InputDataPuffer[l*(short)inputDim[1] + s] = (double)InputPuffer[l*(short)inputDim[1] + s];
         }
       }
       m_InputData = m_InputDataPuffer;
@@ -163,7 +163,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
       {
         for (int s = 0; s < inputDim[1]; ++s)
         {
-          m_InputDataPuffer[l*(unsigned short)inputDim[1] + s] = (double)InputPuffer[l*(unsigned short)inputDim[1] + s];
+          m_InputDataPuffer[l*(short)inputDim[1] + s] = (double)InputPuffer[l*(short)inputDim[1] + s];
         }
       }
       m_InputData = m_InputDataPuffer;
@@ -178,15 +178,15 @@ void mitk::BeamformingDMASFilter::GenerateData()
     {
       for (int s = 0; s < outputDim[1]; ++s)
       {
-        m_OutputData[l*(unsigned short)outputDim[1] + s] = 0;
+        m_OutputData[l*(short)outputDim[1] + s] = 0;
       }
     }
 
-    const unsigned short max_threads = 12;
+    const short max_threads = 12;
 
-    std::thread *threads = new std::thread[(unsigned short)outputDim[0]];
+    std::thread *threads = new std::thread[(short)outputDim[0]];
 
-    for (unsigned short line = 0; line < outputDim[0]; ++line)
+    for (short line = 0; line < outputDim[0]; ++line)
     {
       if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
       {
@@ -201,24 +201,24 @@ void mitk::BeamformingDMASFilter::GenerateData()
         threads[line] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
       }
     }
-    for (unsigned short line = 0; line < outputDim[0]; ++line)
+    for (short line = 0; line < outputDim[0]; ++line)
     {
       threads[line].join();
     }
 
     /*
     bool *threadfinished = new bool[max_threads];
-    for (unsigned short r = 0; r < max_threads; ++r)
+    for (short r = 0; r < max_threads; ++r)
     {
       threadfinished[r] = false;
     }
 
-    unsigned short line = 0;
+    short line = 0;
     while(line < outputDim[0])
     {
       //DMASSphericalLine(m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize)
       //threads[line] = std::thread(&BeamformingDMASFilter::DMASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
-      for (unsigned short n = 0; n < max_threads; ++n)
+      for (short n = 0; n < max_threads; ++n)
       {
         if (threadfinished[n])
         {
@@ -235,7 +235,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
         }
       }
     }
-    for (unsigned short n = 0; n < max_threads; ++n)
+    for (short n = 0; n < max_threads; ++n)
     {
       if (threads[n].joinable())
       {
@@ -485,7 +485,7 @@ double* mitk::BeamformingDMASFilter::BoxFunction(int samples)
   return ApodWindow;
 }
 
-void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
+void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
 {
   double& inputS = inputDim[1];
   double& inputL = inputDim[0];
@@ -493,10 +493,10 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
   double& outputS = outputDim[1];
   double& outputL = outputDim[0];
 
-  unsigned short AddSample1 = 0;
-  unsigned short AddSample2 = 0;
-  unsigned short maxLine = 0;
-  unsigned short minLine = 0;
+  short AddSample1 = 0;
+  short AddSample2 = 0;
+  short maxLine = 0;
+  short minLine = 0;
   double delayMultiplicator = 0;
   double l_i = 0;
   double s_i = 0;
@@ -511,14 +511,14 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
   double apod_mult = 1;
 
   double mult = 0;
-  unsigned short usedLines = (maxLine - minLine);
+  short usedLines = (maxLine - minLine);
 
   //linear delay
   l_i = line / outputL * inputL;
 
   l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
 
-  for (unsigned short sample = 0; sample < outputS; ++sample)
+  for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = sample / outputS * inputS;
 
@@ -527,8 +527,8 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
     if (part < 1)
       part = 1;
 
-    maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-    minLine = (unsigned short)std::max((l_i - part), 0.0);
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
@@ -538,22 +538,22 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
     delayMultiplicator = inputS * root / (m_Conf.RecordTime * m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / inputL;
 
     //calculate the AddSamples beforehand to save some time
-    unsigned short* AddSample = new unsigned short[maxLine - minLine];
-    for (unsigned short l_s = 0; l_s < maxLine - minLine; ++l_s)
+    short* AddSample = new short[maxLine - minLine];
+    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = abs((unsigned short)(delayMultiplicator * (minLine + l_s - l_i) + s_i));
+      AddSample[l_s] = abs((short)(delayMultiplicator * (minLine + l_s - l_i) + s_i));
     }
 
-    for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
       if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
       {
-        for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * input[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * apodisation[(unsigned short)((l_s1 - minLine)*apod_mult)] * apodisation[(unsigned short)((l_s2 - minLine)*apod_mult)];
-            output[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+            mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(short)((l_s1 - minLine)*apod_mult)] * apodisation[(short)((l_s2 - minLine)*apod_mult)];
+            output[sample*(short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
       }
@@ -561,13 +561,13 @@ void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, 
         --usedLines;
     }
 
-    output[sample*(unsigned short)outputL + line] = 10 * output[sample*(unsigned short)outputL + line] / (pow(usedLines, 2) - usedLines);
+    output[sample*(short)outputL + line] = 10 * output[sample*(short)outputL + line] / (pow(usedLines, 2) - usedLines);
 
     delete[] AddSample;
   }
 }
 
-void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
+void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
 {
   double& inputS = inputDim[1];
   double& inputL = inputDim[0];
@@ -575,10 +575,10 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
   double& outputS = outputDim[1];
   double& outputL = outputDim[0];
 
-  unsigned short AddSample1 = 0;
-  unsigned short AddSample2 = 0;
-  unsigned short maxLine = 0;
-  unsigned short minLine = 0;
+  short AddSample1 = 0;
+  short AddSample2 = 0;
+  short maxLine = 0;
+  short minLine = 0;
   double delayMultiplicator = 0;
   double l_i = 0;
   double s_i = 0;
@@ -593,12 +593,12 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
   double apod_mult = 1;
 
   double mult = 0;
-  unsigned short usedLines = (maxLine - minLine);
+  short usedLines = (maxLine - minLine);
 
   //quadratic delay
   l_i = line / outputL * inputL;
 
-  for (unsigned short sample = 0; sample < outputS; ++sample)
+  for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = sample / outputS * inputS;
 
@@ -607,8 +607,8 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
     if (part < 1)
       part = 1;
 
-    maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-    minLine = (unsigned short)std::max((l_i - part), 0.0);
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
@@ -616,22 +616,22 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
     delayMultiplicator = pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * (m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2) / s_i / 2;
 
     //calculate the AddSamples beforehand to save some time
-    unsigned short* AddSample = new unsigned short[maxLine - minLine];
-    for (unsigned short l_s = 0; l_s < maxLine - minLine; ++l_s)
+    short* AddSample = new short[maxLine - minLine];
+    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (unsigned short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i);
+      AddSample[l_s] = (short)(delayMultiplicator * pow((minLine + l_s - l_i), 2) + s_i);
     }
 
-    for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
-      if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
+      if (AddSample[l_s1 - minLine] < (short)inputS && AddSample[l_s1 - minLine] >= 0)
       {
-        for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * apodisation[(unsigned short)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * apodisation[(unsigned short)((l_s1 - minLine)*apod_mult)];
-            output[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+            mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * apodisation[(short)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(short)((l_s1 - minLine)*apod_mult)];
+            output[sample*(short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
       }
@@ -639,13 +639,13 @@ void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* outpu
         --usedLines;
     }
 
-    output[sample*(unsigned short)outputL + line] = 10 * output[sample*(unsigned short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
+    output[sample*(short)outputL + line] = 10 * output[sample*(short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
 
     delete[] AddSample;
   }
 }
 
-void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize)
+void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
 {
   double& inputS = inputDim[1];
   double& inputL = inputDim[0];
@@ -653,10 +653,10 @@ void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* outpu
   double& outputS = outputDim[1];
   double& outputL = outputDim[0];
 
-  unsigned short AddSample1 = 0;
-  unsigned short AddSample2 = 0;
-  unsigned short maxLine = 0;
-  unsigned short minLine = 0;
+  short AddSample1 = 0;
+  short AddSample2 = 0;
+  short maxLine = 0;
+  short minLine = 0;
   double delayMultiplicator = 0;
   double l_i = 0;
   double s_i = 0;
@@ -672,13 +672,13 @@ void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* outpu
 
   double mult = 0;
 
-  unsigned short usedLines = (maxLine - minLine);
+  short usedLines = (maxLine - minLine);
 
   //exact delay
 
   l_i = line / outputL * inputL;
 
-  for (unsigned short sample = 0; sample < outputS; ++sample)
+  for (short sample = 0; sample < outputS; ++sample)
   {
     s_i = sample / outputS * inputS;
 
@@ -687,33 +687,33 @@ void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* outpu
     if (part < 1)
       part = 1;
 
-    maxLine = (unsigned short)std::min((l_i + part) + 1, inputL);
-    minLine = (unsigned short)std::max((l_i - part), 0.0);
+    maxLine = (short)std::min((l_i + part) + 1, inputL);
+    minLine = (short)std::max((l_i - part), 0.0);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
 
     //calculate the AddSamples beforehand to save some time
-    unsigned short* AddSample = new unsigned short[maxLine - minLine];
-    for (unsigned short l_s = 0; l_s < maxLine - minLine; ++l_s)
+    short* AddSample = new short[maxLine - minLine];
+    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
     {
-      AddSample[l_s] = (unsigned short)sqrt(
+      AddSample[l_s] = (short)sqrt(
         pow(s_i, 2)
         +
         pow((inputS / (m_Conf.RecordTime*m_Conf.SpeedOfSound) * ((minLine + l_s - l_i)*m_Conf.Pitch*m_Conf.TransducerElements) / inputL), 2)
       );
     }
 
-    for (unsigned short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
+    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
     {
       if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
       {
-        for (unsigned short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
+        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
         {
           if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
           {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (unsigned short)inputL] * apodisation[(int)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (unsigned short)inputL] * apodisation[(int)((l_s1 - minLine)*apod_mult)];
-            output[sample*(unsigned short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
+            mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * apodisation[(int)((l_s2 - minLine)*apod_mult)] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(int)((l_s1 - minLine)*apod_mult)];
+            output[sample*(short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
           }
         }
       }
@@ -721,7 +721,7 @@ void mitk::BeamformingDMASFilter::DMASSphericalLine(double* input, double* outpu
         --usedLines;
     }
 
-    output[sample*(unsigned short)outputL + line] = 10 * output[sample*(unsigned short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
+    output[sample*(short)outputL + line] = 10 * output[sample*(short)outputL + line] / (pow(usedLines, 2) - (usedLines - 1));
 
     delete[] AddSample;
   }

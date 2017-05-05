@@ -83,9 +83,9 @@ namespace mitk {
     double* HammFunction(int samples);
     double* BoxFunction(int samples);
 
-    void DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
-    void DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
-    void DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const unsigned short& line, double* apodisation, const unsigned short& apodArraySize);
+    void DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
+    void DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
+    void DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
 
     mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
     itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);

@@ -492,7 +492,7 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
     m_CurrentApplicationName = applicationName;
 
     QmitkUSNavigationProcessWidget::NavigationStepVector navigationSteps;
-    if (applicationName == "Punction")
+    if (applicationName == "Puncture")
     {
       QmitkUSNavigationStepCombinedModality* stepCombinedModality =
         new QmitkUSNavigationStepCombinedModality(m_Parent);

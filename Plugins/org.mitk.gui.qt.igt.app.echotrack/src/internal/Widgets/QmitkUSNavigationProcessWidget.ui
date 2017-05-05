@@ -31,22 +31,8 @@
     </widget>
    </item>
    <item>
-    <widget class="QToolBox" name="stepsToolBox">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="page">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>378</width>
-        <height>300</height>
-       </rect>
-      </property>
-      <attribute name="label">
-       <string>No navigation step widgets loaded.</string>
-      </attribute>
+    <widget class="QStackedWidget" name="stepsToolBox">
+     <widget class="QWidget" name="stepsStackedWidgetPage1" native="true">
       <layout class="QVBoxLayout" name="verticalLayout_3"/>
      </widget>
     </widget>

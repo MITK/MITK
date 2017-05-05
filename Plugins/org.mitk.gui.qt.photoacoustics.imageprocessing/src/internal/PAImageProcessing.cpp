@@ -415,9 +415,9 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DASconfig.SamplesPerLine = m_Controls.Samples->value();
   DASconfig.ReconstructionLines = m_Controls.Lines->value();
   DASconfig.TransducerElements = m_Controls.ElementCount->value();
-  DASconfig.Angle = m_Controls.Angle->value();
-  DASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value();
-  DASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value());
+  DASconfig.Angle = m_Controls.Angle->value(); // [deg]
+  DASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
+  DASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value()); // [Hz]
   DASconfig.ButterworthOrder = m_Controls.BPFalloff->value();
   DASconfig.UseBP = m_Controls.UseBP->isChecked();
 
@@ -426,9 +426,9 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DMASconfig.SamplesPerLine = m_Controls.Samples->value();
   DMASconfig.ReconstructionLines = m_Controls.Lines->value();
   DMASconfig.TransducerElements = m_Controls.ElementCount->value();
-  DMASconfig.Angle = m_Controls.Angle->value();
-  DMASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value();
-  DMASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 /1000000 - m_Controls.BPlow->value());
+  DMASconfig.Angle = m_Controls.Angle->value(); //[deg]
+  DMASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
+  DMASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 /1000000 - m_Controls.BPlow->value()); // [Hz]
   DMASconfig.ButterworthOrder = m_Controls.BPFalloff->value();
   DMASconfig.UseBP = m_Controls.UseBP->isChecked();
 

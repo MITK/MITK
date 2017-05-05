@@ -42,13 +42,6 @@ mitk::BeamformingDASFilter::BeamformingDASFilter() : m_OutputData(nullptr), m_In
   this->SetNumberOfIndexedInputs(1);
   this->SetNumberOfRequiredInputs(1);
 
-  m_Conf.Pitch = 0.0003;
-  m_Conf.SpeedOfSound = 1540;
-  m_Conf.SamplesPerLine = 2048;
-  m_Conf.ReconstructionLines = 128;
-  m_Conf.RecordTime = 0.00006;
-  m_Conf.TransducerElements = 128;
-
   m_ProgressHandle = [](int, std::string) {};
 }
 
@@ -108,11 +101,14 @@ void mitk::BeamformingDASFilter::GenerateData()
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
+  if (!output->IsInitialized())
+    return;
+
   double inputDim[2] = { input->GetDimension(0), input->GetDimension(1) / ((int)m_Conf.Photoacoustic + 1) };
+  // if the photoacoustic option is used, we halve the image, as only the upper part of it contains any information
   double outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
 
-  const int apodArraySize = m_Conf.TransducerElements * 4;
-
+  const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
   double* ApodWindow;
   // calculate the appropiate apodization window
   if (m_Conf.Apod == beamformingSettings::Apodization::Hann)
@@ -129,11 +125,7 @@ void mitk::BeamformingDASFilter::GenerateData()
   }
 
   int progInterval = output->GetDimension(2) / 20 > 1 ? output->GetDimension(2) / 20 : 1;
-
-  if (!output->IsInitialized())
-  {
-    return;
-  }
+  // the interval at which we update the gui progress bar
 
   auto begin = std::chrono::high_resolution_clock::now(); // debbuging the performance...
 
@@ -144,6 +136,7 @@ void mitk::BeamformingDASFilter::GenerateData()
     m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
     m_InputDataPuffer = new double[input->GetDimension(0)*input->GetDimension(1)];
 
+    // first, we convert any data to double, which we use by default
     if (input->GetPixelType().GetTypeAsString() == "scalar (double)" || input->GetPixelType().GetTypeAsString() == " (double)")
     {
       m_InputData = (double*)inputReadAccessor.GetData();
@@ -178,6 +171,7 @@ void mitk::BeamformingDASFilter::GenerateData()
       return;
     }
 
+    // fill the image with zeros
     for (int l = 0; l < outputDim[0]; ++l)
     {
       for (int s = 0; s < outputDim[1]; ++s)
@@ -188,6 +182,7 @@ void mitk::BeamformingDASFilter::GenerateData()
 
     std::thread *threads = new std::thread[(short)outputDim[0]];
 
+    // every line will be beamformed in a seperate thread
     for (short line = 0; line < outputDim[0]; ++line)
     {
       if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
@@ -203,6 +198,7 @@ void mitk::BeamformingDASFilter::GenerateData()
         threads[line] = std::thread(&BeamformingDASFilter::DASSphericalLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
       }
     }
+    // wait for all lines to finish
     for (short line = 0; line < outputDim[0]; ++line)
     {
       threads[line].join();
@@ -219,6 +215,7 @@ void mitk::BeamformingDASFilter::GenerateData()
     m_InputData = nullptr;
   }
 
+  // apply a bandpass filter, if requested
   if (m_Conf.UseBP)
   {
     m_ProgressHandle(100, "applying bandpass");
@@ -464,9 +461,9 @@ void mitk::BeamformingDASFilter::DASSphericalLine(double* input, double* output,
   }
 }
 
-
 mitk::Image::Pointer mitk::BeamformingDASFilter::BandpassFilter(mitk::Image::Pointer data)
 {
+  // do a fourier transform, multiply with an appropriate window for the filter, and transform back
   typedef double PixelType;
   typedef itk::Image< PixelType, 3 > RealImageType;
   RealImageType::Pointer image;
@@ -499,10 +496,9 @@ mitk::Image::Pointer mitk::BeamformingDASFilter::BandpassFilter(mitk::Image::Poi
   int width1 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
   int width2 = -BoundLowPass - BoundHighPass + data->GetDimension(1) / 2;
 
-
   /*MITK_INFO << "BHP " << BoundHighPass << " BLP " << BoundLowPass << "BPLP" << m_Conf.BPLowPass;
   MITK_INFO << "center1 " << center1 << " width1 " << width1;
-  MITK_INFO << "center2 " << center2 << " width2 " << width2;*/ //debugging
+  MITK_INFO << "center2 " << center2 << " width2 " << width2;*/ //DEBUG
 
   RealImageType::Pointer fftMultiplicator1 = BPFunction(data, width1, center1);
   RealImageType::Pointer fftMultiplicator2 = BPFunction(data, width2, center2);

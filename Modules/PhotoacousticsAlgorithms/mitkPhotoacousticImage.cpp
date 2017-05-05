@@ -108,20 +108,20 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBmodeFilter(mitk::Image::Poi
   return mitk::GrabItkImageMemory(resampleImageFilter->GetOutput());
 }
 
-//mitk::Image::Pointer mitk::PhotoacousticImage::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
-//{
-//  typedef itk::Image< float, 3 > itkFloatImageType;
-//  typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
+/*mitk::Image::Pointer mitk::PhotoacousticImage::ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scattering)
+{
+  typedef itk::Image< float, 3 > itkFloatImageType;
+  typedef itk::MultiplyImageFilter <itkFloatImageType, itkFloatImageType > MultiplyImageFilterType;
 
-//  itkFloatImageType::Pointer itkImage;
-//  mitk::CastToItkImage(inputImage, itkImage);
+  itkFloatImageType::Pointer itkImage;
+  mitk::CastToItkImage(inputImage, itkImage);
 
-//  MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
-//  multiplyFilter->SetInput1(itkImage);
-//  multiplyFilter->SetInput2(m_FluenceCompResizedItk.at(m_ScatteringCoefficient));
+  MultiplyImageFilterType::Pointer multiplyFilter = MultiplyImageFilterType::New();
+  multiplyFilter->SetInput1(itkImage);
+  multiplyFilter->SetInput2(m_FluenceCompResizedItk.at(m_ScatteringCoefficient));
 
-//  return mitk::GrabItkImageMemory(multiplyFilter->GetOutput());
-//}
+  return mitk::GrabItkImageMemory(multiplyFilter->GetOutput());
+}*/
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[3])
 {
@@ -169,6 +169,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 
   ImageReadAccessor acc(inputImage);
 
+  // convert the data to double by default
   // as of now only those double, short, float are used at all... though it's easy to add other ones
   if (inputImage->GetPixelType().GetTypeAsString() == "scalar (double)" || inputImage->GetPixelType().GetTypeAsString() == " (double)")
   {
@@ -207,6 +208,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
     MITK_INFO << "Could not determine pixel type";
   }
 
+  // copy the data into the cropped image
   for (int sl = 0; sl < outputDim[2]; ++sl)
   {
     for (int l = 0; l < outputDim[0]; ++l)
@@ -230,11 +232,13 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
+  // crop the image
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
   Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
   Image::Pointer resizedImage = croppedImage;
 
+  // resample the image in horizontal direction
   if (inputImage->GetDimension(0) != config.ReconstructionLines)
   {
     progressHandle(0, "resampling image");
@@ -245,23 +249,24 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
     MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
   }
 
+  // perform the beamforming
   BeamformingDASFilter::Pointer Beamformer = BeamformingDASFilter::New();
-
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
   Beamformer->SetProgressHandle(progressHandle);
-
   Beamformer->UpdateLargestPossibleRegion();
   return Beamformer->GetOutput();
 }
 
 mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
+  // crop the image
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
   progressHandle(0, "cropping image");
   Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
   Image::Pointer resizedImage = croppedImage;
 
+  // resample the image in horizontal direction
   if(inputImage->GetDimension(0) != config.ReconstructionLines)
   {
     progressHandle(0, "resampling image");
@@ -272,12 +277,11 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image:
     MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
   }
 
+  // perform the beamforming
   BeamformingDMASFilter::Pointer Beamformer = BeamformingDMASFilter::New();
-
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
   Beamformer->SetProgressHandle(progressHandle);
-
   Beamformer->UpdateLargestPossibleRegion();
   return Beamformer->GetOutput();
 }

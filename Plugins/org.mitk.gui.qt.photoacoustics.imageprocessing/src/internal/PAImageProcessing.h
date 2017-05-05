@@ -120,18 +120,18 @@ class BmodeThread : public QThread
   Q_OBJECT
     void run() Q_DECL_OVERRIDE;
 
-signals:
-  void result(mitk::Image::Pointer);
+  signals:
+    void result(mitk::Image::Pointer);
 
-public:
-  void setConfig(bool useLogfilter, double resampleSpacing);
-  void setInputImage(mitk::Image::Pointer image);
+  public:
+    void setConfig(bool useLogfilter, double resampleSpacing);
+    void setInputImage(mitk::Image::Pointer image);
 
-protected:
-  mitk::Image::Pointer m_InputImage;
+  protected:
+    mitk::Image::Pointer m_InputImage;
 
-  bool m_UseLogfilter;
-  double m_ResampleSpacing;
+    bool m_UseLogfilter;
+    double m_ResampleSpacing;
 };
 
 #endif // PAImageProcessing_h

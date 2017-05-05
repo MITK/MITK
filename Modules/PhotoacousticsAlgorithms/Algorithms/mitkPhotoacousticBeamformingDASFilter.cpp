@@ -522,7 +522,7 @@ mitk::Image::Pointer mitk::BeamformingDASFilter::BandpassFilter(mitk::Image::Poi
 
   /*itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::Pointer toReal = itk::ComplexToModulusImageFilter<ComplexImageType, RealImageType>::New();
   toReal->SetInput(multiplyFilter->GetOutput());
-  return GrabItkImageMemory(toReal->GetOutput()); */ //DEBUG
+  return GrabItkImageMemory(addImageFilter->GetOutput());*/  //DEBUG
 
   typedef itk::FFT1DComplexConjugateToRealImageFilter< ComplexImageType, RealImageType > InverseFilterType;
   InverseFilterType::Pointer inverseFFTFilter = InverseFilterType::New();

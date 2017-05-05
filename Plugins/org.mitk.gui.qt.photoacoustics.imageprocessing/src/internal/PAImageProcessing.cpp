@@ -465,7 +465,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
     DMASconfig.BPHighPass = 0;
     DASconfig.BPHighPass = 0;
   }
-  if (DMASconfig.BPHighPass > DMASconfig.BPLowPass)
+  if (DMASconfig.BPHighPass > maxFrequency - DMASconfig.BPLowPass)
   {
     QMessageBox Msgbox;
     Msgbox.setText("HighPass higher than LowPass, disabled both.");

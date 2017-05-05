@@ -43,41 +43,64 @@ namespace
 {
   const char TIME_STAMP_FORMAT[] = "%Y-%m-%d %H:%M:%S";
 
-  enum class NameType { USER, HOST };
-  std::string getName(NameType type)
+#ifdef _WIN32
+  std::string convertToUtf8(const std::wstring& wstr)
   {
-    const char * envName = nullptr;
-    std::string name_string = std::string();
-    switch ( type ) {
+    const auto size = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
+    if (!size) {
+      return std::string();
+    }
+    std::string str(size, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), &str[0], size, NULL, NULL);
+    return str;
+  }
+#endif
+
+  enum class NameType { USER, HOST };
+
+#ifdef _WIN32
+  const wchar_t*
+#else
+  const char*
+#endif
+  getEnvName(NameType type)
+  {
+    switch (type) {
     case NameType::USER:
 #ifdef _WIN32
-      envName = "USERNAME";
+      return L"USERNAME";
 #else
-      envName = "USER";
+      return "USER";
 #endif
-      break;
     case NameType::HOST:
 #ifdef _WIN32
-      envName = "COMPUTERNAME";
+      return L"COMPUTERNAME";
 #else
-      envName = "HOSTNAME";
+      return "HOSTNAME";
 #endif
-      break;
+    default:
+      return nullptr;
     }
-    auto name = std::getenv(envName);
-    if (name) {
-      name_string = name;
-    }
-#ifndef _WIN32
-    else {
-      char* temp = new char[512];
-      if (gethostname(temp, 512) == 0) {
-        name_string = temp;
-      }
-      delete []temp;
-    }
+  }
+
+  std::string getName(NameType type)
+  {
+    auto envName = getEnvName(type);
+    auto name =
+#ifdef _WIN32
+      _wgetenv(envName);
+#else
+      std::getenv(envName);
 #endif
-    return name_string;
+    if (name){
+#ifdef _WIN32
+      return convertToUtf8(name);
+#else
+      return name;
+#endif
+    }
+    char temp[512] = {};
+    return gethostname(temp, sizeof(temp)) ? std::string() : temp;
   }
 }
 

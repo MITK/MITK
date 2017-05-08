@@ -1036,7 +1036,6 @@ namespace itk
                 m_Parameters.m_FiberModelList[k]->SetFiberDirection(dir);
                 DoubleDwiType::PixelType pix = m_CompartmentImages.at(k)->GetPixel(idx);
                 pix[g] += fiberWeight*m_SegmentVolume*m_Parameters.m_FiberModelList[k]->SimulateMeasurement(g);
-
                 m_CompartmentImages.at(k)->SetPixel(idx, pix);
               }
 
@@ -1091,11 +1090,12 @@ namespace itk
 
             // if volume fraction image is set use it, otherwise use scaling factor to obtain one full fiber voxel
             double fact2 = fact;
-            if ( m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage()!=nullptr
-                 && iAxVolume>0.0001 )
+            if ( m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage()!=nullptr && iAxVolume>0.0001 )
             {
               double val = InterpolateValue(point, m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());
-              if (val>=0) { fact2 = m_VoxelVolume*val/iAxVolume; }
+              if (val<0) 
+                val = 0;
+              fact2 = m_VoxelVolume*val/iAxVolume;
             }
 
             // adjust intra-axonal image value
@@ -1228,12 +1228,12 @@ namespace itk
         m_Parameters.m_NoiseModel->AddNoise(signal);
 
       for (unsigned int i=0; i<signal.Size(); i++)
-      {
+      {          
         if (signal[i]>0)
           signal[i] = floor(signal[i]+0.5);
         else
           signal[i] = ceil(signal[i]-0.5);
-
+          
         if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]>window)
           window = signal[i];
         if ( (!m_Parameters.m_SignalGen.IsBaselineIndex(i) || signal.Size()==1) && signal[i]<min)
@@ -1524,6 +1524,7 @@ namespace itk
           if (other<-0.001)
             MITK_ERROR << "Corrupted signal voxel detected. Fiber volume larger voxel volume!";
           other = 0;
+          interAxonalVolume = extraAxonalVolume;
         }
 
         // adjust non-fiber and intra-axonal signal
@@ -1538,12 +1539,19 @@ namespace itk
             else
               pix /= intraAxonalVolume;
           }
+          else
+          {
+            if (g>=0)
+              pix[g] = 0;
+            else
+              pix *= 0;
+          }
 
           if (m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage()!=nullptr)
           {
             double val = InterpolateValue(point, m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              continue;
+              weight = 0;
             else
               weight = val*m_VoxelVolume;
           }
@@ -1565,7 +1573,7 @@ namespace itk
           {
             double val = InterpolateValue(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              continue;
+              weight = 0;
             else
               weight = val*m_VoxelVolume;
 

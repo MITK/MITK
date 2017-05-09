@@ -1023,7 +1023,12 @@ void QmitkDataManagerView::ShowOnlySelectedNodes( bool )
 
   foreach(mitk::DataNode::Pointer node, allNodes)
   {
-    node->SetVisibility(selectedNodes.contains(node));
+    bool isHelperObject = false;
+    node->GetBoolProperty("helper object", isHelperObject);
+    if (!isHelperObject)
+    {
+      node->SetVisibility(selectedNodes.contains(node));
+    }
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

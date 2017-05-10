@@ -14,10 +14,28 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
-#include <QmitkC3Data.h>
+#include <QmitkC3xyData.h>
 
-void QmitkC3Data::ClearData()
+QmitkC3xyData::QmitkC3xyData()
 {
-  this->m_Frequency.clear();
-  this->m_Measurement.clear();
+}
+
+QmitkC3xyData::QmitkC3xyData(QMap<QVariant, QVariant> data) {
+	SetData(data);
+}
+
+
+void QmitkC3xyData::SetData(QMap<QVariant, QVariant> data)
+{
+	for (const auto& entry : data.toStdMap())
+	{
+		m_XData.push_back(entry.first);
+		m_YData.push_back(entry.second);
+	}
+}
+
+void QmitkC3xyData::ClearData()
+{
+  this->m_YData.clear();
+  this->m_XData.clear();
 }

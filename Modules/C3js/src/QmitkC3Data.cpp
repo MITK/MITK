@@ -16,25 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <QmitkC3Data.h>
 
-QmitkC3Data::QmitkC3Data()
+QmitkC3Data::QmitkC3Data() : m_DiagramTypeName(QVariant("line")),
+m_ShowSubchart(true)
 {
 }
 
-QmitkC3Data::QmitkC3Data(HistogramType::ConstPointer histogram)
-  : m_Histogram(histogram),
-  m_UseLineChart(false),
-  m_ShowSubchart(true)
+void QmitkC3Data::SetAppearance(QVariant diagramTypeName, bool showSubChart, bool usePercentageInPieChart)
 {
-}
-
-void QmitkC3Data::SetAppearance(bool UseLineChart = false, bool ShowSubChart = true)
-{
-  m_UseLineChart = UseLineChart;
-  m_ShowSubchart = ShowSubChart;
-}
-
-void QmitkC3Data::ClearData()
-{
-  this->m_YData.clear();
-  this->m_XData.clear();
+  m_DiagramTypeName = diagramTypeName;
+  m_ShowSubchart = showSubChart;
+  m_UsePercentageInPieChart = usePercentageInPieChart;
 }

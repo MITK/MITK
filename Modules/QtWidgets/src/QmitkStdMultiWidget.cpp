@@ -98,22 +98,14 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
   this->setLayout(QmitkStdMultiWidgetLayout);
 
   // create main splitter
-  m_MainSplit = new QSplitter(this);
+  m_MainSplit = new QSplitter;
   QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
 
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
-  m_MainSplit->addWidget(m_LayoutSplit);
-
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
-
   // creae Widget Container
-  mitkWidget1Container = new QWidget(m_SubSplit1);
-  mitkWidget2Container = new QWidget(m_SubSplit1);
-  mitkWidget3Container = new QWidget(m_SubSplit2);
-  mitkWidget4Container = new QWidget(m_SubSplit2);
+  mitkWidget1Container = new QWidget;
+  mitkWidget2Container = new QWidget;
+  mitkWidget3Container = new QWidget;
+  mitkWidget4Container = new QWidget;
 
   mitkWidget1Container->setContentsMargins(0, 0, 0, 0);
   mitkWidget2Container->setContentsMargins(0, 0, 0, 0);
@@ -152,13 +144,6 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
   mitkWidget2Container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   mitkWidget3Container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   mitkWidget4Container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-  // insert Widget Container into the splitters
-  m_SubSplit1->addWidget(mitkWidget1Container);
-  m_SubSplit1->addWidget(mitkWidget2Container);
-
-  m_SubSplit2->addWidget(mitkWidget3Container);
-  m_SubSplit2->addWidget(mitkWidget4Container);
 
   // Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, name + ".widget1", NULL, m_RenderingManager, renderingMode);
@@ -212,8 +197,7 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
   levelWindowWidget->setSizePolicy(sizePolicy);
   levelWindowWidget->setMaximumWidth(50);
 
-  // add LevelWindow Widget to mainSplitter
-  m_MainSplit->addWidget(levelWindowWidget);
+  changeLayoutToDefault();
 
   // show mainSplitt and add to Layout
   m_MainSplit->show();
@@ -447,150 +431,48 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
 {
   SMW_INFO << "changing layout to 2D images up... " << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // Set Layout to widget
-  this->setLayout(QmitkStdMultiWidgetLayout);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
+  m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
+  m_SubSplit1 = new QSplitter;
+  m_LayoutSplit->addWidget(m_SubSplit1);
+  m_LayoutSplit->addWidget(mitkWidget4Container);
 
-  // insert Widget Container into splitter top
+  // insert the 2D views into the top splitter
   m_SubSplit1->addWidget(mitkWidget1Container);
   m_SubSplit1->addWidget(mitkWidget2Container);
   m_SubSplit1->addWidget(mitkWidget3Container);
 
-  // set SplitterSize for splitter top
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  m_SubSplit1->setSizes(splitterSize);
+  m_SubSplit1->setSizes({ 1000, 1000, 1000 });
+  m_LayoutSplit->setSizes({ 400, 1000 });
 
-  // insert Widget Container into splitter bottom
-  m_SubSplit2->addWidget(mitkWidget4Container);
-
-  // set SplitterSize for splitter m_LayoutSplit
-  splitterSize.clear();
-  splitterSize.push_back(400);
-  splitterSize.push_back(1000);
-  m_LayoutSplit->setSizes(splitterSize);
-
-  // show mainSplitt
-  m_MainSplit->show();
-
-  // show Widget if hidden
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  // Change Layout Name
-  m_Layout = LAYOUT_2D_IMAGES_UP;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_2D_IMAGES_UP);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_2D_IMAGES_UP);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_2D_IMAGES_UP);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_2D_IMAGES_UP);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_2D_IMAGES_UP);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
 {
-  SMW_INFO << "changing layout to 2D images left... " << std::endl;
+  CleanViewsBeforeLayoutChange();
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
-
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(m_MainSplit);
+  m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(Qt::Vertical, m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
+  m_SubSplit1 = new QSplitter(Qt::Vertical);
+  m_LayoutSplit->addWidget(m_SubSplit1);
+  m_LayoutSplit->addWidget(mitkWidget4Container);
 
-  // insert Widget into the splitters
+  // insert the 2D views into the left splitter
   m_SubSplit1->addWidget(mitkWidget1Container);
   m_SubSplit1->addWidget(mitkWidget2Container);
   m_SubSplit1->addWidget(mitkWidget3Container);
 
-  // set splitterSize of SubSplit1
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  m_SubSplit1->setSizes(splitterSize);
+  m_SubSplit1->setSizes({ 1000, 1000, 1000 });
+  m_LayoutSplit->setSizes({ 400, 1000 });
 
-  m_SubSplit2->addWidget(mitkWidget4Container);
-
-  // set splitterSize of Layout Split
-  splitterSize.clear();
-  splitterSize.push_back(400);
-  splitterSize.push_back(1000);
-  m_LayoutSplit->setSizes(splitterSize);
-
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show Widget if hidden
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  // update Layout Name
-  m_Layout = LAYOUT_2D_IMAGES_LEFT;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_2D_IMAGES_LEFT);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_2D_IMAGES_LEFT);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_2D_IMAGES_LEFT);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_2D_IMAGES_LEFT);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_2D_IMAGES_LEFT);
 }
 
 void QmitkStdMultiWidget::SetDecorationProperties(std::string text, mitk::Color color, int widgetNumber)
@@ -655,111 +537,40 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
 {
   SMW_INFO << "changing layout to default... " << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
+  m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
+  m_SubSplit1 = new QSplitter;
+  m_SubSplit2 = new QSplitter;
+  m_LayoutSplit->addWidget(m_SubSplit1);
+  m_LayoutSplit->addWidget(m_SubSplit2);
 
-  // insert Widget container into the splitters
   m_SubSplit1->addWidget(mitkWidget1Container);
   m_SubSplit1->addWidget(mitkWidget2Container);
-
   m_SubSplit2->addWidget(mitkWidget3Container);
   m_SubSplit2->addWidget(mitkWidget4Container);
 
-  // set splitter Size
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
+  const QList<int> splitterSize{ 1000, 1000 };
   m_SubSplit1->setSizes(splitterSize);
   m_SubSplit2->setSizes(splitterSize);
   m_LayoutSplit->setSizes(splitterSize);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show Widget if hidden
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_DEFAULT;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_DEFAULT);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_DEFAULT);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_DEFAULT);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_DEFAULT);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_DEFAULT);
 }
 
 void QmitkStdMultiWidget::changeLayoutToBig3D()
 {
   SMW_INFO << "changing layout to big 3D ..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // add widget Splitter to main Splitter
   m_MainSplit->addWidget(mitkWidget4Container);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  mitkWidget1->hide();
-  mitkWidget2->hide();
-  mitkWidget3->hide();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_BIG_3D;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_BIG_3D);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_BIG_3D);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_BIG_3D);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_BIG_3D);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_BIG_3D);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget4->GetVtkRenderWindow());
 }
 
@@ -767,45 +578,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 {
   SMW_INFO << "changing layout to big Widget1 ..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // add widget Splitter to main Splitter
   m_MainSplit->addWidget(mitkWidget1Container);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  mitkWidget2->hide();
-  mitkWidget3->hide();
-  mitkWidget4->hide();
-
-  m_Layout = LAYOUT_WIDGET1;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_WIDGET1);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_WIDGET1);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_WIDGET1);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_WIDGET1);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
-
+  UpdateViewsAfterLayoutChange(LAYOUT_WIDGET1);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget1->GetVtkRenderWindow());
 }
 
@@ -813,44 +591,12 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
 {
   SMW_INFO << "changing layout to big Widget2 ..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // add widget Splitter to main Splitter
   m_MainSplit->addWidget(mitkWidget2Container);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  mitkWidget1->hide();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  mitkWidget3->hide();
-  mitkWidget4->hide();
-
-  m_Layout = LAYOUT_WIDGET2;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_WIDGET2);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_WIDGET2);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_WIDGET2);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_WIDGET2);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_WIDGET2);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget2->GetVtkRenderWindow());
 }
 
@@ -858,157 +604,49 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 {
   SMW_INFO << "changing layout to big Widget3 ..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // add widget Splitter to main Splitter
   m_MainSplit->addWidget(mitkWidget3Container);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  mitkWidget1->hide();
-  mitkWidget2->hide();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  mitkWidget4->hide();
-
-  m_Layout = LAYOUT_WIDGET3;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_WIDGET3);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_WIDGET3);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_WIDGET3);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_WIDGET3);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_WIDGET3);
   mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(mitkWidget3->GetVtkRenderWindow());
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 {
-  SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
+  SMW_INFO << "changing layout to Widget3 and 4 in one Column..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
+  m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // add Widgets to splitter
   m_LayoutSplit->addWidget(mitkWidget3Container);
   m_LayoutSplit->addWidget(mitkWidget4Container);
 
-  // set Splitter Size
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  m_LayoutSplit->setSizes(splitterSize);
+  m_LayoutSplit->setSizes({ 1000, 1000 });
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  mitkWidget1->hide();
-  mitkWidget2->hide();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_ROW_WIDGET_3_AND_4;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_ROW_WIDGET_3_AND_4);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_ROW_WIDGET_3_AND_4);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_ROW_WIDGET_3_AND_4);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_ROW_WIDGET_3_AND_4);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_ROW_WIDGET_3_AND_4);
 }
 
 void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
 {
-  SMW_INFO << "changing layout to Widget3 and 4 in one Column..." << std::endl;
+  SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(m_MainSplit);
+  m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // add Widgets to splitter
   m_LayoutSplit->addWidget(mitkWidget3Container);
   m_LayoutSplit->addWidget(mitkWidget4Container);
 
-  // set SplitterSize
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  m_LayoutSplit->setSizes(splitterSize);
+  m_LayoutSplit->setSizes({ 1000, 1000 });
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  mitkWidget1->hide();
-  mitkWidget2->hide();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_COLUMN_WIDGET_3_AND_4;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_3_AND_4);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_3_AND_4);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_3_AND_4);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_COLUMN_WIDGET_3_AND_4);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_COLUMN_WIDGET_3_AND_4);
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
@@ -1024,259 +662,128 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
 {
   SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
+  m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(Qt::Vertical, m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
+  m_SubSplit1 = new QSplitter;
+  m_SubSplit1->addWidget(mitkWidget3Container);
+  m_SubSplit1->addWidget(mitkWidget4Container);
 
-  // insert Widget into the splitters
-  m_SubSplit1->addWidget(mitkWidget2Container);
+  m_LayoutSplit->addWidget(mitkWidget2Container);
+  m_LayoutSplit->addWidget(m_SubSplit1);
 
-  m_SubSplit2->addWidget(mitkWidget3Container);
-  m_SubSplit2->addWidget(mitkWidget4Container);
+  m_SubSplit1->setSizes({ 1000, 1000 });
+  m_LayoutSplit->setSizes({ 500, 1000 });
 
-  // set Splitter Size
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  m_SubSplit2->setSizes(splitterSize);
-  splitterSize.clear();
-  splitterSize.push_back(500);
-  splitterSize.push_back(1000);
-  m_LayoutSplit->setSizes(splitterSize);
-
-  // show mainSplitt
-  m_MainSplit->show();
-
-  // show Widget if hidden
-  mitkWidget1->hide();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  if (mitkWidget3->isHidden())
-    mitkWidget3->show();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_SMALL_UPPER_WIDGET2_BIG3_AND4);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
 {
   SMW_INFO << "changing layout to 2 x 2D and 3D Widget" << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(m_MainSplit);
+  m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(Qt::Vertical, m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
-
-  // add Widgets to splitter
+  m_SubSplit1 = new QSplitter(Qt::Vertical);
   m_SubSplit1->addWidget(mitkWidget1Container);
   m_SubSplit1->addWidget(mitkWidget2Container);
-  m_SubSplit2->addWidget(mitkWidget4Container);
 
-  // set Splitter Size
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
-  m_SubSplit1->setSizes(splitterSize);
+  m_LayoutSplit->addWidget(m_SubSplit1);
+  m_LayoutSplit->addWidget(mitkWidget4Container);
+
+  const QList<int> splitterSize{ 1000, 1000 };
   m_LayoutSplit->setSizes(splitterSize);
+  m_SubSplit1->setSizes(splitterSize);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  mitkWidget3->hide();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_2X_2D_AND_3D_WIDGET;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_2X_2D_AND_3D_WIDGET);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_2X_2D_AND_3D_WIDGET);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_2X_2D_AND_3D_WIDGET);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_2X_2D_AND_3D_WIDGET);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_2X_2D_AND_3D_WIDGET);
 }
 
 void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 {
   SMW_INFO << "changing layout to 2D and 3D left, 2D right Widget" << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(m_MainSplit);
+  m_LayoutSplit = new QSplitter;
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(Qt::Vertical, m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
-
-  // add Widgets to splitter
+  m_SubSplit1 = new QSplitter(Qt::Vertical);
   m_SubSplit1->addWidget(mitkWidget1Container);
   m_SubSplit1->addWidget(mitkWidget4Container);
-  m_SubSplit2->addWidget(mitkWidget2Container);
 
-  // set Splitter Size
-  QList<int> splitterSize;
-  splitterSize.push_back(1000);
-  splitterSize.push_back(1000);
+  m_LayoutSplit->addWidget(m_SubSplit1);
+  m_LayoutSplit->addWidget(mitkWidget2Container);
+
+  const QList<int> splitterSize{ 1000, 1000 };
   m_SubSplit1->setSizes(splitterSize);
   m_LayoutSplit->setSizes(splitterSize);
 
-  // show mainSplitt and add to Layout
-  m_MainSplit->show();
-
-  // show/hide Widgets
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  if (mitkWidget2->isHidden())
-    mitkWidget2->show();
-  mitkWidget3->hide();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
-
-  m_Layout = LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET;
-
-  // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
-
-  // update Alle Widgets
-  this->UpdateAllWidgets();
+  UpdateViewsAfterLayoutChange(LAYOUT_2D_AND_3D_LEFT_2D_RIGHT_WIDGET);
 }
 
 void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
 {
   SMW_INFO << "changing layout to 2D up and 3D down" << std::endl;
 
-  // Hide all Menu Widgets
-  this->HideAllWidgetToolbars();
+  CleanViewsBeforeLayoutChange();
 
-  delete QmitkStdMultiWidgetLayout;
-
-  // create Main Layout
-  QmitkStdMultiWidgetLayout = new QHBoxLayout(this);
-
-  // Set Layout to widget
-  this->setLayout(QmitkStdMultiWidgetLayout);
-
-  // create main splitter
-  m_MainSplit = new QSplitter(this);
-  QmitkStdMultiWidgetLayout->addWidget(m_MainSplit);
-
-  // create m_LayoutSplit  and add to the mainSplit
-  m_LayoutSplit = new QSplitter(Qt::Vertical, m_MainSplit);
+  m_LayoutSplit = new QSplitter(Qt::Vertical);
   m_MainSplit->addWidget(m_LayoutSplit);
-
-  // add LevelWindow Widget to mainSplitter
   m_MainSplit->addWidget(levelWindowWidget);
 
-  // create m_SubSplit1 and m_SubSplit2
-  m_SubSplit1 = new QSplitter(m_LayoutSplit);
-  m_SubSplit2 = new QSplitter(m_LayoutSplit);
+  m_SubSplit1 = new QSplitter;
+  m_SubSplit2 = new QSplitter;
+  m_LayoutSplit->addWidget(m_SubSplit1);
+  m_LayoutSplit->addWidget(m_SubSplit2);
 
-  // insert Widget Container into splitter top
   m_SubSplit1->addWidget(mitkWidget1Container);
-
-  // set SplitterSize for splitter top
-  QList<int> splitterSize;
-  // insert Widget Container into splitter bottom
   m_SubSplit2->addWidget(mitkWidget4Container);
-  // set SplitterSize for splitter m_LayoutSplit
-  splitterSize.clear();
+
+  QList<int> splitterSize;
   splitterSize.push_back(700);
   splitterSize.push_back(700);
   m_LayoutSplit->setSizes(splitterSize);
 
-  // show mainSplitt
-  m_MainSplit->show();
+  UpdateViewsAfterLayoutChange(LAYOUT_2D_UP_AND_3D_DOWN);
+}
 
-  // show/hide Widgets
-  if (mitkWidget1->isHidden())
-    mitkWidget1->show();
-  mitkWidget2->hide();
-  mitkWidget3->hide();
-  if (mitkWidget4->isHidden())
-    mitkWidget4->show();
+void QmitkStdMultiWidget::CleanViewsBeforeLayoutChange()
+{
+  // Hide all Menu Widgets
+  this->HideAllWidgetToolbars();
 
-  m_Layout = LAYOUT_2D_UP_AND_3D_DOWN;
+  mitkWidget1Container->setParent(nullptr);
+  mitkWidget2Container->setParent(nullptr);
+  mitkWidget3Container->setParent(nullptr);
+  mitkWidget4Container->setParent(nullptr);
+  delete m_SubSplit1; m_SubSplit1 = nullptr;
+  delete m_SubSplit2; m_SubSplit2 = nullptr;
+  delete m_LayoutSplit; m_LayoutSplit = nullptr;
+}
+
+void QmitkStdMultiWidget::UpdateViewsAfterLayoutChange(const int newLayout)
+{
+  m_Layout = newLayout;
 
   // update Layout Design List
-  mitkWidget1->LayoutDesignListChanged(LAYOUT_2D_UP_AND_3D_DOWN);
-  mitkWidget2->LayoutDesignListChanged(LAYOUT_2D_UP_AND_3D_DOWN);
-  mitkWidget3->LayoutDesignListChanged(LAYOUT_2D_UP_AND_3D_DOWN);
-  mitkWidget4->LayoutDesignListChanged(LAYOUT_2D_UP_AND_3D_DOWN);
+  mitkWidget1->LayoutDesignListChanged(newLayout);
+  mitkWidget2->LayoutDesignListChanged(newLayout);
+  mitkWidget3->LayoutDesignListChanged(newLayout);
+  mitkWidget4->LayoutDesignListChanged(newLayout);
 
-  // update all Widgets
+  // update Alle Widgets
   this->UpdateAllWidgets();
+
+  mitk::RenderingManager::GetInstance()->SetRenderWindowFocus(
+    mitkWidget1->GetVtkRenderWindow());
 }
 
 void QmitkStdMultiWidget::SetDataStorage(mitk::DataStorage *ds)

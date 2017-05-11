@@ -425,5 +425,18 @@ protected:
    * gradient background colors with black.
    */
   void FillGradientBackgroundWithBlack();
+
+  /**
+  * @brief CleanViewsBeforeLayoutChange Clean everything mutable when there's
+  / a layout change, so save mitkWidget#Container from destruction by removing
+  * their parent and delete all QSplitters except m_MainSplit.
+  */
+  void CleanViewsBeforeLayoutChange();
+
+  /**
+  * @brief UpdateViewsAfterLayoutChange Internal helper method to call after
+  * all layout changes, mostly to notify all widgets about the change.
+  */
+  void UpdateViewsAfterLayoutChange(const int newLayout);
 };
 #endif /*QmitkStdMultiWidget_h*/

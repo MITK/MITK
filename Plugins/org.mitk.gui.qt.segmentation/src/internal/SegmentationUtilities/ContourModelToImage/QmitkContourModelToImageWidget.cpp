@@ -27,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QFutureWatcher>
 #include <qmessagebox.h>
 
-static const char* const HelpText = "Select a image and a contour(set)";
+const QString HelpText = QObject::tr("Select a image and a contour(set)");
 
 class QmitkContourModelToImageWidgetPrivate
 {

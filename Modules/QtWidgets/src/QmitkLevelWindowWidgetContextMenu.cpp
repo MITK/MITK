@@ -180,7 +180,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
 
     m_PresetSubmenu = new QMenu( this );
     Q_CHECK_PTR( m_PresetSubmenu );
-    m_PresetSubmenu->setTitle("Presets");
+    m_PresetSubmenu->setTitle(tr("Presets"));
     m_PresetAction = m_PresetSubmenu->addAction(tr("Preset Definition"), this, SLOT(addPreset()));
     m_PresetSubmenu->addSeparator();
     std::map<std::string, double> preset = m_LevelWindowPreset->getLevelPresets();
@@ -193,7 +193,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
     contextMenu->addSeparator();
 
     m_ImageSubmenu = new QMenu( this );
-    m_ImageSubmenu->setTitle("Images");
+    m_ImageSubmenu->setTitle(tr("Images"));
     //m_ImageSubmenu->setCheckable(true);
     m_ImageAction = m_ImageSubmenu->addAction(tr("Set Topmost Image"));
     m_ImageAction->setCheckable(true);

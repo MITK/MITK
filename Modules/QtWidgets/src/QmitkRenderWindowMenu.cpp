@@ -224,9 +224,9 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   connect(m_Widget1LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToWidget1(bool)));
   connect(m_Widget2LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToWidget2(bool)));
   connect(m_Widget3LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToWidget3(bool)));
-  connect(m_RowWidget3And4LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToRowWidget3And4(bool)));
+  connect(m_RowWidget3And4LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToColumnWidget3And4(bool)));
   connect(
-    m_ColumnWidget3And4LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToColumnWidget3And4(bool)));
+    m_ColumnWidget3And4LayoutAction, SIGNAL(triggered(bool)), this, SLOT(OnChangeLayoutToRowWidget3And4(bool)));
   connect(m_SmallUpperWidget2Big3and4LayoutAction,
           SIGNAL(triggered(bool)),
           this,

@@ -615,24 +615,6 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 
 void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 {
-  SMW_INFO << "changing layout to Widget3 and 4 in one Column..." << std::endl;
-
-  CleanViewsBeforeLayoutChange();
-
-  m_LayoutSplit = new QSplitter(Qt::Vertical);
-  m_MainSplit->addWidget(m_LayoutSplit);
-  m_MainSplit->addWidget(levelWindowWidget);
-
-  m_LayoutSplit->addWidget(mitkWidget3Container);
-  m_LayoutSplit->addWidget(mitkWidget4Container);
-
-  m_LayoutSplit->setSizes({ 1000, 1000 });
-
-  UpdateViewsAfterLayoutChange(LAYOUT_ROW_WIDGET_3_AND_4);
-}
-
-void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
-{
   SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
   CleanViewsBeforeLayoutChange();
@@ -647,6 +629,24 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
   m_LayoutSplit->setSizes({ 1000, 1000 });
 
   UpdateViewsAfterLayoutChange(LAYOUT_COLUMN_WIDGET_3_AND_4);
+}
+
+void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
+{
+  SMW_INFO << "changing layout to Widget3 and 4 in one Column..." << std::endl;
+
+  CleanViewsBeforeLayoutChange();
+
+  m_LayoutSplit = new QSplitter(Qt::Vertical);
+  m_MainSplit->addWidget(m_LayoutSplit);
+  m_MainSplit->addWidget(levelWindowWidget);
+
+  m_LayoutSplit->addWidget(mitkWidget3Container);
+  m_LayoutSplit->addWidget(mitkWidget4Container);
+
+  m_LayoutSplit->setSizes({ 1000, 1000 });
+
+  UpdateViewsAfterLayoutChange(LAYOUT_ROW_WIDGET_3_AND_4);
 }
 
 void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()

@@ -25,21 +25,52 @@ namespace berry
 // TODO ism temporary translate
 // it is hard to find point, where plugin name is read from file
 
-const QString QtShowViewAction::plugingTranslateNames[] = { 
-  QAction::tr("BasicImageProcessing"),   
-  QAction::tr("Clipping Plane"),
-  QAction::tr("Display"),
-  QAction::tr("Data Manager"),
-  QAction::tr("Image Navigator"),
-  QAction::tr("LiverSegmentation"),
-  QAction::tr("Measurement"),
-  QAction::tr("PointSet Interaction"),
-  QAction::tr("RegionGrowing Segmentation"),
-  QAction::tr("Segmentation"),
-  QAction::tr("Segmentation Utilities"),
-  QAction::tr("Statistics"),
-  QAction::tr("Vascular Structure Segmentation"),
-  QAction::tr("Volume Visualization")
+const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = { 
+  { "AICP-Registration", QAction::tr("AICP-Registration") },
+  { "Automatic Segmentation", QAction::tr("Automatic Segmentation")},
+  { "BasicImageProcessing", QAction::tr("BasicImageProcessing") },
+  { "Clipping Plane", QAction::tr("Clipping Plane") },
+  { "Display", QAction::tr("Display") },
+  { "Dicom Inspector", QAction::tr("Dicom Inspector") },
+  { "Data Manager", QAction::tr("Data Manager") },
+  { "EditSegmentation", QAction::tr("EditSegmentation") },
+  { "Emphysema Diagnostics", QAction::tr("Emphysema Diagnostics") },
+  { "Geometry Tools", QAction::tr("Geometry Tools") },
+  { "Hepar Couinaud Segmentation", QAction::tr("Hepar Couinaud Segmentation") },
+  { "Image Denoising", QAction::tr("Image Denoising") },
+  { "Image Navigator", QAction::tr("Image Navigator") },
+  { "Image Resize", QAction::tr("Image Resize") },
+  { "Image Local Statistics", QAction::tr("Image Local Statistics") },
+  { "Incremental segmentation view", QAction::tr("Incremental segmentation view") },
+  { "LiverResectionView", QAction::tr("LiverResectionView") },
+  { "LiverSegmentation", QAction::tr("LiverSegmentation") },
+  { "Lung Trauma", QAction::tr("Lung Trauma") },
+  { "Measurement", QAction::tr("Measurement") },
+  { "Object Browser", QAction::tr("Object Browser") },
+  { "Overlay Manager", QAction::tr("Overlay Manager") },
+  { "RegionGrowing Segmentation", QAction::tr("RegionGrowing Segmentation") },
+  { "PointSet Interaction", QAction::tr("PointSet Interaction") },
+  { "PointBasedRegistration", QAction::tr("PointBasedRegistration") },
+  { "PointSet Interaction Ext", QAction::tr("PointSet Interaction Ext") },
+  { "Point Set Interaction Multispectrum", QAction::tr("Point Set Interaction Multispectrum") },
+  { "Properties", QAction::tr("Properties") },
+  { "Remeshing", QAction::tr("Remeshing") },
+  { "RigidRegistration", QAction::tr("RigidRegistration") },
+  { "RT Dose Visualization", QAction::tr("RT Dose Visualization") },
+  { "Segmentation", QAction::tr("Segmentation") },
+  { "Segmentation Metrics", QAction::tr("Segmentation Metrics") },
+  { "Segmentation Comparator", QAction::tr("Segmentation Comparator") },
+  { "Segmentation Lungs", QAction::tr("Segmentation Lungs") },
+  { "Segmentation Utilities", QAction::tr("Segmentation Utilities") },
+  { "Statistics", QAction::tr("Statistics") },
+  { "ThoraxView", QAction::tr("ThoraxView") },
+  { "Tube Graph", QAction::tr("Tube Graph") },
+  { "TumorSegmentation", QAction::tr("TumorSegmentation") },
+  { "Vascular Structure Segmentation", QAction::tr("Vascular Structure Segmentation") },
+  { "Vascular Segmentation", QAction::tr("Vascular Segmentation") },
+  { "Vessels Enhancing", QAction::tr("Vessels Enhancing") },
+  { "View Navigator", QAction::tr("View Navigator") },
+  { "Volume Visualization", QAction::tr("Volume Visualization") },
 };
 
 
@@ -47,25 +78,18 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
     IViewDescriptor::Pointer desc) :
   QAction(nullptr)
 {
-  plugingSrcNames << "BasicImageProcessing" << "Clipping Plane" << "Display" << "Data Manager" << "Image Navigator" << "LiverSegmentation" <<
-    "Measurement" << "PointSet Interaction" << "RegionGrowing Segmentation" << "Segmentation" << "Segmentation Utilities" <<
-    "Statistics" << "Vascular Structure Segmentation" << "Volume Visualization";
-
   this->setParent(static_cast<QWidget*>(window->GetShell()->GetControl()));
 
-  bool findTranslate = false;
-  for (int i=0; i<plugingSrcNames.size(); i++) {
-    if (plugingSrcNames[i].compare(QString(desc->GetLabel().toUtf8().constData())) == 0) {
-      this->setText(plugingTranslateNames[i]);
-      this->setToolTip(plugingTranslateNames[i]);    
-      findTranslate = true;
-      break;
-    }
+  QString label = desc->GetLabel();
+  if (plugingTranslateNames.contains(label)) {
+    this->setText(plugingTranslateNames[label]);
+  } else {
+    Q_ASSERT_X(false, "QtShowViewAction Constructor", ("No name provided for plugin: " + label).toStdString().c_str());
+    this->setText("NO_PLUGIN_NAME");
   }
-  if (!findTranslate) {
-    this->setToolTip(QString(desc->GetLabel().toUtf8().constData()));
-    this->setText(QString(desc->GetLabel().toUtf8().constData()));
-  }
+
+  this->setToolTip(QString(desc->GetLabel().toUtf8().constData()));
+
   this->setIconVisibleInMenu(true);
 
   QIcon icon = desc->GetImageDescriptor();

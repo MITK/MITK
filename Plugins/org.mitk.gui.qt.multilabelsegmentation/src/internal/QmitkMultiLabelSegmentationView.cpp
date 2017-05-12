@@ -672,7 +672,6 @@ void QmitkMultiLabelSegmentationView::OnLockExteriorToggled(bool checked)
   workingImage->GetLabel(0)->SetLocked(checked);
 }
 
-void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode*)
 {
   /*
   bool isHelperObject(false);
@@ -691,7 +690,6 @@ void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode*)
   */
 }
 
-void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
 {
   bool isHelperObject(false);
   node->GetBoolProperty("helper object", isHelperObject);
@@ -801,6 +799,45 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
       {
         return;
       }
+void QmitkMultiLabelSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
+{
+  if (m_AutoSelectionEnabled)
+  {
+    // automatically set the reference node and the working node of the multi label plugin
+    if (1 == nodes.size())
+    {
+      mitk::DataNode::Pointer selectedNode = nodes.at(0);
+      if (selectedNode.IsNull())
+      {
+        return;
+      }
+
+      // check selected node
+      mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(selectedNode->GetData());
+      if (labelSetImage.IsNotNull())
+      {
+        // reset the node selector
+        m_Controls.m_cbReferenceNodeSelector->setCurrentIndex(-1);
+        m_Controls.m_cbWorkingNodeSelector->setCurrentIndex(-1);
+        // selected a label set image (a segmentation ( working node)
+        m_Controls.m_cbWorkingNodeSelector->SetSelectedNode(selectedNode);
+        return;
+      }
+
+      mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
+      if (selectedImage.IsNotNull())
+      {
+        // reset the node selector
+        m_Controls.m_cbWorkingNodeSelector->setCurrentIndex(-1);
+        m_Controls.m_cbReferenceNodeSelector->setCurrentIndex(-1);
+        // selected an image (a reference node)
+        m_Controls.m_cbReferenceNodeSelector->SetSelectedNode(selectedNode);
+        return;
+      }
+    }
+  }
+}
+
 
       mitk::DataStorage::SetOfObjects::ConstPointer patientNodes = GetDataStorage()->GetSubset(m_ReferencePredicate);
       for (mitk::DataStorage::SetOfObjects::const_iterator iter = patientNodes->begin(); iter != patientNodes->end(); ++iter)
@@ -847,6 +884,57 @@ void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
     m_Controls.m_SliceBasedInterpolatorWidget->m_Controls.m_btStart->setChecked(false);
     m_Controls.m_swInterpolation->setCurrentIndex(2);
     m_Controls.m_swInterpolation->hide();
+  }
+}
+
+void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode*)
+{
+  /*
+  bool isHelperObject(false);
+  node->GetBoolProperty("helper object", isHelperObject);
+  if (isHelperObject) return;
+
+  if (m_ReferenceNode.IsNotNull() && dynamic_cast<mitk::LabelSetImage*>(node->GetData()))
+  {
+    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
+
+    if (workingImage->GetNumberOfLabels() > 2)
+      m_Controls.m_LabelSetWidget->show();
+    else
+      m_Controls.m_LabelSetWidget->hide();
+  }
+  */
+}
+
+void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
+{
+  bool isHelperObject(false);
+  node->GetBoolProperty("helper object", isHelperObject);
+  if (isHelperObject) return;
+
+  if (m_ReferenceNode.IsNotNull() && dynamic_cast<mitk::LabelSetImage*>(node->GetData()))
+  {
+    // remove all possible contour markers of the segmentation
+    mitk::DataStorage::SetOfObjects::ConstPointer allContourMarkers =
+        this->GetDataStorage()->GetDerivations(node, mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true)));
+
+    ctkPluginContext* context = mitk::PluginActivator::getContext();
+    ctkServiceReference ppmRef = context->getServiceReference<mitk::PlanePositionManagerService>();
+    mitk::PlanePositionManagerService* service = context->getService<mitk::PlanePositionManagerService>(ppmRef);
+
+    for (mitk::DataStorage::SetOfObjects::ConstIterator it = allContourMarkers->Begin(); it != allContourMarkers->End(); ++it)
+    {
+      std::string nodeName = node->GetName();
+      unsigned int t = nodeName.find_last_of(" ");
+      unsigned int id = atof(nodeName.substr(t+1).c_str())-1;
+
+      service->RemovePlanePosition(id);
+
+      this->GetDataStorage()->Remove(it->Value());
+    }
+
+    context->ungetService(ppmRef);
+    service = NULL;
   }
 }
 

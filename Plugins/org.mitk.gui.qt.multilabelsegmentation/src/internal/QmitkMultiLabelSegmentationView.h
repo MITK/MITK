@@ -110,8 +110,17 @@ protected slots:
 
 protected:
 
-  // invoked when the preferences were changed
+  // reimplemented from QmitkAbstractView
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+
+  // reimplemented from QmitkAbstractView
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+
+  // reimplemented from QmitkAbstractView
+  void NodeAdded(const mitk::DataNode* node) override;
+
+  // reimplemented from QmitkAbstractView
+  void NodeRemoved(const mitk::DataNode* node) override;
 
   void OnEstablishLabelSetConnection();
   void OnLooseLabelSetConnection();
@@ -132,12 +141,6 @@ protected:
 
   /// \brief Checks if two images have the same size and geometry
   bool CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const;
-
-  /// \brief Reimplemented from QmitkAbstractView
-  virtual void NodeAdded(const mitk::DataNode* node);
-
-  /// \brief Reimplemented from QmitkAbstractView
-  virtual void NodeRemoved(const mitk::DataNode* node);
 
   QString GetLastFileOpenPath();
 

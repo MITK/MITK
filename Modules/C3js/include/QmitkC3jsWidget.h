@@ -47,7 +47,6 @@ public:
   QString GetYAxisLabel() const;
 
   void SetDiagramType(DiagramType type);
-  DiagramType GetDiagramType() const;
 
   void ShowDiagram(bool showSubChart=false);
 

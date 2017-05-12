@@ -22,6 +22,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkC3Data.h>
 #include <QmitkC3xyData.h>
 
+#include <iostream>
+
 class QmitkC3jsWidget::Impl final
 {
 public:
@@ -35,6 +37,7 @@ public:
 
   void AddData2D(const QMap<QVariant, QVariant>& data2D) { m_data2D.push_back(data2D); }
   QList<QMap<QVariant, QVariant> > GetData2D() const { return m_data2D; }
+  void ClearData2D() { m_data2D.clear(); }
 
   void AddData1D(const QList<QVariant>& data1D) { m_data1D.push_back(data1D); }
   QList<QList<QVariant> > GetData1D() const { return m_data1D; }
@@ -51,8 +54,7 @@ public:
   QString GetYAxisLabel() const { return m_yAxisLabel; };
   QVariant GetYAxisLabelAsQVariant() const;
 
-  void SetDiagramType(QmitkC3jsWidget::DiagramType diagramType) { m_diagramType = diagramType; }
-  QmitkC3jsWidget::DiagramType GetDiagramType() const { return m_diagramType; }
+  void SetDiagramType(QmitkC3jsWidget::DiagramType diagramType) { GetC3Data()->SetDiagramType(m_diagramTypeToName.value(diagramType)); }
   QVariant GetDiagramTypeAsQVariant() const;
 
   void ClearJavaScriptChart();
@@ -73,8 +75,6 @@ private:
   QString m_xAxisLabel;
   QString m_yAxisLabel;
 
-  QmitkC3jsWidget::DiagramType m_diagramType;
-
   QmitkC3Data m_c3Data;
   QVector<QmitkC3xyData*> m_c3xyData;
   QMap<QmitkC3jsWidget::DiagramType, QVariant> m_diagramTypeToName;
@@ -83,7 +83,7 @@ private:
 QmitkC3jsWidget::Impl::Impl(QWidget* parent)
   : m_WebChannel(new QWebChannel(parent)),
   m_WebEngineView(new QWebEngineView(parent)),
-  m_Parent(parent), m_diagramType(DiagramType::line)
+  m_Parent(parent)
 {
   //disable context menu for QWebEngineView
   m_WebEngineView->setContextMenuPolicy(Qt::NoContextMenu);
@@ -149,11 +149,6 @@ QVariant QmitkC3jsWidget::Impl::GetXAxisLabelAsQVariant() const
 QVariant QmitkC3jsWidget::Impl::GetYAxisLabelAsQVariant() const
 {
 	return m_yAxisLabel;
-}
-
-QVariant QmitkC3jsWidget::Impl::GetDiagramTypeAsQVariant() const
-{
-	return m_diagramTypeToName.value(m_diagramType);
 }
 
 void QmitkC3jsWidget::Impl::ClearJavaScriptChart()
@@ -250,20 +245,14 @@ void QmitkC3jsWidget::SetDiagramType(DiagramType type)
 	m_Impl->SetDiagramType(type);
 }
 
-QmitkC3jsWidget::DiagramType QmitkC3jsWidget::GetDiagramType() const
-{
-	return m_Impl->GetDiagramType();
-}
-
 void QmitkC3jsWidget::ShowDiagram(bool showSubChart)
 {
-	//Clear old data before loading new data. (Check if Statistics Plugin)
-	//this->m_Impl->GetC3Data()->ClearData();
+
 	this->m_Impl->GetC3Data()->SetXAxisLabel(m_Impl->GetXAxisLabelAsQVariant());
 	this->m_Impl->GetC3Data()->SetYAxisLabel(m_Impl->GetYAxisLabelAsQVariant());
 	this->m_Impl->GetC3Data()->SetDataLabels(m_Impl->GetDataLabelsAsQVariant());
 
-	this->m_Impl->GetC3Data()->SetAppearance(m_Impl->GetDiagramTypeAsQVariant(), showSubChart, m_Impl->GetDiagramType()== DiagramType::pie);
+	this->m_Impl->GetC3Data()->SetAppearance(m_Impl->GetC3Data()->GetDiagramType(), showSubChart, m_Impl->GetC3Data()->GetDiagramType()== QVariant("pie"));
 
 	auto data2D = m_Impl->GetData2D();
 
@@ -276,6 +265,8 @@ void QmitkC3jsWidget::ShowDiagram(bool showSubChart)
 
 void QmitkC3jsWidget::ClearDiagram()
 {
+	m_Impl->ClearData2D();
+	m_Impl->GetC3xyData()->clear();
 	m_Impl->ClearJavaScriptChart();
 }
 

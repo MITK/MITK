@@ -18,6 +18,10 @@ window.onload = function()
 {
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
+
+	chartData.SignalDiagramTypeChanged.connect(function(chartType) {
+        chartType.m_DiagramTypeName = chartType
+    });
 	var count = 0;
 	for(var propertyName in channel.objects) {
 		if (propertyName != 'chartData'){
@@ -65,7 +69,6 @@ window.onresize = function () {
 function ReloadChart(showSubchart)
 { 
     chartData.m_ShowSubchart = showSubchart;
-	GenerateChart(chartData.m_DiagramTypeName, chartData.m_ShowSubchart, chartData.m_UsePercentageInPieChart, chartData.m_xAxisLabel, chartData.m_yAxisLabel)
     
     setupChart(chartData);
 }
@@ -73,6 +76,7 @@ function ReloadChart(showSubchart)
 function setupChart(chartData)
 {
   window.onresize();
+
   GenerateChart(chartData.m_DiagramTypeName, chartData.m_ShowSubchart, chartData.m_UsePercentageInPieChart, chartData.m_xAxisLabel, chartData.m_yAxisLabel)
     
   chart.unload(); //unload data before loading new data

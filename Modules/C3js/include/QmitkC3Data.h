@@ -50,7 +50,7 @@ public:
   Q_INVOKABLE void SetYAxisLabel(QVariant label) { m_yAxisLabel = label; };
 
   Q_INVOKABLE QVariant GetDiagramType() { return m_DiagramTypeName; };
-  Q_INVOKABLE void SetDiagramType(QVariant diagramTypeName) { m_DiagramTypeName = diagramTypeName; };
+  Q_INVOKABLE void SetDiagramType(QVariant diagramTypeName) { m_DiagramTypeName = diagramTypeName; emit SignalDiagramTypeChanged(m_DiagramTypeName); };
 
   Q_INVOKABLE QVariant GetShowSubchart() { return m_ShowSubchart; };
   Q_INVOKABLE void SetShowSubchart(QVariant showSubchart) { m_ShowSubchart = showSubchart; };
@@ -62,7 +62,7 @@ signals:
   void SignalDataLabelsChanged(const QList<QVariant> dataLabels);
   void SignalYAxisLabelChanged(const QVariant label);
   void SignalXAxisLabelChanged(const QVariant label);
-  void SignalDiagramTypeChanged(const QVariant useLineChart);
+  void SignalDiagramTypeChanged(const QVariant chartType);
   void SignalShowSubchartChanged(const QVariant showSubchart);
   void SignalUsePercentageInPieChartChanged(const QVariant usePercentageInPieChart);
 

@@ -503,18 +503,18 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
   workingNode->SetData(workingImage);
   workingNode->SetName(newName.toStdString());
-  workingImage->GetExteriorLabel()->SetProperty("name.parent",
-                                                mitk::StringProperty::New(referenceNode->GetName().c_str()));
+
+  workingImage->GetExteriorLabel()->SetProperty("name.parent", mitk::StringProperty::New(referenceNode->GetName().c_str()));
   workingImage->GetExteriorLabel()->SetProperty("name.image", mitk::StringProperty::New(newName.toStdString().c_str()));
-  // Set DICOM SEG properties for segmentation sesion
+  // Set DICOM SEG properties for segmentation session
   mitk::PropertyList::Pointer dicomSegPropertyList =
     mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(referenceImage->GetPropertyList());
   workingImage->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
 
-  if (!this->GetDataStorage()->Exists(workingNode))
-    this->GetDataStorage()->Add(workingNode, referenceNode);
-
-  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+  if (!GetDataStorage()->Exists(workingNode))
+  {
+    GetDataStorage()->Add(workingNode, referenceNode);
+  }
 
   OnNewLabel();
 }
@@ -539,26 +539,31 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
     return;
   }
 
-  QmitkNewSegmentationDialog *dialog = new QmitkNewSegmentationDialog(m_Parent);
+  QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent);
   dialog->SetSuggestionList(mitk::OrganNamesHandling::GetDefaultOrganColorString());
   dialog->setWindowTitle("New Label");
 
   int dialogReturnValue = dialog->exec();
-
   if (dialogReturnValue == QDialog::Rejected)
+  {
     return;
+  }
 
   QString segName = dialog->GetSegmentationName();
   if (segName.isEmpty())
+  {
     segName = "Unnamed";
+  }
+
   workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
   // Set specific DICOM SEG properties for the label
   mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(
     workingImage->GetActiveLabel(workingImage->GetActiveLayer()));
 
   UpdateControls();
-
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(workingNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
 }
 
 void QmitkMultiLabelSegmentationView::OnShowLabelTable(bool value)
@@ -638,7 +643,7 @@ void QmitkMultiLabelSegmentationView::OnDeleteLayer()
     workingImage->RemoveLayer();
     this->WaitCursorOff();
   }
-  catch (mitk::Exception &e)
+  catch (mitk::Exception& e)
   {
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
@@ -685,10 +690,7 @@ void QmitkMultiLabelSegmentationView::OnAddLayer()
     return;
   }
 
-  // Update controls and label set list for direct response
-  m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
   OnNewLabel();
-  UpdateControls();
 }
 
 void QmitkMultiLabelSegmentationView::OnDeactivateActiveTool()

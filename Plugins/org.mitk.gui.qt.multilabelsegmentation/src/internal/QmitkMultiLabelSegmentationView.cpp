@@ -557,18 +557,56 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged(const mitk::Da
   m_ReferenceNode = const_cast<mitk::DataNode*>(node);
   m_ToolManager->SetReferenceData(m_ReferenceNode);
 
-  //check match of segmentation and reference image geometries
-  if (node && m_WorkingNode.IsNotNull())
+  if (m_ReferenceNode.IsNotNull())
   {
-    mitk::Image* workingImage = dynamic_cast<mitk::Image*>(m_WorkingNode->GetData());
-    assert(workingImage);
-
-    mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(node->GetData());
-    assert(referenceImage);
-
-    if (!this->CheckForSameGeometry(referenceImage, workingImage))
+    if (m_AutoSelectionEnabled)
     {
-      return;
+      // if an image is selected find a possible working / segmentation image
+      mitk::DataStorage::SetOfObjects::ConstPointer derivations = this->GetDataStorage()->GetDerivations(m_ReferenceNode, m_SegmentationPredicate);
+      if (derivations->Size() != 0)
+      {
+        // use the first segmentation child node
+        m_WorkingNode = derivations->ElementAt(0);
+        m_ToolManager->SetWorkingData(m_WorkingNode);
+
+        m_Controls.m_cbWorkingNodeSelector->blockSignals(true);
+        m_Controls.m_cbWorkingNodeSelector->SetSelectedNode(m_WorkingNode);
+        m_Controls.m_cbWorkingNodeSelector->blockSignals(false);
+      }
+      else if (derivations->size() == 0)
+      {
+        m_Controls.m_cbWorkingNodeSelector->setCurrentIndex(-1);
+      }
+
+      // hide all image and segmentation nodes to later show only the automatically selected ones
+      mitk::DataStorage::SetOfObjects::ConstPointer patientNodes = GetDataStorage()->GetSubset(m_ReferencePredicate);
+      for (mitk::DataStorage::SetOfObjects::const_iterator iter = patientNodes->begin(); iter != patientNodes->end(); ++iter)
+      {
+        (*iter)->SetVisibility(false);
+      }
+
+      mitk::DataStorage::SetOfObjects::ConstPointer segmentationNodes = GetDataStorage()->GetSubset(m_SegmentationPredicate);
+      for (mitk::DataStorage::SetOfObjects::const_iterator iter = segmentationNodes->begin(); iter != segmentationNodes->end(); ++iter)
+      {
+        (*iter)->SetVisibility(false);
+      }
+    }
+    m_ReferenceNode->SetVisibility(true);
+
+    // check match of segmentation and reference image geometries
+    if (m_WorkingNode.IsNotNull())
+    {
+      mitk::Image* workingImage = dynamic_cast<mitk::Image*>(m_WorkingNode->GetData());
+      assert(workingImage);
+
+      mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(node->GetData());
+      assert(referenceImage);
+
+      if (!this->CheckForSameGeometry(referenceImage, workingImage))
+      {
+        return;
+      }
+      m_WorkingNode->SetVisibility(true);
     }
   }
 
@@ -580,7 +618,7 @@ void QmitkMultiLabelSegmentationView::OnReferenceSelectionChanged(const mitk::Da
   }
 }
 
-void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode *node)
+void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk::DataNode* node)
 {
   m_ToolManager->ActivateTool(-1);
 
@@ -588,8 +626,6 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
   {
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
     assert(workingImage);
-
-    //Loose LabelSetConnections
     OnLooseLabelSetConnection();
   }
 
@@ -599,23 +635,42 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
   {
     mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
     assert(workingImage);
-
-    //Establish LabelSetConnection
     OnEstablishLabelSetConnection();
 
     if (m_AutoSelectionEnabled)
     {
-      // if a segmentation is selected find a possible reference image:
+      // if a segmentation is selected find a possible reference image
       mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(m_WorkingNode, m_ReferencePredicate);
-      mitk::DataNode::Pointer referenceNode;
       if (sources->Size() != 0)
       {
         m_ReferenceNode = sources->ElementAt(0);
         m_ToolManager->SetReferenceData(m_ReferenceNode);
+
+        m_Controls.m_cbReferenceNodeSelector->blockSignals(true);
+        m_Controls.m_cbReferenceNodeSelector->SetSelectedNode(m_ReferenceNode);
+        m_Controls.m_cbReferenceNodeSelector->blockSignals(false);
+      }
+      else if(sources->size() == 0)
+      {
+        m_Controls.m_cbReferenceNodeSelector->setCurrentIndex(-1);
+      }
+
+      // hide all image and segmentation nodes to later show only the automatically selected ones
+      mitk::DataStorage::SetOfObjects::ConstPointer patientNodes = GetDataStorage()->GetSubset(m_ReferencePredicate);
+      for (mitk::DataStorage::SetOfObjects::const_iterator iter = patientNodes->begin(); iter != patientNodes->end(); ++iter)
+      {
+        (*iter)->SetVisibility(false);
+      }
+
+      mitk::DataStorage::SetOfObjects::ConstPointer segmentationNodes = GetDataStorage()->GetSubset(m_SegmentationPredicate);
+      for (mitk::DataStorage::SetOfObjects::const_iterator iter = segmentationNodes->begin(); iter != segmentationNodes->end(); ++iter)
+      {
+        (*iter)->SetVisibility(false);
       }
     }
+    m_WorkingNode->SetVisibility(true);
 
-    //check match of segmentation and reference image geometries
+    // check match of segmentation and reference image geometries
     if (m_ReferenceNode.IsNotNull())
     {
       mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(m_ReferenceNode->GetData());
@@ -628,6 +683,9 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(const mitk:
       {
         return;
       }
+      m_ReferenceNode->SetVisibility(true);
+    }
+  }
 
   UpdateControls();
   if (m_WorkingNode.IsNotNull())
@@ -680,9 +738,8 @@ void QmitkMultiLabelSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::
       mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<mitk::LabelSetImage*>(selectedNode->GetData());
       if (labelSetImage.IsNotNull())
       {
-        // reset the node selector
+        // reset the image / reference node selector in case the current selected segmentation has no image parent
         m_Controls.m_cbReferenceNodeSelector->setCurrentIndex(-1);
-        m_Controls.m_cbWorkingNodeSelector->setCurrentIndex(-1);
         // selected a label set image (a segmentation ( working node)
         m_Controls.m_cbWorkingNodeSelector->SetSelectedNode(selectedNode);
         return;
@@ -691,9 +748,8 @@ void QmitkMultiLabelSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::
       mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
       if (selectedImage.IsNotNull())
       {
-        // reset the node selector
+        // reset the segmentation / working node selector in case the current selected image has no segmentation child
         m_Controls.m_cbWorkingNodeSelector->setCurrentIndex(-1);
-        m_Controls.m_cbReferenceNodeSelector->setCurrentIndex(-1);
         // selected an image (a reference node)
         m_Controls.m_cbReferenceNodeSelector->SetSelectedNode(selectedNode);
         return;

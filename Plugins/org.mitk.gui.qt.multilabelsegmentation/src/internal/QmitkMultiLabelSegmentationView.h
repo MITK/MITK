@@ -61,15 +61,6 @@ public:
 
 protected slots:
 
-  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
-  void OnReferenceSelectionChanged(const mitk::DataNode* node);
-
-  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
-  void OnSegmentationSelectionChanged(const mitk::DataNode *node);
-
-  /// \brief reaction to ...
-  void OnInterpolationSelectionChanged(int);
-
   /// \brief reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
 
@@ -108,6 +99,15 @@ protected slots:
   // reaction to the button "Lock exterior"
   void OnLockExteriorToggled(bool);
 
+  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
+  void OnReferenceSelectionChanged(const mitk::DataNode* node);
+
+  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
+  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
+
+  /// \brief reaction to ...
+  void OnInterpolationSelectionChanged(int);
+
 protected:
 
   // reimplemented from QmitkAbstractView
@@ -123,6 +123,7 @@ protected:
   void NodeRemoved(const mitk::DataNode* node) override;
 
   void OnEstablishLabelSetConnection();
+
   void OnLooseLabelSetConnection();
 
   void SetFocus();

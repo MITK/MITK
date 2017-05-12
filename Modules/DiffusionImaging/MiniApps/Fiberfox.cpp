@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
       mitk::Image::Pointer image = mitk::Image::New();
       image->InitializeByItk(volumeFractions.at(k).GetPointer());
       image->SetVolume(volumeFractions.at(k)->GetBufferPointer());
-      mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<string>(k)+".nrrd");
+      mitk::IOUtil::Save(image, outName+"_Compartment"+boost::lexical_cast<string>(k+1)+".nrrd");
     }
 
     if (tractsToDwiFilter->GetPhaseImage().IsNotNull())

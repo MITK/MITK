@@ -1094,7 +1094,7 @@ namespace itk
             {
               double val = InterpolateValue(point, m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());
               if (val<0) 
-                val = 0;
+                mitkThrow() << "Volume fraction image (index 1) contains values less than zero!";
               fact2 = m_VoxelVolume*val/iAxVolume;
             }
 
@@ -1483,7 +1483,7 @@ namespace itk
           {
             double val = InterpolateValue(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              continue;
+                mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
             else
               weight = val;
           }
@@ -1551,7 +1551,7 @@ namespace itk
           {
             double val = InterpolateValue(point, m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              weight = 0;
+              mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
             else
               weight = val*m_VoxelVolume;
           }
@@ -1573,7 +1573,7 @@ namespace itk
           {
             double val = InterpolateValue(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              weight = 0;
+              mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
             else
               weight = val*m_VoxelVolume;
 

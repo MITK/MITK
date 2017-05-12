@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNumericTypes.h>
 #include <mitkTestingMacros.h>
 
-#include <vnl/vnl_vector_fixed.txx>
+#include <vnl/vnl_vector_fixed.hxx>
 
 int mitkVectorTest(int /*argc*/, char * /*argv*/ [])
 {

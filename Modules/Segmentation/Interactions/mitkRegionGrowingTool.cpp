@@ -455,9 +455,11 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
     // Extract contour
     if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
     {
+      float isoOffset = 0.33;
+
       mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
       contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - 0.5);
+      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
       contourExtractor->Update();
       ContourModel::Pointer resultContour = ContourModel::New();
       resultContour = contourExtractor->GetOutput();
@@ -534,9 +536,11 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
     // Update the contour
     if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
     {
+      float isoOffset = 0.33;
+
       mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
       contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - 0.5);
+      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
       contourExtractor->Update();
       ContourModel::Pointer resultContour = ContourModel::New();
       resultContour = contourExtractor->GetOutput();

@@ -50,7 +50,7 @@ void mitk::IGTLTransformDeviceSource::GenerateData()
   {
     assert(msgIn);
 
-    MITK_INFO << "Received valid image";
+    //MITK_INFO << "Received valid image";
 
     msgOut->SetMessage(msgIn);
     msgOut->SetName(msgIn->GetDeviceName());

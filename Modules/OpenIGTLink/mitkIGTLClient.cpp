@@ -81,7 +81,7 @@ bool mitk::IGTLClient::OpenConnection()
 
 void mitk::IGTLClient::Receive()
 {
-  MITK_INFO << "Trying to receive message";
+  //MITK_INFO << "Trying to receive message";
   //try to receive a message, if the socket is not present anymore stop the
   //communication
   unsigned int status = this->ReceivePrivate(this->m_Socket);

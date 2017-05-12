@@ -29,6 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkILifecycleAwarePart.h"
 #include "mitkPlanarLine.h"
+#include <mitkIntensityProfile.h>
 
 /*!
 \brief QmitkImageStatisticsView is a bundle that allows statistics calculation from images. Three modes
@@ -53,6 +54,8 @@ private:
   typedef QList<mitk::DataNode*> SelectedDataNodeVectorType;
   typedef itk::SimpleMemberCommand< QmitkImageStatisticsView > ITKCommandType;
 
+  QMap<QVariant, QVariant> ConvertHistogramToMap(itk::Statistics::Histogram<double>::Pointer histogram) const;
+  QList<QVariant> ConvertIntensityProfileToList(mitk::IntensityProfile::Pointer intensityProfile) const;
 public:
 
   /*!
@@ -113,9 +116,9 @@ protected:
   void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
           const mitk::Image *image );
 
-  std::vector<QString> CalculateStatisticsForPlanarFigure( const mitk::Image *image);
+  std::vector<QString> CalculateStatisticsForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
 
-  void FillLinearProfileStatisticsTableView( const mitk::Image *image );
+  void FillLinearProfileStatisticsTableView(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
 
   /** \brief  Removes statistics from the GUI */
   void InvalidateStatisticsTableView();

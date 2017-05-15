@@ -142,7 +142,7 @@ void QmitkMultiLabelSegmentationPreferencePage::Update()
     m_SmoothingSpinBox->setEnabled(true);
   }
 
-  m_SelectionModeCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("auto selection", true) );
+  m_SelectionModeCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("auto selection", false) );
 
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 0.1));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));

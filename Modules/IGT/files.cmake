@@ -67,6 +67,9 @@ set(CPP_FILES
   TrackingDevices/mitkMicronTrackerTypeInformation.cpp
   TrackingDevices/mitkOpenIGTLinkTypeInformation.cpp
   TrackingDevices/mitkUnspecifiedTrackingTypeInformation.cpp
+#  TrackingDevices/mitkPolhemusTrackingDevice.cpp
+#  TrackingDevices/mitkPolhemusTool.cpp
+#  TrackingDevices/mitkPolhemusTrackerTypeInformation.cpp
 )
 
 set(H_FILES
@@ -98,3 +101,12 @@ endif(MITK_USE_MICRON_TRACKER)
 if(MITK_USE_MICROBIRD_TRACKER)
   set(CPP_FILES ${CPP_FILES} TrackingDevices/mitkMicroBirdTrackingDevice.cpp)
 endif(MITK_USE_MICROBIRD_TRACKER)
+
+if(MITK_USE_POLHEMUS_TRACKER)
+  set(CPP_FILES ${CPP_FILES}
+  TrackingDevices/mitkPolhemusInterface.cpp
+  TrackingDevices/mitkPolhemusTrackingDevice.cpp
+  TrackingDevices/mitkPolhemusTool.cpp
+  TrackingDevices/mitkPolhemusTrackerTypeInformation.cpp
+)
+endif(MITK_USE_POLHEMUS_TRACKER)

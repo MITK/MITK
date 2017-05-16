@@ -24,6 +24,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkVectorImage.h>
 #include <itkVectorContainer.h>
 #include <itkOrientationDistributionFunction.h>
+#include <QmitkDataStorageComboBoxWithSelectNone.h>
+#include <mitkTensorImage.h>
 
 /*!
 \brief View providing several methods to extract peaks from the spherical harmonic representation of ODFs or from tensors
@@ -60,25 +62,22 @@ public:
   protected slots:
 
   void ConvertShCoeffs();           ///< convert spherical harmonic coefficients to the according mitk datatype
-  void ConvertPeaks();              ///< convert peak files from other toolkits to the according mitk datatype
-  void StartFiniteDiff();           ///< ODF maxima extraction using finite differences on the densely sampled sphere
-  void StartTensor();               ///< extract principal eigenvectors from tensor image
-
+  void StartPeakExtraction();
+  void OnImageSelectionChanged();
 
 protected:
 
-  /// \brief called by QmitkAbstractView when DataManager's selection has changed
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  void StartMaximaExtraction(mitk::Image* img);         ///< ODF maxima extraction using finite differences on the densely sampled sphere
+  void StartTensorPeakExtraction(mitk::TensorImage* img);     ///< extract principal eigenvectors from tensor image
+
+  /// \brief called by QmitkAbstractView when DataManager's selection has changed
 
   Ui::QmitkOdfMaximaExtractionViewControls* m_Controls;
 
-  std::vector< mitk::DataNode::Pointer > m_BinaryImageNodes;    ///< mask images
-  std::vector< mitk::DataNode::Pointer > m_ImageNodes;
-  std::vector< mitk::DataNode::Pointer > m_TensorImageNodes;
-
-  void UpdateGui();             ///< update button activity etc. dpending on current datamanager selection
   template<int shOrder> void TemplatedConvertShCoeffs(mitk::Image* mitkImg);
-  template<int shOrder> void StartMaximaExtraction();   ///< ODF maxima extraction using finite differences on the densely sampled sphere
+  template<int shOrder> void StartMaximaExtraction(mitk::Image* image);   ///< ODF maxima extraction using finite differences on the densely sampled sphere
 
 private:
 

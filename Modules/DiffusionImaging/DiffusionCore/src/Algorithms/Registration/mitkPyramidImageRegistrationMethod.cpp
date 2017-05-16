@@ -287,7 +287,7 @@ RegisterTwoImagesV4(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image
   shrink_factors[0] = max_schedule_val;
   for( unsigned int i=1; i<max_pyramid_lvl; i++)
   {
-    shrink_factors[i] = std::max( shrink_factors[i-1]/2, 1ul);
+	  shrink_factors[i] = std::max(shrink_factors[i - 1] / 2, itk::SizeValueType(1));
   }
 
   if(m_Verbose)

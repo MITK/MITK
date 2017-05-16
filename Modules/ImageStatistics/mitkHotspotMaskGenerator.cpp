@@ -194,7 +194,7 @@ namespace mitk
       bool keepDistanceToImageBorders( neccessaryDistanceToImageBorderInMM > 0 );
       if (keepDistanceToImageBorders)
       {
-        long distanceInPixels[VImageDimension];
+        itk::IndexValueType distanceInPixels[VImageDimension];
         for(unsigned short dimension = 0; dimension < VImageDimension; ++dimension)
         {
           // To confirm that the whole hotspot is inside the image we have to keep a specific distance to the image-borders, which is as long as

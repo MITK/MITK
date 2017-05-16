@@ -237,48 +237,6 @@ void QmitkIVIMView::LambdaSlider (int val)
     OnSliceChanged(dummy);
 }
 
-void QmitkIVIMView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
-{
-    {
-        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
-        command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-    }
-
-    {
-        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
-        command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-    }
-
-    {
-        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
-        itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
-        command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
-    }
-}
-
-void QmitkIVIMView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
-{
-    {
-        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
-        slicer->RemoveObserver( m_SliceObserverTag1 );
-    }
-
-    {
-        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
-        slicer->RemoveObserver( m_SliceObserverTag2 );
-    }
-
-    {
-        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
-        slicer->RemoveObserver( m_SliceObserverTag3 );
-    }
-}
-
 void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, const QList<mitk::DataNode::Pointer>& nodes)
 {
     bool foundOneDiffusionImage = false;
@@ -1008,9 +966,45 @@ void QmitkIVIMView::Deactivated()
 void QmitkIVIMView::Visible()
 {
     m_Visible = true;
+    auto renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(this->GetRenderWindowPart());
+    {
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
+        command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
+        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
+
+    {
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
+        command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
+        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
+
+    {
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
+        itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
+        command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
+        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+    }
 }
 
 void QmitkIVIMView::Hidden()
 {
     m_Visible = false;
+    auto renderWindowPart = dynamic_cast<mitk::IRenderWindowPart*>(this->GetRenderWindowPart());
+    {
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
+        slicer->RemoveObserver( m_SliceObserverTag1 );
+    }
+
+    {
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
+        slicer->RemoveObserver( m_SliceObserverTag2 );
+    }
+
+    {
+        mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
+        slicer->RemoveObserver( m_SliceObserverTag3 );
+    }
 }

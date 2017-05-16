@@ -436,7 +436,6 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
     for (unsigned int i=0; i<num; i++)
     {
       DirectionType dir = peaks.at(i);
-      MITK_INFO << dir.magnitude();
       switch (m_NormalizationMethod)
       {
       case NO_NORM:

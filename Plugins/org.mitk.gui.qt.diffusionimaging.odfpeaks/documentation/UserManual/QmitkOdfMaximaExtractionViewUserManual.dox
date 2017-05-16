@@ -8,7 +8,6 @@ Available sections:
   - \ref OdfMaxUserManualOutputData
   - \ref OdfMaxUserManualMethods
   - \ref OdfMaxUserManualParameters
-  - \ref OdfMaxUserManualReferences
 
 \section OdfMaxUserManualInputData Input Data
 
@@ -36,11 +35,10 @@ Optional Input:
 \section OdfMaxUserManualParameters Input Parameters
 
 \li Vector normalization method (no normalization, maximum normalization of the vecors of one voxel and independent normalization of each vecor).
-\li SH Order: Specify the order of the spherical harmonic coefficients.
 \li Maximum number of peaks to extract. If more peaks are found only the largest are kept.
 \li Threshold to discard small peaks. Value relative to the largest peak of the respective voxel.
-\li Absolute threshold on the peak size. To evaluate this threshold the peaks are additionally weighted by their GFA (low GFA voxels are more likely to be discarded). This threshold is only used for the finite differences extraction method.
-
-\section OdfMaxUserManualReferences References
+\li Absolute threshold on the peak size. To evaluate this threshold the peaks are additionally weighted by their GFA (low GFA voxels are more likely to be discarded).
+\li Clustering angle: close peaks are clustered to obtain the principal direction.
+\li Angular threshold: peaks that were too far away to be clustered can be discarded by this threshold.
 
 */

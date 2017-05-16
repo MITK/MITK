@@ -82,30 +82,30 @@ std::vector<itk::SmartPointer<mitk::BaseData> > mitk::FiberBundleTckReader::Read
               if (header.size() >= 3 && header.compare(header.size() - 3, 3, "END") == 0)
                 header_end = true;
             }
-            MITK_INFO << "Header:";
+            MITK_INFO << "TCK Header:";
             MITK_INFO << header;
 
             int header_size = -1;
-            std::string delimiter = " ";
-            size_t pos = 0;
-            std::string token;
-            bool next = false;
-            while ((pos = header.find(delimiter)) != std::string::npos) {
-                token = header.substr(0, pos);
-                if (token==".")
-                  next = true;
+            try
+            {
+                std::string delimiter = "file: . ";
+                size_t pos = 0;
+                pos = header.find(delimiter);
                 header.erase(0, pos + delimiter.length());
-                if (next)
-                {
-                  int linebr = header.find("\n");
-                  token = header.substr(0, linebr);
-                  header_size = boost::lexical_cast<int>(token);
-                  MITK_INFO << "Parsed header size: " << header_size;
-                }
+                pos = header.find("\n");
+                header_size = boost::lexical_cast<int>(header.substr(0, pos));
             }
+            catch(...)
+            {
+
+            }
+
             if (header_size==-1)
                 mitkThrow() << "Could not parse header size from " << filename;
             std::fseek ( filePointer , header_size , SEEK_SET );
+
+            MITK_INFO << "Reading TCK file";
+
 
             vtkSmartPointer<vtkPoints> vtkNewPoints = vtkSmartPointer<vtkPoints>::New();
             vtkSmartPointer<vtkCellArray> vtkNewCells = vtkSmartPointer<vtkCellArray>::New();

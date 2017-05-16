@@ -48,6 +48,8 @@ class PAImageProcessing : public QmitkAbstractView
   protected slots:
 
     /// \brief Called when the user clicks the GUI button
+
+    void UpdateBounds();
     
     void UseResampling();
     void UseLogfilter();

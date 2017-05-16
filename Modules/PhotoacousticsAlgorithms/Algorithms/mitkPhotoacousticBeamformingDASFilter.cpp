@@ -80,7 +80,13 @@ void mitk::BeamformingDASFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) };
+  if (!m_Conf.partial)
+  {
+    m_Conf.bounds[0] = 0;
+    m_Conf.bounds[1] = input->GetDimension(2) - 1;
+  }
+
+  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) - m_Conf.bounds[0] - ((input->GetDimension(2) - 1) - m_Conf.bounds[1]) };
   output->Initialize(mitk::MakeScalarPixelType<double>(), 3, dim);
 
   mitk::Vector3D spacing;
@@ -131,7 +137,7 @@ void mitk::BeamformingDASFilter::GenerateData()
 
   for (int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
   {
-    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
+    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i + m_Conf.bounds[0]));
 
     m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
     m_InputDataPuffer = new double[input->GetDimension(0)*input->GetDimension(1)];

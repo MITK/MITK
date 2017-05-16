@@ -77,7 +77,13 @@ void mitk::BeamformingDMASFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) };
+  if (!m_Conf.partial)
+  {
+    m_Conf.bounds[0] = 0;
+    m_Conf.bounds[1] = input->GetDimension(2) - 1;
+  }
+
+  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) - m_Conf.bounds[0] - ((input->GetDimension(2)-1)  - m_Conf.bounds[1]) };
   output->Initialize(mitk::MakeScalarPixelType<double>(), 3, dim);
 
   mitk::Vector3D spacing;
@@ -127,7 +133,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
 
   for (int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
   {
-    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
+    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i + m_Conf.bounds[0]));
 
     m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
     m_InputDataPuffer = new double[input->GetDimension(0)*input->GetDimension(1)];
@@ -388,7 +394,7 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingDMASFilter::BPFunction(mitk::Im
 
   for (int n = 0; n < reference->GetDimension(1); ++n)
   {
-    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((double)center - (double)n) / ((double)width / 2), 2*m_Conf.ButterworthOrder));
+    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((double)center - (double)n) / ((double)width / 2), 2 * m_Conf.ButterworthOrder));
   }
 
   // copy and paste to all lines

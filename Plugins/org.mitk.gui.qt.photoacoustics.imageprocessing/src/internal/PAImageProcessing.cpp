@@ -62,9 +62,12 @@ void PAImageProcessing::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UseImageSpacing()));
   connect(m_Controls.ScanDepth, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
   connect(m_Controls.SpeedOfSound, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
-  connect(m_Controls.Samples, SIGNAL(valueChanged(double)), this, SLOT(UpdateFrequency()));
-  connect(m_Controls.UseImageSpacing, SIGNAL(clicked), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.Samples, SIGNAL(valueChanged(int)), this, SLOT(UpdateFrequency()));
+  connect(m_Controls.UseImageSpacing, SIGNAL(clicked()), this, SLOT(UpdateFrequency()));
   connect(m_Controls.UseBP, SIGNAL(clicked()), this, SLOT(UseBandpass()));
+  connect(m_Controls.boundLow, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
+  connect(m_Controls.boundHigh, SIGNAL(valueChanged(int)), this, SLOT(UpdateBounds()));
+  connect(m_Controls.Partial, SIGNAL(clicked()), this, SLOT(UpdateBounds()));
 
   m_Controls.DoResampling->setChecked(false);
   m_Controls.ResamplingValue->setEnabled(false);
@@ -274,6 +277,44 @@ void PAImageProcessing::HandleBmodeResults(mitk::Image::Pointer image)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void PAImageProcessing::UpdateBounds()
+{
+  if (!m_Controls.Partial->isChecked())
+  {
+    m_Controls.boundLow->setEnabled(false);
+    m_Controls.boundHigh->setEnabled(false);
+    DASconfig.partial = false;
+    DMASconfig.partial = false;
+    MITK_INFO << "ASFASF";
+    return;
+  }
+  else
+  {
+    m_Controls.boundLow->setEnabled(true);
+    m_Controls.boundHigh->setEnabled(true);
+    DASconfig.partial = true;
+    DMASconfig.partial = true;
+  }
+
+  if(m_Controls.boundLow->value()>m_Controls.boundHigh->value())
+  {
+    MITK_INFO << "high bound < low bound -> setting both to beamform only first slice";
+    m_Controls.boundLow->setValue(0); 
+    m_Controls.boundHigh->setValue(0);
+    DASconfig.bounds[0] = 0; 
+    DMASconfig.bounds[0] = 0;
+    DASconfig.bounds[1] = 0;
+    DMASconfig.bounds[1] = 0;
+  }
+  else
+  {
+    DASconfig.bounds[0] = m_Controls.boundLow->value();
+    DMASconfig.bounds[0] = m_Controls.boundLow->value();
+    DASconfig.bounds[1] = m_Controls.boundHigh->value();
+    DMASconfig.bounds[1] = m_Controls.boundHigh->value();
+  }
+}
+
 void PAImageProcessing::UpdateProgress(int progress, std::string progressInfo)
 {
   if (progress < 100)
@@ -311,8 +352,7 @@ void PAImageProcessing::UpdateFrequency()
     {
       m_Controls.ElementCount->setValue(image->GetDimension(0));
       m_Controls.Pitch->setValue(image->GetGeometry()->GetSpacing()[0]);
-      MITK_INFO << image->GetGeometry()->GetSpacing()[0];
-      MITK_INFO << (double)image->GetGeometry()->GetSpacing()[0];
+      m_Controls.boundLow->setMaximum(image->GetDimension(2) - 1);
     }
     if (image)
       UpdateRecordTime(image);
@@ -433,6 +473,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   DMASconfig.UseBP = m_Controls.UseBP->isChecked();
 
   UpdateRecordTime(image);
+  UpdateBounds();
 
   // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
 
@@ -452,7 +493,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
     QMessageBox Msgbox;
     Msgbox.setText("LowPass too high, disabled it.");
     Msgbox.exec();
-
+    
     DMASconfig.BPLowPass = 0;
     DASconfig.BPLowPass = 0;
   }

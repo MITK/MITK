@@ -234,7 +234,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 }
 
 bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                              const std::string& filename)
+                              const std::string& filename, bool compress)
 {
   AUTOPLAN_INFO << "Saving MITK file: " << filename;
   if (!sceneNodes)
@@ -491,23 +491,31 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         Poco::File deleteFile( filename.c_str() );
         if (deleteFile.exists())
         {
-          deleteFile.remove();
+          deleteFile.remove(true);
         }
 
         // create zip at filename
         std::string defaultLocaleFilename = Poco::Path::transcode( filename );
-        std::ofstream file( defaultLocaleFilename.c_str(), std::ios::binary | std::ios::out);
-        if (!file.good())
+        if (compress)
         {
-          MITK_ERROR << "Could not open a zip file for writing: '" << defaultLocaleFilename << "'";
-          return false;
+          std::ofstream file( defaultLocaleFilename.c_str(), std::ios::binary | std::ios::out);
+          if (!file.good())
+          {
+            MITK_ERROR << "Could not open a zip file for writing: '" << defaultLocaleFilename << "'";
+            return false;
+          }
+          else
+          {
+            Poco::Zip::Compress zipper( file, true );
+            Poco::Path tmpdir( m_WorkingDirectory );
+            zipper.addRecursive( tmpdir );
+            zipper.close();
+          }
         }
         else
         {
-          Poco::Zip::Compress zipper( file, true );
-          Poco::Path tmpdir( m_WorkingDirectory );
-          zipper.addRecursive( tmpdir );
-          zipper.close();
+          Poco::File tmpdir( m_WorkingDirectory );
+          tmpdir.copyTo(defaultLocaleFilename);
         }
         try
         {

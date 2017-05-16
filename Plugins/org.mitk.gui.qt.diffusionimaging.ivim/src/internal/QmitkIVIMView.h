@@ -38,7 +38,7 @@ See LICENSE.txt or http://www.mitk.org for details.
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 */
 
-class QmitkIVIMView : public QmitkAbstractView, public mitk::ILifecycleAwarePart,  public mitk::IRenderWindowPartListener
+class QmitkIVIMView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
 {
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -64,9 +64,6 @@ public:
   /// Sets the focus to an internal widget.
   ///
   virtual void SetFocus() override;
-
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   void OnSliceChanged(const itk::EventObject& e);
   void OutputToDatastorage(const QList<mitk::DataNode::Pointer>& nodes);

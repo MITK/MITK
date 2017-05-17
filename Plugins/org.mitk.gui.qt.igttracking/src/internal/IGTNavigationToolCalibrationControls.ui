@@ -716,6 +716,30 @@ p, li { white-space: pre-wrap; }
          <widget class="QWidget" name="page">
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_17">
+             <item>
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>Number of pivot poses to collect:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="m_PosesToCollect">
+               <property name="minimum">
+                <number>10</number>
+               </property>
+               <property name="maximum">
+                <number>1000</number>
+               </property>
+               <property name="value">
+                <number>100</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <item>
               <widget class="QLabel" name="label_7">
@@ -747,7 +771,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QPushButton" name="m_AddPivotPose">
                <property name="text">
-                <string>Add Current Pose</string>
+                <string>Collect Pivot Poses</string>
                </property>
               </widget>
              </item>
@@ -789,7 +813,7 @@ p, li { white-space: pre-wrap; }
                 </size>
                </property>
                <property name="text">
-                <string>Comute Pivot Point</string>
+                <string>Compute Pivot Point</string>
                </property>
               </widget>
              </item>
@@ -949,6 +973,10 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
   </layout>
+  <zorder>tabWidget</zorder>
+  <zorder>label</zorder>
+  <zorder>groupBox</zorder>
+  <zorder>groupBox_2</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

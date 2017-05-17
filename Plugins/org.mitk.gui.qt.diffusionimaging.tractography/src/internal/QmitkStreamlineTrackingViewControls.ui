@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>731</height>
+    <height>733</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -366,131 +366,7 @@
          <string>Enable gray matter seeding</string>
         </property>
         <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Parameters</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="2" column="0">
-       <widget class="QLabel" name="m_FaThresholdLabel_2">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Max. num. fibers:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="16" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="m_FaThresholdLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Cutoff:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QSpinBox" name="m_NumFibersBox">
-        <property name="toolTip">
-         <string>Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.</string>
-        </property>
-        <property name="maximum">
-         <number>999999999</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="m_FaThresholdLabel_3">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Mode:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="m_ModeBox">
-        <property name="toolTip">
-         <string>Toggle between deterministic and probabilistic tractography. Some modes might not be available for all types of tractography.</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>Deterministic</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Probabilistic</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Seeds per Voxel:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSpinBox" name="m_SeedsPerVoxelBox">
-        <property name="toolTip">
-         <string>Number of seed points placed in each voxel. </string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>999</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="m_ScalarThresholdBox">
-        <property name="toolTip">
-         <string>Threshold on peak magnitude, FA, GFA, ...</string>
-        </property>
-        <property name="decimals">
-         <number>5</number>
-        </property>
-        <property name="maximum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.100000000000000</double>
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -599,7 +475,7 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="mFaImageLabel">
         <property name="toolTip">
          <string>Only track insida mask area.</string>
         </property>
@@ -651,6 +527,136 @@
      </layout>
     </widget>
    </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_FaThresholdLabel_3">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="m_ModeBox">
+        <property name="toolTip">
+         <string>Toggle between deterministic and probabilistic tractography. Some modes might not be available for all types of tractography.</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Deterministic</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Probabilistic</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Seeds per Voxel:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_SeedsPerVoxelBox">
+        <property name="toolTip">
+         <string>Number of seed points placed in each voxel. </string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>9999999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_FaThresholdLabel_2">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Max. num. fibers:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QSpinBox" name="m_NumFibersBox">
+        <property name="toolTip">
+         <string>Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.</string>
+        </property>
+        <property name="maximum">
+         <number>999999999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_FaThresholdLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Cutoff:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="m_ScalarThresholdBox">
+        <property name="toolTip">
+         <string>Threshold on peak magnitude, FA, GFA, ...</string>
+        </property>
+        <property name="decimals">
+         <number>5</number>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -658,7 +664,7 @@
   <customwidget>
    <class>QmitkDataStorageComboBoxWithSelectNone</class>
    <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBoxWithSelectNone.h</header>
+   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -60,6 +60,8 @@ public:
 protected slots:
 
     void DoFiberTracking();   ///< start fiber tracking
+    void UpdateGui();
+
 
 protected:
 
@@ -67,8 +69,6 @@ protected:
     virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     Ui::QmitkStreamlineTrackingViewControls* m_Controls;
-
-    void UpdateGui();
 
 protected slots:
 

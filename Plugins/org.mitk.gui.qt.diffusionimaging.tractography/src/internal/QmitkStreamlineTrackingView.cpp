@@ -46,6 +46,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <vtkPolyLine.h>
 #include <vtkCellData.h>
 
+#include <itkTensorImageToQBallImageFilter.h>
 #include <omp.h>
 
 
@@ -96,7 +97,11 @@ void QmitkStreamlineTrackingView::CreateQtPartControl( QWidget *parent )
         m_Controls->m_TissueImageBox->SetZeroEntryText("--");
 
         connect( m_Controls->commandLinkButton, SIGNAL(clicked()), this, SLOT(DoFiberTracking()) );
+        connect( m_Controls->m_TissueImageBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
+        connect( m_Controls->m_ModeBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateGui()) );
     }
+
+    UpdateGui();
 }
 
 void QmitkStreamlineTrackingView::SetFocus()
@@ -152,6 +157,7 @@ void QmitkStreamlineTrackingView::UpdateGui()
     m_Controls->m_gBox->setVisible(false);
     m_Controls->m_gLabel->setVisible(false);
     m_Controls->m_FaImageBox->setVisible(false);
+    m_Controls->mFaImageLabel->setVisible(false);
     m_Controls->m_NormalizeODFsBox->setVisible(false);
 
     if (m_Controls->m_TissueImageBox->GetSelectedNode().IsNotNull())
@@ -174,10 +180,15 @@ void QmitkStreamlineTrackingView::UpdateGui()
             m_Controls->m_fLabel->setVisible(true);
             m_Controls->m_gBox->setVisible(true);
             m_Controls->m_gLabel->setVisible(true);
+            m_Controls->mFaImageLabel->setVisible(true);
             m_Controls->m_FaImageBox->setVisible(true);
+
+            if (m_Controls->m_ModeBox->currentIndex()==1)
+                m_Controls->m_NormalizeODFsBox->setVisible(true);
         }
         else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
         {
+            m_Controls->mFaImageLabel->setVisible(true);
             m_Controls->m_FaImageBox->setVisible(true);
             m_Controls->m_NormalizeODFsBox->setVisible(true);
         }
@@ -206,26 +217,62 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         typedef itk::Image< itk::DiffusionTensor3D<float>, 3> TensorImageType;
         typedef mitk::ImageToItk<TensorImageType> CasterType;
 
-        trackingHandler = new mitk::TrackingHandlerTensor();
-        for (int i=0; i<(int)m_InputImages.size(); i++)
+        if (m_Controls->m_ModeBox->currentIndex()==1)
         {
+            if (m_InputImages.size()>1)
+            {
+                QMessageBox::information(nullptr, "Information", "Probabilistic tensor tractography is only implemented for single-tensor mode!");
+                return;
+            }
+
+            QMessageBox::information(nullptr, "Information", "Internally calculating ODF from tensor image and performing probabilistic ODF tractography. Please keep the state of the ODF normalization box (see advanced parameters) in mind. TEND parameters are ignored.");
+
             TensorImageType::Pointer itkImg = TensorImageType::New();
-            mitk::CastToItkImage(m_InputImages.at(i), itkImg);
+            mitk::CastToItkImage(m_InputImages.at(0), itkImg);
 
-            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->AddTensorImage(itkImg);
+            typedef itk::TensorImageToQBallImageFilter< float, float > FilterType;
+            FilterType::Pointer filter = FilterType::New();
+            filter->SetInput( itkImg );
+            filter->Update();
+
+            typedef mitk::ImageToItk< mitk::TrackingHandlerOdf::ItkOdfImageType > CasterType;
+            trackingHandler = new mitk::TrackingHandlerOdf();
+            dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetOdfImage(filter->GetOutput());
+            dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetGfaThreshold(m_Controls->m_ScalarThresholdBox->value());
+            dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetMinMaxNormalize(m_Controls->m_NormalizeODFsBox->isChecked());
+            dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetOdfPower(1);
+
+            if (m_Controls->m_FaImageBox->GetSelectedNode().IsNotNull())
+            {
+                ItkFloatImageType::Pointer itkImg = ItkFloatImageType::New();
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()), itkImg);
+
+                dynamic_cast<mitk::TrackingHandlerOdf*>(trackingHandler)->SetGfaImage(itkImg);
+            }
         }
-
-        if (m_Controls->m_FaImageBox->GetSelectedNode().IsNotNull())
+        else
         {
-            ItkFloatImageType::Pointer itkImg = ItkFloatImageType::New();
-            mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()), itkImg);
+            trackingHandler = new mitk::TrackingHandlerTensor();
+            for (int i=0; i<(int)m_InputImages.size(); i++)
+            {
+                TensorImageType::Pointer itkImg = TensorImageType::New();
+                mitk::CastToItkImage(m_InputImages.at(i), itkImg);
 
-            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaImage(itkImg);
+                dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->AddTensorImage(itkImg);
+            }
+
+            if (m_Controls->m_FaImageBox->GetSelectedNode().IsNotNull())
+            {
+                ItkFloatImageType::Pointer itkImg = ItkFloatImageType::New();
+                mitk::CastToItkImage(dynamic_cast<mitk::Image*>(m_Controls->m_FaImageBox->GetSelectedNode()->GetData()), itkImg);
+
+                dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaImage(itkImg);
+            }
+
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetF((float)m_Controls->m_fBox->value());
+            dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetG((float)m_Controls->m_gBox->value());
         }
-
-        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetFaThreshold(m_Controls->m_ScalarThresholdBox->value());
-        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetF((float)m_Controls->m_fBox->value());
-        dynamic_cast<mitk::TrackingHandlerTensor*>(trackingHandler)->SetG((float)m_Controls->m_gBox->value());
     }
     else if ( dynamic_cast<mitk::QBallImage*>(m_InputImageNodes.at(0)->GetData()) )
     {
@@ -247,6 +294,11 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     }
     else
     {
+        if (m_Controls->m_ModeBox->currentIndex()==1)
+        {
+            QMessageBox::information(nullptr, "Information", "Probabilstic tractography is only implementedfor ODF images.");
+            return;
+        }
         try {
             typedef mitk::ImageToItk< mitk::TrackingHandlerPeaks::PeakImgType > CasterType;
             CasterType::Pointer caster = CasterType::New();
@@ -261,7 +313,6 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
         }
         catch(...)
         {
-            MITK_INFO << "No valid input image selected";
             return;
         }
     }

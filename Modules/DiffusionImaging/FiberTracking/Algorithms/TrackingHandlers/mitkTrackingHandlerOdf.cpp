@@ -55,32 +55,6 @@ void TrackingHandlerOdf::InitForTracking()
         m_OdfFloatDirs[i][2] = odf.GetDirection(m_OdfHemisphereIndices[i])[2];
     }
 
-//    itk::OrientationDistributionFunction< float, 42 > small_set;
-//    for (int j=0; j<12; j++)
-//    {
-//        vnl_vector_fixed<double,3> v = small_set.GetDirection(j);
-//        vnl_vector_fixed<float,3> float_v;
-//        float_v[0]=v[0];
-//        float_v[1]=v[1];
-//        float_v[2]=v[2];
-
-//        if (dot_product(ref, v)<=0)
-//            continue;
-
-//        int min_idx = 0;
-//        float min_angle = -1;
-//        for (unsigned int i=0; i<m_OdfHemisphereIndices.size(); i++)
-//        {
-//            float angle = dot_product(float_v, m_OdfFloatDirs.get_row(i));
-//            if (angle>min_angle)
-//            {
-//                min_idx = i;
-//                min_angle = angle;
-//            }
-//        }
-//        m_OdfReducedIndices.push_back(min_idx);
-//    }
-
     if (m_GfaImage.IsNull())
     {
         MITK_INFO << "Calculating GFA image.";
@@ -110,13 +84,15 @@ void TrackingHandlerOdf::InitForTracking()
         ItkOdfImageType::PixelType odf_values = it.Get();
         ItkOdfImageType::PixelType wodf_values = wit.Get();
 
+        for (int i=0; i<QBALL_ODFSIZE; i++)
+            wodf_values[i] = odf_values[i];
+
         if (m_MinMaxNormalize)
         {
             float max = 0;
             float min = 99999;
             for (int i=0; i<QBALL_ODFSIZE; i++)
             {
-                wodf_values[i] = odf_values[i];
                 if (wodf_values[i]<0)
                     wodf_values[i] = 0;
                 if (wodf_values[i]>=max)
@@ -132,7 +108,6 @@ void TrackingHandlerOdf::InitForTracking()
                 wodf_values /= max;
             }
         }
-
         for (int i=0; i<QBALL_ODFSIZE; i++)
             wodf_values[i] = std::pow(wodf_values[i], m_OdfPower);
 
@@ -256,7 +231,9 @@ vnl_vector_fixed<float,3> TrackingHandlerOdf::ProposeDirection(itk::Point<float,
         return output_direction * odf_val;
     }
     else if (max_idx_v<0.0001)
+    {
         return output_direction;
+    }
 
     if (m_FlipX)
         last_dir[0] *= -1;

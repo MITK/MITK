@@ -1,20 +1,16 @@
 /**
 \page org_mitk_views_streamlinetracking Streamline Tractography
 
-This view provides the user interface for basic streamline fiber tractography on diffusion tensor images (single and multi-tensor tracking), peak images (obtained using e.g. MITK peak extraction or MRtrix) or ODF images (Q-Balls, imorted CSD ODFs). FACT and TEND tracking methods are available.
 
-DOCUMENTATION DEPRECATED
 
 Available sections:
   - \ref StrTrackUserManualInputData
   - \ref StrTrackUserManualParameters
   - \ref StrTrackUserManualReferences
 
-#\imageMacro{streamlinetrackingview.png,"Streamline Tracking View",10.41}
-
 \section StrTrackUserManualInputData Input Data
 
-Mandatory Input:
+Input:
 
 \li One or multiple DTI images selected in the datamanager.
 \li One ODF image (e.g. obtained using MITK Q-ball reconstruction or MRtrix CSD).
@@ -30,14 +26,14 @@ Optional Input:
 
 \section StrTrackUserManualParameters Parameters
 
-\li Mode: Toggle between deterministic and probabilistic tractography. Some modes might not be available for all types of tractography.
+\li Mode: Toggle between deterministic and probabilistic tractography. Peak tracking only supports deterministic mode. The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF.
 \li Seeds per voxel: If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
 \li Max. num. fibers: Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.
 \li Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated.
 
 \section StrTrackUserManualParameters Advanced Parameters
 \li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
-\li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size
+\li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
 \li Min. Tract Length: Shorter fibers are discarded.
 \li f and g values to balance between FACT [1] and TEND [2,3] tracking (only for tensor based tractography). For further information please refer to [2,3]
 \li Flip directions: Internally flips progression directions. This might be necessary depending on the input data.
@@ -52,5 +48,4 @@ Optional Input:
 [1] Mori et al. Annals Neurology 1999\n
 [2] Weinstein et al. Proceedings of IEEE Visualization 1999\n
 [3] Lazar et al. Human Brain Mapping 2003\n
-[4] Neher et al. NeuroImage 2017\n
 */

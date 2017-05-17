@@ -1628,7 +1628,7 @@
           <string notr="true"/>
          </property>
          <property name="text">
-          <string>Calculate ADC map</string>
+          <string>Calculate ADC/MD map</string>
          </property>
         </widget>
        </item>
@@ -1661,6 +1661,19 @@
          </property>
          <property name="value">
           <number>10000</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="m_FitAdcBox">
+         <property name="toolTip">
+          <string>If checked, the ADC is determined by a least squares fit. If unchecked, the ADC is determined as the average ADC from the individual measurements per voxel (mean diffusivity). </string>
+         </property>
+         <property name="text">
+          <string>Fit signal</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

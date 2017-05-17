@@ -1511,6 +1511,7 @@ void QmitkPreprocessingView::DoAdcCalculation()
       (image->GetProperty(mitk::DiffusionPropertyHelper::REFERENCEBVALUEPROPERTYNAME.c_str()).GetPointer() )
         ->GetValue() );
 
+  filter->SetFitSignal(m_Controls->m_FitAdcBox->isChecked());
   filter->Update();
 
   mitk::Image::Pointer newImage = mitk::Image::New();
@@ -1520,6 +1521,12 @@ void QmitkPreprocessingView::DoAdcCalculation()
   imageNode->SetData( newImage );
   QString name = node->GetName().c_str();
 
+  mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+  lut->SetType( mitk::LookupTable::JET_TRANSPARENT );
+  mitk::LookupTableProperty::Pointer lut_prop = mitk::LookupTableProperty::New();
+  lut_prop->SetLookupTable( lut );
+
+  imageNode->SetProperty("LookupTable", lut_prop );
   imageNode->SetName((name+"_ADC").toStdString().c_str());
   GetDataStorage()->Add(imageNode, node);
 }

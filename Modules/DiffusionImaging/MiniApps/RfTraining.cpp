@@ -40,7 +40,7 @@ using namespace std;
 */
 int main(int argc, char* argv[])
 {
-    MITK_INFO << "DFTraining";
+    MITK_INFO << "RfTraining";
     mitkCommandLineParser parser;
 
     parser.setTitle("Training for Machine Learning Based Streamline Tractography");
@@ -60,9 +60,9 @@ int main(int argc, char* argv[])
 
     parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "resampling parameter for the input tractogram in mm (determines number of white-matter samples)", us::Any());
     parser.addArgument("num_gm_samples", "", mitkCommandLineParser::Int, "Number of gray matter samples per voxel:", "Number of gray matter samples per voxel", us::Any());
-    parser.addArgument("num_trees", "", mitkCommandLineParser::Int, "Number of trees:", "number of trees", us::Any());
-    parser.addArgument("max_tree_depth", "", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", us::Any());
-    parser.addArgument("sample_fraction", "", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", us::Any());
+    parser.addArgument("num_trees", "", mitkCommandLineParser::Int, "Number of trees:", "number of trees", 30);
+    parser.addArgument("max_tree_depth", "", mitkCommandLineParser::Int, "Max. tree depth:", "maximum tree depth", 25);
+    parser.addArgument("sample_fraction", "", mitkCommandLineParser::Float, "Sample fraction:", "fraction of samples used per tree", 0.7);
 
     parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features", false);
     parser.addArgument("max_wm_samples", "", mitkCommandLineParser::Int, "Max. num. WM samples:", "upper limit for the number of WM samples");
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("tractograms"))
         tractogramFiles = us::any_cast<mitkCommandLineParser::StringContainerType>(parsedArgs["tractograms"]);
 
-    int num_trees = 50;
+    int num_trees = 30;
     if (parsedArgs.count("num_trees"))
         num_trees = us::any_cast<int>(parsedArgs["num_trees"]);
 
@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("max_tree_depth"))
         max_tree_depth = us::any_cast<int>(parsedArgs["max_tree_depth"]);
 
-    double sample_fraction = 0.6;
+    double sample_fraction = 0.7;
     if (parsedArgs.count("sample_fraction"))
         sample_fraction = us::any_cast<float>(parsedArgs["sample_fraction"]);
 

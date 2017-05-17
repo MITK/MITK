@@ -19,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageToItk.h>
 #include <metaCommand.h>
 #include <mitkCommandLineParser.h>
+#include <mitkLog.h>
 #include <usAny.h>
 #include <itkImageFileWriter.h>
 #include <mitkIOUtil.h>
@@ -59,40 +60,41 @@ int main(int argc, char* argv[])
     // parameters fo all methods
     parser.setArgumentPrefix("--", "-");
     parser.addArgument("input", "i", mitkCommandLineParser::StringList, "Input:", "input image (multiple possible for 'Tensor' algorithm)", us::Any(), false);
-    parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DetODF, ProbODF, RandomForest)", us::Any(), false);
+    parser.addArgument("algorithm", "a", mitkCommandLineParser::String, "Algorithm:", "which algorithm to use (Peaks, Tensor, DetODF, ProbODF, DetRF, ProbRF)", us::Any(), false);
     parser.addArgument("out", "o", mitkCommandLineParser::OutputDirectory, "Output:", "output fiberbundle", us::Any(), false);
 
     parser.addArgument("stop_mask", "", mitkCommandLineParser::String, "Stop image:", "streamlines entering the binary mask will stop immediately", us::Any());
     parser.addArgument("tracking_mask", "", mitkCommandLineParser::String, "Mask image:", "restrict tractography with a binary mask image", us::Any());
     parser.addArgument("seed_mask", "", mitkCommandLineParser::String, "Seed image:", "binary mask image defining seed voxels", us::Any());
-    parser.addArgument("5TT_image", "", mitkCommandLineParser::String, "Tissue type image:", "image with tissue type labels (WM=3, GM=1)", us::Any());
+    parser.addArgument("tissue_image", "", mitkCommandLineParser::String, "Tissue type image:", "image with tissue type labels (WM=3, GM=1)", us::Any());
 
     parser.addArgument("cutoff", "", mitkCommandLineParser::Float, "Cutoff:", "set the FA, GFA or Peak amplitude cutoff for terminating tracks", 0.1);
     parser.addArgument("step_size", "", mitkCommandLineParser::Float, "Step size:", "step size (in voxels)", 0.5);
     parser.addArgument("angular_threshold", "", mitkCommandLineParser::Float, "Angular threshold:", "angular threshold between two successive steps, (default: 90° * step_size)");
     parser.addArgument("seeds", "", mitkCommandLineParser::Int, "Seeds per voxel:", "number of seed points per voxel", 1);
-    parser.addArgument("seed_gm", "", mitkCommandLineParser::Bool, "Seed only GM:", "Seed only in gray matter (requires tissue type image -t)", true);
+    parser.addArgument("seed_gm", "", mitkCommandLineParser::Bool, "Seed only GM:", "Seed only in gray matter (requires tissue type image --tissue_image)");
+    parser.addArgument("control_gm_endings", "", mitkCommandLineParser::Bool, "Control GM endings:", "Seed perpendicular to gray matter and enforce endings inside of the gray matter (requires tissue type image --tissue_image)");
     parser.addArgument("max_tracts", "", mitkCommandLineParser::Int, "Max. number of tracts:", "tractography is stopped if the reconstructed number of tracts is exceeded.", -1);
 
     parser.addArgument("num_samples", "", mitkCommandLineParser::Int, "Num. neighborhood samples:", "number of neighborhood samples that are use to determine the next progression direction", 0);
     parser.addArgument("sampling_distance", "", mitkCommandLineParser::Float, "Sampling distance:", "distance of neighborhood sampling points (in voxels)", 0.25);
-    parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes", true);
+    parser.addArgument("use_stop_votes", "", mitkCommandLineParser::Bool, "Use stop votes:", "use stop votes");
     parser.addArgument("use_only_forward_samples", "", mitkCommandLineParser::Bool, "Use only forward samples:", "use only forward samples");
 
-    parser.addArgument("use_trilinear_interpolation", "", mitkCommandLineParser::Bool, "Use trilinear interpolation:", "use trilinear interpolation", true);
-    parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1", false);
-    parser.addArgument("flip_y", "", mitkCommandLineParser::Bool, "Flip Y:", "multiply y-coordinate of direction proposal by -1", false);
-    parser.addArgument("flip_z", "", mitkCommandLineParser::Bool, "Flip Z:", "multiply z-coordinate of direction proposal by -1", false);
+    parser.addArgument("no_interpolation", "", mitkCommandLineParser::Bool, "Don't interpolate:", "don't interpolate image values");
+    parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
+    parser.addArgument("flip_y", "", mitkCommandLineParser::Bool, "Flip Y:", "multiply y-coordinate of direction proposal by -1");
+    parser.addArgument("flip_z", "", mitkCommandLineParser::Bool, "Flip Z:", "multiply z-coordinate of direction proposal by -1");
 
     parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "Compress output fibers using the given error threshold (in mm)");
     parser.addArgument("additional_images", "", mitkCommandLineParser::StringList, "Additional images:", "specify a list of float images that hold additional information (FA, GFA, additional Features)", us::Any());
 
     // parameters for ODF based tractography
-    parser.addArgument("normalize_odfs", "", mitkCommandLineParser::Bool, "Min-max normalize ODFs:", "Voxel-wise min-max normalization of ODFs", true);
+    parser.addArgument("no_odf_normalization", "", mitkCommandLineParser::Bool, "Don't min-max normalize ODFs:", "No min-max normalization of ODFs");
 
     // parameters for random forest based tractography
     parser.addArgument("forest", "", mitkCommandLineParser::String, "Forest:", "input random forest (HDF5 file)", us::Any());
-    parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features", false);
+    parser.addArgument("use_sh_features", "", mitkCommandLineParser::Bool, "Use SH features:", "use SH features");
 
     // parameters for tensor tractography
     parser.addArgument("tend_f", "", mitkCommandLineParser::Float, "Weight f", "Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).", 1.0);
@@ -107,9 +109,12 @@ int main(int argc, char* argv[])
     string outFile = us::any_cast<string>(parsedArgs["out"]);
     string algorithm = us::any_cast<string>(parsedArgs["algorithm"]);
 
+//    mitk::LoggingBackend::SetLogFile( (outFile + ".log").c_str() );
+//    MITK_INFO << "LOG";
+
     bool interpolate = true;
-    if (parsedArgs.count("use_trilinear_interpolation"))
-        interpolate = us::any_cast<bool>(parsedArgs["use_trilinear_interpolation"]);
+    if (parsedArgs.count("no_interpolation"))
+        interpolate = !us::any_cast<bool>(parsedArgs["no_interpolation"]);
 
     bool use_sh_features = false;
     if (parsedArgs.count("use_sh_features"))
@@ -119,11 +124,15 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("seed_gm"))
         seed_gm = us::any_cast<bool>(parsedArgs["seed_gm"]);
 
-    bool use_stop_votes = true;
+    bool control_gm_endings = false;
+    if (parsedArgs.count("control_gm_endings"))
+        control_gm_endings = us::any_cast<bool>(parsedArgs["control_gm_endings"]);
+
+    bool use_stop_votes = false;
     if (parsedArgs.count("use_stop_votes"))
         use_stop_votes = us::any_cast<bool>(parsedArgs["use_stop_votes"]);
 
-    bool use_only_forward_samples = true;
+    bool use_only_forward_samples = false;
     if (parsedArgs.count("use_only_forward_samples"))
         use_only_forward_samples = us::any_cast<bool>(parsedArgs["use_only_forward_samples"]);
 
@@ -158,8 +167,8 @@ int main(int argc, char* argv[])
         stopFile = us::any_cast<string>(parsedArgs["stop_mask"]);
 
     string tissueFile = "";
-    if (parsedArgs.count("5TT_image"))
-        tissueFile = us::any_cast<string>(parsedArgs["5TT_image"]);
+    if (parsedArgs.count("tissue_image"))
+        tissueFile = us::any_cast<string>(parsedArgs["tissue_image"]);
 
     float cutoff = 0.1;
     if (parsedArgs.count("cutoff"))
@@ -189,13 +198,13 @@ int main(int argc, char* argv[])
     if (parsedArgs.count("tend_g"))
         tend_g = us::any_cast<float>(parsedArgs["tend_g"]);
 
-    float angular_threshold = 0;
+    float angular_threshold = -1;
     if (parsedArgs.count("angular_threshold"))
         angular_threshold = us::any_cast<float>(parsedArgs["angular_threshold"]);
 
     bool normalize_odfs = true;
-    if (parsedArgs.count("normalize_odfs"))
-        normalize_odfs = us::any_cast<bool>(parsedArgs["normalize_odfs"]);
+    if (parsedArgs.count("no_odf_normalization"))
+        normalize_odfs = !us::any_cast<bool>(parsedArgs["no_odf_normalization"]);
 
     unsigned int max_tracts = -1;
     if (parsedArgs.count("max_tracts"))
@@ -274,7 +283,7 @@ int main(int argc, char* argv[])
     TrackerType::Pointer tracker = TrackerType::New();
 
     mitk::TrackingDataHandler* handler;
-    if (algorithm == "RandomForest")
+    if (algorithm == "DetRF" || algorithm == "ProbRF")
     {
         if (use_sh_features)
         {
@@ -290,6 +299,8 @@ int main(int argc, char* argv[])
             dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input_images.at(0));
             dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addImages);
         }
+        if (algorithm == "ProbRF")
+            handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
     }
     else if (algorithm == "Peaks")
     {
@@ -346,7 +357,7 @@ int main(int argc, char* argv[])
         if (addImages.size()>0)
             dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetGfaImage(addImages.at(0).at(0));
 
-        dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->setMinMaxNormalize(normalize_odfs);
+        dynamic_cast<mitk::TrackingHandlerOdf*>(handler)->SetMinMaxNormalize(normalize_odfs);
     }
     handler->SetInterpolate(interpolate);
     handler->SetFlipX(flip_x);
@@ -366,8 +377,9 @@ int main(int argc, char* argv[])
     tracker->SetUseStopVotes(use_stop_votes);
     tracker->SetOnlyForwardSamples(use_only_forward_samples);
     tracker->SetAposterioriCurvCheck(false);
-    tracker->SetFourTTImage(tissue);
+    tracker->SetTissueImage(tissue);
     tracker->SetSeedOnlyGm(seed_gm);
+    tracker->SetControlGmEndings(control_gm_endings);
     tracker->SetMaxNumTracts(max_tracts);
     tracker->SetTrackingHandler(handler);
     tracker->Update();

@@ -98,6 +98,13 @@ void TrackingHandlerTensor::InitForTracking()
                 if (!useUserFaImage)
                     m_FaImage->SetPixel(index, m_FaImage->GetPixel(index)/m_NumberOfInputs);
             }
+
+    if (m_F+m_G>1.0)
+    {
+        float temp = m_F+m_G;
+        m_F /= temp;
+        m_G /= temp;
+    }
 }
 
 vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index<3> idx, vnl_vector_fixed<float,3>& oldDir, int& image_num)
@@ -107,7 +114,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index
   float mag = oldDir.magnitude();
   if (mag<mitk::eps)
   {
-    for (int i=0; i<m_PdImage.size(); i++)
+    for (unsigned int i=0; i<m_PdImage.size(); i++)
     {
       out_dir = m_PdImage.at(i)->GetPixel(idx);
 
@@ -123,7 +130,7 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetMatchingDirection(itk::Index
   }
   else
   {
-    for (int i=0; i<m_PdImage.size(); i++)
+    for (unsigned int i=0; i<m_PdImage.size(); i++)
     {
       vnl_vector_fixed<float,3> dir = m_PdImage.at(i)->GetPixel(idx);
 

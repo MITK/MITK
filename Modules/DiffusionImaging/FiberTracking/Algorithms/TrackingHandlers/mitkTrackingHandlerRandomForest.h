@@ -74,13 +74,7 @@ public:
     void SaveForest(std::string forestFile);
     void LoadForest(std::string forestFile);
 
-    void SetMode( MODE m )
-    {
-        if (m==MODE::DETERMINISTIC)
-            m_Mode = m;
-        else
-            mitkThrow() << "Peak tracker is only implemented for deterministic mode.";
-    }
+    void SetMode( MODE m ){ m_Mode = m; }
 
     void SetMaxNumWmSamples(int num){ m_MaxNumWmSamples=num; }
     void SetNumPreviousDirections( int num ){ m_NumPreviousDirections=num; }
@@ -148,6 +142,7 @@ protected:
     vigra::MultiArray<2, float>                                 m_LabelData;                    ///< vigra container for training labels
     vigra::MultiArray<2, double>                                m_Weights;                      ///< vigra container for training sample weights
     std::vector< vnl_vector_fixed<float,3> >                    m_DirectionContainer;
+    vnl_matrix< float >                                         m_OdfFloatDirs;
 
     bool                                                        m_BidirectionalFiberSampling;
     bool                                                        m_ZeroDirWmFeatures;

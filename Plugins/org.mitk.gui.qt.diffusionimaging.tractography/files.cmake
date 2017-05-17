@@ -11,7 +11,6 @@ set(INTERNAL_CPP_FILES
   Perspectives/QmitkMachineLearningTractographyPerspective.cpp
   Perspectives/QmitkGibbsTractographyPerspective.cpp
   Perspectives/QmitkStreamlineTractographyPerspective.cpp
-  Perspectives/QmitkProbabilisticTractographyPerspective.cpp
   
   mitkPluginActivator.cpp
 )
@@ -38,7 +37,6 @@ set(MOC_H_FILES
   src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h
   src/internal/Perspectives/QmitkGibbsTractographyPerspective.h
   src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h
-  src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h
 )
 
 set(CACHED_RESOURCE_FILES

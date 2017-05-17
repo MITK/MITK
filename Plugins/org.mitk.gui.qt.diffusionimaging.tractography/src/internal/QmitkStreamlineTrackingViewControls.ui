@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>358</width>
-    <height>558</height>
+    <height>731</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,17 +19,30 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
+  <layout class="QFormLayout" name="formLayout">
+   <property name="horizontalSpacing">
+    <number>0</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>0</number>
+   </property>
    <property name="topMargin">
     <number>3</number>
    </property>
    <property name="bottomMargin">
     <number>3</number>
    </property>
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <item row="8" column="0">
+   <item row="1" column="0">
+    <widget class="QCommandLinkButton" name="commandLinkButton">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Start Tractography</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <spacer name="spacer1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -45,117 +58,23 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
-    <widget class="QCommandLinkButton" name="commandLinkButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>Start Tractography</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QGroupBox" name="groupBox_2">
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Parameters</string>
+      <string>Advanced Paramaters</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="9" column="0">
-       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="m_StepsizeLabel">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Seeds per Voxel: 1</string>
+         <string>Step Size:</string>
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="m_MinTractLengthLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Min. Tract Length: 20mm</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QSlider" name="m_fSlider">
-        <property name="toolTip">
-         <string>Weighting factor between first eigenvector (f=1 equals FACT tracking) and input vector dependent direction (f=0).</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="value">
-         <number>100</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QSlider" name="m_MinTractLengthSlider">
-        <property name="toolTip">
-         <string>Minimum tract length in mm.</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>500</number>
-        </property>
-        <property name="value">
-         <number>20</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="QSlider" name="m_SeedsPerVoxelSlider">
-        <property name="toolTip">
-         <string>Number of tracts started in each voxel of the seed ROI.</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="m_fLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>f: 1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="m_FaThresholdLabel_2">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Max. num. fibers:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
+      <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="m_StepSizeBox">
         <property name="toolTip">
          <string>Step size (in voxels)</string>
@@ -177,17 +96,7 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="m_gLabel">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>g: 0</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="m_AngularThresholdLabel">
         <property name="toolTip">
          <string/>
@@ -197,10 +106,71 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_AngularThresholdBox">
+        <property name="toolTip">
+         <string>Default: 90° * step_size</string>
+        </property>
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>90</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_MinTractLengthLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Min. Tract Length:</string>
+        </property>
+       </widget>
+      </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="m_ScalarThresholdBox">
+       <widget class="QDoubleSpinBox" name="m_MinTractLengthBox">
+        <property name="toolTip">
+         <string>Shorter fibers are discarded.</string>
+        </property>
         <property name="decimals">
-         <number>5</number>
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>20.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_fLabel">
+        <property name="toolTip">
+         <string>f parameter of tensor tractography. f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
+        </property>
+        <property name="text">
+         <string>f:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="m_fBox">
+        <property name="toolTip">
+         <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
+        </property>
+        <property name="decimals">
+         <number>2</number>
         </property>
         <property name="maximum">
          <double>1.000000000000000</double>
@@ -209,95 +179,50 @@
          <double>0.100000000000000</double>
         </property>
         <property name="value">
-         <double>0.100000000000000</double>
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
-      <item row="16" column="1">
-       <widget class="QDoubleSpinBox" name="m_FiberErrorBox">
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Maximum error in mm.</string>
-        </property>
-        <property name="decimals">
-         <number>3</number>
-        </property>
-        <property name="maximum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="12" column="0">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="10" column="1">
-       <widget class="QSpinBox" name="m_NumSamplesBox">
-        <property name="toolTip">
-         <string>Number of neighborhood samples that are used to determine the next fiber progression direction.</string>
-        </property>
-        <property name="maximum">
-         <number>50</number>
-        </property>
-       </widget>
-      </item>
-      <item row="15" column="0">
-       <widget class="QCheckBox" name="m_InterpolationBox">
-        <property name="toolTip">
-         <string>Default is nearest neighbor interpolation.</string>
-        </property>
-        <property name="text">
-         <string>Enable Trilinear Interpolation</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="m_StepsizeLabel">
+      <item row="4" column="0">
+       <widget class="QLabel" name="m_gLabel">
         <property name="toolTip">
          <string/>
         </property>
         <property name="text">
-         <string>Step Size:</string>
+         <string>g:</string>
         </property>
        </widget>
       </item>
-      <item row="16" column="0">
-       <widget class="QCheckBox" name="m_ResampleFibersBox">
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="m_gBox">
         <property name="toolTip">
-         <string>Resample fibers using the specified error constraint.</string>
+         <string>f=1 + g=0 means FACT (depending on the chosen interpolation). f=0 and g=1 means TEND (disable interpolation for this mode!).</string>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
+        <property name="toolTip">
+         <string/>
         </property>
         <property name="text">
-         <string>Compress Fibers</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>Flip directions:</string>
         </property>
        </widget>
       </item>
-      <item row="11" column="1">
+      <item row="5" column="1">
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -321,7 +246,7 @@
          <item row="0" column="0">
           <widget class="QCheckBox" name="m_FlipXBox">
            <property name="toolTip">
-            <string/>
+            <string>Internally flips progression directions. This might be necessary depending on the input data.</string>
            </property>
            <property name="text">
             <string>x</string>
@@ -330,6 +255,9 @@
          </item>
          <item row="0" column="1">
           <widget class="QCheckBox" name="m_FlipYBox">
+           <property name="toolTip">
+            <string>Internally flips progression directions. This might be necessary depending on the input data.</string>
+           </property>
            <property name="text">
             <string>y</string>
            </property>
@@ -337,6 +265,9 @@
          </item>
          <item row="0" column="2">
           <widget class="QCheckBox" name="m_FlipZBox">
+           <property name="toolTip">
+            <string>Internally flips progression directions. This might be necessary depending on the input data.</string>
+           </property>
            <property name="text">
             <string>z</string>
            </property>
@@ -345,42 +276,136 @@
         </layout>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QSpinBox" name="m_AngularThresholdBox">
-        <property name="minimum">
-         <number>-1</number>
+      <item row="6" column="0">
+       <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Neighborhood Samples:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QSpinBox" name="m_NumSamplesBox">
+        <property name="toolTip">
+         <string>Number of neighborhood samples that are used to determine the next fiber progression direction.</string>
         </property>
         <property name="maximum">
-         <number>90</number>
+         <number>50</number>
         </property>
-        <property name="singleStep">
-         <number>1</number>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QCheckBox" name="m_ResampleFibersBox">
+        <property name="toolTip">
+         <string>Resample fibers using the specified error constraint.</string>
         </property>
-        <property name="value">
-         <number>-1</number>
+        <property name="text">
+         <string>Compress Fibers</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="7" column="1">
-       <widget class="QSlider" name="m_gSlider">
-        <property name="toolTip">
-         <string>Weighting factor between input vector (g=0) and tensor deflection (g=1 equals TEND tracking)</string>
+       <widget class="QDoubleSpinBox" name="m_FiberErrorBox">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
-        <property name="minimum">
-         <number>0</number>
+        <property name="toolTip">
+         <string>Lossy fiber compression. Recommended for large tractograms. Maximum error in mm.</string>
+        </property>
+        <property name="decimals">
+         <number>3</number>
         </property>
         <property name="maximum">
-         <number>100</number>
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
         </property>
         <property name="value">
-         <number>0</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <double>0.100000000000000</double>
         </property>
        </widget>
       </item>
+      <item row="10" column="0">
+       <widget class="QCheckBox" name="m_NormalizeODFsBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Min-max normalize ODFs</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="m_InterpolationBox">
+        <property name="toolTip">
+         <string>If false, nearest neighbor interpolation is used.</string>
+        </property>
+        <property name="text">
+         <string>Enable Trilinear Interpolation</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
+       <widget class="QCheckBox" name="m_SeedGmBox">
+        <property name="toolTip">
+         <string>Requires tissue image.</string>
+        </property>
+        <property name="text">
+         <string>Enable gray matter seeding</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Parameters</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="2" column="0">
+       <widget class="QLabel" name="m_FaThresholdLabel_2">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Max. num. fibers:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="16" column="0">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="0">
        <widget class="QLabel" name="m_FaThresholdLabel">
         <property name="toolTip">
          <string/>
@@ -390,30 +415,10 @@
         </property>
        </widget>
       </item>
-      <item row="10" column="0">
-       <widget class="QLabel" name="m_SeedsPerVoxelLabel_2">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Samples:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="11" column="0">
-       <widget class="QLabel" name="m_SeedsPerVoxelLabel_3">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="text">
-         <string>Flip peaks:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QSpinBox" name="m_NumFibersBox">
         <property name="toolTip">
-         <string>Number of neighborhood samples that are used to determine the next fiber progression direction.</string>
+         <string>Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.</string>
         </property>
         <property name="maximum">
          <number>999999999</number>
@@ -432,6 +437,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="m_ModeBox">
+        <property name="toolTip">
+         <string>Toggle between deterministic and probabilistic tractography. Some modes might not be available for all types of tractography.</string>
+        </property>
         <item>
          <property name="text">
           <string>Deterministic</string>
@@ -444,51 +452,87 @@
         </item>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_SeedsPerVoxelLabel">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Seeds per Voxel:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="m_SeedsPerVoxelBox">
+        <property name="toolTip">
+         <string>Number of seed points placed in each voxel. </string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="m_ScalarThresholdBox">
+        <property name="toolTip">
+         <string>Threshold on peak magnitude, FA, GFA, ...</string>
+        </property>
+        <property name="decimals">
+         <number>5</number>
+        </property>
+        <property name="maximum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.100000000000000</double>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="0" column="0">
+   <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="m_InputData">
      <property name="title">
       <string>Please Select Input Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="4" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_7">
         <property name="toolTip">
-         <string>Input DTI</string>
+         <string>Only track insida mask area.</string>
         </property>
         <property name="text">
-         <string>Tensor/Peak Image:</string>
+         <string>Mask Image:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
+      <item row="4" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_StopImageBox">
+        <property name="toolTip">
+         <string>Fibers that enter a region defined in this image will stop immediately.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FaImageBox">
+        <property name="toolTip">
+         <string>If an image is selected, the stopping criterion is not calculated from the input image but instead the selected image is used.</string>
+        </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToMinimumContentsLength</enum>
         </property>
@@ -509,18 +553,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
-        </property>
-        <item>
-         <property name="text">
-          <string>-</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QLabel" name="m_TensorImageLabel">
         <property name="text">
@@ -531,14 +563,19 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_7">
+      <item row="1" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_SeedImageBox">
         <property name="toolTip">
-         <string>Only track insida mask area.</string>
+         <string>Seed points are only placed inside the mask image.</string>
         </property>
-        <property name="text">
-         <string>Mask Image:</string>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
         </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item row="4" column="0">
@@ -551,14 +588,64 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="toolTip">
+         <string>Input DTI</string>
+        </property>
+        <property name="text">
+         <string>Tensor/Peak Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
        <widget class="QLabel" name="label_8">
         <property name="toolTip">
          <string>Only track insida mask area.</string>
         </property>
         <property name="text">
-         <string>FA Image:</string>
+         <string>FA/GFA Image:</string>
         </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_MaskImageBox">
+        <property name="toolTip">
+         <string>Tractography is only performed inside the mask image. Fibers that leave the mask image are stopped.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="toolTip">
+         <string>Only track insida mask area.</string>
+        </property>
+        <property name="text">
+         <string>Tissue Image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TissueImageBox">
+        <property name="toolTip">
+         <string>Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.</string>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+        </property>
+        <item>
+         <property name="text">
+          <string>-</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>

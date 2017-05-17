@@ -198,7 +198,7 @@ bool TrackingHandlerOdf::MinMaxNormalize() const
     return m_MinMaxNormalize;
 }
 
-void TrackingHandlerOdf::setMinMaxNormalize(bool MinMaxNormalize)
+void TrackingHandlerOdf::SetMinMaxNormalize(bool MinMaxNormalize)
 {
     m_MinMaxNormalize = MinMaxNormalize;
 }

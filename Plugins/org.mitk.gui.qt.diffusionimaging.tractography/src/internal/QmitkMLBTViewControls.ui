@@ -769,12 +769,12 @@
           <item row="6" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>4TT Image:</string>
+             <string>Tissue Image:</string>
             </property>
            </widget>
           </item>
           <item row="6" column="1">
-           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_FourTTImageBox"/>
+           <widget class="QmitkDataStorageComboBoxWithSelectNone" name="m_TissueImageBox"/>
           </item>
          </layout>
         </widget>

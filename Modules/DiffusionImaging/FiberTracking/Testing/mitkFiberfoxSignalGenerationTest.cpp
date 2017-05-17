@@ -141,27 +141,37 @@ public:
 
     bool CompareDwi(itk::VectorImage< short, 3 >* dwi1, itk::VectorImage< short, 3 >* dwi2)
     {
+      bool out = true;
         typedef itk::VectorImage< short, 3 > DwiImageType;
         try{
             itk::ImageRegionIterator< DwiImageType > it1(dwi1, dwi1->GetLargestPossibleRegion());
             itk::ImageRegionIterator< DwiImageType > it2(dwi2, dwi2->GetLargestPossibleRegion());
+            int count = 0;
             while(!it1.IsAtEnd())
             {
                 if (it1.Get()!=it2.Get())
                 {
-                    MITK_INFO << it1.GetIndex() << ":" << it1.Get();
-                    MITK_INFO << it2.GetIndex() << ":" << it2.Get();
-                    return false;
+                  if (count<10)
+                  {
+                    MITK_INFO << "**************************************";
+                    MITK_INFO << "Test value: " << it1.GetIndex() << ":" << it1.Get();
+                    MITK_INFO << "Ref. value: " << it2.GetIndex() << ":" << it2.Get();
+                  }
+                  out = false;
+                  count++;
                 }
                 ++it1;
                 ++it2;
             }
+            if (count>=10)
+              MITK_INFO << "Skipping errors.";
+            MITK_INFO << "Errors detected: " << count;
         }
         catch(...)
         {
             return false;
         }
-        return true;
+        return out;
     }
 
     void StartSimulation(FiberfoxParameters<double> parameters, mitk::Image::Pointer refImage, string out)

@@ -2116,7 +2116,7 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
                     else if (v2>0)
                         newV = p + d * v2;
                     else
-                        MITK_INFO << "ERROR";
+                        MITK_INFO << "ERROR1 - linear resampling";
                     
                     j--;
                 }
@@ -2128,7 +2128,7 @@ void mitk::FiberBundle::ResampleLinear(double pointDistance)
                 }
                 lastV = newV;
             }
-            else if (j==vertices.size()-1)
+            else if (j==vertices.size()-1 && new_dist>0.0001)
             {
 #pragma omp critical
                 {

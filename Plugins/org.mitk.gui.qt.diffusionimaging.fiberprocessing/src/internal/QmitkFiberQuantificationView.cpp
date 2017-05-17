@@ -308,20 +308,18 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsPointS
 {
     mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
     vtkSmartPointer<vtkPolyData> fiberPolyData = fib->GetFiberPolyData();
-    vtkSmartPointer<vtkCellArray> vLines = fiberPolyData->GetLines();
-    vLines->InitTraversal();
 
     int count = 0;
     int numFibers = fib->GetNumFibers();
     for( int i=0; i<numFibers; i++ )
     {
-        vtkIdType   numPoints(0);
-        vtkIdType*  points(NULL);
-        vLines->GetNextCell ( numPoints, points );
+        vtkCell* cell = fiberPolyData->GetCell(i);
+        int numPoints = cell->GetNumberOfPoints();
+        vtkPoints* points = cell->GetPoints();
 
         if (numPoints>0)
         {
-            double* point = fiberPolyData->GetPoint(points[0]);
+            double* point = points->GetPoint(0);
             itk::Point<float,3> itkPoint;
             itkPoint[0] = point[0];
             itkPoint[1] = point[1];
@@ -331,7 +329,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsPointS
         }
         if (numPoints>2)
         {
-            double* point = fiberPolyData->GetPoint(points[numPoints-1]);
+            double* point = points->GetPoint(numPoints-1);
             itk::Point<float,3> itkPoint;
             itkPoint[0] = point[0];
             itkPoint[1] = point[1];
@@ -349,7 +347,7 @@ mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsPointS
 // generate image displaying the fiber endings
 mitk::DataNode::Pointer QmitkFiberQuantificationView::GenerateFiberEndingsImage(mitk::FiberBundle::Pointer fib)
 {
-    typedef unsigned char OutPixType;
+    typedef unsigned int OutPixType;
     typedef itk::Image<OutPixType,3> OutImageType;
 
     typedef itk::TractsToFiberEndingsImageFilter< OutImageType > ImageGeneratorType;

@@ -62,7 +62,7 @@ public:
     void SetSecondOrder(bool SecondOrder);
 
     bool MinMaxNormalize() const;
-    void setMinMaxNormalize(bool MinMaxNormalize);
+    void SetMinMaxNormalize(bool MinMaxNormalize);
 
 protected:
 
@@ -74,7 +74,6 @@ protected:
     ItkOdfImageType::Pointer        m_WorkingOdfImage;     ///< Modified odf image.
     std::vector< int >              m_OdfHemisphereIndices;
     vnl_matrix< float >             m_OdfFloatDirs;
-    BoostRngType                    m_Rng;
     int                             m_OdfPower;
     bool                            m_SecondOrder;
     bool                            m_MinMaxNormalize;

@@ -60,6 +60,8 @@ public:
 protected slots:
 
     void DoFiberTracking();   ///< start fiber tracking
+    void UpdateGui();
+
 
 protected:
 
@@ -69,12 +71,6 @@ protected:
     Ui::QmitkStreamlineTrackingViewControls* m_Controls;
 
 protected slots:
-
-    /** update labels if parameters have changed */
-    void OnSeedsPerVoxelChanged(int value);
-    void OnMinTractLengthChanged(int value);
-    void OnfChanged(int value);
-    void OngChanged(int value);
 
 private:
 

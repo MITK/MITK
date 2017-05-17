@@ -1,42 +1,47 @@
 /**
 \page org_mitk_views_streamlinetracking Streamline Tractography
 
-This view provides the user interface for basic streamline fiber tractography on diffusion tensor images (single and multi-tensor tracking), peak images (obtained using e.g. MITK peak extraction or MRtrix) or ODF images (Q-Balls, imorted CSD ODFs). FACT and TEND tracking methods are available.
 
-DOCUMENTATION DEPRECATED
 
 Available sections:
   - \ref StrTrackUserManualInputData
   - \ref StrTrackUserManualParameters
   - \ref StrTrackUserManualReferences
 
-\imageMacro{streamlinetrackingview.png,"Streamline Tracking View",10.41}
-
 \section StrTrackUserManualInputData Input Data
 
-Mandatory Input:
+Input:
 
-\li One or multiple DTI Image images selected in the datamanager.
-\li One peak image in MRtrix format (4D float image)
+\li One or multiple DTI images selected in the datamanager.
+\li One ODF image (e.g. obtained using MITK Q-ball reconstruction or MRtrix CSD).
+\li One peak image in MRtrix format (4D float image).
 
 Optional Input:
 
-\li FA image used to determine streamline termination. If no image is specified, the FA image is automatically calculated from the input tensor images. If multiple tensor images are used as input, it is recommended to provide such an FA image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
 \li Binary mask used to define the seed voxels. If no seed mask is specified, the whole image volume is seeded.
 \li Binary mask used to constrain the generated streamlines. Streamlines can not leave the mask area.
+\li Binary mask used to define stopping regions. Streamlines that enter the mask area are stopped immediately.
+\li Tissue label image needed for gray matter seeding (WM=3, GM=1). Use e.g. MRtrix 5ttgen to generate such a label image.
+\li FA/GFA image used to determine streamline termination. If no image is specified, the FA/GFA image is automatically calculated from the input image. If multiple tensor images are used as input, it is recommended to provide such an image since the FA maps calculated from the individual input tensor images can not provide a suitable termination criterion.
 
-\section StrTrackUserManualParameters Input Parameters
+\section StrTrackUserManualParameters Parameters
 
-\li Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated.
-\li Angular threshold: Maximum angle between two successive steps (in degree).
-\li f and g values to balance between FACT [1] and TEND [2,3] tracking (only for tensor based tractography). For further information please refer to [2,3]
-\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
-\li Min. Tract Length: Shorter fibers are discarded.
+\li Mode: Toggle between deterministic and probabilistic tractography. Peak tracking only supports deterministic mode. The probabilistic method simply samples the output direction from the discrete probability ditribution provided by the discretized ODF.
 \li Seeds per voxel: If set to 1, the seed is defined as the voxel center. If > 1 the seeds are distributet randomly inside the voxel.
+\li Max. num. fibers: Tractography is stopped after the desired number of fibers is reached, even before all seed points are processed.
+\li Cutoff: If the streamline reaches a position with an FA value or peak magnitude lower than the speciefied threshold, tracking is terminated.
 
-By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
+\section StrTrackUserManualParameters Advanced Parameters
+\li Step Size: The algorithm proceeds along the streamline with a fixed stepsize. Default is 0.5*minSpacing.
+\li Angular threshold: Maximum angle between two successive steps (in degree). Default is 90° * step_size. For probabilistic tractography, candidate directions exceeding this threshold have probability 0, i.e. the respective ODF value is set to zero. The probabilities of the valid directions are normalized to sum to 1.
+\li Min. Tract Length: Shorter fibers are discarded.
+\li f and g values to balance between FACT [1] and TEND [2,3] tracking (only for tensor based tractography). For further information please refer to [2,3]
+\li Flip directions: Internally flips progression directions. This might be necessary depending on the input data.
+\li Neighborhood Samples: Number of neighborhood samples that are used to determine the next fiber progression direction [4].
+\li Compress Fibers: Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
+\li Enable Trilinear Interpolation: By default the image values are interpolated. Keep in mind that in the noninterpolated case, the TEND term is only applied once per voxel. In the interpolated case the TEND term is applied at each integration step which results in much higher curvatures and has to be compensated by an according choice of f and g.
+\li Min-max normalize ODFs
 
-Whole brain tractograms obtained with a small step size can contain billions of points. The tractograms can be compressed by removing points that do not really contribute to the fiber shape, such as many points on a straight line. An error threshold (in mm) can be defined to specify which points should be removed and which not.
 
 \section StrTrackUserManualReferences References
 

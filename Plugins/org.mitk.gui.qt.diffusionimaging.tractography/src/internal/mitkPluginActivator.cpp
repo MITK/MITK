@@ -18,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "src/internal/Perspectives/QmitkGibbsTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkStreamlineTractographyPerspective.h"
-#include "src/internal/Perspectives/QmitkProbabilisticTractographyPerspective.h"
 #include "src/internal/Perspectives/QmitkMachineLearningTractographyPerspective.h"
 
 #include "src/internal/QmitkGibbsTrackingView.h"
@@ -38,7 +37,6 @@ void mitk::PluginActivator::start(ctkPluginContext* context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTractographyPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStreamlineTractographyPerspective, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMachineLearningTractographyPerspective, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkProbabilisticTractographyPerspective, context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkGibbsTrackingView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkStochasticFiberTrackingView, context)

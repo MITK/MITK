@@ -49,6 +49,16 @@ TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::TrackingHandlerR
     if (dot_product(ref, odf_dir)>0)            // only used directions on one hemisphere
       m_DirectionContainer.push_back(odf_dir);  // store indices for later mapping the classifier output to the actual direction
   }
+
+
+  m_OdfFloatDirs.set_size(m_DirectionContainer.size(), 3);
+
+  for (unsigned int i=0; i<m_DirectionContainer.size(); i++)
+  {
+      m_OdfFloatDirs[i][0] = m_DirectionContainer.at(i)[0];
+      m_OdfFloatDirs[i][1] = m_DirectionContainer.at(i)[1];
+      m_OdfFloatDirs[i][2] = m_DirectionContainer.at(i)[2];
+  }
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >
@@ -224,9 +234,14 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   itk::Index<3> idx;
   m_DwiFeatureImages.at(0)->TransformPhysicalPointToIndex(pos, idx);
 
+  bool check_last_dir = false;
   vnl_vector_fixed<float,3> last_dir;
   if (!olddirs.empty())
+  {
     last_dir = olddirs.back();
+    if (last_dir.magnitude()>0.5)
+      check_last_dir = true;
+  }
 
   if (!m_Interpolate && oldIndex==idx)
     return last_dir;
@@ -244,17 +259,18 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   int i = 0;
   vnl_vector_fixed<double,3> ref; ref.fill(0); ref[0]=1;
 
-  if (m_FlipX)
-      last_dir[0] *= -1;
-  if (m_FlipY)
-      last_dir[1] *= -1;
-  if (m_FlipZ)
-      last_dir[2] *= -1;
-
   for (auto d : olddirs)
   {
     vnl_vector_fixed<double,3> tempD;
     tempD[0] = d[0]; tempD[1] = d[1]; tempD[2] = d[2];
+
+    if (m_FlipX)
+        tempD[0] *= -1;
+    if (m_FlipY)
+        tempD[1] *= -1;
+    if (m_FlipZ)
+        tempD[2] *= -1;
+
     tempD = inverse_direction_matrix * tempD;
     last_dir[0] = tempD[0];
     last_dir[1] = tempD[1];
@@ -288,45 +304,77 @@ vnl_vector_fixed<float,3> TrackingHandlerRandomForest< ShOrder, NumberOfSignalFe
   vigra::MultiArray<2, float> probs(vigra::Shape2(1, m_Forest->class_count()));
   m_Forest->predictProbabilities(featureData, probs);
 
+  vnl_vector< float > angles = m_OdfFloatDirs*last_dir;
+  vnl_vector< float > probs2; probs2.set_size(m_DirectionContainer.size()); probs2.fill(0.0); // used for probabilistic direction sampling
+  float probs_sum = 0;
+
   float pNonFib = 0;     // probability that we left the white matter
   float w = 0;           // weight of the predicted direction
+
   for (int i=0; i<m_Forest->class_count(); i++)   // for each class (number of possible directions + out-of-wm class)
   {
     if (probs(0,i)>0)   // if probability of respective class is 0, do nothing
     {
       // get label of class (does not correspond to the loop variable i)
-      int classLabel = 0;
+      unsigned int classLabel = 0;
       m_Forest->ext_param_.to_classlabel(i, classLabel);
 
       if (classLabel<m_DirectionContainer.size())   // does class label correspond to a direction or to the out-of-wm class?
       {
-        vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
-
-        if (!olddirs.empty() && last_dir.magnitude()>0.5)   // do we have a previous streamline direction or did we just start?
+        if (m_Mode==MODE::PROBABILISTIC)
         {
-          // TODO: check if hard curvature threshold is necessary.
-          // alternatively try square of dot pruduct as weight.
-          // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
-
-          float dot = dot_product(d, last_dir);    // claculate angle between the candidate direction vector and the previous streamline direction
-          if (fabs(dot)>m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
-          {
-            if (dot<0)                          // make sure we don't walk backwards
-              d *= -1;
-            float w_i = probs(0,i)*fabs(dot);
-            output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
-            w += w_i;           // increase output weight of the final direction
-          }
+          if (!check_last_dir || fabs(angles[classLabel])>=m_AngularThreshold)
+            probs2[classLabel] = probs(0,i);
+          probs_sum += probs2[classLabel];
         }
-        else
+        else if (m_Mode==MODE::DETERMINISTIC)
         {
-          output_direction += probs(0,i)*d;
-          w += probs(0,i);
+          vnl_vector_fixed<float,3> d = m_DirectionContainer.at(classLabel);  // get direction vector assiciated with the respective direction index
+          if (check_last_dir)   // do we have a previous streamline direction or did we just start?
+          {
+            // TODO: check if hard curvature threshold is necessary.
+            // alternatively try square of dot product as weight.
+            // TODO: check if additional weighting with dot product as directional prior is necessary. are there alternatives on the classification level?
+
+            float dot = angles[classLabel];    // claculate angle between the candidate direction vector and the previous streamline direction
+            if (fabs(dot)>=m_AngularThreshold)         // is angle between the directions smaller than our hard threshold?
+            {
+              if (dot<0)                          // make sure we don't walk backwards
+                d *= -1;
+              float w_i = probs(0,i)*fabs(dot);
+              output_direction += w_i*d; // weight contribution to output direction with its probability and the angular deviation from the previous direction
+              w += w_i;           // increase output weight of the final direction
+            }
+          }
+          else
+          {
+            output_direction += probs(0,i)*d;
+            w += probs(0,i);
+          }
         }
       }
       else
         pNonFib += probs(0,i);  // probability that we are not in the white matter anymore
     }
+  }
+
+
+  if (m_Mode==MODE::PROBABILISTIC && pNonFib<0.5)
+  {
+    probs2 /= probs_sum;
+    boost::random::discrete_distribution<int, float> dist(probs2.begin(), probs2.end());
+
+    int sampled_idx = 0;
+#pragma omp critical
+    {
+        boost::random::variate_generator<boost::random::mt19937&, boost::random::discrete_distribution<int,float>> sampler(m_Rng, dist);
+        sampled_idx = sampler();
+    }
+
+    output_direction = m_DirectionContainer.at(sampled_idx);
+    w = probs2[sampled_idx];
+    if (check_last_dir && angles[sampled_idx]<0)                          // make sure we don't walk backwards
+        output_direction *= -1;
   }
 
   // if we did not find a suitable direction, make sure that we return (0,0,0)
@@ -424,8 +472,20 @@ bool TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::IsForestVal
   int additional_features = 0;
   if (m_AdditionalFeatureImages.size()>0)
     additional_features = m_AdditionalFeatureImages.at(0).size();
+
+  if (!m_Forest)
+    MITK_ERROR << "Forest could not be read!";
+  else
+  {
+    if (m_Forest->tree_count()<=0)
+      MITK_ERROR << "Forest contains no trees!";
+    if ( m_Forest->feature_count()!=(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features) )
+      MITK_ERROR << "Wrong number of features in forest: got " << m_Forest->feature_count() << ", expected " << (NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features);
+  }
+
   if(m_Forest && m_Forest->tree_count()>0 && m_Forest->feature_count()==(NumberOfSignalFeatures+3*m_NumPreviousDirections+additional_features))
     return true;
+
   return false;
 }
 
@@ -704,7 +764,6 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
     }
 
     unsigned int num_gm_samples = sampleCounter;
-    MITK_INFO << "WM samples...";
     // white matter samples
     mitk::FiberBundle::Pointer fib = m_Tractograms.at(t);
     vtkSmartPointer< vtkPolyData > polyData = fib->GetFiberPolyData();
@@ -859,6 +918,7 @@ void TrackingHandlerRandomForest< ShOrder, NumberOfSignalFeatures >::CalculateTr
     }
   }
   m_Tractograms.clear();
+  MITK_INFO << "done";
 }
 
 template< int ShOrder, int NumberOfSignalFeatures >

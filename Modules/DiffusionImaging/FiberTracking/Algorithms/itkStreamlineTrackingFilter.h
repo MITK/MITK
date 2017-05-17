@@ -72,6 +72,7 @@ public:
     int     m_BuildFibersReady;
     volatile bool m_Stop;
     mitk::PointSet::Pointer             m_SamplingPointset;
+    mitk::PointSet::Pointer             m_StopVotePointset;
     mitk::PointSet::Pointer             m_AlternativePointset;
 
     void SetStepSize(float v)           ///< Integration step size in voxels, default is 0.5 * voxel
@@ -84,7 +85,7 @@ public:
     itkGetMacro( FiberPolyData, PolyDataType )          ///< Output fibers
     itkSetMacro( SeedImage, ItkUcharImgType::Pointer)   ///< Seeds are only placed inside of this mask.
     itkSetMacro( MaskImage, ItkUcharImgType::Pointer)   ///< Tracking is only performed inside of this mask image.
-    itkSetMacro( FourTTImage, ItkUcharImgType::Pointer) ///<
+    itkSetMacro( TissueImage, ItkUcharImgType::Pointer) ///<
     itkSetMacro( SeedsPerVoxel, int)                    ///< One seed placed in the center of each voxel or multiple seeds randomly placed inside each voxel.
     itkSetMacro( MinTractLength, float )                ///< Shorter tracts are discarded.
     itkSetMacro( MaxTractLength, float )                ///< Streamline progression stops if tract is longer than specified.
@@ -94,7 +95,8 @@ public:
     itkSetMacro( DeflectionMod, float )                 ///< Deflection distance modifier
     itkSetMacro( StoppingRegions, ItkUcharImgType::Pointer) ///< Streamlines entering a stopping region will stop immediately
     itkSetMacro( DemoMode, bool )
-    itkSetMacro( SeedOnlyGm, bool )
+    itkSetMacro( SeedOnlyGm, bool )                     ///< place seed points only in the gray matter
+    itkSetMacro( ControlGmEndings, bool )               ///<
     itkSetMacro( NumberOfSamples, unsigned int )        ///< Number of neighborhood sampling points
     itkSetMacro( AposterioriCurvCheck, bool )           ///< Checks fiber curvature (angular deviation across 5mm) is larger than 30°. If yes, the streamline progression is stopped.
     itkSetMacro( AvoidStop, bool )                      ///< Use additional sampling points to avoid premature streamline termination
@@ -159,12 +161,13 @@ protected:
     int                                 m_WmLabel;
     int                                 m_GmLabel;
     bool                                m_SeedOnlyGm;
-    unsigned int                        m_MaxNumTracts;
+    bool                                m_ControlGmEndings;
+    int                                 m_MaxNumTracts;
 
     ItkUcharImgType::Pointer            m_StoppingRegions;
     ItkUcharImgType::Pointer            m_SeedImage;
     ItkUcharImgType::Pointer            m_MaskImage;
-    ItkUcharImgType::Pointer            m_FourTTImage;
+    ItkUcharImgType::Pointer            m_TissueImage;
 
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;

@@ -236,9 +236,9 @@ void QmitkImageStatisticsView::JumpToCoordinates(int row ,int col)
   }
 
   mitk::Point3D world;
-  if (row==4 && !m_WorldMinList.empty())
+  if (row==5 && !m_WorldMinList.empty())
     world = m_WorldMinList[col];
-  else if (row==3 && !m_WorldMaxList.empty())
+  else if (row==4 && !m_WorldMaxList.empty())
     world = m_WorldMaxList[col];
   else
     return;

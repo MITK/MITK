@@ -206,9 +206,16 @@ void QmitkDiffusionQuantificationView::DoAdcCalculation(bool fit)
         filter->SetFitSignal(fit);
         filter->Update();
 
+        typedef itk::ShiftScaleImageFilter<itk::AdcImageFilter< short, double >::OutputImageType, itk::AdcImageFilter< short, double >::OutputImageType> ShiftScaleFilterType;
+        ShiftScaleFilterType::Pointer multi = ShiftScaleFilterType::New();
+        multi->SetShift(0.0);
+        multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());
+        multi->SetInput(filter->GetOutput());
+        multi->Update();
+
         mitk::Image::Pointer newImage = mitk::Image::New();
-        newImage->InitializeByItk( filter->GetOutput() );
-        newImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+        newImage->InitializeByItk( multi->GetOutput() );
+        newImage->SetVolume( multi->GetOutput()->GetBufferPointer() );
         mitk::DataNode::Pointer imageNode = mitk::DataNode::New();
         imageNode->SetData( newImage );
         QString name = node->GetName().c_str();
@@ -522,12 +529,10 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
                                                         "Computing FA for %s", nodename.c_str()).toLatin1());
         typedef itk::Image< TTensorPixelType, 3 >              FAImageType;
 
-        typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType>
-                ShiftScaleFilterType;
-        ShiftScaleFilterType::Pointer multi =
-                ShiftScaleFilterType::New();
+        typedef itk::ShiftScaleImageFilter<FAImageType, FAImageType> ShiftScaleFilterType;
+        ShiftScaleFilterType::Pointer multi = ShiftScaleFilterType::New();
         multi->SetShift(0.0);
-        multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());//itk::NumericTraits<RealValueType>::max()
+        multi->SetScale(m_Controls->m_ScaleImageValuesBox->value());
 
         typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
 

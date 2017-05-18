@@ -31,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandaloneDataStorage.h"
 #include <mitkStandardFileLocations.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -89,7 +92,7 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& workDir,
                                                      DataStorage* pStorage,
-                                                     bool clearStorageFirst )
+                                                     bool clearSegmentations )
 {
 
   // prepare data storage
@@ -99,15 +102,21 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& work
     storage = StandaloneDataStorage::New().GetPointer();
   }
 
-  if ( clearStorageFirst )
+  if ( clearSegmentations )
   {
+    /* Build list of segmentation nodes that should be removed */
+    mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+    mitk::NodePredicateNot::Pointer isNotImage = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("Image", mitk::BoolProperty::New(true)));
+    mitk::NodePredicateNot::Pointer isBinaryObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false)));
+    mitk::NodePredicateAnd::Pointer isSegmentation = mitk::NodePredicateAnd::New(isNotHelperObject, isNotImage, isBinaryObject);
+    mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeRemoved = storage->GetSubset(isSegmentation);
     try
     {
-      storage->Remove( storage->GetAll() );
+      storage->Remove( nodesToBeRemoved );
     }
     catch(...)
     {
-      MITK_ERROR << "DataStorage cannot be cleared properly.";
+      MITK_ERROR << "DataStorage cannot clear segmentations";
     }
   }
 

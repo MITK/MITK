@@ -1,0 +1,138 @@
+diff --git a/.git/index b/.git/index
+index 1a9c78d..4ac460f 100644
+Binary files a/.git/index and b/.git/index differ
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4205569..5cb1f41 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -163,4 +163,15 @@ if (BUILD_PYTHON)
+           FILES_MATCHING PATTERN "*.py")
+ endif()
+ 
++export(EXPORT Caffe2_TARGETS
++  FILE ${CMAKE_BINARY_DIR}/Caffe2Targets.cmake
++)
++
++configure_file(${PROJECT_SOURCE_DIR}/cmake/Caffe2Config.cmake.in ${CMAKE_BINARY_DIR}/Caffe2Config.cmake @ONLY)
++install(FILES
++    "${CMAKE_BINARY_DIR}/Caffe2Config.cmake"
++  DESTINATION ${CMAKE_INSTALL_PREFIX}
++)
++
++
+ Caffe2_print_configuration_summary()
+diff --git a/cmake/Caffe2Config.cmake.in b/cmake/Caffe2Config.cmake.in
+new file mode 100644
+index 0000000..6ca2c11
+--- /dev/null
++++ b/cmake/Caffe2Config.cmake.in
+@@ -0,0 +1,15 @@
++cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
++
++include(${CMAKE_BINARY_DIR}/Caffe2Targets.cmake)
++
++set(GFLAGS_LIBRARIES "@GFLAGS_LIBRARIES@")
++set(GFLAGS_INCLUDE_DIRS "@GFLAGS_INCLUDE_DIRS@")
++
++set(GLOG_LIBRARY "@GLOG_LIBRARY@")
++set(GLOG_INCLUDE_DIR "@GLOG_INCLUDE_DIR@")
++
++set(LMDB_LIBRARIES "@LMDB_LIBRARIES@")
++set(LMDB_INCLUDE_DIRS "@LMDB_INCLUDE_DIRS@")
++
++set(LevelDB_LIBRARY "@LevelDB_LIBRARY@")
++set(LevelDB_INCLUDE "@LevelDB_INCLUDE@")
+diff --git a/cmake/Modules/FindGFlags.cmake b/cmake/Modules/FindGFlags.cmake
+index 29b60f0..2aadc89 100644
+--- a/cmake/Modules/FindGFlags.cmake
++++ b/cmake/Modules/FindGFlags.cmake
+@@ -1,49 +1,46 @@
+-# - Try to find GFLAGS
+-#
+-# The following variables are optionally searched for defaults
+-#  GFLAGS_ROOT_DIR:            Base directory where all GFLAGS components are found
+-#
+-# The following are set after configuration is done:
+-#  GFLAGS_FOUND
+-#  GFLAGS_INCLUDE_DIRS
+-#  GFLAGS_LIBRARIES
+-#  GFLAGS_LIBRARYRARY_DIRS
+-
+-include(FindPackageHandleStandardArgs)
+-
+-set(GFLAGS_ROOT_DIR "" CACHE PATH "Folder contains Gflags")
+-
+-# We are testing only a couple of files in the include directories
+-if(WIN32)
+-    find_path(GFLAGS_INCLUDE_DIR gflags/gflags.h
+-        PATHS ${GFLAGS_ROOT_DIR}/src/windows)
+-else()
+-    find_path(GFLAGS_INCLUDE_DIR gflags/gflags.h
+-        PATHS ${GFLAGS_ROOT_DIR})
+-endif()
+-
+-if(MSVC)
+-    find_library(GFLAGS_LIBRARY_RELEASE
+-        NAMES libgflags
+-        PATHS ${GFLAGS_ROOT_DIR}
+-        PATH_SUFFIXES Release)
+-
+-    find_library(GFLAGS_LIBRARY_DEBUG
+-        NAMES libgflags-debug
+-        PATHS ${GFLAGS_ROOT_DIR}
+-        PATH_SUFFIXES Debug)
+-
+-    set(GFLAGS_LIBRARY optimized ${GFLAGS_LIBRARY_RELEASE} debug ${GFLAGS_LIBRARY_DEBUG})
+-else()
+-    find_library(GFLAGS_LIBRARY gflags)
+-endif()
+-
++set(GFLAGS_INCLUDE_DIR ${GFLAGS_ROOT_DIR}/include)
++set(GFLAGS_CMAKE_DEBUG_POSTFIX d)
++
++set(GFLAGS_LIBRARY)
++
++# Find all libraries, store debug and release separately
++  # Find Release libraries
++  find_library(GFLAGS_LIBRARY_RELEASE
++    gflags
++    PATHS
++    ${GFLAGS_ROOT_DIR}/lib
++    ${GFLAGS_ROOT_DIR}/lib/Release
++    ${GFLAGS_ROOT_DIR}/lib/RelWithDebInfo
++    ${GFLAGS_ROOT_DIR}/bin
++    ${GFLAGS_ROOT_DIR}/bin/Release
++    ${GFLAGS_ROOT_DIR}/bin/RelWithDebInfo
++    NO_DEFAULT_PATH
++    )
++
++  # Find Debug libraries
++  find_library(GFLAGS_LIBRARY_DEBUG
++    gflags${GFLAGS_CMAKE_DEBUG_POSTFIX}
++    PATHS
++    ${GFLAGS_ROOT_DIR}/lib
++    ${GFLAGS_ROOT_DIR}/lib/Debug
++    ${GFLAGS_ROOT_DIR}/bin
++    ${GFLAGS_ROOT_DIR}/bin/Debug
++    NO_DEFAULT_PATH
++    )
++
++  # Add libraries to variable according to build type
++  if(GFLAGS_LIBRARY_RELEASE)
++    list(APPEND GFLAGS_LIBRARY optimized ${GFLAGS_LIBRARY_RELEASE})
++  endif()
++  if(GFLAGS_LIBRARY_DEBUG)
++    list(APPEND GFLAGS_LIBRARY debug ${GFLAGS_LIBRARY_DEBUG})
++  endif()
++  
+ find_package_handle_standard_args(GFlags DEFAULT_MSG GFLAGS_INCLUDE_DIR GFLAGS_LIBRARY)
+ 
+-
+ if(GFLAGS_FOUND)
+-    set(GFLAGS_INCLUDE_DIRS ${GFLAGS_INCLUDE_DIR})
+-    set(GFLAGS_LIBRARIES ${GFLAGS_LIBRARY})
++    set(GFLAGS_INCLUDE_DIRS ${GFLAGS_INCLUDE_DIR} CACHE STRING "")
++    set(GFLAGS_LIBRARIES ${GFLAGS_LIBRARY} CACHE STRING "")
+     message(STATUS "Found gflags  (include: ${GFLAGS_INCLUDE_DIR}, library: ${GFLAGS_LIBRARY})")
+     mark_as_advanced(GFLAGS_LIBRARY_DEBUG GFLAGS_LIBRARY_RELEASE
+                      GFLAGS_LIBRARY GFLAGS_INCLUDE_DIR GFLAGS_ROOT_DIR)

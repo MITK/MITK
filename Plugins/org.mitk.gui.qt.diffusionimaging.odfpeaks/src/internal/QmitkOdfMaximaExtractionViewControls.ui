@@ -405,7 +405,7 @@
   <customwidget>
    <class>QmitkDataStorageComboBoxWithSelectNone</class>
    <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBoxWithSelectNone.h</header>
+   <header location="global">QmitkDataStorageComboBoxWithSelectNone.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

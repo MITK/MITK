@@ -43,7 +43,10 @@ void TrackingHandlerPeaks::InitForTracking()
   origin3[0] = origin4[0]; origin3[1] = origin4[1]; origin3[2] = origin4[2];
   for (int r=0; r<3; r++)
     for (int c=0; c<3; c++)
+    {
       direction3[r][c] = direction4[r][c];
+      m_FloatImageRotation[r][c] = direction4[r][c];
+    }
   imageRegion3.SetSize(0, imageRegion4.GetSize()[0]);
   imageRegion3.SetSize(1, imageRegion4.GetSize()[1]);
   imageRegion3.SetSize(2, imageRegion4.GetSize()[2]);
@@ -142,6 +145,8 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Index<3> idx3,
     dir[1] *= -1;
   if (m_FlipZ)
     dir[2] *= -1;
+  if (m_ApplyDirectionMatrix)
+    dir = m_FloatImageRotation*dir;
 
   return dir;
 }

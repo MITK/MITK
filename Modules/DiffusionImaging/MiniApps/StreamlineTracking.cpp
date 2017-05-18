@@ -85,6 +85,7 @@ int main(int argc, char* argv[])
     parser.addArgument("flip_x", "", mitkCommandLineParser::Bool, "Flip X:", "multiply x-coordinate of direction proposal by -1");
     parser.addArgument("flip_y", "", mitkCommandLineParser::Bool, "Flip Y:", "multiply y-coordinate of direction proposal by -1");
     parser.addArgument("flip_z", "", mitkCommandLineParser::Bool, "Flip Z:", "multiply z-coordinate of direction proposal by -1");
+    //parser.addArgument("apply_image_rotation", "", mitkCommandLineParser::Bool, "Apply image rotation:", "applies image rotation to image peaks (only for 'Peaks' algorithm). This is necessary in some cases, e.g. if the peaks were obtained with MRtrix.");
 
     parser.addArgument("compress", "", mitkCommandLineParser::Float, "Compress:", "Compress output fibers using the given error threshold (in mm)");
     parser.addArgument("additional_images", "", mitkCommandLineParser::StringList, "Additional images:", "specify a list of float images that hold additional information (FA, GFA, additional Features)", us::Any());
@@ -145,6 +146,10 @@ int main(int argc, char* argv[])
     bool flip_z = false;
     if (parsedArgs.count("flip_z"))
         flip_z = us::any_cast<bool>(parsedArgs["flip_z"]);
+
+    bool apply_image_rotation = false;
+    if (parsedArgs.count("apply_image_rotation"))
+        apply_image_rotation = us::any_cast<bool>(parsedArgs["apply_image_rotation"]);
 
     float compress = -1;
     if (parsedArgs.count("compress"))
@@ -299,6 +304,7 @@ int main(int argc, char* argv[])
             dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->AddDwi(input_images.at(0));
             dynamic_cast<mitk::TrackingHandlerRandomForest<6,100>*>(handler)->SetAdditionalFeatureImages(addImages);
         }
+
         if (algorithm == "ProbRF")
             handler->SetMode(mitk::TrackingDataHandler::MODE::PROBABILISTIC);
     }
@@ -313,7 +319,8 @@ int main(int argc, char* argv[])
         mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
 
         dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakImage(itkImg);
-        dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakThreshold(cutoff);
+        dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetApplyDirectionMatrix(apply_image_rotation);
+        dynamic_cast<mitk::TrackingHandlerPeaks*>(handler)->SetPeakThreshold(cutoff);        
     }
     else if (algorithm == "Tensor")
     {

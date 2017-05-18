@@ -59,7 +59,7 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
 
     virtual DataStorage::Pointer LoadWorkspace( const std::string& filename,
                                             DataStorage* storage = NULL,
-                                            bool clearStorageFirst = false );
+                                            bool clearSegmentations = false );
 
 
     /**
@@ -75,7 +75,7 @@ class MITKSCENESERIALIZATION_EXPORT SceneIO : public itk::Object
      * \param predicate defining which items of the datastorage to use and which not
      */
     virtual bool SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                            const std::string& filename);
+                            const std::string& filename, bool compress = true);
 
     /**
      * \brief Get a list of nodes (BaseData containers) that failed to be read/written.

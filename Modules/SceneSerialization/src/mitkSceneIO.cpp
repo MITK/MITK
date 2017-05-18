@@ -31,6 +31,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkStandaloneDataStorage.h"
 #include <mitkStandardFileLocations.h>
 #include <mitkLocaleSwitch.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -89,7 +92,7 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& workDir,
                                                      DataStorage* pStorage,
-                                                     bool clearStorageFirst )
+                                                     bool clearSegmentations )
 {
 
   // prepare data storage
@@ -99,15 +102,21 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadWorkspace( const std::string& work
     storage = StandaloneDataStorage::New().GetPointer();
   }
 
-  if ( clearStorageFirst )
+  if ( clearSegmentations )
   {
+    /* Build list of segmentation nodes that should be removed */
+    mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+    mitk::NodePredicateNot::Pointer isNotImage = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("Image", mitk::BoolProperty::New(true)));
+    mitk::NodePredicateNot::Pointer isBinaryObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false)));
+    mitk::NodePredicateAnd::Pointer isSegmentation = mitk::NodePredicateAnd::New(isNotHelperObject, isNotImage, isBinaryObject);
+    mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeRemoved = storage->GetSubset(isSegmentation);
     try
     {
-      storage->Remove( storage->GetAll() );
+      storage->Remove( nodesToBeRemoved );
     }
     catch(...)
     {
-      MITK_ERROR << "DataStorage cannot be cleared properly.";
+      MITK_ERROR << "DataStorage cannot clear segmentations";
     }
   }
 
@@ -234,7 +243,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 }
 
 bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNodes, const DataStorage* storage,
-                              const std::string& filename)
+                              const std::string& filename, bool compress)
 {
   AUTOPLAN_INFO << "Saving MITK file: " << filename;
   if (!sceneNodes)
@@ -491,23 +500,31 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         Poco::File deleteFile( filename.c_str() );
         if (deleteFile.exists())
         {
-          deleteFile.remove();
+          deleteFile.remove(true);
         }
 
         // create zip at filename
         std::string defaultLocaleFilename = Poco::Path::transcode( filename );
-        std::ofstream file( defaultLocaleFilename.c_str(), std::ios::binary | std::ios::out);
-        if (!file.good())
+        if (compress)
         {
-          MITK_ERROR << "Could not open a zip file for writing: '" << defaultLocaleFilename << "'";
-          return false;
+          std::ofstream file( defaultLocaleFilename.c_str(), std::ios::binary | std::ios::out);
+          if (!file.good())
+          {
+            MITK_ERROR << "Could not open a zip file for writing: '" << defaultLocaleFilename << "'";
+            return false;
+          }
+          else
+          {
+            Poco::Zip::Compress zipper( file, true );
+            Poco::Path tmpdir( m_WorkingDirectory );
+            zipper.addRecursive( tmpdir );
+            zipper.close();
+          }
         }
         else
         {
-          Poco::Zip::Compress zipper( file, true );
-          Poco::Path tmpdir( m_WorkingDirectory );
-          zipper.addRecursive( tmpdir );
-          zipper.close();
+          Poco::File tmpdir( m_WorkingDirectory );
+          tmpdir.copyTo(defaultLocaleFilename);
         }
         try
         {

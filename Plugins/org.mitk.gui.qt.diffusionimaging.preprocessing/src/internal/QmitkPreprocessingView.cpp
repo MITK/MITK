@@ -1527,7 +1527,11 @@ void QmitkPreprocessingView::DoAdcCalculation()
   lut_prop->SetLookupTable( lut );
 
   imageNode->SetProperty("LookupTable", lut_prop );
-  imageNode->SetName((name+"_ADC").toStdString().c_str());
+  if (m_Controls->m_FitAdcBox->isChecked())
+    imageNode->SetName((name+"_ADC").toStdString().c_str());
+  else
+    imageNode->SetName((name+"_MD").toStdString().c_str());
+
   GetDataStorage()->Add(imageNode, node);
 }
 

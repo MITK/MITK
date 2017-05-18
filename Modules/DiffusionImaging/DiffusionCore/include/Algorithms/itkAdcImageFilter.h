@@ -45,6 +45,7 @@ public:
     typedef ImageToImageFilter< VectorImage< TInPixelType, 3 >, Image< TOutPixelType, 3 > >  Superclass;
     typedef mitk::DiffusionPropertyHelper::GradientDirectionType GradientDirectionType;
     typedef mitk::DiffusionPropertyHelper::GradientDirectionsContainerType::Pointer GradientContainerType;
+    typedef itk::Image< unsigned char, 3> ItkUcharImageType;
 
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self)
@@ -57,6 +58,7 @@ public:
     typedef typename Superclass::OutputImageType OutputImageType;
     typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
+    itkSetMacro( MaskImage, ItkUcharImageType::Pointer )
     itkSetMacro( FitSignal, bool )
     itkSetMacro( B_value, double )
     itkSetMacro( GradientDirections, GradientContainerType )
@@ -72,15 +74,22 @@ public:
     bool      m_FitSignal;
     double    m_B_value;
     vnl_vector<double> m_B_values;
+    vnl_vector<double> m_Nonzero_B_values;
     GradientContainerType m_GradientDirections;
+    ItkUcharImageType::Pointer m_MaskImage;
 
     double FitSingleVoxel( const typename InputImageType::PixelType &input);
 
     /**
-     * \brief The lestSquaresFunction struct for Non-Linear-Least-Squres fit of monoexponential model
+     * \brief The lestSquaresFunction struct for Non-Linear-Least-Squres fit of monoexponential model Si = S0*exp(-b*ADC)
      */
     struct adcLeastSquaresFunction: public vnl_least_squares_function
     {
+
+      void set_S0(double val)
+      {
+        S0 = val;
+      }
 
       void set_measurements(const vnl_vector<double>& m)
       {
@@ -90,14 +99,15 @@ public:
 
       void set_bvalues(const vnl_vector<double>& x)
       {
-        bValueVector.set_size(x.size());
-        bValueVector.copy_in(x.data_block());
+        bValues.set_size(x.size());
+        bValues.copy_in(x.data_block());
       }
 
       vnl_vector<double> measurements;
-      vnl_vector<double> bValueVector;
+      vnl_vector<double> bValues;
+      double S0;
 
-      adcLeastSquaresFunction(unsigned int number_of_measurements) :
+      adcLeastSquaresFunction(unsigned int number_of_measurements=1) :
           vnl_least_squares_function(1, number_of_measurements, no_gradient)
       {
       }
@@ -106,9 +116,9 @@ public:
 
         const double & ADC = x[0];
 
-        for(int s=1; s<measurements.size(); s++)
+        for(unsigned int s=0; s<measurements.size(); s++)
         {
-          double approx = measurements[0] * std::exp(-bValueVector[s] * ADC);
+          double approx = S0 * std::exp(-bValues[s] * ADC);
           fx[s] = vnl_math_abs( measurements[s] - approx );
         }
       }

@@ -34,6 +34,8 @@ namespace itk {
 template< class TInPixelType, class TOutPixelType >
 AdcImageFilter< TInPixelType, TOutPixelType>
 ::AdcImageFilter()
+  : m_FitSignal(true)
+  , m_B_value(0)
 {
     this->SetNumberOfRequiredInputs( 1 );
 }
@@ -48,25 +50,57 @@ AdcImageFilter< TInPixelType, TOutPixelType>
     outputImage->FillBuffer(0.0);
 
     m_B_values.set_size(m_GradientDirections->Size());
+    int nonzero = 0;
     for (unsigned int i=0; i<m_GradientDirections->Size(); i++)
     {
       GradientDirectionType g = m_GradientDirections->GetElement(i);
       double twonorm = g.two_norm();
       double b = m_B_value*twonorm*twonorm;
       m_B_values[i] = b;
+
+      if (g.magnitude()>0.001)
+        nonzero++;
     }
+
     MITK_INFO << m_B_values;
+    m_Nonzero_B_values.set_size(nonzero);
+    nonzero = 0;
+    for (unsigned int i=0; i<m_B_values.size(); i++)
+    {
+      if (m_B_values[i]>1)
+      {
+        m_Nonzero_B_values[nonzero] = m_B_values[i];
+        nonzero++;
+      }
+    }
+
+    if (m_B_values.size() == m_Nonzero_B_values.size())
+      mitkThrow() << "Unweighted (b=0 s/mm²) image volume missing!";
+
 }
 
 template< class TInPixelType, class TOutPixelType >
 double
 AdcImageFilter< TInPixelType, TOutPixelType>::FitSingleVoxel( const typename InputImageType::PixelType &input)
 {
-  vnl_vector<double> m; m.set_size(m_B_values.size());
-  for (unsigned int i=0; i<m.size(); i++)
-    m[i] = input[i];
-  adcLeastSquaresFunction f(m_B_values.size());
-  f.set_bvalues(m_B_values);
+  double S0 = 0;
+  int nonzero = 0;
+  vnl_vector<double> m; m.set_size(m_Nonzero_B_values.size());
+  for (unsigned int i=0; i<m_B_values.size(); i++)
+  {
+    if (m_B_values[i]>1)
+    {
+      m[nonzero] = input[i];
+      nonzero++;
+    }
+    else
+      S0 += input[i];
+  }
+  S0 /= (m_B_values.size() - m_Nonzero_B_values.size());
+
+  adcLeastSquaresFunction f(m_Nonzero_B_values.size());
+  f.set_bvalues(m_Nonzero_B_values);
+  f.set_S0(S0);
   f.set_measurements(m);
 
   vnl_levenberg_marquardt lm(f);
@@ -149,8 +183,13 @@ AdcImageFilter< TInPixelType, TOutPixelType>
           outval = FitSingleVoxel(pix);
         }
 
-        if (outval==outval && outval<10000)
+//        if (outval<-0.00001)
+//          outval = -0.00001;
+
+        if (outval==outval && outval<1000)
             oit.Set( outval );
+//        else
+//          oit.Set( -0.00001 );
 
         ++oit;
         ++git;

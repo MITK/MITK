@@ -91,6 +91,7 @@ Image< unsigned char, 3 > >
     itkSetMacro( FlipX, bool)                               ///< flip peaks in x direction
     itkSetMacro( FlipY, bool)                               ///< flip peaks in y direction
     itkSetMacro( FlipZ, bool)                               ///< flip peaks in z direction
+    itkSetMacro( ApplyDirectionMatrix, bool)
 
     // output
     itkGetMacro( NumDirectionsImage, ItkUcharImgType::Pointer )
@@ -140,6 +141,7 @@ Image< unsigned char, 3 > >
     bool                                        m_FlipX;
     bool                                        m_FlipY;
     bool                                        m_FlipZ;
+    bool                                        m_ApplyDirectionMatrix;
 };
 
 }

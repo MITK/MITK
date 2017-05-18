@@ -55,6 +55,7 @@ FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
   , m_AngularThreshold(0.7)
   , m_NumCoeffs((ShOrder*ShOrder + ShOrder + 2)/2 + ShOrder)
   , m_Toolkit(FSL)
+  , m_ApplyDirectionMatrix(false)
 {
   this->SetNumberOfRequiredInputs(1);
 }
@@ -448,7 +449,8 @@ void FiniteDiffOdfMaximaExtractionFilter< PixelType, ShOrder, NrOdfDirections>
         break;
       }
 
-      dir = m_MaskImage->GetDirection()*dir;
+      if (m_ApplyDirectionMatrix)
+        dir = m_MaskImage->GetDirection()*dir;
 
       if (m_FlipX)
         dir[0] = -dir[0];

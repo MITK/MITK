@@ -150,9 +150,12 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
     img->SetVolume(itkCi->GetBufferPointer());
     DataNode::Pointer node = DataNode::New();
     node->SetData(img);
-    node->SetName("_ShCoefficientImage");
-    node->SetVisibility(false);
-    GetDataStorage()->Add(node);
+
+    QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
+    name += "_ShCoefficientImage_Imported";
+    node->SetName(name.toStdString().c_str());
+
+    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 
     {
@@ -161,8 +164,12 @@ void QmitkOdfMaximaExtractionView::TemplatedConvertShCoeffs(mitk::Image* mitkImg
       img->SetVolume(itkQbi->GetBufferPointer());
       DataNode::Pointer node = DataNode::New();
       node->SetData(img);
-      node->SetName("_QballImage");
-      GetDataStorage()->Add(node);
+
+      QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
+      name += "_OdfImage_Imported";
+      node->SetName(name.toStdString().c_str());
+
+      GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
     }
 }
 
@@ -261,8 +268,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
     QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
     name += "_PrincipalDirection";
     node->SetName(name.toStdString().c_str());
-    node->SetVisibility(false);
-    GetDataStorage()->Add(node);
+    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 
   if (m_Controls->m_OutputNumDirectionsBox->isChecked())
@@ -276,7 +282,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
     QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
     name += "_NumDirections";
     node2->SetName(name.toStdString().c_str());
-    GetDataStorage()->Add(node2);
+    GetDataStorage()->Add(node2, m_Controls->m_ImageBox->GetSelectedNode());
   }
 
   if (m_Controls->m_OutputVectorFieldBox->isChecked())
@@ -299,7 +305,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
     node->SetName(name.toStdString().c_str());
     node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
     node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    GetDataStorage()->Add(node);
+    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 }
 
@@ -377,7 +383,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
     QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
     name += "_PEAKS";
     node->SetName(name.toStdString().c_str());
-    GetDataStorage()->Add(node);
+    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 
   if (m_Controls->m_OutputNumDirectionsBox->isChecked())
@@ -391,7 +397,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
     QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
     name += "_NUM_DIRECTIONS";
     node2->SetName(name.toStdString().c_str());
-    GetDataStorage()->Add(node2);
+    GetDataStorage()->Add(node2, m_Controls->m_ImageBox->GetSelectedNode());
   }
 
   if (m_Controls->m_OutputVectorFieldBox->isChecked())
@@ -414,7 +420,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
     node->SetName(name.toStdString().c_str());
     node->SetProperty("Fiber2DSliceThickness", mitk::FloatProperty::New(minSpacing));
     node->SetProperty("Fiber2DfadeEFX", mitk::BoolProperty::New(false));
-    GetDataStorage()->Add(node);
+    GetDataStorage()->Add(node, m_Controls->m_ImageBox->GetSelectedNode());
   }
 }
 
@@ -464,9 +470,7 @@ void QmitkOdfMaximaExtractionView::OnImageSelectionChanged()
 
     Image::Pointer img = dynamic_cast<Image*>(node->GetData());
     if (img->GetDimension()==4)
-    {
         m_Controls->m_ImportShCoeffs->setVisible(true);
-    }
     else
         m_Controls->m_StartPeakExtractionButton->setVisible(true);
 }

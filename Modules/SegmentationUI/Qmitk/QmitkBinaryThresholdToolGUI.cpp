@@ -114,7 +114,18 @@ void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
   if (m_BinaryThresholdTool.IsNotNull())
   {
     m_ChangingSpinner = true;
-    double doubleVal = m_Spinner->value();
+    const double doubleVal = m_Spinner->value();
+
+    // Can happen on float image [_, 1.0[ because the spinner value could be
+    // 1.0 after the min/max are set
+    if (doubleVal >= m_Spinner->maximum())
+    {
+      m_Spinner->setValue(doubleVal / 2.0);
+
+      // The code below will called anyway because we call setValue() above
+      return;
+    }
+
     int intVal = this->DoubleToSliderInt(doubleVal);
     m_BinaryThresholdTool->SetThresholdValue(doubleVal);
     if (m_ChangingSlider == false)

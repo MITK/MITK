@@ -68,6 +68,12 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void NormalizeTimeSteps(const itk::Image<TPixel, VImageDimension>* image);
 
+    /// Offsets without M0s
+    std::string m_RealOffsets;
+
+    /// non M0 indices
+    std::vector< unsigned int > m_NonM0Indices;
+
   };
 } // END mitk namespace
 #endif

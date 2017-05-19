@@ -43,7 +43,20 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
   auto resultMitkImage = this->GetOutput();
   AccessFixedDimensionByItk(inputImage, NormalizeTimeSteps, 4);
 
-  resultMitkImage->SetClonedTimeGeometry(inputImage->GetTimeGeometry());
+  auto originalTimeGeometry = this->GetInput()->GetTimeGeometry();
+  auto resultTimeGeometry = mitk::ProportionalTimeGeometry::New();
+
+  unsigned int numberOfNonM0s = m_NonM0Indices.size();
+  resultTimeGeometry->Expand(numberOfNonM0s);
+
+  for (unsigned int index = 0; index < numberOfNonM0s; ++index)
+  {
+    resultTimeGeometry->SetTimeStepGeometry(originalTimeGeometry->GetGeometryCloneForTimeStep(m_NonM0Indices.at(index)), index);
+  }
+  resultMitkImage->SetTimeGeometry(resultTimeGeometry);
+
+  resultMitkImage->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
+  resultMitkImage->GetPropertyList()->SetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), m_RealOffsets.c_str());
 
 }
 
@@ -61,16 +74,26 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
 
   // determine normalization images
   std::vector<unsigned int> mZeroIndices;
+  std::stringstream offsetsWithoutM0;
+  m_NonM0Indices.clear();
   for (unsigned int index = 0; index < parts.size(); ++index)
   {
     if ((std::stod(parts.at(index)) < -299) || (std::stod(parts.at(index)) > 299))
     {
       mZeroIndices.push_back(index);
     }
+    else
+    {
+      offsetsWithoutM0 << parts.at(index) << " ";
+      m_NonM0Indices.push_back(index);
+    }
   }
 
+
   auto resultImage = OutputImageType::New();
-  resultImage->SetRegions(image->GetLargestPossibleRegion());
+  typename ImageType::RegionType targetEntireRegion = image->GetLargestPossibleRegion();
+  targetEntireRegion.SetSize(3, m_NonM0Indices.size());
+  resultImage->SetRegions(targetEntireRegion);
   resultImage->Allocate();
   resultImage->FillBuffer(0);
 
@@ -84,24 +107,24 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
   sourceRegion.SetSize(3, 1);
   typename OutputImageType::RegionType targetRegion = resultImage->GetLargestPossibleRegion();
   targetRegion.SetSize(3, 1);
-
-  for (unsigned int timestep = 0; timestep < numberOfTimesteps; ++timestep)
+  unsigned int targetTimestep = 0;
+  for (unsigned int sourceTimestep = 0; sourceTimestep < numberOfTimesteps; ++sourceTimestep)
   {
     unsigned int lowerMZeroIndex = mZeroIndices[0];
     unsigned int upperMZeroIndex = mZeroIndices[0];
     for (unsigned int loop = 0; loop < mZeroIndices.size(); ++loop)
     {
-      if (mZeroIndices[loop] <= timestep)
+      if (mZeroIndices[loop] <= sourceTimestep)
       {
         lowerMZeroIndex = mZeroIndices[loop];
       }
-      if (mZeroIndices[loop] > timestep)
+      if (mZeroIndices[loop] > sourceTimestep)
       {
         upperMZeroIndex = mZeroIndices[loop];
         break;
       }
     }
-    bool isMZero = (lowerMZeroIndex == timestep);
+    bool isMZero = (lowerMZeroIndex == sourceTimestep);
 
     double weight = 0.0;
     if (lowerMZeroIndex == upperMZeroIndex)
@@ -110,14 +133,12 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
     }
     else
     {
-      weight = 1.0 - double(timestep - lowerMZeroIndex) / double(upperMZeroIndex - lowerMZeroIndex);
+      weight = 1.0 - double(sourceTimestep - lowerMZeroIndex) / double(upperMZeroIndex - lowerMZeroIndex);
     }
-
     lowerMZeroRegion.SetIndex(3, lowerMZeroIndex);
     upperMZeroRegion.SetIndex(3, upperMZeroIndex);
-    sourceRegion.SetIndex(3, timestep);
-    targetRegion.SetIndex(3, timestep);
-
+    sourceRegion.SetIndex(3, sourceTimestep);
+    targetRegion.SetIndex(3, targetTimestep);
 
     itk::ImageRegionConstIterator<ImageType> lowerMZeroIterator(image, lowerMZeroRegion);
     itk::ImageRegionConstIterator<ImageType> upperMZeroIterator(image, upperMZeroRegion);
@@ -126,13 +147,7 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
 
     if (isMZero)
     {
-      while (!sourceIterator.IsAtEnd())
-      {
-        targetIterator.Set(double(sourceIterator.Get()));
-
-        ++sourceIterator;
-        ++targetIterator;
-      }
+      //do nothing
     }
     else
     {
@@ -146,6 +161,7 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
         ++sourceIterator;
         ++targetIterator;
       }
+      ++targetTimestep;
     }
   }
 
@@ -153,6 +169,8 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
   mitk::Image::Pointer resultMitkImage = this->GetOutput();
   // write into output image
   mitk::CastToMitkImage<OutputImageType>(resultImage, resultMitkImage);
+
+  m_RealOffsets = offsetsWithoutM0.str();
 }
 
 void mitk::CESTImageNormalizationFilter::GenerateOutputInformation()
@@ -161,7 +179,4 @@ void mitk::CESTImageNormalizationFilter::GenerateOutputInformation()
   mitk::Image::Pointer output = this->GetOutput();
 
   itkDebugMacro(<< "GenerateOutputInformation()");
-
-  output->SetClonedTimeGeometry(input->GetTimeGeometry());
-  output->SetPropertyList(input->GetPropertyList()->Clone());
 }

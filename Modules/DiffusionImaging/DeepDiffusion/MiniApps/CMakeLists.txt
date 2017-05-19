@@ -27,7 +27,7 @@ if(BUILD_DeepDiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     mitkFunctionCreateCommandLineApp(
       NAME ${appname}
       DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
-      PACKAGE_DEPENDS ITK Eigen Caffe2
+      PACKAGE_DEPENDS ITK Eigen Caffe2 OpenCV
     )
   endforeach()
 

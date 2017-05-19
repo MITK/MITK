@@ -1,11 +1,6 @@
 set(CPP_FILES
-
+  mitkDeepDiffusionModuleActivator.cpp
 )
 
 set(H_FILES
-
-)
-
-set(RESOURCE_FILES
-
 )

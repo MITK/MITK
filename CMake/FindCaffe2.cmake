@@ -4,6 +4,8 @@ set(Caffe2_INCLUDE_DIR ${Caffe2_DIR}/include)
 set(Caffe2_CMAKE_DEBUG_POSTFIX d)
 
 set(Caffe2_LIBRARIES)
+
+find_library (PROTOBUF_LIB protobuf)
   
 FOREACH(POSTFIX _CPU;_GPU)
 
@@ -36,17 +38,17 @@ FOREACH(POSTFIX _CPU;_GPU)
 
   if(Caffe2_LIBRARY_RELEASE)
     list(APPEND Caffe2_LIBRARIES optimized ${Caffe2_LIBRARY_RELEASE})
-    list(APPEND Caffe2_LIBRARIES optimized /usr/lib/x86_64-linux-gnu/libprotobuf.so)
+    list(APPEND Caffe2_LIBRARIES optimized ${PROTOBUF_LIB})
   endif()
 
   if(Caffe2_LIBRARY_DEBUG)
     list(APPEND Caffe2_LIBRARIES debug ${Caffe2_LIBRARY_DEBUG})
-    list(APPEND Caffe2_LIBRARIES debug /usr/lib/x86_64-linux-gnu/libprotobuf.so)
+    list(APPEND Caffe2_LIBRARIES debug ${PROTOBUF_LIB})
   endif()
   
 ENDFOREACH()
 
 find_package_handle_standard_args(Caffe2
   FOUND_VAR Caffe2_FOUND
-  REQUIRED_VARS Caffe2_INCLUDE_DIR Caffe2_LIBRARIES
+  REQUIRED_VARS Caffe2_INCLUDE_DIR Caffe2_LIBRARIES PROTOBUF_LIB
 )

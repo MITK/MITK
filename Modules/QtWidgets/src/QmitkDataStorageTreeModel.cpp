@@ -559,7 +559,7 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
       m_DataStorage->ChangedNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
         , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::SetNodeModified ) );
 
-      m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
+      m_DataStorage->RemoveNodeEvent.AddFirstListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
         , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::RemoveNode ) );
 
       mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetSubset(m_Predicate);

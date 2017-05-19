@@ -391,6 +391,27 @@ public:
     m_Mutex.Unlock();
   }
 
+  /**
+  * \brief AddFirstListener
+  *
+  * New listener will be first receiver.
+  * Note: The use of both AddListener and AddFirstListener for the same (object, member function) pair in callback can give an unexpected result.
+  */
+  void AddFirstListener(const AbstractDelegate& delegate) const
+  {
+    AbstractDelegatePtr msgCmd(delegate.Clone());
+
+    m_Mutex.Lock();
+    const auto iter = std::find_if(m_Listeners.begin(), m_Listeners.end(),
+      [msgCmd](AbstractDelegatePtr item) { return *item == msgCmd.get(); });
+    if (m_Listeners.end() == iter) {
+      m_Listeners.push_front(msgCmd);
+    } else {
+      m_ListenerToRemove.erase(iter->get());
+    }
+    m_Mutex.Unlock();
+  }
+
   void operator += (const AbstractDelegate& delegate) const
   {
     this->AddListener(delegate);

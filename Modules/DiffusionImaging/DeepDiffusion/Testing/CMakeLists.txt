@@ -1,0 +1,3 @@
+MITK_CREATE_MODULE_TESTS()
+
+mitkAddCustomModuleTest(mitkCaffe2PredictionTest mitkCaffe2PredictionTest)

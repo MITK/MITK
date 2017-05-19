@@ -36,6 +36,42 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+void to_tensorcpu(cv::Mat &img, caffe2::TensorCPU &tensor)
+{
+    cv::Mat img2;
+
+    const int num_channel = tensor.dim(1);
+    const int height = tensor.dim(2);
+    const int width = tensor.dim(3);
+
+    assert(img.channels() == num_channel);
+    assert(img.cols == width);
+    assert(img.rows == height);
+
+    // convert to float
+    if (num_channel==3 && img.type()!=CV_32FC3)
+        img.convertTo(img, CV_32FC3);
+    else if(num_channel==1 && img.type()!=CV_32FC1)
+        img.convertTo(img, CV_32FC1);
+
+    // subtract mean
+    img -= 128;  // necessary?
+
+    float* tensor_data = tensor.mutable_data<float>();
+
+    // create array of cv::Mat where each matrix points to the tensor data
+    std::vector<cv::Mat> bgr;
+    for (int i = 0; i < num_channel; ++i)
+    {
+        bgr.push_back(cv::Mat(height, width, CV_32FC1, tensor_data));
+        tensor_data += width * height;
+    }
+
+    // HWC to CHW
+    // splits 3 channel matrix into three single channel matrices
+    cv::split(img, bgr);
+}
+
 /*!
 * \brief Minimal example for Caffe2 prediction in MITK
 *
@@ -59,16 +95,9 @@ int main(int argc, char* argv[])
 
   cv::Mat img = cv::imread(image_filename, CV_LOAD_IMAGE_COLOR);
 
-  cv::Mat img2;
-  img.convertTo(img2, CV_32FC3);
-  //img2 /= 255.0;
-  //img2 -= 0.5;
-  //img2 -= 127;
-  //img2 *= 0.0;
-
-  cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
-  cv::imshow( "Display window", img2 );                   // Show our image inside it.
-  cv::waitKey(0);                                          // Wait for a keystroke in the window
+//  cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
+//  cv::imshow( "Display window", img2 );                   // Show our image inside it.
+//  cv::waitKey(0);                                          // Wait for a keystroke in the window
 
   caffe2::NetDef init_net, predict_net;
   CAFFE_ENFORCE(ReadProtoFromFile(init_net_filename, &init_net));
@@ -78,14 +107,11 @@ int main(int argc, char* argv[])
   //MITK_INFO << "Init net: " << ProtoDebugString(init_net);
   MITK_INFO << "Predict net: " << ProtoDebugString(predict_net);
   auto predictor = caffe2::make_unique<caffe2::Predictor>(init_net, predict_net);
-  LOG(INFO) << "Checking that a null forward-pass works";
   caffe2::Predictor::TensorVector outputVec;
 
   int w,h,c; w=227; h=227; c=3;
   caffe2::TensorCPU input(std::vector<int>({1, c, h, w}));
-
-  //float input_data[h*w*c];
-  memcpy(input.mutable_data<float>(), (float*)img2.ptr(), h * w * c * sizeof(float));
+  to_tensorcpu(img, input);
 
   caffe2::Predictor::TensorVector inputVec{&input};
 
@@ -94,9 +120,6 @@ int main(int argc, char* argv[])
   caffe2::TensorCPU* output = outputVec[0];
 
   const float* output_data =  output->data<float>();
-//  for (auto el : output->dims())
-//    MITK_INFO << el;
-//  MITK_INFO << output->size();
   int max_class = -1;
   float max_prob = 0;
   for (int i=0; i<output->size(); i++)

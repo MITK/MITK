@@ -27,7 +27,6 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
     FileFormatConverter^^MitkFiberTracking
     RfTraining^^MitkFiberTracking
     TractDensity^^MitkFiberTracking
-    Caffe2Test^^MitkFiberTracking
     )
 
     foreach(diffusionminiapp ${diffusionminiapps})
@@ -42,7 +41,7 @@ if(BUILD_DiffusionMiniApps OR MITK_BUILD_ALL_APPS)
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
         DEPENDS MitkCore MitkDiffusionCore ${dependencies_list}
-        PACKAGE_DEPENDS ITK GFLAGS Caffe2
+        PACKAGE_DEPENDS ITK
       )
     endforeach()
 

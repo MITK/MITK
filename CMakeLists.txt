@@ -283,8 +283,8 @@ if(MITK_USE_Qt5)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  mitkFunctionAddExternalProject(NAME GFLAGS      OFF ADVANCED)
-  mitkFunctionAddExternalProject(NAME Caffe2      OFF ADVANCED DEPENDS GFLAGS)
+  #mitkFunctionAddExternalProject(NAME GFLAGS      OFF ADVANCED)
+  mitkFunctionAddExternalProject(NAME Caffe2      OFF ADVANCED)
 endif()
 
 # -----------------------------------------

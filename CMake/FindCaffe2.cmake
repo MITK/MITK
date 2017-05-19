@@ -36,10 +36,12 @@ FOREACH(POSTFIX _CPU;_GPU)
 
   if(Caffe2_LIBRARY_RELEASE)
     list(APPEND Caffe2_LIBRARIES optimized ${Caffe2_LIBRARY_RELEASE})
+    list(APPEND Caffe2_LIBRARIES optimized /usr/lib/x86_64-linux-gnu/libprotobuf.so)
   endif()
 
   if(Caffe2_LIBRARY_DEBUG)
     list(APPEND Caffe2_LIBRARIES debug ${Caffe2_LIBRARY_DEBUG})
+    list(APPEND Caffe2_LIBRARIES debug /usr/lib/x86_64-linux-gnu/libprotobuf.so)
   endif()
   
 ENDFOREACH()

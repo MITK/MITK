@@ -375,6 +375,11 @@ namespace mitk {
     std::make_pair("0008|1030", "dicom.study.StudyDescription"),
     std::make_pair("0008|1048", "dicom.study.PhysiciansOfRecord"),
     std::make_pair("0008|1060", "dicom.study.NameOfPhysicianReadingStudy"),
+
+    //General Acquisition module
+    std::make_pair("0008|0022", "dicom.acquisition.Date"),
+    std::make_pair("0008|0032", "dicom.acquisition.Time"),
+    std::make_pair("0020|0012", "dicom.acquisition.Number"),
     
     // General Series module
     std::make_pair("0008|0060", "dicom.series.Modality"),
@@ -408,6 +413,10 @@ namespace mitk {
     std::make_pair("0018|1164", "dicom.ImagerPixelSpacing"),
     
     // Misc 
-    std::make_pair("0008|0005", "dicom.SpecificCharacterSet")
+    std::make_pair("0008|0005", "dicom.SpecificCharacterSet"),
+    std::make_pair("0018|0080", "dicom.TR"),
+    std::make_pair("0018|0081", "dicom.TE"),
+    std::make_pair("0018|0087", "dicom.MagneticFieldStrength"),
+    std::make_pair("0051|100E", "dicom.ExInfo")
   };
 }

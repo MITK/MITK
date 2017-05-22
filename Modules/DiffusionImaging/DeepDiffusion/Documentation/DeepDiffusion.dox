@@ -1,0 +1,10 @@
+/**
+\page DeepDiffusion MITK DeepDiffusion
+
+This module contains algorithms using deep learning. As deep learning engine we employ Caffe2 (https://caffe2.ai/, https://github.com/caffe2/caffe2). Using this modul requires the Caffe2 external dependencies to be installed (https://caffe2.ai/docs/getting-started.html?platform=ubuntu&configuration=compile). The python dependencies are not necessary since Caffe2 in MITK is built without python support.
+
+Currently Caffe2 in MITK is only enabled on Linux, so Windows and Mac are not supperted at the moment. In general, this Module is experimental!
+
+An example for prediction with MITK and Caffe2 can be found in mitkCaffe2PredictionTest.cpp
+An example for training in MITK will eventually be included in the future, but probably the most convenient apporoach is to train the networks using python and to only use MITK for prediction.
+*/

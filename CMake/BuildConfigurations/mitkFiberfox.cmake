@@ -11,7 +11,7 @@ set(MITK_BUILD_APP_Workbench OFF CACHE BOOL "Build the MITK Workbench" FORCE)
 set(MITK_BUILD_APP_Fiberfox ON CACHE BOOL "Build MITK Fiberfox" FORCE)
 
 # Activate Diffusion Mini Apps
-set(BUILD_DiffusionMiniApps ON CACHE BOOL "Build MITK Diffusion MiniApps" FORCE)
+set(BUILD_DiffusionCmdApps ON CACHE BOOL "Build MITK Diffusion MiniApps" FORCE)
 
 # Build neither all plugins nor examples
 set(MITK_BUILD_ALL_PLUGINS OFF CACHE BOOL "Build all MITK plugins" FORCE)

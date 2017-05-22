@@ -19,8 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkPhotoacousticBModeImageFilter.h"
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
-#include "mitkPhotoacousticBeamformingDASFilter.h"
-#include "mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingFilter.h"
 #include <chrono>
 #include <mitkAutoCropImageFilter.h>
 
@@ -230,7 +229,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyCropping(mitk::Image::Pointe
   return output;
 }
 
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
+mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
 {
   // crop the image
   config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
@@ -250,35 +249,7 @@ mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDAS(mitk::Image::
   }
 
   // perform the beamforming
-  BeamformingDASFilter::Pointer Beamformer = BeamformingDASFilter::New();
-  Beamformer->SetInput(resizedImage);
-  Beamformer->Configure(config);
-  Beamformer->SetProgressHandle(progressHandle);
-  Beamformer->UpdateLargestPossibleRegion();
-  return Beamformer->GetOutput();
-}
-
-mitk::Image::Pointer mitk::PhotoacousticImage::ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle)
-{
-  // crop the image
-  config.RecordTime = config.RecordTime - cutoff / inputImage->GetDimension(1) * config.RecordTime; // adjust the recorded time lost by cropping
-  progressHandle(0, "cropping image");
-  Image::Pointer croppedImage = ApplyCropping(inputImage, cutoff, 0, 0, 0);
-  Image::Pointer resizedImage = croppedImage;
-
-  // resample the image in horizontal direction
-  if(inputImage->GetDimension(0) != config.ReconstructionLines)
-  {
-    progressHandle(0, "resampling image");
-    auto begin = std::chrono::high_resolution_clock::now();
-    unsigned int dim[3] = { config.ReconstructionLines, croppedImage->GetDimension(1), croppedImage->GetDimension(2) };
-    resizedImage = ApplyResampling(croppedImage, dim);
-    auto end = std::chrono::high_resolution_clock::now();
-    MITK_INFO << "Upsampling from " << inputImage->GetDimension(0) << " to " << config.ReconstructionLines << " lines completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
-  }
-
-  // perform the beamforming
-  BeamformingDMASFilter::Pointer Beamformer = BeamformingDMASFilter::New();
+  BeamformingFilter::Pointer Beamformer = BeamformingFilter::New();
   Beamformer->SetInput(resizedImage);
   Beamformer->Configure(config);
   Beamformer->SetProgressHandle(progressHandle);

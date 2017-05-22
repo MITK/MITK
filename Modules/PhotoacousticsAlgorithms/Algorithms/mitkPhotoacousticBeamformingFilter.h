@@ -15,8 +15,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 ===================================================================*/
 
 
-#ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_DAS_FILTER
-#define MITK_PHOTOACOUSTICS_BEAMFORMING_DAS_FILTER
+#ifndef MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
+#define MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER
 
 #include "mitkImageToImageFilter.h"
 #include <functional>
@@ -26,10 +26,10 @@ namespace mitk {
   //##Documentation
   //## @brief
   //## @ingroup Process
-  class BeamformingDASFilter : public ImageToImageFilter
+  class BeamformingFilter : public ImageToImageFilter
   {
   public:
-    mitkClassMacro(BeamformingDASFilter, ImageToImageFilter);
+    mitkClassMacro(BeamformingFilter, ImageToImageFilter);
 
     itkFactorylessNewMacro(Self)
       itkCloneMacro(Self)
@@ -51,6 +51,9 @@ namespace mitk {
       enum Apodization {Hamm, Hann, Box};
       Apodization Apod = Hann;
 
+      enum BeamformingAlgorithm {DMAS, DAS};
+      BeamformingAlgorithm Algorithm = DAS;
+
       double Angle = 10;
       bool Photoacoustic = true;
       double BPHighPass = 50;
@@ -65,9 +68,9 @@ namespace mitk {
 
   protected:
 
-    BeamformingDASFilter();
+    BeamformingFilter();
 
-    ~BeamformingDASFilter();
+    ~BeamformingFilter();
 
     virtual void GenerateInputRequestedRegion() override;
 
@@ -88,6 +91,9 @@ namespace mitk {
     void DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
     void DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
 
+    void DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
+    void DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
+
     mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
     itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
 
@@ -100,4 +106,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif MITK_PHOTOACOUSTICS_BEAMFORMING_DAS_FILTER
+#endif MITK_PHOTOACOUSTICS_BEAMFORMING_FILTER

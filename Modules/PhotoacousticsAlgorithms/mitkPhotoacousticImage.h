@@ -23,8 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkImage.h"
 #include <functional>
 
-#include "Algorithms/mitkPhotoacousticBeamformingDASFilter.h"
-#include "Algorithms/mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingFilter.h"
 
 #include "MitkPhotoacousticsAlgorithmsExports.h"
 
@@ -38,8 +37,7 @@ namespace mitk {
       mitk::Image::Pointer ApplyBmodeFilter(mitk::Image::Pointer inputImage, bool UseLogFilter = false, float resampleSpacing = 0.15);
 //      mitk::Image::Pointer ApplyScatteringCompensation(mitk::Image::Pointer inputImage, int scatteringCoefficient);
       mitk::Image::Pointer ApplyResampling(mitk::Image::Pointer inputImage, unsigned int outputSize[3]);
-      mitk::Image::Pointer ApplyBeamformingDAS(mitk::Image::Pointer inputImage, BeamformingDASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
-      mitk::Image::Pointer ApplyBeamformingDMAS(mitk::Image::Pointer inputImage, BeamformingDMASFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
+      mitk::Image::Pointer ApplyBeamforming(mitk::Image::Pointer inputImage, BeamformingFilter::beamformingSettings config, int cutoff, std::function<void(int, std::string)> progressHandle = [](int, std::string) {});
       mitk::Image::Pointer ApplyCropping(mitk::Image::Pointer inputImage, int above, int below, int right, int left);
 
     protected:

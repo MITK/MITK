@@ -30,8 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //mitk image
 #include <mitkImage.h>
 #include "mitkPhotoacousticImage.h"
-#include "mitkPhotoacousticBeamformingDASFilter.h"
-#include "mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingFilter.h"
 
 //other
 #include <thread>
@@ -133,8 +132,7 @@ void PAImageProcessing::StartBeamformingThread()
       connect(thread, &BeamformingThread::updateProgress, this, &PAImageProcessing::UpdateProgress);
       connect(thread, &BeamformingThread::finished, thread, &QObject::deleteLater);
 
-      thread->setBeamformingAlgorithm(m_CurrentBeamformingAlgorithm);
-      thread->setConfigs(DMASconfig, DASconfig);
+      thread->setConfig(BFconfig);
       thread->setInputImage(image);
 
       MITK_INFO << "Started new thread for Beamforming";
@@ -153,14 +151,14 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
 
   newNodeName << m_OldNodeName << " ";
 
-  if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DAS)
+  if (BFconfig.Algorithm == mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DAS)
     newNodeName << "DAS bf, ";
-  else if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
+  else if (BFconfig.Algorithm == mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DMAS)
     newNodeName << "DMAS bf, ";
 
-  if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox)
+  if (BFconfig.DelayCalculationMethod == mitk::BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox)
     newNodeName << "q. delay";
-  if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical)
+  if (BFconfig.DelayCalculationMethod == mitk::BeamformingFilter::beamformingSettings::DelayCalc::Spherical)
     newNodeName << "s. delay";
 
   newNode->SetName(newNodeName.str());
@@ -281,17 +279,14 @@ void PAImageProcessing::UpdateBounds()
   {
     m_Controls.boundLow->setEnabled(false);
     m_Controls.boundHigh->setEnabled(false);
-    DASconfig.partial = false;
-    DMASconfig.partial = false;
-    MITK_INFO << "ASFASF";
+    BFconfig.partial = false;
     return;
   }
   else
   {
     m_Controls.boundLow->setEnabled(true);
     m_Controls.boundHigh->setEnabled(true);
-    DASconfig.partial = true;
-    DMASconfig.partial = true;
+    BFconfig.partial = true;
   }
 
   if(m_Controls.boundLow->value()>m_Controls.boundHigh->value())
@@ -299,17 +294,13 @@ void PAImageProcessing::UpdateBounds()
     MITK_INFO << "high bound < low bound -> setting both to beamform only first slice";
     m_Controls.boundLow->setValue(0); 
     m_Controls.boundHigh->setValue(0);
-    DASconfig.bounds[0] = 0; 
-    DMASconfig.bounds[0] = 0;
-    DASconfig.bounds[1] = 0;
-    DMASconfig.bounds[1] = 0;
+    BFconfig.bounds[0] = 0; 
+    BFconfig.bounds[1] = 0;
   }
   else
   {
-    DASconfig.bounds[0] = m_Controls.boundLow->value();
-    DMASconfig.bounds[0] = m_Controls.boundLow->value();
-    DASconfig.bounds[1] = m_Controls.boundHigh->value();
-    DMASconfig.bounds[1] = m_Controls.boundHigh->value();
+    BFconfig.bounds[0] = m_Controls.boundLow->value();
+    BFconfig.bounds[1] = m_Controls.boundHigh->value();
   }
 }
 
@@ -325,8 +316,8 @@ void PAImageProcessing::UpdateProgress(int progress, std::string progressInfo)
 
 void PAImageProcessing::UpdateFrequency()
 {
-  DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
-  DMASconfig.SamplesPerLine = m_Controls.Samples->value();
+  BFconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
+  BFconfig.SamplesPerLine = m_Controls.Samples->value();
 
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
@@ -357,7 +348,7 @@ void PAImageProcessing::UpdateFrequency()
   }
 
   std::stringstream frequency;
-  frequency << 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000; //[MHz]
+  frequency << 1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000; //[MHz]
   frequency << "MHz";
 
   frequency << " is the maximal allowed frequency for the selected image.";
@@ -412,103 +403,82 @@ void PAImageProcessing::SetResampling()
 void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
 {
   if ("DAS" == m_Controls.BFAlgorithm->currentText())
-    m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DAS;
+    BFconfig.Algorithm = mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DAS;
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
-    m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DMAS;
+    BFconfig.Algorithm = mitk::BeamformingFilter::beamformingSettings::BeamformingAlgorithm::DMAS;
 
   if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
-    DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox;
-    DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::QuadApprox;
+    BFconfig.DelayCalculationMethod = mitk::BeamformingFilter::beamformingSettings::DelayCalc::QuadApprox;
   }
   else if ("Spherical Wave" == m_Controls.DelayCalculation->currentText())
   {
-    DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical;
-    DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Spherical;
+    BFconfig.DelayCalculationMethod = mitk::BeamformingFilter::beamformingSettings::DelayCalc::Spherical;
   }
 
   if ("Von Hann" == m_Controls.Apodization->currentText())
   {
-    DASconfig.Apod = mitk::BeamformingDASFilter::beamformingSettings::Apodization::Hann;
-    DMASconfig.Apod = mitk::BeamformingDMASFilter::beamformingSettings::Apodization::Hann;
+    BFconfig.Apod = mitk::BeamformingFilter::beamformingSettings::Apodization::Hann;
   }
   else if ("Hamming" == m_Controls.Apodization->currentText())
   {
-    DASconfig.Apod = mitk::BeamformingDASFilter::beamformingSettings::Apodization::Hamm;
-    DMASconfig.Apod = mitk::BeamformingDMASFilter::beamformingSettings::Apodization::Hamm;
+    BFconfig.Apod = mitk::BeamformingFilter::beamformingSettings::Apodization::Hamm;
   }
   else if ("Box" == m_Controls.Apodization->currentText())
   {
-    DASconfig.Apod = mitk::BeamformingDASFilter::beamformingSettings::Apodization::Box;
-    DMASconfig.Apod = mitk::BeamformingDMASFilter::beamformingSettings::Apodization::Box;
+    BFconfig.Apod = mitk::BeamformingFilter::beamformingSettings::Apodization::Box;
   }
 
-  DASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
-  DASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
-  DASconfig.SamplesPerLine = m_Controls.Samples->value();
-  DASconfig.ReconstructionLines = m_Controls.Lines->value();
-  DASconfig.TransducerElements = m_Controls.ElementCount->value();
-  DASconfig.Angle = m_Controls.Angle->value(); // [deg]
-  DASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
-  DASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value()); // [Hz]
-  DASconfig.ButterworthOrder = m_Controls.BPFalloff->value();
-  DASconfig.UseBP = m_Controls.UseBP->isChecked();
-
-  DMASconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
-  DMASconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
-  DMASconfig.SamplesPerLine = m_Controls.Samples->value();
-  DMASconfig.ReconstructionLines = m_Controls.Lines->value();
-  DMASconfig.TransducerElements = m_Controls.ElementCount->value();
-  DMASconfig.Angle = m_Controls.Angle->value(); //[deg]
-  DMASconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
-  DMASconfig.BPLowPass = 1000000 * (1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000 /1000000 - m_Controls.BPlow->value()); // [Hz]
-  DMASconfig.ButterworthOrder = m_Controls.BPFalloff->value();
-  DMASconfig.UseBP = m_Controls.UseBP->isChecked();
+  BFconfig.Pitch = m_Controls.Pitch->value() / 1000; // [m]
+  BFconfig.SpeedOfSound = m_Controls.SpeedOfSound->value(); // [m/s]
+  BFconfig.SamplesPerLine = m_Controls.Samples->value();
+  BFconfig.ReconstructionLines = m_Controls.Lines->value();
+  BFconfig.TransducerElements = m_Controls.ElementCount->value();
+  BFconfig.Angle = m_Controls.Angle->value(); // [deg]
+  BFconfig.BPHighPass = 1000000 * m_Controls.BPhigh->value(); // [Hz]
+  BFconfig.BPLowPass = 1000000 * (1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000 / 1000000 - m_Controls.BPlow->value()); // [Hz]
+  BFconfig.ButterworthOrder = m_Controls.BPFalloff->value();
+  BFconfig.UseBP = m_Controls.UseBP->isChecked();
 
   UpdateRecordTime(image);
   UpdateBounds();
 
   // add a safeguard so the program does not chrash when applying a Bandpass that reaches out of the bounds of the image
 
-  double maxFrequency = 1 / (DMASconfig.RecordTime / DMASconfig.SamplesPerLine) * DMASconfig.SamplesPerLine / 2 / 2 / 1000; // [Hz]
+  double maxFrequency = 1 / (BFconfig.RecordTime / BFconfig.SamplesPerLine) * BFconfig.SamplesPerLine / 2 / 2 / 1000; // [Hz]
 
-  if (DMASconfig.BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
+  if (BFconfig.BPLowPass > maxFrequency && m_Controls.UseBP->isChecked())
   {
     QMessageBox Msgbox;
     Msgbox.setText("LowPass too low, disabled it.");
     Msgbox.exec();
 
-    DMASconfig.BPLowPass = 0;
-    DASconfig.BPLowPass = 0;
+    BFconfig.BPLowPass = 0;
   }
-  if (DMASconfig.BPLowPass < 0 && m_Controls.UseBP->isChecked())
+  if (BFconfig.BPLowPass < 0 && m_Controls.UseBP->isChecked())
   {
     QMessageBox Msgbox;
     Msgbox.setText("LowPass too high, disabled it.");
     Msgbox.exec();
     
-    DMASconfig.BPLowPass = 0;
-    DASconfig.BPLowPass = 0;
+    BFconfig.BPLowPass = 0;
   }
-  if (DMASconfig.BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
+  if (BFconfig.BPHighPass > maxFrequency &&  m_Controls.UseBP->isChecked())
   {
     QMessageBox Msgbox;
     Msgbox.setText("HighPass too high, disabled it.");
     Msgbox.exec();
 
-    DMASconfig.BPHighPass = 0;
-    DASconfig.BPHighPass = 0;
+    BFconfig.BPHighPass = 0;
   }
-  if (DMASconfig.BPHighPass > maxFrequency - DMASconfig.BPLowPass)
+  if (BFconfig.BPHighPass > maxFrequency - BFconfig.BPLowPass)
   {
     QMessageBox Msgbox;
     Msgbox.setText("HighPass higher than LowPass, disabled both.");
     Msgbox.exec();
 
-    DMASconfig.BPHighPass = 0;
-    DASconfig.BPHighPass = 0;
-    DMASconfig.BPLowPass = 0;
-    DASconfig.BPLowPass = 0;
+    BFconfig.BPHighPass = 0;
+    BFconfig.BPLowPass = 0;
   }
 }
 
@@ -516,31 +486,26 @@ void PAImageProcessing::UpdateRecordTime(mitk::Image::Pointer image)
 {
   if (m_Controls.UseImageSpacing->isChecked())
   {
-    DASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
-    DMASconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
-    MITK_INFO << "Calculated Scan Depth of " << DASconfig.RecordTime * DASconfig.SpeedOfSound * 100 << "cm";
+    BFconfig.RecordTime = image->GetDimension(1)*image->GetGeometry()->GetSpacing()[1] / 1000000; // [s]
+    MITK_INFO << "Calculated Scan Depth of " << BFconfig.RecordTime * BFconfig.SpeedOfSound * 100 << "cm";
   }
   else
   {
-    DASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DASconfig.SpeedOfSound; // [s]
-    DMASconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / DMASconfig.SpeedOfSound; // [s]
+    BFconfig.RecordTime = m_Controls.ScanDepth->value() / 1000 / BFconfig.SpeedOfSound; // [s]
   }
 
   if ("US Image" == m_Controls.ImageType->currentText())
   {
     if (m_Controls.UseImageSpacing->isChecked())
     {
-      DASconfig.RecordTime = DASconfig.RecordTime / 2; // [s]
-      DMASconfig.RecordTime = DMASconfig.RecordTime / 2; // [s]
+      BFconfig.RecordTime = BFconfig.RecordTime / 2; // [s]
     }
 
-    DASconfig.Photoacoustic = false;
-    DMASconfig.Photoacoustic = false;
+    BFconfig.Photoacoustic = false;
   }
   else if ("PA Image" == m_Controls.ImageType->currentText())
   {
-    DASconfig.Photoacoustic = true;
-    DMASconfig.Photoacoustic = true;
+    BFconfig.Photoacoustic = true;
   }
 }
 
@@ -632,23 +597,14 @@ void BeamformingThread::run()
       emit updateProgress(progress, progressInfo);
     };
 
-  if (m_CurrentBeamformingAlgorithm == PAImageProcessing::BeamformingAlgorithms::DAS)
-    resultImage = filterbank->ApplyBeamformingDAS(m_InputImage, m_DASconfig, m_Cutoff, progressHandle);
-  else if (m_CurrentBeamformingAlgorithm == PAImageProcessing::BeamformingAlgorithms::DMAS)
-    resultImage = filterbank->ApplyBeamformingDMAS(m_InputImage, m_DMASconfig, m_Cutoff, progressHandle);
+  resultImage = filterbank->ApplyBeamforming(m_InputImage, m_BFconfig, m_Cutoff, progressHandle);
 
    emit result(resultImage);
 }
 
-void BeamformingThread::setConfigs(mitk::BeamformingDMASFilter::beamformingSettings DMASconfig, mitk::BeamformingDASFilter::beamformingSettings DASconfig)
+void BeamformingThread::setConfig(mitk::BeamformingFilter::beamformingSettings BFconfig)
 {
-  m_DMASconfig = DMASconfig;
-  m_DASconfig = DASconfig;
-}
-
-void BeamformingThread::setBeamformingAlgorithm(PAImageProcessing::BeamformingAlgorithms beamformingAlgorithm)
-{
-  m_CurrentBeamformingAlgorithm = beamformingAlgorithm;
+  m_BFconfig = BFconfig;
 }
 
 void BeamformingThread::setInputImage(mitk::Image::Pointer image)

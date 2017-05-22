@@ -1,6 +1,7 @@
 set(CPP_FILES
   mitkPhotoacousticImage.cpp
   
-  Algorithms/mitkPhotoacousticBeamformingDASFilter.cpp
-  Algorithms/mitkPhotoacousticBeamformingDMASFilter.cpp
+  Algorithms/mitkPhotoacousticBeamformingFilter.cpp
+  
+  Algorithms/OCL/mitkPhotoacousticOCLBeamformer.cpp
 )

@@ -25,8 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "ui_PAImageProcessingControls.h"
 
-#include "mitkPhotoacousticBeamformingDASFilter.h"
-#include "mitkPhotoacousticBeamformingDMASFilter.h"
+#include "mitkPhotoacousticBeamformingFilter.h"
 
 Q_DECLARE_METATYPE(mitk::Image::Pointer)
 Q_DECLARE_METATYPE(std::string)
@@ -42,8 +41,6 @@ class PAImageProcessing : public QmitkAbstractView
     static const std::string VIEW_ID;
 
     PAImageProcessing();
-
-    enum BeamformingAlgorithms { DAS, DMAS };
 
   protected slots:
 
@@ -82,10 +79,7 @@ class PAImageProcessing : public QmitkAbstractView
     bool m_UseLogfilter;
     std::string m_OldNodeName;
 
-    mitk::BeamformingDMASFilter::beamformingSettings DMASconfig;
-    mitk::BeamformingDASFilter::beamformingSettings DASconfig;
-
-    BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
+    mitk::BeamformingFilter::beamformingSettings BFconfig;
 
     void UpdateBFSettings(mitk::Image::Pointer image);
 
@@ -103,16 +97,12 @@ class BeamformingThread : public QThread
     void updateProgress(int, std::string);
 
   public:
-    void setConfigs(mitk::BeamformingDMASFilter::beamformingSettings DMASconfig, mitk::BeamformingDASFilter::beamformingSettings DASconfig);
-    void setBeamformingAlgorithm(PAImageProcessing::BeamformingAlgorithms beamformingAlgorithm);
+    void setConfig(mitk::BeamformingFilter::beamformingSettings BFconfig);
     void setInputImage(mitk::Image::Pointer image);
     void setCutoff(int cutoff);
 
   protected:
-    mitk::BeamformingDMASFilter::beamformingSettings m_DMASconfig;
-    mitk::BeamformingDASFilter::beamformingSettings m_DASconfig;
-
-    PAImageProcessing::BeamformingAlgorithms m_CurrentBeamformingAlgorithm;
+    mitk::BeamformingFilter::beamformingSettings m_BFconfig;
     mitk::Image::Pointer m_InputImage;
     int m_Cutoff;
 };

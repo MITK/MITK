@@ -22,7 +22,9 @@ if(MITK_USE_Caffe2)
   if(NOT DEFINED Caffe2_DIR)
 
     ExternalProject_Add(${proj}
-       URL /home/neher/Downloads/caffe2-43f8da5e.zip
+       #URL /home/neher/Downloads/caffe2-43f8da5e.zip
+       GIT_REPOSITORY https://github.com/caffe2/caffe2.git
+#    GIT_TAG ${revision_tag}
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}

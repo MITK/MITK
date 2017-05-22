@@ -45,7 +45,7 @@ namespace mitk {
       bool partial = false;
       unsigned int bounds[2] = { 0,0 };
 
-      enum DelayCalc {Linear, QuadApprox, Spherical};
+      enum DelayCalc {QuadApprox, Spherical};
       DelayCalc DelayCalculationMethod = QuadApprox;
 
       enum Apodization {Hamm, Hann, Box};
@@ -85,7 +85,6 @@ namespace mitk {
     double* HammFunction(int samples);
     double* BoxFunction(int samples);
 
-    void DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
     void DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
     void DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
 

@@ -350,7 +350,7 @@
             <double>1.000000000000000</double>
            </property>
            <property name="value">
-            <double>45.000000000000000</double>
+            <double>27.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -501,11 +501,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <item>
-            <property name="text">
-             <string>Plane Wave</string>
-            </property>
-           </item>
            <item>
             <property name="text">
              <string>Quad. Approx.</string>

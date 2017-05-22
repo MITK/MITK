@@ -191,11 +191,7 @@ void mitk::BeamformingDASFilter::GenerateData()
     // every line will be beamformed in a seperate thread
     for (short line = 0; line < outputDim[0]; ++line)
     {
-      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
-      {
-        threads[line] = std::thread(&BeamformingDASFilter::DASLinearLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
-      }
-      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
       {
         threads[line] = std::thread(&BeamformingDASFilter::DASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
       }
@@ -279,71 +275,6 @@ double* mitk::BeamformingDASFilter::BoxFunction(int samples)
   }
 
   return ApodWindow;
-}
-
-
-void mitk::BeamformingDASFilter::DASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
-{
-  double& inputS = inputDim[1];
-  double& inputL = inputDim[0];
-
-  double& outputS = outputDim[1];
-  double& outputL = outputDim[0];
-
-  short AddSample = 0;
-  short maxLine = 0;
-  short minLine = 0;
-  double delayMultiplicator = 0;
-  double l_i = 0;
-  double s_i = 0;
-
-  double l = 0;
-  double x = 0;
-  double root = 0;
-
-  double part = 0.07 * inputL;
-  double tan_phi = abs(std::tan(m_Conf.Angle / 360 * 2 * M_PI));
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
-  double apod_mult = 1;
-
-  double mult = 0;
-  short usedLines = (maxLine - minLine);
-
-  //linear delay
-  l_i = line / outputL * inputL;
-
-  l = (inputL / 2 - l_i) / inputL * m_Conf.Pitch * m_Conf.TransducerElements;
-
-  for (short sample = 0; sample < outputS; ++sample)
-  {
-    s_i = sample / outputS * inputS;
-
-    part = part_multiplicator*s_i;
-
-    if (part < 1)
-      part = 1;
-
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0);
-    usedLines = (maxLine - minLine);
-
-    apod_mult = apodArraySize / (maxLine - minLine);
-
-    x = m_Conf.RecordTime * m_Conf.SpeedOfSound * s_i / inputS;
-    root = l / sqrt(pow(l, 2) + pow(x, 2));
-    delayMultiplicator = inputS * root / (m_Conf.RecordTime * m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / inputL;
-
-    for (short l_s = minLine; l_s < maxLine; ++l_s)
-    {
-      AddSample = abs(delayMultiplicator * ((double)l_s - l_i)) + s_i;
-
-      if (AddSample < inputS && AddSample >= 0)
-        output[sample*(short)outputL + line] += input[l_s + AddSample*(short)inputL] * apodisation[(short)((l_s - minLine)*apod_mult)];
-      else
-        --usedLines;
-    }
-    output[sample*(short)outputL + line] = output[sample*(short)outputL + line] / usedLines;
-  }
 }
 
 void mitk::BeamformingDASFilter::DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)

@@ -189,11 +189,7 @@ void mitk::BeamformingDMASFilter::GenerateData()
     // every line will be beamformed in a seperate thread
     for (short line = 0; line < outputDim[0]; ++line)
     {
-      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Linear)
-      {
-        threads[line] = std::thread(&BeamformingDMASFilter::DMASLinearLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
-      }
-      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
       {
         threads[line] = std::thread(&BeamformingDMASFilter::DMASQuadraticLine, this, m_InputData, m_OutputData, inputDim, outputDim, line, ApodWindow, apodArraySize);
       }
@@ -487,88 +483,6 @@ double* mitk::BeamformingDMASFilter::BoxFunction(int samples)
   }
 
   return ApodWindow;
-}
-
-void mitk::BeamformingDMASFilter::DMASLinearLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
-{
-  double& inputS = inputDim[1];
-  double& inputL = inputDim[0];
-
-  double& outputS = outputDim[1];
-  double& outputL = outputDim[0];
-
-  short AddSample1 = 0;
-  short AddSample2 = 0;
-  short maxLine = 0;
-  short minLine = 0;
-  double delayMultiplicator = 0;
-  double l_i = 0;
-  double s_i = 0;
-
-  double l = 0;
-  double x = 0;
-  double root = 0;
-
-  double part = 0.07 * inputL;
-  double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
-  double apod_mult = 1;
-
-  double mult = 0;
-  short usedLines = (maxLine - minLine);
-
-  //linear delay
-  l_i = line / outputL * inputL;
-
-  l = (inputL / 2 - l_i) / inputL*m_Conf.Pitch*m_Conf.TransducerElements;
-
-  for (short sample = 0; sample < outputS; ++sample)
-  {
-    s_i = sample / outputS * inputS;
-
-    part = part_multiplicator*s_i;
-
-    if (part < 1)
-      part = 1;
-
-    maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0);
-    usedLines = (maxLine - minLine);
-
-    apod_mult = apodArraySize / (maxLine - minLine);
-
-    x = m_Conf.RecordTime * m_Conf.SpeedOfSound * s_i / inputS;
-    root = l / sqrt(pow(l, 2) + pow(x, 2));
-    delayMultiplicator = inputS * root / (m_Conf.RecordTime * m_Conf.SpeedOfSound) * m_Conf.Pitch * m_Conf.TransducerElements / inputL;
-
-    //calculate the AddSamples beforehand to save some time
-    short* AddSample = new short[maxLine - minLine];
-    for (short l_s = 0; l_s < maxLine - minLine; ++l_s)
-    {
-      AddSample[l_s] = abs((short)(delayMultiplicator * (minLine + l_s - l_i) + s_i));
-    }
-
-    for (short l_s1 = minLine; l_s1 < maxLine - 1; ++l_s1)
-    {
-      if (AddSample[l_s1 - minLine] < inputS && AddSample[l_s1 - minLine] >= 0)
-      {
-        for (short l_s2 = l_s1 + 1; l_s2 < maxLine; ++l_s2)
-        {
-          if (AddSample[l_s2 - minLine] < inputS && AddSample[l_s2 - minLine] >= 0)
-          {
-            mult = input[l_s2 + AddSample[l_s2 - minLine] * (short)inputL] * input[l_s1 + AddSample[l_s1 - minLine] * (short)inputL] * apodisation[(short)((l_s1 - minLine)*apod_mult)] * apodisation[(short)((l_s2 - minLine)*apod_mult)];
-            output[sample*(short)outputL + line] += sqrt(abs(mult)) * ((mult > 0) - (mult < 0));
-          }
-        }
-      }
-      else
-        --usedLines;
-    }
-
-    output[sample*(short)outputL + line] = 10 * output[sample*(short)outputL + line] / (pow(usedLines, 2) - usedLines);
-
-    delete[] AddSample;
-  }
 }
 
 void mitk::BeamformingDMASFilter::DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)

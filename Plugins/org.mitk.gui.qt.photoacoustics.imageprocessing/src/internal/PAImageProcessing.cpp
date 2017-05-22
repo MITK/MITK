@@ -158,8 +158,6 @@ void PAImageProcessing::HandleBeamformingResults(mitk::Image::Pointer image)
   else if (m_CurrentBeamformingAlgorithm == BeamformingAlgorithms::DMAS)
     newNodeName << "DMAS bf, ";
 
-  if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear)
-    newNodeName << "l. delay";
   if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox)
     newNodeName << "q. delay";
   if (DASconfig.DelayCalculationMethod == mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Spherical)
@@ -418,12 +416,7 @@ void PAImageProcessing::UpdateBFSettings(mitk::Image::Pointer image)
   else if ("DMAS" == m_Controls.BFAlgorithm->currentText())
     m_CurrentBeamformingAlgorithm = BeamformingAlgorithms::DMAS;
 
-  if ("Plane Wave" == m_Controls.DelayCalculation->currentText())
-  {
-    DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::Linear;
-    DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::Linear;
-  }
-  else if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
+  if ("Quad. Approx." == m_Controls.DelayCalculation->currentText())
   {
     DASconfig.DelayCalculationMethod = mitk::BeamformingDASFilter::beamformingSettings::DelayCalc::QuadApprox;
     DMASconfig.DelayCalculationMethod = mitk::BeamformingDMASFilter::beamformingSettings::DelayCalc::QuadApprox;

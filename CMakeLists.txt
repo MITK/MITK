@@ -283,7 +283,7 @@ if(MITK_USE_Qt5)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  mitkFunctionAddExternalProject(NAME Caffe2      OFF ADVANCED)
+  mitkFunctionAddExternalProject(NAME Caffe2      OFF ADVANCED DOC "Experimental. Only available on Linux systems.")
 endif()
 
 # -----------------------------------------

@@ -4,7 +4,7 @@ set( diffusion_module_dirs
       Connectomics
       Quantification
       DiffusionIO
-      MiniApps
+      cmdapps
       DeepDiffusion
 )
 

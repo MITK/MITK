@@ -6,7 +6,7 @@ set(Caffe2_CMAKE_DEBUG_POSTFIX d)
 set(Caffe2_LIBRARIES)
 
 find_library (PROTOBUF_LIB protobuf)
-  
+
 FOREACH(POSTFIX _CPU;_GPU)
 
 # Find all libraries, store debug and release separately
@@ -45,7 +45,7 @@ FOREACH(POSTFIX _CPU;_GPU)
     list(APPEND Caffe2_LIBRARIES debug ${Caffe2_LIBRARY_DEBUG})
     list(APPEND Caffe2_LIBRARIES debug ${PROTOBUF_LIB})
   endif()
-  
+
 ENDFOREACH()
 
 find_package_handle_standard_args(Caffe2

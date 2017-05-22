@@ -305,9 +305,7 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
             caster->SetInput(m_InputImages.at(0));
             caster->Update();
             mitk::TrackingHandlerPeaks::PeakImgType::Pointer itkImg = caster->GetOutput();
-
             trackingHandler = new mitk::TrackingHandlerPeaks();
-
             dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingHandler)->SetPeakImage(itkImg);
             dynamic_cast<mitk::TrackingHandlerPeaks*>(trackingHandler)->SetPeakThreshold(m_Controls->m_ScalarThresholdBox->value());
         }
@@ -378,6 +376,8 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     tracker->SetMinTractLength(m_Controls->m_MinTractLengthBox->value());
     tracker->Update();
 
+    delete trackingHandler;
+
     vtkSmartPointer<vtkPolyData> fiberBundle = tracker->GetFiberPolyData();
     if ( fiberBundle->GetNumberOfLines()==0 )
     {
@@ -403,6 +403,4 @@ void QmitkStreamlineTrackingView::DoFiberTracking()
     node->SetName(name.toStdString());
     node->SetVisibility(true);
     GetDataStorage()->Add(node, m_InputImageNodes.at(0));
-
-    delete trackingHandler;
 }

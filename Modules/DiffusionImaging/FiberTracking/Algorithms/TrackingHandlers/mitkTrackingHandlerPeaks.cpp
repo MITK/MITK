@@ -21,6 +21,7 @@ namespace mitk
 
 TrackingHandlerPeaks::TrackingHandlerPeaks()
   : m_PeakThreshold(0.1)
+  , m_ApplyDirectionMatrix(false)
 {
 
 }

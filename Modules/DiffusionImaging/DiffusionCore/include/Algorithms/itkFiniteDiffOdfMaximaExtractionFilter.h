@@ -67,12 +67,9 @@ Image< unsigned char, 3 > >
     typedef typename Superclass::InputImageType           CoefficientImageType;
     typedef typename CoefficientImageType::RegionType     CoefficientImageRegionType;
     typedef typename CoefficientImageType::PixelType      CoefficientPixelType;
-
     typedef typename Superclass::OutputImageType          OutputImageType;
     typedef typename Superclass::OutputImageRegionType    OutputImageRegionType;
-
     typedef typename Superclass::InputImageRegionType     InputImageRegionType;
-
     typedef Image< float, 4 >                             PeakImageType;
 
     typedef OrientationDistributionFunction<PixelType, NrOdfDirections>   OdfType;

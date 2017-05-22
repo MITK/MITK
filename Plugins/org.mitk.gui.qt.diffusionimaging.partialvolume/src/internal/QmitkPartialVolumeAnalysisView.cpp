@@ -1767,64 +1767,56 @@ void QmitkPartialVolumeAnalysisView::ExtractTensorImages(
     //  node->SetData(m_CAImage);
     //  GetDataStorage()->Add(node);
 
-    typedef DirectionsFilterType::OutputImageType DirImageType;
+    typedef DirectionsFilterType::PeakImageType DirImageType;
     DirectionsFilterType::Pointer dirFilter = DirectionsFilterType::New();
     dirFilter->SetInput(image );
+    dirFilter->SetUsePolarCoordinates(true);
     dirFilter->Update();
+    ItkUcharImgType::Pointer numDirImage = dirFilter->GetOutput();
+    DirImageType::Pointer dirImage = dirFilter->GetPeakImage();
 
-    itk::ImageRegionIterator<DirImageType>
-            itd(dirFilter->GetOutput(), dirFilter->GetOutput()->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<DirImageType> itd(dirImage, dirImage->GetLargestPossibleRegion());
     itd = itd.Begin();
     while( !itd.IsAtEnd() )
     {
         DirImageType::PixelType direction = itd.Get();
-        direction[0] = fabs(direction[0]);
-        direction[1] = fabs(direction[1]);
-        direction[2] = fabs(direction[2]);
+        direction = fabs(direction);
         itd.Set(direction);
         ++itd;
     }
 
-    typedef itk::CartesianToPolarVectorImageFilter<
-            DirImageType, DirImageType, true> C2PFilterType;
-    C2PFilterType::Pointer cpFilter = C2PFilterType::New();
-    cpFilter->SetInput(dirFilter->GetOutput());
-    cpFilter->Update();
-    DirImageType::Pointer dir = cpFilter->GetOutput();
-
     typedef itk::Image<float, 3> CompImageType;
     CompImageType::Pointer comp1 = CompImageType::New();
-    comp1->SetSpacing( dir->GetSpacing() );   // Set the image spacing
-    comp1->SetOrigin( dir->GetOrigin() );     // Set the image origin
-    comp1->SetDirection( dir->GetDirection() );  // Set the image direction
-    comp1->SetRegions( dir->GetLargestPossibleRegion() );
+    comp1->SetSpacing( numDirImage->GetSpacing() );   // Set the image spacing
+    comp1->SetOrigin( numDirImage->GetOrigin() );     // Set the image origin
+    comp1->SetDirection( numDirImage->GetDirection() );  // Set the image direction
+    comp1->SetRegions( numDirImage->GetLargestPossibleRegion() );
     comp1->Allocate();
 
     CompImageType::Pointer comp2 = CompImageType::New();
-    comp2->SetSpacing( dir->GetSpacing() );   // Set the image spacing
-    comp2->SetOrigin( dir->GetOrigin() );     // Set the image origin
-    comp2->SetDirection( dir->GetDirection() );  // Set the image direction
-    comp2->SetRegions( dir->GetLargestPossibleRegion() );
+    comp2->SetSpacing( numDirImage->GetSpacing() );   // Set the image spacing
+    comp2->SetOrigin( numDirImage->GetOrigin() );     // Set the image origin
+    comp2->SetDirection( numDirImage->GetDirection() );  // Set the image direction
+    comp2->SetRegions( numDirImage->GetLargestPossibleRegion() );
     comp2->Allocate();
 
-    itk::ImageRegionConstIterator<DirImageType>
-            it(dir, dir->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<CompImageType> it1(comp1, comp1->GetLargestPossibleRegion());
+    itk::ImageRegionIterator<CompImageType> it2(comp2, comp2->GetLargestPossibleRegion());
 
-    itk::ImageRegionIterator<CompImageType>
-            it1(comp1, comp1->GetLargestPossibleRegion());
-
-    itk::ImageRegionIterator<CompImageType>
-            it2(comp2, comp2->GetLargestPossibleRegion());
-
-    it = it.Begin();
     it1 = it1.Begin();
     it2 = it2.Begin();
 
-    while( !it.IsAtEnd() )
+    while( !it2.IsAtEnd() )
     {
-        it1.Set(it.Get()[1]);
-        it2.Set(it.Get()[2]);
-        ++it;
+        DirImageType::IndexType peakIndex;
+        peakIndex[0] = it1.GetIndex()[0];
+        peakIndex[1] = it1.GetIndex()[1];
+        peakIndex[2] = it1.GetIndex()[2];
+        peakIndex[3] = 1;
+
+        it1.Set(dirImage->GetPixel(peakIndex));
+        peakIndex[3] = 2;
+        it2.Set(dirImage->GetPixel(peakIndex));
         ++it1;
         ++it2;
     }

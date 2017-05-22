@@ -227,8 +227,9 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
 
 void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* img)
 {
-  typedef itk::DiffusionTensorPrincipalDirectionImageFilter< float, float > MaximaExtractionFilterType;
+  typedef itk::DiffusionTensorPrincipalDirectionImageFilter< float > MaximaExtractionFilterType;
   MaximaExtractionFilterType::Pointer filter = MaximaExtractionFilterType::New();
+  filter->SetUsePolarCoordinates(false);
 
   mitk::BaseGeometry::Pointer geometry;
   try{
@@ -259,10 +260,10 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
 
   if (m_Controls->m_OutputDirectionImagesBox->isChecked())
   {
-    MaximaExtractionFilterType::OutputImageType::Pointer itkImg = filter->GetOutput();
+    MaximaExtractionFilterType::PeakImageType::Pointer itkImg = filter->GetPeakImage();
     mitk::Image::Pointer img = mitk::Image::New();
-    img->InitializeByItk(itkImg.GetPointer());
-    img->SetVolume(itkImg->GetBufferPointer());
+    CastToMitkImage(itkImg, img);
+
     DataNode::Pointer node = DataNode::New();
     node->SetData(img);
     QString name(m_Controls->m_ImageBox->GetSelectedNode()->GetName().c_str());
@@ -273,7 +274,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
 
   if (m_Controls->m_OutputNumDirectionsBox->isChecked())
   {
-    ItkUcharImgType::Pointer numDirImage = filter->GetNumDirectionsImage();
+    ItkUcharImgType::Pointer numDirImage = filter->GetOutput();
     mitk::Image::Pointer image2 = mitk::Image::New();
     image2->InitializeByItk(numDirImage.GetPointer());
     image2->SetVolume(numDirImage->GetBufferPointer());

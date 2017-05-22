@@ -61,13 +61,14 @@ public:
   /*!
   \  Convenient typedefs
   */
-  typedef mitk::DataStorage::SetOfObjects                ConstVector;
-  typedef ConstVector::ConstPointer                      ConstVectorPointer;
-  typedef ConstVector::ConstIterator                     ConstVectorIterator;
-  typedef mitk::PartialVolumeAnalysisHistogramCalculator HistogramCalculatorType;
-  typedef HistogramCalculatorType::HistogramType         HistogramType;
-  typedef mitk::PartialVolumeAnalysisClusteringCalculator ClusteringType;
-  typedef itk::DiffusionTensorPrincipalDirectionImageFilter<float,float> DirectionsFilterType;
+  typedef mitk::DataStorage::SetOfObjects                           ConstVector;
+  typedef ConstVector::ConstPointer                                 ConstVectorPointer;
+  typedef ConstVector::ConstIterator                                ConstVectorIterator;
+  typedef mitk::PartialVolumeAnalysisHistogramCalculator            HistogramCalculatorType;
+  typedef HistogramCalculatorType::HistogramType                    HistogramType;
+  typedef mitk::PartialVolumeAnalysisClusteringCalculator           ClusteringType;
+  typedef itk::DiffusionTensorPrincipalDirectionImageFilter<float>  DirectionsFilterType;
+  typedef itk::Image<unsigned char, 3>                              ItkUcharImgType;
 
   /*!
   \brief default constructor

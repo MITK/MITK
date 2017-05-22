@@ -1219,7 +1219,7 @@ void mitk::FiberBundle::UpdateFiberGeometry()
     m_UpdateTime2D.Modified();
 }
 
-float mitk::FiberBundle::GetFiberWeight(unsigned int fiber)
+float mitk::FiberBundle::GetFiberWeight(unsigned int fiber) const
 {
     return m_FiberWeights->GetValue(fiber);
 }
@@ -1897,7 +1897,7 @@ void mitk::FiberBundle::ResampleSpline(float pointDistance)
     ResampleSpline(pointDistance, 0, 0, 0 );
 }
 
-unsigned long mitk::FiberBundle::GetNumberOfPoints()
+unsigned long mitk::FiberBundle::GetNumberOfPoints() const
 {
     unsigned long points = 0;
     for (int i=0; i<m_FiberPolyData->GetNumberOfCells(); i++)

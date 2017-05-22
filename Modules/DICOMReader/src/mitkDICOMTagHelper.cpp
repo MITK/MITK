@@ -86,6 +86,11 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(std::make_pair("dicom.study.PhysiciansOfRecord", DICOMTag(0x0008, 0x1048)));
     result.insert(std::make_pair("dicom.study.NameOfPhysicianReadingStudy", DICOMTag(0x0008, 0x1060)));
 
+    //General Acquisition module
+    result.insert(std::make_pair("dicom.acquisition.Date", DICOMTag(0x0008, 0x0022)));
+    result.insert(std::make_pair("dicom.acquisition.Time", DICOMTag(0x00008, 0x0032)));
+    result.insert(std::make_pair("dicom.acquisition.Number", DICOMTag(0x0020, 0x0012)));
+
     // General Series module
     result.insert(std::make_pair("dicom.series.Modality", DICOMTag(0x0008, 0x0060)));
     result.insert(std::make_pair("dicom.series.SeriesInstanceUID", DICOMTag(0x0020, 0x000e)));
@@ -125,6 +130,10 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(std::make_pair("dicom.StationName", DICOMTag(0x0008, 0x1010)));
     result.insert(std::make_pair("dicom.DoseGridScaling", DICOMTag(0x3004, 0x000e)));
 
+    result.insert(std::make_pair("dicom.TR", DICOMTag(0x0018, 0x0080)));
+    result.insert(std::make_pair("dicom.TE", DICOMTag(0x0018, 0x0081)));
+    result.insert(std::make_pair("dicom.MagneticFieldStrength", DICOMTag(0x0018, 0x0087)));
+    result.insert(std::make_pair("dicom.ExInfo", DICOMTag(0x0051, 0x100E)));
 
     // Patient module
     /*dicom.patient.PatientsName*/ result.insert(MakeEntry(DICOMTag(0x0010, 0x0010)));
@@ -205,6 +214,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0022))); //dicom.acquisition date
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0032))); //dicom.acquisition time
     result.insert(MakeEntry(DICOMTag(0x0008, 0x002a))); //dicom.acquisition datetime
+    result.insert(MakeEntry(DICOMTag(0x0020, 0x0012))); //dicom.acquisition number
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0080))); //dicom.Modality
     result.insert(MakeEntry(DICOMTag(0x0018, 0x002a))); //dicom.Sequence Name
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0020))); //dicom.Scanning Sequence
@@ -213,6 +223,7 @@ mitk::GetDefaultDICOMTagsOfInterest()
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0081))); //dicom.TE
     result.insert(MakeEntry(DICOMTag(0x0018, 0x1310))); //dicom.Acquisition Matrix
     result.insert(MakeEntry(DICOMTag(0x0018, 0x0087))); //dicom.Magnetic Field Strength
+    result.insert(MakeEntry(DICOMTag(0x0051, 0x100E))); //dicom.ExInfo
 
     //SOP
     result.insert(MakeEntry(DICOMTag(0x0008, 0x0018))); //SOP Instance UID

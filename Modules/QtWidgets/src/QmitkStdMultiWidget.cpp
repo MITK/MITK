@@ -1640,16 +1640,29 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
     if (imageMTime != newImageMTime) {
       imageMTime = newImageMTime;
       std::string patient, patientId,
-        birthday, sex, institution, studyDate, studyTime;
+        birthday, sex, institution, studyDate, studyTime,
+        acquisitionNumber, seriesDescription, studyDescription, exInfo,
+        magneticFieldStrength, dicomTR, dicomTE;
 
       imageProperties->GetStringProperty("dicom.patient.PatientsName", patient);
       imageProperties->GetStringProperty("dicom.patient.PatientID", patientId);
       imageProperties->GetStringProperty("dicom.patient.PatientsBirthDate", birthday);
       imageProperties->GetStringProperty("dicom.patient.PatientsSex", sex);
       imageProperties->GetStringProperty("dicom.study.InstitutionName", institution);
-      imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
-      imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
-      
+      imageProperties->GetStringProperty("dicom.acquisition.Date", studyDate);
+      imageProperties->GetStringProperty("dicom.acquisition.Time", studyTime);
+      if (studyDate.empty() || studyTime.empty()) {
+        imageProperties->GetStringProperty("dicom.study.StudyDate", studyDate);
+        imageProperties->GetStringProperty("dicom.study.StudyTime", studyTime);
+      }
+      imageProperties->GetStringProperty("dicom.acquisition.Number", acquisitionNumber);
+      imageProperties->GetStringProperty("dicom.study.StudyDescription", studyDescription);
+      imageProperties->GetStringProperty("dicom.series.SeriesDescription", seriesDescription);
+      imageProperties->GetStringProperty("dicom.ExInfo", exInfo);
+      imageProperties->GetStringProperty("dicom.MagneticFieldStrength", magneticFieldStrength);
+      imageProperties->GetStringProperty("dicom.TR", dicomTR);
+      imageProperties->GetStringProperty("dicom.TE", dicomTE);
+
       std::stringstream infoStringStream[2];
 
       char yy[5]; yy[4] = 0;
@@ -1667,16 +1680,26 @@ void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
           sscanf (birthday.c_str(),"%4c%2c%2c",yy,mm,dd);
           infoStringStream[0] << "\n" << dd << "." << mm << "." << yy << " " << sex.c_str();
         }
-        infoStringStream[0] << "\n" << institution.c_str();
+        infoStringStream[0]
+          << "\n" << institution.c_str()
+          << "\n" << acquisitionNumber
+          << "\n" << studyDescription
+          << "\n" << seriesDescription
+          << "\n" << exInfo;
       } else {
         infoStringStream[0].clear();
       }
 
+      if (m_displayMetaInfo) {
+        infoStringStream[1]
+          << "FS: " << magneticFieldStrength
+          << '\n' << "TR: " << dicomTR << " TE: " << dicomTE;
+      }
       if (m_displayMetaInfo && (studyDate != "" && studyTime != "")) {
         sscanf (studyDate.c_str(),"%4c%2c%2c",yy,mm,dd);
         sscanf (studyTime.c_str(),"%2c%2c%2c",hh,mi,ss);
         infoStringStream[1]
-          << dd << "." << mm << "." << yy 
+          << "\n" << dd << "." << mm << "." << yy 
           << " " << hh << ":" << mi << ":" << ss;
       } else {
         infoStringStream[1].clear();

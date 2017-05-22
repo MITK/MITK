@@ -22,8 +22,7 @@ if(MITK_USE_Caffe2)
   if(NOT DEFINED Caffe2_DIR)
 
     ExternalProject_Add(${proj}
-       URL /home/neher/Downloads/caffe2.zip
-       #PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Caffe2.patch
+       URL /home/neher/Downloads/caffe2-43f8da5e.zip
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
@@ -33,7 +32,6 @@ if(MITK_USE_Caffe2)
          -DBUILD_BINARY:BOOL=OFF
          -DUSE_GFLAGS:BOOL=OFF
          -DUSE_GLOG:BOOL=OFF
-         #-DGFLAGS_ROOT_DIR:PATH=${ep_prefix}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS

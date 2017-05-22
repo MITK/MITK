@@ -48,6 +48,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "src/internal/QmitkInfoDialog.h"
 #include "src/internal/QmitkDataManagerItemDelegate.h"
 //## Berry
+#include <berryAbstractUICTKPlugin.h>
+#include <berryIContributor.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
@@ -288,7 +290,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       // check if the user specified an icon attribute
       if ( !cmIcon.isEmpty() )
       {
-        contextMenuAction = new QAction( QIcon(cmIcon), cmLabel, parent);
+        QIcon icon;
+        if (QFile::exists(cmIcon))
+        {
+          icon = QIcon(cmIcon);
+        }
+        else
+        {
+          icon = berry::AbstractUICTKPlugin::ImageDescriptorFromPlugin(
+            (*cmActionsIt)->GetContributor()->GetName(), cmIcon);
+        }
+        contextMenuAction = new QAction(icon, cmLabel, parent);
       }
       else
       {

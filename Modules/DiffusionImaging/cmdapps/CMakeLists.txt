@@ -27,6 +27,7 @@ if(BUILD_DiffusionCmdApps OR MITK_BUILD_ALL_APPS)
     FileFormatConverter^^MitkFiberTracking
     RfTraining^^MitkFiberTracking
     TractDensity^^MitkFiberTracking
+    Sift2WeightCopy^^MitkFiberTracking
     )
 
     foreach(diffusioncmdapp ${diffusioncmdapps})

@@ -937,7 +937,7 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 }
 
 void QmitkImageStatisticsView::FillStatisticsTableView(
-    const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
+    const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics,
     const mitk::Image *image )
 {
   this->m_Controls->m_StatisticsTable->setColumnCount(image->GetTimeSteps());
@@ -953,107 +953,36 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
     this->m_Controls->m_CheckBox4dCompleteTable->setEnabled(false);
     this->m_Controls->m_CheckBox4dCompleteTable->setChecked(false);
   }
-  int decimals = 2;
 
-  mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
-  mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
-  if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
-  {
-    decimals = 5;
-  }
 
   for (unsigned int t = 0; t < image->GetTimeSteps(); t++)
   {
     this->m_Controls->m_StatisticsTable->setHorizontalHeaderItem(t,
         new QTableWidgetItem(QString::number(t)));
 
-    if (s[t]->GetMaxIndex().size()==3)
+    if (statistics.at(t)->GetMaxIndex().size()==3)
     {
       mitk::Point3D index, max, min;
-      index[0] = s[t]->GetMaxIndex()[0];
-      index[1] = s[t]->GetMaxIndex()[1];
-      index[2] = s[t]->GetMaxIndex()[2];
+      index[0] = statistics.at(t)->GetMaxIndex()[0];
+      index[1] = statistics.at(t)->GetMaxIndex()[1];
+      index[2] = statistics.at(t)->GetMaxIndex()[2];
       m_SelectedImage->GetGeometry()->IndexToWorld(index, max);
       this->m_WorldMaxList.push_back(max);
-      index[0] = s[t]->GetMinIndex()[0];
-      index[1] = s[t]->GetMinIndex()[1];
-      index[2] = s[t]->GetMinIndex()[2];
+      index[0] = statistics.at(t)->GetMinIndex()[0];
+      index[1] = statistics.at(t)->GetMinIndex()[1];
+      index[2] = statistics.at(t)->GetMinIndex()[2];
       m_SelectedImage->GetGeometry()->IndexToWorld(index, min);
       this->m_WorldMinList.push_back(min);
     }
 
-    typedef mitk::ImageStatisticsCalculator::StatisticsContainer::RealType RealType;
-    RealType maxVal = std::numeric_limits<RealType>::max();
+    auto statisticsVector = AssembleStatisticsIntoVector(statistics.at(t), image);
 
-    this->m_Controls->m_StatisticsTable->setItem( 0, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetMean(), 0, 'f', decimals) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 1, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetMedian(), 0, 'f', decimals) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 2, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetStd(), 0, 'f', decimals) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 3, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetRMS(), 0, 'f', decimals) ) );
-
-    QString max; max.append(QString("%1").arg(s[t]->GetMax(), 0, 'f', decimals));
-    max += " (";
-    for (int i=0; i<s[t]->GetMaxIndex().size(); i++)
-    {
-      max += QString::number(s[t]->GetMaxIndex()[i]);
-      if (i<s[t]->GetMaxIndex().size()-1)
-        max += ",";
+    unsigned int count = 0;
+    for (const auto& entry : statisticsVector) {
+      auto item = new QTableWidgetItem(entry);
+      this->m_Controls->m_StatisticsTable->setItem(count, t, item);
+      count++;
     }
-    max += ")";
-    this->m_Controls->m_StatisticsTable->setItem( 4, t, new QTableWidgetItem( max ) );
-
-    QString min; min.append(QString("%1").arg(s[t]->GetMin(), 0, 'f', decimals));
-    min += " (";
-    for (int i=0; i<s[t]->GetMinIndex().size(); i++)
-    {
-      min += QString::number(s[t]->GetMinIndex()[i]);
-      if (i<s[t]->GetMinIndex().size()-1)
-        min += ",";
-    }
-    min += ")";
-    this->m_Controls->m_StatisticsTable->setItem( 5, t, new QTableWidgetItem( min ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 6, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetN()) ) );
-
-    const mitk::BaseGeometry *geometry = image->GetGeometry();
-    if ( geometry != NULL )
-    {
-      const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
-      double volume = spacing[0] * spacing[1] * spacing[2] * (double) s[t]->GetN();
-      this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
-          QString("%1").arg(volume, 0, 'f', decimals) ) );
-    }
-    else
-    {
-      this->m_Controls->m_StatisticsTable->setItem( 7, t, new QTableWidgetItem(
-          "NA" ) );
-    }
-
-    //statistics of higher order should have 5 decimal places because they used to be very small
-    this->m_Controls->m_StatisticsTable->setItem( 8, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetSkewness(), 0, 'f', 5) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetKurtosis(), 0, 'f', 5) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 10, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetUniformity(), 0, 'f', 5) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 11, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetEntropy(), 0, 'f', 5) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 12, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetMPP(), 0, 'f', decimals) ) );
-
-    this->m_Controls->m_StatisticsTable->setItem( 13, t, new QTableWidgetItem(
-        QString("%1").arg(s[t]->GetUPP(), 0, 'f', 5) ) );
 
   }
 
@@ -1116,16 +1045,15 @@ void QmitkImageStatisticsView::FillStatisticsTableView(
   this->m_Controls->m_StatisticsTable->setItem( 9, t, new QTableWidgetItem( hotspotMin ) );*/
 }
 
-std::vector<QString> QmitkImageStatisticsView::CalculateStatisticsForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image)
+std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image)
 {
   std::vector<QString> result;
 
-  int decimals = 2;
+  unsigned int decimals = 2;
+  //statistics of higher order should have 5 decimal places because they used to be very small
+  unsigned int decimalsHigherOrderStatistics = 5;
 
-  mitk::PixelType doublePix = mitk::MakeScalarPixelType< double >();
-  mitk::PixelType floatPix = mitk::MakeScalarPixelType< float >();
-
-  if (image->GetPixelType()==doublePix || image->GetPixelType()==floatPix)
+  if (image->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE || image->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT)
   {
     decimals = 5;
   }
@@ -1134,135 +1062,64 @@ std::vector<QString> QmitkImageStatisticsView::CalculateStatisticsForPlanarFigur
 
   mitk::ComputeIntensityProfileStatistics(intensityProfile, stats);
 
-  typedef mitk::ImageStatisticsCalculator::StatisticsContainer::RealType RealType;
-  RealType maxVal = std::numeric_limits<RealType>::max();
+  result.push_back(GetFormattedString(stats->GetMean(), decimals));
+  result.push_back(GetFormattedString(stats->GetMedian(), decimals));
+  result.push_back(GetFormattedString(stats->GetStd(), decimals));
+  result.push_back(GetFormattedString(stats->GetRMS(), decimals));
+  result.push_back(GetFormattedString(stats->GetMax(), decimals));
+  result.push_back(GetFormattedString(stats->GetMin(), decimals));
+  result.push_back(GetFormattedString(stats->GetN(), 0));
+  result.push_back(QString("NA")); //Volume can't be computed on a line
+  result.push_back(GetFormattedString(stats->GetSkewness(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(stats->GetKurtosis(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(stats->GetUniformity(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(stats->GetEntropy(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(stats->GetMPP(), decimals));
+  result.push_back(GetFormattedString(stats->GetUPP(), decimalsHigherOrderStatistics));
 
-  if (stats->GetMean() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-    result.push_back(QString("%1").arg(stats->GetMean(), 0, 'f', decimals));
-  }
+  return result;
+}
 
-  if (stats->GetMedian() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-    result.push_back(QString("%1").arg(stats->GetMedian(), 0, 'f', decimals));
-  }
+std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer statistics, mitk::Image::ConstPointer image) const
+{
+  std::vector<QString> result;
 
-  if (stats->GetStd() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-    result.push_back( QString("%1").arg( stats->GetStd(), 0, 'f', decimals));
-  }
-
-  if (stats->GetRMS() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-    result.push_back(QString("%1").arg( stats->GetRMS(), 0, 'f', decimals));
-  }
-
-  if (stats->GetMax() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      QString max;
-      max.append(QString("%1").arg(stats->GetMax(), 0, 'f', decimals));
-      result.push_back(max);
-  }
-
-  if (stats->GetMin() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      QString min;
-      min.append(QString("%1").arg(stats->GetMin(), 0, 'f', decimals));
-      result.push_back(min);
-
-  }
-
-
-  if (stats->GetN() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetN()));
-  }
-
-  result.push_back(QString("NA"));
+  unsigned int decimals = 2;
 
   //statistics of higher order should have 5 decimal places because they used to be very small
-  if (stats->GetSkewness() == maxVal)
+  unsigned int decimalsHigherOrderStatistics = 5;
+
+  if (image->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE || image->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT)
   {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetSkewness(), 0, 'f', 5 ));
+    decimals = 5;
   }
 
-  if (stats->GetKurtosis() == maxVal)
+  result.push_back(GetFormattedString(statistics->GetMean(), decimals));
+  result.push_back(GetFormattedString(statistics->GetMedian(), decimals));
+  result.push_back(GetFormattedString(statistics->GetStd(), decimals));
+  result.push_back(GetFormattedString(statistics->GetRMS(), decimals));
+  result.push_back(GetFormattedString(statistics->GetMax(), decimals) + " " + GetFormattedIndex(statistics->GetMaxIndex()));
+  result.push_back(GetFormattedString(statistics->GetMin(), decimals) + " " + GetFormattedIndex(statistics->GetMinIndex()));
+  result.push_back(GetFormattedString(statistics->GetN(), 0));
+
+  const mitk::BaseGeometry *geometry = image->GetGeometry();
+  if (geometry != NULL)
   {
-    result.push_back(QString("NA"));
+    const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
+    double volume = spacing[0] * spacing[1] * spacing[2] * static_cast<double>(statistics->GetN());
+    result.push_back(GetFormattedString(volume, decimals));
   }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetKurtosis(), 0, 'f', 5) );
+  else {
+    result.push_back("NA");
   }
 
-  if (stats->GetUniformity() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetUniformity(), 0, 'f', 5) );
-  }
+  result.push_back(GetFormattedString(statistics->GetSkewness(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(statistics->GetKurtosis(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(statistics->GetUniformity(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(statistics->GetEntropy(), decimalsHigherOrderStatistics));
+  result.push_back(GetFormattedString(statistics->GetMPP(), decimals));
+  result.push_back(GetFormattedString(statistics->GetUPP(), decimalsHigherOrderStatistics));
 
-  if (stats->GetEntropy() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetEntropy(), 0, 'f', 5) );
-  }
-
-  if (stats->GetMPP() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetMPP(), 0, 'f', decimals) );
-  }
-
-  if (stats->GetUPP() == maxVal)
-  {
-    result.push_back(QString("NA"));
-  }
-  else
-  {
-      result.push_back(QString("%1").arg(stats->GetUPP(), 0, 'f', 5) );
-  }
-  
   return result;
 }
 
@@ -1271,7 +1128,7 @@ void QmitkImageStatisticsView::FillLinearProfileStatisticsTableView( mitk::Inten
   this->m_Controls->m_StatisticsTable->setColumnCount(1);
   this->m_Controls->m_StatisticsTable->horizontalHeader()->setVisible(false);
 
-  m_PlanarFigureStatistics = this->CalculateStatisticsForPlanarFigure( intensityProfile, image);
+  m_PlanarFigureStatistics = this->AssembleStatisticsIntoVectorForPlanarFigure( intensityProfile, image);
 
   for (int i = 0; i< m_PlanarFigureStatistics.size(); i++)
   {
@@ -1420,4 +1277,32 @@ QList<QVariant> QmitkImageStatisticsView::ConvertIntensityProfileToList(mitk::In
 		intensityProfileList.append(it.GetMeasurementVector()[0]);
 	}
 	return intensityProfileList;
+}
+
+QString QmitkImageStatisticsView::GetFormattedString(double value, unsigned int decimals) const
+{
+  typedef mitk::ImageStatisticsCalculator::StatisticsContainer::RealType RealType;
+  RealType maxVal = std::numeric_limits<RealType>::max();
+
+  if (value == maxVal)
+  {
+    return QString("NA");
+  }
+  else
+  {
+    return QString("%1").arg(value, 0, 'f', decimals);
+  }
+}
+
+QString QmitkImageStatisticsView::GetFormattedIndex(const vnl_vector<int>& vector) const
+{
+  QString formattedIndex("(");
+  for (const auto& entry : vector)
+  {
+    formattedIndex += QString::number(entry);
+    formattedIndex += ",";
+  }
+  formattedIndex.chop(1);
+  formattedIndex += ")";
+  return formattedIndex;
 }

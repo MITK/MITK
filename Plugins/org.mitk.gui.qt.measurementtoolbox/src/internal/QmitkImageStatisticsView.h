@@ -56,6 +56,11 @@ private:
 
   QMap<QVariant, QVariant> ConvertHistogramToMap(itk::Statistics::Histogram<double>::Pointer histogram) const;
   QList<QVariant> ConvertIntensityProfileToList(mitk::IntensityProfile::Pointer intensityProfile) const;
+  std::vector<QString> AssembleStatisticsIntoVector(mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer statistics, mitk::Image::ConstPointer image) const;
+
+  QString GetFormattedIndex(const vnl_vector<int>& vector) const;
+  QString GetFormattedString(double value, unsigned int decimals) const;
+
 public:
 
   /*!
@@ -116,7 +121,7 @@ protected:
   void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
           const mitk::Image *image );
 
-  std::vector<QString> CalculateStatisticsForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
+  std::vector<QString> AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
 
   void FillLinearProfileStatisticsTableView(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);
 

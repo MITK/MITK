@@ -33,6 +33,7 @@
 #include "mitkCameraController.h"
 
 #include "QmlMitkStdMultiItem.h"
+#include "QVTKFramebufferObjectRenderer.h"
 #include <QQuickWindow>
 
 QmlMitkRenderWindowItem* QmlMitkRenderWindowItem::instance = nullptr;
@@ -187,12 +188,26 @@ mitk::Point2D QmlMitkRenderWindowItem::GetMousePosition(QMouseEvent* me) const
     return point;
 }
 
+mitk::Point2D QmlMitkRenderWindowItem::GetMousePositionFlipY(QMouseEvent* me) const
+{
+    mitk::Point2D point = GetMousePosition(me);
+    point[1] = const_cast<QmlMitkRenderWindowItem*>(this)->GetRenderer()->GetSizeY() - point[1];
+    return point;
+}
+
 mitk::Point2D QmlMitkRenderWindowItem::GetMousePosition(QWheelEvent* we) const
 {
     qreal ratio = this->window()->effectiveDevicePixelRatio();
     mitk::Point2D point;
     point[0] = we->x()*ratio;
     point[1] = we->y()*ratio;
+    return point;
+}
+
+mitk::Point2D QmlMitkRenderWindowItem::GetMousePositionFlipY(QWheelEvent* we) const
+{
+    mitk::Point2D point = GetMousePosition(we);
+    point[1] = const_cast<QmlMitkRenderWindowItem*>(this)->GetRenderer()->GetSizeY() - point[1];
     return point;
 }
 
@@ -282,48 +297,60 @@ int QmlMitkRenderWindowItem::getViewType()
 
 void QmlMitkRenderWindowItem::mousePressEvent(QMouseEvent* me)
 {
-    mitk::Point2D mousePosition = GetMousePosition(me);
-    //mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
+    mitk::Point2D mousePosition = GetMousePositionFlipY(me);
 
-    mitk::MousePressEvent::Pointer mPressEvent =
-    mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
+    auto mitkEvent  = mitk::MousePressEvent::New(mitk::RenderWindowBase::GetRenderer(),
+                                                 mousePosition,
+                                                 GetButtonState(me),
+                                                 GetModifiers(me),
+                                                 GetEventButton(me));
 
-    mitk::RenderWindowBase::HandleEvent(mPressEvent.GetPointer());
+    QueueEvent(mitkEvent.GetPointer());
+
     QVTKQuickItem::mousePressEvent(me);
 }
 
 void QmlMitkRenderWindowItem::mouseReleaseEvent(QMouseEvent* me)
 {
-    mitk::Point2D mousePosition = GetMousePosition(me);
-    //mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
+    mitk::Point2D mousePosition = GetMousePositionFlipY(me);
 
-    mitk::MouseReleaseEvent::Pointer mReleaseEvent =
-    mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me), GetEventButton(me));
+    auto mitkEvent  = mitk::MouseReleaseEvent::New(mitk::RenderWindowBase::GetRenderer(),
+                                                   mousePosition,
+                                                   GetButtonState(me),
+                                                   GetModifiers(me),
+                                                   GetEventButton(me));
 
-    mitk::RenderWindowBase::HandleEvent(mReleaseEvent.GetPointer());
+    QueueEvent(mitkEvent.GetPointer());
+
     QVTKQuickItem::mouseReleaseEvent(me);
 }
 
 void QmlMitkRenderWindowItem::mouseMoveEvent(QMouseEvent* me)
 {
-    mitk::Point2D mousePosition = GetMousePosition(me);
-    //mousePosition[1] = this->GetRenderer()->GetSizeY() - mousePosition[1];
+    mitk::Point2D mousePosition = GetMousePositionFlipY(me);
 
-    mitk::MouseMoveEvent::Pointer mMoveEvent =
-    mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(me), GetModifiers(me));
+    auto mitkEvent  = mitk::MouseMoveEvent::New(mitk::RenderWindowBase::GetRenderer(),
+                                                mousePosition,
+                                                GetButtonState(me),
+                                                GetModifiers(me));
 
-    mitk::RenderWindowBase::HandleEvent(mMoveEvent.GetPointer());
+    QueueEvent(mitkEvent.GetPointer());
+
     QVTKQuickItem::mouseMoveEvent(me);
 }
 
 void QmlMitkRenderWindowItem::wheelEvent(QWheelEvent *we)
 {
-    mitk::Point2D mousePosition = GetMousePosition(we);
+    mitk::Point2D mousePosition = GetMousePositionFlipY(we);
 
-    mitk::MouseWheelEvent::Pointer mWheelEvent =
-    mitk::MouseWheelEvent::New(mitk::RenderWindowBase::GetRenderer(), mousePosition, GetButtonState(we), GetModifiers(we), we->delta());
+    auto mitkEvent  = mitk::MouseWheelEvent::New(mitk::RenderWindowBase::GetRenderer(),
+                                                 mousePosition,
+                                                 GetButtonState(we),
+                                                 GetModifiers(we),
+                                                 we->delta());
 
-    mitk::RenderWindowBase::HandleEvent(mWheelEvent.GetPointer());
+    QueueEvent(mitkEvent.GetPointer());
+
     QVTKQuickItem::wheelEvent(we);
 }
 
@@ -364,4 +391,20 @@ vtkRenderWindow* QmlMitkRenderWindowItem::GetVtkRenderWindow()
 vtkRenderWindowInteractor* QmlMitkRenderWindowItem::GetVtkRenderWindowInteractor()
 {
     return QVTKQuickItem::GetInteractor();
+}
+
+void QmlMitkRenderWindowItem::QueueEvent(mitk::InteractionEvent::Pointer e)
+{
+    m_PendingEvents.push_back(e);
+}
+
+// To be called while rendering is blocked (in Qml sync methods)
+// so picking can access a "still image" and data to be rendered
+// can be modified by interaction
+void QmlMitkRenderWindowItem::processPendingEvents()
+{
+    for (auto e : m_PendingEvents) {
+        mitk::RenderWindowBase::HandleEvent(e);
+    }
+    m_PendingEvents.clear();
 }

@@ -23,6 +23,7 @@
 
 class QVTKFramebufferObjectRenderer;
 
+//! Part of Qml rendering prototype, see QmlMitkRenderWindowItem.
 class vtkInternalOpenGLRenderWindow : public vtkGenericOpenGLRenderWindow
 {
 public:

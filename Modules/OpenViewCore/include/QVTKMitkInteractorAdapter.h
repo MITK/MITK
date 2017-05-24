@@ -65,6 +65,7 @@ class QEvent;
 // .SECTION Description
 // QVTKMitkInteractorAdapter translates QEvents and send them to a
 // vtkRenderWindowInteractor.
+//! Part of Qml rendering prototype, see QmlMitkRenderWindowItem.
 class MITKOPENVIEWCORE_EXPORT QVTKMitkInteractorAdapter : public QObject
 {
   Q_OBJECT

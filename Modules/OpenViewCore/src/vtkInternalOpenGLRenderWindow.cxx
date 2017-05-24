@@ -14,7 +14,8 @@
 
  ===================================================================*/
 
-#include "QVTKInternalOpenglRenderWindow.h"
+#include "vtkInternalOpenglRenderWindow.h"
+
 #include "QVTKFramebufferObjectRenderer.h"
 
 #include <vtkgl.h>
@@ -63,6 +64,7 @@ void vtkInternalOpenGLRenderWindow::Render()
 void vtkInternalOpenGLRenderWindow::SetFramebufferObject(QOpenGLFramebufferObject *fbo)
 {
   this->SetFrontBuffer(vtkgl::COLOR_ATTACHMENT0);
+  // Why all those buffers, too??
   this->SetFrontRightBuffer(vtkgl::COLOR_ATTACHMENT0);
   this->SetBackLeftBuffer(vtkgl::COLOR_ATTACHMENT0);
   this->SetBackRightBuffer(vtkgl::COLOR_ATTACHMENT0);

@@ -132,9 +132,9 @@ void TractDensityImageFilter< OutputImageType >::GenerateData()
     else
         minSpacing = newSpacing[2];
 
-    MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
     if (m_DoFiberResampling)
     {
+      MITK_INFO << "TractDensityImageFilter: resampling fibers to ensure sufficient voxel coverage";
       if (m_WorkOnFiberCopy)
         m_FiberBundle = m_FiberBundle->GetDeepCopy();
       m_FiberBundle->ResampleLinear(minSpacing/10);

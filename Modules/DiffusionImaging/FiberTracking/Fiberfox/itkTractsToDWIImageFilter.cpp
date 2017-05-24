@@ -1070,8 +1070,7 @@ namespace itk
             DoubleDwiType::IndexType index = it3.GetIndex();
             itk::Point<double, 3> point;
             m_TransformedMaskImage->TransformIndexToPhysicalPoint(index, point);
-            if ( m_Parameters.m_SignalGen.m_DoAddMotion && g>=0
-                 && m_Parameters.m_SignalGen.m_MotionVolumes[g] )
+            if ( m_Parameters.m_SignalGen.m_DoAddMotion && g>=0 && m_Parameters.m_SignalGen.m_MotionVolumes[g] )
             {
               if (m_Parameters.m_SignalGen.m_DoRandomizeMotion)
               {
@@ -1093,8 +1092,8 @@ namespace itk
             if ( m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage()!=nullptr && iAxVolume>0.0001 )
             {
               double val = InterpolateValue(point, m_Parameters.m_FiberModelList[0]->GetVolumeFractionImage());
-              if (val<0) 
-                mitkThrow() << "Volume fraction image (index 1) contains values less than zero!";
+              if (val<0)
+                mitkThrow() << "Volume fraction image (index 1) contains negative values (intra-axonal compartment)!";
               fact2 = m_VoxelVolume*val/iAxVolume;
             }
 
@@ -1551,7 +1550,7 @@ namespace itk
           {
             double val = InterpolateValue(point, m_Parameters.m_FiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
+              mitkThrow() << "Volume fraction image (index " << i+1 << ") contains negative values!";
             else
               weight = val*m_VoxelVolume;
           }
@@ -1573,7 +1572,7 @@ namespace itk
           {
             double val = InterpolateValue(point, m_Parameters.m_NonFiberModelList[i]->GetVolumeFractionImage());
             if (val<0)
-              mitkThrow() << "Volume fraction image (index " << i << ") contains values less than zero!";
+              mitkThrow() << "Volume fraction image (index " << numFiberCompartments+i+1 << ") contains negative values (non-fiber compartment)!";
             else
               weight = val*m_VoxelVolume;
 
@@ -1602,7 +1601,7 @@ namespace itk
     img->TransformPhysicalPointToIndex(itkP, idx);
     img->TransformPhysicalPointToContinuousIndex(itkP, cIdx);
 
-    double pix = -1;
+    double pix = 0;
     if ( img->GetLargestPossibleRegion().IsInside(idx) )
       pix = img->GetPixel(idx);
     else

@@ -18,7 +18,7 @@
 #define __vtkInternalOpenGLRenderWindow_h
 
 #include <vtkGenericOpenGLRenderWindow.h>
-#include <qopenglframebufferobject.h>
+#include <QOpenGLFramebufferObject>
 #include <QOpenGLFunctions>
 
 class QVTKFramebufferObjectRenderer;

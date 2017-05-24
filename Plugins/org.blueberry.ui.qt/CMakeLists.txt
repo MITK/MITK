@@ -19,7 +19,7 @@ set(PLUGIN_exported_include_suffixes
 mitk_create_plugin(EXPORT_DIRECTIVE BERRY_UI_QT
                         EXPORTED_INCLUDE_SUFFIXES ${PLUGIN_exported_include_suffixes}
                         MODULE_DEPENDS
-                        PRIVATE MitkConfig
+                        PRIVATE MitkConfig MitkLogging
                         PACKAGE_DEPENDS ${additional_dependencies})
 
 if(MITK_USE_QT)

@@ -19,6 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <berryIWorkbenchPage.h>
 #include <berryUIException.h>
 
+#include <AutoplanLogging.h>
+
 namespace berry
 {
 
@@ -84,7 +86,7 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
   if (plugingTranslateNames.contains(label)) {
     this->setText(plugingTranslateNames[label]);
   } else {
-    Q_ASSERT_X(false, "QtShowViewAction Constructor", ("No name provided for plugin: " + label).toStdString().c_str());
+    AUTOPLAN_FATAL << ("No name provided for plugin: " + label).toStdString();
     this->setText("NO_PLUGIN_NAME");
   }
 

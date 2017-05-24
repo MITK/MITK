@@ -16,11 +16,14 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkEnumerationProperty.h"
 #include <algorithm>
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
 
 // static map members of EnumerationProperty. These Maps point to per-classname-maps of ID <-> String. Accessed by GetEnumIds() and GetEnumString().
 mitk::EnumerationProperty::IdMapForClassNameContainerType     mitk::EnumerationProperty::s_IdMapForClassName;
 mitk::EnumerationProperty::StringMapForClassNameContainerType mitk::EnumerationProperty::s_StringMapForClassName;
-
+boost::shared_mutex s_IdMapForClassNameGuard;
+boost::shared_mutex s_StringMapForClassNameGuard;
 
 mitk::EnumerationProperty::EnumerationProperty()
 {
@@ -174,28 +177,60 @@ bool mitk::EnumerationProperty::IsValidEnumerationValue( const std::string& val 
 mitk::EnumerationProperty::EnumIdsContainerType& mitk::EnumerationProperty::GetEnumIds()
 {
   std::string className = this->GetNameOfClass(); // virtual!
-  return s_IdMapForClassName[ className ];
+  {
+    boost::shared_lock<boost::shared_mutex> lock(s_IdMapForClassNameGuard);
+    auto iter = s_IdMapForClassName.find(className);
+    if (s_IdMapForClassName.end() != iter) {
+      return iter->second;
+    }
+  }
+  boost::unique_lock<boost::shared_mutex> lock(s_IdMapForClassNameGuard);
+  return s_IdMapForClassName[className];
 }
 
 
 const mitk::EnumerationProperty::EnumIdsContainerType& mitk::EnumerationProperty::GetEnumIds() const
 {
   std::string className = this->GetNameOfClass(); // virtual!
-  return s_IdMapForClassName[ className ];
+  {
+    boost::shared_lock<boost::shared_mutex> lock(s_IdMapForClassNameGuard);
+    auto iter = s_IdMapForClassName.find(className);
+    if (s_IdMapForClassName.end() != iter) {
+      return iter->second;
+    }
+  }
+  boost::unique_lock<boost::shared_mutex> lock(s_IdMapForClassNameGuard);
+  return s_IdMapForClassName[className];
 }
 
 
 mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProperty::GetEnumStrings()
 {
   std::string className = this->GetNameOfClass(); // virtual!
-  return s_StringMapForClassName[ className ];
+  {
+    boost::shared_lock<boost::shared_mutex> lock(s_StringMapForClassNameGuard);
+    auto iter = s_StringMapForClassName.find(className);
+    if (s_StringMapForClassName.end() != iter) {
+      return iter->second;
+    }
+  }
+  boost::unique_lock<boost::shared_mutex> lock(s_StringMapForClassNameGuard);
+  return s_StringMapForClassName[className];
 }
 
 
 const mitk::EnumerationProperty::EnumStringsContainerType& mitk::EnumerationProperty::GetEnumStrings() const
 {
   std::string className = this->GetNameOfClass(); // virtual!
-  return s_StringMapForClassName[ className ];
+  {
+    boost::shared_lock<boost::shared_mutex> lock(s_StringMapForClassNameGuard);
+    auto iter = s_StringMapForClassName.find(className);
+    if (s_StringMapForClassName.end() != iter) {
+      return iter->second;
+    }
+  }
+  boost::unique_lock<boost::shared_mutex> lock(s_StringMapForClassNameGuard);
+  return s_StringMapForClassName[className];
 }
 
 itk::LightObject::Pointer mitk::EnumerationProperty::InternalClone() const

@@ -118,6 +118,7 @@ int SourcePriorityNameMapping::ComputeSourcePriority(
     sourcePriority |= GetMapping(name);
   }
 
+  delete info;
   return sourcePriority;
 }
 

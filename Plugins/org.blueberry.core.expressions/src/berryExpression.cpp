@@ -88,7 +88,7 @@ Expression::HashCode(const QList<Object::Pointer>& array)
 const ExpressionInfo*
 Expression::ComputeExpressionInfo() const
 {
-  auto   result= new ExpressionInfo();
+  auto result= new ExpressionInfo();
   this->CollectExpressionInfo(result);
   return result;
 }

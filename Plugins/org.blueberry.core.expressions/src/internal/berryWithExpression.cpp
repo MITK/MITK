@@ -80,13 +80,13 @@ WithExpression::Evaluate(IEvaluationContext* context) const
 void
 WithExpression::CollectExpressionInfo(ExpressionInfo* info) const
 {
-  auto  other = new ExpressionInfo();
-  CompositeExpression::CollectExpressionInfo(other);
-  if (other->HasDefaultVariableAccess())
+  ExpressionInfo other;
+  CompositeExpression::CollectExpressionInfo(&other);
+  if (other.HasDefaultVariableAccess())
   {
     info->AddVariableNameAccess(fVariable);
   }
-  info->MergeExceptDefaultVariable(other);
+  info->MergeExceptDefaultVariable(&other);
 }
 
 uint

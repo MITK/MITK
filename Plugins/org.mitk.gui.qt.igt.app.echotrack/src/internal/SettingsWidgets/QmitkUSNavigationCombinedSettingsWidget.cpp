@@ -42,7 +42,7 @@ void QmitkUSNavigationCombinedSettingsWidget::OnSetSettingsNode(itk::SmartPointe
 {
   if ( overwriteValues )
   {
-    settingsNode->SetStringProperty("settings.application", ui->applicationComboBox->currentText().toStdString().c_str());
+    settingsNode->SetIntProperty("settings.application", ui->applicationComboBox->currentIndex());
     settingsNode->SetStringProperty("settings.interaction-concept", this->InteractionNameToFile(ui->interactionConceptComboBox->currentText()).toStdString().c_str());
     settingsNode->SetBoolProperty("settings.experiment-mode", ui->experimentModeCheckBox->isChecked());
     settingsNode->SetStringProperty("settings.experiment-results-directory", ui->experimentResultsPathButton->directory().toStdString().c_str());
@@ -59,17 +59,16 @@ void QmitkUSNavigationCombinedSettingsWidget::OnSetSettingsNode(itk::SmartPointe
     std::string stringProperty;
     float floatProperty;
     bool boolProperty;
+    int intProperty;
 
     // load state of application setting combo box
-    if ( ! settingsNode->GetStringProperty("settings.application", stringProperty) ) { stringProperty = ""; }
-    int lastIndex = ui->applicationComboBox->findText(QString::fromStdString(stringProperty));
-    if (lastIndex == -1) { lastIndex = 0; }
-    ui->applicationComboBox->setCurrentIndex(lastIndex);
-    this->OnApplicationChanged(lastIndex);
+    if ( ! settingsNode->GetIntProperty("settings.application", intProperty) ) { intProperty = 0; }
+    ui->applicationComboBox->setCurrentIndex(intProperty >= ui->applicationComboBox->count() ? 0 : intProperty);
+    this->OnApplicationChanged(intProperty);
 
     // load state of interaction concept setting combo box
     if ( ! settingsNode->GetStringProperty("settings.interaction-concept", stringProperty) ) { stringProperty = ""; }
-    lastIndex = ui->interactionConceptComboBox->findText(QString::fromStdString(stringProperty));
+    int lastIndex = ui->interactionConceptComboBox->findText(QString::fromStdString(stringProperty));
     if (lastIndex == -1) { lastIndex = 0; }
     ui->interactionConceptComboBox->setCurrentIndex(lastIndex);
 
@@ -133,8 +132,8 @@ void QmitkUSNavigationCombinedSettingsWidget::OnSaveProcessing()
   QSettings settings;
   settings.beginGroup("ultrasound-navigation");
 
-  settings.setValue("application", ui->applicationComboBox->currentText());
-  settingsNode->SetStringProperty("settings.application", ui->applicationComboBox->currentText().toStdString().c_str());
+  settings.setValue("application", ui->applicationComboBox->currentIndex());
+  settingsNode->SetIntProperty("settings.application", ui->applicationComboBox->currentIndex());
 
   settings.setValue("interaction-concept", ui->interactionConceptComboBox->currentText());
   settingsNode->SetStringProperty("settings.interaction-concept", this->InteractionNameToFile(ui->interactionConceptComboBox->currentText()).toStdString().c_str());

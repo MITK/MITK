@@ -150,7 +150,7 @@ protected:
   itk::SmartPointer<mitk::USCombinedModality>          m_CombinedModality;
   bool                                                 m_ReinitAlreadyDone;
   bool                                                 m_IsExperimentRunning;
-  std::string                                          m_CurrentApplicationName;
+  int                                                  m_CurrentApplicationName;
 
   itk::SmartPointer<mitk::USNavigationStepTimer>       m_NavigationStepTimer;
   itk::SmartPointer<mitk::USNavigationExperimentLogging> m_ExperimentLogging;

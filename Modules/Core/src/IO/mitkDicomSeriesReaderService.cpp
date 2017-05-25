@@ -61,8 +61,7 @@ std::vector<itk::SmartPointer<BaseData> > DicomSeriesReaderService::Read()
 
   }
 
-  DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(itksys::SystemTools::GetFilenamePath(fileName),
-                                                                                  true); // true = group gantry tilt images
+  DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(itksys::SystemTools::GetFilenamePath(fileName));
   const unsigned int size = imageBlocks.size();
 
   ProgressBar::GetInstance()->AddStepsToDo(size);

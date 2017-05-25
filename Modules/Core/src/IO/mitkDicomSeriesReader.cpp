@@ -23,6 +23,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkLocaleSwitch.h>
 
 #include <boost/tokenizer.hpp>
+#include <boost/format.hpp>
 
 #include <itkGDCMSeriesFileNames.h>
 
@@ -40,6 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
+
 std::string DicomSeriesReader::ReaderImplementationLevelToString( const ReaderImplementationLevel& enumValue )
 {
   switch (enumValue)
@@ -405,7 +407,6 @@ DicomSeriesReader::DICOMStringToOrientationVectors(const std::string& s, Vector3
 DicomSeriesReader::SliceGroupingAnalysisResult
 DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     const StringContainer& files,
-    bool groupImagesWithGantryTilt,
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
   // result.first = files that fit ITK's assumption
@@ -430,7 +431,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   bool lastOriginInitialized(false);
 
   MITK_DEBUG << "--------------------------------------------------------------------------------";
-  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << groupImagesWithGantryTilt << ")";
+  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader (group tilted: " << true << ")";
   unsigned int fileIndex(0);
   for (auto fileIter = files.begin();
        fileIter != files.end();
@@ -512,7 +513,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           // tell apart gantry tilt from overall skewedness
           // sort out irregularly sheared slices, that IS NOT tilting
 
-          if ( groupImagesWithGantryTilt && tiltInfo.IsRegularGantryTilt() )
+          if (tiltInfo.IsRegularGantryTilt() )
           {
             // check if this is at least roughly the same angle as recorded in DICOM tags
             if ( tagValueMappings[fileIter->c_str()].find(tagGantryTilt) != tagValueMappings[fileIter->c_str()].end() )
@@ -631,13 +632,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 }
 
 DicomSeriesReader::FileNamesGrouping
-DicomSeriesReader::GetSeries(const StringContainer& files, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
-{
-  return GetSeries(files, true, groupImagesWithGantryTilt, restrictions);
-}
-
-DicomSeriesReader::FileNamesGrouping
-DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, bool groupImagesWithGantryTilt, const StringContainer& /*restrictions*/)
+DicomSeriesReader::GetSeries(const StringContainer& files, bool)
 {
   /**
     assumption about this method:
@@ -710,6 +705,10 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   const gdcm::Tag tagSOPInstanceUID(0x0008, 0x0018);
   scanner.AddTag(tagSOPInstanceUID);
 
+  const gdcm::Tag tagTemporalPositionIndex(0x0020, 0x9128);
+  scanner.AddTag(tagTemporalPositionIndex);
+
+
   // TODO add further restrictions from arguments (when anybody asks for it)
 
   FileNamesGrouping result;
@@ -759,7 +758,8 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
   {
     try
     {
-      result[ groupIter->first ] = ImageBlockDescriptor( SortSeriesSlices( groupIter->second.GetFilenames(), scanner.GetMappings() ) ); // sort each slice group spatially
+      auto sortedFilenames = SortSeriesSlices(groupIter->second.GetFilenames(), scanner.GetMappings()); // sort each slice group spatially
+      result[groupIter->first] = ImageBlockDescriptor(sortedFilenames); 
     } catch(...)
     {
        MITK_ERROR << "Caught something.";
@@ -790,12 +790,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     {
       SliceGroupingAnalysisResult analysisResult =
         AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze,
-                                                             groupImagesWithGantryTilt,
                                                              scanner.GetMappings() );
 
       // enhance the UID for additional groups
       std::stringstream newGroupUID;
-      newGroupUID << groupUID << '.' << subgroup;
+      newGroupUID << groupUID << '.' << boost::format("%|05|") % subgroup;
 
       ImageBlockDescriptor thisBlock( analysisResult.GetBlockFilenames() );
 
@@ -836,89 +835,80 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
     //            - if number of files is identical to previous entry, collect for 3D+t block
     //            - as soon as number of files changes from previous entry, record collected blocks as 3D+t block, start a new one, continue
 
-    // decide whether or not to group 3D blocks into 3D+t blocks where possible
-    if ( !sortTo3DPlust )
+    // sort 3D+t (as described in "PART IV")
+
+    MITK_DEBUG << "================================================================================";
+    MITK_DEBUG << "3D+t analysis:";
+
+    unsigned int numberOfFilesInPreviousBlock(0);
+    std::string previousBlockKey;
+
+    for ( FileNamesGrouping::const_iterator block3DIter = groupsOf3DBlocks.begin();
+          block3DIter != groupsOf3DBlocks.end();
+          ++block3DIter )
     {
-      // copy 3D blocks to output
-      groupsOf3DPlusTBlocks.insert( groupsOf3DBlocks.begin(), groupsOf3DBlocks.end() );
-    }
-    else
-    {
-      // sort 3D+t (as described in "PART IV")
+      unsigned int numberOfFilesInThisBlock = block3DIter->second.GetFilenames().size();
+      std::string thisBlockKey = block3DIter->first;
 
-      MITK_DEBUG << "================================================================================";
-      MITK_DEBUG << "3D+t analysis:";
-
-      unsigned int numberOfFilesInPreviousBlock(0);
-      std::string previousBlockKey;
-
-      for ( FileNamesGrouping::const_iterator block3DIter = groupsOf3DBlocks.begin();
-            block3DIter != groupsOf3DBlocks.end();
-            ++block3DIter )
+      if (numberOfFilesInPreviousBlock == 0)
       {
-        unsigned int numberOfFilesInThisBlock = block3DIter->second.GetFilenames().size();
-        std::string thisBlockKey = block3DIter->first;
+        numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
+        groupsOf3DPlusTBlocks[thisBlockKey] = block3DIter->second;
+        MITK_DEBUG << "  3D+t group " << thisBlockKey;
+        previousBlockKey = thisBlockKey;
+      }
+      else
+      {
+        bool identicalOrigins;
+        try {
+          // check whether this and the previous block share a comon origin
+          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
 
-        if (numberOfFilesInPreviousBlock == 0)
-        {
-          numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
-          groupsOf3DPlusTBlocks[thisBlockKey] = block3DIter->second;
-          MITK_DEBUG << "  3D+t group " << thisBlockKey;
-          previousBlockKey = thisBlockKey;
-        }
-        else
-        {
-          bool identicalOrigins;
-          try {
-            // check whether this and the previous block share a comon origin
-            // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
+          const char
+              *origin_value = scanner.GetValue( groupsOf3DBlocks[thisBlockKey].GetFilenames().front().c_str(), tagImagePositionPatient ),
+              *previous_origin_value = scanner.GetValue( groupsOf3DBlocks[previousBlockKey].GetFilenames().front().c_str(), tagImagePositionPatient ),
+              *destination_value = scanner.GetValue( groupsOf3DBlocks[thisBlockKey].GetFilenames().back().c_str(), tagImagePositionPatient ),
+              *previous_destination_value = scanner.GetValue( groupsOf3DBlocks[previousBlockKey].GetFilenames().back().c_str(), tagImagePositionPatient );
 
-            const char
-                *origin_value = scanner.GetValue( groupsOf3DBlocks[thisBlockKey].GetFilenames().front().c_str(), tagImagePositionPatient ),
-                *previous_origin_value = scanner.GetValue( groupsOf3DBlocks[previousBlockKey].GetFilenames().front().c_str(), tagImagePositionPatient ),
-                *destination_value = scanner.GetValue( groupsOf3DBlocks[thisBlockKey].GetFilenames().back().c_str(), tagImagePositionPatient ),
-                *previous_destination_value = scanner.GetValue( groupsOf3DBlocks[previousBlockKey].GetFilenames().back().c_str(), tagImagePositionPatient );
-
-            if (!origin_value || !previous_origin_value || !destination_value || !previous_destination_value)
-            {
-              identicalOrigins = false;
-            }
-            else
-            {
-              std::string thisOriginString = ConstCharStarToString( origin_value );
-              std::string previousOriginString = ConstCharStarToString( previous_origin_value );
-
-              // also compare last origin, because this might differ if z-spacing is different
-              std::string thisDestinationString = ConstCharStarToString( destination_value );
-              std::string previousDestinationString = ConstCharStarToString( previous_destination_value );
-
-              identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
-            }
-          } catch(...)
+          if (!origin_value || !previous_origin_value || !destination_value || !previous_destination_value)
           {
             identicalOrigins = false;
           }
-
-          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
-          {
-            // group with previous block
-            groupsOf3DPlusTBlocks[previousBlockKey].AddFiles( block3DIter->second.GetFilenames() );
-            groupsOf3DPlusTBlocks[previousBlockKey].SetHasMultipleTimePoints(true);
-            MITK_DEBUG << "  --> group enhanced with another timestep";
-          }
           else
           {
-            // start a new block
-            groupsOf3DPlusTBlocks[thisBlockKey] = block3DIter->second;
-            int numberOfTimeSteps = groupsOf3DPlusTBlocks[previousBlockKey].GetFilenames().size() / numberOfFilesInPreviousBlock;
-            MITK_DEBUG << "  ==> group closed with " << numberOfTimeSteps << " time steps";
-            previousBlockKey = thisBlockKey;
-            MITK_DEBUG << "  3D+t group " << thisBlockKey << " started";
+            std::string thisOriginString = ConstCharStarToString( origin_value );
+            std::string previousOriginString = ConstCharStarToString( previous_origin_value );
+
+            // also compare last origin, because this might differ if z-spacing is different
+            std::string thisDestinationString = ConstCharStarToString( destination_value );
+            std::string previousDestinationString = ConstCharStarToString( previous_destination_value );
+
+            identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
           }
+        } catch(...)
+        {
+          identicalOrigins = false;
         }
 
-        numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
+        if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
+        {
+          // group with previous block
+          groupsOf3DPlusTBlocks[previousBlockKey].AddFiles( block3DIter->second.GetFilenames() );
+          groupsOf3DPlusTBlocks[previousBlockKey].SetHasMultipleTimePoints(true);
+          MITK_DEBUG << "  --> group enhanced with another timestep";
+        }
+        else
+        {
+          // start a new block
+          groupsOf3DPlusTBlocks[thisBlockKey] = block3DIter->second;
+          int numberOfTimeSteps = groupsOf3DPlusTBlocks[previousBlockKey].GetFilenames().size() / numberOfFilesInPreviousBlock;
+          MITK_DEBUG << "  ==> group closed with " << numberOfTimeSteps << " time steps";
+          previousBlockKey = thisBlockKey;
+          MITK_DEBUG << "  3D+t group " << thisBlockKey << " started";
+        }
       }
+
+      numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
     }
   }
 
@@ -942,11 +932,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, b
 }
 
 DicomSeriesReader::FileNamesGrouping
-DicomSeriesReader::GetSeries(const std::string &dir, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const std::string &dir)
 {
   gdcm::Directory directoryLister;
   directoryLister.Load( dir.c_str(), false ); // non-recursive
-  return GetSeries(directoryLister.GetFilenames(), groupImagesWithGantryTilt, restrictions);
+  return GetSeries(directoryLister.GetFilenames());
 }
 
 std::string
@@ -1046,25 +1036,6 @@ DicomSeriesReader::IDifyTagValue(const std::string& value)
 }
 
 DicomSeriesReader::StringContainer
-DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, bool groupImagesWithGantryTilt, const StringContainer &restrictions)
-{
-  FileNamesGrouping allSeries = GetSeries(dir, groupImagesWithGantryTilt, restrictions);
-  StringContainer resultingFileList;
-
-  for ( FileNamesGrouping::const_iterator idIter = allSeries.begin();
-        idIter != allSeries.end();
-        ++idIter )
-  {
-    if ( idIter->first.find( series_uid ) == 0 ) // this ID starts with given series_uid
-    {
-      return idIter->second.GetFilenames();
-    }
-  }
-
-  return resultingFileList;
-}
-
-DicomSeriesReader::StringContainer
 DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames, const gdcm::Scanner::MappingType& tags)
 {
   /* we CAN expect a group of equal
@@ -1159,8 +1130,8 @@ DicomSeriesReader::GdcmSortFunction(
     {
       if ( fabs(image_orientation2[dim] - image_orientation1[dim]) > 0.0001 )
       {
-        MITK_ERROR << "Dicom images have different orientations.";
-        throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");
+        // Don't sort such series
+        return false;
       }
     }
 
@@ -1191,50 +1162,75 @@ DicomSeriesReader::GdcmSortFunction(
     {
       // try to sort by Acquisition Number
       static const gdcm::Tag tagAcquisitionNumber(0x0020, 0x0012);
+
+      double acquisition_number1 = 0.0;
+      double acquisition_number2 = 0.0;
       if (ds1.second.find(tagAcquisitionNumber) != ds1.second.end() && ds2.second.find(tagAcquisitionNumber) != ds2.second.end())
       {
-        std::string acquisition_number1 = ds1.second.at(tagAcquisitionNumber); // Acquisition number
-        std::string acquisition_number2 = ds2.second.at(tagAcquisitionNumber);
+        acquisition_number1 = std::stod(ds1.second.at(tagAcquisitionNumber)); // Acquisition number
+        acquisition_number2 = std::stod(ds2.second.at(tagAcquisitionNumber));
+      }
 
-        if (acquisition_number1 != acquisition_number2)
+      if (acquisition_number1 != acquisition_number2)
+      {
+        return acquisition_number1 < acquisition_number2;
+      }
+      else // neither position nor acquisition number are good for sorting, so check more
+      {
+        // let's try temporal index
+        static const gdcm::Tag tagTemporalIndex(0x0020, 0x9128);
+        double temporalIndex1 = 0.0;
+        double temporalIndex2 = 0.0;
+        if (ds1.second.find(tagTemporalIndex) != ds1.second.end() && ds2.second.find(tagTemporalIndex) != ds2.second.end())
         {
-          return acquisition_number1 < acquisition_number2;
+          temporalIndex1 = std::stod(ds1.second.at(tagTemporalIndex));
+          temporalIndex2 = std::stod(ds2.second.at(tagTemporalIndex));
         }
-        else // neither position nor acquisition number are good for sorting, so check more
+
+        if (temporalIndex1 != temporalIndex2)
+        {
+          return temporalIndex1 < temporalIndex2;
+        } 
+        else 
         {
           // try to sort by Acquisition Time
           static const gdcm::Tag tagAcquisitionTime(0x0008, 0x0032);
+          double acquisition_time1 = 0.0;
+          double acquisition_time2 = 0.0;
+
           if (ds1.second.find(tagAcquisitionTime) != ds1.second.end() && ds2.second.find(tagAcquisitionTime) != ds2.second.end())
           {
-            std::string acquisition_time1 = ds1.second.at(tagAcquisitionTime); // Acquisition time
-            std::string acquisition_time2 = ds2.second.at(tagAcquisitionTime);
+            acquisition_time1 = std::stod(ds1.second.at(tagAcquisitionTime)); // Acquisition time
+            acquisition_time2 = std::stod(ds2.second.at(tagAcquisitionTime));
+          }
+          if (acquisition_time1 != acquisition_time2)
+          {
+            return acquisition_time1 < acquisition_time2;
+          } 
+          else // we gave up on image position, acquisition number and acquisition time now
+          {
+            // let's try trigger time
+            static const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
+            double trigger_time1 = 0.0;
+            double trigger_time2 = 0.0;
 
-            if (acquisition_time1 != acquisition_time2)
+            if (ds1.second.find(tagTriggerTime) != ds1.second.end() && ds2.second.find(tagTriggerTime) != ds2.second.end())
             {
-              return acquisition_time1 < acquisition_time2;
+              trigger_time1 = std::stod(ds1.second.at(tagTriggerTime)); // Trigger time
+              trigger_time2 = std::stod(ds2.second.at(tagTriggerTime));
             }
-            else // we gave up on image position, acquisition number and acquisition time now
-            {
-              // let's try trigger time
-              static const gdcm::Tag tagTriggerTime(0x0018, 0x1060);
-              if (ds1.second.find(tagTriggerTime) != ds1.second.end() && ds2.second.find(tagTriggerTime) != ds2.second.end())
-              {
-                std::string trigger_time1 = ds1.second.at(tagTriggerTime); // Trigger time
-                std::string trigger_time2 = ds2.second.at(tagTriggerTime);
 
-                if (trigger_time1 != trigger_time2)
-                {
-                  return trigger_time1 < trigger_time2;
-                }
-                // ELSE!
-                // for this and many previous ifs we fall through if nothing lets us sort
-              } // .
-            }   // .
-          }     // .
+            if (trigger_time1 != trigger_time2)
+            {
+              return trigger_time1 < trigger_time2;
+            }
+              // ELSE!
+              // for this and many previous ifs we fall through if nothing lets us sort
+          }   // .
         }
       }
     }
-  }             // .
+  }
 
   // LAST RESORT: all valuable information for sorting is missing.
   // Sort by some meaningless but unique identifiers to satisfy the sort function
@@ -1594,27 +1590,15 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
   const gdcm::Scanner::MappingType& tagValueMappings,
   bool& canLoadAs4D)
 {
+  canLoadAs4D = false;
   std::list<StringContainer> imageBlocks;
-  StringContainer sorted_filenames = presortedFilenames;
-
-  // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
-  try
-  {
-    sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames, tagValueMappings);
-  } catch (...)
-  {
-    MITK_ERROR << "Caught something.";
-  }
-
   std::string firstPosition;
   unsigned int numberOfBlocks(0); // number of 3D image blocks
-
   static const gdcm::Tag tagImagePositionPatient(0x0020, 0x0032); //Image position (Patient)
-  const gdcm::Tag tagModality(0x0008, 0x0060);
 
   // loop files to determine number of image blocks
-  for (StringContainer::const_iterator fileIter = sorted_filenames.begin();
-    fileIter != sorted_filenames.end();
+  for (StringContainer::const_iterator fileIter = presortedFilenames.begin();
+    fileIter != presortedFilenames.end();
     ++fileIter)
   {
     gdcm::Scanner::TagToValue tagToValueMap = tagValueMappings.find(fileIter->c_str())->second;
@@ -1635,9 +1619,6 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
     if (position == firstPosition)
     {
       ++numberOfBlocks;
-    } else
-    {
-      break; // enough information to know the number of image blocks
     }
   }
 
@@ -1645,48 +1626,24 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT(
 
   if (numberOfBlocks == 0) return imageBlocks; // only possible if called with no files
 
+  int numberOfFilesInBlock = presortedFilenames.size() / numberOfBlocks;
 
-                                               // loop files to sort them into image blocks
-  unsigned int numberOfExpectedSlices(0);
+  if (numberOfFilesInBlock * numberOfBlocks != presortedFilenames.size()) {
+    // Something goes wrong and we can't split files on blocks
+    return imageBlocks;
+  }
+
+  // loop files to sort them into image blocks
   for (unsigned int block = 0; block < numberOfBlocks; ++block)
   {
     StringContainer filesOfCurrentBlock;
-
-    for (StringContainer::const_iterator fileIter = sorted_filenames.begin() + block;
-      fileIter != sorted_filenames.end();
-      //fileIter += numberOfBlocks) // TODO shouldn't this work? give invalid iterators on first attempts
-      )
-    {
-      filesOfCurrentBlock.push_back(*fileIter);
-      for (unsigned int b = 0; b < numberOfBlocks; ++b)
-      {
-        if (fileIter != sorted_filenames.end())
-          ++fileIter;
-      }
+    for (int i = block * numberOfFilesInBlock; i < block * numberOfFilesInBlock + numberOfFilesInBlock; ++i) {
+      filesOfCurrentBlock.push_back(presortedFilenames[i]);
     }
 
     imageBlocks.push_back(filesOfCurrentBlock);
-
-    if (block == 0)
-    {
-      numberOfExpectedSlices = filesOfCurrentBlock.size();
-    } else
-    {
-      if (filesOfCurrentBlock.size() != numberOfExpectedSlices)
-      {
-        MITK_WARN << "DicomSeriesReader expected " << numberOfBlocks
-          << " image blocks of "
-          << numberOfExpectedSlices
-          << " images each. Block "
-          << block
-          << " got "
-          << filesOfCurrentBlock.size()
-          << " instead. Cannot load this as 3D+t"; // TODO implement recovery (load as many slices 3D+t as much as possible)
-        canLoadAs4D = false;
-      }
-    }
   }
-
+  canLoadAs4D = true;
   return imageBlocks;
 }
 

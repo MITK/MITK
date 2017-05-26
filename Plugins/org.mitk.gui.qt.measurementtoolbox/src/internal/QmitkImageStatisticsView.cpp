@@ -550,9 +550,9 @@ void QmitkImageStatisticsView::UpdateStatistics()
   mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
   mitk::NodePredicateOr::Pointer imagePredicate = mitk::NodePredicateOr::New(isImage, isLabelSet);
 
-  std::string maskName = std::string();
-  std::string maskType = std::string();
-  std::string featureImageName = std::string();
+  std::string maskName;
+  std::string maskType;
+  std::string featureImageName;
   unsigned int maskDimension = 0;
 
   // reset data from last run

@@ -71,7 +71,7 @@ int mitkDicomSeriesReaderTest(int argc, char* argv[])
   dir = argv[1];
 
   //check if DICOMTags have been set as property for mitk::Image
-  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( dir, true );
+  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries(dir);
   std::list<mitk::Image::Pointer> images;
   std::map<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer> fileMap;
 

@@ -421,6 +421,7 @@ void QmitkImageStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointe
 
 void QmitkImageStatisticsView::SelectionChanged(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
+  //Clear Histogram if data node is deselected
   m_Controls->m_JSHistogram->ClearDiagram();
 
   if( this->m_StatisticsUpdatePending )
@@ -521,7 +522,6 @@ void QmitkImageStatisticsView::ReinitData()
   m_Controls->m_ErrorMessageLabel->setText( "" );
   m_Controls->m_ErrorMessageLabel->hide();
   this->InvalidateStatisticsTableView();
-  m_Controls->m_JSHistogram->ClearDiagram();
   m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
 }
 
@@ -661,7 +661,6 @@ void QmitkImageStatisticsView::UpdateStatistics()
 
       this->InvalidateStatisticsTableView();
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-      m_Controls->m_JSHistogram->ClearDiagram();
       m_CurrentStatisticsValid = false;
       this->m_StatisticsUpdatePending = false;
       m_Controls->m_lineRadioButton->setEnabled(true);
@@ -783,6 +782,7 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
   {
     if(this->m_DataNodeSelectionChanged)
     {
+      std::cout << "ICH WERDE AUFGERUFEN" << std::endl;
       this->SelectionChanged(this->GetCurrentSelection());
     }
     else
@@ -806,6 +806,8 @@ void QmitkImageStatisticsView::OnHistogramBinSizeBoxValueChanged()
 }
 void QmitkImageStatisticsView::WriteStatisticsToGUI()
 {
+  m_Controls->m_JSHistogram->ClearDiagram();
+
   //Disconnect OnLineRadioButtonSelected() to prevent reloading chart when radiobutton is checked programmatically
   disconnect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), 0, 0);
   m_Controls->m_lineRadioButton->setEnabled(true);
@@ -849,7 +851,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_JSHistogram->ClearDiagram();
     m_CurrentStatisticsValid = false;
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
@@ -916,7 +917,6 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-        m_Controls->m_JSHistogram->ClearDiagram();
         m_CurrentStatisticsValid = false;
         m_Controls->m_ErrorMessageLabel->hide();
         m_Controls->m_SelectedMaskLabel->setText( "None" );

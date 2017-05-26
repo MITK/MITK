@@ -32,7 +32,8 @@ class QmitkC3xyData : public QObject
 
 public:
   QmitkC3xyData();
-  QmitkC3xyData(QMap<QVariant, QVariant> data);
+  QmitkC3xyData(QList<QVariant> data); //Constructor for Data1D (x=1,5,6,...)
+  QmitkC3xyData(QMap<QVariant, QVariant> data); //Constructor for Data2D (x:y=1:2, 2:6, 3:7)
 
   void SetData(QMap<QVariant, QVariant> data);
 

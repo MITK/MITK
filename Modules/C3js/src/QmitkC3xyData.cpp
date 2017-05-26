@@ -21,7 +21,18 @@ QmitkC3xyData::QmitkC3xyData()
 }
 
 QmitkC3xyData::QmitkC3xyData(QMap<QVariant, QVariant> data) {
-	SetData(data);
+  SetData(data);
+}
+
+QmitkC3xyData::QmitkC3xyData(QList<QVariant> data) {
+  QMap<QVariant, QVariant> augmentedData;
+  unsigned int count = 0;
+  //just augment the 1D data
+  for (const auto& ele : data) {
+    augmentedData[count] = ele;
+    count++;
+  }
+  SetData(augmentedData);
 }
 
 

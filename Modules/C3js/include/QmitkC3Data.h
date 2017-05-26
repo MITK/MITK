@@ -40,7 +40,7 @@ public:
 
   void SetAppearance(QVariant diagramTypeName, bool showSubChart = true, bool usePercentageInPieChart = false);
 
-  Q_INVOKABLE QList<QVariant> GetDataLabels() { return m_dataLabels; };
+  Q_INVOKABLE QList<QVariant> GetDataLabels() const { return m_dataLabels; };
   Q_INVOKABLE void SetDataLabels(QList<QVariant> dataLabels) { m_dataLabels = dataLabels; };
 
   Q_INVOKABLE QVariant GetXAxisLabel() { return m_xAxisLabel; };
@@ -50,7 +50,7 @@ public:
   Q_INVOKABLE void SetYAxisLabel(QVariant label) { m_yAxisLabel = label; };
 
   Q_INVOKABLE QVariant GetDiagramType() { return m_DiagramTypeName; };
-  Q_INVOKABLE void SetDiagramType(QVariant diagramTypeName) { m_DiagramTypeName = diagramTypeName; emit SignalDiagramTypeChanged(m_DiagramTypeName); };
+  Q_INVOKABLE void SetDiagramType(QVariant diagramTypeName) { m_DiagramTypeName = diagramTypeName; /*emit SignalDiagramTypeChanged(m_DiagramTypeName);*/ };
 
   Q_INVOKABLE QVariant GetShowSubchart() { return m_ShowSubchart; };
   Q_INVOKABLE void SetShowSubchart(QVariant showSubchart) { m_ShowSubchart = showSubchart; };

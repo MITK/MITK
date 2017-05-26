@@ -32,10 +32,8 @@ public:
   virtual ~QmitkC3jsWidget();
 
   void AddData2D(const QMap<QVariant, QVariant>& data2D);
-  QList<QMap<QVariant, QVariant> > GetData2D() const;
 
   void AddData1D(const QList<QVariant>& data1D);
-  QList<QList<QVariant> > GetData1D() const;
 
   void SetDataLabels(const QList<QString>& labels);
   QList<QString> GetDataLabels() const;
@@ -47,6 +45,7 @@ public:
   QString GetYAxisLabel() const;
 
   void SetDiagramType(DiagramType type);
+  DiagramType GetDiagramType() const;
 
   void ShowDiagram(bool showSubChart=false);
 

@@ -19,9 +19,6 @@ window.onload = function()
   new QWebChannel(qt.webChannelTransport, function(channel) {
     chartData = channel.objects.chartData;
 
-	chartData.SignalDiagramTypeChanged.connect(function(chartType) {
-        chartType.m_DiagramTypeName = chartType
-    });
 	var count = 0;
 	for(var propertyName in channel.objects) {
 		if (propertyName != 'chartData'){

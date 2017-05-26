@@ -35,50 +35,54 @@ public:
 
   QWebChannel* GetWebChannel();
 
-  void AddData2D(const QMap<QVariant, QVariant>& data2D) { m_data2D.push_back(data2D); }
-  QList<QMap<QVariant, QVariant> > GetData2D() const { return m_data2D; }
-  void ClearData2D() { m_data2D.clear(); }
+  void AddData1D(const QList<QVariant>& data1D) { GetC3xyData()->push_back(new QmitkC3xyData(data1D)); }
+  void AddData2D(const QMap<QVariant, QVariant>& data2D) { GetC3xyData()->push_back(new QmitkC3xyData(data2D)); }
 
-  void AddData1D(const QList<QVariant>& data1D) { m_data1D.push_back(data1D); }
-  QList<QList<QVariant> > GetData1D() const { return m_data1D; }
+  void ClearData2D() { GetC3xyData()->clear(); }
 
-  void SetDataLabels(const QList<QString>& labels) { m_dataLabels = labels; }
-  QList<QString> GetDataLabels() const { return m_dataLabels; }
-  QList<QVariant> GetDataLabelsAsQVariant() const;
+  void SetDataLabels(const QList<QString>& labels);
 
-  void SetXAxisLabel(const QString& label) { m_xAxisLabel = label; };
-  QString GetXAxisLabel() const { return m_xAxisLabel; };
-  QVariant GetXAxisLabelAsQVariant() const;
+  QList<QString> GetDataLabels() const {
+    auto dataLabels = GetC3Data()->GetDataLabels();
+    QList<QString> dataLabelsAsString;
+    for (const auto& label : dataLabels) {
+      dataLabelsAsString.push_back(label.toString());
+    }
+    return dataLabelsAsString;
+  }
 
-  void SetYAxisLabel(const QString& label) { m_yAxisLabel = label; };
-  QString GetYAxisLabel() const { return m_yAxisLabel; };
-  QVariant GetYAxisLabelAsQVariant() const;
+  void SetXAxisLabel(const QString& label) { GetC3Data()->SetXAxisLabel(label); }
+  QString GetXAxisLabel() const { return GetC3Data()->GetXAxisLabel().toString(); };
+
+  void SetYAxisLabel(const QString& label) { GetC3Data()->SetYAxisLabel(label); };
+  QString GetYAxisLabel() const { return GetC3Data()->GetYAxisLabel().toString(); };
 
   void SetDiagramType(QmitkC3jsWidget::DiagramType diagramType) { GetC3Data()->SetDiagramType(m_diagramTypeToName.value(diagramType)); }
-  QVariant GetDiagramTypeAsQVariant() const;
+  DiagramType GetDiagramType() const { return m_diagramTypeToName.key(GetC3Data()->GetDiagramType()); }
 
   void ClearJavaScriptChart();
   void initializeJavaScriptChart();
   void callJavaScriptFuntion(QString command);
 
-  QmitkC3Data* GetC3Data() { return &m_c3Data; };
-  QVector<QmitkC3xyData*>* GetC3xyData() { return &m_c3xyData; };
+  QmitkC3Data* GetC3Data() const { return m_c3Data; };
+  QVector<QmitkC3xyData*>* GetC3xyData() const { return m_c3xyData; };
 
 private:
   QWidget* m_Parent;
   QWebChannel* m_WebChannel;
   QWebEngineView* m_WebEngineView;
 
-  QList<QMap<QVariant, QVariant> > m_data2D;
-  QList<QList<QVariant> > m_data1D;
-  QList<QString> m_dataLabels;
-  QString m_xAxisLabel;
-  QString m_yAxisLabel;
-
-  QmitkC3Data m_c3Data;
-  QVector<QmitkC3xyData*> m_c3xyData;
+  QmitkC3Data * m_c3Data;
+  QVector<QmitkC3xyData*> * m_c3xyData;
   QMap<QmitkC3jsWidget::DiagramType, QVariant> m_diagramTypeToName;
 };
+
+void QmitkC3jsWidget::Impl::SetDataLabels(const QList<QString>& labels)
+{
+  QVector<QVariant> variantList(labels.size());
+  qCopy(labels.begin(), labels.end(), variantList.begin());
+  GetC3Data()->SetDataLabels(variantList.toList());
+}
 
 QmitkC3jsWidget::Impl::Impl(QWidget* parent)
   : m_WebChannel(new QWebChannel(parent)),
@@ -104,10 +108,15 @@ QmitkC3jsWidget::Impl::Impl(QWidget* parent)
   m_diagramTypeToName.insert(DiagramType::line, QVariant("line"));
   m_diagramTypeToName.insert(DiagramType::spline, QVariant("spline"));
   m_diagramTypeToName.insert(DiagramType::pie, QVariant("pie"));
+
+  m_c3Data = new QmitkC3Data();
+  m_c3xyData = new QVector<QmitkC3xyData*>();
 }
 
 QmitkC3jsWidget::Impl::~Impl()
 {
+  delete m_c3Data;
+  delete m_c3xyData;
 }
 
 QWebChannel* QmitkC3jsWidget::Impl::GetWebChannel()
@@ -134,23 +143,6 @@ void QmitkC3jsWidget::Impl::callJavaScriptFuntion(QString command)
   m_WebEngineView->page()->runJavaScript(command);
 }
 
-QList<QVariant> QmitkC3jsWidget::Impl::GetDataLabelsAsQVariant() const
-{
-	QList<QVariant> result;
-	std::copy(m_dataLabels.begin(), m_dataLabels.end(), std::back_inserter(result));
-	return result;
-}
-
-QVariant QmitkC3jsWidget::Impl::GetXAxisLabelAsQVariant() const
-{
-	return m_xAxisLabel;
-}
-
-QVariant QmitkC3jsWidget::Impl::GetYAxisLabelAsQVariant() const
-{
-	return m_yAxisLabel;
-}
-
 void QmitkC3jsWidget::Impl::ClearJavaScriptChart()
 {
   m_WebEngineView->setUrl(QUrl(QStringLiteral("qrc:///C3js/empty.html")));
@@ -158,9 +150,9 @@ void QmitkC3jsWidget::Impl::ClearJavaScriptChart()
 
 void QmitkC3jsWidget::Impl::initializeJavaScriptChart()
 {
-  m_WebChannel->registerObject(QStringLiteral("chartData"), &m_c3Data);
+  m_WebChannel->registerObject(QStringLiteral("chartData"), m_c3Data);
   unsigned count = 0;
-  for (auto& xyData : m_c3xyData) {
+  for (auto& xyData : *m_c3xyData) {
 	  QString variableName = "xyData" + QString::number(count);
 	  m_WebChannel->registerObject(variableName, xyData);
 	  count++;
@@ -179,35 +171,10 @@ void QmitkC3jsWidget::AddData2D(const QMap<QVariant, QVariant>& data2D)
 	m_Impl->AddData2D(data2D);
 }
 
-QList<QMap<QVariant, QVariant> > QmitkC3jsWidget::GetData2D() const
-{
-	return m_Impl->GetData2D();
-}
 
 void QmitkC3jsWidget::AddData1D(const QList<QVariant>& data1D)
 {
-	QMap<QVariant, QVariant> augmentedData;
-	unsigned int count = 0;
-	//just augment the 1D data
-	for (const auto& ele : data1D) {
-		augmentedData[count] = ele;
-		count++ ;
-	}
-	m_Impl->AddData2D(augmentedData);
-}
-
-QList<QList<QVariant> > QmitkC3jsWidget::GetData1D() const
-{
-	QList<QList<QVariant> > emulatedData1D;
-	auto data2D = m_Impl->GetData2D();
-	for (const auto& listElement : data2D) {
-		QList<QVariant> innerList;
-		for (const auto& innerListElement : listElement.toStdMap()) {
-			innerList.push_back(innerListElement.second);
-		}
-		emulatedData1D.push_back(innerList);
-	}
-	return emulatedData1D;
+  m_Impl->AddData1D(data1D);
 }
 
 void QmitkC3jsWidget::SetDataLabels(const QList<QString>& labels)
@@ -235,6 +202,7 @@ void QmitkC3jsWidget::SetYAxisLabel(const QString & label)
 	m_Impl->SetYAxisLabel(label);
 }
 
+
 QString QmitkC3jsWidget::GetYAxisLabel() const
 {
 	return m_Impl->GetYAxisLabel();
@@ -245,21 +213,15 @@ void QmitkC3jsWidget::SetDiagramType(DiagramType type)
 	m_Impl->SetDiagramType(type);
 }
 
+QmitkC3jsWidget::DiagramType QmitkC3jsWidget::GetDiagramType() const
+{
+  return m_Impl->GetDiagramType();
+}
+
 void QmitkC3jsWidget::ShowDiagram(bool showSubChart)
 {
-
-	this->m_Impl->GetC3Data()->SetXAxisLabel(m_Impl->GetXAxisLabelAsQVariant());
-	this->m_Impl->GetC3Data()->SetYAxisLabel(m_Impl->GetYAxisLabelAsQVariant());
-	this->m_Impl->GetC3Data()->SetDataLabels(m_Impl->GetDataLabelsAsQVariant());
-
 	this->m_Impl->GetC3Data()->SetAppearance(m_Impl->GetC3Data()->GetDiagramType(), showSubChart, m_Impl->GetC3Data()->GetDiagramType()== QVariant("pie"));
 
-	auto data2D = m_Impl->GetData2D();
-
-	for (const auto& listEntry : data2D) {
-		QmitkC3xyData * xyData = new QmitkC3xyData(listEntry);
-		this->m_Impl->GetC3xyData()->push_back(xyData);
-	}
 	m_Impl->initializeJavaScriptChart();
 }
 

@@ -448,11 +448,10 @@ void USNavigationMarkerPlacement::OnCombinedModalityChanged(itk::SmartPointer<mi
 
 void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::DataNode> settings)
 {
-  std::string applicationName;
-  if (!settings->GetStringProperty("settings.application", applicationName))
-  {
+  int applicationName;
+  if (!settings->GetIntProperty("settings.application", applicationName)) {
     // set default application if the string property is not available
-    applicationName = "Marker Placement";
+    applicationName = QmitkUSNavigationAbstractSettingsWidget::Applications::PUNCTION;
   }
 
   // create navigation step widgets according to the selected application
@@ -461,8 +460,7 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
     m_CurrentApplicationName = applicationName;
 
     QmitkUSNavigationProcessWidget::NavigationStepVector navigationSteps;
-    if (applicationName == "Punction")
-    {
+    if (applicationName == QmitkUSNavigationAbstractSettingsWidget::Applications::PUNCTION) {
       QmitkUSNavigationStepCombinedModality* stepCombinedModality =
         new QmitkUSNavigationStepCombinedModality(m_Parent);
       QmitkUSNavigationStepTumourSelection* stepTumourSelection =
@@ -486,9 +484,7 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
       m_NavigationStepNames.push_back("Critical Structure Marking");
       navigationSteps.push_back(stepIntervention);
       m_NavigationStepNames.push_back("Intervention");
-    }
-    else if (applicationName == "Marker Placement")
-    {
+    } else if (applicationName == QmitkUSNavigationAbstractSettingsWidget::Applications::MARKER_PLACEMENT) {
       QmitkUSNavigationStepCombinedModality* stepCombinedModality =
         new QmitkUSNavigationStepCombinedModality(m_Parent);
       QmitkUSNavigationStepTumourSelection* stepTumourSelection =

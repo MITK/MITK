@@ -53,6 +53,7 @@ protected slots:
   void OnCancel();
 
 public:
+  enum Applications { PUNCTION, MARKER_PLACEMENT };
   explicit QmitkUSNavigationAbstractSettingsWidget(QWidget *parent = 0);
   ~QmitkUSNavigationAbstractSettingsWidget();
 

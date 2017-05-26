@@ -429,10 +429,9 @@ void QmitkUSNavigationProcessWidget::OnSettingsChanged(const mitk::DataNode::Poi
   }
   methodEntered = true;
 
-  std::string application;
-  if ( dataNode->GetStringProperty("settings.application", application) )
-  {
-    QString applicationQString = QString::fromStdString(application);
+  int application;
+  if ( dataNode->GetIntProperty("settings.application", application) ) {
+    QString applicationQString = application == QmitkUSNavigationAbstractSettingsWidget::Applications::PUNCTION ? tr("Punction") : tr("Marker Placement");
     if ( applicationQString != ui->titleLabel->text() )
     {
       ui->titleLabel->setText(applicationQString);
@@ -478,7 +477,7 @@ void QmitkUSNavigationProcessWidget::InitializeNavigationStepWidgets()
     if ( n > 0 ) { ui->stepsToolBox->setItemEnabled(n, false); }
   }
 
-  ui->restartStepButton->setEnabled(m_NavigationSteps.at(0)->GetIsRestartable());
+  ui->restartStepButton->setEnabled(m_NavigationSteps.empty() ? false : m_NavigationSteps.at(0)->GetIsRestartable());
   ui->stepsToolBox->setCurrentIndex(0);
 
   // activate the first navigation step widgets

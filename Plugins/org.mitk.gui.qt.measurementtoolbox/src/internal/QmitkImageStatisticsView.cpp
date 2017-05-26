@@ -85,7 +85,7 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_BinSizeFrame->setVisible(false);
+    m_Controls->m_BinSizeFrame->setEnabled(false);
   }
 }
 
@@ -110,13 +110,13 @@ void QmitkImageStatisticsView::CreateConnections()
 void QmitkImageStatisticsView::OnDefaultBinSizeBoxChanged()
 {
 
-  m_Controls->m_BinSizeFrame->setVisible(!m_Controls->m_UseDefaultBinSizeBox->isChecked());
+  m_Controls->m_BinSizeFrame->setEnabled(!m_Controls->m_UseDefaultBinSizeBox->isChecked());
 
-if (m_CalculationThread != NULL){
-  m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
-  m_CalculationThread->SetUseDefaultNBins(m_Controls->m_UseDefaultBinSizeBox->isChecked());
-}
-this->UpdateStatistics();
+  if (m_CalculationThread != NULL) {
+    m_Controls->m_HistogramBinSizeSpinbox->setValue(m_CalculationThread->GetHistogramBinSize());
+    m_CalculationThread->SetUseDefaultNBins(m_Controls->m_UseDefaultBinSizeBox->isChecked());
+  }
+  this->UpdateStatistics();
 
 }
 
@@ -207,7 +207,9 @@ void QmitkImageStatisticsView::OnTimeChanged(const itk::EventObject& e)
 		  {
 			  this->m_Controls->m_JSHistogram->SetDiagramType(QmitkC3jsWidget::DiagramType::bar);
 		  }
-		  this->m_Controls->m_JSHistogram->SetDataLabels({"Histogram"});
+      this->m_Controls->m_JSHistogram->SetDataLabels({ m_Controls->m_SelectedFeatureImageLabel->text() });
+      this->m_Controls->m_JSHistogram->SetXAxisLabel("Grey value");
+      this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
 		  this->m_Controls->m_JSHistogram->ShowDiagram(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
 
       }
@@ -816,49 +818,51 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
   m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(true);
   m_Controls->m_InfoLabel->setText(QString(""));
 
-  if(m_DataNodeSelectionChanged)
+  if (m_DataNodeSelectionChanged)
   {
     this->m_StatisticsUpdatePending = false;
     this->RequestStatisticsUpdate();
     return;    // stop visualization of results and calculate statistics of new selection
   }
 
-  if ( this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
+  if (this->m_CalculationThread->GetStatisticsUpdateSuccessFlag())
   {
-    if ( this->m_CalculationThread->GetStatisticsChangedFlag() )
+    if (this->m_CalculationThread->GetStatisticsChangedFlag())
     {
       // Do not show any error messages
       m_Controls->m_ErrorMessageLabel->hide();
       m_CurrentStatisticsValid = true;
     }
 
-    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
-    m_Controls->m_HistogramBinSizeSpinbox->setValue( this->m_CalculationThread->GetHistogramBinSize() );
-	auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
-	m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram));
-	m_Controls->m_JSHistogram->SetDiagramType(QmitkC3jsWidget::DiagramType::bar);
-	this->m_Controls->m_JSHistogram->SetDataLabels({ "Histogram" });
-	m_Controls->m_JSHistogram->ShowDiagram(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
-    this->FillStatisticsTableView( this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
+    m_Controls->m_HistogramBinSizeSpinbox->setValue(this->m_CalculationThread->GetHistogramBinSize());
+    auto histogram = this->m_CalculationThread->GetTimeStepHistogram(this->m_CalculationThread->GetTimeStep()).GetPointer();
+    m_Controls->m_JSHistogram->AddData2D(ConvertHistogramToMap(histogram));
+    m_Controls->m_JSHistogram->SetDiagramType(QmitkC3jsWidget::DiagramType::bar);
+    this->m_Controls->m_JSHistogram->SetDataLabels({ m_Controls->m_SelectedFeatureImageLabel->text() });
+    this->m_Controls->m_JSHistogram->SetXAxisLabel("Grey value");
+    this->m_Controls->m_JSHistogram->SetYAxisLabel("Frequency");
+    m_Controls->m_JSHistogram->ShowDiagram(this->m_Controls->m_ShowSubchartCheckBox->isChecked());
+    this->FillStatisticsTableView(this->m_CalculationThread->GetStatisticsData(), this->m_CalculationThread->GetStatisticsImage());
     m_CurrentStatisticsValid = true;
   }
   else
   {
-    m_Controls->m_SelectedMaskLabel->setText( "None" );
-    m_Controls->m_ErrorMessageLabel->setText( m_CalculationThread->GetLastErrorMessage().c_str() );
+    m_Controls->m_SelectedMaskLabel->setText("None");
+    m_Controls->m_ErrorMessageLabel->setText(m_CalculationThread->GetLastErrorMessage().c_str());
     m_Controls->m_ErrorMessageLabel->show();
 
     // Clear statistics and histogram
     this->InvalidateStatisticsTableView();
-    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
     m_CurrentStatisticsValid = false;
 
     // If a (non-closed) PlanarFigure is selected, display a line profile widget
-    if ( m_SelectedPlanarFigure != NULL )
+    if (m_SelectedPlanarFigure != NULL)
     {
       // Check if the (closed) planar figure is out of bounds and so no image mask could be calculated--> Intensity Profile can not be calculated
       bool outOfBounds = false;
-      if ( m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
+      if (m_SelectedPlanarFigure->IsClosed() && m_SelectedImageMask == NULL)
       {
         outOfBounds = true;
         std::stringstream message;
@@ -868,44 +872,46 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
 
       // check whether PlanarFigure is initialized
       const mitk::PlaneGeometry *planarFigurePlaneGeometry = m_SelectedPlanarFigure->GetPlaneGeometry();
-      if ( !(planarFigurePlaneGeometry == NULL || outOfBounds))
+      if (!(planarFigurePlaneGeometry == NULL || outOfBounds))
       {
         unsigned int timeStep = this->GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
 
-		mitk::Image::Pointer image;
+        mitk::Image::Pointer image;
 
-		if (this->m_CalculationThread->GetStatisticsImage()->GetDimension() == 4)
-		{
-			mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-			timeSelector->SetInput(this->m_CalculationThread->GetStatisticsImage());
-			timeSelector->SetTimeNr(timeStep);
-			timeSelector->Update();
+        if (this->m_CalculationThread->GetStatisticsImage()->GetDimension() == 4)
+        {
+          mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+          timeSelector->SetInput(this->m_CalculationThread->GetStatisticsImage());
+          timeSelector->SetTimeNr(timeStep);
+          timeSelector->Update();
 
-			image = timeSelector->GetOutput();
-		}
-		else
-		{
-			image = this->m_CalculationThread->GetStatisticsImage();
-		}
+          image = timeSelector->GetOutput();
+        }
+        else
+        {
+          image = this->m_CalculationThread->GetStatisticsImage();
+        }
 
-		mitk::IntensityProfile::Pointer intensityProfile = mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
+        mitk::IntensityProfile::Pointer intensityProfile = mitk::ComputeIntensityProfile(image, m_SelectedPlanarFigure);
 
-		auto intensityProfileList = ConvertIntensityProfileToList(intensityProfile);
-		m_Controls->m_JSHistogram->SetDiagramType(QmitkC3jsWidget::DiagramType::line);
-		m_Controls->m_JSHistogram->AddData1D(intensityProfileList);
-		m_Controls->m_JSHistogram->SetDataLabels({"Intensity profile"});
-		m_Controls->m_JSHistogram->ShowDiagram(m_Controls->m_ShowSubchartCheckBox->isChecked());
+        auto intensityProfileList = ConvertIntensityProfileToList(intensityProfile);
+        m_Controls->m_JSHistogram->SetDiagramType(QmitkC3jsWidget::DiagramType::line);
+        m_Controls->m_JSHistogram->AddData1D(intensityProfileList);
+        m_Controls->m_JSHistogram->SetDataLabels({ "Intensity profile" });
+        m_Controls->m_JSHistogram->SetXAxisLabel("Distance");
+        m_Controls->m_JSHistogram->SetYAxisLabel("Intensity");
+        m_Controls->m_JSHistogram->ShowDiagram(m_Controls->m_ShowSubchartCheckBox->isChecked());
 
-		m_Controls->m_lineRadioButton->setChecked(true);
-		m_Controls->m_lineRadioButton->setEnabled(false);
-		m_Controls->m_barRadioButton->setEnabled(false);
-		m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
-		m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
+        m_Controls->m_lineRadioButton->setChecked(true);
+        m_Controls->m_lineRadioButton->setEnabled(false);
+        m_Controls->m_barRadioButton->setEnabled(false);
+        m_Controls->m_HistogramBinSizeSpinbox->setEnabled(false);
+        m_Controls->m_HistogramBinSizeCaptionLabel->setEnabled(false);
 
-		//Reconnect OnLineRadioButtonSelected()
+        //Reconnect OnLineRadioButtonSelected()
         connect((QObject*)(this->m_Controls->m_JSHistogram), SIGNAL(PageSuccessfullyLoaded()), (QObject*) this, SLOT(OnLineRadioButtonSelected()));
-		
-        this->FillLinearProfileStatisticsTableView( intensityProfile, this->m_CalculationThread->GetStatisticsImage().GetPointer() );
+
+        this->FillLinearProfileStatisticsTableView(intensityProfile, this->m_CalculationThread->GetStatisticsImage().GetPointer());
 
         std::stringstream message;
         message << "<font color='red'>Only linegraph available for an intensity profile!</font>";
@@ -916,10 +922,10 @@ void QmitkImageStatisticsView::WriteStatisticsToGUI()
       {
         // Clear statistics, histogram, and GUI
         this->InvalidateStatisticsTableView();
-        m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
+        m_Controls->m_StatisticsWidgetStack->setCurrentIndex(0);
         m_CurrentStatisticsValid = false;
         m_Controls->m_ErrorMessageLabel->hide();
-        m_Controls->m_SelectedMaskLabel->setText( "None" );
+        m_Controls->m_SelectedMaskLabel->setText("None");
         this->m_StatisticsUpdatePending = false;
         m_Controls->m_lineRadioButton->setEnabled(true);
         m_Controls->m_barRadioButton->setEnabled(true);

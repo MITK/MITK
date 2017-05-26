@@ -183,19 +183,24 @@ function GenerateChart(chartType, showSubchart, usePercentageInPieChart, xAxisLa
             centered: true,
 			format: d3.format(".1f"),
           },
-		  label : xAxisLabel,
+		  label: {
+			text: xAxisLabel,
+			position: 'outer-center'
+		  }
         },
         y: {
           tick: {
             format: d3.format(formatCharacter)
           },
-		  label: yAxisLabel
+		  label: {
+			text: yAxisLabel,
+			position: 'outer-middle'
+		  }
         }
     },
 	tooltip: {
 		format: {
-			title: function (x) { return d3.format(".2f")(x)} ,
-			value: function (x) { return d3.format(".2f")(x)} ,
+			title: function (x) { return xAxisLabel +  ': ' +  d3.format(".2f")(x)}
 		},
 	},
     //Style data points in linegraph

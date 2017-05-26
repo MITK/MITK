@@ -454,9 +454,9 @@
           </layout>
          </item>
          <item>
-          <widget class="QCheckBox" name="m_UseDefaultBinSizeBox">
+          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
            <property name="text">
-            <string>Use default bin size</string>
+            <string>Show Subchart</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -464,9 +464,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="m_ShowSubchartCheckBox">
+          <widget class="QCheckBox" name="m_UseDefaultBinSizeBox">
            <property name="text">
-            <string>Show Subchart</string>
+            <string>Use default bin size</string>
            </property>
            <property name="checked">
             <bool>true</bool>

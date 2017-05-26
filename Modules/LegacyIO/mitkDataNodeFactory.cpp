@@ -251,7 +251,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
   }
 
-  DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(this->GetDirectory(), true, this->m_SeriesRestrictions); // true = group gantry tilt images
+  DicomSeriesReader::FileNamesGrouping imageBlocks = DicomSeriesReader::GetSeries(this->GetDirectory());
   const unsigned int size = imageBlocks.size();
 
   this->ResizeOutputs(size);

@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
   std::string outFileName = us::any_cast<string>(parsedArgs["output"]);
 
   //check if DICOMTags have been set as property for mitk::Image
-  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( inputFolder, true );
+  mitk::DicomSeriesReader::FileNamesGrouping seriesInFiles = mitk::DicomSeriesReader::GetSeries( inputFolder);
   std::list<mitk::Image::Pointer> images;
   std::map<mitk::Image::Pointer, mitk::DicomSeriesReader::StringContainer> fileMap;
 

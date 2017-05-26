@@ -490,22 +490,7 @@ public:
 
    Find all series (and sub-series -- see details) in a particular directory.
   */
-  static FileNamesGrouping GetSeries(const std::string &dir,
-                                   bool groupImagesWithGantryTilt,
-                                   const StringContainer &restrictions = StringContainer());
-
-  /**
-   \brief see other GetSeries().
-
-   \warning Untested, could or could not work.
-
-   This differs only by having an additional restriction to a single known DICOM series.
-   Internally, it uses the other GetSeries() method.
-  */
-  static StringContainer GetSeries(const std::string &dir,
-                                   const std::string &series_uid,
-                                   bool groupImagesWithGantryTilt,
-                                   const StringContainer &restrictions = StringContainer());
+  static FileNamesGrouping GetSeries(const std::string &dir);
 
   /**
    \brief PREFERRED version of this method - scan and sort DICOM files.
@@ -530,22 +515,8 @@ public:
    \warning Adding restrictions is not yet implemented!
    */
   static
-  FileNamesGrouping
-  GetSeries(const StringContainer& files,
-            bool sortTo3DPlust,
-            bool groupImagesWithGantryTilt,
-            const StringContainer &restrictions = StringContainer());
-
-  /**
-    \brief See other GetSeries().
-
-    Use GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions) instead.
-  */
-  static
-  FileNamesGrouping
-  GetSeries(const StringContainer& files,
-            bool groupImagesWithGantryTilt,
-            const StringContainer &restrictions = StringContainer());
+    FileNamesGrouping
+    GetSeries(const StringContainer& files, bool unused = true /* for backward compatibility */);
 
   /**
    Loads a DICOM series composed by the file names enumerated in the file names container.
@@ -796,7 +767,7 @@ protected:
   */
   static
   SliceGroupingAnalysisResult
-  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, bool groupsOfSimilarImages, const gdcm::Scanner::MappingType& tagValueMappings_);
+  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
 
   /**
     \brief Safely convert const char* to std::string.

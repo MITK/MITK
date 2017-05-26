@@ -1654,6 +1654,7 @@ DicomSeriesReader
   io = DcmIoType::New();
   io->SetFileName(filenames.front().c_str());
   io->ReadImageInformation();
+  io->SetLoadPrivateTags(true);
 
   if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
   {
@@ -1676,6 +1677,7 @@ DicomSeriesReader
   io = DcmIoType::New();
   io->SetFileName(imageBlocks.front().front().c_str());
   io->ReadImageInformation();
+  io->SetLoadPrivateTags(true);
 
   if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
   {

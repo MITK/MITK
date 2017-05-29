@@ -22,8 +22,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkC3Data.h>
 #include <QmitkC3xyData.h>
 
-#include <iostream>
-
 class QmitkC3jsWidget::Impl final
 {
 public:

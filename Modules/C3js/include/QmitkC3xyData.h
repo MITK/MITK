@@ -32,15 +32,15 @@ class QmitkC3xyData : public QObject
 
 public:
   QmitkC3xyData();
-  QmitkC3xyData(QList<QVariant> data); //Constructor for Data1D (x=1,5,6,...)
+  QmitkC3xyData(QList<QVariant> data); //Constructor for Data1D (y=1,5,6,...)
   QmitkC3xyData(QMap<QVariant, QVariant> data); //Constructor for Data2D (x:y=1:2, 2:6, 3:7)
 
   void SetData(QMap<QVariant, QVariant> data);
 
-  Q_INVOKABLE QList<QVariant> GetYData() { return m_YData; };
+  Q_INVOKABLE QList<QVariant> GetYData() const { return m_YData; };
   Q_INVOKABLE void SetYData(QList<QVariant> yData) { m_YData =yData; };
 
-  Q_INVOKABLE QList<QVariant> GetXData() { return m_XData; };
+  Q_INVOKABLE QList<QVariant> GetXData() const { return m_XData; };
   Q_INVOKABLE void SetXData(QList<QVariant> xData) { m_XData =xData; };
 
   

@@ -41,22 +41,22 @@ public:
   void SetAppearance(QVariant diagramTypeName, bool showSubChart = true, bool usePercentageInPieChart = false);
 
   Q_INVOKABLE QList<QVariant> GetDataLabels() const { return m_dataLabels; };
-  Q_INVOKABLE void SetDataLabels(QList<QVariant> dataLabels) { m_dataLabels = dataLabels; };
+  Q_INVOKABLE void SetDataLabels(const QList<QVariant>& dataLabels) { m_dataLabels = dataLabels; emit SignalDataLabelsChanged(dataLabels); };
 
-  Q_INVOKABLE QVariant GetXAxisLabel() { return m_xAxisLabel; };
-  Q_INVOKABLE void SetXAxisLabel(QVariant label) { m_xAxisLabel = label; };
+  Q_INVOKABLE QVariant GetXAxisLabel() const { return m_xAxisLabel; };
+  Q_INVOKABLE void SetXAxisLabel(const QVariant& label) { m_xAxisLabel = label; emit SignalXAxisLabelChanged(label); };
 
-  Q_INVOKABLE QVariant GetYAxisLabel() { return m_yAxisLabel; };
-  Q_INVOKABLE void SetYAxisLabel(QVariant label) { m_yAxisLabel = label; };
+  Q_INVOKABLE QVariant GetYAxisLabel() const { return m_yAxisLabel; };
+  Q_INVOKABLE void SetYAxisLabel(const QVariant& label) { m_yAxisLabel = label; emit SignalYAxisLabelChanged(label); };
 
-  Q_INVOKABLE QVariant GetDiagramType() { return m_DiagramTypeName; };
-  Q_INVOKABLE void SetDiagramType(QVariant diagramTypeName) { m_DiagramTypeName = diagramTypeName; /*emit SignalDiagramTypeChanged(m_DiagramTypeName);*/ };
+  Q_INVOKABLE QVariant GetDiagramType() const { return m_DiagramTypeName; };
+  Q_INVOKABLE void SetDiagramType(const QVariant& diagramTypeName) { m_DiagramTypeName = diagramTypeName; emit SignalDiagramTypeChanged(diagramTypeName); };
 
-  Q_INVOKABLE QVariant GetShowSubchart() { return m_ShowSubchart; };
-  Q_INVOKABLE void SetShowSubchart(QVariant showSubchart) { m_ShowSubchart = showSubchart; };
+  Q_INVOKABLE QVariant GetShowSubchart() const { return m_ShowSubchart; };
+  Q_INVOKABLE void SetShowSubchart(const QVariant& showSubchart) { m_ShowSubchart = showSubchart; emit SignalShowSubchartChanged(showSubchart); };
 
-  Q_INVOKABLE QVariant GetUsePercentageInPieChart() { return m_UsePercentageInPieChart; };
-  Q_INVOKABLE void SetUsePercentageInPieChart(QVariant usePercentageInPieChart) { m_UsePercentageInPieChart = usePercentageInPieChart; };
+  Q_INVOKABLE QVariant GetUsePercentageInPieChart() const { return m_UsePercentageInPieChart; };
+  Q_INVOKABLE void SetUsePercentageInPieChart(const QVariant& usePercentageInPieChart) { m_UsePercentageInPieChart = usePercentageInPieChart; emit SignalUsePercentageInPieChartChanged(usePercentageInPieChart); };
 
 signals:
   void SignalDataLabelsChanged(const QList<QVariant> dataLabels);

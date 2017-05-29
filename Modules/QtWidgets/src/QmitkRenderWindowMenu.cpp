@@ -46,11 +46,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <math.h>
 
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw, bool fullScreenMode)
 :QWidget(NULL, Qt::Tool | Qt::FramelessWindowHint ),
 
 #else
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw, bool fullScreenMode)
 :QWidget(parent,f),
 #endif
 
@@ -59,7 +59,7 @@ m_CrosshairMenu(NULL),
 m_Layout(0),
 m_LayoutDesign(0),
 m_OldLayoutDesign(0),
-m_FullScreenMode(false),
+m_FullScreenMode(fullScreenMode),
 m_Entered(false),
 m_Renderer(b),
 m_MultiWidget(mw),
@@ -145,6 +145,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   m_FullScreenButton->setIcon(QIcon(QPixmap(iconFullScreen_xpm)));
   m_FullScreenButton->setAutoRaise(true);
   layout->addWidget( m_FullScreenButton );
+  this->ChangeFullScreenIcon();
 
   //settingsButton
   m_SettingsButton = new QToolButton(this);
@@ -335,28 +336,21 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
         break;
       }
     }
-
-    //Move Widget and show again
-    this->MoveWidgetToCorrectPos(1.0f);
-
-    //change icon
-    this->ChangeFullScreenIcon();
-
   }
   else
   {
     m_FullScreenMode = false;
     emit SignalChangeLayoutDesign( m_OldLayoutDesign );
-
-    //Move Widget and show again
-    this->MoveWidgetToCorrectPos(1.0f);
-
-    //change icon
-    this->ChangeFullScreenIcon();
   }
 
-  DeferredShowMenu( );
+  emit fullScreenModeChanged(m_FullScreenMode);
 
+  //Move Widget and show again
+  this->MoveWidgetToCorrectPos(1.0f);
+
+  //change icon
+  this->ChangeFullScreenIcon();
+  DeferredShowMenu( );
 }
 
 

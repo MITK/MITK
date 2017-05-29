@@ -163,40 +163,40 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
 {
   m_Settings = new QMenu(this);
 
-  m_DefaultLayoutAction = new QAction( "standard layout", m_Settings );
+  m_DefaultLayoutAction = new QAction( QAction::tr("standard layout"), m_Settings );
   m_DefaultLayoutAction->setDisabled( true );
 
-  m_2DImagesUpLayoutAction = new QAction( "2D images top, 3D bottom", m_Settings );
+  m_2DImagesUpLayoutAction = new QAction( QAction::tr("2D images top, 3D bottom"), m_Settings );
   m_2DImagesUpLayoutAction->setDisabled( false );
 
-  m_2DImagesLeftLayoutAction = new QAction( "2D images left, 3D right", m_Settings );
+  m_2DImagesLeftLayoutAction = new QAction( QAction::tr("2D images left, 3D right"), m_Settings );
   m_2DImagesLeftLayoutAction->setDisabled( false );
 
-  m_Big3DLayoutAction = new QAction( "Big 3D", m_Settings );
+  m_Big3DLayoutAction = new QAction( QAction::tr("Big 3D"), m_Settings );
   m_Big3DLayoutAction->setDisabled( false );
 
-  m_Widget1LayoutAction = new QAction( "Axial plane", m_Settings );
+  m_Widget1LayoutAction = new QAction( QAction::tr("Axial plane"), m_Settings );
   m_Widget1LayoutAction->setDisabled( false );
 
-  m_Widget2LayoutAction = new QAction( "Sagittal plane", m_Settings );
+  m_Widget2LayoutAction = new QAction( QAction::tr("Sagittal plane"), m_Settings );
   m_Widget2LayoutAction->setDisabled( false );
 
-  m_Widget3LayoutAction = new QAction( "Coronal plane", m_Settings );
+  m_Widget3LayoutAction = new QAction( QAction::tr("Coronal plane"), m_Settings );
   m_Widget3LayoutAction->setDisabled( false );
 
-  m_RowWidget3And4LayoutAction = new QAction( "Coronal top, 3D bottom", m_Settings );
+  m_RowWidget3And4LayoutAction = new QAction( QAction::tr("Coronal top, 3D bottom"), m_Settings );
   m_RowWidget3And4LayoutAction->setDisabled( false );
 
-  m_ColumnWidget3And4LayoutAction = new QAction( "Coronal left, 3D right", m_Settings );
+  m_ColumnWidget3And4LayoutAction = new QAction( QAction::tr("Coronal left, 3D right"), m_Settings );
   m_ColumnWidget3And4LayoutAction->setDisabled( false );
 
-  m_SmallUpperWidget2Big3and4LayoutAction = new QAction( "Sagittal top, Coronal n 3D bottom", m_Settings );
+  m_SmallUpperWidget2Big3and4LayoutAction = new QAction( QAction::tr("Sagittal top, Coronal n 3D bottom"), m_Settings );
   m_SmallUpperWidget2Big3and4LayoutAction->setDisabled( false );
 
-  m_2x2Dand3DWidgetLayoutAction = new QAction( "Axial n Sagittal left, 3D right", m_Settings );
+  m_2x2Dand3DWidgetLayoutAction = new QAction( QAction::tr("Axial n Sagittal left, 3D right"), m_Settings );
   m_2x2Dand3DWidgetLayoutAction->setDisabled( false );
 
-  m_Left2Dand3DRight2DLayoutAction = new QAction( "Axial n 3D left, Sagittal right", m_Settings );
+  m_Left2Dand3DRight2DLayoutAction = new QAction( QAction::tr("Axial n 3D left, Sagittal right"), m_Settings );
   m_Left2Dand3DRight2DLayoutAction->setDisabled( false );
 
   m_Settings->addAction(m_DefaultLayoutAction);

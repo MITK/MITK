@@ -1219,16 +1219,11 @@ QMap<QVariant, QVariant> QmitkImageStatisticsView::ConvertHistogramToMap(itk::St
 {
 	QMap<QVariant, QVariant> histogramMap;
 
-	auto startIt = histogram->End();
 	auto endIt = histogram->End();
 	auto it = histogram->Begin();
 
-
-	unsigned int i = 0;
-	bool firstValue = false;
-
 	// generating Lists of measurement and frequencies
-	for (; it != endIt; ++it, ++i)
+  for (; it != endIt; ++it)
 	{
 		QVariant frequency = QVariant::fromValue(it.GetFrequency());
 		QVariant measurement = it.GetMeasurementVector()[0];

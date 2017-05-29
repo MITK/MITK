@@ -79,7 +79,7 @@ public:
   //bool IsExclusiveFunctionality() const;
   /*!
   \brief  Is called from the selection mechanism once the data manager selection has changed*/
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &selectedNodes) override;
 
   static const std::string VIEW_ID;
   static const int STAT_TABLE_BASE_HEIGHT;
@@ -117,7 +117,7 @@ signals:
 
 protected:
   /** \brief  Writes the calculated statistics to the GUI */
-  void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
+  void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &statistics,
     const mitk::Image *image);
 
   std::vector<QString> AssembleStatisticsIntoVectorForPlanarFigure(mitk::IntensityProfile::Pointer intensityProfile, mitk::Image::ConstPointer image);

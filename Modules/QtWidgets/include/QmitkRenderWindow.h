@@ -152,6 +152,7 @@ protected slots:
 
   void DeferredHideMenu();
 
+  void OnFullScreenModeChanged(bool fullscreen);
 private:
 
   // Helper Functions to Convert Qt-Events to Mitk-Events
@@ -171,6 +172,7 @@ private:
   bool m_MenuWidgetActivated;
 
   unsigned int m_LayoutIndex;
+  bool m_FullScreenMode;
 };
 
 #endif

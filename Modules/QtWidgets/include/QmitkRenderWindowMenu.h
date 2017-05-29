@@ -57,7 +57,7 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
   Q_OBJECT
 
 public:
-  QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::BaseRenderer * b = 0, QmitkStdMultiWidget* mw = 0 );
+  QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WindowFlags f = 0, mitk::BaseRenderer * b = 0, QmitkStdMultiWidget* mw = 0, bool fullScreenMode = false);
   virtual ~QmitkRenderWindowMenu();
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes
@@ -133,6 +133,8 @@ signals:
 
   /*! emit signal, when layout design changed by the setting menu.*/
   void SignalChangeLayoutDesign( int layoutDesign );
+
+  void fullScreenModeChanged(bool fullscreen);
 
 public slots:
 

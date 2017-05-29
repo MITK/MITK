@@ -41,7 +41,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
   QString name,
   mitk::VtkPropRenderer* /*renderer*/,
   mitk::RenderingManager* renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode) :
-  QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+  QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0), 
+  m_FullScreenMode(false)
 {
   // Needed if QVTKWidget2 is used instead of QVTKWidget
   //this will be fixed in VTK source if change 18864 is accepted
@@ -258,6 +259,7 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdM
     disconnect(m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)));
     disconnect(m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()));
     disconnect(m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)));
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::fullScreenModeChanged, this, &QmitkRenderWindow::OnFullScreenModeChanged);
 
     delete m_MenuWidget;
     m_MenuWidget = 0;
@@ -265,14 +267,20 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget* stdM
   else if (m_MenuWidgetActivated && !m_MenuWidget)
   {
     //create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this, 0, m_Renderer, stdMultiWidget);
+    m_MenuWidget = new QmitkRenderWindowMenu(this, 0, m_Renderer, stdMultiWidget, m_FullScreenMode);
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
 
     //create Signal/Slot Connection
     connect(m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)));
     connect(m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()));
     connect(m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)));
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::fullScreenModeChanged, this, &QmitkRenderWindow::OnFullScreenModeChanged);
   }
+}
+
+void QmitkRenderWindow::OnFullScreenModeChanged(bool fullscreen)
+{
+  m_FullScreenMode = fullscreen;
 }
 
 void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint& /*pos*/)

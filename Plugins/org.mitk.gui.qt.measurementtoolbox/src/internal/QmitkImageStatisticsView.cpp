@@ -17,8 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkImageStatisticsView.h"
 
 // Qt includes
-#include <qclipboard.h>
-#include <qscrollbar.h>
+#include <QClipboard>
+#include <QScrollBar>
 #include <QVector>
 
 // berry includes
@@ -28,13 +28,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateOr.h"
 #include "mitkPlanarFigureInteractor.h"
-
 #include "mitkImageTimeSelector.h"
+#include <QmitkRenderWindow.h>
 
 // itk includes
 #include "itksys/SystemTools.hxx"
-#include <mitkILinkedRenderWindowPart.h>
-#include <QmitkRenderWindow.h>
 
 #include <limits>
 
@@ -283,28 +281,6 @@ void QmitkImageStatisticsView::OnClipboardHistogramButtonClicked()
         clipboard, QClipboard::Clipboard );
   }
   // If a (non-closed) PlanarFigure is selected, display a line profile widget
-  else if (m_CurrentStatisticsValid && (m_SelectedPlanarFigure != NULL))
-  {
-	  //================================================================================
-
-	/*auto intensity = m_Controls->m_JSHistogram->GetFrequency();
-	auto pixel = m_Controls->m_JSHistogram->GetMeasurement();
-	QString clipboard( "Pixel \t Intensity\n" );
-	auto j = pixel.begin();
-	for (auto i = intensity.begin(); i < intensity.end(); i++)
-	{
-	  assert(j != pixel.end());
-	  clipboard = clipboard.append( "%L1 \t %L2\n" )
-						.arg( (*j).toString())
-						.arg( (*i).toString());
-	  j++;
-	}
-
-	QApplication::clipboard()->setText(
-		clipboard, QClipboard::Clipboard );
-	*/
-	//==================================================================================
-  }
   else
   {
     QApplication::clipboard()->clear();
@@ -784,7 +760,6 @@ void QmitkImageStatisticsView::RequestStatisticsUpdate()
   {
     if(this->m_DataNodeSelectionChanged)
     {
-      std::cout << "ICH WERDE AUFGERUFEN" << std::endl;
       this->SelectionChanged(this->GetCurrentSelection());
     }
     else
@@ -1106,17 +1081,24 @@ std::vector<QString> QmitkImageStatisticsView::AssembleStatisticsIntoVector(mitk
   result.push_back(GetFormattedString(statistics->GetRMS(), decimals));
   result.push_back(GetFormattedString(statistics->GetMax(), decimals) + " " + GetFormattedIndex(statistics->GetMaxIndex()));
   result.push_back(GetFormattedString(statistics->GetMin(), decimals) + " " + GetFormattedIndex(statistics->GetMinIndex()));
-  result.push_back(GetFormattedString(statistics->GetN(), 0));
+  //to prevent large negative values of empty image statistics
+  if (statistics->GetN() != std::numeric_limits<long>::max() + 1) {
+    result.push_back(GetFormattedString(statistics->GetN(), 0));
 
-  const mitk::BaseGeometry *geometry = image->GetGeometry();
-  if (geometry != NULL)
-  {
-    const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
-    double volume = spacing[0] * spacing[1] * spacing[2] * static_cast<double>(statistics->GetN());
-    result.push_back(GetFormattedString(volume, decimals));
+    const mitk::BaseGeometry *geometry = image->GetGeometry();
+    if (geometry != NULL)
+    {
+      const mitk::Vector3D &spacing = image->GetGeometry()->GetSpacing();
+      double volume = spacing[0] * spacing[1] * spacing[2] * static_cast<double>(statistics->GetN());
+      result.push_back(GetFormattedString(volume, decimals));
+    }
+    else {
+      result.push_back("NA");
+    }
   }
   else {
-    result.push_back("NA");
+    result.push_back("0");
+    result.push_back("0");
   }
 
   result.push_back(GetFormattedString(statistics->GetSkewness(), decimalsHigherOrderStatistics));
@@ -1245,22 +1227,6 @@ QMap<QVariant, QVariant> QmitkImageStatisticsView::ConvertHistogramToMap(itk::St
 	unsigned int i = 0;
 	bool firstValue = false;
 
-	// removes frequencies of 0, which are outside the first and last bin
-	//for (; it != endIt; ++it)
-	//{
-	//	if (it.GetFrequency() > 0.0)
-	//	{
-	//		endIt = it;
-	//		if (!firstValue)
-	//		{
-	//			firstValue = true;
-	//			startIt = it;
-	//		}
-	//	}
-	//}
-
-	//++endIt;
-
 	// generating Lists of measurement and frequencies
 	for (; it != endIt; ++it, ++i)
 	{
@@ -1302,6 +1268,9 @@ QString QmitkImageStatisticsView::GetFormattedString(double value, unsigned int 
 
 QString QmitkImageStatisticsView::GetFormattedIndex(const vnl_vector<int>& vector) const
 {
+  if (vector.empty()) {
+    return QString();
+  }
   QString formattedIndex("(");
   for (const auto& entry : vector)
   {

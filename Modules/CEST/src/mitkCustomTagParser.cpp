@@ -170,8 +170,12 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
 
   // determine what revision we are using to handle parameters appropriately
   std::string revisionPrefix = "CEST_Rev";
+  std::string lowerRevisionPrefix = revisionPrefix;
+  std::string lowerParameter = privateParameters["tSequenceFileName"];
+  std::transform(lowerRevisionPrefix.begin(), lowerRevisionPrefix.end(), lowerRevisionPrefix.begin(), ::tolower );
+  std::transform(lowerParameter.begin(), lowerParameter.end(), lowerParameter.begin(), ::tolower);
 
-  std::size_t foundPosition = privateParameters["tSequenceFileName"].find(revisionPrefix);
+  std::size_t foundPosition = lowerParameter.find(lowerRevisionPrefix);
   if (foundPosition == std::string::npos)
   {
     MITK_ERROR << "Could not find revision information.";
@@ -531,7 +535,6 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
       std::string currentOffset;
       while (std::getline(list, currentOffset))
       {
-        currentOffset.erase(std::remove(currentOffset.begin(), currentOffset.end(), ' '), currentOffset.end());
         results << currentOffset << " ";
       }
     }
@@ -557,9 +560,21 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   }
 
   std::string resultString = results.str();
+  // replace multiple spaces by a single space
+  std::string::iterator newEnditerator =
+    std::unique(resultString.begin(), resultString.end(),
+      [=](char lhs, char rhs) { return (lhs == rhs) && (lhs == ' '); }
+  );
+  resultString.erase(newEnditerator, resultString.end());
+
   if ((resultString.length() > 0) && (resultString.at(resultString.length() - 1) == ' '))
   {
     resultString.erase(resultString.end() - 1, resultString.end());
+  }
+
+  if ((resultString.length() > 0) && (resultString.at(0) == ' '))
+  {
+    resultString.erase(resultString.begin(), ++(resultString.begin()));
   }
 
   return resultString;

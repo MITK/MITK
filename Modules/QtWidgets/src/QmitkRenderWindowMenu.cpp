@@ -50,7 +50,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f,
 :QWidget(NULL, Qt::Tool | Qt::FramelessWindowHint ),
 
 #else
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw )
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b, QmitkStdMultiWidget* mw, bool fullScreenMode)
 :QWidget(parent,f),
 #endif
 

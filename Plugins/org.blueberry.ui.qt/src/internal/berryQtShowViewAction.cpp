@@ -69,6 +69,7 @@ const QMap<QString, QString> QtShowViewAction::plugingTranslateNames = {
   { "Segmentation Utilities", QAction::tr("Segmentation Utilities") },
   { "Statistics", QAction::tr("Statistics") },
   { "ThoraxView", QAction::tr("ThoraxView") },
+  { "Tracking", QAction::tr("Tracking") },
   { "Tube Graph", QAction::tr("Tube Graph") },
   { "TumorSegmentation", QAction::tr("TumorSegmentation") },
   { "Vascular Structure Segmentation", QAction::tr("Vascular Structure Segmentation") },

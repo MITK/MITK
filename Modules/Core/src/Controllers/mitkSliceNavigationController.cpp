@@ -290,8 +290,23 @@ namespace mitk
           itkExceptionMacro("unknown ViewDirection");
       }
 
+      /// Setting the 'inverse direction' property of the stepper. The property expresses
+      /// if the stepping direction is reverted if you use 'Previous()' or 'Next()' to
+      /// navigate through the slices.
+      ///
+      /// We set this property based on 'top' so that 'Next()' and 'Previous()' are inter-
+      /// preted in terms of world coordinates, i.e. they mean 'right', 'anterior' or
+      /// 'superior', and 'left', 'posterior' or 'inferior', respectively.
+      ///
+      /// Note that this is just an initial value for the 'inverse direction' property
+      /// that can be overwritten if both the 'auto repeat' and 'ping-pong' property of
+      /// the stepper is set. If both of these properties are set, the direction will be
+      /// flipped over compared to the world direction when you reach the first or last
+      /// slice when scrolling through the slices.
+
+      m_Slice->SetInverseDirection(top);
       m_Slice->SetPos(0);
-      m_Slice->SetSteps((int)slicedWorldGeometry->GetSlices());
+      m_Slice->SetSteps(slicedWorldGeometry->GetSlices());
 
       if ( worldTimeGeometry.IsNull() )
       {

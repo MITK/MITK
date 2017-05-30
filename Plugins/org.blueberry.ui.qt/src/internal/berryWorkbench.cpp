@@ -778,6 +778,7 @@ int Workbench::RunUI()
   if (initOK)
   {
     advisor->PostStartup(); // may trigger a close/restart
+    this->FirePostStartup();
   }
 
   //TODO start eager plug-ins
@@ -1673,6 +1674,19 @@ void Workbench::RemoveWindowListener(IWindowListener* l)
 IWindowListener::Events& Workbench::GetWindowEvents()
 {
   return windowEvents;
+}
+
+/**
+ * Fire workbench postStartup event.
+ */
+void Workbench::FirePostStartup()
+{
+
+  //  SafeRunnable.run(new SafeRunnable() {
+  //    public void run() {
+  workbenchEvents.postStartup(this);
+  //    }
+
 }
 
 bool Workbench::FirePreShutdown(bool forced)

@@ -659,7 +659,7 @@ void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode* node,
 {
   mitk::IPropertyAliases* aliases = mitk::CoreServices::GetPropertyAliases();
   node->AddProperty( "Line width", mitk::FloatProperty::New(1), renderer, overwrite );
-  aliases->AddAlias( "line width", "Crosshair.Line Width", "");
+  aliases->AddAlias( "Line width", "Crosshair.Line Width", "");
   node->AddProperty( "Crosshair.Gap Size", mitk::IntProperty::New(32), renderer, overwrite );
   node->AddProperty( "decoration", mitk::PlaneOrientationProperty
                      ::New(PlaneOrientationProperty::PLANE_DECORATION_NONE), renderer, overwrite );

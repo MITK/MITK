@@ -57,13 +57,18 @@ void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkModuleView, context)
 
-  if (qApp->metaObject()->indexOfSignal("messageReceived(QByteArray)") > -1)
-  {
-    connect(qApp, SIGNAL(messageReceived(QByteArray)), this, SLOT(handleIPCMessage(QByteArray)));
-  }
+  QVariant processArgsByMITKProperty = context->getProperty("applicationArgs.processByMITK");
 
-  // This is a potentially long running operation.
-  loadDataFromDisk(berry::Platform::GetApplicationArgs(), true);
+  if (!processArgsByMITKProperty.isValid() || processArgsByMITKProperty.toBool())
+  {
+    if (qApp->metaObject()->indexOfSignal("messageReceived(QByteArray)") > -1)
+    {
+      connect(qApp, SIGNAL(messageReceived(QByteArray)), this, SLOT(handleIPCMessage(QByteArray)));
+    }
+
+    // This is a potentially long running operation.
+    loadDataFromDisk(berry::Platform::GetApplicationArgs(), true);
+  }
 }
 
 void QmitkCommonExtPlugin::stop(ctkPluginContext* context)

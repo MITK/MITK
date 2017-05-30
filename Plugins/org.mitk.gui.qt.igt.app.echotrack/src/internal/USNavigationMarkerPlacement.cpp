@@ -99,11 +99,6 @@ USNavigationMarkerPlacement::USNavigationMarkerPlacement()
 
 USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 {
-	// make sure that the experiment got finished before destructing the object
-	if (m_IsExperimentRunning)
-	{
-		this->OnFinishExperiment();
-	}
 
 	// remove listener for ultrasound device changes
 	if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
@@ -111,7 +106,16 @@ USNavigationMarkerPlacement::~USNavigationMarkerPlacement()
 		m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
 	}
 
-	delete ui;
+
+  // remove listener for ultrasound device changes
+  if (m_CombinedModality.IsNotNull() && m_CombinedModality->GetUltrasoundDevice().IsNotNull())
+  {
+    m_CombinedModality->GetUltrasoundDevice()->RemovePropertyChangedListener(m_ListenerDeviceChanged);
+  }
+
+  delete ui;
+
+
 }
 
 void USNavigationMarkerPlacement::OnChangeAblationZone(int id, int newSize)
@@ -274,6 +278,23 @@ void USNavigationMarkerPlacement::OnTimeout()
 		// make sure that a reinit was performed on the image
 		this->ReinitOnImage();
 	}
+}
+
+void USNavigationMarkerPlacement::OnResetStandardLayout()
+{
+  MITK_INFO << "Resetting Layout";
+  //reset render windows
+  mitk::DataNode::Pointer widget1 = this->GetDataStorage()->GetNamedNode("stdmulti.widget1.plane");
+  if (widget1.IsNotNull()) { widget1->SetVisibility(true); }
+  mitk::DataNode::Pointer widget3 = this->GetDataStorage()->GetNamedNode("stdmulti.widget3.plane");
+  if (widget3.IsNotNull()) { widget3->SetVisibility(true); }
+  m_StdMultiWidget->changeLayoutToDefault();
+}
+
+void USNavigationMarkerPlacement::OnChangeLayoutClicked()
+{
+  if (ui->m_enableNavigationLayout->isChecked()) OnEnableNavigationLayout();
+  else OnResetStandardLayout();
 }
 
 void USNavigationMarkerPlacement::OnImageAndNavigationDataLoggingTimeout()
@@ -489,16 +510,19 @@ void USNavigationMarkerPlacement::OnSettingsChanged(itk::SmartPointer<mitk::Data
 	{
 		m_CurrentApplicationName = applicationName;
 
-		QmitkUSNavigationProcessWidget::NavigationStepVector navigationSteps;
-		if (applicationName == "Punction")
-		{
-			QmitkUSNavigationStepCombinedModality *stepCombinedModality = new QmitkUSNavigationStepCombinedModality(m_Parent);
-			QmitkUSNavigationStepTumourSelection *stepTumourSelection = new QmitkUSNavigationStepTumourSelection(m_Parent);
-			stepTumourSelection->SetTargetSelectionOptional(true);
-			m_TargetNodeDisplacementFilter = stepTumourSelection->GetTumourNodeDisplacementFilter();
-			QmitkUSNavigationStepZoneMarking *stepZoneMarking = new QmitkUSNavigationStepZoneMarking(m_Parent);
-			QmitkUSNavigationStepPunctuationIntervention *stepIntervention =
-				new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
+    QmitkUSNavigationProcessWidget::NavigationStepVector navigationSteps;
+    if (applicationName == "Puncture")
+    {
+      QmitkUSNavigationStepCombinedModality* stepCombinedModality =
+        new QmitkUSNavigationStepCombinedModality(m_Parent);
+      QmitkUSNavigationStepTumourSelection* stepTumourSelection =
+        new QmitkUSNavigationStepTumourSelection(m_Parent);
+      stepTumourSelection->SetTargetSelectionOptional(true);
+      m_TargetNodeDisplacementFilter = stepTumourSelection->GetTumourNodeDisplacementFilter();
+      QmitkUSNavigationStepZoneMarking* stepZoneMarking =
+        new QmitkUSNavigationStepZoneMarking(m_Parent);
+      QmitkUSNavigationStepPunctuationIntervention* stepIntervention =
+        new QmitkUSNavigationStepPunctuationIntervention(m_Parent);
 
 			connect(stepIntervention, SIGNAL(AddAblationZoneClicked(int)), this, SLOT(OnAddAblationZone(int)));
 			connect(stepIntervention, SIGNAL(AblationZoneChanged(int, int)), this, SLOT(OnChangeAblationZone(int, int)));

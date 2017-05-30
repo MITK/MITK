@@ -38,14 +38,15 @@ QmitkUSNavigationStepPunctuationIntervention::QmitkUSNavigationStepPunctuationIn
   connect(ui->m_AddNewAblationZone, SIGNAL(clicked()), this, SLOT(OnAddAblationZoneClicked()));
   connect(ui->m_EnableAblationMarking, SIGNAL(clicked()), this, SLOT(OnEnableAblationZoneMarkingClicked()));
   connect(ui->m_AblationZoneSizeSlider, SIGNAL(valueChanged(int)), this, SLOT(OnAblationZoneSizeSliderChanged(int)));
+  ui->m_AblationZonesBox->setVisible(false);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnEnableAblationZoneMarkingClicked()
 {
   if(ui->m_EnableAblationMarking->isChecked())
-    ui->m_AblationZonesBox->setEnabled(true);
+    ui->m_AblationZonesBox->setVisible(true);
   else
-    ui->m_AblationZonesBox->setEnabled(false);
+    ui->m_AblationZonesBox->setVisible(false);
 }
 
 void QmitkUSNavigationStepPunctuationIntervention::OnAblationZoneSizeSliderChanged(int size)

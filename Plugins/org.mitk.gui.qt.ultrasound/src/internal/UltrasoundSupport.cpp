@@ -428,6 +428,7 @@ UltrasoundSupport::~UltrasoundSupport()
 {
   try
   {
+    StoreUISettings();
     StopTimers();
 
     // Get all active devicesand deactivate them to prevent freeze
@@ -441,8 +442,6 @@ UltrasoundSupport::~UltrasoundSupport()
         device->Disconnect();
       }
     }
-
-    StoreUISettings();
   }
   catch (std::exception &e)
   {

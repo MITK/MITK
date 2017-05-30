@@ -67,6 +67,7 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
 void mitk::LookupTableProperty::SetValue(const ValueType &value)
 {
   SetLookupTable(value);
+  this->Modified();
 }
 
 itk::LightObject::Pointer mitk::LookupTableProperty::InternalClone() const

@@ -67,6 +67,13 @@ public:
    */
   virtual void SetResendQtEvents(bool resend);
 
+  void ShowMenu() { m_MenuWidget->ShowMenu(); }
+  void HideMenu() { m_MenuWidget->HideMenu(); }
+  void ChangeFullScreenIcon(const bool fullscreen)
+  {
+    m_MenuWidget->ChangeFullScreenIcon(fullscreen);
+  }
+
   // Set Layout Index to define the Layout Type
   void SetLayoutIndex(unsigned int layoutIndex);
 
@@ -76,8 +83,6 @@ public:
   // MenuWidget need to update the Layout Design List when Layout had changed
   void LayoutDesignListChanged(int layoutDesignIndex);
 
-  void HideRenderWindowMenu();
-
   // Activate or Deactivate MenuWidget.
   void ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget = 0);
 
@@ -85,7 +90,6 @@ public:
   // Get it from the QVTKWidget parent
   virtual vtkRenderWindow *GetVtkRenderWindow() override { return GetRenderWindow(); }
   virtual vtkRenderWindowInteractor *GetVtkRenderWindowInteractor() override { return NULL; }
-  void FullScreenMode(bool state);
 
 protected:
   // overloaded move handler
@@ -121,8 +125,6 @@ protected:
   virtual void wheelEvent(QWheelEvent *) override;
 #endif
 
-  void AdjustRenderWindowMenuVisibility(const QPoint &pos);
-
 signals:
 
   void ResetView();
@@ -141,8 +143,6 @@ protected slots:
   void OnChangeLayoutDesign(int layoutDesignIndex);
 
   void OnWidgetPlaneModeChanged(int);
-
-  void DeferredHideMenu();
 
 private:
   // Helper Functions to Convert Qt-Events to Mitk-Events

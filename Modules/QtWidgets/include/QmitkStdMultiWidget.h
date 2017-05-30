@@ -140,8 +140,6 @@ public:
 protected:
   void UpdateAllWidgets();
 
-  void HideAllWidgetToolbars();
-
   mitk::DataNode::Pointer GetTopLayerNode(mitk::DataStorage::SetOfObjects::ConstPointer nodes);
 
 public slots:
@@ -419,6 +417,11 @@ protected:
    * @return the complete CornerAnnotation.
    */
   vtkSmartPointer<vtkCornerAnnotation> CreateCornerAnnotation(std::string text, mitk::Color color);
+
+  /**
+   * @brief Clear splitters and widgets each time a new layout is picked.
+   */
+  void ClearWidgetsForNewLayout();
 
   /**
    * @brief FillGradientBackgroundWithBlack Internal helper method to initialize the

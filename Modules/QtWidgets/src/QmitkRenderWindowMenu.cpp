@@ -65,8 +65,6 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
     m_Layout(0),
     m_LayoutDesign(0),
     m_OldLayoutDesign(0),
-    m_FullScreenMode(false),
-    m_Entered(false),
     m_Renderer(b),
     m_MultiWidget(mw),
     m_Parent(parent)
@@ -108,8 +106,6 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent,
   // for autorotating
   m_AutoRotationTimer.setInterval(75);
   connect(&m_AutoRotationTimer, SIGNAL(timeout()), this, SLOT(AutoRotateNextStep()));
-  m_HideTimer.setSingleShot(true);
-  connect(&m_HideTimer, SIGNAL(timeout()), this, SLOT(DeferredHideMenu()));
   connect(m_Parent, SIGNAL(destroyed()), this, SLOT(deleteLater()));
 }
 
@@ -251,68 +247,63 @@ void QmitkRenderWindowMenu::SetLayoutIndex(unsigned int layoutIndex)
 
 void QmitkRenderWindowMenu::HideMenu()
 {
+  if (!m_MenuIsShown) { return; }
+  m_MenuIsShown = false;
+
   MITK_DEBUG << "menu hideEvent";
-  DeferredHideMenu();
-}
 
-void QmitkRenderWindowMenu::ShowMenu()
-{
-  MITK_DEBUG << "menu showMenu";
-  DeferredShowMenu();
-}
-
-void QmitkRenderWindowMenu::enterEvent(QEvent * /*e*/)
-{
-  MITK_DEBUG << "menu enterEvent";
-  DeferredShowMenu();
-
-  m_Entered = true;
-}
-
-void QmitkRenderWindowMenu::DeferredHideMenu()
-{
-  MITK_DEBUG << "menu deferredhidemenu";
-// Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-// for Mac OS see bug 3192
-// for Windows see bug 12130
-//... so Mac OS and Windows must be treated differently:
+  // Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+  // for Mac OS see bug 3192
+  // for Windows see bug 12130
+  //... so Mac OS and Windows must be treated differently:
 #if defined(Q_OS_MAC)
   this->setWindowOpacity(0.0f);
 #else
   this->setVisible(false);
 #endif
+}
 
-  //    setVisible(false);
-  //    setWindowOpacity(0.0f);
-  /// hide();
+void QmitkRenderWindowMenu::ShowMenu()
+{
+  if (m_MenuIsShown) { return; }
+  m_MenuIsShown = true;
+
+  MITK_DEBUG << "menu showMenu";
+
+  // Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
+  // for Mac OS see bug 3192
+  // for Windows see bug 12130
+  //... so Mac OS and Windows must be treated differently:
+#if defined(Q_OS_MAC)
+  this->setWindowOpacity(1.0f);
+#else
+  this->setVisible(true);
+  this->raise();
+#endif
+
+  MoveWidgetToCorrectPos();
 }
 
 void QmitkRenderWindowMenu::leaveEvent(QEvent * /*e*/)
 {
   MITK_DEBUG << "menu leaveEvent";
 
-  m_Entered = false;
-  smoothHide();
+  // Quit if cursor is ON the QmitkRenderWindow
+  const auto renderWindowRect = m_Parent->rect();
+  const auto pos = m_Parent->mapFromGlobal(QCursor::pos());
+  if (renderWindowRect.contains(pos)) { return; }
+
+  HideMenu();
 }
 
-/* This method is responsible for non fluttering of
- the renderWindowMenu when mouse cursor moves along the renderWindowMenu*/
-void QmitkRenderWindowMenu::smoothHide()
-{
-  MITK_DEBUG << "menu leaveEvent";
-  m_HideTimer.start(10);
-}
-
-void QmitkRenderWindowMenu::ChangeFullScreenMode(bool state)
-{
-  this->OnFullScreenButton(state);
-}
 /// \brief
 void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
 {
-  if (!m_FullScreenMode)
+  const bool isInFullscreen =
+    m_LayoutDesign == LAYOUT_AXIAL || m_LayoutDesign == LAYOUT_SAGITTAL
+    || m_LayoutDesign == LAYOUT_CORONAL || m_LayoutDesign == LAYOUT_BIG3D;
+  if (!isInFullscreen)
   {
-    m_FullScreenMode = true;
     m_OldLayoutDesign = m_LayoutDesign;
 
     switch (m_Layout)
@@ -339,26 +330,14 @@ void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
         break;
       }
     }
-
-    // Move Widget and show again
-    this->MoveWidgetToCorrectPos(1.0f);
-
-    // change icon
-    this->ChangeFullScreenIcon();
   }
   else
   {
-    m_FullScreenMode = false;
     emit SignalChangeLayoutDesign(m_OldLayoutDesign);
-
-    // Move Widget and show again
-    this->MoveWidgetToCorrectPos(1.0f);
-
-    // change icon
-    this->ChangeFullScreenIcon();
   }
 
-  DeferredShowMenu();
+  this->MoveWidgetToCorrectPos();
+  this->ChangeFullScreenIcon(!isInFullscreen);
 }
 
 /// \brief
@@ -374,157 +353,63 @@ void QmitkRenderWindowMenu::OnSettingsButton(bool /*checked*/)
 
 void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_2DIMAGEUP;
   emit SignalChangeLayoutDesign(LAYOUT_2DIMAGEUP);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_2DIMAGELEFT;
   emit SignalChangeLayoutDesign(LAYOUT_2DIMAGELEFT);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_DEFAULT;
   emit SignalChangeLayoutDesign(LAYOUT_DEFAULT);
-
-  DeferredShowMenu();
 }
-
-void QmitkRenderWindowMenu::DeferredShowMenu()
-{
-  MITK_DEBUG << "deferred show menu";
-  m_HideTimer.stop();
-
-// Else part fixes the render window menu issue on Linux bug but caused bugs on Mac OS and Windows
-// for Mac OS see bug 3192
-// for Windows see bug 12130
-//... so Mac OS and Windows must be treated differently:
-#if defined(Q_OS_MAC)
-  this->setWindowOpacity(1.0f);
-#else
-  this->setVisible(true);
-  this->raise();
-#endif
-}
-
 void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
 {
-  MITK_DEBUG << "OnChangeLayoutToBig3D";
-
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_BIG3D;
   emit SignalChangeLayoutDesign(LAYOUT_BIG3D);
-
-  DeferredShowMenu();
 }
-
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_AXIAL;
   emit SignalChangeLayoutDesign(LAYOUT_AXIAL);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_SAGITTAL;
   emit SignalChangeLayoutDesign(LAYOUT_SAGITTAL);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_CORONAL;
   emit SignalChangeLayoutDesign(LAYOUT_CORONAL);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_ROWWIDGET3AND4;
   emit SignalChangeLayoutDesign(LAYOUT_ROWWIDGET3AND4);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_COLUMNWIDGET3AND4;
   emit SignalChangeLayoutDesign(LAYOUT_COLUMNWIDGET3AND4);
-
-  DeferredShowMenu();
 }
-
 void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_SMALLUPPERWIDGET2BIGAND4;
   emit SignalChangeLayoutDesign(LAYOUT_SMALLUPPERWIDGET2BIGAND4);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_2X2DAND3DWIDGET;
   emit SignalChangeLayoutDesign(LAYOUT_2X2DAND3DWIDGET);
-
-  DeferredShowMenu();
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
 {
-  // set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
-  m_FullScreenMode = false;
-  this->ChangeFullScreenIcon();
-
   m_LayoutDesign = LAYOUT_LEFT2DAND3DRIGHT2D;
   emit SignalChangeLayoutDesign(LAYOUT_LEFT2DAND3DRIGHT2D);
-
-  DeferredShowMenu();
 }
 
 void QmitkRenderWindowMenu::UpdateLayoutDesignList(int layoutDesignIndex)
@@ -534,209 +419,23 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(int layoutDesignIndex)
   if (m_Settings == NULL)
     this->CreateSettingsWidget();
 
-  switch (m_LayoutDesign)
-  {
-    case LAYOUT_DEFAULT:
-    {
-      m_DefaultLayoutAction->setEnabled(false);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
+  std::vector<QAction*> actions{
+    m_DefaultLayoutAction, m_2DImagesUpLayoutAction, m_2DImagesLeftLayoutAction,
+    m_Big3DLayoutAction, m_Widget1LayoutAction, m_Widget2LayoutAction,
+    m_Widget3LayoutAction, m_RowWidget3And4LayoutAction, m_ColumnWidget3And4LayoutAction,
+    m_SmallUpperWidget2Big3and4LayoutAction, m_2x2Dand3DWidgetLayoutAction,
+    m_Left2Dand3DRight2DLayoutAction
+  };
+  actions[m_LayoutDesign]->setEnabled(false);
 
-    case LAYOUT_2DIMAGEUP:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(false);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_2DIMAGELEFT:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(false);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_BIG3D:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(false);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_AXIAL:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(false);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_SAGITTAL:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(false);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_CORONAL:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(false);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_2X2DAND3DWIDGET:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(false);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_ROWWIDGET3AND4:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(false);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_COLUMNWIDGET3AND4:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(false);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_SMALLUPPERWIDGET2BIGAND4:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(false);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(true);
-      break;
-    }
-    case LAYOUT_LEFT2DAND3DRIGHT2D:
-    {
-      m_DefaultLayoutAction->setEnabled(true);
-      m_2DImagesUpLayoutAction->setEnabled(true);
-      m_2DImagesLeftLayoutAction->setEnabled(true);
-      m_Big3DLayoutAction->setEnabled(true);
-      m_Widget1LayoutAction->setEnabled(true);
-      m_Widget2LayoutAction->setEnabled(true);
-      m_Widget3LayoutAction->setEnabled(true);
-      m_RowWidget3And4LayoutAction->setEnabled(true);
-      m_ColumnWidget3And4LayoutAction->setEnabled(true);
-      m_SmallUpperWidget2Big3and4LayoutAction->setEnabled(true);
-      m_2x2Dand3DWidgetLayoutAction->setEnabled(true);
-      m_Left2Dand3DRight2DLayoutAction->setEnabled(false);
-      break;
-    }
+  actions.erase(actions.begin() + m_LayoutDesign);
+  for (auto action : actions)
+  {
+    action->setEnabled(true);
   }
 }
 
-#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
-#else
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
-#endif
+void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 {
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
   int X = floor(double(this->m_Parent->width() - this->width() - 8.0));
@@ -745,13 +444,6 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
   QPoint pos = this->m_Parent->mapToGlobal(QPoint(0, 0));
 
   this->move(X + pos.x(), Y + pos.y());
-
-  if (opacity < 0)
-    opacity = 0;
-  else if (opacity > 1)
-    opacity = 1;
-
-  this->setWindowOpacity(opacity);
 #else
   int moveX = floor(double(this->m_Parent->width() - this->width() - 4.0));
   this->move(moveX, 3);
@@ -759,9 +451,9 @@ void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
 #endif
 }
 
-void QmitkRenderWindowMenu::ChangeFullScreenIcon()
+void QmitkRenderWindowMenu::ChangeFullScreenIcon(const bool fullscreen)
 {
-  m_FullScreenButton->setIcon(m_FullScreenMode ? QPixmap(iconLeaveFullScreen_xpm) : QPixmap(iconFullScreen_xpm));
+  m_FullScreenButton->setIcon(fullscreen ? QPixmap(iconLeaveFullScreen_xpm) : QPixmap(iconFullScreen_xpm));
 }
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction *action)

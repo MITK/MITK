@@ -83,15 +83,12 @@ public:
   to disable and all other to enable. */
   void UpdateLayoutDesignList(int layoutDesignIndex);
 
-/*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
-is activated.*/
-#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-  void MoveWidgetToCorrectPos(float opacity);
-#else
-  void MoveWidgetToCorrectPos(float /*opacity*/);
-#endif
+  /*! Change Icon of full-screen button depending on full-screen mode. */
+  void ChangeFullScreenIcon(const bool);
 
-  void ChangeFullScreenMode(bool state);
+  /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
+  is activated.*/
+  void MoveWidgetToCorrectPos();
 
   void NotifyNewWidgetPlanesMode(int mode);
 
@@ -112,9 +109,6 @@ protected:
   this is not supported yet. */
   void UpdateLayoutList();
 
-  /*! Change Icon of full-screen button depending on full-screen mode. */
-  void ChangeFullScreenIcon();
-
   int currentCrosshairRotationMode;
 
 public slots:
@@ -131,12 +125,6 @@ signals:
   /*! emit signal, when layout design changed by the setting menu.*/
   void SignalChangeLayoutDesign(int layoutDesign);
 
-public slots:
-
-  void DeferredHideMenu();
-  void DeferredShowMenu();
-  void smoothHide();
-
 protected slots:
 
   ///
@@ -150,7 +138,6 @@ protected slots:
   ///
   void OnAutoRotationActionTriggered();
 
-  void enterEvent(QEvent * /*e*/) override;
   void leaveEvent(QEvent * /*e*/) override;
   void OnTSNumChanged(int);
 
@@ -317,11 +304,6 @@ protected:
    * layout design will restore.*/
   unsigned int m_OldLayoutDesign;
 
-  /*! Flag if full-screen mode is activated or deactivated. */
-  bool m_FullScreenMode;
-
-  bool m_Entered;
-
 private:
   mitk::BaseRenderer::Pointer m_Renderer;
 
@@ -331,7 +313,8 @@ private:
   /// a timer for the auto rotate action
   ///
   QTimer m_AutoRotationTimer;
-  QTimer m_HideTimer;
+
+  bool m_MenuIsShown;
 
   QWidget *m_Parent;
 };

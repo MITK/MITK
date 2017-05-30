@@ -21,7 +21,7 @@ endmacro()
 # MITK Prerequisites
 #-----------------------------------------------------------------------------
 
-if(UNIX AND NOT APPLE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   include(mitkFunctionCheckPackageHeader)
 

@@ -20,10 +20,12 @@ if(MITK_USE_Caffe2)
   endif()
 
   if(NOT DEFINED Caffe2_DIR)
+  
+    set(revision_tag 63cad96)
 
     ExternalProject_Add(${proj}
        GIT_REPOSITORY https://github.com/caffe2/caffe2.git
-#       GIT_TAG ${revision_tag}
+       GIT_TAG ${revision_tag}
        CMAKE_GENERATOR ${gen}
        CMAKE_ARGS
          ${ep_common_args}
@@ -33,6 +35,8 @@ if(MITK_USE_Caffe2)
          -DBUILD_BINARY:BOOL=OFF
          -DUSE_GFLAGS:BOOL=OFF
          -DUSE_GLOG:BOOL=OFF
+         -DUSE_ROCKSDB:BOOL=OFF
+         -DUSE_NNPACK:BOOL=OFF
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
        CMAKE_CACHE_DEFAULT_ARGS

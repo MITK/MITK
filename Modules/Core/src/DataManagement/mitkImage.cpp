@@ -51,7 +51,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
     return m_MetaDataDictionaryArray;
   }
 
-  mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(static_cast<mitk::BaseProperty*>(GetProperty("autoplan.mainAxisIndex")));
+  mitk::IntProperty* prop = dynamic_cast<mitk::IntProperty*>(GetProperty("autoplan.mainAxisIndex").GetPointer());
   int mainAxisIndex = prop ? prop->GetValue() : 2;
   int numberSlices = GetLargestPossibleRegion().GetSize()[mainAxisIndex];
   
@@ -81,7 +81,7 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
       else
       {
         // TODO: To skip these tags is necessary in order for the gdcm to generate them correctly.
-        if (tagkey == "0008|0016" || tagkey == "0008|0018")
+        if (tagkey == TAG_SOP_CLASS_UID || tagkey == TAG_SOP_INST_UID)
         {
           continue;
         }
@@ -121,17 +121,17 @@ mitk::ReaderType::DictionaryArrayType mitk::Image::GetMetaDataDictionaryArray()
           %spacingVector[0] %spacingVector[1] %spacingVector[2]
           );
           
-          if (tagkey == "0020|0037")
+          if (tagkey == TAG_IMAGE_ORIENTATION)
           {
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imageOrientation);
             continue;
           }
-          else if (tagkey == "0020|0032")
+          else if (tagkey == TAG_IMAGE_POSITION)
           {
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, imagePosition);
             continue;
           }
-          else if (tagkey == "0028|0030")
+          else if (tagkey == TAG_PIXEL_SPACING)
           {
             itk::EncapsulateMetaData<std::string>(*(m_MetaDataDictionaryArray[j]), tagkey, spacing);
             continue;
@@ -163,19 +163,19 @@ void  mitk::Image::SetMetaDataDictionary(ReaderType::DictionaryArrayType metaDat
       SetProperty(tagKey.c_str(),   mitk::StringProperty::New(dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(tagKey))->GetMetaDataObjectValue()));
 
       // Skip tags
-      if (tagKey == "0008|0016" || tagKey == "0008|0018") {
+      if (tagKey == TAG_SOP_CLASS_UID || tagKey == TAG_SOP_INST_UID) {
         continue;
       }
       
       // Slice specific tags
-      if (tagKey == "0020|0037" || tagKey == "0020|0032" || tagKey == "0028|0030") {
+      if (tagKey == TAG_IMAGE_ORIENTATION || tagKey == TAG_IMAGE_POSITION || tagKey == TAG_PIXEL_SPACING) {
         mitk::PlaneGeometry* planegeometry = slicedGeometry->GetPlaneGeometry(i);
         if (planegeometry != nullptr) {
-          if (tagKey == "0020|0037") {
+          if (tagKey == TAG_IMAGE_ORIENTATION) {
             std::vector<std::string> orientation;
             boost::algorithm::split_regex(orientation, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(tagKey))->GetMetaDataObjectValue(), boost::regex("\\\\"));
             std::vector<std::string> spacing;
-            boost::algorithm::split_regex(spacing, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get("0028|0030"))->GetMetaDataObjectValue(), boost::regex("\\\\"));
+            boost::algorithm::split_regex(spacing, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(TAG_PIXEL_SPACING))->GetMetaDataObjectValue(), boost::regex("\\\\"));
 
             mitk::Matrix3D imageMatrix = planegeometry->GetIndexToWorldTransform()->GetMatrix();
             mitk::Vector3D spacingVector;
@@ -198,7 +198,7 @@ void  mitk::Image::SetMetaDataDictionary(ReaderType::DictionaryArrayType metaDat
             
             continue;
           }
-          if (tagKey == "0020|0032") {
+          if (tagKey == TAG_IMAGE_POSITION) {
             std::vector<std::string> imagePosition;
             boost::algorithm::split_regex(imagePosition, dynamic_cast<const itk::MetaDataObject<std::string>*>(metaData[i]->Get(tagKey))->GetMetaDataObjectValue(), boost::regex("\\\\"));
 

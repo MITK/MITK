@@ -29,6 +29,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "caffe2/core/predictor.h"
 #include "caffe2/core/tensor.h"
 #include "caffe2/utils/math.h"
+#include <caffe2/core/context_gpu.h>
+#include <caffe2/core/workspace.h>
 
 #include <gtest/gtest.h>
 
@@ -36,10 +38,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-void to_tensorcpu(cv::Mat &img, caffe2::TensorCPU &tensor)
+template<class TensorType>
+void to_tensor(cv::Mat &img, TensorType &tensor)
 {
-    cv::Mat img2;
-
     const int num_channel = tensor.dim(1);
     const int height = tensor.dim(2);
     const int width = tensor.dim(3);
@@ -57,7 +58,7 @@ void to_tensorcpu(cv::Mat &img, caffe2::TensorCPU &tensor)
     // subtract mean
     img -= 128;  // necessary?
 
-    float* tensor_data = tensor.mutable_data<float>();
+    float* tensor_data = tensor.template mutable_data<float>();
 
     // create array of cv::Mat where each matrix points to the tensor data
     std::vector<cv::Mat> bgr;
@@ -88,12 +89,16 @@ int main(int argc, char* argv[])
   parser.addArgument("init_net", "", mitkCommandLineParser::String, "init_net:", "the network weights (.pb)", us::Any());
   parser.addArgument("predict_net", "", mitkCommandLineParser::String, "predict_net:", "the network definition (.pb)", us::Any());
 
+  typedef caffe2::TensorCPU TensorType;
+  //typedef caffe2::TensorCUDA TensorType;
+
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
   std::string init_net_filename = us::any_cast<std::string>(parsedArgs["init_net"]);
   std::string predict_net_filename = us::any_cast<std::string>(parsedArgs["predict_net"]);
   std::string image_filename = us::any_cast<std::string>(parsedArgs["image"]);
 
   cv::Mat img = cv::imread(image_filename, CV_LOAD_IMAGE_COLOR);
+  img = cv::Mat(30,30,CV_32FC1,129);
 
 //  cv::namedWindow( "Display window", cv::WINDOW_AUTOSIZE );// Create a window for display.
 //  cv::imshow( "Display window", img2 );                   // Show our image inside it.
@@ -104,20 +109,42 @@ int main(int argc, char* argv[])
   CAFFE_ENFORCE(ReadProtoFromFile(predict_net_filename, &predict_net));
 
   // Can be large due to constant fills
-  //MITK_INFO << "Init net: " << ProtoDebugString(init_net);
   MITK_INFO << "Predict net: " << ProtoDebugString(predict_net);
-  auto predictor = caffe2::make_unique<caffe2::Predictor>(init_net, predict_net);
-  caffe2::Predictor::TensorVector outputVec;
+  std::vector<TensorType*> outputVec;
 
-  int w,h,c; w=227; h=227; c=3;
-  caffe2::TensorCPU input(std::vector<int>({1, c, h, w}));
-  to_tensorcpu(img, input);
+  int w,h,c; w=30; h=30; c=1;
+  TensorType input(std::vector<int>({1, c, h, w}));
+  to_tensor<TensorType>(img, input);
 
-  caffe2::Predictor::TensorVector inputVec{&input};
+  input.mutable_data<float>();
 
-  predictor->run(inputVec, &outputVec);
+  std::vector<TensorType> inputVec{input};
 
-  caffe2::TensorCPU* output = outputVec[0];
+  caffe2::Workspace ws;
+  ws.RunNetOnce(init_net);
+  ws.CreateNet(predict_net, true);
+
+  for (auto i = 0; i < inputVec.size(); ++i)
+  {
+    auto* blob = ws.GetBlob(predict_net.external_input(i));
+    TensorType* tensor = blob->template GetMutable<TensorType>();
+    tensor->ResizeLike(inputVec[i]);
+    tensor->ShareData(inputVec[i]);
+  }
+
+  CAFFE_ENFORCE(ws.RunNet(predict_net.name()));
+
+  outputVec.resize(predict_net.external_output_size());
+  for (auto i = 0; i < outputVec.size(); ++i)
+  {
+    auto* blob = ws.GetBlob(predict_net.external_output(i));
+    outputVec[i] = blob->template GetMutable<TensorType>();
+  }
+
+//  auto predictor = caffe2::make_unique<caffe2::Predictor>(init_net, predict_net);
+//  predictor->run(inputVec, &outputVec);
+
+  TensorType* output = outputVec[0];
 
   const float* output_data =  output->data<float>();
   int max_class = -1;

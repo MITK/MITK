@@ -2,10 +2,14 @@
 set(Caffe2_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
 set(Caffe2_INCLUDE_DIR ${Caffe2_DIR}/include)
 set(Caffe2_CMAKE_DEBUG_POSTFIX d)
-
 set(Caffe2_LIBRARIES)
-
 find_library (PROTOBUF_LIB protobuf)
+
+set(CUDA_DIR $ENV{CUDA_DIR})
+if (NOT CUDA_DIR)
+  find_path(CUDA_INSTALL_DIR cuda)
+  set(CUDA_DIR ${CUDA_INSTALL_DIR}/cuda)
+endif()
 
 FOREACH(POSTFIX _CPU;_GPU)
 
@@ -50,5 +54,5 @@ ENDFOREACH()
 
 find_package_handle_standard_args(Caffe2
   FOUND_VAR Caffe2_FOUND
-  REQUIRED_VARS Caffe2_INCLUDE_DIR Caffe2_LIBRARIES PROTOBUF_LIB
+  REQUIRED_VARS Caffe2_INCLUDE_DIR Caffe2_LIBRARIES PROTOBUF_LIB CUDA_DIR
 )

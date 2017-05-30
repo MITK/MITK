@@ -1525,6 +1525,8 @@ namespace itk
           other = 0;
           interAxonalVolume = extraAxonalVolume;
         }
+        
+        double compartmentSum = intraAxonalVolume;
 
         // adjust non-fiber and intra-axonal signal
         for (int i=1; i<numFiberCompartments; i++)
@@ -1555,6 +1557,7 @@ namespace itk
               weight = val*m_VoxelVolume;
           }
 
+          compartmentSum += weight;
           if (g>=0)
             pix[g] *= weight;
           else
@@ -1580,6 +1583,7 @@ namespace itk
               weight *= other/m_VoxelVolume;
           }
 
+          compartmentSum += weight;
           if (g>=0)
             pix[g] += m_Parameters.m_NonFiberModelList[i]->SimulateMeasurement(g)*weight;
           else
@@ -1588,6 +1592,9 @@ namespace itk
           if (g==0)
             m_VolumeFractions.at(i+numFiberCompartments)->SetPixel(index, weight/m_VoxelVolume);
         }
+        
+        if (compartmentSum/m_VoxelVolume>1.05)
+          MITK_ERROR << "Compartments do not sum to 1 in voxel " << index << " (" << compartmentSum/m_VoxelVolume << ")";
       }
     }
   }

@@ -104,6 +104,7 @@ public:
     itkSetMacro( NumPreviousDirections, unsigned int )  ///< How many "old" steps do we want to consider in our decision where to go next?
     itkSetMacro( MaxNumTracts, unsigned int )           ///< Tracking is stopped if the maximum number of tracts is exceeded
     itkSetMacro( Random, bool )                         ///< If true, seedpoints are shuffled randomly before tracking
+    itkSetMacro( Verbose, bool )                        ///< If true, output tracking progress (might be slower)
 
     void SetTrackingHandler( mitk::TrackingDataHandler* h )   ///<
     {
@@ -169,6 +170,7 @@ protected:
     ItkUcharImgType::Pointer            m_MaskImage;
     ItkUcharImgType::Pointer            m_TissueImage;
 
+    bool                                m_Verbose;
     bool                                m_AposterioriCurvCheck;
     bool                                m_AvoidStop;
     bool                                m_DemoMode;

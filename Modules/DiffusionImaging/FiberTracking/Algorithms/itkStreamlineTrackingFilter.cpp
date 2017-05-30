@@ -67,6 +67,7 @@ StreamlineTrackingFilter
     , m_AngularThresholdDeg(-1)
     , m_MaxNumTracts(-1)
     , m_Random(true)
+    , m_Verbose(true)
 {
     this->SetNumberOfRequiredInputs(0);
 }
@@ -710,6 +711,7 @@ void StreamlineTrackingFilter::GenerateData()
     itk::Index<3> zeroIndex; zeroIndex.Fill(0);
     int progress = 0;
     int i = 0;
+    int print_interval = num_seeds/100;
 #pragma omp parallel
     while (i<num_seeds && !stop)
     {
@@ -719,10 +721,10 @@ void StreamlineTrackingFilter::GenerateData()
 
         if (temp_i>=num_seeds || stop)
             continue;
-
+        else if (m_Verbose && i%print_interval==0)
 #pragma omp critical
         {
-            progress++;
+            progress += print_interval;
             std::cout << "                                                                                                     \r";
             if (m_MaxNumTracts>0)
                 std::cout << "Tried: " << progress << "/" << num_seeds << " | Accepted: " << current_tracts << "/" << m_MaxNumTracts << '\r';

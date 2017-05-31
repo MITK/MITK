@@ -57,6 +57,10 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
 
   resultMitkImage->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
   resultMitkImage->GetPropertyList()->SetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), m_RealOffsets.c_str());
+  // remove uids
+  resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0008.0018");
+  resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000D");
+  resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000E");
 
 }
 
@@ -135,15 +139,7 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
     {
       weight = 1.0 - double(sourceTimestep - lowerMZeroIndex) / double(upperMZeroIndex - lowerMZeroIndex);
     }
-    lowerMZeroRegion.SetIndex(3, lowerMZeroIndex);
-    upperMZeroRegion.SetIndex(3, upperMZeroIndex);
-    sourceRegion.SetIndex(3, sourceTimestep);
-    targetRegion.SetIndex(3, targetTimestep);
 
-    itk::ImageRegionConstIterator<ImageType> lowerMZeroIterator(image, lowerMZeroRegion);
-    itk::ImageRegionConstIterator<ImageType> upperMZeroIterator(image, upperMZeroRegion);
-    itk::ImageRegionConstIterator<ImageType> sourceIterator(image, sourceRegion);
-    itk::ImageRegionIterator<OutputImageType> targetIterator(resultImage.GetPointer(), targetRegion);
 
     if (isMZero)
     {
@@ -151,6 +147,16 @@ void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPi
     }
     else
     {
+      lowerMZeroRegion.SetIndex(3, lowerMZeroIndex);
+      upperMZeroRegion.SetIndex(3, upperMZeroIndex);
+      sourceRegion.SetIndex(3, sourceTimestep);
+      targetRegion.SetIndex(3, targetTimestep);
+
+      itk::ImageRegionConstIterator<ImageType> lowerMZeroIterator(image, lowerMZeroRegion);
+      itk::ImageRegionConstIterator<ImageType> upperMZeroIterator(image, upperMZeroRegion);
+      itk::ImageRegionConstIterator<ImageType> sourceIterator(image, sourceRegion);
+      itk::ImageRegionIterator<OutputImageType> targetIterator(resultImage.GetPointer(), targetRegion);
+
       while (!sourceIterator.IsAtEnd())
       {
         targetIterator.Set(double(sourceIterator.Get()) /

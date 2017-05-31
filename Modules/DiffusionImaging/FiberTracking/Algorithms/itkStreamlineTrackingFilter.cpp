@@ -712,6 +712,9 @@ void StreamlineTrackingFilter::GenerateData()
     int progress = 0;
     int i = 0;
     int print_interval = num_seeds/100;
+    if (print_interval<100)
+        m_Verbose=false;
+
 #pragma omp parallel
     while (i<num_seeds && !stop)
     {

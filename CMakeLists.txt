@@ -185,7 +185,7 @@ endmacro()
 
 # -----------------------------------------
 # General build options
-env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" ON)
+env_option(MITK_USE_TOF_KINECTV2 "Enable support for Kinect V2 camera" OFF)
 
 option(BUILD_SHARED_LIBS "Build MITK with shared libraries" ON)
 option(WITH_COVERAGE "Enable/Disable coverage" OFF)

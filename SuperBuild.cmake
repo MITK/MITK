@@ -247,8 +247,9 @@ set(mitk_cmake_boolean_args
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
+  MITK_USE_TOF_KINECTV2
 
-  MITK_ENABLE_PIC_READER
+  MITK_ENABLE_PIC_READER  
   )
 
 #-----------------------------------------------------------------------------

@@ -300,7 +300,7 @@ std::vector<int> mitk::CustomTagParser::GetExternalRevisions()
   std::string prospectiveJsonsPath = stringToModule + "/*.json";
 
   std::set<std::string> JsonFiles;
-  Poco::Glob::glob(prospectiveJsonsPath, JsonFiles);
+  Poco::Glob::glob(prospectiveJsonsPath, JsonFiles, Poco::Glob::GLOB_CASELESS);
 
   std::vector<int> availableRevisionsVector;
 

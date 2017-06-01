@@ -42,6 +42,7 @@ QmitkPropertyItemModel.cpp
 set(MOC_H_FILES
   include/QmitkDataStorageComboBox.h
   include/QmitkDataStorageTableModel.h
+  include/QmitkDataStorageTreeModel.h
   include/QmitkFileReaderOptionsDialog.h
   include/QmitkFileReaderWriterOptionsWidget.h
   include/QmitkFileWriterOptionsDialog.h

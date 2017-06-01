@@ -229,6 +229,18 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
+  if ("" == measurements)
+  {
+    std::string stringRepetitions = "";
+    std::string stringAverages = "";
+    results->GetStringProperty("CEST.repetitions", stringRepetitions);
+    results->GetStringProperty("CEST.averages", stringAverages);
+    std::stringstream  measurementStream;
+    measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
+    measurements = measurementStream.str();
+    MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+  }
+
   if (hasSamplingInformation)
   {
     std::string offsets = GetOffsetString(sampling, offset, measurements);

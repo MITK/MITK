@@ -78,14 +78,14 @@ public:
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> trainMatrixX(percentRange,c);
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> testMatrixXPredict(maxrowrange-percentRange,c);
 
-      for(int row = 0; row < percentRange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = 0; row < percentRange; row++){
+        for(unsigned int col = 0; col < c; col++){
           trainMatrixX(row,col) =  p->GetData(row,col);
         }
       }
 
-      for(int row = percentRange; row < maxrowrange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = percentRange; row < maxrowrange; row++){
+        for(unsigned int col = 0; col < c; col++){
           testMatrixXPredict(row-percentRange,col) =  p->GetData(row,col);
         }
       }
@@ -96,14 +96,14 @@ public:
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> trainLabelMatrixY(percentRange,c);
       Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> testMatrixYPredict(maxrowrange-percentRange,c);
 
-      for(int row = 0; row < percentRange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = 0; row < percentRange; row++){
+        for(unsigned int col = 0; col < c; col++){
           trainLabelMatrixY(row,col) =  p->GetData(row,col);
         }
       }
 
-      for(int row = percentRange; row < maxrowrange; row++){
-        for(int col = 0; col < c; col++){
+      for(unsigned int row = percentRange; row < maxrowrange; row++){
+        for(unsigned int col = 0; col < c; col++){
           testMatrixYPredict(row-percentRange,col) =  p->GetData(row,col);
         }
       }
@@ -208,12 +208,15 @@ public:
     bool isYPredictVector = false;
     int count = 0;
 
-    for(int i= 0; i < maxrows; i++){
-      if(classes(i,0) == m_TestYPredict(i,0)){
+    for (unsigned int i = 0; i < maxrows; i++)
+    {
+      if(classes(i, 0) == m_TestYPredict(i, 0))
+      {
         isYPredictVector = true;
-        count++;
+        ++count;
       }
     }
+
     MITK_INFO << 100*count/(double)(maxrows) << "%";
     MITK_TEST_CONDITION(isEqual<int>(m_TestYPredict,classes),"Expected vector and occured vector match.");
   }
@@ -225,8 +228,8 @@ public:
     bool isSimilar = true;
     unsigned int mrow = expected.rows();
     unsigned int mcol = expected.cols();
-    for(int i = 0; i < mrow; i++){
-      for(int j = 0; j < mcol; j++){
+    for(unsigned int i = 0; i < mrow; i++){
+      for(unsigned int j = 0; j < mcol; j++){
         if(expected(i,j) != actual(i,j)){
           isSimilar = false;
         }
@@ -243,8 +246,8 @@ public:
     int count = 0;
     unsigned int rowRange = expected.rows();
     unsigned int colRange = expected.cols();
-    for(int i = 0; i < rowRange; i++){
-      for(int j = 0; j < colRange; j++){
+    for(unsigned int i = 0; i < rowRange; i++){
+      for(unsigned int j = 0; j < colRange; j++){
         if(expected(i,j) == actual(i,j)){
           count++;
         }
@@ -296,12 +299,15 @@ public:
     bool isYPredictVector = false;
     int count = 0;
 
-    for(int i= 0; i < maxrows; i++){
-      if(classes(i,0) == m_TestYPredict(i,0)){
+    for (unsigned int i = 0; i < maxrows; i++)
+    {
+      if (classes(i, 0) == m_TestYPredict(i, 0))
+      {
         isYPredictVector = true;
-        count++;
+        ++count;
       }
     }
+
     MITK_INFO << 100*count/(double)(maxrows) << "%";
     MITK_TEST_CONDITION(isIntervall<int>(m_TestYPredict,classes,75,100),"Testvalue is in range.");
   }

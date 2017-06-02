@@ -214,7 +214,7 @@ void mitk::SliceBasedInterpolationController::ScanSliceITKProcessing(const itk::
   unsigned int dim1(options.dim1);
 
   std::vector<int> numberOfPixels; // number of pixels in the current slice that are equal to the active label
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  unsigned int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
   numberOfPixels.resize(numberOfLabels);
 
   typedef itk::Image<PixelType, 2> ImageType;
@@ -257,7 +257,7 @@ void mitk::SliceBasedInterpolationController::ScanImageITKProcessing(itk::Image<
   unsigned int z = 0;
 
   std::vector<int> numberOfPixels; // number of pixels per slice that are equal to the active label
-  int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
+  unsigned int numberOfLabels = m_WorkingImage->GetNumberOfLabels();
   numberOfPixels.resize(numberOfLabels);
 
   iter.GoToBegin();
@@ -304,7 +304,7 @@ mitk::Image::Pointer mitk::SliceBasedInterpolationController::Interpolate(unsign
     return nullptr;
   if (sliceDimension > 2)
     return nullptr;
-  int upperLimit = m_LabelCountInSlice[timeStep][sliceDimension].size();
+  unsigned int upperLimit = m_LabelCountInSlice[timeStep][sliceDimension].size();
   if (sliceIndex >= upperLimit - 1)
     return nullptr; // can't interpolate first and last slice
   if (sliceIndex < 1)
@@ -316,8 +316,8 @@ mitk::Image::Pointer mitk::SliceBasedInterpolationController::Interpolate(unsign
   if (m_LabelCountInSlice[timeStep][sliceDimension][sliceIndex][pixelValue] > 0)
     return nullptr;
 
-  int lowerBound(0);
-  int upperBound(0);
+  unsigned int lowerBound(0);
+  unsigned int upperBound(0);
   bool bounds(false);
 
   for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)

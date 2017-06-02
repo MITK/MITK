@@ -499,7 +499,7 @@ float StreamlineTrackingFilter::FollowStreamline(itk::Point<float, 3> pos, vnl_v
 {
     vnl_vector_fixed<float,3> zero_dir; zero_dir.fill(0.0);
     std::deque< vnl_vector_fixed<float,3> > last_dirs;
-    for (int i=0; i<m_NumPreviousDirections-1; i++)
+    for (unsigned int i=0; i<m_NumPreviousDirections-1; i++)
         last_dirs.push_back(zero_dir);
 
     for (int step=0; step< m_MaxLength/2; step++)
@@ -800,7 +800,7 @@ void StreamlineTrackingFilter::GenerateData()
                     m_Tractogram.push_back(fib);
                     current_tracts++;
                 }
-                if (m_MaxNumTracts>0 && current_tracts>=m_MaxNumTracts)
+                if (m_MaxNumTracts > 0 && current_tracts>=static_cast<unsigned int>(m_MaxNumTracts))
                 {
                     if (!stop)
                     {

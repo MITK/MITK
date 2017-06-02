@@ -147,7 +147,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
   vtkPoints *points = polydata->GetPoints();
 
   MeshType::PointType point;
-  for (int i = 0; i < numberOfPoints; i++)
+  for (unsigned int i = 0; i < numberOfPoints; i++)
   {
     double *aux = points->GetPoint(i);
     point[0] = aux[0];

@@ -188,9 +188,9 @@ vnl_vector_fixed<float,3> TrackingHandlerPeaks::GetDirection(itk::Point<float, 3
     frac_z = 1-frac_z;
 
     // int coordinates inside image?
-    if (idx3[0] >= 0 && idx3[0] < m_DummyImage->GetLargestPossibleRegion().GetSize(0)-1 &&
-        idx3[1] >= 0 && idx3[1] < m_DummyImage->GetLargestPossibleRegion().GetSize(1)-1 &&
-        idx3[2] >= 0 && idx3[2] < m_DummyImage->GetLargestPossibleRegion().GetSize(2)-1)
+    if (idx3[0] >= 0 && idx3[0] < static_cast<itk::IndexValueType>(m_DummyImage->GetLargestPossibleRegion().GetSize(0) - 1) &&
+        idx3[1] >= 0 && idx3[1] < static_cast<itk::IndexValueType>(m_DummyImage->GetLargestPossibleRegion().GetSize(1) - 1) &&
+        idx3[2] >= 0 && idx3[2] < static_cast<itk::IndexValueType>(m_DummyImage->GetLargestPossibleRegion().GetSize(2) - 1))
     {
       // trilinear interpolation
       vnl_vector_fixed<float, 8> interpWeights;

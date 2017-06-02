@@ -195,9 +195,9 @@ vnl_vector_fixed<float,3> TrackingHandlerTensor::GetDirection(itk::Point<float, 
         frac_z = 1-frac_z;
 
         // int coordinates inside image?
-        if (idx[0] >= 0 && idx[0] < m_FaImage->GetLargestPossibleRegion().GetSize(0)-1 &&
-                idx[1] >= 0 && idx[1] < m_FaImage->GetLargestPossibleRegion().GetSize(1)-1 &&
-                idx[2] >= 0 && idx[2] < m_FaImage->GetLargestPossibleRegion().GetSize(2)-1)
+        if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(m_FaImage->GetLargestPossibleRegion().GetSize(0) - 1) &&
+            idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(m_FaImage->GetLargestPossibleRegion().GetSize(1) - 1) &&
+            idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(m_FaImage->GetLargestPossibleRegion().GetSize(2) - 1))
         {
             // trilinear interpolation
             vnl_vector_fixed<float, 8> interpWeights;

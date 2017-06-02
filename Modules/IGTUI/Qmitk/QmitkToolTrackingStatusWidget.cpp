@@ -198,7 +198,7 @@ void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Po
   RemoveGuiLabels();
   QLabel* label;
 
-  for(unsigned int i = 0; i < toolStorage->GetToolCount(); i++)
+  for(int i = 0; i < toolStorage->GetToolCount(); i++)
   {
     QString name(toolStorage->GetTool(i)->GetToolName().c_str());
 

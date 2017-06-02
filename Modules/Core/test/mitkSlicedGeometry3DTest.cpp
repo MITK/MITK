@@ -41,7 +41,7 @@ static mitk::SlicedGeometry3D::Pointer createSlicedGeometry(const mitk::Point3D 
   slicedGeometry->SetOrigin(origin);
   slicedGeometry->SetSpacing(spacing);
 
-  for (unsigned int i = 0; i < numberOfSlices; ++i)
+  for (int i = 0; i < numberOfSlices; ++i)
   {
     auto planeGeometry = createPlaneGeometry();
     slicedGeometry->SetPlaneGeometry(planeGeometry, i);

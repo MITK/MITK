@@ -202,9 +202,9 @@ protected:
       frac_z = 1-frac_z;
 
       // int coordinates inside image?
-      if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
-          idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
-          idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
+      if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(0) - 1) &&
+          idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(1) - 1) &&
+          idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(2) - 1))
       {
         // trilinear interpolation
         vnl_vector_fixed<float, 8> interpWeights;
@@ -288,9 +288,9 @@ protected:
       frac_z = 1-frac_z;
 
       // int coordinates inside image?
-      if (idx[0] >= 0 && idx[0] < image->GetLargestPossibleRegion().GetSize(0)-1 &&
-          idx[1] >= 0 && idx[1] < image->GetLargestPossibleRegion().GetSize(1)-1 &&
-          idx[2] >= 0 && idx[2] < image->GetLargestPossibleRegion().GetSize(2)-1)
+      if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(0) - 1) &&
+          idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(1) - 1) &&
+          idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(image->GetLargestPossibleRegion().GetSize(2) - 1))
       {
         // trilinear interpolation
         vnl_vector_fixed<float, 8> interpWeights;

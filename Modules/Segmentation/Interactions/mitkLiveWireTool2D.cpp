@@ -491,10 +491,8 @@ void mitk::LiveWireTool2D::FinishTool()
   int numberOfTimesteps = static_cast<int>(m_Contour->GetTimeGeometry()->CountTimeSteps());
 
   // close contour in each timestep
-  for (unsigned int i = 0; i <= numberOfTimesteps; i++)
-  {
+  for (int i = 0; i <= numberOfTimesteps; i++)
     m_Contour->Close(i);
-  }
 
   m_ToolManager->GetDataStorage()->Remove(m_LiveWireContourNode);
 

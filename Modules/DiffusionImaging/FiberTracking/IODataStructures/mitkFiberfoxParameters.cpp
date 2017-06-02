@@ -642,12 +642,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_MotionVolumes.push_back( true );
           }
           // set all true except those given.
-          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter  )
+          for (auto number : numbers)
           {
-            if ( -(*iter) < m_SignalGen.GetNumVolumes() && -(*iter) >= 0 )
-            {
-              m_SignalGen.m_MotionVolumes.at( -(*iter) ) = false;
-            }
+            if (-number < static_cast<int>(m_SignalGen.GetNumVolumes()) && -number >= 0 )
+              m_SignalGen.m_MotionVolumes.at(-number) = false;
           }
           MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of negative numbers.";
         }
@@ -660,12 +658,10 @@ void mitk::FiberfoxParameters< ScalarType >::LoadParameters(string filename)
             m_SignalGen.m_MotionVolumes.push_back( false );
           }
           // set all false except those given.
-          for( auto iter = std::begin( numbers ); iter != std::end( numbers ); ++iter )
+          for (auto number : numbers)
           {
-            if ( *iter < m_SignalGen.GetNumVolumes() && *iter >= 0 )
-            {
-              m_SignalGen.m_MotionVolumes.at( *iter ) = true;
-            }
+            if (number < static_cast<int>(m_SignalGen.GetNumVolumes()) && number >= 0)
+              m_SignalGen.m_MotionVolumes.at(number) = true;
           }
           MITK_DEBUG << "mitkFiberfoxParameters.cpp: Case list of positive numbers.";
         }

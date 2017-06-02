@@ -74,17 +74,19 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset(std::vector<itk::Index<3>
 
   unsigned int xDim = UINT_MAX;
   unsigned int yDim = UINT_MAX;
+
   if(input.IsNotNull() && input->IsInitialized())
   {
-    unsigned int xDim = input->GetDimension(0);
-    unsigned int yDim = input->GetDimension(1);
+    xDim = input->GetDimension(0);
+    yDim = input->GetDimension(1);
   }
 
   bool pointSetValid = true;
   for (unsigned int i=0; i<subset.size(); i++)
   {
     itk::Index<3> currentIndex = subset.at(i);
-    if (currentIndex[0]<0||currentIndex[0]>xDim||currentIndex[1]<0||currentIndex[1]>yDim)
+    if (currentIndex[0] < 0 || currentIndex[0] > static_cast<itk::IndexValueType>(xDim) ||
+        currentIndex[1] < 0 || currentIndex[1] > static_cast<itk::IndexValueType>(yDim))
     {
       pointSetValid = false;
     }

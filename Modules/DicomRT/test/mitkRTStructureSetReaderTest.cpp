@@ -89,7 +89,7 @@ public:
         }
         else
         {
-          for(unsigned int j=0;j<cm1->GetNumberOfVertices();++j)
+          for(int j=0;j<cm1->GetNumberOfVertices();++j)
           {
             mitk::Point3D p1 = cm1->GetVertexAt(i)->Coordinates;
             mitk::Point3D p2 = cm2->GetVertexAt(i)->Coordinates;

@@ -311,7 +311,7 @@ ScalarType RawShModel< ScalarType >::SimulateMeasurement(unsigned int dir)
     if (this->m_GradientList[dir].GetNorm()>0.001)
     {
         j=0;
-        for (int l=0; l<=m_ShOrder; l=l+2)
+        for (int l=0; l<=static_cast<int>(m_ShOrder); l=l+2)
             for (m=-l; m<=l; m++)
             {
                 plm = legendre_p<double>(l,abs(m),cos(m_SphCoords(dir,0)));
@@ -358,7 +358,7 @@ typename RawShModel< ScalarType >::PixelType RawShModel< ScalarType >::SimulateM
         if (this->m_GradientList[p].GetNorm()>0.001)
         {
             j=0;
-            for (int l=0; l<=m_ShOrder; l=l+2)
+            for (int l=0; l<=static_cast<int>(m_ShOrder); l=l+2)
                 for (m=-l; m<=l; m++)
                 {
                     plm = legendre_p<double>(l,abs(m),cos(m_SphCoords(p,0)));

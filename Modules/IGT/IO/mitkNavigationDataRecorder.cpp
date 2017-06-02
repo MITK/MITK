@@ -61,11 +61,12 @@ void mitk::NavigationDataRecorder::GenerateData()
   }
 
   // if limitation is set and has been reached, stop recording
-  if ((m_RecordCountLimit > 0) && (m_NavigationDataSet->Size() >= m_RecordCountLimit)) m_Recording = false;
+  if ((m_RecordCountLimit > 0) && (m_NavigationDataSet->Size() >= static_cast<unsigned int>(m_RecordCountLimit)))
+    m_Recording = false;
   // We can skip the rest of the method, if recording is deactivated
-  if  (!m_Recording) return;
-
-
+  if (!m_Recording)
+    return;
+  
   // Add data to set
   m_NavigationDataSet->AddNavigationDatas(clonedDatas);
 }

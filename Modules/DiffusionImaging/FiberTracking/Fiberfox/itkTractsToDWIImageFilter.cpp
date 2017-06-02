@@ -77,7 +77,7 @@ namespace itk
   TractsToDWIImageFilter< PixelType >::DoubleDwiType::Pointer TractsToDWIImageFilter< PixelType >::
   SimulateKspaceAcquisition( std::vector< DoubleDwiType::Pointer >& images )
   {
-    int numFiberCompartments = m_Parameters.m_FiberModelList.size();
+    unsigned int numFiberCompartments = m_Parameters.m_FiberModelList.size();
     // create slice object
     ImageRegion<2> sliceRegion;
     sliceRegion.SetSize(0, m_WorkingImageRegion.GetSize()[0]);
@@ -309,8 +309,8 @@ namespace itk
 #else
 #pragma omp parallel for collapse(2)
 #endif
-          for (int y=0; y<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1); y++)
-            for (int x=0; x<magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0); x++)
+          for (int y=0; y<static_cast<int>(magnitudeDwiImage->GetLargestPossibleRegion().GetSize(1)); y++)
+            for (int x=0; x<static_cast<int>(magnitudeDwiImage->GetLargestPossibleRegion().GetSize(0)); x++)
             {
               DoubleDwiType::IndexType index3D; index3D[0]=x; index3D[1]=y; index3D[2]=z;
               DoubleDwiType::PixelType magPix = magnitudeDwiImage->GetPixel(index3D);
@@ -690,12 +690,10 @@ namespace itk
     }
 
     m_NumMotionVolumes = 0;
-    for (int i=0; i<m_Parameters.m_SignalGen.GetNumVolumes(); i++)
+    for (unsigned int i=0; i<m_Parameters.m_SignalGen.GetNumVolumes(); ++i)
     {
       if (m_Parameters.m_SignalGen.m_MotionVolumes[i])
-      {
-        m_NumMotionVolumes++;
-      }
+        ++m_NumMotionVolumes;
     }
     m_MotionCounter = 0;
 
@@ -1303,7 +1301,7 @@ namespace itk
     // is the current volume g affected by motion?
     if ( m_Parameters.m_SignalGen.m_DoAddMotion
          && m_Parameters.m_SignalGen.m_MotionVolumes[g]
-         && g<m_Parameters.m_SignalGen.GetNumVolumes() )
+         && g<static_cast<int>(m_Parameters.m_SignalGen.GetNumVolumes()) )
     {
       if ( m_Parameters.m_SignalGen.m_DoRandomizeMotion )
       {
@@ -1637,9 +1635,9 @@ namespace itk
     frac_z = 1-frac_z;
 
     // int coordinates inside image?
-    if (idx[0] >= 0 && idx[0] < img->GetLargestPossibleRegion().GetSize(0)-1 &&
-        idx[1] >= 0 && idx[1] < img->GetLargestPossibleRegion().GetSize(1)-1 &&
-        idx[2] >= 0 && idx[2] < img->GetLargestPossibleRegion().GetSize(2)-1)
+    if (idx[0] >= 0 && idx[0] < static_cast<itk::IndexValueType>(img->GetLargestPossibleRegion().GetSize(0) - 1) &&
+        idx[1] >= 0 && idx[1] < static_cast<itk::IndexValueType>(img->GetLargestPossibleRegion().GetSize(1) - 1) &&
+        idx[2] >= 0 && idx[2] < static_cast<itk::IndexValueType>(img->GetLargestPossibleRegion().GetSize(2) - 1))
     {
       vnl_vector_fixed<double, 8> interpWeights;
       interpWeights[0] = (  frac_x)*(  frac_y)*(  frac_z);

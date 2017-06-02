@@ -28,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "itkFFT1DComplexConjugateToRealImageFilter.h"
 #include "itkFFT1DRealToComplexConjugateImageFilter.h"
 #include "mitkImageCast.h"
+#include <mitkPhotoacousticOCLBeamformer.h>
 
 // needed itk image filters
 #include "mitkITKImageImport.h"
@@ -80,14 +81,8 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  if (!m_Conf.partial)
-  {
-    m_Conf.bounds[0] = 0;
-    m_Conf.bounds[1] = input->GetDimension(2) - 1;
-  }
-
-  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) - m_Conf.bounds[0] - ((input->GetDimension(2) - 1) - m_Conf.bounds[1]) };
-  output->Initialize(mitk::MakeScalarPixelType<double>(), 3, dim);
+  unsigned int dim[] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, input->GetDimension(2) };
+  output->Initialize(mitk::MakeScalarPixelType<float>(), 3, dim);
 
   mitk::Vector3D spacing;
   spacing[0] = m_Conf.Pitch * m_Conf.TransducerElements * 1000 / m_Conf.ReconstructionLines;
@@ -104,18 +99,19 @@ void mitk::BeamformingFilter::GenerateOutputInformation()
 void mitk::BeamformingFilter::GenerateData()
 {
   GenerateOutputInformation();
-  mitk::Image::ConstPointer input = this->GetInput();
+  mitk::Image::Pointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
   if (!output->IsInitialized())
     return;
 
-  double inputDim[2] = { input->GetDimension(0), input->GetDimension(1) / ((int)m_Conf.Photoacoustic + 1) };
+  float inputDim[2] = { input->GetDimension(0), input->GetDimension(1) / ((int)m_Conf.Photoacoustic + 1) };
   // if the photoacoustic option is used, we halve the image, as only the upper part of it contains any information
-  double outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
+  float outputDim[2] = { output->GetDimension(0), output->GetDimension(1) };
+  unsigned int oclOutputDim[3] = { output->GetDimension(0), output->GetDimension(1), output->GetDimension(2) };
 
   const int apodArraySize = m_Conf.TransducerElements * 4; // set the resolution of the apodization array
-  double* ApodWindow;
+  float* ApodWindow;
   // calculate the appropiate apodization window
   if (m_Conf.Apod == beamformingSettings::Apodization::Hann)
   {
@@ -134,46 +130,22 @@ void mitk::BeamformingFilter::GenerateData()
   // the interval at which we update the gui progress bar
 
   auto begin = std::chrono::high_resolution_clock::now(); // debbuging the performance...
-
+  /*
   for (int i = 0; i < output->GetDimension(2); ++i) // seperate Slices should get Beamforming seperately applied
   {
-    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i + m_Conf.bounds[0]));
+    mitk::ImageReadAccessor inputReadAccessor(input, input->GetSliceData(i));
 
-    m_OutputData = new double[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
-    m_InputDataPuffer = new double[input->GetDimension(0)*input->GetDimension(1)];
+    m_OutputData = new float[m_Conf.ReconstructionLines*m_Conf.SamplesPerLine];
+    m_InputDataPuffer = new float[input->GetDimension(0)*input->GetDimension(1)];
 
-    // first, we convert any data to double, which we use by default
-    if (input->GetPixelType().GetTypeAsString() == "scalar (double)" || input->GetPixelType().GetTypeAsString() == " (double)")
+    // first, we convert any data to float, which we use by default
+    if (input->GetPixelType().GetTypeAsString() == "scalar (float)" || input->GetPixelType().GetTypeAsString() == " (float)")
     {
-      m_InputData = (double*)inputReadAccessor.GetData();
-    }
-    else if (input->GetPixelType().GetTypeAsString() == "scalar (short)")
-    {
-      short* InputPuffer = (short*)inputReadAccessor.GetData();
-      for (int l = 0; l < inputDim[0]; ++l)
-      {
-        for (int s = 0; s < inputDim[1]; ++s)
-        {
-          m_InputDataPuffer[l*(short)inputDim[1] + s] = (double)InputPuffer[l*(short)inputDim[1] + s];
-        }
-      }
-      m_InputData = m_InputDataPuffer;
-    }
-    else if (input->GetPixelType().GetTypeAsString() == "scalar (float)")
-    {
-      float* InputPuffer = (float*)inputReadAccessor.GetData();
-      for (int l = 0; l < inputDim[0]; ++l)
-      {
-        for (int s = 0; s < inputDim[1]; ++s)
-        {
-          m_InputDataPuffer[l*(short)inputDim[1] + s] = (double)InputPuffer[l*(short)inputDim[1] + s];
-        }
-      }
-      m_InputData = m_InputDataPuffer;
+      m_InputData = (float*)inputReadAccessor.GetData();
     }
     else
     {
-      MITK_INFO << "Could not determine pixel type";
+      MITK_INFO << "Pixel type is not float, abort";
       return;
     }
 
@@ -232,15 +204,56 @@ void mitk::BeamformingFilter::GenerateData()
     output->SetSlice(m_OutputData, i);
 
     if (i % progInterval == 0)
-      m_ProgressHandle((int)((i + 1) / (double)output->GetDimension(2) * 100), "performing reconstruction");
+      m_ProgressHandle((int)((i + 1) / (float)output->GetDimension(2) * 100), "performing reconstruction");
 
     delete[] m_OutputData;
     delete[] m_InputDataPuffer;
     m_OutputData = nullptr;
     m_InputData = nullptr;
   }
+  */
+  
+  mitk::PhotoacousticOCLBeamformer::Pointer m_oclFilter = mitk::PhotoacousticOCLBeamformer::New();
+  us::ServiceReference<OclResourceService> ref = GetModuleContext()->GetServiceReference<OclResourceService>();
+  OclResourceService* resources = GetModuleContext()->GetService<OclResourceService>(ref);
+  resources->GetContext();
 
-  // apply a bandpass filter, if requested
+  try
+  {
+    m_oclFilter->SetInput(input);
+    if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DAS)
+    {
+      if(m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASQuad, true);
+      else if(m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DASSphe, true);
+    }
+    else if (m_Conf.Algorithm == beamformingSettings::BeamformingAlgorithm::DMAS)
+    {
+      if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::QuadApprox)
+        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASQuad, true);
+      else if (m_Conf.DelayCalculationMethod == beamformingSettings::DelayCalc::Spherical)
+        m_oclFilter->SetAlgorithm(PhotoacousticOCLBeamformer::BeamformingAlgorithm::DMASSphe, true);
+    }
+    m_oclFilter->SetApodisation(ApodWindow, apodArraySize);
+    m_oclFilter->SetOutputDim(oclOutputDim);
+    m_oclFilter->Update();
+
+    auto out = m_oclFilter->GetOutput();
+    for (int i = 0; i < output->GetDimension(2); ++i)
+    {
+      mitk::ImageReadAccessor copy(out, out->GetSliceData(i));
+      output->SetSlice(copy.GetData(), i);
+    }
+ }
+ catch (mitk::Exception &e)
+ {
+   std::string errorMessage = "Caught unexpected exception ";
+   errorMessage.append(e.what());
+   MITK_ERROR << errorMessage;
+ }
+   
+    // apply a bandpass filter, if requested
   if (m_Conf.UseBP)
   {
     m_ProgressHandle(100, "applying bandpass");
@@ -256,7 +269,7 @@ void mitk::BeamformingFilter::GenerateData()
   m_TimeOfHeaderInitialization.Modified();
 
   auto end = std::chrono::high_resolution_clock::now();
-  MITK_INFO << "Beamforming of " << output->GetDimension(2) << " Images completed in " << ((double)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
+  MITK_INFO << "Beamforming of " << output->GetDimension(2) << " Images completed in " << ((float)std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count()) / 1000000 << "ms" << std::endl;
 }
 
 void mitk::BeamformingFilter::Configure(beamformingSettings settings)
@@ -264,9 +277,9 @@ void mitk::BeamformingFilter::Configure(beamformingSettings settings)
   m_Conf = settings;
 }
 
-double* mitk::BeamformingFilter::VonHannFunction(int samples)
+float* mitk::BeamformingFilter::VonHannFunction(int samples)
 {
-  double* ApodWindow = new double[samples];
+  float* ApodWindow = new float[samples];
 
   for (int n = 0; n < samples; ++n)
   {
@@ -276,9 +289,9 @@ double* mitk::BeamformingFilter::VonHannFunction(int samples)
   return ApodWindow;
 }
 
-double* mitk::BeamformingFilter::HammFunction(int samples)
+float* mitk::BeamformingFilter::HammFunction(int samples)
 {
-  double* ApodWindow = new double[samples];
+  float* ApodWindow = new float[samples];
 
   for (int n = 0; n < samples; ++n)
   {
@@ -288,9 +301,9 @@ double* mitk::BeamformingFilter::HammFunction(int samples)
   return ApodWindow;
 }
 
-double* mitk::BeamformingFilter::BoxFunction(int samples)
+float* mitk::BeamformingFilter::BoxFunction(int samples)
 {
-  double* ApodWindow = new double[samples];
+  float* ApodWindow = new float[samples];
 
   for (int n = 0; n < samples; ++n)
   {
@@ -300,31 +313,31 @@ double* mitk::BeamformingFilter::BoxFunction(int samples)
   return ApodWindow;
 }
 
-void mitk::BeamformingFilter::DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
+void mitk::BeamformingFilter::DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
-  double& inputS = inputDim[1];
-  double& inputL = inputDim[0];
+  float& inputS = inputDim[1];
+  float& inputL = inputDim[0];
 
-  double& outputS = outputDim[1];
-  double& outputL = outputDim[0];
+  float& outputS = outputDim[1];
+  float& outputL = outputDim[0];
 
   short AddSample = 0;
   short maxLine = 0;
   short minLine = 0;
-  double delayMultiplicator = 0;
-  double l_i = 0;
-  double s_i = 0;
+  float delayMultiplicator = 0;
+  float l_i = 0;
+  float s_i = 0;
 
-  double l = 0;
-  double x = 0;
-  double root = 0;
+  float l = 0;
+  float x = 0;
+  float root = 0;
 
-  double part = 0.07 * inputL;
-  double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
-  double apod_mult = 1;
+  float part = 0.07 * inputL;
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float apod_mult = 1;
 
-  double mult = 0;
+  float mult = 0;
   short usedLines = (maxLine - minLine);
 
   //quadratic delay
@@ -340,7 +353,7 @@ void mitk::BeamformingFilter::DASQuadraticLine(double* input, double* output, do
       part = 1;
 
     maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0);
+    minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
@@ -359,40 +372,40 @@ void mitk::BeamformingFilter::DASQuadraticLine(double* input, double* output, do
   }
 }
 
-void mitk::BeamformingFilter::DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
+void mitk::BeamformingFilter::DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
-  double& inputS = inputDim[1];
-  double& inputL = inputDim[0];
+  float& inputS = inputDim[1];
+  float& inputL = inputDim[0];
 
-  double& outputS = outputDim[1];
-  double& outputL = outputDim[0];
+  float& outputS = outputDim[1];
+  float& outputL = outputDim[0];
 
   short AddSample = 0;
   short maxLine = 0;
   short minLine = 0;
-  double delayMultiplicator = 0;
-  double l_i = 0;
-  double s_i = 0;
+  float delayMultiplicator = 0;
+  float l_i = 0;
+  float s_i = 0;
 
-  double l = 0;
-  double x = 0;
-  double root = 0;
+  float l = 0;
+  float x = 0;
+  float root = 0;
 
-  double part = 0.07 * inputL;
-  double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
-  double apod_mult = 1;
+  float part = 0.07 * inputL;
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float apod_mult = 1;
 
-  double mult = 0;
+  float mult = 0;
   short usedLines = (maxLine - minLine);
 
   //exact delay
 
-  l_i = (double)line / outputL * inputL;
+  l_i = (float)line / outputL * inputL;
 
   for (short sample = 0; sample < outputS; ++sample)
   {
-    s_i = (double)sample / outputS * inputS;
+    s_i = (float)sample / outputS * inputS;
 
     part = part_multiplicator*s_i;
 
@@ -400,7 +413,7 @@ void mitk::BeamformingFilter::DASSphericalLine(double* input, double* output, do
       part = 1;
 
     maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0);
+    minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
@@ -424,7 +437,7 @@ void mitk::BeamformingFilter::DASSphericalLine(double* input, double* output, do
 mitk::Image::Pointer mitk::BeamformingFilter::BandpassFilter(mitk::Image::Pointer data)
 {
   // do a fourier transform, multiply with an appropriate window for the filter, and transform back
-  typedef double PixelType;
+  typedef float PixelType;
   typedef itk::Image< PixelType, 3 > RealImageType;
   RealImageType::Pointer image;
 
@@ -446,9 +459,9 @@ mitk::Image::Pointer mitk::BeamformingFilter::BandpassFilter(mitk::Image::Pointe
     return data;
   }
 
-  double singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1)) / 2 / 1000;
-  double BoundHighPass = std::min(m_Conf.BPHighPass / singleVoxel, (double)data->GetDimension(1) / 2);
-  double BoundLowPass = std::min(m_Conf.BPLowPass / singleVoxel, (double)data->GetDimension(1) / 2 - BoundHighPass);
+  float singleVoxel = 1 / (m_Conf.RecordTime / data->GetDimension(1)) / 2 / 1000;
+  float BoundHighPass = std::min(m_Conf.BPHighPass / singleVoxel, (float)data->GetDimension(1) / 2);
+  float BoundLowPass = std::min(m_Conf.BPLowPass / singleVoxel, (float)data->GetDimension(1) / 2 - BoundHighPass);
 
   int center1 = ((-BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundLowPass;
   int center2 = ((-BoundLowPass - BoundHighPass + data->GetDimension(1) / 2) / 2) + BoundHighPass + data->GetDimension(1) / 2;
@@ -492,9 +505,9 @@ mitk::Image::Pointer mitk::BeamformingFilter::BandpassFilter(mitk::Image::Pointe
   return GrabItkImageMemory(inverseFFTFilter->GetOutput());
 }
 
-itk::Image<double, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
+itk::Image<float, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image::Pointer reference, int width, int center)
 {
-  double* imageData = new double[reference->GetDimension(0)*reference->GetDimension(1)];
+  float* imageData = new float[reference->GetDimension(0)*reference->GetDimension(1)];
 
   for (int sample = 0; sample < reference->GetDimension(1); ++sample)
   {
@@ -502,7 +515,7 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image:
   }
 
   /* // tukey window
-  double alpha = m_Conf.BPFalloff;
+  float alpha = m_Conf.BPFalloff;
 
   for (int n = 0; n < width; ++n)
   {
@@ -521,12 +534,12 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image:
   }*/
 
   // Butterworth-Filter
-  double d = center - width / 2;
-  double l = center + width / 2;
+  float d = center - width / 2;
+  float l = center + width / 2;
 
   for (int n = 0; n < reference->GetDimension(1); ++n)
   {
-    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((double)center - (double)n) / ((double)width / 2), 2 * m_Conf.ButterworthOrder));
+    imageData[reference->GetDimension(0)*n] = 1 / (1 + pow(((float)center - (float)n) / ((float)width / 2), 2 * m_Conf.ButterworthOrder));
   }
 
   // copy and paste to all lines
@@ -538,7 +551,7 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image:
     }
   }
 
-  typedef itk::Image< double, 3U >  ImageType;
+  typedef itk::Image< float, 3U >  ImageType;
   ImageType::RegionType region;
   ImageType::IndexType start;
   start.Fill(0);
@@ -560,7 +573,7 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image:
   ImageType::Pointer image = ImageType::New();
   image->SetRegions(region);
   image->Allocate();
-  image->FillBuffer(itk::NumericTraits<double>::Zero);
+  image->FillBuffer(itk::NumericTraits<float>::Zero);
   image->SetSpacing(SpacingItk);
 
   ImageType::IndexType pixelIndex;
@@ -585,32 +598,32 @@ itk::Image<double, 3U>::Pointer mitk::BeamformingFilter::BPFunction(mitk::Image:
   return image;
 }
 
-void mitk::BeamformingFilter::DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
+void mitk::BeamformingFilter::DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
-  double& inputS = inputDim[1];
-  double& inputL = inputDim[0];
+  float& inputS = inputDim[1];
+  float& inputL = inputDim[0];
 
-  double& outputS = outputDim[1];
-  double& outputL = outputDim[0];
+  float& outputS = outputDim[1];
+  float& outputL = outputDim[0];
 
   short AddSample1 = 0;
   short AddSample2 = 0;
   short maxLine = 0;
   short minLine = 0;
-  double delayMultiplicator = 0;
-  double l_i = 0;
-  double s_i = 0;
+  float delayMultiplicator = 0;
+  float l_i = 0;
+  float s_i = 0;
 
-  double l = 0;
-  double x = 0;
-  double root = 0;
+  float l = 0;
+  float x = 0;
+  float root = 0;
 
-  double part = 0.07 * inputL;
-  double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
-  double apod_mult = 1;
+  float part = 0.07 * inputL;
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float apod_mult = 1;
 
-  double mult = 0;
+  float mult = 0;
   short usedLines = (maxLine - minLine);
 
   //quadratic delay
@@ -626,7 +639,7 @@ void mitk::BeamformingFilter::DMASQuadraticLine(double* input, double* output, d
       part = 1;
 
     maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0);
+    minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);
@@ -663,32 +676,32 @@ void mitk::BeamformingFilter::DMASQuadraticLine(double* input, double* output, d
   }
 }
 
-void mitk::BeamformingFilter::DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize)
+void mitk::BeamformingFilter::DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize)
 {
-  double& inputS = inputDim[1];
-  double& inputL = inputDim[0];
+  float& inputS = inputDim[1];
+  float& inputL = inputDim[0];
 
-  double& outputS = outputDim[1];
-  double& outputL = outputDim[0];
+  float& outputS = outputDim[1];
+  float& outputL = outputDim[0];
 
   short AddSample1 = 0;
   short AddSample2 = 0;
   short maxLine = 0;
   short minLine = 0;
-  double delayMultiplicator = 0;
-  double l_i = 0;
-  double s_i = 0;
+  float delayMultiplicator = 0;
+  float l_i = 0;
+  float s_i = 0;
 
-  double l = 0;
-  double x = 0;
-  double root = 0;
+  float l = 0;
+  float x = 0;
+  float root = 0;
 
-  double part = 0.07 * inputL;
-  double tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
-  double part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
-  double apod_mult = 1;
+  float part = 0.07 * inputL;
+  float tan_phi = std::tan(m_Conf.Angle / 360 * 2 * M_PI);
+  float part_multiplicator = tan_phi * m_Conf.RecordTime / inputS * m_Conf.SpeedOfSound / m_Conf.Pitch * m_Conf.ReconstructionLines / m_Conf.TransducerElements;
+  float apod_mult = 1;
 
-  double mult = 0;
+  float mult = 0;
 
   short usedLines = (maxLine - minLine);
 
@@ -706,7 +719,7 @@ void mitk::BeamformingFilter::DMASSphericalLine(double* input, double* output, d
       part = 1;
 
     maxLine = (short)std::min((l_i + part) + 1, inputL);
-    minLine = (short)std::max((l_i - part), 0.0);
+    minLine = (short)std::max((l_i - part), 0.0f);
     usedLines = (maxLine - minLine);
 
     apod_mult = apodArraySize / (maxLine - minLine);

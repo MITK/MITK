@@ -19,7 +19,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "..\\..\\..\\OpenCL\\mitkOclImageToImageFilter.h"
 #include <itkObject.h>
-#ifdef HAHA
 namespace mitk
 {
 class OclImageToImageFilter;
@@ -48,6 +47,8 @@ public:
   */
   void SetInput(Image::Pointer image);
 
+  mitk::Image::Pointer GetOutput();
+
   /** Update the filter */
   void Update();
   
@@ -55,7 +56,21 @@ public:
   {
 	  m_OutputDim[0] = outputDim[0];
 	  m_OutputDim[1] = outputDim[1];
-	  m_OutputDim[2] = outputDim[2];
+    m_OutputDim[2] = outputDim[2];
+  }
+
+  void SetApodisation(float* apodisation, unsigned short apodArraySize)
+  {
+    m_ApodArraySize = apodArraySize;
+    m_Apodisation = apodisation;
+  }
+
+  enum BeamformingAlgorithm { DASQuad, DMASQuad, DASSphe, DMASSphe };
+
+  void SetAlgorithm(BeamformingAlgorithm algorithm, bool PA)
+  {
+    m_Algorithm = algorithm;
+    m_PAImage = PA;
   }
 
 protected:
@@ -73,7 +88,7 @@ protected:
 
   mitk::PixelType GetOutputType()
   {
-    return mitk::MakeScalarPixelType<double>();
+    return mitk::MakeScalarPixelType<float>();
   }
 
   int GetBytesPerElem()
@@ -83,12 +98,19 @@ protected:
 
   virtual us::Module* GetModule();
 
+
 private:
   /** The OpenCL kernel for the filter */
   cl_kernel m_PixelCalculation;
 
-  unsigned int m_outputDim[3];
+  unsigned int m_OutputDim[3];
+  unsigned short m_InputS;
+  unsigned short m_InputL;
+  float* m_Apodisation;
+  float lol = 5;
+  unsigned short m_ApodArraySize;
+  BeamformingAlgorithm m_Algorithm;
+  bool m_PAImage;
 };
 }
-#endif
 #endif

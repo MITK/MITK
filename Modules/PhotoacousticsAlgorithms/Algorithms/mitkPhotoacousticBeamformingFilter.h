@@ -36,11 +36,11 @@ namespace mitk {
 
     struct beamformingSettings
     {
-      double Pitch = 0.0003; // [m]
+      float Pitch = 0.0003; // [m]
       float SpeedOfSound = 1540; // [m/s]
       unsigned int SamplesPerLine = 2048;
       unsigned int ReconstructionLines = 128;
-      double RecordTime = 0.00006; // [s]
+      float RecordTime = 0.00006; // [s]
       unsigned int TransducerElements = 128;
       bool partial = false;
       unsigned int bounds[2] = { 0,0 };
@@ -54,10 +54,10 @@ namespace mitk {
       enum BeamformingAlgorithm {DMAS, DAS};
       BeamformingAlgorithm Algorithm = DAS;
 
-      double Angle = 10;
+      float Angle = 10;
       bool Photoacoustic = true;
-      double BPHighPass = 50;
-      double BPLowPass = 50;
+      float BPHighPass = 50;
+      float BPLowPass = 50;
       bool UseBP = false;
       unsigned int ButterworthOrder = 8;
     };
@@ -84,22 +84,22 @@ namespace mitk {
 
     std::function<void(int, std::string)> m_ProgressHandle;
 
-    double* VonHannFunction(int samples);
-    double* HammFunction(int samples);
-    double* BoxFunction(int samples);
+    float* VonHannFunction(int samples);
+    float* HammFunction(int samples);
+    float* BoxFunction(int samples);
 
-    void DASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
-    void DASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
+    void DASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
+    void DASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
 
-    void DMASQuadraticLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
-    void DMASSphericalLine(double* input, double* output, double inputDim[2], double outputDim[2], const short& line, double* apodisation, const short& apodArraySize);
+    void DMASQuadraticLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
+    void DMASSphericalLine(float* input, float* output, float inputDim[2], float outputDim[2], const short& line, float* apodisation, const short& apodArraySize);
 
     mitk::Image::Pointer BandpassFilter(mitk::Image::Pointer data);
-    itk::Image<double, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
+    itk::Image<float, 3U>::Pointer BPFunction(mitk::Image::Pointer reference, int width, int center);
 
-    double* m_OutputData;
-    double* m_InputData;
-    double* m_InputDataPuffer;
+    float* m_OutputData;
+    float* m_InputData;
+    float* m_InputDataPuffer;
 
     beamformingSettings m_Conf;
   };

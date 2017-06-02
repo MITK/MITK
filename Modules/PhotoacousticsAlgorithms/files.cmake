@@ -5,3 +5,10 @@ set(CPP_FILES
   
   Algorithms/OCL/mitkPhotoacousticOCLBeamformer.cpp
 )
+
+set(RESOURCE_FILES
+  DASQuadratic.cl
+  DMASQuadratic.cl
+  DASspherical.cl
+  DMASspherical.cl
+)

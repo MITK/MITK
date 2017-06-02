@@ -734,6 +734,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool)
     if (!seriesInstanceUid) {
       continue;
     }
+    
+    std::string sopClassUIDString(tagMap[tagSOPClassUID]);
+    if (sopClassUIDString == "1.2.840.10008.5.1.4.1.1.7") {
+      continue;
+    }
 
     /* sort out multi-frame
     if ( scanner.GetValue( fileIter->first , tagNumberOfFrames ) )

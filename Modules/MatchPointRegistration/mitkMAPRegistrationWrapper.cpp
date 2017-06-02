@@ -50,7 +50,7 @@ unsigned int mitk::MAPRegistrationWrapper::GetMovingDimensions() const
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot return moving dimension. Wrapper points to invalid registration (NULL).";
+        mitkThrow()<< "Error. Cannot return moving dimension. Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->getMovingDimensions();
 }
@@ -60,7 +60,7 @@ unsigned int mitk::MAPRegistrationWrapper::GetTargetDimensions() const
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot return target dimension. Wrapper points to invalid registration (NULL).";
+        mitkThrow()<< "Error. Cannot return target dimension. Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->getTargetDimensions();
 }
@@ -69,7 +69,7 @@ const mitk::MAPRegistrationWrapper::TagMapType& mitk::MAPRegistrationWrapper::Ge
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot return registration tags. Wrapper points to invalid registration (NULL).";
+        mitkThrow()<< "Error. Cannot return registration tags. Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->getTags();
 }
@@ -78,7 +78,7 @@ bool mitk::MAPRegistrationWrapper::GetTagValue(const TagType & tag, ValueType & 
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot return registration tag value. Wrapper points to invalid registration (NULL). Tag: " << tag;
+        mitkThrow()<< "Error. Cannot return registration tag value. Wrapper points to invalid registration (nullptr). Tag: " << tag;
     }
     return m_spRegistration->getTagValue(tag,value);
 }
@@ -87,7 +87,7 @@ bool mitk::MAPRegistrationWrapper::HasLimitedTargetRepresentation() const
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot determin HasLimitedTargetRepresentation(). Wrapper points to invalid registration (NULL).";
+        mitkThrow()<< "Error. Cannot determin HasLimitedTargetRepresentation(). Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->hasLimitedTargetRepresentation();
 }
@@ -96,7 +96,7 @@ bool mitk::MAPRegistrationWrapper::HasLimitedMovingRepresentation() const
 {
     if (m_spRegistration.IsNull())
     {
-        mitkThrow()<< "Error. Cannot determin HasLimitedMovingRepresentation(). Wrapper points to invalid registration (NULL).";
+        mitkThrow()<< "Error. Cannot determin HasLimitedMovingRepresentation(). Wrapper points to invalid registration (nullptr).";
     }
     return m_spRegistration->hasLimitedMovingRepresentation();
 }
@@ -121,7 +121,7 @@ void mitk::MAPRegistrationWrapper::PrintSelf (std::ostream &os, itk::Indent inde
     Superclass::PrintSelf(os,indent);
     if (m_spRegistration.IsNull())
     {
-        os<< "Error. Wrapper points to invalid registration (NULL).";
+        os<< "Error. Wrapper points to invalid registration (nullptr).";
     }
     else
     {

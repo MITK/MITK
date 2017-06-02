@@ -64,9 +64,9 @@ public:
 
   void tearDown()
   {
-    m_Image = NULL;
-    m_Image2D = NULL;
-    m_Surface = NULL;
+    m_Image = nullptr;
+    m_Image2D = nullptr;
+    m_Surface = nullptr;
   }
 };
 

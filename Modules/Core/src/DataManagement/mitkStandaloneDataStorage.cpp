@@ -48,7 +48,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
     if (!IsInitialized())
       throw std::logic_error("DataStorage not initialized");
     /* check if node is in its own list of sources */
-    if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
+    if ((parents != nullptr) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
       throw std::invalid_argument("Node is it's own parent");
     /* check if node already exists in StandaloneDataStorage */
     if (m_SourceNodes.find(node) != m_SourceNodes.end())
@@ -56,7 +56,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode *node, const mitk::DataStor
 
     /* create parent list if it does not exist */
     mitk::DataStorage::SetOfObjects::ConstPointer sp;
-    if (parents != NULL)
+    if (parents != nullptr)
       sp = parents;
     else
       sp = mitk::DataStorage::SetOfObjects::New();
@@ -95,7 +95,7 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode *node)
 {
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   // remove ITK modified event listener
@@ -171,7 +171,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   const NodePredicateBase *condition,
   bool onlyDirectlyRelated) const
 {
-  if (node == NULL)
+  if (node == nullptr)
     throw std::invalid_argument("invalid node");
 
   /* Either read direct relations directly from adjacency list */
@@ -220,7 +220,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
   /* now finally copy the results to a proper SetOfObjects variable exluding the initial node and checking the condition
    * if any is given */
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
-  if (condition != NULL)
+  if (condition != nullptr)
   {
     for (std::vector<mitk::DataNode::ConstPointer>::const_iterator resultIt = resultset.cbegin();
          resultIt != resultset.cend();

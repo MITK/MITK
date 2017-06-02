@@ -58,7 +58,7 @@ namespace itk {
   {
     if( m_NormalizationMethod == PV_GLOBAL_MAX )
     {
-      typename InputImageType::Pointer inputImagePointer = NULL;
+      typename InputImageType::Pointer inputImagePointer = nullptr;
       inputImagePointer = static_cast< InputImageType * >(
         this->ProcessObject::GetInput(0) );
 
@@ -79,7 +79,7 @@ namespace itk {
 
     //if(m_DoScaleGfa)
     {
-      typename InputImageType::Pointer inputImagePointer = NULL;
+      typename InputImageType::Pointer inputImagePointer = nullptr;
       inputImagePointer = static_cast< InputImageType * >(
         this->ProcessObject::GetInput(0) );
 
@@ -109,7 +109,7 @@ namespace itk {
     typedef itk::OrientationDistributionFunction<TOdfPixelType,NrOdfDirections> OdfType;
     typedef ImageRegionConstIterator< InputImageType > InputIteratorType;
     typedef typename InputImageType::PixelType         OdfVectorType;
-    typename InputImageType::Pointer inputImagePointer = NULL;
+    typename InputImageType::Pointer inputImagePointer = nullptr;
     inputImagePointer = static_cast< InputImageType * >(
       this->ProcessObject::GetInput(0) );
     InputIteratorType git(inputImagePointer, outputRegionForThread );

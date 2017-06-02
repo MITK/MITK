@@ -50,8 +50,8 @@ class US_ABI_LOCAL Activator : public ModuleActivator
 public:
 
   Activator()
-   : m_context(NULL)
-   , m_tracker(NULL)
+   : m_context(nullptr)
+   , m_tracker(nullptr)
   {}
 
   /**
@@ -95,7 +95,7 @@ public:
         break;
       }
       // If there is no spell checker, then say so.
-      else if (checker == NULL)
+      else if (checker == nullptr)
       {
         std::cout << "No spell checker available." << std::endl;
       }

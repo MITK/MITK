@@ -180,7 +180,7 @@ void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
   mitk::Image::Pointer mitkTestImage = mitk::IOUtil::LoadImage(imageFileName);
 
   // some format checking
-  mitk::Image::Pointer resultImg = NULL;
+  mitk::Image::Pointer resultImg = nullptr;
   if( mitkTestImage->GetDimension() <= 3 )
   {
     if( mitkTestImage->GetDimension() > 2 && mitkTestImage->GetDimension(2) == 1 )
@@ -271,7 +271,7 @@ void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string i
   toOCvConverter->SetImage(inputForIpl);
   IplImage* iplTestImage = toOCvConverter->GetOpenCVImage();
 
-  MITK_TEST_CONDITION_REQUIRED( iplTestImage != NULL, "Conversion to OpenCv IplImage successful!");
+  MITK_TEST_CONDITION_REQUIRED( iplTestImage != nullptr, "Conversion to OpenCv IplImage successful!");
 
   mitk::OpenCVToMitkImageFilter::Pointer toMitkConverter = mitk::OpenCVToMitkImageFilter::New();
   toMitkConverter->SetOpenCVImage(iplTestImage);

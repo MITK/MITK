@@ -42,7 +42,7 @@ int mitkTbssRoiNrrdImageReaderTest(int argc , char* argv[])
 
   mitk::TbssRoiImage* roiImg = roiReader->GetOutput();
 
-  MITK_TEST_CONDITION_REQUIRED(roiImg != NULL, "Testing that roiImg is not null");
+  MITK_TEST_CONDITION_REQUIRED(roiImg != nullptr, "Testing that roiImg is not null");
 
   mitk::TbssRoiImage::SizeType size = roiImg->GetLargestPossibleRegion().GetSize();
 

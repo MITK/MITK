@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
   mitk::Image::Pointer diffusionImage =  mitk::IOUtil::LoadImage(inputFile);
 
-  if (diffusionImage.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(diffusionImage)) // does NULL pointer check make sense after static cast ?
+  if (diffusionImage.IsNull() || !mitk::DiffusionPropertyHelper::IsDiffusionWeightedImage(diffusionImage)) // does nullptr pointer check make sense after static cast ?
   {
     MITK_ERROR << "Invalid Input Image. Must be DWI. Aborting.";
     return -1;

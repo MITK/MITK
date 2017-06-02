@@ -82,9 +82,9 @@ namespace mitk
     void ReinitEventProvider();
 
   protected:
-    RenderWindow(vtkRenderWindow *existingRenderWindow = NULL,
+    RenderWindow(vtkRenderWindow *existingRenderWindow = nullptr,
                  const char *name = "unnamed renderer",
-                 mitk::RenderingManager *rm = NULL,
+                 mitk::RenderingManager *rm = nullptr,
                  mitk::BaseRenderer::RenderingMode::Type rmtype = mitk::BaseRenderer::RenderingMode::Standard);
 
     void ResetView();

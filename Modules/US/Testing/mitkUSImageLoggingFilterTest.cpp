@@ -66,11 +66,11 @@ public:
 
   void tearDown() override
   {
-    m_TestFilter = NULL;
-    m_RandomRestImage1 = NULL;
-    m_RandomRestImage2 = NULL;
-    m_RealTestImage = NULL;
-    m_RandomSingleSliceImage = NULL;
+    m_TestFilter = nullptr;
+    m_RandomRestImage1 = nullptr;
+    m_RandomRestImage2 = nullptr;
+    m_RealTestImage = nullptr;
+    m_RandomSingleSliceImage = nullptr;
   }
 
   void TestInstantiation()

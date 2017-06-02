@@ -66,7 +66,7 @@ void mitk::TubeGraphVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   if (tubeGraph.IsNull() || tubeGraphProperty.IsNull())
   {
-    itkWarningMacro(<< "Input of tube graph mapper is NULL!");
+    itkWarningMacro(<< "Input of tube graph mapper is nullptr!");
     return;
   }
   // Check if the tube graph has changed; if the data has changed, generate the spheres and tubes new;
@@ -685,7 +685,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
     vtkSmartPointer<vtkPolyDataMapper> sphereMapper =
       dynamic_cast<vtkPolyDataMapper *>(ls->m_vtkSpheresActorMap[vertexDesc]->GetMapper());
 
-    if (sphereMapper != NULL)
+    if (sphereMapper != nullptr)
     {
       // first clip the sphere with the cylinder
       vtkSmartPointer<vtkClipPolyData> clipperSphere = vtkSmartPointer<vtkClipPolyData>::New();
@@ -716,7 +716,7 @@ void mitk::TubeGraphVtkMapper3D::ClipPolyData(mitk::TubeGraphVertex &vertex,
         vtkSmartPointer<vtkPolyDataMapper> tubeMapper =
           dynamic_cast<vtkPolyDataMapper *>(ls->m_vtkTubesActorMap[toBeClippedTube]->GetMapper());
 
-        if (tubeMapper != NULL)
+        if (tubeMapper != nullptr)
         {
           // first clip the sphere with the cylinder
           vtkSmartPointer<vtkClipPolyData> clipperTube = vtkSmartPointer<vtkClipPolyData>::New();
@@ -747,7 +747,7 @@ bool mitk::TubeGraphVtkMapper3D::ClipStructures()
   DataNode::Pointer node = this->GetDataNode();
   if (node.IsNull())
   {
-    itkWarningMacro(<< "associated node is NULL!");
+    itkWarningMacro(<< "associated node is nullptr!");
     return false;
   }
 

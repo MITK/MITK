@@ -46,7 +46,7 @@ static mitk::DataNode::Pointer GetTopLayerNode(const mitk::DataStorage::SetOfObj
     // find node with largest layer, that is the node shown on top in the render window
     for (unsigned int x = 0; x < nodes->size(); x++)
     {
-      if ( (nodes->at(x)->GetData()->GetGeometry() != NULL) &&
+      if ( (nodes->at(x)->GetData()->GetGeometry() != nullptr) &&
            nodes->at(x)->GetData()->GetGeometry()->IsInside(position) )
       {
         int layer = 0;
@@ -216,7 +216,7 @@ void QmitkImageNavigatorView::UpdateStatusBar()
         node->GetBoolProperty("binary", isBinary);
         if (isBinary)
         {
-          mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = this->GetDataStorage()->GetSources(node, NULL, true);
+          mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = this->GetDataStorage()->GetSources(node, nullptr, true);
           if (!sourcenodes->empty())
           {
             topSourceNode = GetTopLayerNode(sourcenodes, position, renderer);

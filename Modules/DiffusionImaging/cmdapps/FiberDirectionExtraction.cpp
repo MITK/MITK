@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
         mitk::FiberBundle::Pointer inputTractogram = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::LoadDataNode(fibFile)->GetData());
 
         // load/create mask image
-        ItkUcharImgType::Pointer itkMaskImage = NULL;
+        ItkUcharImgType::Pointer itkMaskImage = nullptr;
         if (maskImage.compare("")!=0)
         {
             std::cout << "Using mask image";

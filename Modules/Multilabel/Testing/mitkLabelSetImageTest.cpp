@@ -185,10 +185,10 @@ public:
   {
     // Test get non existing lset
     mitk::LabelSet::ConstPointer lset = m_LabelSetImage->GetLabelSet(10000);
-    CPPUNIT_ASSERT_MESSAGE("Non existing labelset is not NULL", lset.IsNull());
+    CPPUNIT_ASSERT_MESSAGE("Non existing labelset is not nullptr", lset.IsNull());
 
     lset = m_LabelSetImage->GetLabelSet(0);
-    CPPUNIT_ASSERT_MESSAGE("Existing labelset is NULL", lset.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("Existing labelset is nullptr", lset.IsNotNull());
   }
 
   void TestGetLabel()
@@ -214,11 +214,11 @@ public:
 
     // Try to get a non existing label
     mitk::Label *label3 = m_LabelSetImage->GetLabel(1000);
-    CPPUNIT_ASSERT_MESSAGE("Non existing label should be NULL", label3 == NULL);
+    CPPUNIT_ASSERT_MESSAGE("Non existing label should be nullptr", label3 == nullptr);
 
     // Try to get a label from a non existing layer
     label3 = m_LabelSetImage->GetLabel(200, 1000);
-    CPPUNIT_ASSERT_MESSAGE("Label from non existing layer should be NULL", label3 == NULL);
+    CPPUNIT_ASSERT_MESSAGE("Label from non existing layer should be nullptr", label3 == nullptr);
   }
 
   void TestSetExteriorLabel()
@@ -381,7 +381,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Wrong number of layers, after a layer was removed",
                            m_LabelSetImage->GetNumberOfLayers() == 0);
     CPPUNIT_ASSERT_MESSAGE("Check for existing layer failed", m_LabelSetImage->ExistLabelSet(0) == false);
-    CPPUNIT_ASSERT_MESSAGE("Active layers is not NULL although all layer have been removed",
+    CPPUNIT_ASSERT_MESSAGE("Active layers is not nullptr although all layer have been removed",
                            m_LabelSetImage->GetActiveLabelSet() == 0);
   }
 

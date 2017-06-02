@@ -103,7 +103,7 @@ namespace mitk
   {
     if (m_ImageIO.IsNull())
     {
-      mitkThrow() << "ITK ImageIOBase argument must not be NULL";
+      mitkThrow() << "ITK ImageIOBase argument must not be nullptr";
     }
 
     this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
@@ -172,7 +172,7 @@ namespace mitk
   {
     if (m_ImageIO.IsNull())
     {
-      mitkThrow() << "ITK ImageIOBase argument must not be NULL";
+      mitkThrow() << "ITK ImageIOBase argument must not be nullptr";
     }
 
     this->AbstractFileReader::SetMimeTypePrefix(IOMimeTypes::DEFAULT_BASE_NAME() + ".image.");
@@ -378,7 +378,7 @@ namespace mitk
 
     image->SetTimeGeometry(timeGeometry);
 
-    buffer = NULL;
+    buffer = nullptr;
     MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents() << std::endl;
 
     for (itk::MetaDataDictionary::ConstIterator iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
@@ -469,7 +469,7 @@ namespace mitk
   {
     const mitk::Image *image = dynamic_cast<const mitk::Image *>(this->GetInput());
 
-    if (image == NULL)
+    if (image == nullptr)
     {
       mitkThrow() << "Cannot write non-image data";
     }
@@ -635,7 +635,7 @@ namespace mitk
   {
     // Check if the image dimension is supported
     const Image *image = dynamic_cast<const Image *>(this->GetInput());
-    if (image == NULL)
+    if (image == nullptr)
     {
       // We cannot write a null object, DUH!
       return IFileWriter::Unsupported;

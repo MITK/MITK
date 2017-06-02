@@ -85,7 +85,7 @@ public:
 
   void tearDown() override
   {
-    m_Surface = NULL;
+    m_Surface = nullptr;
     m_Reference.clear();
   }
 

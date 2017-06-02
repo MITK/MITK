@@ -877,7 +877,7 @@ void UltrasoundCalibration::OnReset()
   if (m_Transformation.IsNull()) { m_Transformation = mitk::AffineTransform3D::New(); }
   m_Transformation->SetIdentity();
 
-  if (m_Node.IsNotNull() && (m_Node->GetData() != NULL) && (m_Node->GetData()->GetGeometry() != NULL))
+  if (m_Node.IsNotNull() && (m_Node->GetData() != nullptr) && (m_Node->GetData()->GetGeometry() != nullptr))
   {
     mitk::SlicedGeometry3D::Pointer sliced3d = dynamic_cast<mitk::SlicedGeometry3D*> (m_Node->GetData()->GetGeometry());
     mitk::PlaneGeometry::Pointer plane = const_cast<mitk::PlaneGeometry*> (sliced3d->GetGeometry2D(0));
@@ -1035,7 +1035,7 @@ double UltrasoundCalibration::ComputeFRE(mitk::PointSet::Pointer imageFiducials,
   for (unsigned int i = 0; i < imageFiducials->GetSize(); i++)
   {
     itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
-    if (transform != NULL)
+    if (transform != nullptr)
     {
       current_image_fiducial_point = transform->TransformPoint(imageFiducials->GetPoint(i)[0], imageFiducials->GetPoint(i)[1], imageFiducials->GetPoint(i)[2]);
     }

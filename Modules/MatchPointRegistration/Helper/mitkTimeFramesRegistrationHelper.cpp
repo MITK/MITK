@@ -145,7 +145,7 @@ mitk::TimeFramesRegistrationHelper::DoFrameRegistration(const mitk::Image* movin
   if (targetMask)
   {
     mitk::MaskedAlgorithmHelper maskHelper(m_Algorithm);
-    maskHelper.SetMasks(NULL, targetMask);
+    maskHelper.SetMasks(nullptr, targetMask);
   }
 
   return algHelper.GetRegistration();

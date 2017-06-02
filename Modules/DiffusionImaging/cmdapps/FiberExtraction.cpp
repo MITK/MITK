@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 
             if (operation.empty())
             {
-                result = inputTractogram->ExtractFiberSubset(input1, NULL);
+                result = inputTractogram->ExtractFiberSubset(input1, nullptr);
             }
             else if (operation=="NOT")
             {

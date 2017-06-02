@@ -42,7 +42,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent,
                                      mitk::VtkPropRenderer * /*renderer*/,
                                      mitk::RenderingManager *renderingManager,
                                      mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(NULL), m_MenuWidgetActivated(false), m_LayoutIndex(0)
+  : QVTKWidget(parent), m_ResendQtEvents(true), m_MenuWidget(nullptr), m_MenuWidgetActivated(false), m_LayoutIndex(0)
 {
   // Needed if QVTKWidget2 is used instead of QVTKWidget
   // this will be fixed in VTK source if change 18864 is accepted
@@ -213,7 +213,7 @@ void QmitkRenderWindow::DeferredHideMenu()
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, NULL, "LeaveRenderWindow");
+  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, nullptr, "LeaveRenderWindow");
 
   this->HandleEvent(internalEvent.GetPointer());
 

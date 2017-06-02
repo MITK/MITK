@@ -75,8 +75,8 @@ public:
 
   void tearDown()
   {
-  m_Serializer = NULL;
-  m_Deserializer = NULL;
+  m_Serializer = nullptr;
+  m_Deserializer = nullptr;
   try
     {
       std::remove(m_FileName1.c_str());

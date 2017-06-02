@@ -58,7 +58,7 @@ mitk::PropertyExtension::Pointer mitk::PropertyExtensions::GetExtension(const st
       return iter->second;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 bool mitk::PropertyExtensions::HasExtension(const std::string &propertyName, const std::string &className)

@@ -134,7 +134,7 @@ void mitk::IGTLMessageProvider::CreateOutputs()
     return;
 
   this->SetNumberOfIndexedOutputs(1);
-  if (this->GetOutput(0) == NULL)
+  if (this->GetOutput(0) == nullptr)
   {
     DataObjectPointer newOutput = this->MakeOutput(0);
     this->SetNthOutput(0, newOutput);
@@ -258,7 +258,7 @@ bool mitk::IGTLMessageProvider::IsStreaming()
 void mitk::IGTLMessageProvider::StartStreamingOfSource(IGTLMessageSource* src,
                                                        unsigned int fps)
 {
-  if ( src == NULL )
+  if ( src == nullptr )
     return;
 
   //so far the provider allows the streaming of a single source only
@@ -355,12 +355,12 @@ mitk::IGTLMessageSource::Pointer mitk::IGTLMessageProvider::GetFittingSource(con
       return curSource;
   }
   //no service reference was found or found service reference has no valid source
-  return NULL;
+  return nullptr;
 }
 
 void mitk::IGTLMessageProvider::Send(const mitk::IGTLMessage* msg)
 {
-  if (msg != NULL)
+  if (msg != nullptr)
     this->m_IGTLDevice->SendMessage(msg);
 }
 

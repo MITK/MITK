@@ -94,7 +94,7 @@ void mitk::USZonesInteractor::AddCenter(mitk::StateMachineAction*, mitk::Interac
 {
   // cast InteractionEvent to a position event in order to read out the mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL); // { return false; }
+  if (positionEvent == nullptr); // { return false; }
   mitk::DataNode::Pointer dataNode = this->GetDataNode();
   dataNode->SetBoolProperty(DATANODE_PROPERTY_CREATED, false);
 
@@ -120,7 +120,7 @@ void mitk::USZonesInteractor::ChangeRadius(mitk::StateMachineAction*, mitk::Inte
 {
   // cast InteractionEvent to a position event in order to read out the mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL); //{ return false; }
+  if (positionEvent == nullptr); //{ return false; }
   mitk::DataNode::Pointer curNode = this->GetDataNode();
   mitk::Point3D mousePosition = positionEvent->GetPositionInWorld();
 

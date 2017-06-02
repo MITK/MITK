@@ -96,7 +96,7 @@ bool QmitkNPOptitrackWidget::IsDeviceInstalled()
 
 void QmitkNPOptitrackWidget::SetOptitrackCalibrationFileClicked()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL, tr("Open Calibration File"), "/", "*.*").toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(nullptr, tr("Open Calibration File"), "/", "*.*").toLatin1().data();
   if (filename == "") { return; }
   else
   {

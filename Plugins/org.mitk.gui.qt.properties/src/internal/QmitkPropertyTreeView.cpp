@@ -61,7 +61,7 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
 
-  if (renderWindowPart != NULL)
+  if (renderWindowPart != nullptr)
   {
     QHash<QString, QmitkRenderWindow*> renderWindows = renderWindowPart->GetQmitkRenderWindows();
 
@@ -267,8 +267,8 @@ void QmitkPropertyTreeView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_Model->SetFilterProperties(filterProperties);
   m_Model->SetShowAliases(showAliases);
 
-  bool updateAliases = showAliases != (m_PropertyAliases != NULL);
-  bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != NULL);
+  bool updateAliases = showAliases != (m_PropertyAliases != nullptr);
+  bool updateDescriptions = showDescriptions != (m_PropertyDescriptions != nullptr);
   bool updateAliasesInDescription = showAliasesInDescription != m_ShowAliasesInDescription;
   bool updatePersistenceInDescription = showPersistenceInDescription != m_ShowPersistenceInDescription;
   bool updateDeveloperMode = developerMode != m_DeveloperMode;
@@ -319,11 +319,11 @@ void QmitkPropertyTreeView::OnPropertyNameChanged(const itk::EventObject&)
 {
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
-  if (propertyList != NULL)
+  if (propertyList != nullptr)
   {
     mitk::BaseProperty* nameProperty = propertyList->GetProperty("name");
 
-    if (nameProperty != NULL)
+    if (nameProperty != nullptr)
     {
       QString partName = "Properties (";
       partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
@@ -336,11 +336,11 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
 {
   mitk::PropertyList* propertyList = m_Model->GetPropertyList();
 
-  if (propertyList != NULL)
+  if (propertyList != nullptr)
   {
     mitk::BaseProperty* nameProperty = propertyList->GetProperty("name");
 
-    if (nameProperty != NULL)
+    if (nameProperty != nullptr)
       nameProperty->RemoveObserver(m_PropertyNameChangedTag);
 
     m_PropertyNameChangedTag = 0;
@@ -348,11 +348,11 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
 
   if (nodes.empty() || nodes.front().IsNull())
   {
-    m_SelectedNode = NULL;
+    m_SelectedNode = nullptr;
 
     this->SetPartName("Properties");
-    m_Model->SetPropertyList(NULL);
-    m_Delegate->SetPropertyList(NULL);
+    m_Model->SetPropertyList(nullptr);
+    m_Delegate->SetPropertyList(nullptr);
 
     m_Controls.newButton->setEnabled(false);
   }
@@ -360,7 +360,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
   {
     m_SelectedNode = nodes.front();
 
-    QString selectionClassName = m_SelectedNode->GetData() != NULL
+    QString selectionClassName = m_SelectedNode->GetData() != nullptr
       ? m_SelectedNode->GetData()->GetNameOfClass()
       : "";
 
@@ -368,11 +368,11 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
 
     mitk::PropertyList::Pointer propertyList;
 
-    if (m_Renderer == NULL && m_Controls.propertyListComboBox->currentText() == "Base data")
+    if (m_Renderer == nullptr && m_Controls.propertyListComboBox->currentText() == "Base data")
     {
-      propertyList = m_SelectedNode->GetData() != NULL
+      propertyList = m_SelectedNode->GetData() != nullptr
         ? m_SelectedNode->GetData()->GetPropertyList()
-        : NULL;
+        : nullptr;
     }
     else
     {
@@ -386,7 +386,7 @@ void QmitkPropertyTreeView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, c
 
     mitk::BaseProperty* nameProperty = m_SelectedNode->GetProperty("name");
 
-    if (nameProperty != NULL)
+    if (nameProperty != nullptr)
     {
       itk::ReceptorMemberCommand<QmitkPropertyTreeView>::Pointer command = itk::ReceptorMemberCommand<QmitkPropertyTreeView>::New();
       command->SetCallbackFunction(this, &QmitkPropertyTreeView::OnPropertyNameChanged);
@@ -440,7 +440,7 @@ void QmitkPropertyTreeView::OnPropertyListChanged(int index)
 
   m_Renderer = renderer != "common" && renderer != "Base data"
     ? this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer)->GetRenderer()
-    : NULL;
+    : nullptr;
 
   QList<mitk::DataNode::Pointer> nodes;
 

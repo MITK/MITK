@@ -181,17 +181,17 @@ mitk::IsoDoseLevelSet* DoseVisualizationPreferencePage::GetSelectedIsoLevelSet()
 
 void DoseVisualizationPreferencePage::UpdateLevelSetWidgets()
 {
-  this->m_Controls->btnAddLevel->setEnabled(this->GetSelectedIsoLevelSet()!=NULL);
+  this->m_Controls->btnAddLevel->setEnabled(this->GetSelectedIsoLevelSet()!=nullptr);
 
   QModelIndex selectedIndex = m_Controls->isoLevelSetView->currentIndex();
-  this->m_Controls->btnDelLevel->setEnabled(this->GetSelectedIsoLevelSet()!=NULL && selectedIndex.isValid());
+  this->m_Controls->btnDelLevel->setEnabled(this->GetSelectedIsoLevelSet()!=nullptr && selectedIndex.isValid());
 }
 
 void DoseVisualizationPreferencePage::UpdatePresetsWidgets()
 {
   m_Controls->listPresets->clear();
 
-  QListWidgetItem* selectedItem = NULL;
+  QListWidgetItem* selectedItem = nullptr;
   for (PresetMapType::iterator pos = m_Presets.begin(); pos != m_Presets.end(); ++pos)
   {
     QListWidgetItem* item = new QListWidgetItem(QString::fromStdString(pos->first));
@@ -215,7 +215,7 @@ void DoseVisualizationPreferencePage::UpdatePresetsWidgets()
 
   this->m_LevelSetModel->setIsoDoseLevelSet(this->GetSelectedIsoLevelSet());
 
-  m_Controls->btnDelPreset->setEnabled((m_Controls->listPresets->currentItem() != NULL) && (m_Controls->listPresets->count()>1));
+  m_Controls->btnDelPreset->setEnabled((m_Controls->listPresets->currentItem() != nullptr) && (m_Controls->listPresets->count()>1));
 }
 
 void DoseVisualizationPreferencePage::OnCurrentItemChanged ( QListWidgetItem * currentItem, QListWidgetItem * previousItem)

@@ -65,7 +65,7 @@ public:
   const mitk::DataNode *m_NodeAdded;
   const mitk::DataNode *m_NodeRemoved;
 
-  DSEventReceiver() : m_NodeAdded(NULL), m_NodeRemoved(NULL) {}
+  DSEventReceiver() : m_NodeAdded(nullptr), m_NodeRemoved(nullptr) {}
   void OnAdd(const mitk::DataNode *node) { m_NodeAdded = node; }
   void OnRemove(const mitk::DataNode *node) { m_NodeRemoved = node; }
 };
@@ -151,7 +151,7 @@ int mitkDataStorageTest(int argc, char *argv[])
   MITK_TEST_CONDITION_REQUIRED(argc > 1, "Testing correct test invocation");
   TestDataStorage(sds, argv[1]);
   // TODO: Add specific StandaloneDataStorage Tests here
-  sds = NULL;
+  sds = nullptr;
 
   MITK_TEST_END();
 }
@@ -162,7 +162,7 @@ int mitkDataStorageTest(int argc, char *argv[])
 void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 {
   /* DataStorage valid? */
-  MITK_TEST_CONDITION_REQUIRED(ds != NULL, "DataStorage valid?");
+  MITK_TEST_CONDITION_REQUIRED(ds != nullptr, "DataStorage valid?");
 
   // Take the ItkImageFile Reader for the .nrrd data format.
   // (was previously pic which is now deprecated format)
@@ -276,14 +276,14 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
       MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1),
                           "Requesting objects with specific data object")
     }
-    /* Requesting objects with NULL data */
+    /* Requesting objects with nullptr data */
     {
-      mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(NULL));
+      mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(nullptr));
       mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
       MITK_TEST_CONDITION((all->Size() == 3) && (std::find(all->begin(), all->end(), n3) != all->end()) &&
                             (std::find(all->begin(), all->end(), n4) != all->end()) &&
                             (std::find(all->begin(), all->end(), n5) != all->end()),
-                          "Requesting objects with NULL data");
+                          "Requesting objects with nullptr data");
     }
     /* Requesting objects that meet a conjunction criteria */
     {
@@ -330,7 +330,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     /* Requesting *direct* source objects */
     {
       const mitk::DataStorage::SetOfObjects::ConstPointer all =
-        ds->GetSources(n3, NULL, true); // Get direct parents of n3 (=n2)
+        ds->GetSources(n3, nullptr, true); // Get direct parents of n3 (=n2)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION((all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
                           "Requesting *direct* source objects");
@@ -339,7 +339,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     /* Requesting *all* source objects */
     {
       const mitk::DataStorage::SetOfObjects::ConstPointer all =
-        ds->GetSources(n3, NULL, false); // Get all parents of n3 (= n1 + n2)
+        ds->GetSources(n3, nullptr, false); // Get all parents of n3 (= n1 + n2)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION((all->Size() == 2) && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) &&
                             (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
@@ -349,7 +349,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     /* Requesting *all* sources of object with multiple parents */
     {
       const mitk::DataStorage::SetOfObjects::ConstPointer all =
-        ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3)
+        ds->GetSources(n4, nullptr, false); // Get all parents of n4 (= n1 + n2 + n3)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION(
         (all->Size() == 3) && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) &&
@@ -362,7 +362,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     /* Requesting *direct* derived objects */
     {
       const mitk::DataStorage::SetOfObjects::ConstPointer all =
-        ds->GetDerivations(n1, NULL, true); // Get direct childs of n1 (=n2)
+        ds->GetDerivations(n1, nullptr, true); // Get direct childs of n1 (=n2)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION((all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n2) !=
                                                  stlAll.end()) // check if n1 is the resultset
@@ -374,7 +374,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
     {
       const mitk::DataStorage::SetOfObjects::ConstPointer all =
-        ds->GetDerivations(n2, NULL, true); // Get direct childs of n2 (=n3 + n4)
+        ds->GetDerivations(n2, nullptr, true); // Get direct childs of n2 (=n3 + n4)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION(
         (all->Size() == 2) &&
@@ -388,7 +388,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     //* Requesting *all* derived objects */
     {
       const mitk::DataStorage::SetOfObjects::ConstPointer all =
-        ds->GetDerivations(n1, NULL, false); // Get all childs of n1 (=n2, n3, n4)
+        ds->GetDerivations(n1, nullptr, false); // Get all childs of n1 (=n2, n3, n4)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION((all->Size() == 3) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()) &&
                             (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) &&
@@ -401,7 +401,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
       parents1->InsertElement(0, n4); // make n1 derived from n4 (which is derived from n2, which is derived from n1)
       const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(
         n4,
-        NULL,
+        nullptr,
         false); // Get all parents of n4 (= n1 + n2 + n3, not n4 itself and not multiple versions of the nodes!)
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
       MITK_TEST_CONDITION(
@@ -503,7 +503,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
                         "Checking named node(std::string) method");
 
     /* Checking named node method with wrong name */
-    MITK_TEST_CONDITION(ds->GetNamedNode("This name does not exist") == NULL,
+    MITK_TEST_CONDITION(ds->GetNamedNode("This name does not exist") == nullptr,
                         "Checking named node method with wrong name");
 
     /* Checking named object method */
@@ -513,11 +513,11 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
                         "Checking named object(std::string) method");
 
     /* Checking named object method with wrong DataType */
-    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Surface>("Node 1 - Image Node") == NULL,
+    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Surface>("Node 1 - Image Node") == nullptr,
                         "Checking named object method with wrong DataType");
 
     /* Checking named object method with wrong name */
-    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("This name does not exist") == NULL,
+    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("This name does not exist") == nullptr,
                         "Checking named object method with wrong name");
 
     /* Checking GetNamedDerivedNode with valid name and direct derivation only */
@@ -525,7 +525,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
                         "Checking GetNamedDerivedNode with valid name & direct derivation only");
 
     /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
-    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("wrong name", n1, true) == NULL,
+    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("wrong name", n1, true) == nullptr,
                         "Checking GetNamedDerivedNode with invalid name & direct derivation only");
 
     /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
@@ -533,7 +533,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
                         "Checking GetNamedDerivedNode with invalid name & direct derivation only");
 
     /* Checking GetNamedDerivedNode with valid Name but direct derivation only */
-    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, true) == NULL,
+    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, true) == nullptr,
                         "Checking GetNamedDerivedNode with valid Name but direct derivation only");
 
     /* Checking GetNode with valid predicate */
@@ -544,7 +544,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     /* Checking GetNode with invalid predicate */
     {
       mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("PointSet"));
-      MITK_TEST_CONDITION(ds->GetNode(p) == NULL, "Checking GetNode with invalid predicate");
+      MITK_TEST_CONDITION(ds->GetNode(p) == nullptr, "Checking GetNode with invalid predicate");
     }
   } // object retrieval methods
   catch (...)
@@ -563,9 +563,9 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
       ds->Add(extra);
       MITK_TEST_CONDITION(ds->GetNamedNode("extra") == extra, "Adding extra node");
       ds->Remove(extra);
-      MITK_TEST_CONDITION((ds->GetNamedNode("extra") == NULL) && (refCountbeforeDS == watcher->GetReferenceCount()),
+      MITK_TEST_CONDITION((ds->GetNamedNode("extra") == nullptr) && (refCountbeforeDS == watcher->GetReferenceCount()),
                           "Checking removal of a node without relations");
-      extra = NULL;
+      extra = nullptr;
     }
 
     /* Checking removal of a node with a parent */
@@ -582,10 +582,10 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
                           ,
                           "Adding extra node");
       ds->Remove(extra);
-      MITK_TEST_CONDITION((ds->GetNamedNode("extra") == NULL) && (refCountbeforeDS == watcher->GetReferenceCount()) &&
+      MITK_TEST_CONDITION((ds->GetNamedNode("extra") == nullptr) && (refCountbeforeDS == watcher->GetReferenceCount()) &&
                             (ds->GetDerivations(n1)->Size() == 1),
                           "Checking removal of a node with a parent");
-      extra = NULL;
+      extra = nullptr;
     }
 
     /* Checking removal of a node with two parents */
@@ -608,13 +608,13 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
       ds->Remove(extra);
       MITK_TEST_CONDITION(
-        (ds->GetNamedNode("extra") == NULL) && (refCountbeforeDS == watcher->GetReferenceCount()) &&
+        (ds->GetNamedNode("extra") == nullptr) && (refCountbeforeDS == watcher->GetReferenceCount()) &&
           (ds->GetDerivations(n1)->Size() == 1) // after remove, only n2 should be derived from n1
           &&
           (ds->GetDerivations(n2)->Size() == 2) // after remove, only n3 and n4 should be derived from n2
         ,
         "Checking removal of a node with two parents");
-      extra = NULL;
+      extra = nullptr;
     }
 
     /* Checking removal of a node with two derived nodes */
@@ -642,14 +642,14 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
                           "add extra node");
 
       ds->Remove(extra);
-      MITK_TEST_CONDITION((ds->GetNamedNode("extra") == NULL) && (ds->GetNamedNode("d1") == d1) &&
+      MITK_TEST_CONDITION((ds->GetNamedNode("extra") == nullptr) && (ds->GetNamedNode("d1") == d1) &&
                             (ds->GetNamedNode("d2") == d2) && (refCountbeforeDS == watcher->GetReferenceCount()) &&
                             (ds->GetSources(d1)->Size() == 0) // after remove, d1 should not have a source anymore
                             &&
                             (ds->GetSources(d2)->Size() == 0) // after remove, d2 should not have a source anymore
                           ,
                           "Checking removal of a node with two derived nodes");
-      extra = NULL;
+      extra = nullptr;
     }
 
     /* Checking removal of a node with two parents and two derived nodes */
@@ -688,7 +688,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
       ds->Remove(extra);
       MITK_TEST_CONDITION(
-        (ds->GetNamedNode("extra") == NULL) && (ds->GetNamedNode("d1x") == d1) && (ds->GetNamedNode("d2x") == d2) &&
+        (ds->GetNamedNode("extra") == nullptr) && (ds->GetNamedNode("d1x") == d1) && (ds->GetNamedNode("d2x") == d2) &&
           (refCountbeforeDS == watcher->GetReferenceCount()) &&
           (ds->GetDerivations(n1)->Size() == 1) // after remove, only n2 should be derived from n1
           &&
@@ -699,7 +699,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
           (ds->GetSources(d2)->Size() == 0) // after remove, d2 should not have a source anymore
         ,
         "Checking removal of a node with two parents and two derived nodes");
-      extra = NULL;
+      extra = nullptr;
     }
   }
   catch (...)
@@ -728,7 +728,7 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
     p->push_back(n1);
     p->push_back(n3);
     ds->Add(extra, p);
-    extra = NULL;
+    extra = nullptr;
     ds->Remove(ds->GetNamedNode("extra"));
     MITK_TEST_CONDITION(watcher->GetReferenceCount() == 0, "Checking reference count of node after add and remove");
   }
@@ -760,16 +760,16 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
 
     ds->Remove(ds->GetDerivations(extra));
     MITK_TEST_CONDITION((ds->GetNamedNode("extra") == extra) &&
-                          (ds->GetNamedNode("d1y") == NULL) // d1y should be NULL now
+                          (ds->GetNamedNode("d1y") == nullptr) // d1y should be nullptr now
                           &&
-                          (ds->GetNamedNode("d2y") == NULL) // d2y should be NULL now
+                          (ds->GetNamedNode("d2y") == nullptr) // d2y should be nullptr now
                           &&
                           (refCountbeforeDS == watcherD1y->GetReferenceCount()),
                         "Checking removal of subset of two derived nodes from one parent node");
 
     ds->Remove(extra);
-    MITK_TEST_CONDITION((ds->GetNamedNode("extra") == NULL), "Checking removal of a parent node");
-    extra = NULL;
+    MITK_TEST_CONDITION((ds->GetNamedNode("extra") == nullptr), "Checking removal of a parent node");
+    extra = nullptr;
   }
 
   /* Checking GetGrouptags() */
@@ -804,14 +804,14 @@ void TestDataStorage(mitk::DataStorage *ds, std::string filename)
       mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode *>(&listener, &DSEventReceiver::OnAdd);
     ds->RemoveNodeEvent -=
       mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode *>(&listener, &DSEventReceiver::OnRemove);
-    listener.m_NodeAdded = NULL;
-    listener.m_NodeRemoved = NULL;
+    listener.m_NodeAdded = nullptr;
+    listener.m_NodeRemoved = nullptr;
     ds->Add(extra);
     ds->Remove(extra);
-    MITK_TEST_CONDITION((listener.m_NodeRemoved == NULL) && (listener.m_NodeAdded == NULL), "Checking RemoveListener");
+    MITK_TEST_CONDITION((listener.m_NodeRemoved == nullptr) && (listener.m_NodeAdded == nullptr), "Checking RemoveListener");
 
     std::cout << "Pointer handling after event handling: " << std::flush;
-    extra = NULL; // delete reference to the node. its memory should be freed now
+    extra = nullptr; // delete reference to the node. its memory should be freed now
     MITK_TEST_CONDITION(watcher->GetReferenceCount() == 0, "Pointer handling after event handling");
   }
   catch (...)

@@ -32,7 +32,7 @@ QmitkFreeSurferParcellationWidget::~QmitkFreeSurferParcellationWidget()
     this->disconnect( this->m_Handler, SIGNAL(clicked(QString)), this, SLOT(OnHandlerClicked(QString)) );
     this->disconnect( this->m_Handler, SIGNAL(changed(QString)), this, SLOT(OnHandlerHovered(QString)) );
     delete m_Handler;
-    m_Handler = NULL;
+    m_Handler = nullptr;
   }
 }
 

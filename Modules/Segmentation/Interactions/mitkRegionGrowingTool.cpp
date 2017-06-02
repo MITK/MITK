@@ -348,10 +348,10 @@ void mitk::RegionGrowingTool::OnMousePressedInside()
   //    // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
   //    // apply the skeletonization-and-cut algorithm
   //    // generate contour to remove
-  //    // set m_ReferenceSlice = NULL so nothing will happen during mouse move
+  //    // set m_ReferenceSlice = nullptr so nothing will happen during mouse move
   //    // remember to fill the contour with 0 in mouserelease
   //    mitkIpPicDescriptor* segmentationHistory = ipMITKSegmentationCreateGrowerHistory( workingPicSlice,
-  //    m_LastWorkingSeed, NULL ); // free again
+  //    m_LastWorkingSeed, nullptr ); // free again
   //    if (segmentationHistory)
   //    {
   //        tCutResult cutContour = ipMITKSegmentationGetCutPoints( workingPicSlice, segmentationHistory,
@@ -400,7 +400,7 @@ void mitk::RegionGrowingTool::OnMousePressedInside()
   //        m_FillFeedbackContour = false;
   //    }
 
-  //    m_ReferenceSlice = NULL;
+  //    m_ReferenceSlice = nullptr;
 
   //    return true;
 }

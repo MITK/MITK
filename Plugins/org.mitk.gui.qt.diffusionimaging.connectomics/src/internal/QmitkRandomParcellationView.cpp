@@ -154,7 +154,7 @@ void QmitkRandomParcellationView::SelectRandomNodes()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "No image available", "Please load and select an image before starting image processing.");
+    QMessageBox::information( nullptr, "No image available", "Please load and select an image before starting image processing.");
     return;
   }
 
@@ -235,7 +235,7 @@ void QmitkRandomParcellationView::GetRandomParcels( itk::Image<TPixel, VImageDim
   //WARNINGS
   if (numberNodes > numberVoxels )
   {
-    QMessageBox::information( NULL, "Smaller Number of Nodes", "The number of nodes is greater than the number of voxels. Please choose a smaller number!");
+    QMessageBox::information( nullptr, "Smaller Number of Nodes", "The number of nodes is greater than the number of voxels. Please choose a smaller number!");
     return;
   }
 
@@ -244,7 +244,7 @@ void QmitkRandomParcellationView::GetRandomParcels( itk::Image<TPixel, VImageDim
     int numberParcels = m_Controls.spinBoxNumberParcels->value();
     if (numberNodes<numberParcels )
     {
-      QMessageBox::information( NULL, "Smaller Number of Parcels", "The number of parcels is greater than the number of nodes. Please choose a smaller number of parcels!");
+      QMessageBox::information( nullptr, "Smaller Number of Parcels", "The number of parcels is greater than the number of nodes. Please choose a smaller number of parcels!");
       return;
     }
   }
@@ -254,7 +254,7 @@ void QmitkRandomParcellationView::GetRandomParcels( itk::Image<TPixel, VImageDim
     int sizeSmallestParcel = m_Controls.spinBoxSmallestParcel->value();
     if (sizeSmallestParcel > numberVoxels )
     {
-      QMessageBox::information( NULL, "Smaller Size", "The size of the smallest parcel is greater than the number of voxels. Please choose a smaller size!");
+      QMessageBox::information( nullptr, "Smaller Size", "The size of the smallest parcel is greater than the number of voxels. Please choose a smaller size!");
       return;
     }
   }

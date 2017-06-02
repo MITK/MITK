@@ -29,7 +29,7 @@ int mitkInteractionEventTest(int /*argc*/, char * /*argv*/ [])
    */
   MITK_TEST_BEGIN("InteractionEvent")
 
-  mitk::VtkPropRenderer::Pointer renderer = NULL;
+  mitk::VtkPropRenderer::Pointer renderer = nullptr;
 
   mitk::InteractionEvent::MouseButtons buttonStates =
     mitk::InteractionEvent::LeftMouseButton | mitk::InteractionEvent::RightMouseButton;

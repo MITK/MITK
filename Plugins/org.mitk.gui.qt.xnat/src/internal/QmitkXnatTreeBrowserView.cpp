@@ -907,7 +907,7 @@ void QmitkXnatTreeBrowserView::OnUploadResource(const QList<mitk::DataNode*>& dr
 
   //2. Save files locally
   //3. Upload file
-  mitk::DataNode* node = NULL;
+  mitk::DataNode* node = nullptr;
   foreach (node, droppedNodes)
   {
     mitk::BaseData* data = node->GetData();
@@ -1028,25 +1028,25 @@ void QmitkXnatTreeBrowserView::OnContextMenuRequested(const QPoint & pos)
   ctkXnatObject* xnatObject = m_TreeModel->xnatObject(index);
 
   bool downloadable = false;
-  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject)!=NULL;
-  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject)!=NULL;
+  downloadable |= dynamic_cast<ctkXnatFile*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatScan*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatScanFolder*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatAssessor*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatAssessorFolder*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatResource*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatReconstruction*>(xnatObject)!=nullptr;
+  downloadable |= dynamic_cast<ctkXnatReconstructionFolder*>(xnatObject)!=nullptr;
 
   bool canHaveResourceFolder = false;
-  canHaveResourceFolder |= dynamic_cast<ctkXnatProject*>(xnatObject) != NULL;
-  canHaveResourceFolder |=  dynamic_cast<ctkXnatSubject*>(xnatObject) != NULL;
-  canHaveResourceFolder |=  dynamic_cast<ctkXnatExperiment*>(xnatObject) != NULL;
-  canHaveResourceFolder |= dynamic_cast<ctkXnatResourceFolder*>(xnatObject) != NULL;
+  canHaveResourceFolder |= dynamic_cast<ctkXnatProject*>(xnatObject) != nullptr;
+  canHaveResourceFolder |=  dynamic_cast<ctkXnatSubject*>(xnatObject) != nullptr;
+  canHaveResourceFolder |=  dynamic_cast<ctkXnatExperiment*>(xnatObject) != nullptr;
+  canHaveResourceFolder |= dynamic_cast<ctkXnatResourceFolder*>(xnatObject) != nullptr;
 
   bool uploadFilePossible = false;
-  uploadFilePossible |= dynamic_cast<ctkXnatResource*>(xnatObject) != NULL;
-  uploadFilePossible |=  dynamic_cast<ctkXnatScan*>(xnatObject) != NULL;
-  uploadFilePossible |=  dynamic_cast<ctkXnatAssessor*>(xnatObject) != NULL;
+  uploadFilePossible |= dynamic_cast<ctkXnatResource*>(xnatObject) != nullptr;
+  uploadFilePossible |=  dynamic_cast<ctkXnatScan*>(xnatObject) != nullptr;
+  uploadFilePossible |=  dynamic_cast<ctkXnatAssessor*>(xnatObject) != nullptr;
 
   if (downloadable)
   {

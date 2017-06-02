@@ -50,8 +50,8 @@ QmitkIVIMView::QmitkIVIMView()
     : QmitkAbstractView()
     , m_Controls( 0 )
     , m_SliceObserverTag1(0), m_SliceObserverTag2(0), m_SliceObserverTag3(0)
-    , m_DiffusionImageNode(NULL)
-    , m_MaskImageNode(NULL)
+    , m_DiffusionImageNode(nullptr)
+    , m_MaskImageNode(nullptr)
     , m_Active(false)
     , m_Visible(false)
     , m_HoldUpdate(false)
@@ -243,8 +243,8 @@ void QmitkIVIMView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*part*/, 
     m_Controls->m_InputData->setTitle("Please Select Input Data");
     m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
-    m_MaskImageNode = NULL;
-    m_DiffusionImageNode = NULL;
+    m_MaskImageNode = nullptr;
+    m_DiffusionImageNode = nullptr;
 
     // iterate all selected objects, adjust warning visibility
     for (auto node: nodes)
@@ -305,7 +305,7 @@ void QmitkIVIMView::AutoThreshold()
     if (!nodes.front())
     {
         // Nothing selected. Inform the user and return
-        QMessageBox::information( NULL, "Template", "Please load and select a diffusion image before starting image processing.");
+        QMessageBox::information( nullptr, "Template", "Please load and select a diffusion image before starting image processing.");
         return;
     }
 
@@ -314,7 +314,7 @@ void QmitkIVIMView::AutoThreshold()
     if (!dimg)
     {
         // Nothing selected. Inform the user and return
-        QMessageBox::information( NULL, "Template", "No valid diffusion image was found.");
+        QMessageBox::information( nullptr, "Template", "No valid diffusion image was found.");
         return;
     }
 
@@ -404,7 +404,7 @@ void QmitkIVIMView::FittIVIMStart()
 
     if (!img)
     {
-        QMessageBox::information( NULL, "Template", "No valid diffusion image was found.");
+        QMessageBox::information( nullptr, "Template", "No valid diffusion image was found.");
         return;
     }
 
@@ -513,7 +513,7 @@ void QmitkIVIMView::OnSliceChanged(const itk::EventObject& /*e*/)
     m_Controls->m_KurtosisVisualizationWidget->setVisible(false);
 
     mitk::Image::Pointer diffusionImg = dynamic_cast<mitk::Image*>(m_DiffusionImageNode->GetData());
-    mitk::Image::Pointer maskImg = NULL;
+    mitk::Image::Pointer maskImg = nullptr;
     if (m_MaskImageNode.IsNotNull())
         maskImg = dynamic_cast<mitk::Image*>(m_MaskImageNode->GetData());
 
@@ -840,8 +840,8 @@ void QmitkIVIMView::OutputToDatastorage(const QList<mitk::DataNode::Pointer>& no
     m_Controls->m_InputData->setTitle("Please Select Input Data");
     m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
     m_Controls->m_MaskImageLabel->setText("<font color='grey'>optional</font>");
-    m_MaskImageNode = NULL;
-    m_DiffusionImageNode = NULL;
+    m_MaskImageNode = nullptr;
+    m_DiffusionImageNode = nullptr;
 
 }
 
@@ -971,21 +971,21 @@ void QmitkIVIMView::Visible()
         mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
         command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+        m_SliceObserverTag1 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 
     {
         mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
         command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+        m_SliceObserverTag2 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 
     {
         mitk::SliceNavigationController* slicer = renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController();
         itk::ReceptorMemberCommand<QmitkIVIMView>::Pointer command = itk::ReceptorMemberCommand<QmitkIVIMView>::New();
         command->SetCallbackFunction( this, &QmitkIVIMView::OnSliceChanged );
-        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
+        m_SliceObserverTag3 = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), command );
     }
 }
 

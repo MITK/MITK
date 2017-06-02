@@ -89,21 +89,21 @@ namespace mitk {
 
     /**
      * @return Returns the tracking tool at the position "number"
-     *         in the storage. Returns NULL if there is no
+     *         in the storage. Returns nullptr if there is no
      *         tracking tool at this position.
      */
     mitk::NavigationTool::Pointer GetTool(int number);
 
     /**
      * @return Returns the tracking tool with the given identifier.
-     *         Returns NULL if there is no
+     *         Returns nullptr if there is no
      *         tracking tool with this identifier in the storage.
      */
     mitk::NavigationTool::Pointer GetTool(std::string identifier);
 
     /**
      * @return Returns the tracking tool with the given name.
-     *         Returns NULL if there is no
+     *         Returns nullptr if there is no
      *         tracking tool with this name in the storage.
      */
     mitk::NavigationTool::Pointer GetToolByName(std::string name);
@@ -137,7 +137,7 @@ namespace mitk {
 
     /**
      * @return Returns the corresponding data storage if one is set to this NavigationToolStorage.
-     *         Returns NULL if none is set.
+     *         Returns nullptr if none is set.
      */
     itkGetMacro(DataStorage,mitk::DataStorage::Pointer);
 

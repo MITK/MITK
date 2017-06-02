@@ -79,7 +79,7 @@ public:
   ///
   mitk::DataStorage::Pointer GetDataStorage() const;
   ///
-  /// \brief Return the predicate (may be NULL) that is responsible for the _DataNode selection of this ComboBox.
+  /// \brief Return the predicate (may be nullptr) that is responsible for the _DataNode selection of this ComboBox.
   ///
   const mitk::NodePredicateBase::ConstPointer GetPredicate() const;
   ///
@@ -110,7 +110,7 @@ public:
   ///
   /// \brief Set the predicate for this ComboBox. (QmitkDataStorageComboBox is now owner of the predicate)
   ///
-  /// If predicate is NULL all nodes will be selected. If predicate changes the whole combobox will be resetted.
+  /// If predicate is nullptr all nodes will be selected. If predicate changes the whole combobox will be resetted.
   void SetPredicate(const mitk::NodePredicateBase *_Predicate);
   ///
   /// Adds a node to the ComboBox. Gets called everytime a DataStorage Add Event was thrown.

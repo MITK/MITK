@@ -65,10 +65,10 @@ public:
   void tearDown()
   {
     // destroy all objects
-    m_TestPointSetNode->SetDataInteractor(NULL);
-    m_TestPointSetNode = NULL;
-    m_TestPointSet = NULL;
-    m_DataInteractor = NULL;
+    m_TestPointSetNode->SetDataInteractor(nullptr);
+    m_TestPointSetNode = nullptr;
+    m_TestPointSet = nullptr;
+    m_DataInteractor = nullptr;
   }
 
   void AddPointInteraction()

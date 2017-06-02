@@ -133,8 +133,8 @@ void QmitkTubeGraphView::OnActiveGraphChanged(int)
   }
   else
   {
-    m_ActiveTubeGraph = NULL;
-    m_ActiveProperty = NULL;
+    m_ActiveTubeGraph = nullptr;
+    m_ActiveProperty = nullptr;
     this->SetTabsEnable(false);
 
   }

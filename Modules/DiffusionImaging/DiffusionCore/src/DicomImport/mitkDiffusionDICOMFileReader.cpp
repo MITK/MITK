@@ -213,7 +213,7 @@ void mitk::DiffusionDICOMFileReader
       const char* ch_vendor = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_vendor );
       const char* ch_image_type = gdcmScanner.GetValue( frame_0->Filename.c_str(), t_imagetype );
 
-      if( ch_vendor == NULL || ch_image_type == NULL )
+      if( ch_vendor == nullptr || ch_image_type == nullptr )
       {
         MITK_WARN << "Unable to retrieve vendor/image information from " << frame_0->Filename.c_str() << "\n" <<
                      "Output " << outputidx+1 << " is not valid, skipping analysis.";

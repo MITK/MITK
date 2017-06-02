@@ -114,7 +114,7 @@ public:
   virtual void NodeAddedInDataStorage(const mitk::DataNode* node);
 
   virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
-    const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
+    const char *propertyKey = nullptr, mitk::BaseProperty *property = nullptr );
 
   void PlanarFigureInitialized();
 
@@ -178,7 +178,7 @@ protected:
   /** \brief Removes any cached images which are no longer referenced elsewhere. */
   void RemoveOrphanImages();
 
-  void Select( mitk::DataNode::Pointer node, bool clearMaskOnFirstArgNULL=false, bool clearImageOnFirstArgNULL=false );
+  void Select( mitk::DataNode::Pointer node, bool clearMaskOnFirstArgnullptr=false, bool clearImageOnFirstArgnullptr=false );
 
   void SetMeasurementInfoToRenderWindow(const QString& text);
 

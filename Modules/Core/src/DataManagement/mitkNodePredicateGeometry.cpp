@@ -21,19 +21,19 @@ See LICENSE.txt or http://www.mitk.org for details.
 mitk::NodePredicateGeometry::NodePredicateGeometry(const BaseGeometry* refGeometry, TimePointType relevantTimePoint)
   : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(relevantTimePoint), m_UseTimePoint(true), m_CheckPrecision(mitk::eps)
 {
-  if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is NULL pointer.";
+  if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }
 
 mitk::NodePredicateGeometry::NodePredicateGeometry(const BaseGeometry* refGeometry)
   : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(mitk::eps)
 {
-  if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is NULL pointer.";
+  if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }
 
 mitk::NodePredicateGeometry::NodePredicateGeometry(const TimeGeometry* refGeometry)
   : m_RefGeometry(nullptr), m_RefTimeGeometry(refGeometry), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(mitk::eps)
 {
-  if (m_RefTimeGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is NULL pointer.";
+  if (m_RefTimeGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }
 
 mitk::NodePredicateGeometry::~NodePredicateGeometry()

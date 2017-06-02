@@ -55,8 +55,8 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   // this bug, the geometry is set to identity for the saving progress and restored later.
   mitk::BaseGeometry::Pointer geometryBackup;
   if (  Tool->GetDataNode().IsNotNull()
-        && (Tool->GetDataNode()->GetData()!=NULL)
-        && (Tool->GetDataNode()->GetData()->GetGeometry()!=NULL)
+        && (Tool->GetDataNode()->GetData()!=nullptr)
+        && (Tool->GetDataNode()->GetData()->GetGeometry()!=nullptr)
         )
       {
       geometryBackup = Tool->GetDataNode()->GetData()->GetGeometry()->Clone();
@@ -116,7 +116,7 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
-    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=NULL) thisTool->SetData(Tool->GetDataNode()->GetData());
+    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=nullptr) thisTool->SetData(Tool->GetDataNode()->GetData());
 
   //Tool Landmarks
     thisTool->AddProperty("ToolRegistrationLandmarks",mitk::StringProperty::New(ConvertPointSetToString(Tool->GetToolRegistrationLandmarks())));
@@ -130,7 +130,7 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     }
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:
-    thisTool->ReplaceProperty("material",NULL);
+    thisTool->ReplaceProperty("material",nullptr);
 
 
   return thisTool;

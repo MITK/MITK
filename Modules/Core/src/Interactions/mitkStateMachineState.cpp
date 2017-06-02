@@ -55,7 +55,7 @@ mitk::StateMachineTransition::Pointer mitk::StateMachineState::GetTransition(con
 
   if (transitions.empty())
   {
-    return NULL;
+    return nullptr;
   }
   else
   {

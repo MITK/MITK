@@ -78,7 +78,7 @@ mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::AddTool(const char* toolNam
   mitk::OpenIGTLinkTrackingTool::Pointer t;// = mitk::OpenIGTLinkTrackingTool::New();
   //TODO: Implement
   if (this->InternalAddTool(t) == false)
-    return NULL;
+    return nullptr;
   return t.GetPointer();
 }
 
@@ -369,7 +369,7 @@ unsigned int mitk::OpenIGTLinkTrackingDevice::GetToolCount() const
 mitk::TrackingTool* mitk::OpenIGTLinkTrackingDevice::GetTool(unsigned int toolNumber) const
 {
   if (toolNumber >= this->GetToolCount())
-    return NULL;
+    return nullptr;
   else
     return this->m_AllTools[toolNumber];
 }

@@ -54,7 +54,7 @@ namespace mitk
 
     /**
     * @brief Set the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
-    * of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-value.
+    * of the @a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-value.
     *
     * @warning Change in semantics since Aug 25th 2006. Check your usage of this method if you do
     *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
@@ -67,9 +67,9 @@ namespace mitk
 
     /**
     * @brief Replace the property (instance of BaseProperty) with key @a propertyKey in the PropertyList
-    * of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-reference.
+    * of the @a renderer (if nullptr, use BaseRenderer-independent PropertyList). This is set-by-reference.
     *
-    * If @a renderer is @a NULL the property is set in the BaseRenderer-independent
+    * If @a renderer is @a nullptr the property is set in the BaseRenderer-independent
     * PropertyList of this Annotation.
     * @sa GetProperty
     * @sa m_PropertyList
@@ -81,7 +81,7 @@ namespace mitk
     * @brief Add the property (instance of BaseProperty) if it does
     * not exist (or always if \a overwrite is \a true)
     * with key @a propertyKey in the PropertyList
-    * of the @a renderer (if NULL, use BaseRenderer-independent
+    * of the @a renderer (if nullptr, use BaseRenderer-independent
     * PropertyList). This is set-by-value.
     *
     * For \a overwrite == \a false the property is \em not changed
@@ -116,7 +116,7 @@ namespace mitk
     * @brief Get the property (instance of BaseProperty) with key @a propertyKey from the PropertyList
     * of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
     *
-    * If @a renderer is @a NULL or the @a propertyKey cannot be found
+    * If @a renderer is @a nullptr or the @a propertyKey cannot be found
     * in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
     * PropertyList of this Annotation is queried.
     * @sa GetPropertyList
@@ -129,7 +129,7 @@ namespace mitk
     * @brief Get the property of type T with key @a propertyKey from the PropertyList
     * of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
     *
-    * If @a renderer is @a NULL or the @a propertyKey cannot be found
+    * If @a renderer is @a nullptr or the @a propertyKey cannot be found
     * in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
     * PropertyList of this Annotation is queried.
     * @sa GetPropertyList
@@ -147,7 +147,7 @@ namespace mitk
     * @brief Get the property of type T with key @a propertyKey from the PropertyList
     * of the @a renderer, if available there, otherwise use the BaseRenderer-independent PropertyList.
     *
-    * If @a renderer is @a NULL or the @a propertyKey cannot be found
+    * If @a renderer is @a nullptr or the @a propertyKey cannot be found
     * in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
     * PropertyList of this Annotation is queried.
     * @sa GetPropertyList

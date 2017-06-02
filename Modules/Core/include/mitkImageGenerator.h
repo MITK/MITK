@@ -104,7 +104,7 @@ namespace mitk
       output->Initialize(output_type, reference->GetDimension(), reference->GetDimensions());
 
       // get a pointer to the image buffer to write into
-      TPixelType *imageBuffer = NULL;
+      TPixelType *imageBuffer = nullptr;
       try
       {
         mitk::ImageWriteAccessor writeAccess(output);

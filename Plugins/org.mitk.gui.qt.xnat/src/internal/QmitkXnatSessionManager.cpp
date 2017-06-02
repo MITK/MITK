@@ -50,7 +50,7 @@ QmitkXnatSessionManager::~QmitkXnatSessionManager()
 void QmitkXnatSessionManager::OpenXnatSession()
 {
   ctkXnatSession* session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(m_SessionRegistration.GetReference());
-  if(session == NULL) return;
+  if(session == nullptr) return;
 
   if(!session->isOpen())
   {

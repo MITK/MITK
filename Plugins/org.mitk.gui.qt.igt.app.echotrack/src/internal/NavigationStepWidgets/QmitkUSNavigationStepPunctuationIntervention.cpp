@@ -259,7 +259,7 @@ bool QmitkUSNavigationStepPunctuationIntervention::CheckSphereLineIntersection(m
   double lineP0[3] = {lineStart[0], lineStart[1], lineStart[2]};
   double lineP1[3] = {lineEnd[0], lineEnd[1], lineEnd[2]};
 
-  m_OBBTree->IntersectWithLine(lineP0, lineP1, m_IntersectPoints, NULL);
+  m_OBBTree->IntersectWithLine(lineP0, lineP1, m_IntersectPoints, nullptr);
 
   if (m_IntersectPoints->GetNumberOfPoints() > 0) {return true;}
   else {return false;}

@@ -53,7 +53,7 @@ const std::string QmitkMITKSurfaceMaterialEditorView::VIEW_ID = "org.mitk.views.
 
 QmitkMITKSurfaceMaterialEditorView::QmitkMITKSurfaceMaterialEditorView()
 : QmitkAbstractView(),
-  m_Controls(NULL)
+  m_Controls(nullptr)
 {
   fixedProperties.push_back( "shader" );
   fixedProperties.push_back( "material.representation" );

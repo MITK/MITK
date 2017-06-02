@@ -44,7 +44,7 @@ namespace itk {
 template< class T, class TG, class TO, int L, int NODF>
 AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 ::AnalyticalDiffusionQballReconstructionImageFilter() :
-    m_GradientDirectionContainer(NULL),
+    m_GradientDirectionContainer(nullptr),
     m_NumberOfGradientDirections(0),
     m_NumberOfBaselineImages(1),
     m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
@@ -319,7 +319,7 @@ void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
 
     typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
     typedef typename GradientImagesType::PixelType         GradientVectorType;
-    typename GradientImagesType::Pointer gradientImagePointer = NULL;
+    typename GradientImagesType::Pointer gradientImagePointer = nullptr;
 
     // Would have liked a dynamic_cast here, but seems SGI doesn't like it
     // The enum will ensure that an inappropriate cast is not done

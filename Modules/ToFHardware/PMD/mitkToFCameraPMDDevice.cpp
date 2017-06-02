@@ -22,7 +22,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk
 {
   ToFCameraPMDDevice::ToFCameraPMDDevice() :
-    m_SourceDataBuffer(NULL), m_SourceDataArray(NULL)
+    m_SourceDataBuffer(nullptr), m_SourceDataArray(nullptr)
   {
   }
 
@@ -110,16 +110,16 @@ namespace mitk
   {
     /* extract this pointer from Thread Info structure */
     struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-    if (pInfo == NULL)
+    if (pInfo == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
-    if (pInfo->UserData == NULL)
+    if (pInfo->UserData == nullptr)
     {
       return ITK_THREAD_RETURN_VALUE;
     }
     ToFCameraPMDDevice* toFCameraDevice = (ToFCameraPMDDevice*)pInfo->UserData;
-    if (toFCameraDevice!=NULL)
+    if (toFCameraDevice!=nullptr)
     {
       mitk::RealTimeClock::Pointer realTimeClock;
       realTimeClock = mitk::RealTimeClock::New();

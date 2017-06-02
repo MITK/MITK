@@ -111,16 +111,16 @@ inline bool my_isnan(float x)
 
 QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*parent*/, const char * /*name*/)
     : QmitkAbstractView(),
-      m_Controls( NULL ),
-      m_TimeStepperAdapter( NULL ),
+      m_Controls( nullptr ),
+      m_TimeStepperAdapter( nullptr ),
       m_MeasurementInfoRenderer(0),
       m_MeasurementInfoAnnotation(0),
       m_SelectedImageNodes(  ),
-      m_SelectedImage( NULL ),
-      m_SelectedMaskNode( NULL ),
-      m_SelectedImageMask( NULL ),
+      m_SelectedImage( nullptr ),
+      m_SelectedMaskNode( nullptr ),
+      m_SelectedImageMask( nullptr ),
       m_SelectedPlanarFigureNodes(0),
-      m_SelectedPlanarFigure( NULL ),
+      m_SelectedPlanarFigure( nullptr ),
       m_IsTensorImage(false),
       m_FAImage(0),
       m_RDImage(0),
@@ -131,8 +131,8 @@ QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*paren
       m_DirectionComp1Image(0),
       m_DirectionComp2Image(0),
       m_AngularErrorImage(0),
-      m_SelectedRenderWindow(NULL),
-      m_LastRenderWindow(NULL),
+      m_SelectedRenderWindow(nullptr),
+      m_LastRenderWindow(nullptr),
       m_ImageObserverTag( -1 ),
       m_ImageMaskObserverTag( -1 ),
       m_PlanarFigureObserverTag( -1 ),
@@ -141,7 +141,7 @@ QmitkPartialVolumeAnalysisView::QmitkPartialVolumeAnalysisView(QObject * /*paren
       m_GaussianSigmaChangedSliding(false),
       m_NumberBinsSliding(false),
       m_UpsamplingChangedSliding(false),
-      m_ClusteringResult(NULL),
+      m_ClusteringResult(nullptr),
       m_EllipseCounter(0),
       m_RectangleCounter(0),
       m_PolygonCounter(0),
@@ -193,7 +193,7 @@ QmitkPartialVolumeAnalysisView::~QmitkPartialVolumeAnalysisView()
 
 void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
 {
-    if (m_Controls == NULL)
+    if (m_Controls == nullptr)
     {
         m_Controls = new Ui::QmitkPartialVolumeAnalysisViewControls;
         m_Controls->setupUi(parent);
@@ -242,7 +242,7 @@ void QmitkPartialVolumeAnalysisView::CreateQtPartControl(QWidget *parent)
     this->GetDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkPartialVolumeAnalysisView
                                                       , const mitk::DataNode*>( this, &QmitkPartialVolumeAnalysisView::NodeAddedInDataStorage ) );
 
-    Select(NULL,true,true);
+    Select(nullptr,true,true);
 
     SetAdvancedVisibility();
 }
@@ -549,7 +549,7 @@ void QmitkPartialVolumeAnalysisView::AddFigureToDataStorage(mitk::PlanarFigure* 
     newNode->SetData(figure);
 
     // Add custom property, if available
-    if ( (propertyKey != NULL) && (property != NULL) )
+    if ( (propertyKey != nullptr) && (property != nullptr) )
     {
         newNode->AddProperty( propertyKey, property );
     }
@@ -648,14 +648,14 @@ void QmitkPartialVolumeAnalysisView::OnSelectionChanged(berry::IWorkbenchPart::P
             mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         }
 
-        Select(NULL, true, true);
+        Select(nullptr, true, true);
     }
 
     for (int i=0; i<nodes.size(); i++)
         Select(nodes.at(i));
 }
 
-void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool clearMaskOnFirstArgNULL, bool clearImageOnFirstArgNULL )
+void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool clearMaskOnFirstArgnullptr, bool clearImageOnFirstArgnullptr )
 {
     // Clear any unreferenced images
     this->RemoveOrphanImages();
@@ -665,7 +665,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
     {
         somethingChanged = true;
 
-        if(clearMaskOnFirstArgNULL)
+        if(clearMaskOnFirstArgnullptr)
         {
             if ( (m_SelectedImageMask.IsNotNull()) && (m_ImageMaskObserverTag >= 0) )
             {
@@ -685,17 +685,17 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
                 m_InitializedObserverTag = -1;
             }
 
-            m_SelectedPlanarFigure = NULL;
+            m_SelectedPlanarFigure = nullptr;
             m_SelectedPlanarFigureNodes->RemoveAllNodes();
             m_CurrentFigureNodeInitialized = false;
             m_SelectedRenderWindow = 0;
 
-            m_SelectedMaskNode = NULL;
-            m_SelectedImageMask = NULL;
+            m_SelectedMaskNode = nullptr;
+            m_SelectedImageMask = nullptr;
 
         }
 
-        if(clearImageOnFirstArgNULL)
+        if(clearImageOnFirstArgnullptr)
         {
             if ( (m_SelectedImage.IsNotNull()) && (m_ImageObserverTag >= 0) )
             {
@@ -704,17 +704,17 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
             }
 
             m_SelectedImageNodes->RemoveAllNodes();
-            m_SelectedImage = NULL;
+            m_SelectedImage = nullptr;
 
             m_IsTensorImage = false;
-            m_FAImage = NULL;
-            m_RDImage = NULL;
-            m_ADImage = NULL;
-            m_MDImage = NULL;
-            m_CAImage = NULL;
-            m_DirectionComp1Image = NULL;
-            m_DirectionComp2Image = NULL;
-            m_AngularErrorImage = NULL;
+            m_FAImage = nullptr;
+            m_RDImage = nullptr;
+            m_ADImage = nullptr;
+            m_MDImage = nullptr;
+            m_CAImage = nullptr;
+            m_DirectionComp1Image = nullptr;
+            m_DirectionComp2Image = nullptr;
+            m_AngularErrorImage = nullptr;
 
             m_Controls->m_SimilarAnglesFrame->setVisible(false);
             m_Controls->m_SimilarAnglesLabel->setVisible(false);
@@ -737,16 +737,16 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
         bool isPlanar = false;
         bool isTensorImage = false;
 
-        if (selectedTensorImage != NULL)
+        if (selectedTensorImage != nullptr)
         {
             isTensorImage = true;
         }
-        else if(selectedImage != NULL)
+        else if(selectedImage != nullptr)
         {
             node->GetPropertyValue("binary", isMask);
             isImage = !isMask;
         }
-        else if ( (selectedPlanar != NULL) )
+        else if ( (selectedPlanar != nullptr) )
         {
             isPlanar = true;
         }
@@ -767,14 +767,14 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
                 *m_SelectedImageNodes = node;
                 m_SelectedImage = selectedImage;
                 m_IsTensorImage = false;
-                m_FAImage = NULL;
-                m_RDImage = NULL;
-                m_ADImage = NULL;
-                m_MDImage = NULL;
-                m_CAImage = NULL;
-                m_DirectionComp1Image = NULL;
-                m_DirectionComp2Image = NULL;
-                m_AngularErrorImage = NULL;
+                m_FAImage = nullptr;
+                m_RDImage = nullptr;
+                m_ADImage = nullptr;
+                m_MDImage = nullptr;
+                m_CAImage = nullptr;
+                m_DirectionComp1Image = nullptr;
+                m_DirectionComp2Image = nullptr;
+                m_AngularErrorImage = nullptr;
 
                 // Add change listeners to selected objects
                 m_ImageObserverTag = m_SelectedImage->AddObserver(
@@ -812,8 +812,8 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
                 *m_SelectedPlanarFigureNodes = node;
                 m_CurrentFigureNodeInitialized = selectedPlanar->IsPlaced();
 
-                m_SelectedMaskNode = NULL;
-                m_SelectedImageMask = NULL;
+                m_SelectedMaskNode = nullptr;
+                m_SelectedImageMask = nullptr;
 
                 m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver(
                             mitk::EndInteractionPlanarFigureEvent(), changeListener );
@@ -853,7 +853,7 @@ void QmitkPartialVolumeAnalysisView::Select( mitk::DataNode::Pointer node, bool 
 
                 m_SelectedMaskNode = node;
                 m_SelectedImageMask = selectedImage;
-                m_SelectedPlanarFigure = NULL;
+                m_SelectedPlanarFigure = nullptr;
                 m_SelectedPlanarFigureNodes->RemoveAllNodes();
 
                 m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver(
@@ -1265,14 +1265,14 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
         // cannot be calculated currently.
         if ( !m_IsTensorImage && m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
         {
-            QMessageBox::information( NULL, "Warning", "Non-tensor multi-component images not supported.");
+            QMessageBox::information( nullptr, "Warning", "Non-tensor multi-component images not supported.");
 
             m_Controls->m_HistogramWidget->ClearItemModel();
             m_CurrentStatisticsValid = false;
             return;
         }
 
-        m_CurrentStatisticsCalculator = NULL;
+        m_CurrentStatisticsCalculator = nullptr;
         if(!m_IsTensorImage)
         {
           // Retrieve HistogramStatisticsCalculator from has map (or create a new one
@@ -1452,7 +1452,7 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
                 // perform clustering
                 const HistogramType *histogram = m_CurrentStatisticsCalculator->GetHistogram( );
 
-                if(histogram != NULL)
+                if(histogram != nullptr)
                 {
                     ClusteringType::Pointer clusterer = ClusteringType::New();
                     clusterer->SetStepsNumIntegration(200);
@@ -1527,13 +1527,13 @@ void QmitkPartialVolumeAnalysisView::UpdateStatistics()
         }
         catch ( const std::runtime_error &e )
         {
-            QMessageBox::information( NULL, "Warning", e.what());
+            QMessageBox::information( nullptr, "Warning", e.what());
         }
         catch ( const std::exception &e )
         {
             MITK_ERROR << "Caught exception: " << e.what();
 
-            QMessageBox::information( NULL, "Warning", e.what());
+            QMessageBox::information( nullptr, "Warning", e.what());
         }
 
         m_CurrentStatisticsCalculator->RemoveObserver( progressObserverTag );
@@ -1668,16 +1668,16 @@ void QmitkPartialVolumeAnalysisView::RemoveOrphanImages()
         ++it;
 
         mitk::NodePredicateData::Pointer hasImage = mitk::NodePredicateData::New( image );
-        if ( this->GetDataStorage()->GetNode( hasImage ) == NULL )
+        if ( this->GetDataStorage()->GetNode( hasImage ) == nullptr )
         {
             if ( m_SelectedImage == image )
             {
-                m_SelectedImage = NULL;
+                m_SelectedImage = nullptr;
                 m_SelectedImageNodes->RemoveAllNodes();
             }
             if ( m_CurrentStatisticsCalculator == calculator )
             {
-                m_CurrentStatisticsCalculator = NULL;
+                m_CurrentStatisticsCalculator = nullptr;
             }
             m_PartialVolumeAnalysisMap.erase( image );
             it = m_PartialVolumeAnalysisMap.begin();
@@ -1911,7 +1911,7 @@ void QmitkPartialVolumeAnalysisView::ActivatedZombieView(berry::IWorkbenchPartRe
             figureInteractor = dynamic_cast<mitk::PlanarFigureInteractor*>(node->GetDataInteractor().GetPointer());
 
             if(figureInteractor)
-              figureInteractor->SetDataNode( NULL );
+              figureInteractor->SetDataNode( nullptr );
         }
     }
 }
@@ -1923,7 +1923,7 @@ void QmitkPartialVolumeAnalysisView::Hidden()
         this->GetDataStorage()->Remove(m_ClusteringResult);
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
-    Select(NULL, true, true);
+    Select(nullptr, true, true);
     m_Visible = false;
 }
 
@@ -2097,13 +2097,13 @@ void QmitkPartialVolumeAnalysisView::NodeRemoved(const mitk::DataNode* node)
     if(  node == m_SelectedPlanarFigureNodes->GetNode().GetPointer()
          || node == m_SelectedMaskNode.GetPointer() )
     {
-        this->Select(NULL,true,false);
+        this->Select(nullptr,true,false);
         SetMeasurementInfoToRenderWindow("");
     }
 
     if(  node == m_SelectedImageNodes->GetNode().GetPointer() )
     {
-        this->Select(NULL,false,true);
+        this->Select(nullptr,false,true);
         SetMeasurementInfoToRenderWindow("");
     }
 }

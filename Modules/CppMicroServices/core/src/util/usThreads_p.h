@@ -61,7 +61,7 @@
 
     #define US_THREADS_MUTEX(x)           HANDLE (x);
     #define US_THREADS_MUTEX_INIT(x)
-    #define US_THREADS_MUTEX_CTOR(x)      : x(::CreateMutex(NULL, FALSE, NULL))
+    #define US_THREADS_MUTEX_CTOR(x)      : x(::CreateMutex(nullptr, FALSE, nullptr))
     #define US_THREADS_MUTEX_DELETE(x)    ::CloseHandle (x)
     #define US_THREADS_MUTEX_LOCK(x)      ::WaitForSingleObject (x, INFINITE)
     #define US_THREADS_MUTEX_UNLOCK(x)    ::ReleaseMutex (x)

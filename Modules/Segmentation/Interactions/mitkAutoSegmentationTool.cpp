@@ -74,7 +74,7 @@ mitk::DataNode *mitk::AutoSegmentationTool::GetTargetSegmentationNode()
     {
       // TODO create and use segmentation exceptions instead!!
       MITK_ERROR << "No valid reference data!";
-      return NULL;
+      return nullptr;
     }
     std::string nodename = m_ToolManager->GetReferenceData(0)->GetName() + "_" + this->GetName();
     mitk::Color color;

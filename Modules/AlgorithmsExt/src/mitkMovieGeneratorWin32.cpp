@@ -24,7 +24,7 @@ mitk::MovieGeneratorWin32::MovieGeneratorWin32()
 void mitk::MovieGeneratorWin32::SetFileName(const char *fileName)
 {
   m_sFile = _T(fileName);
-  if (_tcsstr((char *)m_sFile, _T("avi")) == NULL)
+  if (_tcsstr((char *)m_sFile, _T("avi")) == nullptr)
     m_sFile += _T( ".avi" );
 }
 
@@ -87,7 +87,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
   hr = AVIFileOpen(&m_pAVIFile,          // Address to contain the new file interface pointer
                    (LPCTSTR)m_sFile,     // Null-terminated string containing the name of the file to open
                    OF_WRITE | OF_CREATE, // Access mode to use when opening the file.
-                   NULL);                // use handler determined from file extension.
+                   nullptr);                // use handler determined from file extension.
   // Name your file .avi -> very important
 
   if (hr != AVIERR_OK)
@@ -162,7 +162,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 // of AVISaveOptions
 #if !(_MSC_VER >= 1400)
 
-  if (!AVISaveOptions(NULL, 0, 1, &m_pStream, (LPAVICOMPRESSOPTIONS FAR *)&aopts))
+  if (!AVISaveOptions(nullptr, 0, 1, &m_pStream, (LPAVICOMPRESSOPTIONS FAR *)&aopts))
   {
     AVISaveOptionsFree(1, (LPAVICOMPRESSOPTIONS FAR *)&aopts);
     // return false;
@@ -171,7 +171,7 @@ bool mitk::MovieGeneratorWin32::InitGenerator()
 #endif
 
   // Step 5:  Create a compressed stream using codec options.
-  hr = AVIMakeCompressedStream(&m_pStreamCompressed, m_pStream, &opts, NULL);
+  hr = AVIMakeCompressedStream(&m_pStreamCompressed, m_pStream, &opts, nullptr);
 
   if (hr != AVIERR_OK)
   {
@@ -229,8 +229,8 @@ bool mitk::MovieGeneratorWin32::AddFrame(void *data)
                               (BYTE *)data,        // image buffer
                               m_bih.biSizeImage,   // size of this frame
                               AVIIF_KEYFRAME,      // flags....
-                              NULL,
-                              NULL);
+                              nullptr,
+                              nullptr);
   // updating frame counter
   m_lFrame++;
 
@@ -245,17 +245,17 @@ bool mitk::MovieGeneratorWin32::TerminateGenerator()
   if (m_pStream)
   {
     AVIStreamRelease(m_pStream);
-    m_pStream = NULL;
+    m_pStream = nullptr;
   }
   if (m_pStreamCompressed)
   {
     AVIStreamRelease(m_pStreamCompressed);
-    m_pStreamCompressed = NULL;
+    m_pStreamCompressed = nullptr;
   }
   if (m_pAVIFile)
   {
     AVIFileRelease(m_pAVIFile);
-    m_pAVIFile = NULL;
+    m_pAVIFile = nullptr;
   }
   // Close engine
   AVIFileExit();

@@ -101,7 +101,7 @@ public:
 
   TestModuleHActivator()
     : thisServiceName(us_service_interface_iid<TestModuleH>())
-    , mc(NULL)
+    , mc(nullptr)
   {}
 
   void Load(ModuleContext* mc) override

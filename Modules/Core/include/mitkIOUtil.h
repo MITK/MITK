@@ -347,7 +347,7 @@ namespace mitk
      * @brief LoadDataNode Method to load an arbitrary DataNode.
      * @param path The path to the file including file name and file extension.
      * @throws mitk::Exception This exception is thrown when the DataNodeFactory is not able to read/find the file
-     * or the DataNode is NULL.
+     * or the DataNode is nullptr.
      * @return Returns the DataNode.
      *
      * @deprecatedSince{2014_10} Use Load() instead.
@@ -360,7 +360,7 @@ namespace mitk
      * @param optionsCallback Pointer to a callback instance. The callback is used by
      * the load operation if more the suitable reader was found or the reader has options
      * that can be set.
-     * @throws mitk::Exception This exception is thrown when the Image is NULL.
+     * @throws mitk::Exception This exception is thrown when the Image is nullptr.
      * @return Returns the mitkImage.
      */
     static mitk::Image::Pointer LoadImage(const std::string &path,
@@ -372,7 +372,7 @@ namespace mitk
      * @param optionsCallback Pointer to a callback instance. The callback is used by
      * the load operation if more the suitable reader was found or the reader has options
      * that can be set.
-     * @throws mitk::Exception This exception is thrown when the Surface is NULL.
+     * @throws mitk::Exception This exception is thrown when the Surface is nullptr.
      * @return Returns the mitkSurface.
      */
     static mitk::Surface::Pointer LoadSurface(const std::string &path,
@@ -384,7 +384,7 @@ namespace mitk
      * @param optionsCallback Pointer to a callback instance. The callback is used by
      * the load operation if more the suitable reader was found or the reader has options
      * that can be set.
-     * @throws mitk::Exception This exception is thrown when the PointSet is NULL.
+     * @throws mitk::Exception This exception is thrown when the PointSet is nullptr.
      * @return Returns the mitkPointSet.
      */
     static mitk::PointSet::Pointer LoadPointSet(const std::string &path,

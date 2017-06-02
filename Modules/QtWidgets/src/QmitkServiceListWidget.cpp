@@ -30,7 +30,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkServiceListWidget::VIEW_ID = "org.mitk.views.QmitkServiceListWidget";
 
 QmitkServiceListWidget::QmitkServiceListWidget(QWidget *parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_AutomaticallySelectFirstEntry(false), m_Controls(NULL)
+  : QWidget(parent, f), m_AutomaticallySelectFirstEntry(false), m_Controls(nullptr)
 {
   CreateQtPartControl(this);
 }

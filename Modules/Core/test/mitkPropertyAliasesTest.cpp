@@ -24,7 +24,7 @@ int mitkPropertyAliasesTest(int, char *[])
   MITK_TEST_BEGIN("mitkPropertyAliasesTest");
 
   mitk::IPropertyAliases *propertyAliases = mitk::CoreServices::GetPropertyAliases();
-  MITK_TEST_CONDITION_REQUIRED(propertyAliases != NULL, "Get property aliases service");
+  MITK_TEST_CONDITION_REQUIRED(propertyAliases != nullptr, "Get property aliases service");
 
   propertyAliases->AddAlias("propertyName1", "alias1a");
   propertyAliases->AddAlias("propertyName1", "alias1b");

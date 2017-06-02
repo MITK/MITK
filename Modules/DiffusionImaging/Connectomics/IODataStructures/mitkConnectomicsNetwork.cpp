@@ -726,7 +726,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
   {
     if(verbose)
     {
-      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide NULL.";
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] rightHandSide nullptr.";
     }
     return false;
   }
@@ -735,7 +735,7 @@ bool mitk::Equal( mitk::ConnectomicsNetwork* leftHandSide, mitk::ConnectomicsNet
   {
     if(verbose)
     {
-      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide NULL.";
+      MITK_INFO << "[Equal( ConnectomicsNetwork*, ConnectomicsNetwork* )] leftHandSide nullptr.";
     }
     return false;
   }

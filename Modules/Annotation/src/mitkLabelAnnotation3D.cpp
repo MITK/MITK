@@ -150,7 +150,7 @@ void mitk::LabelAnnotation3D::SetLabelCoordinates(mitk::PointSet::Pointer LabelC
   {
     m_LabelCoordinates->RemoveObserver(m_PointSetModifiedObserverTag);
     m_PointSetModifiedObserverTag = 0;
-    m_LabelCoordinates = NULL;
+    m_LabelCoordinates = nullptr;
   }
   if (LabelCoordinates.IsNull())
   {

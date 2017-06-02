@@ -104,7 +104,7 @@ mitk::BaseProperty::Pointer QmitkAddNewPropertyDialog::CreateProperty() const
     assert(false && "Property creation for selected type not implemented!");
   }
 
-  return NULL;
+  return nullptr;
 }
 
 bool QmitkAddNewPropertyDialog::ValidateValue()

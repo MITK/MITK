@@ -113,11 +113,11 @@ const mitk::Point3D QmlMitkStdMultiItem::getCrossPosition() const
     const mitk::PlaneGeometry *plane3 = this->m_viewerSagittal->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
     mitk::Line3D line;
-    if ( (plane1 != NULL) && (plane2 != NULL)
+    if ( (plane1 != nullptr) && (plane2 != nullptr)
         && (plane1->IntersectionLine( plane2, line )) )
     {
         mitk::Point3D point;
-        if ( (plane3 != NULL)
+        if ( (plane3 != nullptr)
             && (plane3->IntersectionPoint( line, point )) )
         {
             return point;

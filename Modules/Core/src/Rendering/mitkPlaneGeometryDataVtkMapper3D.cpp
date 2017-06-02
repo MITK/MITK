@@ -41,7 +41,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 namespace mitk
 {
-  PlaneGeometryDataVtkMapper3D::PlaneGeometryDataVtkMapper3D() : m_NormalsActorAdded(false), m_DataStorage(NULL)
+  PlaneGeometryDataVtkMapper3D::PlaneGeometryDataVtkMapper3D() : m_NormalsActorAdded(false), m_DataStorage(nullptr)
   {
     m_EdgeTuber = vtkTubeFilter::New();
     m_EdgeMapper = vtkPolyDataMapper::New();
@@ -150,12 +150,12 @@ namespace mitk
     // Delete entries in m_ImageActors list one by one
     m_ImageActors.clear();
 
-    m_DataStorage = NULL;
+    m_DataStorage = nullptr;
   }
 
   vtkProp *PlaneGeometryDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
   {
-    if ((this->GetDataNode() != NULL) && (m_ImageAssembly != NULL))
+    if ((this->GetDataNode() != nullptr) && (m_ImageAssembly != nullptr))
     {
       // Do not transform the entire Prop3D assembly, but only the image part
       // here. The colored frame is transformed elsewhere (via m_EdgeTransformer),
@@ -178,7 +178,7 @@ namespace mitk
 
   void PlaneGeometryDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage *storage)
   {
-    if (storage != NULL && m_DataStorage != storage)
+    if (storage != nullptr && m_DataStorage != storage)
     {
       m_DataStorage = storage;
       this->Modified();
@@ -188,11 +188,11 @@ namespace mitk
   void PlaneGeometryDataVtkMapper3D::ImageMapperDeletedCallback(itk::Object *caller, const itk::EventObject & /*event*/)
   {
     ImageVtkMapper2D *imageMapper = dynamic_cast<ImageVtkMapper2D *>(caller);
-    if ((imageMapper != NULL))
+    if ((imageMapper != nullptr))
     {
       if (m_ImageActors.count(imageMapper) > 0)
       {
-        m_ImageActors[imageMapper].m_Sender = NULL; // sender is already destroying itself
+        m_ImageActors[imageMapper].m_Sender = nullptr; // sender is already destroying itself
         m_ImageActors.erase(imageMapper);
       }
     }
@@ -236,7 +236,7 @@ namespace mitk
 
     PlaneGeometryData::Pointer input = const_cast<PlaneGeometryData *>(this->GetInput());
 
-    if (input.IsNotNull() && (input->GetPlaneGeometry() != NULL))
+    if (input.IsNotNull() && (input->GetPlaneGeometry() != nullptr))
     {
       SmartPointerProperty::Pointer surfacecreatorprop;
       surfacecreatorprop =
@@ -298,7 +298,7 @@ namespace mitk
       // bounds
       else if (m_DataStorage.IsNotNull())
       {
-        m_SurfaceCreator->SetBoundingBox(m_DataStorage->ComputeVisibleBoundingBox(NULL, "includeInBoundingBox"));
+        m_SurfaceCreator->SetBoundingBox(m_DataStorage->ComputeVisibleBoundingBox(nullptr, "includeInBoundingBox"));
         tubeRadius = sqrt(m_SurfaceCreator->GetBoundingBox()->GetDiagonalLength2()) / 450.0;
       }
 
@@ -396,7 +396,7 @@ namespace mitk
       for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
       {
         DataNode *node = it->Value();
-        if (node != NULL)
+        if (node != nullptr)
           this->ProcessNode(node, renderer, surface, layerSortedActors);
       }
 
@@ -435,7 +435,7 @@ namespace mitk
 
     VtkRepresentationProperty *representationProperty;
     this->GetDataNode()->GetProperty(representationProperty, "material.representation", renderer);
-    if (representationProperty != NULL)
+    if (representationProperty != nullptr)
       m_BackgroundActor->GetProperty()->SetRepresentation(representationProperty->GetVtkRepresentation());
   }
 
@@ -444,7 +444,7 @@ namespace mitk
                                                  Surface *surface,
                                                  LayerSortedActorList &layerSortedActors)
   {
-    if (node != NULL)
+    if (node != nullptr)
     {
       // we need to get the information from the 2D mapper to render the texture on the 3D plane
       ImageVtkMapper2D *imageMapper =
@@ -484,7 +484,7 @@ namespace mitk
             // generate an actor and a texture object to
             // render the image associated with the ImageVtkMapper2D.
             vtkActor *imageActor;
-            vtkDataSetMapper *dataSetMapper = NULL;
+            vtkDataSetMapper *dataSetMapper = nullptr;
             vtkTexture *texture;
             if (m_ImageActors.count(imageMapper) == 0)
             {
@@ -507,8 +507,8 @@ namespace mitk
 
               // Make imageActor the sole owner of the mapper and texture
               // objects
-              dataSetMapper->UnRegister(NULL);
-              texture->UnRegister(NULL);
+              dataSetMapper->UnRegister(nullptr);
+              texture->UnRegister(nullptr);
 
               // Store the actor so that it may be accessed in following
               // passes.
@@ -525,19 +525,19 @@ namespace mitk
 
             // Set poly data new each time its object changes (e.g. when
             // switching between planar and curved geometries)
-            if ((dataSetMapper != NULL) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()))
+            if ((dataSetMapper != nullptr) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()))
             {
               dataSetMapper->SetInputData(surface->GetVtkPolyData());
             }
 
             dataSetMapper->Update();
 
-            // Check if the m_ReslicedImage is NULL.
+            // Check if the m_ReslicedImage is nullptr.
             // This is the case when no image geometry is met by
             // the reslicer. In that case, the texture has to be
             // empty (black) and we don't have to do anything.
             // See fixed bug #13275
-            if (localStorage->m_ReslicedImage != NULL)
+            if (localStorage->m_ReslicedImage != nullptr)
             {
               texture->SetInputConnection(localStorage->m_LevelWindowFilter->GetOutputPort());
 
@@ -573,14 +573,14 @@ namespace mitk
     m_ObserverID = sender->AddObserver(itk::DeleteEvent(), command);
   }
 
-  PlaneGeometryDataVtkMapper3D::ActorInfo::ActorInfo() : m_Actor(NULL), m_Sender(NULL), m_ObserverID(0) {}
+  PlaneGeometryDataVtkMapper3D::ActorInfo::ActorInfo() : m_Actor(nullptr), m_Sender(nullptr), m_ObserverID(0) {}
   PlaneGeometryDataVtkMapper3D::ActorInfo::~ActorInfo()
   {
-    if (m_Sender != NULL)
+    if (m_Sender != nullptr)
     {
       m_Sender->RemoveObserver(m_ObserverID);
     }
-    if (m_Actor != NULL)
+    if (m_Actor != nullptr)
     {
       m_Actor->ReleaseGraphicsResources(0);
       m_Actor->Delete();

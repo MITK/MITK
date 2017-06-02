@@ -220,11 +220,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl(QWidget *parent)
 
     //Update List of available models for selected tool.
     std::vector<mitk::TrackingDeviceData> Compatibles;
-    if ((m_Controls == NULL) || //check all these stuff for NULL, latterly this causes crashes from time to time
-      (m_Controls->m_configurationWidget == NULL) ||
+    if ((m_Controls == nullptr) || //check all these stuff for nullptr, latterly this causes crashes from time to time
+      (m_Controls->m_configurationWidget == nullptr) ||
       (m_Controls->m_configurationWidget->GetTrackingDevice().IsNull()))
     {
-      MITK_ERROR << "Couldn't get current tracking device or an object is NULL, something went wrong!";
+      MITK_ERROR << "Couldn't get current tracking device or an object is nullptr, something went wrong!";
       return;
     }
     else
@@ -273,7 +273,7 @@ void QmitkMITKIGTTrackingToolboxView::SetFocus()
 void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 {
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL, tr("Open Tool Storage"), "/", tr("Tool Storage Files (*.IGTToolStorage)"));
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Tool Storage"), "/", tr("Tool Storage Files (*.IGTToolStorage)"));
   if (filename.isNull()) return;
 
   //read tool storage from disk
@@ -287,7 +287,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   catch (mitk::IGTException)
   {
     std::string errormessage = "Error during loading the tool storage file. Please only load tool storage files created with the NavigationToolManager view.";
-    QMessageBox::warning(NULL, "Tool Storage Loading Error", errormessage.c_str());
+    QMessageBox::warning(nullptr, "Tool Storage Loading Error", errormessage.c_str());
     return;
   }
 
@@ -724,7 +724,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
     if (ret == 16384) //yes
     {
       //ask the user for a filename
-      QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"), "/", tr("*.IGTToolStorage"));
+      QString fileName = QFileDialog::getSaveFileName(nullptr, tr("Save File"), "/", tr("*.IGTToolStorage"));
       //check for empty filename
       if (fileName == "") { return; }
       mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
@@ -738,7 +738,7 @@ void QmitkMITKIGTTrackingToolboxView::OnAutoDetectToolsFinished(bool success, QS
       catch (mitk::IGTException)
       {
         std::string errormessage = "Error during serialization. Please check the Zip file.";
-        QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+        QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
       }
 
       return;
@@ -845,7 +845,7 @@ void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
     currentPath = QDir(QDir::homePath());
   }
 
-  QString filename = QFileDialog::getSaveFileName(NULL, tr("Choose Logging File"), currentPath.absolutePath(), "*.*");
+  QString filename = QFileDialog::getSaveFileName(nullptr, tr("Choose Logging File"), currentPath.absolutePath(), "*.*");
   if (filename == "") return;
   this->m_Controls->m_LoggingFileName->setText(filename);
   this->OnToggleFileExtension();
@@ -961,7 +961,7 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
     catch (mitk::IGTException)
     {
       std::string errormessage = "Error during start recording. Recorder already started recording?";
-      QMessageBox::warning(NULL, "IGTPlayer: Error", errormessage.c_str());
+      QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
       m_loggingFilter->StopRecording();
       return;
     }

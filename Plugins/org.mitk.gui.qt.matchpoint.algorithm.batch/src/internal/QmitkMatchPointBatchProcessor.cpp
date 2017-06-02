@@ -54,7 +54,7 @@ const std::string QmitkMatchPointBatchProcessor::VIEW_ID =
   "org.mitk.views.matchpoint.algorithm.batchprocessing";
 
 QmitkMatchPointBatchProcessor::QmitkMatchPointBatchProcessor()
-  : m_Parent(NULL), m_LoadedDLLHandle(NULL), m_LoadedAlgorithm(NULL)
+  : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr)
 {
   m_CanLoadAlgorithm = false;
   m_ValidInputs = false;
@@ -246,7 +246,7 @@ void QmitkMatchPointBatchProcessor::CheckInputs()
   //first set the internal nodes according to selection
   if (!m_Controls.m_pbLockTarget->isChecked())
   {
-    mitk::DataNode::Pointer targetNode = NULL;
+    mitk::DataNode::Pointer targetNode = nullptr;
 
     if (dataNodes.size() > 0)
     {
@@ -376,7 +376,7 @@ std::string QmitkMatchPointBatchProcessor::GetDefaultRegJobName() const
   {
     ++estimatedIndex;
     result = "Reg #" +::map::core::convert::toStr(estimatedIndex);
-    isUnique =  this->GetDataStorage()->GetNamedNode(result) == NULL;
+    isUnique =  this->GetDataStorage()->GetNamedNode(result) == nullptr;
   }
 
   return result;

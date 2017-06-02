@@ -61,7 +61,7 @@ public:
     void setUp() override
     {
         omp_set_num_threads(1);
-        original = NULL;
+        original = nullptr;
         original = dynamic_cast<mitk::FiberBundle*>(mitk::IOUtil::Load(GetTestDataFilePath("DiffusionImaging/FiberProcessing/original.fib")).front().GetPointer());
 
         mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(mitk::IOUtil::LoadImage(GetTestDataFilePath("DiffusionImaging/FiberProcessing/MASK.nrrd")).GetPointer());
@@ -71,7 +71,7 @@ public:
 
     void tearDown() override
     {
-        original = NULL;
+        original = nullptr;
     }
 
     void Test1()

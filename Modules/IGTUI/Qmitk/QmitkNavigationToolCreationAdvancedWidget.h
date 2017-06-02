@@ -65,7 +65,7 @@ class MITKIGTUI_EXPORT QmitkNavigationToolCreationAdvancedWidget : public QDialo
      *  will be a clone of this surface). If there is no surface, a simple cone can be used.
      *  Please set cone to true in this case.
      */
-    void SetToolTipSurface(bool cone, mitk::DataNode::Pointer node = NULL);
+    void SetToolTipSurface(bool cone, mitk::DataNode::Pointer node = nullptr);
 
     /** Sets a default tooltip transform, which will shown in the beginning.
      *  If the windows is already open, the transform will be set to default

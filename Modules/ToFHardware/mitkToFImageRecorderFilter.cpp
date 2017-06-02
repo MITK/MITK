@@ -127,7 +127,7 @@ void mitk::ToFImageRecorderFilter::SetInput(  mitk::Image* input )
 
 void mitk::ToFImageRecorderFilter::SetInput( unsigned int idx,  mitk::Image* input )
 {
-  if ((input == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((input == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
   }
@@ -151,7 +151,7 @@ mitk::Image* mitk::ToFImageRecorderFilter::GetInput()
 mitk::Image* mitk::ToFImageRecorderFilter::GetInput( unsigned int idx )
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast< mitk::Image*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -159,7 +159,7 @@ void mitk::ToFImageRecorderFilter::CreateOutputsForAllInputs()
 {
   this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create outputs for all inputs
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
     DataObjectPointer newOutput = this->MakeOutput(idx);
     this->SetNthOutput(idx, newOutput);

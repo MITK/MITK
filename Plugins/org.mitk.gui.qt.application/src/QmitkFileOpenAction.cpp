@@ -110,7 +110,7 @@ void QmitkFileOpenAction::Run()
 {
 
   // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open",
+  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Open",
                                                         d->getLastFileOpenPath(),
                                                         QmitkIOUtil::GetFileOpenFilterString());
 

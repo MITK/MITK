@@ -236,7 +236,7 @@ namespace mitk
 
     /* Methods for NDIProtocol friend class */
     virtual void InvalidateAll();             ///< invalidate all tools
-    NDIPassiveTool* GetInternalTool(std::string portHandle); ///< returns the tool object that has been assigned the port handle or NULL if no tool can be found
+    NDIPassiveTool* GetInternalTool(std::string portHandle); ///< returns the tool object that has been assigned the port handle or nullptr if no tool can be found
 
     /**
     * \brief free all port handles that need to be freed

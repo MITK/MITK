@@ -150,7 +150,7 @@ int StartPeakExtraction(int argc, char* argv[])
         else
             std::cout << "Using MITK SH-basis";
 
-        ItkUcharImgType::Pointer itkMaskImage = NULL;
+        ItkUcharImgType::Pointer itkMaskImage = nullptr;
         if (mask.IsNotNull())
         {
             try{

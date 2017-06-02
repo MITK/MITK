@@ -27,7 +27,7 @@ namespace itk{
   TractsToFiberEndingsImageFilter< OutputImageType >::TractsToFiberEndingsImageFilter()
     : m_InvertImage(false)
     , m_UpsamplingFactor(1)
-    , m_InputImage(NULL)
+    , m_InputImage(nullptr)
     , m_UseImageGeometry(false)
     , m_BinaryOutput(false)
   {

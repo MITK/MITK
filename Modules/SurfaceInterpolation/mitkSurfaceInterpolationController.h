@@ -110,7 +110,7 @@ namespace mitk
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
     * @param ontourInfo the contour which should be returned
-    * @return the contour as an mitk::Surface. If no contour is available at the give position NULL is returned
+    * @return the contour as an mitk::Surface. If no contour is available at the give position nullptr is returned
     */
     const mitk::Surface *GetContour(ContourPositionInformation contourInfo);
 

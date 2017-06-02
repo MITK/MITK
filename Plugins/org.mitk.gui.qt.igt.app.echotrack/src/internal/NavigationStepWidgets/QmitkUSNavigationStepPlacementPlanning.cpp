@@ -502,7 +502,7 @@ void QmitkUSNavigationStepPlacementPlanning::CreateTargetNodesIfNecessary()
                                          USNavigationMarkerPlacement::DATANAME_TARGETS_PATHS);
     targetPathNode->SetOpacity(0.5);
     targetPathNode->SetColor(1, 1, 1);
-    targetPathNode->SetColor(1, 1, 1, NULL, "contourcolor");
+    targetPathNode->SetColor(1, 1, 1, nullptr, "contourcolor");
     targetPathNode->SetBoolProperty("show contour", true);
     m_PlannedNeedlePaths.push_back(targetPathNode);
 

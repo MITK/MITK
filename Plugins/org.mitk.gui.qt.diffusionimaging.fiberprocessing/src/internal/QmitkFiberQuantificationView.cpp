@@ -183,7 +183,7 @@ void QmitkFiberQuantificationView::OnSelectionChanged(berry::IWorkbenchPart::Poi
     //reset existing Vectors containing FiberBundles and PlanarFigures from a previous selection
     m_SelectedFB.clear();
     m_SelectedSurfaces.clear();
-    m_SelectedImage = NULL;
+    m_SelectedImage = nullptr;
 
     for (mitk::DataNode::Pointer node: nodes)
     {
@@ -227,7 +227,7 @@ void QmitkFiberQuantificationView::GenerateStats()
             stats += "Standard deviation:  "+ QString::number(fib->GetLengthStDev(),'f',1) + " mm\n";
 
             vtkSmartPointer<vtkFloatArray> weights = fib->GetFiberWeights();
-            if (weights!=NULL)
+            if (weights!=nullptr)
             {
                 stats += "Detected fiber weights\n";
 //                    stats += "Detected fiber weights:\n";
@@ -254,7 +254,7 @@ void QmitkFiberQuantificationView::GenerateStats()
 void QmitkFiberQuantificationView::ProcessSelectedBundles()
 {
     if ( m_SelectedFB.empty() ){
-        QMessageBox::information( NULL, "Warning", "No fibe bundle selected!");
+        QMessageBox::information( nullptr, "Warning", "No fibe bundle selected!");
         MITK_WARN("QmitkFiberQuantificationView") << "no fibe bundle selected";
         return;
     }
@@ -268,7 +268,7 @@ void QmitkFiberQuantificationView::ProcessSelectedBundles()
         {
             mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
             QString name(node->GetName().c_str());
-            DataNode::Pointer newNode = NULL;
+            DataNode::Pointer newNode = nullptr;
             switch(generationMethod){
             case 0:
                 newNode = GenerateTractDensityImage(fib, false, true);

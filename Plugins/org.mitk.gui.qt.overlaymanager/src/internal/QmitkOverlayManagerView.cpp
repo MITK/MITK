@@ -83,7 +83,7 @@ void QmitkOverlayManagerView::CreateQtPartControl(QWidget *parent)
 
   mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
 
-  if (renderWindowPart != NULL)
+  if (renderWindowPart != nullptr)
   {
     QHash<QString, QmitkRenderWindow *> renderWindows = renderWindowPart->GetQmitkRenderWindows();
 
@@ -263,11 +263,11 @@ void QmitkOverlayManagerView::OnPropertyNameChanged(const itk::EventObject &)
 {
   mitk::PropertyList *propertyList = m_Model->GetPropertyList();
 
-  if (propertyList != NULL)
+  if (propertyList != nullptr)
   {
     mitk::BaseProperty *nameProperty = propertyList->GetProperty("name");
 
-    if (nameProperty != NULL)
+    if (nameProperty != nullptr)
     {
       QString partName = "Properties (";
       partName.append(QString::fromStdString(nameProperty->GetValueAsString())).append(')');
@@ -363,11 +363,11 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
 {
   mitk::PropertyList *propertyList = m_Model->GetPropertyList();
 
-  if (propertyList != NULL)
+  if (propertyList != nullptr)
   {
     mitk::BaseProperty *nameProperty = propertyList->GetProperty("name");
 
-    if (nameProperty != NULL)
+    if (nameProperty != nullptr)
       nameProperty->RemoveObserver(m_PropertyNameChangedTag);
 
     m_PropertyNameChangedTag = 0;
@@ -389,11 +389,11 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
 
   if (!overlay)
   {
-    m_SelectedOverlay = NULL;
+    m_SelectedOverlay = nullptr;
 
     this->SetPartName("Overlay Properties");
-    m_Model->SetPropertyList(NULL);
-    m_Delegate->SetPropertyList(NULL);
+    m_Model->SetPropertyList(nullptr);
+    m_Delegate->SetPropertyList(nullptr);
 
     m_Controls.newButton->setEnabled(false);
   }
@@ -414,7 +414,7 @@ void QmitkOverlayManagerView::OnOverlaySelectionChanged(QListWidgetItem *current
 
     mitk::BaseProperty *nameProperty = m_SelectedOverlay->GetProperty("name");
 
-    if (nameProperty != NULL)
+    if (nameProperty != nullptr)
     {
       itk::ReceptorMemberCommand<QmitkOverlayManagerView>::Pointer command =
         itk::ReceptorMemberCommand<QmitkOverlayManagerView>::New();
@@ -445,7 +445,7 @@ void QmitkOverlayManagerView::OnAddOverlay()
 
   mitk::Annotation::Pointer overlay;
 
-  if (action != NULL)
+  if (action != nullptr)
   {
     const QString widgetKey = action->text();
 

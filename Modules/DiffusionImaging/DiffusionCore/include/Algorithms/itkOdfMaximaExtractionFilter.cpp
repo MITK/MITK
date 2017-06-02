@@ -42,10 +42,10 @@ OdfMaximaExtractionFilter< TOdfPixelType >::OdfMaximaExtractionFilter():
     m_NormalizationMethod(MAX_VEC_NORM),
     m_PeakThreshold(0.2),
     m_MaxNumPeaks(10),
-    m_ShCoeffImage(NULL),
-    m_OutputFiberBundle(NULL),
-    m_NumDirectionsImage(NULL),
-    m_DirectionImageContainer(NULL)
+    m_ShCoeffImage(nullptr),
+    m_OutputFiberBundle(nullptr),
+    m_NumDirectionsImage(nullptr),
+    m_DirectionImageContainer(nullptr)
 {
 
 }

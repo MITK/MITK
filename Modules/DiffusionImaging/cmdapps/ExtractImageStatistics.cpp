@@ -104,7 +104,7 @@ int ExtractImageStatistics(int argc, char* argv[])
   // Calculate Volume
   double volume = 0;
   const mitk::BaseGeometry *geometry = inputImage->GetGeometry();
-  if ( geometry != NULL )
+  if ( geometry != nullptr )
   {
     const mitk::Vector3D &spacing = inputImage->GetGeometry()->GetSpacing();
     volume = spacing[0] * spacing[1] * spacing[2] * (double) statisticsStruct.GetN();

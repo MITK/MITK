@@ -26,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 ///**********************************************
-QmitkSliceNavigationListener::QmitkSliceNavigationListener(): m_renderWindowPart(NULL),
+QmitkSliceNavigationListener::QmitkSliceNavigationListener(): m_renderWindowPart(nullptr),
 m_PendingSliceChangedEvent(false),
 m_internalUpdateFlag(false)
 {
@@ -74,7 +74,7 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
 
     if (!InitObservers())
     {
-      QMessageBox::information(NULL, "Error", "Unable to set up the event observers. The " \
+      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers. The " \
         "plot will not be triggered on changing the crosshair, " \
         "position or time step.");
     }
@@ -83,7 +83,7 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
 
 void QmitkSliceNavigationListener::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  m_renderWindowPart = NULL;
+  m_renderWindowPart = nullptr;
   this->RemoveAllObservers(renderWindowPart);
 };
 
@@ -107,7 +107,7 @@ bool QmitkSliceNavigationListener::InitObservers()
         itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
       cmdSliceEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
       int tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0),
+        mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0),
         cmdSliceEvent);
 
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
@@ -117,7 +117,7 @@ bool QmitkSliceNavigationListener::InitObservers()
         itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
       cmdTimeEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
       tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0),
+        mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0),
         cmdTimeEvent);
 
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
@@ -161,7 +161,7 @@ void QmitkSliceNavigationListener::RemoveAllObservers(mitk::IRenderWindowPart* d
   {
     ObserverMapType::const_iterator delPos = pos++;
 
-    if (deletedPart == NULL || deletedPart == delPos->second.renderWindowPart)
+    if (deletedPart == nullptr || deletedPart == delPos->second.renderWindowPart)
     {
       delPos->second.controller->RemoveObserver(delPos->second.observerTag);
       m_ObserverMap.erase(delPos);

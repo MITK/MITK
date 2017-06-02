@@ -64,7 +64,7 @@ namespace mitk
      be loaded by the file reader.
 
      The descriptor contains the following information:
-     - the mitk::Image itself. This will be NULL after analysis and only be present after actual loading.
+     - the mitk::Image itself. This will be nullptr after analysis and only be present after actual loading.
      - a list of frames (mostly: filenames) that went into composition of the mitk::Image.
      - an assessment of the reader's ability to load this set of files (ReaderImplementationLevel)
      - this can be used for reader selection when one reader is able to load an image with correct colors and the other is able to produce only gray values, for example

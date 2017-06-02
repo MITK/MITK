@@ -56,7 +56,7 @@ namespace mitk
     ImageDataItem parameter.
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted.
     Simplest way to avoid the duplicate
-    deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
+    deletion attempt is to set the desc->data manually to nullptr before calling the ipPicFree() on the descriptor
   */
   MITKLEGACYADAPTORS_EXPORT mitkIpPicDescriptor *CastToIpPicDescriptor(itk::SmartPointer<mitk::ImageDataItem>,
                                                                        mitk::ImageWriteAccessor *,
@@ -80,7 +80,7 @@ namespace mitk
    ImageDataItem parameter.
     Simply calling ipPicFree( desc ) will delete the data and so will the ImageDataItem try when it get deleted.
    Simplest way to avoid the duplicate
-    deletion attempt is to set the desc->data manually to NULL before calling the ipPicFree() on the descriptor
+    deletion attempt is to set the desc->data manually to nullptr before calling the ipPicFree() on the descriptor
    \deprecatedSince{2012_09} Please use image accessors instead! An image accessor (ImageWriteAccessor) can be commited
    to CastToIpPicDescriptor.
   */

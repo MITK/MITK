@@ -49,7 +49,7 @@ void mitk::USPointMarkInteractor::AddPoint(mitk::StateMachineAction*, mitk::Inte
 {
   // cast InteractionEvent to a position event in order to read out the mouse position
   mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
-  if (positionEvent == NULL); //{ return false; }
+  if (positionEvent == nullptr); //{ return false; }
   // set origin of the data node to the mouse click position
   this->GetDataNode()->GetData()->GetGeometry()->SetOrigin(positionEvent->GetPositionInWorld());
 

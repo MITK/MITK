@@ -138,7 +138,7 @@ MBI_STD::ostream &mitk::operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer 
   operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer &dtn)
 #endif
 {
-  if (dtn->GetData() != NULL)
+  if (dtn->GetData() != nullptr)
     o << dtn->GetData()->GetNameOfClass();
   else
     o << "empty data";
@@ -149,7 +149,7 @@ void mitk::DataNode::SetMapper(MapperSlotId id, mitk::Mapper *mapper)
 {
   m_Mappers[id] = mapper;
 
-  if (mapper != NULL)
+  if (mapper != nullptr)
     mapper->SetDataNode(this);
 }
 
@@ -194,7 +194,7 @@ void mitk::DataNode::CopyInformation(const itk::DataObject * /*data*/)
 }
 mitk::PropertyList *mitk::DataNode::GetPropertyList(const mitk::BaseRenderer *renderer) const
 {
-  if (renderer == NULL)
+  if (renderer == nullptr)
     return m_PropertyList;
 
   return this->GetPropertyList(renderer->GetName());
@@ -222,8 +222,8 @@ void mitk::DataNode::ConcatenatePropertyList(PropertyList *pList, bool replace)
 
 mitk::BaseProperty *mitk::DataNode::GetProperty(const char *propertyKey, const mitk::BaseRenderer *renderer) const
 {
-  if (propertyKey == NULL)
-    return NULL;
+  if (propertyKey == nullptr)
+    return nullptr;
 
   // renderer specified?
   if (renderer)
@@ -257,7 +257,7 @@ mitk::BaseProperty *mitk::DataNode::GetProperty(const char *propertyKey, const m
   }
 
   // only to satisfy compiler!
-  return NULL;
+  return nullptr;
 }
 
 mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
@@ -436,16 +436,16 @@ void mitk::DataNode::SetIntProperty(const char *propertyKey, int intValue, const
 }
 void mitk::DataNode::SetBoolProperty(const char *propertyKey,
                                      bool boolValue,
-                                     const mitk::BaseRenderer *renderer /*=NULL*/)
+                                     const mitk::BaseRenderer *renderer /*=nullptr*/)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::BoolProperty::New(boolValue));
 }
 
 void mitk::DataNode::SetFloatProperty(const char *propertyKey,
                                       float floatValue,
-                                      const mitk::BaseRenderer *renderer /*=NULL*/)
+                                      const mitk::BaseRenderer *renderer /*=nullptr*/)
 {
-  if (dynamic_cast<DoubleProperty *>(this->GetProperty(propertyKey, renderer)) != NULL)
+  if (dynamic_cast<DoubleProperty *>(this->GetProperty(propertyKey, renderer)) != nullptr)
   {
     MITK_WARN << "Setting float property " << propertyKey
               << " although a double property with the same name already exists";
@@ -455,7 +455,7 @@ void mitk::DataNode::SetFloatProperty(const char *propertyKey,
 
 void mitk::DataNode::SetDoubleProperty(const char *propertyKey, double doubleValue, const mitk::BaseRenderer *renderer)
 {
-  if (dynamic_cast<FloatProperty *>(this->GetProperty(propertyKey, renderer)) != NULL)
+  if (dynamic_cast<FloatProperty *>(this->GetProperty(propertyKey, renderer)) != nullptr)
   {
     MITK_WARN << "Setting double property " << propertyKey
               << " although a float property with the same name already exists";
@@ -465,7 +465,7 @@ void mitk::DataNode::SetDoubleProperty(const char *propertyKey, double doubleVal
 
 void mitk::DataNode::SetStringProperty(const char *propertyKey,
                                        const char *stringValue,
-                                       const mitk::BaseRenderer *renderer /*=NULL*/)
+                                       const mitk::BaseRenderer *renderer /*=nullptr*/)
 {
   GetPropertyList(renderer)->SetProperty(propertyKey, mitk::StringProperty::New(stringValue));
 }
@@ -489,7 +489,7 @@ void mitk::DataNode::AddProperty(const char *propertyKey,
                                  const mitk::BaseRenderer *renderer,
                                  bool overwrite)
 {
-  if ((overwrite) || (GetProperty(propertyKey, renderer) == NULL))
+  if ((overwrite) || (GetProperty(propertyKey, renderer) == nullptr))
   {
     SetProperty(propertyKey, propertyValue, renderer);
   }
@@ -501,8 +501,8 @@ vtkLinearTransform *mitk::DataNode::GetVtkTransform(int t) const
 
   mitk::BaseGeometry *geometry = m_Data->GetGeometry(t);
 
-  if (geometry == NULL)
-    return NULL;
+  if (geometry == nullptr)
+    return nullptr;
 
   return geometry->GetVtkTransform();
 }

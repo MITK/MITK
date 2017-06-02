@@ -62,7 +62,7 @@ public:
   /**
   * \brief constructor with mandatory QmitkRenderWindow and optional mitk::PropertyList
   */
-  QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl = NULL);
+  QmitkOverlayController(QmitkRenderWindow *rw, mitk::PropertyList *pl = nullptr);
   virtual ~QmitkOverlayController();
 
   /**

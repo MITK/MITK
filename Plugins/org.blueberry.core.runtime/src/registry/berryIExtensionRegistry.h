@@ -275,7 +275,7 @@ struct org_blueberry_core_runtime_EXPORT IExtensionRegistry
    * @param persist indicates if the contribution(s) should be stored in the registry cache. If <code>false</code>,
    *        contribution is not persisted in the registry cache and is lost on BlueBerry restart
    * @param name optional name of the contribution. Used for error reporting; might be <code>QString()</code>
-   * @param translationBundle optional translator used for translations; might be <code>NULL</code>
+   * @param translationBundle optional translator used for translations; might be <code>nullptr</code>
    * @param token the key used to check permissions
    * @return <code>true</code> if the contribution was successfully processed and <code>false</code> otherwise
    * @throws ctkInvalidArgumentException if an incorrect token is passed

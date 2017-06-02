@@ -26,7 +26,7 @@ unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceDimension = 0;
 unsigned int CompareImageSliceTestHelper::m_SliceIndex = 0;
 bool CompareImageSliceTestHelper::m_ComparisonResult = false;
-mitk::Image *CompareImageSliceTestHelper::m_SliceImage = NULL;
+mitk::Image *CompareImageSliceTestHelper::m_SliceImage = nullptr;
 
 class mitkOverwriteSliceImageFilterTestClass
 {
@@ -99,7 +99,7 @@ public:
       if (output.IsNull())
       {
         ++numberFailed;
-        std::cerr << "  (EE) Overwrite filter has output NULL and gave no exception for an " << image->GetDimension()
+        std::cerr << "  (EE) Overwrite filter has output nullptr and gave no exception for an " << image->GetDimension()
                   << "-dimensional image, sliceDimension " << sliceDimension << " sliceIndex 1-2."
                   << "(l. " << __LINE__ << ")" << std::endl;
         continue;
@@ -300,7 +300,7 @@ int mitkOverwriteSliceImageFilterTest(int argc, char *argv[])
 
   // load the image
 
-  mitk::Image::Pointer image = NULL;
+  mitk::Image::Pointer image = nullptr;
   try
   {
     MITK_INFO << "Testing with parameter '" << argv[1] << "'";
@@ -353,7 +353,7 @@ int mitkOverwriteSliceImageFilterTest(int argc, char *argv[])
   std::cout << "Testing filter destruction" << std::endl;
 
   // freeing
-  filter = NULL;
+  filter = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

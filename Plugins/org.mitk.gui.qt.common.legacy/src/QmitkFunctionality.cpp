@@ -204,7 +204,7 @@ void QmitkFunctionality::ClosePartProxy()
   }
 
   // REMOVE SELECTION PROVIDER
-  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(NULL));
+  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(nullptr));
 
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)

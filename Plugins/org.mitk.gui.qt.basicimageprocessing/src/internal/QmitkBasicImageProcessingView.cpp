@@ -143,9 +143,9 @@ typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double >       
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 : QmitkAbstractView(),
-  m_Controls(NULL),
-  m_SelectedImageNode(NULL),
-  m_TimeStepperAdapter(NULL)
+  m_Controls(nullptr),
+  m_SelectedImageNode(nullptr),
+  m_TimeStepperAdapter(nullptr)
 {
 }
 
@@ -158,7 +158,7 @@ QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 
 void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
 {
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new Ui::QmitkBasicImageProcessingViewControls;
     m_Controls->setupUi(parent);
@@ -682,17 +682,17 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   {
   QString exceptionString = tr("An error occured during image loading:\n");
   exceptionString.append( e.what() );
-    QMessageBox::warning( NULL, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( nullptr, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();
     return;
   }
 
-  // check if input image is valid, casting does not throw exception when casting from 'NULL-Object'
+  // check if input image is valid, casting does not throw exception when casting from 'nullptr-Object'
   if ( (! newImage) || (newImage->IsInitialized() == false) )
   {
     this->BusyCursorOff();
 
-    QMessageBox::warning( NULL, "Basic Image Processing", tr("Input image is broken or not initialized. Returning."), QMessageBox::Ok, QMessageBox::NoButton );
+    QMessageBox::warning( nullptr, "Basic Image Processing", tr("Input image is broken or not initialized. Returning."), QMessageBox::Ok, QMessageBox::NoButton );
     return;
   }
 
@@ -1097,7 +1097,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   catch (...)
   {
     this->BusyCursorOff();
-    QMessageBox::warning(NULL, "Warning", "Problem when applying filter operation. Check your input...");
+    QMessageBox::warning(nullptr, "Warning", "Problem when applying filter operation. Check your input...");
     return;
   }
 
@@ -1234,7 +1234,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   CastToItkImage( newImage2, itkImage2 );
 
   // Remove temp image
-//  newImage2 = NULL;
+//  newImage2 = nullptr;
 
   std::string nameAddition = "";
 
@@ -1375,15 +1375,15 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   catch (const itk::ExceptionObject& e )
   {
     this->BusyCursorOff();
-    QMessageBox::warning(NULL, "ITK Exception", e.what() );
-    QMessageBox::warning(NULL, "Warning", tr("Problem when applying arithmetic operation to two images. Check dimensions of input images."));
+    QMessageBox::warning(nullptr, "ITK Exception", e.what() );
+    QMessageBox::warning(nullptr, "Warning", tr("Problem when applying arithmetic operation to two images. Check dimensions of input images."));
     return;
   }
 
   // disconnect pipeline; images will not be reused
   newImage1->DisconnectPipeline();
-  itkImage1 = NULL;
-  itkImage2 = NULL;
+  itkImage1 = nullptr;
+  itkImage2 = nullptr;
 
   // adjust level/window to new image and compose new image name
   mitk::LevelWindow levelwindow;

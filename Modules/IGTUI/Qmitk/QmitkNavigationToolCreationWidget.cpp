@@ -41,7 +41,7 @@ const std::string QmitkNavigationToolCreationWidget::VIEW_ID = "org.mitk.views.n
 QmitkNavigationToolCreationWidget::QmitkNavigationToolCreationWidget(QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   m_AdvancedWidget = new QmitkNavigationToolCreationAdvancedWidget(this);
   m_AdvancedWidget->setWindowFlags(Qt::Tool | Qt::WindowStaysOnTopHint);
   m_AdvancedWidget->setWindowTitle("Tool Creation Advanced Options");
@@ -54,8 +54,8 @@ RefreshTrackingDeviceCollection();
 
 QmitkNavigationToolCreationWidget::~QmitkNavigationToolCreationWidget()
 {
-  m_Controls->m_CalibrationLandmarksList->SetPointSetNode(NULL);
-  m_Controls->m_RegistrationLandmarksList->SetPointSetNode(NULL);
+  m_Controls->m_CalibrationLandmarksList->SetPointSetNode(nullptr);
+  m_Controls->m_RegistrationLandmarksList->SetPointSetNode(nullptr);
   delete m_AdvancedWidget;
 }
 
@@ -185,14 +185,14 @@ m_CreatedTool->SetTrackingDeviceType(m_Controls->m_TrackingDeviceTypeChooser->cu
 
 void QmitkNavigationToolCreationWidget::OnCancel()
 {
-  m_CreatedTool = NULL;
+  m_CreatedTool = nullptr;
 
   emit Canceled();
 }
 
 void QmitkNavigationToolCreationWidget::OnLoadSurface()
 {
-  std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
+  std::string filename = QFileDialog::getOpenFileName(nullptr,tr("Open Surface"), "/", tr("STL (*.stl)")).toLatin1().data();
   try
   {
     mitk::IOUtil::Load(filename.c_str(), *m_DataStorage);
@@ -205,7 +205,7 @@ void QmitkNavigationToolCreationWidget::OnLoadSurface()
 
 void QmitkNavigationToolCreationWidget::OnLoadCalibrationFile()
 {
-  m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(NULL,tr("Open Calibration File"), "/", "*.*"));
+  m_Controls->m_CalibrationFileName->setText(QFileDialog::getOpenFileName(nullptr,tr("Open Calibration File"), "/", "*.*"));
 }
 
 void QmitkNavigationToolCreationWidget::SetDefaultData(mitk::NavigationTool::Pointer DefaultTool)

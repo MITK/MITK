@@ -81,7 +81,7 @@ void InteractionEventRecorder::Play()
 
 void InteractionEventRecorder::OpenFile()
 {
-  QString fn = QFileDialog::getOpenFileName(NULL, "Open File...",
+  QString fn = QFileDialog::getOpenFileName(nullptr, "Open File...",
                                             QString(), "All Files (*)");
   if (!fn.isEmpty())
     this->m_Controls.textFileName->setText(fn);
@@ -115,12 +115,12 @@ void InteractionEventRecorder::RotateView()
 
   vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4");
 
-  if (renderWindow == NULL)
+  if (renderWindow == nullptr)
     return;
 
   mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
 
-  if (stepper == NULL)
+  if (stepper == nullptr)
     return;
 
   unsigned int newPos = 17;

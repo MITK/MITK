@@ -264,7 +264,7 @@ bool mitk::Equal(const mitk::GeometryTransformHolder *leftHandSide,
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType "
-                  "eps, bool verbose) does not with NULL pointer input.";
+                  "eps, bool verbose) does not with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);

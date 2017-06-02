@@ -146,7 +146,7 @@ namespace mitk
   virtual void Write() override                                                                                        \
                                                                                                                        \
   {                                                                                                                    \
-    if (this->GetInput() == NULL)                                                                                      \
+    if (this->GetInput() == nullptr)                                                                                      \
                                                                                                                        \
     {                                                                                                                  \
       itkExceptionMacro(<< "Write:Please specify an input!");                                                          \
@@ -155,8 +155,8 @@ namespace mitk
     /* Fill in image information.*/                                                                                    \
     this->UpdateOutputInformation();                                                                                   \
     (*(this->GetInputs().begin()))->SetRequestedRegionToLargestPossibleRegion();                                       \
-    this->PropagateRequestedRegion(NULL);                                                                              \
-    this->UpdateOutputData(NULL);                                                                                      \
+    this->PropagateRequestedRegion(nullptr);                                                                              \
+    this->UpdateOutputData(nullptr);                                                                                      \
   }                                                                                                                    \
                                                                                                                        \
   virtual void Update() override { Write(); }

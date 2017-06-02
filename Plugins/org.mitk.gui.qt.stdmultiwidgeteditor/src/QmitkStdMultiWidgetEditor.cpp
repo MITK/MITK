@@ -274,7 +274,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     QHBoxLayout* layout = new QHBoxLayout(parent);
     layout->setContentsMargins(0,0,0,0);
 
-    if (d->m_MouseModeToolbar == NULL)
+    if (d->m_MouseModeToolbar == nullptr)
     {
       d->m_MouseModeToolbar = new QmitkMouseModeSwitcher(parent); // delete by Qt via parent
       layout->addWidget(d->m_MouseModeToolbar);

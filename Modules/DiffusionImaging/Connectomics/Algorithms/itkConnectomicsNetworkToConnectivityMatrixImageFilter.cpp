@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 itk::ConnectomicsNetworkToConnectivityMatrixImageFilter::ConnectomicsNetworkToConnectivityMatrixImageFilter()
   : m_BinaryConnectivity(false)
   , m_RescaleConnectivity(false)
-  , m_InputNetwork(NULL)
+  , m_InputNetwork(nullptr)
 {
 }
 

@@ -47,7 +47,7 @@ namespace mitk
     reader->SetFileName(fileName.c_str());
     reader->Update();
 
-    if (reader->GetOutput() != NULL)
+    if (reader->GetOutput() != nullptr)
     {
       output->SetVtkPolyData(reader->GetOutput());
     }

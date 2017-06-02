@@ -280,9 +280,9 @@ void QmitkFiberProcessingView::PruneBundle()
     {
         mitk::FiberBundle::Pointer fib = dynamic_cast<mitk::FiberBundle*>(node->GetData());
         if (!fib->RemoveShortFibers(minLength))
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
         else if (!fib->RemoveLongFibers(maxLength))
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -309,7 +309,7 @@ void QmitkFiberProcessingView::ApplyCurvatureThreshold()
             node->SetData(newFib);
         }
         else
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
     }
     RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -344,7 +344,7 @@ void QmitkFiberProcessingView::RemoveWithMask(bool removeInside)
         mitk::FiberBundle::Pointer newFib = fib->RemoveFibersOutside(mask, removeInside);
         if (newFib->GetNumFibers()<=0)
         {
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
             continue;
         }
         node->SetData(newFib);
@@ -368,7 +368,7 @@ void QmitkFiberProcessingView::ExtractWithMask(bool onlyEnds, bool invert)
         mitk::FiberBundle::Pointer newFib = fib->ExtractFiberSubset(mask, !onlyEnds, invert, m_Controls->m_BothEnds->isChecked(), m_Controls->m_FiberExtractionFractionBox->value());
         if (newFib->GetNumFibers()<=0)
         {
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
             continue;
         }
 
@@ -1000,8 +1000,8 @@ void QmitkFiberProcessingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer
     m_SelectedFB.clear();
     m_SelectedPF.clear();
     m_SelectedSurfaces.clear();
-    m_SelectedImage = NULL;
-    m_MaskImageNode = NULL;
+    m_SelectedImage = nullptr;
+    m_MaskImageNode = nullptr;
 
     for (auto node: nodes)
     {
@@ -1119,7 +1119,7 @@ void QmitkFiberProcessingView::AddFigureToDataStorage(mitk::PlanarFigure* figure
 void QmitkFiberProcessingView::ExtractWithPlanarFigure()
 {
     if ( m_SelectedFB.empty() || m_SelectedPF.empty() ){
-        QMessageBox::information( NULL, "Warning", "No fibe bundle selected!");
+        QMessageBox::information( nullptr, "Warning", "No fibe bundle selected!");
         return;
     }
 
@@ -1132,7 +1132,7 @@ void QmitkFiberProcessingView::ExtractWithPlanarFigure()
         mitk::FiberBundle::Pointer extFB = fib->ExtractFiberSubset(planarFigure, GetDataStorage());
         if (extFB->GetNumFibers()<=0)
         {
-            QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers.");
+            QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers.");
             continue;
         }
 
@@ -1240,7 +1240,7 @@ void QmitkFiberProcessingView::AddCompositeToDatastorage(mitk::DataNode::Pointer
 void QmitkFiberProcessingView::CopyBundles()
 {
     if ( m_SelectedFB.empty() ){
-        QMessageBox::information( NULL, "Warning", "Select at least one fiber bundle!");
+        QMessageBox::information( nullptr, "Warning", "Select at least one fiber bundle!");
         MITK_WARN("QmitkFiberProcessingView") << "Select at least one fiber bundle!";
         return;
     }
@@ -1267,7 +1267,7 @@ void QmitkFiberProcessingView::CopyBundles()
 void QmitkFiberProcessingView::JoinBundles()
 {
     if ( m_SelectedFB.size()<2 ){
-        QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
+        QMessageBox::information( nullptr, "Warning", "Select at least two fiber bundles!");
         MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
         return;
     }
@@ -1294,7 +1294,7 @@ void QmitkFiberProcessingView::JoinBundles()
 void QmitkFiberProcessingView::SubstractBundles()
 {
     if ( m_SelectedFB.size()<2 ){
-        QMessageBox::information( NULL, "Warning", "Select at least two fiber bundles!");
+        QMessageBox::information( nullptr, "Warning", "Select at least two fiber bundles!");
         MITK_WARN("QmitkFiberProcessingView") << "Select at least two fiber bundles!";
         return;
     }
@@ -1313,7 +1313,7 @@ void QmitkFiberProcessingView::SubstractBundles()
     }
     if (newBundle.IsNull())
     {
-        QMessageBox::information(NULL, "No output generated:", "The resulting fiber bundle contains no fibers. Did you select the fiber bundles in the correct order? X-Y is not equal to Y-X!");
+        QMessageBox::information(nullptr, "No output generated:", "The resulting fiber bundle contains no fibers. Did you select the fiber bundles in the correct order? X-Y is not equal to Y-X!");
         return;
     }
 
@@ -1363,7 +1363,7 @@ void QmitkFiberProcessingView::DoImageColorCoding()
 {
     if (m_Controls->m_ColorMapBox->GetSelectedNode().IsNull())
     {
-        QMessageBox::information(NULL, "Bundle coloring aborted:", "No image providing the scalar values for coloring the selected bundle available.");
+        QMessageBox::information(nullptr, "Bundle coloring aborted:", "No image providing the scalar values for coloring the selected bundle available.");
         return;
     }
 

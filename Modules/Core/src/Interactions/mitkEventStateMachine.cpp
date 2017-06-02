@@ -26,9 +26,9 @@
 
 mitk::EventStateMachine::EventStateMachine()
   : m_IsActive(true),
-    m_UndoController(NULL),
-    m_StateMachineContainer(NULL),
-    m_CurrentState(NULL),
+    m_UndoController(nullptr),
+    m_StateMachineContainer(nullptr),
+    m_CurrentState(nullptr),
     m_MouseCursorSet(false)
 {
   if (!m_UndoController)
@@ -44,7 +44,7 @@ mitk::EventStateMachine::EventStateMachine()
 
 bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, const us::Module *module)
 {
-  if (m_StateMachineContainer != NULL)
+  if (m_StateMachineContainer != nullptr)
   {
     m_StateMachineContainer->Delete();
   }
@@ -87,7 +87,7 @@ bool mitk::EventStateMachine::LoadStateMachine(const std::string &filename, cons
 
 mitk::EventStateMachine::~EventStateMachine()
 {
-  if (m_StateMachineContainer != NULL)
+  if (m_StateMachineContainer != nullptr)
   {
     m_StateMachineContainer->Delete();
   }
@@ -195,7 +195,7 @@ bool mitk::EventStateMachine::CheckCondition(const StateMachineCondition &condit
 
 void mitk::EventStateMachine::ExecuteAction(StateMachineAction *action, InteractionEvent *event)
 {
-  if (action == NULL)
+  if (action == nullptr)
   {
     return;
   }
@@ -229,7 +229,7 @@ mitk::StateMachineState *mitk::EventStateMachine::GetCurrentState() const
 
 bool mitk::EventStateMachine::FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode)
 {
-  if (dataNode == NULL)
+  if (dataNode == nullptr)
   {
     MITK_WARN << "EventStateMachine: Empty DataNode received along with this Event " << interactionEvent;
     return false;
@@ -252,10 +252,10 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
   const mitk::StateMachineState::TransitionVector transitionList =
     m_CurrentState->GetTransitionList(event->GetNameOfClass(), MapToEventVariant(event));
 
-  // if there are not transitions, we can return NULL here.
+  // if there are not transitions, we can return nullptr here.
   if (transitionList.empty())
   {
-    return NULL;
+    return nullptr;
   }
 
   StateMachineState::TransitionVector::const_iterator transitionIter;
@@ -318,8 +318,8 @@ mitk::StateMachineTransition *mitk::EventStateMachine::GetExecutableTransition(m
     }
   }
 
-  // We have found no transition that can be executed, return NULL
-  return NULL;
+  // We have found no transition that can be executed, return nullptr
+  return nullptr;
 }
 
 void mitk::EventStateMachine::ResetToStartState()

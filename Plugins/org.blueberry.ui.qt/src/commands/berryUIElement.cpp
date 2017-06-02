@@ -25,7 +25,7 @@ UIElement::UIElement(IServiceLocator* serviceLocator)
   : serviceLocator(serviceLocator)
 {
   if (!serviceLocator)
-    throw std::invalid_argument("serviceLocator must not be NULL");
+    throw std::invalid_argument("serviceLocator must not be nullptr");
 }
 
 IServiceLocator* UIElement::GetServiceLocator() const

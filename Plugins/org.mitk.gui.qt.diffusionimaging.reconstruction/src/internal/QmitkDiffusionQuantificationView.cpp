@@ -49,7 +49,7 @@ const std::string QmitkDiffusionQuantificationView::VIEW_ID = "org.mitk.views.di
 
 QmitkDiffusionQuantificationView::QmitkDiffusionQuantificationView()
     : QmitkAbstractView(),
-      m_Controls(NULL)
+      m_Controls(nullptr)
 {
     m_QBallImages = mitk::DataStorage::SetOfObjects::New();
     m_TensorImages = mitk::DataStorage::SetOfObjects::New();
@@ -116,7 +116,7 @@ void QmitkDiffusionQuantificationView::OnSelectionChanged(berry::IWorkbenchPart:
     bool foundQBIVolume = false;
     bool foundTensorVolume = false;
     bool foundDwVolume = false;
-    mitk::DataNode::Pointer  selNode = NULL;
+    mitk::DataNode::Pointer  selNode = nullptr;
 
     int c=0;
     for (mitk::DataNode::Pointer node: nodes)

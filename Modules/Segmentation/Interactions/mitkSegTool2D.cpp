@@ -61,7 +61,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
 
 mitk::SegTool2D::SegTool2D(const char *type)
-  : Tool(type), m_LastEventSender(NULL), m_LastEventSlice(0), m_Contourmarkername("Position"), m_ShowMarkerNodes(false)
+  : Tool(type), m_LastEventSender(nullptr), m_LastEventSlice(0), m_Contourmarkername("Position"), m_ShowMarkerNodes(false)
 {
   Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
 }
@@ -427,8 +427,8 @@ void mitk::SegTool2D::WriteSliceToVolume(mitk::SegTool2D::SliceInformation slice
   UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 
   // clear the pointers as the operation are stored in the undocontroller and also deleted from there
-  undoOperation = NULL;
-  doOperation = NULL;
+  undoOperation = nullptr;
+  doOperation = nullptr;
   /*============= END undo/redo feature block ========================*/
 }
 
@@ -444,7 +444,7 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 
 int mitk::SegTool2D::AddContourmarker()
 {
-  if (m_LastEventSender == NULL)
+  if (m_LastEventSender == nullptr)
     return -1;
 
   us::ServiceReference<PlanePositionManagerService> serviceRef =

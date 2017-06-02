@@ -663,7 +663,7 @@ void USNavigationMarkerPlacement::ReinitOnImage()
     {
       // make a reinit on the ultrasound image
       mitk::IRenderWindowPart *renderWindow = this->GetRenderWindowPart();
-      if (renderWindow != NULL && image->GetTimeGeometry()->IsValid())
+      if (renderWindow != nullptr && image->GetTimeGeometry()->IsValid())
       {
         renderWindow->GetRenderingManager()->InitializeViews(
           image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);

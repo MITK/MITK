@@ -148,7 +148,7 @@ void CustomViewerWorkbenchWindowAdvisor::UpdateStyle()
 void CustomViewerWorkbenchWindowAdvisor::OpenFile()
 {
   // Ask the user for a list of files to open
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,
+  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr,
                                                         "Open",
                                                         /*d->getLastFileOpenPath()*/ QString(),
                                                         mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());

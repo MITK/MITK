@@ -47,9 +47,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkSliceBasedInterpolatorWidget::QmitkSliceBasedInterpolatorWidget(QWidget *parent, const char * /*name*/)
   : QWidget(parent),
     m_SliceInterpolatorController(mitk::SliceBasedInterpolationController::New()),
-    m_ToolManager(NULL),
+    m_ToolManager(nullptr),
     m_Activated(false),
-    m_DataStorage(NULL),
+    m_DataStorage(nullptr),
     m_LastSNC(0),
     m_LastSliceIndex(0)
 {
@@ -154,13 +154,13 @@ void QmitkSliceBasedInterpolatorWidget::SetSliceNavigationControllers(
     timeChangedCommand->SetCallbackFunction(this, &QmitkSliceBasedInterpolatorWidget::OnTimeChanged);
     m_ControllerToTimeObserverTag.insert(
       slicer,
-      slicer->AddObserver(mitk::SliceNavigationController::TimeSlicedGeometryEvent(NULL, 0), timeChangedCommand));
+      slicer->AddObserver(mitk::SliceNavigationController::TimeSlicedGeometryEvent(nullptr, 0), timeChangedCommand));
 
     itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::Pointer sliceChangedCommand =
       itk::MemberCommand<QmitkSliceBasedInterpolatorWidget>::New();
     sliceChangedCommand->SetCallbackFunction(this, &QmitkSliceBasedInterpolatorWidget::OnSliceChanged);
     m_ControllerToSliceObserverTag.insert(
-      slicer, slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), sliceChangedCommand));
+      slicer, slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), sliceChangedCommand));
   }
 
   m_ActionToSliceDimensionMap = this->CreateActionToSliceDimension();
@@ -307,7 +307,7 @@ mitk::Image::Pointer QmitkSliceBasedInterpolatorWidget::GetWorkingSlice(const mi
   catch (itk::ExceptionObject &excep)
   {
     MITK_ERROR << "Exception caught: " << excep.GetDescription();
-    return NULL;
+    return nullptr;
   }
 
   mitk::Image::Pointer slice = extractor->GetOutput();
@@ -519,10 +519,10 @@ void QmitkSliceBasedInterpolatorWidget::OnAcceptInterpolationClicked()
     mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
 
     // clear the pointers as the operation are stored in the undo controller and also deleted from there
-    m_undoOperation = NULL;
-    m_doOperation = NULL;
+    m_undoOperation = nullptr;
+    m_doOperation = nullptr;
 
-    m_PreviewNode->SetData(NULL);
+    m_PreviewNode->SetData(nullptr);
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
   renderWindow.resize(256, 256);
 
   // cleanup: Remove References to DataStorage. This will delete the object
-  ds = NULL;
+  ds = nullptr;
 }
 /**
 \example Step1.cpp

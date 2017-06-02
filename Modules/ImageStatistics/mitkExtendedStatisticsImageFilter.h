@@ -123,7 +123,7 @@ namespace itk
           }
           else
           {
-              return ITK_NULLPTR;
+              return nullptr;
           }
       }
 

@@ -125,7 +125,7 @@ std::string mitk::StandardFileLocations::FindFile(const char *filename, const ch
   const char *homeDrive = itksys::SystemTools::GetEnv("HOMEDRIVE");
   const char *homePath = itksys::SystemTools::GetEnv("HOMEPATH");
 
-  if ((homeDrive != NULL) || (homePath != NULL))
+  if ((homeDrive != nullptr) || (homePath != nullptr))
   {
     directoryPath = homeDrive;
     directoryPath += homePath;
@@ -183,7 +183,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
 #if defined(_WIN32) && !defined(__CYGWIN__)
     const char *homeDrive = itksys::SystemTools::GetEnv("HOMEDRIVE");
     const char *homePath = itksys::SystemTools::GetEnv("HOMEPATH");
-    if ((homeDrive == NULL) || (homePath == NULL))
+    if ((homeDrive == nullptr) || (homePath == nullptr))
     {
       itkGenericOutputMacro(<< "Environment variables HOMEDRIVE and/or HOMEPATH not set"
                             << ". Using current working directory as home directory: "

@@ -34,7 +34,7 @@ static vtkSmartPointer<vtkPolyData> DeepCopy(vtkPolyData *other)
 
 static void Update(vtkPolyData * /*polyData*/)
 {
-  //  if (polyData != NULL)
+  //  if (polyData != nullptr)
   //    polyData->Update(); //VTK6_TODO vtk pipeline
 }
 
@@ -194,7 +194,7 @@ void mitk::Surface::CalculateBoundingBox()
     BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(i);
 
     if (geometry.IsNull())
-      mitkThrow() << "Time-sliced geometry is invalid (equals NULL).";
+      mitkThrow() << "Time-sliced geometry is invalid (equals nullptr).";
 
     geometry->SetFloatBounds(bounds);
   }
@@ -246,7 +246,7 @@ void mitk::Surface::SetRequestedRegion(const itk::DataObject *data)
 void mitk::Surface::SetRequestedRegion(Surface::RegionType *region)
 {
   if (region == nullptr)
-    mitkThrow() << "Requested region is invalid (equals NULL)";
+    mitkThrow() << "Requested region is invalid (equals nullptr)";
 
   m_RequestedRegion = *region;
 }
@@ -374,7 +374,7 @@ bool mitk::Equal(vtkPolyData *leftHandSide, vtkPolyData *rightHandSide, mitk::Sc
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( vtkPolyData* leftHandSide, vtkPolyData* rightHandSide, mitk::ScalarType eps, bool "
-                  "verbose ) does not work for NULL pointer input.";
+                  "verbose ) does not work for nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);
@@ -474,7 +474,7 @@ bool mitk::Equal(mitk::Surface *leftHandSide, mitk::Surface *rightHandSide, mitk
   if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
   {
     MITK_ERROR << "mitk::Equal( mitk::Surface* leftHandSide, mitk::Surface* rightHandSide, mitk::ScalarType eps, bool "
-                  "verbose ) does not work with NULL pointer input.";
+                  "verbose ) does not work with nullptr pointer input.";
     return false;
   }
   return Equal(*leftHandSide, *rightHandSide, eps, verbose);

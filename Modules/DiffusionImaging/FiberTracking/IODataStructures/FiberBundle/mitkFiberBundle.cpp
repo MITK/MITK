@@ -120,7 +120,7 @@ mitk::FiberBundle::Pointer mitk::FiberBundle::AddBundle(mitk::FiberBundle* fib)
 {
     if (fib==nullptr)
     {
-        MITK_WARN << "trying to call AddBundle with NULL argument";
+        MITK_WARN << "trying to call AddBundle with nullptr argument";
         return nullptr;
     }
     MITK_INFO << "Adding fibers";
@@ -2160,7 +2160,7 @@ bool mitk::FiberBundle::Equals(mitk::FiberBundle* fib, double eps)
 {
     if (fib==nullptr)
     {
-        MITK_INFO << "Reference bundle is NULL!";
+        MITK_INFO << "Reference bundle is nullptr!";
         return false;
     }
 

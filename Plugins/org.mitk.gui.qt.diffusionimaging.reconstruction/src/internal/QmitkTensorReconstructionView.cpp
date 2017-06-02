@@ -75,7 +75,7 @@ using namespace berry;
 
 QmitkTensorReconstructionView::QmitkTensorReconstructionView()
     : QmitkAbstractView(),
-      m_Controls(NULL)
+      m_Controls(nullptr)
 {
     m_DiffusionImages = mitk::DataStorage::SetOfObjects::New();
     m_TensorImages = mitk::DataStorage::SetOfObjects::New();
@@ -821,8 +821,8 @@ void QmitkTensorReconstructionView::OnSelectionChanged(berry::IWorkbenchPart::Po
     bool foundDwiVolume = false;
     bool foundTensorVolume = false;
     m_Controls->m_DiffusionImageLabel->setText("<font color='red'>mandatory</font>");
-    m_DiffusionImage = NULL;
-    m_TensorImage = NULL;
+    m_DiffusionImage = nullptr;
+    m_TensorImage = nullptr;
 
     m_Controls->m_InputData->setTitle("Please Select Input Data");
 

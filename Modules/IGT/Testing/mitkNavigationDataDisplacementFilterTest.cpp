@@ -62,7 +62,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(myFilter->GetOffset() == offset, "testing Set-/GetOffset()");
 
   mitk::NavigationData* output = myFilter->GetOutput();
-  MITK_TEST_CONDITION_REQUIRED(output != NULL, "Testing GetOutput()");
+  MITK_TEST_CONDITION_REQUIRED(output != nullptr, "Testing GetOutput()");
 
   output->Update(); // execute filter
 
@@ -79,7 +79,7 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   nd2->SetPositionAccuracy(initialError);
   nd2->SetDataValid(initialValid);
 
-  myFilter = NULL;
+  myFilter = nullptr;
   myFilter = mitk::NavigationDataDisplacementFilter::New();
   myFilter->SetOffset(offset);
   myFilter->SetInput(0, nd1);
@@ -91,8 +91,8 @@ int mitkNavigationDataDisplacementFilterTest(int /* argc */, char* /*argv*/[])
   output = myFilter->GetOutput();
   mitk::NavigationData* output2 = myFilter->GetOutput(1);
   output2->Update(); // execute filter pipeline. this should update both outputs!
-  MITK_TEST_CONDITION(((output != NULL)
-                    && (output2 != NULL)), "testing GetOutput(index)");
+  MITK_TEST_CONDITION(((output != nullptr)
+                    && (output2 != nullptr)), "testing GetOutput(index)");
 
   MITK_TEST_CONDITION(output->GetPosition() == (initialPos + offset), "Testing offset calculation for output 0");
   MITK_TEST_CONDITION(output2->GetPosition() == (initialPos2 + offset), "Testing offset calculation for output 1");

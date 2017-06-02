@@ -111,7 +111,7 @@ namespace mitk
     }
     algo->Update();
 
-    if (algo->GetOutput() != NULL)
+    if (algo->GetOutput() != nullptr)
     {
       vtkSmartPointer<vtkPolyData> surfaceWithNormals = algo->GetOutput();
       output->SetVtkPolyData(surfaceWithNormals);

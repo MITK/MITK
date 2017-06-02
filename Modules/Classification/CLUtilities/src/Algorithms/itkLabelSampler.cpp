@@ -36,7 +36,7 @@ void LabelSampler< TImage>
 {
 
 
-  srand (time(NULL));
+  srand (time(nullptr));
   this->AllocateOutputs();
 
   typename TImage::ConstPointer input = this->GetInput();

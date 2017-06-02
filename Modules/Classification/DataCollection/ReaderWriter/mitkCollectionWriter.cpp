@@ -96,7 +96,7 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
 
     // Herein create data folders
     DataCollection* subCollections = dynamic_cast<DataCollection*> (dataCollection->GetData(i).GetPointer());
-    if (subCollections == NULL)
+    if (subCollections == nullptr)
     {
       MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
       return false;
@@ -110,7 +110,7 @@ bool mitk::CollectionWriter::ExportCollectionToFolder(DataCollection *dataCollec
       xmlFileStream << "  <" << DATA <<  " " << NAME << "=\"" << subCollections->IndexToName(d) << "\" " <<  FILEPATH << "=\"" << subCollections->GetDataFilePath(d) << "\" id=\"Data" << dataId << "\" >\n";
 
       DataCollection* itemCollections = dynamic_cast<DataCollection*> (subCollections->GetData(d).GetPointer());
-      if (itemCollections == NULL)
+      if (itemCollections == nullptr)
       {
         MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
         return false;
@@ -197,7 +197,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
 
     // Herein create data folders
     DataCollection* subCollections = dynamic_cast<DataCollection*> (dataCollection->GetData(i).GetPointer());
-    if (subCollections == NULL)
+    if (subCollections == nullptr)
     {
       MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
       return false;
@@ -211,7 +211,7 @@ bool mitk::CollectionWriter::SaveCollection(mitk::DataCollection *dataCollection
       xmlFileStream << "  <" << DATA <<  " " << NAME << "=\"" << subCollections->IndexToName(d) << "\" " <<  FILEPATH << "=\"" << subCollections->GetDataFilePath(d) << "\" id=\"Data" << dataId << "\" >\n";
 
       DataCollection* itemCollections = dynamic_cast<DataCollection*> (subCollections->GetData(d).GetPointer());
-      if (itemCollections == NULL)
+      if (itemCollections == nullptr)
       {
         MITK_ERROR<< "mitk::CollectionWriter::SaveCollectionToFolder: Container is illformed. Aborting";
         return false;

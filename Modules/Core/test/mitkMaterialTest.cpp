@@ -38,7 +38,7 @@ class MaterialTest
 public:
   mitk::Material::Pointer myMP;
 
-  MaterialTest() { myMP = NULL; }
+  MaterialTest() { myMP = nullptr; }
   void testConstructor()
   {
     myMP = mitk::Material::New();

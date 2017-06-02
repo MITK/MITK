@@ -502,7 +502,7 @@ void mitk::USDevice::UpdateServiceProperty(std::string key, bool value)
 mitk::Image* mitk::USDevice::GetOutput()
 {
 if (this->GetNumberOfOutputs() < 1)
-return NULL;
+return nullptr;
 
 return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 }
@@ -510,7 +510,7 @@ return static_cast<USImage*>(this->ProcessObject::GetPrimaryOutput());
 mitk::Image* mitk::USDevice::GetOutput(unsigned int idx)
 {
 if (this->GetNumberOfOutputs() < 1)
-return NULL;
+return nullptr;
 return static_cast<USImage*>(this->ProcessObject::GetOutput(idx));
 }
 
@@ -529,13 +529,13 @@ itkExceptionMacro(<<"Requested to graft output " << idx <<
 
 if ( !graft )
 {
-itkExceptionMacro(<<"Requested to graft output with a NULL pointer object" );
+itkExceptionMacro(<<"Requested to graft output with a nullptr pointer object" );
 }
 
 itk::DataObject* output = this->GetOutput(idx);
 if ( !output )
 {
-itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
+itkExceptionMacro(<<"Requested to graft output that is a nullptr pointer" );
 }
 // Call Graft on USImage to copy member data
 output->Graft( graft );
@@ -549,7 +549,7 @@ void mitk::USDevice::GrabImage()
   m_ImageMutex->Lock();
   this->SetImage(image);
   m_ImageMutex->Unlock();
-  // if (image.IsNotNull() && (image->GetGeometry()!=NULL)){
+  // if (image.IsNotNull() && (image->GetGeometry()!=nullptr)){
   //  MITK_INFO << "Spacing: " << image->GetGeometry()->GetSpacing();}
 }
 

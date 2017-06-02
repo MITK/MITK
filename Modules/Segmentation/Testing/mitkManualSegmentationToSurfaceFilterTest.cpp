@@ -60,8 +60,8 @@ public:
 
   void tearDown() override
   {
-    m_Filter = NULL;
-    m_ReferenceSurface = NULL;
+    m_Filter = nullptr;
+    m_ReferenceSurface = nullptr;
   }
 
   void Update_BallBinary_OutputEqualsReference()

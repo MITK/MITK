@@ -217,7 +217,7 @@ void QmitkAICPRegistrationView::OnStartRegistration()
   // sanity check
   if ( d->m_FixedSurface.IsNull() || d->m_MovingSurface.IsNull() )
   {
-    const char* message = "Input surfaces are NULL.";
+    const char* message = "Input surfaces are nullptr.";
     QMessageBox msg;
     msg.setIcon(QMessageBox::Critical);
     msg.setText(message);

@@ -59,7 +59,7 @@ namespace mitk
 
   By default the properties are set to:
   - interpolation mode Nearestneighbor.
-  - a transform NULL (No transform is set).
+  - a transform nullptr (No transform is set).
   - time step 0.
   - component 0.
   - resample by geometry false (Corresponds to input image).

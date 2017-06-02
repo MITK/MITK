@@ -67,14 +67,14 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char *argv[])
     std::cout << "Wrong number of outputs, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput() == NULL)
+  else if (filter->GetOutput() == nullptr)
   {
-    std::cout << "Output is NULL, [FAILED]" << std::endl;
+    std::cout << "Output is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput()->GetVtkPolyData() == NULL)
+  else if (filter->GetOutput()->GetVtkPolyData() == nullptr)
   {
-    std::cout << "PolyData of surface is NULL, [FAILED]" << std::endl;
+    std::cout << "PolyData of surface is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   else
@@ -140,14 +140,14 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char *argv[])
     std::cout << "Wrong number of outputs, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput() == NULL)
+  else if (filter->GetOutput() == nullptr)
   {
-    std::cout << "Output is NULL, [FAILED]" << std::endl;
+    std::cout << "Output is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput()->GetVtkPolyData() == NULL)
+  else if (filter->GetOutput()->GetVtkPolyData() == nullptr)
   {
-    std::cout << "PolyData of surface is NULL, [FAILED]" << std::endl;
+    std::cout << "PolyData of surface is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   else
@@ -186,24 +186,24 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char *argv[])
     std::cout << "Wrong number of outputs, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput() == NULL)
+  else if (filter->GetOutput() == nullptr)
   {
-    std::cout << "Output 0 is NULL, [FAILED]" << std::endl;
+    std::cout << "Output 0 is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput()->GetVtkPolyData() == NULL)
+  else if (filter->GetOutput()->GetVtkPolyData() == nullptr)
   {
-    std::cout << "PolyData of output 0 is NULL, [FAILED]" << std::endl;
+    std::cout << "PolyData of output 0 is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput(1) == NULL)
+  else if (filter->GetOutput(1) == nullptr)
   {
-    std::cout << "Output 1 is NULL, [FAILED]" << std::endl;
+    std::cout << "Output 1 is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput(1)->GetVtkPolyData() == NULL)
+  else if (filter->GetOutput(1)->GetVtkPolyData() == nullptr)
   {
-    std::cout << "PolyData of output 1 is NULL, [FAILED]" << std::endl;
+    std::cout << "PolyData of output 1 is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   else
@@ -254,21 +254,21 @@ int mitkLabeledImageToSurfaceFilterTest(int argc, char *argv[])
   // mitk::Surface::Pointer surface = filter->GetOutput(1);
   // std::cout<< surface->GetReferenceCount() << std::endl;
   filter->Update();
-  // surface = NULL;
+  // surface = nullptr;
 
   if (filter->GetNumberOfOutputs() != 1)
   {
     std::cout << "Wrong number of outputs, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput() == NULL)
+  else if (filter->GetOutput() == nullptr)
   {
-    std::cout << "Output is NULL, [FAILED]" << std::endl;
+    std::cout << "Output is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
-  else if (filter->GetOutput()->GetVtkPolyData() == NULL)
+  else if (filter->GetOutput()->GetVtkPolyData() == nullptr)
   {
-    std::cout << "PolyData of surface is NULL, [FAILED]" << std::endl;
+    std::cout << "PolyData of surface is nullptr, [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
   else

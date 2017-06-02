@@ -34,8 +34,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::OclFilter::OclFilter()
   : m_ClCompilerFlags(""),
-    m_ClProgram(NULL),
-    m_CommandQue(NULL),
+    m_ClProgram(nullptr),
+    m_CommandQue(nullptr),
     m_FilterID("mitkOclFilter"),
     m_Preambel(" "),
     m_Initialized(false)
@@ -44,8 +44,8 @@ mitk::OclFilter::OclFilter()
 
 mitk::OclFilter::OclFilter(const char* filename)
   : m_ClCompilerFlags(""),
-    m_ClProgram(NULL),
-    m_CommandQue(NULL),
+    m_ClProgram(nullptr),
+    m_CommandQue(nullptr),
     m_FilterID(filename),
     m_Preambel(" "),
     m_Initialized(false)
@@ -73,7 +73,7 @@ bool mitk::OclFilter::ExecuteKernel( cl_kernel kernel, unsigned int workSizeDim 
   cl_int clErr = 0;
 
   clErr = clEnqueueNDRangeKernel( this->m_CommandQue, kernel, workSizeDim,
-                                  NULL, this->m_GlobalWorkSize, m_LocalWorkSize, 0, NULL, NULL);
+                                  nullptr, this->m_GlobalWorkSize, m_LocalWorkSize, 0, nullptr, nullptr);
 
   CHECK_OCL_ERR( clErr );
 
@@ -97,7 +97,7 @@ bool mitk::OclFilter::Initialize()
     return false;
   }
 
-  if (m_ClProgram == NULL)
+  if (m_ClProgram == nullptr)
   {
     try
     {
@@ -178,7 +178,7 @@ void mitk::OclFilter::CompileSource()
 
     MITK_DEBUG("ocl.filter") << "cl compiler flags: " << compilerOptions.c_str();
 
-    clErr = clBuildProgram(m_ClProgram, 0, NULL, compilerOptions.c_str(), NULL, NULL);
+    clErr = clBuildProgram(m_ClProgram, 0, nullptr, compilerOptions.c_str(), nullptr, nullptr);
     CHECK_OCL_ERR(clErr);
 
     // if OpenCL Source build failed

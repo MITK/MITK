@@ -44,18 +44,18 @@ mitk::SegmentationObjectFactory::SegmentationObjectFactory() : CoreObjectFactory
 
 mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
   mitk::BaseData *data = node->GetData();
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
     std::string classname("ContourModel");
-    if (dynamic_cast<mitk::Contour *>(node->GetData()) != NULL)
+    if (dynamic_cast<mitk::Contour *>(node->GetData()) != nullptr)
     {
       newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
     }
-    else if (dynamic_cast<mitk::ContourSet *>(node->GetData()) != NULL)
+    else if (dynamic_cast<mitk::ContourSet *>(node->GetData()) != nullptr)
     {
       newMapper = mitk::VtkGLMapperWrapper::New(mitk::ContourSetMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
@@ -63,12 +63,12 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<Contour *>(data) != NULL))
+    if ((dynamic_cast<Contour *>(data) != nullptr))
     {
       newMapper = mitk::ContourVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    else if ((dynamic_cast<ContourSet *>(data) != NULL))
+    else if ((dynamic_cast<ContourSet *>(data) != nullptr))
     {
       newMapper = mitk::ContourSetVtkMapper3D::New();
       newMapper->SetDataNode(node);
@@ -79,7 +79,7 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
 
 void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;

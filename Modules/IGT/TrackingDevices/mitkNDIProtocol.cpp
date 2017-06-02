@@ -1249,7 +1249,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::POS3D(MarkerPointContainerType* markerPosi
   }
   if (markerPositions == nullptr)
   {
-    std::cout << "ERROR: markerPositions==NULL" << std::endl;
+    std::cout << "ERROR: markerPositions==nullptr" << std::endl;
     return NDIUNKNOWNERROR;
   }
 

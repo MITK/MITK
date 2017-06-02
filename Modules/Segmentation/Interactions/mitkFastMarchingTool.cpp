@@ -73,7 +73,7 @@ void mitk::FastMarchingTool::ConnectActionsAndFunctions()
 
 const char **mitk::FastMarchingTool::GetXPM() const
 {
-  return NULL; // mitkFastMarchingTool_xpm;
+  return nullptr; // mitkFastMarchingTool_xpm;
 }
 
 us::ModuleResource mitk::FastMarchingTool::GetIconResource() const
@@ -245,8 +245,8 @@ void mitk::FastMarchingTool::Deactivated()
   m_ToolManager->GetDataStorage()->Remove(this->m_ResultImageNode);
   m_ToolManager->GetDataStorage()->Remove(this->m_SeedsAsPointSetNode);
   this->ClearSeeds();
-  m_ResultImageNode = NULL;
-  m_SeedsAsPointSetNode = NULL;
+  m_ResultImageNode = nullptr;
+  m_SeedsAsPointSetNode = nullptr;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   Superclass::Deactivated();
@@ -335,11 +335,11 @@ void mitk::FastMarchingTool::OnAddPoint(StateMachineAction *, InteractionEvent *
   // Add a new seed point for FastMarching algorithm
   mitk::InteractionPositionEvent *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   // const PositionEvent* p = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   if (m_PositionEvent.IsNotNull())
-    m_PositionEvent = NULL;
+    m_PositionEvent = nullptr;
 
   m_PositionEvent =
     InteractionPositionEvent::New(positionEvent->GetSender(), positionEvent->GetPointerPositionOnScreen());

@@ -415,7 +415,7 @@ void testResourcesFrom(const std::string& moduleName)
 #endif
 
   Module* moduleR = ModuleRegistry::GetModule(moduleName);
-  US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module")
+  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Test for existing module")
 
   US_TEST_CONDITION(moduleR->GetName() == moduleName, "Test module name")
 
@@ -449,7 +449,7 @@ int usModuleResourceTest(int /*argc*/, char* /*argv*/[])
 #endif
 
   Module* moduleR = ModuleRegistry::GetModule("TestModuleR");
-  US_TEST_CONDITION_REQUIRED(moduleR != NULL, "Test for existing module TestModuleR")
+  US_TEST_CONDITION_REQUIRED(moduleR != nullptr, "Test for existing module TestModuleR")
 
   US_TEST_CONDITION(moduleR->GetName() == "TestModuleR", "Test module name")
 

@@ -138,10 +138,10 @@ class QmitkTractbasedSpatialStatisticsView : public QmitkAbstractView, public mi
     void Plot(mitk::TbssImage*, mitk::TbssRoiImage*);
 
 
-    void PlotFiberBundle(mitk::FiberBundle* fib, mitk::Image* img, mitk::DataNode* startRoi=NULL, mitk::DataNode* endRoi=NULL);
+    void PlotFiberBundle(mitk::FiberBundle* fib, mitk::Image* img, mitk::DataNode* startRoi=nullptr, mitk::DataNode* endRoi=nullptr);
 
 
-    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundle* fib, mitk::DataNode *startRoi=NULL, mitk::DataNode *endRoi=NULL);
+    void PlotFiber4D(mitk::TbssImage*, mitk::FiberBundle* fib, mitk::DataNode *startRoi=nullptr, mitk::DataNode *endRoi=nullptr);
 
     // Create a point set. This point set defines the points through which a region of interest should go
     void InitPointsets();

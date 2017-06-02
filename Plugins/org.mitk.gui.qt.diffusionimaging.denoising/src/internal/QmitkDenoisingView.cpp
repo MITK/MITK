@@ -65,12 +65,12 @@ const std::string QmitkDenoisingView::VIEW_ID = "org.mitk.views.denoisingview";
 QmitkDenoisingView::QmitkDenoisingView()
   : QmitkAbstractView()
   , m_Controls( 0 )
-  , m_ImageNode(NULL)
-  , m_BrainMaskNode(NULL)
+  , m_ImageNode(nullptr)
+  , m_BrainMaskNode(nullptr)
   , m_DenoisingWorker(this)
   , m_ThreadIsRunning(false)
-  , m_NonLocalMeansFilter(NULL)
-  , m_InputImage(NULL)
+  , m_NonLocalMeansFilter(nullptr)
+  , m_InputImage(nullptr)
   , m_LastProgressCount(0)
   , m_MaxProgressCount(0)
   , m_SelectedFilter(NOFILTERSELECTED)
@@ -138,8 +138,8 @@ void QmitkDenoisingView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
   m_Controls->m_InputBrainMaskLabel->setText("optional");
   m_Controls->m_ApplyButton->setEnabled(false);
 
-  m_ImageNode = NULL;
-  m_BrainMaskNode = NULL;
+  m_ImageNode = nullptr;
+  m_BrainMaskNode = nullptr;
 
   // iterate selection
   for (mitk::DataNode::Pointer node: nodes)

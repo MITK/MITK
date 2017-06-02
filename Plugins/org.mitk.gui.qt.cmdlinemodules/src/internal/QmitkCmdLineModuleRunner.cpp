@@ -48,12 +48,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 //-----------------------------------------------------------------------------
 QmitkCmdLineModuleRunner::QmitkCmdLineModuleRunner(QWidget *parent)
   : QWidget(parent)
-, m_ModuleManager(NULL)
-, m_DataStorage(NULL)
+, m_ModuleManager(nullptr)
+, m_DataStorage(nullptr)
 , m_UI(new Ui::QmitkCmdLineModuleProgressWidget)
-, m_Layout(NULL)
-, m_ModuleFrontEnd(NULL)
-, m_FutureWatcher(NULL)
+, m_Layout(nullptr)
+, m_ModuleFrontEnd(nullptr)
+, m_FutureWatcher(nullptr)
 {
   m_UI->setupUi(this);
   m_UI->m_RemoveButton->setIcon(QApplication::style()->standardIcon(QStyle::SP_TitleBarCloseButton));
@@ -80,7 +80,7 @@ QmitkCmdLineModuleRunner::QmitkCmdLineModuleRunner(QWidget *parent)
 //-----------------------------------------------------------------------------
 QmitkCmdLineModuleRunner::~QmitkCmdLineModuleRunner()
 {
-  if (m_ModuleFrontEnd != NULL)
+  if (m_ModuleFrontEnd != nullptr)
   {
     delete m_ModuleFrontEnd;
   }
@@ -174,7 +174,7 @@ QString QmitkCmdLineModuleRunner::GetValidNodeName(const QString& nodeName) cons
 bool QmitkCmdLineModuleRunner::IsStarted() const
 {
   bool isStarted = false;
-  if (m_FutureWatcher != NULL && m_FutureWatcher->isStarted())
+  if (m_FutureWatcher != nullptr && m_FutureWatcher->isStarted())
   {
     isStarted = true;
   }
@@ -376,7 +376,7 @@ void QmitkCmdLineModuleRunner::ClearUpTemporaryFiles()
 
   foreach (QTemporaryFile* file, m_TemporaryFiles)
   {
-    assert(file != NULL);
+    assert(file != nullptr);
 
     fileName = file->fileName();
     message = QObject::tr("removing %1").arg(fileName);
@@ -538,12 +538,12 @@ void QmitkCmdLineModuleRunner::Run()
     if (node.IsNotNull())
     {
       mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-      if (image != NULL)
+      if (image != nullptr)
       {
         QString errorMessage;
         QTemporaryFile* tempFile = this->SaveTemporaryImage(parameter, node.GetPointer(), errorMessage);
 
-        if(tempFile == NULL)
+        if(tempFile == nullptr)
         {
           QMessageBox::warning(this, "Saving temporary file failed", errorMessage);
           return;
@@ -566,7 +566,7 @@ void QmitkCmdLineModuleRunner::Run()
   message = "starting.";
   this->PublishMessage(message);
 
-  if (m_FutureWatcher == NULL)
+  if (m_FutureWatcher == nullptr)
   {
     m_FutureWatcher = new ctkCmdLineModuleFutureWatcher();
 
@@ -607,7 +607,7 @@ QTemporaryFile* QmitkCmdLineModuleRunner::SaveTemporaryImage(const ctkCmdLineMod
   QString intermediateError;
   QString intermediateErrors;
 
-  QTemporaryFile *returnedFile = NULL;
+  QTemporaryFile *returnedFile = nullptr;
   QString name = this->GetValidNodeName(QString::fromStdString(node->GetName()));
   QString fileNameTemplate = name + "_XXXXXX";
 

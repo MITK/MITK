@@ -46,7 +46,7 @@ void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> 
     std::string sName = referenceNode->GetName();
     QString qName;
     qName.sprintf("%s.lsetp",sName.c_str());
-    QString filename = QFileDialog::getOpenFileName(NULL,"Load file",QString(),"LabelSet Preset(*.lsetp)");
+    QString filename = QFileDialog::getOpenFileName(nullptr,"Load file",QString(),"LabelSet Preset(*.lsetp)");
     if ( filename.isEmpty() )
       return;
 

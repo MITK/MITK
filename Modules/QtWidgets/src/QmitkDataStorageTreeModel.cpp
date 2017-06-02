@@ -340,7 +340,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(
     int numberOfNodesDropped = 0;
 
     QList<mitk::DataNode *> dataNodeList = QmitkMimeTypes::ToDataNodePtrList(data);
-    mitk::DataNode *node = NULL;
+    mitk::DataNode *node = nullptr;
     foreach (node, dataNodeList)
     {
       if (node && m_DataStorage.IsNotNull() && !m_DataStorage->Exists(node))
@@ -504,7 +504,7 @@ bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode &node
     (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0008, 0x1030).c_str()));
   mitk::BaseProperty *patientsName = (node.GetProperty(mitk::GeneratePropertyNameForDICOMTag(0x0010, 0x0010).c_str()));
 
-  if (patientsName != NULL && studyDescription != NULL && seriesDescription != NULL)
+  if (patientsName != nullptr && studyDescription != nullptr && seriesDescription != nullptr)
   {
     if ((!patientsName->GetValueAsString().empty()) && (!studyDescription->GetValueAsString().empty()) &&
         (!seriesDescription->GetValueAsString().empty()))
@@ -514,7 +514,7 @@ bool QmitkDataStorageTreeModel::DicomPropertiesExists(const mitk::DataNode &node
   }
 
   /** Code coveres the deprecated property naming for backwards compatibility */
-  if (patientsName_deprecated != NULL && studyDescription_deprecated != NULL && seriesDescription_deprecated != NULL)
+  if (patientsName_deprecated != nullptr && studyDescription_deprecated != nullptr && seriesDescription_deprecated != nullptr)
   {
     if ((!patientsName_deprecated->GetValueAsString().empty()) &&
         (!studyDescription_deprecated->GetValueAsString().empty()) &&
@@ -746,7 +746,7 @@ bool QmitkDataStorageTreeModel::setData(const QModelIndex &index, const QVariant
 
     mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(dataNode->GetData());
 
-    if (planarFigure != NULL)
+    if (planarFigure != nullptr)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else if (role == Qt::CheckStateRole)
@@ -845,7 +845,7 @@ QModelIndex QmitkDataStorageTreeModel::GetIndex(const mitk::DataNode *node) cons
 
 QList<QmitkDataStorageTreeModel::TreeItem *> QmitkDataStorageTreeModel::ToTreeItemPtrList(const QMimeData *mimeData)
 {
-  if (mimeData == NULL || !mimeData->hasFormat(QmitkMimeTypes::DataStorageTreeItemPtrs))
+  if (mimeData == nullptr || !mimeData->hasFormat(QmitkMimeTypes::DataStorageTreeItemPtrs))
   {
     return QList<TreeItem *>();
   }

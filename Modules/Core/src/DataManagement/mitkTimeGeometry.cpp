@@ -176,7 +176,7 @@ void mitk::TimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << std::endl;
   os << indent << " GetGeometryForTimeStep(0): ";
   if (GetGeometryForTimeStep(0).IsNull())
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
     GetGeometryForTimeStep(0)->Print(os, indent);
 }

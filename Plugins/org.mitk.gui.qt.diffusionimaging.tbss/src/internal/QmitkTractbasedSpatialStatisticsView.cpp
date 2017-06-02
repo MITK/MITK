@@ -85,8 +85,8 @@ void QmitkTractbasedSpatialStatisticsView::OnSelectionChanged(berry::IWorkbenchP
   mitk::DataNode* start;
   mitk::DataNode* end;
 
-  m_CurrentStartRoi = NULL;
-  m_CurrentEndRoi = NULL;
+  m_CurrentStartRoi = nullptr;
+  m_CurrentEndRoi = nullptr;
 
 
 
@@ -505,7 +505,7 @@ void QmitkTractbasedSpatialStatisticsView::Clicked(const QPointF& pos)
 {
   int index = (int)pos.x();
 
-  if(m_Roi.size() > 0 && m_CurrentGeometry != NULL && !m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
+  if(m_Roi.size() > 0 && m_CurrentGeometry != nullptr && !m_Controls->m_RoiPlotWidget->IsPlottingFiber() )
   {
 
     index = std::min( (int)m_Roi.size()-1, std::max(0, index) );
@@ -554,8 +554,8 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
   mitk::Point3D startCenter = dynamic_cast<mitk::PlanarFigure*>(m_CurrentStartRoi->GetData())->GetWorldControlPoint(0); //center Point of start roi
   mitk::Point3D endCenter = dynamic_cast<mitk::PlanarFigure*>(m_CurrentEndRoi->GetData())->GetWorldControlPoint(0); //center Point of end roi
 
-  mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(m_CurrentStartRoi, NULL);
-  mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(m_CurrentEndRoi, NULL);
+  mitk::FiberBundle::Pointer inStart = fib->ExtractFiberSubset(m_CurrentStartRoi, nullptr);
+  mitk::FiberBundle::Pointer inBoth = inStart->ExtractFiberSubset(m_CurrentEndRoi, nullptr);
 
   int num = inBoth->GetNumFibers();
 
@@ -576,7 +576,7 @@ void QmitkTractbasedSpatialStatisticsView::Cut()
   for( int fiberID( 0 ); fiberID < num; fiberID++ )
   {
     vtkIdType   numPointsInCell(0);
-    vtkIdType*  pointsInCell(NULL);
+    vtkIdType*  pointsInCell(nullptr);
     lines->GetNextCell ( numPointsInCell, pointsInCell );
 
     int startId = 0;

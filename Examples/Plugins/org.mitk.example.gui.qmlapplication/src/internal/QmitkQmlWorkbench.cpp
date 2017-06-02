@@ -51,7 +51,7 @@ QmlMitkWorkbench::~QmlMitkWorkbench()
 
 void QmlMitkWorkbench::loadFiles()
 {
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Load data", 0, QmitkIOUtil::GetFileOpenFilterString());
+  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Load data", 0, QmitkIOUtil::GetFileOpenFilterString());
 
   try
   {

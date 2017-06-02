@@ -89,7 +89,7 @@ public:
 
     mitk::CastToItkImage(m_TestImage, diffImage);
 
-    CPPUNIT_ASSERT_MESSAGE("Casting scalar double (MITK) image to scalar float tensor (ITK). Result shouldn't be NULL.",
+    CPPUNIT_ASSERT_MESSAGE("Casting scalar double (MITK) image to scalar float tensor (ITK). Result shouldn't be nullptr.",
                            diffImage.IsNotNull());
   }
 
@@ -111,7 +111,7 @@ public:
 
     mitk::CastToItkImage(m_TestImage, diffImage);
     MITK_TEST_CONDITION_REQUIRED(diffImage.IsNotNull(),
-                                 "Casting float tensor (MITK) image to float tensor (ITK). Result shouldn't be NULL");
+                                 "Casting float tensor (MITK) image to float tensor (ITK). Result shouldn't be nullptr");
 
     mitk::Image::Pointer mitkImageAfterCast = mitk::ImportItkImage(diffImage);
     MITK_ASSERT_EQUAL(mitkImageAfterCast, m_TestImage, "Same type, images shoul be equal.");

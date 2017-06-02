@@ -31,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 static void InitializeSofa()
 {
   int argc = 0;
-  glutInit(&argc, NULL);
+  glutInit(&argc, nullptr);
 
   sofa::component::init();
   sofa::simulation::xml::initXml();
@@ -66,7 +66,7 @@ mitk::Mapper::Pointer mitk::SimulationObjectFactory::CreateMapper(mitk::DataNode
 {
   Mapper::Pointer mapper;
 
-  if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
+  if (dynamic_cast<Simulation*>(node->GetData()) != nullptr)
   {
     if (slotId == BaseRenderer::Standard2D)
     {
@@ -91,7 +91,7 @@ const char* mitk::SimulationObjectFactory::GetDescription() const
 
 const char* mitk::SimulationObjectFactory::GetFileExtensions()
 {
-  return NULL;
+  return nullptr;
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetFileExtensionsMap()
@@ -101,7 +101,7 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetFile
 
 const char* mitk::SimulationObjectFactory::GetSaveFileExtensions()
 {
-  return NULL;
+  return nullptr;
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetSaveFileExtensionsMap()
@@ -111,10 +111,10 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::SimulationObjectFactory::GetSave
 
 void mitk::SimulationObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
-  if (dynamic_cast<Simulation*>(node->GetData()) != NULL)
+  if (dynamic_cast<Simulation*>(node->GetData()) != nullptr)
   {
     SimulationVtkMapper2D::SetDefaultProperties(node);
     SimulationVtkMapper3D::SetDefaultProperties(node);

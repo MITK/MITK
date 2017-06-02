@@ -227,12 +227,12 @@ namespace mitk
  * @param EXPECTED First object.
  * @param ACTUAL Second object.
  * @param MSG Message to appear with the test.
- * @throw Throws mitkException if a NULL pointer is given as input.
+ * @throw Throws mitkException if a nullptr pointer is given as input.
  */
 #define MITK_ASSERT_EQUAL(EXPECTED, ACTUAL, MSG)                                                                       \
   if (((EXPECTED).IsNull()) || ((ACTUAL).IsNull()))                                                                    \
   {                                                                                                                    \
-    mitkThrow() << "mitk::Equal does not work with NULL pointer input.";                                               \
+    mitkThrow() << "mitk::Equal does not work with nullptr pointer input.";                                               \
   }                                                                                                                    \
   CPPUNIT_ASSERT_MESSAGE(MSG, mitk::Equal(*(EXPECTED), *(ACTUAL), mitk::eps, true))
 
@@ -266,14 +266,14 @@ namespace mitk
  * @param OBJ1 First object.
  * @param OBJ2 Second object.
  * @param MSG Message to appear with the test.
- * @throw Throws mitkException if a NULL pointer is given as input.
+ * @throw Throws mitkException if a nullptr pointer is given as input.
  *
  * \sa MITK_ASSERT_EQUAL
  */
 #define MITK_ASSERT_NOT_EQUAL(OBJ1, OBJ2, MSG)                                                                         \
   if (((OBJ1).IsNull()) || ((OBJ2).IsNull()))                                                                          \
   {                                                                                                                    \
-    mitkThrow() << "mitk::Equal does not work with NULL pointer input.";                                               \
+    mitkThrow() << "mitk::Equal does not work with nullptr pointer input.";                                               \
   }                                                                                                                    \
   CPPUNIT_ASSERT_MESSAGE(MSG, !mitk::Equal(*(OBJ1), *(OBJ2), mitk::eps, true))
 

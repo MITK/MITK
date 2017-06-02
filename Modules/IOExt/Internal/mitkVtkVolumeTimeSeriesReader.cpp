@@ -45,7 +45,7 @@ void mitk::VtkVolumeTimeSeriesReader::GenerateData()
     }
     else
     {
-      itkWarningMacro(<< "vtkPolyDataReader returned NULL while reading " << fileName
+      itkWarningMacro(<< "vtkPolyDataReader returned nullptr while reading " << fileName
                       << ". Trying to continue with empty vtkPolyData...");
       output->SetVtkPolyData(vtkPolyData::New(), i);
     }

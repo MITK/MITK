@@ -39,7 +39,7 @@ mitk::MAPRegistrationWrapperSerializer::~MAPRegistrationWrapperSerializer()
 std::string mitk::MAPRegistrationWrapperSerializer::Serialize()
 {
   const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast<const mitk::MAPRegistrationWrapper*>( m_Data.GetPointer() );
-  if (wrapper == NULL)
+  if (wrapper == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::MAPRegistrationWrapper. Cannot serialize as MAPRegistrationWrapper for MatchPoint registration objects.";

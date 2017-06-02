@@ -92,7 +92,7 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
     bool InitObservers();
     void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
     /** Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
-    void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = NULL);
+    void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = nullptr);
 
     mitk::IRenderWindowPart* m_renderWindowPart;
 

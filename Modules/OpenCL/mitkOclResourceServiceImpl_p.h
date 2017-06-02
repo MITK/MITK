@@ -45,7 +45,7 @@ US_USE_NAMESPACE
 struct OclContextCollection{
 public:
   OclContextCollection()
-    : m_Context(NULL), m_Devices(NULL), m_CreateContextFailed(false)
+    : m_Context(nullptr), m_Devices(nullptr), m_CreateContextFailed(false)
   {
     cl_int clErr = 0;
     size_t szParmDataBytes;
@@ -56,18 +56,18 @@ public:
       clErr = oclGetPlatformID( &cpPlatform);
       CHECK_OCL_ERR( clErr );
 
-      clErr = clGetDeviceIDs( cpPlatform, CL_DEVICE_TYPE_GPU, 1, &m_cdDevice, NULL);
+      clErr = clGetDeviceIDs( cpPlatform, CL_DEVICE_TYPE_GPU, 1, &m_cdDevice, nullptr);
       CHECK_OCL_ERR( clErr );
 
-      this->m_Context = clCreateContext( 0, 1, &m_cdDevice, NULL, NULL, &clErr);
+      this->m_Context = clCreateContext( 0, 1, &m_cdDevice, nullptr, nullptr, &clErr);
       m_CreateContextFailed = (clErr != CL_SUCCESS);
 
       // get the info size
-      clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, 0,NULL, &szParmDataBytes );
+      clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, 0,nullptr, &szParmDataBytes );
       this->m_Devices = (cl_device_id*) malloc(szParmDataBytes);
 
       // get device info
-      clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, szParmDataBytes, m_Devices, NULL);
+      clErr = clGetContextInfo(m_Context, CL_CONTEXT_DEVICES, szParmDataBytes, m_Devices, nullptr);
       CHECK_OCL_ERR( clErr );
 
       // create command queue
@@ -105,7 +105,7 @@ public:
 
   bool CanProvideContext() const
   {
-    return ( m_Context != NULL && !m_CreateContextFailed );
+    return ( m_Context != nullptr && !m_CreateContextFailed );
   }
 
   void PrintContextInfo() const
@@ -142,7 +142,7 @@ private:
     int counter;
     cl_program program;
     itk::FastMutexLock::Pointer mutex;
-    ProgramData() :counter(1), program(NULL)
+    ProgramData() :counter(1), program(nullptr)
     {}
   };
 

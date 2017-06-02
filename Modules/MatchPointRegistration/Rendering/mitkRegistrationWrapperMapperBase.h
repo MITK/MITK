@@ -43,7 +43,7 @@ public:
 
     //========== essential implementation for mapper ==========
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer);
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
     static void SetVtkMapperImmediateModeRendering(vtkMapper *mapper);
     virtual void GenerateDataForRenderer(mitk::BaseRenderer* renderer);
     //=========================================================

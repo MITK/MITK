@@ -45,7 +45,7 @@ mitk::Mapper::Pointer
 mitk::RegEvaluationObjectFactory::
 CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
 {
-    mitk::Mapper::Pointer newMapper = NULL;
+    mitk::Mapper::Pointer newMapper = nullptr;
 
     if ( slotId == mitk::BaseRenderer::Standard2D )
     {

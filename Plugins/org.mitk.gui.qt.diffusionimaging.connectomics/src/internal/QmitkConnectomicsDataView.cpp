@@ -334,13 +334,13 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
     return;
   }
 
   if (! ( nodes.size() == 2 ) )
   {
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
     return;
   }
   mitk::DataNode* firstNode = nodes.front();
@@ -349,7 +349,7 @@ void QmitkConnectomicsDataView::OnNetworkifyPushButtonClicked()
   if (!firstNode)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS_CREATION, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_SELECTION_WARNING);
     return;
   }
 
@@ -400,7 +400,7 @@ void QmitkConnectomicsDataView::OnCreateCorrelationMatrixPushButtonClicked()
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
     return;
   }
 
@@ -411,7 +411,7 @@ void QmitkConnectomicsDataView::OnCreateCorrelationMatrixPushButtonClicked()
     if (!firstNode)
     {
       // Nothing selected. Inform the user and return
-      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+      QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
       return;
     }
 
@@ -437,13 +437,13 @@ void QmitkConnectomicsDataView::OnCreateCorrelationMatrixPushButtonClicked()
     if (!firstNode)
     {
       // Nothing selected. Inform the user and return
-      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+      QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
       return;
     }
     if (!secondNode)
     {
       // Nothing selected. Inform the user and return
-      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+      QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
       return;
     }
 
@@ -470,7 +470,7 @@ void QmitkConnectomicsDataView::OnCreateCorrelationMatrixPushButtonClicked()
         }
         else
         {
-          QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
+          QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_FMRI_CORRELATION_SELECTION_WARNING);
           return;
         }
       }

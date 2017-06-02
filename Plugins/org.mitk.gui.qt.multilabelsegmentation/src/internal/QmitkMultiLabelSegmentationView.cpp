@@ -57,11 +57,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMultiLabelSegmentationView::VIEW_ID = "org.mitk.views.multilabelsegmentation";
 
 QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
-  : m_Parent(NULL),
-    m_IRenderWindowPart(NULL),
-    m_ReferenceNode(NULL),
-    m_ToolManager(NULL),
-    m_WorkingNode(NULL),
+  : m_Parent(nullptr),
+    m_IRenderWindowPart(nullptr),
+    m_ReferenceNode(nullptr),
+    m_ToolManager(nullptr),
+    m_WorkingNode(nullptr),
     m_AutoSelectionEnabled(false),
     m_MouseCursorSet(false)
 {
@@ -103,8 +103,8 @@ QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
   service->RemoveAllPlanePositions();
   context->ungetService(ppmRef);
   */
-  // m_ToolManager->SetReferenceData(NULL);
-  // m_ToolManager->SetWorkingData(NULL);
+  // m_ToolManager->SetReferenceData(nullptr);
+  // m_ToolManager->SetWorkingData(nullptr);
 
   // m_ServiceRegistration.Unregister();
 
@@ -891,7 +891,7 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode *node)
     }
 
     context->ungetService(ppmRef);
-    service = NULL;
+    service = nullptr;
   }
 }
 
@@ -953,10 +953,10 @@ void QmitkMultiLabelSegmentationView::SetFocus()
 void QmitkMultiLabelSegmentationView::UpdateControls()
 {
   mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-  bool hasReferenceNode = referenceNode != NULL;
+  bool hasReferenceNode = referenceNode != nullptr;
 
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-  bool hasValidWorkingNode = workingNode != NULL;
+  bool hasValidWorkingNode = workingNode != nullptr;
 
   m_Controls.m_pbNewLabel->setEnabled(false);
   m_Controls.m_gbInterpolation->setEnabled(false);

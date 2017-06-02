@@ -87,14 +87,14 @@ void mitk::NavigationDataToIGTLMessageFilter::SetInput(unsigned int idx, const N
 const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput(void)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
 }
 
 const mitk::NavigationData* mitk::NavigationDataToIGTLMessageFilter::GetInput(unsigned int idx)
 {
   if (this->GetNumberOfInputs() < 1)
-    return NULL;
+    return nullptr;
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
 }
 
@@ -132,7 +132,7 @@ void mitk::NavigationDataToIGTLMessageFilter::CreateOutputsForAllInputs()
 
   for (unsigned int idx = 0; idx < this->GetNumberOfIndexedOutputs(); ++idx)
   {
-    if (this->GetOutput(idx) == NULL)
+    if (this->GetOutput(idx) == nullptr)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);

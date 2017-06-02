@@ -44,8 +44,8 @@ const std::string QmitkMatchPointRegistrationVisualizer::VIEW_ID =
 "org.mitk.views.matchpoint.visualizer";
 
 QmitkMatchPointRegistrationVisualizer::QmitkMatchPointRegistrationVisualizer()
-    : m_Parent(NULL), m_internalUpdateGuard(false), m_spSelectedFOVRefNode(NULL),
-    m_spSelectedRegNode(NULL)
+    : m_Parent(nullptr), m_internalUpdateGuard(false), m_spSelectedFOVRefNode(nullptr),
+    m_spSelectedRegNode(nullptr)
 {
 }
 
@@ -115,7 +115,7 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
 
 mitk::MAPRegistrationWrapper* QmitkMatchPointRegistrationVisualizer::GetCurrentRegistration()
 {
-    mitk::MAPRegistrationWrapper* result = NULL;
+    mitk::MAPRegistrationWrapper* result = nullptr;
 
     if (this->m_spSelectedRegNode.IsNotNull())
     {
@@ -128,7 +128,7 @@ mitk::MAPRegistrationWrapper* QmitkMatchPointRegistrationVisualizer::GetCurrentR
 
 mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetSelectedRegNode() const
 {
-    mitk::DataNode::Pointer spResult = NULL;
+    mitk::DataNode::Pointer spResult = nullptr;
 
     typedef QList<mitk::DataNode::Pointer> NodeListType;
 
@@ -148,7 +148,7 @@ mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetSelectedRegNod
 
 mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetRefNodeOfReg(bool target) const
 {
-    mitk::DataNode::Pointer spResult = NULL;
+    mitk::DataNode::Pointer spResult = nullptr;
 
     if (this->m_spSelectedRegNode.IsNotNull() && m_spSelectedRegNode->GetData())
     {
@@ -297,40 +297,40 @@ void QmitkMatchPointRegistrationVisualizer::StoreStateInNode()
         tmpColor[1] = this->m_Controls->btnUniColor->color().greenF();
         tmpColor[2] = this->m_Controls->btnUniColor->color().blueF();
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColorUni,
-            mitk::ColorProperty::New(tmpColor), NULL, true);
+            mitk::ColorProperty::New(tmpColor), nullptr, true);
 
         tmpColor[0] = this->m_Controls->btnVecMagColorNeg->color().redF();
         tmpColor[1] = this->m_Controls->btnVecMagColorNeg->color().greenF();
         tmpColor[2] = this->m_Controls->btnVecMagColorNeg->color().blueF();
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor1Value,
-            mitk::ColorProperty::New(tmpColor), NULL, true);
+            mitk::ColorProperty::New(tmpColor), nullptr, true);
 
         tmpColor[0] = this->m_Controls->btnVecMagColorSmall->color().redF();
         tmpColor[1] = this->m_Controls->btnVecMagColorSmall->color().greenF();
         tmpColor[2] = this->m_Controls->btnVecMagColorSmall->color().blueF();
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor2Value,
-            mitk::ColorProperty::New(tmpColor), NULL, true);
+            mitk::ColorProperty::New(tmpColor), nullptr, true);
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor2Magnitude,
-            mitk::DoubleProperty::New(this->m_Controls->sbVecMagSmall->value()), NULL, true);
+            mitk::DoubleProperty::New(this->m_Controls->sbVecMagSmall->value()), nullptr, true);
 
         tmpColor[0] = this->m_Controls->btnVecMagColorMedium->color().redF();
         tmpColor[1] = this->m_Controls->btnVecMagColorMedium->color().greenF();
         tmpColor[2] = this->m_Controls->btnVecMagColorMedium->color().blueF();
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor3Value,
-            mitk::ColorProperty::New(tmpColor), NULL, true);
+            mitk::ColorProperty::New(tmpColor), nullptr, true);
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor3Magnitude,
-            mitk::DoubleProperty::New(this->m_Controls->sbVecMagMedium->value()), NULL, true);
+            mitk::DoubleProperty::New(this->m_Controls->sbVecMagMedium->value()), nullptr, true);
 
         tmpColor[0] = this->m_Controls->btnVecMagColorLarge->color().redF();
         tmpColor[1] = this->m_Controls->btnVecMagColorLarge->color().greenF();
         tmpColor[2] = this->m_Controls->btnVecMagColorLarge->color().blueF();
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor4Value,
-            mitk::ColorProperty::New(tmpColor), NULL, true);
+            mitk::ColorProperty::New(tmpColor), nullptr, true);
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColor4Magnitude,
-            mitk::DoubleProperty::New(this->m_Controls->sbVecMagLarge->value()), NULL, true);
+            mitk::DoubleProperty::New(this->m_Controls->sbVecMagLarge->value()), nullptr, true);
 
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisColorInterpolate,
-            mitk::BoolProperty::New(this->m_Controls->cbVevMagInterlolate->isChecked()), NULL, true);
+            mitk::BoolProperty::New(this->m_Controls->cbVevMagInterlolate->isChecked()), nullptr, true);
 
         //Grid Settings
         this->m_spSelectedRegNode->SetIntProperty(mitk::nodeProp_RegVisGridFrequence,
@@ -341,7 +341,7 @@ void QmitkMatchPointRegistrationVisualizer::StoreStateInNode()
         tmpColor[1] = this->m_Controls->btnStartGridColor->color().greenF();
         tmpColor[2] = this->m_Controls->btnStartGridColor->color().blueF();
         this->m_spSelectedRegNode->AddProperty(mitk::nodeProp_RegVisGridStartColor,
-            mitk::ColorProperty::New(tmpColor), NULL, true);
+            mitk::ColorProperty::New(tmpColor), nullptr, true);
 
         //FOV
         mitk::Vector3D value;
@@ -384,7 +384,7 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
 {
     if (this->m_spSelectedRegNode.IsNotNull())
     {
-        mitk::RegVisDirectionProperty* directionProp = NULL;
+        mitk::RegVisDirectionProperty* directionProp = nullptr;
 
         if (this->m_spSelectedRegNode->GetProperty(directionProp, mitk::nodeProp_RegVisDirection))
         {
@@ -431,7 +431,7 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
 
         ///////////////////////////////////////////////////////
         //visualization
-        mitk::RegVisColorStyleProperty* colorStyleProp = NULL;
+        mitk::RegVisColorStyleProperty* colorStyleProp = nullptr;
 
         if (this->m_spSelectedRegNode->GetProperty(colorStyleProp, mitk::nodeProp_RegVisColorStyle))
         {
@@ -446,27 +446,27 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
 
         QColor tmpColor;
         float colorUni[3] = { 0.0, 0.0, 0.0 };
-        this->m_spSelectedRegNode->GetColor(colorUni, NULL, mitk::nodeProp_RegVisColorUni);
+        this->m_spSelectedRegNode->GetColor(colorUni, nullptr, mitk::nodeProp_RegVisColorUni);
         tmpColor.setRgbF(colorUni[0], colorUni[1], colorUni[2]);
         this->m_Controls->btnUniColor->setColor(tmpColor);
 
         float color1[3] = { 0.0, 0.0, 0.0 };
-        this->m_spSelectedRegNode->GetColor(color1, NULL, mitk::nodeProp_RegVisColor1Value);
+        this->m_spSelectedRegNode->GetColor(color1, nullptr, mitk::nodeProp_RegVisColor1Value);
         tmpColor.setRgbF(color1[0], color1[1], color1[2]);
         this->m_Controls->btnVecMagColorNeg->setColor(tmpColor);
 
         float color2[3] = { 0.25, 0.25, 0.25 };
-        this->m_spSelectedRegNode->GetColor(color2, NULL, mitk::nodeProp_RegVisColor2Value);
+        this->m_spSelectedRegNode->GetColor(color2, nullptr, mitk::nodeProp_RegVisColor2Value);
         tmpColor.setRgbF(color2[0], color2[1], color2[2]);
         this->m_Controls->btnVecMagColorSmall->setColor(tmpColor);
 
         float color3[3] = { 0.5, 0.5, 0.5 };
-        this->m_spSelectedRegNode->GetColor(color3, NULL, mitk::nodeProp_RegVisColor3Value);
+        this->m_spSelectedRegNode->GetColor(color3, nullptr, mitk::nodeProp_RegVisColor3Value);
         tmpColor.setRgbF(color3[0], color3[1], color3[2]);
         this->m_Controls->btnVecMagColorMedium->setColor(tmpColor);
 
         float color4[3] = { 1.0, 1.0, 1.0 };
-        this->m_spSelectedRegNode->GetColor(color4, NULL, mitk::nodeProp_RegVisColor4Value);
+        this->m_spSelectedRegNode->GetColor(color4, nullptr, mitk::nodeProp_RegVisColor4Value);
         tmpColor.setRgbF(color4[0], color4[1], color4[2]);
         this->m_Controls->btnVecMagColorLarge->setColor(tmpColor);
 
@@ -513,13 +513,13 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
 
         float colorStart[3] = { 0.0, 0.0, 0.0 };
-        this->m_spSelectedRegNode->GetColor(colorStart, NULL, mitk::nodeProp_RegVisGridStartColor);
+        this->m_spSelectedRegNode->GetColor(colorStart, nullptr, mitk::nodeProp_RegVisGridStartColor);
         tmpColor.setRgbF(colorStart[0], colorStart[1], colorStart[2]);
         this->m_Controls->btnStartGridColor->setColor(tmpColor);
 
         ///////////////////////////////////////////////////////
         //FOV
-        mitk::Vector3DProperty* valueProp = NULL;
+        mitk::Vector3DProperty* valueProp = nullptr;
 
         if (this->m_spSelectedRegNode->GetProperty(valueProp, mitk::nodeProp_RegVisFOVSize))
         {
@@ -545,7 +545,7 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
                 mitk::nodeProp_RegVisFOVSpacing) + QString(" is not correctly defined."));
         }
 
-        mitk::Point3dProperty* originProp = NULL;
+        mitk::Point3dProperty* originProp = nullptr;
 
         if (this->m_spSelectedRegNode->GetProperty(originProp, mitk::nodeProp_RegVisFOVOrigin))
         {

@@ -40,7 +40,7 @@ namespace mitk
 
       FloatLookupTable lut = prop->GetValue();
       // if (lut.IsNull())
-      //  return NULL; // really?
+      //  return nullptr; // really?
       const FloatLookupTable::LookupTableType &map = lut.GetLookupTable();
 
       auto element = new TiXmlElement("FloatLookupTableTable");

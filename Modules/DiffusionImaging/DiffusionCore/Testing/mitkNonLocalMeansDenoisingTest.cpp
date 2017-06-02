@@ -54,7 +54,7 @@ public:
     std::string imagePath = GetTestDataFilePath("DiffusionImaging/Denoising/test_multi.dwi");
 
     m_Image =  mitk::IOUtil::LoadImage(imagePath);
-    m_ReferenceImage = NULL;
+    m_ReferenceImage = nullptr;
     m_DenoisedImage = mitk::Image::New();
 
     //initialise Filter
@@ -70,11 +70,11 @@ public:
 
   void tearDown() override
   {
-    m_Image = NULL;
-    m_ImageMask = NULL;
-    m_ReferenceImage = NULL;
-    m_DenoisingFilter = NULL;
-    m_DenoisedImage = NULL;
+    m_Image = nullptr;
+    m_ImageMask = nullptr;
+    m_ReferenceImage = nullptr;
+    m_DenoisingFilter = nullptr;
+    m_DenoisedImage = nullptr;
   }
 
   void Denoise_NLMg_shouldReturnTrue()

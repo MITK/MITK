@@ -36,7 +36,7 @@ namespace mitk
         return nullptr;
       BoolLookupTable lut = prop->GetValue();
       // if (lut.IsNull())
-      //  return NULL; // really?
+      //  return nullptr; // really?
       const BoolLookupTable::LookupTableType &map = lut.GetLookupTable();
 
       auto element = new TiXmlElement("BoolLookupTable");

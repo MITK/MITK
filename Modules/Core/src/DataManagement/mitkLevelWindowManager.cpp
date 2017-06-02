@@ -29,11 +29,11 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkCommand.h>
 
 mitk::LevelWindowManager::LevelWindowManager()
-  : m_DataStorage(NULL),
-    m_LevelWindowProperty(NULL),
+  : m_DataStorage(nullptr),
+    m_LevelWindowProperty(nullptr),
     m_AutoTopMost(true),
     m_IsObserverTagSet(false),
-    m_CurrentImage(NULL),
+    m_CurrentImage(nullptr),
     m_IsPropertyModifiedTagSet(false),
     m_SettingImgForLvlWinProp(false)
 {
@@ -47,7 +47,7 @@ mitk::LevelWindowManager::~LevelWindowManager()
       MessageDelegate1<LevelWindowManager, const mitk::DataNode *>(this, &LevelWindowManager::DataStorageAddedNode));
     m_DataStorage->RemoveNodeEvent.RemoveListener(
       MessageDelegate1<LevelWindowManager, const mitk::DataNode *>(this, &LevelWindowManager::DataStorageRemovedNode));
-    m_DataStorage = NULL;
+    m_DataStorage = nullptr;
   }
 
   if (m_IsPropertyModifiedTagSet && m_LevelWindowProperty.IsNotNull())
@@ -62,7 +62,7 @@ mitk::LevelWindowManager::~LevelWindowManager()
 
 void mitk::LevelWindowManager::SetDataStorage(mitk::DataStorage *ds)
 {
-  if (ds == NULL)
+  if (ds == nullptr)
     return;
 
   /* remove listeners of old DataStorage */
@@ -108,7 +108,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
   }
 
   int maxLayer = itk::NumericTraits<int>::min();
-  m_LevelWindowProperty = NULL;
+  m_LevelWindowProperty = nullptr;
 
   mitk::DataNode::Pointer topLevelNode;
 
@@ -116,14 +116,14 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk:
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     mitk::DataNode::Pointer node = it->Value();
-    if (node.IsNull() || (removedNode != NULL && node == removedNode))
+    if (node.IsNull() || (removedNode != nullptr && node == removedNode))
       continue;
 
     m_SettingImgForLvlWinProp = true;
     node->SetBoolProperty("imageForLevelWindow", false);
     m_SettingImgForLvlWinProp = false;
 
-    if (node->IsVisible(NULL) == false)
+    if (node->IsVisible(nullptr) == false)
       continue;
 
     int layer = 0;
@@ -316,7 +316,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode(const mitk::DataNode *remo
   {
     mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
     mitk::DataNode *n = m_DataStorage->GetNode(p2);
-    if (n == NULL || m_AutoTopMost) // if node was deleted, change our behaviour to AutoTopMost, if AutoTopMost is true
+    if (n == nullptr || m_AutoTopMost) // if node was deleted, change our behaviour to AutoTopMost, if AutoTopMost is true
                                     // change level window to topmost node
     {
       SetAutoTopMostImage(true, removedNode);
@@ -324,7 +324,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode(const mitk::DataNode *remo
   }
 
   // reset variable
-  m_NodeMarkedToDelete = NULL;
+  m_NodeMarkedToDelete = nullptr;
 
   // check if everything is still ok
   if ((m_PropObserverToNode.size() != m_PropObserverToNode2.size()) ||
@@ -403,7 +403,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &) // visible prope
   }
 
   int maxVisibleLayer = itk::NumericTraits<int>::min();
-  mitk::DataNode::Pointer highestVisible = NULL;
+  mitk::DataNode::Pointer highestVisible = nullptr;
   std::vector<mitk::DataNode::Pointer> visProbNodes;
 
   mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
@@ -416,9 +416,9 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &) // visible prope
       continue;
     }
 
-    bool visible = node->IsVisible(NULL);
+    bool visible = node->IsVisible(nullptr);
 
-    if (node->IsVisible(NULL))
+    if (node->IsVisible(nullptr))
     {
       int layer = -1;
       node->GetIntProperty("layer", layer);
@@ -487,7 +487,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
 
   mitk::NodePredicateProperty::Pointer notBinary =
     mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false));
-  mitk::NodePredicateProperty::Pointer hasLevelWindow = mitk::NodePredicateProperty::New("levelwindow", NULL);
+  mitk::NodePredicateProperty::Pointer hasLevelWindow = mitk::NodePredicateProperty::New("levelwindow", nullptr);
 
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
   mitk::NodePredicateDataType::Pointer isDImage = mitk::NodePredicateDataType::New("DiffusionImage");

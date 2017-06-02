@@ -106,7 +106,7 @@ double mitk::StaticIGTHelperFunctions::ComputeFRE(mitk::PointSet::Pointer imageF
   for (int i = 0; i < imageFiducials->GetSize(); i++)
   {
     itk::Point<double> current_image_fiducial_point = imageFiducials->GetPoint(i);
-    if (transform != NULL)
+    if (transform != nullptr)
     {
       current_image_fiducial_point = transform->TransformPoint(imageFiducials->GetPoint(i)[0], imageFiducials->GetPoint(i)[1], imageFiducials->GetPoint(i)[2]);
     }

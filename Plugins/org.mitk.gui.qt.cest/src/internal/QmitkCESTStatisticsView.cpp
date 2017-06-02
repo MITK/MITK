@@ -97,7 +97,7 @@ void QmitkCESTStatisticsView::CreateQtPartControl( QWidget *parent )
 void QmitkCESTStatisticsView::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*source*/,
                                              const QList<mitk::DataNode::Pointer>& nodes )
 {
-  if (nodes.size() == nullptr)
+  if (nodes.empty())
   {
     std::stringstream message;
     message << "<font color='red'>Please select an image.</font>";

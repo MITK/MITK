@@ -1343,7 +1343,7 @@ void QmitkImageStatisticsView::Hidden()
   // The slice navigation controller observer is removed here instead of in the destructor.
   // If it was called in the destructor, the application would freeze because the view's
   // destructor gets called after the render windows have been destructed.
-  if ( m_TimeObserverTag != nullptr )
+  if ( m_TimeObserverTag != 0 )
   {
     mitk::IRenderWindowPart* renderWindow = GetRenderWindowPart();
 
@@ -1352,7 +1352,7 @@ void QmitkImageStatisticsView::Hidden()
       renderWindow->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->
           RemoveObserver( m_TimeObserverTag );
     }
-    m_TimeObserverTag = nullptr;
+    m_TimeObserverTag = 0;
   }
 }
 

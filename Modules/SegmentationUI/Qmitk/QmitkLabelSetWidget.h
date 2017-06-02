@@ -42,7 +42,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkLabelSetWidget : public QWidget
   Q_OBJECT
 
 public:
-  explicit QmitkLabelSetWidget(QWidget *parent = NULL);
+  explicit QmitkLabelSetWidget(QWidget *parent = nullptr);
   ~QmitkLabelSetWidget();
 
   void SetDataStorage(mitk::DataStorage *storage);

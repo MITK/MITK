@@ -59,7 +59,7 @@ PCAExample::~PCAExample()
 {
   //clean up
   mitk::DataNode::Pointer ptSetNode = m_Controls.m_pointSetWidget->GetPointSetNode();
-  m_Controls.m_pointSetWidget->SetPointSetNode(NULL);
+  m_Controls.m_pointSetWidget->SetPointSetNode(nullptr);
   this->GetDataStorage()->Remove(ptSetNode);
   this->GetDataStorage()->Remove(m_Axis1Node);
   this->GetDataStorage()->Remove(m_Axis2Node);

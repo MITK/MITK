@@ -37,8 +37,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 QmitkBoundingObjectWidget::QmitkBoundingObjectWidget(QWidget *parent, Qt::WindowFlags f)
   : QWidget(parent, f),
-    m_DataStorage(NULL),
-    m_lastSelectedItem(NULL),
+    m_DataStorage(nullptr),
+    m_lastSelectedItem(nullptr),
     m_lastAffineObserver(0),
     m_ItemNodeMap(),
     m_BoundingObjectCounter(1)
@@ -129,7 +129,7 @@ void QmitkBoundingObjectWidget::SelectionChanged()
   if (selectedItem == m_lastSelectedItem)
     return;
 
-  if (m_lastSelectedItem != NULL)
+  if (m_lastSelectedItem != nullptr)
   {
     m_TreeWidget->closePersistentEditor(m_lastSelectedItem, 0);
 
@@ -302,7 +302,7 @@ mitk::BoundingObject::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObje
     if (boundingObject)
       return boundingObject;
   }
-  return NULL;
+  return nullptr;
 }
 
 void QmitkBoundingObjectWidget::SetDataStorage(mitk::DataStorage *dataStorage)
@@ -336,9 +336,9 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
     mitk::BaseRenderer::GetInstance(windows.at(2))->GetSliceNavigationController()->GetCurrentPlaneGeometry();
 
   mitk::Line3D line;
-  if ((plane1 != NULL) && (plane2 != NULL) && (plane1->IntersectionLine(plane2, line)))
+  if ((plane1 != nullptr) && (plane2 != nullptr) && (plane1->IntersectionLine(plane2, line)))
   {
-    if (!((plane3 != NULL) && (plane3->IntersectionPoint(line, pos))))
+    if (!((plane3 != nullptr) && (plane3->IntersectionPoint(line, pos))))
     {
       return;
     }
@@ -425,14 +425,14 @@ mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetAllBoundingObjects()
   if (boundingObjectGroup->GetCount() > 0)
     return boundingObjectGroupNode;
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObjectNode()
 {
   QList<QTreeWidgetItem *> selectedItems = m_TreeWidget->selectedItems();
   if (selectedItems.size() < 1)
-    return NULL;
+    return nullptr;
 
   QTreeWidgetItem *item = selectedItems.first();
   mitk::DataNode *node = m_ItemNodeMap.find(item)->second;

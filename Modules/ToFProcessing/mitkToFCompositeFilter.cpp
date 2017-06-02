@@ -45,7 +45,7 @@ void mitk::ToFCompositeFilter::SetInput(  mitk::Image* distanceImage )
 
 void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
-  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  if ((distanceImage == nullptr) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to nullptr, reduce the number of inputs by one
   {
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
   }

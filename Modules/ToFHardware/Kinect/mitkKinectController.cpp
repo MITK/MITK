@@ -42,10 +42,10 @@ public:
 };
 
 KinectController::KinectControllerPrivate::KinectControllerPrivate():
-  m_Context(NULL),
-  m_DepthGenerator(NULL),
-  m_ImageGenerator(NULL),
-  m_IRGenerator(NULL),
+  m_Context(nullptr),
+  m_DepthGenerator(nullptr),
+  m_ImageGenerator(nullptr),
+  m_IRGenerator(nullptr),
   m_ConnectionCheck(false),
   m_UseIR(false),
   m_CaptureWidth(640),

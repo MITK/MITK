@@ -191,7 +191,7 @@ void QmitkSceneTreeWidget::clear()
 
 void QmitkSceneTreeWidget::addChild(Node* parent, Node* child)
 {
-  assert(child != nullptr && "Child node is NULL!");
+  assert(child != nullptr && "Child node is nullptr!");
   assert(!m_BaseItemMap.contains(child) && "TODO: Support nodes with multiple parents!");
 
   QTreeWidgetItem* item;
@@ -215,7 +215,7 @@ void QmitkSceneTreeWidget::addChild(Node* parent, Node* child)
 
 void QmitkSceneTreeWidget::removeChild(Node* parent, Node* child)
 {
-  assert(child != nullptr && "Child node is NULL!");
+  assert(child != nullptr && "Child node is nullptr!");
   assert(m_BaseItemMap.contains(child) && "Child node has already been removed!");
 
   MutationListener::removeChild(parent, child);
@@ -245,7 +245,7 @@ void QmitkSceneTreeWidget::moveChild(Node* previous, Node* parent, Node* child)
   }
   else
   {
-    assert(child != nullptr && "Child node is NULL!");
+    assert(child != nullptr && "Child node is nullptr!");
     assert(m_BaseItemMap.contains(previous) && "Unknown previous parent node!");
     assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
     assert(m_BaseItemMap.contains(child) && "Unknown child node!");
@@ -257,8 +257,8 @@ void QmitkSceneTreeWidget::moveChild(Node* previous, Node* parent, Node* child)
 
 void QmitkSceneTreeWidget::addObject(Node* parent, BaseObject* object)
 {
-  assert(parent != nullptr && "Parent node is NULL!");
-  assert(object != nullptr && "Object is NULL!");
+  assert(parent != nullptr && "Parent node is nullptr!");
+  assert(object != nullptr && "Object is nullptr!");
   assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
   // assert(!m_BaseItemMap.contains(object) && "Object has already been added!");
 
@@ -275,8 +275,8 @@ void QmitkSceneTreeWidget::addObject(Node* parent, BaseObject* object)
 
 void QmitkSceneTreeWidget::removeObject(Node* parent, BaseObject* object)
 {
-  assert(parent != nullptr && "Parent node is NULL!");
-  assert(object != nullptr && "Object is NULL!");
+  assert(parent != nullptr && "Parent node is nullptr!");
+  assert(object != nullptr && "Object is nullptr!");
   assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
   assert(m_BaseItemMap.contains(object) && "Object has already been removed!");
 
@@ -298,7 +298,7 @@ void QmitkSceneTreeWidget::moveObject(Node* previous, Node* parent, BaseObject* 
   }
   else
   {
-    assert(object != nullptr && "Object is NULL!");
+    assert(object != nullptr && "Object is nullptr!");
     assert(m_BaseItemMap.contains(previous) && "Unknown previous parent node!");
     assert(m_BaseItemMap.contains(parent) && "Unknown parent node!");
     assert(m_BaseItemMap.contains(object) && "Unknown object!");
@@ -310,8 +310,8 @@ void QmitkSceneTreeWidget::moveObject(Node* previous, Node* parent, BaseObject* 
 
 void QmitkSceneTreeWidget::addSlave(BaseObject* master, BaseObject* slave)
 {
-  assert(master != nullptr && "Master object is NULL!");
-  assert(slave != nullptr && "Slave object is NULL!");
+  assert(master != nullptr && "Master object is nullptr!");
+  assert(slave != nullptr && "Slave object is nullptr!");
   assert(m_BaseItemMap.contains(master) && "Unknown master object!");
   assert(!m_BaseItemMap.contains(slave) && "Slave object has already been added!");
 
@@ -325,8 +325,8 @@ void QmitkSceneTreeWidget::addSlave(BaseObject* master, BaseObject* slave)
 
 void QmitkSceneTreeWidget::removeSlave(BaseObject* master, BaseObject* slave)
 {
-  assert(master != nullptr && "Master object is NULL!");
-  assert(slave != nullptr && "Slave object is NULL!");
+  assert(master != nullptr && "Master object is nullptr!");
+  assert(slave != nullptr && "Slave object is nullptr!");
   assert(m_BaseItemMap.contains(master) && "Unknown master object!");
   assert(m_BaseItemMap.contains(slave) && "Slave object has already been removed!");
 
@@ -348,7 +348,7 @@ void QmitkSceneTreeWidget::moveSlave(BaseObject* previousMaster, BaseObject* mas
   }
   else
   {
-    assert(slave != nullptr && "Slave object is NULL!");
+    assert(slave != nullptr && "Slave object is nullptr!");
     assert(m_BaseItemMap.contains(previousMaster) && "Unknown previous master object!");
     assert(m_BaseItemMap.contains(master) && "Unknown master object!");
     assert(m_BaseItemMap.contains(slave) && "Unknown slave object!");

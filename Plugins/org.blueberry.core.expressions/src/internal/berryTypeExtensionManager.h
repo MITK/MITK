@@ -40,7 +40,7 @@ private:
 
   static const QString TYPE;
 
-  class NULL_PROPERTY_TESTER_ : public IPropertyTester
+  class nullptr_PROPERTY_TESTER_ : public IPropertyTester
   {
   public:
     bool Handles(const QString&  /*namespaze*/, const QString&  /*property*/) override
@@ -66,7 +66,7 @@ private:
     }
   };
 
-  static const NULL_PROPERTY_TESTER_ NULL_PROPERTY_TESTER;
+  static const nullptr_PROPERTY_TESTER_ nullptr_PROPERTY_TESTER;
 
   /*
    * Map containing all already created type extension object.

@@ -74,7 +74,7 @@ void mitk::GeometryDataWriterService::Write()
 
   const GeometryData *data = static_cast<const GeometryData *>(this->GetInput());
 
-  const ProportionalTimeGeometry *timeGeometry(NULL);
+  const ProportionalTimeGeometry *timeGeometry(nullptr);
   if ((timeGeometry = dynamic_cast<const ProportionalTimeGeometry *>(data->GetTimeGeometry())))
   {
     TiXmlElement *timeGeometryElement = ProportionalTimeGeometryToXML::ToXML(timeGeometry);

@@ -87,9 +87,9 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
-    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testObject->GetOutput() != NULL);
+    CPPUNIT_ASSERT_MESSAGE("Testing surface generation!", testObject->GetOutput() != nullptr);
   }
 
   void testDecimatePromeshDecimation()
@@ -97,7 +97,7 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
 
     mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
@@ -117,7 +117,7 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
 
     mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();
@@ -137,7 +137,7 @@ public:
     mitk::ImageToSurfaceFilter::Pointer testObject = mitk::ImageToSurfaceFilter::New();
     testObject->SetInput(m_BallImage);
     testObject->Update();
-    mitk::Surface::Pointer resultSurface = NULL;
+    mitk::Surface::Pointer resultSurface = nullptr;
     resultSurface = testObject->GetOutput();
 
     mitk::Surface::Pointer testSurface1 = testObject->GetOutput()->Clone();

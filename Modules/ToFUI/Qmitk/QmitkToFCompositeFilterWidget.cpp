@@ -25,9 +25,9 @@ const std::string QmitkToFCompositeFilterWidget::VIEW_ID = "org.mitk.views.qmitk
 
 QmitkToFCompositeFilterWidget::QmitkToFCompositeFilterWidget(QWidget* parent, Qt::WindowFlags f): QWidget(parent, f)
 {
-  this->m_ToFCompositeFilter = NULL;
+  this->m_ToFCompositeFilter = nullptr;
 
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 

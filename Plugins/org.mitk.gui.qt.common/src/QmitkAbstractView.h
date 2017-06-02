@@ -169,7 +169,7 @@ protected:
   /**
    * Queries the state of the current selection.
    *
-   * \return If the current selection is <code>NULL</code>, this method returns
+   * \return If the current selection is <code>nullptr</code>, this method returns
    * <code>false</code> and <code>true</code> otherwise.
    */
   bool IsCurrentSelectionValid() const;
@@ -185,7 +185,7 @@ protected:
   /**
    * Queries the state of the current selection of the data manager view.
    *
-   * \return If the current data manager selection is <code>NULL</code>, this method returns
+   * \return If the current data manager selection is <code>nullptr</code>, this method returns
    * <code>false</code> and <code>true</code> otherwise.
    */
   bool IsDataManagerSelectionValid() const;
@@ -316,7 +316,7 @@ private:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes);
 
   /**
-   * Called when a <code>NULL</code> selection occurs.
+   * Called when a <code>nullptr</code> selection occurs.
    *
    * \param part The source part responsible for the selection change.
    */

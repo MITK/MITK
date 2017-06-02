@@ -43,7 +43,7 @@ const std::string QmitkIGTTrackingSemiAutomaticMeasurementView::VIEW_ID = "org.m
 QmitkIGTTrackingSemiAutomaticMeasurementView::QmitkIGTTrackingSemiAutomaticMeasurementView()
   : QmitkFunctionality()
   , m_Controls(0)
-  , m_MultiWidget(NULL)
+  , m_MultiWidget(nullptr)
 {
   m_NextFile = 0;
   m_FilenameVector = std::vector<std::string>();
@@ -141,7 +141,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnUseReferenceToggled(bool st
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::StdMultiWidgetNotAvailable()
 {
-  m_MultiWidget = NULL;
+  m_MultiWidget = nullptr;
 }
 
 mitk::NavigationToolStorage::Pointer QmitkIGTTrackingSemiAutomaticMeasurementView::ReadStorage(std::string file)
@@ -160,7 +160,7 @@ mitk::NavigationToolStorage::Pointer QmitkIGTTrackingSemiAutomaticMeasurementVie
     msgBox.setText(myDeserializer->GetErrorMessage().c_str());
     msgBox.exec();
 
-    returnValue = NULL;
+    returnValue = nullptr;
   }
 
   return returnValue;
@@ -184,7 +184,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnSetReference()
 void QmitkIGTTrackingSemiAutomaticMeasurementView::OnLoadMeasurementStorage()
 {
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL, tr("Open Toolfile"), "/", tr("All Files (*.*)"));
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Toolfile"), "/", tr("All Files (*.*)"));
   if (filename.isNull()) return;
 
   m_MeasurementStorage = ReadStorage(filename.toStdString());
@@ -204,7 +204,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnLoadReferenceStorage()
   //read in filename
   static QString oldFile;
   if (oldFile.isNull()) oldFile = "/";
-  QString filename = QFileDialog::getOpenFileName(NULL, tr("Open Toolfile"), oldFile, tr("All Files (*.*)"));
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Toolfile"), oldFile, tr("All Files (*.*)"));
   if (filename.isNull()) return;
   oldFile = filename;
 
@@ -322,7 +322,7 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnMeasurementLoadFile()
   m_NextFile = 0;
 
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
   if (filename.isNull()) return;
 
   //save old locale

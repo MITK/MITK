@@ -42,7 +42,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.views.example.regiongrowing";
 
-QmitkRegionGrowingView::QmitkRegionGrowingView() : m_PointListWidget(NULL)
+QmitkRegionGrowingView::QmitkRegionGrowingView() : m_PointListWidget(nullptr)
 {
 }
 
@@ -132,7 +132,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information(NULL, "Template", "Please load and select an image before starting image processing.");
+    QMessageBox::information(nullptr, "Template", "Please load and select an image before starting image processing.");
     return;
   }
 
@@ -151,7 +151,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
       if (m_PointSet->GetSize() == 0)
       {
         // no points there. Not good for region growing
-        QMessageBox::information(NULL,
+        QMessageBox::information(nullptr,
                                  "Region growing functionality",
                                  "Please set some seed points inside the image first.\n"
                                  "(hold Shift key and click left mouse button inside the image.)");

@@ -142,7 +142,7 @@ QString QmitkPythonTextEditor::ReadFile(const QString& filename)
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
     MITK_ERROR << "Could not open file " << filename.toStdString();
-    return NULL;
+    return nullptr;
   }
 
   QByteArray total;

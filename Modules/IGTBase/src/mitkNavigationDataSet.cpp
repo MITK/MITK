@@ -75,7 +75,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  if ( toolIndex >= m_NavigationDataVectors.size() )
 //  {
 //    MITK_WARN("NavigationDataSet") << "There is no tool with index " << toolIndex << ".";
-//    return NULL;
+//    return nullptr;
 //  }
 //
 //  std::vector<mitk::NavigationData::Pointer>::const_iterator it;
@@ -92,7 +92,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSet::GetNavigationDataForIndex
 //  if ( it == m_NavigationDataVectors.at(toolIndex).begin() )
 //  {
 //    MITK_WARN("NavigationDataSet") << "No NavigationData was recorded before given timestamp.";
-//    return NULL;
+//    return nullptr;
 //  }
 //
 //  // return last element smaller than the given timestamp

@@ -241,7 +241,7 @@ void mitk::ArbitraryTimeGeometry::AppendNewTimeStep(BaseGeometry *geometry,
 {
   if ( !geometry )
   {
-    mitkThrow() << "Cannot append geometry to time geometry. Invalid geometry passed (NULL pointer).";
+    mitkThrow() << "Cannot append geometry to time geometry. Invalid geometry passed (nullptr pointer).";
   }
 
   if (maximumTimePoint < minimumTimePoint)

@@ -36,7 +36,7 @@ namespace mitk
       context->RegisterService<IShaderRepository>(m_VtkShaderRepository.get());
     }
 
-    void Unload(us::ModuleContext *) override { m_VtkShaderRepository.reset(NULL); }
+    void Unload(us::ModuleContext *) override { m_VtkShaderRepository.reset(nullptr); }
   private:
     VtkShadersActivator(const VtkShadersActivator &);
     VtkShadersActivator &operator=(const VtkShadersActivator &);

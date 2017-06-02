@@ -157,7 +157,7 @@ QmitkFramesRegistrationJob::QmitkFramesRegistrationJob(map::algorithm::Registrat
 {
   m_MappedName = "Unnamed RegJob";
 
-  m_spTargetMask = NULL;
+  m_spTargetMask = nullptr;
 
   m_spCommand = ::itk::MemberCommand<QmitkFramesRegistrationJob>::New();
   m_spCommand->SetCallbackFunction(this, &QmitkFramesRegistrationJob::OnMapAlgorithmEvent);

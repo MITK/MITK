@@ -156,11 +156,11 @@ const std::string QmitkDiffusionRegistrationView::VIEW_ID = "org.mitk.views.diff
 QmitkDiffusionRegistrationView::QmitkDiffusionRegistrationView()
   : QmitkAbstractView()
   , m_Controls( 0 )
-  , m_DiffusionImage( NULL )
+  , m_DiffusionImage( nullptr )
   , m_ThreadIsRunning(false)
   , m_Steps(100)
   , m_LastStep(0)
-  , m_GlobalRegisterer(NULL)
+  , m_GlobalRegisterer(nullptr)
   , m_RegistrationWorker(this)
 
 {
@@ -204,7 +204,7 @@ void QmitkDiffusionRegistrationView::AfterThread()
 
   if( !m_GlobalRegisterer->GetIsInValidState() )
   {
-    QMessageBox::critical( NULL,  "Registration", "An internal error occured, or user canceled the Registration.\n Please check the log for details." );
+    QMessageBox::critical( nullptr,  "Registration", "An internal error occured, or user canceled the Registration.\n Please check the log for details." );
     return;
   }
 
@@ -266,7 +266,7 @@ void QmitkDiffusionRegistrationView::OnSelectionChanged(berry::IWorkbenchPart::P
 
   bool foundDwiVolume = false;
   QString tempSelectedNames = "";
-  m_DiffusionImage = NULL;
+  m_DiffusionImage = nullptr;
   m_SelectedDiffusionNodes.clear();
 
   // iterate selection
@@ -375,11 +375,11 @@ void QmitkDiffusionRegistrationView::StartRegistration()
     MITK_WARN("QmitkDiffusionRegistrationView")<<"Thread already running!";
     return;
   }
-  m_GlobalRegisterer = NULL;
+  m_GlobalRegisterer = nullptr;
 
   if (m_SelectedDiffusionNodes.size()<1)
   {
-    QMessageBox::information( NULL, "Warning", "Please load and select a diffusion image before starting image processing.");
+    QMessageBox::information( nullptr, "Warning", "Please load and select a diffusion image before starting image processing.");
     return;
   }
 
@@ -442,7 +442,7 @@ void QmitkDiffusionRegistrationView::StartBatch()
   QString outputPath = m_Controls->m_OutputFolderTextbox->text();
 
   if(inputPath == outputPath){
-    QMessageBox::information( NULL, "Error", "Input and Output folders can't be the same");
+    QMessageBox::information( nullptr, "Error", "Input and Output folders can't be the same");
     return;
   }
 
@@ -468,11 +468,11 @@ void QmitkDiffusionRegistrationView::StartBatch()
       MITK_WARN("QmitkDiffusionRegistrationView")<<"Thread already running!";
       return;
     }
-    m_GlobalRegisterer = NULL;
+    m_GlobalRegisterer = nullptr;
 
     if (m_BatchList.size()<1)
     {
-      QMessageBox::information( NULL, "Error", "No diffusion images were found in the selected input folder.");
+      QMessageBox::information( nullptr, "Error", "No diffusion images were found in the selected input folder.");
       return;
     }
 

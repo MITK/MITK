@@ -75,7 +75,7 @@ int mitkImageSliceSelectorTest(int argc, char *argv[])
   if(itksys::SystemTools::LowerCase(itksys::SystemTools::GetFilenameExtension(argv[1])).find(".pic")!=std::string::npos)
   {
     std::cout << "Testing whether the slice is identical with a slice loaded by mitkIpPicGetSlice:";
-    mitkIpPicDescriptor *picslice = mitkIpPicGetSlice(argv[1], NULL, (image->GetDimension(2)-1-slice_nr)+1);
+    mitkIpPicDescriptor *picslice = mitkIpPicGetSlice(argv[1], nullptr, (image->GetDimension(2)-1-slice_nr)+1);
     int i, size = _mitkIpPicSize(picslice);
     char * p1 = (char*)slice->GetPic()->data;
     char * p2 = (char*)picslice->data;

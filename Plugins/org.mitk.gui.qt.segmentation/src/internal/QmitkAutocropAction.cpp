@@ -119,7 +119,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
     }
     else
     {
-      MITK_INFO << "   a NULL node selected";
+      MITK_INFO << "   a nullptr node selected";
     }
   }
 }

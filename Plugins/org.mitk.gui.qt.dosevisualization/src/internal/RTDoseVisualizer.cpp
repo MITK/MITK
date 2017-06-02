@@ -58,7 +58,7 @@ const std::string RTDoseVisualizer::VIEW_ID = "org.mitk.views.rt.dosevisualizati
 
 RTDoseVisualizer::RTDoseVisualizer()
 {
-  m_selectedNode = NULL;
+  m_selectedNode = nullptr;
   m_selectedPresetName = "";
   m_internalUpdate = false;
   m_PrescribedDose_Data = 0.0;
@@ -453,7 +453,7 @@ void RTDoseVisualizer::OnSelectionChanged( berry::IWorkbenchPart::Pointer /*sour
 {
   QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
 
-  mitk::DataNode* selectedNode = NULL;
+  mitk::DataNode* selectedNode = nullptr;
 
   if (!dataNodes.empty())
   {

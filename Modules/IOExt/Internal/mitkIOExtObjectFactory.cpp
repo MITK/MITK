@@ -79,17 +79,17 @@ mitk::IOExtObjectFactory::~IOExtObjectFactory()
 
 mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
   mitk::BaseData *data = node->GetData();
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
-    if ((dynamic_cast<Mesh *>(data) != NULL))
+    if ((dynamic_cast<Mesh *>(data) != nullptr))
     {
       newMapper = mitk::MeshMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    else if ((dynamic_cast<UnstructuredGrid *>(data) != NULL))
+    else if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))
     {
       newMapper = mitk::VtkGLMapperWrapper::New(mitk::UnstructuredGridMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
@@ -97,17 +97,17 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<Image *>(data) != NULL))
+    if ((dynamic_cast<Image *>(data) != nullptr))
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    else if ((dynamic_cast<Mesh *>(data) != NULL))
+    else if ((dynamic_cast<Mesh *>(data) != nullptr))
     {
       newMapper = mitk::MeshVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
-    else if ((dynamic_cast<UnstructuredGrid *>(data) != NULL))
+    else if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))
     {
       newMapper = mitk::UnstructuredGridVtkMapper3D::New();
       newMapper->SetDataNode(node);
@@ -118,7 +118,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
 
 void mitk::IOExtObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;

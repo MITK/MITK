@@ -28,7 +28,7 @@ QmitkUSDeviceManagerWidget::QmitkUSDeviceManagerWidget(QWidget* parent,
   Qt::WindowFlags f)
   : QWidget(parent, f)
 {
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 

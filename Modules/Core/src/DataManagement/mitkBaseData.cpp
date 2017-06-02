@@ -270,7 +270,7 @@ void mitk::BaseData::PrintSelf(std::ostream &os, itk::Indent indent) const
   os << std::endl;
   os << indent << " TimeGeometry: ";
   if (GetTimeGeometry() == nullptr)
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   else
     GetTimeGeometry()->Print(os, indent);
   // print out all properties

@@ -60,15 +60,15 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkMatchPoint::VIEW_ID = "org.mitk.views.matchpoint.algorithm.control";
 
 QmitkMatchPoint::QmitkMatchPoint()
-  : m_Parent(NULL), m_LoadedDLLHandle(NULL), m_LoadedAlgorithm(NULL)
+  : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr)
 {
   m_CanLoadAlgorithm = false;
   m_ValidInputs = false;
   m_Working = false;
-  m_spSelectedTargetData = NULL;
-  m_spSelectedMovingData = NULL;
-  m_spSelectedTargetMaskData = NULL;
-  m_spSelectedMovingMaskData = NULL;
+  m_spSelectedTargetData = nullptr;
+  m_spSelectedMovingData = nullptr;
+  m_spSelectedTargetMaskData = nullptr;
+  m_spSelectedMovingMaskData = nullptr;
 }
 
 QmitkMatchPoint::~QmitkMatchPoint()
@@ -240,28 +240,28 @@ bool QmitkMatchPoint::CheckInputs()
   if (m_LoadedAlgorithm.IsNull())
   {
     m_Controls.m_lbMovingName->setText(QString("<font color='red'>No algorithm seleted!</font>"));
-    m_spSelectedMovingNode = NULL;
-    m_spSelectedMovingData = NULL;
+    m_spSelectedMovingNode = nullptr;
+    m_spSelectedMovingData = nullptr;
     m_Controls.m_lbTargetName->setText(QString("<font color='red'>No algorithm seleted!</font>"));
-    m_spSelectedTargetNode = NULL;
-    m_spSelectedTargetData = NULL;
+    m_spSelectedTargetNode = nullptr;
+    m_spSelectedTargetData = nullptr;
 
-    m_spSelectedMovingMaskNode = NULL;
-    m_spSelectedMovingMaskData = NULL;
-    m_spSelectedTargetMaskNode = NULL;
-    m_spSelectedTargetMaskData = NULL;
+    m_spSelectedMovingMaskNode = nullptr;
+    m_spSelectedMovingMaskData = nullptr;
+    m_spSelectedTargetMaskNode = nullptr;
+    m_spSelectedTargetMaskData = nullptr;
   }
   else
   {
     QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
 
-    mitk::Image* movingImage = NULL;
-    mitk::PointSet* movingPointSet = NULL;
-    mitk::Image* targetImage = NULL;
-    mitk::PointSet* targetPointSet = NULL;
+    mitk::Image* movingImage = nullptr;
+    mitk::PointSet* movingPointSet = nullptr;
+    mitk::Image* targetImage = nullptr;
+    mitk::PointSet* targetPointSet = nullptr;
 
-    mitk::Image* movingMaskImage = NULL;
-    mitk::Image* targetMaskImage = NULL;
+    mitk::Image* movingMaskImage = nullptr;
+    mitk::Image* targetMaskImage = nullptr;
 
     typedef ::map::core::continuous::Elements<3>::InternalPointSetType InternalDefaultPointSetType;
     typedef ::map::algorithm::facet::PointSetRegistrationAlgorithmInterface<InternalDefaultPointSetType, InternalDefaultPointSetType>
@@ -275,8 +275,8 @@ bool QmitkMatchPoint::CheckInputs()
     if (nodes.count() < 1)
     {
       m_Controls.m_lbMovingName->setText(QString("<font color='red'>no data selected!</font>"));
-      m_spSelectedMovingNode = NULL;
-      m_spSelectedMovingData = NULL;
+      m_spSelectedMovingNode = nullptr;
+      m_spSelectedMovingData = nullptr;
     }
     else
     {
@@ -326,8 +326,8 @@ bool QmitkMatchPoint::CheckInputs()
     if (nodes.count() < 1)
     {
       m_Controls.m_lbTargetName->setText(QString("<font color='red'>no data selected!</font>"));
-      m_spSelectedTargetNode = NULL;
-      m_spSelectedTargetData = NULL;
+      m_spSelectedTargetNode = nullptr;
+      m_spSelectedTargetData = nullptr;
     }
     else
     {
@@ -379,13 +379,13 @@ bool QmitkMatchPoint::CheckInputs()
       if (nodes.count() < 1)
       {
         m_Controls.m_lbMovingMaskName->setText(QString("<font color='red'>no data selected!</font>"));
-        m_spSelectedMovingMaskNode = NULL;
-        m_spSelectedMovingMaskData = NULL;
+        m_spSelectedMovingMaskNode = nullptr;
+        m_spSelectedMovingMaskData = nullptr;
       }
       else
       {
         m_spSelectedMovingMaskNode = nodes.front();
-        m_spSelectedMovingMaskData = NULL;
+        m_spSelectedMovingMaskData = nullptr;
 
         movingMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedMovingMaskNode->GetData());
 
@@ -435,8 +435,8 @@ bool QmitkMatchPoint::CheckInputs()
     {
       m_Controls.m_lbMovingMaskName->setText(QString("mask deactivated"));
       validMovingMask = true;
-      m_spSelectedMovingMaskNode = NULL;
-      m_spSelectedMovingMaskData = NULL;
+      m_spSelectedMovingMaskNode = nullptr;
+      m_spSelectedMovingMaskData = nullptr;
     }
 
     if (m_Controls.checkTargetMask->isChecked())
@@ -444,13 +444,13 @@ bool QmitkMatchPoint::CheckInputs()
       if (nodes.count() < 1)
       {
         m_Controls.m_lbTargetMaskName->setText(QString("<font color='red'>no data selected!</font>"));
-        m_spSelectedTargetMaskNode = NULL;
-        m_spSelectedTargetMaskData = NULL;
+        m_spSelectedTargetMaskNode = nullptr;
+        m_spSelectedTargetMaskData = nullptr;
       }
       else
       {
         m_spSelectedTargetMaskNode = nodes.front();
-        m_spSelectedTargetMaskData = NULL;
+        m_spSelectedTargetMaskData = nullptr;
         targetMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
 
         bool isMask = maskPredicate->CheckNode(m_spSelectedTargetMaskNode);
@@ -498,8 +498,8 @@ bool QmitkMatchPoint::CheckInputs()
     {
       m_Controls.m_lbTargetMaskName->setText(QString("mask deactivated"));
       validTargetMask = true;
-      m_spSelectedTargetMaskNode = NULL;
-      m_spSelectedTargetMaskData = NULL;
+      m_spSelectedTargetMaskNode = nullptr;
+      m_spSelectedTargetMaskData = nullptr;
     }
 
   }
@@ -534,7 +534,7 @@ bool QmitkMatchPoint::CheckInputs()
 
 std::string QmitkMatchPoint::GetInputNodeDisplayName(const mitk::DataNode* node) const
 {
-  std::string result = "UNDEFINED/NULL";
+  std::string result = "UNDEFINED/nullptr";
 
   if (node)
   {
@@ -588,7 +588,7 @@ std::string QmitkMatchPoint::GetDefaultRegJobName() const
   {
     ++estimatedIndex;
     result = "Reg #" +::map::core::convert::toStr(estimatedIndex);
-    isUnique =  this->GetDataStorage()->GetNamedNode(result) == NULL;
+    isUnique =  this->GetDataStorage()->GetNamedNode(result) == nullptr;
   }
 
   return result;
@@ -628,7 +628,7 @@ void QmitkMatchPoint::ConfigureRegistrationControls()
     const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>
                                        (m_LoadedAlgorithm.GetPointer());
 
-    m_Controls.groupMasks->setVisible(pMaskReg != NULL);
+    m_Controls.groupMasks->setVisible(pMaskReg != nullptr);
 
     //if the stop button is set to visible and the algorithm is working ->
     //then the algorithm is stoppable, thus enable the button.
@@ -798,12 +798,12 @@ void QmitkMatchPoint::OnSaveLogBtnPushed()
   QDateTime currentTime = QDateTime::currentDateTime();
   QString fileName = tr("registration_log_") + currentTime.toString(tr("yyyy-MM-dd_hh-mm-ss")) +
                      tr(".txt");
-  fileName = QFileDialog::getSaveFileName(NULL, tr("Save registration log"), fileName,
+  fileName = QFileDialog::getSaveFileName(nullptr, tr("Save registration log"), fileName,
                                           tr("Text files (*.txt)"));
 
   if (fileName.isEmpty())
   {
-    QMessageBox::critical(NULL, tr("No file selected!"),
+    QMessageBox::critical(nullptr, tr("No file selected!"),
                           tr("Cannot save registration log file. Please selected a file."));
   }
   else

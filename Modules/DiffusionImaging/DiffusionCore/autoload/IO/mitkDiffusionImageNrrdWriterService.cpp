@@ -54,7 +54,7 @@ void mitk::DiffusionImageNrrdWriterService::Write()
 
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to DiffusionImageNrrdWriterService is NULL!";
+    MITK_ERROR <<"Sorry, input to DiffusionImageNrrdWriterService is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )

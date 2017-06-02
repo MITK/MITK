@@ -74,7 +74,7 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   //
   mitk::Surface::Pointer input = const_cast<mitk::Surface *>(this->GetInput());
   vtkSmartPointer<vtkPolyData> polydata = input->GetVtkPolyData(this->GetTimestep());
-  if (polydata == NULL)
+  if (polydata == nullptr)
   {
     ls->m_Actor->VisibilityOff();
     return;
@@ -358,7 +358,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer *renderer, 
     }
     // pass the texture to the actor
     ls->m_Actor->SetTexture(vtkTxture);
-    if (ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == NULL)
+    if (ls->m_VtkPolyDataMapper->GetInput()->GetPointData()->GetTCoords() == nullptr)
     {
       MITK_ERROR << "Surface.Texture property was set, but there are no texture coordinates. Please provide texture "
                     "coordinates for the vtkPolyData via vtkPolyData->GetPointData()->SetTCoords().";
@@ -391,12 +391,12 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer *renderer, 
   else if (deprecatedUsePointData)
   {
     float scalarsMin = 0;
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != nullptr)
       scalarsMin =
         dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
 
     float scalarsMax = 0.1;
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != nullptr)
       scalarsMax =
         dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
@@ -421,7 +421,7 @@ void mitk::SurfaceVtkMapper3D::ApplyAllProperties(mitk::BaseRenderer *renderer, 
   // this node. Check both renderer specific and global property lists, since
   // properties in both should be considered.
   const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList(renderer)->GetMap();
-  const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList(NULL)->GetMap();
+  const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList(nullptr)->GetMap();
 
   // Add clipping planes (if any)
   ls->m_ClippingPlaneCollection->RemoveAllItems();
@@ -459,7 +459,7 @@ void mitk::SurfaceVtkMapper3D::CheckForClippingProperty(mitk::BaseRenderer *rend
 
   ClippingProperty *clippingProperty = dynamic_cast<ClippingProperty *>(property);
 
-  if ((clippingProperty != NULL) && (clippingProperty->GetClippingEnabled()))
+  if ((clippingProperty != nullptr) && (clippingProperty->GetClippingEnabled()))
   {
     const Point3D &origin = clippingProperty->GetOrigin();
     const Vector3D &normal = clippingProperty->GetNormal();
@@ -511,7 +511,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::
   mitk::Surface::Pointer surface = dynamic_cast<Surface *>(node->GetData());
   if (surface.IsNotNull())
   {
-    if ((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != NULL) &&
+    if ((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != nullptr) &&
         (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
     {
       node->AddProperty("scalar visibility", mitk::BoolProperty::New(true), renderer, overwrite);

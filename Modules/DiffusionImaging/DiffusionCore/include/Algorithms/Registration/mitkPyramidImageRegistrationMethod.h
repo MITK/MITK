@@ -172,7 +172,7 @@ public:
    */
   void GetParameters( double* paramArray)
   {
-    if( m_EstimatedParameters == NULL )
+    if( m_EstimatedParameters == nullptr )
     {
       mitkThrow() << "No parameters were estimated yet, call Update() first.";
     }
@@ -194,7 +194,7 @@ public:
    */
   ParametersType GetLastRegistrationParameters()
   {
-    if( m_EstimatedParameters == NULL )
+    if( m_EstimatedParameters == nullptr )
     {
       mitkThrow() << "No parameters were estimated yet, call Update() first.";
     }

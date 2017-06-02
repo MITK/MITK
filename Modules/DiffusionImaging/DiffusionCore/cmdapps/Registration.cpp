@@ -344,7 +344,7 @@ int main( int argc, char* argv[] )
   MITK_INFO << "Loading Reference (fixed) image: " << referenceFileName;
   std::string fileType = itksys::SystemTools::GetFilenameExtension(referenceFileName);
   mitk::Image::Pointer refImage = ExtractFirstTS(mitk::IOUtil::LoadImage(referenceFileName), fileType);
-  mitk::Image::Pointer resampleReference = NULL;
+  mitk::Image::Pointer resampleReference = nullptr;
   if (doResampling)
   {
     refImage = ResampleBySpacing(refImage,spacing);
@@ -352,7 +352,7 @@ int main( int argc, char* argv[] )
   }
 
   if (refImage.IsNull())
-    MITK_ERROR << "Loaded fixed image is NULL";
+    MITK_ERROR << "Loaded fixed image is nullptr";
 
   // Copy reference image to destination
   std::string savePathAndFileName = GetSavePath(outputPath, referenceFileName);
@@ -364,7 +364,7 @@ int main( int argc, char* argv[] )
   CopyResources(referenceFileList, outputPath);
 
   std::string derivedResourceFilename;
-  mitk::Image::Pointer referenceMask = NULL; // union of all segmentations
+  mitk::Image::Pointer referenceMask = nullptr; // union of all segmentations
 
   if (!silent)
   {
@@ -385,7 +385,7 @@ int main( int argc, char* argv[] )
 
 
   // TODO Reactivate Resampling Feature
-  //  mitk::Image::Pointer resampleImage = NULL;
+  //  mitk::Image::Pointer resampleImage = nullptr;
   //  if (QFileInfo(resampleReference).isFile())
   //  {
   //    resampleImage = mitk::IOUtil::LoadImage(resampleReference.toStdString());
@@ -417,7 +417,7 @@ int main( int argc, char* argv[] )
       mitk::Image::Pointer movingImage = ExtractFirstTS(mitk::IOUtil::LoadImage(fileMorphName), fileType);
 
       if (movingImage.IsNull())
-        MITK_ERROR << "Loaded moving image is NULL";
+        MITK_ERROR << "Loaded moving image is nullptr";
 
       // Store transformation,  apply it to morph file
       MITK_INFO << "----------Registering moving image to reference----------";

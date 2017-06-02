@@ -101,7 +101,7 @@ public:
     int toolID = GetToolIdByToolName(toolName);
     mitk::Tool *tool = m_ToolManager->GetToolById(toolID);
 
-    CPPUNIT_ASSERT(tool != NULL);
+    CPPUNIT_ASSERT(tool != nullptr);
 
     // Create empty segmentation working image
     mitk::DataNode::Pointer workingImageNode = mitk::DataNode::New();
@@ -121,7 +121,7 @@ public:
     }
 
     CPPUNIT_ASSERT(workingImageNode.IsNotNull());
-    CPPUNIT_ASSERT(workingImageNode->GetData() != NULL);
+    CPPUNIT_ASSERT(workingImageNode->GetData() != nullptr);
 
     // add images to datastorage
     interactionTestHelper.AddNodeToStorage(patientImageNode);
@@ -137,7 +137,7 @@ public:
     // load interaction events
     m_ToolManager->ActivateTool(toolID);
 
-    CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != NULL);
+    CPPUNIT_ASSERT(m_ToolManager->GetActiveTool() != nullptr);
 
     // Start Interaction
     interactionTestHelper.PlaybackInteraction();
@@ -157,7 +157,7 @@ public:
   void tearDown()
   {
     m_ToolManager->ActivateTool(-1);
-    m_ToolManager = NULL;
+    m_ToolManager = nullptr;
   }
 
   void AddToolInteractionTest()

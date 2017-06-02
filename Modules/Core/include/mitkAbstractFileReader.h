@@ -61,7 +61,7 @@ namespace mitk
      *
      * This method must be implemented for each specific reader. Call
      * GetInputStream() first and check for a non-null stream to read from.
-     * If the input stream is \c NULL, use GetInputLocation() to read from a local
+     * If the input stream is \c nullptr, use GetInputLocation() to read from a local
      * file-system path.
      *
      * If the reader cannot use streams directly, use GetLocalFileName() instead.
@@ -160,7 +160,7 @@ namespace mitk
      *
      * @param context
      * @return
-     * @throws std::invalid_argument if \c context is NULL.
+     * @throws std::invalid_argument if \c context is nullptr.
      */
     virtual us::ServiceRegistration<CustomMimeType> RegisterMimeType(us::ModuleContext *context);
 

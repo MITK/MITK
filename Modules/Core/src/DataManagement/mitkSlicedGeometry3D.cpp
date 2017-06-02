@@ -623,7 +623,7 @@ void mitk::SlicedGeometry3D::PrintSelf(std::ostream &os, itk::Indent indent) con
   os << indent << " GetPlaneGeometry(0): ";
   if (this->GetPlaneGeometry(0) == nullptr)
   {
-    os << "NULL" << std::endl;
+    os << "nullptr" << std::endl;
   }
   else
   {

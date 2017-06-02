@@ -170,9 +170,9 @@ void mitk::GPUVolumeMapper3D::DeinitGPU(mitk::BaseRenderer *renderer)
     // deinit renderwindow, this is needed to release the memory allocated on the gpu
     // to prevent leaking memory on the gpu
     ls->m_MapperGPU->ReleaseGraphicsResources(renderer->GetVtkRenderer()->GetVTKWindow());
-    ls->m_VolumePropertyGPU = NULL;
-    ls->m_MapperGPU = NULL;
-    ls->m_VolumeGPU = NULL;
+    ls->m_VolumePropertyGPU = nullptr;
+    ls->m_MapperGPU = nullptr;
+    ls->m_VolumeGPU = nullptr;
     ls->m_gpuInitialized = false;
   }
 }
@@ -186,15 +186,15 @@ void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer *renderer)
 
   GPU_INFO << "deinitializing cpu-raycast-vr";
 
-  ls->m_VolumePropertyCPU = NULL;
-  ls->m_MapperCPU = NULL;
-  ls->m_VolumeCPU = NULL;
+  ls->m_VolumePropertyCPU = nullptr;
+  ls->m_MapperCPU = nullptr;
+  ls->m_VolumeCPU = nullptr;
   ls->m_cpuInitialized = false;
 }
 
 mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
 {
-  m_VolumeNULL = 0;
+  m_Volumenullptr = 0;
   m_commonInitialized = false;
 }
 
@@ -251,7 +251,7 @@ bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer *renderer)
 
   vtkImageData *inputData = input->GetVtkImageData(this->GetTimestep());
 
-  if (inputData == NULL)
+  if (inputData == nullptr)
     return false;
 
   return true;
@@ -302,12 +302,12 @@ vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   if (!IsRenderable(renderer))
   {
-    if (!m_VolumeNULL)
+    if (!m_Volumenullptr)
     {
-      m_VolumeNULL = vtkSmartPointer<vtkVolume>::New();
-      m_VolumeNULL->VisibilityOff();
+      m_Volumenullptr = vtkSmartPointer<vtkVolume>::New();
+      m_Volumenullptr->VisibilityOff();
     }
-    return m_VolumeNULL;
+    return m_Volumenullptr;
   }
 
   InitCommon();
@@ -569,7 +569,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::B
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
   if (image.IsNotNull() && image->IsInitialized())
   {
-    if ((overwrite) || (node->GetProperty("levelwindow", renderer) == NULL))
+    if ((overwrite) || (node->GetProperty("levelwindow", renderer) == nullptr))
     {
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
@@ -578,7 +578,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataNode *node, mitk::B
       node->SetProperty("levelwindow", levWinProp, renderer);
     }
 
-    if ((overwrite) || (node->GetProperty("TransferFunction", renderer) == NULL))
+    if ((overwrite) || (node->GetProperty("TransferFunction", renderer) == nullptr))
     {
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
@@ -657,14 +657,14 @@ void mitk::GPUVolumeMapper3D::DeinitRAY(mitk::BaseRenderer *renderer)
   {
     GPU_INFO << "deinitializing gpu-raycast-vr";
 
-    ls->m_MapperRAY = NULL;
-    ls->m_VolumePropertyRAY = NULL;
+    ls->m_MapperRAY = nullptr;
+    ls->m_VolumePropertyRAY = nullptr;
     // Here ReleaseGraphicsResources has to be called to avoid VTK error messages.
     // This seems like a VTK bug, because ReleaseGraphicsResources() is ment for internal use,
     // but you cannot just delete the object (last smartpointer reference) without getting the
     // VTK error.
     ls->m_VolumeRAY->ReleaseGraphicsResources(renderer->GetVtkRenderer()->GetRenderWindow());
-    ls->m_VolumeRAY = NULL;
+    ls->m_VolumeRAY = nullptr;
     ls->m_rayInitialized = false;
   }
 }

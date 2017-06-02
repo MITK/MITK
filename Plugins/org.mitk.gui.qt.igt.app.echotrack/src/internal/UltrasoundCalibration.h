@@ -333,7 +333,7 @@ protected:
   */
   vtkSmartPointer<vtkPolyData> ConvertPointSetToVtkPolyData(mitk::PointSet::Pointer PointSet);
 
-  double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
+  double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = nullptr);
 
   void ApplyTransformToPointSet(mitk::PointSet::Pointer pointSet, vtkSmartPointer<vtkLandmarkTransform> transform);
 

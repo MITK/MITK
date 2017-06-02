@@ -266,7 +266,7 @@ struct QbrSelListener : ISelectionListener
 
 QmitkQBallReconstructionView::QmitkQBallReconstructionView()
   : QmitkAbstractView(),
-    m_Controls(NULL)
+    m_Controls(nullptr)
 {
 }
 
@@ -543,11 +543,11 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
       }
 #else
       std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-      QMessageBox::warning(NULL,"ERROR","Boost 1.35 minimum required");
+      QMessageBox::warning(nullptr,"ERROR","Boost 1.35 minimum required");
 #endif
 #else
       std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
-      QMessageBox::warning(NULL,"ERROR","Boost 1.35 minimum required");
+      QMessageBox::warning(nullptr,"ERROR","Boost 1.35 minimum required");
 #endif
     }
   }

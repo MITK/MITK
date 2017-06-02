@@ -104,7 +104,7 @@ void QmitkCmdLineModuleMenuComboBox::RebuildMenu()
 {
   if (m_ModuleManager == nullptr)
   {
-    qDebug() << "QmitkCmdLineModuleMenuComboBox::RebuildMenu(): Module Manager is NULL? Surely a bug?";
+    qDebug() << "QmitkCmdLineModuleMenuComboBox::RebuildMenu(): Module Manager is nullptr? Surely a bug?";
     return;
   }
 

@@ -40,7 +40,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PickingTool, "PickingTool");
 }
 
-mitk::PickingTool::PickingTool() : m_WorkingData(NULL)
+mitk::PickingTool::PickingTool() : m_WorkingData(nullptr)
 {
   m_PointSetNode = mitk::DataNode::New();
   m_PointSetNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New("Picking_Seedpoint"));
@@ -74,7 +74,7 @@ mitk::PickingTool::~PickingTool()
 
 const char **mitk::PickingTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 const char *mitk::PickingTool::GetName() const
@@ -239,7 +239,7 @@ void mitk::PickingTool::ConfirmSegmentation()
   newNode->SetProperty("color", mitk::ColorProperty::New(rgb));
 
   float opacity = 1.0f;
-  m_WorkingData->GetOpacity(opacity, NULL);
+  m_WorkingData->GetOpacity(opacity, nullptr);
   newNode->SetProperty("opacity", mitk::FloatProperty::New(opacity));
 
   newNode->SetData(m_ResultNode->GetData());
@@ -247,7 +247,7 @@ void mitk::PickingTool::ConfirmSegmentation()
   GetDataStorage()->Add(newNode, this->GetReferenceData());
   m_WorkingData->SetVisibility(false);
 
-  m_ResultNode->SetData(NULL);
+  m_ResultNode->SetData(nullptr);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

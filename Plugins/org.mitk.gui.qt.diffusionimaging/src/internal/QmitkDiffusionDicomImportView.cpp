@@ -59,7 +59,7 @@ const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusion
 
 
 QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const char* /*name*/)
-  : QmitkAbstractView(), m_Controls(NULL),
+  : QmitkAbstractView(), m_Controls(nullptr),
     m_OutputFolderName(""), m_OutputFolderNameSet(false)
 {
 }
@@ -76,7 +76,7 @@ QmitkDiffusionDicomImport::~QmitkDiffusionDicomImport()
 void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
 {
   m_Parent = parent;
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new Ui::QmitkDiffusionDicomImportControls;
     m_Controls->setupUi(parent);
@@ -329,13 +329,13 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
   try
   {
     const std::string& locale = "C";
-    const std::string& currLocale = setlocale( LC_ALL, NULL );
+    const std::string& currLocale = setlocale( LC_ALL, nullptr );
 
     if ( locale.compare(currLocale)!=0 )
     {
       try
       {
-        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, nullptr) << " to '" << locale << "'";
         setlocale(LC_ALL, locale.c_str());
       }
       catch(...)
@@ -526,7 +526,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
 
     try
     {
-      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, nullptr) << " to '" << currLocale << "'";
       setlocale(LC_ALL, currLocale.c_str());
     }
     catch(...)
@@ -541,7 +541,7 @@ void QmitkDiffusionDicomImport::NewDicomLoadStartLoad()
   }
 
   if (!imageSuccessfullySaved)
-    QMessageBox::warning(NULL,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
+    QMessageBox::warning(nullptr,"WARNING","One or more files could not be saved! The according files where moved to the datastorage.");
   Status(QString("Finished import with memory:"));
 
   PrintMemoryUsage();

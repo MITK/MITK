@@ -42,7 +42,7 @@ mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
 
 mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 {
-  if (m_NodeModifiedObserverAdded && GetDataNode() != NULL)
+  if (m_NodeModifiedObserverAdded && GetDataNode() != nullptr)
   {
     GetDataNode()->RemoveObserver(m_NodeModifiedObserverTag);
   }
@@ -72,7 +72,7 @@ void mitk::PlanarFigureMapper2D::Paint(mitk::BaseRenderer *renderer)
 
   // Get 2D geometry frame of PlanarFigure
   const mitk::PlaneGeometry *planarFigurePlaneGeometry = planarFigure->GetPlaneGeometry();
-  if (planarFigurePlaneGeometry == NULL)
+  if (planarFigurePlaneGeometry == nullptr)
   {
     MITK_ERROR << "PlanarFigure does not have valid PlaneGeometry!";
     return;
@@ -85,7 +85,7 @@ void mitk::PlanarFigureMapper2D::Paint(mitk::BaseRenderer *renderer)
   // world plane is parallel to and within the planar figure geometry bounds
   // (otherwise, display nothing)
 
-  if ((planarFigurePlaneGeometry != NULL) && (rendererPlaneGeometry != NULL))
+  if ((planarFigurePlaneGeometry != nullptr) && (rendererPlaneGeometry != nullptr))
   {
     double planeThickness = planarFigurePlaneGeometry->GetExtentInMM(2);
     if (!planarFigurePlaneGeometry->IsParallel(rendererPlaneGeometry) ||
@@ -411,7 +411,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
 
 void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode(const mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
   {
     return;
   }
@@ -474,71 +474,71 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode(co
 
   // Set default color and opacity
   // If property "planarfigure.default.*.color" exists, then use that color. Otherwise global "color" property is used.
-  if (!node->GetColor(m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color"))
+  if (!node->GetColor(m_LineColor[PF_DEFAULT], nullptr, "planarfigure.default.line.color"))
   {
-    node->GetColor(m_LineColor[PF_DEFAULT], NULL, "color");
+    node->GetColor(m_LineColor[PF_DEFAULT], nullptr, "color");
   }
   node->GetFloatProperty("planarfigure.default.line.opacity", m_LineOpacity[PF_DEFAULT]);
 
-  if (!node->GetColor(m_OutlineColor[PF_DEFAULT], NULL, "planarfigure.default.outline.color"))
+  if (!node->GetColor(m_OutlineColor[PF_DEFAULT], nullptr, "planarfigure.default.outline.color"))
   {
-    node->GetColor(m_OutlineColor[PF_DEFAULT], NULL, "color");
+    node->GetColor(m_OutlineColor[PF_DEFAULT], nullptr, "color");
   }
   node->GetFloatProperty("planarfigure.default.outline.opacity", m_OutlineOpacity[PF_DEFAULT]);
 
-  if (!node->GetColor(m_HelperlineColor[PF_DEFAULT], NULL, "planarfigure.default.helperline.color"))
+  if (!node->GetColor(m_HelperlineColor[PF_DEFAULT], nullptr, "planarfigure.default.helperline.color"))
   {
-    node->GetColor(m_HelperlineColor[PF_DEFAULT], NULL, "color");
+    node->GetColor(m_HelperlineColor[PF_DEFAULT], nullptr, "color");
   }
   node->GetFloatProperty("planarfigure.default.helperline.opacity", m_HelperlineOpacity[PF_DEFAULT]);
 
-  node->GetColor(m_MarkerlineColor[PF_DEFAULT], NULL, "planarfigure.default.markerline.color");
+  node->GetColor(m_MarkerlineColor[PF_DEFAULT], nullptr, "planarfigure.default.markerline.color");
   node->GetFloatProperty("planarfigure.default.markerline.opacity", m_MarkerlineOpacity[PF_DEFAULT]);
-  node->GetColor(m_MarkerColor[PF_DEFAULT], NULL, "planarfigure.default.marker.color");
+  node->GetColor(m_MarkerColor[PF_DEFAULT], nullptr, "planarfigure.default.marker.color");
   node->GetFloatProperty("planarfigure.default.marker.opacity", m_MarkerOpacity[PF_DEFAULT]);
-  if (!node->GetColor(m_AnnotationColor[PF_DEFAULT], NULL, "planarfigure.default.annotation.color"))
+  if (!node->GetColor(m_AnnotationColor[PF_DEFAULT], nullptr, "planarfigure.default.annotation.color"))
   {
-    if (!node->GetColor(m_AnnotationColor[PF_DEFAULT], NULL, "planarfigure.default.line.color"))
+    if (!node->GetColor(m_AnnotationColor[PF_DEFAULT], nullptr, "planarfigure.default.line.color"))
     {
-      node->GetColor(m_AnnotationColor[PF_DEFAULT], NULL, "color");
+      node->GetColor(m_AnnotationColor[PF_DEFAULT], nullptr, "color");
     }
   }
 
   // Set hover color and opacity
-  node->GetColor(m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color");
+  node->GetColor(m_LineColor[PF_HOVER], nullptr, "planarfigure.hover.line.color");
   node->GetFloatProperty("planarfigure.hover.line.opacity", m_LineOpacity[PF_HOVER]);
-  node->GetColor(m_OutlineColor[PF_HOVER], NULL, "planarfigure.hover.outline.color");
+  node->GetColor(m_OutlineColor[PF_HOVER], nullptr, "planarfigure.hover.outline.color");
   node->GetFloatProperty("planarfigure.hover.outline.opacity", m_OutlineOpacity[PF_HOVER]);
-  node->GetColor(m_HelperlineColor[PF_HOVER], NULL, "planarfigure.hover.helperline.color");
+  node->GetColor(m_HelperlineColor[PF_HOVER], nullptr, "planarfigure.hover.helperline.color");
   node->GetFloatProperty("planarfigure.hover.helperline.opacity", m_HelperlineOpacity[PF_HOVER]);
-  node->GetColor(m_MarkerlineColor[PF_HOVER], NULL, "planarfigure.hover.markerline.color");
+  node->GetColor(m_MarkerlineColor[PF_HOVER], nullptr, "planarfigure.hover.markerline.color");
   node->GetFloatProperty("planarfigure.hover.markerline.opacity", m_MarkerlineOpacity[PF_HOVER]);
-  node->GetColor(m_MarkerColor[PF_HOVER], NULL, "planarfigure.hover.marker.color");
+  node->GetColor(m_MarkerColor[PF_HOVER], nullptr, "planarfigure.hover.marker.color");
   node->GetFloatProperty("planarfigure.hover.marker.opacity", m_MarkerOpacity[PF_HOVER]);
-  if (!node->GetColor(m_AnnotationColor[PF_HOVER], NULL, "planarfigure.hover.annotation.color"))
+  if (!node->GetColor(m_AnnotationColor[PF_HOVER], nullptr, "planarfigure.hover.annotation.color"))
   {
-    if (!node->GetColor(m_AnnotationColor[PF_HOVER], NULL, "planarfigure.hover.line.color"))
+    if (!node->GetColor(m_AnnotationColor[PF_HOVER], nullptr, "planarfigure.hover.line.color"))
     {
-      node->GetColor(m_AnnotationColor[PF_HOVER], NULL, "color");
+      node->GetColor(m_AnnotationColor[PF_HOVER], nullptr, "color");
     }
   }
 
   // Set selected color and opacity
-  node->GetColor(m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color");
+  node->GetColor(m_LineColor[PF_SELECTED], nullptr, "planarfigure.selected.line.color");
   node->GetFloatProperty("planarfigure.selected.line.opacity", m_LineOpacity[PF_SELECTED]);
-  node->GetColor(m_OutlineColor[PF_SELECTED], NULL, "planarfigure.selected.outline.color");
+  node->GetColor(m_OutlineColor[PF_SELECTED], nullptr, "planarfigure.selected.outline.color");
   node->GetFloatProperty("planarfigure.selected.outline.opacity", m_OutlineOpacity[PF_SELECTED]);
-  node->GetColor(m_HelperlineColor[PF_SELECTED], NULL, "planarfigure.selected.helperline.color");
+  node->GetColor(m_HelperlineColor[PF_SELECTED], nullptr, "planarfigure.selected.helperline.color");
   node->GetFloatProperty("planarfigure.selected.helperline.opacity", m_HelperlineOpacity[PF_SELECTED]);
-  node->GetColor(m_MarkerlineColor[PF_SELECTED], NULL, "planarfigure.selected.markerline.color");
+  node->GetColor(m_MarkerlineColor[PF_SELECTED], nullptr, "planarfigure.selected.markerline.color");
   node->GetFloatProperty("planarfigure.selected.markerline.opacity", m_MarkerlineOpacity[PF_SELECTED]);
-  node->GetColor(m_MarkerColor[PF_SELECTED], NULL, "planarfigure.selected.marker.color");
+  node->GetColor(m_MarkerColor[PF_SELECTED], nullptr, "planarfigure.selected.marker.color");
   node->GetFloatProperty("planarfigure.selected.marker.opacity", m_MarkerOpacity[PF_SELECTED]);
-  if (!node->GetColor(m_AnnotationColor[PF_SELECTED], NULL, "planarfigure.selected.annotation.color"))
+  if (!node->GetColor(m_AnnotationColor[PF_SELECTED], nullptr, "planarfigure.selected.annotation.color"))
   {
-    if (!node->GetColor(m_AnnotationColor[PF_SELECTED], NULL, "planarfigure.selected.line.color"))
+    if (!node->GetColor(m_AnnotationColor[PF_SELECTED], nullptr, "planarfigure.selected.line.color"))
     {
-      node->GetColor(m_AnnotationColor[PF_SELECTED], NULL, "color");
+      node->GetColor(m_AnnotationColor[PF_SELECTED], nullptr, "color");
     }
   }
 

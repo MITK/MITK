@@ -134,7 +134,7 @@ void mitk::SimulationIO::Write()
 
   const Simulation* simulation = dynamic_cast<const Simulation*>(this->GetInput());
 
-  if (simulation == NULL)
+  if (simulation == nullptr)
     mitkThrow() << "Invalid input!";
 
   std::string originalContent = simulation->GetProperty("Scene File")->GetValueAsString();
@@ -159,7 +159,7 @@ mitk::IFileIO::ConfidenceLevel mitk::SimulationIO::GetWriterConfidenceLevel() co
   if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
     return Unsupported;
 
-  return dynamic_cast<const Simulation*>(this->GetInput()) == NULL
+  return dynamic_cast<const Simulation*>(this->GetInput()) == nullptr
     ? Unsupported
     : Supported;
 }

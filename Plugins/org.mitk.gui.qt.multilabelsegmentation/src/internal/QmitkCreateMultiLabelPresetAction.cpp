@@ -43,14 +43,14 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
 
       if(referenceImage->GetNumberOfLabels() <= 1)
       {
-        QMessageBox::information(NULL, "Create LabelSetImage Preset", "Could not create a LabelSetImage preset.\nNo Labels defined!\n");\
+        QMessageBox::information(nullptr, "Create LabelSetImage Preset", "Could not create a LabelSetImage preset.\nNo Labels defined!\n");\
         return;
       }
 
       std::string sName = referenceNode->GetName();
       QString qName;
       qName.sprintf("%s.lsetp",sName.c_str());
-      QString filename = QFileDialog::getSaveFileName( NULL,"save file dialog",QString(),"LabelSet Preset(*.lsetp)");
+      QString filename = QFileDialog::getSaveFileName( nullptr,"save file dialog",QString(),"LabelSet Preset(*.lsetp)");
       if ( filename.isEmpty() )
         return;
 
@@ -59,7 +59,7 @@ void QmitkCreateMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer
 
       if(!wasSaved)
       {
-        QMessageBox::information(NULL, "Create LabelSetImage Preset", "Could not save a LabelSetImage preset as Xml.\n");\
+        QMessageBox::information(nullptr, "Create LabelSetImage Preset", "Could not save a LabelSetImage preset as Xml.\n");\
         return;
       }
     }

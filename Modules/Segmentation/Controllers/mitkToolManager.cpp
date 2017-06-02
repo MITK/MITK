@@ -301,7 +301,7 @@ void mitk::ToolManager::SetWorkingData(DataNode *data)
 {
   DataVectorType v;
 
-  if (data) // don't allow for NULL nodes
+  if (data) // don't allow for nullptr nodes
   {
     v.push_back(data);
   }

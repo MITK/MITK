@@ -18,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mapMetaProperty.h"
 
-QmitkMAPAlgorithmModel::QmitkMAPAlgorithmModel(QObject *parent) : QAbstractTableModel(parent), m_pMetaInterface(NULL)
+QmitkMAPAlgorithmModel::QmitkMAPAlgorithmModel(QObject *parent) : QAbstractTableModel(parent), m_pMetaInterface(nullptr)
 {
 }
 

@@ -62,7 +62,7 @@ QWidget *QmitkMapPropertyDelegate::createEditor(QWidget *parent,
 
   if (data.isValid())
   {
-    QWidget *editorWidget = NULL;
+    QWidget *editorWidget = nullptr;
 
     if (data.type() == QVariant::Int)
     {

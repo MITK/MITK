@@ -57,7 +57,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
       newName.append("-labels");
 
       bool ok = false;
-      newName = QInputDialog::getText(NULL, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
+      newName = QInputDialog::getText(nullptr, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
       if(!ok) return;
 
       mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();

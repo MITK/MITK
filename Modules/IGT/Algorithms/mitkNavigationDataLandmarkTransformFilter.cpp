@@ -27,8 +27,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::NavigationDataLandmarkTransformFilter::NavigationDataLandmarkTransformFilter() : mitk::NavigationDataToNavigationDataFilter(),
 m_ErrorMean(-1.0), m_ErrorStdDev(-1.0), m_ErrorRMS(-1.0), m_ErrorMin(-1.0), m_ErrorMax(-1.0), m_ErrorAbsMax(-1.0),
-m_SourcePoints(), m_TargetPoints(), m_LandmarkTransformInitializer(NULL), m_LandmarkTransform(NULL),
-m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitialization(false)
+m_SourcePoints(), m_TargetPoints(), m_LandmarkTransformInitializer(nullptr), m_LandmarkTransform(nullptr),
+m_QuatLandmarkTransform(nullptr), m_QuatTransform(nullptr), m_Errors(), m_UseICPInitialization(false)
 {
   m_LandmarkTransform = LandmarkTransformType::New();
 
@@ -43,10 +43,10 @@ m_QuatLandmarkTransform(NULL), m_QuatTransform(NULL), m_Errors(), m_UseICPInitia
 
 mitk::NavigationDataLandmarkTransformFilter::~NavigationDataLandmarkTransformFilter()
 {
-  m_LandmarkTransform = NULL;
-  m_LandmarkTransformInitializer = NULL;
-  m_QuatLandmarkTransform = NULL;
-  m_QuatTransform = NULL;
+  m_LandmarkTransform = nullptr;
+  m_LandmarkTransformInitializer = nullptr;
+  m_QuatLandmarkTransform = nullptr;
+  m_QuatTransform = nullptr;
 }
 
 

@@ -122,7 +122,7 @@ const mitk::Image* mitk::RegEvaluationMapper2D::GetTargetImage( void )
     return evalObj->GetTargetImage();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const mitk::Image* mitk::RegEvaluationMapper2D::GetMovingImage( void )
@@ -133,7 +133,7 @@ const mitk::Image* mitk::RegEvaluationMapper2D::GetMovingImage( void )
     return evalObj->GetMovingImage();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const mitk::DataNode* mitk::RegEvaluationMapper2D::GetTargetNode(void)
@@ -144,7 +144,7 @@ const mitk::DataNode* mitk::RegEvaluationMapper2D::GetTargetNode(void)
     return evalObj->GetTargetNode();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const mitk::DataNode* mitk::RegEvaluationMapper2D::GetMovingNode(void)
@@ -155,7 +155,7 @@ const mitk::DataNode* mitk::RegEvaluationMapper2D::GetMovingNode(void)
     return evalObj->GetMovingNode();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 const mitk::MAPRegistrationWrapper* mitk::RegEvaluationMapper2D::GetRegistration( void )
@@ -166,7 +166,7 @@ const mitk::MAPRegistrationWrapper* mitk::RegEvaluationMapper2D::GetRegistration
     return evalObj->GetRegistration();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 vtkProp* mitk::RegEvaluationMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
@@ -199,7 +199,7 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
 
   //check if there is a valid worldGeometry
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
+  if( ( worldGeometry == nullptr ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
   }
@@ -214,10 +214,10 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
     // and the geometry of the image that is to be rendered.
     if ( !RenderingGeometryIntersectsImage( worldGeometry, targetInput->GetSlicedGeometry() ) )
     {
-      // set image to NULL, to clear the texture in 3D, because
+      // set image to nullptr, to clear the texture in 3D, because
       // the latest image is used there if the plane is out of the geometry
       // see bug-13275
-      localStorage->m_EvaluationImage = NULL;
+      localStorage->m_EvaluationImage = nullptr;
       localStorage->m_Mapper->SetInputData( localStorage->m_EmptyPolyData );
       return;
     }
@@ -247,7 +247,7 @@ void mitk::RegEvaluationMapper2D::GenerateDataForRenderer( mitk::BaseRenderer *r
         resliceInterpolationProperty, "reslice interpolation" );
 
       int interpolationMode = VTK_RESLICE_NEAREST;
-      if ( resliceInterpolationProperty != NULL )
+      if ( resliceInterpolationProperty != nullptr )
       {
         interpolationMode = resliceInterpolationProperty->GetInterpolation();
       }
@@ -656,7 +656,7 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
   }
 
   mitk::Image* data  = const_cast<mitk::Image *>( this->GetTargetImage() );
-  if ( data == NULL )
+  if ( data == nullptr )
   {
     return;
   }
@@ -666,7 +666,7 @@ void mitk::RegEvaluationMapper2D::Update(mitk::BaseRenderer* renderer)
 
   // Check if time step is valid
   const TimeGeometry *dataTimeGeometry = data->GetTimeGeometry();
-  if ( ( dataTimeGeometry == NULL )
+  if ( ( dataTimeGeometry == nullptr )
     || ( dataTimeGeometry->CountTimeSteps() == 0 )
     || ( !dataTimeGeometry->IsValidTimeStep( this->GetTimestep() ) ) )
   {
@@ -767,9 +767,9 @@ void mitk::RegEvaluationMapper2D::TransformActor(mitk::BaseRenderer* renderer)
 
 bool mitk::RegEvaluationMapper2D::RenderingGeometryIntersectsImage( const Geometry2D* renderingGeometry, SlicedGeometry3D* imageGeometry )
 {
-  // if either one of the two geometries is NULL we return true
+  // if either one of the two geometries is nullptr we return true
   // for safety reasons
-  if ( renderingGeometry == NULL || imageGeometry == NULL )
+  if ( renderingGeometry == nullptr || imageGeometry == nullptr )
     return true;
 
   // get the distance for the first cornerpoint

@@ -320,7 +320,7 @@ QVariant ApplicationHandle::SetInternalResult(const QVariant& result, IApplicati
   } else {
     if (result == IApplicationContext.EXIT_ASYNC_RESULT) {
       setAsyncResult = true;
-      return NULL_RESULT; // the result well be set with setResult
+      return nullptr_RESULT; // the result well be set with setResult
     }
   }
   */

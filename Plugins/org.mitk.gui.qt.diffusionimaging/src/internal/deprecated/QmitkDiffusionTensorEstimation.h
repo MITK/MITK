@@ -40,7 +40,7 @@ public:
   /*!
   \brief default constructor
   */
-  QmitkDiffusionTensorEstimation(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkDiffusionTensorEstimation(QObject *parent=0, const char *name=0, mitk::DataTreeIteratorBase* dataIt = nullptr);
 
   /*!
   \brief default destructor

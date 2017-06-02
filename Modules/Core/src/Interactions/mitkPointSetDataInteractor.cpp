@@ -55,7 +55,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineActi
   }
   // To add a point the minimal information is the position, this method accepts all InteractionsPositionEvents
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
@@ -108,7 +108,7 @@ void mitk::PointSetDataInteractor::AddPoint(StateMachineAction *stateMachineActi
       // Signal that DataNode is fully filled
       this->NotifyResultReady();
       // Send internal event that can be used by StateMachines to switch in a different state
-      InternalEvent::Pointer event = InternalEvent::New(NULL, this, "MaximalNumberOfPoints");
+      InternalEvent::Pointer event = InternalEvent::New(nullptr, this, "MaximalNumberOfPoints");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }
   }
@@ -120,7 +120,7 @@ void mitk::PointSetDataInteractor::SelectPoint(StateMachineAction *, Interaction
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     Point3D point = positionEvent->GetPositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
@@ -166,7 +166,7 @@ void mitk::PointSetDataInteractor::RemovePoint(StateMachineAction *, Interaction
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     mitk::Point3D itkPoint = positionEvent->GetPositionInWorld();
 
@@ -211,13 +211,13 @@ void mitk::PointSetDataInteractor::IsClosedContour(StateMachineAction *, Interac
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     Point3D point = positionEvent->GetPositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
     if (GetPointIndexByPosition(point, timeStep) != -1 && m_PointSet->GetSize(timeStep) >= 3)
     {
-      InternalEvent::Pointer event = InternalEvent::New(NULL, this, "ClosedContour");
+      InternalEvent::Pointer event = InternalEvent::New(nullptr, this, "ClosedContour");
       positionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
     }
   }
@@ -228,7 +228,7 @@ void mitk::PointSetDataInteractor::MovePoint(StateMachineAction *stateMachineAct
   unsigned int timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     IsClosedContour(stateMachineAction, interactionEvent);
     mitk::Point3D newPoint, resultPoint;
@@ -282,7 +282,7 @@ void mitk::PointSetDataInteractor::UnSelectPointAtPosition(StateMachineAction *,
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     Point3D point = positionEvent->GetPositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
@@ -315,7 +315,7 @@ void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
   ScalarType timeInMs = interactionEvent->GetSender()->GetTime();
 
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     Point3D positioninWorld = positionEvent->GetPositionInWorld();
     PointSet::PointsContainer::Iterator it, end;
@@ -363,7 +363,7 @@ void mitk::PointSetDataInteractor::UnSelectAll(mitk::StateMachineAction *, mitk:
 void mitk::PointSetDataInteractor::UpdatePointSet(mitk::StateMachineAction *, mitk::InteractionEvent *)
 {
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(this->GetDataNode()->GetData());
-  if (pointSet == NULL)
+  if (pointSet == nullptr)
   {
     MITK_ERROR << "PointSetDataInteractor:: No valid point set .";
     return;
@@ -374,7 +374,7 @@ void mitk::PointSetDataInteractor::UpdatePointSet(mitk::StateMachineAction *, mi
 
 void mitk::PointSetDataInteractor::Abort(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  InternalEvent::Pointer event = InternalEvent::New(NULL, this, IntDeactivateMe);
+  InternalEvent::Pointer event = InternalEvent::New(nullptr, this, IntDeactivateMe);
   interactionEvent->GetSender()->GetDispatcher()->QueueEvent(event.GetPointer());
 }
 
@@ -386,7 +386,7 @@ void mitk::PointSetDataInteractor::DataNodeChanged()
   if (GetDataNode() != nullptr)
   {
     PointSet *points = dynamic_cast<PointSet *>(GetDataNode()->GetData());
-    if (points == NULL)
+    if (points == nullptr)
     {
       m_PointSet = PointSet::New();
       GetDataNode()->SetData(m_PointSet);
@@ -409,7 +409,7 @@ void mitk::PointSetDataInteractor::InitMove(StateMachineAction *, InteractionEve
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
 
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   // start of the Movement is stored to calculate the undoKoordinate
@@ -430,7 +430,7 @@ void mitk::PointSetDataInteractor::FinishMove(StateMachineAction *, InteractionE
 
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
 
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     // finish the movement:
     // the final point is m_LastPoint
@@ -501,7 +501,7 @@ int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsi
   // iterate over point set and check if it contains a point close enough to the pointer to be selected
   PointSet *points = dynamic_cast<PointSet *>(GetDataNode()->GetData());
   int index = -1;
-  if (points == NULL)
+  if (points == nullptr)
   {
     return index;
   }
@@ -530,7 +530,7 @@ int mitk::PointSetDataInteractor::GetPointIndexByPosition(Point3D position, unsi
 bool mitk::PointSetDataInteractor::CheckSelection(const mitk::InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent != NULL)
+  if (positionEvent != nullptr)
   {
     int timeStep = positionEvent->GetSender()->GetTimeStep();
     Point3D point = positionEvent->GetPositionInWorld();
@@ -545,13 +545,13 @@ bool mitk::PointSetDataInteractor::CheckSelection(const mitk::InteractionEvent *
 void mitk::PointSetDataInteractor::UnselectAll(unsigned int timeStep, ScalarType timeInMs)
 {
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(GetDataNode()->GetData());
-  if (pointSet == NULL)
+  if (pointSet == nullptr)
   {
     return;
   }
 
   mitk::PointSet::DataType *itkPointSet = pointSet->GetPointSet(timeStep);
-  if (itkPointSet == NULL)
+  if (itkPointSet == nullptr)
   {
     return;
   }
@@ -595,7 +595,7 @@ void mitk::PointSetDataInteractor::SelectPoint(int position, unsigned int timeSt
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet *>(this->GetDataNode()->GetData());
 
   // if List is empty, then no selection of a point can be done!
-  if ((pointSet == NULL) || (pointSet->GetSize(timeStep) <= 0))
+  if ((pointSet == nullptr) || (pointSet->GetSize(timeStep) <= 0))
   {
     return;
   }

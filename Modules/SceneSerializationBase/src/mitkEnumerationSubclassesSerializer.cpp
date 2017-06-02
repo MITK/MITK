@@ -43,7 +43,7 @@ class classname##Serializer                                                     
           mitkClassMacro(classname##Serializer, EnumerationPropertySerializer) itkFactorylessNewMacro(Self)            \
             itkCloneMacro(Self)                                                                                        \
                                                                                                                        \
-              virtual BaseProperty::Pointer Deserialize(TiXmlElement * element) override{if (!element) return NULL;    \
+              virtual BaseProperty::Pointer Deserialize(TiXmlElement * element) override{if (!element) return nullptr;    \
     const char *sa(element->Attribute("value"));                                                                       \
                                                                                                                        \
     std::string s(sa ? sa : "");                                                                                       \

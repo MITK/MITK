@@ -29,7 +29,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 const std::string QmitkViewInitializationView::VIEW_ID = "org.mitk.views.viewinitialization";
 
-QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(NULL)
+QmitkViewInitializationView::QmitkViewInitializationView() : m_Controls(nullptr)
 {
   m_CommandTag = 0;
 }
@@ -94,7 +94,7 @@ void QmitkViewInitializationView::OnApply()
     viewDirection = mitk::SliceNavigationController::Sagittal;
 
   vtkRenderWindow *renderwindow = this->GetSelectedRenderWindow();
-  if (renderwindow != NULL)
+  if (renderwindow != nullptr)
   {
     mitk::BaseRenderer::GetInstance(renderwindow)
       ->GetSliceNavigationController()
@@ -130,7 +130,7 @@ vtkRenderWindow *QmitkViewInitializationView::GetSelectedRenderWindow()
   {
     return (*mapit).first;
   }
-  return NULL;
+  return nullptr;
 }
 
 void QmitkViewInitializationView::InitRenderWindowSelector()

@@ -54,7 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 //#include <berryIPreferencesService.h>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
-  : QWidget(parent), m_ToolManager(NULL), m_DataStorage(NULL), m_Completer(NULL)
+  : QWidget(parent), m_ToolManager(nullptr), m_DataStorage(nullptr), m_Completer(nullptr)
 {
   m_Controls.setupUi(this);
 

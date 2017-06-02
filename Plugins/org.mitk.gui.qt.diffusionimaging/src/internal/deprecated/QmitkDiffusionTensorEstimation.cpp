@@ -142,7 +142,7 @@ struct Root {
 };
 
 QmitkDiffusionTensorEstimation::QmitkDiffusionTensorEstimation(QObject *parent, const char *name,  mitk::DataTreeIteratorBase* it)
-: QmitkAbstractView(parent, name, it), m_Controls(NULL)
+: QmitkAbstractView(parent, name, it), m_Controls(nullptr)
 {
   SetAvailability(true);
   m_FilterInitialized = false;
@@ -153,7 +153,7 @@ QmitkDiffusionTensorEstimation::~QmitkDiffusionTensorEstimation()
 
 QWidget * QmitkDiffusionTensorEstimation::CreateControlWidget(QWidget *parent)
 {
-  if (m_Controls == NULL)
+  if (m_Controls == nullptr)
   {
     m_Controls = new QmitkDiffusionTensorEstimationControls(parent);
   }

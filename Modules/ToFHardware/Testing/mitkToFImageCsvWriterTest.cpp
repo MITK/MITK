@@ -115,9 +115,9 @@ int mitkToFImageCsvWriterTest(int /* argc */, char* /*argv*/[])
   }
   csvWriter->Close(); //close file
 
-  FILE* distanceInfile = NULL;
-  FILE* amplitudeInfile = NULL;
-  FILE* intensityInfile = NULL;
+  FILE* distanceInfile = nullptr;
+  FILE* amplitudeInfile = nullptr;
+  FILE* intensityInfile = nullptr;
 
   //open file again
   OpenCsvFile(&(distanceInfile), distanceImageFileName);

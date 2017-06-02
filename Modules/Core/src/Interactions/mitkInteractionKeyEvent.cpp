@@ -46,5 +46,5 @@ bool mitk::InteractionKeyEvent::IsEqual(const mitk::InteractionEvent &interactio
 
 bool mitk::InteractionKeyEvent::IsSuperClassOf(const InteractionEvent::Pointer &baseClass) const
 {
-  return (dynamic_cast<InteractionKeyEvent *>(baseClass.GetPointer()) != NULL);
+  return (dynamic_cast<InteractionKeyEvent *>(baseClass.GetPointer()) != nullptr);
 }

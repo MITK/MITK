@@ -119,7 +119,7 @@ unsigned long mitk::PropertyList::GetMTime() const
   {
     if (it->second.IsNull())
     {
-      itkWarningMacro(<< "Property '" << it->first << "' contains nothing (NULL).");
+      itkWarningMacro(<< "Property '" << it->first << "' contains nothing (nullptr).");
       continue;
     }
     if (Superclass::GetMTime() < it->second->GetMTime())

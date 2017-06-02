@@ -37,7 +37,7 @@ namespace mitk {
   {
     Q_UNUSED(context);
 
-    m_Context = NULL;
+    m_Context = nullptr;
   }
 
   ctkPluginContext* org_mitk_gui_qt_dosevisualization_Activator::GetContext()

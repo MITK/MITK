@@ -199,7 +199,7 @@ protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   ///
   /// Holds the predicate that defines this SubSet of Nodes. If m_Predicate
-  /// is NULL all Nodes will be selected.
+  /// is nullptr all Nodes will be selected.
   ///
   mitk::NodePredicateBase::Pointer m_Predicate;
   ///

@@ -46,7 +46,7 @@ void mitk::NrrdTbssRoiImageWriter::GenerateData()
 
   if (input == nullptr)
   {
-    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is NULL!")
+    itkWarningMacro(<<"Sorry, input to NrrdTbssImageWriter is nullptr!")
     return;
   }
   if ( m_FileName == "" )

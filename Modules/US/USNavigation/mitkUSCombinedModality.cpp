@@ -454,14 +454,14 @@ void mitk::USCombinedModality::DeserializeCalibration(const std::string& xmlStri
     return;
   }
   TiXmlElement* root = doc.FirstChildElement();
-  if (root == NULL)
+  if (root == nullptr)
   {
     MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
     mitkThrow() << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
     return;
   }
   // Read Calibrations
-  for (TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement())
+  for (TiXmlElement* elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement())
   {
     mitk::AffineTransform3D::MatrixType matrix;
     mitk::AffineTransform3D::OffsetType translation;

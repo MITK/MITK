@@ -81,7 +81,7 @@ protected:
   bool InitObservers();
   void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
   /** Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
-  void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = NULL);
+  void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = nullptr);
 
   /** Sets m_currentSelectedPosition to the current selection and validates if this position is valid
    * for the input image of the currently selected fit. If it is valid, m_validSelectedPosition is set to true.

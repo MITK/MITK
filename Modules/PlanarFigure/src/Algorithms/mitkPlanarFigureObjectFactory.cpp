@@ -54,10 +54,10 @@ mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
 
 mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
   mitk::BaseData *data = node->GetData();
 
-  if (dynamic_cast<PlanarFigure *>(data) != NULL)
+  if (dynamic_cast<PlanarFigure *>(data) != nullptr)
   {
     if (id == mitk::BaseRenderer::Standard2D)
     {
@@ -76,7 +76,7 @@ mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNo
 
 void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
   {
     return;
   }
@@ -88,8 +88,8 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   {
     mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
     mitk::PlanarFigureVtkMapper3D::SetDefaultProperties(node);
-    node->AddProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0), NULL, true);
-    node->AddProperty("opacity", mitk::FloatProperty::New(0.8), NULL, true);
+    node->AddProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0), nullptr, true);
+    node->AddProperty("opacity", mitk::FloatProperty::New(0.8), nullptr, true);
   }
 }
 

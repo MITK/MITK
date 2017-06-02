@@ -51,7 +51,7 @@ namespace mitk
 
     virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) override;
 
-    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     void ApplyProperties(vtkActor * /*actor*/, mitk::BaseRenderer *renderer) override;
 

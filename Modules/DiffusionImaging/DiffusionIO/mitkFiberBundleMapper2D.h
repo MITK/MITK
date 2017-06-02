@@ -55,7 +55,7 @@ public:
     virtual void Update(mitk::BaseRenderer * renderer) override;
 
 
-    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = nullptr, bool overwrite = false );
 
 
     //### methods of MITK-VTK rendering pipeline

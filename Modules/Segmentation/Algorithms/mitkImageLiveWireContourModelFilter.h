@@ -115,7 +115,7 @@ namespace mitk
     virtual void DumpMaskImage();
 
     /** \brief Create dynamic cost tranfer map - on the fly training*/
-    bool CreateDynamicCostMap(mitk::ContourModel *path = NULL);
+    bool CreateDynamicCostMap(mitk::ContourModel *path = nullptr);
 
   protected:
     ImageLiveWireContourModelFilter();
@@ -156,7 +156,7 @@ namespace mitk
 
     template <typename TPixel, unsigned int VImageDimension>
     void CreateDynamicCostMapByITK(const itk::Image<TPixel, VImageDimension> *inputImage,
-                                   mitk::ContourModel *path = NULL);
+                                   mitk::ContourModel *path = nullptr);
 
     InternalImageType::Pointer m_InternalImage;
   };

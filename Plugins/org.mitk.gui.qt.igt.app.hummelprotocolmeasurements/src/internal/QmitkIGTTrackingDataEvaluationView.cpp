@@ -53,7 +53,7 @@ const std::string QmitkIGTTrackingDataEvaluationView::VIEW_ID = "org.mitk.views.
 QmitkIGTTrackingDataEvaluationView::QmitkIGTTrackingDataEvaluationView()
   : QmitkFunctionality()
   , m_Controls(0)
-  , m_MultiWidget(NULL)
+  , m_MultiWidget(nullptr)
   , m_scalingfactor(1)
 {
   m_CSVtoXMLInputFilenameVector = std::vector<std::string>();
@@ -403,13 +403,13 @@ void QmitkIGTTrackingDataEvaluationView::StdMultiWidgetAvailable(QmitkStdMultiWi
 
 void QmitkIGTTrackingDataEvaluationView::StdMultiWidgetNotAvailable()
 {
-  m_MultiWidget = NULL;
+  m_MultiWidget = nullptr;
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnAddToCurrentList()
 {
   //read in files
-  QStringList files = QFileDialog::getOpenFileNames(NULL, "Select one or more files to open", "/", "CSV (*.csv)");
+  QStringList files = QFileDialog::getOpenFileNames(nullptr, "Select one or more files to open", "/", "CSV (*.csv)");
   if (files.isEmpty()) return;
 
   for (int i = 0; i < files.size(); i++){
@@ -848,7 +848,7 @@ int QmitkIGTTrackingDataEvaluationView::ConvertOneFile(std::string inputFilename
 void QmitkIGTTrackingDataEvaluationView::OnCSVtoXMLLoadInputList()
 {
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
   if (filename.isNull()) return;
 
   m_CSVtoXMLInputFilenameVector = this->GetFileContentLineByLine(filename.toStdString());
@@ -859,7 +859,7 @@ void QmitkIGTTrackingDataEvaluationView::OnCSVtoXMLLoadInputList()
 void QmitkIGTTrackingDataEvaluationView::OnCSVtoXMLLoadOutputList()
 {
   //read in filename
-  QString filename = QFileDialog::getOpenFileName(NULL, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
+  QString filename = QFileDialog::getOpenFileName(nullptr, tr("Open Measurement Filename List"), "/", tr("All Files (*.*)"));
   if (filename.isNull()) return;
 
   m_CSVtoXMLOutputFilenameVector = this->GetFileContentLineByLine(filename.toStdString());
@@ -1070,8 +1070,8 @@ std::vector<mitk::NavigationDataEvaluationFilter::Pointer> QmitkIGTTrackingDataE
       for (int j = 0; j < m_Controls->m_NumberOfSamples->value(); j++) { myEvaluationFilter->Update(); }
     }
 
-    myEvaluationFilter->SetInput(NULL);
-    myPlayer = NULL;
+    myEvaluationFilter->SetInput(nullptr);
+    myPlayer = nullptr;
     EvaluationDataCollection.push_back(myEvaluationFilter);
   }
 

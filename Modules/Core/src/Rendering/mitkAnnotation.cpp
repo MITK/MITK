@@ -76,7 +76,7 @@ void mitk::Annotation::AddProperty(const std::string &propertyKey,
                                    const BaseProperty::Pointer &propertyValue,
                                    bool overwrite)
 {
-  if ((overwrite) || (GetProperty(propertyKey) == NULL))
+  if ((overwrite) || (GetProperty(propertyKey) == nullptr))
   {
     SetProperty(propertyKey, propertyValue);
   }
@@ -94,7 +94,7 @@ mitk::BaseProperty *mitk::Annotation::GetProperty(const std::string &propertyKey
     return property;
 
   // only to satisfy compiler!
-  return NULL;
+  return nullptr;
 }
 
 bool mitk::Annotation::GetBoolProperty(const std::string &propertyKey, bool &boolValue) const
@@ -174,7 +174,7 @@ void mitk::Annotation::SetStringProperty(const std::string &propertyKey, const s
 std::string mitk::Annotation::GetName() const
 {
   mitk::StringProperty *sp = dynamic_cast<mitk::StringProperty *>(this->GetProperty("name"));
-  if (sp == NULL)
+  if (sp == nullptr)
     return "";
   return sp->GetValue();
 }
@@ -329,7 +329,7 @@ std::string mitk::Annotation::GetMicroserviceID()
 
 void mitk::Annotation::RegisterAsMicroservice(us::ServiceProperties props)
 {
-  if (m_ServiceRegistration != NULL)
+  if (m_ServiceRegistration != nullptr)
     m_ServiceRegistration.Unregister();
   us::ModuleContext *context = us::GetModuleContext();
   // Define ServiceProps
@@ -340,7 +340,7 @@ void mitk::Annotation::RegisterAsMicroservice(us::ServiceProperties props)
 
 void mitk::Annotation::UnRegisterMicroservice()
 {
-  if (m_ServiceRegistration != NULL)
+  if (m_ServiceRegistration != nullptr)
     m_ServiceRegistration.Unregister();
   m_ServiceRegistration = 0;
 }

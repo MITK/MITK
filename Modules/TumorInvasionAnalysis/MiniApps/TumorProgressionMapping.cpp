@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
 
   // Now iterate over all data sets, extract overlay and add it to reference image
   mitk::Image *morphImage;
-  mitk::Image *segmentationImage = NULL;
+  mitk::Image *segmentationImage = nullptr;
 
   for (unsigned int i = 0; i < noOfTimeSteps; i++)
   {
@@ -482,7 +482,7 @@ int main(int argc, char *argv[])
     if (!blank)
     {
       segmentationImage = segImages.at(i);
-      if (segmentationImage != NULL)
+      if (segmentationImage != nullptr)
       {
         MITK_INFO << "-- Add Overlay";
         progressVis.AddColouredOverlay(rgbImage, segmentationImage, color);

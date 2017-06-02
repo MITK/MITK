@@ -20,7 +20,7 @@ QmlMitkSliderNavigatorItem::QmlMitkSliderNavigatorItem(QQuickItem* parent)
  : QQuickItem(parent)
 {
 
-  // this avoids trying to use m_Stepper until it is set to something != NULL
+  // this avoids trying to use m_Stepper until it is set to something != nullptr
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = true;
   m_HasLabels = false;
@@ -96,7 +96,7 @@ void QmlMitkSliderNavigatorItem::SetStepper( mitk::Stepper * stepper)
 {
   m_Stepper = stepper;
 
-  // this avoids trying to use m_Stepper until it is set to something != NULL
+  // this avoids trying to use m_Stepper until it is set to something != nullptr
   // (additionally to the avoiding recursions during refetching)
   m_InRefetch = (stepper==nullptr);
 }

@@ -46,11 +46,11 @@ bool ImageVtkDataReferenceCheck(const char *fname)
   try
   {
     mitk::Image::Pointer image = mitk::IOUtil::LoadImage(filename);
-    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-NULL image")
+    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-nullptr image")
 
     vtkImageData *vtk = image->GetVtkImageData();
 
-    if (vtk == NULL)
+    if (vtk == nullptr)
       return false;
   }
   catch (...)
@@ -181,8 +181,8 @@ int mitkImageTest(int argc, char *argv[])
   MITK_TEST_CONDITION_REQUIRED(imgMem->IsInitialized(), "Image::IsInitialized() ?");
   MITK_TEST_CONDITION_REQUIRED(imgMem->GetPixelType() == pt, "PixelType was set correctly.");
 
-  int *p = NULL;
-  int *p2 = NULL;
+  int *p = nullptr;
+  int *p2 = nullptr;
   try
   {
     mitk::ImageReadAccessor imgMemAcc(imgMem);
@@ -192,7 +192,7 @@ int mitkImageTest(int argc, char *argv[])
   {
     MITK_ERROR << e.what();
   }
-  MITK_TEST_CONDITION(p != NULL, "GetData() returned not-NULL pointer.");
+  MITK_TEST_CONDITION(p != nullptr, "GetData() returned not-nullptr pointer.");
 
   // filling image
   const unsigned int size = dim[0] * dim[1] * dim[2];
@@ -209,7 +209,7 @@ int mitkImageTest(int argc, char *argv[])
   {
     MITK_ERROR << e.what();
   }
-  MITK_TEST_CONDITION(p2 != NULL, "GetData() returned not-NULL pointer.");
+  MITK_TEST_CONDITION(p2 != nullptr, "GetData() returned not-nullptr pointer.");
 
   bool isEqual = true;
   for (unsigned int i = 0; i < size; ++i, ++p2)
@@ -232,7 +232,7 @@ int mitkImageTest(int argc, char *argv[])
   {
     MITK_ERROR << e.what();
   }
-  MITK_TEST_CONDITION_REQUIRED(p2 != NULL, "Valid slice data returned");
+  MITK_TEST_CONDITION_REQUIRED(p2 != nullptr, "Valid slice data returned");
 
   unsigned int xy_size = dim[0] * dim[1];
   unsigned int start_mid_slice = (dim[2] / 2) * xy_size;
@@ -301,7 +301,7 @@ int mitkImageTest(int argc, char *argv[])
   {
     MITK_ERROR << e.what();
   }
-  MITK_TEST_CONDITION_REQUIRED(p != NULL, "GetData() returned valid pointer.");
+  MITK_TEST_CONDITION_REQUIRED(p != nullptr, "GetData() returned valid pointer.");
 
   // Testing Initialize(const mitk::PixelType& type, int sDim, const mitk::PlaneGeometry& geometry) and GetData(): ";
   imgMem->Initialize(mitk::MakePixelType<int, int, 1>(), 40, *planegeometry);
@@ -315,7 +315,7 @@ int mitkImageTest(int argc, char *argv[])
   {
     MITK_ERROR << e.what();
   }
-  MITK_TEST_CONDITION_REQUIRED(p != NULL, "GetData() returned valid pointer.");
+  MITK_TEST_CONDITION_REQUIRED(p != nullptr, "GetData() returned valid pointer.");
 
   //-----------------
   // testing origin information and methods
@@ -358,14 +358,14 @@ int mitkImageTest(int argc, char *argv[])
     mitk::ImageReadAccessor vecImgAcc0(vecImg, vecImg->GetChannelData(0));
     mitk::ImageReadAccessor vecImgAcc1(vecImg, vecImg->GetChannelData(1));
 
-    MITK_TEST_CONDITION_REQUIRED(vecImgAcc0.GetData() != NULL && vecImgAcc1.GetData() != NULL,
+    MITK_TEST_CONDITION_REQUIRED(vecImgAcc0.GetData() != nullptr && vecImgAcc1.GetData() != nullptr,
                                  "Testing set and return of channel data!");
 
     MITK_TEST_CONDITION_REQUIRED(vecImg->IsValidSlice(0, 0, 1), "");
     MITK_TEST_OUTPUT(<< " Testing whether CopyMemory worked");
     MITK_TEST_CONDITION_REQUIRED(imgMemAcc.GetData() != vecImgAcc.GetData(), "");
     MITK_TEST_OUTPUT(<< " Testing destruction after SetImportChannel");
-    vecImg = NULL;
+    vecImg = nullptr;
     MITK_TEST_CONDITION_REQUIRED(vecImg.IsNull(), "testing destruction!");
   }
   catch (mitk::Exception &e)
@@ -438,7 +438,7 @@ int mitkImageTest(int argc, char *argv[])
   try
   {
     image = mitk::IOUtil::LoadImage(filename);
-    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-NULL image")
+    MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(), "Non-nullptr image")
   }
   catch (...)
   {

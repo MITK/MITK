@@ -99,7 +99,7 @@ namespace mitk
 }
 
 mitk::SimulationInteractor::Impl::Impl()
-  : m_Interaction(NULL),
+  : m_Interaction(nullptr),
     m_IsMouseNodeAttached(false),
     m_UseCollisionPipeline(true)
 {
@@ -136,14 +136,14 @@ void mitk::SimulationInteractor::Impl::Initialize(const Node::SPtr rootNode)
   const Factory* factory = Factory::getInstance();
 
   for (Factory::const_iterator it = factory->begin(); it != factory->end(); ++it)
-    m_InteractionComponents.push_back(it->second->createInstance(NULL));
+    m_InteractionComponents.push_back(it->second->createInstance(nullptr));
 
   m_MouseNode->detachFromGraph();
 
   Pipeline* collisionPipeline;
   rootNode->getContext()->get(collisionPipeline, BaseContext::SearchRoot);
 
-  m_UseCollisionPipeline = collisionPipeline != NULL;
+  m_UseCollisionPipeline = collisionPipeline != nullptr;
 }
 
 void mitk::SimulationInteractor::Impl::Uninitialize()
@@ -156,7 +156,7 @@ void mitk::SimulationInteractor::Impl::Uninitialize()
       delete *it;
 
     m_InteractionComponents.clear();
-    m_Interaction = NULL;
+    m_Interaction = nullptr;
   }
 
   if (m_MouseNode)
@@ -191,7 +191,7 @@ void mitk::SimulationInteractor::Impl::DetachMouseNode()
 
 bool mitk::SimulationInteractor::Impl::IsInteractionPerformerNotNull() const
 {
-  return m_InteractionPerformer.get() != NULL;
+  return m_InteractionPerformer.get() != nullptr;
 }
 
 void mitk::SimulationInteractor::Impl::UpdatePickRay(InteractionPositionEvent* event)
@@ -240,7 +240,7 @@ void mitk::SimulationInteractor::Impl::FindCollision()
   {
     m_LastBodyPicked = this->FindCollisionUsingPipeline();
 
-    if (m_LastBodyPicked.body != NULL)
+    if (m_LastBodyPicked.body != nullptr)
       return;
   }
 
@@ -290,7 +290,7 @@ BodyPicked mitk::SimulationInteractor::Impl::FindCollisionUsingPipeline()
       if (t < 0.0 || t > length)
         continue;
 
-      if (bodyPicked.body == NULL || t < bodyPicked.rayLength)
+      if (bodyPicked.body == nullptr || t < bodyPicked.rayLength)
       {
         bodyPicked.body = collisionElement.getCollisionModel();
         bodyPicked.indexCollisionElement = collisionElement.getIndex();
@@ -334,20 +334,20 @@ void mitk::SimulationInteractor::Impl::AttachCompatibleInteraction()
 {
   BaseContext* context;
 
-  if (m_LastBodyPicked.body == NULL)
+  if (m_LastBodyPicked.body == nullptr)
   {
-    context = m_LastBodyPicked.mstate != NULL
+    context = m_LastBodyPicked.mstate != nullptr
       ? m_LastBodyPicked.mstate->getContext()
-      : NULL;
+      : nullptr;
   }
   else
   {
     context = m_LastBodyPicked.body->getContext();
   }
 
-  if (context != NULL)
+  if (context != nullptr)
   {
-    if (m_Interaction == NULL || !m_Interaction->isCompatible(context))
+    if (m_Interaction == nullptr || !m_Interaction->isCompatible(context))
     {
       bool foundCompatibleInteractor = false;
 
@@ -373,7 +373,7 @@ void mitk::SimulationInteractor::Impl::AttachCompatibleInteraction()
     this->DetachInteraction(true);
   }
 
-  if (m_Interaction != NULL)
+  if (m_Interaction != nullptr)
   {
     m_Interaction->mouseInteractor->setMouseRayModel(m_PickRayModel.get());
     m_Interaction->mouseInteractor->setBodyPicked(m_LastBodyPicked);
@@ -382,24 +382,24 @@ void mitk::SimulationInteractor::Impl::AttachCompatibleInteraction()
 
 void mitk::SimulationInteractor::Impl::DetachInteraction(bool setNull)
 {
-  if (m_Interaction != NULL)
+  if (m_Interaction != nullptr)
   {
     m_Interaction->detach();
 
     if (setNull)
-      m_Interaction = NULL;
+      m_Interaction = nullptr;
   }
 }
 
 void mitk::SimulationInteractor::Impl::StartInteraction(const std::string& type)
 {
-  if (m_Interaction == NULL)
+  if (m_Interaction == nullptr)
     return;
 
   InteractionPerformer::InteractionPerformerFactory* factory = InteractionPerformer::InteractionPerformerFactory::getInstance();
   m_InteractionPerformer.reset(factory->createObject(type, m_Interaction->mouseInteractor.get()));
 
-  if (m_InteractionPerformer.get() != NULL)
+  if (m_InteractionPerformer.get() != nullptr)
   {
     this->ConfigureInteractionPerformer();
     m_Interaction->mouseInteractor->addInteractionPerformer(m_InteractionPerformer.get());
@@ -411,7 +411,7 @@ void mitk::SimulationInteractor::Impl::ConfigureInteractionPerformer()
 {
   AttachBodyPerformer<Vec3Types>* attachBodyPerformer = dynamic_cast<AttachBodyPerformer<Vec3Types>*>(m_InteractionPerformer.get());
 
-  if (attachBodyPerformer != NULL)
+  if (attachBodyPerformer != nullptr)
   {
     attachBodyPerformer->setStiffness(1000);
     attachBodyPerformer->setArrowSize(0);
@@ -421,13 +421,13 @@ void mitk::SimulationInteractor::Impl::ConfigureInteractionPerformer()
 
   FixParticlePerformerConfiguration* fixParticlePerformer = dynamic_cast<FixParticlePerformerConfiguration*>(m_InteractionPerformer.get());
 
-  if (fixParticlePerformer != NULL)
+  if (fixParticlePerformer != nullptr)
     fixParticlePerformer->setStiffness(10000);
 }
 
 void mitk::SimulationInteractor::Impl::ExecuteInteraction()
 {
-  if (m_InteractionPerformer.get() == NULL)
+  if (m_InteractionPerformer.get() == nullptr)
     return;
 
   m_InteractionPerformer->execute();
@@ -435,12 +435,12 @@ void mitk::SimulationInteractor::Impl::ExecuteInteraction()
 
 void mitk::SimulationInteractor::Impl::StopInteraction()
 {
-  if (m_InteractionPerformer.get() == NULL)
+  if (m_InteractionPerformer.get() == nullptr)
     return;
 
   AttachBodyPerformer<Vec3Types>* attachBodyPerformer = dynamic_cast<AttachBodyPerformer<Vec3Types>*>(m_InteractionPerformer.get());
 
-  if (attachBodyPerformer != NULL)
+  if (attachBodyPerformer != nullptr)
     attachBodyPerformer->clear();
 
   m_Interaction->mouseInteractor->removeInteractionPerformer(m_InteractionPerformer.get());

@@ -89,11 +89,11 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename
     int numberOfLabels;
     layerElem->QueryIntAttribute("labels", &numberOfLabels);
 
-    if (inputImage->GetLabelSet(i) == NULL)
+    if (inputImage->GetLabelSet(i) == nullptr)
       inputImage->AddLayer();
 
     TiXmlElement *labelElement = layerElem->FirstChildElement("Label");
-    if (labelElement == NULL)
+    if (labelElement == nullptr)
       break;
     for (int j = 0; j < numberOfLabels; j++)
     {
@@ -105,7 +105,7 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(std::string &presetFilename
         inputImage->GetLabelSet()->AddLabel(label);
 
       labelElement = labelElement->NextSiblingElement("Label");
-      if (labelElement == NULL)
+      if (labelElement == nullptr)
         break;
     }
   }

@@ -44,8 +44,8 @@ QmitkIGTLDeviceSourceManagementWidget::QmitkIGTLDeviceSourceManagementWidget(
     QWidget* parent, Qt::WindowFlags f)
   : QWidget(parent, f), m_IsClient(false), m_MessageReceivedObserverTag(0), m_CommandReceivedObserverTag(0), m_LostConnectionObserverTag(0), m_NewConnectionObserverTag(0), m_StateModifiedObserverTag(0)
 {
-  m_Controls = NULL;
-  this->m_IGTLDevice = NULL;
+  m_Controls = nullptr;
+  this->m_IGTLDevice = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -161,7 +161,7 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
 
     //check if the device is a server or a client
     if ( dynamic_cast<mitk::IGTLClient*>(
-           this->m_IGTLDeviceSource->GetIGTLDevice()) == NULL )
+           this->m_IGTLDeviceSource->GetIGTLDevice()) == nullptr )
     {
       m_IsClient = false;
     }
@@ -203,7 +203,7 @@ void QmitkIGTLDeviceSourceManagementWidget::LoadSource(
   }
   else
   {
-    m_IGTLDeviceSource = NULL;
+    m_IGTLDeviceSource = nullptr;
   }
   this->AdaptGUIToState();
 }

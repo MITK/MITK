@@ -292,7 +292,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::TrainTreesCallback(voi
     data->m_mutex->Unlock();
   }
 
-  return NULL;
+  return 0;
 
 }
 
@@ -345,7 +345,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictCallback(void *
   data->m_RandomForest.predictProbabilities(split_features, split_probability);
 
 
-  return NULL;
+  return 0;
 
 }
 
@@ -396,7 +396,7 @@ ITK_THREAD_RETURN_TYPE mitk::VigraRandomForestClassifier::PredictWeightedCallbac
 
   VigraPredictWeighted(data, split_features,split_labels,split_probability);
 
-  return NULL;
+  return 0;
 }
 
 

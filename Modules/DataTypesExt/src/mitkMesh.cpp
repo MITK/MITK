@@ -534,7 +534,7 @@ void mitk::Mesh::ExecuteOperation(Operation *operation)
       ////the cell has to exist!
       //{
       // mitk::LineOperation *lineOp = dynamic_cast<mitk::LineOperation *>(operation);
-      //  if (lineOp == NULL)//if no lineoperation, then call superclass pointSet
+      //  if (lineOp == nullptr)//if no lineoperation, then call superclass pointSet
       // {
       //    Superclass::ExecuteOperation(operation);
       //  }

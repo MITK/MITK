@@ -76,7 +76,7 @@ public:
     static QmlMitkRenderWindowItem* instance;
     static QmlMitkRenderWindowItem* GetInstanceForVTKRenderWindow( vtkRenderWindow* rw );
 
-    QmlMitkRenderWindowItem(QQuickItem* parent = 0, const QString& name = "QML render window", mitk::VtkPropRenderer* renderer = NULL, mitk::RenderingManager* renderingManager = NULL);
+    QmlMitkRenderWindowItem(QQuickItem* parent = 0, const QString& name = "QML render window", mitk::VtkPropRenderer* renderer = nullptr, mitk::RenderingManager* renderingManager = nullptr);
     ~QmlMitkRenderWindowItem();
 
     virtual vtkRenderWindow* GetVtkRenderWindow();

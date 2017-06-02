@@ -436,7 +436,7 @@ public:
   void AppendNewTimeStep()
   {
     // Test append
-    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(NULL, 0, 1));
+    MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(nullptr, 0, 1));
     MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(m_Geometry3_5,m_Geometry3_5MinTP,m_Geometry3_5MaxTP));
     MITK_TEST_FOR_EXCEPTION(mitk::Exception, m_123TimeGeometry->AppendNewTimeStep(m_Geometry4, m_Geometry4MaxTP, m_Geometry4MinTP)); //valid but inverted bounds
 

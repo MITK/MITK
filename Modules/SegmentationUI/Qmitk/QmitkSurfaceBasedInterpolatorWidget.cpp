@@ -39,8 +39,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget *parent, const char * /*name*/)
   : QWidget(parent),
     m_SurfaceBasedInterpolatorController(mitk::SurfaceBasedInterpolationController::GetInstance()),
-    m_ToolManager(NULL),
-    m_DataStorage(NULL),
+    m_ToolManager(nullptr),
+    m_DataStorage(nullptr),
     m_Activated(false)
 {
   m_Controls.setupUi(this);
@@ -144,8 +144,8 @@ void QmitkSurfaceBasedInterpolatorWidget::OnSurfaceInterpolationFinished()
   }
   else
   {
-    m_InterpolatedSurfaceNode->SetData(NULL);
-    m_3DContourNode->SetData(NULL);
+    m_InterpolatedSurfaceNode->SetData(nullptr);
+    m_3DContourNode->SetData(nullptr);
     this->ShowInterpolationResult(false);
   }
 }

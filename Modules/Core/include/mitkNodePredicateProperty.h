@@ -26,9 +26,9 @@ namespace mitk
 {
   //##Documentation
   //## @brief Predicate that evaluates if the given DataNode has a specific property.
-  //## If the second parameter is NULL, it will only be checked whether there is a property with the specified name.
+  //## If the second parameter is nullptr, it will only be checked whether there is a property with the specified name.
   //## If a renderer is specified in the third parameter the renderer-specific property will be checked. If this
-  //## parameter is NULL or not specified, then the non-renderer-specific property will be checked.
+  //## parameter is nullptr or not specified, then the non-renderer-specific property will be checked.
   //##
   //##
   //##

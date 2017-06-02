@@ -145,7 +145,7 @@ namespace mitk
     * \param[in] numberOfBytes  The number of bytes to read. When an eol
     *                           character is used this is interpretted as the
     *                           maximum number of bytes to read.
-    * \param[in] eol  Pointer to an End-of-Line character. If this is NULL
+    * \param[in] eol  Pointer to an End-of-Line character. If this is nullptr
     *                 (the default) then no End-of-Line character is used.
     */
     int Receive(std::string& answer, unsigned int numberOfBytes, const char *eol=nullptr);

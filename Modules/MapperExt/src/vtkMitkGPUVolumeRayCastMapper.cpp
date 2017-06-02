@@ -299,7 +299,7 @@ int vtkMitkGPUVolumeRayCastMapper::ValidateRender(vtkRenderer *ren, vtkVolume *v
 
   if (goodSoFar && !this->TransformedInput)
   {
-    vtkErrorMacro("Input is NULL but is required");
+    vtkErrorMacro("Input is nullptr but is required");
     goodSoFar = 0;
   }
 

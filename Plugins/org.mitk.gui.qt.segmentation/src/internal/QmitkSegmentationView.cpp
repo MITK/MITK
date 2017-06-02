@@ -53,8 +53,8 @@ const std::string QmitkSegmentationView::VIEW_ID =
 
 QmitkSegmentationView::QmitkSegmentationView()
    :m_MouseCursorSet(false)
-   ,m_Parent(NULL)
-   ,m_Controls(NULL)
+   ,m_Parent(nullptr)
+   ,m_Controls(nullptr)
    ,m_DataSelectionChanged(false)
    ,m_Activated(false)
 {
@@ -223,7 +223,7 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-   if (m_Controls != NULL)
+   if (m_Controls != nullptr)
    {
       bool slimView = prefs->GetBool("slim view", false);
       m_Controls->m_ManualToolSelectionBox2D->SetShowNames(!slimView);
@@ -349,13 +349,13 @@ void QmitkSegmentationView::CreateNewSegmentation()
                }
                catch (std::bad_alloc)
                {
-                  QMessageBox::warning(NULL,tr("Create new segmentation"),tr("Could not allocate memory for new segmentation"));
+                  QMessageBox::warning(nullptr,tr("Create new segmentation"),tr("Could not allocate memory for new segmentation"));
                }
             }
          }
          else
          {
-            QMessageBox::information(NULL,tr("Segmentation"),tr("Segmentation is currently not supported for 2D images"));
+            QMessageBox::information(nullptr,tr("Segmentation"),tr("Segmentation is currently not supported for 2D images"));
          }
       }
    }
@@ -407,7 +407,7 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
       {
          m_Controls->patImageSelector->RemoveNode(node);
          m_Controls->segImageSelector->AddNode(node);
-         this->SetToolManagerSelection(NULL,NULL);
+         this->SetToolManagerSelection(nullptr,nullptr);
          return;
       }
    }
@@ -428,7 +428,7 @@ void QmitkSegmentationView::OnBinaryPropertyChanged()
          m_Controls->segImageSelector->RemoveNode(node);
          m_Controls->patImageSelector->AddNode(node);
          if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0) == node)
-            mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(NULL);
+            mitk::ToolManagerProvider::GetInstance()->GetToolManager()->SetWorkingData(nullptr);
          return;
       }
    }
@@ -504,11 +504,11 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
       }
 
       context->ungetService(ppmRef);
-      service = NULL;
+      service = nullptr;
 
       if ((mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0) == node) && m_Controls->patImageSelector->GetSelectedNode().IsNotNull())
       {
-         this->SetToolManagerSelection(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0), NULL);
+         this->SetToolManagerSelection(mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0), nullptr);
          this->UpdateWarningLabel(tr("Select or create a segmentation"));
       }
 
@@ -528,7 +528,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
    {
       //as we don't know which node was actually removed e.g. our reference node, disable 'New Segmentation' button.
       //consider the case that there is no more image in the datastorage
-      this->SetToolManagerSelection(NULL, NULL);
+      this->SetToolManagerSelection(nullptr, nullptr);
       this->SetToolSelectionBoxesEnabled( false );
    }
 }
@@ -602,7 +602,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 //        if (image->GetDimension()>3)
 //        {
 //          m_Controls->widgetStack->setCurrentIndex(0);
-//          QMessageBox::information(NULL,"Segmentation","Lesion segmentation is currently not supported for 4D images");
+//          QMessageBox::information(nullptr,"Segmentation","Lesion segmentation is currently not supported for 4D images");
 //        }
 //      }
 //    }
@@ -614,7 +614,7 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataNode* node )
 {
    //mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
-   if( node != NULL )
+   if( node != nullptr )
    {
       this->UpdateWarningLabel("");
       mitk::DataNode* segNode = m_Controls->segImageSelector->GetSelectedNode();
@@ -631,7 +631,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
          if ( !isSourceNode && (!this->CheckForSameGeometry(segNode, node) || possibleParents->Size() > 0 ))
          {
-            this->SetToolManagerSelection(node, NULL);
+            this->SetToolManagerSelection(node, nullptr);
             this->SetToolSelectionBoxesEnabled( false );
             this->UpdateWarningLabel(tr("The selected patient image does not match with the selected segmentation!"));
          }
@@ -650,7 +650,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
       }
       else
       {
-         this->SetToolManagerSelection(node, NULL);
+         this->SetToolManagerSelection(node, nullptr);
          this->SetToolSelectionBoxesEnabled( false );
          this->UpdateWarningLabel(tr("Select or create a segmentation"));
       }
@@ -664,7 +664,7 @@ void QmitkSegmentationView::OnPatientComboBoxSelectionChanged( const mitk::DataN
 
 void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::DataNode *node)
 {
-   if (node == NULL)
+   if (node == nullptr)
    {
       this->UpdateWarningLabel(tr("Select or create a segmentation"));
       this->SetToolSelectionBoxesEnabled( false );
@@ -693,7 +693,7 @@ void QmitkSegmentationView::OnSegmentationComboBoxSelectionChanged(const mitk::D
          {
             this->UpdateWarningLabel(tr("The selected segmentation does not match with the selected patient image!"));
             this->SetToolSelectionBoxesEnabled( false );
-            this->SetToolManagerSelection(NULL, node);
+            this->SetToolManagerSelection(nullptr, node);
          }
          else
          {
@@ -769,7 +769,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
    {
       if (nodes.size() == 0 && m_Controls->patImageSelector->GetSelectedNode().IsNull())
       {
-         SetToolManagerSelection(NULL,NULL);
+         SetToolManagerSelection(nullptr,nullptr);
       }
       else if (nodes.size() == 1)
       {
@@ -782,7 +782,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
          mitk::Image::Pointer selectedImage = dynamic_cast<mitk::Image*>(selectedNode->GetData());
          if (selectedImage.IsNull())
          {
-            SetToolManagerSelection(NULL,NULL);
+            SetToolManagerSelection(nullptr,nullptr);
             return;
          }
          else
@@ -860,7 +860,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
                         return;
                      }
                   }
-                  this->SetToolManagerSelection(NULL, selectedNode);
+                  this->SetToolManagerSelection(nullptr, selectedNode);
                }
                mitk::RenderingManager::GetInstance()->InitializeViews(selectedNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
             }
@@ -868,7 +868,7 @@ void QmitkSegmentationView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*
             {
                if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0) != selectedNode)
                {
-                  SetToolManagerSelection(selectedNode, NULL);
+                  SetToolManagerSelection(selectedNode, nullptr);
                   //May be a bug in the selection services. A node which is deselected will be passed as selected node to the OnSelectionChanged function
                   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
                   if (renderWindowPart && !selectedNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
@@ -979,7 +979,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
    toolManager->SetWorkingData(  const_cast<mitk::DataNode*>(workingData));
 
    // check original image
-   m_Controls->btnNewSegmentation->setEnabled(referenceData != NULL);
+   m_Controls->btnNewSegmentation->setEnabled(referenceData != nullptr);
    if (referenceData)
    {
       this->UpdateWarningLabel("");
@@ -1033,7 +1033,7 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
    // 2.
    //   if  a segmentation is selected,
    //     show it
-   //     (and hide all all its siblings (childs of the same parent, incl, NULL parent))
+   //     (and hide all all its siblings (childs of the same parent, incl, nullptr parent))
    //   if no segmentation is selected, do nothing
 
    if (!m_Controls)
@@ -1136,7 +1136,7 @@ void QmitkSegmentationView::RenderingManagerReinitialized()
       }
       else
       {
-         this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), NULL);
+         this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), nullptr);
          this->SetToolSelectionBoxesEnabled(false);
          this->UpdateWarningLabel(tr("Please perform a reinit on the segmentation image!"));
       }

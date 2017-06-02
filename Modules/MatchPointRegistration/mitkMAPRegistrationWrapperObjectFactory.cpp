@@ -47,7 +47,7 @@ mitk::Mapper::Pointer
 mitk::MAPRegistrationWrapperObjectFactory::
 CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
 {
-    mitk::Mapper::Pointer newMapper=NULL;
+    mitk::Mapper::Pointer newMapper=nullptr;
 
     if ( slotId == mitk::BaseRenderer::Standard2D )
     {
@@ -73,15 +73,15 @@ CreateMapper(mitk::DataNode* node, MapperSlotId slotId)
 
 void mitk::MAPRegistrationWrapperObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  if(node==NULL)
+  if(node==nullptr)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
 
-  if(node->GetData() ==NULL)
+  if(node->GetData() ==nullptr)
     return;
 
-  if( dynamic_cast<mitk::MAPRegistrationWrapper*>(node->GetData())!=NULL )
+  if( dynamic_cast<mitk::MAPRegistrationWrapper*>(node->GetData())!=nullptr )
   {
     mitk::MITKRegistrationWrapperMapperBase::SetDefaultProperties(node);
   }

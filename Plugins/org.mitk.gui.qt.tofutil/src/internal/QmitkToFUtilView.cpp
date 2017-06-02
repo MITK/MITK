@@ -54,16 +54,16 @@ const std::string QmitkToFUtilView::VIEW_ID = "org.mitk.views.tofutil";
 //Constructor
 QmitkToFUtilView::QmitkToFUtilView()
   : QmitkAbstractView()
-  , m_Controls(NULL)
-  , m_MitkDistanceImage(NULL), m_MitkAmplitudeImage(NULL), m_MitkIntensityImage(NULL), m_Surface(NULL)
-  , m_DistanceImageNode(NULL), m_AmplitudeImageNode(NULL), m_IntensityImageNode(NULL), m_RGBImageNode(NULL), m_SurfaceNode(NULL)
-  , m_ToFImageRecorder(NULL), m_ToFImageGrabber(NULL), m_ToFDistanceImageToSurfaceFilter(NULL), m_ToFCompositeFilter(NULL)
+  , m_Controls(nullptr)
+  , m_MitkDistanceImage(nullptr), m_MitkAmplitudeImage(nullptr), m_MitkIntensityImage(nullptr), m_Surface(nullptr)
+  , m_DistanceImageNode(nullptr), m_AmplitudeImageNode(nullptr), m_IntensityImageNode(nullptr), m_RGBImageNode(nullptr), m_SurfaceNode(nullptr)
+  , m_ToFImageRecorder(nullptr), m_ToFImageGrabber(nullptr), m_ToFDistanceImageToSurfaceFilter(nullptr), m_ToFCompositeFilter(nullptr)
   , m_2DDisplayCount(0)
-  , m_RealTimeClock(NULL)
+  , m_RealTimeClock(nullptr)
   , m_StepsForFramerate(100)
   , m_2DTimeBefore(0.0)
   , m_2DTimeAfter(0.0)
-  , m_CameraIntrinsics(NULL)
+  , m_CameraIntrinsics(nullptr)
 {
   this->m_Frametimer = new QTimer(this);
 
@@ -297,7 +297,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
     }
     else
     {
-      m_CameraIntrinsics = NULL;
+      m_CameraIntrinsics = nullptr;
       MITK_ERROR << "No camera intrinsics were found!";
     }
 
@@ -346,7 +346,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
     }
     else
     {
-      this->m_RGBImageNode = NULL;
+      this->m_RGBImageNode = nullptr;
     }
 
     if(hasAmplitudeImage)
@@ -367,7 +367,7 @@ void QmitkToFUtilView::OnToFCameraStarted()
 
     this->UseToFVisibilitySettings(true);
 
-    this->m_SurfaceNode = ReplaceNodeData("Surface", NULL);
+    this->m_SurfaceNode = ReplaceNodeData("Surface", nullptr);
     m_Controls->m_ToFCompositeFilterWidget->UpdateFilterParameter();
     // initialize visualization widget
     m_Controls->m_ToFVisualisationSettingsWidget->Initialize(this->m_DistanceImageNode,

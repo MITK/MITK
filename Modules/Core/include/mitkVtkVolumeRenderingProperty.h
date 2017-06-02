@@ -33,7 +33,7 @@ namespace mitk
    * (VTK constant/Id/string representation):
    * VTK_VOLUME_RAY_CAST_MIP_FUNCTION
    * VTK_RAY_CAST_COMPOSITE_FUNCTION
-   * Default is NULL
+   * Default is nullptr
    */
   class MITKCORE_EXPORT VtkVolumeRenderingProperty : public EnumerationProperty
   {

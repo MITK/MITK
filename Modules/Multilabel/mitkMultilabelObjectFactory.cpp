@@ -44,12 +44,12 @@ mitk::MultilabelObjectFactory::~MultilabelObjectFactory()
 
 mitk::Mapper::Pointer mitk::MultilabelObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
   mitk::BaseData *data = node->GetData();
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
-    if ((dynamic_cast<mitk::LabelSetImage *>(data) != NULL))
+    if ((dynamic_cast<mitk::LabelSetImage *>(data) != nullptr))
     {
       newMapper = mitk::LabelSetImageVtkMapper2D::New();
       newMapper->SetDataNode(node);

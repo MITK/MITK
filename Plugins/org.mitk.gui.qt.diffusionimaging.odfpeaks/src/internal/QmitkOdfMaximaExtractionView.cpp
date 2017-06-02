@@ -221,7 +221,7 @@ void QmitkOdfMaximaExtractionView::ConvertShCoeffs()
     TemplatedConvertShCoeffs<12>(mitkImg);
     break;
   default :
-      QMessageBox::warning(NULL, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
+      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
   }
 }
 
@@ -241,7 +241,7 @@ void QmitkOdfMaximaExtractionView::StartTensorPeakExtraction(mitk::TensorImage* 
   catch (itk::ExceptionObject &e)
   {
     MITK_INFO << "wrong image type: " << e.what();
-    QMessageBox::warning(NULL, "Wrong pixel type", "Could not perform Tensor Principal Direction Extraction due to Image has wrong pixel type.", QMessageBox::Ok);
+    QMessageBox::warning(nullptr, "Wrong pixel type", "Could not perform Tensor Principal Direction Extraction due to Image has wrong pixel type.", QMessageBox::Ok);
     return;
   }
 
@@ -340,7 +340,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image *image)
   catch (itk::ExceptionObject &e)
   {
     MITK_INFO << "wrong image type: " << e.what();
-    QMessageBox::warning(NULL, "Wrong pixel type", "Could not perform Finite Differences Extraction due to Image has wrong pixel type.", QMessageBox::Ok);
+    QMessageBox::warning(nullptr, "Wrong pixel type", "Could not perform Finite Differences Extraction due to Image has wrong pixel type.", QMessageBox::Ok);
     return;
   }
 
@@ -450,7 +450,7 @@ void QmitkOdfMaximaExtractionView::StartMaximaExtraction(Image* img)
     StartMaximaExtraction<12>(img);
     break;
   default :
-      QMessageBox::warning(NULL, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
+      QMessageBox::warning(nullptr, "Error", "Only spherical harmonics orders 2-12 are supported.", QMessageBox::Ok);
   }
 }
 

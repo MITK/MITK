@@ -74,7 +74,7 @@ namespace mitk
 
     //##Documentation
     //## @brief returns the last specified OperationEvent in Undo-list
-    //## corresponding to the given values; if nothing found, then returns NULL
+    //## corresponding to the given values; if nothing found, then returns nullptr
     //##
     //## needed to get the old Position of an Element for declaring an UndoOperation
     virtual OperationEvent *GetLastOfType(OperationActor *destination, OperationType opType) = 0;

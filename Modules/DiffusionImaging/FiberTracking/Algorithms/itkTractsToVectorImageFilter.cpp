@@ -26,12 +26,12 @@ template< class PixelType >
 TractsToVectorImageFilter< PixelType >::TractsToVectorImageFilter():
     m_AngularThreshold(0.7),
     m_Epsilon(0.999),
-    m_MaskImage(NULL),
+    m_MaskImage(nullptr),
     m_NormalizeVectors(false),
     m_UseWorkingCopy(true),
     m_MaxNumDirections(3),
     m_SizeThreshold(0.3),
-    m_NumDirectionsImage(NULL),
+    m_NumDirectionsImage(nullptr),
     m_CreateDirectionImages(true)
 {
     this->SetNumberOfRequiredOutputs(1);

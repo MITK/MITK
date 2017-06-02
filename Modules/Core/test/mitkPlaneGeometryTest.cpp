@@ -187,7 +187,7 @@ public:
                        1.4713633875410579244699160624544119378442750389703e-43,
                        9.2806360452222355258639080851310540729807238879469e-32);
 
-    std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = NULL): " << std::endl;
+    std::cout << "Testing InitializeStandardPlane(rightVector, downVector, spacing = nullptr): " << std::endl;
     CPPUNIT_ASSERT_NO_THROW(planegeometry->InitializeStandardPlane(right, down, &spacing));
     /*
     std::cout << "Testing width, height and thickness (in units): ";

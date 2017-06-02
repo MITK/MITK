@@ -236,7 +236,7 @@ static void TestSelectVertexAtWrongPosition()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
 
-  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == nullptr, "selected vertex is NULL");
+  MITK_TEST_CONDITION_REQUIRED(contour->GetSelectedVertex() == nullptr, "selected vertex is nullptr");
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
 

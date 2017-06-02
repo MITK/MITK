@@ -47,8 +47,8 @@ IGTNavigationToolCalibration::~IGTNavigationToolCalibration()
 {
 //The following code is required due to a bug in the point list widget.
 //If this is removed, MITK crashes when closing the view:
-m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(NULL);
-m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(NULL);
+m_Controls.m_RegistrationLandmarkWidget->SetPointSetNode(nullptr);
+m_Controls.m_CalibrationLandmarkWidget->SetPointSetNode(nullptr);
 }
 
 void IGTNavigationToolCalibration::SetFocus()
@@ -545,7 +545,7 @@ void IGTNavigationToolCalibration::SaveCalibratedTool()
     calibratedTool->SetToolCalibrationLandmarks(this->m_CalibrationLandmarks);
     calibratedTool->SetToolRegistrationLandmarks(this->m_RegistrationLandmarks);
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
+    std::string filename = QFileDialog::getSaveFileName(nullptr,tr("Save Navigation Tool"), "/", "*.IGTTool").toUtf8().data();
     filename.append(".IGTTool");
     if (filename == "") return;
     if (myWriter->DoWrite(filename,calibratedTool)) MITK_INFO << "Saved calibrated tool to file " << filename;

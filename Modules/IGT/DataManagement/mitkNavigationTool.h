@@ -138,7 +138,7 @@ namespace mitk {
      */
     std::string GetToolName();
     //ToolSurface (only getter):
-    /** @return Returns the surface of this navigation tool. Returns NULL if there is
+    /** @return Returns the surface of this navigation tool. Returns nullptr if there is
      *          no surface (for example because the data node has not been set yet).
      *
      *          Note: There is no setter for the surface,

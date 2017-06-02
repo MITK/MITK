@@ -33,7 +33,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #endif
 
 mitk::MovieGenerator::MovieGenerator()
-  : m_stepper(NULL), m_renderer(NULL), m_width(0), m_height(0), m_initialized(false), m_FrameRate(20)
+  : m_stepper(nullptr), m_renderer(nullptr), m_width(0), m_height(0), m_initialized(false), m_FrameRate(20)
 {
   m_fileName[0] = 0;
 }
@@ -42,7 +42,7 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 {
   Pointer smartPtr;
   MovieGenerator *rawPtr = ::itk::ObjectFactory<MovieGenerator>::Create();
-  if (rawPtr == NULL)
+  if (rawPtr == nullptr)
   {
 #ifdef WIN32
 #ifndef __GNUC__
@@ -54,7 +54,7 @@ mitk::MovieGenerator::Pointer mitk::MovieGenerator::New()
 #endif
   }
   smartPtr = rawPtr;
-  if (rawPtr != NULL)
+  if (rawPtr != nullptr)
     rawPtr->UnRegister();
   return smartPtr;
 }

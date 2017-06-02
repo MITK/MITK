@@ -75,7 +75,7 @@ std::vector<mitk::USDevice::Pointer> mitk::USDevicePersistence::RestoreLastDevic
     catch (...)
     {
       MITK_ERROR << "Error occured while loading a USVideoDevice from persistence. Device assumed corrupt, will be deleted.";
-      //QMessageBox::warning(NULL, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
+      //QMessageBox::warning(nullptr, "Could not load device" ,"A stored ultrasound device is corrupted and could not be loaded. The device will be deleted.");
     }
   }
 

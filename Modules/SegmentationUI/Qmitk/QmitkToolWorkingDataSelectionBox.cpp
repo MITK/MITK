@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget *parent)
   : QListWidget(parent),
     m_SelfCall(false),
-    m_LastSelectedReferenceData(NULL),
+    m_LastSelectedReferenceData(nullptr),
     m_ToolGroupsForFiltering("default"),
     m_DisplayOnlyDerivedNodes(true)
 {
@@ -59,7 +59,7 @@ mitk::ToolManager *QmitkToolWorkingDataSelectionBox::GetToolManager()
 }
 
 void QmitkToolWorkingDataSelectionBox::SetToolManager(
-  mitk::ToolManager &newManager) // no NULL pointer allowed here, a manager is required
+  mitk::ToolManager &newManager) // no nullptr pointer allowed here, a manager is required
 {
   m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkToolWorkingDataSelectionBox>(
     this, &QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified);
@@ -91,7 +91,7 @@ void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
   }
   else
   {
-    emit WorkingNodeSelected(NULL);
+    emit WorkingNodeSelected(nullptr);
   }
 
   m_SelfCall = true;
@@ -114,7 +114,7 @@ void QmitkToolWorkingDataSelectionBox::OnToolManagerReferenceDataModified()
 {
   if (m_ToolManager->GetReferenceData(0) != m_LastSelectedReferenceData)
   {
-    m_ToolManager->SetWorkingData(NULL);
+    m_ToolManager->SetWorkingData(nullptr);
     UpdateDataDisplay();
 
     m_LastSelectedReferenceData = m_ToolManager->GetReferenceData(0);
@@ -205,7 +205,7 @@ mitk::DataNode *QmitkToolWorkingDataSelectionBox::GetSelectedNode()
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(bool onlyDerivedFromOriginal)
@@ -225,7 +225,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   */
 
   std::vector<mitk::NodePredicateBase::ConstPointer> m_Predicates;
-  mitk::NodePredicateBase::ConstPointer completePredicate = NULL;
+  mitk::NodePredicateBase::ConstPointer completePredicate = nullptr;
   bool rebuildNeeded = true;
   if (rebuildNeeded)
   {
@@ -290,7 +290,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
   }
 
   m_Predicates.clear();
-  completePredicate = NULL;
+  completePredicate = nullptr;
 
   mitk::ToolManager::DataVectorType resultVector;
 

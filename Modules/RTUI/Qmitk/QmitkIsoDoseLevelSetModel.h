@@ -36,7 +36,7 @@ class MITKRTUI_EXPORT QmitkIsoDoseLevelSetModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  explicit QmitkIsoDoseLevelSetModel(QObject *parent = NULL);
+  explicit QmitkIsoDoseLevelSetModel(QObject *parent = nullptr);
   virtual ~QmitkIsoDoseLevelSetModel() {};
 
   /** Sets the data handled by the model and resets the modified flag*/

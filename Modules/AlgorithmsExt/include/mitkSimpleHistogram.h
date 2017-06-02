@@ -108,7 +108,7 @@ namespace mitk
     }
 
     /** @brief Creates a new histogram out the source which must be an image. Method does nothing if the image is
-     * invalid, NULL, etc.. */
+     * invalid, nullptr, etc.. */
     void ComputeFromBaseData(BaseData *source) override;
     float GetRelativeBin(double start, double end) const override;
   };

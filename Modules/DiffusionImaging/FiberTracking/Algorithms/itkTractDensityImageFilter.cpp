@@ -30,9 +30,9 @@ namespace itk{
 template< class OutputImageType >
 TractDensityImageFilter< OutputImageType >::TractDensityImageFilter()
     : m_InvertImage(false)
-    , m_FiberBundle(NULL)
+    , m_FiberBundle(nullptr)
     , m_UpsamplingFactor(1)
-    , m_InputImage(NULL)
+    , m_InputImage(nullptr)
     , m_BinaryOutput(false)
     , m_UseImageGeometry(false)
     , m_OutputAbsoluteValues(false)

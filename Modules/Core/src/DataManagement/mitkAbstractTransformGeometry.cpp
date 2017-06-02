@@ -51,7 +51,7 @@ mitk::ScalarType mitk::AbstractTransformGeometry::GetParametricExtentInMM(int di
 {
   if (m_Plane.IsNull())
   {
-    itkExceptionMacro(<< "m_Plane is NULL.");
+    itkExceptionMacro(<< "m_Plane is nullptr.");
   }
   return m_Plane->GetExtentInMM(direction);
 }

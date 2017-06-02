@@ -40,7 +40,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(myFilter.IsNotNull(),"Testing instantiation");
 
   /* create helper objects: navigation data with position as origin, zero quaternion, zero error and data valid */
-  srand(time(NULL));
+  srand(time(nullptr));
   // generate a random position for the navigation data
   mitk::NavigationData::PositionType position;
   position[0] = rand()%1000;

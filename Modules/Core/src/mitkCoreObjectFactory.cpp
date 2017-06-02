@@ -115,7 +115,7 @@ mitk::CoreObjectFactory::~CoreObjectFactory()
 
 void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 {
-  if (node == NULL)
+  if (node == nullptr)
     return;
 
   mitk::DataNode::Pointer nodePointer = node;
@@ -167,8 +167,8 @@ mitk::CoreObjectFactory::CoreObjectFactory()
 
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
 {
-  mitk::Mapper::Pointer newMapper = NULL;
-  mitk::Mapper::Pointer tmpMapper = NULL;
+  mitk::Mapper::Pointer newMapper = nullptr;
+  mitk::Mapper::Pointer tmpMapper = nullptr;
 
   // check whether extra factories provide mapper
   for (ExtraFactoriesContainer::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
@@ -184,24 +184,24 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node
 
     if (id == mitk::BaseRenderer::Standard2D)
     {
-      if ((dynamic_cast<Image *>(data) != NULL))
+      if ((dynamic_cast<Image *>(data) != nullptr))
       {
         newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<PlaneGeometryData *>(data) != NULL))
+      else if ((dynamic_cast<PlaneGeometryData *>(data) != nullptr))
       {
         newMapper = mitk::PlaneGeometryDataMapper2D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<Surface *>(data) != NULL))
+      else if ((dynamic_cast<Surface *>(data) != nullptr))
       {
         newMapper = mitk::SurfaceVtkMapper2D::New();
         // cast because SetDataNode is not virtual
         mitk::SurfaceVtkMapper2D *castedMapper = dynamic_cast<mitk::SurfaceVtkMapper2D *>(newMapper.GetPointer());
         castedMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<PointSet *>(data) != NULL))
+      else if ((dynamic_cast<PointSet *>(data) != nullptr))
       {
         newMapper = mitk::PointSetVtkMapper2D::New();
         newMapper->SetDataNode(node);
@@ -209,17 +209,17 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode *node
     }
     else if (id == mitk::BaseRenderer::Standard3D)
     {
-      if ((dynamic_cast<PlaneGeometryData *>(data) != NULL))
+      if ((dynamic_cast<PlaneGeometryData *>(data) != nullptr))
       {
         newMapper = mitk::PlaneGeometryDataVtkMapper3D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<Surface *>(data) != NULL))
+      else if ((dynamic_cast<Surface *>(data) != nullptr))
       {
         newMapper = mitk::SurfaceVtkMapper3D::New();
         newMapper->SetDataNode(node);
       }
-      else if ((dynamic_cast<PointSet *>(data) != NULL))
+      else if ((dynamic_cast<PointSet *>(data) != nullptr))
       {
         newMapper = mitk::PointSetVtkMapper3D::New();
         newMapper->SetDataNode(node);

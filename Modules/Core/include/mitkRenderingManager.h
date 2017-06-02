@@ -142,7 +142,7 @@ namespace mitk
 
     /** Initializes the windows specified by requestType to the geometry of the
      * given DataStorage. */
-    // virtual bool InitializeViews( const DataStorage *storage, const DataNode* node = NULL,
+    // virtual bool InitializeViews( const DataStorage *storage, const DataNode* node = nullptr,
     //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
     /** Initializes the windows specified by requestType to the given
@@ -163,7 +163,7 @@ namespace mitk
     /** Initializes the specified window to the geometry of the given
      * DataNode. Set "initializeGlobalTimeSNC" to true in order to use this
      * geometry as global TimeGeometry. PLATFORM SPECIFIC. */
-    // virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataNode* node = NULL,
+    // virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataNode* node = nullptr,
     // bool initializeGlobalTimeSNC = false );
 
     /** Initializes the specified window to the given geometry. Set
@@ -236,7 +236,7 @@ namespace mitk
 
     int GetNextLOD(BaseRenderer *renderer);
 
-    /** Set current LOD (NULL means all renderers)*/
+    /** Set current LOD (nullptr means all renderers)*/
     void SetMaximumLOD(unsigned int max);
 
     void SetShading(bool state, unsigned int lod);

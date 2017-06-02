@@ -296,7 +296,7 @@ int mitkSceneIOTest(int, char *argv[])
         }
         else
         {
-          MITK_TEST_OUTPUT_NO_ENDL(<< "(NULL)");
+          MITK_TEST_OUTPUT_NO_ENDL(<< "(nullptr)");
         }
 
         MITK_TEST_OUTPUT(<< " contained in node '" << (*iter)->GetName() << "'");
@@ -343,7 +343,7 @@ int mitkSceneIOTest(int, char *argv[])
         }
         else
         {
-          MITK_TEST_OUTPUT_NO_ENDL(<< "(NULL)");
+          MITK_TEST_OUTPUT_NO_ENDL(<< "(nullptr)");
         }
 
         MITK_TEST_OUTPUT(<< " contained in node '" << (*iter)->GetName() << "'");

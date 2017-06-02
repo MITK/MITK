@@ -53,9 +53,9 @@ vtkProp* mitk::VectorImageVtkGlyphMapper3D::GetVtkProp(mitk::BaseRenderer*  /*re
 */
 mitk::VectorImageVtkGlyphMapper3D::~VectorImageVtkGlyphMapper3D()
 {
-  if ( m_Glyph3DMapper != NULL )
+  if ( m_Glyph3DMapper != nullptr )
     m_Glyph3DMapper->Delete();
-  if ( m_Glyph3DGenerator != NULL )
+  if ( m_Glyph3DGenerator != nullptr )
     m_Glyph3DGenerator->Delete();
 }
 
@@ -71,13 +71,13 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
 
   if ( !visible )
   {
-    if ( m_Glyph3DActor != NULL )
+    if ( m_Glyph3DActor != nullptr )
       m_Glyph3DActor->VisibilityOff();
     return ;
   }
   else
   {
-    if ( m_Glyph3DActor != NULL )
+    if ( m_Glyph3DActor != nullptr )
       m_Glyph3DActor->VisibilityOn();
   }
 
@@ -95,7 +95,7 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
   // get the input image...
   //
   mitk::Image::Pointer mitkImage = this->GetInput();
-  if ( mitkImage.GetPointer() == NULL )
+  if ( mitkImage.GetPointer() == nullptr )
   {
     itkWarningMacro( << "VectorImage is null !" );
     return;
@@ -116,9 +116,9 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
   // make sure, that we have point data with more than 1 component (as vectors)
   //
   vtkPointData* pointData = vtkImage->GetPointData();
-  if ( pointData == NULL )
+  if ( pointData == nullptr )
   {
-    itkWarningMacro( << "vtkImage->GetPointData() returns NULL!" );
+    itkWarningMacro( << "vtkImage->GetPointData() returns nullptr!" );
     return ;
   }
   if ( pointData->GetNumberOfArrays() == 0 )
@@ -126,7 +126,7 @@ void mitk::VectorImageVtkGlyphMapper3D::GenerateDataForRenderer( mitk::BaseRende
     itkWarningMacro( << "vtkImage->GetPointData()->GetNumberOfArrays() is 0!" );
     return ;
   }
-  else if ( pointData->GetArrayName( 0 ) == NULL )
+  else if ( pointData->GetArrayName( 0 ) == nullptr )
   {
     vtkImage->GetPointData() ->GetArray( 0 ) ->SetName( "vector" );
   }

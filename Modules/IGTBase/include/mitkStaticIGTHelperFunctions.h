@@ -48,6 +48,6 @@ namespace mitk {
   *  @param transform        This transform is applied to the image fiducials before the FRE calculation if it is given.
   *  @return                 Returns the FRE. Returns -1 if there was an error.
   */
-  static double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = NULL);
+  static double ComputeFRE(mitk::PointSet::Pointer imageFiducials, mitk::PointSet::Pointer realWorldFiducials, vtkSmartPointer<vtkLandmarkTransform> transform = nullptr);
   };
 }

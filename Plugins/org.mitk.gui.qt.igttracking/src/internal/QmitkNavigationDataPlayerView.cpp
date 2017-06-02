@@ -84,11 +84,11 @@ void QmitkNavigationDataPlayerView::CreateConnections()
 
 void QmitkNavigationDataPlayerView::OnOpenFile()
 {
-  mitk::NavigationDataReaderInterface::Pointer reader = NULL;
+  mitk::NavigationDataReaderInterface::Pointer reader = nullptr;
 
   QString filter = tr("NavigationData File (*.csv *.xml)");
 
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+  QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open NavigationData Set"), "", filter);
 
   if ( fileName.isNull() ) { return; } // user pressed cancel
 
@@ -175,7 +175,7 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
     m_ToolStorage->RegisterAsMicroservice(m_Player->GetMicroserviceID());
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();
-    m_ToolStorage = NULL;
+    m_ToolStorage = nullptr;
     m_Player->UnRegisterMicroservice();
   }
 }
@@ -227,7 +227,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
 }
 
 void QmitkNavigationDataPlayerView::DestroyPipeline(){
-  m_VisFilter = NULL;
+  m_VisFilter = nullptr;
   for (unsigned int i = 0; i < m_RenderingNodes.size(); i++){
     this->GetDataStorage()->Remove(m_RenderingNodes[i]);
   }

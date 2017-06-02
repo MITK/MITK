@@ -59,7 +59,7 @@ namespace itk
 
   template< class PixelType >
   TractsToDWIImageFilter< PixelType >::TractsToDWIImageFilter()
-    : m_FiberBundle(NULL)
+    : m_FiberBundle(nullptr)
     , m_StatusText("")
     , m_UseConstantRandSeed(false)
     , m_RandGen(itk::Statistics::MersenneTwisterRandomVariateGenerator::New())
@@ -216,7 +216,7 @@ namespace itk
         int spikeCoil = m_RandGen->GetIntegerVariate()%m_Parameters.m_SignalGen.m_NumberOfCoils;
 
         if (this->GetAbortGenerateData())
-          return NULL;
+          return nullptr;
 
 #pragma omp parallel for
         for (int c=0; c<m_Parameters.m_SignalGen.m_NumberOfCoils; c++)
@@ -910,15 +910,15 @@ namespace itk
 
     // check input data
     if (m_FiberBundle.IsNull() && m_InputImage.IsNull())
-      itkExceptionMacro("Input fiber bundle and input diffusion-weighted image is NULL!");
+      itkExceptionMacro("Input fiber bundle and input diffusion-weighted image is nullptr!");
 
     if (m_Parameters.m_FiberModelList.empty() && m_InputImage.IsNull())
       itkExceptionMacro("No diffusion model for fiber compartments defined and input diffusion-weighted"
-                        " image is NULL! At least one fiber compartment is necessary to simulate diffusion.");
+                        " image is nullptr! At least one fiber compartment is necessary to simulate diffusion.");
 
     if (m_Parameters.m_NonFiberModelList.empty() && m_InputImage.IsNull())
       itkExceptionMacro("No diffusion model for non-fiber compartments defined and input diffusion-weighted"
-                        " image is NULL! At least one non-fiber compartment is necessary to simulate diffusion.");
+                        " image is nullptr! At least one non-fiber compartment is necessary to simulate diffusion.");
 
     int baselineIndex = m_Parameters.m_SignalGen.GetFirstBaselineIndex();
     if (baselineIndex<0) { itkExceptionMacro("No baseline index found!"); }

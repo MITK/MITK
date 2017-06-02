@@ -240,7 +240,7 @@ namespace mitk
     * fulfilled, this instance is returned.
     *
     * If a transition has no condition, it is automatically returned.
-    * If no executable transition is found, NULL is returned.
+    * If no executable transition is found, nullptr is returned.
     */
     StateMachineTransition *GetExecutableTransition(InteractionEvent *event);
 

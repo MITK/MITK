@@ -24,7 +24,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /*name*/)
-  : QWidget(parent), m_ToolManager(NULL), m_DataStorage(NULL)
+  : QWidget(parent), m_ToolManager(nullptr), m_DataStorage(nullptr)
 {
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();

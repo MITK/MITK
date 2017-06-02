@@ -52,7 +52,7 @@ namespace mitk
       mitkThrow() << "Cannot configure node correctly. Node property "<<mitk::nodeProp_RegVisGridFrequence<<" is not correctly defined.";
     }
 
-    mitk::Vector3DProperty* valueProp = NULL;
+    mitk::Vector3DProperty* valueProp = nullptr;
     mitk::Vector3D size;
     mitk::Vector3D spacing;
 
@@ -74,7 +74,7 @@ namespace mitk
       mitkThrow() << "Cannot configure node correctly. Node property "<<mitk::nodeProp_RegVisFOVSpacing<<" is not correctly defined.";
     }
 
-    mitk::Point3dProperty* originProp = NULL;
+    mitk::Point3dProperty* originProp = nullptr;
     mitk::Point3D origin;
     if (regNode->GetProperty(originProp, mitk::nodeProp_RegVisFOVOrigin))
     {
@@ -187,7 +187,7 @@ namespace mitk
     return output;
   }
 
-  vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGrid( const mitk::BaseGeometry* gridDesc, unsigned int gridFrequence, const map::core::RegistrationKernelBase<3,3>* regKernel /*= NULL*/ )
+  vtkSmartPointer<vtkPolyData> MITKMATCHPOINTREGISTRATION_EXPORT Generate3DDeformationGrid( const mitk::BaseGeometry* gridDesc, unsigned int gridFrequence, const map::core::RegistrationKernelBase<3,3>* regKernel /*= nullptr*/ )
   {
     assert(gridDesc);
 
@@ -362,7 +362,7 @@ namespace mitk
 
   const map::core::RegistrationKernelBase<3,3>* GetRelevantRegKernelOfNode(const mitk::DataNode* regNode)
   {
-    const map::core::RegistrationKernelBase<3,3>* regKernel = NULL;
+    const map::core::RegistrationKernelBase<3,3>* regKernel = nullptr;
 
     if (!regNode) return regKernel;
 
@@ -374,7 +374,7 @@ namespace mitk
 
     if (reg)
     {
-      mitk::RegVisDirectionProperty* directionProp = NULL;
+      mitk::RegVisDirectionProperty* directionProp = nullptr;
       if (regNode->GetProperty(directionProp, mitk::nodeProp_RegVisDirection))
       {
         if (directionProp->GetValueAsId()==0)

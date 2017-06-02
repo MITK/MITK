@@ -63,8 +63,8 @@ using namespace berry;
 
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView()
   : QmitkAbstractView(),
-    m_Controls(NULL),
-    m_NodeUsedForOdfVisualization(NULL),
+    m_Controls(nullptr),
+    m_NodeUsedForOdfVisualization(nullptr),
     m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
     m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
     m_IconGlyOFF_T(new QIcon(":/QmitkDiffusionImaging/glyphsoff_T.png")),
@@ -80,10 +80,10 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
     m_GlyIsOn_T(false),
     m_FiberBundleObserverTag(0),
     m_FiberBundleObserveOpacityTag(0),
-    m_Color(NULL)
+    m_Color(nullptr)
 {
   currentThickSlicesMode = 1;
-  m_MyMenu = NULL;
+  m_MyMenu = nullptr;
   int numThread = itk::MultiThreader::GetGlobalMaximumNumberOfThreads();
   if (numThread > 12)
     numThread = 12;
@@ -361,7 +361,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
   m_Controls->m_GlyphFrame->setVisible(false);
   m_Controls->m_TSMenu->setVisible(false);
 
-  m_SelectedNode = NULL;
+  m_SelectedNode = nullptr;
 
   int numOdfImages = 0;
   for (mitk::DataNode::Pointer node: nodes)
@@ -370,7 +370,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       continue;
 
     mitk::BaseData* nodeData = node->GetData();
-    if(nodeData == NULL)
+    if(nodeData == nullptr)
       continue;
 
     m_SelectedNode = node;
@@ -382,7 +382,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command
           = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
       command->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleCustomColor );
-      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", NULL));
+      m_Color = dynamic_cast<mitk::ColorProperty*>(node->GetProperty("color", nullptr));
       if (m_Color.IsNotNull())
         m_FiberBundleObserverTag = m_Color->AddObserver( itk::ModifiedEvent(), command );
 
@@ -393,7 +393,7 @@ void QmitkControlVisualizationPropertiesView::OnSelectionChanged(berry::IWorkben
       itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::Pointer command2
           = itk::ReceptorMemberCommand<QmitkControlVisualizationPropertiesView>::New();
       command2->SetCallbackFunction( this, &QmitkControlVisualizationPropertiesView::SetFiberBundleOpacity );
-      m_Opacity = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("opacity", NULL));
+      m_Opacity = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("opacity", nullptr));
 
       if (m_Opacity.IsNotNull())
       {
@@ -596,7 +596,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
   m_GlyIsOn_S = m_Controls->m_VisibleOdfsON_S->isChecked();
   if (m_NodeUsedForOdfVisualization.IsNull())
   {
-    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is nullptr";
     return;
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_S", m_GlyIsOn_S);
@@ -609,7 +609,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_T()
   m_GlyIsOn_T = m_Controls->m_VisibleOdfsON_T->isChecked();
   if (m_NodeUsedForOdfVisualization.IsNull())
   {
-    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is nullptr";
     return;
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_T", m_GlyIsOn_T);
@@ -622,7 +622,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
   m_GlyIsOn_C = m_Controls->m_VisibleOdfsON_C->isChecked();
   if (m_NodeUsedForOdfVisualization.IsNull())
   {
-    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is NULL";
+    MITK_WARN << "ODF visualization activated but m_NodeUsedForOdfVisualization is nullptr";
     return;
   }
   m_NodeUsedForOdfVisualization->SetBoolProperty("VisibleOdfs_C", m_GlyIsOn_C);
@@ -633,7 +633,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
 bool QmitkControlVisualizationPropertiesView::IsPlaneRotated()
 {
   mitk::Image* currentImage = dynamic_cast<mitk::Image* >( m_NodeUsedForOdfVisualization->GetData() );
-  if( currentImage == NULL )
+  if( currentImage == nullptr )
   {
     MITK_ERROR << " Casting problems. Returning false";
     return false;

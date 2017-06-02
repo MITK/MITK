@@ -148,7 +148,7 @@ namespace mitk
 
     /**
       \brief Extract the slice of the currently selected working image that the user just scribbles on.
-      \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem
+      \return nullptr if SegTool2D is either unable to determine which slice was affected, or if there was some problem
       getting the image data at that position,
                    or just no working image is selected.
     */
@@ -156,7 +156,7 @@ namespace mitk
 
     /**
       \brief Extract the slice of the currently selected reference image that the user just scribbles on.
-      \return NULL if SegTool2D is either unable to determine which slice was affected, or if there was some problem
+      \return nullptr if SegTool2D is either unable to determine which slice was affected, or if there was some problem
       getting the image data at that position,
                    or just no reference image is selected.
     */

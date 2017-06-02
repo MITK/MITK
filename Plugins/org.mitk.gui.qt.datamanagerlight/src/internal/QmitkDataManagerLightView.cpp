@@ -166,7 +166,7 @@ void QmitkDataManagerLightView::ListSelectionChanged()
 void QmitkDataManagerLightView::on_Load_pressed()
 {
     MITK_DEBUG << "on_Load_pressed";
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
     FileOpen((*it).toLatin1(), 0);
@@ -200,7 +200,7 @@ void QmitkDataManagerLightView::on_Remove_pressed()
     question.append( QString::fromStdString( node->GetName() ) );
     question.append(" ?");
 
-    QMessageBox::StandardButton answerButton = QMessageBox::question( NULL
+    QMessageBox::StandardButton answerButton = QMessageBox::question( nullptr
       , tr("DataManagerLight")
       , question
       , QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -217,7 +217,7 @@ void QmitkDataManagerLightView::GlobalReinit()
   mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
 
   // no render window available
-  if (renderWindow == NULL) return;
+  if (renderWindow == nullptr) return;
 
   // get all nodes that have not set "includeInBoundingBox" to false
   mitk::NodePredicateNot::Pointer pred

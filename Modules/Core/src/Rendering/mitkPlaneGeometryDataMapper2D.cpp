@@ -258,8 +258,8 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
   const PlaneGeometry *worldPlaneGeometry =
     dynamic_cast<const PlaneGeometry *>(rendererWorldPlaneGeometryData->GetPlaneGeometry());
 
-  if (worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(worldPlaneGeometry) == NULL &&
-      inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(input->GetPlaneGeometry()) == NULL)
+  if (worldPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(worldPlaneGeometry) == nullptr &&
+      inputPlaneGeometry && dynamic_cast<const AbstractTransformGeometry *>(input->GetPlaneGeometry()) == nullptr)
   {
     const BaseGeometry *referenceGeometry = inputPlaneGeometry->GetReferenceGeometry();
 
@@ -295,7 +295,7 @@ void mitk::PlaneGeometryDataMapper2D::CreateVtkCrosshair(mitk::BaseRenderer *ren
       NodesVectorType::iterator otherPlanesEnd = m_OtherPlaneGeometries.end();
 
       int gapSize = 32;
-      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, NULL);
+      this->GetDataNode()->GetPropertyValue("Crosshair.Gap Size", gapSize, nullptr);
 
       auto intervals = IntervalSet<double>(SimpleInterval<double>(0, 1));
 
@@ -616,7 +616,7 @@ void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties(BaseRenderer *renderer)
 
   PlaneOrientationProperty *decorationProperty;
   this->GetDataNode()->GetProperty(decorationProperty, "decoration", renderer);
-  if (decorationProperty != NULL)
+  if (decorationProperty != nullptr)
   {
     if (decorationProperty->GetPlaneDecoration() == PlaneOrientationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION)
     {

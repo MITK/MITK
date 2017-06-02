@@ -38,27 +38,27 @@ namespace mitk
   struct LocaleSwitch
   {
     LocaleSwitch(const std::string& newLocale)
-      : m_OldLocale(std::setlocale(LC_ALL, NULL))
+      : m_OldLocale(std::setlocale(LC_ALL, nullptr))
       , m_NewLocale(newLocale)
     {
-      if (m_OldLocale == NULL)
+      if (m_OldLocale == nullptr)
       {
         m_OldLocale = "";
       }
       else if (m_NewLocale != m_OldLocale)
       {
         // set the locale
-        if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == NULL)
+        if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == nullptr)
         {
           MITK_INFO << "Could not set locale " << m_NewLocale;
-          m_OldLocale = NULL;
+          m_OldLocale = nullptr;
         }
       }
     }
 
     ~LocaleSwitch()
     {
-      if (m_OldLocale != NULL && std::setlocale(LC_ALL, m_OldLocale) == NULL)
+      if (m_OldLocale != nullptr && std::setlocale(LC_ALL, m_OldLocale) == nullptr)
       {
         MITK_INFO << "Could not reset locale " << m_OldLocale;
       }
@@ -148,7 +148,7 @@ namespace mitk
     {
       bool result = false;
 
-      result = dynamic_cast<const map::core::Registration<i,j> *>(obj->GetRegistration()) != NULL;
+      result = dynamic_cast<const map::core::Registration<i,j> *>(obj->GetRegistration()) != nullptr;
 
       return result;
     }
@@ -163,7 +163,7 @@ namespace mitk
     static bool Execute(const mitk::MAPRegistrationWrapper* obj, const map::core::String& data)
     {
       const map::core::Registration<i,j>* pReg = dynamic_cast<const map::core::Registration<i,j>*>(obj->GetRegistration());
-      if (pReg == NULL)
+      if (pReg == nullptr)
       {
         return false;
       }
@@ -215,13 +215,13 @@ namespace mitk
   {
     bool success = false;
     const BaseData* input = this->GetInput();
-    if (input == NULL)
+    if (input == nullptr)
     {
-      mitkThrow() << "Cannot write data. Data pointer is NULL.";
+      mitkThrow() << "Cannot write data. Data pointer is nullptr.";
     }
 
     const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast<const mitk::MAPRegistrationWrapper*>(input);
-    if (wrapper == NULL)
+    if (wrapper == nullptr)
     {
       mitkThrow() << "Cannot write data. Data pointer is not a Registration wrapper.";
     }
@@ -255,7 +255,7 @@ namespace mitk
   {
     const mitk::MAPRegistrationWrapper* regWrapper =  dynamic_cast<const mitk::MAPRegistrationWrapper*>(this->GetInput());
 
-    if (regWrapper == NULL)
+    if (regWrapper == nullptr)
     {
       return IFileWriter::Unsupported;
     }

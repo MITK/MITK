@@ -278,7 +278,7 @@ void QmitkMLBTView::OnTrackingThreadStop()
         m_AlternativePointsNode->SetData(tracker->m_AlternativePointset);
     }
 
-    tracker = NULL;
+    tracker = nullptr;
     m_TrackingTimer->stop();
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

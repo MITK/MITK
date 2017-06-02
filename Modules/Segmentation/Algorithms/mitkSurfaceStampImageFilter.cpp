@@ -54,7 +54,7 @@ void mitk::SurfaceStampImageFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 
-  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == NULL))
+  if (inputImage.IsNull() || (inputImage->IsInitialized() == false) || (inputImage->GetTimeGeometry() == nullptr))
     return;
 
   if (m_MakeOutputBinary)

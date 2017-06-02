@@ -207,7 +207,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
 
   // FIXME Filter for correct files and use correct Reader
   QString filter = tr("NavigationData File (*.csv *.xml)");
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open NavigationData Set"), "", filter);
+  QString fileName = QFileDialog::getOpenFileName(nullptr, tr("Open NavigationData Set"), "", filter);
 
   if ( fileName.isNull() ) { return; } // user pressed cancel
 

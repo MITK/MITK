@@ -31,9 +31,9 @@ QmitkToFMESAParameterWidget::QmitkToFMESAParameterWidget(QWidget* parent, Qt::Wi
 {
   this->m_IntegrationTime = 0;
   this->m_ModulationFrequency = 0;
-  this->m_ToFImageGrabber = NULL;
+  this->m_ToFImageGrabber = nullptr;
 
-  m_Controls = NULL;
+  m_Controls = nullptr;
   CreateQtPartControl(this);
 }
 
@@ -127,7 +127,7 @@ void QmitkToFMESAParameterWidget::OnChangeANFCheckBox(bool checked)
 
 void QmitkToFMESAParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
 {
-  if (this->m_ToFImageGrabber != NULL)
+  if (this->m_ToFImageGrabber != nullptr)
   {
     // stop camera if active
     bool active = m_ToFImageGrabber->IsCameraActive();
@@ -146,7 +146,7 @@ void QmitkToFMESAParameterWidget::OnChangeIntegrationTimeSpinBox(int value)
 
 void QmitkToFMESAParameterWidget::OnChangeModulationFrequencyComboBox(int index)
 {
-  if (this->m_ToFImageGrabber != NULL)
+  if (this->m_ToFImageGrabber != nullptr)
   {
     // stop camera if active
     bool active = m_ToFImageGrabber->IsCameraActive();

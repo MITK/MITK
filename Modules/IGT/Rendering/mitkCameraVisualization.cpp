@@ -25,7 +25,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 
 mitk::CameraVisualization::CameraVisualization(): NavigationDataToNavigationDataFilter(),
-m_Renderer(NULL), m_FocalLength(10.0)
+m_Renderer(nullptr), m_FocalLength(10.0)
 {
   // initialize members
   m_DirectionOfProjectionInToolCoordinates[0] = 0;
@@ -115,7 +115,7 @@ const mitk::BaseRenderer* mitk::CameraVisualization::GetRenderer()
 
 void mitk::CameraVisualization::SetParameters( const mitk::PropertyList* p )
 {
-  if (p == NULL)
+  if (p == nullptr)
     return;
   mitk::Vector3D doP;
   if (p->GetPropertyValue<mitk::Vector3D>("CameraVisualization_DirectionOfProjectionInToolCoordinates", doP) == true)  // search for DirectionOfProjectionInToolCoordinates parameter

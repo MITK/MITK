@@ -49,7 +49,7 @@ static const std::string& WILDCARD_STRING()
   return s;
 }
 
-static const std::string& NULLQ()
+static const std::string& nullptrQ()
 {
   static std::string s = "Null query";
   return s;
@@ -743,7 +743,7 @@ LDAPExpr::ParseState::ParseState( const std::string& str )
 {
   if (str.empty())
   {
-    error(LDAPExprConstants::NULLQ());
+    error(LDAPExprConstants::nullptrQ());
   }
 
   m_str = str;

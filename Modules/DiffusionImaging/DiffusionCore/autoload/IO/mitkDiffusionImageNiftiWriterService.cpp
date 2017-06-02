@@ -54,7 +54,7 @@ void mitk::DiffusionImageNiftiWriterService::Write()
 
   if (input.IsNull())
   {
-    MITK_ERROR <<"Sorry, input to DiffusionImageNiftiWriterService is NULL!";
+    MITK_ERROR <<"Sorry, input to DiffusionImageNiftiWriterService is nullptr!";
     return;
   }
   if ( this->GetOutputLocation().empty() )

@@ -11,16 +11,16 @@
 
 
 mitk::CollectionStatistic::CollectionStatistic()
-  : m_GroundTruthValueToIndexMapper(NULL)
-  , m_TestValueToIndexMapper(NULL)
+  : m_GroundTruthValueToIndexMapper(nullptr)
+  , m_TestValueToIndexMapper(nullptr)
 {
 
 }
 
 mitk::CollectionStatistic::~CollectionStatistic()
 {
-  m_GroundTruthValueToIndexMapper = NULL;
-  m_TestValueToIndexMapper = NULL;
+  m_GroundTruthValueToIndexMapper = nullptr;
+  m_TestValueToIndexMapper = nullptr;
 }
 
 
@@ -100,15 +100,15 @@ int mitk::CollectionStatistic::IsInSameVirtualClass(unsigned char gold, unsigned
 
 bool mitk::CollectionStatistic::Update()
 {
-  if (m_GroundTruthValueToIndexMapper == NULL)
+  if (m_GroundTruthValueToIndexMapper == nullptr)
   {
-    MITK_ERROR << "m_GroundTruthValueToIndexMapper is NULL";
+    MITK_ERROR << "m_GroundTruthValueToIndexMapper is nullptr";
     return false;
   }
 
-  if (m_TestValueToIndexMapper == NULL)
+  if (m_TestValueToIndexMapper == nullptr)
   {
-    MITK_ERROR << "m_TestValueToIndexMapper is NULL";
+    MITK_ERROR << "m_TestValueToIndexMapper is nullptr";
     return false;
   }
 
@@ -387,8 +387,8 @@ std::vector<mitk::StatisticData> mitk::CollectionStatistic::GetStatisticData(uns
 void mitk::CollectionStatistic::ComputeRMSD()
 {
   assert(m_ClassCount == 2);
-  assert(m_GroundTruthValueToIndexMapper != NULL);
-  assert(m_TestValueToIndexMapper != NULL);
+  assert(m_GroundTruthValueToIndexMapper != nullptr);
+  assert(m_TestValueToIndexMapper != nullptr);
 
   DataCollectionImageIterator<unsigned char, 3> groundTruthIter(m_Collection, m_GroundTruthName);
   DataCollectionImageIterator<unsigned char, 3> testIter(m_Collection, m_TestName);
@@ -420,7 +420,7 @@ void mitk::CollectionStatistic::ComputeRMSD()
   ConstNeighborhoodIteratorType neighborhoodIter;
 
   ImageType::Pointer distanceImage;
-  std::vector<mitk::StatisticData>* currentImageStatistics = NULL;
+  std::vector<mitk::StatisticData>* currentImageStatistics = nullptr;
 
   unsigned int distanceBorderSamples = 0;
   double totalBorderRMSDistance = 0;

@@ -173,8 +173,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 //      {
 //        ++testcounter,
 //        "Test2D",
-//        NULL,
-//        NULL,
+//        nullptr,
+//        nullptr,
 //        false,
 //        &Test1D
 //      }
@@ -197,7 +197,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 ////
 ////  if (filepath.empty())
 ////  {
-////  return NULL;
+////  return nullptr;
 ////  }
 ////
 //////TODO read imge from file
@@ -217,47 +217,47 @@ See LICENSE.txt or http://www.mitk.org for details.
 //  static mitk::Geometry2D::Pointer TestSagital()
 //  {
 //
-//    return NULL;
+//    return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer TestCoronal()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer TestAxial()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test_u_Rotation()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test_v_Rotation()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer TestTwoDirectionalRotation()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test4DImage()
-//  {return NULL;
+//  {return nullptr;
 //
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test2DImage()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //  static mitk::Geometry2D::Pointer Test1DImage()
 //  {
-// return NULL;
+// return nullptr;
 //  }
 //
 //};

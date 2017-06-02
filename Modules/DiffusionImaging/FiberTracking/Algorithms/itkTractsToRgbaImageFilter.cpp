@@ -29,7 +29,7 @@ namespace itk{
   template< class OutputImageType >
   TractsToRgbaImageFilter< OutputImageType >::TractsToRgbaImageFilter()
     : m_UpsamplingFactor(1)
-    , m_InputImage(NULL)
+    , m_InputImage(nullptr)
     , m_UseImageGeometry(false)
   {
 

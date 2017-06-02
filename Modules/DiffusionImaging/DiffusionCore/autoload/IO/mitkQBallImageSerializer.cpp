@@ -37,7 +37,7 @@ mitk::QBallImageSerializer::~QBallImageSerializer()
 std::string mitk::QBallImageSerializer::Serialize()
 {
   const QBallImage* image = dynamic_cast<const QBallImage*>( m_Data.GetPointer() );
-  if (image == NULL)
+  if (image == nullptr)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::NrrdQBallImage. Cannot serialize as NrrdQBallImage.";

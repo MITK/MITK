@@ -87,17 +87,17 @@ private:
   }
 
 public:
-  mitkDICOMLocaleTestSuite() : m_OldLocale(NULL), m_SkipImageTest(false) {}
+  mitkDICOMLocaleTestSuite() : m_OldLocale(nullptr), m_SkipImageTest(false) {}
   // Change the current locale to m_Locale
   void setUp() override
   {
     m_SkipImageTest = false;
-    m_OldLocale = NULL;
+    m_OldLocale = nullptr;
     SetTestParameter();
 
     try
     {
-      m_OldLocale = setlocale(LC_ALL, NULL);
+      m_OldLocale = setlocale(LC_ALL, nullptr);
       MITK_TEST_OUTPUT(<< " ** Changing locale from " << m_OldLocale << " to '" << m_Locale << "'")
       setlocale(LC_ALL, m_Locale.c_str());
       std::cin.imbue(std::locale(m_Locale.c_str()));

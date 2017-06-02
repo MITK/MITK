@@ -31,7 +31,7 @@ class QmitkSliceAnimationWidget : public QmitkAnimationWidget
   Q_OBJECT
 
 public:
-  explicit QmitkSliceAnimationWidget(QWidget* parent = NULL);
+  explicit QmitkSliceAnimationWidget(QWidget* parent = nullptr);
   ~QmitkSliceAnimationWidget();
 
   void SetAnimationItem(QmitkAnimationItem* sliceAnimationItem) override;

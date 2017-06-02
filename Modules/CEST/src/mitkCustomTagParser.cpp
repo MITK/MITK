@@ -143,7 +143,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   for (int i = 0; i < len; i += 3)
   {
     std::string byte = dicomPropertyString.substr(i, 2);
-    char chr = (char)(int)strtol(byte.c_str(), NULL, 16);
+    char chr = (char)(int)strtol(byte.c_str(), nullptr, 16);
     asciiString.push_back(chr);
   }
 

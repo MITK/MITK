@@ -35,7 +35,7 @@ std::string mitk::GeometryDataSerializer::Serialize()
 {
   // Verify good input data type
   const GeometryData *ps = dynamic_cast<const GeometryData *>(m_Data.GetPointer());
-  if (ps == NULL)
+  if (ps == nullptr)
   {
     MITK_ERROR << " Object at " << (const void *)this->m_Data << " is not an mitk::GeometryData. Cannot serialize...";
     return "";

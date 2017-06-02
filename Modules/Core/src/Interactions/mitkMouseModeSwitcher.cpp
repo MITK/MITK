@@ -22,7 +22,7 @@
 #include "mitkInteractionEventObserver.h"
 
 mitk::MouseModeSwitcher::MouseModeSwitcher()
-  : m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(NULL)
+  : m_ActiveInteractionScheme(MITK), m_ActiveMouseMode(MousePointer), m_CurrentObserver(nullptr)
 {
   this->InitializeListeners();
   this->SetInteractionScheme(m_ActiveInteractionScheme);

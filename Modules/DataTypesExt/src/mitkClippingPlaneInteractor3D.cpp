@@ -64,7 +64,7 @@ void mitk::ClippingPlaneInteractor3D::DataNodeChanged()
 bool mitk::ClippingPlaneInteractor3D::CheckOverObject(const InteractionEvent *interactionEvent)
 {
   const InteractionPositionEvent *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return false;
 
   Point3D currentWorldPoint;
@@ -108,7 +108,7 @@ void mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction *, Inter
 void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
@@ -121,7 +121,7 @@ void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, Intera
 
   // Get the timestep to also support 3D+t
   int timeStep = 0;
-  if ((interactionEvent->GetSender()) != NULL)
+  if ((interactionEvent->GetSender()) != nullptr)
     timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
   // Make deep copy of current Geometry3D of the plane
@@ -133,7 +133,7 @@ void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, Intera
 void mitk::ClippingPlaneInteractor3D::InitRotate(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   m_InitialPickedDisplayPoint = positionEvent->GetPointerPositionOnScreen();
@@ -156,7 +156,7 @@ void mitk::ClippingPlaneInteractor3D::InitRotate(StateMachineAction *, Interacti
 void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   double currentWorldPoint[4];
@@ -179,17 +179,17 @@ void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, Inte
 
   // If data is an mitk::Surface, extract it
   Surface::Pointer surface = dynamic_cast<Surface *>(this->GetDataNode()->GetData());
-  vtkPolyData *polyData = NULL;
+  vtkPolyData *polyData = nullptr;
   if (surface.IsNotNull())
   {
     polyData = surface->GetVtkPolyData(timeStep);
 
     // Extract surface normal from surface (if existent, otherwise use default)
     vtkPointData *pointData = polyData->GetPointData();
-    if (pointData != NULL)
+    if (pointData != nullptr)
     {
       vtkDataArray *normal = polyData->GetPointData()->GetVectors("planeNormal");
-      if (normal != NULL)
+      if (normal != nullptr)
       {
         m_ObjectNormal[0] = normal->GetComponent(0, 0);
         m_ObjectNormal[1] = normal->GetComponent(0, 1);
@@ -210,7 +210,7 @@ void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, Inte
 void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   InteractionPositionEvent *positionEvent = dynamic_cast<InteractionPositionEvent *>(interactionEvent);
-  if (positionEvent == NULL)
+  if (positionEvent == nullptr)
     return;
 
   double currentWorldPoint[4];
@@ -221,19 +221,19 @@ void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, Interac
                                                0.0, // m_InitialInteractionPickedPoint[2],
                                                currentWorldPoint);
 
-  vtkCamera *camera = NULL;
-  vtkRenderer *currentVtkRenderer = NULL;
+  vtkCamera *camera = nullptr;
+  vtkRenderer *currentVtkRenderer = nullptr;
 
-  if ((interactionEvent->GetSender()) != NULL)
+  if ((interactionEvent->GetSender()) != nullptr)
   {
     vtkRenderWindow *renderWindow = interactionEvent->GetSender()->GetRenderWindow();
-    if (renderWindow != NULL)
+    if (renderWindow != nullptr)
     {
       vtkRenderWindowInteractor *renderWindowInteractor = renderWindow->GetInteractor();
-      if (renderWindowInteractor != NULL)
+      if (renderWindowInteractor != nullptr)
       {
         currentVtkRenderer = renderWindowInteractor->GetInteractorStyle()->GetCurrentRenderer();
-        if (currentVtkRenderer != NULL)
+        if (currentVtkRenderer != nullptr)
           camera = currentVtkRenderer->GetActiveCamera();
       }
     }
@@ -271,7 +271,7 @@ void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, Interac
     Point3D rotationCenter = m_OriginalGeometry->GetCenter();
 
     int timeStep = 0;
-    if ((interactionEvent->GetSender()) != NULL)
+    if ((interactionEvent->GetSender()) != nullptr)
       timeStep = interactionEvent->GetSender()->GetTimeStep(this->GetDataNode()->GetData());
 
     // Reset current Geometry3D to original state (pre-interaction) and
@@ -303,25 +303,25 @@ void mitk::ClippingPlaneInteractor3D::ColorizeSurface(BaseRenderer::Pointer rend
 
   // If data is an mitk::Surface, extract it
   Surface::Pointer surface = dynamic_cast<Surface *>(data.GetPointer());
-  vtkPolyData *polyData = NULL;
+  vtkPolyData *polyData = nullptr;
   if (surface.IsNotNull())
     polyData = surface->GetVtkPolyData(timeStep);
 
-  if (polyData == NULL)
+  if (polyData == nullptr)
   {
     MITK_ERROR << "ClippingPlaneInteractor3D: No poly data present!";
     return;
   }
 
   vtkPointData *pointData = polyData->GetPointData();
-  if (pointData == NULL)
+  if (pointData == nullptr)
   {
     MITK_ERROR << "ClippingPlaneInteractor3D: No point data present!";
     return;
   }
 
   vtkDataArray *scalars = pointData->GetScalars();
-  if (scalars == NULL)
+  if (scalars == nullptr)
   {
     MITK_ERROR << "ClippingPlaneInteractor3D: No scalars for point data present!";
     return;

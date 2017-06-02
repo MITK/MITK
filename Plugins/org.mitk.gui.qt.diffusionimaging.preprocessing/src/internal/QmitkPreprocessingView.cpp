@@ -99,7 +99,7 @@ typedef float TTensorPixelType;
 
 QmitkPreprocessingView::QmitkPreprocessingView()
   : QmitkAbstractView(),
-    m_Controls(NULL)
+    m_Controls(nullptr)
 {
 }
 
@@ -265,7 +265,7 @@ void QmitkPreprocessingView::DoFlipAxis()
   }
   else
   {
-    QMessageBox::warning(NULL,"Warning", QString("Operation not supported in multi-component images") );
+    QMessageBox::warning(nullptr,"Warning", QString("Operation not supported in multi-component images") );
   }
 }
 
@@ -481,7 +481,7 @@ void QmitkPreprocessingView::DoCropImage()
   }
   else
   {
-    QMessageBox::warning(NULL,"Warning", QString("Operation not supported in multi-component images") );
+    QMessageBox::warning(nullptr,"Warning", QString("Operation not supported in multi-component images") );
   }
 }
 
@@ -569,7 +569,7 @@ void QmitkPreprocessingView::DoApplySpacing()
   }
   else
   {
-    QMessageBox::warning(NULL,"Warning", QString("Operation not supported in multi-component images") );
+    QMessageBox::warning(nullptr,"Warning", QString("Operation not supported in multi-component images") );
   }
 }
 
@@ -646,7 +646,7 @@ void QmitkPreprocessingView::DoApplyOrigin()
   }
   else
   {
-    QMessageBox::warning(NULL,"Warning", QString("Operation not supported in multi-component images") );
+    QMessageBox::warning(nullptr,"Warning", QString("Operation not supported in multi-component images") );
   }
 }
 
@@ -857,7 +857,7 @@ void QmitkPreprocessingView::DoResampleImage()
   }
   else
   {
-    QMessageBox::warning(NULL,"Warning", QString("Operation not supported in multi-component images") );
+    QMessageBox::warning(nullptr,"Warning", QString("Operation not supported in multi-component images") );
   }
 }
 
@@ -1100,7 +1100,7 @@ void QmitkPreprocessingView::DoApplyDirectionMatrix()
   }
   else
   {
-    QMessageBox::warning(NULL,"Warning", QString("Operation not supported in multi-component images") );
+    QMessageBox::warning(nullptr,"Warning", QString("Operation not supported in multi-component images") );
   }
 }
 
@@ -1214,7 +1214,7 @@ void QmitkPreprocessingView::DoDwiNormalization()
   filter->SetNewMean(m_Controls->m_NewMean->value());
   filter->SetNewStdev(m_Controls->m_NewStdev->value());
 
-  UcharImageType::Pointer itkImage = NULL;
+  UcharImageType::Pointer itkImage = nullptr;
   if (m_Controls->m_NormalizationMaskBox->GetSelectedNode().IsNotNull())
   {
     itkImage = UcharImageType::New();

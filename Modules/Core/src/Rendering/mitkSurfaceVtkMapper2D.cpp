@@ -127,7 +127,7 @@ vtkProp *mitk::SurfaceVtkMapper2D::GetVtkProp(mitk::BaseRenderer *renderer)
 void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 {
   const mitk::DataNode *node = GetDataNode();
-  if (node == NULL)
+  if (node == nullptr)
     return;
   bool visible = true;
   node->GetVisibility(visible, renderer, "visible");
@@ -135,7 +135,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
     return;
 
   mitk::Surface *surface = static_cast<mitk::Surface *>(node->GetData());
-  if (surface == NULL)
+  if (surface == nullptr)
     return;
 
   // Calculate time step of the input data for the specified renderer (integer value)
@@ -143,7 +143,7 @@ void mitk::SurfaceVtkMapper2D::Update(mitk::BaseRenderer *renderer)
 
   // Check if time step is valid
   const mitk::TimeGeometry *dataTimeGeometry = surface->GetTimeGeometry();
-  if ((dataTimeGeometry == NULL) || (dataTimeGeometry->CountTimeSteps() == 0) ||
+  if ((dataTimeGeometry == nullptr) || (dataTimeGeometry->CountTimeSteps() == 0) ||
       (!dataTimeGeometry->IsValidTimeStep(this->GetTimestep())))
   {
     return;
@@ -187,19 +187,19 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
     timestep = dataTimeGeometry->TimePointToTimeStep(time);
 
   vtkSmartPointer<vtkPolyData> inputPolyData = surface->GetVtkPolyData(timestep);
-  if ((inputPolyData == NULL) || (inputPolyData->GetNumberOfPoints() < 1))
+  if ((inputPolyData == nullptr) || (inputPolyData->GetNumberOfPoints() < 1))
     return;
 
   // apply color and opacity read from the PropertyList
   this->ApplyAllProperties(renderer);
 
   const PlaneGeometry *planeGeometry = renderer->GetCurrentWorldPlaneGeometry();
-  if ((planeGeometry == NULL) || (!planeGeometry->IsValid()) || (!planeGeometry->HasReferenceGeometry()))
+  if ((planeGeometry == nullptr) || (!planeGeometry->IsValid()) || (!planeGeometry->HasReferenceGeometry()))
   {
     return;
   }
 
-  if (localStorage->m_Actor->GetMapper() == NULL)
+  if (localStorage->m_Actor->GetMapper() == nullptr)
     localStorage->m_Actor->SetMapper(localStorage->m_Mapper);
 
   double origin[3];
@@ -236,7 +236,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   }
   else
   {
-    localStorage->m_NormalGlyph->SetInputConnection(NULL);
+    localStorage->m_NormalGlyph->SetInputConnection(nullptr);
     localStorage->m_PropAssembly->RemovePart(localStorage->m_NormalActor);
   }
 
@@ -257,7 +257,7 @@ void mitk::SurfaceVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   }
   else
   {
-    localStorage->m_ReverseSense->SetInputConnection(NULL);
+    localStorage->m_ReverseSense->SetInputConnection(nullptr);
     localStorage->m_PropAssembly->RemovePart(localStorage->m_InverseNormalActor);
   }
 }
@@ -280,7 +280,7 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer *renderer)
 {
   const DataNode *node = GetDataNode();
 
-  if (node == NULL)
+  if (node == nullptr)
   {
     return;
   }

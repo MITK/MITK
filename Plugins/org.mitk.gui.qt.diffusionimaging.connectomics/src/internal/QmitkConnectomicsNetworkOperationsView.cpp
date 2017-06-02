@@ -178,7 +178,7 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
     return;
   }
 
@@ -211,13 +211,13 @@ void QmitkConnectomicsNetworkOperationsView::OnConvertToRGBAImagePushButtonClick
     }
     else
     {
-      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+      QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
       return;
     }
   }
   else
   {
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
     return;
   }
 }
@@ -232,7 +232,7 @@ void QmitkConnectomicsNetworkOperationsView::OnAssignFreeSurferColorsPushButtonC
   if (!node)
   {
     // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
     return;
   }
 
@@ -264,13 +264,13 @@ void QmitkConnectomicsNetworkOperationsView::OnAssignFreeSurferColorsPushButtonC
     }
     else
     {
-      QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+      QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
       return;
     }
   }
   else
   {
-    QMessageBox::information( NULL, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
+    QMessageBox::information( nullptr, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_CONNECTOMICS, mitk::ConnectomicsConstantsManager::CONNECTOMICS_GUI_ONLY_PARCELLATION_SELECTION_WARNING);
     return;
   }
 }
@@ -406,7 +406,7 @@ void QmitkConnectomicsNetworkOperationsView::OnModularizePushButtonClicked()
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
-    QMessageBox::information( NULL, "Modularization calculation", "Please select exactly one network.");
+    QMessageBox::information( nullptr, "Modularization calculation", "Please select exactly one network.");
     return;
   }
 
@@ -471,7 +471,7 @@ void QmitkConnectomicsNetworkOperationsView::OnPrunePushButtonClicked()
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
-    QMessageBox::information( NULL, "Network pruning", "Please select one or more networks.");
+    QMessageBox::information( nullptr, "Network pruning", "Please select one or more networks.");
     return;
   }
 
@@ -532,7 +532,7 @@ void QmitkConnectomicsNetworkOperationsView::OnCreateConnectivityMatrixImagePush
   QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
   if ( nodes.empty() )
   {
-    QMessageBox::information( NULL, "Connectivity Matrix Image creation", "Please select one or more networks.");
+    QMessageBox::information( nullptr, "Connectivity Matrix Image creation", "Please select one or more networks.");
     return;
   }
 

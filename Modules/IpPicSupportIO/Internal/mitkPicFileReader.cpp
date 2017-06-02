@@ -54,7 +54,7 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
 
   std::string fileName = this->GetLocalFileName();
 
-  mitkIpPicDescriptor *header = mitkIpPicGetHeader(const_cast<char *>(fileName.c_str()), NULL);
+  mitkIpPicDescriptor *header = mitkIpPicGetHeader(const_cast<char *>(fileName.c_str()), nullptr);
 
   if (!header)
   {
@@ -66,7 +66,7 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
   int channels = 1;
 
   mitkIpPicTSV_t *tsv;
-  if ((tsv = mitkIpPicQueryTag(header, "SOURCE HEADER")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(header, "SOURCE HEADER")) != nullptr)
   {
     if (tsv->n[0] > 1e+06)
     {
@@ -75,19 +75,19 @@ mitk::Image::Pointer mitk::PicFileReader::CreateImage()
       mitkIpPicFreeTag(tsvSH);
     }
   }
-  if ((tsv = mitkIpPicQueryTag(header, "ICON80x80")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(header, "ICON80x80")) != nullptr)
   {
     mitkIpPicTSV_t *tsvSH;
     tsvSH = mitkIpPicDelTag(header, "ICON80x80");
     mitkIpPicFreeTag(tsvSH);
   }
-  if ((tsv = mitkIpPicQueryTag(header, "VELOCITY")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(header, "VELOCITY")) != nullptr)
   {
     ++channels;
     mitkIpPicDelTag(header, "VELOCITY");
   }
 
-  if (header == NULL || header->bpe == 0)
+  if (header == nullptr || header->bpe == 0)
   {
     mitkThrow() << " Could not read file " << fileName;
   }
@@ -128,7 +128,7 @@ void mitk::PicFileReader::ConvertHandedness(mitkIpPicDescriptor *pic)
   // left to right handed conversion
   if (pic->dim >= 3)
   {
-    mitkIpPicDescriptor *slice = mitkIpPicCopyHeader(pic, NULL);
+    mitkIpPicDescriptor *slice = mitkIpPicCopyHeader(pic, nullptr);
     slice->dim = 2;
     size_t size = _mitkIpPicSize(slice);
     slice->data = malloc(size);
@@ -169,7 +169,7 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
   ConvertHandedness(pic);
 
   mitkIpPicTSV_t *tsv;
-  if ((tsv = mitkIpPicQueryTag(pic, "SOURCE HEADER")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(pic, "SOURCE HEADER")) != nullptr)
   {
     if (tsv->n[0] > 1e+06)
     {
@@ -178,19 +178,19 @@ void mitk::PicFileReader::FillImage(Image::Pointer output)
       mitkIpPicFreeTag(tsvSH);
     }
   }
-  if ((tsv = mitkIpPicQueryTag(pic, "ICON80x80")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(pic, "ICON80x80")) != nullptr)
   {
     mitkIpPicTSV_t *tsvSH;
     tsvSH = mitkIpPicDelTag(pic, "ICON80x80");
     mitkIpPicFreeTag(tsvSH);
   }
-  if ((tsv = mitkIpPicQueryTag(pic, "VELOCITY")) != NULL)
+  if ((tsv = mitkIpPicQueryTag(pic, "VELOCITY")) != nullptr)
   {
-    mitkIpPicDescriptor *header = mitkIpPicCopyHeader(pic, NULL);
+    mitkIpPicDescriptor *header = mitkIpPicCopyHeader(pic, nullptr);
     header->data = tsv->value;
     ConvertHandedness(header);
     output->SetChannel(header->data, 1);
-    header->data = NULL;
+    header->data = nullptr;
     mitkIpPicFree(header);
     mitkIpPicDelTag(pic, "VELOCITY");
   }

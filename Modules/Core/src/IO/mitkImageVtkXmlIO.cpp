@@ -73,7 +73,7 @@ namespace mitk
     }
     reader->Update();
 
-    if (reader->GetOutput() != NULL)
+    if (reader->GetOutput() != nullptr)
     {
       mitk::Image::Pointer output = mitk::Image::New();
       output->Initialize(reader->GetOutput());
@@ -92,7 +92,7 @@ namespace mitk
   {
     if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
       return Unsupported;
-    if (this->GetInputStream() == NULL)
+    if (this->GetInputStream() == nullptr)
     {
       // check if the xml vtk reader can handle the file
       vtkSmartPointer<VtkXMLImageDataReader> xmlReader = vtkSmartPointer<VtkXMLImageDataReader>::New();
@@ -123,7 +123,7 @@ namespace mitk
       writer->SetFileName(this->GetOutputLocation().c_str());
     }
 
-    ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), NULL, input->GetVtkImageData());
+    ImageVtkReadAccessor vtkReadAccessor(Image::ConstPointer(input), nullptr, input->GetVtkImageData());
     writer->SetInputData(const_cast<vtkImageData *>(vtkReadAccessor.GetVtkImageData()));
 
     if (writer->Write() == 0 || writer->GetErrorCode() != 0)

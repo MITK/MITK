@@ -71,7 +71,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
   // copy the input (since m_WorkingImage will be changed later)
   m_WorkingImage = inputImage;
 
-  TimeGeometry::Pointer originalGeometry = NULL;
+  TimeGeometry::Pointer originalGeometry = nullptr;
 
   if (inputImage->GetTimeGeometry())
   {

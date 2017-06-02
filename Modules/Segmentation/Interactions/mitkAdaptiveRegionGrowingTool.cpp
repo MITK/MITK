@@ -44,12 +44,12 @@ mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
 
 bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData *referenceData) const
 {
-  if (referenceData == NULL)
+  if (referenceData == nullptr)
     return false;
 
   Image *image = dynamic_cast<Image *>(referenceData);
 
-  if (image == NULL)
+  if (image == nullptr)
     return false;
 
   if (image->GetDimension() < 3)
@@ -60,7 +60,7 @@ bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData *referenceData) const
 
 const char **mitk::AdaptiveRegionGrowingTool::GetXPM() const
 {
-  return NULL;
+  return nullptr;
 }
 
 const char *mitk::AdaptiveRegionGrowingTool::GetName() const
